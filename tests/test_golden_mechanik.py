@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+import hashlib
 import importlib
+import json
+import shutil
 import sys
 from datetime import UTC, datetime
 from pathlib import Path
@@ -160,3 +163,82 @@ def test_schalter_ausfall_verweigert_einen_lauf_mit_antwort():
     with pytest.raises(SystemExit, match="hat geantwortet"):
         golden_aufnehmen.llm_pruefen(beantwortet, llm_ausfall=True)
     golden_aufnehmen.llm_pruefen(beantwortet, llm_ausfall=False)
+
+
+GOLDEN = Path(__file__).resolve().parent / "fixtures" / "golden"
+AUFNAHME = max(p for p in GOLDEN.iterdir() if p.is_dir())
+waechter_vertraege = importlib.import_module("waechter_vertraege")
+
+
+def _kopie(tmp_path) -> Path:
+    ziel = tmp_path / "wurzel" / "tests" / "fixtures" / "golden" / AUFNAHME.name
+    shutil.copytree(AUFNAHME, ziel)
+    return ziel
+
+
+def _seiten_neu(monkeypatch, ordner: Path, seiten: dict[str, str]) -> list[str]:
+    monkeypatch.setattr(golden_aufnehmen, "wiedergaben", lambda _: seiten)
+    return golden_aufnehmen.seiten_neu(ordner)
+
+
+def test_seiten_neu_schreibt_nur_erwartet_und_seinen_sha256(tmp_path, monkeypatch):
+    ordner = _kopie(tmp_path)
+    vorher = {p: p.read_bytes() for p in ordner.rglob("*") if p.is_file()}
+    erwartet = json.loads((ordner / "erwartet.json").read_text(encoding="utf-8"))
+    seiten = {**erwartet, "geraete.html": "neu"}
+    del seiten["index.html"]
+
+    geaendert = _seiten_neu(monkeypatch, ordner, seiten)
+
+    assert geaendert == ["geraete.html", "index.html"]
+    neu = json.loads((ordner / "erwartet.json").read_text(encoding="utf-8"))
+    assert neu == seiten
+    anders = sorted(p.name for p, roh in vorher.items() if p.read_bytes() != roh)
+    assert anders == ["_herkunft.json", "erwartet.json"]
+    alt_herkunft = json.loads(vorher[ordner / "_herkunft.json"])
+    neu_herkunft = json.loads((ordner / "_herkunft.json").read_text(encoding="utf-8"))
+    sha = hashlib.sha256((ordner / "erwartet.json").read_bytes()).hexdigest()
+    for eintrag in alt_herkunft["eintraege"]:
+        if eintrag["datei"] == "erwartet.json":
+            eintrag["sha256_roh"] = sha
+    assert neu_herkunft == alt_herkunft
+    assert waechter_vertraege.fixture_herkunft(tmp_path / "wurzel") == []
+
+
+def test_gleiche_seiten_lassen_die_aufnahme_unberuehrt(tmp_path, monkeypatch):
+    ordner = _kopie(tmp_path)
+    vorher = {p: p.read_bytes() for p in ordner.rglob("*") if p.is_file()}
+    erwartet = json.loads((ordner / "erwartet.json").read_text(encoding="utf-8"))
+
+    assert _seiten_neu(monkeypatch, ordner, erwartet) == []
+
+    assert all(p.read_bytes() == roh for p, roh in vorher.items())
+
+
+def test_von_hand_geaenderte_seite_ohne_sha256_ist_in_stufe_0_rot(tmp_path):
+    ordner = _kopie(tmp_path)
+    datei = ordner / "erwartet.json"
+    zeilen = datei.read_text(encoding="utf-8").splitlines(keepends=True)
+    zeilen[1] = zeilen[1].replace('": "', '": "0', 1)
+    datei.write_text("".join(zeilen), encoding="utf-8")
+
+    meldungen = waechter_vertraege.fixture_herkunft(tmp_path / "wurzel")
+
+    assert meldungen == [
+        f"tests/fixtures/golden/{AUFNAHME.name}/erwartet.json: sha256 weicht vom"
+        " Eintrag in _herkunft.json ab"
+    ]
+
+
+def test_ableiten_behaelt_alte_luecken_die_noch_angefragt_werden():
+    neu = golden.Band()
+    neu.merke(("GET", QUELLE, "radar", "0"), {"fehler": "ConnectError"})
+    alt = [
+        f"HTTP-Antwort für GET {QUELLE} fehlt, {golden.HINWEIS}",
+        f"HTTP-Antwort für GET https://weg.example/rss fehlt, {golden.HINWEIS}",
+    ]
+    fehlend = [f"HTTP-Antwort für GET https://neu.example/a,b fehlt, {golden.HINWEIS}"]
+
+    luecken = golden_aufnehmen.luecken_vereinigen(alt, fehlend, neu)
+
+    assert luecken == sorted([alt[0], fehlend[0]])

@@ -67,7 +67,9 @@ def _ausfuehren(
     return subprocess.CompletedProcess(befehl, lauf.returncode, aus, fehler)
 
 
-def leiter(wurzel: Path, ort: Path, art: str, basen: str) -> tuple[int, str]:
+def leiter(
+    wurzel: Path, ort: Path, art: str, basen: tuple[str, ...]
+) -> tuple[int, str]:
     """Führt die Prüfleiter mit dem Python des Hauptbaums in ``ort`` aus.
 
     Außerhalb des Hauptbaums stehen die Basen danach wieder auf dem Commit, weil
@@ -76,5 +78,6 @@ def leiter(wurzel: Path, ort: Path, art: str, basen: str) -> tuple[int, str]:
     python = str(wurzel / ".venv/bin/python")
     lauf = starten([python, "scripts/pruefleiter.py", f"--{art}"], ort)
     if ort != wurzel:
-        starten(["git", "checkout", "-q", "--", basen], ort)
+        for basis in basen:
+            starten(["git", "checkout", "-q", "--", basis], ort)
     return lauf.returncode, lauf.stdout + lauf.stderr

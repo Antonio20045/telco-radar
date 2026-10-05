@@ -130,6 +130,11 @@ def blobs(ort: Path, pfade: list[str]) -> dict[str, str]:
     return stand
 
 
+def anders(ort: Path, stand: dict[str, str]) -> list[str]:
+    """Pfade, deren Blob nicht mehr dem in ``stand`` gleicht."""
+    return [p for p, b in blobs(ort, [*stand]).items() if b != stand[p]]
+
+
 def genau_committen(ort: Path, titel: str, stand: dict[str, str]) -> str:
     """Committet genau die Blobs aus ``stand`` auf HEAD, ohne Haken, und prüft nach."""
     if not stand:

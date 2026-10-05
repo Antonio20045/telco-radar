@@ -180,3 +180,12 @@ def verbrauch(bericht: object) -> dict[str, object]:
         "token_aus": zahl(nutzung, "output_tokens"),
         "modell": " ".join(sorted(modelle)) if isinstance(modelle, dict) else "",
     }
+
+
+def commit_titel(auftrag: dict, nachricht: Path, rot: Path, zusatz: str) -> str:
+    """Titel des Auftragscommits: Nachricht des Baus, roter Beleg, ``zusatz``."""
+    titel = nachricht.read_text("utf-8").strip() if nachricht.is_file() else ""
+    titel = titel or f"auftrag({auftrag['id']}): {auftrag['ziel']}"
+    if rot.is_file():
+        titel += f"\n\nAbnahmetest vor dem Bau rot:\n{rot.read_text('utf-8')}"
+    return titel + zusatz

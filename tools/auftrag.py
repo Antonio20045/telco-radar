@@ -32,6 +32,8 @@ git_ = importlib.import_module("auftrag_git")
 prozess_ = importlib.import_module("auftrag_prozess")
 zaun_ = importlib.import_module("auftrag_zaun")
 mutation_ = importlib.import_module("mutation")
+golden_ = importlib.import_module("auftrag_golden")
+basen_ = importlib.import_module("auftrag_basen")
 AUFTRAEGE, KOSTEN, GEMERGT = format_.AUFTRAEGE, format_.KOSTEN, format_.GEMERGT
 
 RUNDEN = 2
@@ -50,7 +52,7 @@ LAUFDATEIEN = {
     "TELCO_AUFTRAG": "auftrag.json",
 }
 ROT_BELEG = "rot.txt"
-BASEN = "pruef/"
+BASEN = basen_.BASEN
 SPERRE = "main.sperre"
 FACHLICH = re.compile(r"\bAssertionError\b|\bFailed: |^.+?:\d+: assert ")
 GRUEN = 0
@@ -193,7 +195,9 @@ def _agent(
 def _ausserhalb(lauf: Lauf, rolle: str) -> str:
     alt, neu = git_.geaendert(lauf.wt, lauf.start)
     ziel = rolle_.Ziel(rolle, lauf.auftrag["bereich"], lauf.auftrag["abnahme"])
-    fremd = [p for p in alt + neu if rolle_.verstoss(ziel, lauf.wt, Path(p), p in neu)]
+    pfade = golden_.ohne_frei(lauf, rolle, alt + neu)
+    pfade, fremd = basen_.bereinigen(lauf.wt, lauf.start, pfade)
+    fremd += [p for p in pfade if rolle_.verstoss(ziel, lauf.wt, Path(p), p in neu)]
     if git_.kopf(lauf.wt) != (f"refs/heads/{ZWEIG}{lauf.auftrag['id']}", lauf.start):
         fremd.append("HEAD (eigener Commit oder Zweig)")
     if zaun := zaun_.verletzt(lauf.zaun, zaun_.stand(lauf.wt, lauf.wurzel)):
@@ -246,34 +250,31 @@ def _commit(lauf: Lauf, titel: str, dateien: list[str]) -> str:
 
 
 def _urteil(lauf: Lauf, runde: int, code: int, summe: dict[str, str]) -> str:
-    alt, neu = git_.geaendert(lauf.wt, lauf.start)
-    geprueft = git_.blobs(lauf.wt, [*alt, *neu])
-    zeilen = git_.produktzeilen(lauf.wt, lauf.start)
     if code:
         return f"Agent Exit {code}"
     if anders := git_.veraendert(lauf.wt, summe):
         return f"Abnahmetest geändert oder gelöscht: {', '.join(anders)}"
     if fremd := _ausserhalb(lauf, "bau"):
         return fremd
+    alt, neu = git_.geaendert(lauf.wt, lauf.start)
+    geprueft = git_.blobs(lauf.wt, [*alt, *neu])
+    zeilen = git_.produktzeilen(lauf.wt, lauf.start)
     if zeilen > DIFF_GRENZE:
         return f"{zeilen} Zeilen Produktcode, höchstens {DIFF_GRENZE}"
     code, ausgabe = _abnahme(lauf)
     if code != GRUEN:
         return f"Abnahmetest rot (Exit {code})\n{_tail(ausgabe)}"
+    if befund := golden_.fuer_auftrag(lauf, geprueft):
+        return befund
     stufen = ((a, *_leiter(lauf.wurzel, lauf.wt, a)) for a in ("schnell", "statisch"))
     if rot := next((r for r in stufen if r[1] != GRUEN), None):
         return f"{rot[0]}e Leiter rot (Exit {rot[1]})\n{_tail(rot[2])}"
     if befund := _pruefer(lauf, runde) or _ausserhalb(lauf, "bau"):
         return befund
     nachricht = lauf.datei(LAUFDATEIEN["TELCO_COMMIT_NACHRICHT"])
-    rot = lauf.datei(ROT_BELEG)
-    titel = nachricht.read_text("utf-8").strip() if nachricht.is_file() else ""
-    titel = titel or f"auftrag({lauf.auftrag['id']}): {lauf.auftrag['ziel']}"
-    if rot.is_file():
-        titel += f"\n\nAbnahmetest vor dem Bau rot:\n{rot.read_text('utf-8')}"
-    if anders := [
-        p for p, b in git_.blobs(lauf.wt, alt + neu).items() if b != geprueft[p]
-    ]:
+    seiten = golden_.titel(lauf.datei(golden_.PROTOKOLL))
+    titel = format_.commit_titel(lauf.auftrag, nachricht, lauf.datei(ROT_BELEG), seiten)
+    if anders := git_.anders(lauf.wt, geprueft):
         return f"während der Prüfung geändert: {', '.join(anders)}"
     return _tail(git_.genau_committen(lauf.wt, titel, geprueft))
 
@@ -353,7 +354,7 @@ def _ablauf(lauf: Lauf) -> tuple[Ende, list[str]]:
 def ausfuehren(lauf: Lauf) -> Ende:
     """Führt einen startbereiten Auftrag aus und gibt seinen Ausgang zurück."""
     lauf.datei("").mkdir(parents=True, exist_ok=True)
-    for alt in [*LAUFDATEIEN.values(), ROT_BELEG]:
+    for alt in [*LAUFDATEIEN.values(), ROT_BELEG, golden_.PROTOKOLL]:
         lauf.datei(alt).unlink(missing_ok=True)
     text = json.dumps(lauf.auftrag, ensure_ascii=False, indent=1)
     lauf.datei(LAUFDATEIEN["TELCO_AUFTRAG"]).write_text(text, "utf-8")

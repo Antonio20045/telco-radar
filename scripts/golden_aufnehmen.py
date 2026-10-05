@@ -8,7 +8,10 @@ in frischen Prozessen ohne Lücke dieselben Seiten ergeben; erst dann entsteht
 jede Anfrage ab, bricht die Aufnahme ab; nur ``--llm-ausfall`` nimmt diesen Weg
 ausdrücklich auf und vermerkt ihn in ``_herkunft.json``. ``--ableiten ALT`` nimmt
 ohne Netz aus der Aufnahme ALT neu auf, wenn sich der Code geändert hat; was ALT
-nicht kennt, landet als Verbindungsfehler und unter ``luecken``. Läuft mit
+nicht kennt, landet als Verbindungsfehler und unter ``luecken``; alte Lücken, die
+der neue Lauf noch anfragt, bleiben stehen. ``--seiten-neu ORDNER`` schreibt nach
+zwei gleichen Wiedergaben nur ``erwartet.json`` und dessen sha256 neu, die Bänder
+bleiben byte-gleich, und gibt die geänderten Seiten als JSON-Liste aus. Läuft mit
 ``PYTHONPATH=src``.
 """
 
@@ -235,9 +238,24 @@ def ableiten(alt: Path, ordner: Path) -> None:
     }
     uhr = datetime.fromisoformat(angaben["zeit"])
     aufnehmen(ordner, uhr, http.Wiedergabe(netz), abgelehnt, True, zusatz)
-    angaben = {**golden.herkunft(ordner), "luecken": sorted(set(netz.fehlend))}
+    neu = golden.lies_band(ordner / golden.HTTP_DATEI)
+    luecken = luecken_vereinigen(angaben.get("luecken", []), netz.fehlend, neu)
+    angaben = {**golden.herkunft(ordner), "luecken": luecken}
     alt_filter = golden.herkunft(ordner / "config")["eintraege"]
     schreibe_herkunft(ordner, angaben, {e["datei"]: e["filter"] for e in alt_filter})
+
+
+def luecken_vereinigen(
+    alt: list[str], fehlend: list[str], neu: golden.Band
+) -> list[str]:
+    """Neue Lücken und die alten, deren Anfrage der neue Lauf noch stellt.
+
+    Eine alte Lücke steht im abgeleiteten Band als Verbindungsfehler und gilt der
+    nächsten Ableitung als vorhanden; ohne diese Vereinigung ginge sie verloren.
+    """
+    angefragt = {f"HTTP-Antwort für {k[0]} {k[1]}" for k in neu.eintraege}
+    bleiben = {e for e in alt if e.partition(" fehlt, ")[0] in angefragt}
+    return sorted(set(fehlend) | bleiben)
 
 
 def pruefen(ordner: Path) -> dict[str, str]:
@@ -259,8 +277,8 @@ def pruefen(ordner: Path) -> dict[str, str]:
         return golden.seiten(wurzel)
 
 
-def freigeben(ordner: Path) -> None:
-    """Zwei Wiedergaben in eigenen Prozessen; nur gleiche Seiten werden erwartet."""
+def wiedergaben(ordner: Path) -> dict[str, str]:
+    """Zwei Wiedergaben in eigenen Prozessen; nur gleiche Seiten zählen."""
     umgebung = {
         k: v
         for k, v in os.environ.items()
@@ -282,11 +300,43 @@ def freigeben(ordner: Path) -> None:
     )
     if abweichend or ergebnisse[0].keys() != ergebnisse[1].keys():
         sys.exit("Wiedergaben weichen ab: " + ", ".join(abweichend[:20]))
-    text = json.dumps(ergebnisse[0], indent=1, sort_keys=True)
+    return ergebnisse[0]
+
+
+def _erwartet_schreiben(ordner: Path, seiten: dict[str, str]) -> None:
+    text = json.dumps(seiten, indent=1, sort_keys=True)
     (ordner / ERWARTET).write_text(text + "\n", encoding="utf-8")
+
+
+def freigeben(ordner: Path) -> None:
+    """Schreibt ``erwartet.json`` aus zwei gleichen Wiedergaben und die Herkunft."""
+    _erwartet_schreiben(ordner, wiedergaben(ordner))
     angaben = golden.herkunft(ordner)
     alt = golden.herkunft(ordner / "config")["eintraege"]
     schreibe_herkunft(ordner, angaben, {e["datei"]: e["filter"] for e in alt})
+
+
+def seiten_neu(ordner: Path) -> list[str]:
+    """Neue Seiten aus der bestehenden Aufnahme; gibt die geänderten Pfade zurück.
+
+    Nur ``erwartet.json`` und sein sha256 in ``_herkunft.json`` ändern sich; Bänder,
+    Konfiguration und alle übrigen Angaben der Herkunft bleiben, wie sie sind.
+    """
+    neu = wiedergaben(ordner)
+    alt = json.loads((ordner / ERWARTET).read_text(encoding="utf-8"))
+    geaendert = sorted(p for p in alt.keys() | neu.keys() if alt.get(p) != neu.get(p))
+    if not geaendert:
+        return []
+    _erwartet_schreiben(ordner, neu)
+    pfad = ordner / golden.HERKUNFT
+    herkunft = json.loads(pfad.read_text(encoding="utf-8"))
+    roh = (ordner / ERWARTET).read_bytes()
+    for eintrag in herkunft["eintraege"]:
+        if eintrag["datei"] == ERWARTET:
+            eintrag["sha256_roh"] = hashlib.sha256(roh).hexdigest()
+    text = json.dumps(herkunft, indent=1, sort_keys=True, ensure_ascii=False)
+    pfad.write_text(text + "\n", encoding="utf-8")
+    return geaendert
 
 
 def main() -> int:
@@ -294,9 +344,13 @@ def main() -> int:
     parser.add_argument("--pruefen", type=Path, help="nur wiedergeben, Seiten als JSON")
     parser.add_argument("--llm-ausfall", action="store_true", help=LLM_AUSFALL)
     parser.add_argument("--ableiten", type=Path, help="ohne Netz aus dieser Aufnahme")
+    parser.add_argument("--seiten-neu", type=Path, help="nur erwartet.json neu")
     args = parser.parse_args()
     if args.pruefen:
         print(json.dumps(pruefen(args.pruefen), sort_keys=True))
+        return 0
+    if args.seiten_neu:
+        print(json.dumps(seiten_neu(args.seiten_neu.resolve()), ensure_ascii=False))
         return 0
     if args.ableiten:
         if not args.llm_ausfall:
