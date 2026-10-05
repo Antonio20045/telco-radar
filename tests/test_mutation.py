@@ -210,4 +210,7 @@ def test_stand_schritt_6_verlangt_eine_mutationsprobe_mit_zeit_oder_grund(
 def test_probe_nennt_einen_git_fehler_statt_abzubrechen(tmp_path):
     probe = mutation.probe(tmp_path, "HEAD~1", tmp_path / "mutation.log")
 
-    assert probe.ergebnis.startswith("entfällt: git diff scheiterte"), probe.ergebnis
+    assert probe.ergebnis.startswith("gescheitert: git diff"), probe.ergebnis
+    stand = importlib.import_module("stand")
+    zeile = {"ergebnis": probe.ergebnis, "sekunden": str(probe.sekunden)}
+    assert not stand._probe_belegt(zeile), "ein git-Fehler belegt keine Probe"

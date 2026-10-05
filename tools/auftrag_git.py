@@ -5,12 +5,11 @@ from __future__ import annotations
 import fcntl
 import hashlib
 import importlib
-import os
 import posixpath
-import subprocess
 from collections.abc import Iterable, Iterator
 from contextlib import contextmanager
 from pathlib import Path
+from unicodedata import normalize
 
 pruefstempel = importlib.import_module("pruefstempel")
 
@@ -82,7 +81,9 @@ def stand(ort: Path, basis: str) -> tuple[object, ...]:
 def committen(ort: Path, titel: str, pfade: list[str]) -> None:
     """Committet genau ``pfade``; anderes Gestagtes bleibt draußen."""
     _git(ort, "add", "--", *pfade)
-    _git(ort, "commit", "-q", "-m", titel, "--", *pfade)
+    _git(
+        ort, "-c", "core.hooksPath=/dev/null", "commit", "-q", "-m", titel, "--", *pfade
+    )
 
 
 def veraendert(ort: Path, summen: dict[str, str]) -> list[str]:
@@ -91,21 +92,23 @@ def veraendert(ort: Path, summen: dict[str, str]) -> list[str]:
 
 
 def genau_committen(ort: Path, titel: str, pfade: list[str]) -> str:
-    """Committet genau ``pfade`` auf HEAD; sonst der Grund samt Ausgabe."""
-    _git(ort, "read-tree", "HEAD")
+    """Committet genau ``pfade`` auf HEAD ohne Git-Haken und prüft Eltern und Baum."""
+    if not pfade:
+        return "Commit abgelehnt: keine geprüfte Änderung"
+    alt = kopf(ort)[1]
+    _git(ort, "read-tree", alt)
     _git(ort, "add", "--", *pfade)
-    umgebung = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
-    befehl = ["git", "commit", "-q", "-m", titel]
-    lauf = subprocess.run(befehl, cwd=ort, env=umgebung, capture_output=True, text=True)
-    if lauf.returncode:
-        return f"Commit abgelehnt (Exit {lauf.returncode})\n{lauf.stdout}{lauf.stderr}"
-    drin = _git(ort, "diff", "-z", "--name-only", "--no-renames", "HEAD~1", "HEAD")
+    baum = _git(ort, "write-tree").strip()
+    neu = _git(ort, "commit-tree", baum, "-p", alt, "-m", titel).strip()
+    _git(ort, "update-ref", "-m", titel, "HEAD", neu, alt)
+    drin = _git(ort, "diff", "-z", "--name-only", "--no-renames", alt, neu)
     if abweichung := sorted({p for p in drin.split("\0") if p} ^ set(pfade)):
         return f"Commit weicht von den geprüften Pfaden ab: {', '.join(abweichung)}"
-    return ""
+    ist = _git(ort, "rev-parse", "HEAD^", "HEAD^{tree}").split()
+    return "" if ist == [alt, baum] else f"HEAD nach dem Commit ist nicht {neu[:7]}"
 
 
 def ueberschneiden(eins: str, zwei: str) -> bool:
-    """Ob zwei Bereiche denselben Pfad treffen, nach Normalisierung."""
-    a, b = posixpath.normpath(eins), posixpath.normpath(zwei)
+    """Ob zwei Bereiche denselben Pfad treffen, auch auf Dateisystemen wie macOS."""
+    a, b = (posixpath.normpath(normalize("NFC", x).casefold()) for x in (eins, zwei))
     return a == b or a.startswith(b + "/") or b.startswith(a + "/")

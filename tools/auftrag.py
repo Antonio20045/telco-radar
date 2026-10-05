@@ -156,13 +156,13 @@ def _ausfuehren(befehl: list[str], ort: Path) -> tuple[int, str]:
     return lauf.returncode, lauf.stdout + lauf.stderr
 
 
-def _leiter(ort: Path, art: str) -> tuple[int, str]:
-    python = str(ort / ".venv/bin/python")
+def _leiter(wurzel: Path, ort: Path, art: str) -> tuple[int, str]:
+    python = str(wurzel / ".venv/bin/python")
     return _ausfuehren([python, "scripts/pruefleiter.py", f"--{art}"], ort)
 
 
 def _abnahme(lauf: Lauf) -> tuple[int, str]:
-    python = str(lauf.wt / ".venv/bin/python")
+    python = str(lauf.wurzel / ".venv/bin/python")
     befehl = [python, "-m", "pytest", "-q", "--tb=line", "-p", "no:cacheprovider"]
     return _ausfuehren([*befehl, lauf.auftrag["abnahme"]], lauf.wt)
 
@@ -265,7 +265,7 @@ def _urteil(lauf: Lauf, runde: int, code: int, summe: dict[str, str]) -> str:
     code, ausgabe = _abnahme(lauf)
     if code != GRUEN:
         return f"Abnahmetest rot (Exit {code})\n{_tail(ausgabe)}"
-    code, ausgabe = _leiter(lauf.wt, "schnell")
+    code, ausgabe = _leiter(lauf.wurzel, lauf.wt, "schnell")
     if code != GRUEN:
         return f"schnelle Leiter rot (Exit {code})\n{_tail(ausgabe)}"
     if befund := _pruefer(lauf, runde):
@@ -289,7 +289,8 @@ def _bauphase(lauf: Lauf) -> tuple[Ende, list[str]]:
             return Ende.VORAUSSETZUNG, [voraussetzung.read_text("utf-8").strip()]
         befunde.append(_urteil(lauf, runde, code, summe))
         if not befunde[-1]:
-            p = mutation_.probe(lauf.wt, lauf.start, lauf.datei("mutation.log"))
+            log = lauf.datei("mutation.log")
+            p = mutation_.probe(lauf.wt, lauf.start, log, haupt=lauf.wurzel)
             _zeile(lauf, "mutation", 0, p.exit, agent="mutmut", **p.spalten())
             return Ende.GEMERGT, []
     return Ende.NOTIZ, befunde[1:]
@@ -320,7 +321,7 @@ def _unter_sperre(lauf: Lauf) -> tuple[Ende, list[str]]:
     if code:
         return Ende.NOTIZ, [f"merge --ff-only gescheitert\n{_tail(ausgabe)}"]
     gemergt = git_.kopf(lauf.wurzel)[1]
-    code, ausgabe = _leiter(lauf.wurzel, "voll")
+    code, ausgabe = _leiter(lauf.wurzel, lauf.wurzel, "voll")
     basen = git_.schmutz(lauf.wurzel, frei)
     if code != GRUEN or (fremd := [p for p in basen if not p.startswith(BASEN)]):
         grund = f"Leiter änderte {', '.join(fremd)}" if not code else "Leiter rot"

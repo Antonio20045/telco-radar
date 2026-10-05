@@ -136,6 +136,8 @@ else:
         haupt = Path(os.environ["TELCO_AUFTRAG"]).parents[3]
         (haupt / "scripts/pruefleiter.py").write_text("raise SystemExit(0)\\n")
         subprocess.run(["git", "-C", str(haupt), "commit", "-qam", "Agent"], check=True)
+    if modus == "python":
+        Path(".venv/bin/python").write_text("#!/bin/sh\\nexit 0\\n")
     if modus == "gestaged":
         for name in ("src/telco_radar/sonst.py", "tests/test_alt.py"):
             Path(name).write_text("X = 1\\n")
@@ -145,7 +147,7 @@ else:
         notiz = Path(os.environ["TELCO_AUFTRAG"]).parents[3] / "outputs/auftraege"
         notiz.mkdir(parents=True, exist_ok=True)
         (notiz / "B1-notiz.md").write_text("Notiz eines parallelen Auftrags")
-    faktor = {"rot": 3, "umbau": 1}.get(modus, 2)
+    faktor = {"rot": 3, "umbau": 1, "python": 3}.get(modus, 2)
     kern.write_text(f"def verdopple(x):\\n    return x * {faktor}\\n")
     Path(os.environ["TELCO_COMMIT_NACHRICHT"]).write_text("rechnen: verdopple richtig")
     if modus == "gross":
@@ -728,16 +730,54 @@ def test_gestagte_dateien_ausserhalb_der_pruefung_kommen_nicht_in_den_commit(rep
     assert "x * 2" in _git(repo, "show", "main:src/telco_radar/rechnen/kern.py")
 
 
-def test_commit_mit_anderen_dateien_als_geprueft_ist_rot(repo):
+ANGRIFF = """#!/bin/sh
+marke="$(git rev-parse --git-common-dir)/angriff"
+[ -e "$marke" ] && exit 0
+touch "$marke"
+c=$(git rev-parse HEAD)
+blob=$(printf 'def test_basis():\\n    pass\\n' | git hash-object -w --stdin)
+export GIT_INDEX_FILE="$marke.index"
+git read-tree "$c~1"
+git update-index --add --cacheinfo "100644,$blob,tests/test_basis.py"
+d=$(git commit-tree "$(git write-tree)" -p "$c" -m D)
+git read-tree "$c"
+git update-index --add --cacheinfo "100644,$blob,tests/test_basis.py"
+e=$(git commit-tree "$(git write-tree)" -p "$d" -m E)
+unset GIT_INDEX_FILE
+git reset -q --hard "$e"
+"""
+
+
+@pytest.mark.parametrize("basen", [False, True])
+@pytest.mark.parametrize(
+    ("name", "text"),
+    [
+        ("pre-commit", "#!/bin/sh\necho x > extra.txt\ngit add extra.txt\n"),
+        ("post-commit", ANGRIFF),
+    ],
+)
+def test_git_haken_aendern_den_geprueften_commit_nicht(
+    repo, monkeypatch, name, text, basen
+):
+    if basen:
+        monkeypatch.setenv("ERSATZ_BASIS", "1")
+    basis = _git(repo, "show", "main:tests/test_basis.py")
     haken = Path(_git(repo, "rev-parse", "--git-common-dir"))
-    haken = (haken if haken.is_absolute() else repo / haken) / "hooks/pre-commit"
-    haken.write_text("#!/bin/sh\necho x > extra.txt\ngit add extra.txt\n")
+    haken = (haken if haken.is_absolute() else repo / haken) / "hooks" / name
+    haken.write_text(text)
     haken.chmod(0o755)
 
-    assert _starte(repo) == auftrag.Ende.NOTIZ
+    assert _starte(repo) == auftrag.Ende.GEMERGT
 
-    assert "extra.txt" in (repo / auftrag.AUFTRAEGE / "A1-notiz.md").read_text()
+    assert _git(repo, "show", "main:tests/test_basis.py") == basis
     assert _git(repo, "ls-tree", "main", "extra.txt") == ""
+    assert "x * 2" in _git(repo, "show", "main:src/telco_radar/rechnen/kern.py")
+
+
+def test_ersetztes_python_im_worktree_faelscht_kein_urteil(repo):
+    assert _starte(repo, "python") == auftrag.Ende.NOTIZ
+
+    assert "Abnahmetest rot" in (repo / auftrag.AUFTRAEGE / "A1-notiz.md").read_text()
 
 
 def test_bereich_mit_punkt_im_pfad_ueberschneidet_sich(repo):
@@ -749,3 +789,14 @@ def test_bereich_mit_punkt_im_pfad_ueberschneidet_sich(repo):
     lauf.datei("").parent.joinpath("B1/auftrag.json").write_text(json.dumps(fremd))
 
     assert "Bereich überschneidet sich mit Auftrag B1" in auftrag.sperren(lauf)
+
+
+@pytest.mark.parametrize(
+    ("eins", "zwei"),
+    [
+        ("src/telco_radar/rechnen/", "src/telco_radar/Rechnen/kern.py"),
+        ("src/telco_radar/k\u00e4se.py", "src/telco_radar/ka\u0308se.py"),
+    ],
+)
+def test_bereiche_ueberschneiden_sich_ohne_gross_klein_und_nfd(eins, zwei):
+    assert auftrag.git_.ueberschneiden(eins, zwei)

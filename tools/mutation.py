@@ -149,17 +149,27 @@ def kurzname(mutant: str) -> str:
     return name.removeprefix("x_").removeprefix(f"x{TRENNER}").replace(TRENNER, ".")
 
 
-def probe(ort: Path, basis: str, protokoll: Path, frist: float = FRIST) -> Probe:
-    """Lässt mutmut auf den geänderten Funktionen von ``basis..HEAD`` laufen."""
+def probe(
+    ort: Path,
+    basis: str,
+    protokoll: Path,
+    frist: float = FRIST,
+    haupt: Path | None = None,
+) -> Probe:
+    """Lässt mutmut auf den geänderten Funktionen von ``basis..HEAD`` laufen.
+
+    ``haupt`` ist der Baum, dessen ``.venv`` die Probe nutzt, standardmäßig ``ort``.
+    """
+    python = (ort if haupt is None else haupt) / ".venv/bin/python"
     try:
-        return _probe(ort, basis, protokoll, frist)
+        return _probe(ort, basis, protokoll, frist, str(python))
     except subprocess.CalledProcessError as fehler:
         befehl = " ".join(map(str, fehler.cmd[:2]))
         grund = (fehler.stderr or "").strip()[:120]
-        return Probe(fehler.returncode, 0.0, f"entfällt: {befehl} scheiterte ({grund})")
+        return Probe(fehler.returncode, 0.0, f"gescheitert: {befehl} ({grund})")
 
 
-def _probe(ort: Path, basis: str, protokoll: Path, frist: float) -> Probe:
+def _probe(ort: Path, basis: str, protokoll: Path, frist: float, python: str) -> Probe:
     start = time.monotonic()
 
     def ende(code: int | str, text: str) -> Probe:
@@ -168,7 +178,6 @@ def _probe(ort: Path, basis: str, protokoll: Path, frist: float) -> Probe:
     muster = geaenderte_funktionen(ort, basis)
     if not muster:
         return ende("", "entfällt: keine geänderte Funktion unter src/")
-    python = str(ort / ".venv/bin/python")
     tests = leiter_schnell.betroffene(ort, list(muster)).dateien
     if not tests:
         return ende("", "entfällt: kein Test importiert die geänderten Module")
