@@ -277,7 +277,12 @@ def test_fehlender_stop_hook_und_fehlende_sperre_sind_rot(tmp_path):
 
 
 @pytest.mark.parametrize(
-    "sperre", ["Edit(scripts/claude_rolle.py)", "Edit(.claude/agents/**)"]
+    "sperre",
+    [
+        "Edit(scripts/claude_rolle.py)",
+        "Edit(scripts/claude_rolle_shell.py)",
+        "Edit(.claude/agents/**)",
+    ],
 )
 def test_rollenregel_und_agenten_ohne_sperre_sind_rot(tmp_path, sperre):
     _ordner(tmp_path)

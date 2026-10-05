@@ -40,6 +40,7 @@ PFLICHT_SPERREN = (
     "Edit(.githooks/**)",
     "Edit(.claude/settings.json)",
     "Edit(scripts/claude_rolle.py)",
+    "Edit(scripts/claude_rolle_shell.py)",
     "Edit(.claude/agents/**)",
     "Edit(.importlinter)",
     "Edit(pyproject.toml)",
