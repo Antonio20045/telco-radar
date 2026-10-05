@@ -25,6 +25,7 @@ Struktur und wird fuer den Weg durch die Sammelschicht benutzt.
 """
 
 import json
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
@@ -228,7 +229,13 @@ def test_die_sammelschicht_reicht_die_preisform_durch(katalog, farben):
         ],
     )
     bilanz = sammle_anbieter(
-        anbieter, katalog, farben, hole, "2026-09-03", RobotsWaechter(hole=hole)
+        anbieter,
+        katalog,
+        farben,
+        hole,
+        "2026-09-03",
+        RobotsWaechter(hole=hole),
+        jetzt=datetime(2026, 9, 3, 12, tzinfo=UTC),
     )
     assert len(bilanz.listungen) == 1
     listung = bilanz.listungen[0]

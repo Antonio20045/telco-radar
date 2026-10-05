@@ -58,7 +58,6 @@ src/telco_radar/analyze/competitors.py breite-ausnahme 1
 src/telco_radar/analyze/competitors.py noqa:BLE001 1
 src/telco_radar/analyze/diff_curator.py breite-ausnahme 1
 src/telco_radar/analyze/diff_curator.py noqa:BLE001 1
-src/telco_radar/analyze/geraete_lifecycle.py uhr 2
 src/telco_radar/analyze/highlight_topics.py breite-ausnahme 1
 src/telco_radar/analyze/highlight_topics.py noqa:BLE001 1
 src/telco_radar/analyze/promo_analyst.py breite-ausnahme 1
@@ -77,14 +76,12 @@ src/telco_radar/collect/ct_log.py noqa:BLE001 1
 src/telco_radar/collect/ct_log.py uhr 1
 src/telco_radar/collect/geraete/__init__.py breite-ausnahme 3
 src/telco_radar/collect/geraete/__init__.py noqa:BLE001 3
-src/telco_radar/collect/geraete/__init__.py uhr 3
 src/telco_radar/collect/geraete/einsundeins.py breite-ausnahme 2
 src/telco_radar/collect/geraete/einsundeins.py noqa:BLE001 2
 src/telco_radar/collect/geraete/o2.py breite-ausnahme 1
 src/telco_radar/collect/geraete/o2.py noqa:BLE001 1
 src/telco_radar/collect/geraete/robots.py breite-ausnahme 1
 src/telco_radar/collect/geraete/robots.py noqa:BLE001 1
-src/telco_radar/collect/geraete/robots.py uhr 1
 src/telco_radar/collect/geraete/vodafone.py breite-ausnahme 1
 src/telco_radar/collect/geraete/vodafone.py noqa:BLE001 1
 src/telco_radar/collect/lieferzeit.py breite-ausnahme 1

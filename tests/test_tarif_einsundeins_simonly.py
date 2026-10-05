@@ -28,6 +28,7 @@ from __future__ import annotations
 
 import gzip
 import json
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
@@ -232,7 +233,12 @@ def test_sammle_holt_details_nur_fuer_verlinkte_slug_adressen():
             "&bk=false": (200, details),
         }
     )
-    refs, protokoll = sammle(attrappe, "2026-09-09", abstand_sekunden=0)
+    refs, protokoll = sammle(
+        attrappe,
+        "2026-09-09",
+        abstand_sekunden=0,
+        uhr=lambda: datetime(2026, 9, 3, 12, tzinfo=UTC),
+    )
     assert len(refs) == 7
     assert protokoll["details"] == 1
     assert protokoll["details_gescheitert"] == 6
@@ -258,7 +264,12 @@ def test_sammle_ohne_erlaubnis_holt_gar_nichts():
             ),
         }
     )
-    refs, protokoll = sammle(gesperrt, "2026-09-09", abstand_sekunden=0)
+    refs, protokoll = sammle(
+        gesperrt,
+        "2026-09-09",
+        abstand_sekunden=0,
+        uhr=lambda: datetime(2026, 9, 3, 12, tzinfo=UTC),
+    )
     assert refs == []
     assert gesperrt.abrufe == ["https://www.1und1.de/robots.txt"]
 
@@ -270,7 +281,12 @@ def test_sammle_mit_http_fehler_liefert_keine_referenzen():
             SEITEN_URL: (503, ""),
         }
     )
-    refs, _protokoll = sammle(kaputt, "2026-09-09", abstand_sekunden=0)
+    refs, _protokoll = sammle(
+        kaputt,
+        "2026-09-09",
+        abstand_sekunden=0,
+        uhr=lambda: datetime(2026, 9, 3, 12, tzinfo=UTC),
+    )
     assert refs == []
 
 
@@ -284,5 +300,10 @@ def test_sammle_wirft_nicht_wenn_der_seitenabruf_stirbt():
             return (200, "User-agent: *\n")
         raise ConnectionError("Netz weg")
 
-    refs, _protokoll = sammle(_tot, "2026-09-09", abstand_sekunden=0)
+    refs, _protokoll = sammle(
+        _tot,
+        "2026-09-09",
+        abstand_sekunden=0,
+        uhr=lambda: datetime(2026, 9, 3, 12, tzinfo=UTC),
+    )
     assert refs == []

@@ -310,13 +310,13 @@ def nachfolger_effekt(
     basis = _preis_am(eigene, start)
     if basis is None or basis == 0:
         return None
-    stand = _datum(heute) or date.today()
+    stand = _datum(heute)
 
     nach: dict = {}
     prozent: dict = {}
     for tage in _FENSTER:
         stichtag = start.fromordinal(start.toordinal() + tage)
-        if stichtag > stand:
+        if stand is None or stichtag > stand:
             nach[tage] = None
             prozent[tage] = None
             continue
@@ -517,10 +517,10 @@ def auswertung(
         for tage in termine_je_anbieter.values():
             daten.extend(d for d in (_datum(t) for t in (tage or [])) if d)
     termine = sorted({d for d in daten})
-    stand = _datum(heute) or date.today()
-    if daten and max(daten) > stand:
+    stand = _datum(heute)
+    if daten and (stand is None or max(daten) > stand):
         stand = max(daten)
-    beobachtungstage = (stand - min(daten)).days if daten else 0
+    beobachtungstage = (stand - min(daten)).days if daten and stand else 0
     wochen = max(1, beobachtungstage // 7) if beobachtungstage >= 7 else 0
 
     def _spanne(von, bis) -> Optional[int]:

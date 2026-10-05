@@ -31,6 +31,7 @@ Beide Faelle liefern einen gueltigen Buendel-Rohsatz, nur der eine ohne
 """
 
 import json
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
@@ -791,7 +792,13 @@ def test_sammle_anbieter_liest_buendel_von_derselben_seite(katalog, farben):
 
     waechter = RobotsWaechter(hole=hole)
     bilanz = sammle_anbieter(
-        _vodafone_anbieter(), katalog, farben, hole, "2026-09-05", waechter
+        _vodafone_anbieter(),
+        katalog,
+        farben,
+        hole,
+        "2026-09-05",
+        waechter,
+        jetzt=datetime(2026, 9, 3, 12, tzinfo=UTC),
     )
     assert bilanz.status == "ok"
     assert len(bilanz.listungen) == 3

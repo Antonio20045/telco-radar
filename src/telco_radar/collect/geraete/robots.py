@@ -43,7 +43,7 @@ from __future__ import annotations
 import logging
 import re
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Callable, Optional
 from urllib.parse import urlparse
 
@@ -253,16 +253,14 @@ class RobotsWaechter:
         self._cache[host] = regeln
         return regeln
 
-    def darf(self, url: str, jetzt: Optional[datetime] = None) -> tuple[bool, str]:
+    def darf(self, url: str, jetzt: datetime) -> tuple[bool, str]:
         """(darf abgerufen werden, Grund). Der Grund steht auf der
         Quellenseite - er ist kein Log-Text, sondern Anzeige.
 
         `jetzt` ist der Zeitpunkt DIESES Abrufs, nicht der eines Laufs. Wer
         hier den Startzeitpunkt eines stundenlangen Laufs einsetzt, prueft
-        ein Fenster, das laengst zu sein kann (siehe `_laufuhr` im Collector).
+        ein Fenster, das laengst zu sein kann (siehe `laufuhr` im Collector).
         """
-        if jetzt is None:
-            jetzt = datetime.now(timezone.utc)
         regeln = self.regeln(url)
         if not regeln.abrufbar:
             return (False, regeln.fehler or "robots.txt nicht lesbar")

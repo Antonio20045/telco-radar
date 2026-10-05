@@ -51,6 +51,7 @@ DIE DREI REGELN, AN DENEN DIESES PAKET SCHEITERN KANN
 """
 
 import gzip
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
@@ -567,7 +568,13 @@ def test_der_zustand_kommt_als_neu_aus_dem_titelweg(katalog, farben):
         return 200, seite
 
     bilanz = sammle_anbieter(
-        _anbieter(), katalog, farben, hole, "2026-09-08", RobotsWaechter(hole=hole)
+        _anbieter(),
+        katalog,
+        farben,
+        hole,
+        "2026-09-08",
+        RobotsWaechter(hole=hole),
+        jetzt=datetime(2026, 9, 3, 12, tzinfo=UTC),
     )
     assert bilanz.status == "ok"
     assert [b["zustand"] for b in bilanz.buendel] == ["refurbished", "neu"]
@@ -615,7 +622,13 @@ def test_sammle_liefert_listung_und_buendel_aus_einer_antwort(katalog, farben):
         return 200, _fixture("einsundeins_produktseite_galaxy_a57.html.gz")
 
     bilanz = sammle_anbieter(
-        _anbieter(), katalog, farben, hole, "2026-09-08", RobotsWaechter(hole=hole)
+        _anbieter(),
+        katalog,
+        farben,
+        hole,
+        "2026-09-08",
+        RobotsWaechter(hole=hole),
+        jetzt=datetime(2026, 9, 3, 12, tzinfo=UTC),
     )
     assert bilanz.status == "ok"
     assert abrufe == [_A57_URL]

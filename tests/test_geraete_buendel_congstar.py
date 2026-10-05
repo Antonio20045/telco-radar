@@ -37,6 +37,7 @@ n × recurring.discounted == total` ist Bedingung, nicht Protokoll.
 """
 
 import gzip
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
@@ -642,7 +643,13 @@ def test_sammle_anbieter_liefert_buendel_und_keine_listungen(katalog, farben):
 
     waechter = RobotsWaechter(hole=hole)
     bilanz = sammle_anbieter(
-        _congstar_anbieter(), katalog, farben, hole, "2026-09-08", waechter
+        _congstar_anbieter(),
+        katalog,
+        farben,
+        hole,
+        "2026-09-08",
+        waechter,
+        jetzt=datetime(2026, 9, 3, 12, tzinfo=UTC),
     )
     assert bilanz.status == "ok"
     assert bilanz.listungen == []
@@ -680,6 +687,7 @@ def test_der_zustand_eines_buendels_kommt_aus_dem_condition_feld(katalog, farben
         hole,
         "2026-09-08",
         RobotsWaechter(hole=hole),
+        jetzt=datetime(2026, 9, 3, 12, tzinfo=UTC),
     )
     assert bilanz.status == "ok" and bilanz.buendel
     assert all(b["zustand"] == "refurbished" for b in bilanz.buendel)
@@ -728,6 +736,7 @@ def test_auf_den_produktseiten_wird_die_buendelmatrix_gelesen(katalog, farben):
         _sitemap_hole(abgerufen, _fixture(_IPHONE17_HEUTE)),
         "2026-09-29",
         RobotsWaechter(hole=_sitemap_hole([], "")),
+        jetzt=datetime(2026, 9, 3, 12, tzinfo=UTC),
     )
     assert bilanz.status == "ok"
     assert ADAPTER["congstar_next"].buendel_auf_produktseite is True
@@ -751,6 +760,7 @@ def test_die_sitemap_holt_keine_uhren_kopfhoerer_oder_tablets(katalog, farben):
         _sitemap_hole(abgerufen, _fixture(_IPHONE17_HEUTE)),
         "2026-09-29",
         RobotsWaechter(hole=_sitemap_hole([], "")),
+        jetzt=datetime(2026, 9, 3, 12, tzinfo=UTC),
     )
     assert len(abgerufen) == 43
     for marke in ("watch", "airpods", "ipad", "galaxy-tab", "/anio/", "/xplora/"):
@@ -770,6 +780,7 @@ def test_die_sitemap_holt_keine_uhren_kopfhoerer_oder_tablets(katalog, farben):
         _sitemap_hole(ohne_ausschluss, _fixture(_IPHONE17_HEUTE)),
         "2026-09-29",
         RobotsWaechter(hole=_sitemap_hole([], "")),
+        jetzt=datetime(2026, 9, 3, 12, tzinfo=UTC),
     )
     assert len(ohne_ausschluss) == 56
 

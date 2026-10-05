@@ -35,6 +35,7 @@ ZWEI NACHRECHNUNGEN SIND BEDINGUNG, NICHT PROTOKOLL
 import gzip
 import json
 import re
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
@@ -387,7 +388,13 @@ def test_sammle_anbieter_liefert_buendel_und_keine_listungen(katalog, farben):
 
     waechter = RobotsWaechter(hole=hole)
     bilanz = sammle_anbieter(
-        _telekom_anbieter(), katalog, farben, hole, "2026-09-08", waechter
+        _telekom_anbieter(),
+        katalog,
+        farben,
+        hole,
+        "2026-09-08",
+        waechter,
+        jetzt=datetime(2026, 9, 3, 12, tzinfo=UTC),
     )
     assert bilanz.status == "ok"
     assert bilanz.listungen == []
@@ -438,7 +445,13 @@ def test_der_robots_abruf_traegt_den_absender_des_anbieters(katalog, farben):
     )
 
     bilanz = sammle_anbieter(
-        anbieter, katalog, farben, hole, "2026-09-08", RobotsWaechter(hole=hole)
+        anbieter,
+        katalog,
+        farben,
+        hole,
+        "2026-09-08",
+        RobotsWaechter(hole=hole),
+        jetzt=datetime(2026, 9, 3, 12, tzinfo=UTC),
     )
     assert bilanz.status == "ok" and bilanz.buendel
     robots = [u for u in gesehen if u.endswith("/robots.txt")]

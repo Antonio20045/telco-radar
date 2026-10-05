@@ -164,7 +164,9 @@ def test_nachfolger_effekt_ueber_30_60_90_tage():
         ("2025-10-30", 1149.0),
         ("2025-12-15", 999.0),
     )
-    e = nachfolger_effekt("apple-iphone-16-pro-max", _KATALOG, punkte)
+    e = nachfolger_effekt(
+        "apple-iphone-16-pro-max", _KATALOG, punkte, heute="2026-08-11"
+    )
     assert e is not None
     assert e["nachfolger"] == "apple-iphone-17-pro-max"
     assert e["marktstart"] == "2025-09-19"
@@ -733,7 +735,9 @@ def test_ohne_die_schwelle_keine_nachfolger_zeile():
         "jung", anbieter="expert", first="2026-08-01", last="2026-08-10"
     )
 
-    roh = nachfolger_effekt("apple-iphone-16-pro-max", _KATALOG, punkte)
+    roh = nachfolger_effekt(
+        "apple-iphone-16-pro-max", _KATALOG, punkte, heute="2026-08-11"
+    )
     assert roh is not None and roh["nach"][90] == 999.0
     assert listungsdauer(jung) == 9 < MIND_TAGE_JE_GERAET
 
@@ -1788,3 +1792,29 @@ def test_die_letzte_bestaetigung_ist_ein_messtag():
         termine_je_anbieter=weniger,
     )
     assert b["dauern"] == []
+
+
+def test_ohne_heute_bleiben_die_fenster_nach_dem_start_offen():
+    """Ohne `heute` rechnet der Effekt nicht gegen die Wanduhr: kein Fenster
+    nach dem Marktstart gilt als erreicht, die Basis bleibt."""
+    punkte = _punkte(
+        ("2025-08-01", 1449.0),
+        ("2025-09-25", 1299.0),
+        ("2025-10-30", 1149.0),
+        ("2025-12-15", 999.0),
+    )
+    e = nachfolger_effekt("apple-iphone-16-pro-max", _KATALOG, punkte)
+    assert e is not None
+    assert e["basis"] == 1449.0
+    assert e["nach"] == {30: None, 60: None, 90: None}
+    assert e["prozent"] == {30: None, 60: None, 90: None}
+
+
+def test_ohne_heute_ist_der_juengste_messtag_der_stand():
+    """Ohne `heute` endet die Beobachtung am juengsten Messtag, nicht an der
+    Wanduhr; die Gegenprobe mit spaeterem `heute` zaehlt bis dorthin."""
+    punkte = _punkte(("2026-08-01", 1449.0), ("2026-08-15", 1399.0))
+    ohne = auswertung([], punkte, _KATALOG)
+    mit = auswertung([], punkte, _KATALOG, heute="2026-08-29")
+    assert "– 14 Tage," in ohne["hinweis"]
+    assert "– 28 Tage," in mit["hinweis"]

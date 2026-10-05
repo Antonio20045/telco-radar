@@ -63,6 +63,7 @@ import html as html_modul
 import logging
 import re
 import time
+from datetime import datetime
 from typing import Callable, Optional
 from urllib.parse import urljoin
 
@@ -314,27 +315,25 @@ def referenzen_aus_html(
 def sammle(
     hole: Callable,
     abgerufen_am: str,
+    uhr: Callable[[], datetime],
     robots: Optional[RobotsWaechter] = None,
     abstand_sekunden: Optional[float] = None,
 ) -> tuple[list[SimOnlyReferenz], dict]:
     """Die ehrliche Messung: Seite je Tarif-Slug einmal, Details je Slug.
 
-    `hole(url, kopfzeilen=None, user_agent=None) -> (status, text)` ist
-    dieselbe Bauform wie im Geraetezweig (`geraete_pipeline._hole_fabrik`)
-    - inklusive des Per-Aufruf-Absenders, damit diese Messung immer mit
-    der ehrlichen Kennung laeuft, egal was in `settings.yaml` steht.
-
-    Ein Misserfolg ist eine dokumentierte Messgrenze: Zurueck kommen die
-    Referenzen, die standen (im Zweifel keine), und ein Protokoll mit
-    dem Grund - die Funktion wirft nicht, ein Aufrufer darf an ihr keine
-    Bestaende verlieren.
+    `hole(url, kopfzeilen=None, user_agent=None) -> (status, text)` wie im
+    Geraetezweig (`geraete_pipeline._hole_fabrik`), mit Per-Aufruf-Absender:
+    die Messung laeuft immer mit der ehrlichen Kennung. `uhr()` ist die Zeit
+    des naechsten Abrufs. Ein Misserfolg ist eine dokumentierte Messgrenze:
+    zurueck kommen die Referenzen, die standen (im Zweifel keine), und ein
+    Protokoll mit dem Grund; die Funktion wirft nicht.
     """
     if abstand_sekunden is None:
         abstand_sekunden = _ABSTAND_SEKUNDEN
     protokoll = {"seite": "", "details": 0, "details_gescheitert": 0, "ohne_details": 0}
     if robots is None:
         robots = RobotsWaechter(lambda url: hole(url, user_agent=USER_AGENT))
-    erlaubt, grund = robots.darf(SEITEN_URL)
+    erlaubt, grund = robots.darf(SEITEN_URL, uhr())
     if not erlaubt:
         log.warning(
             "1&1 SIM-only: %s nicht abrufbar (%s) - Messgrenze", SEITEN_URL, grund
@@ -359,7 +358,7 @@ def sammle(
             protokoll["ohne_details"] += 1
             continue
         adresse = urljoin(SEITEN_URL, html_modul.unescape(adresse))
-        erlaubt, grund = robots.darf(adresse)
+        erlaubt, grund = robots.darf(adresse, uhr())
         if not erlaubt:
             log.warning(
                 "1&1 SIM-only: Tarifdetails %s uebergangen (%s) - "

@@ -49,7 +49,7 @@ from .analyze.tarif_referenzen import aus_bestand
 from .analyze.tco_buendel import aus_rohsaetzen
 from .analyze.tco_store import TcoDB
 from .tarif_bezug import Tarifbestand
-from .collect.geraete import ADAPTER, hole_mit_robots, sammle
+from .collect.geraete import ADAPTER, hole_mit_robots, laufuhr, sammle
 from .collect.geraete.robots import RobotsWaechter
 from .collect.geraete import autoerkennung
 from .collect.geraete.congstar import ergaenze_pib_slug
@@ -307,7 +307,7 @@ def nachsammle_buendel(
     bilanzen: list,
     quellen,
     hole: Callable,
-    uhr: Optional[Callable[[], datetime]] = None,
+    uhr: Callable[[], datetime],
 ) -> None:
     """Die Nachbearbeitungs-Haken der Adapter ueber die Buendel laufen
     lassen. Wirft nie - ein Fehler hier darf den Bestand nicht kosten,
@@ -323,10 +323,8 @@ def nachsammle_buendel(
     bekommt deshalb ein `hole`, das durch dieselbe `Abrufschleuse` geht
     wie die Sammelphase - je Anbieter eine eigene, wie dort.
 
-    `uhr()` ist die Zeit des NAECHSTEN Abrufs, nicht der Start des Laufs.
-    Ohne Angabe die echte Uhr: diese Stufe laeuft in Echtzeit, und ein
-    eingefrorener Zeitstempel waere genau der Fehler, den die Fensterprobe
-    verhindern soll.
+    `uhr()` ist die Zeit des NAECHSTEN Abrufs: die Stufe laeuft in Echtzeit,
+    ein eingefrorener Zeitstempel waere der Fehler, den die Fensterprobe sucht.
     """
     for bilanz in bilanzen:
         if not bilanz.buendel:
@@ -387,7 +385,7 @@ def nachsammle_buendel(
 def run_geraete_stage(
     root: Path,
     http_cfg: dict,
-    heute: str,
+    heute: Optional[str],
     jetzt: Optional[datetime] = None,
     frist_sekunden: Optional[float] = FRIST_STANDARD,
     hole: Optional[Callable] = None,
@@ -408,6 +406,9 @@ def run_geraete_stage(
     beginn = time.monotonic()
     if jetzt is None:
         jetzt = datetime.now(timezone.utc)
+    if heute is None:
+        heute = jetzt.strftime("%Y-%m-%d")
+    uhr = laufuhr(jetzt)
     root = Path(root)
 
     katalog = lade_katalog(root)
@@ -424,9 +425,7 @@ def run_geraete_stage(
         }
 
     hole = hole or _hole_fabrik(http_cfg)
-    ergebnis = sammle(
-        quellen, katalog, farben, hole, heute, jetzt, frist_sekunden=frist_sekunden
-    )
+    ergebnis = sammle(quellen, katalog, farben, hole, heute, jetzt, frist_sekunden, uhr)
 
     zustand = root / "data" / "state"
     db = GeraeteDB(zustand / "geraete_db.json")
@@ -493,7 +492,7 @@ def run_geraete_stage(
     historie.save()
     db.save(heute)
 
-    nachsammle_buendel(ergebnis["anbieter"], quellen, hole)
+    nachsammle_buendel(ergebnis["anbieter"], quellen, hole, uhr)
 
     rohbuendel = [
         b for bilanz in ergebnis["anbieter"] for b in getattr(bilanz, "buendel", [])
@@ -524,7 +523,7 @@ def run_geraete_stage(
                     simonly_refs = []
                     simonly_protokoll = {}
                 else:
-                    simonly_refs, simonly_protokoll = sammle_simonly(hole, heute)
+                    simonly_refs, simonly_protokoll = sammle_simonly(hole, heute, uhr)
             except Exception as exc:  # noqa: BLE001
                 simonly_refs = []
                 log.warning(
@@ -739,9 +738,8 @@ def main() -> None:
     )
     root = Path(args.root)
     cfg = load_config(root)
-    heute = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     run_geraete_stage(
-        root, cfg.settings.get("http", {}), heute, frist_sekunden=args.frist
+        root, cfg.settings.get("http", {}), None, frist_sekunden=args.frist
     )
 
 

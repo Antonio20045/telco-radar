@@ -51,7 +51,7 @@ from __future__ import annotations
 import argparse
 import json
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime, timezone
 from pathlib import Path
 from urllib.parse import urlsplit
 
@@ -125,7 +125,7 @@ def main() -> None:
     protokoll = {"seite": "(nicht gelaufen)"}
     try:
         hole = geraete_pipeline._hole_fabrik(http_cfg)
-        referenzen, protokoll = sammle_simonly(hole, heute)
+        referenzen, protokoll = sammle_simonly(hole, heute, lambda: datetime.now(UTC))
         if referenzen:
             tco = TcoDB(root / "data" / "state" / "geraete_tco.json")
             neu = tco.setze_referenzen(referenzen, heute)

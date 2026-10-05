@@ -20,7 +20,7 @@ VIER REGELN, DIE HIER ERZWUNGEN WERDEN
    einmal abrufen (`hole_mit_robots`, gerufen aus
    `geraete_pipeline.nachsammle_buendel`). Beide gehen durch dieselbe
    `Abrufschleuse`. Ein Lauf, der im Fenster startet, steht eine halbe
-   Stunde spaeter davor - die Uhr laeuft mit (`_laufuhr`), und der
+   Stunde spaeter davor - die Uhr laeuft mit (`laufuhr`), und der
    Zeitanteil eines Anbieters mit Fenster endet spaetestens mit diesem
    (`_fensterfrist`). Wer draussen steht, wird uebersprungen - nicht
    gealtert, auch wenn die Tuer erst mitten im Lauf zugegangen ist.
@@ -45,7 +45,7 @@ import logging
 import re
 import time
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from typing import Callable, Optional
 from urllib.parse import urljoin, urlparse
 
@@ -294,7 +294,7 @@ def _preisfelder(anbieter, satz: dict) -> dict:
     }
 
 
-def _laufuhr(beginn: datetime) -> Callable[[], datetime]:
+def laufuhr(beginn: datetime) -> Callable[[], datetime]:
     """Die mitlaufende Uhr EINES Laufs: Beginn plus verstrichene Zeit.
 
     Nicht schlicht `datetime.now(timezone.utc)`, aus zwei Gruenden. Erstens
@@ -392,8 +392,8 @@ class Abrufschleuse:
 def hole_mit_robots(
     hole: Callable,
     waechter: RobotsWaechter,
-    rate_limit_sekunden: float = 0.0,
-    uhr: Optional[Callable[[], datetime]] = None,
+    rate_limit_sekunden: float,
+    uhr: Callable[[], datetime],
 ) -> Callable:
     """`hole` MIT robots-Pruefung - fuer Abrufe AUSSERHALB von `sammle()`.
 
@@ -410,9 +410,7 @@ def hole_mit_robots(
     `GeraeteAbrufFehler` - die Haken fangen das je Adresse ab und lassen
     das Feld offen, statt zu raten.
     """
-    schleuse = Abrufschleuse(
-        waechter, uhr or (lambda: datetime.now(timezone.utc)), rate_limit_sekunden
-    )
+    schleuse = Abrufschleuse(waechter, uhr, rate_limit_sekunden)
 
     def gebremst(url: str, *args, **kwargs):
         schleuse.passiere(url)
@@ -428,7 +426,7 @@ def sammle_anbieter(
     hole: Callable,
     heute: str,
     waechter: RobotsWaechter,
-    jetzt: Optional[datetime] = None,
+    jetzt: datetime,
     frist_bis: Optional[float] = None,
     uhr: Optional[Callable[[], datetime]] = None,
 ) -> Anbieterbilanz:
@@ -441,16 +439,14 @@ def sammle_anbieter(
 
     `jetzt` ist der BEGINN des Laufs, nicht der Zeitpunkt eines Abrufs.
     `uhr()` liefert die Zeit des naechsten Abrufs; wer sie nicht mitgibt,
-    bekommt `_laufuhr(jetzt)`. `sammle()` reicht EINE Uhr ueber alle
+    bekommt `laufuhr(jetzt)`. `sammle()` reicht EINE Uhr ueber alle
     Anbieter durch - eine je Anbieter neu gestellte Uhr faenge bei jedem
     wieder bei null an und waere derselbe eingefrorene Zeitstempel wie
     vorher, nur feiner verteilt.
     """
     bilanz = Anbieterbilanz(name=anbieter.name)
-    if jetzt is None:
-        jetzt = datetime.now(timezone.utc)
     if uhr is None:
-        uhr = _laufuhr(jetzt)
+        uhr = laufuhr(jetzt)
 
     if not anbieter.crawlbar:
         bilanz.status = "uebersprungen"
@@ -980,7 +976,7 @@ def sammle(
     farben: dict,
     hole: Callable,
     heute: str,
-    jetzt: Optional[datetime] = None,
+    jetzt: datetime,
     frist_sekunden: Optional[float] = None,
     uhr: Optional[Callable[[], datetime]] = None,
 ) -> dict:
@@ -1002,10 +998,8 @@ def sammle(
     sehen, dass seit dem Start eine halbe Stunde vergangen ist, und nicht
     wieder bei null anfangen.
     """
-    if jetzt is None:
-        jetzt = datetime.now(timezone.utc)
     if uhr is None:
-        uhr = _laufuhr(jetzt)
+        uhr = laufuhr(jetzt)
     waechter = RobotsWaechter(hole=hole)
     frist_bis = (time.monotonic() + frist_sekunden) if frist_sekunden else None
 
