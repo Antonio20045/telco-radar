@@ -132,6 +132,9 @@ else:
     if modus == "haupt":
         haupt = Path(os.environ["TELCO_AUFTRAG"]).parents[3] / "scripts/pruefleiter.py"
         haupt.write_text(haupt.read_text() + "# vom Bauagenten\\n")
+    if modus == "hauptrot":
+        haupt = Path(os.environ["TELCO_AUFTRAG"]).parents[3] / "scripts/pruefleiter.py"
+        haupt.write_text(haupt.read_text() + "# vom Bauagenten\\n")
     if modus == "hauptcommit":
         haupt = Path(os.environ["TELCO_AUFTRAG"]).parents[3]
         (haupt / "scripts/pruefleiter.py").write_text("raise SystemExit(0)\\n")
@@ -147,7 +150,7 @@ else:
         notiz = Path(os.environ["TELCO_AUFTRAG"]).parents[3] / "outputs/auftraege"
         notiz.mkdir(parents=True, exist_ok=True)
         (notiz / "B1-notiz.md").write_text("Notiz eines parallelen Auftrags")
-    faktor = {"rot": 3, "umbau": 1, "python": 3}.get(modus, 2)
+    faktor = {"rot": 3, "umbau": 1, "python": 3, "hauptrot": 3}.get(modus, 2)
     kern.write_text(f"def verdopple(x):\\n    return x * {faktor}\\n")
     Path(os.environ["TELCO_COMMIT_NACHRICHT"]).write_text("rechnen: verdopple richtig")
     if modus == "gross":
@@ -889,4 +892,15 @@ def test_schreiben_ausserhalb_des_zauns_ist_eine_rote_runde(repo, modus, pfad):
 
     notiz = (repo / auftrag.AUFTRAEGE / "A1-notiz.md").read_text()
     assert f"Zaun verletzt, Hauptbaum prüfen: {pfad}" in notiz
+    assert _git(repo, "rev-parse", "main") == vorher
+
+
+def test_hauptbaum_wird_auch_nach_einer_roten_runde_geprueft(repo):
+    vorher = _git(repo, "rev-parse", "main")
+
+    assert _starte(repo, "hauptrot") == auftrag.Ende.NOTIZ
+
+    notiz = (repo / auftrag.AUFTRAEGE / "A1-notiz.md").read_text()
+    befund = "Hauptbaum vor dem Merge verändert: scripts/pruefleiter.py"
+    assert f"Hauptbaum verdächtig: {befund}" in notiz
     assert _git(repo, "rev-parse", "main") == vorher

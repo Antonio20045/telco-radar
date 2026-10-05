@@ -313,8 +313,7 @@ def _unter_sperre(lauf: Lauf) -> tuple[Ende, list[str]]:
     _zeile(lauf, "ende", 0, "", ergebnis=GEMERGT)
     kosten = format_.kosten_schreiben(lauf.zeilen, lauf.wt).relative_to(lauf.wt)
     lauf.zeilen.pop()
-    befund = _commit(lauf, f"auftrag({lauf.auftrag['id']}): Kosten", [str(kosten)])
-    if befund:
+    if befund := _commit(lauf, f"auftrag({lauf.auftrag['id']}): Kosten", [str(kosten)]):
         return Ende.NOTIZ, [befund]
     vorher = _git(lauf.wurzel, "rev-parse", "HEAD").strip()
     code, ausgabe = _ausfuehren(["git", "merge", "--ff-only", "-q", zweig], lauf.wurzel)
@@ -364,6 +363,7 @@ def ausfuehren(lauf: Lauf) -> Ende:
     except (pruefstempel.StempelFehler, OSError) as fehler:
         ende, befunde = Ende.ABGEBROCHEN, [f"{type(fehler).__name__}: {fehler}"]
     if ende is not Ende.GEMERGT:
+        befunde += git_.verdacht(lauf.wurzel, AUFTRAEGE + "/", befunde)
         _zeile(lauf, "ende", 0, "", ergebnis=ende.name.lower())
         format_.kosten_schreiben(lauf.zeilen, lauf.wurzel)
         notiz = format_.notiz(

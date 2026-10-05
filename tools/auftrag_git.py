@@ -84,6 +84,16 @@ def hauptbaum_befund(wurzel: Path, frei: str) -> str:
     )
 
 
+def verdacht(wurzel: Path, frei: str, befunde: list[str]) -> list[str]:
+    """Hauptbaum-Befund nach einer Runde ohne Merge, sofern noch nicht gemeldet."""
+    try:
+        befund = hauptbaum_befund(wurzel, frei)
+    except pruefstempel.StempelFehler as fehler:
+        befund = f"{type(fehler).__name__}: {fehler}"
+    neu = befund and befund not in befunde
+    return [f"Hauptbaum verdächtig: {befund}"] if neu else []
+
+
 def stand(ort: Path, basis: str) -> tuple[object, ...]:
     """Pfade, Kopf und Inhalt des Arbeitsbaums gegen ``basis`` zum Vergleich."""
     return geaendert(ort, basis), kopf(ort), _git(ort, "diff", "--binary", basis)
