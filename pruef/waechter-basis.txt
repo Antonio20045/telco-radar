@@ -109,7 +109,7 @@ src/telco_radar/report/diff_bilder.py noqa:BLE001 1
 src/telco_radar/report/fruehwarnung.py dateizugriff 1
 src/telco_radar/report/geraete_bewegung.py breite-ausnahme 1
 src/telco_radar/report/geraete_bewegung.py noqa:BLE001 1
-src/telco_radar/report/geraete_export.py dateizugriff 6
+src/telco_radar/report/geraete_export.py dateizugriff 1
 src/telco_radar/report/geraete_view.py breite-ausnahme 1
 src/telco_radar/report/geraete_view.py noqa:BLE001 1
 src/telco_radar/report/geraete_zeitreihe.py dateizugriff 2

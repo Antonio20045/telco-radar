@@ -1822,6 +1822,18 @@ var TelcoFrage = (function () {
     } catch (e) { /* Datei-Offline: kein replaceState noetig */ }
   }
 
+  /* Datenkonzept Geräte 5.4: auch der Bündel-Export folgt dem Umschalter.
+     Ziel und Text je Ansicht stehen fertig in den data-Feldern des Links
+     (`geraete_export.schreibe_exporte`, `tco_je_laufzeit`); ohne Feld bleibt
+     der Link, wie er ist. */
+  function setzeExport() {
+    var link = element('gr-export-tco');
+    var datei = link && link.getAttribute('data-datei-' + zustand.laufzeit);
+    if (!datei) return;
+    link.setAttribute('href', datei);
+    link.textContent = link.getAttribute('data-text-' + zustand.laufzeit);
+  }
+
   function waehleLaufzeit(lz) {
     if (!laufzeitErlaubt(lz) || lz === zustand.laufzeit) return;
     zustand.laufzeit = lz;
@@ -1830,6 +1842,7 @@ var TelcoFrage = (function () {
     setzeKartenBand(zustand.band);
     setzeGraph(zustand.modell, zustand.band);
     stelleZeilen(zustand.band);
+    setzeExport();
     schreibeLink();
   }
 
@@ -2113,6 +2126,7 @@ var TelcoFrage = (function () {
   setzeKartenBand(zustand.band);
   setzeSuchfeld();
   stelleZeilen(zustand.band);
+  setzeExport();
   /* P1/A2: der First Paint steht serverseitig da (setzeGraph lief noch
      nicht) - seine Kreise und die Preiszahl brauchen Cursor und Fokus. */
   zrEingaengeRuesten();

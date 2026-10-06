@@ -41,13 +41,9 @@ Dazu das Kriterium des Geraeteradars (10.08.2026):
      Seit E3 Schritt 3 (17.09.2026) steht die Alarmtabelle im Radar-Reiter
      von geraete.html (bis dahin eigene Seite wettbewerbsradar.html, heute
      eine Weiterleitung) - Kriterium 11 liest sie von der EINEN Seite, und
-     11b misst deren ALLE Tafeln einschliesslich der Radar-Tafel.
-
-     Bis zum 30.08.2026 vermass dieses Kriterium die Positionskarte und
-     rechnete aus jeder Etikettenhoehe den Preis zurueck. Die Karte ist
-     geloescht; die drei Verbote des Auftrags (kein gedrehter Text, keine
-     Schrift unter 12 px, keine mit "..." gekuerzte Beschriftung) misst
-     `tests/test_geraete_reiter_browser.py` im echten Chromium.
+     11b misst deren ALLE Tafeln einschliesslich der Radar-Tafel. Jede Buendelzeile
+     mit Zahl nennt „über H Monate“ (5.3); die Verbote der seit 30.08.2026
+     geloeschten Positionskarte misst `tests/test_geraete_reiter_browser.py`.
 
 Dazu das Kriterium der Umbenennung (11.08.2026):
 
@@ -60,11 +56,10 @@ Dazu das Kriterium der Umbenennung (11.08.2026):
 Kriterium 1, 6, 7, 10 und 12 brauchen einen echten Browser - Chromium liegt
 unter /opt/pw-browsers. Ohne Browser laufen die uebrigen trotzdem durch.
 
-**Gemessen wird ueber einen lokalen HTTP-Server, nicht ueber file://.** Der
-Grund ist Kriterium 10: `fetch('search_index.json')` ist unter file:// von der
-Same-Origin-Regel gesperrt, die Suchseite bliebe leer, und die Pruefung wuerde
-einen Fehler messen, den es in Wirklichkeit nicht gibt. Der Server bindet auf
-127.0.0.1 und braucht kein Netz.
+**Gemessen wird ueber einen lokalen HTTP-Server, nicht ueber file://.** Der Grund ist
+Kriterium 10: `fetch('search_index.json')` ist unter file:// von der Same-Origin-Regel
+gesperrt, die Suchseite bliebe leer, und die Pruefung wuerde einen Fehler messen, den es
+in Wirklichkeit nicht gibt. Der Server bindet auf 127.0.0.1 und braucht kein Netz.
 
     python scripts/pruefe_portal.py                 # rendert nach /tmp und prueft
     python scripts/pruefe_portal.py --site site     # prueft ein fertiges site/
@@ -126,6 +121,16 @@ class Bilanz:
             f"{durchgefallen} durchgefallen, {offen} nicht pruefbar"
         )
         return 1 if durchgefallen else 0
+
+
+def zeitraum_maengel(tafel) -> list[str]:
+    """11: jede Buendelzeile mit Zahl nennt „über H Monate“ (H: data-leitzahl)."""
+    stumm = sum(
+        f"über {z.get('data-leitzahl-monate')} Monate"
+        not in " ".join(e.get_text(" ") for e in z.select(".gr-bnd-tco .gr-bnd-label"))
+        for z in tafel.select(".gr-bnd[data-gesamt]:not([data-gesamt=''])")
+    )
+    return [f"{stumm} Bündelzeilen ohne 'über H Monate'"] if stumm else []
 
 
 def _rendern(ziel: Path, root: Path) -> None:
@@ -859,12 +864,7 @@ def main() -> int:
                 "Barpreis-Auswahl (Doppel-Darstellung, §4.6/4.8)"
             )
 
-        if (
-            start is not None
-            and start.select(".gr-bnd[data-gesamt]")
-            and not start.select(".gr-bnd .gr-kk-24")
-        ):
-            maengel.append("keine Bündelzeile beantwortet 'nach 24 Monaten gezahlt'")
+        maengel += zeitraum_maengel(start) if start is not None else []
         verlauf = gr.select_one("#tafel-verlauf")
         verlauf_leer = (
             verlauf is not None and verlauf.select_one("#gr-verlaufdaten") is None

@@ -156,15 +156,26 @@ def test_telekom_congstar_und_11_stehen_als_benannte_luecke(bestand):
     gezeichnet, in anderen ehrlich fehlend. Gemessen wird deshalb die
     REGEL: je Band gilt gezeichnet-oder-benannt fuer ALLE erwarteten
     Anbieter - und beide Telekom-Zustaende treten wirklich ein
-    (Lookup-Zeile, sonst pruefte der Test nur einen von beiden)."""
+    (Lookup-Zeile, sonst pruefte der Test nur einen von beiden).
+    Datenkonzept Geräte 5.4: der Graph zeichnet je Ratenlaufzeit - die Regel
+    gilt deshalb je Laufzeit, gegen die Karten DIESER Laufzeit."""
     modell = _modell(bestand, VORGABE_MODELL)
-    baender = band.baender_fuer_modell(
-        modell, bestand["band_je_tarif"], leiter=bestand["leiter"]
-    )
-    assert baender, "kein Band vorhanden - Test prueft nichts"
-    je_band = band.karten_je_band(modell, bestand["band_je_tarif"])
+    je_laufzeit = [
+        (
+            eintrag,
+            band.karten_je_band(modell, bestand["band_je_tarif"], laufzeit),
+        )
+        for laufzeit in (12, 24, 36)
+        for eintrag in band.baender_fuer_modell(
+            modell,
+            bestand["band_je_tarif"],
+            leiter=bestand["leiter"],
+            laufzeit=laufzeit,
+        )
+    ]
+    assert je_laufzeit, "kein Band vorhanden - Test prueft nichts"
     telekom_gezeichnet = telekom_fehlend = 0
-    for eintrag in baender:
+    for eintrag, je_band in je_laufzeit:
         gezeichnet = set(je_band.get(eintrag["key"]) or {})
         namen = {f["anbieter"] for f in eintrag["fehlend"]}
         assert gezeichnet | namen >= set(band.ERWARTETE_ANBIETER), (
@@ -199,7 +210,9 @@ def test_leerzustand_modell_ohne_buendel_in_keinem_band(bestand, tarife):
     Fixture. Seit Datenkonzept Geräte Schritt 2 traegt der Vertrag
     Zuzahlung und Anschlusspreis: `kosten_ueber` nennt beide sonst als
     Luecke statt sie als 0 zu zaehlen, und ohne Zahl gaebe es kein echtes
-    Buendel."""
+    Buendel. Seit Datenkonzept 5.4 zeichnet der Graph je Ratenlaufzeit:
+    beide Faelle laufen in der Laufzeit des Vertrags (36), sonst waere die
+    Leere trivial."""
     sku = "apple-iphone-15-999gb-schwarz"
     listung = {
         "sku_id": sku,
@@ -234,14 +247,14 @@ def test_leerzustand_modell_ohne_buendel_in_keinem_band(bestand, tarife):
     assert echte, "das konstruierte Modell hat kein echtes Buendel - kein Fall"
     assert (
         band.baender_fuer_modell(
-            ohne, bestand["band_je_tarif"], leiter=bestand["leiter"]
+            ohne, bestand["band_je_tarif"], leiter=bestand["leiter"], laufzeit=36
         )
         == []
     ), "ein Tarif ohne Datenvolumen darf kein Band gebaeren"
 
     mit_band = _modell_mit("11:1-1-all-net-flat-s", "1&1 All-Net-Flat S")
     assert band.baender_fuer_modell(
-        mit_band, bestand["band_je_tarif"], leiter=bestand["leiter"]
+        mit_band, bestand["band_je_tarif"], leiter=bestand["leiter"], laufzeit=36
     ), "Gegenprobe: die All-Net-Flat S (10 GB) muss Stufe XS gebaeren"
 
 

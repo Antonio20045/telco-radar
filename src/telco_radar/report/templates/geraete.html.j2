@@ -1256,8 +1256,18 @@
         >Alle exportieren ({{ geraete.export.aktuell.zeilen }} Zeilen)</a>
       <a class="gr-knopf" href="{{ geraete.export.historie.datei }}" download
         >Preishistorie ({{ geraete.export.historie.zeilen }})</a>
-      <a class="gr-knopf" href="{{ geraete.export.tco.datei }}" download
-        >Bündel-TCO ({{ geraete.export.tco.zeilen }})</a>
+      {# Datenkonzept Geräte 5.4: der Bündel-Export folgt dem Umschalter der
+         Ratenlaufzeit - app.js (`setzeExport`) tauscht Ziel und Text aus den
+         data-Feldern, je Ansicht `geraete-tco-<N>.csv`. Ohne Skript blendet
+         die Tafel keine Zeile aus, und der Link nennt den Gesamtexport. #}
+      {% set tco_text = 'Bündel-TCO (' ~ geraete.export.tco.zeilen ~ ')' %}
+      <a class="gr-knopf" id="gr-export-tco" href="{{ geraete.export.tco.datei }}"
+        download data-datei-alle="{{ geraete.export.tco.datei }}"
+        data-text-alle="{{ tco_text }}"{% for lz, e in
+        (geraete.export.tco_je_laufzeit or {}).items() %}
+        data-datei-{{ lz }}="{{ e.datei }}"
+        data-text-{{ lz }}="Bündel-TCO {{ lz }} Monate ({{ e.zeilen }})"{%
+        endfor %}>{{ tco_text }}</a>
       <a class="gr-knopf" href="{{ geraete.export.radar.datei }}" download
         >Radar ({{ geraete.export.radar.zeilen }})</a>
       {# P3: der Katalog auf Modellebene ist eine eigene ZAHLENSEKTION -

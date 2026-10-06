@@ -38,7 +38,7 @@ from __future__ import annotations
 import logging
 
 from . import geraete_tco_band, geraete_tco_grafik, geraete_tco_karten
-from . import geraete_notbremse, geraete_vergleich
+from . import geraete_laufzeit, geraete_notbremse, geraete_vergleich
 from ..geraete_model import VERGLEICHBARE_ZUSTAENDE, Ratenzahlung, normalisiere
 from ..tarif_model import PREISTYP_LIVE_SHOP, vertrag_basis
 from ..tco_model import (
@@ -475,25 +475,15 @@ def _export_zeilen(
 ) -> dict:
     """Die Zeilen des TCO-Gesamtexports (O4) - WERTE, keine Form.
 
-    Der Export filtert nicht selbst (Doktrin des Modulkopfs von
-    `geraete_export`): hier steht JEDES Bündel des Bestands, auch eines
-    ohne Tarifband und ohne auflösbare Gerätezordnung - seine Modellspalte
-    trägt dann die SKU als Rueckfall, genau wie `aktuell_csv` die device_id
-    nennt, wenn der Katalog nichts hergibt. Aufgeloest wird ueber denselben
-    Weg wie die Modelltafel (`geraet_je_sku` aus den Listungen, ergaenzt
-    um den Katalog), und die Kostenspalte ist `tco_model.kosten_ueber()` wie auf
-    der Karte. Hier ZAHLEN; Dezimalkomma und Semikolon macht `geraete_export.tco_csv`.
-
-    Die `sku_id` steht als EIGENE Spalte (A4): ohne sie kollabierten
-    Farbvarianten zu byte-identischen Zeilen. Der Zeitraum H geht als
-    EIGENES Feld durch (`leitzahl_monate` aus `Kosten.monate`, P0-B-h4).
-
-    `status` ist der Zustand der Notbremse (`geraete_notbremse.kurz`, dasselbe
-    Wort wie an der Bündelzeile), leer bei einem Bündel, das zählt; `luecke`
-    nennt die Posten, ohne die es keine Kostenzahl gibt.
-
-    Die Bündelzeilen stehen nach Ratenlaufzeit gruppiert (Datenkonzept
-    Geräte Schritt 2), innerhalb einer Laufzeit in der Folge des Bestands.
+    Hier steht JEDES Bündel des Bestands, auch eines ohne Tarifband und ohne
+    auflösbare Gerätezuordnung (Modellspalte dann die SKU, wie `aktuell_csv`).
+    Aufgelöst wird wie in der Modelltafel (`geraet_je_sku` plus Katalog), die
+    Kostenspalte ist `tco_model.kosten_ueber()` wie auf der Karte; Dezimalkomma
+    und Semikolon macht `geraete_export.tco_csv`. Eigene Felder: `sku_id` (A4),
+    der Zeitraum H (`leitzahl_monate`, P0-B-h4), `status` (Notbremse, dasselbe
+    Wort wie an der Bündelzeile), `luecke` (Posten ohne Zahl) und
+    `raten_laufzeit` (die Ansicht des Umschalters, `geraete_laufzeit`). Die
+    Bündelzeilen stehen nach Ratenlaufzeit gruppiert, sonst in Bestandsfolge.
 
     Die SIM-only-Zeilen sind DERSELBE Massstab wie auf der Tafel
     (`_referenztabelle`), `ueber_horizont` als ihre TCO-24 (`tco_24` über
@@ -531,6 +521,7 @@ def _export_zeilen(
                 "geraet_monatsrate": b.geraet_monatsrate,
                 "buendel_monatlich": b.buendel_monatlich,
                 "laufzeit": b.laufzeit_monate,
+                "raten_laufzeit": geraete_laufzeit.raten_laufzeit(b),
                 "anschlusspreis": b.anschlusspreis,
                 "tco24": kosten.gesamt,
                 "leitzahl_monate": kosten.monate,
@@ -699,12 +690,16 @@ def aufbereiten(
         modell["zeilen_ohne_band"] = sorted(
             (k for k in echte if not k.get("band")), key=_zeilen_rang
         )
-        modell["baender"] = geraete_tco_band.baender_fuer_modell(
-            modell, band_je_tarif, gb_je_tarif, leiter
-        )
-        modell["band_leer"] = (
-            None if modell["baender"] else geraete_tco_band.band_leer_text(leiter)
-        )
+        je_laufzeit = {
+            lz: geraete_tco_band.baender_fuer_modell(
+                modell, band_je_tarif, gb_je_tarif, leiter, lz
+            )
+            for lz in geraete_laufzeit.LAUFZEITEN
+        }
+        modell["baender_je_laufzeit"] = je_laufzeit
+        modell["baender"] = je_laufzeit[geraete_laufzeit.LAUFZEIT_STANDARD]
+        leer = geraete_tco_band.band_leer_text(leiter)
+        modell["band_leer"] = None if any(je_laufzeit.values()) else leer
 
     graph_daten = {
         "stand": max(
@@ -731,18 +726,21 @@ def aufbereiten(
                     "tarif_anbieter": modell["antwort"]["tarif_anbieter"],
                 },
                 "baender": {
-                    b["key"]: {
-                        "label": b["label"],
-                        "bereich": b["bereich"],
-                        "chip": b["chip"],
-                        "unterzeile": b["unterzeile"],
-                        "zeilen": b["balken"]["zeilen"],
-                        "luecke_text": b["balken"]["luecke_text"],
-                        "bnd_titel": (
-                            f"Alle Bündel im Band {b['label']} – {modell['titel']}"
-                        ),
+                    lz: {
+                        b["key"]: {
+                            "label": b["label"],
+                            "bereich": b["bereich"],
+                            "chip": b["chip"],
+                            "unterzeile": b["unterzeile"],
+                            "zeilen": b["balken"]["zeilen"],
+                            "luecke_text": b["balken"]["luecke_text"],
+                            "bnd_titel": (
+                                f"Alle Bündel im Band {b['label']} – {modell['titel']}"
+                            ),
+                        }
+                        for b in baender
                     }
-                    for b in modell.get("baender") or []
+                    for lz, baender in modell["baender_je_laufzeit"].items()
                 },
                 "band_leer": modell.get("band_leer"),
                 "bnd_titel_ohne": f"Alle Bündel – {modell['titel']}",

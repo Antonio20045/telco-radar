@@ -16,14 +16,19 @@ dabei 36 Raten als „nächstgelegene“ unter „24 Monate“.
 from __future__ import annotations
 
 import contextlib
+import csv
 import functools
 import http.server
+import io
 import json
 import re
 import socket
 import threading
+import urllib.request
 
 import pytest
+from bs4 import BeautifulSoup
+from test_laufzeit_grafik_export import portal
 from test_laufzeit_vergleich import HEUTE, MODELL, SOLL, ansicht, baue, bestand
 
 from telco_radar.report.geraete_laufzeit import ALLE_TEXT
@@ -299,3 +304,56 @@ def test_vodafone_ohne_zahl_heisst_nicht_nicht_erfasst(tmp_path):
     ohne = ansicht(tmp_path / "b", bestand(ohne={("Vodafone", 36)}))
     satz = _text(_paar(ohne, 36)["antwort_html"])
     assert "Vodafone ist mit 36 Raten nicht erfasst" in satz, satz
+
+
+_EXPORT = """() => { const a = document.getElementById('gr-export-tco');
+  return a && {href: a.getAttribute('href'), text: a.textContent.trim()}; }"""
+
+
+def _laden(basis: str, pfad: str) -> str:
+    with urllib.request.urlopen(f"{basis}/{pfad}") as antwort:
+        return antwort.read().decode("utf-8-sig")
+
+
+def test_der_export_folgt_dem_umschalter(_basis):
+    """Datenkonzept 5.4: der Umschalter steuert auch den Export. Bei
+    ?laufzeit=36 zeigt der Bündel-Export auf die 36er-Datei, und die Datei
+    trägt genau die Bündel mit 36 Raten. Gegenproben: 24 ohne Parameter,
+    12 nach dem Klick, „alle“ auf den Gesamtexport."""
+    _browser, basis = _basis
+    with _oeffne(_basis, "?laufzeit=36") as s:
+        link = s.evaluate(_EXPORT)
+        assert link == {
+            "href": "exporte/geraete-tco-36.csv",
+            "text": f"Bündel-TCO 36 Monate ({len(SOLL[36])})",
+        }, link
+        text = _laden(basis, link["href"])
+        zeilen = [
+            z
+            for z in csv.DictReader(io.StringIO(text), delimiter=";")
+            if z["Art"] == "Bündel"
+        ]
+        assert sorted(z["Anbieter"] for z in zeilen) == sorted(SOLL[36]), zeilen
+        assert {z["Laufzeit Monate"] for z in zeilen} == {"36"}
+        _waehle(s, "12")
+        assert s.evaluate(_EXPORT)["href"] == "exporte/geraete-tco-12.csv"
+        _waehle(s, "alle")
+        assert s.evaluate(_EXPORT)["href"] == "exporte/geraete-tco.csv"
+    with _oeffne(_basis) as s:
+        assert s.evaluate(_EXPORT)["href"] == "exporte/geraete-tco-24.csv"
+
+
+def test_kriterium_11_haelt_an_der_gerenderten_seite(_basis):
+    """Die Portal-Abnahme (Kriterium 11) an der echten Vorlage: jede Zeile mit
+    Zahl nennt „über H Monate“. Gegenprobe: ohne Etikett wird sie rot."""
+    _browser, basis = _basis
+    seite = BeautifulSoup(_laden(basis, "geraete.html"), "html.parser")
+    tafel = seite.select_one("#tafel-tco")
+    mit_zahl = tafel.select(".gr-bnd[data-gesamt]:not([data-gesamt=''])")
+    assert len(mit_zahl) == sum(len(v) for v in SOLL.values()), len(mit_zahl)
+    assert portal.zeitraum_maengel(tafel) == []
+    for etikett in tafel.select(".gr-bnd-tco .gr-bnd-label"):
+        etikett.decompose()
+    assert portal.zeitraum_maengel(tafel) == [
+        f"{len(mit_zahl)} Bündelzeilen ohne 'über H Monate'"
+    ]

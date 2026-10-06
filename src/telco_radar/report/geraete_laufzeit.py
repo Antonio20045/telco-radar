@@ -34,6 +34,17 @@ def zeitraum(laufzeit: int) -> int:
     return max(laufzeit, TCO_HORIZONT)
 
 
+def raten_laufzeit(b) -> int | None:
+    """N eines Bündels: nur, wenn es Geräteraten oder einen Bündelbetrag trägt.
+
+    Die eine Regel für Karte (`raten_laufzeit`) und Export - ohne Raten gibt es
+    nichts, was eine Ratenlaufzeit zählen könnte.
+    """
+    if b.geraet_monatsrate is None and b.buendel_monatlich is None:
+        return None
+    return b.laufzeit_monate
+
+
 def ansicht(karte: dict) -> int | None:
     """Die Laufzeit-Ansicht, in der diese Karte steht, oder `None`.
 
@@ -56,6 +67,22 @@ def setze_ansicht(karten: list) -> None:
     for k in karten:
         laufzeit = ansicht(k)
         k["laufzeit_sichtbar"] = ALLE if laufzeit is None else str(laufzeit)
+
+
+def export_je_laufzeit(export: dict) -> dict:
+    """{Laufzeit: Exportzeilen} - je Wahl des Umschalters nur ihre Bündel (5.4).
+
+    Dieselbe Zuordnung wie die Zeilen der Seite (`ansicht` über `raten_laufzeit`).
+    Die SIM-only-Zeilen sind der Maßstab der Näherung und stehen wie sie unter
+    der Standardansicht. „alle“ ist der Gesamtexport `geraete-tco.csv`.
+    """
+    return {
+        lz: {
+            "buendel": [z for z in export.get("buendel") or [] if ansicht(z) == lz],
+            "sim_only": export.get("sim_only") or [] if lz == LAUFZEIT_STANDARD else [],
+        }
+        for lz in LAUFZEITEN
+    }
 
 
 def gruppe(karte: dict) -> tuple:

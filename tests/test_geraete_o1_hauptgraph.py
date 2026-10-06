@@ -81,11 +81,11 @@ def bestand():
     )
 
 
-def _baender(modell, tarife):
+def _baender(modell, tarife, laufzeit=24):
     gb = {tid: (satz or {}).get("datenvolumen_gb") for tid, satz in tarife.items()}
     leiter = bandmod.tarifleiter(tarife)
     return bandmod.baender_fuer_modell(
-        modell, bandmod.tarif_baender(tarife, leiter), gb, leiter
+        modell, bandmod.tarif_baender(tarife, leiter), gb, leiter, laufzeit
     )
 
 
@@ -306,16 +306,18 @@ def test_der_graph_knoten_traegt_alle_modelle():
 def test_der_graph_knoten_traegt_dieselben_zahlen_wie_die_balken():
     """KEINE ZWEITE RECHNUNG: was der Server für das Vorgabemodell rendert
     und was app.js für jedes andere Modell baut, kommt aus DEMSELBEN
-    `balken`-Feld - der Knoten serialisiert es nur."""
+    `balken`-Feld - der Knoten serialisiert es nur. Seit Datenkonzept Geräte
+    5.4 trägt der Knoten die Bänder je Ratenlaufzeit (`baender[N][band]`)."""
     daten = _aufbereitung()
     knoten = dict((m["id"], m) for m in daten["graph_daten"]["modelle"])
     tarife = Tarifbestand.aus_datei(ZUSTAND / "tarife.jsonl").je_id
     geprueft = 0
     for modell in daten["modelle"]:
-        for band in _baender(modell, tarife):
-            im_knoten = knoten[modell["id"]]["baender"][band["key"]]
-            assert im_knoten["zeilen"] == band["balken"]["zeilen"]
-            geprueft += 1
+        for laufzeit in (12, 24, 36):
+            for band in _baender(modell, tarife, laufzeit):
+                im_knoten = knoten[modell["id"]]["baender"][laufzeit][band["key"]]
+                assert im_knoten["zeilen"] == band["balken"]["zeilen"]
+                geprueft += 1
     assert geprueft >= 100, (
         f"nur {geprueft} Modell×Band-Paare geprüft - der Bestand hat mehr"
     )

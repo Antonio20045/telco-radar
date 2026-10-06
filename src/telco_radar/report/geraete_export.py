@@ -70,6 +70,7 @@ from typing import Optional
 
 from ..tco_model import TCO_HORIZONT
 from .geraete_bereinigung import zustand_der_zeile
+from .geraete_laufzeit import export_je_laufzeit
 from .geraete_radar import STATUS_VERGLEICHBAR
 from .geraete_tco_band import band_label
 
@@ -695,57 +696,37 @@ def schreibe_exporte(
     Die Zeilenzahl steht NEBEN dem Link, nicht nur in der Datei: wer einen
     Export herunterlaedt, will vorher wissen, ob er sich lohnt - und ein
     leerer Download ist der teuerste Weg, das herauszufinden.
+
+    Datenkonzept Geräte 5.4: der Bündel-Export folgt dem Umschalter der
+    Ratenlaufzeit. Je Ansicht entsteht `geraete-tco-<N>.csv` mit genau ihren
+    Bündeln (`tco_je_laufzeit`, `geraete_laufzeit.export_je_laufzeit`);
+    `geraete-tco.csv` bleibt der Gesamtexport für „alle“.
     """
     ordner = Path(site_dir) / "exporte"
     ordner.mkdir(parents=True, exist_ok=True)
 
-    inhalt_a, zeilen_a = aktuell_csv(eintraege or [], katalog)
-    inhalt_h, zeilen_h = historie_csv(punkte or [], eintraege or [], katalog)
-    (ordner / "geraete-aktuell.csv").write_text(inhalt_a, encoding=KODIERUNG)
-    (ordner / "geraete-historie.csv").write_text(inhalt_h, encoding=KODIERUNG)
-
-    inhalt_t, zeilen_t = tco_csv(tco or {})
-    (ordner / "geraete-tco.csv").write_text(inhalt_t, encoding=KODIERUNG)
-    inhalt_r, zeilen_r = radar_csv(radar or {})
-    (ordner / "wettbewerbsradar.csv").write_text(inhalt_r, encoding=KODIERUNG)
-
-    inhalt_mb, zeilen_mb = modell_barpreis_csv(modelle or [])
-    (ordner / "geraete-modell-barpreis.csv").write_text(inhalt_mb, encoding=KODIERUNG)
-    inhalt_mt, zeilen_mt = modell_tco_csv(modelle or [])
-    (ordner / "geraete-modell-tco.csv").write_text(inhalt_mt, encoding=KODIERUNG)
+    def datei(name: str, inhalt: str, zeilen: int) -> dict:
+        (ordner / name).write_text(inhalt, encoding=KODIERUNG)
+        groesse = len(inhalt.encode(KODIERUNG))
+        return {"datei": f"exporte/{name}", "zeilen": zeilen, "bytes": groesse}
 
     return {
         "stand": stand,
-        "aktuell": {
-            "datei": "exporte/geraete-aktuell.csv",
-            "zeilen": zeilen_a,
-            "bytes": len(inhalt_a.encode(KODIERUNG)),
+        "aktuell": datei("geraete-aktuell.csv", *aktuell_csv(eintraege or [], katalog)),
+        "historie": datei(
+            "geraete-historie.csv",
+            *historie_csv(punkte or [], eintraege or [], katalog),
+        ),
+        "tco": datei("geraete-tco.csv", *tco_csv(tco or {})),
+        "tco_je_laufzeit": {
+            lz: datei(f"geraete-tco-{lz}.csv", *tco_csv(teil))
+            for lz, teil in export_je_laufzeit(tco or {}).items()
         },
-        "historie": {
-            "datei": "exporte/geraete-historie.csv",
-            "zeilen": zeilen_h,
-            "bytes": len(inhalt_h.encode(KODIERUNG)),
-        },
-        "tco": {
-            "datei": "exporte/geraete-tco.csv",
-            "zeilen": zeilen_t,
-            "bytes": len(inhalt_t.encode(KODIERUNG)),
-        },
-        "radar": {
-            "datei": "exporte/wettbewerbsradar.csv",
-            "zeilen": zeilen_r,
-            "bytes": len(inhalt_r.encode(KODIERUNG)),
-        },
-        "modell_barpreis": {
-            "datei": "exporte/geraete-modell-barpreis.csv",
-            "zeilen": zeilen_mb,
-            "bytes": len(inhalt_mb.encode(KODIERUNG)),
-        },
-        "modell_tco": {
-            "datei": "exporte/geraete-modell-tco.csv",
-            "zeilen": zeilen_mt,
-            "bytes": len(inhalt_mt.encode(KODIERUNG)),
-        },
+        "radar": datei("wettbewerbsradar.csv", *radar_csv(radar or {})),
+        "modell_barpreis": datei(
+            "geraete-modell-barpreis.csv", *modell_barpreis_csv(modelle or [])
+        ),
+        "modell_tco": datei("geraete-modell-tco.csv", *modell_tco_csv(modelle or [])),
     }
 
 
@@ -755,6 +736,7 @@ def leer() -> dict:
         "aktuell": {"datei": "", "zeilen": 0, "bytes": 0},
         "historie": {"datei": "", "zeilen": 0, "bytes": 0},
         "tco": {"datei": "", "zeilen": 0, "bytes": 0},
+        "tco_je_laufzeit": {},
         "radar": {"datei": "", "zeilen": 0, "bytes": 0},
         "modell_barpreis": {"datei": "", "zeilen": 0, "bytes": 0},
         "modell_tco": {"datei": "", "zeilen": 0, "bytes": 0},

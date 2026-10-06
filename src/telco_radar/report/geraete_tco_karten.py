@@ -684,6 +684,8 @@ def _karte(
     A3: `heute` entscheidet über die Frische der Karte (`ist_frisch`,
     dieselbe Definition wie jede Auswahl). Ohne das Datum altert nichts.
     """
+    from . import geraete_laufzeit
+
     frisch = ist_frisch(b.abgerufen_am, heute)
     kosten = kosten_ueber(b)
     belastbar = kosten.gesamt is not None
@@ -729,11 +731,7 @@ def _karte(
         "leitzahl_monate": monate,
         "ab_monat": AB_MONAT,
         "tarif_bindung": b.tarif_bindung_monate,
-        "raten_laufzeit": (
-            b.laufzeit_monate
-            if (b.geraet_monatsrate is not None or b.buendel_monatlich is not None)
-            else None
-        ),
+        "raten_laufzeit": geraete_laufzeit.raten_laufzeit(b),
         "belastbar": belastbar,
         "gesamt": kosten.gesamt,
         "schnitt_monat": kosten.monatlich,

@@ -40,6 +40,7 @@ from typing import Optional
 
 from . import geraete_tco_grafik
 from .anbieter_farben import farbe_fuer
+from .geraete_laufzeit import LAUFZEIT_STANDARD, NICHT_ERFASST, ansicht, zeitraum
 from .geraete_tco_karten import ANBIETER_REIHENFOLGE, HAENDLER_OHNE_BUENDEL
 
 log = logging.getLogger(__name__)
@@ -249,16 +250,18 @@ def _reihe(anbieter: str, karte: dict) -> dict:
     }
 
 
-def _grund(anbieter: str, hat_irgendein_buendel: bool) -> str:
+def _grund(anbieter: str, mit_buendel: set, in_laufzeit: set, laufzeit: int) -> str:
     """Warum dieser Anbieter in diesem Band keine Linie traegt.
 
-    Zwei Faelle, unterschieden: der Anbieter liefert fuer dieses Geraet
-    UEBERHAUPT kein Buendel (die Formulierung, die BRIEF_GRAPH1 fuer
-    Telekom woertlich vorgibt), oder er liefert welche, nur keins in DIESEM
-    Band (ein anderes Datenvolumen).
+    Drei Faelle: der Anbieter liefert fuer dieses Geraet UEBERHAUPT kein
+    Buendel (die Formulierung, die BRIEF_GRAPH1 fuer Telekom woertlich
+    vorgibt), keins mit der gewaehlten Ratenlaufzeit („nicht erfasst“,
+    Datenkonzept 5.4), oder keins in DIESEM Band (ein anderes Datenvolumen).
     """
-    if not hat_irgendein_buendel:
+    if anbieter not in mit_buendel:
         return f"Bündel seitens {anbieter} noch nicht erhoben."
+    if anbieter not in in_laufzeit:
+        return f"{anbieter} ist mit {laufzeit} Raten {NICHT_ERFASST}."
     return f"{anbieter} führt für dieses Gerät kein Bündel in diesem Band."
 
 
@@ -280,8 +283,6 @@ def alle_karten_je_band(
     `laufzeit` beschränkt auf die Karten einer Ansicht
     (`geraete_laufzeit.ansicht`) - 24 Raten werden nie gegen 36 gestellt.
     """
-    from .geraete_laufzeit import ansicht
-
     echte = [
         k
         for k in (modell.get("karten") or [])
@@ -317,14 +318,15 @@ def karten_je_band(
     }
 
 
-def anbieter_mit_irgendeinem_buendel(modell: dict) -> set:
+def anbieter_mit_irgendeinem_buendel(modell: dict, laufzeit: int | None = None) -> set:
     """Wer fuer dieses Geraet UEBERHAUPT ein echtes Buendel fuehrt - in
-    IRGENDEINEM Band. Getrennt von `karten_je_band`, weil `_grund` beide
-    Mengen braucht (siehe dort)."""
+    IRGENDEINEM Band, mit `laufzeit` nur in dieser Ansicht. Getrennt von
+    `karten_je_band`, weil `_grund` beide Mengen braucht (siehe dort)."""
     return {
         k["anbieter"]
         for k in (modell.get("karten") or [])
         if k.get("belastbar") and not k.get("naeherung") and k.get("gesamt") is not None
+        if laufzeit is None or ansicht(k) == laufzeit
     }
 
 
@@ -562,31 +564,22 @@ def baender_fuer_modell(
     band_je_tarif: dict,
     gb_je_tarif: dict | None = None,
     leiter: tuple[Stufe, ...] = (),
+    laufzeit: int = LAUFZEIT_STANDARD,
 ) -> list[dict]:
-    """Je Modell die Baender, fuer die es ECHTE Buendel gibt (§7/Aufgabe 1).
-
-    Rueckgabe: eine Liste, EIN Eintrag je Band MIT mindestens einem echten
-    Buendel - kein leeres Band wird als Auswahloption angeboten (Aufgabe 1:
-    "pro Modell nur Bänder anbieten, für die Bündel existieren"). Je Eintrag:
-        key, label, bereich   - die Stufe der `leiter`
-        grafik                 - `geraete_tco_grafik.zeitreihe(...)`,
-                                  Y-Achse TCO-24 (Aufgabe 3)
-        fehlend                 - [{"anbieter","grund"}] fuer jeden
-                                  erwarteten Anbieter ohne Linie in diesem
-                                  Band (Aufgabe 4)
-        werte (P1, 11.09.2026) - [{"anbieter","slug","eigen","tarif","gb",
-                                  "gesamt"}] je Anbieter MIT Linie: die
-                                  exakten TCO-24 als SICHTBARER TEXT unter
-                                  dem Chart, nicht nur im Hover-Tooltip, den
-                                  es am Telefon nicht gibt (UX-5). `gb`
-                                  braucht `gb_je_tarif` (tarif_id ->
-                                  Datenvolumen, dieselbe Datei wie
-                                  `band_je_tarif`); ohne es steht "" da.
+    """Je Modell die Baender, fuer die es ECHTE Buendel der Ratenlaufzeit
+    `laufzeit` gibt (§7/Aufgabe 1; Datenkonzept 5.4: eine Linie je Anbieter in
+    der gewaehlten Laufzeit, Achse H) - kein leeres Band wird angeboten.
+    Je Eintrag: key, label, bereich (die Stufe der `leiter`); laufzeit;
+    grafik (`geraete_tco_grafik.zeitreihe`, beschriftet „Kosten über H
+    Monate“); fehlend ([{"anbieter","grund"}] je erwartetem Anbieter ohne
+    Linie, Aufgabe 4); werte (je Anbieter MIT Linie die exakte Zahl als
+    sichtbarer Text, UX-5; `gb` braucht `gb_je_tarif`, sonst ""); balken.
     """
     gb_je_tarif = gb_je_tarif or {}
-    je_band = karten_je_band(modell, band_je_tarif)
-    alle_je_band = alle_karten_je_band(modell, band_je_tarif)
-    mit_irgendeinem_buendel = anbieter_mit_irgendeinem_buendel(modell)
+    je_band = karten_je_band(modell, band_je_tarif, laufzeit)
+    alle_je_band = alle_karten_je_band(modell, band_je_tarif, laufzeit)
+    mit_buendel = anbieter_mit_irgendeinem_buendel(modell)
+    in_laufzeit = anbieter_mit_irgendeinem_buendel(modell, laufzeit)
 
     ergebnis = []
     for stufe in leiter:
@@ -600,7 +593,7 @@ def baender_fuer_modell(
         reihen = [_reihe(anbieter, karte) for anbieter, karte in geordnet]
         vorhanden = set(karten_je_anbieter)
         fehlend = [
-            {"anbieter": a, "grund": _grund(a, a in mit_irgendeinem_buendel)}
+            {"anbieter": a, "grund": _grund(a, mit_buendel, in_laufzeit, laufzeit)}
             for a in ERWARTETE_ANBIETER
             if a not in vorhanden
         ]
@@ -614,8 +607,11 @@ def baender_fuer_modell(
                 "key": key,
                 "label": label,
                 "bereich": bereich,
+                "laufzeit": laufzeit,
                 "grafik": geraete_tco_grafik.zeitreihe(
-                    reihen, messgroesse="Kosten über 24 Monate", klasse="gr-tcoband"
+                    reihen,
+                    messgroesse=f"Kosten über {zeitraum(laufzeit)} Monate",
+                    klasse="gr-tcoband",
                 ),
                 "fehlend": fehlend,
                 "werte": [
