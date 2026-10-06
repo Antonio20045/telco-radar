@@ -11,10 +11,12 @@ Prüfstelle. Synthetisch über die öffentlichen Eingänge
 
 from __future__ import annotations
 
+from dataclasses import asdict
+
 import pytest
 
 from telco_radar.report import geraete_notbremse as notbremse
-from telco_radar.report import geraete_tco_karten, geraete_view
+from telco_radar.report import geraete_tco_karten, geraete_tco_view, geraete_view
 from telco_radar.tco_model import Buendel
 
 HEUTE = "2026-10-03"
@@ -153,3 +155,28 @@ def test_katalogzeile_nimmt_kein_buendel_in_quarantaene():
     assert (z["buendel_anbieter"], z["buendel_monat"]) == ("congstar", 55.0), z
     gegen = _katalogzeile(_pruefung("gueltig"))
     assert (gegen["buendel_anbieter"], gegen["buendel_monat"]) == ("o2", 50.0), gegen
+
+
+def _ueber_den_speicher(pruefung: str) -> dict:
+    """Die Karte des o2-Bündels, gelesen wie die Seite: als Speichersatz."""
+    saetze = [
+        asdict(_buendel("Vodafone", 30.0)),
+        asdict(_buendel("o2", 20.0, pruefung)),
+    ]
+    listungen = [_listung("Vodafone"), _listung("o2")]
+    erg = geraete_tco_view.aufbereiten(saetze, [], listungen, katalog=None, heute=HEUTE)
+    return _karte(erg["modelle"][0], "o2")
+
+
+@pytest.mark.parametrize("status", sorted(GESPERRT))
+def test_vermerk_kommt_ueber_den_speicherweg_bis_zur_karte(status):
+    """Die Seite liest Bündel als Speichersätze (``geraete_tco_view``): der Vermerk
+    muss diesen Weg überleben, sonst stellt ein Bündel in Quarantäne doch den
+    Sieger."""
+    o2 = _ueber_den_speicher(_pruefung(status))
+    assert o2["delta"] is None
+    assert o2["notbremse"]["kurz"] == GESPERRT[status][0]
+
+
+def test_gegenprobe_gueltiger_vermerk_ueber_den_speicherweg_behaelt_delta():
+    assert _ueber_den_speicher(_pruefung("gueltig"))["delta"]["betrag"] == -240.0
