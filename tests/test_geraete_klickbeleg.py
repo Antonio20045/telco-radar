@@ -29,15 +29,17 @@ from telco_radar.collect.geraete.klickbeleg import (
 )
 from telco_radar.collect.geraete.klickecho import Variante
 from telco_radar.collect.geraete.klickhar import (
+    GESCHWAERZT,
     HarFehler,
     har_aus,
     har_eintrag,
+    schwaerze,
     zugangskoepfe,
 )
 from telco_radar.collect.geraete.klicklauf import (
     BEFUND,
     BELEG_FEHLT,
-    BELEGT,
+    BELEG_OFFEN,
     ERFASST,
     NICHT_ANGEBOTEN,
     OHNE_WERT,
@@ -158,8 +160,8 @@ def test_erfasster_wert_ohne_beleg_ist_befund_und_nicht_gueltig():
     assert ohne.werte == werte
     assert not ohne.gueltig
     assert mit.status == ERFASST
-    assert mit.beleg_status == BELEGT
-    assert mit.gueltig
+    assert mit.beleg_status == BELEG_OFFEN
+    assert not mit.gueltig, "gültig erst, wenn der Beleg im Archiv liegt"
 
 
 def test_kombination_ohne_werte_braucht_keinen_beleg():
@@ -210,6 +212,79 @@ def test_mitschnitt_traegt_nie_cookies_oder_zugangskoepfe():
     namen = {k["name"].lower() for k in eintrag["response"]["headers"]}
     assert "content-type" in namen
     assert not namen & {"cookie", "set-cookie", "authorization"}
+
+
+def test_mitschnitt_schwaerzt_cookie_und_zugangswerte_im_koerper():
+    kopf = {
+        "Cookie": "sitzung=Geheim/Wert+123; kurz=ab",
+        "Set-Cookie": "sid=AnderesGeheimnis99; Path=/; HttpOnly\nflag=1",
+        "Authorization": "Bearer TraegerGeheim77",
+    }
+    koerper = (
+        "<p>Geheim/Wert+123 Geheim%2FWert%2B123 AnderesGeheimnis99 "
+        "TraegerGeheim77 ab 1</p>"
+    )
+    kopie = replace(antwortkopie(None, **kopf), koerper=koerper.encode())
+
+    har = har_aus(kopie, ZEIT)
+    _, _, text = har_eintrag(har)
+
+    for geheim in ("Geheim/Wert+123", "Geheim%2FWert", "Geheimnis99", "Traeger"):
+        assert geheim.encode() not in har
+    assert text.decode() == "<p>" + f"{GESCHWAERZT} " * 4 + "ab 1</p>"
+
+
+def test_mitschnitt_schwaerzt_geheime_schluessel_in_json_und_text():
+    nutzlast = {
+        "sessionId": "s-1234",
+        "auth": {"benutzer": "x"},
+        "authenticated": True,
+        "daten": [{"csrfToken": "c-5678", "accessToken": 42}],
+        "preis": {"rate": 25.0},
+    }
+    html = (
+        '<meta name="csrf-token" content="m-91"><script>s={"jwt": "j-77", '
+        "'preis': '25,00'}</script>"
+    )
+
+    aus_json = json.loads(schwaerze(json.dumps(nutzlast).encode()))
+    aus_html = schwaerze(html.encode()).decode()
+
+    assert aus_json == {
+        "sessionId": GESCHWAERZT,
+        "auth": GESCHWAERZT,
+        "authenticated": True,
+        "daten": [{"csrfToken": GESCHWAERZT, "accessToken": GESCHWAERZT}],
+        "preis": {"rate": 25.0},
+    }
+    assert aus_html == (
+        f'<meta name="csrf-token" content="{GESCHWAERZT}"><script>s={{"jwt": '
+        f"\"{GESCHWAERZT}\", 'preis': '25,00'}}</script>"
+    )
+
+
+def test_schwaerzen_laesst_einen_harmlosen_koerper_byte_fuer_byte_stehen():
+    roh = b'{ "preis" : {"rate": 25.000},  "token_typ": null, "auth": ""}'
+
+    assert schwaerze(roh, {"cookie": "a=kurz"}) == roh
+    assert schwaerze(b"\x00\xff binaer") == b"\x00\xff binaer"
+
+
+def test_anfragekoerper_im_mitschnitt_ist_geschwaerzt():
+    kopie = replace(
+        antwortkopie(None, Cookie="sitzung=GeheimerWert1"),
+        methode="POST",
+        anfragekoerper=b'{"_csrf": "abc", "wert": "GeheimerWert1", "menge": 1}',
+    )
+
+    anfrage = json.loads(har_aus(kopie, ZEIT))["log"]["entries"][0]["request"]
+
+    assert json.loads(anfrage["postData"]["text"]) == {
+        "_csrf": GESCHWAERZT,
+        "wert": GESCHWAERZT,
+        "menge": 1,
+    }
+    assert anfrage["bodySize"] == len(anfrage["postData"]["text"].encode())
 
 
 def test_zugangskoepfe_findet_cookies_in_einer_fremden_datei():

@@ -10,8 +10,10 @@ Tag ist der UTC-Tag des Belegs. ``haenge_an`` schreibt Zeilen ans Ende,
 ``pruefe_manifest`` nennt jede unvollständige Zeile, jede fehlende Datei, jeden Hash,
 jede Größe und jede ``beleg_id``, die nicht zur Datei passt, jeden Cookie- oder
 Zugangskopf im Mitschnitt und jeden Stempel, dessen Digest nicht zu den Zeilen davor
-passt. Ein ausgefallener Stempel ist ein gültiger Zustand, kein Befund. Dieses Modul
-ruft kein Netz.
+passt; eine Datei, die die Ablage nicht herausgibt oder deren Name kein gültiger
+Ablageschlüssel ist, ist ein Befund ihrer Zeile, und die Prüfung geht weiter. Ein
+ausgefallener Stempel ist ein gültiger Zustand, kein Befund. Dieses Modul ruft kein
+Netz.
 """
 
 from __future__ import annotations
@@ -26,6 +28,7 @@ from pathlib import Path
 from typing import Any
 
 from ...textwerkzeug import slug
+from .belegablage import ArchivFehler
 from .belegstempel import Stempel
 from .klickbeleg import BELEG_VERSION, Beleg, Belegdatei, Fundstelle, beleg_id, sha256
 from .klickhar import HarFehler, har_eintrag, zugangskoepfe
@@ -37,6 +40,7 @@ ART_STEMPEL = "stempel"
 ENDUNG = ".jsonl"
 ZEITFORMAT = "%Y-%m-%dT%H:%M:%SZ"
 _HEX64 = re.compile(r"[0-9a-f]{64}")
+_DATEINAME = re.compile(r"[0-9a-f]{64}\.(?:webp|png|har)")
 _TEXTFELDER = ("beleg_id", "anbieter", "zeitpunkt", "adresse", "seite", "antwort_url")
 
 
@@ -147,7 +151,11 @@ def _pruefe(beleg: Beleg, lies_datei: Callable[[str], bytes | None]) -> list[str
     befunde = _fundstellenbefunde(beleg)
     inhalt: dict[str, bytes] = {}
     for rolle, datei in (("Bild", beleg.bild), ("Mitschnitt", beleg.mitschnitt)):
-        daten = lies_datei(ablageschluessel(beleg, datei))
+        try:
+            daten = lies_datei(ablageschluessel(beleg, datei))
+        except (ValueError, ArchivFehler) as fehler:
+            befunde.append(f"{rolle} {datei.name!r} nicht lesbar: {fehler}")
+            continue
         if daten is None:
             befunde.append(f"{rolle} {datei.name} fehlt in der Ablage")
             continue
@@ -252,8 +260,13 @@ def _beleg(nummer: int, daten: Mapping) -> Beleg:
 
 def _datei(roh: Mapping) -> Belegdatei:
     datei = Belegdatei(**roh)
-    if not datei.name or not _HEX64.fullmatch(datei.sha256) or datei.groesse < 0:
-        raise ValueError(f"Datei {datei.name or '?'} ohne Name, Hash oder Größe")
+    if not _DATEINAME.fullmatch(str(datei.name)):
+        raise ValueError(f"Dateiname {datei.name!r} ist nicht <beleg_id>.<Endung>")
+    groesse = datei.groesse
+    if not _HEX64.fullmatch(str(datei.sha256)) or not isinstance(groesse, int):
+        raise ValueError(f"Datei {datei.name} ohne Hash oder Größe")
+    if groesse < 0:
+        raise ValueError(f"Datei {datei.name} mit negativer Größe")
     return datei
 
 

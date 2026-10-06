@@ -9,8 +9,9 @@ Pfadstil, jede Anfrage selbst signiert (``belegsignatur``), HTTP über
 Umgebungsvariablen in ``UMGEBUNG``; fehlt eine, wirft sie ``ArchivNichtEingerichtet``
 mit den Namen, nie mit Werten. Kein Schlüssel steht in Log, Fehler oder ``repr``.
 Antwortet der Bucket anders als erwartet, wirft die Ablage ``ArchivFehler`` mit Status.
-``waehle_ablage`` nimmt den Bucket, wenn er eingerichtet ist, sonst den Ordner mit dem
-Hinweis „Archiv nicht eingerichtet“.
+``waehle_ablage`` nimmt den Bucket, wenn er eingerichtet ist, sonst den Ordner; der
+trägt dann selbst den Hinweis „Archiv nicht eingerichtet“ (``Ablage.hinweis``), und
+``belegarchiv`` meldet ihn in jedem Bericht.
 """
 
 from __future__ import annotations
@@ -63,6 +64,10 @@ class Ablage(Protocol):
     def ort(self) -> str:
         """Wo die Ablage liegt, ohne Zugangsdaten."""
 
+    @property
+    def hinweis(self) -> str | None:
+        """Was an der Ablage fehlt, etwa „Archiv nicht eingerichtet“; sonst ``None``."""
+
     def lege(self, schluessel: str, daten: bytes, typ: str) -> None:
         """Legt ``daten`` unter ``schluessel`` ab; wirft ``ArchivFehler``."""
 
@@ -82,9 +87,10 @@ def pruefe_schluessel(schluessel: str) -> str:
 
 @dataclass(frozen=True)
 class LokaleAblage:
-    """Eine Ablage in einem Ordner."""
+    """Eine Ablage in einem Ordner; ``hinweis`` sagt, warum es kein Bucket ist."""
 
     ordner: Path
+    hinweis: str | None = None
 
     @property
     def ort(self) -> str:
@@ -141,6 +147,11 @@ class B2Ablage:
     def ort(self) -> str:
         """Endpunkt und Bucket, ohne Schlüssel."""
         return f"{self.zugang.endpunkt.rstrip('/')}/{self.zugang.bucket}"
+
+    @property
+    def hinweis(self) -> str | None:
+        """Ein eingerichteter Bucket hat keinen Hinweis."""
+        return None
 
     def lege(self, schluessel: str, daten: bytes, typ: str) -> None:
         """PUT der Datei; jede Antwort außer 200 oder 201 wirft ``ArchivFehler``."""
@@ -199,9 +210,13 @@ class B2Ablage:
 def waehle_ablage(
     umgebung: Mapping[str, str], ordner: Path, uhr: Callable[[], datetime]
 ) -> tuple[Ablage, str | None]:
-    """Der Bucket, wenn eingerichtet; sonst der Ordner und der benannte Hinweis."""
+    """Der Bucket, wenn eingerichtet; sonst der Ordner mit dem benannten Hinweis.
+
+    Das zweite Glied wiederholt ``Ablage.hinweis``.
+    """
     try:
         return B2Ablage.aus_umgebung(umgebung, uhr), None
     except ArchivNichtEingerichtet as fehler:
         log.warning("Beleg-Archiv: %s; Belege nur unter %s", fehler, ordner)
-        return LokaleAblage(ordner), f"{fehler}; Belege nur im Ordner {ordner}"
+        hinweis = f"{fehler}; Belege nur im Ordner {ordner}"
+        return LokaleAblage(ordner, hinweis), hinweis

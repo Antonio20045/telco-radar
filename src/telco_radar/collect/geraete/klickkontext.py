@@ -11,7 +11,10 @@ Chromium an beiden vorbei; die entfernt das Tor aus jeder Antwort und ``OHNE_VOR
 aus nachgeladenen Elementen, auch in Shadow Roots, bevor der Browser sie liest.
 ``schliesse`` verlässt die Seite, schließt den Kontext und gibt das Vorabladen frei.
 HAR-Belege in ``wiedergabe`` beantworten ihre Anfragen ohne Netz und vor dem Tor; was
-sie nicht kennen, geht an das Tor.
+sie nicht kennen, geht an das Tor. Grenze: ein HAR-Beleg hält nur die Preisantwort, die
+Produktseite selbst kommt weiter aus dem Netz. Ohne erreichbare Seite liest die
+Wiedergabe nichts. Eine Seitenkopie für die Wiedergabe gehört nur in den privaten
+Bucket des Beleg-Archivs, nie ins Repo.
 """
 
 from __future__ import annotations

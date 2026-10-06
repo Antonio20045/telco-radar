@@ -238,22 +238,28 @@ def werte_aus_json(daten: Mapping[str, Any]) -> Preiswerte:
 
 
 def kopie_aus(antwort: Response | None) -> Antwortkopie | None:
-    """Die Preisantwort als Daten; ``None`` ohne Antwort oder ohne lesbaren Körper."""
+    """Die Preisantwort als Daten; ``None`` ohne Antwort, lesbaren Körper oder Köpfe.
+
+    Die Köpfe kommen aus ``all_headers`` samt Cookies, damit ``klickhar.schwaerze``
+    deren Werte auch im Körper findet; in die HAR-Datei kommen sie nie.
+    """
     if antwort is None:
         return None
+    anfrage = antwort.request
     try:
         koerper = antwort.body()
+        anfragekopf = anfrage.all_headers()
+        antwortkopf = antwort.all_headers()
     except PlaywrightFehler as fehler:
         log.info("Klick-Crawler: Körper von %s fehlt: %s", antwort.url, fehler)
         return None
-    anfrage = antwort.request
     return Antwortkopie(
         methode=anfrage.method,
         url=antwort.url,
-        anfragekopf=dict(anfrage.headers),
+        anfragekopf=anfragekopf,
         status=antwort.status,
         statustext=antwort.status_text,
-        antwortkopf=dict(antwort.headers),
+        antwortkopf=antwortkopf,
         koerper=koerper,
         anfragekoerper=anfrage.post_data_buffer,
     )

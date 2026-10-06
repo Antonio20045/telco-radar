@@ -13,6 +13,7 @@ import logging
 from datetime import UTC, datetime
 
 import pytest
+from belegbau import paket
 from belegserver import Anfrage, Antwort, belegserver
 
 from telco_radar.collect.geraete.belegablage import (
@@ -25,7 +26,15 @@ from telco_radar.collect.geraete.belegablage import (
     pruefe_schluessel,
     waehle_ablage,
 )
+from telco_radar.collect.geraete.belegarchiv import ARCHIVIERT, OHNE_BELEG, archiviere
 from telco_radar.collect.geraete.belegsignatur import signiere
+from telco_radar.collect.geraete.klickecho import Variante
+from telco_radar.collect.geraete.klicklauf import (
+    BELEG_OFFEN,
+    ERFASST,
+    Klicklauf,
+    Kombiergebnis,
+)
 
 ZEIT = datetime(2026, 10, 3, 5, 0, tzinfo=UTC)
 GEHEIM = "BEISPIELgeheimerSchluessel0815"
@@ -138,6 +147,26 @@ def test_ohne_bucket_nimmt_waehle_ablage_den_ordner_mit_hinweis(tmp_path, caplog
     assert isinstance(bucket, B2Ablage)
     assert kein_hinweis is None
     assert set(UMGEBUNG.values()) == set(_umgebung("x"))
+
+
+def test_archiv_ohne_bucket_nennt_nicht_eingerichtet_ohne_durchreichen(tmp_path):
+    ablage, hinweis = waehle_ablage({}, tmp_path / "ordner", lambda: ZEIT)
+    bucket, _ = waehle_ablage(_umgebung("http://x"), tmp_path, lambda: ZEIT)
+    lauf = Klicklauf("Beispielanbieter", "http://127.0.0.1:8000/handy/beispielhandy-x")
+    offen = Kombiergebnis(
+        Variante("256", "S", 24), ERFASST, beleg=paket(), beleg_status=BELEG_OFFEN
+    )
+    leer = Klicklauf(lauf.anbieter, lauf.adresse)
+    lauf.ergebnisse.append(offen)
+
+    bericht = archiviere(lauf, ablage, tmp_path / "m", ZEIT, stempler=lambda d: ())
+    ohne = archiviere(leer, ablage, tmp_path / "m", ZEIT, stempler=lambda d: ())
+
+    assert ablage.hinweis == hinweis
+    assert (bericht.zustand, ohne.zustand) == (ARCHIVIERT, OHNE_BELEG)
+    assert bericht.hinweis.startswith(NICHT_EINGERICHTET)
+    assert ohne.hinweis == bericht.hinweis
+    assert bucket.hinweis is None
 
 
 def _bucket(dateien: dict[str, bytes], status: int | None = None):

@@ -14,9 +14,11 @@ die Preisschnittstelle JSON liefern soll. Gescheiterte Anfragen hält der Lauf m
 fest.
 
 Jede Kombination mit gelesenen Werten trägt ihren Beleg (``klickbeleg``) und
-``beleg_status``: ``belegt``, ``fehlt`` oder ``ohne_wert``. Ein Wert ohne Beleg ist
-nicht gültig: ``mit_beleg`` macht eine erfasste Kombination ohne Beleg zum ``befund``
-mit Grund, die Werte bleiben sichtbar; ``gueltig`` gilt nur erfasst und belegt.
+``beleg_status``: ``offen`` (gebaut, noch nicht im Archiv), ``belegt`` (Dateien in der
+Ablage und Zeile im Manifest, gesetzt nur von ``belegarchiv``), ``fehlt`` oder
+``ohne_wert``. Ein Wert ohne archivierten Beleg ist nicht gültig: ``beleg_fehlt``
+macht eine erfasste Kombination zum ``befund`` mit Grund, die Werte bleiben sichtbar;
+``gueltig`` gilt nur erfasst und belegt.
 
 Der Strukturwächter zählt je Lauf gesuchte und gefundene Knöpfe und Felder. Findet ein
 Lauf weniger als ``MINDESTANTEIL_KNOEPFE`` der gesuchten Knöpfe oder weniger als
@@ -47,6 +49,7 @@ BEFUND = "befund"
 LAUF_GELESEN = "gelesen"
 LAUF_GESTOERT = "gestoert"
 LAUF_GESPERRT = "gesperrt"
+BELEG_OFFEN = "offen"
 BELEGT = "belegt"
 BELEG_FEHLT = "fehlt"
 OHNE_WERT = "ohne_wert"
@@ -112,7 +115,7 @@ class Kombiergebnis:
 
     @property
     def gueltig(self) -> bool:
-        """Wahr nur für eine erfasste Kombination mit Beleg."""
+        """Wahr nur für eine erfasste Kombination mit archiviertem Beleg."""
         return self.status == ERFASST and self.beleg_status == BELEGT
 
 
@@ -196,17 +199,22 @@ def bot_schutz(
 def mit_beleg(
     ergebnis: Kombiergebnis, paket: Belegpaket | None, grund: str | None
 ) -> Kombiergebnis:
-    """Hängt den Beleg an; ohne Beleg werden gelesene Werte zum Befund mit Grund."""
+    """Hängt den Beleg als ``offen`` an; ohne Beleg werden Werte zum Befund."""
     if paket is not None:
-        return replace(ergebnis, beleg=paket, beleg_status=BELEGT)
+        return replace(ergebnis, beleg=paket, beleg_status=BELEG_OFFEN)
     gelesen = any(getattr(ergebnis.werte, f) is not None for f in WERTFELDER)
     if not gelesen:
         return replace(ergebnis, beleg_status=OHNE_WERT)
-    befund = Befund("beleg", grund or "Beleg fehlt")
+    return beleg_fehlt(ergebnis, grund or "Beleg fehlt")
+
+
+def beleg_fehlt(ergebnis: Kombiergebnis, grund: str) -> Kombiergebnis:
+    """Der Beleg fehlt oder kam nicht ins Archiv: Befund mit Grund, nicht gültig."""
+    befund = Befund("beleg", grund)
     return replace(
         ergebnis,
         status=BEFUND,
-        grund=ergebnis.grund or befund.grund,
+        grund=ergebnis.grund or grund,
         befunde=(*ergebnis.befunde, befund),
         beleg_status=BELEG_FEHLT,
     )

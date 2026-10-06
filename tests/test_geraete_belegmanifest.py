@@ -16,6 +16,7 @@ from telco_radar.collect.geraete.belegablage import ArchivFehler, LokaleAblage
 from telco_radar.collect.geraete.belegarchiv import (
     ARCHIVIERT,
     GESTOERT,
+    NICHT_ABGELEGT,
     OHNE_BELEG,
     archiviere,
 )
@@ -29,6 +30,10 @@ from telco_radar.collect.geraete.belegmanifest import (
 from telco_radar.collect.geraete.belegstempel import AUSGEFALLEN, Stempel
 from telco_radar.collect.geraete.klickecho import Variante
 from telco_radar.collect.geraete.klicklauf import (
+    BEFUND,
+    BELEG_FEHLT,
+    BELEG_OFFEN,
+    BELEGT,
     ERFASST,
     NICHT_ANGEBOTEN,
     Klicklauf,
@@ -50,7 +55,8 @@ def _lauf(*pakete) -> Klicklauf:
     lauf = Klicklauf("Beispielanbieter", "http://127.0.0.1:8000/handy/beispielhandy-x")
     for nummer, fertig in enumerate(pakete):
         variante = Variante("256", "S", 24 + nummer)
-        lauf.ergebnisse.append(Kombiergebnis(variante, ERFASST, beleg=fertig))
+        offen = Kombiergebnis(variante, ERFASST, beleg=fertig, beleg_status=BELEG_OFFEN)
+        lauf.ergebnisse.append(offen)
     lauf.ergebnisse.append(Kombiergebnis(Variante("128", "S", 36), NICHT_ANGEBOTEN))
     return lauf
 
@@ -78,6 +84,7 @@ def test_archiv_legt_dateien_ab_und_schreibt_eine_zeile_je_beleg(tmp_path):
 
     assert bericht.zustand == ARCHIVIERT
     assert bericht.belege == 2
+    assert bericht.fehlend == ()
     assert bericht.manifeste == (pfad,)
     assert pfad.relative_to(tmp_path).as_posix() == (
         "manifest/beispielanbieter/2026-10-03.jsonl"
@@ -244,6 +251,65 @@ def test_gestoerte_ablage_heisst_gestoert_und_haelt_nur_ganze_belege(tmp_path):
     pfad = bericht.manifeste[0]
     assert [b.beleg_id for b in lies_manifest(pfad).belege] == [erster.beleg.beleg_id]
     assert pruefe_manifest(pfad, ablage.lies) == []
+
+
+def test_beleg_ohne_ablage_und_manifest_fehlt_und_ist_nicht_gueltig(tmp_path):
+    erster, zweiter, dritter = paket(), _zweiter(), paket(screenshot_png=png((9, 9, 9)))
+    lauf = _lauf(erster, zweiter, dritter)
+    ablage = _Kaputt(tmp_path / "ablage")
+
+    bericht = archiviere(lauf, ablage, tmp_path / "m", ZEIT, stempler=lambda d: ())
+
+    belegt, *fehlt = lauf.ergebnisse[:3]
+    assert (belegt.beleg_status, belegt.gueltig) == (BELEGT, True)
+    assert [e.beleg_status for e in fehlt] == [BELEG_FEHLT, BELEG_FEHLT]
+    assert not any(e.gueltig for e in fehlt)
+    assert all(e.status == BEFUND for e in fehlt)
+    assert all(e.grund.startswith(f"{NICHT_ABGELEGT}: Archiv gestört") for e in fehlt)
+    assert [e.beleg for e in fehlt] == [zweiter, dritter]
+    assert bericht.fehlend == tuple(e.variante for e in fehlt)
+    assert lauf.ergebnisse[3].beleg_status != BELEG_FEHLT
+
+
+def test_manifest_nicht_schreibbar_heisst_jeder_beleg_fehlt(tmp_path):
+    lauf = _lauf(paket(), _zweiter())
+    (tmp_path / "m").write_text("kein Ordner", "utf-8")
+
+    bericht = archiviere(
+        lauf, LokaleAblage(tmp_path / "a"), tmp_path / "m", ZEIT, stempler=lambda d: ()
+    )
+
+    assert bericht.zustand == GESTOERT
+    assert bericht.grund.startswith("Archiv gestört: Manifest 2026-10-03.jsonl")
+    assert (bericht.belege, bericht.manifeste) == (0, ())
+    assert [e.beleg_status for e in lauf.ergebnisse[:2]] == [BELEG_FEHLT] * 2
+    assert bericht.fehlend == (Variante("256", "S", 24), Variante("256", "S", 25))
+
+
+@pytest.mark.parametrize("name", ["a b.webp", "x/../y.webp", "../../x.webp"])
+def test_ungueltiger_dateiname_im_manifest_ist_ein_befund(tmp_path, name):
+    _, ablage, pfad, _ = _archiv(tmp_path, paket(), _zweiter())
+    zeilen = pfad.read_text("utf-8").splitlines()
+    erste = json.loads(zeilen[0])
+    erste["bild"]["name"] = name
+    zeilen[0] = json.dumps(erste, ensure_ascii=False)
+    pfad.write_text("\n".join(zeilen[:2]) + "\n", "utf-8")
+
+    befunde = pruefe_manifest(pfad, ablage.lies)
+
+    assert befunde[0].startswith("Zeile 1:"), befunde
+    assert not any(b.startswith("Zeile 2:") for b in befunde)
+
+
+def test_ablage_die_beim_lesen_scheitert_ist_ein_befund(tmp_path):
+    _, _, pfad, _ = _archiv(tmp_path, paket())
+
+    def lies(schluessel: str) -> bytes | None:
+        raise ArchivFehler(f"{schluessel}: Ablage antwortet HTTP 503")
+
+    befunde = pruefe_manifest(pfad, lies)
+
+    assert any("nicht lesbar" in b and "HTTP 503" in b for b in befunde), befunde
 
 
 def test_beleg_nach_mitternacht_landet_im_manifest_seines_tages(tmp_path):

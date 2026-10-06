@@ -27,9 +27,12 @@ Tageslauf. Je Produktseite und Klick-Karte (``klickkarte``):
    ist der Lauf gestört.
 5. Jede gelesene Kombination trägt ihren Beleg (``klickbeleg``): Screenshot, HAR der
    Preisantwort, Zeitpunkt aus ``uhr``, Fundstellen. Ohne Beleg ist ein Wert nicht
-   gültig (``klicklauf.mit_beleg``). ``wiedergabe`` nennt HAR-Belege, aus denen der
+   gültig (``klicklauf.mit_beleg``), mit Beleg heißt er ``offen``, bis
+   ``belegarchiv`` ihn ablegt. ``wiedergabe`` nennt HAR-Belege, aus denen der
    Kontext Antworten ohne Netz abspielt (``route_from_har``); was sie nicht kennen,
-   geht wie sonst durch das Tor.
+   geht wie sonst durch das Tor. Grenze: der Beleg hält nur die Preisantwort, die
+   Produktseite kommt weiter aus dem Netz; ist sie weg, liest die Wiedergabe nichts.
+   Eine Seitenkopie gehört nur in den privaten Bucket, nie ins Repo.
 
 Den Browser startet der Aufrufer; dieses Modul setzt keine Tarnung, keinen Proxy und
 keine fremde Kennung.
