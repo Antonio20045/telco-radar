@@ -71,14 +71,10 @@
       k.zustand_etikett }}</span>{% endif %}{#
       Notbremse (Datenkonzept Geräteradar, Schritt 1): eine Karte, die
       nicht zählt (`geraete_notbremse.felder`), sagt es an der Zeile -
-      dieselben Wörter wie ihr Δ-Zustand. Die Erklärung steht im `title`,
+      dieselben Wörter wie ihr Δ-Zustand (`notbremse`). Die Erklärung steht im `title`,
       nicht als Unterzeile. #}{%
-      if k.schaetzung %} <span class="gr-kk-marke gr-kk-marke--notbremse"
-      title="Preis abgeleitet, nicht auf der Anbieterseite gemessen – zählt nicht im Vergleich"
-      >Schätzung</span>{% endif %}{%
-      if k.veraltet_aktion %} <span class="gr-kk-marke gr-kk-marke--notbremse"
-      title="Im Preis steckt eine abgelaufene Aktion – zählt nicht im Vergleich"
-      >Aktion abgelaufen</span>{% endif %}{%
+      if k.notbremse %} <span class="gr-kk-marke gr-kk-marke--notbremse"
+      title="{{ k.notbremse.satz }}">{{ k.notbremse.kurz }}</span>{% endif %}{%
       if k.alt_marke %} <span class="gr-kk-marke gr-kk-marke--alt">{{
       k.alt_marke }}</span>{% endif %}{%
       if k.naeherung %} <span class="gr-kk-marke">Referenzrechnung</span>{%

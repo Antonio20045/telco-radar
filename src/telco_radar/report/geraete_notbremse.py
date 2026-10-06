@@ -20,17 +20,18 @@ SATZ_AKTION_ABGELAUFEN = (
 
 
 def felder(b: Buendel, heute: str) -> dict:
-    """``schaetzung``, ``veraltet_aktion`` und ``zaehlt`` einer Karte.
+    """Die Notbremse-Felder einer Karte: Flags, ``zaehlt``, benannter Zustand.
 
     Abgelaufen ist eine eingerechnete Aktion, die der Anbieter vor ``heute``
     befristet hat (``Aktion.gilt_am``); ein Platzhalter-Ende wie 2050 läuft weiter.
     """
     schaetzung = bool(b.herleitung.strip())
     veraltet = any(a.eingerechnet and not a.gilt_am(heute) for a in b.aktionen)
+    flags = {"schaetzung": schaetzung, "veraltet_aktion": veraltet}
     return {
-        "schaetzung": schaetzung,
-        "veraltet_aktion": veraltet,
+        **flags,
         "zaehlt": not schaetzung and not veraltet,
+        "notbremse": zustand(flags),
     }
 
 
