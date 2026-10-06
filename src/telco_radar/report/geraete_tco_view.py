@@ -330,6 +330,7 @@ _BUENDEL_FELDER = (
     "quelle_url",
     "abgerufen_am",
     "zustand",
+    "herleitung",
 )
 
 _REFERENZ_FELDER = (
@@ -364,8 +365,7 @@ def _aus_speicher(eintraege: list, typ, felder: tuple) -> list:
     (`Buendel.__post_init__`: kein Anbieter, kein Tarif, kein Geraetepreis
     ohne SKU). Ein Satz, der sie verletzt, ist kaputt und darf die TAFEL
     nicht kosten - er wird uebergangen, nicht repariert. Repariert stuende
-    eine erfundene Zahl in einer Kennzahl, und das ist teurer als eine
-    fehlende Zeile.
+    eine erfundene Zahl in einer Kennzahl, teurer als eine fehlende Zeile.
     """
     fertig = []
     for e in eintraege:

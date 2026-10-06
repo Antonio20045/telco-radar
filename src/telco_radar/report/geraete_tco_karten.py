@@ -50,8 +50,6 @@ import re
 from datetime import date as _datum
 from typing import Optional
 
-from . import anbieter_farben, geraete_vergleich
-from .geraete_tco_grafik import anbieter_slug
 from ..geraete_model import VERGLEICHBARE_ZUSTAENDE, ZUSTAENDE, normalisiere
 from ..tarif_model import Preisphase
 from ..tco_model import (
@@ -75,7 +73,9 @@ from ..tco_model import (
     tco_24,
     zeitraum_vergleichbar,
 )
-
+from . import anbieter_farben, geraete_vergleich
+from . import geraete_notbremse as notbremse
+from .geraete_tco_grafik import anbieter_slug
 
 LAUFZEIT = TCO_HORIZONT
 AB_MONAT = TCO_HORIZONT + 1
@@ -783,6 +783,7 @@ def _karte(
         "abgerufen_am": b.abgerufen_am,
         "tarif_quelle_url": (tarif or {}).get("dokument_url", ""),
         "naeherung": False,
+        **notbremse.felder(b, heute),
         "ab_preis": b.buendel_monatlich is not None,
     }
 
@@ -1207,7 +1208,11 @@ def delta_zustand(karte: dict, referenz: Optional[dict]) -> Optional[dict]:
     damit auch keinen numerischen Δ-Sortierschluessel und faellt aus der
     Rangfolge nach Δ heraus (`data-delta` bleibt leer).
     """
-    if not _delta_faellig(karte, referenz) or gleicher_horizont(karte, referenz):
+    if not _delta_faellig(karte, referenz):
+        return None
+    if gesperrt := notbremse.zustand(karte):
+        return gesperrt
+    if gleicher_horizont(karte, referenz):
         return None
     monate = karte.get("leitzahl_monate")
     dieses = (
@@ -1229,23 +1234,11 @@ def _delta(karte: dict, referenz: Optional[dict]) -> Optional[dict]:
     der Karte 36 Monate traegt und die Referenz 24, waere die Differenz
     die Laufzeit und nicht der Preis.
 
-    P0-B-fix2: dann gibt es auch KEIN monatliches Delta mehr. Bis hierher
-    stand in diesem Fall der Ø/Monat-Abstand da (A5.3) - aber der Ø/Monat
-    teilt beide Summen durch dieselben 24 Monate
-    (`tco_model.Tco.monatlich`), und eine 36-Monats-Summe durch 24 ist
-    kein Monatspreis. Gemessen an 1&1s iPhone 17 256 GB: ausgewiesen waren
-    "+79,74 EUR / +4,3 % über der Vodafone-Referenz", waehrend allein die
-    12 Tarifmonate jenseits des Horizonts mit mindestens 179,88 EUR in der
-    Zahl stecken - das Vorzeichen war nicht belegt. Die Zeile bekommt
-    stattdessen den benannten Zustand aus `delta_zustand` (Regel 9: der
-    Ausfall steht auf der Seite).
-
-    Ein Abstand unter der Wesentlichkeits-Schwelle ist eine ANNAEHERUNG
-    (`ungefaehr`, A2 20.09.2026), kein fehlendes Delta: der Strich der
-    Δ-Spalte heisst "kein Angebot", und ein gemessenes, das nur knapp
-    daneben liegt, ist sehr wohl eines.
+    P0-B-fix2: dann auch kein monatliches Delta (36-Monats-Summe durch 24
+    ist kein Monatspreis), sondern der Zustand aus `delta_zustand`. Unter
+    der Wesentlichkeits-Schwelle ist es `ungefaehr` (A2), nicht fehlend.
     """
-    if not _delta_faellig(karte, referenz):
+    if not _delta_faellig(karte, referenz) or not notbremse.zaehlt(karte):
         return None
     if not gleicher_horizont(karte, referenz):
         return None
@@ -1502,7 +1495,7 @@ def modelle(
         )
         eigene = [
             k
-            for k in karten
+            for k in filter(notbremse.zaehlt, karten)
             if k["eigen"] and k["belastbar"] and k["vergleichbar"] and k["frisch"]
         ]
         naeherung = None
@@ -1559,7 +1552,7 @@ def modelle(
         )
         tarifangebote = [
             k
-            for k in angebote
+            for k in filter(notbremse.zaehlt, angebote)
             if k["vergleichbar"] and k["frisch"] and k["gesamt"] is not None
         ]
         guenstigster_tarif = (
