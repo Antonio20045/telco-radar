@@ -233,3 +233,41 @@ def test_kaputte_parameter_nennen_die_stelle(ersetzt, feld):
         _karte(**ersetzt)
 
     assert fehler.value.feld == feld
+
+
+@pytest.mark.parametrize(
+    ("text", "feld", "erwartet"),
+    [
+        ("eSIM-Aktivierung sofort, keine Wartezeit", "anschluss", None),
+        ("Anzahlung frei wählbar, keine Zinsen", "anzahlung", None),
+        ("Anzahlung 99,00 € · Auch ohne Anzahlung erhältlich", "anzahlung", 99.0),
+        ("Auch ohne Anzahlung erhältlich · Anzahlung 99,00 €", "anzahlung", 99.0),
+        ("Anzahlung – entfällt", "anzahlung", 0.0),
+        ("Ohne Anzahlung · Rate 25,00 €", "anzahlung", 0.0),
+    ],
+)
+def test_nullwort_gilt_nur_am_posten_und_ein_betrag_geht_vor(text, feld, erwartet):
+    from telco_radar.collect.geraete.klickecho import lies_zusammenfassung
+
+    assert getattr(lies_zusammenfassung(text), feld) == erwartet
+
+
+@pytest.mark.parametrize(
+    ("roh", "monate"),
+    [
+        ("Einmalzahlung 1.099 €", None),
+        ("Sofortkauf 0 € Versand", None),
+        ("Laufzeit wählen", None),
+        ("24 Monate", 24),
+        ("36 Monaten", 36),
+        ("24 x", 24),
+        ("24x 25,00 €", 24),
+        ("24", 24),
+        (" 36 ", 36),
+        (24, 24),
+    ],
+)
+def test_laufzeit_nur_aus_einer_monatsangabe(roh, monate):
+    from telco_radar.collect.geraete.klickecho import variante_aus
+
+    assert variante_aus("128", "S", roh).laufzeit == monate

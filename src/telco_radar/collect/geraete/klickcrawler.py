@@ -3,22 +3,27 @@
 Gerüst aus Schritt 4 des Datenkonzepts Geräteradar (Abschnitt 8); noch ruft es kein
 Tageslauf. Je Produktseite und Klick-Karte (``klickkarte``):
 
-1. Der Crawler legt einen eigenen Browserkontext ohne Service Worker an. Jede Anfrage
+1. Der Crawler legt einen eigenen Browserkontext an (``klickkontext``). Jede Anfrage
    geht durch das Tor (``klicktor``): robots.txt für jede Adresse und jedes Ziel einer
-   Umleitung, Crawl-delay je Host für Seiten, XHR und Fetch. Gesperrte Adressen gehen
-   nicht hinaus und stehen in ``verworfen``. Nach dem Lauf verlässt er die Seite und
-   schließt den Kontext; die Seite lädt danach nichts mehr.
+   Umleitung, Crawl-delay je Host für jede Anfrage. Gesperrte Adressen gehen nicht
+   hinaus und stehen in ``verworfen``, gescheiterte in ``gescheitert``. Die Seite
+   lädt ohne Frist für die Wartezeit des Crawl-delays: die Frist zählt nur Zeit, in
+   der niemand wartet. Nach dem Lauf verlässt er die Seite und schließt den Kontext.
 2. Antwortet die Seite mit 202 (Challenge), 4xx oder 5xx oder fehlt der Kanarienwert,
    ist der Abruf gestört: kein zweiter Versuch, keine Umgehung (CLAUDE.md Regel 4).
-   Sperrt robots.txt die Seite oder ihre Preisantwort, ist der Lauf gesperrt.
+   Sperrt robots.txt die Seite oder ihre Preisantwort, ist der Lauf gesperrt; scheitert
+   die Preisanfrage, ist er gestört.
 3. Er liest die angebotenen Optionen je Dimension und klickt jede Kombination; nach
    jedem Klick liest er die Optionen neu und führt neu erschienene Werte mit. Eine
+   gewählte Option klickt er nicht; eine gesperrte heißt erst ``nicht_angeboten``,
+   wenn die Seite ruht (keine Preisanfrage offen, zwei gleiche Lesungen). Eine
    Antwort gehört nur zu dem Klick, nach dem ihre Anfrage hinausging; bleibt eine
    Anfrage über die Frist offen, wartet er sie vor dem nächsten Klick ab oder bricht
-   den Lauf als gestört ab. Dann liest er die Preiszusammenfassung, prüft die roh
-   markierten Optionen und das Echo (``klickecho``) und macht einen Screenshot.
+   den Lauf als gestört ab. Dann liest ``klicklesung`` Antwort, Text, Markierung und
+   Echo und macht einen Screenshot.
 4. Je Kombination: erfasst, nicht_angeboten, nicht_erfasst oder befund; dazu der
-   Strukturwächter je Lauf (beides in ``klicklauf``).
+   Strukturwächter je Lauf (beides in ``klicklauf``). Ist keine Kombination
+   angeboten, ist der Lauf gestört.
 
 Den Browser startet der Aufrufer; dieses Modul setzt keine Tarnung, keinen Proxy und
 keine fremde Kennung.
@@ -33,23 +38,11 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 
 from playwright.sync_api import Error as PlaywrightFehler
-from playwright.sync_api import TimeoutError as PlaywrightZeitueberschreitung
 
-from .klickecho import (
-    KEINE_AUSWAHL,
-    LAUFZEIT,
-    Antwortlesung,
-    Befund,
-    Echo,
-    Variante,
-    lies_antwort,
-    pruefe_echo,
-    variante_aus,
-)
-from .klickkarte import DIMENSIONEN, WERTFELDER, Klickkarte
+from .klickecho import LAUFZEIT, Variante, variante_aus
+from .klickkarte import DIMENSIONEN, Klickkarte
+from .klickkontext import Mitschnitt, oeffne_kontext, schliesse
 from .klicklauf import (
-    BEFUND,
-    ERFASST,
     LAUF_GELESEN,
     LAUF_GESPERRT,
     LAUF_GESTOERT,
@@ -58,27 +51,19 @@ from .klicklauf import (
     Klicklauf,
     Kombiergebnis,
     abruf_gestoert,
-    strukturgrund,
+    ergebnisgrund,
+    pruefe_struktur,
 )
-from .klickoptionen import (
-    Auswahl,
-    Option,
-    angebotene_werte,
-    lies_optionen,
-    naechste,
-    vereinige,
-)
-from .klicktext import Preiswerte, lies_zusammenfassung
+from .klicklesung import Leser
+from .klickoptionen import Auswahl, Option, angebotene_werte, naechste, vereinige
 from .klicktor import (
     GRUND_ZU_VIELE,
     HOECHSTE_UMLEITUNGEN,
     SEITEN_FRIST_MS,
-    Mitschnitt,
+    WARTE_TAKT_MS,
     Schleuse,
     Tor,
     kurz,
-    schliesse,
-    sperre_beiwege,
 )
 from .robots import RobotsWaechter
 
@@ -96,12 +81,13 @@ if TYPE_CHECKING:
 log = logging.getLogger(__name__)
 
 ANTWORT_FRIST_MS = 15000
-WARTE_TAKT_MS = 50
+RUHE_MS = 500
+MINDESTE_RUHELESUNGEN = 3
 HOECHSTE_KOMBINATIONEN = 200
 FENSTER: ViewportSize = {"width": 1280, "height": 900}
-_ZWEI_BILDER_JS = (
-    "() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)))"
-)
+_GELADEN_JS = "() => document.readyState === 'complete'"
+
+Marke = tuple[int, int]
 
 
 def klicke_durch(
@@ -119,29 +105,29 @@ def klicke_durch(
 
     ``uhr`` liefert die Zeit des nächsten Abrufs für robots.txt; ``schleuse`` hält den
     Crawl-delay je Host über Läufe hinweg (``klicktor.Hostschleuse``, eine je
-    Anbieterlauf). ``vorlauf`` ist der letzte Lauf derselben Seite; er zählt nur, wenn
-    er gelesen ist. Ein Abbruch steht als Status und Grund im Lauf, die Kombinationen
-    bis dahin bleiben erhalten.
+    Anbieterlauf). ``vorlauf`` ist der letzte Lauf derselben Seite; sein Bezug für den
+    Strukturwächter wandert weiter (``klicklauf.pruefe_struktur``). Ein Abbruch steht
+    als Status und Grund im Lauf, die Kombinationen bis dahin bleiben erhalten.
     """
     lauf = Klicklauf(anbieter=karte.anbieter, adresse=adresse)
-    tor = Tor(waechter, uhr, schleuse, lauf.verworfen, frist_ms)
+    tor = Tor(waechter, uhr, schleuse, lauf)
     kontext: BrowserContext | None = None
     seite: Page | None = None
     try:
-        kontext = browser.new_context(service_workers="block", viewport=FENSTER)
-        kontext.route("**/*", tor)
-        seite = kontext.new_page()
-        sperre_beiwege(kontext, seite)
+        kontext, seite = oeffne_kontext(browser, tor, FENSTER)
         _Gang(seite, karte, tor, frist_ms, lauf).laufe()
     except _Abbruch as abbruch:
         lauf.status, lauf.grund = abbruch.status, abbruch.grund
     except PlaywrightFehler as fehler:
         lauf.status, lauf.grund = LAUF_GESTOERT, f"Browserfehler: {kurz(fehler)}"
     finally:
+        tor.geschlossen = True
         schliesse(kontext, seite)
-    bruch = strukturgrund(lauf.struktur, vorlauf)
-    if lauf.status == LAUF_GELESEN and bruch is not None:
-        lauf.status, lauf.grund = LAUF_GESTOERT, bruch
+    bruch = pruefe_struktur(lauf, vorlauf)
+    leer = ergebnisgrund(lauf.ergebnisse)
+    for grund in (bruch, leer):
+        if lauf.status == LAUF_GELESEN and grund is not None:
+            lauf.status, lauf.grund = LAUF_GESTOERT, grund
     if lauf.status != LAUF_GELESEN:
         log.warning("Klick-Crawler %s %s: %s", karte.anbieter, adresse, lauf.grund)
     return lauf
@@ -168,6 +154,7 @@ class _Gang:
     ) -> None:
         self.seite, self.karte, self.tor, self.lauf = seite, karte, tor, lauf
         self.frist_ms = frist_ms
+        self.leser = Leser(seite, karte, frist_ms)
         self.antwort: Response | None = None
         self.geklickt = False
         self.mitschnitt = Mitschnitt(karte.antwort.passt)
@@ -208,53 +195,85 @@ class _Gang:
         if not darf:
             raise _Abbruch(LAUF_GESPERRT, grund)
         kanarie = self.karte.kanarie
-        if kanarie.enthaelt not in self._text(self.seite.locator(kanarie.selektor)):
+        if kanarie.enthaelt not in self.leser.text(
+            self.seite.locator(kanarie.selektor)
+        ):
             grund = f"Kanarienwert fehlt: {kanarie.selektor} ohne „{kanarie.enthaelt}“"
             raise _Abbruch(LAUF_GESTOERT, grund)
-        self._nimm_antwort(self._antwort_seit(0), 0)
+        self._nimm_antwort(self._antwort_seit(0), (0, 0))
 
     def _lade(self, ziel: str) -> Response | None:
+        """Öffnet ``ziel``; die Frist bis zur Antwort trägt den Crawl-delay mit."""
         self.tor.umleitung = None
-        seit = len(self.lauf.verworfen)
+        verworfen, gescheitert = self._marke()
+        frist = SEITEN_FRIST_MS + round(1000 * self.tor.schleuse.abstand(ziel))
         try:
-            return self.seite.goto(ziel, timeout=SEITEN_FRIST_MS)
+            haupt = self.seite.goto(ziel, wait_until="commit", timeout=frist)
         except PlaywrightFehler as fehler:
             if self.tor.umleitung is not None:
                 return None
-            gesperrt = self.lauf.verworfen[seit:]
+            gesperrt = self.lauf.verworfen[verworfen:]
             if gesperrt:
                 raise _Abbruch(LAUF_GESPERRT, gesperrt[0].grund) from fehler
+            ohne = self.lauf.gescheitert[gescheitert:]
+            if ohne:
+                raise _Abbruch(
+                    LAUF_GESTOERT, f"Abruf gestört ({ohne[0].grund})"
+                ) from fehler
             raise
+        if self.tor.umleitung is None and not self._warte(
+            self._geladen, SEITEN_FRIST_MS
+        ):
+            raise _Abbruch(
+                LAUF_GESTOERT, f"Seite nach {SEITEN_FRIST_MS} ms nicht geladen"
+            )
+        return haupt
 
-    def _warte(self, bedingung: Callable[[], bool]) -> bool:
-        for _ in range(max(1, self.frist_ms // WARTE_TAKT_MS)):
+    def _geladen(self) -> bool:
+        try:
+            return self.seite.evaluate(_GELADEN_JS) is True
+        except PlaywrightFehler:
+            return False
+
+    def _warte(
+        self, bedingung: Callable[[], bool], frist_ms: int | None = None
+    ) -> bool:
+        """Wartet in Takten; Wartezeit des Tors auf den Crawl-delay zählt nicht."""
+        takte = (self.frist_ms if frist_ms is None else frist_ms) // WARTE_TAKT_MS
+        for _ in range(max(1, takte)):
             if bedingung():
                 return True
             self.seite.wait_for_timeout(WARTE_TAKT_MS)
         return bedingung()
+
+    def _marke(self) -> Marke:
+        return len(self.lauf.verworfen), len(self.lauf.gescheitert)
 
     def _antwort_seit(self, seit: int) -> Response | None:
         if not self._warte(lambda: self.mitschnitt.fertig_seit(seit)):
             return None
         return self.mitschnitt.letzte_seit(seit)
 
-    def _nimm_antwort(self, antwort: Response | None, seit: int) -> None:
+    def _nimm_antwort(self, antwort: Response | None, marke: Marke) -> None:
+        passt = self.karte.antwort.passt
         if antwort is None:
-            verworfen = self.lauf.verworfen[seit:]
-            gesperrt = [v for v in verworfen if self.karte.antwort.passt(v.anfrage)]
+            verworfen = self.lauf.verworfen[marke[0] :]
+            gesperrt = [v for v in verworfen if passt(v.anfrage)]
             if gesperrt:
                 raise _Abbruch(LAUF_GESPERRT, f"Preisantwort {gesperrt[0].grund}")
+            gescheitert = self.lauf.gescheitert[marke[1] :]
+            ohne = [g for g in gescheitert if passt(g.anfrage)]
+            if ohne:
+                grund = f"Preisantwort gescheitert: {ohne[0].grund}"
+                raise _Abbruch(LAUF_GESTOERT, grund)
         else:
             stoerung = abruf_gestoert(antwort.status)
             if stoerung is not None:
                 raise _Abbruch(LAUF_GESTOERT, f"Preisantwort: {stoerung}")
         self.antwort = antwort
 
-    def _optionen(self, dimension: str) -> list[Option]:
-        return lies_optionen(self.seite, self.karte, dimension)
-
     def _angebotene_werte(self, dimension: str) -> list[str | None]:
-        optionen = self._optionen(dimension)
+        optionen = self.leser.optionen(dimension)
         self.lauf.struktur.knopf(bool(optionen))
         return angebotene_werte(optionen)
 
@@ -275,7 +294,7 @@ class _Gang:
             ergebnis = self._waehle(dimension, str(ziel[dimension]), variante)
             if ergebnis is not None:
                 return ergebnis
-        return self._lies(variante, ziel)
+        return self.leser.lies(variante, ziel, self.antwort, self.lauf.struktur)
 
     def _fehlen(self, dimension: str) -> str:
         selektor = self.karte.knoepfe[dimension].selektor
@@ -284,20 +303,44 @@ class _Gang:
     def _waehle(
         self, dimension: str, wert: str, variante: Variante
     ) -> Kombiergebnis | None:
-        optionen = self._optionen(dimension)
+        """Klickt ``wert``, wenn nötig; sonst das Ergebnis, das den Weg beendet.
+
+        Eine gewählte Option bleibt, auch wenn die Seite sie sperrt. Eine gesperrte
+        heißt erst ``nicht_angeboten``, wenn die Seite ruht; kommt sie nicht zur Ruhe,
+        heißt die Kombination ``nicht_erfasst``.
+        """
+        optionen: list[Option] | None = self.leser.optionen(dimension)
         self.lauf.struktur.knopf(bool(optionen))
         if not optionen:
             return Kombiergebnis(variante, NICHT_ERFASST, self._fehlen(dimension))
-        stelle = next((i for i, o in enumerate(optionen) if o.wert == wert), None)
-        if stelle is None:
+        option = _option(optionen, wert)
+        if option is not None and option.deaktiviert and not option.gewaehlt:
+            optionen = self._in_ruhe(dimension)
+            if optionen is None:
+                grund = f"Seite kam für {dimension} {wert} nicht zur Ruhe"
+                return Kombiergebnis(variante, NICHT_ERFASST, grund)
+            option = _option(optionen, wert)
+        if option is None:
             grund = f"Seite zeigt {dimension} {wert} in diesem Zustand nicht"
             return Kombiergebnis(variante, NICHT_ERFASST, grund)
-        if optionen[stelle].deaktiviert:
+        if option.gewaehlt:
+            return None
+        if option.deaktiviert:
             grund = f"Seite bietet {dimension} {wert} nicht an"
             return Kombiergebnis(variante, NICHT_ANGEBOTEN, grund)
-        if optionen[stelle].gewaehlt:
-            return None
-        return self._klicke(dimension, stelle, variante)
+        return self._klicke(dimension, optionen.index(option), variante)
+
+    def _in_ruhe(self, dimension: str) -> list[Option] | None:
+        """Die Knöpfe, sobald keine Preisanfrage offen ist und zwei Lesungen im Abstand
+        ``RUHE_MS`` gleich sind; ``None``, wenn die Frist vorher abläuft."""
+        vorher: list[Option] | None = None
+        for _ in range(max(MINDESTE_RUHELESUNGEN, self.frist_ms // RUHE_MS)):
+            jetzt = None if self.mitschnitt.offen else self.leser.optionen(dimension)
+            if jetzt is not None and jetzt == vorher:
+                return jetzt
+            vorher = jetzt
+            self.seite.wait_for_timeout(RUHE_MS)
+        return None
 
     def _klicke(
         self, dimension: str, stelle: int, variante: Variante
@@ -305,7 +348,7 @@ class _Gang:
         if not self._warte(lambda: not self.mitschnitt.offen):
             grund = f"Preisantwort nach {self.frist_ms} ms noch offen"
             raise _Abbruch(LAUF_GESTOERT, grund)
-        seit, seit_verworfen = self.mitschnitt.stand(), len(self.lauf.verworfen)
+        seit, marke = self.mitschnitt.stand(), self._marke()
         knopf = self.seite.locator(self.karte.knoepfe[dimension].selektor).nth(stelle)
         try:
             self._druecke(knopf)
@@ -313,7 +356,7 @@ class _Gang:
             grund = f"Knopf für {dimension} nicht klickbar: {fehler}"
             return Kombiergebnis(variante, NICHT_ERFASST, grund)
         self.geklickt = True
-        self._nimm_antwort(self._antwort_seit(seit), seit_verworfen)
+        self._nimm_antwort(self._antwort_seit(seit), marke)
         return None
 
     def _druecke(self, knopf: Locator) -> None:
@@ -322,70 +365,6 @@ class _Gang:
         except PlaywrightFehler as fehler:
             raise _Klickfehler(kurz(fehler)) from fehler
 
-    def _lies(self, variante: Variante, ziel: dict[str, str | None]) -> Kombiergebnis:
-        """Liest Antwort, dann Text: der Antwortkörper ist da, bevor die Seite malt."""
-        bereich = self.seite.locator(self.karte.zusammenfassung).first
-        lesung, unlesbar = self._lies_antwort()
-        url = self.antwort.url if self.antwort is not None else None
-        self.seite.evaluate(_ZWEI_BILDER_JS)
-        text = self._text(bereich)
-        if not text:
-            self.lauf.struktur.felder(0)
-            ort = self.karte.zusammenfassung
-            grund = f"Preiszusammenfassung nicht gefunden ({ort})"
-            return Kombiergebnis(variante, NICHT_ERFASST, grund, antwort_url=url)
-        im_text = lies_zusammenfassung(text)
-        gefunden = sum(getattr(im_text, f) is not None for f in WERTFELDER)
-        self.lauf.struktur.felder(gefunden)
-        if unlesbar is not None:
-            befunde: tuple[Befund, ...] = (unlesbar,)
-            return Kombiergebnis(variante, BEFUND, unlesbar.grund, befunde=befunde)
-        abweichung = self._abweichung(ziel)
-        echo = (
-            Echo(Preiswerte(), abweichung, ())
-            if abweichung
-            else pruefe_echo(variante, variante, im_text, lesung)
-        )
-        bild, bildbefunde = self._screenshot(bereich)
-        befunde = echo.befunde + bildbefunde
-        erster: str | None = befunde[0].grund if befunde else None
-        status = BEFUND if befunde else ERFASST
-        return Kombiergebnis(
-            variante, status, erster, echo.werte, befunde, echo.luecken, bild, url
-        )
 
-    def _abweichung(self, ziel: dict[str, str | None]) -> tuple[Befund, ...]:
-        """Befunde, wo die Seite eine andere Option markiert als die geklickte."""
-        befunde = []
-        for dimension in DIMENSIONEN:
-            gezeigt = self._gewaehlt(dimension)
-            if gezeigt != ziel[dimension]:
-                zeige = KEINE_AUSWAHL if gezeigt is None else gezeigt
-                grund = f"Seite zeigt {zeige} statt {ziel[dimension]}"
-                befunde.append(Befund(f"variante.{dimension}", grund))
-        return tuple(befunde)
-
-    def _text(self, bereich: Locator) -> str:
-        try:
-            return bereich.first.inner_text(timeout=self.frist_ms)
-        except PlaywrightZeitueberschreitung:
-            return ""
-
-    def _gewaehlt(self, dimension: str) -> str | None:
-        gewaehlt = [o.wert for o in self._optionen(dimension) if o.gewaehlt]
-        return gewaehlt[0] if len(gewaehlt) == 1 else None
-
-    def _lies_antwort(self) -> tuple[Antwortlesung | None, Befund | None]:
-        if self.antwort is None:
-            return None, None
-        try:
-            nutzlast = self.antwort.json()
-        except (PlaywrightFehler, ValueError) as fehler:
-            return None, Befund("antwort", f"Antwort nicht lesbar: {kurz(fehler)}")
-        return lies_antwort(nutzlast, self.karte.antwort, self.antwort.url), None
-
-    def _screenshot(self, bereich: Locator) -> tuple[bytes | None, tuple[Befund, ...]]:
-        try:
-            return bereich.screenshot(type="png", timeout=self.frist_ms), ()
-        except PlaywrightFehler as fehler:
-            return None, (Befund("screenshot", f"Screenshot fehlt: {kurz(fehler)}"),)
+def _option(optionen: list[Option], wert: str) -> Option | None:
+    return next((o for o in optionen if o.wert == wert), None)

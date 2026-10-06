@@ -3,13 +3,14 @@
 Nach jedem Klick liest der Klick-Crawler dieselben Werte zweimal (Datenkonzept
 Geräteradar, Abschnitt 8): aus dem sichtbaren Text der Preiszusammenfassung
 (``lies_zusammenfassung`` in ``klicktext``) und aus der mitgeschnittenen Antwort über
-die Pfade der Klick-Karte (``lies_antwort``). Die Antwort nennt ihre Variante über
-Pfade in der JSON-Antwort oder Parameter ihrer Adresse. ``pruefe_echo`` übernimmt einen
-Wert nur, wenn beide ihn gleich nennen und Seite wie Antwort die gewählte Variante
-zeigen; eine gewählte Option, die sich nicht lesen lässt, bestätigt nichts. Sonst
-entsteht ein ``Befund`` mit Grund. Fehlt ein Wert auf beiden Seiten, ist er ``None``
-und eine benannte Lücke, nie 0. Unbegrenztes Volumen ist ``math.inf`` wie im
-Tarifmodell. Deutsche Zahlen liest ``tarif_model.zahl``. Dieses Modul ruft kein Netz.
+die Pfade der Klick-Karte (``lies_antwort``). Die Antwort nennt ihre Variante über Pfade
+in der JSON-Antwort oder Parameter ihrer Adresse. ``pruefe_echo`` übernimmt einen Wert
+nur, wenn beide ihn gleich nennen und Seite wie Antwort die gewählte Variante zeigen;
+eine gewählte Option, die sich nicht lesen lässt, bestätigt nichts. Sonst entsteht ein
+``Befund`` mit Grund. Fehlt ein Wert auf beiden Seiten, ist er ``None`` und eine
+benannte Lücke, nie 0. Unbegrenztes Volumen ist ``math.inf`` wie im Tarifmodell. Eine
+Laufzeit gilt nur als Monatsangabe („24 Monate“, „24 x“ oder reine Zahl), sonst ist sie
+``None``. Deutsche Zahlen liest ``tarif_model.zahl``. Dieses Modul ruft kein Netz.
 """
 
 from __future__ import annotations
@@ -36,6 +37,8 @@ KEINE_AUSWAHL = "keine Auswahl"
 GRUND_UNLESBAR = "gewählte Option nicht lesbar"
 
 _GANZZAHL = re.compile(r"\d+")
+_MONATSANGABE = re.compile(r"(\d+)\s*(?:Monat|x\b|×)", re.I)
+_NUR_ZAHL = re.compile(r"\s*(\d+)\s*")
 
 
 @dataclass(frozen=True)
@@ -79,7 +82,7 @@ class Echo:
 
 def variante_aus(speicher: object, tarif: object, laufzeit: object) -> Variante:
     """Liest eine Variante einheitlich: Text ohne Ränder, Laufzeit als Monatszahl."""
-    return Variante(_als_text(speicher), _als_text(tarif), _ganzzahl(laufzeit))
+    return Variante(_als_text(speicher), _als_text(tarif), _monate(laufzeit))
 
 
 def lies_antwort(
@@ -271,6 +274,13 @@ def _ganzzahl(roh: object) -> int | None:
     return int(treffer[0]) if treffer else None
 
 
+def _monate(roh: object) -> int | None:
+    if not isinstance(roh, str):
+        return _ganzzahl(roh)
+    treffer = _NUR_ZAHL.fullmatch(roh) or _MONATSANGABE.search(roh)
+    return int(treffer[1]) if treffer else None
+
+
 def _volumen(roh: object) -> float | None:
     if isinstance(roh, str) and nennt_volumen(roh):
         return volumen_aus_zeile(roh)
@@ -278,7 +288,7 @@ def _volumen(roh: object) -> float | None:
 
 
 def _dimension(dimension: str, roh: object) -> str | int | None:
-    return _ganzzahl(roh) if dimension == LAUFZEIT else _als_text(roh)
+    return _monate(roh) if dimension == LAUFZEIT else _als_text(roh)
 
 
 def _als_text(roh: object) -> str | None:

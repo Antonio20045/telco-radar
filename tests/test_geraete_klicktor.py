@@ -225,11 +225,10 @@ def test_crawl_delay_gilt_fuer_den_host_der_preisantwort(chromium):
         server.antworte = _beispiel(_seite(preis=preis, zweiter_speicher=True))
         lauf = _laufe(chromium, server.adresse("/handy/x"), robots)
 
-    zeiten = [t for t, pfad in server.zeiten if pfad.startswith("/api/preis")]
     assert lauf.status == "gelesen"
     assert [e.werte.rate for e in lauf.ergebnisse] == [25.0, 30.0]
-    assert len(zeiten) == 2
-    assert zeiten[1] - zeiten[0] >= verzug - 0.1
+    assert len(server.mit("/api/preis")) == 2
+    assert min(server.luecken("/api/preis")) >= verzug
 
 
 def test_seite_laedt_nach_dem_lauf_nichts_mehr(chromium):
@@ -263,7 +262,7 @@ def test_crawl_delay_gilt_zwischen_zwei_produktseiten(chromium):
             waechter=waechter,
             schleuse=schleuse,
         )
-        ende_erster = server.zeiten[-1][0]
+        ende_erster = max(t for t, _ in server.fertig)
         zweiter = _laufe(
             chromium,
             server.adresse("/handy/y"),
@@ -274,9 +273,6 @@ def test_crawl_delay_gilt_zwischen_zwei_produktseiten(chromium):
 
     start_zweiter = next(t for t, pfad in server.zeiten if pfad == "/handy/y")
     assert (erster.status, zweiter.status) == ("gelesen", "gelesen")
-    assert start_zweiter - ende_erster >= verzug - 0.1
-    getaktet = [t for t, pfad in server.zeiten if pfad.startswith(("/handy/", "/api/"))]
-    assert len(getaktet) == 4
-    assert (
-        min(b - a for a, b in zip(getaktet, getaktet[1:], strict=False)) >= verzug - 0.1
-    )
+    assert start_zweiter - ende_erster >= verzug
+    assert len(server.mit("/handy/") + server.mit("/api/")) == 4
+    assert min(server.luecken(("/handy/", "/api/"))) >= verzug

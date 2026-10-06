@@ -75,6 +75,12 @@ class Mitschreiber:
         self.adressen.append(url)
         self.innen.passiere(url)
 
+    def erledigt(self, url: str) -> None:
+        self.innen.erledigt(url)
+
+    def abstand(self, url: str) -> float:
+        return self.innen.abstand(url)
+
 
 def _hole(robots: str):
     def hole(url: str) -> tuple[int, str]:

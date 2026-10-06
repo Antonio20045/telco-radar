@@ -2,16 +2,20 @@
 
 Der Klick-Crawler (``klickcrawler``) füllt diese Typen; dieses Modul ruft keinen
 Browser und kein Netz. Je Kombination gilt einer von vier Zuständen: ``erfasst``,
-``nicht_angeboten`` (die Seite zeigt die Option deaktiviert), ``nicht_erfasst`` (Knöpfe,
-Option oder Zusammenfassung nicht gefunden, Laufzeit nicht lesbar, nicht besucht) oder
-``befund`` (das Echo widerspricht sich). Ein Lauf ist ``gelesen``, ``gestoert``
-(Challenge 202, 4xx, 5xx, fehlender Kanarienwert, offene Preisantwort, Strukturbruch)
-oder ``gesperrt`` (robots.txt sperrt Seite, Preisantwort oder Zeit).
+``nicht_angeboten`` (die Seite zeigt die Option in Ruhe deaktiviert), ``nicht_erfasst``
+(Knöpfe, Option oder Zusammenfassung nicht gefunden, Laufzeit nicht lesbar, nicht
+besucht, Seite nicht zur Ruhe gekommen) oder ``befund`` (das Echo widerspricht sich).
+Ein Lauf ist ``gelesen``, ``gestoert`` (Challenge 202, 4xx, 5xx, fehlender
+Kanarienwert, offene oder gescheiterte Preisantwort, Strukturbruch, keine einzige
+angebotene Kombination) oder ``gesperrt`` (robots.txt sperrt Seite, Preisantwort oder
+Zeit). Gescheiterte Anfragen hält der Lauf mit Grund fest.
 
 Der Strukturwächter zählt je Lauf gesuchte und gefundene Knöpfe und Felder. Findet ein
 Lauf weniger als ``MINDESTANTEIL_KNOEPFE`` der gesuchten Knöpfe oder fällt ein Anteil
-gegen den letzten gelesenen Lauf um mehr als ``STRUKTUR_SPRUNG``, ist der Lauf gestört
-und nicht „nichts gefunden“. Ohne Suche ist ein Anteil ``None``, nie 0.
+gegen den Bezug um mehr als ``STRUKTUR_SPRUNG``, ist der Lauf gestört und nicht
+„nichts gefunden“. Bezug ist die Bilanz des letzten gelesenen Laufs; ein gestörter
+oder gesperrter Lauf trägt sie weiter, sodass ein bleibender Bruch gestört bleibt.
+Ohne Suche ist ein Anteil ``None``, nie 0.
 """
 
 from __future__ import annotations
@@ -38,6 +42,19 @@ MINDESTANTEIL_KNOEPFE = 0.5
 @dataclass(frozen=True)
 class Verworfen:
     """Eine Adresse, die robots.txt sperrt; sie ging nicht hinaus.
+
+    ``anfrage`` ist die Adresse, die die Seite anfragte; nach einer Umleitung weicht
+    sie von ``url`` ab.
+    """
+
+    url: str
+    grund: str
+    anfrage: str
+
+
+@dataclass(frozen=True)
+class Gescheitert:
+    """Eine Anfrage, die hinausging oder hinaus sollte und keine Antwort bekam.
 
     ``anfrage`` ist die Adresse, die die Seite anfragte; nach einer Umleitung weicht
     sie von ``url`` ab.
@@ -99,7 +116,10 @@ class Strukturbilanz:
 
 @dataclass
 class Klicklauf:
-    """Ein Lauf über eine Produktseite: Status, Ergebnisse, Struktur, Verworfenes."""
+    """Ein Lauf über eine Produktseite: Status, Ergebnisse, Struktur, Verworfenes.
+
+    ``bezug`` ist die Strukturbilanz, gegen die ``pruefe_struktur`` den Lauf maß.
+    """
 
     anbieter: str
     adresse: str
@@ -109,6 +129,8 @@ class Klicklauf:
     ergebnisse: list[Kombiergebnis] = field(default_factory=list)
     struktur: Strukturbilanz = field(default_factory=Strukturbilanz)
     verworfen: list[Verworfen] = field(default_factory=list)
+    gescheitert: list[Gescheitert] = field(default_factory=list)
+    bezug: Strukturbilanz | None = None
 
 
 def abruf_gestoert(status: int | None) -> str | None:
@@ -120,20 +142,32 @@ def abruf_gestoert(status: int | None) -> str | None:
     return None
 
 
-def strukturgrund(aktuell: Strukturbilanz, vorlauf: Klicklauf | None) -> str | None:
-    """Grund, wenn der Lauf zu wenige Knöpfe fand oder gegen den Vorlauf einbrach.
+def ergebnisgrund(ergebnisse: list[Kombiergebnis]) -> str | None:
+    """Grund, wenn jede Kombination ``nicht_angeboten`` ist; der Lauf las nichts."""
+    if ergebnisse and all(e.status == NICHT_ANGEBOTEN for e in ergebnisse):
+        return "keine Kombination angeboten: alle Knöpfe gesperrt"
+    return None
 
-    Der Mindestanteil gilt immer; der Vorlauf zählt nur, wenn er gelesen ist.
+
+def pruefe_struktur(lauf: Klicklauf, vorlauf: Klicklauf | None) -> str | None:
+    """Grund, wenn der Lauf zu wenige Knöpfe fand oder gegen den Bezug einbrach.
+
+    Der Mindestanteil gilt immer. Bezug ist die Bilanz des Vorlaufs, wenn er gelesen
+    ist, sonst der Bezug, den er selbst trug; ``lauf.bezug`` hält ihn fest.
     """
+    if vorlauf is not None:
+        gelesen = vorlauf.status == LAUF_GELESEN
+        lauf.bezug = vorlauf.struktur if gelesen else vorlauf.bezug
+    aktuell = lauf.struktur
     anteil = aktuell.anteil_knoepfe
     if anteil is not None and anteil < MINDESTANTEIL_KNOEPFE:
         return (
             f"Strukturbruch: nur {_prozent(anteil)} der gesuchten Knöpfe gefunden"
             f" (mindestens {_prozent(MINDESTANTEIL_KNOEPFE)})"
         )
-    if vorlauf is None or vorlauf.status != LAUF_GELESEN:
+    if lauf.bezug is None:
         return None
-    return strukturbruch(aktuell, vorlauf.struktur)
+    return strukturbruch(aktuell, lauf.bezug)
 
 
 def strukturbruch(
