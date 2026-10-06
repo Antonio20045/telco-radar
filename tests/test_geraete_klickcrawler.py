@@ -4,8 +4,8 @@ Die Produktseite unter ``tests/fixtures/klickcrawler/`` ist ein BEISPIEL, von Ha
 geschrieben, kein echter Anbieter: Knöpfe für Speicher, Tarif und Ratenlaufzeit, eine
 per JavaScript geladene Preisantwort, 36 Monate zu Tarif S deaktiviert, ein
 Online-Rabatt bei 256 GB, Tarif M und 36 Monaten, den die Antwort nicht nennt, und ein
-Zähler unter ``/privat/json/``, den robots.txt sperrt. Chromium lädt sie über
-``page.route`` aus den Dateien; keine Anfrage verlässt den Rechner.
+Zähler unter ``/privat/json/``, den robots.txt sperrt. Ein lokaler Server auf 127.0.0.1
+liefert sie aus den Dateien; keine Anfrage verlässt den Rechner.
 """
 
 from __future__ import annotations
@@ -17,13 +17,12 @@ from urllib.parse import parse_qs, urlsplit
 
 import pytest
 import yaml
+from klickserver import Antwort, html, klickserver
 
 from telco_radar.collect.geraete.robots import RobotsWaechter
 
 FIXTURES = Path(__file__).parent / "fixtures" / "klickcrawler"
-HOST = "beispiel.invalid"
 PRODUKTPFAD = "/handy/beispielhandy-x"
-ADRESSE = f"https://{HOST}{PRODUKTPFAD}"
 JETZT = datetime(2026, 10, 3, 5, 0, tzinfo=UTC)
 ROBOTS = "User-agent: *\nDisallow: /privat/json/\n"
 FRIST_MS = 5000
@@ -42,40 +41,27 @@ ERWARTET = {
 KLICKS_IM_VOLLLAUF = 6
 
 
-class Beispielserver:
-    """Liefert Beispielseite und Preisantworten aus den Fixtures, merkt jeden Abruf."""
+def _beispiel(status_seite: int = 200):
+    """Liefert Beispielseite und Preisantworten aus den Fixtures."""
+    preise = json.loads((FIXTURES / "beispiel_preise.json").read_text("utf-8"))
+    seite = (FIXTURES / "beispiel_produktseite.html").read_text("utf-8")
 
-    def __init__(self, status_seite: int = 200) -> None:
-        self.status_seite = status_seite
-        self.abrufe: list[str] = []
-        self.preise = json.loads((FIXTURES / "beispiel_preise.json").read_text("utf-8"))
-        self.seite = (FIXTURES / "beispiel_produktseite.html").read_text("utf-8")
-
-    def __call__(self, route) -> None:
-        teile = urlsplit(route.request.url)
-        self.abrufe.append(f"{teile.path}?{teile.query}" if teile.query else teile.path)
+    def antworte(pfad: str) -> Antwort:
+        teile = urlsplit(pfad)
         if teile.path == "/api/preis":
             frage = parse_qs(teile.query)
             schluessel = "|".join(
                 frage.get(teil, [""])[0] for teil in ("speicher", "tarif", "laufzeit")
             )
-            antwort = self.preise.get(schluessel)
+            antwort = preise.get(schluessel)
             if antwort is None:
-                route.fulfill(status=404, body="")
-                return
-            route.fulfill(
-                status=200, content_type="application/json", body=json.dumps(antwort)
-            )
-            return
+                return Antwort(404)
+            return Antwort(200, "application/json", json.dumps(antwort))
         if teile.path == PRODUKTPFAD:
-            gut = self.status_seite == 200
-            route.fulfill(
-                status=self.status_seite,
-                content_type="text/html; charset=utf-8",
-                body=self.seite if gut else CHALLENGE,
-            )
-            return
-        route.fulfill(status=404, body="")
+            return html(seite if status_seite == 200 else CHALLENGE, status_seite)
+        return Antwort(404)
+
+    return antworte
 
 
 class Mitschreiber:
@@ -92,7 +78,7 @@ class Mitschreiber:
 
 def _hole(robots: str):
     def hole(url: str) -> tuple[int, str]:
-        return (200, robots) if urlsplit(url).hostname == HOST else (404, "")
+        return (200, robots) if urlsplit(url).hostname == "127.0.0.1" else (404, "")
 
     return hole
 
@@ -110,45 +96,34 @@ def _karte(**ersetzt):
     return klickkarte_aus_daten(daten, "Beispielkarte")
 
 
-def _laufe(kontext, *, karte=None, robots=ROBOTS, status_seite=200, **weiter):
-    from telco_radar.collect.geraete import Abrufschleuse
+def _laufe(chromium, *, karte=None, robots=ROBOTS, status_seite=200, **weiter):
     from telco_radar.collect.geraete.klickcrawler import klicke_durch
+    from telco_radar.collect.geraete.klicktor import Hostschleuse
 
-    server = Beispielserver(status_seite)
-    seite = kontext.new_page()
-    seite.route(f"https://{HOST}/**", server)
     waechter = RobotsWaechter(hole=_hole(robots))
-    schleuse = Mitschreiber(Abrufschleuse(waechter, lambda: JETZT))
+    schleuse = Mitschreiber(Hostschleuse(waechter, lambda: JETZT))
     weiter.setdefault("frist_ms", FRIST_MS)
-    lauf = klicke_durch(
-        seite,
-        ADRESSE,
-        karte or _karte(),
-        waechter,
-        lambda: JETZT,
-        schleuse=schleuse,
-        **weiter,
-    )
-    seite.close()
+    with klickserver(_beispiel(status_seite)) as server:
+        lauf = klicke_durch(
+            chromium,
+            server.adresse(PRODUKTPFAD),
+            karte or _karte(),
+            waechter,
+            lambda: JETZT,
+            schleuse=schleuse,
+            **weiter,
+        )
     return lauf, server, schleuse
 
 
 @pytest.fixture(scope="module")
-def kontext(chromium):
-    """Ein Browserkontext je Modul und Worker; jeder Lauf öffnet eine eigene Seite."""
-    kontext = chromium.new_context(viewport={"width": 1280, "height": 900})
-    yield kontext
-    kontext.close()
-
-
-@pytest.fixture(scope="module")
-def volllauf(kontext):
+def volllauf(chromium):
     """Der volle Lauf über die Beispielseite, einmal je Modul und Worker."""
     gemerkt: dict = {}
 
     def hole():
         if "lauf" not in gemerkt:
-            gemerkt["lauf"] = _laufe(kontext)
+            gemerkt["lauf"] = _laufe(chromium)
         return gemerkt["lauf"]
 
     return hole
@@ -228,12 +203,12 @@ def test_screenshot_des_preisbereichs_je_gelesener_kombination(volllauf):
     assert all(e.screenshot_png[:8] == b"\x89PNG\r\n\x1a\n" for e in gelesen)
 
 
-def test_jeder_klick_geht_durch_die_schleuse(volllauf):
+def test_jede_seiten_und_preisanfrage_geht_durch_die_schleuse(volllauf):
     _, server, schleuse = volllauf()
 
-    assert schleuse.adressen == [ADRESSE] * (1 + KLICKS_IM_VOLLLAUF)
-    preisabrufe = [a for a in server.abrufe if a.startswith("/api/preis")]
-    assert len(preisabrufe) == 1 + KLICKS_IM_VOLLLAUF
+    pfade = [urlsplit(a).path for a in schleuse.adressen]
+    assert pfade == [PRODUKTPFAD] + ["/api/preis"] * (1 + KLICKS_IM_VOLLLAUF)
+    assert len(server.mit("/api/preis")) == 1 + KLICKS_IM_VOLLLAUF
 
 
 def test_robots_gesperrte_anfragen_gehen_nicht_hinaus(volllauf):
@@ -242,7 +217,7 @@ def test_robots_gesperrte_anfragen_gehen_nicht_hinaus(volllauf):
     assert len(lauf.verworfen) == 1 + KLICKS_IM_VOLLLAUF
     assert all("/privat/json/zaehler" in v.url for v in lauf.verworfen)
     assert all("per robots.txt gesperrt" in v.grund for v in lauf.verworfen)
-    assert not [a for a in server.abrufe if a.startswith("/privat/")]
+    assert server.mit("/privat/") == []
 
 
 def test_strukturwaechter_findet_alle_knoepfe_und_felder(volllauf):
@@ -254,12 +229,12 @@ def test_strukturwaechter_findet_alle_knoepfe_und_felder(volllauf):
 
 
 def test_fehlende_knoepfe_heissen_nicht_erfasst_und_brechen_die_struktur(
-    kontext, volllauf
+    chromium, volllauf
 ):
     gut, _, _ = volllauf()
     karte = _karte(knoepfe__tarif={"selektor": "#gibt-es-nicht button"})
 
-    lauf, server, _ = _laufe(kontext, karte=karte, vorlauf=gut.struktur)
+    lauf, server, _ = _laufe(chromium, karte=karte, vorlauf=gut)
 
     assert {e.status for e in lauf.ergebnisse} == {"nicht_erfasst"}
     assert len(lauf.ergebnisse) == 4
@@ -268,34 +243,34 @@ def test_fehlende_knoepfe_heissen_nicht_erfasst_und_brechen_die_struktur(
     assert lauf.struktur.anteil_knoepfe < 0.5
     assert lauf.status == "gestoert"
     assert "Strukturbruch" in lauf.grund
-    assert len([a for a in server.abrufe if a.startswith("/api/preis")]) == 1
+    assert len(server.mit("/api/preis")) == 1
 
 
 @pytest.mark.parametrize("status", [202, 403, 429])
-def test_challenge_oder_sperre_heisst_abruf_gestoert(kontext, status):
-    lauf, server, schleuse = _laufe(kontext, status_seite=status)
+def test_challenge_oder_sperre_heisst_abruf_gestoert(chromium, status):
+    lauf, server, schleuse = _laufe(chromium, status_seite=status)
 
     assert lauf.status == "gestoert"
     assert lauf.http_status == status
     assert str(status) in lauf.grund
     assert lauf.ergebnisse == []
     assert server.abrufe == [PRODUKTPFAD]
-    assert schleuse.adressen == [ADRESSE]
+    assert schleuse.adressen == [server.adresse(PRODUKTPFAD)]
 
 
-def test_fehlender_kanarienwert_heisst_abruf_gestoert(kontext):
+def test_fehlender_kanarienwert_heisst_abruf_gestoert(chromium):
     karte = _karte(kanarie__enthaelt="Anderes Handy")
 
-    lauf, _, schleuse = _laufe(kontext, karte=karte, frist_ms=KURZE_FRIST_MS)
+    lauf, server, schleuse = _laufe(chromium, karte=karte, frist_ms=KURZE_FRIST_MS)
 
     assert lauf.status == "gestoert"
     assert "Kanarienwert" in lauf.grund
     assert lauf.ergebnisse == []
-    assert schleuse.adressen == [ADRESSE]
+    assert schleuse.adressen[0] == server.adresse(PRODUKTPFAD)
 
 
-def test_robots_gesperrte_produktseite_wird_nicht_geladen(kontext):
-    lauf, server, _ = _laufe(kontext, robots="User-agent: *\nDisallow: /handy/\n")
+def test_robots_gesperrte_produktseite_wird_nicht_geladen(chromium):
+    lauf, server, _ = _laufe(chromium, robots="User-agent: *\nDisallow: /handy/\n")
 
     assert lauf.status == "gesperrt"
     assert "per robots.txt gesperrt" in lauf.grund
@@ -303,14 +278,14 @@ def test_robots_gesperrte_produktseite_wird_nicht_geladen(kontext):
     assert lauf.ergebnisse == []
 
 
-def test_robots_gesperrte_preisantwort_beendet_den_lauf(kontext):
+def test_robots_gesperrte_preisantwort_beendet_den_lauf(chromium):
     robots = "User-agent: *\nDisallow: /api/\nDisallow: /privat/json/\n"
 
-    lauf, server, _ = _laufe(kontext, robots=robots, frist_ms=KURZE_FRIST_MS)
+    lauf, server, _ = _laufe(chromium, robots=robots, frist_ms=KURZE_FRIST_MS)
 
     assert lauf.status == "gesperrt"
     assert "/api/preis" in lauf.grund
-    assert not [a for a in server.abrufe if a.startswith("/api/")]
+    assert server.mit("/api/") == []
     assert lauf.ergebnisse == []
 
 

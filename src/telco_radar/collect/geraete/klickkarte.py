@@ -25,14 +25,17 @@ Format (YAML)::
         rate: preis.rate
         tarifphasen: {liste: tarif.phasen, von: ab, bis: bis, betrag: betrag}
       variante: {speicher: auswahl.speicher}
+      parameter: {tarif: tarif}
     kanarie: {selektor: "#kanarie", enthaelt: Beispielhandy X}
 
 ``wert`` eines Knopfs nennt das Attribut mit dem Optionswert; ohne es gilt der
 sichtbare Text. Pfade sind Punktpfade in die JSON-Antwort, Listenstellen als Zahl
 (``tarif.phasen.0.betrag``). ``tarifphasen`` ist entweder ein einfacher Pfad auf einen
 Monatspreis ohne Phasen oder eine Liste von Phasen mit den Feldnamen für ersten Monat,
-letzten Monat und Betrag. ``variante`` ist wahlweise: nennt die Antwort die Variante,
-prüft der Crawler sie mit.
+letzten Monat und Betrag. Woran die Antwort ihre Variante nennt, ist Pflicht:
+``variante`` mit Pfaden in die JSON-Antwort, ``parameter`` mit Namen der Parameter ihrer
+Adresse oder beides, zusammen mindestens eine Dimension. Der Crawler nimmt eine Antwort
+nur, wenn sie die gewählte Variante nennt.
 """
 
 from __future__ import annotations
@@ -64,6 +67,7 @@ GRUND_KEIN_TEXT = "ist kein Text"
 GRUND_UNBEKANNT = "unbekanntes Feld"
 GRUND_MUSTER = "kein gültiger regulärer Ausdruck"
 GRUND_YAML = "kein lesbares YAML"
+GRUND_OHNE_VARIANTE = "Antwort nennt keine Variante (variante oder parameter)"
 
 
 class KlickkartenFehler(ValueError):
@@ -110,6 +114,7 @@ class Antwortmuster:
     url_muster: re.Pattern[str]
     pfade: Mapping[str, str | Phasenpfad]
     variante: Mapping[str, str]
+    parameter: Mapping[str, str]
 
     def passt(self, url: str) -> bool:
         """Wahr, wenn ``url`` die mitzuschneidende Antwort ist."""
@@ -187,7 +192,9 @@ def _knopf(leser: _Leser, knoepfe: Mapping, dimension: str) -> Knopf:
 
 def _antwort(leser: _Leser, daten: Mapping) -> Antwortmuster:
     antwort = leser.zuordnung(
-        daten.get("antwort"), "antwort", ("url_muster", "pfade", "variante")
+        daten.get("antwort"),
+        "antwort",
+        ("url_muster", "pfade", "variante", "parameter"),
     )
     muster = leser.text(antwort, "url_muster", "antwort")
     try:
@@ -198,19 +205,24 @@ def _antwort(leser: _Leser, daten: Mapping) -> Antwortmuster:
     pfade = leser.zuordnung(antwort.get("pfade"), "antwort.pfade", WERTFELDER)
     if not pfade:
         raise leser.fehler("antwort.pfade", GRUND_FEHLT)
-    variante = antwort.get("variante")
+    variante = _dimensionen(leser, antwort, "variante")
+    parameter = _dimensionen(leser, antwort, "parameter")
+    if not variante and not parameter:
+        raise leser.fehler("antwort.variante", GRUND_OHNE_VARIANTE)
     return Antwortmuster(
         url_muster=url_muster,
         pfade={feld: _pfad(leser, pfade, feld) for feld in pfade},
-        variante=(
-            {}
-            if variante is None
-            else {
-                d: leser.text(variante, d, "antwort.variante")
-                for d in leser.zuordnung(variante, "antwort.variante", DIMENSIONEN)
-            }
-        ),
+        variante=variante,
+        parameter=parameter,
     )
+
+
+def _dimensionen(leser: _Leser, antwort: Mapping, schluessel: str) -> dict[str, str]:
+    if antwort.get(schluessel) is None:
+        return {}
+    stelle = f"antwort.{schluessel}"
+    zuordnung = leser.zuordnung(antwort[schluessel], stelle, DIMENSIONEN)
+    return {d: leser.text(zuordnung, d, stelle) for d in zuordnung}
 
 
 def _pfad(leser: _Leser, pfade: Mapping, feld: str) -> str | Phasenpfad:

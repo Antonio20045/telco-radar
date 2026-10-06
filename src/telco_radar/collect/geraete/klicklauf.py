@@ -2,22 +2,25 @@
 
 Der Klick-Crawler (``klickcrawler``) füllt diese Typen; dieses Modul ruft keinen
 Browser und kein Netz. Je Kombination gilt einer von vier Zuständen: ``erfasst``,
-``nicht_angeboten`` (die Seite bietet die Option nicht an), ``nicht_erfasst`` (Knöpfe
-oder Zusammenfassung nicht gefunden) oder ``befund`` (das Echo widerspricht sich). Ein
-Lauf ist ``gelesen``, ``gestoert`` (Challenge 202, 4xx, 5xx, fehlender Kanarienwert,
-Strukturbruch) oder ``gesperrt`` (robots.txt sperrt Seite, Preisantwort oder Zeit).
+``nicht_angeboten`` (die Seite zeigt die Option deaktiviert), ``nicht_erfasst`` (Knöpfe,
+Option oder Zusammenfassung nicht gefunden, Laufzeit nicht lesbar, nicht besucht) oder
+``befund`` (das Echo widerspricht sich). Ein Lauf ist ``gelesen``, ``gestoert``
+(Challenge 202, 4xx, 5xx, fehlender Kanarienwert, offene Preisantwort, Strukturbruch)
+oder ``gesperrt`` (robots.txt sperrt Seite, Preisantwort oder Zeit).
 
-Der Strukturwächter zählt je Lauf gesuchte und gefundene Knöpfe und Felder. Fällt ein
-Anteil gegen den Vorlauf um mehr als ``STRUKTUR_SPRUNG``, ist der Lauf gestört und
-nicht „nichts gefunden“. Ohne Suche ist ein Anteil ``None``, nie 0.
+Der Strukturwächter zählt je Lauf gesuchte und gefundene Knöpfe und Felder. Findet ein
+Lauf weniger als ``MINDESTANTEIL_KNOEPFE`` der gesuchten Knöpfe oder fällt ein Anteil
+gegen den letzten gelesenen Lauf um mehr als ``STRUKTUR_SPRUNG``, ist der Lauf gestört
+und nicht „nichts gefunden“. Ohne Suche ist ein Anteil ``None``, nie 0.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from .klickecho import Befund, Preiswerte, Variante
+from .klickecho import Befund, Variante
 from .klickkarte import WERTFELDER
+from .klicktext import Preiswerte
 
 ERFASST = "erfasst"
 NICHT_ANGEBOTEN = "nicht_angeboten"
@@ -29,19 +32,29 @@ LAUF_GESPERRT = "gesperrt"
 CHALLENGE_STATUS = 202
 FEHLER_AB_STATUS = 400
 STRUKTUR_SPRUNG = 0.2
+MINDESTANTEIL_KNOEPFE = 0.5
 
 
 @dataclass(frozen=True)
 class Verworfen:
-    """Eine Anfrage, die robots.txt sperrt; sie ging nicht hinaus."""
+    """Eine Adresse, die robots.txt sperrt; sie ging nicht hinaus.
+
+    ``anfrage`` ist die Adresse, die die Seite anfragte; nach einer Umleitung weicht
+    sie von ``url`` ab.
+    """
 
     url: str
     grund: str
+    anfrage: str
 
 
 @dataclass(frozen=True)
 class Kombiergebnis:
-    """Das Ergebnis einer Kombination aus Speicher, Tarif und Ratenlaufzeit."""
+    """Das Ergebnis einer Kombination aus Speicher, Tarif und Ratenlaufzeit.
+
+    ``variante`` ist gelesen (Laufzeit als Monatszahl), ``auswahl`` die rohen Werte
+    der Knöpfe in der Reihenfolge von ``klickkarte.DIMENSIONEN``.
+    """
 
     variante: Variante
     status: str
@@ -51,6 +64,7 @@ class Kombiergebnis:
     luecken: tuple[str, ...] = ()
     screenshot_png: bytes | None = None
     antwort_url: str | None = None
+    auswahl: tuple[str | None, ...] = ()
 
 
 @dataclass
@@ -104,6 +118,22 @@ def abruf_gestoert(status: int | None) -> str | None:
     if status == CHALLENGE_STATUS or status >= FEHLER_AB_STATUS:
         return f"Abruf gestört (HTTP {status})"
     return None
+
+
+def strukturgrund(aktuell: Strukturbilanz, vorlauf: Klicklauf | None) -> str | None:
+    """Grund, wenn der Lauf zu wenige Knöpfe fand oder gegen den Vorlauf einbrach.
+
+    Der Mindestanteil gilt immer; der Vorlauf zählt nur, wenn er gelesen ist.
+    """
+    anteil = aktuell.anteil_knoepfe
+    if anteil is not None and anteil < MINDESTANTEIL_KNOEPFE:
+        return (
+            f"Strukturbruch: nur {_prozent(anteil)} der gesuchten Knöpfe gefunden"
+            f" (mindestens {_prozent(MINDESTANTEIL_KNOEPFE)})"
+        )
+    if vorlauf is None or vorlauf.status != LAUF_GELESEN:
+        return None
+    return strukturbruch(aktuell, vorlauf.struktur)
 
 
 def strukturbruch(

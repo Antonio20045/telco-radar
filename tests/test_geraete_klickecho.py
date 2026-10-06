@@ -214,16 +214,17 @@ def test_antwort_mit_einfachem_tarifpfad_und_listenstelle():
         "antwort": {
             "url_muster": "/api/preis",
             "pfade": {"tarifphasen": "tarife.0.preis", "volumen_gb": "tarife.0.gb"},
+            "parameter": {"tarif": "tarif"},
         },
     }
     muster = klickkarte_aus_daten(karte, "Beispielkarte").antwort
     nutzlast = {"tarife": [{"preis": "19,99", "gb": "unbegrenzt"}]}
 
-    lesung = lies_antwort(nutzlast, muster)
+    lesung = lies_antwort(nutzlast, muster, "/api/preis?tarif=M")
 
     assert lesung.werte.tarifphasen == (Preisphase(1, None, 19.99),)
     assert lesung.werte.volumen_gb == math.inf
-    assert dict(lesung.variante) == {}
+    assert dict(lesung.variante) == {"tarif": "M"}
 
 
 def test_echo_uebernimmt_was_text_antwort_und_variante_teilen():
