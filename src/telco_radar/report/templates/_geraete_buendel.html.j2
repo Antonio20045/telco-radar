@@ -123,11 +123,14 @@
        getestet: `tests/test_geraete_tco_zustand.py::
        test_die_gerenderte_zeile_zeigt_kleine_abstaende_mit_ungefaehr`
        haelt Text ("≈ +11,00 €"/"−679,05 € · −37,7 %") und die
-       `gr-bnd-delta--wert`-Klasse fest. #}
+       `gr-bnd-delta--wert`-Klasse fest.
+       Notbremse: eine eigene Zeile, die nicht zählt, stellt keine Referenz
+       und nennt ihren Zustand (`k.notbremse`). #}
     <span class="gr-bnd-delta{% if not k.naeherung and not (k.eigen and
       k.belastbar) and k.delta_kurz and not (k.delta and k.delta.ungefaehr)
       %} gr-bnd-delta--wert{% endif %}">{% if
-      k.naeherung %}Referenz{% elif
+      k.naeherung %}Referenz{% elif k.eigen and k.belastbar and k.notbremse
+      %}{{ k.notbremse.kurz }}{% elif
       k.eigen and k.belastbar %}Referenz{% elif k.delta_kurz %}{{ k.delta_kurz
       }}{% elif k.delta_zustand %}{{ k.delta_zustand.kurz }}{% else %}–{% endif %}</span>
     {# Der Gerätepreis ohne Vertrag ist die ZWEITE Zahl (§3): nur der eigene
