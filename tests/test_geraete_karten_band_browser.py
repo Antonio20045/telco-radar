@@ -45,7 +45,7 @@ from tarifleiter_testbestand import mit_leiter
 import yaml
 
 from telco_radar.report.html import render_site
-from test_geraete_zeitreihe_browser import waehle_band, waehle_modell
+from test_geraete_zeitreihe_browser import waehle_band, waehle_laufzeit, waehle_modell
 
 WURZEL = pathlib.Path(__file__).resolve().parents[1]
 HEUTE = "2026-09-11"
@@ -301,20 +301,26 @@ def _sichtbare_anbieter(seite):
 def test_die_zeilenliste_aendert_sich_bei_bandwechsel(_seite):
     """UX-1: bis P1 zeigte die Klappe bei jedem Band dieselben Karten aller
     Bänder gemischt. Seit O2 zeigt die Zeilenliste die Bündel des
-    gewählten Bands - und die Liste ist nach dem Wechsel eine ANDERE."""
-    waehle_band(_seite, "xs")
-    _seite.wait_for_timeout(120)
-    klein = _sichtbare_anbieter(_seite)
-    assert "o2" in klein, f"Band XS zeigt keine o2-Karte: {klein}"
-    assert "congstar" not in klein, klein
+    gewählten Bands - und die Liste ist nach dem Wechsel eine ANDERE.
+    Unter „alle“ (Datenkonzept Geräte 5.4), weil congstar im Band M nur mit
+    36 Raten steht und die 24er-Ansicht diese Zeile nicht zeigt."""
+    waehle_laufzeit(_seite, "alle")
+    try:
+        waehle_band(_seite, "xs")
+        _seite.wait_for_timeout(120)
+        klein = _sichtbare_anbieter(_seite)
+        assert "o2" in klein, f"Band XS zeigt keine o2-Karte: {klein}"
+        assert "congstar" not in klein, klein
 
-    waehle_band(_seite, "m")
-    _seite.wait_for_timeout(120)
-    mittel = _sichtbare_anbieter(_seite)
-    assert "congstar" in mittel and "Vodafone" in mittel, mittel
-    assert klein != mittel, (
-        f"die Kartenliste folgt der Bandwahl nicht: {klein} == {mittel}"
-    )
+        waehle_band(_seite, "m")
+        _seite.wait_for_timeout(120)
+        mittel = _sichtbare_anbieter(_seite)
+        assert "congstar" in mittel and "Vodafone" in mittel, mittel
+        assert klein != mittel, (
+            f"die Kartenliste folgt der Bandwahl nicht: {klein} == {mittel}"
+        )
+    finally:
+        waehle_laufzeit(_seite, "24")
 
 
 def test_zeilen_anderer_baender_bleiben_im_dokument_und_verstecken_sich(_seite):
@@ -405,7 +411,14 @@ def test_die_tco_werte_des_bands_stehen_ohne_hover_im_dom(_seite):
     waehle_band(_seite, "m")
     _seite.wait_for_timeout(250)
     tafel = _seite.eval_on_selector("#tafel-tco", "e => e.innerText")
-    assert "1.008,76" in tafel and "1.765,00" in tafel, tafel[:200]
+    assert "1.008,76" in tafel, tafel[:200]
+    assert "1.765,00" not in tafel, "die 36-Raten-Zeile steht in der 24er-Ansicht"
+    waehle_laufzeit(_seite, "36")
+    try:
+        tafel = _seite.eval_on_selector("#tafel-tco", "e => e.innerText")
+        assert "1.765,00" in tafel and "1.008,76" not in tafel, tafel[:200]
+    finally:
+        waehle_laufzeit(_seite, "24")
 
 
 def test_der_antwort_satz_nennt_die_zahl_der_guenstigsten_zeile(_seite):
@@ -461,8 +474,10 @@ def test_die_finanzierungssumme_heisst_so_und_nicht_geraetepreis(_seite):
     Gerätepreis ohne Vertrag wird als eigene Aussage benannt - hier als
     benannte Lücke, weil congstar dazu nichts gemessen hat. Die Kernzahl
     der 36-Raten-Zeile läuft seit Datenkonzept Geräte Schritt 2 über 36
-    Monate (1.765,00 statt 1.477,00 über „24 Monate“)."""
+    Monate (1.765,00 statt 1.477,00 über „24 Monate“) und steht deshalb in
+    der 36er-Ansicht."""
     waehle_band(_seite, "m")
+    waehle_laufzeit(_seite, "36")
     _seite.wait_for_timeout(120)
     congstar = _seite.eval_on_selector(
         "#gr-bndliste .gr-bnd[data-anbieter='congstar'][data-band='m']",
@@ -483,6 +498,7 @@ def test_die_finanzierungssumme_heisst_so_und_nicht_geraetepreis(_seite):
     _seite.evaluate(
         "() => document.querySelectorAll('.gr-bnd').forEach(z => { z.open = false; })"
     )
+    waehle_laufzeit(_seite, "24")
     assert "Finanzierung" in congstar["bar"], congstar["bar"]
     assert "901,00" in congstar["bar"], congstar["bar"]
     assert "Gerätepreis" not in congstar["bar"], congstar["bar"]

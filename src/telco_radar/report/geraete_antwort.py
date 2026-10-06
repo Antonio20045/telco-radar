@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from ..tco_model import TCO_HORIZONT
 from . import geraete_notbremse as notbremse
-from .geraete_laufzeit import NICHT_ERFASST, zeitraum
+from .geraete_laufzeit import NICHT_ERFASST, ansicht, zeitraum
 from .geraete_rechenweg import EIGEN, _datum_de, _esc, _euro
 from .geraete_tco_karten import kurz_datum
 
@@ -162,10 +162,31 @@ def _antwort_html(
                 f"({_euro(zweit['gesamt'])})."
             )
     elif eigen is None and laufzeit is not None:
-        satz += f" — Vodafone ist mit {laufzeit} Raten {NICHT_ERFASST}."
+        satz += _vodafone_fehlt(modell, band, laufzeit)
     elif eigen is None:
         satz += " — Vodafone führt in diesem Band kein Bündel."
     return satz if satz.endswith(".") else satz + "."
+
+
+def _vodafone_fehlt(modell: dict, band: str, laufzeit: int) -> str:
+    """Der Zusatz, wenn Vodafone in dieser Ansicht keine Zahl stellt.
+
+    „nicht erfasst“ nur, wenn Vodafone in dieser Laufzeit gar kein Bündel hat;
+    hat es eines ohne vollständige, aktuelle Zahl, heißt es „ohne Zahl“ - den
+    Grund nennt der Lückensatz unter dem Graphen.
+    """
+    eigene = [
+        k
+        for k in modell.get("karten") or []
+        if k["anbieter"] == EIGEN
+        and (k.get("sku_id") or k.get("naeherung"))
+        and ansicht(k) == laufzeit
+    ]
+    if not eigene:
+        return f" — Vodafone ist mit {laufzeit} Raten {NICHT_ERFASST}."
+    if not any(k.get("band") == band for k in eigene):
+        return f" — Vodafone führt in diesem Band kein Bündel mit {laufzeit} Raten."
+    return f" — Vodafone mit {laufzeit} Raten ohne Zahl."
 
 
 def _leitzahl_html(zeilen: list) -> str | None:

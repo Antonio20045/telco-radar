@@ -276,7 +276,7 @@
       <div class="gr-zr-vorschau" id="gr-zr-vorschau" role="listbox"
            aria-label="Modell-Vorschau"></div>
     </div>
-    <div class="gr-zr-feld">
+    <div class="gr-zr-feld gr-zr-feld--band">
       <label id="gr-zr-band-label">Tarifband</label>
       <div class="gr-zr-baender" role="group" aria-labelledby="gr-zr-band-label" id="gr-zr-baender">
         {# Die Stufen der Tarifleiter; nicht erlaubte werden vom Client
@@ -289,6 +289,21 @@
           %}>{{ zr.baender[b].label }}{% if zr.baender[b].bereich
           %}<small>{{ zr.baender[b].bereich }}</small>{% endif %}</button>
         {% endfor %}
+      </div>
+    </div>
+    {# Datenkonzept Geräte 5.4: der Umschalter der Ratenlaufzeit steuert die
+       ganze Tafel (Kacheln, Antwort, Graph, Zeilen, Δ); Standard 24, im Link
+       als ?laufzeit=. „alle“ zeigt die Zeilen gruppiert, ohne Sieger und Δ. #}
+    <div class="gr-zr-feld gr-zr-feld--lz">
+      <label id="gr-zr-lz-label">Ratenlaufzeit</label>
+      <div class="gr-zr-baender gr-zr-laufzeiten" role="group"
+           aria-labelledby="gr-zr-lz-label" id="gr-zr-laufzeiten">
+        {% for lz in zr.daten.laufzeiten %}<button type="button" data-lz="{{ lz }}"
+          aria-pressed="{{ 'true' if lz == zr.daten.start_laufzeit else 'false'
+          }}">{{ lz }}<small><span class="gr-zr-lang">Monate</span><span
+          class="gr-zr-kurz">Mon.</span></small></button>{% endfor %}<button
+          type="button" data-lz="alle" aria-pressed="false">alle<small
+          class="gr-zr-lang">Laufzeiten</small></button>
       </div>
     </div>
   </div>
@@ -366,6 +381,10 @@
         <span class="gr-zr-k-preis"><small class="gr-zr-k-leer"
           title="dieses Gerät wird in diesem Band nicht geführt">—</small>
       </span></span>
+      {# Unter „alle“ gibt es keinen Sieger und damit keinen ab-Preis. #}
+      <span class="gr-zr-k-band gr-zr-k-band--alle" hidden>
+        <span class="gr-zr-k-preis"><small class="gr-zr-k-leer"
+          title="{{ zr.daten.alle_text }}">—</small></span></span>
     </button>
     {% endfor %}
   </div>
@@ -423,8 +442,8 @@
         >Anbieter</button></span><span>Tarif · Volumen</span><span><button
         type="button" class="gr-bsort" data-bsort="tco" aria-label=
         "nach den Kosten mit Tarif sortieren, getrennt nach Zeitraum"
-        >Kosten mit Tarif</button></span><span><button type="button" class="gr-bsort"
-        data-bsort="delta" aria-label=
+        >Kosten mit Tarif</button></span><span class="gr-bnd-kopf-delta"><button
+        type="button" class="gr-bsort" data-bsort="delta" aria-label=
         "nach Abstand über oder unter der Vodafone-Referenz sortieren"
         >Δ zu Vodafone</button></span><span>Gerät ohne
         Vertrag</span><span></span>

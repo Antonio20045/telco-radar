@@ -508,6 +508,12 @@ def waehle_band(s, band: str) -> None:
     s.wait_for_timeout(500)
 
 
+def waehle_laufzeit(s, laufzeit: str) -> None:
+    """Der Umschalter der Ratenlaufzeit (Datenkonzept Geräte 5.4)."""
+    s.click(f"#gr-zr-laufzeiten button[data-lz='{laufzeit}']")
+    s.wait_for_timeout(500)
+
+
 def test_die_legende_weicht_den_endlabels_auf_dem_schreibtisch(schreibtisch):
     s, _ = schreibtisch
     anzeige = s.eval_on_selector(

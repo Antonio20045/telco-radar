@@ -1,9 +1,13 @@
-"""P3-E2: der Laufzeit-Filter der Bündeltabelle, Standard 24 Monate.
+"""Der Laufzeit-Filter der Bündeltabelle, Standard 24 Monate.
 
 Python entscheidet, welche Zeile unter welcher Wahl steht
-(`geraete_tco_karten.laufzeit_wahl`), app.js blendet nur. Die Wahl blendet
-keinen Anbieter aus: wer die gewaehlte Laufzeit nicht anbietet, steht mit
-seiner naechstgelegenen da (Telekom, o2 und 1&1 bieten heute nur 36 Raten).
+(`geraete_laufzeit.setze_ansicht`), app.js blendet nur. Seit Datenkonzept
+Geräte Schritt 3 steht eine Zeile genau unter ihrer eigenen Ratenlaufzeit:
+die frühere Regel (P3-E2), wer die gewählte Laufzeit nicht anbietet, stehe
+mit seiner nächstgelegenen da, stellte 36 Raten unter „24 Monate“ - genau
+der Vergleich, den Regel 5 verbietet. Wer fehlt, nennt der Lückensatz der
+Ansicht („Mit 24 Raten nicht erfasst: …“). Der Umschalter steht seither
+einmal für die ganze Tafel in der Wahl-Leiste (`#gr-zr-laufzeiten`).
 
 Die Browser-Tests laufen im echten Chromium auf eigenem Server - dieselbe
 Bauform wie `tests/test_geraete_o2_zeilen_browser.py`.
@@ -17,6 +21,7 @@ import json
 import pytest
 import yaml
 
+from telco_radar.report import geraete_laufzeit
 from telco_radar.report import geraete_tco_karten as karten
 from telco_radar.report.html import render_site
 
@@ -42,46 +47,56 @@ def _k(anbieter, tarif, lz, zustand="neu"):
     }
 
 
-def test_jede_wahl_zeigt_je_angebot_genau_eine_zeile():
+def test_jede_wahl_zeigt_nur_zeilen_ihrer_laufzeit():
     cs24, cs36 = _k("congstar", "XS", 24), _k("congstar", "XS", 36)
     o2 = _k("o2", "M", 36)
     vf12, vf24 = _k("Vodafone", "S", 12), _k("Vodafone", "S", 24)
     ref = _k("Vodafone", "Referenz", None)
     alle = [cs24, cs36, o2, vf12, vf24, ref]
-    wahl = karten.laufzeit_wahl(alle)
-    assert wahl == {"optionen": [12, 24, 36], "start": 24}
-    assert cs24["laufzeit_sichtbar"] == "12 24"
+    geraete_laufzeit.setze_ansicht(alle)
+    assert cs24["laufzeit_sichtbar"] == "24"
     assert cs36["laufzeit_sichtbar"] == "36"
-    assert o2["laufzeit_sichtbar"] == "12 24 36"
+    assert o2["laufzeit_sichtbar"] == "36", "36 Raten nie unter 12 oder 24"
     assert vf12["laufzeit_sichtbar"] == "12"
-    assert vf24["laufzeit_sichtbar"] == "24 36"
-    assert ref["laufzeit_sichtbar"] == "", "ohne Raten gehoert sie zu keiner Wahl"
-    for lz in ("12", "24", "36"):
+    assert vf24["laufzeit_sichtbar"] == "24", "24 Raten nie unter 36"
+    assert ref["laufzeit_sichtbar"] == "alle", "ohne Raten nur unter „alle“"
+    soll = {
+        "12": {("Vodafone", "S")},
+        "24": {("congstar", "XS"), ("Vodafone", "S")},
+        "36": {("congstar", "XS"), ("o2", "M")},
+    }
+    for lz, angebote in soll.items():
         je_angebot: dict = {}
-        for k in alle[:-1]:
-            if lz in k["laufzeit_sichtbar"].split():
+        for k in alle:
+            if k["laufzeit_sichtbar"] == lz:
                 je_angebot.setdefault((k["anbieter"], k["tarif"]), []).append(k)
         assert all(len(v) == 1 for v in je_angebot.values()), (lz, je_angebot)
-        assert len(je_angebot) == 3
+        assert set(je_angebot) == angebote, (lz, je_angebot)
+        assert {k["raten_laufzeit"] for v in je_angebot.values() for k in v} == {
+            int(lz)
+        }
 
 
-def test_der_zustand_trennt_die_angebote():
+def test_der_zustand_aendert_die_ansicht_nicht():
     neu = _k("o2", "M", 24)
     erneuert = _k("o2", "M", 36, zustand="refurbished")
-    karten.laufzeit_wahl([neu, erneuert])
-    assert erneuert["laufzeit_sichtbar"] == "24 36"
+    geraete_laufzeit.setze_ansicht([neu, erneuert])
+    assert (neu["laufzeit_sichtbar"], erneuert["laufzeit_sichtbar"]) == ("24", "36")
 
 
-def test_ohne_zwei_laufzeiten_gibt_es_nichts_zu_waehlen():
-    k = _k("o2", "M", 36)
-    assert karten.laufzeit_wahl([k, _k("Telekom", "L", 36)]) is None
-    assert k["laufzeit_sichtbar"] == ""
+def test_auch_eine_einzige_laufzeit_steht_unter_ihrer_ansicht():
+    k, tk = _k("o2", "M", 36), _k("Telekom", "L", 36)
+    geraete_laufzeit.setze_ansicht([k, tk])
+    assert k["laufzeit_sichtbar"] == tk["laufzeit_sichtbar"] == "36"
 
 
-def test_fehlt_die_standardlaufzeit_gilt_die_naechste_kuerzere():
-    assert karten.laufzeit_wahl([_k("a", "t", 12), _k("b", "t", 36)])["start"] == 12
-    assert karten.laufzeit_wahl([_k("a", "t", 30), _k("b", "t", 36)])["start"] == 30
+def test_eine_fremde_laufzeit_steht_unter_keiner_ansicht():
+    zwoelf, dreissig = _k("a", "t", 12), _k("b", "t", 30)
+    geraete_laufzeit.setze_ansicht([zwoelf, dreissig])
+    assert zwoelf["laufzeit_sichtbar"] == "12"
+    assert dreissig["laufzeit_sichtbar"] == "alle", "nie als nächstgelegene"
     assert karten.LAUFZEIT_STANDARD == 24
+    assert geraete_laufzeit.LAUFZEITEN == (12, 24, 36)
 
 
 _GERAET = "apple-iphone-17-pro"
@@ -252,21 +267,23 @@ _SICHTBAR = """() => Array.from(document.querySelectorAll('#gr-bnd-gruppe .gr-bn
 
 
 def _waehle(seite, lz):
-    seite.click(f".gr-bnd-lz button[data-lz='{lz}']")
-    seite.wait_for_timeout(120)
+    seite.click(f"#gr-zr-laufzeiten button[data-lz='{lz}']")
+    seite.wait_for_timeout(300)
 
 
 def test_ohne_klick_stehen_24_monate(seite):
     gedrueckt = seite.eval_on_selector_all(
-        ".gr-bnd-lz button[aria-pressed='true']", "e => e.map(k => k.textContent)"
+        "#gr-zr-laufzeiten button[aria-pressed='true']",
+        "e => e.map(k => k.dataset.lz)",
     )
     assert gedrueckt == ["24"]
-    assert seite.evaluate(_SICHTBAR) == ["Vodafone 24", "congstar 24", "o2 36"]
+    assert seite.evaluate(_SICHTBAR) == ["Vodafone 24", "congstar 24"]
+    assert "laufzeit=24" in seite.evaluate("location.search")
 
 
-def test_die_wahl_36_tauscht_nur_die_congstar_zeile(seite):
+def test_die_wahl_36_zeigt_nur_36_raten(seite):
     _waehle(seite, "36")
-    assert seite.evaluate(_SICHTBAR) == ["Vodafone 24", "congstar 36", "o2 36"]
+    assert seite.evaluate(_SICHTBAR) == ["congstar 36", "o2 36"]
     _waehle(seite, "alle")
     assert seite.evaluate(_SICHTBAR) == [
         "Vodafone 24",
@@ -279,13 +296,15 @@ def test_die_wahl_36_tauscht_nur_die_congstar_zeile(seite):
 def test_die_laufzeitwahl_ueberlebt_den_bandwechsel(seite):
     _waehle(seite, "36")
     waehle_band(seite, "xs")
-    assert seite.evaluate(_SICHTBAR) == ["Vodafone 24", "congstar 36", "o2 36"]
+    assert seite.evaluate(_SICHTBAR) == ["congstar 36", "o2 36"]
+    assert "laufzeit=36" in seite.evaluate("location.search")
 
 
 def test_der_filter_laeuft_nicht_aus_dem_bild(seite):
     ueber = seite.evaluate("""() => {
-      const l = document.querySelector('.gr-bnd-lz').getBoundingClientRect();
-      return Array.from(document.querySelectorAll('.gr-bnd-lz button'))
+      const l = document.querySelector('#gr-zr-laufzeiten')
+        .getBoundingClientRect();
+      return Array.from(document.querySelectorAll('#gr-zr-laufzeiten button'))
         .filter(k => k.getBoundingClientRect().right > l.right + 0.5
                   || k.getBoundingClientRect().right > window.innerWidth)
         .map(k => k.textContent)}""")

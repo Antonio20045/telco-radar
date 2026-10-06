@@ -4053,6 +4053,14 @@ circle.gr-zr-punkt.gr-zr-aktiv{stroke:var(--ink);stroke-width:2.8}
   .gr-zr-baender button{flex:1 1 0;padding:6px 2px;font-size:11.5px;
     text-align:center}
   .gr-zr-baender button small{font-size:8.5px}
+  /* Band und Ratenlaufzeit teilen sich EINE Zeile ohne Beschriftung - die
+     Knöpfe nennen „15 GB“ und „Monate“ selbst; eine zweite Zeile schöbe die
+     Kurve unter die Falz (11c). */
+  .gr-zr-feld--band{flex:1 1 0}
+  .gr-zr-feld--band>label,.gr-zr-feld--lz>label{display:none}
+  .gr-zr-laufzeiten button{padding:6px 4px}
+  .gr-zr-laufzeiten button .gr-zr-lang{display:none}
+  .gr-zr-laufzeiten button .gr-zr-kurz{display:inline}
   /* P1/F3 (A3): die Karten rollen QUER (kein 2x3-Berg - der wuerde die
      Antwort um ueber 100 px unter die 844-er-Falz druecken, Kriterium
      11c geht vor). Alle Karten bleiben ohne vertikalen Berg erreichbar;
@@ -4175,20 +4183,16 @@ circle.gr-zr-punkt.gr-zr-aktiv{stroke:var(--ink);stroke-width:2.8}
   background-image:repeating-linear-gradient(45deg,var(--anb,var(--anb-ersatz)) 0
   3px,var(--paper) 3px 6px)}
 
-/* --- P3-E2/E3 (28.09.2026): Laufzeit-Filter und Aktionen ------------- */
-/* Der Filter ueber der Bündeltabelle: dieselbe Knopfsprache wie die
-   Band-Leiste, kleiner - er ist eine Einstellung der Tabelle, keine
-   Hauptwahl der Seite. */
-.gr-bnd-lz{display:flex;flex-wrap:wrap;align-items:center;gap:4px;
-  margin:4px 0 10px;font-family:var(--sans);font-size:12px}
-.gr-bnd-lz-kopf{color:var(--ink-4);font-weight:700;letter-spacing:.06em;
-  text-transform:uppercase;margin-right:2px}
-.gr-bnd-lz button{font:inherit;font-weight:700;color:var(--ink-2);
-  background:var(--paper);border:1px solid var(--rule-2);border-radius:2px;
-  padding:3px 7px;cursor:pointer;white-space:nowrap}
-.gr-bnd-lz button[aria-pressed="true"]{background:var(--red-wash);
-  border-color:var(--red);color:var(--red-deep)}
-.gr-bnd-lz button:focus-visible{outline:2px solid var(--red);outline-offset:1px}
+/* --- Datenkonzept Geräte Schritt 3: die Ratenlaufzeit der Tafel ------- */
+/* Der Umschalter steht als `.gr-zr-baender` neben dem Band. Unter „alle“
+   stehen die Zeilen nach Laufzeit gruppiert, mit Kopf und ohne Δ. */
+.gr-bnd-lzkopf{font-family:var(--sans);font-size:12px;font-weight:700;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);
+  margin:14px 0 4px}
+.gr-buendel--alle .gr-bnd-delta,.gr-buendel--alle .gr-bnd-kopf-delta{
+  visibility:hidden}
+.gr-zr-laufzeiten .gr-zr-kurz{display:none}
+/* --- P3-E3 (28.09.2026): Aktionen ------------------------------------ */
 /* Der Ueberhang einer nicht eingerechneten Aktion unter der Leitzahl -
    eigene Zeile, zurueckgenommen, nie so gross wie die Zahl selbst. */
 .gr-bnd-aktion{display:block;font-family:var(--sans);font-size:12px;

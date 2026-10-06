@@ -22,6 +22,11 @@ LAUFZEIT_STANDARD = karten_modul.LAUFZEIT_STANDARD
 NICHT_ERFASST = "nicht erfasst"
 DELTA_VF_NICHT_ERFASST = "Vodafone nicht erfasst"
 DELTA_VF_OHNE_ZAHL = "Vodafone ohne Zahl"
+ALLE = "alle"
+ALLE_TEXT = (
+    "Über alle Laufzeiten gibt es keinen Sieger: verglichen wird nur innerhalb "
+    "von " + ", ".join(map(str, LAUFZEITEN[:-1])) + f" oder {LAUFZEITEN[-1]} Raten."
+)
 
 
 def zeitraum(laufzeit: int) -> int:
@@ -39,6 +44,18 @@ def ansicht(karte: dict) -> int | None:
         return LAUFZEIT_STANDARD
     laufzeit = karte.get("raten_laufzeit")
     return laufzeit if laufzeit in LAUFZEITEN else None
+
+
+def setze_ansicht(karten: list) -> None:
+    """Unter welcher Wahl des Umschalters jede Zeile steht (`laufzeit_sichtbar`).
+
+    Genau unter ihrer eigenen Ansicht: eine Zeile mit 36 Raten steht nie unter
+    „24 Monate“, auch nicht als nächstgelegene (Regel 5). Eine Zeile ohne
+    Ansicht steht nur unter „alle“ (`ansicht`).
+    """
+    for k in karten:
+        laufzeit = ansicht(k)
+        k["laufzeit_sichtbar"] = ALLE if laufzeit is None else str(laufzeit)
 
 
 def gruppe(karte: dict) -> tuple:

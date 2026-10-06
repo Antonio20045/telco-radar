@@ -1310,49 +1310,6 @@ def _angebot_rang(karte: dict) -> tuple:
 LAUFZEIT_STANDARD = 24
 
 
-def laufzeit_wahl(karten: list) -> Optional[dict]:
-    """Der Laufzeit-Filter eines Modells (P3-E2) - und je Karte, unter
-    welcher Wahl sie sichtbar ist (`k["laufzeit_sichtbar"]`).
-
-    Die Wahl blendet nicht stumpf alles aus, was nicht passt: dann
-    verschwaenden bei "24 Monate" Telekom, o2 und 1&1, die heute nur
-    36 Raten anbieten (Fallstrick 16: gemessen, keine Erfassungsluecke -
-    und selbst wenn, waere Ausblenden die falsche Antwort). Stattdessen
-    gilt je Angebot (Anbieter, Tarif, Zustand): die gewaehlte Laufzeit,
-    wenn es sie gibt, sonst die naechstgelegene (bei Gleichstand die
-    kuerzere). Jede Zeile nennt ihre Ratenzahl selbst.
-
-    Karten ohne Ratenlaufzeit (Referenzrechnung, Barpreis-Angebote,
-    Platzhalter) gehoeren zu keiner Wahl und bleiben immer sichtbar
-    (`laufzeit_sichtbar` leer). Rueckgabe `None`, wenn das Modell keine
-    zwei Laufzeiten fuehrt - dann gibt es nichts zu waehlen.
-    """
-    optionen = sorted({k["raten_laufzeit"] for k in karten if k.get("raten_laufzeit")})
-    for k in karten:
-        k["laufzeit_sichtbar"] = ""
-    if len(optionen) < 2:
-        return None
-    gruppen: dict = {}
-    for k in karten:
-        if k.get("raten_laufzeit"):
-            schluessel = (k["anbieter"], k.get("tarif"), k.get("zustand"))
-            gruppen.setdefault(schluessel, []).append(k)
-    for gruppe in gruppen.values():
-        vorhanden = sorted({k["raten_laufzeit"] for k in gruppe})
-        sichtbar: dict = {lz: [] for lz in vorhanden}
-        for wahl in optionen:
-            passend = min(vorhanden, key=lambda lz: (abs(lz - wahl), lz))
-            sichtbar[passend].append(str(wahl))
-        for k in gruppe:
-            k["laufzeit_sichtbar"] = " ".join(sichtbar[k["raten_laufzeit"]])
-    start = (
-        LAUFZEIT_STANDARD
-        if LAUFZEIT_STANDARD in optionen
-        else min(optionen, key=lambda lz: (abs(lz - LAUFZEIT_STANDARD), lz))
-    )
-    return {"optionen": optionen, "start": start}
-
-
 def _vorgabe(modelle: list) -> str:
     """Welches Modell ohne Klick sichtbar ist.
 
@@ -1503,6 +1460,7 @@ def modelle(
             and geraete_laufzeit.ansicht(k) == LAUFZEIT_STANDARD
         ]
         spannen = geraete_laufzeit.spannen(karten)
+        geraete_laufzeit.setze_ansicht(karten)
         name = _name(katalog, gruppe["device_id"], gruppe["speicher"], rueckfall=mid)
         hersteller = _hersteller(katalog, gruppe["device_id"])
         katalog_eintrag = katalog.nach_id(gruppe["device_id"]) if katalog else None
@@ -1585,7 +1543,6 @@ def modelle(
                 "karten": karten,
                 "referenz": referenz,
                 "laufzeiten": laufzeiten,
-                "laufzeit_wahl": laufzeit_wahl(karten),
                 "angebote": len(angebote),
                 "erneuert": len(
                     [k for k in angebote if k["zustand"] in ("refurbished", "b-ware")]

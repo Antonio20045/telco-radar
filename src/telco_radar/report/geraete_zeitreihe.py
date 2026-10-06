@@ -5,9 +5,8 @@ Antonios Wortlaut (§1a): „Ich will einen verfickten Graphen haben. Mit
 verfickten Punkten und Koordinatensystem. […] Y-Achse ist Euro-Kosten.
 Und X-Achse ist das DATUM. Ich möchte dann genau die verschiedenen
 Messtage immer sehen." - und nach dem Ansehen des Prototyps: „Den Graphen
-finde ich gut." Der Prototyp (docs/entwuerfe/geraete-eine-seite-2026-09-16,
-entwurf-v2.html + prototyp.js, DOM-bewiesen in Commit 2f40457) ist hier
-Production geworden. Drei Regeln tragen dieses Modul:
+finde ich gut." Der Prototyp (Commit 2f40457) ist hier Production geworden.
+Drei Regeln tragen dieses Modul:
 
 1. **JEDE ZAHL ENTSTEHT HIER, KEINE IM CLIENT.** Der Browser setzt fertige
    Knoten ein (Antwort-Satz, Messtag-Zeile, beide SVG-Varianten,
@@ -17,10 +16,8 @@ Production geworden. Drei Regeln tragen dieses Modul:
 2. **Nichts wird interpoliert.** Ein Anbieter ohne Messung an einem Tag
    hat keinen Punkt an diesem Tag; unter zwei Punkten gibt es keinen
    Linienzug. Die Lücke IST die Aussage des Graphen.
-3. **Der Startzustand kommt aus den Daten**: das Modell × Band mit den
-   meisten Anbietern, bei Gleichstand das mit den meisten Punkten. Nichts
-   ist hardcodiert - der Bestand wächst jede Nacht, und der Start darf
-   nicht an einem Prototypsstand kleben.
+3. **Der Startzustand kommt aus den Daten**: das Modell × Band der 24er-Ansicht
+   mit den meisten Anbietern, bei Gleichstand den meisten Punkten.
 
 Die Zuordnung der Historie ist die des Sammel-Skripts des Prototyps
 (`historie_sammeln.py`, reine Lesearbeit auf data/state):
@@ -55,6 +52,7 @@ from .geraete_antwort import _antwort_html as _antwort_html
 from .geraete_antwort import _kurz_name, _satz_name, _schnitt
 from .geraete_antwort import _leitzahl_html as _leitzahl_html
 from .geraete_antwort import _rechnung_html as _rechnung_html
+from .geraete_laufzeit import ALLE_TEXT as ALLE_TEXT
 from .geraete_laufzeit import LAUFZEIT_STANDARD, LAUFZEITEN, ansicht, zeitraum
 from .geraete_luecken import _alternativen as _alternativen
 from .geraete_luecken import _luecke_text as _luecke_text
@@ -1373,6 +1371,7 @@ def aufbereiten(
         "start_band": (start or {}).get("band", ""),
         "start_laufzeit": LAUFZEIT_STANDARD,
         "laufzeiten": list(LAUFZEITEN),
+        "alle_text": ALLE_TEXT,
         "band_folge": list(band_katalog),
         "modelle_gesamt": len(wahl),
         "suchindex": suchindex,
@@ -1435,6 +1434,7 @@ def leer() -> dict:
             "start_band": "",
             "start_laufzeit": LAUFZEIT_STANDARD,
             "laufzeiten": list(LAUFZEITEN),
+            "alle_text": ALLE_TEXT,
             "modelle_gesamt": 0,
             "suchindex": [],
             "erlaubt": {},

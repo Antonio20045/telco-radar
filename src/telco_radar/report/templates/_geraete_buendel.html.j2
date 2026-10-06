@@ -28,9 +28,10 @@
          {% if k.band %}data-band="{{ k.band }}"{% endif %}
          data-zustand="{{ k.zustand }}"
          data-laufzeit="{{ k.laufzeit or 0 }}"
-         {# P3-E2: unter welcher Wahl des Laufzeit-Filters diese Zeile
-            steht (`geraete_tco_karten.laufzeit_wahl`, Python entscheidet,
-            app.js blendet nur). Ohne Attribut: immer sichtbar. #}
+         {# Datenkonzept Geräte Schritt 3: die Ansicht des Umschalters, unter
+            der diese Zeile steht - genau ihre eigene Ratenlaufzeit, ohne
+            Ansicht nur „alle“ (`geraete_laufzeit.setze_ansicht`, app.js
+            blendet nur). Ohne Attribut: unter jeder Wahl sichtbar. #}
          {% if k.laufzeit_sichtbar %}data-lz="{{ k.laufzeit_sichtbar }}"{% endif %}
          {# P0-B-z2: DER ZEITRAUM, DEN DIE SUMME DIESER ZEILE TRÄGT -
             gelesen aus `leitzahl_monate` (`Tco.leitzahl_monate`, P0-B-h1),
@@ -397,6 +398,13 @@
    rendert OHNE ids: 87 Kopien derselben id wären ein ungültiges
    Dokument, und der Modellwechsel adressiert seine Knoten über
    `#gr-bnd-gruppe`. #}
+{# Die Köpfe der Laufzeit-Gruppen unter „alle“ - versteckt, app.js stellt
+   jeden vor die erste sichtbare Zeile seiner Gruppe. #}
+{% macro laufzeitkoepfe(zeilen) %}{% for lz in zeilen
+  | map(attribute='laufzeit_sichtbar', default='') | select | unique | sort %}<h4
+  class="gr-bnd-lzkopf" data-lz-kopf="{{ lz }}" hidden>{{ 'andere Laufzeit'
+  if lz == 'alle' else lz ~ ' Raten' }}</h4>{% endfor %}{% endmacro %}
+
 {% macro buendelgruppe(m, ids=false) %}
       {# A3: „alles alt“ steht als EIN Satz über den Zeilen des Modells
          (`alt_hinweis`, in Python gebaut, mit Datum und Grenze) - nicht
@@ -404,20 +412,11 @@
          Karte mehr steht (harte Regel 9). #}
       {% if m.alt_hinweis %}<p class="gr-erklaer gr-basis--duenn">{{
         m.alt_hinweis }}</p>{% endif %}
-      {# P3-E2: der Laufzeit-Filter - im Makro, damit jedes Modell (auch
-         aus dem Fragment) seine eigenen Laufzeiten mitbringt. `data-start`
-         ist `LAUFZEIT_STANDARD` oder die naechste vorhandene. #}
-      {% if m.laufzeit_wahl %}
-      <div class="gr-bnd-lz" role="group" aria-label="Ratenlaufzeit"
-           data-start="{{ m.laufzeit_wahl.start }}">
-        <span class="gr-bnd-lz-kopf">Raten in Monaten</span>
-        {% for lz in m.laufzeit_wahl.optionen %}<button type="button"
-          data-lz="{{ lz }}" aria-pressed="{{ 'true' if lz == m.laufzeit_wahl.start
-          else 'false' }}">{{ lz }}</button>{% endfor %}<button
-          type="button" data-lz="alle" aria-pressed="false">alle</button>
-      </div>
-      {% endif %}
+      {# Die Laufzeit wählt der Umschalter der Wahl-Leiste (`#gr-zr-laufzeiten`)
+         für die ganze Tafel. Unter „alle“ stehen die Zeilen nach Laufzeit
+         gruppiert: app.js ordnet sie und zeigt diese Köpfe. #}
       <div class="gr-bndliste"{% if ids %} id="gr-bndliste"{% endif %}>
+        {{ laufzeitkoepfe(m.zeilen_band) }}
         {% for k in m.zeilen_band %}{{ buendelzeile(k) }}{% endfor %}
       </div>
 
@@ -445,9 +444,10 @@
         <div class="gr-bnd-kopf gr-bnd-kopf--ohne" aria-hidden="true">
           <span>Anbieter</span><span>Tarif · Volumen</span><span>Kosten mit
           Tarif</span>
-          <span>Δ zu Vodafone</span><span>Gerät ohne Vertrag</span><span></span>
+          <span class="gr-bnd-kopf-delta">Δ zu Vodafone</span><span>Gerät ohne Vertrag</span><span></span>
         </div>
         <div class="gr-bndliste">
+          {{ laufzeitkoepfe(m.zeilen_ohne_band) }}
           {% for k in m.zeilen_ohne_band %}{{ buendelzeile(k) }}{% endfor %}
         </div>
         {% for h, eintrag in haendler_mit_preis %}

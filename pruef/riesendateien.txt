@@ -38,10 +38,10 @@ src/telco_radar/report/differentiation.py zeilen 427
 src/telco_radar/report/differenzierung_view.py zeilen 439
 src/telco_radar/report/geraete_export.py zeilen 761
 src/telco_radar/report/geraete_pruefung.py zeilen 448
-src/telco_radar/report/geraete_radar.py zeilen 1057
+src/telco_radar/report/geraete_radar.py zeilen 1054
 src/telco_radar/report/geraete_tco_band.py zeilen 640
 src/telco_radar/report/geraete_tco_grafik.py zeilen 887
-src/telco_radar/report/geraete_tco_karten.py zeilen 1614
+src/telco_radar/report/geraete_tco_karten.py zeilen 1571
 src/telco_radar/report/geraete_tco_view.py zeilen 805
 src/telco_radar/report/geraete_view.py zeilen 1785
 src/telco_radar/report/geraete_zeitreihe.py zeilen 1446

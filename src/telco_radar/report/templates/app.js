@@ -1111,7 +1111,14 @@ var TelcoFrage = (function () {
 
   function element(id) { return document.getElementById(id); }
 
-  /* --- Deep-Link ?modell=&band= (bleibt: die 88 Sprung-Links der
+  /* Datenkonzept Geräte 5.4: die Ratenlaufzeit der Tafel - eine der Ansichten
+     aus dem Datenknoten oder „alle“; alles andere fällt auf den Start zurück. */
+  function laufzeitErlaubt(lz) {
+    return lz === 'alle' ||
+      (daten.laufzeiten || []).map(String).indexOf(lz) > -1;
+  }
+
+  /* --- Deep-Link ?modell=&band=&laufzeit= (bleibt: die 88 Sprung-Links der
      Abweichungstafel nutzen ?modell=, und Lesezeichen aus der Zeit der
      eigenen Radar-Seite ebenso). Eine unbekannte id faellt still aufs
      Startgeraet zurueck - derselbe Grundsatz wie zuvor. */
@@ -1131,6 +1138,8 @@ var TelcoFrage = (function () {
         zustand.band = erlaubtStart[0];
       }
     }
+    var wunschL = params.get('laufzeit');
+    if (wunschL && laufzeitErlaubt(wunschL)) zustand.laufzeit = wunschL;
   } catch (e) { /* aeltere Browser: Startzustand bleibt */ }
 
   /* --- Das Zeitreihen-Fragment: ALLE Paare, auch der Startzustand. Der
@@ -1184,6 +1193,18 @@ var TelcoFrage = (function () {
 
   function setzeGraph(modell, band) {
     var folge = ++zrFolge;
+    if (zustand.laufzeit === 'alle') {
+      /* Über Laufzeiten hinweg gibt es keinen Sieger - also weder Antwort
+         noch Graph, sondern den benannten Satz aus dem Datenknoten. */
+      zrPanelSchliessen();
+      zrOeffneNach = null;
+      while (zrGruppe.firstChild) zrGruppe.removeChild(zrGruppe.firstChild);
+      var satz = document.createElement('p');
+      satz.className = 'gr-zr-keine gr-zr-alle';
+      satz.textContent = daten.alle_text || '';
+      zrGruppe.appendChild(satz);
+      return;
+    }
     holeZr().then(function (lager) {
       if (folge !== zrFolge) return;
       var block = lager && lager[modell + '::' + band + '::' +
@@ -1610,6 +1631,7 @@ var TelcoFrage = (function () {
           return (kx - ky) * richt;
         });
         zeilen.forEach(function (z) { liste.appendChild(z); });
+        if (zustand.laufzeit === 'alle') ordneNachLaufzeit(liste);
       });
   }
 
@@ -1635,51 +1657,75 @@ var TelcoFrage = (function () {
     });
   });
 
-  /* P3-E2: der Laufzeit-Filter. Welche Zeile unter welcher Wahl steht,
-     entscheidet Python (`data-lz`, geraete_tco_karten.laufzeit_wahl);
-     hier wird nur geblendet. Die Wahl des Nutzers ueberlebt den
-     Modellwechsel, solange das neue Modell sie fuehrt - sonst gilt
-     dessen `data-start`. */
-  var laufzeitWahl = null;
+  /* Datenkonzept Geräte Schritt 3: die Zeilen folgen dem Umschalter der
+     Ratenlaufzeit (`zustand.laufzeit`). Unter welcher Wahl eine Zeile steht,
+     entscheidet Python (`data-lz`, geraete_laufzeit.setze_ansicht); hier wird
+     nur geblendet. Unter „alle“ stehen die Zeilen nach Laufzeit gruppiert -
+     stabil umgeordnet, mit den Köpfen der Vorlage - und ohne Δ. */
+  function lzRang(z) {
+    var lz = parseInt(z.getAttribute('data-lz'), 10);
+    return isNaN(lz) ? 1e9 : lz;
+  }
 
-  function aktiveLaufzeit() {
-    var leiste = document.querySelector('#gr-bnd-gruppe .gr-bnd-lz');
-    if (!leiste) return null;
-    var knoepfe = leiste.querySelectorAll('button[data-lz]');
-    var wahl = leiste.getAttribute('data-start');
-    Array.prototype.forEach.call(knoepfe, function (k) {
-      if (k.getAttribute('data-lz') === laufzeitWahl) wahl = laufzeitWahl;
+  function ordneNachLaufzeit(liste) {
+    var paare = Array.prototype.filter.call(liste.children, function (k) {
+      return k.classList && k.classList.contains('gr-bnd');
+    }).map(function (z, i) { return [z, i]; });
+    paare.sort(function (a, b) {
+      return (lzRang(a[0]) - lzRang(b[0])) || (a[1] - b[1]);
     });
-    Array.prototype.forEach.call(knoepfe, function (k) {
-      k.setAttribute('aria-pressed',
-                     k.getAttribute('data-lz') === wahl ? 'true' : 'false');
-    });
-    return wahl;
+    paare.forEach(function (p) { liste.appendChild(p[0]); });
+    Array.prototype.forEach.call(
+      liste.querySelectorAll('.gr-bnd-lzkopf'),
+      function (kopf) {
+        var lz = kopf.getAttribute('data-lz-kopf');
+        var erste = null;
+        paare.some(function (p) {
+          if (p[0].hidden || (p[0].getAttribute('data-lz') || '') !== lz) {
+            return false;
+          }
+          erste = p[0];
+          return true;
+        });
+        kopf.hidden = !erste;
+        if (erste) liste.insertBefore(kopf, erste);
+      });
   }
 
   function stelleZeilen(band) {
-    var lz = aktiveLaufzeit();
+    var lz = zustand.laufzeit;
+    var alle = lz === 'alle';
+    var sektion = element('gr-buendel');
+    if (sektion) sektion.classList.toggle('gr-buendel--alle', alle);
     var zeilen = document.querySelectorAll('#gr-bnd-gruppe .gr-bnd');
     Array.prototype.forEach.call(zeilen, function (z) {
       var bandAus = !!band && z.hasAttribute('data-band')
         && z.getAttribute('data-band') !== band;
-      var lzAus = !!lz && lz !== 'alle' && z.hasAttribute('data-lz')
-        && (' ' + z.getAttribute('data-lz') + ' ').indexOf(' ' + lz + ' ')
-           === -1;
+      var lzAus = !alle && z.hasAttribute('data-lz')
+        && z.getAttribute('data-lz') !== lz;
       z.hidden = bandAus || lzAus;
     });
+    Array.prototype.forEach.call(
+      document.querySelectorAll('#gr-bnd-gruppe .gr-bndliste'),
+      function (liste) {
+        if (alle) {
+          ordneNachLaufzeit(liste);
+          return;
+        }
+        Array.prototype.forEach.call(
+          liste.querySelectorAll('.gr-bnd-lzkopf'),
+          function (kopf) { kopf.hidden = true; });
+      });
+    /* „Ohne Tarifband“ ohne eine sichtbare Zeile dieser Laufzeit und ohne
+       Händlerpreis stünde als leerer Kopf da - die Gruppe tritt zurück. */
+    Array.prototype.forEach.call(
+      document.querySelectorAll('#gr-bnd-gruppe .gr-ohneband'),
+      function (gruppe) {
+        gruppe.hidden = !Array.prototype.some.call(
+          gruppe.querySelectorAll('.gr-bnd, .gr-haendlerzeile'),
+          function (z) { return !z.hidden; });
+      });
   }
-
-  (function () {
-    var gruppe = element('gr-bnd-gruppe');
-    if (!gruppe) return;
-    gruppe.addEventListener('click', function (ev) {
-      var knopf = ev.target.closest ? ev.target.closest('.gr-bnd-lz button[data-lz]') : null;
-      if (!knopf) return;
-      laufzeitWahl = knopf.getAttribute('data-lz');
-      stelleZeilen(zustand.band);
-    });
-  })();
 
   /* --- Die Wahl: Band-Knoepfe, Kacheln, Suchfeld --------------------- */
   function markiereBaender() {
@@ -1724,8 +1770,11 @@ var TelcoFrage = (function () {
             s.hidden = !passt;
             if (passt) traf = true;
           });
+        var alle = zustand.laufzeit === 'alle';
         var ersatz = k.querySelector('.gr-zr-k-band--kein');
-        if (ersatz) ersatz.hidden = traf;
+        if (ersatz) ersatz.hidden = traf || alle;
+        var ohneSieger = k.querySelector('.gr-zr-k-band--alle');
+        if (ohneSieger) ohneSieger.hidden = !alle;
       });
   }
 
@@ -1749,6 +1798,39 @@ var TelcoFrage = (function () {
   function schliesseVorschau() {
     var box = element('gr-zr-vorschau');
     if (box) box.textContent = '';
+  }
+
+  function markiereLaufzeiten() {
+    Array.prototype.forEach.call(
+      document.querySelectorAll('#gr-zr-laufzeiten button[data-lz]'),
+      function (k) {
+        k.setAttribute('aria-pressed', k.getAttribute('data-lz') ===
+                       zustand.laufzeit ? 'true' : 'false');
+      });
+  }
+
+  /* P4 Schritt 2c: parameterweise statt die URL neu aufzubauen - ein
+     ?ansicht=-Deep-Link des Katalogs ueberlebt so jeden Wechsel (bis P4
+     loeschte dieser Neuaufbau alle Nachbarn). */
+  function schreibeLink() {
+    try {
+      var p = new URLSearchParams(location.search);
+      p.set('modell', zustand.modell);
+      p.set('band', zustand.band);
+      p.set('laufzeit', zustand.laufzeit);
+      history.replaceState(null, '', '?' + p.toString() + location.hash);
+    } catch (e) { /* Datei-Offline: kein replaceState noetig */ }
+  }
+
+  function waehleLaufzeit(lz) {
+    if (!laufzeitErlaubt(lz) || lz === zustand.laufzeit) return;
+    zustand.laufzeit = lz;
+    zrOeffneNach = null;
+    markiereLaufzeiten();
+    setzeKartenBand(zustand.band);
+    setzeGraph(zustand.modell, zustand.band);
+    stelleZeilen(zustand.band);
+    schreibeLink();
   }
 
   function waehle(modell, band) {
@@ -1776,15 +1858,7 @@ var TelcoFrage = (function () {
       zuletztModell = zustand.modell;
       setzeBuendel(zustand.modell, zustand.band);
     }
-    try {
-      /* P4 Schritt 2c: parameterweise statt die URL neu aufzubauen -
-         ein ?ansicht=-Deep-Link des Katalogs ueberlebt so jeden
-         Modellwechsel (bis P4 loeschte dieser Neuaufbau alle Nachbarn). */
-      var p = new URLSearchParams(location.search);
-      p.set('modell', zustand.modell);
-      p.set('band', zustand.band);
-      history.replaceState(null, '', '?' + p.toString() + location.hash);
-    } catch (e) { /* Datei-Offline: kein replaceState noetig */ }
+    schreibeLink();
   }
 
   /* Gegenstueck zu „Ohne Vertrag“ (siehe `leserGeraet` dort): wird dieser
@@ -1806,6 +1880,14 @@ var TelcoFrage = (function () {
       k.addEventListener('click', function () {
         if (k.disabled) return;
         waehle(zustand.modell, k.getAttribute('data-band'));
+      });
+    });
+
+  Array.prototype.forEach.call(
+    document.querySelectorAll('#gr-zr-laufzeiten button[data-lz]'),
+    function (k) {
+      k.addEventListener('click', function () {
+        waehleLaufzeit(k.getAttribute('data-lz'));
       });
     });
 
@@ -2026,6 +2108,7 @@ var TelcoFrage = (function () {
      Deep-Link-Band, das vom Server-Start abweicht, schaltet auch die
      Karten-Spans um (Sicht-B2) - der Server rendert sein Startband. */
   markiereBaender();
+  markiereLaufzeiten();
   markiereKacheln();
   setzeKartenBand(zustand.band);
   setzeSuchfeld();
@@ -2041,18 +2124,18 @@ var TelcoFrage = (function () {
      Geraet zeigten (gemessen am o3-Rueckwechseltest: 4 Zeilen des
      Startmodells unter einem s26-Deep-Link). */
   zuletztModell = vorgabe;
-  try {
-    /* Dieselbe parameterweise Schreibweise wie in waehle() - siehe dort. */
-    var p0 = new URLSearchParams(location.search);
-    p0.set('modell', zustand.modell);
-    p0.set('band', zustand.band);
-    history.replaceState(null, '', '?' + p0.toString() + location.hash);
-  } catch (e) { /* offline */ }
+  schreibeLink();
   /* Ein Deep-Link auf ein ANDERES Geraet als den Server-Startzustand
      braucht den ersten Fragmentabruf - sonst zeigten Graph und Tabelle
-     das Startgeraet, obwohl die URL ein anderes nennt. */
+     das Startgeraet, obwohl die URL ein anderes nennt. Dasselbe gilt fuer
+     ein anderes Band oder eine andere Laufzeit desselben Geraets: der
+     Server rendert nur sein Startpaar. */
   if (zustand.modell !== vorgabe) {
     waehle(zustand.modell, zustand.band);
+  } else if (zustand.band !== daten.start_band ||
+             zustand.laufzeit !== String(daten.start_laufzeit)) {
+    setzeGraph(zustand.modell, zustand.band);
+    setzeBndTitel(zustand.modell, zustand.band);
   }
   /* Ohne Leser-Wunsch gilt das Startgeraet dieses Reiters auch fuer
      „Ohne Vertrag“ - beide Reiter oeffnen mit demselben Geraet. */

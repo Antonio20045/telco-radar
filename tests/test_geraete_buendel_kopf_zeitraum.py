@@ -340,10 +340,12 @@ def ctx(site, chromium):
 
 @pytest.fixture()
 def seite(ctx):
+    """Die Tafel unter „alle“: nur dort stehen 24 und 36 Raten untereinander
+    (Datenkonzept Geräte 5.4), nach Laufzeit gruppiert."""
     wurzel, browser = ctx
     s = browser.new_page(viewport={"width": 1440, "height": 900})
     try:
-        s.goto(f"{wurzel}/geraete.html", wait_until="networkidle")
+        s.goto(f"{wurzel}/geraete.html?laufzeit=alle", wait_until="networkidle")
         yield s
     finally:
         s.close()
@@ -416,19 +418,24 @@ def test_eine_zeile_ohne_gemessenen_zeitraum_rangiert_hinten_und_bleibt(seite):
     seite.wait_for_timeout(120)
     reihe = _reihe(seite)
     assert len(reihe) == 4, reihe
-    assert [z[1] for z in reihe] == ["24", "24", "36", ""], reihe
-    assert reihe[-1][0] == "congstar", reihe
+    assert [z[1] for z in reihe] == ["24", "24", "", "36"], (
+        "hinten in ihrer Laufzeit-Gruppe (24 Raten), vor der Gruppe 36",
+        reihe,
+    )
+    assert reihe[2][0] == "congstar", reihe
 
 
 def test_die_anbieter_sortierung_bleibt_eine_reine_namensfolge(seite):
-    """GEGENPROBE zur Gruppierung: sie gilt NUR fuer den Kostenrang. Nach
-    Anbieter sortiert steht 1&1 vorn, wo der Name hingehoert - der
-    Zeitraum mischt sich dort nicht ein."""
+    """GEGENPROBE zur Gruppierung nach Zeitraum: sie gilt NUR fuer den
+    Kostenrang. Unter „alle“ steht zuerst die Laufzeit-Gruppe (Datenkonzept
+    Geräte 5.4: 24 Raten nie in einem Rang mit 36); innerhalb der Gruppe ist
+    die Anbieterfolge eine reine Namensfolge."""
     seite.click("#gr-buendel .gr-bnd-kopf button[data-bsort='anbieter']")
     seite.wait_for_timeout(120)
-    namen = [z[0] for z in _reihe(seite)]
-    assert namen == sorted(namen, key=str.lower), namen
-    assert namen[0] == "1&1", namen
+    reihe = _reihe(seite)
+    namen = [z[0] for z in reihe if z[1] == "24"]
+    assert namen == sorted(namen, key=str.lower) == ["congstar", "o2", "Vodafone"]
+    assert [z[0] for z in reihe][-1] == "1&1", reihe
 
 
 def _zeile_text(karte: dict) -> str:
