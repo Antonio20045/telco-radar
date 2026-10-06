@@ -299,15 +299,6 @@ def _band_zeilen(modell: dict) -> dict:
     return fertig
 
 
-def _gesperrt_namen(karten: list) -> list[str]:
-    """„1&1 (Schätzung)“ je Anbieter und Grund, wo die Notbremse Karten nimmt."""
-    return list(
-        dict.fromkeys(
-            f"{k['anbieter']} ({notbremse.zustand(k)['kurz']})" for k in karten
-        )
-    )
-
-
 def _alternativen(karten: list, band: str, anbieter: str) -> list[dict]:
     """Die besten Bänder EINES Anbieters, der im gewählten Band fehlt.
 
@@ -405,7 +396,7 @@ def _luecken(
             for k in karten
             if k["anbieter"] == anbieter and (k.get("sku_id") or k.get("naeherung"))
         ]
-        namen = _gesperrt_namen(
+        namen = notbremse.namen(
             [k for k in gesperrt or [] if k["anbieter"] == anbieter]
         )
         if not eigene:
@@ -582,39 +573,35 @@ def _antwort_html(
                 f"es keinen Vergleich mit {TCO_HORIZONT} Monaten."
             )
         if gesperrt:
-            wer = _esc(", ".join(_gesperrt_namen(gesperrt)))
+            wer = _esc(", ".join(notbremse.namen(gesperrt)))
             return (
                 f"Beim {name} im Band {label}{klammer} steht kein Bündel "
                 f"im Vergleich: {wer}."
             )
         return f"Beim {name} im Band {label}{klammer} führt kein Anbieter ein Bündel."
     beste = zeilen[0]
+    kern = (
+        f"<b class='gr-zr-zahl'>{_euro(beste['gesamt'])}</b> Kosten über "
+        f"{TCO_HORIZONT} Monate, Ø <b class='gr-zr-zahl'>{_schnitt(beste)}</b> "
+        f"({_esc(beste.get('tarif') or '')}{_gb_teil(beste)})"
+    )
     if len(zeilen) == 1 and beste["anbieter"] == EIGEN:
-        return (
-            f"Beim {name} im Band {label}{klammer} führt nur Vodafone: "
-            f"<b class='gr-zr-zahl'>{_euro(beste['gesamt'])}</b> Kosten "
-            f"über {TCO_HORIZONT} Monate, Ø <b class='gr-zr-zahl'>"
-            f"{_schnitt(beste)}</b> ({_esc(beste.get('tarif') or '')}"
-            f"{_gb_teil(beste)})."
-        )
+        andere = [k for k in gesperrt or [] if k["anbieter"] != EIGEN]
+        if andere:
+            return (
+                f"Beim {name} im Band {label}{klammer} steht nur Vodafone im "
+                f"Vergleich: {kern}. Nicht im Vergleich: "
+                f"{_esc(', '.join(notbremse.namen(andere)))}."
+            )
+        return f"Beim {name} im Band {label}{klammer} führt nur Vodafone: {kern}."
     satz = (
         f"Beim {name} im Band {label}{klammer} ist "
-        f"{_esc(beste['anbieter'])} am günstigsten: "
-        f"<b class='gr-zr-zahl'>{_euro(beste['gesamt'])}</b> Kosten "
-        f"über {TCO_HORIZONT} Monate, Ø <b class='gr-zr-zahl'>"
-        f"{_schnitt(beste)}</b> ({_esc(beste.get('tarif') or '')}"
-        f"{_gb_teil(beste)})"
+        f"{_esc(beste['anbieter'])} am günstigsten: {kern}"
     )
     eigen = next((z for z in zeilen if z["anbieter"] == EIGEN), None)
     if eigen is beste:
         zweit = zeilen[1] if len(zeilen) > 1 else None
-        satz = (
-            f"Beim {name} im Band {label}{klammer} führt Vodafone: "
-            f"<b class='gr-zr-zahl'>{_euro(beste['gesamt'])}</b> Kosten "
-            f"über {TCO_HORIZONT} Monate, Ø <b class='gr-zr-zahl'>"
-            f"{_schnitt(beste)}</b> ({_esc(beste.get('tarif') or '')}"
-            f"{_gb_teil(beste)})"
-        )
+        satz = f"Beim {name} im Band {label}{klammer} führt Vodafone: {kern}"
         if zweit is not None:
             satz += (
                 f" Nächster Anbieter: {_esc(zweit['anbieter'])} "
@@ -1020,11 +1007,14 @@ def buendel_schluessel(satz: dict) -> str | None:
     return roh or None
 
 
-def _messungen(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
+def _messungen(
+    state_dir: Path, tco: dict, tarife: dict | None = None, heute: str = ""
+) -> dict:
     """{(modell, band): {anbieter: {datum: MESSUNG}}} aus der Historie.
 
     Eine MESSUNG ist das dict `{"satz": <Historien-Zeile>, "stand":
-    <Buendel-Eintrag aus geraete_tco.json>, "wert": <Leitzahl von HEUTE>}`.
+    <Buendel-Eintrag aus geraete_tco.json>, "wert": <Leitzahl von HEUTE>}`
+    samt der Notbremse ihres Bündels (`felder_aus_satz` am Stand, `zaehlt`).
     Je (Modell, Band, Anbieter, Tag) zaehlt das GUENSTIGSTE Buendel (Farben
     sind Preisdimensionen) - seit A1 nach der HEUTIGEN Rechnung (`wert`,
     nicht dem eingefrorenen `gesamt` der Historie). Ein fehlender Tag
@@ -1141,6 +1131,7 @@ def _messungen(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
                 "monate": monate,
                 "laufzeit": laufzeit,
                 "weitere_laufzeiten": sorted(weitere),
+                **notbremse.felder_aus_satz(b, heute),
             }
         elif _gleichstand(alt) and laufzeit is not None:
             bekannt = set(alt.get("weitere_laufzeiten") or [])
@@ -1814,7 +1805,9 @@ def _legende_html(anbieter_serien: dict, zeitraeume: dict | None = None) -> str:
     return "<div class='gr-zr-legende'>" + "".join(eintraege) + "</div>"
 
 
-def aufbereiten(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
+def aufbereiten(
+    state_dir: Path, tco: dict, tarife: dict | None = None, heute: str = ""
+) -> dict:
     """Alles, was die Hauptansicht braucht.
 
     `tco` ist die Rueckgabe von `geraete_tco_view.aufbereiten()` - dieselben
@@ -1829,12 +1822,15 @@ def aufbereiten(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
     werden mit der HEUTIGEN Leitzahl gerechnet, und deren Tarifanteil ist
     phasengewichtet, wo der Stamm Phasen nennt - dieselben Phasen wie auf
     der Tafel (`phasen_fuer_buendel`, ohne Widerspruch zur Messung).
+    `heute` stellt die Uhr der Notbremse; Kachel-Delta, Startpaar und
+    Kachelfolge (`wahl`) zählen nur Messungen, deren Bündel zählt.
     """
     state_dir = Path(state_dir)
     modelle = tco.get("modelle") or []
     band_katalog = {b["key"]: b for b in tco.get("baender_katalog") or []}
-    messungen_alle = _messungen(state_dir, tco, tarife)
+    messungen_alle = _messungen(state_dir, tco, tarife, heute)
     serien_alle = _serien_aus(messungen_alle, tarife)
+    zaehlend_alle = _serien_aus(notbremse.nur_zaehlende(messungen_alle), tarife)
     zeitraeume_alle = _zeitraeume_aus(messungen_alle, tarife)
     if messungen_alle:
         log.info(
@@ -1884,6 +1880,7 @@ def aufbereiten(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
             alte = satz.get("alt") or []
             fremde = satz.get("fremd") or []
             serien = serien_alle.get((modell["id"], band), {})
+            zaehlend = zaehlend_alle.get((modell["id"], band), {})
             zeitraeume = zeitraeume_alle.get((modell["id"], band), {})
             punkte = sum(len(v) for v in serien.values())
             eintrag = {
@@ -1896,6 +1893,7 @@ def aufbereiten(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
                 "anbieter_text": "",
                 "alt_text": None,
                 "fremd_text": None,
+                "gesperrt_text": None,
             }
             echt = next(
                 (
@@ -1930,11 +1928,14 @@ def aufbereiten(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
                     if monate_fremd is not None
                     else "nur über eine andere Laufzeit"
                 )
+            elif satz.get("gesperrt"):
+                gruende = notbremse.gruende(satz["gesperrt"])
+                eintrag["gesperrt_text"] = f"nicht im Vergleich ({gruende})"
             if serien:
                 band_anbieter = [a for a in ANBIETER_FOLGE if serien.get(a)]
                 eintrag["punkte_html"] = _anbieter_punkte(band_anbieter)
                 eintrag["anbieter_text"] = ", ".join(band_anbieter)
-                bew = _bewegung(serien, zeitraeume)
+                bew = _bewegung(zaehlend, zeitraeume)
                 if bew:
                     eintrag["delta_text"] = bew["text"]
                     eintrag["delta_richtung"] = bew["richtung"]
@@ -2003,6 +2004,7 @@ def aufbereiten(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
                     "leer_text": leer,
                     "anbieter": [a for a in ANBIETER_FOLGE if serien.get(a)],
                     "punkte": punkte,
+                    "wahl": (len(zaehlend), sum(map(len, zaehlend.values()))),
                 }
             )
 
@@ -2014,9 +2016,7 @@ def aufbereiten(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
             vorlagen,
             sum(p["punkte"] for p in paare),
         )
-    kandidaten = [
-        (p["modell"], p["band"], len(p["anbieter"]), p["punkte"]) for p in paare
-    ]
+    kandidaten = [(p["modell"], p["band"], *p["wahl"]) for p in paare]
     start = None
     if kandidaten:
         rang = {b: i for i, b in enumerate(band_katalog)}
@@ -2054,7 +2054,7 @@ def aufbereiten(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
 
     kachel_werte: dict[str, tuple] = {}
     for p in paare:
-        wert = (len(p["anbieter"]), p["punkte"])
+        wert = p["wahl"]
         bisher = kachel_werte.get(p["modell"])
         if bisher is None or wert > bisher:
             kachel_werte[p["modell"]] = wert

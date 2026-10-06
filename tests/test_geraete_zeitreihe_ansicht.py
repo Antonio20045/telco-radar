@@ -262,6 +262,10 @@ def _baue(tmp_path: pathlib.Path):
     return root, state
 
 
+baue = _baue
+"""Öffentlicher Name des Testbestands für neue Tests (Wächter PLC2701)."""
+
+
 @pytest.fixture(scope="module")
 def ansicht(tmp_path_factory):
     root, state = _baue(tmp_path_factory.mktemp("zr"))

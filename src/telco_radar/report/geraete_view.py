@@ -670,15 +670,14 @@ TCO_DELTA_GRUND_UNBESTIMMT = (
 
 
 def _buendel_je_anbieter_modell(
-    buendel: list, eintraege: list, katalog
+    buendel: list, eintraege: list, katalog, heute: str = ""
 ) -> tuple[dict, dict]:
     """Zwei Lesarten derselben Bündel-Aufloesung.
 
     1. `(Anbieter, modell_schluessel) -> das guenstigste Bündel mit
-       Monatspreis` - die Monatsangabe "nur im Bündel, ab X EUR/Monat"
-       braucht einen Beleg aus `geraete_tco.json`, NICHT das
-       `preis_mit_vertrag_ab` der Listung, denn der Bündelstore traegt dazu
-       Quelle und Abrufdatum (Belegzwang).
+       Monatspreis`, das zählt (`geraete_notbremse`) - die Monatsangabe "nur
+       im Bündel, ab X EUR/Monat" braucht einen Beleg aus `geraete_tco.json`,
+       NICHT das `preis_mit_vertrag_ab` der Listung (Belegzwang).
     2. `modell_schluessel -> {device_id, speicher}` für JEDES Bündel, dessen
        SKU auf ein Geraet aufloest - unabhaengig vom Monatspreis (P5-Auftrag
        1, 18.09.2026: Sichtbarkeit folgt den Daten, nicht dem Weg - schon
@@ -717,6 +716,8 @@ def _buendel_je_anbieter_modell(
                 continue
             mid = geraete_tco_karten.modell_schluessel(*geraet)
         geraet_je_mid.setdefault(mid, {"device_id": geraet[0], "speicher": geraet[1]})
+        if not notbremse.felder_aus_satz(b, heute)["zaehlt"]:
+            continue
         monat = b.get("buendel_monatlich")
         if monat is None:
             tarif, rate = b.get("tarif_monatlich"), b.get("geraet_monatsrate")
@@ -1005,14 +1006,13 @@ def katalog_modellzeilen(
     fail-closed, ein fehlender Graph-Link ist ehrlicher als ein toter.
 
     A3-Nachbesserung (Pruefer 20.09.2026, "hoch"): `heute` stellt die Uhr
-    fuer den ab-Preis. DIESELBE Frische-Definition wie an der Tafel
-    (`geraete_tco_karten.ist_frisch`, Clean Code 7) entscheidet, welcher
-    Beleg "ab" stellt und in die Spanne zaehlt - ein alter Barpreis ist
-    kein "ab" von heute (gemessener Fall: "ab 1.299 EUR bei
-    mobilcom-debitel" vom 14.08., 37 Tage; "ab 289 EUR bei Medimax" vom
-    06.09. unterbot das frische ElectronicPartner-Angebot vom 19.09.).
-    Ohne `heute` (leerer String) altert nichts - der Modus der alten
-    Aufrufer und Tests.
+    fuer den ab-Preis und die Notbremse der Bündel-Angabe. DIESELBE
+    Frische-Definition wie an der Tafel (`geraete_tco_karten.ist_frisch`,
+    Clean Code 7) entscheidet, welcher Beleg "ab" stellt und in die Spanne
+    zaehlt - ein alter Barpreis ist kein "ab" von heute (gemessen: "ab
+    1.299 EUR bei mobilcom-debitel" vom 14.08., 37 Tage; "ab 289 EUR bei
+    Medimax" vom 06.09. unterbot ElectronicPartner vom 19.09.). Ohne
+    `heute` altert nichts - der Modus der alten Aufrufer und Tests.
 
     P5-AUFTRAG 1 (STRATEGIE_GERAETE_V3, 18.09.2026): SICHTBARKEIT FOLGT DEN
     DATEN, NICHT DEM WEG - Bündel ODER Listung genuegt. Neben den Gruppen
@@ -1025,7 +1025,7 @@ def katalog_modellzeilen(
     """
     belege = geraete_tco_karten.barpreise(eintraege)
     buendel_je, buendel_geraete = _buendel_je_anbieter_modell(
-        buendel, eintraege, katalog
+        buendel, eintraege, katalog, heute
     )
     tco_je_id = {m.get("id"): m for m in (tco_modelle or [])}
 
@@ -1694,7 +1694,7 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
     ausfaelle: list[Ausfall] = []
     try:
         zeitreihe = geraete_zeitreihe.aufbereiten(
-            state_dir, tco, tarife=tarifbestand.je_id_aktuell
+            state_dir, tco, tarife=tarifbestand.je_id_aktuell, heute=tco_heute
         )
     except Exception as exc:  # noqa: BLE001
         log.error(

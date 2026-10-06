@@ -24,8 +24,10 @@ zweier Angebote ist keine Preisänderung. Ein Angebotswechsel ist deshalb
 „ohne Aussage" und wird gezählt, nie gemeldet (Clean Code 4).
 
 Ebenso ohne Aussage: eine Seite ohne Messung im Toleranzfenster um einen
-der beiden Tage, und eine Leitzahl über einen anderen Zeitraum als
-`TCO_HORIZONT` (sie ist mit Vodafones nicht vergleichbar).
+der beiden Tage, eine Messung, deren Bündel nicht zählt (Notbremse:
+Schätzung oder abgelaufene Aktion, `zaehlt` aus `_messungen`), und eine
+Leitzahl über einen anderen Zeitraum als `TCO_HORIZONT` (sie ist mit
+Vodafones nicht vergleichbar).
 
 WAS DER BLOCK NICHT SIEHT: `wert` ist die Leitzahl nach dem HEUTIGEN
 Tarifstamm (A1, `_messungen`). Eine Aenderung des Tarifgrundpreises
@@ -44,6 +46,7 @@ from collections import Counter
 from datetime import date, timedelta
 
 from ..tco_model import TCO_HORIZONT, zeitraum_vergleichbar
+from . import geraete_notbremse as notbremse
 
 BEWEGUNG_EURO = 50.0
 BEWEGUNG_PROZENT = 5.0
@@ -63,6 +66,7 @@ AUSFALL_VERALTET = "die letzte Vodafone-Messung vom {tag} ist veraltet"
 GRUND_MESSUNG = "messung_fehlt"
 GRUND_WECHSEL = "angebotswechsel"
 GRUND_ZEITRAUM = "anderer_zeitraum"
+GRUND_ZAEHLT_NICHT = "zaehlt_nicht"
 
 
 def _messung_um(slot: dict, tag: str) -> dict | None:
@@ -127,6 +131,9 @@ def bewegungen(
             c1 = _messung_um(anbieter[name], bis)
             if None in (v0, v1, c0, c1):
                 ohne[GRUND_MESSUNG] += 1
+                continue
+            if not all(map(notbremse.zaehlt, (v0, v1, c0, c1))):
+                ohne[GRUND_ZAEHLT_NICHT] += 1
                 continue
             if schluessel(c0["satz"]) != schluessel(c1["satz"]) or schluessel(
                 v0["satz"]

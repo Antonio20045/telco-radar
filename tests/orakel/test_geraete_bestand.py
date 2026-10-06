@@ -386,7 +386,8 @@ def test_gw_zaehlt_sperrt_schaetzung_und_abgelaufene_aktion():
 
 
 _GW_ANTWORT_MUSTER = re.compile(
-    r"(?:ist (?P<anb1>[^:<]+?) am günstigsten|führt nur (?P<anb2>[^:<]+?))"
+    r"(?:ist (?P<anb1>[^:<]+?) am günstigsten|führt nur (?P<anb2>[^:<]+?)"
+    r"|steht nur (?P<anb3>[^:<]+?) im Vergleich)"
     r": <b class='gr-zr-zahl'>(?P<gesamt>[\d.,]+) €</b> "
     r"Kosten über 24 Monate, Ø "
     r"<b class='gr-zr-zahl'>(?P<o>[\d.,]+) €/Monat</b> \((?P<klammer>.*)\)"
@@ -416,7 +417,7 @@ def _gw_antwort(block: str) -> dict | None:
     if not m:
         return None
     return {
-        "anb": (m.group("anb1") or m.group("anb2")).strip(),
+        "anb": (m.group("anb1") or m.group("anb2") or m.group("anb3")).strip(),
         "gesamt": _gw_dezimal(m.group("gesamt")),
         "o": _gw_dezimal(m.group("o")),
         "klammer": m.group("klammer"),
@@ -890,7 +891,8 @@ def test_tor_geraete_leitzahl_je_band_am_bestand(gw_seite, modell, band):
     """Je eine Leitzahl der vier Tor-Geräte, je Stufe: die Zahl des
     Antwort-Satzes gegen die EIGENE Minimumsrechnung über alle neu-Bündel
     des Modells in der Stufe - und die Guenstigkeitsbehauptung des Satzes
-    ('ist X am guenstigsten' / 'fuehrt nur X') gegen dasselbe Minimum.
+    ('ist X am guenstigsten' / 'fuehrt nur X' / 'steht nur X im Vergleich',
+    Notbremse) gegen dasselbe Minimum.
     Kein Skip: die Faelle sind am Bestand nachgerechnet, ein fehlendes
     Paar oder ein fehlender Satz ist ein Befund."""
     tco, blaetter, _db = _gw_rohdaten(gw_seite["bestand"])

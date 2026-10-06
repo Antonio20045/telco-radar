@@ -338,6 +338,13 @@
           class="gr-zr-k-leer gr-zr-k-alt gr-zr-k-fremd"
           title="Bündel-Angebot nur über eine andere Laufzeit">{{
           s.fremd_text }}</small></span>
+        {# Notbremse: das Band führt nur Bündel, die nicht zählen (Schätzung,
+           abgelaufene Aktion) - derselbe Zustand wie der Antwortsatz, kein
+           „kein Angebot". #}
+        {%- elif s.gesperrt_text %}<span class="gr-zr-k-preis"><small
+          class="gr-zr-k-leer gr-zr-k-alt gr-zr-k-gesperrt"
+          title="Bündel-Angebot nicht im Vergleich">{{
+          s.gesperrt_text }}</small></span>
         {%- else %}<span class="gr-zr-k-preis"><small class="gr-zr-k-leer"
           title="kein Bündel-Angebot in diesem Band">—</small></span>{%- endif %}
         {#- 28.09.2026: die Bewegung steht nur, wenn sich wirklich etwas
