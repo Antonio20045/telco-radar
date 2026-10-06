@@ -171,12 +171,9 @@ def _zeile(lauf: Lauf, rolle: str, runde: int, code: object, **mehr: object) -> 
 def _agent(
     lauf: Lauf, rolle: str, runde: int, befund: str, **extra: str
 ) -> tuple[int, object]:
-    auftrag = lauf.auftrag
-    soll = format_.SOLL[auftrag["art"]].format(auftrag.get("erwarteterFehler"))
-    werte = {"abnahme": auftrag["abnahme"], "bereich": auftrag["bereich"]}
-    prompt = format_.PROMPT[rolle].format(**werte, grenze=DIFF_GRENZE, soll=soll)
-    prompt += f"\n\nBefund der letzten Runde:\n{befund}" if befund else ""
     pfade = {name: str(lauf.datei(datei)) for name, datei in LAUFDATEIEN.items()}
+    prompt = format_.prompt(rolle, lauf.auftrag, DIFF_GRENZE, pfade | extra)
+    prompt += f"\n\nBefund der letzten Runde:\n{befund}" if befund else ""
     einstellungen = json.dumps(rolle_.einstellungen(rolle))
     befehl = [*lauf.agent, "--agent", rolle, "--settings", einstellungen]
     start = time.monotonic()

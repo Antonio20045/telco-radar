@@ -44,6 +44,18 @@ SPALTEN = ("datum", "auftrag", "rolle", "runde", "agent", "exit", "sekunden")
 SPALTEN += ("kosten_usd", "token_ein", "token_aus", "modell", "ergebnis")
 
 
+def prompt(rolle: str, auftrag: dict, grenze: int, pfade: dict[str, str]) -> str:
+    """Prompt einer Rolle; die Pfade der Laufdateien stehen wörtlich darin.
+
+    Der Rollen-Hook sperrt Variablen in Bash, ein Agent kann ``$TELCO_AUFTRAG`` also
+    nicht selbst auflösen.
+    """
+    soll = SOLL[auftrag["art"]].format(auftrag.get("erwarteterFehler"))
+    werte = {"abnahme": auftrag["abnahme"], "bereich": auftrag["bereich"]}
+    text = PROMPT[rolle].format(**werte, grenze=grenze, soll=soll)
+    return text + "".join(f"\n{name} = {pfad}" for name, pfad in sorted(pfade.items()))
+
+
 def gemergt(wurzel: Path) -> set[str]:
     """Gibt die Kennungen der Aufträge, die laut Kostendatei gemergt sind."""
     datei = wurzel / KOSTEN

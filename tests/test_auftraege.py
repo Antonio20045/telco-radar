@@ -100,3 +100,15 @@ def test_abhaengiger_auftrag_wartet_auf_gemergt():
 def test_unlesbarer_plan_startet_nichts(tmp_path, capsys):
     assert auftraege.main([str(tmp_path / "fehlt")]) == 1
     assert "Plan nicht lesbar" in capsys.readouterr().out
+
+
+def test_prompt_nennt_die_pfade_der_laufdateien_woertlich():
+    format_ = importlib.import_module("auftrag_format")
+    auftrag = {"art": "umbau", "abnahme": "tests/test_x.py", "bereich": "src/a/"}
+    pfade = {"TELCO_PRUEFER_ORDNER": "/tmp/pruefer-S1-x", "TELCO_AUFTRAG": "/r/a.json"}
+
+    text = format_.prompt("pruefer", auftrag, 400, pfade)
+
+    assert "TELCO_PRUEFER_ORDNER = /tmp/pruefer-S1-x" in text
+    assert "TELCO_AUFTRAG = /r/a.json" in text
+    assert "Abnahme tests/test_x.py" in text
