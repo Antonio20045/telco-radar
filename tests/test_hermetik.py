@@ -27,6 +27,13 @@ W = Path({str(WURZEL)!r})
 """
 
 
+_SEEN_UEBER_CWD = (
+    "Path('/proc/self/cwd/data/state/seen.jsonl').read_bytes()"
+    if Path("/proc/self/cwd").exists()
+    else "Path(os.getcwd(), '..', W.name, 'data/state/seen.jsonl').read_bytes()"
+)
+
+
 def _lauf(code, test="tests/test_neu.py::test_x (call)", **umgebung):
     env = {k: v for k, v in os.environ.items() if not k.startswith("TELCO_TESTS")}
     env.update(PROBE_TEST=test, **umgebung)
@@ -105,7 +112,7 @@ def test_beim_sammeln_zaehlt_die_aeusserste_testdatei(tmp_path):
 @pytest.mark.parametrize(
     ("zugriff", "pfad"),
     [
-        ("Path('/proc/self/cwd/data/state/seen.jsonl').read_bytes()", "data/state"),
+        (_SEEN_UEBER_CWD, "data/state"),
         ("os.chdir(W / 'data/state')", "data/state"),
         (
             "import subprocess as s; s.run(['head', str(W / 'data/state/seen.jsonl')])",

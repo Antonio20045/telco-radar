@@ -17,7 +17,7 @@ Automatisches Competitive-Intelligence-System für Vodafone-Manager ohne Technik
 ## Befehle
 
 ```bash
-make einrichten                  # venv und Git-Hooks (core.hooksPath .githooks)
+make einrichten                  # venv, Playwright-Chromium und Git-Hooks (core.hooksPath .githooks)
 make schnell                     # Leiter Stufen 0, 1, 4 auf den geänderten Dateien
 make pruefen                     # volle Leiter 0–3 und 5; grün stempelt den Stand
 make stand                       # zehn Umbauschritte: erfüllt oder offen, weil …

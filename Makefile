@@ -6,8 +6,12 @@ venv:
 	.venv/bin/pip install -q -r requirements-dev.txt
 	git config blame.ignoreRevsFile .git-blame-ignore-revs
 
+.PHONY: browser
+browser:
+	.venv/bin/python -m playwright install chromium
+
 .PHONY: einrichten
-einrichten: venv
+einrichten: venv browser
 	git config core.hooksPath .githooks
 
 .PHONY: schnell

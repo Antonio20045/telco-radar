@@ -350,7 +350,7 @@ b,strong{font-weight:700}
    liest. */
 .ausfall-hinweis{background:var(--red-wash);border-left:3px solid var(--red);
   padding:10px 14px;margin:0 0 16px;font-family:var(--sans);font-size:12px;
-  line-height:1.5;color:var(--ink-2)}
+  line-height:1.5;color:var(--ink-2);overflow-wrap:anywhere}
 
 
 /* ================================================  MELDUNGEN (Ressort) == */
