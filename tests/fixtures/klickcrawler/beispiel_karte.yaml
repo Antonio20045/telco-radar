@@ -1,0 +1,27 @@
+# BEISPIEL: von Hand geschriebene Klick-Karte für beispiel_produktseite.html.
+# Kein echter Anbieter; echte Karten folgen in Schritt 5 unter config/.
+anbieter: Beispielanbieter
+knoepfe:
+  speicher: {selektor: "#speicher button", wert: data-wert}
+  tarif: {selektor: "#tarif button", wert: data-wert}
+  laufzeit: {selektor: "#laufzeit button", wert: data-wert}
+  gewaehlt: {attribut: aria-pressed, wert: "true"}
+zusammenfassung:
+  selektor: "#preis"
+antwort:
+  url_muster: '/api/preis\?'
+  pfade:
+    anzahlung: preis.anzahlung
+    rate: preis.rate
+    ratenzahl: preis.raten
+    tarifphasen: {liste: tarif.phasen, von: ab, bis: bis, betrag: betrag}
+    tarifbindung: tarif.mindestlaufzeit
+    anschluss: tarif.anschluss
+    volumen_gb: tarif.volumen_gb
+  variante:
+    speicher: auswahl.speicher
+    tarif: auswahl.tarif
+    laufzeit: auswahl.laufzeit
+kanarie:
+  selektor: "#kanarie"
+  enthaelt: Beispielhandy X

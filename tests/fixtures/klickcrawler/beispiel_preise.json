@@ -1,0 +1,180 @@
+{
+ "_hinweis": "BEISPIEL: von Hand geschriebene Preisantworten zu beispiel_produktseite.html, kein echter Anbieter, keine echten Preise.",
+ "128|S|24": {
+  "auswahl": {
+   "speicher": "128",
+   "tarif": "S",
+   "laufzeit": 24
+  },
+  "preis": {
+   "anzahlung": 99.0,
+   "rate": 20.0,
+   "raten": 24
+  },
+  "tarif": {
+   "phasen": [
+    {
+     "ab": 1,
+     "bis": 24,
+     "betrag": 29.99
+    },
+    {
+     "ab": 25,
+     "bis": null,
+     "betrag": 34.99
+    }
+   ],
+   "mindestlaufzeit": 24,
+   "anschluss": 39.99,
+   "volumen_gb": 25
+  }
+ },
+ "128|M|24": {
+  "auswahl": {
+   "speicher": "128",
+   "tarif": "M",
+   "laufzeit": 24
+  },
+  "preis": {
+   "anzahlung": 49.0,
+   "rate": 18.0,
+   "raten": 24
+  },
+  "tarif": {
+   "phasen": [
+    {
+     "ab": 1,
+     "bis": 24,
+     "betrag": 39.99
+    },
+    {
+     "ab": 25,
+     "bis": null,
+     "betrag": 49.99
+    }
+   ],
+   "mindestlaufzeit": 24,
+   "anschluss": 0.0,
+   "volumen_gb": 1000
+  }
+ },
+ "128|M|36": {
+  "auswahl": {
+   "speicher": "128",
+   "tarif": "M",
+   "laufzeit": 36
+  },
+  "preis": {
+   "anzahlung": 49.0,
+   "rate": 12.5,
+   "raten": 36
+  },
+  "tarif": {
+   "phasen": [
+    {
+     "ab": 1,
+     "bis": 24,
+     "betrag": 39.99
+    },
+    {
+     "ab": 25,
+     "bis": null,
+     "betrag": 49.99
+    }
+   ],
+   "mindestlaufzeit": 24,
+   "anschluss": 0.0,
+   "volumen_gb": 1000
+  }
+ },
+ "256|S|24": {
+  "auswahl": {
+   "speicher": "256",
+   "tarif": "S",
+   "laufzeit": 24
+  },
+  "preis": {
+   "anzahlung": 1099.0,
+   "rate": 25.0,
+   "raten": 24
+  },
+  "tarif": {
+   "phasen": [
+    {
+     "ab": 1,
+     "bis": 24,
+     "betrag": 29.99
+    },
+    {
+     "ab": 25,
+     "bis": null,
+     "betrag": 34.99
+    }
+   ],
+   "mindestlaufzeit": 24,
+   "anschluss": 39.99,
+   "volumen_gb": 25
+  }
+ },
+ "256|M|24": {
+  "auswahl": {
+   "speicher": "256",
+   "tarif": "M",
+   "laufzeit": 24
+  },
+  "preis": {
+   "anzahlung": 999.0,
+   "rate": 23.0,
+   "raten": 24
+  },
+  "tarif": {
+   "phasen": [
+    {
+     "ab": 1,
+     "bis": 24,
+     "betrag": 39.99
+    },
+    {
+     "ab": 25,
+     "bis": null,
+     "betrag": 49.99
+    }
+   ],
+   "mindestlaufzeit": 24,
+   "anschluss": 0.0,
+   "volumen_gb": 1000
+  }
+ },
+ "256|M|36": {
+  "auswahl": {
+   "speicher": "256",
+   "tarif": "M",
+   "laufzeit": 36
+  },
+  "preis": {
+   "anzahlung": 999.0,
+   "rate": 16.0,
+   "raten": 36
+  },
+  "tarif": {
+   "phasen": [
+    {
+     "ab": 1,
+     "bis": 24,
+     "betrag": 39.99
+    },
+    {
+     "ab": 25,
+     "bis": null,
+     "betrag": 49.99
+    }
+   ],
+   "mindestlaufzeit": 24,
+   "anschluss": 0.0,
+   "volumen_gb": 1000
+  },
+  "aktion": {
+   "online_rabatt": 1.0
+  }
+ }
+}

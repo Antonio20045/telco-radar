@@ -1,0 +1,26 @@
+{
+  "zweck": "BEISPIEL, kein echter Anbieter: eine von Hand geschriebene Produktseite mit Knöpfen für Speicher, Tarif und Ratenlaufzeit, die ihre Preisantwort per JavaScript lädt, die Preisantworten dazu und die passende Klick-Karte. Sie prüfen das Gerüst des Klick-Crawlers ohne Netz (tests/test_geraete_klickcrawler.py). Bewusst eingebaut: 36 Monate sind zu Tarif S deaktiviert (nicht angeboten), 256 GB mit Tarif M und 36 Monaten zeigt einen Online-Rabatt, den die Antwort nicht nennt (Befund), und die Seite lädt bei jedem Preis einen per robots.txt gesperrten Zähler unter /privat/json/.",
+  "eintraege": [
+    {
+      "datei": "beispiel_karte.yaml",
+      "quelle": "BEISPIEL, von Hand geschrieben, kein Abruf: Gerüst des Klick-Crawlers (Datenkonzept Geräteradar, Schritt 4)",
+      "abgerufen_am": null,
+      "bytes_roh": 913,
+      "sha256_roh": "367df871dc88cddf8fd462e9fa9fea6cb4744e410bdc459cc53eaafa538c4f09"
+    },
+    {
+      "datei": "beispiel_preise.json",
+      "quelle": "BEISPIEL, von Hand geschrieben, kein Abruf: Gerüst des Klick-Crawlers (Datenkonzept Geräteradar, Schritt 4)",
+      "abgerufen_am": null,
+      "bytes_roh": 2617,
+      "sha256_roh": "86eee32b167abf536b8f07ce382fc826d716ab58a9c1e2a4420eb3f28b8b972c"
+    },
+    {
+      "datei": "beispiel_produktseite.html",
+      "quelle": "BEISPIEL, von Hand geschrieben, kein Abruf: Gerüst des Klick-Crawlers (Datenkonzept Geräteradar, Schritt 4)",
+      "abgerufen_am": null,
+      "bytes_roh": 2931,
+      "sha256_roh": "1be46c4e9f92e849c52efb2e911cc1833b740a379ff2c2ab97fce86eff8ec052"
+    }
+  ]
+}

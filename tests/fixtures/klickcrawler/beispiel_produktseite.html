@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>BEISPIEL – keine echte Anbieterseite</title>
+</head>
+<body>
+<p>BEISPIEL: Diese Seite ist von Hand geschrieben und dient nur dem Test des
+Klick-Crawlers. Kein echter Anbieter, keine echten Preise.</p>
+<h1 id="kanarie">Beispielhandy X</h1>
+<div id="speicher">
+  <button type="button" data-wert="128" aria-pressed="true">128 GB</button>
+  <button type="button" data-wert="256" aria-pressed="false">256 GB</button>
+</div>
+<div id="tarif">
+  <button type="button" data-wert="S" aria-pressed="true">Tarif S</button>
+  <button type="button" data-wert="M" aria-pressed="false">Tarif M</button>
+</div>
+<div id="laufzeit">
+  <button type="button" data-wert="24" aria-pressed="true">24 Monate</button>
+  <button type="button" data-wert="36" aria-pressed="false" disabled>36 Monate</button>
+</div>
+<section id="preis"></section>
+<script>
+"use strict";
+const GRUPPEN = ["speicher", "tarif", "laufzeit"];
+const auswahl = { speicher: "128", tarif: "S", laufzeit: "24" };
+
+function tausender(ganz) {
+  return ganz.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
+function euro(betrag) {
+  const [ganz, rest] = betrag.toFixed(2).split(".");
+  return `${tausender(ganz)},${rest} €`;
+}
+
+function markiere() {
+  for (const gruppe of GRUPPEN) {
+    for (const knopf of document.querySelectorAll(`#${gruppe} button`)) {
+      knopf.setAttribute("aria-pressed", String(knopf.dataset.wert === auswahl[gruppe]));
+    }
+  }
+  document.querySelector('#laufzeit button[data-wert="36"]').disabled = auswahl.tarif === "S";
+}
+
+function zeige(d) {
+  const [vorn, hinten] = d.tarif.phasen;
+  const rate = d.aktion ? d.preis.rate - d.aktion.online_rabatt : d.preis.rate;
+  document.getElementById("preis").innerText = [
+    `Ihre Auswahl: ${d.auswahl.speicher} GB · Tarif ${d.auswahl.tarif} · ${d.auswahl.laufzeit} Monate`,
+    `Einmalige Anzahlung ${euro(d.preis.anzahlung)}`,
+    `Monatliche Gerätrate ${euro(rate)} · ${d.preis.raten} Raten`,
+    `Tarif ${d.auswahl.tarif}: ${euro(vorn.betrag)} mtl. in den Monaten ${vorn.ab}–${vorn.bis}, ` +
+      `ab dem ${hinten.ab}. Monat ${euro(hinten.betrag)} mtl.`,
+    `Mindestlaufzeit ${d.tarif.mindestlaufzeit} Monate`,
+    `Anschlusspreis ${euro(d.tarif.anschluss)}`,
+    `Datenvolumen ${tausender(String(d.tarif.volumen_gb))} GB`,
+  ].join("\n");
+}
+
+function lade() {
+  const frage = new URLSearchParams(auswahl).toString();
+  fetch(`/api/preis?${frage}`).then((antwort) => antwort.json()).then(zeige);
+  fetch("/privat/json/zaehler").catch(() => {});
+}
+
+for (const gruppe of GRUPPEN) {
+  for (const knopf of document.querySelectorAll(`#${gruppe} button`)) {
+    knopf.addEventListener("click", () => {
+      auswahl[gruppe] = knopf.dataset.wert;
+      if (auswahl.tarif === "S" && auswahl.laufzeit === "36") {
+        auswahl.laufzeit = "24";
+      }
+      markiere();
+      lade();
+    });
+  }
+}
+markiere();
+lade();
+</script>
+</body>
+</html>
