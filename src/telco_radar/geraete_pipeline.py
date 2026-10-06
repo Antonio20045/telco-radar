@@ -47,6 +47,7 @@ from .analyze.geraete_store import (
 )
 from .analyze.tarif_referenzen import aus_bestand
 from .analyze.tco_buendel import aus_rohsaetzen
+from .analyze.geraete_pruefstelle import vermerke as pruefe_buendel
 from .analyze.tco_store import TcoDB
 from .tarif_bezug import Tarifbestand
 from .collect.geraete import ADAPTER, hole_mit_robots, laufuhr, sammle
@@ -57,6 +58,7 @@ from .collect.tarif_einsundeins_simonly import ANBIETER as SIMONLY_ANBIETER
 from .collect.tarif_einsundeins_simonly import sammle as sammle_simonly
 
 from . import geraete_fragment
+from .report.geraete_tco_karten import geraet_aus_sku, ist_frisch
 from .geraete_config import lade_farben, lade_katalog, lade_quellen
 
 log = logging.getLogger(__name__)
@@ -81,12 +83,11 @@ def _hole_fabrik(http_cfg: dict) -> Callable:
     und sein Ausnahmezweig sagt zu Recht "kein Ergebnis heisst nicht
     erlaubt": der Anbieter wurde als nicht abrufbar gefuehrt.
 
-    Aufgefallen ist es nie, weil jeder bisher konfigurierte Host eine
-    robots.txt mit HTTP 200 ausliefert. `api.vodafone.de` ist der erste
-    ohne - dort antwortet 404, also "keine Regeln", und der ganze Anbieter
-    fiel mit "404 Not Found" aus, obwohl die Schnittstelle einwandfrei
-    antwortet. Ein Host ohne robots.txt ist der Normalfall im Web, nicht
-    der Sonderfall.
+    Aufgefallen ist es nie, weil jeder bisher konfigurierte Host eine robots.txt mit
+    HTTP 200 ausliefert. `api.vodafone.de` ist der erste ohne - dort antwortet 404, also
+    "keine Regeln", und der ganze Anbieter fiel mit "404 Not Found" aus, obwohl die
+    Schnittstelle einwandfrei antwortet. Ein Host ohne robots.txt ist der Normalfall im
+    Web, nicht der Sonderfall.
     """
     from .collect.http import StatusFehler, fetch
 
@@ -259,16 +260,14 @@ def sende_alarm_mail(alarme: list, tag: str, *, trocken: bool = False) -> str:
 def melde_proben(bilanzen: list) -> None:
     """Je Anbieter MIT Feld-Proben eine Zeile - die Existenz-Schwelle.
 
-    100 % sind eine Info-Zeile, darunter eine Warnung mit den gescheiterten
-    Feldebenen: genau der Fall, in dem die Nutzlast einer Schnittstelle
-    sich geaendert hat, ohne dass ein Abruf fehlschlaegt (FM 2). Der
-    TOTALTOD des Referenzfeldes zaehlt als gescheiterte Probe (Ebene
-    "monthlyPrice"), nicht als Stille - sonst wuerde der Fall an der
-    Buendelzeile ("0 von 0", Info) und am Ausfallalarm (o2 liefert seine
-    LISTUNGEN weiter, Funde bleiben > 0) vorbeigehen (S2-1 der
-    P5-Codepruefung). Ohne Kandidaten (Probe lief nicht - kein Bündel-
-    zweig, nur Zubehör- und tariflose Sätze) steht keine Zeile: dafuer
-    sind die Buendel- und Ausfallzeile da.
+    100 % sind eine Info-Zeile, darunter eine Warnung mit den gescheiterten Feldebenen:
+    genau der Fall, in dem die Nutzlast einer Schnittstelle sich geaendert hat, ohne
+    dass ein Abruf fehlschlaegt (FM 2). Der TOTALTOD des Referenzfeldes zaehlt als
+    gescheiterte Probe (Ebene "monthlyPrice"), nicht als Stille - sonst wuerde der Fall
+    an der Buendelzeile ("0 von 0", Info) und am Ausfallalarm (o2 liefert seine
+    LISTUNGEN weiter, Funde bleiben > 0) vorbeigehen (S2-1 der P5-Codepruefung). Ohne
+    Kandidaten (Probe lief nicht - kein Bündelzweig, nur Zubehör- und tariflose Sätze)
+    steht keine Zeile: dafuer sind die Buendel- und Ausfallzeile da.
     """
     for satz in bilanzen:
         proben = satz.get("proben") or {}
@@ -564,6 +563,7 @@ def run_geraete_stage(
                 buendelbilanz = aus_rohsaetzen(rohbuendel, bestand, heute)
                 if buendelbilanz.buendel:
                     neue_buendel, _ = tco.upsert_buendel(buendelbilanz.buendel, heute)
+            pruefe_buendel(tco, db, bestand, heute, ist_frisch, geraet_aus_sku, katalog)
             tco.save(heute)
             geschrieben = True
     except Exception as exc:  # noqa: BLE001

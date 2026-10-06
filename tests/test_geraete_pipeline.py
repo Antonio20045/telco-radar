@@ -718,6 +718,19 @@ def test_ein_buendel_einstieg_schreibt_die_tco_datei_und_keine_listung(tmp_path)
     )
 
 
+def test_der_lauf_schreibt_den_status_der_pruefstelle_in_jedes_buendel(tmp_path):
+    """Schritt 7: Die Prüfstelle läuft vor dem Speichern über den ganzen Bestand."""
+    root = _o2_root(tmp_path)
+    run_geraete_stage(root, {}, "2026-09-04", jetzt=_jetzt(), hole=_o2_hole())
+    tco = json.loads(
+        (root / "data" / "state" / "geraete_tco.json").read_text(encoding="utf-8")
+    )
+    pruefung = tco["buendel"][0].get("pruefung")
+    assert pruefung is not None, "Bündel ohne Status der Prüfstelle gespeichert"
+    assert pruefung["status"] in ("gueltig", "quarantaene", "veraltet"), pruefung
+    assert {"gruende", "luecken", "nicht_pruefbar"} <= set(pruefung)
+
+
 def test_ohne_tarif_im_bestand_wird_kein_buendel_geschrieben(tmp_path):
     """Die Regel von `upsert_buendel`, hier als Auswahl statt als Wurf.
 

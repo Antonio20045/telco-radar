@@ -34,7 +34,7 @@ from .differentiation import DIFF_THEMES
 from .promo import prepare_promo_view
 from .thema import build_thema_view
 from .wettbewerb import anker as _wb_anker, build_wettbewerb_view
-from ..analyze import ctm
+from ..analyze import ctm, geraete_pruefkennzahlen
 from ..analyze import themen_store
 from ..analyze.diff_curator import DiffStore
 from ..analyze.begriffe import (
@@ -250,8 +250,7 @@ def _redirect_html(ziel: str) -> str:
 
     Render ist eine Static Site - es gibt keine Serverregel, in die man eine
     301 schreiben koennte. Meta-Refresh plus sichtbarer Link ist deshalb die
-    ganze Mechanik; ein Skript waere unnoetig und wuerde ohne JS scheitern.
-    """
+    ganze Mechanik; ein Skript waere unnoetig und wuerde ohne JS scheitern."""
     ziel_escaped = html_lib.escape(ziel, quote=True)
     return (
         '<!DOCTYPE html>\n<html lang="de">\n<head>\n<meta charset="utf-8">\n'
@@ -1801,6 +1800,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
             newsletter=newsletter_protokoll.aufbereiten(
                 state_dir / "newsletter_stats.jsonl"
             ),
+            geraete_pruefung=geraete_pruefkennzahlen.aufbereiten(state_dir),
             by_region=by_region,
             news_sources=news_sources,
             tech_themes=tech_themes,

@@ -1,0 +1,75 @@
+{# Prüfstelle der Geräte-Bündel (Datenkonzept Geräteradar, Schritt 7): Kennzahlen je
+   Anbieter für den letzten Gerätelauf. Gerechnet wird in
+   analyze/geraete_pruefkennzahlen.py, hier wird nur gesetzt. Eine Quote ohne ein
+   prüfbares Bündel heißt „nicht prüfbar“, nie 0 %. #}
+{% macro quote(q) %}{% if q.prozent is none %}nicht prüfbar{% else %}{{ q.prozent }} %{% endif %}{% endmacro %}
+{% if geraete_pruefung and (geraete_pruefung.vorhanden or geraete_pruefung.fehler) %}
+<div class="card" id="geraete-pruefung">
+  <div class="card-head"><h2>Geräte-Bündel: Prüfung</h2>
+    {% if geraete_pruefung.lauf %}<span class="rubrik-zahl">Lauf {{ geraete_pruefung.lauf | date_de }}</span>{% endif %}</div>
+  {% if geraete_pruefung.fehler %}
+  <div class="nl-prot-warn"><p>Prüfung nicht lesbar: {{ geraete_pruefung.fehler }}</p></div>
+  {% else %}
+  {% set s = geraete_pruefung.summe %}
+  {% if s.gescheitert %}
+  <div class="nl-prot-warn"><p>Prüfung gescheitert: {{ s.fehler }}</p></div>
+  {% endif %}
+  <div class="t-bilanz-reihe">
+    <div class="t-kennzahl"><b>{{ s.gueltig }}</b><span>gültig</span></div>
+    <div class="t-kennzahl"><b>{{ s.quarantaene }}</b><span>Quarantäne</span></div>
+    <div class="t-kennzahl"><b>{{ s.veraltet }}</b><span>veraltet</span></div>
+    {% if s.nie_geprueft %}<div class="t-kennzahl"><b>{{ s.nie_geprueft }}</b><span>nicht geprüft</span></div>{% endif %}
+    {% if s.gescheitert %}<div class="t-kennzahl"><b>{{ s.gescheitert }}</b><span>Prüfung gescheitert</span></div>{% endif %}
+  </div>
+  <div class="gr-scroll">
+  <table class="src-table">
+    <thead>
+      <tr><th>Anbieter</th><th class="num">Bündel</th>
+        {% for m in geraete_pruefung.laufzeiten %}<th class="num">{{ m }} Mon. gültig</th>{% endfor %}
+        <th class="num">frisch</th><th class="num">Quarantäne</th>
+        <th class="num">Konflikte</th><th class="num">Belege</th><th>nicht prüfbar</th></tr>
+    </thead>
+    <tbody>
+      {% for z in geraete_pruefung.anbieter %}
+      <tr>
+        <td><b>{{ z.name }}</b></td>
+        <td class="num">{{ z.buendel }}</td>
+        {% for a in z.abdeckung %}<td class="num">{% if a.erfasst %}{{ a.gueltig }}{% else %}nicht erfasst{% endif %}</td>{% endfor %}
+        <td class="num">{{ quote(z.frische) }}</td>
+        <td class="num">{{ quote(z.quarantaenequote) }}</td>
+        <td class="num">{{ quote(z.konfliktquote) }}</td>
+        <td class="num">{{ quote(z.belegquote) }}</td>
+        <td>{% if z.ohne_daten %}Regel {{ z.ohne_daten | join(", ") }}{% else %}–{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  {% if geraete_pruefung.anbieter | selectattr('erfassungsluecken') | list %}
+  <table class="src-table" style="margin-top:18px">
+    <thead><tr><th>Anbieter</th><th>Erfassungslücke</th></tr></thead>
+    <tbody>
+      {% for z in geraete_pruefung.anbieter if z.erfassungsluecken %}
+      <tr><td><b>{{ z.name }}</b></td><td>{{ z.erfassungsluecken | join(" · ") }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+  <details class="evidence">
+    <summary><span>Je Regel</span><small>verletzt, Lücke, nicht prüfbar</small></summary>
+    <div class="evidence-body">
+    <table class="src-table">
+      <thead><tr><th class="num">Nr.</th><th>Regel</th><th class="num">verletzt</th>
+        <th class="num">Lücke</th><th class="num">nicht prüfbar</th></tr></thead>
+      <tbody>
+        {% for r in geraete_pruefung.regeln %}
+        <tr><td class="num">{{ r.nr }}</td><td>{{ r.name }}</td><td class="num">{{ r.verletzt }}</td>
+          <td class="num">{{ r.luecke }}</td><td class="num">{{ r.nicht_pruefbar }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    </div>
+  </details>
+  {% endif %}
+</div>
+{% endif %}

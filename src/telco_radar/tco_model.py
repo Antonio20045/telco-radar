@@ -57,28 +57,26 @@ Die Felder eines Buendels
                       keinen Tarifnamen); bis dahin IST der Name der
                       Schluessel.
     tarif_monatlich   Grundpreis je Monat, ohne Geraeteanteil
-    tarif_phasen      Preisphasen des Tarifs, aus dem Tarifbestand
-                      (`tarife.jsonl`) angereichert - wo sie vorliegen,
-                      wird der Tarifanteil PHASENGEWICHTET gerechnet statt
-                      flach multipliziert. Sie stehen am Objekt und nicht
-                      im Store, weil sie zur Tarif-Stammdaten gehoeren und
-                      nicht zur Messung des Bündels (A1, 20.09.2026).
-                      Anzureichern ist nur ein Blatt OHNE Widerspruch zur
-                      Messung (`phasen_fuer_buendel`, QA-Fix 20.09.2026):
-                      das Blatt nennt den Tarif ohne Geraetezuschlag,
-                      die Karte die gemessene Bündel-Rate.
+    tarif_phasen      Preisphasen des Tarifs, aus dem Tarifbestand (`tarife.jsonl`)
+                      angereichert - wo sie vorliegen, wird der Tarifanteil
+                      PHASENGEWICHTET gerechnet statt flach multipliziert. Sie stehen am
+                      Objekt und nicht im Store, weil sie zur Tarif-Stammdaten gehoeren
+                      und nicht zur Messung des Bündels (A1, 20.09.2026). Anzureichern
+                      ist nur ein Blatt OHNE Widerspruch zur Messung
+                      (`phasen_fuer_buendel`, QA-Fix 20.09.2026): das Blatt nennt den
+                      Tarif ohne Geraetezuschlag, die Karte die gemessene Bündel-Rate.
     geraet_zuzahlung  einmalig bei Vertragsschluss
     geraet_monatsrate die Geraeterate je Monat, NEBEN dem Tarif
-    laufzeit_monate   ueber wie viele Monate die Geraeterate laeuft (12,
-                      24, 36 und 37 kommen vor) - und `None`, wenn die
-                      Quelle das nicht sagt. Es gibt hier KEINE Vorgabe
-                      von 24 (P0-B-fix1): die Laufzeit steht im
-                      Schluessel, eine geratene verschmilzt den Satz mit
-                      dem echten 24-Monats-Angebot
+    laufzeit_monate   ueber wie viele Monate die Geraeterate laeuft (12, 24, 36
+                      und 37 kommen vor) - und `None`, wenn die Quelle das nicht
+                      sagt. Es gibt hier KEINE Vorgabe von 24 (P0-B-fix1): die
+                      Laufzeit steht im Schluessel, eine geratene verschmilzt
+                      den Satz mit dem echten 24-Monats-Angebot
     anschlusspreis    Bereitstellungsentgelt, einmalig
     rabatte           benannt, befristet, separat - nie eingerechnet
     quelle_url        die Seite, auf der DIESE Zahlen stehen
     abgerufen_am      wann sie dort standen
+    pruefung          Status der Prüfstelle (`analyze/geraete_regeln`), keine Messung
 
 Ein Buendel OHNE Geraet (`sku_id == ""`) ist die SIM-only-Referenz desselben
 Tarifs. Sie ist der Grund, warum ein effektiver Geraetepreis ueberhaupt
@@ -524,6 +522,7 @@ class Buendel:
     herleitung: str = ""
     zustand: str = ""
     tarif_phasen: list[Preisphase] = field(default_factory=list)
+    pruefung: dict | None = None
 
     def __post_init__(self):
         if not (self.anbieter or "").strip():
