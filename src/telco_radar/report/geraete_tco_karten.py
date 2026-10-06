@@ -1412,8 +1412,9 @@ def modelle(
 
     Rueckgabe:
         modelle         [{id, name, hersteller, speicher, karten, referenz,
-                          laufzeiten, spanne, bundle_anbieter}]
-        vorgabe         die ID des Modells, das ohne Klick sichtbar ist
+                          laufzeiten, spanne, bundle_anbieter}]; `spanne` und
+                          der günstigste Tarif aus derselben Menge (zaehlt)
+        vorgabe        die ID des Modells, das ohne Klick sichtbar ist
         ohne_zuordnung  Buendel, deren SKU weder eine Listung noch ein
                         Katalogeintrag aufloest - mit Grund, nie als Modell
 
@@ -1519,11 +1520,12 @@ def modelle(
                 karten.append(_leere_karte(anbieter))
 
         angebote = [k for k in karten if k["belastbar"] and not k["naeherung"]]
-        betraege = [
-            k["gesamt"]
-            for k in angebote
+        tarifangebote = [
+            k
+            for k in filter(notbremse.zaehlt, angebote)
             if k["vergleichbar"] and k["frisch"] and k["gesamt"] is not None
         ]
+        betraege = [k["gesamt"] for k in tarifangebote]
         name = _name(katalog, gruppe["device_id"], gruppe["speicher"], rueckfall=mid)
         hersteller = _hersteller(katalog, gruppe["device_id"])
         katalog_eintrag = katalog.nach_id(gruppe["device_id"]) if katalog else None
@@ -1550,11 +1552,6 @@ def modelle(
             if geraetepreise
             else None
         )
-        tarifangebote = [
-            k
-            for k in filter(notbremse.zaehlt, angebote)
-            if k["vergleichbar"] and k["frisch"] and k["gesamt"] is not None
-        ]
         guenstigster_tarif = (
             min(tarifangebote, key=lambda k: k["gesamt"]) if tarifangebote else None
         )

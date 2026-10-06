@@ -1,23 +1,30 @@
 """Notbremse in der Zeitreihe der Geräteseite (Datenkonzept Geräteradar, Schritt 1).
 
-Das Rechenweg-Panel nennt den Zeitraum seiner Zahl mit demselben Etikett wie
-die Karten (1&1: „Kosten über 36 Monate“) und schreibt Monatsnamen deutsch,
-auch unter englischem Locale. Gerendert aus dem Bestand vom 2026-10-03; der
-Bezugstag kommt aus dem Bestand, nie vom heutigen Datum.
+Sieger, Antwortsatz und Alternativ-Beträge der Zeitreihe nehmen nur Karten, die
+zählen: eine Schätzung oder ein Satz mit abgelaufener Aktion stellt nie den
+günstigsten Preis. Ein Band, in dem nur solche Karten stehen, bleibt wählbar und
+nennt den Grund. Das Rechenweg-Panel nennt den Zeitraum seiner Zahl mit demselben
+Etikett wie die Karten (1&1: „Kosten über 36 Monate“) und schreibt Monatsnamen
+deutsch, auch unter englischem Locale. Gerendert aus dem Bestand vom 2026-10-03;
+der Bezugstag kommt aus dem Bestand, nie vom heutigen Datum.
 """
 
 from __future__ import annotations
 
 import locale
 import re
+import shutil
 
 import pytest
-from bestand_pfad import abbild
+from bestand_pfad import ZUSTAND, abbild, lese_wurzel
 from bs4 import BeautifulSoup
 
 from telco_radar.config import load_config
+from telco_radar.geraete_config import lade_katalog, lade_quellen
+from telco_radar.report import geraete_view
 from telco_radar.report.html import render_site
 
+HEUTE = "2026-10-03"
 DEUTSCHE_MONATE = {
     "Januar",
     "Februar",
@@ -33,6 +40,8 @@ DEUTSCHE_MONATE = {
     "Dezember",
 }
 DATUM = re.compile(r"\b\d{1,2}\. ([A-Za-zä]+) \d{4}\b")
+BETRAG = re.compile(r"([\d.]+,\d{2}) €")
+ALTERNATIVEN = re.compile(r"(1&1|o2|Telekom|congstar|Vodafone) \(([^()]*€[^()]*)\)")
 
 
 @pytest.fixture(scope="module")
@@ -50,6 +59,152 @@ def gerendert(tmp_path_factory):
         encoding="utf-8"
     )
     return seite, BeautifulSoup(fragment, "html.parser")
+
+
+@pytest.fixture(scope="module")
+def karten(tmp_path_factory):
+    """Die Karten je (Modell, Band) mit ``zaehlt`` aus dem öffentlichen Eingang."""
+    zustand = tmp_path_factory.mktemp("notbremse-zr-karten") / "state"
+    shutil.copytree(ZUSTAND, zustand)
+    wurzel = lese_wurzel()
+    geraete = geraete_view.aufbereiten(
+        zustand, lade_quellen(wurzel), lade_katalog(wurzel), heute=HEUTE
+    )
+    je_band: dict[tuple, list] = {}
+    for modell in geraete["tco"]["modelle"]:
+        for karte in modell["karten"]:
+            if karte.get("band"):
+                je_band.setdefault((modell["id"], karte["band"]), []).append(karte)
+    return je_band
+
+
+def _euro(text: str) -> float:
+    return float(text.replace(".", "").replace(",", "."))
+
+
+def _brauchbar(karte: dict) -> bool:
+    return bool(
+        karte.get("vergleichbar")
+        and karte.get("belastbar")
+        and karte.get("gesamt") is not None
+    )
+
+
+def _bloecke(fragment: BeautifulSoup) -> list[tuple[tuple, str]]:
+    return [
+        ((b["data-modell"], b["data-band"]), b.select_one(".gr-zr-antwort").decode())
+        for b in fragment.select(".gr-zr-lager")
+    ]
+
+
+def _sieger(antwort: str, karten: list) -> list[dict]:
+    """Die Karten, deren Betrag der Antwortsatz als erste Zahl nennt."""
+    zahl = re.search(r"<b class=\"gr-zr-zahl\">([^<]+)</b>", antwort)
+    betrag = BETRAG.search(zahl.group(1)) if zahl else None
+    if betrag is None:
+        return []
+    return [k for k in karten if k.get("gesamt") == _euro(betrag.group(1))]
+
+
+def test_sieger_der_zeitreihe_zaehlt(gerendert, karten):
+    _, fragment = gerendert
+    gesperrt = []
+    for paar, antwort in _bloecke(fragment):
+        traeger = _sieger(antwort, karten.get(paar, []))
+        if traeger and all(not k.get("zaehlt", True) for k in traeger):
+            k = traeger[0]
+            gesperrt.append(f"{paar}: {k['anbieter']} {k['tarif']} {k['gesamt']}")
+    assert not gesperrt, (
+        f"Sieger zählt nicht: {len(gesperrt)} Antwortsätze nennen eine Schätzung "
+        f"oder abgelaufene Aktion (z. B. {gesperrt[:3]})"
+    )
+
+
+def test_gemessene_sieger_bleiben(gerendert, karten):
+    """Gegenprobe: ein gemessener Sieger war schon vorher der günstigste, der
+    zählt, und bleibt stehen."""
+    _, fragment = gerendert
+    gemessen = {
+        k["anbieter"]
+        for paar, antwort in _bloecke(fragment)
+        for k in _sieger(antwort, karten.get(paar, []))
+        if k.get("zaehlt", True)
+    }
+    assert {"Vodafone", "o2", "congstar"} <= gemessen, gemessen
+
+
+def test_band_nur_mit_schaetzungen_bleibt_und_nennt_den_grund(gerendert, karten):
+    """Eine Datenqualitätsheuristik schaltet nie die Navigation: das Band bleibt
+    wählbar, der Satz nennt den Grund statt eines Preises."""
+    _, fragment = gerendert
+    nur_gesperrt = []
+    for paar, antwort in _bloecke(fragment):
+        brauchbar = [k for k in karten.get(paar, []) if _brauchbar(k)]
+        if brauchbar and not any(k.get("zaehlt", True) for k in brauchbar):
+            nur_gesperrt.append((paar, antwort))
+    assert nur_gesperrt, "Bänder nur mit Schätzungen fehlen in der Zeitreihe"
+    ohne_grund = [
+        paar
+        for paar, antwort in nur_gesperrt
+        if "steht kein Bündel im Vergleich: " not in antwort
+        or ("(Schätzung)" not in antwort and "(Aktion abgelaufen)" not in antwort)
+    ]
+    mit_preis = [paar for paar, antwort in nur_gesperrt if "gr-zr-zahl" in antwort]
+    assert not ohne_grund and not mit_preis, (
+        f"Band nur mit Schätzungen: {len(ohne_grund)} ohne Grund "
+        f"(z. B. {ohne_grund[:3]}), {len(mit_preis)} mit Preis ({mit_preis[:3]})"
+    )
+
+
+def test_luecke_nennt_schaetzung_nicht_als_fehlendes_buendel(gerendert, karten):
+    _, fragment = gerendert
+    falsch, benannt = [], 0
+    for block in fragment.select(".gr-zr-lager"):
+        luecke = block.select_one(".gr-lueckenzeile")
+        if luecke is None:
+            continue
+        paar = (block["data-modell"], block["data-band"])
+        gesperrt = {
+            k["anbieter"]
+            for k in karten.get(paar, [])
+            if _brauchbar(k) and not k.get("zaehlt", True)
+        }
+        text = luecke.get_text()
+        benannt += "Nicht im Vergleich: " in text
+        kein = re.search(r"Kein Bündel in diesem Band: ([^.]*)\.", text)
+        if kein and any(a in kein.group(1) for a in gesperrt):
+            falsch.append(f"{paar}: {text}")
+    assert not falsch, (
+        f"Lücke: {len(falsch)} Sätze nennen eine Schätzung „kein Bündel“ "
+        f"(z. B. {falsch[:2]})"
+    )
+    assert benannt, "Lücke: erwartet „Nicht im Vergleich: …“ im Bestand"
+
+
+def test_alternativen_im_lueckensatz_zaehlen(gerendert, karten):
+    """Die Alternativ-Beträge anderer Bänder im Lückensatz („o2 (M 958,75 €)“)
+    stammen nur aus Karten, die zählen; gemessene Alternativen bleiben."""
+    _, fragment = gerendert
+    gesperrt, gemessen = [], 0
+    for block in fragment.select(".gr-zr-lager"):
+        luecke = block.select_one(".gr-lueckenzeile")
+        if luecke is None:
+            continue
+        for anbieter, teil in ALTERNATIVEN.findall(luecke.get_text()):
+            for stufe, betrag in re.findall(r"([A-Z]+) ([\d.]+,\d{2}) €", teil):
+                traeger = [
+                    k
+                    for k in karten.get((block["data-modell"], stufe.lower()), [])
+                    if k["anbieter"] == anbieter and k.get("gesamt") == _euro(betrag)
+                ]
+                if traeger and not any(k.get("zaehlt", True) for k in traeger):
+                    gesperrt.append(f"{block['data-modell']} {anbieter} {stufe}")
+                gemessen += bool(traeger) and anbieter == "congstar"
+    assert not gesperrt, (
+        f"Alternative zählt nicht: {len(gesperrt)} Beträge im Lückensatz aus "
+        f"Schätzungen (z. B. {gesperrt[:3]})"
+    )
+    assert gemessen, "keine gemessene Alternative im Lückensatz - Fall fehlt"
 
 
 def _panels(fragment: BeautifulSoup) -> list[tuple[str, BeautifulSoup]]:

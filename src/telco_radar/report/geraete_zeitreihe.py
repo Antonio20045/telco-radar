@@ -58,6 +58,7 @@ from ..tco_model import (
     zeitraum_vergleichbar,
 )
 from . import geraete_bewegung
+from . import geraete_notbremse as notbremse
 from .anbieter_farben import STRICHMUSTER, stil_fuer
 from .geraete_tco_band import ERWARTETE_ANBIETER, band_label
 from .geraete_tco_karten import kurz_datum, label_der_leitzahl, phasen_fuer_buendel
@@ -228,6 +229,9 @@ def _band_zeilen(modell: dict) -> dict:
     Wahl), und der Antwort-Satz nennt ihren letzten Stand. Ein altes
     Angebot verdraengt kein frisches, auch nicht beim selben Anbieter:
     die frischen kommen zuerst an die Reihe.
+
+    Notbremse: eine Karte, die nicht zaehlt (Schätzung, abgelaufene Aktion),
+    stellt weder Zeile noch Sieger; sie steht benannt in `gesperrt`.
     """
     baender: dict[str, dict] = {}
     karten = modell.get("karten") or []
@@ -249,6 +253,8 @@ def _band_zeilen(modell: dict) -> dict:
             ),
             key=lambda k: k["gesamt"],
         )
+        gesperrt = [k for k in brauchbar if not notbremse.zaehlt(k)]
+        brauchbar = [k for k in brauchbar if notbremse.zaehlt(k)]
         kandidaten = [
             k
             for k in brauchbar
@@ -288,8 +294,18 @@ def _band_zeilen(modell: dict) -> dict:
             "karten": satz["karten"],
             "alt": alt,
             "fremd": fremd,
+            "gesperrt": gesperrt,
         }
     return fertig
+
+
+def _gesperrt_namen(karten: list) -> list[str]:
+    """„1&1 (Schätzung)“ je Anbieter und Grund, wo die Notbremse Karten nimmt."""
+    return list(
+        dict.fromkeys(
+            f"{k['anbieter']} ({notbremse.zustand(k)['kurz']})" for k in karten
+        )
+    )
 
 
 def _alternativen(karten: list, band: str, anbieter: str) -> list[dict]:
@@ -301,7 +317,8 @@ def _alternativen(karten: list, band: str, anbieter: str) -> list[dict]:
     etwas darüber, wo ein Anbieter steht; die Leerkarte der Festanbieter
     ist kein Angebot. Und seit A3 nur FRISCHE: ein altes Angebot ist keine
     Alternative von heute (`geraete_tco_karten.ist_frisch`, Clean Code 7 -
-    dieselbe Definition wie Zeilen und Kacheln).
+    dieselbe Definition wie Zeilen und Kacheln). Und nur Karten, die
+    zaehlen: eine Schätzung ist auch als Alternative kein Preis.
 
     P0-B-z1: jede Alternative traegt ihren ZEITRAUM mit
     (`leitzahl_monate`, gelesen). Ohne ihn stand im Luecken-Satz ein
@@ -315,7 +332,7 @@ def _alternativen(karten: list, band: str, anbieter: str) -> list[dict]:
     for karte in karten:
         if karte.get("anbieter") != anbieter:
             continue
-        if not karte.get("frisch", True):
+        if not karte.get("frisch", True) or not notbremse.zaehlt(karte):
             continue
         if not (karte.get("sku_id") or karte.get("naeherung")):
             continue
@@ -342,7 +359,11 @@ def _alternativen(karten: list, band: str, anbieter: str) -> list[dict]:
 
 
 def _luecken(
-    zeilen: list, karten: list, band: str, fremd: list | None = None
+    zeilen: list,
+    karten: list,
+    band: str,
+    fremd: list | None = None,
+    gesperrt: list | None = None,
 ) -> list[dict]:
     """Je erwartetem Anbieter ohne Zeile: der Grund, in EINEM Satz zusammen.
 
@@ -384,12 +405,17 @@ def _luecken(
             for k in karten
             if k["anbieter"] == anbieter and (k.get("sku_id") or k.get("naeherung"))
         ]
+        namen = _gesperrt_namen(
+            [k for k in gesperrt or [] if k["anbieter"] == anbieter]
+        )
         if not eigene:
             grund = "gar-kein-buendel"
         elif not any(k.get("band") == band for k in eigene):
             grund = "anderes-band"
         elif not any(k.get("frisch", True) for k in eigene if k.get("band") == band):
             grund = "nur-alte"
+        elif namen:
+            grund = "zaehlt-nicht"
         else:
             grund = "kein-belastbares"
         monate = None
@@ -406,6 +432,7 @@ def _luecken(
                 "grund": grund,
                 "monate": monate,
                 "alternativ": _alternativen(karten, band, anbieter),
+                "gesperrt": namen,
             }
         )
     return luecken
@@ -434,7 +461,8 @@ def _stufe(band_labels: dict, band: str) -> str:
 def _luecke_text(luecken: list, band_labels: dict) -> str | None:
     if not luecken:
         return None
-    anderes, gar_nicht, nur_alt, fremd = [], [], [], []
+    anderes, gar_nicht, nur_alt, fremd, gesperrt = [], [], [], [], []
+    eimer = {"gar-kein-buendel": gar_nicht, "nur-alte": nur_alt}
     for l in luecken:
         name = l["anbieter"]
         if l["alternativ"]:
@@ -445,18 +473,16 @@ def _luecke_text(luecken: list, band_labels: dict) -> str | None:
                 for a in l["alternativ"]
             )
             name += f" ({alt})"
-        if l["grund"] == "gar-kein-buendel":
-            gar_nicht.append(name)
-        elif l["grund"] == "nur-alte":
-            nur_alt.append(name)
-        elif l["grund"] == "anderer-zeitraum":
+        if l["grund"] == "anderer-zeitraum":
             fremd.append(
                 f"{l['anbieter']} ({l['monate']} Monate)"
                 if l.get("monate") is not None
                 else l["anbieter"]
             )
+        elif l["grund"] == "zaehlt-nicht":
+            gesperrt += l["gesperrt"]
         else:
-            anderes.append(name)
+            eimer.get(l["grund"], anderes).append(name)
     teile = []
     if anderes:
         teile.append("Kein Bündel in diesem Band: " + ", ".join(anderes) + ".")
@@ -465,6 +491,8 @@ def _luecke_text(luecken: list, band_labels: dict) -> str | None:
             f"Nur über eine andere Laufzeit, nicht über "
             f"{TCO_HORIZONT} Monate: " + ", ".join(fremd) + "."
         )
+    if gesperrt:
+        teile.append("Nicht im Vergleich: " + ", ".join(gesperrt) + ".")
     if nur_alt:
         teile.append("Kein aktueller Stand: " + ", ".join(nur_alt) + ".")
     if gar_nicht:
@@ -484,6 +512,7 @@ def _antwort_html(
     band_katalog: dict,
     alte: list | None = None,
     fremd: list | None = None,
+    gesperrt: list | None = None,
 ) -> str:
     """Der Antwort-Satz des Paar-Blocks.
 
@@ -551,6 +580,12 @@ def _antwort_html(
                 f"({_esc(beste_fremd.get('tarif') or '')}"
                 f"{_gb_teil(beste_fremd)}). Über zwei Laufzeiten gibt "
                 f"es keinen Vergleich mit {TCO_HORIZONT} Monaten."
+            )
+        if gesperrt:
+            wer = _esc(", ".join(_gesperrt_namen(gesperrt)))
+            return (
+                f"Beim {name} im Band {label}{klammer} steht kein Bündel "
+                f"im Vergleich: {wer}."
             )
         return f"Beim {name} im Band {label}{klammer} führt kein Anbieter ein Bündel."
     beste = zeilen[0]
@@ -716,28 +751,11 @@ def _messwert(
 ) -> tuple[float | None, int | None]:
     """`(Leitzahl, ihr Zeitraum in Monaten)` - EINE Messung, EINE Rechnung.
 
-    Der Zeitraum wird GELESEN (`Tco.leitzahl_monate`, die eine Stelle aus
-    P0-B-h1), nie nachgerechnet und nie angenommen: die aufgeteilte
-    Preisform traegt 24 Monate, ein zusammengelegter Buendelmonatspreis
-    (1&1, EIN Betrag fuer Tarif UND Geraet) seine ganze Ratenlaufzeit -
-    am Bestand vom 21.09.2026 sind das 36 Monate.
-
-    P0-B-z1 (21.09.2026) NIMMT DAS TOR VON HIER WEG. P0-B-h3 hatte die
-    Kurve gesperrt, sobald der Zeitraum abwich (`(None, 36)`), und damit
-    ein gemessenes Angebot aus dem Bild genommen: am iPhone 17 Pro fiel
-    die 1&1-Serie ganz aus, die Tafel zaehlte einen Anbieter weniger, und
-    der Leser verlor die Information, dass 1&1 das Geraet ueberhaupt
-    fuehrt. Ein verschwiegenes Angebot ist schlimmer als ein
-    beschriftetes (CLAUDE.md: Meldungen werden nie gekappt, harte Regel
-    9). Die Kurve steht deshalb - MIT ihrem Zeitraum am Kurvenende
-    (`_svg`) - und das Tor wirkt weiter dort, wo es hingehoert: an jedem
-    VORZEICHEN und jeder RANGFOLGE ueber zwei Zeitraeume (`_band_zeilen`
-    fuer die Zeilen, `_bewegung` fuer das Delta der Kachel).
-
-    Zwei Ausgaenge:
-      * `(Wert, N)`      - die Leitzahl und der Zeitraum, den sie traegt,
-      * `(None, None)`   - keine belastbare Zahl (Tarifgrundpreis oder
-                           Ratenlaufzeit nicht gemessen; Clean Code 3/5).
+    Der Zeitraum wird GELESEN (`Tco.leitzahl_monate`), nie angenommen:
+    aufgeteilt 24 Monate, 1&1 (ein Bündelbetrag) seine Ratenlaufzeit. Ein
+    fremder Zeitraum sperrt die Kurve nicht (P0-B-z1); das Tor wirkt an
+    Rangfolge und Vorzeichen (`_band_zeilen`, `_bewegung`).
+    `(None, None)`: keine belastbare Zahl (Clean Code 3/5).
     """
     b = _buendel_aus_messung(messung, tarife)
     if b is None:
@@ -749,19 +767,8 @@ def _messwert(
 
 
 def _wert_aus_messung(messung: dict, tarife: dict | None = None) -> float | None:
-    """Die HEUTIGE Leitzahl einer Messung - oder None, wenn sie keine hat.
-
-    A1 (20.09.2026): der Graph haengt am Stand des MARKTS, nicht am Stand
-    der Formel. Das eingefrorene `gesamt` der Historie ist die Rechnung
-    des Tages, an dem der Sammellauf sie schrieb (bis zum 20.09.2026 die
-    auf 24 Monate gekappte); Punkte, Auswahl und Panel rechnen mit der
-    Formel von HEUTE neu. Der eingefrorene Wert bleibt unangetastet in
-    der Historie stehen - Historie wird nie umgeschrieben.
-
-    P0-B-z1: `None` heisst hier NUR "nicht belastbar gemessen". Ein
-    abweichender Zeitraum ist kein Ausfall - er wird benannt
-    (`_messwert`, `_zeitraeume_aus`), nicht weggelassen.
-    """
+    """Die HEUTIGE Leitzahl einer Messung (A1), nicht das eingefrorene
+    `gesamt` der Historie; `None` heisst nur "nicht belastbar gemessen"."""
     return _messwert(messung, tarife)[0]
 
 
@@ -1000,30 +1007,11 @@ def _rechenwege_html(
 def buendel_schluessel(satz: dict) -> str | None:
     """Der Schluessel, unter dem Stand und Historie einander finden.
 
-    DIE EINE STELLE dafuer (Clean Code 1/7): der Stand-Index und die
-    Historien-Lesung in `_messungen` rufen diese Funktion, damit beide
-    Seiten denselben Schluessel bilden - zwei eigene Zuordnungen waeren
-    zwei Wahrheiten ueber dieselbe ID.
-
-    Zuerst die Lesemigration B1 (`tco_store.id_aus_satz`): eine ID von vor
-    B1 (vier Segmente) wird unter ihrer heutigen Form (fuenf Segmente)
-    gefuehrt, damit Altbestand und heutige Zeilen zusammenfallen.
-
-    EINE UNBEKANNTE ID-FORM IST KEIN VERLUST (P0-B-fix2). Bis hierher gab
-    `id_aus_satz` fuer jede andere Segmentzahl `None`, und beide Seiten
-    verwarfen den Satz per `continue`: ein Buendel mit der ID
-    `buendel--o2-1` fiel aus Stand UND Historie, die Zeitreihe des Modells
-    verschwand ersatzlos, und der einzige Hinweis war eine Protokollzeile
-    (belegt an `tests/test_geraete_reiter_browser.py::test_die_start-
-    ansicht_traegt_genau_die_pflichtgrafik`). Eine ID ist ein OPAKER
-    Schluessel: wer ihre Form nicht kennt, verwendet sie UNVERAENDERT
-    weiter - sie gruppiert sich korrekt mit sich selbst, Stand und
-    Historie treffen sich also weiter, und aus "unbekannte Form" wird kein
-    leerer Graph. Der Fall wird gezaehlt und protokolliert, nicht
-    verschwiegen (Clean Code 5).
-
-    `None` heisst nur noch: der Satz traegt ueberhaupt keine ID. Dann gibt
-    es nichts, womit er sich gruppieren liesse.
+    DIE EINE STELLE dafuer (Clean Code 1/7). Zuerst die Lesemigration B1
+    (`tco_store.id_aus_satz`, vier Segmente -> fuenf); eine unbekannte
+    ID-Form ist ein OPAKER Schluessel und bleibt unveraendert (P0-B-fix2),
+    sonst fiele das Buendel aus Stand und Historie. `None` heisst: der
+    Satz traegt ueberhaupt keine ID.
     """
     migriert = id_aus_satz(satz)
     if migriert is not None:
@@ -1887,7 +1875,7 @@ def aufbereiten(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
         bands = [
             b
             for b, s in zeilen_je_band.items()
-            if s["zeilen"] or s.get("alt") or s.get("fremd")
+            if s["zeilen"] or s.get("alt") or s.get("fremd") or s.get("gesperrt")
         ]
         erlaubt[modell["id"]] = bands
         for band in bands:
@@ -1952,7 +1940,13 @@ def aufbereiten(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
                     eintrag["delta_richtung"] = bew["richtung"]
             karten_baender.setdefault(modell["id"], {})[band] = eintrag
             mess = messungen_alle.get((modell["id"], band), {})
-            luecken = _luecken(zeilen, modell.get("karten") or [], band, fremd=fremde)
+            luecken = _luecken(
+                zeilen,
+                modell.get("karten") or [],
+                band,
+                fremd=fremde,
+                gesperrt=satz.get("gesperrt"),
+            )
             beleg_je = {
                 z["anbieter"]: (z.get("quelle_url") or "", z.get("abgerufen_am") or "")
                 for z in zeilen
@@ -1982,6 +1976,7 @@ def aufbereiten(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
                         band_katalog.get(band, {}),
                         alte=satz.get("alt"),
                         fremd=fremde,
+                        gesperrt=satz.get("gesperrt"),
                     ),
                     "leitzahl_html": _leitzahl_html(zeilen),
                     "rechnung_html": _rechnung_html(zeilen),

@@ -285,6 +285,26 @@ def _gw_frisch(buendel: dict, heute: str) -> bool:
     return alter <= 3
 
 
+def _gw_zaehlt(buendel: dict, heute: str) -> bool:
+    """EIGENE Notbremse (Datenkonzept Geräteradar, Abschnitt 4 Regel 1): ein
+    Bündel mit `herleitung` stand so nie beim Anbieter (Schätzung), und eines,
+    dessen eingerechnete Aktion vor `heute` endet (`gueltig_bis`), trägt einen
+    Preis von gestern. Beide stellen keinen Sieger. Ohne Ende oder ohne
+    Bezugstag läuft eine Aktion weiter."""
+    if str(buendel.get("herleitung") or "").strip():
+        return False
+    for aktion in buendel.get("aktionen") or []:
+        ende = str(aktion.get("gueltig_bis") or "").strip()
+        if (
+            aktion.get("eingerechnet")
+            and ende
+            and heute
+            and _gw_dt.date.fromisoformat(ende) < _gw_dt.date.fromisoformat(heute)
+        ):
+            return False
+    return True
+
+
 def _gw_min_buendel(
     tco: dict,
     blaetter: dict,
@@ -299,7 +319,8 @@ def _gw_min_buendel(
     Auswahlmenge wie die Seite: Zustand neu (vergleichbar), eine
     belastbare Zahl (ohne Tarifgrundpreis zaehlt ein Bündel nicht), -
     seit A3 - FRISCHE (`_gw_frisch`) und eine Leitzahl ueber 24 Monate
-    (kein Buendelbetrag ueber eine andere Laufzeit, P0-B-h3). Mit `anbieter`
+    (kein Buendelbetrag ueber eine andere Laufzeit, P0-B-h3), seit der
+    Notbremse nur Bündel, die zählen (`_gw_zaehlt`). Mit `anbieter`
     auf dessen Bündel beschraenkt - die Vodafone-Referenz ist das Minimum UNTER DEN
     EIGENEN frischen Bündeln, nicht der Sieger des Bandes.
     """
@@ -313,7 +334,7 @@ def _gw_min_buendel(
             continue
         if _gw_band(b, blaetter) != band:
             continue
-        if not _gw_frisch(b, heute):
+        if not _gw_frisch(b, heute) or not _gw_zaehlt(b, heute):
             continue
         if (
             b.get("buendel_monatlich") is not None
@@ -344,6 +365,24 @@ def test_gw_heute_liest_nur_datums_stems_und_lesbare_uhren(tmp_path):
     (reports / "2026-09-18.md").write_text("# B\n", encoding="utf-8")
     assert _gw_heute({"updated": "kaputt"}, reports) == "2026-09-18"
     assert _gw_heute({"updated": "2026-09-20"}, reports) == "2026-09-20"
+
+
+def test_gw_zaehlt_sperrt_schaetzung_und_abgelaufene_aktion():
+    """Die Notbremse des Orakels: Schätzung und abgelaufene eingerechnete Aktion
+    zählen nicht; eine nicht eingerechnete, eine laufende und eine Aktion ohne
+    Ende sperren nichts (Gegenprobe)."""
+
+    def aktion(ende: str, eingerechnet: bool = True) -> dict:
+        return {"eingerechnet": eingerechnet, "gueltig_bis": ende}
+
+    heute = "2026-10-03"
+    assert not _gw_zaehlt({"herleitung": "Tarifsumme minus Geräterate"}, heute)
+    assert not _gw_zaehlt({"aktionen": [aktion("2026-09-29")]}, heute)
+    assert _gw_zaehlt({"herleitung": " ", "aktionen": []}, heute)
+    assert _gw_zaehlt({"aktionen": [aktion("2026-09-29", eingerechnet=False)]}, heute)
+    assert _gw_zaehlt({"aktionen": [aktion("2026-10-03"), aktion("")]}, heute)
+    assert _gw_zaehlt({"aktionen": [aktion("2050-12-30")]}, heute)
+    assert _gw_zaehlt({"aktionen": [aktion("2026-09-29")]}, "")
 
 
 _GW_ANTWORT_MUSTER = re.compile(
