@@ -25,6 +25,13 @@ die fertigen Karten aus `geraete_tco_karten.modelle()` - genau wie
 EINE zusaetzliche Division (die Abweichung selbst) und vergleicht dafuer
 zwei bereits fertige TCO-24-Betraege.
 
+NOTBREMSE (Datenkonzept Geräteradar, Schritt 1)
+-----------------------------------------------
+Paare, Belegzeilen und damit die Kernzahl nehmen nur Karten, die zaehlen
+(`geraete_notbremse.zaehlt`): eine Schaetzung oder ein Preis mit abgelaufener
+Aktion stellt keine Zahl. Traegt ein Wettbewerber nur solche Karten, nennt
+seine Zeile den Zustand der Notbremse statt eines Betrags.
+
 BASIS JE GERAET, BAND ALS SCHRANKE (§2b/§7)
 --------------------------------------------
 Die Basis ist `modell["referenz"]` - dieselbe EINE Vodafone-Referenz, die
@@ -40,11 +47,8 @@ die Referenz ist Vodafones GUENSTIGSTES Buendel (am echten Bestand 59 von
 83 Geraeten im Band Klein), und o2 fuehrt dieselben Geraete dort regelmaessig
 nicht. Gegen sie gerechnet waere fast jede Zeile ein Mismatch, OBWOHL echte
 Paare existieren (iPhone 15: VF-Basis Klein 1.235,80, aber VF selbst Mittel
-1.949,80 gegen o2 Mittel 808,75). Seit RAD-1b (08.09.2026, abends) steht
-JEDE echte Karte des Wettbewerbers in JEDEM gemeinsamen Band als eigenes
-Paar da - bis dahin zeigte die Seite je Wettbewerber genau EINE Zeile (die
-guenstigste Karte eines bevorzugten Bandes), und von den 51 Paaren des
-Bestands fehlten 21, alleine 18 davon Telekom XS/S/M im Band Klein.
+1.949,80 gegen o2 Mittel 808,75). Seit RAD-1b steht JEDE echte Karte des
+Wettbewerbers in JEDEM gemeinsamen Band als eigenes Paar da.
 Liegt der Wettbewerber in keinem gemeinsamen Band oder laesst sich keins
 von beiden bestimmen (kein Datenvolumen erhoben, oder unbegrenzt), heisst die
 Zeile ehrlich "Band-Mismatch" statt eine Zahl zu erfinden -
@@ -59,17 +63,11 @@ Karte fuehrt (B.2.5: "ein Anbieter, der weggelassen wird, sieht aus wie
 einen, den es nicht gibt"). Sie stehen je Modell IMMER da, auch ohne
 Bündel (ehrliches kein_buendel statt Weglassen).
 
-Zweitmarken (B3, 08.09.2026): congstar - mit Karte, wo er eine hat, und
-OHNE Platzhalter, wo er keine hat. Bis B-3 blieb congstar draussen, weil
-er keine Bündel lieferte und eine leere Zeile je Modell nur Lücken
-waere ("eine leere Zeile fuer jede denkbare Zweitmarke waere eine Wand
-aus Luecken"); seit der Bündelerhebung auf seinen Tarifseiten liefert er
-72 Sätze zu 4 Geräten. Wo congstar dasselbe Gerät im selben Band führt
-wie Vodafone, entsteht das Vergleichspaar automatisch; wo nicht, entsteht
-NICHTS - congstar ist kein Vollsortimenter, und 55 kein_buendel-Zeilen
-waere genau die Wand, gegen die die Regel gebaut wurde. Der Unterschied
-zu den Netzbetreibern ist also nicht die Marke, sondern der Anspruch:
-die drei führen nahezu alle Geräte, congstar führt vier.
+Zweitmarken (B3): congstar - mit Karte, wo er eine hat, und OHNE
+Platzhalter, wo er keine hat. Wo congstar dasselbe Gerät im selben Band
+führt wie Vodafone, entsteht das Vergleichspaar automatisch; wo nicht,
+entsteht NICHTS - congstar ist kein Vollsortimenter, und eine
+kein_buendel-Zeile je Modell waere eine Wand aus Luecken.
 
 Haendler (Gerätepreis, eigener Abschnitt): Saturn, mobilcom-debitel, Amazon
 - ausdruecklich im Auftrag genannt. Sie vergleichen GERAETEPREIS gegen
@@ -78,26 +76,20 @@ Vodafones Gerätepreis. Datenquelle ist die bestehende
 `geraete_vergleich.vergleich()` - keine zweite Preisrechnung, nur ein
 zweiter Filter (anbieter_typ == "handel").
 
-DIE SORTIERRICHTUNG, AUSGESCHRIEBEN (Widerspruch im Auftrag aufgeloest)
-------------------------------------------------------------------------
-BRIEF_RAD1.md nennt in der Einleitung "positiv = Wettbewerber teurer,
-negativ = günstiger" UND in den Fachlichen Regeln fuer dieselbe Formel den
-Klammerzusatz "(d. h. Wettbewerber am teuersten relativ)" fuer die
-Sortierung "zuungunsten Vodafones" - das widerspricht sich: bei fester
-Vorzeichendefinition ist "Wettbewerber am teuersten" der POSITIVE, fuer
-Vodafone GUENSTIGE Fall, nicht der "zuungunsten"-Fall. Die Normen-Quelle
-(AUFTRAG_GERAETESEITE.md §2b) loest den Widerspruch mit ihrem woertlichen
-Beispiel auf: "hier ist Vodafone 10 % teurer als der Wettbewerber" ist DER
-Fall, fuer den die Seite geoeffnet wird, und das ist rechnerisch der
-NEGATIVE Wert (Wettbewerber guenstiger). Sortiert wird deshalb aufsteigend
-(negativste/"zuungunsten Vodafones"-Werte zuerst) - siehe
-`outputs/rad1-2026-09-08.md` fuer die ausgeschriebene Begruendung.
+DIE SORTIERRICHTUNG (Widerspruch im Auftrag aufgeloest)
+-------------------------------------------------------
+BRIEF_RAD1.md widerspricht sich bei "zuungunsten Vodafones". Die Normen-Quelle
+(AUFTRAG_GERAETESEITE.md §2b) entscheidet mit ihrem Beispiel "hier ist
+Vodafone 10 % teurer als der Wettbewerber": das ist der NEGATIVE Wert
+(Wettbewerber guenstiger). Sortiert wird deshalb aufsteigend, negativste
+Werte zuerst - Begruendung in `outputs/rad1-2026-09-08.md`.
 """
 
 from __future__ import annotations
 
 from typing import Optional
 
+from . import geraete_notbremse as notbremse
 from . import geraete_tco_band, geraete_tco_karten
 
 from ..tco_model import zeitraum_vergleichbar
@@ -194,6 +186,12 @@ def _vodafone_basis(modell: dict, band_je_tarif: dict) -> Optional[dict]:
     }
 
 
+def _notbremse_satz(karte: dict | None) -> str:
+    """Der benannte Zustand einer Karte, die nicht zählt (Schätzung, abgelaufene
+    Aktion; `geraete_notbremse`), sonst leer. Sie stellt keine Zahl im Radar."""
+    return (notbremse.zustand(karte or {}) or {}).get("satz", "")
+
+
 def _zeile_fuer_anbieter(
     anbieter: str, karte: Optional[dict], basis: dict, band_je_tarif: dict
 ) -> dict:
@@ -210,6 +208,18 @@ def _zeile_fuer_anbieter(
             "band_label": "",
             "grund": grund
             or f"Für dieses Modell ist bei {anbieter} kein Bündel erhoben.",
+            **_beleg("", ""),
+        }
+    if satz := _notbremse_satz(karte):
+        return {
+            "anbieter": anbieter,
+            "status": STATUS_NICHT_VERGLEICHBAR,
+            "prozent": None,
+            "gesamt": None,
+            "tarif": "",
+            "band": None,
+            "band_label": "",
+            "grund": satz,
             **_beleg("", ""),
         }
     if karte.get("frisch") is False:
@@ -295,13 +305,9 @@ def _zeile_fuer_anbieter(
 def _paar_zeile(anbieter: str, band: str, wb_karte: dict, vf_karte: dict) -> dict:
     """Vergleichbare Zeile: beide Karten liegen im SELBEN Band, und die
     Abweichung rechnet gegen VODAFONES KARTE IN DIESEM BAND - nicht gegen
-    die Referenz des Geraets. Der Grund: Vodafones Referenz ist sein
-    GUENSTIGSTES Buendel und liegt deshalb bei 59 von 83 Modellen im Band
-    Klein, waehrend kein Wettbewerber dort fuehrt - eine Abweichung gegen
-    sie waere genau der Apfel-Birnen-Vergleich, den die Bandlogik
-    verbietet (iPhone 15: o2 nur Mittel 808,75, VF-Basis Klein 1.235,80,
-    VF selbst Mittel 1.949,80). GRAPH-1 vergleicht INNERHALB eines Bandes;
-    diese Zeile tut dasselbe und nennt die VF-Gegenkarte im Beleg."""
+    die Referenz des Geraets (Grund im Modulkopf, BASIS JE GERAET).
+    GRAPH-1 vergleicht INNERHALB eines Bandes; diese Zeile tut dasselbe
+    und nennt die VF-Gegenkarte im Beleg."""
     if not wb_karte.get("vergleichbar", True):
         return {
             "anbieter": anbieter,
@@ -360,12 +366,9 @@ def _guenstigste_echte_karte_je_anbieter(modell: dict) -> dict[str, dict]:
     Belegzeile fuer einen Band-Mismatch. Dieselbe Auswahlregel wie
     `geraete_tco_band.karten_je_band`, nur ohne die Bandtrennung.
 
-    S2-2 (Diff-Prüfung 21.09.2026): FRISCHE vor Preis - dieselbe
-    Ordnung wie `_angebot_rang` in den Karten. Vorher gewann hier das
-    Minimum über frische UND alte Karten, und ein altes Billig-Angebot
-    (Prüfer-Repro: Telekom 720,76 EUR vom 15.09.) verdraengte die
-    frische Karte desselben Anbieters (1.440,76 EUR vom 19.09.) als
-    Beleg - die frische war im Radar unsichtbar."""
+    S2-2: FRISCHE vor Preis - dieselbe Ordnung wie `_angebot_rang` in den
+    Karten, sonst verdraengt ein altes Billig-Angebot die frische Karte
+    desselben Anbieters als Beleg."""
     beste: dict[str, dict] = {}
     for k in modell.get("karten") or []:
         a = k["anbieter"]
@@ -398,10 +401,8 @@ def netzbetreiber_gruppen(
     der GRAPH-1-Bandlogik (`geraete_tco_band.alle_karten_je_band` /
     `karten_je_band`): verglichen wird im Band, in dem BEIDE das Geraet
     fuehren. Seit RAD-1b steht JEDE echte Karte des Wettbewerbers in
-    JEDEM gemeinsamen Band als eigenes Paar da - nicht nur die guenstigste
-    Karte eines bevorzugten Bandes (am echten Bestand gemessen, Stand
-    08.09.2026: 51 Paare im Bestand, 30 gezeichnet; Telekom fuehrt je
-    Geraet XS/S/M, alle drei im Band Klein - die Seite zeigte nur XS).
+    JEDEM gemeinsamen Band als eigenes Paar da. Gruppiert werden nur Karten,
+    die zaehlen (NOTBREMSE im Modulkopf).
     Ein erneuertes Geraet im gemeinsamen Band steht als nicht
     vergleichbare Zeile mit Grund daneben (B1-Zustandsregel), es verdraengt
     die vergleichbare Karte nicht mehr. Gibt es kein gemeinsames Band:
@@ -410,10 +411,13 @@ def netzbetreiber_gruppen(
     gruppen = []
     for modell in modelle:
         basis = _vodafone_basis(modell, band_je_tarif)
-        alle_je_band = geraete_tco_band.alle_karten_je_band(modell, band_je_tarif)
-        je_band = geraete_tco_band.karten_je_band(modell, band_je_tarif)
-        uebrig = _guenstigste_echte_karte_je_anbieter(modell)
-        hat_karte = {k.get("anbieter") for k in (modell.get("karten") or [])}
+        karten = modell.get("karten") or []
+        zaehlend = {**modell, "karten": list(filter(notbremse.zaehlt, karten))}
+        alle_je_band = geraete_tco_band.alle_karten_je_band(zaehlend, band_je_tarif)
+        je_band = geraete_tco_band.karten_je_band(zaehlend, band_je_tarif)
+        uebrig = _guenstigste_echte_karte_je_anbieter(zaehlend)
+        ungefiltert = _guenstigste_echte_karte_je_anbieter(modell)
+        hat_karte = {k.get("anbieter") for k in karten}
         if basis is None:
             zeilen = [
                 {
@@ -424,7 +428,7 @@ def netzbetreiber_gruppen(
                     "tarif": (uebrig.get(a) or {}).get("tarif", ""),
                     "band": None,
                     "band_label": "",
-                    "grund": "",
+                    "grund": _notbremse_satz(uebrig.get(a) or ungefiltert.get(a)),
                     **_beleg("", ""),
                 }
                 for a in ALLE_WETTBEWERBER
@@ -469,13 +473,8 @@ def netzbetreiber_gruppen(
                             _paar_zeile(a, b, karte_wb, je_band[b]["Vodafone"])
                         )
                 continue
-            karte_anders = uebrig.get(a)
-            if karte_anders is not None:
-                zeilen.append(
-                    _zeile_fuer_anbieter(a, karte_anders, basis, band_je_tarif)
-                )
-                continue
-            zeilen.append(_zeile_fuer_anbieter(a, None, basis, band_je_tarif))
+            karte = uebrig.get(a) or ungefiltert.get(a)
+            zeilen.append(_zeile_fuer_anbieter(a, karte, basis, band_je_tarif))
         zeilen.sort(
             key=lambda z: z["prozent"] if z["prozent"] is not None else float("inf")
         )

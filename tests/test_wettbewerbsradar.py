@@ -40,6 +40,7 @@ from bestand_pfad import ZUSTAND, lese_wurzel
 from bs4 import BeautifulSoup
 
 from telco_radar.geraete_config import lade_katalog, lade_quellen
+from telco_radar.report import geraete_notbremse as notbremse
 from telco_radar.report import geraete_radar as wr
 from telco_radar.report import geraete_tco_band as band
 from telco_radar.report import geraete_tco_karten as karten
@@ -1042,7 +1043,11 @@ def test_am_echten_bestand_steht_jedes_band_paar_auf_der_seite(echt):
     benannt = 0
     for g in echt["radar"]["gruppen"]:
         modell = by_id[g["id"]]
-        alle_je_band = band.alle_karten_je_band(modell, echt["band_je_tarif"])
+        zaehlende = {
+            **modell,
+            "karten": list(filter(notbremse.zaehlt, modell["karten"])),
+        }
+        alle_je_band = band.alle_karten_je_band(zaehlende, echt["band_je_tarif"])
         vf_gemeinsam = {
             b
             for b, je in alle_je_band.items()
