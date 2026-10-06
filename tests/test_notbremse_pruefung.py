@@ -1,7 +1,8 @@
 """Notbremse nach der Prüfstelle: nur ein gültiges Bündel stellt Sieger, Spanne und Δ.
 
 Datenkonzept Geräteradar, Schritt 7: Quarantäne, veraltet und eine gescheiterte
-Prüfung (``unbekannt``) zählen nicht; die Karte nennt den Zustand mit der Regel. Ein
+Prüfung (``unbekannt``) zählen nicht; die Karte nennt den Zustand mit der Regel aus
+dem gespeicherten Vermerk (``"quarantaene 3"``). Ein
 Bündel ohne Feld ``pruefung`` ist nie geprüft worden und zählt wie vor der
 Prüfstelle. Synthetisch über die öffentlichen Eingänge
 ``geraete_tco_karten.modelle`` (Bündelobjekte) und
@@ -18,15 +19,17 @@ from telco_radar.tco_model import Buendel
 
 HEUTE = "2026-10-03"
 SKU = "pruefer-phone-128-schwarz"
-GRUND = "Tarif mit Gerät 20,00 € unter SIM-only 30,00 €"
+GRUND = "Regel 3: Tarif zum SIM-only-Preis."
 
 
-def _pruefung(status: str) -> dict:
-    gruende = [] if status == "gueltig" else [{"regel": 3, "satz": GRUND}]
-    return {"status": status, "gruende": gruende, "luecken": [], "nicht_pruefbar": []}
+def _pruefung(status: str) -> str:
+    """Der gespeicherte Vermerk: Status und verletzte Regel, sonst der Fehler."""
+    if status == "unbekannt":
+        return "unbekannt RuntimeError: kaputt"
+    return status if status == "gueltig" else f"{status} 3"
 
 
-def _buendel(anbieter: str, tarif: float, pruefung: dict | None = None) -> Buendel:
+def _buendel(anbieter: str, tarif: float, pruefung: str | None = None) -> Buendel:
     return Buendel(
         sku_id=SKU,
         anbieter=anbieter,
@@ -56,7 +59,7 @@ def _listung(anbieter: str) -> dict:
     }
 
 
-def _modell(o2: dict | None) -> dict:
+def _modell(o2: str | None) -> dict:
     buendel = [_buendel("Vodafone", 30.0), _buendel("o2", 20.0, o2)]
     listungen = [_listung("Vodafone"), _listung("o2")]
     erg = geraete_tco_karten.modelle(buendel, listungen, [], {}, None, heute=HEUTE)
@@ -85,7 +88,10 @@ def test_gesperrtes_buendel_stellt_weder_sieger_noch_delta(status):
     kurz, satz = GESPERRT[status]
     assert o2["notbremse"]["kurz"] == kurz
     assert satz in o2["notbremse"]["satz"]
-    assert f"Regel 3: {GRUND}." in o2["notbremse"]["satz"], "die Karte nennt die Regel"
+    if status != "unbekannt":
+        assert GRUND in o2["notbremse"]["satz"], "die Karte nennt die Regel"
+    else:
+        assert "Regel" not in o2["notbremse"]["satz"], "gescheitert: keine Regel"
 
 
 @pytest.mark.parametrize(
@@ -112,7 +118,7 @@ def test_zaehlt_nur_mit_status_gueltig(status, zaehlt):
     assert notbremse.zaehlt(satz) is zaehlt, "Objekt und Rohsatz: eine Definition"
 
 
-def _rohsatz(anbieter: str, tarif: float, pruefung: dict | None) -> dict:
+def _rohsatz(anbieter: str, tarif: float, pruefung: str | None) -> dict:
     satz = {
         "sku_id": SKU,
         "anbieter": anbieter,
@@ -126,7 +132,7 @@ def _rohsatz(anbieter: str, tarif: float, pruefung: dict | None) -> dict:
     return satz if pruefung is None else {**satz, "pruefung": pruefung}
 
 
-def _katalogzeile(pruefung: dict | None) -> dict:
+def _katalogzeile(pruefung: str | None) -> dict:
     listungen = [
         {**_listung(a), "preis_ohne_vertrag": None, "zuzahlung": None}
         for a in ("o2", "congstar")

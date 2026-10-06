@@ -7,7 +7,13 @@ Ratenlaufzeit, die bei allen Geräten fehlt) ergibt eine Erfassungslücke je Anb
 (``erfassungsluecken``), keinen Status. Regel 15 gilt im Vergleich (Sieger, Δ); je
 Bündel wird nur geprüft, ob der Zeitraum H bestimmbar ist. Regel 4 prüft das Volumen im
 Tarifnamen gegen den Tarifbestand; ob ein Tarif in ein Band mit mehr Volumen fällt,
-entscheidet die Bandzuordnung der Ansicht.
+entscheidet die Bandzuordnung der Ansicht. Regel 3 zieht vom SIM-only-Preis den belegten
+Bündelnachlass des Anbieters ab (``BUENDEL_NACHLASS``).
+
+Tarifbindung und Preisphasen zeigt die Seite aus dem Tarifblatt, und diese Ergänzung
+steht nur in ``report/`` (``FELDER_AUS_DEM_TARIFBLATT``). Die Regeln 7 und 8 sind
+deshalb nicht prüfbar, Regel 14 und Regel 12 prüfen nur die übrigen Pflichtfelder: eine
+zweite Ergänzung hier wäre eine zweite Definition dessen, was die Seite zeigt.
 
 Felder, die erst Klick-Crawler und Beleg-Archiv liefern: ``geraet_summe`` (Gerätesumme,
 wie die Seite sie nennt), ``echo`` (``klickecho.Echo`` als Zuordnung mit ``werte`` und
@@ -22,17 +28,11 @@ from collections.abc import Iterable, Mapping
 
 from ..geraete_model import normalisiere
 from ..tarif_model import vertrag_basis
-from ..tco_model import (
-    POSTEN_BUENDEL,
-    POSTEN_TARIF,
-    Buendel,
-    kosten_ueber,
-    sim_only_id,
-    tco_24,
-)
+from ..tco_model import Buendel, sim_only_id, tco_24
 from ..tco_model import zeitraum as zeitraum_h
 from .geraete_pruefstatus import (
     AUSREISSER_VORTAG,
+    BUENDEL_NACHLASS,
     CENT,
     ERLAUBTE_RATENLAUFZEITEN,
     FELD_BELEG_VARIANTE,
@@ -56,6 +56,12 @@ from .geraete_pruefstatus import (
     gb,
     geraetepreis,
     pflichtfelder,
+)
+
+FELDER_AUS_DEM_TARIFBLATT = ("tarif_bindung_monate", "tarif_phasen")
+AUS_DEM_TARIFBLATT = (
+    "die Seite zeigt Tarifbindung und Preisphasen aus dem Tarifblatt; die Ergänzung "
+    "steht nur in report/ (geraete_tco_view, geraete_tco_karten.phasen_fuer_buendel)"
 )
 
 
@@ -98,7 +104,7 @@ def erfassungsluecken(saetze: Iterable[Mapping]) -> dict[str, list[str]]:
         saetze_ = [f"{aufzaehlung(fehlend)} Monate nicht erfasst"] if fehlend else []
         werte: dict[tuple[str, str], list] = {}
         for b in liste:
-            for feld, name in pflichtfelder(b):
+            for feld, name in _gemessene_pflicht(b):
                 if feld != "laufzeit_monate":
                     werte.setdefault((feld, name), []).append(getattr(b, feld))
         for (feld, name), gesehen in werte.items():
@@ -183,10 +189,12 @@ def _r3_sim_only(satz: Mapping, b: Buendel, k: Kontext) -> Befund | None:
     sim = sim_only_preis(b, k.sim_only)
     if sim is None:
         return _nicht(3, "SIM-only-Preis desselben Tarifs fehlt")
-    if b.tarif_monatlich >= sim - CENT:
+    nachlass = BUENDEL_NACHLASS.get(normalisiere(b.anbieter), 0.0)
+    if b.tarif_monatlich >= sim - nachlass - CENT:
         return None
+    abzug = f" abzüglich {eur(nachlass)} Bündelnachlass" if nachlass else ""
     return _verletzt(
-        3, f"Tarif mit Gerät {eur(b.tarif_monatlich)} unter SIM-only {eur(sim)}"
+        3, f"Tarif mit Gerät {eur(b.tarif_monatlich)} unter SIM-only {eur(sim)}{abzug}"
     )
 
 
@@ -215,23 +223,11 @@ def _r6_laufzeit(satz: Mapping, b: Buendel, k: Kontext) -> Befund | None:
 
 
 def _r7_bindung(satz: Mapping, b: Buendel, k: Kontext) -> Befund | None:
-    if b.tarif_bindung_monate is None:
-        return Befund(7, LUECKE, "Tarifbindung fehlt")
-    return None
+    return _nicht(7, AUS_DEM_TARIFBLATT)
 
 
 def _r8_phasen(satz: Mapping, b: Buendel, k: Kontext) -> Befund | None:
-    kosten = kosten_ueber(b)
-    if kosten.monate is None:
-        return _nicht(8, "Zeitraum H nicht bestimmbar")
-    offen = [
-        posten
-        for posten in kosten.luecken
-        if posten.startswith((POSTEN_TARIF, f"{POSTEN_BUENDEL} Monat"))
-    ]
-    if not offen:
-        return None
-    return Befund(8, LUECKE, f"über {kosten.monate} Monate fehlt: {', '.join(offen)}")
+    return _nicht(8, AUS_DEM_TARIFBLATT)
 
 
 def _r9_echo(satz: Mapping, b: Buendel, k: Kontext) -> Befund | None:
@@ -295,10 +291,16 @@ def _r13_beleg(satz: Mapping, b: Buendel, k: Kontext) -> Befund | None:
 
 
 def _r14_pflicht(satz: Mapping, b: Buendel, k: Kontext) -> Befund | None:
-    fehlend = [name for feld, name in pflichtfelder(b) if getattr(b, feld) is None]
+    fehlend = [name for feld, name in _gemessene_pflicht(b) if getattr(b, feld) is None]
     if not fehlend:
         return None
     return Befund(14, LUECKE, f"es fehlt {aufzaehlung(fehlend)}")
+
+
+def _gemessene_pflicht(b: Buendel) -> list[tuple[str, str]]:
+    """Die Pflichtfelder, die die Seite so zeigt, wie sie gemessen sind; die
+    Tarifbindung füllt die Ansicht aus dem Tarifblatt (Regel 7)."""
+    return [(f, n) for f, n in pflichtfelder(b) if f not in FELDER_AUS_DEM_TARIFBLATT]
 
 
 def _r15_zeitraum(satz: Mapping, b: Buendel, k: Kontext) -> Befund | None:

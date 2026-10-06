@@ -10,8 +10,11 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
+import pytest
 import yaml
 
+from telco_radar.analyze import geraete_pruefstelle, geraete_regeln
+from telco_radar.analyze.geraete_pruefstatus import STATUS, lies_vermerk
 from telco_radar.analyze.geraete_store import (
     STATUS_AKTIV,
     STATUS_VERMUTLICH,
@@ -727,8 +730,44 @@ def test_der_lauf_schreibt_den_status_der_pruefstelle_in_jedes_buendel(tmp_path)
     )
     pruefung = tco["buendel"][0].get("pruefung")
     assert pruefung is not None, "Bündel ohne Status der Prüfstelle gespeichert"
-    assert pruefung["status"] in ("gueltig", "quarantaene", "veraltet"), pruefung
-    assert {"gruende", "luecken", "nicht_pruefbar"} <= set(pruefung)
+    assert lies_vermerk(pruefung).status in STATUS, pruefung
+    assert tco["pruefung"]["lauf"] == "2026-09-04"
+    assert tco["pruefung"]["summe"]["buendel"] == 1
+
+
+def _wirft(*_args, **_kw):
+    raise RuntimeError("unerwartet")
+
+
+@pytest.mark.parametrize(
+    "modul,name,erwartet",
+    [
+        (geraete_regeln, "sim_only_preis", "unbekannt RuntimeError: unerwartet"),
+        (geraete_pruefstelle, "kennzahlen", None),
+    ],
+    ids=["regel", "kennzahlen"],
+)
+def test_ein_fehler_der_pruefstelle_kostet_keinen_messtag(
+    tmp_path, monkeypatch, caplog, modul, name, erwartet
+):
+    """Lehre aus geraete.yml: eine Stufe vor dem Speichern darf den Lauf nie kosten."""
+    monkeypatch.setattr(modul, name, _wirft)
+    root = _o2_root(tmp_path)
+    bilanz = run_geraete_stage(root, {}, "2026-09-04", jetzt=_jetzt(), hole=_o2_hole())
+    assert bilanz["buendel"] == 1
+    tco = json.loads(
+        (root / "data" / "state" / "geraete_tco.json").read_text(encoding="utf-8")
+    )
+    assert len(tco["buendel"]) == 1, "der Messtag ist gespeichert"
+    vermerk = tco["buendel"][0]["pruefung"]
+    assert vermerk == erwartet or lies_vermerk(vermerk).status in STATUS, vermerk
+    lauf = tco["pruefung"]
+    if erwartet:
+        assert lauf["summe"]["gescheitert"] == 1, lauf
+        assert lauf["summe"]["fehler"] == "RuntimeError: unerwartet"
+    else:
+        assert lauf == {"lauf": "2026-09-04", "fehler": "RuntimeError: unerwartet"}
+    assert "Prüfstelle gescheitert" in caplog.text
 
 
 def test_ohne_tarif_im_bestand_wird_kein_buendel_geschrieben(tmp_path):

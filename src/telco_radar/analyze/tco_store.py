@@ -2,14 +2,13 @@
 
 Warum eine EIGENE Datei
 -----------------------
-`data/state/geraete_db.json` traegt seit dem 10.08.2026 die Listungen, also
-was ein Anbieter fuer ein GERAET verlangt. Ein Buendel ist ein anderer
-Sachverhalt: es kommt von einer Tarifseite, hat einen anderen Lebenszyklus
-und eine andere Identitaet (SKU x Anbieter x Tarif x Ratenlaufzeit
-statt SKU x Anbieter).
-Es steht deshalb in
+`data/state/geraete_db.json` traegt seit dem 10.08.2026 die Listungen, also was ein
+Anbieter fuer ein GERAET verlangt. Ein Buendel ist ein anderer Sachverhalt: es kommt
+von einer Tarifseite, hat einen anderen Lebenszyklus und eine andere Identitaet (SKU x
+Anbieter x Tarif x Ratenlaufzeit statt SKU x Anbieter). Es steht deshalb in
 
-    data/state/geraete_tco.json    Buendel und SIM-only-Referenzen
+    data/state/geraete_tco.json    Buendel, SIM-only-Referenzen und unter `pruefung`
+                                   die Kennzahlen der Pruefstelle (`TcoDB.pruefung`)
 
 und nicht als weiterer Abschnitt in der Listungsdatei. Der Grund ist nicht
 Ordnungsliebe, sondern Risiko: `geraete_db.json` traegt 391 gewachsene
@@ -21,9 +20,8 @@ Fehlerklasse wie ein neu vergebener Farbschluessel
 nicht: dieses Modul oeffnet die andere gar nicht.
 
 Die IDs koennen sich ebenfalls nicht ueberschneiden, und zwar an ihrer Form
-(`tco_model.buendel_id`): eine `listung_id` hat zwei Bestandteile, ein
-Buendel seit B1 fuenf (die Ratenlaufzeit ist dazugekommen; vorher vier),
-eine Referenz drei.
+(`tco_model.buendel_id`): eine `listung_id` hat zwei Bestandteile, ein Buendel seit B1
+fuenf (die Ratenlaufzeit ist dazugekommen; vorher vier), eine Referenz drei.
 
 Der Altbestand traegt weiterhin die vierteilige ID - beide Dateien dieses
 Moduls werden NICHT umgeschrieben (harte Regeln 2 und 3). Ein Alt-Satz wird
@@ -44,18 +42,17 @@ dass er aus zwei Messungen stammt. Lieber eine sichtbare Luecke
 (`tco_model.Tco.luecken`) als eine unsichtbare Mischung - und genau derselbe
 Befund hat am 03.09.2026 die Preisform an ihre Zahl gebunden.
 
-`first_seen` bleibt davon unberuehrt: seit wann ein Angebot beobachtet wird,
-ist keine Messung dieses Laufs.
+`first_seen` bleibt davon unberuehrt: seit wann ein Angebot beobachtet wird, ist
+keine Messung dieses Laufs.
 
 Was hier bewusst NICHT steht
 ----------------------------
-Keine Loesch- oder Alterungslogik fuer BUENDEL. Die Alterung alter Werte
-ist seit A3 (STRATEGIE_GERAETE_V4, 20.09.2026) eine ENTSCHEIDUNG DER
-ANSICHT, nicht des Bestands: `report/geraete_tco_karten.ist_frisch`
-(gegen `ALT_AB_TAGEN`) faellt ein Angebot aus ab-Preis, Delta und
-Ranking, die Zeile bleibt ausgegraut mit Abrufdatum stehen. Der Store
-haelt die Messung unveraendert bereit - zurueck in den Vergleich kommt
-ein Angebot allein durch einen neuen Lauf, nie durch Loeschen.
+Keine Loesch- oder Alterungslogik fuer BUENDEL. Die Alterung alter Werte ist seit A3
+(STRATEGIE_GERAETE_V4, 20.09.2026) eine ENTSCHEIDUNG DER ANSICHT, nicht des Bestands:
+`report/geraete_tco_karten.ist_frisch` (gegen `ALT_AB_TAGEN`) faellt ein Angebot aus
+ab-Preis, Delta und Ranking, die Zeile bleibt ausgegraut mit Abrufdatum stehen. Der
+Store haelt die Messung unveraendert bereit - zurueck in den Vergleich kommt ein
+Angebot allein durch einen neuen Lauf, nie durch Loeschen.
 `mark_stale` bleibt fuer LISTUNGEN reserviert (`geraete_pipeline`):
 "Nicht gelesen" ist nicht "leer" (CLAUDE.md, Fallstricke).
 
@@ -66,10 +63,9 @@ weiter nur ihn. Daneben waechst
 
     data/state/geraete_tco_historie.jsonl
 
-eine Zeile je (buendel_id, datum) mit den Messfeldern, der gerechneten
-Leitzahl `gesamt` (eingefroren aus `tco_model.tco_24`, damit P5 die Reihe
-zeichnen kann, ohne die Rechnung frueherer Laeufe nachzubauen) und
-`abgerufen_am`. Die Schreibregeln:
+eine Zeile je (buendel_id, datum) mit den Messfeldern, der gerechneten Leitzahl
+`gesamt` (eingefroren aus `tco_model.tco_24`, damit P5 die Reihe zeichnen kann, ohne
+die Rechnung frueherer Laeufe nachzubauen) und `abgerufen_am`. Die Schreibregeln:
 
 * gleiches Datum je Buendel -> die Zeile wird ERSETZT. Ein wiederholter
   Lauf am selben Tag ist dieselbe Messung, kein zweiter Punkt (sonst
@@ -77,9 +73,8 @@ zeichnen kann, ohne die Rechnung frueherer Laeufe nachzubauen) und
 * neues Datum -> neue Zeile dazu; ALTE Tage bleiben unveraendert stehen.
   Ein Messtag ist nicht nachholbar - deshalb wird die Datei beim
   Zusammenfuehren gelesen und nie blind neu geschrieben.
-* Es gibt keine Rueckrechnung aus den frueheren Stand-Commits
-  (Entscheidung 3 im Strategiedokument): die Reihe beginnt ehrlich mit
-  dem ersten Lauf nach der Umstellung.
+* Es gibt keine Rueckrechnung aus den frueheren Stand-Commits (Entscheidung 3 im
+  Strategiedokument): die Reihe beginnt ehrlich mit dem ersten Lauf nach der Umstellung.
 """
 
 from __future__ import annotations
@@ -197,6 +192,7 @@ class TcoDB:
         self._buendel: dict[str, dict] = {}
         self._referenzen: dict[str, dict] = {}
         self.updated = ""
+        self.pruefung: dict | None = None
         self._historie_pendente: dict[tuple[str, str], dict] = {}
         self.lesbar = True
         if not self.path.exists():
@@ -208,6 +204,8 @@ class TcoDB:
             self.lesbar = False
             return
         self.updated = roh.get("updated", "")
+        pruefung = roh.get("pruefung")
+        self.pruefung = pruefung if isinstance(pruefung, dict) else None
         migriert = 0
         for eintrag in roh.get("buendel") or []:
             bid = id_aus_satz(eintrag)
@@ -460,6 +458,7 @@ class TcoDB:
             "updated": today,
             "buendel": self.buendel(),
             "sim_only": self.referenzen(),
+            **({"pruefung": self.pruefung} if self.pruefung else {}),
         }
         self.path.write_text(
             json.dumps(daten, ensure_ascii=False, indent=1), encoding="utf-8"

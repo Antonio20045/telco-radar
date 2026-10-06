@@ -76,7 +76,7 @@ Die Felder eines Buendels
     rabatte           benannt, befristet, separat - nie eingerechnet
     quelle_url        die Seite, auf der DIESE Zahlen stehen
     abgerufen_am      wann sie dort standen
-    pruefung          Status der Prüfstelle (`analyze/geraete_regeln`), keine Messung
+    pruefung          Vermerk der Prüfstelle (`geraete_pruefstatus`), keine Messung
 
 Ein Buendel OHNE Geraet (`sku_id == ""`) ist die SIM-only-Referenz desselben
 Tarifs. Sie ist der Grund, warum ein effektiver Geraetepreis ueberhaupt
@@ -522,7 +522,7 @@ class Buendel:
     herleitung: str = ""
     zustand: str = ""
     tarif_phasen: list[Preisphase] = field(default_factory=list)
-    pruefung: dict | None = None
+    pruefung: str | None = None
 
     def __post_init__(self):
         if not (self.anbieter or "").strip():

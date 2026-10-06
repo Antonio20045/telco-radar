@@ -3,8 +3,9 @@
 Datenkonzept Geräteradar, Schritt 7: Abdeckung je Laufzeit, Frische,
 Quarantänequote, Konfliktquote und Belegquote stehen als Daten neben „nicht
 prüfbar“. Orakel ist eine Handrechnung an einem kleinen Bestand mit fest
-eingetragenem Feld ``pruefung``; die Gegenprobe ändert einen Status und erwartet die
-nachgerechnete Änderung. Fester Bezugstag, nie das heutige Datum.
+eingetragenem vollem Feld je Bündel; die Gegenprobe ändert einen Status und erwartet
+die nachgerechnete Änderung. Die Quellen-Seite liest den Lauf-Eintrag ``pruefung`` aus
+``geraete_tco.json``. Fester Bezugstag, nie das heutige Datum.
 """
 
 from __future__ import annotations
@@ -16,6 +17,7 @@ from orakel.test_seiten_inhalt import lies_seite, render
 
 from telco_radar.analyze import geraete_pruefkennzahlen
 from telco_radar.analyze.geraete_pruefkennzahlen import kennzahlen
+from telco_radar.analyze.geraete_pruefstatus import vermerk
 from telco_radar.analyze.geraete_regeln import erfassungsluecken
 
 HEUTE = "2026-10-03"
@@ -72,6 +74,12 @@ def _bestand(a2: str = "quarantaene") -> list[dict]:
     ]
 
 
+def _kennzahlen(bestand: list[dict]) -> dict:
+    """Die Kennzahlen mit dem vollen Feld je Bündel, wie die Prüfstelle sie rechnet."""
+    felder = {s["id"]: s["pruefung"] for s in bestand if "pruefung" in s}
+    return kennzahlen(bestand, felder)
+
+
 def _zeile(daten: dict, name: str) -> dict:
     return next(z for z in daten["anbieter"] if z["name"] == name)
 
@@ -82,7 +90,7 @@ def _prozent(zeile: dict) -> dict:
 
 
 def test_kennzahlen_je_anbieter_gegen_handrechnung():
-    o2 = _zeile(kennzahlen(_bestand()), "o2")
+    o2 = _zeile(_kennzahlen(_bestand()), "o2")
     assert (o2["buendel"], o2["geprueft"]) == (4, 4)
     assert (o2["gueltig"], o2["quarantaene"], o2["veraltet"]) == (1, 2, 1)
     assert o2["abdeckung"] == [
@@ -104,7 +112,7 @@ def test_kennzahlen_je_anbieter_gegen_handrechnung():
 
 
 def test_gegenprobe_ein_status_weniger_in_quarantaene():
-    o2 = _zeile(kennzahlen(_bestand(a2="gueltig")), "o2")
+    o2 = _zeile(_kennzahlen(_bestand(a2="gueltig")), "o2")
     assert (o2["gueltig"], o2["quarantaene"]) == (2, 1)
     assert o2["quarantaenequote"]["prozent"] == 25
     assert o2["abdeckung"][2] == {"monate": 24, "gueltig": 2, "erfasst": True}
@@ -117,7 +125,7 @@ def test_gegenprobe_ein_status_weniger_in_quarantaene():
 
 
 def test_ohne_gepruefte_buendel_ist_jede_quote_nicht_pruefbar_nie_null():
-    congstar = _zeile(kennzahlen(_bestand()), "congstar")
+    congstar = _zeile(_kennzahlen(_bestand()), "congstar")
     assert (congstar["nie_geprueft"], congstar["gescheitert"]) == (1, 1)
     assert congstar["fehler"] == "RuntimeError: kaputt"
     assert congstar["geprueft"] == 0
@@ -126,14 +134,14 @@ def test_ohne_gepruefte_buendel_ist_jede_quote_nicht_pruefbar_nie_null():
 
 
 def test_summe_zaehlt_alle_anbieter():
-    summe = kennzahlen(_bestand())["summe"]
+    summe = _kennzahlen(_bestand())["summe"]
     assert (summe["buendel"], summe["geprueft"]) == (6, 4)
     assert (summe["nie_geprueft"], summe["gescheitert"]) == (1, 1)
     assert (summe["gueltig"], summe["quarantaene"], summe["veraltet"]) == (1, 2, 1)
 
 
 def test_je_regel_zaehlt_nicht_pruefbar_und_luecken():
-    regeln = {r["nr"]: r for r in kennzahlen(_bestand())["regeln"]}
+    regeln = {r["nr"]: r for r in _kennzahlen(_bestand())["regeln"]}
     assert len(regeln) == 16
     assert regeln[11]["nicht_pruefbar"] == 4, "nicht prüfbar wird je Regel gezählt"
     assert (regeln[9]["verletzt"], regeln[9]["nicht_pruefbar"]) == (1, 3)
@@ -177,29 +185,48 @@ def test_gegenprobe_erfassungsluecke():
     }, "zwei gleiche Werte sind zu wenig für eine Aussage"
 
 
-def test_fehlende_tarifbindung_ueberall_ist_luecke_nicht_null():
+def test_tarifbindung_ist_keine_erfassungsluecke_der_messung():
+    """Die Seite zeigt die Tarifbindung aus dem Tarifblatt (Regel 7 nicht prüfbar);
+    eine überall fehlende gemessene Bindung ist deshalb keine Aussage der Seite."""
     bestand = [
         _satz("o2", n, m, tarif_bindung_monate=None, anschlusspreis=float(n))
         for n, m in enumerate((6, 12, 24, 36))
     ]
-    assert erfassungsluecken(bestand) == {
-        "o2": ["Tarifbindung fehlt bei allen 4 Bündeln"]
-    }
+    assert erfassungsluecken(bestand) == {}
+    gleich = [{**s, "anschlusspreis": 39.99} for s in bestand]
+    assert erfassungsluecken(gleich) == {
+        "o2": ["Anschluss bei allen 4 Bündeln 39,99 €"]
+    }, "Gegenprobe: ein gemessenes Pflichtfeld bleibt Erfassungslücke"
 
 
-def test_ansicht_liest_den_bestand(tmp_path):
+def _datei(bestand: list[dict], lauf: dict | None) -> str:
+    """``geraete_tco.json`` wie nach einem Gerätelauf: Vermerk je Satz, Lauf-Eintrag."""
+    saetze = [
+        {**s, "pruefung": vermerk(s["pruefung"]).als_text()} if "pruefung" in s else s
+        for s in bestand
+    ]
+    daten = {"updated": HEUTE, "buendel": saetze, "sim_only": []}
+    return json.dumps(daten if lauf is None else {**daten, "pruefung": lauf})
+
+
+def test_ansicht_liest_den_lauf_eintrag(tmp_path):
     leer = {"vorhanden": False, "fehler": "", "lauf": ""}
     assert geraete_pruefkennzahlen.aufbereiten(tmp_path) == leer
     datei = tmp_path / geraete_pruefkennzahlen.DATEI
     datei.write_text("{kaputt", encoding="utf-8")
     kaputt = geraete_pruefkennzahlen.aufbereiten(tmp_path)
     assert kaputt["fehler"].startswith("geraete_tco.json unlesbar"), kaputt
-    datei.write_text(
-        json.dumps({"updated": HEUTE, "buendel": _bestand()}), encoding="utf-8"
-    )
+    datei.write_text(_datei(_bestand(), None), encoding="utf-8")
+    assert geraete_pruefkennzahlen.aufbereiten(tmp_path) == leer, "noch kein Lauf"
+    lauf = {"lauf": HEUTE, **_kennzahlen(_bestand())}
+    datei.write_text(_datei(_bestand(), lauf), encoding="utf-8")
     daten = geraete_pruefkennzahlen.aufbereiten(tmp_path)
     assert (daten["vorhanden"], daten["lauf"]) == (True, HEUTE)
-    assert daten["summe"] == kennzahlen(_bestand())["summe"]
+    assert daten["summe"] == _kennzahlen(_bestand())["summe"]
+    fehler = {"lauf": HEUTE, "fehler": "RuntimeError: kaputt"}
+    datei.write_text(_datei(_bestand(), fehler), encoding="utf-8")
+    daten = geraete_pruefkennzahlen.aufbereiten(tmp_path)
+    assert (daten["vorhanden"], daten["fehler"]) == (False, "RuntimeError: kaputt")
 
 
 def _quellenseite(tmp_path, inhalt: str | None) -> BeautifulSoup:
@@ -212,8 +239,20 @@ def _quellenseite(tmp_path, inhalt: str | None) -> BeautifulSoup:
     return BeautifulSoup(html, "html.parser")
 
 
+def _karten(karte) -> dict[str, dict[str, str]]:
+    return {
+        a["data-anbieter"]: {
+            z.select_one(".fwb-name").get_text(): z.select_one(
+                ".fwb-zustand"
+            ).get_text()
+            for z in a.select(".fwb-ind")
+        }
+        for a in karte.select("article.fwb-frage")
+    }
+
+
 def test_quellenseite_zeigt_die_kennzahlen_aus_den_daten(tmp_path):
-    inhalt = json.dumps({"updated": HEUTE, "buendel": _bestand()})
+    inhalt = _datei(_bestand(), {"lauf": HEUTE, **_kennzahlen(_bestand())})
     karte = _quellenseite(tmp_path, inhalt).select_one("#geraete-pruefung")
     assert karte is not None, "Karte der Prüfstelle fehlt auf der Quellen-Seite"
     kacheln = {
@@ -227,32 +266,33 @@ def test_quellenseite_zeigt_die_kennzahlen_aus_den_daten(tmp_path):
         "nicht geprüft": "1",
         "Prüfung gescheitert": "1",
     }
-    zeilen = {
-        z.find("td").get_text(): [td.get_text(" ", strip=True) for td in z("td")]
-        for z in karte.select("table.src-table")[0].select("tbody tr")
+    karten = _karten(karte)
+    assert karten["o2"] == {
+        "Bündel": "4",
+        "gültig 24 Monate": "1",
+        "gültig 36 Monate": "0",
+        "frisch": "75 %",
+        "Quarantäne": "50 %",
+        "Konflikte": "100 %",
+        "Belege": "50 %",
+        "nicht prüfbar": "Regel 11",
     }
-    assert zeilen["o2"][1:10] == [
-        "4",
-        "nicht erfasst",
-        "nicht erfasst",
-        "1",
-        "0",
-        "75 %",
-        "50 %",
-        "100 %",
-        "50 %",
-    ]
-    assert zeilen["o2"][10] == "Regel 11"
-    assert zeilen["congstar"][6:10] == ["nicht prüfbar"] * 4, "nie 0 % ohne Nenner"
-    text = karte.get_text(" ", strip=True)
-    assert "Prüfung gescheitert: RuntimeError: kaputt" in text
-    assert "Anschluss bei allen 4 Bündeln 39,99 €" in text
+    assert "gültig 6 Monate" not in karten["o2"], "nicht erfasst steht als Lücke"
+    quoten = [karten["congstar"][n] for n in ("frisch", "Quarantäne", "Belege")]
+    assert quoten == ["nicht prüfbar"] * 3, "nie 0 % ohne Nenner"
+    o2 = karte.select_one('article[data-anbieter="o2"]').get_text(" ", strip=True)
+    assert "6 und 12 Monate nicht erfasst · Anschluss bei allen 4 Bündeln 39,99 €" in o2
+    assert "Prüfung gescheitert: RuntimeError: kaputt" in karte.get_text(
+        " ", strip=True
+    )
 
 
 def test_ohne_geraetelauf_entfaellt_die_karte(tmp_path):
     assert (
         _quellenseite(tmp_path / "ohne", None).select_one("#geraete-pruefung") is None
     )
+    ohne_lauf = _quellenseite(tmp_path / "alt", _datei(_bestand(), None))
+    assert ohne_lauf.select_one("#geraete-pruefung") is None, "noch nie geprüft"
     ausfall = _quellenseite(tmp_path / "kaputt", "{kaputt").select_one(
         "#geraete-pruefung"
     )

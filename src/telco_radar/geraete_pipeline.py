@@ -33,7 +33,7 @@ import time
 from datetime import datetime, timezone
 from html import escape
 from pathlib import Path
-from typing import Callable, Optional
+from typing import Any, Callable, Optional
 
 from . import versand
 from .analyze.geraete_store import (
@@ -47,7 +47,7 @@ from .analyze.geraete_store import (
 )
 from .analyze.tarif_referenzen import aus_bestand
 from .analyze.tco_buendel import aus_rohsaetzen
-from .analyze.geraete_pruefstelle import vermerke as pruefe_buendel
+from .analyze.geraete_pruefstelle import Seite, vermerke as pruefe_buendel
 from .analyze.tco_store import TcoDB
 from .tarif_bezug import Tarifbestand
 from .collect.geraete import ADAPTER, hole_mit_robots, laufuhr, sammle
@@ -68,20 +68,32 @@ FRIST_TAGESLAUF = 1500.0
 UNBEKANNTE_TITEL_MAX = 40
 
 
+def abgesichert(aufgabe: Callable[[], Any], bei_fehler: Callable[[Exception], Any]):
+    """Die Absicherung des Gerätelaufs (`analyze.takt.Absicherung`, wie im Wochenlauf):
+    ein Fehler der Aufgabe geht an `bei_fehler`, der Lauf und sein Messtag bleiben."""
+    try:
+        return aufgabe()
+    except Exception as exc:  # noqa: BLE001
+        return bei_fehler(exc)
+
+
+def _ohne_simonly(exc: Exception) -> tuple[list, dict]:
+    log.warning("1&1 SIM-only-Messung gescheitert (%s) - Bestandsableitung bleibt", exc)
+    return [], {}
+
+
 def _hole_fabrik(http_cfg: dict) -> Callable:
     """`(status, text)` statt Response oder Ausnahme.
 
-    Der Waechter muss 404 ("keine robots.txt, also keine Regeln") von 403
-    ("nicht anfassen") unterscheiden koennen. Ein Verbindungsfehler bleibt
-    dagegen eine Ausnahme und wird oben als Fehler gewertet, nicht als
-    Freibrief.
+    Der Waechter muss 404 ("keine robots.txt, also keine Regeln") von 403 ("nicht
+    anfassen") unterscheiden koennen. Ein Verbindungsfehler bleibt dagegen eine
+    Ausnahme und wird oben als Fehler gewertet, nicht als Freibrief.
 
-    DIESE FUNKTION HAT DAS BIS ZUM 28.08.2026 NICHT GEHALTEN, und ihre
-    eigene Docstring behauptete das Gegenteil ("`fetch` wirft bei beidem
-    nicht"). `collect.http.fetch` ruft `raise_for_status()` - es wirft bei
-    JEDEM 4xx. Der Waechter bekam damit statt eines Status eine Ausnahme,
-    und sein Ausnahmezweig sagt zu Recht "kein Ergebnis heisst nicht
-    erlaubt": der Anbieter wurde als nicht abrufbar gefuehrt.
+    DIESE FUNKTION HAT DAS BIS ZUM 28.08.2026 NICHT GEHALTEN, und ihre eigene Docstring
+    behauptete das Gegenteil ("`fetch` wirft bei beidem nicht"). `collect.http.fetch`
+    ruft `raise_for_status()` - es wirft bei JEDEM 4xx. Der Waechter bekam damit statt
+    eines Status eine Ausnahme, und sein Ausnahmezweig sagt zu Recht "kein Ergebnis
+    heisst nicht erlaubt": der Anbieter wurde als nicht abrufbar gefuehrt.
 
     Aufgefallen ist es nie, weil jeder bisher konfigurierte Host eine robots.txt mit
     HTTP 200 ausliefert. `api.vodafone.de` ist der erste ohne - dort antwortet 404, also
@@ -135,27 +147,25 @@ def _abdeckungszustand(bilanz) -> str:
         ein Leseversuch, der nicht durchkam. Der zaehlt als Ausfall, denn
         genau dafuer gibt es diesen Waechter.
 
-    WARUM TOTE PRODUKTADRESSEN HIER NICHT VORKOMMEN (22.09.2026). Eine
-    Quelle, deren Sitemap veraltete Adressen fuehrt, liefert einen Lauf
-    mit Luecken - und trotzdem GELESEN, nicht TEILGELESEN. Das ist kein
-    zweiter Teilzustand neben dem des Waechters, sondern ausdruecklich ein
-    anderer Fall, und der Unterschied ist der Grund fuer beide Zustaende:
-    TEILGELESEN heisst "der Lauf wurde ABGEBROCHEN, was durchkam ist nicht
-    das Sortiment" - deshalb taugt so ein Tag nicht als Vergleichsbasis
-    (`Messtag.vergleichsbasis`). Bei einer toten Adresse ist nichts
-    abgebrochen: jede Adresse, die der Anbieter nennt, wurde versucht, und
-    die fehlenden hat er selbst als nicht mehr vorhanden beantwortet. Da
-    ist nichts mehr zu lesen - das IST das Sortiment, und der Tag ist eine
-    taugliche Basis. Waere er TEILGELESEN, haette mobilcom-debitel nie
-    wieder einen vollstaendigen Vergleichstag und liefe nach
-    `_OHNE_BASIS_TAGE` dauerhaft in `ALARM_OHNE_BASIS` - genau die
-    Blindheit, gegen die S2-1 gebaut wurde. Wie viele tote Adressen ein
-    Lauf vertraegt, entscheidet allein
-    `collect.geraete._MINDESTANTEIL_GELESENER_PRODUKTSEITEN`; reisst er
-    die Schwelle, ist `vollstaendig` False und der Tag hier LESEFEHLER.
-    Dass diese Schwelle je Nacht rechnet und eine langsame Erosion
-    darunter durchginge, faengt nicht dieser Zustand ab, sondern der
-    Verlauf: `geraete_store.ALARM_EROSION`, gespeist aus `_adressbilanz`.
+    WARUM TOTE PRODUKTADRESSEN HIER NICHT VORKOMMEN (22.09.2026). Eine Quelle, deren
+    Sitemap veraltete Adressen fuehrt, liefert einen Lauf mit Luecken - und trotzdem
+    GELESEN, nicht TEILGELESEN. Das ist kein zweiter Teilzustand neben dem des
+    Waechters, sondern ausdruecklich ein anderer Fall, und der Unterschied ist der
+    Grund fuer beide Zustaende: TEILGELESEN heisst "der Lauf wurde ABGEBROCHEN, was
+    durchkam ist nicht das Sortiment" - deshalb taugt so ein Tag nicht als
+    Vergleichsbasis (`Messtag.vergleichsbasis`). Bei einer toten Adresse ist nichts
+    abgebrochen: jede Adresse, die der Anbieter nennt, wurde versucht, und die
+    fehlenden hat er selbst als nicht mehr vorhanden beantwortet. Da ist nichts mehr zu
+    lesen - das IST das Sortiment, und der Tag ist eine taugliche Basis. Waere er
+    TEILGELESEN, haette mobilcom-debitel nie wieder einen vollstaendigen Vergleichstag
+    und liefe nach `_OHNE_BASIS_TAGE` dauerhaft in `ALARM_OHNE_BASIS` - genau die
+    Blindheit, gegen die S2-1 gebaut wurde. Wie viele tote Adressen ein Lauf
+    vertraegt, entscheidet allein
+    `collect.geraete._MINDESTANTEIL_GELESENER_PRODUKTSEITEN`; reisst er die Schwelle,
+    ist `vollstaendig` False und der Tag hier LESEFEHLER. Dass
+    diese Schwelle je Nacht rechnet und eine langsame Erosion darunter durchginge,
+    faengt nicht dieser Zustand ab, sondern der Verlauf: `geraete_store.ALARM_EROSION`,
+    gespeist aus `_adressbilanz`.
 
     Erkannt wird die Besuchszeit am Flag der Bilanz
     (`ausserhalb_besuchszeit`), nicht am Grundtext - ein Waechter, der
@@ -514,21 +524,10 @@ def run_geraete_stage(
                 tarife,
             )
         else:
-            try:
-                if (
-                    referenz_anbieter is not None
-                    and SIMONLY_ANBIETER not in referenz_anbieter
-                ):
-                    simonly_refs = []
-                    simonly_protokoll = {}
-                else:
-                    simonly_refs, simonly_protokoll = sammle_simonly(hole, heute, uhr)
-            except Exception as exc:  # noqa: BLE001
-                simonly_refs = []
-                log.warning(
-                    "1&1 SIM-only-Messung gescheitert (%s) - die "
-                    "Bestandsableitung bleibt stehen",
-                    exc,
+            simonly_refs, simonly_protokoll = [], {}
+            if referenz_anbieter is None or SIMONLY_ANBIETER in referenz_anbieter:
+                simonly_refs, simonly_protokoll = abgesichert(
+                    lambda: sammle_simonly(hole, heute, uhr), _ohne_simonly
                 )
             if simonly_refs:
                 gemessen = {r.tarif_name for r in simonly_refs}
@@ -563,7 +562,8 @@ def run_geraete_stage(
                 buendelbilanz = aus_rohsaetzen(rohbuendel, bestand, heute)
                 if buendelbilanz.buendel:
                     neue_buendel, _ = tco.upsert_buendel(buendelbilanz.buendel, heute)
-            pruefe_buendel(tco, db, bestand, heute, ist_frisch, geraet_aus_sku, katalog)
+            seite = Seite(ist_frisch, geraet_aus_sku, katalog)
+            pruefe_buendel(tco, db, bestand, heute, seite, abgesichert)
             tco.save(heute)
             geschrieben = True
     except Exception as exc:  # noqa: BLE001

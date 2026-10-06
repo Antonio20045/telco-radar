@@ -13,9 +13,11 @@ import pytest
 
 from telco_radar.analyze.geraete_pruefstatus import (
     GUELTIG,
+    NICHT_PRUEFBAR,
     QUARANTAENE,
     VERALTET,
     Kontext,
+    buendel_aus_satz,
 )
 from telco_radar.analyze.geraete_regeln import pruefe_bestand, sim_only_tabelle
 from telco_radar.collect.geraete.klicktext import volumen_aus_zeile
@@ -111,8 +113,8 @@ def _erwaehnt(feld: dict, regel: int) -> bool:
     return any(regel in liste for liste in listen)
 
 
-def test_grundsatz_besteht_jede_regel_und_jede_ist_pruefbar():
-    leer = {"status": GUELTIG, "gruende": [], "luecken": [], "nicht_pruefbar": []}
+def test_grundsatz_besteht_jede_regel_und_jede_ausser_7_und_8_ist_pruefbar():
+    leer = {"status": GUELTIG, "gruende": [], "luecken": [], "nicht_pruefbar": [7, 8]}
     assert _feld() == leer
 
 
@@ -123,9 +125,9 @@ FAELLE = [
     (
         3,
         {},
-        {"sim_only": {f"o2|{TARIF_ID}": 35.0}},
+        {"sim_only": {f"o2|{TARIF_ID}": 35.01}},
         QUARANTAENE,
-        "Tarif mit Gerät 30,00 € unter SIM-only 35,00 €",
+        "unter SIM-only 35,01 € abzüglich 5,00 € Bündelnachlass",
     ),
     (
         4,
@@ -220,7 +222,7 @@ def test_sprung_zum_vortag_ist_quarantaene_bis_zum_zweiten_abruf():
 
 def test_ohne_vortag_ist_der_sprung_nicht_pruefbar_und_kein_grund():
     feld = _feld(vortag={})
-    assert feld["nicht_pruefbar"] == [11]
+    assert feld["nicht_pruefbar"] == [7, 8, 11]
     assert feld["status"] == GUELTIG
 
 
@@ -255,19 +257,49 @@ def test_speicher_ohne_katalog_ist_nicht_pruefbar():
     assert feld["status"] == GUELTIG
 
 
-def test_fehlende_tarifbindung_ist_luecke_nicht_null():
-    feld = _feld(_satz(tarif_bindung_monate=None))
-    assert feld["luecken"] == [7, 14], feld
-    assert feld["status"] == GUELTIG, "eine Lücke ist kein Regelverstoß"
-    gegen = _feld(_satz(tarif_bindung_monate=0))
-    assert not _erwaehnt(gegen, 7), "0 Monate sind gemessen: ohne Mindestlaufzeit"
-    assert gegen["luecken"] == []
+@pytest.mark.parametrize(
+    "regel,o2_unter_sim_only,status",
+    [
+        (3, 5.00, GUELTIG),
+        (3, 5.01, QUARANTAENE),
+        (3, 4.00, GUELTIG),
+    ],
+    ids=["o2-genau-5", "o2-5,01", "o2-4"],
+)
+def test_o2_bundelnachlass_von_5_euro_ist_belegt(regel, o2_unter_sim_only, status):
+    sim = {f"o2|{TARIF_ID}": round(30.0 + o2_unter_sim_only, 2)}
+    feld = _feld(_satz(), sim_only=sim)
+    assert feld["status"] == status, feld
+    assert (regel in _gruende(feld)) is (status == QUARANTAENE)
 
 
-def test_preisphase_ueber_die_bindung_hinaus_ist_luecke():
-    feld = _feld(_satz(laufzeit_monate=36))
-    assert 8 in feld["luecken"], feld
-    assert not _erwaehnt(_feld(_satz(laufzeit_monate=24)), 8)
+@pytest.mark.parametrize(
+    "sim_only,status", [(30.01, QUARANTAENE), (30.00, GUELTIG)], ids=["0,01", "gleich"]
+)
+def test_ohne_belegten_nachlass_zaehlt_jeder_cent(sim_only, status):
+    congstar = _satz(anbieter="congstar")
+    feld = _feld(congstar, sim_only={f"congstar|{TARIF_ID}": sim_only})
+    assert feld["status"] == status, feld
+    if status == QUARANTAENE:
+        assert _gruende(feld)[3] == "Tarif mit Gerät 30,00 € unter SIM-only 30,01 €"
+
+
+@pytest.mark.parametrize("bindung", [None, 0, 24])
+@pytest.mark.parametrize("laufzeit", [24, 36])
+def test_tarifbindung_und_preisphasen_zeigt_die_seite_aus_dem_tarifblatt(
+    bindung, laufzeit
+):
+    """Die Ansicht ergänzt beides nur in report/: nicht prüfbar mit Grund, nie
+    bestanden, und eine fehlende Bindung bleibt None statt 0."""
+    satz = _satz(tarif_bindung_monate=bindung, laufzeit_monate=laufzeit)
+    ergebnis = pruefe_bestand([satz], _kontext((satz,)))[satz["id"]]
+    nicht = {b.regel: b.satz for b in ergebnis.je(NICHT_PRUEFBAR)}
+    assert {7, 8} <= set(nicht), nicht
+    assert all("Tarifblatt" in nicht[r] for r in (7, 8)), nicht
+    feld = ergebnis.als_feld()
+    assert not {7, 8} & set(feld["luecken"]) and not {7, 8} & set(_gruende(feld))
+    assert 14 not in feld["luecken"], "die Tarifbindung prüft Regel 7, nicht 14"
+    assert buendel_aus_satz(satz).tarif_bindung_monate == bindung
 
 
 def test_fehlendes_pflichtfeld_ist_luecke_mit_namen():
@@ -280,7 +312,9 @@ def test_fehlendes_pflichtfeld_ist_luecke_mit_namen():
         buendel_monatlich=60.0,
         tarif_bindung_monate=None,
     )
-    assert _feld(vertrag)["luecken"] == [7, 14]
+    assert _feld(vertrag)["luecken"] == [], "Vertrag mit allen gemessenen Feldern"
+    ohne_anschluss = {**vertrag, "anschlusspreis": None}
+    assert _feld(ohne_anschluss)["luecken"] == [14]
     assert not _erwaehnt(_feld(_satz()), 14)
 
 
@@ -310,6 +344,6 @@ def test_regel_ohne_daten_ist_nicht_pruefbar_statt_bestanden():
     und Vortag. Keine dieser Regeln gilt als bestanden, keine setzt Quarantäne."""
     satz = _satz(geraet_summe=None, echo=None, beleg_variante=None)
     feld = _feld(satz, uvp={}, sim_only={}, vortag={})
-    assert feld["nicht_pruefbar"] == [1, 2, 3, 6, 9, 11, 13], feld
+    assert feld["nicht_pruefbar"] == [1, 2, 3, 6, 7, 8, 9, 11, 13], feld
     assert feld["status"] == GUELTIG
     assert feld["gruende"] == []

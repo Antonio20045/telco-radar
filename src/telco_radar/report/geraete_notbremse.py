@@ -8,23 +8,25 @@ Beide bleiben als Zeile sichtbar, stellen aber weder Δ noch Referenz noch Siege
 keine Bewegung und keinen Günstigst-Wert; der Export nennt denselben Zustand.
 
 Schritt 7: Ebenso ein Bündel, dem die Prüfstelle (``analyze/geraete_regeln``) den Status
-Quarantäne oder veraltet gegeben hat oder an dem sie gescheitert ist (``unbekannt``).
-Ein Bündel ohne Feld ``pruefung`` ist nie geprüft worden und zählt wie vor der
-Prüfstelle; die Quellen-Seite zählt es als „nicht geprüft“.
+Quarantäne oder veraltet gegeben hat oder an dem sie gescheitert ist (``unbekannt``);
+gelesen wird ihr Vermerk im Feld ``pruefung`` (``geraete_pruefstatus.lies_vermerk``),
+die Gründe heißen wie die Regeln (``REGELN``). Ein Bündel ohne Vermerk ist nie geprüft
+worden und zählt wie vor der Prüfstelle.
 """
 
 from __future__ import annotations
 
-from collections.abc import Iterable, Mapping
+from collections.abc import Iterable
 
 from ..analyze.geraete_pruefstatus import (
     FELD_PRUEFUNG,
     GUELTIG,
     QUARANTAENE,
+    REGELN,
     UNBEKANNT,
     VERALTET,
     abgelaufene_aktionen,
-    status_aus_feld,
+    lies_vermerk,
 )
 from ..tco_model import Aktion, Buendel, aktionen_aus
 
@@ -73,26 +75,21 @@ def _felder(
 ) -> dict:
     schaetzung = bool(herleitung.strip())
     veraltet = bool(abgelaufene_aktionen(aktionen, heute))
-    status = status_aus_feld(pruefung)
+    vermerk = lies_vermerk(pruefung)
+    status = vermerk.status
     flags = {
         "schaetzung": schaetzung,
         "veraltet_aktion": veraltet,
         "quarantaene": status == QUARANTAENE,
         "veraltet_pruefung": status == VERALTET,
         "pruefung_gescheitert": status == UNBEKANNT,
-        "pruefgruende": _pruefgruende(pruefung),
+        "pruefgruende": [f"Regel {n}: {REGELN.get(n, '?')}" for n in vermerk.regeln],
     }
     return {
         **flags,
         "zaehlt": not schaetzung and not veraltet and status in (None, GUELTIG),
         "notbremse": zustand(flags),
     }
-
-
-def _pruefgruende(pruefung: object) -> list[str]:
-    """„Regel 3: Tarif mit Gerät 14,99 € unter SIM-only 19,99 €“ je Grund."""
-    gruende = pruefung.get("gruende") if isinstance(pruefung, Mapping) else None
-    return [f"Regel {g.get('regel')}: {g.get('satz')}" for g in gruende or []]
 
 
 def zaehlt(karte: dict) -> bool:

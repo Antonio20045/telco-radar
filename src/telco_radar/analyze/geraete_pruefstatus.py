@@ -12,9 +12,12 @@ und Satz:
                     SIM-only-Preis, Echo, Beleg, Vortag); weder gültig noch Quarantäne
                     aus diesem Grund, aber je Regel gezählt
 
-Die Regeln selbst stehen in ``geraete_regeln``. Der Status steht im Bündelsatz von
-``geraete_tco.json`` im Feld ``pruefung`` (``Pruefergebnis.als_feld``); ein Satz ohne
-dieses Feld ist nie geprüft worden und zählt wie vor der Prüfstelle.
+Die Regeln selbst stehen in ``geraete_regeln``. Im Bündelsatz von ``geraete_tco.json``
+steht nur der ``Vermerk`` im Feld ``pruefung``, ein kurzer Text: der Status und die
+Nummern der verletzten Regeln (``"quarantaene 3 5"``), bei ``unbekannt`` der Fehler
+(``"unbekannt RuntimeError: …"``). Die Sätze je Regel kommen aus ``REGELN``; Lücken und
+„nicht prüfbar“ zählen nur die Kennzahlen des Laufs. Ein Satz ohne dieses Feld ist nie
+geprüft worden und zählt wie vor der Prüfstelle.
 """
 
 from __future__ import annotations
@@ -45,6 +48,11 @@ AUSREISSER_VORTAG = 0.15
 ERLAUBTE_RATENLAUFZEITEN = (6, 12, 24, 36)
 RECHEN_TOLERANZ_EUR = 1.00
 CENT = 0.005
+BUENDEL_NACHLASS = {"o2": 5.00}
+"""Belegter Nachlass des Anbieters auf den Tarif im Bündel (normalisierter Name → €
+im Monat), sonst 0: o2 stellt den Bündel-Tarifpreis selbst 5 € unter SIM-only,
+„attraktiver monatlicher Rabatt auf deinen Tarif“ (``analyze/tco_buendel.py``,
+Modulkopf, 21.09.2026). Regel 3 misst gegen SIM-only minus diesen Nachlass."""
 MIN_BUENDEL_GLEICHWERT = 3
 
 REGELN = {
@@ -114,7 +122,7 @@ class Pruefergebnis:
         )
 
     def als_feld(self) -> dict:
-        """Das Feld ``pruefung`` im Bündelsatz von ``geraete_tco.json``."""
+        """Alle Befunde als Zuordnung: Grundlage für Vermerk und Kennzahlen."""
         return {
             "status": self.status,
             "gruende": [{"regel": b.regel, "satz": b.satz} for b in self.je(VERLETZT)],
@@ -169,15 +177,63 @@ def pflichtfelder(b: Buendel) -> tuple[tuple[str, str], ...]:
     return PFLICHT_EIN_VERTRAG if b.buendel_monatlich is not None else PFLICHT_GETRENNT
 
 
-def status_aus_feld(pruefung: object) -> str | None:
-    """Der Status eines gespeicherten Felds ``pruefung``; None, wenn nie geprüft.
+def fehlerfeld(exc: BaseException) -> dict:
+    """Das Feld eines Bündels, an dem die Prüfstelle gescheitert ist."""
+    return {"status": UNBEKANNT, "fehler": f"{type(exc).__name__}: {exc}"}
+
+
+def status_aus_feld(feld: object) -> str | None:
+    """Der Status eines Felds aus ``als_feld`` oder ``fehlerfeld``; None ohne Feld.
 
     Ein Feld, das keinen der drei Status trägt, ist ``unbekannt``.
     """
-    if pruefung is None:
+    if feld is None:
         return None
-    status = pruefung.get("status") if isinstance(pruefung, Mapping) else None
+    status = feld.get("status") if isinstance(feld, Mapping) else None
     return status if status in STATUS else UNBEKANNT
+
+
+@dataclass(frozen=True)
+class Vermerk:
+    """Der gespeicherte Vermerk eines Bündels: Status, verletzte Regeln, Fehler.
+
+    ``status`` ist None, wenn das Bündel nie geprüft worden ist.
+    """
+
+    status: str | None
+    regeln: tuple[int, ...] = ()
+    fehler: str = ""
+
+    def als_text(self) -> str:
+        """``"gueltig"``, ``"quarantaene 3 5"`` oder ``"unbekannt <Fehler>"``."""
+        if self.status == UNBEKANNT:
+            return f"{UNBEKANNT} {self.fehler}".strip()
+        return " ".join([str(self.status), *map(str, self.regeln)])
+
+
+def vermerk(feld: Mapping) -> Vermerk:
+    """Der Vermerk eines Felds aus ``als_feld`` oder ``fehlerfeld``."""
+    status = status_aus_feld(feld) or UNBEKANNT
+    if status == UNBEKANNT:
+        return Vermerk(UNBEKANNT, fehler=str(feld.get("fehler") or ""))
+    regeln = sorted({int(g["regel"]) for g in feld.get("gruende") or []})
+    return Vermerk(status, tuple(regeln))
+
+
+def lies_vermerk(text: object) -> Vermerk:
+    """Der Vermerk aus dem Feld ``pruefung`` eines gespeicherten Bündelsatzes.
+
+    Ohne Feld ist der Status None; ein unlesbarer Vermerk ist ``unbekannt``.
+    """
+    if text is None:
+        return Vermerk(None)
+    status, _, rest = str(text).partition(" ")
+    if status == UNBEKANNT:
+        return Vermerk(UNBEKANNT, fehler=rest)
+    teile = rest.split()
+    if status not in STATUS or not all(t.isdigit() for t in teile):
+        return Vermerk(UNBEKANNT, fehler=f"Vermerk unlesbar: {text}")
+    return Vermerk(status, tuple(int(t) for t in teile))
 
 
 def eur(betrag: float) -> str:
