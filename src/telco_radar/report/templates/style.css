@@ -3182,6 +3182,9 @@ b,strong{font-weight:700}
      rund 75 px) - lesbar auf ein bis zwei statt drei bis vier Zeilen. */
   .gr-bnd-an .gr-kk-marke{display:block;width:100%;box-sizing:border-box;
     margin:3px 0 0}
+  /* Die kurze Notbremse-Marke bleibt neben dem Namen: keine Zeile mehr. */
+  .gr-bnd-an .gr-kk-marke--notbremse{display:inline-block;width:auto;
+    margin:0 0 0 4px}
   /* justify-self:end schrumpft die tco-Box auf den Inhalt und richtet sie
      an der rechten Kante der Zeile aus (dieselbe Kante bei jeder Zeile,
      da die Zeile selbst immer volle Breite hat) - die Box beginnt damit
@@ -3370,6 +3373,10 @@ b,strong{font-weight:700}
    Marke `--alt` nennt Abrufdatum bzw. „unbekannt" auf der Zeile selbst;
    der Text dafür steht in Python (`alt_marke`), nie hier. */
 .gr-kk-marke--alt{color:var(--ink-3);border-color:currentColor}
+/* Notbremse: Schätzung oder abgelaufene Aktion - grau, gestrichelt (nicht
+   gemessen), kein Rot. */
+.gr-kk-marke--notbremse{color:var(--ink-3);border-style:dashed;
+  border-color:currentColor;letter-spacing:.02em}
 .gr-bnd--alt{border-left-color:var(--rule-2)}
 .gr-bnd--alt summary{color:var(--ink-3)}
 .gr-bnd--alt summary .gr-bnd-name{color:var(--ink-3)}
