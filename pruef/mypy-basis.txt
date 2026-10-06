@@ -98,10 +98,8 @@ src/telco_radar/report/geraete_view.py arg-type 2
 src/telco_radar/report/geraete_view.py index 2
 src/telco_radar/report/geraete_view.py operator 1
 src/telco_radar/report/geraete_view.py type-var 1
-src/telco_radar/report/geraete_zeitreihe.py arg-type 3
-src/telco_radar/report/geraete_zeitreihe.py index 1
+src/telco_radar/report/geraete_zeitreihe.py arg-type 1
 src/telco_radar/report/geraete_zeitreihe.py operator 3
-src/telco_radar/report/geraete_zeitreihe.py union-attr 1
 src/telco_radar/report/html.py arg-type 4
 src/telco_radar/report/html.py assignment 2
 src/telco_radar/report/html.py index 4

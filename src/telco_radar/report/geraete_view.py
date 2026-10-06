@@ -852,7 +852,7 @@ def _tco_spalte(modell_tco: dict | None, heute: str = "") -> dict:
     zaehlende = list(filter(notbremse.zaehlt, vergleichbare))
     if not zaehlende:
         gesperrt = min(vergleichbare, key=lambda k: k["gesamt"])
-        return _tco_leer(notbremse.zustand(gesperrt)["kurz"])
+        return _tco_leer(notbremse.gruende([gesperrt]))
     bester = min(zaehlende, key=lambda k: k["gesamt"])
     fremde = [k for k in zaehlende if not k.get("eigen")]
     traeger = (

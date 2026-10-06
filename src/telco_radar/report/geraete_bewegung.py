@@ -132,7 +132,7 @@ def bewegungen(
             if None in (v0, v1, c0, c1):
                 ohne[GRUND_MESSUNG] += 1
                 continue
-            if not all(map(notbremse.zaehlt, (v0, v1, c0, c1))):
+            if not all(notbremse.zaehlt(m or {}) for m in (v0, v1, c0, c1)):
                 ohne[GRUND_ZAEHLT_NICHT] += 1
                 continue
             if schluessel(c0["satz"]) != schluessel(c1["satz"]) or schluessel(

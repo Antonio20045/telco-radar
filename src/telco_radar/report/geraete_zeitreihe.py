@@ -452,7 +452,7 @@ def _stufe(band_labels: dict, band: str) -> str:
 def _luecke_text(luecken: list, band_labels: dict) -> str | None:
     if not luecken:
         return None
-    anderes, gar_nicht, nur_alt, fremd, gesperrt = [], [], [], [], []
+    anderes, gar_nicht, nur_alt, fremd, gesperrt = (list[str]() for _ in range(5))
     eimer = {"gar-kein-buendel": gar_nicht, "nur-alte": nur_alt}
     for l in luecken:
         name = l["anbieter"]

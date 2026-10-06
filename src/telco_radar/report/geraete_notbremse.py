@@ -74,7 +74,7 @@ def namen(karten: list) -> list[str]:
 
 def gruende(karten: list) -> str:
     """„Schätzung“, „Aktion abgelaufen“ oder beide, je Grund einmal."""
-    return ", ".join(dict.fromkeys(zustand(k)["kurz"] for k in karten))
+    return ", ".join(dict.fromkeys((zustand(k) or {}).get("kurz", "") for k in karten))
 
 
 def nur_zaehlende(messungen: dict) -> dict:

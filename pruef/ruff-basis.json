@@ -546,7 +546,6 @@
  "src/telco_radar/report/geraete_tco_karten.py": {
   "C901": 1,
   "E741": 3,
-  "I001": 1,
   "SIM103": 1,
   "UP045": 27
  },
@@ -629,7 +628,6 @@
   "C901": 2,
   "D102": 2,
   "E741": 2,
-  "F401": 1,
   "UP045": 45
  },
  "src/telco_radar/uebersetzung/__init__.py": {
