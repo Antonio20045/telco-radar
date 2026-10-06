@@ -80,12 +80,20 @@ class Sitzung:
     wache: CDPSession
 
 
-def oeffne_sitzung(browser: Browser, tor: Tor, fenster: ViewportSize) -> Sitzung:
-    """Eigener Kontext ohne Service Worker und ohne Vorabladen, alles am Tor."""
+def oeffne_sitzung(
+    browser: Browser, tor: Tor, fenster: ViewportSize, kennung: str | None = None
+) -> Sitzung:
+    """Eigener Kontext ohne Service Worker und ohne Vorabladen, alles am Tor.
+
+    ``kennung`` ist der User-Agent aus ``geraete_quellen.yaml``, sonst der des Browsers;
+    eine andere Kopfzeile setzt der Kontext nicht.
+    """
     wache = sperre_vorabladen(browser)
     kontext: BrowserContext | None = None
     try:
-        kontext = browser.new_context(service_workers="block", viewport=fenster)
+        kontext = browser.new_context(
+            service_workers="block", viewport=fenster, user_agent=kennung
+        )
         kontext.add_init_script(script=OHNE_VORAB_JS)
         kontext.route_web_socket("**/*", tor.websocket)
         kontext.route("**/*", tor)

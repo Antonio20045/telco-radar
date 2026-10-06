@@ -18,6 +18,7 @@ from collections.abc import Callable, Iterator
 from pathlib import Path
 
 import waechter_claude
+import waechter_erkundung
 import waechter_speicher
 import yaml
 
@@ -70,6 +71,7 @@ def pruefe(wurzel: Path) -> list[str]:
         *workflows(wurzel),
         *git_hooks(wurzel),
         *waechter_claude.vertrag(wurzel),
+        *waechter_erkundung.vertrag(wurzel),
     ]
 
 

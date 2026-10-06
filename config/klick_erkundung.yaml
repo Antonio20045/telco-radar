@@ -1,0 +1,84 @@
+# =============================================================================
+# TELCO RADAR - Klick-Erkundung (Datenkonzept Geräteradar, Schritt 5a)
+# =============================================================================
+# Je Anbieter ein bis zwei Produktseiten, auf denen `scripts/klick_erkunden.py`
+# das Material für die Klick-Karte holt: gerenderte Seite, Bedienelemente,
+# Preis-Kandidaten, Mitschnitt, Klick-Effekte und Screenshot. Geladen wird über
+# denselben Kontext und dasselbe Tor wie der Klick-Crawler (robots.txt samt
+# Crawl-delay und Visit-time je Anfrage, Bot-Schutz heißt „gestört“).
+#
+# DIE ADRESSEN SIND NICHT ZUSAMMENGESETZT. Jede steht wörtlich als
+# `quelle_url` im Bestand des Geräteradars (data/state/geraete_db.json bzw.
+# geraete_tco.json, Stand 06.10.2026), also auf einer Seite, die der Anbieter
+# selbst verlinkt. Wo der Bestand die Bündelansicht kennt (o2 mit
+# `ohne-tarif=nein`, Telekom mit `tariffId`), steht sie; freenet führt im
+# Bestand nur die Seiten „ohne Vertrag“.
+#
+# Felder:
+#   schluessel  Ordnername unter erkundung/ und Wert der Workflow-Eingabe
+#   name        Anbieter wie in config/geraete_quellen.yaml (User-Agent,
+#               rate_limit_sekunden und basis_url kommen von dort)
+#   seiten      höchstens zwei; `geraet` ist eine device_id aus
+#               config/geraete_katalog.yaml, `speicher_gb` muss dort stehen
+# =============================================================================
+
+anbieter:
+  - schluessel: o2
+    name: o2
+    seiten:
+      - geraet: apple-iphone-17-pro
+        speicher_gb: 256
+        url: https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus
+      - geraet: samsung-galaxy-s26
+        speicher_gb: 256
+        url: https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus
+
+  - schluessel: vodafone
+    name: Vodafone
+    seiten:
+      - geraet: apple-iphone-17-pro
+        speicher_gb: 256
+        url: https://www.vodafone.de/privat/handys/iphone-17-pro.html
+      - geraet: samsung-galaxy-s26
+        speicher_gb: 256
+        url: https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html
+
+  - schluessel: 1und1
+    name: 1&1
+    seiten:
+      - geraet: apple-iphone-17-pro
+        speicher_gb: 256
+        url: https://mobile.1und1.de/iphone-17-pro
+      - geraet: samsung-galaxy-s26
+        speicher_gb: 256
+        url: https://mobile.1und1.de/samsung-galaxy-s26
+
+  - schluessel: telekom
+    name: Telekom
+    seiten:
+      - geraet: apple-iphone-17-pro
+        speicher_gb: 256
+        url: https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: google-pixel-11
+        speicher_gb: 256
+        url: https://www.telekom.de/shop/geraet/google/google-pixel-11/frost-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+
+  - schluessel: congstar
+    name: congstar
+    seiten:
+      - geraet: apple-iphone-17-pro
+        speicher_gb: 256
+        url: https://www.congstar.de/geraete/apple/apple-iphone-17-pro/
+      - geraet: samsung-galaxy-s26
+        speicher_gb: 256
+        url: https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/
+
+  - schluessel: freenet
+    name: mobilcom-debitel
+    seiten:
+      - geraet: apple-iphone-17-pro
+        speicher_gb: 256
+        url: https://www.freenet.de/handys-smartphones/apple/iphone-17-pro-ohne-vertrag/p/P-M-4234664?ds=P-4356815
+      - geraet: google-pixel-10
+        speicher_gb: 256
+        url: https://www.freenet.de/handys-smartphones/google/google-pixel-10-ohne-vertrag/p/P-M-4206117?ds=P-4292934
