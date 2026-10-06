@@ -1315,14 +1315,14 @@ def _angebot_rang(karte: dict) -> tuple:
 
     A3 darüber (20.09.2026): FRISCHE vor Quelle und Datum - ein Angebot
     jenseits von ALT_AB_TAGEN verliert die Dedupe an eine frische Listung
-    desselben Angebots, statt weiter als aktuelle Karte zu stehen. A2
-    bleibt der Tiebreaker INNERHALB der Frische - und ihr einziger
-    Anker im Kompatibilitätsmodus `heute=""`, in dem nichts altert und
-    alle Karten gleich frisch sind: dort entscheidet weiter das
-    aktuellste Datum vor dem Preis.
+    desselben Angebots; A2 bleibt Tiebreaker INNERHALB der Frische und
+    einziger Anker im Modus `heute=""` (nichts altert, das aktuellste Datum
+    entscheidet vor dem Preis). Gleich nach der Frische die Notbremse: eine
+    billigere Schätzung verdrängt kein gemessenes Angebot.
     """
     return (
         not karte.get("frisch", True),
+        not notbremse.zaehlt(karte),
         1 if karte.get("aus_listung") else 0,
         -_neuigkeit(karte),
         karte["schnitt_monat"] if karte["schnitt_monat"] is not None else 9e9,
