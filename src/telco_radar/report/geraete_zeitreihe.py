@@ -60,7 +60,8 @@ from ..tco_model import (
 from . import geraete_bewegung
 from .anbieter_farben import STRICHMUSTER, stil_fuer
 from .geraete_tco_band import ERWARTETE_ANBIETER, band_label
-from .geraete_tco_karten import kurz_datum, phasen_fuer_buendel
+from .geraete_tco_karten import kurz_datum, label_der_leitzahl, phasen_fuer_buendel
+from .verlauf import MONATE_DE
 
 log = logging.getLogger(__name__)
 
@@ -136,8 +137,9 @@ def _datum_kurz(iso: str) -> str:
 
 
 def _datum_de(iso: str) -> str:
-    y, m, d = iso.split("-")
-    return f"{int(d)}. {date(int(y), int(m), int(d)).strftime('%B')} {y}"
+    """„1. Oktober 2026“ - Monatsname aus fester Liste, nie vom Locale."""
+    tag = date.fromisoformat(iso)
+    return f"{tag.day}. {MONATE_DE[tag.month - 1]} {tag.year}"
 
 
 def _mon_kurz(monate: list) -> str:
@@ -766,20 +768,12 @@ def _wert_aus_messung(messung: dict, tarife: dict | None = None) -> float | None
 def _rechung(messung: dict, tarife: dict | None = None) -> dict | None:
     """Die Postenliste EINER Messung aus der Historien-Zeile.
 
-    Die Rechnung selbst ist `tco_24` - seit A1 die vollstaendige: alle
-    Geräteraten der eigenen Laufzeit (inklusive Restschuld nach Monat 24)
-    und den Tarif phasengewichtet, wo der Tarifbestand Phasen nennt.
-    Dieses Modul ZERLEGT sie nur fuer die Anzeige: der `betrag` je Posten
-    kommt aus `Tco.bestandteile`, nichts wird hier neu addiert. Es gibt
-    genau zwei Preisformen (aufgeteilt: Tarif und Rate getrennt; zusammen:
-    1&1 nennt EINEN Bündelmonatspreis) - Boni und Geraeteanteil stehen
-    nicht in der Historie und erscheinen deshalb nicht (kein Posten wird
-    erfunden).
-
-    Die Schluessel von `bestandteile` werden EXAKT konstruiert, wie
-    `tco_24` sie schreibt - ein startswith-Praefix wuede eine stille
-    Umbenennung dort ueberhoeren; hier fehlt der Posten und die Summe
-    geht nicht auf, was der Summen-Test meldet.
+    Gerechnet wird nur in `tco_24` (A1: alle Raten, Tarif phasengewichtet);
+    hier wird ZERLEGT, der `betrag` je Posten kommt aus `Tco.bestandteile`
+    (Schluessel EXAKT wie dort, sonst fehlt ein Posten und die Summe geht
+    nicht auf). Zwei Preisformen: aufgeteilt (Tarif und Rate) und zusammen
+    (1&1, ein Bündelbetrag); Boni stehen nicht in der Historie. `monate`
+    ist der Zeitraum der Leitzahl (`Tco.leitzahl_monate`) fuer ihr Etikett.
     """
     satz = messung["satz"]
     b = _buendel_aus_messung(messung, tarife)
@@ -852,6 +846,7 @@ def _rechung(messung: dict, tarife: dict | None = None) -> dict | None:
     return {
         "posten": posten,
         "gesamt": t.gesamt,
+        "monate": t.leitzahl_monate,
         "offen": offen,
         "datum": satz.get("datum") or "",
         "quelle_url": satz.get("quelle_url") or "",
@@ -918,8 +913,7 @@ def _rechung_html(anbieter: str, messung: dict, tarife: dict | None = None) -> s
     teile.append("</ul>")
     teile.append(
         f"<p class='gr-zr-rsumme'>= <b>{_euro(r['gesamt'])}</b> "
-        f"<span class='gr-zr-plabel'>Kosten über "
-        f"{TCO_HORIZONT} Monate</span></p>"
+        f"<span class='gr-zr-plabel'>{label_der_leitzahl(r['monate'])}</span></p>"
     )
     if r["offen"] is not None:
         teile.append(
