@@ -13,8 +13,6 @@ layers =
     telco_radar.analyze
     telco_radar.collect
 ignore_imports =
-    telco_radar.collect.ct_log -> telco_radar.analyze.llm
-    telco_radar.analyze.diff_curator -> telco_radar.report.differentiation
 
 [importlinter:contract:wurzel-unten]
 name = Wurzelmodule importieren keine Schicht

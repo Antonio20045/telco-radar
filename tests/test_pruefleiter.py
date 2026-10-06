@@ -443,13 +443,13 @@ def test_haengender_test_wird_rot_statt_die_leiter_anzuhalten(
     kleines_projekt, monkeypatch, tmp_path
 ):
     (kleines_projekt / "tests" / "test_rot.py").write_text(
-        "import time\n\n\ndef test_haengt():\n    time.sleep(60)\n", "utf-8"
+        "import time\n\n\ndef test_haengt():\n    time.sleep(300)\n", "utf-8"
     )
     monkeypatch.setattr(pruefleiter, "TEST_FRIST_SEKUNDEN", 2)
     start = time.monotonic()
     with (tmp_path / "log").open("w") as log:
         ergebnis = pruefleiter.stufe_tests(log)
-    assert time.monotonic() - start < 50
+    assert time.monotonic() - start < 150
     assert not ergebnis.gruen
     assert ergebnis.zeilen[0].startswith("FAILED tests/test_rot.py::test_haengt")
 

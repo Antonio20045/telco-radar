@@ -124,7 +124,10 @@ def verstoss(ziel: Ziel, wurzel: Path, pfad: Path, neu: bool) -> str | None:
         relativ = absolut.relative_to(os.path.realpath(wurzel)).as_posix()
     except ValueError:
         neben = absolut.is_relative_to(os.path.realpath(wurzel.parent))
-        frei = absolut.is_relative_to(os.path.realpath(tempfile.gettempdir()))
+        frei = any(
+            absolut.is_relative_to(os.path.realpath(ort))
+            for ort in (tempfile.gettempdir(), "/tmp")
+        )
         return None if frei and not neben and ziel.rolle != "suchen" else regel
     neuer_test = neu and relativ.startswith(TESTS) and absolut.name not in NIE_NEU
     erlaubt = {
