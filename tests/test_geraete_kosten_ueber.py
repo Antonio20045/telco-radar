@@ -1,8 +1,10 @@
 """`kosten_ueber`: was ein Bündel über H Monate kostet (Datenkonzept Geräte 5.3).
 
 H ist der größere Wert aus Ratenlaufzeit N und Tarifbindung; die 36er-Ansicht
-rechnet 36 Tarifmonate (Entscheidung 1). Für H = 24 ist es dieselbe Zahl wie
-`tco_24`, gegengeprüft an jedem Bündel des Schnappschusses. Die Tests importieren
+rechnet 36 Tarifmonate (Entscheidung 1). Ein gemessener Grundpreis ohne Preisphasen
+ist nur für die Tarifbindung belegt (ohne Bindung 24 Monate); jeder Monat danach ohne
+belegten Preis ist eine Lücke. Für H = 24 ist es dieselbe Zahl wie `tco_24`,
+gegengeprüft an jedem Bündel des Schnappschusses. Die Tests importieren
 `kosten_ueber` in der Testfunktion, damit ein fehlender Bau ein roter Test ist.
 """
 
@@ -33,8 +35,10 @@ from telco_radar.tco_model import (
     tco_24,
 )
 
+TARIF_24 = "Tarif über 24 Monate"
 TARIF_36 = "Tarif über 36 Monate"
 RATEN_36 = "Geräteraten über 36 Monate"
+AB_25 = f"{POSTEN_TARIF} Monat 25–36"
 
 
 def _o2(**kw) -> Buendel:
@@ -53,6 +57,11 @@ def _o2(**kw) -> Buendel:
     )
     felder.update(kw)
     return Buendel(**felder)
+
+
+def _blatt(betrag: float) -> list[Preisphase]:
+    """Ein Tarifblatt, das den Preis ohne Ende nennt: belegt auch ab Monat 25."""
+    return [Preisphase(1, None, betrag)]
 
 
 def _einsundeins(**kw) -> Buendel:
@@ -75,7 +84,7 @@ def test_36_raten_bei_24_monaten_bindung_zaehlen_zwoelf_tarifmonate_mehr():
     (1.794,76 €); der Abstand sind genau zwölf Monate Tarif, 12 × 19,99 = 239,88 €."""
     from telco_radar.tco_model import kosten_ueber
 
-    b = _o2()
+    b = _o2(tarif_phasen=_blatt(19.99))
     k = kosten_ueber(b, 36)
     assert k.posten == {
         TARIF_36: 719.64,
@@ -94,6 +103,40 @@ def test_36_raten_bei_24_monaten_bindung_zaehlen_zwoelf_tarifmonate_mehr():
     assert ausstieg.posten[RATEN_36] == 1314.00, "alle 36 Raten bleiben geschuldet"
 
 
+@pytest.mark.parametrize(
+    ("bindung", "luecken_36", "luecken_24"),
+    [
+        (24, [AB_25], []),
+        (None, [AB_25], []),
+        (0, [AB_25], []),
+        (36, [], [AB_25]),
+    ],
+)
+def test_ein_grundpreis_ohne_phasen_ist_nur_fuer_die_bindung_belegt(
+    bindung, luecken_36, luecken_24
+):
+    """Ohne Phasen gilt der gemessene Preis als Phase 1 bis Bindung, ohne Bindung bis
+    24; ab Monat 25 nennt ihn die Seite nicht, also wird er nicht fortgeschrieben. Bei
+    36 Monaten Bindung sind die Monate 25 bis 36 über 24 Monate geschuldet."""
+    from telco_radar.tco_model import kosten_ueber
+
+    b = _o2(tarif_bindung_monate=bindung)
+    k = kosten_ueber(b, 36)
+    assert k.luecken == luecken_36
+    assert k.gesamt == (None if luecken_36 else 2034.64)
+    assert (TARIF_36 in k.posten) == (not luecken_36)
+
+    als_phase = _o2(
+        tarif_bindung_monate=bindung, tarif_phasen=[Preisphase(1, 24, 19.99)]
+    )
+    assert kosten_ueber(als_phase, 36).luecken == [AB_25]
+
+    vierundzwanzig = kosten_ueber(b, 24)
+    assert vierundzwanzig.luecken == luecken_24
+    assert vierundzwanzig.gesamt == (None if luecken_24 else 1794.76)
+    assert tco_24(b).gesamt == 1794.76
+
+
 def test_jeder_tarifmonat_zaehlt_zum_preis_seiner_phase():
     """„23,95 € für 24 Monate, danach 31,95 €“ (Datenkonzept, Regel 3) über 36 Monate:
     0,99 + 24 × 23,95 + 12 × 31,95 + 36 × 42,50 + 0 = 2.489,19 €."""
@@ -107,8 +150,9 @@ def test_jeder_tarifmonat_zaehlt_zum_preis_seiner_phase():
     assert k.gesamt == 2489.19
     assert round(k.gesamt - tco_24(b).gesamt, 2) == round(12 * 31.95, 2)
 
-    flach = kosten_ueber(_o2(**felder), 36)
-    assert flach.gesamt == 2393.19 != k.gesamt
+    durchgehend = kosten_ueber(_o2(tarif_phasen=_blatt(23.95), **felder), 36)
+    assert durchgehend.gesamt == 2393.19 != k.gesamt
+    assert kosten_ueber(_o2(**felder), 36).luecken == [AB_25]
 
 
 def test_ohne_preis_ab_monat_25_ist_die_36er_zahl_eine_luecke():
@@ -119,12 +163,23 @@ def test_ohne_preis_ab_monat_25_ist_die_36er_zahl_eine_luecke():
     b.tarif_phasen = [Preisphase(1, 24, 23.95)]
     k = kosten_ueber(b, 36)
     assert (k.gesamt, k.monatlich) == (None, None)
-    assert k.luecken == [f"{POSTEN_TARIF} Monat 25–36"]
+    assert k.luecken == [AB_25]
     assert TARIF_36 not in k.posten
 
     vierundzwanzig = kosten_ueber(b, 24)
     assert vierundzwanzig.luecken == []
     assert vierundzwanzig.gesamt == tco_24(b).gesamt == 1889.80
+
+
+def test_eine_phasenluecke_unter_24_monaten_weicht_bewusst_von_tco_24_ab():
+    """`tco_24` schreibt den letzten Preis fort (`phasensumme`), `kosten_ueber` nennt
+    die Lücke. Im Schnappschuss kommt keine solche Phasenlücke vor."""
+    from telco_radar.tco_model import kosten_ueber
+
+    b = _o2(laufzeit_monate=24, tarif_phasen=[Preisphase(1, 12, 19.99)])
+    k = kosten_ueber(b, 24)
+    assert (k.gesamt, k.luecken) == (None, [f"{POSTEN_TARIF} Monat 13–24"])
+    assert tco_24(b).gesamt == round(1 + 24 * 19.99 + 24 * 36.50, 2)
 
 
 def test_ein_monat_mit_zwei_preisen_ist_eine_luecke():
@@ -139,6 +194,33 @@ def test_ein_monat_mit_zwei_preisen_ist_eine_luecke():
 
     b.tarif_phasen = [Preisphase(1, 12, 20.00), Preisphase(13, None, 25.00)]
     assert kosten_ueber(b, 36).gesamt == round(1 + 12 * 20 + 24 * 25 + 36 * 36.50, 2)
+
+
+@pytest.mark.parametrize(
+    ("bindung", "luecken", "gesamt"),
+    [
+        (24, [f"{POSTEN_TARIF} Monat 13–24"], None),
+        (None, [f"{POSTEN_TARIF} Monat 13–24"], None),
+        (0, [], 1458.40),
+    ],
+)
+def test_ein_zeitraum_unter_der_bindung_laesst_keine_tarifmonate_weg(
+    bindung, luecken, gesamt
+):
+    """Vodafone, 12 Raten, 24 Monate gebunden: über 12 Monate fehlen die geschuldeten
+    Tarifmonate 13 bis 24. Pflicht über 24 Monate: 1 + 24 × 41,95 + 12 × 79,50 + 0 =
+    1.961,80 €. Ohne Mindestlaufzeit ist nichts geschuldet: 1 + 12 × 41,95 + 954."""
+    from telco_radar.tco_model import kosten_ueber
+
+    b = _o2(
+        laufzeit_monate=12,
+        tarif_monatlich=41.95,
+        geraet_monatsrate=79.50,
+        tarif_bindung_monate=bindung,
+    )
+    k = kosten_ueber(b, 12)
+    assert (k.gesamt, k.luecken) == (gesamt, luecken)
+    assert kosten_ueber(b, 24).gesamt == tco_24(b).gesamt == 1961.80
 
 
 def test_ein_vertrag_zaehlt_h_mal_den_buendelbetrag():
@@ -188,7 +270,7 @@ def test_ein_vertrag_ueber_einen_anderen_zeitraum_ist_eine_luecke(monate):
 def test_der_standardzeitraum_ist_der_groessere_wert(felder, erwartet):
     from telco_radar.tco_model import kosten_ueber, zeitraum
 
-    b = _o2(**felder)
+    b = _o2(tarif_phasen=_blatt(19.99), **felder)
     assert zeitraum(b) == erwartet
     k = kosten_ueber(b)
     assert k.monate == erwartet
@@ -202,9 +284,9 @@ def test_ohne_ratenlaufzeit_gibt_es_keinen_zeitraum_und_keine_zahl():
     b = _o2(laufzeit_monate=None)
     assert zeitraum(b) is None
     assert kosten_ueber(b).luecken == [POSTEN_ZEITRAUM, POSTEN_LAUFZEIT]
-    k = kosten_ueber(b, 36)
+    k = kosten_ueber(b, 24)
     assert (k.gesamt, k.ratenlaufzeit, k.luecken) == (None, None, [POSTEN_LAUFZEIT])
-    assert TARIF_36 in k.posten
+    assert TARIF_24 in k.posten
 
 
 @pytest.mark.parametrize(
@@ -219,9 +301,9 @@ def test_ohne_ratenlaufzeit_gibt_es_keinen_zeitraum_und_keine_zahl():
 def test_ein_fehlender_posten_ist_eine_luecke_und_nie_null(feld, luecke):
     from telco_radar.tco_model import kosten_ueber
 
-    voll = kosten_ueber(_o2(), 36)
+    voll = kosten_ueber(_o2(), 24)
     assert voll.luecken == [] and voll.gesamt is not None
-    k = kosten_ueber(_o2(**{feld: None}), 36)
+    k = kosten_ueber(_o2(**{feld: None}), 24)
     assert (k.gesamt, k.monatlich) == (None, None)
     assert k.luecken == [luecke]
     assert len(k.posten) == len(voll.posten) - 1
@@ -234,6 +316,7 @@ def test_boni_und_aktionen_gehen_nie_ein():
 
     quelle = "https://www.o2online.de/handys/apple-iphone-17-pro/"
     b = _o2(
+        tarif_phasen=_blatt(19.99),
         rabatte=[Rabatt(name="Wechselbonus", betrag_monatlich=10.0, bis_monat=6)],
         aktionen=[
             Aktion(
@@ -252,7 +335,8 @@ def test_boni_und_aktionen_gehen_nie_ein():
         ],
     )
     assert b.rabatte[0].wert(36) == 60.0
-    mit, ohne = kosten_ueber(b, 36), kosten_ueber(_o2(), 36)
+    mit = kosten_ueber(b, 36)
+    ohne = kosten_ueber(_o2(tarif_phasen=_blatt(19.99)), 36)
     assert (mit.gesamt, mit.posten, mit.luecken) == (ohne.gesamt, ohne.posten, [])
     assert mit.gesamt == 2034.64
 
@@ -323,11 +407,8 @@ def _gebunden_bis_24(b: Buendel) -> bool:
     return b.tarif_bindung_monate is None or b.tarif_bindung_monate <= 24
 
 
-def _preis_im_monat(b: Buendel, monat: int) -> float:
-    """Der Tarifpreis eines Monats aus Phase oder Grundpreis, ohne `phasensumme`."""
-    if not b.tarif_phasen:
-        assert b.tarif_monatlich is not None, b.id
-        return b.tarif_monatlich
+def _phasenpreis(b: Buendel, monat: int) -> float:
+    """Der Preis eines Monats aus der einen Phase, die ihn nennt, ohne `phasensumme`."""
     treffer = [
         p.betrag
         for p in b.tarif_phasen
@@ -359,11 +440,12 @@ def test_am_bestand_ist_es_bis_24_raten_dieselbe_zahl_wie_tco_24(raten, anzahl, 
     assert (len(auswahl), mit_phasen) == (anzahl, phasen)
 
 
-def test_am_bestand_zaehlen_36_raten_genau_zwoelf_tarifmonate_mehr():
-    """Jedes 36-Raten-Bündel mit höchstens 24 Monaten Bindung: Kosten über 36 Monate
-    minus `tco_24` sind zwölf Monate Tarif zum Preis ab Monat 25. Im Schnappschuss
-    ändert kein Tarif ab Monat 25 seinen Preis; den Wechsel prüft
-    `test_jeder_tarifmonat_zaehlt_zum_preis_seiner_phase`."""
+def test_am_bestand_zaehlen_36_raten_zwoelf_tarifmonate_nur_mit_belegtem_preis():
+    """Jedes 36-Raten-Bündel mit höchstens 24 Monaten Bindung. Nennt ein Tarifblatt den
+    Preis ohne Ende (congstar, Telekom), sind Kosten über 36 Monate minus `tco_24` zwölf
+    Monate zu diesem Preis. Ohne Phasen ist nur die Bindung belegt, Monat 25 bis 36
+    sind eine Lücke: o2, Vodafone (die Bestellstrecke misst 31,95 €, das Blatt nennt
+    ohne Smartphone-Zuschlag 29,95 €) und congstar ohne Blatt."""
     from telco_radar.tco_model import kosten_ueber
 
     auswahl = [
@@ -373,16 +455,21 @@ def test_am_bestand_zaehlen_36_raten_genau_zwoelf_tarifmonate_mehr():
         and b.laufzeit_monate == 36
         and _gebunden_bis_24(b)
     ]
-    mit_phasen = 0
+    belegt = 0
     for b in auswahl:
         k, t = kosten_ueber(b, 36), tco_24(b)
-        assert (k.luecken, k.monate, k.ratenlaufzeit) == ([], 36, 36), b.id
-        assert kosten_ueber(b).gesamt == k.gesamt, b.id
+        assert (k.monate, k.ratenlaufzeit) == (36, 36), b.id
+        assert kosten_ueber(b).luecken == k.luecken, b.id
         assert k.posten[RATEN_36] == t.bestandteile[RATEN_36], b.id
-        zwoelf = round(12 * _preis_im_monat(b, 25), 2)
+        if not b.tarif_phasen:
+            assert (k.gesamt, k.luecken) == (None, [AB_25]), b.id
+            continue
+        zwoelf = round(12 * _phasenpreis(b, 25), 2)
+        assert k.luecken == [], b.id
         assert round(k.gesamt - t.gesamt, 2) == zwoelf > 0, b.id
-        mit_phasen += bool(b.tarif_phasen)
-    assert (len(auswahl), mit_phasen) == (2354, 468)
+        belegt += 1
+    assert (len(auswahl), belegt) == (2354, 468)
+    assert {b.anbieter for b in auswahl if b.tarif_phasen} == {"congstar", "Telekom"}
 
 
 def test_am_bestand_rechnet_ein_vertrag_seine_laufzeit_wie_tco_24():

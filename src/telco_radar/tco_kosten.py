@@ -6,10 +6,12 @@ Datenkonzept Geräte 5.3 und Entscheidung 1 (die 36er-Ansicht rechnet 36 Tarifmo
                          + Tarif in jedem Monat 1 bis H zum Preis seiner Phase
     ein Vertrag (1&1):   = Anzahlung + Anschluss + H × Bündelbetrag
 
-H ist der größere Wert aus Ratenlaufzeit N und Tarifbindung (`zeitraum`). Fehlt ein
-Posten, ist `Kosten.gesamt` None und die Lücke benannt; Boni und Aktionen gehen nie
-ein, eingerechnete Aktionen stecken schon in der gemessenen Rate. Für H = 24 ist es
-dieselbe Zahl wie `tco_24`.
+H ist der größere Wert aus Ratenlaufzeit N und Tarifbindung (`zeitraum`). Ein
+gemessener Grundpreis ohne Preisphasen ist nur bis zum Ende der Bindung belegt (ohne
+Bindung 24 Monate); die Bestellstrecke nennt ihn nicht für die Monate danach. Fehlt
+ein Posten oder der Preis eines Monats, ist `Kosten.gesamt` None und die Lücke
+benannt; Boni und Aktionen gehen nie ein, eingerechnete Aktionen stecken schon in der
+gemessenen Rate. Für H = 24 ist es dieselbe Zahl wie `tco_24`.
 
 `tco_model` reexportiert `Kosten`, `kosten_ueber` und `zeitraum` und lädt dieses Modul
 dafür beim eigenen Laden. Die Namen aus `tco_model` liest dieses Modul deshalb erst
@@ -21,8 +23,9 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
+from .tarif_model import Preisphase
+
 if TYPE_CHECKING:
-    from .tarif_model import Preisphase
     from .tco_model import Buendel
 
 ZEITRAUM_OHNE_BINDUNG = 24
@@ -68,10 +71,15 @@ def kosten_ueber(buendel: Buendel, monate: int | None = None) -> Kosten:
     """Was `buendel` über `monate` Monate kostet, ohne `monate` über `zeitraum`.
 
     Getrennte Preisform: der Tarif in jedem Monat 1 bis H, alle N Raten (auch die
-    nach Monat H), Anzahlung und Anschluss. Ein Vertrag (`buendel_monatlich`) trägt
+    nach Monat H), Anzahlung und Anschluss; endet H vor der Tarifbindung, fehlen die
+    geschuldeten Tarifmonate danach. Ein Vertrag (`buendel_monatlich`) trägt
     H × Bündelbetrag nur für H = N: davor fehlt die Einmalzahlung bei Kündigung,
     danach der Preis. Ein `monate`, das keine ganze Zahl über null ist, ist ein
     Aufruffehler (ValueError).
+
+    Abweichung von `tco_24`: Nennen die Preisphasen einen Monat bis 24 nicht, ist er
+    hier eine Lücke; `tco_24` schreibt über `phasensumme` den letzten Preis fort. Im
+    Schnappschuss vom 3. Oktober 2026 kommt keine solche Phasenlücke vor.
     """
     from .tco_model import monatsschnitt
 
@@ -112,29 +120,39 @@ def _vertrag(k: Kosten, betrag: float, laufzeit: int | None, h: int) -> None:
 
 
 def _tarif(k: Kosten, buendel: Buendel, h: int) -> None:
-    """Der Tarif in jedem Monat 1 bis H: aus den Preisphasen, ohne sie flach.
+    """Der Tarif in jedem Monat 1 bis H zum Preis der einen Phase, die ihn nennt.
 
-    Ein Monat ohne genau eine Phase hat keinen bestimmbaren Preis und wird nicht mit
-    dem Grundpreis oder der letzten Phase gefüllt.
+    Ohne Phasen ist der gemessene Grundpreis eine Phase bis zum Ende der Bindung.
+    Ein Monat ohne genau eine Phase wird nicht gefüllt, sondern Lücke, ebenso jeder
+    geschuldete Tarifmonat der Bindung nach Monat H.
     """
     from .tco_model import POSTEN_TARIF, phasensumme
 
-    phasen = buendel.tarif_phasen
-    monate = range(1, h + 1)
-    offen = [m for m in monate if _preise_im_monat(phasen, m) != 1] if phasen else []
-    if offen:
-        k.luecken += [f"{POSTEN_TARIF} Monat {s}" for s in _spannen(offen)]
-        return
-    if phasen:
-        summe = phasensumme(phasen, h)
-    elif buendel.tarif_monatlich is not None:
-        summe = round(buendel.tarif_monatlich * h, 2)
-    else:
-        summe = None
-    if summe is None:
+    bindung = buendel.tarif_bindung_monate
+    pflicht = ZEITRAUM_OHNE_BINDUNG if bindung is None else bindung
+    phasen = buendel.tarif_phasen or _grundpreis_als_phase(
+        buendel.tarif_monatlich, pflicht
+    )
+    if not phasen:
         k.luecken.append(POSTEN_TARIF)
-    else:
+        return
+    offen = [m for m in range(1, h + 1) if _preise_im_monat(phasen, m) != 1]
+    k.luecken += [f"{POSTEN_TARIF} Monat {s}" for s in _spannen(offen)]
+    summe = None if offen else phasensumme(phasen, h)
+    if summe is not None:
         k.posten[f"Tarif über {h} Monate"] = summe
+    elif not offen:
+        k.luecken.append(POSTEN_TARIF)
+    if h < pflicht:
+        k.luecken.append(f"{POSTEN_TARIF} Monat {_spanne(h + 1, pflicht)}")
+
+
+def _grundpreis_als_phase(preis: float | None, bindung: int) -> list[Preisphase]:
+    """Der gemessene Grundpreis als Phase bis zum Ende der Bindung; ohne Bindung
+    (0 Monate) gilt er `ZEITRAUM_OHNE_BINDUNG` Monate wie bei unbekannter Bindung."""
+    if preis is None:
+        return []
+    return [Preisphase(1, bindung if bindung > 0 else ZEITRAUM_OHNE_BINDUNG, preis)]
 
 
 def _geraet_und_anschluss(k: Kosten, buendel: Buendel) -> None:
