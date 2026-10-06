@@ -203,8 +203,13 @@ def test_telekom_steht_ueberall_mit_ihrem_datenstand(bestand):
     ein Manager ohne Technik-Hintergrund liest (S-Q1, Review 05.09.2026):
     kein "GitHub Actions", keine "202-Challenge", keine "Phase T". Die
     technische Ursache steht in `config/geraete_quellen.yaml`, nicht im
-    Nutzer-Sichtbaren."""
-    mit_zahl = leer = 0
+    Nutzer-Sichtbaren.
+
+    Seit der Prüfrunde DK23 hat keine Telekom-Karte des Bestands eine Zahl:
+    Telekom führt nur 36 Raten, und kein Telekom-Blatt nennt den Tarif ab Monat
+    25. Jede ihrer 45 Bündelkarten nennt diese Lücke, jede andere Karte den
+    fehlenden Bündelpreis."""
+    mit_zahl = leer = luecke_ab_25 = 0
     for modell in bestand["modelle"]:
         karten = [k for k in modell["karten"] if k["anbieter"] == "Telekom"]
         assert karten, f"{modell['id']}: Telekom-Karte fehlt (B.2.5)"
@@ -217,8 +222,10 @@ def test_telekom_steht_ueberall_mit_ihrem_datenstand(bestand):
                 assert karte["leer_grund"].strip()
                 for jargon in ("GitHub Actions", "202-Challenge", "Phase T"):
                     assert jargon not in karte["leer_grund"]
-    assert mit_zahl, "keine belastbare Telekom-Karte im Bestand"
-    assert leer, "kein Telekom-Leerzustand im Bestand"
+                luecke_ab_25 += "Tarifgrundpreis Monat 25–36" in karte["leer_grund"]
+    assert mit_zahl == 0, f"{mit_zahl} Telekom-Karten mit Zahl ohne Preis ab Monat 25"
+    assert luecke_ab_25 == 45, luecke_ab_25
+    assert leer > luecke_ab_25, "kein Telekom-Modell ohne Bündel im Bestand"
 
 
 def test_antwortzeile_nennt_je_metrik_die_guenstigste_zahl_mit_anbieter(bestand):
@@ -727,29 +734,35 @@ def test_g1_entsteht_erst_ab_zwei_zahlen(bestand):
 
 
 def test_g1_zeichnet_keine_karte_ohne_zahl(bestand):
-    """B2 (08.09.2026): apple-iphone-17-pro-256 fuehrt inzwischen EIN
-    Telekom-Bündel - der Balken gehoert dort also HIN. Gemessen wird die
-    REGEL statt eines festen Modells: ein Modell MIT belastbarer
-    Telekom-Karte zeichnet ihren Balken, ein Modell OHNE zeichnet keinen
-    (ein Balken der Laenge null mit Namen liest sich als kostenlos)."""
+    """Gemessen wird die REGEL statt eines festen Modells: ein Modell MIT
+    belastbarer Karte eines Anbieters zeichnet ihren Balken, ein Modell OHNE
+    zeichnet keinen (ein Balken der Laenge null mit Namen liest sich als
+    kostenlos). Bis zur Prüfrunde DK23 an Telekom gemessen; seitdem hat keine
+    Telekom-Karte des Bestands eine Zahl (nur 36 Raten, kein Blatt nennt
+    Monat 25), und congstar trägt beide Zustände."""
+    assert not any(
+        k["anbieter"] == "Telekom" and k["belastbar"]
+        for m in bestand["modelle"]
+        for k in m["karten"]
+    )
     mit = [
         m
         for m in bestand["modelle"]
-        if any(k["anbieter"] == "Telekom" and k["belastbar"] for k in m["karten"])
+        if any(k["anbieter"] == "congstar" and k["belastbar"] for k in m["karten"])
     ]
     ohne = [
         m
         for m in bestand["modelle"]
-        if not any(k["anbieter"] == "Telekom" and k["belastbar"] for k in m["karten"])
+        if not any(k["anbieter"] == "congstar" and k["belastbar"] for k in m["karten"])
     ]
-    assert mit, "kein Modell mit Telekom-Bündel - der positive Fall fehlt"
-    assert ohne, "kein Modell ohne Telekom-Bündel - der negative Fall fehlt"
+    assert mit, "kein Modell mit congstar-Bündel - der positive Fall fehlt"
+    assert ohne, "kein Modell ohne congstar-Bündel - der negative Fall fehlt"
 
     svg = grafik.balken(mit[0])
-    assert "Telekom" in svg, "ein vorhandenes Bündel muss einen Balken haben"
+    assert "congstar" in svg, "ein vorhandenes Bündel muss einen Balken haben"
 
     svg = grafik.balken(ohne[0])
-    assert "Telekom" not in svg, (
+    assert "congstar" not in svg, (
         "ein Balken der Laenge null mit Namen liest sich als kostenlos"
     )
     assert svg.count('class="gr-g1-betrag"') >= 2, (
@@ -1027,7 +1040,7 @@ def _buendel_ohne_listung(sku=_SKU_OHNE_LISTUNG, anbieter="o2"):
         abgerufen_am="2026-09-04",
     )
     b.tarif_bindung_monate = 24
-    b.tarif_phasen = [Preisphase(1, None, 14.99)]
+    b.tarif_phasen = [Preisphase(1, 24, 14.99), Preisphase(25, None, 14.99)]
     return b
 
 

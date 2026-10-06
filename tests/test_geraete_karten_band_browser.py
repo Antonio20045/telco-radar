@@ -157,6 +157,8 @@ def _buendel(
 
 
 def _tarif(anbieter, tarif_id, tarif_name, gb, betrag):
+    """Ein Tarifblatt, dessen Phasentabelle den Preis ab Monat 25 nennt - sonst
+    hätte die 36-Raten-Zeile keine Zahl (Prüfrunde DK23)."""
     return {
         "anbieter": anbieter,
         "name": tarif_name,
@@ -165,7 +167,10 @@ def _tarif(anbieter, tarif_id, tarif_name, gb, betrag):
         "grundgebuehr": betrag,
         "laufzeit_monate": 24,
         "datenvolumen_gb": gb,
-        "preisphasen": [{"von_monat": 1, "bis_monat": None, "betrag": betrag}],
+        "preisphasen": [
+            {"von_monat": 1, "bis_monat": 24, "betrag": betrag},
+            {"von_monat": 25, "bis_monat": None, "betrag": betrag},
+        ],
         "dokument_url": f"https://example.de/pib/{tarif_id}",
         "abgerufen_am": HEUTE,
         "confidence": {},

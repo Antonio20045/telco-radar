@@ -4191,6 +4191,10 @@ circle.gr-zr-punkt.gr-zr-aktiv{stroke:var(--ink);stroke-width:2.8}
   margin:14px 0 4px}
 .gr-buendel--alle .gr-bnd-delta,.gr-buendel--alle .gr-bnd-kopf-delta{
   visibility:hidden}
+/* Auch aufgeklappt: der ausgeschriebene Abstand zur Vodafone-Referenz und
+   der Satz, warum es keinen gibt, gehören zu einer Ansicht mit Vergleich. */
+.gr-buendel--alle .gr-kk-delta,.gr-buendel--alle .gr-kk-luecke--delta{
+  display:none}
 .gr-zr-laufzeiten .gr-zr-kurz{display:none}
 /* --- P3-E3 (28.09.2026): Aktionen ------------------------------------ */
 /* Der Ueberhang einer nicht eingerechneten Aktion unter der Leitzahl -

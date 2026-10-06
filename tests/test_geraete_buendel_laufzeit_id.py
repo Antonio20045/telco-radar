@@ -187,12 +187,16 @@ _TCO_SICHT = {
 _TARIFE = {
     TARIF_ID: {
         "laufzeit_monate": 24,
-        "preisphasen": [{"von_monat": 1, "bis_monat": None, "betrag": 20.0}],
+        "preisphasen": [
+            {"von_monat": 1, "bis_monat": 24, "betrag": 20.0},
+            {"von_monat": 25, "bis_monat": None, "betrag": 20.0},
+        ],
     }
 }
-"""Das Tarifblatt nennt 20,00 EUR ohne Ende: seit Datenkonzept Geräte Schritt 2
-rechnet eine 36-Raten-Zeile 36 Tarifmonate und braucht dafür den Preis ab
-Monat 25 - ohne ihn wäre sie eine Lücke und kein Punkt der Reihe."""
+"""Die Phasentabelle nennt 20,00 EUR auch ab Monat 25: seit Datenkonzept Geräte
+Schritt 2 rechnet eine 36-Raten-Zeile 36 Tarifmonate und braucht dafür den Preis
+ab Monat 25 - ohne ihn wäre sie eine Lücke und kein Punkt der Reihe. Eine einzige
+Phase ohne Ende nennt ihn nicht (Prüfrunde DK23)."""
 
 
 def _historie_zeile(bid: str, datum: str, rate: float, laufzeit: int = 36) -> dict:

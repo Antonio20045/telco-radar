@@ -52,7 +52,7 @@ from typing import Optional
 
 from ..geraete_model import VERGLEICHBARE_ZUSTAENDE, ZUSTAENDE, normalisiere
 from ..tarif_model import Preisphase
-from ..tco_kosten import POSTEN_ZEITRAUM
+from ..tco_kosten import POSTEN_ZEITRAUM, belegte_phasen
 from ..tco_model import (
     AKTION_ANSCHLUSS_ERLASSEN,
     AKTION_GERAETERABATT,
@@ -792,13 +792,12 @@ def _grund(kosten) -> str:
 
 
 def _phase_ab(tarif: dict, monat: int) -> Optional[float]:
-    """Der Betrag, der im gegebenen Monat laut Pflichtdokument gilt."""
-    for phase in tarif.get("preisphasen") or []:
-        von = phase.get("von_monat") or 1
-        bis = phase.get("bis_monat")
-        if von <= monat and (bis is None or monat <= bis):
-            betrag = phase.get("betrag")
-            return round(float(betrag), 2) if betrag is not None else None
+    """Der Betrag, der im gegebenen Monat laut Pflichtdokument gilt - nur wo die
+    Quelle den Monat nennt (`tco_kosten.belegte_phasen`, dieselbe Regel wie H)."""
+    phasen = belegte_phasen(phasen_aus_tarifsatz(tarif), tarif.get("laufzeit_monate"))
+    for p in phasen:
+        if p.von_monat <= monat and (p.bis_monat is None or monat <= p.bis_monat):
+            return round(float(p.betrag), 2)
     return None
 
 

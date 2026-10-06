@@ -77,12 +77,16 @@ EINS_EINS_MESSUNG = {
 O2_TARIFE = {
     "o2:o2-mobile-on-demand-m": {
         "laufzeit_monate": 24,
-        "preisphasen": [{"von_monat": 1, "bis_monat": None, "betrag": 14.99}],
+        "preisphasen": [
+            {"von_monat": 1, "bis_monat": 24, "betrag": 14.99},
+            {"von_monat": 25, "bis_monat": None, "betrag": 14.99},
+        ],
     }
 }
-"""Der Tarifbestand zur o2-Messung: 14,99 € ohne Ende der Phase, also auch in den
-Monaten 25 bis 36 belegt. Ohne ihn hätte die 36-Raten-Messung keine Kernzahl
-(Datenkonzept Geräte 5.3: die 36er-Ansicht rechnet 36 Tarifmonate)."""
+"""Der Tarifbestand zur o2-Messung: die Phasentabelle nennt 14,99 € auch ab Monat 25,
+also sind die Monate 25 bis 36 belegt. Ohne sie hätte die 36-Raten-Messung keine
+Kernzahl (Datenkonzept Geräte 5.3: die 36er-Ansicht rechnet 36 Tarifmonate; eine
+einzige Phase ohne Ende nennt Monat 25 nicht, Prüfrunde DK23)."""
 
 
 def _messung(satz, *, anbieter="o2", tarif="O2 Mobile on Demand M Plus"):

@@ -309,8 +309,9 @@
        wird kein Text gebaut. `gr-kk-luecke` und NICHT `gr-kk-delta`:
        dessen Fettschrift in Alarmfarbe heisst "teurer als die Referenz",
        und genau das ist hier nicht belegt - eine benannte Luecke ist
-       zurueckgenommen (kursiv, grau), nicht laut. #}
-    <p class="gr-kk-luecke">{{ k.delta_zustand.satz }}</p>
+       zurueckgenommen (kursiv, grau), nicht laut. `--delta`: unter „alle“
+       tritt der Satz mit dem Δ zurück (style.css, Datenkonzept 5.4). #}
+    <p class="gr-kk-luecke gr-kk-luecke--delta">{{ k.delta_zustand.satz }}</p>
     {% endif %}
 
     {# Der Rechenweg. Jede Zahl der Zeile ist hier nachlesbar, samt dem, was

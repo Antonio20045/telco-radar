@@ -8,7 +8,8 @@ Datenkonzept Geräte 5.3 und Entscheidung 1 (die 36er-Ansicht rechnet 36 Tarifmo
 
 H ist der größere Wert aus Ratenlaufzeit N und Tarifbindung (`zeitraum`). Ein
 gemessener Grundpreis ohne Preisphasen ist nur bis zum Ende der Bindung belegt (ohne
-Bindung 24 Monate); die Bestellstrecke nennt ihn nicht für die Monate danach. Fehlt
+Bindung 24 Monate); die Bestellstrecke nennt ihn nicht für die Monate danach. Dasselbe
+gilt für eine einzige Phase ab Monat 1 ohne Ende (`belegte_phasen`). Fehlt
 ein Posten oder der Preis eines Monats, ist `Kosten.gesamt` None und die Lücke
 benannt; Boni und Aktionen gehen nie ein, eingerechnete Aktionen stecken schon in der
 gemessenen Rate. Für H = 24 ist es dieselbe Zahl wie `tco_24`.
@@ -132,7 +133,7 @@ def _tarif(k: Kosten, buendel: Buendel, h: int) -> None:
 
     bindung = buendel.tarif_bindung_monate
     pflicht = ZEITRAUM_OHNE_BINDUNG if bindung is None else bindung
-    phasen = buendel.tarif_phasen or _grundpreis_als_phase(
+    phasen = belegte_phasen(buendel.tarif_phasen, pflicht) or _grundpreis_als_phase(
         buendel.tarif_monatlich, pflicht
     )
     if not phasen:
@@ -147,6 +148,23 @@ def _tarif(k: Kosten, buendel: Buendel, h: int) -> None:
         k.luecken.append(POSTEN_TARIF)
     if h < pflicht:
         k.luecken.append(f"{POSTEN_TARIF} Monat {_spanne(h + 1, pflicht)}")
+
+
+def belegte_phasen(phasen: list[Preisphase], bindung: int | None) -> list[Preisphase]:
+    """Die Preisphasen, soweit die Quelle ihre Monate wirklich nennt.
+
+    Eine einzige Phase ab Monat 1 ohne Ende ist keine Phasentabelle, sondern der
+    Grundpreis: so schreibt ihn der Leser eines Produktinformationsblatts, das keine
+    Phasen nennt. Sie gilt wie `_grundpreis_als_phase` nur bis zum Ende der Bindung
+    (ohne Bindung 24 Monate). Über die Bindung hinaus trägt nur eine Tabelle, die
+    einen späteren Monat ausdrücklich nennt - für jeden Anbieter dieselbe Regel
+    (Datenkonzept Geräte 5.3: nennt die Quelle den Preis ab Monat 25 nicht, ist das
+    Bündel in der 36er-Ansicht eine Lücke).
+    """
+    if len(phasen) == 1 and phasen[0].von_monat == 1 and phasen[0].bis_monat is None:
+        pflicht = ZEITRAUM_OHNE_BINDUNG if bindung is None else bindung
+        return _grundpreis_als_phase(phasen[0].betrag, pflicht)
+    return list(phasen)
 
 
 def _grundpreis_als_phase(preis: float | None, bindung: int) -> list[Preisphase]:

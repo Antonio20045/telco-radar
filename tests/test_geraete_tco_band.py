@@ -158,7 +158,11 @@ def test_telekom_congstar_und_11_stehen_als_benannte_luecke(bestand):
     Anbieter - und beide Telekom-Zustaende treten wirklich ein
     (Lookup-Zeile, sonst pruefte der Test nur einen von beiden).
     Datenkonzept Geräte 5.4: der Graph zeichnet je Ratenlaufzeit - die Regel
-    gilt deshalb je Laufzeit, gegen die Karten DIESER Laufzeit."""
+    gilt deshalb je Laufzeit, gegen die Karten DIESER Laufzeit. Seit der
+    Prüfrunde DK23 ist Telekom im Bestand nirgends zeichenbar: sie führt nur
+    36 Raten, und kein Telekom-Blatt nennt den Tarif ab Monat 25. Die
+    Lookup-Zeile verlangt deshalb einen Anbieter in BEIDEN Zuständen, und
+    Telekom steht überall benannt."""
     modell = _modell(bestand, VORGABE_MODELL)
     je_laufzeit = [
         (
@@ -174,7 +178,7 @@ def test_telekom_congstar_und_11_stehen_als_benannte_luecke(bestand):
         )
     ]
     assert je_laufzeit, "kein Band vorhanden - Test prueft nichts"
-    telekom_gezeichnet = telekom_fehlend = 0
+    zustaende: dict = {}
     for eintrag, je_band in je_laufzeit:
         gezeichnet = set(je_band.get(eintrag["key"]) or {})
         namen = {f["anbieter"] for f in eintrag["fehlend"]}
@@ -186,12 +190,15 @@ def test_telekom_congstar_und_11_stehen_als_benannte_luecke(bestand):
         )
         for f in eintrag["fehlend"]:
             assert f["grund"], f"{f['anbieter']} hat keinen Grund"
-        if "Telekom" in gezeichnet:
-            telekom_gezeichnet += 1
-        if "Telekom" in namen:
-            telekom_fehlend += 1
-    assert telekom_gezeichnet, "Telekom nirgends gezeichnet - Bestand ohne Bündel?"
-    assert telekom_fehlend, "Telekom überall gezeichnet - der Lückenfall fehlt"
+        for anbieter in gezeichnet:
+            zustaende.setdefault(anbieter, set()).add("gezeichnet")
+        for anbieter in namen:
+            zustaende.setdefault(anbieter, set()).add("fehlend")
+    assert any(z == {"gezeichnet", "fehlend"} for z in zustaende.values()), (
+        f"kein Anbieter gezeichnet UND benannt - der Test prüft einen Zustand: "
+        f"{zustaende}"
+    )
+    assert zustaende.get("Telekom") == {"fehlend"}, zustaende.get("Telekom")
 
 
 def test_leerzustand_modell_ohne_buendel_in_keinem_band(bestand, tarife):

@@ -158,7 +158,8 @@ def _vodafone() -> Buendel:
 
 def _tarife():
     """congstar S mit 18 GB im Band der Vodafone-Karte: seit Teil B gibt es ein
-    Δ nur im selben Band und in derselben Ratenlaufzeit."""
+    Δ nur im selben Band und in derselben Ratenlaufzeit. Die Phasentabellen nennen
+    den Preis ab Monat 25, sonst hätte die 36-Raten-Zeile keine Zahl."""
     return mit_leiter(
         {
             t["tarif_id"]: t
@@ -172,7 +173,8 @@ def _tarife():
                     "laufzeit_monate": 24,
                     "datenvolumen_gb": 18,
                     "preisphasen": [
-                        {"von_monat": 1, "bis_monat": None, "betrag": 15.0}
+                        {"von_monat": 1, "bis_monat": 24, "betrag": 15.0},
+                        {"von_monat": 25, "bis_monat": None, "betrag": 15.0},
                     ],
                     "dokument_url": "https://example.de/pib/cs-s",
                     "abgerufen_am": HEUTE,
@@ -188,7 +190,8 @@ def _tarife():
                     "laufzeit_monate": 24,
                     "datenvolumen_gb": 18,
                     "preisphasen": [
-                        {"von_monat": 1, "bis_monat": None, "betrag": 29.95}
+                        {"von_monat": 1, "bis_monat": 24, "betrag": 29.95},
+                        {"von_monat": 25, "bis_monat": None, "betrag": 29.95},
                     ],
                     "dokument_url": "https://example.de/pib/vf-xs",
                     "abgerufen_am": HEUTE,

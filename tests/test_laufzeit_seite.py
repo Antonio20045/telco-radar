@@ -68,8 +68,14 @@ def _server(site):
         httpd.shutdown()
 
 
-def _baue_site(tmp_path):
-    root, _state = baue(tmp_path)
+def _baue_site(tmp_path, buendel=None, ohne_barpreis=False):
+    root, state = baue(tmp_path, buendel)
+    if ohne_barpreis:
+        db = json.loads((state / "geraete_db.json").read_text("utf-8"))
+        for e in db["listungen"]:
+            e["preis_ohne_vertrag"] = None
+            e["erstpreis"] = None
+        (state / "geraete_db.json").write_text(json.dumps(db), "utf-8")
     reports = root / "data" / "reports"
     reports.mkdir(parents=True)
     (reports / f"{HEUTE}.json").write_text(
@@ -262,6 +268,32 @@ def test_alle_gruppiert_die_zeilen_ohne_sieger_und_ohne_delta(_basis):
         )
 
 
+_DELTA_SICHTBAR = """() => [...document.querySelectorAll(
+  '#gr-bnd-gruppe .gr-bnd[open] .gr-kk-delta,'
+  + '#gr-bnd-gruppe .gr-bnd[open] .gr-kk-luecke--delta')]
+  .filter(e => e.offsetParent !== null
+               && getComputedStyle(e).visibility !== 'hidden')
+  .map(e => e.textContent.replace(/\\s+/g, ' ').trim())"""
+
+
+def test_unter_alle_steht_kein_delta_auch_nicht_aufgeklappt(_basis):
+    """Prüfrunde DK23: „alle“ zeigt kein Δ - auch nicht der Satz in der
+    aufgeklappten Zeile (o2 mit 24 Raten, 238,80 € unter Vodafone). Gegenprobe:
+    unter 24 steht derselbe Satz in derselben offenen Zeile."""
+    with _oeffne(_basis, "?laufzeit=alle") as s:
+        zeile = s.locator(
+            "#gr-bnd-gruppe details.gr-bnd[data-anbieter='o2'][data-lz='24']"
+        ).first
+        assert zeile.get_attribute("data-delta") == "-238.8"
+        zeile.locator("summary").click()
+        s.wait_for_timeout(400)
+        assert zeile.get_attribute("open") is not None
+        assert s.evaluate(_DELTA_SICHTBAR) == []
+        _waehle(s, "24")
+        sichtbar = s.evaluate(_DELTA_SICHTBAR)
+        assert len(sichtbar) == 1 and _euro(238.8) in sichtbar[0], sichtbar
+
+
 def test_der_link_haelt_die_wahl_und_verwirft_fremde_werte(_basis):
     with _oeffne(_basis) as s:
         _waehle(s, "12")
@@ -289,6 +321,24 @@ def test_am_telefon_stehen_band_und_laufzeit_in_einer_zeile(_basis):
         }""")
         assert lage["b"] == lage["l"], lage
         assert lage["rechts"] <= lage["breit"] and lage["quer"] <= lage["breit"]
+
+
+def test_der_katalog_nennt_die_raten_seines_monatsbetrags(tmp_path):
+    """Prüfrunde DK23: die Katalogzeile eines Geräts, das es nur im Bündel gibt,
+    nennt den Monatsbetrag der Standardansicht samt Raten (o2 mit 24 Raten,
+    25,00 + 40,00 €), nicht Vodafones 36er (60,95 €) ohne Laufzeit."""
+    buendel = [s for s in bestand() if s["anbieter"] in ("Vodafone", "o2")]
+    site = _baue_site(tmp_path, buendel, ohne_barpreis=True)
+    suppe = BeautifulSoup((site / "geraete.html").read_text("utf-8"), "html.parser")
+    zeile = next(
+        z
+        for z in suppe.select("#gr-katalogtabelle tr.gr-k-zeile")
+        if z.get("data-modell") == MODELL
+    )
+    text = " ".join(zeile.get_text(" ", strip=True).split())
+    assert "nur im Bündel" in text, text
+    assert f"ab {_euro(65.0)} €/Monat mit 24 Raten bei o2" in text, text
+    assert _euro(60.95) not in text, text
 
 
 def test_vodafone_ohne_zahl_heisst_nicht_nicht_erfasst(tmp_path):

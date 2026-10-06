@@ -158,7 +158,9 @@ def test_die_leitzahl_zeitraum_spalte_ist_die_von_tco_24(tco_csv):
     Seit Datenkonzept Geräte Schritt 2 ist der Zeitraum der aufgeteilten Form
     H = größerer Wert aus Ratenlaufzeit und Tarifbindung: 12 und 24 Raten
     tragen 24, 36 Raten 36. Die Gegenprobe bleibt: 12 Raten liegen unter
-    ihrem Zeitraum, und eine 36-Raten-Zeile trägt 36."""
+    ihrem Zeitraum, und eine 36-Raten-Zeile trägt 36 - auch als Lücke, denn
+    seit der Prüfrunde DK23 nennt kein Blatt im Bestand den Tarif ab Monat 25
+    (keine aufgeteilte 36er hat eine Zahl)."""
     from telco_radar.tco_model import TCO_HORIZONT
 
     kopf, zeilen = tco_csv
@@ -180,10 +182,18 @@ def test_die_leitzahl_zeitraum_spalte_ist_die_von_tco_24(tco_csv):
         assert z[idx["Leitzahl-Zeitraum Monate"]] == str(soll), z
     laenger = [
         z
-        for z in aufgeteilt
-        if z[idx["Laufzeit Monate"]] not in ("", str(TCO_HORIZONT))
+        for z in zeilen
+        if z[0] == "Bündel"
+        and not z[idx["Bündel/Monat EUR"]]
+        and z[idx["Laufzeit Monate"]] not in ("", str(TCO_HORIZONT))
     ]
+    for z in laenger:
+        soll = max(int(z[idx["Laufzeit Monate"]]), TCO_HORIZONT)
+        assert z[idx["Leitzahl-Zeitraum Monate"]] == str(soll), z
     assert {z[idx["Leitzahl-Zeitraum Monate"]] for z in laenger} == {"24", "36"}
+    assert not any(
+        _o4_leitzahl(z, idx) for z in laenger if z[idx["Laufzeit Monate"]] == "36"
+    ), "eine aufgeteilte 36er mit Zahl, obwohl kein Blatt Monat 25 nennt"
     assert laenger, (
         "keine aufgeteilte Zeile mit abweichender "
         "Ratenlaufzeit im Bestand - die Gegenprobe greift "

@@ -60,9 +60,14 @@ TARIFBLATT = {
     "name": "Allnet Flat XS",
     "grundgebuehr": TARIF_MONATLICH,
     "laufzeit_monate": 24,
-    "preisphasen": [{"von_monat": 1, "bis_monat": None, "betrag": TARIF_MONATLICH}],
+    "preisphasen": [
+        {"von_monat": 1, "bis_monat": 24, "betrag": TARIF_MONATLICH},
+        {"von_monat": 25, "bis_monat": None, "betrag": TARIF_MONATLICH},
+    ],
     "abgerufen_am": HEUTE,
 }
+"""Die Phasentabelle nennt den Preis ab Monat 25; eine einzige Phase ohne Ende
+nennte ihn nicht, und die 36er-Zahl wäre eine Lücke (Prüfrunde DK23)."""
 
 
 def _congstar_buendel(laufzeit: int) -> dict:

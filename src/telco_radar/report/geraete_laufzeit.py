@@ -45,6 +45,16 @@ def raten_laufzeit(b) -> int | None:
     return b.laufzeit_monate
 
 
+def rang_der_monatsangabe(laufzeit: int | None) -> tuple:
+    """Welche Ratenlaufzeit eine Monatsangabe („ab X €/Monat“) stellt: die
+    Standardansicht zuerst, dann aufsteigend, ohne bekannte Laufzeit zuletzt.
+
+    Wer nach (Rang, Betrag) das Minimum nimmt, vergleicht nur Beträge derselben
+    Laufzeit - 36 Raten werden nie gegen 24 gestellt (Regel 5).
+    """
+    return (laufzeit != LAUFZEIT_STANDARD, laufzeit is None, laufzeit or 0)
+
+
 def ansicht(karte: dict) -> int | None:
     """Die Laufzeit-Ansicht, in der diese Karte steht, oder `None`.
 

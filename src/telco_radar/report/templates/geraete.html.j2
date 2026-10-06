@@ -806,7 +806,8 @@
             m.ab_alt_marke }}</span>{% endif %}
           {%- elif m.nur_buendel %}
           <span class="gr-k-ab">nur im Bündel</span>
-          <span class="gr-a-klein">ab {{ m.buendel_monat | euro }}/Monat{% if m.buendel_anbieter %}
+          <span class="gr-a-klein">ab {{ m.buendel_monat | euro }}/Monat{% if
+            m.buendel_raten %} mit {{ m.buendel_raten }} Raten{% endif %}{% if m.buendel_anbieter %}
             bei {{ m.buendel_anbieter }}{% endif %}{% if m.buendel_beleg and m.buendel_beleg.quelle_url %} · <a
             class="gr-a-quelle" href="{{ m.buendel_beleg.quelle_url }}" rel="noopener"
             title="Bündel beim Anbieter öffnen">Beleg<span class="gr-a-pfeil"

@@ -16,6 +16,9 @@ Rechnung aus den Rohwerten im Test, nicht aus dem Produktcode:
                    1&1      340 + 39,90 + 36 × 42,99 = 1.927,54
                    Vodafone 1 + 36 × 29,95 + 36 × 31 = 2.195,20
 
+Die Tarife nennen ihren Preis ab Monat 25 ausdrücklich (Phasentabelle), sonst
+wäre die 36er-Zahl nach der Prüfrunde eine Lücke.
+
 Vor Teil B stellte die 12er-Karte von congstar den Sieger der 24-Monats-Tafel,
 Δ rechnete gegen die günstigste Vodafone-Karte über alle Laufzeiten, und 1&1
 trug „andere Laufzeit“. Jeder Test hier ist gegen diesen Stand rot.
@@ -83,7 +86,10 @@ def _tarif(anbieter, tid, name, gb, betrag):
         "grundgebuehr": betrag,
         "laufzeit_monate": 24,
         "datenvolumen_gb": gb,
-        "preisphasen": [{"von_monat": 1, "bis_monat": None, "betrag": betrag}],
+        "preisphasen": [
+            {"von_monat": 1, "bis_monat": 24, "betrag": betrag},
+            {"von_monat": 25, "bis_monat": None, "betrag": betrag},
+        ],
         "dokument_url": f"https://example.de/pib/{tid}",
         "abgerufen_am": HEUTE,
         "confidence": {},
@@ -500,3 +506,63 @@ def test_der_wettbewerbsradar_vergleicht_je_laufzeit(g):
 
 def paares_vf(paare: dict, laufzeit: int) -> set:
     return {z["vf_gesamt"] for (_a, lz), z in paare.items() if lz == laufzeit}
+
+
+def _nur_im_buendel(tmp_path, buendel: list[dict]) -> dict:
+    """Die Katalogzeile des Modells, wenn kein Laden es ohne Vertrag verkauft."""
+    root, state = baue(tmp_path, buendel)
+    db = json.loads((state / "geraete_db.json").read_text("utf-8"))
+    for e in db["listungen"]:
+        e["preis_ohne_vertrag"] = None
+        e["erstpreis"] = None
+    (state / "geraete_db.json").write_text(json.dumps(db), "utf-8")
+    g = geraete_view.aufbereiten(
+        state, lade_quellen(root), lade_katalog(root), heute=HEUTE
+    )
+    zeile = next(m for m in g["katalog_modelle"] if m["schluessel"] == MODELL)
+    assert zeile["nur_buendel"], zeile
+    return zeile
+
+
+def test_der_katalog_nennt_den_monatsbetrag_der_standardansicht(tmp_path):
+    """Prüfrunde DK23: „nur im Bündel, ab X €/Monat bei Y“ vergleicht nur Bündel
+    mit 24 Raten. Vodafone mit 36 Raten (29,95 + 31,00 = 60,95 €) ist billiger je
+    Monat als o2 mit 24 (25,00 + 40,00 = 65,00 €), aber mit 24 Raten ist o2
+    günstiger als Vodafone (29,95 + 45,00 = 74,95 €). Vorher: 60,95 bei
+    Vodafone, ohne Raten."""
+    buendel = [s for s in bestand() if s["anbieter"] in ("Vodafone", "o2")]
+    zeile = _nur_im_buendel(tmp_path, buendel)
+    assert (
+        zeile["buendel_anbieter"],
+        zeile["buendel_monat"],
+        zeile["buendel_raten"],
+    ) == ("o2", 65.0, 24)
+
+
+def test_ohne_24er_nennt_der_katalog_die_raten_des_gezeigten_buendels(tmp_path):
+    """Gegenprobe: ohne Bündel mit 24 Raten vergleicht die Zeile innerhalb der
+    kürzesten vorhandenen Ratenlaufzeit und nennt sie. o2 führt hier 12 Raten
+    (25,00 + 50,00 = 75,00 €) gegen Vodafone 12 Raten (29,95 + 80,00 =
+    109,95 €); Vodafones 36er (60,95 €) wäre der kleinere Monatsbetrag, aber
+    aus einer anderen Laufzeit."""
+    o2_zwoelf = {
+        "laufzeit_monate": 12,
+        "geraet_monatsrate": 50.0,
+        "id": buendel_id(SKU, "o2", "O2 Mobile S", 12),
+    }
+    buendel = [
+        s
+        for s in bestand(aendern={("o2", 24): o2_zwoelf})
+        if s["anbieter"] in ("Vodafone", "o2") and s["laufzeit_monate"] != 24
+    ]
+    assert sorted((s["anbieter"], s["laufzeit_monate"]) for s in buendel) == [
+        ("Vodafone", 12),
+        ("Vodafone", 36),
+        ("o2", 12),
+    ]
+    zeile = _nur_im_buendel(tmp_path, buendel)
+    assert (
+        zeile["buendel_anbieter"],
+        zeile["buendel_monat"],
+        zeile["buendel_raten"],
+    ) == ("o2", 75.0, 12)

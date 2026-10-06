@@ -60,7 +60,7 @@ from . import (
 )
 from . import geraete_notbremse as notbremse
 
-from .geraete_laufzeit import LAUFZEIT_STANDARD, ansicht
+from .geraete_laufzeit import LAUFZEIT_STANDARD, ansicht, rang_der_monatsangabe
 from .geraete_tco_band import _MONATE, band_label
 from ..analyze import geraete_lifecycle
 from ..analyze.tco_store import TcoDB
@@ -675,25 +675,20 @@ def _buendel_je_anbieter_modell(
 ) -> tuple[dict, dict]:
     """Zwei Lesarten derselben Bündel-Aufloesung.
 
-    1. `(Anbieter, modell_schluessel) -> das guenstigste Bündel mit
-       Monatspreis`, das zählt (`geraete_notbremse`) - die Monatsangabe "nur
-       im Bündel, ab X EUR/Monat" braucht einen Beleg aus `geraete_tco.json`,
-       NICHT das `preis_mit_vertrag_ab` der Listung (Belegzwang).
+    1. `(Anbieter, modell_schluessel) -> das guenstigste zählende Bündel mit
+       Monatspreis` (`geraete_notbremse`) - "nur im Bündel, ab X EUR/Monat"
+       braucht einen Beleg aus `geraete_tco.json`, NICHT das
+       `preis_mit_vertrag_ab` der Listung (Belegzwang).
     2. `modell_schluessel -> {device_id, speicher}` für JEDES Bündel, dessen
-       SKU auf ein Geraet aufloest - unabhaengig vom Monatspreis (P5-Auftrag
-       1, 18.09.2026: Sichtbarkeit folgt den Daten, nicht dem Weg - schon
-       EIN Bündel ohne Listung stellt die Katalog-Zeile, auch wenn aus ihm
-       noch keine Monatsangabe lesbar ist).
+       SKU auf ein Geraet aufloest, auch ohne Monatspreis (P5-Auftrag 1:
+       schon EIN Bündel ohne Listung stellt die Katalog-Zeile).
 
-    Die Aufloesung einer Bündel-SKU auf das Modell laeuft ueber den WEG von
-    `geraete_tco_karten.modelle()`: erst die Listung derselben SKU, dann der
-    Katalog (`geraet_aus_sku`) - eine zweite, eigene Aufloesung wuesste
-    bald etwas anderes als die TCO-Tafel ueber dasselbe Bündel.
-
-    Der Monatsbetrag ist die Angabe des ANBIETERS, nie eine Rechnung dieses
-    Projekts: `buendel_monatlich` (so verkauft 1&1, § 13.2) und nur wenn der
-    fehlt, die Summe aus Tarif- und Geraeterate - zwei Felder, die der
-    Anbieter selbst nebeneinander nennt.
+    Die Bündel-SKU loest wie in `geraete_tco_karten.modelle()` auf (erst die
+    Listung derselben SKU, dann `geraet_aus_sku`) - eine eigene Aufloesung wuesste
+    bald etwas anderes als die TCO-Tafel. Der Monatsbetrag ist die Angabe des
+    ANBIETERS: `buendel_monatlich` (1&1, § 13.2), sonst Tarif- plus Geraeterate.
+    Verglichen wird nur in einer Ratenlaufzeit, 24 Raten zuerst
+    (`rang_der_monatsangabe`); die Angabe nennt ihre `laufzeit`.
     """
     modell_je_sku: dict[str, str] = {}
     geraet_je_sku: dict[str, tuple] = {}
@@ -725,12 +720,15 @@ def _buendel_je_anbieter_modell(
             if tarif is None or rate is None:
                 continue
             monat = round(float(tarif) + float(rate), 2)
-        monat = float(monat)
+        monat, laufzeit = float(monat), b.get("laufzeit_monate")
+        rang = (rang_der_monatsangabe(laufzeit), monat)
         schluessel = (geraete_tco_karten.normalisiere(b.get("anbieter", "")), mid)
         bisher = beste.get(schluessel)
-        if bisher is None or monat < bisher["monat"]:
+        if bisher is None or rang < bisher["rang"]:
             beste[schluessel] = {
                 "monat": monat,
+                "laufzeit": laufzeit,
+                "rang": rang,
                 "anbieter": b.get("anbieter", ""),
                 "tarif": (b.get("tarif_name") or "").strip(),
                 "quelle_url": b.get("quelle_url", ""),
@@ -1126,7 +1124,7 @@ def katalog_modellzeilen(
                 else [v for (_, m), v in buendel_je.items() if m == mid]
             )
             if pool:
-                buendel_angabe = min(pool, key=lambda b: b["monat"])
+                buendel_angabe = min(pool, key=lambda b: b["rang"])
 
         name = gruppe["modell"]
         if gruppe["speicher"]:
@@ -1167,6 +1165,7 @@ def katalog_modellzeilen(
                 "spanne": spanne,
                 "nur_buendel": buendel_angabe is not None,
                 "buendel_monat": buendel_angabe["monat"] if buendel_angabe else None,
+                "buendel_raten": buendel_angabe["laufzeit"] if buendel_angabe else None,
                 "buendel_anbieter": (
                     buendel_angabe["anbieter"] if buendel_angabe else None
                 ),
