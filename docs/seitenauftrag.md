@@ -12,6 +12,12 @@ Ein Seitenauftrag ändert eine Seite sichtbar und läuft über `tools/auftrag.py
 
 Das Skript endet mit `gemergt` (Exit 0) oder legt `outputs/auftraege/<id>-notiz.md` mit dem Befund an; vor dem nächsten Start die Notiz und die geänderte `kosten.csv` committen (danach `make pruefen`) oder verwerfen, sonst ist der Arbeitsbaum unsauber. Höchstens zwei Aufträge laufen gleichzeitig, und ihre Bereiche dürfen sich nicht überschneiden.
 
+## Mit Planer: ein Satz statt JSON
+
+1. `.venv/bin/python tools/plane.py S2 "Auf der Geräteseite soll …"` startet den Planer (Rolle `suchen`, ändert nichts). Er schreibt `spezifikation.md`, je Unteraufgabe `S2-<nr>.json` und die Reihenfolge `plan.json` nach `~/auftraege/S2/` (anders mit `--ordner`). Jede Unteraufgabe besteht dieselbe Formatprüfung wie oben; ein ungültiger Plan bekommt eine zweite Runde, danach liegt die Antwort in `planer-roh.txt`.
+2. `spezifikation.md` lesen. Passt sie nicht, Ordner löschen und den Satz schärfen.
+3. `.venv/bin/python tools/auftraege.py ~/auftraege/S2` startet jede Unteraufgabe über `tools/auftrag.py`, sobald ihre Abhängigkeiten gemergt sind; höchstens zwei gleichzeitig und nie mit überschneidendem Bereich. Endet eine nicht mit `gemergt`, startet keine weitere. Ergebnis in `ergebnis.md`, Log je Unteraufgabe als `S2-<nr>.log` im Planordner.
+
 ## Pflichtfelder
 
 | Feld | Typ | Inhalt |
