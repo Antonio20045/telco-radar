@@ -45,6 +45,7 @@ from telco_radar.report import geraete_radar as wr
 from telco_radar.report import geraete_tco_band as band
 from telco_radar.report import geraete_tco_karten as karten
 from telco_radar.report import geraete_view
+from telco_radar.report.geraete_laufzeit import LAUFZEITEN
 from telco_radar.report.html import render_site
 from telco_radar.tco_model import Buendel, SimOnlyReferenz, zeitraum_vergleichbar
 
@@ -1039,36 +1040,47 @@ def test_am_echten_bestand_steht_jedes_band_paar_auf_der_seite(echt):
     Seite (`tco_model.zeitraum_vergleichbar`) - eine zweite Definition
     von "vergleichbares Paar" waere genau der Riss, aus dem der Befund
     entstand. Die gesperrten Paare verschwinden nicht: sie werden unten
-    als benannte Zeilen mitgezaehlt."""
+    als benannte Zeilen mitgezaehlt.
+
+    Datenkonzept Geräte Schritt 3: ein Paar ist erst eines in derselben
+    Ratenlaufzeit (Regel 5). Gezählt wird deshalb je Laufzeit gegen
+    Vodafones Karte dieser Laufzeit; eine Karte ohne Vodafone-Gegenstück in
+    ihrer Laufzeit gehört zu den benannten Zeilen."""
     by_id = {m["id"]: m for m in echt["modelle"]}
     paare = 0
     gezeichnet = 0
     fremder_zeitraum = 0
     benannt = 0
+
+    def vf_zaehlt(je):
+        return "Vodafone" in je and je["Vodafone"][0].get("vergleichbar", True)
+
     for g in echt["radar"]["gruppen"]:
         modell = by_id[g["id"]]
         zaehlende = {
             **modell,
             "karten": list(filter(notbremse.zaehlt, modell["karten"])),
         }
-        alle_je_band = band.alle_karten_je_band(zaehlende, echt["band_je_tarif"])
+        je_laufzeit = [
+            band.alle_karten_je_band(zaehlende, echt["band_je_tarif"], lz)
+            for lz in LAUFZEITEN
+        ]
         vf_gemeinsam = {
-            b
-            for b, je in alle_je_band.items()
-            if "Vodafone" in je and je["Vodafone"][0].get("vergleichbar", True)
+            b for je_band in je_laufzeit for b, je in je_band.items() if vf_zaehlt(je)
         }
         for a in wr.ALLE_WETTBEWERBER:
-            for b in vf_gemeinsam:
-                vf = alle_je_band[b]["Vodafone"][0]
-                for k in alle_je_band[b].get(a) or []:
-                    if not k.get("vergleichbar", True):
-                        continue
-                    if zeitraum_vergleichbar(
-                        k.get("leitzahl_monate"), vf.get("leitzahl_monate")
-                    ):
-                        paare += 1
-                    else:
-                        fremder_zeitraum += 1
+            for je_band in je_laufzeit:
+                for b, je in je_band.items():
+                    for k in (je.get(a) or []) if b in vf_gemeinsam else []:
+                        if not k.get("vergleichbar", True):
+                            continue
+                        if vf_zaehlt(je) and zeitraum_vergleichbar(
+                            k.get("leitzahl_monate"),
+                            je["Vodafone"][0].get("leitzahl_monate"),
+                        ):
+                            paare += 1
+                        else:
+                            fremder_zeitraum += 1
             gezeichnet += len(
                 [
                     z

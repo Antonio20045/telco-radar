@@ -40,30 +40,19 @@ dem BEIDE das Geraet fuehren, und dann gegen VODAFONES KARTE IN DIESEM PAAR
 gerechnet waere fast jede Zeile ein Mismatch, obwohl echte Paare existieren
 (iPhone 15: VF-Basis Klein 1.235,80, aber VF selbst Mittel 1.949,80 gegen o2
 Mittel 808,75). JEDE echte Karte des Wettbewerbers steht in JEDEM
-gemeinsamen Paar da (RAD-1b). Ohne gemeinsames Paar heisst die Zeile ehrlich
-"Band-Mismatch" oder nennt die andere Laufzeit, statt eine Zahl zu erfinden
+gemeinsamen Paar da (RAD-1b); fehlt Vodafone in ihrer Laufzeit, nennt die
+Zeile beide Laufzeiten. Ohne gemeinsames Band heisst sie "Band-Mismatch"
 (AUFTRAG_GERAETESEITE.md §2b: "ehrlich benennen, nicht mischen").
 
 WETTBEWERBERKREIS
 ------------------
-Netzbetreiber: Telekom, 1&1, o2 - dieselben drei, die
-`geraete_tco_karten.ANBIETER_REIHENFOLGE` neben Vodafone ohnehin auf JEDER
-Karte fuehrt (B.2.5: "ein Anbieter, der weggelassen wird, sieht aus wie
-einen, den es nicht gibt"). Sie stehen je Modell IMMER da, auch ohne
-Bündel (ehrliches kein_buendel statt Weglassen).
-
-Zweitmarken (B3): congstar - mit Karte, wo er eine hat, und OHNE
-Platzhalter, wo er keine hat. Wo congstar dasselbe Gerät im selben Band
-führt wie Vodafone, entsteht das Vergleichspaar automatisch; wo nicht,
-entsteht NICHTS - congstar ist kein Vollsortimenter, und eine
-kein_buendel-Zeile je Modell waere eine Wand aus Luecken.
-
-Haendler (Gerätepreis, eigener Abschnitt): Saturn, mobilcom-debitel, Amazon
-- ausdruecklich im Auftrag genannt. Sie vergleichen GERAETEPREIS gegen
-GERAETEPREIS (kein Tarif, keine TCO) und benutzen dieselbe %-Formel gegen
-Vodafones Gerätepreis. Datenquelle ist die bestehende
-`geraete_vergleich.vergleich()` - keine zweite Preisrechnung, nur ein
-zweiter Filter (anbieter_typ == "handel").
+Netzbetreiber: Telekom, 1&1, o2 (`geraete_tco_karten.ANBIETER_REIHENFOLGE`
+ohne Vodafone) - je Modell IMMER da, auch ohne Bündel (ehrliches
+kein_buendel statt Weglassen, B.2.5). Die Zweitmarke congstar (B3) nur mit
+Karte und ohne Platzhalter: kein Vollsortimenter, keine Wand aus Luecken.
+Haendler (Saturn, mobilcom-debitel, Amazon) vergleichen Gerätepreis gegen
+Gerätepreis mit derselben %-Formel; Quelle ist `geraete_vergleich.vergleich()`
+mit dem Filter anbieter_typ == "handel" - keine zweite Preisrechnung.
 
 DIE SORTIERRICHTUNG (Widerspruch im Auftrag aufgeloest)
 -------------------------------------------------------
@@ -81,7 +70,7 @@ from typing import Optional
 from ..tco_model import zeitraum_vergleichbar
 from . import geraete_notbremse as notbremse
 from . import geraete_tco_band, geraete_tco_karten
-from .geraete_laufzeit import LAUFZEITEN, ansicht
+from .geraete_laufzeit import LAUFZEIT_STANDARD, LAUFZEITEN, ansicht
 
 NETZ_WETTBEWERBER = tuple(
     a for a in geraete_tco_karten.ANBIETER_REIHENFOLGE if a != "Vodafone"
@@ -297,9 +286,7 @@ def _zeile_fuer_anbieter(
     }
 
 
-def _paar_zeile(
-    anbieter: str, band: str, wb_karte: dict, vf_karte: dict, laufzeit: int
-) -> dict:
+def _paar_zeile(anbieter: str, band: str, wb_karte: dict, vf_karte: dict) -> dict:
     """Vergleichbare Zeile: beide Karten liegen im SELBEN Band, und die
     Abweichung rechnet gegen VODAFONES KARTE IN DIESEM BAND - nicht gegen
     die Referenz des Geraets (Grund im Modulkopf, BASIS JE GERAET).
@@ -322,7 +309,8 @@ def _paar_zeile(
             ),
             **_beleg(wb_karte.get("quelle_url", ""), wb_karte.get("abgerufen_am", "")),
         }
-    if not zeitraum_vergleichbar(
+    raten = (ansicht(wb_karte), ansicht(vf_karte))
+    if raten[0] != raten[1] or not zeitraum_vergleichbar(
         wb_karte.get("leitzahl_monate"), vf_karte.get("leitzahl_monate")
     ):
         return {
@@ -338,6 +326,7 @@ def _paar_zeile(
                 anbieter,
                 wb_karte.get("leitzahl_monate"),
                 vf_karte.get("leitzahl_monate"),
+                raten,
             ),
             **_beleg(wb_karte.get("quelle_url", ""), wb_karte.get("abgerufen_am", "")),
         }
@@ -350,7 +339,7 @@ def _paar_zeile(
         "prozent": prozent,
         "gesamt": wb_karte["gesamt"],
         "vf_gesamt": vf_karte["gesamt"],
-        "laufzeit": laufzeit,
+        "laufzeit": raten[0],
         "monate": vf_karte.get("leitzahl_monate"),
         "tarif": wb_karte.get("tarif", ""),
         "band": band,
@@ -388,6 +377,33 @@ def _guenstigste_echte_karte_je_anbieter(modell: dict) -> dict[str, dict]:
     return beste
 
 
+def _vf_zaehlt(je: dict) -> bool:
+    return "Vodafone" in je and je["Vodafone"][0].get("vergleichbar", True)
+
+
+def _paar_zeilen(anbieter: str, alle_je: dict, band_rang: dict) -> list[dict]:
+    """Jede Karte des Wettbewerbers in einem Band, in dem Vodafone eine Karte
+    führt: gegen Vodafones Karte derselben Ratenlaufzeit, sonst als benannte
+    Zeile gegen die Vodafone-Karte des Bandes (24 Raten zuerst) - verglichen
+    wird nie über zwei Laufzeiten, verschwiegen wird keine Karte."""
+    vf_im_band: dict = {}
+    for lz in sorted(LAUFZEITEN, key=lambda lz: lz != LAUFZEIT_STANDARD):
+        for b, je in alle_je[lz].items():
+            if _vf_zaehlt(je):
+                vf_im_band.setdefault(b, je["Vodafone"][0])
+    zeilen = []
+    for _rang, b, lz in sorted(
+        (band_rang.get(b, len(band_rang)), b, lz)
+        for lz, je_band in alle_je.items()
+        for b, je in je_band.items()
+        if anbieter in je and b in vf_im_band
+    ):
+        je = alle_je[lz][b]
+        vf = je["Vodafone"][0] if _vf_zaehlt(je) else vf_im_band[b]
+        zeilen += [_paar_zeile(anbieter, b, k, vf) for k in je[anbieter]]
+    return zeilen
+
+
 def netzbetreiber_gruppen(
     modelle: list, band_je_tarif: dict, band_rang: dict | None = None
 ) -> list[dict]:
@@ -396,16 +412,10 @@ def netzbetreiber_gruppen(
     Weglassen), dazu Zweitmarken MIT Karte ohne Platzhalter (B3) - sortiert
     aufsteigend nach %-Abweichung.
 
-    Die Karten des Wettbewerbers und seine VODAFONE-Gegenkarte kommen aus
-    der GRAPH-1-Bandlogik (`geraete_tco_band.alle_karten_je_band` /
-    `karten_je_band`): verglichen wird im Band, in dem BEIDE das Geraet
-    fuehren. Seit RAD-1b steht JEDE echte Karte des Wettbewerbers in
-    JEDEM gemeinsamen Band als eigenes Paar da. Gruppiert werden nur Karten,
-    die zaehlen (NOTBREMSE im Modulkopf).
-    Ein erneuertes Geraet im gemeinsamen Band steht als nicht
-    vergleichbare Zeile mit Grund daneben (B1-Zustandsregel), es verdraengt
-    die vergleichbare Karte nicht mehr. Gibt es kein gemeinsames Band:
-    ehrlicher Band-Mismatch mit seiner GUENSTIGSTEN Karte als Beleg."""
+    Die Paare kommen aus `_paar_zeilen` (Band und Ratenlaufzeit, RAD-1b),
+    gruppiert werden nur Karten, die zaehlen (NOTBREMSE im Modulkopf). Ein
+    erneuertes Geraet steht als nicht vergleichbare Zeile mit Grund daneben
+    (B1). Ohne gemeinsames Band: Band-Mismatch mit der GUENSTIGSTEN Karte."""
     band_rang = band_rang or {}
     gruppen = []
     for modell in modelle:
@@ -457,21 +467,8 @@ def netzbetreiber_gruppen(
         for a in ALLE_WETTBEWERBER:
             if a not in NETZ_WETTBEWERBER and a not in hat_karte:
                 continue
-            gemeinsam = sorted(
-                (
-                    (band_rang.get(b, len(band_rang)), b, lz)
-                    for lz, je_band in alle_je.items()
-                    for b, je in je_band.items()
-                    if a in je
-                    and "Vodafone" in je
-                    and je["Vodafone"][0].get("vergleichbar", True)
-                ),
-            )
-            if gemeinsam:
-                for _rang, b, lz in gemeinsam:
-                    vf = alle_je[lz][b]["Vodafone"][0]
-                    for karte_wb in alle_je[lz][b][a]:
-                        zeilen.append(_paar_zeile(a, b, karte_wb, vf, lz))
+            if paare := _paar_zeilen(a, alle_je, band_rang):
+                zeilen += paare
                 continue
             karte = uebrig.get(a) or ungefiltert.get(a)
             zeilen.append(_zeile_fuer_anbieter(a, karte, basis, band_je_tarif))
