@@ -37,6 +37,8 @@
   --al-kritisch:#e60000; --al-mittel:#c47f00;
   --al-gering:#217a3c;   --al-bestpreis:#2b5bd7;
   --al-mittel-hell:#fbf1de; --al-gering-hell:#e9f3ec;
+  --weiss:#fff; --gruen-ok:#1a7f4b; --gruen-tief:#2f6b3a; --gruen-nl:#146b3a;
+  --markierung:#fbe9a7; --red-hover:#c00; --anb-ersatz:#57534a;
 
   --wrap:1240px; --wrap-text:700px;
   --serif:'Source Serif 4','Source Serif Pro',Charter,'Bitstream Charter',
@@ -203,7 +205,7 @@ b,strong{font-weight:700}
      GEMESSENE Zahl kalibriert (307 px) - gemessen allerdings in einer
      Sandbox, in der Google Fonts nicht laden. In GitHub Actions laedt die
      echte Source Serif 4, sie ist breiter als die Rueckfallschrift, und die
-     Seite lief waagerecht aus dem Bild: CI-Lauf #159 auf `main` fiel mit
+     Seite lief waagerecht aus dem Bild: CI-Lauf Nr. 159 auf `main` fiel mit
      genau diesen vier Schuldigen durch (.brand, .brand-name, em,
      .topbar-right).
 
@@ -466,7 +468,7 @@ b,strong{font-weight:700}
   font-family:var(--sans);font-size:9px;font-weight:700;text-transform:uppercase;
   letter-spacing:.08em;color:var(--ink-4)}
 .mz-rel{display:inline-block;min-width:15px;text-align:center;padding:1px 4px;
-  color:#fff;background:var(--r2);font-weight:800;
+  color:var(--weiss);background:var(--r2);font-weight:800;
   font-variant-numeric:lining-nums;flex-shrink:0}
 .mz-rel.r5{background:var(--r5)}.mz-rel.r4{background:var(--r4)}
 .mz-rel.r3{background:var(--r3)}
@@ -668,11 +670,11 @@ b,strong{font-weight:700}
   border:1px solid var(--rule);padding:2px 7px;white-space:nowrap}
 .rel-badge{display:inline-block;font-family:var(--sans);font-size:10px;
   font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;
-  color:#fff;background:var(--r2)}
+  color:var(--weiss);background:var(--r2)}
 .rel-badge.r5{background:var(--r5)}.rel-badge.r4{background:var(--r4)}
 .rel-badge.r3{background:var(--r3)}.rel-badge.r2,.rel-badge.r0{background:var(--r2)}
 .sdot{width:8px;height:8px;display:inline-block;border-radius:50%}
-.sdot.ok{background:#1a7f4b}.sdot.empty{background:var(--r4)}
+.sdot.ok{background:var(--gruen-ok)}.sdot.empty{background:var(--r4)}
 .sdot.fail{background:var(--r5)}.sdot.quarantaene{background:var(--ink-4)}
 /* Keine Aussage: heute nicht gelesen. Hohl statt gefuellt - ein
    grauer Vollpunkt saehe aus wie ein gemessener Dauerzustand. */
@@ -1294,7 +1296,7 @@ b,strong{font-weight:700}
   font-weight:700;letter-spacing:-.02em;color:var(--ink)}
 .dsk-kopf{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:0 0 6px}
 .dsk-art{font-family:var(--sans);font-size:8.5px;font-weight:800;
-  letter-spacing:.11em;text-transform:uppercase;padding:2px 6px;color:#fff;
+  letter-spacing:.11em;text-transform:uppercase;padding:2px 6px;color:var(--weiss);
   background:var(--ink-4)}
 .dsk-art.bericht{background:var(--r3)}
 .dsk-art.differenzierung{background:var(--red)}
@@ -1308,7 +1310,7 @@ b,strong{font-weight:700}
   font-weight:600;letter-spacing:-.012em;color:var(--ink)}
 .dsk-titel:hover{color:var(--red)}
 .dsk-anriss{margin:7px 0 0;font-size:14.5px;line-height:1.5;color:var(--ink-3)}
-.dsk mark{background:#fbe9a7;color:inherit}
+.dsk mark{background:var(--markierung);color:inherit}
 /* Der Fuss steht buendig am unteren Kartenrand - sonst laege die Haarlinie
    in jeder Karte einer Reihe auf einer anderen Hoehe. */
 .dsk-text > :nth-last-child(2){margin-bottom:auto}
@@ -1769,7 +1771,7 @@ b,strong{font-weight:700}
 /* ==========================================================  DRUCK  ===== */
 @media print{
   .topbar,.subbar,.foot,.evidence,.filters{display:none}
-  body{background:#fff;font-size:11pt}
+  body{background:var(--weiss);font-size:11pt}
   .prose{max-width:none;columns:2;column-gap:28px}
 }
 
@@ -1793,7 +1795,7 @@ b,strong{font-weight:700}
 .lz-feld{display:block}
 .lz-wert{font-family:var(--serif);font-size:19px;font-weight:700;
   display:block;color:var(--ink)}
-.lz-wert.lz-sofort{color:#2f6b3a}
+.lz-wert.lz-sofort{color:var(--gruen-tief)}
 .lz-wert.lz-verzoegert{color:var(--r4)}
 .lz-wert.lz-nein{color:var(--red)}
 .lz-roh{display:block;font-family:var(--sans);font-size:11px;
@@ -1806,7 +1808,7 @@ b,strong{font-weight:700}
 .lz-verlauf{display:flex;gap:3px;margin-top:6px}
 .lz-punkt{width:7px;height:7px;border-radius:50%;background:var(--rule);
   display:inline-block}
-.lz-punkt.lz-sofort{background:#2f6b3a}
+.lz-punkt.lz-sofort{background:var(--gruen-tief)}
 .lz-punkt.lz-verzoegert{background:var(--r4)}
 .lz-punkt.lz-nein{background:var(--red)}
 .lz-grenzen{margin:34px 0}
@@ -1824,13 +1826,13 @@ b,strong{font-weight:700}
 .vl-bewegung{display:flex;flex-wrap:wrap;gap:12px;margin:14px 0 22px}
 .vl-move{display:block;padding:9px 14px 9px 12px;border-left:3px solid var(--rule);
   min-width:180px}
-.vl-move.vl-auf{border-left-color:#2f6b3a}
+.vl-move.vl-auf{border-left-color:var(--gruen-tief)}
 .vl-move.vl-ab{border-left-color:var(--red)}
 .vl-move-label{display:block;font-family:var(--serif);font-size:17px;
   font-weight:700;color:var(--ink)}
 .vl-move-delta{display:block;font-family:var(--sans);font-size:11.5px;
   font-weight:700;margin-top:2px}
-.vl-auf .vl-move-delta{color:#2f6b3a}
+.vl-auf .vl-move-delta{color:var(--gruen-tief)}
 .vl-ab .vl-move-delta{color:var(--red)}
 .vl-move-detail{display:block;font-family:var(--sans);font-size:10.5px;
   color:var(--ink-4)}
@@ -2641,15 +2643,15 @@ b,strong{font-weight:700}
 .nl-opt input{accent-color:var(--red);flex:none;transform:translateY(1px)}
 
 .nl-feld{font:400 15px/1.4 inherit;padding:9px 11px;border:1px solid var(--rule-ink);
-  background:#fff;color:var(--ink);min-width:0}
+  background:var(--weiss);color:var(--ink);min-width:0}
 .nl-feld--breit{width:100%;max-width:34ch;display:block;margin-bottom:18px}
 .nl-feld:focus{outline:2px solid var(--red);outline-offset:1px}
 .nl-stichwort-zeile{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
 .nl-stichwort-zeile .nl-feld{flex:1 1 22ch}
 
 .nl-btn{font:700 14px/1 var(--sans);letter-spacing:.04em;text-transform:uppercase;
-  padding:13px 26px;border:0;background:var(--red);color:#fff;cursor:pointer}
-.nl-btn:hover{background:#c00}
+  padding:13px 26px;border:0;background:var(--red);color:var(--weiss);cursor:pointer}
+.nl-btn:hover{background:var(--red-hover)}
 .nl-btn:disabled{background:var(--ink-4);cursor:not-allowed}
 .nl-btn-klein{font:700 12px/1 var(--sans);letter-spacing:.04em;text-transform:uppercase;
   padding:0 16px;border:1px solid var(--rule-ink);background:transparent;
@@ -2680,7 +2682,7 @@ b,strong{font-weight:700}
 .nl-consent-p + .nl-consent-p{margin-top:9px}
 .nl-fein{margin:0 0 20px;font-size:12.5px;line-height:1.5;color:var(--ink-4)}
 .nl-status{margin:12px 0 0;font:600 14px/1.5 var(--sans);min-height:1.4em}
-.nl-status--ok{color:#146b3a}
+.nl-status--ok{color:var(--gruen-nl)}
 .nl-status--warn{color:var(--red)}
 
 /* Der Honeypot. KEIN `display:none` und kein `type=hidden` - Skripte fuellen
@@ -2884,7 +2886,7 @@ b,strong{font-weight:700}
   border:1px solid var(--rule)}
 
 /* Der eigene Anbieter in der Portfolio-Tiefe. Die Farbe steht HIER und nicht
-   als `style="background:#e60000"` in der Vorlage: `#e60000` war damit an
+   als Inline-Hintergrund in der Vorlage: das Vodafone-Rot war damit an
    einer vierten Stelle hartkodiert, waehrend `var(--red)` genau dafuer da
    ist. */
 .gr-tiefe .gr-eigen .dz-balken-fuell{background:var(--red)}
@@ -3011,7 +3013,7 @@ b,strong{font-weight:700}
   align-items:baseline;padding:5px 0 4px;border-top:1px solid var(--rule-2);
   font-family:var(--sans)}
 .gr-tband-wert:first-child{border-top:none}
-.gr-tband-wert dt{font-size:13px;font-weight:700;color:var(--anb,#57534a);
+.gr-tband-wert dt{font-size:13px;font-weight:700;color:var(--anb,var(--anb-ersatz));
   margin:0;min-width:0}
 .gr-tband-wert dd{margin:0;font-family:var(--serif);font-size:16px;
   font-weight:700;white-space:nowrap}
@@ -3101,13 +3103,13 @@ b,strong{font-weight:700}
 .gr-bnd-kopf span:nth-child(3),.gr-bnd-kopf span:nth-child(4),
 .gr-bnd-kopf span:nth-child(5){text-align:right}
 .gr-bnd{border-bottom:1px solid var(--rule);border-left:3px solid
-  var(--anb,#57534a);margin:0 0 0}
+  var(--anb,var(--anb-ersatz));margin:0 0 0}
 .gr-bnd summary{cursor:pointer;list-style:none;padding:9px 6px 9px 6px;
   font-variant-numeric:tabular-nums;line-height:1.45}
 .gr-bnd summary::-webkit-details-marker{display:none}
 .gr-bnd summary:hover{background:var(--paper-2)}
 .gr-bnd summary:focus-visible{outline:2px solid var(--red);outline-offset:-2px}
-.gr-bnd-name{font-weight:700;color:var(--anb,#57534a)}
+.gr-bnd-name{font-weight:700;color:var(--anb,var(--anb-ersatz))}
 .gr-bnd-tarif{font-family:var(--serif);font-size:13px;color:var(--ink-2);
   min-width:0}
 .gr-bnd-tco{text-align:right;font-family:var(--serif);font-size:15px;
@@ -3373,7 +3375,7 @@ b,strong{font-weight:700}
   margin-left:4px}
 /* Der Geraetezustand ist eine Preisdimension - das Etikett steht in Rot,
    damit "erneuert" nicht wie ein Tarifzusatz liest (QA-Befund B1). */
-.gr-kk-marke--zustand{color:var(--red,#e60000);border-color:currentColor;
+.gr-kk-marke--zustand{color:var(--red);border-color:currentColor;
   font-weight:700}
 /* A3 (STRATEGIE_GERAETE_V4, 20.09.2026): die ALTE Bündelzeile - Abruf
    älter als `geraete_tco_karten.ALT_AB_TAGEN`. Die Zeile bleibt stehen
@@ -3395,8 +3397,8 @@ b,strong{font-weight:700}
    30.08.2026, `test_keine_beschriftung_unter_zwoelf_pixeln`). */
 .gr-g1-delta{font-family:var(--sans);font-size:12px;fill:var(--ink-4)}
 .gr-g1-zustand{font-family:var(--sans);font-size:12px;font-weight:700;
-  letter-spacing:.06em;text-transform:uppercase;fill:var(--red,#e60000)}
-.gr-t-zustand{color:var(--red,#e60000);font-weight:700}
+  letter-spacing:.06em;text-transform:uppercase;fill:var(--red)}
+.gr-t-zustand{color:var(--red);font-weight:700}
 .gr-kk-bau,.gr-kk-24,.gr-kk-eff,.gr-kk-nach,.gr-kk-bonus,.gr-kk-hinweis,
 .gr-kk-luecke{margin:0 0 5px;font-size:13px;line-height:1.45}
 /* Der Satz unter der Zweitzahl sagt, WORAUS das Ø besteht. Er gehoert zur
@@ -3441,9 +3443,9 @@ b,strong{font-weight:700}
    Strichstaerke las sich Telekom-Magenta daneben als zweite rote Linie.
    Dieselbe Auszeichnung wie im interaktiven Chart (app.js,
    `r.eigen ? 3 : 2`). */
-.gr-g0-linie{stroke:var(--anb,#57534a);stroke-width:2}
+.gr-g0-linie{stroke:var(--anb,var(--anb-ersatz));stroke-width:2}
 .gr-g0-linie--eigen{stroke-width:3}
-.gr-g0-punkt{fill:var(--anb,#57534a)}
+.gr-g0-punkt{fill:var(--anb,var(--anb-ersatz))}
 /* Ein Anbieter mit nur EINEM Punkt traegt keine Linie - der Punkt ist
    etwas groesser (siehe `_symbol` in `geraete_tco_grafik`) und bekommt
    einen Rand in Papierfarbe, damit er auch dann auffaellt, wenn eine
@@ -3454,11 +3456,11 @@ b,strong{font-weight:700}
    Diese Regel steht NACH der Einzel-Punkt-Regel, damit der Papier-Halo
    dem Ring seinen Strich nicht ueberschreibt - gleiche Spezifitaet,
    die spatere gewinnt. */
-.gr-g0-punkt--ring{fill:none;stroke:var(--anb,#57534a);stroke-width:2.4}
+.gr-g0-punkt--ring{fill:none;stroke:var(--anb,var(--anb-ersatz));stroke-width:2.4}
 /* Das Legenden-Symbol (F-4b): `<use>` aus den defs derselben Grafik -
    Fuellung vom referenzierenden Element, genau wie am Datenpunkt. */
-.gr-g0-legendesymbol{fill:var(--anb,#57534a)}
-.gr-g0-legendesymbol--ring{fill:none;stroke:var(--anb,#57534a);
+.gr-g0-legendesymbol{fill:var(--anb,var(--anb-ersatz))}
+.gr-g0-legendesymbol--ring{fill:none;stroke:var(--anb,var(--anb-ersatz));
   stroke-width:2.4}
 /* Die Beschriftung des Einzelpunkts (BRIEF_FADEN, 05.09.2026): "Serie
    startet" statt eines nackten Punkts, der wie "keine Werte" aussieht. 12
@@ -3466,9 +3468,9 @@ b,strong{font-weight:700}
    seit F-4e (09.09.2026) in der Sans-Schrift des SYSTEMS statt des
    Webfonts. */
 .gr-g0-einzeln{font-family:var(--sans-system);font-size:12px;
-  fill:var(--anb,#57534a)}
+  fill:var(--anb,var(--anb-ersatz))}
 .gr-g0-legende{font-family:var(--sans);font-size:12px;
-  fill:var(--anb,#57534a)}
+  fill:var(--anb,var(--anb-ersatz))}
 /* Die Sammelluecke: ein ruhiges Feld statt eines uebersehbaren Leerraums -
    sie darf nicht lauter sein als die Linien selbst. */
 .gr-g0-luecke{fill:var(--ink);opacity:.05}
@@ -3492,7 +3494,7 @@ b,strong{font-weight:700}
 .gr-g1-null{stroke:var(--rule-ink);stroke-width:1.5}
 .gr-g1-ref{stroke:var(--al-kritisch);stroke-width:1.5;stroke-dasharray:5 4}
 .gr-g1-reftext{font-family:var(--sans);font-size:12px;fill:var(--al-kritisch)}
-.gr-g1-seg{fill:var(--anb,#57534a)}
+.gr-g1-seg{fill:var(--anb,var(--anb-ersatz))}
 .gr-g1-bonus{fill:none;stroke:var(--ink-3);stroke-width:1;
   stroke-dasharray:3 3}
 
@@ -3570,8 +3572,8 @@ b,strong{font-weight:700}
    Etikett ("Vodafone"), kein Raster - jeder Balken traegt seinen Wert.
    Farbe nach Richtung: Ink = Wettbewerber guenstiger (VF teuerer),
    Blau (--al-bestpreis) = Vodafone guenstiger, Rot GENAU EIN Balken
-   (der groesste Abstand, `--spitze`). Palette-Validator: #e60000 gegen
-   #2b5bd7, CVD dE 29,4 protan / 36,3 tritan, Kontrast >= 3:1 - PASS. */
+   (der groesste Abstand, `--spitze`). Palette-Validator: --red gegen
+   --al-bestpreis, CVD dE 29,4 protan / 36,3 tritan, Kontrast >= 3:1 - PASS. */
 .wr-grafik-bild{margin:2px 0 0}
 .wr-grafik-bild svg{display:block;width:100%;height:auto}
 .wr-grafik-bild svg.wr-gr--schmal{display:none}
@@ -3828,7 +3830,7 @@ td .gr-sprung,td .gr-ksprung{display:inline-block;margin-top:3px}
 .gr-zr-k-band .gr-zr-k-delta--steigt,.gr-zr-k-band .gr-zr-k-delta--sinkt{
   font-size:13.5px;font-weight:700}
 .gr-zr-k-delta--steigt{color:var(--red)}
-.gr-zr-k-delta--sinkt{color:#2f6b3a}
+.gr-zr-k-delta--sinkt{color:var(--gruen-tief)}
 /* Die Punkte-Spalte ist selbst ein Band-Span (wechselt mit) - ihr
    flex-direction MUSS hier ausdrücklich row stehen, sonst erbt sie die
    column des Band-Koerpers und stapelt die Anbieterpunkte untereinander
@@ -4178,10 +4180,10 @@ circle.gr-zr-punkt.gr-zr-aktiv{stroke:var(--ink);stroke-width:2.8}
    (`geraete_tco_karten.zerlegung_balken` liefert es nicht mehr), sonst
    waere `min-width` hier ein 2px-Phantomstreifen ohne Aussage gewesen. */
 .gr-bnd-zerl-seg{display:block;height:100%;min-width:2px;
-  background:var(--anb,#57534a);border-right:2px solid var(--paper)}
+  background:var(--anb,var(--anb-ersatz));border-right:2px solid var(--paper)}
 .gr-bnd-zerl-seg:last-child{border-right:0}
 .gr-bnd-zerl-seg--offen{background-color:var(--paper);
-  background-image:repeating-linear-gradient(45deg,var(--anb,#57534a) 0
+  background-image:repeating-linear-gradient(45deg,var(--anb,var(--anb-ersatz)) 0
   3px,var(--paper) 3px 6px)}
 
 /* --- P3-E2/E3 (28.09.2026): Laufzeit-Filter und Aktionen ------------- */
