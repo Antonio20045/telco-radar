@@ -1,10 +1,12 @@
 {# Prüfstelle der Geräte-Bündel (Datenkonzept Geräteradar, Schritt 7): Kennzahlen je
    Anbieter für den letzten Gerätelauf. Gerechnet wird in
    analyze/geraete_pruefkennzahlen.py, hier wird nur gesetzt. Eine Quote ohne ein
-   prüfbares Bündel heißt „nicht prüfbar“, nie 0 %. Je Anbieter eine Karte, damit die
-   Seite auf dem Telefon nicht seitlich scrollt; eine nicht erfasste Laufzeit steht
-   benannt in der Erfassungslücke der Karte. Ohne Karte entsteht kein Zeichen. -#}
-{% macro quote(q) %}{% if q.prozent is none %}nicht prüfbar{% else %}{{ q.prozent }} %{% endif %}{% endmacro -%}
+   prüfbares Bündel heißt „nicht prüfbar“, nie 0 %; sonst nennt sie die nicht
+   prüfbaren Bündel mit („100 % von 1, 9 nicht prüfbar“). Je Anbieter eine Karte,
+   damit die Seite auf dem Telefon nicht seitlich scrollt; eine nicht erfasste
+   Laufzeit steht benannt in der Erfassungslücke der Karte. Ohne Karte entsteht kein
+   Zeichen. -#}
+{% macro quote(q) %}{% if q.prozent is none %}nicht prüfbar{% else %}{{ q.prozent }} %{% if q.nicht_pruefbar %} von {{ q.von }}, {{ q.nicht_pruefbar }} nicht prüfbar{% endif %}{% endif %}{% endmacro -%}
 {% macro zeile(name, wert, aktiv=false) %}<li class="fwb-ind{% if aktiv %} fwb-aktiv{% endif %}"><span class="fwb-punkt" aria-hidden="true"></span><span class="fwb-name">{{ name }}</span><span class="fwb-zustand">{{ wert }}</span></li>{% endmacro -%}
 {% if geraete_pruefung and (geraete_pruefung.vorhanden or geraete_pruefung.fehler) %}
 <div class="card" id="geraete-pruefung">

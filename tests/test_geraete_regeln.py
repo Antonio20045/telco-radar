@@ -53,6 +53,7 @@ def _satz(speicher: int = 128, **aenderung) -> dict:
         "anschlusspreis": 39.99,
         "quelle_url": "https://example.org/o2",
         "abgerufen_am": HEUTE,
+        "zustand": "neu",
         **aenderung,
     }
     zuzahlung, rate = satz["geraet_zuzahlung"], satz["geraet_monatsrate"]
@@ -251,6 +252,33 @@ def test_gegenprobe_speicher_monotonie(gross):
     assert not any(_erwaehnt(f, 5) for f in felder.values()), felder
 
 
+@pytest.mark.parametrize(
+    "zustand,erwartet",
+    [("refurbished", None), ("neu", QUARANTAENE)],
+    ids=["refurbished", "gegenprobe-neu"],
+)
+def test_speicher_monotonie_nur_bei_gleichem_zustand(zustand, erwartet):
+    """Ein generalüberholtes 256-GB-Gerät darf weniger kosten als ein neues 128-GB-Gerät
+    (am Bestand: Galaxy S26 Ultra 512 GB refurbished unter 256 GB neu)."""
+    klein = _satz(128)
+    gross = _satz(256, geraet_monatsrate=25.0, zustand=zustand)
+    felder = _pruefe(klein, gross)
+    if erwartet is None:
+        assert not any(_erwaehnt(f, 5) for f in felder.values()), felder
+        assert felder[klein["id"]]["status"] == GUELTIG
+    else:
+        assert all(f["status"] == erwartet for f in felder.values()), felder
+
+
+@pytest.mark.parametrize("zustand", ["", "unbekannt"])
+def test_unbekannter_zustand_faellt_aus_der_speicherprobe(zustand):
+    klein = _satz(128, zustand=zustand)
+    gross = _satz(256, geraet_monatsrate=25.0)
+    felder = _pruefe(klein, gross)
+    assert 5 in felder[klein["id"]]["nicht_pruefbar"], felder
+    assert not any(5 in _gruende(f) for f in felder.values()), felder
+
+
 def test_speicher_ohne_katalog_ist_nicht_pruefbar():
     feld = _feld(geraet_von=lambda sku: ("", None))
     assert 5 in feld["nicht_pruefbar"]
@@ -347,3 +375,59 @@ def test_regel_ohne_daten_ist_nicht_pruefbar_statt_bestanden():
     assert feld["nicht_pruefbar"] == [1, 2, 3, 6, 7, 8, 9, 11, 13], feld
     assert feld["status"] == GUELTIG
     assert feld["gruende"] == []
+
+
+ON_DEMAND = "11:1-1-unlimited-on-demand-s"
+
+
+@pytest.mark.parametrize("groesse,menge", [("S", 10.0), ("M", 50.0), ("L", 150.0)])
+def test_unlimited_on_demand_nennt_kein_volumen(groesse, menge):
+    """1&1 nennt „Unlimited on demand S“ mit 10 GB, M 50 GB, L 150 GB (tarife.jsonl):
+    ein Produktname, kein unbegrenztes Volumen. Ohne GB-Zahl nicht prüfbar."""
+    name = f"1&1 Unlimited on demand {groesse}"
+    satz = _satz(anbieter="1&1", tarif_name=name, tarif_id=ON_DEMAND)
+    feld = _feld(satz, volumen={ON_DEMAND: menge})
+    assert 4 not in _gruende(feld), feld
+    assert 4 in feld["nicht_pruefbar"], feld
+
+
+@pytest.mark.parametrize(
+    "name,menge,text",
+    [
+        ("1&1 Unlimited on demand S 10 GB", 10.0, None),
+        (
+            "1&1 Unlimited on demand S 10 GB",
+            50.0,
+            "Tarifname nennt 10 GB, gemessen 50 GB",
+        ),
+        (
+            "O2 Mobile Unlimited Max",
+            150.0,
+            "Tarifname nennt unbegrenzt, gemessen 150 GB",
+        ),
+    ],
+    ids=["zusatz-10-gb", "zusatz-gegen-50", "echt-unbegrenzt"],
+)
+def test_gegenprobe_volumen_im_namen_wird_weiter_gelesen(name, menge, text):
+    satz = _satz(tarif_name=name, tarif_id=ON_DEMAND)
+    feld = _feld(satz, volumen={ON_DEMAND: menge})
+    assert _gruende(feld).get(4) == text, feld
+    assert 4 not in feld["nicht_pruefbar"], feld
+
+
+@pytest.mark.parametrize(
+    "beleg",
+    [{"laufzeit": None, "tarif": "", "speicher": None}, {}],
+    ids=["leere-angaben", "leer"],
+)
+def test_leerer_beleg_ist_nicht_pruefbar_statt_bestanden(beleg):
+    feld = _feld(_satz(beleg_variante=beleg))
+    assert 13 in feld["nicht_pruefbar"], feld
+    assert 13 not in _gruende(feld), feld
+
+
+@pytest.mark.parametrize("speicher,verletzt", [(128, False), (256, True)])
+def test_gegenprobe_eine_angabe_im_beleg_reicht(speicher, verletzt):
+    feld = _feld(_satz(beleg_variante={"speicher": speicher}))
+    assert 13 not in feld["nicht_pruefbar"], feld
+    assert (13 in _gruende(feld)) is verletzt, feld

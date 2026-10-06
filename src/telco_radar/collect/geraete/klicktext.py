@@ -51,7 +51,11 @@ _BINDUNG_WORT = r"\b(?:Mindest(?:vertrags)?laufzeit|Vertragslaufzeit|Tarifbindun
 _BINDUNG = re.compile(_BINDUNG_WORT + r"\D{0,20}?(\d{1,2})\s*Monat", re.I)
 _VOLUMENZEILE = re.compile(r"\b(?:Daten|Volumen|Highspeed)", re.I)
 _VOLUMEN = re.compile(_ZAHL + r"\s*(GB|MB|TB)\b", re.I)
-_UNBEGRENZT = re.compile(r"\b(?:unbegrenzt|unlimitiert|unlimited)", re.I)
+_UNBEGRENZT = re.compile(
+    r"\b(?:unbegrenzt|unlimitiert|unlimited)(?![a-z]*[\s-]+on[\s-]+demand)", re.I
+)
+"""„unbegrenzt“ als Volumen; „Unlimited on demand“ ist bei 1&1 ein Produktname mit
+festem Grundvolumen (S 10, M 50, L 150 GB laut 1&1, tarife.jsonl), kein Volumen."""
 _GEGENWERT = re.compile(r"\b(?:statt|sonst)\b", re.I)
 
 
@@ -117,7 +121,10 @@ def fundstellen(text: str) -> dict[str, str]:
 
 
 def volumen_aus_zeile(zeile: str) -> float | None:
-    """GB aus einer Zeile; ``math.inf`` nur für „unbegrenzt“ ohne GB-Zahl."""
+    """GB aus einer Zeile; ``math.inf`` nur für „unbegrenzt“ ohne GB-Zahl.
+
+    „1&1 Unlimited on demand S“ nennt kein Volumen (None); „… S 10 GB“ nennt 10 GB.
+    """
     vorn = _GEGENWERT.split(zeile, maxsplit=1)[0]
     treffer = _VOLUMEN.search(vorn)
     if treffer is None:

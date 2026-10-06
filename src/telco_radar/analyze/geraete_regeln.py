@@ -2,13 +2,15 @@
 
 ``pruefe_bestand`` gibt jedem Bündelsatz ein ``Pruefergebnis`` (Status und Befunde,
 ``geraete_pruefstatus``). Regel 5 (Preis steigt mit dem Speicher) prüft den ganzen
-Bestand; Regel 12 (gleicher Wert bei allen Bündeln eines Anbieters, auch eine
-Ratenlaufzeit, die bei allen Geräten fehlt) ergibt eine Erfassungslücke je Anbieter
-(``erfassungsluecken``), keinen Status. Regel 15 gilt im Vergleich (Sieger, Δ); je
-Bündel wird nur geprüft, ob der Zeitraum H bestimmbar ist. Regel 4 prüft das Volumen im
-Tarifnamen gegen den Tarifbestand; ob ein Tarif in ein Band mit mehr Volumen fällt,
-entscheidet die Bandzuordnung der Ansicht. Regel 3 zieht vom SIM-only-Preis den belegten
-Bündelnachlass des Anbieters ab (``BUENDEL_NACHLASS``).
+Bestand je Anbieter, Tarif, Laufzeit, Gerät und Zustand; Regel 12 (gleicher Wert bei
+allen Bündeln eines Anbieters, auch eine Ratenlaufzeit, die bei allen Geräten fehlt)
+ergibt eine Erfassungslücke je Anbieter (``erfassungsluecken``), keinen Status. Regel
+15 gilt im Vergleich (Sieger, Δ); je Bündel wird nur geprüft, ob der Zeitraum H
+bestimmbar ist. Regel 4 prüft das Volumen im Tarifnamen gegen den Tarifbestand; ob ein
+Tarif in ein Band mit mehr Volumen fällt, entscheidet die Bandzuordnung der Ansicht.
+Regel 3 zieht vom SIM-only-Preis den belegten Bündelnachlass des Anbieters ab
+(``BUENDEL_NACHLASS``). Ein Beleg ohne Ratenlaufzeit, Tarif und Speicher ist für Regel
+13 nicht prüfbar.
 
 Tarifbindung und Preisphasen zeigt die Seite aus dem Tarifblatt, und diese Ergänzung
 steht nur in ``report/`` (``FELDER_AUS_DEM_TARIFBLATT``). Die Regeln 7 und 8 sind
@@ -59,6 +61,8 @@ from .geraete_pruefstatus import (
 )
 
 FELDER_AUS_DEM_TARIFBLATT = ("tarif_bindung_monate", "tarif_phasen")
+ZUSTAND_UNBEKANNT = ("", "unbekannt")
+"""Zustände, die Regel 5 nicht vergleicht (``Buendel.zustand`` ohne Angabe)."""
 AUS_DEM_TARIFBLATT = (
     "die Seite zeigt Tarifbindung und Preisphasen aus dem Tarifblatt; die Ergänzung "
     "steht nur in report/ (geraete_tco_view, geraete_tco_karten.phasen_fuer_buendel)"
@@ -274,17 +278,21 @@ def _r13_beleg(satz: Mapping, b: Buendel, k: Kontext) -> Befund | None:
     if not isinstance(beleg, Mapping):
         return _nicht(13, "kein Beleg der Variante")
     speicher = k.geraet_von(b.sku_id)[1] if k.geraet_von else None
-    tarif, beleg_speicher = str(beleg.get("tarif") or ""), beleg.get("speicher")
-    bekannt = None not in (speicher, beleg_speicher)
-    abweichend = [
-        name
-        for name, anders in (
-            ("Ratenlaufzeit", beleg.get("laufzeit") not in (None, b.laufzeit_monate)),
-            ("Tarif", normalisiere(tarif) not in ("", normalisiere(b.tarif_name))),
-            ("Speicher", bekannt and beleg_speicher != speicher),
-        )
-        if anders
-    ]
+    laufzeit, beleg_speicher = beleg.get("laufzeit"), beleg.get("speicher")
+    tarif = normalisiere(str(beleg.get("tarif") or ""))
+    vergleiche = (
+        ("Ratenlaufzeit", laufzeit is not None, laufzeit != b.laufzeit_monate),
+        ("Tarif", tarif != "", tarif != normalisiere(b.tarif_name)),
+        (
+            "Speicher",
+            None not in (speicher, beleg_speicher),
+            beleg_speicher != speicher,
+        ),
+    )
+    geprueft = [(name, anders) for name, pruefbar, anders in vergleiche if pruefbar]
+    if not geprueft:
+        return _nicht(13, "Beleg ohne Ratenlaufzeit, Tarif und Speicher")
+    abweichend = [name for name, anders in geprueft if anders]
     if not abweichend:
         return None
     return _verletzt(13, f"Beleglink zeigt andere {aufzaehlung(abweichend)}")
@@ -336,8 +344,10 @@ _JE_BUENDEL = (
 
 
 def _speicherstufen(lesbar: list[tuple[str, Buendel]], k: Kontext) -> dict[str, Befund]:
-    """Regel 5 über den Bestand: beim selben Anbieter, Tarif, Laufzeit und Gerät kostet
-    mehr Speicher nie weniger. Beide Bündel eines verletzten Paars sind Quarantäne."""
+    """Regel 5 über den Bestand: beim selben Anbieter, Tarif, Laufzeit, Gerät und
+    Zustand kostet mehr Speicher nie weniger. Beide Bündel eines verletzten Paars sind
+    Quarantäne. Ein unbekannter Zustand fällt aus dem Vergleich (CLAUDE.md, Clean
+    Code 4): ein generalüberholtes Gerät darf weniger kosten als ein neues."""
     befunde: dict[str, Befund] = {}
     stufen: dict[tuple, dict[int, list[tuple[str, float]]]] = {}
     for bid, b in lesbar:
@@ -346,8 +356,11 @@ def _speicherstufen(lesbar: list[tuple[str, Buendel]], k: Kontext) -> dict[str, 
         if not geraet or speicher is None or preis is None:
             befunde[bid] = _nicht(5, "Gerät, Speicher oder Gerätepreis fehlt")
             continue
+        if b.zustand in ZUSTAND_UNBEKANNT:
+            befunde[bid] = _nicht(5, "Zustand des Geräts unbekannt")
+            continue
         tarif = b.tarif_id or normalisiere(b.tarif_name)
-        reihe = (normalisiere(b.anbieter), tarif, b.laufzeit_monate, geraet)
+        reihe = (normalisiere(b.anbieter), tarif, b.laufzeit_monate, geraet, b.zustand)
         stufen.setdefault(reihe, {}).setdefault(speicher, []).append((bid, preis))
     for je_speicher in stufen.values():
         groessen = sorted(je_speicher)

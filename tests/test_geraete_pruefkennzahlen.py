@@ -273,8 +273,8 @@ def test_quellenseite_zeigt_die_kennzahlen_aus_den_daten(tmp_path):
         "gültig 36 Monate": "0",
         "frisch": "75 %",
         "Quarantäne": "50 %",
-        "Konflikte": "100 %",
-        "Belege": "50 %",
+        "Konflikte": "100 % von 1, 3 nicht prüfbar",
+        "Belege": "50 % von 2, 2 nicht prüfbar",
         "nicht prüfbar": "Regel 11",
     }
     assert "gültig 6 Monate" not in karten["o2"], "nicht erfasst steht als Lücke"
@@ -298,3 +298,24 @@ def test_ohne_geraetelauf_entfaellt_die_karte(tmp_path):
     )
     assert ausfall is not None, "eine unlesbare Datei ist ein Ausfall, kein Nichts"
     assert "Prüfung nicht lesbar: geraete_tco.json unlesbar" in ausfall.get_text()
+
+
+def test_quote_nennt_nicht_pruefbare_buendel(tmp_path):
+    """1 von 10 o2-Bündeln hat einen Beleg: nie „Belege 100 %“ ohne die 9 daneben."""
+    bestand = [_satz("o2", 1, 24, _p("gueltig"))] + [
+        _satz("o2", n, 24, _p("gueltig", nicht=[13])) for n in range(2, 11)
+    ]
+    lauf = {"lauf": HEUTE, **_kennzahlen(bestand)}
+    o2 = _zeile(lauf, "o2")
+    assert o2["belegquote"] == {
+        "zahl": 1,
+        "von": 1,
+        "prozent": 100,
+        "nicht_pruefbar": 9,
+    }
+    karte = _quellenseite(tmp_path, _datei(bestand, lauf)).select_one(
+        "#geraete-pruefung"
+    )
+    zeilen = _karten(karte)["o2"]
+    assert zeilen["Belege"] == "100 % von 1, 9 nicht prüfbar", zeilen
+    assert zeilen["frisch"] == "100 %", "Gegenprobe: ohne nicht prüfbare nur die Quote"
