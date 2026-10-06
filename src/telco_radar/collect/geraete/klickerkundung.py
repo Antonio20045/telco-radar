@@ -13,10 +13,16 @@ Anfragen mit den Körpern der JSON- und Textantworten (``klickspur``). Alles lan
 Bot-Schutz (Hauptseite mit 202, 4xx außer 404/410 oder 5xx, Challenge-Muster, oder eine
 Antwort der eigenen Website mit 403/429 oder Challenge) beendet die Seite als
 ``gestoert``; danach geht für diesen Anbieter keine Anfrage mehr hinaus (CLAUDE.md
-Regel 4). Sperrt robots.txt die Seite, ist sie ``gesperrt``. Jeder Anbieter hat
+Regel 4). Sperrt robots.txt die Seite, ist sie ``gesperrt``; zeigt sie kein
+Bedienelement oder keinen Preis, ist sie ``leer``. Vor jeder Seite fragt die
+``Laufpruefung`` (``klickparallel``), ob ein Gerätelauf oder Radarlauf ansteht oder
+läuft; dann ist der Rest ``verschoben``, ohne Anfrage. Jeder Anbieter hat
 ``ZEIT_JE_ANBIETER_S``, jede Seite ``ZEIT_JE_SEITE_S``, beides gegen die Gesamtfrist
-``ende`` (``time.monotonic``); die ``Fristschleuse`` lässt danach keine Anfrage mehr
-hinaus. Was nicht gelesen wurde, heißt so und ist nie leer: ``nicht_besucht`` mit Grund.
+``ende`` (``time.monotonic``); danach lassen ``Fristschleuse`` und der Abruf von
+robots.txt keine Anfrage mehr hinaus. Was nicht gelesen wurde, heißt so und ist nie
+leer: ``nicht_besucht`` mit Grund; Abstand und Besuchszeit stehen nur im Index, wenn
+robots.txt gelesen wurde. Screenshot und Seite gehören nur ins Artefakt des Laufs
+(``scripts/erkundung_ablegen.py`` lässt sie vom öffentlichen Zweig).
 """
 
 from __future__ import annotations
@@ -29,13 +35,21 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from .. import http
+from .basis import GeraeteAbrufFehler
 from .klickablage import Ablage
 from .klicklauf import LAUF_GELESEN, LAUF_GESPERRT, LAUF_GESTOERT
-from .klickseite import GRUND_FRIST, Fristschleuse, Seitenergebnis, Seitenlauf
-from .klickspur import als_daten, ohne_geheimnisse
+from .klickparallel import Laufpruefung
+from .klickseite import (
+    GRUND_FRIST,
+    LAUF_LEER,
+    Fristschleuse,
+    Seitenergebnis,
+    Seitenlauf,
+)
+from .klickspur import ohne_geheimnisse
 from .klicktor import Hostschleuse
 from .klickziele import Erkundungsziel, Seitenziel
-from .robots import RobotsWaechter
+from .robots import RobotsWaechter, host_von
 
 if TYPE_CHECKING:
     from playwright.sync_api import Browser
@@ -48,6 +62,9 @@ MINDESTZEIT_SEITE_S = 3 * 60
 GROESSE_JE_ANBIETER = 8_000_000
 ROBOTS_FRIST_S = 20.0
 NICHT_BESUCHT = "nicht_besucht"
+VERSCHOBEN = "verschoben"
+PRUEFUNG_AUS = "aus"
+PRUEFUNG_AN = "vor jeder Seite"
 GRUND_NACH_BOT = "nach Bot-Schutz keine weitere Anfrage (CLAUDE.md Regel 4)"
 HOECHSTE_LISTE = 200
 
@@ -73,13 +90,26 @@ def erkunde(
     uhr: Callable[[], datetime],
     ausgabe: Path,
     ende: float,
+    *,
+    laeufe: Laufpruefung | None,
     holer: Robotsholer = robots_holer,
     grenze: int = GROESSE_JE_ANBIETER,
 ) -> list[dict]:
-    """Erkundet die Anbieter nacheinander; je Anbieter der Inhalt von ``index.json``."""
+    """Erkundet die Anbieter nacheinander; je Anbieter der Inhalt von ``index.json``.
+
+    ``laeufe`` ist Pflicht; ``None`` schaltet die Parallellauf-Prüfung ausdrücklich ab
+    (nur für lokale Läufe), und ``index.json`` sagt das.
+    """
     return [
         erkunde_anbieter(
-            browser, z, uhr, holer(z.kennung or http.BOT_UA), ausgabe, ende, grenze
+            browser,
+            z,
+            uhr,
+            holer(z.kennung or http.BOT_UA),
+            ausgabe,
+            ende,
+            grenze,
+            laeufe=laeufe,
         )
         for z in ziele
     ]
@@ -93,33 +123,48 @@ def erkunde_anbieter(
     ausgabe: Path,
     ende: float,
     grenze: int = GROESSE_JE_ANBIETER,
+    *,
+    laeufe: Laufpruefung | None = None,
 ) -> dict:
     """Alle Seiten eines Anbieters; schreibt den Ordner, gibt ``index.json`` zurück."""
     start = time.monotonic()
     tag = uhr().date().isoformat()
     ablage = Ablage(ausgabe / ziel.schluessel / tag, grenze)
-    waechter = RobotsWaechter(hole=hole_robots)
+    gelesen: set[str] = set()
     anbieter_ende = min(ende, start + ZEIT_JE_ANBIETER_S)
-    innen = Hostschleuse(waechter, uhr, ziel.rate_limit_sekunden)
-    schleuse = Fristschleuse(innen, anbieter_ende)
+
+    def hole_mit_frist(url: str) -> tuple[int, str]:
+        if time.monotonic() >= schleuse.ende:
+            raise GeraeteAbrufFehler(f"{GRUND_FRIST}, robots.txt nicht abgerufen")
+        antwort = hole_robots(url)
+        gelesen.add(host_von(url))
+        return antwort
+
+    waechter = RobotsWaechter(hole=hole_mit_frist)
+    schleuse = Fristschleuse(
+        Hostschleuse(waechter, uhr, ziel.rate_limit_sekunden), anbieter_ende
+    )
     seiten: list[dict] = []
-    stopp: str | None = None
+    stopp: tuple[str, str] | None = None
     for nummer, seite in enumerate(ziel.seiten, 1):
         rest = anbieter_ende - time.monotonic()
         if stopp is None and rest < MINDESTZEIT_SEITE_S:
-            stopp = f"{GRUND_FRIST}: noch {max(0, round(rest))} s"
+            stopp = NICHT_BESUCHT, f"{GRUND_FRIST}: noch {max(0, round(rest))} s"
+        if stopp is None and laeufe is not None:
+            belegt = laeufe()
+            stopp = None if belegt is None else (VERSCHOBEN, belegt)
         if stopp is not None:
-            seiten.append(_nicht_besucht(nummer, seite, stopp))
+            seiten.append(_nicht_besucht(nummer, seite, *stopp))
             continue
         schleuse.setze(min(anbieter_ende, time.monotonic() + ZEIT_JE_SEITE_S))
         anteil = ablage.platz // (len(ziel.seiten) - nummer + 1)
-        lauf = Seitenlauf(browser, ziel, seite, waechter, uhr, schleuse)
-        ergebnis = lauf.laufe()
-        seiten.append(_lege_ab(ablage, nummer, seite, ergebnis, lauf, anteil))
+        ergebnis = Seitenlauf(browser, ziel, seite, waechter, uhr, schleuse).laufe()
+        seiten.append(lege_ab(ablage, nummer, seite, ergebnis, anteil))
         if ergebnis.bot:
-            stopp = GRUND_NACH_BOT
+            stopp = NICHT_BESUCHT, GRUND_NACH_BOT
     status, grund = gesamtstatus(seiten)
     adresse = ziel.seiten[0].adresse
+    robots = host_von(adresse) in gelesen
     index = {
         "anbieter": ziel.schluessel,
         "name": ziel.name,
@@ -127,8 +172,10 @@ def erkunde_anbieter(
         "status": status,
         "grund": grund,
         "kennung": ziel.kennung,
-        "abstand_sekunden": schleuse.abstand(adresse),
-        "besuchszeit": _besuchszeit(waechter, adresse),
+        "parallelpruefung": PRUEFUNG_AUS if laeufe is None else PRUEFUNG_AN,
+        "robots_gelesen": robots,
+        "abstand_sekunden": schleuse.abstand(adresse) if robots else None,
+        "besuchszeit": _besuchszeit(waechter, adresse) if robots else None,
         "dauer_sekunden": round(time.monotonic() - start, 1),
         "zeitgrenze_sekunden": ZEIT_JE_ANBIETER_S,
         "seiten": seiten,
@@ -139,22 +186,31 @@ def erkunde_anbieter(
 
 
 def gesamtstatus(seiten: list[dict]) -> tuple[str, str | None]:
-    """Gelesen nur, wenn jede Seite gelesen ist; gesperrt, wenn jede gesperrt ist."""
+    """Gelesen nur, wenn jede Seite gelesen ist; sonst der schwerste Befund mit Seite.
+
+    Gestört geht vor verschoben; leer gilt, wenn jede andere Seite gelesen ist;
+    gesperrt, wenn jede Seite gesperrt ist; jede andere Mischung heißt gestört.
+    """
     offen = [s for s in seiten if s["status"] != LAUF_GELESEN]
     if not offen:
         return LAUF_GELESEN, None
     if all(s["status"] == LAUF_GESPERRT for s in seiten):
         return LAUF_GESPERRT, offen[0]["grund"]
-    erste = next((s for s in offen if s["status"] == LAUF_GESTOERT), offen[0])
+    for status in (LAUF_GESTOERT, VERSCHOBEN):
+        erste = next((s for s in offen if s["status"] == status), None)
+        if erste is not None:
+            return status, f"Seite {erste['nummer']}: {erste['grund']}"
+    if all(s["status"] == LAUF_LEER for s in offen):
+        return LAUF_LEER, f"Seite {offen[0]['nummer']}: {offen[0]['grund']}"
+    erste = next(s for s in offen if s["status"] != LAUF_LEER)
     return LAUF_GESTOERT, f"Seite {erste['nummer']}: {erste['grund']}"
 
 
-def _lege_ab(
+def lege_ab(
     ablage: Ablage,
     nummer: int,
     seite: Seitenziel,
     ergebnis: Seitenergebnis,
-    lauf: Seitenlauf,
     anteil: int,
 ) -> dict:
     """Schreibt die Dateien einer Seite in ``anteil`` Bytes; gibt ihren Indexeintrag."""
@@ -183,6 +239,12 @@ def _lege_ab(
         dateien["klicks"] = ablage.schreibe_json(
             f"klicks-{nummer}.json", klicks, frei()
         )
+    platz = frei() - len(ablage.json_bytes(ergebnis.anfragen))
+    antworten = ablage.passe_mitschnitt(ergebnis.mitschnitt, platz)
+    mitschnitt = {"anfragen": ergebnis.anfragen, "antworten": antworten}
+    dateien["mitschnitt"] = ablage.schreibe_json(
+        f"mitschnitt-{nummer}.json", mitschnitt, frei()
+    )
     if ergebnis.bild is not None:
         dateien["screenshot"] = ablage.schreibe(
             f"seite-{nummer}.png", ergebnis.bild, frei()
@@ -190,13 +252,6 @@ def _lege_ab(
     if ergebnis.html is not None:
         name = f"seite-{nummer}.html.gz"
         dateien["html"] = ablage.schreibe_html(name, ergebnis.html, frei())
-    anfragen = als_daten(lauf.spur.eintraege)
-    platz = frei() - len(ablage.json_bytes(anfragen))
-    antworten = ablage.passe_mitschnitt(lauf.spur.mitschnitt, platz)
-    mitschnitt = {"anfragen": anfragen, "antworten": antworten}
-    dateien["mitschnitt"] = ablage.schreibe_json(
-        f"mitschnitt-{nummer}.json", mitschnitt, frei()
-    )
     return {
         "nummer": nummer,
         "geraet": seite.geraet,
@@ -206,31 +261,25 @@ def _lege_ab(
         "status": ergebnis.status,
         "grund": ergebnis.grund,
         "bot_schutz": ergebnis.bot,
-        "http_status": lauf.tor.haupt_status,
+        "http_status": ergebnis.http_status,
         "ruhe": ergebnis.ruhe,
         "dateien": dateien,
-        "zaehlung": _zaehlung(ergebnis, lauf),
-        "verworfen": [
-            {"url": ohne_geheimnisse(v.url), "grund": v.grund}
-            for v in lauf.lauf.verworfen[:HOECHSTE_LISTE]
-        ],
-        "gescheitert": [
-            {"url": ohne_geheimnisse(g.url), "grund": g.grund}
-            for g in lauf.lauf.gescheitert[:HOECHSTE_LISTE]
-        ],
+        "zaehlung": _zaehlung(ergebnis),
+        "verworfen": ergebnis.verworfen[:HOECHSTE_LISTE],
+        "gescheitert": ergebnis.gescheitert[:HOECHSTE_LISTE],
     }
 
 
-def _zaehlung(ergebnis: Seitenergebnis, lauf: Seitenlauf) -> dict:
+def _zaehlung(ergebnis: Seitenergebnis) -> dict:
     inventar = ergebnis.inventar
     je_art: dict[str, int] = {}
     for gruppe in inventar.gruppen if inventar else []:
         je_art[gruppe.art] = je_art.get(gruppe.art, 0) + 1
     return {
-        "anfragen": len(lauf.spur.eintraege),
-        "verworfen": len(lauf.lauf.verworfen),
-        "gescheitert": len(lauf.lauf.gescheitert),
-        "mitschnitt": len(lauf.spur.mitschnitt),
+        "anfragen": len(ergebnis.anfragen),
+        "verworfen": len(ergebnis.verworfen),
+        "gescheitert": len(ergebnis.gescheitert),
+        "mitschnitt": len(ergebnis.mitschnitt),
         "elemente": None if inventar is None else inventar.gesamt,
         "gruppen_je_art": None if inventar is None else je_art,
         "preis_kandidaten": None if inventar is None else inventar.preise_gesamt,
@@ -238,13 +287,13 @@ def _zaehlung(ergebnis: Seitenergebnis, lauf: Seitenlauf) -> dict:
     }
 
 
-def _nicht_besucht(nummer: int, seite: Seitenziel, grund: str) -> dict:
+def _nicht_besucht(nummer: int, seite: Seitenziel, status: str, grund: str) -> dict:
     return {
         "nummer": nummer,
         "geraet": seite.geraet,
         "speicher_gb": seite.speicher_gb,
         "adresse": ohne_geheimnisse(seite.adresse),
-        "status": NICHT_BESUCHT,
+        "status": status,
         "grund": grund,
         "dateien": {},
     }

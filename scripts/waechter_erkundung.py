@@ -10,6 +10,13 @@ mindestens ``ZEIT_JE_ANBIETER_S`` (CLAUDE.md Regel 8). ``git add`` nimmt nur
 ``erkundung``, ``git push`` geht ohne jeden Zusatz nur nach
 ``HEAD:refs/heads/klick-erkundung``, ``git pull`` holt nur ``klick-erkundung``: kein
 Force-Push, nie ``main``, nie ``data/`` oder ``site/``.
+
+Parallellauf (CLAUDE.md Regel 4): der Erkundungsjob darf ``actions: read`` und gibt dem
+Skript ``GITHUB_TOKEN: ${{ github.token }}``, nie ``--ohne-parallelpruefung``.
+Öffentlicher Zweig (Datenkonzept Abschnitt 12): nach ``ablage/erkundung`` schreibt nur
+``scripts/erkundung_ablegen.py einsortieren``, kein Artefakt wird dorthin geladen, und
+zwischen ``git add`` und ``git commit`` steht ``erkundung_ablegen.py pruefe``;
+Artefakte leben höchstens ``ARTEFAKT_TAGE`` Tage.
 """
 
 from __future__ import annotations
@@ -43,6 +50,15 @@ ERLAUBT = {
 VERBOTEN = re.compile(r"secrets\.|render_deploy|RENDER_DEPLOY", re.I)
 TRENNER = frozenset({";", "&&", "||", "|", "&", "(", ")", "((", "))"})
 GIT_OPTION_MIT_WERT = frozenset({"-c", "-C"})
+ACTIONS_RECHTE = ("actions", "read")
+TOKEN = ("GITHUB_TOKEN", "${{ github.token }}")
+OHNE_PRUEFUNG = "--ohne-parallelpruefung"
+ABLAGE_ORDNER = "ablage"
+ABLAGE = f"{ABLAGE_ORDNER}/erkundung"
+ABLEGER = "scripts/erkundung_ablegen.py"
+EINSORTIEREN = f"{ABLEGER} einsortieren"
+PRUEFEN = f"{ABLEGER} pruefe"
+ARTEFAKT_TAGE = 7
 _RECHENARTEN = {ast.Mult: float.__mul__, ast.Add: float.__add__, ast.Sub: float.__sub__}
 
 
@@ -53,7 +69,12 @@ def vertrag(wurzel: Path) -> list[str]:
         return []
     try:
         daten = yaml.safe_load(pfad.read_text(encoding="utf-8"))
-        return rahmen(daten) + fristjobs(wurzel, daten) + git_befehle(daten)
+        return (
+            rahmen(daten)
+            + fristjobs(wurzel, daten)
+            + git_befehle(daten)
+            + ablage(daten)
+        )
     except (
         OSError,
         KeyError,
@@ -113,6 +134,7 @@ def fristjobs(wurzel: Path, daten: dict) -> list[str]:
         if fehlt:
             meldungen.append(f"{ort}: {SKRIPT} ohne {', '.join(fehlt)}")
         umgebung = schritt.get("env") or {}
+        meldungen += _parallel(ort, job, umgebung, lauf)
         minuten = job.get("timeout-minutes")
         if umgebung.get(MINUTEN) != minuten:
             meldungen.append(
@@ -145,6 +167,64 @@ def git_befehle(daten: dict) -> list[str]:
     return meldungen
 
 
+def ablage(daten: dict) -> list[str]:
+    """Nur einsortierte und geprüfte Strukturdaten auf den Zweig, Artefakte kurz."""
+    meldungen = []
+    for name, job in daten["jobs"].items():
+        ort = f"{WORKFLOW} Job {name}"
+        laeufe = [str(s.get("run") or "") for s in job.get("steps") or []]
+        for schritt in job.get("steps") or []:
+            mit = schritt.get("with") or {}
+            art = str(schritt.get("uses") or "")
+            ziel = str(mit.get("path", ""))
+            if "download-artifact" in art and ziel.startswith(ABLAGE_ORDNER):
+                meldungen.append(f"{ort}: Artefakt direkt nach {ziel}")
+            tage = mit.get("retention-days")
+            if "upload-artifact" in art and (
+                not isinstance(tage, int) or tage > ARTEFAKT_TAGE
+            ):
+                meldungen.append(
+                    f"{ort}: Artefakt ohne retention-days ≤ {ARTEFAKT_TAGE}"
+                )
+        for zeile in (z for lauf in laeufe for z in _zeilen(lauf)):
+            if ABLAGE in zeile and EINSORTIEREN not in zeile:
+                meldungen.append(
+                    f"{ort}: schreibt an {EINSORTIEREN} vorbei: {zeile.strip()}"
+                )
+        for lauf in laeufe:
+            if any(b == "add" for b, _ in _git(lauf)):
+                meldungen += _geprueft(ort, lauf, laeufe)
+    return meldungen
+
+
+def _geprueft(ort: str, lauf: str, laeufe: list[str]) -> list[str]:
+    """Vor dem Vormerken eingeordnet, zwischen Vormerken und Commit geprüft."""
+    meldungen = []
+    stelle = laeufe.index(lauf)
+    if not any(EINSORTIEREN in v for v in laeufe[:stelle]):
+        meldungen.append(f"{ort}: git add ohne vorheriges {EINSORTIEREN}")
+    zeilen = _zeilen(lauf)
+    add = next(i for i, z in enumerate(zeilen) if any(b == "add" for b, _ in _git(z)))
+    commit = [i for i, z in enumerate(zeilen) if any(b == "commit" for b, _ in _git(z))]
+    zwischen = zeilen[add : commit[0]] if commit else zeilen[add:]
+    if not any(PRUEFEN in z for z in zwischen):
+        meldungen.append(f"{ort}: kein {PRUEFEN} zwischen git add und git commit")
+    return meldungen
+
+
+def _parallel(ort: str, job: dict, umgebung: dict, lauf: str) -> list[str]:
+    """Der Erkundungsjob fragt die GitHub-API nach Gerätelauf und Radarlauf."""
+    meldungen = []
+    rechte = job.get("permissions") or {}
+    if rechte.get(ACTIONS_RECHTE[0]) != ACTIONS_RECHTE[1]:
+        meldungen.append(f"{ort}: permissions ohne actions: read")
+    if umgebung.get(TOKEN[0]) != TOKEN[1]:
+        meldungen.append(f"{ort}: {TOKEN[0]} nicht {TOKEN[1]}")
+    if OHNE_PRUEFUNG in lauf:
+        meldungen.append(f"{ort}: {OHNE_PRUEFUNG} im Workflow")
+    return meldungen
+
+
 def _erkundet(schritt: dict) -> bool:
     lauf = str(schritt.get("run") or "")
     return SKRIPT in lauf and PLAN not in lauf
@@ -152,7 +232,7 @@ def _erkundet(schritt: dict) -> bool:
 
 def _git(lauf: str) -> Iterator[tuple[str, tuple[str, ...]]]:
     """Unterbefehl und Argumente jedes ``git``-Aufrufs, Kommentarzeilen ausgenommen."""
-    for zeile in lauf.replace("\\\n", " ").splitlines():
+    for zeile in _zeilen(lauf):
         if zeile.lstrip().startswith("#"):
             continue
         leser = shlex.shlex(zeile, posix=True, punctuation_chars=True)
@@ -171,6 +251,11 @@ def _git(lauf: str) -> Iterator[tuple[str, tuple[str, ...]]]:
                 rest = rest[2:] if rest[0] in GIT_OPTION_MIT_WERT else rest[1:]
             if rest:
                 yield rest[0], tuple(rest[1:])
+
+
+def _zeilen(lauf: str) -> list[str]:
+    """Die Zeilen eines ``run``-Blocks, Fortsetzungen mit ``\\`` zusammengezogen."""
+    return lauf.replace("\\\n", " ").splitlines()
 
 
 def _texte(knoten: object) -> Iterator[str]:

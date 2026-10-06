@@ -5,10 +5,16 @@
 geprüft wie der Crawler, wartet auf Laden und Ruhe (Takte von ``RUHE_MS``; Zeit, in der
 das Tor den Crawl-delay abwartet, zählt nicht) und lehnt eine Einwilligungsabfrage ab.
 Dann hält er Seite, Screenshot und Inventar fest und probiert Klicks (``klickproben``).
-In jedem Takt fragt ``pruefe`` die Spur nach Bot-Verdacht und das Tor nach Störung; dann
-geht keine Anfrage mehr hinaus und ``Seitenergebnis.bot`` ist wahr, außer die Hauptseite
-war tot (404, 410). Die ``Fristschleuse`` hält die Zeitgrenze: danach verwirft das Tor
-jede Anfrage, und der Lauf endet mit ``GRUND_FRIST``.
+Jede Antwort sieht der Lauf schon im Tor (``Tor.beobachter``): eine 403 oder 429 der
+eigenen Website auf eine Daten- oder Dokumentanfrage (``klickspur.bot_verdacht``) ist
+sofort eine Störung, vor jeder weiteren Anfrage, und jeder Set-Cookie-Wert kommt auf die
+Liste zum Schwärzen. In jedem Takt fragt ``pruefe`` die Spur nach Challenge-Mustern und
+das Tor nach Störung; dann geht keine Anfrage mehr hinaus und ``Seitenergebnis.bot`` ist
+wahr, außer die Hauptseite war tot (404, 410). Die ``Fristschleuse`` hält die
+Zeitgrenze: danach verwirft das Tor jede Anfrage, und der Lauf endet mit
+``GRUND_FRIST``. Eine Seite ohne Bedienelement oder ohne Preis-Kandidat heißt
+``LAUF_LEER`` mit Grund, nie „gelesen“. Alles, was die Ablage braucht, steht danach im
+``Seitenergebnis``.
 """
 
 from __future__ import annotations
@@ -27,7 +33,7 @@ from .klickinventar import Inventar, lies_inventar
 from .klickkontext import Sitzung, oeffne_sitzung, schliesse
 from .klicklauf import LAUF_GELESEN, LAUF_GESPERRT, LAUF_GESTOERT, Klicklauf
 from .klickproben import lehne_einwilligung_ab, probiere
-from .klickspur import Spur, ohne_geheimnisse
+from .klickspur import Eintrag, Spur, als_daten, bot_verdacht, ohne_geheimnisse
 from .klicktor import (
     GRUND_ZU_VIELE,
     HOECHSTE_UMLEITUNGEN,
@@ -42,7 +48,7 @@ from .klickziele import Erkundungsziel, Seitenziel
 from .robots import RobotsWaechter
 
 if TYPE_CHECKING:
-    from playwright.sync_api import Browser, Page, ViewportSize
+    from playwright.sync_api import APIResponse, Browser, Page, Request, ViewportSize
 
 log = logging.getLogger(__name__)
 
@@ -51,6 +57,8 @@ FENSTER: ViewportSize = {"width": 1280, "height": 900}
 ABGELAUFEN = "zeitgrenze"
 GRUND_FRIST = "Zeitgrenze erreicht"
 TOTE_STATUS = frozenset({404, 410})
+LAUF_LEER = "leer"
+SET_COOKIE = "set-cookie"
 _GELADEN_JS = "() => document.readyState === 'complete'"
 
 
@@ -96,7 +104,12 @@ class Seitenergebnis:
     einwilligung: dict | None = None
     klicks: list[dict] = field(default_factory=list)
     klick_vermerk: str | None = None
-    cookies: list[str] = field(default_factory=list)
+    cookies: set[str] = field(default_factory=set)
+    http_status: int | None = None
+    anfragen: list[dict] = field(default_factory=list)
+    mitschnitt: list[dict] = field(default_factory=list)
+    verworfen: list[dict] = field(default_factory=list)
+    gescheitert: list[dict] = field(default_factory=list)
 
 
 class Seitenlauf:
@@ -116,6 +129,7 @@ class Seitenlauf:
         self.browser, self.ziel, self.adresse = browser, ziel, seite.adresse
         self.lauf = Klicklauf(anbieter=ziel.name, adresse=seite.adresse)
         self.tor = Tor(waechter, uhr, schleuse, self.lauf)
+        self.tor.beobachter = self._beobachte
         self.schleuse = schleuse
         self.spur = Spur()
         self.ergebnis = Seitenergebnis()
@@ -136,6 +150,7 @@ class Seitenlauf:
             self.tor.geschlossen = True
             self._raeume(sitzung)
             schliesse(sitzung)
+        self._uebernimm()
         return self.ergebnis
 
     def pruefe(self) -> None:
@@ -187,6 +202,9 @@ class Seitenlauf:
             self.ergebnis.klick_vermerk = abbruch.grund
             if abbruch.status != ABGELAUFEN:
                 self._halte_an(abbruch)
+        luecke = leer(self.ergebnis.inventar)
+        if luecke is not None and self.ergebnis.status == LAUF_GELESEN:
+            self.ergebnis.status, self.ergebnis.grund = LAUF_LEER, luecke
 
     def _halte_an(self, abbruch: Abbruch) -> None:
         status = LAUF_GESTOERT if abbruch.status == ABGELAUFEN else abbruch.status
@@ -240,13 +258,36 @@ class Seitenlauf:
             self.seite.wait_for_timeout(WARTE_TAKT_MS)
         return False
 
+    def _beobachte(self, anfrage: Request, antwort: APIResponse) -> str | None:
+        """Merkt Set-Cookie-Werte; Grund, wenn die Antwort nach Bot-Schutz aussieht."""
+        for kopf in antwort.headers_array:
+            if kopf["name"].lower() == SET_COOKIE:
+                self.ergebnis.cookies.add(cookie_wert(kopf["value"]))
+        art, url = anfrage.resource_type, ohne_geheimnisse(antwort.url)
+        eintrag = Eintrag(0, anfrage.method, url, art, antwort.status)
+        return bot_verdacht(eintrag, "", self.adresse)
+
+    def _uebernimm(self) -> None:
+        """Was Tor, Spur und Lauf festhielten, als Daten ins Ergebnis."""
+        self.ergebnis.http_status = self.tor.haupt_status
+        self.ergebnis.anfragen = als_daten(self.spur.eintraege)
+        self.ergebnis.mitschnitt = self.spur.mitschnitt
+        self.ergebnis.verworfen = [
+            {"url": ohne_geheimnisse(v.url), "grund": v.grund}
+            for v in self.lauf.verworfen
+        ]
+        self.ergebnis.gescheitert = [
+            {"url": ohne_geheimnisse(g.url), "grund": g.grund}
+            for g in self.lauf.gescheitert
+        ]
+
     def _raeume(self, sitzung: Sitzung | None) -> None:
         """Letzte Antworten in den Mitschnitt, Cookie-Werte zum Schwärzen merken."""
         if sitzung is None:
             return
         try:
             verdacht = self.spur.sammle(sitzung.seite.url)
-            self.ergebnis.cookies = [c["value"] for c in sitzung.kontext.cookies()]
+            self.ergebnis.cookies.update(c["value"] for c in sitzung.kontext.cookies())
         except PlaywrightFehler as fehler:
             log.warning(
                 "Klick-Erkundung %s: nicht aufgeräumt: %s", self.adresse, kurz(fehler)
@@ -255,3 +296,21 @@ class Seitenlauf:
         if verdacht is not None and self.ergebnis.status == LAUF_GELESEN:
             self.ergebnis.status, self.ergebnis.grund = LAUF_GESTOERT, verdacht
             self.ergebnis.bot = True
+
+
+def leer(inventar: Inventar | None) -> str | None:
+    """Grund, wenn die Seite kein Bedienelement oder keinen Preis-Kandidaten zeigt."""
+    if inventar is None:
+        return None
+    fehlt = []
+    if inventar.gesamt == 0:
+        fehlt.append("kein Bedienelement")
+    if inventar.preise_gesamt == 0:
+        fehlt.append("kein Preis-Kandidat")
+    return " und ".join(fehlt) if fehlt else None
+
+
+def cookie_wert(set_cookie: str) -> str:
+    """Der Wert aus einer Set-Cookie-Zeile ``name=wert; Attribute``."""
+    paar = set_cookie.split(";", 1)[0]
+    return paar.partition("=")[2].strip().strip('"')

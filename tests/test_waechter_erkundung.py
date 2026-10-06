@@ -1,19 +1,23 @@
 """Stufe-0-Vertrag des Klick-Erkundungs-Workflows an einem Beispiel im Wegwerfordner.
 
 Das Beispiel hält den Vertrag; jeder Test bricht genau eine Stelle (Auslöser,
-Concurrency, Rechte, Secret, Zeitgrenze, Chromium, Frist, ``git add``/``push``/
-``pull``) und erwartet genau ihre Meldung. Fehlt der Workflow, gilt nichts; die
+Concurrency, Rechte, Secret, Zeitgrenze, Chromium, Frist, Parallellauf-Prüfung,
+``git add``/``push``/``pull``, Einsortieren und Leckscan vor dem Commit, Artefakte)
+und erwartet genau ihre Meldung. Fehlt der Workflow, gilt nichts; die
 Leiter ruft den Vertrag über ``waechter_vertraege.pruefe``.
 """
 
 from __future__ import annotations
 
+import importlib
+import sys
 from pathlib import Path
 
 import pytest
 
-from scripts import waechter_erkundung as we
-from scripts import waechter_vertraege as wv
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+we = importlib.import_module("waechter_erkundung")
+wv = importlib.import_module("waechter_vertraege")
 
 ORT = f"{we.WORKFLOW} Job erkunde"
 MODUL = "ZEIT_JE_ANBIETER_S = 50 * 60\n"
@@ -31,20 +35,33 @@ concurrency:
 jobs:
   erkunde:
     timeout-minutes: 75
+    permissions:
+      contents: read
+      actions: read
     steps:
       - run: python -m playwright install --with-deps chromium
       - env:
+          GITHUB_TOKEN: ${{ github.token }}
           JOB_MINUTEN: 75
           RESERVE_SEKUNDEN: 600
         run: |
           frist=$(( JOB_START + JOB_MINUTEN * 60 - RESERVE_SEKUNDEN - $(date +%s) ))
           python scripts/klick_erkunden.py --anbieter "$A" \\
             --frist-sekunden "$frist"
+      - uses: actions/upload-artifact@v4
+        with:
+          path: erkundung/
+          retention-days: 7
   ablegen:
     steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: neu
+      - run: python scripts/erkundung_ablegen.py einsortieren neu ablage/erkundung
       - run: |
           # git add -A steht hier nur im Kommentar
           git add erkundung
+          python scripts/erkundung_ablegen.py pruefe erkundung
           git -C . commit -m "x"
           if git push origin "HEAD:refs/heads/klick-erkundung"; then exit 0; fi
           git pull --rebase origin klick-erkundung || exit 1
@@ -124,6 +141,35 @@ def test_ohne_workflow_gilt_nichts(tmp_path):
             "git pull --rebase",
         ),
         ('-m "x"', '-m "x', "nicht prüfbar"),
+        ("      actions: read\n", "", "permissions ohne actions: read"),
+        (
+            "GITHUB_TOKEN: ${{ github.token }}",
+            "GITHUB_TOKEN: ${{ env.T }}",
+            "GITHUB_TOKEN nicht ${{ github.token }}",
+        ),
+        (
+            '--frist-sekunden "$frist"',
+            '--frist-sekunden "$frist" --ohne-parallelpruefung',
+            "--ohne-parallelpruefung im Workflow",
+        ),
+        ("retention-days: 7", "retention-days: 30", "retention-days ≤ 7"),
+        ("path: neu", "path: ablage/erkundung", "Artefakt direkt nach ablage"),
+        (
+            "einsortieren neu ablage/erkundung",
+            "--help",
+            "git add ohne vorheriges scripts/erkundung_ablegen.py einsortieren",
+        ),
+        (
+            "          python scripts/erkundung_ablegen.py pruefe erkundung\n",
+            "",
+            "kein scripts/erkundung_ablegen.py pruefe zwischen git add und git commit",
+        ),
+        (
+            "      - run: |\n          # git",
+            "      - run: cp -R neu/. ablage/erkundung/\n"
+            "      - run: |\n          # git",
+            "schreibt an scripts/erkundung_ablegen.py einsortieren vorbei",
+        ),
     ],
 )
 def test_jeder_bruch_nennt_seine_stelle(projekt, alt, neu, meldung):

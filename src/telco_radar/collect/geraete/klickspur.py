@@ -3,10 +3,12 @@
 ``Spur`` hängt an den Ereignissen der Seite (``binde``) und hält je Anfrage Methode,
 Adresse, Art, HTTP-Status oder Abbruchgrund; laufende Anfragen machen die Ruhe aus
 (keine läuft, keine neue seit der letzten Lesung). ``sammle`` liest die Körper der seit
-dem letzten Aufruf eingegangenen Antworten, nur JSON und Text (``MITSCHNITT_TYPEN``),
-je Antwort höchstens ``HOECHSTE_ANTWORT`` Bytes, gekürzt mit Vermerk. Kopfzeilen werden
-nie gespeichert, also auch kein Cookie und kein Set-Cookie; jede Adresse verliert die
-Werte geheimer Parameter (``ohne_geheimnisse``).
+dem letzten Aufruf eingegangenen Antworten, nur JSON (``MITSCHNITT_TYPEN``; Seiten und
+anderer Text bleiben draußen), je Antwort höchstens ``HOECHSTE_ANTWORT`` Bytes, gekürzt
+mit Vermerk. Kopfzeilen werden nie gespeichert, also auch kein Cookie und kein
+Set-Cookie; jede Adresse verliert die Werte geheimer Parameter (``ohne_geheimnisse``).
+``schwaerze_text`` ersetzt in beliebigem Text die Werte geheimer Parameter, geheimer
+JSON-Schlüssel (``GEHEIM``), JSON Web Tokens und Bearer-Kennungen.
 
 ``bot_verdacht`` nennt den Grund, wenn eine Antwort der eigenen Website (dieselben
 letzten zwei Namensteile wie die Seite) nach Bot-Schutz aussieht: HTTP 403 oder 429 auf
@@ -34,29 +36,57 @@ if TYPE_CHECKING:
 log = logging.getLogger(__name__)
 
 HOECHSTE_ANTWORT = 200_000
-MITSCHNITT_TYPEN = re.compile(r"json|^text/(?:plain|html|xml)|^application/xml", re.I)
+MITSCHNITT_TYPEN = re.compile(r"json", re.I)
 DATENARTEN = frozenset({"xhr", "fetch", "document"})
 BOT_STATUS = frozenset({403, 429})
 GEHEIM = re.compile(
-    r"token|secret|passw|session|^sid$|auth|signature|^sig$|api[_-]?key|^key$"
+    r"token|secret|passw|session|^sid$|auth(?!or)|signature|^sig$|api[_-]?key|^key$"
     r"|jwt|csrf|xsrf|nonce",
     re.I,
 )
 ENTFERNT = "ENTFERNT"
+_PARAMETER = re.compile(r"(?<![\w.\[\]-])([\w.\[\]-]{1,80})=([^&#;,\s\"'<>\\]*)")
+_JSON_FELD = re.compile(r'"([^"\\]{1,80})"(\s*:\s*)("(?:[^"\\]|\\.)*"|-?\d[\d.eE+-]*)')
+_JWT = re.compile(r"eyJ[\w-]{4,}\.eyJ[\w-]{4,}\.[\w-]*")
+_BEARER = re.compile(r"(?i)\b(bearer\s+)(?!ENTFERNT\b)[\w.~+/=-]{4,}")
 WEB_SCHEMA = ("http", "https")
 NAMENSTEILE_SITE = 2
 
 
 def ohne_geheimnisse(url: str) -> str:
-    """Die Adresse ohne Werte geheimer Parameter und ohne Zugangsdaten im Host."""
+    """Die Adresse ohne Werte geheimer Parameter und ohne Zugangsdaten im Host.
+
+    Eine relative Adresse behält Pfad und Parameter, ohne Fragment.
+    """
     teile = urlsplit(url)
-    if teile.scheme not in WEB_SCHEMA:
-        return teile.scheme + ":" if teile.scheme else url
+    if teile.scheme and teile.scheme not in WEB_SCHEMA:
+        return teile.scheme + ":"
     paare = parse_qsl(teile.query, keep_blank_values=True)
     sauber = [(k, ENTFERNT if GEHEIM.search(k) else v) for k, v in paare]
     host = teile.hostname or ""
     ort = f"{host}:{teile.port}" if teile.port else host
     return urlunsplit((teile.scheme, ort, teile.path, urlencode(sauber), ""))
+
+
+def schwaerze_text(text: str) -> str:
+    """Text ohne Werte geheimer Parameter und JSON-Felder, ohne Tokens."""
+    text = _JWT.sub(ENTFERNT, text)
+    text = _BEARER.sub(lambda m: m[1] + ENTFERNT, text)
+    text = _PARAMETER.sub(_ohne_wert, text)
+    return _JSON_FELD.sub(_ohne_feldwert, text)
+
+
+def _ohne_wert(treffer: re.Match[str]) -> str:
+    schluessel, wert = treffer[1], treffer[2]
+    if not wert or not GEHEIM.search(schluessel):
+        return treffer[0]
+    return f"{schluessel}={ENTFERNT}"
+
+
+def _ohne_feldwert(treffer: re.Match[str]) -> str:
+    if not GEHEIM.search(treffer[1]):
+        return treffer[0]
+    return f'"{treffer[1]}"{treffer[2]}"{ENTFERNT}"'
 
 
 def gleiche_site(url: str, seite: str) -> bool:

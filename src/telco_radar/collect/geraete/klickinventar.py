@@ -10,6 +10,7 @@ jedes Select ist eine eigene. ``art_der_gruppe`` ordnet sie Speicher, Laufzeit, 
 oder Farbe zu, sonst ``unbekannt``. ``preise`` nennt jedes kleinste Element mit einem
 €-Betrag samt Text, Kontext und Pfad. Shadow-DOM bleibt außen vor; Elemente über
 ``HOECHSTE_ELEMENTE`` und Preise über ``HOECHSTE_PREISE`` fallen weg, mit Zählung.
+Links und die Adresse verlieren geheime Parameter, Felder mit geheimem Namen ihren Wert.
 """
 
 from __future__ import annotations
@@ -17,6 +18,8 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
+
+from .klickspur import ENTFERNT, GEHEIM, ohne_geheimnisse
 
 if TYPE_CHECKING:
     from playwright.sync_api import Page
@@ -247,7 +250,7 @@ class Inventar:
 def lies_inventar(seite: Page) -> Inventar:
     """Bedienelemente, Gruppen und Preis-Kandidaten im aktuellen Zustand der Seite."""
     roh = seite.evaluate(_INVENTAR_JS, HOECHSTE_ELEMENTE)
-    elemente: list[dict] = roh["elemente"]
+    elemente: list[dict] = [_ohne_geheimes(e) for e in roh["elemente"]]
     gruppen: list[Gruppe] = []
     for nummer, behaelter in enumerate(roh["behaelter"]):
         glieder = tuple(i for i, e in enumerate(elemente) if e["behaelter"] == nummer)
@@ -275,9 +278,20 @@ def lies_inventar(seite: Page) -> Inventar:
                 )
             )
     preise = preis_kandidaten(seite)
+    adresse = ohne_geheimnisse(seite.url)
     return Inventar(
-        seite.url, elemente, gruppen, roh["gesamt"], preise["preise"], preise["gesamt"]
+        adresse, elemente, gruppen, roh["gesamt"], preise["preise"], preise["gesamt"]
     )
+
+
+def _ohne_geheimes(element: dict) -> dict:
+    """Ein Link ohne geheime Parameter, ein Feld mit geheimem Namen ohne Wert."""
+    if element["href"] is not None:
+        element["href"] = ohne_geheimnisse(element["href"])
+    name = element["name"]
+    if name is not None and element["wert"] is not None and GEHEIM.search(name):
+        element["wert"] = ENTFERNT
+    return element
 
 
 def preis_kandidaten(seite: Page) -> dict:

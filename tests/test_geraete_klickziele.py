@@ -151,10 +151,19 @@ def test_gesamtstatus_nennt_die_erste_stoerung():
     gelesen = {"nummer": 1, "status": "gelesen", "grund": None}
     gesperrt = {"nummer": 2, "status": "gesperrt", "grund": "per robots.txt"}
     offen = {"nummer": 2, "status": "nicht_besucht", "grund": "Zeitgrenze"}
+    leer = {"nummer": 2, "status": "leer", "grund": "kein Preis-Kandidat"}
+    spaeter = {"nummer": 2, "status": "verschoben", "grund": "Gerätelauf läuft"}
+    bot = {"nummer": 1, "status": "gestoert", "grund": "HTTP 403"}
 
     assert gesamtstatus([gelesen, gelesen]) == ("gelesen", None)
     assert gesamtstatus([gesperrt, gesperrt]) == ("gesperrt", "per robots.txt")
     assert gesamtstatus([gelesen, offen]) == ("gestoert", "Seite 2: Zeitgrenze")
+    assert gesamtstatus([gelesen, leer]) == ("leer", "Seite 2: kein Preis-Kandidat")
+    assert gesamtstatus([gelesen, spaeter]) == (
+        "verschoben",
+        "Seite 2: Gerätelauf läuft",
+    )
+    assert gesamtstatus([bot, spaeter]) == ("gestoert", "Seite 1: HTTP 403")
 
 
 def test_ablage_schwaerzt_cookies_und_haelt_die_grenze(tmp_path):

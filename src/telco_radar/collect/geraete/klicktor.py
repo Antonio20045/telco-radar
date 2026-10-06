@@ -154,7 +154,10 @@ class Tor:
     nicht gescheitert. Was nach ``geschlossen`` scheitert, zählt nicht als gescheitert.
     Sieht eine Antwort auf die Hauptseite nach Bot-Schutz aus (``bot_schutz``), kommt
     sie nie im Browser an: ``stoerung`` nennt den Grund, ``haupt_status`` den Status,
-    und keine weitere Anfrage geht hinaus.
+    und keine weitere Anfrage geht hinaus; geprüft wird beim Eintritt und noch einmal
+    nach jedem Warten auf Host und Abstand, unmittelbar vor dem Abruf. ``beobachter``
+    sieht jede geholte Antwort, bevor sie in den Browser geht; nennt er einen Grund,
+    ist das eine Störung, außer bei der Hauptseite (dort gilt ``bot_schutz``).
     """
 
     def __init__(
@@ -171,6 +174,7 @@ class Tor:
         self.haupt_status: int | None = None
         self.umleitung: str | None = None
         self.warte: Callable[[float], None] | None = None
+        self.beobachter: Callable[[Request, APIResponse], str | None] | None = None
         self._unterwegs: set[str] = set()
 
     def darf(self, url: str) -> tuple[bool, str]:
@@ -205,8 +209,9 @@ class Tor:
             antwort = self._hole(route, ziel, methode)
             if antwort is None:
                 return
-            ort = antwort.headers.get("location")
             hauptseite = _hauptseite(anfrage)
+            self._beobachte(anfrage, antwort, hauptseite)
+            ort = antwort.headers.get("location")
             if ort is None or not UMLEITUNG_AB <= antwort.status <= UMLEITUNG_BIS:
                 if not hauptseite or self._pruefe_hauptseite(route, antwort):
                     _gib_weiter(route, antwort)
@@ -234,10 +239,15 @@ class Tor:
             self._unterwegs.add(host)
             try:
                 self.schleuse.passiere(ziel)
-                return True
             except GeraeteAbrufFehler as fehler:
                 self._unterwegs.discard(host)
                 grund = str(fehler)
+            else:
+                if self.stoerung is None:
+                    return True
+                self._unterwegs.discard(host)
+                _schliesse(route, ABBRUCH_CODE)
+                return False
         self._verwirf(route, ziel, grund, anfrage)
         return False
 
@@ -247,6 +257,14 @@ class Tor:
                 break
             self.warte(WARTE_TAKT_MS)
         return host not in self._unterwegs
+
+    def _beobachte(
+        self, anfrage: Request, antwort: APIResponse, hauptseite: bool
+    ) -> None:
+        grund = None if self.beobachter is None else self.beobachter(anfrage, antwort)
+        if grund is not None and not hauptseite and self.stoerung is None:
+            log.warning("Klick-Crawler: %s; Lauf endet", grund)
+            self.stoerung = grund
 
     def _hole(self, route: Route, ziel: str, methode: str) -> APIResponse | None:
         try:

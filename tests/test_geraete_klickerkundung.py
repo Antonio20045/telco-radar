@@ -263,7 +263,7 @@ def test_groessengrenze_kuerzt_mit_vermerk(chromium, tmp_path):
 
 
 def test_antwort_ueber_200_kb_wird_mit_vermerk_gekuerzt(chromium, tmp_path):
-    riesig = Antwort(200, "text/plain", "z" * (HOECHSTE_ANTWORT + 50_000))
+    riesig = Antwort(200, "application/json", "9" * (HOECHSTE_ANTWORT + 50_000))
     laden = 'fetch("/api/riesig").catch(() => {});'
     with klickserver(
         _beispiel(_seite(nachladen=laden), **{"/api/riesig": riesig})

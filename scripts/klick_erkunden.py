@@ -10,6 +10,7 @@ AUFRUF
 ------
     PYTHONPATH=src python scripts/klick_erkunden.py [--anbieter alle|o2,telekom]
         [--ausgabe erkundung] [--frist-sekunden 3600] [--root .] [--chromium PFAD]
+        [--ohne-parallelpruefung]
     PYTHONPATH=src python scripts/klick_erkunden.py --plan --anbieter alle
 
 ``--frist-sekunden`` ist die Gesamtfrist ab Start; jeder Anbieter bekommt höchstens
@@ -18,6 +19,10 @@ gibt die Schlüssel als JSON-Liste aus (für die Matrix des Workflows), ohne Net
 gestörter Anbieter ist ein Ergebnis, kein Fehler: der Exit-Code ist 0; 2 heißt, die
 Auswahl oder die Konfiguration ist falsch. ``--chromium`` nennt eine vorhandene
 Chromium-Datei für lokale Läufe ohne passenden Playwright-Browser; Actions lässt es weg.
+Vor jeder Seite fragt die Erkundung über die GitHub-API (``GITHUB_REPOSITORY``,
+``GITHUB_TOKEN``), ob ``geraete.yml`` oder ``radar.yml`` ansteht oder läuft; dann und
+ohne lesbare API ist der Anbieter ``verschoben``. ``--ohne-parallelpruefung`` schaltet
+das nur für lokale Läufe gegen einen Beispielserver ab; ``index.json`` nennt es.
 """
 
 from __future__ import annotations
@@ -25,6 +30,7 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import os
 import sys
 import time
 from datetime import UTC, datetime
@@ -33,6 +39,7 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 
 from telco_radar.collect.geraete.klickerkundung import ZEIT_JE_ANBIETER_S, erkunde
+from telco_radar.collect.geraete.klickparallel import aus_umgebung
 from telco_radar.collect.geraete.klickziele import (
     ALLE,
     ErkundungszielFehler,
@@ -55,6 +62,7 @@ def main(argumente: list[str] | None = None) -> int:
     parser.add_argument("--frist-sekunden", type=float, default=ZEIT_JE_ANBIETER_S)
     parser.add_argument("--plan", action="store_true")
     parser.add_argument("--chromium", type=Path)
+    parser.add_argument("--ohne-parallelpruefung", action="store_true")
     args = parser.parse_args(argumente)
     try:
         ziele = waehle(lade_ziele(args.root), args.anbieter)
@@ -68,10 +76,11 @@ def main(argumente: list[str] | None = None) -> int:
         level=logging.INFO, format="%(levelname)s %(name)s: %(message)s"
     )
     ende = time.monotonic() + args.frist_sekunden
+    laeufe = None if args.ohne_parallelpruefung else aus_umgebung(os.environ)
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch(executable_path=args.chromium)
         try:
-            indizes = erkunde(browser, ziele, _uhr, args.ausgabe, ende)
+            indizes = erkunde(browser, ziele, _uhr, args.ausgabe, ende, laeufe=laeufe)
         finally:
             browser.close()
     for index in indizes:

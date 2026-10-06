@@ -4,9 +4,11 @@
 gegen ``grenze``; ``RESERVE_INDEX`` bleibt für ``index.json``. Passt eine Datei nicht
 mehr, wird sie nicht geschrieben und ``vermerke`` nennt sie; den Mitschnitt kürzt
 ``passe_mitschnitt`` vorher, indem er die größten Körper weglässt, je mit Vermerk am
-Eintrag. Text geht vor dem Schreiben durch ``schwaerze``: jeder Cookie-Wert des Kontexts
+Eintrag. Text geht vor dem Schreiben durch ``schwaerze``: jeder je gesehene Cookie-Wert
 ab ``COOKIE_MINDESTLAENGE`` Zeichen, auch URL-kodiert, wird ersetzt, damit kein Cookie
-gespeichert wird, auch keiner, den eine Seite in ihr HTML oder eine Antwort schreibt.
+gespeichert wird, auch keiner, den eine Seite in ihr HTML oder eine Antwort schreibt;
+danach ersetzt ``klickspur.schwaerze_text`` geheime Parameter, JSON-Felder und Tokens.
+Bei JSON gilt das für jeden Text darin einzeln, auch für Antwortkörper.
 Ein alter Stand desselben Tages wird vorher geleert, damit der Ordner genau einen Lauf
 zeigt.
 """
@@ -15,9 +17,12 @@ from __future__ import annotations
 
 import gzip
 import json
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from pathlib import Path
 from urllib.parse import quote
+
+from .klickspur import schwaerze_text
 
 RESERVE_INDEX = 100_000
 COOKIE_MINDESTLAENGE = 8
@@ -48,21 +53,30 @@ class Ablage:
         """Bytes, die bis zur Grenze noch frei sind, ohne die Reserve des Index."""
         return max(0, self.grenze - RESERVE_INDEX - self.belegt)
 
-    def merke_cookies(self, werte: list[str]) -> None:
+    def merke_cookies(self, werte: Iterable[str]) -> None:
         """Merkt Cookie-Werte, die vor jedem Schreiben geschwärzt werden."""
         self.geheim.update(w for w in werte if len(w) >= COOKIE_MINDESTLAENGE)
 
     def schwaerze(self, text: str) -> str:
-        """Ersetzt jeden gemerkten Cookie-Wert, roh und URL-kodiert."""
+        """Ersetzt jeden gemerkten Cookie-Wert, roh und URL-kodiert, und Geheimes."""
         for wert in sorted(self.geheim, key=len, reverse=True):
             for form in {wert, quote(wert, safe="")}:
                 text = text.replace(form, GESCHWAERZT)
-        return text
+        return schwaerze_text(text)
 
     def json_bytes(self, daten: object) -> bytes:
-        """Geschwärztes JSON als UTF-8."""
-        text = json.dumps(daten, ensure_ascii=False, indent=1)
+        """Geschwärztes JSON als UTF-8, jeder Text darin auch einzeln geschwärzt."""
+        text = json.dumps(self._sauber(daten), ensure_ascii=False, indent=1)
         return self.schwaerze(text).encode("utf-8")
+
+    def _sauber(self, daten: object) -> object:
+        if isinstance(daten, str):
+            return self.schwaerze(daten)
+        if isinstance(daten, dict):
+            return {k: self._sauber(v) for k, v in daten.items()}
+        if isinstance(daten, list | tuple):
+            return [self._sauber(v) for v in daten]
+        return daten
 
     def schreibe(self, name: str, daten: bytes, platz: int | None = None) -> str | None:
         """Schreibt ``daten``, wenn sie in ``platz`` (Standard: ``self.platz``) passen.
