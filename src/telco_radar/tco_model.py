@@ -103,15 +103,16 @@ from typing import Optional
 from .geraete_model import Ratenzahlung, normalisiere
 from .tarif_model import (
     PREISTYP_DOKUMENT,
-    PREISTYP_LIVE_SHOP,
     Preisphase,
     vertrag_basis,
 )
+from .tco_kosten import Kosten as Kosten
+from .tco_kosten import kosten_ueber as kosten_ueber
+from .tco_kosten import zeitraum as zeitraum
 
 log = logging.getLogger(__name__)
 
 TCO_HORIZONT = 24
-
 
 _TRENNER = "--"
 
@@ -350,9 +351,8 @@ class Rabatt:
             wert = float(wert)
             if wert < 0:
                 raise ValueError(
-                    f"negativer betrag in {feld}: {wert} - ein "
-                    f"Rabatt wird als positiver Nachlass "
-                    f"geschrieben"
+                    f"negativer betrag in {feld}: {wert} - ein Rabatt wird "
+                    "als positiver Nachlass geschrieben"
                 )
             setattr(self, feld, round(wert, 2))
         self.von_monat = int(self.von_monat)
