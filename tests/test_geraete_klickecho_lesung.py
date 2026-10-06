@@ -1,9 +1,10 @@
 """Lesung der Preiszusammenfassung und Variantenprüfung: Grenzfälle des Prüfers.
 
-Ein entfallender Posten bekommt nicht den nächsten Betrag, begrenztes Volumen wird nicht
-unbegrenzt, ein Betrag vor „in den ersten N Monaten“ ist Phase 1–N, widersprüchliche
-Phasen fallen weg, eine nicht lesbare Laufzeit gilt nie als bestätigt und die Antwort
-nennt ihre Variante über Pfad oder Adressparameter (Pflicht in der Klick-Karte).
+Ein entfallender Posten bekommt nicht den nächsten Betrag, auch nicht über Komma,
+Gedankenstrich oder Semikolon hinweg, begrenztes Volumen wird nicht unbegrenzt, ein
+Betrag vor „in den ersten N Monaten“ ist Phase 1–N, widersprüchliche Phasen fallen
+weg, eine nicht lesbare Laufzeit gilt nie als bestätigt und die Antwort nennt ihre
+Variante über Pfad oder Adressparameter (Pflicht in der Klick-Karte).
 """
 
 from __future__ import annotations
@@ -247,6 +248,25 @@ def test_kaputte_parameter_nennen_die_stelle(ersetzt, feld):
     ],
 )
 def test_nullwort_gilt_nur_am_posten_und_ein_betrag_geht_vor(text, feld, erwartet):
+    from telco_radar.collect.geraete.klickecho import lies_zusammenfassung
+
+    assert getattr(lies_zusammenfassung(text), feld) == erwartet
+
+
+@pytest.mark.parametrize(
+    ("text", "feld", "erwartet"),
+    [
+        ("Ohne Anzahlung, Rate 25,00 €", "anzahlung", 0.0),
+        ("Gerät ohne Anzahlung – Rate 33,00 €", "anzahlung", 0.0),
+        ("Gerät ohne Anzahlung – Rate 33,00 €", "rate", 33.0),
+        ("Keine Anschlussgebühr, Versand 4,99 €", "anschluss", 0.0),
+        ("Keine Anzahlung; Rate 25,00 €", "anzahlung", 0.0),
+        ("Anzahlung, Rate 30,00 €", "anzahlung", None),
+        ("Anzahlung – 99,00 €", "anzahlung", 99.0),
+        ("Anzahlung - entfällt", "anzahlung", 0.0),
+    ],
+)
+def test_posten_endet_an_komma_strich_und_semikolon(text, feld, erwartet):
     from telco_radar.collect.geraete.klickecho import lies_zusammenfassung
 
     assert getattr(lies_zusammenfassung(text), feld) == erwartet

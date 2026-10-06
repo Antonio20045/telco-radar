@@ -1,15 +1,17 @@
 """Lesung der sichtbaren Preiszusammenfassung nach einem Klick.
 
 Die erste der zwei Lesungen des Klick-Crawlers (Datenkonzept Geräteradar, Abschnitt 8);
-die zweite, die Antwort, liest ``klickecho``. Ein genannter Betrag geht vor; die Lücke
-zwischen Posten und Betrag überspringt weder „entfällt“, „keine“, „kostenlos“ noch
-„sonst“, „statt“, „danach“ oder Trenner wie „·“. Ohne Betrag ist ein Posten 0, wenn das
-Nullwort unmittelbar am Posten steht („Anzahlung: entfällt“) oder davor („ohne
-Anzahlung“); ein Nullwort eines anderen Satzteils („keine Zinsen“) ist keine 0. Ein
-Datenvolumen mit GB-Zahl ist begrenzt, auch wenn die Zeile „unbegrenzt“ nennt;
-unbegrenzt ist es nur ohne Zahl (``math.inf``). Tarifphasen mit einem Ende vor dem
-Anfang sind ein Widerspruch: die Zeile ergibt dann keine Phasen. Fehlt ein Wert, ist er
-``None``, nie 0. Deutsche Zahlen liest ``tarif_model.zahl``.
+die zweite, die Antwort, liest ``klickecho``. Ein genannter Betrag geht vor, aber nur am
+Posten selbst: ein Posten endet an Komma, Gedankenstrich, Semikolon, „·“ und Zeilenende,
+und die Lücke bis zum Betrag überspringt weder „entfällt“, „keine“, „kostenlos“ noch
+„sonst“, „statt“, „danach“; ein verneinter Posten („ohne Anzahlung“) nimmt keinen
+Betrag. Ohne Betrag ist ein Posten 0, wenn das Nullwort unmittelbar am Posten steht
+(„Anzahlung: entfällt“) oder davor („ohne Anzahlung“); ein Nullwort eines anderen
+Satzteils („keine Zinsen“) ist keine 0. Ein Datenvolumen mit GB-Zahl ist begrenzt, auch
+wenn die Zeile „unbegrenzt“ nennt; unbegrenzt ist es nur ohne Zahl (``math.inf``).
+Tarifphasen mit einem Ende vor dem Anfang sind ein Widerspruch: die Zeile ergibt dann
+keine Phasen. Fehlt ein Wert, ist er ``None``, nie 0. Deutsche Zahlen liest
+``tarif_model.zahl``.
 """
 
 from __future__ import annotations
@@ -26,7 +28,10 @@ _BETRAG = r"(\d{1,3}(?:\.\d{3})+(?:,\d{1,2})?|\d+(?:,\d{1,2})?)\s*(?:€|EUR\b|E
 _ZAHL = r"(\d{1,3}(?:\.\d{3})+(?:,\d+)?|\d+(?:,\d+)?)"
 _NULLWORT = r"\b(?:entf(?:ä|ae)ll\w*|keine?|kostenlos|gratis)\b"
 _HALT = _NULLWORT + r"|\b(?:sonst|statt|danach)\b|[·•|;]"
-_AM_POSTEN = r"\w*\s*[:–-]?\s*"
+_AM_POSTEN = r"\w*\s*[:–—-]?\s*"
+_POSTEN_HALT = _HALT + r"|[,–—]|\s-\s"
+_POSTEN_LUECKE = r"(?:(?!" + _POSTEN_HALT + r")[^\d€\n]){0,40}?"
+_VERNEINT = re.compile(r"\b(?:ohne|keine?)\s+$", re.I)
 _LUECKE = r"(?:(?!" + _HALT + r")[^\d€\n]){0,40}?"
 _BETRAG_RE = re.compile(_BETRAG, re.I)
 _RATE = re.compile(r"\b(?:Ger(?:ä|ae)te?)?rate\b" + _LUECKE + _BETRAG, re.I)
@@ -50,7 +55,7 @@ _GEGENWERT = re.compile(r"\b(?:statt|sonst)\b", re.I)
 
 
 def _posten(wort: str) -> tuple[re.Pattern[str], ...]:
-    betrag = re.compile(wort + _LUECKE + _BETRAG, re.I)
+    betrag = re.compile(wort + _AM_POSTEN + _POSTEN_LUECKE + _BETRAG, re.I)
     null_danach = re.compile(wort + _AM_POSTEN + _NULLWORT, re.I)
     null_davor = re.compile(r"\b(?:keine?|ohne)\s+" + wort, re.I)
     return betrag, null_danach, null_davor
@@ -119,9 +124,9 @@ def phase(
 
 def _postenwert(muster: tuple[re.Pattern[str], ...], text: str) -> float | None:
     betrag, *null = muster
-    treffer = betrag.search(text)
-    if treffer is not None:
-        return zahl(treffer[1])
+    for treffer in betrag.finditer(text):
+        if not _VERNEINT.search(text[: treffer.start()]):
+            return zahl(treffer[1])
     return 0.0 if any(m.search(text) for m in null) else None
 
 

@@ -1,25 +1,30 @@
 """Ergebnis eines Klick-Laufs: Status je Kombination, Strukturwächter, Störung.
 
-Der Klick-Crawler (``klickcrawler``) füllt diese Typen; dieses Modul ruft keinen
-Browser und kein Netz. Je Kombination gilt einer von vier Zuständen: ``erfasst``,
+Der Klick-Crawler (``klickcrawler``) füllt diese Typen; dieses Modul ruft keinen Browser
+und kein Netz. Je Kombination gilt einer von vier Zuständen: ``erfasst``,
 ``nicht_angeboten`` (die Seite zeigt die Option in Ruhe deaktiviert), ``nicht_erfasst``
 (Knöpfe, Option oder Zusammenfassung nicht gefunden, Laufzeit nicht lesbar, nicht
-besucht, Seite nicht zur Ruhe gekommen) oder ``befund`` (das Echo widerspricht sich).
-Ein Lauf ist ``gelesen``, ``gestoert`` (Challenge 202, 4xx, 5xx, fehlender
-Kanarienwert, offene oder gescheiterte Preisantwort, Strukturbruch, keine einzige
-angebotene Kombination) oder ``gesperrt`` (robots.txt sperrt Seite, Preisantwort oder
-Zeit). Gescheiterte Anfragen hält der Lauf mit Grund fest.
+besucht, Seite nicht zur Ruhe gekommen, Preisantwort über die Frist offen) oder
+``befund`` (das Echo widerspricht sich). Ein Lauf ist ``gelesen``, ``gestoert``
+(Bot-Schutz, fehlender Kanarienwert, offene oder gescheiterte Preisantwort,
+Strukturbruch, keine einzige angebotene Kombination) oder ``gesperrt`` (robots.txt
+sperrt Seite, Preisantwort oder Zeit). Bot-Schutz heißt ``bot_schutz``: HTTP 202, 4xx
+oder 5xx, ein bekanntes Challenge-Muster (``CHALLENGE_MUSTER``) oder eine HTML-Seite, wo
+die Preisschnittstelle JSON liefern soll. Gescheiterte Anfragen hält der Lauf mit Grund
+fest.
 
 Der Strukturwächter zählt je Lauf gesuchte und gefundene Knöpfe und Felder. Findet ein
-Lauf weniger als ``MINDESTANTEIL_KNOEPFE`` der gesuchten Knöpfe oder fällt ein Anteil
-gegen den Bezug um mehr als ``STRUKTUR_SPRUNG``, ist der Lauf gestört und nicht
-„nichts gefunden“. Bezug ist die Bilanz des letzten gelesenen Laufs; ein gestörter
-oder gesperrter Lauf trägt sie weiter, sodass ein bleibender Bruch gestört bleibt.
-Ohne Suche ist ein Anteil ``None``, nie 0.
+Lauf weniger als ``MINDESTANTEIL_KNOEPFE`` der gesuchten Knöpfe oder weniger als
+``MINDESTANTEIL_FELDER`` der gesuchten Felder, oder fällt ein Anteil gegen den Bezug um
+mehr als ``STRUKTUR_SPRUNG``, ist der Lauf gestört und nicht „nichts gefunden“. Bezug
+ist die Bilanz des letzten gelesenen Laufs; ein gestörter oder gesperrter Lauf trägt sie
+weiter, sodass ein bleibender Bruch gestört bleibt. Ohne Suche ist ein Anteil ``None``,
+nie 0.
 """
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 
 from .klickecho import Befund, Variante
@@ -37,6 +42,13 @@ CHALLENGE_STATUS = 202
 FEHLER_AB_STATUS = 400
 STRUKTUR_SPRUNG = 0.2
 MINDESTANTEIL_KNOEPFE = 0.5
+MINDESTANTEIL_FELDER = 0.1
+CHALLENGE_MUSTER = re.compile(
+    r"radware bot manager|validate\.perfdrive\.com|captcha-delivery\.com|px-captcha"
+    r"|cf-chl-|attention required! \| cloudflare|incapsula incident"
+    r"|ein mensch sind|are you a (?:human|robot)",
+    re.I,
+)
 
 
 @dataclass(frozen=True)
@@ -142,6 +154,25 @@ def abruf_gestoert(status: int | None) -> str | None:
     return None
 
 
+def bot_schutz(
+    status: int | None, typ: str, koerper: str, *, json_erwartet: bool = False
+) -> str | None:
+    """Grund, wenn eine Antwort nach Bot-Schutz oder Störung aussieht, sonst ``None``.
+
+    HTTP 202, 4xx oder 5xx; eine HTML-Seite, wo ``json_erwartet`` gilt; oder ein
+    Muster aus ``CHALLENGE_MUSTER`` im Körper.
+    """
+    gestoert = abruf_gestoert(status)
+    if gestoert is not None:
+        return gestoert
+    if json_erwartet and "html" in typ.lower():
+        return f"Abruf gestört (HTML statt JSON, HTTP {status})"
+    treffer = CHALLENGE_MUSTER.search(koerper)
+    if treffer is not None:
+        return f"Abruf gestört (Challenge „{treffer[0]}“, HTTP {status})"
+    return None
+
+
 def ergebnisgrund(ergebnisse: list[Kombiergebnis]) -> str | None:
     """Grund, wenn jede Kombination ``nicht_angeboten`` ist; der Lauf las nichts."""
     if ergebnisse and all(e.status == NICHT_ANGEBOTEN for e in ergebnisse):
@@ -150,21 +181,27 @@ def ergebnisgrund(ergebnisse: list[Kombiergebnis]) -> str | None:
 
 
 def pruefe_struktur(lauf: Klicklauf, vorlauf: Klicklauf | None) -> str | None:
-    """Grund, wenn der Lauf zu wenige Knöpfe fand oder gegen den Bezug einbrach.
+    """Grund, wenn der Lauf zu wenige Knöpfe oder Felder fand oder gegen den Bezug
+    einbrach.
 
-    Der Mindestanteil gilt immer. Bezug ist die Bilanz des Vorlaufs, wenn er gelesen
-    ist, sonst der Bezug, den er selbst trug; ``lauf.bezug`` hält ihn fest.
+    Die Mindestanteile gelten immer, auch im ersten Lauf. Bezug ist die Bilanz des
+    Vorlaufs, wenn er gelesen ist, sonst der Bezug, den er selbst trug;
+    ``lauf.bezug`` hält ihn fest.
     """
     if vorlauf is not None:
         gelesen = vorlauf.status == LAUF_GELESEN
         lauf.bezug = vorlauf.struktur if gelesen else vorlauf.bezug
     aktuell = lauf.struktur
-    anteil = aktuell.anteil_knoepfe
-    if anteil is not None and anteil < MINDESTANTEIL_KNOEPFE:
-        return (
-            f"Strukturbruch: nur {_prozent(anteil)} der gesuchten Knöpfe gefunden"
-            f" (mindestens {_prozent(MINDESTANTEIL_KNOEPFE)})"
-        )
+    minima = (
+        ("Knöpfe", aktuell.anteil_knoepfe, MINDESTANTEIL_KNOEPFE),
+        ("Felder", aktuell.anteil_felder, MINDESTANTEIL_FELDER),
+    )
+    for name, anteil, mindestens in minima:
+        if anteil is not None and anteil < mindestens:
+            return (
+                f"Strukturbruch: nur {_prozent(anteil)} der gesuchten {name} gefunden"
+                f" (mindestens {_prozent(mindestens)})"
+            )
     if lauf.bezug is None:
         return None
     return strukturbruch(aktuell, lauf.bezug)

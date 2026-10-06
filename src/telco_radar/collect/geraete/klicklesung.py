@@ -2,10 +2,11 @@
 
 Der Klick-Crawler (``klickcrawler``) ruft ``Leser.lies``, sobald die Antwort zum Klick
 da ist. Der Leser liest erst die mitgeschnittene Antwort, dann nach zwei Bildern den
-Text der Preiszusammenfassung, prüft die roh markierten Optionen gegen die geklickten
-und das Echo (``klickecho``) und macht einen Screenshot des Preisbereichs. Fehlt die
-Zusammenfassung, heißt die Kombination ``nicht_erfasst``; widerspricht sich etwas,
-``befund``. Gefundene Wertfelder zählt der Strukturwächter.
+Text der Preiszusammenfassung (in Takten, der Crawl-delay zählt nicht gegen die Frist),
+prüft die roh markierten Optionen gegen die geklickten und das Echo (``klickecho``) und
+macht einen Screenshot des Preisbereichs. Fehlt die Zusammenfassung, heißt die
+Kombination ``nicht_erfasst``; widerspricht sich etwas, ``befund``. Gefundene Wertfelder
+zählt der Strukturwächter.
 """
 
 from __future__ import annotations
@@ -28,7 +29,7 @@ from .klickkarte import DIMENSIONEN, WERTFELDER, Klickkarte
 from .klicklauf import BEFUND, ERFASST, NICHT_ERFASST, Kombiergebnis, Strukturbilanz
 from .klickoptionen import Option, lies_optionen
 from .klicktext import Preiswerte, lies_zusammenfassung
-from .klicktor import kurz
+from .klicktor import WARTE_TAKT_MS, kurz
 
 if TYPE_CHECKING:
     from playwright.sync_api import Locator, Page, Response
@@ -48,10 +49,24 @@ class Leser:
         """Die Knöpfe einer Dimension im aktuellen Zustand der Seite."""
         return lies_optionen(self.seite, self.karte, dimension)
 
-    def text(self, bereich: Locator) -> str:
-        """Sichtbarer Text des ersten Treffers; leer, wenn er nicht erscheint."""
+    def text(self, bereich: Locator, gesucht: str = "") -> str:
+        """Sichtbarer Text des ersten Treffers, sobald er ``gesucht`` enthält.
+
+        Wartet in Takten von ``WARTE_TAKT_MS``: Zeit, in der das Tor den Crawl-delay
+        abwartet, zählt nicht gegen die Frist. Leer, wenn kein Text erscheint.
+        """
+        for _ in range(max(1, self.frist_ms // WARTE_TAKT_MS)):
+            jetzt = self._text(bereich)
+            if jetzt and gesucht in jetzt:
+                return jetzt
+            self.seite.wait_for_timeout(WARTE_TAKT_MS)
+        return self._text(bereich)
+
+    def _text(self, bereich: Locator) -> str:
+        if bereich.count() == 0:
+            return ""
         try:
-            return bereich.first.inner_text(timeout=self.frist_ms)
+            return bereich.first.inner_text(timeout=WARTE_TAKT_MS)
         except PlaywrightZeitueberschreitung:
             return ""
 

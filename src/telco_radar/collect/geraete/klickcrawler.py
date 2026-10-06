@@ -3,27 +3,28 @@
 Gerüst aus Schritt 4 des Datenkonzepts Geräteradar (Abschnitt 8); noch ruft es kein
 Tageslauf. Je Produktseite und Klick-Karte (``klickkarte``):
 
-1. Der Crawler legt einen eigenen Browserkontext an (``klickkontext``). Jede Anfrage
-   geht durch das Tor (``klicktor``): robots.txt für jede Adresse und jedes Ziel einer
-   Umleitung, Crawl-delay je Host für jede Anfrage. Gesperrte Adressen gehen nicht
-   hinaus und stehen in ``verworfen``, gescheiterte in ``gescheitert``. Die Seite
-   lädt ohne Frist für die Wartezeit des Crawl-delays: die Frist zählt nur Zeit, in
-   der niemand wartet. Nach dem Lauf verlässt er die Seite und schließt den Kontext.
-2. Antwortet die Seite mit 202 (Challenge), 4xx oder 5xx oder fehlt der Kanarienwert,
-   ist der Abruf gestört: kein zweiter Versuch, keine Umgehung (CLAUDE.md Regel 4).
-   Sperrt robots.txt die Seite oder ihre Preisantwort, ist der Lauf gesperrt; scheitert
-   die Preisanfrage, ist er gestört.
+1. Der Crawler legt einen eigenen Browserkontext ohne Vorabladen an (``klickkontext``).
+   Jede Anfrage geht durch das Tor (``klicktor``): robots.txt für jede Adresse und jedes
+   Ziel einer Umleitung, Crawl-delay je Host für jede Anfrage. Gesperrte Adressen gehen
+   nicht hinaus und stehen in ``verworfen``, gescheiterte in ``gescheitert``. Fristen
+   zählen nur Zeit, in der niemand auf den Crawl-delay wartet (``klickwache``). Nach dem
+   Lauf verlässt er die Seite und schließt den Kontext.
+2. Zeigt eine Hauptseite Bot-Schutz (202-Challenge, 4xx, 5xx, Challenge-Muster), beim
+   Öffnen oder mitten im Lauf, oder die Preisantwort, oder fehlt der Kanarienwert, ist
+   der Abruf gestört und der Lauf endet sofort: kein zweiter Versuch, keine Umgehung
+   (CLAUDE.md Regel 4). Sperrt robots.txt die Seite oder ihre Preisantwort, ist der Lauf
+   gesperrt; scheitert die Preisanfrage, ist er gestört.
 3. Er liest die angebotenen Optionen je Dimension und klickt jede Kombination; nach
    jedem Klick liest er die Optionen neu und führt neu erschienene Werte mit. Eine
-   gewählte Option klickt er nicht; eine gesperrte heißt erst ``nicht_angeboten``,
-   wenn die Seite ruht (keine Preisanfrage offen, zwei gleiche Lesungen). Eine
-   Antwort gehört nur zu dem Klick, nach dem ihre Anfrage hinausging; bleibt eine
-   Anfrage über die Frist offen, wartet er sie vor dem nächsten Klick ab oder bricht
-   den Lauf als gestört ab. Dann liest ``klicklesung`` Antwort, Text, Markierung und
-   Echo und macht einen Screenshot.
+   gewählte Option klickt er nicht; eine gesperrte heißt erst ``nicht_angeboten``, wenn
+   die Seite ruht (keine Anfrage läuft, zwei gleiche Lesungen). Eine Antwort gehört nur
+   zu dem Klick, nach dem ihre Anfrage hinausging; bleibt eine Anfrage über die Frist
+   offen, heißt die Kombination ``nicht_erfasst``, und vor dem nächsten Klick wie am
+   Ende wartet er sie ab oder bricht den Lauf als gestört ab. Dann liest ``klicklesung``
+   Antwort, Text, Markierung und Echo und macht einen Screenshot.
 4. Je Kombination: erfasst, nicht_angeboten, nicht_erfasst oder befund; dazu der
-   Strukturwächter je Lauf (beides in ``klicklauf``). Ist keine Kombination
-   angeboten, ist der Lauf gestört.
+   Strukturwächter je Lauf (beides in ``klicklauf``). Ist keine Kombination angeboten,
+   ist der Lauf gestört.
 
 Den Browser startet der Aufrufer; dieses Modul setzt keine Tarnung, keinen Proxy und
 keine fremde Kennung.
@@ -41,7 +42,7 @@ from playwright.sync_api import Error as PlaywrightFehler
 
 from .klickecho import LAUFZEIT, Variante, variante_aus
 from .klickkarte import DIMENSIONEN, Klickkarte
-from .klickkontext import Mitschnitt, oeffne_kontext, schliesse
+from .klickkontext import Sitzung, oeffne_sitzung, schliesse
 from .klicklauf import (
     LAUF_GELESEN,
     LAUF_GESPERRT,
@@ -50,7 +51,6 @@ from .klicklauf import (
     NICHT_ERFASST,
     Klicklauf,
     Kombiergebnis,
-    abruf_gestoert,
     ergebnisgrund,
     pruefe_struktur,
 )
@@ -60,20 +60,18 @@ from .klicktor import (
     GRUND_ZU_VIELE,
     HOECHSTE_UMLEITUNGEN,
     SEITEN_FRIST_MS,
-    WARTE_TAKT_MS,
     Schleuse,
     Tor,
     kurz,
 )
+from .klickwache import Abbruch, Wache
 from .robots import RobotsWaechter
 
 if TYPE_CHECKING:
     from playwright.sync_api import (
         Browser,
-        BrowserContext,
         Locator,
         Page,
-        Response,
         ViewportSize,
     )
 
@@ -81,13 +79,9 @@ if TYPE_CHECKING:
 log = logging.getLogger(__name__)
 
 ANTWORT_FRIST_MS = 15000
-RUHE_MS = 500
-MINDESTE_RUHELESUNGEN = 3
 HOECHSTE_KOMBINATIONEN = 200
 FENSTER: ViewportSize = {"width": 1280, "height": 900}
 _GELADEN_JS = "() => document.readyState === 'complete'"
-
-Marke = tuple[int, int]
 
 
 def klicke_durch(
@@ -111,18 +105,19 @@ def klicke_durch(
     """
     lauf = Klicklauf(anbieter=karte.anbieter, adresse=adresse)
     tor = Tor(waechter, uhr, schleuse, lauf)
-    kontext: BrowserContext | None = None
-    seite: Page | None = None
+    sitzung: Sitzung | None = None
     try:
-        kontext, seite = oeffne_kontext(browser, tor, FENSTER)
-        _Gang(seite, karte, tor, frist_ms, lauf).laufe()
-    except _Abbruch as abbruch:
+        sitzung = oeffne_sitzung(browser, tor, FENSTER)
+        _Gang(sitzung.seite, karte, tor, frist_ms, lauf).laufe()
+    except Abbruch as abbruch:
         lauf.status, lauf.grund = abbruch.status, abbruch.grund
     except PlaywrightFehler as fehler:
         lauf.status, lauf.grund = LAUF_GESTOERT, f"Browserfehler: {kurz(fehler)}"
+        if tor.stoerung is not None:
+            lauf.grund = tor.stoerung
     finally:
         tor.geschlossen = True
-        schliesse(kontext, seite)
+        schliesse(sitzung)
     bruch = pruefe_struktur(lauf, vorlauf)
     leer = ergebnisgrund(lauf.ergebnisse)
     for grund in (bruch, leer):
@@ -133,21 +128,12 @@ def klicke_durch(
     return lauf
 
 
-class _Abbruch(Exception):
-    """Beendet einen Lauf mit Status und Grund."""
-
-    def __init__(self, status: str, grund: str) -> None:
-        super().__init__(grund)
-        self.status = status
-        self.grund = grund
-
-
 class _Klickfehler(Exception):
     """Ein Knopf ließ sich nicht klicken."""
 
 
 class _Gang:
-    """Zustand eines Laufs: Seite, Karte, Tor, Mitschnitt und die aktuelle Antwort."""
+    """Zustand eines Laufs: Seite, Karte, Tor, Leser und Wache."""
 
     def __init__(
         self, seite: Page, karte: Klickkarte, tor: Tor, frist_ms: int, lauf: Klicklauf
@@ -155,18 +141,15 @@ class _Gang:
         self.seite, self.karte, self.tor, self.lauf = seite, karte, tor, lauf
         self.frist_ms = frist_ms
         self.leser = Leser(seite, karte, frist_ms)
-        self.antwort: Response | None = None
+        self.wache = Wache(seite, karte, tor, lauf, frist_ms)
         self.geklickt = False
-        self.mitschnitt = Mitschnitt(karte.antwort.passt)
-        seite.on("request", self.mitschnitt.anfrage)
-        seite.on("response", self.mitschnitt.antwort)
-        seite.on("requestfailed", self.mitschnitt.gescheitert)
 
     def laufe(self) -> None:
         self._oeffne()
         werte = {d: self._angebotene_werte(d) for d in DIMENSIONEN}
         besucht: set[Auswahl] = set()
         while (auswahl := naechste(werte, besucht)) is not None:
+            self.wache.pruefe_tor()
             besucht.add(auswahl)
             self.geklickt = False
             ergebnis = self._kombination(auswahl, len(besucht))
@@ -174,103 +157,66 @@ class _Gang:
             if self.geklickt:
                 for d in DIMENSIONEN:
                     werte[d] = vereinige(werte[d], self._angebotene_werte(d))
+        self.wache.warte_offen()
+        self.wache.pruefe_tor()
 
     def _oeffne(self) -> None:
-        ziel, haupt = self.lauf.adresse, None
+        ziel = self.lauf.adresse
         for _ in range(HOECHSTE_UMLEITUNGEN + 1):
             darf, grund = self.tor.darf(ziel)
             if not darf:
-                raise _Abbruch(LAUF_GESPERRT, grund)
-            haupt = self._lade(ziel)
+                raise Abbruch(LAUF_GESPERRT, grund)
+            self._lade(ziel)
             if self.tor.umleitung is None:
                 break
             ziel = self.tor.umleitung
         else:
-            raise _Abbruch(LAUF_GESTOERT, f"Abruf gestört ({GRUND_ZU_VIELE})")
-        self.lauf.http_status = haupt.status if haupt is not None else None
-        stoerung = abruf_gestoert(self.lauf.http_status)
-        if stoerung is not None:
-            raise _Abbruch(LAUF_GESTOERT, stoerung)
+            raise Abbruch(LAUF_GESTOERT, f"Abruf gestört ({GRUND_ZU_VIELE})")
+        self.wache.geoeffnet = True
+        self.wache.pruefe_tor()
         darf, grund = self.tor.darf(self.seite.url)
         if not darf:
-            raise _Abbruch(LAUF_GESPERRT, grund)
+            raise Abbruch(LAUF_GESPERRT, grund)
         kanarie = self.karte.kanarie
-        if kanarie.enthaelt not in self.leser.text(
-            self.seite.locator(kanarie.selektor)
-        ):
+        ort = self.seite.locator(kanarie.selektor)
+        if kanarie.enthaelt not in self.leser.text(ort, kanarie.enthaelt):
+            self.wache.pruefe_tor()
             grund = f"Kanarienwert fehlt: {kanarie.selektor} ohne „{kanarie.enthaelt}“"
-            raise _Abbruch(LAUF_GESTOERT, grund)
-        self._nimm_antwort(self._antwort_seit(0), (0, 0))
+            raise Abbruch(LAUF_GESTOERT, grund)
+        self.wache.nimm_antwort((0, 0, 0))
 
-    def _lade(self, ziel: str) -> Response | None:
+    def _lade(self, ziel: str) -> None:
         """Öffnet ``ziel``; die Frist bis zur Antwort trägt den Crawl-delay mit."""
         self.tor.umleitung = None
-        verworfen, gescheitert = self._marke()
+        _, verworfen, gescheitert = self.wache.marke()
         frist = SEITEN_FRIST_MS + round(1000 * self.tor.schleuse.abstand(ziel))
         try:
-            haupt = self.seite.goto(ziel, wait_until="commit", timeout=frist)
+            self.seite.goto(ziel, wait_until="commit", timeout=frist)
         except PlaywrightFehler as fehler:
+            self.lauf.http_status = self.tor.haupt_status
+            self.wache.pruefe_tor()
             if self.tor.umleitung is not None:
-                return None
+                return
             gesperrt = self.lauf.verworfen[verworfen:]
             if gesperrt:
-                raise _Abbruch(LAUF_GESPERRT, gesperrt[0].grund) from fehler
+                raise Abbruch(LAUF_GESPERRT, gesperrt[0].grund) from fehler
             ohne = self.lauf.gescheitert[gescheitert:]
             if ohne:
-                raise _Abbruch(
-                    LAUF_GESTOERT, f"Abruf gestört ({ohne[0].grund})"
-                ) from fehler
+                grund = f"Abruf gestört ({ohne[0].grund})"
+                raise Abbruch(LAUF_GESTOERT, grund) from fehler
             raise
-        if self.tor.umleitung is None and not self._warte(
+        self.lauf.http_status = self.tor.haupt_status
+        if self.tor.umleitung is None and not self.wache.warte(
             self._geladen, SEITEN_FRIST_MS
         ):
-            raise _Abbruch(
-                LAUF_GESTOERT, f"Seite nach {SEITEN_FRIST_MS} ms nicht geladen"
-            )
-        return haupt
+            grund = f"Seite nach {SEITEN_FRIST_MS} ms nicht geladen"
+            raise Abbruch(LAUF_GESTOERT, grund)
 
     def _geladen(self) -> bool:
         try:
             return self.seite.evaluate(_GELADEN_JS) is True
         except PlaywrightFehler:
             return False
-
-    def _warte(
-        self, bedingung: Callable[[], bool], frist_ms: int | None = None
-    ) -> bool:
-        """Wartet in Takten; Wartezeit des Tors auf den Crawl-delay zählt nicht."""
-        takte = (self.frist_ms if frist_ms is None else frist_ms) // WARTE_TAKT_MS
-        for _ in range(max(1, takte)):
-            if bedingung():
-                return True
-            self.seite.wait_for_timeout(WARTE_TAKT_MS)
-        return bedingung()
-
-    def _marke(self) -> Marke:
-        return len(self.lauf.verworfen), len(self.lauf.gescheitert)
-
-    def _antwort_seit(self, seit: int) -> Response | None:
-        if not self._warte(lambda: self.mitschnitt.fertig_seit(seit)):
-            return None
-        return self.mitschnitt.letzte_seit(seit)
-
-    def _nimm_antwort(self, antwort: Response | None, marke: Marke) -> None:
-        passt = self.karte.antwort.passt
-        if antwort is None:
-            verworfen = self.lauf.verworfen[marke[0] :]
-            gesperrt = [v for v in verworfen if passt(v.anfrage)]
-            if gesperrt:
-                raise _Abbruch(LAUF_GESPERRT, f"Preisantwort {gesperrt[0].grund}")
-            gescheitert = self.lauf.gescheitert[marke[1] :]
-            ohne = [g for g in gescheitert if passt(g.anfrage)]
-            if ohne:
-                grund = f"Preisantwort gescheitert: {ohne[0].grund}"
-                raise _Abbruch(LAUF_GESTOERT, grund)
-        else:
-            stoerung = abruf_gestoert(antwort.status)
-            if stoerung is not None:
-                raise _Abbruch(LAUF_GESTOERT, f"Preisantwort: {stoerung}")
-        self.antwort = antwort
 
     def _angebotene_werte(self, dimension: str) -> list[str | None]:
         optionen = self.leser.optionen(dimension)
@@ -294,7 +240,9 @@ class _Gang:
             ergebnis = self._waehle(dimension, str(ziel[dimension]), variante)
             if ergebnis is not None:
                 return ergebnis
-        return self.leser.lies(variante, ziel, self.antwort, self.lauf.struktur)
+        if self.wache.ausstehend is not None:
+            return Kombiergebnis(variante, NICHT_ERFASST, self.wache.ausstehend)
+        return self.leser.lies(variante, ziel, self.wache.antwort, self.lauf.struktur)
 
     def _fehlen(self, dimension: str) -> str:
         selektor = self.karte.knoepfe[dimension].selektor
@@ -315,7 +263,7 @@ class _Gang:
             return Kombiergebnis(variante, NICHT_ERFASST, self._fehlen(dimension))
         option = _option(optionen, wert)
         if option is not None and option.deaktiviert and not option.gewaehlt:
-            optionen = self._in_ruhe(dimension)
+            optionen = self.wache.in_ruhe(lambda: self.leser.optionen(dimension))
             if optionen is None:
                 grund = f"Seite kam für {dimension} {wert} nicht zur Ruhe"
                 return Kombiergebnis(variante, NICHT_ERFASST, grund)
@@ -330,25 +278,11 @@ class _Gang:
             return Kombiergebnis(variante, NICHT_ANGEBOTEN, grund)
         return self._klicke(dimension, optionen.index(option), variante)
 
-    def _in_ruhe(self, dimension: str) -> list[Option] | None:
-        """Die Knöpfe, sobald keine Preisanfrage offen ist und zwei Lesungen im Abstand
-        ``RUHE_MS`` gleich sind; ``None``, wenn die Frist vorher abläuft."""
-        vorher: list[Option] | None = None
-        for _ in range(max(MINDESTE_RUHELESUNGEN, self.frist_ms // RUHE_MS)):
-            jetzt = None if self.mitschnitt.offen else self.leser.optionen(dimension)
-            if jetzt is not None and jetzt == vorher:
-                return jetzt
-            vorher = jetzt
-            self.seite.wait_for_timeout(RUHE_MS)
-        return None
-
     def _klicke(
         self, dimension: str, stelle: int, variante: Variante
     ) -> Kombiergebnis | None:
-        if not self._warte(lambda: not self.mitschnitt.offen):
-            grund = f"Preisantwort nach {self.frist_ms} ms noch offen"
-            raise _Abbruch(LAUF_GESTOERT, grund)
-        seit, marke = self.mitschnitt.stand(), self._marke()
+        self.wache.warte_offen()
+        marke = self.wache.marke()
         knopf = self.seite.locator(self.karte.knoepfe[dimension].selektor).nth(stelle)
         try:
             self._druecke(knopf)
@@ -356,7 +290,7 @@ class _Gang:
             grund = f"Knopf für {dimension} nicht klickbar: {fehler}"
             return Kombiergebnis(variante, NICHT_ERFASST, grund)
         self.geklickt = True
-        self._nimm_antwort(self._antwort_seit(seit), marke)
+        self.wache.nimm_antwort(marke)
         return None
 
     def _druecke(self, knopf: Locator) -> None:

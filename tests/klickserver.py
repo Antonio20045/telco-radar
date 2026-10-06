@@ -3,6 +3,7 @@
 Eine Antwortfunktion bekommt den Pfad samt Anfrage und liefert eine ``Antwort``; der
 Server merkt jeden Abruf mit Pfad und Zeitpunkt (``time.monotonic``), beim Eingang und
 am Ende der Antwort; ``luecken`` misst den Crawl-delay vom Ende der vorigen Antwort.
+Schließt der Browser die Verbindung vor dem Ende, steht der Pfad in ``abgebrochen``.
 Unter ``localhost`` ist derselbe Server als zweiter Host erreichbar. ``karte`` und
 ``laufe`` bauen eine Prüfkarte und rufen den Crawler mit eigener Hostschleuse.
 """
@@ -42,6 +43,7 @@ class Klickserver:
     abrufe: list[str] = field(default_factory=list)
     zeiten: list[tuple[float, str]] = field(default_factory=list)
     fertig: list[tuple[float, str]] = field(default_factory=list)
+    abgebrochen: list[str] = field(default_factory=list)
 
     def adresse(self, pfad: str, host: str = "127.0.0.1") -> str:
         return f"http://{host}:{self.port}{pfad}"
@@ -71,14 +73,18 @@ def klickserver(antworte: Callable[[str], Antwort]) -> Iterator[Klickserver]:
             if antwort.verzug:
                 time.sleep(antwort.verzug)
             daten = antwort.koerper.encode("utf-8")
-            self.send_response(antwort.status)
-            self.send_header("Content-Type", antwort.typ)
-            self.send_header("Content-Length", str(len(daten)))
-            for name, wert in antwort.kopf.items():
-                self.send_header(name, wert)
-            self.end_headers()
-            self.wfile.write(daten)
-            self.wfile.flush()
+            try:
+                self.send_response(antwort.status)
+                self.send_header("Content-Type", antwort.typ)
+                self.send_header("Content-Length", str(len(daten)))
+                for name, wert in antwort.kopf.items():
+                    self.send_header(name, wert)
+                self.end_headers()
+                self.wfile.write(daten)
+                self.wfile.flush()
+            except (BrokenPipeError, ConnectionResetError):
+                server.abgebrochen.append(self.path)
+                return
             server.fertig.append((time.monotonic(), self.path))
 
     httpd = ThreadingHTTPServer(("127.0.0.1", 0), Handler)

@@ -1,6 +1,6 @@
 """Tor des Klick-Crawlers: robots.txt, Crawl-delay je Host, Umleitungen und Nebenwege.
 
-Der Klick-Crawler öffnet seinen Kontext über ``klickkontext.oeffne_kontext``; jede
+Der Klick-Crawler öffnet seinen Kontext über ``klickkontext.oeffne_sitzung``; jede
 Anfrage der Seite geht durch das ``Tor``, bevor sie hinausgeht. Bilder, Medien,
 Schriften und Datenkanäle ohne Nutzen für die Lesung (EventSource, Beacon, Prefetch,
 Manifest) bricht das Tor ab. Jede andere Adresse prüft ``RobotsWaechter.darf`` und
@@ -12,9 +12,12 @@ das erlaubte Ziel, beantwortet die Umleitung mit einer leeren Seite, und der Cra
 öffnet das Ziel als neue Seite. Bekommt eine Anfrage keine Antwort, steht sie mit Grund
 in ``Klicklauf.gescheitert``.
 
+Antwortet die Hauptseite mit Bot-Schutz (``klicklauf.bot_schutz``), beim Öffnen wie
+mitten im Lauf, kommt die Seite nie im Browser an, und danach geht nichts mehr hinaus.
 Ein WebSocket verbindet nie (sperrt robots.txt ihn, steht er in ``verworfen``), und
-Speculation Rules entfernt das Tor aus Kopf und Dokument jeder Antwort; was sonst an
-``route`` vorbeiginge, schließt ``klickkontext`` aus.
+Vorabladen (Speculation Rules, ``<link rel=prerender|prefetch>``, Kopfzeile ``Link``)
+entfernt das Tor aus Kopf und Dokument jeder Antwort; was sonst an ``route``
+vorbeiginge, schließt ``klickkontext`` aus.
 """
 
 from __future__ import annotations
@@ -31,7 +34,7 @@ from playwright.sync_api import Error as PlaywrightFehler
 
 from . import Abrufschleuse
 from .basis import GeraeteAbrufFehler
-from .klicklauf import Gescheitert, Klicklauf, Verworfen
+from .klicklauf import Gescheitert, Klicklauf, Verworfen, bot_schutz
 from .robots import RobotsWaechter, host_von
 
 if TYPE_CHECKING:
@@ -71,12 +74,17 @@ WARTE_TAKT_MS = 50
 GRUND_ZU_VIELE = f"mehr als {HOECHSTE_UMLEITUNGEN} Umleitungen"
 LEERE_SEITE = 200
 SPEKULATIONSKOPF = "speculation-rules"
-NEU_BERECHNET = frozenset({SPEKULATIONSKOPF, "content-length", "content-encoding"})
+LINKKOPF = "link"
+NEU_BERECHNET = frozenset(
+    {SPEKULATIONSKOPF, LINKKOPF, "content-length", "content-encoding"}
+)
 WEB_SCHEMA = {"ws": "http", "wss": "https"}
-_SPEKULATIONSSKRIPT = re.compile(
-    rb"<script\b[^>]*?\btype\s*=\s*[\"']?\s*speculationrules\b[^>]*>.*?</script\s*>",
+_VORABLADEN = re.compile(
+    rb"<script\b[^>]*?\btype\s*=\s*[\"']?\s*speculationrules\b[^>]*>.*?</script\s*>"
+    rb"|<link\b[^>]*?\brel\s*=\s*[\"']?[^\"'>]*?\b(?:prerender|prefetch)\b[^>]*>",
     re.I | re.S,
 )
+_VORAB_REL = re.compile(r"\brel\s*=\s*\"?[^\";,]*?\b(?:prerender|prefetch)\b", re.I)
 
 
 class Schleuse(Protocol):
@@ -141,9 +149,12 @@ class Tor:
     """Route-Handler des Browserkontexts: robots.txt, Schleuse und Umleitungen.
 
     ``warte`` wartet, ohne den Browser anzuhalten (``Page.wait_for_timeout``);
-    ``klickkontext.oeffne_kontext`` setzt es, sobald die Seite steht. Jede Anfrage
+    ``klickkontext.oeffne_sitzung`` setzt es, sobald die Seite steht. Jede Anfrage
     darf ``ABRUF_FRIST_MS`` dauern; eine Antwort nach der Frist des Crawlers ist spät,
     nicht gescheitert. Was nach ``geschlossen`` scheitert, zählt nicht als gescheitert.
+    Sieht eine Antwort auf die Hauptseite nach Bot-Schutz aus (``bot_schutz``), kommt
+    sie nie im Browser an: ``stoerung`` nennt den Grund, ``haupt_status`` den Status,
+    und keine weitere Anfrage geht hinaus.
     """
 
     def __init__(
@@ -156,6 +167,8 @@ class Tor:
         self.waechter, self.uhr, self.schleuse = waechter, uhr, schleuse
         self.lauf = lauf
         self.geschlossen = False
+        self.stoerung: str | None = None
+        self.haupt_status: int | None = None
         self.umleitung: str | None = None
         self.warte: Callable[[float], None] | None = None
         self._unterwegs: set[str] = set()
@@ -167,7 +180,7 @@ class Tor:
     def __call__(self, route: Route) -> None:
         """Lässt eine Anfrage durch, leitet sie geprüft um oder bricht sie ab."""
         anfrage = route.request
-        if anfrage.resource_type in ABGEBROCHENE_ARTEN:
+        if anfrage.resource_type in ABGEBROCHENE_ARTEN or self.stoerung is not None:
             _schliesse(route, ABBRUCH_CODE)
             return
         try:
@@ -193,12 +206,14 @@ class Tor:
             if antwort is None:
                 return
             ort = antwort.headers.get("location")
+            hauptseite = _hauptseite(anfrage)
             if ort is None or not UMLEITUNG_AB <= antwort.status <= UMLEITUNG_BIS:
-                _gib_weiter(route, antwort)
+                if not hauptseite or self._pruefe_hauptseite(route, antwort):
+                    _gib_weiter(route, antwort)
                 return
             ziel = urljoin(ziel, ort)
             methode = "GET" if antwort.status == SIEHE_ANDERE else methode
-            if anfrage.is_navigation_request() and anfrage.frame.parent_frame is None:
+            if hauptseite:
                 self._leite_hauptseite_um(route, ziel, anfrage.url)
                 return
         self._scheitere(route, anfrage.url, GRUND_ZU_VIELE)
@@ -245,6 +260,20 @@ class Tor:
             self._unterwegs.discard(host_von(ziel))
             self.schleuse.erledigt(ziel)
 
+    def _pruefe_hauptseite(self, route: Route, antwort: APIResponse) -> bool:
+        """Wahr, wenn die Hauptseite in den Browser darf; Bot-Schutz bricht sie ab."""
+        self.haupt_status = antwort.status
+        typ = antwort.headers.get("content-type", "")
+        text = antwort.text() if "html" in typ.lower() else ""
+        grund = bot_schutz(antwort.status, typ, text)
+        if grund is None:
+            return True
+        log.warning("Klick-Crawler: %s, %s; Lauf endet", antwort.url, grund)
+        if self.stoerung is None:
+            self.stoerung = grund
+        _schliesse(route, ABBRUCH_CODE)
+        return False
+
     def _leite_hauptseite_um(self, route: Route, ziel: str, anfrage: str) -> None:
         darf, grund = self.darf(ziel)
         if not darf:
@@ -272,17 +301,31 @@ def kurz(fehler: BaseException) -> str:
     return zeilen[0] if zeilen else type(fehler).__name__
 
 
+def _hauptseite(anfrage: Request) -> bool:
+    return anfrage.is_navigation_request() and anfrage.frame.parent_frame is None
+
+
 def _gib_weiter(route: Route, antwort: APIResponse) -> None:
-    """Reicht die Antwort durch, ohne Speculation Rules in Kopf und Dokument."""
+    """Reicht die Antwort durch, ohne Vorabladen in Kopf und Dokument.
+
+    Entfernt Speculation Rules, ``<link rel=prerender|prefetch>`` und solche Einträge
+    der Kopfzeile ``Link``.
+    """
     kopf = antwort.headers
     html = "html" in kopf.get("content-type", "").lower()
     koerper = antwort.body() if html else b""
-    ohne = _SPEKULATIONSSKRIPT.sub(b"", koerper)
-    if SPEKULATIONSKOPF not in kopf and ohne == koerper:
+    ohne = _VORABLADEN.sub(b"", koerper)
+    link = kopf.get(LINKKOPF)
+    links = (
+        [] if link is None else [e for e in link.split(",") if not _VORAB_REL.search(e)]
+    )
+    if SPEKULATIONSKOPF not in kopf and ohne == koerper and link == ",".join(links):
         route.fulfill(response=antwort)
         return
-    log.info("Klick-Crawler: Speculation Rules aus %s entfernt", antwort.url)
+    log.info("Klick-Crawler: Vorabladen aus %s entfernt", antwort.url)
     neu = {k: v for k, v in kopf.items() if k not in NEU_BERECHNET}
+    if links:
+        neu[LINKKOPF] = ",".join(links)
     route.fulfill(response=antwort, headers=neu, body=ohne if html else antwort.body())
 
 

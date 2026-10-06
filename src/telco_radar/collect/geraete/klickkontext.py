@@ -1,19 +1,22 @@
-"""Browserkontext des Klick-Crawlers: Nebenwege zu, Antworten mitschneiden, schließen.
+"""Browserkontext des Klick-Crawlers: Nebenwege und Vorabladen zu, sauber schließen.
 
-``oeffne_kontext`` legt je Lauf einen eigenen Kontext an: ohne Service Worker, jede
-Anfrage und jeder WebSocket am ``klicktor.Tor``, ein Init-Skript entfernt nachgeladene
-Speculation Rules, bevor der Browser sie liest, und ``sperre_beiwege`` bricht über das
-DevTools-Protokoll ab, was der Browser an ``route`` vorbei anfragt (Favicons, Art
-„Other“; nur Chromium). ``schliesse`` verlässt die Seite und schließt den Kontext.
-
-``Mitschnitt`` merkt die Anfragen, die zum Antwortmuster der Karte passen, und ihre
-Antworten; so gehört eine Antwort nur zu dem Klick, nach dem ihre Anfrage hinausging.
+``oeffne_sitzung`` legt je Lauf einen eigenen Kontext an: ohne Service Worker, jede
+Anfrage und jeder WebSocket am ``klicktor.Tor``. Was der Browser an ``route`` vorbei
+anfragt, geht nicht hinaus (nur Chromium, über das DevTools-Protokoll):
+``sperre_beiwege`` bricht Anfragen der Art „Other“ ab (Favicons), und
+``sperre_vorabladen`` bricht auf Browserebene jede Vorab-Anfrage ab (Kopfzeile
+``Sec-Purpose`` mit prefetch oder prerender, etwa ``<link rel=prerender>``), solange der
+Lauf dauert, auch in anderen Kontexten desselben Browsers. Speculation Rules holt
+Chromium an beiden vorbei; die entfernt das Tor aus jeder Antwort und ``OHNE_VORAB_JS``
+aus nachgeladenen Elementen, auch in Shadow Roots, bevor der Browser sie liest.
+``schliesse`` verlässt die Seite, schließt den Kontext und gibt das Vorabladen frei.
 """
 
 from __future__ import annotations
 
 import logging
-from collections.abc import Callable
+import re
+from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 from playwright.sync_api import Error as PlaywrightFehler
@@ -24,9 +27,8 @@ if TYPE_CHECKING:
     from playwright.sync_api import (
         Browser,
         BrowserContext,
+        CDPSession,
         Page,
-        Request,
-        Response,
         ViewportSize,
     )
 
@@ -36,84 +38,96 @@ log = logging.getLogger(__name__)
 BEIWEG_ARTEN = ("Other",)
 BEIWEG_GRUND = "BlockedByClient"
 LEER = "about:blank"
-OHNE_SPEKULATION_JS = """(() => {
-  const istRegel = (k) => k instanceof HTMLScriptElement
-    && k.type.trim().toLowerCase() === "speculationrules";
-  const entferne = (k) => {
-    if (istRegel(k)) { k.remove(); return; }
-    if (!k.querySelectorAll) return;
-    for (const s of k.querySelectorAll("script")) if (istRegel(s)) s.remove();
-  };
-  new MutationObserver((liste) => {
+VORAB_ZWECK = re.compile(r"prefetch|prerender", re.I)
+OHNE_VORAB_JS = """(() => {
+  const vorab = /\\b(?:prerender|prefetch)\\b/i;
+  const weg = (k) => (k instanceof HTMLScriptElement
+      && k.type.trim().toLowerCase() === "speculationrules")
+    || (k instanceof HTMLLinkElement && vorab.test(k.rel));
+  const beobachter = new MutationObserver((liste) => {
     for (const m of liste) {
-      if (istRegel(m.target)) m.target.remove();
-      for (const k of m.addedNodes) entferne(k);
+      pruefe(m.target, false);
+      for (const k of m.addedNodes) pruefe(k, true);
     }
-  }).observe(document, {childList: true, subtree: true, attributes: true,
-                        attributeFilter: ["type"]});
+  });
+  const beobachte = (wurzel) => beobachter.observe(wurzel, {childList: true,
+    subtree: true, attributes: true, attributeFilter: ["type", "rel"]});
+  const pruefe = (k, tief) => {
+    if (weg(k)) { k.remove(); return; }
+    if (!tief || !k.querySelectorAll) return;
+    for (const e of k.querySelectorAll("*")) {
+      if (weg(e)) e.remove();
+      else if (e.shadowRoot) { beobachte(e.shadowRoot); pruefe(e.shadowRoot, true); }
+    }
+    if (k.shadowRoot) { beobachte(k.shadowRoot); pruefe(k.shadowRoot, true); }
+  };
+  const haenge = Element.prototype.attachShadow;
+  Element.prototype.attachShadow = function (...art) {
+    const wurzel = haenge.apply(this, art);
+    beobachte(wurzel);
+    return wurzel;
+  };
+  beobachte(document);
 })();"""
 
 
-class Mitschnitt:
-    """Anfragen zum Antwortmuster der Karte und ihre Antworten, in Reihenfolge."""
+@dataclass(frozen=True)
+class Sitzung:
+    """Kontext, Seite und Vorab-Sperre eines Laufs."""
 
-    def __init__(self, passt: Callable[[str], bool]) -> None:
-        self._passt = passt
-        self.anfragen: list[Request] = []
-        self.offen: list[Request] = []
-        self.antworten: list[Response] = []
-
-    def anfrage(self, anfrage: Request) -> None:
-        """Merkt eine passende Anfrage als offen."""
-        if self._passt(anfrage.url):
-            self.anfragen.append(anfrage)
-            self.offen.append(anfrage)
-
-    def antwort(self, antwort: Response) -> None:
-        """Merkt eine passende Antwort; ihre Anfrage ist nicht mehr offen."""
-        if self._passt(antwort.url):
-            self.antworten.append(antwort)
-            self._schliesse(antwort.request)
-
-    def gescheitert(self, anfrage: Request) -> None:
-        """Eine abgebrochene Anfrage ist nicht mehr offen."""
-        self._schliesse(anfrage)
-
-    def stand(self) -> int:
-        """Zahl der bisher gemerkten Anfragen, die Marke vor einem Klick."""
-        return len(self.anfragen)
-
-    def fertig_seit(self, seit: int) -> bool:
-        """Wahr, wenn seit der Marke eine Anfrage hinausging und keine offen ist."""
-        neue = self.anfragen[seit:]
-        return bool(neue) and not any(_unter(a, self.offen) for a in neue)
-
-    def letzte_seit(self, seit: int) -> Response | None:
-        """Die letzte Antwort auf eine Anfrage seit der Marke, sonst ``None``."""
-        neue = self.anfragen[seit:]
-        eigene = [a for a in self.antworten if _unter(a.request, neue)]
-        return eigene[-1] if eigene else None
-
-    def _schliesse(self, anfrage: Request) -> None:
-        self.offen = [a for a in self.offen if a is not anfrage]
+    kontext: BrowserContext
+    seite: Page
+    wache: CDPSession
 
 
-def oeffne_kontext(
-    browser: Browser, tor: Tor, fenster: ViewportSize
-) -> tuple[BrowserContext, Page]:
-    """Eigener Kontext ohne Service Worker; jede Anfrage und jeder WebSocket am Tor."""
-    kontext = browser.new_context(service_workers="block", viewport=fenster)
+def oeffne_sitzung(browser: Browser, tor: Tor, fenster: ViewportSize) -> Sitzung:
+    """Eigener Kontext ohne Service Worker und ohne Vorabladen, alles am Tor."""
+    wache = sperre_vorabladen(browser)
+    kontext: BrowserContext | None = None
     try:
-        kontext.add_init_script(script=OHNE_SPEKULATION_JS)
+        kontext = browser.new_context(service_workers="block", viewport=fenster)
+        kontext.add_init_script(script=OHNE_VORAB_JS)
         kontext.route_web_socket("**/*", tor.websocket)
         kontext.route("**/*", tor)
         seite = kontext.new_page()
         sperre_beiwege(kontext, seite)
     except PlaywrightFehler:
-        schliesse(kontext, None)
+        _schliesse_kontext(kontext, None)
+        _gib_frei(wache)
         raise
     tor.warte = seite.wait_for_timeout
-    return kontext, seite
+    return Sitzung(kontext, seite, wache)
+
+
+def schliesse(sitzung: Sitzung | None) -> None:
+    """Schließt Seite und Kontext und gibt das Vorabladen frei; wirft nie."""
+    if sitzung is not None:
+        _schliesse_kontext(sitzung.kontext, sitzung.seite)
+        _gib_frei(sitzung.wache)
+
+
+def sperre_vorabladen(browser: Browser) -> CDPSession:
+    """Bricht auf Browserebene jede Anfrage mit Vorab-Zweck ab; andere gehen weiter."""
+    wache = browser.new_browser_cdp_session()
+
+    def pruefe(ereignis: dict) -> None:
+        kopf = {k.lower(): v for k, v in ereignis["request"]["headers"].items()}
+        zweck = kopf.get("sec-purpose", kopf.get("purpose", ""))
+        frage = {"requestId": ereignis["requestId"]}
+        befehl = "Fetch.continueRequest"
+        if VORAB_ZWECK.search(zweck):
+            log.info(
+                "Klick-Crawler: Vorabladen %s abgebrochen", ereignis["request"]["url"]
+            )
+            befehl, frage["errorReason"] = "Fetch.failRequest", BEIWEG_GRUND
+        try:
+            wache.send(befehl, frage)
+        except PlaywrightFehler as fehler:
+            log.info("Klick-Crawler: Anfrage nicht weitergegeben: %s", kurz(fehler))
+
+    wache.on("Fetch.requestPaused", pruefe)
+    wache.send("Fetch.enable", {"patterns": [{"urlPattern": "*"}]})
+    return wache
 
 
 def sperre_beiwege(kontext: BrowserContext, seite: Page) -> None:
@@ -133,7 +147,7 @@ def sperre_beiwege(kontext: BrowserContext, seite: Page) -> None:
     sitzung.send("Fetch.enable", {"patterns": muster})
 
 
-def schliesse(kontext: BrowserContext | None, seite: Page | None) -> None:
+def _schliesse_kontext(kontext: BrowserContext | None, seite: Page | None) -> None:
     """Verlässt die Seite, dann schließt der Kontext; wirft nie.
 
     Erst ``about:blank``: so bricht ``sperre_beiwege`` angehaltene Beiwege noch ab,
@@ -152,5 +166,9 @@ def schliesse(kontext: BrowserContext | None, seite: Page | None) -> None:
         log.warning("Klick-Crawler: Kontext nicht geschlossen: %s", kurz(fehler))
 
 
-def _unter(anfrage: Request, anfragen: list[Request]) -> bool:
-    return any(anfrage is a for a in anfragen)
+def _gib_frei(wache: CDPSession) -> None:
+    try:
+        wache.send("Fetch.disable")
+        wache.detach()
+    except PlaywrightFehler as fehler:
+        log.info("Klick-Crawler: Vorab-Sperre nicht gelöst: %s", kurz(fehler))

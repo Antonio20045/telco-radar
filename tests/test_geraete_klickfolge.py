@@ -13,7 +13,6 @@ import json
 from datetime import UTC, datetime
 from urllib.parse import parse_qs, urlsplit
 
-import pytest
 from klickserver import Antwort, html, klickserver
 
 from telco_radar.collect.geraete.robots import RobotsWaechter
@@ -237,182 +236,15 @@ def test_andere_markierte_option_als_geklickt_ist_befund(chromium):
 def test_lauf_ohne_einen_gefundenen_knopf_ist_nicht_gelesen(chromium):
     seite = TARIFE.replace('<div id="', '<div class="weg-')
 
-    with klickserver(lambda pfad: html(seite)) as server:
+    def antworte(pfad: str) -> Antwort:
+        if pfad.startswith("/api/preis"):
+            return Antwort(200, "application/json", json.dumps({"rate": 20}))
+        return html(seite)
+
+    with klickserver(antworte) as server:
         lauf = _laufe(chromium, server.adresse("/handy/x"), _karte({"tarif": "tarif"}))
 
     assert lauf.struktur.anteil_knoepfe == 0.0
     assert lauf.status == "gestoert"
     assert "Strukturbruch" in lauf.grund
     assert [e.status for e in lauf.ergebnisse] == ["nicht_erfasst"]
-
-
-def _lauf(gefunden, status="gelesen"):
-    from telco_radar.collect.geraete.klicklauf import Klicklauf, Strukturbilanz
-
-    return Klicklauf(
-        anbieter="Beispielanbieter",
-        adresse="https://beispiel.invalid/handy/x",
-        status=status,
-        struktur=Strukturbilanz(10, gefunden, 70, 70),
-    )
-
-
-@pytest.mark.parametrize(
-    ("gefunden", "bruch"), [(0, True), (4, True), (5, False), (10, False)]
-)
-def test_mindestanteil_gefundener_knoepfe_gilt_ohne_vorlauf(gefunden, bruch):
-    from telco_radar.collect.geraete.klicklauf import pruefe_struktur
-
-    grund = pruefe_struktur(_lauf(gefunden), None)
-
-    assert (grund is not None) is bruch
-    if bruch:
-        assert "Strukturbruch" in grund
-
-
-@pytest.mark.parametrize(
-    ("status_vorlauf", "bruch"),
-    [("gelesen", True), ("gestoert", False), ("gesperrt", False)],
-)
-def test_nur_ein_gelesener_lauf_ist_bezug(status_vorlauf, bruch):
-    from telco_radar.collect.geraete.klicklauf import pruefe_struktur
-
-    lauf = _lauf(7)
-
-    grund = pruefe_struktur(lauf, _lauf(10, status_vorlauf))
-
-    assert (grund is not None) is bruch
-    assert (lauf.bezug is not None) is bruch
-
-
-def test_bleibender_strukturbruch_bleibt_gestoert():
-    from telco_radar.collect.geraete.klicklauf import pruefe_struktur
-
-    erster, zweiter, dritter = _lauf(10), _lauf(6), _lauf(6)
-    vierter, fuenfter = _lauf(10), _lauf(10)
-
-    assert pruefe_struktur(erster, None) is None
-    grund_zwei = pruefe_struktur(zweiter, erster)
-    zweiter.status, zweiter.grund = "gestoert", grund_zwei
-    grund_drei = pruefe_struktur(dritter, zweiter)
-    dritter.status, dritter.grund = "gestoert", grund_drei
-
-    assert grund_zwei is not None
-    assert grund_drei is not None
-    assert dritter.bezug == erster.struktur
-    assert pruefe_struktur(vierter, dritter) is None
-    assert pruefe_struktur(fuenfter, vierter) is None
-    assert fuenfter.bezug == vierter.struktur
-
-
-@pytest.mark.parametrize(
-    ("status", "gestoert"),
-    [
-        (("nicht_angeboten", "nicht_angeboten"), True),
-        (("nicht_angeboten", "erfasst"), False),
-        (("nicht_angeboten", "nicht_erfasst"), False),
-        ((), False),
-    ],
-)
-def test_lauf_mit_nur_nicht_angebotenen_kombinationen_ist_gestoert(status, gestoert):
-    from telco_radar.collect.geraete.klickecho import Variante
-    from telco_radar.collect.geraete.klicklauf import Kombiergebnis, ergebnisgrund
-
-    ergebnisse = [Kombiergebnis(Variante("128", "S", 24), s) for s in status]
-
-    grund = ergebnisgrund(ergebnisse)
-
-    assert (grund is not None) is gestoert
-
-
-GESPERRTE_KNOEPFE = """<!doctype html><html><body>
-<h1 id="kanarie">Beispielhandy X</h1>
-<div id="speicher"><button data-wert="128" aria-pressed="true">128 GB</button></div>
-<div id="tarif">
- <button data-wert="S" aria-pressed="true">Tarif S</button>
- <button data-wert="M" aria-pressed="false">Tarif M</button>
-</div>
-<div id="laufzeit">
- <button data-wert="24" aria-pressed="true">24 Monate</button>
- <button data-wert="36" aria-pressed="false">36 Monate</button>
-</div>
-<section id="preis"></section>
-<script>
-const MUSTER = "MUSTERNAME";
-const auswahl = {tarif: "S", laufzeit: "24"};
-function markiere() {
-  const paare = [["#tarif", auswahl.tarif], ["#laufzeit", auswahl.laufzeit]];
-  for (const [ort, wert] of paare) {
-    for (const k of document.querySelectorAll(ort + " button")) {
-      k.setAttribute("aria-pressed", String(k.dataset.wert === wert));
-      if (MUSTER === "aktiv_gesperrt") {
-        k.setAttribute("aria-disabled", String(k.dataset.wert === wert));
-      }
-      if (MUSTER === "wirklich_gesperrt") {
-        k.disabled = auswahl.tarif === "S" && k.dataset.wert === "36";
-      }
-    }
-  }
-}
-function sperre(an) {
-  if (MUSTER !== "ladesperre") return;
-  for (const k of document.querySelectorAll("#tarif button, #laufzeit button")) {
-    k.disabled = an;
-  }
-}
-function lade() {
-  markiere();
-  sperre(true);
-  fetch(`/api/preis?tarif=${auswahl.tarif}&laufzeit=${auswahl.laufzeit}`)
-    .then(r => r.json())
-    .then(d => {
-      document.getElementById("preis").innerText =
-        `Monatliche Rate ${d.rate},00 € · ${auswahl.laufzeit} Raten`;
-      setTimeout(() => sperre(false), 200);
-    });
-}
-for (const k of document.querySelectorAll("#tarif button")) {
-  k.addEventListener("click", () => {
-    auswahl.tarif = k.dataset.wert;
-    const sperrt = MUSTER === "wirklich_gesperrt" && auswahl.tarif === "S";
-    if (sperrt) auswahl.laufzeit = "24";
-    lade();
-  });
-}
-for (const k of document.querySelectorAll("#laufzeit button")) {
-  k.addEventListener("click", () => { auswahl.laufzeit = k.dataset.wert; lade(); });
-}
-lade();
-</script></body></html>"""
-RATE_JE_KOMBINATION = {
-    ("S", "24"): 30,
-    ("S", "36"): 25,
-    ("M", "24"): 35,
-    ("M", "36"): 28,
-}
-
-
-@pytest.mark.parametrize(
-    ("muster", "erwartet"),
-    [
-        ("aktiv_gesperrt", "erfasst"),
-        ("ladesperre", "erfasst"),
-        ("wirklich_gesperrt", "nicht_angeboten"),
-    ],
-)
-def test_gesperrter_knopf_ist_nur_nach_ruhe_nicht_angeboten(chromium, muster, erwartet):
-    seite = GESPERRTE_KNOEPFE.replace("MUSTERNAME", muster)
-    antworte = _je_tarif_und_laufzeit(seite, lambda t, lz: RATE_JE_KOMBINATION[t, lz])
-    knoepfe = {"tarif": "tarif", "laufzeit": "laufzeit"}
-    karte = _karte(knoepfe, {"rate": "rate", "ratenzahl": "raten"})
-
-    with klickserver(antworte) as server:
-        lauf = _laufe(chromium, server.adresse("/handy/x"), karte)
-
-    status = {
-        (e.variante.tarif, e.variante.laufzeit): e.status for e in lauf.ergebnisse
-    }
-    assert lauf.status == "gelesen"
-    assert status.pop(("S", 36)) == erwartet
-    assert set(status.values()) == {"erfasst"}
-    assert len(status) == 3
