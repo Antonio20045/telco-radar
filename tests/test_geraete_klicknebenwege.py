@@ -14,6 +14,7 @@ geschrieben; keine Anfrage verlässt den Rechner.
 from __future__ import annotations
 
 import json
+import logging
 import time
 
 import pytest
@@ -149,6 +150,25 @@ def test_speculation_rules_werden_entfernt_erlaubte_seite_bleibt_gleich(chromium
 
     assert server.mit("/frei/") == []
     assert [(e.status, e.werte.rate) for e in lauf.ergebnisse] == [("erfasst", 25.0)]
+
+
+def test_antwort_ohne_vorabladen_meldet_keine_entfernung(chromium, caplog):
+    seite = _seite()
+
+    def antworte(pfad: str) -> Antwort:
+        if pfad == "/handy/x":
+            return html(seite)
+        if pfad.startswith("/api/preis"):
+            return Antwort(200, "application/json", json.dumps({"rate": 25}))
+        return Antwort(200, "text/plain", "")
+
+    caplog.set_level(logging.INFO, logger="telco_radar.collect.geraete.klicktor")
+    with klickserver(antworte) as server:
+        lauf = laufe(chromium, server.adresse("/handy/x"), karte(ANTWORT), OFFEN)
+
+    meldungen = [r.getMessage() for r in caplog.records]
+    assert lauf.status == "gelesen"
+    assert [m for m in meldungen if "Vorabladen" in m] == []
 
 
 @pytest.mark.parametrize("weg", ["prerender", "prerender_nachgeladen"])

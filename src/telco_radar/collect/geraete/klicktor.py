@@ -319,7 +319,8 @@ def _gib_weiter(route: Route, antwort: APIResponse) -> None:
     links = (
         [] if link is None else [e for e in link.split(",") if not _VORAB_REL.search(e)]
     )
-    if SPEKULATIONSKOPF not in kopf and ohne == koerper and link == ",".join(links):
+    link_neu = None if link is None else ",".join(links)
+    if SPEKULATIONSKOPF not in kopf and ohne == koerper and link == link_neu:
         route.fulfill(response=antwort)
         return
     log.info("Klick-Crawler: Vorabladen aus %s entfernt", antwort.url)
