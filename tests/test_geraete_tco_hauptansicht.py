@@ -551,7 +551,13 @@ def test_die_beschriftung_der_referenz_aendert_kein_delta(bestand):
     Mobil XS mit 36 Raten (beim iPhone 15 die alte Referenz, 1.469,80 EUR über
     24 Monate) hat ohne Tarifpreis ab Monat 25 keine Zahl mehr; die Referenz ist
     Mobil S mit 12 Raten (1.709,80 EUR über 24 Monate). Gezählt werden nur Karten
-    mit Zahl - eine 36-Raten-Karte ohne Zahl hat kein Delta."""
+    mit Zahl - eine 36-Raten-Karte ohne Zahl hat kein Delta.
+
+    Datenkonzept Geräte Teil B: Δ nur gegen die Vodafone-Karte mit gleichem
+    Band und gleicher Ratenlaufzeit; die Referenz des Modells ist die
+    günstigste Vodafone-Karte mit 24 Raten (iPhone 15: Mobil M, 1.949,80 EUR -
+    Mobil S mit 12 Raten steht in der 12er-Ansicht). o2 L Plus gegen Vodafone
+    Mobil L mit 24 Raten (2.675,80), o2 on Demand M Plus gegen Mobil M."""
 
     def delta(mid, tarif):
         (betrag,) = {
@@ -565,16 +571,16 @@ def test_die_beschriftung_der_referenz_aendert_kein_delta(bestand):
         return betrag
 
     assert _modell(bestand, "apple-iphone-17-pro-256")["referenz"]["gesamt"] == 1955.80
-    assert _modell(bestand, "apple-iphone-15-128")["referenz"]["gesamt"] == 1709.80
+    assert _modell(bestand, "apple-iphone-15-128")["referenz"]["gesamt"] == 1949.80
     assert (
         delta("apple-iphone-17-pro-256", "O2 Mobile L Plus mit 150 GB+ (24 Mon.)")
-        == round(1794.76 - 1955.80, 2)
-        == -161.04
+        == round(1794.76 - 2675.80, 2)
+        == -881.04
     )
     assert (
         delta("apple-iphone-15-128", "O2 Mobile on Demand M Plus mit 50 GB+ (24 Mon.)")
-        == round(1120.75 - 1709.80, 2)
-        == -589.05
+        == round(1120.75 - 1949.80, 2)
+        == -829.05
     )
     for modell in bestand["modelle"]:
         ref = modell["referenz"]

@@ -757,7 +757,7 @@ def test_die_karte_traegt_preis_und_anbieter_punkte(ansicht):
     k = ansicht["kacheln"][0]
     assert k["id"] == "apple-iphone-17-pro-256"
     assert set(k["baender"]) == {"xs", "m"}
-    klein = k["baender"]["xs"]
+    klein = k["baender"]["xs"][24]
     assert klein["ab"] == "841,00 €"
     assert klein["ab_monat"] == "35,04 €/Monat"
     assert klein["anb"] == "1&1"
@@ -765,7 +765,7 @@ def test_die_karte_traegt_preis_und_anbieter_punkte(ansicht):
     assert "#e60000" in klein["punkte_html"], "Vodafone-Punkt in Hausfarbe"
     assert "#0019a5" in klein["punkte_html"], "o2-Punkt in Hausfarbe"
     assert klein["anbieter_text"] == "Vodafone, o2, 1&1, congstar"
-    mittel = k["baender"]["m"]
+    mittel = k["baender"]["m"][24]
     assert mittel["anb"] == "congstar"
     assert mittel["ab"] == "961,00 €"
     assert mittel["punkte_html"].count("<i") == 1
@@ -813,8 +813,8 @@ def test_das_karten_delta_ist_die_bewegung_des_fuehrenden_anbieters(ansicht_stat
     )
     delta = round(je_anbieter[fuehrend][tage[-1]] - je_anbieter[fuehrend][tage[0]], 2)
     assert delta == 0.0
-    assert k["baender"]["xs"]["delta_text"] == "±0 € in 3 Tagen"
-    assert k["baender"]["xs"]["delta_richtung"] == "gleich"
+    assert k["baender"]["xs"][24]["delta_text"] == "±0 € in 3 Tagen"
+    assert k["baender"]["xs"][24]["delta_richtung"] == "gleich"
 
 
 def test_ohne_zwei_messtage_gibt_es_kein_delta(ansicht):
@@ -822,9 +822,10 @@ def test_ohne_zwei_messtage_gibt_es_kein_delta(ansicht):
     geraten. Die Karte zeigt keins (Feld None, kein Pfeil)."""
     k = ansicht["kacheln"][1]
     assert k["id"] == "samsung-galaxy-s26-256"
-    for band in k["baender"].values():
-        assert band["delta_text"] is None
-        assert band["delta_richtung"] is None
+    for je_laufzeit in k["baender"].values():
+        for band in je_laufzeit.values():
+            assert band["delta_text"] is None
+            assert band["delta_richtung"] is None
 
 
 def test_bewegung_traegt_alle_richtungen():
@@ -1070,12 +1071,14 @@ def test_auto_modell_mit_zwei_mestagen_steht_in_der_wahl(tmp_path):
 
 
 def _h3_karte(anbieter, gesamt, monate, band="xs", frisch=True):
-    """Eine Kartenzeile in der Form, die `_band_zeilen` liest."""
+    """Eine Kartenzeile in der Form, die `_band_zeilen` liest; seit Teil A
+    trägt jede Karte ihre Ratenlaufzeit (hier gleich dem Zeitraum)."""
     return {
         "anbieter": anbieter,
         "gesamt": gesamt,
         "schnitt_monat": round(gesamt / monate, 2),
         "leitzahl_monate": monate,
+        "raten_laufzeit": monate,
         "tarif": f"{anbieter} Tarif",
         "band": band,
         "band_gb_text": "15 GB",
@@ -1093,7 +1096,10 @@ def test_h3_eine_36_monats_karte_ist_keine_zeile_dieser_tafel():
     """Rot gegen den alten Stand: dort stand 1&1 mit 1.299,54 EUR (36
     Monate) als GUENSTIGSTE Zeile vor Vodafones 1.433,80 EUR (24 Monate)
     - der Antwort-Satz nannte sie "Kosten über 24 Monate", und
-    `_leitzahl_html` zog die zwei Zahlen voneinander ab."""
+    `_leitzahl_html` zog die zwei Zahlen voneinander ab.
+
+    Datenkonzept Geräte Schritt 2: die 36-Raten-Karte gehört in die
+    36er-Ansicht, nicht als „fremd“ in die 24er."""
     modell = {
         "id": "m",
         "titel": "Testgerät",
@@ -1103,9 +1109,9 @@ def test_h3_eine_36_monats_karte_ist_keine_zeile_dieser_tafel():
     }
     satz = geraete_zeitreihe._band_zeilen(modell)["xs"]
     assert [z["anbieter"] for z in satz["zeilen"]] == ["Vodafone"]
-    assert [(k["anbieter"], k["leitzahl_monate"]) for k in satz["fremd"]] == [
-        ("1&1", 36)
-    ]
+    assert satz["fremd"] == []
+    sechsunddreissig = geraete_zeitreihe._band_zeilen(modell, 36)["xs"]
+    assert [z["anbieter"] for z in sechsunddreissig["zeilen"]] == ["1&1"]
     assert geraete_zeitreihe._leitzahl_html(satz["zeilen"]) is None
     text = _text(
         geraete_zeitreihe._antwort_html(
@@ -1118,7 +1124,8 @@ def test_h3_eine_36_monats_karte_ist_keine_zeile_dieser_tafel():
 
 def test_h3_der_luecken_satz_nennt_anbieter_und_zeitraum():
     """Der Anbieter faellt aus den Zeilen - und wird GENANNT. "Kein
-    Bündel in diesem Band" waere gelogen (harte Regel 9)."""
+    Bündel in diesem Band" waere gelogen (harte Regel 9). Seit Datenkonzept
+    Geräte Schritt 2 heißt der Grund „mit 24 Raten nicht erfasst“."""
     modell = {
         "id": "m",
         "titel": "Testgerät",
@@ -1128,14 +1135,12 @@ def test_h3_der_luecken_satz_nennt_anbieter_und_zeitraum():
     }
     satz = geraete_zeitreihe._band_zeilen(modell)["xs"]
     luecken = geraete_zeitreihe._luecken(
-        satz["zeilen"], modell["karten"], "xs", fremd=satz["fremd"]
+        satz["zeilen"], modell["karten"], "xs", fremd=satz["fremd"], laufzeit=24
     )
     eins = next(l for l in luecken if l["anbieter"] == "1&1")
-    assert (eins["grund"], eins["monate"]) == ("anderer-zeitraum", 36)
+    assert (eins["grund"], eins["monate"]) == ("nicht-erfasst", None)
     text = geraete_zeitreihe._luecke_text(luecken, {})
-    assert (
-        "Nur über eine andere Laufzeit, nicht über 24 Monate: 1&1 (36 Monate)" in text
-    ), text
+    assert "Mit 24 Raten nicht erfasst: 1&1." in text, text
     assert "Kein Bündel in diesem Band: 1&1" not in text
 
 
@@ -1143,7 +1148,10 @@ def test_h3_ein_band_mit_nur_fremdem_zeitraum_verschwindet_nicht():
     """Der stille Verlust, den das Tor sonst verursacht: ein Band, dessen
     EINZIGES Angebot 36 Monate traegt, hat keine Zeile - "führt kein
     Anbieter ein Bündel" waere falsch, und das Band ganz aus der Auswahl
-    zu nehmen waere ein gemessenes Angebot ohne ein Wort."""
+    zu nehmen waere ein gemessenes Angebot ohne ein Wort.
+
+    Datenkonzept Geräte Schritt 2: das Angebot steht in der 36er-Ansicht;
+    die 24er-Ansicht desselben Bandes nennt 1&1 „nicht erfasst“."""
     modell = {
         "id": "m",
         "titel": "Testgerät",
@@ -1151,22 +1159,24 @@ def test_h3_ein_band_mit_nur_fremdem_zeitraum_verschwindet_nicht():
         "speicher": 256,
         "karten": [_h3_karte("1&1", 2019.54, 36)],
     }
-    satz = geraete_zeitreihe._band_zeilen(modell)["xs"]
-    assert satz["zeilen"] == [] and satz["alt"] == []
-    assert satz["fremd"], "das Angebot ist verloren gegangen"
+    assert "xs" not in geraete_zeitreihe._band_zeilen(modell)
+    satz = geraete_zeitreihe._band_zeilen(modell, 36)["xs"]
+    assert [z["anbieter"] for z in satz["zeilen"]] == ["1&1"]
     text = _text(
         geraete_zeitreihe._antwort_html(
-            modell,
-            "xs",
-            satz["zeilen"],
-            {"label": "XS"},
-            alte=satz["alt"],
-            fremd=satz["fremd"],
+            modell, "xs", satz["zeilen"], {"label": "XS"}, laufzeit=36
         )
     )
-    assert "führt kein Anbieter ein Bündel" not in text
-    assert "führt nur 1&amp;1" in text and "nur über 36 Monate" in text
-    assert "2.019,54 €" in text, text
+    assert "mit 36 Raten" in text and "2.019,54 €" in text, text
+    leer = _text(
+        geraete_zeitreihe._antwort_html(modell, "xs", [], {"label": "XS"}, laufzeit=24)
+    )
+    assert "führt kein Anbieter ein Bündel" not in leer
+    assert "mit 24 Raten ist kein Bündel erfasst" in leer, leer
+    luecken = geraete_zeitreihe._luecken([], modell["karten"], "xs", laufzeit=24)
+    assert "Mit 24 Raten nicht erfasst: 1&1." in geraete_zeitreihe._luecke_text(
+        luecken, {}
+    )
 
 
 def test_z1_die_beschriftung_behauptet_nur_zeitraeume_die_im_bild_stehen(ansicht):
@@ -1281,7 +1291,13 @@ def test_z1_der_fremde_zeitraum_hat_sein_eigenes_kachel_feld(tmp_path):
     aktueller Bündel-Stand") ueber einem heute gemessenen Angebot. ROT
     gegen den alten Stand: dort war `alt_text` gesetzt und `fremd_text`
     gab es nicht.
+
+    Seit Datenkonzept Geräte Schritt 2 steht eine 36-Raten-Karte in ihrer
+    eigenen Ansicht; fremd ist in der 24er-Ansicht nur noch eine Karte mit
+    24 Raten, deren Zahl über einen anderen Zeitraum läuft (Tarif 36 Monate).
     """
+    fremd = _h3_karte("1&1", 2019.54, 36)
+    fremd["raten_laufzeit"] = 24
     tco = {
         "modelle": [
             {
@@ -1289,7 +1305,7 @@ def test_z1_der_fremde_zeitraum_hat_sein_eigenes_kachel_feld(tmp_path):
                 "titel": "Testgerät 256 GB",
                 "hersteller": "Test",
                 "speicher": 256,
-                "karten": [_h3_karte("1&1", 2019.54, 36)],
+                "karten": [fremd],
             }
         ],
         "baender_katalog": [{"key": "xs", "label": "XS"}],
@@ -1297,7 +1313,7 @@ def test_z1_der_fremde_zeitraum_hat_sein_eigenes_kachel_feld(tmp_path):
         "historie_lage": {},
     }
     a = geraete_zeitreihe.aufbereiten(tmp_path, tco)
-    kachel = a["kacheln"][0]["baender"]["xs"]
+    kachel = a["kacheln"][0]["baender"]["xs"][24]
     assert kachel["fremd_text"] == "nur über 36 Monate"
     assert kachel["alt_text"] is None, "der fremde Zeitraum ist kein alter Stand"
     assert kachel["ab"] is None, "kein Betrag ohne vergleichbaren Zeitraum"
@@ -1376,22 +1392,32 @@ def test_p1_gleichstand_zweier_ratenlaufzeiten_verliert_die_zweite_nicht(tmp_pat
     36 Monate und steht nie im Gleichstand mit einer 24-Monats-Zahl; der Fall
     sind deshalb 12 und 24 Raten (beide über 24 Monate, wie Vodafone):
     24 × 20 + 12 × 60 = 24 × 20 + 24 × 30 = 1.200,00 EUR.
+
+    Seit Teil B hat jede Ratenlaufzeit ihre eigene Reihe: beide Zahlweisen
+    bleiben, keine verdrängt die andere.
     """
     state, tco = _p1_state(tmp_path)
     messungen = geraete_zeitreihe._messungen(state, tco)
-    slot = messungen[("modell-x", "xs")]["congstar"]["2026-09-22"]
-    assert slot["laufzeit"] == 12
-    assert slot["wert"] == 1200.0
-    assert slot["weitere_laufzeiten"] == [24]
+    for laufzeit in (12, 24):
+        slot = messungen[("modell-x", "xs", laufzeit)]["congstar"]["2026-09-22"]
+        assert slot["laufzeit"] == laufzeit
+        assert slot["wert"] == 1200.0
 
 
 def test_p1_der_rechenweg_nennt_die_zweite_zahlweise(tmp_path):
+    """Seit Teil B steht die zweite Zahlweise in ihrer eigenen Ansicht: der
+    Rechenweg jeder Laufzeit nennt genau ihre Raten."""
     state, tco = _p1_state(tmp_path)
     a = geraete_zeitreihe.aufbereiten(state, tco)
-    paar = _paar(a, ("modell-x", "xs"))
-    assert paar is not None
-    assert "Zum selben Betrag auch über 24 Monate" in paar["rechenweg_html"]
-    assert "Restschuld" not in paar["rechenweg_html"]
+    for laufzeit in (12, 24):
+        paar = next(
+            p
+            for p in a["paare"]
+            if (p["modell"], p["band"], p["laufzeit"]) == ("modell-x", "xs", laufzeit)
+        )
+        text = re.sub(r"<[^>]+>", " ", paar["rechenweg_html"])
+        assert re.findall(r"Geräterate\s+(\d+) ×", text) == [str(laufzeit)], text
+        assert "Restschuld" not in paar["rechenweg_html"]
 
 
 def test_p1_bei_reihenfolgetausch_bleibt_dieselbe_zahlweise_gewinnen(tmp_path):
@@ -1409,6 +1435,6 @@ def test_p1_bei_reihenfolgetausch_bleibt_dieselbe_zahlweise_gewinnen(tmp_path):
         "\n".join(json.dumps(z) for z in zeilen) + "\n", encoding="utf-8"
     )
     messungen = geraete_zeitreihe._messungen(state, tco)
-    slot = messungen[("modell-x", "xs")]["congstar"]["2026-09-22"]
-    assert slot["laufzeit"] == 12
-    assert slot["weitere_laufzeiten"] == [24]
+    for laufzeit in (12, 24):
+        slot = messungen[("modell-x", "xs", laufzeit)]["congstar"]["2026-09-22"]
+        assert slot["laufzeit"] == laufzeit

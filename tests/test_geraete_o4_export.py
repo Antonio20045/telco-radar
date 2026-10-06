@@ -289,7 +289,10 @@ def test_die_tco24_einer_zeile_ist_gerechnet_nach_geraten(tco_csv, store):
         and b.get("tarif_monatlich") == _zahl(probe[idx["Tarif/Monat EUR"]])
         and b.get("geraet_monatsrate") == _zahl(probe[idx["Geräterate EUR"]])
         and b.get("buendel_monatlich") == _zahl(probe[idx["Bündel/Monat EUR"]])
+        and str(b.get("laufzeit_monate")) == probe[idx["Laufzeit Monate"]]
     ]
+    """Teil B ordnet den Export nach Ratenlaufzeit: die erste Zeile ist eine mit
+    12 Raten, und ohne die Laufzeit träfe ihr Schlüssel auch Sätze mit 24."""
     assert kandidaten, "Stichprobe trifft keinen Satz des Stores"
     werte = set()
     for satz in kandidaten:

@@ -51,9 +51,12 @@ def _zaehlt_nicht(roh: dict) -> str:
     return ""
 
 
-def _andere_gesperrt(karten: list, band: str, roh: list) -> dict[str, set[str]]:
+def _andere_gesperrt(
+    karten: list, band: str, roh: list, laufzeit: int
+) -> dict[str, set[str]]:
     """Wettbewerber mit frischem, belastbarem Bündel im Band, das nicht zählt,
-    je Anbieter mit ihren Gründen."""
+    je Anbieter mit ihren Gründen - in der Ratenlaufzeit des Paares
+    (Datenkonzept Geräte Schritt 2: ein Paar ist eine Laufzeit-Ansicht)."""
     grund = {
         (
             r.get("anbieter"),
@@ -74,6 +77,7 @@ def _andere_gesperrt(karten: list, band: str, roh: list) -> dict[str, set[str]]:
         )
         if (
             k.get("band") == band
+            and k.get("raten_laufzeit") == laufzeit
             and k["anbieter"] != "Vodafone"
             and k.get("sku_id")
             and k.get("belastbar")
@@ -95,7 +99,10 @@ def _nur_vodafone_zaehlt(geraete, roh):
     for p in geraete["zeitreihe"]["paare"]:
         satz = _satz(p)
         if NUR_VODAFONE in satz or "steht nur Vodafone im Vergleich" in satz:
-            yield p, _andere_gesperrt(karten[p["modell"]], p["band"], roh)
+            yield (
+                p,
+                _andere_gesperrt(karten[p["modell"]], p["band"], roh, p["laufzeit"]),
+            )
 
 
 def test_fuehrt_nur_vodafone_nur_wenn_kein_anderer_anbieter_im_band(bestand):

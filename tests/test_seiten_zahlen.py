@@ -667,7 +667,7 @@ def test_die_kartenzahlen_stehen_wortlich_auf_der_seite(tmp_path):
         text = text_je_id[k["id"]]
         assert k["kurz"] in text, f"Name fehlt auf der Karte {k['id']}"
         assert set(k["baender"]), f"Karte {k['id']} ohne Band-Werte"
-        for band, s in k["baender"].items():
+        for band, s in ((b, s) for b, je in k["baender"].items() for s in je.values()):
             if s["ab"]:
                 assert s["ab"] in text, (
                     f"ab-Preis {s['ab']} ({band}) fehlt auf {k['id']}"
@@ -699,8 +699,9 @@ def test_keine_karte_zeigt_zahlen_die_die_aufbereitung_nicht_hat(tmp_path):
     erlaubt = set()
     for k in aufbereitung["kacheln"]:
         erlaubt |= {k["kurz"], "ab"}
-        for s in k["baender"].values():
-            erlaubt |= {s["ab"], s["ab_monat"], s["delta_text"], s["anbieter_text"]}
+        for je in k["baender"].values():
+            for s in je.values():
+                erlaubt |= {s["ab"], s["ab_monat"], s["delta_text"], s["anbieter_text"]}
     erlaubt |= {t for k in aufbereitung["kacheln"] for t in k["kurz"].split()}
     erlaubt.discard(None)
     for karte in soup.select("#gr-zr-kacheln button[data-modell]"):

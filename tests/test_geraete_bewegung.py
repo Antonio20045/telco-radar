@@ -318,5 +318,8 @@ def test_die_zeitreihe_liefert_den_block_aus_ihrer_historie(tmp_path):
         -72.0,
         0.0,
     )
-    assert z["link"] == ("geraete.html?modell=" + z["modell"] + "&band=" + z["band"])
+    assert z["link"] == (
+        "geraete.html?modell=" + z["modell"] + "&band=" + z["band"] + "&laufzeit=24"
+    ), "der Link öffnet genau das Paar samt Ratenlaufzeit (Teil B)"
+    assert z["laufzeit"] == 24
     assert z["band"] in g["zeitreihe"]["daten"]["erlaubt"][z["modell"]]

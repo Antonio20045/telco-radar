@@ -9,24 +9,14 @@ KEINE weitere Spalte in der Alarmtabelle (Strategie § 8, Phase 8, Punkt 1).
 Eine TCO neben einem Barpreis in derselben Zeile waere genau der Befund, mit
 dem dieses Vorhaben angefangen hat: zwei Groessen unter einer Ueberschrift.
 
-Der Stand, gegen den dieses Modul gebaut ist (04.09.2026)
---------------------------------------------------------
-`data/state/geraete_tco.json` gibt es noch nicht. Es gibt **null Buendel und
-null SIM-only-Referenzen**, weil kein Adapter Tarifpreise sammelt - das ist
-Phase 6. Also ist heute **keine einzige TCO-24 rechenbar**, und diese Tafel
-zeigt statt einer Zahl die benannte Luecke.
-
-Das ist keine Notloesung, sondern der Punkt. Aus `report/effektivpreis.py`
-woertlich uebernommen und in `tco_model` § 6.4 wiederholt: "Wenn kein
-Anschlusspreis bekannt ist, heisst das nicht kostenlos." Eine Tafel, die aus
-einem Geraetepreis ohne Tarif eine gerundete Gesamtsumme macht, waere eine
-Meinung mit Eurozeichen. Sobald Phase 6 die Tarifpreise liefert, fuellt sich
-dieselbe Spalte ohne eine Zeile Aenderung an dieser Datei.
+Fehlt ein Posten, zeigt die Tafel die benannte Luecke statt einer Zahl:
+"Wenn kein Anschlusspreis bekannt ist, heisst das nicht kostenlos"
+(`report/effektivpreis.py`, `tco_model` § 6.4).
 
 Die vier Regeln, die dieses Modul tragen
 ----------------------------------------
 1. **Gerechnet wird ausschliesslich in `tco_model`.** Dieses Modul ruft
-   `tco_24()` und `geraeteanteil()` auf und formt das Ergebnis; es addiert
+   `kosten_ueber()` und `geraeteanteil()` auf und formt das Ergebnis; es addiert
    selbst keinen Euro. Zwei Rechnungen fuer dieselbe Zahl sind zwei Zahlen
    (CLAUDE.md § 6) - und die eine davon stuende in einer Vorlage, wo sie
    niemand testet.
@@ -468,6 +458,12 @@ HAENDLER_OHNE_BUENDEL = geraete_tco_karten.HAENDLER_OHNE_BUENDEL
 _haendler_ohne_buendel_preise = geraete_tco_karten._haendler_geraetepreise
 
 
+def _nach_ratenlaufzeit(zeile: dict) -> tuple:
+    """Sortierschlüssel des Exports: Ratenlaufzeit aufsteigend, ohne zuletzt."""
+    laufzeit = zeile["laufzeit"]
+    return (laufzeit is None, laufzeit if laufzeit is not None else 0)
+
+
 def _export_zeilen(
     buendel: list,
     massstab: list,
@@ -488,19 +484,16 @@ def _export_zeilen(
     um den Katalog), und die Kostenspalte ist `tco_model.kosten_ueber()` wie auf
     der Karte. Hier ZAHLEN; Dezimalkomma und Semikolon macht `geraete_export.tco_csv`.
 
-    Die `sku_id` steht als EIGENE Spalte (A4, 20.09.2026): Modell,
-    Speicher und alle Preise sind je Farbvariante gleich, und ohne die
-    SKU kollabierten Vodafone-Varianten zu byte-identischen
-    Exportzeilen (live: 156). Sie ist Teil des Bündelschluessels und
-    trennt deshalb JEDES Paar, nicht nur das heutige.
-
-    P0-B-h4 (21.09.2026): der Zeitraum H geht als EIGENES Feld durch
-    (`leitzahl_monate`, gelesen aus `Kosten.monate`, bei SIM-only aus
-    `Tco.leitzahl_monate`): 36 Raten und 1&1 rechnen 36 Monate, 12 und 24 Raten 24.
+    Die `sku_id` steht als EIGENE Spalte (A4): ohne sie kollabierten
+    Farbvarianten zu byte-identischen Zeilen. Der Zeitraum H geht als
+    EIGENES Feld durch (`leitzahl_monate` aus `Kosten.monate`, P0-B-h4).
 
     `status` ist der Zustand der Notbremse (`geraete_notbremse.kurz`, dasselbe
     Wort wie an der Bündelzeile), leer bei einem Bündel, das zählt; `luecke`
     nennt die Posten, ohne die es keine Kostenzahl gibt.
+
+    Die Bündelzeilen stehen nach Ratenlaufzeit gruppiert (Datenkonzept
+    Geräte Schritt 2), innerhalb einer Laufzeit in der Folge des Bestands.
 
     Die SIM-only-Zeilen sind DERSELBE Massstab wie auf der Tafel
     (`_referenztabelle`), `ueber_horizont` als ihre TCO-24 (`tco_24` über
@@ -548,6 +541,7 @@ def _export_zeilen(
                 "luecke": ", ".join(kosten.luecken),
             }
         )
+    zeilen.sort(key=_nach_ratenlaufzeit)
     sim = []
     for r in massstab:
         sim.append(

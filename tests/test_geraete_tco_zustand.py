@@ -562,6 +562,12 @@ def _baue(
         encoding="utf-8",
     )
     tarife = list(_tarife())
+    if ungefaehr_delta:
+        tarife = [
+            dict(t, datenvolumen_gb=18) if t["tarif_id"] == "o2:on-demand-m" else t
+            for t in tarife
+        ]
+        """Teil B: Δ nur im selben Band - o2 steht hier im Band der Vodafone-Karte."""
     if graphloses_modell:
         ohne = {
             "anbieter": "o2",
@@ -638,7 +644,10 @@ def test_die_gerenderte_seite_traegt_das_etikett_auf_zeile_und_rechenweg(tmp_pat
     )
     neu = tafel.select_one('.gr-bnd[data-anbieter="o2"][data-zustand="neu"]')
     assert neu.select_one(".gr-kk-marke--zustand") is None
-    assert neu.select_one(".gr-kk-delta") is not None
+    assert neu.select_one(".gr-bnd-delta").get_text(strip=True) == (
+        "Vodafone nicht erfasst"
+    ), "Teil B: Δ nur gegen Vodafone im selben Band - o2 M hat dort keine"
+    assert neu.select_one(".gr-kk-luecke") is not None
 
     assert tafel.select_one("svg.gr-g1") is None
     svg = grafik.balken(_modell())

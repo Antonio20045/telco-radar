@@ -404,7 +404,7 @@ def test_zeitreihe_band_mit_nur_alten_angeboten_bleibt_waehlbar(tmp_path):
     paar = next(p for p in zr["paare"] if p["modell"] == mid)
     assert "kein aktueller Stand" in paar["antwort_html"]
     assert "16.09.2026" in paar["antwort_html"]
-    kachel = zr["kacheln"][0]["baender"]["m"]
+    kachel = zr["kacheln"][0]["baender"]["m"][24]
     assert kachel["ab"] is None
     assert kachel["alt_text"] == "kein aktueller Stand seit 16.09.2026"
     assert paar["luecke_text"] is not None
@@ -421,7 +421,7 @@ def test_zeitreihe_gemischtes_band_ignoriert_das_alte_angebot(tmp_path):
     paar = next(p for p in zr["paare"] if p["modell"] == mid)
     assert "führt Vodafone" in paar["antwort_html"]
     assert "1.224,76" in paar["antwort_html"]
-    kachel = zr["kacheln"][0]["baender"]["m"]
+    kachel = zr["kacheln"][0]["baender"]["m"][24]
     assert kachel["ab"] == "1.224,76 €"
     assert kachel.get("alt_text") is None
     assert "Kein aktueller Stand: o2." in (paar["luecke_text"] or "")

@@ -240,7 +240,6 @@ def _rechung(messung: dict, tarife: dict | None = None) -> dict | None:
         "datum": satz.get("datum") or "",
         "quelle_url": satz.get("quelle_url") or "",
         "abgerufen_am": satz.get("abgerufen_am") or "",
-        "weitere_laufzeiten": messung.get("weitere_laufzeiten") or [],
     }
 
 
@@ -304,11 +303,6 @@ def _rechung_html(anbieter: str, messung: dict, tarife: dict | None = None) -> s
         f"<p class='gr-zr-rsumme'>= <b>{_euro(r['gesamt'])}</b> "
         f"<span class='gr-zr-plabel'>{label_der_leitzahl(r['monate'])}</span></p>"
     )
-    if r["weitere_laufzeiten"]:
-        teile.append(
-            f"<p class='gr-zr-rweitere'>Zum selben Betrag auch "
-            f"über {_zeitraum_wort(r['weitere_laufzeiten'])} erhältlich.</p>"
-        )
     url = r["quelle_url"]
     link = (
         f"<a href='{_esc(url)}' target='_blank' rel='noopener'>{a}&nbsp;↗</a>"

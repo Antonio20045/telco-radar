@@ -51,6 +51,14 @@ from ..tco_model import TCO_HORIZONT, zeitraum_vergleichbar
 from . import geraete_bewegung
 from . import geraete_notbremse as notbremse
 from .anbieter_farben import STRICHMUSTER, stil_fuer
+from .geraete_antwort import _antwort_html as _antwort_html
+from .geraete_antwort import _kurz_name, _satz_name, _schnitt
+from .geraete_antwort import _leitzahl_html as _leitzahl_html
+from .geraete_antwort import _rechnung_html as _rechnung_html
+from .geraete_laufzeit import LAUFZEIT_STANDARD, LAUFZEITEN, ansicht, zeitraum
+from .geraete_luecken import _alternativen as _alternativen
+from .geraete_luecken import _luecke_text as _luecke_text
+from .geraete_luecken import _luecken as _luecken
 from .geraete_rechenweg import _NAEHERUNG_SATZ as _NAEHERUNG_SATZ
 from .geraete_rechenweg import (
     ANBIETER_FOLGE,
@@ -68,7 +76,6 @@ from .geraete_rechenweg import _rechenwege_html as _rechenwege_html
 from .geraete_rechenweg import _rechung as _rechung
 from .geraete_rechenweg import _rechung_html as _rechung_html
 from .geraete_rechenweg import _wert_aus_messung as _wert_aus_messung
-from .geraete_tco_band import band_label
 from .geraete_tco_karten import kurz_datum
 
 log = logging.getLogger(__name__)
@@ -124,39 +131,7 @@ def _mon_kurz(monate: list) -> str:
     return "/".join(str(m) for m in monate) + " Mon."
 
 
-def _kurz_name(modell: dict) -> str:
-    """„Apple iPhone 17 Pro 256 GB" -> „iPhone 17 Pro" (Kachel/Vorschau)."""
-    titel = modell.get("titel") or modell.get("id", "")
-    hersteller = modell.get("hersteller") or ""
-    speicher = modell.get("speicher")
-    if hersteller and titel.startswith(hersteller + " "):
-        titel = titel[len(hersteller) + 1 :]
-    if speicher:
-        titel = titel.rstrip()
-        suffix = f" {speicher} GB"
-        if titel.endswith(suffix):
-            titel = titel[: -len(suffix)]
-    return titel
-
-
-def _satz_name(modell: dict) -> str:
-    """Der Name im Antwort-Satz: MIT Hersteller, wenn der Katalog ihn kennt.
-
-    `_kurz_name` schneidet den Hersteller fuer Kacheln und Vorschauen ab -
-    im Fliesstext liest sich „Beim 17 im Band Mittel" (Xiaomi 17) als Zahl
-    ohne Bezug. Der Satz nennt deshalb den Hersteller aus dem Katalog-/Auto-
-    Eintrag vor dem Kurznamen. Fehlt er im Eintrag, bleibt der Kurzname
-    stehen - geraten wird nichts (Antonios Regel: keine Vermutung, wo der
-    Katalog schweigt).
-    """
-    kurz = _kurz_name(modell)
-    hersteller = (modell.get("hersteller") or "").strip()
-    if not hersteller or kurz == hersteller or kurz.startswith(hersteller + " "):
-        return kurz
-    return f"{hersteller} {kurz}"
-
-
-def _band_zeilen(modell: dict) -> dict:
+def _band_zeilen(modell: dict, laufzeit: int = LAUFZEIT_STANDARD) -> dict:
     """Je Band des Modells: die Zeilen (beste je Anbieter) und Luecken.
 
     Dieselbe Auswahl wie der Prototyp (`zahlen_sammeln.py`): vergleichbare,
@@ -174,12 +149,17 @@ def _band_zeilen(modell: dict) -> dict:
     stellt weder Zeile noch Sieger; sie steht benannt in `gesperrt`. Ein
     Bündel ohne vollständigen Preis (`kosten_ueber` nennt eine Lücke) steht in
     `unvollstaendig` - das Band bleibt wählbar und nennt die Lücke.
+
+    Datenkonzept Geräte Schritt 2: je Ansicht `laufzeit` zählen nur Karten
+    dieser Ratenlaufzeit (`geraete_laufzeit.ansicht`), ihr Zeitraum ist H =
+    `zeitraum(laufzeit)`. 24 Raten stehen nie neben 36.
     """
+    h = zeitraum(laufzeit)
     baender: dict[str, dict] = {}
     karten = modell.get("karten") or []
     for karte in karten:
         band = karte.get("band")
-        if not band:
+        if not band or ansicht(karte) != laufzeit:
             continue
         baender.setdefault(band, {"karten": []})["karten"].append(karte)
 
@@ -198,15 +178,13 @@ def _band_zeilen(modell: dict) -> dict:
         gesperrt = [k for k in brauchbar if not notbremse.zaehlt(k)]
         brauchbar = [k for k in brauchbar if notbremse.zaehlt(k)]
         kandidaten = [
-            k
-            for k in brauchbar
-            if zeitraum_vergleichbar(k.get("leitzahl_monate"), TCO_HORIZONT)
+            k for k in brauchbar if zeitraum_vergleichbar(k.get("leitzahl_monate"), h)
         ]
         fremd = [
             k
             for k in brauchbar
             if k.get("frisch", True)
-            and not zeitraum_vergleichbar(k.get("leitzahl_monate"), TCO_HORIZONT)
+            and not zeitraum_vergleichbar(k.get("leitzahl_monate"), h)
         ]
         zeilen, alt, gesehen = [], [], set()
         for karte in (k for k in kandidaten if k.get("frisch", True)):
@@ -246,402 +224,6 @@ def _band_zeilen(modell: dict) -> dict:
     return fertig
 
 
-def _alternativen(karten: list, band: str, anbieter: str) -> list[dict]:
-    """Die besten Bänder EINES Anbieters, der im gewählten Band fehlt.
-
-    §4.5: „fehlende Anbieter MIT NAMEN und Alternativ-Bändern samt Betrag
-    in Klammern" - der Leser sieht nicht nur DASS einer fehlt, sondern wo
-    er steht. Nur ECHTE Karten (Bündel mit SKU oder die Näherung) sagen
-    etwas darüber, wo ein Anbieter steht; die Leerkarte der Festanbieter
-    ist kein Angebot. Und seit A3 nur FRISCHE: ein altes Angebot ist keine
-    Alternative von heute (`geraete_tco_karten.ist_frisch`, Clean Code 7 -
-    dieselbe Definition wie Zeilen und Kacheln). Und nur Karten, die
-    zaehlen: eine Schätzung ist auch als Alternative kein Preis.
-
-    P0-B-z1: jede Alternative traegt ihren ZEITRAUM mit
-    (`leitzahl_monate`, gelesen). Ohne ihn stand im Luecken-Satz ein
-    36-Monats-Betrag als „mittel 2.019,54 €" mitten unter
-    24-Monats-Zahlen. Und die Wahl der guenstigsten je Band vergleicht
-    nur INNERHALB eines Zeitraums: der Zeitraum des Horizonts zuerst,
-    sonst der kuerzeste gemessene - ein Minimum ueber zwei Laufzeiten
-    waere dieselbe Rangfolge, die das Tor verbietet.
-    """
-    beste: dict[str, dict] = {}
-    for karte in karten:
-        if karte.get("anbieter") != anbieter:
-            continue
-        if not karte.get("frisch", True) or not notbremse.zaehlt(karte):
-            continue
-        if not (karte.get("sku_id") or karte.get("naeherung")):
-            continue
-        b = karte.get("band")
-        if (
-            b is None
-            or not karte.get("vergleichbar")
-            or karte.get("gesamt") is None
-            or b == band
-        ):
-            continue
-        monate = karte.get("leitzahl_monate")
-        rang = (
-            0 if zeitraum_vergleichbar(monate, TCO_HORIZONT) else 1,
-            monate if monate is not None else 10**6,
-            karte["gesamt"],
-        )
-        if b not in beste or rang < beste[b]["rang"]:
-            beste[b] = {"rang": rang, "tco": karte["gesamt"], "monate": monate}
-    return [
-        {"band": b, "tco": v["tco"], "monate": v["monate"]}
-        for b, v in sorted(beste.items())
-    ]
-
-
-def _luecken(
-    zeilen: list,
-    karten: list,
-    band: str,
-    fremd: list | None = None,
-    gesperrt: list | None = None,
-) -> list[dict]:
-    """Je erwartetem Anbieter ohne Zeile: der Grund, in EINEM Satz zusammen.
-
-    Antonio 9b.7: „Wenn es nichts gibt, dann brauchst du es nicht
-    anzuzeigen von den jeweiligen Anbietern" - die Namen stehen im SAMMEL-
-    satz, nie als eigene Zeile mit leerem Inhalt.
-
-    Seit A3 gibt es einen VIERten Grund: der Anbieter führt ein Bündel,
-    aber nur mit altem Abruf - „kein Bündel in diesem Band" waere gelogen
-    (harte Regel 9), der alte Preis darf aber auch nicht als heutiger
-    Alternative-Betrag stehen.
-
-    S2-3 (Diff-Prüfung 21.09.2026): gefragt ist DIESES Band - die
-    Frische-Prüfung muss die Karten DES BANDES meinen, nicht alle Karten
-    des Anbieters. Vorher gewann der Anbieter-Weitblick: Telekom mit
-    einem alten Klein-Bündel (720,76 EUR vom 15.09.) und einem frischen
-    Groß-Bündel bekam im Band klein „kein-belastbares" - die Seite sagte
-    „Kein Bündel in diesem Band: Telekom", obwohl die alte Klein-Karte
-    als alt-Zeile direkt darüber steht. Reihenfolge jetzt: gar kein
-    Bündel - kein Bündel in DIESEM Band - nur alter Stand in diesem
-    Band - frisch im Band, aber nicht belastbar.
-
-    P0-B-h3 (Befund 3): und als letzter Grund `anderer-zeitraum` - das
-    Bündel ist da und belastbar, seine Leitzahl trägt nur einen anderen
-    Zeitraum als diese Tafel (1&1, 36 Monate). Er steht ZULETZT, weil er
-    die Fälle mit vorhandenem Bündel aufteilt: erst seit P0-B-h3 fällt
-    eine solche Karte aus `_band_zeilen` heraus, und "Kein Bündel in
-    diesem Band" wäre für sie falsch. `fremd` ist dabei genau der Eimer,
-    den das Tor in `_band_zeilen` gefüllt hat - dieselbe Menge, keine
-    zweite Ableitung.
-    """
-    gesehen = {z["anbieter"] for z in zeilen}
-    luecken = []
-    for anbieter in ANBIETER_FOLGE:
-        if anbieter in gesehen:
-            continue
-        eigene = [
-            k
-            for k in karten
-            if k["anbieter"] == anbieter and (k.get("sku_id") or k.get("naeherung"))
-        ]
-        namen = notbremse.namen(
-            [k for k in gesperrt or [] if k["anbieter"] == anbieter]
-        )
-        if not eigene:
-            grund = "gar-kein-buendel"
-        elif not any(k.get("band") == band for k in eigene):
-            grund = "anderes-band"
-        elif not any(k.get("frisch", True) for k in eigene if k.get("band") == band):
-            grund = "nur-alte"
-        elif namen:
-            grund = "zaehlt-nicht"
-        else:
-            grund = "kein-belastbares"
-        monate = None
-        fremde = sorted(
-            k["leitzahl_monate"]
-            for k in (fremd or [])
-            if k["anbieter"] == anbieter and k.get("leitzahl_monate") is not None
-        )
-        if fremde:
-            grund, monate = "anderer-zeitraum", fremde[0]
-        luecken.append(
-            {
-                "anbieter": anbieter,
-                "grund": grund,
-                "monate": monate,
-                "alternativ": _alternativen(karten, band, anbieter),
-                "gesperrt": namen,
-            }
-        )
-    return luecken
-
-
-def _alt_zeitraum(monate) -> str:
-    """ " über 36 Monate" - der Zeitraum eines Alternativ-Betrags, oder "".
-
-    Nur bei ABWEICHUNG vom Horizont: eine 24 hinter jeder Zahl in einem
-    Satz, der ohnehin von 24 Monaten spricht, waere dieselbe Angabe
-    zweimal am selben Ort. Ein unlesbarer Zeitraum wird BENANNT, nie als
-    Horizont angenommen (Clean Code 4).
-    """
-    if zeitraum_vergleichbar(monate, TCO_HORIZONT):
-        return ""
-    if monate is None:
-        return " über eine nicht gemessene Laufzeit"
-    return f" über {_zeitraum_wort([monate])}"
-
-
-def _stufe(band_labels: dict, band: str) -> str:
-    """Der Name der Stufe ("XS") aus dem Katalog, sonst aus dem Schluessel."""
-    return (band_labels.get(band) or {}).get("label") or band_label(band)
-
-
-_LUECKEN_SATZ = (
-    ("anderes-band", "Kein Bündel in diesem Band: "),
-    (
-        "anderer-zeitraum",
-        f"Nur über eine andere Laufzeit, nicht über {TCO_HORIZONT} Monate: ",
-    ),
-    ("zaehlt-nicht", "Nicht im Vergleich: "),
-    ("kein-belastbares", "Kein vollständiger Preis: "),
-    ("nur-alte", "Kein aktueller Stand: "),
-)
-_EIGENER_EIMER = ("gar-kein-buendel", "nur-alte", "kein-belastbares")
-
-
-def _luecke_text(luecken: list, band_labels: dict) -> str | None:
-    if not luecken:
-        return None
-    eimer: dict[str, list[str]] = {}
-    for l in luecken:
-        name, grund = l["anbieter"], l["grund"]
-        if l["alternativ"]:
-            alt = " · ".join(
-                f"{_stufe(band_labels, a['band'])} "
-                f"{_euro(a['tco'])}"
-                f"{_alt_zeitraum(a.get('monate'))}"
-                for a in l["alternativ"]
-            )
-            name += f" ({alt})"
-        if grund == "anderer-zeitraum":
-            name = l["anbieter"]
-            if l.get("monate") is not None:
-                name += f" ({l['monate']} Monate)"
-        if grund == "zaehlt-nicht":
-            eimer.setdefault(grund, []).extend(l["gesperrt"])
-            continue
-        if grund not in _EIGENER_EIMER and grund != "anderer-zeitraum":
-            grund = "anderes-band"
-        eimer.setdefault(grund, []).append(name)
-    teile = [p + ", ".join(eimer[g]) + "." for g, p in _LUECKEN_SATZ if eimer.get(g)]
-    gar_nicht = eimer.get("gar-kein-buendel") or []
-    if gar_nicht:
-        teile.append(
-            ", ".join(gar_nicht)
-            + (" führt" if len(gar_nicht) == 1 else " führen")
-            + " das Gerät gar nicht im Bündel."
-        )
-    return " ".join(teile) or None
-
-
-def _antwort_html(
-    modell: dict,
-    band: str,
-    zeilen: list,
-    band_katalog: dict,
-    alte: list | None = None,
-    fremd: list | None = None,
-    gesperrt: list | None = None,
-    unvollstaendig: list | None = None,
-) -> str:
-    """Der Antwort-Satz des Paar-Blocks.
-
-    Seit P4/D4 (STRATEGIE_GERAETE_V3, 18.09.2026) traegt er das
-    TCO-Delta zur Vodafone-Referenz NICHT mehr im Satz - es steht als
-    EIGENE Leitzahl-Zeile ueber ihm (`_leitzahl_html`, DIE ANTWORT IST
-    DIE GROESSTE ZAHL, design.md Regel 1). Dieselbe Rechnung, keine
-    zweite Stelle: Der Satz nennt Anbieter, TCO-24 und Ø je Monat, die
-    Leitzahl den Abstand zur Referenz.
-
-    A3 (STRATEGIE_GERAETE_V4, 20.09.2026): steht in einem Band KEIN
-    frisches Angebot, aber ein altes, sagt der Satz den letzten Stand
-    MIT DATUM - „führt kein Anbieter ein Bündel" waere gelogen (harte
-    Regel 9), und ein Datum wird nie geraten: keines lesbar heisst
-    „unbekannt" (Clean Code 4).
-
-    P0-B-h3 (Befund 3): dieselbe Regel fuer den fremden Zeitraum. Ein
-    Band, dessen einziges Angebot seine Leitzahl ueber 36 Monate traegt
-    (1&1), hat keine Zeile dieser Tafel - „führt kein Anbieter ein
-    Bündel" waere dort genauso gelogen. Der Satz nennt Anbieter, Betrag
-    und den Zeitraum, den der Betrag traegt. Am Bestand vom 21.09.2026
-    traf das 12 (Modell, Band)-Tafeln; ohne diesen Zweig fielen sie ganz
-    aus der Auswahl (`aufbereiten`).
-    """
-    name = _esc(_satz_name(modell))
-    label = band_katalog.get("label", band)
-    bereich = band_katalog.get("bereich") or ""
-    klammer = f" ({bereich})" if bereich else ""
-    if not zeilen:
-        alte = alte or []
-        alt_seit = max(
-            (
-                k.get("abgerufen_am") or ""
-                for k in alte
-                if kurz_datum(k.get("abgerufen_am") or "")
-            ),
-            default="",
-        )
-        if alte and alt_seit:
-            return (
-                f"Beim {name} im Band {label}{klammer} liegt kein "
-                f"aktueller Stand vor – die letzte Messung ist vom "
-                f"{kurz_datum(alt_seit)}."
-            )
-        if alte:
-            return (
-                f"Beim {name} im Band {label}{klammer} liegt kein "
-                f"aktueller Stand vor – das Abrufdatum der letzten "
-                f"Bündel ist unbekannt."
-            )
-        fremd = fremd or []
-        if fremd:
-            beste_fremd = fremd[0]
-            monate = beste_fremd.get("leitzahl_monate")
-            zeit = (
-                f"{monate} Monate"
-                if monate is not None
-                else "eine nicht gemessene Laufzeit"
-            )
-            return (
-                f"Beim {name} im Band {label}{klammer} führt nur "
-                f"{_esc(beste_fremd['anbieter'])} – und nur über "
-                f"{zeit}: <b class='gr-zr-zahl'>"
-                f"{_euro(beste_fremd['gesamt'])}</b> "
-                f"({_esc(beste_fremd.get('tarif') or '')}"
-                f"{_gb_teil(beste_fremd)}). Über zwei Laufzeiten gibt "
-                f"es keinen Vergleich mit {TCO_HORIZONT} Monaten."
-            )
-        if gesperrt:
-            wer = _esc(", ".join(notbremse.namen(gesperrt)))
-            return (
-                f"Beim {name} im Band {label}{klammer} steht kein Bündel "
-                f"im Vergleich: {wer}."
-            )
-        if unvollstaendig:
-            wer = _esc(", ".join(dict.fromkeys(k["anbieter"] for k in unvollstaendig)))
-            return (
-                f"Beim {name} im Band {label}{klammer} hat kein Bündel einen "
-                f"vollständigen Preis: {wer}."
-            )
-        return f"Beim {name} im Band {label}{klammer} führt kein Anbieter ein Bündel."
-    beste = zeilen[0]
-    kern = (
-        f"<b class='gr-zr-zahl'>{_euro(beste['gesamt'])}</b> Kosten über "
-        f"{TCO_HORIZONT} Monate, Ø <b class='gr-zr-zahl'>{_schnitt(beste)}</b> "
-        f"({_esc(beste.get('tarif') or '')}{_gb_teil(beste)})"
-    )
-    if len(zeilen) == 1 and beste["anbieter"] == EIGEN:
-        andere = [k for k in gesperrt or [] if k["anbieter"] != EIGEN]
-        if andere:
-            return (
-                f"Beim {name} im Band {label}{klammer} steht nur Vodafone im "
-                f"Vergleich: {kern}. Nicht im Vergleich: "
-                f"{_esc(', '.join(notbremse.namen(andere)))}."
-            )
-        return f"Beim {name} im Band {label}{klammer} führt nur Vodafone: {kern}."
-    satz = (
-        f"Beim {name} im Band {label}{klammer} ist "
-        f"{_esc(beste['anbieter'])} am günstigsten: {kern}"
-    )
-    eigen = next((z for z in zeilen if z["anbieter"] == EIGEN), None)
-    if eigen is beste:
-        zweit = zeilen[1] if len(zeilen) > 1 else None
-        satz = f"Beim {name} im Band {label}{klammer} führt Vodafone: {kern}"
-        if zweit is not None:
-            satz += (
-                f" Nächster Anbieter: {_esc(zweit['anbieter'])} "
-                f"({_euro(zweit['gesamt'])})."
-            )
-    elif eigen is None:
-        satz += " — Vodafone führt in diesem Band kein Bündel."
-    return satz if satz.endswith(".") else satz + "."
-
-
-def _leitzahl_html(zeilen: list) -> str | None:
-    """P4/D4: das TCO-Delta als EIGENE Leitzahl-Zeile ueber dem Antwort-Satz.
-
-    Bis P4 stand der Abstand zur Vodafone-Referenz als 13-px-<b> mitten
-    im Satz (design.md §4: "Die wichtigste Zahl steht in 13 px mitten in
-    einem Satz") - die Antwort des Vergleichs-Reiters war damit die
-    KLEINSTE wichtigen Zahl der Tafel. Jetzt ist sie die groesste Schrift
-    des ersten Viewports (.gr-leit-zahl, clamp 32-60 px); der Satz
-    darunter traegt die Umstaende. Die Zahl selbst faellt aus dem SATZ
-    (keine Zahl zweimal am selben Ort), der Referenzbetrag steht in der
-    Klammer des Labels - unverändert derselbe Wert, keine zweite Rechnung.
-
-    None, wenn es kein Delta gibt: Vodafone fuehrt selbst, fuehrt im
-    Band kein Bündel oder ist allein auf der Tafel - dann gibt es keinen
-    Abstand, und der Antwort-Satz traegt die Antwort allein."""
-    if not zeilen:
-        return None
-    beste = zeilen[0]
-    eigen = next((z for z in zeilen if z["anbieter"] == EIGEN), None)
-    if eigen is None or eigen is beste:
-        return None
-    delta = round(eigen["gesamt"] - beste["gesamt"], 2)
-    return (
-        f"<b class='gr-leit-zahl'>{_euro(delta)}</b>"
-        f"<span class='gr-leit-label'>{_esc(beste['anbieter'])} "
-        f"unter Vodafone "
-        f"({_euro(eigen['gesamt'])}"
-        f"{', Näherung' if eigen.get('naeherung') else ''})</span>"
-    )
-
-
-def _schnitt(karte: dict) -> str:
-    monat = karte.get("schnitt_monat")
-    if monat is None:
-        return ""
-    return (
-        f"{monat:,.2f}".replace(",", " ").replace(".", ",").replace(" ", ".")
-        + " €/Monat"
-    )
-
-
-def _gb_teil(karte: dict) -> str:
-    gb = karte.get("band_gb_text")
-    return f" · {_esc(gb)}" if gb else ""
-
-
-def _rechnung_html(zeilen: list) -> str:
-    """(a) Rechenschaftssatz - EINE Zeile unter dem Antwort-Satz.
-
-    Er nennt die Formel der Leitzahl und den Beleg des besten Angebots
-    (Absender, Link, Abrufdatum) - die Transparenz-Forderung aus 9a
-    („man kann hier nirgendwo auf den Link drücken") am wichtigsten Ort
-    der Tafel.
-    """
-    if not zeilen:
-        return ""
-    beste = zeilen[0]
-    url = beste.get("quelle_url") or ""
-    link = (
-        f"<a href='{_esc(url)}' target='_blank' rel='noopener'>"
-        f"{_esc(beste['anbieter'])}&nbsp;↗</a>"
-        if url
-        else _esc(beste["anbieter"])
-    )
-    datum = beste.get("abgerufen_am") or ""
-    datum_teil = f", abgerufen am {_datum_de(datum)}" if datum else ""
-    return (
-        f"So gerechnet: <code>Kosten über {TCO_HORIZONT} Monate = "
-        f"Anzahlung + "
-        f"{TCO_HORIZONT} × Tarifgrundpreis + alle Geräteraten + "
-        f"Anschlusspreis</code> — Boni bleiben außerhalb. Beleg des "
-        f"günstigsten Angebots: {link}{datum_teil}."
-    )
-
-
 def buendel_schluessel(satz: dict) -> str | None:
     """Der Schluessel, unter dem Stand und Historie einander finden.
 
@@ -661,7 +243,11 @@ def buendel_schluessel(satz: dict) -> str | None:
 def _messungen(
     state_dir: Path, tco: dict, tarife: dict | None = None, heute: str = ""
 ) -> dict:
-    """{(modell, band): {anbieter: {datum: MESSUNG}}} aus der Historie.
+    """{(modell, band, laufzeit): {anbieter: {datum: MESSUNG}}} aus der Historie.
+
+    Datenkonzept Geräte Schritt 2: je Ratenlaufzeit eine eigene Reihe - 24
+    Raten stehen nie gegen 36. Eine Laufzeit ausserhalb `LAUFZEITEN` hat
+    keine Ansicht und wird gezaehlt, nicht gezeichnet.
 
     Eine MESSUNG ist das dict `{"satz": <Historien-Zeile>, "stand":
     <Buendel-Eintrag aus geraete_tco.json>, "wert": <Leitzahl von HEUTE>}`
@@ -673,8 +259,7 @@ def _messungen(
 
     P1 (17.09.2026): die Zeile wird GANZ behalten, nicht nur ihr `gesamt` -
     aus ihren Messfeldern baut `_rechung` die Postenliste. Bei gleichem
-    `wert` gewinnt die ZEILE, die zuerst gelesen wurde (strikt `<`),
-    exakt dieselbe Regel wie vorher nur mit dem Wert.
+    `wert` gewinnt die ZEILE, die zuerst gelesen wurde (strikt `<`).
     """
     sku_modell: dict[str, str] = {}
     for modell in tco.get("modelle") or []:
@@ -707,7 +292,7 @@ def _messungen(
     if not historie.exists():
         return {}
     ohne_id = ohne_stand = ueber_basis = ohne_wert = 0
-    fremder_zeitraum = 0
+    fremder_zeitraum = fremde_laufzeit = 0
     for zeile in historie.read_text(encoding="utf-8").splitlines():
         if not zeile.strip():
             continue
@@ -740,54 +325,34 @@ def _messungen(
         if wert is None:
             ohne_wert += 1
             continue
-        if not zeitraum_vergleichbar(monate, TCO_HORIZONT):
+        laufzeit = satz.get("laufzeit_monate")
+        if laufzeit is None:
+            laufzeit = b.get("laufzeit_monate")
+        if laufzeit not in LAUFZEITEN:
+            fremde_laufzeit += 1
+            continue
+        h = zeitraum(laufzeit)
+        if not zeitraum_vergleichbar(monate, h):
             fremder_zeitraum += 1
-        slot = messungen.setdefault((modell, band), {}).setdefault(
+        slot = messungen.setdefault((modell, band, laufzeit), {}).setdefault(
             b.get("anbieter") or "?", {}
         )
         alt = slot.get(datum)
-        laufzeit = satz.get("laufzeit_monate")
-
-        def _gleichstand(kandidat):
-            return (
-                kandidat is not None
-                and kandidat["wert"] == wert
-                and zeitraum_vergleichbar(monate, kandidat["monate"])
-                and laufzeit != kandidat.get("laufzeit")
-            )
-
         if alt is None:
             besser = True
         elif zeitraum_vergleichbar(monate, alt["monate"]):
-            if wert < alt["wert"]:
-                besser = True
-            elif _gleichstand(alt):
-                besser = laufzeit is not None and (
-                    alt.get("laufzeit") is None or laufzeit < alt["laufzeit"]
-                )
-            else:
-                besser = False
+            besser = wert < alt["wert"]
         else:
-            besser = zeitraum_vergleichbar(monate, TCO_HORIZONT)
+            besser = zeitraum_vergleichbar(monate, h)
         if besser:
-            weitere = (
-                set(alt.get("weitere_laufzeiten") or []) if _gleichstand(alt) else set()
-            )
-            if _gleichstand(alt) and alt.get("laufzeit") is not None:
-                weitere.add(alt["laufzeit"])
             slot[datum] = {
                 "satz": satz,
                 "stand": b,
                 "wert": wert,
                 "monate": monate,
                 "laufzeit": laufzeit,
-                "weitere_laufzeiten": sorted(weitere),
                 **notbremse.felder_aus_satz(b, heute),
             }
-        elif _gleichstand(alt) and laufzeit is not None:
-            bekannt = set(alt.get("weitere_laufzeiten") or [])
-            bekannt.add(laufzeit)
-            alt["weitere_laufzeiten"] = sorted(bekannt)
     if (
         ohne_id
         or ohne_stand
@@ -795,20 +360,22 @@ def _messungen(
         or ohne_wert
         or stand_ohne_id
         or fremder_zeitraum
+        or fremde_laufzeit
     ):
         log.info(
             "Zeitreihe: %d Historienzeile(n) ohne jede ID, %d ohne "
             "Buendel im heutigen Stand, %d ueber den laufzeitfreien "
             "Schluessel zugeordnet, %d ohne belastbare Leitzahl "
             "(kein Punkt), %d Punkt(e) mit Leitzahl ueber einen "
-            "anderen Zeitraum als %d Monate (Kurve MIT Zeitraum am "
-            "Ende); %d Stand-Eintrag/Eintraege ohne ID.",
+            "anderen Zeitraum als ihre Ansicht (Kurve MIT Zeitraum am "
+            "Ende), %d mit einer Ratenlaufzeit ausserhalb 12/24/36; "
+            "%d Stand-Eintrag/Eintraege ohne ID.",
             ohne_id,
             ohne_stand,
             ueber_basis,
             ohne_wert,
             fremder_zeitraum,
-            TCO_HORIZONT,
+            fremde_laufzeit,
             stand_ohne_id,
         )
     return messungen
@@ -1094,6 +661,7 @@ def _svg(
     breit: bool,
     beleg_je: dict[str, tuple[str, str]],
     zeitraeume: dict | None = None,
+    laufzeit: int | None = None,
 ) -> str:
     """DER EINE Graph - SVG-Koordinatensystem, fertig gerendert.
 
@@ -1109,7 +677,8 @@ def _svg(
     ihn der Titel fuer alle), und die Beschriftung behauptet nie einen
     Zeitraum, der nicht fuer alle Kurven gilt. Ohne Angabe (`None`)
     nennt das Bild GAR KEINEN Zeitraum - lieber keine Angabe als eine
-    angenommene (Clean Code 3/4).
+    angenommene (Clean Code 3/4). `laufzeit` ist die Ratenlaufzeit der
+    Ansicht; der Kopf des Bildes nennt sie neben dem Zeitraum.
     """
     anbieter = [a for a in ANBIETER_FOLGE if anbieter_serien.get(a)]
     if not anbieter:
@@ -1152,6 +721,8 @@ def _svg(
     teile: list[str] = []
     wort = _zeitraum_wort(alle_monate)
     kopf = f"Kosten über {wort}" if wort else "Kosten"
+    if laufzeit is not None:
+        kopf += f" · {laufzeit} Raten"
     teile.append(
         f"<svg class='gr-zr gr-zr--{'breit' if breit else 'schmal'}' "
         f"viewBox='0 0 {w} {h}' role='img' aria-label='{_esc(kopf)} "
@@ -1456,6 +1027,164 @@ def _legende_html(anbieter_serien: dict, zeitraeume: dict | None = None) -> str:
     return "<div class='gr-zr-legende'>" + "".join(eintraege) + "</div>"
 
 
+_REIHE = tuple(sorted(LAUFZEITEN, key=lambda lz: lz != LAUFZEIT_STANDARD))
+"""Die Laufzeiten in der Reihenfolge der Paare: die Standardansicht zuerst."""
+
+
+def _ohne_satz() -> dict:
+    """Ein Band ohne Karte dieser Laufzeit - die Ansicht nennt die Lücke."""
+    return {
+        "zeilen": [],
+        "karten": [],
+        "alt": [],
+        "fremd": [],
+        "gesperrt": [],
+        "unvollstaendig": [],
+    }
+
+
+def _hat_inhalt(satz: dict) -> bool:
+    """Trägt das Band in dieser Laufzeit irgendetwas, das die Seite nennt?"""
+    return bool(
+        satz["zeilen"]
+        or satz.get("alt")
+        or satz.get("fremd")
+        or satz.get("gesperrt")
+        or satz.get("unvollstaendig")
+    )
+
+
+def _kachel_eintrag(satz: dict, serien: dict, zaehlend: dict, zeitraeume: dict) -> dict:
+    """Die Kachelzeile eines Bandes in EINER Ratenlaufzeit."""
+    zeilen, alte, fremde = satz["zeilen"], satz.get("alt") or [], satz.get("fremd")
+    eintrag: dict = {
+        "ab": None,
+        "ab_monat": None,
+        "anb": None,
+        "delta_text": None,
+        "delta_richtung": None,
+        "punkte_html": "",
+        "anbieter_text": "",
+        "alt_text": None,
+        "fremd_text": None,
+        "gesperrt_text": None,
+    }
+    echt = next(
+        (z for z in zeilen if not z.get("naeherung") and z.get("gesamt") is not None),
+        None,
+    )
+    if echt is not None:
+        eintrag["ab"] = _euro(echt["gesamt"])
+        eintrag["ab_monat"] = _schnitt(echt)
+        eintrag["anb"] = echt["anbieter"]
+    elif alte:
+        alt_seit = max(
+            (
+                k.get("abgerufen_am") or ""
+                for k in alte
+                if kurz_datum(k.get("abgerufen_am") or "")
+            ),
+            default="",
+        )
+        eintrag["alt_text"] = (
+            f"kein aktueller Stand seit {kurz_datum(alt_seit)}"
+            if alt_seit
+            else "kein aktueller Stand"
+        )
+    elif fremde:
+        monate_fremd = fremde[0].get("leitzahl_monate")
+        eintrag["fremd_text"] = (
+            f"nur über {monate_fremd} Monate"
+            if monate_fremd is not None
+            else "nur über eine andere Laufzeit"
+        )
+    elif satz.get("gesperrt"):
+        gruende = notbremse.gruende(satz["gesperrt"])
+        eintrag["gesperrt_text"] = f"nicht im Vergleich ({gruende})"
+    if serien:
+        band_anbieter = [a for a in ANBIETER_FOLGE if serien.get(a)]
+        eintrag["punkte_html"] = _anbieter_punkte(band_anbieter)
+        eintrag["anbieter_text"] = ", ".join(band_anbieter)
+        bew = _bewegung(zaehlend, zeitraeume)
+        if bew:
+            eintrag["delta_text"] = bew["text"]
+            eintrag["delta_richtung"] = bew["richtung"]
+    return eintrag
+
+
+def _paar(
+    modell: dict,
+    band: str,
+    laufzeit: int,
+    satz: dict,
+    band_katalog: dict,
+    mess: dict,
+    serien: dict,
+    zaehlend: dict,
+    zeitraeume: dict,
+    tarife: dict | None,
+    historie_lage: dict,
+) -> dict:
+    """Der vorgerenderte Block eines Paares (Modell, Band, Ratenlaufzeit)."""
+    zeilen, fremde = satz["zeilen"], satz.get("fremd") or []
+    h = zeitraum(laufzeit)
+    band_info = band_katalog.get(band, {})
+    luecken = _luecken(
+        zeilen,
+        modell.get("karten") or [],
+        band,
+        fremd=fremde,
+        gesperrt=satz.get("gesperrt"),
+        laufzeit=laufzeit,
+    )
+    beleg_je = {
+        z["anbieter"]: (z.get("quelle_url") or "", z.get("abgerufen_am") or "")
+        for z in zeilen
+    }
+    leer = None
+    if not serien:
+        seit_text = (
+            f"seit dem {_datum_de(historie_lage['seit'])}"
+            if historie_lage.get("seit")
+            else ""
+        )
+        leer = (
+            f"Für {_satz_name(modell)} im Band {band_info.get('label', band)} "
+            f"mit {laufzeit} Raten liegt noch keine Messreihe vor - die "
+            f"Zeitreihe beginnt {seit_text} und wächst mit jedem Messtag. Der "
+            f"Stand heute steht in den Bündel-Zeilen darunter."
+        )
+    return {
+        "modell": modell["id"],
+        "band": band,
+        "laufzeit": laufzeit,
+        "antwort_html": _antwort_html(
+            modell,
+            band,
+            zeilen,
+            band_info,
+            alte=satz.get("alt"),
+            fremd=fremde,
+            gesperrt=satz.get("gesperrt"),
+            unvollstaendig=satz.get("unvollstaendig"),
+            laufzeit=laufzeit,
+        ),
+        "leitzahl_html": _leitzahl_html(zeilen),
+        "rechnung_html": _rechnung_html(zeilen, h),
+        "legende_html": _legende_html(serien, zeitraeume),
+        "graph_beschriftung": f"Kosten über {h} Monate mit {laufzeit} Raten "
+        f"je Messtag und Anbieter",
+        "svg_breit": _svg(serien, True, beleg_je, zeitraeume, laufzeit=laufzeit),
+        "svg_schmal": _svg(serien, False, beleg_je, zeitraeume, laufzeit=laufzeit),
+        "rechenweg_html": _rechenwege_html(mess, zeilen, tarife),
+        "luecke_text": _luecke_text(luecken, band_katalog, h),
+        "leer_text": leer,
+        "anbieter": [a for a in ANBIETER_FOLGE if serien.get(a)],
+        "punkte": sum(len(v) for v in serien.values()),
+        "wahl": (len(zaehlend), sum(map(len, zaehlend.values()))),
+    }
+
+
 def aufbereiten(
     state_dir: Path, tco: dict, tarife: dict | None = None, heute: str = ""
 ) -> dict:
@@ -1494,8 +1223,8 @@ def aufbereiten(
         )
 
     messtage_je_modell: dict[str, set] = {}
-    for (mid, _band), anbieter_serien in serien_alle.items():
-        messtage_je_modell.setdefault(mid, set()).update(_messtage(anbieter_serien))
+    for paar, anbieter_serien in serien_alle.items():
+        messtage_je_modell.setdefault(paar[0], set()).update(_messtage(anbieter_serien))
     wahl = [
         m
         for m in modelle
@@ -1518,150 +1247,38 @@ def aufbereiten(
     erlaubt: dict[str, list[str]] = {}
     karten_baender: dict[str, dict[str, dict]] = {}
     for modell in wahl:
-        zeilen_je_band = _band_zeilen(modell)
-        bands = [
-            b
-            for b, s in zeilen_je_band.items()
-            if s["zeilen"]
-            or s.get("alt")
-            or s.get("fremd")
-            or s.get("gesperrt")
-            or s.get("unvollstaendig")
-        ]
+        je_laufzeit = {lz: _band_zeilen(modell, lz) for lz in _REIHE}
+        bands: list[str] = []
+        for lz in _REIHE:
+            bands += [
+                b
+                for b, s in je_laufzeit[lz].items()
+                if _hat_inhalt(s) and b not in bands
+            ]
         erlaubt[modell["id"]] = bands
-        for band in bands:
-            satz = zeilen_je_band[band]
-            zeilen = satz["zeilen"]
-            alte = satz.get("alt") or []
-            fremde = satz.get("fremd") or []
-            serien = serien_alle.get((modell["id"], band), {})
-            zaehlend = zaehlend_alle.get((modell["id"], band), {})
-            zeitraeume = zeitraeume_alle.get((modell["id"], band), {})
-            punkte = sum(len(v) for v in serien.values())
-            eintrag = {
-                "ab": None,
-                "ab_monat": None,
-                "anb": None,
-                "delta_text": None,
-                "delta_richtung": None,
-                "punkte_html": "",
-                "anbieter_text": "",
-                "alt_text": None,
-                "fremd_text": None,
-                "gesperrt_text": None,
-            }
-            echt = next(
-                (
-                    z
-                    for z in zeilen
-                    if not z.get("naeherung") and z.get("gesamt") is not None
-                ),
-                None,
+        for band, lz in ((b, lz) for b in bands for lz in _REIHE):
+            satz = je_laufzeit[lz].get(band) or _ohne_satz()
+            schluessel = (modell["id"], band, lz)
+            serien = serien_alle.get(schluessel, {})
+            zaehlend = zaehlend_alle.get(schluessel, {})
+            zeitraeume = zeitraeume_alle.get(schluessel, {})
+            karten_baender.setdefault(modell["id"], {}).setdefault(band, {})[lz] = (
+                _kachel_eintrag(satz, serien, zaehlend, zeitraeume)
             )
-            if echt is not None:
-                eintrag["ab"] = _euro(echt["gesamt"])
-                eintrag["ab_monat"] = _schnitt(echt)
-                eintrag["anb"] = echt["anbieter"]
-            elif alte:
-                alt_seit = max(
-                    (
-                        k.get("abgerufen_am") or ""
-                        for k in alte
-                        if kurz_datum(k.get("abgerufen_am") or "")
-                    ),
-                    default="",
-                )
-                eintrag["alt_text"] = (
-                    f"kein aktueller Stand seit {kurz_datum(alt_seit)}"
-                    if alt_seit
-                    else "kein aktueller Stand"
-                )
-            elif fremde:
-                monate_fremd = fremde[0].get("leitzahl_monate")
-                eintrag["fremd_text"] = (
-                    f"nur über {monate_fremd} Monate"
-                    if monate_fremd is not None
-                    else "nur über eine andere Laufzeit"
-                )
-            elif satz.get("gesperrt"):
-                gruende = notbremse.gruende(satz["gesperrt"])
-                eintrag["gesperrt_text"] = f"nicht im Vergleich ({gruende})"
-            if serien:
-                band_anbieter = [a for a in ANBIETER_FOLGE if serien.get(a)]
-                eintrag["punkte_html"] = _anbieter_punkte(band_anbieter)
-                eintrag["anbieter_text"] = ", ".join(band_anbieter)
-                bew = _bewegung(zaehlend, zeitraeume)
-                if bew:
-                    eintrag["delta_text"] = bew["text"]
-                    eintrag["delta_richtung"] = bew["richtung"]
-            karten_baender.setdefault(modell["id"], {})[band] = eintrag
-            mess = messungen_alle.get((modell["id"], band), {})
-            luecken = _luecken(
-                zeilen,
-                modell.get("karten") or [],
-                band,
-                fremd=fremde,
-                gesperrt=satz.get("gesperrt"),
-            )
-            beleg_je = {
-                z["anbieter"]: (z.get("quelle_url") or "", z.get("abgerufen_am") or "")
-                for z in zeilen
-            }
-            leer = None
-            if not serien:
-                seit = tco.get("historie_lage") or {}
-                seit_text = (
-                    f"seit dem {_datum_de(seit['seit'])}" if seit.get("seit") else ""
-                )
-                leer = (
-                    f"Für {_satz_name(modell)} im Band "
-                    f"{band_katalog.get(band, {}).get('label', band)} "
-                    f"liegt noch keine Messreihe vor - die Zeitreihe "
-                    f"beginnt {seit_text} und wächst mit jedem "
-                    f"Messtag. Der Stand heute steht in den Bündel-"
-                    f"Zeilen darunter."
-                )
             paare.append(
-                {
-                    "modell": modell["id"],
-                    "band": band,
-                    "antwort_html": _antwort_html(
-                        modell,
-                        band,
-                        zeilen,
-                        band_katalog.get(band, {}),
-                        alte=satz.get("alt"),
-                        fremd=fremde,
-                        gesperrt=satz.get("gesperrt"),
-                        unvollstaendig=satz.get("unvollstaendig"),
-                    ),
-                    "leitzahl_html": _leitzahl_html(zeilen),
-                    "rechnung_html": _rechnung_html(zeilen),
-                    "legende_html": _legende_html(serien, zeitraeume),
-                    "graph_beschriftung": (
-                        f"Kosten über {wort} je Messtag und Anbieter"
-                        if (
-                            wort := _zeitraum_wort(
-                                sorted(
-                                    {
-                                        m
-                                        for liste in zeitraeume.values()
-                                        for m in (liste or [])
-                                    }
-                                )
-                            )
-                        )
-                        else "Kosten je Messtag und Anbieter"
-                    ),
-                    "svg_breit": _svg(serien, True, beleg_je, zeitraeume),
-                    "svg_schmal": _svg(serien, False, beleg_je, zeitraeume),
-                    "rechenweg_html": _rechenwege_html(mess, zeilen, tarife),
-                    "luecke_text": _luecke_text(luecken, band_katalog),
-                    "leer_text": leer,
-                    "anbieter": [a for a in ANBIETER_FOLGE if serien.get(a)],
-                    "punkte": punkte,
-                    "wahl": (len(zaehlend), sum(map(len, zaehlend.values()))),
-                }
+                _paar(
+                    modell,
+                    band,
+                    lz,
+                    satz,
+                    band_katalog,
+                    messungen_alle.get(schluessel, {}),
+                    serien,
+                    zaehlend,
+                    zeitraeume,
+                    tarife,
+                    tco.get("historie_lage") or {},
+                )
             )
 
     vorlagen = sum(p["rechenweg_html"].count("<template") for p in paare)
@@ -1672,7 +1289,11 @@ def aufbereiten(
             vorlagen,
             sum(p["punkte"] for p in paare),
         )
-    kandidaten = [(p["modell"], p["band"], *p["wahl"]) for p in paare]
+    kandidaten = [
+        (p["modell"], p["band"], *p["wahl"])
+        for p in paare
+        if p["laufzeit"] == LAUFZEIT_STANDARD
+    ]
     start = None
     if kandidaten:
         rang = {b: i for i, b in enumerate(band_katalog)}
@@ -1684,7 +1305,10 @@ def aufbereiten(
         (
             p
             for p in paare
-            if start and p["modell"] == start["modell"] and p["band"] == start["band"]
+            if start
+            and p["modell"] == start["modell"]
+            and p["band"] == start["band"]
+            and p["laufzeit"] == LAUFZEIT_STANDARD
         ),
         None,
     )
@@ -1747,6 +1371,8 @@ def aufbereiten(
     daten = {
         "vorgabe": (start or {}).get("modell", ""),
         "start_band": (start or {}).get("band", ""),
+        "start_laufzeit": LAUFZEIT_STANDARD,
+        "laufzeiten": list(LAUFZEITEN),
         "band_folge": list(band_katalog),
         "modelle_gesamt": len(wahl),
         "suchindex": suchindex,
@@ -1807,6 +1433,8 @@ def leer() -> dict:
         "daten": {
             "vorgabe": "",
             "start_band": "",
+            "start_laufzeit": LAUFZEIT_STANDARD,
+            "laufzeiten": list(LAUFZEITEN),
             "modelle_gesamt": 0,
             "suchindex": [],
             "erlaubt": {},

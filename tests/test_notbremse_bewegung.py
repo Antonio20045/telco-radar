@@ -144,7 +144,7 @@ def test_mail_meldet_keinen_abstand_aus_buendeln_die_nicht_zaehlen(tmp_path, fel
 
 def _kachel_delta(zeitreihe: dict) -> str | None:
     kachel = next(k for k in zeitreihe["kacheln"] if k["id"] == IPHONE)
-    return kachel["baender"][BAND]["delta_text"]
+    return kachel["baender"][BAND][24]["delta_text"]
 
 
 def _mit_billigem_o2_am_letzten_tag(tmp_path, name: str):

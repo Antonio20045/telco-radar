@@ -60,6 +60,7 @@ from . import (
 )
 from . import geraete_notbremse as notbremse
 
+from .geraete_laufzeit import LAUFZEIT_STANDARD, ansicht
 from .geraete_tco_band import _MONATE, band_label
 from ..analyze import geraete_lifecycle
 from ..analyze.tco_store import TcoDB
@@ -642,7 +643,7 @@ def _katalog_zeile(e: dict, katalog) -> dict:
 TCO_LEER_KEIN_BUNDEL = "kein Bündel gemessen"
 TCO_LEER_KEIN_VERGLEICHBARES = "kein vergleichbares Bündel gemessen"
 TCO_LEER_NUR_ALT = "kein aktueller Bündel-Stand"
-TCO_LEER_ANDERE_LAUFZEIT = f"kein Bündel über {TCO_HORIZONT} Monate"
+TCO_LEER_ANDERE_LAUFZEIT = f"kein Bündel mit {LAUFZEIT_STANDARD} Raten"
 
 TCO_DELTA_LEER_KEINE_REFERENZ = "keine Referenz"
 TCO_DELTA_GRUND_KEINE_REFERENZ = (
@@ -816,13 +817,10 @@ def _tco_spalte(modell_tco: dict | None, heute: str = "") -> dict:
     vergleichbar, heisst die Luecke "kein Wettbewerber-Angebot" - nicht
     "keine Referenz", denn die Referenz ist das eigene Angebot selbst.
 
-    P0-B-h2: DIE SPALTE HAT EINEN ZEITRAUM (`TCO_HORIZONT`, derselbe Wert
-    wie ihr Kopf und die Vodafone-Referenz); gefiltert wird auf den
-    Zeitraum, den die Leitzahl der Karte traegt (`leitzahl_monate`). Ohne
-    den Filter stellten 16 Modellzeilen eine 36-Monats-Summe unter den
-    24-Monats-Kopf. Die anderen Zahlen werden BENANNT: die Zeile sagt
-    "kein Bündel über 24 Monate", die Δ-Zelle "andere Laufzeit" -
-    dieselben Worte wie die Buendelzeile derselben Karte.
+    P0-B-h2 und Datenkonzept Geräte Schritt 2: DIE SPALTE IST DIE
+    STANDARDANSICHT (24 Raten über `TCO_HORIZONT`, wie ihr Kopf und die
+    Vodafone-Referenz). Andere Zahlen werden BENANNT: die Zeile sagt "kein
+    Bündel mit 24 Raten", die Δ-Zelle "andere Laufzeit".
 
     Notbremse (Datenkonzept Geräteradar, Schritt 1): Bester und Traeger
     des Abstands sind nur Karten mit `zaehlt`. Zaehlt keine, nennt die
@@ -845,7 +843,8 @@ def _tco_spalte(modell_tco: dict | None, heute: str = "") -> dict:
     vergleichbare = [
         k
         for k in kandidaten
-        if zeitraum_vergleichbar(k.get("leitzahl_monate"), TCO_HORIZONT)
+        if ansicht(k) == LAUFZEIT_STANDARD
+        and zeitraum_vergleichbar(k.get("leitzahl_monate"), TCO_HORIZONT)
     ]
     if not vergleichbare:
         return _tco_leer(TCO_LEER_ANDERE_LAUFZEIT)

@@ -31,10 +31,12 @@ def seite(tmp_path_factory):
 
 
 def _antworten(fragment) -> dict[tuple, str]:
+    """Je (Modell, Band, Ratenlaufzeit) der Antwortsatz - seit Datenkonzept
+    Geräte Schritt 2 ist jede Laufzeit ein eigenes Paar."""
     return {
-        (b["data-modell"], b["data-band"]): b.select_one(".gr-zr-antwort").get_text(
-            " ", strip=True
-        )
+        (b["data-modell"], b["data-band"], b["data-laufzeit"]): b.select_one(
+            ".gr-zr-antwort"
+        ).get_text(" ", strip=True)
         for b in fragment.select(".gr-zr-lager")
     }
 
@@ -48,7 +50,7 @@ def _kachel_baender(html) -> dict[tuple, BeautifulSoup]:
                 or span.select_one(".gr-zr-k-preis") is None
             ):
                 continue
-            fertig[(knopf["data-modell"], span["data-band"])] = span
+            fertig[(knopf["data-modell"], span["data-band"], span["data-lz"])] = span
     return fertig
 
 

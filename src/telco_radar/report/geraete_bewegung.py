@@ -26,8 +26,10 @@ zweier Angebote ist keine Preisänderung. Ein Angebotswechsel ist deshalb
 Ebenso ohne Aussage: eine Seite ohne Messung im Toleranzfenster um einen
 der beiden Tage, eine Messung, deren Bündel nicht zählt (Notbremse:
 Schätzung oder abgelaufene Aktion, `zaehlt` aus `_messungen`), und eine
-Leitzahl über einen anderen Zeitraum als `TCO_HORIZONT` (sie ist mit
-Vodafones nicht vergleichbar).
+Leitzahl über einen anderen Zeitraum als den ihrer Ratenlaufzeit (sie ist
+mit Vodafones nicht vergleichbar). Seit Datenkonzept Geräte Schritt 2 ist
+jede Reihe eine Ratenlaufzeit (Schlüssel `(modell, band, laufzeit)`): 24
+Raten werden nur mit Vodafones 24 Raten verglichen.
 
 WAS DER BLOCK NICHT SIEHT: `wert` ist die Leitzahl nach dem HEUTIGEN
 Tarifstamm (A1, `_messungen`). Eine Aenderung des Tarifgrundpreises
@@ -47,6 +49,7 @@ from datetime import date, timedelta
 
 from ..tco_model import TCO_HORIZONT, zeitraum_vergleichbar
 from . import geraete_notbremse as notbremse
+from .geraete_laufzeit import zeitraum
 
 BEWEGUNG_EURO = 50.0
 BEWEGUNG_PROZENT = 5.0
@@ -91,6 +94,18 @@ def stichtag_aus(messungen: dict, anbieter: str | None = None) -> str | None:
     return max(tage) if tage else None
 
 
+def _band_label(band_katalog: dict, band: str, laufzeit: int | None) -> str:
+    """Das Band, wie Seite und Mail es nennen - mit der Ratenlaufzeit."""
+    label = (band_katalog.get(band) or {}).get("label", band)
+    return label if laufzeit is None else f"{label} · {laufzeit} Raten"
+
+
+def _link(modell: str, band: str, laufzeit: int | None) -> str:
+    """Der Deep-Link auf genau das Paar, dessen Zahl die Zeile nennt."""
+    link = f"geraete.html?modell={modell}&band={band}"
+    return link if laufzeit is None else f"{link}&laufzeit={laufzeit}"
+
+
 def ist_bewegung(delta: float, eigen_wert: float) -> bool:
     """Überschreitet die Abstandsänderung die Schwelle? ODER, nicht UND."""
     betrag = abs(delta)
@@ -119,9 +134,12 @@ def bewegungen(
     treffer: list[dict] = []
     ohne: Counter = Counter()
     geprueft = 0
-    for (modell, band), anbieter in sorted(messungen.items()):
+    for paar, anbieter in sorted(messungen.items()):
+        modell, band = paar[0], paar[1]
+        laufzeit = paar[2] if len(paar) > 2 else None
         if band not in (erlaubt.get(modell) or []):
             continue
+        h = TCO_HORIZONT if laufzeit is None else zeitraum(laufzeit)
         v0 = _messung_um(anbieter.get(EIGEN) or {}, von)
         v1 = _messung_um(anbieter.get(EIGEN) or {}, bis)
         for name in sorted(anbieter):
@@ -140,10 +158,7 @@ def bewegungen(
             ) != schluessel(v1["satz"]):
                 ohne[GRUND_WECHSEL] += 1
                 continue
-            if not all(
-                zeitraum_vergleichbar(m["monate"], TCO_HORIZONT)
-                for m in (v0, v1, c0, c1)
-            ):
+            if not all(zeitraum_vergleichbar(m["monate"], h) for m in (v0, v1, c0, c1)):
                 ohne[GRUND_ZEITRAUM] += 1
                 continue
             geprueft += 1
@@ -157,7 +172,8 @@ def bewegungen(
                     "modell": modell,
                     "band": band,
                     "geraet": titel.get(modell) or modell,
-                    "band_label": (band_katalog.get(band) or {}).get("label", band),
+                    "laufzeit": laufzeit,
+                    "band_label": _band_label(band_katalog, band, laufzeit),
                     "anbieter": name,
                     "abstand_vorher": round(c0["wert"] - v0["wert"], 2),
                     "abstand_jetzt": round(c1["wert"] - v1["wert"], 2),
@@ -168,7 +184,7 @@ def bewegungen(
                     "eigen_wert": v1["wert"],
                     "quelle_url": c1["satz"].get("quelle_url") or "",
                     "eigen_quelle_url": v1["satz"].get("quelle_url") or "",
-                    "link": f"geraete.html?modell={modell}&band={band}",
+                    "link": _link(modell, band, laufzeit),
                 }
             )
     treffer.sort(key=lambda t: (-abs(t["delta"]), t["geraet"], t["anbieter"]))

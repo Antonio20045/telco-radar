@@ -1106,7 +1106,8 @@ var TelcoFrage = (function () {
      kein zweiter, fest verdrahteter Katalog im Browser. */
   var BAND_KEYS = daten.band_folge || [];
   var zustand = { modell: daten.vorgabe,
-                  band: daten.start_band || BAND_KEYS[0] || '' };
+                  band: daten.start_band || BAND_KEYS[0] || '',
+                  laufzeit: String(daten.start_laufzeit || 24) };
 
   function element(id) { return document.getElementById(id); }
 
@@ -1153,7 +1154,8 @@ var TelcoFrage = (function () {
             doc.querySelectorAll('.gr-zr-lager[data-modell]'),
             function (l) {
               zrLager[l.getAttribute('data-modell') + '::' +
-                      l.getAttribute('data-band')] = l;
+                      l.getAttribute('data-band') + '::' +
+                      l.getAttribute('data-laufzeit')] = l;
             });
           return zrLager;
         });
@@ -1184,7 +1186,8 @@ var TelcoFrage = (function () {
     var folge = ++zrFolge;
     holeZr().then(function (lager) {
       if (folge !== zrFolge) return;
-      var block = lager && lager[modell + '::' + band];
+      var block = lager && lager[modell + '::' + band + '::' +
+                                 zustand.laufzeit];
       while (zrGruppe.firstChild) zrGruppe.removeChild(zrGruppe.firstChild);
       /* P1/A2: ein offenes Panel gehoert zum PAAR, nicht zur Seite - sein
          Inhalt waere die Messung des eben entfernten Graphen. Im Fehlerfall
@@ -1716,7 +1719,8 @@ var TelcoFrage = (function () {
         Array.prototype.forEach.call(
           k.querySelectorAll('.gr-zr-k-band[data-band]'),
           function (s) {
-            var passt = s.getAttribute('data-band') === band;
+            var passt = s.getAttribute('data-band') === band &&
+              s.getAttribute('data-lz') === zustand.laufzeit;
             s.hidden = !passt;
             if (passt) traf = true;
           });

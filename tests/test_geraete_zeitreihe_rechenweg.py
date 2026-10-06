@@ -276,7 +276,9 @@ def test_die_auswahl_des_guenstigsten_buendels_je_tag_rechnet_neu(tmp_path):
         "band_je_tarif": {O2_MESSUNG["tarif_id"]: "b"},
     }
     messungen = zr._messungen(tmp_path, tco, O2_TARIFE)
-    assert zr._serien_aus(messungen) == {("m", "b"): {"o2": [("2026-09-12", 1159.63)]}}
+    assert zr._serien_aus(messungen) == {
+        ("m", "b", O2_MESSUNG["laufzeit_monate"]): {"o2": [("2026-09-12", 1159.63)]}
+    }, "Teil B: die Reihe trägt ihre Ratenlaufzeit im Schlüssel"
     zeilen = [
         json.loads(z)
         for z in (tmp_path / "geraete_tco_historie.jsonl")

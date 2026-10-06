@@ -401,13 +401,13 @@ def _alarm_zeilen(alarme: dict) -> list[list[str]]:
 def _preisart_netz(z: dict, gruppe: dict) -> str:
     """Preisart einer Netzbetreiber-Zeile - nur mit Zeitraum, wo er BELEGT ist.
 
-    Ein Zeitraum wird nur genannt, wenn die Zeile nachweislich (per
-    Betragsgleichheit) gegen DIESELBE Vodafone-Karte geprüft wurde, deren
-    Zeitraum `gruppe["vodafone"]["monate"]` ist - sonst koennte die Zeile
-    gegen eine andere, bandspezifische Vodafone-Karte mit einem anderen
-    Zeitraum stehen, und diese Datei kennt dessen Wert nicht (Clean Code
-    3: kein geratener Zeitraum).
+    Ein Paar trägt Ratenlaufzeit und Zeitraum seiner Vodafone-Karte selbst
+    (Datenkonzept Geräte Schritt 2). Sonst wird ein Zeitraum nur genannt, wenn
+    die Zeile per Betragsgleichheit gegen DIESELBE Vodafone-Karte geprüft
+    wurde wie `gruppe["vodafone"]` (Clean Code 3: kein geratener Zeitraum).
     """
+    if z.get("status") == STATUS_VERGLEICHBAR and z.get("laufzeit") and z.get("monate"):
+        return f"Kosten über {z['monate']} Monate · {z['laufzeit']} Raten"
     vf = gruppe.get("vodafone") or {}
     monate = vf.get("monate")
     if (

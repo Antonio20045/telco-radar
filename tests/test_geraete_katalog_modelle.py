@@ -122,6 +122,7 @@ def _karte(
         "leitzahl_monate": leitzahl_monate,
         "delta_zustand": delta_zustand,
         "laufzeit": TCO_HORIZONT,
+        "raten_laufzeit": leitzahl_monate,
         "frisch": True,
         "quelle_url": f"https://example.de/{anbieter}",
         "sku_id": "s",
@@ -559,7 +560,7 @@ def test_36_monats_summe_steht_nicht_unter_dem_24_monats_kopf():
     assert zeile["tco_anbieter"] is None
     assert zeile["tco_band"] is None
     assert zeile["tco_band_label"] == ""
-    assert zeile["tco_leer"] == "kein Bündel über 24 Monate"
+    assert zeile["tco_leer"] == "kein Bündel mit 24 Raten"
 
 
 def test_gegenprobe_die_24_monats_karte_stellt_die_spalte():

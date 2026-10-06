@@ -63,7 +63,8 @@ def gerendert(tmp_path_factory):
 
 @pytest.fixture(scope="module")
 def karten(tmp_path_factory):
-    """Die Karten je (Modell, Band) mit ``zaehlt`` aus dem öffentlichen Eingang."""
+    """Die Karten je (Modell, Band, Ratenlaufzeit) mit ``zaehlt`` aus dem
+    öffentlichen Eingang; die Näherung steht in der 24er-Ansicht."""
     zustand = tmp_path_factory.mktemp("notbremse-zr-karten") / "state"
     shutil.copytree(ZUSTAND, zustand)
     wurzel = lese_wurzel()
@@ -74,7 +75,9 @@ def karten(tmp_path_factory):
     for modell in geraete["tco"]["modelle"]:
         for karte in modell["karten"]:
             if karte.get("band"):
-                je_band.setdefault((modell["id"], karte["band"]), []).append(karte)
+                lz = 24 if karte.get("naeherung") else karte.get("raten_laufzeit")
+                paar = (modell["id"], karte["band"], lz)
+                je_band.setdefault(paar, []).append(karte)
     return je_band
 
 
@@ -92,7 +95,10 @@ def _brauchbar(karte: dict) -> bool:
 
 def _bloecke(fragment: BeautifulSoup) -> list[tuple[tuple, str]]:
     return [
-        ((b["data-modell"], b["data-band"]), b.select_one(".gr-zr-antwort").decode())
+        (
+            (b["data-modell"], b["data-band"], int(b["data-laufzeit"])),
+            b.select_one(".gr-zr-antwort").decode(),
+        )
         for b in fragment.select(".gr-zr-lager")
     ]
 
@@ -163,7 +169,7 @@ def test_luecke_nennt_schaetzung_nicht_als_fehlendes_buendel(gerendert, karten):
         luecke = block.select_one(".gr-lueckenzeile")
         if luecke is None:
             continue
-        paar = (block["data-modell"], block["data-band"])
+        paar = (block["data-modell"], block["data-band"], int(block["data-laufzeit"]))
         gesperrt = {
             k["anbieter"]
             for k in karten.get(paar, [])
@@ -194,7 +200,14 @@ def test_alternativen_im_lueckensatz_zaehlen(gerendert, karten):
             for stufe, betrag in re.findall(r"([A-Z]+) ([\d.]+,\d{2}) €", teil):
                 traeger = [
                     k
-                    for k in karten.get((block["data-modell"], stufe.lower()), [])
+                    for k in karten.get(
+                        (
+                            block["data-modell"],
+                            stufe.lower(),
+                            int(block["data-laufzeit"]),
+                        ),
+                        [],
+                    )
                     if k["anbieter"] == anbieter and k.get("gesamt") == _euro(betrag)
                 ]
                 if traeger and not any(k.get("zaehlt", True) for k in traeger):

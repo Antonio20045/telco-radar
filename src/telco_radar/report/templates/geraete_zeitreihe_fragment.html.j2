@@ -15,5 +15,5 @@
    Stelle, an der ein Deep-Link die fremden Zeilen als "Vorgabe" einfrieren
    liess (S2-Befund). #}
 {% from "_geraete_zeitreihe.html.j2" import paarblock %}
-{% for p in paare %}<div class="gr-zr-lager" data-modell="{{ p.modell }}" data-band="{{ p.band }}">{{ paarblock(p) }}</div>
+{% for p in paare %}<div class="gr-zr-lager" data-modell="{{ p.modell }}" data-band="{{ p.band }}" data-laufzeit="{{ p.laufzeit }}">{{ paarblock(p) }}</div>
 {% endfor %}

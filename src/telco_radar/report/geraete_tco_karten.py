@@ -986,6 +986,7 @@ def _vodafone_referenz(
         "geraet_abgerufen_am": geraet.get("abgerufen_am", ""),
         "monate": monate,
         "tarif_monate": monate,
+        "ansicht": LAUFZEIT_STANDARD,
         "gesamt": gesamt,
         "schnitt_monat": monatsschnitt(gesamt, monate),
         "fortgeschrieben": fortgeschrieben,
@@ -1014,6 +1015,7 @@ def _referenz_aus_buendel(karte: dict) -> dict:
         "geraet_quelle_url": karte.get("quelle_url", ""),
         "geraet_abgerufen_am": karte.get("abgerufen_am", ""),
         "monate": karte["leitzahl_monate"],
+        "ansicht": karte.get("raten_laufzeit"),
         "gesamt": karte["gesamt"],
         "schnitt_monat": karte["schnitt_monat"],
         "fortgeschrieben": False,
@@ -1135,37 +1137,33 @@ def _delta_faellig(karte: dict, referenz: Optional[dict]) -> bool:
     "vergleichbare Zeile", und eine Leerkarte oder die Referenz selbst
     bekaeme irgendwann ein "andere Laufzeit" an die Δ-Spalte.
     """
-    if referenz is None or not karte["belastbar"] or karte["naeherung"]:
+    return referenz is not None and zeile_vergleichbar(karte)
+
+
+def zeile_vergleichbar(karte: dict) -> bool:
+    """Darf diese Zeile ueberhaupt einen Abstand tragen - mit oder ohne Referenz?"""
+    if not karte["belastbar"] or karte["naeherung"]:
         return False
     if karte["gesamt"] is None or not karte["laufzeit"]:
         return False
-    if not karte.get("frisch", True):
-        return False
-    if not karte.get("vergleichbar", True):
-        return False
-    if karte["eigen"]:
-        return False
-    return True
+    return (
+        bool(karte.get("frisch", True) and karte.get("vergleichbar", True))
+        and not karte["eigen"]
+    )
 
 
 def gleicher_horizont(karte: dict, referenz: Optional[dict]) -> bool:
-    """Tragen Zeile und Referenz denselben Zeitraum? DAS EINE TOR.
+    """Tragen Zeile und Referenz dieselbe Ratenlaufzeit UND denselben Zeitraum?
 
-    Der ganze Weg zu einem Delta laeuft hier durch - Euro-Delta
-    (`_delta`), benannter Ersatzzustand (`delta_zustand`) und jeder
-    Leser, der eine Kartenzeile gegen die Referenz stellt (Radar, Alarm,
-    Export): wer ein Vorzeichen zeigen will, fragt DIESE Funktion. Sie
-    liest die zwei Felder und wendet die Regel nicht selbst an - die
-    steht in `tco_model.zeitraum_vergleichbar`, neben der Rechnung, die
-    die Zeitraeume bestimmt (P0-B-h1).
-
-    Verglichen werden die Zeitraeume, die die zwei ZAHLEN tragen
-    (`leitzahl_monate` gegen `referenz["monate"]`) - nicht die
-    Tariflaufzeit der Rechnung, die auf jeder Karte 24 ist. Genau diese
-    Verwechslung hat 1&1s 36-Monats-Buendel ein Euro-Delta gegen eine
-    24-Monats-Referenz gegeben (P0-B-fix2, Befund 3).
+    DAS EINE TOR: Euro-Delta (`_delta`), benannter Ersatzzustand
+    (`delta_zustand`) und jeder Leser, der eine Kartenzeile gegen die Referenz
+    stellt, fragt diese Funktion. Datenkonzept Geraete Schritt 2: 12 und 24
+    Raten rechnen beide 24 Monate und werden trotzdem nicht verglichen - die
+    Ratenlaufzeit der Zeile muss die Ansicht der Referenz sein
+    (`referenz["ansicht"]`; die Naeherung gehoert zur 24er-Ansicht), und der
+    Zeitraum beider Zahlen gleich (`tco_model.zeitraum_vergleichbar`).
     """
-    if referenz is None:
+    if referenz is None or karte.get("raten_laufzeit") != referenz.get("ansicht"):
         return False
     return zeitraum_vergleichbar(karte.get("leitzahl_monate"), referenz.get("monate"))
 
@@ -1185,7 +1183,7 @@ def delta_zustand(karte: dict, referenz: Optional[dict]) -> Optional[dict]:
     damit auch keinen numerischen Δ-Sortierschluessel und faellt aus der
     Rangfolge nach Δ heraus (`data-delta` bleibt leer).
     """
-    if not _delta_faellig(karte, referenz):
+    if referenz is None or not _delta_faellig(karte, referenz):
         return None
     if gesperrt := notbremse.zustand(karte):
         return gesperrt
@@ -1195,12 +1193,15 @@ def delta_zustand(karte: dict, referenz: Optional[dict]) -> Optional[dict]:
     dieses = (
         f"{monate} Monate" if monate is not None else "eine nicht gemessene Laufzeit"
     )
+    satz = f"diese Zahl trägt {dieses}, die Referenz {referenz['monate']} Monate"
+    if zeitraum_vergleichbar(monate, referenz.get("monate")):
+        satz = (
+            f"diese Zeile hat {karte.get('raten_laufzeit')} Raten, die "
+            f"Referenz gehört zu {referenz.get('ansicht')} Raten"
+        )
     return {
         "kurz": DELTA_ANDERE_LAUFZEIT,
-        "satz": (
-            f"Kein Abstand zur Vodafone-Referenz: diese Zahl trägt "
-            f"{dieses}, die Referenz {referenz['monate']} Monate."
-        ),
+        "satz": f"Kein Abstand zur Vodafone-Referenz: {satz}.",
     }
 
 
@@ -1389,16 +1390,13 @@ def modelle(
 
     Rueckgabe:
         modelle         [{id, name, hersteller, speicher, karten, referenz,
-                          laufzeiten, spanne, bundle_anbieter}]; `spanne` und
-                          der günstigste Tarif aus derselben Menge (zaehlt)
-        vorgabe        die ID des Modells, das ohne Klick sichtbar ist
-        ohne_zuordnung  Buendel, deren SKU weder eine Listung noch ein
-                        Katalogeintrag aufloest - mit Grund, nie als Modell
+                          laufzeiten, spanne, spanne_je_laufzeit, ...}]
+        vorgabe         die ID des Modells, das ohne Klick sichtbar ist
+        ohne_zuordnung  Buendel ohne aufloesbare SKU - mit Grund, nie Modell
 
-    A3: `heute` (Datum der Ausgabe, "YYYY-MM-DD") schaltet die Alterung
-    ein - `ist_frisch` entscheidet dann je Bündel über „ab“-Preis, Delta
-    und Ranking. Ohne das Datum (leerer String) altert nichts; die Seite
-    rendert in Production immer mit dem Datum des Berichts.
+    Δ nur gegen Vodafone mit gleichem Band und gleicher Ratenlaufzeit
+    (`geraete_laufzeit`); `referenz` und `spanne` gelten der Standardansicht
+    (24 Raten). A3: `heute` ("YYYY-MM-DD") schaltet die Alterung ein.
     """
     geraet_je_sku: dict = {}
     for e in listungen:
@@ -1407,6 +1405,9 @@ def modelle(
                 e["sku_id"], (e.get("device_id") or "", e.get("speicher_gb"))
             )
     ohne_zuordnung = ergaenze_geraete_aus_katalog(geraet_je_sku, buendel, katalog)
+    from . import geraete_laufzeit, geraete_tco_band
+
+    band_je_tarif = geraete_tco_band.tarif_baender(tarife) if tarife else {}
     belege = barpreise(listungen)
     zustaende = _zustand_je_listung(listungen)
 
@@ -1473,26 +1474,20 @@ def modelle(
         laufzeiten = sorted(
             {k["raten_laufzeit"] for k in karten if k["raten_laufzeit"]}
         )
-        eigene = [
-            k
-            for k in filter(notbremse.zaehlt, karten)
-            if k["eigen"] and k["belastbar"] and k["vergleichbar"] and k["frisch"]
-        ]
         naeherung = None
-        if eigene:
-            referenz = _referenz_aus_buendel(min(eigene, key=lambda k: k["gesamt"]))
-        else:
-            referenz = _vodafone_referenz(referenzen, tarife, belege_modell)
-            naeherung = referenz
-        referenz_aktuell = referenz_ist_frisch(referenz, heute)
+        if not geraete_laufzeit.zaehlende_eigene(karten):
+            naeherung = _vodafone_referenz(referenzen, tarife, belege_modell)
         for k in karten:
-            massstab = referenz if referenz_aktuell else None
-            k["delta"] = _delta(k, massstab)
-            k["delta_zustand"] = delta_zustand(k, massstab)
+            k["band"] = band_je_tarif.get((k.get("tarif_id") or "").strip())
+        massstab = geraete_laufzeit.setze_deltas(
+            karten, naeherung, band_je_tarif, heute
+        )
+        referenz = geraete_laufzeit.modell_referenz(massstab, naeherung)
 
         vorhanden = {k["anbieter"] for k in karten}
         if naeherung is not None and not any(k["eigen"] for k in karten):
             karten.append(_referenzkarte(naeherung, heute))
+            karten[-1]["band"] = band_je_tarif.get(naeherung.get("tarif_id") or "")
             vorhanden.add("Vodafone")
         for anbieter in ANBIETER_REIHENFOLGE:
             if anbieter not in vorhanden:
@@ -1502,9 +1497,12 @@ def modelle(
         tarifangebote = [
             k
             for k in filter(notbremse.zaehlt, angebote)
-            if k["vergleichbar"] and k["frisch"] and k["gesamt"] is not None
+            if k["vergleichbar"]
+            and k["frisch"]
+            and k["gesamt"] is not None
+            and geraete_laufzeit.ansicht(k) == LAUFZEIT_STANDARD
         ]
-        betraege = [k["gesamt"] for k in tarifangebote]
+        spannen = geraete_laufzeit.spannen(karten)
         name = _name(katalog, gruppe["device_id"], gruppe["speicher"], rueckfall=mid)
         hersteller = _hersteller(katalog, gruppe["device_id"])
         katalog_eintrag = katalog.nach_id(gruppe["device_id"]) if katalog else None
@@ -1595,7 +1593,8 @@ def modelle(
                 "zustand_offen": len(
                     [k for k in angebote if k["zustand"] == "unbekannt"]
                 ),
-                "spanne": ([min(betraege), max(betraege)] if betraege else []),
+                "spanne": spannen.get(LAUFZEIT_STANDARD, []),
+                "spanne_je_laufzeit": spannen,
                 "bundle_anbieter": sorted(
                     {k["anbieter"] for k in angebote if k["frisch"]}
                 ),

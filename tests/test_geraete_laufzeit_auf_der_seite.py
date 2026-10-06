@@ -157,6 +157,8 @@ def _vodafone() -> Buendel:
 
 
 def _tarife():
+    """congstar S mit 18 GB im Band der Vodafone-Karte: seit Teil B gibt es ein
+    Δ nur im selben Band und in derselben Ratenlaufzeit."""
     return mit_leiter(
         {
             t["tarif_id"]: t
@@ -168,7 +170,7 @@ def _tarife():
                     "art": "mobilfunk",
                     "grundgebuehr": 15.0,
                     "laufzeit_monate": 24,
-                    "datenvolumen_gb": 50,
+                    "datenvolumen_gb": 18,
                     "preisphasen": [
                         {"von_monat": 1, "bis_monat": None, "betrag": 15.0}
                     ],
@@ -311,16 +313,20 @@ def test_ueber_zwei_zeitraeume_steht_der_zustand_statt_eines_vorzeichens():
     36 Monate (1 + 36 × 15,00 + 36 × 25,50 = 1.459,00 EUR) und trägt kein Δ
     gegen die 24-Monats-Referenz; die Gegenprobe mit Vorzeichen ist congstar mit
     24 Raten.
+
+    Teil B: verglichen wird nur innerhalb einer Ratenlaufzeit. Ohne
+    Vodafone-Bündel mit 36 Raten im Band heißt der Zustand „Vodafone nicht
+    erfasst“ - weiter ohne Vorzeichen.
     """
     modell = _modell([_einsundeins(), _vodafone()])
     eins = next(k for k in modell["karten"] if k["anbieter"] == "1&1")
     assert eins["delta"] is None, "kein Betrag ueber zwei Zeitraeume"
-    assert eins["delta_zustand"]["kurz"] == "andere Laufzeit"
-    assert "36 Monate, die Referenz 24 Monate" in eins["delta_zustand"]["satz"]
+    assert eins["delta_zustand"]["kurz"] == "Vodafone nicht erfasst"
+    assert "Vodafone-Bündel mit 36 Raten" in eins["delta_zustand"]["satz"]
 
     zeile = zeile_html(eins)
     zelle = zeile.select_one(".gr-bnd-delta")
-    assert zelle.get_text(strip=True) == "andere Laufzeit"
+    assert zelle.get_text(strip=True) == "Vodafone nicht erfasst"
     assert "gr-bnd-delta--wert" not in (zelle.get("class") or [])
     assert zeile.select_one(".gr-bnd")["data-delta"] == ""
     assert "über der Vodafone-Referenz" not in vorlage_text(zeile)

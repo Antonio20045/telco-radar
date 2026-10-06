@@ -12,19 +12,8 @@ Vodafone-Tarifleiter (`tarifleiter`), abgeleitet aus den ERHOBENEN Saetzen
 von `tarife.jsonl` - nicht erfunden, nicht gerundet. Die frueheren festen
 Baender Klein/Mittel/Gross (bis 20 / 21-60 / ueber 60 GB) sind entfallen.
 
-Warum hier keine echte Zeitreihe entsteht
-------------------------------------------
-`analyze/tco_store.TcoDB` fuehrt bewusst KEINE Preishistorie (siehe
-Modulkopf dort: "Was hier bewusst NICHT steht ... keine Preishistorie -
-beides braucht erst einen Lauf, der Buendel wirklich sammelt"). Jeder
-Buendeldatensatz zeigt EINE Messung, `abgerufen_am`. Eine Linie "je
-Anbieter ueber die Monate" ist deshalb heute genau das, was G0 fuer einen
-einzelnen Messpunkt schon kennt: ein einzelner, ehrlich beschrifteter
-Punkt ("Serie startet"). Sobald ein zweiter Lauf Buendel liefert, TRAEGT
-`geraete_tco_grafik.zeitreihe()` automatisch eine echte Linie - dieselbe
-Funktion wie fuer G0, hier nur unter der TCO-24-Beschriftung
-(`messgroesse="TCO-24"`). Keine zweite Geometrie, keine erfundene
-Zwischenstufe.
+Die Zeitreihe ueber alle Messtage baut `geraete_zeitreihe`; hier steht je
+Band der Stand eines Tages, gruppiert je Ratenlaufzeit (`laufzeit`).
 
 Die drei Regeln, die dieses Modul traegt
 -----------------------------------------
@@ -274,7 +263,7 @@ def _grund(anbieter: str, hat_irgendein_buendel: bool) -> str:
 
 
 def alle_karten_je_band(
-    modell: dict, band_je_tarif: dict
+    modell: dict, band_je_tarif: dict, laufzeit: int | None = None
 ) -> dict[str, dict[str, list]]:
     """Je Band ALLE echten Karten jedes Anbieters, nach Gesamt sortiert.
 
@@ -287,7 +276,12 @@ def alle_karten_je_band(
     Wettbewerbs-Radar (RAD-1b) liest ALLE - ein Anbieter, der dasselbe
     Geraet in ZWEI Tarifen desselben Bandes fuehrt (Telekom XS/S/M alle
     im Band Klein), hat auch ZWEI Vergleichspaare, nicht eines.
+
+    `laufzeit` beschränkt auf die Karten einer Ansicht
+    (`geraete_laufzeit.ansicht`) - 24 Raten werden nie gegen 36 gestellt.
     """
+    from .geraete_laufzeit import ansicht
+
     echte = [
         k
         for k in (modell.get("karten") or [])
@@ -295,6 +289,7 @@ def alle_karten_je_band(
         and not k.get("naeherung")
         and k.get("gesamt") is not None
         and k.get("frisch", True)
+        and (laufzeit is None or ansicht(k) == laufzeit)
     ]
 
     je_band: dict[str, dict[str, list]] = {}
@@ -309,16 +304,13 @@ def alle_karten_je_band(
     return je_band
 
 
-def karten_je_band(modell: dict, band_je_tarif: dict) -> dict[str, dict]:
-    """Je Band die guenstigste ECHTE Karte jedes Anbieters (Regel 1-3 oben).
-
-    Rueckgabe: `{band_key: {anbieter: karte}}` - nur Baender mit mindestens
-    einem echten Buendel stehen darin. Diese Funktion ist der EINE Ort, an
-    dem "Geraet x Tarifband" gruppiert wird; `baender_fuer_modell` (der
-    Graph) und `wettbewerbs_radar` (die %-Abweichung, RAD-1) lesen beide
-    von hier - keine zweite Gruppierung fuer dieselbe Frage.
-    """
-    alle = alle_karten_je_band(modell, band_je_tarif)
+def karten_je_band(
+    modell: dict, band_je_tarif: dict, laufzeit: int | None = None
+) -> dict[str, dict]:
+    """Je Band die guenstigste ECHTE Karte jedes Anbieters (Regel 1-3 oben):
+    `{band_key: {anbieter: karte}}`, aus `alle_karten_je_band` (dem EINEN Ort
+    der Gruppierung "Geraet x Tarifband"), `laufzeit` wie dort."""
+    alle = alle_karten_je_band(modell, band_je_tarif, laufzeit)
     return {
         band: {anbieter: ks[0] for anbieter, ks in je_anbieter.items()}
         for band, je_anbieter in alle.items()

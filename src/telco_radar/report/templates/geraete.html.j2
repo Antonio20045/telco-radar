@@ -307,19 +307,22 @@
          Angebot zeigt „—" statt eines geratenen Preises. #}
   {% if zr.kacheln %}
   {% set aktives_band = zr.start.band if zr.start else '' %}
+  {% set aktive_lz = zr.daten.start_laufzeit %}
   <div class="gr-zr-kacheln" id="gr-zr-kacheln" aria-label="Häufige Geräte">
     {% for k in zr.kacheln %}
     <button type="button" data-modell="{{ k.id }}"{% if k.id ==
       start_modell %} aria-pressed="true"{% endif %}>
       <span class="gr-zr-k-kopf"><span class="gr-zr-k-name">{{ k.kurz
-        }}</span>{% for b, s in k.baender.items() %}<span class="gr-zr-k-punkte
-        gr-zr-k-band" data-band="{{ b }}"{% if b != aktives_band %}
+        }}</span>{% for b, je in k.baender.items() %}{% for lz, s in je.items()
+        %}<span class="gr-zr-k-punkte gr-zr-k-band" data-band="{{ b }}"
+        data-lz="{{ lz }}"{% if b != aktives_band or lz != aktive_lz %}
         hidden{% endif %}{% if s.anbieter_text %} role="img"
         aria-label="Anbieter mit Messung: {{ s.anbieter_text }}"{% endif
-        %}>{{ s.punkte_html|safe }}</span>{% endfor %}</span>
-      {% for b, s in k.baender.items() %}
-      <span class="gr-zr-k-band" data-band="{{ b }}"{% if b != aktives_band %}
-        hidden{% endif %}{% if s.anb %} data-anb="{{ s.anb }}"{% endif %}>
+        %}>{{ s.punkte_html|safe }}</span>{% endfor %}{% endfor %}</span>
+      {% for b, je in k.baender.items() %}{% for lz, s in je.items() %}
+      <span class="gr-zr-k-band" data-band="{{ b }}" data-lz="{{ lz }}"{% if
+        b != aktives_band or lz != aktive_lz %} hidden{% endif %}{% if s.anb
+        %} data-anb="{{ s.anb }}"{% endif %}>
         {%- if s.ab %}<span class="gr-zr-k-preis"><small>ab</small><b>{{
           s.ab }}</b>{% if s.ab_monat %}<span class="gr-zr-k-monat">{{
           s.ab_monat }}</span>{% endif %}</span>
@@ -354,7 +357,7 @@
           class="gr-zr-k-delta gr-zr-k-delta--{{ s.delta_richtung }}">{{
           s.delta_text }}</span>{%- endif %}
       </span>
-      {% endfor %}
+      {% endfor %}{% endfor %}
       {# Ein Band, das DIESE Karte nicht führt, lässt sie nicht leer
          sterben: der Ersatz-Span steht auf und sagt „—" (dasselbe
          Zeichen wie ein Band ohne echtes Angebot - ein benannter

@@ -218,7 +218,16 @@ def _historie_zeile(bid: str, datum: str, rate: float, laufzeit: int = 36) -> di
 def _reihe(
     tmp_path: pathlib.Path, zeilen: list[dict], stand_laufzeit: int = 36
 ) -> dict:
-    """Die Messungen je Tag fuer (Modell, Band, o2) aus diesen Zeilen."""
+    """Die Messungen je Tag fuer (Modell, Band, o2) aus diesen Zeilen, über
+    alle Ratenlaufzeiten zusammen (Teil B: jede Laufzeit ist eine Reihe)."""
+    reihen = _reihen(tmp_path, zeilen, stand_laufzeit)
+    return {tag: m for reihe in reihen.values() for tag, m in reihe.items()}
+
+
+def _reihen(
+    tmp_path: pathlib.Path, zeilen: list[dict], stand_laufzeit: int = 36
+) -> dict:
+    """{Ratenlaufzeit: {Tag: Messung}} fuer (Modell, Band, o2)."""
     state = tmp_path / "state"
     state.mkdir(exist_ok=True)
     (state / "geraete_tco.json").write_text(
@@ -246,7 +255,11 @@ def _reihe(
         encoding="utf-8",
     )
     messungen = geraete_zeitreihe._messungen(state, _TCO_SICHT, _TARIFE)
-    return (messungen.get(("apple-iphone-17-256", "klein")) or {}).get("o2") or {}
+    return {
+        schluessel[2]: reihen.get("o2") or {}
+        for schluessel, reihen in messungen.items()
+        if schluessel[:2] == ("apple-iphone-17-256", "klein")
+    }
 
 
 def test_alte_und_neue_historienzeile_landen_in_derselben_reihe(tmp_path):
@@ -282,7 +295,7 @@ def test_eine_gemessene_laufzeit_ausserhalb_des_standes_kappt_keinen_tag(tmp_pat
     """Nichts kappen: wechselt ein Anbieter die Ratenlaufzeit, steht die
     gemessene Variante im heutigen Stand nicht mehr. Anbieter, SKU und
     Tarif haengen nicht an der Laufzeit - der Messtag bleibt."""
-    tage = _reihe(
+    reihen = _reihen(
         tmp_path,
         [
             _historie_zeile(
@@ -292,7 +305,12 @@ def test_eine_gemessene_laufzeit_ausserhalb_des_standes_kappt_keinen_tag(tmp_pat
         ],
         stand_laufzeit=36,
     )
+    tage = {tag for reihe in reihen.values() for tag in reihe}
     assert sorted(tage) == ["2026-09-19", "2026-09-20"]
+    assert {lz: sorted(r) for lz, r in reihen.items()} == {
+        24: ["2026-09-19"],
+        36: ["2026-09-20"],
+    }, "Teil B: jeder Messtag steht in der Reihe seiner Ratenlaufzeit"
 
 
 def test_eine_zeile_ohne_zuordenbares_buendel_bleibt_ohne_punkt(tmp_path):
