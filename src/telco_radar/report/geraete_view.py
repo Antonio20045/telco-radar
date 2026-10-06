@@ -58,6 +58,7 @@ from . import (
     geraete_verlauf,
     geraete_zeitreihe,
 )
+from . import geraete_notbremse as notbremse
 
 from .geraete_tco_band import _MONATE, band_label
 from ..analyze import geraete_lifecycle
@@ -771,6 +772,25 @@ def _buendel_aus_listungen(eintraege: list) -> list[dict]:
     return saetze
 
 
+def _tco_leer(grund: str) -> dict:
+    """Die TCO-Felder einer Modellzeile ohne bestes Bündel, mit benanntem Grund."""
+    return {
+        "tco_ab": None,
+        "tco_anbieter": None,
+        "tco_monat": None,
+        "tco_band": None,
+        "tco_band_label": "",
+        "tco_beleg": None,
+        "tco_leer": grund,
+        "tco_delta": None,
+        "tco_delta_prozent": None,
+        "tco_delta_kurz": None,
+        "tco_delta_anbieter": None,
+        "tco_delta_leer": None,
+        "tco_delta_leer_grund": None,
+    }
+
+
 def _tco_spalte(modell_tco: dict | None, heute: str = "") -> dict:
     """Die TCO-Felder EINER Modellzeile aus der TCO-Aufbereitung.
 
@@ -795,40 +815,21 @@ def _tco_spalte(modell_tco: dict | None, heute: str = "") -> dict:
     vergleichbar, heisst die Luecke "kein Wettbewerber-Angebot" - nicht
     "keine Referenz", denn die Referenz ist das eigene Angebot selbst.
 
-    P0-B-h2: DIE SPALTE HAT EINEN ZEITRAUM, und nur Zahlen dieses
-    Zeitraums stehen darin (`TCO_HORIZONT`, derselbe Wert, den ihr Kopf
-    nennt und den die Vodafone-Referenz traegt). Seit P0-B-fix2/h1 nennt
-    jede Karte den Zeitraum, den ihre Leitzahl wirklich traegt
-    (`leitzahl_monate`) - damit ist die Vorbedingung eingetreten, die im
-    Kommentar unten stand ("Wird `laufzeit` je wieder variabel, MUSS an
-    dieser Stelle auf 24 gefiltert werden"). Ohne den Filter stellten 16
-    Modellzeilen eine 36-Monats-Summe unter den 24-Monats-Kopf, mit einem
-    Ø/Monat und einem Sortierschluessel gegen echte 24-Monats-Zahlen; und
-    schon die Wahl des Minimums verglich zwei Zeitraeume. Die anderen
-    Zahlen verschwinden nicht, sie werden BENANNT: die Zeile sagt "kein
-    Bündel über 24 Monate", die Δ-Zelle "andere Laufzeit" - dieselben
-    Worte wie die Buendelzeile derselben Karte, und das ganze Buendel
-    steht mit eigenem Etikett in der Vergleichsansicht.
+    P0-B-h2: DIE SPALTE HAT EINEN ZEITRAUM (`TCO_HORIZONT`, derselbe Wert
+    wie ihr Kopf und die Vodafone-Referenz); gefiltert wird auf den
+    Zeitraum, den die Leitzahl der Karte traegt (`leitzahl_monate`). Ohne
+    den Filter stellten 16 Modellzeilen eine 36-Monats-Summe unter den
+    24-Monats-Kopf. Die anderen Zahlen werden BENANNT: die Zeile sagt
+    "kein Bündel über 24 Monate", die Δ-Zelle "andere Laufzeit" -
+    dieselben Worte wie die Buendelzeile derselben Karte.
+
+    Notbremse (Datenkonzept Geräteradar, Schritt 1): Bester und Traeger
+    des Abstands sind nur Karten mit `zaehlt`. Zaehlt keine, nennt die
+    Zeile den Zustand der Karte ("Schätzung", "Aktion abgelaufen"), die
+    Δ-Zelle ebenso, wenn nur ein nicht zaehlendes fremdes Angebot bleibt.
     """
-    leer_delta = {
-        "tco_delta": None,
-        "tco_delta_prozent": None,
-        "tco_delta_kurz": None,
-        "tco_delta_anbieter": None,
-        "tco_delta_leer": None,
-        "tco_delta_leer_grund": None,
-    }
     if not modell_tco:
-        return {
-            "tco_ab": None,
-            "tco_anbieter": None,
-            "tco_monat": None,
-            "tco_band": None,
-            "tco_band_label": "",
-            "tco_beleg": None,
-            "tco_leer": TCO_LEER_KEIN_BUNDEL,
-            **leer_delta,
-        }
+        return _tco_leer(TCO_LEER_KEIN_BUNDEL)
     pool = [
         k
         for k in modell_tco.get("karten") or []
@@ -839,42 +840,27 @@ def _tco_spalte(modell_tco: dict | None, heute: str = "") -> dict:
     ]
     kandidaten = [k for k in pool if k.get("frisch", True)]
     if not kandidaten:
-        leer = TCO_LEER_NUR_ALT if pool else TCO_LEER_KEIN_VERGLEICHBARES
-        return {
-            "tco_ab": None,
-            "tco_anbieter": None,
-            "tco_monat": None,
-            "tco_band": None,
-            "tco_band_label": "",
-            "tco_beleg": None,
-            "tco_leer": leer,
-            **leer_delta,
-        }
+        return _tco_leer(TCO_LEER_NUR_ALT if pool else TCO_LEER_KEIN_VERGLEICHBARES)
     vergleichbare = [
         k
         for k in kandidaten
         if zeitraum_vergleichbar(k.get("leitzahl_monate"), TCO_HORIZONT)
     ]
     if not vergleichbare:
-        return {
-            "tco_ab": None,
-            "tco_anbieter": None,
-            "tco_monat": None,
-            "tco_band": None,
-            "tco_band_label": "",
-            "tco_beleg": None,
-            "tco_leer": TCO_LEER_ANDERE_LAUFZEIT,
-            **leer_delta,
-        }
-    bester = min(vergleichbare, key=lambda k: k["gesamt"])
-    fremde = [k for k in vergleichbare if not k.get("eigen")]
+        return _tco_leer(TCO_LEER_ANDERE_LAUFZEIT)
+    zaehlende = list(filter(notbremse.zaehlt, vergleichbare))
+    if not zaehlende:
+        gesperrt = min(vergleichbare, key=lambda k: k["gesamt"])
+        return _tco_leer(notbremse.zustand(gesperrt)["kurz"])
+    bester = min(zaehlende, key=lambda k: k["gesamt"])
+    fremde = [k for k in zaehlende if not k.get("eigen")]
     traeger = (
         bester
         if not bester.get("eigen")
         else (min(fremde, key=lambda k: k["gesamt"]) if fremde else None)
     )
-    im_zeitraum = {id(k) for k in vergleichbare}
-    andere_laufzeit = [
+    im_zeitraum = {id(k) for k in zaehlende}
+    ohne_abstand = [
         k for k in kandidaten if not k.get("eigen") and id(k) not in im_zeitraum
     ]
     referenz = modell_tco.get("referenz")
@@ -886,9 +872,9 @@ def _tco_spalte(modell_tco: dict | None, heute: str = "") -> dict:
     elif not geraete_tco_karten.referenz_ist_frisch(referenz, heute):
         delta_leer = TCO_DELTA_LEER_ALTE_REFERENZ
         delta_leer_grund = TCO_DELTA_GRUND_ALTE_REFERENZ
-    elif traeger is None and andere_laufzeit:
+    elif traeger is None and ohne_abstand:
         zustand = (
-            min(andere_laufzeit, key=lambda k: k["gesamt"]).get("delta_zustand") or {}
+            min(ohne_abstand, key=lambda k: k["gesamt"]).get("delta_zustand") or {}
         )
         delta_leer = zustand.get("kurz") or geraete_tco_karten.DELTA_ANDERE_LAUFZEIT
         delta_leer_grund = zustand.get("satz") or TCO_DELTA_GRUND_ANDERE_LAUFZEIT
