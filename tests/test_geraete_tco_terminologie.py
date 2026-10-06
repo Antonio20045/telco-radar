@@ -52,6 +52,10 @@ def test_die_referenzzeile_behauptet_keine_36_monate(tmp_path):
     mit der Leitzahl (wie der Graph über ihr), der Gerätepreis ohne
     Vertrag steht in der eigenen Spalte, Ø/Monat und der Rechenweg im
     Aufklapper.
+
+    Datenkonzept Geräte Schritt 2: die o2-Zeile der Fixture trägt 24 Raten,
+    gerechnet über H = 24 Monate; eine Restschuld nach Monat 24 gibt es nicht
+    mehr, alle Raten liegen im Zeitraum der Zahl.
     """
     s = _baue(tmp_path)
     ref = s.select_one('#tafel-tco .gr-bnd[data-anbieter="Vodafone"]')
@@ -71,16 +75,11 @@ def test_die_referenzzeile_behauptet_keine_36_monate(tmp_path):
     o2_text = vorlage_text(o2)
     assert "TCO-36" not in o2_text and "36 Monate Bindung" not in o2_text
     assert "24 Monate Bindung" not in o2_text
-    assert (
-        "Gerechnet über 24 Monate – der Tarif bindet 24 Monate, "
-        "die Geräteraten laufen 36"
-    ) in o2_text
+    assert "Gerechnet über 24 Monate. Enthalten sind" in o2_text
     assert "Kosten der ersten 24 Monate" not in o2_text
     assert "auch alle Geräteraten der eigenen Laufzeit" in o2_text
-    assert (
-        "die Raten nach Monat 24 stehen als offener Betrag auf der Zeile"
-    ) in o2_text
-    assert "danach noch offen: 240,00 € (12 Geräteraten)" in o2_text
+    assert "offener Betrag" not in o2_text
+    assert "danach noch offen" not in o2_text
 
 
 def test_die_tafel_spricht_katalog_d(tmp_path):
@@ -110,7 +109,7 @@ def test_die_tafel_spricht_katalog_d(tmp_path):
         assert "€" in text and "Kosten über 24 Monate" in text, text
     o2 = tafel.select_one('.gr-bnd[data-anbieter="o2"][data-zustand="neu"]')
     bau = vorlage_text(o2.select_one(".gr-kk-bau"))
-    assert "720,00 € in 36 Raten à 20,00 €" in bau
+    assert "720,00 € in 24 Raten à 30,00 €" in bau
     assert "(0 %)" not in vorlage_text(tafel)
 
 
@@ -122,19 +121,32 @@ def test_die_buendelkarte_nennt_die_wahre_dauer_und_die_richtigen_raten(tmp_path
     in der TCO-24)" ist gefallen, die Pflichtzeile darunter sagt den
     offenen Rest. Was nach 24 Monaten offen ist, sind auf DIESER Karte
     Monatsraten aus Tarif und Geraet zusammen; die aufgeteilt erhobene
-    o2-Karte daneben sagt weiterhin Geräteraten."""
-    s = _baue(tmp_path, eins_und_eins=True)
+    o2-Karte daneben sagt weiterhin Geräteraten.
+
+    Datenkonzept Geräte Schritt 2: die Zahl rechnet über H = 36 Monate, einen
+    offenen Rest gibt es nicht mehr. Ohne gemessene Gerätezuzahlung und
+    Anschlusspreis trägt die 1&1-Zeile keine Zahl, sondern die benannte
+    Lücke - deshalb setzt die Fixture beide (Gegenprobe darunter)."""
+    s = _baue(tmp_path, eins_und_eins=True, einmalzahlung=360.0, anschlusspreis=39.9)
     eins = s.select_one('#tafel-tco .gr-bnd[data-anbieter="1&1"]')
     assert eins is not None, "die Fixture muss die 1&1-Karte liefern"
     bau = vorlage_text(eins.select_one(".gr-kk-bau"))
-    assert bau == "monatlich 44,99 € für Tarif und Gerät zusammen · 36 Monate"
+    assert bau.startswith("monatlich 44,99 € für Tarif und Gerät zusammen · 36 Monate")
     eins_text = vorlage_text(eins)
-    assert "danach noch offen: 539,88 € (12 Monatsraten)" in eins_text
+    assert "Gerechnet über 36 Monate" in eins_text
+    assert "auch alle Monatsraten der eigenen Laufzeit" in eins_text
+    assert "danach noch offen" not in eins_text
     assert "Geräteraten" not in eins_text
     assert "davon in der" not in eins_text, "die Kappungsklammer ist tot"
     o2 = s.select_one('#tafel-tco .gr-bnd[data-anbieter="o2"][data-zustand="neu"]')
     o2_text = vorlage_text(o2)
-    assert "danach noch offen: 240,00 € (12 Geräteraten)" in o2_text
+    assert "danach noch offen" not in o2_text
+    assert "auch alle Geräteraten der eigenen Laufzeit" in o2_text
+
+    ohne = _baue(tmp_path / "ohne-einmal", eins_und_eins=True)
+    luecke = ohne.select_one('#tafel-tco .gr-bnd[data-anbieter="1&1"]')
+    assert "gr-bnd--leer" in luecke["class"] and not luecke.get("data-gesamt")
+    assert "Gerätezuzahlung" in vorlage_text(luecke.select_one(".gr-kk-luecke"))
 
 
 def test_die_buendelkarte_nennt_einmalzahlung_und_bereitstellung(tmp_path):

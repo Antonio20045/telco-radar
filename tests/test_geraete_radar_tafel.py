@@ -109,7 +109,10 @@ def _listung(anbieter, sku, preis, typ="netzbetreiber") -> dict:
 
 def _buendel(sku, tarif_id, tarif_name, tarif_monatlich, rate, anbieter="o2") -> dict:
     """Ein Bündelsatz für geraete_tco.json - dieselben Felder, die der
-    nächtliche Lauf schreibt."""
+    nächtliche Lauf schreibt. 24 Raten: die Vodafone-Seite dieser Fixture ist
+    die Näherung über 24 Monate, und seit Datenkonzept Geräte Schritt 2 rechnen
+    36 Raten über 36 Monate (bis dahin 36 Raten zu zwei Dritteln der Rate,
+    dieselbe Summe)."""
     return {
         "id": f"buendel--{anbieter.lower()}--{sku}",
         "sku_id": sku,
@@ -120,7 +123,7 @@ def _buendel(sku, tarif_id, tarif_name, tarif_monatlich, rate, anbieter="o2") ->
         "tarif_monatlich": tarif_monatlich,
         "geraet_zuzahlung": 1.0,
         "geraet_monatsrate": rate,
-        "laufzeit_monate": 36,
+        "laufzeit_monate": 24,
         "anschlusspreis": 0.0,
         "rabatte": [],
         "zustand": "neu",
@@ -249,15 +252,15 @@ def _state(n_generisch: int) -> dict:
         _listung("Vodafone", SKU_P10, 899.00),
     ]
     buendel = [
-        _buendel(SKU_IP15, "o2:k", "O2 Mobile S", 9.99, 20.00),
-        _buendel(SKU_S26, "o2:k", "O2 Mobile S", 9.99, 30.00),
-        _buendel(SKU_X17, "o2:k", "O2 Mobile S", 9.99, 15.00),
-        _buendel(SKU_P10, "o2:g", "O2 Mobile L", 39.99, 25.00),
+        _buendel(SKU_IP15, "o2:k", "O2 Mobile S", 9.99, 30.00),
+        _buendel(SKU_S26, "o2:k", "O2 Mobile S", 9.99, 45.00),
+        _buendel(SKU_X17, "o2:k", "O2 Mobile S", 9.99, 22.50),
+        _buendel(SKU_P10, "o2:g", "O2 Mobile L", 39.99, 37.50),
     ]
     for i in range(n_generisch):
         sku = f"testmarke-testgerat-{i + 1:02d}-128gb-schwarz"
         listungen.append(_listung("Vodafone", sku, 500.0 + i))
-        buendel.append(_buendel(sku, "o2:k", "O2 Mobile S", 9.99, 10.00 + i))
+        buendel.append(_buendel(sku, "o2:k", "O2 Mobile S", 9.99, 15.00 + 1.5 * i))
     return {"listungen": listungen, "buendel": buendel}
 
 

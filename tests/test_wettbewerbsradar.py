@@ -153,7 +153,11 @@ def _buendel(
 
 def _bestand():
     """Vier Modelle am echten Katalog - jede Zahl entsteht auf dem Weg,
-    den auch die Seite geht (`karten.modelle` -> `tco_24()`)."""
+    den auch die Seite geht (`karten.modelle` -> `kosten_ueber()`).
+
+    M2 trägt 24 Raten à 120,00 (bis Datenkonzept Geräte Schritt 2: 36 à
+    80,00 mit derselben Summe über 24 Tarifmonate) - die Näherung rechnet über
+    24 Monate, und 36 Raten stehen seither über 36 Monate."""
     tarife = {t["tarif_id"]: t for t in _tarife()}
     listungen = [
         _listung("Vodafone", SKU_M1, 709.90),
@@ -169,7 +173,7 @@ def _bestand():
         _buendel(SKU_M1, "o2:k", "O2 Mobile S", 9.99, 1.0),
         _buendel(SKU_M1, "o2:k2", "O2 Mobile S Plus", 12.99, 1.5),
         _buendel(SKU_M1, "o2:m", "O2 Mobile M", 19.99, 2.0),
-        _buendel(SKU_M2, "o2:k", "O2 Mobile S", 49.99, 80.0, laufzeit=36),
+        _buendel(SKU_M2, "o2:k", "O2 Mobile S", 49.99, 120.0, laufzeit=24),
         _buendel(SKU_M3, "o2:g", "O2 Mobile L", 39.99, 5.0, zuzahlung=0.0),
         _buendel(SKU_M3, "o2:g2", "O2 Mobile L Plus", 44.99, 5.0, zuzahlung=50.0),
         _buendel(SKU_M4, "o2:m", "O2 Mobile M", 19.99, 10.0),
@@ -1269,7 +1273,10 @@ def test_h3_am_echten_bestand_traegt_keine_prozentzahl_zwei_zeitraeume(echt):
     """Die Invariante ueber den GANZEN Bestand: wo ein Vorzeichen steht,
     tragen beide Zahlen denselben Zeitraum. Gemessen wird gegen die
     Karten des Modells, nicht gegen die Zeile selbst (sonst prueft die
-    Zeile sich selbst)."""
+    Zeile sich selbst). Der Lookup trägt Tarif und Vergleichbarkeit (nur ein
+    Neugerät stellt ein Vorzeichen): seit die 36-Raten-Karten über 36 Monate
+    rechnen, tragen Karten desselben Anbieters öfter denselben Betrag über
+    verschiedene Zeiträume."""
     by_id = {m["id"]: m for m in echt["modelle"]}
     geprueft = 0
     for g in echt["radar"]["gruppen"]:
@@ -1280,7 +1287,10 @@ def test_h3_am_echten_bestand_traegt_keine_prozentzahl_zwei_zeitraeume(echt):
             treffer = [
                 k
                 for k in modell["karten"]
-                if k["anbieter"] == z["anbieter"] and k.get("gesamt") == z["gesamt"]
+                if k["anbieter"] == z["anbieter"]
+                and k.get("gesamt") == z["gesamt"]
+                and k.get("tarif") == z["tarif"]
+                and k.get("vergleichbar")
             ]
             assert treffer, (
                 f"{g['id']}/{z['anbieter']}: keine Karte zu {z['gesamt']} - "

@@ -117,7 +117,7 @@ def bewegungen(
         return ausfall(AUSFALL_KEINE_MESSUNG)
     von = (date.fromisoformat(bis) - timedelta(days=FENSTER_TAGE)).isoformat()
     treffer: list[dict] = []
-    ohne = Counter()
+    ohne: Counter = Counter()
     geprueft = 0
     for (modell, band), anbieter in sorted(messungen.items()):
         if band not in (erlaubt.get(modell) or []):
@@ -129,7 +129,7 @@ def bewegungen(
                 continue
             c0 = _messung_um(anbieter[name], von)
             c1 = _messung_um(anbieter[name], bis)
-            if None in (v0, v1, c0, c1):
+            if v0 is None or v1 is None or c0 is None or c1 is None:
                 ohne[GRUND_MESSUNG] += 1
                 continue
             if not all(notbremse.zaehlt(m or {}) for m in (v0, v1, c0, c1)):

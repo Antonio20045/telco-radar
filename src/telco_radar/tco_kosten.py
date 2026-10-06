@@ -81,7 +81,7 @@ def kosten_ueber(buendel: Buendel, monate: int | None = None) -> Kosten:
     hier eine Lücke; `tco_24` schreibt über `phasensumme` den letzten Preis fort. Im
     Schnappschuss vom 3. Oktober 2026 kommt keine solche Phasenlücke vor.
     """
-    from .tco_model import monatsschnitt
+    from .tco_model import POSTEN_LAUFZEIT, monatsschnitt
 
     if monate is not None and (
         isinstance(monate, bool) or not isinstance(monate, int) or monate <= 0
@@ -94,6 +94,8 @@ def kosten_ueber(buendel: Buendel, monate: int | None = None) -> Kosten:
     )
     if h is None:
         k.luecken.append(POSTEN_ZEITRAUM)
+        if buendel.buendel_monatlich is not None and buendel.laufzeit_monate is None:
+            k.luecken.append(POSTEN_LAUFZEIT)
     elif buendel.buendel_monatlich is not None:
         _vertrag(k, buendel.buendel_monatlich, buendel.laufzeit_monate, h)
     else:

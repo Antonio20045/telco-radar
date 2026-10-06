@@ -30,9 +30,10 @@ import pytest
 from bs4 import BeautifulSoup
 from test_geraete_zeitreihe_ansicht import HEUTE, _baue
 
+from telco_radar.report import geraete_rechenweg as rechenweg
 from telco_radar.report import geraete_zeitreihe as zr
 from telco_radar.report.html import render_site
-from telco_radar.tco_model import tco_24
+from telco_radar.tco_model import kosten_ueber, tco_24
 
 WURZEL = pathlib.Path(__file__).resolve().parents[1]
 
@@ -73,6 +74,17 @@ EINS_EINS_MESSUNG = {
 }
 
 
+O2_TARIFE = {
+    "o2:o2-mobile-on-demand-m": {
+        "laufzeit_monate": 24,
+        "preisphasen": [{"von_monat": 1, "bis_monat": None, "betrag": 14.99}],
+    }
+}
+"""Der Tarifbestand zur o2-Messung: 14,99 € ohne Ende der Phase, also auch in den
+Monaten 25 bis 36 belegt. Ohne ihn hätte die 36-Raten-Messung keine Kernzahl
+(Datenkonzept Geräte 5.3: die 36er-Ansicht rechnet 36 Tarifmonate)."""
+
+
 def _messung(satz, *, anbieter="o2", tarif="O2 Mobile on Demand M Plus"):
     stand = {
         "id": satz["id"],
@@ -84,17 +96,17 @@ def _messung(satz, *, anbieter="o2", tarif="O2 Mobile on Demand M Plus"):
 
 
 def test_die_posten_der_o2_messung_ergeben_die_heutige_summe():
-    """A1: das Panel zerlegt die HEUTIGE Rechnung - alle 36 Raten -
-    und geht mit ihr auf (37 + 39,99 + 24 × 14,99 + 36 × 19,00)."""
-    r = zr._rechung(_messung(O2_MESSUNG))
+    """A1: das Panel zerlegt die HEUTIGE Rechnung - alle 36 Raten und 36
+    Tarifmonate - und geht mit ihr auf (37 + 39,99 + 36 × 14,99 + 36 × 19,00)."""
+    r = zr._rechung(_messung(O2_MESSUNG), O2_TARIFE)
     assert r is not None
-    assert round(sum(p["betrag"] for p in r["posten"]), 2) == 1120.75
-    assert r["gesamt"] == 1120.75
+    assert round(sum(p["betrag"] for p in r["posten"]), 2) == 1300.63
+    assert r["gesamt"] == 1300.63
     assert r["gesamt"] != O2_MESSUNG["gesamt"]
 
 
 def test_die_posten_stehen_in_der_reihenfolge_der_aufgabe():
-    r = zr._rechung(_messung(O2_MESSUNG))
+    r = zr._rechung(_messung(O2_MESSUNG), O2_TARIFE)
     assert [p["label"] for p in r["posten"]] == [
         "Gerätezuzahlung",
         "Anschlusspreis",
@@ -106,7 +118,7 @@ def test_die_posten_stehen_in_der_reihenfolge_der_aufgabe():
 def test_die_rate_zaehlt_alle_laufzeitmonate():
     """A1: 36 Raten laufen, gerechnet werden ALLE 36 - die Laufzeit steht
     im Faktor (36 × 19,00 = 684,00), die Kappungsklammer ist gefallen."""
-    r = zr._rechung(_messung(O2_MESSUNG))
+    r = zr._rechung(_messung(O2_MESSUNG), O2_TARIFE)
     rate = next(p for p in r["posten"] if p["label"] == "Geräterate")
     assert rate["anzahl"] == 36 and rate["einzeln"] == 19.0
     assert rate["betrag"] == 684.0
@@ -137,27 +149,32 @@ def test_die_zusammenform_hat_einen_buendelposten_und_erfindet_keine_teile():
 def test_kein_anschlusspreis_ist_eine_luecke_und_null_null_ein_betrag():
     """Hausregel aus tco_model: None ist „nicht gemessen" (kein Posten,
     keine Null), 0.0 ist ein gemessener „keine". Genau das trennt eine
-    ehrliche Rechung von einer geratenen."""
+    ehrliche Rechung von einer geratenen. Seit `kosten_ueber` die Kernzahl
+    rechnet, hat eine Messung ohne Anschlusspreis gar keine Summe und damit
+    keinen Rechenweg - die Lücke steht an der Karte, nicht als Null im Panel."""
     satz = dict(O2_MESSUNG, anschlusspreis=None, gesamt=round(892.75 - 39.99, 2))
-    r = zr._rechung(_messung(satz))
-    assert "Anschlusspreis" not in [p["label"] for p in r["posten"]]
+    assert zr._rechung(_messung(satz), O2_TARIFE) is None
+    assert zr._messwert(_messung(satz), O2_TARIFE) == (None, None)
     satz0 = dict(O2_MESSUNG, anschlusspreis=0.0, gesamt=852.76)
-    r0 = zr._rechung(_messung(satz0))
+    r0 = zr._rechung(_messung(satz0), O2_TARIFE)
     anschluss = next(p for p in r0["posten"] if p["label"] == "Anschlusspreis")
     assert anschluss["betrag"] == 0.0
 
 
 def test_boni_erscheinen_nicht_die_historie_hat_keine():
-    r = zr._rechung(_messung(O2_MESSUNG))
+    r = zr._rechung(_messung(O2_MESSUNG), O2_TARIFE)
+    assert r is not None
     text = json.dumps(r, ensure_ascii=False)
     assert "Bonus" not in text and "Rabatt" not in text
 
 
 def test_die_serie_rechnet_die_punkte_mit_der_heutigen_leitzahl():
-    """Der Punkt der o2-Messung ist die NEU gerechnete 1.120,75 - nicht die
-    eingefrorene 892,75 der gekappten Rechnung."""
+    """Der Punkt der o2-Messung ist die NEU gerechnete 1.300,63 über 36 Monate -
+    nicht die eingefrorene 892,75 der gekappten Rechnung."""
     messungen = {("m", "b"): {"o2": {"2026-09-12": _messung(O2_MESSUNG)}}}
-    assert zr._serien_aus(messungen) == {("m", "b"): {"o2": [("2026-09-12", 1120.75)]}}
+    assert zr._serien_aus(messungen, O2_TARIFE) == {
+        ("m", "b"): {"o2": [("2026-09-12", 1300.63)]}
+    }
 
 
 def test_die_zusammenform_behaelt_ihre_kurve_und_nennt_ihren_zeitraum():
@@ -187,14 +204,15 @@ def test_die_zusammenform_behaelt_ihre_kurve_und_nennt_ihren_zeitraum():
 
 
 def test_die_aufgeteilte_form_nennt_ihre_24_monate_genauso():
-    """Die Gegenprobe: o2 rechnet 24 Tarifmonate plus alle Raten - die
-    Leitzahl traegt 24 Monate, und `_messwert` NENNT sie. Dass der
-    Zeitraum immer mitkommt, ist genau der Unterschied zum alten Stand,
-    an dem `None` zweierlei hiess ("passt auf die Achse" und "nicht
-    gemessen")."""
-    m = _messung(O2_MESSUNG)
-    assert zr._messwert(m) == (1120.75, 24)
-    assert tco_24(zr._buendel_aus_messung(m)).leitzahl_monate == 24
+    """Die Gegenprobe: o2 mit 24 Raten rechnet 24 Tarifmonate plus alle Raten -
+    die Leitzahl traegt 24 Monate, und `_messwert` NENNT sie; mit 36 Raten
+    sind es 36 Tarifmonate (Datenkonzept Geräte 5.3). Dass der Zeitraum immer
+    mitkommt, ist genau der Unterschied zum alten Stand, an dem `None`
+    zweierlei hiess ("passt auf die Achse" und "nicht gemessen")."""
+    kurz = _messung(dict(O2_MESSUNG, laufzeit_monate=24))
+    assert zr._messwert(kurz, O2_TARIFE) == (892.75, 24)
+    assert kosten_ueber(zr._buendel_aus_messung(kurz, O2_TARIFE)).monate == 24
+    assert zr._messwert(_messung(O2_MESSUNG), O2_TARIFE) == (1300.63, 36)
 
 
 def test_ohne_belastbare_zahl_gibt_es_weiter_keinen_punkt():
@@ -219,7 +237,7 @@ def test_ohne_belastbare_zahl_gibt_es_weiter_keinen_punkt():
 def test_die_auswahl_des_guenstigsten_buendels_je_tag_rechnet_neu(tmp_path):
     """Zwei Bündel desselben Anbieters am selben Tag - die eingefrorenen
     Werte sagen A ist günstiger (892,75 < 919,75), die heutige Leitzahl
-    sagt B (979,75 < 1.120,75, weil B die kürzere Rate hat). Gewählt wird
+    sagt B (1.159,63 < 1.300,63, weil B die kleinere Rate hat). Gewählt wird
     nach der HEUTIGEN Rechnung - sonst klänge der Graph von einer Formel,
     die es nicht mehr gibt."""
     b_satz = dict(
@@ -257,8 +275,8 @@ def test_die_auswahl_des_guenstigsten_buendels_je_tag_rechnet_neu(tmp_path):
         ],
         "band_je_tarif": {O2_MESSUNG["tarif_id"]: "b"},
     }
-    messungen = zr._messungen(tmp_path, tco)
-    assert zr._serien_aus(messungen) == {("m", "b"): {"o2": [("2026-09-12", 979.75)]}}
+    messungen = zr._messungen(tmp_path, tco, O2_TARIFE)
+    assert zr._serien_aus(messungen) == {("m", "b"): {"o2": [("2026-09-12", 1159.63)]}}
     zeilen = [
         json.loads(z)
         for z in (tmp_path / "geraete_tco_historie.jsonl")
@@ -277,8 +295,9 @@ def test_zwei_messungen_ohne_laufzeit_am_selben_tag_verlieren_keine_zahlweise(tm
     gibt es keine zweite Zahlweise, die `weitere_laufzeiten` zeigen
     koennte - Gegenprobe zum congstar-24/36-Fall (`test_geraete_buendel_
     zeilenkopf_d3.py`), wo BEIDE Laufzeiten bekannt sind und die zweite
-    Zeile sehr wohl sichtbar bleibt. Der Punkt der ERSTEN Zeile bleibt
-    stehen (Dateireihenfolge), `weitere_laufzeiten` bleibt leer."""
+    Zeile sehr wohl sichtbar bleibt. Seit `kosten_ueber` die Kernzahl rechnet,
+    ist ohne Ratenlaufzeit auch der Zeitraum H unbekannt: keine der beiden
+    Zeilen traegt einen Punkt."""
     basis = dict(O2_MESSUNG, laufzeit_monate=None, geraet_monatsrate=None)
     a = dict(basis, id=basis["id"] + "--a")
     b = dict(basis, id=basis["id"] + "--b")
@@ -310,26 +329,23 @@ def test_zwei_messungen_ohne_laufzeit_am_selben_tag_verlieren_keine_zahlweise(tm
         ],
         "band_je_tarif": {a["tarif_id"]: "b"},
     }
-    messungen = zr._messungen(tmp_path, tco)
-    eintrag = messungen[("m", "b")]["o2"][a["datum"]]
-    assert eintrag["satz"]["id"] == a["id"], (
-        "die erste Zeile bleibt stehen - kein stiller Tausch"
+    messungen = zr._messungen(tmp_path, tco, O2_TARIFE)
+    assert messungen == {}, (
+        "ohne Ratenlaufzeit ist der Zeitraum H unbekannt (`kosten_ueber`): "
+        f"kein Punkt, keine erfundene Zahlweise - {messungen}"
     )
-    assert eintrag["weitere_laufzeiten"] == [], (
-        "eine erfundene weitere Laufzeit ohne Messgrundlage: "
-        f"{eintrag['weitere_laufzeiten']}"
-    )
+    assert zr._messwert(_messung(a), O2_TARIFE) == (None, None)
 
 
 def test_der_block_zeigt_das_mal_muster_und_die_summe():
     """design.md Regel 6: die Rechung ist GESETZT („70,00 € × 24 =
     1 680 €"), keine prose Erklärung - und die Werte genau dieser
     Messung. A1: alle 36 Raten, Summe mit dem Etikett der Leitzahl."""
-    html = zr._rechung_html("o2", _messung(O2_MESSUNG))
-    assert "24 × 14,99 €" in html and "= 359,76 €" in html
+    html = zr._rechung_html("o2", _messung(O2_MESSUNG), O2_TARIFE)
+    assert "36 × 14,99 €" in html and "= 539,64 €" in html
     assert "36 × 19,00 €" in html and "= 684,00 €" in html
-    assert "= <b>1.120,75 €</b>" in html
-    assert "Kosten über 24 Monate" in html
+    assert "= <b>1.300,63 €</b>" in html
+    assert "Kosten über 36 Monate" in html
     assert "TCO-24" not in html
 
 
@@ -338,11 +354,11 @@ def test_jeder_posten_traegt_seinen_anteil_als_balken():
     seines Anteils an der Summe. Die Breite ist eine fertige Prozent-
     angabe aus EINER Rechnung (Server), der Client setzt nur ein; der
     groesste Posten hat den breitesten Balken."""
-    html = zr._rechung_html("o2", _messung(O2_MESSUNG))
+    html = zr._rechung_html("o2", _messung(O2_MESSUNG), O2_TARIFE)
     suppe = BeautifulSoup(html, "html.parser")
     balken = suppe.select("li.gr-zr-posten")
     assert len(balken) == 4
-    r = zr._rechung(_messung(O2_MESSUNG))
+    r = zr._rechung(_messung(O2_MESSUNG), O2_TARIFE)
     breiten = []
     for li, p in zip(balken, r["posten"]):
         i = li.select_one(".gr-zr-pbar i")
@@ -353,43 +369,29 @@ def test_jeder_posten_traegt_seinen_anteil_als_balken():
     assert breiten[2] > breiten[0]
 
 
-def test_die_restschuld_steht_in_der_rechnung_wenn_die_rate_laenger_laeuft():
-    """Sicht-A3, seit A1 „davon nach Monat 24 noch zu zahlen" - die Rest-
-    schuld IST in der Summe und wird zusaetzlich ausgewiesen (o2: 36
-    Raten, 12 × 19,00 € laufen nach Monat 24 weiter). Bei 24 Monaten
-    Laufzeit gibt es keine Restschuld (None, keine Zeile) - „nichts
-    offen" ist eine Aussage, aber keine Zeile wert."""
-    r = zr._rechung(_messung(O2_MESSUNG))
-    assert r["offen"] == {"anzahl": 12, "einzeln": 19.0, "betrag": 228.0}
-    html = zr._rechung_html("o2", _messung(O2_MESSUNG))
-    assert "davon nach Monat 24 noch zu zahlen: 12 × 19,00 €" in html
-    assert "= 228,00 €" in html
-    r11 = zr._rechung(
-        _messung(EINS_EINS_MESSUNG, anbieter="1&1", tarif="1&1 All-Net-Flat S")
-    )
-    assert r11["offen"] == {
-        "anzahl": 12,
-        "einzeln": 49.99,
-        "betrag": round(12 * 49.99, 2),
-    }
-    html11 = zr._rechung_html(
-        "1&1", _messung(EINS_EINS_MESSUNG, anbieter="1&1", tarif="1&1 All-Net-Flat S")
-    )
-    assert "davon nach Monat 24 noch zu zahlen: 12 × 49,99 € = 599,88 €" in html11
-    kurz = dict(
-        O2_MESSUNG,
-        laufzeit_monate=24,
-        gesamt=round(37.0 + 39.99 + 24 * 14.99 + 24 * 19.0, 2),
-    )
-    rk = zr._rechung(_messung(kurz))
-    assert rk["offen"] is None
-    assert "davon nach Monat 24" not in zr._rechung_html("o2", _messung(kurz))
+def test_die_rechnung_kennt_keine_restschuld_alle_raten_liegen_im_zeitraum():
+    """Sicht-A3 nannte „davon nach Monat 24 noch zu zahlen", solange die Zahl
+    nur 24 Tarifmonate trug. Seit `kosten_ueber` reicht der Zeitraum H bis zur
+    letzten Rate (36 Raten: 36 Monate, 1&1: sein Vertrag über 36): nach H ist
+    nichts mehr offen, also steht keine Restschuld-Zeile und kein `offen`-Feld.
+    Gegenprobe: das Etikett nennt die 36 Monate, die Rate läuft 36 × 19,00 €."""
+    r = zr._rechung(_messung(O2_MESSUNG), O2_TARIFE)
+    assert "offen" not in r and r["monate"] == 36
+    html = zr._rechung_html("o2", _messung(O2_MESSUNG), O2_TARIFE)
+    assert "noch zu zahlen" not in html and "Restschuld" not in html
+    assert "36 × 19,00 €" in html and "Kosten über 36 Monate" in html
+    eins = _messung(EINS_EINS_MESSUNG, anbieter="1&1", tarif="1&1 All-Net-Flat S")
+    r11 = zr._rechung(eins)
+    assert "offen" not in r11 and r11["monate"] == 36
+    html11 = zr._rechung_html("1&1", eins)
+    assert "noch zu zahlen" not in html11
+    assert "36 × 49,99 € <span class='gr-zr-pg'>= 1.799,64 €" in html11
 
 
 def test_der_rechnungskopf_traegt_den_farbpunkt_des_anbieters():
     """Sicht 12: Anbieter-Farbpunkt im Panel-Kopf - dieselbe Farbe wie die
     Linie im Graphen (die Kopplung, die das Lesen des Charts lehrt)."""
-    html = zr._rechung_html("o2", _messung(O2_MESSUNG))
+    html = zr._rechung_html("o2", _messung(O2_MESSUNG), O2_TARIFE)
     assert "<i class='gr-zr-rpunkt' style='background:#0019a5'" in html
     html11 = zr._rechung_html(
         "1&1", _messung(EINS_EINS_MESSUNG, anbieter="1&1", tarif="1&1 All-Net-Flat S")
@@ -406,7 +408,7 @@ def test_der_klammer_text_und_das_label_erfuellen_die_12_px_regel(
     sind sie auf Schreibtisch und Telefon mindestens 12 px groß."""
     from telco_radar.report.html import schreibe_statische_dateien
 
-    original = zr._rechung
+    original = rechenweg._rechung
 
     def mit_klammer(*args, **kwargs):
         r = original(*args, **kwargs)
@@ -415,8 +417,10 @@ def test_der_klammer_text_und_das_label_erfuellen_die_12_px_regel(
                 p["klammer"] = "24 von 36 Raten"
         return r
 
-    monkeypatch.setattr(zr, "_rechung", mit_klammer)
-    html = zr._rechenwege_html({"o2": {"2026-09-12": _messung(O2_MESSUNG)}}, [])
+    monkeypatch.setattr(rechenweg, "_rechung", mit_klammer)
+    html = zr._rechenwege_html(
+        {"o2": {"2026-09-12": _messung(O2_MESSUNG)}}, [], O2_TARIFE
+    )
     assert "gr-zr-pk" in html and "gr-zr-plabel" in html
     schreibe_statische_dateien(tmp_path)
     (tmp_path / "panel.html").write_text(
@@ -448,14 +452,16 @@ def test_der_klammer_text_und_das_label_erfuellen_die_12_px_regel(
             seite.close()
         klammer, label = gemessen
         assert klammer and klammer["text"] == "24 von 36 Raten", (breite, gemessen)
-        assert label and label["text"] == "Kosten über 24 Monate", (breite, gemessen)
+        assert label and label["text"] == "Kosten über 36 Monate", (breite, gemessen)
         for e in gemessen:
             assert e["hoehe"] > 0, (breite, e)
             assert e["px"] >= 12, f"{e['text']!r} bei {breite} px: {e['px']} px"
 
 
 def test_der_block_traegt_anbieter_messtag_und_beleg_dieses_tages():
-    html = zr._rechenwege_html({"o2": {"2026-09-12": _messung(O2_MESSUNG)}}, [])
+    html = zr._rechenwege_html(
+        {"o2": {"2026-09-12": _messung(O2_MESSUNG)}}, [], O2_TARIFE
+    )
     assert "data-anb='o2'" in html and "data-m='2026-09-12'" in html
     assert "Messung vom 12. September 2026" in html
     assert "abgerufen 12.09.2026" in html
@@ -469,7 +475,7 @@ def test_je_serie_und_messung_gibt_es_genau_ein_template():
             "2026-09-13": _messung(dict(O2_MESSUNG, datum="2026-09-13")),
         }
     }
-    html = zr._rechenwege_html(messungen, [])
+    html = zr._rechenwege_html(messungen, [], O2_TARIFE)
     suppe = BeautifulSoup(html, "html.parser")
     templates = suppe.select("template[data-anb][data-m]")
     assert len(templates) == 2
@@ -529,7 +535,7 @@ def test_zwei_preisformen_am_selben_tag_bleiben_zwei_templates():
             )
         },
     }
-    html = zr._rechenwege_html(messungen, [])
+    html = zr._rechenwege_html(messungen, [], O2_TARIFE)
     suppe = BeautifulSoup(html, "html.parser")
     paare = {
         (t["data-anb"], t["data-m"]) for t in suppe.select("template[data-anb][data-m]")

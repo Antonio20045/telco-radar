@@ -1341,17 +1341,17 @@ def _p1_buendel(bid, laufzeit, rate):
 def _p1_state(tmp_path):
     state = tmp_path / "state"
     state.mkdir()
+    id12 = "buendel--congstar--sku-x--tarif-x--12"
     id24 = "buendel--congstar--sku-x--tarif-x--24"
-    id36 = "buendel--congstar--sku-x--tarif-x--36"
     (state / "geraete_tco.json").write_text(
         json.dumps(
-            {"buendel": [_p1_buendel(id24, 24, 30.0), _p1_buendel(id36, 36, 20.0)]}
+            {"buendel": [_p1_buendel(id12, 12, 60.0), _p1_buendel(id24, 24, 30.0)]}
         ),
         encoding="utf-8",
     )
     zeilen = [
+        _p1_zeile(id12, "2026-09-22", 12, 60.0),
         _p1_zeile(id24, "2026-09-22", 24, 30.0),
-        _p1_zeile(id36, "2026-09-22", 36, 20.0),
     ]
     (state / "geraete_tco_historie.jsonl").write_text(
         "\n".join(json.dumps(z) for z in zeilen) + "\n", encoding="utf-8"
@@ -1370,14 +1370,19 @@ def test_p1_gleichstand_zweier_ratenlaufzeiten_verliert_die_zweite_nicht(tmp_pat
     """ROT vor dem Fix: `besser = wert < alt["wert"]` (strikt) verwarf die
     zweite Zeile still, sobald beide denselben `wert` trugen - welche der
     beiden ueberlebte, entschied nur die Dateireihenfolge, und die
-    verworfene Zahlweise (hier: 36 Monate mit Restschuld) verschwand ganz.
+    verworfene Zahlweise verschwand ganz.
+
+    Seit Datenkonzept Geräte Schritt 2 rechnet eine 36-Raten-Zahlweise über
+    36 Monate und steht nie im Gleichstand mit einer 24-Monats-Zahl; der Fall
+    sind deshalb 12 und 24 Raten (beide über 24 Monate, wie Vodafone):
+    24 × 20 + 12 × 60 = 24 × 20 + 24 × 30 = 1.200,00 EUR.
     """
     state, tco = _p1_state(tmp_path)
     messungen = geraete_zeitreihe._messungen(state, tco)
     slot = messungen[("modell-x", "xs")]["congstar"]["2026-09-22"]
-    assert slot["laufzeit"] == 24
+    assert slot["laufzeit"] == 12
     assert slot["wert"] == 1200.0
-    assert slot["weitere_laufzeiten"] == [36]
+    assert slot["weitere_laufzeiten"] == [24]
 
 
 def test_p1_der_rechenweg_nennt_die_zweite_zahlweise(tmp_path):
@@ -1385,8 +1390,8 @@ def test_p1_der_rechenweg_nennt_die_zweite_zahlweise(tmp_path):
     a = geraete_zeitreihe.aufbereiten(state, tco)
     paar = _paar(a, ("modell-x", "xs"))
     assert paar is not None
-    assert "Zum selben Betrag auch über 36 Monate" in paar["rechenweg_html"]
-    assert "Restschuld" in paar["rechenweg_html"]
+    assert "Zum selben Betrag auch über 24 Monate" in paar["rechenweg_html"]
+    assert "Restschuld" not in paar["rechenweg_html"]
 
 
 def test_p1_bei_reihenfolgetausch_bleibt_dieselbe_zahlweise_gewinnen(tmp_path):
@@ -1394,16 +1399,16 @@ def test_p1_bei_reihenfolgetausch_bleibt_dieselbe_zahlweise_gewinnen(tmp_path):
     Dateireihenfolge abhaengig - dieselbe Pruefung mit vertauschten Zeilen
     muss dasselbe Ergebnis liefern."""
     state, tco = _p1_state(tmp_path)
+    id12 = "buendel--congstar--sku-x--tarif-x--12"
     id24 = "buendel--congstar--sku-x--tarif-x--24"
-    id36 = "buendel--congstar--sku-x--tarif-x--36"
     zeilen = [
-        _p1_zeile(id36, "2026-09-22", 36, 20.0),
         _p1_zeile(id24, "2026-09-22", 24, 30.0),
+        _p1_zeile(id12, "2026-09-22", 12, 60.0),
     ]
     (state / "geraete_tco_historie.jsonl").write_text(
         "\n".join(json.dumps(z) for z in zeilen) + "\n", encoding="utf-8"
     )
     messungen = geraete_zeitreihe._messungen(state, tco)
     slot = messungen[("modell-x", "xs")]["congstar"]["2026-09-22"]
-    assert slot["laufzeit"] == 24
-    assert slot["weitere_laufzeiten"] == [36]
+    assert slot["laufzeit"] == 12
+    assert slot["weitere_laufzeiten"] == [24]

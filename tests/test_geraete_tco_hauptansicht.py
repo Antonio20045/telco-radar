@@ -28,6 +28,7 @@ from telco_radar.geraete_config import lade_katalog
 from telco_radar.report import geraete_tco_grafik as grafik
 from telco_radar.report import geraete_tco_karten as karten
 from telco_radar.tarif_bezug import Tarifbestand
+from telco_radar.tarif_model import Preisphase
 from telco_radar.tco_model import Buendel, SimOnlyReferenz
 
 WURZEL = pathlib.Path(__file__).resolve().parents[1]
@@ -54,9 +55,7 @@ def bestand():
             quelle_url=satz.get("quelle_url", ""),
             abgerufen_am=satz.get("abgerufen_am", ""),
         )
-        satz_tarif = tarife.get(b.tarif_id) or {}
-        if satz_tarif.get("laufzeit_monate"):
-            b.tarif_bindung_monate = int(satz_tarif["laufzeit_monate"])
+        karten.tarif_anreichern(b, tarife.get(b.tarif_id) or {})
         buendel.append(b)
     referenzen = [
         SimOnlyReferenz(
@@ -91,9 +90,10 @@ def _naeherungs_modell():
     es dort also nicht mehr. Ohne diese gestellte Fixture wuerde die
     Naeherungsrechnung selbst gar nicht mehr geprueft. Zahlen von Hand
     nachgerechnet (siehe outputs/phase-tco24-1-2026-09-08.md);
-    A1 (20.09.2026) rechnet alle 36 Raten in die Leitzahl:
-        o2:       1,00 Zuzahlung + 36×30,00 Rate + 24×24,99 Tarif = 1.680,76
-                  (offen nach Monat 24: 12×30,00 = 360,00)
+    Seit Datenkonzept Geräte 5.3 rechnen 36 Raten 36 Tarifmonate und stehen
+    in einer anderen Ansicht als die 24-Monats-Referenz; das o2-Bündel finanziert
+    deshalb über 24 Raten, zur selben Summe wie vorher (36×30,00 = 24×45,00):
+        o2:       1,00 Zuzahlung + 24×45,00 Rate + 24×24,99 Tarif = 1.680,76
         Vodafone: 899,90 Barpreis + 24×19,99 Tarif (Mobil XS, guenstigster
                   von zwei Tarifen) = 1.379,66 - GERECHNET, kein Angebot
     """
@@ -106,8 +106,8 @@ def _naeherungs_modell():
             tarif_monatlich=24.99,
             tarif_bindung_monate=24,
             geraet_zuzahlung=1.0,
-            geraet_monatsrate=30.0,
-            laufzeit_monate=36,
+            geraet_monatsrate=45.0,
+            laufzeit_monate=24,
             anschlusspreis=0.0,
             quelle_url="https://o2.invalid/x",
             abgerufen_am="2026-09-08",
@@ -364,31 +364,32 @@ def test_antwortzeile_der_tarifgewinner_ist_kein_naeherungsangebot(bestand):
 
 
 def test_die_rechenprobe_steht_auf_der_karte(bestand):
-    """iPhone 17 Pro 256 GB bei o2 im Tarif L Plus (19,99 EUR, Zuzahlung
-    1,00 EUR, 36 Raten zu 36,50 EUR) - dieselben Betraege wie im Rechenkern.
+    """iPhone 17 Pro 256 GB bei o2 im Tarif L Plus (19,99 EUR) - dieselben
+    Betraege wie im Rechenkern.
 
-    A1 (20.09.2026): die Leitzahl heisst "Kosten über 24 Monate" und
-    rechnet ALLE Geräteraten der eigenen Laufzeit. o2s Raten laufen 36
-    Monate: 1.080,00 statt 720,00 EUR Ratenanteil, `gesamt` steigt auf
-    1.794,76 EUR; die 12 Raten nach Monat 24 (438,00 EUR) stehen als
-    `offen_nach_24` daneben und `gezahlt_nach_24` traegt die alte
-    24-Monates-Summe weiter."""
-    (karte,) = [
-        k
+    Datenkonzept Geräte 5.3 (H je Ratenlaufzeit): 24 Raten (Zuzahlung 7,00,
+    Rate 54,50) rechnen 24 Tarifmonate, 1.794,76 EUR über 24 Monate. 36 Raten
+    (1,00 und 36,50) rechnen 36 Tarifmonate; der Bestand nennt den Tarifpreis ab
+    Monat 25 nicht, also steht statt der alten 24-Monats-Zahl samt Restschuld die
+    benannte Lücke."""
+    karten_l_plus = {
+        k["raten_laufzeit"]: k
         for k in _modell(bestand, "apple-iphone-17-pro-256")["karten"]
         if k["anbieter"] == "o2"
         and k["sku_id"] == "apple-iphone-17-pro-256gb-silber"
         and k["tarif"] == "O2 Mobile L Plus mit 150 GB+ (24 Mon.)"
-        and k["raten_laufzeit"] == 36
-    ]
-    assert (karte["zuzahlung"], karte["rate"], karte["monatlich"]) == (1.0, 36.5, 19.99)
-    assert karte["anschlusspreis"] == 0.0
-    assert karte["label"] == "Kosten über 24 Monate"
-    assert karte["gesamt"] == round(1.0 + 36 * 36.5 + 24 * 19.99, 2) == 1794.76
-    assert karte["schnitt_monat"] == 74.78
-    assert karte["gezahlt_nach_24"] == 1356.76
-    assert karte["offen_nach_24"] == 438.00
-    assert karte["offene_raten"] == 12
+    }
+    vier, sechs = karten_l_plus[24], karten_l_plus[36]
+    assert (vier["zuzahlung"], vier["rate"], vier["monatlich"]) == (7.0, 54.5, 19.99)
+    assert vier["anschlusspreis"] == 0.0
+    assert vier["label"] == "Kosten über 24 Monate"
+    assert vier["gesamt"] == round(7.0 + 24 * 54.5 + 24 * 19.99, 2) == 1794.76
+    assert vier["schnitt_monat"] == 74.78
+    assert (sechs["zuzahlung"], sechs["rate"], sechs["monatlich"]) == (1.0, 36.5, 19.99)
+    assert sechs["label"] == "Kosten über 36 Monate"
+    assert sechs["gesamt"] is None and not sechs["belastbar"]
+    assert "Tarifgrundpreis Monat 25–36" in sechs["luecken"]
+    assert "Monat 25–36" in sechs["leer_grund"]
 
 
 def test_der_geraetepreis_fuehrt_wo_er_ausgewiesen_ist(bestand):
@@ -430,9 +431,9 @@ def test_der_geraetepreis_fuehrt_wo_er_ausgewiesen_ist(bestand):
             if not k["belastbar"] or k["geraetepreis"] is None:
                 continue
             geprueft += 1
-            grenze = k["gesamt"] + (k["offen_nach_24"] or 0.0)
-            assert k["geraetepreis"] <= grenze + 0.01, (
-                f"{k['anbieter']} {m['id']}: Geraetepreis groesser als TCO-24 plus Restbetrag"
+            assert k["geraetepreis"] <= k["gesamt"] + 0.01, (
+                f"{k['anbieter']} {m['id']}: Geraetepreis groesser als die Kosten über "
+                f"{k['leitzahl_monate']} Monate, die alle Raten enthalten"
             )
     assert geprueft >= 2, "der Test prueft nichts ohne echte Geraetepreise"
 
@@ -544,18 +545,27 @@ def test_die_beschriftung_der_referenz_aendert_kein_delta(bestand):
 
     A1 (20.09.2026): die Kappung ist zurueckgenommen - die Deltas rechnen
     wieder mit ALLEN Geraeteraten (und Referenz-Buendeln ihrer eigenen
-    Laufzeit), beide Werte sind neu gemessen."""
+    Laufzeit), beide Werte sind neu gemessen.
+
+    Datenkonzept Geräte 5.3: 36 Raten rechnen 36 Tarifmonate. Vodafones
+    Mobil XS mit 36 Raten (beim iPhone 15 die alte Referenz, 1.469,80 EUR über
+    24 Monate) hat ohne Tarifpreis ab Monat 25 keine Zahl mehr; die Referenz ist
+    Mobil S mit 12 Raten (1.709,80 EUR über 24 Monate). Gezählt werden nur Karten
+    mit Zahl - eine 36-Raten-Karte ohne Zahl hat kein Delta."""
 
     def delta(mid, tarif):
         (betrag,) = {
             k["delta"]["betrag"]
             for k in _modell(bestand, mid)["karten"]
-            if k["anbieter"] == "o2" and k["zustand"] == "neu" and k["tarif"] == tarif
+            if k["anbieter"] == "o2"
+            and k["zustand"] == "neu"
+            and k["tarif"] == tarif
+            and k["belastbar"]
         }
         return betrag
 
     assert _modell(bestand, "apple-iphone-17-pro-256")["referenz"]["gesamt"] == 1955.80
-    assert _modell(bestand, "apple-iphone-15-128")["referenz"]["gesamt"] == 1469.80
+    assert _modell(bestand, "apple-iphone-15-128")["referenz"]["gesamt"] == 1709.80
     assert (
         delta("apple-iphone-17-pro-256", "O2 Mobile L Plus mit 150 GB+ (24 Mon.)")
         == round(1794.76 - 1955.80, 2)
@@ -563,8 +573,8 @@ def test_die_beschriftung_der_referenz_aendert_kein_delta(bestand):
     )
     assert (
         delta("apple-iphone-15-128", "O2 Mobile on Demand M Plus mit 50 GB+ (24 Mon.)")
-        == round(1120.75 - 1469.80, 2)
-        == -349.05
+        == round(1120.75 - 1709.80, 2)
+        == -589.05
     )
     for modell in bestand["modelle"]:
         ref = modell["referenz"]
@@ -630,8 +640,9 @@ def test_jede_belastbare_karte_traegt_das_label_der_leitzahl(bestand):
     Buendelmonatspreis, dessen Zahl 36 Monatsraten fuer Tarif UND Geraet
     enthaelt (1.927,54 EUR = 340,00 + 36 × 42,99 + 39,90). Das Etikett
     nennt jetzt den Zeitraum, den die Zahl WIRKLICH traegt
-    (`leitzahl_monate`); die Tariflaufzeit der Rechnung und der Teiler des
-    Ø/Monat bleiben die Konstante 24 (`laufzeit`)."""
+    (`leitzahl_monate`). Seit `kosten_ueber` ist auch die Tariflaufzeit der
+    Rechnung und der Teiler des Ø/Monat dieser Zeitraum H: 36 bei 36 Raten,
+    24 bei 12 und 24 Raten (Datenkonzept Geräte 5.3)."""
     geprueft = 0
     for modell in bestand["modelle"]:
         for karte in modell["karten"]:
@@ -645,7 +656,11 @@ def test_jede_belastbare_karte_traegt_das_label_der_leitzahl(bestand):
             assert karte["label"] == f"Kosten über {monate} Monate", (
                 f"{modell['id']}/{karte['anbieter']}: {karte['label']!r}"
             )
-            assert karte["laufzeit"] == 24
+            assert (
+                karte["laufzeit"]
+                == monate
+                == (36 if karte["raten_laufzeit"] == 36 else 24)
+            ), f"{modell['id']}/{karte['anbieter']}: {karte['raten_laufzeit']} Raten"
     assert geprueft, "kein belastbares Angebot - der Test prueft nichts"
 
 
@@ -719,7 +734,7 @@ def test_g1_zeichnet_keine_karte_ohne_zahl(bestand):
     ohne = [
         m
         for m in bestand["modelle"]
-        if any(k["anbieter"] == "Telekom" and not k["belastbar"] for k in m["karten"])
+        if not any(k["anbieter"] == "Telekom" and k["belastbar"] for k in m["karten"])
     ]
     assert mit, "kein Modell mit Telekom-Bündel - der positive Fall fehlt"
     assert ohne, "kein Modell ohne Telekom-Bündel - der negative Fall fehlt"
@@ -1006,6 +1021,7 @@ def _buendel_ohne_listung(sku=_SKU_OHNE_LISTUNG, anbieter="o2"):
         abgerufen_am="2026-09-04",
     )
     b.tarif_bindung_monate = 24
+    b.tarif_phasen = [Preisphase(1, None, 14.99)]
     return b
 
 
@@ -1057,7 +1073,7 @@ def test_ein_buendel_ohne_listung_steht_unter_seinem_katalognamen():
     assert modell["titel"] == "Apple iPhone 16 Pro Max 256 GB"
     assert modell["hersteller"] == "Apple"
     o2 = [k for k in modell["karten"] if k["anbieter"] == "o2"][0]
-    assert o2["belastbar"] and o2["label"] == "Kosten über 24 Monate"
+    assert o2["belastbar"] and o2["label"] == "Kosten über 36 Monate"
     assert o2["zustand"] == "unbekannt", "keine Listung belegt keinen Zustand"
 
 
@@ -1112,7 +1128,11 @@ def test_die_referenz_des_iphone_17_ist_die_aktuelle_messung(bestand):
     (31,95 ist die gemessene Bündel-Rate; das Blatt nennt 29,95 ohne
     Smartphone-Zuschlag - Widerspruch, also flach gerechnet.) Die Zahl des
     Live-Befunds (1.391,79 bzw. korrekt 1.487,80 EUR vor A1) war dieselbe
-    Geist-Messung, noch mit 24 statt 36 Raten."""
+    Geist-Messung, noch mit 24 statt 36 Raten.
+
+    Datenkonzept Geräte 5.3: 12 und 24 Raten tragen weiter diese Zahl über 24
+    Monate; 36 Raten rechnen 36 Tarifmonate, und der Mobil-XS-Preis ab Monat 25
+    ist nicht erhoben - dort steht die benannte Lücke."""
     modell = _modell(bestand, "apple-iphone-17-256")
     ref = modell["referenz"]
     assert ref["tarif"] == "Mobil XS"
@@ -1133,11 +1153,15 @@ def test_die_referenz_des_iphone_17_ist_die_aktuelle_messung(bestand):
         sorted(xs, key=lambda k: k["raten_laufzeit"]), (90.0, 45.0, 30.0), strict=True
     ):
         assert (k["zuzahlung"], k["rate"], k["monatlich"]) == (1.0, rate, 31.95)
-        assert (
-            k["gesamt"]
-            == round(1.0 + k["raten_laufzeit"] * rate + 24 * 31.95, 2)
-            == 1847.8
-        )
+        if k["raten_laufzeit"] == 36:
+            assert k["gesamt"] is None and k["label"] == "Kosten über 36 Monate"
+            assert "Tarifgrundpreis Monat 25–36" in k["luecken"]
+        else:
+            assert (
+                k["gesamt"]
+                == round(1.0 + k["raten_laufzeit"] * rate + 24 * 31.95, 2)
+                == 1847.8
+            )
         assert k["abgerufen_am"] == ref["tarif_abgerufen_am"]
     assert all(
         k.get("abgerufen_am") != "2026-09-06"

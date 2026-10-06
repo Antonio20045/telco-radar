@@ -389,7 +389,11 @@ def test_die_tco_werte_des_bands_stehen_ohne_hover_im_dom(_seite):
     """UX-5, E2-Fassung: die exakten Werte stehen als TEXT im DOM - im
     Antwort-Satz (der beste des Bands) und auf jeder Bündel-Zeile. Das
     SVG der Zeitreihe trägt seine Werte ebenfalls als <text>, niemals
-    nur als Tooltip."""
+    nur als Tooltip.
+
+    Seit Datenkonzept Geräte Schritt 2 rechnet die congstar-Zeile mit 36
+    Raten auch 36 Tarifmonate: 1 + 36x24,00 + 36x25,00 = 1.765,00 statt
+    der alten 1.477,00, die nur 24 Tarifmonate neben 36 Raten zählte."""
     waehle_band(_seite, "xs")
     _seite.wait_for_timeout(250)
     tafel = _seite.eval_on_selector("#tafel-tco", "e => e.innerText")
@@ -401,7 +405,7 @@ def test_die_tco_werte_des_bands_stehen_ohne_hover_im_dom(_seite):
     waehle_band(_seite, "m")
     _seite.wait_for_timeout(250)
     tafel = _seite.eval_on_selector("#tafel-tco", "e => e.innerText")
-    assert "1.008,76" in tafel and "1.477,00" in tafel, tafel[:200]
+    assert "1.008,76" in tafel and "1.765,00" in tafel, tafel[:200]
 
 
 def test_der_antwort_satz_nennt_die_zahl_der_guenstigsten_zeile(_seite):
@@ -455,7 +459,9 @@ def test_die_finanzierungssumme_heisst_so_und_nicht_geraetepreis(_seite):
     Zuzahlung und allen Raten unter „Gerätepreis“. §3 verlangt zwei Zahlen,
     nie vermischt: die Finanzierung heißt Finanzierung, und der reine
     Gerätepreis ohne Vertrag wird als eigene Aussage benannt - hier als
-    benannte Lücke, weil congstar dazu nichts gemessen hat."""
+    benannte Lücke, weil congstar dazu nichts gemessen hat. Die Kernzahl
+    der 36-Raten-Zeile läuft seit Datenkonzept Geräte Schritt 2 über 36
+    Monate (1.765,00 statt 1.477,00 über „24 Monate“)."""
     waehle_band(_seite, "m")
     _seite.wait_for_timeout(120)
     congstar = _seite.eval_on_selector(
@@ -484,8 +490,8 @@ def test_die_finanzierungssumme_heisst_so_und_nicht_geraetepreis(_seite):
         "der Rechenweg nennt die Lücke beim Gerätepreis ohne Vertrag nicht"
     )
     assert (
-        "Kosten über 24 Monate" in congstar["summary"]
-        and "1.477,00" in congstar["summary"]
+        "Kosten über 36 Monate" in congstar["summary"]
+        and "1.765,00" in congstar["summary"]
     )
 
 

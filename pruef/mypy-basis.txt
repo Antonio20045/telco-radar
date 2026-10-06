@@ -76,8 +76,6 @@ src/telco_radar/report/differenzierung_view.py assignment 1
 src/telco_radar/report/differenzierung_view.py union-attr 2
 src/telco_radar/report/fruehwarnung.py index 1
 src/telco_radar/report/geraete_bereinigung.py type-var 1
-src/telco_radar/report/geraete_bewegung.py index 13
-src/telco_radar/report/geraete_bewegung.py var-annotated 1
 src/telco_radar/report/geraete_export.py arg-type 1
 src/telco_radar/report/geraete_pruefung.py operator 5
 src/telco_radar/report/geraete_pruefung.py type-var 6
@@ -89,7 +87,6 @@ src/telco_radar/report/geraete_tco_grafik.py misc 1
 src/telco_radar/report/geraete_tco_karten.py arg-type 3
 src/telco_radar/report/geraete_tco_karten.py assignment 1
 src/telco_radar/report/geraete_tco_karten.py index 9
-src/telco_radar/report/geraete_tco_karten.py operator 1
 src/telco_radar/report/geraete_tco_karten.py return-value 1
 src/telco_radar/report/geraete_tco_view.py assignment 2
 src/telco_radar/report/geraete_tco_view.py misc 1
@@ -98,7 +95,6 @@ src/telco_radar/report/geraete_view.py index 2
 src/telco_radar/report/geraete_view.py operator 1
 src/telco_radar/report/geraete_view.py type-var 1
 src/telco_radar/report/geraete_zeitreihe.py arg-type 1
-src/telco_radar/report/geraete_zeitreihe.py operator 3
 src/telco_radar/report/html.py arg-type 4
 src/telco_radar/report/html.py assignment 2
 src/telco_radar/report/html.py index 4

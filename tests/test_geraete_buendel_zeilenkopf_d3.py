@@ -7,11 +7,13 @@ lauteten beide Zeilen wortgleich, der Unterschied (die Ratenzahl, und bei
 36 Raten die Restschuld nach Monat 24) stand erst im aufgeklappten
 Rechenweg. Diese Datei pinnt die Behebung an einer eigenen, kleinen
 Fixture mit GENAU diesem Fall - denselben Zahlen wie der reale Pflichtfall
-(iPhone 17 Pro 256 GB, congstar Allnet Flat XS, 22.09.2026:
-1 + 24×15,00 + 24×45,75 EUR = 1 + 24×15,00 + 36×30,50 EUR = 1.459,00 EUR,
-Restschuld 0,00 EUR gegen 366,00 EUR) - damit ist jeder Assert hier auch
-am echten Bestand nachvollziehbar (siehe
-`tests/test_seiten_zahlen.py::test_leitzahl_congstar_xs_iphone17pro256_am_bestand`).
+(iPhone 17 Pro 256 GB, congstar Allnet Flat XS, 22.09.2026).
+
+Seit Datenkonzept Geräte Schritt 2 rechnet jede Zahlweise über ihren eigenen
+Zeitraum H: 24 Raten 1 + 24×15,00 + 24×45,75 = 1.459,00 EUR, 36 Raten
+1 + 36×15,00 + 36×30,50 = 1.639,00 EUR (das Tarifblatt der Fixture nennt
+15,00 EUR ohne Ende). Eine Restschuld gibt es nicht mehr, und 24 Raten
+werden nie gegen 36 gestellt: Δ zu Vodafone trägt nur die 24er.
 
 Drei weitere Punkte desselben Auftrags, an derselben Fixture:
   - Punkt 2: die Hauptzahl der Zeile nennt ihr Subjekt
@@ -21,8 +23,7 @@ Drei weitere Punkte desselben Auftrags, an derselben Fixture:
     `#57534a` zurück, weil keine `gr-anb--<slug>`-Klasse an der Zeile
     stand (die Regel in `style.css` existierte, ihre Klasse fehlte).
   - Punkt 4: der Zerlegungsbalken - seine Segmentbeträge summieren exakt
-    zur Leitzahl, und die Restschuld trägt ein eigenes (schraffiertes)
-    Segment.
+    zur Leitzahl, ohne offenes Segment.
 """
 
 from __future__ import annotations
@@ -52,8 +53,16 @@ MODELL = "apple-iphone-17-pro-256"
 ZUZAHLUNG = 1.0
 TARIF_MONATLICH = 15.0
 RATEN = {24: 45.75, 36: 30.50}
-SOLL_GESAMT = 1459.00
-SOLL_RESTSCHULD = {24: 0.0, 36: 366.00}
+SOLL_GESAMT = {24: 1459.00, 36: 1639.00}
+TARIFBLATT = {
+    "tarif_id": "cs:xs",
+    "anbieter": "congstar",
+    "name": "Allnet Flat XS",
+    "grundgebuehr": TARIF_MONATLICH,
+    "laufzeit_monate": 24,
+    "preisphasen": [{"von_monat": 1, "bis_monat": None, "betrag": TARIF_MONATLICH}],
+    "abgerufen_am": HEUTE,
+}
 
 
 def _congstar_buendel(laufzeit: int) -> dict:
@@ -107,6 +116,7 @@ def _bestand() -> dict:
     return {
         "buendel": [_congstar_buendel(24), _congstar_buendel(36), _vodafone_buendel()],
         "listung": _listung("Vodafone", DEVICE, 256, 1199.90),
+        "tarife": [TARIFBLATT],
     }
 
 
@@ -141,7 +151,10 @@ def _baue(tmp_path: pathlib.Path, bestand: dict) -> pathlib.Path:
         json.dumps({"updated": HEUTE, "buendel": bestand["buendel"], "sim_only": []}),
         encoding="utf-8",
     )
-    (state / "tarife.jsonl").write_text("", encoding="utf-8")
+    (state / "tarife.jsonl").write_text(
+        "".join(json.dumps(s) + "\n" for s in bestand.get("tarife", [])),
+        encoding="utf-8",
+    )
     reports = root / "data" / "reports"
     reports.mkdir(parents=True)
     (reports / f"{HEUTE}.json").write_text(
@@ -211,9 +224,9 @@ def test_lookup_greift(site):
 
 def test_punkt1_zeilen_sind_zugeklappt_unterscheidbar(site):
     """DER KERNTEST: die beiden Zahlweisen sind zugeklappt (im
-    <summary>-Text) verschieden, tragen ihre Ratenzahl, und die 36er
-    trägt zusätzlich die Restschuld - die 24er NICHT (0,00 EUR ist keine
-    Meldung wert, "24 Raten" allein ist schon der Unterschied)."""
+    <summary>-Text) verschieden, tragen ihre Ratenzahl, die Tarifbindung
+    und ihre eigene Zahl über ihren eigenen Zeitraum - eine Restschuld
+    nennt keine (Datenkonzept Geräte 5.3)."""
     html = (site / "geraete.html").read_text(encoding="utf-8")
     zeilen = _congstar_zeilen(html)
     _klassen24, text24, _b24 = zeilen[24]
@@ -225,22 +238,15 @@ def test_punkt1_zeilen_sind_zugeklappt_unterscheidbar(site):
     )
     assert "24 Raten" in text24 and "36 Raten" not in text24
     assert "36 Raten" in text36 and "24 Raten" not in text36
-    assert "Restschuld 366,00 €" in text36, (
-        f"36-Raten-Zeile nennt die Restschuld nicht: {text36!r}"
-    )
-    assert "Restschuld" not in text24, (
-        f"24-Raten-Zeile (0 EUR Restschuld) nennt trotzdem eine Restschuld: {text24!r}"
-    )
-    assert (
-        f"{SOLL_GESAMT:,.2f}".replace(",", "#").replace(".", ",").replace("#", ".")
-        + " €"
-        in text24
-    )
-    assert (
-        f"{SOLL_GESAMT:,.2f}".replace(",", "#").replace(".", ",").replace("#", ".")
-        + " €"
-        in text36
-    )
+    assert "36 Raten · Tarif 24 Monate" in text36
+    assert "Restschuld" not in text24 + text36
+    for n, text in ((24, text24), (36, text36)):
+        betrag = (
+            f"{SOLL_GESAMT[n]:,.2f}".replace(",", "#")
+            .replace(".", ",")
+            .replace("#", ".")
+        )
+        assert f"{betrag} € Kosten über {n} Monate" in text, (n, text)
 
 
 def _congstar_xs_summarys(html: str) -> list:
@@ -264,10 +270,11 @@ def _congstar_xs_summarys(html: str) -> list:
 
 
 def test_punkt1_ohne_ratenzahl_waeren_die_zeilen_wortgleich(site, chromium):
-    """Der Befund vor D3 am heutigen Render: nimmt man den Ratenteil
-    (`.gr-bnd-raten`) aus den zugeklappten Zeilen, sind 24er- und 36er-Zeile
-    wortgleich. Der Ratenteil ist also das Einzige, was sie unterscheidet, und
-    er ist zugeklappt im Browser sichtbar, am Schreibtisch und am Telefon."""
+    """Der Befund vor D3: ohne den Ratenteil (`.gr-bnd-raten`) waren 24er-
+    und 36er-Zeile wortgleich. Seit Datenkonzept Geräte Schritt 2 trägt jede
+    ihre eigene Zahl über ihren eigenen Zeitraum, die Zeilen unterscheiden
+    sich auch ohne Ratenteil; der Ratenteil bleibt zugeklappt im Browser
+    sichtbar, am Schreibtisch und am Telefon."""
     html = (site / "geraete.html").read_text(encoding="utf-8")
     ohne_raten = []
     for _opentag, _text, block in _congstar_zeilen(html).values():
@@ -276,7 +283,10 @@ def test_punkt1_ohne_ratenzahl_waeren_die_zeilen_wortgleich(site, chromium):
         assert len(raten) == 1, f"kein Ratenteil im Zeilenkopf: {summary}"
         raten[0].decompose()
         ohne_raten.append(" ".join(summary.get_text(" ").split()))
-    assert len(ohne_raten) == 2 and ohne_raten[0] == ohne_raten[1], ohne_raten
+    assert len(ohne_raten) == 2 and ohne_raten[0] != ohne_raten[1], ohne_raten
+    assert {"Kosten über 24 Monate", "Kosten über 36 Monate"} == {
+        re.search(r"Kosten über \d+ Monate", t).group(0) for t in ohne_raten
+    }
 
     for breite in (1440, 390):
         seite = chromium.new_page(viewport={"width": breite, "height": 900})
@@ -306,15 +316,22 @@ def test_punkt2_delta_spalte_traegt_die_feste_zahl(site):
     Wesentlichkeits-Schwelle (Δ > 15 € UND > 3 %, siehe
     `_vodafone_buendel`) - GEGENPROBE zur "≈"-Regel: ein wesentlicher
     Abstand zeigt die feste Zahl, kein "≈", und traegt die
-    `gr-bnd-delta--wert`-Klasse (Δ-Praefix mobil)."""
+    `gr-bnd-delta--wert`-Klasse (Δ-Praefix mobil).
+
+    Nur die 24er: die 36er hat keine Vodafone-Karte derselben Laufzeit
+    neben sich, ihre Δ-Spalte trägt keinen Betrag (Datenkonzept Geräte 4,
+    Regel 5)."""
     html = (site / "geraete.html").read_text(encoding="utf-8")
     zeilen = _congstar_zeilen(html)
-    delta = round(SOLL_GESAMT - (1 + 24 * 26.0 + 24 * 54.0), 2)
+    delta = round(SOLL_GESAMT[24] - (1 + 24 * 26.0 + 24 * 54.0), 2)
     assert delta < 0
     betrag_text = (
         f"{abs(delta):,.2f} €".replace(",", "#").replace(".", ",").replace("#", ".")
     )
-    for n in (24, 36):
+    ohne = BeautifulSoup(zeilen[36][2], "html.parser").select_one(".gr-bnd-delta")
+    assert ohne is not None and "€" not in ohne.get_text(), ohne
+    assert "gr-bnd-delta--wert" not in (ohne.get("class") or [])
+    for n in (24,):
         _klassen, _text, block = zeilen[n]
         soup = BeautifulSoup(block, "html.parser")
         zelle = soup.select_one(".gr-bnd-delta")
@@ -381,7 +398,7 @@ def _zerlegung(block: str) -> list:
 def test_punkt4_zerlegungsbalken_summiert_exakt_zur_leitzahl(site):
     """Die Segmentbetraege des Balkens (aus den `title`-Attributen
     gelesen) summieren GENAU zur Leitzahl - keine zweite Rechnung, nur
-    eine zweite, groessere Darstellung derselben `tco_24()`-Bestandteile.
+    eine zweite, groessere Darstellung derselben `kosten_ueber()`-Posten.
     """
     html = (site / "geraete.html").read_text(encoding="utf-8")
     zeilen = _congstar_zeilen(html)
@@ -389,32 +406,28 @@ def test_punkt4_zerlegungsbalken_summiert_exakt_zur_leitzahl(site):
         seg = _zerlegung(block)
         assert seg, f"{n} Raten: kein Zerlegungsbalken im Rechenweg"
         summe = round(sum(s["betrag"] for s in seg), 2)
-        assert summe == pytest.approx(SOLL_GESAMT, abs=0.005), (
+        assert summe == pytest.approx(SOLL_GESAMT[n], abs=0.005), (
             f"{n} Raten: Segmente summieren zu {summe} EUR, "
-            f"Leitzahl ist {SOLL_GESAMT} EUR"
+            f"Leitzahl ist {SOLL_GESAMT[n]} EUR"
         )
         pct_summe = round(sum(s["pct"] for s in seg), 1)
         assert pct_summe == pytest.approx(100.0, abs=0.2)
 
 
-def test_punkt4_restschuld_ist_schraffiertes_segment(site):
-    """Nur die 36-Raten-Zeile traegt ein `--offen`-Segment, und sein
-    Betrag ist exakt die Restschuld (366,00 EUR) - die 24er hat keins."""
+def test_punkt4_kein_offenes_segment_alle_raten_im_zeitraum(site):
+    """Bis Datenkonzept Geräte Schritt 2 trug die 36-Raten-Zeile ein
+    `--offen`-Segment (Restschuld nach Monat 24, 366,00 EUR). Jetzt liegen
+    alle Raten im Zeitraum der Zahl: kein Segment ist offen, und die 36er
+    trägt ihre Raten (36 × 30,50 = 1.098,00 EUR) und 36 Tarifmonate
+    (36 × 15,00 = 540,00 EUR) als eigene Segmente."""
     html = (site / "geraete.html").read_text(encoding="utf-8")
     zeilen = _congstar_zeilen(html)
     for n, (_klassen, _text, block) in zeilen.items():
         seg = _zerlegung(block)
-        offen = [s for s in seg if s["offen"]]
-        if SOLL_RESTSCHULD[n]:
-            assert len(offen) == 1, (
-                f"{n} Raten: erwartet EIN offenes Segment, gefunden {len(offen)}"
-            )
-            assert offen[0]["betrag"] == pytest.approx(SOLL_RESTSCHULD[n], abs=0.005)
-            assert offen[0]["name"] == "Restschuld nach Monat 24"
-        else:
-            assert not offen, (
-                f"{n} Raten: eine erfundene Restschuld steht im Balken ({offen})"
-            )
+        assert seg and not [s for s in seg if s["offen"]], (n, seg)
+    je_name = {s["name"]: s["betrag"] for s in _zerlegung(zeilen[36][2])}
+    assert je_name["Geräteraten über 36 Monate"] == pytest.approx(1098.0)
+    assert je_name["Tarif über 36 Monate"] == pytest.approx(540.0)
 
 
 def test_mutationsprobe_punkt1_erkennt_wortgleiche_zeilen():

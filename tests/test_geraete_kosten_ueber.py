@@ -284,6 +284,13 @@ def test_ohne_ratenlaufzeit_gibt_es_keinen_zeitraum_und_keine_zahl():
     b = _o2(laufzeit_monate=None)
     assert zeitraum(b) is None
     assert kosten_ueber(b).luecken == [POSTEN_ZEITRAUM, POSTEN_LAUFZEIT]
+    vertrag = _o2(
+        laufzeit_monate=None,
+        buendel_monatlich=44.99,
+        tarif_monatlich=None,
+        geraet_monatsrate=None,
+    )
+    assert kosten_ueber(vertrag).luecken == [POSTEN_ZEITRAUM, POSTEN_LAUFZEIT]
     k = kosten_ueber(b, 24)
     assert (k.gesamt, k.ratenlaufzeit, k.luecken) == (None, None, [POSTEN_LAUFZEIT])
     assert TARIF_24 in k.posten

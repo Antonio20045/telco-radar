@@ -198,7 +198,7 @@ _TCO_BUENDEL = [
         "geraet_zuzahlung": 1.0,
         "geraet_monatsrate": 20.0 + i,
         "laufzeit_monate": 24,
-        "anschlusspreis": None,
+        "anschlusspreis": 0.0,
         "rabatte": [],
         "quelle_url": f"https://example.de/p/{sku}",
         "abgerufen_am": "2026-09-04",
@@ -209,6 +209,12 @@ _TCO_BUENDEL = [
         [("Vodafone", "vf-1"), ("o2", "o2-1"), ("Vodafone", "vf-3"), ("o2", "o2-3")]
     )
 ]
+
+"""Die Buendel tragen einen Anschlusspreis von 0,00 EUR: seit Datenkonzept
+Geraete Schritt 2 ist die Kernzahl `kosten_ueber`, und die nennt einen
+fehlenden Anschlusspreis als Luecke ohne Zahl - mit `None` stuende keine
+Zeile mit `data-gesamt` da, und die Tests der Zeitreihe und Sortierung
+maessen nichts."""
 
 _TCO = {"updated": "2026-09-04", "buendel": _TCO_BUENDEL, "sim_only": _TCO_REFERENZEN}
 

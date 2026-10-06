@@ -196,7 +196,10 @@ def test_leerzustand_modell_ohne_buendel_in_keinem_band(bestand, tarife):
     Erhebungsstand wegnehmen kann (dieselbe Kalibrierung wie beim
     Balken-Test in B-2). Die Gegenprobe mit der All-Net-Flat S beweist,
     dass die leere Bandliste am TARIF liegt und nicht an einer kaputten
-    Fixture."""
+    Fixture. Seit Datenkonzept Geräte Schritt 2 traegt der Vertrag
+    Zuzahlung und Anschlusspreis: `kosten_ueber` nennt beide sonst als
+    Luecke statt sie als 0 zu zaehlen, und ohne Zahl gaebe es kein echtes
+    Buendel."""
     sku = "apple-iphone-15-999gb-schwarz"
     listung = {
         "sku_id": sku,
@@ -214,7 +217,9 @@ def test_leerzustand_modell_ohne_buendel_in_keinem_band(bestand, tarife):
                 tarif_name=tarif_name,
                 tarif_id=tarif_id,
                 buendel_monatlich=54.99,
+                geraet_zuzahlung=0.0,
                 laufzeit_monate=36,
+                anschlusspreis=39.9,
                 abgerufen_am="2026-09-08",
             )
         ]

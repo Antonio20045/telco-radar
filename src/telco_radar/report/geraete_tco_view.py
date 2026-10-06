@@ -64,6 +64,7 @@ from ..tco_model import (
     SimOnlyReferenz,
     aktionen_aus,
     geraeteanteil,
+    kosten_ueber,
     sim_only_id,
     tco_24,
 )
@@ -484,9 +485,8 @@ def _export_zeilen(
     trägt dann die SKU als Rueckfall, genau wie `aktuell_csv` die device_id
     nennt, wenn der Katalog nichts hergibt. Aufgeloest wird ueber denselben
     Weg wie die Modelltafel (`geraet_je_sku` aus den Listungen, ergaenzt
-    um den Katalog), und die TCO-24-Spalte ist `tco_model.tco_24()` -
-    dieselbe Funktion wie Karte, Graph und Radar. Diese Funktion liefert
-    ZAHLEN; Dezimalkomma und Semikolon macht `geraete_export.tco_csv`.
+    um den Katalog), und die Kostenspalte ist `tco_model.kosten_ueber()` wie auf
+    der Karte. Hier ZAHLEN; Dezimalkomma und Semikolon macht `geraete_export.tco_csv`.
 
     Die `sku_id` steht als EIGENE Spalte (A4, 20.09.2026): Modell,
     Speicher und alle Preise sind je Farbvariante gleich, und ohne die
@@ -494,13 +494,13 @@ def _export_zeilen(
     Exportzeilen (live: 156). Sie ist Teil des Bündelschluessels und
     trennt deshalb JEDES Paar, nicht nur das heutige.
 
-    P0-B-h4 (21.09.2026): 74 Bündel (1&1, `buendel_monatlich`) tragen ihre
-    Summe über 36 Monate, der Kopf behauptete 24 für JEDE Zeile. Der Zeitraum
-    geht deshalb als EIGENES Feld durch (`leitzahl_monate`, gelesen aus
-    `Tco.leitzahl_monate`, bei SIM-only aus derselben Rechnung).
+    P0-B-h4 (21.09.2026): der Zeitraum H geht als EIGENES Feld durch
+    (`leitzahl_monate`, gelesen aus `Kosten.monate`, bei SIM-only aus
+    `Tco.leitzahl_monate`): 36 Raten und 1&1 rechnen 36 Monate, 12 und 24 Raten 24.
 
     `status` ist der Zustand der Notbremse (`geraete_notbremse.kurz`, dasselbe
-    Wort wie an der Bündelzeile), leer bei einem Bündel, das zählt.
+    Wort wie an der Bündelzeile), leer bei einem Bündel, das zählt; `luecke`
+    nennt die Posten, ohne die es keine Kostenzahl gibt.
 
     Die SIM-only-Zeilen sind DERSELBE Massstab wie auf der Tafel
     (`_referenztabelle`), `ueber_horizont` als ihre TCO-24 (`tco_24` über
@@ -522,7 +522,7 @@ def _export_zeilen(
             continue
         device_id, speicher = geraet_je_sku.get(b.sku_id) or ("", None)
         g = katalog.nach_id(device_id) if (katalog and device_id) else None
-        kennzahl = tco_24(b)
+        kosten = kosten_ueber(b)
         zeilen.append(
             {
                 "modell": (getattr(g, "modell", "") or device_id or b.sku_id),
@@ -539,12 +539,13 @@ def _export_zeilen(
                 "buendel_monatlich": b.buendel_monatlich,
                 "laufzeit": b.laufzeit_monate,
                 "anschlusspreis": b.anschlusspreis,
-                "tco24": kennzahl.gesamt if kennzahl.belastbar else None,
-                "leitzahl_monate": kennzahl.leitzahl_monate,
+                "tco24": kosten.gesamt,
+                "leitzahl_monate": kosten.monate,
                 "abgerufen_am": b.abgerufen_am,
                 "quelle_url": b.quelle_url,
                 "sku_id": b.sku_id or "",
                 "status": geraete_notbremse.kurz(b, heute),
+                "luecke": ", ".join(kosten.luecken),
             }
         )
     sim = []
@@ -628,13 +629,7 @@ def aufbereiten(
     tarife = tarife or {}
     for b in buendel:
         if isinstance(b, Buendel) and b.tarif_id:
-            satz = tarife.get(b.tarif_id) or {}
-            laufzeit = satz.get("laufzeit_monate")
-            if laufzeit:
-                b.tarif_bindung_monate = int(laufzeit)
-            b.tarif_phasen = geraete_tco_karten.phasen_fuer_buendel(
-                satz, b.tarif_monatlich
-            )
+            geraete_tco_karten.tarif_anreichern(b, tarife.get(b.tarif_id) or {})
 
     zeilen = []
     for b in buendel:

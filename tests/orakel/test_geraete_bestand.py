@@ -62,18 +62,18 @@ def _gw_rohdaten(bestand: Path) -> tuple[dict, dict, dict]:
 def _gw_phasen(buendel: dict, blaetter: dict) -> list[dict]:
     """Blatt-Phasen des Bündels - nur ohne Widerspruch zur Messung.
 
-    Die Messung (tarif_monatlich) muss in der Preisspanne der Phasen
-    liegen (einschliesslich, Toleranz ein halber Cent); sonst gewinnt die
-    Messung flach und die Phasen gelten nicht. Ohne Messung gibt es keinen
-    Widerspruch. Eigenbau nach der dokumentierten Regel, nicht importiert.
+    Es gilt die AKTUELLE Lesart des Vertrags (`_gw_aktuell`, siehe Kopf): trägt
+    sie keine Phasen, gibt es keine, auch wenn ein älteres Blatt oder die
+    andere Lesart welche nannte. Die Messung (tarif_monatlich) muss in der
+    Preisspanne der Phasen liegen (einschliesslich, Toleranz ein halber Cent);
+    sonst gewinnt die Messung flach und die Phasen gelten nicht. Ohne Messung
+    gibt es keinen Widerspruch. Eigenbau nach der dokumentierten Regel, nicht
+    importiert.
     """
-    phasen = []
-    for blatt in blaetter.get(buendel.get("tarif_id") or "", []):
-        phasen = [
-            p for p in (blatt.get("preisphasen") or []) if p.get("betrag") is not None
-        ]
-        if phasen:
-            break
+    blatt = _gw_aktuell_gemerkt(blaetter).get(buendel.get("tarif_id") or "") or {}
+    phasen = [
+        p for p in (blatt.get("preisphasen") or []) if p.get("betrag") is not None
+    ]
     messung = buendel.get("tarif_monatlich")
     if not phasen or messung is None:
         return phasen
@@ -84,30 +84,16 @@ def _gw_phasen(buendel: dict, blaetter: dict) -> list[dict]:
     return []
 
 
-def _gw_phasensumme(phasen: list[dict], horizont: int) -> int:
-    """Monatsentgelte ueber den Horizont, phasengewichtet, in Cent.
+_GW_AKTUELL_MERKER: dict = {}
 
-    Phase ohne Ende laeuft bis zum Horizont, darueber hinausreichende
-    werden gekappt, Monate nach der letzten Phase laufen zum letzten
-    bekannten Preis weiter (der letzte Preis eines Tarifs ist der
-    Normalpreis, nicht der Rabattpreis).
-    """
-    summe = abgedeckt = 0
-    for phase in sorted(phasen, key=lambda p: p["von_monat"]):
-        bis = (
-            horizont
-            if phase.get("bis_monat") is None
-            else min(int(phase["bis_monat"]), horizont)
-        )
-        monate = max(0, bis - int(phase["von_monat"]) + 1)
-        if monate <= 0:
-            continue
-        summe += monate * gw_cent(phase["betrag"])
-        abgedeckt += monate
-    if abgedeckt < horizont:
-        letzter = max(phasen, key=lambda p: p["von_monat"])
-        summe += (horizont - abgedeckt) * gw_cent(letzter["betrag"])
-    return summe
+
+def _gw_aktuell_gemerkt(blaetter: dict) -> dict:
+    """`_gw_aktuell` je Blattsammlung einmal - die Bestandstests fragen tausendfach."""
+    schluessel = id(blaetter)
+    if schluessel not in _GW_AKTUELL_MERKER:
+        _GW_AKTUELL_MERKER.clear()
+        _GW_AKTUELL_MERKER[schluessel] = (blaetter, _gw_aktuell(blaetter))
+    return _GW_AKTUELL_MERKER[schluessel][1]
 
 
 def _gw_cent_oder_luecke(wert) -> int | None:
@@ -115,39 +101,84 @@ def _gw_cent_oder_luecke(wert) -> int | None:
     return None if wert is None else gw_cent(wert)
 
 
+def _gw_bindung(buendel: dict, blaetter: dict) -> int | None:
+    """Die Tarifbindung: aus dem aktuellen Blatt, wenn es eine nennt (0 zählt nicht
+    als Angabe), sonst die des Bündels selbst - None, wenn keiner sie kennt."""
+    blatt = _gw_aktuell_gemerkt(blaetter).get(buendel.get("tarif_id") or "") or {}
+    if blatt.get("laufzeit_monate"):
+        return int(blatt["laufzeit_monate"])
+    eigene = buendel.get("tarif_bindung_monate")
+    return None if eigene is None else int(eigene)
+
+
+def gw_zeitraum(buendel: dict, blaetter: dict) -> int | None:
+    """H der Soll-Definition (Datenkonzept Geräte 5.3): der größere Wert aus
+    Ratenlaufzeit und Tarifbindung, eine unbekannte Bindung zählt 24 Monate.
+    Ohne Ratenlaufzeit gibt es keinen Zeitraum."""
+    laufzeit = buendel.get("laufzeit_monate")
+    if laufzeit is None:
+        return None
+    bindung = _gw_bindung(buendel, blaetter)
+    return max(int(laufzeit), _GW_HORIZONT if bindung is None else bindung)
+
+
+def _gw_tarif_cent(buendel: dict, blaetter: dict, monate: int) -> int | None:
+    """Der Tarif in jedem Monat 1 bis `monate` zum Preis der EINEN Phase, die den
+    Monat nennt, in Cent. Ohne Blatt-Phasen gilt der gemessene Preis bis zum Ende
+    der Bindung (ohne Bindung 24 Monate); ein Monat ohne genau eine Phase ist eine
+    Lücke (None), nie der fortgeschriebene letzte Preis."""
+    phasen = _gw_phasen(buendel, blaetter)
+    if not phasen:
+        if buendel.get("tarif_monatlich") is None:
+            return None
+        bindung = _gw_bindung(buendel, blaetter)
+        bis = bindung if bindung else _GW_HORIZONT
+        phasen = [
+            {"von_monat": 1, "bis_monat": bis, "betrag": buendel["tarif_monatlich"]}
+        ]
+    summe = 0
+    for monat in range(1, monate + 1):
+        nennen = [
+            p
+            for p in phasen
+            if int(p.get("von_monat") or 1) <= monat
+            and (p.get("bis_monat") is None or monat <= int(p["bis_monat"]))
+        ]
+        if len(nennen) != 1:
+            return None
+        summe += gw_cent(nennen[0]["betrag"])
+    return summe
+
+
 def _gw_leitzahl(buendel: dict, blaetter: dict) -> tuple:
-    """(gesamt_cent, rest_cent) der Soll-Definition; None = Luecke."""
-    laufzeit = int(buendel["laufzeit_monate"])
-    offen = max(0, laufzeit - _GW_HORIZONT)
-    if buendel.get("buendel_monatlich") is not None:
-        monat = gw_cent(buendel["buendel_monatlich"])
-        teile = [
-            monat * laufzeit,
-            _gw_cent_oder_luecke(buendel["geraet_zuzahlung"]),
-            _gw_cent_oder_luecke(buendel["anschlusspreis"]),
-        ]
-        rest = monat * offen
-    else:
-        phasen = _gw_phasen(buendel, blaetter)
-        tarif24 = _gw_phasensumme(phasen, _GW_HORIZONT) if phasen else None
-        if tarif24 is None:
-            if buendel.get("tarif_monatlich") is None:
-                return None, None
-            tarif24 = gw_cent(buendel["tarif_monatlich"]) * _GW_HORIZONT
-        rate = buendel.get("geraet_monatsrate")
-        if rate is None:
-            return None, None
-        rate_c = gw_cent(rate)
-        teile = [
-            _gw_cent_oder_luecke(buendel["geraet_zuzahlung"]),
-            tarif24,
-            rate_c * laufzeit,
-            _gw_cent_oder_luecke(buendel["anschlusspreis"]),
-        ]
-        rest = rate_c * offen
-    if any(t is None for t in teile):
+    """(gesamt_cent, H) der Soll-Definition; gesamt None = Lücke.
+
+    Kosten über H Monate = Anzahlung + Anschlusspreis + alle N Geräteraten +
+    Tarif in jedem Monat 1 bis H; ein zusammengelegter Bündelbetrag (1&1) trägt
+    H × Betrag und gilt nur für H = N. Fehlt ein Posten, gibt es keine Zahl."""
+    monate = gw_zeitraum(buendel, blaetter)
+    if monate is None:
         return None, None
-    return sum(teile), rest
+    laufzeit = int(buendel["laufzeit_monate"])
+    if buendel.get("buendel_monatlich") is not None:
+        teile = [
+            gw_cent(buendel["buendel_monatlich"]) * monate
+            if monate == laufzeit
+            else None
+        ]
+    else:
+        rate = buendel.get("geraet_monatsrate")
+        teile = [
+            _gw_tarif_cent(buendel, blaetter, monate),
+            None if rate is None else gw_cent(rate) * laufzeit,
+        ]
+    teile += [
+        _gw_cent_oder_luecke(buendel.get("geraet_zuzahlung")),
+        _gw_cent_oder_luecke(buendel.get("anschlusspreis")),
+    ]
+    if any(t is None for t in teile):
+        return None, monate
+    return sum(teile), monate
 
 
 _GW_VF_MIT_SMARTPHONE = re.compile(r"^Vodafone Mobil ([A-Z]{1,4}) mit Smartphone$")
@@ -319,8 +350,9 @@ def _gw_min_buendel(
     Auswahlmenge wie die Seite: Zustand neu (vergleichbar), eine
     belastbare Zahl (ohne Tarifgrundpreis zaehlt ein Bündel nicht), -
     seit A3 - FRISCHE (`_gw_frisch`) und eine Leitzahl ueber 24 Monate
-    (kein Buendelbetrag ueber eine andere Laufzeit, P0-B-h3), seit der
-    Notbremse nur Bündel, die zählen (`_gw_zaehlt`). Mit `anbieter`
+    (kein Bündel mit 36 Raten oder Bündelbetrag über 36 Monate, P0-B-h3 und
+    Datenkonzept Geräte 5.3), seit der Notbremse nur Bündel, die zählen
+    (`_gw_zaehlt`). Mit `anbieter`
     auf dessen Bündel beschraenkt - die Vodafone-Referenz ist das Minimum UNTER DEN
     EIGENEN frischen Bündeln, nicht der Sieger des Bandes.
     """
@@ -336,13 +368,8 @@ def _gw_min_buendel(
             continue
         if not _gw_frisch(b, heute) or not _gw_zaehlt(b, heute):
             continue
-        if (
-            b.get("buendel_monatlich") is not None
-            and int(b["laufzeit_monate"]) != _GW_HORIZONT
-        ):
-            continue
-        gesamt, _rest = _gw_leitzahl(b, blaetter)
-        if gesamt is None:
+        gesamt, monate = _gw_leitzahl(b, blaetter)
+        if gesamt is None or monate != _GW_HORIZONT:
             continue
         if beste is None or gesamt < beste[0]:
             beste = (gesamt, b)
@@ -450,10 +477,11 @@ def gw_vergleiche(ist: _gw_Dez, soll_cent: int, kontext: str) -> None:
     )
 
 
-def _gw_o_monat(soll_cent: int) -> set:
+def _gw_o_monat(soll_cent: int, monate: int = _GW_HORIZONT) -> set:
     """O/Monat auf Cent gerundet - half-even (Python round der Seite) und
-    half-up (kaufmaennisch) als akzeptierte Menge."""
-    genau = _gw_Dez(soll_cent) / 2400
+    half-up (kaufmaennisch) als akzeptierte Menge; geteilt durch den Zeitraum H
+    der Zahl."""
+    genau = _gw_Dez(soll_cent) / (100 * monate)
     return {
         genau.quantize(_gw_Dez("0.01"), rounding=_gw_HEVEN),
         genau.quantize(_gw_Dez("0.01"), rounding=_gw_HUP),
@@ -470,6 +498,9 @@ _GW_PFLICHT_TARIF = "Allnet Flat S"
 _GW_PFLICHT_BAND = "m"
 _GW_PFLICHT_LEITZAHL = "1.216,00 €"
 _GW_PFLICHT_RATEN = {24: 3000, 36: 2000}
+_GW_PFLICHT_SOLL = {24: 121600, 36: 145600}
+"""Je Zahlweise die Kosten über H Monate: 1 + 24 × 20,00 + 24 × 30,00 + 15,00 und
+1 + 36 × 20,00 + 36 × 20,00 + 15,00 (36 Tarifmonate, Datenkonzept Geräte 5.3)."""
 
 
 def _gw_ist_startpaar(titel: str) -> bool:
@@ -481,10 +512,11 @@ def _gw_ist_startpaar(titel: str) -> bool:
 
 
 def _gw_pflichtbuendel(tco: dict, blaetter: dict) -> tuple:
-    """(soll_cent, {Laufzeit: Bündel}, {Abruftage}).
+    """(soll_cent über 24 Monate, {Laufzeit: Bündel}, {Abruftage}).
 
-    Alle Farben UND alle Zahlweisen rechnen auf dieselbe Leitzahl; das
-    wird hier geprüft, nicht vorausgesetzt."""
+    Alle Farben einer Zahlweise rechnen auf dieselbe Zahl; das wird hier
+    geprüft, nicht vorausgesetzt. Die Zahl je Zahlweise liefert
+    `_gw_pflicht_soll`."""
     kandidaten = [
         b
         for b in tco["buendel"]
@@ -498,10 +530,15 @@ def _gw_pflichtbuendel(tco: dict, blaetter: dict) -> tuple:
         f"kein neu-Bündel {_GW_PFLICHT_ANBIETER}/{_GW_PFLICHT_TARIF} "
         f"zu {_GW_PFLICHT_SKU}"
     )
-    werte = {_gw_leitzahl(b, blaetter)[0] for b in kandidaten}
-    assert None not in werte and len(werte) == 1, (
-        f"Farben des Pflichtfalls rechnen verschieden: {werte}"
-    )
+    for n in {b["laufzeit_monate"] for b in kandidaten}:
+        werte = {
+            _gw_leitzahl(b, blaetter)[0]
+            for b in kandidaten
+            if b["laufzeit_monate"] == n
+        }
+        assert None not in werte and len(werte) == 1, (
+            f"Farben des Pflichtfalls mit {n} Raten rechnen verschieden: {werte}"
+        )
     je_laufzeit: dict = {}
     for b in kandidaten:
         vorher = je_laufzeit.setdefault(b["laufzeit_monate"], b)
@@ -528,7 +565,26 @@ def _gw_pflichtbuendel(tco: dict, blaetter: dict) -> tuple:
         "sich geaendert, der Anker ist nachzurechnen"
     )
     tage = {b.get("abgerufen_am", "") for b in kandidaten}
-    return werte.pop(), je_laufzeit, tage
+    return _gw_leitzahl(je_laufzeit[_GW_HORIZONT], blaetter)[0], je_laufzeit, tage
+
+
+def _gw_pflicht_soll(je_laufzeit: dict, blaetter: dict) -> dict:
+    """{Laufzeit: (Kosten in Cent, H)} je Zahlweise des Pflichtfalls."""
+    return {n: _gw_leitzahl(b, blaetter) for n, b in sorted(je_laufzeit.items())}
+
+
+def _gw_modell_zeilen(gw_seite: dict, modell: str) -> list[str]:
+    """Die Bündelzeilen (`<details class="gr-bnd">`) eines Modells - aus seinem
+    Block im Nachladefragment, beim Startmodell aus `geraete.html`."""
+    lager = re.split(r'<div class="gr-bnd-lager" data-modell="', gw_seite["buendel"])
+    for block in lager[1:]:
+        if block[: block.index('"')] == modell:
+            return re.findall(r'<details class="gr-bnd".*?</details>', block, re.S)
+    vorgabe = re.search(r'"vorgabe":\s*"([^"]+)"', gw_seite["geraete"])
+    if vorgabe and vorgabe.group(1) == modell:
+        start = gw_seite["geraete"][gw_seite["geraete"].find('id="gr-bndliste"') :]
+        return re.findall(r'<details class="gr-bnd".*?</details>', start, re.S)
+    return []
 
 
 def test_leitzahl_des_pflichtfalls_am_bestand(gw_seite):
@@ -538,11 +594,12 @@ def test_leitzahl_des_pflichtfalls_am_bestand(gw_seite):
     wenn der Server-First-Paint gerade mit diesem Paar startet, auch
     dessen Antwort-Satz und Bündelzeile.
 
-    Der Pflichtfall trägt zwei Zahlweisen (24 x 30,00 EUR und 36 x 20,00 EUR)
-    mit derselben Leitzahl 1.216,00 EUR - congstar finanziert zum Nulltarif.
-    Der Rechenweg der jüngsten Messung nennt die des Horizonts (24): die
-    Zeitreihe führt je (Anbieter, Tag) ein Bündel, und bei zwei Zeiträumen am
-    selben Tag gewinnt der des Horizonts."""
+    Der Pflichtfall trägt zwei Zahlweisen (24 x 30,00 EUR und 36 x 20,00 EUR).
+    Seit Datenkonzept Geräte 5.3 rechnet jede über ihren Zeitraum: 24 Raten
+    1.216,00 EUR über 24 Monate, 36 Raten 1.456,00 EUR über 36 Monate (36
+    Tarifmonate). Der Rechenweg der jüngsten Messung nennt die des Horizonts
+    (24): die Zeitreihe führt je (Anbieter, Tag) ein Bündel, und bei zwei
+    Zeiträumen am selben Tag gewinnt der des Horizonts."""
     tco, blaetter, _db = _gw_rohdaten(gw_seite["bestand"])
     soll_cent, je_laufzeit, _tage = _gw_pflichtbuendel(tco, blaetter)
 
@@ -550,6 +607,9 @@ def test_leitzahl_des_pflichtfalls_am_bestand(gw_seite):
         f"Pflichtfall-Rechnung ergibt {soll_cent / 100} € - Verankerung "
         "1.216,00 € (1 + 24 × 20,00 + 24 × 30,00 + 15,00) stimmt nicht mehr"
     )
+    soll_je = _gw_pflicht_soll(je_laufzeit, blaetter)
+    assert {n: c for n, (c, _h) in soll_je.items()} == _GW_PFLICHT_SOLL
+    assert {n: h for n, (_c, h) in soll_je.items()} == {24: 24, 36: 36}
 
     block = _gw_paar_block(gw_seite["fragment"], _GW_PFLICHT_MODELL, _GW_PFLICHT_BAND)
     assert block, f"Paar {_GW_PFLICHT_MODELL}/{_GW_PFLICHT_BAND} fehlt im Fragment"
@@ -616,18 +676,26 @@ def test_leitzahl_des_pflichtfalls_am_bestand(gw_seite):
     )
 
     gezeigt = {}
-    for dok in (gw_seite["geraete"], gw_seite["buendel"]):
-        for roh in re.findall(
-            r'<details class="gr-bnd"[^>]*data-anbieter="congstar"'
-            rf'[^>]*data-band="{_GW_PFLICHT_BAND}"[^>]*>(.*?)</details>',
-            dok,
-            re.S,
+    for roh in _gw_modell_zeilen(gw_seite, _GW_PFLICHT_MODELL):
+        attrs = dict(re.findall(r'data-([a-z-]+)="([^"]*)"', roh.split(">", 1)[0]))
+        klar = " ".join(re.sub(r"<[^>]+>", " ", roh).split())
+        if (
+            attrs.get("anbieter") != _GW_PFLICHT_ANBIETER
+            or attrs.get("band") != _GW_PFLICHT_BAND
+            or attrs.get("zustand") != "neu"
+            or f"{_GW_PFLICHT_TARIF} ·" not in klar
         ):
-            klar = " ".join(re.sub(r"<[^>]+>", " ", roh).split())
-            if f"{_GW_PFLICHT_TARIF} ·" not in klar or _GW_PFLICHT_LEITZAHL not in klar:
-                continue
-            for n, rate in re.findall(r"in (\d+) Raten à ([\d.,]+) €", klar):
-                gezeigt[int(n)] = _gw_dezimal(rate)
+            continue
+        for n, rate in re.findall(r"in (\d+) Raten à ([\d.,]+) €", klar):
+            cent, monate = soll_je[int(n)]
+            gezeigt[int(n)] = _gw_dezimal(rate)
+            gw_vergleiche(
+                _gw_Dez(attrs["gesamt"]), cent, f"Pflichtfall, {n} Raten, data-gesamt"
+            )
+            assert _gw_Dez(attrs["schnitt"]) in _gw_o_monat(cent, monate), attrs
+            assert f"Kosten über {monate} Monate" in klar, klar[:200]
+            euro = f"{cent // 100:,}".replace(",", ".") + f",{cent % 100:02d} €"
+            assert euro in klar, f"{n} Raten: {euro} fehlt wörtlich in der Zeile"
     assert gezeigt == {n: _gw_Dez(c) / 100 for n, c in _GW_PFLICHT_RATEN.items()}, (
         f"die Seite zeigt zum Pflichtfall die Zahlweisen {gezeigt}, der "
         f"Bestand trägt {_GW_PFLICHT_RATEN}. Eine Zahlweise, die der "
@@ -635,40 +703,12 @@ def test_leitzahl_des_pflichtfalls_am_bestand(gw_seite):
     )
 
     titel = re.search(r'class="gr-bnd-titel"[^>]*>([^<]+)<', gw_seite["geraete"])
-    fp_geprueft = 0
     if titel and _gw_ist_startpaar(titel.group(1)):
-        fp_geprueft += 1
         fp_antwort = _gw_antwort(gw_seite["geraete"])
         assert fp_antwort and fp_antwort["anb"] == _GW_PFLICHT_ANBIETER
         gw_vergleiche(
             fp_antwort["gesamt"], soll_cent, "Pflichtfall, Antwort-Satz im First Paint"
         )
-        zeile = re.search(
-            r'<details class="gr-bnd"[^>]*data-anbieter="congstar"'
-            rf'[^>]*data-band="{_GW_PFLICHT_BAND}"[^>]*>(.*?)</details>',
-            gw_seite["geraete"],
-            re.S,
-        )
-        assert zeile, f"Bündelzeile congstar/{_GW_PFLICHT_BAND} fehlt im First Paint"
-        kopf = re.search(r"<summary>(.*?)</summary>", zeile.group(1), re.S)
-        assert kopf and _GW_PFLICHT_TARIF in kopf.group(1), (
-            "Bündelzeile nennt nicht den Pflichttarif"
-        )
-        attrs = re.search(r'<details class="gr-bnd"([^>]*)>', zeile.group(0))
-        gesamt_attr = re.search(r'data-gesamt="([\d.]+)"', attrs.group(1))
-        schnitt_attr = re.search(r'data-schnitt="([\d.]+)"', attrs.group(1))
-        assert (
-            gesamt_attr and _gw_Dez(gesamt_attr.group(1)) == _gw_Dez(soll_cent) / 100
-        ), gesamt_attr and gesamt_attr.group(1)
-        assert schnitt_attr and _gw_Dez(schnitt_attr.group(1)) in _gw_o_monat(soll_cent)
-        text = " ".join(re.sub(r"<[^>]+>", " ", zeile.group(1)).split())
-        assert _GW_PFLICHT_LEITZAHL in text, "Leitzahl fehlt wortlich in der Zeile"
-    assert fp_geprueft >= 1, (
-        "Server-First-Paint startet nicht mit dem Pflichtpaar - Antwor- und "
-        "Bündelzeilen-Prüfungen wären still übersprungen. Der Start folgt "
-        "dem Bestand (meiste Anbieter); bei einem Wechsel diesen Zweig "
-        "bewusst neu verankern oder auf ein anderes Fragment-Paar heben."
-    )
 
 
 def _gw_pflichttage_ohne_horizont(bestand: Path, tarif_id: str) -> list[str]:
@@ -687,164 +727,73 @@ def _gw_pflichttage_ohne_horizont(bestand: Path, tarif_id: str) -> list[str]:
 
 
 def test_monatsschnitt_und_restschuld_des_pflichtfalls_am_bestand(gw_seite):
-    """Die Zweitzahl (Ø/Monat) und die Restschuld-Ausweisungen: 'davon
-    nach Monat 24 noch zu zahlen' im Rechenweg und 'danach noch offen' in
-    der Bündelkarte - plus die gekappte Zahl 'nach 24 Monaten gezahlt',
-    die seit A1 NUR noch unter diesem Label stehen darf (die alte,
-    1.093,00 €-Leitzahl war genau um die Restschuld zu niedrig).
+    """Die Zweitzahl (Ø/Monat) und das Ende der Restschuld.
 
-    Die Restschuld ist die EINZIGE Zahl, die die zwei Zahlweisen des
-    Pflichtfalls unterscheidet - 36 x 20,00 lassen nach Monat 24 noch
-    240,00 € offen, 24 x 30,00 nichts. Die Leitzahl (1.216,00 €) und der Ø/Monat sind in
-    beiden Fällen dieselben. Der Test verankert deshalb BEIDE Rechnungen
-    und verlangt die Restschuld genau dort, wo es eine gibt: ein "davon
-    nach Monat 24 noch zu zahlen" unter einer 24-Raten-Zahlweise wäre
-    eine erfundene Schuld, sein Fehlen unter 36 Raten ein Datenverlust."""
+    Bis Datenkonzept Geräte 5.3 trugen beide Zahlweisen des Pflichtfalls
+    dieselbe 24-Monats-Zahl, und die 36er wies „davon nach Monat 24 noch zu
+    zahlen“ und „danach noch offen“ aus. Seit jede Zahlweise über ihren eigenen
+    Zeitraum H rechnet (36 Raten: 36 Monate), liegt jede Rate innerhalb von H:
+    eine Restschuld-Zeile wäre eine erfundene Schuld. Geprüft wird je Zahlweise
+    Ø/Monat = Kosten ÷ H im Rechenweg der Zeile und im Rechenweg-Panel der
+    Zeitreihe, jedes Panel mit dem Etikett seines Zeitraums - und nirgends eine
+    Restschuld."""
     tco, blaetter, _db = _gw_rohdaten(gw_seite["bestand"])
-    soll_cent, je_laufzeit, _tage = _gw_pflichtbuendel(tco, blaetter)
-
-    def _rest(n: int) -> int:
-        return gw_cent(je_laufzeit[n]["geraet_monatsrate"]) * max(0, n - _GW_HORIZONT)
-
-    assert {
-        n: (soll_cent, _rest(n), soll_cent - _rest(n)) for n in sorted(je_laufzeit)
-    } == {24: (121600, 0, 121600), 36: (121600, 24000, 97600)}
+    _soll, je_laufzeit, _tage = _gw_pflichtbuendel(tco, blaetter)
+    soll_je = _gw_pflicht_soll(je_laufzeit, blaetter)
+    assert {n: _gw_o_monat(c, h) for n, (c, h) in soll_je.items()} == {
+        24: {_gw_Dez("50.67")},
+        36: {_gw_Dez("40.44")},
+    }
 
     block = _gw_paar_block(gw_seite["fragment"], _GW_PFLICHT_MODELL, _GW_PFLICHT_BAND)
-    _messtag, inhalt = _gw_neueste_vorlage(block, _GW_PFLICHT_ANBIETER)
-    n_raten = int(
-        re.search(
-            r"<span class='gr-zr-pn'>Geräterate</span>.*?(\d+) × ", inhalt, re.S
-        ).group(1)
+    vorlagen = re.findall(
+        r"<template data-anb='([^']+)' data-m='([^']+)'[^>]*>(.*?)</template>",
+        block or "",
+        re.S,
     )
-    assert n_raten in je_laufzeit, (
-        f"Rechenweg nennt {n_raten} Geräteraten, der Bestand kennt "
-        f"{sorted(je_laufzeit)}"
-    )
-    buendel = je_laufzeit[n_raten]
-    rest_c = _rest(n_raten)
-    offen = re.search(
-        r"davon nach Monat 24 noch zu zahlen: (\d+) × ([\d.,]+) € "
-        r"= ([\d.,]+) €",
-        inhalt,
-    )
-    if rest_c:
-        assert offen, (
-            f"Rechenweg der {n_raten}-Raten-Zahlweise nennt die "
-            f"Restschuld nicht - offen sind {rest_c / 100} €"
+    eigene = [(m, roh) for a, m, roh in vorlagen if a == _GW_PFLICHT_ANBIETER]
+    assert eigene, "kein congstar-Rechenweg im Paar-Block des Pflichtfalls"
+    zahlweisen = set()
+    for messtag, roh in eigene:
+        n = int(re.search(r"Geräterate</span>.*?(\d+) × ", roh, re.S).group(1))
+        assert n in je_laufzeit, f"Rechenweg vom {messtag} nennt {n} Raten"
+        zahlweisen.add(n)
+        _cent, monate = soll_je[n]
+        assert f"Kosten über {monate} Monate" in roh, (messtag, n)
+        assert "noch zu zahlen" not in roh and "Restschuld" not in roh, (
+            f"Rechenweg vom {messtag} ({n} Raten) weist eine Restschuld aus, "
+            f"obwohl alle Raten in {monate} Monaten liegen"
         )
-        assert int(offen.group(1)) == n_raten - _GW_HORIZONT
-        assert _gw_dezimal(offen.group(2)) == _gw_Dez(str(buendel["geraet_monatsrate"]))
-        gw_vergleiche(
-            _gw_dezimal(offen.group(3)),
-            rest_c,
-            "Restschuld im Rechenweg des Pflichtfalls",
-        )
-    else:
-        assert offen is None, (
-            f"Rechenweg nennt eine Restschuld ({offen.group(3)} €), "
-            f"obwohl {n_raten} Raten in {_GW_HORIZONT} Monaten bezahlt "
-            "sind - eine erfundene Schuld"
-        )
-
-    rest_geprueft = 0
-    for n in sorted(je_laufzeit):
-        if n == n_raten or not _rest(n):
-            continue
-        muster = ("Geräterate</span>", f"{n} × ")
-        for _anb, _m, roh in re.findall(
-            r"<template data-anb='([^']+)' data-m='([^']+)'[^>]*>"
-            r"(.*?)</template>",
-            block,
-            re.S,
-        ):
-            if _anb != _GW_PFLICHT_ANBIETER or not all(t in roh for t in muster):
-                continue
-            treffer = re.search(
-                r"davon nach Monat 24 noch zu zahlen: (\d+) × "
-                r"([\d.,]+) € = ([\d.,]+) €",
-                roh,
-            )
-            assert treffer, (
-                f"Rechenweg vom {_m} nennt {n} Raten, aber keine "
-                f"Restschuld - {_rest(n) / 100} € fallen unter den Tisch"
-            )
-            gw_vergleiche(
-                _gw_dezimal(treffer.group(3)),
-                _rest(n),
-                f"Restschuld der {n}-Raten-Zahlweise ({_m})",
-            )
-            rest_geprueft += 1
     tage_ohne_horizont = _gw_pflichttage_ohne_horizont(
-        gw_seite["bestand"], je_laufzeit[n_raten]["tarif_id"]
+        gw_seite["bestand"], je_laufzeit[_GW_HORIZONT]["tarif_id"]
     )
-    assert (rest_geprueft >= 1) == bool(tage_ohne_horizont), (
-        f"{rest_geprueft} Rechenwege mit Restschuld der anderen Zahlweise, "
-        f"die Historie hat {len(tage_ohne_horizont)} Tage ohne die "
-        f"{_GW_HORIZONT}-Raten-Zahlweise - das Fragment hat Messungen verloren "
-        "oder erfunden"
+    assert (zahlweisen != {_GW_HORIZONT}) == bool(tage_ohne_horizont), (
+        f"Rechenwege mit {sorted(zahlweisen)} Raten, die Historie hat "
+        f"{len(tage_ohne_horizont)} Tage ohne die {_GW_HORIZONT}-Raten-Zahlweise"
+        " - das Fragment hat Messungen verloren oder erfunden"
     )
 
-    titel = re.search(r'class="gr-bnd-titel"[^>]*>([^<]+)<', gw_seite["geraete"])
-    fp_geprueft = 0
-    if titel and _gw_ist_startpaar(titel.group(1)):
-        for roh in re.findall(
-            r'<details class="gr-bnd"[^>]*data-anbieter="congstar"'
-            rf'[^>]*data-band="{_GW_PFLICHT_BAND}"[^>]*>(.*?)</details>',
-            gw_seite["geraete"],
-            re.S,
+    geprueft = set()
+    for roh in _gw_modell_zeilen(gw_seite, _GW_PFLICHT_MODELL):
+        text = " ".join(re.sub(r"<[^>]+>", " ", roh).split())
+        raten = re.search(r"in (\d+) Raten à ([\d.,]+) €", text)
+        if (
+            f'data-anbieter="{_GW_PFLICHT_ANBIETER}"' not in roh
+            or f"{_GW_PFLICHT_TARIF} ·" not in text
+            or not raten
         ):
-            text = " ".join(re.sub(r"<[^>]+>", " ", roh).split())
-            raten = re.search(r"in (\d+) Raten à ([\d.,]+) €", text)
-            if f"{_GW_PFLICHT_TARIF} ·" not in text or not raten:
-                continue
-            n = int(raten.group(1))
-            if n not in je_laufzeit:
-                continue
-            fp_geprueft += 1
-            assert _gw_dezimal(raten.group(2)) == _gw_Dez(_GW_PFLICHT_RATEN[n]) / 100, (
-                f"Bündelzeile nennt {raten.group(2)} € je Rate, verankert "
-                f"sind {_GW_PFLICHT_RATEN[n]} Cent"
-            )
-            m = re.search(
-                r"nach 24 Monaten gezahlt: ([\d.,]+) € · "
-                r"danach noch offen: ([\d.,]+) € "
-                r"\((\d+) Geräteraten\)",
-                text,
-            )
-            if _rest(n):
-                assert m, f"Bündelkarte ohne Ausweisung: {text[:160]!r}"
-                gw_vergleiche(
-                    _gw_dezimal(m.group(1)),
-                    soll_cent - _rest(n),
-                    f"'nach 24 Monaten gezahlt' ({n} Raten)",
-                )
-                gw_vergleiche(
-                    _gw_dezimal(m.group(2)),
-                    _rest(n),
-                    f"'danach noch offen' ({n} Raten)",
-                )
-                assert int(m.group(3)) == n - _GW_HORIZONT
-            else:
-                assert m is None, (
-                    f"Bündelkarte weist {m.group(2)} € als offen aus, "
-                    f"obwohl {n} Raten in {_GW_HORIZONT} Monaten bezahlt "
-                    "sind"
-                )
-                assert re.search(r"nach 24 Monaten gezahlt: ([\d.,]+) €", text), (
-                    "auch die voll bezahlte Zahlweise nennt die gekappte "
-                    f"Zahl unter ihrem Label: {text[:160]!r}"
-                )
-            assert "nach 24 Monaten gezahlt" in text
-        assert fp_geprueft == len(je_laufzeit), (
-            f"{fp_geprueft} von {len(je_laufzeit)} Zahlweisen im First "
-            "Paint geprüft - eine Bündelzeile des Pflichttarifs fehlt"
+            continue
+        n = int(raten.group(1))
+        cent, monate = soll_je[n]
+        schnitt = re.search(r"Ø ([\d.,]+) €/Monat", text)
+        assert schnitt and _gw_dezimal(schnitt.group(1)) in _gw_o_monat(cent, monate)
+        assert "noch offen" not in text and "nach 24 Monaten gezahlt" not in text, (
+            f"Bündelzeile ({n} Raten) nennt eine Restschuld: {text[:160]!r}"
         )
-    assert fp_geprueft >= 1, (
-        "Server-First-Paint startet nicht mit dem Pflichtpaar - die "
-        "Ausweisung 'nach 24 Monaten gezahlt / danach noch offen' wäre "
-        "still übersprungen (Fragment-Gegenstück: der offen-Satz im "
-        "Rechenweg oben)."
+        geprueft.add(n)
+    assert geprueft == set(je_laufzeit), (
+        f"Zahlweisen {sorted(geprueft)} geprüft, der Bestand trägt "
+        f"{sorted(je_laufzeit)} - eine Bündelzeile des Pflichttarifs fehlt"
     )
 
 
@@ -1159,11 +1108,12 @@ def test_vodafone_referenz_und_delta_des_pflichtfalls_am_bestand(gw_seite):
 
 def test_geraete_tco_csv_gegen_die_eigene_rechnung(gw_seite):
     """site/exporte/geraete-tco.csv desselben Renders: Jede Bündel-Zeile
-    aus ihren eigenen Postenspalten nachgerechnet (Zuzahlung + 24 × Tarif
-    + Rate × Laufzeit + Anschluss; Bündelform: Bündelbetrag × Laufzeit +
-    Zuzahlung + Anschluss). SIM-only-Zeilen prüft der EIGENE Test mit dem
-    fachlichen Soll inklusive Anschlusspreis (P0.8/A4) - hier stehen sie
-    nicht, damit dieser Test nur die Bündel scharf hält. Und der heutige
+    aus ihren eigenen Postenspalten nachgerechnet (Zuzahlung + H × Tarif
+    + Rate × Laufzeit + Anschluss mit H = 24, bei 36 Raten 36; Bündelform:
+    Bündelbetrag × Laufzeit + Zuzahlung + Anschluss), und ihr Zeitraum H
+    steht in der Spalte „Leitzahl-Zeitraum Monate“. SIM-only-Zeilen prüft der
+    EIGENE Test mit dem fachlichen Soll inklusive Anschlusspreis (P0.8/A4) -
+    hier stehen sie nicht, damit dieser Test nur die Bündel scharf hält. Und der heutige
     Stand zusaetzlich gegen den Store: jedes Bündel mit
     abgerufen_am == tco.updated muss als CSV-Zeile mit genau diesen
     Posten stehen und auf dieselbe Zahl rechnen."""
@@ -1185,16 +1135,18 @@ def test_geraete_tco_csv_gegen_die_eigene_rechnung(gw_seite):
         lz = r["Laufzeit Monate"]
         if r["Art"] == "SIM-only":
             continue
+        monate = max(int(lz), _GW_HORIZONT) if lz else None
         if buendel is not None:
             soll = buendel * int(lz) + (zu or 0) + (anschluss or 0)
         elif lz and tarif is not None and rate is not None:
-            soll = (zu or 0) + tarif * 24 + rate * int(lz) + (anschluss or 0)
+            soll = (zu or 0) + tarif * monate + rate * int(lz) + (anschluss or 0)
         else:
             soll = None
         ist = _n(_gw_leitzahl_aus_zeile(r))
         if soll is None or ist is None:
             continue
         geprueft += 1
+        assert r["Leitzahl-Zeitraum Monate"] == str(monate), (r["Anbieter"], lz)
         if soll != ist:
             abweich.append(
                 (
@@ -1225,9 +1177,12 @@ def test_geraete_tco_csv_gegen_die_eigene_rechnung(gw_seite):
         and r["Abgerufen am"] in tage
     ]
     assert pflicht, f"Pflichtfall fehlt im Export (Stand {gw_seite['stand']})"
+    soll_je = _gw_pflicht_soll(_pflichtbuendel, blaetter)
     for zeile in pflicht:
         gw_vergleiche(
-            _n(_gw_leitzahl_aus_zeile(zeile)), _soll, "Pflichtfall im CSV-Export"
+            _n(_gw_leitzahl_aus_zeile(zeile)),
+            soll_je[int(zeile["Laufzeit Monate"])][0],
+            f"Pflichtfall im CSV-Export, {zeile['Laufzeit Monate']} Raten",
         )
 
     treffer = _gw_csv_store_abgleich(zeilen, tco, blaetter, gw_seite["stand"])
@@ -1269,7 +1224,7 @@ def _gw_csv_store_abgleich(zeilen: list, tco: dict, blaetter: dict, stand: str) 
             or b.get("zustand", "neu") != "neu"
         ):
             continue
-        g, _rest = _gw_leitzahl(b, blaetter)
+        g, _monate = _gw_leitzahl(b, blaetter)
         if g is None:
             continue
         slug = re.sub(r"[^a-z0-9]+", "-", b["sku_id"]).strip("-")
@@ -1430,12 +1385,15 @@ def test_ein_verfaelschter_schnappschuss_macht_den_pflichtfall_rot(gw_seite, tmp
 
 _PF_MODELL_RE = re.compile(r"^(?P<basis>.+)-(?P<gb>\d+)gb(?:-.*)?$")
 _PF_LAGER_RE = re.compile(r'<div class="gr-bnd-lager" data-modell="')
-_PF_DETAIL_RE = re.compile(r'<details class="gr-bnd"(.*?)</details>', re.S)
+_PF_DETAIL_RE = re.compile(
+    r'<details class="gr-bnd(?: gr-bnd--leer)?"(.*?)</details>', re.S
+)
 _PF_ATTR_RE = re.compile(r'data-([a-z]+)="([^"]*)"')
 _PF_TARIF_RE = re.compile(r'gr-bnd-tarif">(.*?)</span>', re.S)
 _PF_BAU_RE = re.compile(r'gr-kk-bau">(.*?)</p>', re.S)
 _PF_RATEN_RE = re.compile(r"in (\d+) Raten")
 _PF_BMONATE_RE = re.compile(r"zusammen · (\d+) Monate")
+_PF_KOPFRATEN_RE = re.compile(r'gr-bnd-raten">\s*(\d+) ')
 
 _PF_FAELLE = (
     ("apple-iphone-18-pro-256", "Vodafone", "Mobil XS"),
@@ -1492,7 +1450,11 @@ def _pf_anbieter_segment(satz_id: str) -> str:
 
 
 def _pf_letzte_messung(
-    historie: list[dict], modell: str, anbieter_slug: str, tarif_teil: str
+    historie: list[dict],
+    modell: str,
+    anbieter_slug: str,
+    tarif_teil: str,
+    laufzeit: int | None = None,
 ) -> dict:
     """Die JUENGSTE Historienzeile eines neuen Geraets zu (Modell, Anbieter,
     Tarifsegment); refurbished und B-Ware stehen auf der Seite in eigenen Zeilen.
@@ -1515,6 +1477,8 @@ def _pf_letzte_messung(
             continue
         if satz.get("zustand") != "neu":
             continue
+        if laufzeit is not None and satz.get("laufzeit_monate") != laufzeit:
+            continue
         treffer.append(satz)
     assert treffer, (
         "kein Messpunkt in der Historie fuer "
@@ -1524,7 +1488,7 @@ def _pf_letzte_messung(
     return sorted(treffer, key=lambda s: (s.get("datum", ""), s.get("id", "")))[-1]
 
 
-def pf_leitzahl_cent(satz: dict) -> int:
+def pf_leitzahl_cent(satz: dict, blaetter: dict) -> int | None:
     """Die Soll-Leitzahl in Cent - EIGENE Rechnung aus den Posten.
 
     Rundung: jeder Posten wird einzeln auf ganze Cent gebracht (HALF_UP),
@@ -1533,15 +1497,15 @@ def pf_leitzahl_cent(satz: dict) -> int:
     Cent, nicht 30,4999.
 
     Eine Luecke ist eine Luecke: fehlt ein Posten, wirft diese Funktion.
-    Keine 0, kein `or`-Vorgabewert (CLAUDE.md Clean Code 3)."""
+    Keine 0, kein `or`-Vorgabewert (CLAUDE.md Clean Code 3). Gerechnet wird
+    über den Zeitraum H (`_gw_leitzahl`); nennt das Tarifblatt den Preis eines
+    Monats bis H nicht, ist die Antwort None - auch die Seite trägt dann keine
+    Zahl."""
     for feld in ("geraet_zuzahlung", "anschlusspreis", "laufzeit_monate"):
         assert satz.get(feld) is not None, (
             f"Posten {feld} fehlt in {satz.get('id')} - eine Leitzahl "
             "daraus waere geraten"
         )
-    laufzeit = int(satz["laufzeit_monate"])
-    zuzahlung = gw_cent(satz["geraet_zuzahlung"])
-    anschluss = gw_cent(satz["anschlusspreis"])
     buendelbetrag = satz.get("buendel_monatlich")
     rate = satz.get("geraet_monatsrate")
     tarif = satz.get("tarif_monatlich")
@@ -1550,13 +1514,11 @@ def pf_leitzahl_cent(satz: dict) -> int:
             f"{satz.get('id')} traegt Buendelbetrag UND getrennte Posten - "
             "welcher gilt, ist dann eine Meinung"
         )
-        return zuzahlung + gw_cent(buendelbetrag) * laufzeit + anschluss
-    assert tarif is not None and rate is not None, (
-        f"{satz.get('id')} hat weder Buendelbetrag noch Tarif+Rate"
-    )
-    return (
-        zuzahlung + gw_cent(tarif) * _GW_HORIZONT + gw_cent(rate) * laufzeit + anschluss
-    )
+    else:
+        assert tarif is not None and rate is not None, (
+            f"{satz.get('id')} hat weder Buendelbetrag noch Tarif+Rate"
+        )
+    return _gw_leitzahl(satz, blaetter)[0]
 
 
 def pf_seitenzeilen(fragment: str, geraete_html: str = "") -> dict:
@@ -1599,12 +1561,16 @@ def _pf_zeilen_aus_block(block: str) -> list:
     out = []
     for roh in _PF_DETAIL_RE.findall(block):
         attr = dict(_PF_ATTR_RE.findall(roh))
-        if "gesamt" not in attr or not attr["gesamt"]:
+        if "anbieter" not in attr:
             continue
         tarif = _PF_TARIF_RE.search(roh)
         bau = _PF_BAU_RE.search(roh)
         text = " ".join(_gw_text(bau.group(1)).split()) if bau else ""
-        raten = _PF_RATEN_RE.search(text) or _PF_BMONATE_RE.search(text)
+        raten = (
+            _PF_RATEN_RE.search(text)
+            or _PF_BMONATE_RE.search(text)
+            or _PF_KOPFRATEN_RE.search(roh)
+        )
         out.append(
             {
                 "anbieter": _gw_text(attr.get("anbieter", "")),
@@ -1612,7 +1578,7 @@ def _pf_zeilen_aus_block(block: str) -> list:
                 "tarif": " ".join(_gw_text(tarif.group(1)).split()).split(" · ")[0]
                 if tarif
                 else "",
-                "gesamt_cent": gw_cent(attr["gesamt"]),
+                "gesamt_cent": gw_cent(attr["gesamt"]) if attr.get("gesamt") else None,
                 "laufzeit_raten": int(raten.group(1)) if raten else None,
                 "bau": text,
             }
@@ -1633,13 +1599,17 @@ def test_pf_leitzahl_von_zehn_buendeln_gegen_die_historie(gw_seite):
 
     Die vier Geraete der Historie im Schnappschuss (iPhone 18 Pro 256,
     iPhone 17 256, Galaxy S26 Ultra 256, Pixel 11 256) x je Anbieter ein
-    Buendel. Gerechnet wird
-    Anzahlung + 24 x Tarif + Laufzeit x Rate + Anschlusspreis, bei 1&1
-    Anzahlung + Laufzeit x Buendelbetrag + Anschlusspreis.
+    Buendel, JE RATENLAUFZEIT verglichen (Datenkonzept Geraete 5.5: 24 Raten
+    nie gegen 36). Gerechnet wird ueber H = max(Laufzeit, Bindung):
+    Anzahlung + Tarif in jedem Monat 1 bis H + Laufzeit x Rate +
+    Anschlusspreis, bei 1&1 Anzahlung + H x Buendelbetrag + Anschlusspreis.
+    Nennt das Blatt einen Monat bis H nicht, traegt auch die Seite keine Zahl.
 
     Greift ein Lookup ins Leere (Modell nicht gerendert, Tarif nicht in
-    der Historie), ist das rot - nicht uebersprungen."""
+    der Historie), ist das rot - nicht uebersprungen. Jeder Fall traegt
+    mindestens eine nachgerechnete Zahl."""
     historie = _pf_historie(gw_seite["bestand"])
+    _tco, blaetter, _db = _gw_rohdaten(gw_seite["bestand"])
     seite = pf_seitenzeilen(gw_seite["buendel"], gw_seite["geraete"])
     assert seite, "kein einziger Buendelblock im gerenderten HTML"
 
@@ -1650,7 +1620,7 @@ def test_pf_leitzahl_von_zehn_buendeln_gegen_die_historie(gw_seite):
         "Telekom": "telekom",
         "1&1": "1-1",
     }
-    geprueft = []
+    geprueft, zahlen = [], 0
     for modell, anbieter, tarif in _PF_FAELLE:
         kandidaten = [
             z
@@ -1663,27 +1633,41 @@ def test_pf_leitzahl_von_zehn_buendeln_gegen_die_historie(gw_seite):
             f"Die Seite fuehrt kein neu-Buendel {anbieter}/{tarif} zu "
             f"{modell} - Lookup ins Leere, der Test prueft sonst nichts"
         )
-        satz = _pf_letzte_messung(
-            historie,
-            modell,
-            slug[anbieter],
-            re.sub(r"[^a-z0-9]+", "-", tarif.lower()).strip("-"),
-        )
-        soll = pf_leitzahl_cent(satz)
-        ist = min(z["gesamt_cent"] for z in kandidaten)
-        assert ist == soll, (
-            f"{modell} / {anbieter} / {tarif}: Seite zeigt "
-            f"{ist / 100:.2f} EUR, die eigene Rechnung aus "
-            f"{satz['id']} (Messung {satz['datum']}, Laufzeit "
-            f"{satz['laufzeit_monate']} Monate) ergibt {soll / 100:.2f} EUR"
-        )
-        assert ist + 100 != soll and ist - 100 != soll
+        mit_zahl = 0
+        for laufzeit in sorted({z["laufzeit_raten"] for z in kandidaten}):
+            assert laufzeit is not None, f"{modell}/{anbieter}: Zeile ohne Ratenzahl"
+            satz = _pf_letzte_messung(
+                historie,
+                modell,
+                slug[anbieter],
+                re.sub(r"[^a-z0-9]+", "-", tarif.lower()).strip("-"),
+                laufzeit,
+            )
+            soll = pf_leitzahl_cent(satz, blaetter)
+            zeilen = [z for z in kandidaten if z["laufzeit_raten"] == laufzeit]
+            if soll is None:
+                assert all(z["gesamt_cent"] is None for z in zeilen), (
+                    f"{modell} / {anbieter} / {tarif} ({laufzeit} Raten): die "
+                    "eigene Rechnung findet eine Luecke, die Seite zeigt eine Zahl"
+                )
+                continue
+            ist = min(z["gesamt_cent"] for z in zeilen if z["gesamt_cent"] is not None)
+            assert ist == soll, (
+                f"{modell} / {anbieter} / {tarif} ({laufzeit} Raten): Seite zeigt "
+                f"{ist / 100:.2f} EUR, die eigene Rechnung aus "
+                f"{satz['id']} (Messung {satz['datum']}) ergibt {soll / 100:.2f} EUR"
+            )
+            assert ist + 100 != soll and ist - 100 != soll
+            mit_zahl += 1
+        assert mit_zahl, f"{modell} / {anbieter} / {tarif}: keine einzige Zahl geprueft"
+        zahlen += mit_zahl
         geprueft.append((modell, anbieter, tarif))
 
     assert len(geprueft) >= _PF_MINDESTFAELLE, (
         f"nur {len(geprueft)} von {_PF_MINDESTFAELLE} Faellen "
         "nachgerechnet - der Test greift nicht mehr"
     )
+    assert zahlen > len(geprueft), "keine zweite Ratenlaufzeit nachgerechnet"
 
 
 _PF_RECHENWEGE_MIT_HISTORIE = 260
@@ -1915,7 +1899,9 @@ def test_pf_simonly_mit_erhobenem_volumen_traegt_sein_band(gw_seite):
     )
 
 
-_PR_DETAIL_RE = re.compile(r'<details class="gr-bnd"(.*?)</details>', re.S)
+_PR_DETAIL_RE = re.compile(
+    r'<details class="gr-bnd(?: gr-bnd--leer)?"(.*?)</details>', re.S
+)
 _PR_ATTR_RE = re.compile(r'data-([a-z]+)="([^"]*)"')
 _PR_LABEL_RE = re.compile(r'gr-bnd-label">([^<]*)<')
 _PR_RWZ_RE = re.compile(r'gr-bnd-rw-z">(.*?)</p>', re.S)
@@ -2001,52 +1987,60 @@ def _pr_buendelzeilen(gw_seite: dict) -> list[dict]:
 
 
 def test_pr_fuenf_leitzahlen_gegen_die_historie_nachgerechnet(gw_seite):
-    """Fuenf Zahlen der Seite, EIGENE Rechnung aus der Historie.
+    """Fuenf Bündel je Ratenlaufzeit, EIGENE Rechnung aus der Historie.
 
-    Definition (Auftrag): Anzahlung + 24 Monate Tarif + ALLE Geraeteraten
-    einschliesslich der Restschuld nach Monat 24 + Anschlusspreis. Bei
-    einem zusammengelegten Buendelmonatspreis (1&1) tritt dieser Betrag
-    ueber seine eigene Laufzeit an die Stelle von Tarif UND Rate.
+    Definition (Datenkonzept Geraete 5.3, Entscheidung 1): Kosten ueber H =
+    max(Ratenlaufzeit, Tarifbindung) Monate = Anzahlung + Tarif in jedem Monat
+    1 bis H + ALLE Geraeteraten + Anschlusspreis. Bei einem zusammengelegten
+    Buendelmonatspreis (1&1) tritt dieser Betrag ueber H an die Stelle von
+    Tarif UND Rate. Nennt das Tarifblatt den Preis eines Monats bis H nicht,
+    ist die Zahl eine Luecke - auf der Seite steht dann keine.
 
     Rundung offen benannt: jeder Monatsbetrag wird als ganze Cent gelesen
     und danach multipliziert (eine Rate von 30,50 EUR ist 3050 Cent), die
     Summe bleibt exakt - keine Gleitkommatoleranz.
 
-    Nachgerechnet am Schnappschuss, je juengste Messung, Seite == Soll:
-      congstar / iPhone 18 Pro 256 / Allnet Flat XS, 36 Raten
-        199,00 + 24 x 15,00 + 36 x 33,00 + 15,00            = 1.762,00 EUR
-      o2 / iPhone 18 Pro 256 / Unlimited M, 36 Raten
-        1,00 + 24 x 24,99 + 36 x 43,50 + 0,00               = 2.166,76 EUR
-      Vodafone / iPhone 18 Pro 256 / Mobil XS, 36 Raten
-        0,99 + 24 x 31,95 + 36 x 40,00 + 0,00               = 2.207,79 EUR
+    Nachgerechnet am Schnappschuss, je juengste Messung der Laufzeit:
+      congstar / iPhone 18 Pro 256 / Allnet Flat XS
+        24 Raten: 199,00 + 24 x 15,00 + 24 x 49,50 + 15,00  = 1.762,00 EUR
+        36 Raten: 199,00 + 36 x 15,00 + 36 x 33,00 + 15,00  = 1.942,00 EUR
+      o2 / iPhone 18 Pro 256 / Unlimited M
+        24 Raten: 7,00 + 24 x 24,99 + 24 x 65,00 + 0,00     = 2.166,76 EUR
+        36 Raten: Blatt ohne Preis ab Monat 25               = Luecke
+      Vodafone / iPhone 18 Pro 256 / Mobil XS
+        12 Raten: 0,99 + 24 x 31,95 + 12 x 120,00 + 0,00    = 2.207,79 EUR
+        24 Raten: 0,99 + 24 x 31,95 + 24 x 60,00 + 0,00     = 2.207,79 EUR
+        36 Raten: Blatt ohne Preis ab Monat 25               = Luecke
       1&1 / iPhone 18 Pro 256 / All-Net-Flat S, Buendelbetrag
-        420,00 + 36 x 49,99 + 39,90                         = 2.259,54 EUR
-      congstar / Galaxy S26 Ultra 256 / Allnet Flat S, 36 Raten
-        119,00 + 24 x 20,00 + 36 x 29,00 + 15,00            = 1.658,00 EUR
-    Verglichen wird mit der Zeile derselben Ratenlaufzeit: o2 und Vodafone
-    tragen je Tarif mehrere Zahlweisen mit verschiedenen Leitzahlen.
+        36 Monate: 420,00 + 36 x 49,99 + 39,90              = 2.259,54 EUR
+      congstar / Galaxy S26 Ultra 256 / Allnet Flat S
+        24 Raten: 119,00 + 24 x 20,00 + 24 x 43,50 + 15,00  = 1.658,00 EUR
+        36 Raten: 119,00 + 36 x 20,00 + 36 x 29,00 + 15,00  = 1.898,00 EUR
+    Verglichen wird nur mit der Zeile derselben Ratenlaufzeit.
     """
     historie = _pf_historie(gw_seite["bestand"])
+    _tco, blaetter, _db = _gw_rohdaten(gw_seite["bestand"])
+    o2_tarif = "o2-mobile-unlimited-m-mit-100-mbit-s-24-mon"
     faelle = (
-        ("apple-iphone-18-pro-256", "congstar", "allnet-flat-xs", 176200),
-        (
-            "apple-iphone-18-pro-256",
-            "o2",
-            "o2-mobile-unlimited-m-mit-100-mbit-s-24-mon",
-            216676,
-        ),
-        ("apple-iphone-18-pro-256", "vodafone", "mobil-xs", 220779),
-        ("apple-iphone-18-pro-256", "1-1", "1-1-all-net-flat-s", 225954),
-        ("samsung-galaxy-s26-ultra-256", "congstar", "allnet-flat-s", 165800),
+        ("apple-iphone-18-pro-256", "congstar", "allnet-flat-xs", 24, 176200),
+        ("apple-iphone-18-pro-256", "congstar", "allnet-flat-xs", 36, 194200),
+        ("apple-iphone-18-pro-256", "o2", o2_tarif, 24, 216676),
+        ("apple-iphone-18-pro-256", "o2", o2_tarif, 36, None),
+        ("apple-iphone-18-pro-256", "vodafone", "mobil-xs", 12, 220779),
+        ("apple-iphone-18-pro-256", "vodafone", "mobil-xs", 24, 220779),
+        ("apple-iphone-18-pro-256", "vodafone", "mobil-xs", 36, None),
+        ("apple-iphone-18-pro-256", "1-1", "1-1-all-net-flat-s", 36, 225954),
+        ("samsung-galaxy-s26-ultra-256", "congstar", "allnet-flat-s", 24, 165800),
+        ("samsung-galaxy-s26-ultra-256", "congstar", "allnet-flat-s", 36, 189800),
     )
     zeilen = _pr_buendelzeilen(gw_seite)
-    geprueft, fehler = 0, []
-    for modell, slug, tarifteil, verankert in faelle:
-        satz = _pf_letzte_messung(historie, modell, slug, tarifteil)
-        soll = pf_leitzahl_cent(satz)
+    geprueft, luecken, fehler = 0, 0, []
+    for modell, slug, tarifteil, laufzeit, verankert in faelle:
+        satz = _pf_letzte_messung(historie, modell, slug, tarifteil, laufzeit)
+        soll = pf_leitzahl_cent(satz, blaetter)
         assert soll == verankert, (
-            f"{slug}/{tarifteil} zu {modell}: eigene Rechnung "
-            f"{soll / 100} EUR gegen verankerte {verankert / 100} EUR"
+            f"{slug}/{tarifteil} zu {modell} ({laufzeit} Raten): eigene Rechnung "
+            f"{soll} Cent gegen verankerte {verankert} Cent"
         )
         treffer = [
             z
@@ -2054,26 +2048,30 @@ def test_pr_fuenf_leitzahlen_gegen_die_historie_nachgerechnet(gw_seite):
             if _pr_anbieter_slug(z["anbieter"]) == slug
             and _pr_tarifteil(z["tarif"]) == tarifteil
             and z["attribute"].get("zustand") == "neu"
-            and _pr_ratenzahl(z) in (None, satz["laufzeit_monate"])
-            and z["attribute"].get("gesamt")
+            and _pr_ratenzahl(z) in (None, laufzeit)
             and z["modell"] == modell
         ]
         assert treffer, (
-            f"keine Buendelzeile {slug}/{tarifteil} zu {modell} auf der "
-            "Seite - der Lookup greift ins Leere und dieser Test wuerde "
+            f"keine Buendelzeile {slug}/{tarifteil} ({laufzeit} Raten) zu {modell} "
+            "auf der Seite - der Lookup greift ins Leere und dieser Test wuerde "
             "sonst gruen nichts pruefen"
         )
         for zeile in treffer:
+            gezeigt = zeile["attribute"].get("gesamt")
+            if soll is None:
+                luecken += 1
+                if gezeigt:
+                    fehler.append((modell, slug, laufzeit, gezeigt, "Luecke"))
+                continue
             geprueft += 1
             ist = int(
-                (_gw_Dez(zeile["attribute"]["gesamt"]) * 100).to_integral_value(
-                    rounding=_gw_HUP
-                )
+                (_gw_Dez(gezeigt or "0") * 100).to_integral_value(rounding=_gw_HUP)
             )
-            if ist != soll:
-                fehler.append((modell, slug, tarifteil, ist, soll))
-    assert geprueft >= len(faelle), (
-        f"nur {geprueft} Zeilen geprueft - erwartet mindestens {len(faelle)}"
+            if not gezeigt or ist != soll:
+                fehler.append((modell, slug, laufzeit, gezeigt, soll))
+    assert geprueft >= 8 and luecken >= 2, (
+        f"nur {geprueft} Zahlen und {luecken} Luecken geprueft - der Lookup greift "
+        "ins Leere"
     )
     assert not fehler, f"Seite gegen eigene Rechnung: {fehler}"
 
@@ -2169,12 +2167,17 @@ def test_pr_kein_vorzeichen_gegen_vodafone_ueber_zwei_zeitraeume(gw_seite):
     allein die zwoelf Tarifmonate jenseits des Horizonts (12 x 14,99 EUR
     nach `tarife.jsonl` = 179,88 EUR) sind groesser als jedes hier
     ausgewiesene Delta. Geprueft wird: kein Vorzeichen fuer ein Angebot,
-    dessen Buendelzeile den Zeitraum 36 nennt."""
+    dessen Buendelzeile den Zeitraum 36 nennt.
+
+    Der Schluessel traegt das Modell: seit die Kernzahl ueber H rechnet
+    (Datenkonzept Geraete 5.3), stehen viele 36er-Zeilen auf der Seite, und
+    gleiche Betraege verschiedener Geraete sind kein Treffer."""
     zeilen = _pr_buendelzeilen(gw_seite)
     andere_laufzeit = {
-        (_pr_anbieter_slug(z["anbieter"]), z["attribute"].get("gesamt"))
+        (z["modell"], _pr_anbieter_slug(z["anbieter"]), z["attribute"].get("gesamt"))
         for z in zeilen
-        if (_PR_MONATE_RE.search(z["etikett"]) or [None, "24"])[1] != "24"
+        if z["attribute"].get("gesamt")
+        and (_PR_MONATE_RE.search(z["etikett"]) or [None, "24"])[1] != "24"
     }
     assert andere_laufzeit, (
         "keine Zeile mit abweichendem Zeitraum auf der Seite - der Test "
@@ -2189,9 +2192,11 @@ def test_pr_kein_vorzeichen_gegen_vodafone_ueber_zwei_zeitraeume(gw_seite):
             (attribute.get("anbieter") or "").replace("&amp;", "&")
         )
         gesamt = attribute.get("gesamt")
+        modell = re.search(r'data-modell="([^"]+)"', block)
+        assert modell is not None, "Alarmzeile ohne data-modell - der Schluessel fehlt"
         if not attribute.get("prozent"):
             continue
-        if (anbieter, gesamt) in andere_laufzeit:
+        if (modell.group(1), anbieter, gesamt) in andere_laufzeit:
             mit_vorzeichen.append(
                 (attribute.get("geraet"), anbieter, gesamt, attribute.get("prozent"))
             )
@@ -2270,41 +2275,22 @@ _PZ_TOLERANZ = _gw_Dez("0.01")
 _PZ_CSV_ZEITRAUM = "Leitzahl-Zeitraum Monate"
 
 
-def _pz_soll(b: dict) -> tuple:
-    """(Leitzahl, Zeitraum) aus den ROHFELDERN - oder (None, None).
+def _pz_soll(b: dict, blaetter: dict) -> tuple:
+    """(Leitzahl in Euro, Zeitraum H) aus den ROHFELDERN - oder (None, H).
 
     Zwei Formen, genau wie die Anbieter sie ausweisen:
       * zusammengelegter Monatsbetrag (`buendel_monatlich`, 1&1): Tarif und
-        Geraet in EINER Rate, der Zeitraum ist die eigene Laufzeit.
-      * getrennt (`tarif_monatlich` + `geraet_monatsrate`): 24 Tarifmonate,
-        dazu ALLE Geraeteraten der eigenen Laufzeit - der Zeitraum dieser
-        Zahl ist 24.
-    Ohne gemessene Laufzeit gibt es keine Summe und keinen Zeitraum (None,
-    nie 0, nie geraten).
+        Geraet in EINER Rate ueber H Monate.
+      * getrennt (`tarif_monatlich` + `geraet_monatsrate`): der Tarif in jedem
+        Monat 1 bis H, dazu ALLE Geraeteraten der eigenen Laufzeit.
+    H ist der groessere Wert aus Ratenlaufzeit und Tarifbindung (Datenkonzept
+    Geraete 5.3). Fehlt ein Posten oder der Preis eines Monats, gibt es keine
+    Summe (None, nie 0, nie geraten) - dieselbe Rechnung wie `_gw_leitzahl`.
     """
-
-    def dez(wert):
-        return None if wert is None else _gw_Dez(str(wert))
-
-    zu = dez(b.get("geraet_zuzahlung")) or _gw_Dez("0")
-    anschluss = dez(b.get("anschlusspreis")) or _gw_Dez("0")
-    laufzeit = b.get("laufzeit_monate")
-    zusammen = dez(b.get("buendel_monatlich"))
-    tarif = dez(b.get("tarif_monatlich"))
-    rate = dez(b.get("geraet_monatsrate"))
-    if zusammen is not None:
-        if laufzeit is None:
-            return None, None
-        summe = zu + zusammen * laufzeit + anschluss
-        return summe.quantize(_gw_Dez("0.01"), rounding=_gw_HUP), laufzeit
-    if tarif is None:
-        return None, None
-    summe = zu + tarif * _GW_HORIZONT + anschluss
-    if rate is not None:
-        if laufzeit is None:
-            return None, None
-        summe = summe + rate * laufzeit
-    return summe.quantize(_gw_Dez("0.01"), rounding=_gw_HUP), _GW_HORIZONT
+    cent, monate = _gw_leitzahl(b, blaetter)
+    if cent is None:
+        return None, monate
+    return (_gw_Dez(cent) / 100).quantize(_gw_Dez("0.01"), rounding=_gw_HUP), monate
 
 
 def _pz_zeilen(html: str) -> list[dict]:
@@ -2341,12 +2327,10 @@ def test_pruefer_jede_leitzahl_der_seite_gegen_eine_eigene_rechnung(gw_seite):
     beide Zeitraeume des Bestands (24 UND 36) muessen vorkommen - sonst
     prueft der Test die interessante Haelfte nicht.
     """
-    stand = json.loads(
-        (gw_seite["bestand"] / "state" / "geraete_tco.json").read_text(encoding="utf-8")
-    )
+    stand, blaetter, _db = _gw_rohdaten(gw_seite["bestand"])
     soll: dict[tuple, set] = {}
     for b in stand["buendel"]:
-        betrag, monate = _pz_soll(b)
+        betrag, monate = _pz_soll(b, blaetter)
         if betrag is None:
             continue
         soll.setdefault((b["anbieter"], betrag), set()).add(monate)
@@ -2557,15 +2541,37 @@ def test_pruefer_der_csv_kopf_widerspricht_nicht_seiner_zeitraum_spalte(gw_seite
             f"Wert nennt: {fremd[:4]}"
         )
 
-    stumm = [
-        (z["Anbieter"], z[_PZ_CSV_ZEITRAUM])
-        for z in zeilen
-        if (z[_PZ_CSV_ZEITRAUM] or "").strip()
-        and not any((z[k] or "").strip() for k in spalten)
-    ]
+    stand, blaetter, _db = _gw_rohdaten(gw_seite["bestand"])
+    luecke_je_schluessel: dict[tuple, set] = {}
+    for b in stand["buendel"]:
+        schluessel = (
+            b["anbieter"],
+            b.get("sku_id") or "",
+            b.get("tarif_name") or "",
+            str(b.get("laufzeit_monate") or ""),
+        )
+        luecke_je_schluessel.setdefault(schluessel, set()).add(
+            _gw_leitzahl(b, blaetter)[0] is None
+        )
+    stumm, unbenannt = [], []
+    for z in zeilen:
+        if not (z[_PZ_CSV_ZEITRAUM] or "").strip() or z["Art"] != "Bündel":
+            continue
+        if any((z[k] or "").strip() for k in spalten):
+            continue
+        schluessel = (z["Anbieter"], z["SKU-ID"], z["Tarif"], z["Laufzeit Monate"])
+        if luecke_je_schluessel.get(schluessel) != {True}:
+            stumm.append((z["Anbieter"], z[_PZ_CSV_ZEITRAUM], z["Tarif"]))
+        elif not (z.get("Lücke") or "").strip():
+            unbenannt.append((z["Anbieter"], z["Tarif"], z["Status"]))
     assert not stumm, (
         f"{len(stumm)} Zeilen tragen einen Zeitraum, aber in keiner "
-        f"'Kosten über'-Spalte eine Zahl: {stumm[:4]}"
+        f"'Kosten über'-Spalte eine Zahl, obwohl die eigene Rechnung eine "
+        f"kennt: {stumm[:4]}"
+    )
+    assert not unbenannt, (
+        f"{len(unbenannt)} Zeilen ohne Zahl nennen ihre Luecke nicht (Spalte Lücke): "
+        f"{unbenannt[:4]}"
     )
     doppelt = [
         (z["Anbieter"], z[_PZ_CSV_ZEITRAUM])

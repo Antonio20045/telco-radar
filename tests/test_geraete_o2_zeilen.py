@@ -374,8 +374,13 @@ def _euro(betrag: float) -> str:
 
 def test_jede_zeile_traegt_rechenweg_pflichtzeile_und_belege(tmp_path):
     """A6: Der Rechenweg-Aufklapper einer Zeile trägt, was die Karte trug -
-    die Postenliste, die Pflichtzeile aus A5.2 ("nach 24 Monaten gezahlt"),
-    den vollen Delta-Satz mit Referenz-Tarif, Beleglink UND Abrufdatum."""
+    die Postenliste, den Zeitraum der Zahl, den vollen Delta-Satz mit
+    Referenz-Tarif, Beleglink UND Abrufdatum.
+
+    Die Pflichtzeile aus A5.2 ("nach 24 Monaten gezahlt … noch offen") ist mit
+    Datenkonzept Geräte Schritt 2 gefallen: die Zahl rechnet alle Raten und
+    den Tarif über H Monate, offen bleibt nichts. An ihrer Stelle steht der
+    Zeitraum ("Gerechnet über H Monate") - dieselbe Zahl wie das Etikett."""
     s = _baue(tmp_path)
     zeilen = s.select("#tafel-tco .gr-bnd")
     assert zeilen
@@ -384,9 +389,11 @@ def test_jede_zeile_traegt_rechenweg_pflichtzeile_und_belege(tmp_path):
         assert rw is not None
         posten = rw.select(".gr-tposten li")
         assert posten, f"{z.get('data-anbieter')}: Rechenweg ohne Posten"
-        assert "nach 24 Monaten gezahlt" in vorlage_text(rw), (
-            f"{z.get('data-anbieter')}: Pflichtzeile fehlt"
+        monate = z.get("data-leitzahl-monate")
+        assert monate and f"Gerechnet über {monate} Monate" in vorlage_text(rw), (
+            f"{z.get('data-anbieter')}: der Zeitraum der Zahl fehlt im Rechenweg"
         )
+        assert "noch offen" not in vorlage_text(rw)
         assert rw.select_one("a[href]") is not None, (
             f"{z.get('data-anbieter')}: kein Beleglink im Rechenweg"
         )

@@ -306,6 +306,11 @@ def test_ueber_zwei_zeitraeume_steht_der_zustand_statt_eines_vorzeichens():
     Gegen den alten Stand rot: dort stand ein Δ mit Vorzeichen (bis B1 ein
     Euro-Betrag, danach der Ø/Monat-Abstand - beide aus zwei Summen
     verschiedener Zeitraeume).
+
+    Seit Datenkonzept Geräte Schritt 2 rechnet auch congstar mit 36 Raten über
+    36 Monate (1 + 36 × 15,00 + 36 × 25,50 = 1.459,00 EUR) und trägt kein Δ
+    gegen die 24-Monats-Referenz; die Gegenprobe mit Vorzeichen ist congstar mit
+    24 Raten.
     """
     modell = _modell([_einsundeins(), _vodafone()])
     eins = next(k for k in modell["karten"] if k["anbieter"] == "1&1")
@@ -325,7 +330,12 @@ def test_ueber_zwei_zeitraeume_steht_der_zustand_statt_eines_vorzeichens():
         vorlage_text(zeile.select_one(".gr-kk-luecke")) == eins["delta_zustand"]["satz"]
     )
 
-    modell2 = _modell([_congstar(36, 25.5), _vodafone()])
+    sechsunddreissig = _modell([_congstar(36, 25.5), _vodafone()])
+    cs36 = next(k for k in sechsunddreissig["karten"] if k["anbieter"] == "congstar")
+    assert cs36["leitzahl_monate"] == 36 and cs36["gesamt"] == 1459.0
+    assert cs36["delta"] is None, "36 Raten stehen nie gegen eine 24-Monats-Zahl"
+
+    modell2 = _modell([_congstar(24, 38.25), _vodafone()])
     cs = next(k for k in modell2["karten"] if k["anbieter"] == "congstar")
     assert cs["leitzahl_monate"] == 24
     assert cs["delta_zustand"] is None
@@ -420,9 +430,7 @@ def test_eine_rate_ohne_laufzeit_wirft_keinen_typeerror():
         heute=HEUTE,
     )
     assert karte["raten_summe"] is None, "keine Ratensumme ohne ihre Monate"
-    assert karte["offene_raten"] is None, (
-        "unbekannt viele offene Raten sind nicht null offene Raten"
-    )
+    assert "offene_raten" not in karte, "eine Restschuld gibt es nicht mehr"
     assert karte["belastbar"] is False
     assert "Ratenlaufzeit" in karte["luecken"]
     assert "keine belastbare Zahl" in vorlage_text(zeile_html(karte))
@@ -438,7 +446,7 @@ def test_eine_rate_ohne_laufzeit_wirft_keinen_typeerror():
         heute=HEUTE,
     )
     assert karte36["raten_summe"] == 1098.0
-    assert karte36["offene_raten"] == 12
+    assert karte36["leitzahl_monate"] == 36
 
 
 _KATALOG = {

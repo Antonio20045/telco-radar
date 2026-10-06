@@ -61,6 +61,7 @@ SPALTEN_TCO = [
     "Quelle",
     "SKU-ID",
     "Status",
+    "Lücke",
 ]
 
 
@@ -152,7 +153,12 @@ def test_die_leitzahl_zeitraum_spalte_ist_die_von_tco_24(tco_csv):
     Geraeteraten selbst laenger laufen (congstar: 36 Raten in einer
     24-Monats-Leitzahl - "Laufzeit Monate" und "Leitzahl-Zeitraum Monate"
     sind dort verschiedene Zahlen, und genau das ist der Punkt: die eine
-    ist die RATENlaufzeit, die andere der Zeitraum der Summe daneben)."""
+    ist die RATENlaufzeit, die andere der Zeitraum der Summe daneben).
+
+    Seit Datenkonzept Geräte Schritt 2 ist der Zeitraum der aufgeteilten Form
+    H = größerer Wert aus Ratenlaufzeit und Tarifbindung: 12 und 24 Raten
+    tragen 24, 36 Raten 36. Die Gegenprobe bleibt: 12 Raten liegen unter
+    ihrem Zeitraum, und eine 36-Raten-Zeile trägt 36."""
     from telco_radar.tco_model import TCO_HORIZONT
 
     kopf, zeilen = tco_csv
@@ -170,12 +176,14 @@ def test_die_leitzahl_zeitraum_spalte_ist_die_von_tco_24(tco_csv):
     aufgeteilt = [z for z in buendel if not z[idx["Bündel/Monat EUR"]]]
     assert aufgeteilt, "keine aufgeteilte Zeile im Bestand"
     for z in aufgeteilt:
-        assert z[idx["Leitzahl-Zeitraum Monate"]] == str(TCO_HORIZONT), z
+        soll = max(int(z[idx["Laufzeit Monate"]]), TCO_HORIZONT)
+        assert z[idx["Leitzahl-Zeitraum Monate"]] == str(soll), z
     laenger = [
         z
         for z in aufgeteilt
         if z[idx["Laufzeit Monate"]] not in ("", str(TCO_HORIZONT))
     ]
+    assert {z[idx["Leitzahl-Zeitraum Monate"]] for z in laenger} == {"24", "36"}
     assert laenger, (
         "keine aufgeteilte Zeile mit abweichender "
         "Ratenlaufzeit im Bestand - die Gegenprobe greift "

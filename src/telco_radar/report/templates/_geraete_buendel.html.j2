@@ -80,18 +80,16 @@
       if k.naeherung %} <span class="gr-kk-marke">Referenzrechnung</span>{%
       endif %}</span>
     {# D3, PUNKT 1 (gemessen): zwei Zahlweisen DESSELBEN Tarifs (congstar
-       seit dem 22.09. 24 UND 36 Raten) trugen zugeklappt woertlich
-       denselben Text - der Unterschied stand erst im Rechenweg. Die
-       Ratenlaufzeit gehoert deshalb HIER auf die Zeile, knapp, und bei
-       einer offenen Restschuld (`offen_nach_24`, echte 0,0 faellt per
-       Truthiness heraus - "24 Raten" ohne Zusatz ist dann schon der
-       Unterschied) auch ihr Betrag - dieselbe Zahl, die der Rechenweg
-       unter "danach noch offen" traegt, hier nur eine Ebene hoeher. #}
+       24 UND 36 Raten) trugen zugeklappt woertlich denselben Text. Die
+       Ratenlaufzeit gehoert deshalb HIER auf die Zeile, knapp, mit der
+       Bindung des Tarifs daneben (Datenkonzept 5.4: „36 Raten · Tarif 24
+       Monate“). Eine Restschuld gibt es nicht mehr: die Zahl rechnet alle
+       Raten und den Tarif ueber H Monate. #}
     <span class="gr-bnd-tarif">{{ k.tarif }}{% if k.band_gb_text %} ·
       {{ k.band_gb_text }}{% endif %}{% if k.raten_laufzeit %} · <span
       class="gr-bnd-raten">{{ k.raten_laufzeit }} {{ kurzraten
-      }}{% if k.offen_nach_24 %} · Restschuld {{ k.offen_nach_24 | euro
-      }}{% endif %}</span>{% endif %}</span>
+      }}{% if k.tarif_bindung %} · Tarif {{ k.tarif_bindung }} Monate{% endif
+      %}</span>{% endif %}</span>
     {# DIE TCO TRAEGT IHRE LAUFZEIT IM ETIKETT (A5.1) - eine unbeschriftete
        Gesamtsumme ist ueber zwei Bindungsdauern nicht lesbar. #}
     {# P3-E3: der UEBERHANG - die groesste nicht eingerechnete Aktion
@@ -161,10 +159,8 @@
     <p class="gr-bnd-rw-z">{{ k.label }} {{ k.gesamt | euro }} · Ø {{
       k.schnitt_monat | euro }}/Monat</p>
     {# D3, PUNKT 4: der Zerlegungsbalken - Segmente aus `k.zerlegung`
-       (`geraete_tco_karten.zerlegung_balken()`, liest nur, was `tco_24()`
-       schon gerechnet hat). Die Restschuld-Segmente (`offen`) sind
-       schraffiert: sichtbar, dass dieser Teil erst nach Monat 24 faellig
-       wird, aber IN der Summe steckt. Die Breiten sind Prozentanteile an
+       (`geraete_tco_karten.zerlegung_balken()`, liest nur, was
+       `kosten_ueber()` schon gerechnet hat). Die Breiten sind Prozentanteile an
        `k.gesamt` - die Summe der `betrag`-Felder ist per Konstruktion
        genau diese Zahl, hier wird nichts addiert. Rein dekorativ
        (`aria-hidden`): dieselben Posten stehen textlich in der Liste
@@ -248,18 +244,6 @@
       {% endif %}{{ k.raten_laufzeit }} Raten à {{ k.rate | euro }}{% endif %}{%
       if k.anschlusspreis is not none %} · Anschlusspreis {{
       k.anschlusspreis | euro }}{% endif %}{% endif %}</p>
-
-    {# A5.2, PFLICHTZEILE: Antonios Leitfrage, woertlich beantwortet - auch
-       und gerade bei 36 Monaten Bindung. #}
-    {% if k.gezahlt_nach_24 is not none %}
-    {# "DANACH", NICHT "DAVON": die offenen Raten sind der Rest der
-       Gesamtsumme, kein Teil der genannten 24-Monats-Zahlung. #}
-    <p class="gr-kk-24">nach 24 Monaten gezahlt: <b>{{ k.gezahlt_nach_24 | euro
-      }}</b>{% if k.offen_nach_24 %} · danach noch offen: {{ k.offen_nach_24 | euro
-      }}{% if k.offene_raten %} ({{ k.offene_raten }} {{ 'Monatsraten' if
-      k.buendel_monatlich is not none else 'Geräteraten' }}){% endif %}{%
-      endif %}</p>
-    {% endif %}
 
     {% if k.eff_ohne_geraet is not none %}
     <p class="gr-kk-eff">eff. {{ k.eff_ohne_geraet | euro }}/M. ohne Gerät
@@ -365,26 +349,22 @@
     Tarifbindung; nicht enthalten sind Versand, Nutzungsentgelte über den
     Tarif hinaus und jeder Bonus, der hier nicht beim Namen steht.</p>
     {% else %}
-    {# S-Q4: "Bindung" nennt nur noch, was der Vertrag bindet. A1: enthalten
-       sind ALLE Raten der eigenen Laufzeit - die nach Monat 24 stehen
-       als offener Betrag auf der Zeile (Pflichtzeile oben). Das Raten-Wort
-       ist dasselbe wie in der Pflichtzeile: zusammengelegte Bündelpreise
-       (1&1) zahlen Tarif und Gerät in EINER Monatsrate. #}
+    {# S-Q4: "Bindung" nennt nur noch, was der Vertrag bindet. Enthalten
+       sind ALLE Raten der eigenen Laufzeit und der Tarif ueber H Monate;
+       zusammengelegte Bündelpreise (1&1) zahlen Tarif und Gerät in EINER
+       Monatsrate. #}
     {% set raten_wort = 'Monatsraten' if k.buendel_monatlich is not none
        else 'Geräteraten' %}
-    {# P0-B-fix2: „Gerechnet über N Monate“ nennt den Zeitraum, den die
-       LEITZAHL traegt (`leitzahl_monate`) - 24 bei getrenntem Tarif und
-       Rate, die eigene Laufzeit bei einem zusammengelegten
-       Buendelmonatspreis. Der Schnitt bei Monat 24 (gezahlt/offen) bleibt
-       davon unberuehrt. #}
+    {# „Gerechnet über H Monate“ nennt den Zeitraum, den die LEITZAHL traegt
+       (`leitzahl_monate`, Datenkonzept 5.3): 24 bei 12 und 24 Raten, 36 bei
+       36 Raten, die eigene Laufzeit bei einem zusammengelegten
+       Buendelmonatspreis. #}
     <p class="gr-basis--duenn">Gerechnet über {{ k.leitzahl_monate }} Monate{% if
       k.tarif_bindung and k.raten_laufzeit and k.tarif_bindung !=
       k.raten_laufzeit %} – der Tarif bindet {{ k.tarif_bindung }} Monate, die
       {{ raten_wort }} laufen {{ k.raten_laufzeit }}{% endif %}. Enthalten sind
       alle fest anfallenden Kosten, auch alle {{ raten_wort }} der eigenen
-      Laufzeit{% if
-      k.offen_nach_24 %}; die Raten nach Monat {{ k.laufzeit }} stehen als
-      offener Betrag auf der Zeile{% endif %}. Nicht enthalten sind Versand,
+      Laufzeit. Nicht enthalten sind Versand,
       Nutzungsentgelte über den Tarif hinaus und jeder Bonus, der hier nicht
       beim Namen steht.</p>
     {% endif %}

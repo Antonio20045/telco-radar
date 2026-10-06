@@ -102,6 +102,10 @@ def _listungen():
 
 
 def _buendel(sku, rate, zustand=""):
+    """o2 On Demand M zum iPhone 15 128 GB, 24 Raten (Datenkonzept Geräte
+    Schritt 2: verglichen wird nur gleiche Finanzierung - die Vodafone-Karten
+    dieser Fixture tragen ebenfalls 24 Raten). Bis dahin 36 Raten zu zwei
+    Dritteln der Rate; die Summe über 24 Tarifmonate ist dieselbe."""
     return Buendel(
         sku_id=sku,
         anbieter="o2",
@@ -112,7 +116,7 @@ def _buendel(sku, rate, zustand=""):
         tarif_bindung_monate=24,
         geraet_zuzahlung=1.0,
         geraet_monatsrate=rate,
-        laufzeit_monate=36,
+        laufzeit_monate=24,
         anschlusspreis=39.99,
         zustand=zustand,
         quelle_url=f"https://example.de/o2/{sku}",
@@ -179,9 +183,9 @@ def _tarife():
 
 def _modell(erneuert=True):
     tarife = {t["tarif_id"]: t for t in _tarife()}
-    buendel = [_buendel(SKU_NEU, 20.0)]
+    buendel = [_buendel(SKU_NEU, 30.0)]
     if erneuert:
-        buendel.append(_buendel(SKU_ERNEUERT, 17.0))
+        buendel.append(_buendel(SKU_ERNEUERT, 25.5))
     ergebnis = karten.modelle(
         buendel, _listungen(), _referenzen(), tarife, lade_katalog(lese_wurzel())
     )
@@ -224,7 +228,7 @@ def test_das_etikett_steht_am_g1_balken():
 def test_ohne_beleg_gilt_der_zustand_als_unbekannt_nicht_als_neu():
     """Ein Buendel ohne Listung, ohne Feld und ohne Zustandsstrecke."""
     tarife = {t["tarif_id"]: t for t in _tarife()}
-    fremd = _buendel("apple-iphone-15-256gb-blau", 22.0)
+    fremd = _buendel("apple-iphone-15-256gb-blau", 33.0)
     ergebnis = karten.modelle(
         [fremd], _listungen(), _referenzen(), tarife, lade_katalog(lese_wurzel())
     )
@@ -283,7 +287,7 @@ def test_ein_erneuertes_eigenes_buendel_wird_nicht_zur_referenz():
         _listung("Vodafone", SKU_ERNEUERT, 400.0, zustand="refurbished")
     ]
     ergebnis = karten.modelle(
-        [_buendel(SKU_NEU, 20.0), eigen],
+        [_buendel(SKU_NEU, 30.0), eigen],
         listungen,
         _referenzen(),
         tarife,
@@ -299,7 +303,7 @@ def test_ein_erneuertes_eigenes_buendel_wird_nicht_zur_referenz():
 
 def test_der_zustand_ueberlebt_speicher_und_leser(tmp_path):
     db = TcoDB(tmp_path / "geraete_tco.json")
-    db.upsert_buendel([_buendel(SKU_ERNEUERT, 17.0, zustand="refurbished")], HEUTE)
+    db.upsert_buendel([_buendel(SKU_ERNEUERT, 25.5, zustand="refurbished")], HEUTE)
     assert db.save(HEUTE)
     neu_geladen = TcoDB(tmp_path / "geraete_tco.json")
     gespeichert = neu_geladen.buendel()[0]
@@ -500,11 +504,11 @@ def _baue(
     (state / "geraete_preise.jsonl").write_text(
         "\n".join(json.dumps(z) for z in punkte) + "\n", encoding="utf-8"
     )
-    buendel = [_buendel(SKU_NEU, 20.0, zustand="neu")]
+    buendel = [_buendel(SKU_NEU, 30.0, zustand="neu")]
     if erneuert:
-        buendel.append(_buendel(SKU_ERNEUERT, 17.0, zustand="refurbished"))
+        buendel.append(_buendel(SKU_ERNEUERT, 25.5, zustand="refurbished"))
     if graphloses_modell:
-        graphlos = _buendel(SKU_GRAPHLOS, 20.0, zustand="neu")
+        graphlos = _buendel(SKU_GRAPHLOS, 30.0, zustand="neu")
         graphlos = Buendel(
             **{
                 **graphlos.__dict__,
@@ -529,8 +533,8 @@ def _baue(
             )
         )
     if ungefaehr_delta:
-        buendel.append(_xs_buendel(SKU_NEU, 30.0, HEUTE, tarif_monatlich=29.95))
-        buendel.append(_knapp_o2(30.25, 2.0))
+        buendel.append(_xs_buendel(SKU_NEU, 45.0, HEUTE, tarif_monatlich=29.95))
+        buendel.append(_knapp_o2(45.25, 5.0))
     (state / "geraete_tco.json").write_text(
         json.dumps(
             {
@@ -577,7 +581,7 @@ def _baue(
     (state / "tarife.jsonl").write_text(
         "\n".join(json.dumps(t) for t in tarife) + "\n", encoding="utf-8"
     )
-    neu_b = _buendel(SKU_NEU, 20.0, zustand="neu")
+    neu_b = _buendel(SKU_NEU, 30.0, zustand="neu")
     historie = []
     for tag, gesamt in (
         ("2026-09-02", 961.76),
@@ -688,9 +692,11 @@ def test_jede_karte_mit_zahl_nennt_den_preis_nach_der_laufzeit_oder_die_luecke(
 
 
 def _xs_buendel(sku, rate, tag, zuzahlung=1.0, anschluss=0.0, tarif_monatlich=31.95):
-    """Vodafone Mobil XS zum iPhone 15 128 GB - die Bauform des echten
-    Bestands: 36 Raten, gemessene Buendel-Rate ueber dem Blatt-Preis
-    (29,95 im Pflichtdokument, mit Smartphone-Zuschlag 31,95 am Bündel)."""
+    """Vodafone Mobil XS zum iPhone 15 128 GB - gemessene Buendel-Rate ueber
+    dem Blatt-Preis (29,95 im Pflichtdokument, mit Smartphone-Zuschlag 31,95
+    am Bündel). 24 Raten: seit Datenkonzept Geräte Schritt 2 rechnet ein
+    36-Raten-Bündel 36 Tarifmonate, und das Blatt belegt die Monate 25-36
+    für 31,95 nicht; bis dahin 36 Raten zu zwei Dritteln der Rate."""
     return Buendel(
         sku_id=sku,
         anbieter="Vodafone",
@@ -701,7 +707,7 @@ def _xs_buendel(sku, rate, tag, zuzahlung=1.0, anschluss=0.0, tarif_monatlich=31
         tarif_bindung_monate=24,
         geraet_zuzahlung=zuzahlung,
         geraet_monatsrate=rate,
-        laufzeit_monate=36,
+        laufzeit_monate=24,
         anschlusspreis=anschluss,
         zustand="neu",
         quelle_url=f"https://example.de/vodafone/{sku}",
@@ -717,14 +723,14 @@ def test_eine_veraltete_messung_verdraengt_kein_aktuelles_angebot():
     Bündel (AUFFRISCHEN, nie löschen) - die Auswahl muss deshalb die
     AKTUELLSTE Messung des Slots nehmen, nicht die billigste Geist-Zahl.
 
-    Frisch (schwarz, 20.09.): 1,00 + 24×31,95 + 36×30,00 + 0,00
+    Frisch (schwarz, 20.09.): 1,00 + 24×31,95 + 24×45,00 + 0,00
                              = 1.847,80 EUR
-    Geist (weiss, 06.09.):   0,99 + 24×31,95 + 36×26,00
+    Geist (weiss, 06.09.):   0,99 + 24×31,95 + 24×39,00
                              = 1.703,79 EUR - billiger, aber alt."""
     tarife = {t["tarif_id"]: t for t in _tarife()}
-    frisch = _xs_buendel(SKU_NEU, 30.0, "2026-09-20")
+    frisch = _xs_buendel(SKU_NEU, 45.0, "2026-09-20")
     geist = _xs_buendel(
-        "apple-iphone-15-128gb-weiss", 26.0, "2026-09-06", zuzahlung=0.99
+        "apple-iphone-15-128gb-weiss", 39.0, "2026-09-06", zuzahlung=0.99
     )
     modell = karten.modelle(
         [frisch, geist],
@@ -755,8 +761,8 @@ def test_eine_veraltete_messung_verdraengt_kein_aktuelles_angebot():
 
     gleich_alt = karten.modelle(
         [
-            _xs_buendel("apple-iphone-15-128gb-blau", 28.0, "2026-09-20"),
-            _xs_buendel("apple-iphone-15-128gb-gruen", 30.0, "2026-09-20"),
+            _xs_buendel("apple-iphone-15-128gb-blau", 42.0, "2026-09-20"),
+            _xs_buendel("apple-iphone-15-128gb-gruen", 45.0, "2026-09-20"),
         ],
         _listungen(),
         _referenzen(),
@@ -785,7 +791,7 @@ def _knapp_o2(rate, anschluss):
         tarif_bindung_monate=24,
         geraet_zuzahlung=1.0,
         geraet_monatsrate=rate,
-        laufzeit_monate=36,
+        laufzeit_monate=24,
         anschlusspreis=anschluss,
         zustand="neu",
         quelle_url=f"https://example.de/o2/knapp",
@@ -797,13 +803,13 @@ def test_ein_kleiner_abstand_erscheint_als_ungefaehr_statt_strich():
     """Fix 2 (A2): der Strich in der Δ-Spalte bedeutet "kein Angebot" -
     bis A2 bedeutete er auch "Abstand unter 15 EUR / 3 %", und ein
     gemessenes Angebot stand da wie ein fehlendes. Referenz (Vodafone
-    Mobil XS, 29,95 gemessen): 1,00 + 24×29,95 + 36×30,00 + 0,00
-    = 1.799,80 EUR. Knapp daneben (Rate 30,25, Anschluss 2,00):
+    Mobil XS, 29,95 gemessen): 1,00 + 24×29,95 + 24×45,00 + 0,00
+    = 1.799,80 EUR. Knapp daneben (Rate 45,25, Anschluss 5,00):
     1.810,80 EUR - exakt +11,00 EUR, 0,6 %."""
     tarife = {t["tarif_id"]: t for t in _tarife()}
-    referenz = _xs_buendel(SKU_NEU, 30.0, HEUTE, tarif_monatlich=29.95)
+    referenz = _xs_buendel(SKU_NEU, 45.0, HEUTE, tarif_monatlich=29.95)
     modell = karten.modelle(
-        [referenz, _knapp_o2(30.25, 2.0)],
+        [referenz, _knapp_o2(45.25, 5.0)],
         _listungen(),
         _referenzen(),
         tarife,
@@ -820,7 +826,7 @@ def test_ein_kleiner_abstand_erscheint_als_ungefaehr_statt_strich():
     )
 
     gleich = karten.modelle(
-        [referenz, _knapp_o2(30.0, 0.0)],
+        [referenz, _knapp_o2(45.0, 0.0)],
         _listungen(),
         _referenzen(),
         tarife,
@@ -832,7 +838,7 @@ def test_ein_kleiner_abstand_erscheint_als_ungefaehr_statt_strich():
     assert d0["guenstiger"] is False
 
     deutlich = karten.modelle(
-        [referenz, _knapp_o2(30.0, 40.0)],
+        [referenz, _knapp_o2(45.0, 40.0)],
         _listungen(),
         _referenzen(),
         tarife,
@@ -844,7 +850,7 @@ def test_ein_kleiner_abstand_erscheint_als_ungefaehr_statt_strich():
 
     ohne_vodafone = [l for l in _listungen() if l["anbieter"] != "Vodafone"]
     ohne = karten.modelle(
-        [_knapp_o2(30.25, 2.0)],
+        [_knapp_o2(45.25, 5.0)],
         ohne_vodafone,
         _referenzen(),
         tarife,
@@ -860,9 +866,9 @@ def test_delta_kurz_und_der_graph_traegen_das_ungefaehr():
     Scheingenaugkeit). Die delta_text-Einheit selbst haelt beide Welten:
     ungefaehr OHNE Prozentanteil, wesentlich MIT - unverändert."""
     tarife = {t["tarif_id"]: t for t in _tarife()}
-    referenz = _xs_buendel(SKU_NEU, 30.0, HEUTE, tarif_monatlich=29.95)
+    referenz = _xs_buendel(SKU_NEU, 45.0, HEUTE, tarif_monatlich=29.95)
     ergebnis = view.aufbereiten(
-        [_speicherform(referenz), _speicherform(_knapp_o2(30.25, 2.0))],
+        [_speicherform(referenz), _speicherform(_knapp_o2(45.25, 5.0))],
         [],
         _listungen(),
         lade_katalog(lese_wurzel()),
@@ -947,7 +953,7 @@ def test_ueber_zwei_zeitraeume_steht_kein_betrag_sondern_der_zustand():
     1.800,76 EUR - vier Cent im Monat darueber, aber nicht ueber
     denselben Zeitraum."""
     tarife = {t["tarif_id"]: t for t in _tarife()}
-    referenz = _xs_buendel(SKU_NEU, 30.0, HEUTE, tarif_monatlich=29.95)
+    referenz = _xs_buendel(SKU_NEU, 45.0, HEUTE, tarif_monatlich=29.95)
     o2_24 = Buendel(
         sku_id=SKU_NEU,
         anbieter="o2",

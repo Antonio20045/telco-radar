@@ -184,6 +184,17 @@ _TCO_SICHT = {
 }
 
 
+_TARIFE = {
+    TARIF_ID: {
+        "laufzeit_monate": 24,
+        "preisphasen": [{"von_monat": 1, "bis_monat": None, "betrag": 20.0}],
+    }
+}
+"""Das Tarifblatt nennt 20,00 EUR ohne Ende: seit Datenkonzept Geräte Schritt 2
+rechnet eine 36-Raten-Zeile 36 Tarifmonate und braucht dafür den Preis ab
+Monat 25 - ohne ihn wäre sie eine Lücke und kein Punkt der Reihe."""
+
+
 def _historie_zeile(bid: str, datum: str, rate: float, laufzeit: int = 36) -> dict:
     return {
         "id": bid,
@@ -234,7 +245,7 @@ def _reihe(
         "".join(json.dumps(z, ensure_ascii=False) + "\n" for z in zeilen),
         encoding="utf-8",
     )
-    messungen = geraete_zeitreihe._messungen(state, _TCO_SICHT, {})
+    messungen = geraete_zeitreihe._messungen(state, _TCO_SICHT, _TARIFE)
     return (messungen.get(("apple-iphone-17-256", "klein")) or {}).get("o2") or {}
 
 

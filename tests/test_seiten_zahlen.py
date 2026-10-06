@@ -22,7 +22,6 @@ from __future__ import annotations
 
 import gzip as _pf_gzip
 import json
-import re
 from decimal import Decimal
 from pathlib import Path
 
@@ -1441,11 +1440,14 @@ def test_pf_beide_ratenlaufzeiten_eines_congstar_abrufs_werden_zwei_zeilen(
     Der gemessene Fall (Apple iPhone 17 Pro 512 GB, Allnet Flat M):
       24 Raten a 50,25 EUR und 36 Raten a 33,50 EUR, je 97,00 EUR
       Zuzahlung, Tarif 24,00 EUR, Anschlusspreis 0,00 EUR.
-    congstar finanziert zum Nulltarif - beide Zahlweisen ergeben dieselbe
-    Leitzahl (1.879,00 EUR). Unterscheidbar sind sie an Rate, Ratenzahl
-    und Restschuld: die 36er traegt nach Monat 24 noch 402,00 EUR offen
-    (12 Geraeteraten), die 24er nichts. Genau das wird geprueft, damit
-    der Test nicht auf zwei identischen Zeilen gruen wird.
+    Seit Datenkonzept Geraete Schritt 2 rechnet jede Zeile ueber ihren eigenen
+    Zeitraum H (24 Raten: 24 Monate, 36 Raten: 36 Monate, das Tarifblatt nennt
+    24,00 EUR ohne Ende). congstar finanziert zum Nulltarif - die 24er traegt
+    1.879,00 EUR, die 36er 2.167,00 EUR, der Unterschied sind genau die zwoelf
+    Tarifmonate 25 bis 36 (288,00 EUR). Eine Restschuld gibt es nicht mehr:
+    alle Raten liegen im Zeitraum. Geprueft werden Zahl, Rate, Ratenzahl und
+    Zeitraum je Zeile, damit der Test nicht auf zwei identischen Zeilen
+    gruen wird.
 
     NICHT GEMESSEN wird die Bestandslage: ob der Produktionsbestand
     ueberhaupt Gruppen mit zwei Laufzeiten kennt, sagt
@@ -1539,10 +1541,16 @@ def test_pf_beide_ratenlaufzeiten_eines_congstar_abrufs_werden_zwei_zeilen(
         f"die zwei Zeilen nennen nicht 24 und 36 Raten, sondern {sorted(je_laufzeit)}"
     )
 
+    blaetter = {_PF_CS_BLATT: [blatt]}
     for satz in rohsaetze:
         laufzeit = satz["laufzeit_monate"]
         zeile = je_laufzeit[laufzeit]
-        soll = pf_leitzahl_cent({**satz, "id": f"congstar/{laufzeit}m"})
+        soll = pf_leitzahl_cent(
+            {**satz, "id": f"congstar/{laufzeit}m", "tarif_id": _PF_CS_BLATT}, blaetter
+        )
+        assert soll is not None, (
+            f"{laufzeit} Raten: die eigene Rechnung hat eine Luecke"
+        )
         gw_vergleiche(
             Decimal(zeile["gesamt_cent"]) / 100,
             soll,
@@ -1553,19 +1561,22 @@ def test_pf_beide_ratenlaufzeiten_eines_congstar_abrufs_werden_zwei_zeilen(
         assert f"in {laufzeit} Raten à {rate} €" in zeile["bau"], (
             f"die {laufzeit}-Monats-Zeile nennt ihre Rate nicht: {zeile['bau']}"
         )
-    assert je_laufzeit[24]["gesamt_cent"] == je_laufzeit[36]["gesamt_cent"], (
-        "congstar finanziert zum Nulltarif - weichen die Leitzahlen ab, "
-        "hat sich die Rechnung geaendert und dieser Test ist neu zu "
-        f"verankern: {je_laufzeit[24]['gesamt_cent']} gegen "
-        f"{je_laufzeit[36]['gesamt_cent']}"
+    tarif_cent = gw_cent(rohsaetze[0]["tarif_monatlich"])
+    assert (je_laufzeit[24]["gesamt_cent"], je_laufzeit[36]["gesamt_cent"]) == (
+        187900,
+        187900 + 12 * tarif_cent,
+    ), (
+        "congstar finanziert zum Nulltarif - die 36er liegt genau zwoelf "
+        "Tarifmonate ueber der 24er; sonst hat sich die Rechnung geaendert: "
+        f"{je_laufzeit[24]['gesamt_cent']} gegen {je_laufzeit[36]['gesamt_cent']}"
     )
 
     inline = (site / "geraete.html").read_text(encoding="utf-8")
-    offen = re.findall(r"danach noch offen: ([\d.,]+) € \((\d+) Geräteraten\)", inline)
-    assert offen == [("402,00", "12")], (
-        "genau die 36-Monats-Zeile muss ihre Restschuld nennen (402,00 € "
-        f"aus 12 Geraeteraten), gefunden: {offen}"
-    )
+    assert "danach noch offen" not in inline, "eine Restschuld gibt es nicht mehr"
+    for laufzeit in (24, 36):
+        assert f"Kosten über {laufzeit} Monate" in inline, (
+            f"die {laufzeit}-Raten-Zeile nennt ihren Zeitraum nicht"
+        )
 
 
 def test_pf_ohne_tarifleiter_nennt_die_seite_den_grund(tmp_path, bestand):

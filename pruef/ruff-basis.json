@@ -545,9 +545,9 @@
  },
  "src/telco_radar/report/geraete_tco_karten.py": {
   "C901": 1,
-  "E741": 3,
+  "E741": 2,
   "SIM103": 1,
-  "UP045": 27
+  "UP045": 26
  },
  "src/telco_radar/report/geraete_tco_view.py": {
   "C901": 1,
@@ -573,9 +573,7 @@
   "B007": 1,
   "B023": 3,
   "C901": 3,
-  "E741": 1,
-  "F401": 1,
-  "I001": 1
+  "E741": 1
  },
  "src/telco_radar/report/html.py": {
   "B007": 1,
@@ -861,9 +859,6 @@
  "tests/test_geraete_tco_band_browser.py": {
   "F401": 1,
   "I001": 1
- },
- "tests/test_geraete_tco_hauptansicht.py": {
-  "E501": 1
  },
  "tests/test_geraete_tco_historie.py": {
   "F841": 1

@@ -52,6 +52,7 @@ from typing import Optional
 
 from ..geraete_model import VERGLEICHBARE_ZUSTAENDE, ZUSTAENDE, normalisiere
 from ..tarif_model import Preisphase
+from ..tco_kosten import POSTEN_ZEITRAUM
 from ..tco_model import (
     AKTION_ANSCHLUSS_ERLASSEN,
     AKTION_GERAETERABATT,
@@ -68,9 +69,9 @@ from ..tco_model import (
     POSTEN_ZUZAHLUNG,
     TCO_HORIZONT,
     Buendel,
+    kosten_ueber,
     monatsschnitt,
     phasensumme,
-    tco_24,
     zeitraum_vergleichbar,
 )
 from . import anbieter_farben, geraete_vergleich
@@ -512,16 +513,12 @@ def buendel_aus_listungen(listungen: list) -> list[Buendel]:
     return fertig
 
 
-def _bestandteile_mit_kategorie(kennzahl) -> list:
-    """`tco_24`s Posten (Name -> Betrag) mit ihrer Kostenart, fuer die
-    Balkengrafik (`geraete_tco_grafik.balken`) - dieselbe Kategorienliste,
-    die zuvor `tco_bindung` fuehrte. `tco_24` speichert die Posten als
-    Woerterbuch (Name -> Betrag, dieselbe Reihenfolge wie gerechnet); die
-    Grafik braucht dieselben Zeilen als Liste mit ihrer Kostenart, das ist
-    Formatierung und keine zweite Rechnung.
-    """
+def _bestandteile_mit_kategorie(posten_je_name: dict) -> list:
+    """Die Posten von `kosten_ueber` (Name -> Betrag, in Rechenreihenfolge) mit
+    ihrer Kostenart, als Liste fuer Zerlegungsbalken und Rechenweg - Formatierung,
+    keine zweite Rechnung."""
     posten = []
-    for name, betrag in kennzahl.bestandteile.items():
+    for name, betrag in posten_je_name.items():
         if name in (POSTEN_ZUZAHLUNG, POSTEN_ANSCHLUSS):
             kat = "einmalig"
         elif name.startswith(POSTEN_BUENDEL):
@@ -676,46 +673,40 @@ def _karte(
     zustand: str = "unbekannt",
     heute: str = "",
 ) -> dict:
-    """Aus einem Buendel wird eine Karte - gerechnet wird in `tco_model`.
+    """Aus einem Buendel wird eine Karte - gerechnet wird in `tco_kosten`.
 
-    Diese Funktion addiert keinen Euro. Sie holt die Kennzahl, haengt die
-    Belege daran und formt die Pflichtzeilen des Katalogs D.
-
-    TICKET TCO24-1: die Leitzahl ist `tco_24()`, IMMER 24 Monate
-    (AUFTRAG_GERAETESEITE.md §3). Bis dahin fuehrte diese Funktion
-    `tco_bindung()`, eine Kennzahl ueber die eigene Bindung des Buendels -
-    sichtbar als "TCO-36", der deklarierte Fehler dieses Tickets.
+    Diese Funktion addiert keinen Euro. Die Kernzahl ist `kosten_ueber` ueber den
+    Zeitraum H des Buendels (Datenkonzept Geraete 5.3: 12 und 24 Raten 24 Monate,
+    36 Raten 36 Monate, 1&1 sein Vertrag); fehlt ein Posten oder der Tarifpreis
+    eines Monats, steht keine Zahl, sondern die benannte Luecke. `laufzeit` und
+    `leitzahl_monate` sind beide H: so viele Tarifmonate traegt die Zahl.
 
     A3: `heute` entscheidet über die Frische der Karte (`ist_frisch`,
     dieselbe Definition wie jede Auswahl). Ohne das Datum altert nichts.
     """
     frisch = ist_frisch(b.abgerufen_am, heute)
-    kennzahl = tco_24(b)
+    kosten = kosten_ueber(b)
+    belastbar = kosten.gesamt is not None
     aktionen, aktion_ueberhang = aktionen_der_karte(b, heute)
-    monate = kennzahl.leitzahl_monate
+    monate = kosten.monate
     device_id, speicher = geraet_je_sku.get(b.sku_id, ("", None))
-    nach_bindung = _phase_ab(tarif, AB_MONAT) if tarif else None
-
     eff = None
-    if barpreis is not None and kennzahl.belastbar and monate:
-        eff = round(kennzahl.monatlich - barpreis["betrag"] / monate, 2)
+    if barpreis is not None and belastbar and kosten.monatlich is not None and monate:
+        eff = round(kosten.monatlich - barpreis["betrag"] / monate, 2)
     raten_summe = (
         round(b.geraet_monatsrate * b.laufzeit_monate, 2)
         if (b.geraet_monatsrate is not None and b.laufzeit_monate is not None)
         else None
     )
-    if b.geraet_monatsrate is None and b.buendel_monatlich is None:
-        offene_raten: Optional[int] = 0
-    elif b.laufzeit_monate is None:
-        offene_raten = None
-    else:
-        offene_raten = max(0, b.laufzeit_monate - TCO_HORIZONT)
     geraetepreis, geraetepreis_art = _geraetepreis(
         barpreis, b.geraet_zuzahlung, raten_summe
     )
-    bestandteile = _bestandteile_mit_kategorie(kennzahl)
+    bestandteile = _bestandteile_mit_kategorie(kosten.posten)
+    luecken = list(kosten.luecken)
+    if not b.rabatte and not aktionen:
+        luecken.append(POSTEN_RABATTE)
     return {
-        "leer_grund": "" if kennzahl.belastbar else _grund(kennzahl),
+        "leer_grund": "" if belastbar else _grund(kosten),
         "sku_id": b.sku_id,
         "modell_id": modell_schluessel(device_id, speicher),
         "zustand": zustand,
@@ -734,7 +725,7 @@ def _karte(
         "geraetepreis": geraetepreis,
         "geraetepreis_art": geraetepreis_art,
         "label": label_der_leitzahl(monate),
-        "laufzeit": LAUFZEIT,
+        "laufzeit": monate,
         "leitzahl_monate": monate,
         "ab_monat": AB_MONAT,
         "tarif_bindung": b.tarif_bindung_monate,
@@ -743,40 +734,22 @@ def _karte(
             if (b.geraet_monatsrate is not None or b.buendel_monatlich is not None)
             else None
         ),
-        "belastbar": kennzahl.belastbar,
-        "gesamt": kennzahl.gesamt if kennzahl.belastbar else None,
-        "schnitt_monat": kennzahl.monatlich if kennzahl.belastbar else None,
-        "gezahlt_nach_24": (
-            round(kennzahl.gesamt - (kennzahl.restbetrag or 0.0), 2)
-            if kennzahl.belastbar
-            else None
-        ),
-        "offen_nach_24": (
-            kennzahl.restbetrag
-            if kennzahl.belastbar and kennzahl.restbetrag is not None
-            else None
-        ),
-        "offene_raten": offene_raten,
+        "belastbar": belastbar,
+        "gesamt": kosten.gesamt,
+        "schnitt_monat": kosten.monatlich,
         "monatlich": b.tarif_monatlich,
         "buendel_monatlich": b.buendel_monatlich,
         "zuzahlung": b.geraet_zuzahlung,
         "rate": b.geraet_monatsrate,
         "raten_summe": raten_summe,
         "anschlusspreis": b.anschlusspreis,
-        "nach_bindung": nach_bindung,
+        "nach_bindung": _phase_ab(tarif, AB_MONAT) if tarif else None,
         "eff_ohne_geraet": eff,
         "eff_basis": barpreis,
         "bestandteile": bestandteile,
-        "zerlegung": zerlegung_balken(
-            bestandteile,
-            kennzahl.restbetrag,
-            kennzahl.gesamt if kennzahl.belastbar else None,
-        ),
-        "luecken": [
-            l for l in kennzahl.luecken if not (l == POSTEN_RABATTE and aktionen)
-        ],
+        "zerlegung": zerlegung_balken(bestandteile, None, kosten.gesamt),
+        "luecken": luecken,
         "boni": [],
-        "boni_abzug": kennzahl.rabatte_offen,
         "aktionen": aktionen,
         "aktion_ueberhang": aktion_ueberhang,
         "quelle_url": b.quelle_url,
@@ -802,20 +775,20 @@ _GRUND_JE_LUECKE = {
 }
 
 
-def _grund(kennzahl) -> str:
+def _grund(kosten) -> str:
     """Warum diese Karte keine Zahl traegt - in der Reihenfolge der Ursachen."""
-    if POSTEN_TARIF in kennzahl.luecken:
+    if POSTEN_TARIF in kosten.luecken:
         return _GRUND_JE_LUECKE[POSTEN_TARIF]
-    if POSTEN_LAUFZEIT in kennzahl.luecken:
+    if POSTEN_LAUFZEIT in kosten.luecken or POSTEN_ZEITRAUM in kosten.luecken:
         return _GRUND_JE_LUECKE[POSTEN_LAUFZEIT]
-    if kennzahl.gesamt is None:
+    if not kosten.posten:
         return (
             "Zu diesem Bündel ist kein einziger Posten erhoben – es "
             "steht als Angebot da, nicht als Preis."
         )
     return (
         "Die Rechnung ist unvollständig: "
-        + ", ".join(kennzahl.luecken)
+        + ", ".join(kosten.luecken)
         + " nicht gemessen."
     )
 
@@ -848,9 +821,6 @@ def _leere_karte(anbieter: str, grund: str = "") -> dict:
         "belastbar": False,
         "gesamt": None,
         "schnitt_monat": None,
-        "gezahlt_nach_24": None,
-        "offen_nach_24": None,
-        "offene_raten": 0,
         "monatlich": None,
         "buendel_monatlich": None,
         "zuzahlung": None,
@@ -864,7 +834,6 @@ def _leere_karte(anbieter: str, grund: str = "") -> dict:
         "zerlegung": [],
         "luecken": [],
         "boni": [],
-        "boni_abzug": 0.0,
         "quelle_url": "",
         "abgerufen_am": "",
         "tarif_quelle_url": "",
@@ -906,6 +875,16 @@ def phasen_aus_tarifsatz(tarif: Optional[dict]) -> list:
         for p in ((tarif or {}).get("preisphasen") or [])
         if p.get("betrag") is not None
     ]
+
+
+def tarif_anreichern(b: Buendel, tarif: dict) -> None:
+    """Bindung und Preisphasen aus dem Tarifsatz des Bestands ans Bündel - die eine
+    Stelle für Karte, Zeitreihe und Export, damit alle drei denselben Zeitraum H
+    rechnen. Eine Bindung von 0 oder ohne Angabe lässt die gemessene stehen."""
+    laufzeit = tarif.get("laufzeit_monate")
+    if laufzeit:
+        b.tarif_bindung_monate = int(laufzeit)
+    b.tarif_phasen = phasen_fuer_buendel(tarif, b.tarif_monatlich)
 
 
 _PREIS_TOLERANZ = 0.005
@@ -1109,7 +1088,6 @@ def _referenzkarte(ref: dict, heute: str = "") -> dict:
             "gesamt": ref["gesamt"],
             "schnitt_monat": ref["schnitt_monat"],
             "monatlich": ref["monatlich"],
-            "gezahlt_nach_24": ref["gesamt"],
             "tarif_bindung": ref["tarif_monate"],
             "nach_bindung": ref.get("nach_bindung"),
             "bestandteile": [
@@ -1131,8 +1109,7 @@ def _referenzkarte(ref: dict, heute: str = "") -> dict:
             "referenz": ref,
         }
     )
-    karte["offen_nach_24"] = 0.0
-    karte["zerlegung"] = zerlegung_balken(karte["bestandteile"], 0.0, karte["gesamt"])
+    karte["zerlegung"] = zerlegung_balken(karte["bestandteile"], None, karte["gesamt"])
     frisch = referenz_ist_frisch(ref, heute)
     karte["frisch"] = frisch
     karte["alt_marke"] = "" if frisch else alt_marke_fuer(_referenz_stand(ref))
@@ -1449,6 +1426,8 @@ def modelle(
         device_id, speicher = geraet_je_sku[b.sku_id]
         mid = modell_schluessel(device_id, speicher)
         tarif = tarife.get(b.tarif_id) if b.tarif_id else None
+        if tarif is not None:
+            tarif_anreichern(b, tarif)
         karte = _karte(
             b,
             tarif,

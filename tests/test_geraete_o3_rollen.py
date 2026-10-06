@@ -265,17 +265,25 @@ def test_das_buendel_fragment_existiert_fuer_alle_anderen_modelle(site, geraete)
 
 
 def test_jede_belastbare_fragment_zeile_traegt_die_pflichtzeile(site):
-    """A: dieselben Garantien wie O2 — jede Zeile mit Zahl beantwortet
-    „nach 24 Monaten gezahlt" und trägt Sortier-Schlüssel als Daten-
-    Attribute (C: TCO-24, Δ, Anbieter)."""
+    """A: dieselben Garantien wie O2 — jede Zeile mit Zahl nennt den Zeitraum
+    ihrer Zahl („Gerechnet über H Monate“, seit Datenkonzept Geräte Schritt 2
+    statt der Pflichtzeile „nach 24 Monaten gezahlt … noch offen“, offen bleibt
+    nichts mehr) und trägt Sortier-Schlüssel als Daten-Attribute (C: Kosten,
+    Δ, Anbieter)."""
     lager = BeautifulSoup(
         (site / "data" / "geraete-buendel.html").read_text(encoding="utf-8"),
         "html.parser",
     )
     belastbar = [z for z in lager.select(".gr-bnd") if z.get("data-gesamt")]
     assert belastbar, "keine belastbare Zeile im Fragment"
-    ohne_pflicht = [z for z in belastbar if z.select_one(".gr-kk-24") is None]
-    assert not ohne_pflicht, f"{len(ohne_pflicht)} belastbare Zeilen ohne Pflichtzeile"
+    ohne_pflicht = [
+        z
+        for z in belastbar
+        if f"Gerechnet über {z.get('data-leitzahl-monate')} Monate"
+        not in " ".join("".join(z.find_all(string=True)).split())
+        or z.select_one(".gr-kk-24") is not None
+    ]
+    assert not ohne_pflicht, f"{len(ohne_pflicht)} belastbare Zeilen ohne Zeitraum"
     for z in lager.select(".gr-bnd")[:50]:
         assert z.get("data-anbieter"), "Zeile ohne data-anbieter"
         assert z.has_attr("data-delta"), (

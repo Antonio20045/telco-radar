@@ -47,41 +47,37 @@ from datetime import date
 from pathlib import Path
 
 from ..analyze.tco_store import basis_aus_satz, id_aus_satz
-from ..tco_model import (
-    Buendel,
-    POSTEN_ANSCHLUSS,
-    POSTEN_BUENDEL,
-    POSTEN_RATE,
-    POSTEN_ZUZAHLUNG,
-    TCO_HORIZONT,
-    tco_24,
-    zeitraum_vergleichbar,
-)
+from ..tco_model import TCO_HORIZONT, zeitraum_vergleichbar
 from . import geraete_bewegung
 from . import geraete_notbremse as notbremse
 from .anbieter_farben import STRICHMUSTER, stil_fuer
-from .geraete_tco_band import ERWARTETE_ANBIETER, band_label
-from .geraete_tco_karten import kurz_datum, label_der_leitzahl, phasen_fuer_buendel
-from .verlauf import MONATE_DE
+from .geraete_rechenweg import _NAEHERUNG_SATZ as _NAEHERUNG_SATZ
+from .geraete_rechenweg import (
+    ANBIETER_FOLGE,
+    EIGEN,
+    _datum_de,
+    _datum_kurz,
+    _esc,
+    _euro,
+    _zeitraum_wort,
+    _zr_marker_farbe,
+)
+from .geraete_rechenweg import _buendel_aus_messung as _buendel_aus_messung
+from .geraete_rechenweg import _messwert as _messwert
+from .geraete_rechenweg import _rechenwege_html as _rechenwege_html
+from .geraete_rechenweg import _rechung as _rechung
+from .geraete_rechenweg import _rechung_html as _rechung_html
+from .geraete_rechenweg import _wert_aus_messung as _wert_aus_messung
+from .geraete_tco_band import band_label
+from .geraete_tco_karten import kurz_datum
 
 log = logging.getLogger(__name__)
-
-ANBIETER_FOLGE = ("Telekom", "Vodafone", "o2", "1&1", "congstar")
 
 
 def _zr_farbe(anbieter: str) -> str:
     """Die Linienfarbe - fuer Pfad, Achsen-Name und `_anbieter_punkte`."""
     return stil_fuer(anbieter).farbe
 
-
-def _zr_marker_farbe(anbieter: str) -> str:
-    """Die PUNKTfarbe - bei congstar bewusst nicht die Linienfarbe (gelber
-    Marker auf schwarzer Linie, sonst waere das Gelb auf hellem Papier die
-    einzige Spur des Anbieters)."""
-    return stil_fuer(anbieter).marker_farbe
-
-
-EIGEN = "Vodafone"
 
 BREIT_W, BREIT_MIN_H = 1136, 420
 SCHMAL_W, SCHMAL_MIN_H = 358, 380
@@ -101,24 +97,6 @@ LUECKE_TAGE_SCHWELLE = 10
 
 AUTO_SICHTBAR_AB_MESTAGEN = 2
 
-_NAEHERUNG_SATZ = (
-    "Referenzrechnung, kein Angebot: der Vodafone-Bündelpreis "
-    "zu diesem Gerät ist noch nicht erhoben – gerechnet aus "
-    "dem eigenen Barpreis des Geräts und dem Tarifgrundpreis "
-    "aus dem Produktinformationsblatt"
-)
-_NAEHERUNG_KEIN_WEG = (
-    " Für die Näherung gibt es keine Messung je Messtag – "
-    "deshalb steht hier keine Rechung."
-)
-
-
-def _euro(betrag) -> str:
-    """1.234,56 € - dieselbe Schreibweise wie ueberall auf der Seite."""
-    if betrag is None:
-        return ""
-    return f"{betrag:,.2f}".replace(",", " ").replace(".", ",").replace(" ", ".") + " €"
-
 
 def _euro0(betrag) -> str:
     if betrag is None:
@@ -130,17 +108,6 @@ def _tag_monat(iso: str) -> str:
     """„12.9." - das X-Achsen-Format des Prototyps (echtes deutsches)."""
     y, m, d = iso.split("-")
     return f"{int(d)}.{int(m)}."
-
-
-def _datum_kurz(iso: str) -> str:
-    y, m, d = iso.split("-")
-    return f"{d}.{m}.{y}"
-
-
-def _datum_de(iso: str) -> str:
-    """„1. Oktober 2026“ - Monatsname aus fester Liste, nie vom Locale."""
-    tag = date.fromisoformat(iso)
-    return f"{tag.day}. {MONATE_DE[tag.month - 1]} {tag.year}"
 
 
 def _mon_kurz(monate: list) -> str:
@@ -155,23 +122,6 @@ def _mon_kurz(monate: list) -> str:
     if not monate:
         return ""
     return "/".join(str(m) for m in monate) + " Mon."
-
-
-def _zeitraum_wort(monate: list) -> str:
-    """„24 Monate" / „24 und 36 Monate" - die Beschriftung des Bildes.
-
-    P0-B-z1: der Titel darf keinen Zeitraum behaupten, der nicht fuer
-    ALLE Kurven gilt. Kommen mehrere vor, nennt er sie - in wenigen
-    Worten; die Zuordnung zur einzelnen Kurve steht am Kurvenende
-    (`_mon_kurz`). Leere Liste heisst „kein Zeitraum gelesen" und ergibt
-    KEIN Wort (der Aufrufer laesst die Angabe dann weg).
-    """
-    zahlen = [str(m) for m in monate]
-    if not zahlen:
-        return ""
-    if len(zahlen) == 1:
-        return f"{zahlen[0]} Monate"
-    return f"{', '.join(zahlen[:-1])} und {zahlen[-1]} Monate"
 
 
 def _kurz_name(modell: dict) -> str:
@@ -206,16 +156,6 @@ def _satz_name(modell: dict) -> str:
     return f"{hersteller} {kurz}"
 
 
-def _esc(text: str) -> str:
-    return (
-        str(text)
-        .replace("&", "&amp;")
-        .replace("<", "&lt;")
-        .replace(">", "&gt;")
-        .replace('"', "&quot;")
-    )
-
-
 def _band_zeilen(modell: dict) -> dict:
     """Je Band des Modells: die Zeilen (beste je Anbieter) und Luecken.
 
@@ -231,7 +171,9 @@ def _band_zeilen(modell: dict) -> dict:
     die frischen kommen zuerst an die Reihe.
 
     Notbremse: eine Karte, die nicht zaehlt (Schätzung, abgelaufene Aktion),
-    stellt weder Zeile noch Sieger; sie steht benannt in `gesperrt`.
+    stellt weder Zeile noch Sieger; sie steht benannt in `gesperrt`. Ein
+    Bündel ohne vollständigen Preis (`kosten_ueber` nennt eine Lücke) steht in
+    `unvollstaendig` - das Band bleibt wählbar und nennt die Lücke.
     """
     baender: dict[str, dict] = {}
     karten = modell.get("karten") or []
@@ -295,6 +237,11 @@ def _band_zeilen(modell: dict) -> dict:
             "alt": alt,
             "fremd": fremd,
             "gesperrt": gesperrt,
+            "unvollstaendig": [
+                k
+                for k in satz["karten"]
+                if k.get("vergleichbar") and k.get("sku_id") and not k.get("belastbar")
+            ],
         }
     return fertig
 
@@ -449,13 +396,25 @@ def _stufe(band_labels: dict, band: str) -> str:
     return (band_labels.get(band) or {}).get("label") or band_label(band)
 
 
+_LUECKEN_SATZ = (
+    ("anderes-band", "Kein Bündel in diesem Band: "),
+    (
+        "anderer-zeitraum",
+        f"Nur über eine andere Laufzeit, nicht über {TCO_HORIZONT} Monate: ",
+    ),
+    ("zaehlt-nicht", "Nicht im Vergleich: "),
+    ("kein-belastbares", "Kein vollständiger Preis: "),
+    ("nur-alte", "Kein aktueller Stand: "),
+)
+_EIGENER_EIMER = ("gar-kein-buendel", "nur-alte", "kein-belastbares")
+
+
 def _luecke_text(luecken: list, band_labels: dict) -> str | None:
     if not luecken:
         return None
-    anderes, gar_nicht, nur_alt, fremd, gesperrt = (list[str]() for _ in range(5))
-    eimer = {"gar-kein-buendel": gar_nicht, "nur-alte": nur_alt}
+    eimer: dict[str, list[str]] = {}
     for l in luecken:
-        name = l["anbieter"]
+        name, grund = l["anbieter"], l["grund"]
         if l["alternativ"]:
             alt = " · ".join(
                 f"{_stufe(band_labels, a['band'])} "
@@ -464,33 +423,22 @@ def _luecke_text(luecken: list, band_labels: dict) -> str | None:
                 for a in l["alternativ"]
             )
             name += f" ({alt})"
-        if l["grund"] == "anderer-zeitraum":
-            fremd.append(
-                f"{l['anbieter']} ({l['monate']} Monate)"
-                if l.get("monate") is not None
-                else l["anbieter"]
-            )
-        elif l["grund"] == "zaehlt-nicht":
-            gesperrt += l["gesperrt"]
-        else:
-            eimer.get(l["grund"], anderes).append(name)
-    teile = []
-    if anderes:
-        teile.append("Kein Bündel in diesem Band: " + ", ".join(anderes) + ".")
-    if fremd:
-        teile.append(
-            f"Nur über eine andere Laufzeit, nicht über "
-            f"{TCO_HORIZONT} Monate: " + ", ".join(fremd) + "."
-        )
-    if gesperrt:
-        teile.append("Nicht im Vergleich: " + ", ".join(gesperrt) + ".")
-    if nur_alt:
-        teile.append("Kein aktueller Stand: " + ", ".join(nur_alt) + ".")
+        if grund == "anderer-zeitraum":
+            name = l["anbieter"]
+            if l.get("monate") is not None:
+                name += f" ({l['monate']} Monate)"
+        if grund == "zaehlt-nicht":
+            eimer.setdefault(grund, []).extend(l["gesperrt"])
+            continue
+        if grund not in _EIGENER_EIMER and grund != "anderer-zeitraum":
+            grund = "anderes-band"
+        eimer.setdefault(grund, []).append(name)
+    teile = [p + ", ".join(eimer[g]) + "." for g, p in _LUECKEN_SATZ if eimer.get(g)]
+    gar_nicht = eimer.get("gar-kein-buendel") or []
     if gar_nicht:
         teile.append(
             ", ".join(gar_nicht)
-            + " "
-            + ("führt" if len(gar_nicht) == 1 else "führen")
+            + (" führt" if len(gar_nicht) == 1 else " führen")
             + " das Gerät gar nicht im Bündel."
         )
     return " ".join(teile) or None
@@ -504,6 +452,7 @@ def _antwort_html(
     alte: list | None = None,
     fremd: list | None = None,
     gesperrt: list | None = None,
+    unvollstaendig: list | None = None,
 ) -> str:
     """Der Antwort-Satz des Paar-Blocks.
 
@@ -577,6 +526,12 @@ def _antwort_html(
             return (
                 f"Beim {name} im Band {label}{klammer} steht kein Bündel "
                 f"im Vergleich: {wer}."
+            )
+        if unvollstaendig:
+            wer = _esc(", ".join(dict.fromkeys(k["anbieter"] for k in unvollstaendig)))
+            return (
+                f"Beim {name} im Band {label}{klammer} hat kein Bündel einen "
+                f"vollständigen Preis: {wer}."
             )
         return f"Beim {name} im Band {label}{klammer} führt kein Anbieter ein Bündel."
     beste = zeilen[0]
@@ -685,310 +640,6 @@ def _rechnung_html(zeilen: list) -> str:
         f"Anschlusspreis</code> — Boni bleiben außerhalb. Beleg des "
         f"günstigsten Angebots: {link}{datum_teil}."
     )
-
-
-def _buendel_aus_messung(messung: dict, tarife: dict | None = None) -> Buendel | None:
-    """Das Buendel EINER Messung - aus Historien-Zeile und Stand.
-
-    A1 (20.09.2026): die EINE Baustelle dafuer. `_rechung` (das Panel) und
-    `_messungen` (Punkte und Auswahl) bauen denselben Satz - zwei Bauten
-    waeren zwei Rechnungen. Die Preisphasen des Tarifs kommen aus dem
-    Tarifbestand dazu (`phasen_fuer_buendel`, dieselbe Stelle wie die
-    Vodafone-Referenz und die Bündel-Anreicherung der Hauptansicht) - nur
-    ohne Widerspruch zur gemessenen Monatsrate (QA-Fix 20.09.2026), sonst
-    rechnete die Zeitreihe andere Punkte als die Karte daneben sagt.
-    None, wenn sich die Zeile nicht als Buendel lesen laesst.
-    """
-    satz, stand = messung["satz"], messung["stand"]
-    try:
-        b = Buendel(
-            sku_id=stand.get("sku_id") or "",
-            anbieter=stand.get("anbieter") or "?",
-            tarif_name=stand.get("tarif_name") or "",
-            tarif_id=satz.get("tarif_id") or "",
-            tarif_monatlich=satz.get("tarif_monatlich"),
-            tarif_bindung_monate=satz.get("tarif_bindung_monate"),
-            buendel_monatlich=satz.get("buendel_monatlich"),
-            geraet_zuzahlung=satz.get("geraet_zuzahlung"),
-            geraet_monatsrate=satz.get("geraet_monatsrate"),
-            laufzeit_monate=satz.get("laufzeit_monate"),
-            anschlusspreis=satz.get("anschlusspreis"),
-            zustand=satz.get("zustand") or "",
-            quelle_url=satz.get("quelle_url") or "",
-            abgerufen_am=satz.get("abgerufen_am") or "",
-        )
-    except (ValueError, TypeError) as exc:
-        log.warning(
-            "Zeitreihe: Messung %s am %s nicht als Buendel lesbar "
-            "(%s) - kein Punkt, kein Panel.",
-            satz.get("id"),
-            satz.get("datum"),
-            exc,
-        )
-        return None
-    if b.tarif_id:
-        b.tarif_phasen = phasen_fuer_buendel(
-            (tarife or {}).get(b.tarif_id) or {}, b.tarif_monatlich
-        )
-    return b
-
-
-def _messwert(
-    messung: dict, tarife: dict | None = None
-) -> tuple[float | None, int | None]:
-    """`(Leitzahl, ihr Zeitraum in Monaten)` - EINE Messung, EINE Rechnung.
-
-    Der Zeitraum wird GELESEN (`Tco.leitzahl_monate`), nie angenommen:
-    aufgeteilt 24 Monate, 1&1 (ein Bündelbetrag) seine Ratenlaufzeit. Ein
-    fremder Zeitraum sperrt die Kurve nicht (P0-B-z1); das Tor wirkt an
-    Rangfolge und Vorzeichen (`_band_zeilen`, `_bewegung`).
-    `(None, None)`: keine belastbare Zahl (Clean Code 3/5).
-    """
-    b = _buendel_aus_messung(messung, tarife)
-    if b is None:
-        return None, None
-    t = tco_24(b)
-    if not t.belastbar:
-        return None, None
-    return t.gesamt, t.leitzahl_monate
-
-
-def _wert_aus_messung(messung: dict, tarife: dict | None = None) -> float | None:
-    """Die HEUTIGE Leitzahl einer Messung (A1), nicht das eingefrorene
-    `gesamt` der Historie; `None` heisst nur "nicht belastbar gemessen"."""
-    return _messwert(messung, tarife)[0]
-
-
-def _rechung(messung: dict, tarife: dict | None = None) -> dict | None:
-    """Die Postenliste EINER Messung aus der Historien-Zeile.
-
-    Gerechnet wird nur in `tco_24` (A1: alle Raten, Tarif phasengewichtet);
-    hier wird ZERLEGT, der `betrag` je Posten kommt aus `Tco.bestandteile`
-    (Schluessel EXAKT wie dort, sonst fehlt ein Posten und die Summe geht
-    nicht auf). Zwei Preisformen: aufgeteilt (Tarif und Rate) und zusammen
-    (1&1, ein Bündelbetrag); Boni stehen nicht in der Historie. `monate`
-    ist der Zeitraum der Leitzahl (`Tco.leitzahl_monate`) fuer ihr Etikett.
-    """
-    satz = messung["satz"]
-    b = _buendel_aus_messung(messung, tarife)
-    if b is None:
-        return None
-    t = tco_24(b)
-    if t.gesamt is None:
-        return None
-    lz = b.laufzeit_monate
-
-    posten: list[dict] = []
-
-    def _posten(label: str, betrag, anzahl=None, einzeln=None, klammer=""):
-        if betrag is None:
-            return
-        posten.append(
-            {
-                "label": label,
-                "anzahl": anzahl,
-                "einzeln": einzeln,
-                "betrag": betrag,
-                "klammer": klammer,
-            }
-        )
-
-    _posten(POSTEN_ZUZAHLUNG, t.bestandteile.get(POSTEN_ZUZAHLUNG))
-    _posten(POSTEN_ANSCHLUSS, t.bestandteile.get(POSTEN_ANSCHLUSS))
-    if b.buendel_monatlich is not None:
-        _posten(
-            POSTEN_BUENDEL,
-            t.bestandteile.get(f"{POSTEN_BUENDEL} über {lz} Monate"),
-            anzahl=lz,
-            einzeln=b.buendel_monatlich,
-        )
-    else:
-        _posten(
-            "Tarif",
-            t.bestandteile.get(f"Tarif über {TCO_HORIZONT} Monate"),
-            anzahl=TCO_HORIZONT,
-            einzeln=b.tarif_monatlich,
-            klammer="phasengewichtet" if b.tarif_phasen else "",
-        )
-        _posten(
-            POSTEN_RATE,
-            t.bestandteile.get(f"Geräteraten über {lz} Monate"),
-            anzahl=lz,
-            einzeln=b.geraet_monatsrate,
-        )
-
-    summe = round(sum(p["betrag"] for p in posten), 2)
-    if summe != t.gesamt:
-        log.warning(
-            "Rechenweg: Posten von %s am %s ergeben %s, gerechnet "
-            "ist %s - die Zerlegung weicht von ihrer Rechnung ab.",
-            satz.get("id"),
-            satz.get("datum"),
-            summe,
-            t.gesamt,
-        )
-    offen = None
-    monatlich = (
-        b.geraet_monatsrate if b.buendel_monatlich is None else b.buendel_monatlich
-    )
-    if lz > TCO_HORIZONT and monatlich is not None:
-        offen = {
-            "anzahl": lz - TCO_HORIZONT,
-            "einzeln": monatlich,
-            "betrag": round((lz - TCO_HORIZONT) * monatlich, 2),
-        }
-    return {
-        "posten": posten,
-        "gesamt": t.gesamt,
-        "monate": t.leitzahl_monate,
-        "offen": offen,
-        "datum": satz.get("datum") or "",
-        "quelle_url": satz.get("quelle_url") or "",
-        "abgerufen_am": satz.get("abgerufen_am") or "",
-        "weitere_laufzeiten": messung.get("weitere_laufzeiten") or [],
-    }
-
-
-def _rechung_html(anbieter: str, messung: dict, tarife: dict | None = None) -> str:
-    """EINE Messung als fertiger Block - die gesetzte Rechung.
-
-    Struktur (fuer das Klick-Panel, siehe schnittstelle-rechenweg.md):
-    Kopf (Anbieter mit Farb-Punkt wie seine Linie im Graphen, Messtag),
-    Postenliste (Label, `anzahl × einzeln = betrag`; einmalige Posten ohne
-    Faktor; je Posten ein BALKEN in Breite seines Anteils an der Summe -
-    P1-Fix Sicht-A2: „nicht nur Zeilen", die Breite ist eine fertige
-    Prozentangabe aus dieser einen Rechnung, der Client setzt nichts),
-    Summe mit dem Label der Leitzahl, die Restschuld nach Monat 24
-    (Sicht-A3) und den Beleg mit Abrufdatum DIESES Messtags (nicht von
-    heute - das ist der Unterschied zum statischen „So gerechnet"-Satz).
-
-    `tarife` reicht der Tarifbestand durch dieselbe wie die Punkte: auch
-    das Panel rechnet die HEUTIGE Leitzahl, phasengewichtet wo der Stamm
-    Phasen nennt (A1).
-    """
-    r = _rechung(messung, tarife)
-    if r is None or not r["posten"]:
-        return ""
-    a = _esc(anbieter)
-    punkt = (
-        f"<i class='gr-zr-rpunkt' style='background:"
-        f"{_zr_marker_farbe(anbieter)}' aria-hidden='true'>"
-        f"</i>"
-    )
-    teile = [
-        "<div class='gr-zr-rech'>",
-        f"<p class='gr-zr-rkopf'>{punkt}<strong>{a}</strong> · Messung "
-        f"vom {_esc(_datum_de(r['datum']))}</p>",
-        "<ul class='gr-zr-posten'>",
-    ]
-    for p in r["posten"]:
-        if p["anzahl"] is not None and p["einzeln"] is not None:
-            ausdruck = (
-                f"{p['anzahl']} × {_euro(p['einzeln'])} "
-                f"<span class='gr-zr-pg'>= {_euro(p['betrag'])}"
-                f"</span>"
-            )
-        else:
-            ausdruck = _euro(p["betrag"])
-        klammer = (
-            f" <span class='gr-zr-pk'>{_esc(p['klammer'])}</span>"
-            if p["klammer"]
-            else ""
-        )
-        anteil = f"{p['betrag'] / r['gesamt'] * 100:.1f}%" if r["gesamt"] else "0%"
-        teile.append(
-            f"<li class='gr-zr-posten'>"
-            f"<span class='gr-zr-pn'>{_esc(p['label'])}</span>"
-            f"<span class='gr-zr-pbar'><i style='width:{anteil}"
-            f"'></i></span>"
-            f"<span class='gr-zr-pr'>{ausdruck}{klammer}</span>"
-            f"</li>"
-        )
-    teile.append("</ul>")
-    teile.append(
-        f"<p class='gr-zr-rsumme'>= <b>{_euro(r['gesamt'])}</b> "
-        f"<span class='gr-zr-plabel'>{label_der_leitzahl(r['monate'])}</span></p>"
-    )
-    if r["offen"] is not None:
-        teile.append(
-            f"<p class='gr-zr-roffen'>davon nach Monat "
-            f"{TCO_HORIZONT} noch zu zahlen: "
-            f"{r['offen']['anzahl']} × {_euro(r['offen']['einzeln'])}"
-            f" = {_euro(r['offen']['betrag'])}</p>"
-        )
-    if r["weitere_laufzeiten"]:
-        teile.append(
-            f"<p class='gr-zr-rweitere'>Zum selben Betrag auch "
-            f"über {_zeitraum_wort(r['weitere_laufzeiten'])} "
-            f"erhältlich – dabei bleibt nach Monat {TCO_HORIZONT} "
-            f"eine Restschuld offen.</p>"
-        )
-    url = r["quelle_url"]
-    link = (
-        f"<a href='{_esc(url)}' target='_blank' rel='noopener'>{a}&nbsp;↗</a>"
-        if url
-        else a
-    )
-    datum_teil = (
-        f", abgerufen {_esc(_datum_kurz(r['abgerufen_am']))}"
-        if r["abgerufen_am"]
-        else ""
-    )
-    teile.append(f"<p class='gr-zr-rbeleg'>Beleg: {link}{datum_teil}.</p>")
-    teile.append("</div>")
-    return "".join(teile)
-
-
-def _naeherung_html() -> str:
-    """Der benannte Leerzustand der Vodafone-Naeherung.
-
-    Die Naehrungskarte ist eine gerechnete Referenz (PIB-Tarif plus
-    eigener Barpreis), kein Bündel der Historie - es gibt keine Messung
-    je Messtag und damit keinen Rechenweg dieses Panels. Der erste Satz
-    ist wortgleich der Hinweis von der Bündel-Karte (`_NAEHERUNG_SATZ`),
-    nur der Grund des Leerzustands kommt dazu.
-    """
-    return (
-        f"<div class='gr-zr-rech gr-zr-rech--leer' data-anb='{EIGEN}' "
-        f"data-m='naeherung'><p class='gr-zr-rkopf'><strong>{EIGEN}"
-        f"</strong> · Referenzrechnung</p>"
-        f"<p class='gr-zr-rleer'>{_esc(_NAEHERUNG_SATZ)}"
-        f"{_esc(_NAEHERUNG_KEIN_WEG)}</p></div>"
-    )
-
-
-def _rechenwege_html(
-    messungen_paar: dict, zeilen: list, tarife: dict | None = None
-) -> str:
-    """Je Serie/Messung ein <template data-m=...> unter dem SVG (V1).
-
-    Der Server liefert die fertige Rechung JE MESSUNG als inerte Vorlage;
-    der Client setzt sie bei Klick nur noch ein (app.js montiert, es
-    rechnet nichts - Regel 1). Der Container ist `hidden`: ohne Klick
-    kostet er keinen Platz. Die Naeherung bekommt EINEN Leerzustand-
-    Block mit `data-m='naeherung'`, damit jede klickbare Vodafone-Zahl
-    dieses Paars eine Antwort findet.
-    """
-    bloecke: list[str] = []
-    for anbieter in ANBIETER_FOLGE:
-        saetze = messungen_paar.get(anbieter)
-        if not saetze:
-            continue
-        for datum in sorted(saetze):
-            inhalt = _rechung_html(anbieter, saetze[datum], tarife)
-            if inhalt:
-                bloecke.append(
-                    f"<template data-anb='{_esc(anbieter)}' "
-                    f"data-m='{_esc(datum)}'>{inhalt}</template>"
-                )
-    if any(z.get("naeherung") for z in zeilen):
-        bloecke.append(
-            f"<template data-anb='{EIGEN}' data-m='naeherung'>"
-            f"{_naeherung_html()}</template>"
-        )
-    if not bloecke:
-        return ""
-    return "<div class='gr-zr-rechnungen' hidden>" + "".join(bloecke) + "</div>"
 
 
 def buendel_schluessel(satz: dict) -> str | None:
@@ -1871,7 +1522,11 @@ def aufbereiten(
         bands = [
             b
             for b, s in zeilen_je_band.items()
-            if s["zeilen"] or s.get("alt") or s.get("fremd") or s.get("gesperrt")
+            if s["zeilen"]
+            or s.get("alt")
+            or s.get("fremd")
+            or s.get("gesperrt")
+            or s.get("unvollstaendig")
         ]
         erlaubt[modell["id"]] = bands
         for band in bands:
@@ -1978,6 +1633,7 @@ def aufbereiten(
                         alte=satz.get("alt"),
                         fremd=fremde,
                         gesperrt=satz.get("gesperrt"),
+                        unvollstaendig=satz.get("unvollstaendig"),
                     ),
                     "leitzahl_html": _leitzahl_html(zeilen),
                     "rechnung_html": _rechnung_html(zeilen),

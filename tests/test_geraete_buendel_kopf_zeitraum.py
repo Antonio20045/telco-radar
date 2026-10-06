@@ -264,15 +264,16 @@ def test_jede_zeile_traegt_ihren_zeitraum_als_sortiergruppe(suppe):
     Beschriftungsregel, eine Gruppierung).
 
     Gegen den alten Stand rot: das Attribut gab es nicht, und `data-
-    laufzeit` daneben ist fuer JEDE Zeile 24 - auch fuer die 36er.
+    laufzeit` daneben war fuer JEDE Zeile 24 - auch fuer die 36er. Seit
+    Datenkonzept Geräte Schritt 2 ist `karte["laufzeit"]` der Zeitraum H der
+    Kernzahl und damit dieselbe Zahl wie das Etikett.
     """
     zeilen = _zeilen(suppe)
     paare = [(z.get("data-leitzahl-monate"), _etikett_monate(z)) for z in zeilen]
     assert all(a for a, _e in paare), paare
     assert all(int(a) == e for a, e in paare), paare
-    assert {z.get("data-laufzeit") for z in zeilen} == {"24"}, [
-        z.get("data-laufzeit") for z in zeilen
-    ]
+    assert all(z.get("data-laufzeit") == z.get("data-leitzahl-monate") for z in zeilen)
+    assert {z.get("data-laufzeit") for z in zeilen} == {"24", "36"}
 
 
 def test_ohne_gemessenen_zeitraum_bleibt_die_sortiergruppe_leer():

@@ -10,8 +10,8 @@
 - Eine Datenqualitätsheuristik schaltet nie die Navigation; die Veröffentlichungsschwelle rechnet gegen den Bestand.
 - Arbeitsstand der Geräteseite: `outputs/fortschritt-geraeteseite.md`.
 
-## Leitzahl der Geräteseite (Ziel, noch nicht umgesetzt)
+## Leitzahl der Geräteseite
 
-Kosten über 24 Monate = Anzahlung + 24 Monate Tarif + alle Geräteraten inklusive Restschuld nach Monat 24 + Anschlusspreis.
+Kernzahl jeder Bündelzeile ist `tco_model.kosten_ueber()`: Anzahlung + Tarif über H Monate + alle Geräteraten + Anschlusspreis, H = größerer Wert aus Ratenlaufzeit und Tarifbindung (12 → 24, 24 → 24, 36 → 36; 1&1 ein Vertrag über 36). Ein Tarifmonat nach der Bindung zählt nur mit gemessener Preisphase, sonst ist die Zeile eine benannte Lücke ohne Zahl. Karte, Zeitreihe, Rechenweg und Export rufen dieselbe Funktion (`docs/datenkonzept-geraete.md` Abschnitt 5).
 
-Erfasst werden alle angebotenen Ratenlaufzeiten: Telekom 6/12/24/36, o2 24/36, congstar 24/36, 1&1 „24+12“ mit Schlusszahlung, Vodafone 12/24/36. Die Laufzeit gehört in den Bündelschlüssel, sonst überschreiben sich die Varianten. Das ist nicht der Ist-Stand von `tco_model.py` (`tco_24()`, `tco_bindung()`); wer daran arbeitet, gleicht Code, Etiketten und Tests an und prüft, dass Rechenweg-Panel und Katalog dieselbe Zahl zeigen.
+Erfasst werden alle angebotenen Ratenlaufzeiten: Telekom 6/12/24/36, o2 24/36, congstar 24/36, 1&1 „24+12“ mit Schlusszahlung, Vodafone 12/24/36. Die Laufzeit gehört in den Bündelschlüssel, sonst überschreiben sich die Varianten.
