@@ -10,6 +10,8 @@ Lauf dauert, auch in anderen Kontexten desselben Browsers. Speculation Rules hol
 Chromium an beiden vorbei; die entfernt das Tor aus jeder Antwort und ``OHNE_VORAB_JS``
 aus nachgeladenen Elementen, auch in Shadow Roots, bevor der Browser sie liest.
 ``schliesse`` verlässt die Seite, schließt den Kontext und gibt das Vorabladen frei.
+HAR-Belege in ``wiedergabe`` beantworten ihre Anfragen ohne Netz und vor dem Tor; was
+sie nicht kennen, geht an das Tor.
 """
 
 from __future__ import annotations
@@ -17,6 +19,7 @@ from __future__ import annotations
 import logging
 import re
 from dataclasses import dataclass
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 from playwright.sync_api import Error as PlaywrightFehler
@@ -81,12 +84,18 @@ class Sitzung:
 
 
 def oeffne_sitzung(
-    browser: Browser, tor: Tor, fenster: ViewportSize, kennung: str | None = None
+    browser: Browser,
+    tor: Tor,
+    fenster: ViewportSize,
+    kennung: str | None = None,
+    *,
+    wiedergabe: tuple[Path, ...] = (),
 ) -> Sitzung:
     """Eigener Kontext ohne Service Worker und ohne Vorabladen, alles am Tor.
 
     ``kennung`` ist der User-Agent aus ``geraete_quellen.yaml``, sonst der des Browsers;
-    eine andere Kopfzeile setzt der Kontext nicht.
+    eine andere Kopfzeile setzt der Kontext nicht. Die HAR-Dateien in ``wiedergabe``
+    stehen vor dem Tor.
     """
     wache = sperre_vorabladen(browser)
     kontext: BrowserContext | None = None
@@ -97,6 +106,8 @@ def oeffne_sitzung(
         kontext.add_init_script(script=OHNE_VORAB_JS)
         kontext.route_web_socket("**/*", tor.websocket)
         kontext.route("**/*", tor)
+        for har in wiedergabe:
+            kontext.route_from_har(har, not_found="fallback")
         seite = kontext.new_page()
         sperre_beiwege(kontext, seite)
     except PlaywrightFehler:

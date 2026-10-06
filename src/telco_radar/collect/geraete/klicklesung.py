@@ -4,9 +4,9 @@ Der Klick-Crawler (``klickcrawler``) ruft ``Leser.lies``, sobald die Antwort zum
 da ist. Der Leser liest erst die mitgeschnittene Antwort, dann nach zwei Bildern den
 Text der Preiszusammenfassung (in Takten, der Crawl-delay zählt nicht gegen die Frist),
 prüft die roh markierten Optionen gegen die geklickten und das Echo (``klickecho``) und
-macht einen Screenshot des Preisbereichs. Fehlt die Zusammenfassung, heißt die
-Kombination ``nicht_erfasst``; widerspricht sich etwas, ``befund``. Gefundene Wertfelder
-zählt der Strukturwächter.
+macht einen Screenshot des Preisbereichs; den gelesenen Text gibt er für die Fundstellen
+des Belegs mit. Fehlt die Zusammenfassung, heißt die Kombination ``nicht_erfasst``;
+widerspricht sich etwas, ``befund``. Gefundene Wertfelder zählt der Strukturwächter.
 """
 
 from __future__ import annotations
@@ -104,7 +104,15 @@ class Leser:
         erster: str | None = befunde[0].grund if befunde else None
         status = BEFUND if befunde else ERFASST
         return Kombiergebnis(
-            variante, status, erster, echo.werte, befunde, echo.luecken, bild, url
+            variante,
+            status,
+            erster,
+            echo.werte,
+            befunde,
+            echo.luecken,
+            bild,
+            url,
+            text=text,
         )
 
     def _abweichung(self, ziel: dict[str, str | None]) -> tuple[Befund, ...]:

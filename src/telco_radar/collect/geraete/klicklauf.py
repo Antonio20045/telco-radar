@@ -13,6 +13,11 @@ oder 5xx, ein bekanntes Challenge-Muster (``CHALLENGE_MUSTER``) oder eine HTML-S
 die Preisschnittstelle JSON liefern soll. Gescheiterte Anfragen hält der Lauf mit Grund
 fest.
 
+Jede Kombination mit gelesenen Werten trägt ihren Beleg (``klickbeleg``) und
+``beleg_status``: ``belegt``, ``fehlt`` oder ``ohne_wert``. Ein Wert ohne Beleg ist
+nicht gültig: ``mit_beleg`` macht eine erfasste Kombination ohne Beleg zum ``befund``
+mit Grund, die Werte bleiben sichtbar; ``gueltig`` gilt nur erfasst und belegt.
+
 Der Strukturwächter zählt je Lauf gesuchte und gefundene Knöpfe und Felder. Findet ein
 Lauf weniger als ``MINDESTANTEIL_KNOEPFE`` der gesuchten Knöpfe oder weniger als
 ``MINDESTANTEIL_FELDER`` der gesuchten Felder, oder fällt ein Anteil gegen den Bezug um
@@ -25,11 +30,15 @@ nie 0.
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
+from typing import TYPE_CHECKING
 
 from .klickecho import Befund, Variante
 from .klickkarte import WERTFELDER
 from .klicktext import Preiswerte
+
+if TYPE_CHECKING:
+    from .klickbeleg import Belegpaket
 
 ERFASST = "erfasst"
 NICHT_ANGEBOTEN = "nicht_angeboten"
@@ -38,6 +47,9 @@ BEFUND = "befund"
 LAUF_GELESEN = "gelesen"
 LAUF_GESTOERT = "gestoert"
 LAUF_GESPERRT = "gesperrt"
+BELEGT = "belegt"
+BELEG_FEHLT = "fehlt"
+OHNE_WERT = "ohne_wert"
 CHALLENGE_STATUS = 202
 FEHLER_AB_STATUS = 400
 STRUKTUR_SPRUNG = 0.2
@@ -94,6 +106,14 @@ class Kombiergebnis:
     screenshot_png: bytes | None = None
     antwort_url: str | None = None
     auswahl: tuple[str | None, ...] = ()
+    text: str | None = None
+    beleg: Belegpaket | None = None
+    beleg_status: str = OHNE_WERT
+
+    @property
+    def gueltig(self) -> bool:
+        """Wahr nur für eine erfasste Kombination mit Beleg."""
+        return self.status == ERFASST and self.beleg_status == BELEGT
 
 
 @dataclass
@@ -171,6 +191,25 @@ def bot_schutz(
     if treffer is not None:
         return f"Abruf gestört (Challenge „{treffer[0]}“, HTTP {status})"
     return None
+
+
+def mit_beleg(
+    ergebnis: Kombiergebnis, paket: Belegpaket | None, grund: str | None
+) -> Kombiergebnis:
+    """Hängt den Beleg an; ohne Beleg werden gelesene Werte zum Befund mit Grund."""
+    if paket is not None:
+        return replace(ergebnis, beleg=paket, beleg_status=BELEGT)
+    gelesen = any(getattr(ergebnis.werte, f) is not None for f in WERTFELDER)
+    if not gelesen:
+        return replace(ergebnis, beleg_status=OHNE_WERT)
+    befund = Befund("beleg", grund or "Beleg fehlt")
+    return replace(
+        ergebnis,
+        status=BEFUND,
+        grund=ergebnis.grund or befund.grund,
+        befunde=(*ergebnis.befunde, befund),
+        beleg_status=BELEG_FEHLT,
+    )
 
 
 def ergebnisgrund(ergebnisse: list[Kombiergebnis]) -> str | None:

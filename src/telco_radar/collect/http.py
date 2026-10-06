@@ -15,6 +15,7 @@ from __future__ import annotations
 import hashlib
 import logging
 import random
+import ssl
 import threading
 import time
 from contextlib import contextmanager
@@ -176,12 +177,40 @@ def _hole(url: str, **art: Any) -> httpx.Response:
 Zeitueberschreitung = httpx.TimeoutException
 HttpFehler = httpx.HTTPError
 StatusFehler = httpx.HTTPStatusError
+Antwort = httpx.Response
 
 
 def get(url: str, **art: Any) -> httpx.Response:
     """Ein GET ohne Kennungswechsel und Backoff, über Drossel und Naht."""
     with _gate.slot(url):
         return _hole(url, **art)
+
+
+def _tls() -> ssl.SSLContext | bool:
+    """TLS-Prüfung gegen das Bündel von ``_ca_bundle`` als Kontext."""
+    buendel = _ca_bundle()
+    return ssl.create_default_context(cafile=buendel) if buendel is not True else True
+
+
+def sende(
+    methode: str, url: str, inhalt: bytes, kopf: dict[str, str], frist: float
+) -> httpx.Response:
+    """Ein Aufruf mit Körper an einen eigenen Dienst (Ablage, Zeitstempel), über
+    Drossel und Naht; ohne Kennungswechsel, Backoff und Umleitung."""
+    with _gate.slot(url):
+        if TRANSPORT is None:
+            return httpx.request(
+                methode,
+                url,
+                content=inhalt,
+                headers=kopf,
+                timeout=frist,
+                verify=_tls(),
+            )
+        with httpx.Client(transport=TRANSPORT) as client:
+            return client.request(
+                methode, url, content=inhalt, headers=kopf, timeout=frist
+            )
 
 
 def fetch(

@@ -25,6 +25,11 @@ Tageslauf. Je Produktseite und Klick-Karte (``klickkarte``):
 4. Je Kombination: erfasst, nicht_angeboten, nicht_erfasst oder befund; dazu der
    Strukturwächter je Lauf (beides in ``klicklauf``). Ist keine Kombination angeboten,
    ist der Lauf gestört.
+5. Jede gelesene Kombination trägt ihren Beleg (``klickbeleg``): Screenshot, HAR der
+   Preisantwort, Zeitpunkt aus ``uhr``, Fundstellen. Ohne Beleg ist ein Wert nicht
+   gültig (``klicklauf.mit_beleg``). ``wiedergabe`` nennt HAR-Belege, aus denen der
+   Kontext Antworten ohne Netz abspielt (``route_from_har``); was sie nicht kennen,
+   geht wie sonst durch das Tor.
 
 Den Browser startet der Aufrufer; dieses Modul setzt keine Tarnung, keinen Proxy und
 keine fremde Kennung.
@@ -36,14 +41,18 @@ import logging
 from collections.abc import Callable
 from dataclasses import replace
 from datetime import datetime
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 from playwright.sync_api import Error as PlaywrightFehler
 
+from .klickbeleg import Belegquelle, baue_beleg, kopie_aus
 from .klickecho import LAUFZEIT, Variante, variante_aus
 from .klickkarte import DIMENSIONEN, Klickkarte
 from .klickkontext import Sitzung, oeffne_sitzung, schliesse
 from .klicklauf import (
+    BEFUND,
+    ERFASST,
     LAUF_GELESEN,
     LAUF_GESPERRT,
     LAUF_GESTOERT,
@@ -52,6 +61,7 @@ from .klicklauf import (
     Klicklauf,
     Kombiergebnis,
     ergebnisgrund,
+    mit_beleg,
     pruefe_struktur,
 )
 from .klicklesung import Leser
@@ -94,6 +104,7 @@ def klicke_durch(
     schleuse: Schleuse,
     vorlauf: Klicklauf | None = None,
     frist_ms: int = ANTWORT_FRIST_MS,
+    wiedergabe: tuple[Path, ...] = (),
 ) -> Klicklauf:
     """Klickt alle angebotenen Kombinationen auf ``adresse``; wirft nie.
 
@@ -107,7 +118,7 @@ def klicke_durch(
     tor = Tor(waechter, uhr, schleuse, lauf)
     sitzung: Sitzung | None = None
     try:
-        sitzung = oeffne_sitzung(browser, tor, FENSTER)
+        sitzung = oeffne_sitzung(browser, tor, FENSTER, wiedergabe=wiedergabe)
         _Gang(sitzung.seite, karte, tor, frist_ms, lauf).laufe()
     except Abbruch as abbruch:
         lauf.status, lauf.grund = abbruch.status, abbruch.grund
@@ -242,7 +253,24 @@ class _Gang:
                 return ergebnis
         if self.wache.ausstehend is not None:
             return Kombiergebnis(variante, NICHT_ERFASST, self.wache.ausstehend)
-        return self.leser.lies(variante, ziel, self.wache.antwort, self.lauf.struktur)
+        antwort = self.wache.antwort
+        ergebnis = self.leser.lies(variante, ziel, antwort, self.lauf.struktur)
+        if ergebnis.status not in (ERFASST, BEFUND):
+            return ergebnis
+        quelle = Belegquelle(
+            anbieter=self.karte.anbieter,
+            adresse=self.lauf.adresse,
+            seite=self.seite.url,
+            http_status=self.lauf.http_status,
+            variante=variante,
+            status=ergebnis.status,
+            werte=ergebnis.werte,
+            text=ergebnis.text,
+            screenshot_png=ergebnis.screenshot_png,
+            antwort=kopie_aus(antwort),
+        )
+        paket, ohne = baue_beleg(quelle, self.karte, self.tor.uhr())
+        return mit_beleg(ergebnis, paket, ohne)
 
     def _fehlen(self, dimension: str) -> str:
         selektor = self.karte.knoepfe[dimension].selektor

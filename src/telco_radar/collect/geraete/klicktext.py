@@ -11,7 +11,8 @@ Satzteils („keine Zinsen“) ist keine 0. Ein Datenvolumen mit GB-Zahl ist beg
 wenn die Zeile „unbegrenzt“ nennt; unbegrenzt ist es nur ohne Zahl (``math.inf``).
 Tarifphasen mit einem Ende vor dem Anfang sind ein Widerspruch: die Zeile ergibt dann
 keine Phasen. Fehlt ein Wert, ist er ``None``, nie 0. Deutsche Zahlen liest
-``tarif_model.zahl``.
+``tarif_model.zahl``. ``fundstellen`` nennt je Feld den Ausschnitt, aus dem der Wert
+stammt; der Beleg (``klickbeleg``) hält ihn fest.
 """
 
 from __future__ import annotations
@@ -93,6 +94,28 @@ def lies_zusammenfassung(text: str) -> Preiswerte:
     )
 
 
+def fundstellen(text: str) -> dict[str, str]:
+    """Je Wertfeld der Ausschnitt, aus dem ``lies_zusammenfassung`` den Wert liest.
+
+    Allein gelesen nennt ein Ausschnitt sein Feld wie der ganze Text: so findet eine
+    Prüfung einen archivierten Wert an seiner Fundstelle wieder.
+    """
+    zeilen = text.splitlines()
+    rate, mal = _RATE.search(text), _MAL_RATE.search(text)
+    funde = {
+        "anzahlung": _postenstelle(_ANZAHLUNG, text),
+        "rate": _ausschnitt(rate or mal),
+        "ratenzahl": _ausschnitt(_RATENZAHL.search(text) or mal),
+        "tarifphasen": next(
+            (z for z in zeilen if _TARIFZEILE.search(z) and _BETRAG_RE.search(z)), None
+        ),
+        "tarifbindung": _ausschnitt(_BINDUNG.search(text)),
+        "anschluss": _postenstelle(_ANSCHLUSS, text),
+        "volumen_gb": next((z for z in zeilen if _volumenzeile(z)), None),
+    }
+    return {feld: stelle for feld, stelle in funde.items() if stelle is not None}
+
+
 def volumen_aus_zeile(zeile: str) -> float | None:
     """GB aus einer Zeile; ``math.inf`` nur für „unbegrenzt“ ohne GB-Zahl."""
     vorn = _GEGENWERT.split(zeile, maxsplit=1)[0]
@@ -128,6 +151,22 @@ def _postenwert(muster: tuple[re.Pattern[str], ...], text: str) -> float | None:
         if not _VERNEINT.search(text[: treffer.start()]):
             return zahl(treffer[1])
     return 0.0 if any(m.search(text) for m in null) else None
+
+
+def _postenstelle(muster: tuple[re.Pattern[str], ...], text: str) -> str | None:
+    betrag, *null = muster
+    for treffer in betrag.finditer(text):
+        if not _VERNEINT.search(text[: treffer.start()]):
+            return treffer[0]
+    return next((t[0] for m in null if (t := m.search(text)) is not None), None)
+
+
+def _ausschnitt(treffer: re.Match[str] | None) -> str | None:
+    return None if treffer is None else treffer[0]
+
+
+def _volumenzeile(zeile: str) -> bool:
+    return bool(_VOLUMENZEILE.search(zeile)) and volumen_aus_zeile(zeile) is not None
 
 
 def _rate_aus_text(text: str) -> tuple[float | None, int | None]:
