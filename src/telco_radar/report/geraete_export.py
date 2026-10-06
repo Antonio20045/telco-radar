@@ -169,6 +169,7 @@ SPALTEN_TCO = [
     "Abgerufen am",
     "Quelle",
     "SKU-ID",
+    "Status",
 ]
 
 SPALTEN_RADAR = [
@@ -278,25 +279,22 @@ def tco_csv(zeilen: dict) -> tuple[str, int]:
     """Der TCO-Bestand als CSV - eine Zeile je Bündel, plus SIM-only.
 
     `zeilen` kommt aus `geraete_tco_view.aufbereiten()["export"]`: WERTE
-    (Modellname, Band, TCO-24 aus `tco_24`) sind dort aufgelöst, hier wird
-    nur FORM gemacht - Dezimalkomma, Semikolon, leere Zelle fuer eine
-    Lücke. Die SIM-only-Zeilen tragen ihre TCO-24 als `ueber_horizont` -
-    seit A4 dieselbe Rechnung wie die Bündel (`tco_24` ueber
-    `als_buendel()`, inklusive Anschlusspreis), gerechnet in derselben
-    Funktion, die auch die Tafel fuettert. Die letzte Spalte ist die
-    SKU-ID (A4): ohne sie kollabieren Farbvarianten zu byte-identischen
-    Zeilen - SIM-only-Zeilen tragen sie leer, sie haben kein Gerät.
+    (Modellname, Band, TCO-24 aus `tco_24`, für SIM-only seit A4 über
+    `als_buendel()` samt Anschlusspreis) sind dort aufgelöst, hier wird nur
+    FORM gemacht - Dezimalkomma, Semikolon, leere Zelle für eine Lücke. Die
+    SKU-ID (A4) trennt Farbvarianten, die sonst byte-gleich wären; „Status“
+    dahinter nennt die Notbremse wie die Bündelzeile („Schätzung“, „Aktion
+    abgelaufen“). SIM-only-Zeilen tragen beide leer, sie haben kein Gerät.
 
     P0-B-h4: der ZEITRAUM der Leitzahl steht als EIGENE Spalte
     (`leitzahl_monate`, aus `Tco.leitzahl_monate` gelesen) - er wird hier
     nicht geraten und nicht aus `laufzeit` abgeleitet, weil beides
     auseinanderlaufen kann (congstar: 36 Raten, 24 Monate Leitzahl).
 
-    P0-B-z3 (BEFUND 1): die neue Spalte VOR dem alten Kopf traegt dieselbe
-    Zahl NUR, wenn `leitzahl_monate == TCO_HORIZONT` ist - fuer die
-    1&1-Zeilen mit 36 Monaten bleibt sie eine benannte Luecke statt der
-    Zahl unter einem Kopf, der 24 behauptet. Der alte Kopf DANEBEN aendert
-    sich nicht (Fremdschluessel, siehe Modulkopf).
+    P0-B-z3 (BEFUND 1): die Spalte über 24 Monate trägt die Zahl NUR bei
+    `leitzahl_monate == TCO_HORIZONT`; für die 1&1-Zeilen mit 36 Monaten
+    bleibt sie eine benannte Lücke statt einer Zahl unter einem Kopf, der 24
+    behauptet (die Zahl steht dann unter `SPALTE_UEBER_LAUFZEIT`).
     """
     ausgabe = []
     for z in (zeilen or {}).get("buendel", []):
@@ -324,6 +322,7 @@ def tco_csv(zeilen: dict) -> tuple[str, int]:
                 z.get("abgerufen_am", ""),
                 z.get("quelle_url", ""),
                 z.get("sku_id", ""),
+                z.get("status", ""),
             ]
         )
     for z in (zeilen or {}).get("sim_only", []):
@@ -350,6 +349,7 @@ def tco_csv(zeilen: dict) -> tuple[str, int]:
                 ueber_laufzeit,
                 z.get("abgerufen_am", ""),
                 z.get("quelle_url", ""),
+                "",
                 "",
             ]
         )

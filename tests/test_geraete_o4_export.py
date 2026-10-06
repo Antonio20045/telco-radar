@@ -60,6 +60,7 @@ SPALTEN_TCO = [
     "Abgerufen am",
     "Quelle",
     "SKU-ID",
+    "Status",
 ]
 
 

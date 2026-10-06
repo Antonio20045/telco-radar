@@ -48,7 +48,7 @@ from __future__ import annotations
 import logging
 
 from . import geraete_tco_band, geraete_tco_grafik, geraete_tco_karten
-from . import geraete_vergleich
+from . import geraete_notbremse, geraete_vergleich
 from ..geraete_model import VERGLEICHBARE_ZUSTAENDE, Ratenzahlung, normalisiere
 from ..tarif_model import PREISTYP_LIVE_SHOP, vertrag_basis
 from ..tco_model import (
@@ -474,6 +474,7 @@ def _export_zeilen(
     katalog,
     band_je_tarif: dict,
     anbieter_typen: dict | None,
+    heute: str = "",
 ) -> dict:
     """Die Zeilen des TCO-Gesamtexports (O4) - WERTE, keine Form.
 
@@ -493,19 +494,17 @@ def _export_zeilen(
     Exportzeilen (live: 156). Sie ist Teil des Bündelschluessels und
     trennt deshalb JEDES Paar, nicht nur das heutige.
 
-    P0-B-h4 (BEFUND HOCH, 21.09.2026): der Spaltenkopf `geraete_export.
-    SPALTEN_TCO` behauptete "Kosten über 24 Monate EUR" fuer JEDE Zeile,
-    obwohl 74 Buendel des Bestands (`buendel_monatlich`, 1&1) ihre Summe
-    ueber 36 Monate tragen (`Tco.leitzahl_monate`, P0-B-h1). Diese Funktion
-    reicht den Zeitraum deshalb als EIGENES Feld durch (`leitzahl_monate`,
-    aus `kennzahl.leitzahl_monate` bzw. derselben Rechnung fuer die
-    SIM-only-Referenz) - der Export liest ihn, statt eine feste Zahl in den
-    Kopf zu schreiben.
+    P0-B-h4 (21.09.2026): 74 Bündel (1&1, `buendel_monatlich`) tragen ihre
+    Summe über 36 Monate, der Kopf behauptete 24 für JEDE Zeile. Der Zeitraum
+    geht deshalb als EIGENES Feld durch (`leitzahl_monate`, gelesen aus
+    `Tco.leitzahl_monate`, bei SIM-only aus derselben Rechnung).
 
-    Die SIM-only-Zeilen sind DERSELBE Massstab, den die Tafel zeigt
-    (`_referenztabelle`), inklusive `ueber_horizont` als ihrer TCO-24 -
-    `tco_24` ueber `als_buendel()`, inklusive Anschlusspreis, gerechnet
-    an derselben Stelle wie die Leitzahl der Bündel.
+    `status` ist der Zustand der Notbremse (`geraete_notbremse.kurz`, dasselbe
+    Wort wie an der Bündelzeile), leer bei einem Bündel, das zählt.
+
+    Die SIM-only-Zeilen sind DERSELBE Massstab wie auf der Tafel
+    (`_referenztabelle`), `ueber_horizont` als ihre TCO-24 (`tco_24` über
+    `als_buendel()` samt Anschlusspreis, dieselbe Stelle wie bei den Bündeln).
     """
     geraet_je_sku: dict = {}
     for e in eintraege:
@@ -545,6 +544,7 @@ def _export_zeilen(
                 "abgerufen_am": b.abgerufen_am,
                 "quelle_url": b.quelle_url,
                 "sku_id": b.sku_id or "",
+                "status": geraete_notbremse.kurz(b, heute),
             }
         )
     sim = []
@@ -782,7 +782,7 @@ def aufbereiten(
         "baender_katalog": geraete_tco_band.baender_katalog(leiter),
         "band_je_tarif": band_je_tarif,
         "export": _export_zeilen(
-            buendel, massstab, eintraege, katalog, band_je_tarif, anbieter_typen
+            buendel, massstab, eintraege, katalog, band_je_tarif, anbieter_typen, heute
         ),
         "historie_lage": tco_historie
         if tco_historie is not None
