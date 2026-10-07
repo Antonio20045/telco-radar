@@ -3108,6 +3108,34 @@ b,strong{font-weight:700}
 .gr-bnd-delta,.gr-bnd-bar{text-align:right;font-family:var(--sans);
   font-size:13px;color:var(--ink-2)}
 .gr-bnd-delta{white-space:nowrap}
+/* Die Rechnung der Zeile (Antonio 07.10.2026): offen, eine Zeile unter Tarif
+   bis Gerätepreis, Summanden und Summe in gleicher Ziffernbreite. Die
+   Summe wiederholt die Kernzahl rechts - das Gleichheitszeichen schließt
+   die Rechnung, die große Zahl bleibt die Leitzahl. */
+@media (min-width:901px){
+  .gr-bnd-an,.gr-bnd-tco,.gr-bnd-delta,.gr-bnd-bar{grid-row:1 / span 3}
+  .gr-bnd-tarif{grid-column:2;grid-row:1}
+  .gr-bnd-rechnung{grid-column:2;grid-row:2}
+  .gr-bnd-herleitung{grid-column:2;grid-row:3}
+}
+.gr-bnd-rechnung,.gr-bnd-herleitung{font-family:var(--sans);
+  font-size:13px;line-height:1.5;min-width:0;overflow-wrap:anywhere}
+.gr-bnd-rechnung{color:var(--ink-2);margin-top:3px}
+.gr-bnd-term{white-space:nowrap}
+.gr-bnd-wort{color:var(--ink-4)}
+.gr-bnd-op{color:var(--ink-4);white-space:pre}
+.gr-bnd-ergebnis{white-space:nowrap}
+.gr-bnd-fehlt{color:var(--ink-4);font-style:italic;white-space:nowrap}
+.gr-bnd-summe{color:var(--ink);font-weight:650}
+.gr-bnd-herleitung{font-size:12px;color:var(--ink-4)}
+.gr-bnd-versand{margin:-4px 0 8px;font-family:var(--sans);font-size:12px;
+  color:var(--ink-4)}
+/* Marken an der Zeile sind schlichter grauer Text unter dem Namen, keine
+   Kästchen: die Rechnung daneben sagt, was zählt. */
+.gr-bnd-an .gr-kk-marke{display:block;border:0;padding:0;margin:2px 0 0;
+  background:none;font-family:var(--sans);font-size:12px;font-weight:400;
+  letter-spacing:0;text-transform:none;color:var(--ink-4);line-height:1.35}
+.gr-bnd-an .gr-kk-marke--zustand{color:var(--red)}
 /* EIN Aufklappzeichen je Bündelzeile (28.09.2026): bis hierhin trug die
    Zeile das „+" der Chevron-Zelle UND das rote „▾" der Tafel-Regel
    (`.gr-tafel summary::after`), das als eigenes Grid-Element in eine
@@ -3170,7 +3198,9 @@ b,strong{font-weight:700}
      statt nur die halbe. */
   .gr-bnd summary{
     grid-template-columns:minmax(0,1fr) auto;row-gap:3px;
-    grid-template-areas:"an an" "tco tco" "tar bar" "dl chev"}
+    grid-template-areas:"an an" "tco tco" "tar bar" "re re" "hl hl" "dl chev"}
+  .gr-bnd-rechnung{grid-area:re}
+  .gr-bnd-herleitung{grid-area:hl}
   .gr-bnd-an{grid-area:an;min-width:0}
   /* I (QA-Fix 24.09.2026): DAS ABZEICHEN BEKOMMT DIE VOLLE ZEILENBREITE.
      Als `inline-block` (Basisregel `.gr-kk-marke`) war seine Breite

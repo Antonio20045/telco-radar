@@ -32,6 +32,34 @@ if TYPE_CHECKING:
 ZEITRAUM_OHNE_BINDUNG = 24
 POSTEN_ZEITRAUM = "Zeitraum"
 POSTEN_EINMALZAHLUNG = "Einmalzahlung bei Kündigung"
+SCHRITT_GERAET = "geraet"
+SCHRITT_TARIF = "tarif"
+SCHRITT_VERTRAG = "vertrag"
+SCHRITT_ANZAHLUNG = "anzahlung"
+SCHRITT_ANSCHLUSS = "anschluss"
+SCHRITT_BARPREIS = "barpreis"
+REIHENFOLGE_SCHRITTE = (
+    SCHRITT_BARPREIS,
+    SCHRITT_GERAET,
+    SCHRITT_VERTRAG,
+    SCHRITT_TARIF,
+    SCHRITT_ANZAHLUNG,
+    SCHRITT_ANSCHLUSS,
+)
+
+
+@dataclass(frozen=True)
+class Rechenschritt:
+    """Ein Summand der Kernzahl, wie die Seite ihn zeigt: `anzahl` × `betrag`.
+
+    `anzahl` ist None bei einem einmaligen Betrag; `summe` ist der Posten, den
+    `kosten_ueber` addiert hat (bei Preisphasen ein Teil davon).
+    """
+
+    art: str
+    anzahl: int | None
+    betrag: float
+    summe: float
 
 
 @dataclass
@@ -41,6 +69,9 @@ class Kosten:
     `gesamt` ist None, sobald `luecken` einen Posten nennt. `monate` ist der Zeitraum
     H, `ratenlaufzeit` die Zahl N der Geräteraten (None ohne Gerät), `monatlich` der
     Schnitt über H, `posten` Name → Betrag in der Reihenfolge von `tco_24`.
+    `rechnung` sind dieselben Posten als Summanden (Gerät, Tarif, einmalig, ohne
+    Nullbeträge); ihre Summe ist `gesamt`. Ohne `gesamt` stehen darin nur die
+    gemessenen Posten, die fehlenden nennt `luecken`.
     """
 
     gesamt: float | None = None
@@ -49,6 +80,7 @@ class Kosten:
     monatlich: float | None = None
     posten: dict[str, float] = field(default_factory=dict)
     luecken: list[str] = field(default_factory=list)
+    rechnung: list[Rechenschritt] = field(default_factory=list)
 
 
 def zeitraum(buendel: Buendel) -> int | None:
@@ -105,6 +137,10 @@ def kosten_ueber(buendel: Buendel, monate: int | None = None) -> Kosten:
     if not k.luecken:
         k.gesamt = round(sum(k.posten.values()), 2)
         k.monatlich = monatsschnitt(k.gesamt, h)
+    k.rechnung = sorted(
+        (s for s in k.rechnung if s.summe),
+        key=lambda s: REIHENFOLGE_SCHRITTE.index(s.art),
+    )
     return k
 
 
@@ -120,6 +156,9 @@ def _vertrag(k: Kosten, betrag: float, laufzeit: int | None, h: int) -> None:
         k.luecken.append(f"{POSTEN_BUENDEL} Monat {_spanne(laufzeit + 1, h)}")
     else:
         k.posten[f"{POSTEN_BUENDEL} über {h} Monate"] = round(betrag * h, 2)
+        k.rechnung.append(
+            Rechenschritt(SCHRITT_VERTRAG, h, betrag, round(betrag * h, 2))
+        )
 
 
 def _tarif(k: Kosten, buendel: Buendel, h: int) -> None:
@@ -144,10 +183,33 @@ def _tarif(k: Kosten, buendel: Buendel, h: int) -> None:
     summe = None if offen else phasensumme(phasen, h)
     if summe is not None:
         k.posten[f"Tarif über {h} Monate"] = summe
+        k.rechnung += tarifschritte(phasen, h)
     elif not offen:
         k.luecken.append(POSTEN_TARIF)
     if h < pflicht:
         k.luecken.append(f"{POSTEN_TARIF} Monat {_spanne(h + 1, pflicht)}")
+
+
+def tarifschritte(phasen: list[Preisphase], h: int) -> list[Rechenschritt]:
+    """Je Preisphase ein Summand „Monate × Preis“; gleiche Preise in Folge zusammen.
+
+    Wie `phasensumme` läuft der letzte Preis über Monate weiter, die keine Phase
+    nennt; `kosten_ueber` ruft es nur ohne solche Monate.
+    """
+    paare: list[tuple[int, float]] = []
+    for phase in sorted(phasen, key=lambda p: p.von_monat):
+        if phase.monate(h) > 0:
+            paare.append((phase.monate(h), phase.betrag))
+    if paare and sum(m for m, _ in paare) < h:
+        paare.append((h - sum(m for m, _ in paare), paare[-1][1]))
+    schritte: list[Rechenschritt] = []
+    for monate, betrag in paare:
+        if schritte and schritte[-1].betrag == betrag:
+            monate += schritte.pop().anzahl or 0
+        schritte.append(
+            Rechenschritt(SCHRITT_TARIF, monate, betrag, round(monate * betrag, 2))
+        )
+    return schritte
 
 
 def belegte_phasen(phasen: list[Preisphase], bindung: int | None) -> list[Preisphase]:
@@ -185,7 +247,7 @@ def _geraet_und_anschluss(k: Kosten, buendel: Buendel) -> None:
     )
 
     if not buendel.ohne_geraet:
-        _posten(k, POSTEN_ZUZAHLUNG, buendel.geraet_zuzahlung)
+        _posten(k, POSTEN_ZUZAHLUNG, buendel.geraet_zuzahlung, SCHRITT_ANZAHLUNG)
     if not buendel.ohne_geraet and buendel.buendel_monatlich is None:
         rate, laufzeit = buendel.geraet_monatsrate, buendel.laufzeit_monate
         if rate is None:
@@ -193,16 +255,19 @@ def _geraet_und_anschluss(k: Kosten, buendel: Buendel) -> None:
         elif laufzeit is None:
             k.luecken.append(POSTEN_LAUFZEIT)
         else:
-            k.posten[f"Geräteraten über {laufzeit} Monate"] = round(rate * laufzeit, 2)
-    _posten(k, POSTEN_ANSCHLUSS, buendel.anschlusspreis)
+            summe = round(rate * laufzeit, 2)
+            k.posten[f"Geräteraten über {laufzeit} Monate"] = summe
+            k.rechnung.append(Rechenschritt(SCHRITT_GERAET, laufzeit, rate, summe))
+    _posten(k, POSTEN_ANSCHLUSS, buendel.anschlusspreis, SCHRITT_ANSCHLUSS)
 
 
-def _posten(k: Kosten, name: str, betrag: float | None) -> None:
+def _posten(k: Kosten, name: str, betrag: float | None, art: str) -> None:
     """Ein gemessener Betrag wird Posten, ein fehlender Lücke; 0,00 € ist gemessen."""
     if betrag is None:
         k.luecken.append(name)
     else:
         k.posten[name] = betrag
+        k.rechnung.append(Rechenschritt(art, None, betrag, betrag))
 
 
 def _preise_im_monat(phasen: list[Preisphase], monat: int) -> int:

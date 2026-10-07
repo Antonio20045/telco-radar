@@ -1,7 +1,8 @@
 """Notbremse an der Bündelzeile: die Zeile sagt selbst, dass ihr Preis nicht zählt.
 
 Eine Schätzung (Bündel mit ``herleitung``: 1&1 aus dem Tarifraster, o2 aus
-Tarifsumme minus Geräterate) trägt an ihrer Zeile die Marke „Schätzung“, ein Satz
+Tarifsumme minus Geräterate) trägt an ihrer Zeile die Marke „berechnet“ oder, mit
+Rechnung, den Satz, wie der Preis berechnet ist (Antonio 07.10.2026), ein Satz
 mit abgelaufener eingerechneter Aktion (congstar) die Marke „Aktion abgelaufen“.
 Gemessene Zeilen tragen keine. Gerendert wird der Bestand vom 2026-10-03 mit
 ``render_site``; die Karten zum Abgleich kommen über den öffentlichen Eingang
@@ -24,12 +25,18 @@ from telco_radar.geraete_config import lade_katalog, lade_quellen
 from telco_radar.report import geraete_view
 from telco_radar.report.html import render_site
 
-SCHAETZUNG = "Schätzung"
+SCHAETZUNG = "berechnet"
 AKTION = "Aktion abgelaufen"
 
 
 def _marken(an) -> list[str]:
-    return [m.get_text(" ", strip=True) for m in an.select(".gr-kk-marke")]
+    """Die Marken der Zeile; der Herleitungssatz unter der Rechnung zählt als
+    „berechnet“."""
+    marken = [m.get_text(" ", strip=True) for m in an.select(".gr-kk-marke")]
+    kopf = an.find_parent("summary")
+    if kopf is not None and kopf.select_one(".gr-bnd-herleitung") is not None:
+        marken.append(SCHAETZUNG)
+    return marken
 
 
 def _zeilen(modell: dict) -> list[dict]:
@@ -68,9 +75,9 @@ def paare(tmp_path_factory) -> list[tuple[dict, list[str]]]:
     fragment = BeautifulSoup(
         (site / "data" / "geraete-buendel.html").read_text(encoding="utf-8"),
         "html.parser",
-        parse_only=SoupStrainer(class_="gr-bnd-an"),
+        parse_only=SoupStrainer("summary"),
     )
-    an_fragment = fragment.select(".gr-bnd-an")
+    an_fragment = fragment.select("summary .gr-bnd-an")
 
     assert len(an_seite) == len(karten_seite), "Seite: Zeilen und Karten zählen anders"
     assert len(an_fragment) == len(karten_fragment), (

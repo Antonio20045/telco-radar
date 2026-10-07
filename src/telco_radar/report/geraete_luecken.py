@@ -155,6 +155,9 @@ def _luecken(
                 "alternativ": _alternativen(karten, band, anbieter, laufzeit),
                 "gesperrt": namen,
                 "laufzeit": laufzeit,
+                "andere_laufzeiten": sorted(
+                    {a for k in alle if (a := ansicht(k)) is not None} - {laufzeit}
+                ),
             }
         )
     return luecken
@@ -219,6 +222,9 @@ def _luecke_text(luecken: list, band_labels: dict, h: int = TCO_HORIZONT) -> str
             name = lu["anbieter"]
             if lu.get("monate") is not None:
                 name += f" ({lu['monate']} Monate)"
+            elif grund == "nicht-erfasst" and lu.get("andere_laufzeiten"):
+                raten = " und ".join(str(a) for a in lu["andere_laufzeiten"])
+                name += f" ({raten} Raten erfasst)"
         if grund == "zaehlt-nicht":
             eimer.setdefault(grund, []).extend(lu["gesperrt"])
             continue

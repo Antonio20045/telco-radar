@@ -32,7 +32,7 @@ ABGELAUFEN = {
     "gueltig_bis": "2026-09-01",
 }
 GESPERRT = {
-    "apple-iphone-16-128": ("Schätzung", {"herleitung": "tarifsumme_minus_rate"}),
+    "apple-iphone-16-128": ("berechnet", {"herleitung": "tarifsumme_minus_rate"}),
     "apple-iphone-17-256": ("Aktion abgelaufen", {"aktionen": [ABGELAUFEN]}),
 }
 """Modell → (erwartete Δ-Zelle, Felder an seinen Vodafone-Bündeln)."""

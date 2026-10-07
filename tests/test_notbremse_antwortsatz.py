@@ -3,7 +3,7 @@
 Zählt im Band nur Vodafone, stehen dort aber Wettbewerber mit Schätzung oder
 abgelaufener Aktion, nimmt die Notbremse deren Zahl aus dem Vergleich, nicht ihr
 Angebot vom Markt. Der Satz sagt dann „steht nur Vodafone im Vergleich“ und nennt
-die übrigen benannt („Nicht im Vergleich: o2 (Schätzung)“), statt Exklusivität
+die übrigen benannt („Nicht im Vergleich: o2 (berechnet)“), statt Exklusivität
 vorzutäuschen (harte Regel 6). Fund des Prüfers am Bestand vom 2026-10-03: 53 Paare.
 
 Eigenes Orakel aus den Rohsätzen (``herleitung``, eingerechnete Aktion mit
@@ -42,7 +42,7 @@ def bestand(tmp_path_factory):
 def _zaehlt_nicht(roh: dict) -> str:
     """„Schätzung“, „Aktion abgelaufen“ oder leer (zählt)."""
     if str(roh.get("herleitung") or "").strip():
-        return "Schätzung"
+        return "berechnet"
     if any(
         a.get("eingerechnet") and a.get("gueltig_bis") and a["gueltig_bis"] < HEUTE
         for a in roh.get("aktionen") or []

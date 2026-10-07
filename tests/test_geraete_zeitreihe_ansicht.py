@@ -1140,7 +1140,7 @@ def test_h3_der_luecken_satz_nennt_anbieter_und_zeitraum():
     eins = next(l for l in luecken if l["anbieter"] == "1&1")
     assert (eins["grund"], eins["monate"]) == ("nicht-erfasst", None)
     text = geraete_zeitreihe._luecke_text(luecken, {})
-    assert "Mit 24 Raten nicht erfasst: 1&1." in text, text
+    assert "Mit 24 Raten nicht erfasst: 1&1 (36 Raten erfasst)." in text, text
     assert "Kein Bündel in diesem Band: 1&1" not in text
 
 
@@ -1174,8 +1174,9 @@ def test_h3_ein_band_mit_nur_fremdem_zeitraum_verschwindet_nicht():
     assert "führt kein Anbieter ein Bündel" not in leer
     assert "mit 24 Raten ist kein Bündel erfasst" in leer, leer
     luecken = geraete_zeitreihe._luecken([], modell["karten"], "xs", laufzeit=24)
-    assert "Mit 24 Raten nicht erfasst: 1&1." in geraete_zeitreihe._luecke_text(
-        luecken, {}
+    assert (
+        "Mit 24 Raten nicht erfasst: 1&1 (36 Raten erfasst)."
+        in geraete_zeitreihe._luecke_text(luecken, {})
     )
 
 

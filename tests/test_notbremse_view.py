@@ -134,7 +134,7 @@ def test_nur_geschaetzte_buendel_heissen_schaetzung(tmp_path):
         if z["schluessel"] == MODELL_NUR_SCHAETZUNG
     )
     assert zeile["hat_buendel"], "Modell verliert mit den Messungen die Zeile"
-    assert (zeile["tco_ab"], zeile["tco_leer"]) == (None, "Schätzung"), (
+    assert (zeile["tco_ab"], zeile["tco_leer"]) == (None, "berechnet"), (
         f"{MELDUNG_BESTES} – {MODELL_NUR_SCHAETZUNG}: "
         f"{zeile['tco_anbieter']} {zeile['tco_ab']}, Lücke {zeile['tco_leer']!r}"
     )

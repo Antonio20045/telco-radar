@@ -30,8 +30,24 @@ from ..analyze.geraete_pruefstatus import (
 )
 from ..tco_model import Aktion, Buendel, aktionen_aus
 
-DELTA_SCHAETZUNG = "Schätzung"
-SATZ_SCHAETZUNG = "Kein Abstand zur Vodafone-Referenz: dieser Preis ist abgeleitet."
+DELTA_SCHAETZUNG = "berechnet"
+SATZ_SCHAETZUNG = (
+    "Kein Abstand zur Vodafone-Referenz: der Anbieter nennt diesen Preis nicht "
+    "direkt, er ist aus seinen Angaben berechnet."
+)
+HERLEITUNG_SATZ = {
+    "tarifsumme_minus_geraeterate": (
+        "{anbieter} nennt den Tarifpreis hier nicht einzeln – berechnet als "
+        "Monatspreis minus Geräterate."
+    ),
+    "tarifaufschlag_aus_tarifraster": (
+        "{anbieter} nennt den Monatspreis für diesen Tarif nicht beim Gerät – "
+        "berechnet aus dem Grundangebot plus Tarifaufschlag der Preisliste."
+    ),
+}
+HERLEITUNG_SATZ_SONST = (
+    "{anbieter} nennt diesen Preis nicht direkt – berechnet aus seinen Angaben."
+)
 DELTA_AKTION_ABGELAUFEN = "Aktion abgelaufen"
 SATZ_AKTION_ABGELAUFEN = (
     "Kein Abstand zur Vodafone-Referenz: die eingerechnete Aktion ist abgelaufen."
@@ -59,7 +75,19 @@ def felder(b: Buendel, heute: str) -> dict:
     Abgelaufen ist eine eingerechnete Aktion, die der Anbieter vor ``heute``
     befristet hat (``Aktion.gilt_am``); ein Platzhalter-Ende wie 2050 läuft weiter.
     """
-    return _felder(b.herleitung, b.aktionen, heute, b.pruefung)
+    return {
+        **_felder(b.herleitung, b.aktionen, heute, b.pruefung),
+        "herleitung_satz": herleitung_satz(b.anbieter, b.herleitung),
+    }
+
+
+def herleitung_satz(anbieter: str, herleitung: str) -> str:
+    """Der Satz an der Zeile, wie ein nicht direkt genannter Preis berechnet ist;
+    leer für einen gemessenen Preis."""
+    if not herleitung.strip():
+        return ""
+    vorlage = HERLEITUNG_SATZ.get(herleitung.strip(), HERLEITUNG_SATZ_SONST)
+    return vorlage.format(anbieter=anbieter)
 
 
 def felder_aus_satz(satz: dict, heute: str) -> dict:

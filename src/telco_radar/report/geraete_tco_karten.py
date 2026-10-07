@@ -74,7 +74,7 @@ from ..tco_model import (
     phasensumme,
     zeitraum_vergleichbar,
 )
-from . import anbieter_farben, geraete_vergleich
+from . import anbieter_farben, geraete_rechnung, geraete_vergleich
 from . import geraete_notbremse as notbremse
 from .geraete_tco_grafik import anbieter_slug
 
@@ -677,12 +677,9 @@ def _karte(
 
     Diese Funktion addiert keinen Euro. Die Kernzahl ist `kosten_ueber` ueber den
     Zeitraum H des Buendels (Datenkonzept Geraete 5.3: 12 und 24 Raten 24 Monate,
-    36 Raten 36 Monate, 1&1 sein Vertrag); fehlt ein Posten oder der Tarifpreis
-    eines Monats, steht keine Zahl, sondern die benannte Luecke. `laufzeit` und
-    `leitzahl_monate` sind beide H: so viele Tarifmonate traegt die Zahl.
-
-    A3: `heute` entscheidet über die Frische der Karte (`ist_frisch`,
-    dieselbe Definition wie jede Auswahl). Ohne das Datum altert nichts.
+    36 Raten 36 Monate, 1&1 sein Vertrag), ihre Summanden `rechnung`; fehlt ein
+    Posten, steht keine Zahl, sondern die benannte Luecke. `laufzeit` und
+    `leitzahl_monate` sind H. A3: `heute` entscheidet über die Frische (`ist_frisch`).
     """
     from . import geraete_laufzeit
 
@@ -746,6 +743,7 @@ def _karte(
         "eff_basis": barpreis,
         "bestandteile": bestandteile,
         "zerlegung": zerlegung_balken(bestandteile, None, kosten.gesamt),
+        **geraete_rechnung.felder(kosten),
         "luecken": luecken,
         "boni": [],
         "aktionen": aktionen,
@@ -975,6 +973,7 @@ def _vodafone_referenz(
         "tarif_id": referenz.tarif_id,
         "monatlich": referenz.tarif_sim_only_monatlich,
         "tarif_summe": summe,
+        "phasen": phasen,
         "tarif_quelle_url": referenz.quelle_url,
         "tarif_abgerufen_am": referenz.abgerufen_am,
         "geraet_betrag": geraet["betrag"],
@@ -1106,6 +1105,7 @@ def _referenzkarte(ref: dict, heute: str = "") -> dict:
             "abgerufen_am": ref["geraet_abgerufen_am"],
             "tarif_quelle_url": ref["tarif_quelle_url"],
             "referenz": ref,
+            "rechnung": geraete_rechnung.referenz(ref),
         }
     )
     karte["zerlegung"] = zerlegung_balken(karte["bestandteile"], None, karte["gesamt"])

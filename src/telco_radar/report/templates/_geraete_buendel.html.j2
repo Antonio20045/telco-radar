@@ -73,8 +73,9 @@
       Notbremse (Datenkonzept Geräteradar, Schritt 1): eine Karte, die
       nicht zählt (`geraete_notbremse.felder`), sagt es an der Zeile -
       dieselben Wörter wie ihr Δ-Zustand (`notbremse`). Die Erklärung steht im `title`,
-      nicht als Unterzeile. #}{%
-      if k.notbremse %} <span class="gr-kk-marke gr-kk-marke--notbremse"
+      nicht als Unterzeile. Ein berechneter Preis mit Rechnung trägt statt der
+      Marke seinen Herleitungssatz unter der Rechnung. #}{%
+      if k.notbremse and not k.herleitung_satz %} <span class="gr-kk-marke gr-kk-marke--notbremse"
       title="{{ k.notbremse.satz }}">{{ k.notbremse.kurz }}</span>{% endif %}{%
       if k.alt_marke %} <span class="gr-kk-marke gr-kk-marke--alt">{{
       k.alt_marke }}</span>{% endif %}{%
@@ -143,6 +144,22 @@
       k.geraetepreis is not none %}{{ k.geraetepreis | euro }} <em
       class="gr-bnd-label gr-bnd-label--fin">Finanzierung gesamt</em>{% else
       %}–{% endif %}</span>
+    {# Antonio 07.10.2026: wie der Preis zustande kommt, steht OFFEN an der
+       Zeile - die Summanden aus `kosten_ueber` (`k.rechnung`), am Ende die
+       Kernzahl. Ein nicht direkt genannter Preis sagt in einem Satz, wie er
+       berechnet ist (`k.herleitung_satz`). #}
+    {% if k.rechnung and (k.belastbar or k.rechnung_luecken) %}<span
+      class="gr-bnd-rechnung">{% for s in
+      k.rechnung %}{% if not loop.first %}<span class="gr-bnd-op"> + </span>{%
+      endif %}<span class="gr-bnd-term">{% if s.anzahl %}{{ s.anzahl }} × {%
+      endif %}{{ s.betrag | euro }} <span class="gr-bnd-wort">{{ s.wort
+      }}</span></span>{% endfor %}{% if k.belastbar %}<span
+      class="gr-bnd-ergebnis"><span class="gr-bnd-op"> = </span><b
+      class="gr-bnd-summe">{{ k.gesamt | euro }}</b></span>{% else %}{% for l in
+      k.rechnung_luecken %}<span class="gr-bnd-op"> + </span><span
+      class="gr-bnd-fehlt">{{ l }}</span>{% endfor %}{% endif %}</span>{% endif %}
+    {% if k.herleitung_satz %}<span class="gr-bnd-herleitung">{{
+      k.herleitung_satz }}</span>{% endif %}
     <span class="gr-bnd-chev" aria-hidden="true"></span>
   </summary>
   {# P4-Fix (Sicht-Pruefung 18.09., Kriterium 13 / FM 4): der Aufklapp-

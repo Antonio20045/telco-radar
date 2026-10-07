@@ -1,7 +1,7 @@
 """Notbremse an der Modell-Kachel der Zeitreihe: dieselbe Definition wie der Satz.
 
 Steht in einem Band nur eine Schätzung oder ein Satz mit abgelaufener Aktion, sagt
-der Antwortsatz „steht kein Bündel im Vergleich: o2 (Schätzung)“. Die Kachel darf
+der Antwortsatz „steht kein Bündel im Vergleich: o2 (berechnet)“. Die Kachel darf
 dort nicht „kein Bündel-Angebot in diesem Band“ behaupten, sondern nennt den
 benannten Zustand (harte Regel 6, Clean Code 4 und 7). Gerendert aus dem Bestand
 vom 2026-10-03; der Bezugstag kommt aus dem Bestand, nie vom heutigen Datum.
@@ -73,7 +73,7 @@ def test_kachel_nennt_schaetzung_statt_kein_angebot(seite):
     falsch = []
     for paar, satz in sorted(nur_gesperrt.items()):
         text, titel = _text_und_titel(kacheln[paar])
-        gruende = [g for g in ("Schätzung", "Aktion abgelaufen") if f"({g})" in satz]
+        gruende = [g for g in ("berechnet", "Aktion abgelaufen") if f"({g})" in satz]
         if "kein Bündel-Angebot" in titel or not all(g in text for g in gruende):
             falsch.append(f"{paar}: Kachel „{text}“ ({titel}) gegen Satz „{satz}“")
     assert not falsch, (
