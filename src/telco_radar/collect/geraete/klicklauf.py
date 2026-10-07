@@ -6,14 +6,14 @@ und kein Netz. Je Kombination gilt einer von vier Zuständen: ``erfasst``,
 (Knöpfe, Option oder Zusammenfassung nicht gefunden, Laufzeit nicht lesbar, nicht
 besucht, Seite nicht zur Ruhe gekommen, Preisantwort über die Frist offen, kein
 Preiswert gelesen) oder ``befund`` (das Echo widerspricht sich). ``lesestatus`` setzt
-den Zustand einer Lesung: ohne einen der ``PREISFELDER`` (Rate, Ratenzahl, bei
-``ein_vertrag`` Bündelbetrag) ist sie nie erfasst, auch wenn Volumen oder Bindung
-stimmen. Ein Lauf ist ``gelesen``, ``gestoert``
-(Bot-Schutz, fehlender Kanarienwert, offene oder gescheiterte Preisantwort,
-Strukturbruch, keine einzige angebotene Kombination), ``gesperrt`` (robots.txt
-sperrt Seite, Preisantwort oder Besuchszeit) oder ``zeitgrenze`` (die Zeitgrenze des
-Aufrufers schnitt ihn ab; was er nicht besuchte, heißt so). Bot-Schutz heißt
-``bot_schutz``: HTTP 202, 4xx oder 5xx, ein bekanntes Challenge-Muster
+den Zustand einer Lesung: ohne ``PREISFELD`` (die Gerätrate), bei ``ein_vertrag`` ohne
+``PREISFELD_EIN_VERTRAG`` (den Bündelbetrag) ist sie nie erfasst, auch wenn Tarif,
+Volumen oder Bindung stimmen; die Ratenzahl spiegelt nur den Klick. Ein Lauf ist
+``gelesen``, ``gestoert`` (Bot-Schutz, fehlender Kanarienwert, offene oder gescheiterte
+Preisantwort, Strukturbruch, keine einzige angebotene Kombination), ``gesperrt``
+(robots.txt sperrt Seite, Preisantwort oder Besuchszeit) oder ``zeitgrenze`` (die
+Zeitgrenze des Aufrufers schnitt ihn ab; was er nicht besuchte, heißt so). Bot-Schutz
+heißt ``bot_schutz``: HTTP 202, 4xx oder 5xx, ein bekanntes Challenge-Muster
 (``CHALLENGE_MUSTER``) oder eine HTML-Seite, wo die Preisschnittstelle JSON liefern
 soll. Gescheiterte Anfragen hält der Lauf mit Grund fest, ebenso jede Hilfsdatei, die
 ohne Regeln in den Browser ging (``Hilfsdatei``, ``klickhilfe``).
@@ -37,7 +37,7 @@ nie 0.
 from __future__ import annotations
 
 import re
-from dataclasses import asdict, dataclass, field, replace
+from dataclasses import dataclass, field, replace
 from typing import TYPE_CHECKING
 
 from .klickecho import Befund, Variante
@@ -59,10 +59,13 @@ BELEG_OFFEN = "offen"
 BELEGT = "belegt"
 BELEG_FEHLT = "fehlt"
 OHNE_WERT = "ohne_wert"
-PREISFELDER = ("rate", "ratenzahl", "buendelbetrag")
-"""Felder, von denen eine erfasste Kombination mindestens eines nennt; der Bündelbetrag
-steht nur bei ``ein_vertrag`` (1&1, freenet), wo Rate und Ratenzahl entfallen."""
-GRUND_OHNE_PREISWERT = "keine Werte gelesen: weder Rate, Ratenzahl noch Bündelbetrag"
+PREISFELD = "rate"
+"""Der Preiswert einer erfassten Kombination: die Gerätrate (``Preiswerte``)."""
+PREISFELD_EIN_VERTRAG = "buendelbetrag"
+"""Dasselbe bei ``ein_vertrag`` (1&1, freenet), wo Rate und Ratenzahl entfallen
+(``Buendelwerte``)."""
+GRUND_OHNE_RATE = "kein Gerätepreis gelesen (Rate)"
+GRUND_OHNE_BUENDELBETRAG = "kein Bündelbetrag gelesen"
 CHALLENGE_STATUS = 202
 FEHLER_AB_STATUS = 400
 STRUKTUR_SPRUNG = 0.2
@@ -145,7 +148,8 @@ class Kombiergebnis:
     der Knöpfe in der Reihenfolge von ``klickkarte.DIMENSIONEN``. ``werte`` hält nur,
     was Text und Antwort gleich nennen; ``textwerte`` und ``antwortwerte`` sind die
     beiden Lesungen davor, ``None`` heißt nicht gelesen. ``buendel`` hat nur eine
-    Karte mit ``vertragsform`` ``ein_vertrag``.
+    Karte mit ``vertragsform`` ``ein_vertrag``, ebenso ``textbuendel`` und
+    ``antwortbuendel``, die beiden Lesungen der Bündelwerte.
     """
 
     variante: Variante
@@ -163,6 +167,8 @@ class Kombiergebnis:
     textwerte: Preiswerte | None = None
     antwortwerte: Preiswerte | None = None
     buendel: Buendelwerte | None = None
+    textbuendel: Buendelwerte | None = None
+    antwortbuendel: Buendelwerte | None = None
 
     @property
     def gueltig(self) -> bool:
@@ -221,21 +227,35 @@ class Klicklauf:
     bezug: Strukturbilanz | None = None
 
 
-def nennt_preis(werte: Preiswerte, buendel: Buendelwerte | None) -> bool:
-    """Wahr, wenn ``werte`` oder ``buendel`` eines der ``PREISFELDER`` nennen."""
-    gelesen = asdict(werte) | asdict(Buendelwerte() if buendel is None else buendel)
-    return any(gelesen[feld] is not None for feld in PREISFELDER)
+def fehlender_preis(
+    werte: Preiswerte, buendel: Buendelwerte | None, *, ein_vertrag: bool = False
+) -> str | None:
+    """Der Grund, wenn der Preiswert der Lesung fehlt, sonst ``None``.
+
+    Ohne ``ein_vertrag`` ist es ``PREISFELD`` in ``werte``, mit ihm
+    ``PREISFELD_EIN_VERTRAG`` in ``buendel``.
+    """
+    if ein_vertrag:
+        betrag = None if buendel is None else getattr(buendel, PREISFELD_EIN_VERTRAG)
+        return GRUND_OHNE_BUENDELBETRAG if betrag is None else None
+    return GRUND_OHNE_RATE if getattr(werte, PREISFELD) is None else None
 
 
 def lesestatus(
-    befunde: tuple[Befund, ...], werte: Preiswerte, buendel: Buendelwerte | None
+    befunde: tuple[Befund, ...],
+    werte: Preiswerte,
+    buendel: Buendelwerte | None,
+    *,
+    ein_vertrag: bool = False,
 ) -> tuple[str, str | None]:
     """Zustand und Grund einer Lesung mit Echo: ``befund`` mit dem ersten Grund, ohne
-    Preiswert ``nicht_erfasst`` mit ``GRUND_OHNE_PREISWERT``, sonst ``erfasst``."""
+    Preiswert ``nicht_erfasst`` mit dem Grund aus ``fehlender_preis``, sonst
+    ``erfasst``."""
     if befunde:
         return BEFUND, befunde[0].grund
-    if not nennt_preis(werte, buendel):
-        return NICHT_ERFASST, GRUND_OHNE_PREISWERT
+    fehlt = fehlender_preis(werte, buendel, ein_vertrag=ein_vertrag)
+    if fehlt is not None:
+        return NICHT_ERFASST, fehlt
     return ERFASST, None
 
 

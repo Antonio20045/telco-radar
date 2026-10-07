@@ -36,6 +36,7 @@ from .klickablage import HOECHSTE_LISTE
 from .klickbeleg import werte_als_json
 from .klickcrawler import GRUND_NICHT_BESUCHT, klicke_durch
 from .klickkarte import (
+    BUENDELFELDER,
     DIMENSIONEN,
     WERTFELDER,
     Klickkarte,
@@ -249,18 +250,22 @@ def _struktur(lauf: Klicklauf) -> dict:
 
 
 def _gefunden(lauf: Klicklauf, karte: Klickkarte) -> dict:
-    """Je Dimension Selektor und gesehene Knopfwerte, je Wertfeld die Lesungen."""
+    """Je Dimension Selektor und gesehene Knopfwerte, je Wertfeld die Lesungen, bei
+    ``ein_vertrag`` auch je Bündelfeld."""
     werte: dict[str, list[str]] = {d: [] for d in DIMENSIONEN}
     for ergebnis in lauf.ergebnisse:
         for dimension, wert in zip(DIMENSIONEN, ergebnis.auswahl, strict=True):
             if wert is not None and wert not in werte[dimension]:
                 werte[dimension].append(wert)
+    lesungen = [(f, "textwerte", "antwortwerte") for f in WERTFELDER]
+    if karte.ein_vertrag:
+        lesungen += [(f, "textbuendel", "antwortbuendel") for f in BUENDELFELDER]
     felder = {
         feld: {
-            "text": _gelesen(lauf, feld, "textwerte"),
-            "antwort": _gelesen(lauf, feld, "antwortwerte"),
+            "text": _gelesen(lauf, feld, text),
+            "antwort": _gelesen(lauf, feld, antwort),
         }
-        for feld in WERTFELDER
+        for feld, text, antwort in lesungen
     }
     return {
         "knoepfe": {
@@ -273,7 +278,7 @@ def _gefunden(lauf: Klicklauf, karte: Klickkarte) -> dict:
 
 
 def _gelesen(lauf: Klicklauf, feld: str, lesung: str) -> int:
-    """Zahl der Kombinationen, deren Lesung ``lesung`` das Wertfeld ``feld`` nennt."""
+    """Zahl der Kombinationen, deren Lesung ``lesung`` das Feld ``feld`` nennt."""
     return sum(
         getattr(werte, feld) is not None
         for werte in (getattr(e, lesung) for e in lauf.ergebnisse)

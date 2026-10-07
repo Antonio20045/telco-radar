@@ -90,6 +90,7 @@ def test_buendelwerte_bestaetigt_rate_entfaellt_beleg_traegt_sie(chromium):
     assert set(ergebnisse) == {(s, "All-Net-Flat S", 24) for s in ("128", "256")}
     teuer = ergebnisse[("256", "All-Net-Flat S", 24)]
     assert teuer.buendel == Buendelwerte(buendelbetrag=51.99, einmalzahlung=29.99)
+    assert teuer.textbuendel == teuer.antwortbuendel == teuer.buendel
     for ergebnis in ergebnisse.values():
         assert ergebnis.befunde == ()
         assert not {"rate", "ratenzahl"} & set(ergebnis.luecken)
@@ -116,3 +117,5 @@ def test_abweichende_einmalzahlung_im_text_ist_ein_befund(chromium):
     )
     assert falsch.buendel.einmalzahlung is None
     assert falsch.buendel.buendelbetrag == 51.99
+    assert falsch.textbuendel.einmalzahlung == 19.99
+    assert falsch.antwortbuendel.einmalzahlung == 29.99

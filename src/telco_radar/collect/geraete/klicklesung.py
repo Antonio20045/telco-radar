@@ -157,11 +157,18 @@ class Leser(Textleser):
             for f in felder
         )
         struktur.felder(gefunden, len(felder))
+        ein_vertrag = self.karte.ein_vertrag
+        textbuendel = buendel if ein_vertrag else None
         if zweite.befund is not None:
             befunde: tuple[Befund, ...] = (zweite.befund,)
             grund = zweite.befund.grund
             return Kombiergebnis(
-                variante, BEFUND, grund, befunde=befunde, textwerte=im_text
+                variante,
+                BEFUND,
+                grund,
+                befunde=befunde,
+                textwerte=im_text,
+                textbuendel=textbuendel,
             )
         abweichung = self._abweichung(ziel) + self._ohne_echo(
             ziel, seitenwerte, zweite.lesung
@@ -175,14 +182,20 @@ class Leser(Textleser):
                 angezeigt,
                 im_text,
                 zweite.lesung,
-                buendel=buendel if self.karte.ein_vertrag else None,
+                buendel=textbuendel,
                 entfallen=self.karte.entfallen,
             )
         )
         bild, bildbefunde = self._screenshot(bereich)
         self.schliesse_dialog(bereich)
         befunde = echo.befunde + bildbefunde
-        status, erster = lesestatus(befunde, echo.werte, echo.buendel)
+        gebuendelt = echo.buendel if ein_vertrag else None
+        status, erster = lesestatus(
+            befunde, echo.werte, gebuendelt, ein_vertrag=ein_vertrag
+        )
+        antwortbuendel = None
+        if ein_vertrag and zweite.lesung is not None:
+            antwortbuendel = zweite.lesung.buendel
         return Kombiergebnis(
             variante,
             status,
@@ -195,7 +208,9 @@ class Leser(Textleser):
             text=text,
             textwerte=im_text,
             antwortwerte=in_antwort,
-            buendel=echo.buendel if self.karte.ein_vertrag else None,
+            buendel=gebuendelt,
+            textbuendel=textbuendel,
+            antwortbuendel=antwortbuendel,
         )
 
     def belege(

@@ -5,9 +5,11 @@ Fixture ``kartenprobe_texte_20261007.json``: je gelesener Kombination aus
 c8ce1f77) Auswahl, Status, Text und die drei Lesungen, Werte unverändert
 (Herkunft in ``_herkunft.json``).
 
-1. Erfasst heißt: mindestens ein Preiswert (Rate, Ratenzahl, bei ``ein_vertrag``
-   Bündelbetrag). 1&1 stand als „erfasst“ mit leeren Werten in ``karte-1.json``; der
-   Bündelbetrag war gelesen, die Datei nannte ihn nicht.
+1. Erfasst heißt: der Preiswert ist gelesen, die Gerätrate, bei ``ein_vertrag`` der
+   Bündelbetrag; die Ratenzahl allein spiegelt nur den Klick. 1&1 stand als „erfasst“
+   mit leeren Werten in ``karte-1.json``; der Bündelbetrag war gelesen, die Datei und
+   ihre Übersicht ``gefunden.felder`` nannten ihn nicht. Die Prüferreproduktionen zu
+   300bde3c (Vodafone karte-1 Nr. 0, Grund, Übersicht) stehen hier als Tests.
 2. 1&1 setzt Euro, Komma und Cent in eigene Elemente: „44\\n,\\n99\\n€/Monat“ ist 44,99,
    nicht 99,00. congstar, o2 und Vodafone lesen sich danach wie in der Probe.
 3. o2 setzt den Tarifbetrag in eine eigene Zeile; alle 20 Kombinationen waren
@@ -44,7 +46,8 @@ from telco_radar.collect.geraete.klickkartentypen import Textmuster
 from telco_radar.collect.geraete.klicklauf import (
     BEFUND,
     ERFASST,
-    GRUND_OHNE_PREISWERT,
+    GRUND_OHNE_BUENDELBETRAG,
+    GRUND_OHNE_RATE,
     NICHT_ERFASST,
     Klicklauf,
     Kombiergebnis,
@@ -124,24 +127,64 @@ def test_ohne_preiswert_ist_die_kombination_nicht_erfasst():
     """1&1 karte-1 Nr. 0, wie die Datei sie nennt: keine Werte, kein Bündelbetrag."""
     werte = werte_aus_json(_von("1und1")[0]["werte"])
 
-    assert lesestatus((), werte, Buendelwerte()) == (
-        NICHT_ERFASST,
-        GRUND_OHNE_PREISWERT,
-    )
-    assert lesestatus((), werte, None) == (NICHT_ERFASST, GRUND_OHNE_PREISWERT)
+    for buendel in (Buendelwerte(), None):
+        assert lesestatus((), werte, buendel, ein_vertrag=True) == (
+            NICHT_ERFASST,
+            GRUND_OHNE_BUENDELBETRAG,
+        )
 
 
-def test_volumen_und_bindung_allein_sind_nicht_erfasst():
-    """congstar karte-1 Nr. 0 ohne Rate und Ratenzahl: Tarif, Bindung, Anschluss und
-    Volumen stimmen, ein Gerätepreis fehlt."""
+def test_ohne_rate_ist_nicht_erfasst_auch_mit_ratenzahl():
+    """congstar karte-1 Nr. 0 ohne Rate: Ratenzahl, Tarif, Bindung, Anschluss und
+    Volumen stimmen, ein Gerätepreis fehlt. Gegenprobe: ohne Ratenzahl, mit Rate."""
     werte = werte_aus_json(_von("congstar")[0]["werte"])
-    assert werte.tarifbindung is not None and werte.volumen_gb is not None
+    assert werte.ratenzahl is not None and werte.volumen_gb is not None
 
-    ohne_preis = replace(werte, rate=None, ratenzahl=None)
+    ohne_rate = replace(werte, rate=None)
 
-    assert lesestatus((), ohne_preis, None)[0] == NICHT_ERFASST
+    assert lesestatus((), ohne_rate, None) == (NICHT_ERFASST, GRUND_OHNE_RATE)
     assert lesestatus((), replace(werte, ratenzahl=None), None) == (ERFASST, None)
-    assert lesestatus((), replace(werte, rate=None), None) == (ERFASST, None)
+
+
+def test_ratenzahl_allein_ist_kein_preiswert():
+    """Prüferreproduktion, Vodafone karte-1 Nr. 0: Rate 33,00, Anzahlung 1,00,
+    Ratenzahl 36 (Label). Fehlt die Rate in Text und Antwort, bleibt nur die
+    Ratenzahl, die das Echo der gewählten Laufzeit gleichsetzt: nicht erfasst."""
+    vodafone = _von("vodafone")[0]
+    assert (vodafone["werte"]["rate"], vodafone["werte"]["ratenzahl"]) == (33.0, 36)
+    gewaehlt = variante_aus("256 GB", "unbekannt", "36")
+    mit_rate = Preiswerte(anzahlung=1.0, rate=33.0, ratenzahl=36)
+    gegenprobe = pruefe_echo(gewaehlt, gewaehlt, mit_rate, Antwortlesung(mit_rate, {}))
+    assert lesestatus(gegenprobe.befunde, gegenprobe.werte, gegenprobe.buendel) == (
+        ERFASST,
+        None,
+    )
+
+    nur_raten = Preiswerte(ratenzahl=36)
+    echo = pruefe_echo(gewaehlt, gewaehlt, nur_raten, Antwortlesung(nur_raten, {}))
+    assert echo.befunde == ()
+    assert echo.werte.rate is None and echo.werte.anzahlung is None
+
+    status, grund = lesestatus(echo.befunde, echo.werte, echo.buendel)
+
+    assert (status, grund) == (NICHT_ERFASST, GRUND_OHNE_RATE)
+
+
+def test_grund_ohne_geraetepreis_nennt_gelesene_werte_nicht_als_fehlend():
+    """Prüferreproduktion: Tarif 49,95 €, Anschluss 39,95 €, 50 GB bestätigt,
+    Gerätepreis fehlt; der Grund nennt genau die Rate."""
+    werte = Preiswerte(
+        tarifphasen=(Preisphase(1, None, 49.95),), anschluss=39.95, volumen_gb=50.0
+    )
+
+    status, grund = lesestatus((), werte, None)
+
+    assert (status, grund) == (NICHT_ERFASST, GRUND_OHNE_RATE)
+    assert "keine Werte gelesen" not in grund
+    assert lesestatus((), werte, None, ein_vertrag=True) == (
+        NICHT_ERFASST,
+        GRUND_OHNE_BUENDELBETRAG,
+    )
 
 
 @pytest.mark.parametrize("nummer", range(4))
@@ -152,7 +195,8 @@ def test_gegenprobe_buendelbetrag_aus_dem_text_ist_erfasst(nummer):
     buendel = Buendelwerte(buendelbetrag=BUENDEL_1UND1[nummer])
     assert kombination["text"].startswith(str(BUENDEL_1UND1[nummer]).split(".")[0])
 
-    assert lesestatus((), werte, buendel) == (ERFASST, None)
+    assert lesestatus((), werte, buendel, ein_vertrag=True) == (ERFASST, None)
+    assert lesestatus((), werte, buendel) == (NICHT_ERFASST, GRUND_OHNE_RATE)
 
 
 def test_befund_geht_vor_der_preisregel():
@@ -179,7 +223,7 @@ def test_karte_json_nennt_den_buendelbetrag():
                 text=kombination["text"],
             ),
             Kombiergebnis(
-                variante, NICHT_ERFASST, GRUND_OHNE_PREISWERT, auswahl=auswahl
+                variante, NICHT_ERFASST, GRUND_OHNE_BUENDELBETRAG, auswahl=auswahl
             ),
         ],
     )
@@ -189,11 +233,66 @@ def test_karte_json_nennt_den_buendelbetrag():
 
     assert mit["buendel"] == {"buendelbetrag": 44.99, "einmalzahlung": None}
     assert ohne["buendel"] is None
-    assert ohne["grund"] == GRUND_OHNE_PREISWERT
+    assert ohne["grund"] == GRUND_OHNE_BUENDELBETRAG
 
 
-def _beispielkarte() -> Klickkarte:
-    return lade_klickkarte(BEISPIELKARTE)
+def _beispielkarte(vertragsform: str | None = None) -> Klickkarte:
+    karte = lade_klickkarte(BEISPIELKARTE)
+    return karte if vertragsform is None else replace(karte, vertragsform=vertragsform)
+
+
+def _lauf_1und1(lesung: Buendelwerte | None) -> Klicklauf:
+    """1&1 karte-1 Nr. 0 wie im Crawler: Bündelbetrag in beiden Lesungen."""
+    kombination = _von("1und1")[0]
+    auswahl = tuple(kombination["auswahl"][d] for d in DIMENSIONEN)
+    ergebnis = Kombiergebnis(
+        variante_aus(**kombination["variante"]),
+        ERFASST,
+        auswahl=auswahl,
+        buendel=Buendelwerte(buendelbetrag=44.99),
+        text=kombination["text"],
+        textwerte=werte_aus_json(kombination["werte_text"]),
+        antwortwerte=werte_aus_json(kombination["werte_antwort"]),
+        textbuendel=lesung,
+        antwortbuendel=lesung,
+    )
+    return Klicklauf("1&1", kombination["adresse"], ergebnisse=[ergebnis])
+
+
+def test_gefunden_nennt_den_buendelbetrag_bei_ein_vertrag():
+    """Prüferreproduktion: die Übersicht ``gefunden.felder`` zählte nur die Wertfelder
+    und meldete für 1&1 „nichts gefunden“ (Text 0, Antwort 0 je Feld)."""
+    lauf = _lauf_1und1(Buendelwerte(buendelbetrag=44.99))
+    karte = _beispielkarte("ein_vertrag")
+    probe = Kartenprobe(GELAUFEN, "1und1.yaml", lauf=lauf, karte=karte)
+
+    daten = als_daten(probe)
+
+    assert daten["kombinationen"][0]["buendel"]["buendelbetrag"] == 44.99
+    felder = daten["gefunden"]["felder"]
+    assert felder["buendelbetrag"] == {"text": 1, "antwort": 1}
+    assert felder["einmalzahlung"] == {"text": 0, "antwort": 0}
+    assert sum(f["text"] + f["antwort"] for f in felder.values()) == 2
+
+
+def test_gegenprobe_gefunden_ohne_ein_vertrag_ohne_buendelfelder():
+    lauf = _lauf_1und1(Buendelwerte(buendelbetrag=44.99))
+    probe = Kartenprobe(GELAUFEN, "1und1.yaml", lauf=lauf, karte=_beispielkarte())
+
+    felder = als_daten(probe)["gefunden"]["felder"]
+
+    assert "buendelbetrag" not in felder
+    assert sum(f["text"] + f["antwort"] for f in felder.values()) == 0
+    ungelesen = Kartenprobe(
+        GELAUFEN,
+        "1und1.yaml",
+        lauf=_lauf_1und1(None),
+        karte=_beispielkarte("ein_vertrag"),
+    )
+    assert als_daten(ungelesen)["gefunden"]["felder"]["buendelbetrag"] == {
+        "text": 0,
+        "antwort": 0,
+    }
 
 
 @pytest.mark.parametrize("nummer", range(4))

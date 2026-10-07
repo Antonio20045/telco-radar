@@ -70,6 +70,8 @@ EINSUNDEINS_KARTE = {
         "muster": {"rate": r"(\d+\s*,\s*\d{2})\s*€/Monat"},
     },
 }
+RATE_ZEILE = "\n    <div>Gerät: Rate 21,00 € mtl.</div>"
+RATE_JSON = ', "geraet": {"rate": 21.0}'
 TELEKOM_KOERPER = """
 <aside>
   <div id="zahlung">Einmalige Zahlung 138,95 € inkl. Bereitstellung 39,95 €
@@ -163,10 +165,31 @@ def test_ohne_einheit_widerspricht_der_centbetrag_dem_text(chromium):
     )
 
 
-def _telekom(chromium, **ersetzt):
+def _telekom(chromium, koerper: str = TELEKOM_KOERPER, **ersetzt):
     k = karte(**{**TELEKOM_KARTE, **ersetzt})
-    lauf, _ = laufe_mit(chromium, _antworter(seite(TELEKOM_KOERPER, "")), k)
+    lauf, _ = laufe_mit(chromium, _antworter(seite(koerper, "")), k)
     return nach_auswahl(lauf), lauf
+
+
+def test_ohne_geraetepreis_ist_die_kombination_nicht_erfasst(chromium):
+    """Der Crawler setzt den Zustand über ``klicklauf.lesestatus``: Tarif, Anschluss
+    und Volumen stimmen, Seite und Antwort nennen keine Rate. Gegenprobe mit Rate:
+    ``test_skript_json_und_zwei_bereiche_ohne_werbeblock``."""
+    from telco_radar.collect.geraete.klicklauf import GRUND_OHNE_RATE
+
+    assert RATE_ZEILE in TELEKOM_KOERPER and RATE_JSON in TELEKOM_KOERPER
+    koerper = TELEKOM_KOERPER.replace(RATE_ZEILE, "").replace(RATE_JSON, "")
+    pfade = {f: p for f, p in TELEKOM_KARTE["antwort"]["pfade"].items() if f != "rate"}
+    antwort = {**TELEKOM_KARTE["antwort"], "pfade": pfade}
+
+    ergebnisse, lauf = _telekom(chromium, koerper, antwort=antwort)
+
+    assert lauf.status == "gelesen", lauf.grund
+    ergebnis = ergebnisse[("256 GB", "MagentaMobil M", 36)]
+    assert (ergebnis.status, ergebnis.grund) == ("nicht_erfasst", GRUND_OHNE_RATE)
+    assert ergebnis.befunde == ()
+    assert (ergebnis.werte.rate, ergebnis.werte.anschluss) == (None, 39.95)
+    assert ergebnis.beleg is None
 
 
 def test_skript_json_und_zwei_bereiche_ohne_werbeblock(chromium):
