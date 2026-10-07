@@ -2,7 +2,9 @@
 
 Antonio, 07.10.2026: „Man sollte direkt erkennen, wie der Preis zustande kommt“ und
 „keiner weiß, was du mit Schätzung meinst“. Jede belastbare Zeile zeigt deshalb im
-zugeklappten Kopf ``24 × 54,50 € Gerät + 24 × 14,99 € Tarif + … = 1.714,75 €``; die
+zugeklappten Kopf ``24 × 69,49 € Monatspreis (54,50 € Gerät + 14,99 € Tarif) + … =
+1.714,75 €``, den Monatspreis wie beim Anbieter (Antonio, 07.10.2026: Vodafone
+nennt nur ihn); die
 Schritte kommen aus ``kosten_ueber`` (``Kosten.rechnung``) und ergeben genau die
 Kernzahl. Ein vom Anbieter nicht direkt genannter Preis sagt in einem Satz, wie er
 berechnet ist, statt „Schätzung“. Gerendert wird der Bestand vom 2026-10-03.
@@ -27,6 +29,7 @@ from telco_radar.report import geraete_view
 from telco_radar.report.geraete_tco_grafik import euro
 from telco_radar.report.html import render_site
 from telco_radar.tarif_model import Preisphase
+from telco_radar.tco_kosten import monatsschritte
 from telco_radar.tco_model import Buendel, kosten_ueber
 
 
@@ -74,6 +77,35 @@ def test_rechnung_nennt_jeden_posten_mit_anzahl_und_preis():
     ]
     assert k.gesamt == 1714.75
     assert round(sum(s.summe for s in k.rechnung), 2) == k.gesamt
+
+
+def test_geraet_und_tarif_gleich_lang_sind_ein_monatspreis():
+    """Vodafone zeigt 81,45 € im Monat, nicht 49,50 € und 31,95 € getrennt."""
+    k = kosten_ueber(
+        _buendel(anbieter="Vodafone", tarif_monatlich=31.95, geraet_monatsrate=49.5)
+    )
+    schritte = monatsschritte(k.rechnung)
+    assert [(s.art, s.anzahl, s.betrag) for s in schritte] == [
+        ("monat", 24, 81.45),
+        ("anzahlung", None, 7.0),
+        ("anschluss", None, 39.99),
+    ]
+    assert [(t.art, t.betrag) for t in schritte[0].teile] == [
+        ("geraet", 49.5),
+        ("tarif", 31.95),
+    ]
+    assert round(sum(s.summe for s in schritte), 2) == k.gesamt
+
+
+def test_ungleich_lange_raten_bleiben_getrennt():
+    """12 Raten, Tarif 24 Monate: ein gemeinsamer Monatspreis wäre falsch."""
+    k = kosten_ueber(_buendel(laufzeit_monate=12, geraet_monatsrate=99.0))
+    assert [s.art for s in monatsschritte(k.rechnung)] == [
+        "geraet",
+        "tarif",
+        "anzahlung",
+        "anschluss",
+    ]
 
 
 def test_rechnung_teilt_den_tarif_nach_preisphasen():
@@ -205,11 +237,15 @@ def test_o2_zeile_rechnet_wie_die_karte(bestand):
         and k["raten_laufzeit"] == 24
     ]
     assert o2, "Bestand ohne o2-Zeile mit 24 Raten"
-    texte = {_text(r) for r in soup.select(".gr-bnd-rechnung")}
+    texte = {
+        _text(r).replace("( ", "(").replace(" )", ")")
+        for r in soup.select(".gr-bnd-rechnung")
+    }
     k = o2[0]
+    assert k["leitzahl_monate"] == 24
     erwartet = (
-        f"24 × {euro(k['rate'])} Gerät + "
-        f"{k['leitzahl_monate']} × {euro(k['monatlich'])} Tarif + "
+        f"24 × {euro(round(k['rate'] + k['monatlich'], 2))} Monatspreis "
+        f"({euro(k['rate'])} Gerät + {euro(k['monatlich'])} Tarif) + "
         f"{euro(k['zuzahlung'])} Anzahlung"
     )
     treffer = [

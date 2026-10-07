@@ -38,6 +38,7 @@ SCHRITT_VERTRAG = "vertrag"
 SCHRITT_ANZAHLUNG = "anzahlung"
 SCHRITT_ANSCHLUSS = "anschluss"
 SCHRITT_BARPREIS = "barpreis"
+SCHRITT_MONAT = "monat"
 REIHENFOLGE_SCHRITTE = (
     SCHRITT_BARPREIS,
     SCHRITT_GERAET,
@@ -53,13 +54,15 @@ class Rechenschritt:
     """Ein Summand der Kernzahl, wie die Seite ihn zeigt: `anzahl` × `betrag`.
 
     `anzahl` ist None bei einem einmaligen Betrag; `summe` ist der Posten, den
-    `kosten_ueber` addiert hat (bei Preisphasen ein Teil davon).
+    `kosten_ueber` addiert hat (bei Preisphasen ein Teil davon). `teile` nennt
+    bei einem Monatspreis die Schritte Gerät und Tarif, aus denen er besteht.
     """
 
     art: str
     anzahl: int | None
     betrag: float
     summe: float
+    teile: tuple[Rechenschritt, ...] = ()
 
 
 @dataclass
@@ -187,6 +190,24 @@ def _tarif(k: Kosten, buendel: Buendel, h: int) -> None:
         k.rechnung += tarifschritte(phasen, offen[0] - 1)
     if h < pflicht:
         k.luecken.append(f"{POSTEN_TARIF} Monat {_spanne(h + 1, pflicht)}")
+
+
+def monatsschritte(schritte: list[Rechenschritt]) -> list[Rechenschritt]:
+    """Gerät und Tarif über gleich viele Monate als ein Monatspreis, wie der
+    Anbieter ihn nennt; Gerät und Tarif bleiben als `teile`. Sonst unverändert."""
+    geraet = [s for s in schritte if s.art == SCHRITT_GERAET]
+    tarif = [s for s in schritte if s.art == SCHRITT_TARIF]
+    if len(geraet) != 1 or len(tarif) != 1 or geraet[0].anzahl != tarif[0].anzahl:
+        return list(schritte)
+    g, t = geraet[0], tarif[0]
+    monat = Rechenschritt(
+        SCHRITT_MONAT,
+        g.anzahl,
+        round(g.betrag + t.betrag, 2),
+        round(g.summe + t.summe, 2),
+        (g, t),
+    )
+    return [monat, *(s for s in schritte if s is not g and s is not t)]
 
 
 def tarifschritte(phasen: list[Preisphase], h: int) -> list[Rechenschritt]:

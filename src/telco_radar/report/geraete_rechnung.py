@@ -14,10 +14,12 @@ from ..tco_kosten import (
     SCHRITT_ANZAHLUNG,
     SCHRITT_BARPREIS,
     SCHRITT_GERAET,
+    SCHRITT_MONAT,
     SCHRITT_TARIF,
     SCHRITT_VERTRAG,
     Kosten,
     Rechenschritt,
+    monatsschritte,
     tarifschritte,
 )
 from ..tco_model import POSTEN_ANSCHLUSS, POSTEN_BUENDEL, POSTEN_TARIF, POSTEN_ZUZAHLUNG
@@ -29,6 +31,7 @@ WORT_JE_SCHRITT = {
     SCHRITT_TARIF: "Tarif",
     SCHRITT_ANZAHLUNG: "Anzahlung",
     SCHRITT_ANSCHLUSS: "Anschluss",
+    SCHRITT_MONAT: "Monatspreis",
 }
 WORT_JE_LUECKE = {
     POSTEN_TARIF: "Tarif",
@@ -39,9 +42,17 @@ WORT_JE_LUECKE = {
 
 
 def zum_lesen(schritte: list[Rechenschritt]) -> list[dict]:
-    """Die Summanden mit ihrem Wort für die Zeile."""
+    """Die Summanden mit ihrem Wort für die Zeile; ein Monatspreis mit Gerät und
+    Tarif als `teile`."""
     return [
-        {"anzahl": s.anzahl, "betrag": s.betrag, "wort": WORT_JE_SCHRITT[s.art]}
+        {
+            "anzahl": s.anzahl,
+            "betrag": s.betrag,
+            "wort": WORT_JE_SCHRITT[s.art],
+            "teile": [
+                {"betrag": t.betrag, "wort": WORT_JE_SCHRITT[t.art]} for t in s.teile
+            ],
+        }
         for s in schritte
     ]
 
@@ -59,9 +70,11 @@ def luecken_zum_lesen(luecken: list[str]) -> list[str]:
 
 
 def felder(kosten: Kosten) -> dict:
-    """Die Felder der Bündelkarte: Summanden und, ohne Kernzahl, was fehlt."""
+    """Die Felder der Bündelkarte: Summanden und, ohne Kernzahl, was fehlt. Gerät
+    und Tarif über gleich viele Monate stehen als Monatspreis wie beim Anbieter
+    (Antonio, 07.10.2026)."""
     return {
-        "rechnung": zum_lesen(kosten.rechnung),
+        "rechnung": zum_lesen(monatsschritte(kosten.rechnung)),
         "rechnung_luecken": luecken_zum_lesen(kosten.luecken),
     }
 

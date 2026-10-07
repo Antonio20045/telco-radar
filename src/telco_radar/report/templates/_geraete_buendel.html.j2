@@ -153,7 +153,9 @@
       k.rechnung %}{% if not loop.first %}<span class="gr-bnd-op"> + </span>{%
       endif %}<span class="gr-bnd-term">{% if s.anzahl %}{{ s.anzahl }} × {%
       endif %}{{ s.betrag | euro }} <span class="gr-bnd-wort">{{ s.wort
-      }}</span></span>{% endfor %}{% if k.belastbar %}<span
+      }}</span></span>{% if s.teile %} <span class="gr-bnd-teile">({% for t in
+      s.teile %}{% if not loop.first %} + {% endif %}<span class="gr-bnd-teil">{{
+      t.betrag | euro }} {{ t.wort }}</span>{% endfor %})</span>{% endif %}{% endfor %}{% if k.belastbar %}<span
       class="gr-bnd-ergebnis"><span class="gr-bnd-op"> = </span><b
       class="gr-bnd-summe">{{ k.gesamt | euro }}</b></span>{% else %}{% for l in
       k.rechnung_luecken %}<span class="gr-bnd-op"> + </span><span
