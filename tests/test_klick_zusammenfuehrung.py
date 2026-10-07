@@ -12,11 +12,13 @@ from __future__ import annotations
 
 import gzip
 import json
+import shutil
 from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
-from bestand_pfad import ZUSTAND, lese_wurzel
+import yaml
+from bestand_pfad import WURZEL, ZUSTAND, lese_wurzel
 from klickergebnisse import (
     O2_SEITE,
     TELEKOM_SEITE,
@@ -29,7 +31,9 @@ from klickergebnisse import (
 
 from telco_radar.analyze.klick_zusammenfuehrung import (
     STAND,
+    UMGEBUNG,
     fuehre_zusammen,
+    klickordner,
     zusammenfuehren,
 )
 from telco_radar.analyze.tco_buendel import aus_rohsaetzen
@@ -39,6 +43,7 @@ from telco_radar.collect.geraete.klicklauf import LAUF_GESTOERT
 from telco_radar.collect.geraete.robots import RobotsWaechter
 from telco_radar.geraete_config import Anbieter, Einstieg, lade_farben, lade_katalog
 from telco_radar.geraete_model import sku_id
+from telco_radar.geraete_pipeline import run_geraete_stage
 from telco_radar.report.geraete_tco_karten import geraet_aus_sku
 from telco_radar.tarif_bezug import Tarifbestand
 
@@ -64,9 +69,21 @@ def bestand():
     return Tarifbestand.aus_datei(ZUSTAND / "tarife.jsonl")
 
 
-@pytest.fixture(scope="module")
-def adapter(katalog):
-    """Die 48 Rohsätze des o2-Sammlers zum iPhone 17 Pro, mit ``sku_id``."""
+_O2 = {
+    "name": "o2",
+    "typ": "netzbetreiber",
+    "methode": "o2_katalog",
+    "rang": 3,
+    "basis_url": "https://www.o2online.de",
+    "rate_limit_sekunden": 0,
+    "kopfzeilen": {"Accept": "application/vnd.commerce.message+json"},
+    "einstiege": [{"url": _KATALOG_URL, "label": "mit Tarif", "kind": "buendel"}],
+}
+_JETZT = datetime(2026, 9, 29, 3, tzinfo=UTC)
+
+
+def _hole():
+    """Der Mitschnitt vom 29.09.2026 als Abrufer, robots.txt wie damals gültig."""
     with gzip.open(_FIX / "o2_vertiefung_iphone17pro.json.gz", "rt") as fh:
         mitschnitt = json.load(fh)
     antworten = dict(mitschnitt["antworten"])
@@ -77,23 +94,26 @@ def adapter(katalog):
             return (200, "User-agent: *\nDisallow: /postpaid/\n")
         return (200, antworten[url]) if url in antworten else (404, "")
 
+    return hole
+
+
+@pytest.fixture(scope="module")
+def adapter(katalog):
+    """Die 48 Rohsätze des o2-Sammlers zum iPhone 17 Pro, mit ``sku_id``."""
+    hole = _hole()
+    einstiege = [Einstieg(url=e["url"], kind=e["kind"]) for e in _O2["einstiege"]]
+    felder = ("name", "typ", "methode", "basis_url", "rate_limit_sekunden")
     anbieter = Anbieter(
-        name="o2",
-        typ="netzbetreiber",
-        methode="o2_katalog",
-        basis_url="https://www.o2online.de",
-        rate_limit_sekunden=0,
-        kopfzeilen={"Accept": "application/vnd.commerce.message+json"},
-        einstiege=[Einstieg(url=_KATALOG_URL, kind="buendel")],
+        **{f: _O2[f] for f in felder}, kopfzeilen=_O2["kopfzeilen"], einstiege=einstiege
     )
     bilanz = sammle_anbieter(
         anbieter,
         katalog,
-        lade_farben(Path(__file__).parent.parent),
+        lade_farben(WURZEL),
         hole,
         HEUTE,
         RobotsWaechter(hole=hole),
-        datetime(2026, 9, 29, 3, tzinfo=UTC),
+        _JETZT,
     )
     assert len(bilanz.buendel) == 48
     return bilanz.buendel
@@ -259,3 +279,46 @@ def test_ordner_wird_gelesen_und_stand_erst_beim_speichern_geschrieben(
     assert not (zustand / STAND).exists()
     zug.speichere()
     assert lies_stand(zustand / STAND)["seiten"]["o2"] == {O2_SEITE.adresse: HEUTE}
+
+
+@pytest.mark.parametrize("mit_klick", [True, False], ids=["mit", "ohne"])
+def test_geraetelauf_fuehrt_klick_zusammen(tmp_path, mit_klick):
+    """``run_geraete_stage`` mit dem o2-Mitschnitt als einzigem Anbieter: mit Ordner
+    ersetzt die Klick-Lesung einen der 48 Adaptersätze, ohne Ordner bleibt alles wie
+    bisher und kein Lesestand entsteht."""
+    root = tmp_path / "repo"
+    (root / "config").mkdir(parents=True)
+    for name in ("geraete_katalog.yaml", "farben.yaml"):
+        shutil.copy(WURZEL / "config" / name, root / "config" / name)
+    quellen = yaml.safe_dump({"anbieter": [_O2]}, allow_unicode=True)
+    (root / "config" / "geraete_quellen.yaml").write_text(quellen, encoding="utf-8")
+    (root / "data" / "state").mkdir(parents=True)
+    shutil.copy(ZUSTAND / "tarife.jsonl", root / "data" / "state" / "tarife.jsonl")
+    ordner = tmp_path / "klick"
+    schreibe(
+        ordner / "klick-o2" / "o2.json", _o2(erfasst(o2_lesung("256 GB", M_PLUS, 36)))
+    )
+
+    bilanz = run_geraete_stage(
+        root,
+        {},
+        HEUTE,
+        jetzt=_JETZT,
+        hole=_hole(),
+        klick=ordner if mit_klick else None,
+    )
+
+    assert (bilanz["rohbuendel"], bilanz["buendel"]) == (48, 48)
+    stand = root / "data" / "state" / STAND
+    if not mit_klick:
+        assert bilanz["klick"] is None and not stand.exists()
+        return
+    assert bilanz["klick"]["ersetzt"] == 1
+    assert bilanz["klick"]["gegenprobe"]["gleich"] == 1
+    assert lies_stand(stand)["seiten"]["o2"] == {O2_SEITE.adresse: HEUTE}
+
+
+def test_klickordner_nur_aus_gesetzter_umgebung():
+    assert klickordner({}) is None
+    assert klickordner({UMGEBUNG: ""}) is None
+    assert klickordner({UMGEBUNG: "klick"}) == Path("klick")

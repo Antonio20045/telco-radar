@@ -29,7 +29,6 @@ wurde, altert nicht.
 from __future__ import annotations
 
 import logging
-import os
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -46,7 +45,7 @@ from .analyze.geraete_store import (
     Preishistorie,
     TEILGELESEN,
 )
-from .analyze.klick_zusammenfuehrung import UMGEBUNG as KLICK_UMGEBUNG
+from .analyze.klick_zusammenfuehrung import klickordner
 from .analyze.klick_zusammenfuehrung import zusammenfuehren
 from .analyze.tarif_referenzen import aus_bestand
 from .analyze.tco_buendel import aus_rohsaetzen
@@ -683,7 +682,7 @@ def main() -> None:
     p = argparse.ArgumentParser(description="Geraete- und Preisradar")
     p.add_argument("--root", default=".")
     p.add_argument("--frist", type=float, default=FRIST_STANDARD)
-    p.add_argument("--klick", type=Path, default=os.environ.get(KLICK_UMGEBUNG) or None)
+    p.add_argument("--klick", type=Path, default=klickordner())
     args = p.parse_args()
 
     logging.basicConfig(

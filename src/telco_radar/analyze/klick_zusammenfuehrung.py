@@ -26,8 +26,9 @@ Klick-Messung mit ihrem Datum und altert sie wie jede andere.
 from __future__ import annotations
 
 import logging
+import os
 from collections import Counter
-from collections.abc import Callable, Iterable
+from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
@@ -121,6 +122,12 @@ class Zusammenfuehrung:
         """Schreibt den Lesestand, wenn es einen gibt; ohne Klick-Ordner nichts."""
         if self.stand is not None and self.pfad is not None:
             schreibe(self.pfad, self.stand)
+
+
+def klickordner(umgebung: Mapping[str, str] | None = None) -> Path | None:
+    """Der Ordner aus ``UMGEBUNG``; leer oder nicht gesetzt heißt kein Klick-Ordner."""
+    wert = (os.environ if umgebung is None else umgebung).get(UMGEBUNG, "")
+    return Path(wert) if wert else None
 
 
 def zusammenfuehren(
