@@ -238,22 +238,32 @@ def test_echte_goldliste_hat_ihre_form(tmp_path):
     )
 
 
-def test_beleganteil_zaehlt_nur_belegte_zaehlende_buendel():
+def test_beleg_gilt_fuer_jede_buendelzeile_auch_ohne_zaehlen():
     bestand = _bestand(zahl=4)
     punkt = _punkt(abnahme.stand(bestand, TAG), abnahme.PUNKT_BELEG)
     assert (punkt.status, punkt.zahl) == (abnahme.ROT, 0)
-    bestand[0] |= {"beleg_id": "a" * 64, "beleg_status": "belegt"}
-    bestand[1] |= {"beleg_id": "b" * 64, "beleg_status": "offen"}
-    bestand.append(
-        _satz(herleitung="x", beleg_id="c" * 64, beleg_status="belegt", tarif="Z")
-    )
+    for satz in bestand:
+        satz |= {"beleg_id": "a" * 64, "beleg_status": "belegt"}
+    bestand[1]["beleg_status"] = "offen"
+    schaetzung = _satz(herleitung="tarifsumme", tarif="Z")
+    bestand.append(schaetzung)
     punkt = _punkt(abnahme.stand(bestand, TAG), abnahme.PUNKT_BELEG)
-    assert (punkt.status, punkt.zahl) == (abnahme.ROT, 25)
-    assert punkt.grund.startswith("1 von 4 ")
-    for satz in bestand[1:4]:
-        satz |= {"beleg_id": "d" * 64, "beleg_status": "belegt"}
-    punkt = _punkt(abnahme.stand(bestand, TAG), abnahme.PUNKT_BELEG)
+    assert (punkt.status, punkt.zahl) == (abnahme.ROT, 60)
+    assert punkt.grund.startswith("3 von 5 Bündelzeilen ")
+    for satz in (bestand[1], schaetzung):
+        satz |= {"beleg_id": "b" * 64, "beleg_status": "belegt"}
+    unlesbar = _satz(tarif="")
+    punkt = _punkt(abnahme.stand([*bestand, unlesbar], TAG), abnahme.PUNKT_BELEG)
     assert (punkt.status, punkt.zahl) == (abnahme.GRUEN, 100)
+    assert punkt.grund.endswith("1 Sätze unlesbar, nicht auf der Seite")
+
+
+def test_eine_schaetzung_ohne_beleg_ist_nie_gruen():
+    gemessen = _satz(beleg_id="a" * 64, beleg_status="belegt")
+    schaetzung = _satz(tarif="Z", herleitung="tarifaufschlag")
+    assert not satz_zaehlt(schaetzung, TAG)
+    punkt = _punkt(abnahme.stand([gemessen, schaetzung], TAG), abnahme.PUNKT_BELEG)
+    assert (punkt.status, punkt.zahl) == (abnahme.ROT, 50)
 
 
 def test_anteil_rundet_ab_und_hundert_heisst_alle():
@@ -268,6 +278,57 @@ def test_anteil_rundet_ab_und_hundert_heisst_alle():
         abnahme.stand([*bestand[:2], bestand[199]], TAG), abnahme.PUNKT_BELEG
     )
     assert (punkt.status, punkt.zahl) == (abnahme.ROT, 66)
+
+
+def _mit_variante(**mehr: object) -> dict:
+    werte = {"anzahlung": 1.0, "rate": 49.5, "ratenzahl": 24, "anschluss": 0.0}
+    beleg = {"laufzeit": 24, "tarif": "Tarif S", "speicher": 256}
+    felder = {
+        "geraet_zuzahlung": 1.0,
+        "geraet_monatsrate": 49.5,
+        "tarif_monatlich": 31.95,
+        "anschlusspreis": 0.0,
+        "echo": {"werte": werte, "befunde": []},
+        "beleg_variante": beleg,
+        "pruefung": "gueltig",
+    }
+    return _satz(**(felder | mehr))
+
+
+def _variante(saetze: list[dict], geraet_von=_geraet_von) -> tuple:
+    punkte = abnahme.stand(saetze, TAG, geraet_von=geraet_von)
+    punkt = _punkt(punkte, abnahme.PUNKT_VARIANTE)
+    return punkt.status, punkt.zahl
+
+
+def test_variante_stimmt_nur_positiv_geprueft():
+    gut = _mit_variante()
+    assert _variante([gut]) == (abnahme.GRUEN, 100)
+    leer = _mit_variante(echo={"werte": {}, "befunde": []}, beleg_variante={})
+    assert leer["pruefung"] == "gueltig"
+    assert _variante([leer]) == (abnahme.ROT, 0)
+    ohne_speicher = _mit_variante(beleg_variante={"laufzeit": 24, "tarif": "Tarif S"})
+    anderer_tarif = _mit_variante(
+        beleg_variante={"laufzeit": 24, "tarif": "Tarif M", "speicher": 256}
+    )
+    andere_rate = _mit_variante(
+        echo={"werte": {"rate": 50.0, "ratenzahl": 24}, "befunde": []}
+    )
+    mit_befund = _mit_variante(
+        echo={"werte": {"rate": 49.5}, "befunde": [{"feld": "rate", "grund": "x"}]}
+    )
+    for falsch in (ohne_speicher, anderer_tarif, andere_rate, mit_befund):
+        assert _variante([gut, falsch]) == (abnahme.ROT, 50), falsch
+    schaetzung = _satz(tarif="Z", herleitung="tarifaufschlag")
+    assert _variante([gut, schaetzung]) == (abnahme.ROT, 50)
+
+
+def test_variante_ohne_katalog_oder_ohne_angabe_ist_offen():
+    assert _variante([_mit_variante()], geraet_von=None) == (abnahme.OFFEN, None)
+    punkte = abnahme.stand(_bestand(zahl=3), TAG, geraet_von=_geraet_von)
+    punkt = _punkt(punkte, abnahme.PUNKT_VARIANTE)
+    assert (punkt.status, punkt.zahl) == (abnahme.OFFEN, None)
+    assert punkt.grund.startswith("kein Echo und kein Beleglink")
 
 
 def test_ohne_daten_ist_nichts_gruen():
@@ -305,6 +366,12 @@ def test_laufzeit_ist_rot_wenn_die_id_eine_andere_laufzeit_traegt():
     assert punkt.grund.startswith("2 von 4 ")
 
 
+def _stichprobe(
+    bestand: list[dict], protokoll: abnahme.Probenprotokoll
+) -> abnahme.Pruefpunkt:
+    return _punkt(abnahme.stand(bestand, TAG, protokoll), abnahme.PUNKT_STICHPROBE)
+
+
 def test_fehlendes_protokoll_ist_offen_und_nie_gruen():
     punkt = _punkt(abnahme.stand(_bestand(), TAG), abnahme.PUNKT_STICHPROBE)
     assert (punkt.status, punkt.zahl) == (abnahme.OFFEN, 0)
@@ -312,33 +379,65 @@ def test_fehlendes_protokoll_ist_offen_und_nie_gruen():
 
 
 def test_dreissig_fehlerfreie_proben_in_folge_sind_gruen():
+    bestand = _bestand()
+    b1 = bestand[0]["id"]
     tage = _tage(abnahme.PROBEN_IN_FOLGE)
-    neunundzwanzig = _proben(*((t, "o2", "b1", abnahme.OK) for t in tage[1:]))
-    punkt = _punkt(
-        abnahme.stand(_bestand(), TAG, neunundzwanzig), abnahme.PUNKT_STICHPROBE
-    )
+    neunundzwanzig = _proben(*((t, "o2", b1, abnahme.OK) for t in tage[1:]))
+    punkt = _stichprobe(bestand, neunundzwanzig)
     assert (punkt.status, punkt.zahl) == (abnahme.OFFEN, 29)
-    dreissig = _proben(*((t, "o2", "b1", abnahme.OK) for t in tage))
-    punkt = _punkt(abnahme.stand(_bestand(), TAG, dreissig), abnahme.PUNKT_STICHPROBE)
+    dreissig = _proben(*((t, "o2", b1, abnahme.OK) for t in tage))
+    punkt = _stichprobe(bestand, dreissig)
     assert (punkt.status, punkt.zahl) == (abnahme.GRUEN, 30)
-    zwei_anbieter = _bestand() + _bestand("Vodafone", 1)
-    punkt = _punkt(
-        abnahme.stand(zwei_anbieter, TAG, dreissig), abnahme.PUNKT_STICHPROBE
-    )
+    punkt = _stichprobe(bestand + _bestand("Vodafone", 1), dreissig)
     assert (punkt.status, punkt.zahl) == (abnahme.OFFEN, 0)
 
 
+def test_proben_ohne_buendel_dieses_anbieters_machen_nicht_gruen():
+    bestand = _bestand() + _bestand("Vodafone", 1)
+    o2, vodafone = bestand[0]["id"], bestand[-1]["id"]
+    tage = _tage(abnahme.PROBEN_IN_FOLGE)
+    zeilen = [(t, "o2", o2, abnahme.OK) for t in tage]
+    zeilen += [(t, "Vodafone", vodafone, abnahme.OK) for t in tage]
+    assert _stichprobe(bestand, _proben(*zeilen)).status == abnahme.GRUEN
+    for anbieter, fremd in (
+        ("o2", "buendel--o2--erfunden--tarif-s--24m"),
+        ("Vodafone", o2),
+    ):
+        punkt = _stichprobe(bestand, _proben(*zeilen, (tage[0], anbieter, fremd, "ok")))
+        assert (punkt.status, punkt.zahl) == (abnahme.OFFEN, 30)
+        etwa = f"1 Proben ohne Bündel dieses Anbieters im Bestand, etwa {anbieter}"
+        assert punkt.grund.endswith(f"{etwa} {fremd}")
+    nur_fremd = _proben(*((t, "Vodafone", o2, abnahme.OK) for t in tage))
+    assert _stichprobe(_bestand("Vodafone", 1), nur_fremd).status == abnahme.OFFEN
+
+
 def test_ein_fehler_setzt_die_folge_zurueck():
+    bestand = _bestand()
+    b1, b2, b3 = _ids(bestand[:3])
     tage = _tage(abnahme.PROBEN_IN_FOLGE + 6)
-    zeilen = [(t, "o2", "b1", abnahme.OK) for t in tage[:30]]
-    zeilen += [(tage[30], "o2", "b2", abnahme.OK), (tage[30], "o2", "b3", "fehler")]
-    zeilen += [(t, "o2", "b1", abnahme.OK) for t in tage[31:]]
-    punkt = _punkt(
-        abnahme.stand(_bestand(), TAG, _proben(*zeilen)), abnahme.PUNKT_STICHPROBE
-    )
+    zeilen = [(t, "o2", b1, abnahme.OK) for t in tage[:30]]
+    zeilen += [(tage[30], "o2", b2, abnahme.OK), (tage[30], "o2", b3, "fehler")]
+    zeilen += [(t, "o2", b1, abnahme.OK) for t in tage[31:]]
+    punkt = _stichprobe(bestand, _proben(*zeilen))
     assert (punkt.status, punkt.zahl) == (abnahme.ROT, 5)
     folge = abnahme.folgen(_proben(*zeilen).proben)["o2"]
     assert (folge.fehlerfrei, folge.fehler) == (5, 1)
+
+
+def test_ein_fehler_ohne_beleg_bricht_die_folge_eine_ok_probe_nicht():
+    bestand = _bestand()
+    b1, b2 = _ids(bestand[:2])
+    tage = _tage(abnahme.PROBEN_IN_FOLGE + 2)
+    zeilen = [_zeile(t, b1, abnahme.OK) for t in tage[:30]]
+    zeilen += [_zeile(tage[30], b2, abnahme.FEHLER, beleg=None)]
+    zeilen += [_zeile(tage[31], b1, abnahme.OK)]
+    protokoll = abnahme.lies_proben("\n".join(zeilen))
+    assert protokoll.unlesbar == 0
+    punkt = _stichprobe(bestand, protokoll)
+    assert (punkt.status, punkt.zahl) == (abnahme.ROT, 1)
+    ohne_beleg = [_zeile(t, b1, abnahme.OK, beleg=None) for t in tage]
+    protokoll = abnahme.lies_proben("\n".join(ohne_beleg))
+    assert (protokoll.proben, protokoll.unlesbar) == ((), len(tage))
 
 
 def test_dieselbe_probe_am_selben_tag_zaehlt_einmal_und_der_fehler_gewinnt():
@@ -348,35 +447,29 @@ def test_dieselbe_probe_am_selben_tag_zaehlt_einmal_und_der_fehler_gewinnt():
     assert abnahme.folgen(_proben(*zeilen).proben)["o2"] == abnahme.Folge(0, 1)
 
 
-def test_probe_ohne_beleg_oder_unlesbar_zaehlt_nicht():
+def _zeile(tag: str, buendel: str, ergebnis: str, beleg: str | None = "s.webp") -> str:
+    roh = {"tag": tag, "anbieter": "o2", "buendel": buendel, "ergebnis": ergebnis}
+    return json.dumps(roh if beleg is None else roh | {"beleg": beleg})
+
+
+def test_unlesbare_zeilen_zaehlen_nicht_und_machen_nicht_gruen():
     text = "\n".join(
         [
             json.dumps({"tag": "2026-11-01", "anbieter": "o2", "buendel": "b1"}),
-            json.dumps(
-                {
-                    "tag": "2026-11-01",
-                    "anbieter": "o2",
-                    "buendel": "b1",
-                    "ergebnis": "vielleicht",
-                    "beleg": "s.webp",
-                }
-            ),
+            _zeile("2026-11-01", "b1", "vielleicht"),
+            _zeile("01.11.2026", "b1", abnahme.OK),
             "kein json",
             "",
         ]
     )
     protokoll = abnahme.lies_proben(text)
-    assert (protokoll.proben, protokoll.unlesbar) == ((), 3)
-    tage = _tage(abnahme.PROBEN_IN_FOLGE)
-    gute = [
-        json.dumps(
-            {"tag": t, "anbieter": "o2", "buendel": "b", "ergebnis": "ok", "beleg": "x"}
-        )
-        for t in tage
-    ]
+    assert (protokoll.proben, protokoll.unlesbar) == ((), 4)
+    bestand = _bestand()
+    gute = [_zeile(t, bestand[0]["id"], abnahme.OK) for t in _tage(30)]
     protokoll = abnahme.lies_proben("\n".join([*gute, "kein json"]))
-    punkt = _punkt(abnahme.stand(_bestand(), TAG, protokoll), abnahme.PUNKT_STICHPROBE)
+    punkt = _stichprobe(bestand, protokoll)
     assert (punkt.status, punkt.zahl) == (abnahme.OFFEN, 30)
+    assert punkt.grund.endswith("; 1 Zeilen unlesbar")
 
 
 SKRIPT_KATALOG = (

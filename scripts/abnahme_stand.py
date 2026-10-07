@@ -1,10 +1,11 @@
 """Stand der Abnahme der Geräteseite (Datenkonzept Geräte, Abschnitt 11), ohne Netz.
 
 Liest ``data/state/geraete_tco.json``, die Goldliste ``config/geraete_goldliste.yaml``
-und, falls vorhanden, das Probenprotokoll ``docs/abnahme/proben.jsonl``. Druckt je
-Prüfpunkt Status, Zahl und Grund, je Anbieter die aufgelöste Goldliste und mit
-``--tag`` die Stichprobe dieses Tages. Ohne ``--tag`` gilt der Tag des Bestands. Ein
-Bericht: Exit 0 auch bei rot; 1 nur, wenn der Bestand nicht lesbar ist.
+und, falls vorhanden, das Probenprotokoll ``docs/abnahme/proben.jsonl`` (Format in
+``analyze/geraete_proben``). Druckt je Prüfpunkt Status, Zahl und Grund, je Anbieter
+die aufgelöste Goldliste und mit ``--tag`` die Stichprobe dieses Tages. Ohne ``--tag``
+gilt der Tag des Bestands. Ein Bericht: Exit 0 auch bei rot; 1 nur, wenn Bestand oder
+Probenprotokoll nicht lesbar sind.
 
     PYTHONPATH=src .venv/bin/python scripts/abnahme_stand.py [--tag 2026-10-07]
 """
@@ -64,12 +65,17 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Probenprotokoll {proben_pfad} nicht lesbar: {exc!r}", file=sys.stderr)
         return 1
     protokolle = sorted(p.name for p in wurzel.glob(abnahme.BEISPIEL_PROTOKOLLE))
+    katalog = lade_katalog(wurzel)
+
+    def geraet_von(sku: str) -> tuple[str, int | None]:
+        return geraet_aus_sku(sku, katalog)
+
     zaehlend = sum(satz_zaehlt(s, tag) for s in buendel)
     print(f"Abnahme Geräteseite, Tag {tag}: {len(buendel)} Bündel, {zaehlend} zählend")
     print()
-    _tabelle(abnahme.stand(buendel, tag, proben, protokolle))
+    _tabelle(abnahme.stand(buendel, tag, proben, protokolle, geraet_von))
     print()
-    _goldliste(wurzel, buendel, tag)
+    _goldliste(wurzel, buendel, tag, geraet_von)
     if args.tag:
         print()
         _stichprobe(buendel, args.tag, args.anzahl)
@@ -91,16 +97,15 @@ def _tabelle(punkte: list[abnahme.Pruefpunkt]) -> None:
         print(f"{zeile}  {grund}")
 
 
-def _goldliste(wurzel: Path, buendel: list[dict], tag: str) -> None:
+def _goldliste(
+    wurzel: Path, buendel: list[dict], tag: str, geraet_von: gold.GeraetVon
+) -> None:
     try:
         eintraege = gold.lade_goldliste(wurzel)
     except gold.GoldlisteFehler as exc:
         print(f"Goldliste: {exc}")
         return
-    katalog = lade_katalog(wurzel)
-    aufgeloest = gold.goldliste_aufloesen(
-        eintraege, buendel, lambda sku: geraet_aus_sku(sku, katalog)
-    )
+    aufgeloest = gold.goldliste_aufloesen(eintraege, buendel, geraet_von)
     gefunden = sum(a.buendel is not None for a in aufgeloest)
     print(f"Goldliste ({gold.GOLDLISTE}): {gefunden} von {len(aufgeloest)} gefunden")
     for anbieter in dict.fromkeys(a.eintrag.anbieter for a in aufgeloest):

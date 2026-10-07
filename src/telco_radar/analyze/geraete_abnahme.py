@@ -4,41 +4,47 @@ Ohne Netz und ohne Uhr; den Tag gibt der Aufrufer. ``stichprobe`` zieht je Anbie
 Tag 10 bis 20 zählende Bündel über SHA-256 aus Tag, Anbieter und Bündel-ID: derselbe
 Tag zieht dieselben Bündel, ein anderer Tag andere. ``stand`` rechnet die Prüfpunkte
 aus Abschnitt 11, je Status ``gruen``, ``rot`` oder ``offen``, Zahl (oder None) und
-Grund. Die Goldliste lädt und löst ``geraete_goldliste`` auf.
+Grund. Die Goldliste lädt und löst ``geraete_goldliste`` auf, das Probenprotokoll der
+Stichprobe Mensch liest ``geraete_proben``.
 
-Zählend heißt, was die Notbremse der Seite zählen lässt (``satz_zaehlt``). Was nur mit
-Netz, Ablage, Zugang oder einem Menschen prüfbar ist, bleibt ``offen`` mit Grund, nie
-grün. Das Probenprotokoll der Stichprobe Mensch ist JSONL, eine Probe je Zeile::
-
-    {"tag": "2026-10-07", "anbieter": "o2", "buendel": "<Bündel-ID>",
-     "ergebnis": "ok", "beleg": "<Screenshot>", "notiz": "…"}
-
-``ergebnis`` ist ``ok`` oder ``fehler``, ``beleg`` Pfad oder Adresse des Screenshots;
-eine Zeile ohne Beleg zählt nicht. Je Anbieter und Tag zählt jedes Bündel einmal, ein
-Fehler an ihm gewinnt; ein Tag mit Fehler setzt die Folge auf 0.
+Zählend heißt, was die Notbremse der Seite zählen lässt (``satz_zaehlt``). Beleg und
+Variante gelten für jede Bündelzeile, zählend oder nicht: auch eine Schätzung steht mit
+Beträgen auf der Seite. Eine Zeile ist jeder Satz, aus dem ein ``Buendel`` wird; einen
+anderen übergeht die Seite. Die Variante stimmt nur positiv geprüft: Echo ohne Befund
+mit Werten gleich dem Datensatz (``ECHO_ZU_SATZ``) und ein Beleglink, der Ratenlaufzeit,
+Tarif und Speicher nennt und Regel 13 besteht. Was nur mit Netz, Ablage, Zugang oder
+einem Menschen prüfbar ist, bleibt ``offen`` mit Grund, nie grün.
 """
 
 from __future__ import annotations
 
 import hashlib
-import json
 import logging
 from collections import Counter
-from collections.abc import Iterable, Mapping, Sequence
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import date
 
 from ..collect.geraete.klicklauf import BELEGT
-from ..tco_model import laufzeit_segment
+from ..tco_model import Buendel, laufzeit_segment
+from .geraete_proben import FEHLER as FEHLER
+from .geraete_proben import OK as OK
+from .geraete_proben import PROBEN_IN_FOLGE as PROBEN_IN_FOLGE
+from .geraete_proben import Folge as Folge
+from .geraete_proben import Probenprotokoll as Probenprotokoll
+from .geraete_proben import folgen as folgen
+from .geraete_proben import lies_proben as lies_proben
+from .geraete_proben import nicht_zuordenbar
 from .geraete_pruefstatus import (
+    CENT,
     ERLAUBTE_RATENLAUFZEITEN,
     FELD_BELEG_VARIANTE,
     FELD_ECHO,
-    FELD_PRUEFUNG,
-    GUELTIG,
-    lies_vermerk,
+    Kontext,
+    buendel_aus_satz,
     satz_zaehlt,
 )
+from .geraete_regeln import regel_9_echo, regel_13_beleglink
 from .tco_store import id_aus_satz
 
 log = logging.getLogger(__name__)
@@ -48,12 +54,19 @@ ROT = "rot"
 OFFEN = "offen"
 STICHPROBE_MIN = 10
 STICHPROBE_MAX = 20
-PROBEN_IN_FOLGE = 30
 BEISPIEL_PROTOKOLLE = "docs/abnahme/beispielseite-*.md"
-OK = "ok"
-FEHLER = "fehler"
 FELD_BELEG_ID = "beleg_id"
 FELD_BELEG_STATUS = "beleg_status"
+ECHO_ZU_SATZ = {
+    "anzahlung": "geraet_zuzahlung",
+    "rate": "geraet_monatsrate",
+    "ratenzahl": "laufzeit_monate",
+    "anschluss": "anschlusspreis",
+}
+"""Echo-Wert (``klicktext.Preiswerte``) und das Feld des Bündelsatzes, das ihn trägt."""
+BELEGLINK_TEILE = ("laufzeit", "tarif", "speicher")
+ZEILEN = ("Bündelzeilen", "keine Bündelzeile im Bestand")
+ZAEHLENDE = ("zählenden Bündeln", "kein zählendes Bündel im Bestand")
 PUNKT_BELEG = "Jede Zahl hat einen Beleg"
 PUNKT_WOERTLICH = "Wörtlich im Beleg"
 PUNKT_VARIANTE = "Variante stimmt"
@@ -62,34 +75,9 @@ PUNKT_STICHPROBE = "Stichprobe Mensch"
 PUNKT_GEGENPROBE = "Gegenprobe"
 PUNKT_BEISPIEL = "Beispielseite"
 PUNKT_OPTIK = "Optik"
-_PROBE_FELDER = ("tag", "anbieter", "buendel", "ergebnis", "beleg")
 
-
-@dataclass(frozen=True)
-class Probe:
-    """Eine Zeile des Probenprotokolls."""
-
-    tag: str
-    anbieter: str
-    buendel: str
-    ergebnis: str
-    beleg: str
-
-
-@dataclass(frozen=True)
-class Probenprotokoll:
-    """Die lesbaren Proben und die Zahl der Zeilen, die nicht zählen."""
-
-    proben: tuple[Probe, ...]
-    unlesbar: int = 0
-
-
-@dataclass(frozen=True)
-class Folge:
-    """Fehlerfreie Proben seit dem letzten Tag mit Fehler, Fehler insgesamt."""
-
-    fehlerfrei: int = 0
-    fehler: int = 0
+GeraetVon = Callable[[str], tuple[str, int | None]]
+Zeile = tuple[Mapping, Buendel]
 
 
 @dataclass(frozen=True)
@@ -128,96 +116,78 @@ def stichprobe(
     return [satz for _, _, satz in lose[:anzahl]]
 
 
-def lies_proben(text: str) -> Probenprotokoll:
-    """Das Probenprotokoll aus JSONL; jede Zeile, die nicht zählt, steht im Log."""
-    proben: list[Probe] = []
-    unlesbar = 0
-    for nummer, zeile in enumerate(text.splitlines(), start=1):
-        if not zeile.strip():
-            continue
-        try:
-            proben.append(_probe(json.loads(zeile)))
-        except ValueError as exc:
-            log.warning("Probenprotokoll Zeile %d zählt nicht: %s", nummer, exc)
-            unlesbar += 1
-    return Probenprotokoll(tuple(proben), unlesbar)
-
-
-def _probe(roh: object) -> Probe:
-    if not isinstance(roh, Mapping):
-        raise ValueError("Zeile ist keine Zuordnung")
-    werte = {f: str(roh.get(f) or "").strip() for f in _PROBE_FELDER}
-    fehlt = [f for f, wert in werte.items() if not wert]
-    if fehlt:
-        raise ValueError(f"es fehlt {', '.join(fehlt)}")
-    if werte["ergebnis"] not in (OK, FEHLER):
-        raise ValueError(f"Ergebnis {werte['ergebnis']!r} ist weder ok noch fehler")
-    werte["tag"] = date.fromisoformat(werte["tag"]).isoformat()
-    return Probe(**werte)
-
-
-def folgen(proben: Iterable[Probe]) -> dict[str, Folge]:
-    """Je Anbieter die fehlerfreien Proben seit dem letzten Tag mit Fehler."""
-    tage: dict[tuple[str, str], dict[str, str]] = {}
-    for p in proben:
-        je_buendel = tage.setdefault((p.anbieter, p.tag), {})
-        if je_buendel.get(p.buendel) != FEHLER:
-            je_buendel[p.buendel] = p.ergebnis
-    folge: dict[str, Folge] = {}
-    for (anbieter, _tag), ergebnisse in sorted(tage.items()):
-        bisher = folge.get(anbieter, Folge())
-        fehler = sum(e == FEHLER for e in ergebnisse.values())
-        folge[anbieter] = (
-            Folge(0, bisher.fehler + fehler)
-            if fehler
-            else Folge(bisher.fehlerfrei + len(ergebnisse), bisher.fehler)
-        )
-    return folge
-
-
 def stand(
     buendel: Iterable[Mapping],
     tag: str,
     proben: Probenprotokoll | None = None,
     beispielprotokolle: Sequence[str] = (),
+    geraet_von: GeraetVon | None = None,
 ) -> list[Pruefpunkt]:
     """Die Prüfpunkte aus Abschnitt 11 in dessen Reihenfolge.
 
     ``tag`` ist der Tag des Bestands, ``proben`` das gelesene Probenprotokoll oder
     None, wenn es fehlt, ``beispielprotokolle`` die Namen der Protokolle der
-    Beispielseite (``BEISPIEL_PROTOKOLLE``).
+    Beispielseite (``BEISPIEL_PROTOKOLLE``), ``geraet_von`` Gerät und Speicher einer
+    SKU wie auf der Seite; ohne sie ist der Speicher im Beleglink nicht prüfbar.
     """
     saetze = list(buendel)
+    zeilen, unlesbar = _zeilen(saetze)
     zaehlende = [s for s in saetze if satz_zaehlt(s, tag)]
     anbieter = {str(s.get("anbieter") or "") for s in saetze} - {""}
     gegenprobe = "kein Zugang zu TARIFFUXX, communicationAds oder Diffbot"
     optik = "pruefe_portal.py und Screenshots 1440 px und 390 px sieht ein Mensch an"
+    belegt = sum(_belegt(s) for s, _ in zeilen)
+    was = "mit beleg_id und Belegstatus belegt"
+    beleg = _anteil(PUNKT_BELEG, belegt, len(zeilen), was, ZEILEN)
+    if unlesbar:
+        grund = f"{beleg.grund}; {unlesbar} Sätze unlesbar, nicht auf der Seite"
+        beleg = Pruefpunkt(beleg.name, beleg.status, beleg.zahl, grund, beleg.einheit)
     return [
-        _anteil(
-            PUNKT_BELEG,
-            sum(map(_belegt, zaehlende)),
-            len(zaehlende),
-            "mit beleg_id und Belegstatus belegt",
-        ),
-        _woertlich(zaehlende),
-        _variante(zaehlende),
+        beleg,
+        _woertlich(zeilen),
+        _variante(zeilen, Kontext(heute=tag, geraet_von=geraet_von)),
         _laufzeit(zaehlende),
-        _stichprobe_mensch(anbieter, proben),
+        _stichprobe_mensch(anbieter, proben, _anbieter_je_buendel(saetze)),
         Pruefpunkt(PUNKT_GEGENPROBE, OFFEN, None, gegenprobe),
         _beispielseite(beispielprotokolle),
         Pruefpunkt(PUNKT_OPTIK, OFFEN, None, optik),
     ]
 
 
-def _anteil(name: str, treffer: int, von: int, was: str) -> Pruefpunkt:
-    """Grün nur, wenn alle ``von`` treffen; ohne zählendes Bündel offen.
+def _zeilen(saetze: list[Mapping]) -> tuple[list[Zeile], int]:
+    """Jeder Satz, aus dem ein ``Buendel`` wird, und die Zahl der übrigen."""
+    zeilen: list[Zeile] = []
+    unlesbar = 0
+    for satz in saetze:
+        try:
+            zeilen.append((satz, buendel_aus_satz(satz)))
+        except (TypeError, ValueError) as exc:
+            log.warning("Abnahme: Satz %s unlesbar: %s", satz.get("id", "?"), exc)
+            unlesbar += 1
+    return zeilen, unlesbar
+
+
+def _anbieter_je_buendel(saetze: list[Mapping]) -> dict[str, str]:
+    """Gespeicherte und heutige ID (``id_aus_satz``) jedes Satzes zu seinem Anbieter."""
+    return {
+        schluessel: str(s.get("anbieter") or "")
+        for s in saetze
+        for schluessel in (str(s.get("id") or ""), id_aus_satz(dict(s)))
+        if schluessel
+    }
+
+
+def _anteil(
+    name: str, treffer: int, von: int, was: str, menge: tuple[str, str]
+) -> Pruefpunkt:
+    """Grün nur, wenn alle ``von`` treffen; ohne einen offen.
 
     Die Zahl ist der Anteil in ganzen Prozent, abgerundet: 100 heißt alle.
     """
     if not von:
-        return Pruefpunkt(name, OFFEN, None, "kein zählendes Bündel im Bestand")
+        return Pruefpunkt(name, OFFEN, None, menge[1])
     status = GRUEN if treffer == von else ROT
-    grund = f"{treffer} von {von} zählenden Bündeln {was}"
+    grund = f"{treffer} von {von} {menge[0]} {was}"
     return Pruefpunkt(name, status, 100 * treffer // von, grund, "%")
 
 
@@ -229,28 +199,63 @@ def _belegt(satz: Mapping) -> bool:
     return bool(_beleg_id(satz)) and satz.get(FELD_BELEG_STATUS) == BELEGT
 
 
-def _woertlich(zaehlende: list[Mapping]) -> Pruefpunkt:
-    mit_id = sum(1 for s in zaehlende if _beleg_id(s))
+def _woertlich(zeilen: list[Zeile]) -> Pruefpunkt:
+    mit_id = sum(1 for s, _ in zeilen if _beleg_id(s))
     if not mit_id:
-        grund = f"kein archivierter Beleg: 0 von {len(zaehlende)} zählenden Bündeln"
+        grund = f"kein archivierter Beleg: 0 von {len(zeilen)} {ZEILEN[0]}"
     else:
         grund = f"{mit_id} Bündel mit beleg_id; Neulesen braucht die Ablage"
     return Pruefpunkt(PUNKT_WOERTLICH, OFFEN, None, grund)
 
 
-def _variante(zaehlende: list[Mapping]) -> Pruefpunkt:
-    mit_echo = [s for s in zaehlende if isinstance(s.get(FELD_ECHO), Mapping)]
-    if not mit_echo:
-        grund = f"kein Echo im Bestand: 0 von {len(zaehlende)} zählenden Bündeln"
-        return Pruefpunkt(PUNKT_VARIANTE, OFFEN, None, grund)
-    stimmt = sum(
-        1
-        for s in mit_echo
-        if isinstance(s.get(FELD_BELEG_VARIANTE), Mapping)
-        and lies_vermerk(s.get(FELD_PRUEFUNG)).status == GUELTIG
+def _variante(zeilen: list[Zeile], k: Kontext) -> Pruefpunkt:
+    angaben = sum(
+        1 for s, _ in zeilen if s.get(FELD_ECHO) or s.get(FELD_BELEG_VARIANTE)
     )
-    was = "mit Echo, Beleglink der Variante und Prüfstatus gültig"
-    return _anteil(PUNKT_VARIANTE, stimmt, len(zaehlende), was)
+    if not angaben:
+        grund = f"kein Echo und kein Beleglink: 0 von {len(zeilen)} {ZEILEN[0]}"
+        return Pruefpunkt(PUNKT_VARIANTE, OFFEN, None, grund)
+    if k.geraet_von is None:
+        grund = "ohne Gerätekatalog ist der Speicher im Beleglink nicht prüfbar"
+        return Pruefpunkt(PUNKT_VARIANTE, OFFEN, None, grund)
+    stimmt = sum(_variante_geprueft(s, b, k) for s, b in zeilen)
+    was = "mit Echo gleich Datensatz und Beleglink der Variante"
+    return _anteil(PUNKT_VARIANTE, stimmt, len(zeilen), was, ZEILEN)
+
+
+def _variante_geprueft(satz: Mapping, b: Buendel, k: Kontext) -> bool:
+    """Positiv geprüft, nicht nur nicht verletzt: Regeln 9 und 13 bestanden, der
+    Beleglink nennt alle ``BELEGLINK_TEILE``, der Katalog kennt den Speicher, und das
+    Echo nennt Werte, die dem Datensatz gleichen."""
+    beleg = satz.get(FELD_BELEG_VARIANTE)
+    if not isinstance(beleg, Mapping) or k.geraet_von is None:
+        return False
+    return (
+        all(beleg.get(teil) not in (None, "") for teil in BELEGLINK_TEILE)
+        and k.geraet_von(b.sku_id)[1] is not None
+        and _echo_gleich(satz)
+        and regel_9_echo(satz, b, k) is None
+        and regel_13_beleglink(satz, b, k) is None
+    )
+
+
+def _echo_gleich(satz: Mapping) -> bool:
+    """Das Echo nennt mindestens einen Wert, und jeder gleicht dem Datensatz."""
+    echo = satz.get(FELD_ECHO)
+    werte = echo.get("werte") if isinstance(echo, Mapping) else None
+    if not isinstance(werte, Mapping):
+        return False
+    paare = [(werte.get(e), satz.get(s)) for e, s in ECHO_ZU_SATZ.items()]
+    genannt = any(e is not None for e, _ in paare)
+    return genannt and all(_gleich(e, s) for e, s in paare)
+
+
+def _gleich(echo: object, satz: object) -> bool:
+    if echo is None or satz is None:
+        return echo is satz
+    if isinstance(echo, int | float) and isinstance(satz, int | float):
+        return abs(echo - satz) <= CENT
+    return echo == satz
 
 
 def _laufzeit(zaehlende: list[Mapping]) -> Pruefpunkt:
@@ -268,7 +273,7 @@ def _laufzeit(zaehlende: list[Mapping]) -> Pruefpunkt:
         and i.rsplit("--", 1)[-1] == laufzeit_segment(s.get("laufzeit_monate"))
     )
     was = "mit erlaubter Ratenlaufzeit in eindeutiger ID"
-    punkt = _anteil(PUNKT_LAUFZEIT, getrennt, len(zaehlende), was)
+    punkt = _anteil(PUNKT_LAUFZEIT, getrennt, len(zaehlende), was, ZAEHLENDE)
     if punkt.status != GRUEN:
         return punkt
     grund = f"{punkt.grund}; die Vergleiche der Seite prüfen nur die Tests aus 5.5"
@@ -276,21 +281,30 @@ def _laufzeit(zaehlende: list[Mapping]) -> Pruefpunkt:
 
 
 def _stichprobe_mensch(
-    anbieter: set[str], protokoll: Probenprotokoll | None
+    anbieter: set[str],
+    protokoll: Probenprotokoll | None,
+    anbieter_je_buendel: Mapping[str, str],
 ) -> Pruefpunkt:
+    """Rot nach einem Fehler, bis wieder ``PROBEN_IN_FOLGE`` fehlerfrei folgen; grün
+    erst, wenn jeder Anbieter sie hat und keine Zeile unlesbar oder nicht zuordenbar
+    ist."""
     if protokoll is None:
         grund = f"kein Probenprotokoll: 0 von {PROBEN_IN_FOLGE} je Anbieter"
         return Pruefpunkt(PUNKT_STICHPROBE, OFFEN, 0, grund, "Proben")
     je = folgen(protokoll.proben)
+    fremd = nicht_zuordenbar(protokoll.proben, anbieter_je_buendel)
     werte = {a: je.get(a, Folge()) for a in sorted(anbieter | set(je))}
     zahl = min((f.fehlerfrei for f in werte.values()), default=0)
     teile = ", ".join(f"{a} {f.fehlerfrei}" for a, f in werte.items())
     grund = f"in Folge fehlerfrei, Grenze {PROBEN_IN_FOLGE}: {teile or 'kein Anbieter'}"
     if protokoll.unlesbar:
-        grund += f"; {protokoll.unlesbar} Zeilen zählen nicht"
+        grund += f"; {protokoll.unlesbar} Zeilen unlesbar"
+    if fremd:
+        grund += f"; {len(fremd)} Proben ohne Bündel dieses Anbieters im Bestand"
+        grund += f", etwa {fremd[0].anbieter} {fremd[0].buendel}"
     if any(f.fehler and f.fehlerfrei < PROBEN_IN_FOLGE for f in werte.values()):
         status = ROT
-    elif werte and zahl >= PROBEN_IN_FOLGE and not protokoll.unlesbar:
+    elif werte and zahl >= PROBEN_IN_FOLGE and not protokoll.unlesbar and not fremd:
         status = GRUEN
     else:
         status = OFFEN

@@ -234,7 +234,8 @@ def _r8_phasen(satz: Mapping, b: Buendel, k: Kontext) -> Befund | None:
     return _nicht(8, AUS_DEM_TARIFBLATT)
 
 
-def _r9_echo(satz: Mapping, b: Buendel, k: Kontext) -> Befund | None:
+def regel_9_echo(satz: Mapping, b: Buendel, k: Kontext) -> Befund | None:
+    """Regel 9: Text und mitgeschnittene Antwort; None heißt bestanden."""
     echo = _echo(satz)
     if echo is None:
         return _nicht(9, "keine mitgeschnittene Antwort")
@@ -273,7 +274,8 @@ def _r11_vortag(satz: Mapping, b: Buendel, k: Kontext) -> Befund | None:
     )
 
 
-def _r13_beleg(satz: Mapping, b: Buendel, k: Kontext) -> Befund | None:
+def regel_13_beleglink(satz: Mapping, b: Buendel, k: Kontext) -> Befund | None:
+    """Regel 13: der Beleglink nennt dieselbe Variante; None heißt bestanden."""
     beleg = satz.get(FELD_BELEG_VARIANTE)
     if not isinstance(beleg, Mapping):
         return _nicht(13, "kein Beleg der Variante")
@@ -333,10 +335,10 @@ _JE_BUENDEL = (
     _r6_laufzeit,
     _r7_bindung,
     _r8_phasen,
-    _r9_echo,
+    regel_9_echo,
     _r10_aktion,
     _r11_vortag,
-    _r13_beleg,
+    regel_13_beleglink,
     _r14_pflicht,
     _r15_zeitraum,
     _r16_frische,
