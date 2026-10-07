@@ -222,27 +222,43 @@ def aus_rohsaetzen(rohsaetze, bestand: Tarifbestand, heute: str) -> Buendelbilan
     return bilanz
 
 
+PLUS_SLUG = "-plus"
+"""Endung des o2-Slugs der Fassung "Plus" eines Tarifs (nur mit Geraet, Rabatt im
+Buendel): `o2-mobile-unlimited-l-plus` zum Grundtarif `o2-mobile-unlimited-l`."""
+
+
 def ohne_tarifblatt(bestand: Tarifbestand, anbieter: str, slug: str) -> Bezug | None:
     """Ein Buendeltarif ohne Tarifblatt im Bestand - unter dem Slug des Anbieters.
 
     o2 fuehrt Tarife nur mit Geraet: "O2 Mobile Special" hat keine SIM-only-Kachel,
     und die Kachel "Unlimited L" verlinkt `o2-mobile-unlimited-l` ohne `-plus`.
     `Tarifbestand.loese` loest sie nicht auf, und das bleibt so: "Plus" wird nie auf
-    den Tarif ohne "Plus" geraten. Die Tarif-ID ist der Slug, so gebildet wie der
-    Bestand seine IDs bildet; nennt er ihn spaeter, ist es dieselbe ID. Nur fuer den
+    den Tarif ohne "Plus" geraten. Die Tarif-ID ist `tarif_id(anbieter, slug)`.
+
+    Nur, wenn der Bestand o2s Kacheln gelesen hat und den Slug weder als Tarif-ID
+    noch als Kachel-Link kennt; "nicht gelesen" ist nicht "nur mit Geraet". Ein
+    Plus-Slug zusaetzlich nur, wenn die Kachel seines Grundtarifs gelesen ist und
+    einen anderen Slug verlinkt. Fehlt sie (Tarifsammler Mi/Fr, Geraetelauf
+    taeglich), bleibt der Satz ohne Tarif, statt spaeter die ID zu wechseln
+    (`o2:...-m-plus` zu `o2:...-m`, `ueber_slug`). Ohne `-plus` ist es dieselbe ID,
+    die `loese` spaeter findet, wenn das Blatt unter dem Slug steht; verlinkt erst
+    eine spaetere Kachel den Slug unter anderem Namen, wechselt sie. Nur fuer den
     Anbieter, dessen Slug als Tarif-ID belegt ist (`SLUG_ALS_ID_ANBIETER`);
-    Vodafones Slug ist ein Angebots-Hash, der zwischen Tagen wechselt. None, wenn der
-    Bestand den Slug kennt (als Tarif-ID oder Kachel-Link, auch mehrdeutig).
+    Vodafones Slug ist ein Angebots-Hash, der zwischen Tagen wechselt.
     """
     gesucht = (slug or "").strip().lower()
     if anbieter != SLUG_ALS_ID_ANBIETER or not gesucht:
         return None
+    gelesen = any(s.get("buendel_slug") for s in bestand.saetze(anbieter))
     tid = tarif_id(anbieter, gesucht)
-    if tid in bestand.je_id_aktuell or any(
-        str(s.get("buendel_slug") or "").strip().lower() == gesucht
-        for s in bestand.saetze(anbieter)
-    ):
+    if not gelesen or tid in bestand.je_id_aktuell:
         return None
+    if bestand.kacheln_zum_slug(anbieter, gesucht):
+        return None
+    if gesucht.endswith(PLUS_SLUG):
+        basis = tarif_id(anbieter, gesucht.removesuffix(PLUS_SLUG))
+        if not (bestand.je_id_aktuell.get(basis) or {}).get("buendel_slug"):
+            return None
     return Bezug(
         tarif_id=tid,
         tarif_name="",

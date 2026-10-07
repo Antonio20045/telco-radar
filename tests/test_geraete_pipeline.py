@@ -770,10 +770,12 @@ def test_ein_fehler_der_pruefstelle_kostet_keinen_messtag(
     assert "Prüfstelle gescheitert" in caplog.text
 
 
-def test_ohne_tarifblatt_im_bestand_wird_buendel_ohne_sim_only_bezug(tmp_path):
-    """Kein Tarifblatt zum Slug: das Buendel bleibt (vorher verworfen, Geraetelauf
-    07.10.2026), mit der Tarif-ID aus dem o2-Slug und der Guete `nur_mit_geraet`;
-    `upsert_buendel` nimmt es an, der Lauf schreibt die Datei."""
+def test_ohne_tarif_im_bestand_wird_kein_buendel_geschrieben(tmp_path):
+    """Die Regel von `upsert_buendel`, hier als Auswahl statt als Wurf.
+
+    Ohne sie kostet ein einziger unaufloesbarer Satz die ganze Uebergabe -
+    und der Bestand haette null Buendel statt der uebrigen.
+    """
     root = _o2_root(
         tmp_path,
         tarife=[
@@ -787,6 +789,38 @@ def test_ohne_tarifblatt_im_bestand_wird_buendel_ohne_sim_only_bezug(tmp_path):
     )
     bilanz = run_geraete_stage(root, {}, "2026-09-04", jetzt=_jetzt(), hole=_o2_hole())
     assert bilanz["rohbuendel"] == 1
+    assert bilanz["buendel"] == 0 and bilanz["buendel_ohne_tarif"] == 1
+    tco = json.loads(
+        (root / "data" / "state" / "geraete_tco.json").read_text(encoding="utf-8")
+    )
+    assert tco["buendel"] == []
+
+
+def test_ein_satz_ohne_slug_faellt_und_der_lauf_schreibt(tmp_path):
+    """Ohne Slug kein stabiler Schluessel: der Satz faellt mit Namen, der Lauf
+    schreibt Datei und SIM-only-Referenzen trotzdem."""
+    antwort = json.loads(_o2_antwort())
+    del antwort["hardware"][0]["ecommerceProductValue"]["attributes"]["dimension59"]
+    root = _o2_root(tmp_path)
+    bilanz = run_geraete_stage(
+        root, {}, "2026-09-04", jetzt=_jetzt(), hole=_o2_hole(json.dumps(antwort))
+    )
+    assert bilanz["rohbuendel"] == 1
+    assert bilanz["buendel"] == 0 and bilanz["buendel_ohne_tarif"] == 1
+    tco = json.loads(
+        (root / "data" / "state" / "geraete_tco.json").read_text(encoding="utf-8")
+    )
+    assert tco["buendel"] == [] and len(tco["sim_only"]) == 1
+
+
+def test_ein_plus_tarif_ohne_kachel_wird_buendel_ohne_sim_only_bezug(tmp_path):
+    """Die Kachel des Grundtarifs ist gelesen und verlinkt den Slug ohne `-plus`
+    (wie o2 "Unlimited L" am 07.10.2026): das Plus-Buendel bleibt mit der Tarif-ID
+    aus seinem Slug und der Guete `nur_mit_geraet`; `upsert_buendel` nimmt es an."""
+    root = _o2_root(
+        tmp_path, tarife=[{**_O2_TARIFE[0], "buendel_slug": "o2-mobile-on-demand-m"}]
+    )
+    bilanz = run_geraete_stage(root, {}, "2026-09-04", jetzt=_jetzt(), hole=_o2_hole())
     assert bilanz["buendel"] == 1 and bilanz["buendel_ohne_tarif"] == 0
     tco = json.loads(
         (root / "data" / "state" / "geraete_tco.json").read_text(encoding="utf-8")

@@ -301,26 +301,17 @@ class Tarifbestand:
         Zuordnung, sondern gar keine.
         """
         gesucht = (slug or "").strip().lower()
-        if not gesucht:
-            return None
-        marke = tarif_id(anbieter, "")
-        treffer = [
-            s
-            for s in self.je_id.values()
-            if str(s.get("buendel_slug") or "").strip().lower() == gesucht
-            and tarif_id(s.get("anbieter", ""), "") == marke
-        ]
+        treffer = self.kacheln_zum_slug(anbieter, gesucht)
         if not treffer:
-            return self._slug_ist_tarif_id(anbieter, gesucht)
+            return self._slug_ist_tarif_id(anbieter, gesucht) if gesucht else None
         if len(treffer) != 1:
-            if treffer:
-                log.info(
-                    "Tarifbezug ueber den Slug %r bei %s ist nicht "
-                    "eindeutig (%d Tarife) - verworfen",
-                    gesucht,
-                    anbieter,
-                    len(treffer),
-                )
+            log.info(
+                "Tarifbezug ueber den Slug %r bei %s ist nicht "
+                "eindeutig (%d Tarife) - verworfen",
+                gesucht,
+                anbieter,
+                len(treffer),
+            )
             return None
         satz = treffer[0]
         return Bezug(
@@ -333,6 +324,15 @@ class Tarifbestand:
                 f"({gesucht})"
             ),
         )
+
+    def kacheln_zum_slug(self, anbieter: str, slug: str) -> list[dict]:
+        """Die Saetze dieses Anbieters, deren SIM-only-Kachel `slug` verlinkt."""
+        gesucht = (slug or "").strip().lower()
+        return [
+            s
+            for s in self.saetze(anbieter)
+            if gesucht and str(s.get("buendel_slug") or "").strip().lower() == gesucht
+        ]
 
     def _slug_ist_tarif_id(self, anbieter: str, slug: str) -> Optional[Bezug]:
         """Der Slug IST die Tarif-ID des Bestands - der Tarif ohne "Plus".
@@ -361,7 +361,7 @@ class Tarifbestand:
         """
         if anbieter != SLUG_ALS_ID_ANBIETER:
             return None
-        kern = f"{tarif_id(anbieter, '')}:{slug}"
+        kern = tarif_id(anbieter, slug)
         satz = self.je_id_aktuell.get(kern)
         if satz is None or not satz.get("tarif_id"):
             return None

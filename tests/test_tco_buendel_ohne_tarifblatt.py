@@ -19,11 +19,12 @@ from __future__ import annotations
 
 import gzip
 import json
+import re
 from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
-from bestand_pfad import ZUSTAND, lese_wurzel
+from bestand_pfad import ZUSTAND, abbild, lese_wurzel
 
 from telco_radar.analyze import tco_buendel
 from telco_radar.analyze.geraete_pruefstatus import (
@@ -39,6 +40,7 @@ from telco_radar.collect.geraete.robots import RobotsWaechter
 from telco_radar.collect.geraete.vodafone import lies_buendel, loese_tarifnamen
 from telco_radar.geraete_config import Anbieter, Einstieg, lade_farben, lade_katalog
 from telco_radar.report.geraete_tco_view import aufbereiten
+from telco_radar.report.html import render_site
 from telco_radar.tarif_bezug import Tarifbestand
 from telco_radar.tarif_model import HOCH
 from telco_radar.tco_model import POSTEN_TARIF, kosten_ueber
@@ -239,6 +241,74 @@ def test_die_seite_zeigt_den_tarifnamen_ohne_geraeteanteil(gespeichert, bestand)
     ]
     assert karten and {k["tarif_id_guete"] for k in karten} == {NUR_MIT_GERAET}
     assert 2034.76 in {k["gesamt"] for k in karten}
+
+
+@pytest.fixture(scope="module")
+def ab_monat(o2_bilanz, tmp_path_factory) -> list[tuple[str, str]]:
+    """Je Bündelzeile der gerenderten Seite (Schnappschuss plus o2-Bündel): Tarif
+    und Text der Zeile „ab Monat …“."""
+    site = tmp_path_factory.mktemp("ohne-tarifblatt") / "site"
+    berichte = abbild(site.parent)
+    tco = TcoDB(site.parent / "data" / "state" / "geraete_tco.json")
+    tco.upsert_buendel(o2_bilanz.buendel, _HEUTE)
+    tco.save(_HEUTE)
+    render_site(site, berichte)
+    seite = (site / "data" / "geraete-buendel.html").read_text(encoding="utf-8")
+    zeilen = []
+    for block in re.findall(r'<details class="gr-bnd.*?</details>', seite, flags=re.S):
+        tarif = next((n for n in (_SPECIAL, _L_PLUS, _L) if n in block), None)
+        nach = re.search(r'class="gr-kk-nach[^"]*">(.*?)</p>', block, flags=re.S)
+        if tarif and nach:
+            zeilen.append((tarif, re.sub(r"\s+", " ", nach.group(1)).strip()))
+    return zeilen
+
+
+def test_ab_monat_25_ohne_tarifblatt_nennt_keine_tarifquelle(ab_monat):
+    """Prüferbefund zu fb832ba4: die Lücke behauptete eine Tarifquelle, weil die
+    Vorlage den Grund an der Tarif-ID festmachte. Gegenprobe: Unlimited L hat ein
+    Tarifblatt und behält den Quellengrund."""
+    ohne = [z for tarif, z in ab_monat if tarif in (_SPECIAL, _L_PLUS)]
+    mit = [z for tarif, z in ab_monat if tarif == _L]
+    assert len(ohne) == 4 and mit
+    for zeile in ohne:
+        assert "Tarifquelle" not in zeile and "nicht im Tarifbestand" in zeile, zeile
+    assert not [z for z in mit if "nicht im Tarifbestand" in z]
+
+
+def _bestand_ohne(weg) -> Tarifbestand:
+    zeilen = (ZUSTAND / "tarife.jsonl").read_text(encoding="utf-8").splitlines()
+    return Tarifbestand(
+        [s for z in zeilen if z.strip() and not weg(s := json.loads(z))]
+    )
+
+
+def test_plus_ohne_gelesene_kachel_wechselt_nie_die_tarif_id(o2_roh):
+    """Prüferbefund zu fb832ba4: ohne die Kachel "Unlimited M" (Tarifsammler Mi/Fr,
+    Gerätelauf täglich) bekam M Plus `o2:...-m-plus`, mit ihr `o2:...-m`. Jetzt
+    bleibt der Satz bis zur Kachel ohne Tarif. Gegenprobe: L Plus, dessen
+    Grundtarif-Kachel gelesen ist, kommt im selben Bestand an."""
+    ohne_kachel = _bestand_ohne(
+        lambda s: s.get("buendel_slug") == "o2-mobile-unlimited-m-plus"
+    )
+    roh = [dict(s) for s in o2_roh if s["tarif_name"] in (_M_PLUS, _L_PLUS)]
+    vorher = aus_rohsaetzen(roh, ohne_kachel, _HEUTE)
+    assert vorher.offene_tarife == {_M_PLUS: 4}
+    assert {(b.tarif_name, b.tarif_id) for b in vorher.buendel} == {
+        (_L_PLUS, "o2:o2-mobile-unlimited-l-plus")
+    }
+    nachher = aus_rohsaetzen(roh, _bestand_ohne(lambda s: False), _HEUTE)
+    assert {b.tarif_id for b in nachher.buendel if b.tarif_name == _M_PLUS} == {
+        "o2:o2-mobile-unlimited-m"
+    }
+
+
+def test_ohne_gelesene_o2_kacheln_kein_tarif_nur_mit_geraet(o2_roh):
+    """Nicht gelesen ist nicht "nur mit Gerät": ohne eine einzige o2-Kachel im
+    Bestand bekommt Special keine Tarif-ID."""
+    bestand = _bestand_ohne(lambda s: s.get("anbieter") == "o2")
+    roh = [dict(s) for s in o2_roh if s["tarif_name"] == _SPECIAL]
+    bilanz = aus_rohsaetzen(roh, bestand, _HEUTE)
+    assert (bilanz.buendel, bilanz.offene_tarife) == ([], {_SPECIAL: 4})
 
 
 def _vodafone_roh():
