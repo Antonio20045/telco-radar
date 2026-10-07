@@ -2,8 +2,8 @@
  "updated": "2026-10-07",
  "anbieter": {
   "ALDI TALK": {
-   "laeufe": 53,
-   "funde_gesamt": 236,
+   "laeufe": 54,
+   "funde_gesamt": 241,
    "letzter_lauf": "2026-10-07",
    "letzte_funde": 5,
    "letzter_fund": "2026-10-07",
@@ -182,15 +182,15 @@
      5,
      "gelesen",
      0,
-     28,
+     30,
      0
     ]
    ],
    "tote_adressen": 0
   },
   "Vodafone": {
-   "laeufe": 51,
-   "funde_gesamt": 8651,
+   "laeufe": 52,
+   "funde_gesamt": 8834,
    "letzter_lauf": "2026-10-07",
    "letzte_funde": 183,
    "termine": [
@@ -376,10 +376,10 @@
    "tote_adressen": 0
   },
   "o2": {
-   "laeufe": 51,
-   "funde_gesamt": 3425,
+   "laeufe": 52,
+   "funde_gesamt": 3494,
    "letzter_lauf": "2026-10-07",
-   "letzte_funde": 68,
+   "letzte_funde": 69,
    "termine": [
     "2026-08-29",
     "2026-08-30",
@@ -553,9 +553,9 @@
     ],
     [
      "2026-10-07",
-     68,
+     69,
      "gelesen",
-     1975,
+     1974,
      0,
      null
     ]
@@ -564,8 +564,8 @@
   },
   "mobilcom-debitel": {
    "laeufe": 5,
-   "funde_gesamt": 5905,
-   "letzte_funde": 86,
+   "funde_gesamt": 5978,
+   "letzte_funde": 73,
    "termine": [
     "2026-08-29",
     "2026-08-30",
@@ -739,15 +739,15 @@
     ],
     [
      "2026-10-07",
-     86,
+     73,
      "lesefehler",
      0,
-     27,
-     5
+     22,
+     4
     ]
    ],
    "letzter_lauf": "2026-09-29",
-   "tote_adressen": 5
+   "tote_adressen": 4
   },
   "ElectronicPartner": {
    "laeufe": 1,
@@ -1047,10 +1047,10 @@
    "tote_adressen": 0
   },
   "congstar": {
-   "laeufe": 29,
-   "funde_gesamt": 6021,
+   "laeufe": 30,
+   "funde_gesamt": 6174,
    "letzter_lauf": "2026-10-07",
-   "letzte_funde": 152,
+   "letzte_funde": 153,
    "termine": [
     "2026-09-03",
     "2026-09-04",
@@ -1218,9 +1218,9 @@
     ],
     [
      "2026-10-07",
-     152,
+     153,
      "gelesen",
-     932,
+     944,
      44,
      0
     ]
@@ -1228,8 +1228,8 @@
    "tote_adressen": 0
   },
   "1&1": {
-   "laeufe": 43,
-   "funde_gesamt": 1542,
+   "laeufe": 44,
+   "funde_gesamt": 1578,
    "letzter_lauf": "2026-10-07",
    "letzte_funde": 36,
    "termine": [
@@ -1546,10 +1546,10 @@
    "tote_adressen": null
   },
   "Saturn": {
-   "laeufe": 39,
-   "funde_gesamt": 765,
+   "laeufe": 40,
+   "funde_gesamt": 781,
    "letzter_lauf": "2026-10-07",
-   "letzte_funde": 20,
+   "letzte_funde": 16,
    "termine": [
     "2026-09-05",
     "2026-09-06",
@@ -1716,7 +1716,7 @@
     ],
     [
      "2026-10-07",
-     20,
+     16,
      "gelesen",
      0,
      0,
@@ -5848,6 +5848,36 @@
     "https://www.saturn.de/de/brand/apple/iphone/iphone-17-pro"
    ],
    "titel_roh": "APPLE iPhone 17 Pro Max 5G 256 GB Silber Dual SIM",
+   "preis_ohne_vertrag": 1329.0
+  },
+  {
+   "id": "saturn--apple-iphone-17-pro-max-256gb-tiefblau",
+   "sku_id": "apple-iphone-17-pro-max-256gb-tiefblau",
+   "device_id": "apple-iphone-17-pro-max",
+   "anbieter": "Saturn",
+   "anbieter_typ": "handel",
+   "netz": "",
+   "speicher_gb": 256,
+   "farbe_roh": "Tiefblau",
+   "farbe_normalisiert": null,
+   "ean": "",
+   "zustand": "neu",
+   "first_seen": "2026-10-07",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "erstpreis": 1329.0,
+   "erstpreis_art": "ohne_vertrag",
+   "erstpreis_am": "2026-10-07",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
+   "quelle_url": "https://www.saturn.de/de/product/_apple-iphone-17-pro-max-5g-256-gb-tiefblau-dual-sim-3013596.html",
+   "abgerufen_am": "2026-10-07",
+   "verfuegbarkeit": "unbekannt",
+   "confidence": "hoch",
+   "einstiege": [
+    "https://www.saturn.de/de/brand/apple/iphone/iphone-17-pro"
+   ],
+   "titel_roh": "APPLE iPhone 17 Pro Max 5G 256 GB Tiefblau Dual SIM",
    "preis_ohne_vertrag": 1329.0
   },
   {
@@ -17231,6 +17261,36 @@
    "preis_ohne_vertrag": 1529.0
   },
   {
+   "id": "congstar--samsung-galaxy-s26-ultra-512gb-cobalt-violet-refurbished",
+   "sku_id": "samsung-galaxy-s26-ultra-512gb-cobalt-violet-refurbished",
+   "device_id": "samsung-galaxy-s26-ultra",
+   "anbieter": "congstar",
+   "anbieter_typ": "discount",
+   "netz": "Telekom",
+   "speicher_gb": 512,
+   "farbe_roh": "cobalt violet",
+   "farbe_normalisiert": null,
+   "ean": "4021114388323",
+   "zustand": "refurbished",
+   "first_seen": "2026-10-07",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "erstpreis": 1097.0,
+   "erstpreis_art": "ohne_vertrag",
+   "erstpreis_am": "2026-10-07",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
+   "quelle_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26-ultra-zustand-wie-neu/",
+   "abgerufen_am": "2026-10-07",
+   "verfuegbarkeit": "lieferbar",
+   "confidence": "hoch",
+   "einstiege": [
+    "https://www.congstar.de/sitemap/devices.xml"
+   ],
+   "titel_roh": "Samsung Galaxy S26 Ultra 512 GB cobalt violet NEUWERTIG",
+   "preis_ohne_vertrag": 1097.0
+  },
+  {
    "id": "congstar--samsung-galaxy-s26-ultra-512gb-schwarz",
    "sku_id": "samsung-galaxy-s26-ultra-512gb-schwarz",
    "device_id": "samsung-galaxy-s26-ultra",
@@ -25917,6 +25977,40 @@
    "preis_ohne_vertrag": 955.0,
    "anzahlung": 7.0,
    "monatsrate": 39.5,
+   "laufzeit_monate": 24,
+   "zins_effektiv": 0.0
+  },
+  {
+   "id": "o2--xiaomi-17-ultra-512gb-schwarz",
+   "sku_id": "xiaomi-17-ultra-512gb-schwarz",
+   "device_id": "xiaomi-17-ultra",
+   "anbieter": "o2",
+   "anbieter_typ": "netzbetreiber",
+   "netz": "",
+   "speicher_gb": 512,
+   "farbe_roh": "schwarz",
+   "farbe_normalisiert": "schwarz",
+   "ean": "",
+   "zustand": "neu",
+   "first_seen": "2026-10-07",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "erstpreis": 1333.0,
+   "erstpreis_art": "ohne_vertrag",
+   "erstpreis_am": "2026-10-07",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
+   "quelle_url": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17-ultra-512gb-schwarz-details?ohne-tarif=ja&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung",
+   "abgerufen_am": "2026-10-07",
+   "verfuegbarkeit": "unbekannt",
+   "confidence": "hoch",
+   "einstiege": [
+    "https://www.o2online.de/e-shop/rest/catalog/o2shop/privatkunden/ratenzahlung/default/__not-specified__/__not-specified__/__not-specified__?hwOnly=true"
+   ],
+   "titel_roh": "Xiaomi 17 Ultra 512 GB schwarz",
+   "preis_ohne_vertrag": 1333.0,
+   "anzahlung": 1.0,
+   "monatsrate": 55.5,
    "laufzeit_monate": 24,
    "zins_effektiv": 0.0
   },
