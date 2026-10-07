@@ -14,13 +14,17 @@ from collections.abc import Mapping
 from typing import TYPE_CHECKING
 
 from .klickkartentypen import (
+    BUENDELFELDER,
     DIMENSIONEN,
     EINHEITEN,
+    ENTFALLEN_IM_BUENDEL,
     GRUND_EINE_QUELLE,
     GRUND_EINHEIT,
+    GRUND_ENTFAELLT,
     GRUND_FEHLT,
     GRUND_KEINE_ZUORDNUNG,
     GRUND_NAME,
+    GRUND_NUR_BUENDEL,
     GRUND_NUR_URL,
     GRUND_OHNE_VARIANTE,
     GRUND_PLATZHALTER,
@@ -58,6 +62,7 @@ SEITENTEILE = ("selektor", "attribut", "parameter", "muster")
 MUSTERTEILE = ("muster", "selektor")
 GRUND_PFAD = "kein gültiger Pfad"
 GRUND_GLOBAL = "kein Bezeichner einer globalen Variable"
+FELDER = (*WERTFELDER, *BUENDELFELDER)
 _NAME = re.compile(r"[a-z_][a-z0-9_]*")
 _GLOBAL = re.compile(r"[A-Za-z_$][\w$]*")
 
@@ -105,12 +110,23 @@ def lies_seite(leser: Kartenleser, roh: object) -> dict[str, Seitenwert]:
     return werte
 
 
+def pruefe_felder(
+    leser: Kartenleser, felder: Mapping[str, object], ort: str, ein_vertrag: bool
+) -> None:
+    """Bündelfelder nur bei ``ein_vertrag``; dort entfallen Rate und Ratenzahl."""
+    for feld in felder:
+        if feld in BUENDELFELDER and not ein_vertrag:
+            raise leser.fehler(f"{ort}.{feld}", GRUND_NUR_BUENDEL)
+        if feld in ENTFALLEN_IM_BUENDEL and ein_vertrag:
+            raise leser.fehler(f"{ort}.{feld}", GRUND_ENTFAELLT)
+
+
 def lies_textmuster(leser: Kartenleser, roh: object) -> dict[str, Textmuster]:
     """Fundort je Wertfeld im Text; ohne Feld keiner."""
     if roh is None:
         return {}
     ort = "zusammenfassung.muster"
-    daten = leser.zuordnung(roh, ort, WERTFELDER)
+    daten = leser.zuordnung(roh, ort, FELDER)
     muster = {}
     for feld in daten:
         if not isinstance(daten[feld], Mapping):
@@ -149,7 +165,7 @@ def _quelle(
     for nur in ("laden", "segment"):
         if url is None and daten.get(nur) is not None:
             raise leser.fehler(f"{feld}.{nur}", GRUND_NUR_URL)
-    pfade = leser.zuordnung(daten.get("pfade"), f"{feld}.pfade", WERTFELDER)
+    pfade = leser.zuordnung(daten.get("pfade"), f"{feld}.pfade", FELDER)
     if not pfade:
         raise leser.fehler(f"{feld}.pfade", GRUND_FEHLT)
     erkennung = leser.wahlweise_text(daten, "erkennung", feld)

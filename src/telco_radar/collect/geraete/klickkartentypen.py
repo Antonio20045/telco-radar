@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import re
 from collections.abc import Mapping
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 
 DIMENSIONEN = ("speicher", "tarif", "laufzeit")
 WERTFELDER = (
@@ -21,6 +21,10 @@ WERTFELDER = (
     "anschluss",
     "volumen_gb",
 )
+BUENDELFELDER = ("buendelbetrag", "einmalzahlung")
+EIN_VERTRAG = "ein_vertrag"
+VERTRAGSFORMEN = ("tarif_plus_ratenkauf", EIN_VERTRAG)
+ENTFALLEN_IM_BUENDEL = ("rate", "ratenzahl")
 PHASENFELD = "tarifphasen"
 PHASENTEILE = ("liste", "von", "bis", "betrag")
 GEWAEHLT = "gewaehlt"
@@ -34,6 +38,9 @@ GRUND_MUSTER = "kein gültiger regulärer Ausdruck"
 GRUND_YAML = "kein lesbares YAML"
 GRUND_OHNE_VARIANTE = "Antwort nennt keine Variante (variante oder parameter)"
 GRUND_ENTWEDER = "entweder attribut mit wert oder passt"
+GRUND_ADRESSEN_UND_KNOPF = "adressen schließt alle anderen Teile des Knopfs aus"
+GRUND_EINE_ADRESSDIMENSION = "adressen nur bei einer Dimension"
+ADRESSATTRIBUT = "href"
 GRUND_FEST_UND_KNOPF = "fest schließt selektor, wert, wert_in, muster und gewaehlt aus"
 GRUND_OHNE_MARKE = "Dimension ohne eigene Marke braucht knoepfe.gewaehlt"
 GRUND_PLATZHALTER = "unbekannter Platzhalter"
@@ -43,6 +50,9 @@ GRUND_WAHRHEITSWERT = "ist kein Wahrheitswert"
 GRUND_EINHEIT = "unbekannte Einheit"
 GRUND_NAME = "kein gültiger Name (Kleinbuchstaben, Ziffern, _)"
 GRUND_SEITENWERT = "braucht selektor oder parameter"
+GRUND_NUR_BUENDEL = f"nur mit vertragsform {EIN_VERTRAG}"
+GRUND_ENTFAELLT = f"entfällt bei vertragsform {EIN_VERTRAG}"
+GRUND_VERTRAGSFORM = "unbekannte Vertragsform"
 EINHEIT_CENT = "cent"
 EINHEIT_MB = "mb"
 EINHEITEN = (EINHEIT_CENT, EINHEIT_MB)
@@ -80,6 +90,7 @@ class Knopf:
     kommt aus ``wert_attribut`` oder dem sichtbaren Text, am Klickziel oder an dessen
     erstem Kind-Element ``wert_in``; ``muster`` nimmt daraus die erste Gruppe.
     ``marke`` ist die eigene Auswahlmarke der Dimension, ``None`` heißt: die der Karte.
+    ``adressen``: die Optionen sind eigene Seiten (dann ist ``selektor`` ``None``).
     """
 
     selektor: str | None
@@ -88,6 +99,20 @@ class Knopf:
     muster: re.Pattern[str] | None = None
     marke: Auswahlmarke | None = None
     fest: str | None = None
+    adressen: Adressen | None = None
+
+
+@dataclass(frozen=True)
+class Adressen:
+    """Optionen einer Dimension als Adressen, die die Seite selbst zeigt.
+
+    ``selektor`` trifft die Elemente, ``attribut`` trägt die Adresse, der Parameter
+    ``parameter`` dieser Adresse ist der Optionswert.
+    """
+
+    selektor: str
+    parameter: str
+    attribut: str = ADRESSATTRIBUT
 
 
 @dataclass(frozen=True)
@@ -233,7 +258,9 @@ class Klickkarte:
     ``gewaehlt`` ist die Standardmarke (``None`` nur, wenn jede geklickte Dimension eine
     eigene trägt); ``zusammenfassung`` nennt die Bereiche der Textlesung für Belege.
     ``quellen`` sind alle Quellen der zweiten Lesung in Reihenfolge, ``antwort`` ist
-    die erste; ``seite`` nennt Seitenwerte nach Namen.
+    die erste; ``seite`` nennt Seitenwerte nach Namen. Bei ``vertragsform``
+    ``ein_vertrag`` entfallen Rate und Ratenzahl planmäßig, dafür gelten
+    ``BUENDELFELDER``.
     """
 
     anbieter: str
@@ -246,6 +273,23 @@ class Klickkarte:
     vorbereitung: tuple[Vorbereitung, ...] = field(default=())
     quellen: tuple[Antwortmuster, ...] = field(default=())
     seite: Mapping[str, Seitenwert] = field(default_factory=dict)
+    vertragsform: str = VERTRAGSFORMEN[0]
+
+    @property
+    def ein_vertrag(self) -> bool:
+        """Wahr, wenn Gerät und Tarif ein Vertrag mit Bündelbetrag sind."""
+        return self.vertragsform == EIN_VERTRAG
+
+    @property
+    def entfallen(self) -> tuple[str, ...]:
+        """Wertfelder, die planmäßig entfallen und keine Lücke sind."""
+        return ENTFALLEN_IM_BUENDEL if self.ein_vertrag else ()
+
+    @property
+    def lesefelder(self) -> tuple[str, ...]:
+        """Die Felder, die jede Lesung sucht: Wertfelder und bei Bedarf Bündelfelder."""
+        felder = tuple(f for f in WERTFELDER if f not in self.entfallen)
+        return (*felder, *BUENDELFELDER) if self.ein_vertrag else felder
 
     @property
     def lesequellen(self) -> tuple[Antwortmuster, ...]:
@@ -256,6 +300,16 @@ class Klickkarte:
     def je_klick(self) -> bool:
         """Wahr, wenn eine Quelle nach jedem Klick eine Antwort erwartet."""
         return any(q.je_klick for q in self.lesequellen)
+
+    @property
+    def adressdimension(self) -> str | None:
+        """Die Dimension, deren Optionen eigene Adressen sind; ``None`` ohne."""
+        return next((d for d, k in self.knoepfe.items() if k.adressen), None)
+
+    def mit_fest(self, dimension: str, wert: str) -> Klickkarte:
+        """Dieselbe Karte, in der ``dimension`` den festen Wert ``wert`` hat."""
+        knoepfe = {**self.knoepfe, dimension: Knopf(selektor=None, fest=wert)}
+        return replace(self, knoepfe=knoepfe)
 
     def marke(self, dimension: str) -> Auswahlmarke | None:
         """Die Marke einer Dimension: ihre eigene, sonst die der Karte."""

@@ -83,6 +83,14 @@ class Preiswerte:
     volumen_gb: float | None = None
 
 
+@dataclass(frozen=True)
+class Buendelwerte:
+    """Werte eines Vertrags aus Gerät und Tarif (``klickkarte.BUENDELFELDER``)."""
+
+    buendelbetrag: float | None = None
+    einmalzahlung: float | None = None
+
+
 def lies_zusammenfassung(text: str) -> Preiswerte:
     """Liest die Werte aus dem sichtbaren Text der Preiszusammenfassung."""
     rate, ratenzahl = _rate_aus_text(text)

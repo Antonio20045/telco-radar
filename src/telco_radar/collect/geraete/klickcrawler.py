@@ -10,16 +10,19 @@ Tageslauf. Je Produktseite und Klick-Karte (``klickkarte``):
    zählen nur Zeit, in der niemand auf den Crawl-delay wartet (``klickwache``). Nach dem
    Lauf verlässt er die Seite und schließt den Kontext.
 2. Zeigt eine Hauptseite Bot-Schutz (202-Challenge, 4xx, 5xx, Challenge-Muster), beim
-   Öffnen oder mitten im Lauf, oder die Preisantwort, oder fehlt der Kanarienwert, ist
+   Öffnen oder mitten im Lauf, oder die Preisantwort, antwortet die eigene Website auf
+   irgendeine Anfrage mit HTTP 202 (``klickwache``), oder fehlt der Kanarienwert, ist
    der Abruf gestört und der Lauf endet sofort: kein zweiter Versuch, keine Umgehung
    (CLAUDE.md Regel 4). Sperrt robots.txt die Seite oder ihre Preisantwort, ist der Lauf
    gesperrt; scheitert die Preisanfrage, ist er gestört.
 3. Er liest die angebotenen Optionen je Dimension und klickt jede Kombination; nach
    jedem Klick liest er die Optionen neu und führt neu erschienene Werte mit. Eine feste
-   Dimension hat keinen Knopf. Eine gewählte Option klickt er nicht; eine gesperrte
-   heißt erst ``nicht_angeboten``, wenn die Seite ruht (keine Anfrage läuft, zwei
-   gleiche Lesungen). Vor jeder Lesung stellt ``klickbedienung`` die Vorbereitung her.
-   Eine Antwort gehört nur zu dem Klick, nach dem ihre Anfrage hinausging; bleibt eine
+   Dimension hat keinen Knopf. Sind die Optionen einer Dimension eigene Adressen
+   (``klickadressen``), lädt er jede Adresse, die die Startseite zeigt, und klickt dort
+   die übrigen Dimensionen. Eine gewählte Option klickt er nicht; eine gesperrte heißt
+   erst ``nicht_angeboten``, wenn die Seite ruht (keine Anfrage läuft, zwei gleiche
+   Lesungen). Vor jeder Lesung stellt ``klickbedienung`` die Vorbereitung her. Eine
+   Antwort gehört nur zu dem Klick, nach dem ihre Anfrage hinausging; bleibt eine
    Anfrage über die Frist offen, heißt die Kombination ``nicht_erfasst``, und vor dem
    nächsten Klick wie am Ende wartet er sie ab oder bricht den Lauf als gestört ab. Dann
    liest ``klicklesung`` Antwort, Text, Markierung und Echo und macht einen Screenshot.
@@ -50,10 +53,10 @@ from typing import TYPE_CHECKING
 
 from playwright.sync_api import Error as PlaywrightFehler
 
+from .klickadressen import Adresse, lies_adressen, ohne_adresse, pruefe_robots
 from .klickbedienung import Bedienung
-from .klickbeleg import Belegquelle, baue_beleg
 from .klickecho import LAUFZEIT, Variante, variante_aus
-from .klickkarte import DIMENSIONEN, Klickkarte
+from .klickkarte import DIMENSIONEN, Adressen, Klickkarte
 from .klickkontext import Sitzung, cookie_werte, oeffne_sitzung, schliesse
 from .klicklauf import (
     BEFUND,
@@ -67,7 +70,6 @@ from .klicklauf import (
     Klicklauf,
     Kombiergebnis,
     ergebnisgrund,
-    mit_beleg,
     pruefe_struktur,
 )
 from .klicklesung import Leser
@@ -124,14 +126,13 @@ def klicke_durch(
 
     ``uhr`` liefert die Zeit des nächsten Abrufs für robots.txt; ``schleuse`` hält den
     Crawl-delay je Host über Läufe hinweg (``klicktor.Hostschleuse``). ``vorlauf`` ist
-    der letzte Lauf derselben Seite, Bezug für ``klicklauf.pruefe_struktur``. Ein
-    Abbruch steht als Status und Grund im Lauf; die Kombinationen bis dahin bleiben.
-    ``kennung`` ist der User-Agent aus ``geraete_quellen.yaml``. Nach ``hoechste``
-    Kombinationen oder wenn ``frist`` (``klickseite.Fristschleuse.offen``) vor einem
-    Klick falsch ist, heißt die Kombination ``nicht_erfasst`` mit Grund ``nicht
-    besucht``; schneidet die Frist welche ab oder verwirft sie eine Anfrage, ist der
-    Lauf ``zeitgrenze``. ``beobachter`` sieht jede Antwort im Tor, ``cookies`` erhält
-    beim Schließen die Cookie-Werte, ``modell`` füllt ``{modell}`` im Kanarienwert.
+    der letzte Lauf derselben Seite (``klicklauf.pruefe_struktur``). Ein Abbruch steht
+    als Status und Grund im Lauf; Kombinationen davor bleiben. ``kennung`` ist der
+    User-Agent aus ``geraete_quellen.yaml``. Nach ``hoechste`` Kombinationen oder wenn
+    ``frist`` vor einem Klick falsch ist, heißt die Kombination ``nicht_erfasst`` mit
+    Grund ``nicht besucht``; schneidet die Frist welche ab oder verwirft sie eine
+    Anfrage, ist der Lauf ``zeitgrenze``. ``beobachter`` sieht jede Antwort, ``cookies``
+    am Ende die Cookie-Werte, ``modell`` füllt ``{modell}`` im Kanarienwert.
     """
     lauf = Klicklauf(anbieter=karte.anbieter, adresse=adresse)
     tor = Tor(waechter, uhr, schleuse, lauf)
@@ -190,12 +191,45 @@ class _Gang:
         self.unberuehrt = True
 
     def laufe(self) -> None:
-        try:
-            self._oeffne()
-        except Abbruch as abbruch:
-            raise self._nach_zeitgrenze(abbruch) or abbruch from None
-        werte = {d: self._angebotene_werte(d) for d in DIMENSIONEN}
+        self._oeffne_vor_frist(self.lauf.adresse)
+        dimension = self.karte.adressdimension
         besucht: set[Auswahl] = set()
+        adressen = None if dimension is None else self.karte.knoepfe[dimension].adressen
+        if dimension is None or adressen is None:
+            self._klicke_alle(besucht)
+        else:
+            self._je_adresse(dimension, adressen, besucht)
+        self.wache.warte_offen()
+        self.wache.pruefe_tor()
+        if self.nach_frist:
+            grund = f"{GRUND_ZEIT}: {self.nach_frist} Kombinationen nicht besucht"
+            raise Abbruch(LAUF_ZEITGRENZE, grund)
+
+    def _je_adresse(
+        self, dimension: str, adressen: Adressen, besucht: set[Auswahl]
+    ) -> None:
+        """Lädt jede Adresse der Dimension und klickt dort die übrigen durch."""
+        karte = self.karte
+        gelesen = lies_adressen(self.seite, adressen)
+        self.lauf.struktur.knopf(any(a.grund is None for a in gelesen))
+        if not gelesen:
+            grund = f"Adressen für {dimension} nicht gefunden ({adressen.selektor})"
+            gelesen = [Adresse(None, self.seite.url, grund)]
+        for roh in gelesen:
+            adresse = pruefe_robots(roh, self.tor, self.lauf)
+            if adresse.wert is None or adresse.grund is not None:
+                self.lauf.ergebnisse.append(ohne_adresse(dimension, adresse))
+                continue
+            self._nimm_karte(karte.mit_fest(dimension, adresse.wert))
+            self._oeffne_vor_frist(adresse.url)
+            self._klicke_alle(besucht)
+
+    def _nimm_karte(self, karte: Klickkarte) -> None:
+        self.karte = self.leser.karte = self.leser.quellen.karte = karte
+        self.bedienung.karte = karte
+
+    def _klicke_alle(self, besucht: set[Auswahl]) -> None:
+        werte = {d: self._angebotene_werte(d) for d in DIMENSIONEN}
         while (auswahl := naechste(werte, besucht)) is not None:
             self.wache.pruefe_tor()
             besucht.add(auswahl)
@@ -210,11 +244,12 @@ class _Gang:
             if self.geklickt:
                 for d in DIMENSIONEN:
                     werte[d] = vereinige(werte[d], self._angebotene_werte(d))
-        self.wache.warte_offen()
-        self.wache.pruefe_tor()
-        if self.nach_frist:
-            grund = f"{GRUND_ZEIT}: {self.nach_frist} Kombinationen nicht besucht"
-            raise Abbruch(LAUF_ZEITGRENZE, grund)
+
+    def _oeffne_vor_frist(self, ziel: str) -> None:
+        try:
+            self._oeffne(ziel)
+        except Abbruch as abbruch:
+            raise self._nach_zeitgrenze(abbruch) or abbruch from None
 
     def _nach_zeitgrenze(self, abbruch: Abbruch) -> Abbruch | None:
         """Eine Sperre bei geschlossener Frist als ``zeitgrenze``; sonst ``None``."""
@@ -230,8 +265,11 @@ class _Gang:
         grund = f"{GRUND_NICHT_BESUCHT}: {GRUND_ZEIT}"
         return Kombiergebnis(variante, NICHT_ERFASST, grund)
 
-    def _oeffne(self) -> None:
-        ziel = self.lauf.adresse
+    def _oeffne(self, ziel: str) -> None:
+        self.wache.warte_offen()
+        self.wache.geoeffnet = False
+        marke = self.wache.marke()
+        self.wache.geladen = marke[0]
         for _ in range(HOECHSTE_UMLEITUNGEN + 1):
             darf, grund = self.tor.darf(ziel)
             if not darf:
@@ -250,7 +288,7 @@ class _Gang:
         self.bedienung.pruefe_kanarie()
         quellen = self.karte.lesequellen
         if any(q.url_muster is not None for q in quellen):
-            self.wache.nimm_antwort((0, 0, 0))
+            self.wache.nimm_antwort(marke)
         if not self.karte.je_klick:
             self.wache.warte_ruhe()
         self.unberuehrt = not self.bedienung.bereite_vor()
@@ -289,23 +327,7 @@ class _Gang:
         ergebnis = self.leser.lies(variante, ziel, struktur, self.unberuehrt)
         if ergebnis.status not in (ERFASST, BEFUND):
             return ergebnis
-        teile = self.leser.belegteile
-        quelle = Belegquelle(
-            anbieter=self.karte.anbieter,
-            adresse=self.lauf.adresse,
-            seite=self.seite.url,
-            http_status=self.lauf.http_status,
-            variante=variante,
-            status=ergebnis.status,
-            werte=ergebnis.werte,
-            text=ergebnis.text,
-            screenshot_png=ergebnis.screenshot_png,
-            antwort=teile.kopie,
-            json_pfade=teile.json_pfade,
-            fundorte=teile.fundorte,
-        )
-        paket, ohne = baue_beleg(quelle, self.karte, self.tor.uhr())
-        return mit_beleg(ergebnis, paket, ohne)
+        return self.leser.belege(ergebnis, variante, self.lauf, self.tor.uhr())
 
     def _fehlen(self, dimension: str) -> str:
         selektor = self.karte.knoepfe[dimension].selektor

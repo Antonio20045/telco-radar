@@ -17,14 +17,24 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import dataclass, field
+from datetime import datetime
 from typing import TYPE_CHECKING
 
 from playwright.sync_api import Error as PlaywrightFehler
 
+from .klickbeleg import Belegquelle, baue_beleg
 from .klickecho import KEINE_AUSWAHL, Befund, Echo, Variante, pruefe_echo, variante_aus
 from .klickhar import Antwortkopie
-from .klickkarte import DIMENSIONEN, PLATZHALTER_MODELL, WERTFELDER, Klickkarte
-from .klicklauf import BEFUND, ERFASST, NICHT_ERFASST, Kombiergebnis, Strukturbilanz
+from .klickkarte import BUENDELFELDER, DIMENSIONEN, PLATZHALTER_MODELL, Klickkarte
+from .klicklauf import (
+    BEFUND,
+    ERFASST,
+    NICHT_ERFASST,
+    Klicklauf,
+    Kombiergebnis,
+    Strukturbilanz,
+    mit_beleg,
+)
 from .klickoptionen import Option, lies_optionen
 from .klickquellen import Quellenleser
 from .klicktext import Preiswerte
@@ -84,7 +94,9 @@ class Leser(Textleser):
         bereich = self.seite.locator(self.karte.textlesung.selektoren[0]).first
         seitenwerte = self.quellen.seitenwerte()
         platz = {**seitenwerte, **ziel, PLATZHALTER_MODELL: self.modell}
-        zweite = self.quellen.lies(self.wache.seit, unberuehrt, platz)
+        zweite = self.quellen.lies(
+            self.wache.seit, unberuehrt, platz, self.wache.geladen
+        )
         self.belegteile = Belegteile(zweite.kopie, zweite.json_pfade)
         url = None if zweite.kopie is None else zweite.kopie.url
         in_antwort = zweite.lesung.werte if zweite.lesung is not None else None
@@ -102,9 +114,14 @@ class Leser(Textleser):
             return Kombiergebnis(
                 variante, NICHT_ERFASST, grund, antwort_url=url, antwortwerte=in_antwort
             )
-        im_text, fundorte = self.textwerte(text)
+        im_text, buendel, fundorte = self.textwerte(text)
         self.belegteile = Belegteile(zweite.kopie, zweite.json_pfade, fundorte)
-        struktur.felder(sum(getattr(im_text, f) is not None for f in WERTFELDER))
+        felder = self.karte.lesefelder
+        gefunden = sum(
+            getattr(buendel if f in BUENDELFELDER else im_text, f) is not None
+            for f in felder
+        )
+        struktur.felder(gefunden, len(felder))
         if zweite.befund is not None:
             befunde: tuple[Befund, ...] = (zweite.befund,)
             grund = zweite.befund.grund
@@ -116,7 +133,14 @@ class Leser(Textleser):
         echo = (
             Echo(Preiswerte(), abweichung, ())
             if abweichung
-            else pruefe_echo(variante, angezeigt, im_text, zweite.lesung)
+            else pruefe_echo(
+                variante,
+                angezeigt,
+                im_text,
+                zweite.lesung,
+                buendel=buendel if self.karte.ein_vertrag else None,
+                entfallen=self.karte.entfallen,
+            )
         )
         bild, bildbefunde = self._screenshot(bereich)
         self.schliesse_dialog(bereich)
@@ -135,7 +159,35 @@ class Leser(Textleser):
             text=text,
             textwerte=im_text,
             antwortwerte=in_antwort,
+            buendel=echo.buendel if self.karte.ein_vertrag else None,
         )
+
+    def belege(
+        self,
+        ergebnis: Kombiergebnis,
+        variante: Variante,
+        lauf: Klicklauf,
+        zeitpunkt: datetime,
+    ) -> Kombiergebnis:
+        """``ergebnis`` mit dem Beleg der letzten Lesung (``klicklauf.mit_beleg``)."""
+        teile = self.belegteile
+        quelle = Belegquelle(
+            anbieter=self.karte.anbieter,
+            adresse=lauf.adresse,
+            seite=self.seite.url,
+            http_status=lauf.http_status,
+            variante=variante,
+            status=ergebnis.status,
+            werte=ergebnis.werte,
+            text=ergebnis.text,
+            screenshot_png=ergebnis.screenshot_png,
+            antwort=teile.kopie,
+            json_pfade=teile.json_pfade,
+            fundorte=teile.fundorte,
+            buendel=ergebnis.buendel,
+        )
+        paket, ohne = baue_beleg(quelle, self.karte, zeitpunkt)
+        return mit_beleg(ergebnis, paket, ohne)
 
     def _angezeigt(
         self, variante: Variante, seitenwerte: Mapping[str, str | None]

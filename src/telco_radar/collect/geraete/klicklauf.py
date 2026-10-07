@@ -39,7 +39,7 @@ from typing import TYPE_CHECKING
 
 from .klickecho import Befund, Variante
 from .klickkarte import WERTFELDER
-from .klicktext import Preiswerte
+from .klicktext import Buendelwerte, Preiswerte
 
 if TYPE_CHECKING:
     from .klickbeleg import Belegpaket
@@ -137,7 +137,8 @@ class Kombiergebnis:
     ``variante`` ist gelesen (Laufzeit als Monatszahl), ``auswahl`` die rohen Werte
     der Knöpfe in der Reihenfolge von ``klickkarte.DIMENSIONEN``. ``werte`` hält nur,
     was Text und Antwort gleich nennen; ``textwerte`` und ``antwortwerte`` sind die
-    beiden Lesungen davor, ``None`` heißt nicht gelesen.
+    beiden Lesungen davor, ``None`` heißt nicht gelesen. ``buendel`` hat nur eine
+    Karte mit ``vertragsform`` ``ein_vertrag``.
     """
 
     variante: Variante
@@ -154,6 +155,7 @@ class Kombiergebnis:
     beleg_status: str = OHNE_WERT
     textwerte: Preiswerte | None = None
     antwortwerte: Preiswerte | None = None
+    buendel: Buendelwerte | None = None
 
     @property
     def gueltig(self) -> bool:
@@ -175,9 +177,9 @@ class Strukturbilanz:
         self.knoepfe_gesucht += 1
         self.knoepfe_gefunden += int(gefunden)
 
-    def felder(self, gefunden: int) -> None:
+    def felder(self, gefunden: int, gesucht: int = len(WERTFELDER)) -> None:
         """Zählt die Wertfelder einer gelesenen oder fehlenden Zusammenfassung."""
-        self.felder_gesucht += len(WERTFELDER)
+        self.felder_gesucht += gesucht
         self.felder_gefunden += gefunden
 
     @property
@@ -247,6 +249,9 @@ def mit_beleg(
     if paket is not None:
         return replace(ergebnis, beleg=paket, beleg_status=BELEG_OFFEN)
     gelesen = any(getattr(ergebnis.werte, f) is not None for f in WERTFELDER)
+    gelesen = gelesen or (
+        ergebnis.buendel is not None and ergebnis.buendel != Buendelwerte()
+    )
     if not gelesen:
         return replace(ergebnis, beleg_status=OHNE_WERT)
     return beleg_fehlt(ergebnis, grund or "Beleg fehlt")

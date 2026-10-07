@@ -94,6 +94,23 @@ Zweite Lesung (Stufe 2 von Format 2):
   (o2 „Gerät mtl. (36 Raten)“, 1&1 „44 , 99 €/Monat“, Vodafone „… € einmal“ und
   Ratenzahl im gewählten Label).
 
+Stufe 3 von Format 2:
+
+- ``knoepfe.<dimension>.adressen: {selektor, attribut, parameter}``: die Optionen sind
+  eigene Seiten (Telekom ``tariffId``, freenet Bündel je Tarif ``ts``, 1&1
+  ``chosenTariff``). Der Crawler liest auf der Startseite die Adressen aus ``attribut``
+  (Standard ``href``) der Elemente zu ``selektor``; der Parameter ``parameter`` ist der
+  Optionswert. Er lädt jede Adresse über das Tor (robots.txt, Crawl-delay) und klickt
+  dort die übrigen Dimensionen. Adressen werden nie zusammengesetzt oder hochgezählt;
+  ein anderer Host, ein fehlender Parameter oder robots.txt machen die Option
+  ``nicht_erfasst`` mit Grund (``klickadressen``). Höchstens eine Dimension; das Echo
+  „Seite zeigt“ kommt aus einem gleichnamigen Seitenwert oder der zweiten Lesung.
+- ``vertragsform: ein_vertrag`` (1&1, freenet; Standard ``tarif_plus_ratenkauf``):
+  die Wertfelder ``buendelbetrag`` und ``einmalzahlung`` in ``antwort.pfade`` und
+  ``zusammenfassung.muster``; ``rate`` und ``ratenzahl`` entfallen planmäßig, sind
+  keine Lücke und dort verboten. Beleg Version 1 kennt keine Bündelwerte: die Werte
+  bleiben sichtbar, ohne Beleg aber ein Befund mit Grund (``klickbeleg``).
+
 Selektoren der Klickziele sind Playwright-Selektoren (``:text-matches`` und
 ``:has-text`` gehen); ``passt``, ``bis`` und ``wert_in`` sind reines CSS.
 """
@@ -106,7 +123,9 @@ import yaml
 
 from .klickkartenleser import Kartenleser
 from .klickkartentypen import (
+    BUENDELFELDER,
     DIMENSIONEN,
+    EIN_VERTRAG,
     GEWAEHLT,
     GRUND_FEHLT,
     GRUND_KEIN_TEXT,
@@ -114,11 +133,14 @@ from .klickkartentypen import (
     GRUND_MUSTER,
     GRUND_OHNE_VARIANTE,
     GRUND_UNBEKANNT,
+    GRUND_VERTRAGSFORM,
     GRUND_YAML,
     PHASENFELD,
     PHASENTEILE,
     PLATZHALTER_MODELL,
+    VERTRAGSFORMEN,
     WERTFELDER,
+    Adressen,
     Antwortmuster,
     Auswahlmarke,
     Kanarie,
@@ -132,10 +154,14 @@ from .klickkartentypen import (
     Vorbereitung,
     Wertpfad,
 )
-from .klickquellenleser import lies_quellen, lies_seite
+from .klickquellenleser import lies_quellen, lies_seite, pruefe_felder
 
 __all__ = [
+    "Adressen",
+    "BUENDELFELDER",
     "DIMENSIONEN",
+    "EIN_VERTRAG",
+    "VERTRAGSFORMEN",
     "GEWAEHLT",
     "GRUND_FEHLT",
     "GRUND_KEINE_ZUORDNUNG",
@@ -173,6 +199,7 @@ KOPFFELDER = (
     "kanarie",
     "vorbereitung",
     "seite",
+    "vertragsform",
 )
 
 
@@ -194,8 +221,19 @@ def klickkarte_aus_daten(roh: object, quelle: str) -> Klickkarte:
     daten = leser.zuordnung(roh, "", KOPFFELDER)
     knoepfe, gewaehlt = leser.knoepfe(daten.get("knoepfe"))
     textlesung = leser.textlesung(daten.get("zusammenfassung"))
+    vertragsform = leser.wahlweise_text(daten, "vertragsform", "")
+    if vertragsform is None:
+        vertragsform = VERTRAGSFORMEN[0]
+    if vertragsform not in VERTRAGSFORMEN:
+        raise leser.fehler("vertragsform", f"{GRUND_VERTRAGSFORM} {vertragsform}")
+    ein_vertrag = vertragsform == EIN_VERTRAG
+    pruefe_felder(leser, textlesung.muster, "zusammenfassung.muster", ein_vertrag)
     seite = lies_seite(leser, daten.get("seite"))
     quellen = lies_quellen(leser, daten.get("antwort"), seite)
+    liste = isinstance(daten.get("antwort"), list)
+    for stelle, antwort in enumerate(quellen):
+        ort = f"antwort.{stelle}.pfade" if liste else "antwort.pfade"
+        pruefe_felder(leser, antwort.pfade, ort, ein_vertrag)
     return Klickkarte(
         anbieter=leser.text(daten, "anbieter", ""),
         knoepfe=knoepfe,
@@ -207,4 +245,5 @@ def klickkarte_aus_daten(roh: object, quelle: str) -> Klickkarte:
         vorbereitung=leser.vorbereitung(daten.get("vorbereitung")),
         quellen=quellen,
         seite=seite,
+        vertragsform=vertragsform,
     )

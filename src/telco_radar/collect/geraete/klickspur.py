@@ -13,10 +13,12 @@ nennt diese Werte selbst, damit die Ablage sie überall schwärzt, wo sie wieder
 auftauchen (im Pfad, unter einem harmlosen Namen, in der Seite).
 
 ``bot_verdacht`` nennt den Grund, wenn eine Antwort der eigenen Website (dieselben
-letzten zwei Namensteile wie die Seite) nach Bot-Schutz aussieht: HTTP 403 oder 429 auf
-eine Daten- oder Dokumentanfrage oder ein Challenge-Muster im Körper
-(``klicklauf.CHALLENGE_MUSTER``). Die Erkundung endet dann als gestört (CLAUDE.md
-Regel 4). Dieses Modul ruft kein Netz.
+letzten zwei Namensteile wie die Seite) nach Bot-Schutz aussieht: HTTP 202 auf jede
+Anfrage (Telekom, Erkundung 07.10.2026: die Sperrseite kam unter 202 auch auf eine
+xhr- und eine Skriptanfrage), HTTP 403 oder 429 auf eine Daten- oder Dokumentanfrage
+(``status_verdacht``, so prüft auch die Wache des Klick-Crawlers) oder ein
+Challenge-Muster im Körper (``klicklauf.CHALLENGE_MUSTER``). Die Erkundung endet dann
+als gestört (CLAUDE.md Regel 4). Dieses Modul ruft kein Netz.
 """
 
 from __future__ import annotations
@@ -29,7 +31,7 @@ from urllib.parse import parse_qsl, unquote, urlencode, urlsplit, urlunsplit
 
 from playwright.sync_api import Error as PlaywrightFehler
 
-from .klicklauf import CHALLENGE_MUSTER
+from .klicklauf import CHALLENGE_MUSTER, CHALLENGE_STATUS
 from .klicktor import kurz
 
 if TYPE_CHECKING:
@@ -235,12 +237,27 @@ class Spur:
         return next((e for a, e in self._offen if a is anfrage), None)
 
 
+def status_verdacht(
+    url: str, status: int | None, art: str, seite_url: str
+) -> str | None:
+    """Grund, wenn der Status einer Antwort der eigenen Website Bot-Schutz zeigt.
+
+    HTTP 202 auf jede Anfrage, 403 und 429 auf Daten- und Dokumentanfragen.
+    """
+    if not gleiche_site(url, seite_url):
+        return None
+    if status == CHALLENGE_STATUS or (status in BOT_STATUS and art in DATENARTEN):
+        return f"Abruf gestört (HTTP {status} auf {url})"
+    return None
+
+
 def bot_verdacht(eintrag: Eintrag, koerper: str, seite_url: str) -> str | None:
     """Grund, wenn eine Antwort der eigenen Website nach Bot-Schutz aussieht."""
     if not gleiche_site(eintrag.url, seite_url):
         return None
-    if eintrag.status in BOT_STATUS and eintrag.art in DATENARTEN:
-        return f"Abruf gestört (HTTP {eintrag.status} auf {eintrag.url})"
+    grund = status_verdacht(eintrag.url, eintrag.status, eintrag.art, seite_url)
+    if grund is not None:
+        return grund
     treffer = CHALLENGE_MUSTER.search(koerper)
     if treffer is not None:
         return f"Abruf gestört (Challenge „{treffer[0]}“ in {eintrag.url})"

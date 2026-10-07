@@ -23,8 +23,9 @@ from playwright.sync_api import Error as PlaywrightFehler
 from playwright.sync_api import TimeoutError as PlaywrightZeitueberschreitung
 
 from .klickecho import feldwert
+from .klickkartentypen import BUENDELFELDER
 from .klicklauf import LAUF_GESTOERT
-from .klicktext import Preiswerte, lies_zusammenfassung
+from .klicktext import Buendelwerte, Preiswerte, lies_zusammenfassung
 from .klicktor import WARTE_TAKT_MS, kurz
 from .klickwache import Abbruch
 
@@ -69,8 +70,13 @@ class Textleser:
                 text = text.replace(weg, "")
         return text
 
-    def textwerte(self, text: str) -> tuple[Preiswerte, dict[str, tuple[str, str]]]:
-        """Werte des Texts; je Feld mit Textmuster dessen Fundort und Ausschnitt."""
+    def textwerte(
+        self, text: str
+    ) -> tuple[Preiswerte, Buendelwerte, dict[str, tuple[str, str]]]:
+        """Werte des Texts; je Feld mit Textmuster dessen Fundort und Ausschnitt.
+
+        Bündelfelder (``ein_vertrag``) stehen nur über ihr Textmuster im Text.
+        """
         werte = lies_zusammenfassung(text)
         gemustert: dict[str, Any] = {}
         fundorte: dict[str, tuple[str, str]] = {}
@@ -91,7 +97,8 @@ class Textleser:
             )
             if gemustert[feld] is not None and treffer is not None:
                 fundorte[feld] = (ort, treffer[0])
-        return replace(werte, **gemustert), fundorte
+        buendel = {f: gemustert.pop(f) for f in BUENDELFELDER if f in gemustert}
+        return replace(werte, **gemustert), Buendelwerte(**buendel), fundorte
 
     def oeffne_dialog(self, bereich: Locator) -> str | None:
         """Öffnet den Dialog der Zusammenfassung; der Grund, wenn er nicht aufgeht."""

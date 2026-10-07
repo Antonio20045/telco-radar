@@ -11,8 +11,11 @@ import re
 from collections.abc import Mapping
 
 from .klickkartentypen import (
+    ADRESSATTRIBUT,
     DIMENSIONEN,
     GEWAEHLT,
+    GRUND_ADRESSEN_UND_KNOPF,
+    GRUND_EINE_ADRESSDIMENSION,
     GRUND_ENTWEDER,
     GRUND_FEHLT,
     GRUND_FEST_UND_KNOPF,
@@ -24,6 +27,7 @@ from .klickkartentypen import (
     GRUND_PLATZHALTER,
     GRUND_UNBEKANNT,
     PLATZHALTER_MODELL,
+    Adressen,
     Auswahlmarke,
     Kanarie,
     KlickkartenFehler,
@@ -33,7 +37,8 @@ from .klickkartentypen import (
 )
 from .klickquellenleser import lies_textmuster, texte
 
-KNOPFTEILE = ("selektor", "wert", "wert_in", "muster", GEWAEHLT, "fest")
+KNOPFTEILE = ("selektor", "wert", "wert_in", "muster", GEWAEHLT, "fest", "adressen")
+ADRESSTEILE = ("selektor", "attribut", "parameter")
 MARKENTEILE = ("attribut", "wert", "passt")
 VORBEREITUNGSTEILE = ("klick", "bis", "pruefe")
 LESUNGSTEILE = ("selektor", "oeffnen", "schliessen", "ohne", "muster")
@@ -110,10 +115,16 @@ class Kartenleser:
         """Die Knöpfe je Dimension und die Standardmarke."""
         knoepfe = self.zuordnung(roh, "knoepfe", (*DIMENSIONEN, GEWAEHLT))
         je_dimension = {d: self.knopf(knoepfe, d) for d in DIMENSIONEN}
+        mit_adressen = [d for d, k in je_dimension.items() if k.adressen is not None]
+        if len(mit_adressen) > 1:
+            ort = f"knoepfe.{mit_adressen[1]}.adressen"
+            raise self.fehler(ort, GRUND_EINE_ADRESSDIMENSION)
         feld = f"knoepfe.{GEWAEHLT}"
         if knoepfe.get(GEWAEHLT) is not None:
             return je_dimension, self.marke(knoepfe[GEWAEHLT], feld)
-        if any(k.fest is None and k.marke is None for k in je_dimension.values()):
+        if any(
+            k.selektor is not None and k.marke is None for k in je_dimension.values()
+        ):
             raise self.fehler(feld, GRUND_OHNE_MARKE)
         return je_dimension, None
 
@@ -126,6 +137,11 @@ class Kartenleser:
             if andere:
                 raise self.fehler(stelle(feld, andere[0]), GRUND_FEST_UND_KNOPF)
             return Knopf(selektor=None, fest=self.text(daten, "fest", feld))
+        if daten.get("adressen") is not None:
+            andere = [str(k) for k in daten if k != "adressen"]
+            if andere:
+                raise self.fehler(stelle(feld, andere[0]), GRUND_ADRESSEN_UND_KNOPF)
+            return Knopf(selektor=None, adressen=self.adressen(daten, feld))
         marke = daten.get(GEWAEHLT)
         return Knopf(
             selektor=self.text(daten, "selektor", feld),
@@ -133,6 +149,17 @@ class Kartenleser:
             wert_in=self.wahlweise_text(daten, "wert_in", feld),
             muster=self.wahlweise_muster(daten, "muster", feld),
             marke=None if marke is None else self.marke(marke, f"{feld}.{GEWAEHLT}"),
+        )
+
+    def adressen(self, daten: Mapping, feld: str) -> Adressen:
+        """Selektor, Attribut und Parameter der Adressen einer Dimension."""
+        ort = stelle(feld, "adressen")
+        teile = self.zuordnung(daten["adressen"], ort, ADRESSTEILE)
+        attribut = self.wahlweise_text(teile, "attribut", ort)
+        return Adressen(
+            selektor=self.text(teile, "selektor", ort),
+            parameter=self.text(teile, "parameter", ort),
+            attribut=ADRESSATTRIBUT if attribut is None else attribut,
         )
 
     def marke(self, roh: object, feld: str) -> Auswahlmarke:

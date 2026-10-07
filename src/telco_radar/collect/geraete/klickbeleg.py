@@ -9,7 +9,8 @@ im sichtbaren Text Selektor und Ausschnitt (``klicktext.fundstellen``, bei einem
 Textmuster der Karte dessen Fundort), in der Antwort der JSON-Pfad der Klick-Karte
 (bei mehreren Quellen mit Stelle und Ort davor, ``klickquellen``). Die ``beleg_id``
 ist SHA-256 über beide Dateien, nie aus Titeltext. Fehlt Screenshot, Antwort oder
-eine Fundstelle, gibt es keinen Beleg, sondern einen Grund; ein Wert ohne Beleg ist
+eine Fundstelle oder trägt die Kombination Bündelwerte (``ein_vertrag``, das Schema
+kennt sie nicht), gibt es keinen Beleg, sondern einen Grund; ein Wert ohne Beleg ist
 nicht gültig (``klicklauf.mit_beleg``). ``Beleg`` ist zugleich das Schema einer
 Manifestzeile (``belegmanifest``). Dieses Modul ruft kein Netz.
 """
@@ -32,7 +33,7 @@ from ...tarif_model import Preisphase
 from .klickecho import Variante
 from .klickhar import Antwortkopie, har_aus
 from .klickkarte import WERTFELDER, Klickkarte, Phasenpfad, Wertpfad
-from .klicktext import Preiswerte, fundstellen
+from .klicktext import Buendelwerte, Preiswerte, fundstellen
 
 if TYPE_CHECKING:
     from playwright.sync_api import Response
@@ -48,6 +49,9 @@ UNBEGRENZT = "unbegrenzt"
 GRUND_OHNE_BILD = "Beleg fehlt: kein Screenshot des Preisbereichs"
 GRUND_OHNE_ANTWORT = "Beleg fehlt: keine Preisantwort mitgeschnitten"
 GRUND_OHNE_WERTE = "Beleg fehlt: keine gelesenen Werte"
+GRUND_BUENDEL = (
+    f"Beleg fehlt: Bündelwerte passen nicht in Beleg Version {BELEG_VERSION}"
+)
 
 
 @dataclass(frozen=True)
@@ -120,6 +124,7 @@ class Belegquelle:
     antwort: Antwortkopie | None
     json_pfade: Mapping[str, str] | None = None
     fundorte: Mapping[str, tuple[str, str]] = field(default_factory=dict)
+    buendel: Buendelwerte | None = None
 
 
 def baue_beleg(
@@ -130,6 +135,8 @@ def baue_beleg(
         return None, GRUND_OHNE_BILD
     if quelle.antwort is None:
         return None, GRUND_OHNE_ANTWORT
+    if quelle.buendel is not None and quelle.buendel != Buendelwerte():
+        return None, GRUND_BUENDEL
     stellen, grund = belegstellen(
         quelle.werte,
         quelle.text or "",

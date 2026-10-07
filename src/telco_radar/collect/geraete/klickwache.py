@@ -4,15 +4,19 @@
 ``klicktor.WARTE_TAKT_MS``: Zeit, in der das Tor den Crawl-delay abwartet, zählt so
 nicht gegen die Frist. In jedem Takt fragt sie das Tor: zeigte eine Hauptseite
 Bot-Schutz (``Tor.stoerung``) oder leitet die Hauptseite nach dem Öffnen um, endet der
-Lauf sofort als gestört (CLAUDE.md Regel 4). Eine Antwort gehört nur zu dem Klick, nach
-dem ihre Anfrage hinausging (``klickmitschnitt``); sieht sie nach Bot-Schutz aus
-(``klicklauf.bot_schutz``, auch HTML statt JSON), ist der Lauf gestört. Bleibt sie über
-die Frist offen, heißt die Kombination ``nicht_erfasst`` (``ausstehend``), und vor dem
-nächsten Klick wie am Ende des Laufs wartet die Wache sie ab oder bricht den Lauf als
-gestört ab. Ruhe heißt: keine Anfrage der Seite läuft, und zwei Lesungen im Abstand
-``RUHE_MS`` zeigen dieselben Knöpfe und keine neue Anfrage. Mitgeschnitten wird jede
-Antwort, die zu einer Quelle der Karte passt; erwartet keine Quelle eine Antwort je
-Klick (congstar, Vodafone, 1&1), wartet die Wache nach einem Klick nur auf Ruhe.
+Lauf sofort als gestört (CLAUDE.md Regel 4). Dasselbe gilt, wenn irgendeine andere
+Antwort der eigenen Website nach Bot-Schutz aussieht (``klickspur.status_verdacht``:
+HTTP 202 auf jede Anfrage, Telekom; 403 und 429 auf Daten- und Dokumentanfragen); die
+Wache setzt dann ``Tor.stoerung``, sodass keine weitere Anfrage hinausgeht. Eine Antwort
+gehört nur zu dem Klick, nach dem ihre Anfrage hinausging (``klickmitschnitt``); sieht
+sie nach Bot-Schutz aus (``klicklauf.bot_schutz``, auch HTML statt JSON), ist der Lauf
+gestört. Bleibt sie über die Frist offen, heißt die Kombination ``nicht_erfasst``
+(``ausstehend``), und vor dem nächsten Klick wie am Ende des Laufs wartet die Wache sie
+ab oder bricht den Lauf als gestört ab. Ruhe heißt: keine Anfrage der Seite läuft, und
+zwei Lesungen im Abstand ``RUHE_MS`` zeigen dieselben Knöpfe und keine neue Anfrage.
+Mitgeschnitten wird jede Antwort, die zu einer Quelle der Karte passt; erwartet keine
+Quelle eine Antwort je Klick (congstar, Vodafone, 1&1), wartet die Wache nach einem
+Klick nur auf Ruhe.
 """
 
 from __future__ import annotations
@@ -31,6 +35,7 @@ from .klicklauf import (
     bot_schutz,
 )
 from .klickmitschnitt import Mitschnitt
+from .klickspur import ohne_geheimnisse, status_verdacht
 from .klicktor import SEITEN_FRIST_MS, WARTE_TAKT_MS, Tor, kurz
 
 if TYPE_CHECKING:
@@ -70,8 +75,10 @@ class Wache:
         )
         self.frist_ms = frist_ms
         self.seit = 0
+        self.geladen = 0
         self.mitschnitt = Mitschnitt(self.passt)
         self.mitschnitt.binde(seite)
+        seite.on("response", self._beobachte)
         self.antwort: Response | None = None
         self.ausstehend: str | None = None
         self.geoeffnet = False
@@ -178,6 +185,20 @@ class Wache:
             vorher = jetzt
             self.seite.wait_for_timeout(RUHE_MS)
         return None
+
+    def _beobachte(self, antwort: Response) -> None:
+        """Setzt die Störung, wenn eine Antwort der eigenen Website Bot-Schutz zeigt.
+
+        Preisantworten prüft ``_pruefe`` vollständig, die Hauptseite das Tor.
+        """
+        if self.passt(antwort.url) or self.tor.stoerung is not None:
+            return
+        art = antwort.request.resource_type
+        url = ohne_geheimnisse(antwort.url)
+        grund = status_verdacht(url, antwort.status, art, self.lauf.adresse)
+        if grund is not None:
+            log.warning("Klick-Crawler: %s; Lauf endet", grund)
+            self.tor.stoerung = grund
 
     def _ohne_antwort(self, marke: Marke) -> None:
         verworfen = self.lauf.verworfen[marke[1] :]

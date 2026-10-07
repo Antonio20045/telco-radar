@@ -36,10 +36,16 @@ from .klickecho import (
     lies_antwort,
 )
 from .klickhar import Antwortkopie
-from .klickkarte import DIMENSIONEN, WERTFELDER, Antwortmuster, Klickkarte
+from .klickkarte import (
+    BUENDELFELDER,
+    DIMENSIONEN,
+    WERTFELDER,
+    Antwortmuster,
+    Klickkarte,
+)
 from .klickoptionen import wert_nach_muster
 from .klickpfad import am_pfad
-from .klicktext import Preiswerte
+from .klicktext import Buendelwerte, Preiswerte
 from .klicktor import kurz
 
 if TYPE_CHECKING:
@@ -49,6 +55,7 @@ if TYPE_CHECKING:
 
 LESUNG = "LESUNG"
 MEHRDEUTIG = "mehrdeutig"
+FELDER = (*WERTFELDER, *BUENDELFELDER)
 _SEITENWERT_JS = "(e, a) => a ? e.getAttribute(a) : e.innerText"
 _GLOBALE_JS = """(namen) => Object.fromEntries(
   namen.map((n) => [n, window[n] === undefined ? null : window[n]]))"""
@@ -101,14 +108,23 @@ class Quellenleser:
         return werte
 
     def lies(
-        self, seit: int, unberuehrt: bool, platz: Mapping[str, str | None]
+        self,
+        seit: int,
+        unberuehrt: bool,
+        platz: Mapping[str, str | None],
+        geladen: int = 0,
     ) -> Quellenlesung:
-        """Liest jede gültige Quelle und vereint ihre Werte."""
+        """Liest jede gültige Quelle und vereint ihre Werte.
+
+        ``laden``-Quellen lesen die Antworten seit ``geladen``, dem Stand des
+        Mitschnitts vor dem Laden der Seite.
+        """
         lasten: list[Nutzlast] = []
         for stelle, quelle in enumerate(self.karte.lesequellen):
             if quelle.start and not unberuehrt:
                 continue
-            last, befund = self._nutzlast(stelle, quelle, seit, platz)
+            ab = geladen if quelle.laden else seit
+            last, befund = self._nutzlast(stelle, quelle, ab, platz)
             if befund is not None:
                 return Quellenlesung(None, befund)
             if last is not None:
@@ -137,11 +153,7 @@ class Quellenleser:
             return self._skript(stelle, quelle.skript)
         if quelle.globale:
             return self._globale(stelle, quelle.globale)
-        alle = (
-            self.mitschnitt.antworten
-            if quelle.laden
-            else self.mitschnitt.antworten_seit(seit)
-        )
+        alle = self.mitschnitt.antworten_seit(seit)
         passend = [a for a in alle if quelle.passt(a.url)]
         for antwort in reversed(passend):
             try:
@@ -239,17 +251,20 @@ def _herkunft(
 ) -> dict[str, Nutzlast | None]:
     paare = list(zip(lasten, lesungen, strict=True))
     return {
-        f: next(
-            (n for n, lesung in paare if getattr(lesung.werte, f) is not None), None
-        )
-        for f in WERTFELDER
+        f: next((n for n, lesung in paare if gelesen(lesung, f) is not None), None)
+        for f in FELDER
     }
+
+
+def gelesen(lesung: Antwortlesung, feld: str) -> Any:
+    """Der Wert eines Wert- oder Bündelfelds einer Lesung."""
+    return getattr(lesung.buendel if feld in BUENDELFELDER else lesung.werte, feld)
 
 
 def _vereint(lesungen: list[Antwortlesung]) -> Antwortlesung:
     werte = {
-        f: next((w for x in lesungen if (w := getattr(x.werte, f)) is not None), None)
-        for f in WERTFELDER
+        f: next((w for x in lesungen if (w := gelesen(x, f)) is not None), None)
+        for f in FELDER
     }
     variante: dict[str, str | int | None] = {}
     for dimension in DIMENSIONEN:
@@ -264,4 +279,8 @@ def _vereint(lesungen: list[Antwortlesung]) -> Antwortlesung:
         elif verschieden:
             liste = " | ".join(str(w) for w in verschieden)
             variante[dimension] = f"{MEHRDEUTIG}: {liste}"
-    return Antwortlesung(werte=Preiswerte(**werte), variante=variante)
+    return Antwortlesung(
+        Preiswerte(**{f: werte[f] for f in WERTFELDER}),
+        variante,
+        Buendelwerte(**{f: werte[f] for f in BUENDELFELDER}),
+    )
