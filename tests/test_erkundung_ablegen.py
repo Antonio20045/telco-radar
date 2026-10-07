@@ -139,6 +139,28 @@ def test_leckscan_findet_tokens_und_sitzungen(tmp_path, inhalt, fund):
     assert ea.main(["pruefe", str(tmp_path / "zweig")]) == 1
 
 
+def test_kartenprobe_kommt_auf_den_zweig_und_durch_den_leckscan(tmp_path):
+    karte = b'{"status": "gelesen", "kombinationen": []}'
+    _artefakt(
+        tmp_path / "neu", "o2", {"index.json": _index("o2"), "karte-1.json": karte}
+    )
+
+    abgelegt = ea.einsortieren(tmp_path / "neu", tmp_path / "zweig")
+
+    assert abgelegt == ["o2"]
+    assert _namen(tmp_path / "zweig") == [
+        f"o2/{TAG}/index.json",
+        f"o2/{TAG}/karte-1.json",
+    ]
+    assert ea.pruefe(tmp_path / "zweig") == []
+    leck = b'{"text": "' + JWT + b'"}'
+    (tmp_path / "zweig" / "o2" / TAG / "karte-1.json").write_bytes(leck)
+    assert ea.pruefe(tmp_path / "zweig") == [
+        f"o2/{TAG}/karte-1.json: JSON Web Token gefunden"
+    ]
+    assert ea.main(["pruefe", str(tmp_path / "zweig")]) == 1
+
+
 def test_leckscan_sieht_in_gepackte_dateien_und_nennt_fremde_namen(tmp_path):
     ordner = tmp_path / "zweig" / "o2" / TAG
     ordner.mkdir(parents=True)

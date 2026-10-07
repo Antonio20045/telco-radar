@@ -41,6 +41,7 @@ keine fremde Kennung.
 from __future__ import annotations
 
 import logging
+import time
 from collections.abc import Callable
 from dataclasses import replace
 from datetime import datetime
@@ -94,6 +95,8 @@ log = logging.getLogger(__name__)
 ANTWORT_FRIST_MS = 15000
 HOECHSTE_KOMBINATIONEN = 200
 FENSTER: ViewportSize = {"width": 1280, "height": 900}
+GRUND_NICHT_BESUCHT = "nicht besucht"
+GRUND_ZEIT = "Zeitgrenze erreicht"
 _GELADEN_JS = "() => document.readyState === 'complete'"
 
 
@@ -108,6 +111,9 @@ def klicke_durch(
     vorlauf: Klicklauf | None = None,
     frist_ms: int = ANTWORT_FRIST_MS,
     wiedergabe: tuple[Path, ...] = (),
+    kennung: str | None = None,
+    hoechste: int = HOECHSTE_KOMBINATIONEN,
+    ende: float | None = None,
 ) -> Klicklauf:
     """Klickt alle angebotenen Kombinationen auf ``adresse``; wirft nie.
 
@@ -116,13 +122,18 @@ def klicke_durch(
     Anbieterlauf). ``vorlauf`` ist der letzte Lauf derselben Seite; sein Bezug für den
     Strukturwächter wandert weiter (``klicklauf.pruefe_struktur``). Ein Abbruch steht
     als Status und Grund im Lauf, die Kombinationen bis dahin bleiben erhalten.
+    ``kennung`` ist der User-Agent aus ``geraete_quellen.yaml``. Nach ``hoechste``
+    Kombinationen und ab ``ende`` (``time.monotonic``) klickt der Lauf nicht mehr;
+    jede weitere Kombination heißt ``nicht_erfasst`` mit Grund ``nicht besucht``, und
+    hat ``ende`` welche abgeschnitten, ist der Lauf ``gesperrt`` (Zeit).
     """
     lauf = Klicklauf(anbieter=karte.anbieter, adresse=adresse)
     tor = Tor(waechter, uhr, schleuse, lauf)
     sitzung: Sitzung | None = None
     try:
-        sitzung = oeffne_sitzung(browser, tor, FENSTER, wiedergabe=wiedergabe)
-        _Gang(sitzung.seite, karte, tor, frist_ms, lauf).laufe()
+        sitzung = oeffne_sitzung(browser, tor, FENSTER, kennung, wiedergabe=wiedergabe)
+        gang = _Gang(sitzung.seite, karte, tor, frist_ms, lauf, hoechste, ende)
+        gang.laufe()
     except Abbruch as abbruch:
         lauf.status, lauf.grund = abbruch.status, abbruch.grund
     except PlaywrightFehler as fehler:
@@ -147,16 +158,24 @@ class _Klickfehler(Exception):
 
 
 class _Gang:
-    """Zustand eines Laufs: Seite, Karte, Tor, Leser und Wache."""
+    """Zustand eines Laufs: Seite, Karte, Tor, Leser, Wache und Grenzen."""
 
     def __init__(
-        self, seite: Page, karte: Klickkarte, tor: Tor, frist_ms: int, lauf: Klicklauf
+        self,
+        seite: Page,
+        karte: Klickkarte,
+        tor: Tor,
+        frist_ms: int,
+        lauf: Klicklauf,
+        hoechste: int,
+        ende: float | None,
     ) -> None:
         self.seite, self.karte, self.tor, self.lauf = seite, karte, tor, lauf
-        self.frist_ms = frist_ms
+        self.frist_ms, self.hoechste, self.ende = frist_ms, hoechste, ende
         self.leser = Leser(seite, karte, frist_ms)
         self.wache = Wache(seite, karte, tor, lauf, frist_ms)
         self.geklickt = False
+        self.nach_frist = 0
 
     def laufe(self) -> None:
         self._oeffne()
@@ -173,6 +192,9 @@ class _Gang:
                     werte[d] = vereinige(werte[d], self._angebotene_werte(d))
         self.wache.warte_offen()
         self.wache.pruefe_tor()
+        if self.nach_frist:
+            grund = f"{GRUND_ZEIT}: {self.nach_frist} Kombinationen nicht besucht"
+            raise Abbruch(LAUF_GESPERRT, grund)
 
     def _oeffne(self) -> None:
         ziel = self.lauf.adresse
@@ -240,8 +262,12 @@ class _Gang:
     def _kombination(self, auswahl: Auswahl, nummer: int) -> Kombiergebnis:
         ziel = dict(zip(DIMENSIONEN, auswahl, strict=True))
         variante = variante_aus(*auswahl)
-        if nummer > HOECHSTE_KOMBINATIONEN:
-            grund = f"nicht besucht: mehr als {HOECHSTE_KOMBINATIONEN} Kombinationen"
+        if nummer > self.hoechste:
+            grund = f"{GRUND_NICHT_BESUCHT}: mehr als {self.hoechste} Kombinationen"
+            return Kombiergebnis(variante, NICHT_ERFASST, grund)
+        if self.ende is not None and time.monotonic() >= self.ende:
+            self.nach_frist += 1
+            grund = f"{GRUND_NICHT_BESUCHT}: {GRUND_ZEIT}"
             return Kombiergebnis(variante, NICHT_ERFASST, grund)
         fehlend = [d for d in DIMENSIONEN if ziel[d] is None]
         if fehlend:

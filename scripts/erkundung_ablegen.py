@@ -7,7 +7,8 @@ Der Job ``ablegen`` in ``.github/workflows/klick-erkundung.yml`` ruft zwei Schri
     nur Ordner mit gültigem ``index.json`` (Anbieter und Tag wie der Ordner, ein
     Status), dessen Status nicht ``verschoben`` ist; ein Teilergebnis ohne Index
     ersetzt nie einen vollständigen Stand. Kopiert werden nur abgeleitete
-    Strukturdaten (``ERLAUBT``: Index, Bedienelemente, Preise, Klicks, Mitschnitt);
+    Strukturdaten (``ERLAUBT``: Index, Bedienelemente, Preise, Klicks, Mitschnitt,
+    Kartenprobe);
     Screenshot und Seite bleiben im Artefakt (Datenkonzept Abschnitt 12). Nennt die
     abgelegten Anbieter; ohne ein einziges gültiges ``index.json`` Exit 1.
 
@@ -31,7 +32,7 @@ import zlib
 from pathlib import Path
 
 ERLAUBT = re.compile(
-    r"^(?:index|(?:bedienelemente|preise|klicks|mitschnitt)-\d{1,3})\.json$"
+    r"^(?:index|(?:bedienelemente|preise|klicks|mitschnitt|karte)-\d{1,3})\.json$"
 )
 INDEX = "index.json"
 ANBIETER = re.compile(r"^[a-z0-9]{1,40}$")

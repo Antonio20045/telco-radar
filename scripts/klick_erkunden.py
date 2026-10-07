@@ -4,7 +4,9 @@ Holt je Anbieter aus ``config/klick_erkundung.yaml`` das Material für die Klick
 gerenderte Seite, Bedienelemente, Preis-Kandidaten, Mitschnitt, Klick-Proben und
 Screenshot, nach ``<ausgabe>/<anbieter>/<JJJJ-MM-TT>/`` mit ``index.json``. Die Logik
 steht in ``telco_radar.collect.geraete.klickerkundung``; dieses Skript liest nur die
-Eingaben, startet Chromium ohne Tarnung und gibt je Anbieter eine Zeile aus.
+Eingaben, startet Chromium ohne Tarnung und gibt je Anbieter eine Zeile aus. Liegt
+``config/klickkarten/<schluessel>.yaml`` vor, erprobt die Erkundung die Klick-Karte
+gleich mit (``klickkartenprobe``, Ergebnis in ``karte-<n>.json``).
 
 AUFRUF
 ------
@@ -39,6 +41,7 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 
 from telco_radar.collect.geraete.klickerkundung import ZEIT_JE_ANBIETER_S, erkunde
+from telco_radar.collect.geraete.klickkartenprobe import KARTEN
 from telco_radar.collect.geraete.klickparallel import aus_umgebung
 from telco_radar.collect.geraete.klickziele import (
     ALLE,
@@ -80,7 +83,15 @@ def main(argumente: list[str] | None = None) -> int:
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch(executable_path=args.chromium)
         try:
-            indizes = erkunde(browser, ziele, _uhr, args.ausgabe, ende, laeufe=laeufe)
+            indizes = erkunde(
+                browser,
+                ziele,
+                _uhr,
+                args.ausgabe,
+                ende,
+                laeufe=laeufe,
+                karten=args.root / KARTEN,
+            )
         finally:
             browser.close()
     for index in indizes:

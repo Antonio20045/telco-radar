@@ -10,7 +10,8 @@ gespeichert wird, auch keiner, den eine Seite in ihr HTML oder eine Antwort schr
 danach ersetzt ``klickspur.schwaerze_text`` geheime Parameter, JSON-Felder und Tokens.
 Bei JSON gilt das für jeden Text darin einzeln, auch für Antwortkörper.
 Ein alter Stand desselben Tages wird vorher geleert, damit der Ordner genau einen Lauf
-zeigt.
+zeigt. Listen von Adressen (verworfen, gescheitert) stehen mit höchstens
+``HOECHSTE_LISTE`` Einträgen in einer Datei; ihre Zahl steht ungekürzt daneben.
 """
 
 from __future__ import annotations
@@ -30,6 +31,7 @@ GESCHWAERZT = "[Cookie entfernt]"
 INDEX = "index.json"
 GZIP_STUFE = 9
 VERMERK_KOERPER = "Körper wegen Größengrenze je Anbieter nicht gespeichert"
+HOECHSTE_LISTE = 200
 
 
 @dataclass

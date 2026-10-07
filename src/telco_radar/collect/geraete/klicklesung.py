@@ -81,18 +81,27 @@ class Leser:
         bereich = self.seite.locator(self.karte.zusammenfassung).first
         lesung, unlesbar = self._lies_antwort(antwort)
         url = antwort.url if antwort is not None else None
+        in_antwort = lesung.werte if lesung is not None else None
         self.seite.evaluate(_ZWEI_BILDER_JS)
         text = self.text(bereich)
         if not text:
             struktur.felder(0)
             ort = self.karte.zusammenfassung
             grund = f"Preiszusammenfassung nicht gefunden ({ort})"
-            return Kombiergebnis(variante, NICHT_ERFASST, grund, antwort_url=url)
+            return Kombiergebnis(
+                variante,
+                NICHT_ERFASST,
+                grund,
+                antwort_url=url,
+                antwortwerte=in_antwort,
+            )
         im_text = lies_zusammenfassung(text)
         struktur.felder(sum(getattr(im_text, f) is not None for f in WERTFELDER))
         if unlesbar is not None:
             befunde: tuple[Befund, ...] = (unlesbar,)
-            return Kombiergebnis(variante, BEFUND, unlesbar.grund, befunde=befunde)
+            return Kombiergebnis(
+                variante, BEFUND, unlesbar.grund, befunde=befunde, textwerte=im_text
+            )
         abweichung = self._abweichung(ziel)
         echo = (
             Echo(Preiswerte(), abweichung, ())
@@ -113,6 +122,8 @@ class Leser:
             bild,
             url,
             text=text,
+            textwerte=im_text,
+            antwortwerte=in_antwort,
         )
 
     def _abweichung(self, ziel: dict[str, str | None]) -> tuple[Befund, ...]:

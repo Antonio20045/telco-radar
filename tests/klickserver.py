@@ -3,9 +3,10 @@
 Eine Antwortfunktion bekommt den Pfad samt Anfrage und liefert eine ``Antwort``; der
 Server merkt jeden Abruf mit Pfad und Zeitpunkt (``time.monotonic``), beim Eingang und
 am Ende der Antwort; ``luecken`` misst den Crawl-delay vom Ende der vorigen Antwort.
-Schließt der Browser die Verbindung vor dem Ende, steht der Pfad in ``abgebrochen``.
-Unter ``localhost`` ist derselbe Server als zweiter Host erreichbar. ``karte`` und
-``laufe`` bauen eine Prüfkarte und rufen den Crawler mit eigener Hostschleuse.
+Schließt der Browser die Verbindung vor dem Ende, steht der Pfad in ``abgebrochen``;
+``kennungen`` hält je Abruf den User-Agent. Unter ``localhost`` ist derselbe Server als
+zweiter Host erreichbar. ``karte`` und ``laufe`` bauen eine Prüfkarte und rufen den
+Crawler mit eigener Hostschleuse.
 """
 
 from __future__ import annotations
@@ -45,6 +46,7 @@ class Klickserver:
     zeiten: list[tuple[float, str]] = field(default_factory=list)
     fertig: list[tuple[float, str]] = field(default_factory=list)
     abgebrochen: list[str] = field(default_factory=list)
+    kennungen: list[str | None] = field(default_factory=list)
 
     def adresse(self, pfad: str, host: str = "127.0.0.1") -> str:
         return f"http://{host}:{self.port}{pfad}"
@@ -69,6 +71,7 @@ def klickserver(antworte: Callable[[str], Antwort]) -> Iterator[Klickserver]:
 
         def do_GET(self) -> None:
             server.abrufe.append(self.path)
+            server.kennungen.append(self.headers.get("User-Agent"))
             server.zeiten.append((time.monotonic(), self.path))
             antwort = server.antworte(self.path)
             if antwort.verzug:

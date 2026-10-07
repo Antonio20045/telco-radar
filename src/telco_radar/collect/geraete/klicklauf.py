@@ -116,7 +116,9 @@ class Kombiergebnis:
     """Das Ergebnis einer Kombination aus Speicher, Tarif und Ratenlaufzeit.
 
     ``variante`` ist gelesen (Laufzeit als Monatszahl), ``auswahl`` die rohen Werte
-    der Knöpfe in der Reihenfolge von ``klickkarte.DIMENSIONEN``.
+    der Knöpfe in der Reihenfolge von ``klickkarte.DIMENSIONEN``. ``werte`` hält nur,
+    was Text und Antwort gleich nennen; ``textwerte`` und ``antwortwerte`` sind die
+    beiden Lesungen davor, ``None`` heißt nicht gelesen.
     """
 
     variante: Variante
@@ -131,6 +133,8 @@ class Kombiergebnis:
     text: str | None = None
     beleg: Belegpaket | None = None
     beleg_status: str = OHNE_WERT
+    textwerte: Preiswerte | None = None
+    antwortwerte: Preiswerte | None = None
 
     @property
     def gueltig(self) -> bool:

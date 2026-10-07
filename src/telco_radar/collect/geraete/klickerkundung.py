@@ -23,6 +23,12 @@ robots.txt keine Anfrage mehr hinaus. Was nicht gelesen wurde, heißt so und ist
 leer: ``nicht_besucht`` mit Grund; Abstand und Besuchszeit stehen nur im Index, wenn
 robots.txt gelesen wurde. Screenshot und Seite gehören nur ins Artefakt des Laufs
 (``scripts/erkundung_ablegen.py`` lässt sie vom öffentlichen Zweig).
+
+Liegt unter ``karten`` eine Klick-Karte des Anbieters, erprobt die ``klickkartenprobe``
+sie nach jeder gelesenen oder leeren Seite auf derselben Seite, mit Tor, Schleuse und
+Zeitgrenze der Seite; ihr Ergebnis steht in ``karte-<n>.json``, ihr Status je Seite im
+Index unter ``karte``. Endet die Probe mit „Abruf gestört“, gilt dasselbe wie nach
+Bot-Schutz der Seite.
 """
 
 from __future__ import annotations
@@ -36,7 +42,17 @@ from typing import TYPE_CHECKING
 
 from .. import http
 from .basis import GeraeteAbrufFehler
-from .klickablage import Ablage
+from .klickablage import HOECHSTE_LISTE, Ablage
+from .klickkartenprobe import (
+    NICHT_BESUCHT,
+    Kartenprobe,
+    Probenmittel,
+    als_daten,
+    indexeintrag,
+    lade_karte,
+    ohne_probe,
+    probiere,
+)
 from .klicklauf import LAUF_GELESEN, LAUF_GESPERRT, LAUF_GESTOERT
 from .klickparallel import Laufpruefung
 from .klickseite import (
@@ -61,12 +77,10 @@ ZEIT_JE_SEITE_S = 25 * 60
 MINDESTZEIT_SEITE_S = 3 * 60
 GROESSE_JE_ANBIETER = 8_000_000
 ROBOTS_FRIST_S = 20.0
-NICHT_BESUCHT = "nicht_besucht"
 VERSCHOBEN = "verschoben"
 PRUEFUNG_AUS = "aus"
 PRUEFUNG_AN = "vor jeder Seite"
 GRUND_NACH_BOT = "nach Bot-Schutz keine weitere Anfrage (CLAUDE.md Regel 4)"
-HOECHSTE_LISTE = 200
 
 Robotsholer = Callable[[str], Callable[[str], tuple[int, str]]]
 
@@ -94,11 +108,13 @@ def erkunde(
     laeufe: Laufpruefung | None,
     holer: Robotsholer = robots_holer,
     grenze: int = GROESSE_JE_ANBIETER,
+    karten: Path | None = None,
 ) -> list[dict]:
     """Erkundet die Anbieter nacheinander; je Anbieter der Inhalt von ``index.json``.
 
     ``laeufe`` ist Pflicht; ``None`` schaltet die Parallellauf-Prüfung ausdrücklich ab
-    (nur für lokale Läufe), und ``index.json`` sagt das.
+    (nur für lokale Läufe), und ``index.json`` sagt das. ``karten`` ist das Verzeichnis
+    der Klick-Karten (``klickkartenprobe.KARTEN``); ohne es läuft keine Kartenprobe.
     """
     return [
         erkunde_anbieter(
@@ -110,6 +126,7 @@ def erkunde(
             ende,
             grenze,
             laeufe=laeufe,
+            karten=karten,
         )
         for z in ziele
     ]
@@ -125,6 +142,7 @@ def erkunde_anbieter(
     grenze: int = GROESSE_JE_ANBIETER,
     *,
     laeufe: Laufpruefung | None = None,
+    karten: Path | None = None,
 ) -> dict:
     """Alle Seiten eines Anbieters; schreibt den Ordner, gibt ``index.json`` zurück."""
     start = time.monotonic()
@@ -144,6 +162,8 @@ def erkunde_anbieter(
     schleuse = Fristschleuse(
         Hostschleuse(waechter, uhr, ziel.rate_limit_sekunden), anbieter_ende
     )
+    lage = lade_karte(karten, ziel.schluessel)
+    mittel = Probenmittel(waechter, uhr, schleuse)
     seiten: list[dict] = []
     stopp: tuple[str, str] | None = None
     for nummer, seite in enumerate(ziel.seiten, 1):
@@ -154,13 +174,15 @@ def erkunde_anbieter(
             belegt = laeufe()
             stopp = None if belegt is None else (VERSCHOBEN, belegt)
         if stopp is not None:
-            seiten.append(_nicht_besucht(nummer, seite, *stopp))
+            probe = ohne_probe(lage, stopp[1])
+            seiten.append(_nicht_besucht(nummer, seite, *stopp, probe))
             continue
         schleuse.setze(min(anbieter_ende, time.monotonic() + ZEIT_JE_SEITE_S))
         anteil = ablage.platz // (len(ziel.seiten) - nummer + 1)
         ergebnis = Seitenlauf(browser, ziel, seite, waechter, uhr, schleuse).laufe()
-        seiten.append(lege_ab(ablage, nummer, seite, ergebnis, anteil))
-        if ergebnis.bot:
+        probe = probiere(browser, ziel, seite, lage, ergebnis, mittel)
+        seiten.append(lege_ab(ablage, nummer, seite, ergebnis, anteil, probe))
+        if ergebnis.bot or probe.bot:
             stopp = NICHT_BESUCHT, GRUND_NACH_BOT
     status, grund = gesamtstatus(seiten)
     adresse = ziel.seiten[0].adresse
@@ -212,8 +234,13 @@ def lege_ab(
     seite: Seitenziel,
     ergebnis: Seitenergebnis,
     anteil: int,
+    probe: Kartenprobe | None = None,
 ) -> dict:
-    """Schreibt die Dateien einer Seite in ``anteil`` Bytes; gibt ihren Indexeintrag."""
+    """Schreibt die Dateien einer Seite in ``anteil`` Bytes; gibt ihren Indexeintrag.
+
+    Die Kartenprobe kommt vor Mitschnitt, Screenshot und Seite; ohne ``probe`` ist der
+    Kartenstatus ``None``.
+    """
     ablage.merke_cookies(ergebnis.cookies)
     start = ablage.belegt
     dateien: dict[str, str | None] = {}
@@ -239,6 +266,10 @@ def lege_ab(
         dateien["klicks"] = ablage.schreibe_json(
             f"klicks-{nummer}.json", klicks, frei()
         )
+    karte = None if probe is None else als_daten(probe)
+    if karte is not None:
+        name = f"karte-{nummer}.json"
+        dateien["karte"] = ablage.schreibe_json(name, karte, frei())
     platz = frei() - len(ablage.json_bytes(ergebnis.anfragen))
     antworten = ablage.passe_mitschnitt(ergebnis.mitschnitt, platz)
     mitschnitt = {"anfragen": ergebnis.anfragen, "antworten": antworten}
@@ -267,6 +298,7 @@ def lege_ab(
         "zaehlung": _zaehlung(ergebnis),
         "verworfen": ergebnis.verworfen[:HOECHSTE_LISTE],
         "gescheitert": ergebnis.gescheitert[:HOECHSTE_LISTE],
+        "karte": None if probe is None else indexeintrag(probe, dateien.get("karte")),
     }
 
 
@@ -287,7 +319,9 @@ def _zaehlung(ergebnis: Seitenergebnis) -> dict:
     }
 
 
-def _nicht_besucht(nummer: int, seite: Seitenziel, status: str, grund: str) -> dict:
+def _nicht_besucht(
+    nummer: int, seite: Seitenziel, status: str, grund: str, probe: Kartenprobe
+) -> dict:
     return {
         "nummer": nummer,
         "geraet": seite.geraet,
@@ -296,6 +330,7 @@ def _nicht_besucht(nummer: int, seite: Seitenziel, status: str, grund: str) -> d
         "status": status,
         "grund": grund,
         "dateien": {},
+        "karte": indexeintrag(probe, None),
     }
 
 

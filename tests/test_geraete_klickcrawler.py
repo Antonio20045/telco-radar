@@ -11,6 +11,7 @@ liefert sie aus den Dateien; keine Anfrage verlässt den Rechner.
 from __future__ import annotations
 
 import json
+import time
 from datetime import UTC, datetime
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
@@ -273,6 +274,18 @@ def test_fehlender_kanarienwert_heisst_abruf_gestoert(chromium):
     assert "Kanarienwert" in lauf.grund
     assert lauf.ergebnisse == []
     assert schleuse.adressen[0] == server.adresse(PRODUKTPFAD)
+
+
+def test_ab_der_zeitgrenze_klickt_der_lauf_nicht_mehr(chromium):
+    lauf, server, _ = _laufe(chromium, ende=time.monotonic())
+
+    assert len(lauf.ergebnisse) == len(ERWARTET)
+    assert {(e.status, e.grund) for e in lauf.ergebnisse} == {
+        ("nicht_erfasst", "nicht besucht: Zeitgrenze erreicht")
+    }
+    assert lauf.status == "gesperrt"
+    assert lauf.grund == "Zeitgrenze erreicht: 8 Kombinationen nicht besucht"
+    assert len(server.mit("/api/preis")) == 1
 
 
 def test_robots_gesperrte_produktseite_wird_nicht_geladen(chromium):
