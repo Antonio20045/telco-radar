@@ -54,6 +54,7 @@ def _ca_bundle():
 
 
 _UA_SWAP_STATUSES = {403, 406}
+_ENDGUELTIGE_STATUSES = {404, 410}
 _BACKOFF_STATUSES = {429, 500, 502, 503}
 _BACKOFF_WAITS = (4.0, 9.0)
 Transport = httpx.BaseTransport
@@ -220,7 +221,7 @@ def fetch(
     extra_headers: dict | None = None,
     schnell: bool = False,
 ) -> httpx.Response:
-    """GET with UA fallback + short backoff on rate limits.
+    """GET with UA fallback + short backoff on rate limits; 404 und 410 sind endgültig.
 
     `schnell=True` schaltet beides ab: ein User-Agent, ein Versuch, kein
     Backoff. Gedacht fuer die BREITENSUCHE (scripts/finde_quellen.py), wo
@@ -240,6 +241,7 @@ def fetch(
     site_root = f"{urlsplit(url).scheme}://{urlsplit(url).netloc}/"
 
     last_exc: Exception | None = None
+    endgueltig: httpx.HTTPStatusError | None = None
     for ua in uas:
         headers = {
             "User-Agent": ua,
@@ -264,6 +266,13 @@ def fetch(
                     resp = _hole(
                         url, timeout=timeout, headers=headers, follow_redirects=True
                     )
+                if resp.status_code in _ENDGUELTIGE_STATUSES:
+                    endgueltig = httpx.HTTPStatusError(
+                        f"status {resp.status_code}",
+                        request=resp.request,
+                        response=resp,
+                    )
+                    break
                 if resp.status_code in _UA_SWAP_STATUSES:
                     last_exc = httpx.HTTPStatusError(
                         f"{resp.status_code} with UA '{ua[:24]}...'",
@@ -283,6 +292,8 @@ def fetch(
             except httpx.HTTPError as exc:
                 last_exc = exc
                 continue
+        if endgueltig is not None:
+            raise endgueltig
         if (
             isinstance(last_exc, httpx.HTTPStatusError)
             and last_exc.response is not None
