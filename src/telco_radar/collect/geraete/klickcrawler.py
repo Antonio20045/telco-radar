@@ -1,13 +1,11 @@
 """Klick-Crawler: klickt jede angebotene Variante einer Produktseite, liest zweifach.
 
-Gerüst aus Schritt 4 des Datenkonzepts Geräteradar (Abschnitt 8); noch ruft es kein
-Tageslauf. Je Produktseite und Klick-Karte (``klickkarte``):
+Datenkonzept Geräteradar, Abschnitt 8. Je Produktseite und Klick-Karte (``klickkarte``):
 
 1. Der Crawler legt einen eigenen Browserkontext ohne Vorabladen an (``klickkontext``).
    Jede Anfrage geht durch das Tor (``klicktor``): robots.txt für jede Adresse und jedes
    Ziel einer Umleitung, Crawl-delay je Host. Gesperrte Adressen stehen in
-   ``verworfen``, gescheiterte in ``gescheitert``. Fristen zählen ohne Crawl-delay
-   (``klickwache``). Am Ende schließt er den Kontext.
+   ``verworfen``, gescheiterte in ``gescheitert``; Fristen ohne Crawl-delay.
 2. Zeigen Hauptseite oder Preisantwort Bot-Schutz (202-Challenge, 4xx, 5xx,
    Challenge-Muster), antwortet die eigene Website mit HTTP 202 (``klickwache``) oder
    fehlt der Kanarienwert, ist der Abruf gestört und der Lauf endet sofort, ohne zweiten
@@ -29,12 +27,10 @@ Tageslauf. Je Produktseite und Klick-Karte (``klickkarte``):
 5. Jede gelesene Kombination trägt ihren Beleg (``klickbeleg``): Screenshot, HAR der
    Preisantwort, Zeitpunkt aus ``uhr``, Fundstellen. Ohne Beleg ist ein Wert nicht
    gültig (``klicklauf.mit_beleg``), mit Beleg heißt er ``offen``, bis ``belegarchiv``
-   ihn ablegt. ``wiedergabe`` nennt HAR-Belege, aus denen der Kontext Antworten ohne
-   Netz abspielt (``route_from_har``); was sie nicht kennen, geht durch das Tor. Der
-   Beleg hält nur die Preisantwort; eine Seitenkopie gehört nur in den privaten Bucket.
+   ihn ablegt. ``wiedergabe`` spielt HAR-Belege ohne Netz ab (``route_from_har``),
+   Unbekanntes geht durch das Tor; eine Seitenkopie gehört nur in den privaten Bucket.
 
-Den Browser startet der Aufrufer; dieses Modul setzt keine Tarnung, keinen Proxy und
-keine fremde Kennung.
+Den Browser startet der Aufrufer; keine Tarnung, kein Proxy, keine fremde Kennung.
 """
 
 from __future__ import annotations
@@ -78,7 +74,7 @@ from .klicktor import (
     kurz,
 )
 from .klickwache import Abbruch, Wache
-from .klickweiter import GRUND_NICHT_BESUCHT, Kontexte, je_weiter
+from .klickweiter import GRUND_NICHT_BESUCHT, Kontexte, fehlen, je_weiter
 from .robots import RobotsWaechter
 
 if TYPE_CHECKING:
@@ -238,30 +234,37 @@ class _Gang:
             try:
                 ergebnis = self._kombination(auswahl, len(besucht))
             except Abbruch as abbruch:
-                if self._nach_zeitgrenze(abbruch) is None:
+                if self.nach_zeitgrenze(abbruch) is None:
                     raise
-                ergebnis = self._nicht_besucht(variante_aus(*auswahl))
+                ergebnis = self.nicht_besucht(variante_aus(*auswahl))
             self.lauf.ergebnisse.append(replace(ergebnis, auswahl=auswahl))
             if self.geklickt:
                 for d in DIMENSIONEN:
                     werte[d] = vereinige(werte[d], self._angebotene_werte(d))
 
+    def oeffne_neu(self) -> None:
+        """Ein frischer Kontext mit geladener Startseite (``klickweiter``)."""
+        self._binde(self.kontexte.neu())
+        self._oeffne_vor_frist(self.lauf.adresse)
+
     def _oeffne_vor_frist(self, ziel: str) -> None:
         try:
             self._oeffne(ziel)
         except Abbruch as abbruch:
-            raise self._nach_zeitgrenze(abbruch) or abbruch from None
+            raise self.nach_zeitgrenze(abbruch) or abbruch from None
 
-    def _nach_zeitgrenze(self, abbruch: Abbruch) -> Abbruch | None:
+    def nach_zeitgrenze(self, abbruch: Abbruch) -> Abbruch | None:
         """Eine Sperre bei geschlossener Frist als ``zeitgrenze``; sonst ``None``."""
-        if abbruch.status != LAUF_GESPERRT or not self._zeit_um():
+        if abbruch.status != LAUF_GESPERRT or not self.zeit_um():
             return None
         return Abbruch(LAUF_ZEITGRENZE, f"{GRUND_ZEIT}: {abbruch.grund}")
 
-    def _zeit_um(self) -> bool:
+    def zeit_um(self) -> bool:
+        """Ob die Frist des Laufs abgelaufen ist."""
         return self.frist is not None and not self.frist(self.lauf.adresse)
 
-    def _nicht_besucht(self, variante: Variante) -> Kombiergebnis:
+    def nicht_besucht(self, variante: Variante) -> Kombiergebnis:
+        """Die Kombination als „nicht besucht: Zeitgrenze erreicht“."""
         self.nach_frist += 1
         grund = f"{GRUND_NICHT_BESUCHT}: {GRUND_ZEIT}"
         return Kombiergebnis(variante, NICHT_ERFASST, grund)
@@ -307,7 +310,8 @@ class _Gang:
         fehlend = [d for d in DIMENSIONEN if ziel[d] is None]
         if fehlend:
             self.lauf.struktur.knopf(False)
-            return Kombiergebnis(variante, NICHT_ERFASST, self._fehlen(fehlend[0]))
+            grund = fehlen(self.karte, fehlend[0])
+            return Kombiergebnis(variante, NICHT_ERFASST, grund)
         unlesbar = self.leser.unlesbar_in(ziel)
         if unlesbar is not None:
             return Kombiergebnis(variante, NICHT_ERFASST, unlesbar)
@@ -315,7 +319,7 @@ class _Gang:
             grund = f"Laufzeit „{ziel[LAUFZEIT]}“ nicht lesbar"
             return Kombiergebnis(variante, NICHT_ERFASST, grund)
         for dimension in DIMENSIONEN:
-            ergebnis = self._waehle(dimension, str(ziel[dimension]), variante)
+            ergebnis = self.waehle(dimension, str(ziel[dimension]), variante)
             if ergebnis is not None:
                 return ergebnis
         if self.bedienung.bereite_vor():
@@ -329,11 +333,7 @@ class _Gang:
             return ergebnis
         return self.leser.belege(ergebnis, variante, self.lauf, self.tor.uhr())
 
-    def _fehlen(self, dimension: str) -> str:
-        selektor = self.karte.knoepfe[dimension].selektor
-        return f"Knöpfe für {dimension} nicht gefunden ({selektor})"
-
-    def _waehle(
+    def waehle(
         self, dimension: str, wert: str, variante: Variante
     ) -> Kombiergebnis | None:
         """Klickt ``wert``, wenn nötig; sonst das Ergebnis, das den Weg beendet.
@@ -347,7 +347,7 @@ class _Gang:
         optionen: list[Option] | None = self.leser.optionen(dimension)
         self.lauf.struktur.knopf(bool(optionen))
         if not optionen:
-            return Kombiergebnis(variante, NICHT_ERFASST, self._fehlen(dimension))
+            return Kombiergebnis(variante, NICHT_ERFASST, fehlen(self.karte, dimension))
         option = _option(optionen, wert)
         if option is not None and option.deaktiviert and not option.gewaehlt:
             optionen = self.wache.in_ruhe(lambda: self.leser.optionen(dimension))
@@ -370,10 +370,10 @@ class _Gang:
     ) -> Kombiergebnis | None:
         selektor = self.karte.knoepfe[dimension].selektor
         if selektor is None:
-            return Kombiergebnis(variante, NICHT_ERFASST, self._fehlen(dimension))
+            return Kombiergebnis(variante, NICHT_ERFASST, fehlen(self.karte, dimension))
         self.wache.warte_offen()
-        if self._zeit_um():
-            return self._nicht_besucht(variante)
+        if self.zeit_um():
+            return self.nicht_besucht(variante)
         marke = self.wache.marke()
         knopf = self.seite.locator(selektor).nth(stelle)
         try:

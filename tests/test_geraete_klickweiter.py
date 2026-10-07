@@ -197,7 +197,7 @@ def test_gegenprobe_robots_sperrt_die_folgeseite(chromium):
 
     assert lauf.status == "gesperrt"
     assert lauf.grund.startswith(
-        f"Weiter-Knopf: {server.adresse('/bestellung/laufzeit')}"
+        f"Weiter-Knopf: GET {server.adresse('/bestellung/laufzeit')}"
     )
     assert "robots.txt" in lauf.grund
     assert server.mit("/bestellung/laufzeit") == []

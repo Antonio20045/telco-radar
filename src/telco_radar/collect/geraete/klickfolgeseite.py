@@ -55,15 +55,17 @@ from .klickspur import (
     ohne_geheimnisse,
 )
 from .klickstrecke import (
+    DOKUMENT,
     FELDER_JS,
-    KNOPF_JS,
+    GRUND_KNOPF,
+    POST,
     WEBSCHEMATA,
-    kein_weiter,
-    knapp,
     ohne_anker,
+    sperre_des_klicks,
     streckenende,
+    waehle_knopf,
 )
-from .klicktor import GRUND_NUR_LESEN, WARTE_TAKT_MS, kurz
+from .klicktor import WARTE_TAKT_MS, kurz
 from .klickwache import Abbruch
 from .klickziele import Erkundungsziel, Seitenziel, Weiter
 from .robots import RobotsWaechter
@@ -75,12 +77,8 @@ log = logging.getLogger(__name__)
 
 LAUF_BEFUND = "befund"
 WEITER_FRIST_MS = 20_000
-HOECHSTE_TREFFER = 20
-GRUND_KNOPF = "Weiter-Knopf"
 GRUND_AUSGANG = "Ausgangsseite"
 OHNE_PROBEN = "Folgeseite: keine Klick-Proben"
-POST = "POST"
-DOKUMENT = "document"
 
 
 @dataclass(frozen=True)
@@ -230,35 +228,14 @@ class Folgelauf(Seitenlauf):
 
     def _knopf(self) -> Locator:
         """Der eine sichtbare Treffer mit dem erwarteten Text; sonst ein Befund."""
-        treffer = self.seite.locator(self.weiter.selektor)
-        try:
-            anzahl = treffer.count()
-            sichtbar = [
-                treffer.nth(i)
-                for i in range(min(anzahl, HOECHSTE_TREFFER))
-                if treffer.nth(i).is_visible()
-            ]
-            passend = [(k, k.evaluate(KNOPF_JS)) for k in sichtbar]
-        except PlaywrightFehler as fehler:
-            grund = f"{GRUND_KNOPF}: Selektor nicht lesbar ({kurz(fehler)})"
-            raise Abbruch(LAUF_BEFUND, grund) from fehler
-        if self.weiter.text is not None:
-            gesucht = knapp(self.weiter.text)
-            passend = [(k, d) for k, d in passend if gesucht in knapp(d["text"])]
-        self.protokoll.update(treffer=anzahl, sichtbar=len(sichtbar))
-        if len(passend) != 1:
-            wie = "nicht gefunden" if not passend else "nicht eindeutig"
-            grund = (
-                f"{GRUND_KNOPF} {wie}: {anzahl} Treffer, {len(sichtbar)} sichtbar,"
-                f" {len(passend)} passend"
-            )
-            raise Abbruch(LAUF_BEFUND, grund)
-        knopf, daten = passend[0]
-        self.protokoll["geklickt"] = daten["text"]
-        mangel = kein_weiter(daten)
-        if mangel is not None:
-            raise Abbruch(LAUF_BEFUND, f"{GRUND_KNOPF} „{daten['text']}“ {mangel}")
-        return knopf
+        wahl = waehle_knopf(self.seite, self.weiter.selektor, self.weiter.text)
+        if wahl.treffer is not None:
+            self.protokoll.update(treffer=wahl.treffer, sichtbar=wahl.sichtbar)
+        if wahl.text is not None:
+            self.protokoll["geklickt"] = wahl.text
+        if wahl.knopf is None:
+            raise Abbruch(LAUF_BEFUND, str(wahl.grund))
+        return wahl.knopf
 
     def _warte_auf_wechsel(
         self, adresse: str, marke: int, verworfen: int, fenster: int
@@ -285,14 +262,10 @@ class Folgelauf(Seitenlauf):
     def _gesperrt_seit(self, marke: int, verworfen: int) -> str | None:
         """Ziel oder POST des Klicks, wenn das Tor sie verwarf, nicht wegen
         ``GRUND_NUR_LESEN``; sonst ``None``."""
-        neu = {
-            ohne_geheimnisse(v.url): v.grund
-            for v in self.lauf.verworfen[verworfen:]
-            if v.grund != GRUND_NUR_LESEN
+        klick = {
+            e.url: e.methode
+            for e in self.spur.seit(marke)
+            if e.art == DOKUMENT or e.methode == POST
         }
-        for eintrag in self.spur.seit(marke):
-            if eintrag.url in neu and (
-                eintrag.art == DOKUMENT or eintrag.methode == POST
-            ):
-                return f"{eintrag.methode} {eintrag.url} {neu[eintrag.url]}"
-        return None
+        verworfen_seit = self.lauf.verworfen[verworfen:]
+        return sperre_des_klicks(verworfen_seit, klick, ohne_geheimnisse)

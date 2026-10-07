@@ -19,11 +19,16 @@ Klick-Crawler (``klickcrawler``) je Kombination der übrigen Dimensionen so vor:
 4. Zeigt die Folgeseite Anmeldung, Checkout oder Zahlung (``streckenende``), nach dem
    Laden, nach der Ruhe oder nach der Lesung, ist der Lauf gestört und endet.
 5. Er liest jede Kachel (``knoepfe.<kacheln>``): Wert wie bei Knöpfen, nie geklickt;
-   die Zusammenfassung ist die Kachel an derselben Stelle.
+   die Zusammenfassung ist die Kachel an derselben Stelle. Einen zweiten Klick gibt
+   es nicht: der Lader lehnt ``oeffnen``, ``schliessen`` und Textmuster mit eigenem
+   Selektor ab.
 
 Scheitert der Weiter-Klick (Knopf fehlt, nicht eindeutig, verboten, nicht klickbar,
-keine neue Adresse), heißt die Kombination ``nicht_erfasst`` mit Grund; Bot-Schutz,
-eine Sperre durch robots.txt oder das Ende der Strecke beenden den Lauf.
+keine neue Adresse), heißt die Kombination ``nicht_erfasst`` mit Grund, und die
+nächste wird versucht. Bot-Schutz, eine Sperre von Dokument oder POST des Klicks
+(``klickstrecke.sperre_des_klicks``; eine fremde Sperre zählt nicht) oder das Ende der
+Strecke beenden den Lauf. Ist dabei die Frist abgelaufen, heißt die Kombination wie
+beim Klicken „nicht besucht“; gelesene Kacheln bleiben, der Lauf heißt ``zeitgrenze``.
 """
 
 from __future__ import annotations
@@ -44,29 +49,26 @@ from .klicklauf import (
     ERFASST,
     LAUF_GESPERRT,
     LAUF_GESTOERT,
+    LAUF_ZEITGRENZE,
     NICHT_ERFASST,
     Kombiergebnis,
 )
 from .klickstrecke import (
+    DOKUMENT,
     FELDER_JS,
-    KNOPF_JS,
+    GRUND_KNOPF,
+    POST,
     WEBSCHEMATA,
-    kein_weiter,
-    knapp,
     ohne_anker,
+    sperre_des_klicks,
     streckenende,
+    waehle_knopf,
 )
-from .klicktor import (
-    GRUND_NUR_LESEN,
-    GRUND_ZU_VIELE,
-    HOECHSTE_UMLEITUNGEN,
-    SEITEN_FRIST_MS,
-    kurz,
-)
+from .klicktor import GRUND_ZU_VIELE, HOECHSTE_UMLEITUNGEN, SEITEN_FRIST_MS, kurz
 from .klickwache import Abbruch
 
 if TYPE_CHECKING:
-    from playwright.sync_api import Locator, Page
+    from playwright.sync_api import Page, Request
 
     from .klickbedienung import Bedienung
     from .klickkarte import Klickkarte, Weiterschritt
@@ -76,9 +78,7 @@ if TYPE_CHECKING:
     from .klickwache import Wache
 
 GRUND_NICHT_BESUCHT = "nicht besucht"
-GRUND_KNOPF = "Weiter-Knopf"
 WEITER_FRIST_MS = 20_000
-HOECHSTE_TREFFER = 20
 _GELADEN_JS = "() => document.readyState === 'complete'"
 
 
@@ -123,32 +123,38 @@ class Gang(Protocol):
     wache: Wache
     leser: Leser
     bedienung: Bedienung
-    kontexte: Kontexte
     frist_ms: int
     hoechste: int
     unberuehrt: bool
 
-    def _binde(self, seite: Page) -> None: ...
+    def oeffne_neu(self) -> None:
+        """Ein frischer Kontext mit geladener Startseite."""
 
-    def _oeffne_vor_frist(self, ziel: str) -> None: ...
-
-    def _angebotene_werte(self, dimension: str) -> list[str | None]: ...
-
-    def _waehle(
+    def waehle(
         self, dimension: str, wert: str, variante: Variante
-    ) -> Kombiergebnis | None: ...
+    ) -> Kombiergebnis | None:
+        """Klickt ``wert``, wenn nötig; sonst das Ergebnis, das den Weg beendet."""
 
-    def _zeit_um(self) -> bool: ...
+    def zeit_um(self) -> bool:
+        """Ob die Frist des Laufs abgelaufen ist."""
 
-    def _nicht_besucht(self, variante: Variante) -> Kombiergebnis: ...
+    def nicht_besucht(self, variante: Variante) -> Kombiergebnis:
+        """Die Kombination als „nicht besucht: Zeitgrenze erreicht“."""
 
-    def _fehlen(self, dimension: str) -> str: ...
+    def nach_zeitgrenze(self, abbruch: Abbruch) -> Abbruch | None:
+        """Eine Sperre bei geschlossener Frist als ``zeitgrenze``; sonst ``None``."""
+
+
+def fehlen(karte: Klickkarte, dimension: str) -> str:
+    """Der Grund, wenn die Knöpfe einer Dimension fehlen."""
+    selektor = karte.knoepfe[dimension].selektor
+    return f"Knöpfe für {dimension} nicht gefunden ({selektor})"
 
 
 def je_weiter(gang: Gang, weiter: Weiterschritt) -> None:
     """Je Kombination der Startseite: wählen, vorlesen, weiterklicken, Kacheln lesen."""
     vorn = [d for d in DIMENSIONEN if d != weiter.kacheln]
-    angeboten = [gang._angebotene_werte(d) for d in vorn]
+    angeboten = [gang.leser.angebotene(d, gang.lauf.struktur) for d in vorn]
     starts = [dict(zip(vorn, w, strict=True)) for w in itertools.product(*angeboten)]
     ziele = [{**s, weiter.kacheln: None} for s in starts]
     unlesbar = [gang.leser.unlesbar_in(z) for z in ziele]
@@ -159,18 +165,34 @@ def je_weiter(gang: Gang, weiter: Weiterschritt) -> None:
             ergebnisse = [Kombiergebnis(variante, NICHT_ERFASST, grund)]
         elif len(gang.lauf.ergebnisse) >= gang.hoechste:
             ergebnisse = [_zu_viele(gang, variante)]
-        elif gang._zeit_um():
-            ergebnisse = [gang._nicht_besucht(variante)]
+        elif gang.zeit_um():
+            ergebnisse = [gang.nicht_besucht(variante)]
         else:
-            if nummer:
-                gang._binde(gang.kontexte.neu())
-                gang._oeffne_vor_frist(gang.lauf.adresse)
-            ergebnisse = _start(gang, weiter, ziel, variante)
+            ergebnisse = _versuche(gang, weiter, ziel, variante, nummer > 0)
         auswahl = tuple(ziel[d] for d in DIMENSIONEN)
         for ergebnis in ergebnisse:
             gang.lauf.ergebnisse.append(
                 ergebnis if ergebnis.auswahl else replace(ergebnis, auswahl=auswahl)
             )
+
+
+def _versuche(
+    gang: Gang,
+    weiter: Weiterschritt,
+    ziel: dict[str, str | None],
+    variante: Variante,
+    neu: bool,
+) -> list[Kombiergebnis]:
+    """Ein Start, ab dem zweiten in frischem Kontext; schließt die Frist mitten darin
+    (Sperre bei abgelaufener Frist), heißt er „nicht besucht“, wie beim Klicken."""
+    try:
+        if neu:
+            gang.oeffne_neu()
+        return _start(gang, weiter, ziel, variante)
+    except Abbruch as abbruch:
+        if abbruch.status != LAUF_ZEITGRENZE and gang.nach_zeitgrenze(abbruch) is None:
+            raise
+        return [gang.nicht_besucht(variante)]
 
 
 def _start(
@@ -184,9 +206,9 @@ def _start(
     fehlend = [d for d in vorn if ziel[d] is None]
     if fehlend:
         gang.lauf.struktur.knopf(False)
-        return [Kombiergebnis(variante, NICHT_ERFASST, gang._fehlen(fehlend[0]))]
+        return [Kombiergebnis(variante, NICHT_ERFASST, fehlen(gang.karte, fehlend[0]))]
     for dimension in vorn:
-        ergebnis = gang._waehle(dimension, str(ziel[dimension]), variante)
+        ergebnis = gang.waehle(dimension, str(ziel[dimension]), variante)
         if ergebnis is not None:
             return [ergebnis]
     if gang.bedienung.bereite_vor():
@@ -203,18 +225,29 @@ def _start(
 
 
 def _klicke_weiter(gang: Gang, weiter: Weiterschritt) -> str | None:
-    """Klickt den einen Weiter-Knopf und lädt die Folgeseite; sonst der Grund."""
+    """Klickt den einen Weiter-Knopf und lädt die Folgeseite; sonst der Grund.
+
+    Sperrt das Tor Dokument oder POST des Klicks (``sperre_des_klicks``) und kommt
+    keine Folgeseite im Netz an, ist der Lauf gesperrt; eine fremde Sperre, etwa ein
+    Zähler, zählt nicht.
+    """
     seite, tor, wache = gang.seite, gang.tor, gang.wache
-    knopf, grund = _knopf(seite, weiter)
-    if knopf is None:
-        return grund
+    wahl = waehle_knopf(seite, weiter.selektor, weiter.text)
+    if wahl.knopf is None:
+        return wahl.grund
     wache.warte_offen()
     adresse = ohne_anker(seite.url)
     marke = len(gang.lauf.verworfen)
+    anfragen: list[Request] = []
+
+    def merke(anfrage: Request) -> None:
+        anfragen.append(anfrage)
+
+    seite.on("request", merke)
     wache.geoeffnet = False
     tor.weiter_klick = True
     try:
-        knopf.click(timeout=gang.frist_ms, no_wait_after=True)
+        wahl.knopf.click(timeout=gang.frist_ms, no_wait_after=True)
         gewechselt = wache.warte(
             lambda: ohne_anker(seite.url) != adresse, WEITER_FRIST_MS
         )
@@ -222,7 +255,13 @@ def _klicke_weiter(gang: Gang, weiter: Weiterschritt) -> str | None:
         return f"{GRUND_KNOPF} nicht klickbar: {kurz(fehler)}"
     finally:
         tor.nur_lesen = True
-    gesperrt = _gesperrt(gang, marke)
+        seite.remove_listener("request", merke)
+    klick = {
+        a.url: a.method
+        for a in anfragen
+        if a.resource_type == DOKUMENT or a.method == POST
+    }
+    gesperrt = sperre_des_klicks(gang.lauf.verworfen[marke:], klick)
     if gesperrt is not None and not (gewechselt and _im_netz(seite.url)):
         raise Abbruch(LAUF_GESPERRT, f"{GRUND_KNOPF}: {gesperrt}")
     if not gewechselt:
@@ -233,35 +272,6 @@ def _klicke_weiter(gang: Gang, weiter: Weiterschritt) -> str | None:
     wache.warte_ruhe()
     _pruefe_strecke(seite)
     return None
-
-
-def _knopf(seite: Page, weiter: Weiterschritt) -> tuple[Locator | None, str | None]:
-    """Der eine sichtbare Treffer mit dem erwarteten Text; sonst der Grund."""
-    treffer = seite.locator(weiter.selektor)
-    try:
-        anzahl = treffer.count()
-        sichtbar = [
-            treffer.nth(i)
-            for i in range(min(anzahl, HOECHSTE_TREFFER))
-            if treffer.nth(i).is_visible()
-        ]
-        passend = [(k, k.evaluate(KNOPF_JS)) for k in sichtbar]
-    except PlaywrightFehler as fehler:
-        return None, f"{GRUND_KNOPF}: Selektor nicht lesbar ({kurz(fehler)})"
-    gesucht = knapp(weiter.text)
-    passend = [(k, d) for k, d in passend if gesucht in knapp(d["text"])]
-    if len(passend) != 1:
-        wie = "nicht gefunden" if not passend else "nicht eindeutig"
-        grund = (
-            f"{GRUND_KNOPF} {wie}: {anzahl} Treffer, {len(sichtbar)} sichtbar,"
-            f" {len(passend)} passend"
-        )
-        return None, grund
-    knopf, daten = passend[0]
-    mangel = kein_weiter(daten)
-    if mangel is not None:
-        return None, f"{GRUND_KNOPF} „{daten['text']}“ {mangel}"
-    return knopf, None
 
 
 def _folge(gang: Gang) -> None:
@@ -300,7 +310,7 @@ def _kacheln(
     gang.lauf.struktur.knopf(bool(optionen))
     if not optionen:
         variante = variante_aus(*(ziel[d] for d in DIMENSIONEN))
-        return [Kombiergebnis(variante, NICHT_ERFASST, gang._fehlen(kachel))]
+        return [Kombiergebnis(variante, NICHT_ERFASST, fehlen(gang.karte, kachel))]
     ergebnisse: list[Kombiergebnis] = []
     for stelle, option in enumerate(optionen):
         wert = option.unlesbar if option.wert is None else option.wert
@@ -349,14 +359,6 @@ def _pruefe_strecke(seite: Page) -> None:
     ende = streckenende(seite.url, seite.evaluate(FELDER_JS))
     if ende is not None:
         raise Abbruch(LAUF_GESTOERT, f"Folgeseite zeigt {ende}")
-
-
-def _gesperrt(gang: Gang, marke: int) -> str | None:
-    """Was das Tor seit ``marke`` verwarf, nicht wegen ``GRUND_NUR_LESEN``."""
-    for verworfen in gang.lauf.verworfen[marke:]:
-        if verworfen.grund != GRUND_NUR_LESEN:
-            return f"{verworfen.url} {verworfen.grund}"
-    return None
 
 
 def _im_netz(adresse: str) -> bool:

@@ -3,20 +3,39 @@
 Die Folgeseite der Erkundung (``klickfolgeseite``) und der Weiter-Schritt der
 Klick-Karte (``klickweiter``) klicken genau einen Knopf in die Bestellstrecke. Erlaubt
 ist er nur als ``a`` oder ``button`` (oder mit dieser Rolle), ohne neues Fenster und
-ohne Kauf-, Kassen- oder Anmeldewort (``KAUFWORT``); ``kein_weiter`` nennt den Mangel.
-``streckenende`` erkennt Anmeldung, Checkout oder Zahlung an Host oder Pfad der Adresse
-oder an sichtbaren Feldern der Seite (``FELDER_JS``: Passwort-, Karten- oder IBAN-Feld,
-Knopf „zahlungspflichtig bestellen“). Dieses Modul ruft kein Netz.
+ohne Kauf-, Kassen- oder Anmeldewort (``KAUFWORT``); ``kein_weiter`` nennt den Mangel,
+``waehle_knopf`` sucht den einen sichtbaren Treffer mit dem erwarteten Text.
+``sperre_des_klicks`` nennt die Sperre, die Dokument oder POST des Klicks traf (eine
+fremde Anfrage, etwa ein Zähler, zählt nicht). ``streckenende`` erkennt Anmeldung,
+Checkout oder Zahlung an Host oder Pfad der Adresse oder an sichtbaren Feldern der
+Seite (``FELDER_JS``: Passwort-, Karten- oder IBAN-Feld, Knopf „zahlungspflichtig
+bestellen“). Dieses Modul ruft kein Netz.
 """
 
 from __future__ import annotations
 
 import re
+from collections.abc import Callable, Iterable, Mapping
+from dataclasses import dataclass
+from typing import TYPE_CHECKING
 from urllib.parse import unquote, urldefrag, urlsplit
+
+from playwright.sync_api import Error as PlaywrightFehler
+
+from .klicktor import GRUND_NUR_LESEN, kurz
+
+if TYPE_CHECKING:
+    from playwright.sync_api import Locator, Page
+
+    from .klicklauf import Verworfen
 
 KNOPF_TAGS = frozenset({"a", "button"})
 KNOPF_ROLLEN = frozenset({"button", "link"})
 NEUES_FENSTER = "_blank"
+GRUND_KNOPF = "Weiter-Knopf"
+HOECHSTE_TREFFER = 20
+POST = "POST"
+DOKUMENT = "document"
 WEBSCHEMATA = frozenset({"http", "https"})
 KAUFWORT = re.compile(
     r"kaufen|bestell|kasse|bezahl|anmeld|einlogg|login|registrier|checkout", re.I
@@ -93,3 +112,65 @@ def knapp(text: str) -> str:
 def ohne_anker(adresse: str) -> str:
     """Die Adresse ohne Anker."""
     return urldefrag(adresse)[0]
+
+
+@dataclass(frozen=True)
+class Knopfwahl:
+    """Der erlaubte Weiter-Knopf oder ``grund``; Treffer, sichtbare und Text für das
+    Protokoll, soweit gelesen."""
+
+    knopf: Locator | None
+    grund: str | None
+    treffer: int | None = None
+    sichtbar: int | None = None
+    text: str | None = None
+
+
+def waehle_knopf(seite: Page, selektor: str, text: str | None) -> Knopfwahl:
+    """Der eine sichtbare Treffer von ``selektor`` mit ``text``, erlaubt als Weiter."""
+    treffer = seite.locator(selektor)
+    try:
+        anzahl = treffer.count()
+        sichtbar = [
+            treffer.nth(i)
+            for i in range(min(anzahl, HOECHSTE_TREFFER))
+            if treffer.nth(i).is_visible()
+        ]
+        passend = [(k, k.evaluate(KNOPF_JS)) for k in sichtbar]
+    except PlaywrightFehler as fehler:
+        return Knopfwahl(None, f"{GRUND_KNOPF}: Selektor nicht lesbar ({kurz(fehler)})")
+    if text is not None:
+        passend = [(k, d) for k, d in passend if knapp(text) in knapp(d["text"])]
+    if len(passend) != 1:
+        wie = "nicht gefunden" if not passend else "nicht eindeutig"
+        grund = (
+            f"{GRUND_KNOPF} {wie}: {anzahl} Treffer, {len(sichtbar)} sichtbar,"
+            f" {len(passend)} passend"
+        )
+        return Knopfwahl(None, grund, anzahl, len(sichtbar))
+    knopf, daten = passend[0]
+    mangel = kein_weiter(daten)
+    if mangel is not None:
+        grund = f"{GRUND_KNOPF} „{daten['text']}“ {mangel}"
+        return Knopfwahl(None, grund, anzahl, len(sichtbar), daten["text"])
+    return Knopfwahl(knopf, None, anzahl, len(sichtbar), daten["text"])
+
+
+def sperre_des_klicks(
+    verworfen: Iterable[Verworfen],
+    klick: Mapping[str, str],
+    norm: Callable[[str], str] = str,
+) -> str | None:
+    """Die erste Sperre einer Anfrage des Klicks, nicht wegen ``GRUND_NUR_LESEN``.
+
+    ``klick`` ordnet jeder Adresse, die der Klick als Dokument oder POST anfragte, ihre
+    Methode zu; ein gesperrtes Umleitungsziel zählt über seine Anfrage. ``norm`` macht
+    die Adressen der Sperren mit denen in ``klick`` vergleichbar.
+    """
+    for eintrag in verworfen:
+        if eintrag.grund == GRUND_NUR_LESEN:
+            continue
+        for adresse in (norm(eintrag.url), norm(eintrag.anfrage)):
+            if adresse in klick:
+                return f"{klick[adresse]} {norm(eintrag.url)} {eintrag.grund}"
+    return None
