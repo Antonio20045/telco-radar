@@ -4,7 +4,8 @@ Eine Antwortfunktion bekommt den Pfad samt Anfrage und liefert eine ``Antwort``;
 Server merkt jeden Abruf mit Pfad und Zeitpunkt (``time.monotonic``), beim Eingang und
 am Ende der Antwort; ``luecken`` misst den Crawl-delay vom Ende der vorigen Antwort.
 Schließt der Browser die Verbindung vor dem Ende, steht der Pfad in ``abgebrochen``;
-``kennungen`` hält je Abruf den User-Agent. Unter ``localhost`` ist derselbe Server als
+``kennungen`` hält je Abruf den User-Agent. Ein POST zählt wie ein Abruf; Pfad und
+Körper stehen zusätzlich in ``posts``. Unter ``localhost`` ist derselbe Server als
 zweiter Host erreichbar. ``karte`` und ``laufe`` bauen eine Prüfkarte und rufen den
 Crawler mit eigener Hostschleuse.
 """
@@ -47,6 +48,7 @@ class Klickserver:
     fertig: list[tuple[float, str]] = field(default_factory=list)
     abgebrochen: list[str] = field(default_factory=list)
     kennungen: list[str | None] = field(default_factory=list)
+    posts: list[tuple[str, str]] = field(default_factory=list)
 
     def adresse(self, pfad: str, host: str = "127.0.0.1") -> str:
         return f"http://{host}:{self.port}{pfad}"
@@ -90,6 +92,12 @@ def klickserver(antworte: Callable[[str], Antwort]) -> Iterator[Klickserver]:
                 server.abgebrochen.append(self.path)
                 return
             server.fertig.append((time.monotonic(), self.path))
+
+        def do_POST(self) -> None:
+            laenge = int(self.headers.get("Content-Length") or 0)
+            koerper = self.rfile.read(laenge).decode("utf-8", errors="replace")
+            server.posts.append((self.path, koerper))
+            self.do_GET()
 
     httpd = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
     server.port = httpd.server_address[1]

@@ -6,7 +6,8 @@ Screenshot, nach ``<ausgabe>/<anbieter>/<JJJJ-MM-TT>/`` mit ``index.json``. Die 
 steht in ``telco_radar.collect.geraete.klickerkundung``; dieses Skript liest nur die
 Eingaben, startet Chromium ohne Tarnung und gibt je Anbieter eine Zeile aus. Liegt
 ``config/klickkarten/<schluessel>.yaml`` vor, erprobt die Erkundung die Klick-Karte
-gleich mit (``klickkartenprobe``, Ergebnis in ``karte-<n>.json``).
+gleich mit (``klickkartenprobe``, Ergebnis in ``karte-<n>.json``). Trägt eine Seite
+``weiter``, hält sie auch die Folgeseite der Bestellstrecke fest (``klickfolgeseite``).
 
 AUFRUF
 ------

@@ -5,9 +5,11 @@ Workflow-Eingabe), den Namen aus ``config/geraete_quellen.yaml`` und höchstens
 ``HOECHSTE_SEITEN`` Seiten mit Gerät und Adresse. ``lade_ziele`` prüft jede Zeile gegen
 Quellen und Katalog (``geraete_config``): der Anbieter steht in den Quellen, das Gerät
 im Katalog, der Speicher beim Gerät, die Adresse ist https (http nur für
-``LOKALE_HOSTS``, den Trockenlauf) und liegt auf dem Host der ``basis_url``. Jeder
-Verstoß wirft ``ErkundungszielFehler`` mit der Stelle; ein Ziel wird nie still
-übergangen. User-Agent und Abrufabstand kommen aus den Quellen.
+``LOKALE_HOSTS``, den Trockenlauf) und liegt auf dem Host der ``basis_url``. Eine
+Seite darf ``weiter`` tragen (``Weiter``): Selektor und, wenn angegeben, sichtbarer Text
+genau eines Knopfs oder Links zum nächsten Schritt der Bestellstrecke
+(``klickfolgeseite``). Jeder Verstoß wirft ``ErkundungszielFehler`` mit der Stelle; ein
+Ziel wird nie still übergangen. User-Agent und Abrufabstand kommen aus den Quellen.
 """
 
 from __future__ import annotations
@@ -27,6 +29,7 @@ HOECHSTE_SEITEN = 2
 ALLE = "alle"
 SCHEMA = "https"
 LOKALE_HOSTS = frozenset({"127.0.0.1", "localhost"})
+WEITER_FELDER = frozenset({"selektor", "text"})
 
 
 class ErkundungszielFehler(ValueError):
@@ -34,12 +37,21 @@ class ErkundungszielFehler(ValueError):
 
 
 @dataclass(frozen=True)
+class Weiter:
+    """Der eine Knopf oder Link zur Folgeseite: CSS-Selektor, erwarteter Text."""
+
+    selektor: str
+    text: str | None = None
+
+
+@dataclass(frozen=True)
 class Seitenziel:
-    """Eine Produktseite: Gerät aus dem Katalog, Speicherstufe, Adresse."""
+    """Eine Produktseite: Gerät aus dem Katalog, Speicherstufe, Adresse, Weiter."""
 
     geraet: str
     speicher_gb: int | None
     adresse: str
+    weiter: Weiter | None = None
 
 
 @dataclass(frozen=True)
@@ -136,7 +148,20 @@ def _seite(roh: object, ort: str, katalog: Katalog, basis_url: str) -> Seitenzie
     if host_von(adresse) != host_von(basis_url):
         grund = f"Host {host_von(adresse)} ist nicht {host_von(basis_url)}"
         raise ErkundungszielFehler(f"{ort}: {grund}")
-    return Seitenziel(geraet_id, speicher, adresse)
+    return Seitenziel(geraet_id, speicher, adresse, _weiter(roh.get("weiter"), ort))
+
+
+def _weiter(roh: object, ort: str) -> Weiter | None:
+    if roh is None:
+        return None
+    ort = f"{ort}.weiter"
+    if not isinstance(roh, dict):
+        raise ErkundungszielFehler(f"{ort}: keine Zuordnung")
+    fremd = sorted(set(roh) - WEITER_FELDER)
+    if fremd:
+        raise ErkundungszielFehler(f"{ort}: unbekanntes Feld {', '.join(fremd)}")
+    text = _text(roh, "text", ort) if "text" in roh else None
+    return Weiter(_text(roh, "selektor", ort), text)
 
 
 def _text(daten: dict, feld: str, ort: str) -> str:

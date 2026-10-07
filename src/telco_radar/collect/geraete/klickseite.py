@@ -16,7 +16,9 @@ Grenze hinausginge; danach verwirft das Tor jede Anfrage, und der Lauf endet mit
 ``GRUND_FRIST``. ``beobachte`` ist die Beobachtung des Tors, die auch die Kartenprobe
 nutzt. Eine Seite ohne Bedienelement oder ohne Preis-Kandidat heißt
 ``LAUF_LEER`` mit Grund, nie „gelesen“. Alles, was die Ablage braucht, steht danach im
-``Seitenergebnis``.
+``Seitenergebnis``. Zwischen Einwilligung und Festhalten liegt ``_vor_der_lesung``;
+dort klickt die Folgeseite (``klickfolgeseite.Folgelauf``) weiter und folgt dem Ziel
+mit ``_folge`` wie beim Öffnen.
 """
 
 from __future__ import annotations
@@ -114,6 +116,7 @@ class Seitenergebnis:
     klicks: list[dict] = field(default_factory=list)
     klick_vermerk: str | None = None
     cookies: set[str] = field(default_factory=set)
+    weiter: dict | None = None
     http_status: int | None = None
     anfragen: list[dict] = field(default_factory=list)
     mitschnitt: list[dict] = field(default_factory=list)
@@ -195,6 +198,7 @@ class Seitenlauf:
             self._oeffne()
             self.ergebnis.ruhe = self.ruhe()
             self.ergebnis.einwilligung = lehne_einwilligung_ab(self)
+            self._vor_der_lesung()
         except Abbruch as abbruch:
             self._halte_an(abbruch)
             if not self.geoeffnet:
@@ -215,12 +219,18 @@ class Seitenlauf:
         if luecke is not None and self.ergebnis.status == LAUF_GELESEN:
             self.ergebnis.status, self.ergebnis.grund = LAUF_LEER, luecke
 
+    def _vor_der_lesung(self) -> None:
+        """Schritt vor dem Festhalten; eine Produktseite bleibt, wie sie ist."""
+
     def _halte_an(self, abbruch: Abbruch) -> None:
         status = LAUF_GESTOERT if abbruch.status == ABGELAUFEN else abbruch.status
         self.ergebnis.status, self.ergebnis.grund = status, abbruch.grund
 
     def _oeffne(self) -> None:
-        ziel = self.adresse
+        self._folge(self.adresse)
+
+    def _folge(self, ziel: str) -> None:
+        """Lädt ``ziel``, folgt geprüften Umleitungen, wartet aufs Laden."""
         for _ in range(HOECHSTE_UMLEITUNGEN + 1):
             darf, grund = self.tor.darf(ziel)
             if not darf:
@@ -232,6 +242,10 @@ class Seitenlauf:
         else:
             raise Abbruch(LAUF_GESTOERT, f"Abruf gestört ({GRUND_ZU_VIELE})")
         self.geoeffnet = True
+        self.pruefe_geladen()
+
+    def pruefe_geladen(self) -> None:
+        """Wartet aufs Laden; wirft ``Abbruch``, wenn robots.txt die Adresse sperrt."""
         if not self._warte_geladen():
             raise Abbruch(
                 LAUF_GESTOERT, f"Seite nach {SEITEN_FRIST_MS} ms nicht geladen"

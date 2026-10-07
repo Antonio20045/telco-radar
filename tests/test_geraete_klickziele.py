@@ -24,6 +24,7 @@ from telco_radar.collect.geraete.klickinventar import art_der_gruppe
 from telco_radar.collect.geraete.klickspur import ohne_geheimnisse, schwaerze_text
 from telco_radar.collect.geraete.klickziele import (
     ErkundungszielFehler,
+    Weiter,
     lade_ziele,
     waehle,
 )
@@ -65,6 +66,21 @@ def test_ausgelieferte_ziele_loesen_sich_gegen_quellen_und_katalog(wurzel):
     assert {z.schluessel: z.rate_limit_sekunden for z in ziele}["telekom"] == 10.0
 
 
+def test_weiter_steht_bei_1und1_und_vodafone_auf_beiden_seiten(wurzel):
+    weiter = {z.schluessel: [s.weiter for s in z.seiten] for z in lade_ziele(wurzel)}
+
+    einsundeins = Weiter(
+        "#hwd-configuration-section button.hwd-add-to-cart-button-price-component",
+        "Weiter zur Tarifauswahl",
+    )
+    vodafone = Weiter(
+        "#device-details-offer-summary-card a.ws10-button--primary", "Zur Tarifauswahl"
+    )
+    assert weiter.pop("1und1") == [einsundeins, einsundeins]
+    assert weiter.pop("vodafone") == [vodafone, vodafone]
+    assert all(w is None for liste in weiter.values() for w in liste)
+
+
 @pytest.mark.parametrize(
     ("aendern", "meldung"),
     [
@@ -82,6 +98,22 @@ def test_ausgelieferte_ziele_loesen_sich_gegen_quellen_und_katalog(wurzel):
         (lambda a: a[0]["seiten"].append(a[0]["seiten"][0]), "höchstens 2"),
         (lambda a: a[1].update(schluessel="o2"), "Schlüssel doppelt"),
         (lambda a: a[0].update(seiten=[]), "keine Seiten"),
+        (
+            lambda a: a[0]["seiten"][0].update(weiter="#knopf"),
+            r"seiten\[0\]\.weiter: keine Zuordnung",
+        ),
+        (
+            lambda a: a[0]["seiten"][0].update(weiter={"text": "Weiter"}),
+            r"weiter: selektor fehlt",
+        ),
+        (
+            lambda a: a[0]["seiten"][0].update(weiter={"selektor": "a", "text": " "}),
+            r"weiter: text fehlt oder ist leer",
+        ),
+        (
+            lambda a: a[0]["seiten"][0].update(weiter={"selektor": "a", "klick": 2}),
+            r"weiter: unbekanntes Feld klick",
+        ),
     ],
 )
 def test_kaputte_zeile_wirft_mit_stelle(wurzel, aendern, meldung):
@@ -164,6 +196,13 @@ def test_gesamtstatus_nennt_die_erste_stoerung():
         "Seite 2: Gerätelauf läuft",
     )
     assert gesamtstatus([bot, spaeter]) == ("gestoert", "Seite 1: HTTP 403")
+    befund = {"nummer": 3, "status": "befund", "grund": "Folgeseite zeigt Anmeldung"}
+    assert gesamtstatus([gelesen, befund]) == (
+        "befund",
+        "Seite 3: Folgeseite zeigt Anmeldung",
+    )
+    assert gesamtstatus([leer, befund])[0] == "befund"
+    assert gesamtstatus([spaeter, befund])[0] == "verschoben"
 
 
 def test_ablage_schwaerzt_cookies_und_haelt_die_grenze(tmp_path):

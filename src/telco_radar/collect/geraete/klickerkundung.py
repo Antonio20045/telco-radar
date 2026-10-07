@@ -29,6 +29,11 @@ sie nach jeder gelesenen oder leeren Seite auf derselben Seite, mit Tor, Schleus
 Zeitgrenze der Seite; ihr Ergebnis steht in ``karte-<n>.json``, ihr Status je Seite im
 Index unter ``karte``. Endet die Probe gestört, gilt dasselbe wie nach Bot-Schutz der
 Seite; ihre Cookie-Werte schwärzt die Ablage wie die der Seite.
+
+Trägt eine Seite ``weiter``, folgt nach Seite und Kartenprobe ihre Folgeseite
+(``klickfolgeseite``) als eigener Schritt mit eigener Nummer, eigenen Dateien und
+``folge_von`` im Index, mit denselben Grenzen für Zeit, Parallelläufe und Bot-Schutz.
+Ist die Ausgangsseite weder gelesen noch leer, ist die Folgeseite ``nicht_besucht``.
 """
 
 from __future__ import annotations
@@ -43,6 +48,14 @@ from typing import TYPE_CHECKING
 from .. import http
 from .basis import GeraeteAbrufFehler
 from .klickablage import HOECHSTE_LISTE, Ablage
+from .klickfolgeseite import (
+    LAUF_BEFUND,
+    Folge,
+    Folgelauf,
+    angabe,
+    ohne_ausgang,
+    plane,
+)
 from .klickkartenprobe import (
     NICHT_BESUCHT,
     Kartenprobe,
@@ -165,24 +178,40 @@ def erkunde_anbieter(
     lage = lade_karte(karten, ziel.schluessel)
     mittel = Probenmittel(waechter, uhr, schleuse)
     seiten: list[dict] = []
+    ausgang: dict[int, Seitenergebnis] = {}
     stopp: tuple[str, str] | None = None
-    for nummer, seite in enumerate(ziel.seiten, 1):
+    schritte = plane(ziel.seiten)
+    for stelle, schritt in enumerate(schritte):
+        nummer, seite, folge = schritt.nummer, schritt.seite, schritt.folge
         rest = anbieter_ende - time.monotonic()
         if stopp is None and rest < MINDESTZEIT_SEITE_S:
             stopp = NICHT_BESUCHT, f"{GRUND_FRIST}: noch {max(0, round(rest))} s"
         if stopp is None and laeufe is not None:
             belegt = laeufe()
             stopp = None if belegt is None else (VERSCHOBEN, belegt)
-        if stopp is not None:
-            probe = ohne_probe(lage, stopp[1])
-            seiten.append(_nicht_besucht(nummer, seite, *stopp, probe))
+        offen = stopp
+        if offen is None and folge is not None:
+            grund = ohne_ausgang(ausgang.get(folge.von), folge.von)
+            offen = None if grund is None else (NICHT_BESUCHT, grund)
+        if offen is not None:
+            probe = None if folge is not None else ohne_probe(lage, offen[1])
+            eintrag = _nicht_besucht(nummer, seite, *offen, probe)
+            seiten.append(_mit_folge(eintrag, folge, None))
             continue
         schleuse.setze(min(anbieter_ende, time.monotonic() + ZEIT_JE_SEITE_S))
-        anteil = ablage.platz // (len(ziel.seiten) - nummer + 1)
-        ergebnis = Seitenlauf(browser, ziel, seite, waechter, uhr, schleuse).laufe()
-        probe = probiere(browser, ziel, seite, lage, ergebnis, mittel)
-        seiten.append(lege_ab(ablage, nummer, seite, ergebnis, anteil, probe))
-        if ergebnis.bot or probe.bot:
+        anteil = ablage.platz // (len(schritte) - stelle)
+        if folge is None:
+            ergebnis = Seitenlauf(browser, ziel, seite, waechter, uhr, schleuse).laufe()
+            probe = probiere(browser, ziel, seite, lage, ergebnis, mittel)
+            ausgang[nummer] = ergebnis
+        else:
+            ergebnis = Folgelauf(
+                browser, ziel, seite, waechter, uhr, schleuse, folge.weiter
+            ).laufe()
+            probe = None
+        eintrag = lege_ab(ablage, nummer, seite, ergebnis, anteil, probe)
+        seiten.append(_mit_folge(eintrag, folge, ergebnis))
+        if ergebnis.bot or (probe is not None and probe.bot):
             stopp = NICHT_BESUCHT, GRUND_NACH_BOT
     status, grund = gesamtstatus(seiten)
     adresse = ziel.seiten[0].adresse
@@ -210,15 +239,16 @@ def erkunde_anbieter(
 def gesamtstatus(seiten: list[dict]) -> tuple[str, str | None]:
     """Gelesen nur, wenn jede Seite gelesen ist; sonst der schwerste Befund mit Seite.
 
-    Gestört geht vor verschoben; leer gilt, wenn jede andere Seite gelesen ist;
-    gesperrt, wenn jede Seite gesperrt ist; jede andere Mischung heißt gestört.
+    Gestört geht vor verschoben, verschoben vor einem Befund (Folgeseite); leer gilt,
+    wenn jede andere Seite gelesen ist; gesperrt, wenn jede Seite gesperrt ist; jede
+    andere Mischung heißt gestört.
     """
     offen = [s for s in seiten if s["status"] != LAUF_GELESEN]
     if not offen:
         return LAUF_GELESEN, None
     if all(s["status"] == LAUF_GESPERRT for s in seiten):
         return LAUF_GESPERRT, offen[0]["grund"]
-    for status in (LAUF_GESTOERT, VERSCHOBEN):
+    for status in (LAUF_GESTOERT, VERSCHOBEN, LAUF_BEFUND):
         erste = next((s for s in offen if s["status"] == status), None)
         if erste is not None:
             return status, f"Seite {erste['nummer']}: {erste['grund']}"
@@ -321,8 +351,22 @@ def _zaehlung(ergebnis: Seitenergebnis) -> dict:
     }
 
 
+def _mit_folge(
+    eintrag: dict, folge: Folge | None, ergebnis: Seitenergebnis | None
+) -> dict:
+    """Eine Folgeseite nennt ihre Ausgangsseite und ihren Weiter-Klick."""
+    if folge is None:
+        return eintrag
+    weiter = angabe(folge.weiter) if ergebnis is None else ergebnis.weiter
+    return eintrag | {"folge_von": folge.von, "weiter": weiter}
+
+
 def _nicht_besucht(
-    nummer: int, seite: Seitenziel, status: str, grund: str, probe: Kartenprobe
+    nummer: int,
+    seite: Seitenziel,
+    status: str,
+    grund: str,
+    probe: Kartenprobe | None,
 ) -> dict:
     return {
         "nummer": nummer,
@@ -332,7 +376,7 @@ def _nicht_besucht(
         "status": status,
         "grund": grund,
         "dateien": {},
-        "karte": indexeintrag(probe, None),
+        "karte": None if probe is None else indexeintrag(probe, None),
     }
 
 
