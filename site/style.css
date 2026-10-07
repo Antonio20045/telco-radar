@@ -350,7 +350,7 @@ b,strong{font-weight:700}
    liest. */
 .ausfall-hinweis{background:var(--red-wash);border-left:3px solid var(--red);
   padding:10px 14px;margin:0 0 16px;font-family:var(--sans);font-size:12px;
-  line-height:1.5;color:var(--ink-2)}
+  line-height:1.5;color:var(--ink-2);overflow-wrap:anywhere}
 
 
 /* ================================================  MELDUNGEN (Ressort) == */
@@ -3196,6 +3196,9 @@ b,strong{font-weight:700}
      rund 75 px) - lesbar auf ein bis zwei statt drei bis vier Zeilen. */
   .gr-bnd-an .gr-kk-marke{display:block;width:100%;box-sizing:border-box;
     margin:3px 0 0}
+  /* Die kurze Notbremse-Marke bleibt neben dem Namen: keine Zeile mehr. */
+  .gr-bnd-an .gr-kk-marke--notbremse{display:inline-block;width:auto;
+    margin:0 0 0 4px}
   /* justify-self:end schrumpft die tco-Box auf den Inhalt und richtet sie
      an der rechten Kante der Zeile aus (dieselbe Kante bei jeder Zeile,
      da die Zeile selbst immer volle Breite hat) - die Box beginnt damit
@@ -3384,6 +3387,10 @@ b,strong{font-weight:700}
    Marke `--alt` nennt Abrufdatum bzw. „unbekannt" auf der Zeile selbst;
    der Text dafür steht in Python (`alt_marke`), nie hier. */
 .gr-kk-marke--alt{color:var(--ink-3);border-color:currentColor}
+/* Notbremse: Schätzung oder abgelaufene Aktion - grau, gestrichelt (nicht
+   gemessen), kein Rot. */
+.gr-kk-marke--notbremse{color:var(--ink-3);border-style:dashed;
+  border-color:currentColor;letter-spacing:.02em}
 .gr-bnd--alt{border-left-color:var(--rule-2)}
 .gr-bnd--alt summary{color:var(--ink-3)}
 .gr-bnd--alt summary .gr-bnd-name{color:var(--ink-3)}
@@ -4026,10 +4033,6 @@ li.gr-zr-posten:first-child{border-top:0}
    TCO-24 vergleichbar macht, steht da, wo gerechnet wird. */
 .gr-zr-roffen{font-family:var(--sans);font-size:12.5px;color:var(--ink-3);
   margin:4px 0 0}
-/* P1-Fix (Datenverlust-Befund, 24.09.2026): die zweite Zahlweise zum
-   selben Betrag - derselbe Ton wie die Restschuld-Zeile daneben. */
-.gr-zr-rweitere{font-family:var(--sans);font-size:12.5px;color:var(--ink-3);
-  margin:4px 0 0}
 .gr-zr-rbeleg{font-family:var(--sans);font-size:12px;color:var(--ink-4);
   margin:6px 0 0;text-align:right}
 /* Die Eingaenge des Panels: die unsichtbare Trefferflaeche ueber dem
@@ -4064,6 +4067,14 @@ circle.gr-zr-punkt.gr-zr-aktiv{stroke:var(--ink);stroke-width:2.8}
   .gr-zr-baender button{flex:1 1 0;padding:6px 2px;font-size:11.5px;
     text-align:center}
   .gr-zr-baender button small{font-size:8.5px}
+  /* Band und Ratenlaufzeit teilen sich EINE Zeile ohne Beschriftung - die
+     Knöpfe nennen „15 GB“ und „Monate“ selbst; eine zweite Zeile schöbe die
+     Kurve unter die Falz (11c). */
+  .gr-zr-feld--band{flex:1 1 0}
+  .gr-zr-feld--band>label,.gr-zr-feld--lz>label{display:none}
+  .gr-zr-laufzeiten button{padding:6px 4px}
+  .gr-zr-laufzeiten button .gr-zr-lang{display:none}
+  .gr-zr-laufzeiten button .gr-zr-kurz{display:inline}
   /* P1/F3 (A3): die Karten rollen QUER (kein 2x3-Berg - der wuerde die
      Antwort um ueber 100 px unter die 844-er-Falz druecken, Kriterium
      11c geht vor). Alle Karten bleiben ohne vertikalen Berg erreichbar;
@@ -4186,20 +4197,20 @@ circle.gr-zr-punkt.gr-zr-aktiv{stroke:var(--ink);stroke-width:2.8}
   background-image:repeating-linear-gradient(45deg,var(--anb,var(--anb-ersatz)) 0
   3px,var(--paper) 3px 6px)}
 
-/* --- P3-E2/E3 (28.09.2026): Laufzeit-Filter und Aktionen ------------- */
-/* Der Filter ueber der Bündeltabelle: dieselbe Knopfsprache wie die
-   Band-Leiste, kleiner - er ist eine Einstellung der Tabelle, keine
-   Hauptwahl der Seite. */
-.gr-bnd-lz{display:flex;flex-wrap:wrap;align-items:center;gap:4px;
-  margin:4px 0 10px;font-family:var(--sans);font-size:12px}
-.gr-bnd-lz-kopf{color:var(--ink-4);font-weight:700;letter-spacing:.06em;
-  text-transform:uppercase;margin-right:2px}
-.gr-bnd-lz button{font:inherit;font-weight:700;color:var(--ink-2);
-  background:var(--paper);border:1px solid var(--rule-2);border-radius:2px;
-  padding:3px 7px;cursor:pointer;white-space:nowrap}
-.gr-bnd-lz button[aria-pressed="true"]{background:var(--red-wash);
-  border-color:var(--red);color:var(--red-deep)}
-.gr-bnd-lz button:focus-visible{outline:2px solid var(--red);outline-offset:1px}
+/* --- Datenkonzept Geräte Schritt 3: die Ratenlaufzeit der Tafel ------- */
+/* Der Umschalter steht als `.gr-zr-baender` neben dem Band. Unter „alle“
+   stehen die Zeilen nach Laufzeit gruppiert, mit Kopf und ohne Δ. */
+.gr-bnd-lzkopf{font-family:var(--sans);font-size:12px;font-weight:700;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);
+  margin:14px 0 4px}
+.gr-buendel--alle .gr-bnd-delta,.gr-buendel--alle .gr-bnd-kopf-delta{
+  visibility:hidden}
+/* Auch aufgeklappt: der ausgeschriebene Abstand zur Vodafone-Referenz und
+   der Satz, warum es keinen gibt, gehören zu einer Ansicht mit Vergleich. */
+.gr-buendel--alle .gr-kk-delta,.gr-buendel--alle .gr-kk-luecke--delta{
+  display:none}
+.gr-zr-laufzeiten .gr-zr-kurz{display:none}
+/* --- P3-E3 (28.09.2026): Aktionen ------------------------------------ */
 /* Der Ueberhang einer nicht eingerechneten Aktion unter der Leitzahl -
    eigene Zeile, zurueckgenommen, nie so gross wie die Zahl selbst. */
 .gr-bnd-aktion{display:block;font-family:var(--sans);font-size:12px;
