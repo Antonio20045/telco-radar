@@ -1,6 +1,6 @@
 {
- "elemente_gesamt": 199,
- "elemente_gelesen": 199,
+ "elemente_gesamt": 219,
+ "elemente_gelesen": 219,
  "gruppen": [
   {
    "nummer": 0,
@@ -50,7 +50,7 @@
    },
    "elemente": [
     3,
-    34
+    43
    ],
    "select": false,
    "mit_marke": false
@@ -69,9 +69,9 @@
    "elemente": [
     4,
     5,
-    33,
-    35,
-    36
+    42,
+    44,
+    45
    ],
    "select": false,
    "mit_marke": false
@@ -89,11 +89,11 @@
    },
    "elemente": [
     6,
-    37,
-    38,
-    39,
-    40,
-    41
+    46,
+    47,
+    48,
+    49,
+    50
    ],
    "select": false,
    "mit_marke": false
@@ -111,7 +111,7 @@
    },
    "elemente": [
     7,
-    100
+    109
    ],
    "select": false,
    "mit_marke": false
@@ -165,7 +165,7 @@
    },
    "elemente": [
     12,
-    103
+    112
    ],
    "select": false,
    "mit_marke": false
@@ -263,7 +263,7 @@
   },
   {
    "nummer": 14,
-   "pfad": "#i6wzgu-accordion > div:nth-of-type(1)",
+   "pfad": "#\\39 ogyaz-accordion > div:nth-of-type(1)",
    "name": "0 - 95 €",
    "art": "unbekannt",
    "anteile": {
@@ -292,8 +292,7 @@
    },
    "elemente": [
     26,
-    27,
-    28
+    27
    ],
    "select": false,
    "mit_marke": false
@@ -310,15 +309,41 @@
     "farbe": 0.0
    },
    "elemente": [
-    29,
-    132,
-    133
+    28,
+    152,
+    153
    ],
    "select": false,
    "mit_marke": true
   },
   {
    "nummer": 17,
+   "pfad": "body > div:nth-of-type(1) > ecom-footer:nth-of-type(1) > section:nth-of-type(3) > div:nth-of-type(3) > div:nth-of-type(1) > footer-footnote-accordion:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 18,
    "pfad": "#outdated-browser",
    "name": null,
    "art": "unbekannt",
@@ -329,14 +354,14 @@
     "farbe": 0.0
    },
    "elemente": [
-    30,
-    31
+    39,
+    40
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 18,
+   "nummer": 19,
    "pfad": "body > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
@@ -347,13 +372,13 @@
     "farbe": 0.0
    },
    "elemente": [
-    32
+    41
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 19,
+   "nummer": 20,
    "pfad": "body > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > div:nth-of-type(2) > ul:nth-of-type(1)",
    "name": "Headline",
    "art": "unbekannt",
@@ -364,15 +389,15 @@
     "farbe": 0.0
    },
    "elemente": [
-    42,
-    43,
-    44
+    51,
+    52,
+    53
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 20,
+   "nummer": 21,
    "pfad": "body > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > div:nth-of-type(2) > ul:nth-of-type(2)",
    "name": "Headline",
    "art": "unbekannt",
@@ -383,14 +408,14 @@
     "farbe": 0.0
    },
    "elemente": [
-    45,
-    46
+    54,
+    55
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 21,
+   "nummer": 22,
    "pfad": "body > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > div:nth-of-type(2)",
    "name": "Schließen",
    "art": "unbekannt",
@@ -401,14 +426,14 @@
     "farbe": 0.0
    },
    "elemente": [
-    47,
-    51
+    56,
+    60
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 22,
+   "nummer": 23,
    "pfad": "body > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > div:nth-of-type(2) > ul:nth-of-type(4)",
    "name": null,
    "art": "unbekannt",
@@ -419,15 +444,15 @@
     "farbe": 0.0
    },
    "elemente": [
-    48,
-    49,
-    50
+    57,
+    58,
+    59
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 23,
+   "nummer": 24,
    "pfad": "body > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > div:nth-of-type(3) > ul:nth-of-type(1)",
    "name": "Headline",
    "art": "tarif",
@@ -438,18 +463,18 @@
     "farbe": 0.0
    },
    "elemente": [
-    52,
-    53,
-    54,
-    55,
-    56,
-    57
+    61,
+    62,
+    63,
+    64,
+    65,
+    66
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 24,
+   "nummer": 25,
    "pfad": "body > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > div:nth-of-type(3) > ul:nth-of-type(2)",
    "name": "Headline",
    "art": "unbekannt",
@@ -460,18 +485,18 @@
     "farbe": 0.0
    },
    "elemente": [
-    58,
-    59,
-    60,
-    61,
-    62,
-    63
+    67,
+    68,
+    69,
+    70,
+    71,
+    72
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 25,
+   "nummer": 26,
    "pfad": "body > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > div:nth-of-type(3) > ul:nth-of-type(3)",
    "name": "Headline",
    "art": "unbekannt",
@@ -482,15 +507,15 @@
     "farbe": 0.0
    },
    "elemente": [
-    64,
-    65,
-    66
+    73,
+    74,
+    75
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 26,
+   "nummer": 27,
    "pfad": "body > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > div:nth-of-type(3) > ul:nth-of-type(4)",
    "name": null,
    "art": "unbekannt",
@@ -501,14 +526,14 @@
     "farbe": 0.0
    },
    "elemente": [
-    67,
-    68
+    76,
+    77
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 27,
+   "nummer": 28,
    "pfad": "body > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > div:nth-of-type(3)",
    "name": "Schließen",
    "art": "unbekannt",
@@ -519,13 +544,13 @@
     "farbe": 0.0
    },
    "elemente": [
-    69
+    78
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 28,
+   "nummer": 29,
    "pfad": "body > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > div:nth-of-type(3) > ul:nth-of-type(6)",
    "name": null,
    "art": "unbekannt",
@@ -536,16 +561,16 @@
     "farbe": 0.0
    },
    "elemente": [
-    70,
-    71,
-    72,
-    73
+    79,
+    80,
+    81,
+    82
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 29,
+   "nummer": 30,
    "pfad": "body > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > div:nth-of-type(3) > ul:nth-of-type(7)",
    "name": null,
    "art": "unbekannt",
@@ -556,17 +581,17 @@
     "farbe": 0.0
    },
    "elemente": [
-    74,
-    75,
-    76,
-    77,
-    78
+    83,
+    84,
+    85,
+    86,
+    87
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 30,
+   "nummer": 31,
    "pfad": "body > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > div:nth-of-type(3) > ul:nth-of-type(8)",
    "name": null,
    "art": "unbekannt",
@@ -577,20 +602,20 @@
     "farbe": 0.0
    },
    "elemente": [
-    79,
-    80,
-    81,
-    82,
-    83,
-    84,
-    85,
-    86
+    88,
+    89,
+    90,
+    91,
+    92,
+    93,
+    94,
+    95
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 31,
+   "nummer": 32,
    "pfad": "body > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > div:nth-of-type(3) > ul:nth-of-type(9)",
    "name": null,
    "art": "unbekannt",
@@ -601,20 +626,20 @@
     "farbe": 0.0
    },
    "elemente": [
-    87,
-    88,
-    89,
-    90,
-    91,
-    92,
-    93,
-    94
+    96,
+    97,
+    98,
+    99,
+    100,
+    101,
+    102,
+    103
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 32,
+   "nummer": 33,
    "pfad": "body > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > div:nth-of-type(3) > ul:nth-of-type(10)",
    "name": null,
    "art": "unbekannt",
@@ -625,17 +650,17 @@
     "farbe": 0.0
    },
    "elemente": [
-    95,
-    96,
-    97,
-    98,
-    99
+    104,
+    105,
+    106,
+    107,
+    108
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 33,
+   "nummer": 34,
    "pfad": "body > div:nth-of-type(1) > div:nth-of-type(3)",
    "name": null,
    "art": "unbekannt",
@@ -646,13 +671,13 @@
     "farbe": 0.0
    },
    "elemente": [
-    101
+    110
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 34,
+   "nummer": 35,
    "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
@@ -663,87 +688,14 @@
     "farbe": 0.0
    },
    "elemente": [
-    102
-   ],
-   "select": false,
-   "mit_marke": false
-  },
-  {
-   "nummer": 35,
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3)",
-   "name": null,
-   "art": "unbekannt",
-   "anteile": {
-    "speicher": 0.0,
-    "laufzeit": 0.0,
-    "tarif": 0.0,
-    "farbe": 0.0
-   },
-   "elemente": [
-    104
+    111
    ],
    "select": false,
    "mit_marke": false
   },
   {
    "nummer": 36,
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2)",
-   "name": "DEIN WUNSCHHANDY",
-   "art": "unbekannt",
-   "anteile": {
-    "speicher": 0.0,
-    "laufzeit": 0.0,
-    "tarif": 0.0,
-    "farbe": 0.0
-   },
-   "elemente": [
-    105,
-    112
-   ],
-   "select": false,
-   "mit_marke": false
-  },
-  {
-   "nummer": 37,
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(11) > div:nth-of-type(1)",
-   "name": "Farbe",
-   "art": "farbe",
-   "anteile": {
-    "speicher": 0.0,
-    "laufzeit": 0.0,
-    "tarif": 0.0,
-    "farbe": 1.5
-   },
-   "elemente": [
-    106,
-    107,
-    108
-   ],
-   "select": false,
-   "mit_marke": true
-  },
-  {
-   "nummer": 38,
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(12) > div:nth-of-type(1)",
-   "name": "Speicherplatz",
-   "art": "speicher",
-   "anteile": {
-    "speicher": 1.17,
-    "laufzeit": 0.0,
-    "tarif": 0.0,
-    "farbe": 0.0
-   },
-   "elemente": [
-    109,
-    110,
-    111
-   ],
-   "select": false,
-   "mit_marke": true
-  },
-  {
-   "nummer": 39,
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1)",
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3)",
    "name": null,
    "art": "unbekannt",
    "anteile": {
@@ -759,7 +711,80 @@
    "mit_marke": false
   },
   {
+   "nummer": 37,
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2)",
+   "name": "DEIN WUNSCHHANDY",
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    114,
+    121
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 38,
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(11) > div:nth-of-type(1)",
+   "name": "Farbe",
+   "art": "farbe",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 1.5
+   },
+   "elemente": [
+    115,
+    116,
+    117
+   ],
+   "select": false,
+   "mit_marke": true
+  },
+  {
+   "nummer": 39,
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(12) > div:nth-of-type(1)",
+   "name": "Speicherplatz",
+   "art": "speicher",
+   "anteile": {
+    "speicher": 1.17,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    118,
+    119,
+    120
+   ],
+   "select": false,
+   "mit_marke": true
+  },
+  {
    "nummer": 40,
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    122
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 41,
    "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
@@ -770,14 +795,14 @@
     "farbe": 0.0
    },
    "elemente": [
-    114
+    123
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 41,
-   "pfad": "#cokhr8-accordion > div:nth-of-type(1) > div:nth-of-type(1)",
+   "nummer": 42,
+   "pfad": "#\\39 b703d-accordion > div:nth-of-type(1) > div:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
    "anteile": {
@@ -787,16 +812,16 @@
     "farbe": 0.0
    },
    "elemente": [
-    115,
-    116,
-    117,
-    118
+    124,
+    125,
+    126,
+    127
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 42,
+   "nummer": 43,
    "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2)",
    "name": "Netzwahl Telekom Vodafone o2 Telefonica",
    "art": "unbekannt",
@@ -807,14 +832,14 @@
     "farbe": 0.0
    },
    "elemente": [
-    119
+    128
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 43,
-   "pfad": "#\\33 t5ktq-accordion > div:nth-of-type(1) > div:nth-of-type(1)",
+   "nummer": 44,
+   "pfad": "#kyys4v-accordion > div:nth-of-type(1) > div:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
    "anteile": {
@@ -824,16 +849,16 @@
     "farbe": 0.0
    },
    "elemente": [
-    120,
-    121,
-    122,
-    123
+    129,
+    130,
+    131,
+    132
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 44,
+   "nummer": 45,
    "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3)",
    "name": "Datenvolumen 1 - 4 GB 5 - 10 GB 11 - 20 GB > als 20 GB",
    "art": "unbekannt",
@@ -844,13 +869,13 @@
     "farbe": 0.0
    },
    "elemente": [
-    124
+    133
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 45,
+   "nummer": 46,
    "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(4)",
    "name": "Monatlicher Preis 0 - 95 €",
    "art": "laufzeit",
@@ -861,14 +886,14 @@
     "farbe": 0.0
    },
    "elemente": [
-    125
+    134
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 46,
-   "pfad": "#oug7i5-accordion > div:nth-of-type(1) > div:nth-of-type(1)",
+   "nummer": 47,
+   "pfad": "#r8w8f9-accordion > div:nth-of-type(1) > div:nth-of-type(1)",
    "name": null,
    "art": "tarif",
    "anteile": {
@@ -878,14 +903,41 @@
     "farbe": 0.0
    },
    "elemente": [
-    126,
-    127
+    135,
+    136
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 47,
+   "nummer": 48,
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1)",
+   "name": null,
+   "art": "tarif",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.91,
+    "farbe": 0.0
+   },
+   "elemente": [
+    137,
+    138,
+    139,
+    140,
+    141,
+    142,
+    143,
+    144,
+    145,
+    146,
+    147
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 49,
    "pfad": "body > div:nth-of-type(1) > ecom-footer:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
@@ -896,16 +948,16 @@
     "farbe": 0.0
    },
    "elemente": [
-    128,
-    129,
-    130,
-    131
+    148,
+    149,
+    150,
+    151
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 48,
+   "nummer": 50,
    "pfad": "body > div:nth-of-type(1) > ecom-footer:nth-of-type(1) > section:nth-of-type(3) > div:nth-of-type(2) > nav:nth-of-type(1) > ul:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
@@ -916,19 +968,19 @@
     "farbe": 0.0
    },
    "elemente": [
-    134,
-    135,
-    136,
-    137,
-    138,
-    139,
-    140
+    154,
+    155,
+    156,
+    157,
+    158,
+    159,
+    160
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 49,
+   "nummer": 51,
    "pfad": "body > div:nth-of-type(1) > ecom-footer:nth-of-type(1) > section:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > footer-ecom-link-container:nth-of-type(1) > nav:nth-of-type(1) > div:nth-of-type(1) > ul:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
@@ -939,22 +991,22 @@
     "farbe": 0.0
    },
    "elemente": [
-    141,
-    142,
-    143,
-    144,
-    145,
-    146,
-    147,
-    148,
-    149,
-    150
+    161,
+    162,
+    163,
+    164,
+    165,
+    166,
+    167,
+    168,
+    169,
+    170
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 50,
+   "nummer": 52,
    "pfad": "body > div:nth-of-type(1) > ecom-footer:nth-of-type(1) > section:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > footer-ecom-link-container:nth-of-type(1) > nav:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1)",
    "name": null,
    "art": "tarif",
@@ -965,24 +1017,24 @@
     "farbe": 0.0
    },
    "elemente": [
-    151,
-    152,
-    153,
-    154,
-    155,
-    156,
-    157,
-    158,
-    159,
-    160,
-    161,
-    162
+    171,
+    172,
+    173,
+    174,
+    175,
+    176,
+    177,
+    178,
+    179,
+    180,
+    181,
+    182
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 51,
+   "nummer": 53,
    "pfad": "body > div:nth-of-type(1) > ecom-footer:nth-of-type(1) > section:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > footer-ecom-link-container:nth-of-type(1) > nav:nth-of-type(1) > div:nth-of-type(3) > ul:nth-of-type(1)",
    "name": null,
    "art": "tarif",
@@ -993,21 +1045,21 @@
     "farbe": 0.0
    },
    "elemente": [
-    163,
-    164,
-    165,
-    166,
-    167,
-    168,
-    169,
-    170,
-    171
+    183,
+    184,
+    185,
+    186,
+    187,
+    188,
+    189,
+    190,
+    191
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 52,
+   "nummer": 54,
    "pfad": "body > div:nth-of-type(1) > ecom-footer:nth-of-type(1) > section:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > footer-ecom-link-container:nth-of-type(1) > nav:nth-of-type(1) > div:nth-of-type(4) > ul:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
@@ -1018,15 +1070,15 @@
     "farbe": 0.0
    },
    "elemente": [
-    172,
-    173,
-    174
+    192,
+    193,
+    194
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 53,
+   "nummer": 55,
    "pfad": "body > div:nth-of-type(1) > ecom-footer:nth-of-type(1) > section:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > footer-ecom-link-container:nth-of-type(1) > nav:nth-of-type(1) > div:nth-of-type(5) > ul:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
@@ -1037,24 +1089,24 @@
     "farbe": 0.0
    },
    "elemente": [
-    175,
-    176,
-    177,
-    178,
-    179,
-    180,
-    181,
-    182,
-    183,
-    184,
-    185,
-    186
+    195,
+    196,
+    197,
+    198,
+    199,
+    200,
+    201,
+    202,
+    203,
+    204,
+    205,
+    206
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 54,
+   "nummer": 56,
    "pfad": "body > div:nth-of-type(1) > ecom-footer:nth-of-type(1) > section:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > footer-ecom-link-container:nth-of-type(1) > nav:nth-of-type(1) > div:nth-of-type(6) > ul:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
@@ -1065,24 +1117,24 @@
     "farbe": 0.0
    },
    "elemente": [
-    187,
-    188,
-    189,
-    190,
-    191,
-    192,
-    193,
-    194,
-    195,
-    196,
-    197,
-    198
+    207,
+    208,
+    209,
+    210,
+    211,
+    212,
+    213,
+    214,
+    215,
+    216,
+    217,
+    218
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 55,
+   "nummer": 57,
    "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(1) > select:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
@@ -1099,7 +1151,7 @@
    "mit_marke": true
   },
   {
-   "nummer": 56,
+   "nummer": 58,
    "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > select:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
@@ -1752,7 +1804,7 @@
    "rolle": "slider",
    "text": "",
    "aria": {
-    "aria-controls": "jqsc2u-slider",
+    "aria-controls": "1wblik-slider",
     "aria-valuemax": "95",
     "aria-valuemin": "0",
     "aria-valuenow": "0",
@@ -1772,7 +1824,7 @@
    "typ": null,
    "href": null,
    "ziel": null,
-   "pfad": "#i6wzgu-accordion > div:nth-of-type(1) > span:nth-of-type(1)",
+   "pfad": "#\\39 ogyaz-accordion > div:nth-of-type(1) > span:nth-of-type(1)",
    "sichtbar": true,
    "deaktiviert": false,
    "gewaehlt": null,
@@ -1784,7 +1836,7 @@
    "rolle": "slider",
    "text": "",
    "aria": {
-    "aria-controls": "wq29mu-slider",
+    "aria-controls": "b3suvv-slider",
     "aria-valuemax": "95",
     "aria-valuemin": "0",
     "aria-valuenow": "95",
@@ -1804,7 +1856,7 @@
    "typ": null,
    "href": null,
    "ziel": null,
-   "pfad": "#i6wzgu-accordion > div:nth-of-type(1) > span:nth-of-type(3)",
+   "pfad": "#\\39 ogyaz-accordion > div:nth-of-type(1) > span:nth-of-type(3)",
    "sichtbar": true,
    "deaktiviert": false,
    "gewaehlt": null,
@@ -1814,7 +1866,7 @@
   {
    "tag": "button",
    "rolle": "button",
-   "text": "4,61(45,1k)Hervorragend",
+   "text": "4,61 (45,2k) Hervorragend",
    "aria": {},
    "daten": {},
    "id": null,
@@ -1828,33 +1880,6 @@
    "ziel": null,
    "pfad": "#minimized-trustbadge-98e3dadd90eb493088abdc5597a70810 > button:nth-of-type(1)",
    "sichtbar": true,
-   "deaktiviert": false,
-   "gewaehlt": null,
-   "optionen": null,
-   "behaelter": 15
-  },
-  {
-   "tag": "span",
-   "rolle": "switch",
-   "text": "",
-   "aria": {
-    "aria-label": "Trstd Login",
-    "aria-checked": "false"
-   },
-   "daten": {
-    "data-testid": "trstd-login-toggle-rail"
-   },
-   "id": null,
-   "klassen": [
-    "_kxqqda"
-   ],
-   "name": null,
-   "wert": null,
-   "typ": null,
-   "href": null,
-   "ziel": null,
-   "pfad": "#minimized-trustbadge-98e3dadd90eb493088abdc5597a70810 > button:nth-of-type(1) > span:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(1)",
-   "sichtbar": false,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
@@ -1912,11 +1937,361 @@
    "href": null,
    "ziel": null,
    "pfad": "body > div:nth-of-type(1) > ecom-footer:nth-of-type(1) > section:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > footer-store-locator:nth-of-type(1) > div:nth-of-type(1) > form:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > button:nth-of-type(1)",
-   "sichtbar": false,
+   "sichtbar": true,
    "deaktiviert": true,
    "gewaehlt": null,
    "optionen": null,
    "behaelter": 16
+  },
+  {
+   "tag": "fa-icon",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-controls": "accordion-content-1",
+    "aria-label": "Details anzeigen",
+    "aria-expanded": "false"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "ng-fa-icon",
+    "ecom-fnm--translate-y-1/2",
+    "ecom-fnm-absolute",
+    "ecom-fnm-cursor-pointer",
+    "ecom-fnm-duration-150",
+    "ecom-fnm-ease-in-out",
+    "ecom-fnm-right-0",
+    "ecom-fnm-top-1/2",
+    "ecom-fnm-transform",
+    "ecom-fnm-transition"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "body > div:nth-of-type(1) > ecom-footer:nth-of-type(1) > section:nth-of-type(3) > div:nth-of-type(3) > div:nth-of-type(1) > footer-footnote-accordion:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > fa-icon:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 17
+  },
+  {
+   "tag": "fa-icon",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-controls": "accordion-content-2",
+    "aria-label": "Details anzeigen",
+    "aria-expanded": "false"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "ng-fa-icon",
+    "ecom-fnm--translate-y-1/2",
+    "ecom-fnm-absolute",
+    "ecom-fnm-cursor-pointer",
+    "ecom-fnm-duration-150",
+    "ecom-fnm-ease-in-out",
+    "ecom-fnm-right-0",
+    "ecom-fnm-top-1/2",
+    "ecom-fnm-transform",
+    "ecom-fnm-transition"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "body > div:nth-of-type(1) > ecom-footer:nth-of-type(1) > section:nth-of-type(3) > div:nth-of-type(3) > div:nth-of-type(1) > footer-footnote-accordion:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > fa-icon:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 17
+  },
+  {
+   "tag": "fa-icon",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-controls": "accordion-content-3",
+    "aria-label": "Details anzeigen",
+    "aria-expanded": "false"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "ng-fa-icon",
+    "ecom-fnm--translate-y-1/2",
+    "ecom-fnm-absolute",
+    "ecom-fnm-cursor-pointer",
+    "ecom-fnm-duration-150",
+    "ecom-fnm-ease-in-out",
+    "ecom-fnm-right-0",
+    "ecom-fnm-top-1/2",
+    "ecom-fnm-transform",
+    "ecom-fnm-transition"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "body > div:nth-of-type(1) > ecom-footer:nth-of-type(1) > section:nth-of-type(3) > div:nth-of-type(3) > div:nth-of-type(1) > footer-footnote-accordion:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > fa-icon:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 17
+  },
+  {
+   "tag": "fa-icon",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-controls": "accordion-content-4",
+    "aria-label": "Details anzeigen",
+    "aria-expanded": "false"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "ng-fa-icon",
+    "ecom-fnm--translate-y-1/2",
+    "ecom-fnm-absolute",
+    "ecom-fnm-cursor-pointer",
+    "ecom-fnm-duration-150",
+    "ecom-fnm-ease-in-out",
+    "ecom-fnm-right-0",
+    "ecom-fnm-top-1/2",
+    "ecom-fnm-transform",
+    "ecom-fnm-transition"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "body > div:nth-of-type(1) > ecom-footer:nth-of-type(1) > section:nth-of-type(3) > div:nth-of-type(3) > div:nth-of-type(1) > footer-footnote-accordion:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(1) > fa-icon:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 17
+  },
+  {
+   "tag": "fa-icon",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-controls": "accordion-content-5",
+    "aria-label": "Details anzeigen",
+    "aria-expanded": "false"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "ng-fa-icon",
+    "ecom-fnm--translate-y-1/2",
+    "ecom-fnm-absolute",
+    "ecom-fnm-cursor-pointer",
+    "ecom-fnm-duration-150",
+    "ecom-fnm-ease-in-out",
+    "ecom-fnm-right-0",
+    "ecom-fnm-top-1/2",
+    "ecom-fnm-transform",
+    "ecom-fnm-transition"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "body > div:nth-of-type(1) > ecom-footer:nth-of-type(1) > section:nth-of-type(3) > div:nth-of-type(3) > div:nth-of-type(1) > footer-footnote-accordion:nth-of-type(1) > div:nth-of-type(5) > div:nth-of-type(1) > fa-icon:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 17
+  },
+  {
+   "tag": "fa-icon",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-controls": "accordion-content-6",
+    "aria-label": "Details anzeigen",
+    "aria-expanded": "false"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "ng-fa-icon",
+    "ecom-fnm--translate-y-1/2",
+    "ecom-fnm-absolute",
+    "ecom-fnm-cursor-pointer",
+    "ecom-fnm-duration-150",
+    "ecom-fnm-ease-in-out",
+    "ecom-fnm-right-0",
+    "ecom-fnm-top-1/2",
+    "ecom-fnm-transform",
+    "ecom-fnm-transition"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "body > div:nth-of-type(1) > ecom-footer:nth-of-type(1) > section:nth-of-type(3) > div:nth-of-type(3) > div:nth-of-type(1) > footer-footnote-accordion:nth-of-type(1) > div:nth-of-type(6) > div:nth-of-type(1) > fa-icon:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 17
+  },
+  {
+   "tag": "fa-icon",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-controls": "accordion-content-7",
+    "aria-label": "Details anzeigen",
+    "aria-expanded": "false"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "ng-fa-icon",
+    "ecom-fnm--translate-y-1/2",
+    "ecom-fnm-absolute",
+    "ecom-fnm-cursor-pointer",
+    "ecom-fnm-duration-150",
+    "ecom-fnm-ease-in-out",
+    "ecom-fnm-right-0",
+    "ecom-fnm-top-1/2",
+    "ecom-fnm-transform",
+    "ecom-fnm-transition"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "body > div:nth-of-type(1) > ecom-footer:nth-of-type(1) > section:nth-of-type(3) > div:nth-of-type(3) > div:nth-of-type(1) > footer-footnote-accordion:nth-of-type(1) > div:nth-of-type(7) > div:nth-of-type(1) > fa-icon:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 17
+  },
+  {
+   "tag": "fa-icon",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-controls": "accordion-content-8",
+    "aria-label": "Details anzeigen",
+    "aria-expanded": "false"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "ng-fa-icon",
+    "ecom-fnm--translate-y-1/2",
+    "ecom-fnm-absolute",
+    "ecom-fnm-cursor-pointer",
+    "ecom-fnm-duration-150",
+    "ecom-fnm-ease-in-out",
+    "ecom-fnm-right-0",
+    "ecom-fnm-top-1/2",
+    "ecom-fnm-transform",
+    "ecom-fnm-transition"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "body > div:nth-of-type(1) > ecom-footer:nth-of-type(1) > section:nth-of-type(3) > div:nth-of-type(3) > div:nth-of-type(1) > footer-footnote-accordion:nth-of-type(1) > div:nth-of-type(8) > div:nth-of-type(1) > fa-icon:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 17
+  },
+  {
+   "tag": "fa-icon",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-controls": "accordion-content-9",
+    "aria-label": "Details anzeigen",
+    "aria-expanded": "false"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "ng-fa-icon",
+    "ecom-fnm--translate-y-1/2",
+    "ecom-fnm-absolute",
+    "ecom-fnm-cursor-pointer",
+    "ecom-fnm-duration-150",
+    "ecom-fnm-ease-in-out",
+    "ecom-fnm-right-0",
+    "ecom-fnm-top-1/2",
+    "ecom-fnm-transform",
+    "ecom-fnm-transition"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "body > div:nth-of-type(1) > ecom-footer:nth-of-type(1) > section:nth-of-type(3) > div:nth-of-type(3) > div:nth-of-type(1) > footer-footnote-accordion:nth-of-type(1) > div:nth-of-type(9) > div:nth-of-type(1) > fa-icon:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 17
+  },
+  {
+   "tag": "fa-icon",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-controls": "accordion-content-10",
+    "aria-label": "Details anzeigen",
+    "aria-expanded": "false"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "ng-fa-icon",
+    "ecom-fnm--translate-y-1/2",
+    "ecom-fnm-absolute",
+    "ecom-fnm-cursor-pointer",
+    "ecom-fnm-duration-150",
+    "ecom-fnm-ease-in-out",
+    "ecom-fnm-right-0",
+    "ecom-fnm-top-1/2",
+    "ecom-fnm-transform",
+    "ecom-fnm-transition"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "body > div:nth-of-type(1) > ecom-footer:nth-of-type(1) > section:nth-of-type(3) > div:nth-of-type(3) > div:nth-of-type(1) > footer-footnote-accordion:nth-of-type(1) > div:nth-of-type(10) > div:nth-of-type(1) > fa-icon:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 17
   },
   {
    "tag": "a",
@@ -1938,7 +2313,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 17
+   "behaelter": 18
   },
   {
    "tag": "a",
@@ -1958,7 +2333,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 17
+   "behaelter": 18
   },
   {
    "tag": "a",
@@ -1980,7 +2355,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 18
+   "behaelter": 19
   },
   {
    "tag": "a",
@@ -2225,7 +2600,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 19
+   "behaelter": 20
   },
   {
    "tag": "a",
@@ -2250,7 +2625,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 19
+   "behaelter": 20
   },
   {
    "tag": "a",
@@ -2275,7 +2650,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 19
+   "behaelter": 20
   },
   {
    "tag": "a",
@@ -2300,7 +2675,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 20
+   "behaelter": 21
   },
   {
    "tag": "a",
@@ -2325,7 +2700,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 20
+   "behaelter": 21
   },
   {
    "tag": "a",
@@ -2350,7 +2725,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 21
+   "behaelter": 22
   },
   {
    "tag": "a",
@@ -2375,7 +2750,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 22
+   "behaelter": 23
   },
   {
    "tag": "a",
@@ -2400,7 +2775,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 22
+   "behaelter": 23
   },
   {
    "tag": "a",
@@ -2425,7 +2800,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 22
+   "behaelter": 23
   },
   {
    "tag": "a",
@@ -2448,7 +2823,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 21
+   "behaelter": 22
   },
   {
    "tag": "a",
@@ -2473,7 +2848,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 23
+   "behaelter": 24
   },
   {
    "tag": "a",
@@ -2498,7 +2873,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 23
+   "behaelter": 24
   },
   {
    "tag": "a",
@@ -2523,7 +2898,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 23
+   "behaelter": 24
   },
   {
    "tag": "a",
@@ -2548,7 +2923,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 23
+   "behaelter": 24
   },
   {
    "tag": "a",
@@ -2573,7 +2948,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 23
+   "behaelter": 24
   },
   {
    "tag": "a",
@@ -2598,7 +2973,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 23
+   "behaelter": 24
   },
   {
    "tag": "a",
@@ -2623,7 +2998,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 24
+   "behaelter": 25
   },
   {
    "tag": "a",
@@ -2648,7 +3023,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 24
+   "behaelter": 25
   },
   {
    "tag": "a",
@@ -2673,7 +3048,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 24
+   "behaelter": 25
   },
   {
    "tag": "a",
@@ -2698,7 +3073,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 24
+   "behaelter": 25
   },
   {
    "tag": "a",
@@ -2723,7 +3098,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 24
+   "behaelter": 25
   },
   {
    "tag": "a",
@@ -2748,7 +3123,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 24
+   "behaelter": 25
   },
   {
    "tag": "a",
@@ -2773,7 +3148,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 25
+   "behaelter": 26
   },
   {
    "tag": "a",
@@ -2798,7 +3173,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 25
+   "behaelter": 26
   },
   {
    "tag": "a",
@@ -2823,7 +3198,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 25
+   "behaelter": 26
   },
   {
    "tag": "a",
@@ -2848,7 +3223,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 26
+   "behaelter": 27
   },
   {
    "tag": "a",
@@ -2873,7 +3248,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 26
+   "behaelter": 27
   },
   {
    "tag": "a",
@@ -2898,7 +3273,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 27
+   "behaelter": 28
   },
   {
    "tag": "a",
@@ -2923,7 +3298,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 28
+   "behaelter": 29
   },
   {
    "tag": "a",
@@ -2948,7 +3323,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 28
+   "behaelter": 29
   },
   {
    "tag": "a",
@@ -2973,7 +3348,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 28
+   "behaelter": 29
   },
   {
    "tag": "a",
@@ -2998,7 +3373,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 28
+   "behaelter": 29
   },
   {
    "tag": "a",
@@ -3023,7 +3398,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 29
+   "behaelter": 30
   },
   {
    "tag": "a",
@@ -3048,7 +3423,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 29
+   "behaelter": 30
   },
   {
    "tag": "a",
@@ -3073,7 +3448,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 29
+   "behaelter": 30
   },
   {
    "tag": "a",
@@ -3098,7 +3473,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 29
+   "behaelter": 30
   },
   {
    "tag": "a",
@@ -3123,7 +3498,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 29
+   "behaelter": 30
   },
   {
    "tag": "a",
@@ -3148,7 +3523,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 30
+   "behaelter": 31
   },
   {
    "tag": "a",
@@ -3173,7 +3548,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 30
+   "behaelter": 31
   },
   {
    "tag": "a",
@@ -3198,7 +3573,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 30
+   "behaelter": 31
   },
   {
    "tag": "a",
@@ -3223,7 +3598,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 30
+   "behaelter": 31
   },
   {
    "tag": "a",
@@ -3248,7 +3623,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 30
+   "behaelter": 31
   },
   {
    "tag": "a",
@@ -3273,7 +3648,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 30
+   "behaelter": 31
   },
   {
    "tag": "a",
@@ -3298,7 +3673,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 30
+   "behaelter": 31
   },
   {
    "tag": "a",
@@ -3323,7 +3698,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 30
+   "behaelter": 31
   },
   {
    "tag": "a",
@@ -3348,7 +3723,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 31
+   "behaelter": 32
   },
   {
    "tag": "a",
@@ -3373,7 +3748,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 31
+   "behaelter": 32
   },
   {
    "tag": "a",
@@ -3398,7 +3773,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 31
+   "behaelter": 32
   },
   {
    "tag": "a",
@@ -3423,7 +3798,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 31
+   "behaelter": 32
   },
   {
    "tag": "a",
@@ -3448,7 +3823,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 31
+   "behaelter": 32
   },
   {
    "tag": "a",
@@ -3473,7 +3848,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 31
+   "behaelter": 32
   },
   {
    "tag": "a",
@@ -3498,7 +3873,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 31
+   "behaelter": 32
   },
   {
    "tag": "a",
@@ -3523,7 +3898,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 31
+   "behaelter": 32
   },
   {
    "tag": "a",
@@ -3548,7 +3923,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 32
+   "behaelter": 33
   },
   {
    "tag": "a",
@@ -3573,7 +3948,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 32
+   "behaelter": 33
   },
   {
    "tag": "a",
@@ -3598,7 +3973,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 32
+   "behaelter": 33
   },
   {
    "tag": "a",
@@ -3623,7 +3998,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 32
+   "behaelter": 33
   },
   {
    "tag": "a",
@@ -3648,7 +4023,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 32
+   "behaelter": 33
   },
   {
    "tag": "a",
@@ -3695,7 +4070,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 33
+   "behaelter": 34
   },
   {
    "tag": "a",
@@ -3719,7 +4094,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 34
+   "behaelter": 35
   },
   {
    "tag": "a",
@@ -3767,7 +4142,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 35
+   "behaelter": 36
   },
   {
    "tag": "a",
@@ -3788,32 +4163,6 @@
    "ziel": null,
    "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > a:nth-of-type(1)",
    "sichtbar": false,
-   "deaktiviert": false,
-   "gewaehlt": null,
-   "optionen": null,
-   "behaelter": 36
-  },
-  {
-   "tag": "a",
-   "rolle": "link",
-   "text": "",
-   "aria": {},
-   "daten": {
-    "data-button-value": "cosmic orange"
-   },
-   "id": null,
-   "klassen": [
-    "variant-switch__button-wrapper",
-    "js-variant-button",
-    "-color-orange"
-   ],
-   "name": null,
-   "wert": null,
-   "typ": null,
-   "href": "https://www.freenet.de/handys-smartphones/apple/iphone-17-pro-mit-vertrag/b/tariffs_postpaid_voice/P-M-4234664/?desc=custom&fl=bundle&v=P-4356821",
-   "ziel": null,
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(11) > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(1)",
-   "sichtbar": true,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
@@ -3839,12 +4188,38 @@
    "typ": null,
    "href": "https://www.freenet.de/handys-smartphones/apple/iphone-17-pro-mit-vertrag/b/tariffs_postpaid_voice/P-M-4234664/?desc=custom&fl=bundle&v=P-4356821",
    "ziel": null,
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(11) > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(1)",
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(11) > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(1)",
    "sichtbar": true,
    "deaktiviert": false,
    "gewaehlt": "klasse:-active",
    "optionen": null,
-   "behaelter": 37
+   "behaelter": 38
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "",
+   "aria": {},
+   "daten": {
+    "data-button-value": "cosmic orange"
+   },
+   "id": null,
+   "klassen": [
+    "variant-switch__button-wrapper",
+    "js-variant-button",
+    "-color-orange"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.freenet.de/handys-smartphones/apple/iphone-17-pro-mit-vertrag/b/tariffs_postpaid_voice/P-M-4234664/?desc=custom&fl=bundle&v=P-4356821",
+   "ziel": null,
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(11) > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 38
   },
   {
    "tag": "a",
@@ -3870,7 +4245,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 37
+   "behaelter": 38
   },
   {
    "tag": "a",
@@ -3896,7 +4271,7 @@
    "deaktiviert": false,
    "gewaehlt": "klasse:-active",
    "optionen": null,
-   "behaelter": 38
+   "behaelter": 39
   },
   {
    "tag": "a",
@@ -3921,7 +4296,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 38
+   "behaelter": 39
   },
   {
    "tag": "a",
@@ -3946,7 +4321,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 38
+   "behaelter": 39
   },
   {
    "tag": "a",
@@ -3969,7 +4344,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 36
+   "behaelter": 37
   },
   {
    "tag": "a",
@@ -3995,18 +4370,18 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 39
+   "behaelter": 40
   },
   {
    "tag": "a",
    "rolle": "link",
    "text": "Netzwahl",
    "aria": {
-    "aria-controls": "cokhr8-accordion",
+    "aria-controls": "9b703d-accordion",
     "aria-expanded": "true"
    },
    "daten": {},
-   "id": "cokhr8-accordion-label",
+   "id": "9b703d-accordion-label",
    "klassen": [
     "accordion-title",
     "accordion__title-wrapper"
@@ -4016,12 +4391,12 @@
    "typ": null,
    "href": "https://www.freenet.de/handys-smartphones/apple/iphone-17-pro-mit-vertrag/b/tariffs_postpaid_voice/P-M-4234664/?desc=custom&fl=bundle&v=P-4356821",
    "ziel": null,
-   "pfad": "#cokhr8-accordion-label",
+   "pfad": "#\\39 b703d-accordion-label",
    "sichtbar": true,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 40
+   "behaelter": 41
   },
   {
    "tag": "a",
@@ -4041,12 +4416,12 @@
    "typ": null,
    "href": "https://www.freenet.de/handys-smartphones/apple/iphone-17-pro-mit-vertrag/b/tariffs_postpaid_voice/P-M-4234664/?desc=custom&fl=bundle&v=P-4356821",
    "ziel": null,
-   "pfad": "#cokhr8-accordion > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(1)",
+   "pfad": "#\\39 b703d-accordion > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(1)",
    "sichtbar": true,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 41
+   "behaelter": 42
   },
   {
    "tag": "a",
@@ -4066,12 +4441,12 @@
    "typ": null,
    "href": "https://www.freenet.de/handys-smartphones/apple/iphone-17-pro-mit-vertrag/b/tariffs_postpaid_voice/P-M-4234664/?desc=custom&fl=bundle&v=P-4356821",
    "ziel": null,
-   "pfad": "#cokhr8-accordion > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(2)",
+   "pfad": "#\\39 b703d-accordion > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(2)",
    "sichtbar": true,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 41
+   "behaelter": 42
   },
   {
    "tag": "a",
@@ -4091,12 +4466,12 @@
    "typ": null,
    "href": "https://www.freenet.de/handys-smartphones/apple/iphone-17-pro-mit-vertrag/b/tariffs_postpaid_voice/P-M-4234664/?desc=custom&fl=bundle&v=P-4356821",
    "ziel": null,
-   "pfad": "#cokhr8-accordion > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(3)",
+   "pfad": "#\\39 b703d-accordion > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(3)",
    "sichtbar": true,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 41
+   "behaelter": 42
   },
   {
    "tag": "a",
@@ -4116,23 +4491,23 @@
    "typ": null,
    "href": "https://www.freenet.de/handys-smartphones/apple/iphone-17-pro-mit-vertrag/b/tariffs_postpaid_voice/P-M-4234664/?desc=custom&fl=bundle&v=P-4356821",
    "ziel": null,
-   "pfad": "#cokhr8-accordion > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(4)",
+   "pfad": "#\\39 b703d-accordion > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(4)",
    "sichtbar": true,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 41
+   "behaelter": 42
   },
   {
    "tag": "a",
    "rolle": "link",
    "text": "Datenvolumen",
    "aria": {
-    "aria-controls": "3t5ktq-accordion",
+    "aria-controls": "kyys4v-accordion",
     "aria-expanded": "true"
    },
    "daten": {},
-   "id": "3t5ktq-accordion-label",
+   "id": "kyys4v-accordion-label",
    "klassen": [
     "accordion-title",
     "accordion__title-wrapper"
@@ -4142,12 +4517,12 @@
    "typ": null,
    "href": "https://www.freenet.de/handys-smartphones/apple/iphone-17-pro-mit-vertrag/b/tariffs_postpaid_voice/P-M-4234664/?desc=custom&fl=bundle&v=P-4356821",
    "ziel": null,
-   "pfad": "#\\33 t5ktq-accordion-label",
+   "pfad": "#kyys4v-accordion-label",
    "sichtbar": true,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 42
+   "behaelter": 43
   },
   {
    "tag": "a",
@@ -4170,12 +4545,12 @@
    "typ": null,
    "href": "https://www.freenet.de/handys-smartphones/apple/iphone-17-pro-mit-vertrag/b/tariffs_postpaid_voice/P-M-4234664/?desc=custom&fl=bundle&v=P-4356821",
    "ziel": null,
-   "pfad": "#\\33 t5ktq-accordion > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(1)",
+   "pfad": "#kyys4v-accordion > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(1)",
    "sichtbar": true,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 43
+   "behaelter": 44
   },
   {
    "tag": "a",
@@ -4198,12 +4573,12 @@
    "typ": null,
    "href": "https://www.freenet.de/handys-smartphones/apple/iphone-17-pro-mit-vertrag/b/tariffs_postpaid_voice/P-M-4234664/?desc=custom&fl=bundle&v=P-4356821",
    "ziel": null,
-   "pfad": "#\\33 t5ktq-accordion > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(2)",
+   "pfad": "#kyys4v-accordion > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(2)",
    "sichtbar": true,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 43
+   "behaelter": 44
   },
   {
    "tag": "a",
@@ -4226,12 +4601,12 @@
    "typ": null,
    "href": "https://www.freenet.de/handys-smartphones/apple/iphone-17-pro-mit-vertrag/b/tariffs_postpaid_voice/P-M-4234664/?desc=custom&fl=bundle&v=P-4356821",
    "ziel": null,
-   "pfad": "#\\33 t5ktq-accordion > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(3)",
+   "pfad": "#kyys4v-accordion > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(3)",
    "sichtbar": true,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 43
+   "behaelter": 44
   },
   {
    "tag": "a",
@@ -4254,33 +4629,7 @@
    "typ": null,
    "href": "https://www.freenet.de/handys-smartphones/apple/iphone-17-pro-mit-vertrag/b/tariffs_postpaid_voice/P-M-4234664/?desc=custom&fl=bundle&v=P-4356821",
    "ziel": null,
-   "pfad": "#\\33 t5ktq-accordion > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(4)",
-   "sichtbar": true,
-   "deaktiviert": false,
-   "gewaehlt": null,
-   "optionen": null,
-   "behaelter": 43
-  },
-  {
-   "tag": "a",
-   "rolle": "link",
-   "text": "Monatlicher Preis",
-   "aria": {
-    "aria-controls": "i6wzgu-accordion",
-    "aria-expanded": "true"
-   },
-   "daten": {},
-   "id": "i6wzgu-accordion-label",
-   "klassen": [
-    "accordion-title",
-    "accordion__title-wrapper"
-   ],
-   "name": null,
-   "wert": null,
-   "typ": null,
-   "href": "https://www.freenet.de/handys-smartphones/apple/iphone-17-pro-mit-vertrag/b/tariffs_postpaid_voice/P-M-4234664/?desc=custom&fl=bundle&v=P-4356821",
-   "ziel": null,
-   "pfad": "#i6wzgu-accordion-label",
+   "pfad": "#kyys4v-accordion > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(4)",
    "sichtbar": true,
    "deaktiviert": false,
    "gewaehlt": null,
@@ -4290,13 +4639,13 @@
   {
    "tag": "a",
    "rolle": "link",
-   "text": "Weitere Merkmale",
+   "text": "Monatlicher Preis",
    "aria": {
-    "aria-controls": "oug7i5-accordion",
-    "aria-expanded": "false"
+    "aria-controls": "9ogyaz-accordion",
+    "aria-expanded": "true"
    },
    "daten": {},
-   "id": "oug7i5-accordion-label",
+   "id": "9ogyaz-accordion-label",
    "klassen": [
     "accordion-title",
     "accordion__title-wrapper"
@@ -4306,12 +4655,38 @@
    "typ": null,
    "href": "https://www.freenet.de/handys-smartphones/apple/iphone-17-pro-mit-vertrag/b/tariffs_postpaid_voice/P-M-4234664/?desc=custom&fl=bundle&v=P-4356821",
    "ziel": null,
-   "pfad": "#oug7i5-accordion-label",
+   "pfad": "#\\39 ogyaz-accordion-label",
    "sichtbar": true,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
    "behaelter": 45
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Weitere Merkmale",
+   "aria": {
+    "aria-controls": "r8w8f9-accordion",
+    "aria-expanded": "false"
+   },
+   "daten": {},
+   "id": "r8w8f9-accordion-label",
+   "klassen": [
+    "accordion-title",
+    "accordion__title-wrapper"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.freenet.de/handys-smartphones/apple/iphone-17-pro-mit-vertrag/b/tariffs_postpaid_voice/P-M-4234664/?desc=custom&fl=bundle&v=P-4356821",
+   "ziel": null,
+   "pfad": "#r8w8f9-accordion-label",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 46
   },
   {
    "tag": "a",
@@ -4331,12 +4706,12 @@
    "typ": null,
    "href": "https://www.freenet.de/handys-smartphones/apple/iphone-17-pro-mit-vertrag/b/tariffs_postpaid_voice/P-M-4234664/?desc=custom&fl=bundle&v=P-4356821",
    "ziel": null,
-   "pfad": "#oug7i5-accordion > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(1)",
+   "pfad": "#r8w8f9-accordion > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(1)",
    "sichtbar": true,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 46
+   "behaelter": 47
   },
   {
    "tag": "a",
@@ -4356,12 +4731,296 @@
    "typ": null,
    "href": "https://www.freenet.de/handys-smartphones/apple/iphone-17-pro-mit-vertrag/b/tariffs_postpaid_voice/P-M-4234664/?desc=custom&fl=bundle&v=P-4356821",
    "ziel": null,
-   "pfad": "#oug7i5-accordion > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(2)",
+   "pfad": "#r8w8f9-accordion > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(2)",
    "sichtbar": true,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 46
+   "behaelter": 47
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Zum Angebot",
+   "aria": {},
+   "daten": {
+    "data-variant": "ds",
+    "data-ga-list-click": "%7B%22name%22%3A%22iPhone%2017%20Pro%22%2C%22id%22%3A%22P-M-4234664%22%2C%22category%22%3A%22MobilePhone%5C%2Fbundle%22%2C%22variant%22%3A%22Magenta%20Mobil%20M%22%2C%22dimension16%22%3A%22P-4545715%2",
+    "data-ga-click": "Funnel|nextStep|{inline}"
+   },
+   "id": null,
+   "klassen": [
+    "button-text"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.freenet.de/b/smartphones/P-M-4234664/summary/P-4545715/P-4356821?fl=bundle&v=P-4356821",
+   "ziel": null,
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 48
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Zum Angebot",
+   "aria": {},
+   "daten": {
+    "data-variant": "ds",
+    "data-ga-list-click": "%7B%22name%22%3A%22iPhone%2017%20Pro%22%2C%22id%22%3A%22P-M-4234664%22%2C%22category%22%3A%22MobilePhone%5C%2Fbundle%22%2C%22variant%22%3A%22Magenta%20Mobil%20M%20Young%205G%22%2C%22dimension16%22%3A%",
+    "data-ga-click": "Funnel|nextStep|{inline}"
+   },
+   "id": null,
+   "klassen": [
+    "button-text"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.freenet.de/b/smartphones/P-M-4234664/summary/P-4401530/P-4356821?fl=bundle&v=P-4356821",
+   "ziel": null,
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 48
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Zum Angebot",
+   "aria": {},
+   "daten": {
+    "data-variant": "ds",
+    "data-ga-list-click": "%7B%22name%22%3A%22iPhone%2017%20Pro%22%2C%22id%22%3A%22P-M-4234664%22%2C%22category%22%3A%22MobilePhone%5C%2Fbundle%22%2C%22variant%22%3A%22Magenta%20Mobil%20L%22%2C%22dimension16%22%3A%22P-4545742%2",
+    "data-ga-click": "Funnel|nextStep|{inline}"
+   },
+   "id": null,
+   "klassen": [
+    "button-text"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.freenet.de/b/smartphones/P-M-4234664/summary/P-4545742/P-4356821?fl=bundle&v=P-4356821",
+   "ziel": null,
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 48
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Zum Angebot",
+   "aria": {},
+   "daten": {
+    "data-variant": "ds",
+    "data-ga-list-click": "%7B%22name%22%3A%22iPhone%2017%20Pro%22%2C%22id%22%3A%22P-M-4234664%22%2C%22category%22%3A%22MobilePhone%5C%2Fbundle%22%2C%22variant%22%3A%22Magenta%20Mobil%20L%20Young%205G%22%2C%22dimension16%22%3A%",
+    "data-ga-click": "Funnel|nextStep|{inline}"
+   },
+   "id": null,
+   "klassen": [
+    "button-text"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.freenet.de/b/smartphones/P-M-4234664/summary/P-4401557/P-4356821?fl=bundle&v=P-4356821",
+   "ziel": null,
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 48
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Zum Angebot",
+   "aria": {},
+   "daten": {
+    "data-variant": "ds",
+    "data-ga-list-click": "%7B%22name%22%3A%22iPhone%2017%20Pro%22%2C%22id%22%3A%22P-M-4234664%22%2C%22category%22%3A%22MobilePhone%5C%2Fbundle%22%2C%22variant%22%3A%22Magenta%20Mobil%20XL%20Young%205G%22%2C%22dimension16%22%3A",
+    "data-ga-click": "Funnel|nextStep|{inline}"
+   },
+   "id": null,
+   "klassen": [
+    "button-text"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.freenet.de/b/smartphones/P-M-4234664/summary/P-4401584/P-4356821?fl=bundle&v=P-4356821",
+   "ziel": null,
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(5) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 48
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Zum Angebot",
+   "aria": {},
+   "daten": {
+    "data-variant": "ds",
+    "data-ga-list-click": "%7B%22name%22%3A%22iPhone%2017%20Pro%22%2C%22id%22%3A%22P-M-4234664%22%2C%22category%22%3A%22MobilePhone%5C%2Fbundle%22%2C%22variant%22%3A%22Magenta%20Mobil%20XL%22%2C%22dimension16%22%3A%22P-4545769%",
+    "data-ga-click": "Funnel|nextStep|{inline}"
+   },
+   "id": null,
+   "klassen": [
+    "button-text"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.freenet.de/b/smartphones/P-M-4234664/summary/P-4545769/P-4356821?fl=bundle&v=P-4356821",
+   "ziel": null,
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(6) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 48
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Zum Angebot",
+   "aria": {},
+   "daten": {
+    "data-variant": "ds",
+    "data-ga-list-click": "%7B%22name%22%3A%22iPhone%2017%20Pro%22%2C%22id%22%3A%22P-M-4234664%22%2C%22category%22%3A%22MobilePhone%5C%2Fbundle%22%2C%22variant%22%3A%22Allnet%20Unlimited%20Advanced%20100%22%2C%22dimension16%22%",
+    "data-ga-click": "Funnel|nextStep|{inline}"
+   },
+   "id": null,
+   "klassen": [
+    "button-text"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.freenet.de/b/smartphones/P-M-4234664/summary/P-4481401/P-4356821?fl=bundle&v=P-4356821",
+   "ziel": null,
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(7) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 48
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Zum Angebot",
+   "aria": {},
+   "daten": {
+    "data-variant": "ds",
+    "data-ga-list-click": "%7B%22name%22%3A%22iPhone%2017%20Pro%22%2C%22id%22%3A%22P-M-4234664%22%2C%22category%22%3A%22MobilePhone%5C%2Fbundle%22%2C%22variant%22%3A%22Allnet%20Unlimited%20Advanced%2050%22%2C%22dimension16%22%3",
+    "data-ga-click": "Funnel|nextStep|{inline}"
+   },
+   "id": null,
+   "klassen": [
+    "button-text"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.freenet.de/b/smartphones/P-M-4234664/summary/P-4481365/P-4356821?fl=bundle&v=P-4356821",
+   "ziel": null,
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(8) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 48
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Zum Angebot",
+   "aria": {},
+   "daten": {
+    "data-variant": "ds",
+    "data-ga-list-click": "%7B%22name%22%3A%22iPhone%2017%20Pro%22%2C%22id%22%3A%22P-M-4234664%22%2C%22category%22%3A%22MobilePhone%5C%2Fbundle%22%2C%22variant%22%3A%22o2%20Mobile%20M%22%2C%22dimension16%22%3A%22P-4688823%22%2C",
+    "data-ga-click": "Funnel|nextStep|{inline}"
+   },
+   "id": null,
+   "klassen": [
+    "button-text"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.freenet.de/b/smartphones/P-M-4234664/summary/P-4688823/P-4356821?fl=bundle&v=P-4356821",
+   "ziel": null,
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(9) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 48
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Zum Angebot",
+   "aria": {},
+   "daten": {
+    "data-variant": "ds",
+    "data-ga-list-click": "%7B%22name%22%3A%22iPhone%2017%20Pro%22%2C%22id%22%3A%22P-M-4234664%22%2C%22category%22%3A%22MobilePhone%5C%2Fbundle%22%2C%22variant%22%3A%22o2%20Mobile%20L%22%2C%22dimension16%22%3A%22P-4688832%22%2C",
+    "data-ga-click": "Funnel|nextStep|{inline}"
+   },
+   "id": null,
+   "klassen": [
+    "button-text"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.freenet.de/b/smartphones/P-M-4234664/summary/P-4688832/P-4356821?fl=bundle&v=P-4356821",
+   "ziel": null,
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(10) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 48
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Mehr anzeigen",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "button-text",
+    "-multiline",
+    "-color-secondary"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.freenet.de/handys-smartphones/apple/iphone-17-pro-mit-vertrag/b/tariffs_postpaid_voice/P-M-4234664/?desc=custom&fl=bundle&v=P-4356821",
+   "ziel": null,
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(11) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 48
   },
   {
    "tag": "a",
@@ -4383,7 +5042,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 47
+   "behaelter": 49
   },
   {
    "tag": "a",
@@ -4405,7 +5064,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 47
+   "behaelter": 49
   },
   {
    "tag": "a",
@@ -4427,7 +5086,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 47
+   "behaelter": 49
   },
   {
    "tag": "a",
@@ -4449,7 +5108,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 47
+   "behaelter": 49
   },
   {
    "tag": "a",
@@ -4556,7 +5215,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 48
+   "behaelter": 50
   },
   {
    "tag": "a",
@@ -4585,7 +5244,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 48
+   "behaelter": 50
   },
   {
    "tag": "a",
@@ -4614,7 +5273,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 48
+   "behaelter": 50
   },
   {
    "tag": "a",
@@ -4643,7 +5302,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 48
+   "behaelter": 50
   },
   {
    "tag": "a",
@@ -4672,7 +5331,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 48
+   "behaelter": 50
   },
   {
    "tag": "a",
@@ -4701,7 +5360,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 48
+   "behaelter": 50
   },
   {
    "tag": "a",
@@ -4730,7 +5389,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 48
+   "behaelter": 50
   },
   {
    "tag": "a",
@@ -4759,7 +5418,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 49
+   "behaelter": 51
   },
   {
    "tag": "a",
@@ -4788,7 +5447,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 49
+   "behaelter": 51
   },
   {
    "tag": "a",
@@ -4817,7 +5476,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 49
+   "behaelter": 51
   },
   {
    "tag": "a",
@@ -4846,7 +5505,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 49
+   "behaelter": 51
   },
   {
    "tag": "a",
@@ -4875,7 +5534,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 49
+   "behaelter": 51
   },
   {
    "tag": "a",
@@ -4904,7 +5563,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 49
+   "behaelter": 51
   },
   {
    "tag": "a",
@@ -4933,7 +5592,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 49
+   "behaelter": 51
   },
   {
    "tag": "a",
@@ -4962,7 +5621,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 49
+   "behaelter": 51
   },
   {
    "tag": "a",
@@ -4991,7 +5650,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 49
+   "behaelter": 51
   },
   {
    "tag": "a",
@@ -5020,7 +5679,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 49
+   "behaelter": 51
   },
   {
    "tag": "a",
@@ -5049,7 +5708,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 50
+   "behaelter": 52
   },
   {
    "tag": "a",
@@ -5078,7 +5737,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 50
+   "behaelter": 52
   },
   {
    "tag": "a",
@@ -5107,7 +5766,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 50
+   "behaelter": 52
   },
   {
    "tag": "a",
@@ -5136,7 +5795,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 50
+   "behaelter": 52
   },
   {
    "tag": "a",
@@ -5165,7 +5824,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 50
+   "behaelter": 52
   },
   {
    "tag": "a",
@@ -5194,7 +5853,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 50
+   "behaelter": 52
   },
   {
    "tag": "a",
@@ -5223,7 +5882,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 50
+   "behaelter": 52
   },
   {
    "tag": "a",
@@ -5252,7 +5911,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 50
+   "behaelter": 52
   },
   {
    "tag": "a",
@@ -5281,7 +5940,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 50
+   "behaelter": 52
   },
   {
    "tag": "a",
@@ -5310,7 +5969,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 50
+   "behaelter": 52
   },
   {
    "tag": "a",
@@ -5339,7 +5998,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 50
+   "behaelter": 52
   },
   {
    "tag": "a",
@@ -5368,7 +6027,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 50
+   "behaelter": 52
   },
   {
    "tag": "a",
@@ -5397,7 +6056,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 51
+   "behaelter": 53
   },
   {
    "tag": "a",
@@ -5426,7 +6085,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 51
+   "behaelter": 53
   },
   {
    "tag": "a",
@@ -5455,7 +6114,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 51
+   "behaelter": 53
   },
   {
    "tag": "a",
@@ -5484,7 +6143,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 51
+   "behaelter": 53
   },
   {
    "tag": "a",
@@ -5513,7 +6172,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 51
+   "behaelter": 53
   },
   {
    "tag": "a",
@@ -5542,7 +6201,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 51
+   "behaelter": 53
   },
   {
    "tag": "a",
@@ -5571,7 +6230,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 51
+   "behaelter": 53
   },
   {
    "tag": "a",
@@ -5600,7 +6259,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 51
+   "behaelter": 53
   },
   {
    "tag": "a",
@@ -5629,7 +6288,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 51
+   "behaelter": 53
   },
   {
    "tag": "a",
@@ -5658,7 +6317,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 52
+   "behaelter": 54
   },
   {
    "tag": "a",
@@ -5687,7 +6346,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 52
+   "behaelter": 54
   },
   {
    "tag": "a",
@@ -5716,7 +6375,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 52
+   "behaelter": 54
   },
   {
    "tag": "a",
@@ -5745,7 +6404,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 53
+   "behaelter": 55
   },
   {
    "tag": "a",
@@ -5774,7 +6433,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 53
+   "behaelter": 55
   },
   {
    "tag": "a",
@@ -5803,7 +6462,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 53
+   "behaelter": 55
   },
   {
    "tag": "a",
@@ -5832,7 +6491,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 53
+   "behaelter": 55
   },
   {
    "tag": "a",
@@ -5861,7 +6520,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 53
+   "behaelter": 55
   },
   {
    "tag": "a",
@@ -5890,7 +6549,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 53
+   "behaelter": 55
   },
   {
    "tag": "a",
@@ -5919,7 +6578,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 53
+   "behaelter": 55
   },
   {
    "tag": "a",
@@ -5948,7 +6607,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 53
+   "behaelter": 55
   },
   {
    "tag": "a",
@@ -5977,7 +6636,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 53
+   "behaelter": 55
   },
   {
    "tag": "a",
@@ -6006,7 +6665,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 53
+   "behaelter": 55
   },
   {
    "tag": "a",
@@ -6035,7 +6694,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 53
+   "behaelter": 55
   },
   {
    "tag": "a",
@@ -6064,7 +6723,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 53
+   "behaelter": 55
   },
   {
    "tag": "a",
@@ -6093,7 +6752,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 54
+   "behaelter": 56
   },
   {
    "tag": "a",
@@ -6122,7 +6781,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 54
+   "behaelter": 56
   },
   {
    "tag": "a",
@@ -6151,7 +6810,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 54
+   "behaelter": 56
   },
   {
    "tag": "a",
@@ -6180,7 +6839,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 54
+   "behaelter": 56
   },
   {
    "tag": "a",
@@ -6209,7 +6868,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 54
+   "behaelter": 56
   },
   {
    "tag": "a",
@@ -6238,7 +6897,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 54
+   "behaelter": 56
   },
   {
    "tag": "a",
@@ -6267,7 +6926,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 54
+   "behaelter": 56
   },
   {
    "tag": "a",
@@ -6296,7 +6955,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 54
+   "behaelter": 56
   },
   {
    "tag": "a",
@@ -6325,7 +6984,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 54
+   "behaelter": 56
   },
   {
    "tag": "a",
@@ -6354,7 +7013,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 54
+   "behaelter": 56
   },
   {
    "tag": "a",
@@ -6383,7 +7042,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 54
+   "behaelter": 56
   },
   {
    "tag": "a",
@@ -6412,7 +7071,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 54
+   "behaelter": 56
   }
  ]
 }

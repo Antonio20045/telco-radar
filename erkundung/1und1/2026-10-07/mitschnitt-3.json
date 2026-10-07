@@ -267,15 +267,15 @@
   {
    "nummer": 34,
    "methode": "GET",
-   "url": "https://mobile.1und1.de/_catalog/images/",
-   "art": "image",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/b015a129abe3909685c76f198806966f48351f15/icons.svg?bust=4",
+   "art": "xhr",
    "status": null,
-   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+   "abbruch": "net::ERR_ABORTED"
   },
   {
    "nummer": 35,
    "methode": "GET",
-   "url": "https://mobile.1und1.de/frontend/product-details/images/hwd-first-visit/d-apple-hwd-configurator-d44811-optimiert-img-info-zum-eins-und-eins-einfachwechsel.svg",
+   "url": "https://mobile.1und1.de/_catalog/images/",
    "art": "image",
    "status": null,
    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
@@ -283,7 +283,7 @@
   {
    "nummer": 36,
    "methode": "GET",
-   "url": "https://mobile.1und1.de/_catalog/images/9c73aa46f7868272bb266b7a9b5e3781-img-apple-iPhone-17-pro-orange-duo.png",
+   "url": "https://mobile.1und1.de/frontend/product-details/images/hwd-first-visit/d-apple-hwd-configurator-d44811-optimiert-img-info-zum-eins-und-eins-einfachwechsel.svg",
    "art": "image",
    "status": null,
    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
@@ -291,7 +291,7 @@
   {
    "nummer": 37,
    "methode": "GET",
-   "url": "https://mobile.1und1.de/_catalog/images/565f4c84055ad48b3b64a8dce9b55b70-img-apple-iPhone-17-pro-orange-back~235x470.png",
+   "url": "https://mobile.1und1.de/_catalog/images/9c73aa46f7868272bb266b7a9b5e3781-img-apple-iPhone-17-pro-orange-duo.png",
    "art": "image",
    "status": null,
    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
@@ -299,7 +299,7 @@
   {
    "nummer": 38,
    "methode": "GET",
-   "url": "https://mobile.1und1.de/_catalog/images/d54ed2748cd16535af7d0f7da12874a6-img-apple-iPhone-17-pro-orange-front.png",
+   "url": "https://mobile.1und1.de/_catalog/images/565f4c84055ad48b3b64a8dce9b55b70-img-apple-iPhone-17-pro-orange-back~235x470.png",
    "art": "image",
    "status": null,
    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
@@ -307,7 +307,7 @@
   {
    "nummer": 39,
    "methode": "GET",
-   "url": "https://mobile.1und1.de/_catalog/images/c121ffcda457ebac520d62c82b71c551-img-apple-iPhone-17-pro-orange-links.png",
+   "url": "https://mobile.1und1.de/_catalog/images/d54ed2748cd16535af7d0f7da12874a6-img-apple-iPhone-17-pro-orange-front.png",
    "art": "image",
    "status": null,
    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
@@ -315,7 +315,7 @@
   {
    "nummer": 40,
    "methode": "GET",
-   "url": "https://mobile.1und1.de/_catalog/images/e6b5ea0b8cd1ff3d0a85b9c6d98f8f97-img-apple-iPhone-17-pro-orange-side.png",
+   "url": "https://mobile.1und1.de/_catalog/images/c121ffcda457ebac520d62c82b71c551-img-apple-iPhone-17-pro-orange-links.png",
    "art": "image",
    "status": null,
    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
@@ -323,13 +323,21 @@
   {
    "nummer": 41,
    "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/e6b5ea0b8cd1ff3d0a85b9c6d98f8f97-img-apple-iPhone-17-pro-orange-side.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 42,
+   "methode": "GET",
    "url": "https://mobile.1und1.de/hinweistexte/ssc-allgemein-1?lightbox=true",
    "art": "document",
    "status": 200,
    "abbruch": null
   },
   {
-   "nummer": 42,
+   "nummer": 43,
    "methode": "GET",
    "url": "https://content.1und1.de/ctx/dh/libt.min.js?bust=2026100712",
    "art": "script",
@@ -337,26 +345,18 @@
    "abbruch": null
   },
   {
-   "nummer": 43,
+   "nummer": 44,
    "methode": "POST",
    "url": "https://api.1und1.de/genesys/channelroutingservice/request/productline",
    "art": "fetch",
-   "status": 200,
-   "abbruch": null
-  },
-  {
-   "nummer": 44,
-   "methode": "GET",
-   "url": "https://mobile.1und1.de/cdn-cgi/challenge-platform/scripts/jsd/main.js",
-   "art": "script",
    "status": 200,
    "abbruch": null
   },
   {
    "nummer": 45,
-   "methode": "POST",
-   "url": "https://api.1und1.de/genesys/channelroutingservice/request/productline",
-   "art": "fetch",
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/cdn-cgi/challenge-platform/scripts/jsd/main.js",
+   "art": "script",
    "status": 200,
    "abbruch": null
   },
@@ -371,10 +371,10 @@
   {
    "nummer": 47,
    "methode": "POST",
-   "url": "https://mobile.1und1.de/cdn-cgi/challenge-platform/h/g/jsd/oneshot/4df4a60fa397/0.08319912652634998:1791370838:ucV7dimT-lIecoK6gdT1Vv-IEUPH5zs5AY6uuvG6fr0/a46cc86d78300c0f",
-   "art": "xhr",
-   "status": null,
-   "abbruch": "net::ERR_ABORTED"
+   "url": "https://api.1und1.de/genesys/channelroutingservice/request/productline",
+   "art": "fetch",
+   "status": 200,
+   "abbruch": null
   },
   {
    "nummer": 48,
@@ -395,7 +395,7 @@
   {
    "nummer": 50,
    "methode": "GET",
-   "url": "https://api.1und1.de/ctx/dh/cdn/onlineshop/prod/cdh.v.js?a=1und1%2Fonlineshop%2F202608121058&cb=1791374865309",
+   "url": "https://api.1und1.de/ctx/dh/cdn/onlineshop/prod/cdh.v.js?a=1und1%2Fonlineshop%2F202608121058&cb=1791374931965",
    "art": "script",
    "status": 200,
    "abbruch": null
@@ -434,9 +434,9 @@
   },
   {
    "nummer": 55,
-   "methode": "POST",
-   "url": "https://mobile.1und1.de/cdn-cgi/challenge-platform/h/g/jsd/oneshot/4df4a60fa397/0.08319912652634998:1791370838:ucV7dimT-lIecoK6gdT1Vv-IEUPH5zs5AY6uuvG6fr0/a46cc9bddaef0c0f",
-   "art": "xhr",
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/cdn-cgi/challenge-platform/scripts/jsd/main.js",
+   "art": "script",
    "status": 200,
    "abbruch": null
   },
@@ -450,6 +450,22 @@
   },
   {
    "nummer": 57,
+   "methode": "POST",
+   "url": "https://mobile.1und1.de/cdn-cgi/challenge-platform/h/g/jsd/oneshot/4df4a60fa397/0.08319912652634998:1791370838:ucV7dimT-lIecoK6gdT1Vv-IEUPH5zs5AY6uuvG6fr0/a46cca80adcf7c56",
+   "art": "xhr",
+   "status": null,
+   "abbruch": "net::ERR_ABORTED"
+  },
+  {
+   "nummer": 58,
+   "methode": "POST",
+   "url": "https://mobile.1und1.de/cdn-cgi/challenge-platform/h/g/jsd/oneshot/4df4a60fa397/0.08319912652634998:1791370838:ucV7dimT-lIecoK6gdT1Vv-IEUPH5zs5AY6uuvG6fr0/a46ccb2c59587c56",
+   "art": "xhr",
+   "status": null,
+   "abbruch": "net::ERR_ABORTED"
+  },
+  {
+   "nummer": 59,
    "methode": "GET",
    "url": "https://mobile.1und1.de/_Resources/Persistent/8ef6d77fca8a9b5ceb565d92605217c0daa2665b/vi-d37149-img-internet-made-in-germany.svg?bust=4",
    "art": "image",
@@ -457,9 +473,57 @@
    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
   },
   {
-   "nummer": 58,
+   "nummer": 60,
    "methode": "GET",
    "url": "https://mobile.1und1.de/_Resources/Persistent/94e6afc3cf98ee3e787a4191e4a6ccb360307e11/img-logo-1und1-nachhaltigkeit.svg?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 61,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/d6f7615e22396778787074b7e3c7d76ee4911889/facebook.svg?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 62,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/2aed61bb727294182ecd1c106f222a44d7995aa0/instagram-logo.svg?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 63,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/2ce3a922137d6bb18f61efbecc1a6efc7d8b60e5/twitter.svg?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 64,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/deeb0ca24aa0d0cbcc069c0f45a4777fcf740932/youtube.svg?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 65,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/c9955fafdf1efe7c3ef9413b211f8f527c6a81bb/linkedin.svg?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 66,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/7f802e4ef61c049da1a887d2878f9c87bc399f47/xing.svg?bust=4",
    "art": "image",
    "status": null,
    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
@@ -467,7 +531,7 @@
  ],
  "antworten": [
   {
-   "nummer": 43,
+   "nummer": 44,
    "methode": "POST",
    "url": "https://api.1und1.de/genesys/channelroutingservice/request/productline",
    "art": "fetch",
@@ -475,10 +539,10 @@
    "typ": "application/json",
    "groesse": 265,
    "gekuerzt": false,
-   "koerper": "{\"requestId\":\"e5667589-e79e-418f-a498-af4723c6c018\",\"accessToken\":\"ENTFERNT\",\"channels\":[{\"channelType\":\"CHAT\",\"available\":true,\"description\":null,\"chatEnvironment\":\"prod-euc1\",\"chatDeploymentId\":\"59ba7a17-2146-40f0-b02a-b833655edb41\"}]}"
+   "koerper": "{\"requestId\":\"27c92e93-837c-4e1b-924e-6653ad76a3d1\",\"accessToken\":\"ENTFERNT\",\"channels\":[{\"channelType\":\"CHAT\",\"available\":true,\"description\":null,\"chatEnvironment\":\"prod-euc1\",\"chatDeploymentId\":\"59ba7a17-2146-40f0-b02a-b833655edb41\"}]}"
   },
   {
-   "nummer": 45,
+   "nummer": 47,
    "methode": "POST",
    "url": "https://api.1und1.de/genesys/channelroutingservice/request/productline",
    "art": "fetch",
@@ -486,7 +550,7 @@
    "typ": "application/json",
    "groesse": 266,
    "gekuerzt": false,
-   "koerper": "{\"requestId\":\"bb81ef4a-5b4c-4439-94e7-03a090e9c91f\",\"accessToken\":\"ENTFERNT\",\"channels\":[{\"channelType\":\"CHAT\",\"available\":false,\"description\":null,\"chatEnvironment\":\"prod-euc1\",\"chatDeploymentId\":\"7906e3b6-6f61-4ba1-9d44-de7d69af4a2c\"}]}"
+   "koerper": "{\"requestId\":\"be8e5e23-94d4-44f5-81fb-c4c6e36cf9a5\",\"accessToken\":\"ENTFERNT\",\"channels\":[{\"channelType\":\"CHAT\",\"available\":false,\"description\":null,\"chatEnvironment\":\"prod-euc1\",\"chatDeploymentId\":\"7906e3b6-6f61-4ba1-9d44-de7d69af4a2c\"}]}"
   },
   {
    "nummer": 48,

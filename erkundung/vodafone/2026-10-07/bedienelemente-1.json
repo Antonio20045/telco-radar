@@ -4,7 +4,7 @@
  "gruppen": [
   {
    "nummer": 0,
-   "pfad": "body > div:nth-of-type(2)",
+   "pfad": "body > div:nth-of-type(3)",
    "name": null,
    "art": "unbekannt",
    "anteile": {
@@ -2627,7 +2627,7 @@
    "typ": null,
    "href": null,
    "ziel": null,
-   "pfad": "body > div:nth-of-type(2) > div:nth-of-type(1)",
+   "pfad": "body > div:nth-of-type(3) > div:nth-of-type(1)",
    "sichtbar": false,
    "deaktiviert": false,
    "gewaehlt": null,
@@ -2649,7 +2649,7 @@
    "typ": null,
    "href": null,
    "ziel": null,
-   "pfad": "body > div:nth-of-type(2) > div:nth-of-type(3) > div:nth-of-type(1)",
+   "pfad": "body > div:nth-of-type(3) > div:nth-of-type(3) > div:nth-of-type(1)",
    "sichtbar": false,
    "deaktiviert": false,
    "gewaehlt": null,
@@ -2671,7 +2671,7 @@
    "typ": null,
    "href": null,
    "ziel": null,
-   "pfad": "body > div:nth-of-type(2) > div:nth-of-type(4) > div:nth-of-type(1)",
+   "pfad": "body > div:nth-of-type(3) > div:nth-of-type(4) > div:nth-of-type(1)",
    "sichtbar": false,
    "deaktiviert": false,
    "gewaehlt": null,
@@ -2693,7 +2693,7 @@
    "typ": null,
    "href": null,
    "ziel": null,
-   "pfad": "body > div:nth-of-type(2) > div:nth-of-type(5) > div:nth-of-type(1)",
+   "pfad": "body > div:nth-of-type(3) > div:nth-of-type(5) > div:nth-of-type(1)",
    "sichtbar": false,
    "deaktiviert": false,
    "gewaehlt": null,
@@ -2715,7 +2715,7 @@
    "typ": null,
    "href": null,
    "ziel": null,
-   "pfad": "body > div:nth-of-type(2) > div:nth-of-type(6) > div:nth-of-type(1)",
+   "pfad": "body > div:nth-of-type(3) > div:nth-of-type(6) > div:nth-of-type(1)",
    "sichtbar": false,
    "deaktiviert": false,
    "gewaehlt": null,
@@ -2738,7 +2738,7 @@
    "typ": null,
    "href": null,
    "ziel": null,
-   "pfad": "body > div:nth-of-type(2) > div:nth-of-type(7) > div:nth-of-type(1)",
+   "pfad": "body > div:nth-of-type(3) > div:nth-of-type(7) > div:nth-of-type(1)",
    "sichtbar": false,
    "deaktiviert": false,
    "gewaehlt": null,
@@ -3572,7 +3572,8 @@
    "daten": {},
    "id": "ws10-option-picker-item-label-option-picker-color-0",
    "klassen": [
-    "ws10-option-picker__label"
+    "ws10-option-picker__label",
+    "checked"
    ],
    "name": null,
    "wert": null,
@@ -3707,7 +3708,8 @@
    "daten": {},
    "id": "ws10-option-picker-item-label-option-picker-capacity-0",
    "klassen": [
-    "ws10-option-picker__label"
+    "ws10-option-picker__label",
+    "checked"
    ],
    "name": null,
    "wert": null,
@@ -3842,7 +3844,8 @@
    "daten": {},
    "id": "ws10-option-picker-item-label-option-picker-financing-duration-0",
    "klassen": [
-    "ws10-option-picker__label"
+    "ws10-option-picker__label",
+    "checked"
    ],
    "name": null,
    "wert": null,
@@ -8678,9 +8681,7 @@
    "rolle": "link",
    "text": "MeinVodafone",
    "aria": {
-    "aria-label": "MeinVodafone Login",
-    "aria-controls": "mc-nav-login-dropdown",
-    "aria-expanded": "false"
+    "aria-label": "MeinVodafone Login"
    },
    "daten": {},
    "id": null,

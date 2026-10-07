@@ -824,7 +824,7 @@
   {
    "nummer": 44,
    "pfad": "body > aside:nth-of-type(2)",
-   "name": "2026-10-07T14:06:59.559",
+   "name": "2026-10-07T14:08:24.550",
    "art": "unbekannt",
    "anteile": {
     "speicher": 0.0,
@@ -4669,7 +4669,7 @@
    "href": null,
    "ziel": null,
    "pfad": "#hwd-configuration-section > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(2)",
-   "sichtbar": false,
+   "sichtbar": true,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
@@ -4694,7 +4694,7 @@
    "href": null,
    "ziel": null,
    "pfad": "#hwd-configuration-section > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > add-to-cart-button:nth-of-type(1) > button:nth-of-type(1)",
-   "sichtbar": false,
+   "sichtbar": true,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,

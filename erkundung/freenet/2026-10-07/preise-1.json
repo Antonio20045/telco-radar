@@ -1,10 +1,190 @@
 {
- "preise_gesamt": 1,
+ "preise_gesamt": 31,
  "preise": [
   {
-   "pfad": "#i6wzgu-accordion > p:nth-of-type(1)",
+   "pfad": "#\\39 ogyaz-accordion > p:nth-of-type(1)",
    "text": "0 - 95 €",
    "kontext": "0 - 95 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "59,95 €",
+   "kontext": "mtl. nur 59,95 €",
+   "sichtbar": false
+  },
+  {
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > span:nth-of-type(1)",
+   "text": "399,99 €",
+   "kontext": "Handy einmalig 399,99 €",
+   "sichtbar": false
+  },
+  {
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "49,95 €",
+   "kontext": "mtl. nur 49,95 €",
+   "sichtbar": false
+  },
+  {
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > span:nth-of-type(1)",
+   "text": "399,99 €",
+   "kontext": "Handy einmalig 399,99 €",
+   "sichtbar": false
+  },
+  {
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "69,95 €",
+   "kontext": "mtl. nur 69,95 €",
+   "sichtbar": false
+  },
+  {
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > span:nth-of-type(1)",
+   "text": "249,99 €",
+   "kontext": "Handy einmalig 249,99 €",
+   "sichtbar": false
+  },
+  {
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "59,95 €",
+   "kontext": "mtl. nur 59,95 €",
+   "sichtbar": false
+  },
+  {
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > span:nth-of-type(1)",
+   "text": "249,99 €",
+   "kontext": "Handy einmalig 249,99 €",
+   "sichtbar": false
+  },
+  {
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(5) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "84,95 €",
+   "kontext": "mtl. nur 84,95 €",
+   "sichtbar": false
+  },
+  {
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(5) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > span:nth-of-type(1)",
+   "text": "99,99 €",
+   "kontext": "Handy einmalig 99,99 €",
+   "sichtbar": false
+  },
+  {
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(6) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "94,95 €",
+   "kontext": "mtl. nur 94,95 €",
+   "sichtbar": false
+  },
+  {
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(6) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > span:nth-of-type(1)",
+   "text": "99,99 €",
+   "kontext": "Handy einmalig 99,99 €",
+   "sichtbar": false
+  },
+  {
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(7) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "69,99 €",
+   "kontext": "mtl. nur 69,99 €",
+   "sichtbar": false
+  },
+  {
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(7) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > span:nth-of-type(1)",
+   "text": "249,99 €",
+   "kontext": "Handy einmalig 249,99 €",
+   "sichtbar": false
+  },
+  {
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(8) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "64,99 €",
+   "kontext": "mtl. nur 64,99 €",
+   "sichtbar": false
+  },
+  {
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(8) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > span:nth-of-type(1)",
+   "text": "249,99 €",
+   "kontext": "Handy einmalig 249,99 €",
+   "sichtbar": false
+  },
+  {
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(9) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "39,99 €",
+   "kontext": "mtl. nur 39,99 €",
+   "sichtbar": false
+  },
+  {
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(9) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > span:nth-of-type(1)",
+   "text": "599,99 €",
+   "kontext": "Handy einmalig 599,99 €",
+   "sichtbar": false
+  },
+  {
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(10) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "44,99 €",
+   "kontext": "mtl. nur 44,99 €",
+   "sichtbar": false
+  },
+  {
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(10) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > span:nth-of-type(1)",
+   "text": "529,99 €",
+   "kontext": "Handy einmalig 529,99 €",
+   "sichtbar": false
+  },
+  {
+   "pfad": "body > div:nth-of-type(1) > ecom-footer:nth-of-type(1) > section:nth-of-type(3) > div:nth-of-type(3) > div:nth-of-type(1) > footer-footnote-accordion:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2)",
+   "text": "Gilt bei Abschluss eines freenet Mobilfunkvertrags im Tarif Magenta Mobil M mit Smartphone 10 im Netz der Telekom. Mindestvertragslaufzeit 24 Monate, Kündigungsfrist 1 Monat zum Laufzeitende. Danach unbefristet und jederzeit mit einer Frist von einem Monat kündbar. Monatlicher Paketpreis 59,95 EUR, ",
+   "kontext": "1 Gilt bei Abschluss eines freenet Mobilfunkvertrags im Tarif Magenta Mobil M mit Smartphone 10 im Netz der Telekom. Mindestvertragslaufzeit 24 Monate, Kündigungsfrist 1 Monat zum Laufzeitende. Danach unbefristet und jederzeit mit einer Frist von einem Monat kündbar. Monatlicher Paketpreis 59,95 EUR",
+   "sichtbar": true
+  },
+  {
+   "pfad": "body > div:nth-of-type(1) > ecom-footer:nth-of-type(1) > section:nth-of-type(3) > div:nth-of-type(3) > div:nth-of-type(1) > footer-footnote-accordion:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2)",
+   "text": "Gilt bei Abschluss eines freenet Mobilfunkvertrags im Tarif Magenta Mobil M Young 5G mit Smartphone 10 im Netz der Telekom. Mindestvertragslaufzeit 24 Monate, Kündigungsfrist 1 Monat zum Laufzeitende. Danach unbefristet und jederzeit mit einer Frist von einem Monat kündbar. Monatlicher Paketpreis 49",
+   "kontext": "2 Gilt bei Abschluss eines freenet Mobilfunkvertrags im Tarif Magenta Mobil M Young 5G mit Smartphone 10 im Netz der Telekom. Mindestvertragslaufzeit 24 Monate, Kündigungsfrist 1 Monat zum Laufzeitende. Danach unbefristet und jederzeit mit einer Frist von einem Monat kündbar. Monatlicher Paketpreis ",
+   "sichtbar": true
+  },
+  {
+   "pfad": "body > div:nth-of-type(1) > ecom-footer:nth-of-type(1) > section:nth-of-type(3) > div:nth-of-type(3) > div:nth-of-type(1) > footer-footnote-accordion:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(2)",
+   "text": "Gilt bei Abschluss eines freenet Mobilfunkvertrags im Tarif Magenta Mobil L mit Smartphone 10 im Netz der Telekom. Mindestvertragslaufzeit 24 Monate, Kündigungsfrist 1 Monat zum Laufzeitende. Danach unbefristet und jederzeit mit einer Frist von einem Monat kündbar. Monatlicher Paketpreis 69,95 EUR, ",
+   "kontext": "3 Gilt bei Abschluss eines freenet Mobilfunkvertrags im Tarif Magenta Mobil L mit Smartphone 10 im Netz der Telekom. Mindestvertragslaufzeit 24 Monate, Kündigungsfrist 1 Monat zum Laufzeitende. Danach unbefristet und jederzeit mit einer Frist von einem Monat kündbar. Monatlicher Paketpreis 69,95 EUR",
+   "sichtbar": true
+  },
+  {
+   "pfad": "body > div:nth-of-type(1) > ecom-footer:nth-of-type(1) > section:nth-of-type(3) > div:nth-of-type(3) > div:nth-of-type(1) > footer-footnote-accordion:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(2)",
+   "text": "Gilt bei Abschluss eines freenet Mobilfunkvertrags im Tarif Magenta Mobil L Young 5G mit Smartphone 10 im Netz der Telekom. Mindestvertragslaufzeit 24 Monate, Kündigungsfrist 1 Monat zum Laufzeitende. Danach unbefristet und jederzeit mit einer Frist von einem Monat kündbar. Monatlicher Paketpreis 59",
+   "kontext": "4 Gilt bei Abschluss eines freenet Mobilfunkvertrags im Tarif Magenta Mobil L Young 5G mit Smartphone 10 im Netz der Telekom. Mindestvertragslaufzeit 24 Monate, Kündigungsfrist 1 Monat zum Laufzeitende. Danach unbefristet und jederzeit mit einer Frist von einem Monat kündbar. Monatlicher Paketpreis ",
+   "sichtbar": true
+  },
+  {
+   "pfad": "body > div:nth-of-type(1) > ecom-footer:nth-of-type(1) > section:nth-of-type(3) > div:nth-of-type(3) > div:nth-of-type(1) > footer-footnote-accordion:nth-of-type(1) > div:nth-of-type(5) > div:nth-of-type(1) > div:nth-of-type(2)",
+   "text": "Gilt bei Abschluss eines freenet Mobilfunkvertrags im Tarif Magenta Mobil XL Young 5G mit Smartphone 10 im Netz der Telekom. Mindestvertragslaufzeit 24 Monate, Kündigungsfrist 1 Monat zum Laufzeitende. Danach unbefristet und jederzeit mit einer Frist von einem Monat kündbar. Monatlicher Paketpreis 8",
+   "kontext": "5 Gilt bei Abschluss eines freenet Mobilfunkvertrags im Tarif Magenta Mobil XL Young 5G mit Smartphone 10 im Netz der Telekom. Mindestvertragslaufzeit 24 Monate, Kündigungsfrist 1 Monat zum Laufzeitende. Danach unbefristet und jederzeit mit einer Frist von einem Monat kündbar. Monatlicher Paketpreis",
+   "sichtbar": true
+  },
+  {
+   "pfad": "body > div:nth-of-type(1) > ecom-footer:nth-of-type(1) > section:nth-of-type(3) > div:nth-of-type(3) > div:nth-of-type(1) > footer-footnote-accordion:nth-of-type(1) > div:nth-of-type(6) > div:nth-of-type(1) > div:nth-of-type(2)",
+   "text": "Gilt bei Abschluss eines freenet Mobilfunkvertrags im Tarif Magenta Mobil XL mit Smartphone 10 im Netz der Telekom. Mindestvertragslaufzeit 24 Monate, Kündigungsfrist 1 Monat zum Laufzeitende. Danach unbefristet und jederzeit mit einer Frist von einem Monat kündbar. Monatlicher Paketpreis 94,95 EUR,",
+   "kontext": "6 Gilt bei Abschluss eines freenet Mobilfunkvertrags im Tarif Magenta Mobil XL mit Smartphone 10 im Netz der Telekom. Mindestvertragslaufzeit 24 Monate, Kündigungsfrist 1 Monat zum Laufzeitende. Danach unbefristet und jederzeit mit einer Frist von einem Monat kündbar. Monatlicher Paketpreis 94,95 EU",
+   "sichtbar": true
+  },
+  {
+   "pfad": "body > div:nth-of-type(1) > ecom-footer:nth-of-type(1) > section:nth-of-type(3) > div:nth-of-type(3) > div:nth-of-type(1) > footer-footnote-accordion:nth-of-type(1) > div:nth-of-type(7) > div:nth-of-type(1) > div:nth-of-type(2)",
+   "text": "Gilt bei Abschluss eines freenet Mobilfunkvertrags im Tarif Allnet Unlimited Advanced 100 mit Smartphone 10 im Netz der Vodafone. Mindestvertragslaufzeit 24 Monate, Kündigungsfrist 1 Monat zum Laufzeitende. Danach unbefristet und jederzeit mit einer Frist von einem Monat kündbar. Monatlicher Paketpr",
+   "kontext": "7 Gilt bei Abschluss eines freenet Mobilfunkvertrags im Tarif Allnet Unlimited Advanced 100 mit Smartphone 10 im Netz der Vodafone. Mindestvertragslaufzeit 24 Monate, Kündigungsfrist 1 Monat zum Laufzeitende. Danach unbefristet und jederzeit mit einer Frist von einem Monat kündbar. Monatlicher Paket",
+   "sichtbar": true
+  },
+  {
+   "pfad": "body > div:nth-of-type(1) > ecom-footer:nth-of-type(1) > section:nth-of-type(3) > div:nth-of-type(3) > div:nth-of-type(1) > footer-footnote-accordion:nth-of-type(1) > div:nth-of-type(8) > div:nth-of-type(1) > div:nth-of-type(2)",
+   "text": "Gilt bei Abschluss eines freenet Mobilfunkvertrags im Tarif Allnet Unlimited Advanced 50 mit Smartphone 10 im Netz der Vodafone. Mindestvertragslaufzeit 24 Monate, Kündigungsfrist 1 Monat zum Laufzeitende. Danach unbefristet und jederzeit mit einer Frist von einem Monat kündbar. Monatlicher Paketpre",
+   "kontext": "8 Gilt bei Abschluss eines freenet Mobilfunkvertrags im Tarif Allnet Unlimited Advanced 50 mit Smartphone 10 im Netz der Vodafone. Mindestvertragslaufzeit 24 Monate, Kündigungsfrist 1 Monat zum Laufzeitende. Danach unbefristet und jederzeit mit einer Frist von einem Monat kündbar. Monatlicher Paketp",
+   "sichtbar": true
+  },
+  {
+   "pfad": "body > div:nth-of-type(1) > ecom-footer:nth-of-type(1) > section:nth-of-type(3) > div:nth-of-type(3) > div:nth-of-type(1) > footer-footnote-accordion:nth-of-type(1) > div:nth-of-type(9) > div:nth-of-type(1) > div:nth-of-type(2)",
+   "text": "Gilt bei Abschluss eines freenet Mobilfunkvertrags im Tarif o2 Mobile M mit Smartphone 10 im Netz der Telefónica. Mindestvertragslaufzeit 24 Monate, Kündigungsfrist 1 Monat zum Laufzeitende. Danach unbefristet und jederzeit mit einer Frist von einem Monat kündbar. Monatlicher Paketpreis 39,99 EUR, A",
+   "kontext": "9 Gilt bei Abschluss eines freenet Mobilfunkvertrags im Tarif o2 Mobile M mit Smartphone 10 im Netz der Telefónica. Mindestvertragslaufzeit 24 Monate, Kündigungsfrist 1 Monat zum Laufzeitende. Danach unbefristet und jederzeit mit einer Frist von einem Monat kündbar. Monatlicher Paketpreis 39,99 EUR,",
+   "sichtbar": true
+  },
+  {
+   "pfad": "body > div:nth-of-type(1) > ecom-footer:nth-of-type(1) > section:nth-of-type(3) > div:nth-of-type(3) > div:nth-of-type(1) > footer-footnote-accordion:nth-of-type(1) > div:nth-of-type(10) > div:nth-of-type(1) > div:nth-of-type(2)",
+   "text": "Gilt bei Abschluss eines freenet Mobilfunkvertrags im Tarif o2 Mobile L mit Smartphone 10 im Netz der Telefónica. Mindestvertragslaufzeit 24 Monate, Kündigungsfrist 1 Monat zum Laufzeitende. Danach unbefristet und jederzeit mit einer Frist von einem Monat kündbar. Monatlicher Paketpreis 49,99 EUR, A",
+   "kontext": "10 Gilt bei Abschluss eines freenet Mobilfunkvertrags im Tarif o2 Mobile L mit Smartphone 10 im Netz der Telefónica. Mindestvertragslaufzeit 24 Monate, Kündigungsfrist 1 Monat zum Laufzeitende. Danach unbefristet und jederzeit mit einer Frist von einem Monat kündbar. Monatlicher Paketpreis 49,99 EUR",
    "sichtbar": true
   }
  ]

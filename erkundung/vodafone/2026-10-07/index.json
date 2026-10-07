@@ -9,7 +9,7 @@
  "robots_gelesen": true,
  "abstand_sekunden": 2.0,
  "besuchszeit": null,
- "dauer_sekunden": 503.3,
+ "dauer_sekunden": 1180.8,
  "zeitgrenze_sekunden": 3000,
  "seiten": [
   {
@@ -32,9 +32,10 @@
     "html": "seite-1.html.gz"
    },
    "zaehlung": {
-    "anfragen": 365,
+    "anfragen": 371,
     "verworfen": 2,
     "gescheitert": 0,
+    "hilfsdateien": 0,
     "mitschnitt": 6,
     "elemente": 396,
     "gruppen_je_art": {
@@ -57,7 +58,83 @@
      "grund": "robots.txt nicht lesbar (HTTP 400)"
     }
    ],
-   "gescheitert": []
+   "gescheitert": [],
+   "hilfsdateien": [],
+   "karte": {
+    "status": "keine_karte",
+    "karte": "vodafone.yaml",
+    "grund": "vodafone.yaml nicht vorhanden"
+   }
+  },
+  {
+   "nummer": 3,
+   "geraet": "apple-iphone-17-pro",
+   "speicher_gb": 256,
+   "adresse": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
+   "endadresse": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+   "status": "gelesen",
+   "grund": null,
+   "bot_schutz": false,
+   "http_status": 200,
+   "ruhe": true,
+   "dateien": {
+    "bedienelemente": "bedienelemente-3.json",
+    "preise": "preise-3.json",
+    "klicks": "klicks-3.json",
+    "mitschnitt": "mitschnitt-3.json",
+    "screenshot": "seite-3.png",
+    "html": "seite-3.html.gz"
+   },
+   "zaehlung": {
+    "anfragen": 384,
+    "verworfen": 5,
+    "gescheitert": 0,
+    "hilfsdateien": 0,
+    "mitschnitt": 8,
+    "elemente": 321,
+    "gruppen_je_art": {
+     "unbekannt": 96,
+     "tarif": 17,
+     "laufzeit": 1
+    },
+    "preis_kandidaten": 89,
+    "klicks": 0
+   },
+   "verworfen": [
+    {
+     "url": "https://dyn.vodafone.de/csp/csp.php?b_id=&shopid=&referer=&referrer=&protect=",
+     "grund": "per robots.txt gesperrt: /csp/csp.php?b_id=&shopid=&referer=&referrer=&protect="
+    },
+    {
+     "url": "https://cdn.dimml.io/dimml.js",
+     "grund": "robots.txt nicht lesbar (HTTP 400)"
+    },
+    {
+     "url": "https://dyn.vodafone.de/csp/csp.php?b_id=&shopid=&referer=https%3A%2F%2Fwww.vodafone.de%2Fprivat%2Fhandys%2Fiphone-17-pro.html&referrer=https%3A%2F%2Fwww.vodafone.de%2Fprivat%2Fhandys%2Fiphone-17-pro.html&protect=",
+     "grund": "per robots.txt gesperrt: /csp/csp.php?b_id=&shopid=&referer=https%3A%2F%2Fwww.vodafone.de%2Fprivat%2Fhandys%2Fiphone-17-pro.html&referrer=https%3A%2F%2Fwww.vodafone.de%2Fprivat%2Fhandys%2Fiphone-17-pro.html&protect="
+    },
+    {
+     "url": "https://at.vodafone.de/rest/v1/delivery?client=vodafonegroupservice&sessionId=ENTFERNT&version=2.6.1",
+     "grund": "nach dem Weiter-Klick nur GET und HEAD"
+    },
+    {
+     "url": "https://cdn.dimml.io/dimml.js",
+     "grund": "robots.txt nicht lesbar (HTTP 400)"
+    }
+   ],
+   "gescheitert": [],
+   "hilfsdateien": [],
+   "karte": null,
+   "folge_von": 1,
+   "weiter": {
+    "selektor": "#device-details-offer-summary-card a.ws10-button--primary",
+    "text": "Zur Tarifauswahl",
+    "treffer": 1,
+    "sichtbar": 1,
+    "geklickt": "Zur Tarifauswahl",
+    "von": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
+    "nach": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html"
+   }
   },
   {
    "nummer": 2,
@@ -79,9 +156,10 @@
     "html": "seite-2.html.gz"
    },
    "zaehlung": {
-    "anfragen": 297,
+    "anfragen": 291,
     "verworfen": 2,
     "gescheitert": 0,
+    "hilfsdateien": 0,
     "mitschnitt": 6,
     "elemente": 353,
     "gruppen_je_art": {
@@ -104,10 +182,86 @@
      "grund": "robots.txt nicht lesbar (HTTP 400)"
     }
    ],
-   "gescheitert": []
+   "gescheitert": [],
+   "hilfsdateien": [],
+   "karte": {
+    "status": "keine_karte",
+    "karte": "vodafone.yaml",
+    "grund": "vodafone.yaml nicht vorhanden"
+   }
+  },
+  {
+   "nummer": 4,
+   "geraet": "samsung-galaxy-s26",
+   "speicher_gb": 256,
+   "adresse": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html",
+   "endadresse": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+   "status": "gelesen",
+   "grund": null,
+   "bot_schutz": false,
+   "http_status": 200,
+   "ruhe": true,
+   "dateien": {
+    "bedienelemente": "bedienelemente-4.json",
+    "preise": "preise-4.json",
+    "klicks": "klicks-4.json",
+    "mitschnitt": "mitschnitt-4.json",
+    "screenshot": "seite-4.png",
+    "html": "seite-4.html.gz"
+   },
+   "zaehlung": {
+    "anfragen": 371,
+    "verworfen": 5,
+    "gescheitert": 0,
+    "hilfsdateien": 0,
+    "mitschnitt": 8,
+    "elemente": 321,
+    "gruppen_je_art": {
+     "unbekannt": 96,
+     "tarif": 17,
+     "laufzeit": 1
+    },
+    "preis_kandidaten": 89,
+    "klicks": 0
+   },
+   "verworfen": [
+    {
+     "url": "https://dyn.vodafone.de/csp/csp.php?b_id=&shopid=&referer=&referrer=&protect=",
+     "grund": "per robots.txt gesperrt: /csp/csp.php?b_id=&shopid=&referer=&referrer=&protect="
+    },
+    {
+     "url": "https://cdn.dimml.io/dimml.js",
+     "grund": "robots.txt nicht lesbar (HTTP 400)"
+    },
+    {
+     "url": "https://dyn.vodafone.de/csp/csp.php?b_id=&shopid=&referer=https%3A%2F%2Fwww.vodafone.de%2Fprivat%2Fhandys%2Fsamsung-galaxy-s26.html&referrer=https%3A%2F%2Fwww.vodafone.de%2Fprivat%2Fhandys%2Fsamsung-galaxy-s26.html&protect=",
+     "grund": "per robots.txt gesperrt: /csp/csp.php?b_id=&shopid=&referer=https%3A%2F%2Fwww.vodafone.de%2Fprivat%2Fhandys%2Fsamsung-galaxy-s26.html&referrer=https%3A%2F%2Fwww.vodafone.de%2Fprivat%2Fhandys%2Fsamsung-galaxy-s26.html&protect="
+    },
+    {
+     "url": "https://at.vodafone.de/rest/v1/delivery?client=vodafonegroupservice&sessionId=ENTFERNT&version=2.6.1",
+     "grund": "nach dem Weiter-Klick nur GET und HEAD"
+    },
+    {
+     "url": "https://cdn.dimml.io/dimml.js",
+     "grund": "robots.txt nicht lesbar (HTTP 400)"
+    }
+   ],
+   "gescheitert": [],
+   "hilfsdateien": [],
+   "karte": null,
+   "folge_von": 2,
+   "weiter": {
+    "selektor": "#device-details-offer-summary-card a.ws10-button--primary",
+    "text": "Zur Tarifauswahl",
+    "treffer": 1,
+    "sichtbar": 1,
+    "geklickt": "Zur Tarifauswahl",
+    "von": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html",
+    "nach": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html"
+   }
   }
  ],
- "groesse_bytes": 2250140,
+ "groesse_bytes": 4352609,
  "groessengrenze_bytes": 8000000,
  "gekuerzt": []
 }

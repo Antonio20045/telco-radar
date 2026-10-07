@@ -2,14 +2,14 @@
  "anbieter": "freenet",
  "name": "mobilcom-debitel",
  "datum": "2026-10-07",
- "status": "gestoert",
- "grund": "Seite 1: Seite nach 30000 ms nicht geladen",
+ "status": "gelesen",
+ "grund": null,
  "kennung": null,
  "parallelpruefung": "vor jeder Seite",
  "robots_gelesen": true,
  "abstand_sekunden": 2.0,
  "besuchszeit": null,
- "dauer_sekunden": 173.5,
+ "dauer_sekunden": 168.1,
  "zeitgrenze_sekunden": 3000,
  "seiten": [
   {
@@ -18,11 +18,11 @@
    "speicher_gb": 256,
    "adresse": "https://www.freenet.de/b/tariffs_postpaid_voice/P-M-4234664/?fl=bundle&v=P-4356815",
    "endadresse": "https://www.freenet.de/handys-smartphones/apple/iphone-17-pro-mit-vertrag/b/tariffs_postpaid_voice/P-M-4234664/?desc=custom&fl=bundle&v=P-4356821",
-   "status": "gestoert",
-   "grund": "Seite nach 30000 ms nicht geladen",
+   "status": "gelesen",
+   "grund": null,
    "bot_schutz": false,
    "http_status": 200,
-   "ruhe": null,
+   "ruhe": true,
    "dateien": {
     "bedienelemente": "bedienelemente-1.json",
     "preise": "preise-1.json",
@@ -32,64 +32,77 @@
     "html": "seite-1.html.gz"
    },
    "zaehlung": {
-    "anfragen": 115,
-    "verworfen": 10,
+    "anfragen": 184,
+    "verworfen": 5,
     "gescheitert": 0,
-    "mitschnitt": 2,
-    "elemente": 199,
+    "hilfsdateien": 6,
+    "mitschnitt": 12,
+    "elemente": 219,
     "gruppen_je_art": {
-     "unbekannt": 49,
+     "unbekannt": 50,
      "farbe": 2,
-     "tarif": 4,
+     "tarif": 5,
      "speicher": 1,
      "laufzeit": 1
     },
-    "preis_kandidaten": 1,
-    "klicks": 0
+    "preis_kandidaten": 31,
+    "klicks": 1
    },
    "verworfen": [
-    {
-     "url": "https://fnm-prod-components.s3.eu-central-1.amazonaws.com/ecom-order-progressbar/ecom-order-progressbar.styles.css.gz",
-     "grund": "robots.txt nicht lesbar (HTTP 403)"
-    },
-    {
-     "url": "https://fnm-prod-components.s3.eu-central-1.amazonaws.com/ecom-trusted-badge/ecom-trusted-badge.styles.css.gz",
-     "grund": "robots.txt nicht lesbar (HTTP 403)"
-    },
-    {
-     "url": "https://fnm-prod-components.s3.eu-central-1.amazonaws.com/ecom-footer/ecom-footer.styles.css.gz",
-     "grund": "robots.txt nicht lesbar (HTTP 403)"
-    },
     {
      "url": "https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495",
      "grund": "ReadTimeout: The read operation timed out"
     },
     {
-     "url": "https://fnm-prod-components.s3.eu-central-1.amazonaws.com/ecom-order-progressbar/ecom-order-progressbar.js.gz",
-     "grund": "robots.txt nicht lesbar (HTTP 403)"
-    },
-    {
-     "url": "https://fnm-prod-components.s3.eu-central-1.amazonaws.com/ecom-trusted-badge/ecom-trusted-badge.js.gz",
-     "grund": "robots.txt nicht lesbar (HTTP 403)"
-    },
-    {
-     "url": "https://fnm-prod-components.s3.eu-central-1.amazonaws.com/ecom-footer/ecom-footer.js.gz",
-     "grund": "robots.txt nicht lesbar (HTTP 403)"
+     "url": "https://www.freenet.de/cdn-cgi/challenge-platform/scripts/jsd/main.js",
+     "grund": "per robots.txt gesperrt: /cdn-cgi/challenge-platform/scripts/jsd/main.js"
     },
     {
      "url": "https://binkiesproductionweu.servicebus.windows.net/binkiesproductionp2weu/messages",
      "grund": "robots.txt nicht lesbar (HTTP 401)"
     },
     {
-     "url": "https://cdn.privacy-mgmt.com/unified/wrapperMessagingWithoutDetection.js?cb=1791360565556",
-     "grund": "per robots.txt gesperrt: /unified/wrapperMessagingWithoutDetection.js?cb=1791360565556"
+     "url": "https://cdn.privacy-mgmt.com/unified/wrapperMessagingWithoutDetection.js?cb=1791374874808",
+     "grund": "per robots.txt gesperrt: /unified/wrapperMessagingWithoutDetection.js?cb=1791374874808"
     },
     {
-     "url": "https://www.freenet.de/cdn-cgi/challenge-platform/scripts/jsd/main.js",
-     "grund": "per robots.txt gesperrt: /cdn-cgi/challenge-platform/scripts/jsd/main.js"
+     "url": "https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495",
+     "grund": "ReadTimeout: The read operation timed out"
     }
    ],
    "gescheitert": [],
+   "hilfsdateien": [
+    {
+     "url": "https://fnm-prod-components.s3.eu-central-1.amazonaws.com/ecom-order-progressbar/ecom-order-progressbar.styles.css.gz",
+     "art": "stylesheet",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://fnm-prod-components.s3.eu-central-1.amazonaws.com/ecom-order-progressbar/ecom-order-progressbar.js.gz",
+     "art": "script",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://fnm-prod-components.s3.eu-central-1.amazonaws.com/ecom-trusted-badge/ecom-trusted-badge.js.gz",
+     "art": "script",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://fnm-prod-components.s3.eu-central-1.amazonaws.com/ecom-trusted-badge/ecom-trusted-badge.styles.css.gz",
+     "art": "stylesheet",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://fnm-prod-components.s3.eu-central-1.amazonaws.com/ecom-footer/ecom-footer.styles.css.gz",
+     "art": "stylesheet",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://fnm-prod-components.s3.eu-central-1.amazonaws.com/ecom-footer/ecom-footer.js.gz",
+     "art": "script",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    }
+   ],
    "karte": {
     "status": "keine_karte",
     "karte": "freenet.yaml",
@@ -101,12 +114,12 @@
    "geraet": "google-pixel-10",
    "speicher_gb": 256,
    "adresse": "https://www.freenet.de/b/tariffs_postpaid_voice/P-M-4206117/?fl=bundle&v=P-4292934",
-   "endadresse": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-mit-vertrag/b/tariffs_postpaid_voice/P-M-4206117/?fl=bundle&v=P-4292934",
+   "endadresse": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-mit-vertrag/b/tariffs_postpaid_voice/P-M-4206117/?desc=custom&fl=bundle&v=P-4292919",
    "status": "gelesen",
    "grund": null,
    "bot_schutz": false,
    "http_status": 200,
-   "ruhe": false,
+   "ruhe": true,
    "dateien": {
     "bedienelemente": "bedienelemente-2.json",
     "preise": "preise-2.json",
@@ -116,10 +129,11 @@
     "html": "seite-2.html.gz"
    },
    "zaehlung": {
-    "anfragen": 121,
-    "verworfen": 10,
-    "gescheitert": 4,
-    "mitschnitt": 1,
+    "anfragen": 176,
+    "verworfen": 5,
+    "gescheitert": 0,
+    "hilfsdateien": 6,
+    "mitschnitt": 12,
     "elemente": 199,
     "gruppen_je_art": {
      "unbekannt": 49,
@@ -133,62 +147,57 @@
    },
    "verworfen": [
     {
-     "url": "https://fnm-prod-components.s3.eu-central-1.amazonaws.com/ecom-order-progressbar/ecom-order-progressbar.styles.css.gz",
-     "grund": "robots.txt nicht lesbar (HTTP 403)"
-    },
-    {
-     "url": "https://fnm-prod-components.s3.eu-central-1.amazonaws.com/ecom-trusted-badge/ecom-trusted-badge.styles.css.gz",
-     "grund": "robots.txt nicht lesbar (HTTP 403)"
-    },
-    {
-     "url": "https://fnm-prod-components.s3.eu-central-1.amazonaws.com/ecom-footer/ecom-footer.styles.css.gz",
-     "grund": "robots.txt nicht lesbar (HTTP 403)"
-    },
-    {
      "url": "https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495",
      "grund": "ReadTimeout: The read operation timed out"
-    },
-    {
-     "url": "https://fnm-prod-components.s3.eu-central-1.amazonaws.com/ecom-order-progressbar/ecom-order-progressbar.js.gz",
-     "grund": "robots.txt nicht lesbar (HTTP 403)"
-    },
-    {
-     "url": "https://fnm-prod-components.s3.eu-central-1.amazonaws.com/ecom-trusted-badge/ecom-trusted-badge.js.gz",
-     "grund": "robots.txt nicht lesbar (HTTP 403)"
-    },
-    {
-     "url": "https://fnm-prod-components.s3.eu-central-1.amazonaws.com/ecom-footer/ecom-footer.js.gz",
-     "grund": "robots.txt nicht lesbar (HTTP 403)"
     },
     {
      "url": "https://binkiesproductionweu.servicebus.windows.net/binkiesproductionp2weu/messages",
      "grund": "robots.txt nicht lesbar (HTTP 401)"
     },
     {
-     "url": "https://cdn.privacy-mgmt.com/unified/wrapperMessagingWithoutDetection.js?cb=1791360631089",
-     "grund": "per robots.txt gesperrt: /unified/wrapperMessagingWithoutDetection.js?cb=1791360631089"
+     "url": "https://cdn.privacy-mgmt.com/unified/wrapperMessagingWithoutDetection.js?cb=1791374923634",
+     "grund": "per robots.txt gesperrt: /unified/wrapperMessagingWithoutDetection.js?cb=1791374923634"
     },
     {
      "url": "https://www.freenet.de/cdn-cgi/challenge-platform/scripts/jsd/main.js",
      "grund": "per robots.txt gesperrt: /cdn-cgi/challenge-platform/scripts/jsd/main.js"
+    },
+    {
+     "url": "https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495",
+     "grund": "ReadTimeout: The read operation timed out"
     }
    ],
-   "gescheitert": [
+   "gescheitert": [],
+   "hilfsdateien": [
     {
-     "url": "https://www.freenet.de/config/error-codes.php",
-     "grund": "Host freenet.de nach 30000 ms noch belegt"
+     "url": "https://fnm-prod-components.s3.eu-central-1.amazonaws.com/ecom-order-progressbar/ecom-order-progressbar.styles.css.gz",
+     "art": "stylesheet",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
     },
     {
-     "url": "https://www.freenet.de/q/tariff-bundles?fl=bundle&v=P-4292934&f=%7B%220%22%3A%7B%7D%2C%221%22%3A%7B%7D%2C%222%22%3A%7B%7D%2C%22categories%22%3A%22tariffs_postpaid_voice%22%2C%22count%22%3A0%2C%22network%7Ctn%22%3A%5B%5D%2C%22data%7Ctd%22%3A%5B%5D%2C%22price_t%7Ctp%22%3A%5B%5D%2C%22additional%7Cta%22%3A%5B%5D%7D&s=%7B%22desc%22%3A%22custom%22%7D&v=P-4292922&_=1791360628929",
-     "grund": "Host freenet.de nach 30000 ms noch belegt"
+     "url": "https://fnm-prod-components.s3.eu-central-1.amazonaws.com/ecom-trusted-badge/ecom-trusted-badge.styles.css.gz",
+     "art": "stylesheet",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
     },
     {
-     "url": "https://www.freenet.de/shop/_ui/responsive/theme-whitelabel/partials/kameleoon-iframe-md.html",
-     "grund": "Host freenet.de nach 30000 ms noch belegt"
+     "url": "https://fnm-prod-components.s3.eu-central-1.amazonaws.com/ecom-footer/ecom-footer.styles.css.gz",
+     "art": "stylesheet",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
     },
     {
-     "url": "https://www.freenet.de/q/e?message=Timeout+PLP",
-     "grund": "Host freenet.de nach 30000 ms noch belegt"
+     "url": "https://fnm-prod-components.s3.eu-central-1.amazonaws.com/ecom-order-progressbar/ecom-order-progressbar.js.gz",
+     "art": "script",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://fnm-prod-components.s3.eu-central-1.amazonaws.com/ecom-trusted-badge/ecom-trusted-badge.js.gz",
+     "art": "script",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://fnm-prod-components.s3.eu-central-1.amazonaws.com/ecom-footer/ecom-footer.js.gz",
+     "art": "script",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
     }
    ],
    "karte": {
@@ -198,7 +207,7 @@
    }
   }
  ],
- "groesse_bytes": 975262,
+ "groesse_bytes": 1315012,
  "groessengrenze_bytes": 8000000,
  "gekuerzt": []
 }

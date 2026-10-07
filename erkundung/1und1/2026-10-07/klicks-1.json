@@ -11,60 +11,76 @@
    "pfad": "#hwd-configuration-section > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > label:nth-of-type(2)",
    "text": "512 GB",
    "wert": null,
-   "fehler": null,
-   "navigiert": "https://mobile.1und1.de/iphone-17-pro?color=COSMIC_ORANGE&size=512",
+   "fehler": "Locator.click: Timeout 5000ms exceeded.",
+   "navigiert": null,
    "umleitung": null,
    "ruhe": true,
    "anfragen": [
     {
-     "nummer": 80,
+     "nummer": 57,
      "methode": "GET",
-     "url": "https://mobile.1und1.de/frontend/product-details/images/hwd-first-visit/d-apple-hwd-configurator-d44811-optimiert-img-info-zum-eins-und-eins-einfachwechsel.svg",
+     "url": "https://mobile.1und1.de/_Resources/Persistent/8ef6d77fca8a9b5ceb565d92605217c0daa2665b/vi-d37149-img-internet-made-in-germany.svg?bust=4",
      "art": "image",
      "status": null,
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 81,
+     "nummer": 58,
      "methode": "GET",
-     "url": "https://mobile.1und1.de/_catalog/images/9c73aa46f7868272bb266b7a9b5e3781-img-apple-iPhone-17-pro-orange-duo.png",
-     "art": "image",
-     "status": null,
-     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
-    },
-    {
-     "nummer": 82,
-     "methode": "GET",
-     "url": "https://mobile.1und1.de/_catalog/images/565f4c84055ad48b3b64a8dce9b55b70-img-apple-iPhone-17-pro-orange-back~235x470.png",
-     "art": "image",
-     "status": null,
-     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
-    },
-    {
-     "nummer": 83,
-     "methode": "GET",
-     "url": "https://mobile.1und1.de/_catalog/images/d54ed2748cd16535af7d0f7da12874a6-img-apple-iPhone-17-pro-orange-front.png",
-     "art": "image",
-     "status": null,
-     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
-    },
-    {
-     "nummer": 84,
-     "methode": "GET",
-     "url": "https://mobile.1und1.de/_catalog/images/c121ffcda457ebac520d62c82b71c551-img-apple-iPhone-17-pro-orange-links.png",
-     "art": "image",
-     "status": null,
-     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
-    },
-    {
-     "nummer": 85,
-     "methode": "GET",
-     "url": "https://mobile.1und1.de/_catalog/images/e6b5ea0b8cd1ff3d0a85b9c6d98f8f97-img-apple-iPhone-17-pro-orange-side.png",
+     "url": "https://mobile.1und1.de/_Resources/Persistent/94e6afc3cf98ee3e787a4191e4a6ccb360307e11/img-logo-1und1-nachhaltigkeit.svg?bust=4",
      "art": "image",
      "status": null,
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     }
-   ]
+   ],
+   "preise_geaendert": [],
+   "marke_nachher": null,
+   "uebernommen": "nein"
+  },
+  {
+   "gruppe": 23,
+   "art": "tarif",
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > button:nth-of-type(1)",
+   "text": "",
+   "wert": null,
+   "fehler": "Locator.click: Timeout 5000ms exceeded.",
+   "navigiert": null,
+   "umleitung": null,
+   "ruhe": true,
+   "anfragen": [],
+   "preise_geaendert": [],
+   "marke_nachher": null,
+   "uebernommen": "unbekannt"
+  },
+  {
+   "gruppe": 23,
+   "art": "tarif",
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > button:nth-of-type(2)",
+   "text": "",
+   "wert": null,
+   "fehler": "Locator.click: Timeout 5000ms exceeded.",
+   "navigiert": null,
+   "umleitung": null,
+   "ruhe": true,
+   "anfragen": [],
+   "preise_geaendert": [],
+   "marke_nachher": null,
+   "uebernommen": "unbekannt"
+  },
+  {
+   "gruppe": 28,
+   "art": "tarif",
+   "pfad": "#hwd-configuration-section > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(2)",
+   "text": "",
+   "wert": null,
+   "fehler": "Locator.click: Timeout 5000ms exceeded.",
+   "navigiert": null,
+   "umleitung": null,
+   "ruhe": true,
+   "anfragen": [],
+   "preise_geaendert": [],
+   "marke_nachher": null,
+   "uebernommen": "unbekannt"
   }
  ]
 }

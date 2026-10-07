@@ -2,14 +2,14 @@
  "anbieter": "1und1",
  "name": "1&1",
  "datum": "2026-10-07",
- "status": "gelesen",
- "grund": null,
+ "status": "befund",
+ "grund": "Seite 3: Weiter-Knopf nicht klickbar: Locator.click: Timeout 5000ms exceeded.",
  "kennung": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)",
  "parallelpruefung": "vor jeder Seite",
  "robots_gelesen": true,
  "abstand_sekunden": 2.0,
  "besuchszeit": null,
- "dauer_sekunden": 135.7,
+ "dauer_sekunden": 245.9,
  "zeitgrenze_sekunden": 3000,
  "seiten": [
   {
@@ -32,20 +32,21 @@
     "html": "seite-1.html.gz"
    },
    "zaehlung": {
-    "anfragen": 85,
-    "verworfen": 4,
+    "anfragen": 58,
+    "verworfen": 2,
     "gescheitert": 0,
-    "mitschnitt": 5,
-    "elemente": 407,
+    "hilfsdateien": 1,
+    "mitschnitt": 3,
+    "elemente": 518,
     "gruppen_je_art": {
-     "unbekannt": 109,
+     "unbekannt": 179,
      "tarif": 16,
      "farbe": 1,
      "speicher": 2,
      "laufzeit": 1
     },
     "preis_kandidaten": 9,
-    "klicks": 1
+    "klicks": 4
    },
    "verworfen": [
     {
@@ -53,19 +54,88 @@
      "grund": "ReadTimeout: The read operation timed out"
     },
     {
-     "url": "https://content.1und1.de/ctx/dh/libt.min.js?bust=2026100706",
+     "url": "https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495",
+     "grund": "ReadTimeout: The read operation timed out"
+    }
+   ],
+   "gescheitert": [],
+   "hilfsdateien": [
+    {
+     "url": "https://content.1und1.de/ctx/dh/libt.min.js?bust=2026100712",
+     "art": "script",
      "grund": "robots.txt nicht lesbar (HTTP 403)"
+    }
+   ],
+   "karte": {
+    "status": "keine_karte",
+    "karte": "1und1.yaml",
+    "grund": "1und1.yaml nicht vorhanden"
+   }
+  },
+  {
+   "nummer": 3,
+   "geraet": "apple-iphone-17-pro",
+   "speicher_gb": 256,
+   "adresse": "https://mobile.1und1.de/iphone-17-pro",
+   "endadresse": "https://mobile.1und1.de/iphone-17-pro",
+   "status": "befund",
+   "grund": "Weiter-Knopf nicht klickbar: Locator.click: Timeout 5000ms exceeded.",
+   "bot_schutz": false,
+   "http_status": 200,
+   "ruhe": true,
+   "dateien": {
+    "bedienelemente": "bedienelemente-3.json",
+    "preise": "preise-3.json",
+    "klicks": "klicks-3.json",
+    "mitschnitt": "mitschnitt-3.json",
+    "screenshot": "seite-3.png",
+    "html": "seite-3.html.gz"
+   },
+   "zaehlung": {
+    "anfragen": 66,
+    "verworfen": 2,
+    "gescheitert": 0,
+    "hilfsdateien": 1,
+    "mitschnitt": 3,
+    "elemente": 518,
+    "gruppen_je_art": {
+     "unbekannt": 179,
+     "tarif": 16,
+     "farbe": 1,
+     "speicher": 2,
+     "laufzeit": 1
     },
+    "preis_kandidaten": 9,
+    "klicks": 0
+   },
+   "verworfen": [
     {
      "url": "https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495",
      "grund": "ReadTimeout: The read operation timed out"
     },
     {
-     "url": "https://js-agent.newrelic.com/nr-spa-1.318.0.min.js",
-     "grund": "per robots.txt gesperrt: /nr-spa-1.318.0.min.js"
+     "url": "https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495",
+     "grund": "ReadTimeout: The read operation timed out"
     }
    ],
-   "gescheitert": []
+   "gescheitert": [],
+   "hilfsdateien": [
+    {
+     "url": "https://content.1und1.de/ctx/dh/libt.min.js?bust=2026100712",
+     "art": "script",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    }
+   ],
+   "karte": null,
+   "folge_von": 1,
+   "weiter": {
+    "selektor": "#hwd-configuration-section button.hwd-add-to-cart-button-price-component",
+    "text": "Weiter zur Tarifauswahl",
+    "treffer": 2,
+    "sichtbar": 1,
+    "geklickt": "Weiter zur Tarifauswahl",
+    "von": "https://mobile.1und1.de/iphone-17-pro"
+   }
   },
   {
    "nummer": 2,
@@ -87,35 +157,105 @@
     "html": "seite-2.html.gz"
    },
    "zaehlung": {
-    "anfragen": 65,
-    "verworfen": 2,
+    "anfragen": 69,
+    "verworfen": 1,
     "gescheitert": 0,
-    "mitschnitt": 2,
-    "elemente": 429,
+    "hilfsdateien": 1,
+    "mitschnitt": 3,
+    "elemente": 539,
     "gruppen_je_art": {
-     "unbekannt": 112,
+     "unbekannt": 182,
      "tarif": 15,
      "farbe": 3,
      "speicher": 2,
      "laufzeit": 1
     },
     "preis_kandidaten": 12,
-    "klicks": 1
+    "klicks": 4
    },
    "verworfen": [
     {
      "url": "https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495",
      "grund": "ReadTimeout: The read operation timed out"
-    },
+    }
+   ],
+   "gescheitert": [],
+   "hilfsdateien": [
     {
-     "url": "https://content.1und1.de/ctx/dh/libt.min.js?bust=2026100706",
+     "url": "https://content.1und1.de/ctx/dh/libt.min.js?bust=2026100712",
+     "art": "script",
      "grund": "robots.txt nicht lesbar (HTTP 403)"
     }
    ],
-   "gescheitert": []
+   "karte": {
+    "status": "keine_karte",
+    "karte": "1und1.yaml",
+    "grund": "1und1.yaml nicht vorhanden"
+   }
+  },
+  {
+   "nummer": 4,
+   "geraet": "samsung-galaxy-s26",
+   "speicher_gb": 256,
+   "adresse": "https://mobile.1und1.de/samsung-galaxy-s26",
+   "endadresse": "https://mobile.1und1.de/samsung-galaxy-s26",
+   "status": "befund",
+   "grund": "Weiter-Knopf nicht klickbar: Locator.click: Timeout 5000ms exceeded.",
+   "bot_schutz": false,
+   "http_status": 200,
+   "ruhe": true,
+   "dateien": {
+    "bedienelemente": "bedienelemente-4.json",
+    "preise": "preise-4.json",
+    "klicks": "klicks-4.json",
+    "mitschnitt": "mitschnitt-4.json",
+    "screenshot": "seite-4.png",
+    "html": "seite-4.html.gz"
+   },
+   "zaehlung": {
+    "anfragen": 69,
+    "verworfen": 1,
+    "gescheitert": 0,
+    "hilfsdateien": 1,
+    "mitschnitt": 3,
+    "elemente": 539,
+    "gruppen_je_art": {
+     "unbekannt": 182,
+     "tarif": 15,
+     "farbe": 3,
+     "speicher": 2,
+     "laufzeit": 1
+    },
+    "preis_kandidaten": 12,
+    "klicks": 0
+   },
+   "verworfen": [
+    {
+     "url": "https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495",
+     "grund": "ReadTimeout: The read operation timed out"
+    }
+   ],
+   "gescheitert": [],
+   "hilfsdateien": [
+    {
+     "url": "https://content.1und1.de/ctx/dh/libt.min.js?bust=2026100712",
+     "art": "script",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    }
+   ],
+   "karte": null,
+   "folge_von": 2,
+   "weiter": {
+    "selektor": "#hwd-configuration-section button.hwd-add-to-cart-button-price-component",
+    "text": "Weiter zur Tarifauswahl",
+    "treffer": 2,
+    "sichtbar": 1,
+    "geklickt": "Weiter zur Tarifauswahl",
+    "von": "https://mobile.1und1.de/samsung-galaxy-s26"
+   }
   }
  ],
- "groesse_bytes": 1365656,
+ "groesse_bytes": 2793252,
  "groessengrenze_bytes": 8000000,
  "gekuerzt": []
 }

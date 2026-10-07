@@ -458,14 +458,6 @@
   },
   {
    "nummer": 58,
-   "methode": "POST",
-   "url": "https://api.1und1.de/genesys/channelroutingservice/request/productline",
-   "art": "fetch",
-   "status": 200,
-   "abbruch": null
-  },
-  {
-   "nummer": 59,
    "methode": "GET",
    "url": "https://api.1und1.de/ctx/dh/cdn/onlineshop/prod/cdh.js",
    "art": "script",
@@ -473,15 +465,15 @@
    "abbruch": null
   },
   {
-   "nummer": 60,
+   "nummer": 59,
    "methode": "POST",
-   "url": "https://mobile.1und1.de/cdn-cgi/challenge-platform/h/g/jsd/oneshot/4df4a60fa397/0.08319912652634998:1791370838:ucV7dimT-lIecoK6gdT1Vv-IEUPH5zs5AY6uuvG6fr0/a46ccbd1e9f12ff5",
-   "art": "xhr",
-   "status": null,
-   "abbruch": "net::ERR_ABORTED"
+   "url": "https://api.1und1.de/genesys/channelroutingservice/request/productline",
+   "art": "fetch",
+   "status": 200,
+   "abbruch": null
   },
   {
-   "nummer": 61,
+   "nummer": 60,
    "methode": "POST",
    "url": "https://api.1und1.de/ctx/dh/cs/event",
    "art": "xhr",
@@ -489,7 +481,7 @@
    "abbruch": null
   },
   {
-   "nummer": 62,
+   "nummer": 61,
    "methode": "GET",
    "url": "https://content.1und1.de/fonts/1und1-web-sans-77-90-black-condensed.woff2",
    "art": "font",
@@ -497,12 +489,20 @@
    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
   },
   {
-   "nummer": 63,
+   "nummer": 62,
    "methode": "GET",
-   "url": "https://api.1und1.de/ctx/dh/cdn/onlineshop/prod/cdh.v.js?a=1und1%2Fonlineshop%2F202608121058&cb=1791374986282",
+   "url": "https://api.1und1.de/ctx/dh/cdn/onlineshop/prod/cdh.v.js?a=1und1%2Fonlineshop%2F202608121058&cb=1791375041730",
    "art": "script",
    "status": 200,
    "abbruch": null
+  },
+  {
+   "nummer": 63,
+   "methode": "POST",
+   "url": "https://mobile.1und1.de/cdn-cgi/challenge-platform/h/g/jsd/oneshot/4df4a60fa397/0.08319912652634998:1791370838:ucV7dimT-lIecoK6gdT1Vv-IEUPH5zs5AY6uuvG6fr0/a46ccd4589dd588f",
+   "art": "xhr",
+   "status": null,
+   "abbruch": "net::ERR_ABORTED"
   },
   {
    "nummer": 64,
@@ -563,21 +563,21 @@
    "typ": "application/json",
    "groesse": 266,
    "gekuerzt": false,
-   "koerper": "{\"requestId\":\"088ba652-619e-477e-8513-62a724cbb47a\",\"accessToken\":\"ENTFERNT\",\"channels\":[{\"channelType\":\"CHAT\",\"available\":false,\"description\":null,\"chatEnvironment\":\"prod-euc1\",\"chatDeploymentId\":\"59ba7a17-2146-40f0-b02a-b833655edb41\"}]}"
+   "koerper": "{\"requestId\":\"3e7168bb-3c89-460c-a123-560596684ccb\",\"accessToken\":\"ENTFERNT\",\"channels\":[{\"channelType\":\"CHAT\",\"available\":false,\"description\":null,\"chatEnvironment\":\"prod-euc1\",\"chatDeploymentId\":\"59ba7a17-2146-40f0-b02a-b833655edb41\"}]}"
   },
   {
-   "nummer": 58,
+   "nummer": 59,
    "methode": "POST",
    "url": "https://api.1und1.de/genesys/channelroutingservice/request/productline",
    "art": "fetch",
    "status": 200,
    "typ": "application/json",
-   "groesse": 265,
+   "groesse": 266,
    "gekuerzt": false,
-   "koerper": "{\"requestId\":\"51b2f55f-6d3e-4835-89a5-07e16f48490a\",\"accessToken\":\"ENTFERNT\",\"channels\":[{\"channelType\":\"CHAT\",\"available\":true,\"description\":null,\"chatEnvironment\":\"prod-euc1\",\"chatDeploymentId\":\"7906e3b6-6f61-4ba1-9d44-de7d69af4a2c\"}]}"
+   "koerper": "{\"requestId\":\"887c44d9-c822-482f-8f9c-69b89c800a73\",\"accessToken\":\"ENTFERNT\",\"channels\":[{\"channelType\":\"CHAT\",\"available\":false,\"description\":null,\"chatEnvironment\":\"prod-euc1\",\"chatDeploymentId\":\"7906e3b6-6f61-4ba1-9d44-de7d69af4a2c\"}]}"
   },
   {
-   "nummer": 61,
+   "nummer": 60,
    "methode": "POST",
    "url": "https://api.1und1.de/ctx/dh/cs/event",
    "art": "xhr",

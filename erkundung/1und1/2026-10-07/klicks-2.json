@@ -11,47 +11,15 @@
    "pfad": "#hwd-configuration-section > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > label:nth-of-type(2)",
    "text": "512 GB",
    "wert": null,
-   "fehler": null,
-   "navigiert": "https://mobile.1und1.de/samsung-galaxy-s26?color=COBALT_VIOLET&size=512",
+   "fehler": "Locator.click: Timeout 5000ms exceeded.",
+   "navigiert": null,
    "umleitung": null,
    "ruhe": true,
    "anfragen": [
     {
-     "nummer": 60,
-     "methode": "GET",
-     "url": "https://mobile.1und1.de/frontend/product-details/images/hwd-first-visit/d-android-hwd-configurator-d44811-optimiert-img-info-zum-eins-und-eins-einfachwechsel.svg",
-     "art": "image",
-     "status": null,
-     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
-    },
-    {
-     "nummer": 61,
-     "methode": "GET",
-     "url": "https://mobile.1und1.de/_catalog/images/c7671e327ea0c1e6fbb095d579fc9a1c-img-samsung-galaxy-s26-violet-duo-1.png",
-     "art": "image",
-     "status": null,
-     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
-    },
-    {
-     "nummer": 62,
-     "methode": "GET",
-     "url": "https://mobile.1und1.de/_catalog/images/1cd29eb62dedca4c2b5d118e2bfea17e-img-samsung-galaxy-s26-violet-back~235x470.png",
-     "art": "image",
-     "status": null,
-     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
-    },
-    {
-     "nummer": 63,
-     "methode": "GET",
-     "url": "https://mobile.1und1.de/_catalog/images/0652976f22e7986c6837768980b7bc1c-img-samsung-galaxy-s26-violet-rechts.png",
-     "art": "image",
-     "status": null,
-     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
-    },
-    {
      "nummer": 64,
      "methode": "GET",
-     "url": "https://mobile.1und1.de/_catalog/images/53ac3ab433514823fc527a02cbd82a19-img-samsung-galaxy-s26-violet-front-badge-1.png",
+     "url": "https://mobile.1und1.de/_Resources/Persistent/b24de564ee8fc2158a6218ceccf954059ba9998b/d-t-m-ssc-feature-card-1-v4599-img-samsung-galaxy-s26-796x448.webp?bust=4",
      "art": "image",
      "status": null,
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
@@ -59,12 +27,92 @@
     {
      "nummer": 65,
      "methode": "GET",
-     "url": "https://mobile.1und1.de/_catalog/images/84aec9cc5f440c9900f1c4ea274b244e-img-samsung-galaxy-s26-violet-side.png",
+     "url": "https://mobile.1und1.de/_Resources/Persistent/b3c565607df4873259735ce88cf6984fd16836cc/d-t-m-ssc-feature-card-2-v4599-img-samsung-galaxy-s26-796x448.webp?bust=4",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 66,
+     "methode": "GET",
+     "url": "https://mobile.1und1.de/_Resources/Persistent/7728cc3685786344206173f565a60dbc6aef6d6c/d-t-m-ssc-feature-card-3-v4599-img-samsung-galaxy-s26-796x448.webp?bust=4",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 67,
+     "methode": "GET",
+     "url": "https://mobile.1und1.de/_Resources/Persistent/34f005c556b75e38295623dd5cdc2d057e405cd4/69ef99608afaf268d81a2623007b0dae-img-award-chip-galaxy-s26-sehr-gut.png?bust=4",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 68,
+     "methode": "GET",
+     "url": "https://mobile.1und1.de/_Resources/Persistent/e4726df72e1519d85c1d0bb21a19ffb44d6e17a0/a82c4452a5f09dd8691cde567d40840b-img-award-comp-bild-galaxy-s26-sehr-gut.png?bust=4",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 69,
+     "methode": "GET",
+     "url": "https://mobile.1und1.de/_Resources/Persistent/0782a112c6be0492e06cc0b84da30699ae12e655/09e1309a408d9f97decf0ce708fa6842-award-d48539-img-connect-samsung-galaxy-s26-sehr-gut.png?bust=4",
      "art": "image",
      "status": null,
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     }
-   ]
+   ],
+   "preise_geaendert": [],
+   "marke_nachher": null,
+   "uebernommen": "nein"
+  },
+  {
+   "gruppe": 23,
+   "art": "tarif",
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > button:nth-of-type(1)",
+   "text": "",
+   "wert": null,
+   "fehler": "Locator.click: Timeout 5000ms exceeded.",
+   "navigiert": null,
+   "umleitung": null,
+   "ruhe": true,
+   "anfragen": [],
+   "preise_geaendert": [],
+   "marke_nachher": null,
+   "uebernommen": "unbekannt"
+  },
+  {
+   "gruppe": 23,
+   "art": "tarif",
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > button:nth-of-type(2)",
+   "text": "",
+   "wert": null,
+   "fehler": "Locator.click: Timeout 5000ms exceeded.",
+   "navigiert": null,
+   "umleitung": null,
+   "ruhe": true,
+   "anfragen": [],
+   "preise_geaendert": [],
+   "marke_nachher": null,
+   "uebernommen": "unbekannt"
+  },
+  {
+   "gruppe": 30,
+   "art": "tarif",
+   "pfad": "#hwd-configuration-section > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(2)",
+   "text": "",
+   "wert": null,
+   "fehler": "Locator.click: Timeout 5000ms exceeded.",
+   "navigiert": null,
+   "umleitung": null,
+   "ruhe": true,
+   "anfragen": [],
+   "preise_geaendert": [],
+   "marke_nachher": null,
+   "uebernommen": "unbekannt"
   }
  ]
 }

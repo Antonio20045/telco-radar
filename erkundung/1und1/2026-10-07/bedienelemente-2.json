@@ -1,6 +1,6 @@
 {
- "elemente_gesamt": 429,
- "elemente_gelesen": 429,
+ "elemente_gesamt": 539,
+ "elemente_gelesen": 539,
  "gruppen": [
   {
    "nummer": 0,
@@ -15,7 +15,7 @@
    },
    "elemente": [
     0,
-    153
+    255
    ],
    "select": false,
    "mit_marke": false
@@ -33,7 +33,7 @@
    },
    "elemente": [
     1,
-    154
+    256
    ],
    "select": false,
    "mit_marke": false
@@ -51,7 +51,7 @@
    },
    "elemente": [
     2,
-    167
+    269
    ],
    "select": false,
    "mit_marke": false
@@ -69,7 +69,7 @@
    },
    "elemente": [
     3,
-    168
+    270
    ],
    "select": false,
    "mit_marke": false
@@ -87,7 +87,7 @@
    },
    "elemente": [
     4,
-    185
+    287
    ],
    "select": false,
    "mit_marke": false
@@ -105,7 +105,7 @@
    },
    "elemente": [
     5,
-    186
+    288
    ],
    "select": false,
    "mit_marke": false
@@ -124,8 +124,8 @@
    "elemente": [
     6,
     7,
-    207,
-    208
+    309,
+    310
    ],
    "select": false,
    "mit_marke": false
@@ -143,7 +143,7 @@
    },
    "elemente": [
     8,
-    209
+    311
    ],
    "select": false,
    "mit_marke": false
@@ -162,8 +162,8 @@
    "elemente": [
     9,
     10,
-    218,
-    219
+    320,
+    321
    ],
    "select": false,
    "mit_marke": false
@@ -181,7 +181,7 @@
    },
    "elemente": [
     11,
-    220
+    322
    ],
    "select": false,
    "mit_marke": false
@@ -200,8 +200,8 @@
    "elemente": [
     12,
     13,
-    236,
-    237
+    338,
+    339
    ],
    "select": false,
    "mit_marke": false
@@ -219,7 +219,7 @@
    },
    "elemente": [
     14,
-    238
+    340
    ],
    "select": false,
    "mit_marke": false
@@ -238,8 +238,8 @@
    "elemente": [
     15,
     16,
-    253,
-    254
+    355,
+    356
    ],
    "select": false,
    "mit_marke": false
@@ -257,7 +257,7 @@
    },
    "elemente": [
     17,
-    255
+    357
    ],
    "select": false,
    "mit_marke": false
@@ -275,7 +275,7 @@
    },
    "elemente": [
     18,
-    261
+    363
    ],
    "select": false,
    "mit_marke": false
@@ -293,7 +293,7 @@
    },
    "elemente": [
     19,
-    262
+    364
    ],
    "select": false,
    "mit_marke": false
@@ -311,7 +311,7 @@
    },
    "elemente": [
     20,
-    268
+    370
    ],
    "select": false,
    "mit_marke": false
@@ -329,7 +329,7 @@
    },
    "elemente": [
     21,
-    269
+    371
    ],
    "select": false,
    "mit_marke": false
@@ -347,7 +347,7 @@
    },
    "elemente": [
     22,
-    293
+    395
    ],
    "select": false,
    "mit_marke": false
@@ -365,7 +365,7 @@
    },
    "elemente": [
     23,
-    294
+    396
    ],
    "select": false,
    "mit_marke": false
@@ -383,7 +383,7 @@
    },
    "elemente": [
     24,
-    319
+    421
    ],
    "select": false,
    "mit_marke": false
@@ -401,7 +401,7 @@
    },
    "elemente": [
     25,
-    320
+    422
    ],
    "select": false,
    "mit_marke": false
@@ -438,7 +438,7 @@
     27,
     28,
     29,
-    322
+    424
    ],
    "select": false,
    "mit_marke": false
@@ -550,7 +550,7 @@
    },
    "elemente": [
     44,
-    330
+    432
    ],
    "select": false,
    "mit_marke": false
@@ -797,7 +797,7 @@
    },
    "elemente": [
     82,
-    332
+    434
    ],
    "select": false,
    "mit_marke": false
@@ -878,7 +878,7 @@
     96,
     99,
     100,
-    336
+    438
    ],
    "select": false,
    "mit_marke": false
@@ -926,7 +926,7 @@
   {
    "nummer": 49,
    "pfad": "body > aside:nth-of-type(2)",
-   "name": "2026-10-07T08:35:30.865",
+   "name": "2026-10-07T14:09:18.516",
    "art": "unbekannt",
    "anteile": {
     "speicher": 0.0,
@@ -936,8 +936,8 @@
    },
    "elemente": [
     107,
-    338,
-    346
+    440,
+    448
    ],
    "select": false,
    "mit_marke": false
@@ -975,7 +975,7 @@
    },
    "elemente": [
     112,
-    343
+    445
    ],
    "select": false,
    "mit_marke": false
@@ -993,7 +993,7 @@
    },
    "elemente": [
     113,
-    347
+    449
    ],
    "select": false,
    "mit_marke": false
@@ -1011,7 +1011,7 @@
    },
    "elemente": [
     114,
-    364
+    466
    ],
    "select": false,
    "mit_marke": false
@@ -1029,7 +1029,7 @@
    },
    "elemente": [
     115,
-    374
+    476
    ],
    "select": false,
    "mit_marke": false
@@ -1047,7 +1047,7 @@
    },
    "elemente": [
     116,
-    392
+    494
    ],
    "select": false,
    "mit_marke": false
@@ -1065,7 +1065,7 @@
    },
    "elemente": [
     117,
-    404
+    506
    ],
    "select": false,
    "mit_marke": false
@@ -1083,7 +1083,7 @@
    },
    "elemente": [
     118,
-    405
+    507
    ],
    "select": false,
    "mit_marke": false
@@ -1101,7 +1101,7 @@
    },
    "elemente": [
     119,
-    420
+    522
    ],
    "select": false,
    "mit_marke": false
@@ -1119,7 +1119,7 @@
    },
    "elemente": [
     120,
-    421
+    523
    ],
    "select": false,
    "mit_marke": false
@@ -1137,7 +1137,7 @@
    },
    "elemente": [
     121,
-    422
+    524
    ],
    "select": false,
    "mit_marke": false
@@ -1155,7 +1155,7 @@
    },
    "elemente": [
     122,
-    423
+    525
    ],
    "select": false,
    "mit_marke": false
@@ -1173,7 +1173,7 @@
    },
    "elemente": [
     123,
-    424
+    526
    ],
    "select": false,
    "mit_marke": false
@@ -1191,7 +1191,7 @@
    },
    "elemente": [
     124,
-    425
+    527
    ],
    "select": false,
    "mit_marke": false
@@ -1210,7 +1210,7 @@
    "elemente": [
     125,
     126,
-    426
+    528
    ],
    "select": false,
    "mit_marke": false
@@ -1228,7 +1228,7 @@
    },
    "elemente": [
     127,
-    428
+    530
    ],
    "select": false,
    "mit_marke": false
@@ -1246,14 +1246,14 @@
    },
    "elemente": [
     128,
-    427
+    529
    ],
    "select": false,
    "mit_marke": false
   },
   {
    "nummer": 67,
-   "pfad": "body > ul:nth-of-type(1)",
+   "pfad": "#consent-details",
    "name": null,
    "art": "unbekannt",
    "anteile": {
@@ -1263,17 +1263,31 @@
     "farbe": 0.0
    },
    "elemente": [
-    129,
-    130,
-    131,
-    132
+    129
    ],
    "select": false,
    "mit_marke": false
   },
   {
    "nummer": 68,
-   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1)",
+   "pfad": "#consent-details > div:nth-of-type(2)",
+   "name": "Cookie-Einstellungen",
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    130
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 69,
+   "pfad": "#consent-details > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
    "anteile": {
@@ -1283,36 +1297,14 @@
     "farbe": 0.0
    },
    "elemente": [
-    133,
-    134
+    131
    ],
    "select": false,
    "mit_marke": true
   },
   {
-   "nummer": 69,
-   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2)",
-   "name": "Privatkunden Geschäftskunden",
-   "art": "unbekannt",
-   "anteile": {
-    "speicher": 0.0,
-    "laufzeit": 0.0,
-    "tarif": 0.0,
-    "farbe": 0.0
-   },
-   "elemente": [
-    135,
-    136,
-    137,
-    138,
-    139
-   ],
-   "select": false,
-   "mit_marke": false
-  },
-  {
    "nummer": 70,
-   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1)",
+   "pfad": "#consent-details > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > label:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
    "anteile": {
@@ -1322,14 +1314,15 @@
     "farbe": 0.0
    },
    "elemente": [
-    140
+    132,
+    133
    ],
    "select": false,
-   "mit_marke": false
+   "mit_marke": true
   },
   {
    "nummer": 71,
-   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(1)",
+   "pfad": "#consent-details > div:nth-of-type(3) > div:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
    "anteile": {
@@ -1339,14 +1332,14 @@
     "farbe": 0.0
    },
    "elemente": [
-    141
+    134
    ],
    "select": false,
    "mit_marke": false
   },
   {
    "nummer": 72,
-   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(1) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(1) > ul:nth-of-type(1)",
+   "pfad": "#consent-details > div:nth-of-type(3) > div:nth-of-type(2) > div:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
    "anteile": {
@@ -1356,18 +1349,14 @@
     "farbe": 0.0
    },
    "elemente": [
-    142,
-    143,
-    144,
-    145,
-    146
+    135
    ],
    "select": false,
    "mit_marke": false
   },
   {
    "nummer": 73,
-   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(1) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(2) > ul:nth-of-type(1)",
+   "pfad": "#cC_1_label",
    "name": null,
    "art": "unbekannt",
    "anteile": {
@@ -1377,19 +1366,15 @@
     "farbe": 0.0
    },
    "elemente": [
-    147,
-    148,
-    149,
-    150,
-    151,
-    152
+    136,
+    137
    ],
    "select": false,
    "mit_marke": false
   },
   {
    "nummer": 74,
-   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(2)",
+   "pfad": "#consent-details > div:nth-of-type(3) > div:nth-of-type(2)",
    "name": null,
    "art": "unbekannt",
    "anteile": {
@@ -1399,14 +1384,14 @@
     "farbe": 0.0
    },
    "elemente": [
-    155
+    138
    ],
    "select": false,
    "mit_marke": false
   },
   {
    "nummer": 75,
-   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(2) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(1) > ul:nth-of-type(1)",
+   "pfad": "#consent-details > div:nth-of-type(3) > div:nth-of-type(3) > div:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
    "anteile": {
@@ -1416,17 +1401,14 @@
     "farbe": 0.0
    },
    "elemente": [
-    156,
-    157,
-    158,
-    159
+    139
    ],
    "select": false,
    "mit_marke": false
   },
   {
    "nummer": 76,
-   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(2) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(2) > ul:nth-of-type(1)",
+   "pfad": "#cC_2_label",
    "name": null,
    "art": "unbekannt",
    "anteile": {
@@ -1436,20 +1418,15 @@
     "farbe": 0.0
    },
    "elemente": [
-    160,
-    161,
-    162,
-    163,
-    164,
-    165,
-    166
+    140,
+    141
    ],
    "select": false,
    "mit_marke": false
   },
   {
    "nummer": 77,
-   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(3)",
+   "pfad": "#consent-details > div:nth-of-type(3) > div:nth-of-type(3)",
    "name": null,
    "art": "unbekannt",
    "anteile": {
@@ -1459,14 +1436,14 @@
     "farbe": 0.0
    },
    "elemente": [
-    169
+    142
    ],
    "select": false,
    "mit_marke": false
   },
   {
    "nummer": 78,
-   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(3) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(1) > ul:nth-of-type(1)",
+   "pfad": "#consent-details > div:nth-of-type(3) > div:nth-of-type(4) > div:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
    "anteile": {
@@ -1476,20 +1453,367 @@
     "farbe": 0.0
    },
    "elemente": [
-    170,
-    171,
-    172,
-    173,
-    174,
-    175,
-    176
+    143
    ],
    "select": false,
    "mit_marke": false
   },
   {
    "nummer": 79,
-   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(3) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(2) > ul:nth-of-type(1)",
+   "pfad": "#cC_3_label",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    144,
+    145
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 80,
+   "pfad": "#consent-details > div:nth-of-type(3) > div:nth-of-type(4)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    146
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 81,
+   "pfad": "#cm-consentDesc",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    147
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 82,
+   "pfad": "#descContent_1 > ul:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    148
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 83,
+   "pfad": "#descContent_1 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    149,
+    150,
+    151
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 84,
+   "pfad": "#descContent_1 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    152,
+    156
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 85,
+   "pfad": "#descContent_1 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(2)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    153
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 86,
+   "pfad": "#ck_2_label",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    154,
+    155
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 87,
+   "pfad": "#descContent_1 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(3)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    157,
+    161
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 88,
+   "pfad": "#descContent_1 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(3) > td:nth-of-type(2)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    158
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 89,
+   "pfad": "#ck_1_label",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    159,
+    160
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 90,
+   "pfad": "#descContent_1 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(4)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    162,
+    166
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 91,
+   "pfad": "#descContent_1 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(4) > td:nth-of-type(2)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    163
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 92,
+   "pfad": "#ck_4_label",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    164,
+    165
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 93,
+   "pfad": "#descContent_1 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(5)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    167,
+    171
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 94,
+   "pfad": "#descContent_1 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(5) > td:nth-of-type(2)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    168
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 95,
+   "pfad": "#ck_5_label",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    169,
+    170
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 96,
+   "pfad": "#descContent_1 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(6)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    172,
+    176
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 97,
+   "pfad": "#descContent_1 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(6) > td:nth-of-type(2)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    173
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 98,
+   "pfad": "#ck_6_label",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    174,
+    175
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 99,
+   "pfad": "#descContent_1 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(7)",
    "name": null,
    "art": "unbekannt",
    "anteile": {
@@ -1500,20 +1824,14 @@
    },
    "elemente": [
     177,
-    178,
-    179,
-    180,
-    181,
-    182,
-    183,
-    184
+    181
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 80,
-   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(4)",
+   "nummer": 100,
+   "pfad": "#descContent_1 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(7) > td:nth-of-type(2)",
    "name": null,
    "art": "unbekannt",
    "anteile": {
@@ -1523,14 +1841,103 @@
     "farbe": 0.0
    },
    "elemente": [
-    187
+    178
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 81,
-   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(4) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(1) > ul:nth-of-type(1)",
+   "nummer": 101,
+   "pfad": "#ck_7_label",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    179,
+    180
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 102,
+   "pfad": "#descContent_1 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(8)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    182,
+    186
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 103,
+   "pfad": "#descContent_1 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(8) > td:nth-of-type(2)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    183
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 104,
+   "pfad": "#ck_11_label",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    184,
+    185
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 105,
+   "pfad": "#descContent_2 > ul:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    187,
+    201
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 106,
+   "pfad": "#descContent_2 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
    "anteile": {
@@ -1541,20 +1948,49 @@
    },
    "elemente": [
     188,
-    189,
-    190,
+    189
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 107,
+   "pfad": "#descContent_2 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    190
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 108,
+   "pfad": "#ck_10_label",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
     191,
-    192,
-    193,
-    194,
-    195
+    192
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 82,
-   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(4) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(1)",
+   "nummer": 109,
+   "pfad": "#descContent_2 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2)",
    "name": null,
    "art": "unbekannt",
    "anteile": {
@@ -1564,17 +2000,85 @@
     "farbe": 0.0
    },
    "elemente": [
-    196,
-    197,
+    193
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 110,
+   "pfad": "#descContent_2 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(3) > td:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    194
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 111,
+   "pfad": "#ck_15_label",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    195,
+    196
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 112,
+   "pfad": "#descContent_2 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(3)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    197
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 113,
+   "pfad": "#descContent_2 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(4)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
     198,
-    199
+    199,
+    200
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 83,
-   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(4) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(2) > ul:nth-of-type(1)",
+   "nummer": 114,
+   "pfad": "#descContent_3 > ul:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
    "anteile": {
@@ -1584,60 +2088,240 @@
     "farbe": 0.0
    },
    "elemente": [
-    200,
-    201,
-    202,
+    202
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 115,
+   "pfad": "#descContent_3 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
     203,
-    204,
-    205,
-    206
+    204
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 84,
-   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(5)",
+   "nummer": 116,
+   "pfad": "#descContent_3 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(1)",
    "name": null,
-   "art": "tarif",
+   "art": "unbekannt",
    "anteile": {
     "speicher": 0.0,
     "laufzeit": 0.0,
-    "tarif": 1.0,
+    "tarif": 0.0,
     "farbe": 0.0
    },
    "elemente": [
-    210
+    205
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 85,
-   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(5) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(1) > ul:nth-of-type(1)",
+   "nummer": 117,
+   "pfad": "#ck_12_label",
    "name": null,
-   "art": "tarif",
+   "art": "unbekannt",
    "anteile": {
     "speicher": 0.0,
     "laufzeit": 0.0,
-    "tarif": 1.0,
+    "tarif": 0.0,
     "farbe": 0.0
    },
    "elemente": [
-    211,
-    212,
-    213,
+    206,
+    207
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 118,
+   "pfad": "#descContent_3 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    208
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 119,
+   "pfad": "#descContent_3 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(3) > td:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    209
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 120,
+   "pfad": "#ck_13_label",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    210,
+    211
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 121,
+   "pfad": "#descContent_3 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(3)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    212
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 122,
+   "pfad": "#descContent_3 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(4) > td:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    213
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 123,
+   "pfad": "#ck_14_label",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
     214,
-    215,
-    216,
+    215
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 124,
+   "pfad": "#descContent_3 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(4)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    216
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 125,
+   "pfad": "#descContent_3 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(5) > td:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
     217
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 86,
-   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(6)",
+   "nummer": 126,
+   "pfad": "#ck_9_label",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    218,
+    219
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 127,
+   "pfad": "#descContent_3 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(5)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    220
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 128,
+   "pfad": "#descContent_3 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(6) > td:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
    "anteile": {
@@ -1653,8 +2337,8 @@
    "mit_marke": false
   },
   {
-   "nummer": 87,
-   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(6) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(1) > ul:nth-of-type(1)",
+   "nummer": 129,
+   "pfad": "#ck_3_label",
    "name": null,
    "art": "unbekannt",
    "anteile": {
@@ -1665,15 +2349,31 @@
    },
    "elemente": [
     222,
-    223,
+    223
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 130,
+   "pfad": "#descContent_3 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(6)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
     224
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 88,
-   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(6) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(1)",
+   "nummer": 131,
+   "pfad": "#consent-details > div:nth-of-type(5) > div:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
    "anteile": {
@@ -1684,7 +2384,23 @@
    },
    "elemente": [
     225,
-    226,
+    226
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 132,
+   "pfad": "#consent-wall",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
     227,
     228
    ],
@@ -1692,8 +2408,8 @@
    "mit_marke": false
   },
   {
-   "nummer": 89,
-   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(6) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(2) > ul:nth-of-type(1)",
+   "nummer": 133,
+   "pfad": "#consent-wall > div:nth-of-type(3) > div:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
    "anteile": {
@@ -1705,18 +2421,34 @@
    "elemente": [
     229,
     230,
+    535
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 134,
+   "pfad": "body > ul:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
     231,
     232,
     233,
-    234,
-    235
+    234
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 90,
-   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(7)",
+   "nummer": 135,
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
    "anteile": {
@@ -1726,15 +2458,16 @@
     "farbe": 0.0
    },
    "elemente": [
-    239
+    235,
+    236
    ],
    "select": false,
-   "mit_marke": false
+   "mit_marke": true
   },
   {
-   "nummer": 91,
-   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(7) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(1) > ul:nth-of-type(1)",
-   "name": null,
+   "nummer": 136,
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2)",
+   "name": "Privatkunden Geschäftskunden",
    "art": "unbekannt",
    "anteile": {
     "speicher": 0.0,
@@ -1743,16 +2476,35 @@
     "farbe": 0.0
    },
    "elemente": [
+    237,
+    238,
+    239,
     240,
-    241,
+    241
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 137,
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
     242
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 92,
-   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(7) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(1)",
+   "nummer": 138,
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
    "anteile": {
@@ -1762,16 +2514,14 @@
     "farbe": 0.0
    },
    "elemente": [
-    243,
-    244,
-    245
+    243
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 93,
-   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(7) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(2) > ul:nth-of-type(1)",
+   "nummer": 139,
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(1) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(1) > ul:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
    "anteile": {
@@ -1781,20 +2531,40 @@
     "farbe": 0.0
    },
    "elemente": [
+    244,
+    245,
     246,
     247,
-    248,
+    248
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 140,
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(1) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(2) > ul:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
     249,
     250,
     251,
-    252
+    252,
+    253,
+    254
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 94,
-   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(8)",
+   "nummer": 141,
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(2)",
    "name": null,
    "art": "unbekannt",
    "anteile": {
@@ -1804,14 +2574,14 @@
     "farbe": 0.0
    },
    "elemente": [
-    256
+    257
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 95,
-   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(8) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(1) > ul:nth-of-type(1)",
+   "nummer": 142,
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(2) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(1) > ul:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
    "anteile": {
@@ -1821,17 +2591,17 @@
     "farbe": 0.0
    },
    "elemente": [
-    257,
     258,
     259,
-    260
+    260,
+    261
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 96,
-   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(8) > div:nth-of-type(1) > ul:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1)",
+   "nummer": 143,
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(2) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(2) > ul:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
    "anteile": {
@@ -1841,50 +2611,20 @@
     "farbe": 0.0
    },
    "elemente": [
-    263
-   ],
-   "select": false,
-   "mit_marke": false
-  },
-  {
-   "nummer": 97,
-   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(9)",
-   "name": null,
-   "art": "tarif",
-   "anteile": {
-    "speicher": 0.0,
-    "laufzeit": 0.0,
-    "tarif": 1.0,
-    "farbe": 0.0
-   },
-   "elemente": [
-    264
-   ],
-   "select": false,
-   "mit_marke": false
-  },
-  {
-   "nummer": 98,
-   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(9) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(1) > ul:nth-of-type(1)",
-   "name": null,
-   "art": "tarif",
-   "anteile": {
-    "speicher": 0.0,
-    "laufzeit": 0.0,
-    "tarif": 1.0,
-    "farbe": 0.0
-   },
-   "elemente": [
+    262,
+    263,
+    264,
     265,
     266,
-    267
+    267,
+    268
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 99,
-   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(10)",
+   "nummer": 144,
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(3)",
    "name": null,
    "art": "unbekannt",
    "anteile": {
@@ -1894,14 +2634,14 @@
     "farbe": 0.0
    },
    "elemente": [
-    270
+    271
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 100,
-   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(10) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(1) > ul:nth-of-type(1)",
+   "nummer": 145,
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(3) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(1) > ul:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
    "anteile": {
@@ -1911,68 +2651,85 @@
     "farbe": 0.0
    },
    "elemente": [
-    271,
     272,
     273,
     274,
     275,
     276,
     277,
-    278,
+    278
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 146,
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(3) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(2) > ul:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
     279,
     280,
     281,
-    282
-   ],
-   "select": false,
-   "mit_marke": false
-  },
-  {
-   "nummer": 101,
-   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(10) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(2) > ul:nth-of-type(1)",
-   "name": null,
-   "art": "unbekannt",
-   "anteile": {
-    "speicher": 0.0,
-    "laufzeit": 0.0,
-    "tarif": 0.0,
-    "farbe": 0.0
-   },
-   "elemente": [
+    282,
     283,
     284,
     285,
-    286,
-    287,
-    288,
-    289,
+    286
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 147,
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(4)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    289
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 148,
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(4) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(1) > ul:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
     290,
     291,
-    292
+    292,
+    293,
+    294,
+    295,
+    296,
+    297
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 102,
-   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(10) > div:nth-of-type(1) > ul:nth-of-type(1) > div:nth-of-type(2)",
-   "name": "NEU - IONOSKI-TelefonassistentVerpassen Sie keinen Kundenanruf – 24/7 verfügbar",
-   "art": "unbekannt",
-   "anteile": {
-    "speicher": 0.0,
-    "laufzeit": 0.0,
-    "tarif": 0.0,
-    "farbe": 0.0
-   },
-   "elemente": [
-    295
-   ],
-   "select": false,
-   "mit_marke": false
-  },
-  {
-   "nummer": 103,
-   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(11)",
+   "nummer": 149,
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(4) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
    "anteile": {
@@ -1982,28 +2739,26 @@
     "farbe": 0.0
    },
    "elemente": [
-    296
-   ],
-   "select": false,
-   "mit_marke": false
-  },
-  {
-   "nummer": 104,
-   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(11) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(1) > ul:nth-of-type(1)",
-   "name": null,
-   "art": "unbekannt",
-   "anteile": {
-    "speicher": 0.0,
-    "laufzeit": 0.0,
-    "tarif": 0.0,
-    "farbe": 0.0
-   },
-   "elemente": [
-    297,
     298,
     299,
     300,
-    301,
+    301
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 150,
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(4) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(2) > ul:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
     302,
     303,
     304,
@@ -2016,51 +2771,48 @@
    "mit_marke": false
   },
   {
-   "nummer": 105,
-   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(11) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(2) > ul:nth-of-type(1)",
+   "nummer": 151,
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(5)",
    "name": null,
-   "art": "unbekannt",
+   "art": "tarif",
    "anteile": {
     "speicher": 0.0,
     "laufzeit": 0.0,
-    "tarif": 0.0,
+    "tarif": 1.0,
     "farbe": 0.0
    },
    "elemente": [
-    309,
-    310,
-    311,
-    312,
+    312
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 152,
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(5) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(1) > ul:nth-of-type(1)",
+   "name": null,
+   "art": "tarif",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 1.0,
+    "farbe": 0.0
+   },
+   "elemente": [
     313,
     314,
     315,
     316,
     317,
-    318
+    318,
+    319
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 106,
-   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(11) > div:nth-of-type(1) > ul:nth-of-type(1) > div:nth-of-type(2)",
-   "name": "NEU - IONOSKI-TelefonassistentVerpassen Sie keinen Kundenanruf – 24/7 verfügbar",
-   "art": "unbekannt",
-   "anteile": {
-    "speicher": 0.0,
-    "laufzeit": 0.0,
-    "tarif": 0.0,
-    "farbe": 0.0
-   },
-   "elemente": [
-    321
-   ],
-   "select": false,
-   "mit_marke": false
-  },
-  {
-   "nummer": 107,
-   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1)",
+   "nummer": 153,
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(6)",
    "name": null,
    "art": "unbekannt",
    "anteile": {
@@ -2076,26 +2828,8 @@
    "mit_marke": false
   },
   {
-   "nummer": 108,
-   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2)",
-   "name": "Zum Login",
-   "art": "unbekannt",
-   "anteile": {
-    "speicher": 0.0,
-    "laufzeit": 0.0,
-    "tarif": 0.0,
-    "farbe": 0.0
-   },
-   "elemente": [
-    324,
-    325
-   ],
-   "select": false,
-   "mit_marke": false
-  },
-  {
-   "nummer": 109,
-   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1)",
+   "nummer": 154,
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(6) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(1) > ul:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
    "anteile": {
@@ -2105,14 +2839,16 @@
     "farbe": 0.0
    },
    "elemente": [
+    324,
+    325,
     326
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 110,
-   "pfad": "#navigation > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > nav:nth-of-type(1) > ol:nth-of-type(1)",
+   "nummer": 155,
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(6) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
    "anteile": {
@@ -2124,31 +2860,15 @@
    "elemente": [
     327,
     328,
-    329
+    329,
+    330
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 111,
-   "pfad": "#hwd-configuration-section > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(4)",
-   "name": "Welche Farbe gefällt Ihnen? Farbe: Cobalt Violet Wie viel Speicher benötigen Sie? 256 GB 512 GB Sofort lieferbar",
-   "art": "speicher",
-   "anteile": {
-    "speicher": 0.5,
-    "laufzeit": 0.0,
-    "tarif": 0.0,
-    "farbe": 0.5
-   },
-   "elemente": [
-    331
-   ],
-   "select": false,
-   "mit_marke": false
-  },
-  {
-   "nummer": 112,
-   "pfad": "#awards-collapse > section:nth-of-type(1) > ul:nth-of-type(1)",
+   "nummer": 156,
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(6) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(2) > ul:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
    "anteile": {
@@ -2158,115 +2878,98 @@
     "farbe": 0.0
    },
    "elemente": [
+    331,
+    332,
     333,
     334,
-    335
+    335,
+    336,
+    337
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 113,
-   "pfad": "body > aside:nth-of-type(2) > div:nth-of-type(4)",
-   "name": "Beratung & VerkaufKunden-Hotline1ChatChat",
-   "art": "unbekannt",
-   "anteile": {
-    "speicher": 0.0,
-    "laufzeit": 0.0,
-    "tarif": 0.0,
-    "farbe": 0.0
-   },
-   "elemente": [
-    339,
-    340
-   ],
-   "select": false,
-   "mit_marke": false
-  },
-  {
-   "nummer": 114,
-   "pfad": "body > aside:nth-of-type(2) > div:nth-of-type(5)",
-   "name": "Beratung & Verkauf 0721 / 960 6000Anrufen",
-   "art": "unbekannt",
-   "anteile": {
-    "speicher": 0.0,
-    "laufzeit": 0.0,
-    "tarif": 0.0,
-    "farbe": 0.0
-   },
-   "elemente": [
-    341,
-    342
-   ],
-   "select": false,
-   "mit_marke": false
-  },
-  {
-   "nummer": 115,
-   "pfad": "body > aside:nth-of-type(2) > div:nth-of-type(6)",
-   "name": "Beratung & Verkauf 0721 / 960 6000Anrufen",
-   "art": "unbekannt",
-   "anteile": {
-    "speicher": 0.0,
-    "laufzeit": 0.0,
-    "tarif": 0.0,
-    "farbe": 0.0
-   },
-   "elemente": [
-    344,
-    345
-   ],
-   "select": false,
-   "mit_marke": false
-  },
-  {
-   "nummer": 116,
-   "pfad": "#controllId-1-1 > li:nth-of-type(1)",
+   "nummer": 157,
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(7)",
    "name": null,
-   "art": "tarif",
+   "art": "unbekannt",
    "anteile": {
     "speicher": 0.0,
     "laufzeit": 0.0,
-    "tarif": 1.0,
+    "tarif": 0.0,
     "farbe": 0.0
    },
    "elemente": [
-    348
+    341
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 117,
-   "pfad": "#controllId-1-1 > li:nth-of-type(1) > ul:nth-of-type(1)",
+   "nummer": 158,
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(7) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(1) > ul:nth-of-type(1)",
    "name": null,
-   "art": "tarif",
+   "art": "unbekannt",
    "anteile": {
     "speicher": 0.0,
     "laufzeit": 0.0,
-    "tarif": 0.5,
+    "tarif": 0.0,
     "farbe": 0.0
    },
    "elemente": [
+    342,
+    343,
+    344
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 159,
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(7) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    345,
+    346,
+    347
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 160,
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(7) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(2) > ul:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    348,
     349,
     350,
     351,
     352,
     353,
-    354,
-    355,
-    356,
-    357,
-    358,
-    359,
-    360
+    354
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 118,
-   "pfad": "#controllId-1-1 > li:nth-of-type(2)",
+   "nummer": 161,
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(8)",
    "name": null,
    "art": "unbekannt",
    "anteile": {
@@ -2276,6 +2979,25 @@
     "farbe": 0.0
    },
    "elemente": [
+    358
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 162,
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(8) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(1) > ul:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    359,
+    360,
     361,
     362
    ],
@@ -2283,31 +3005,14 @@
    "mit_marke": false
   },
   {
-   "nummer": 119,
-   "pfad": "#controllId-1-1",
+   "nummer": 163,
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(8) > div:nth-of-type(1) > ul:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
    "anteile": {
     "speicher": 0.0,
     "laufzeit": 0.0,
     "tarif": 0.0,
-    "farbe": 0.0
-   },
-   "elemente": [
-    363
-   ],
-   "select": false,
-   "mit_marke": false
-  },
-  {
-   "nummer": 120,
-   "pfad": "#controllId-2-1 > li:nth-of-type(1)",
-   "name": null,
-   "art": "tarif",
-   "anteile": {
-    "speicher": 0.0,
-    "laufzeit": 0.0,
-    "tarif": 1.0,
     "farbe": 0.0
    },
    "elemente": [
@@ -2317,32 +3022,44 @@
    "mit_marke": false
   },
   {
-   "nummer": 121,
-   "pfad": "#controllId-2-1 > li:nth-of-type(1) > ul:nth-of-type(1)",
+   "nummer": 164,
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(9)",
    "name": null,
    "art": "tarif",
    "anteile": {
     "speicher": 0.0,
     "laufzeit": 0.0,
-    "tarif": 0.5,
+    "tarif": 1.0,
     "farbe": 0.0
    },
    "elemente": [
-    366,
+    366
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 165,
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(9) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(1) > ul:nth-of-type(1)",
+   "name": null,
+   "art": "tarif",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 1.0,
+    "farbe": 0.0
+   },
+   "elemente": [
     367,
     368,
-    369,
-    370,
-    371,
-    372,
-    373
+    369
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 122,
-   "pfad": "#controllId-3-1 > li:nth-of-type(1)",
+   "nummer": 166,
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(10)",
    "name": null,
    "art": "unbekannt",
    "anteile": {
@@ -2352,14 +3069,14 @@
     "farbe": 0.0
    },
    "elemente": [
-    375
+    372
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 123,
-   "pfad": "#controllId-3-1 > li:nth-of-type(1) > ul:nth-of-type(1)",
+   "nummer": 167,
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(10) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(1) > ul:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
    "anteile": {
@@ -2369,6 +3086,9 @@
     "farbe": 0.0
    },
    "elemente": [
+    373,
+    374,
+    375,
     376,
     377,
     378,
@@ -2383,7 +3103,462 @@
    "mit_marke": false
   },
   {
-   "nummer": 124,
+   "nummer": 168,
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(10) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(2) > ul:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    385,
+    386,
+    387,
+    388,
+    389,
+    390,
+    391,
+    392,
+    393,
+    394
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 169,
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(10) > div:nth-of-type(1) > ul:nth-of-type(1) > div:nth-of-type(2)",
+   "name": "NEU - IONOSKI-TelefonassistentVerpassen Sie keinen Kundenanruf – 24/7 verfügbar",
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    397
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 170,
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(11)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    398
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 171,
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(11) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(1) > ul:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    399,
+    400,
+    401,
+    402,
+    403,
+    404,
+    405,
+    406,
+    407,
+    408,
+    409,
+    410
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 172,
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(11) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(2) > ul:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    411,
+    412,
+    413,
+    414,
+    415,
+    416,
+    417,
+    418,
+    419,
+    420
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 173,
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(11) > div:nth-of-type(1) > ul:nth-of-type(1) > div:nth-of-type(2)",
+   "name": "NEU - IONOSKI-TelefonassistentVerpassen Sie keinen Kundenanruf – 24/7 verfügbar",
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    423
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 174,
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    425
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 175,
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2)",
+   "name": "Zum Login",
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    426,
+    427
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 176,
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    428
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 177,
+   "pfad": "#navigation > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > nav:nth-of-type(1) > ol:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    429,
+    430,
+    431
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 178,
+   "pfad": "#hwd-configuration-section > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(4)",
+   "name": "Welche Farbe gefällt Ihnen? Farbe: Cobalt Violet Wie viel Speicher benötigen Sie? 256 GB 512 GB Sofort lieferbar",
+   "art": "speicher",
+   "anteile": {
+    "speicher": 0.5,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.5
+   },
+   "elemente": [
+    433
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 179,
+   "pfad": "#awards-collapse > section:nth-of-type(1) > ul:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    435,
+    436,
+    437
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 180,
+   "pfad": "body > aside:nth-of-type(2) > div:nth-of-type(4)",
+   "name": "Beratung & VerkaufKunden-Hotline1ChatChat",
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    441,
+    442
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 181,
+   "pfad": "body > aside:nth-of-type(2) > div:nth-of-type(5)",
+   "name": "Beratung & Verkauf 0721 / 960 6000Anrufen",
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    443,
+    444
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 182,
+   "pfad": "body > aside:nth-of-type(2) > div:nth-of-type(6)",
+   "name": "Beratung & Verkauf 0721 / 960 6000Anrufen",
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    446,
+    447
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 183,
+   "pfad": "#controllId-1-1 > li:nth-of-type(1)",
+   "name": null,
+   "art": "tarif",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 1.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    450
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 184,
+   "pfad": "#controllId-1-1 > li:nth-of-type(1) > ul:nth-of-type(1)",
+   "name": null,
+   "art": "tarif",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.5,
+    "farbe": 0.0
+   },
+   "elemente": [
+    451,
+    452,
+    453,
+    454,
+    455,
+    456,
+    457,
+    458,
+    459,
+    460,
+    461,
+    462
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 185,
+   "pfad": "#controllId-1-1 > li:nth-of-type(2)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    463,
+    464
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 186,
+   "pfad": "#controllId-1-1",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    465
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 187,
+   "pfad": "#controllId-2-1 > li:nth-of-type(1)",
+   "name": null,
+   "art": "tarif",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 1.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    467
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 188,
+   "pfad": "#controllId-2-1 > li:nth-of-type(1) > ul:nth-of-type(1)",
+   "name": null,
+   "art": "tarif",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.5,
+    "farbe": 0.0
+   },
+   "elemente": [
+    468,
+    469,
+    470,
+    471,
+    472,
+    473,
+    474,
+    475
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 189,
+   "pfad": "#controllId-3-1 > li:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    477
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 190,
+   "pfad": "#controllId-3-1 > li:nth-of-type(1) > ul:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    478,
+    479,
+    480,
+    481,
+    482,
+    483,
+    484,
+    485,
+    486
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 191,
    "pfad": "#controllId-3-1 > li:nth-of-type(2)",
    "name": null,
    "art": "unbekannt",
@@ -2394,13 +3569,13 @@
     "farbe": 0.0
    },
    "elemente": [
-    385
+    487
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 125,
+   "nummer": 192,
    "pfad": "#controllId-3-1 > li:nth-of-type(2) > ul:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
@@ -2411,15 +3586,15 @@
     "farbe": 0.0
    },
    "elemente": [
-    386,
-    387,
-    388
+    488,
+    489,
+    490
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 126,
+   "nummer": 193,
    "pfad": "#controllId-3-1 > li:nth-of-type(3)",
    "name": null,
    "art": "unbekannt",
@@ -2430,13 +3605,13 @@
     "farbe": 0.0
    },
    "elemente": [
-    389
+    491
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 127,
+   "nummer": 194,
    "pfad": "#controllId-3-1 > li:nth-of-type(3) > ul:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
@@ -2447,14 +3622,14 @@
     "farbe": 0.0
    },
    "elemente": [
-    390,
-    391
+    492,
+    493
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 128,
+   "nummer": 195,
    "pfad": "#controllId-4-1 > li:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
@@ -2465,13 +3640,13 @@
     "farbe": 0.0
    },
    "elemente": [
-    393
+    495
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 129,
+   "nummer": 196,
    "pfad": "#controllId-4-1 > li:nth-of-type(1) > ul:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
@@ -2482,17 +3657,17 @@
     "farbe": 0.0
    },
    "elemente": [
-    394,
-    395,
-    396,
-    397,
-    398
+    496,
+    497,
+    498,
+    499,
+    500
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 130,
+   "nummer": 197,
    "pfad": "#controllId-4-1 > li:nth-of-type(2)",
    "name": null,
    "art": "unbekannt",
@@ -2503,13 +3678,13 @@
     "farbe": 0.0
    },
    "elemente": [
-    399
+    501
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 131,
+   "nummer": 198,
    "pfad": "#controllId-4-1 > li:nth-of-type(2) > ul:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
@@ -2520,16 +3695,16 @@
     "farbe": 0.0
    },
    "elemente": [
-    400,
-    401,
-    402,
-    403
+    502,
+    503,
+    504,
+    505
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 132,
+   "nummer": 199,
    "pfad": "#footer > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ul:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
@@ -2540,20 +3715,75 @@
     "farbe": 0.0
    },
    "elemente": [
-    406,
-    407,
-    408,
-    409,
-    410,
-    411,
-    412,
-    413,
-    414,
-    415,
-    416,
-    417,
-    418,
-    419
+    508,
+    509,
+    510,
+    511,
+    512,
+    513,
+    514,
+    515,
+    516,
+    517,
+    518,
+    519,
+    520,
+    521
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 200,
+   "pfad": "#consent-details > div:nth-of-type(2) > p:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    531,
+    532
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 201,
+   "pfad": "#consent-details > div:nth-of-type(6)",
+   "name": "Link zum Impressum",
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    533,
+    534
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 202,
+   "pfad": "#consent-wall > div:nth-of-type(4) > div:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    536,
+    537,
+    538
    ],
    "select": false,
    "mit_marke": false
@@ -5203,7 +6433,7 @@
   {
    "tag": "div",
    "rolle": "button",
-   "text": "1",
+   "text": "",
    "aria": {
     "aria-label": "Flyout öffnen"
    },
@@ -5296,6 +6526,7 @@
    "klassen": [
     "contact-bubble__icon-text",
     "bg-secondary-100",
+    "d-none",
     "contact-bubble__button--transparent"
    ],
    "name": null,
@@ -5322,8 +6553,7 @@
    "klassen": [
     "contact-bubble__icon-text",
     "disabled",
-    "contact-bubble__button--transparent",
-    "d-none"
+    "contact-bubble__button--transparent"
    ],
    "name": null,
    "wert": null,
@@ -5756,6 +6986,2266 @@
    "behaelter": 66
   },
   {
+   "tag": "p",
+   "rolle": "p",
+   "text": "Cookie-Einstellungen",
+   "aria": {},
+   "daten": {},
+   "id": "cm-headline",
+   "klassen": [
+    "title"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#cm-headline",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 67
+  },
+  {
+   "tag": "p",
+   "rolle": "p",
+   "text": "Wir setzen Cookies ein, um Ihnen die Webseitennutzung zu erleichtern, unsere Produkte zu verbessern und auf Sie zuzuschneiden sowie Ihnen zusammen mit weiteren Unternehmen personalisierte Angebote zu ",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#consent-details > div:nth-of-type(2) > p:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 68
+  },
+  {
+   "tag": "label",
+   "rolle": "label",
+   "text": "Notwendig",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "container",
+    "greyed-text"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#consent-details > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > label:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": true,
+   "gewaehlt": "label-checked",
+   "optionen": null,
+   "behaelter": 69
+  },
+  {
+   "tag": "input",
+   "rolle": "checkbox",
+   "text": "on",
+   "aria": {},
+   "daten": {},
+   "id": "default",
+   "klassen": [
+    "cmCat-checkbox"
+   ],
+   "name": "necessary",
+   "wert": null,
+   "typ": "checkbox",
+   "href": null,
+   "ziel": null,
+   "pfad": "#default",
+   "sichtbar": false,
+   "deaktiviert": true,
+   "gewaehlt": "checked",
+   "optionen": null,
+   "behaelter": 70
+  },
+  {
+   "tag": "span",
+   "rolle": "checkbox",
+   "text": "",
+   "aria": {
+    "aria-checked": "true",
+    "aria-labelledby": "default_label"
+   },
+   "daten": {},
+   "id": "checkmark_default",
+   "klassen": [
+    "checkmark",
+    "cmNoEdit"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#checkmark_default",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": "aria-checked",
+   "optionen": null,
+   "behaelter": 70
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "Details",
+   "aria": {
+    "aria-expanded": "false",
+    "aria-controls": "cm-consentDesc"
+   },
+   "daten": {},
+   "id": "cmDetailCat_0",
+   "klassen": [
+    "cm-descToggle"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#cmDetailCat_0",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 71
+  },
+  {
+   "tag": "label",
+   "rolle": "label",
+   "text": "Komfort*",
+   "aria": {},
+   "daten": {},
+   "id": "cC_1_label",
+   "klassen": [
+    "container"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#cC_1_label",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 72
+  },
+  {
+   "tag": "input",
+   "rolle": "checkbox",
+   "text": "on",
+   "aria": {},
+   "daten": {},
+   "id": "cmCall_1",
+   "klassen": [
+    "cmCallAll"
+   ],
+   "name": "statistics",
+   "wert": null,
+   "typ": "checkbox",
+   "href": null,
+   "ziel": null,
+   "pfad": "#cmCall_1",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 73
+  },
+  {
+   "tag": "span",
+   "rolle": "checkbox",
+   "text": "",
+   "aria": {
+    "aria-checked": "false",
+    "aria-labelledby": "cmCall_1_label"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "checkmark"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#cC_1_label > span:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 73
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "Details",
+   "aria": {
+    "aria-expanded": "false",
+    "aria-controls": "cm-consentDesc"
+   },
+   "daten": {},
+   "id": "cmDetailCat_1",
+   "klassen": [
+    "cm-descToggle"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#cmDetailCat_1",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 74
+  },
+  {
+   "tag": "label",
+   "rolle": "label",
+   "text": "Partnerschaften*",
+   "aria": {},
+   "daten": {},
+   "id": "cC_2_label",
+   "klassen": [
+    "container"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#cC_2_label",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 75
+  },
+  {
+   "tag": "input",
+   "rolle": "checkbox",
+   "text": "on",
+   "aria": {},
+   "daten": {},
+   "id": "cmCall_2",
+   "klassen": [
+    "cmCallAll"
+   ],
+   "name": "comfort",
+   "wert": null,
+   "typ": "checkbox",
+   "href": null,
+   "ziel": null,
+   "pfad": "#cmCall_2",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 76
+  },
+  {
+   "tag": "span",
+   "rolle": "checkbox",
+   "text": "",
+   "aria": {
+    "aria-checked": "false",
+    "aria-labelledby": "cmCall_2_label"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "checkmark"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#cC_2_label > span:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 76
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "Details",
+   "aria": {
+    "aria-expanded": "false",
+    "aria-controls": "cm-consentDesc"
+   },
+   "daten": {},
+   "id": "cmDetailCat_2",
+   "klassen": [
+    "cm-descToggle"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#cmDetailCat_2",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 77
+  },
+  {
+   "tag": "label",
+   "rolle": "label",
+   "text": "Promotion*",
+   "aria": {},
+   "daten": {},
+   "id": "cC_3_label",
+   "klassen": [
+    "container"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#cC_3_label",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 78
+  },
+  {
+   "tag": "input",
+   "rolle": "checkbox",
+   "text": "on",
+   "aria": {},
+   "daten": {},
+   "id": "cmCall_3",
+   "klassen": [
+    "cmCallAll"
+   ],
+   "name": "marketing",
+   "wert": null,
+   "typ": "checkbox",
+   "href": null,
+   "ziel": null,
+   "pfad": "#cmCall_3",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 79
+  },
+  {
+   "tag": "span",
+   "rolle": "checkbox",
+   "text": "",
+   "aria": {
+    "aria-checked": "false",
+    "aria-labelledby": "cmCall_3_label"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "checkmark"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#cC_3_label > span:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 79
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "Details",
+   "aria": {
+    "aria-expanded": "false",
+    "aria-controls": "cm-consentDesc"
+   },
+   "daten": {},
+   "id": "cmDetailCat_3",
+   "klassen": [
+    "cm-descToggle"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#cmDetailCat_3",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 80
+  },
+  {
+   "tag": "p",
+   "rolle": "p",
+   "text": "Technisch erforderliche Cookies helfen uns dabei, die Bedienung der Webseite zu ermöglichen. Sie stellen Grundfunktionen, wie die Darstellung und Auswahl von Produkten, das Befüllen des Warenkorbs ode",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#descContent_0 > ul:nth-of-type(1) > li:nth-of-type(1) > p:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 81
+  },
+  {
+   "tag": "p",
+   "rolle": "p",
+   "text": "Funktionalität Mit funktionellen Cookies kann die Darstellung der Webseite verbessert werden. Außerdem erleichtern sie die Bedienung der Webseite für Sie. Statistik Wir setzen Cookies zu statistischen",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#descContent_1 > ul:nth-of-type(1) > li:nth-of-type(1) > p:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 82
+  },
+  {
+   "tag": "th",
+   "rolle": "th",
+   "text": "Verant­wort­lich",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#descContent_1 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(1) > th:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 83
+  },
+  {
+   "tag": "th",
+   "rolle": "th",
+   "text": "Technologie",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#descContent_1 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(1) > th:nth-of-type(2)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 83
+  },
+  {
+   "tag": "th",
+   "rolle": "th",
+   "text": "Zweck",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#descContent_1 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(1) > th:nth-of-type(3)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 83
+  },
+  {
+   "tag": "td",
+   "rolle": "td",
+   "text": "1&1",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#descContent_1 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 84
+  },
+  {
+   "tag": "label",
+   "rolle": "label",
+   "text": "Adobe Analytics",
+   "aria": {},
+   "daten": {},
+   "id": "ck_2_label",
+   "klassen": [
+    "container"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#ck_2_label",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 85
+  },
+  {
+   "tag": "input",
+   "rolle": "checkbox",
+   "text": "on",
+   "aria": {},
+   "daten": {},
+   "id": "ck_2",
+   "klassen": [
+    "cmCat-checkboxes",
+    "cmCall_1"
+   ],
+   "name": "adobe",
+   "wert": null,
+   "typ": "checkbox",
+   "href": null,
+   "ziel": null,
+   "pfad": "#ck_2",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 86
+  },
+  {
+   "tag": "span",
+   "rolle": "checkbox",
+   "text": "",
+   "aria": {
+    "aria-checked": "false",
+    "aria-labelledby": "ck_2_label"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "checkmark"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#ck_2_label > span:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 86
+  },
+  {
+   "tag": "td",
+   "rolle": "td",
+   "text": "Statistische Analyse der Nutzung unserer Webseite",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#descContent_1 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(3)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 84
+  },
+  {
+   "tag": "td",
+   "rolle": "td",
+   "text": "1&1",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#descContent_1 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(3) > td:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 87
+  },
+  {
+   "tag": "label",
+   "rolle": "label",
+   "text": "Adition",
+   "aria": {},
+   "daten": {},
+   "id": "ck_1_label",
+   "klassen": [
+    "container"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#ck_1_label",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 88
+  },
+  {
+   "tag": "input",
+   "rolle": "checkbox",
+   "text": "on",
+   "aria": {},
+   "daten": {},
+   "id": "ck_1",
+   "klassen": [
+    "cmCat-checkboxes",
+    "cmCall_1"
+   ],
+   "name": "adition",
+   "wert": null,
+   "typ": "checkbox",
+   "href": null,
+   "ziel": null,
+   "pfad": "#ck_1",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 89
+  },
+  {
+   "tag": "span",
+   "rolle": "checkbox",
+   "text": "",
+   "aria": {
+    "aria-checked": "false",
+    "aria-labelledby": "ck_1_label"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "checkmark"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#ck_1_label > span:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 89
+  },
+  {
+   "tag": "td",
+   "rolle": "td",
+   "text": "Individualisierung von Inhalten und Werbung für Produkte von 1&1",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#descContent_1 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(3) > td:nth-of-type(3)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 87
+  },
+  {
+   "tag": "td",
+   "rolle": "td",
+   "text": "1&1",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#descContent_1 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(4) > td:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 90
+  },
+  {
+   "tag": "label",
+   "rolle": "label",
+   "text": "Rogator",
+   "aria": {},
+   "daten": {},
+   "id": "ck_4_label",
+   "klassen": [
+    "container"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#ck_4_label",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 91
+  },
+  {
+   "tag": "input",
+   "rolle": "checkbox",
+   "text": "on",
+   "aria": {},
+   "daten": {},
+   "id": "ck_4",
+   "klassen": [
+    "cmCat-checkboxes",
+    "cmCall_1"
+   ],
+   "name": "clicktale",
+   "wert": null,
+   "typ": "checkbox",
+   "href": null,
+   "ziel": null,
+   "pfad": "#ck_4",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 92
+  },
+  {
+   "tag": "span",
+   "rolle": "checkbox",
+   "text": "",
+   "aria": {
+    "aria-checked": "false",
+    "aria-labelledby": "ck_4_label"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "checkmark"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#ck_4_label > span:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 92
+  },
+  {
+   "tag": "td",
+   "rolle": "td",
+   "text": "Durchführung von Kundenumfragen",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#descContent_1 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(4) > td:nth-of-type(3)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 90
+  },
+  {
+   "tag": "td",
+   "rolle": "td",
+   "text": "1&1",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#descContent_1 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(5) > td:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 93
+  },
+  {
+   "tag": "label",
+   "rolle": "label",
+   "text": "AB Tasty",
+   "aria": {},
+   "daten": {},
+   "id": "ck_5_label",
+   "klassen": [
+    "container"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#ck_5_label",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 94
+  },
+  {
+   "tag": "input",
+   "rolle": "checkbox",
+   "text": "on",
+   "aria": {},
+   "daten": {},
+   "id": "ck_5",
+   "klassen": [
+    "cmCat-checkboxes",
+    "cmCall_1"
+   ],
+   "name": "abtasty",
+   "wert": null,
+   "typ": "checkbox",
+   "href": null,
+   "ziel": null,
+   "pfad": "#ck_5",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 95
+  },
+  {
+   "tag": "span",
+   "rolle": "checkbox",
+   "text": "",
+   "aria": {
+    "aria-checked": "false",
+    "aria-labelledby": "ck_5_label"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "checkmark"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#ck_5_label > span:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 95
+  },
+  {
+   "tag": "td",
+   "rolle": "td",
+   "text": "Individualisierung der Webseiten-Inhalte und anonyme Tests (A/B-Tests)",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#descContent_1 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(5) > td:nth-of-type(3)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 93
+  },
+  {
+   "tag": "td",
+   "rolle": "td",
+   "text": "1&1",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#descContent_1 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(6) > td:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 96
+  },
+  {
+   "tag": "label",
+   "rolle": "label",
+   "text": "Spoteffects (Matomo)",
+   "aria": {},
+   "daten": {},
+   "id": "ck_6_label",
+   "klassen": [
+    "container"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#ck_6_label",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 97
+  },
+  {
+   "tag": "input",
+   "rolle": "checkbox",
+   "text": "on",
+   "aria": {},
+   "daten": {},
+   "id": "ck_6",
+   "klassen": [
+    "cmCat-checkboxes",
+    "cmCall_1"
+   ],
+   "name": "spoteffects",
+   "wert": null,
+   "typ": "checkbox",
+   "href": null,
+   "ziel": null,
+   "pfad": "#ck_6",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 98
+  },
+  {
+   "tag": "span",
+   "rolle": "checkbox",
+   "text": "",
+   "aria": {
+    "aria-checked": "false",
+    "aria-labelledby": "ck_6_label"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "checkmark"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#ck_6_label > span:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 98
+  },
+  {
+   "tag": "td",
+   "rolle": "td",
+   "text": "Statistische Analyse und anonyme Reichweitenmessung",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#descContent_1 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(6) > td:nth-of-type(3)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 96
+  },
+  {
+   "tag": "td",
+   "rolle": "td",
+   "text": "1&1",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#descContent_1 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(7) > td:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 99
+  },
+  {
+   "tag": "label",
+   "rolle": "label",
+   "text": "Optimizely",
+   "aria": {},
+   "daten": {},
+   "id": "ck_7_label",
+   "klassen": [
+    "container"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#ck_7_label",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 100
+  },
+  {
+   "tag": "input",
+   "rolle": "checkbox",
+   "text": "on",
+   "aria": {},
+   "daten": {},
+   "id": "ck_7",
+   "klassen": [
+    "cmCat-checkboxes",
+    "cmCall_1"
+   ],
+   "name": "optimizely",
+   "wert": null,
+   "typ": "checkbox",
+   "href": null,
+   "ziel": null,
+   "pfad": "#ck_7",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 101
+  },
+  {
+   "tag": "span",
+   "rolle": "checkbox",
+   "text": "",
+   "aria": {
+    "aria-checked": "false",
+    "aria-labelledby": "ck_7_label"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "checkmark"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#ck_7_label > span:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 101
+  },
+  {
+   "tag": "td",
+   "rolle": "td",
+   "text": "Individualisierung der Webseiten-Inhalte und anonyme Tests (A/B-Tests)",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#descContent_1 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(7) > td:nth-of-type(3)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 99
+  },
+  {
+   "tag": "td",
+   "rolle": "td",
+   "text": "1&1",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#descContent_1 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(8) > td:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 102
+  },
+  {
+   "tag": "label",
+   "rolle": "label",
+   "text": "Tealium Audience Stream",
+   "aria": {},
+   "daten": {},
+   "id": "ck_11_label",
+   "klassen": [
+    "container"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#ck_11_label",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 103
+  },
+  {
+   "tag": "input",
+   "rolle": "checkbox",
+   "text": "on",
+   "aria": {},
+   "daten": {},
+   "id": "ck_11",
+   "klassen": [
+    "cmCat-checkboxes",
+    "cmCall_1"
+   ],
+   "name": "tealiumas",
+   "wert": null,
+   "typ": "checkbox",
+   "href": null,
+   "ziel": null,
+   "pfad": "#ck_11",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 104
+  },
+  {
+   "tag": "span",
+   "rolle": "checkbox",
+   "text": "",
+   "aria": {
+    "aria-checked": "false",
+    "aria-labelledby": "ck_11_label"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "checkmark"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#ck_11_label > span:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 104
+  },
+  {
+   "tag": "td",
+   "rolle": "td",
+   "text": "Statistische Analyse der Nutzung unserer Webseite sowie Individualisierung von Inhalten und Werbung für Produkte von 1&1",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#descContent_1 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(8) > td:nth-of-type(3)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 102
+  },
+  {
+   "tag": "p",
+   "rolle": "p",
+   "text": "Wir kooperieren mit ausgewählten Partnern, um Ihnen personalisierte Inhalte passend zu Ihren Interessen anzuzeigen oder um gemeinsame Kampagnen auszuwerten, nachzuhalten und abzurechnen.",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#descContent_2 > ul:nth-of-type(1) > li:nth-of-type(1) > p:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 105
+  },
+  {
+   "tag": "th",
+   "rolle": "th",
+   "text": "Firma",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#descContent_2 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(1) > th:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 106
+  },
+  {
+   "tag": "th",
+   "rolle": "th",
+   "text": "Zweck",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#descContent_2 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(1) > th:nth-of-type(2)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 106
+  },
+  {
+   "tag": "label",
+   "rolle": "label",
+   "text": "AWIN",
+   "aria": {},
+   "daten": {},
+   "id": "ck_10_label",
+   "klassen": [
+    "container"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#ck_10_label",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 107
+  },
+  {
+   "tag": "input",
+   "rolle": "checkbox",
+   "text": "on",
+   "aria": {},
+   "daten": {},
+   "id": "ck_10",
+   "klassen": [
+    "cmCat-checkboxes",
+    "cmCall_2"
+   ],
+   "name": "awin",
+   "wert": null,
+   "typ": "checkbox",
+   "href": null,
+   "ziel": null,
+   "pfad": "#ck_10",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 108
+  },
+  {
+   "tag": "span",
+   "rolle": "checkbox",
+   "text": "",
+   "aria": {
+    "aria-checked": "false",
+    "aria-labelledby": "ck_10_label"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "checkmark"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#ck_10_label > span:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 108
+  },
+  {
+   "tag": "td",
+   "rolle": "td",
+   "text": "Individualisierte Werbung in einem Werbenetzwerk",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#descContent_2 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(2)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 109
+  },
+  {
+   "tag": "label",
+   "rolle": "label",
+   "text": "United Internet Media GmbH",
+   "aria": {},
+   "daten": {},
+   "id": "ck_15_label",
+   "klassen": [
+    "container"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#ck_15_label",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 110
+  },
+  {
+   "tag": "input",
+   "rolle": "checkbox",
+   "text": "on",
+   "aria": {},
+   "daten": {},
+   "id": "ck_15",
+   "klassen": [
+    "cmCat-checkboxes",
+    "cmCall_2"
+   ],
+   "name": "United Internet Media GmbH",
+   "wert": null,
+   "typ": "checkbox",
+   "href": null,
+   "ziel": null,
+   "pfad": "#ck_15",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 111
+  },
+  {
+   "tag": "span",
+   "rolle": "checkbox",
+   "text": "",
+   "aria": {
+    "aria-checked": "false",
+    "aria-labelledby": "ck_15_label"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "checkmark"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#ck_15_label > span:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 111
+  },
+  {
+   "tag": "td",
+   "rolle": "td",
+   "text": "Profilbildung und die zielgruppenspezifische Ansprache auf Seiten innerhalb der Medienreichweite des Partners",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#descContent_2 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(3) > td:nth-of-type(2)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 112
+  },
+  {
+   "tag": "td",
+   "rolle": "td",
+   "text": "LG Electronics",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#descContent_2 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(4) > td:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 113
+  },
+  {
+   "tag": "label",
+   "rolle": "label",
+   "text": "LG Electronics",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "container"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#descContent_2 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(4) > td:nth-of-type(1) > label:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 113
+  },
+  {
+   "tag": "td",
+   "rolle": "td",
+   "text": "Kampagnensteuerung und Abrechnung",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#descContent_2 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(4) > td:nth-of-type(2)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 113
+  },
+  {
+   "tag": "p",
+   "rolle": "p",
+   "text": "Mit den Partnern in dieser Kategorie wurde vertraglich eine gemeinsame Verantwortung für die Datenverarbeitung vereinbart. Weitere Informationen erhalten sie in den Webseiten-Einstellungen.",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#descContent_2 > ul:nth-of-type(1) > li:nth-of-type(3) > p:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 105
+  },
+  {
+   "tag": "p",
+   "rolle": "p",
+   "text": "Um Ihnen auch außerhalb unserer Webseite individuelle Produkt- und Serviceangebote anzeigen zu können, setzen wir Cookies zur erweiterten Kundenansprache ein. Diese können von anderen werbenden Untern",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#descContent_3 > ul:nth-of-type(1) > li:nth-of-type(1) > p:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 114
+  },
+  {
+   "tag": "th",
+   "rolle": "th",
+   "text": "Firma",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#descContent_3 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(1) > th:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 115
+  },
+  {
+   "tag": "th",
+   "rolle": "th",
+   "text": "Zweck",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#descContent_3 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(1) > th:nth-of-type(2)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 115
+  },
+  {
+   "tag": "label",
+   "rolle": "label",
+   "text": "Facebook",
+   "aria": {},
+   "daten": {},
+   "id": "ck_12_label",
+   "klassen": [
+    "container"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#ck_12_label",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 116
+  },
+  {
+   "tag": "input",
+   "rolle": "checkbox",
+   "text": "on",
+   "aria": {},
+   "daten": {},
+   "id": "ck_12",
+   "klassen": [
+    "cmCat-checkboxes",
+    "cmCall_3"
+   ],
+   "name": "facebook",
+   "wert": null,
+   "typ": "checkbox",
+   "href": null,
+   "ziel": null,
+   "pfad": "#ck_12",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 117
+  },
+  {
+   "tag": "span",
+   "rolle": "checkbox",
+   "text": "",
+   "aria": {
+    "aria-checked": "false",
+    "aria-labelledby": "ck_12_label"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "checkmark"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#ck_12_label > span:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 117
+  },
+  {
+   "tag": "td",
+   "rolle": "td",
+   "text": "Ausspielung von individualisierter Werbung auf Webseiten im Internet",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#descContent_3 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(2)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 118
+  },
+  {
+   "tag": "label",
+   "rolle": "label",
+   "text": "Google Ads",
+   "aria": {},
+   "daten": {},
+   "id": "ck_13_label",
+   "klassen": [
+    "container"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#ck_13_label",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 119
+  },
+  {
+   "tag": "input",
+   "rolle": "checkbox",
+   "text": "on",
+   "aria": {},
+   "daten": {},
+   "id": "ck_13",
+   "klassen": [
+    "cmCat-checkboxes",
+    "cmCall_3"
+   ],
+   "name": "google",
+   "wert": null,
+   "typ": "checkbox",
+   "href": null,
+   "ziel": null,
+   "pfad": "#ck_13",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 120
+  },
+  {
+   "tag": "span",
+   "rolle": "checkbox",
+   "text": "",
+   "aria": {
+    "aria-checked": "false",
+    "aria-labelledby": "ck_13_label"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "checkmark"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#ck_13_label > span:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 120
+  },
+  {
+   "tag": "td",
+   "rolle": "td",
+   "text": "Ausspielung von individualisierter Werbung auf Webseiten im Internet",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#descContent_3 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(3) > td:nth-of-type(2)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 121
+  },
+  {
+   "tag": "label",
+   "rolle": "label",
+   "text": "Bing Ads",
+   "aria": {},
+   "daten": {},
+   "id": "ck_14_label",
+   "klassen": [
+    "container"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#ck_14_label",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 122
+  },
+  {
+   "tag": "input",
+   "rolle": "checkbox",
+   "text": "on",
+   "aria": {},
+   "daten": {},
+   "id": "ck_14",
+   "klassen": [
+    "cmCat-checkboxes",
+    "cmCall_3"
+   ],
+   "name": "bing",
+   "wert": null,
+   "typ": "checkbox",
+   "href": null,
+   "ziel": null,
+   "pfad": "#ck_14",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 123
+  },
+  {
+   "tag": "span",
+   "rolle": "checkbox",
+   "text": "",
+   "aria": {
+    "aria-checked": "false",
+    "aria-labelledby": "ck_14_label"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "checkmark"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#ck_14_label > span:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 123
+  },
+  {
+   "tag": "td",
+   "rolle": "td",
+   "text": "Ausspielung von individualisierter Werbung auf Webseiten im Internet",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#descContent_3 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(4) > td:nth-of-type(2)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 124
+  },
+  {
+   "tag": "label",
+   "rolle": "label",
+   "text": "TikTok",
+   "aria": {},
+   "daten": {},
+   "id": "ck_9_label",
+   "klassen": [
+    "container"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#ck_9_label",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 125
+  },
+  {
+   "tag": "input",
+   "rolle": "checkbox",
+   "text": "on",
+   "aria": {},
+   "daten": {},
+   "id": "ck_9",
+   "klassen": [
+    "cmCat-checkboxes",
+    "cmCall_3"
+   ],
+   "name": "TikTok",
+   "wert": null,
+   "typ": "checkbox",
+   "href": null,
+   "ziel": null,
+   "pfad": "#ck_9",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 126
+  },
+  {
+   "tag": "span",
+   "rolle": "checkbox",
+   "text": "",
+   "aria": {
+    "aria-checked": "false",
+    "aria-labelledby": "ck_9_label"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "checkmark"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#ck_9_label > span:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 126
+  },
+  {
+   "tag": "td",
+   "rolle": "td",
+   "text": "Ausspielung von individualisierter Werbung auf TikTok",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#descContent_3 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(5) > td:nth-of-type(2)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 127
+  },
+  {
+   "tag": "label",
+   "rolle": "label",
+   "text": "Reddit",
+   "aria": {},
+   "daten": {},
+   "id": "ck_3_label",
+   "klassen": [
+    "container"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#ck_3_label",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 128
+  },
+  {
+   "tag": "input",
+   "rolle": "checkbox",
+   "text": "on",
+   "aria": {},
+   "daten": {},
+   "id": "ck_3",
+   "klassen": [
+    "cmCat-checkboxes",
+    "cmCall_3"
+   ],
+   "name": "Reddit",
+   "wert": null,
+   "typ": "checkbox",
+   "href": null,
+   "ziel": null,
+   "pfad": "#ck_3",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 129
+  },
+  {
+   "tag": "span",
+   "rolle": "checkbox",
+   "text": "",
+   "aria": {
+    "aria-checked": "false",
+    "aria-labelledby": "ck_3_label"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "checkmark"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#ck_3_label > span:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 129
+  },
+  {
+   "tag": "td",
+   "rolle": "td",
+   "text": "Ausspielung von individualisierter Werbung auf Webseiten im Internet",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#descContent_3 > ul:nth-of-type(1) > li:nth-of-type(2) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(6) > td:nth-of-type(2)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 130
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "Auswahl bestätigen",
+   "aria": {
+    "aria-label": "Alle Cookies bestätigen"
+   },
+   "daten": {},
+   "id": "preferences_prompt_submit",
+   "klassen": [
+    "button-secondary"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#preferences_prompt_submit",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 131
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "Alle auswählen",
+   "aria": {
+    "aria-label": "Cookieauswahl bestätigen"
+   },
+   "daten": {},
+   "id": "preferences_prompt_submit_all",
+   "klassen": [
+    "button-primary"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#preferences_prompt_submit_all",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 131
+  },
+  {
+   "tag": "p",
+   "rolle": "p",
+   "text": "Cookie-Einstellungen",
+   "aria": {},
+   "daten": {},
+   "id": "cw-headline",
+   "klassen": [
+    "title"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#cw-headline",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 132
+  },
+  {
+   "tag": "p",
+   "rolle": "p",
+   "text": "Diese Webseite verwendet Cookies und ähnliche Technologien für folgende Zwecke: Notwendig: Zurverfügungstellung der Webseite und Verwaltung Ihrer Einwilligungen (Notwendige Einstellungen) Komfort: Erw",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#consent-wall > div:nth-of-type(2) > p:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 132
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "Ablehnen",
+   "aria": {
+    "aria-label": "Cookies ablehnen"
+   },
+   "daten": {},
+   "id": "consent_wall_optout",
+   "klassen": [
+    "button-secondary"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#consent_wall_optout",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 133
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "Bestätigen",
+   "aria": {
+    "aria-label": "Cookies bestätigen"
+   },
+   "daten": {},
+   "id": "consent_wall_optin",
+   "klassen": [
+    "button-primary"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#consent_wall_optin",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 133
+  },
+  {
    "tag": "a",
    "rolle": "link",
    "text": "Suchfeld",
@@ -5775,7 +9265,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 67
+   "behaelter": 134
   },
   {
    "tag": "a",
@@ -5797,7 +9287,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 67
+   "behaelter": 134
   },
   {
    "tag": "a",
@@ -5819,7 +9309,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 67
+   "behaelter": 134
   },
   {
    "tag": "a",
@@ -5841,7 +9331,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 67
+   "behaelter": 134
   },
   {
    "tag": "a",
@@ -5864,7 +9354,7 @@
    "deaktiviert": false,
    "gewaehlt": "klasse:navigation__e0-link--active",
    "optionen": null,
-   "behaelter": 68
+   "behaelter": 135
   },
   {
    "tag": "a",
@@ -5886,7 +9376,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 68
+   "behaelter": 135
   },
   {
    "tag": "a",
@@ -5910,7 +9400,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 69
+   "behaelter": 136
   },
   {
    "tag": "a",
@@ -5934,7 +9424,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 69
+   "behaelter": 136
   },
   {
    "tag": "a",
@@ -5958,7 +9448,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 69
+   "behaelter": 136
   },
   {
    "tag": "a",
@@ -5982,7 +9472,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 69
+   "behaelter": 136
   },
   {
    "tag": "a",
@@ -6006,7 +9496,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 69
+   "behaelter": 136
   },
   {
    "tag": "a",
@@ -6030,7 +9520,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 70
+   "behaelter": 137
   },
   {
    "tag": "a",
@@ -6054,7 +9544,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 71
+   "behaelter": 138
   },
   {
    "tag": "a",
@@ -6078,7 +9568,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 72
+   "behaelter": 139
   },
   {
    "tag": "a",
@@ -6102,7 +9592,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 72
+   "behaelter": 139
   },
   {
    "tag": "a",
@@ -6126,7 +9616,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 72
+   "behaelter": 139
   },
   {
    "tag": "a",
@@ -6150,7 +9640,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 72
+   "behaelter": 139
   },
   {
    "tag": "a",
@@ -6174,7 +9664,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 72
+   "behaelter": 139
   },
   {
    "tag": "a",
@@ -6198,7 +9688,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 73
+   "behaelter": 140
   },
   {
    "tag": "a",
@@ -6222,7 +9712,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 73
+   "behaelter": 140
   },
   {
    "tag": "a",
@@ -6246,7 +9736,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 73
+   "behaelter": 140
   },
   {
    "tag": "a",
@@ -6270,7 +9760,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 73
+   "behaelter": 140
   },
   {
    "tag": "a",
@@ -6294,7 +9784,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 73
+   "behaelter": 140
   },
   {
    "tag": "a",
@@ -6318,7 +9808,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 73
+   "behaelter": 140
   },
   {
    "tag": "a",
@@ -6387,7 +9877,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 74
+   "behaelter": 141
   },
   {
    "tag": "a",
@@ -6411,7 +9901,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 75
+   "behaelter": 142
   },
   {
    "tag": "a",
@@ -6435,7 +9925,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 75
+   "behaelter": 142
   },
   {
    "tag": "a",
@@ -6459,7 +9949,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 75
+   "behaelter": 142
   },
   {
    "tag": "a",
@@ -6483,7 +9973,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 75
+   "behaelter": 142
   },
   {
    "tag": "a",
@@ -6507,7 +9997,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 76
+   "behaelter": 143
   },
   {
    "tag": "a",
@@ -6531,7 +10021,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 76
+   "behaelter": 143
   },
   {
    "tag": "a",
@@ -6555,7 +10045,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 76
+   "behaelter": 143
   },
   {
    "tag": "a",
@@ -6579,7 +10069,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 76
+   "behaelter": 143
   },
   {
    "tag": "a",
@@ -6603,7 +10093,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 76
+   "behaelter": 143
   },
   {
    "tag": "a",
@@ -6627,7 +10117,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 76
+   "behaelter": 143
   },
   {
    "tag": "a",
@@ -6651,7 +10141,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 76
+   "behaelter": 143
   },
   {
    "tag": "a",
@@ -6720,7 +10210,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 77
+   "behaelter": 144
   },
   {
    "tag": "a",
@@ -6744,7 +10234,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 78
+   "behaelter": 145
   },
   {
    "tag": "a",
@@ -6768,7 +10258,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 78
+   "behaelter": 145
   },
   {
    "tag": "a",
@@ -6792,7 +10282,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 78
+   "behaelter": 145
   },
   {
    "tag": "a",
@@ -6816,7 +10306,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 78
+   "behaelter": 145
   },
   {
    "tag": "a",
@@ -6840,7 +10330,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 78
+   "behaelter": 145
   },
   {
    "tag": "a",
@@ -6864,7 +10354,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 78
+   "behaelter": 145
   },
   {
    "tag": "a",
@@ -6888,7 +10378,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 78
+   "behaelter": 145
   },
   {
    "tag": "a",
@@ -6912,7 +10402,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 79
+   "behaelter": 146
   },
   {
    "tag": "a",
@@ -6936,7 +10426,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 79
+   "behaelter": 146
   },
   {
    "tag": "a",
@@ -6960,7 +10450,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 79
+   "behaelter": 146
   },
   {
    "tag": "a",
@@ -6984,7 +10474,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 79
+   "behaelter": 146
   },
   {
    "tag": "a",
@@ -7008,7 +10498,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 79
+   "behaelter": 146
   },
   {
    "tag": "a",
@@ -7032,7 +10522,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 79
+   "behaelter": 146
   },
   {
    "tag": "a",
@@ -7056,7 +10546,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 79
+   "behaelter": 146
   },
   {
    "tag": "a",
@@ -7080,7 +10570,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 79
+   "behaelter": 146
   },
   {
    "tag": "a",
@@ -7149,7 +10639,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 80
+   "behaelter": 147
   },
   {
    "tag": "a",
@@ -7173,7 +10663,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 81
+   "behaelter": 148
   },
   {
    "tag": "a",
@@ -7197,7 +10687,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 81
+   "behaelter": 148
   },
   {
    "tag": "a",
@@ -7221,7 +10711,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 81
+   "behaelter": 148
   },
   {
    "tag": "a",
@@ -7245,7 +10735,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 81
+   "behaelter": 148
   },
   {
    "tag": "a",
@@ -7269,7 +10759,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 81
+   "behaelter": 148
   },
   {
    "tag": "a",
@@ -7293,7 +10783,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 81
+   "behaelter": 148
   },
   {
    "tag": "a",
@@ -7317,7 +10807,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 81
+   "behaelter": 148
   },
   {
    "tag": "a",
@@ -7341,7 +10831,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 81
+   "behaelter": 148
   },
   {
    "tag": "a",
@@ -7368,7 +10858,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 82
+   "behaelter": 149
   },
   {
    "tag": "a",
@@ -7395,7 +10885,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 82
+   "behaelter": 149
   },
   {
    "tag": "a",
@@ -7422,7 +10912,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 82
+   "behaelter": 149
   },
   {
    "tag": "a",
@@ -7449,7 +10939,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 82
+   "behaelter": 149
   },
   {
    "tag": "a",
@@ -7473,7 +10963,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 83
+   "behaelter": 150
   },
   {
    "tag": "a",
@@ -7497,7 +10987,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 83
+   "behaelter": 150
   },
   {
    "tag": "a",
@@ -7521,7 +11011,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 83
+   "behaelter": 150
   },
   {
    "tag": "a",
@@ -7545,7 +11035,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 83
+   "behaelter": 150
   },
   {
    "tag": "a",
@@ -7569,7 +11059,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 83
+   "behaelter": 150
   },
   {
    "tag": "a",
@@ -7593,7 +11083,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 83
+   "behaelter": 150
   },
   {
    "tag": "a",
@@ -7617,7 +11107,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 83
+   "behaelter": 150
   },
   {
    "tag": "a",
@@ -7711,7 +11201,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 84
+   "behaelter": 151
   },
   {
    "tag": "a",
@@ -7735,7 +11225,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 85
+   "behaelter": 152
   },
   {
    "tag": "a",
@@ -7759,7 +11249,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 85
+   "behaelter": 152
   },
   {
    "tag": "a",
@@ -7783,7 +11273,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 85
+   "behaelter": 152
   },
   {
    "tag": "a",
@@ -7807,7 +11297,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 85
+   "behaelter": 152
   },
   {
    "tag": "a",
@@ -7831,7 +11321,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 85
+   "behaelter": 152
   },
   {
    "tag": "a",
@@ -7855,7 +11345,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 85
+   "behaelter": 152
   },
   {
    "tag": "a",
@@ -7879,7 +11369,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 85
+   "behaelter": 152
   },
   {
    "tag": "a",
@@ -7973,7 +11463,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 86
+   "behaelter": 153
   },
   {
    "tag": "a",
@@ -7997,7 +11487,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 87
+   "behaelter": 154
   },
   {
    "tag": "a",
@@ -8021,7 +11511,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 87
+   "behaelter": 154
   },
   {
    "tag": "a",
@@ -8045,7 +11535,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 87
+   "behaelter": 154
   },
   {
    "tag": "a",
@@ -8072,7 +11562,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 88
+   "behaelter": 155
   },
   {
    "tag": "a",
@@ -8099,7 +11589,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 88
+   "behaelter": 155
   },
   {
    "tag": "a",
@@ -8126,7 +11616,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 88
+   "behaelter": 155
   },
   {
    "tag": "a",
@@ -8153,7 +11643,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 88
+   "behaelter": 155
   },
   {
    "tag": "a",
@@ -8177,7 +11667,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 89
+   "behaelter": 156
   },
   {
    "tag": "a",
@@ -8201,7 +11691,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 89
+   "behaelter": 156
   },
   {
    "tag": "a",
@@ -8225,7 +11715,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 89
+   "behaelter": 156
   },
   {
    "tag": "a",
@@ -8249,7 +11739,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 89
+   "behaelter": 156
   },
   {
    "tag": "a",
@@ -8273,7 +11763,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 89
+   "behaelter": 156
   },
   {
    "tag": "a",
@@ -8297,7 +11787,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 89
+   "behaelter": 156
   },
   {
    "tag": "a",
@@ -8321,7 +11811,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 89
+   "behaelter": 156
   },
   {
    "tag": "a",
@@ -8415,7 +11905,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 90
+   "behaelter": 157
   },
   {
    "tag": "a",
@@ -8439,7 +11929,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 91
+   "behaelter": 158
   },
   {
    "tag": "a",
@@ -8463,7 +11953,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 91
+   "behaelter": 158
   },
   {
    "tag": "a",
@@ -8487,7 +11977,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 91
+   "behaelter": 158
   },
   {
    "tag": "a",
@@ -8514,7 +12004,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 92
+   "behaelter": 159
   },
   {
    "tag": "a",
@@ -8541,7 +12031,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 92
+   "behaelter": 159
   },
   {
    "tag": "a",
@@ -8568,7 +12058,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 92
+   "behaelter": 159
   },
   {
    "tag": "a",
@@ -8592,7 +12082,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 93
+   "behaelter": 160
   },
   {
    "tag": "a",
@@ -8616,7 +12106,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 93
+   "behaelter": 160
   },
   {
    "tag": "a",
@@ -8640,7 +12130,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 93
+   "behaelter": 160
   },
   {
    "tag": "a",
@@ -8664,7 +12154,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 93
+   "behaelter": 160
   },
   {
    "tag": "a",
@@ -8688,7 +12178,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 93
+   "behaelter": 160
   },
   {
    "tag": "a",
@@ -8712,7 +12202,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 93
+   "behaelter": 160
   },
   {
    "tag": "a",
@@ -8736,7 +12226,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 93
+   "behaelter": 160
   },
   {
    "tag": "a",
@@ -8830,7 +12320,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 94
+   "behaelter": 161
   },
   {
    "tag": "a",
@@ -8854,7 +12344,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 95
+   "behaelter": 162
   },
   {
    "tag": "a",
@@ -8878,7 +12368,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 95
+   "behaelter": 162
   },
   {
    "tag": "a",
@@ -8902,7 +12392,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 95
+   "behaelter": 162
   },
   {
    "tag": "a",
@@ -8926,7 +12416,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 95
+   "behaelter": 162
   },
   {
    "tag": "a",
@@ -8993,7 +12483,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 96
+   "behaelter": 163
   },
   {
    "tag": "a",
@@ -9017,7 +12507,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 97
+   "behaelter": 164
   },
   {
    "tag": "a",
@@ -9041,7 +12531,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 98
+   "behaelter": 165
   },
   {
    "tag": "a",
@@ -9065,7 +12555,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 98
+   "behaelter": 165
   },
   {
    "tag": "a",
@@ -9089,7 +12579,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 98
+   "behaelter": 165
   },
   {
    "tag": "a",
@@ -9160,7 +12650,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 99
+   "behaelter": 166
   },
   {
    "tag": "a",
@@ -9184,7 +12674,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 100
+   "behaelter": 167
   },
   {
    "tag": "a",
@@ -9208,7 +12698,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 100
+   "behaelter": 167
   },
   {
    "tag": "a",
@@ -9232,7 +12722,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 100
+   "behaelter": 167
   },
   {
    "tag": "a",
@@ -9256,7 +12746,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 100
+   "behaelter": 167
   },
   {
    "tag": "a",
@@ -9280,7 +12770,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 100
+   "behaelter": 167
   },
   {
    "tag": "a",
@@ -9304,7 +12794,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 100
+   "behaelter": 167
   },
   {
    "tag": "a",
@@ -9328,7 +12818,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 100
+   "behaelter": 167
   },
   {
    "tag": "a",
@@ -9352,7 +12842,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 100
+   "behaelter": 167
   },
   {
    "tag": "a",
@@ -9376,7 +12866,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 100
+   "behaelter": 167
   },
   {
    "tag": "a",
@@ -9400,7 +12890,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 100
+   "behaelter": 167
   },
   {
    "tag": "a",
@@ -9424,7 +12914,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 100
+   "behaelter": 167
   },
   {
    "tag": "a",
@@ -9448,7 +12938,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 100
+   "behaelter": 167
   },
   {
    "tag": "a",
@@ -9472,7 +12962,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 101
+   "behaelter": 168
   },
   {
    "tag": "a",
@@ -9496,7 +12986,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 101
+   "behaelter": 168
   },
   {
    "tag": "a",
@@ -9520,7 +13010,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 101
+   "behaelter": 168
   },
   {
    "tag": "a",
@@ -9544,7 +13034,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 101
+   "behaelter": 168
   },
   {
    "tag": "a",
@@ -9568,7 +13058,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 101
+   "behaelter": 168
   },
   {
    "tag": "a",
@@ -9592,7 +13082,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 101
+   "behaelter": 168
   },
   {
    "tag": "a",
@@ -9616,7 +13106,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 101
+   "behaelter": 168
   },
   {
    "tag": "a",
@@ -9640,7 +13130,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 101
+   "behaelter": 168
   },
   {
    "tag": "a",
@@ -9664,7 +13154,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 101
+   "behaelter": 168
   },
   {
    "tag": "a",
@@ -9688,7 +13178,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 101
+   "behaelter": 168
   },
   {
    "tag": "a",
@@ -9757,7 +13247,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 102
+   "behaelter": 169
   },
   {
    "tag": "a",
@@ -9781,7 +13271,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 103
+   "behaelter": 170
   },
   {
    "tag": "a",
@@ -9805,7 +13295,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 104
+   "behaelter": 171
   },
   {
    "tag": "a",
@@ -9829,7 +13319,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 104
+   "behaelter": 171
   },
   {
    "tag": "a",
@@ -9853,7 +13343,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 104
+   "behaelter": 171
   },
   {
    "tag": "a",
@@ -9877,7 +13367,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 104
+   "behaelter": 171
   },
   {
    "tag": "a",
@@ -9901,7 +13391,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 104
+   "behaelter": 171
   },
   {
    "tag": "a",
@@ -9925,7 +13415,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 104
+   "behaelter": 171
   },
   {
    "tag": "a",
@@ -9949,7 +13439,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 104
+   "behaelter": 171
   },
   {
    "tag": "a",
@@ -9973,7 +13463,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 104
+   "behaelter": 171
   },
   {
    "tag": "a",
@@ -9997,7 +13487,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 104
+   "behaelter": 171
   },
   {
    "tag": "a",
@@ -10021,7 +13511,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 104
+   "behaelter": 171
   },
   {
    "tag": "a",
@@ -10045,7 +13535,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 104
+   "behaelter": 171
   },
   {
    "tag": "a",
@@ -10069,7 +13559,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 104
+   "behaelter": 171
   },
   {
    "tag": "a",
@@ -10093,7 +13583,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 105
+   "behaelter": 172
   },
   {
    "tag": "a",
@@ -10117,7 +13607,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 105
+   "behaelter": 172
   },
   {
    "tag": "a",
@@ -10141,7 +13631,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 105
+   "behaelter": 172
   },
   {
    "tag": "a",
@@ -10165,7 +13655,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 105
+   "behaelter": 172
   },
   {
    "tag": "a",
@@ -10189,7 +13679,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 105
+   "behaelter": 172
   },
   {
    "tag": "a",
@@ -10213,7 +13703,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 105
+   "behaelter": 172
   },
   {
    "tag": "a",
@@ -10237,7 +13727,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 105
+   "behaelter": 172
   },
   {
    "tag": "a",
@@ -10261,7 +13751,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 105
+   "behaelter": 172
   },
   {
    "tag": "a",
@@ -10285,7 +13775,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 105
+   "behaelter": 172
   },
   {
    "tag": "a",
@@ -10309,7 +13799,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 105
+   "behaelter": 172
   },
   {
    "tag": "a",
@@ -10378,7 +13868,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 106
+   "behaelter": 173
   },
   {
    "tag": "a",
@@ -10431,7 +13921,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 107
+   "behaelter": 174
   },
   {
    "tag": "a",
@@ -10451,7 +13941,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 108
+   "behaelter": 175
   },
   {
    "tag": "a",
@@ -10471,7 +13961,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 108
+   "behaelter": 175
   },
   {
    "tag": "a",
@@ -10495,7 +13985,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 109
+   "behaelter": 176
   },
   {
    "tag": "a",
@@ -10519,7 +14009,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 110
+   "behaelter": 177
   },
   {
    "tag": "a",
@@ -10541,7 +14031,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 110
+   "behaelter": 177
   },
   {
    "tag": "a",
@@ -10563,7 +14053,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 110
+   "behaelter": 177
   },
   {
    "tag": "a",
@@ -10613,7 +14103,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 111
+   "behaelter": 178
   },
   {
    "tag": "a",
@@ -10655,7 +14145,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 112
+   "behaelter": 179
   },
   {
    "tag": "a",
@@ -10675,7 +14165,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 112
+   "behaelter": 179
   },
   {
    "tag": "a",
@@ -10695,7 +14185,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 112
+   "behaelter": 179
   },
   {
    "tag": "a",
@@ -10797,7 +14287,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 113
+   "behaelter": 180
   },
   {
    "tag": "a",
@@ -10823,7 +14313,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 113
+   "behaelter": 180
   },
   {
    "tag": "a",
@@ -10850,7 +14340,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 114
+   "behaelter": 181
   },
   {
    "tag": "a",
@@ -10876,7 +14366,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 114
+   "behaelter": 181
   },
   {
    "tag": "a",
@@ -10931,7 +14421,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 115
+   "behaelter": 182
   },
   {
    "tag": "a",
@@ -10946,8 +14436,7 @@
    "klassen": [
     "btn",
     "btn-secondary",
-    "bkChat",
-    "d-none"
+    "bkChat"
    ],
    "name": null,
    "wert": null,
@@ -10959,7 +14448,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 115
+   "behaelter": 182
   },
   {
    "tag": "a",
@@ -11024,7 +14513,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 116
+   "behaelter": 183
   },
   {
    "tag": "a",
@@ -11051,7 +14540,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 117
+   "behaelter": 184
   },
   {
    "tag": "a",
@@ -11078,7 +14567,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 117
+   "behaelter": 184
   },
   {
    "tag": "a",
@@ -11105,7 +14594,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 117
+   "behaelter": 184
   },
   {
    "tag": "a",
@@ -11132,7 +14621,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 117
+   "behaelter": 184
   },
   {
    "tag": "a",
@@ -11159,7 +14648,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 117
+   "behaelter": 184
   },
   {
    "tag": "a",
@@ -11186,7 +14675,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 117
+   "behaelter": 184
   },
   {
    "tag": "a",
@@ -11213,7 +14702,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 117
+   "behaelter": 184
   },
   {
    "tag": "a",
@@ -11240,7 +14729,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 117
+   "behaelter": 184
   },
   {
    "tag": "a",
@@ -11267,7 +14756,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 117
+   "behaelter": 184
   },
   {
    "tag": "a",
@@ -11294,7 +14783,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 117
+   "behaelter": 184
   },
   {
    "tag": "a",
@@ -11321,7 +14810,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 117
+   "behaelter": 184
   },
   {
    "tag": "a",
@@ -11348,7 +14837,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 117
+   "behaelter": 184
   },
   {
    "tag": "a",
@@ -11368,7 +14857,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 118
+   "behaelter": 185
   },
   {
    "tag": "a",
@@ -11395,7 +14884,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 118
+   "behaelter": 185
   },
   {
    "tag": "a",
@@ -11415,7 +14904,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 119
+   "behaelter": 186
   },
   {
    "tag": "a",
@@ -11455,7 +14944,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 120
+   "behaelter": 187
   },
   {
    "tag": "a",
@@ -11482,7 +14971,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 121
+   "behaelter": 188
   },
   {
    "tag": "a",
@@ -11509,7 +14998,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 121
+   "behaelter": 188
   },
   {
    "tag": "a",
@@ -11536,7 +15025,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 121
+   "behaelter": 188
   },
   {
    "tag": "a",
@@ -11563,7 +15052,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 121
+   "behaelter": 188
   },
   {
    "tag": "a",
@@ -11590,7 +15079,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 121
+   "behaelter": 188
   },
   {
    "tag": "a",
@@ -11617,7 +15106,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 121
+   "behaelter": 188
   },
   {
    "tag": "a",
@@ -11644,7 +15133,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 121
+   "behaelter": 188
   },
   {
    "tag": "a",
@@ -11671,7 +15160,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 121
+   "behaelter": 188
   },
   {
    "tag": "a",
@@ -11711,7 +15200,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 122
+   "behaelter": 189
   },
   {
    "tag": "a",
@@ -11738,7 +15227,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 123
+   "behaelter": 190
   },
   {
    "tag": "a",
@@ -11765,7 +15254,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 123
+   "behaelter": 190
   },
   {
    "tag": "a",
@@ -11792,7 +15281,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 123
+   "behaelter": 190
   },
   {
    "tag": "a",
@@ -11819,7 +15308,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 123
+   "behaelter": 190
   },
   {
    "tag": "a",
@@ -11846,7 +15335,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 123
+   "behaelter": 190
   },
   {
    "tag": "a",
@@ -11873,7 +15362,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 123
+   "behaelter": 190
   },
   {
    "tag": "a",
@@ -11900,7 +15389,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 123
+   "behaelter": 190
   },
   {
    "tag": "a",
@@ -11927,7 +15416,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 123
+   "behaelter": 190
   },
   {
    "tag": "a",
@@ -11954,7 +15443,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 123
+   "behaelter": 190
   },
   {
    "tag": "a",
@@ -11974,7 +15463,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 124
+   "behaelter": 191
   },
   {
    "tag": "a",
@@ -12001,7 +15490,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 125
+   "behaelter": 192
   },
   {
    "tag": "a",
@@ -12028,7 +15517,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 125
+   "behaelter": 192
   },
   {
    "tag": "a",
@@ -12055,7 +15544,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 125
+   "behaelter": 192
   },
   {
    "tag": "a",
@@ -12075,7 +15564,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 126
+   "behaelter": 193
   },
   {
    "tag": "a",
@@ -12102,7 +15591,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 127
+   "behaelter": 194
   },
   {
    "tag": "a",
@@ -12129,7 +15618,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 127
+   "behaelter": 194
   },
   {
    "tag": "a",
@@ -12169,7 +15658,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 128
+   "behaelter": 195
   },
   {
    "tag": "a",
@@ -12196,7 +15685,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 129
+   "behaelter": 196
   },
   {
    "tag": "a",
@@ -12223,7 +15712,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 129
+   "behaelter": 196
   },
   {
    "tag": "a",
@@ -12250,7 +15739,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 129
+   "behaelter": 196
   },
   {
    "tag": "a",
@@ -12277,7 +15766,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 129
+   "behaelter": 196
   },
   {
    "tag": "a",
@@ -12304,7 +15793,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 129
+   "behaelter": 196
   },
   {
    "tag": "a",
@@ -12324,7 +15813,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 130
+   "behaelter": 197
   },
   {
    "tag": "a",
@@ -12351,7 +15840,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 131
+   "behaelter": 198
   },
   {
    "tag": "a",
@@ -12378,7 +15867,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 131
+   "behaelter": 198
   },
   {
    "tag": "a",
@@ -12405,7 +15894,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 131
+   "behaelter": 198
   },
   {
    "tag": "a",
@@ -12432,7 +15921,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 131
+   "behaelter": 198
   },
   {
    "tag": "a",
@@ -12503,7 +15992,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 132
+   "behaelter": 199
   },
   {
    "tag": "a",
@@ -12530,7 +16019,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 132
+   "behaelter": 199
   },
   {
    "tag": "a",
@@ -12557,7 +16046,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 132
+   "behaelter": 199
   },
   {
    "tag": "a",
@@ -12584,7 +16073,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 132
+   "behaelter": 199
   },
   {
    "tag": "a",
@@ -12611,7 +16100,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 132
+   "behaelter": 199
   },
   {
    "tag": "a",
@@ -12638,7 +16127,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 132
+   "behaelter": 199
   },
   {
    "tag": "a",
@@ -12665,7 +16154,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 132
+   "behaelter": 199
   },
   {
    "tag": "a",
@@ -12692,7 +16181,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 132
+   "behaelter": 199
   },
   {
    "tag": "a",
@@ -12719,7 +16208,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 132
+   "behaelter": 199
   },
   {
    "tag": "a",
@@ -12746,7 +16235,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 132
+   "behaelter": 199
   },
   {
    "tag": "a",
@@ -12773,7 +16262,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 132
+   "behaelter": 199
   },
   {
    "tag": "a",
@@ -12800,7 +16289,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 132
+   "behaelter": 199
   },
   {
    "tag": "a",
@@ -12827,7 +16316,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 132
+   "behaelter": 199
   },
   {
    "tag": "a",
@@ -12854,7 +16343,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 132
+   "behaelter": 199
   },
   {
    "tag": "a",
@@ -13068,6 +16557,186 @@
    "gewaehlt": null,
    "optionen": null,
    "behaelter": 65
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Webseiten-Einstellungen",
+   "aria": {},
+   "daten": {},
+   "id": "dataInfo",
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.1und1.de/Cookie-Einstellungen",
+   "ziel": "_blank",
+   "pfad": "#consent-details > div:nth-of-type(2) > p:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 200
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Datenschutzhinweisen",
+   "aria": {},
+   "daten": {},
+   "id": "dataInfo",
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.1und1.de/DatenschutzTelecomGmbH",
+   "ziel": "_blank",
+   "pfad": "#consent-details > div:nth-of-type(2) > p:nth-of-type(1) > a:nth-of-type(2)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 200
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Impressum",
+   "aria": {},
+   "daten": {},
+   "id": "imprintLink",
+   "klassen": [
+    "icon-link"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://unternehmen.1und1.de/impressum/",
+   "ziel": "_blank",
+   "pfad": "#imprintLink",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 201
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Datenschutzhinweise",
+   "aria": {
+    "aria-label": "Link zu den Datenschutzhinweisen"
+   },
+   "daten": {},
+   "id": "privacypolicyLink",
+   "klassen": [
+    "icon-link"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.1und1.de/Datenschutz",
+   "ziel": "_blank",
+   "pfad": "#privacypolicyLink",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 201
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "hier",
+   "aria": {
+    "aria-label": "hier detaillierte Cookie-Einstellungen vornehmen"
+   },
+   "daten": {},
+   "id": "consent_wall_details",
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "javascript:",
+   "ziel": null,
+   "pfad": "#consent_wall_details",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 133
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Impressum",
+   "aria": {
+    "aria-label": "Link zum Impressum"
+   },
+   "daten": {},
+   "id": "imprintLinkb",
+   "klassen": [
+    "icon-link"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://unternehmen.1und1.de/impressum/",
+   "ziel": "_blank",
+   "pfad": "#imprintLinkb",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 202
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Datenschutzhinweise",
+   "aria": {
+    "aria-label": "Link zu den Datenschutzhinweisen"
+   },
+   "daten": {},
+   "id": "privacypolicyLinkb",
+   "klassen": [
+    "icon-link"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.1und1.de/Datenschutz",
+   "ziel": "_blank",
+   "pfad": "#privacypolicyLinkb",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 202
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Cookie-Infos",
+   "aria": {
+    "aria-label": "Link zu den Cookie-Infos"
+   },
+   "daten": {},
+   "id": "cookieLink",
+   "klassen": [
+    "icon-link"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.1und1.de/Cookie-Einstellungen",
+   "ziel": "_blank",
+   "pfad": "#cookieLink",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 202
   }
  ]
 }

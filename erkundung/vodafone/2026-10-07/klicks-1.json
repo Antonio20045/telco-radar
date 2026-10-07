@@ -4,7 +4,7 @@
   "ruhe": true,
   "anfragen": [
    {
-    "nummer": 233,
+    "nummer": 239,
     "methode": "POST",
     "url": "https://fc.vodafone.de/op/vfde-web/info?attributes=&notifications=&permissions=&identifiers=&nbidentifiers=&out=json",
     "art": "xhr",
@@ -12,7 +12,7 @@
     "abbruch": null
    },
    {
-    "nummer": 234,
+    "nummer": 240,
     "methode": "POST",
     "url": "https://collect.vodafone.de/vodafone/de-main/2/i.gif",
     "art": "ping",
@@ -20,7 +20,7 @@
     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
    },
    {
-    "nummer": 235,
+    "nummer": 241,
     "methode": "GET",
     "url": "https://cdn.dimml.io/dimml.js",
     "art": "script",
@@ -28,7 +28,7 @@
     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
    },
    {
-    "nummer": 236,
+    "nummer": 242,
     "methode": "GET",
     "url": "https://tags.vodafone.de/de-main/prod/utag.954.js?utv=ut4.53.202609301401",
     "art": "script",
@@ -36,7 +36,7 @@
     "abbruch": null
    },
    {
-    "nummer": 237,
+    "nummer": 243,
     "methode": "POST",
     "url": "https://collect.vodafone.de/vodafone/de-main-cdp/2/i.gif",
     "art": "xhr",
@@ -44,73 +44,25 @@
     "abbruch": null
    },
    {
-    "nummer": 238,
-    "methode": "GET",
-    "url": "https://visitor-service.tealiumiq.com/vodafone/de-main-cdp/p-4bedf0ce-260e-4eb7-adf0-ce260e7eb764?callback=adv_lib.dle.callback&rnd=1791357460069",
-    "art": "script",
-    "status": 200,
-    "abbruch": null
-   },
-   {
-    "nummer": 239,
-    "methode": "GET",
-    "url": "https://visitor-service.tealiumiq.com/vodafone/de-main-cdp/p-4bedf0ce-260e-4eb7-adf0-ce260e7eb764?callback=adv_lib.dle.callback&rnd=1791357460469",
-    "art": "script",
-    "status": 200,
-    "abbruch": null
-   },
-   {
-    "nummer": 240,
-    "methode": "GET",
-    "url": "https://visitor-service.tealiumiq.com/vodafone/de-main-cdp/p-4bedf0ce-260e-4eb7-adf0-ce260e7eb764?callback=adv_lib.dle.callback&rnd=1791357461030",
-    "art": "script",
-    "status": 200,
-    "abbruch": null
-   },
-   {
-    "nummer": 241,
-    "methode": "GET",
-    "url": "https://visitor-service.tealiumiq.com/vodafone/de-main-cdp/p-4bedf0ce-260e-4eb7-adf0-ce260e7eb764?callback=adv_lib.dle.callback&rnd=1791357461815",
-    "art": "script",
-    "status": 200,
-    "abbruch": null
-   },
-   {
-    "nummer": 242,
-    "methode": "GET",
-    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/p-4bedf0ce-260e-4eb7-adf0-ce260e7eb764?callback=adv_lib.dle.callback&rnd=1791357462912",
-    "art": "script",
-    "status": 200,
-    "abbruch": null
-   },
-   {
-    "nummer": 243,
-    "methode": "GET",
-    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/p-4bedf0ce-260e-4eb7-adf0-ce260e7eb764?callback=adv_lib.dle.callback&rnd=1791357464449",
-    "art": "script",
-    "status": 200,
-    "abbruch": null
-   },
-   {
     "nummer": 244,
     "methode": "GET",
-    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/p-4bedf0ce-260e-4eb7-adf0-ce260e7eb764?callback=adv_lib.dle.callback&rnd=1791357466601",
+    "url": "https://visitor-service.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791374992321",
     "art": "script",
     "status": 200,
     "abbruch": null
    },
    {
     "nummer": 245,
-    "methode": "POST",
-    "url": "https://at.vodafone.de/rest/v1/delivery?client=vodafonegroupservice&sessionId=ENTFERNT&version=2.6.1",
-    "art": "xhr",
+    "methode": "GET",
+    "url": "https://visitor-service.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791374992722",
+    "art": "script",
     "status": 200,
     "abbruch": null
    },
    {
     "nummer": 246,
     "methode": "GET",
-    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/p-4bedf0ce-260e-4eb7-adf0-ce260e7eb764?callback=adv_lib.dle.callback&rnd=1791357469612",
+    "url": "https://visitor-service.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791374993283",
     "art": "script",
     "status": 200,
     "abbruch": null
@@ -118,7 +70,55 @@
    {
     "nummer": 247,
     "methode": "GET",
-    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/p-4bedf0ce-260e-4eb7-adf0-ce260e7eb764?callback=adv_lib.dle.callback&rnd=1791357473829",
+    "url": "https://visitor-service.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791374994068",
+    "art": "script",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 248,
+    "methode": "GET",
+    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791374995165",
+    "art": "script",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 249,
+    "methode": "GET",
+    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791374996702",
+    "art": "script",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 250,
+    "methode": "GET",
+    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791374998854",
+    "art": "script",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 251,
+    "methode": "POST",
+    "url": "https://at.vodafone.de/rest/v1/delivery?client=vodafonegroupservice&sessionId=ENTFERNT&version=2.6.1",
+    "art": "xhr",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 252,
+    "methode": "GET",
+    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791375001866",
+    "art": "script",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 253,
+    "methode": "GET",
+    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791375006082",
     "art": "script",
     "status": 200,
     "abbruch": null
@@ -139,7 +139,7 @@
    "ruhe": true,
    "anfragen": [
     {
-     "nummer": 248,
+     "nummer": 254,
      "methode": "GET",
      "url": "https://www.vodafone.de/simplicity/icons/mobile-info.svg",
      "art": "other",
@@ -147,7 +147,7 @@
      "abbruch": null
     },
     {
-     "nummer": 249,
+     "nummer": 255,
      "methode": "GET",
      "url": "https://www.vodafone.de/simplicity/icons/chevron-down.svg",
      "art": "other",
@@ -155,7 +155,7 @@
      "abbruch": null
     },
     {
-     "nummer": 250,
+     "nummer": 256,
      "methode": "GET",
      "url": "https://www.vodafone.de/simplicity/icons/screen-size.svg",
      "art": "other",
@@ -163,7 +163,7 @@
      "abbruch": null
     },
     {
-     "nummer": 251,
+     "nummer": 257,
      "methode": "GET",
      "url": "https://www.vodafone.de/simplicity/icons/camera.svg",
      "art": "other",
@@ -171,7 +171,7 @@
      "abbruch": null
     },
     {
-     "nummer": 252,
+     "nummer": 258,
      "methode": "GET",
      "url": "https://www.vodafone.de/simplicity/icons/e-sim.svg",
      "art": "other",
@@ -179,7 +179,7 @@
      "abbruch": null
     },
     {
-     "nummer": 253,
+     "nummer": 259,
      "methode": "GET",
      "url": "https://www.vodafone.de/simplicity/icons/sim.svg",
      "art": "other",
@@ -187,7 +187,7 @@
      "abbruch": null
     },
     {
-     "nummer": 254,
+     "nummer": 260,
      "methode": "GET",
      "url": "https://www.vodafone.de/simplicity/icons/connectivity.svg",
      "art": "other",
@@ -195,7 +195,7 @@
      "abbruch": null
     },
     {
-     "nummer": 255,
+     "nummer": 261,
      "methode": "GET",
      "url": "https://www.vodafone.de/simplicity/icons/touch-screen.svg",
      "art": "other",
@@ -203,7 +203,7 @@
      "abbruch": null
     },
     {
-     "nummer": 256,
+     "nummer": 262,
      "methode": "GET",
      "url": "https://www.vodafone.de/simplicity/icons/box.svg",
      "art": "other",
@@ -211,7 +211,7 @@
      "abbruch": null
     },
     {
-     "nummer": 257,
+     "nummer": 263,
      "methode": "GET",
      "url": "https://www.vodafone.de/simplicity/icons/favorite.svg",
      "art": "other",
@@ -219,7 +219,7 @@
      "abbruch": null
     },
     {
-     "nummer": 258,
+     "nummer": 264,
      "methode": "GET",
      "url": "https://www.vodafone.de/simplicity/icons/sync.svg",
      "art": "other",
@@ -227,7 +227,7 @@
      "abbruch": null
     },
     {
-     "nummer": 259,
+     "nummer": 265,
      "methode": "GET",
      "url": "https://www.vodafone.de/media/img/products/NSF-288x320/iphone17-pro-cosmic-orange-288x320-01.png",
      "art": "image",
@@ -235,7 +235,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 260,
+     "nummer": 266,
      "methode": "GET",
      "url": "https://www.vodafone.de/media/img/products/NSF-288x320/iphone17-pro-cosmic-orange-288x320-02.png",
      "art": "image",
@@ -243,7 +243,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 261,
+     "nummer": 267,
      "methode": "GET",
      "url": "https://www.vodafone.de/media/img/products/NSF-288x320/iphone17-pro-cosmic-orange-288x320-03.png",
      "art": "image",
@@ -251,7 +251,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 262,
+     "nummer": 268,
      "methode": "GET",
      "url": "https://www.vodafone.de/media/img/chargerIncluded/charger-not-included.svg",
      "art": "image",
@@ -259,7 +259,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 263,
+     "nummer": 269,
      "methode": "GET",
      "url": "https://www.vodafone.de/media/img/products/compatibleCharger/iphone-17-pro-charger.svg",
      "art": "image",
@@ -267,7 +267,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 264,
+     "nummer": 270,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/logo_hero_pro_large.png",
      "art": "image",
@@ -275,7 +275,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 265,
+     "nummer": 271,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/hero_large.png",
      "art": "image",
@@ -283,7 +283,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 266,
+     "nummer": 272,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/design_large.png",
      "art": "image",
@@ -291,7 +291,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 267,
+     "nummer": 273,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/unibody_large.png",
      "art": "image",
@@ -299,7 +299,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 268,
+     "nummer": 274,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/front_camera_large.png",
      "art": "image",
@@ -307,7 +307,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 269,
+     "nummer": 275,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/camera_system_large.png",
      "art": "image",
@@ -315,7 +315,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 270,
+     "nummer": 276,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/a19_chip_pro_large.png",
      "art": "image",
@@ -323,7 +323,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 271,
+     "nummer": 277,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/Performance_large.png",
      "art": "image",
@@ -331,7 +331,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 272,
+     "nummer": 278,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/ai_ios_large.png",
      "art": "image",
@@ -339,7 +339,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 273,
+     "nummer": 279,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/icon_esim_large.png",
      "art": "image",
@@ -347,7 +347,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 274,
+     "nummer": 280,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/icon_internaldrive_large.png",
      "art": "image",
@@ -355,7 +355,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 275,
+     "nummer": 281,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/upgraders_iphone_17_pro_max_aluminum_large.png",
      "art": "image",
@@ -363,7 +363,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 276,
+     "nummer": 282,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/upgraders_iphone_17_pro_max_carmera_control_large.png",
      "art": "image",
@@ -371,7 +371,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 277,
+     "nummer": 283,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/upgraders_iphone_17_pro_max_ceramic_shield_large.png",
      "art": "image",
@@ -379,7 +379,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 278,
+     "nummer": 284,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/upgraders_iphone_17_pro_max_carmera_stage_large.png",
      "art": "image",
@@ -387,7 +387,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 279,
+     "nummer": 285,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/upgraders_iphone_17_pro_max_promotion_large.png",
      "art": "image",
@@ -395,7 +395,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 280,
+     "nummer": 286,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/icon_upgraders_iphone_17_pro_max_film_large.png",
      "art": "image",
@@ -403,7 +403,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 281,
+     "nummer": 287,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/icon_flex_apple_logo_lock_elevated_large.png",
      "art": "image",
@@ -411,7 +411,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 282,
+     "nummer": 288,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/icon_flex_earth_americas_elevated_large.png",
      "art": "image",
@@ -419,7 +419,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 283,
+     "nummer": 289,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/icon_flex_iphone_and_iphone_elevated_large.png",
      "art": "image",
@@ -427,7 +427,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 284,
+     "nummer": 290,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/icon_flex_ios_large.png",
      "art": "image",
@@ -435,7 +435,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 285,
+     "nummer": 291,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/flex_accessories_large.png",
      "art": "image",
@@ -443,7 +443,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 286,
+     "nummer": 292,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/logo_flex_appletv_large.png",
      "art": "image",
@@ -451,7 +451,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 287,
+     "nummer": 293,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/flex_tv_large.png",
      "art": "image",
@@ -459,7 +459,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 288,
+     "nummer": 294,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/flex_logo_apple_care_plus_large.png",
      "art": "image",
@@ -467,7 +467,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 289,
+     "nummer": 295,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/flex_check_ff1736_34_R_large.png",
      "art": "image",
@@ -475,7 +475,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 290,
+     "nummer": 296,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/flex_applecare_large.png",
      "art": "image",
@@ -483,7 +483,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 291,
+     "nummer": 297,
      "methode": "GET",
      "url": "https://www.vodafone.de/media/img/teaser/re-trade-mt-1248x600-dt.jpg",
      "art": "image",
@@ -491,7 +491,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 292,
+     "nummer": 298,
      "methode": "GET",
      "url": "https://www.vodafone.de/media/img/teaser/ELEKTROGERATE-RUCKNAHME-mt-1248x600-dt.png",
      "art": "image",
@@ -499,7 +499,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 293,
+     "nummer": 299,
      "methode": "GET",
      "url": "https://www.vodafone.de/media/img/teaser/BATTERIE-RUCKNAHME-Edited-mt-1248x600-dt.jpg",
      "art": "image",
@@ -507,7 +507,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 294,
+     "nummer": 300,
      "methode": "GET",
      "url": "https://www.vodafone.de/media/img/teaser/Imagery-mt-1248x600-dt.jpg",
      "art": "image",
@@ -515,7 +515,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 295,
+     "nummer": 301,
      "methode": "POST",
      "url": "https://collect.vodafone.de/vodafone/de-main/2/i.gif",
      "art": "ping",
@@ -523,7 +523,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 296,
+     "nummer": 302,
      "methode": "POST",
      "url": "https://collect.vodafone.de/vodafone/de-main-cdp/2/i.gif",
      "art": "ping",
@@ -531,57 +531,9 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 297,
-     "methode": "GET",
-     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/p-4bedf0ce-260e-4eb7-adf0-ce260e7eb764?callback=adv_lib.dle.callback&rnd=1791357477393",
-     "art": "script",
-     "status": 200,
-     "abbruch": null
-    },
-    {
-     "nummer": 298,
-     "methode": "GET",
-     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/p-4bedf0ce-260e-4eb7-adf0-ce260e7eb764?callback=adv_lib.dle.callback&rnd=1791357477794",
-     "art": "script",
-     "status": 200,
-     "abbruch": null
-    },
-    {
-     "nummer": 299,
-     "methode": "GET",
-     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/p-4bedf0ce-260e-4eb7-adf0-ce260e7eb764?callback=adv_lib.dle.callback&rnd=1791357478355",
-     "art": "script",
-     "status": 200,
-     "abbruch": null
-    },
-    {
-     "nummer": 300,
-     "methode": "GET",
-     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/p-4bedf0ce-260e-4eb7-adf0-ce260e7eb764?callback=adv_lib.dle.callback&rnd=1791357479139",
-     "art": "script",
-     "status": 200,
-     "abbruch": null
-    },
-    {
-     "nummer": 301,
-     "methode": "GET",
-     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/p-4bedf0ce-260e-4eb7-adf0-ce260e7eb764?callback=adv_lib.dle.callback&rnd=1791357480237",
-     "art": "script",
-     "status": 200,
-     "abbruch": null
-    },
-    {
-     "nummer": 302,
-     "methode": "GET",
-     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/p-4bedf0ce-260e-4eb7-adf0-ce260e7eb764?callback=adv_lib.dle.callback&rnd=1791357481774",
-     "art": "script",
-     "status": 200,
-     "abbruch": null
-    },
-    {
      "nummer": 303,
      "methode": "GET",
-     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/p-4bedf0ce-260e-4eb7-adf0-ce260e7eb764?callback=adv_lib.dle.callback&rnd=1791357483925",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791375009435",
      "art": "script",
      "status": 200,
      "abbruch": null
@@ -589,7 +541,7 @@
     {
      "nummer": 304,
      "methode": "GET",
-     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/p-4bedf0ce-260e-4eb7-adf0-ce260e7eb764?callback=adv_lib.dle.callback&rnd=1791357486937",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791375009836",
      "art": "script",
      "status": 200,
      "abbruch": null
@@ -597,7 +549,7 @@
     {
      "nummer": 305,
      "methode": "GET",
-     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/p-4bedf0ce-260e-4eb7-adf0-ce260e7eb764?callback=adv_lib.dle.callback&rnd=1791357491154",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791375010397",
      "art": "script",
      "status": 200,
      "abbruch": null
@@ -605,7 +557,55 @@
     {
      "nummer": 306,
      "methode": "GET",
-     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/p-4bedf0ce-260e-4eb7-adf0-ce260e7eb764?callback=adv_lib.dle.callback&rnd=1791357497057",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791375011182",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 307,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791375012279",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 308,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791375013816",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 309,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791375015968",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 310,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791375018980",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 311,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791375023196",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 312,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791375029100",
      "art": "script",
      "status": 200,
      "abbruch": null
@@ -683,7 +683,7 @@
    "ruhe": true,
    "anfragen": [
     {
-     "nummer": 307,
+     "nummer": 313,
      "methode": "GET",
      "url": "https://www.vodafone.de/simplicity/icons/mobile-info.svg",
      "art": "other",
@@ -691,7 +691,7 @@
      "abbruch": null
     },
     {
-     "nummer": 308,
+     "nummer": 314,
      "methode": "GET",
      "url": "https://www.vodafone.de/simplicity/icons/chevron-down.svg",
      "art": "other",
@@ -699,7 +699,7 @@
      "abbruch": null
     },
     {
-     "nummer": 309,
+     "nummer": 315,
      "methode": "GET",
      "url": "https://www.vodafone.de/simplicity/icons/screen-size.svg",
      "art": "other",
@@ -707,7 +707,7 @@
      "abbruch": null
     },
     {
-     "nummer": 310,
+     "nummer": 316,
      "methode": "GET",
      "url": "https://www.vodafone.de/simplicity/icons/camera.svg",
      "art": "other",
@@ -715,7 +715,7 @@
      "abbruch": null
     },
     {
-     "nummer": 311,
+     "nummer": 317,
      "methode": "GET",
      "url": "https://www.vodafone.de/simplicity/icons/e-sim.svg",
      "art": "other",
@@ -723,7 +723,7 @@
      "abbruch": null
     },
     {
-     "nummer": 312,
+     "nummer": 318,
      "methode": "GET",
      "url": "https://www.vodafone.de/simplicity/icons/sim.svg",
      "art": "other",
@@ -731,7 +731,7 @@
      "abbruch": null
     },
     {
-     "nummer": 313,
+     "nummer": 319,
      "methode": "GET",
      "url": "https://www.vodafone.de/simplicity/icons/connectivity.svg",
      "art": "other",
@@ -739,7 +739,7 @@
      "abbruch": null
     },
     {
-     "nummer": 314,
+     "nummer": 320,
      "methode": "GET",
      "url": "https://www.vodafone.de/simplicity/icons/touch-screen.svg",
      "art": "other",
@@ -747,7 +747,7 @@
      "abbruch": null
     },
     {
-     "nummer": 315,
+     "nummer": 321,
      "methode": "GET",
      "url": "https://www.vodafone.de/simplicity/icons/box.svg",
      "art": "other",
@@ -755,7 +755,7 @@
      "abbruch": null
     },
     {
-     "nummer": 316,
+     "nummer": 322,
      "methode": "GET",
      "url": "https://www.vodafone.de/simplicity/icons/favorite.svg",
      "art": "other",
@@ -763,7 +763,7 @@
      "abbruch": null
     },
     {
-     "nummer": 317,
+     "nummer": 323,
      "methode": "GET",
      "url": "https://www.vodafone.de/simplicity/icons/sync.svg",
      "art": "other",
@@ -771,7 +771,7 @@
      "abbruch": null
     },
     {
-     "nummer": 318,
+     "nummer": 324,
      "methode": "GET",
      "url": "https://www.vodafone.de/media/img/products/NSF-288x320/iphone17-pro-cosmic-orange-288x320-01.png",
      "art": "image",
@@ -779,7 +779,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 319,
+     "nummer": 325,
      "methode": "GET",
      "url": "https://www.vodafone.de/media/img/products/NSF-288x320/iphone17-pro-cosmic-orange-288x320-02.png",
      "art": "image",
@@ -787,7 +787,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 320,
+     "nummer": 326,
      "methode": "GET",
      "url": "https://www.vodafone.de/media/img/products/NSF-288x320/iphone17-pro-cosmic-orange-288x320-03.png",
      "art": "image",
@@ -795,7 +795,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 321,
+     "nummer": 327,
      "methode": "GET",
      "url": "https://www.vodafone.de/media/img/chargerIncluded/charger-not-included.svg",
      "art": "image",
@@ -803,7 +803,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 322,
+     "nummer": 328,
      "methode": "GET",
      "url": "https://www.vodafone.de/media/img/products/compatibleCharger/iphone-17-pro-charger.svg",
      "art": "image",
@@ -811,7 +811,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 323,
+     "nummer": 329,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/logo_hero_pro_large.png",
      "art": "image",
@@ -819,7 +819,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 324,
+     "nummer": 330,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/hero_large.png",
      "art": "image",
@@ -827,7 +827,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 325,
+     "nummer": 331,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/design_large.png",
      "art": "image",
@@ -835,7 +835,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 326,
+     "nummer": 332,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/unibody_large.png",
      "art": "image",
@@ -843,7 +843,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 327,
+     "nummer": 333,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/front_camera_large.png",
      "art": "image",
@@ -851,7 +851,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 328,
+     "nummer": 334,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/camera_system_large.png",
      "art": "image",
@@ -859,7 +859,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 329,
+     "nummer": 335,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/a19_chip_pro_large.png",
      "art": "image",
@@ -867,7 +867,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 330,
+     "nummer": 336,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/Performance_large.png",
      "art": "image",
@@ -875,7 +875,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 331,
+     "nummer": 337,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/ai_ios_large.png",
      "art": "image",
@@ -883,7 +883,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 332,
+     "nummer": 338,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/icon_esim_large.png",
      "art": "image",
@@ -891,7 +891,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 333,
+     "nummer": 339,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/icon_internaldrive_large.png",
      "art": "image",
@@ -899,7 +899,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 334,
+     "nummer": 340,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/upgraders_iphone_17_pro_max_aluminum_large.png",
      "art": "image",
@@ -907,7 +907,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 335,
+     "nummer": 341,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/upgraders_iphone_17_pro_max_carmera_control_large.png",
      "art": "image",
@@ -915,7 +915,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 336,
+     "nummer": 342,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/upgraders_iphone_17_pro_max_ceramic_shield_large.png",
      "art": "image",
@@ -923,7 +923,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 337,
+     "nummer": 343,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/upgraders_iphone_17_pro_max_carmera_stage_large.png",
      "art": "image",
@@ -931,7 +931,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 338,
+     "nummer": 344,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/upgraders_iphone_17_pro_max_promotion_large.png",
      "art": "image",
@@ -939,7 +939,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 339,
+     "nummer": 345,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/icon_upgraders_iphone_17_pro_max_film_large.png",
      "art": "image",
@@ -947,7 +947,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 340,
+     "nummer": 346,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/icon_flex_apple_logo_lock_elevated_large.png",
      "art": "image",
@@ -955,7 +955,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 341,
+     "nummer": 347,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/icon_flex_earth_americas_elevated_large.png",
      "art": "image",
@@ -963,7 +963,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 342,
+     "nummer": 348,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/icon_flex_iphone_and_iphone_elevated_large.png",
      "art": "image",
@@ -971,7 +971,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 343,
+     "nummer": 349,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/icon_flex_ios_large.png",
      "art": "image",
@@ -979,7 +979,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 344,
+     "nummer": 350,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/flex_accessories_large.png",
      "art": "image",
@@ -987,7 +987,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 345,
+     "nummer": 351,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/logo_flex_appletv_large.png",
      "art": "image",
@@ -995,7 +995,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 346,
+     "nummer": 352,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/flex_tv_large.png",
      "art": "image",
@@ -1003,7 +1003,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 347,
+     "nummer": 353,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/flex_logo_apple_care_plus_large.png",
      "art": "image",
@@ -1011,7 +1011,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 348,
+     "nummer": 354,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/flex_check_ff1736_34_R_large.png",
      "art": "image",
@@ -1019,7 +1019,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 349,
+     "nummer": 355,
      "methode": "GET",
      "url": "https://www.vodafone.de/apple/apple-2025/iphone-17-pro/flex_applecare_large.png",
      "art": "image",
@@ -1027,7 +1027,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 350,
+     "nummer": 356,
      "methode": "GET",
      "url": "https://www.vodafone.de/media/img/teaser/re-trade-mt-1248x600-dt.jpg",
      "art": "image",
@@ -1035,7 +1035,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 351,
+     "nummer": 357,
      "methode": "GET",
      "url": "https://www.vodafone.de/media/img/teaser/ELEKTROGERATE-RUCKNAHME-mt-1248x600-dt.png",
      "art": "image",
@@ -1043,7 +1043,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 352,
+     "nummer": 358,
      "methode": "GET",
      "url": "https://www.vodafone.de/media/img/teaser/BATTERIE-RUCKNAHME-Edited-mt-1248x600-dt.jpg",
      "art": "image",
@@ -1051,7 +1051,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 353,
+     "nummer": 359,
      "methode": "GET",
      "url": "https://www.vodafone.de/media/img/teaser/Imagery-mt-1248x600-dt.jpg",
      "art": "image",
@@ -1059,7 +1059,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 354,
+     "nummer": 360,
      "methode": "POST",
      "url": "https://collect.vodafone.de/vodafone/de-main/2/i.gif",
      "art": "ping",
@@ -1067,7 +1067,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 355,
+     "nummer": 361,
      "methode": "POST",
      "url": "https://collect.vodafone.de/vodafone/de-main-cdp/2/i.gif",
      "art": "ping",
@@ -1075,57 +1075,9 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 356,
-     "methode": "GET",
-     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/p-4bedf0ce-260e-4eb7-adf0-ce260e7eb764?callback=adv_lib.dle.callback&rnd=1791357516942",
-     "art": "script",
-     "status": 200,
-     "abbruch": null
-    },
-    {
-     "nummer": 357,
-     "methode": "GET",
-     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/p-4bedf0ce-260e-4eb7-adf0-ce260e7eb764?callback=adv_lib.dle.callback&rnd=1791357517342",
-     "art": "script",
-     "status": 200,
-     "abbruch": null
-    },
-    {
-     "nummer": 358,
-     "methode": "GET",
-     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/p-4bedf0ce-260e-4eb7-adf0-ce260e7eb764?callback=adv_lib.dle.callback&rnd=1791357517903",
-     "art": "script",
-     "status": 200,
-     "abbruch": null
-    },
-    {
-     "nummer": 359,
-     "methode": "GET",
-     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/p-4bedf0ce-260e-4eb7-adf0-ce260e7eb764?callback=adv_lib.dle.callback&rnd=1791357518688",
-     "art": "script",
-     "status": 200,
-     "abbruch": null
-    },
-    {
-     "nummer": 360,
-     "methode": "GET",
-     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/p-4bedf0ce-260e-4eb7-adf0-ce260e7eb764?callback=adv_lib.dle.callback&rnd=1791357519785",
-     "art": "script",
-     "status": 200,
-     "abbruch": null
-    },
-    {
-     "nummer": 361,
-     "methode": "GET",
-     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/p-4bedf0ce-260e-4eb7-adf0-ce260e7eb764?callback=adv_lib.dle.callback&rnd=1791357521322",
-     "art": "script",
-     "status": 200,
-     "abbruch": null
-    },
-    {
      "nummer": 362,
      "methode": "GET",
-     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/p-4bedf0ce-260e-4eb7-adf0-ce260e7eb764?callback=adv_lib.dle.callback&rnd=1791357523474",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791375047000",
      "art": "script",
      "status": 200,
      "abbruch": null
@@ -1133,7 +1085,7 @@
     {
      "nummer": 363,
      "methode": "GET",
-     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/p-4bedf0ce-260e-4eb7-adf0-ce260e7eb764?callback=adv_lib.dle.callback&rnd=1791357526485",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791375047401",
      "art": "script",
      "status": 200,
      "abbruch": null
@@ -1141,7 +1093,7 @@
     {
      "nummer": 364,
      "methode": "GET",
-     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/p-4bedf0ce-260e-4eb7-adf0-ce260e7eb764?callback=adv_lib.dle.callback&rnd=1791357530702",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791375047962",
      "art": "script",
      "status": 200,
      "abbruch": null
@@ -1149,7 +1101,55 @@
     {
      "nummer": 365,
      "methode": "GET",
-     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/p-4bedf0ce-260e-4eb7-adf0-ce260e7eb764?callback=adv_lib.dle.callback&rnd=1791357536605",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791375048746",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 366,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791375049844",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 367,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791375051381",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 368,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791375053533",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 369,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791375056544",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 370,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791375060761",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 371,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791375066665",
      "art": "script",
      "status": 200,
      "abbruch": null
