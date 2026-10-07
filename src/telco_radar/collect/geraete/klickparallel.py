@@ -7,8 +7,8 @@ nennt sie den Grund, und der Anbieter ist ``verschoben``. ``GithubLaeufe`` fragt
 Workflow, ob ein Lauf ``queued`` oder ``in_progress`` ist, mit dem ``GITHUB_TOKEN`` des
 Workflows (``actions: read``). Ist die API nicht erreichbar, antwortet sie nicht mit 200
 oder ist die Antwort unlesbar, ist das ebenso ein Grund: nie still weiter. Das Token
-steht in keiner Meldung. Der Klick-Tageslauf (eigener Workflow ``klick.yml``) fragt
-nach ``TAGESLAUF_WORKFLOWS``; sobald es ``klick.yml`` gibt, gehört er in ``WORKFLOWS``.
+steht in keiner Meldung. Die Erkundung weicht auch dem Klick-Tageslauf (``klick.yml``,
+seit 07.10.2026 auf main) aus; der Tageslauf selbst fragt nach ``TAGESLAUF_WORKFLOWS``.
 """
 
 from __future__ import annotations
@@ -19,7 +19,11 @@ from dataclasses import dataclass, field
 
 from .. import http
 
-WORKFLOWS = {"geraete.yml": "Gerätelauf", "radar.yml": "Radarlauf"}
+WORKFLOWS = {
+    "geraete.yml": "Gerätelauf",
+    "klick.yml": "Klick-Tageslauf",
+    "radar.yml": "Radarlauf",
+}
 TAGESLAUF_WORKFLOWS = {
     "geraete.yml": "Gerätelauf",
     "klick-erkundung.yml": "Klick-Erkundung",

@@ -64,7 +64,7 @@ def test_frei_wenn_kein_lauf_ansteht_und_jede_frage_traegt_das_token():
     assert [u for u, _ in api.fragen] == [
         f"{API}/repos/Antonio20045/telco-radar/actions/workflows/{d}/runs"
         f"?status={z}&per_page=1"
-        for d in ("geraete.yml", "radar.yml")
+        for d in ("geraete.yml", "klick.yml", "radar.yml")
         for z in ("queued", "in_progress")
     ]
     assert {k["Authorization"] for _, k in api.fragen} == {f"Bearer {TOKEN}"}
@@ -79,6 +79,10 @@ def test_frei_wenn_kein_lauf_ansteht_und_jede_frage_traegt_das_token():
         ),
         ({("geraete.yml", "queued"): 2}, "Gerätelauf läuft (geraete.yml, queued)"),
         ({("radar.yml", "in_progress"): 1}, "Radarlauf läuft (radar.yml, in_progress)"),
+        (
+            {("klick.yml", "in_progress"): 1},
+            "Klick-Tageslauf läuft (klick.yml, in_progress)",
+        ),
     ],
 )
 def test_ein_anstehender_oder_laufender_lauf_ist_der_grund(laeufe, grund):
