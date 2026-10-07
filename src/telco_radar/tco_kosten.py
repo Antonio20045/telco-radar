@@ -186,6 +186,8 @@ def _tarif(k: Kosten, buendel: Buendel, h: int) -> None:
         k.rechnung += tarifschritte(phasen, h)
     elif not offen:
         k.luecken.append(POSTEN_TARIF)
+    elif offen[0] > 1:
+        k.rechnung += tarifschritte(phasen, offen[0] - 1)
     if h < pflicht:
         k.luecken.append(f"{POSTEN_TARIF} Monat {_spanne(h + 1, pflicht)}")
 
@@ -194,14 +196,16 @@ def tarifschritte(phasen: list[Preisphase], h: int) -> list[Rechenschritt]:
     """Je Preisphase ein Summand „Monate × Preis“; gleiche Preise in Folge zusammen.
 
     Wie `phasensumme` läuft der letzte Preis über Monate weiter, die keine Phase
-    nennt; `kosten_ueber` ruft es nur ohne solche Monate.
+    nennt; `kosten_ueber` ruft es nur für Monate, die eine Phase nennt (ohne
+    Kernzahl für die belegten Monate vor der ersten Lücke).
     """
     paare: list[tuple[int, float]] = []
     for phase in sorted(phasen, key=lambda p: p.von_monat):
         if phase.monate(h) > 0:
             paare.append((phase.monate(h), phase.betrag))
     if paare and sum(m for m, _ in paare) < h:
-        paare.append((h - sum(m for m, _ in paare), paare[-1][1]))
+        letzter = sorted(phasen, key=lambda p: p.von_monat)[-1].betrag
+        paare.append((h - sum(m for m, _ in paare), letzter))
     schritte: list[Rechenschritt] = []
     for monate, betrag in paare:
         if schritte and schritte[-1].betrag == betrag:

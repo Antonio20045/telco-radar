@@ -2,8 +2,8 @@
 
 Antonio, 07.10.2026: auf einen Blick sehen, wie der Preis zustande kommt. Die
 Summanden rechnet `tco_kosten.kosten_ueber` (`Kosten.rechnung`), die Referenz-
-rechnung `tco_kosten.tarifschritte`; hier bekommen sie nur ihr Wort. Ein Betrag
-wird nicht nachgerechnet.
+rechnung `tco_kosten.tarifschritte`; hier bekommen sie ihr Wort. Die Summanden
+der Referenz werden gegen ihre Tarifsumme gehalten, nie an ihre Stelle gesetzt.
 """
 
 from __future__ import annotations
@@ -68,16 +68,17 @@ def felder(kosten: Kosten) -> dict:
 
 def referenz(ref: dict) -> list[dict]:
     """Die Summanden der Vodafone-Referenzrechnung: Barpreis plus Tarif über die
-    Monate der Referenz, je Preisphase wie `phasensumme` sie zählt; leer für eine
-    Referenz ohne diese Angaben."""
+    Monate der Referenz, je Preisphase wie `phasensumme` sie zählt. Ergeben die
+    Schritte nicht die Tarifsumme der Referenz (`tarif_summe`), steht sie als ein
+    Betrag; leer für eine Referenz ohne diese Angaben."""
     monate, monatlich = ref.get("tarif_monate"), ref.get("monatlich")
     if not monate or monatlich is None or ref.get("geraet_betrag") is None:
         return []
-    phasen = ref.get("phasen") or [Preisphase(1, None, monatlich)]
     bar = ref["geraet_betrag"]
-    return zum_lesen(
-        [
-            Rechenschritt(SCHRITT_BARPREIS, None, bar, bar),
-            *tarifschritte(phasen, monate),
-        ]
-    )
+    summe = ref.get("tarif_summe")
+    tarif = tarifschritte(ref.get("phasen") or [], monate)
+    if summe is not None and round(sum(t.summe for t in tarif), 2) != summe:
+        tarif = tarifschritte([Preisphase(1, None, monatlich)], monate)
+    if summe is not None and round(sum(t.summe for t in tarif), 2) != summe:
+        tarif = [Rechenschritt(SCHRITT_TARIF, None, summe, summe)]
+    return zum_lesen([Rechenschritt(SCHRITT_BARPREIS, None, bar, bar), *tarif])

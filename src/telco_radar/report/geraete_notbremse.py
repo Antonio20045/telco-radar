@@ -30,7 +30,7 @@ from ..analyze.geraete_pruefstatus import (
 )
 from ..tco_model import Aktion, Buendel, aktionen_aus
 
-DELTA_SCHAETZUNG = "berechnet"
+DELTA_SCHAETZUNG = "nicht direkt genannt"
 SATZ_SCHAETZUNG = (
     "Kein Abstand zur Vodafone-Referenz: der Anbieter nennt diesen Preis nicht "
     "direkt, er ist aus seinen Angaben berechnet."

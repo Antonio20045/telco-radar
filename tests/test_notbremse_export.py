@@ -43,7 +43,7 @@ def export(tmp_path_factory):
 
 def _grund(roh: dict, heute: str) -> str:
     if str(roh.get("herleitung") or "").strip():
-        return "berechnet"
+        return "nicht direkt genannt"
     for a in roh.get("aktionen") or []:
         ende = str(a.get("gueltig_bis") or "").strip()
         if a.get("eingerechnet") and ende and ende < heute:
@@ -79,7 +79,7 @@ def test_der_export_hat_eine_statusspalte(export):
     assert zeilen and STATUS in zeilen[0], sorted(zeilen[0]) if zeilen else zeilen
 
 
-@pytest.mark.parametrize("grund", ["berechnet", "Aktion abgelaufen"])
+@pytest.mark.parametrize("grund", ["nicht direkt genannt", "Aktion abgelaufen"])
 def test_buendel_das_nicht_zaehlt_ist_markiert(export, grund):
     betroffen = [z for z, g in _gruende_je_zeile(export) if g == {grund}]
     assert betroffen, f"Fall fehlt: keine Zeile mit {grund} im Export"

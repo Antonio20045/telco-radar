@@ -153,7 +153,10 @@ def test_band_nur_mit_schaetzungen_bleibt_und_nennt_den_grund(gerendert, karten)
         paar
         for paar, antwort in nur_gesperrt
         if "steht kein Bündel im Vergleich: " not in antwort
-        or ("(berechnet)" not in antwort and "(Aktion abgelaufen)" not in antwort)
+        or (
+            "(nicht direkt genannt)" not in antwort
+            and "(Aktion abgelaufen)" not in antwort
+        )
     ]
     mit_preis = [paar for paar, antwort in nur_gesperrt if "gr-zr-zahl" in antwort]
     assert not ohne_grund and not mit_preis, (

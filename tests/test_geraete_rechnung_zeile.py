@@ -116,6 +116,39 @@ def test_ohne_gesamtpreis_nur_die_gemessenen_posten():
     assert k.luecken == ["Geräterate"]
 
 
+def test_luecke_nach_der_bindung_verschweigt_den_belegten_tarif_nicht():
+    """36 Raten, Tarifpreis nur bis Monat 24 belegt: die Rechnung nennt den
+    belegten Tarif und die Lücke danach, keine Kernzahl."""
+    k = kosten_ueber(_buendel(laufzeit_monate=36))
+    assert k.gesamt is None
+    assert (24, 14.99, "tarif") in _schritte(k)
+    assert "Tarifgrundpreis Monat 25–36" in k.luecken
+
+
+@pytest.mark.parametrize(
+    "phasen,tarif_summe",
+    [
+        ([Preisphase(1, 12, 10.0), Preisphase(25, None, 30.0)], 480.0),
+        ([Preisphase(25, None, 30.0)], 240.0),
+    ],
+)
+def test_referenzrechnung_ergibt_ihre_tarifsumme(phasen, tarif_summe):
+    """Die Summanden der Referenz ergeben genau ihre Tarifsumme, auch wenn die
+    Phasen Monate offen lassen."""
+    from telco_radar.report.geraete_rechnung import referenz
+
+    ref = {
+        "tarif_monate": 24,
+        "monatlich": 10.0,
+        "geraet_betrag": 1000.0,
+        "tarif_summe": tarif_summe,
+        "phasen": phasen,
+    }
+    schritte = referenz(ref)
+    summe = sum(s["betrag"] * (s["anzahl"] or 1) for s in schritte)
+    assert round(summe, 2) == 1000.0 + tarif_summe
+
+
 @pytest.fixture(scope="module")
 def bestand(tmp_path_factory):
     wurzel = tmp_path_factory.mktemp("rechnung-zeile")
