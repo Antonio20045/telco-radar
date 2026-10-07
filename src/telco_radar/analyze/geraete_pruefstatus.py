@@ -53,6 +53,11 @@ BUENDEL_NACHLASS = {"o2": 5.00}
 im Monat), sonst 0: o2 stellt den Bündel-Tarifpreis selbst 5 € unter SIM-only,
 „attraktiver monatlicher Rabatt auf deinen Tarif“ (``analyze/tco_buendel.py``,
 Modulkopf, 21.09.2026). Regel 3 misst gegen SIM-only minus diesen Nachlass."""
+GERAETETARIF_MERKMAL = {"o2": "Plus"}
+"""Wort im Namen eines Tarifs, den der Anbieter nur mit Gerät führt (normalisierter Name
+→ Wort). o2s „… Plus …“ trägt die Tarif-ID des Grundtarifs, ist aber ein eigener Tarif:
+zum iPhone 17 Pro kostet Unlimited M Plus 19,99 € statt 39,99 €, SIM-only Unlimited M
+29,99 € (o2-Seite am 07.10.2026). Für Regel 3 fehlt sein SIM-only-Preis."""
 MIN_BUENDEL_GLEICHWERT = 3
 
 REGELN = {

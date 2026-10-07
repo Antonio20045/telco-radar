@@ -431,3 +431,25 @@ def test_gegenprobe_eine_angabe_im_beleg_reicht(speicher, verletzt):
     feld = _feld(_satz(beleg_variante={"speicher": speicher}))
     assert 13 not in feld["nicht_pruefbar"], feld
     assert (13 in _gruende(feld)) is verletzt, feld
+
+
+@pytest.mark.parametrize(
+    "tarif,status",
+    [
+        ("O2 Mobile Unlimited M Plus mit 100 MBit/s (24 Mon.)", GUELTIG),
+        ("O2 Mobile Unlimited M mit 100 MBit/s (24 Mon.)", QUARANTAENE),
+    ],
+    ids=["plus-ist-eigener-tarif", "gegenprobe-grundtarif"],
+)
+def test_o2_plus_tarif_misst_nicht_am_sim_only_des_grundtarifs(tarif, status):
+    """o2-Seite am 07.10.2026: iPhone 17 Pro mit Unlimited M Plus 19,99 € statt
+    39,99 €. Plus trägt die Tarif-ID von Unlimited M (SIM-only 29,99 €), ist aber ein
+    eigener Tarif."""
+    satz = _satz(
+        tarif_name=tarif,
+        tarif_monatlich=19.99,
+        beleg_variante={"laufzeit": 24, "tarif": tarif, "speicher": 128},
+    )
+    feld = _feld(satz, sim_only={f"o2|{TARIF_ID}": 29.99}, volumen={})
+    assert feld["status"] == status, feld
+    assert (3 in feld["nicht_pruefbar"]) is (status == GUELTIG), feld

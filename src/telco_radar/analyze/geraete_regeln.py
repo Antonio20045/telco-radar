@@ -40,6 +40,7 @@ from .geraete_pruefstatus import (
     FELD_BELEG_VARIANTE,
     FELD_ECHO,
     FELD_GERAETESUMME,
+    GERAETETARIF_MERKMAL,
     LUECKE,
     MIN_BUENDEL_GLEICHWERT,
     NICHT_PRUEFBAR,
@@ -140,9 +141,12 @@ def sim_only_tabelle(referenzen: Iterable[Mapping]) -> dict[str, float]:
 
 
 def sim_only_preis(b: Buendel, tabelle: Mapping[str, float]) -> float | None:
-    """Der SIM-only-Preis desselben Tarifs: über Namen, Tarif-ID oder Vertrag."""
+    """Der SIM-only-Preis desselben Tarifs: über Namen, Tarif-ID oder Vertrag; ein Tarif
+    nur mit Gerät (``GERAETETARIF_MERKMAL``) nur über den Namen."""
     schluessel = [sim_only_id(b.anbieter, b.tarif_name)]
-    if tid := (b.tarif_id or "").strip():
+    merkmal = GERAETETARIF_MERKMAL.get(normalisiere(b.anbieter))
+    nur_mit_geraet = merkmal is not None and merkmal in (b.tarif_name or "").split()
+    if (tid := (b.tarif_id or "").strip()) and not nur_mit_geraet:
         schluessel.append(_tarif_schluessel(b.anbieter, tid))
         schluessel.append(_tarif_schluessel(b.anbieter, vertrag_basis(tid)))
     return next((tabelle[s] for s in schluessel if s in tabelle), None)
