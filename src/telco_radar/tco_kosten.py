@@ -170,11 +170,8 @@ def _tarif(k: Kosten, buendel: Buendel, h: int) -> None:
     """
     from .tco_model import POSTEN_TARIF, phasensumme
 
-    bindung = buendel.tarif_bindung_monate
-    pflicht = ZEITRAUM_OHNE_BINDUNG if bindung is None else bindung
-    phasen = belegte_phasen(buendel.tarif_phasen, pflicht) or _grundpreis_als_phase(
-        buendel.tarif_monatlich, pflicht
-    )
+    pflicht = _pflicht(buendel)
+    phasen = tarifphasen(buendel)
     if not phasen:
         k.luecken.append(POSTEN_TARIF)
         return
@@ -214,6 +211,31 @@ def tarifschritte(phasen: list[Preisphase], h: int) -> list[Rechenschritt]:
             Rechenschritt(SCHRITT_TARIF, monate, betrag, round(monate * betrag, 2))
         )
     return schritte
+
+
+def _pflicht(buendel: Buendel) -> int:
+    bindung = buendel.tarif_bindung_monate
+    return ZEITRAUM_OHNE_BINDUNG if bindung is None else bindung
+
+
+def tarifphasen(buendel: Buendel) -> list[Preisphase]:
+    """Die Phasen, mit denen `kosten_ueber` den Tarif rechnet: die belegten, sonst der
+    gemessene Grundpreis bis zum Ende der Bindung."""
+    pflicht = _pflicht(buendel)
+    return belegte_phasen(buendel.tarif_phasen, pflicht) or _grundpreis_als_phase(
+        buendel.tarif_monatlich, pflicht
+    )
+
+
+def tarifpreis_im_monat(buendel: Buendel, monat: int) -> float | None:
+    """Der Tarifpreis in `monat`, wie `kosten_ueber` ihn rechnet - None, wo nicht genau
+    eine Phase den Monat nennt (dort rechnet `kosten_ueber` eine Lücke)."""
+    treffer = [
+        p
+        for p in tarifphasen(buendel)
+        if p.von_monat <= monat and (p.bis_monat is None or monat <= p.bis_monat)
+    ]
+    return round(float(treffer[0].betrag), 2) if len(treffer) == 1 else None
 
 
 def belegte_phasen(phasen: list[Preisphase], bindung: int | None) -> list[Preisphase]:

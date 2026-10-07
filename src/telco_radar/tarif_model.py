@@ -211,8 +211,12 @@ def buendelphasen(phasen) -> list[Preisphase]:
 
 def vor_dem_blatt(buendel, blatt: list[Preisphase]) -> list[Preisphase]:
     """Die Preisphasen eines Buendels beim Anreichern: was der Anbieter fuer dieses
-    Buendel selbst nennt, geht dem Tarifblatt vor; sonst gilt das Blatt."""
-    return buendelphasen(buendel.tarif_phasen) or blatt
+    Buendel selbst nennt, geht einem Blatt vor, das nur den Grundpreis nennt (eine
+    Phase ab Monat 1 ohne Ende). Eine Phasentabelle des Blatts nennt einzelne Monate
+    ausdruecklich und bleibt stehen."""
+    nur_grundpreis = all(p.von_monat == 1 and p.bis_monat is None for p in blatt)
+    eigene = buendelphasen(buendel.tarif_phasen) if nur_grundpreis else []
+    return eigene or blatt
 
 
 def schreibe_buendelphasen(eintrag: dict, satz) -> None:

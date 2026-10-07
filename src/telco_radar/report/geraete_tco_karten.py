@@ -52,7 +52,7 @@ from typing import Optional
 
 from ..geraete_model import VERGLEICHBARE_ZUSTAENDE, ZUSTAENDE, normalisiere
 from ..tarif_model import Preisphase, vor_dem_blatt
-from ..tco_kosten import POSTEN_ZEITRAUM, belegte_phasen
+from ..tco_kosten import POSTEN_ZEITRAUM, belegte_phasen, tarifpreis_im_monat
 from ..tco_model import (
     AKTION_ANSCHLUSS_ERLASSEN,
     AKTION_GERAETERABATT,
@@ -738,7 +738,7 @@ def _karte(
         "rate": b.geraet_monatsrate,
         "raten_summe": raten_summe,
         "anschlusspreis": b.anschlusspreis,
-        "nach_bindung": _phase_ab(tarif, AB_MONAT) if tarif else None,
+        "nach_bindung": tarifpreis_im_monat(b, AB_MONAT),
         "eff_ohne_geraet": eff,
         "eff_basis": barpreis,
         "bestandteile": bestandteile,

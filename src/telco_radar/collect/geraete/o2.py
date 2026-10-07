@@ -565,8 +565,8 @@ def saetze_aus_konfiguration(
     out = [
         _rohsatz(basis, g, g["name"], g["slug"], g["tarif_rate"], g["anschluss"], url)
     ]
-    gewaehlt = _link(_ausgewaehlt(optionen) or {})
-    out[0]["tarif_phasen"] = o2_phasen(pv, gewaehlt, g, g["tarif_rate"], z)
+    uri = _link(_ausgewaehlt(optionen) or {})
+    out[0]["tarif_phasen"] = o2_phasen(pv, uri, g, g["tarif_rate"], z, gemessen=True)
     _zaehle(z, "gemessen")
     if referenz is None:
         return out

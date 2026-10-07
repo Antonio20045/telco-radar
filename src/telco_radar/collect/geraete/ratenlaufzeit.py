@@ -42,6 +42,9 @@ _RATENPLAN_SATZ_RE = re.compile(
     r"Rabatt auf deinen Tarif\."
 )
 _TARIF_RATEN_RE = re.compile(r"-hwv-(?P<raten>\d+)m-")
+_AB_MONAT_RE = re.compile(r"ab dem (?P<monat>\d+)\. Monat\b(?P<rest>.*)", re.S)
+_EURO_RE = re.compile(r"\d{1,3}(?:\.\d{3})*,\d{2}")
+_TAG_RE = re.compile(r"<[^>]+>")
 
 
 def ganze_ratenlaufzeit(beleg: str | None, laufzeit, betrag) -> list[dict]:
@@ -83,13 +86,18 @@ def konfiguration(uri: str) -> dict[str, str]:
     return teile
 
 
-def o2_phasen(pv: dict, uri: str, g: dict, betrag: float, zaehler: dict) -> list[dict]:
-    """Die Phase eines o2-Satzes: `pv` ist die Konfigurationsantwort, `uri` die
+def o2_phasen(
+    pv: dict, uri: str, g: dict, betrag: float, zaehler: dict, gemessen: bool = False
+) -> list[dict]:
+    """Die Phasen eines o2-Satzes: `pv` ist die Konfigurationsantwort, `uri` die
     Adresse seiner Tarifoption, `g` der gemessene Satz der Antwort (`o2._gemessen`).
 
     Belegt, wenn die Antwort den Satz des Hinweises trägt UND die Konfiguration genau
-    dieses Angebot mit einem Tarif für dieselbe Ratenzahl verbindet. Jeder belegte
-    Satz wird unter `ZAEHLER_BELEGT` gezählt.
+    dieses Angebot mit einem Tarif für dieselbe Ratenzahl verbindet. Für den
+    `gemessen`en Tarif der Antwort gilt dazu ihre Preiszusammenfassung: nennt sie
+    einen Preis "ab dem X. Monat", werden es zwei Phasen wie gelesen, ist er nicht
+    eindeutig lesbar, keine (`_spaeterer_preis`). Jeder belegte Satz wird unter
+    `ZAEHLER_BELEGT` gezählt.
     """
     satz = ratenplan_satz(pv)
     teile = konfiguration(uri)
@@ -102,9 +110,52 @@ def o2_phasen(pv: dict, uri: str, g: dict, betrag: float, zaehler: dict) -> list
         or int(m.group("raten")) != g["laufzeit"]
     ):
         return []
-    zaehler[ZAEHLER_BELEGT] = int(zaehler.get(ZAEHLER_BELEGT, 0)) + 1
     beleg = f"{RATENPLAN_HINWEIS}: {satz} Tarif {tarif}"
-    return ganze_ratenlaufzeit(beleg, g["laufzeit"], betrag)
+    phasen = ganze_ratenlaufzeit(beleg, g["laufzeit"], betrag)
+    if gemessen:
+        phasen = _mit_spaeterem_preis(phasen, _spaeterer_preis(pv))
+    if phasen:
+        zaehler[ZAEHLER_BELEGT] = int(zaehler.get(ZAEHLER_BELEGT, 0)) + 1
+    return phasen
+
+
+def _spaeterer_preis(pv: dict) -> list[tuple[int, float | None, str]]:
+    """Jede Zeile der o2-Preiszusammenfassung, die einen Preis ab einem späteren Monat
+    nennt, als (Monat, Betrag oder None, Wortlaut). Gemessen am 29.09.2026 beim Tarif
+    "o2-mobile-special-online": {"description": "ab dem 25. Monat: 29,99 €"}."""
+    zeilen = []
+    for e in (pv.get("priceSummary") or {}).get("recurringChargesListEntries") or []:
+        if not isinstance(e, dict):
+            continue
+        text = " ".join(_TAG_RE.sub(" ", str(e.get("description") or "")).split())
+        m = _AB_MONAT_RE.search(text)
+        if m is None:
+            continue
+        betraege = set(_EURO_RE.findall(f"{m.group('rest')} {e.get('amount') or ''}"))
+        betrag = _euro(betraege.pop()) if len(betraege) == 1 else None
+        zeilen.append((int(m.group("monat")), betrag, text))
+    return zeilen
+
+
+def _mit_spaeterem_preis(phasen: list[dict], spaeter: list) -> list[dict]:
+    """Die Phase 1 bis N, geteilt am Monat X der einen lesbaren Zeile "ab dem X.
+    Monat"; mehrere oder unlesbare Zeilen lassen keine Phase stehen."""
+    if not phasen or not spaeter:
+        return phasen
+    [phase] = phasen
+    if len(spaeter) > 1 or spaeter[0][1] is None or spaeter[0][0] < 2:
+        return []
+    ab, neu, text = spaeter[0]
+    if ab > phase["bis_monat"]:
+        return phasen
+    return [
+        {**phase, "bis_monat": ab - 1},
+        {**phase, "von_monat": ab, "betrag": neu, "beleg": f"priceSummary: {text}"},
+    ]
+
+
+def _euro(text: str) -> float:
+    return float(text.replace(".", "").replace(",", "."))
 
 
 def katalog_mit_phasen(katalog: list, tief: list) -> list:
@@ -123,7 +174,7 @@ def _mit_phasen_des_zwillings(satz: dict, tief_je: dict) -> dict:
     preis = satz.get("tarif_monatlich")
     if not zwilling.get(PHASEN) or not _gleich(zwilling.get("tarif_monatlich"), preis):
         return satz
-    return {**satz, PHASEN: [{**p, "betrag": preis} for p in zwilling[PHASEN]]}
+    return {**satz, PHASEN: [dict(p) for p in zwilling[PHASEN]]}
 
 
 def congstar_phasen(saetze: list[dict], preis) -> list[dict]:
