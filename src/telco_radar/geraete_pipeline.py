@@ -29,13 +29,15 @@ wurde, altert nicht.
 from __future__ import annotations
 
 import logging
+import os
 import time
 from datetime import datetime, timezone
-from html import escape
 from pathlib import Path
 from typing import Any, Callable, Optional
 
-from . import versand
+from .geraete_alarm import baue_alarm_mail as baue_alarm_mail
+from .geraete_alarm import melde_ausfall
+from .geraete_alarm import sende_alarm_mail as sende_alarm_mail
 from .analyze.geraete_store import (
     GELESEN,
     GeraeteDB,
@@ -43,8 +45,9 @@ from .analyze.geraete_store import (
     NICHT_GELESEN,
     Preishistorie,
     TEILGELESEN,
-    tag_de,
 )
+from .analyze.klick_zusammenfuehrung import UMGEBUNG as KLICK_UMGEBUNG
+from .analyze.klick_zusammenfuehrung import zusammenfuehren
 from .analyze.tarif_referenzen import aus_bestand
 from .analyze.tco_buendel import aus_rohsaetzen
 from .analyze.geraete_pruefstelle import Seite, vermerke as pruefe_buendel
@@ -201,72 +204,6 @@ def _adressbilanz(bilanz) -> tuple:
     return (bilanz.produkte_versucht, len(bilanz.tote_adressen))
 
 
-def melde_ausfall(alarme: list) -> None:
-    """Je eingebrochenem Anbieter EINE Zeile, mit fester Wortform.
-
-    Der Wortlaut ist Testvertrag (`tests/test_geraete_abdeckung.py`) - die
-    Zeile ist der Alarm, und ein Alarm, dessen Wortlaut driftet, ist im
-    Actions-Log nicht mehr grepbar. Der Satz selbst kommt aus dem
-    Alarmobjekt: Protokoll, Mail und Quellenseite sagen damit wortgleich
-    dasselbe (Clean Code 7).
-    """
-    for alarm in alarme:
-        log.warning(
-            "Geraeteradar-Abdeckung: %s (Quelle pruefen: geraete-quellen.html)",
-            alarm.satz,
-        )
-
-
-def baue_alarm_mail(alarme: list, tag: str) -> tuple:
-    """(Betreff, Text, HTML) fuer die Abdeckungsmail. Ohne Netz, ohne
-    Zustellung - damit der Inhalt pruefbar ist, ohne einen Mailserver zu
-    brauchen.
-
-    Der Inhalt ist EIN Satz je Anbieter, derselbe wie im Protokoll und auf
-    der Quellenseite. Keine Zusammenfassung, keine Empfehlung: die Mail
-    sagt, was fehlt, und verlinkt die Seite, auf der es nachzusehen ist.
-    """
-    datum = tag_de(tag)
-    seite = f"{versand.SITE_URL}/geraete-quellen.html"
-    betreff = (
-        f"Geräteradar {datum}: {len(alarme)} Anbieter heute nicht vollständig erfasst"
-    )
-    zeilen = [a.satz for a in alarme]
-    text = "\n".join(
-        [f"Stand {datum}", ""]
-        + [f"- {z}" for z in zeilen]
-        + ["", f"Quellenseite: {seite}"]
-    )
-    inhalt = (
-        f"<html><body><p>Stand {escape(datum)}</p><ul>"
-        + "".join(f"<li>{escape(z)}</li>" for z in zeilen)
-        + f'</ul><p><a href="{seite}">Quellenseite</a></p></body></html>'
-    )
-    return betreff, text, inhalt
-
-
-def sende_alarm_mail(alarme: list, tag: str, *, trocken: bool = False) -> str:
-    """Verschickt die Abdeckungsmail und gibt die Bilanzzeile zurueck.
-
-    Ohne Alarme wird NICHTS verschickt - eine taegliche "alles in Ordnung"-
-    Mail ist nach zwei Wochen ein Filter im Postfach, und ein
-    stummgeschalteter Kanal ist schlimmer als keiner (`versand.py`).
-
-    Ein Zustellfehler wird NICHT geschluckt: `VersandFehler` geht an den
-    Aufrufer weiter (der Workflow-Schritt faellt damit rot aus). Ein
-    Alarmkanal, der still nicht zustellt, ist genau die Fehlerklasse, gegen
-    die dieser Waechter gebaut ist.
-    """
-    if not alarme:
-        return "keine Abdeckungsalarme - keine Mail"
-    betreff, text, html = baue_alarm_mail(alarme, tag)
-    ergebnis = versand.sende_mail(betreff, text, html, trocken=trocken)
-    log.warning(
-        "Geraeteradar-Abdeckung: %d Alarme per Mail (%s)", len(alarme), ergebnis
-    )
-    return ergebnis
-
-
 def melde_proben(bilanzen: list) -> None:
     """Je Anbieter MIT Feld-Proben eine Zeile - die Existenz-Schwelle.
 
@@ -399,6 +336,7 @@ def run_geraete_stage(
     frist_sekunden: Optional[float] = FRIST_STANDARD,
     hole: Optional[Callable] = None,
     referenz_anbieter: Optional[set] = None,
+    klick: Path | None = None,
 ) -> dict:
     """Sammeln, aufnehmen, altern, speichern. Gibt die Bilanz zurueck.
 
@@ -411,6 +349,8 @@ def run_geraete_stage(
     heutige Daten NUR an die Referenzen dieses Anbieters ein. Der Lauf
     vom 15.09.2026 hat ohne diesen Scope 35 Fremd-Referenzen neu datiert
     und 1&1 abgerufen (Befund Runde 2, outputs/telekom-taeglich-2026-09-15.md).
+    `klick` ist der Ordner der Klick-Ergebnisse (`analyze.klick_zusammenfuehrung`);
+    ohne ihn laeuft alles wie ohne Klick-Crawler.
     """
     beginn = time.monotonic()
     if jetzt is None:
@@ -510,6 +450,7 @@ def run_geraete_stage(
     tarife = 0
     neue_buendel = 0
     buendelbilanz = None
+    klickbilanz = None
     geschrieben = False
     try:
         bestand = Tarifbestand.aus_datei(zustand / "tarife.jsonl")
@@ -558,13 +499,23 @@ def run_geraete_stage(
                     "Tarif-Referenzen: %d nicht mehr im Tarifbestand - entfernt",
                     entfernt,
                 )
-            if rohbuendel:
-                buendelbilanz = aus_rohsaetzen(rohbuendel, bestand, heute)
+            klickzug = zusammenfuehren(
+                rohbuendel,
+                klick,
+                zustand,
+                katalog,
+                heute,
+                lambda sku: geraet_aus_sku(sku, katalog),
+            )
+            if klickzug.rohsaetze:
+                buendelbilanz = aus_rohsaetzen(klickzug.rohsaetze, bestand, heute)
                 if buendelbilanz.buendel:
                     neue_buendel, _ = tco.upsert_buendel(buendelbilanz.buendel, heute)
+            klickbilanz = klickzug.bilanz
             seite = Seite(ist_frisch, geraet_aus_sku, katalog)
             pruefe_buendel(tco, db, bestand, heute, seite, abgesichert)
             tco.save(heute)
+            klickzug.speichere()
             geschrieben = True
     except Exception as exc:  # noqa: BLE001
         log.warning("SIM-only-Referenzen nicht geschrieben: %s", exc)
@@ -637,6 +588,7 @@ def run_geraete_stage(
         "buendel": len(buendelbilanz.buendel) if buendelbilanz else 0,
         "buendel_neu": neue_buendel,
         "buendel_ohne_tarif": buendelbilanz.ohne_tarif if buendelbilanz else 0,
+        "klick": klickbilanz,
         "kollisionen": len(kollisionen),
         "auto_neu": auto_neu,
         "auto_eintraege": len(auto_eintraege),
@@ -731,6 +683,7 @@ def main() -> None:
     p = argparse.ArgumentParser(description="Geraete- und Preisradar")
     p.add_argument("--root", default=".")
     p.add_argument("--frist", type=float, default=FRIST_STANDARD)
+    p.add_argument("--klick", type=Path, default=os.environ.get(KLICK_UMGEBUNG) or None)
     args = p.parse_args()
 
     logging.basicConfig(
@@ -739,7 +692,11 @@ def main() -> None:
     root = Path(args.root)
     cfg = load_config(root)
     run_geraete_stage(
-        root, cfg.settings.get("http", {}), None, frist_sekunden=args.frist
+        root,
+        cfg.settings.get("http", {}),
+        None,
+        frist_sekunden=args.frist,
+        klick=args.klick,
     )
 
 

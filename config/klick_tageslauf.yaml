@@ -1,0 +1,124 @@
+# =============================================================================
+# TELCO RADAR - Klick-Tageslauf (Datenkonzept Geräteradar §8 „Betrieb“)
+# =============================================================================
+# Je Anbieter die Produktseiten, die `scripts/klick_tageslauf.py` täglich mit der
+# Klick-Karte config/klickkarten/<schluessel>.yaml durchklickt (Matrix-Job je
+# Anbieter in geraete.yml). Format und Prüfung wie config/klick_erkundung.yaml
+# (`klickziele.lade_ziele`), aber ohne Grenze der Seitenzahl; `weiter` gibt es
+# hier nicht.
+#
+# DIE ADRESSEN SIND NICHT ZUSAMMENGESETZT. Jede steht wörtlich als `quelle_url`
+# im Bestand des Geräteradars (Stand 07.10.2026): o2 und Telekom aus
+# data/state/geraete_tco.json (Bündelansicht mit `ohne-tarif=nein` bzw. einer
+# `tariffId` je Tarif), 1&1 und congstar aus data/state/geraete_db.json, dazu
+# die Seiten der Klick-Erkundung. Telekom zeigt je Seite nur einen Tarif
+# (Karte: der Tarif kommt aus der Startadresse); jede Tarifstufe ist darum eine
+# eigene Seite.
+#
+# Rotation: nie gelesene Seiten zuerst, dann die am längsten nicht gelesenen
+# (data/state/klick_stand.json). Reicht das Zeitbudget nicht für alle Seiten
+# eines Tages, liest der nächste Tag die übrigen; jede Seite soll spätestens
+# alle drei Tage gelesen sein (`ueberfaellig` in der Ergebnisdatei).
+#
+# Vodafone: die Produktseite wählt den Tarif nicht (Karte: tarif fest
+# „unbekannt“); erfasste Werte bleiben darum ohne Bündel und zählen als Lücke
+# `tarif_unbekannt`, bis die Karte die Tarifauswahl liest.
+
+anbieter:
+  - schluessel: o2
+    name: o2
+    seiten:
+      - geraet: apple-iphone-17-pro
+        speicher_gb: 256
+        url: https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus
+      - geraet: samsung-galaxy-s26
+        speicher_gb: 256
+        url: https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus
+      - geraet: apple-iphone-17
+        speicher_gb: 256
+        url: https://www.o2online.de/e-shop/apple/apple-iphone-17-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: apple-iphone-17-pro-max
+        speicher_gb: 256
+        url: https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-max-256gb-cosmic-orange-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus
+      - geraet: samsung-galaxy-s26-ultra
+        speicher_gb: 256
+        url: https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ultra-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus
+      - geraet: google-pixel-11
+        speicher_gb: 256
+        url: https://www.o2online.de/e-shop/google/google-pixel-11-256gb-frost-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+
+  - schluessel: vodafone
+    name: Vodafone
+    seiten:
+      - geraet: apple-iphone-17-pro
+        speicher_gb: 256
+        url: https://www.vodafone.de/privat/handys/iphone-17-pro.html
+      - geraet: samsung-galaxy-s26
+        speicher_gb: 256
+        url: https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html
+
+  - schluessel: 1und1
+    name: 1&1
+    seiten:
+      - geraet: apple-iphone-17-pro
+        speicher_gb: 256
+        url: https://mobile.1und1.de/iphone-17-pro
+      - geraet: samsung-galaxy-s26
+        speicher_gb: 256
+        url: https://mobile.1und1.de/samsung-galaxy-s26
+      - geraet: apple-iphone-17
+        speicher_gb: 256
+        url: https://mobile.1und1.de/iphone-17
+      - geraet: apple-iphone-17-pro-max
+        speicher_gb: 256
+        url: https://mobile.1und1.de/iphone-17-pro-max
+      - geraet: samsung-galaxy-s26-ultra
+        speicher_gb: 256
+        url: https://mobile.1und1.de/samsung-galaxy-s26-ultra
+      - geraet: google-pixel-11
+        speicher_gb: 256
+        url: https://mobile.1und1.de/google-pixel-11
+
+  - schluessel: telekom
+    name: Telekom
+    seiten:
+      - geraet: apple-iphone-17-pro
+        speicher_gb: 256
+        url: https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: google-pixel-11
+        speicher_gb: 256
+        url: https://www.telekom.de/shop/geraet/google/google-pixel-11/frost-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: apple-iphone-17-pro
+        speicher_gb: 256
+        url: https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17779&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: apple-iphone-17-pro
+        speicher_gb: 256
+        url: https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17785&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: apple-iphone-17-pro
+        speicher_gb: 256
+        url: https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17797&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: apple-iphone-17-pro
+        speicher_gb: 256
+        url: https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17803&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: apple-iphone-17
+        speicher_gb: 256
+        url: https://www.telekom.de/shop/geraet/apple/apple-iphone-17/lavendel-256-gb?tariffId=MF_17791&categoryId=smartphones
+
+  - schluessel: congstar
+    name: congstar
+    seiten:
+      - geraet: apple-iphone-17-pro
+        speicher_gb: 256
+        url: https://www.congstar.de/geraete/apple/apple-iphone-17-pro/
+      - geraet: samsung-galaxy-s26
+        speicher_gb: 256
+        url: https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/
+      - geraet: apple-iphone-17
+        speicher_gb: 256
+        url: https://www.congstar.de/geraete/apple/apple-iphone-17/
+      - geraet: apple-iphone-17-pro-max
+        speicher_gb: 256
+        url: https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/
+      - geraet: google-pixel-11
+        speicher_gb: 256
+        url: https://www.congstar.de/geraete/google/google-pixel-11/

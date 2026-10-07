@@ -10,6 +10,8 @@ Seite darf ``weiter`` tragen (``Weiter``): Selektor und, wenn angegeben, sichtba
 genau eines Knopfs oder Links zum nächsten Schritt der Bestellstrecke
 (``klickfolgeseite``). Jeder Verstoß wirft ``ErkundungszielFehler`` mit der Stelle; ein
 Ziel wird nie still übergangen. User-Agent und Abrufabstand kommen aus den Quellen.
+Der Klick-Tageslauf liest dasselbe Format aus ``TAGESDATEI``, ohne Seitengrenze
+(``klicktageslauf``).
 """
 
 from __future__ import annotations
@@ -25,6 +27,7 @@ from ...geraete_model import Katalog
 from .robots import host_von
 
 DATEI = Path("config") / "klick_erkundung.yaml"
+TAGESDATEI = Path("config") / "klick_tageslauf.yaml"
 HOECHSTE_SEITEN = 2
 ALLE = "alle"
 SCHEMA = "https"
@@ -69,20 +72,25 @@ class Erkundungsziel:
     rate_limit_sekunden: float
 
 
-def lade_ziele(root: Path) -> list[Erkundungsziel]:
-    """Alle Ziele aus ``config/klick_erkundung.yaml``, geprüft an Quellen, Katalog."""
-    pfad = root / DATEI
+def lade_ziele(
+    root: Path, datei: Path = DATEI, hoechste: int | None = HOECHSTE_SEITEN
+) -> list[Erkundungsziel]:
+    """Alle Ziele aus ``datei``, geprüft an Quellen und Katalog.
+
+    ``hoechste`` begrenzt die Seiten je Anbieter; ``None`` heißt ohne Grenze.
+    """
+    pfad = root / datei
     try:
         roh = yaml.safe_load(pfad.read_text(encoding="utf-8"))
     except (OSError, yaml.YAMLError) as fehler:
-        raise ErkundungszielFehler(f"{DATEI}: nicht lesbar ({fehler})") from fehler
+        raise ErkundungszielFehler(f"{datei}: nicht lesbar ({fehler})") from fehler
     eintraege = roh.get("anbieter") if isinstance(roh, dict) else None
     if not isinstance(eintraege, list) or not eintraege:
-        raise ErkundungszielFehler(f"{DATEI}: keine Anbieter")
+        raise ErkundungszielFehler(f"{datei}: keine Anbieter")
     quellen, katalog = lade_quellen(root), lade_katalog(root)
     ziele: list[Erkundungsziel] = []
     for stelle, eintrag in enumerate(eintraege):
-        ort = f"{DATEI}, anbieter[{stelle}]"
+        ort = f"{datei}, anbieter[{stelle}]"
         if not isinstance(eintrag, dict):
             raise ErkundungszielFehler(f"{ort}: keine Zuordnung")
         schluessel = _text(eintrag, "schluessel", ort)
@@ -93,8 +101,8 @@ def lade_ziele(root: Path) -> list[Erkundungsziel]:
         roh_seiten = eintrag.get("seiten")
         if not isinstance(roh_seiten, list) or not roh_seiten:
             raise ErkundungszielFehler(f"{ort}: keine Seiten")
-        if len(roh_seiten) > HOECHSTE_SEITEN:
-            grund = f"{len(roh_seiten)} Seiten, höchstens {HOECHSTE_SEITEN}"
+        if hoechste is not None and len(roh_seiten) > hoechste:
+            grund = f"{len(roh_seiten)} Seiten, höchstens {hoechste}"
             raise ErkundungszielFehler(f"{ort}: {grund}")
         seiten = tuple(
             _seite(s, f"{ort}.seiten[{i}]", katalog, anbieter.basis_url)
@@ -112,7 +120,7 @@ def lade_ziele(root: Path) -> list[Erkundungsziel]:
     schluessel_alle = [z.schluessel for z in ziele]
     doppelt = {s for s in schluessel_alle if schluessel_alle.count(s) > 1}
     if doppelt:
-        raise ErkundungszielFehler(f"{DATEI}: Schlüssel doppelt: {sorted(doppelt)}")
+        raise ErkundungszielFehler(f"{datei}: Schlüssel doppelt: {sorted(doppelt)}")
     return ziele
 
 
