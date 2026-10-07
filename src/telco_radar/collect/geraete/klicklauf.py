@@ -66,6 +66,25 @@ CHALLENGE_MUSTER = re.compile(
 )
 
 
+_ZEICHENSATZ = re.compile(r"charset=[\"']?([\w.:-]+)", re.I)
+STANDARD_ZEICHENSATZ = "utf-8"
+
+
+def antworttext(koerper: bytes, typ: str) -> str:
+    """Der Körper als Text im Zeichensatz aus ``typ``, sonst UTF-8; nie ein Absturz.
+
+    Playwrights ``text()`` liest nur UTF-8. Die Vodafone-Seite enthielt am 07.10.2026
+    ein Byte aus ISO-8859-1, und der Fehler im Tor riss den ganzen Lauf mit. Ein
+    unlesbares Byte wird zu U+FFFD; die Muster in ``CHALLENGE_MUSTER`` bleiben lesbar.
+    """
+    treffer = _ZEICHENSATZ.search(typ)
+    zeichensatz = STANDARD_ZEICHENSATZ if treffer is None else treffer[1]
+    try:
+        return koerper.decode(zeichensatz, errors="replace")
+    except LookupError:
+        return koerper.decode(STANDARD_ZEICHENSATZ, errors="replace")
+
+
 @dataclass(frozen=True)
 class Verworfen:
     """Eine Adresse, die robots.txt sperrt; sie ging nicht hinaus.

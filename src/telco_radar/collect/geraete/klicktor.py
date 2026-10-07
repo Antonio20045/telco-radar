@@ -34,7 +34,7 @@ from playwright.sync_api import Error as PlaywrightFehler
 
 from . import Abrufschleuse
 from .basis import GeraeteAbrufFehler
-from .klicklauf import Gescheitert, Klicklauf, Verworfen, bot_schutz
+from .klicklauf import Gescheitert, Klicklauf, Verworfen, antworttext, bot_schutz
 from .robots import RobotsWaechter, host_von
 
 if TYPE_CHECKING:
@@ -282,7 +282,7 @@ class Tor:
         """Wahr, wenn die Hauptseite in den Browser darf; Bot-Schutz bricht sie ab."""
         self.haupt_status = antwort.status
         typ = antwort.headers.get("content-type", "")
-        text = antwort.text() if "html" in typ.lower() else ""
+        text = antworttext(antwort.body(), typ) if "html" in typ.lower() else ""
         grund = bot_schutz(antwort.status, typ, text)
         if grund is None:
             return True

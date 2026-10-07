@@ -21,7 +21,13 @@ from typing import TYPE_CHECKING
 
 from playwright.sync_api import Error as PlaywrightFehler
 
-from .klicklauf import LAUF_GESPERRT, LAUF_GESTOERT, Klicklauf, bot_schutz
+from .klicklauf import (
+    LAUF_GESPERRT,
+    LAUF_GESTOERT,
+    Klicklauf,
+    antworttext,
+    bot_schutz,
+)
 from .klickmitschnitt import Mitschnitt
 from .klicktor import WARTE_TAKT_MS, Tor, kurz
 
@@ -137,7 +143,7 @@ class Wache:
     def _pruefe(self, antwort: Response) -> None:
         typ = antwort.headers.get("content-type", "")
         try:
-            koerper = antwort.text()
+            koerper = antworttext(antwort.body(), typ)
         except PlaywrightFehler as fehler:
             log.info(
                 "Klick-Crawler: Körper von %s fehlt: %s", antwort.url, kurz(fehler)

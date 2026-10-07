@@ -26,6 +26,7 @@ class Antwort:
     koerper: str = ""
     kopf: dict[str, str] = field(default_factory=dict)
     verzug: float = 0.0
+    kodierung: str = "utf-8"
 
 
 def html(koerper: str, status: int = 200) -> Antwort:
@@ -72,7 +73,7 @@ def klickserver(antworte: Callable[[str], Antwort]) -> Iterator[Klickserver]:
             antwort = server.antworte(self.path)
             if antwort.verzug:
                 time.sleep(antwort.verzug)
-            daten = antwort.koerper.encode("utf-8")
+            daten = antwort.koerper.encode(antwort.kodierung)
             try:
                 self.send_response(antwort.status)
                 self.send_header("Content-Type", antwort.typ)
