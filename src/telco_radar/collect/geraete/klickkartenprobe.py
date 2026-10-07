@@ -212,6 +212,10 @@ def als_daten(probe: Kartenprobe) -> dict | None:
             {"url": ohne_geheimnisse(g.url), "grund": g.grund}
             for g in lauf.gescheitert[:HOECHSTE_LISTE]
         ],
+        "hilfsdateien": [
+            {"url": ohne_geheimnisse(h.url), "art": h.art, "grund": h.grund}
+            for h in lauf.hilfsdateien[:HOECHSTE_LISTE]
+        ],
     }
 
 

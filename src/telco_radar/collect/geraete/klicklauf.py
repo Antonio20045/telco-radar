@@ -12,7 +12,8 @@ sperrt Seite, Preisantwort oder Besuchszeit) oder ``zeitgrenze`` (die Zeitgrenze
 Aufrufers schnitt ihn ab; was er nicht besuchte, heißt so). Bot-Schutz heißt
 ``bot_schutz``: HTTP 202, 4xx oder 5xx, ein bekanntes Challenge-Muster
 (``CHALLENGE_MUSTER``) oder eine HTML-Seite, wo die Preisschnittstelle JSON liefern
-soll. Gescheiterte Anfragen hält der Lauf mit Grund fest.
+soll. Gescheiterte Anfragen hält der Lauf mit Grund fest, ebenso jede Hilfsdatei, die
+ohne Regeln hinausging (``Hilfsdatei``).
 
 Jede Kombination mit gelesenen Werten trägt ihren Beleg (``klickbeleg``) und
 ``beleg_status``: ``offen`` (gebaut, noch nicht im Archiv), ``belegt`` (Dateien in der
@@ -114,6 +115,21 @@ class Gescheitert:
 
 
 @dataclass(frozen=True)
+class Hilfsdatei:
+    """Ein Skript oder Stylesheet, das ohne Regeln hinausging (``klicktor.Tor``).
+
+    ``grund`` nennt die Antwort der robots.txt ihres Hosts (401 oder 403); ``anfrage``
+    ist die Adresse, die die Seite anfragte; nach einer Umleitung weicht sie von
+    ``url`` ab.
+    """
+
+    url: str
+    art: str
+    grund: str
+    anfrage: str
+
+
+@dataclass(frozen=True)
 class Kombiergebnis:
     """Das Ergebnis einer Kombination aus Speicher, Tarif und Ratenlaufzeit.
 
@@ -178,7 +194,8 @@ class Strukturbilanz:
 class Klicklauf:
     """Ein Lauf über eine Produktseite: Status, Ergebnisse, Struktur, Verworfenes.
 
-    ``bezug`` ist die Strukturbilanz, gegen die ``pruefe_struktur`` den Lauf maß.
+    ``bezug`` ist die Strukturbilanz, gegen die ``pruefe_struktur`` den Lauf maß;
+    ``hilfsdateien`` sind die Skripte und Stylesheets, die ohne Regeln hinausgingen.
     """
 
     anbieter: str
@@ -190,6 +207,7 @@ class Klicklauf:
     struktur: Strukturbilanz = field(default_factory=Strukturbilanz)
     verworfen: list[Verworfen] = field(default_factory=list)
     gescheitert: list[Gescheitert] = field(default_factory=list)
+    hilfsdateien: list[Hilfsdatei] = field(default_factory=list)
     bezug: Strukturbilanz | None = None
 
 

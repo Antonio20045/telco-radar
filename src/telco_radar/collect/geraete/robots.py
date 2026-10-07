@@ -83,7 +83,11 @@ def _als_regex(muster: str) -> re.Pattern:
 
 @dataclass
 class Regelwerk:
-    """Die fuer uns geltenden Regeln EINES Hosts."""
+    """Die fuer uns geltenden Regeln EINES Hosts.
+
+    `status` ist der HTTP-Status der robots.txt, `None` ohne Antwort; `darf()`
+    liest ihn nicht, nur das Tor des Klick-Crawlers (`klicktor.Tor`).
+    """
 
     disallow: list = field(default_factory=list)
     allow: list = field(default_factory=list)
@@ -92,6 +96,7 @@ class Regelwerk:
     visit_bis: Optional[int] = None
     abrufbar: bool = True
     fehler: str = ""
+    status: int | None = None
 
     def erlaubt(self, url: str) -> bool:
         """Laengster Treffer gewinnt - so steht es im Entwurf und so machen
@@ -250,6 +255,7 @@ class RobotsWaechter:
             regeln = Regelwerk(
                 abrufbar=False, fehler=f"robots.txt nicht lesbar (HTTP {status})"
             )
+        regeln.status = status
         self._cache[host] = regeln
         return regeln
 

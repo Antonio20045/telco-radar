@@ -97,10 +97,13 @@ class Fristschleuse:
 
     def passiere(self, url: str) -> None:
         """Wirft ``GeraeteAbrufFehler``, wenn der Abstand über die Grenze reicht."""
-        if not self.offen(url):
-            self.abgelaufen = True
-            raise GeraeteAbrufFehler(f"{GRUND_FRIST}, nicht abgerufen")
+        self._pruefe_frist(url)
         self.innen.passiere(url)
+
+    def passiere_ohne_regeln(self, url: str) -> None:
+        """Wie ``passiere``, ohne robots.txt zu fragen: nur für eine Hilfsdatei."""
+        self._pruefe_frist(url)
+        self.innen.passiere_ohne_regeln(url)
 
     def erledigt(self, url: str) -> None:
         """Die Antwort ist da; der Abstand zählt ab jetzt."""
@@ -109,6 +112,11 @@ class Fristschleuse:
     def abstand(self, url: str) -> float:
         """Crawl-delay oder eigener Abstand des Hosts."""
         return self.innen.abstand(url)
+
+    def _pruefe_frist(self, url: str) -> None:
+        if not self.offen(url):
+            self.abgelaufen = True
+            raise GeraeteAbrufFehler(f"{GRUND_FRIST}, nicht abgerufen")
 
 
 @dataclass
@@ -134,6 +142,7 @@ class Seitenergebnis:
     mitschnitt: list[dict] = field(default_factory=list)
     verworfen: list[dict] = field(default_factory=list)
     gescheitert: list[dict] = field(default_factory=list)
+    hilfsdateien: list[dict] = field(default_factory=list)
 
 
 class Seitenlauf:
@@ -317,6 +326,10 @@ class Seitenlauf:
         self.ergebnis.gescheitert = [
             {"url": ohne_geheimnisse(g.url), "grund": g.grund}
             for g in self.lauf.gescheitert
+        ]
+        self.ergebnis.hilfsdateien = [
+            {"url": ohne_geheimnisse(h.url), "art": h.art, "grund": h.grund}
+            for h in self.lauf.hilfsdateien
         ]
 
     def _raeume(self, sitzung: Sitzung | None) -> None:

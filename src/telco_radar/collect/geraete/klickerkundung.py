@@ -21,8 +21,10 @@ läuft; dann ist der Rest ``verschoben``, ohne Anfrage. Jeder Anbieter hat
 ``ende`` (``time.monotonic``); danach lassen ``Fristschleuse`` und der Abruf von
 robots.txt keine Anfrage mehr hinaus. Was nicht gelesen wurde, heißt so und ist nie
 leer: ``nicht_besucht`` mit Grund; Abstand und Besuchszeit stehen nur im Index, wenn
-robots.txt gelesen wurde. Screenshot und Seite gehören nur ins Artefakt des Laufs
-(``scripts/erkundung_ablegen.py`` lässt sie vom öffentlichen Zweig).
+robots.txt gelesen wurde. Skripte und Stylesheets, die das Tor ohne Regeln hinausließ
+(``klicktor.HILFSDATEI_ARTEN``), stehen je Seite unter ``hilfsdateien``. Screenshot und
+Seite gehören nur ins Artefakt des Laufs (``scripts/erkundung_ablegen.py`` lässt sie vom
+öffentlichen Zweig).
 
 Liegt unter ``karten`` eine Klick-Karte des Anbieters, erprobt die ``klickkartenprobe``
 sie nach jeder gelesenen oder leeren Seite auf derselben Seite, mit Tor, Schleuse und
@@ -331,6 +333,7 @@ def lege_ab(
         "zaehlung": _zaehlung(ergebnis),
         "verworfen": ergebnis.verworfen[:HOECHSTE_LISTE],
         "gescheitert": ergebnis.gescheitert[:HOECHSTE_LISTE],
+        "hilfsdateien": ergebnis.hilfsdateien[:HOECHSTE_LISTE],
         "karte": None if probe is None else indexeintrag(probe, dateien.get("karte")),
     }
 
@@ -344,6 +347,7 @@ def _zaehlung(ergebnis: Seitenergebnis) -> dict:
         "anfragen": len(ergebnis.anfragen),
         "verworfen": len(ergebnis.verworfen),
         "gescheitert": len(ergebnis.gescheitert),
+        "hilfsdateien": len(ergebnis.hilfsdateien),
         "mitschnitt": len(ergebnis.mitschnitt),
         "elemente": None if inventar is None else inventar.gesamt,
         "gruppen_je_art": None if inventar is None else je_art,
