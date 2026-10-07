@@ -9,3 +9,4 @@
 - Meldungen werden nie gekappt, nur parallelisiert: Scheitert ein Analysten-Stapel, kommen seine Meldungen als `_ungelesen` zurück und bleiben aus dem Seen-Store.
 - Wer den Editor-Themenabschnitt ändert, ändert Prompt und `validate_editorial_briefing` gemeinsam.
 - `config/ctm_fokus.yaml` sagt, was „für uns wichtig“ heißt, und steuert die Reihenfolge der Startseite.
+- Abnahme der Geräteseite (Datenkonzept 11): `geraete_abnahme.stand()`, Goldliste `config/geraete_goldliste.yaml`, Ausgabe `scripts/abnahme_stand.py`. „Zählt“ heißt `geraete_pruefstatus.satz_zaehlt`, dieselbe Definition wie die Notbremse; was Netz, Ablage oder einen Menschen braucht, bleibt `offen`, nie grün.

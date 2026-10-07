@@ -20,12 +20,12 @@ from collections.abc import Iterable
 
 from ..analyze.geraete_pruefstatus import (
     FELD_PRUEFUNG,
-    GUELTIG,
     QUARANTAENE,
     REGELN,
     UNBEKANNT,
     VERALTET,
     abgelaufene_aktionen,
+    buendel_zaehlt,
     lies_vermerk,
 )
 from ..tco_model import Aktion, Buendel, aktionen_aus
@@ -73,6 +73,7 @@ def felder_aus_satz(satz: dict, heute: str) -> dict:
 def _felder(
     herleitung: str, aktionen: Iterable[Aktion], heute: str, pruefung: object
 ) -> dict:
+    aktionen = list(aktionen)
     schaetzung = bool(herleitung.strip())
     veraltet = bool(abgelaufene_aktionen(aktionen, heute))
     vermerk = lies_vermerk(pruefung)
@@ -87,7 +88,7 @@ def _felder(
     }
     return {
         **flags,
-        "zaehlt": not schaetzung and not veraltet and status in (None, GUELTIG),
+        "zaehlt": buendel_zaehlt(herleitung, aktionen, heute, pruefung),
         "notbremse": zustand(flags),
     }
 

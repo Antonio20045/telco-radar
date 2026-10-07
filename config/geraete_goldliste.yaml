@@ -1,0 +1,292 @@
+# =============================================================================
+# TELCO RADAR - Goldliste der Abnahme (Datenkonzept Geräte, Abschnitt 11)
+# =============================================================================
+# Je Netzbetreiber höchstens 10 feste Varianten, die ein Mensch täglich gegen
+# die Anbieterseite prüft (Stichprobe Mensch, Protokoll docs/abnahme/proben.jsonl,
+# Format in src/telco_radar/analyze/geraete_abnahme.py). Die erste Variante je
+# Anbieter ist die Beispielseite iPhone 17 Pro 256 GB im Band XS (Abschnitt 2);
+# wo die Beispielseite zwei Zeilen hat (1&1, congstar), steht die zweite an
+# zweiter Stelle.
+#
+# Schlüssel, nie Titeltext: device_id aus config/geraete_katalog.yaml,
+# speicher_gb, farbe wie in der SKU, tarif_name wie im Bündelbestand,
+# laufzeit_monate (Ratenlaufzeit). analyze/geraete_goldliste.py löst jede
+# Variante zu genau einem Bündel auf oder nennt den Befund (nicht gefunden,
+# mehrdeutig); scripts/abnahme_stand.py druckt das Ergebnis.
+#
+# Gewählt aus data/state/geraete_tco.json, Stand 2026-10-06, gestreut über
+# Geräte, Bänder und Laufzeiten. Band nach der Vodafone-Tarifleiter dieses
+# Tages. "Schätzung": das Bündel trägt `herleitung` und zählt nicht im
+# Vergleich, steht aber als Zeile mit Betrag auf der Seite; "veraltet": eine
+# eingerechnete Aktion ist abgelaufen.
+#
+# Lücken im Bestand (Stand 2026-10-06):
+#   freenet/mobilcom-debitel  kein Bündel und keine Gerätequelle; 0 von 10
+#   1&1       nur 36 Raten; zählend nur 1&1 All-Net-Flat S, Rest Schätzung
+#   Telekom   nur 36 Raten, Stand 15.09. und 09.09.; nur 9 Geräte, deshalb
+#             das iPhone 17 Pro zweimal (Band XS und XL)
+#   o2        zählend nur die Bänder M, L und XL; XS nur als Schätzung
+#   congstar  kein Band S; die Beispielseite ist veraltet (Stand 28.09.,
+#             Aktion bis 29.09.)
+# =============================================================================
+
+anbieter:
+  o2:
+    - device_id: apple-iphone-17-pro  # Beispielseite, Band XS, Schätzung
+      speicher_gb: 256
+      farbe: cosmic-orange
+      tarif_name: "O2 Mobile S mit 15 GB+ (24 Mon.)"
+      laufzeit_monate: 24
+    - device_id: apple-iphone-15-plus  # Band XS, Schätzung
+      speicher_gb: 128
+      farbe: schwarz
+      tarif_name: "O2 Mobile S mit 15 GB+ (24 Mon.)"
+      laufzeit_monate: 36
+    - device_id: samsung-galaxy-s26  # Band L
+      speicher_gb: 256
+      farbe: schwarz
+      tarif_name: "O2 Mobile L Plus mit 150 GB+ (24 Mon.)"
+      laufzeit_monate: 36
+    - device_id: apple-iphone-15-pro  # Band L, Schätzung
+      speicher_gb: 128
+      farbe: titan-natur
+      tarif_name: "O2 Mobile L mit 150 GB+ (24 Mon.)"
+      laufzeit_monate: 24
+    - device_id: google-pixel-10a  # Band M
+      speicher_gb: 128
+      farbe: schwarz
+      tarif_name: "O2 Mobile on Demand M Plus mit 50 GB+ (24 Mon.)"
+      laufzeit_monate: 24
+    - device_id: fairphone-6  # Band M
+      speicher_gb: 256
+      farbe: schwarz
+      tarif_name: "O2 Mobile on Demand M Plus mit 50 GB+ (24 Mon.)"
+      laufzeit_monate: 36
+    - device_id: samsung-galaxy-a27  # Band M
+      speicher_gb: 128
+      farbe: schwarz
+      tarif_name: "O2 Mobile on Demand M mit 50 GB+ (24 Mon.)"
+      laufzeit_monate: 24
+    - device_id: samsung-galaxy-s26-ultra  # Band XL
+      speicher_gb: 256
+      farbe: cobalt-violet
+      tarif_name: "O2 Mobile Unlimited M Plus mit 100 MBit/s (24 Mon.)"
+      laufzeit_monate: 24
+    - device_id: apple-iphone-17-pro-max  # Band XL
+      speicher_gb: 256
+      farbe: cosmic-orange
+      tarif_name: "O2 Mobile Unlimited M Plus mit 100 MBit/s (24 Mon.)"
+      laufzeit_monate: 36
+    - device_id: samsung-galaxy-s26-plus  # Band XL
+      speicher_gb: 512
+      farbe: cobalt-violet
+      tarif_name: "O2 Mobile Unlimited M Plus mit 100 MBit/s (24 Mon.)"
+      laufzeit_monate: 36
+
+  Vodafone:
+    - device_id: apple-iphone-17-pro  # Beispielseite, Band XS
+      speicher_gb: 256
+      farbe: cosmic-orange
+      tarif_name: "Mobil XS"
+      laufzeit_monate: 24
+    - device_id: google-pixel-11  # Band XS
+      speicher_gb: 256
+      farbe: frost
+      tarif_name: "Mobil XS"
+      laufzeit_monate: 36
+    - device_id: samsung-galaxy-s26  # Band S
+      speicher_gb: 256
+      farbe: schwarz
+      tarif_name: "Mobil S"
+      laufzeit_monate: 12
+    - device_id: apple-iphone-air  # Band S
+      speicher_gb: 1024
+      farbe: space-schwarz
+      tarif_name: "Mobil S"
+      laufzeit_monate: 24
+    - device_id: google-pixel-10a  # Band M
+      speicher_gb: 128
+      farbe: schwarz
+      tarif_name: "Mobil M"
+      laufzeit_monate: 36
+    - device_id: samsung-galaxy-z-flip8  # Band M
+      speicher_gb: 512
+      farbe: cream
+      tarif_name: "Mobil M"
+      laufzeit_monate: 24
+    - device_id: fairphone-6  # Band L
+      speicher_gb: 256
+      farbe: horizon-black
+      tarif_name: "Mobil L"
+      laufzeit_monate: 24
+    - device_id: xiaomi-17t-pro  # Band L
+      speicher_gb: 512
+      farbe: schwarz
+      tarif_name: "Mobil L"
+      laufzeit_monate: 36
+    - device_id: apple-iphone-17  # Band XL
+      speicher_gb: 256
+      farbe: schwarz
+      tarif_name: "Mobil XL"
+      laufzeit_monate: 12
+    - device_id: samsung-galaxy-a57  # Band XL
+      speicher_gb: 256
+      farbe: awesome-navy
+      tarif_name: "Mobil XL"
+      laufzeit_monate: 36
+
+  "1&1":
+    - device_id: apple-iphone-17-pro  # Beispielseite, Band XS
+      speicher_gb: 256
+      farbe: cosmic-orange
+      tarif_name: "1&1 All-Net-Flat S"
+      laufzeit_monate: 36
+    - device_id: apple-iphone-17-pro  # Beispielseite, Band XS, Schätzung
+      speicher_gb: 256
+      farbe: cosmic-orange
+      tarif_name: "1&1 Unlimited on demand S"
+      laufzeit_monate: 36
+    - device_id: google-pixel-11-pro  # Band XS
+      speicher_gb: 256
+      farbe: canyon
+      tarif_name: "1&1 All-Net-Flat S"
+      laufzeit_monate: 36
+    - device_id: samsung-galaxy-s26-ultra  # Band XS
+      speicher_gb: 512
+      farbe: cobalt-violet
+      tarif_name: "1&1 All-Net-Flat S"
+      laufzeit_monate: 36
+    - device_id: xiaomi-17  # Band XS
+      speicher_gb: 512
+      farbe: schwarz
+      tarif_name: "1&1 All-Net-Flat S"
+      laufzeit_monate: 36
+    - device_id: fairphone-6  # Band XS
+      speicher_gb: 256
+      farbe: forest-green
+      tarif_name: "1&1 All-Net-Flat S"
+      laufzeit_monate: 36
+    - device_id: apple-iphone-16  # Band M, Schätzung
+      speicher_gb: 128
+      farbe: blau
+      tarif_name: "1&1 All-Net-Flat M"
+      laufzeit_monate: 36
+    - device_id: google-pixel-10a  # Band M, Schätzung
+      speicher_gb: 128
+      farbe: violett
+      tarif_name: "1&1 Unlimited on demand M"
+      laufzeit_monate: 36
+    - device_id: samsung-galaxy-a57  # Band L, Schätzung
+      speicher_gb: 256
+      farbe: awesome-gray
+      tarif_name: "1&1 All-Net-Flat L"
+      laufzeit_monate: 36
+    - device_id: apple-iphone-17-pro-max  # ohne Band, Schätzung
+      speicher_gb: 256
+      farbe: silber
+      tarif_name: "1&1 Unlimited XL"
+      laufzeit_monate: 36
+
+  Telekom:
+    - device_id: apple-iphone-17-pro  # Beispielseite, Band XS
+      speicher_gb: 256
+      farbe: tiefblau
+      tarif_name: "MagentaMobil XS"
+      laufzeit_monate: 36
+    - device_id: samsung-galaxy-z-fold8  # Band XS
+      speicher_gb: 256
+      farbe: cream
+      tarif_name: "MagentaMobil XS"
+      laufzeit_monate: 36
+    - device_id: google-pixel-11-pro-xl  # Band S
+      speicher_gb: 256
+      farbe: schwarz
+      tarif_name: "MagentaMobil S"
+      laufzeit_monate: 36
+    - device_id: xiaomi-17t-pro  # Band S, Stand 09.09.
+      speicher_gb: 512
+      farbe: schwarz
+      tarif_name: "MagentaMobil S"
+      laufzeit_monate: 36
+    - device_id: google-pixel-11-pro  # Band M
+      speicher_gb: 256
+      farbe: olive
+      tarif_name: "MagentaMobil M"
+      laufzeit_monate: 36
+    - device_id: apple-iphone-17  # Band M, Stand 09.09.
+      speicher_gb: 256
+      farbe: violett
+      tarif_name: "MagentaMobil M"
+      laufzeit_monate: 36
+    - device_id: google-pixel-11  # Band L
+      speicher_gb: 256
+      farbe: frost
+      tarif_name: "MagentaMobil L"
+      laufzeit_monate: 36
+    - device_id: samsung-galaxy-z-fold8-ultra  # Band L
+      speicher_gb: 256
+      farbe: violet-shadow
+      tarif_name: "MagentaMobil L"
+      laufzeit_monate: 36
+    - device_id: samsung-galaxy-z-flip8  # Band XL
+      speicher_gb: 256
+      farbe: rosa
+      tarif_name: "MagentaMobil XL"
+      laufzeit_monate: 36
+    - device_id: apple-iphone-17-pro  # Band XL
+      speicher_gb: 256
+      farbe: tiefblau
+      tarif_name: "MagentaMobil XL"
+      laufzeit_monate: 36
+
+  congstar:
+    - device_id: apple-iphone-17-pro  # Beispielseite, Band XS, veraltet
+      speicher_gb: 256
+      farbe: silber
+      tarif_name: "Allnet Flat XS"
+      laufzeit_monate: 24
+    - device_id: apple-iphone-17-pro  # Beispielseite, Band XS, veraltet
+      speicher_gb: 256
+      farbe: silber
+      tarif_name: "Allnet Flat XS Flex"
+      laufzeit_monate: 24
+    - device_id: apple-iphone-17e  # Band XS
+      speicher_gb: 256
+      farbe: rosa
+      tarif_name: "Allnet Flat XS"
+      laufzeit_monate: 24
+    - device_id: xiaomi-17-ultra  # Band XS
+      speicher_gb: 512
+      farbe: starlit-green
+      tarif_name: "Allnet Flat XS"
+      laufzeit_monate: 36
+    - device_id: google-pixel-11-pro  # Band M
+      speicher_gb: 256
+      farbe: canyon
+      tarif_name: "Allnet Flat S"
+      laufzeit_monate: 24
+    - device_id: samsung-galaxy-a57  # Band M
+      speicher_gb: 256
+      farbe: awesome-icyblue
+      tarif_name: "Allnet Flat S Flex"
+      laufzeit_monate: 36
+    - device_id: samsung-galaxy-s26  # Band L
+      speicher_gb: 256
+      farbe: cobalt-violet
+      tarif_name: "Allnet Flat L"
+      laufzeit_monate: 24
+    - device_id: samsung-galaxy-s26-ultra  # Band L
+      speicher_gb: 256
+      farbe: cobalt-violet
+      tarif_name: "Allnet Flat M"
+      laufzeit_monate: 36
+    - device_id: fairphone-6  # Band L
+      speicher_gb: 256
+      farbe: schwarz
+      tarif_name: "Allnet Flat M Flex"
+      laufzeit_monate: 24
+    - device_id: apple-iphone-17-pro-max  # Band L
+      speicher_gb: 256
+      farbe: cosmic-orange
+      tarif_name: "Allnet Flat L Flex"
+      laufzeit_monate: 36

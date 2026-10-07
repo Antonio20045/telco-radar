@@ -162,6 +162,32 @@ def abgelaufene_aktionen(aktionen: Iterable[Aktion], heute: str) -> list[Aktion]
     return [a for a in aktionen if a.eingerechnet and not a.gilt_am(heute)]
 
 
+def buendel_zaehlt(
+    herleitung: str, aktionen: Iterable[Aktion], heute: str, pruefung: object
+) -> bool:
+    """Darf das Bündel Δ, Referenz oder Sieger stellen (Notbremse, Schritte 1 und 7)?
+
+    Nur gemessen (ohne ``herleitung``), ohne abgelaufene eingerechnete Aktion und mit
+    Status gültig oder nie geprüft. Seite und Abnahme teilen diese eine Definition.
+    """
+    status = lies_vermerk(pruefung).status
+    return (
+        not herleitung.strip()
+        and not abgelaufene_aktionen(aktionen, heute)
+        and status in (None, GUELTIG)
+    )
+
+
+def satz_zaehlt(satz: Mapping, heute: str) -> bool:
+    """``buendel_zaehlt`` für einen gespeicherten Bündelsatz (``geraete_tco.json``)."""
+    return buendel_zaehlt(
+        str(satz.get("herleitung") or ""),
+        aktionen_aus(satz.get("aktionen")),
+        heute,
+        satz.get(FELD_PRUEFUNG),
+    )
+
+
 def geraetepreis(b: Buendel) -> float | None:
     """Was das Gerät im Bündel kostet: Anzahlung plus alle Raten; ein Vertrag ohne
     eigene Rate (1&1) über seine Laufzeit. None, wenn ein Posten fehlt."""
