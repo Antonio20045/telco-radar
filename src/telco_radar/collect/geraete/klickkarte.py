@@ -114,6 +114,18 @@ Stufe 3 von Format 2:
   ``zusammenfassung.muster``; ``rate`` und ``ratenzahl`` entfallen planmäßig, sind
   keine Lücke und dort verboten. Der Beleg trägt sie ab Version 2 (``klickbeleg``).
 
+Stufe 4 von Format 2 (1&1, Erkundung 07.10.2026, Commit c8ce1f77, Seiten 3 und 4):
+
+- ``weiter: {selektor, text, kacheln}``: Die Optionen der Dimension ``kacheln`` gibt
+  es erst nach einem Klick in die Bestellstrecke (1&1: 24 oder „24+12“ Monate nach
+  „Weiter zur Tarifauswahl“), dort als Kacheln nebeneinander. Je Kombination der
+  übrigen Dimensionen wählt der Crawler sie auf der Startseite, liest dort Seitenwerte
+  und zweite Lesung, klickt den einen Weiter-Knopf und liest auf der Folgeseite jede
+  Kachel: ``knoepfe.<kacheln>`` trifft die Kacheln (Wert wie bei Knöpfen, keine Marke,
+  nie geklickt), die Zusammenfassung ist die Kachel selbst (erster Bereich gleich dem
+  Selektor der Kacheln). Jede weitere Kombination beginnt in einem frischen Kontext;
+  die Regeln stehen in ``klickweiter``. Schließt ``adressen`` aus.
+
 Selektoren der Klickziele sind Playwright-Selektoren (``:text-matches`` und
 ``:has-text`` gehen); ``passt``, ``bis`` und ``wert_in`` sind reines CSS.
 """
@@ -155,6 +167,7 @@ from .klickkartentypen import (
     Textlesung,
     Textmuster,
     Vorbereitung,
+    Weiterschritt,
     Wertpfad,
 )
 from .klickquellenleser import lies_quellen, lies_seite, pruefe_felder
@@ -189,6 +202,7 @@ __all__ = [
     "Textlesung",
     "Textmuster",
     "Vorbereitung",
+    "Weiterschritt",
     "Wertpfad",
     "klickkarte_aus_daten",
     "lade_klickkarte",
@@ -203,6 +217,7 @@ KOPFFELDER = (
     "vorbereitung",
     "seite",
     "vertragsform",
+    "weiter",
 )
 
 
@@ -222,7 +237,9 @@ def klickkarte_aus_daten(roh: object, quelle: str) -> Klickkarte:
     """Baut die Karte aus geladenen YAML-Daten; ``quelle`` steht in jedem Fehler."""
     leser = Kartenleser(quelle)
     daten = leser.zuordnung(roh, "", KOPFFELDER)
-    knoepfe, gewaehlt = leser.knoepfe(daten.get("knoepfe"))
+    roh_weiter = daten.get("weiter")
+    kacheln = roh_weiter.get("kacheln") if isinstance(roh_weiter, dict) else None
+    knoepfe, gewaehlt = leser.knoepfe(daten.get("knoepfe"), kacheln)
     textlesung = leser.textlesung(daten.get("zusammenfassung"))
     vertragsform = leser.wahlweise_text(daten, "vertragsform", "")
     if vertragsform is None:
@@ -249,4 +266,5 @@ def klickkarte_aus_daten(roh: object, quelle: str) -> Klickkarte:
         quellen=quellen,
         seite=seite,
         vertragsform=vertragsform,
+        weiter=leser.weiter(roh_weiter, knoepfe, textlesung),
     )

@@ -1,16 +1,32 @@
-# Klick-Karte 1&1 (Format 2) für die Produktseite, Kartenprobe in Actions.
-# Fundstellen: Zweig klick-erkundung, Lauf a9b45f5a, erkundung/1und1/2026-10-07/
-# (B1 = bedienelemente-1.json, iPhone 17 Pro; B2 = bedienelemente-2.json, Galaxy S26;
-# P1/P2 = preise-1/-2.json). Die Seitenskripte stehen in keinem Mitschnitt; sie sind
-# aus den Fixtures tests/fixtures/geraete/einsundeins_produktseite_iphone_17_pro
-# (08.09.) und …_galaxy_s26_ultra_2026-09-29 belegt (Herkunft in _herkunft.json).
+# Klick-Karte 1&1 (Format 2, Stufe 4) für Produktseite und Bestellweg, Kartenprobe in
+# Actions. Fundstellen auf dem Zweig klick-erkundung, erkundung/1und1/2026-10-07/:
+# Lauf a9b45f5a: B1 = bedienelemente-1.json (iPhone 17 Pro), B2 = bedienelemente-2.json
+# (Galaxy S26), P1/P2 = preise-1/-2.json. Lauf c8ce1f77 (Bestellweg nach „Weiter zur
+# Tarifauswahl“; in a9b45f5a waren Seite 3/4 noch „Weiter-Knopf nicht klickbar“):
+# I = index.json Seite 3/4 „weiter“, B3/B4 = bedienelemente-3/-4.json, P3/P4 =
+# preise-3/-4.json, M3 = mitschnitt-3.json. Die Seitenskripte stehen in keinem
+# Mitschnitt; sie sind aus den Fixtures tests/fixtures/geraete/
+# einsundeins_produktseite_iphone_17_pro (08.09.), …_galaxy_s26_ultra_2026-09-29 und
+# …_iphone_18_pro_2026-09-29 belegt (Herkunft in _herkunft.json).
 #
-# Ein Vertrag aus Gerät und Tarif: die Seite nennt nur den Bündelbetrag je Monat für
-# 1&1 All-Net-Flat S und 36 Monate. Die Wahl 24 oder 36 Monate und andere Tarife gibt
-# es erst nach „Weiter zur Tarifauswahl“ (Warenkorb, Folgeseite), nicht auf dieser
-# Seite. Bewusst nicht gelesen (Lücke): Einmalzahlung (hwdVariantsOneOffPaymentFees
-# steht nirgends sichtbar), Anzahlung, Tarifphasen, Bindung, Anschluss und Volumen
-# (nur in den Tarifdetails der Lightbox).
+# Ein Vertrag aus Gerät und Tarif. Die Produktseite nennt nur 24+12 Monate; die Wahl
+# 24 oder 24+12 (= 36) gibt es erst im Bestellweg: Der Crawler wählt den Speicher auf
+# der Produktseite, klickt einmal „Weiter zur Tarifauswahl“ (legt einen Warenkorb an,
+# danach nur GET/HEAD) und liest beide Laufzeit-Kacheln der Folgeseite
+# /flow2/mobile/ssc-private/tariffContractDuration. Je Speicher ein frischer Kontext.
+#
+# Erwartet je Gerät: Speicher × Tarif 1 × Laufzeit 2 (heute 2 Speicher, also 4).
+# 24+12: Bündelbetrag und Einmalzahlung aus Kachel und Globalen der Produktseite.
+# 24: Betrag steht in der Kachel (P3 „59 , 99 €/Mon.“), aber keine zweite Quelle ist
+# belegt (die Globalen gelten für 24+12, currentHardwareOfferDuration '36'); die
+# Kombination bleibt Befund „Antwort nennt 36 statt 24“ statt eines ungeprüften Werts.
+# Bewusst nicht gelesen (Lücke):
+# - andere Tarife: Beide Kacheln tragen nur chosenTariff=tariff-anf-s-mvl (B3/B4
+#   Elemente 1 und 5); die Tarifauswahl ist der nächste Schritt hinter „Weiter“ in
+#   der Kachel (<add-to-cart-button>, B3 Elemente 2/6), also ein zweiter Klick, der
+#   den Warenkorb ändert und nicht erkundet ist.
+# - Anzahlung, Tarifphasen, Bindung, Anschluss, Volumen: nennt keine der beiden Seiten
+#   (P3/P4 haben drei Preis-Kandidaten; Tarifdetails nur in der Lightbox).
 anbieter: 1&1
 vertragsform: ein_vertrag
 
@@ -26,23 +42,41 @@ knoepfe:
     wert: value
     gewaehlt: {passt: ":has(input:checked)"}
   tarif:
-    # chosenTariff im Tarifdetail-Link (B1 Element 40, B2 Element 45): 1&1
-    # All-Net-Flat S.
+    # chosenTariff im Tarifdetail-Link (B1 Element 40, B2 Element 45; Folgeseite B3/B4
+    # Elemente 1 und 5): 1&1 All-Net-Flat S.
     fest: tariff-anf-s-mvl
   laufzeit:
-    # window.currentHardwareOfferDuration = '36' (Fixtures); siehe antwort.variante.
-    fest: 36
+    # Kacheln der Folgeseite: B3/B4 Gruppe 1 (#tariff-cards-container >
+    # div:nth-of-type(2) > div:nth-of-type(1)) mit Element 2 <add-to-cart-button>
+    # data-linkid „content_tile :: button :: Weiter mit HW24“, Gruppe 2 (… >
+    # div:nth-of-type(2)) mit Element 6 „… Weiter mit HW24+12“; sonst kein
+    # add-to-cart-button auf der Seite (71 Elemente). „24+12“ zählt als 36 Monate.
+    selektor: "#tariff-cards-container > div > div:has(add-to-cart-button)"
+    wert_in: add-to-cart-button
+    wert: data-linkid
+    muster: 'Weiter mit HW(\d+(?:\+\d+)?)$'
+
+weiter:
+  # I Seite 3/4: Selektor 2 Treffer, 1 sichtbar, geklickt „Weiter zur Tarifauswahl“
+  # (B1 Element 67 sichtbar, 42 in der Klebeleiste; B2 83 und 47). M3 Anfrage 62 POST
+  # /frontend/cart-facade/add (Antwort true), 71 GET der Produktseite mit
+  # startPageFlowId, 72 GET /flow2/mobile/ssc-private/tariffContractDuration; danach
+  # nur GET (Anfrage 97 POST verworfen: „nach dem Weiter-Klick nur GET und HEAD“).
+  selektor: "#hwd-configuration-section button.hwd-add-to-cart-button-price-component"
+  text: Weiter zur Tarifauswahl
+  kacheln: laufzeit
 
 vorbereitung:
   # Zubehör: B1 Element 61/62 „Ohne AirPods“ mit #no-incentive checked; B2 Element 61
   # Galaxy Buds vorgewählt (data-auto-add true), 78/79 „Ohne Kopfhörer“ nicht
-  # gewählt, P2 Kandidat 10 „… jeden Monat 2,– € sparen“. Vor jeder Lesung „ohne“.
+  # gewählt, P2 Kandidat 10 „… jeden Monat 2,– € sparen“. Vor dem Weiter „ohne“
+  # (ohne sie trug B4 Gruppe 3 „… Samsung Galaxy S26 und Samsung Galaxy Buds 4“).
   - {klick: 'label.toggle-label:has(#no-incentive)', pruefe: "#no-incentive", bis: ":checked"}
 
 seite:
-  # Der erste Tarifdetail-Link (B1 Element 40 sichtbar, 41 die Kopie der
-  # Klebeleiste); updateTariffDetailsLink() schreibt color= und size= nach jedem
-  # Variantenwechsel neu (Fixture 08.09.).
+  # Auf der Produktseite vor dem Weiter gelesen. Der erste Tarifdetail-Link (B1
+  # Element 40 sichtbar, 41 die Kopie der Klebeleiste); updateTariffDetailsLink()
+  # schreibt color= und size= nach jedem Variantenwechsel neu (Fixture 08.09.).
   speicher:
     selektor: "#hwd-tariff-details-link-price-component"
     attribut: data-iframe
@@ -52,30 +86,33 @@ seite:
     attribut: data-iframe
     parameter: chosenTariff
   # B1 Element 44 COSMIC_ORANGE checked, B2 COBALT_VIOLET; Schlüssel von
-  # hwdVariantsPrices ist product-<FARBE>-<Speicher>.
+  # hwdVariantsPrices und hwdVariantsOneOffPaymentFees ist product-<FARBE>-<Speicher>.
   farbe:
     selektor: '#hwd-configuration-section input[name$=".color"]:checked'
     attribut: value
 
 zusammenfassung:
-  # P1 Kandidat 5 „44 , 99 €/Monat“, P2 Kandidat 5 „34 , 99 €/Monat“, sichtbar, an
-  # #hwd-configuration-section > div:nth-of-type(2) > div:nth-of-type(1) >
-  # div:nth-of-type(2) > div:nth-of-type(1); Kandidat 6 ist die Kopie der
-  # Klebeleiste (unsichtbar, .hwd-monthly-price--stuck).
-  selektor: >-
-    #hwd-configuration-section
-    .hwd-monthly-price:not(.hwd-monthly-price--stuck) > .hwd-monthly-price__content
+  # Die Kachel selbst (Selektor wie knoepfe.laufzeit). P3 Kandidat 0 „59 , 99 €/Mon.“
+  # (Kachel 1, HW24), Kandidat 1 „44 , 99 €/Mon.“ (Kachel 2, HW24+12), Kandidat 2 in
+  # Kachel 2: „Flexibel nach 24 Monaten: … Oder Vertrag kündigen und Altgerät gegen
+  # einmalig 360,– € behalten.“; P4 „44 , 99“, „34 , 99“, „einmalig 220,– €“.
+  selektor: "#tariff-cards-container > div > div:has(add-to-cart-button)"
   muster:
-    buendelbetrag: '(\d+\s*,\s*\d{2})\s*€/Monat'
+    buendelbetrag: '(\d+\s*,\s*\d{2})\s*€/Mon\.'
+    einmalzahlung: 'einmalig\s+(\d[\d.]*,(?:\d{2}|–))\s*€'
 
 antwort:
-  # Globale der Seite (Fixtures): hwdVariantsPrices = {'product-COSMIC_ORANGE-256':
-  # [4499], …} in setHwdPrices() (ohne var, also window), Cent; Bündel mit Zubehör
-  # haben eigene Schlüssel (…-bundle-…). currentHardwareOfferDuration ist die
-  # Gerätelaufzeit der Seite und das Echo für laufzeit.
-  global: [hwdVariantsPrices, currentHardwareOfferDuration]
+  # Globale der Produktseite (Fixtures), gelesen vor dem Weiter: hwdVariantsPrices =
+  # {'product-COSMIC_ORANGE-256': [4499], …} in setHwdPrices() (ohne var, also window),
+  # Cent; Bündel mit Zubehör haben eigene Schlüssel (…-bundle-…).
+  # hwdVariantsOneOffPaymentFees = {"product-COSMIC_ORANGE-256":"360,–", …} (ohne var,
+  # nur wenn currentHardwareOfferDuration === '36'); 360 ist derselbe Betrag wie in
+  # P3 Kandidat 2. currentHardwareOfferDuration ist die Laufzeit dieser Werte und das
+  # Echo für laufzeit.
+  global: [hwdVariantsPrices, hwdVariantsOneOffPaymentFees, currentHardwareOfferDuration]
   pfade:
     buendelbetrag: {pfad: "hwdVariantsPrices.product-{farbe}-{speicher}.0", einheit: cent}
+    einmalzahlung: "hwdVariantsOneOffPaymentFees.product-{farbe}-{speicher}"
   variante:
     laufzeit: currentHardwareOfferDuration
 

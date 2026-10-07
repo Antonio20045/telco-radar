@@ -1,20 +1,22 @@
-"""Klick-Karte 1&1 gegen eine gespeicherte echte Produktseite, ohne Browser.
+"""Klick-Karte 1&1 gegen gespeicherte echte Seiten des Bestellwegs, ohne Browser.
 
-1&1 nennt den Preis in keiner Antwort, sondern in der Globalen ``hwdVariantsPrices``
-der Seite (Cent je ``product-<FARBE>-<Speicher>``). Kein Mitschnitt der
-Klick-Erkundung hält das Dokument; Beleg ist darum die Produktseite iPhone 17 Pro vom
-08.09.2026 (``einsundeins_produktseite_iphone_17_pro.html.gz``, Herkunft in
-``tests/fixtures/geraete/_herkunft.json``). Ihr Preis 44,99 € ist derselbe, den die
-Erkundung vom 07.10.2026 sichtbar las (Zweig ``klick-erkundung``, Commit a9b45f5a,
-``erkundung/1und1/2026-10-07/preise-1.json`` Kandidat 5 „44 , 99 €/Monat“). Die
-Selektoren der Karte laufen hier über BeautifulSoup auf derselben Seite. Gegenprobe:
-512 GB liest seinen eigenen Betrag, nie den eines Zubehör-Bündels, und eine Farbe,
-die es nicht gibt, liest keinen.
+1&1 nennt 24 oder „24+12“ Monate erst nach „Weiter zur Tarifauswahl“: zwei Kacheln
+auf ``/flow2/mobile/ssc-private/tariffContractDuration`` (Klick-Erkundung 07.10.2026,
+Zweig ``klick-erkundung``, Commit c8ce1f77, Seiten 3 und 4; Auszug
+``einsundeins_bestellweg_laufzeit_20261007.json``). Die zweite Lesung sind die Globalen
+der Produktseite (``hwdVariantsPrices``, ``hwdVariantsOneOffPaymentFees``), gelesen vor
+dem Weiter; kein Mitschnitt hält das Dokument, Beleg ist die Produktseite iPhone 17 Pro
+vom 08.09.2026 (``einsundeins_produktseite_iphone_17_pro.html.gz``). Ihre Werte 44,99 €
+und 360 € sind dieselben, die die Kachel „24+12“ am 07.10. zeigte. Herkunft beider
+Dateien in ``tests/fixtures/geraete/_herkunft.json``. Gegenproben: die Kachel 24 bleibt
+Befund (die Globale nennt 36), 512 GB liest seinen eigenen Betrag, nie den eines
+Zubehör-Bündels, und eine Farbe, die es nicht gibt, liest keinen.
 """
 
 from __future__ import annotations
 
 import gzip
+import json
 import re
 from pathlib import Path
 from urllib.parse import parse_qs, urljoin, urlparse
@@ -22,6 +24,7 @@ from urllib.parse import parse_qs, urljoin, urlparse
 import pytest
 from bs4 import BeautifulSoup
 
+from telco_radar.collect.geraete.klickantwort import monate
 from telco_radar.collect.geraete.klickecho import (
     feldwert,
     lies_antwort,
@@ -29,19 +32,22 @@ from telco_radar.collect.geraete.klickecho import (
     variante_aus,
 )
 from telco_radar.collect.geraete.klickkartenprobe import GELADEN, lade_karte
+from telco_radar.collect.geraete.klickstrecke import KAUFWORT
 from telco_radar.collect.geraete.klicktext import Buendelwerte, Preiswerte
 
 KARTEN = Path(__file__).resolve().parents[1] / "config" / "klickkarten"
-SEITE = (
-    Path(__file__).parent
-    / "fixtures"
-    / "geraete"
-    / "einsundeins_produktseite_iphone_17_pro.html.gz"
-)
+FIXTURES = Path(__file__).parent / "fixtures" / "geraete"
+SEITE = FIXTURES / "einsundeins_produktseite_iphone_17_pro.html.gz"
+BESTELLWEG = FIXTURES / "einsundeins_bestellweg_laufzeit_20261007.json"
 ADRESSE = "https://mobile.1und1.de/iphone-17-pro"
 PREISE = re.compile(r"hwdVariantsPrices\s*=\s*\{(.*?)\};", re.S)
 EINTRAG = re.compile(r"'([^']+)'\s*:\s*\[\s*(\d+)\s*,?\s*\]")
 LAUFZEIT = re.compile(r"window\.currentHardwareOfferDuration\s*=\s*'(\d+)'")
+EINMAL = re.compile(r"hwdVariantsOneOffPaymentFees\s*=\s*(\{.*?\})")
+KACHEL = re.compile(
+    r"^#tariff-cards-container > div:nth-of-type\(\d+\) > div:nth-of-type\(\d+\)"
+)
+PLATZ = {"speicher": "256", "tarif": "tariff-anf-s-mvl", "farbe": "COSMIC_ORANGE"}
 
 
 @pytest.fixture(scope="module")
@@ -62,11 +68,17 @@ def dom(html):
 
 
 @pytest.fixture(scope="module")
+def weg() -> dict:
+    return json.loads(BESTELLWEG.read_text(encoding="utf-8"))
+
+
+@pytest.fixture(scope="module")
 def globale(html) -> dict:
-    """Was ``window.hwdVariantsPrices`` und die Laufzeit der Seite liefern."""
+    """Was die drei Globalen der Produktseite liefern."""
     preise = {k: [int(v)] for k, v in EINTRAG.findall(PREISE.search(html)[1])}
     return {
         "hwdVariantsPrices": preise,
+        "hwdVariantsOneOffPaymentFees": json.loads(EINMAL.search(html)[1]),
         "currentHardwareOfferDuration": LAUFZEIT.search(html)[1],
     }
 
@@ -80,7 +92,50 @@ def _seitenwert(dom, karte, name: str) -> str | None:
     return roh
 
 
-def test_selektoren_der_karte_treffen_die_seite(karte, dom):
+def _kacheln(weg: dict, seite: int) -> list[tuple[str, str]]:
+    """Je Kachel (Pfad der Kachel, data-linkid) aus dem Inventar der Folgeseite."""
+    elemente = weg[f"seite_{seite}"]["bedienelemente"].values()
+    return [
+        (KACHEL.match(e["pfad"])[0], e["daten"]["data-linkid"])
+        for e in elemente
+        if e["tag"] == "add-to-cart-button"
+    ]
+
+
+def _kacheltext(weg: dict, seite: int, kachel: str) -> str:
+    """Die Preis-Kandidaten einer Kachel, wie die Erkundung sie las."""
+    preise = weg[f"seite_{seite}"]["preise"].values()
+    return "\n".join(p["kontext"] for p in preise if p["pfad"].startswith(kachel))
+
+
+def _textwerte(karte, text: str) -> Buendelwerte:
+    werte = {}
+    for feld, muster in karte.textlesung.muster.items():
+        treffer = muster.muster.search(text)
+        roh = None if treffer is None else "".join(treffer[1].split())
+        werte[feld] = None if roh is None else feldwert(feld, roh)
+    return Buendelwerte(**werte)
+
+
+def _laufzeit(karte, linkid: str) -> str:
+    return karte.knoepfe["laufzeit"].muster.search(linkid)[1]
+
+
+def _echo(karte, globale, linkid: str, im_text: Buendelwerte):
+    lesung = lies_antwort(globale, karte.antwort, None, PLATZ)
+    variante = variante_aus("256", "tariff-anf-s-mvl", _laufzeit(karte, linkid))
+    echo = pruefe_echo(
+        variante,
+        variante,
+        Preiswerte(),
+        lesung,
+        buendel=im_text,
+        entfallen=karte.entfallen,
+    )
+    return variante, lesung, echo
+
+
+def test_selektoren_der_karte_treffen_die_produktseite(karte, dom):
     knoepfe = dom.select(karte.knoepfe["speicher"].selektor)
     werte = [k.select_one(karte.knoepfe["speicher"].wert_in)["value"] for k in knoepfe]
     gewaehlt = [k for k in knoepfe if k.select_one("input:checked") is not None]
@@ -97,39 +152,72 @@ def test_selektoren_der_karte_treffen_die_seite(karte, dom):
     }
 
 
-def test_buendelbetrag_aus_text_und_globaler_stimmt_ueberein(karte, dom, globale):
-    platz = {
-        "speicher": "256",
-        "tarif": "tariff-anf-s-mvl",
-        "laufzeit": "36",
-        "farbe": "COSMIC_ORANGE",
-    }
-    text = dom.select_one(karte.zusammenfassung).get_text(" ", strip=True)
-    treffer = karte.textlesung.muster["buendelbetrag"].muster.search(text)
-    im_text = feldwert("buendelbetrag", "".join(treffer[1].split()))
-    lesung = lies_antwort(globale, karte.antwort, None, platz)
-    variante = variante_aus("256", "tariff-anf-s-mvl", 36)
+def test_weiter_knopf_wie_in_der_erkundung(karte, weg):
+    for seite, ausgang in ((3, 1), (4, 2)):
+        index = weg[f"seite_{seite}"]["index"]
+        knoepfe = list(weg[f"seite_{ausgang}"]["bedienelemente"].values())
+        sichtbar = [k["text"] for k in knoepfe if k["sichtbar"]]
 
-    echo = pruefe_echo(
-        variante,
-        variante,
-        Preiswerte(),
-        lesung,
-        buendel=Buendelwerte(buendelbetrag=im_text),
-        entfallen=karte.entfallen,
-    )
+        assert index["weiter"]["selektor"] == karte.weiter.selektor
+        assert index["weiter"]["geklickt"] == karte.weiter.text
+        assert "/ssc-private/tariffContractDuration?" in index["endadresse"]
+        assert (len(knoepfe), sichtbar) == (2, [karte.weiter.text])
+    assert KAUFWORT.search(karte.weiter.text) is None
 
-    assert text.startswith("44 , 99 €/Monat")
+
+def test_zwei_kacheln_mit_24_und_24_plus_12(karte, weg):
+    for seite in (3, 4):
+        kacheln = _kacheln(weg, seite)
+        laufzeiten = [_laufzeit(karte, linkid) for _, linkid in kacheln]
+
+        assert len({pfad for pfad, _ in kacheln}) == 2
+        assert laufzeiten == ["24", "24+12"]
+        assert [monate(w) for w in laufzeiten] == [24, 36]
+    assert karte.knoepfe["laufzeit"].selektor == karte.textlesung.selektoren[0]
+    assert karte.weiter.kacheln == "laufzeit"
+
+
+def test_kachel_36_bestaetigt_buendel_und_einmalzahlung(karte, weg, globale):
+    kachel, linkid = _kacheln(weg, 3)[1]
+    im_text = _textwerte(karte, _kacheltext(weg, 3, kachel))
+
+    variante, lesung, echo = _echo(karte, globale, linkid, im_text)
+
+    assert variante.laufzeit == 36
     assert dict(lesung.variante) == {"laufzeit": 36}
     assert echo.stimmt, echo.befunde
-    assert echo.buendel == Buendelwerte(buendelbetrag=44.99)
-    assert "einmalzahlung" in echo.luecken and "rate" not in echo.luecken
+    assert echo.buendel == Buendelwerte(buendelbetrag=44.99, einmalzahlung=360.0)
+    assert "rate" not in echo.luecken
+
+
+def test_galaxy_s26_kacheln_lesen_eigene_werte(karte, weg):
+    kacheln = _kacheln(weg, 4)
+    werte = [_textwerte(karte, _kacheltext(weg, 4, k)) for k, _ in kacheln]
+
+    assert werte == [
+        Buendelwerte(buendelbetrag=44.99),
+        Buendelwerte(buendelbetrag=34.99, einmalzahlung=220.0),
+    ]
+
+
+def test_gegenprobe_kachel_24_bleibt_befund(karte, weg, globale):
+    kachel, linkid = _kacheln(weg, 3)[0]
+    im_text = _textwerte(karte, _kacheltext(weg, 3, kachel))
+
+    variante, _, echo = _echo(karte, globale, linkid, im_text)
+
+    assert variante.laufzeit == 24
+    assert im_text == Buendelwerte(buendelbetrag=59.99)
+    assert [(b.feld, b.grund) for b in echo.befunde] == [
+        ("antwort.laufzeit", "Antwort nennt 36 statt 24")
+    ]
+    assert echo.buendel == Buendelwerte()
 
 
 def test_gegenprobe_anderer_speicher_kein_buendel_keine_fremde_farbe(karte, globale):
-    def betrag(speicher: str, farbe: str) -> float | None:
+    def werte(speicher: str, farbe: str) -> Buendelwerte:
         platz = {"speicher": speicher, "farbe": farbe}
-        return lies_antwort(globale, karte.antwort, None, platz).buendel.buendelbetrag
+        return lies_antwort(globale, karte.antwort, None, platz).buendel
 
     preise = globale["hwdVariantsPrices"]
     buendel = preise[
@@ -137,25 +225,7 @@ def test_gegenprobe_anderer_speicher_kein_buendel_keine_fremde_farbe(karte, glob
     ]
 
     eigener = preise["product-COSMIC_ORANGE-512"][0]
-    assert betrag("512", "COSMIC_ORANGE") == eigener / 100
-    assert betrag("512", "COSMIC_ORANGE") != buendel[0] / 100
-    assert betrag("256", "VIOLETT") is None
-
-
-def test_laufzeit_der_seite_ist_echo_der_festen_laufzeit(karte, globale):
-    platz = {"speicher": "256", "farbe": "COSMIC_ORANGE"}
-    vierundzwanzig = {**globale, "currentHardwareOfferDuration": "24"}
-    lesung = lies_antwort(vierundzwanzig, karte.antwort, None, platz)
-    variante = variante_aus("256", "tariff-anf-s-mvl", 36)
-
-    echo = pruefe_echo(
-        variante,
-        variante,
-        Preiswerte(),
-        lesung,
-        buendel=Buendelwerte(buendelbetrag=44.99),
-        entfallen=karte.entfallen,
-    )
-
-    assert karte.knoepfe["laufzeit"].fest == "36"
-    assert [b.feld for b in echo.befunde] == ["antwort.laufzeit"]
+    assert werte("512", "COSMIC_ORANGE").buendelbetrag == eigener / 100
+    assert werte("512", "COSMIC_ORANGE").buendelbetrag != buendel[0] / 100
+    assert werte("512", "COSMIC_ORANGE").einmalzahlung == 450.0
+    assert werte("256", "VIOLETT") == Buendelwerte()

@@ -15,10 +15,14 @@ from .klickkartentypen import (
     DIMENSIONEN,
     GEWAEHLT,
     GRUND_ADRESSEN_UND_KNOPF,
+    GRUND_DIMENSION,
     GRUND_EINE_ADRESSDIMENSION,
     GRUND_ENTWEDER,
     GRUND_FEHLT,
     GRUND_FEST_UND_KNOPF,
+    GRUND_KACHEL_BEREICH,
+    GRUND_KACHEL_KNOPF,
+    GRUND_KACHEL_MARKE,
     GRUND_KEIN_TEXT,
     GRUND_KEINE_LISTE,
     GRUND_KEINE_ZUORDNUNG,
@@ -26,6 +30,7 @@ from .klickkartentypen import (
     GRUND_OHNE_MARKE,
     GRUND_PLATZHALTER,
     GRUND_UNBEKANNT,
+    GRUND_WEITER_ADRESSEN,
     PLATZHALTER_MODELL,
     Adressen,
     Auswahlmarke,
@@ -34,6 +39,7 @@ from .klickkartentypen import (
     Knopf,
     Textlesung,
     Vorbereitung,
+    Weiterschritt,
 )
 from .klickquellenleser import lies_textmuster, texte
 
@@ -43,6 +49,7 @@ MARKENTEILE = ("attribut", "wert", "passt")
 VORBEREITUNGSTEILE = ("klick", "bis", "pruefe")
 LESUNGSTEILE = ("selektor", "oeffnen", "schliessen", "ohne", "muster")
 KANARIENTEILE = ("selektor", "enthaelt", "attribut")
+WEITERTEILE = ("selektor", "text", "kacheln")
 _PLATZHALTER = re.compile(r"\{([^{}]*)\}")
 
 
@@ -111,8 +118,10 @@ class Kartenleser:
             return None
         return self.muster(daten, schluessel, feld)
 
-    def knoepfe(self, roh: object) -> tuple[dict[str, Knopf], Auswahlmarke | None]:
-        """Die Knöpfe je Dimension und die Standardmarke."""
+    def knoepfe(
+        self, roh: object, kacheln: object = None
+    ) -> tuple[dict[str, Knopf], Auswahlmarke | None]:
+        """Die Knöpfe je Dimension und die Standardmarke; ``kacheln`` braucht keine."""
         knoepfe = self.zuordnung(roh, "knoepfe", (*DIMENSIONEN, GEWAEHLT))
         je_dimension = {d: self.knopf(knoepfe, d) for d in DIMENSIONEN}
         mit_adressen = [d for d, k in je_dimension.items() if k.adressen is not None]
@@ -123,7 +132,8 @@ class Kartenleser:
         if knoepfe.get(GEWAEHLT) is not None:
             return je_dimension, self.marke(knoepfe[GEWAEHLT], feld)
         if any(
-            k.selektor is not None and k.marke is None for k in je_dimension.values()
+            k.selektor is not None and k.marke is None and d != kacheln
+            for d, k in je_dimension.items()
         ):
             raise self.fehler(feld, GRUND_OHNE_MARKE)
         return je_dimension, None
@@ -202,6 +212,32 @@ class Kartenleser:
             schliessen=self.wahlweise_text(daten, "schliessen", feld),
             ohne=ohne,
             muster=lies_textmuster(self, daten.get("muster")),
+        )
+
+    def weiter(
+        self, roh: object, knoepfe: Mapping[str, Knopf], textlesung: Textlesung
+    ) -> Weiterschritt | None:
+        """Der Klick in die Bestellstrecke und die Kacheln der Folgeseite."""
+        if roh is None:
+            return None
+        feld = "weiter"
+        daten = self.zuordnung(roh, feld, WEITERTEILE)
+        kacheln = self.text(daten, "kacheln", feld)
+        if kacheln not in DIMENSIONEN:
+            raise self.fehler(f"{feld}.kacheln", f"{GRUND_DIMENSION} {kacheln}")
+        if any(k.adressen is not None for k in knoepfe.values()):
+            raise self.fehler(feld, GRUND_WEITER_ADRESSEN)
+        knopf, ort = knoepfe[kacheln], f"knoepfe.{kacheln}"
+        if knopf.selektor is None:
+            raise self.fehler(ort, GRUND_KACHEL_KNOPF)
+        if knopf.marke is not None:
+            raise self.fehler(f"{ort}.{GEWAEHLT}", GRUND_KACHEL_MARKE)
+        if textlesung.selektoren[0] != knopf.selektor:
+            raise self.fehler("zusammenfassung.selektor", GRUND_KACHEL_BEREICH)
+        return Weiterschritt(
+            selektor=self.text(daten, "selektor", feld),
+            text=self.text(daten, "text", feld),
+            kacheln=kacheln,
         )
 
     def kanarie(self, roh: object) -> Kanarie:

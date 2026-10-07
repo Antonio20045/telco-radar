@@ -5,28 +5,24 @@ Tageslauf. Je Produktseite und Klick-Karte (``klickkarte``):
 
 1. Der Crawler legt einen eigenen Browserkontext ohne Vorabladen an (``klickkontext``).
    Jede Anfrage geht durch das Tor (``klicktor``): robots.txt für jede Adresse und jedes
-   Ziel einer Umleitung, Crawl-delay je Host für jede Anfrage. Gesperrte Adressen gehen
-   nicht hinaus und stehen in ``verworfen``, gescheiterte in ``gescheitert``. Fristen
-   zählen nur Zeit, in der niemand auf den Crawl-delay wartet (``klickwache``). Nach dem
-   Lauf verlässt er die Seite und schließt den Kontext.
-2. Zeigt eine Hauptseite Bot-Schutz (202-Challenge, 4xx, 5xx, Challenge-Muster), beim
-   Öffnen oder mitten im Lauf, oder die Preisantwort, antwortet die eigene Website auf
-   irgendeine Anfrage mit HTTP 202 (``klickwache``), oder fehlt der Kanarienwert, ist
-   der Abruf gestört und der Lauf endet sofort: kein zweiter Versuch, keine Umgehung
-   (CLAUDE.md Regel 4). Sperrt robots.txt die Seite oder ihre Preisantwort, ist der Lauf
-   gesperrt; scheitert die Preisanfrage, ist er gestört.
+   Ziel einer Umleitung, Crawl-delay je Host. Gesperrte Adressen stehen in
+   ``verworfen``, gescheiterte in ``gescheitert``. Fristen zählen ohne Crawl-delay
+   (``klickwache``). Am Ende schließt er den Kontext.
+2. Zeigen Hauptseite oder Preisantwort Bot-Schutz (202-Challenge, 4xx, 5xx,
+   Challenge-Muster), antwortet die eigene Website mit HTTP 202 (``klickwache``) oder
+   fehlt der Kanarienwert, ist der Abruf gestört und der Lauf endet sofort, ohne zweiten
+   Versuch und ohne Umgehung (CLAUDE.md Regel 4). Sperrt robots.txt Seite oder
+   Preisantwort, ist er gesperrt; scheitert die Preisanfrage, gestört.
 3. Er liest die angebotenen Optionen je Dimension und klickt jede Kombination; nach
    jedem Klick liest er die Optionen neu und führt neu erschienene Werte mit. Eine feste
    Dimension hat keinen Knopf. Sind die Optionen einer Dimension eigene Adressen
-   (``klickadressen``), lädt er jede Adresse, die die Startseite zeigt, und klickt dort
-   die übrigen Dimensionen. Eine gewählte Option klickt er nicht; eine gesperrte heißt
-   erst ``nicht_angeboten``, wenn die Seite ruht (keine Anfrage läuft, zwei gleiche
-   Lesungen). Nach dem Öffnen lehnt ``klickbedienung`` eine Einwilligungsabfrage ab
-   und stellt vor jeder Lesung die Vorbereitung her. Eine Antwort gehört nur zu dem
-   Klick, nach dem ihre Anfrage hinausging; bleibt eine Anfrage über die Frist offen,
-   heißt die Kombination ``nicht_erfasst``, und vor dem nächsten Klick wie am Ende
-   wartet er sie ab oder bricht den Lauf als gestört ab. Dann
-   liest ``klicklesung`` Antwort, Text, Markierung und Echo und macht einen Screenshot.
+   (``klickadressen``), lädt er jede Adresse der Startseite und klickt dort die übrigen
+   Dimensionen; mit ``weiter`` liest er je Kombination der Startseite die Kacheln der
+   Folgeseite (``klickweiter``). Eine gewählte Option klickt er nicht, eine gesperrte
+   heißt erst ``nicht_angeboten``, wenn die Seite ruht. ``klickbedienung`` lehnt die
+   Einwilligung ab und stellt die Vorbereitung her. Eine Antwort gehört nur zum Klick,
+   nach dem ihre Anfrage hinausging, sonst ``nicht_erfasst``. Dann liest ``klicklesung``
+   Antwort, Text, Markierung und Echo und macht einen Screenshot.
 4. Je Kombination: erfasst, nicht_angeboten, nicht_erfasst oder befund; dazu der
    Strukturwächter je Lauf (beides in ``klicklauf``). Ist keine Kombination angeboten,
    ist der Lauf gestört.
@@ -34,10 +30,8 @@ Tageslauf. Je Produktseite und Klick-Karte (``klickkarte``):
    Preisantwort, Zeitpunkt aus ``uhr``, Fundstellen. Ohne Beleg ist ein Wert nicht
    gültig (``klicklauf.mit_beleg``), mit Beleg heißt er ``offen``, bis ``belegarchiv``
    ihn ablegt. ``wiedergabe`` nennt HAR-Belege, aus denen der Kontext Antworten ohne
-   Netz abspielt (``route_from_har``); was sie nicht kennen, geht wie sonst durch das
-   Tor. Grenze: der Beleg hält nur die Preisantwort, die Produktseite kommt weiter aus
-   dem Netz; ist sie weg, liest die Wiedergabe nichts. Eine Seitenkopie gehört nur in
-   den privaten Bucket, nie ins Repo.
+   Netz abspielt (``route_from_har``); was sie nicht kennen, geht durch das Tor. Der
+   Beleg hält nur die Preisantwort; eine Seitenkopie gehört nur in den privaten Bucket.
 
 Den Browser startet der Aufrufer; dieses Modul setzt keine Tarnung, keinen Proxy und
 keine fremde Kennung.
@@ -49,6 +43,7 @@ import logging
 from collections.abc import Callable
 from dataclasses import replace
 from datetime import datetime
+from functools import partial
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -58,7 +53,7 @@ from .klickadressen import Adresse, lies_adressen, ohne_adresse, pruefe_robots
 from .klickbedienung import Bedienung
 from .klickecho import LAUFZEIT, Variante, variante_aus
 from .klickkarte import DIMENSIONEN, Adressen, Klickkarte
-from .klickkontext import Sitzung, cookie_werte, oeffne_sitzung, schliesse
+from .klickkontext import oeffne_sitzung
 from .klicklauf import (
     BEFUND,
     ERFASST,
@@ -83,6 +78,7 @@ from .klicktor import (
     kurz,
 )
 from .klickwache import Abbruch, Wache
+from .klickweiter import GRUND_NICHT_BESUCHT, Kontexte, je_weiter
 from .robots import RobotsWaechter
 
 if TYPE_CHECKING:
@@ -101,7 +97,6 @@ log = logging.getLogger(__name__)
 ANTWORT_FRIST_MS = 15000
 HOECHSTE_KOMBINATIONEN = 200
 FENSTER: ViewportSize = {"width": 1280, "height": 900}
-GRUND_NICHT_BESUCHT = "nicht besucht"
 GRUND_ZEIT = "Zeitgrenze erreicht"
 
 
@@ -133,15 +128,15 @@ def klicke_durch(
     ``frist`` vor einem Klick falsch ist, heißt die Kombination ``nicht_erfasst`` mit
     Grund ``nicht besucht``; schneidet die Frist welche ab oder verwirft sie eine
     Anfrage, ist der Lauf ``zeitgrenze``. ``beobachter`` sieht jede Antwort, ``cookies``
-    am Ende die Cookie-Werte, ``modell`` füllt ``{modell}`` im Kanarienwert.
+    die Cookie-Werte jedes Kontexts, ``modell`` füllt ``{modell}`` im Kanarienwert.
     """
     lauf = Klicklauf(anbieter=karte.anbieter, adresse=adresse)
     tor = Tor(waechter, uhr, schleuse, lauf)
     tor.beobachter = beobachter
-    sitzung: Sitzung | None = None
+    oeffne = partial(oeffne_sitzung, browser, tor, FENSTER, kennung)
+    kontexte = Kontexte(partial(oeffne, wiedergabe=wiedergabe), tor, cookies)
     try:
-        sitzung = oeffne_sitzung(browser, tor, FENSTER, kennung, wiedergabe=wiedergabe)
-        gang = _Gang(sitzung.seite, karte, tor, frist_ms, lauf, hoechste, frist, modell)
+        gang = _Gang(kontexte, karte, tor, frist_ms, lauf, hoechste, frist, modell)
         gang.laufe()
     except Abbruch as abbruch:
         lauf.status, lauf.grund = abbruch.status, abbruch.grund
@@ -150,10 +145,7 @@ def klicke_durch(
         if tor.stoerung is not None:
             lauf.grund = tor.stoerung
     finally:
-        tor.geschlossen = True
-        if cookies is not None:
-            cookies.update(cookie_werte(sitzung))
-        schliesse(sitzung)
+        kontexte.schliesse()
     bruch = pruefe_struktur(lauf, vorlauf)
     leer = ergebnisgrund(lauf.ergebnisse)
     for grund in (bruch, leer):
@@ -173,7 +165,7 @@ class _Gang:
 
     def __init__(
         self,
-        seite: Page,
+        kontexte: Kontexte,
         karte: Klickkarte,
         tor: Tor,
         frist_ms: int,
@@ -182,21 +174,29 @@ class _Gang:
         frist: Callable[[str], bool] | None,
         modell: str | None = None,
     ) -> None:
-        self.seite, self.karte, self.tor, self.lauf = seite, karte, tor, lauf
+        self.karte, self.tor, self.lauf = karte, tor, lauf
         self.frist_ms, self.hoechste, self.frist = frist_ms, hoechste, frist
-        self.wache = Wache(seite, karte, tor, lauf, frist_ms)
-        self.leser = Leser(seite, karte, frist_ms, self.wache, modell)
-        self.bedienung = Bedienung(seite, karte, self.wache, self.leser, modell)
+        self.kontexte, self.modell = kontexte, modell
+        self._binde(kontexte.neu())
         self.geklickt = False
         self.nach_frist = 0
         self.unberuehrt = True
+
+    def _binde(self, seite: Page) -> None:
+        """Seite, Wache, Leser und Bedienung eines (neuen) Kontexts."""
+        self.seite, karte, modell = seite, self.karte, self.modell
+        self.wache = Wache(seite, karte, self.tor, self.lauf, self.frist_ms)
+        self.leser = Leser(seite, karte, self.frist_ms, self.wache, modell)
+        self.bedienung = Bedienung(seite, karte, self.wache, self.leser, modell)
 
     def laufe(self) -> None:
         self._oeffne_vor_frist(self.lauf.adresse)
         dimension = self.karte.adressdimension
         besucht: set[Auswahl] = set()
         adressen = None if dimension is None else self.karte.knoepfe[dimension].adressen
-        if dimension is None or adressen is None:
+        if self.karte.weiter is not None:
+            je_weiter(self, self.karte.weiter)
+        elif dimension is None or adressen is None:
             self._klicke_alle(besucht)
         else:
             self._je_adresse(dimension, adressen, besucht)

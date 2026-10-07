@@ -49,6 +49,7 @@ LAUFZEIT = "laufzeit"
 _GANZZAHL = re.compile(r"\d+")
 _MONATSANGABE = re.compile(r"(\d+)\s*(?:Monat|x\b|×)", re.I)
 _NUR_ZAHL = re.compile(r"\s*(\d+)\s*")
+_SUMME = re.compile(r"\s*(\d+)\s*\+\s*(\d+)\s*")
 
 
 @dataclass(frozen=True)
@@ -221,9 +222,16 @@ def _ganzzahl(roh: object) -> int | None:
 
 
 def monate(roh: object) -> int | None:
-    """Eine Laufzeit als Monatszahl: „24 Monate“, „24 x“ oder reine Zahl."""
+    """Eine Laufzeit als Monatszahl: „24 Monate“, „24 x“, reine Zahl oder Summe.
+
+    Die Summe „24+12“ ist das 1&1-Modell: 24 Monate, dann 12 weitere, zusammen 36
+    (Datenkonzept Geräteradar, Abschnitt 5.1).
+    """
     if not isinstance(roh, str):
         return _ganzzahl(roh)
+    summe = _SUMME.fullmatch(roh)
+    if summe is not None:
+        return int(summe[1]) + int(summe[2])
     treffer = _NUR_ZAHL.fullmatch(roh) or _MONATSANGABE.search(roh)
     return int(treffer[1]) if treffer else None
 

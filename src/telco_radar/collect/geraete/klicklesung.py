@@ -16,7 +16,9 @@ das nicht aus der eigenen Adresse stammt: einen Seitenwert mit Selektor oder ein
 Variantenwert der Antwort ohne Platzhalter ihrer Dimension; sonst ist sie ein Befund.
 Gefundene Wertfelder zählt der Strukturwächter, ebenso jede angezeigte Option, auf die
 das Muster der Karte nicht passt (``unlesbar``); deren Kombination heißt
-``nicht_erfasst``.
+``nicht_erfasst``. Mit ``weiter`` (``klickweiter``) liest ``vorlesung`` Seitenwerte,
+zweite Lesung und Markierung auf der Startseite vor dem Weiter-Klick; ``lies`` nimmt
+sie mit und liest auf der Folgeseite nur die Kachel an ``stelle``.
 """
 
 from __future__ import annotations
@@ -48,7 +50,7 @@ from .klicklauf import (
     mit_beleg,
 )
 from .klickoptionen import Option, angebotene_werte, lies_optionen
-from .klickquellen import Quellenleser
+from .klickquellen import Quellenleser, Quellenlesung
 from .klicktext import Preiswerte
 from .klicktextleser import Textleser
 from .klicktor import kurz
@@ -71,6 +73,15 @@ class Belegteile:
     kopie: Antwortkopie | None = None
     json_pfade: Mapping[str, str] = field(default_factory=dict)
     fundorte: Mapping[str, tuple[str, str]] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class Vorlesung:
+    """Was die Startseite vor dem Weiter-Klick für alle Kacheln liest."""
+
+    seitenwerte: Mapping[str, str | None]
+    zweite: Quellenlesung
+    abweichung: tuple[Befund, ...] | None = None
 
 
 class Leser(Textleser):
@@ -115,23 +126,41 @@ class Leser(Textleser):
                 return f"Option „{wert}“ für {dimension} passt nicht auf das Muster"
         return None
 
+    def vorlesung(
+        self,
+        ziel: Mapping[str, str | None],
+        unberuehrt: bool = False,
+        markiert: bool = True,
+    ) -> Vorlesung:
+        """Seitenwerte und zweite Lesung im jetzigen Zustand, mit ``markiert`` auch
+        die Befunde der Markierung."""
+        seitenwerte = self.quellen.seitenwerte()
+        platz = {**seitenwerte, **ziel, PLATZHALTER_MODELL: self.modell}
+        zweite = self.quellen.lies(
+            self.wache.seit, unberuehrt, platz, self.wache.geladen
+        )
+        abweichung = self._abweichung(ziel) if markiert else None
+        return Vorlesung(seitenwerte, zweite, abweichung)
+
     def lies(
         self,
         variante: Variante,
         ziel: dict[str, str | None],
         struktur: Strukturbilanz,
         unberuehrt: bool = False,
+        vorab: Vorlesung | None = None,
+        stelle: int = 0,
     ) -> Kombiergebnis:
         """Liest Quellen, dann Text: der Antwortkörper ist da, bevor die Seite malt.
 
         ``unberuehrt`` heißt: seit dem Laden wurde nichts geklickt (``start``-Quellen).
+        ``vorab`` ist die Vorlesung der Startseite, ``stelle`` der Treffer des ersten
+        Bereichs (die Kachel).
         """
-        bereich = self.seite.locator(self.karte.textlesung.selektoren[0]).first
-        seitenwerte = self.quellen.seitenwerte()
-        platz = {**seitenwerte, **ziel, PLATZHALTER_MODELL: self.modell}
-        zweite = self.quellen.lies(
-            self.wache.seit, unberuehrt, platz, self.wache.geladen
-        )
+        bereich = self.seite.locator(self.karte.textlesung.selektoren[0]).nth(stelle)
+        if vorab is None:
+            vorab = self.vorlesung(ziel, unberuehrt, markiert=False)
+        seitenwerte, zweite = vorab.seitenwerte, vorab.zweite
         self.belegteile = Belegteile(zweite.kopie, zweite.json_pfade)
         url = None if zweite.kopie is None else zweite.kopie.url
         in_antwort = zweite.lesung.werte if zweite.lesung is not None else None
@@ -170,9 +199,10 @@ class Leser(Textleser):
                 textwerte=im_text,
                 textbuendel=textbuendel,
             )
-        abweichung = self._abweichung(ziel) + self._ohne_echo(
-            ziel, seitenwerte, zweite.lesung
-        )
+        markierung = vorab.abweichung
+        if markierung is None:
+            markierung = self._abweichung(ziel)
+        abweichung = markierung + self._ohne_echo(ziel, seitenwerte, zweite.lesung)
         angezeigt = self._angezeigt(variante, seitenwerte)
         echo = (
             Echo(Preiswerte(), abweichung, ())
@@ -251,11 +281,12 @@ class Leser(Textleser):
         ]
         return variante_aus(*gezeigt)
 
-    def _abweichung(self, ziel: dict[str, str | None]) -> tuple[Befund, ...]:
+    def _abweichung(self, ziel: Mapping[str, str | None]) -> tuple[Befund, ...]:
         """Befunde, wo die Seite eine andere Option markiert als die geklickte."""
         befunde = []
         for dimension in DIMENSIONEN:
-            if self.karte.knoepfe[dimension].fest is not None:
+            knopf = self.karte.knoepfe[dimension]
+            if knopf.fest is not None or dimension == self.karte.kacheldimension:
                 continue
             gezeigt = self._gewaehlt(dimension)
             if gezeigt != ziel[dimension]:

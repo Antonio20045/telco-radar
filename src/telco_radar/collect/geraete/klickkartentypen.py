@@ -56,6 +56,11 @@ GRUND_VERTRAGSFORM = "unbekannte Vertragsform"
 EINHEIT_CENT = "cent"
 EINHEIT_MB = "mb"
 EINHEITEN = (EINHEIT_CENT, EINHEIT_MB)
+GRUND_DIMENSION = "keine Dimension"
+GRUND_KACHEL_KNOPF = "Kacheln brauchen selektor, nicht fest oder adressen"
+GRUND_KACHEL_MARKE = "Kacheln werden nie geklickt und tragen keine Marke"
+GRUND_KACHEL_BEREICH = "erster Bereich muss der Selektor der Kacheln sein"
+GRUND_WEITER_ADRESSEN = "weiter schließt adressen aus"
 
 
 class KlickkartenFehler(ValueError):
@@ -255,6 +260,20 @@ class Kanarie:
 
 
 @dataclass(frozen=True)
+class Weiterschritt:
+    """Der eine Klick in die Bestellstrecke und die Dimension auf der Folgeseite.
+
+    ``selektor`` und ``text`` nennen den Weiter-Knopf der Startseite; die Optionen von
+    ``kacheln`` stehen auf der Folgeseite als Kacheln nebeneinander und werden gelesen,
+    nie geklickt.
+    """
+
+    selektor: str
+    text: str
+    kacheln: str
+
+
+@dataclass(frozen=True)
 class Klickkarte:
     """Die Klick-Karte eines Anbieters.
 
@@ -263,7 +282,7 @@ class Klickkarte:
     ``quellen`` sind alle Quellen der zweiten Lesung in Reihenfolge, ``antwort`` ist
     die erste; ``seite`` nennt Seitenwerte nach Namen. Bei ``vertragsform``
     ``ein_vertrag`` entfallen Rate und Ratenzahl planmäßig, dafür gelten
-    ``BUENDELFELDER``.
+    ``BUENDELFELDER``. ``weiter`` nennt den Klick in die Bestellstrecke.
     """
 
     anbieter: str
@@ -277,6 +296,7 @@ class Klickkarte:
     quellen: tuple[Antwortmuster, ...] = field(default=())
     seite: Mapping[str, Seitenwert] = field(default_factory=dict)
     vertragsform: str = VERTRAGSFORMEN[0]
+    weiter: Weiterschritt | None = None
 
     @property
     def ein_vertrag(self) -> bool:
@@ -308,6 +328,11 @@ class Klickkarte:
     def adressdimension(self) -> str | None:
         """Die Dimension, deren Optionen eigene Adressen sind; ``None`` ohne."""
         return next((d for d, k in self.knoepfe.items() if k.adressen), None)
+
+    @property
+    def kacheldimension(self) -> str | None:
+        """Die Dimension mit Kacheln auf der Folgeseite; ``None`` ohne ``weiter``."""
+        return None if self.weiter is None else self.weiter.kacheln
 
     def mit_fest(self, dimension: str, wert: str) -> Klickkarte:
         """Dieselbe Karte, in der ``dimension`` den festen Wert ``wert`` hat; eine
