@@ -11,11 +11,17 @@ Ratenzahl ist die bestätigte Ratenzahl, sonst die gewählte Laufzeit.
 Werte: Anzahlung, Rate, Tarifpreis ab Monat 1, Tarifbindung, Anschluss und Volumen wie
 gelesen; bei ``ein_vertrag`` Bündelbetrag statt Rate und Tarifpreis, die Einmalzahlung
 als Zuzahlung, wenn keine Anzahlung gelesen ist. Tarifphasen werden zu Bündelphasen
-(``tarif_model.Buendelphase``) mit dem Beleg als Wortlaut; eine offene letzte Phase
-(„ab dem 25. Monat …“) reicht bis zum größeren Wert aus Ratenzahl und Bindung, ein
-einzelner Preis ohne Phasen ist keine (Monat 25 bis 36 bleiben eine Lücke). Quelle ist
-die Seitenadresse des Belegs, sonst die Adresse der Produktseite; ``quelle_art`` ist
-``klick``. Eine ``herleitung`` trägt kein Klick-Satz: er ist gemessen.
+(``tarif_model.Buendelphase``) mit dem Beleg als Wortlaut. Eine offene letzte Phase
+(„ab dem 25. Monat …“) bleibt offen (``bis_monat`` ``None``): ihr Ende steht nicht
+auf der Seite, und ``buendelphasen_aus`` lässt sie mit Protokoll fallen; ein einzelner
+Preis ohne Phasen ist keine. Quelle ist die Seitenadresse des Belegs, sonst die Adresse
+der Produktseite; ``quelle_art`` ist ``klick``. Eine ``herleitung`` trägt kein
+Klick-Satz: er ist gemessen.
+
+Rohsatz wird jede Kombination mit Status ``erfasst``, auch mit ``beleg_status``
+``offen``: das Belegarchiv (``belegablage``) braucht Antonios Speicherkonto und ist im
+Tageslauf noch nicht angeschlossen. ``beleg_id`` und ``beleg_status`` gehen darum mit
+ins Bündel, damit sichtbar bleibt, welche Messung noch ohne Beleg ist.
 
 Jede andere Kombination wird gezählt, nie zu einem Nullwert: ``befund``,
 ``nicht_erfasst``, ``nicht_angeboten``, ``nicht_besucht`` (Grund beginnt mit „nicht
@@ -183,21 +189,16 @@ def _ab_monat_eins(phasen: object) -> float | None:
 
 
 def _phasen(werte: dict, satz: dict) -> list[dict]:
-    """Bündelphasen mit Ende; ein einzelner offener Preis ab Monat 1 ist keine."""
+    """Bündelphasen wie gelesen, eine offene bleibt offen; ein einzelner offener Preis
+    ab Monat 1 ist keine."""
     roh = werte.get("tarifphasen")
     if satz.get("buendel_monatlich") is not None or not isinstance(roh, list):
         return []
     if len(roh) == 1 and roh[0][1] is None:
         return []
-    ende = max(satz.get("laufzeit_monate") or 0, satz.get("tarif_bindung_monate") or 0)
     beleg = f"Klick-Beleg {satz['beleg_id'] or satz['quelle_url']}"
     return [
-        {
-            "von_monat": von,
-            "bis_monat": bis if bis is not None else max(ende, von),
-            "betrag": betrag,
-            "beleg": beleg,
-        }
+        {"von_monat": von, "bis_monat": bis, "betrag": betrag, "beleg": beleg}
         for von, bis, betrag in roh
     ]
 

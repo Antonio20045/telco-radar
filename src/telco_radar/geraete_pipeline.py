@@ -45,10 +45,8 @@ from .analyze.geraete_store import (
     Preishistorie,
     TEILGELESEN,
 )
-from .analyze.klick_zusammenfuehrung import klickordner
 from .analyze.klick_zusammenfuehrung import zusammenfuehren
 from .analyze.tarif_referenzen import aus_bestand
-from .analyze.tco_buendel import aus_rohsaetzen
 from .analyze.geraete_pruefstelle import Seite, vermerke as pruefe_buendel
 from .analyze.tco_store import TcoDB
 from .tarif_bezug import Tarifbestand
@@ -349,7 +347,7 @@ def run_geraete_stage(
     vom 15.09.2026 hat ohne diesen Scope 35 Fremd-Referenzen neu datiert
     und 1&1 abgerufen (Befund Runde 2, outputs/telekom-taeglich-2026-09-15.md).
     `klick` ist der Ordner der Klick-Ergebnisse (`analyze.klick_zusammenfuehrung`),
-    ohne Angabe `data/state/klick`; gibt es keinen, laeuft alles wie bisher.
+    ohne Angabe aus TELCO_KLICK_ERGEBNISSE, sonst `data/state/klick`.
     """
     beginn = time.monotonic()
     if jetzt is None:
@@ -507,7 +505,7 @@ def run_geraete_stage(
                 lambda sku: geraet_aus_sku(sku, katalog),
             )
             if klickzug.rohsaetze:
-                buendelbilanz = aus_rohsaetzen(klickzug.rohsaetze, bestand, heute)
+                buendelbilanz = klickzug.buendel(bestand, heute, tco.nach_id)
                 if buendelbilanz.buendel:
                     neue_buendel, _ = tco.upsert_buendel(buendelbilanz.buendel, heute)
             klickbilanz = klickzug.bilanz
@@ -681,7 +679,7 @@ def main() -> None:
     p = argparse.ArgumentParser(description="Geraete- und Preisradar")
     p.add_argument("--root", default=".")
     p.add_argument("--frist", type=float, default=FRIST_STANDARD)
-    p.add_argument("--klick", type=Path, default=klickordner())
+    p.add_argument("--klick", type=Path, default=None)
     args = p.parse_args()
 
     logging.basicConfig(

@@ -2,12 +2,11 @@
 
 Warum es dieses Modul gibt
 --------------------------
-Die Geraeteseite vergleicht heute Barpreise. Der halbe Markt verkauft aber
-kein Geraet, sondern ein Buendel: 1 EUR Zuzahlung, 24 x 30 EUR Geraeterate,
-daneben ein Tarif, dazu ein Anschlusspreis und ein Bonus, der nach sechs
-Monaten ausgelaufen ist. Wer davon EINE Zahl in eine Preisspalte schreibt,
-schreibt eine Meinung. Dieses Modul haelt die Bestandteile getrennt und
-rechnet die Kennzahl daraus - jedes Mal neu.
+Die Geraeteseite vergleicht heute Barpreise. Der halbe Markt verkauft aber kein Geraet,
+sondern ein Buendel: 1 EUR Zuzahlung, 24 x 30 EUR Geraeterate, daneben ein Tarif, dazu
+ein Anschlusspreis und ein Bonus, der nach sechs Monaten ausgelaufen ist. Wer davon EINE
+Zahl in eine Preisspalte schreibt, schreibt eine Meinung. Dieses Modul haelt die
+Bestandteile getrennt und rechnet die Kennzahl daraus - jedes Mal neu.
 
     Kosten über 24 Monate =   Geraetezuzahlung (Anzahlung)
                             + 24 Monate Tarifgrundpreis - phasengewichtet,
@@ -16,17 +15,16 @@ rechnet die Kennzahl daraus - jedes Mal neu.
                               die Restschuld nach Monat 24 (Raten 25-36)
                             + Anschlusspreis
 
-Die Leitzahl ist "Kosten über 24 Monate" (A1 vom 20.09.2026; vorher TCO-24,
-Entscheidung E2 vom 03.09.2026), daneben steht Ø/Monat als greifbare
-Zweitzahl. Der Horizont von 24 Monaten ist der der Tarifbindung, nicht der
-der Geraetefinanzierung - wer 36 Raten waehlt, hat nach 24 Monaten noch
-zwoelf offen, und diese Restschuld bleibt GESCHULDET: Sie steht IN der
-Kennzahl und zusaetzlich als eigene Zahl daneben (`Tco.restbetrag`).
-Bis A1 kappte die Rechnung die Raten bei 24 Monaten und stellte den Rest
-daneben - das war die CHECK24-Methodik mit Ausweis, die § 5.4 des
-Strategiedokuments verwirft; am echten Bestand vom 20.09.2026 lag dadurch
-jedes der 88 scheinbar unter dem Barpreis subventionierten Bündel nur um
-seine eigene Restschuld zu niedrig (Messung im Orakel-Test).
+Die Leitzahl ist "Kosten über 24 Monate" (A1 vom 20.09.2026; vorher TCO-24, Entscheidung
+E2 vom 03.09.2026), daneben steht Ø/Monat als greifbare Zweitzahl. Der Horizont von 24
+Monaten ist der der Tarifbindung, nicht der der Geraetefinanzierung - wer 36 Raten
+waehlt, hat nach 24 Monaten noch zwoelf offen, und diese Restschuld bleibt GESCHULDET:
+Sie steht IN der Kennzahl und zusaetzlich als eigene Zahl daneben (`Tco.restbetrag`).
+Bis A1 kappte die Rechnung die Raten bei 24 Monaten und stellte den Rest daneben - das
+war die CHECK24-Methodik mit Ausweis, die § 5.4 des Strategiedokuments verwirft; am
+echten Bestand vom 20.09.2026 lag dadurch jedes der 88 scheinbar unter dem Barpreis
+subventionierten Bündel nur um seine eigene Restschuld zu niedrig (Messung im
+Orakel-Test).
 
 Die drei Regeln, die dieses Modul tragen
 ----------------------------------------
@@ -77,19 +75,19 @@ Die Felder eines Buendels
     quelle_url        die Seite, auf der DIESE Zahlen stehen
     abgerufen_am      wann sie dort standen
     pruefung          Vermerk der Prüfstelle (`geraete_pruefstatus`), keine Messung
+    quelle_art        mit beleg_id, beleg_status nur am Klick-Bündel (`klickrohsatz`)
 
-Ein Buendel OHNE Geraet (`sku_id == ""`) ist die SIM-only-Referenz desselben
-Tarifs. Sie ist der Grund, warum ein effektiver Geraetepreis ueberhaupt
-rechenbar ist: `geraeteanteil()` zieht die eine TCO von der anderen ab, und
-was bleibt, ist der Betrag, den der Anbieter fuer das Geraet nimmt - die
-Zahl, die auf keiner seiner Seiten steht.
+Ein Buendel OHNE Geraet (`sku_id == ""`) ist die SIM-only-Referenz desselben Tarifs. Sie
+ist der Grund, warum ein effektiver Geraetepreis ueberhaupt rechenbar ist:
+`geraeteanteil()` zieht die eine TCO von der anderen ab, und was bleibt, ist der Betrag,
+den der Anbieter fuer das Geraet nimmt - die Zahl, die auf keiner seiner Seiten steht.
 
 Was dieses Modul bewusst nicht tut
 ----------------------------------
-Es raet nicht. Kein Barpreis wird aus einer Rate geschaetzt (§ 11), keine
-Sachleistung bekommt ein Preisschild, und ein Buendel wird nie gegen die
-SIM-only-Referenz eines ANDEREN Anbieters oder Tarifs gerechnet - das waere
-eine Differenz zweier verschiedener Fragen.
+Es raet nicht. Kein Barpreis wird aus einer Rate geschaetzt (§ 11), keine Sachleistung
+bekommt ein Preisschild, und ein Buendel wird nie gegen die SIM-only-Referenz eines
+ANDEREN Anbieters oder Tarifs gerechnet - das waere eine Differenz zweier verschiedener
+Fragen.
 """
 
 from __future__ import annotations
@@ -489,18 +487,17 @@ def aktionen_aus(rohsaetze) -> list[Aktion]:
 class Buendel:
     """EIN Angebot aus Geraet und Tarif bei EINEM Anbieter.
 
-    Der Schluessel ist (SKU x Anbieter x Tarif x Ratenlaufzeit) - dasselbe
-    Geraet beim selben Anbieter zu zwei Tarifen sind zwei Buendel, weil es
-    zwei Preise sind, und derselbe Tarif in zwei Zahlweisen (24 und 36
-    Raten) ebenfalls. Die Laufzeit steht seit B1 im Schluessel
-    (`buendel_id`); vorher ueberschrieben sich die Zahlweisen still. Die
-    Feldbedeutungen stehen im Modulkopf.
+    Der Schluessel ist (SKU x Anbieter x Tarif x Ratenlaufzeit) - dasselbe Geraet beim
+    selben Anbieter zu zwei Tarifen sind zwei Buendel, weil es zwei Preise sind, und
+    derselbe Tarif in zwei Zahlweisen (24 und 36 Raten) ebenfalls. Die Laufzeit steht
+    seit B1 im Schluessel (`buendel_id`); vorher ueberschrieben sich die Zahlweisen
+    still. Die Feldbedeutungen stehen im Modulkopf.
 
-    Es gibt hier bewusst KEIN `preis_ohne_vertrag`. Der Gesamtbetrag der
-    Geraeteraten ist eine Ratenzahlung und keine Kassenzahl; ihn in dasselbe
-    Feld zu schreiben wie einen Barpreis war der Befund, mit dem dieses
-    Vorhaben angefangen hat (o2, 03.09.2026: 721,00 EUR standen in derselben
-    Spalte wie freenets 949,00 EUR Barpreis).
+    Es gibt hier bewusst KEIN `preis_ohne_vertrag`. Der Gesamtbetrag der Geraeteraten
+    ist eine Ratenzahlung und keine Kassenzahl; ihn in dasselbe Feld zu schreiben wie
+    einen Barpreis war der Befund, mit dem dieses Vorhaben angefangen hat (o2,
+    03.09.2026: 721,00 EUR standen in derselben Spalte wie freenets 949,00 EUR
+    Barpreis).
     """
 
     sku_id: str = ""
@@ -523,6 +520,9 @@ class Buendel:
     zustand: str = ""
     tarif_phasen: list[Preisphase] = field(default_factory=list)
     pruefung: str | None = None
+    quelle_art: str = ""
+    beleg_id: str = ""
+    beleg_status: str = ""
 
     def __post_init__(self):
         if not (self.anbieter or "").strip():

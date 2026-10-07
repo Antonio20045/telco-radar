@@ -53,6 +53,7 @@ from .klicklauf import (
 from .klickseite import GRUND_FRIST, LAUF_LEER, Fristschleuse, Seitenergebnis, beobachte
 from .klickspur import ohne_geheimnisse
 from .klicktext import Preiswerte
+from .klickziele import KARTEN as KARTEN
 from .klickziele import Erkundungsziel, Seitenziel
 from .robots import RobotsWaechter
 
@@ -61,7 +62,6 @@ if TYPE_CHECKING:
 
 log = logging.getLogger(__name__)
 
-KARTEN = Path("config") / "klickkarten"
 HOECHSTE_KOMBINATIONEN_PROBE = 12
 KEINE_KARTE = "keine_karte"
 KARTENFEHLER = "kartenfehler"

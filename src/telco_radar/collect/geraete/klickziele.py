@@ -11,7 +11,8 @@ genau eines Knopfs oder Links zum nächsten Schritt der Bestellstrecke
 (``klickfolgeseite``). Jeder Verstoß wirft ``ErkundungszielFehler`` mit der Stelle; ein
 Ziel wird nie still übergangen. User-Agent und Abrufabstand kommen aus den Quellen.
 Der Klick-Tageslauf liest dasselbe Format aus ``TAGESDATEI``, ohne Seitengrenze
-(``klicktageslauf``).
+(``klicktageslauf``); ``geplante_anbieter`` nennt, wer darin eine Karte unter
+``KARTEN`` hat und darum jeden Tag ein Ergebnis liefern soll.
 """
 
 from __future__ import annotations
@@ -28,6 +29,7 @@ from .robots import host_von
 
 DATEI = Path("config") / "klick_erkundung.yaml"
 TAGESDATEI = Path("config") / "klick_tageslauf.yaml"
+KARTEN = Path("config") / "klickkarten"
 HOECHSTE_SEITEN = 2
 ALLE = "alle"
 SCHEMA = "https"
@@ -182,3 +184,23 @@ def _text(daten: dict, feld: str, ort: str) -> str:
     if not isinstance(wert, str) or not wert.strip():
         raise ErkundungszielFehler(f"{ort}: {feld} fehlt oder ist leer")
     return wert.strip()
+
+
+def geplante_anbieter(root: Path) -> list[str] | None:
+    """Namen der Anbieter aus ``TAGESDATEI`` mit Karte; ``None``, wenn die Datei fehlt.
+
+    Ohne Prüfung gegen Quellen und Katalog: der Gerätelauf braucht nur die Namen, um
+    eine fehlende Ergebnisdatei zu benennen.
+    """
+    try:
+        roh = yaml.safe_load((root / TAGESDATEI).read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return None
+    eintraege = roh.get("anbieter") if isinstance(roh, dict) else None
+    return [
+        str(e["name"])
+        for e in eintraege or []
+        if isinstance(e, dict)
+        and (root / KARTEN / f"{e.get('schluessel')}.yaml").is_file()
+        and e.get("name")
+    ]

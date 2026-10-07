@@ -21,8 +21,10 @@ Crawler nennt den Rest ``nicht besucht``.
 Rotation: Einheit ist die Produktseite, denn der Crawler klickt alle Varianten einer
 Seite in einem Gang. Zuerst kommen nie gelesene Seiten, dann die am längsten nicht
 gelesenen (Lesestand, ``klickergebnis.lies_stand``); bei Gleichstand gilt die
-Reihenfolge der Konfiguration. Seiten, die heute nicht gelesen wurden und deren letzte
-Lesung ``FRISCHEGRENZE_TAGE`` oder älter ist, stehen unter ``ueberfaellig``. Kein LLM.
+Reihenfolge der Konfiguration. Seiten, die heute nicht ganz gelesen wurden (eine an der
+Zeitgrenze abgeschnittene zählt nicht, ``klickergebnis.ROTATION_GELESEN``) und deren
+letzte Lesung ``FRISCHEGRENZE_TAGE`` oder älter ist, stehen unter ``ueberfaellig``.
+Kein LLM.
 """
 
 from __future__ import annotations
@@ -38,7 +40,7 @@ from .klickcrawler import klicke_durch
 from .klickergebnis import (
     FORMAT,
     FRISCHEGRENZE_TAGE,
-    GELESENE_SEITEN,
+    ROTATION_GELESEN,
     laufstatus,
     nicht_besucht,
     seite_als_daten,
@@ -139,7 +141,7 @@ def fahre(
         if lauf.status == LAUF_GESTOERT:
             stopp = f"{GRUND_NACH_STOERUNG}: {lauf.grund}"
     status, grund = laufstatus(seiten)
-    heute_gelesen = {s["adresse"] for s in seiten if s["status"] in GELESENE_SEITEN}
+    heute_gelesen = {s["adresse"] for s in seiten if s["status"] in ROTATION_GELESEN}
     faellig = ueberfaellig(ziel.seiten, gelesen, heute_gelesen, heute)
     daten = {
         "format": FORMAT,

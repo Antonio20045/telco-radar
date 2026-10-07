@@ -11,36 +11,34 @@ Anbieter x Tarif x Ratenlaufzeit statt SKU x Anbieter). Es steht deshalb in
                                    die Kennzahlen der Pruefstelle (`TcoDB.pruefung`)
 
 und nicht als weiterer Abschnitt in der Listungsdatei. Der Grund ist nicht
-Ordnungsliebe, sondern Risiko: `geraete_db.json` traegt 391 gewachsene
-Listungen und haengt an `geraete_preise.jsonl`, das die ganze Preishistorie
-haelt. Eine neue Entitaet, die diese Datei umschreibt, kann eine `listung_id`
-verschieben - und eine verschobene ID zerreisst still den Verlauf, dieselbe
-Fehlerklasse wie ein neu vergebener Farbschluessel
-(`geraete_model.farbe_aus_titel`). Zwei Dateien koennen das strukturell
-nicht: dieses Modul oeffnet die andere gar nicht.
+Ordnungsliebe, sondern Risiko: `geraete_db.json` traegt 391 gewachsene Listungen und
+haengt an `geraete_preise.jsonl`, das die ganze Preishistorie haelt. Eine neue Entitaet,
+die diese Datei umschreibt, kann eine `listung_id` verschieben - und eine verschobene ID
+zerreisst still den Verlauf, dieselbe Fehlerklasse wie ein neu vergebener Farbschluessel
+(`geraete_model.farbe_aus_titel`). Zwei Dateien koennen das strukturell nicht: dieses
+Modul oeffnet die andere gar nicht.
 
 Die IDs koennen sich ebenfalls nicht ueberschneiden, und zwar an ihrer Form
 (`tco_model.buendel_id`): eine `listung_id` hat zwei Bestandteile, ein Buendel seit B1
 fuenf (die Ratenlaufzeit ist dazugekommen; vorher vier), eine Referenz drei.
 
-Der Altbestand traegt weiterhin die vierteilige ID - beide Dateien dieses
-Moduls werden NICHT umgeschrieben (harte Regeln 2 und 3). Ein Alt-Satz wird
-beim LESEN dem heutigen Buendel zugeordnet (`id_aus_satz` unten, ueber
-`laufzeit_monate`); die neue Form entsteht in der Stand-Datei erst durch
-das naechste regulaere `save()`, und in der Historie ueberhaupt nicht -
-eine geschriebene Zeile bleibt, wie sie war.
+Der Altbestand traegt weiterhin die vierteilige ID - beide Dateien dieses Moduls werden
+NICHT umgeschrieben (harte Regeln 2 und 3). Ein Alt-Satz wird beim LESEN dem heutigen
+Buendel zugeordnet (`id_aus_satz` unten, ueber `laufzeit_monate`); die neue Form
+entsteht in der Stand-Datei erst durch das naechste regulaere `save()`, und in der
+Historie ueberhaupt nicht - eine geschriebene Zeile bleibt, wie sie war.
 
 Die eine Regel, die dieses Modul von `geraete_store` unterscheidet
 ------------------------------------------------------------------
-**Ein Buendeldatensatz zeigt EINE Messung.** Wo `GeraeteDB.upsert` einen
-Wert, den ein Lauf nicht fand, stehen laesst (ein Ausfall der Extraktion ist
-keine Preisaenderung), schreibt ein Lauf hier ALLE Preisfelder eines
-Buendels gemeinsam - auch als `None`. Der Grund ist die Kennzahl: TCO-24 ist
-eine SUMME. Ein Tarifpreis von gestern plus eine Geraeterate von heute ergibt
-einen Betrag, der an keinem Tag gegolten hat, und niemand koennte ihm ansehen,
-dass er aus zwei Messungen stammt. Lieber eine sichtbare Luecke
-(`tco_model.Tco.luecken`) als eine unsichtbare Mischung - und genau derselbe
-Befund hat am 03.09.2026 die Preisform an ihre Zahl gebunden.
+**Ein Buendeldatensatz zeigt EINE Messung.** Wo `GeraeteDB.upsert` einen Wert, den ein
+Lauf nicht fand, stehen laesst (ein Ausfall der Extraktion ist keine Preisaenderung),
+schreibt ein Lauf hier ALLE Preisfelder eines Buendels gemeinsam - auch als `None`. Der
+Grund ist die Kennzahl: TCO-24 ist eine SUMME. Ein Tarifpreis von gestern plus eine
+Geraeterate von heute ergibt einen Betrag, der an keinem Tag gegolten hat, und niemand
+koennte ihm ansehen, dass er aus zwei Messungen stammt. Lieber eine sichtbare Luecke
+(`tco_model.Tco.luecken`) als eine unsichtbare Mischung - und genau derselbe Befund hat
+am 03.09.2026 die Preisform an ihre Zahl gebunden. Ebenso gemeinsam: die Kennzeichen
+eines Klick-Buendels (`tco_buendel.KLICKFELDER`), die ein Adapterwert abraeumt.
 
 `first_seen` bleibt davon unberuehrt: seit wann ein Angebot beobachtet wird, ist
 keine Messung dieses Laufs.
@@ -70,9 +68,9 @@ die Rechnung frueherer Laeufe nachzubauen) und `abgerufen_am`. Die Schreibregeln
 * gleiches Datum je Buendel -> die Zeile wird ERSETZT. Ein wiederholter
   Lauf am selben Tag ist dieselbe Messung, kein zweiter Punkt (sonst
   luege die Reihe ab P5 um die Zahl der Nachtlaeufe, nicht um den Markt).
-* neues Datum -> neue Zeile dazu; ALTE Tage bleiben unveraendert stehen.
-  Ein Messtag ist nicht nachholbar - deshalb wird die Datei beim
-  Zusammenfuehren gelesen und nie blind neu geschrieben.
+* neues Datum -> neue Zeile dazu; ALTE Tage bleiben unveraendert stehen. Ein Messtag ist
+  nicht nachholbar - deshalb wird die Datei beim Zusammenfuehren gelesen und nie blind
+  neu geschrieben.
 * Es gibt keine Rueckrechnung aus den frueheren Stand-Commits (Entscheidung 3 im
   Strategiedokument): die Reihe beginnt ehrlich mit dem ersten Lauf nach der Umstellung.
 """
@@ -94,6 +92,7 @@ from ..tco_model import (
     sim_only_id,
     tco_24,
 )
+from .tco_buendel import KLICKFELDER
 
 log = logging.getLogger(__name__)
 
@@ -294,9 +293,9 @@ class TcoDB:
     def upsert_buendel(self, buendel, today: str) -> tuple[int, set]:
         """Buendel aufnehmen oder auffrischen.
 
-        Gibt (Zahl der NEU aufgenommenen, IDs aller in diesem Aufruf
-        gesehenen) zurueck - dieselbe Bauform wie `GeraeteDB.upsert`, damit
-        ein spaeterer Sammellauf beide gleich behandeln kann.
+        Gibt (Zahl der NEU aufgenommenen, IDs aller in diesem Aufruf gesehenen) zurueck
+        - dieselbe Bauform wie `GeraeteDB.upsert`, damit ein spaeterer Sammellauf beide
+        gleich behandeln kann.
         """
         neu = 0
         gesehen: set[str] = set()
@@ -329,6 +328,9 @@ class TcoDB:
                 neu += 1
             gesehen.add(bid)
             self._schreibe_messung(eintrag, satz, _MESSFELDER)
+            for f in KLICKFELDER:
+                eintrag.pop(f, None)
+                eintrag.update({f: getattr(satz, f)} if getattr(satz, f) else {})
             eintrag["rabatte"] = [asdict(r) for r in satz.rabatte]
             eintrag["aktionen"] = [asdict(a) for a in satz.aktionen]
             eintrag["last_verified"] = today
@@ -423,12 +425,11 @@ class TcoDB:
     def _historie_zeile(satz: Buendel, datum: str) -> dict:
         """Eine Zeile der Preishistorie - siehe Modulkopf (P2).
 
-        Die Messfelder kommen aus derselben Positivliste wie der Stand
-        (`_MESSFELDER`): ein neues Messfeld muss in BEIDEN landen, sonst
-        klaffe Stand und Historie auseinander. `gesamt` ist die Leitzahl
-        der Messung, eingefroren aus `tco_model.tco_24` - die Rechnung
-        bleibt dort, hier steht nur ihr Ergebnis von damals. Sie kann
-        `None` sein (Messung ohne jeden Posten); das ist eine ehrliche
+        Die Messfelder kommen aus derselben Positivliste wie der Stand (`_MESSFELDER`):
+        ein neues Messfeld muss in BEIDEN landen, sonst klaffe Stand und Historie
+        auseinander. `gesamt` ist die Leitzahl der Messung, eingefroren aus
+        `tco_model.tco_24` - die Rechnung bleibt dort, hier steht nur ihr Ergebnis von
+        damals. Sie kann `None` sein (Messung ohne jeden Posten); das ist eine ehrliche
         Luecke und kein Fehler.
         """
         zeile = {"id": satz.id, "datum": datum}
@@ -439,16 +440,15 @@ class TcoDB:
     def save(self, today: str) -> bool:
         """Schreibt die Datei - aber nur, wenn sie etwas zu sagen hat.
 
-        Ein leerer Bestand legt KEINE Datei an. Solange kein Sammellauf
-        Buendel liefert (Phase 6/7 des Strategiedokuments), soll dieser
-        Zweig im naechtlichen Lauf nichts hinterlassen: eine Datei mit zwei
-        leeren Listen sieht im Repo aus wie ein Ergebnis und ist keins.
+        Ein leerer Bestand legt KEINE Datei an. Solange kein Sammellauf Buendel liefert
+        (Phase 6/7 des Strategiedokuments), soll dieser Zweig im naechtlichen Lauf
+        nichts hinterlassen: eine Datei mit zwei leeren Listen sieht im Repo aus wie ein
+        Ergebnis und ist keins.
 
-        Seit P2 schreibt `save` ZUSAETZLICH die vorgemerkten Historienzeilen
-        dieses Laufs in `geraete_tco_historie.jsonl`. Die Stand-Datei wird
-        ZUERST gesichert: ein Fehler an der Historie darf den Messtag der
-        Gegenwart nicht kosten (der Rueckgabewert bleibt an der Stand-Datei
-        gebunden).
+        Seit P2 schreibt `save` ZUSAETZLICH die vorgemerkten Historienzeilen dieses
+        Laufs in `geraete_tco_historie.jsonl`. Die Stand-Datei wird ZUERST gesichert:
+        ein Fehler an der Historie darf den Messtag der Gegenwart nicht kosten (der
+        Rueckgabewert bleibt an der Stand-Datei gebunden).
         """
         if not self._buendel and not self._referenzen:
             return False

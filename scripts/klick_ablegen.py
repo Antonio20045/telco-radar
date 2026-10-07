@@ -8,19 +8,17 @@ Liest alle Ergebnisdateien unter ``--quelle`` (je Anbieter ein Artefakt), legt s
 ``data/state/klick/<schluessel>.json`` und führt dort den Lesestand fort
 (``telco_radar.analyze.klick_ablage``). Gibt es ``--quelle`` nicht (kein Artefakt),
 bleibt alles, wie es war: Exit-Code 0. Ist eine Datei unlesbar oder abgelehnt, sind
-die lesbaren trotzdem abgelegt und der Exit-Code ist 1. Dieses Skript stellt die Uhr.
+die lesbaren trotzdem abgelegt und der Exit-Code ist 1.
 """
 
 from __future__ import annotations
 
 import argparse
 import sys
-from datetime import UTC, datetime
 from pathlib import Path
 
 from telco_radar.analyze.klick_ablage import lege_ab
 from telco_radar.collect.geraete.klickergebnis import ORDNER, lies_ergebnisse
-from telco_radar.geraete_config import lade_katalog
 
 FEHLER_DATEI = 1
 
@@ -33,10 +31,9 @@ def main(argumente: list[str] | None = None) -> int:
     if not args.quelle.is_dir():
         print(f"Klick-Ablage: kein Ordner {args.quelle}, nichts abgelegt")
         return 0
-    heute = datetime.now(UTC).date().isoformat()
     ergebnisse, unlesbar = lies_ergebnisse(args.quelle)
     ziel = args.root / ORDNER
-    ablage = lege_ab(ergebnisse, ziel, lade_katalog(args.root), heute)
+    ablage = lege_ab(ergebnisse, ziel)
     for daten in ergebnisse:
         grund = f" ({daten.get('grund')})" if daten.get("grund") else ""
         print(f"{daten.get('anbieter')}: {daten.get('laufstatus')}{grund}")

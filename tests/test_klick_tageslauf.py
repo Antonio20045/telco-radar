@@ -28,6 +28,7 @@ from telco_radar.collect.geraete.klicklauf import (
     LAUF_GELESEN,
     LAUF_GESPERRT,
     LAUF_GESTOERT,
+    LAUF_ZEITGRENZE,
     Klicklauf,
     abruf_gestoert,
 )
@@ -105,6 +106,9 @@ class Crawler:
             return Klicklauf("o2", seite.adresse, status, abruf_gestoert(403), 403)
         if status == LAUF_GESPERRT:
             return Klicklauf("o2", seite.adresse, status, "robots.txt verbietet", None)
+        if status == LAUF_ZEITGRENZE:
+            erfasst_bis_hier = [self.kombination]
+            return Klicklauf("o2", seite.adresse, status, ergebnisse=erfasst_bis_hier)
         return Klicklauf("o2", seite.adresse, ergebnisse=[self.kombination])
 
 
@@ -213,6 +217,25 @@ def test_gesperrte_seite_beendet_den_anbieter_nicht(o2, karte, gelesen_o2):
     assert len(crawler.aufrufe) == len(o2.seiten)
     assert daten["laufstatus"] == LAUF_GELESEN
     assert daten["ueberfaellig"] == [o2.seiten[1].adresse]
+
+
+@pytest.mark.parametrize(
+    ("status", "faellig"), [(LAUF_ZEITGRENZE, 1), (LAUF_GELESEN, 0)]
+)
+def test_abgeschnittene_seite_bleibt_ueberfaellig(
+    o2, karte, gelesen_o2, status, faellig
+):
+    """Eine an der Zeitgrenze abgeschnittene Seite hat ihre erste Variante erfasst,
+    ist aber nicht ganz gelesen: sie bleibt überfällig. Gegenprobe: ganz gelesen."""
+    zweite = o2.seiten[1].adresse
+    uhr = Uhr()
+    crawler = Crawler(uhr, gelesen_o2, status={zweite: status})
+
+    daten = _fahre(o2, karte, crawler, uhr)
+
+    assert daten["seiten"][1]["status"] == status
+    assert daten["laufstatus"] == LAUF_GELESEN
+    assert daten["ueberfaellig"] == [zweite][:faellig]
 
 
 def test_ergebnisdatei_traegt_bis_zu_den_rohsaetzen(o2, karte, gelesen_o2, tmp_path):

@@ -2,14 +2,15 @@
 
 Der Workflow ``klick.yml`` lädt die Ergebnisdateien seiner Matrix-Jobs herunter;
 ``lege_ab`` schreibt jede nach ``data/state/klick/<schluessel>.json``
-(``klickergebnis.ORDNER``) und führt den Lesestand ``STAND_DATEI`` fort: für jede Datei
-mit Laufstatus ``gelesen`` das Datum jeder gelesenen Seite (Rotation des Tageslaufs)
-und jeder erfassten Variante (Ersetzung über die Rotation im Gerätelauf). Eine
-gestörte, leere oder ungelesene Datei wird ebenso abgelegt, damit der Gerätelauf ihren
-Zustand sieht, und lässt den Lesestand unberührt. Fehlt das Ergebnis eines Anbieters,
-bleibt seine alte Datei liegen und verliert nach ``FRISCHEGRENZE_TAGE`` jede Wirkung.
-Varianten jenseits der Frischegrenze fallen aus dem Lesestand; Seiten bleiben, denn
-ihr Datum ordnet die Rotation.
+(``klickergebnis.ORDNER``), auch eine gestörte, leere oder ungelesene, damit der
+Gerätelauf ihren Zustand sieht. Fehlt das Ergebnis eines Anbieters, bleibt seine alte
+Datei liegen; der Gerätelauf nimmt nur eine Datei von heute als Messung.
+
+Den Lesestand ``STAND_DATEI`` führt die Ablage für jede Datei fort, gleich welcher
+Laufstatus: jede ganz gelesene Seite (``ROTATION_GELESEN``) bekommt das Datum der Datei.
+Auch ein Lauf, der nichts erfasst hat, schiebt so die Rotation weiter; eine an der
+Zeitgrenze abgeschnittene Seite bleibt vorn. Welche Klick-Messung Vorrang vor dem
+Adapter hat, steht nicht hier, sondern im Bestand (``klick_zusammenfuehrung``).
 """
 
 from __future__ import annotations
@@ -19,17 +20,12 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from ..collect.geraete.klickergebnis import (
-    FRISCHEGRENZE_TAGE,
-    GELESENE_SEITEN,
+    ROTATION_GELESEN,
     STAND_DATEI,
     STAND_FORMAT,
     lies_stand,
     schreibe,
 )
-from ..collect.geraete.klicklauf import LAUF_GELESEN
-from ..collect.geraete.klickrohsatz import ausbeute
-from ..geraete_model import Katalog
-from .klick_zusammenfuehrung import alter_tage, klickschluessel, schluesseltext
 
 SCHLUESSEL = re.compile(r"^[a-z0-9][a-z0-9_-]*$")
 """Anbieterschlüssel wie in ``config/klick_tageslauf.yaml``; zugleich der Dateiname."""
@@ -44,9 +40,10 @@ class Ablage:
     stand: dict = field(default_factory=dict)
 
 
-def lege_ab(ergebnisse: list[dict], ziel: Path, katalog: Katalog, heute: str) -> Ablage:
+def lege_ab(ergebnisse: list[dict], ziel: Path) -> Ablage:
     """Schreibt die Ergebnisse nach ``ziel`` und den Lesestand daneben."""
     stand = lies_stand(ziel / STAND_DATEI)
+    stand["format"] = STAND_FORMAT
     ablage = Ablage(stand=stand)
     for daten in ergebnisse:
         schluessel = str(daten.get("anbieter", ""))
@@ -55,34 +52,9 @@ def lege_ab(ergebnisse: list[dict], ziel: Path, katalog: Katalog, heute: str) ->
             continue
         schreibe(ziel / f"{schluessel}.json", daten)
         ablage.abgelegt.append(schluessel)
-        if daten.get("laufstatus") == LAUF_GELESEN:
-            _merke(stand, daten, katalog)
-    _kuerze(stand, heute)
+        for seite in daten.get("seiten") or []:
+            if seite.get("status") in ROTATION_GELESEN:
+                seiten = stand["seiten"].setdefault(str(daten.get("name")), {})
+                seiten[str(seite.get("adresse"))] = str(daten.get("datum"))
     schreibe(ziel / STAND_DATEI, stand)
     return ablage
-
-
-def _merke(stand: dict, daten: dict, katalog: Katalog) -> None:
-    """Lesedatum der gelesenen Seiten und der erfassten Varianten einer Datei."""
-    datum = str(daten.get("datum"))
-    name = str(daten.get("name"))
-    seiten = stand["seiten"].setdefault(name, {})
-    for seite in daten.get("seiten") or []:
-        if seite.get("status") in GELESENE_SEITEN:
-            seiten[str(seite.get("adresse"))] = datum
-    varianten = stand["varianten"].setdefault(name, {})
-    for satz in ausbeute(daten, katalog).rohsaetze:
-        varianten[schluesseltext(klickschluessel(satz))] = datum
-
-
-def _kuerze(stand: dict, heute: str) -> None:
-    """Varianten jenseits der Frischegrenze wirken nicht mehr und fallen weg."""
-    stand["format"] = STAND_FORMAT
-    for anbieter, varianten in stand["varianten"].items():
-        stand["varianten"][anbieter] = {
-            k: d for k, d in varianten.items() if _frisch(alter_tage(d, heute))
-        }
-
-
-def _frisch(alter: int | None) -> bool:
-    return alter is not None and alter < FRISCHEGRENZE_TAGE

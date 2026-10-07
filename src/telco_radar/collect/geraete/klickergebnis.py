@@ -15,10 +15,11 @@ Gerätelauf etwas (``analyze.klick_zusammenfuehrung``).
 
 Im Repo liegen die Dateien unter ``data/state/klick/<schluessel>.json`` (``ORDNER``,
 abgelegt von ``analyze.klick_ablage`` im eigenen Workflow), daneben der Lesestand
-``STAND_DATEI`` (``lies_stand``): je Anbieter das letzte Lesedatum jeder Produktseite
-und jeder erfassten Variante. Der Tageslauf ordnet danach, der Gerätelauf liest ihn.
-``FRISCHEGRENZE_TAGE`` ist die Frist, in der jede Variante wieder gelesen sein soll;
-eine ältere Datei ersetzt nichts mehr.
+``STAND_DATEI`` (``lies_stand``): je Anbieter das Datum, an dem jede Produktseite
+zuletzt ganz gelesen wurde (``ROTATION_GELESEN``; eine an der Zeitgrenze abgeschnittene
+Seite liefert ihre besuchten Varianten, gilt aber nicht als gelesen). Der Tageslauf
+ordnet danach. ``FRISCHEGRENZE_TAGE`` ist die Frist, in der jede Seite wieder gelesen
+sein soll und in der eine Klick-Messung im Bestand Vorrang vor dem Adapter behält.
 """
 
 from __future__ import annotations
@@ -52,6 +53,7 @@ LAUF_LEER = "leer"
 LAUF_NICHT_GELESEN = "nicht_gelesen"
 SEITE_NICHT_BESUCHT = "nicht_besucht"
 GELESENE_SEITEN = frozenset({LAUF_GELESEN, LAUF_ZEITGRENZE})
+ROTATION_GELESEN = frozenset({LAUF_GELESEN})
 GRUND_NICHTS_ERFASST = "keine Kombination erfasst"
 GRUND_KEINE_SEITE = "keine Seite gelesen"
 STAND_FORMAT = 1
@@ -168,7 +170,7 @@ def lies_ergebnisse(ordner: Path) -> tuple[list[dict], list[str]]:
 
 def lies_stand(pfad: Path) -> dict:
     """Der Lesestand; fehlt er oder ist er unlesbar, ein leerer Stand mit Vermerk."""
-    leer = {"format": STAND_FORMAT, "seiten": {}, "varianten": {}}
+    leer = {"format": STAND_FORMAT, "seiten": {}}
     try:
         stand = json.loads(pfad.read_text(encoding="utf-8"))
     except FileNotFoundError:
@@ -180,5 +182,4 @@ def lies_stand(pfad: Path) -> dict:
         log.warning("Klick-Stand %s: Format nicht %s", pfad, STAND_FORMAT)
         return leer
     stand.setdefault("seiten", {})
-    stand.setdefault("varianten", {})
     return stand

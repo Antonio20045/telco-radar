@@ -10,12 +10,15 @@ Regel wie jeder Adaptersatz draußen.
 
 from __future__ import annotations
 
+import gzip
 import json
+from dataclasses import replace
 
 import pytest
 from bestand_pfad import ZUSTAND, lese_wurzel
 from klickergebnisse import (
     EINSUNDEINS_SEITE,
+    FIX,
     O2_SEITE,
     TELEKOM_SEITE,
     einsundeins_lesung,
@@ -27,6 +30,7 @@ from klickergebnisse import (
 )
 
 from telco_radar.analyze.tco_buendel import aus_rohsaetzen
+from telco_radar.collect.geraete.einsundeins import lies_buendel
 from telco_radar.collect.geraete.klickbeleg import Beleg, Belegdatei, Belegpaket
 from telco_radar.collect.geraete.klickcrawler import GRUND_NICHT_BESUCHT, GRUND_ZEIT
 from telco_radar.collect.geraete.klickecho import pruefe_echo, variante_aus
@@ -102,17 +106,19 @@ def test_erfasste_o2_kombination_wird_rohsatz_mit_allen_werten(katalog):
     assert "herleitung" not in satz
 
 
-def test_offene_letzte_phase_reicht_bis_zur_letzten_rate(katalog):
+def test_offene_letzte_phase_bleibt_offen(katalog):
+    """„ab dem 25. Monat 29,99 €“ nennt kein Ende; der Satz erfindet keins (früher:
+    bis zur Ratenzahl 36). Als Bündelphase gilt sie nicht, Monat 25 bis 36 bleiben eine
+    Lücke; Gegenprobe: die geschlossene erste Phase bleibt."""
     special = erfasst(o2_lesung("256 GB", "O2 Mobile Special", 36))
 
     (satz,) = ausbeute(_o2(special), katalog).rohsaetze
 
     assert satz["tarif_monatlich"] == 14.99
+    roh = [(p["von_monat"], p["bis_monat"], p["betrag"]) for p in satz["tarif_phasen"]]
+    assert roh == [(1, 24, 14.99), (25, None, 29.99)]
     phasen = buendelphasen_aus(satz["tarif_phasen"])
-    assert [(p.von_monat, p.bis_monat, p.betrag) for p in phasen] == [
-        (1, 24, 14.99),
-        (25, 36, 29.99),
-    ]
+    assert [(p.von_monat, p.bis_monat, p.betrag) for p in phasen] == [(1, 24, 14.99)]
 
 
 def test_quelle_ist_der_beleglink_der_variante(katalog):
@@ -212,6 +218,37 @@ def test_ein_vertrag_traegt_buendelbetrag_und_unbekannter_tarif_bleibt_luecke(
     assert satz["geraet_zuzahlung"] is None
     assert bilanz.buendel == []
     assert bilanz.offene_tarife == {"tariff-anf-s-mvl": 1}
+
+
+def _einsundeins(lesung):
+    kombination = erfasst(lesung, "256", "tariff-anf-s-mvl", 36)
+    seite = (EINSUNDEINS_SEITE, lauf(EINSUNDEINS_SEITE, [kombination]))
+    return ergebnisdatei("1&1", "1und1", [seite], HEUTE, vertragsform="ein_vertrag")
+
+
+def test_ein_vertrag_einmalzahlung_wird_zuzahlung(katalog):
+    """Die 1&1-Produktseite nennt zum Bündelbetrag eine Einmalzahlung (der Adapter
+    liest 44,99 € und 360,00 € aus derselben Seite). Ohne Anzahlung wird sie die
+    Zuzahlung des Satzes; Gegenprobe: ohne Einmalzahlung bleibt die Zuzahlung eine
+    Lücke, keine 0."""
+    html = gzip.decompress(
+        (FIX / "einsundeins_produktseite_iphone_17_pro.html.gz").read_bytes()
+    ).decode("utf-8")
+    (adapter,) = [
+        r
+        for r in lies_buendel(html, EINSUNDEINS_SEITE.adresse)
+        if r["speicher_gb"] == 256
+    ]
+    assert (adapter["buendel_monatlich"], adapter["geraet_zuzahlung"]) == (44.99, 360.0)
+    lesung = einsundeins_lesung()
+    einmal = replace(lesung.buendel, einmalzahlung=adapter["geraet_zuzahlung"])
+
+    (mit,) = ausbeute(_einsundeins(replace(lesung, buendel=einmal)), katalog).rohsaetze
+    (ohne,) = ausbeute(_einsundeins(lesung), katalog).rohsaetze
+
+    assert (mit["buendel_monatlich"], mit["einmalzahlung"]) == (44.99, 360.0)
+    assert mit["geraet_zuzahlung"] == 360.0
+    assert ohne["einmalzahlung"] is None and ohne["geraet_zuzahlung"] is None
 
 
 def test_jeder_andere_zustand_ist_eine_gezaehlte_luecke(katalog):
