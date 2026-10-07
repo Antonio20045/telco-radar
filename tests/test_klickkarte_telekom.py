@@ -81,11 +81,23 @@ def test_gegenprobe_summen_der_antwort(karte, details, laufzeit):
     assert summen["recurringFee"] == round(werte.rate + tarif, 2)
 
 
-@pytest.mark.parametrize("anzahlung", [None, "99", "458,15"])
+@pytest.mark.parametrize(
+    ("anzahlung", "rate", "betrag"),
+    [("458,15", 23.63, 458.15), ("654,50", 18.18, 654.5)],
+)
+def test_cent_anzahlung_der_seite_findet_ihren_plan(
+    karte, details, anzahlung, rate, betrag
+):
+    """Die Seite schreibt die Stufe deutsch („458,15 €“, aria-label des
+    Laufzeitknopfs), die Antwort als Zahl (upfrontPrice RTK-13090-36-4/-7)."""
+    werte = _lies(karte, details, "36", anzahlung).werte
+    assert (werte.rate, werte.ratenzahl, werte.anzahlung) == (rate, 36, betrag)
+
+
+@pytest.mark.parametrize("anzahlung", [None, "99", "458,16"])
 def test_ohne_eindeutigen_plan_keine_rate(karte, details, anzahlung):
-    """99 € gibt es beim 512-GB-Gerät nicht, „458,15“ ist deutsch geschrieben (die
-    Antwort nennt 458.15): kein Plan, also weder Rate noch Anzahlung, nie die eines
-    anderen Plans."""
+    """99 € und 458,16 € gibt es beim 512-GB-Gerät nicht: kein Plan, also weder Rate
+    noch Anzahlung, nie die eines anderen Plans."""
     werte = _lies(karte, details, "36", anzahlung).werte
     assert (werte.rate, werte.ratenzahl, werte.anzahlung) == (None, None, None)
     assert werte.tarifphasen == (Preisphase(1, None, 49.95),)

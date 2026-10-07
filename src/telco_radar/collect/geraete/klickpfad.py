@@ -10,7 +10,9 @@ und ``*`` fächern auf: nennen die Treffer mehr als einen verschiedenen Wert, is
 Ergebnis mehrdeutig und ``None``, nie der erste (o2 ``paymentOptions[selected=true]``,
 congstar ``variants[id={plan}]``, Vodafone ``atomics[capacity.sortValue={speicher}]``).
 Verglichen wird ohne Markup, Leerraum sowie Groß- und Kleinschreibung
-(``vergleichbar``). Dieses Modul ruft kein Netz.
+(``vergleichbar``); ein Filterwert, der eine Zahl ist, trifft auch dieselbe Zahl in
+anderer Schreibweise (Seite „458,15“ und „1.049“, Antwort 458.15 und 1049,
+``als_zahl``). Dieses Modul ruft kein Netz.
 """
 
 from __future__ import annotations
@@ -19,6 +21,7 @@ import html
 import json
 import re
 from collections.abc import Mapping
+from decimal import Decimal, InvalidOperation
 
 ALLE = "*"
 GRUND_KLAMMERN = "Klammern passen nicht"
@@ -28,6 +31,8 @@ _SCHRITT = re.compile(r"([^\[\]=]*)((?:\[[^\[\]=]+=[^\[\]]*\])*)")
 _FILTER = re.compile(r"\[([^\[\]=]+)=([^\[\]]*)\]")
 _PLATZHALTER = re.compile(r"\{([^{}]*)\}")
 _MARKUP = re.compile(r"<[^>]*>")
+_ZAHL_DEUTSCH = re.compile(r"\d{1,3}(?:\.\d{3})+(?:,\d+)?|\d+,\d+")
+_ZAHL = re.compile(r"\d+(?:\.\d+)?")
 
 
 def schritte(pfad: str) -> list[str]:
@@ -146,9 +151,35 @@ def _elemente(knoten: object) -> list[object]:
     return []
 
 
+def als_zahl(wert: object) -> Decimal | None:
+    """Der Zahlenwert einer JSON-Zahl oder eines Zahlentexts; ``None`` für alles andere.
+
+    Ein Text mit Komma oder mit Punkten vor Dreiergruppen ist deutsch geschrieben
+    („458,15“, „1.049“, „1.049,50“), sonst gilt der Punkt als Dezimalpunkt („26.9“).
+    """
+    if isinstance(wert, bool):
+        return None
+    if isinstance(wert, int | float):
+        return Decimal(str(wert))
+    if not isinstance(wert, str):
+        return None
+    text = "".join(ohne_markup(wert).split()).removeprefix("+")
+    if _ZAHL_DEUTSCH.fullmatch(text):
+        text = text.replace(".", "").replace(",", ".")
+    elif not _ZAHL.fullmatch(text):
+        return None
+    try:
+        return Decimal(text)
+    except InvalidOperation:
+        return None
+
+
 def _gleich(werte: list[object], soll: str) -> bool:
-    ziel = vergleichbar(soll)
-    return any(vergleichbar(w) == ziel for w in werte)
+    ziel, zahl = vergleichbar(soll), als_zahl(soll)
+    return any(
+        vergleichbar(w) == ziel or (zahl is not None and als_zahl(w) == zahl)
+        for w in werte
+    )
 
 
 def _schluessel(wert: object) -> str:

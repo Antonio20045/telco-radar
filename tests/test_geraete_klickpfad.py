@@ -15,7 +15,12 @@ import re
 import pytest
 
 from telco_radar.collect.geraete.klickkarte import Antwortmuster, Wertpfad
-from telco_radar.collect.geraete.klickpfad import am_pfad, pfadfehler, vergleichbar
+from telco_radar.collect.geraete.klickpfad import (
+    als_zahl,
+    am_pfad,
+    pfadfehler,
+    vergleichbar,
+)
 
 ATOMICS = {
     "atomics": [
@@ -82,6 +87,29 @@ def test_filter_vergleicht_wahrheitswerte_zahlen_und_text_ohne_leerraum():
     assert am_pfad({"l": [{"n": " Allnet  M", "w": 2}]}, "l[n=allnetm].w") == 2
     assert vergleichbar("O<sub>2</sub> Mobile S") == "o2mobiles"
     assert vergleichbar({"a": 1}) is None
+
+
+@pytest.mark.parametrize(
+    ("soll", "erwartet"),
+    [("458,15", "c"), ("654,50", "d"), ("1.049", "e"), ("26.9", "b"), ("199", "a")],
+)
+def test_filter_trifft_dieselbe_zahl_in_deutscher_schreibweise(soll, erwartet):
+    """Telekom: die Seite schreibt „458,15 €“, die Antwort 458.15."""
+    preise = [
+        {"v": 199, "id": "a"},
+        {"v": 26.9, "id": "b"},
+        {"v": 458.15, "id": "c"},
+        {"v": 654.5, "id": "d"},
+        {"v": 1049, "id": "e"},
+    ]
+    assert am_pfad({"l": preise}, f"l[v={soll}].id") == erwartet
+
+
+@pytest.mark.parametrize("soll", ["458,1", "45815", "1049,01", "199 GB", "true"])
+def test_gegenprobe_andere_zahl_oder_kein_zahlentext_trifft_nichts(soll):
+    preise = [{"v": 458.15, "id": "c"}, {"v": 1049, "id": "e"}, {"v": 199, "id": "a"}]
+    assert am_pfad({"l": preise}, f"l[v={soll}].id") is None
+    assert als_zahl(True) is None
 
 
 def test_platzhalter_im_schluessel():
