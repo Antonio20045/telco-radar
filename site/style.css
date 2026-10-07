@@ -3137,6 +3137,8 @@ b,strong{font-weight:700}
 .gr-bnd-rechnung{color:var(--ink-2);margin-top:3px}
 .gr-bnd-term{white-space:nowrap}
 .gr-bnd-wort{color:var(--ink-4)}
+.gr-bnd-teile{color:var(--ink-4)}
+.gr-bnd-teil{white-space:nowrap}
 .gr-bnd-op{color:var(--ink-4);white-space:pre}
 .gr-bnd-ergebnis{white-space:nowrap}
 .gr-bnd-fehlt{color:var(--ink-4);font-style:italic;white-space:nowrap}
