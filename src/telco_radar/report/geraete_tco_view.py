@@ -39,6 +39,7 @@ import logging
 
 from . import geraete_tco_band, geraete_tco_grafik, geraete_tco_karten
 from . import geraete_laufzeit, geraete_notbremse, geraete_vergleich
+from ..analyze.geraete_pruefstatus import listen_aus_satz
 from ..geraete_model import VERGLEICHBARE_ZUSTAENDE, Ratenzahlung, normalisiere
 from ..tarif_model import PREISTYP_LIVE_SHOP, vertrag_basis
 from ..tco_model import (
@@ -52,7 +53,6 @@ from ..tco_model import (
     Buendel,
     Rabatt,
     SimOnlyReferenz,
-    aktionen_aus,
     geraeteanteil,
     kosten_ueber,
     sim_only_id,
@@ -366,7 +366,7 @@ def _aus_speicher(eintraege: list, typ, felder: tuple) -> list:
             continue
         werte = {f: e.get(f) for f in felder if e.get(f) is not None}
         if typ is Buendel:
-            werte["aktionen"] = aktionen_aus(e.get("aktionen"))
+            werte.update(listen_aus_satz(e))
         try:
             satz = typ(**werte, rabatte=_rabatte(e))
         except (TypeError, ValueError) as exc:

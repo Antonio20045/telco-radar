@@ -38,9 +38,12 @@ Zahlen in die Datenbank (`ist_quarantaene`).
 
 from __future__ import annotations
 
+import logging
 import re
 from dataclasses import dataclass, field, asdict
 from typing import Optional
+
+log = logging.getLogger(__name__)
 
 PFLICHTFELDER = ("grundgebuehr", "laufzeit_monate")
 
@@ -155,6 +158,74 @@ class Preisphase:
     def monate(self, laufzeit: int) -> int:
         ende = self.bis_monat if self.bis_monat is not None else laufzeit
         return max(0, min(ende, laufzeit) - self.von_monat + 1)
+
+
+BUENDELPHASEN = "tarif_phasen"
+
+
+@dataclass
+class Buendelphase(Preisphase):
+    """Eine Preisphase, die der Anbieter fuer genau ein Buendel nennt.
+
+    Die Phasen des Tarifblatts beschreiben den Tarif und kommen beim Lesen dazu
+    (`report.geraete_tco_karten.tarif_anreichern`); diese misst der Adapter am
+    Buendel (`collect/geraete/ratenlaufzeit.py`), und der Store haelt sie unter
+    `BUENDELPHASEN`. `beleg` ist der Wortlaut oder der Antwortpfad, die Adresse
+    `Buendel.quelle_url`. Ohne Beleg oder ohne Ende ist sie keine (ValueError).
+    """
+
+    beleg: str = ""
+
+    def __post_init__(self):
+        self.beleg = " ".join((self.beleg or "").split())
+        if not self.beleg:
+            raise ValueError("eine Buendelphase ohne Beleg ist nicht nachpruefbar")
+        if self.bis_monat is None:
+            raise ValueError("eine Buendelphase ohne Ende belegt keinen Monat")
+        self.von_monat, self.bis_monat = int(self.von_monat), int(self.bis_monat)
+        if not 1 <= self.von_monat <= self.bis_monat:
+            raise ValueError(f"keine Monatsspanne: {self.von_monat}-{self.bis_monat}")
+        self.betrag = round(float(self.betrag), 2)
+        if self.betrag < 0:
+            raise ValueError(f"negativer Tarifpreis: {self.betrag}")
+
+
+def buendelphasen_aus(rohsaetze) -> list[Preisphase]:
+    """Phasen-Rohsaetze (dicts aus Adapter oder Store) als `Buendelphase`n.
+
+    Eine unlesbare Phase faellt mit Protokoll weg; das Buendel rechnet dann wie eines
+    ohne Beleg. Dieselbe Funktion fuer Sammel- und Leseweg."""
+    fertig: list[Preisphase] = []
+    for roh in rohsaetze or []:
+        try:
+            fertig.append(roh if isinstance(roh, Buendelphase) else Buendelphase(**roh))
+        except (TypeError, ValueError) as exc:
+            log.warning("Buendelphase uebergangen: %s (%r)", exc, roh)
+    return fertig
+
+
+def buendelphasen(phasen) -> list[Preisphase]:
+    """Nur die am Buendel gemessenen Phasen; die des Tarifblatts nie."""
+    return [p for p in phasen if isinstance(p, Buendelphase)]
+
+
+def vor_dem_blatt(buendel, blatt: list[Preisphase]) -> list[Preisphase]:
+    """Die Preisphasen eines Buendels beim Anreichern: was der Anbieter fuer dieses
+    Buendel selbst nennt, geht dem Tarifblatt vor; sonst gilt das Blatt."""
+    return buendelphasen(buendel.tarif_phasen) or blatt
+
+
+def schreibe_buendelphasen(eintrag: dict, satz) -> None:
+    """Die gemessenen Phasen eines Satzes in seinen Store-Eintrag - oder keine.
+
+    Sie gehoeren zur Messung wie die Preise: ohne sie faellt das Feld weg, damit keine
+    Phase eines frueheren Laufs neben den Preisen von heute steht. Ein Satz ohne
+    Phasen (SIM-only-Referenz) bekommt keine."""
+    phasen = [asdict(p) for p in buendelphasen(getattr(satz, "tarif_phasen", []))]
+    if phasen:
+        eintrag[BUENDELPHASEN] = phasen
+    else:
+        eintrag.pop(BUENDELPHASEN, None)
 
 
 @dataclass

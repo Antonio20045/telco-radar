@@ -86,6 +86,7 @@ import logging
 from dataclasses import dataclass, field
 
 from ..tarif_bezug import Tarifbestand
+from ..tarif_model import buendelphasen_aus
 from ..tco_model import Buendel, aktionen_aus
 
 log = logging.getLogger(__name__)
@@ -163,6 +164,7 @@ def aus_rohsaetzen(rohsaetze, bestand: Tarifbestand, heute: str) -> Buendelbilan
                     quelle_url=str(satz.get("quelle_url") or ""),
                     abgerufen_am=heute,
                     herleitung=str(satz.get("herleitung") or ""),
+                    tarif_phasen=buendelphasen_aus(satz.get("tarif_phasen")),
                 )
             )
         except (ValueError, TypeError) as exc:

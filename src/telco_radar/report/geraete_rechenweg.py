@@ -13,6 +13,7 @@ from __future__ import annotations
 import logging
 from datetime import date
 
+from ..tarif_model import buendelphasen_aus
 from ..tco_model import (
     POSTEN_ANSCHLUSS,
     POSTEN_BUENDEL,
@@ -125,6 +126,7 @@ def _buendel_aus_messung(messung: dict, tarife: dict | None = None) -> Buendel |
             zustand=satz.get("zustand") or "",
             quelle_url=satz.get("quelle_url") or "",
             abgerufen_am=satz.get("abgerufen_am") or "",
+            tarif_phasen=buendelphasen_aus(satz.get("tarif_phasen")),
         )
     except (ValueError, TypeError) as exc:
         log.warning(

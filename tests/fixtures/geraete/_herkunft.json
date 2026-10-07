@@ -390,6 +390,19 @@
       "hinweis": "GEKUERZT wie o2_vertiefung_iphone17pro (29.09.2026): iPhone 18 Pro mit vier Speichern (256 GB bis 2 TB) und sieben Tarifen. Beleg fuer Terabyte im Angebotsnamen und fuer den Trackingblock, der der Preiszusammenfassung widerspricht (24 Raten: metric2 34,99, Zusammenfassung 24,99)."
     },
     {
+      "datei": "o2_ratenplan_galaxy_s26_20261007.json.gz",
+      "url": "https://www.o2online.de/e-shop/rest/configuration/<id> (2 Antworten: Galaxy S26 512 GB mit 36 und mit 24 Raten, Tarif Unlimited M Plus; Adressen in der Datei)",
+      "quelle": "Zweig klick-erkundung, Commit f31d5543, erkundung/o2/2026-10-07/mitschnitt-2.json, Antworten 131 und 133 (Klick-Erkundung, Actions-Lauf 37582071155)",
+      "abgerufen_am": "2026-10-07",
+      "http_status": 200,
+      "content_type": "application/vnd.commerce.message+json",
+      "bytes_roh": 17694,
+      "sha256_roh": "ee2aeec3576abdf15a117c3ae6cfd9fa050815e02b675caffa30319e8889b73d",
+      "gzip": true,
+      "bytes_abgelegt": 1983,
+      "hinweis": "AUSZUG, nicht byteidentisch: der Mitschnitt haelt je Antwort nur die ersten rund 198 kB der 427 kB (gekuerzt=true). Uebernommen sind mit unveraenderten Werten @type, productConfigurationId, hardware.@type, hardware.offerName, hardware.paymentOptions, hardware.contents.selectedHardwareRateDurationModal (der Ratenplan-Hinweis) und die ersten 6 tariffOptions, die im gekuerzten Mitschnitt vollstaendig stehen (je @type, displayValue, selected, selectCall, monthlyCharges). Preiszusammenfassung und Trackingblock liegen hinter der Kuerzung. Beleg fuer den Satz ueber die gesamte Laufzeit des Geraete-Ratenplans und fuer den Tarif-Slug -hwv-36m-05-00 gegen -hwv-24m-05-00."
+    },
+    {
       "datei": "congstar_produkt_iphone17_20260929.html.gz",
       "url": "https://www.congstar.de/geraete/apple/apple-iphone-17/",
       "abgerufen_am": "2026-09-29",

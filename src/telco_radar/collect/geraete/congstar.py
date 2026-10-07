@@ -232,8 +232,8 @@ import re
 from typing import Optional
 
 from .basis import GeraeteAbrufFehler, _preis
+from .ratenlaufzeit import congstar_phasen
 from ...geraete_model import probe_geht_auf
-
 from ...tco_model import (
     AKTION_ANSCHLUSS_ERLASSEN,
     AKTION_GERAETERABATT,
@@ -870,7 +870,7 @@ def _saetze_eines_plans(plan: dict, url: str, quelle: str) -> list[dict]:
                         "quelle": quelle,
                     }
                 )
-    return out
+    return congstar_phasen(out, preise.get("recurring"))
 
 
 def ergaenze_pib_slug(bestand) -> int:

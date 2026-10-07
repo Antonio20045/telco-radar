@@ -131,3 +131,14 @@ def _preis(wert) -> float | None:
         return float(wert)
     except (TypeError, ValueError):
         return None
+
+
+HALBER_CENT = 0.005
+
+
+def _gleich(a: float | None, b: float | None) -> bool:
+    """Ein Cent ist kein Rundungsfehler - dieselbe Toleranz wie ueberall; ein
+    fehlender Betrag gleicht keinem."""
+    if a is None or b is None:
+        return False
+    return abs(float(a) - float(b)) < HALBER_CENT

@@ -25,6 +25,7 @@ from __future__ import annotations
 from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass, field, fields
 
+from ..tarif_model import buendelphasen_aus
 from ..tco_model import Aktion, Buendel, aktionen_aus, kosten_ueber
 
 GUELTIG = "gueltig"
@@ -159,7 +160,16 @@ class Kontext:
 def buendel_aus_satz(satz: Mapping) -> Buendel:
     """Ein gespeicherter Bündelsatz als ``Buendel``; wirft wie dessen Konstruktor."""
     werte = {f: satz[f] for f in _SKALARE if satz.get(f) is not None}
-    return Buendel(**werte, aktionen=aktionen_aus(satz.get("aktionen")))
+    return Buendel(**werte, **listen_aus_satz(satz))
+
+
+def listen_aus_satz(satz: Mapping) -> dict:
+    """Die Listenfelder eines gespeicherten Bündelsatzes als Objekte: Aktionen und die
+    am Bündel gemessenen Preisphasen. Eine Stelle für Prüfstelle und Seite."""
+    return {
+        "aktionen": aktionen_aus(satz.get("aktionen")),
+        "tarif_phasen": buendelphasen_aus(satz.get("tarif_phasen")),
+    }
 
 
 def abgelaufene_aktionen(aktionen: Iterable[Aktion], heute: str) -> list[Aktion]:

@@ -79,7 +79,8 @@ import logging
 import re
 from typing import Optional
 
-from .basis import GeraeteAbrufFehler, _preis
+from .basis import GeraeteAbrufFehler, _gleich, _preis
+from .ratenlaufzeit import katalog_mit_phasen, o2_phasen
 from ...geraete_model import probe_geht_auf
 
 log = logging.getLogger(__name__)
@@ -200,13 +201,6 @@ _TAG_RE = re.compile(r"<[^>]+>")
 
 def _ohne_markup(text: str) -> str:
     return " ".join(_TAG_RE.sub("", text or "").split())
-
-
-def _gleich(a: Optional[float], b: Optional[float]) -> bool:
-    """Ein Cent ist kein Rundungsfehler - dieselbe Toleranz wie ueberall."""
-    if a is None or b is None:
-        return False
-    return abs(float(a) - float(b)) < 0.005
 
 
 def _buendelsatz(h: dict, proben: Optional[dict] = None) -> Optional[dict]:
@@ -560,16 +554,19 @@ def saetze_aus_konfiguration(
     Abgeleitet wird nur mit Referenz, nur wenn der eigene Tarif dieser
     Antwort zur Referenz passt (gleicher Slug, gleicher Anschlusspreis),
     und nur fuer Tarife, die die Referenz kennt. Jeder Verzicht wird
-    gezaehlt.
+    gezaehlt, ebenso jede Phase ueber die ganze Ratenlaufzeit (`o2_phasen`).
     """
     z = zaehler if zaehler is not None else {}
     g = _gemessen(pv)
     if g is None:
         _zaehle(z, "ohne_probe")
         return []
+    optionen = (pv.get("tariff") or {}).get("tariffOptions") or []
     out = [
         _rohsatz(basis, g, g["name"], g["slug"], g["tarif_rate"], g["anschluss"], url)
     ]
+    gewaehlt = _link(_ausgewaehlt(optionen) or {})
+    out[0]["tarif_phasen"] = o2_phasen(pv, gewaehlt, g, g["tarif_rate"], z)
     _zaehle(z, "gemessen")
     if referenz is None:
         return out
@@ -581,7 +578,7 @@ def saetze_aus_konfiguration(
     ):
         _zaehle(z, "referenz_widerspricht")
         return out
-    for option in (pv.get("tariff") or {}).get("tariffOptions") or []:
+    for option in optionen:
         if not isinstance(option, dict) or option.get("selected"):
             continue
         ref = referenz.get(_ohne_markup(option.get("displayValue") or ""))
@@ -602,6 +599,7 @@ def saetze_aus_konfiguration(
             ref["anschluss"],
             url,
         )
+        satz["tarif_phasen"] = o2_phasen(pv, _link(option), g, tarif_rate, z)
         satz["herleitung"] = HERLEITUNG_TARIFSUMME
         out.append(satz)
         _zaehle(z, "abgeleitet")
@@ -704,9 +702,10 @@ def fuehre_zusammen(katalog: list, tief: list) -> list:
     demselben Tarif-Slug ist dasselbe Buendel; der Katalogsatz bleibt dann
     stehen und die Vertiefung faellt weg. Er ist ueber seine Proben gegen
     den typisierten Katalogpreis gelaufen, und seine Adresse ist die
-    Produktseite genau dieses Buendels.
+    Produktseite genau dieses Buendels; die Phase der Vertiefung uebernimmt
+    er (`ratenlaufzeit.katalog_mit_phasen`).
     """
     schon = {(s.get("angebot"), s.get("tarif_slug")) for s in katalog}
-    return list(katalog) + [
+    return katalog_mit_phasen(katalog, tief) + [
         s for s in tief if (s.get("angebot"), s.get("tarif_slug")) not in schon
     ]

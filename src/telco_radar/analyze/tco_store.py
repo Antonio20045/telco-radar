@@ -85,6 +85,7 @@ from dataclasses import asdict
 from pathlib import Path
 from typing import Optional
 
+from ..tarif_model import schreibe_buendelphasen
 from ..tco_model import (
     Buendel,
     SimOnlyReferenz,
@@ -415,8 +416,8 @@ class TcoDB:
     @staticmethod
     def _schreibe_messung(eintrag: dict, satz, felder: tuple) -> None:
         """Alle Messfelder gemeinsam, auch die leeren - siehe Modulkopf."""
-        for feld in felder:
-            eintrag[feld] = getattr(satz, feld)
+        eintrag.update({feld: getattr(satz, feld) for feld in felder})
+        schreibe_buendelphasen(eintrag, satz)
 
     @staticmethod
     def _historie_zeile(satz: Buendel, datum: str) -> dict:
@@ -431,8 +432,7 @@ class TcoDB:
         Luecke und kein Fehler.
         """
         zeile = {"id": satz.id, "datum": datum}
-        for feld in _MESSFELDER:
-            zeile[feld] = getattr(satz, feld)
+        TcoDB._schreibe_messung(zeile, satz, _MESSFELDER)
         zeile["gesamt"] = tco_24(satz).gesamt
         return zeile
 

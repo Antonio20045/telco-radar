@@ -57,14 +57,14 @@ Die Felder eines Buendels
                       keinen Tarifnamen); bis dahin IST der Name der
                       Schluessel.
     tarif_monatlich   Grundpreis je Monat, ohne Geraeteanteil
-    tarif_phasen      Preisphasen des Tarifs, aus dem Tarifbestand (`tarife.jsonl`)
-                      angereichert - wo sie vorliegen, wird der Tarifanteil
-                      PHASENGEWICHTET gerechnet statt flach multipliziert. Sie stehen am
-                      Objekt und nicht im Store, weil sie zur Tarif-Stammdaten gehoeren
-                      und nicht zur Messung des Bündels (A1, 20.09.2026). Anzureichern
-                      ist nur ein Blatt OHNE Widerspruch zur Messung
-                      (`phasen_fuer_buendel`, QA-Fix 20.09.2026): das Blatt nennt den
-                      Tarif ohne Geraetezuschlag, die Karte die gemessene Bündel-Rate.
+    tarif_phasen      Preisphasen des Tarifs, PHASENGEWICHTET gerechnet. Die des
+                      Tarifbestands (`tarife.jsonl`) sind Stammdaten, kommen beim Lesen
+                      dazu und stehen nicht im Store (A1, 20.09.2026), nur ohne
+                      Widerspruch zur Messung (`phasen_fuer_buendel`, QA-Fix 20.09.2026:
+                      das Blatt nennt den Tarif ohne Geraetezuschlag, die Karte die
+                      gemessene Bündel-Rate). Nennt der Anbieter den Preis fuer DIESES
+                      Buendel selbst, ist die Phase eine Messung mit Beleg
+                      (`tarif_model.Buendelphase`): im Store, vor dem Blatt.
     geraet_zuzahlung  einmalig bei Vertragsschluss
     geraet_monatsrate die Geraeterate je Monat, NEBEN dem Tarif
     laufzeit_monate   ueber wie viele Monate die Geraeterate laeuft (12, 24, 36

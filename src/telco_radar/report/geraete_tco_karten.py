@@ -51,7 +51,7 @@ from datetime import date as _datum
 from typing import Optional
 
 from ..geraete_model import VERGLEICHBARE_ZUSTAENDE, ZUSTAENDE, normalisiere
-from ..tarif_model import Preisphase
+from ..tarif_model import Preisphase, vor_dem_blatt
 from ..tco_kosten import POSTEN_ZEITRAUM, belegte_phasen
 from ..tco_model import (
     AKTION_ANSCHLUSS_ERLASSEN,
@@ -879,7 +879,7 @@ def tarif_anreichern(b: Buendel, tarif: dict) -> None:
     laufzeit = tarif.get("laufzeit_monate")
     if laufzeit:
         b.tarif_bindung_monate = int(laufzeit)
-    b.tarif_phasen = phasen_fuer_buendel(tarif, b.tarif_monatlich)
+    b.tarif_phasen = vor_dem_blatt(b, phasen_fuer_buendel(tarif, b.tarif_monatlich))
 
 
 _PREIS_TOLERANZ = 0.005
