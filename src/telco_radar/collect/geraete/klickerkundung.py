@@ -27,8 +27,8 @@ robots.txt gelesen wurde. Screenshot und Seite gehören nur ins Artefakt des Lau
 Liegt unter ``karten`` eine Klick-Karte des Anbieters, erprobt die ``klickkartenprobe``
 sie nach jeder gelesenen oder leeren Seite auf derselben Seite, mit Tor, Schleuse und
 Zeitgrenze der Seite; ihr Ergebnis steht in ``karte-<n>.json``, ihr Status je Seite im
-Index unter ``karte``. Endet die Probe mit „Abruf gestört“, gilt dasselbe wie nach
-Bot-Schutz der Seite.
+Index unter ``karte``. Endet die Probe gestört, gilt dasselbe wie nach Bot-Schutz der
+Seite; ihre Cookie-Werte schwärzt die Ablage wie die der Seite.
 """
 
 from __future__ import annotations
@@ -239,9 +239,11 @@ def lege_ab(
     """Schreibt die Dateien einer Seite in ``anteil`` Bytes; gibt ihren Indexeintrag.
 
     Die Kartenprobe kommt vor Mitschnitt, Screenshot und Seite; ohne ``probe`` ist der
-    Kartenstatus ``None``.
+    Kartenstatus ``None``. Cookie-Werte von Seite und Probe sind vorher gemerkt.
     """
     ablage.merke_cookies(ergebnis.cookies)
+    if probe is not None:
+        ablage.merke_cookies(probe.cookies)
     start = ablage.belegt
     dateien: dict[str, str | None] = {}
 

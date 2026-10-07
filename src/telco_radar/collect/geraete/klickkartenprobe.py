@@ -6,15 +6,18 @@ eine Klick-Karte gleich mit. Liegt ``KARTEN/<schluessel>.yaml`` vor, lädt
 Karte ist ``kartenfehler`` mit Grund, ohne Karte heißt es ``keine_karte``, und es
 ändert sich nichts. Nach Inventar und Klick-Proben einer gelesenen oder leeren Seite
 lässt ``probiere`` den Klick-Crawler (``klickcrawler.klicke_durch``) auf derselben Seite
-laufen, mit demselben Tor, derselben Schleuse samt Crawl-delay und Zeitgrenze der Seite
-(``klickseite.Fristschleuse``), denselben robots-Regeln und demselben User-Agent, für
-höchstens ``HOECHSTE_KOMBINATIONEN_PROBE`` Kombinationen; jede weitere heißt
-``nicht besucht``. Endet die Probe mit „Abruf gestört“ (Bot-Schutz, Challenge oder ein
-gescheiterter Abruf), ist ``Kartenprobe.bot`` wahr, und für den Anbieter geht keine
-Anfrage mehr hinaus (CLAUDE.md Regel 4). ``als_daten`` ist der Inhalt von
-``karte-<n>.json``, ``indexeintrag`` der Kartenstatus einer Seite in ``index.json``.
-Belege archiviert die Probe nicht (kein Konto); ihr Status bleibt, wie der Crawler ihn
-setzt.
+laufen, mit demselben Tor samt Beobachtung (``klickseite.beobachte``: eine 403 oder 429
+der eigenen Website ist Bot-Schutz), derselben Schleuse samt Crawl-delay und Zeitgrenze
+der Seite (``klickseite.Fristschleuse.offen``), denselben robots-Regeln und demselben
+User-Agent, für höchstens ``HOECHSTE_KOMBINATIONEN_PROBE`` Kombinationen; jede weitere
+heißt ``nicht besucht``. Ist die Zeit vor der Probe um, heißt sie ``nicht_besucht``.
+Endet der Lauf ``gestoert`` (Bot-Schutz, Challenge, fehlender Kanarienwert, gescheiterte
+Preisantwort, Strukturbruch), ist ``Kartenprobe.bot`` wahr, und für den Anbieter geht
+keine Anfrage mehr hinaus (CLAUDE.md Regel 4). Set-Cookie- und Kontextwerte der Probe
+stehen in ``Kartenprobe.cookies``; die Ablage schwärzt sie vor jedem Schreiben.
+``als_daten`` ist der Inhalt von ``karte-<n>.json``, ``indexeintrag`` der Kartenstatus
+einer Seite in ``index.json``. Belege archiviert die Probe nicht (kein Konto); ihr
+Status bleibt, wie der Crawler ihn setzt.
 """
 
 from __future__ import annotations
@@ -47,14 +50,14 @@ from .klicklauf import (
     Klicklauf,
     Kombiergebnis,
 )
-from .klickseite import LAUF_LEER, Fristschleuse, Seitenergebnis
+from .klickseite import GRUND_FRIST, LAUF_LEER, Fristschleuse, Seitenergebnis, beobachte
 from .klickspur import ohne_geheimnisse
 from .klicktext import Preiswerte
 from .klickziele import Erkundungsziel, Seitenziel
 from .robots import RobotsWaechter
 
 if TYPE_CHECKING:
-    from playwright.sync_api import Browser
+    from playwright.sync_api import APIResponse, Browser, Request
 
 log = logging.getLogger(__name__)
 
@@ -65,7 +68,7 @@ KARTENFEHLER = "kartenfehler"
 GELADEN = "geladen"
 GELAUFEN = "gelaufen"
 NICHT_BESUCHT = "nicht_besucht"
-ABRUF_GESTOERT = "Abruf gestört"
+GRUND_VOR_PROBE = f"{GRUND_FRIST}, Probe nicht begonnen"
 GRUND_OHNE_VERZEICHNIS = "kein Kartenverzeichnis angegeben"
 BELEGE = "nicht archiviert (kein Konto)"
 SEITE_PROBIERBAR = frozenset({LAUF_GELESEN, LAUF_LEER})
@@ -91,16 +94,12 @@ class Kartenprobe:
     grund: str | None = None
     lauf: Klicklauf | None = None
     karte: Klickkarte | None = None
+    cookies: frozenset[str] = frozenset()
 
     @property
     def bot(self) -> bool:
-        """Wahr, wenn die Probe mit „Abruf gestört“ endete; dann keine Anfrage mehr."""
-        lauf = self.lauf
-        return (
-            lauf is not None
-            and lauf.status == LAUF_GESTOERT
-            and ABRUF_GESTOERT in (lauf.grund or "")
-        )
+        """Wahr, wenn der Lauf ``gestoert`` endete; dann keine Anfrage mehr."""
+        return self.lauf is not None and self.lauf.status == LAUF_GESTOERT
 
 
 @dataclass(frozen=True)
@@ -150,6 +149,13 @@ def probiere(
     """Lässt den Klick-Crawler mit der Karte über die Seite laufen; wirft nie."""
     if lage.karte is None or ergebnis.status not in SEITE_PROBIERBAR:
         return ohne_probe(lage, f"Seite {ergebnis.status}: {ergebnis.grund}")
+    if not mittel.schleuse.offen(seite.adresse):
+        return ohne_probe(lage, GRUND_VOR_PROBE)
+    cookies: set[str] = set()
+
+    def beobachter(anfrage: Request, antwort: APIResponse) -> str | None:
+        return beobachte(anfrage, antwort, seite.adresse, cookies)
+
     lauf = klicke_durch(
         browser,
         seite.adresse,
@@ -159,10 +165,13 @@ def probiere(
         schleuse=mittel.schleuse,
         kennung=ziel.kennung,
         hoechste=HOECHSTE_KOMBINATIONEN_PROBE,
-        ende=mittel.schleuse.ende,
+        frist=mittel.schleuse.offen,
+        beobachter=beobachter,
+        cookies=cookies,
     )
     log.info("Kartenprobe %s %s: %s", ziel.schluessel, seite.adresse, lauf.status)
-    return Kartenprobe(GELAUFEN, lage.datei, lauf.grund, lauf, lage.karte)
+    kekse = frozenset(cookies)
+    return Kartenprobe(GELAUFEN, lage.datei, lauf.grund, lauf, lage.karte, kekse)
 
 
 def indexeintrag(probe: Kartenprobe, datei: str | None) -> dict:

@@ -9,7 +9,8 @@ anfragt, geht nicht hinaus (nur Chromium, über das DevTools-Protokoll):
 Lauf dauert, auch in anderen Kontexten desselben Browsers. Speculation Rules holt
 Chromium an beiden vorbei; die entfernt das Tor aus jeder Antwort und ``OHNE_VORAB_JS``
 aus nachgeladenen Elementen, auch in Shadow Roots, bevor der Browser sie liest.
-``schliesse`` verlässt die Seite, schließt den Kontext und gibt das Vorabladen frei.
+``schliesse`` verlässt die Seite, schließt den Kontext und gibt das Vorabladen frei;
+``cookie_werte`` liest vorher die Cookie-Werte des Kontexts zum Schwärzen.
 HAR-Belege in ``wiedergabe`` beantworten ihre Anfragen ohne Netz und vor dem Tor; was
 sie nicht kennen, geht an das Tor. Grenze: ein HAR-Beleg hält nur die Preisantwort, die
 Produktseite selbst kommt weiter aus dem Netz. Ohne erreichbare Seite liest die
@@ -119,6 +120,17 @@ def oeffne_sitzung(
         raise
     tor.warte = seite.wait_for_timeout
     return Sitzung(kontext, seite, wache)
+
+
+def cookie_werte(sitzung: Sitzung | None) -> set[str]:
+    """Die Cookie-Werte des Kontexts; leer ohne Sitzung oder lesbaren Kontext (Log)."""
+    if sitzung is None:
+        return set()
+    try:
+        return {c["value"] for c in sitzung.kontext.cookies()}
+    except PlaywrightFehler as fehler:
+        log.warning("Klick-Crawler: Cookies nicht gelesen: %s", kurz(fehler))
+        return set()
 
 
 def schliesse(sitzung: Sitzung | None) -> None:

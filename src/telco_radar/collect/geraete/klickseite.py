@@ -11,8 +11,10 @@ sofort eine Störung, vor jeder weiteren Anfrage, und jeder Set-Cookie-Wert komm
 Liste zum Schwärzen. In jedem Takt fragt ``pruefe`` die Spur nach Challenge-Mustern und
 das Tor nach Störung; dann geht keine Anfrage mehr hinaus und ``Seitenergebnis.bot`` ist
 wahr, außer die Hauptseite war tot (404, 410). Die ``Fristschleuse`` hält die
-Zeitgrenze: danach verwirft das Tor jede Anfrage, und der Lauf endet mit
-``GRUND_FRIST``. Eine Seite ohne Bedienelement oder ohne Preis-Kandidat heißt
+Zeitgrenze: ``offen`` ist die eine Definition, ob ein Abruf samt Abstand noch vor der
+Grenze hinausginge; danach verwirft das Tor jede Anfrage, und der Lauf endet mit
+``GRUND_FRIST``. ``beobachte`` ist die Beobachtung des Tors, die auch die Kartenprobe
+nutzt. Eine Seite ohne Bedienelement oder ohne Preis-Kandidat heißt
 ``LAUF_LEER`` mit Grund, nie „gelesen“. Alles, was die Ablage braucht, steht danach im
 ``Seitenergebnis``.
 """
@@ -73,9 +75,16 @@ class Fristschleuse:
         """Neue Grenze für die nächste Seite."""
         self.ende, self.abgelaufen = ende, False
 
+    def offen(self, url: str) -> bool:
+        """Wahr, solange ein Abruf von ``url`` samt Abstand vor der Grenze hinausgeht.
+
+        Dieselbe Grenze gilt für ``passiere`` und für den Klick-Crawler (``frist``).
+        """
+        return time.monotonic() + self.innen.abstand(url) < self.ende
+
     def passiere(self, url: str) -> None:
         """Wirft ``GeraeteAbrufFehler``, wenn der Abstand über die Grenze reicht."""
-        if time.monotonic() + self.innen.abstand(url) >= self.ende:
+        if not self.offen(url):
             self.abgelaufen = True
             raise GeraeteAbrufFehler(f"{GRUND_FRIST}, nicht abgerufen")
         self.innen.passiere(url)
@@ -259,13 +268,7 @@ class Seitenlauf:
         return False
 
     def _beobachte(self, anfrage: Request, antwort: APIResponse) -> str | None:
-        """Merkt Set-Cookie-Werte; Grund, wenn die Antwort nach Bot-Schutz aussieht."""
-        for kopf in antwort.headers_array:
-            if kopf["name"].lower() == SET_COOKIE:
-                self.ergebnis.cookies.add(cookie_wert(kopf["value"]))
-        art, url = anfrage.resource_type, ohne_geheimnisse(antwort.url)
-        eintrag = Eintrag(0, anfrage.method, url, art, antwort.status)
-        return bot_verdacht(eintrag, "", self.adresse)
+        return beobachte(anfrage, antwort, self.adresse, self.ergebnis.cookies)
 
     def _uebernimm(self) -> None:
         """Was Tor, Spur und Lauf festhielten, als Daten ins Ergebnis."""
@@ -308,6 +311,19 @@ def leer(inventar: Inventar | None) -> str | None:
     if inventar.preise_gesamt == 0:
         fehlt.append("kein Preis-Kandidat")
     return " und ".join(fehlt) if fehlt else None
+
+
+def beobachte(
+    anfrage: Request, antwort: APIResponse, adresse: str, cookies: set[str]
+) -> str | None:
+    """Merkt Set-Cookie-Werte in ``cookies``; Grund, wenn die Antwort nach Bot-Schutz
+    aussieht (``klickspur.bot_verdacht`` gegen die Website von ``adresse``)."""
+    for kopf in antwort.headers_array:
+        if kopf["name"].lower() == SET_COOKIE:
+            cookies.add(cookie_wert(kopf["value"]))
+    art, url = anfrage.resource_type, ohne_geheimnisse(antwort.url)
+    eintrag = Eintrag(0, anfrage.method, url, art, antwort.status)
+    return bot_verdacht(eintrag, "", adresse)
 
 
 def cookie_wert(set_cookie: str) -> str:

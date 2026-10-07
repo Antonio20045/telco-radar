@@ -7,11 +7,12 @@ und kein Netz. Je Kombination gilt einer von vier Zuständen: ``erfasst``,
 besucht, Seite nicht zur Ruhe gekommen, Preisantwort über die Frist offen) oder
 ``befund`` (das Echo widerspricht sich). Ein Lauf ist ``gelesen``, ``gestoert``
 (Bot-Schutz, fehlender Kanarienwert, offene oder gescheiterte Preisantwort,
-Strukturbruch, keine einzige angebotene Kombination) oder ``gesperrt`` (robots.txt
-sperrt Seite, Preisantwort oder Zeit). Bot-Schutz heißt ``bot_schutz``: HTTP 202, 4xx
-oder 5xx, ein bekanntes Challenge-Muster (``CHALLENGE_MUSTER``) oder eine HTML-Seite, wo
-die Preisschnittstelle JSON liefern soll. Gescheiterte Anfragen hält der Lauf mit Grund
-fest.
+Strukturbruch, keine einzige angebotene Kombination), ``gesperrt`` (robots.txt
+sperrt Seite, Preisantwort oder Besuchszeit) oder ``zeitgrenze`` (die Zeitgrenze des
+Aufrufers schnitt ihn ab; was er nicht besuchte, heißt so). Bot-Schutz heißt
+``bot_schutz``: HTTP 202, 4xx oder 5xx, ein bekanntes Challenge-Muster
+(``CHALLENGE_MUSTER``) oder eine HTML-Seite, wo die Preisschnittstelle JSON liefern
+soll. Gescheiterte Anfragen hält der Lauf mit Grund fest.
 
 Jede Kombination mit gelesenen Werten trägt ihren Beleg (``klickbeleg``) und
 ``beleg_status``: ``offen`` (gebaut, noch nicht im Archiv), ``belegt`` (Dateien in der
@@ -49,6 +50,7 @@ BEFUND = "befund"
 LAUF_GELESEN = "gelesen"
 LAUF_GESTOERT = "gestoert"
 LAUF_GESPERRT = "gesperrt"
+LAUF_ZEITGRENZE = "zeitgrenze"
 BELEG_OFFEN = "offen"
 BELEGT = "belegt"
 BELEG_FEHLT = "fehlt"

@@ -11,7 +11,6 @@ liefert sie aus den Dateien; keine Anfrage verlässt den Rechner.
 from __future__ import annotations
 
 import json
-import time
 from datetime import UTC, datetime
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
@@ -277,14 +276,24 @@ def test_fehlender_kanarienwert_heisst_abruf_gestoert(chromium):
 
 
 def test_ab_der_zeitgrenze_klickt_der_lauf_nicht_mehr(chromium):
-    lauf, server, _ = _laufe(chromium, ende=time.monotonic())
+    gefragt: list[str] = []
 
-    assert len(lauf.ergebnisse) == len(ERWARTET)
-    assert {(e.status, e.grund) for e in lauf.ergebnisse} == {
-        ("nicht_erfasst", "nicht besucht: Zeitgrenze erreicht")
+    def frist(url: str) -> bool:
+        gefragt.append(url)
+        return False
+
+    lauf, server, _ = _laufe(chromium, frist=frist)
+
+    status = {v: e.status for v, e in _je_variante(lauf).items()}
+    ohne_klick = {("128", "S", 24), ("128", "S", 36)}
+    assert status == {
+        v: ERWARTET[v] if v in ohne_klick else "nicht_erfasst" for v in ERWARTET
     }
-    assert lauf.status == "gesperrt"
-    assert lauf.grund == "Zeitgrenze erreicht: 8 Kombinationen nicht besucht"
+    nicht_besucht = [e for e in lauf.ergebnisse if e.status == "nicht_erfasst"]
+    assert {e.grund for e in nicht_besucht} == {"nicht besucht: Zeitgrenze erreicht"}
+    assert set(gefragt) == {server.adresse(PRODUKTPFAD)}
+    assert lauf.status == "zeitgrenze"
+    assert lauf.grund == "Zeitgrenze erreicht: 6 Kombinationen nicht besucht"
     assert len(server.mit("/api/preis")) == 1
 
 

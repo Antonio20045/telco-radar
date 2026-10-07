@@ -41,7 +41,6 @@ keine fremde Kennung.
 from __future__ import annotations
 
 import logging
-import time
 from collections.abc import Callable
 from dataclasses import replace
 from datetime import datetime
@@ -53,13 +52,14 @@ from playwright.sync_api import Error as PlaywrightFehler
 from .klickbeleg import Belegquelle, baue_beleg, kopie_aus
 from .klickecho import LAUFZEIT, Variante, variante_aus
 from .klickkarte import DIMENSIONEN, Klickkarte
-from .klickkontext import Sitzung, oeffne_sitzung, schliesse
+from .klickkontext import Sitzung, cookie_werte, oeffne_sitzung, schliesse
 from .klicklauf import (
     BEFUND,
     ERFASST,
     LAUF_GELESEN,
     LAUF_GESPERRT,
     LAUF_GESTOERT,
+    LAUF_ZEITGRENZE,
     NICHT_ANGEBOTEN,
     NICHT_ERFASST,
     Klicklauf,
@@ -83,9 +83,11 @@ from .robots import RobotsWaechter
 
 if TYPE_CHECKING:
     from playwright.sync_api import (
+        APIResponse,
         Browser,
         Locator,
         Page,
+        Request,
         ViewportSize,
     )
 
@@ -113,7 +115,9 @@ def klicke_durch(
     wiedergabe: tuple[Path, ...] = (),
     kennung: str | None = None,
     hoechste: int = HOECHSTE_KOMBINATIONEN,
-    ende: float | None = None,
+    frist: Callable[[str], bool] | None = None,
+    beobachter: Callable[[Request, APIResponse], str | None] | None = None,
+    cookies: set[str] | None = None,
 ) -> Klicklauf:
     """Klickt alle angebotenen Kombinationen auf ``adresse``; wirft nie.
 
@@ -123,16 +127,20 @@ def klicke_durch(
     Strukturwächter wandert weiter (``klicklauf.pruefe_struktur``). Ein Abbruch steht
     als Status und Grund im Lauf, die Kombinationen bis dahin bleiben erhalten.
     ``kennung`` ist der User-Agent aus ``geraete_quellen.yaml``. Nach ``hoechste``
-    Kombinationen und ab ``ende`` (``time.monotonic``) klickt der Lauf nicht mehr;
-    jede weitere Kombination heißt ``nicht_erfasst`` mit Grund ``nicht besucht``, und
-    hat ``ende`` welche abgeschnitten, ist der Lauf ``gesperrt`` (Zeit).
+    Kombinationen klickt der Lauf nicht mehr, ebenso wenn ``frist`` vor einem Klick für
+    ``adresse`` falsch ist (``klickseite.Fristschleuse.offen``, die Grenze der
+    Schleuse): die Kombination heißt ``nicht_erfasst`` mit Grund ``nicht besucht``. Hat
+    die Frist welche abgeschnitten oder eine Anfrage verworfen, ist der Lauf
+    ``zeitgrenze``. ``beobachter`` sieht im Tor jede Antwort (``Tor.beobachter``);
+    in ``cookies`` landen beim Schließen die Cookie-Werte des Kontexts.
     """
     lauf = Klicklauf(anbieter=karte.anbieter, adresse=adresse)
     tor = Tor(waechter, uhr, schleuse, lauf)
+    tor.beobachter = beobachter
     sitzung: Sitzung | None = None
     try:
         sitzung = oeffne_sitzung(browser, tor, FENSTER, kennung, wiedergabe=wiedergabe)
-        gang = _Gang(sitzung.seite, karte, tor, frist_ms, lauf, hoechste, ende)
+        gang = _Gang(sitzung.seite, karte, tor, frist_ms, lauf, hoechste, frist)
         gang.laufe()
     except Abbruch as abbruch:
         lauf.status, lauf.grund = abbruch.status, abbruch.grund
@@ -142,6 +150,8 @@ def klicke_durch(
             lauf.grund = tor.stoerung
     finally:
         tor.geschlossen = True
+        if cookies is not None:
+            cookies.update(cookie_werte(sitzung))
         schliesse(sitzung)
     bruch = pruefe_struktur(lauf, vorlauf)
     leer = ergebnisgrund(lauf.ergebnisse)
@@ -168,24 +178,32 @@ class _Gang:
         frist_ms: int,
         lauf: Klicklauf,
         hoechste: int,
-        ende: float | None,
+        frist: Callable[[str], bool] | None,
     ) -> None:
         self.seite, self.karte, self.tor, self.lauf = seite, karte, tor, lauf
-        self.frist_ms, self.hoechste, self.ende = frist_ms, hoechste, ende
+        self.frist_ms, self.hoechste, self.frist = frist_ms, hoechste, frist
         self.leser = Leser(seite, karte, frist_ms)
         self.wache = Wache(seite, karte, tor, lauf, frist_ms)
         self.geklickt = False
         self.nach_frist = 0
 
     def laufe(self) -> None:
-        self._oeffne()
+        try:
+            self._oeffne()
+        except Abbruch as abbruch:
+            raise self._nach_zeitgrenze(abbruch) or abbruch from None
         werte = {d: self._angebotene_werte(d) for d in DIMENSIONEN}
         besucht: set[Auswahl] = set()
         while (auswahl := naechste(werte, besucht)) is not None:
             self.wache.pruefe_tor()
             besucht.add(auswahl)
             self.geklickt = False
-            ergebnis = self._kombination(auswahl, len(besucht))
+            try:
+                ergebnis = self._kombination(auswahl, len(besucht))
+            except Abbruch as abbruch:
+                if self._nach_zeitgrenze(abbruch) is None:
+                    raise
+                ergebnis = self._nicht_besucht(variante_aus(*auswahl))
             self.lauf.ergebnisse.append(replace(ergebnis, auswahl=auswahl))
             if self.geklickt:
                 for d in DIMENSIONEN:
@@ -194,7 +212,21 @@ class _Gang:
         self.wache.pruefe_tor()
         if self.nach_frist:
             grund = f"{GRUND_ZEIT}: {self.nach_frist} Kombinationen nicht besucht"
-            raise Abbruch(LAUF_GESPERRT, grund)
+            raise Abbruch(LAUF_ZEITGRENZE, grund)
+
+    def _nach_zeitgrenze(self, abbruch: Abbruch) -> Abbruch | None:
+        """Eine Sperre bei geschlossener Frist als ``zeitgrenze``; sonst ``None``."""
+        if abbruch.status != LAUF_GESPERRT or not self._zeit_um():
+            return None
+        return Abbruch(LAUF_ZEITGRENZE, f"{GRUND_ZEIT}: {abbruch.grund}")
+
+    def _zeit_um(self) -> bool:
+        return self.frist is not None and not self.frist(self.lauf.adresse)
+
+    def _nicht_besucht(self, variante: Variante) -> Kombiergebnis:
+        self.nach_frist += 1
+        grund = f"{GRUND_NICHT_BESUCHT}: {GRUND_ZEIT}"
+        return Kombiergebnis(variante, NICHT_ERFASST, grund)
 
     def _oeffne(self) -> None:
         ziel = self.lauf.adresse
@@ -264,10 +296,6 @@ class _Gang:
         variante = variante_aus(*auswahl)
         if nummer > self.hoechste:
             grund = f"{GRUND_NICHT_BESUCHT}: mehr als {self.hoechste} Kombinationen"
-            return Kombiergebnis(variante, NICHT_ERFASST, grund)
-        if self.ende is not None and time.monotonic() >= self.ende:
-            self.nach_frist += 1
-            grund = f"{GRUND_NICHT_BESUCHT}: {GRUND_ZEIT}"
             return Kombiergebnis(variante, NICHT_ERFASST, grund)
         fehlend = [d for d in DIMENSIONEN if ziel[d] is None]
         if fehlend:
@@ -339,6 +367,8 @@ class _Gang:
         self, dimension: str, stelle: int, variante: Variante
     ) -> Kombiergebnis | None:
         self.wache.warte_offen()
+        if self._zeit_um():
+            return self._nicht_besucht(variante)
         marke = self.wache.marke()
         knopf = self.seite.locator(self.karte.knoepfe[dimension].selektor).nth(stelle)
         try:
