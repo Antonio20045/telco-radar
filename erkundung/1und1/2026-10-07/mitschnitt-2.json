@@ -299,15 +299,15 @@
   {
    "nummer": 38,
    "methode": "GET",
-   "url": "https://mobile.1und1.de/_Resources/Persistent/f51e04f9974566d6e5338412c94f39cbb59b83d7/d-t-m-img-d48240-wackelfrei-video-animation-slide.png?bust=4",
-   "art": "image",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/b015a129abe3909685c76f198806966f48351f15/icons.svg?bust=4",
+   "art": "xhr",
    "status": null,
-   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+   "abbruch": "net::ERR_ABORTED"
   },
   {
    "nummer": 39,
    "methode": "GET",
-   "url": "https://mobile.1und1.de/_Resources/Persistent/9645a512daba222c5edb94652e94d6601b03c957/d-t-m-hwd-content2-front-v4599-img-galaxy-s26.webp?bust=4",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/f51e04f9974566d6e5338412c94f39cbb59b83d7/d-t-m-img-d48240-wackelfrei-video-animation-slide.png?bust=4",
    "art": "image",
    "status": null,
    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
@@ -315,7 +315,7 @@
   {
    "nummer": 40,
    "methode": "GET",
-   "url": "https://mobile.1und1.de/_Resources/Persistent/9f2cc9b1e66c1961922b43e53715ad290e05587b/d-t-m-hwd-content2-back2-v4599-img-galaxy-s26.webp?bust=4",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/9645a512daba222c5edb94652e94d6601b03c957/d-t-m-hwd-content2-front-v4599-img-galaxy-s26.webp?bust=4",
    "art": "image",
    "status": null,
    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
@@ -323,7 +323,7 @@
   {
    "nummer": 41,
    "methode": "GET",
-   "url": "https://mobile.1und1.de/_Resources/Persistent/63c9b70861cd27e7dc4b9e580cc77fa34b930e1b/d-t-m-hwd-content-img-samsung-galaxy-s26-violet-front.webp?bust=4",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/9f2cc9b1e66c1961922b43e53715ad290e05587b/d-t-m-hwd-content2-back2-v4599-img-galaxy-s26.webp?bust=4",
    "art": "image",
    "status": null,
    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
@@ -331,7 +331,7 @@
   {
    "nummer": 42,
    "methode": "GET",
-   "url": "https://mobile.1und1.de/_Resources/Persistent/cbe71a44a9a081d018ed22392716aff79850a27c/d-t-m-ssc-content3-v4599-img-akku.webp?bust=4",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/63c9b70861cd27e7dc4b9e580cc77fa34b930e1b/d-t-m-hwd-content-img-samsung-galaxy-s26-violet-front.webp?bust=4",
    "art": "image",
    "status": null,
    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
@@ -339,10 +339,10 @@
   {
    "nummer": 43,
    "methode": "GET",
-   "url": "https://mobile.1und1.de/_Resources/Persistent/b015a129abe3909685c76f198806966f48351f15/icons.svg?bust=4",
-   "art": "xhr",
-   "status": 200,
-   "abbruch": null
+   "url": "https://mobile.1und1.de/_Resources/Persistent/cbe71a44a9a081d018ed22392716aff79850a27c/d-t-m-ssc-content3-v4599-img-akku.webp?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
   },
   {
    "nummer": 44,
@@ -427,7 +427,7 @@
   {
    "nummer": 54,
    "methode": "GET",
-   "url": "https://content.1und1.de/ctx/dh/libt.min.js?bust=2026100712",
+   "url": "https://content.1und1.de/ctx/dh/libt.min.js?bust=2026100715",
    "art": "script",
    "status": 200,
    "abbruch": null
@@ -475,7 +475,7 @@
   {
    "nummer": 60,
    "methode": "POST",
-   "url": "https://mobile.1und1.de/cdn-cgi/challenge-platform/h/g/jsd/oneshot/4df4a60fa397/0.08319912652634998:1791370838:ucV7dimT-lIecoK6gdT1Vv-IEUPH5zs5AY6uuvG6fr0/a46ccbd1e9f12ff5",
+   "url": "https://mobile.1und1.de/cdn-cgi/challenge-platform/h/g/jsd/oneshot/4df4a60fa397/0.26514088464714347:1791385240:v4M95sZ94b0hWNu89ZP_IvYg-IbMUp5cZbVsPnuPMLE/a46df9d69a1faf33",
    "art": "xhr",
    "status": null,
    "abbruch": "net::ERR_ABORTED"
@@ -499,47 +499,47 @@
   {
    "nummer": 63,
    "methode": "GET",
-   "url": "https://api.1und1.de/ctx/dh/cdn/onlineshop/prod/cdh.v.js?a=1und1%2Fonlineshop%2F202608121058&cb=1791374986282",
+   "url": "https://api.1und1.de/ctx/dh/cdn/onlineshop/prod/cdh.v.js?a=1und1%2Fonlineshop%2F202608121058&cb=1791387354795",
    "art": "script",
    "status": 200,
    "abbruch": null
   },
   {
    "nummer": 64,
-   "methode": "GET",
-   "url": "https://mobile.1und1.de/_Resources/Persistent/b24de564ee8fc2158a6218ceccf954059ba9998b/d-t-m-ssc-feature-card-1-v4599-img-samsung-galaxy-s26-796x448.webp?bust=4",
-   "art": "image",
-   "status": null,
-   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+   "methode": "POST",
+   "url": "https://api.1und1.de/ctx/dh/cs/event",
+   "art": "xhr",
+   "status": 200,
+   "abbruch": null
   },
   {
    "nummer": 65,
    "methode": "GET",
-   "url": "https://mobile.1und1.de/_Resources/Persistent/b3c565607df4873259735ce88cf6984fd16836cc/d-t-m-ssc-feature-card-2-v4599-img-samsung-galaxy-s26-796x448.webp?bust=4",
-   "art": "image",
-   "status": null,
-   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+   "url": "https://cdn.appdynamics.com/adrum/adrum-latest.js",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
   },
   {
    "nummer": 66,
    "methode": "GET",
-   "url": "https://mobile.1und1.de/_Resources/Persistent/7728cc3685786344206173f565a60dbc6aef6d6c/d-t-m-ssc-feature-card-3-v4599-img-samsung-galaxy-s26-796x448.webp?bust=4",
-   "art": "image",
-   "status": null,
-   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+   "url": "https://cdn.appdynamics.com/adrum-ext.b5670ee02cea89158a710705f2152002.js",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
   },
   {
    "nummer": 67,
    "methode": "GET",
-   "url": "https://mobile.1und1.de/_Resources/Persistent/34f005c556b75e38295623dd5cdc2d057e405cd4/69ef99608afaf268d81a2623007b0dae-img-award-chip-galaxy-s26-sehr-gut.png?bust=4",
-   "art": "image",
+   "url": "https://cdn.appdynamics.com/adrum-xd.b5670ee02cea89158a710705f2152002.html",
+   "art": "document",
    "status": null,
-   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT"
   },
   {
    "nummer": 68,
    "methode": "GET",
-   "url": "https://mobile.1und1.de/_Resources/Persistent/e4726df72e1519d85c1d0bb21a19ffb44d6e17a0/a82c4452a5f09dd8691cde567d40840b-img-award-comp-bild-galaxy-s26-sehr-gut.png?bust=4",
+   "url": "https://mobile.1und1.de/frontend/product-details/images/hwd-first-visit/d-android-hwd-configurator-d44811-optimiert-img-info-zum-eins-und-eins-einfachwechsel.svg",
    "art": "image",
    "status": null,
    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
@@ -547,7 +547,39 @@
   {
    "nummer": 69,
    "methode": "GET",
-   "url": "https://mobile.1und1.de/_Resources/Persistent/0782a112c6be0492e06cc0b84da30699ae12e655/09e1309a408d9f97decf0ce708fa6842-award-d48539-img-connect-samsung-galaxy-s26-sehr-gut.png?bust=4",
+   "url": "https://mobile.1und1.de/_catalog/images/c7671e327ea0c1e6fbb095d579fc9a1c-img-samsung-galaxy-s26-violet-duo-1.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 70,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/1cd29eb62dedca4c2b5d118e2bfea17e-img-samsung-galaxy-s26-violet-back~235x470.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 71,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/0652976f22e7986c6837768980b7bc1c-img-samsung-galaxy-s26-violet-rechts.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 72,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/53ac3ab433514823fc527a02cbd82a19-img-samsung-galaxy-s26-violet-front-badge-1.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 73,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/84aec9cc5f440c9900f1c4ea274b244e-img-samsung-galaxy-s26-violet-side.png",
    "art": "image",
    "status": null,
    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
@@ -563,7 +595,7 @@
    "typ": "application/json",
    "groesse": 266,
    "gekuerzt": false,
-   "koerper": "{\"requestId\":\"088ba652-619e-477e-8513-62a724cbb47a\",\"accessToken\":\"ENTFERNT\",\"channels\":[{\"channelType\":\"CHAT\",\"available\":false,\"description\":null,\"chatEnvironment\":\"prod-euc1\",\"chatDeploymentId\":\"59ba7a17-2146-40f0-b02a-b833655edb41\"}]}"
+   "koerper": "{\"requestId\":\"db5b85f5-60c6-434e-b470-31d68223a183\",\"accessToken\":\"ENTFERNT\",\"channels\":[{\"channelType\":\"CHAT\",\"available\":false,\"description\":null,\"chatEnvironment\":\"prod-euc1\",\"chatDeploymentId\":\"59ba7a17-2146-40f0-b02a-b833655edb41\"}]}"
   },
   {
    "nummer": 58,
@@ -572,12 +604,23 @@
    "art": "fetch",
    "status": 200,
    "typ": "application/json",
-   "groesse": 265,
+   "groesse": 266,
    "gekuerzt": false,
-   "koerper": "{\"requestId\":\"51b2f55f-6d3e-4835-89a5-07e16f48490a\",\"accessToken\":\"ENTFERNT\",\"channels\":[{\"channelType\":\"CHAT\",\"available\":true,\"description\":null,\"chatEnvironment\":\"prod-euc1\",\"chatDeploymentId\":\"7906e3b6-6f61-4ba1-9d44-de7d69af4a2c\"}]}"
+   "koerper": "{\"requestId\":\"792a063e-87e9-46bf-bbcc-15d879d10adf\",\"accessToken\":\"ENTFERNT\",\"channels\":[{\"channelType\":\"CHAT\",\"available\":false,\"description\":null,\"chatEnvironment\":\"prod-euc1\",\"chatDeploymentId\":\"7906e3b6-6f61-4ba1-9d44-de7d69af4a2c\"}]}"
   },
   {
    "nummer": 61,
+   "methode": "POST",
+   "url": "https://api.1und1.de/ctx/dh/cs/event",
+   "art": "xhr",
+   "status": 200,
+   "typ": "application/json",
+   "groesse": 0,
+   "gekuerzt": false,
+   "koerper": ""
+  },
+  {
+   "nummer": 64,
    "methode": "POST",
    "url": "https://api.1und1.de/ctx/dh/cs/event",
    "art": "xhr",

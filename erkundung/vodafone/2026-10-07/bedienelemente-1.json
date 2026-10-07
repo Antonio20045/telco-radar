@@ -1232,8 +1232,8 @@
     "farbe": 0.0
    },
    "elemente": [
-    134,
-    135
+    133,
+    134
    ],
    "select": false,
    "mit_marke": false
@@ -1250,7 +1250,7 @@
     "farbe": 0.0
    },
    "elemente": [
-    136,
+    135,
     393
    ],
    "select": false,
@@ -1268,8 +1268,8 @@
     "farbe": 0.0
    },
    "elemente": [
-    137,
-    138
+    136,
+    137
    ],
    "select": false,
    "mit_marke": false
@@ -6003,33 +6003,6 @@
    "behaelter": null
   },
   {
-   "tag": "button",
-   "rolle": "button",
-   "text": "",
-   "aria": {
-    "aria-label": "Overlay schließen"
-   },
-   "daten": {},
-   "id": null,
-   "klassen": [
-    "ws10-button-icon-only",
-    "ws10-button-icon-only--tertiary-floating",
-    "ws10-button-icon-only--circle",
-    "ws10-button-icon-only--standard"
-   ],
-   "name": null,
-   "wert": null,
-   "typ": null,
-   "href": null,
-   "ziel": null,
-   "pfad": "#flyout-overlay > dialog:nth-of-type(1) > div:nth-of-type(1) > button:nth-of-type(1)",
-   "sichtbar": false,
-   "deaktiviert": false,
-   "gewaehlt": null,
-   "optionen": null,
-   "behaelter": null
-  },
-  {
    "tag": "div",
    "rolle": "button",
    "text": "",
@@ -6147,6 +6120,33 @@
    "gewaehlt": null,
    "optionen": null,
    "behaelter": 68
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-label": "Overlay schließen"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "ws10-button-icon-only",
+    "ws10-button-icon-only--tertiary-floating",
+    "ws10-button-icon-only--circle",
+    "ws10-button-icon-only--standard"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#flyout-overlay > dialog:nth-of-type(1) > div:nth-of-type(1) > button:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": null
   },
   {
    "tag": "button",

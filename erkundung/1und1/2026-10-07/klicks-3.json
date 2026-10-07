@@ -1,7 +1,41 @@
 {
  "einwilligung": {
-  "geklickt": null,
-  "grund": "kein Ablehnen-Knopf sichtbar"
+  "geklickt": "Ablehnen",
+  "ruhe": true,
+  "anfragen": [
+   {
+    "nummer": 58,
+    "methode": "POST",
+    "url": "https://api.1und1.de/ctx/dh/cs/event",
+    "art": "xhr",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 59,
+    "methode": "GET",
+    "url": "https://cdn.appdynamics.com/adrum/adrum-latest.js",
+    "art": "script",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 60,
+    "methode": "GET",
+    "url": "https://cdn.appdynamics.com/adrum-ext.b5670ee02cea89158a710705f2152002.js",
+    "art": "script",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 61,
+    "methode": "GET",
+    "url": "https://cdn.appdynamics.com/adrum-xd.b5670ee02cea89158a710705f2152002.html",
+    "art": "document",
+    "status": null,
+    "abbruch": "net::ERR_BLOCKED_BY_CLIENT"
+   }
+  ]
  },
  "vermerk": "Folgeseite: keine Klick-Proben",
  "proben": []

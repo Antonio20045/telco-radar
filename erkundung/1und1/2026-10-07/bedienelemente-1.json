@@ -824,7 +824,7 @@
   {
    "nummer": 44,
    "pfad": "body > aside:nth-of-type(2)",
-   "name": "2026-10-07T14:06:59.559",
+   "name": "2026-10-07T17:32:16.754",
    "art": "unbekannt",
    "anteile": {
     "speicher": 0.0,
@@ -4348,7 +4348,8 @@
     "btn-secondary",
     "btn-secondary-dark",
     "btn--small",
-    "navigation__chat"
+    "navigation__chat",
+    "d-none"
    ],
    "name": null,
    "wert": null,
@@ -4356,7 +4357,7 @@
    "href": null,
    "ziel": null,
    "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > button:nth-of-type(2)",
-   "sichtbar": true,
+   "sichtbar": false,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
@@ -5813,7 +5814,7 @@
   {
    "tag": "div",
    "rolle": "button",
-   "text": "1",
+   "text": "",
    "aria": {
     "aria-label": "Flyout öffnen"
    },
@@ -5906,6 +5907,7 @@
    "klassen": [
     "contact-bubble__icon-text",
     "bg-secondary-100",
+    "d-none",
     "contact-bubble__button--transparent"
    ],
    "name": null,
@@ -5932,8 +5934,7 @@
    "klassen": [
     "contact-bubble__icon-text",
     "disabled",
-    "contact-bubble__button--transparent",
-    "d-none"
+    "contact-bubble__button--transparent"
    ],
    "name": null,
    "wert": null,
@@ -8551,7 +8552,7 @@
    "href": null,
    "ziel": null,
    "pfad": "#cw-headline",
-   "sichtbar": true,
+   "sichtbar": false,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
@@ -8571,7 +8572,7 @@
    "href": null,
    "ziel": null,
    "pfad": "#consent-wall > div:nth-of-type(2) > p:nth-of-type(1)",
-   "sichtbar": true,
+   "sichtbar": false,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
@@ -8595,7 +8596,7 @@
    "href": null,
    "ziel": null,
    "pfad": "#consent_wall_optout",
-   "sichtbar": true,
+   "sichtbar": false,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
@@ -8619,7 +8620,7 @@
    "href": null,
    "ziel": null,
    "pfad": "#consent_wall_optin",
-   "sichtbar": true,
+   "sichtbar": false,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
@@ -16061,7 +16062,7 @@
    "href": "javascript:",
    "ziel": null,
    "pfad": "#consent_wall_details",
-   "sichtbar": true,
+   "sichtbar": false,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
@@ -16085,7 +16086,7 @@
    "href": "https://unternehmen.1und1.de/impressum/",
    "ziel": "_blank",
    "pfad": "#imprintLinkb",
-   "sichtbar": true,
+   "sichtbar": false,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
@@ -16109,7 +16110,7 @@
    "href": "https://www.1und1.de/Datenschutz",
    "ziel": "_blank",
    "pfad": "#privacypolicyLinkb",
-   "sichtbar": true,
+   "sichtbar": false,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
@@ -16133,7 +16134,7 @@
    "href": "https://www.1und1.de/Cookie-Einstellungen",
    "ziel": "_blank",
    "pfad": "#cookieLink",
-   "sichtbar": true,
+   "sichtbar": false,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,

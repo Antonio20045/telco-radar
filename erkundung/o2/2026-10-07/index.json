@@ -9,7 +9,7 @@
  "robots_gelesen": true,
  "abstand_sekunden": 2.0,
  "besuchszeit": null,
- "dauer_sekunden": 305.0,
+ "dauer_sekunden": 747.9,
  "zeitgrenze_sekunden": 3000,
  "seiten": [
   {
@@ -27,24 +27,26 @@
     "bedienelemente": "bedienelemente-1.json",
     "preise": "preise-1.json",
     "klicks": "klicks-1.json",
+    "karte": "karte-1.json",
     "mitschnitt": "mitschnitt-1.json",
     "screenshot": "seite-1.png",
     "html": "seite-1.html.gz"
    },
    "zaehlung": {
-    "anfragen": 139,
+    "anfragen": 140,
     "verworfen": 4,
     "gescheitert": 0,
+    "hilfsdateien": 0,
     "mitschnitt": 4,
-    "elemente": 315,
+    "elemente": 325,
     "gruppen_je_art": {
-     "tarif": 10,
+     "tarif": 17,
      "farbe": 46,
-     "unbekannt": 50,
+     "unbekannt": 49,
      "speicher": 1,
      "laufzeit": 2
     },
-    "preis_kandidaten": 80,
+    "preis_kandidaten": 83,
     "klicks": 7
    },
    "verworfen": [
@@ -57,15 +59,34 @@
      "grund": "per robots.txt gesperrt: /assets/code/tracking/vertrag-kuendigen-js-code"
     },
     {
-     "url": "https://static.trbo.com/assets/trbo-icons.css",
-     "grund": "per robots.txt gesperrt: /assets/trbo-icons.css"
-    },
-    {
      "url": "https://config.eu.usercentrics.eu/settings/2BGLbVtv/latest/languages.json",
      "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://static.trbo.com/assets/trbo-icons.css",
+     "grund": "per robots.txt gesperrt: /assets/trbo-icons.css"
     }
    ],
-   "gescheitert": []
+   "gescheitert": [],
+   "hilfsdateien": [],
+   "karte": {
+    "status": "gelaufen",
+    "karte": "o2.yaml",
+    "grund": null,
+    "datei": "karte-1.json",
+    "laufstatus": "gelesen",
+    "bot_schutz": false,
+    "zaehlung": {
+     "kombinationen": 8,
+     "erfasst": 0,
+     "nicht_angeboten": 0,
+     "nicht_erfasst": 0,
+     "befund": 8,
+     "nicht_besucht": 0,
+     "verworfen": 4,
+     "gescheitert": 0
+    }
+   }
   },
   {
    "nummer": 2,
@@ -82,24 +103,26 @@
     "bedienelemente": "bedienelemente-2.json",
     "preise": "preise-2.json",
     "klicks": "klicks-2.json",
+    "karte": "karte-2.json",
     "mitschnitt": "mitschnitt-2.json",
     "screenshot": "seite-2.png",
     "html": "seite-2.html.gz"
    },
    "zaehlung": {
-    "anfragen": 138,
+    "anfragen": 139,
     "verworfen": 4,
     "gescheitert": 0,
+    "hilfsdateien": 0,
     "mitschnitt": 5,
-    "elemente": 327,
+    "elemente": 332,
     "gruppen_je_art": {
      "tarif": 17,
      "farbe": 46,
-     "unbekannt": 49,
+     "unbekannt": 52,
      "speicher": 2,
      "laufzeit": 2
     },
-    "preis_kandidaten": 80,
+    "preis_kandidaten": 84,
     "klicks": 8
    },
    "verworfen": [
@@ -120,10 +143,29 @@
      "grund": "robots.txt nicht lesbar (HTTP 403)"
     }
    ],
-   "gescheitert": []
+   "gescheitert": [],
+   "hilfsdateien": [],
+   "karte": {
+    "status": "gelaufen",
+    "karte": "o2.yaml",
+    "grund": null,
+    "datei": "karte-2.json",
+    "laufstatus": "gelesen",
+    "bot_schutz": false,
+    "zaehlung": {
+     "kombinationen": 16,
+     "erfasst": 0,
+     "nicht_angeboten": 0,
+     "nicht_erfasst": 4,
+     "befund": 12,
+     "nicht_besucht": 4,
+     "verworfen": 4,
+     "gescheitert": 0
+    }
+   }
   }
  ],
- "groesse_bytes": 2837940,
+ "groesse_bytes": 2894688,
  "groessengrenze_bytes": 8000000,
  "gekuerzt": []
 }

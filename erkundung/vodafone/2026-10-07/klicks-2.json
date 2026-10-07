@@ -4,7 +4,7 @@
   "ruhe": true,
   "anfragen": [
    {
-    "nummer": 214,
+    "nummer": 220,
     "methode": "POST",
     "url": "https://fc.vodafone.de/op/vfde-web/info?attributes=&notifications=&permissions=&identifiers=&nbidentifiers=&out=json",
     "art": "xhr",
@@ -12,7 +12,7 @@
     "abbruch": null
    },
    {
-    "nummer": 215,
+    "nummer": 221,
     "methode": "POST",
     "url": "https://collect.vodafone.de/vodafone/de-main/2/i.gif",
     "art": "ping",
@@ -20,7 +20,7 @@
     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
    },
    {
-    "nummer": 216,
+    "nummer": 222,
     "methode": "GET",
     "url": "https://cdn.dimml.io/dimml.js",
     "art": "script",
@@ -28,7 +28,7 @@
     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
    },
    {
-    "nummer": 217,
+    "nummer": 223,
     "methode": "GET",
     "url": "https://tags.vodafone.de/de-main/prod/utag.954.js?utv=ut4.53.202609301401",
     "art": "script",
@@ -36,7 +36,7 @@
     "abbruch": null
    },
    {
-    "nummer": 218,
+    "nummer": 224,
     "methode": "POST",
     "url": "https://collect.vodafone.de/vodafone/de-main-cdp/2/i.gif",
     "art": "xhr",
@@ -44,23 +44,15 @@
     "abbruch": null
    },
    {
-    "nummer": 219,
+    "nummer": 225,
     "methode": "GET",
-    "url": "https://visitor-service.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791375608007",
+    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791388330801",
     "art": "script",
     "status": 200,
     "abbruch": null
    },
    {
-    "nummer": 220,
-    "methode": "GET",
-    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791375608408",
-    "art": "script",
-    "status": 200,
-    "abbruch": null
-   },
-   {
-    "nummer": 221,
+    "nummer": 226,
     "methode": "POST",
     "url": "https://at.vodafone.de/rest/v1/delivery?client=vodafonegroupservice&sessionId=ENTFERNT&version=2.6.1",
     "art": "xhr",
@@ -68,49 +60,9 @@
     "abbruch": null
    },
    {
-    "nummer": 222,
-    "methode": "GET",
-    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791375608969",
-    "art": "script",
-    "status": 200,
-    "abbruch": null
-   },
-   {
-    "nummer": 223,
-    "methode": "GET",
-    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791375609753",
-    "art": "script",
-    "status": 200,
-    "abbruch": null
-   },
-   {
-    "nummer": 224,
-    "methode": "GET",
-    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791375610851",
-    "art": "script",
-    "status": 200,
-    "abbruch": null
-   },
-   {
-    "nummer": 225,
-    "methode": "GET",
-    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791375612387",
-    "art": "script",
-    "status": 200,
-    "abbruch": null
-   },
-   {
-    "nummer": 226,
-    "methode": "GET",
-    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791375614539",
-    "art": "script",
-    "status": 200,
-    "abbruch": null
-   },
-   {
     "nummer": 227,
     "methode": "GET",
-    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791375617551",
+    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791388331201",
     "art": "script",
     "status": 200,
     "abbruch": null
@@ -118,7 +70,55 @@
    {
     "nummer": 228,
     "methode": "GET",
-    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791375621767",
+    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791388331762",
+    "art": "script",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 229,
+    "methode": "GET",
+    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791388332546",
+    "art": "script",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 230,
+    "methode": "GET",
+    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791388333644",
+    "art": "script",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 231,
+    "methode": "GET",
+    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791388335180",
+    "art": "script",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 232,
+    "methode": "GET",
+    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791388337332",
+    "art": "script",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 233,
+    "methode": "GET",
+    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791388340344",
+    "art": "script",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 234,
+    "methode": "GET",
+    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791388344560",
     "art": "script",
     "status": 200,
     "abbruch": null
@@ -139,7 +139,7 @@
    "ruhe": true,
    "anfragen": [
     {
-     "nummer": 229,
+     "nummer": 235,
      "methode": "GET",
      "url": "https://www.vodafone.de/simplicity/icons/delivery.svg",
      "art": "other",
@@ -147,7 +147,7 @@
      "abbruch": null
     },
     {
-     "nummer": 230,
+     "nummer": 236,
      "methode": "GET",
      "url": "https://www.vodafone.de/simplicity/icons/mobile-info.svg",
      "art": "other",
@@ -155,7 +155,7 @@
      "abbruch": null
     },
     {
-     "nummer": 231,
+     "nummer": 237,
      "methode": "GET",
      "url": "https://www.vodafone.de/simplicity/icons/chevron-down.svg",
      "art": "other",
@@ -163,7 +163,7 @@
      "abbruch": null
     },
     {
-     "nummer": 232,
+     "nummer": 238,
      "methode": "GET",
      "url": "https://www.vodafone.de/simplicity/icons/screen-size.svg",
      "art": "other",
@@ -171,7 +171,7 @@
      "abbruch": null
     },
     {
-     "nummer": 233,
+     "nummer": 239,
      "methode": "GET",
      "url": "https://www.vodafone.de/simplicity/icons/camera.svg",
      "art": "other",
@@ -179,7 +179,7 @@
      "abbruch": null
     },
     {
-     "nummer": 234,
+     "nummer": 240,
      "methode": "GET",
      "url": "https://www.vodafone.de/simplicity/icons/e-sim.svg",
      "art": "other",
@@ -187,7 +187,7 @@
      "abbruch": null
     },
     {
-     "nummer": 235,
+     "nummer": 241,
      "methode": "GET",
      "url": "https://www.vodafone.de/simplicity/icons/sim.svg",
      "art": "other",
@@ -195,7 +195,7 @@
      "abbruch": null
     },
     {
-     "nummer": 236,
+     "nummer": 242,
      "methode": "GET",
      "url": "https://www.vodafone.de/simplicity/icons/connectivity.svg",
      "art": "other",
@@ -203,7 +203,7 @@
      "abbruch": null
     },
     {
-     "nummer": 237,
+     "nummer": 243,
      "methode": "GET",
      "url": "https://www.vodafone.de/simplicity/icons/touch-screen.svg",
      "art": "other",
@@ -211,7 +211,7 @@
      "abbruch": null
     },
     {
-     "nummer": 238,
+     "nummer": 244,
      "methode": "GET",
      "url": "https://www.vodafone.de/simplicity/icons/box.svg",
      "art": "other",
@@ -219,7 +219,7 @@
      "abbruch": null
     },
     {
-     "nummer": 239,
+     "nummer": 245,
      "methode": "GET",
      "url": "https://www.vodafone.de/simplicity/icons/favorite.svg",
      "art": "other",
@@ -227,7 +227,7 @@
      "abbruch": null
     },
     {
-     "nummer": 240,
+     "nummer": 246,
      "methode": "GET",
      "url": "https://www.vodafone.de/simplicity/icons/sync.svg",
      "art": "other",
@@ -235,7 +235,7 @@
      "abbruch": null
     },
     {
-     "nummer": 241,
+     "nummer": 247,
      "methode": "GET",
      "url": "https://www.vodafone.de/media/img/products/NSF-288x320/s26-violet-288x320-01.png",
      "art": "image",
@@ -243,7 +243,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 242,
+     "nummer": 248,
      "methode": "GET",
      "url": "https://www.vodafone.de/media/img/products/NSF-288x320/s26-violet-288x320-02.png",
      "art": "image",
@@ -251,7 +251,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 243,
+     "nummer": 249,
      "methode": "GET",
      "url": "https://www.vodafone.de/media/img/products/NSF-288x320/s26-violet-288x320-03.png",
      "art": "image",
@@ -259,7 +259,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 244,
+     "nummer": 250,
      "methode": "GET",
      "url": "https://www.vodafone.de/media/img/chargerIncluded/charger-not-included.svg",
      "art": "image",
@@ -267,7 +267,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 245,
+     "nummer": 251,
      "methode": "GET",
      "url": "https://www.vodafone.de/media/img/products/compatibleCharger/s26-charger.svg",
      "art": "image",
@@ -275,7 +275,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 246,
+     "nummer": 252,
      "methode": "GET",
      "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/01.jpg",
      "art": "image",
@@ -283,7 +283,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 247,
+     "nummer": 253,
      "methode": "GET",
      "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/award_S26_1.png",
      "art": "image",
@@ -291,7 +291,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 248,
+     "nummer": 254,
      "methode": "GET",
      "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/award_S26_2.png",
      "art": "image",
@@ -299,7 +299,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 249,
+     "nummer": 255,
      "methode": "GET",
      "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/11.jpg",
      "art": "image",
@@ -307,7 +307,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 250,
+     "nummer": 256,
      "methode": "GET",
      "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/02.jpg",
      "art": "image",
@@ -315,7 +315,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 251,
+     "nummer": 257,
      "methode": "GET",
      "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/03.jpg",
      "art": "image",
@@ -323,7 +323,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 252,
+     "nummer": 258,
      "methode": "GET",
      "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/04.jpg",
      "art": "image",
@@ -331,7 +331,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 253,
+     "nummer": 259,
      "methode": "GET",
      "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/05.jpg",
      "art": "image",
@@ -339,7 +339,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 254,
+     "nummer": 260,
      "methode": "GET",
      "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/06.jpg",
      "art": "image",
@@ -347,7 +347,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 255,
+     "nummer": 261,
      "methode": "GET",
      "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/07.jpg",
      "art": "image",
@@ -355,7 +355,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 256,
+     "nummer": 262,
      "methode": "GET",
      "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/08.jpg",
      "art": "image",
@@ -363,7 +363,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 257,
+     "nummer": 263,
      "methode": "GET",
      "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/09.jpg",
      "art": "image",
@@ -371,7 +371,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 258,
+     "nummer": 264,
      "methode": "GET",
      "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/10.jpg",
      "art": "image",
@@ -379,7 +379,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 259,
+     "nummer": 265,
      "methode": "GET",
      "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/12.jpg",
      "art": "image",
@@ -387,7 +387,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 260,
+     "nummer": 266,
      "methode": "GET",
      "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/13.jpg",
      "art": "image",
@@ -395,7 +395,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 261,
+     "nummer": 267,
      "methode": "GET",
      "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/14.jpg",
      "art": "image",
@@ -403,7 +403,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 262,
+     "nummer": 268,
      "methode": "GET",
      "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/15.jpg",
      "art": "image",
@@ -411,7 +411,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 263,
+     "nummer": 269,
      "methode": "GET",
      "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/16.jpg",
      "art": "image",
@@ -419,7 +419,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 264,
+     "nummer": 270,
      "methode": "GET",
      "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/17.jpg",
      "art": "image",
@@ -427,7 +427,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 265,
+     "nummer": 271,
      "methode": "GET",
      "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/18.jpg",
      "art": "image",
@@ -435,7 +435,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 266,
+     "nummer": 272,
      "methode": "GET",
      "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/19.jpg",
      "art": "image",
@@ -443,7 +443,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 267,
+     "nummer": 273,
      "methode": "GET",
      "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/20.jpg",
      "art": "image",
@@ -451,7 +451,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 268,
+     "nummer": 274,
      "methode": "GET",
      "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/22.jpg",
      "art": "image",
@@ -459,7 +459,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 269,
+     "nummer": 275,
      "methode": "GET",
      "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/thumb_S26.jpg",
      "art": "image",
@@ -467,7 +467,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 270,
+     "nummer": 276,
      "methode": "GET",
      "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/thumb_S25.jpg",
      "art": "image",
@@ -475,7 +475,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 271,
+     "nummer": 277,
      "methode": "GET",
      "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/thumb_S24.jpg",
      "art": "image",
@@ -483,7 +483,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 272,
+     "nummer": 278,
      "methode": "GET",
      "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/ic_camera.png",
      "art": "image",
@@ -491,7 +491,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 273,
+     "nummer": 279,
      "methode": "GET",
      "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/ic_battery.png",
      "art": "image",
@@ -499,7 +499,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 274,
+     "nummer": 280,
      "methode": "GET",
      "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/ic_ai.png",
      "art": "image",
@@ -507,7 +507,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 275,
+     "nummer": 281,
      "methode": "GET",
      "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/ic_processor.png",
      "art": "image",
@@ -515,7 +515,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 276,
+     "nummer": 282,
      "methode": "GET",
      "url": "https://www.vodafone.de/media/img/teaser/re-trade-mt-1248x600-dt.jpg",
      "art": "image",
@@ -523,7 +523,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 277,
+     "nummer": 283,
      "methode": "GET",
      "url": "https://www.vodafone.de/media/img/teaser/ELEKTROGERATE-RUCKNAHME-mt-1248x600-dt.png",
      "art": "image",
@@ -531,7 +531,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 278,
+     "nummer": 284,
      "methode": "GET",
      "url": "https://www.vodafone.de/media/img/teaser/BATTERIE-RUCKNAHME-Edited-mt-1248x600-dt.jpg",
      "art": "image",
@@ -539,7 +539,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 279,
+     "nummer": 285,
      "methode": "GET",
      "url": "https://www.vodafone.de/media/img/teaser/Imagery-mt-1248x600-dt.jpg",
      "art": "image",
@@ -547,7 +547,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 280,
+     "nummer": 286,
      "methode": "POST",
      "url": "https://collect.vodafone.de/vodafone/de-main/2/i.gif",
      "art": "ping",
@@ -555,7 +555,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 281,
+     "nummer": 287,
      "methode": "POST",
      "url": "https://collect.vodafone.de/vodafone/de-main-cdp/2/i.gif",
      "art": "ping",
@@ -563,57 +563,9 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 282,
-     "methode": "GET",
-     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791375625477",
-     "art": "script",
-     "status": 200,
-     "abbruch": null
-    },
-    {
-     "nummer": 283,
-     "methode": "GET",
-     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791375625878",
-     "art": "script",
-     "status": 200,
-     "abbruch": null
-    },
-    {
-     "nummer": 284,
-     "methode": "GET",
-     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791375626438",
-     "art": "script",
-     "status": 200,
-     "abbruch": null
-    },
-    {
-     "nummer": 285,
-     "methode": "GET",
-     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791375627223",
-     "art": "script",
-     "status": 200,
-     "abbruch": null
-    },
-    {
-     "nummer": 286,
-     "methode": "GET",
-     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791375628321",
-     "art": "script",
-     "status": 200,
-     "abbruch": null
-    },
-    {
-     "nummer": 287,
-     "methode": "GET",
-     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791375629857",
-     "art": "script",
-     "status": 200,
-     "abbruch": null
-    },
-    {
      "nummer": 288,
      "methode": "GET",
-     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791375632009",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791388349702",
      "art": "script",
      "status": 200,
      "abbruch": null
@@ -621,7 +573,7 @@
     {
      "nummer": 289,
      "methode": "GET",
-     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791375635021",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791388350102",
      "art": "script",
      "status": 200,
      "abbruch": null
@@ -629,7 +581,7 @@
     {
      "nummer": 290,
      "methode": "GET",
-     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791375639237",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791388350663",
      "art": "script",
      "status": 200,
      "abbruch": null
@@ -637,7 +589,55 @@
     {
      "nummer": 291,
      "methode": "GET",
-     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791375645141",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791388351447",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 292,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791388352545",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 293,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791388354082",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 294,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791388356233",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 295,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791388359245",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 296,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791388363462",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 297,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791388369365",
      "art": "script",
      "status": 200,
      "abbruch": null

@@ -3,7 +3,7 @@
   {
    "nummer": 1,
    "methode": "GET",
-   "url": "https://mobile.1und1.de/iphone-17-pro",
+   "url": "https://mobile.1und1.de[Cookie entfernt]",
    "art": "document",
    "status": 200,
    "abbruch": null
@@ -339,7 +339,7 @@
   {
    "nummer": 43,
    "methode": "GET",
-   "url": "https://content.1und1.de/ctx/dh/libt.min.js?bust=2026100712",
+   "url": "https://content.1und1.de/ctx/dh/libt.min.js?bust=2026100715",
    "art": "script",
    "status": 200,
    "abbruch": null
@@ -362,14 +362,6 @@
   },
   {
    "nummer": 46,
-   "methode": "GET",
-   "url": "https://api.1und1.de/ctx/dh/cdn/onlineshop/prod/cdh.js",
-   "art": "script",
-   "status": 200,
-   "abbruch": null
-  },
-  {
-   "nummer": 47,
    "methode": "POST",
    "url": "https://api.1und1.de/genesys/channelroutingservice/request/productline",
    "art": "fetch",
@@ -377,7 +369,23 @@
    "abbruch": null
   },
   {
+   "nummer": 47,
+   "methode": "GET",
+   "url": "https://api.1und1.de/ctx/dh/cdn/onlineshop/prod/cdh.js",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
    "nummer": 48,
+   "methode": "POST",
+   "url": "https://mobile.1und1.de/cdn-cgi/challenge-platform/h/g/jsd/oneshot/4df4a60fa397/0.26514088464714347:1791385240:v4M95sZ94b0hWNu89ZP_IvYg-IbMUp5cZbVsPnuPMLE/a46df7fe5c4c2c33",
+   "art": "xhr",
+   "status": null,
+   "abbruch": "net::ERR_ABORTED"
+  },
+  {
+   "nummer": 49,
    "methode": "POST",
    "url": "https://api.1und1.de/ctx/dh/cs/event",
    "art": "xhr",
@@ -385,7 +393,7 @@
    "abbruch": null
   },
   {
-   "nummer": 49,
+   "nummer": 50,
    "methode": "GET",
    "url": "https://content.1und1.de/fonts/1und1-web-sans-77-90-black-condensed.woff2",
    "art": "font",
@@ -393,15 +401,15 @@
    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
   },
   {
-   "nummer": 50,
+   "nummer": 51,
    "methode": "GET",
-   "url": "https://api.1und1.de/ctx/dh/cdn/onlineshop/prod/cdh.v.js?a=1und1%2Fonlineshop%2F202608121058&cb=1791374931965",
+   "url": "https://api.1und1.de/ctx/dh/cdn/onlineshop/prod/cdh.v.js?a=1und1%2Fonlineshop%2F202608121058&cb=1791387279095",
    "art": "script",
    "status": 200,
    "abbruch": null
   },
   {
-   "nummer": 51,
+   "nummer": 52,
    "methode": "GET",
    "url": "https://content.1und1.de/fonts/1und1-web-sans-57-condensed.woff2",
    "art": "font",
@@ -409,7 +417,7 @@
    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
   },
   {
-   "nummer": 52,
+   "nummer": 53,
    "methode": "GET",
    "url": "https://content.1und1.de/fonts/1und1-web-sans-77-black-condensed.woff2",
    "art": "font",
@@ -417,7 +425,7 @@
    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
   },
   {
-   "nummer": 53,
+   "nummer": 54,
    "methode": "GET",
    "url": "https://content.1und1.de/fonts/1und1-web-sans-87-extra-black-condensed.woff2",
    "art": "font",
@@ -425,7 +433,7 @@
    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
   },
   {
-   "nummer": 54,
+   "nummer": 55,
    "methode": "GET",
    "url": "https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495",
    "art": "script",
@@ -433,15 +441,15 @@
    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
   },
   {
-   "nummer": 55,
-   "methode": "GET",
-   "url": "https://mobile.1und1.de/cdn-cgi/challenge-platform/scripts/jsd/main.js",
-   "art": "script",
+   "nummer": 56,
+   "methode": "POST",
+   "url": "https://mobile.1und1.de/cdn-cgi/challenge-platform/h/g/jsd/oneshot/4df4a60fa397/0.26514088464714347:1791385240:v4M95sZ94b0hWNu89ZP_IvYg-IbMUp5cZbVsPnuPMLE/a46df8dd6ce62c33",
+   "art": "xhr",
    "status": 200,
    "abbruch": null
   },
   {
-   "nummer": 56,
+   "nummer": 57,
    "methode": "GET",
    "url": "https://mobile.1und1.de/_Resources/Persistent/b015a129abe3909685c76f198806966f48351f15/icons.svg?bust=4",
    "art": "xhr",
@@ -449,23 +457,47 @@
    "abbruch": "net::ERR_ABORTED"
   },
   {
-   "nummer": 57,
-   "methode": "POST",
-   "url": "https://mobile.1und1.de/cdn-cgi/challenge-platform/h/g/jsd/oneshot/4df4a60fa397/0.08319912652634998:1791370838:ucV7dimT-lIecoK6gdT1Vv-IEUPH5zs5AY6uuvG6fr0/a46cca80adcf7c56",
-   "art": "xhr",
-   "status": null,
-   "abbruch": "net::ERR_ABORTED"
-  },
-  {
    "nummer": 58,
    "methode": "POST",
-   "url": "https://mobile.1und1.de/cdn-cgi/challenge-platform/h/g/jsd/oneshot/4df4a60fa397/0.08319912652634998:1791370838:ucV7dimT-lIecoK6gdT1Vv-IEUPH5zs5AY6uuvG6fr0/a46ccb2c59587c56",
+   "url": "https://api.1und1.de/ctx/dh/cs/event",
    "art": "xhr",
-   "status": null,
-   "abbruch": "net::ERR_ABORTED"
+   "status": 200,
+   "abbruch": null
   },
   {
    "nummer": 59,
+   "methode": "GET",
+   "url": "https://cdn.appdynamics.com/adrum/adrum-latest.js",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 60,
+   "methode": "GET",
+   "url": "https://cdn.appdynamics.com/adrum-ext.b5670ee02cea89158a710705f2152002.js",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 61,
+   "methode": "GET",
+   "url": "https://cdn.appdynamics.com/adrum-xd.b5670ee02cea89158a710705f2152002.html",
+   "art": "document",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT"
+  },
+  {
+   "nummer": 62,
+   "methode": "POST",
+   "url": "https://mobile.1und1.de/frontend/cart-facade/add",
+   "art": "xhr",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 63,
    "methode": "GET",
    "url": "https://mobile.1und1.de/_Resources/Persistent/8ef6d77fca8a9b5ceb565d92605217c0daa2665b/vi-d37149-img-internet-made-in-germany.svg?bust=4",
    "art": "image",
@@ -473,7 +505,7 @@
    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
   },
   {
-   "nummer": 60,
+   "nummer": 64,
    "methode": "GET",
    "url": "https://mobile.1und1.de/_Resources/Persistent/94e6afc3cf98ee3e787a4191e4a6ccb360307e11/img-logo-1und1-nachhaltigkeit.svg?bust=4",
    "art": "image",
@@ -481,7 +513,7 @@
    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
   },
   {
-   "nummer": 61,
+   "nummer": 65,
    "methode": "GET",
    "url": "https://mobile.1und1.de/_Resources/Persistent/d6f7615e22396778787074b7e3c7d76ee4911889/facebook.svg?bust=4",
    "art": "image",
@@ -489,7 +521,7 @@
    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
   },
   {
-   "nummer": 62,
+   "nummer": 66,
    "methode": "GET",
    "url": "https://mobile.1und1.de/_Resources/Persistent/2aed61bb727294182ecd1c106f222a44d7995aa0/instagram-logo.svg?bust=4",
    "art": "image",
@@ -497,7 +529,7 @@
    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
   },
   {
-   "nummer": 63,
+   "nummer": 67,
    "methode": "GET",
    "url": "https://mobile.1und1.de/_Resources/Persistent/2ce3a922137d6bb18f61efbecc1a6efc7d8b60e5/twitter.svg?bust=4",
    "art": "image",
@@ -505,7 +537,7 @@
    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
   },
   {
-   "nummer": 64,
+   "nummer": 68,
    "methode": "GET",
    "url": "https://mobile.1und1.de/_Resources/Persistent/deeb0ca24aa0d0cbcc069c0f45a4777fcf740932/youtube.svg?bust=4",
    "art": "image",
@@ -513,7 +545,7 @@
    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
   },
   {
-   "nummer": 65,
+   "nummer": 69,
    "methode": "GET",
    "url": "https://mobile.1und1.de/_Resources/Persistent/c9955fafdf1efe7c3ef9413b211f8f527c6a81bb/linkedin.svg?bust=4",
    "art": "image",
@@ -521,12 +553,260 @@
    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
   },
   {
-   "nummer": 66,
+   "nummer": 70,
    "methode": "GET",
    "url": "https://mobile.1und1.de/_Resources/Persistent/7f802e4ef61c049da1a887d2878f9c87bc399f47/xing.svg?bust=4",
    "art": "image",
    "status": null,
    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 71,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de[Cookie entfernt]?startPageFlowId=f2-ssc-hw-private&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de[Cookie entfernt]&tariffChangeUrl=%2F%2Fmobile.1und1.de[Cookie entfernt]",
+   "art": "document",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 72,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de[Cookie entfernt]&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de[Cookie entfernt]&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=abfd70ec-b8c8-4be4-b905-ce3534a30b80",
+   "art": "document",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 73,
+   "methode": "GET",
+   "url": "https://content.1und1.de/fonts/1und1-web-sans-57-condensed.woff2",
+   "art": "font",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 74,
+   "methode": "GET",
+   "url": "https://content.1und1.de/fonts/1und1-web-sans-77-black-condensed.woff2",
+   "art": "font",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 75,
+   "methode": "GET",
+   "url": "https://content.1und1.de/fonts/1und1-web-sans-87-extra-black-condensed.woff2",
+   "art": "font",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 76,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/609613e56ea5d0ade59b9f2cfade1d9d0bac1d2b/main.css?bust=4",
+   "art": "stylesheet",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 77,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.JNodeTypes/1791299590/Images/ContactBubble/lg.png?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 78,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.AccComponents/1791299594/JavaScript/StickyContactChatGenesys.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 79,
+   "methode": "GET",
+   "url": "https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495",
+   "art": "script",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 80,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/b9e0d709755d7bcdcab6b6567c9877aa2b2f9349/main.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 81,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.NNodeTypes/1791299590/JavaScript/bs-transformer.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 82,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.NNodeTypes/1791299590/JavaScript/shop-general.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 83,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.ReactNodeTypes/1791299590/JavaScript/main.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 84,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.JNodeTypes/1791299590/JavaScript/RecurringModal/RecurringModal.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 85,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.Shop/1791299595/JavaScript/Survey/isurvey.min.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 86,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.Shop/1791299595/JavaScript/Survey/rogator.min.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 87,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/b015a129abe3909685c76f198806966f48351f15/icons.svg?bust=4",
+   "art": "xhr",
+   "status": null,
+   "abbruch": "net::ERR_ABORTED"
+  },
+  {
+   "nummer": 88,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/8ef6d77fca8a9b5ceb565d92605217c0daa2665b/vi-d37149-img-internet-made-in-germany.svg?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 89,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/94e6afc3cf98ee3e787a4191e4a6ccb360307e11/img-logo-1und1-nachhaltigkeit.svg?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 90,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/d6f7615e22396778787074b7e3c7d76ee4911889/facebook.svg?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 91,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/2aed61bb727294182ecd1c106f222a44d7995aa0/instagram-logo.svg?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 92,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/2ce3a922137d6bb18f61efbecc1a6efc7d8b60e5/twitter.svg?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 93,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/deeb0ca24aa0d0cbcc069c0f45a4777fcf740932/youtube.svg?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 94,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/c9955fafdf1efe7c3ef9413b211f8f527c6a81bb/linkedin.svg?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 95,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/7f802e4ef61c049da1a887d2878f9c87bc399f47/xing.svg?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 96,
+   "methode": "GET",
+   "url": "https://content.1und1.de/ctx/dh/libt.min.js?bust=2026100715",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 97,
+   "methode": "POST",
+   "url": "https://api.1und1.de/genesys/channelroutingservice/request/productline",
+   "art": "fetch",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 98,
+   "methode": "GET",
+   "url": "https://api.1und1.de/ctx/dh/cdn/onlineshop/prod/cdh.js",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 99,
+   "methode": "GET",
+   "url": "https://cdn.appdynamics.com/adrum/adrum-latest.js",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 100,
+   "methode": "GET",
+   "url": "https://cdn.appdynamics.com/adrum-ext.b5670ee02cea89158a710705f2152002.js",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 101,
+   "methode": "GET",
+   "url": "https://cdn.appdynamics.com/adrum-xd.b5670ee02cea89158a710705f2152002.html",
+   "art": "document",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT"
   }
  ],
  "antworten": [
@@ -537,23 +817,23 @@
    "art": "fetch",
    "status": 200,
    "typ": "application/json",
-   "groesse": 265,
+   "groesse": 266,
    "gekuerzt": false,
-   "koerper": "{\"requestId\":\"27c92e93-837c-4e1b-924e-6653ad76a3d1\",\"accessToken\":\"ENTFERNT\",\"channels\":[{\"channelType\":\"CHAT\",\"available\":true,\"description\":null,\"chatEnvironment\":\"prod-euc1\",\"chatDeploymentId\":\"59ba7a17-2146-40f0-b02a-b833655edb41\"}]}"
+   "koerper": "{\"requestId\":\"ec8d3acb-fc31-49d1-ba81-122baf057efd\",\"accessToken\":\"ENTFERNT\",\"channels\":[{\"channelType\":\"CHAT\",\"available\":false,\"description\":null,\"chatEnvironment\":\"prod-euc1\",\"chatDeploymentId\":\"59ba7a17-2146-40f0-b02a-b833655edb41\"}]}"
   },
   {
-   "nummer": 47,
+   "nummer": 46,
    "methode": "POST",
    "url": "https://api.1und1.de/genesys/channelroutingservice/request/productline",
    "art": "fetch",
    "status": 200,
    "typ": "application/json",
-   "groesse": 266,
+   "groesse": 265,
    "gekuerzt": false,
-   "koerper": "{\"requestId\":\"be8e5e23-94d4-44f5-81fb-c4c6e36cf9a5\",\"accessToken\":\"ENTFERNT\",\"channels\":[{\"channelType\":\"CHAT\",\"available\":false,\"description\":null,\"chatEnvironment\":\"prod-euc1\",\"chatDeploymentId\":\"7906e3b6-6f61-4ba1-9d44-de7d69af4a2c\"}]}"
+   "koerper": "{\"requestId\":\"fe690197-6567-4a49-b68d-9e38f309166c\",\"accessToken\":\"ENTFERNT\",\"channels\":[{\"channelType\":\"CHAT\",\"available\":true,\"description\":null,\"chatEnvironment\":\"prod-euc1\",\"chatDeploymentId\":\"7906e3b6-6f61-4ba1-9d44-de7d69af4a2c\"}]}"
   },
   {
-   "nummer": 48,
+   "nummer": 49,
    "methode": "POST",
    "url": "https://api.1und1.de/ctx/dh/cs/event",
    "art": "xhr",
@@ -562,6 +842,28 @@
    "groesse": 0,
    "gekuerzt": false,
    "koerper": ""
+  },
+  {
+   "nummer": 58,
+   "methode": "POST",
+   "url": "https://api.1und1.de/ctx/dh/cs/event",
+   "art": "xhr",
+   "status": 200,
+   "typ": "application/json",
+   "groesse": 0,
+   "gekuerzt": false,
+   "koerper": ""
+  },
+  {
+   "nummer": 62,
+   "methode": "POST",
+   "url": "https://mobile.1und1.de/frontend/cart-facade/add",
+   "art": "xhr",
+   "status": 200,
+   "typ": "application/json",
+   "koerper": "true",
+   "groesse": 4,
+   "gekuerzt": false
   }
  ]
 }

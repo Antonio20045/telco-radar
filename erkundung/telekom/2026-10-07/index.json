@@ -3,13 +3,13 @@
  "name": "Telekom",
  "datum": "2026-10-07",
  "status": "gestoert",
- "grund": "Seite 2: Abruf gestört (HTTP 202)",
+ "grund": "Seite 2: nach Bot-Schutz keine weitere Anfrage (CLAUDE.md Regel 4)",
  "kennung": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)",
  "parallelpruefung": "vor jeder Seite",
  "robots_gelesen": true,
  "abstand_sekunden": 10.0,
  "besuchszeit": null,
- "dauer_sekunden": 332.1,
+ "dauer_sekunden": 337.7,
  "zeitgrenze_sekunden": 3000,
  "seiten": [
   {
@@ -27,13 +27,14 @@
     "bedienelemente": "bedienelemente-1.json",
     "preise": "preise-1.json",
     "klicks": "klicks-1.json",
+    "karte": "karte-1.json",
     "mitschnitt": "mitschnitt-1.json",
     "screenshot": "seite-1.png",
     "html": "seite-1.html.gz"
    },
    "zaehlung": {
     "anfragen": 223,
-    "verworfen": 37,
+    "verworfen": 38,
     "gescheitert": 0,
     "hilfsdateien": 17,
     "mitschnitt": 15,
@@ -54,24 +55,24 @@
      "grund": "per robots.txt gesperrt: /forward/ablyft-cdn/s/55651514.js"
     },
     {
-     "url": "https://bf72977jfz.bf.dynatrace.com/bf?type=js3&sn=v_4_srv_-2D8502_sn_55OBSHR3OSTJEG9ODPV6MKR4DIB4AOA7&svrid=-8502&flavor=cors&vi=ASHPMKGRECEHLLRNWKJJFOMKTRMKALAF-0&modifiedSince=1790854839540&bp=3&app=b05c2f3edf669fad&crc=3419196013&en=p9vvb6ny&end=1",
-     "grund": "per robots.txt gesperrt: /bf?type=js3&sn=v_4_srv_-2D8502_sn_55OBSHR3OSTJEG9ODPV6MKR4DIB4AOA7&svrid=-8502&flavor=cors&vi=ASHPMKGRECEHLLRNWKJJFOMKTRMKALAF-0&modifiedSince=1790854839540&bp=3&app=b05c2f3edf669fad&crc=3419196013&en=p9vvb6ny&end=1"
+     "url": "https://bf72977jfz.bf.dynatrace.com/bf?type=js3&sn=v_4_srv_-2D18639_sn_2AFM5ICCF5D9N8FCMEFVO7J5A63G7UQR&svrid=-18639&flavor=cors&vi=WPUTPTPHHAKHTDUPPLAPALLFKOAJFKCF-0&modifiedSince=1790854839540&bp=3&app=b05c2f3edf669fad&crc=3971468925&en=p9vvb6ny&end=1",
+     "grund": "per robots.txt gesperrt: /bf?type=js3&sn=v_4_srv_-2D18639_sn_2AFM5ICCF5D9N8FCMEFVO7J5A63G7UQR&svrid=-18639&flavor=cors&vi=WPUTPTPHHAKHTDUPPLAPALLFKOAJFKCF-0&modifiedSince=1790854839540&bp=3&app=b05c2f3edf669fad&crc=3971468925&en=p9vvb6ny&end=1"
     },
     {
-     "url": "https://bf72977jfz.bf.dynatrace.com/bf?type=js3&sn=v_4_srv_-2D8502_sn_55OBSHR3OSTJEG9ODPV6MKR4DIB4AOA7&svrid=-8502&flavor=cors&vi=ASHPMKGRECEHLLRNWKJJFOMKTRMKALAF-0&modifiedSince=1790854839540&bp=3&app=b05c2f3edf669fad&crc=687993335&en=p9vvb6ny&end=1",
-     "grund": "per robots.txt gesperrt: /bf?type=js3&sn=v_4_srv_-2D8502_sn_55OBSHR3OSTJEG9ODPV6MKR4DIB4AOA7&svrid=-8502&flavor=cors&vi=ASHPMKGRECEHLLRNWKJJFOMKTRMKALAF-0&modifiedSince=1790854839540&bp=3&app=b05c2f3edf669fad&crc=687993335&en=p9vvb6ny&end=1"
+     "url": "https://bf72977jfz.bf.dynatrace.com/bf?type=js3&sn=v_4_srv_-2D18639_sn_2AFM5ICCF5D9N8FCMEFVO7J5A63G7UQR&svrid=-18639&flavor=cors&vi=WPUTPTPHHAKHTDUPPLAPALLFKOAJFKCF-0&modifiedSince=1790854839540&bp=3&app=b05c2f3edf669fad&crc=369492560&en=p9vvb6ny&end=1",
+     "grund": "per robots.txt gesperrt: /bf?type=js3&sn=v_4_srv_-2D18639_sn_2AFM5ICCF5D9N8FCMEFVO7J5A63G7UQR&svrid=-18639&flavor=cors&vi=WPUTPTPHHAKHTDUPPLAPALLFKOAJFKCF-0&modifiedSince=1790854839540&bp=3&app=b05c2f3edf669fad&crc=369492560&en=p9vvb6ny&end=1"
     },
     {
      "url": "https://cms-cdn.yo-digital.com/cdn/ONmYZUYiGdfBtYy4l1ejqUHZg2VwIpwN/en/web-strings.json",
      "grund": "per robots.txt gesperrt: /cdn/ONmYZUYiGdfBtYy4l1ejqUHZg2VwIpwN/en/web-strings.json"
     },
     {
-     "url": "https://bf72977jfz.bf.dynatrace.com/bf?type=js3&sn=v_4_srv_-2D8502_sn_55OBSHR3OSTJEG9ODPV6MKR4DIB4AOA7&svrid=-8502&flavor=cors&vi=ASHPMKGRECEHLLRNWKJJFOMKTRMKALAF-0&modifiedSince=1790854839540&bp=3&app=b05c2f3edf669fad&crc=3386436951&en=p9vvb6ny&end=1",
-     "grund": "per robots.txt gesperrt: /bf?type=js3&sn=v_4_srv_-2D8502_sn_55OBSHR3OSTJEG9ODPV6MKR4DIB4AOA7&svrid=-8502&flavor=cors&vi=ASHPMKGRECEHLLRNWKJJFOMKTRMKALAF-0&modifiedSince=1790854839540&bp=3&app=b05c2f3edf669fad&crc=3386436951&en=p9vvb6ny&end=1"
+     "url": "https://bf72977jfz.bf.dynatrace.com/bf?type=js3&sn=v_4_srv_-2D18639_sn_2AFM5ICCF5D9N8FCMEFVO7J5A63G7UQR&svrid=-18639&flavor=cors&vi=WPUTPTPHHAKHTDUPPLAPALLFKOAJFKCF-0&modifiedSince=1790854839540&bp=3&app=b05c2f3edf669fad&crc=1663990031&en=p9vvb6ny&end=1",
+     "grund": "per robots.txt gesperrt: /bf?type=js3&sn=v_4_srv_-2D18639_sn_2AFM5ICCF5D9N8FCMEFVO7J5A63G7UQR&svrid=-18639&flavor=cors&vi=WPUTPTPHHAKHTDUPPLAPALLFKOAJFKCF-0&modifiedSince=1790854839540&bp=3&app=b05c2f3edf669fad&crc=1663990031&en=p9vvb6ny&end=1"
     },
     {
-     "url": "https://bf72977jfz.bf.dynatrace.com/bf?type=js3&sn=v_4_srv_-2D8502_sn_55OBSHR3OSTJEG9ODPV6MKR4DIB4AOA7&svrid=-8502&flavor=cors&vi=ASHPMKGRECEHLLRNWKJJFOMKTRMKALAF-0&modifiedSince=1790854839540&bp=3&app=b05c2f3edf669fad&crc=2166533286&en=p9vvb6ny&end=1",
-     "grund": "per robots.txt gesperrt: /bf?type=js3&sn=v_4_srv_-2D8502_sn_55OBSHR3OSTJEG9ODPV6MKR4DIB4AOA7&svrid=-8502&flavor=cors&vi=ASHPMKGRECEHLLRNWKJJFOMKTRMKALAF-0&modifiedSince=1790854839540&bp=3&app=b05c2f3edf669fad&crc=2166533286&en=p9vvb6ny&end=1"
+     "url": "https://bf72977jfz.bf.dynatrace.com/bf?type=js3&sn=v_4_srv_-2D18639_sn_2AFM5ICCF5D9N8FCMEFVO7J5A63G7UQR&svrid=-18639&flavor=cors&vi=WPUTPTPHHAKHTDUPPLAPALLFKOAJFKCF-0&modifiedSince=1790854839540&bp=3&app=b05c2f3edf669fad&crc=114740360&en=p9vvb6ny&end=1",
+     "grund": "per robots.txt gesperrt: /bf?type=js3&sn=v_4_srv_-2D18639_sn_2AFM5ICCF5D9N8FCMEFVO7J5A63G7UQR&svrid=-18639&flavor=cors&vi=WPUTPTPHHAKHTDUPPLAPALLFKOAJFKCF-0&modifiedSince=1790854839540&bp=3&app=b05c2f3edf669fad&crc=114740360&en=p9vvb6ny&end=1"
     },
     {
      "url": "https://www2.telekom.de/lib-custom/es",
@@ -106,96 +107,100 @@
      "grund": "robots.txt nicht lesbar (HTTP 401)"
     },
     {
+     "url": "https://binkiesproductionweu.servicebus.windows.net/binkiesproductionp2weu/messages",
+     "grund": "robots.txt nicht lesbar (HTTP 401)"
+    },
+    {
      "url": "https://cms-cdn.yo-digital.com/campaign/api/v2/de/fetchCampaigns",
      "grund": "per robots.txt gesperrt: /campaign/api/v2/de/fetchCampaigns"
     },
     {
-     "url": "https://bf72977jfz.bf.dynatrace.com/bf?sc=0&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&cy=event&bc=272433527&co=snappy&si=[Cookie entfernt]&st=1791375090720&ss=0&qc=3930111378&end=1",
-     "grund": "per robots.txt gesperrt: /bf?sc=0&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&cy=event&bc=272433527&co=snappy&si=[Cookie entfernt]&st=1791375090720&ss=0&qc=3930111378&end=1"
+     "url": "https://bf72977jfz.bf.dynatrace.com/bf?sc=0&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&cy=event&bc=2823202133&co=snappy&si=[Cookie entfernt]&st=1791387405369&ss=0&qc=3845215944&end=1",
+     "grund": "per robots.txt gesperrt: /bf?sc=0&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&cy=event&bc=2823202133&co=snappy&si=[Cookie entfernt]&st=1791387405369&ss=0&qc=3845215944&end=1"
     },
     {
      "url": "https://binkiesproductionweu.servicebus.windows.net/binkiesproductionp2weu/messages",
      "grund": "robots.txt nicht lesbar (HTTP 401)"
     },
     {
-     "url": "https://bf72977jfz.bf.dynatrace.com/bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&cy=event&bc=1533942551&co=snappy&si=[Cookie entfernt]&st=1791375100688&ss=0&qc=3222324491&end=1",
-     "grund": "per robots.txt gesperrt: /bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&cy=event&bc=1533942551&co=snappy&si=[Cookie entfernt]&st=1791375100688&ss=0&qc=3222324491&end=1"
+     "url": "https://bf72977jfz.bf.dynatrace.com/bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&cy=event&bc=4006523984&co=snappy&si=[Cookie entfernt]&st=1791387415336&ss=0&qc=4105599526&end=1",
+     "grund": "per robots.txt gesperrt: /bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&cy=event&bc=4006523984&co=snappy&si=[Cookie entfernt]&st=1791387415336&ss=0&qc=4105599526&end=1"
     },
     {
-     "url": "https://bf72977jfz.bf.dynatrace.com/bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=1323133907&end=1",
-     "grund": "per robots.txt gesperrt: /bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=1323133907&end=1"
+     "url": "https://bf72977jfz.bf.dynatrace.com/bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=825594554&end=1",
+     "grund": "per robots.txt gesperrt: /bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=825594554&end=1"
     },
     {
-     "url": "https://bf72977jfz.bf.dynatrace.com/bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=1323133907&end=1",
-     "grund": "per robots.txt gesperrt: /bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=1323133907&end=1"
+     "url": "https://bf72977jfz.bf.dynatrace.com/bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=825594554&end=1",
+     "grund": "per robots.txt gesperrt: /bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=825594554&end=1"
     },
     {
-     "url": "https://bf72977jfz.bf.dynatrace.com/bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&cy=event&bc=4166405609&co=snappy&si=[Cookie entfernt]&st=1791375102745&ss=0&qc=3545664461&end=1",
-     "grund": "per robots.txt gesperrt: /bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&cy=event&bc=4166405609&co=snappy&si=[Cookie entfernt]&st=1791375102745&ss=0&qc=3545664461&end=1"
+     "url": "https://bf72977jfz.bf.dynatrace.com/bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&cy=event&bc=2666018698&co=snappy&si=[Cookie entfernt]&st=1791387418845&ss=0&qc=1968183169&end=1",
+     "grund": "per robots.txt gesperrt: /bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&cy=event&bc=2666018698&co=snappy&si=[Cookie entfernt]&st=1791387418845&ss=0&qc=1968183169&end=1"
     },
     {
-     "url": "https://bf72977jfz.bf.dynatrace.com/bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=1323133907&end=1",
-     "grund": "per robots.txt gesperrt: /bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=1323133907&end=1"
+     "url": "https://bf72977jfz.bf.dynatrace.com/bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=825594554&end=1",
+     "grund": "per robots.txt gesperrt: /bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=825594554&end=1"
+    },
+    {
+     "url": "https://bf72977jfz.bf.dynatrace.com/bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&cy=event&bc=2993872245&co=snappy&si=[Cookie entfernt]&st=1791387427447&ss=0&qc=178736162&end=1",
+     "grund": "per robots.txt gesperrt: /bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&cy=event&bc=2993872245&co=snappy&si=[Cookie entfernt]&st=1791387427447&ss=0&qc=178736162&end=1"
+    },
+    {
+     "url": "https://bf72977jfz.bf.dynatrace.com/bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=825594554&end=1",
+     "grund": "per robots.txt gesperrt: /bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=825594554&end=1"
     },
     {
      "url": "https://www2.telekom.de/lib-custom/es",
      "grund": "per robots.txt gesperrt: /lib-custom/es"
-    },
-    {
-     "url": "https://bf72977jfz.bf.dynatrace.com/bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&cy=event&bc=2387926167&co=snappy&si=[Cookie entfernt]&st=1791375112846&ss=0&qc=4269290664&end=1",
-     "grund": "per robots.txt gesperrt: /bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&cy=event&bc=2387926167&co=snappy&si=[Cookie entfernt]&st=1791375112846&ss=0&qc=4269290664&end=1"
-    },
-    {
-     "url": "https://www2.telekom.de/lib-custom/es",
-     "grund": "per robots.txt gesperrt: /lib-custom/es"
-    },
-    {
-     "url": "https://bf72977jfz.bf.dynatrace.com/bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&cy=event&bc=2047744983&co=snappy&si=[Cookie entfernt]&st=1791375120727&ss=0&qc=2870355600&end=1",
-     "grund": "per robots.txt gesperrt: /bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&cy=event&bc=2047744983&co=snappy&si=[Cookie entfernt]&st=1791375120727&ss=0&qc=2870355600&end=1"
     },
     {
      "url": "https://ext.telekom.de/js/exactag.js",
      "grund": "per robots.txt gesperrt: /js/exactag.js"
     },
     {
-     "url": "https://bf72977jfz.bf.dynatrace.com/bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=1323133907&end=1",
-     "grund": "per robots.txt gesperrt: /bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=1323133907&end=1"
-    },
-    {
-     "url": "https://bf72977jfz.bf.dynatrace.com/bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=1323133907&end=1",
-     "grund": "per robots.txt gesperrt: /bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=1323133907&end=1"
+     "url": "https://bf72977jfz.bf.dynatrace.com/bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&cy=event&bc=2962461918&co=snappy&si=[Cookie entfernt]&st=1791387437574&ss=0&qc=1772691893&end=1",
+     "grund": "per robots.txt gesperrt: /bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&cy=event&bc=2962461918&co=snappy&si=[Cookie entfernt]&st=1791387437574&ss=0&qc=1772691893&end=1"
     },
     {
      "url": "https://www2.telekom.de/lib-custom/es",
      "grund": "per robots.txt gesperrt: /lib-custom/es"
     },
     {
-     "url": "https://bf72977jfz.bf.dynatrace.com/bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&cy=event&bc=420901593&co=snappy&si=[Cookie entfernt]&st=1791375123380&ss=0&qc=1422687755&end=1",
-     "grund": "per robots.txt gesperrt: /bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&cy=event&bc=420901593&co=snappy&si=[Cookie entfernt]&st=1791375123380&ss=0&qc=1422687755&end=1"
-    },
-    {
-     "url": "https://bf72977jfz.bf.dynatrace.com/bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&cy=event&bc=1786467737&co=snappy&si=[Cookie entfernt]&st=1791375131371&ss=0&qc=4283578277&end=1",
-     "grund": "per robots.txt gesperrt: /bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&cy=event&bc=1786467737&co=snappy&si=[Cookie entfernt]&st=1791375131371&ss=0&qc=4283578277&end=1"
-    },
-    {
-     "url": "https://bf72977jfz.bf.dynatrace.com/bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=1323133907&end=1",
-     "grund": "per robots.txt gesperrt: /bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=1323133907&end=1"
-    },
-    {
-     "url": "https://bf72977jfz.bf.dynatrace.com/bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=1323133907&end=1",
-     "grund": "per robots.txt gesperrt: /bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=1323133907&end=1"
+     "url": "https://bf72977jfz.bf.dynatrace.com/bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=825594554&end=1",
+     "grund": "per robots.txt gesperrt: /bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=825594554&end=1"
     },
     {
      "url": "https://www2.telekom.de/lib-custom/es",
      "grund": "per robots.txt gesperrt: /lib-custom/es"
     },
     {
-     "url": "https://bf72977jfz.bf.dynatrace.com/bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&cy=event&bc=2218614569&co=snappy&si=[Cookie entfernt]&st=1791375134330&ss=0&qc=404243654&end=1",
-     "grund": "per robots.txt gesperrt: /bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&cy=event&bc=2218614569&co=snappy&si=[Cookie entfernt]&st=1791375134330&ss=0&qc=404243654&end=1"
+     "url": "https://bf72977jfz.bf.dynatrace.com/bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&cy=event&bc=3862244485&co=snappy&si=[Cookie entfernt]&st=1791387440150&ss=0&qc=2418395489&end=1",
+     "grund": "per robots.txt gesperrt: /bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&cy=event&bc=3862244485&co=snappy&si=[Cookie entfernt]&st=1791387440150&ss=0&qc=2418395489&end=1"
     },
     {
-     "url": "https://bf72977jfz.bf.dynatrace.com/bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=1323133907&end=1",
-     "grund": "per robots.txt gesperrt: /bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=1323133907&end=1"
+     "url": "https://bf72977jfz.bf.dynatrace.com/bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&cy=event&bc=2292611955&co=snappy&si=[Cookie entfernt]&st=1791387447518&ss=0&qc=2660102230&end=1",
+     "grund": "per robots.txt gesperrt: /bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&cy=event&bc=2292611955&co=snappy&si=[Cookie entfernt]&st=1791387447518&ss=0&qc=2660102230&end=1"
+    },
+    {
+     "url": "https://bf72977jfz.bf.dynatrace.com/bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=825594554&end=1",
+     "grund": "per robots.txt gesperrt: /bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=825594554&end=1"
+    },
+    {
+     "url": "https://bf72977jfz.bf.dynatrace.com/bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=825594554&end=1",
+     "grund": "per robots.txt gesperrt: /bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=825594554&end=1"
+    },
+    {
+     "url": "https://www2.telekom.de/lib-custom/es",
+     "grund": "per robots.txt gesperrt: /lib-custom/es"
+    },
+    {
+     "url": "https://bf72977jfz.bf.dynatrace.com/bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&cy=event&bc=3005045177&co=snappy&si=[Cookie entfernt]&st=1791387450437&ss=0&qc=1645464432&end=1",
+     "grund": "per robots.txt gesperrt: /bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&cy=event&bc=3005045177&co=snappy&si=[Cookie entfernt]&st=1791387450437&ss=0&qc=1645464432&end=1"
+    },
+    {
+     "url": "https://bf72977jfz.bf.dynatrace.com/bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=825594554&end=1",
+     "grund": "per robots.txt gesperrt: /bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=825594554&end=1"
     }
    ],
    "gescheitert": [],
@@ -221,6 +226,11 @@
      "grund": "robots.txt nicht lesbar (HTTP 403)"
     },
     {
+     "url": "https://dtdl-static-natco.eshop.yo-digital.com/assets/de/621327981966859_pdp-marketing-content.css",
+     "art": "stylesheet",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
      "url": "https://static.eshop.telekom.de/de/prod/dtdl/new/shop/assets/dt-components.72d42471.js",
      "art": "script",
      "grund": "robots.txt nicht lesbar (HTTP 403)"
@@ -228,11 +238,6 @@
     {
      "url": "https://static.eshop.telekom.de/de/prod/dtdl/new/shop/assets/one-ui-library.8dac447e.js",
      "art": "script",
-     "grund": "robots.txt nicht lesbar (HTTP 403)"
-    },
-    {
-     "url": "https://dtdl-static-natco.eshop.yo-digital.com/assets/de/621327981966859_pdp-marketing-content.css",
-     "art": "stylesheet",
      "grund": "robots.txt nicht lesbar (HTTP 403)"
     },
     {
@@ -287,9 +292,22 @@
     }
    ],
    "karte": {
-    "status": "keine_karte",
+    "status": "gelaufen",
     "karte": "telekom.yaml",
-    "grund": "telekom.yaml nicht vorhanden"
+    "grund": "Abruf gestört (HTTP 202)",
+    "datei": "karte-1.json",
+    "laufstatus": "gestoert",
+    "bot_schutz": true,
+    "zaehlung": {
+     "kombinationen": 0,
+     "erfasst": 0,
+     "nicht_angeboten": 0,
+     "nicht_erfasst": 0,
+     "befund": 0,
+     "nicht_besucht": 0,
+     "verworfen": 0,
+     "gescheitert": 0
+    }
    }
   },
   {
@@ -297,37 +315,17 @@
    "geraet": "google-pixel-11",
    "speicher_gb": 256,
    "adresse": "https://www.telekom.de/shop/geraet/google/google-pixel-11/frost-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false",
-   "endadresse": null,
-   "status": "gestoert",
-   "grund": "Abruf gestört (HTTP 202)",
-   "bot_schutz": true,
-   "http_status": 202,
-   "ruhe": null,
-   "dateien": {
-    "mitschnitt": "mitschnitt-2.json"
-   },
-   "zaehlung": {
-    "anfragen": 1,
-    "verworfen": 0,
-    "gescheitert": 0,
-    "hilfsdateien": 0,
-    "mitschnitt": 0,
-    "elemente": null,
-    "gruppen_je_art": null,
-    "preis_kandidaten": null,
-    "klicks": null
-   },
-   "verworfen": [],
-   "gescheitert": [],
-   "hilfsdateien": [],
+   "status": "nicht_besucht",
+   "grund": "nach Bot-Schutz keine weitere Anfrage (CLAUDE.md Regel 4)",
+   "dateien": {},
    "karte": {
-    "status": "keine_karte",
+    "status": "nicht_besucht",
     "karte": "telekom.yaml",
-    "grund": "telekom.yaml nicht vorhanden"
+    "grund": "nach Bot-Schutz keine weitere Anfrage (CLAUDE.md Regel 4)"
    }
   }
  ],
- "groesse_bytes": 1620309,
+ "groesse_bytes": 1618703,
  "groessengrenze_bytes": 8000000,
  "gekuerzt": []
 }

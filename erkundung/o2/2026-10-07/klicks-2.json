@@ -32,17 +32,17 @@
    "ruhe": true,
    "anfragen": [
     {
-     "nummer": 131,
+     "nummer": 132,
      "methode": "GET",
-     "url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1zYW1zdW5nLWdhbGF4eS1zMjYtNTEyZ2ItY29iYWx0LXZpb2xldC0zNnhoaWdoO3RhcmlmZj1vMnNob3A6OnByaXZhdGt1bmRlbi1vMi1tb2JpbGUtdW5saW1pdGVkLW0tcGx1cy1vbmxpbmUtaHd2LTM2bS0wNS0wMDtwYWNrcz11bXRzLW9wdGlvbg==",
+     "url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1zYW1zdW5nLWdhbGF4eS1zMjYtNTEyZ2ItY29iYWx0LXZpb2xldC0zNnhoaWdoO3RhcmlmZj1vMnNob3A6OnByaXZhdGt1bmRlbi1vMi1tb2JpbGUtdW5saW1pdGVkLW0tcGx1cy1vbmxpbmUtaHd2LTM2bS0wNy0wMDtwYWNrcz11bXRzLW9wdGlvbg==",
      "art": "xhr",
      "status": 200,
      "abbruch": null
     },
     {
-     "nummer": 132,
+     "nummer": 133,
      "methode": "GET",
-     "url": "https://www.o2online.de/are-wp/947602/?sid=ENTFERNT&wpt=H&prf%5Bappl%5D=shop&prf%5Bsite%5D=configurator&prf%5Btgr%5D=privatkunden&prf%5Bona%5D=o2shop_privatkunden-o2-mobile-unlimited-m-plus-online-hwv-36m-05-00_privatkunden-samsung-galaxy-s26-512gb-cobalt-violet-36xhigh&prf%5Bdur%5D=fixed&prf%5Bpay%5D=rate&prf%5Bcnt%5D=1&prf%5Bsy%5D=www",
+     "url": "https://www.o2online.de/are-wp/947602/?sid=ENTFERNT&wpt=H&prf%5Bappl%5D=shop&prf%5Bsite%5D=configurator&prf%5Btgr%5D=privatkunden&prf%5Bona%5D=o2shop_privatkunden-o2-mobile-unlimited-m-plus-online-hwv-36m-07-00_privatkunden-samsung-galaxy-s26-512gb-cobalt-violet-36xhigh&prf%5Bdur%5D=fixed&prf%5Bpay%5D=rate&prf%5Bcnt%5D=1&prf%5Bsy%5D=www",
      "art": "xhr",
      "status": 200,
      "abbruch": null
@@ -51,23 +51,23 @@
    "preise_geaendert": [
     {
      "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(3) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > tef-choice-panel:nth-of-type(1) > label:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(1)",
-     "vorher": "56,49 €",
-     "nachher": "61,99 €"
+     "vorher": "54,49 €",
+     "nachher": "59,99 €"
     },
     {
      "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(3) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > tef-choice-panel:nth-of-type(1) > label:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(1)",
-     "vorher": "46,49 €",
-     "nachher": "51,99 €"
+     "vorher": "44,49 €",
+     "nachher": "49,99 €"
     },
     {
      "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(3) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > tef-choice-panel:nth-of-type(1) > label:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(1)",
-     "vorher": "46,49 €",
-     "nachher": "51,99 €"
+     "vorher": "44,49 €",
+     "nachher": "49,99 €"
     },
     {
      "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(3) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > tef-choice-panel:nth-of-type(1) > label:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(1)",
-     "vorher": "46,49 €",
-     "nachher": "51,99 €"
+     "vorher": "44,49 €",
+     "nachher": "49,99 €"
     },
     {
      "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(1) > td:nth-of-type(2)",
@@ -76,13 +76,13 @@
     },
     {
      "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(2) > tr:nth-of-type(1) > td:nth-of-type(1) > strong:nth-of-type(1)",
-     "vorher": "46,49 €",
-     "nachher": "51,99 €"
+     "vorher": "44,49 €",
+     "nachher": "49,99 €"
     },
     {
      "pfad": "#info-modal-id > div:nth-of-type(2) > div:nth-of-type(1) > p:nth-of-type(1)",
-     "vorher": "Für Neukunden und besteht aus einem o2 Mein Handyvertrag mit dem Samsung Galaxy S26 mit Ratenzahlung à 26,50 € monatlich über 36 Monate (Gesamtpreis: 46,49 € ) sowie die o2-mobile-unlimited-m-plus Mobilfunkvertrag mit 24 Monate Mindestlaufzeit von Monaten für monatliche Zahlungen 19,99 € Plus 0,00 €",
-     "nachher": "Für Neukunden und besteht aus einem o2 Mein Handyvertrag mit dem Samsung Galaxy S26 mit Ratenzahlung à 32,00 € monatlich über 36 Monate (Gesamtpreis: 51,99 € ) sowie die o2-mobile-unlimited-m-plus Mobilfunkvertrag mit 24 Monate Mindestlaufzeit von Monaten für monatliche Zahlungen 19,99 € Plus 0,00 €"
+     "vorher": "Für Neukunden und besteht aus einem o2 Mein Handyvertrag mit dem Samsung Galaxy S26 mit Ratenzahlung à 26,50 € monatlich über 36 Monate (Gesamtpreis: 44,49 € ) sowie die o2-mobile-unlimited-m-plus Mobilfunkvertrag mit 24 Monate Mindestlaufzeit von Monaten für monatliche Zahlungen 17,99 € Plus 0,00 €",
+     "nachher": "Für Neukunden und besteht aus einem o2 Mein Handyvertrag mit dem Samsung Galaxy S26 mit Ratenzahlung à 32,00 € monatlich über 36 Monate (Gesamtpreis: 49,99 € ) sowie die o2-mobile-unlimited-m-plus Mobilfunkvertrag mit 24 Monate Mindestlaufzeit von Monaten für monatliche Zahlungen 17,99 € Plus 0,00 €"
     }
    ],
    "marke_nachher": null,
@@ -115,17 +115,17 @@
    "ruhe": true,
    "anfragen": [
     {
-     "nummer": 133,
+     "nummer": 134,
      "methode": "GET",
-     "url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1zYW1zdW5nLWdhbGF4eS1zMjYtNTEyZ2ItY29iYWx0LXZpb2xldC0yNHhoaWdoO3RhcmlmZj1vMnNob3A6OnByaXZhdGt1bmRlbi1vMi1tb2JpbGUtdW5saW1pdGVkLW0tcGx1cy1vbmxpbmUtaHd2LTI0bS0wNS0wMDtwYWNrcz11bXRzLW9wdGlvbg==",
+     "url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1zYW1zdW5nLWdhbGF4eS1zMjYtNTEyZ2ItY29iYWx0LXZpb2xldC0yNHhoaWdoO3RhcmlmZj1vMnNob3A6OnByaXZhdGt1bmRlbi1vMi1tb2JpbGUtdW5saW1pdGVkLW0tcGx1cy1vbmxpbmUtaHd2LTI0bS0wNy0wMDtwYWNrcz11bXRzLW9wdGlvbg==",
      "art": "xhr",
      "status": 200,
      "abbruch": null
     },
     {
-     "nummer": 134,
+     "nummer": 135,
      "methode": "GET",
-     "url": "https://www.o2online.de/are-wp/947602/?sid=ENTFERNT&wpt=H&prf%5Bappl%5D=shop&prf%5Bsite%5D=configurator&prf%5Btgr%5D=privatkunden&prf%5Bona%5D=o2shop_privatkunden-o2-mobile-unlimited-m-plus-online-hwv-24m-05-00_privatkunden-samsung-galaxy-s26-512gb-cobalt-violet-24xhigh&prf%5Bdur%5D=fixed&prf%5Bpay%5D=rate&prf%5Bcnt%5D=1&prf%5Bsy%5D=www",
+     "url": "https://www.o2online.de/are-wp/947602/?sid=ENTFERNT&wpt=H&prf%5Bappl%5D=shop&prf%5Bsite%5D=configurator&prf%5Btgr%5D=privatkunden&prf%5Bona%5D=o2shop_privatkunden-o2-mobile-unlimited-m-plus-online-hwv-24m-07-00_privatkunden-samsung-galaxy-s26-512gb-cobalt-violet-24xhigh&prf%5Bdur%5D=fixed&prf%5Bpay%5D=rate&prf%5Bcnt%5D=1&prf%5Bsy%5D=www",
      "art": "xhr",
      "status": 200,
      "abbruch": null
@@ -134,23 +134,23 @@
    "preise_geaendert": [
     {
      "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(3) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > tef-choice-panel:nth-of-type(1) > label:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(1)",
-     "vorher": "61,99 €",
-     "nachher": "77,99 €"
+     "vorher": "59,99 €",
+     "nachher": "75,99 €"
     },
     {
      "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(3) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > tef-choice-panel:nth-of-type(1) > label:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(1)",
-     "vorher": "51,99 €",
-     "nachher": "67,99 €"
+     "vorher": "49,99 €",
+     "nachher": "65,99 €"
     },
     {
      "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(3) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > tef-choice-panel:nth-of-type(1) > label:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(1)",
-     "vorher": "51,99 €",
-     "nachher": "67,99 €"
+     "vorher": "49,99 €",
+     "nachher": "65,99 €"
     },
     {
      "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(3) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > tef-choice-panel:nth-of-type(1) > label:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(1)",
-     "vorher": "51,99 €",
-     "nachher": "67,99 €"
+     "vorher": "49,99 €",
+     "nachher": "65,99 €"
     },
     {
      "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(5) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > tef-shop-accessories-slider:nth-of-type(1) > tef-slider:nth-of-type(1) > div:nth-of-type(1) > tef-shop-hardware-teaser:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(2)",
@@ -204,18 +204,13 @@
     },
     {
      "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(2) > tr:nth-of-type(1) > td:nth-of-type(1) > strong:nth-of-type(1)",
-     "vorher": "51,99 €",
-     "nachher": "67,99 €"
-    },
-    {
-     "pfad": "#\\32 226092 > p:nth-of-type(2)",
-     "vorher": "Bei erstmaliger Buchung von O2 TV Classic 24M erhalten Kund:innen optional die Möglichkeit, Netflix Standard mit Werbung drei Monate kostenfrei freizuschalten; die Aktivierung erfolgt separat beim Anbieter. In den ersten 3 Monaten ist es kostenfrei, danach zzgl. 6,99 € mtl. Die Mindestlaufzeit beträ",
-     "nachher": "Bei erstmaliger Buchung von O2 TV Classic 24M erhalten Kund:innen optional die Möglichkeit, Netflix Standard mit Werbung drei Monate kostenfrei freizuschalten; die Aktivierung erfolgt separat beim Anbieter. In den ersten 3 Monaten ist es kostenfrei, danach zzgl. 4,99 € mtl. Die Mindestlaufzeit beträ"
+     "vorher": "49,99 €",
+     "nachher": "65,99 €"
     },
     {
      "pfad": "#info-modal-id > div:nth-of-type(2) > div:nth-of-type(1) > p:nth-of-type(1)",
-     "vorher": "Für Neukunden und besteht aus einem o2 Mein Handyvertrag mit dem Samsung Galaxy S26 mit Ratenzahlung à 32,00 € monatlich über 36 Monate (Gesamtpreis: 51,99 € ) sowie die o2-mobile-unlimited-m-plus Mobilfunkvertrag mit 24 Monate Mindestlaufzeit von Monaten für monatliche Zahlungen 19,99 € Plus 0,00 €",
-     "nachher": "Für Neukunden und besteht aus einem o2 Mein Handyvertrag mit dem Samsung Galaxy S26 mit Ratenzahlung à 48,00 € monatlich über 24 Monate (Gesamtpreis: 67,99 € ) sowie die o2-mobile-unlimited-m-plus Mobilfunkvertrag mit 24 Monate Mindestlaufzeit von Monaten für monatliche Zahlungen 19,99 € Plus 0,00 €"
+     "vorher": "Für Neukunden und besteht aus einem o2 Mein Handyvertrag mit dem Samsung Galaxy S26 mit Ratenzahlung à 32,00 € monatlich über 36 Monate (Gesamtpreis: 49,99 € ) sowie die o2-mobile-unlimited-m-plus Mobilfunkvertrag mit 24 Monate Mindestlaufzeit von Monaten für monatliche Zahlungen 17,99 € Plus 0,00 €",
+     "nachher": "Für Neukunden und besteht aus einem o2 Mein Handyvertrag mit dem Samsung Galaxy S26 mit Ratenzahlung à 48,00 € monatlich über 24 Monate (Gesamtpreis: 65,99 € ) sowie die o2-mobile-unlimited-m-plus Mobilfunkvertrag mit 24 Monate Mindestlaufzeit von Monaten für monatliche Zahlungen 17,99 € Plus 0,00 €"
     }
    ],
    "marke_nachher": null,
@@ -224,7 +219,7 @@
   {
    "gruppe": 20,
    "art": "tarif",
-   "pfad": "#choice-panel-input-648",
+   "pfad": "#choice-panel-input-557",
    "text": "select-tariff",
    "wert": null,
    "fehler": "Locator.click: Timeout 5000ms exceeded.",
@@ -240,7 +235,7 @@
    "gruppe": 20,
    "art": "tarif",
    "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(3) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > tef-choice-panel:nth-of-type(1) > label:nth-of-type(1)",
-   "text": "O2 Mobile Unlimited L Plus mit 300 MBit/s mtl. 56,49 €",
+   "text": "O2 Mobile Unlimited L Plus mit 300 MBit/s mtl. 54,49 €",
    "wert": null,
    "fehler": null,
    "navigiert": null,
@@ -248,17 +243,17 @@
    "ruhe": true,
    "anfragen": [
     {
-     "nummer": 135,
+     "nummer": 136,
      "methode": "GET",
-     "url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1zYW1zdW5nLWdhbGF4eS1zMjYtNTEyZ2ItY29iYWx0LXZpb2xldC0yNHhoaWdoO3RhcmlmZj1vMnNob3A6OnByaXZhdGt1bmRlbi1vMi1tb2JpbGUtdW5saW1pdGVkLWwtcGx1cy1vbmxpbmUtaHd2LTI0bS0wNS0wMDtwYWNrcz1pbmtsdXNpdi11bmJlZ3Jlbnp0ZXMtZGF0ZW52b2x1bWVuLHVtdHMtb3B0aW9u",
+     "url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1zYW1zdW5nLWdhbGF4eS1zMjYtNTEyZ2ItY29iYWx0LXZpb2xldC0yNHhoaWdoO3RhcmlmZj1vMnNob3A6OnByaXZhdGt1bmRlbi1vMi1tb2JpbGUtdW5saW1pdGVkLWwtcGx1cy1vbmxpbmUtaHd2LTI0bS0wNy0wMDtwYWNrcz1pbmtsdXNpdi11bmJlZ3Jlbnp0ZXMtZGF0ZW52b2x1bWVuLHVtdHMtb3B0aW9u",
      "art": "xhr",
      "status": 200,
      "abbruch": null
     },
     {
-     "nummer": 136,
+     "nummer": 137,
      "methode": "GET",
-     "url": "https://www.o2online.de/are-wp/947602/?sid=ENTFERNT&wpt=H&prf%5Bappl%5D=shop&prf%5Bsite%5D=configurator&prf%5Btgr%5D=privatkunden&prf%5Bona%5D=o2shop_privatkunden-o2-mobile-unlimited-l-plus-online-hwv-24m-05-00_privatkunden-samsung-galaxy-s26-512gb-cobalt-violet-24xhigh&prf%5Bdur%5D=fixed&prf%5Bpay%5D=rate&prf%5Bcnt%5D=1&prf%5Bsy%5D=www",
+     "url": "https://www.o2online.de/are-wp/947602/?sid=ENTFERNT&wpt=H&prf%5Bappl%5D=shop&prf%5Bsite%5D=configurator&prf%5Btgr%5D=privatkunden&prf%5Bona%5D=o2shop_privatkunden-o2-mobile-unlimited-l-plus-online-hwv-24m-07-00_privatkunden-samsung-galaxy-s26-512gb-cobalt-violet-24xhigh&prf%5Bdur%5D=fixed&prf%5Bpay%5D=rate&prf%5Bcnt%5D=1&prf%5Bsy%5D=www",
      "art": "xhr",
      "status": 200,
      "abbruch": null
@@ -267,13 +262,13 @@
    "preise_geaendert": [
     {
      "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(2)",
-     "vorher": "19,99 €",
-     "nachher": "29,99 €"
+     "vorher": "17,99 €",
+     "nachher": "27,99 €"
     },
     {
      "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(2) > tr:nth-of-type(1) > td:nth-of-type(1) > strong:nth-of-type(1)",
-     "vorher": "67,99 €",
-     "nachher": "77,99 €"
+     "vorher": "65,99 €",
+     "nachher": "75,99 €"
     },
     {
      "pfad": "#\\32 267892 > p:nth-of-type(2)",
@@ -281,14 +276,9 @@
      "nachher": null
     },
     {
-     "pfad": "#\\32 226092 > p:nth-of-type(2)",
-     "vorher": "Bei erstmaliger Buchung von O2 TV Classic 24M erhalten Kund:innen optional die Möglichkeit, Netflix Standard mit Werbung drei Monate kostenfrei freizuschalten; die Aktivierung erfolgt separat beim Anbieter. In den ersten 3 Monaten ist es kostenfrei, danach zzgl. 4,99 € mtl. Die Mindestlaufzeit beträ",
-     "nachher": "Bei erstmaliger Buchung von O2 TV Classic 24M erhalten Kund:innen optional die Möglichkeit, Netflix Standard mit Werbung drei Monate kostenfrei freizuschalten; die Aktivierung erfolgt separat beim Anbieter. In den ersten 3 Monaten ist es kostenfrei, danach zzgl. 6,99 € mtl. Die Mindestlaufzeit beträ"
-    },
-    {
      "pfad": "#info-modal-id > div:nth-of-type(2) > div:nth-of-type(1) > p:nth-of-type(1)",
-     "vorher": "Für Neukunden und besteht aus einem o2 Mein Handyvertrag mit dem Samsung Galaxy S26 mit Ratenzahlung à 48,00 € monatlich über 24 Monate (Gesamtpreis: 67,99 € ) sowie die o2-mobile-unlimited-m-plus Mobilfunkvertrag mit 24 Monate Mindestlaufzeit von Monaten für monatliche Zahlungen 19,99 € Plus 0,00 €",
-     "nachher": "Für Neukunden und besteht aus einem o2 Mein Handyvertrag mit dem Samsung Galaxy S26 mit Ratenzahlung à 48,00 € monatlich über 24 Monate (Gesamtpreis: 77,99 € ) sowie die o2-mobile-unlimited-l-plus Mobilfunkvertrag mit 24 Monate Mindestlaufzeit von Monaten für monatliche Zahlungen 29,99 € Plus 0,00 €"
+     "vorher": "Für Neukunden und besteht aus einem o2 Mein Handyvertrag mit dem Samsung Galaxy S26 mit Ratenzahlung à 48,00 € monatlich über 24 Monate (Gesamtpreis: 65,99 € ) sowie die o2-mobile-unlimited-m-plus Mobilfunkvertrag mit 24 Monate Mindestlaufzeit von Monaten für monatliche Zahlungen 17,99 € Plus 0,00 €",
+     "nachher": "Für Neukunden und besteht aus einem o2 Mein Handyvertrag mit dem Samsung Galaxy S26 mit Ratenzahlung à 48,00 € monatlich über 24 Monate (Gesamtpreis: 75,99 € ) sowie die o2-mobile-unlimited-l-plus Mobilfunkvertrag mit 24 Monate Mindestlaufzeit von Monaten für monatliche Zahlungen 27,99 € Plus 0,00 €"
     },
     {
      "pfad": "#\\32 267894 > p:nth-of-type(2)",
@@ -302,7 +292,7 @@
   {
    "gruppe": 22,
    "art": "tarif",
-   "pfad": "#choice-panel-input-94",
+   "pfad": "#choice-panel-input-448",
    "text": "select-tariff",
    "wert": null,
    "fehler": "Locator.click: Timeout 5000ms exceeded.",
@@ -318,7 +308,7 @@
    "gruppe": 22,
    "art": "tarif",
    "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(3) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > tef-choice-panel:nth-of-type(1) > label:nth-of-type(1)",
-   "text": "O2 Mobile Unlimited S Special Plus mit 15 MBit/s mtl. 46,49 €",
+   "text": "O2 Mobile Unlimited S Special Plus mit 15 MBit/s mtl. 44,49 €",
    "wert": null,
    "fehler": null,
    "navigiert": null,
@@ -326,17 +316,17 @@
    "ruhe": true,
    "anfragen": [
     {
-     "nummer": 137,
+     "nummer": 138,
      "methode": "GET",
-     "url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1zYW1zdW5nLWdhbGF4eS1zMjYtNTEyZ2ItY29iYWx0LXZpb2xldC0yNHhoaWdoO3RhcmlmZj1vMnNob3A6OnByaXZhdGt1bmRlbi1vMi1tb2JpbGUtdW5saW1pdGVkLXMtc3BlY2lhbC1wbHVzLW9ubGluZS1od3Y7cGFja3M9dW10cy1vcHRpb24=",
+     "url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1zYW1zdW5nLWdhbGF4eS1zMjYtNTEyZ2ItY29iYWx0LXZpb2xldC0yNHhoaWdoO3RhcmlmZj1vMnNob3A6OnByaXZhdGt1bmRlbi1vMi1tb2JpbGUtdW5saW1pdGVkLXMtc3BlY2lhbC1wbHVzLW9ubGluZS1od3YtMjRtLTAyLTAwO3BhY2tzPXVtdHMtb3B0aW9u",
      "art": "xhr",
      "status": 200,
      "abbruch": null
     },
     {
-     "nummer": 138,
+     "nummer": 139,
      "methode": "GET",
-     "url": "https://www.o2online.de/are-wp/947602/?sid=ENTFERNT&wpt=H&prf%5Bappl%5D=shop&prf%5Bsite%5D=configurator&prf%5Btgr%5D=privatkunden&prf%5Bona%5D=o2shop_privatkunden-o2-mobile-unlimited-s-special-plus-online-hwv_privatkunden-samsung-galaxy-s26-512gb-cobalt-violet-24xhigh&prf%5Bdur%5D=fixed&prf%5Bpay%5D=rate&prf%5Bcnt%5D=1&prf%5Bsy%5D=www",
+     "url": "https://www.o2online.de/are-wp/947602/?sid=ENTFERNT&wpt=H&prf%5Bappl%5D=shop&prf%5Bsite%5D=configurator&prf%5Btgr%5D=privatkunden&prf%5Bona%5D=o2shop_privatkunden-o2-mobile-unlimited-s-special-plus-online-hwv-24m-02-00_privatkunden-samsung-galaxy-s26-512gb-cobalt-violet-24xhigh&prf%5Bdur%5D=fixed&prf%5Bpay%5D=rate&prf%5Bcnt%5D=1&prf%5Bsy%5D=www",
      "art": "xhr",
      "status": 200,
      "abbruch": null
@@ -345,13 +335,13 @@
    "preise_geaendert": [
     {
      "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(2)",
-     "vorher": "29,99 €",
-     "nachher": "19,99 €"
+     "vorher": "27,99 €",
+     "nachher": "17,99 €"
     },
     {
      "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(2) > tr:nth-of-type(1) > td:nth-of-type(1) > strong:nth-of-type(1)",
-     "vorher": "77,99 €",
-     "nachher": "67,99 €"
+     "vorher": "75,99 €",
+     "nachher": "65,99 €"
     },
     {
      "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(3) > tr:nth-of-type(2) > td:nth-of-type(2)",
@@ -369,14 +359,9 @@
      "nachher": null
     },
     {
-     "pfad": "#\\32 226092 > p:nth-of-type(2)",
-     "vorher": "Bei erstmaliger Buchung von O2 TV Classic 24M erhalten Kund:innen optional die Möglichkeit, Netflix Standard mit Werbung drei Monate kostenfrei freizuschalten; die Aktivierung erfolgt separat beim Anbieter. In den ersten 3 Monaten ist es kostenfrei, danach zzgl. 6,99 € mtl. Die Mindestlaufzeit beträ",
-     "nachher": "Bei erstmaliger Buchung von O2 TV Classic 24M erhalten Kund:innen optional die Möglichkeit, Netflix Standard mit Werbung drei Monate kostenfrei freizuschalten; die Aktivierung erfolgt separat beim Anbieter. In den ersten 3 Monaten ist es kostenfrei, danach zzgl. 4,99 € mtl. Die Mindestlaufzeit beträ"
-    },
-    {
      "pfad": "#info-modal-id > div:nth-of-type(2) > div:nth-of-type(1) > p:nth-of-type(1)",
-     "vorher": "Für Neukunden und besteht aus einem o2 Mein Handyvertrag mit dem Samsung Galaxy S26 mit Ratenzahlung à 48,00 € monatlich über 24 Monate (Gesamtpreis: 77,99 € ) sowie die o2-mobile-unlimited-l-plus Mobilfunkvertrag mit 24 Monate Mindestlaufzeit von Monaten für monatliche Zahlungen 29,99 € Plus 0,00 €",
-     "nachher": "Für Neukunden und besteht aus einem o2 Mein Handyvertrag mit dem Samsung Galaxy S26 mit Ratenzahlung à 48,00 € monatlich über 24 Monate (Gesamtpreis: 67,99 € ) sowie die o2-mobile-unlimited-s-special-plus Mobilfunkvertrag mit 24 Monate Mindestlaufzeit von Monaten für monatliche Zahlungen 19,99 € Plu"
+     "vorher": "Für Neukunden und besteht aus einem o2 Mein Handyvertrag mit dem Samsung Galaxy S26 mit Ratenzahlung à 48,00 € monatlich über 24 Monate (Gesamtpreis: 75,99 € ) sowie die o2-mobile-unlimited-l-plus Mobilfunkvertrag mit 24 Monate Mindestlaufzeit von Monaten für monatliche Zahlungen 27,99 € Plus 0,00 €",
+     "nachher": "Für Neukunden und besteht aus einem o2 Mein Handyvertrag mit dem Samsung Galaxy S26 mit Ratenzahlung à 48,00 € monatlich über 24 Monate (Gesamtpreis: 65,99 € ) sowie die o2-mobile-unlimited-s-special-plus Mobilfunkvertrag mit 24 Monate Mindestlaufzeit von Monaten für monatliche Zahlungen 17,99 € Plu"
     },
     {
      "pfad": "#\\32 267890 > p:nth-of-type(2)",

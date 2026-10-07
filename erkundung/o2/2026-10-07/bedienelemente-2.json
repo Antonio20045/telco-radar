@@ -1,6 +1,6 @@
 {
- "elemente_gesamt": 327,
- "elemente_gelesen": 327,
+ "elemente_gesamt": 332,
+ "elemente_gelesen": 332,
  "gruppen": [
   {
    "nummer": 0,
@@ -15,7 +15,7 @@
    },
    "elemente": [
     0,
-    76
+    77
    ],
    "select": false,
    "mit_marke": false
@@ -33,7 +33,7 @@
    },
    "elemente": [
     1,
-    98
+    99
    ],
    "select": false,
    "mit_marke": false
@@ -51,7 +51,7 @@
    },
    "elemente": [
     2,
-    114
+    115
    ],
    "select": false,
    "mit_marke": false
@@ -69,7 +69,7 @@
    },
    "elemente": [
     3,
-    123
+    124
    ],
    "select": false,
    "mit_marke": false
@@ -87,7 +87,7 @@
    },
    "elemente": [
     4,
-    141
+    142
    ],
    "select": false,
    "mit_marke": false
@@ -105,7 +105,7 @@
    },
    "elemente": [
     5,
-    164
+    165
    ],
    "select": false,
    "mit_marke": false
@@ -177,7 +177,7 @@
    },
    "elemente": [
     12,
-    195
+    196
    ],
    "select": false,
    "mit_marke": false
@@ -195,7 +195,7 @@
    },
    "elemente": [
     13,
-    196
+    197
    ],
    "select": false,
    "mit_marke": false
@@ -591,7 +591,7 @@
    },
    "elemente": [
     56,
-    222
+    226
    ],
    "select": false,
    "mit_marke": false
@@ -609,8 +609,8 @@
    },
    "elemente": [
     57,
-    206,
-    207
+    207,
+    208
    ],
    "select": false,
    "mit_marke": false
@@ -634,8 +634,8 @@
   },
   {
    "nummer": 35,
-   "pfad": "#id-2194688",
-   "name": "Hersteller- & Sicherheitsinformationen",
+   "pfad": "#id-2361978 > div:nth-of-type(1)",
+   "name": "Aktion: Zusätzlich 300 Euro Tauschvorteil",
    "art": "unbekannt",
    "anteile": {
     "speicher": 0.0,
@@ -645,18 +645,36 @@
    },
    "elemente": [
     59,
-    60,
-    61,
-    62,
-    63,
-    64,
-    65
+    236
    ],
    "select": false,
    "mit_marke": false
   },
   {
    "nummer": 36,
+   "pfad": "#id-2194688",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    60,
+    61,
+    62,
+    63,
+    64,
+    65,
+    66
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 37,
    "pfad": "#id-2206490",
    "name": null,
    "art": "unbekannt",
@@ -667,16 +685,16 @@
     "farbe": 0.0
    },
    "elemente": [
-    66,
     67,
     68,
-    69
+    69,
+    70
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 37,
+   "nummer": 38,
    "pfad": "#modal-1955966",
    "name": "Mehr Informationen zu Beratung und Bestellung",
    "art": "unbekannt",
@@ -687,13 +705,13 @@
     "farbe": 0.0
    },
    "elemente": [
-    70
+    71
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 38,
+   "nummer": 39,
    "pfad": "#id-2006630",
    "name": null,
    "art": "unbekannt",
@@ -704,15 +722,15 @@
     "farbe": 0.33
    },
    "elemente": [
-    71,
-    176,
-    177
+    72,
+    177,
+    178
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 39,
+   "nummer": 40,
    "pfad": "#id-2006634 > div:nth-of-type(1) > ul:nth-of-type(1)",
    "name": null,
    "art": "farbe",
@@ -723,14 +741,14 @@
     "farbe": 1.0
    },
    "elemente": [
-    72,
-    73
+    73,
+    74
    ],
    "select": false,
    "mit_marke": true
   },
   {
-   "nummer": 40,
+   "nummer": 41,
    "pfad": "#id-2006634 > div:nth-of-type(1) > ul:nth-of-type(2)",
    "name": null,
    "art": "farbe",
@@ -741,14 +759,14 @@
     "farbe": 1.0
    },
    "elemente": [
-    74,
-    75
+    75,
+    76
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 41,
+   "nummer": 42,
    "pfad": "#layer-menu-Mobilfunk",
    "name": null,
    "art": "tarif",
@@ -759,13 +777,13 @@
     "farbe": 1.0
    },
    "elemente": [
-    77
+    78
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 42,
+   "nummer": 43,
    "pfad": "#layer-menu-Mobilfunk > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > ul:nth-of-type(1)",
    "name": null,
    "art": "farbe",
@@ -776,7 +794,6 @@
     "farbe": 1.0
    },
    "elemente": [
-    78,
     79,
     80,
     81,
@@ -784,13 +801,14 @@
     83,
     84,
     85,
-    86
+    86,
+    87
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 43,
+   "nummer": 44,
    "pfad": "#layer-menu-Mobilfunk > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1)",
    "name": null,
    "art": "farbe",
@@ -801,20 +819,20 @@
     "farbe": 1.0
    },
    "elemente": [
-    87,
     88,
     89,
     90,
     91,
     92,
     93,
-    94
+    94,
+    95
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 44,
+   "nummer": 45,
    "pfad": "#layer-menu-Mobilfunk > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2)",
    "name": null,
    "art": "farbe",
@@ -825,13 +843,13 @@
     "farbe": 1.0
    },
    "elemente": [
-    95
+    96
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 45,
+   "nummer": 46,
    "pfad": "#layer-menu-Mobilfunk > div:nth-of-type(2) > div:nth-of-type(1)",
    "name": null,
    "art": "farbe",
@@ -842,14 +860,14 @@
     "farbe": 1.0
    },
    "elemente": [
-    96,
-    97
+    97,
+    98
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 46,
+   "nummer": 47,
    "pfad": "#layer-menu-Internet\\%20zuhause",
    "name": null,
    "art": "farbe",
@@ -860,13 +878,13 @@
     "farbe": 1.0
    },
    "elemente": [
-    99
+    100
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 47,
+   "nummer": 48,
    "pfad": "#layer-menu-Internet\\%20zuhause > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > ul:nth-of-type(1)",
    "name": null,
    "art": "farbe",
@@ -877,20 +895,20 @@
     "farbe": 1.0
    },
    "elemente": [
-    100,
     101,
     102,
     103,
     104,
     105,
     106,
-    107
+    107,
+    108
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 48,
+   "nummer": 49,
    "pfad": "#layer-menu-Internet\\%20zuhause > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1)",
    "name": null,
    "art": "farbe",
@@ -901,16 +919,16 @@
     "farbe": 1.0
    },
    "elemente": [
-    108,
     109,
     110,
-    111
+    111,
+    112
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 49,
+   "nummer": 50,
    "pfad": "#layer-menu-Internet\\%20zuhause > div:nth-of-type(2) > div:nth-of-type(1)",
    "name": null,
    "art": "farbe",
@@ -921,14 +939,14 @@
     "farbe": 1.0
    },
    "elemente": [
-    112,
-    113
+    113,
+    114
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 50,
+   "nummer": 51,
    "pfad": "#layer-menu-Kombi-Angebote",
    "name": null,
    "art": "farbe",
@@ -939,13 +957,13 @@
     "farbe": 1.0
    },
    "elemente": [
-    115
+    116
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 51,
+   "nummer": 52,
    "pfad": "#layer-menu-Kombi-Angebote > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > ul:nth-of-type(1)",
    "name": null,
    "art": "farbe",
@@ -956,17 +974,17 @@
     "farbe": 1.0
    },
    "elemente": [
-    116,
     117,
     118,
     119,
-    120
+    120,
+    121
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 52,
+   "nummer": 53,
    "pfad": "#layer-menu-Kombi-Angebote > div:nth-of-type(2) > div:nth-of-type(1)",
    "name": null,
    "art": "tarif",
@@ -977,14 +995,14 @@
     "farbe": 1.0
    },
    "elemente": [
-    121,
-    122
+    122,
+    123
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 53,
+   "nummer": 54,
    "pfad": "#layer-menu-TV\\%20\\%26\\%20Extras",
    "name": null,
    "art": "farbe",
@@ -995,13 +1013,13 @@
     "farbe": 1.0
    },
    "elemente": [
-    124
+    125
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 54,
+   "nummer": 55,
    "pfad": "#layer-menu-TV\\%20\\%26\\%20Extras > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > ul:nth-of-type(1)",
    "name": null,
    "art": "farbe",
@@ -1012,17 +1030,17 @@
     "farbe": 1.0
    },
    "elemente": [
-    125,
     126,
     127,
     128,
-    129
+    129,
+    130
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 55,
+   "nummer": 56,
    "pfad": "#layer-menu-TV\\%20\\%26\\%20Extras > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1)",
    "name": null,
    "art": "farbe",
@@ -1033,20 +1051,20 @@
     "farbe": 1.0
    },
    "elemente": [
-    130,
     131,
     132,
     133,
     134,
     135,
     136,
-    137
+    137,
+    138
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 56,
+   "nummer": 57,
    "pfad": "#layer-menu-TV\\%20\\%26\\%20Extras > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > tef-teaser-nav:nth-of-type(1)",
    "name": null,
    "art": "farbe",
@@ -1057,14 +1075,14 @@
     "farbe": 1.0
    },
    "elemente": [
-    138,
-    139
+    139,
+    140
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 57,
+   "nummer": 58,
    "pfad": "#layer-menu-TV\\%20\\%26\\%20Extras > div:nth-of-type(2) > div:nth-of-type(1)",
    "name": null,
    "art": "farbe",
@@ -1075,13 +1093,13 @@
     "farbe": 1.0
    },
    "elemente": [
-    140
+    141
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 58,
+   "nummer": 59,
    "pfad": "#layer-menu-Ger\\%C3\\%A4te",
    "name": null,
    "art": "farbe",
@@ -1092,13 +1110,13 @@
     "farbe": 1.0
    },
    "elemente": [
-    142
+    143
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 59,
+   "nummer": 60,
    "pfad": "#layer-menu-Ger\\%C3\\%A4te > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > ul:nth-of-type(1)",
    "name": null,
    "art": "farbe",
@@ -1109,7 +1127,6 @@
     "farbe": 1.0
    },
    "elemente": [
-    143,
     144,
     145,
     146,
@@ -1118,13 +1135,14 @@
     149,
     150,
     151,
-    152
+    152,
+    153
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 60,
+   "nummer": 61,
    "pfad": "#layer-menu-Ger\\%C3\\%A4te > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1)",
    "name": null,
    "art": "farbe",
@@ -1135,20 +1153,20 @@
     "farbe": 1.0
    },
    "elemente": [
-    153,
     154,
     155,
     156,
     157,
     158,
     159,
-    160
+    160,
+    161
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 61,
+   "nummer": 62,
    "pfad": "#layer-menu-Ger\\%C3\\%A4te > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2)",
    "name": null,
    "art": "farbe",
@@ -1159,13 +1177,13 @@
     "farbe": 1.0
    },
    "elemente": [
-    161
+    162
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 62,
+   "nummer": 63,
    "pfad": "#layer-menu-Ger\\%C3\\%A4te > div:nth-of-type(2) > div:nth-of-type(1)",
    "name": null,
    "art": "farbe",
@@ -1176,14 +1194,14 @@
     "farbe": 1.0
    },
    "elemente": [
-    162,
-    163
+    163,
+    164
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 63,
+   "nummer": 64,
    "pfad": "#layer-menu-Top\\%20Deals",
    "name": null,
    "art": "farbe",
@@ -1194,13 +1212,13 @@
     "farbe": 1.0
    },
    "elemente": [
-    165
+    166
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 64,
+   "nummer": 65,
    "pfad": "#layer-menu-Top\\%20Deals > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > ul:nth-of-type(1)",
    "name": null,
    "art": "farbe",
@@ -1211,18 +1229,18 @@
     "farbe": 1.0
    },
    "elemente": [
-    166,
     167,
     168,
     169,
     170,
-    171
+    171,
+    172
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 65,
+   "nummer": 66,
    "pfad": "#layer-menu-Top\\%20Deals > div:nth-of-type(2) > div:nth-of-type(1)",
    "name": null,
    "art": "farbe",
@@ -1233,14 +1251,14 @@
     "farbe": 1.0
    },
    "elemente": [
-    172,
-    173
+    173,
+    174
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 66,
+   "nummer": 67,
    "pfad": "#id-2277024",
    "name": null,
    "art": "farbe",
@@ -1251,14 +1269,14 @@
     "farbe": 1.0
    },
    "elemente": [
-    174,
-    175
+    175,
+    176
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 67,
+   "nummer": 68,
    "pfad": "#id-2006630 > tef-navigation-layer:nth-of-type(3)",
    "name": null,
    "art": "farbe",
@@ -1269,13 +1287,13 @@
     "farbe": 1.0
    },
    "elemente": [
-    178
+    179
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 68,
+   "nummer": 69,
    "pfad": "#id-1152416",
    "name": null,
    "art": "farbe",
@@ -1286,17 +1304,17 @@
     "farbe": 1.0
    },
    "elemente": [
-    179,
     180,
     181,
     182,
-    183
+    183,
+    184
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 69,
+   "nummer": 70,
    "pfad": "#id-2006630 > tef-navigation-layer:nth-of-type(3) > div:nth-of-type(2) > div:nth-of-type(1)",
    "name": null,
    "art": "farbe",
@@ -1307,14 +1325,14 @@
     "farbe": 1.0
    },
    "elemente": [
-    184,
-    185
+    185,
+    186
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 70,
+   "nummer": 71,
    "pfad": "#id-2006630 > tef-navigation-layer:nth-of-type(3) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(4) > ul:nth-of-type(1)",
    "name": null,
    "art": "farbe",
@@ -1325,16 +1343,16 @@
     "farbe": 1.0
    },
    "elemente": [
-    186,
     187,
     188,
-    189
+    189,
+    190
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 71,
+   "nummer": 72,
    "pfad": "#id-2006630 > tef-routing-widget:nth-of-type(1) > div:nth-of-type(2) > tef-collapsible:nth-of-type(1) > div:nth-of-type(2)",
    "name": "Warum ist das wichtig?",
    "art": "unbekannt",
@@ -1345,14 +1363,14 @@
     "farbe": 0.0
    },
    "elemente": [
-    190,
-    191
+    191,
+    192
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 72,
+   "nummer": 73,
    "pfad": "#id-71434 > tef-breadcrumb:nth-of-type(1) > ol:nth-of-type(1)",
    "name": null,
    "art": "farbe",
@@ -1363,14 +1381,14 @@
     "farbe": 1.0
    },
    "elemente": [
-    192,
-    193
+    193,
+    194
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 73,
+   "nummer": 74,
    "pfad": "#tariff-details-modal > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
@@ -1381,13 +1399,13 @@
     "farbe": 0.0
    },
    "elemente": [
-    194
+    195
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 74,
+   "nummer": 75,
    "pfad": "#id-368770 > div:nth-of-type(2)",
    "name": "Standard-Voreinstellungen",
    "art": "unbekannt",
@@ -1398,13 +1416,13 @@
     "farbe": 0.0
    },
    "elemente": [
-    197
+    198
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 75,
+   "nummer": 76,
    "pfad": "#id-369070 > div:nth-of-type(1) > div:nth-of-type(1) > table:nth-of-type(1) > tbody:nth-of-type(1)",
    "name": null,
    "art": "tarif",
@@ -1415,14 +1433,14 @@
     "farbe": 0.0
    },
    "elemente": [
-    198,
-    199
+    199,
+    200
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 76,
+   "nummer": 77,
    "pfad": "#id-368798 > div:nth-of-type(1) > div:nth-of-type(1) > table:nth-of-type(1) > tbody:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
@@ -1433,16 +1451,16 @@
     "farbe": 0.0
    },
    "elemente": [
-    200,
     201,
     202,
-    203
+    203,
+    204
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 77,
+   "nummer": 78,
    "pfad": "#tariff-details-modal > div:nth-of-type(2) > article:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
@@ -1453,14 +1471,14 @@
     "farbe": 0.0
    },
    "elemente": [
-    204,
-    205
+    205,
+    206
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 78,
+   "nummer": 79,
    "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
@@ -1471,33 +1489,15 @@
     "farbe": 0.0
    },
    "elemente": [
-    208
-   ],
-   "select": false,
-   "mit_marke": false
-  },
-  {
-   "nummer": 79,
-   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(1) > div:nth-of-type(3)",
-   "name": "Samsung Galaxy S26",
-   "art": "unbekannt",
-   "anteile": {
-    "speicher": 0.0,
-    "laufzeit": 0.0,
-    "tarif": 0.0,
-    "farbe": 0.0
-   },
-   "elemente": [
-    209,
-    214
+    209
    ],
    "select": false,
    "mit_marke": false
   },
   {
    "nummer": 80,
-   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2)",
-   "name": "Samsung Galaxy S26",
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(1) > div:nth-of-type(3) > article:nth-of-type(1) > div:nth-of-type(1)",
+   "name": null,
    "art": "unbekannt",
    "anteile": {
     "speicher": 0.0,
@@ -1514,8 +1514,8 @@
   },
   {
    "nummer": 81,
-   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(6) > div:nth-of-type(1) > tef-promo-box:nth-of-type(1)",
-   "name": null,
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2)",
+   "name": "Samsung Galaxy S26",
    "art": "unbekannt",
    "anteile": {
     "speicher": 0.0,
@@ -1532,31 +1532,48 @@
   },
   {
    "nummer": 82,
-   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(3) > div:nth-of-type(2) > tef-shop-tile:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > ul:nth-of-type(1)",
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(6) > div:nth-of-type(1) > tef-promo-box:nth-of-type(1)",
    "name": null,
-   "art": "tarif",
+   "art": "unbekannt",
    "anteile": {
     "speicher": 0.0,
     "laufzeit": 0.0,
-    "tarif": 0.5,
+    "tarif": 0.0,
     "farbe": 0.0
    },
    "elemente": [
-    215,
-    216
+    214,
+    215
    ],
    "select": false,
    "mit_marke": false
   },
   {
    "nummer": 83,
-   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(3) > div:nth-of-type(2) > tef-shop-tile:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2)",
-   "name": "Zu den Tarifdetails",
-   "art": "tarif",
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(1) > div:nth-of-type(3)",
+   "name": "Samsung Galaxy S26",
+   "art": "unbekannt",
    "anteile": {
     "speicher": 0.0,
     "laufzeit": 0.0,
-    "tarif": 0.5,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    216
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 84,
+   "pfad": "#id-2364682",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
     "farbe": 0.0
    },
    "elemente": [
@@ -1567,14 +1584,14 @@
    "mit_marke": false
   },
   {
-   "nummer": 84,
-   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(3) > div:nth-of-type(2) > tef-shop-tile:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1)",
-   "name": "SIM-Karten Produktinformation",
-   "art": "unbekannt",
+   "nummer": 85,
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(3) > div:nth-of-type(2) > tef-shop-tile:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > ul:nth-of-type(1)",
+   "name": null,
+   "art": "tarif",
    "anteile": {
     "speicher": 0.0,
     "laufzeit": 0.0,
-    "tarif": 0.0,
+    "tarif": 0.5,
     "farbe": 0.0
    },
    "elemente": [
@@ -1585,7 +1602,43 @@
    "mit_marke": false
   },
   {
-   "nummer": 85,
+   "nummer": 86,
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(3) > div:nth-of-type(2) > tef-shop-tile:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2)",
+   "name": "Zu den Tarifdetails",
+   "art": "tarif",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.5,
+    "farbe": 0.0
+   },
+   "elemente": [
+    221,
+    222
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 87,
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(3) > div:nth-of-type(2) > tef-shop-tile:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1)",
+   "name": "SIM-Karten Produktinformation",
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    223,
+    224
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 88,
    "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(4)",
    "name": null,
    "art": "unbekannt",
@@ -1596,13 +1649,13 @@
     "farbe": 0.0
    },
    "elemente": [
-    221
+    225
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 86,
+   "nummer": 89,
    "pfad": "#id-8300 > div:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
@@ -1613,15 +1666,15 @@
     "farbe": 0.0
    },
    "elemente": [
-    223,
-    224,
-    225
+    227,
+    228,
+    229
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 87,
+   "nummer": 90,
    "pfad": "#content > section:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
@@ -1632,13 +1685,13 @@
     "farbe": 0.0
    },
    "elemente": [
-    226
+    230
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 88,
+   "nummer": 91,
    "pfad": "#content > section:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
@@ -1649,13 +1702,13 @@
     "farbe": 0.0
    },
    "elemente": [
-    227
+    231
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 89,
+   "nummer": 92,
    "pfad": "#id-2194668 > ul:nth-of-type(1)",
    "name": "Netzteil nicht im Lieferumfang enthalten Kompatibles Netzteil: 10-25 W USB PD",
    "art": "unbekannt",
@@ -1666,16 +1719,16 @@
     "farbe": 0.0
    },
    "elemente": [
-    228,
-    229,
-    230,
-    231
+    232,
+    233,
+    234,
+    235
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 90,
+   "nummer": 93,
    "pfad": "#content > section:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
@@ -1686,15 +1739,15 @@
     "farbe": 0.0
    },
    "elemente": [
-    232,
-    233,
-    234
+    237,
+    238,
+    239
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 91,
+   "nummer": 94,
    "pfad": "#technical-details-accordion",
    "name": "Technische Details zu Samsung Galaxy S26",
    "art": "unbekannt",
@@ -1705,16 +1758,16 @@
     "farbe": 0.0
    },
    "elemente": [
-    235,
-    236,
-    237,
-    238
+    240,
+    241,
+    242,
+    243
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 92,
+   "nummer": 95,
    "pfad": "#content > section:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > article:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
@@ -1725,14 +1778,14 @@
     "farbe": 0.0
    },
    "elemente": [
-    239,
-    240
+    244,
+    245
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 93,
+   "nummer": 96,
    "pfad": "#\\32 267892",
    "name": null,
    "art": "tarif",
@@ -1743,99 +1796,14 @@
     "farbe": 0.0
    },
    "elemente": [
-    241
-   ],
-   "select": false,
-   "mit_marke": false
-  },
-  {
-   "nummer": 94,
-   "pfad": "#\\31 817562",
-   "name": null,
-   "art": "unbekannt",
-   "anteile": {
-    "speicher": 0.0,
-    "laufzeit": 0.0,
-    "tarif": 0.0,
-    "farbe": 0.0
-   },
-   "elemente": [
-    242
-   ],
-   "select": false,
-   "mit_marke": false
-  },
-  {
-   "nummer": 95,
-   "pfad": "#\\31 817586",
-   "name": "Die Gutschrift für die kostenfreien Reisetage erfolgt mit der Abrechnung der ersten Auslandsreise.",
-   "art": "unbekannt",
-   "anteile": {
-    "speicher": 0.0,
-    "laufzeit": 0.0,
-    "tarif": 0.0,
-    "farbe": 0.0
-   },
-   "elemente": [
-    243
-   ],
-   "select": false,
-   "mit_marke": false
-  },
-  {
-   "nummer": 96,
-   "pfad": "#\\31 817578",
-   "name": null,
-   "art": "unbekannt",
-   "anteile": {
-    "speicher": 0.0,
-    "laufzeit": 0.0,
-    "tarif": 0.0,
-    "farbe": 0.0
-   },
-   "elemente": [
-    244
-   ],
-   "select": false,
-   "mit_marke": false
-  },
-  {
-   "nummer": 97,
-   "pfad": "#\\31 817546",
-   "name": "Die Gutschrift für die kostenfreien Reisetage erfolgt mit der Abrechnung der ersten Auslandsreise.",
-   "art": "unbekannt",
-   "anteile": {
-    "speicher": 0.0,
-    "laufzeit": 0.0,
-    "tarif": 0.0,
-    "farbe": 0.0
-   },
-   "elemente": [
-    245
-   ],
-   "select": false,
-   "mit_marke": false
-  },
-  {
-   "nummer": 98,
-   "pfad": "#\\31 817476",
-   "name": null,
-   "art": "unbekannt",
-   "anteile": {
-    "speicher": 0.0,
-    "laufzeit": 0.0,
-    "tarif": 0.0,
-    "farbe": 0.0
-   },
-   "elemente": [
     246
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 99,
-   "pfad": "#\\31 817538",
+   "nummer": 97,
+   "pfad": "#\\31 817562",
    "name": null,
    "art": "unbekannt",
    "anteile": {
@@ -1851,9 +1819,9 @@
    "mit_marke": false
   },
   {
-   "nummer": 100,
-   "pfad": "#\\31 723944",
-   "name": null,
+   "nummer": 98,
+   "pfad": "#\\31 817586",
+   "name": "Die Gutschrift für die kostenfreien Reisetage erfolgt mit der Abrechnung der ersten Auslandsreise.",
    "art": "unbekannt",
    "anteile": {
     "speicher": 0.0,
@@ -1868,8 +1836,8 @@
    "mit_marke": false
   },
   {
-   "nummer": 101,
-   "pfad": "#\\31 724124",
+   "nummer": 99,
+   "pfad": "#\\31 817578",
    "name": null,
    "art": "unbekannt",
    "anteile": {
@@ -1885,9 +1853,9 @@
    "mit_marke": false
   },
   {
-   "nummer": 102,
-   "pfad": "#\\31 723754",
-   "name": null,
+   "nummer": 100,
+   "pfad": "#\\31 817546",
+   "name": "Die Gutschrift für die kostenfreien Reisetage erfolgt mit der Abrechnung der ersten Auslandsreise.",
    "art": "unbekannt",
    "anteile": {
     "speicher": 0.0,
@@ -1902,7 +1870,92 @@
    "mit_marke": false
   },
   {
+   "nummer": 101,
+   "pfad": "#\\31 817476",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    251
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 102,
+   "pfad": "#\\31 817538",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    252
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
    "nummer": 103,
+   "pfad": "#\\31 723944",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    253
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 104,
+   "pfad": "#\\31 724124",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    254
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 105,
+   "pfad": "#\\31 723754",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    255
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 106,
    "pfad": "#\\32 073476",
    "name": null,
    "art": "unbekannt",
@@ -1913,14 +1966,14 @@
     "farbe": 0.0
    },
    "elemente": [
-    251,
-    252
+    256,
+    257
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 104,
+   "nummer": 107,
    "pfad": "#id-60080 > div:nth-of-type(1)",
    "name": null,
    "art": "farbe",
@@ -1931,15 +1984,15 @@
     "farbe": 1.0
    },
    "elemente": [
-    253,
-    254,
-    255
+    258,
+    259,
+    260
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 105,
+   "nummer": 108,
    "pfad": "#id-2007618 > div:nth-of-type(1) > div:nth-of-type(1) > ul:nth-of-type(1)",
    "name": null,
    "art": "farbe",
@@ -1950,20 +2003,20 @@
     "farbe": 0.62
    },
    "elemente": [
-    256,
-    257,
-    258,
-    259,
-    260,
     261,
     262,
-    263
+    263,
+    264,
+    265,
+    266,
+    267,
+    268
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 106,
+   "nummer": 109,
    "pfad": "#id-2007622 > div:nth-of-type(1) > div:nth-of-type(1) > ul:nth-of-type(1)",
    "name": null,
    "art": "farbe",
@@ -1974,20 +2027,20 @@
     "farbe": 0.5
    },
    "elemente": [
-    264,
-    265,
-    266,
-    267,
-    268,
     269,
     270,
-    271
+    271,
+    272,
+    273,
+    274,
+    275,
+    276
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 107,
+   "nummer": 110,
    "pfad": "#id-2007626 > div:nth-of-type(1) > div:nth-of-type(1) > ul:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
@@ -1998,23 +2051,23 @@
     "farbe": 0.36
    },
    "elemente": [
-    272,
-    273,
-    274,
-    275,
-    276,
     277,
     278,
     279,
     280,
     281,
-    282
+    282,
+    283,
+    284,
+    285,
+    286,
+    287
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 108,
+   "nummer": 111,
    "pfad": "#id-2007636 > div:nth-of-type(1) > div:nth-of-type(1) > ul:nth-of-type(1)",
    "name": null,
    "art": "farbe",
@@ -2025,20 +2078,20 @@
     "farbe": 1.0
    },
    "elemente": [
-    283,
-    284,
-    285,
-    286,
-    287,
     288,
     289,
-    290
+    290,
+    291,
+    292,
+    293,
+    294,
+    295
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 109,
+   "nummer": 112,
    "pfad": "#id-59676 > ul:nth-of-type(1)",
    "name": null,
    "art": "farbe",
@@ -2049,23 +2102,23 @@
     "farbe": 1.0
    },
    "elemente": [
-    291,
-    292,
-    293,
-    294,
-    295,
     296,
     297,
     298,
     299,
     300,
-    301
+    301,
+    302,
+    303,
+    304,
+    305,
+    306
    ],
    "select": false,
    "mit_marke": true
   },
   {
-   "nummer": 110,
+   "nummer": 113,
    "pfad": "#id-984298 > ul:nth-of-type(1)",
    "name": null,
    "art": "farbe",
@@ -2076,14 +2129,14 @@
     "farbe": 1.0
    },
    "elemente": [
-    302,
-    303
+    307,
+    308
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 111,
+   "nummer": 114,
    "pfad": "#id-60036 > ul:nth-of-type(1)",
    "name": null,
    "art": "farbe",
@@ -2094,17 +2147,17 @@
     "farbe": 1.0
    },
    "elemente": [
-    304,
-    305,
-    306,
-    307,
-    308
+    309,
+    310,
+    311,
+    312,
+    313
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 112,
+   "nummer": 115,
    "pfad": "#bottom > tef-footer:nth-of-type(1) > div:nth-of-type(4)",
    "name": null,
    "art": "farbe",
@@ -2115,14 +2168,14 @@
     "farbe": 1.0
    },
    "elemente": [
-    309,
-    310
+    314,
+    315
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 113,
+   "nummer": 116,
    "pfad": "#id-1994812",
    "name": null,
    "art": "unbekannt",
@@ -2133,14 +2186,14 @@
     "farbe": 0.0
    },
    "elemente": [
-    314,
-    315
+    319,
+    320
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 114,
+   "nummer": 117,
    "pfad": "#trboModule_12897_549249_105_container > tef-teaser-nav:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
@@ -2151,14 +2204,14 @@
     "farbe": 0.0
    },
    "elemente": [
-    317,
-    318
+    322,
+    323
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 115,
+   "nummer": 118,
    "pfad": "#id-1955968 > div:nth-of-type(1)",
    "name": "Beratung und Bestellung",
    "art": "farbe",
@@ -2169,9 +2222,9 @@
     "farbe": 1.0
    },
    "elemente": [
-    324,
-    325,
-    326
+    329,
+    330,
+    331
    ],
    "select": false,
    "mit_marke": false
@@ -2429,7 +2482,7 @@
    },
    "daten": {
     "data-parent": "#id-2241710",
-    "data-target": "#id-2241710-id-2262144-r-819802063",
+    "data-target": "#id-2241710-id-2262144-r-1972097154",
     "data-toggle": "collapse",
     "data-tracking-action": "accordion",
     "data-tracking-description": "cms__Datenvolumen"
@@ -2460,7 +2513,7 @@
    },
    "daten": {
     "data-parent": "#id-2241710",
-    "data-target": "#id-2241710-id-2029478-r-1319744410",
+    "data-target": "#id-2241710-id-2029478-r-1348349132",
     "data-toggle": "collapse",
     "data-tracking-action": "accordion",
     "data-tracking-description": "cms__Übertragungsgeschwindigkeit"
@@ -2491,7 +2544,7 @@
    },
    "daten": {
     "data-parent": "#id-2241710",
-    "data-target": "#id-2241710-id-587554-r-1762405868",
+    "data-target": "#id-2241710-id-587554-r-1106316575",
     "data-toggle": "collapse",
     "data-tracking-action": "accordion",
     "data-tracking-description": "cms__5G"
@@ -2522,7 +2575,7 @@
    },
    "daten": {
     "data-parent": "#id-2241710",
-    "data-target": "#id-2241710-id-587542-r-725249760",
+    "data-target": "#id-2241710-id-587542-r-229572137",
     "data-toggle": "collapse",
     "data-tracking-action": "accordion",
     "data-tracking-description": "cms__EU-Roaming"
@@ -2553,7 +2606,7 @@
    },
    "daten": {
     "data-parent": "#id-586986",
-    "data-target": "#id-586986-id-350322-r-1509165224",
+    "data-target": "#id-586986-id-350322-r-1029648717",
     "data-toggle": "collapse",
     "data-tracking-action": "accordion",
     "data-tracking-description": "cms__Gespräche"
@@ -2584,7 +2637,7 @@
    },
    "daten": {
     "data-parent": "#id-586986",
-    "data-target": "#id-586986-id-181556-r-59493678",
+    "data-target": "#id-586986-id-181556-r-2139202521",
     "data-toggle": "collapse",
     "data-tracking-action": "accordion",
     "data-tracking-description": "cms__SMS"
@@ -2615,7 +2668,7 @@
    },
    "daten": {
     "data-parent": "#id-586986",
-    "data-target": "#id-586986-id-178560-r-1001004178",
+    "data-target": "#id-586986-id-178560-r-554460725",
     "data-toggle": "collapse",
     "data-tracking-action": "accordion",
     "data-tracking-description": "cms__Festnetznummer"
@@ -2972,17 +3025,17 @@
    "text": "select-tariff",
    "aria": {
     "aria-checked": "false",
-    "aria-labelledby": "choice-panel-input-648"
+    "aria-labelledby": "choice-panel-input-557"
    },
    "daten": {},
-   "id": "choice-panel-input-648",
+   "id": "choice-panel-input-557",
    "klassen": [],
    "name": "select-tariff",
    "wert": "select-tariff",
    "typ": "radio",
    "href": null,
    "ziel": null,
-   "pfad": "#choice-panel-input-648",
+   "pfad": "#choice-panel-input-557",
    "sichtbar": true,
    "deaktiviert": false,
    "gewaehlt": null,
@@ -2992,7 +3045,7 @@
   {
    "tag": "label",
    "rolle": "label",
-   "text": "O2 Mobile Unlimited L Plus mit 300 MBit/s mtl. 56,49 €",
+   "text": "O2 Mobile Unlimited L Plus mit 300 MBit/s mtl. 54,49 €",
    "aria": {},
    "daten": {},
    "id": null,
@@ -3015,17 +3068,17 @@
    "text": "select-tariff",
    "aria": {
     "aria-checked": "true",
-    "aria-labelledby": "choice-panel-input-760"
+    "aria-labelledby": "choice-panel-input-35"
    },
    "daten": {},
-   "id": "choice-panel-input-760",
+   "id": "choice-panel-input-35",
    "klassen": [],
    "name": "select-tariff",
    "wert": "select-tariff",
    "typ": "radio",
    "href": null,
    "ziel": null,
-   "pfad": "#choice-panel-input-760",
+   "pfad": "#choice-panel-input-35",
    "sichtbar": true,
    "deaktiviert": false,
    "gewaehlt": "checked",
@@ -3035,7 +3088,7 @@
   {
    "tag": "label",
    "rolle": "label",
-   "text": "O2 Mobile Unlimited M Plus mit 100 MBit/s mtl. 46,49 €",
+   "text": "O2 Mobile Unlimited M Plus mit 100 MBit/s mtl. 44,49 €",
    "aria": {},
    "daten": {},
    "id": null,
@@ -3058,17 +3111,17 @@
    "text": "select-tariff",
    "aria": {
     "aria-checked": "false",
-    "aria-labelledby": "choice-panel-input-94"
+    "aria-labelledby": "choice-panel-input-448"
    },
    "daten": {},
-   "id": "choice-panel-input-94",
+   "id": "choice-panel-input-448",
    "klassen": [],
    "name": "select-tariff",
    "wert": "select-tariff",
    "typ": "radio",
    "href": null,
    "ziel": null,
-   "pfad": "#choice-panel-input-94",
+   "pfad": "#choice-panel-input-448",
    "sichtbar": true,
    "deaktiviert": false,
    "gewaehlt": null,
@@ -3078,7 +3131,7 @@
   {
    "tag": "label",
    "rolle": "label",
-   "text": "O2 Mobile Unlimited S Special Plus mit 15 MBit/s mtl. 46,49 €",
+   "text": "O2 Mobile Unlimited S Special Plus mit 15 MBit/s mtl. 44,49 €",
    "aria": {},
    "daten": {},
    "id": null,
@@ -3101,17 +3154,17 @@
    "text": "select-tariff",
    "aria": {
     "aria-checked": "false",
-    "aria-labelledby": "choice-panel-input-482"
+    "aria-labelledby": "choice-panel-input-455"
    },
    "daten": {},
-   "id": "choice-panel-input-482",
+   "id": "choice-panel-input-455",
    "klassen": [],
    "name": "select-tariff",
    "wert": "select-tariff",
    "typ": "radio",
    "href": null,
    "ziel": null,
-   "pfad": "#choice-panel-input-482",
+   "pfad": "#choice-panel-input-455",
    "sichtbar": true,
    "deaktiviert": false,
    "gewaehlt": null,
@@ -3121,7 +3174,7 @@
   {
    "tag": "label",
    "rolle": "label",
-   "text": "O2 Mobile L Plus mit 150 GB+ mtl. 46,49 €",
+   "text": "O2 Mobile L Plus mit 150 GB+ mtl. 44,49 €",
    "aria": {},
    "daten": {},
    "id": null,
@@ -3166,17 +3219,17 @@
    "text": "select-whalebone-pack",
    "aria": {
     "aria-checked": "false",
-    "aria-labelledby": "choice-panel-input-57"
+    "aria-labelledby": "choice-panel-input-342"
    },
    "daten": {},
-   "id": "choice-panel-input-57",
+   "id": "choice-panel-input-342",
    "klassen": [],
    "name": "select-whalebone-pack",
    "wert": "select-whalebone-pack",
    "typ": "radio",
    "href": null,
    "ziel": null,
-   "pfad": "#choice-panel-input-57",
+   "pfad": "#choice-panel-input-342",
    "sichtbar": true,
    "deaktiviert": false,
    "gewaehlt": null,
@@ -3209,17 +3262,17 @@
    "text": "select-whalebone-pack",
    "aria": {
     "aria-checked": "false",
-    "aria-labelledby": "choice-panel-input-972"
+    "aria-labelledby": "choice-panel-input-257"
    },
    "daten": {},
-   "id": "choice-panel-input-972",
+   "id": "choice-panel-input-257",
    "klassen": [],
    "name": "select-whalebone-pack",
    "wert": "select-whalebone-pack",
    "typ": "radio",
    "href": null,
    "ziel": null,
-   "pfad": "#choice-panel-input-972",
+   "pfad": "#choice-panel-input-257",
    "sichtbar": true,
    "deaktiviert": false,
    "gewaehlt": null,
@@ -3252,17 +3305,17 @@
    "text": "select-whalebone-pack",
    "aria": {
     "aria-checked": "false",
-    "aria-labelledby": "choice-panel-input-400"
+    "aria-labelledby": "choice-panel-input-803"
    },
    "daten": {},
-   "id": "choice-panel-input-400",
+   "id": "choice-panel-input-803",
    "klassen": [],
    "name": "select-whalebone-pack",
    "wert": "select-whalebone-pack",
    "typ": "radio",
    "href": null,
    "ziel": null,
-   "pfad": "#choice-panel-input-400",
+   "pfad": "#choice-panel-input-803",
    "sichtbar": true,
    "deaktiviert": false,
    "gewaehlt": null,
@@ -3295,17 +3348,17 @@
    "text": "select-whalebone-pack",
    "aria": {
     "aria-checked": "false",
-    "aria-labelledby": "choice-panel-input-961"
+    "aria-labelledby": "choice-panel-input-486"
    },
    "daten": {},
-   "id": "choice-panel-input-961",
+   "id": "choice-panel-input-486",
    "klassen": [],
    "name": "select-whalebone-pack",
    "wert": "select-whalebone-pack",
    "typ": "radio",
    "href": null,
    "ziel": null,
-   "pfad": "#choice-panel-input-961",
+   "pfad": "#choice-panel-input-486",
    "sichtbar": true,
    "deaktiviert": false,
    "gewaehlt": null,
@@ -3338,17 +3391,17 @@
    "text": "select-whalebone-pack",
    "aria": {
     "aria-checked": "false",
-    "aria-labelledby": "choice-panel-input-858"
+    "aria-labelledby": "choice-panel-input-211"
    },
    "daten": {},
-   "id": "choice-panel-input-858",
+   "id": "choice-panel-input-211",
    "klassen": [],
    "name": "select-whalebone-pack",
    "wert": "select-whalebone-pack",
    "typ": "radio",
    "href": null,
    "ziel": null,
-   "pfad": "#choice-panel-input-858",
+   "pfad": "#choice-panel-input-211",
    "sichtbar": true,
    "deaktiviert": false,
    "gewaehlt": null,
@@ -3381,17 +3434,17 @@
    "text": "select-whalebone-pack",
    "aria": {
     "aria-checked": "false",
-    "aria-labelledby": "choice-panel-input-35"
+    "aria-labelledby": "choice-panel-input-739"
    },
    "daten": {},
-   "id": "choice-panel-input-35",
+   "id": "choice-panel-input-739",
    "klassen": [],
    "name": "select-whalebone-pack",
    "wert": "select-whalebone-pack",
    "typ": "radio",
    "href": null,
    "ziel": null,
-   "pfad": "#choice-panel-input-35",
+   "pfad": "#choice-panel-input-739",
    "sichtbar": true,
    "deaktiviert": false,
    "gewaehlt": null,
@@ -3424,17 +3477,17 @@
    "text": "select-whalebone-pack",
    "aria": {
     "aria-checked": "true",
-    "aria-labelledby": "choice-panel-input-454"
+    "aria-labelledby": "choice-panel-input-202"
    },
    "daten": {},
-   "id": "choice-panel-input-454",
+   "id": "choice-panel-input-202",
    "klassen": [],
    "name": "select-whalebone-pack",
    "wert": "select-whalebone-pack",
    "typ": "radio",
    "href": null,
    "ziel": null,
-   "pfad": "#choice-panel-input-454",
+   "pfad": "#choice-panel-input-202",
    "sichtbar": true,
    "deaktiviert": false,
    "gewaehlt": "checked",
@@ -3524,7 +3577,7 @@
    },
    "daten": {
     "data-parent": "",
-    "data-target": "#id-2194672-id-2194670-r-75123074",
+    "data-target": "#id-2194672-id-2194670-r-962314347",
     "data-toggle": "collapse",
     "data-tracking-action": "accordion",
     "data-tracking-description": "cms__Hersteller- & Sicherheitsinformationen"
@@ -3549,13 +3602,43 @@
   {
    "tag": "button",
    "rolle": "button",
+   "text": "Aktion: Zusätzlich 300 Euro Tauschvorteil",
+   "aria": {
+    "aria-controls": "id-2361980"
+   },
+   "daten": {
+    "data-parent": "",
+    "data-target": "#id-2361978-id-2361980-r-342732529",
+    "data-toggle": "collapse",
+    "data-tracking-action": "accordion",
+    "data-tracking-description": "cms__Aktion: Zusätzlich 300 Euro Tauschvorteil"
+   },
+   "id": null,
+   "klassen": [
+    "js-enhanced"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": "button",
+   "href": null,
+   "ziel": null,
+   "pfad": "#id-2361978 > div:nth-of-type(1) > h3:nth-of-type(1) > button:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 35
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
    "text": "Samsung Galaxy S26: Das ist neu",
    "aria": {
     "aria-controls": "id-2194694"
    },
    "daten": {
     "data-parent": "",
-    "data-target": "#id-2194688-id-2194694-r-2120366789",
+    "data-target": "#id-2194688-id-2194694-r-404959888",
     "data-toggle": "collapse",
     "data-tracking-action": "accordion",
     "data-tracking-description": "cms__Samsung Galaxy S26: Das ist neu"
@@ -3574,7 +3657,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 35
+   "behaelter": 36
   },
   {
    "tag": "button",
@@ -3586,7 +3669,7 @@
    },
    "daten": {
     "data-parent": "",
-    "data-target": "#id-2194688-id-2194704-r-929607956",
+    "data-target": "#id-2194688-id-2194704-r-516111084",
     "data-toggle": "collapse",
     "data-tracking-action": "accordion",
     "data-tracking-description": "cms__Akku"
@@ -3605,7 +3688,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 35
+   "behaelter": 36
   },
   {
    "tag": "button",
@@ -3617,7 +3700,7 @@
    },
    "daten": {
     "data-parent": "",
-    "data-target": "#id-2194688-id-2194692-r-1566369958",
+    "data-target": "#id-2194688-id-2194692-r-2128988713",
     "data-toggle": "collapse",
     "data-tracking-action": "accordion",
     "data-tracking-description": "cms__Speicher"
@@ -3636,7 +3719,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 35
+   "behaelter": 36
   },
   {
    "tag": "button",
@@ -3648,7 +3731,7 @@
    },
    "daten": {
     "data-parent": "",
-    "data-target": "#id-2194688-id-2194698-r-788936655",
+    "data-target": "#id-2194688-id-2194698-r-1311851001",
     "data-toggle": "collapse",
     "data-tracking-action": "accordion",
     "data-tracking-description": "cms__Kamera"
@@ -3667,7 +3750,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 35
+   "behaelter": 36
   },
   {
    "tag": "button",
@@ -3679,7 +3762,7 @@
    },
    "daten": {
     "data-parent": "",
-    "data-target": "#id-2194688-id-2194700-r-1474148101",
+    "data-target": "#id-2194688-id-2194700-r-81717992",
     "data-toggle": "collapse",
     "data-tracking-action": "accordion",
     "data-tracking-description": "cms__Display"
@@ -3698,7 +3781,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 35
+   "behaelter": 36
   },
   {
    "tag": "button",
@@ -3710,7 +3793,7 @@
    },
    "daten": {
     "data-parent": "",
-    "data-target": "#id-2194688-id-2194696-r-2026763896",
+    "data-target": "#id-2194688-id-2194696-r-631394455",
     "data-toggle": "collapse",
     "data-tracking-action": "accordion",
     "data-tracking-description": "cms__Prozessor & Leistung"
@@ -3729,7 +3812,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 35
+   "behaelter": 36
   },
   {
    "tag": "button",
@@ -3741,7 +3824,7 @@
    },
    "daten": {
     "data-parent": "",
-    "data-target": "#id-2194688-id-2194702-r-327403350",
+    "data-target": "#id-2194688-id-2194702-r-1742190205",
     "data-toggle": "collapse",
     "data-tracking-action": "accordion",
     "data-tracking-description": "cms__Lieferumfang"
@@ -3760,7 +3843,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 35
+   "behaelter": 36
   },
   {
    "tag": "button",
@@ -3771,7 +3854,7 @@
    },
    "daten": {
     "data-parent": "",
-    "data-target": "#id-2206490-id-2206494-r-917478229",
+    "data-target": "#id-2206490-id-2206494-r-741755625",
     "data-toggle": "collapse",
     "data-tracking-action": "accordion",
     "data-tracking-description": "cms__Worauf sollte man beim Samsung Galaxy S26 mit Vertrag achten?"
@@ -3791,7 +3874,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 36
+   "behaelter": 37
   },
   {
    "tag": "button",
@@ -3802,7 +3885,7 @@
    },
    "daten": {
     "data-parent": "",
-    "data-target": "#id-2206490-id-2206500-r-1434020116",
+    "data-target": "#id-2206490-id-2206500-r-1151534464",
     "data-toggle": "collapse",
     "data-tracking-action": "accordion",
     "data-tracking-description": "cms__Lohnt sich das Samsung Galaxy S26 mit Vertrag?"
@@ -3822,7 +3905,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 36
+   "behaelter": 37
   },
   {
    "tag": "button",
@@ -3833,7 +3916,7 @@
    },
    "daten": {
     "data-parent": "",
-    "data-target": "#id-2206490-id-2206498-r-189741868",
+    "data-target": "#id-2206490-id-2206498-r-2131651500",
     "data-toggle": "collapse",
     "data-tracking-action": "accordion",
     "data-tracking-description": "cms__Samsung Galaxy S26 mit Vertrag oder ohne – was ist besser?"
@@ -3853,7 +3936,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 36
+   "behaelter": 37
   },
   {
    "tag": "button",
@@ -3864,7 +3947,7 @@
    },
    "daten": {
     "data-parent": "",
-    "data-target": "#id-2206490-id-2206516-r-183475404",
+    "data-target": "#id-2206490-id-2206516-r-1488478727",
     "data-toggle": "collapse",
     "data-tracking-action": "accordion",
     "data-tracking-description": "cms__Kann man das Samsung Galaxy S26 mit Vertrag und Ratenzahlung kombinieren?"
@@ -3884,7 +3967,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 36
+   "behaelter": 37
   },
   {
    "tag": "button",
@@ -3909,7 +3992,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 37
+   "behaelter": 38
   },
   {
    "tag": "a",
@@ -3932,7 +4015,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 38
+   "behaelter": 39
   },
   {
    "tag": "a",
@@ -3958,7 +4041,7 @@
    "deaktiviert": false,
    "gewaehlt": "klasse:navigation-meta-item-current",
    "optionen": null,
-   "behaelter": 39
+   "behaelter": 40
   },
   {
    "tag": "a",
@@ -3981,7 +4064,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 39
+   "behaelter": 40
   },
   {
    "tag": "a",
@@ -4004,7 +4087,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 40
+   "behaelter": 41
   },
   {
    "tag": "a",
@@ -4035,7 +4118,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 40
+   "behaelter": 41
   },
   {
    "tag": "a",
@@ -4081,7 +4164,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 41
+   "behaelter": 42
   },
   {
    "tag": "a",
@@ -4104,7 +4187,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 42
+   "behaelter": 43
   },
   {
    "tag": "a",
@@ -4127,7 +4210,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 42
+   "behaelter": 43
   },
   {
    "tag": "a",
@@ -4150,7 +4233,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 42
+   "behaelter": 43
   },
   {
    "tag": "a",
@@ -4173,7 +4256,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 42
+   "behaelter": 43
   },
   {
    "tag": "a",
@@ -4196,7 +4279,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 42
+   "behaelter": 43
   },
   {
    "tag": "a",
@@ -4219,7 +4302,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 42
+   "behaelter": 43
   },
   {
    "tag": "a",
@@ -4242,7 +4325,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 42
+   "behaelter": 43
   },
   {
    "tag": "a",
@@ -4265,7 +4348,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 42
+   "behaelter": 43
   },
   {
    "tag": "a",
@@ -4288,7 +4371,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 42
+   "behaelter": 43
   },
   {
    "tag": "a",
@@ -4314,7 +4397,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 43
+   "behaelter": 44
   },
   {
    "tag": "a",
@@ -4340,7 +4423,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 43
+   "behaelter": 44
   },
   {
    "tag": "a",
@@ -4366,7 +4449,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 43
+   "behaelter": 44
   },
   {
    "tag": "a",
@@ -4392,7 +4475,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 43
+   "behaelter": 44
   },
   {
    "tag": "a",
@@ -4418,7 +4501,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 43
+   "behaelter": 44
   },
   {
    "tag": "a",
@@ -4444,7 +4527,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 43
+   "behaelter": 44
   },
   {
    "tag": "a",
@@ -4470,7 +4553,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 43
+   "behaelter": 44
   },
   {
    "tag": "a",
@@ -4496,7 +4579,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 43
+   "behaelter": 44
   },
   {
    "tag": "a",
@@ -4519,7 +4602,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 44
+   "behaelter": 45
   },
   {
    "tag": "a",
@@ -4542,7 +4625,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 45
+   "behaelter": 46
   },
   {
    "tag": "a",
@@ -4565,7 +4648,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 45
+   "behaelter": 46
   },
   {
    "tag": "a",
@@ -4611,7 +4694,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 46
+   "behaelter": 47
   },
   {
    "tag": "a",
@@ -4634,7 +4717,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 47
+   "behaelter": 48
   },
   {
    "tag": "a",
@@ -4657,7 +4740,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 47
+   "behaelter": 48
   },
   {
    "tag": "a",
@@ -4680,7 +4763,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 47
+   "behaelter": 48
   },
   {
    "tag": "a",
@@ -4703,7 +4786,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 47
+   "behaelter": 48
   },
   {
    "tag": "a",
@@ -4726,7 +4809,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 47
+   "behaelter": 48
   },
   {
    "tag": "a",
@@ -4749,7 +4832,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 47
+   "behaelter": 48
   },
   {
    "tag": "a",
@@ -4772,7 +4855,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 47
+   "behaelter": 48
   },
   {
    "tag": "a",
@@ -4795,7 +4878,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 47
+   "behaelter": 48
   },
   {
    "tag": "a",
@@ -4821,7 +4904,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 48
+   "behaelter": 49
   },
   {
    "tag": "a",
@@ -4847,7 +4930,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 48
+   "behaelter": 49
   },
   {
    "tag": "a",
@@ -4873,7 +4956,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 48
+   "behaelter": 49
   },
   {
    "tag": "a",
@@ -4899,7 +4982,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 48
+   "behaelter": 49
   },
   {
    "tag": "a",
@@ -4922,7 +5005,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 49
+   "behaelter": 50
   },
   {
    "tag": "a",
@@ -4940,12 +5023,12 @@
    "typ": null,
    "href": "https://www.o2online.de/internet-festnetz/homespot-tarife/",
    "ziel": null,
-   "pfad": "#id-1723524 > div:nth-of-type(5) > a:nth-of-type(1)",
+   "pfad": "#id-1723524 > div:nth-of-type(3) > a:nth-of-type(1)",
    "sichtbar": true,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 49
+   "behaelter": 50
   },
   {
    "tag": "a",
@@ -4991,7 +5074,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 50
+   "behaelter": 51
   },
   {
    "tag": "a",
@@ -5014,7 +5097,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 51
+   "behaelter": 52
   },
   {
    "tag": "a",
@@ -5037,7 +5120,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 51
+   "behaelter": 52
   },
   {
    "tag": "a",
@@ -5060,7 +5143,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 51
+   "behaelter": 52
   },
   {
    "tag": "a",
@@ -5083,7 +5166,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 51
+   "behaelter": 52
   },
   {
    "tag": "a",
@@ -5106,7 +5189,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 51
+   "behaelter": 52
   },
   {
    "tag": "a",
@@ -5129,7 +5212,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 52
+   "behaelter": 53
   },
   {
    "tag": "a",
@@ -5152,7 +5235,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 52
+   "behaelter": 53
   },
   {
    "tag": "a",
@@ -5198,7 +5281,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 53
+   "behaelter": 54
   },
   {
    "tag": "a",
@@ -5221,7 +5304,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 54
+   "behaelter": 55
   },
   {
    "tag": "a",
@@ -5244,7 +5327,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 54
+   "behaelter": 55
   },
   {
    "tag": "a",
@@ -5267,7 +5350,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 54
+   "behaelter": 55
   },
   {
    "tag": "a",
@@ -5290,7 +5373,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 54
+   "behaelter": 55
   },
   {
    "tag": "a",
@@ -5313,7 +5396,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 54
+   "behaelter": 55
   },
   {
    "tag": "a",
@@ -5339,7 +5422,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 55
+   "behaelter": 56
   },
   {
    "tag": "a",
@@ -5365,7 +5448,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 55
+   "behaelter": 56
   },
   {
    "tag": "a",
@@ -5391,7 +5474,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 55
+   "behaelter": 56
   },
   {
    "tag": "a",
@@ -5417,7 +5500,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 55
+   "behaelter": 56
   },
   {
    "tag": "a",
@@ -5443,7 +5526,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 55
+   "behaelter": 56
   },
   {
    "tag": "a",
@@ -5469,7 +5552,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 55
+   "behaelter": 56
   },
   {
    "tag": "a",
@@ -5495,7 +5578,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 55
+   "behaelter": 56
   },
   {
    "tag": "a",
@@ -5521,7 +5604,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 55
+   "behaelter": 56
   },
   {
    "tag": "a",
@@ -5554,7 +5637,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 56
+   "behaelter": 57
   },
   {
    "tag": "a",
@@ -5577,7 +5660,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 56
+   "behaelter": 57
   },
   {
    "tag": "a",
@@ -5600,7 +5683,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 57
+   "behaelter": 58
   },
   {
    "tag": "a",
@@ -5646,7 +5729,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 58
+   "behaelter": 59
   },
   {
    "tag": "a",
@@ -5669,7 +5752,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 59
+   "behaelter": 60
   },
   {
    "tag": "a",
@@ -5692,7 +5775,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 59
+   "behaelter": 60
   },
   {
    "tag": "a",
@@ -5715,7 +5798,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 59
+   "behaelter": 60
   },
   {
    "tag": "a",
@@ -5738,7 +5821,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 59
+   "behaelter": 60
   },
   {
    "tag": "a",
@@ -5761,7 +5844,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 59
+   "behaelter": 60
   },
   {
    "tag": "a",
@@ -5784,7 +5867,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 59
+   "behaelter": 60
   },
   {
    "tag": "a",
@@ -5807,7 +5890,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 59
+   "behaelter": 60
   },
   {
    "tag": "a",
@@ -5830,7 +5913,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 59
+   "behaelter": 60
   },
   {
    "tag": "a",
@@ -5853,7 +5936,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 59
+   "behaelter": 60
   },
   {
    "tag": "a",
@@ -5876,7 +5959,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 59
+   "behaelter": 60
   },
   {
    "tag": "a",
@@ -5902,7 +5985,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 60
+   "behaelter": 61
   },
   {
    "tag": "a",
@@ -5928,7 +6011,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 60
+   "behaelter": 61
   },
   {
    "tag": "a",
@@ -5954,7 +6037,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 60
+   "behaelter": 61
   },
   {
    "tag": "a",
@@ -5980,7 +6063,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 60
+   "behaelter": 61
   },
   {
    "tag": "a",
@@ -6006,7 +6089,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 60
+   "behaelter": 61
   },
   {
    "tag": "a",
@@ -6032,7 +6115,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 60
+   "behaelter": 61
   },
   {
    "tag": "a",
@@ -6058,7 +6141,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 60
+   "behaelter": 61
   },
   {
    "tag": "a",
@@ -6084,7 +6167,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 60
+   "behaelter": 61
   },
   {
    "tag": "a",
@@ -6107,7 +6190,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 61
+   "behaelter": 62
   },
   {
    "tag": "a",
@@ -6130,7 +6213,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 62
+   "behaelter": 63
   },
   {
    "tag": "a",
@@ -6153,7 +6236,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 62
+   "behaelter": 63
   },
   {
    "tag": "a",
@@ -6199,7 +6282,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 63
+   "behaelter": 64
   },
   {
    "tag": "a",
@@ -6222,7 +6305,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 64
+   "behaelter": 65
   },
   {
    "tag": "a",
@@ -6245,7 +6328,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 64
+   "behaelter": 65
   },
   {
    "tag": "a",
@@ -6268,7 +6351,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 64
+   "behaelter": 65
   },
   {
    "tag": "a",
@@ -6291,7 +6374,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 64
+   "behaelter": 65
   },
   {
    "tag": "a",
@@ -6314,7 +6397,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 64
+   "behaelter": 65
   },
   {
    "tag": "a",
@@ -6337,7 +6420,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 64
+   "behaelter": 65
   },
   {
    "tag": "a",
@@ -6360,7 +6443,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 65
+   "behaelter": 66
   },
   {
    "tag": "a",
@@ -6383,7 +6466,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 65
+   "behaelter": 66
   },
   {
    "tag": "a",
@@ -6416,7 +6499,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 66
+   "behaelter": 67
   },
   {
    "tag": "a",
@@ -6439,7 +6522,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 66
+   "behaelter": 67
   },
   {
    "tag": "a",
@@ -6461,7 +6544,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 38
+   "behaelter": 39
   },
   {
    "tag": "a",
@@ -6483,7 +6566,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 38
+   "behaelter": 39
   },
   {
    "tag": "a",
@@ -6506,7 +6589,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 67
+   "behaelter": 68
   },
   {
    "tag": "a",
@@ -6529,7 +6612,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 68
+   "behaelter": 69
   },
   {
    "tag": "a",
@@ -6552,7 +6635,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 68
+   "behaelter": 69
   },
   {
    "tag": "a",
@@ -6575,7 +6658,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 68
+   "behaelter": 69
   },
   {
    "tag": "a",
@@ -6598,7 +6681,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 68
+   "behaelter": 69
   },
   {
    "tag": "a",
@@ -6621,7 +6704,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 68
+   "behaelter": 69
   },
   {
    "tag": "a",
@@ -6644,7 +6727,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 69
+   "behaelter": 70
   },
   {
    "tag": "a",
@@ -6667,7 +6750,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 69
+   "behaelter": 70
   },
   {
    "tag": "a",
@@ -6694,7 +6777,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 70
+   "behaelter": 71
   },
   {
    "tag": "a",
@@ -6717,7 +6800,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 70
+   "behaelter": 71
   },
   {
    "tag": "a",
@@ -6742,7 +6825,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 70
+   "behaelter": 71
   },
   {
    "tag": "a",
@@ -6767,7 +6850,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 70
+   "behaelter": 71
   },
   {
    "tag": "a",
@@ -6787,7 +6870,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 71
+   "behaelter": 72
   },
   {
    "tag": "a",
@@ -6807,7 +6890,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 71
+   "behaelter": 72
   },
   {
    "tag": "a",
@@ -6830,7 +6913,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 72
+   "behaelter": 73
   },
   {
    "tag": "a",
@@ -6853,7 +6936,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 72
+   "behaelter": 73
   },
   {
    "tag": "a",
@@ -6878,7 +6961,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 73
+   "behaelter": 74
   },
   {
    "tag": "a",
@@ -6957,7 +7040,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 74
+   "behaelter": 75
   },
   {
    "tag": "a",
@@ -6990,7 +7073,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 75
+   "behaelter": 76
   },
   {
    "tag": "a",
@@ -7023,7 +7106,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 75
+   "behaelter": 76
   },
   {
    "tag": "a",
@@ -7056,7 +7139,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 76
+   "behaelter": 77
   },
   {
    "tag": "a",
@@ -7089,7 +7172,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 76
+   "behaelter": 77
   },
   {
    "tag": "a",
@@ -7122,7 +7205,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 76
+   "behaelter": 77
   },
   {
    "tag": "a",
@@ -7155,7 +7238,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 76
+   "behaelter": 77
   },
   {
    "tag": "a",
@@ -7177,7 +7260,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 77
+   "behaelter": 78
   },
   {
    "tag": "a",
@@ -7199,7 +7282,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 77
+   "behaelter": 78
   },
   {
    "tag": "a",
@@ -7278,7 +7361,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 78
+   "behaelter": 79
   },
   {
    "tag": "a",
@@ -7301,7 +7384,33 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 79
+   "behaelter": 80
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Mehr zur Aktion",
+   "aria": {},
+   "daten": {
+    "data-tracking-action": "textlink",
+    "data-tracking-description": "cms___"
+   },
+   "id": null,
+   "klassen": [
+    "link",
+    "link-bold"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.o2online.de/e-shop/",
+   "ziel": null,
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(1) > div:nth-of-type(3) > article:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 80
   },
   {
    "tag": "a",
@@ -7332,7 +7441,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 80
+   "behaelter": 81
   },
   {
    "tag": "a",
@@ -7363,7 +7472,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 80
+   "behaelter": 81
   },
   {
    "tag": "a",
@@ -7390,11 +7499,11 @@
    "href": "https://www.o2online.de/e-shop/",
    "ziel": null,
    "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(6) > div:nth-of-type(1) > tef-promo-box:nth-of-type(1) > div:nth-of-type(3) > ol:nth-of-type(1) > li:nth-of-type(4) > a:nth-of-type(1)",
-   "sichtbar": true,
+   "sichtbar": false,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 81
+   "behaelter": 82
   },
   {
    "tag": "a",
@@ -7422,11 +7531,11 @@
    "href": "https://www.o2online.de/e-shop/",
    "ziel": null,
    "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(6) > div:nth-of-type(1) > tef-promo-box:nth-of-type(1) > div:nth-of-type(4) > a:nth-of-type(1)",
-   "sichtbar": true,
+   "sichtbar": false,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 81
+   "behaelter": 82
   },
   {
    "tag": "a",
@@ -7449,7 +7558,66 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 79
+   "behaelter": 83
+  },
+  {
+   "tag": "a",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-label": "Mehr Informationen zur Tauschprämie",
+    "aria-haspopup": "dialog"
+   },
+   "daten": {
+    "data-tracking-action": "textlink",
+    "data-tracking-description": "cms___",
+    "data-js": "modals",
+    "data-cms-target": "2332060"
+   },
+   "id": null,
+   "klassen": [
+    "modal-link",
+    "occl-modal-link",
+    "occl-info-icon"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.o2online.de/e-shop/",
+   "ziel": null,
+   "pfad": "#id-2364682 > div:nth-of-type(5) > div:nth-of-type(1) > p:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 84
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Jetzt Vorteil sichern",
+   "aria": {
+    "aria-label": "Zur Aktionsseite auf der das Altgerät in Zahlung gegeben werden kann"
+   },
+   "daten": {
+    "data-tracking-action": "textlink",
+    "data-tracking-description": "cms___ Jetzt Vorteil sichern"
+   },
+   "id": null,
+   "klassen": [
+    "text-link"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://telefonica-campaign.foxway.tech/samsung-campaigns/",
+   "ziel": "_blank",
+   "pfad": "#id-2364682 > div:nth-of-type(6) > div:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 84
   },
   {
    "tag": "a",
@@ -7481,7 +7649,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 82
+   "behaelter": 85
   },
   {
    "tag": "a",
@@ -7513,7 +7681,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 82
+   "behaelter": 85
   },
   {
    "tag": "a",
@@ -7538,7 +7706,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 83
+   "behaelter": 86
   },
   {
    "tag": "a",
@@ -7558,7 +7726,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 83
+   "behaelter": 86
   },
   {
    "tag": "a",
@@ -7581,7 +7749,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 84
+   "behaelter": 87
   },
   {
    "tag": "a",
@@ -7611,7 +7779,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 84
+   "behaelter": 87
   },
   {
    "tag": "a",
@@ -7641,7 +7809,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 85
+   "behaelter": 88
   },
   {
    "tag": "a",
@@ -7699,7 +7867,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 86
+   "behaelter": 89
   },
   {
    "tag": "a",
@@ -7722,7 +7890,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 86
+   "behaelter": 89
   },
   {
    "tag": "a",
@@ -7747,7 +7915,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 86
+   "behaelter": 89
   },
   {
    "tag": "a",
@@ -7769,7 +7937,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 87
+   "behaelter": 90
   },
   {
    "tag": "a",
@@ -7799,7 +7967,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 88
+   "behaelter": 91
   },
   {
    "tag": "a",
@@ -7822,7 +7990,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 89
+   "behaelter": 92
   },
   {
    "tag": "a",
@@ -7845,7 +8013,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 89
+   "behaelter": 92
   },
   {
    "tag": "a",
@@ -7870,7 +8038,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 89
+   "behaelter": 92
   },
   {
    "tag": "a",
@@ -7893,7 +8061,27 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 89
+   "behaelter": 92
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "hier",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://handyankauf.foxway.tech/campaigns/",
+   "ziel": "_blank",
+   "pfad": "#id-2361976 > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(3) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 35
   },
   {
    "tag": "a",
@@ -7918,7 +8106,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 90
+   "behaelter": 93
   },
   {
    "tag": "a",
@@ -7943,7 +8131,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 90
+   "behaelter": 93
   },
   {
    "tag": "a",
@@ -7968,7 +8156,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 90
+   "behaelter": 93
   },
   {
    "tag": "a",
@@ -7996,7 +8184,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 91
+   "behaelter": 94
   },
   {
    "tag": "a",
@@ -8024,7 +8212,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 91
+   "behaelter": 94
   },
   {
    "tag": "a",
@@ -8052,7 +8240,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 91
+   "behaelter": 94
   },
   {
    "tag": "a",
@@ -8080,7 +8268,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 91
+   "behaelter": 94
   },
   {
    "tag": "a",
@@ -8102,7 +8290,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 92
+   "behaelter": 95
   },
   {
    "tag": "a",
@@ -8124,7 +8312,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 92
+   "behaelter": 95
   },
   {
    "tag": "a",
@@ -8144,7 +8332,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 93
+   "behaelter": 96
   },
   {
    "tag": "a",
@@ -8167,7 +8355,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 94
+   "behaelter": 97
   },
   {
    "tag": "a",
@@ -8190,7 +8378,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 95
+   "behaelter": 98
   },
   {
    "tag": "a",
@@ -8213,7 +8401,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 96
+   "behaelter": 99
   },
   {
    "tag": "a",
@@ -8236,7 +8424,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 97
+   "behaelter": 100
   },
   {
    "tag": "a",
@@ -8259,7 +8447,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 98
+   "behaelter": 101
   },
   {
    "tag": "a",
@@ -8282,7 +8470,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 99
+   "behaelter": 102
   },
   {
    "tag": "a",
@@ -8305,7 +8493,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 100
+   "behaelter": 103
   },
   {
    "tag": "a",
@@ -8328,7 +8516,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 101
+   "behaelter": 104
   },
   {
    "tag": "a",
@@ -8351,7 +8539,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 102
+   "behaelter": 105
   },
   {
    "tag": "a",
@@ -8374,7 +8562,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 103
+   "behaelter": 106
   },
   {
    "tag": "a",
@@ -8397,7 +8585,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 103
+   "behaelter": 106
   },
   {
    "tag": "a",
@@ -8420,7 +8608,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 104
+   "behaelter": 107
   },
   {
    "tag": "a",
@@ -8451,7 +8639,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 104
+   "behaelter": 107
   },
   {
    "tag": "a",
@@ -8474,7 +8662,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 104
+   "behaelter": 107
   },
   {
    "tag": "a",
@@ -8497,7 +8685,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 105
+   "behaelter": 108
   },
   {
    "tag": "a",
@@ -8520,7 +8708,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 105
+   "behaelter": 108
   },
   {
    "tag": "a",
@@ -8543,7 +8731,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 105
+   "behaelter": 108
   },
   {
    "tag": "a",
@@ -8563,7 +8751,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 105
+   "behaelter": 108
   },
   {
    "tag": "a",
@@ -8586,7 +8774,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 105
+   "behaelter": 108
   },
   {
    "tag": "a",
@@ -8606,7 +8794,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 105
+   "behaelter": 108
   },
   {
    "tag": "a",
@@ -8629,7 +8817,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 105
+   "behaelter": 108
   },
   {
    "tag": "a",
@@ -8649,7 +8837,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 105
+   "behaelter": 108
   },
   {
    "tag": "a",
@@ -8672,7 +8860,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 106
+   "behaelter": 109
   },
   {
    "tag": "a",
@@ -8692,7 +8880,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 106
+   "behaelter": 109
   },
   {
    "tag": "a",
@@ -8712,7 +8900,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 106
+   "behaelter": 109
   },
   {
    "tag": "a",
@@ -8732,7 +8920,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 106
+   "behaelter": 109
   },
   {
    "tag": "a",
@@ -8752,7 +8940,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 106
+   "behaelter": 109
   },
   {
    "tag": "a",
@@ -8775,7 +8963,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 106
+   "behaelter": 109
   },
   {
    "tag": "a",
@@ -8798,7 +8986,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 106
+   "behaelter": 109
   },
   {
    "tag": "a",
@@ -8821,7 +9009,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 106
+   "behaelter": 109
   },
   {
    "tag": "a",
@@ -8841,7 +9029,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 107
+   "behaelter": 110
   },
   {
    "tag": "a",
@@ -8861,7 +9049,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 107
+   "behaelter": 110
   },
   {
    "tag": "a",
@@ -8881,7 +9069,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 107
+   "behaelter": 110
   },
   {
    "tag": "a",
@@ -8901,7 +9089,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 107
+   "behaelter": 110
   },
   {
    "tag": "a",
@@ -8921,7 +9109,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 107
+   "behaelter": 110
   },
   {
    "tag": "a",
@@ -8941,7 +9129,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 107
+   "behaelter": 110
   },
   {
    "tag": "a",
@@ -8961,7 +9149,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 107
+   "behaelter": 110
   },
   {
    "tag": "a",
@@ -8984,7 +9172,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 107
+   "behaelter": 110
   },
   {
    "tag": "a",
@@ -9007,7 +9195,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 107
+   "behaelter": 110
   },
   {
    "tag": "a",
@@ -9030,7 +9218,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 107
+   "behaelter": 110
   },
   {
    "tag": "a",
@@ -9053,7 +9241,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 107
+   "behaelter": 110
   },
   {
    "tag": "a",
@@ -9076,7 +9264,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 108
+   "behaelter": 111
   },
   {
    "tag": "a",
@@ -9099,7 +9287,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 108
+   "behaelter": 111
   },
   {
    "tag": "a",
@@ -9122,7 +9310,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 108
+   "behaelter": 111
   },
   {
    "tag": "a",
@@ -9145,7 +9333,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 108
+   "behaelter": 111
   },
   {
    "tag": "a",
@@ -9168,7 +9356,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 108
+   "behaelter": 111
   },
   {
    "tag": "a",
@@ -9191,7 +9379,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 108
+   "behaelter": 111
   },
   {
    "tag": "a",
@@ -9214,7 +9402,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 108
+   "behaelter": 111
   },
   {
    "tag": "a",
@@ -9237,7 +9425,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 108
+   "behaelter": 111
   },
   {
    "tag": "a",
@@ -9260,7 +9448,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 109
+   "behaelter": 112
   },
   {
    "tag": "a",
@@ -9283,7 +9471,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 109
+   "behaelter": 112
   },
   {
    "tag": "a",
@@ -9306,7 +9494,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 109
+   "behaelter": 112
   },
   {
    "tag": "a",
@@ -9329,7 +9517,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 109
+   "behaelter": 112
   },
   {
    "tag": "a",
@@ -9352,7 +9540,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 109
+   "behaelter": 112
   },
   {
    "tag": "a",
@@ -9375,7 +9563,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 109
+   "behaelter": 112
   },
   {
    "tag": "a",
@@ -9398,7 +9586,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 109
+   "behaelter": 112
   },
   {
    "tag": "a",
@@ -9421,7 +9609,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 109
+   "behaelter": 112
   },
   {
    "tag": "a",
@@ -9444,7 +9632,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 109
+   "behaelter": 112
   },
   {
    "tag": "a",
@@ -9470,7 +9658,7 @@
    "deaktiviert": false,
    "gewaehlt": "klasse:text-link--state-active",
    "optionen": null,
-   "behaelter": 109
+   "behaelter": 112
   },
   {
    "tag": "a",
@@ -9493,7 +9681,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 109
+   "behaelter": 112
   },
   {
    "tag": "a",
@@ -9516,7 +9704,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 110
+   "behaelter": 113
   },
   {
    "tag": "a",
@@ -9539,7 +9727,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 110
+   "behaelter": 113
   },
   {
    "tag": "a",
@@ -9562,7 +9750,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 111
+   "behaelter": 114
   },
   {
    "tag": "a",
@@ -9585,7 +9773,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 111
+   "behaelter": 114
   },
   {
    "tag": "a",
@@ -9608,7 +9796,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 111
+   "behaelter": 114
   },
   {
    "tag": "a",
@@ -9631,7 +9819,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 111
+   "behaelter": 114
   },
   {
    "tag": "a",
@@ -9654,7 +9842,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 111
+   "behaelter": 114
   },
   {
    "tag": "a",
@@ -9677,7 +9865,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 112
+   "behaelter": 115
   },
   {
    "tag": "a",
@@ -9702,7 +9890,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 112
+   "behaelter": 115
   },
   {
    "tag": "a",
@@ -9803,7 +9991,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 113
+   "behaelter": 116
   },
   {
    "tag": "a",
@@ -9826,7 +10014,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 113
+   "behaelter": 116
   },
   {
    "tag": "a",
@@ -9881,7 +10069,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 114
+   "behaelter": 117
   },
   {
    "tag": "a",
@@ -9904,7 +10092,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 114
+   "behaelter": 117
   },
   {
    "tag": "a",
@@ -10044,7 +10232,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 115
+   "behaelter": 118
   },
   {
    "tag": "a",
@@ -10073,7 +10261,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 115
+   "behaelter": 118
   },
   {
    "tag": "a",
@@ -10100,7 +10288,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 115
+   "behaelter": 118
   }
  ]
 }

@@ -1,5 +1,5 @@
 {
- "preise_gesamt": 80,
+ "preise_gesamt": 83,
  "preise": [
   {
    "pfad": "#layer-menu-Mobilfunk > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > tef-teaser-nav:nth-of-type(1) > div:nth-of-type(2) > tef-scope:nth-of-type(1) > div:nth-of-type(1)",
@@ -128,7 +128,7 @@
    "sichtbar": false
   },
   {
-   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(7) > div:nth-of-type(1) > tef-promo-box:nth-of-type(1) > div:nth-of-type(2) > strong:nth-of-type(1)",
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(6) > div:nth-of-type(1) > tef-promo-box:nth-of-type(1) > div:nth-of-type(2) > strong:nth-of-type(1)",
    "text": "800 €",
    "kontext": "Handy verkaufen & bis zu 800 € sichern",
    "sichtbar": true
@@ -158,10 +158,40 @@
    "sichtbar": true
   },
   {
-   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(4) > tef-shop-tile:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > tef-choice-panel:nth-of-type(1) > label:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(2)",
-   "text": "5,00 €",
-   "kontext": "mtl. 5,00 €",
-   "sichtbar": false
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(4) > div:nth-of-type(3) > div:nth-of-type(1) > tef-choice-panel:nth-of-type(1) > label:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "2,49 €",
+   "kontext": "2,49 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(4) > div:nth-of-type(3) > div:nth-of-type(2) > tef-choice-panel:nth-of-type(1) > label:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "1,99 €",
+   "kontext": "1,99 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(4) > div:nth-of-type(3) > div:nth-of-type(3) > tef-choice-panel:nth-of-type(1) > label:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "5 €",
+   "kontext": "5 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(4) > div:nth-of-type(3) > div:nth-of-type(4) > tef-choice-panel:nth-of-type(1) > label:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "5 €",
+   "kontext": "5 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(4) > div:nth-of-type(3) > div:nth-of-type(5) > tef-choice-panel:nth-of-type(1) > label:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "1,99 €",
+   "kontext": "1,99 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(4) > div:nth-of-type(3) > div:nth-of-type(6) > tef-choice-panel:nth-of-type(1) > label:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "2,49 €",
+   "kontext": "2,49 €",
+   "sichtbar": true
   },
   {
    "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(5) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > tef-shop-accessories-slider:nth-of-type(1) > tef-slider:nth-of-type(1) > div:nth-of-type(1) > tef-shop-hardware-teaser:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(2)",
@@ -272,12 +302,6 @@
    "sichtbar": true
   },
   {
-   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(2) > tr:nth-of-type(1) > td:nth-of-type(2) > strong:nth-of-type(1)",
-   "text": "56,49 €",
-   "kontext": "56,49 €",
-   "sichtbar": false
-  },
-  {
    "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(3) > tr:nth-of-type(1) > td:nth-of-type(2)",
    "text": "1,00 €",
    "kontext": "Gerät Anzahlung: 1,00 €",
@@ -300,12 +324,6 @@
    "text": "7,99 €",
    "kontext": "7,99 €",
    "sichtbar": true
-  },
-  {
-   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(4) > tr:nth-of-type(1) > td:nth-of-type(2) > strong:nth-of-type(1)",
-   "text": "7,99 €",
-   "kontext": "7,99 €",
-   "sichtbar": false
   },
   {
    "pfad": "#\\32 267892 > p:nth-of-type(2)",
@@ -399,7 +417,7 @@
   },
   {
    "pfad": "#\\32 247542 > p:nth-of-type(2)",
-   "text": "Bei erstmaliger Buchung von O2 TV Smart 24M erhalten Kund:innen optional die Möglichkeit, die Services Netflix Standard mit Werbung sowie Disney+ Standard mit Werbung kostenfrei freizuschalten. Ab dem 4. Monat kostet Netflix Standard mit Werbung zzgl. 4,99 € mtl.; Disney+ Standard mit Werbung kostet",
+   "text": "Bei erstmaliger Buchung von O2 TV Smart 24M erhalten Kund:innen optional die Möglichkeit, die Services Netflix Standard mit Werbung sowie Disney+ Standard mit Werbung kostenfrei freizuschalten. Ab dem 4. Monat kostet Netflix Standard mit Werbung zzgl. 6,99 € mtl.; Disney+ Standard mit Werbung kostet",
    "kontext": "O2 TV Smart 24M für 8,99 € mtl. ist nur zu O2 Mobilfunk-, Home Tarifen buchbar; Mindestlaufzeit 24 Monate, danach jederzeit kündbar. O2 TV Smart kann auf Smartphone und Tablets (nur iOS und Android), Amazon Fire TV, Apple TV oder ausgewählten Smart TVs über die kostenfrei herunterladbare O2 TV App u",
    "sichtbar": false
   },

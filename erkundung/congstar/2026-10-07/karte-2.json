@@ -1,0 +1,1021 @@
+{
+ "karte": "congstar.yaml",
+ "anbieter": "congstar",
+ "adresse": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
+ "status": "gelesen",
+ "grund": null,
+ "bot_schutz": false,
+ "http_status": 200,
+ "hoechste_kombinationen": 12,
+ "belege": "nicht archiviert (kein Konto)",
+ "zaehlung": {
+  "kombinationen": 16,
+  "erfasst": 12,
+  "nicht_angeboten": 0,
+  "nicht_erfasst": 4,
+  "befund": 0,
+  "nicht_besucht": 4,
+  "verworfen": 2,
+  "gescheitert": 0
+ },
+ "struktur": {
+  "knoepfe_gesucht": 75,
+  "knoepfe_gefunden": 75,
+  "felder_gesucht": 84,
+  "felder_gefunden": 84,
+  "anteil_knoepfe": 1.0,
+  "anteil_felder": 1.0
+ },
+ "gefunden": {
+  "knoepfe": {
+   "speicher": {
+    "selektor": "[data-testid=\"memory-size\"]",
+    "werte": [
+     "256 GB",
+     "512 GB"
+    ]
+   },
+   "tarif": {
+    "selektor": "label:has(input[aria-label^=\"Tarifoption \"])",
+    "werte": [
+     "Allnet Flat XS",
+     "Allnet Flat S",
+     "Allnet Flat M",
+     "Allnet Flat L"
+    ]
+   },
+   "laufzeit": {
+    "selektor": "label:has(input[aria-label$=\"mtl. Zahlungen\"])",
+    "werte": [
+     "36",
+     "24"
+    ]
+   }
+  },
+  "zusammenfassung": "[data-testid=\"sticky-box-side-postpaid\"], #layout > main > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(3)",
+  "felder": {
+   "anzahlung": {
+    "text": 12,
+    "antwort": 12
+   },
+   "rate": {
+    "text": 12,
+    "antwort": 12
+   },
+   "ratenzahl": {
+    "text": 12,
+    "antwort": 12
+   },
+   "tarifphasen": {
+    "text": 12,
+    "antwort": 12
+   },
+   "tarifbindung": {
+    "text": 12,
+    "antwort": 12
+   },
+   "anschluss": {
+    "text": 12,
+    "antwort": 12
+   },
+   "volumen_gb": {
+    "text": 12,
+    "antwort": 12
+   }
+  }
+ },
+ "kombinationen": [
+  {
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "Allnet Flat XS",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "Allnet Flat XS",
+    "laufzeit": 36
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 1.0,
+    "rate": 21.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      15.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 15.0
+   },
+   "werte_text": {
+    "anzahlung": 1.0,
+    "rate": 21.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      15.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 15.0
+   },
+   "werte_antwort": {
+    "anzahlung": 1.0,
+    "rate": 21.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      15.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 15.0
+   },
+   "echo": {
+    "befunde": [],
+    "luecken": []
+   },
+   "text": "Monatliche Kosten\nSumme 1. bis 36. Monat\n36,00 €\nGerät\n21,00 €\nin den ersten 36 Monaten\nTarif\n15,00 €\nnach 24 Monaten mtl. kündbar\nSumme ab dem 37. Monat\n15,00 €\nEinmalige Kosten\nSumme einmalig\n16,00 €\nzzgl. 4,99 € Versandkosten\nWeiter zum Warenkorb\nSichere Zahlungsmethoden",
+   "antwort_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=543",
+   "beleg_status": "offen"
+  },
+  {
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "Allnet Flat XS",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "Allnet Flat XS",
+    "laufzeit": 24
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 1.0,
+    "rate": 31.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      15.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 15.0
+   },
+   "werte_text": {
+    "anzahlung": 1.0,
+    "rate": 31.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      15.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 15.0
+   },
+   "werte_antwort": {
+    "anzahlung": 1.0,
+    "rate": 31.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      15.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 15.0
+   },
+   "echo": {
+    "befunde": [],
+    "luecken": []
+   },
+   "text": "Monatliche Kosten\nSumme 1. bis 24. Monat\n46,50 €\nGerät\n31,50 €\nin den ersten 24 Monaten\nTarif\n15,00 €\nnach 24 Monaten mtl. kündbar\nSumme ab dem 25. Monat\n15,00 €\nEinmalige Kosten\nSumme einmalig\n16,00 €\nzzgl. 4,99 € Versandkosten\nWeiter zum Warenkorb\nSichere Zahlungsmethoden",
+   "antwort_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=543&installmentPlanId=500",
+   "beleg_status": "offen"
+  },
+  {
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "Allnet Flat S",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "Allnet Flat S",
+    "laufzeit": 36
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 1.0,
+    "rate": 19.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      20.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 50.0
+   },
+   "werte_text": {
+    "anzahlung": 1.0,
+    "rate": 19.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      20.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 50.0
+   },
+   "werte_antwort": {
+    "anzahlung": 1.0,
+    "rate": 19.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      20.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 50.0
+   },
+   "echo": {
+    "befunde": [],
+    "luecken": []
+   },
+   "text": "Monatliche Kosten\nSumme 1. bis 36. Monat\n39,00 €\nGerät\n19,00 €\nin den ersten 36 Monaten\nTarif\n20,00 €\nnach 24 Monaten mtl. kündbar\nSumme ab dem 37. Monat\n20,00 €\nEinmalige Kosten\nSumme einmalig\n16,00 €\nzzgl. 4,99 € Versandkosten\nWeiter zum Warenkorb\nSichere Zahlungsmethoden",
+   "antwort_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=560&installmentPlanId=501",
+   "beleg_status": "offen"
+  },
+  {
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "Allnet Flat S",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "Allnet Flat S",
+    "laufzeit": 24
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 1.0,
+    "rate": 28.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      20.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 50.0
+   },
+   "werte_text": {
+    "anzahlung": 1.0,
+    "rate": 28.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      20.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 50.0
+   },
+   "werte_antwort": {
+    "anzahlung": 1.0,
+    "rate": 28.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      20.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 50.0
+   },
+   "echo": {
+    "befunde": [],
+    "luecken": []
+   },
+   "text": "Monatliche Kosten\nSumme 1. bis 24. Monat\n48,50 €\nGerät\n28,50 €\nin den ersten 24 Monaten\nTarif\n20,00 €\nnach 24 Monaten mtl. kündbar\nSumme ab dem 25. Monat\n20,00 €\nEinmalige Kosten\nSumme einmalig\n16,00 €\nzzgl. 4,99 € Versandkosten\nWeiter zum Warenkorb\nSichere Zahlungsmethoden",
+   "antwort_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=560&installmentPlanId=500",
+   "beleg_status": "offen"
+  },
+  {
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "Allnet Flat M",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "Allnet Flat M",
+    "laufzeit": 36
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 1.0,
+    "rate": 17.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      25.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 125.0
+   },
+   "werte_text": {
+    "anzahlung": 1.0,
+    "rate": 17.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      25.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 125.0
+   },
+   "werte_antwort": {
+    "anzahlung": 1.0,
+    "rate": 17.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      25.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 125.0
+   },
+   "echo": {
+    "befunde": [],
+    "luecken": []
+   },
+   "text": "Monatliche Kosten\nSumme 1. bis 36. Monat\n42,00 €\nGerät\n17,00 €\nin den ersten 36 Monaten\nTarif\n25,00 €\nnach 24 Monaten mtl. kündbar\nSumme ab dem 37. Monat\n25,00 €\nEinmalige Kosten\nSumme einmalig\n16,00 €\nzzgl. 4,99 € Versandkosten\nWeiter zum Warenkorb\nSichere Zahlungsmethoden",
+   "antwort_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=540&installmentPlanId=501",
+   "beleg_status": "offen"
+  },
+  {
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "Allnet Flat M",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "Allnet Flat M",
+    "laufzeit": 24
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 1.0,
+    "rate": 25.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      25.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 125.0
+   },
+   "werte_text": {
+    "anzahlung": 1.0,
+    "rate": 25.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      25.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 125.0
+   },
+   "werte_antwort": {
+    "anzahlung": 1.0,
+    "rate": 25.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      25.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 125.0
+   },
+   "echo": {
+    "befunde": [],
+    "luecken": []
+   },
+   "text": "Monatliche Kosten\nSumme 1. bis 24. Monat\n50,50 €\nGerät\n25,50 €\nin den ersten 24 Monaten\nTarif\n25,00 €\nnach 24 Monaten mtl. kündbar\nSumme ab dem 25. Monat\n25,00 €\nEinmalige Kosten\nSumme einmalig\n16,00 €\nzzgl. 4,99 € Versandkosten\nWeiter zum Warenkorb\nSichere Zahlungsmethoden",
+   "antwort_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=540&installmentPlanId=500",
+   "beleg_status": "offen"
+  },
+  {
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "Allnet Flat L",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "Allnet Flat L",
+    "laufzeit": 36
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 1.0,
+    "rate": 15.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      30.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 200.0
+   },
+   "werte_text": {
+    "anzahlung": 1.0,
+    "rate": 15.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      30.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 200.0
+   },
+   "werte_antwort": {
+    "anzahlung": 1.0,
+    "rate": 15.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      30.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 200.0
+   },
+   "echo": {
+    "befunde": [],
+    "luecken": []
+   },
+   "text": "Monatliche Kosten\nSumme 1. bis 36. Monat\n45,00 €\nGerät\n15,00 €\nin den ersten 36 Monaten\nTarif\n30,00 €\nnach 24 Monaten mtl. kündbar\nSumme ab dem 37. Monat\n30,00 €\nEinmalige Kosten\nSumme einmalig\n16,00 €\nzzgl. 4,99 € Versandkosten\nWeiter zum Warenkorb\nSichere Zahlungsmethoden",
+   "antwort_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=545&installmentPlanId=501",
+   "beleg_status": "offen"
+  },
+  {
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "Allnet Flat L",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "Allnet Flat L",
+    "laufzeit": 24
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 1.0,
+    "rate": 22.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      30.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 200.0
+   },
+   "werte_text": {
+    "anzahlung": 1.0,
+    "rate": 22.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      30.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 200.0
+   },
+   "werte_antwort": {
+    "anzahlung": 1.0,
+    "rate": 22.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      30.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 200.0
+   },
+   "echo": {
+    "befunde": [],
+    "luecken": []
+   },
+   "text": "Monatliche Kosten\nSumme 1. bis 24. Monat\n52,50 €\nGerät\n22,50 €\nin den ersten 24 Monaten\nTarif\n30,00 €\nnach 24 Monaten mtl. kündbar\nSumme ab dem 25. Monat\n30,00 €\nEinmalige Kosten\nSumme einmalig\n16,00 €\nzzgl. 4,99 € Versandkosten\nWeiter zum Warenkorb\nSichere Zahlungsmethoden",
+   "antwort_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=545&installmentPlanId=500",
+   "beleg_status": "offen"
+  },
+  {
+   "auswahl": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat XS",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat XS",
+    "laufzeit": 36
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 1.0,
+    "rate": 27.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      15.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 15.0
+   },
+   "werte_text": {
+    "anzahlung": 1.0,
+    "rate": 27.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      15.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 15.0
+   },
+   "werte_antwort": {
+    "anzahlung": 1.0,
+    "rate": 27.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      15.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 15.0
+   },
+   "echo": {
+    "befunde": [],
+    "luecken": []
+   },
+   "text": "Monatliche Kosten\nSumme 1. bis 36. Monat\n42,00 €\nGerät\n27,00 €\nin den ersten 36 Monaten\nTarif\n15,00 €\nnach 24 Monaten mtl. kündbar\nSumme ab dem 37. Monat\n15,00 €\nEinmalige Kosten\nSumme einmalig\n16,00 €\nzzgl. 4,99 € Versandkosten\nWeiter zum Warenkorb\nSichere Zahlungsmethoden",
+   "antwort_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=543&installmentPlanId=501&memorySize=512+GB",
+   "beleg_status": "offen"
+  },
+  {
+   "auswahl": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat XS",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat XS",
+    "laufzeit": 24
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 1.0,
+    "rate": 40.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      15.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 15.0
+   },
+   "werte_text": {
+    "anzahlung": 1.0,
+    "rate": 40.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      15.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 15.0
+   },
+   "werte_antwort": {
+    "anzahlung": 1.0,
+    "rate": 40.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      15.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 15.0
+   },
+   "echo": {
+    "befunde": [],
+    "luecken": []
+   },
+   "text": "Monatliche Kosten\nSumme 1. bis 24. Monat\n55,50 €\nGerät\n40,50 €\nin den ersten 24 Monaten\nTarif\n15,00 €\nnach 24 Monaten mtl. kündbar\nSumme ab dem 25. Monat\n15,00 €\nEinmalige Kosten\nSumme einmalig\n16,00 €\nzzgl. 4,99 € Versandkosten\nWeiter zum Warenkorb\nSichere Zahlungsmethoden",
+   "antwort_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=543&installmentPlanId=500&memorySize=512+GB",
+   "beleg_status": "offen"
+  },
+  {
+   "auswahl": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat S",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat S",
+    "laufzeit": 36
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 1.0,
+    "rate": 26.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      20.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 50.0
+   },
+   "werte_text": {
+    "anzahlung": 1.0,
+    "rate": 26.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      20.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 50.0
+   },
+   "werte_antwort": {
+    "anzahlung": 1.0,
+    "rate": 26.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      20.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 50.0
+   },
+   "echo": {
+    "befunde": [],
+    "luecken": []
+   },
+   "text": "Monatliche Kosten\nSumme 1. bis 36. Monat\n46,00 €\nGerät\n26,00 €\nin den ersten 36 Monaten\nTarif\n20,00 €\nnach 24 Monaten mtl. kündbar\nSumme ab dem 37. Monat\n20,00 €\nEinmalige Kosten\nSumme einmalig\n16,00 €\nzzgl. 4,99 € Versandkosten\nWeiter zum Warenkorb\nSichere Zahlungsmethoden",
+   "antwort_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=560&installmentPlanId=501&memorySize=512+GB",
+   "beleg_status": "offen"
+  },
+  {
+   "auswahl": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat S",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat S",
+    "laufzeit": 24
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 1.0,
+    "rate": 39.0,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      20.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 50.0
+   },
+   "werte_text": {
+    "anzahlung": 1.0,
+    "rate": 39.0,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      20.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 50.0
+   },
+   "werte_antwort": {
+    "anzahlung": 1.0,
+    "rate": 39.0,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      20.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 50.0
+   },
+   "echo": {
+    "befunde": [],
+    "luecken": []
+   },
+   "text": "Monatliche Kosten\nSumme 1. bis 24. Monat\n59,00 €\nGerät\n39,00 €\nin den ersten 24 Monaten\nTarif\n20,00 €\nnach 24 Monaten mtl. kündbar\nSumme ab dem 25. Monat\n20,00 €\nEinmalige Kosten\nSumme einmalig\n16,00 €\nzzgl. 4,99 € Versandkosten\nWeiter zum Warenkorb\nSichere Zahlungsmethoden",
+   "antwort_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=560&installmentPlanId=500&memorySize=512+GB",
+   "beleg_status": "offen"
+  },
+  {
+   "auswahl": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat M",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat M",
+    "laufzeit": 36
+   },
+   "status": "nicht_erfasst",
+   "grund": "nicht besucht: mehr als 12 Kombinationen",
+   "werte": {
+    "anzahlung": null,
+    "rate": null,
+    "ratenzahl": null,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_text": null,
+   "werte_antwort": null,
+   "echo": {
+    "befunde": [],
+    "luecken": []
+   },
+   "text": null,
+   "antwort_url": null,
+   "beleg_status": "ohne_wert"
+  },
+  {
+   "auswahl": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat M",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat M",
+    "laufzeit": 24
+   },
+   "status": "nicht_erfasst",
+   "grund": "nicht besucht: mehr als 12 Kombinationen",
+   "werte": {
+    "anzahlung": null,
+    "rate": null,
+    "ratenzahl": null,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_text": null,
+   "werte_antwort": null,
+   "echo": {
+    "befunde": [],
+    "luecken": []
+   },
+   "text": null,
+   "antwort_url": null,
+   "beleg_status": "ohne_wert"
+  },
+  {
+   "auswahl": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat L",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat L",
+    "laufzeit": 36
+   },
+   "status": "nicht_erfasst",
+   "grund": "nicht besucht: mehr als 12 Kombinationen",
+   "werte": {
+    "anzahlung": null,
+    "rate": null,
+    "ratenzahl": null,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_text": null,
+   "werte_antwort": null,
+   "echo": {
+    "befunde": [],
+    "luecken": []
+   },
+   "text": null,
+   "antwort_url": null,
+   "beleg_status": "ohne_wert"
+  },
+  {
+   "auswahl": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat L",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat L",
+    "laufzeit": 24
+   },
+   "status": "nicht_erfasst",
+   "grund": "nicht besucht: mehr als 12 Kombinationen",
+   "werte": {
+    "anzahlung": null,
+    "rate": null,
+    "ratenzahl": null,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_text": null,
+   "werte_antwort": null,
+   "echo": {
+    "befunde": [],
+    "luecken": []
+   },
+   "text": null,
+   "antwort_url": null,
+   "beleg_status": "ohne_wert"
+  }
+ ],
+ "verworfen": [
+  {
+   "url": "https://api.usercentrics.eu/settings/3DQmSnVkN/latest/languages.json",
+   "grund": "robots.txt nicht lesbar (HTTP 403)"
+  },
+  {
+   "url": "https://www.congstar.de/checkout/api/cart-state",
+   "grund": "per robots.txt gesperrt: /checkout/api/cart-state"
+  }
+ ],
+ "gescheitert": [],
+ "hilfsdateien": []
+}

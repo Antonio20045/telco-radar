@@ -2,22 +2,22 @@
  "anbieter": "1und1",
  "name": "1&1",
  "datum": "2026-10-07",
- "status": "befund",
- "grund": "Seite 3: Weiter-Knopf nicht klickbar: Locator.click: Timeout 5000ms exceeded.",
+ "status": "gelesen",
+ "grund": null,
  "kennung": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)",
  "parallelpruefung": "vor jeder Seite",
  "robots_gelesen": true,
  "abstand_sekunden": 2.0,
  "besuchszeit": null,
- "dauer_sekunden": 245.9,
+ "dauer_sekunden": 355.8,
  "zeitgrenze_sekunden": 3000,
  "seiten": [
   {
    "nummer": 1,
    "geraet": "apple-iphone-17-pro",
    "speicher_gb": 256,
-   "adresse": "https://mobile.1und1.de/iphone-17-pro",
-   "endadresse": "https://mobile.1und1.de/iphone-17-pro",
+   "adresse": "https://mobile.1und1.de[Cookie entfernt]",
+   "endadresse": "https://mobile.1und1.de[Cookie entfernt]",
    "status": "gelesen",
    "grund": null,
    "bot_schutz": false,
@@ -27,16 +27,17 @@
     "bedienelemente": "bedienelemente-1.json",
     "preise": "preise-1.json",
     "klicks": "klicks-1.json",
+    "karte": "karte-1.json",
     "mitschnitt": "mitschnitt-1.json",
     "screenshot": "seite-1.png",
     "html": "seite-1.html.gz"
    },
    "zaehlung": {
-    "anfragen": 58,
-    "verworfen": 2,
+    "anfragen": 66,
+    "verworfen": 3,
     "gescheitert": 0,
-    "hilfsdateien": 1,
-    "mitschnitt": 3,
+    "hilfsdateien": 3,
+    "mitschnitt": 4,
     "elemente": 518,
     "gruppen_je_art": {
      "unbekannt": 179,
@@ -46,7 +47,7 @@
      "laufzeit": 1
     },
     "preis_kandidaten": 9,
-    "klicks": 4
+    "klicks": 1
    },
    "verworfen": [
     {
@@ -56,30 +57,57 @@
     {
      "url": "https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495",
      "grund": "ReadTimeout: The read operation timed out"
+    },
+    {
+     "url": "https://cdn.appdynamics.com/adrum-xd.b5670ee02cea89158a710705f2152002.html",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
     }
    ],
    "gescheitert": [],
    "hilfsdateien": [
     {
-     "url": "https://content.1und1.de/ctx/dh/libt.min.js?bust=2026100712",
+     "url": "https://content.1und1.de/ctx/dh/libt.min.js?bust=2026100715",
+     "art": "script",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://cdn.appdynamics.com/adrum/adrum-latest.js",
+     "art": "script",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://cdn.appdynamics.com/adrum-ext.b5670ee02cea89158a710705f2152002.js",
      "art": "script",
      "grund": "robots.txt nicht lesbar (HTTP 403)"
     }
    ],
    "karte": {
-    "status": "keine_karte",
+    "status": "gelaufen",
     "karte": "1und1.yaml",
-    "grund": "1und1.yaml nicht vorhanden"
+    "grund": null,
+    "datei": "karte-1.json",
+    "laufstatus": "gelesen",
+    "bot_schutz": false,
+    "zaehlung": {
+     "kombinationen": 2,
+     "erfasst": 2,
+     "nicht_angeboten": 0,
+     "nicht_erfasst": 0,
+     "befund": 0,
+     "nicht_besucht": 0,
+     "verworfen": 3,
+     "gescheitert": 0
+    }
    }
   },
   {
    "nummer": 3,
    "geraet": "apple-iphone-17-pro",
    "speicher_gb": 256,
-   "adresse": "https://mobile.1und1.de/iphone-17-pro",
-   "endadresse": "https://mobile.1und1.de/iphone-17-pro",
-   "status": "befund",
-   "grund": "Weiter-Knopf nicht klickbar: Locator.click: Timeout 5000ms exceeded.",
+   "adresse": "https://mobile.1und1.de[Cookie entfernt]",
+   "endadresse": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de[Cookie entfernt]&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de[Cookie entfernt]&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=abfd70ec-b8c8-4be4-b905-ce3534a30b80",
+   "status": "gelesen",
+   "grund": null,
    "bot_schutz": false,
    "http_status": 200,
    "ruhe": true,
@@ -92,20 +120,18 @@
     "html": "seite-3.html.gz"
    },
    "zaehlung": {
-    "anfragen": 66,
-    "verworfen": 2,
+    "anfragen": 101,
+    "verworfen": 6,
     "gescheitert": 0,
-    "hilfsdateien": 1,
-    "mitschnitt": 3,
-    "elemente": 518,
+    "hilfsdateien": 6,
+    "mitschnitt": 5,
+    "elemente": 71,
     "gruppen_je_art": {
-     "unbekannt": 179,
-     "tarif": 16,
-     "farbe": 1,
-     "speicher": 2,
+     "tarif": 2,
+     "unbekannt": 19,
      "laufzeit": 1
     },
-    "preis_kandidaten": 9,
+    "preis_kandidaten": 3,
     "klicks": 0
    },
    "verworfen": [
@@ -116,12 +142,53 @@
     {
      "url": "https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495",
      "grund": "ReadTimeout: The read operation timed out"
+    },
+    {
+     "url": "https://cdn.appdynamics.com/adrum-xd.b5670ee02cea89158a710705f2152002.html",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495",
+     "grund": "ReadTimeout: The read operation timed out"
+    },
+    {
+     "url": "https://api.1und1.de/genesys/channelroutingservice/request/productline",
+     "grund": "nach dem Weiter-Klick nur GET und HEAD"
+    },
+    {
+     "url": "https://cdn.appdynamics.com/adrum-xd.b5670ee02cea89158a710705f2152002.html",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
     }
    ],
    "gescheitert": [],
    "hilfsdateien": [
     {
-     "url": "https://content.1und1.de/ctx/dh/libt.min.js?bust=2026100712",
+     "url": "https://content.1und1.de/ctx/dh/libt.min.js?bust=2026100715",
+     "art": "script",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://cdn.appdynamics.com/adrum/adrum-latest.js",
+     "art": "script",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://cdn.appdynamics.com/adrum-ext.b5670ee02cea89158a710705f2152002.js",
+     "art": "script",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://content.1und1.de/ctx/dh/libt.min.js?bust=2026100715",
+     "art": "script",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://cdn.appdynamics.com/adrum/adrum-latest.js",
+     "art": "script",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://cdn.appdynamics.com/adrum-ext.b5670ee02cea89158a710705f2152002.js",
      "art": "script",
      "grund": "robots.txt nicht lesbar (HTTP 403)"
     }
@@ -134,7 +201,8 @@
     "treffer": 2,
     "sichtbar": 1,
     "geklickt": "Weiter zur Tarifauswahl",
-    "von": "https://mobile.1und1.de/iphone-17-pro"
+    "von": "https://mobile.1und1.de[Cookie entfernt]",
+    "nach": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de[Cookie entfernt]&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de[Cookie entfernt]&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=abfd70ec-b8c8-4be4-b905-ce3534a30b80"
    }
   },
   {
@@ -152,16 +220,17 @@
     "bedienelemente": "bedienelemente-2.json",
     "preise": "preise-2.json",
     "klicks": "klicks-2.json",
+    "karte": "karte-2.json",
     "mitschnitt": "mitschnitt-2.json",
     "screenshot": "seite-2.png",
     "html": "seite-2.html.gz"
    },
    "zaehlung": {
-    "anfragen": 69,
-    "verworfen": 1,
+    "anfragen": 73,
+    "verworfen": 2,
     "gescheitert": 0,
-    "hilfsdateien": 1,
-    "mitschnitt": 3,
+    "hilfsdateien": 3,
+    "mitschnitt": 4,
     "elemente": 539,
     "gruppen_je_art": {
      "unbekannt": 182,
@@ -171,26 +240,53 @@
      "laufzeit": 1
     },
     "preis_kandidaten": 12,
-    "klicks": 4
+    "klicks": 1
    },
    "verworfen": [
     {
      "url": "https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495",
      "grund": "ReadTimeout: The read operation timed out"
+    },
+    {
+     "url": "https://cdn.appdynamics.com/adrum-xd.b5670ee02cea89158a710705f2152002.html",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
     }
    ],
    "gescheitert": [],
    "hilfsdateien": [
     {
-     "url": "https://content.1und1.de/ctx/dh/libt.min.js?bust=2026100712",
+     "url": "https://content.1und1.de/ctx/dh/libt.min.js?bust=2026100715",
+     "art": "script",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://cdn.appdynamics.com/adrum/adrum-latest.js",
+     "art": "script",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://cdn.appdynamics.com/adrum-ext.b5670ee02cea89158a710705f2152002.js",
      "art": "script",
      "grund": "robots.txt nicht lesbar (HTTP 403)"
     }
    ],
    "karte": {
-    "status": "keine_karte",
+    "status": "gelaufen",
     "karte": "1und1.yaml",
-    "grund": "1und1.yaml nicht vorhanden"
+    "grund": null,
+    "datei": "karte-2.json",
+    "laufstatus": "gelesen",
+    "bot_schutz": false,
+    "zaehlung": {
+     "kombinationen": 2,
+     "erfasst": 2,
+     "nicht_angeboten": 0,
+     "nicht_erfasst": 0,
+     "befund": 0,
+     "nicht_besucht": 0,
+     "verworfen": 2,
+     "gescheitert": 0
+    }
    }
   },
   {
@@ -198,9 +294,9 @@
    "geraet": "samsung-galaxy-s26",
    "speicher_gb": 256,
    "adresse": "https://mobile.1und1.de/samsung-galaxy-s26",
-   "endadresse": "https://mobile.1und1.de/samsung-galaxy-s26",
-   "status": "befund",
-   "grund": "Weiter-Knopf nicht klickbar: Locator.click: Timeout 5000ms exceeded.",
+   "endadresse": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=c82888dd-3d8c-460d-b73f-e0a6e80223a3",
+   "status": "gelesen",
+   "grund": null,
    "bot_schutz": false,
    "http_status": 200,
    "ruhe": true,
@@ -213,32 +309,71 @@
     "html": "seite-4.html.gz"
    },
    "zaehlung": {
-    "anfragen": 69,
-    "verworfen": 1,
+    "anfragen": 105,
+    "verworfen": 5,
     "gescheitert": 0,
-    "hilfsdateien": 1,
-    "mitschnitt": 3,
-    "elemente": 539,
+    "hilfsdateien": 6,
+    "mitschnitt": 5,
+    "elemente": 71,
     "gruppen_je_art": {
-     "unbekannt": 182,
-     "tarif": 15,
-     "farbe": 3,
-     "speicher": 2,
+     "tarif": 2,
+     "unbekannt": 19,
      "laufzeit": 1
     },
-    "preis_kandidaten": 12,
+    "preis_kandidaten": 3,
     "klicks": 0
    },
    "verworfen": [
     {
-     "url": "https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495",
+     "url": "https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920",
      "grund": "ReadTimeout: The read operation timed out"
+    },
+    {
+     "url": "https://cdn.appdynamics.com/adrum-xd.b5670ee02cea89158a710705f2152002.html",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920",
+     "grund": "ReadTimeout: The read operation timed out"
+    },
+    {
+     "url": "https://api.1und1.de/genesys/channelroutingservice/request/productline",
+     "grund": "nach dem Weiter-Klick nur GET und HEAD"
+    },
+    {
+     "url": "https://cdn.appdynamics.com/adrum-xd.b5670ee02cea89158a710705f2152002.html",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
     }
    ],
    "gescheitert": [],
    "hilfsdateien": [
     {
-     "url": "https://content.1und1.de/ctx/dh/libt.min.js?bust=2026100712",
+     "url": "https://content.1und1.de/ctx/dh/libt.min.js?bust=2026100715",
+     "art": "script",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://cdn.appdynamics.com/adrum/adrum-latest.js",
+     "art": "script",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://cdn.appdynamics.com/adrum-ext.b5670ee02cea89158a710705f2152002.js",
+     "art": "script",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://content.1und1.de/ctx/dh/libt.min.js?bust=2026100715",
+     "art": "script",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://cdn.appdynamics.com/adrum/adrum-latest.js",
+     "art": "script",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://cdn.appdynamics.com/adrum-ext.b5670ee02cea89158a710705f2152002.js",
      "art": "script",
      "grund": "robots.txt nicht lesbar (HTTP 403)"
     }
@@ -251,11 +386,12 @@
     "treffer": 2,
     "sichtbar": 1,
     "geklickt": "Weiter zur Tarifauswahl",
-    "von": "https://mobile.1und1.de/samsung-galaxy-s26"
+    "von": "https://mobile.1und1.de/samsung-galaxy-s26",
+    "nach": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=c82888dd-3d8c-460d-b73f-e0a6e80223a3"
    }
   }
  ],
- "groesse_bytes": 2793252,
+ "groesse_bytes": 1952741,
  "groessengrenze_bytes": 8000000,
  "gekuerzt": []
 }

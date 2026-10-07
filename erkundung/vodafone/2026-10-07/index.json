@@ -9,7 +9,7 @@
  "robots_gelesen": true,
  "abstand_sekunden": 2.0,
  "besuchszeit": null,
- "dauer_sekunden": 1180.8,
+ "dauer_sekunden": 1914.0,
  "zeitgrenze_sekunden": 3000,
  "seiten": [
   {
@@ -27,6 +27,7 @@
     "bedienelemente": "bedienelemente-1.json",
     "preise": "preise-1.json",
     "klicks": "klicks-1.json",
+    "karte": "karte-1.json",
     "mitschnitt": "mitschnitt-1.json",
     "screenshot": "seite-1.png",
     "html": "seite-1.html.gz"
@@ -61,9 +62,22 @@
    "gescheitert": [],
    "hilfsdateien": [],
    "karte": {
-    "status": "keine_karte",
+    "status": "gelaufen",
     "karte": "vodafone.yaml",
-    "grund": "vodafone.yaml nicht vorhanden"
+    "grund": null,
+    "datei": "karte-1.json",
+    "laufstatus": "gelesen",
+    "bot_schutz": false,
+    "zaehlung": {
+     "kombinationen": 9,
+     "erfasst": 9,
+     "nicht_angeboten": 0,
+     "nicht_erfasst": 0,
+     "befund": 0,
+     "nicht_besucht": 0,
+     "verworfen": 2,
+     "gescheitert": 0
+    }
    }
   },
   {
@@ -151,12 +165,13 @@
     "bedienelemente": "bedienelemente-2.json",
     "preise": "preise-2.json",
     "klicks": "klicks-2.json",
+    "karte": "karte-2.json",
     "mitschnitt": "mitschnitt-2.json",
     "screenshot": "seite-2.png",
     "html": "seite-2.html.gz"
    },
    "zaehlung": {
-    "anfragen": 291,
+    "anfragen": 297,
     "verworfen": 2,
     "gescheitert": 0,
     "hilfsdateien": 0,
@@ -185,9 +200,22 @@
    "gescheitert": [],
    "hilfsdateien": [],
    "karte": {
-    "status": "keine_karte",
+    "status": "gelaufen",
     "karte": "vodafone.yaml",
-    "grund": "vodafone.yaml nicht vorhanden"
+    "grund": null,
+    "datei": "karte-2.json",
+    "laufstatus": "gelesen",
+    "bot_schutz": false,
+    "zaehlung": {
+     "kombinationen": 6,
+     "erfasst": 6,
+     "nicht_angeboten": 0,
+     "nicht_erfasst": 0,
+     "befund": 0,
+     "nicht_besucht": 0,
+     "verworfen": 2,
+     "gescheitert": 0
+    }
    }
   },
   {
@@ -261,7 +289,7 @@
    }
   }
  ],
- "groesse_bytes": 4352609,
+ "groesse_bytes": 4371276,
  "groessengrenze_bytes": 8000000,
  "gekuerzt": []
 }

@@ -1,58 +1,22 @@
 {
- "preise_gesamt": 9,
+ "preise_gesamt": 3,
  "preise": [
   {
-   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(1) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(2) > a:nth-of-type(1)",
-   "text": "AKTION 1&1 DSL ab 34,99 €/Monat – jetzt inklusive 1&1 HomeServer Pro",
-   "kontext": "AKTION 1&1 DSL ab 34,99 €/Monat – jetzt inklusive 1&1 HomeServer Pro",
-   "sichtbar": false
-  },
-  {
-   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(2) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(2) > a:nth-of-type(1)",
-   "text": "AKTION 1&1 Glasfaser ab 39,99 €/Monat – jetzt inklusive 1&1 HomeServer Pro",
-   "kontext": "AKTION 1&1 Glasfaser ab 39,99 €/Monat – jetzt inklusive 1&1 HomeServer Pro",
-   "sichtbar": false
-  },
-  {
-   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(3) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(2) > a:nth-of-type(1)",
-   "text": "AKTION 1&1 DSL ab 34,99 €/Monat – jetzt inklusive 1&1 HomeServer Pro",
-   "kontext": "AKTION 1&1 DSL ab 34,99 €/Monat – jetzt inklusive 1&1 HomeServer Pro",
-   "sichtbar": false
-  },
-  {
-   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(3) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(6) > a:nth-of-type(1)",
-   "text": "AKTION 1&1 Glasfaser ab 39,99 €/Monat – jetzt inklusive 1&1 HomeServer Pro",
-   "kontext": "AKTION 1&1 Glasfaser ab 39,99 €/Monat – jetzt inklusive 1&1 HomeServer Pro",
-   "sichtbar": false
-  },
-  {
-   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(9) > div:nth-of-type(1) > ul:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2)",
-   "text": "Zum Surfen mit dem Laptop – auch von unterwegs ab 4,99 €/Monat.",
-   "kontext": "1&1 Daten-FlatZum Surfen mit dem Laptop – auch von unterwegs ab 4,99 €/Monat.",
-   "sichtbar": false
-  },
-  {
-   "pfad": "#hwd-configuration-section > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2)",
-   "text": "99 €/Monat",
-   "kontext": "44 , 99 €/Monat",
+   "pfad": "#tariff-cards-container > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2)",
+   "text": "99 €/Mon.",
+   "kontext": "59 , 99 €/Mon.",
    "sichtbar": true
   },
   {
-   "pfad": "#hwd-configuration-section > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2)",
-   "text": "99 €/Monat",
-   "kontext": "44 , 99 €/Monat",
+   "pfad": "#tariff-cards-container > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2)",
+   "text": "99 €/Mon.",
+   "kontext": "44 , 99 €/Mon.",
    "sichtbar": true
   },
   {
-   "pfad": "#hwd-configuration-section > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(4) > ul:nth-of-type(1) > li:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(1) > label:nth-of-type(1) > span:nth-of-type(3) > strong:nth-of-type(1)",
-   "text": "5,– €/Monat",
-   "kontext": "Statt UVP (149,–) für nur 5,– €/Monat",
-   "sichtbar": true
-  },
-  {
-   "pfad": "#hwd-configuration-section > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(4) > ul:nth-of-type(1) > li:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(1) > label:nth-of-type(1) > span:nth-of-type(3) > strong:nth-of-type(1)",
-   "text": "9,– €/Monat",
-   "kontext": "Statt UVP (249,–) für nur 9,– €/Monat",
+   "pfad": "#tariff-cards-container > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > ul:nth-of-type(1) > li:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "Flexibel nach 24 Monaten: Jederzeit neues Handy wählen und Altgerät zurückschicken. Oder Vertrag kündigen und Altgerät gegen einmalig 360,– € behalten.",
+   "kontext": "Flexibel nach 24 Monaten: Jederzeit neues Handy wählen und Altgerät zurückschicken. Oder Vertrag kündigen und Altgerät gegen einmalig 360,– € behalten.",
    "sichtbar": true
   }
  ]

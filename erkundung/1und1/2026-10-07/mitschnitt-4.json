@@ -99,7 +99,7 @@
   {
    "nummer": 13,
    "methode": "GET",
-   "url": "https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495",
+   "url": "https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920",
    "art": "script",
    "status": null,
    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
@@ -427,7 +427,7 @@
   {
    "nummer": 54,
    "methode": "GET",
-   "url": "https://content.1und1.de/ctx/dh/libt.min.js?bust=2026100712",
+   "url": "https://content.1und1.de/ctx/dh/libt.min.js?bust=2026100715",
    "art": "script",
    "status": 200,
    "abbruch": null
@@ -491,7 +491,7 @@
   {
    "nummer": 62,
    "methode": "GET",
-   "url": "https://api.1und1.de/ctx/dh/cdn/onlineshop/prod/cdh.v.js?a=1und1%2Fonlineshop%2F202608121058&cb=1791375041730",
+   "url": "https://api.1und1.de/ctx/dh/cdn/onlineshop/prod/cdh.v.js?a=1und1%2Fonlineshop%2F202608121058&cb=1791387443001",
    "art": "script",
    "status": 200,
    "abbruch": null
@@ -499,13 +499,53 @@
   {
    "nummer": 63,
    "methode": "POST",
-   "url": "https://mobile.1und1.de/cdn-cgi/challenge-platform/h/g/jsd/oneshot/4df4a60fa397/0.08319912652634998:1791370838:ucV7dimT-lIecoK6gdT1Vv-IEUPH5zs5AY6uuvG6fr0/a46ccd4589dd588f",
+   "url": "https://mobile.1und1.de/cdn-cgi/challenge-platform/h/g/jsd/oneshot/4df4a60fa397/0.26514088464714347:1791385240:v4M95sZ94b0hWNu89ZP_IvYg-IbMUp5cZbVsPnuPMLE/a46dfc094cee2fcc",
    "art": "xhr",
    "status": null,
    "abbruch": "net::ERR_ABORTED"
   },
   {
    "nummer": 64,
+   "methode": "POST",
+   "url": "https://api.1und1.de/ctx/dh/cs/event",
+   "art": "xhr",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 65,
+   "methode": "GET",
+   "url": "https://cdn.appdynamics.com/adrum/adrum-latest.js",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 66,
+   "methode": "GET",
+   "url": "https://cdn.appdynamics.com/adrum-ext.b5670ee02cea89158a710705f2152002.js",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 67,
+   "methode": "GET",
+   "url": "https://cdn.appdynamics.com/adrum-xd.b5670ee02cea89158a710705f2152002.html",
+   "art": "document",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT"
+  },
+  {
+   "nummer": 68,
+   "methode": "POST",
+   "url": "https://mobile.1und1.de/frontend/cart-facade/add",
+   "art": "xhr",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 69,
    "methode": "GET",
    "url": "https://mobile.1und1.de/_Resources/Persistent/b24de564ee8fc2158a6218ceccf954059ba9998b/d-t-m-ssc-feature-card-1-v4599-img-samsung-galaxy-s26-796x448.webp?bust=4",
    "art": "image",
@@ -513,7 +553,7 @@
    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
   },
   {
-   "nummer": 65,
+   "nummer": 70,
    "methode": "GET",
    "url": "https://mobile.1und1.de/_Resources/Persistent/b3c565607df4873259735ce88cf6984fd16836cc/d-t-m-ssc-feature-card-2-v4599-img-samsung-galaxy-s26-796x448.webp?bust=4",
    "art": "image",
@@ -521,7 +561,7 @@
    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
   },
   {
-   "nummer": 66,
+   "nummer": 71,
    "methode": "GET",
    "url": "https://mobile.1und1.de/_Resources/Persistent/7728cc3685786344206173f565a60dbc6aef6d6c/d-t-m-ssc-feature-card-3-v4599-img-samsung-galaxy-s26-796x448.webp?bust=4",
    "art": "image",
@@ -529,7 +569,7 @@
    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
   },
   {
-   "nummer": 67,
+   "nummer": 72,
    "methode": "GET",
    "url": "https://mobile.1und1.de/_Resources/Persistent/34f005c556b75e38295623dd5cdc2d057e405cd4/69ef99608afaf268d81a2623007b0dae-img-award-chip-galaxy-s26-sehr-gut.png?bust=4",
    "art": "image",
@@ -537,7 +577,7 @@
    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
   },
   {
-   "nummer": 68,
+   "nummer": 73,
    "methode": "GET",
    "url": "https://mobile.1und1.de/_Resources/Persistent/e4726df72e1519d85c1d0bb21a19ffb44d6e17a0/a82c4452a5f09dd8691cde567d40840b-img-award-comp-bild-galaxy-s26-sehr-gut.png?bust=4",
    "art": "image",
@@ -545,12 +585,260 @@
    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
   },
   {
-   "nummer": 69,
+   "nummer": 74,
    "methode": "GET",
    "url": "https://mobile.1und1.de/_Resources/Persistent/0782a112c6be0492e06cc0b84da30699ae12e655/09e1309a408d9f97decf0ce708fa6842-award-d48539-img-connect-samsung-galaxy-s26-sehr-gut.png?bust=4",
    "art": "image",
    "status": null,
    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 75,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/samsung-galaxy-s26?startPageFlowId=f2-ssc-hw-private&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26",
+   "art": "document",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 76,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=c82888dd-3d8c-460d-b73f-e0a6e80223a3",
+   "art": "document",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 77,
+   "methode": "GET",
+   "url": "https://content.1und1.de/fonts/1und1-web-sans-57-condensed.woff2",
+   "art": "font",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 78,
+   "methode": "GET",
+   "url": "https://content.1und1.de/fonts/1und1-web-sans-77-black-condensed.woff2",
+   "art": "font",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 79,
+   "methode": "GET",
+   "url": "https://content.1und1.de/fonts/1und1-web-sans-87-extra-black-condensed.woff2",
+   "art": "font",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 80,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/609613e56ea5d0ade59b9f2cfade1d9d0bac1d2b/main.css?bust=4",
+   "art": "stylesheet",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 81,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.JNodeTypes/1791299590/Images/ContactBubble/lg.png?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 82,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.AccComponents/1791299594/JavaScript/StickyContactChatGenesys.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 83,
+   "methode": "GET",
+   "url": "https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920",
+   "art": "script",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 84,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/b9e0d709755d7bcdcab6b6567c9877aa2b2f9349/main.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 85,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.NNodeTypes/1791299590/JavaScript/bs-transformer.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 86,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.NNodeTypes/1791299590/JavaScript/shop-general.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 87,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.ReactNodeTypes/1791299590/JavaScript/main.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 88,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.JNodeTypes/1791299590/JavaScript/RecurringModal/RecurringModal.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 89,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.Shop/1791299595/JavaScript/Survey/isurvey.min.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 90,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.Shop/1791299595/JavaScript/Survey/rogator.min.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 91,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/b015a129abe3909685c76f198806966f48351f15/icons.svg?bust=4",
+   "art": "xhr",
+   "status": null,
+   "abbruch": "net::ERR_ABORTED"
+  },
+  {
+   "nummer": 92,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/8ef6d77fca8a9b5ceb565d92605217c0daa2665b/vi-d37149-img-internet-made-in-germany.svg?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 93,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/94e6afc3cf98ee3e787a4191e4a6ccb360307e11/img-logo-1und1-nachhaltigkeit.svg?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 94,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/d6f7615e22396778787074b7e3c7d76ee4911889/facebook.svg?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 95,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/2aed61bb727294182ecd1c106f222a44d7995aa0/instagram-logo.svg?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 96,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/2ce3a922137d6bb18f61efbecc1a6efc7d8b60e5/twitter.svg?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 97,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/deeb0ca24aa0d0cbcc069c0f45a4777fcf740932/youtube.svg?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 98,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/c9955fafdf1efe7c3ef9413b211f8f527c6a81bb/linkedin.svg?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 99,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/7f802e4ef61c049da1a887d2878f9c87bc399f47/xing.svg?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 100,
+   "methode": "GET",
+   "url": "https://content.1und1.de/ctx/dh/libt.min.js?bust=2026100715",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 101,
+   "methode": "GET",
+   "url": "https://api.1und1.de/ctx/dh/cdn/onlineshop/prod/cdh.js",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 102,
+   "methode": "POST",
+   "url": "https://api.1und1.de/genesys/channelroutingservice/request/productline",
+   "art": "fetch",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 103,
+   "methode": "GET",
+   "url": "https://cdn.appdynamics.com/adrum/adrum-latest.js",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 104,
+   "methode": "GET",
+   "url": "https://cdn.appdynamics.com/adrum-ext.b5670ee02cea89158a710705f2152002.js",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 105,
+   "methode": "GET",
+   "url": "https://cdn.appdynamics.com/adrum-xd.b5670ee02cea89158a710705f2152002.html",
+   "art": "document",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT"
   }
  ],
  "antworten": [
@@ -563,7 +851,7 @@
    "typ": "application/json",
    "groesse": 266,
    "gekuerzt": false,
-   "koerper": "{\"requestId\":\"3e7168bb-3c89-460c-a123-560596684ccb\",\"accessToken\":\"ENTFERNT\",\"channels\":[{\"channelType\":\"CHAT\",\"available\":false,\"description\":null,\"chatEnvironment\":\"prod-euc1\",\"chatDeploymentId\":\"59ba7a17-2146-40f0-b02a-b833655edb41\"}]}"
+   "koerper": "{\"requestId\":\"d76f82ca-b830-449c-aa59-e771d4570a13\",\"accessToken\":\"ENTFERNT\",\"channels\":[{\"channelType\":\"CHAT\",\"available\":false,\"description\":null,\"chatEnvironment\":\"prod-euc1\",\"chatDeploymentId\":\"59ba7a17-2146-40f0-b02a-b833655edb41\"}]}"
   },
   {
    "nummer": 59,
@@ -574,7 +862,7 @@
    "typ": "application/json",
    "groesse": 266,
    "gekuerzt": false,
-   "koerper": "{\"requestId\":\"887c44d9-c822-482f-8f9c-69b89c800a73\",\"accessToken\":\"ENTFERNT\",\"channels\":[{\"channelType\":\"CHAT\",\"available\":false,\"description\":null,\"chatEnvironment\":\"prod-euc1\",\"chatDeploymentId\":\"7906e3b6-6f61-4ba1-9d44-de7d69af4a2c\"}]}"
+   "koerper": "{\"requestId\":\"ec76842d-edb7-4b3a-841b-0f6980f36389\",\"accessToken\":\"ENTFERNT\",\"channels\":[{\"channelType\":\"CHAT\",\"available\":false,\"description\":null,\"chatEnvironment\":\"prod-euc1\",\"chatDeploymentId\":\"7906e3b6-6f61-4ba1-9d44-de7d69af4a2c\"}]}"
   },
   {
    "nummer": 60,
@@ -586,6 +874,28 @@
    "groesse": 0,
    "gekuerzt": false,
    "koerper": ""
+  },
+  {
+   "nummer": 64,
+   "methode": "POST",
+   "url": "https://api.1und1.de/ctx/dh/cs/event",
+   "art": "xhr",
+   "status": 200,
+   "typ": "application/json",
+   "groesse": 0,
+   "gekuerzt": false,
+   "koerper": ""
+  },
+  {
+   "nummer": 68,
+   "methode": "POST",
+   "url": "https://mobile.1und1.de/frontend/cart-facade/add",
+   "art": "xhr",
+   "status": 200,
+   "typ": "application/json",
+   "koerper": "true",
+   "groesse": 4,
+   "gekuerzt": false
   }
  ]
 }

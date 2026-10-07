@@ -9,7 +9,7 @@
  "robots_gelesen": true,
  "abstand_sekunden": 2.0,
  "besuchszeit": null,
- "dauer_sekunden": 110.5,
+ "dauer_sekunden": 243.2,
  "zeitgrenze_sekunden": 3000,
  "seiten": [
   {
@@ -27,19 +27,21 @@
     "bedienelemente": "bedienelemente-1.json",
     "preise": "preise-1.json",
     "klicks": "klicks-1.json",
+    "karte": "karte-1.json",
     "mitschnitt": "mitschnitt-1.json",
     "screenshot": "seite-1.png",
     "html": "seite-1.html.gz"
    },
    "zaehlung": {
-    "anfragen": 76,
+    "anfragen": 68,
     "verworfen": 2,
     "gescheitert": 0,
+    "hilfsdateien": 0,
     "mitschnitt": 3,
     "elemente": 537,
     "gruppen_je_art": {
-     "tarif": 28,
-     "unbekannt": 134,
+     "tarif": 29,
+     "unbekannt": 133,
      "farbe": 2,
      "speicher": 1,
      "laufzeit": 3
@@ -49,15 +51,34 @@
    },
    "verworfen": [
     {
-     "url": "https://api.usercentrics.eu/settings/3DQmSnVkN/latest/languages.json",
-     "grund": "robots.txt nicht lesbar (HTTP 403)"
-    },
-    {
      "url": "https://www.congstar.de/checkout/api/cart-state",
      "grund": "per robots.txt gesperrt: /checkout/api/cart-state"
+    },
+    {
+     "url": "https://api.usercentrics.eu/settings/3DQmSnVkN/latest/languages.json",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
     }
    ],
-   "gescheitert": []
+   "gescheitert": [],
+   "hilfsdateien": [],
+   "karte": {
+    "status": "gelaufen",
+    "karte": "congstar.yaml",
+    "grund": null,
+    "datei": "karte-1.json",
+    "laufstatus": "gelesen",
+    "bot_schutz": false,
+    "zaehlung": {
+     "kombinationen": 8,
+     "erfasst": 8,
+     "nicht_angeboten": 0,
+     "nicht_erfasst": 0,
+     "befund": 0,
+     "nicht_besucht": 0,
+     "verworfen": 2,
+     "gescheitert": 0
+    }
+   }
   },
   {
    "nummer": 2,
@@ -74,6 +95,7 @@
     "bedienelemente": "bedienelemente-2.json",
     "preise": "preise-2.json",
     "klicks": "klicks-2.json",
+    "karte": "karte-2.json",
     "mitschnitt": "mitschnitt-2.json",
     "screenshot": "seite-2.png",
     "html": "seite-2.html.gz"
@@ -82,11 +104,12 @@
     "anfragen": 78,
     "verworfen": 2,
     "gescheitert": 0,
+    "hilfsdateien": 0,
     "mitschnitt": 3,
     "elemente": 544,
     "gruppen_je_art": {
-     "tarif": 29,
-     "unbekannt": 135,
+     "tarif": 28,
+     "unbekannt": 136,
      "farbe": 2,
      "speicher": 2,
      "laufzeit": 3
@@ -96,18 +119,37 @@
    },
    "verworfen": [
     {
-     "url": "https://api.usercentrics.eu/settings/3DQmSnVkN/latest/languages.json",
-     "grund": "robots.txt nicht lesbar (HTTP 403)"
-    },
-    {
      "url": "https://www.congstar.de/checkout/api/cart-state",
      "grund": "per robots.txt gesperrt: /checkout/api/cart-state"
+    },
+    {
+     "url": "https://api.usercentrics.eu/settings/3DQmSnVkN/latest/languages.json",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
     }
    ],
-   "gescheitert": []
+   "gescheitert": [],
+   "hilfsdateien": [],
+   "karte": {
+    "status": "gelaufen",
+    "karte": "congstar.yaml",
+    "grund": null,
+    "datei": "karte-2.json",
+    "laufstatus": "gelesen",
+    "bot_schutz": false,
+    "zaehlung": {
+     "kombinationen": 16,
+     "erfasst": 12,
+     "nicht_angeboten": 0,
+     "nicht_erfasst": 4,
+     "befund": 0,
+     "nicht_besucht": 4,
+     "verworfen": 2,
+     "gescheitert": 0
+    }
+   }
   }
  ],
- "groesse_bytes": 1853219,
+ "groesse_bytes": 1888406,
  "groessengrenze_bytes": 8000000,
  "gekuerzt": []
 }

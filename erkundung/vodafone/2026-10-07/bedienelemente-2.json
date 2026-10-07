@@ -991,8 +991,8 @@
   },
   {
    "nummer": 54,
-   "pfad": "#vf-flyout-item-hotline",
-   "name": null,
+   "pfad": "#tobi-frame-buttons",
+   "name": "TOBi Chat Steuerung",
    "art": "unbekannt",
    "anteile": {
     "speicher": 0.0,
@@ -1002,15 +1002,15 @@
    },
    "elemente": [
     95,
-    350
+    96
    ],
    "select": false,
    "mit_marke": false
   },
   {
    "nummer": 55,
-   "pfad": "#vf-flyout-item-support",
-   "name": null,
+   "pfad": "#tobi-iframe-container",
+   "name": "TOBi Chat",
    "art": "unbekannt",
    "anteile": {
     "speicher": 0.0,
@@ -1019,33 +1019,16 @@
     "farbe": 0.0
    },
    "elemente": [
-    96,
-    351
+    97,
+    350
    ],
    "select": false,
    "mit_marke": false
   },
   {
    "nummer": 56,
-   "pfad": "body > div:nth-of-type(11)",
+   "pfad": "#tobi-content-area",
    "name": null,
-   "art": "unbekannt",
-   "anteile": {
-    "speicher": 0.0,
-    "laufzeit": 0.0,
-    "tarif": 0.0,
-    "farbe": 0.0
-   },
-   "elemente": [
-    97
-   ],
-   "select": false,
-   "mit_marke": false
-  },
-  {
-   "nummer": 57,
-   "pfad": "#tobi-frame-buttons",
-   "name": "TOBi Chat Steuerung",
    "art": "unbekannt",
    "anteile": {
     "speicher": 0.0,
@@ -1061,9 +1044,9 @@
    "mit_marke": false
   },
   {
-   "nummer": 58,
-   "pfad": "#tobi-iframe-container",
-   "name": "TOBi Chat",
+   "nummer": 57,
+   "pfad": "#vf-flyout-item-hotline",
+   "name": null,
    "art": "unbekannt",
    "anteile": {
     "speicher": 0.0,
@@ -1073,14 +1056,14 @@
    },
    "elemente": [
     100,
-    352
+    351
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 59,
-   "pfad": "#tobi-content-area",
+   "nummer": 58,
+   "pfad": "#vf-flyout-item-support",
    "name": null,
    "art": "unbekannt",
    "anteile": {
@@ -1091,6 +1074,23 @@
    },
    "elemente": [
     101,
+    352
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 59,
+   "pfad": "body > div:nth-of-type(12)",
+   "name": "Chat starten",
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
     102
    ],
    "select": false,
@@ -4540,72 +4540,6 @@
    "behaelter": null
   },
   {
-   "tag": "button",
-   "rolle": "button",
-   "text": "",
-   "aria": {},
-   "daten": {},
-   "id": "vf-flyout-trigger-hotline",
-   "klassen": [
-    "vf-flyout-item-trigger"
-   ],
-   "name": null,
-   "wert": null,
-   "typ": "button",
-   "href": null,
-   "ziel": null,
-   "pfad": "#vf-flyout-trigger-hotline",
-   "sichtbar": false,
-   "deaktiviert": true,
-   "gewaehlt": null,
-   "optionen": null,
-   "behaelter": 54
-  },
-  {
-   "tag": "button",
-   "rolle": "button",
-   "text": "",
-   "aria": {},
-   "daten": {},
-   "id": "vf-flyout-trigger-support",
-   "klassen": [
-    "vf-flyout-item-trigger"
-   ],
-   "name": null,
-   "wert": null,
-   "typ": "button",
-   "href": null,
-   "ziel": null,
-   "pfad": "#vf-flyout-trigger-support",
-   "sichtbar": false,
-   "deaktiviert": true,
-   "gewaehlt": null,
-   "optionen": null,
-   "behaelter": 55
-  },
-  {
-   "tag": "button",
-   "rolle": "button",
-   "text": "",
-   "aria": {},
-   "daten": {},
-   "id": null,
-   "klassen": [
-    "vf-flyout-trigger"
-   ],
-   "name": null,
-   "wert": null,
-   "typ": "button",
-   "href": null,
-   "ziel": null,
-   "pfad": "body > div:nth-of-type(11) > button:nth-of-type(1)",
-   "sichtbar": false,
-   "deaktiviert": false,
-   "gewaehlt": null,
-   "optionen": null,
-   "behaelter": 56
-  },
-  {
    "tag": "div",
    "rolle": "button",
    "text": "",
@@ -4629,7 +4563,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 57
+   "behaelter": 54
   },
   {
    "tag": "div",
@@ -4654,7 +4588,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 57
+   "behaelter": 54
   },
   {
    "tag": "iframe",
@@ -4676,7 +4610,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 58
+   "behaelter": 55
   },
   {
    "tag": "div",
@@ -4698,7 +4632,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 59
+   "behaelter": 56
   },
   {
    "tag": "div",
@@ -4718,6 +4652,72 @@
    "href": null,
    "ziel": null,
    "pfad": "#tobi-floating-action-button",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 56
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "",
+   "aria": {},
+   "daten": {},
+   "id": "vf-flyout-trigger-hotline",
+   "klassen": [
+    "vf-flyout-item-trigger"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": "button",
+   "href": null,
+   "ziel": null,
+   "pfad": "#vf-flyout-trigger-hotline",
+   "sichtbar": false,
+   "deaktiviert": true,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 57
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "",
+   "aria": {},
+   "daten": {},
+   "id": "vf-flyout-trigger-support",
+   "klassen": [
+    "vf-flyout-item-trigger"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": "button",
+   "href": null,
+   "ziel": null,
+   "pfad": "#vf-flyout-trigger-support",
+   "sichtbar": false,
+   "deaktiviert": true,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 58
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "vf-flyout-trigger"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": "button",
+   "href": null,
+   "ziel": null,
+   "pfad": "body > div:nth-of-type(12) > button:nth-of-type(1)",
    "sichtbar": false,
    "deaktiviert": false,
    "gewaehlt": null,
@@ -10377,6 +10377,28 @@
   {
    "tag": "a",
    "rolle": "link",
+   "text": "Zum TOBi Chat springen",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "tobi-skip-link"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html",
+   "ziel": null,
+   "pfad": "#tobi-iframe-container > a:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 55
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
    "text": "0800 724 26 10",
    "aria": {},
    "daten": {},
@@ -10395,7 +10417,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 54
+   "behaelter": 57
   },
   {
    "tag": "a",
@@ -10414,28 +10436,6 @@
    "href": "tel:",
    "ziel": null,
    "pfad": "#vf-flyout-item-support > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(1)",
-   "sichtbar": false,
-   "deaktiviert": false,
-   "gewaehlt": null,
-   "optionen": null,
-   "behaelter": 55
-  },
-  {
-   "tag": "a",
-   "rolle": "link",
-   "text": "Zum TOBi Chat springen",
-   "aria": {},
-   "daten": {},
-   "id": null,
-   "klassen": [
-    "tobi-skip-link"
-   ],
-   "name": null,
-   "wert": null,
-   "typ": null,
-   "href": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html",
-   "ziel": null,
-   "pfad": "#tobi-iframe-container > a:nth-of-type(1)",
    "sichtbar": false,
    "deaktiviert": false,
    "gewaehlt": null,
