@@ -736,6 +736,32 @@
       "gzip": true,
       "bytes_abgelegt": 7053,
       "hinweis": "Körper der Antwort unverändert (gekuerzt=false im Mitschnitt), nur gzip-verpackt. Beleg für die Pfade der Klick-Karte config/klickkarten/vodafone.yaml."
+    },
+    {
+      "datei": "o2_konfiguration_20261007.json.gz",
+      "url": "https://www.o2online.de/e-shop/rest/configuration/<id> (3 Antworten: iPhone 17 Pro 256 GB 24 Monate mit L Plus und mit S Special Plus, Galaxy S26 512 GB 24 Monate mit L Plus; Adressen in der Datei)",
+      "quelle": "Zweig klick-erkundung, Commit f31d5543, erkundung/o2/2026-10-07/mitschnitt-1.json Antworten 135 und 138, mitschnitt-2.json Antwort 135 (Klick-Erkundung, Actions-Lauf 37582071155)",
+      "abgerufen_am": "2026-10-07",
+      "http_status": 200,
+      "content_type": "application/vnd.commerce.message+json",
+      "bytes_roh": 8961,
+      "sha256_roh": "4ccba618ae09d14c85c2cbf726e58736bad8f578a75e4b66849384228dd66fa9",
+      "gzip": true,
+      "bytes_abgelegt": 1325,
+      "hinweis": "AUSZUG, nicht byteidentisch: der Mitschnitt haelt je Antwort nur die ersten rund 198 kB der 430-483 kB (gekuerzt=true). Uebernommen sind mit unveraenderten Werten @type, hardware.offerName, hardware.storageOptions und hardware.paymentOptions (je @type, displayValue, selected), tariff.tariffCmsContent.name und die ersten 6 tariffOptions, die im gekuerzten Mitschnitt vollstaendig stehen (je @type, displayValue, dataVolumeMbNumeric, selected). Preiszusammenfassung liegt hinter der Kuerzung. Beleg fuer die Variantenpfade und das Volumen der Klick-Karte o2 (tests/test_klickkarte_o2.py)."
+    },
+    {
+      "datei": "congstar_graphql_20261007.json.gz",
+      "url": "https://www.congstar.de/webshop-graphql/graphql (5 POST-Antworten beim Laden: Tarife, Geraet, Geraetepreise je Tarif; Schluessel Seite/Nummer in der Datei)",
+      "quelle": "Zweig klick-erkundung, Commit f31d5543, erkundung/congstar/2026-10-07/mitschnitt-1.json Antworten 62, 63, 64 und mitschnitt-2.json Antworten 64, 65 (Klick-Erkundung, Actions-Lauf 37582071155)",
+      "abgerufen_am": "2026-10-07",
+      "http_status": 200,
+      "content_type": "application/json",
+      "bytes_roh": 351462,
+      "sha256_roh": "b71bd77b598ea4a6eb4c1404cac3525e7a7e1cac17b394390656c415386ceb41",
+      "gzip": true,
+      "bytes_abgelegt": 16632,
+      "hinweis": "Koerper unveraendert als Text je Antwort (im Mitschnitt nicht gekuerzt), verpackt in ein JSON mit quelle, herkunft und antworten. Seite 1 Apple iPhone 17 Pro 512 GB (Warenkorb-Link mit deviceVariantId), Seite 2 Samsung Galaxy S26 (Kameleoon-Test 453, deviceVariantId in data-kam-dke-453-source). Die Tarif-Antwort von Seite 2 (Nr. 63) gleicht Seite 1 Nr. 62 und fehlt darum. Beleg der Klick-Karte congstar (tests/test_klickkarte_congstar.py)."
     }
   ]
 }

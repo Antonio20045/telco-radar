@@ -4,7 +4,9 @@
 Auffächerung, Platzhalter) und die Variante an Pfaden oder in den Parametern der
 Antwortadresse, mit ``segment`` auch aus deren Base64-Pfadsegment (o2). ``feldwert``
 wandelt einen Wert in den Typ seines Felds: Betrag, Ganzzahl, Volumen in GB (``-1``
-heißt unbegrenzt, o2) oder eine Phase ohne Ende; Bündelfelder (1&1, freenet) sind
+heißt unbegrenzt, o2) oder eine Phase ohne Ende, aus einer Liste von Posten die
+Phasen wie im Text (o2 ``priceSummary.recurringChargesListEntries`` mit der Zeile „ab
+dem 25. Monat: 29,99 €“); Bündelfelder (1&1, freenet) sind
 Beträge in ``Antwortlesung.buendel``; ``einheit`` rechnet Cent in Euro
 (1&1) und MB in GB (o2). Eine Laufzeit gilt nur als Monatsangabe („24 Monate“, „24 x“
 oder reine Zahl), sonst ist sie ``None``; ``muster`` eines Pfads nimmt sie aus anderem
@@ -34,6 +36,7 @@ from .klicktext import (
     Preiswerte,
     nennt_volumen,
     phase,
+    phasen_aus_text,
     volumen_aus_zeile,
 )
 
@@ -124,6 +127,8 @@ def adressparameter(url: str | None, segment: re.Pattern[str] | None) -> dict[st
 
 def feldwert(feld: str, roh: object, einheit: str | None = None) -> object:
     """Ein Wert als Typ seines Felds: Betrag, Ganzzahl, Volumen in GB oder Phase."""
+    if feld == PHASENFELD and isinstance(roh, list):
+        return phasen_aus_text(_postenzeilen(roh))
     if feld == PHASENFELD:
         betrag = _umgerechnet(_betrag(roh), einheit)
         return None if betrag is None else (Preisphase(1, None, betrag),)
@@ -132,6 +137,20 @@ def feldwert(feld: str, roh: object, einheit: str | None = None) -> object:
     if feld == VOLUMENFELD:
         return _umgerechnet(_volumen(roh), einheit)
     return _umgerechnet(_betrag(roh), einheit)
+
+
+def _postenzeilen(posten: list) -> str:
+    """Je Posten eine Zeile aus seinen Texten ohne Markup, ohne Schlüssel mit „@“."""
+    zeilen = []
+    for eintrag in posten:
+        paare = eintrag.items() if isinstance(eintrag, Mapping) else [("", eintrag)]
+        texte = [
+            ohne_markup(w)
+            for k, w in paare
+            if isinstance(w, str) and not str(k).startswith("@")
+        ]
+        zeilen.append(" ".join(" ".join(texte).split()))
+    return "\n".join(zeilen)
 
 
 def _feldwert(

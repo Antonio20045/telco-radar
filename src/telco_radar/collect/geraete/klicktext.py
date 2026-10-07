@@ -10,13 +10,16 @@ Betrag. Ohne Betrag ist ein Posten 0, wenn das Nullwort unmittelbar am Posten st
 Satzteils („keine Zinsen“) ist keine 0. Ein Datenvolumen mit GB-Zahl ist begrenzt, auch
 wenn die Zeile „unbegrenzt“ nennt; unbegrenzt ist es nur ohne Zahl (``math.inf``).
 Tarifphasen mit einem Ende vor dem Anfang sind ein Widerspruch: die Zeile ergibt dann
-keine Phasen. Fehlt ein Wert, ist er ``None``, nie 0. Deutsche Zahlen liest
+keine Phasen. Zur Tarifzeile gehören die direkt folgenden Zeilen, die mit „ab (dem)
+N. Monat“ beginnen (o2: eigene Zeile „ab dem 25. Monat: 29,99 €“ unter „Tarif mtl.“).
+Fehlt ein Wert, ist er ``None``, nie 0. Deutsche Zahlen liest
 ``tarif_model.zahl``. ``fundstellen`` nennt je Feld den Ausschnitt, aus dem der Wert
 stammt; der Beleg (``klickbeleg``) hält ihn fest.
 """
 
 from __future__ import annotations
 
+import itertools
 import math
 import re
 from dataclasses import dataclass
@@ -43,6 +46,7 @@ _SPANNE = r"\bMonate?n?\s+(\d{1,2})\s*(?:[-–]|bis)\s*(\d{1,2})\b"
 _PHASE_SPANNE = re.compile(_BETRAG + _LUECKE + _SPANNE, re.I)
 _AB = r"\bab\s+(?:dem\s+)?(?:Monat\s+(\d{1,2})|(\d{1,2})\.\s*Monat)\b"
 _PHASE_AB = re.compile(_AB + _LUECKE + _BETRAG, re.I)
+_FOLGEPHASE = re.compile(r"\s*" + _AB, re.I)
 _ERSTE = r"\bersten\s+(\d{1,2})\s+Monate?n?\b"
 _PHASE_ERSTE = re.compile(_ERSTE + _LUECKE + _BETRAG, re.I)
 _PHASE_ERSTE_VORN = re.compile(_BETRAG + _LUECKE + _ERSTE, re.I)
@@ -99,7 +103,7 @@ def lies_zusammenfassung(text: str) -> Preiswerte:
         anzahlung=_postenwert(_ANZAHLUNG, text),
         rate=rate,
         ratenzahl=ratenzahl,
-        tarifphasen=_phasen_aus_text(text),
+        tarifphasen=phasen_aus_text(text),
         tarifbindung=int(bindung[1]) if bindung else None,
         anschluss=_postenwert(_ANSCHLUSS, text),
         volumen_gb=_volumen_aus_text(text),
@@ -118,9 +122,7 @@ def fundstellen(text: str) -> dict[str, str]:
         "anzahlung": _postenstelle(_ANZAHLUNG, text),
         "rate": _ausschnitt(rate or mal),
         "ratenzahl": _ausschnitt(_RATENZAHL.search(text) or mal),
-        "tarifphasen": next(
-            (z for z in zeilen if _TARIFZEILE.search(z) and _BETRAG_RE.search(z)), None
-        ),
+        "tarifphasen": _tarifstelle(zeilen),
         "tarifbindung": _ausschnitt(_BINDUNG.search(text)),
         "anschluss": _postenstelle(_ANSCHLUSS, text),
         "volumen_gb": next((z for z in zeilen if _volumenzeile(z)), None),
@@ -192,10 +194,18 @@ def _rate_aus_text(text: str) -> tuple[float | None, int | None]:
     return betrag, int(raten) if raten is not None else None
 
 
-def _phasen_aus_text(text: str) -> tuple[Preisphase, ...] | None:
-    for zeile in text.splitlines():
+def phasen_aus_text(text: str) -> tuple[Preisphase, ...] | None:
+    """Die Tarifphasen der ersten Tarifzeile mit Betrag samt ihren Folgezeilen."""
+    stelle = _tarifstelle(text.splitlines())
+    return None if stelle is None else _phasen_aus_zeile(" ".join(stelle.splitlines()))
+
+
+def _tarifstelle(zeilen: list[str]) -> str | None:
+    """Die erste Tarifzeile mit Betrag und die direkt folgenden Zeilen „ab … Monat“."""
+    for nummer, zeile in enumerate(zeilen):
         if _TARIFZEILE.search(zeile) and _BETRAG_RE.search(zeile):
-            return _phasen_aus_zeile(zeile)
+            folge = itertools.takewhile(_FOLGEPHASE.match, zeilen[nummer + 1 :])
+            return "\n".join([zeile, *folge])
     return None
 
 

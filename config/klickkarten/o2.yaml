@@ -1,0 +1,91 @@
+# Klick-Karte o2, Format 2.
+# Beleg: Klick-Erkundung vom 07.10.2026, Zweig klick-erkundung, Commit f31d5543,
+# erkundung/o2/2026-10-07/ (Actions-Lauf 37582071155); Seite 1 Apple iPhone 17 Pro 256 GB,
+# Seite 2 Samsung Galaxy S26. Kürzel: B1/B2 = bedienelemente-1/-2.json (Element),
+# P1/P2 = preise-1/-2.json (Eintrag), M1/M2 = mitschnitt-1/-2.json (Antwort), K1/K2 =
+# klicks-1/-2.json (Probe). priceSummary liegt im Mitschnitt hinter der Kürzung (rund 198 kB
+# von 430–483 kB); belegt ist er in tests/fixtures/geraete/o2_vertiefung_iphone17pro.json.gz
+# (pageValue und 14 Konfigurationsantworten vom 29.09.2026).
+#
+# Bewusst nicht gelesen:
+# - Tarife ohne Kachel: die Antwort kennt 12 Tarife (M1 Nr. 133 tariff.tariffOptions), die Seite
+#   bietet vier als Knöpfe (B1 El. 29–36); eine eigene Adresse je Tarif ist nicht belegt.
+# - Farbe (Inputs mit name, B1 El. 17–22): ändert den Preis nicht.
+# - Zubuchoptionen Onlineschutz und Connect-Option (B2 El. 42–55, B1 El. 38–41): nie geklickt.
+anbieter: o2
+
+knoepfe:
+  speicher:
+    # Label neben einem Input ohne name im selben div (B1 El. 23/24 „256 GB“; B2 El. 25/26
+    # „256 GB“, El. 27/28 „512 GB“). Farb-Inputs tragen name (B1 El. 17–22), Tarife
+    # name="select-tariff". Klick aufs Label lädt die Konfiguration (K2 Probe 2 → M2 Nr. 131).
+    selektor: '#content div:has(> input[type="radio"]:not([name])) > label:not(:has-text("Monate"))'
+    muster: '^(\d+\s*[GT]B)\b'
+    # Input im selben div ist checked (B1 El. 23, B2 El. 25)
+    gewaehlt: {passt: 'div:has(> input[type="radio"]:checked) > label'}
+  tarif:
+    # Kachel-Label im tef-choice-panel mit Input name="select-tariff" (B1 El. 29–36, B2 El. 33–40;
+    # Gruppen 18–21). Der Input läuft in die Frist (K1 Probe 4/6), das Label lädt die
+    # Konfiguration (K1 Probe 5 → M1 Nr. 135, Probe 7 → M1 Nr. 138).
+    selektor: 'tef-choice-panel:has(input[name="select-tariff"]) > label'
+    # „O2 Mobile Unlimited L Plus mit 300 MBit/s mtl. 66,49 €“ (B1 El. 30): Name ohne den Preis,
+    # der mit Speicher und Laufzeit wechselt (B2 El. 34 „… mtl. 56,49 €“)
+    muster: '^(.+?)\s+mtl\.'
+    # vorher B1 El. 32/B2 El. 36 label-checked, nach dem Klick K1 Probe 5/7, K2 Probe 6/8
+    gewaehlt: {passt: 'tef-choice-panel:has(input[name="select-tariff"]:checked) > label'}
+  laufzeit:
+    # B1 El. 25–28 „36 Monate“ (Input checked)/„24 Monate“, B2 El. 29–32; Klick aufs Label lädt
+    # die Konfiguration (K1 Probe 3 → M1 Nr. 133)
+    selektor: '#content div:has(> input[type="radio"]:not([name])) > label:has-text("Monate")'
+    muster: '^(\d+)\s*Monate'
+    gewaehlt: {passt: 'div:has(> input[type="radio"]:checked) > label'}
+
+zusammenfassung:
+  # Tabelle #content > section:1 > div:1 > div:2 > div:1 > div:1 > div:1 > div:2 > div:3 > table
+  # (P1 Nr. 42–50, P2 Nr. 44–50): „Gerät mtl. (36 Raten): 36,50 €“, „Tarif mtl. (Mindestlaufzeit
+  # 24 Monate): 19,99 €“, „Gerät Anzahlung: 1,00 €“, „einmaliger Anschlusspreis 0,00 €“. Daraus
+  # liest der Text ohne Muster Anzahlung, Ratenzahl, Tarifphasen, Bindung und Anschluss.
+  selektor: '#content table:has-text("Gerät Anzahlung")'
+  muster:
+    # „Rate“ steht dort nur als „Raten“ (P1 Nr. 42, P2 Nr. 44)
+    rate: 'Gerät mtl\.\s*\(\d+\s*Raten\):?\s*([\d.,]+)\s*€'
+    # Volumen nur an der gewählten Kachel: „Unlimited“ oder „150 GB+“ (B1 El. 30–36)
+    volumen_gb:
+      selektor: 'tef-choice-panel:has(input[name="select-tariff"]:checked) > label'
+      muster: '(Unlimited|\d+\s*GB)'
+
+antwort:
+  # Nach jedem Klick GET /e-shop/rest/configuration/<Base64> (M1 Nr. 133, 135, 138;
+  # M2 Nr. 131, 133, 135, 137). Pfade der Variante in M1 Nr. 133–138 und M2 Nr. 131–137,
+  # die der Preise in o2_vertiefung_iphone17pro.json.gz.
+  - url_muster: '^https://www\.o2online\.de/e-shop/rest/configuration/'
+    pfade: &pfade
+      # nonRecurring „Gerät Anzahlung:“ „1,00 €“
+      anzahlung: 'priceSummary.nonRecurringChargesListEntries[description=Gerät Anzahlung:].amount'
+      # recurring [0] „Gerät mtl. (36 Raten):“ „36,50 €“
+      rate: priceSummary.recurringChargesListEntries.0.amount
+      ratenzahl: priceSummary.recurringChargesListEntries.0.description
+      # recurring [1] „Tarif mtl. (Mindestlaufzeit 24 Monate):“ „19,99 €“; beim Tarif
+      # O2 Mobile Special dazu [2] „ab dem 25. Monat: 29,99 €“ ohne amount. Die Liste ergibt die
+      # Phasen wie die Tabelle.
+      tarifphasen: priceSummary.recurringChargesListEntries
+      tarifbindung: priceSummary.recurringChargesListEntries.1.description
+      anschluss: 'priceSummary.nonRecurringChargesListEntries[description=einmaliger Anschlusspreis].amount'
+      # „-1“ unbegrenzt, „153600+“ = 150 GB (M1 Nr. 133, 135, 138)
+      volumen_gb: {pfad: 'tariff.tariffOptions[selected=true].dataVolumeMbNumeric', einheit: mb}
+    variante: &variante
+      # „256 GB“, „24 Monate“, „O<sub>2</sub> Mobile Unlimited L Plus mit 300 MBit/s“
+      speicher: 'hardware.storageOptions[selected=true].displayValue'
+      laufzeit: 'hardware.paymentOptions[selected=true].displayValue'
+      tarif: 'tariff.tariffOptions[selected=true].displayValue'
+  # Ausgangszustand vor dem ersten Klick: dasselbe JSON in script#pageValue
+  # (o2_vertiefung_iphone17pro.json.gz, Produktseite)
+  - skript: 'script#pageValue'
+    start: true
+    pfade: *pfade
+    variante: *variante
+
+kanarie:
+  # Tarifzeile der Tabelle (P1 Nr. 43, P2 Nr. 45)
+  selektor: '#content table:has-text("Gerät Anzahlung")'
+  enthaelt: 'Tarif mtl. (Mindestlaufzeit'

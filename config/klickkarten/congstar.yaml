@@ -1,0 +1,164 @@
+# Klick-Karte congstar, Format 2.
+# Beleg: Klick-Erkundung vom 07.10.2026, Zweig klick-erkundung, Commit f31d5543,
+# erkundung/congstar/2026-10-07/ (Actions-Lauf 37582071155); Seite 1 Apple iPhone 17 Pro (nur
+# 512 GB), Seite 2 Samsung Galaxy S26 (256 und 512 GB). Kürzel: B1/B2 = bedienelemente-1/-2.json
+# (Element), P1/P2 = preise-1/-2.json (Eintrag), M1/M2 = mitschnitt-1/-2.json (Antwort),
+# K1/K2 = klicks-1/-2.json (Probe). Dazu die gespeicherten Produktseiten
+# tests/fixtures/geraete/congstar_produkt_*.html.gz (31.08. und 29.09.2026, serverseitig
+# gerendert): dort stehen dieselben Knöpfe, data-testid der Zusammenfassung und, beim Galaxy S25
+# und Redmi Note 17 Pro, eine Seite ohne Rückgabedeal.
+#
+# Bewusst nicht gelesen:
+# - Bindung 24 Monate gegen Flex: eine vierte Dimension kennt das Format nicht. Die Karte liest
+#   die vorgewählte Bindung (24 Monate auf allen acht belegten Seiten); steht Flex, nennt die
+#   Antwort „Allnet Flat M Flex“ statt des Tarifs, und die Kombination wird Befund.
+# - Aktionsende: nur als Fußnotentext („bis zum 11.11.2026“, M1 Nr. 62), kein Feld des Formats.
+# - Rückgabedeal mit 37. Schlussrate: die Vorbereitung schaltet ihn aus; gelesen werden die
+#   Zahlweisen ohne Rückgabe (subtype UNSPECIFIED).
+anbieter: congstar
+
+knoepfe:
+  speicher:
+    # button role=radio, aria-label „512 GB“ (B1 El. 73; B2 El. 75/76). Ein Klick ändert nur die
+    # Adresse (?memorySize=512+GB), ohne Anfrage (K2 Probe 2).
+    selektor: '[data-testid="memory-size"]'
+    wert: aria-label
+    gewaehlt: {attribut: aria-checked, wert: "true"}
+  tarif:
+    # Label mit Input aria-label „Tarifoption Allnet Flat XS/S/M/L“ (B1 El. 99–106, B2 El.
+    # 102–109). Der Input läuft in die Frist (K1 Probe 2/3), geklickt wird das Label; sein Text
+    # „125 GB 25,00 € mtl.“ nennt den Namen nicht.
+    selektor: 'label:has(input[aria-label^="Tarifoption "])'
+    wert_in: input
+    wert: aria-label
+    muster: '^Tarifoption\s+(.+)$'
+    gewaehlt: {attribut: data-selected, wert: "true"}
+  laufzeit:
+    # Label mit Input aria-label „36 mtl. Zahlungen“/„24 mtl. Zahlungen“ (B1 El. 93–96,
+    # B2 El. 96–99); der value (510/511) wechselt mit dem Rückgabedeal, das aria-label nicht.
+    selektor: 'label:has(input[aria-label$="mtl. Zahlungen"])'
+    wert_in: input
+    wert: aria-label
+    muster: '^(\d+)\s*mtl\.'
+    gewaehlt: {attribut: data-selected, wert: "true"}
+
+vorbereitung:
+  # Rückgabedeal ab Werk an (B1 El. 90, B2 El. 93: aria-checked="true", Zahlweisen 510/511 mit
+  # 37. Schlussrate). Ohne Schalter (Galaxy S25, Redmi Note 17 Pro) ist nichts zu tun: geprüft
+  # wird darum am body, nicht am Schalter.
+  - klick: '#forward-trade-in-toggle'
+    pruefe: body
+    bis: 'body:not(:has(#forward-trade-in-toggle[aria-checked="true"]))'
+
+seite:
+  # PlanVariant der gewählten Bindung: Input value 540 (24 Monate) bzw. 548 (Flex) im Label mit
+  # data-selected (B1 El. 108/109, B2 El. 111/112)
+  plan:
+    selektor: 'label[data-selected="true"] input[aria-label^="Mindestlaufzeit von"]'
+    attribut: value
+  # Gerätevariante aus dem Warenkorb-Link „…/5g-option?planId=540&deviceVariantId=304327“
+  # (B1 El. 502). Auf Seite 2 hat ein Test der Seite (Kameleoon 453) den Link auf /checkout/…
+  # umgeschrieben und die alte Adresse in data-kam-dke-453-source behalten (B2 El. 509).
+  geraet:
+    selektor: 'a[href*="deviceVariantId="]'
+    attribut: href
+    parameter: deviceVariantId
+  geraet_ab:
+    selektor: 'a[data-kam-dke-453-source*="deviceVariantId="]'
+    attribut: data-kam-dke-453-source
+    parameter: deviceVariantId
+
+zusammenfassung:
+  # Kasten rechts: data-testid in allen gespeicherten Produktseiten; am 07.10. der Pfad mit
+  # „Summe 1. bis 36. Monat 49,00 €“, „Gerät 24,00 €“, „Tarif 25,00 €“, „Summe ab dem
+  # 37. Monat 25,00 €“, „Summe einmalig 194,00 €“ (P1 Nr. 39–47, P2 Nr. 39–47). Nicht der
+  # unsichtbare Mobilbalken div:nth-of-type(3) > div:nth-of-type(2) (P1 Nr. 35–38).
+  selektor: '[data-testid="sticky-box-side-postpaid"], #layout > main > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(3)'
+  muster:
+    # „Gerät 24,00 €“ (P1 Nr. 40), „Tarif 25,00 €“ (P1 Nr. 41), „Summe 1. bis 36. Monat“ (P1 Nr. 39)
+    rate: '\bGerät\s*([\d.,]+)\s*€'
+    ratenzahl: 'Summe\s*1\.\s*bis\s*(\d+)\.\s*Monat'
+    tarifphasen: '\bTarif\s*([\d.,]+)\s*€'
+    # Anzahlung nur in der gewählten Ratenkachel: „Monatliche Kosten 24,00 € Anzahlung
+    # 179,00 €“ (P1 Nr. 0–2) im div neben dem Label (Label B1 El. 93 „… > div:2 > label:1“,
+    # Preise P1 Nr. 1/2 „… > div:2 > div:1 > …“; in den Produktseiten div#510-content, auf
+    # das das aria-describedby des Inputs zeigt, B1 El. 94). Nicht div:has(…): das braucht
+    # auf der Seite länger als ein Lesetakt (50 ms).
+    anzahlung:
+      selektor: 'label[data-selected="true"]:has(input[aria-label$="mtl. Zahlungen"]) ~ div'
+      muster: 'Anzahlung\s*([\d.,]+)\s*€'
+    # Bereitstellungspreis an der gewählten Bindungskachel, ebenso daneben: „25,00 €“ und
+    # „15,00 €“ (P1 Nr. 26/27, P2 Nr. 26/27; Flex 35,00 €, Nr. 29), beschriftet „Monatliche
+    # Kosten 24,00 € Einmalige Kosten 15,00 €“ (congstar_produkt_galaxy_s25.html.gz,
+    # div#540-content). Fußnote der Antwort: „Einmaliger Bereitstellungspreis 15 €“
+    # (M1 Nr. 62); „Summe einmalig 194,00 €“ = 179 + 15 (P1 Nr. 46).
+    anschluss:
+      selektor: 'label[data-selected="true"]:has(input[aria-label^="Mindestlaufzeit von"]) ~ div'
+      muster: 'Einmalige\s*Kosten\s*([\d.,]+)\s*€'
+    # „24 Monate Laufzeit“ (B1 El. 108, B2 El. 111)
+    tarifbindung:
+      selektor: 'label[data-selected="true"]:has(input[aria-label^="Mindestlaufzeit von"])'
+      muster: '(\d+)\s*Monate\s*Laufzeit'
+    # „125 GB 25,00 € mtl.“ (B1 El. 103, B2 El. 106)
+    volumen_gb:
+      selektor: 'label[data-selected="true"]:has(input[aria-label^="Tarifoption "])'
+      muster: '(\d+\s*GB)'
+
+antwort:
+  # Kein Klick löst eine Anfrage aus (K1, K2: anfragen leer). Die Preise kommen beim Laden in
+  # drei POST auf /webshop-graphql/graphql (M1 Nr. 62–64, M2 Nr. 63–65, nicht gekürzt),
+  # unterschieden am Inhalt (erkennung). Je Seite gilt genau eine der Quellen mit {geraet} und
+  # {geraet_ab}: die andere findet ohne ihren Seitenwert keine Antwort.
+  # Tarife: data.plans[].variants[] mit title „Allnet Flat M“/„Allnet Flat M Flex“, id 540/548,
+  # recurring.discounted 25.0 ohne Rabatt, minimumContractDuration 24/0, DATA_VOLUME 125 GB
+  # (M1 Nr. 62 = M2 Nr. 63).
+  - url_muster: '^https://www\.congstar\.de/webshop-graphql/graphql'
+    laden: true
+    erkennung: 'data.plans.*.variants[id={plan}].title'
+    pfade:
+      tarifphasen: 'data.plans.*.variants[id={plan}].prices.recurring.discounted'
+      # prices.activation: 15.0 (24 Monate) bzw. 35.0 (Flex), billingPeriod ONE_TIME
+      anschluss: 'data.plans.*.variants[id={plan}].prices.activation.discounted'
+      tarifbindung: 'data.plans.*.variants[id={plan}].minimumContractDuration'
+      volumen_gb: 'data.plans.*.variants[id={plan}].contingents[type=DATA_VOLUME].discountedAmount'
+    variante:
+      tarif: 'data.plans.*.variants[id={plan}].title'
+  # Gerätepreise je PlanVariant und Gerätevariante (M1 Nr. 64, M2 Nr. 65): Zahlweise ohne
+  # Rückgabedeal, z. B. 501 UNSPECIFIED 36 Monate: Anzahlung 179.0, Rate 31.0 (P1 Nr. 10
+  # „Maximaler Gesamtpreis … 1295,00 €“ = 179 + 36 × 31). Der Geräterabatt läuft über die
+  # ganze Laufzeit (discounts.iterations = contractDuration).
+  - url_muster: '^https://www\.congstar\.de/webshop-graphql/graphql'
+    laden: true
+    erkennung: 'data.plans.*.variants[id={plan}].devices.*.variants[id={geraet}].id'
+    pfade:
+      anzahlung: 'data.plans.*.variants[id={plan}].devices.*.variants[id={geraet}].prices.paymentVariants[subtype=UNSPECIFIED][contractDuration={laufzeit}].oneTime.discounted'
+      rate: 'data.plans.*.variants[id={plan}].devices.*.variants[id={geraet}].prices.paymentVariants[subtype=UNSPECIFIED][contractDuration={laufzeit}].recurring.discounted'
+      ratenzahl: 'data.plans.*.variants[id={plan}].devices.*.variants[id={geraet}].prices.paymentVariants[subtype=UNSPECIFIED][contractDuration={laufzeit}].contractDuration'
+  - url_muster: '^https://www\.congstar\.de/webshop-graphql/graphql'
+    laden: true
+    erkennung: 'data.plans.*.variants[id={plan}].devices.*.variants[id={geraet_ab}].id'
+    pfade:
+      anzahlung: 'data.plans.*.variants[id={plan}].devices.*.variants[id={geraet_ab}].prices.paymentVariants[subtype=UNSPECIFIED][contractDuration={laufzeit}].oneTime.discounted'
+      rate: 'data.plans.*.variants[id={plan}].devices.*.variants[id={geraet_ab}].prices.paymentVariants[subtype=UNSPECIFIED][contractDuration={laufzeit}].recurring.discounted'
+      ratenzahl: 'data.plans.*.variants[id={plan}].devices.*.variants[id={geraet_ab}].prices.paymentVariants[subtype=UNSPECIFIED][contractDuration={laufzeit}].contractDuration'
+  # Gerät: data.device.variants[] mit memory.name „512 GB“ (M1 Nr. 63, M2 Nr. 64); Preise dort
+  # nur für den vorgewählten Tarif, darum nur Speicher und die Ratenzahl.
+  - url_muster: '^https://www\.congstar\.de/webshop-graphql/graphql'
+    laden: true
+    erkennung: 'data.device.variants[id={geraet}].memory.name'
+    pfade:
+      ratenzahl: 'data.device.variants[id={geraet}].prices.paymentVariants[subtype=UNSPECIFIED][contractDuration={laufzeit}].contractDuration'
+    variante:
+      speicher: 'data.device.variants[id={geraet}].memory.name'
+  - url_muster: '^https://www\.congstar\.de/webshop-graphql/graphql'
+    laden: true
+    erkennung: 'data.device.variants[id={geraet_ab}].memory.name'
+    pfade:
+      ratenzahl: 'data.device.variants[id={geraet_ab}].prices.paymentVariants[subtype=UNSPECIFIED][contractDuration={laufzeit}].contractDuration'
+    variante:
+      speicher: 'data.device.variants[id={geraet_ab}].memory.name'
+
+kanarie:
+  # „Speicher: 512 GB“ (B1 El. 72, B2 El. 74)
+  selektor: '[data-testid="memory-size-selection"]'
+  enthaelt: 'Speicher:'
