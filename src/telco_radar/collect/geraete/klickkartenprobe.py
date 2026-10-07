@@ -15,9 +15,11 @@ Endet der Lauf ``gestoert`` (Bot-Schutz, Challenge, fehlender Kanarienwert, gesc
 Preisantwort, Strukturbruch), ist ``Kartenprobe.bot`` wahr, und für den Anbieter geht
 keine Anfrage mehr hinaus (CLAUDE.md Regel 4). Set-Cookie- und Kontextwerte der Probe
 stehen in ``Kartenprobe.cookies``; die Ablage schwärzt sie vor jedem Schreiben.
-``als_daten`` ist der Inhalt von ``karte-<n>.json``, ``indexeintrag`` der Kartenstatus
-einer Seite in ``index.json``. Belege archiviert die Probe nicht (kein Konto); ihr
-Status bleibt, wie der Crawler ihn setzt.
+``als_daten`` ist der Inhalt von ``karte-<n>.json`` (bei ``ein_vertrag`` je Kombination
+auch ``buendel``: ohne das Feld sah 1&1 am 07.10.2026 leer aus, obwohl der
+Bündelbetrag gelesen war), ``indexeintrag`` der Kartenstatus einer Seite in
+``index.json``. Belege archiviert die Probe nicht (kein Konto); ihr Status bleibt, wie
+der Crawler ihn setzt.
 """
 
 from __future__ import annotations
@@ -289,6 +291,7 @@ def _kombination(ergebnis: Kombiergebnis) -> dict:
         "werte": werte_als_json(ergebnis.werte),
         "werte_text": _werte(ergebnis.textwerte),
         "werte_antwort": _werte(ergebnis.antwortwerte),
+        "buendel": None if ergebnis.buendel is None else asdict(ergebnis.buendel),
         "echo": {
             "befunde": [{"feld": b.feld, "grund": b.grund} for b in ergebnis.befunde],
             "luecken": list(ergebnis.luecken),

@@ -3,9 +3,11 @@
 BEISPIEL-Seiten nach der Erkundung vom 07.10.2026. 1&1: Preise in Cent in
 ``hwdVariantsPrices['product-<FARBE>-<GB>']``, Farbe und Speicher nur in der
 Seitenadresse (``?color=…&size=…``), der Betrag „44 , 99 €/Monat“ in getrennten
-Elementen; Tarif und Laufzeit fest. Telekom: serverseitig gerendert, Werte im
-Skript-JSON, Zusammenfassung aus zwei Blöcken ohne den Werbeblock (sonst liest der
-Text „unbegrenztes Datenvolumen“ als Volumen). Keine Anfrage verlässt den Rechner.
+Elementen (Fundstelle ohne den Leerraum: „44,99 €/Monat“); Tarif und Laufzeit fest.
+Telekom: serverseitig gerendert, Werte im Skript-JSON, Zusammenfassung aus zwei
+Blöcken ohne den Werbeblock (sonst liest der Text „unbegrenztes Datenvolumen“ als
+Volumen), mit Geräterate: ohne Preiswert wäre die Kombination nicht erfasst
+(``klicklauf.lesestatus``). Keine Anfrage verlässt den Rechner.
 """
 
 from __future__ import annotations
@@ -71,13 +73,14 @@ EINSUNDEINS_KARTE = {
 TELEKOM_KOERPER = """
 <aside>
   <div id="zahlung">Einmalige Zahlung 138,95 € inkl. Bereitstellung 39,95 €
+    <div>Gerät: Rate 21,00 € mtl.</div>
     <div id="werbung">Doppeltes oder unbegrenztes Datenvolumen mit MagentaEINS</div>
   </div>
   <div id="tarifblock">MagentaMobil M<br>Tarif 49,95 € mtl.<br>Datenvolumen 50 GB</div>
 </aside>
 <script type="application/json" id="zustand">
   {"tarif": {"name": "MagentaMobil M", "preis": 49.95, "anschluss": 39.95,
-   "volumen": 50}}
+   "volumen": 50}, "geraet": {"rate": 21.0}}
 </script>"""
 TELEKOM_KARTE = {
     "knoepfe": {
@@ -88,6 +91,7 @@ TELEKOM_KARTE = {
     "antwort": {
         "skript": "#zustand",
         "pfade": {
+            "rate": "geraet.rate",
             "tarifphasen": "tarif.preis",
             "anschluss": "tarif.anschluss",
             "volumen_gb": "tarif.volumen",
@@ -128,7 +132,7 @@ def test_globale_in_cent_mit_schluessel_aus_der_seitenadresse(chromium):
     assert rate == 51.99
     beleg = ergebnisse[("256", "All-Net-Flat S", 36)].beleg.beleg
     assert [(s.feld, s.selektor, s.ausschnitt) for s in beleg.fundstellen] == [
-        ("rate", "#preis", "51 , 99 €/Monat")
+        ("rate", "#preis", "51,99 €/Monat")
     ]
     assert (
         beleg.fundstellen[0].json_pfad
@@ -172,7 +176,7 @@ def test_skript_json_und_zwei_bereiche_ohne_werbeblock(chromium):
     ergebnis = ergebnisse[("256 GB", "MagentaMobil M", 36)]
     assert ergebnis.status == "erfasst", ergebnis.grund
     werte = ergebnis.werte
-    assert (werte.anschluss, werte.volumen_gb) == (39.95, 50.0)
+    assert (werte.rate, werte.anschluss, werte.volumen_gb) == (21.0, 39.95, 50.0)
     assert werte.tarifphasen[0].betrag == 49.95
     assert "unbegrenzt" not in ergebnis.text
     assert ergebnis.beleg.beleg.antwort_url.endswith("/handy/x#lesung")

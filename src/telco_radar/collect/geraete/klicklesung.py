@@ -9,7 +9,8 @@ markierten Optionen gegen die geklickten, die Seitenwerte mit dem Namen einer Di
 als „Seite zeigt“ und das Echo (``klickecho``) und macht einen Screenshot des
 Preisbereichs. Was der Beleg braucht (Mitschnitt, JSON-Pfade, Fundorte der
 Textmuster), legt er in ``belegteile``. Fehlt die Zusammenfassung, heißt die
-Kombination ``nicht_erfasst``; widerspricht sich etwas, ``befund``. Eine feste
+Kombination ``nicht_erfasst``, ebenso ohne Preiswert (``klicklauf.lesestatus``);
+widerspricht sich etwas, ``befund``. Eine feste
 Dimension hat keine Markierung. Eine Option als Adresse (``adressen``) braucht ein Echo,
 das nicht aus der eigenen Adresse stammt: einen Seitenwert mit Selektor oder einen
 Variantenwert der Antwort ohne Platzhalter ihrer Dimension; sonst ist sie ein Befund.
@@ -39,11 +40,11 @@ from .klickkarte import (
 )
 from .klicklauf import (
     BEFUND,
-    ERFASST,
     NICHT_ERFASST,
     Klicklauf,
     Kombiergebnis,
     Strukturbilanz,
+    lesestatus,
     mit_beleg,
 )
 from .klickoptionen import Option, angebotene_werte, lies_optionen
@@ -181,8 +182,7 @@ class Leser(Textleser):
         bild, bildbefunde = self._screenshot(bereich)
         self.schliesse_dialog(bereich)
         befunde = echo.befunde + bildbefunde
-        erster: str | None = befunde[0].grund if befunde else None
-        status = BEFUND if befunde else ERFASST
+        status, erster = lesestatus(befunde, echo.werte, echo.buendel)
         return Kombiergebnis(
             variante,
             status,

@@ -10,7 +10,11 @@ offen, ist der Lauf gestört. ``textwerte`` liest die Werte mit
 ``klicktext.lies_zusammenfassung`` und ersetzt jedes Feld mit Textmuster der Karte
 durch die erste Gruppe des Musters ohne Leerraum, im Text der Zusammenfassung oder
 am eigenen Fundort (o2 „Gerät mtl. (36 Raten)“, 1&1 „44 , 99 €/Monat“, Vodafone
-Ratenzahl im gewählten Label). Dieses Modul ruft kein Netz außer über die Seite.
+Ratenzahl im gewählten Label). Jeder Text kommt vorher durch
+``klicktext.zahlen_ohne_leerraum``, auch der der Zusammenfassung im Beleg. Nennt die
+Gruppe für ``tarifphasen`` Beträge mit €, liest sie die Phasen wie eine Tarifzeile
+(o2 „19,99 € ab dem 25. Monat: 29,99 €“); ohne € ist sie ein Betrag ab Monat 1
+(congstar „25,00“). Dieses Modul ruft kein Netz außer über die Seite.
 """
 
 from __future__ import annotations
@@ -23,9 +27,16 @@ from playwright.sync_api import Error as PlaywrightFehler
 from playwright.sync_api import TimeoutError as PlaywrightZeitueberschreitung
 
 from .klickecho import feldwert
-from .klickkartentypen import BUENDELFELDER
+from .klickkartentypen import BUENDELFELDER, PHASENFELD
 from .klicklauf import LAUF_GESTOERT
-from .klicktext import Buendelwerte, Preiswerte, lies_zusammenfassung
+from .klicktext import (
+    Buendelwerte,
+    Preiswerte,
+    lies_zusammenfassung,
+    nennt_betrag,
+    phasen_der_stelle,
+    zahlen_ohne_leerraum,
+)
 from .klicktor import WARTE_TAKT_MS, kurz
 from .klickwache import Abbruch
 
@@ -68,7 +79,7 @@ class Textleser:
         for ohne in lesung.ohne:
             for weg in self._alle_texte(ohne):
                 text = text.replace(weg, "")
-        return text
+        return zahlen_ohne_leerraum(text)
 
     def textwerte(
         self, text: str
@@ -88,13 +99,11 @@ class Textleser:
                     muster.selektor,
                     self._text(self.seite.locator(muster.selektor)),
                 )
-            treffer = muster.muster.search(quelle)
+            treffer = muster.muster.search(zahlen_ohne_leerraum(quelle))
             roh = None
             if treffer is not None:
                 roh = treffer[1] if muster.muster.groups else treffer[0]
-            gemustert[feld] = (
-                None if roh is None else feldwert(feld, "".join(roh.split()))
-            )
+            gemustert[feld] = None if roh is None else musterwert(feld, roh)
             if gemustert[feld] is not None and treffer is not None:
                 fundorte[feld] = (ort, treffer[0])
         buendel = {f: gemustert.pop(f) for f in BUENDELFELDER if f in gemustert}
@@ -151,6 +160,13 @@ class Textleser:
                 return True
             self.seite.wait_for_timeout(WARTE_TAKT_MS)
         return bedingung()
+
+
+def musterwert(feld: str, roh: str) -> object:
+    """Die Gruppe eines Textmusters als Wert ihres Felds (``feldwert``)."""
+    if feld == PHASENFELD and nennt_betrag(roh):
+        return phasen_der_stelle(roh)
+    return feldwert(feld, "".join(roh.split()))
 
 
 def sichtbar(bereich: Locator) -> bool:

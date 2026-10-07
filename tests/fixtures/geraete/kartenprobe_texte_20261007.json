@@ -1,0 +1,3200 @@
+{
+ "quelle": "Zweig klick-erkundung, Commit c8ce1f77",
+ "hinweis": "Auszug: je gelesener Kombination die Felder aus karte-<n>.json mit unveraenderten Werten",
+ "kombinationen": [
+  {
+   "datei": "erkundung/1und1/2026-10-07/karte-1.json",
+   "kombination": 0,
+   "karte": "1und1.yaml",
+   "adresse": "https://mobile.1und1.de/iphone-17-pro",
+   "auswahl": {
+    "speicher": "256",
+    "tarif": "tariff-anf-s-mvl",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "256",
+    "tarif": "tariff-anf-s-mvl",
+    "laufzeit": 36
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": null,
+    "rate": null,
+    "ratenzahl": null,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_text": {
+    "anzahlung": null,
+    "rate": null,
+    "ratenzahl": null,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_antwort": {
+    "anzahlung": null,
+    "rate": null,
+    "ratenzahl": null,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "text": "44\n,\n99\n€/Monat\ndauerhaft\nInkl. 1&1 All-Net-Flat S"
+  },
+  {
+   "datei": "erkundung/1und1/2026-10-07/karte-1.json",
+   "kombination": 1,
+   "karte": "1und1.yaml",
+   "adresse": "https://mobile.1und1.de/iphone-17-pro",
+   "auswahl": {
+    "speicher": "512",
+    "tarif": "tariff-anf-s-mvl",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "512",
+    "tarif": "tariff-anf-s-mvl",
+    "laufzeit": 36
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": null,
+    "rate": null,
+    "ratenzahl": null,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_text": {
+    "anzahlung": null,
+    "rate": null,
+    "ratenzahl": null,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_antwort": {
+    "anzahlung": null,
+    "rate": null,
+    "ratenzahl": null,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "text": "51\n,\n99\n€/Monat\ndauerhaft\nInkl. 1&1 All-Net-Flat S"
+  },
+  {
+   "datei": "erkundung/1und1/2026-10-07/karte-2.json",
+   "kombination": 0,
+   "karte": "1und1.yaml",
+   "adresse": "https://mobile.1und1.de/samsung-galaxy-s26",
+   "auswahl": {
+    "speicher": "256",
+    "tarif": "tariff-anf-s-mvl",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "256",
+    "tarif": "tariff-anf-s-mvl",
+    "laufzeit": 36
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": null,
+    "rate": null,
+    "ratenzahl": null,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_text": {
+    "anzahlung": null,
+    "rate": null,
+    "ratenzahl": null,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_antwort": {
+    "anzahlung": null,
+    "rate": null,
+    "ratenzahl": null,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "text": "32\n,\n99\n€/Monat\ndauerhaft\nInkl. 1&1 All-Net-Flat S\n\n"
+  },
+  {
+   "datei": "erkundung/1und1/2026-10-07/karte-2.json",
+   "kombination": 1,
+   "karte": "1und1.yaml",
+   "adresse": "https://mobile.1und1.de/samsung-galaxy-s26",
+   "auswahl": {
+    "speicher": "512",
+    "tarif": "tariff-anf-s-mvl",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "512",
+    "tarif": "tariff-anf-s-mvl",
+    "laufzeit": 36
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": null,
+    "rate": null,
+    "ratenzahl": null,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_text": {
+    "anzahlung": null,
+    "rate": null,
+    "ratenzahl": null,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_antwort": {
+    "anzahlung": null,
+    "rate": null,
+    "ratenzahl": null,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "text": "38\n,\n99\n€/Monat\ndauerhaft\nInkl. 1&1 All-Net-Flat S\n\n"
+  },
+  {
+   "datei": "erkundung/congstar/2026-10-07/karte-1.json",
+   "kombination": 0,
+   "karte": "congstar.yaml",
+   "adresse": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/",
+   "auswahl": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat XS",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat XS",
+    "laufzeit": 36
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 179.0,
+    "rate": 34.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      15.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 15.0
+   },
+   "werte_text": {
+    "anzahlung": 179.0,
+    "rate": 34.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      15.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 15.0
+   },
+   "werte_antwort": {
+    "anzahlung": 179.0,
+    "rate": 34.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      15.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 15.0
+   },
+   "text": "Monatliche Kosten\nSumme 1. bis 36. Monat\n49,00 €\nGerät\n34,00 €\nin den ersten 36 Monaten\nTarif\n15,00 €\nnach 24 Monaten mtl. kündbar\nSumme ab dem 37. Monat\n15,00 €\nEinmalige Kosten\nSumme einmalig\n194,00 €\nzzgl. 4,99 € Versandkosten\nWeiter zum Warenkorb\nSichere Zahlungsmethoden"
+  },
+  {
+   "datei": "erkundung/congstar/2026-10-07/karte-1.json",
+   "kombination": 1,
+   "karte": "congstar.yaml",
+   "adresse": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/",
+   "auswahl": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat XS",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat XS",
+    "laufzeit": 24
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 179.0,
+    "rate": 51.0,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      15.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 15.0
+   },
+   "werte_text": {
+    "anzahlung": 179.0,
+    "rate": 51.0,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      15.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 15.0
+   },
+   "werte_antwort": {
+    "anzahlung": 179.0,
+    "rate": 51.0,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      15.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 15.0
+   },
+   "text": "Monatliche Kosten\nSumme 1. bis 24. Monat\n66,00 €\nGerät\n51,00 €\nin den ersten 24 Monaten\nTarif\n15,00 €\nnach 24 Monaten mtl. kündbar\nSumme ab dem 25. Monat\n15,00 €\nEinmalige Kosten\nSumme einmalig\n194,00 €\nzzgl. 4,99 € Versandkosten\nWeiter zum Warenkorb\nSichere Zahlungsmethoden"
+  },
+  {
+   "datei": "erkundung/congstar/2026-10-07/karte-1.json",
+   "kombination": 2,
+   "karte": "congstar.yaml",
+   "adresse": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/",
+   "auswahl": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat S",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat S",
+    "laufzeit": 36
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 179.0,
+    "rate": 32.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      20.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 50.0
+   },
+   "werte_text": {
+    "anzahlung": 179.0,
+    "rate": 32.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      20.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 50.0
+   },
+   "werte_antwort": {
+    "anzahlung": 179.0,
+    "rate": 32.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      20.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 50.0
+   },
+   "text": "Monatliche Kosten\nSumme 1. bis 36. Monat\n52,00 €\nGerät\n32,00 €\nin den ersten 36 Monaten\nTarif\n20,00 €\nnach 24 Monaten mtl. kündbar\nSumme ab dem 37. Monat\n20,00 €\nEinmalige Kosten\nSumme einmalig\n194,00 €\nzzgl. 4,99 € Versandkosten\nWeiter zum Warenkorb\nSichere Zahlungsmethoden"
+  },
+  {
+   "datei": "erkundung/congstar/2026-10-07/karte-1.json",
+   "kombination": 3,
+   "karte": "congstar.yaml",
+   "adresse": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/",
+   "auswahl": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat S",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat S",
+    "laufzeit": 24
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 179.0,
+    "rate": 48.0,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      20.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 50.0
+   },
+   "werte_text": {
+    "anzahlung": 179.0,
+    "rate": 48.0,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      20.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 50.0
+   },
+   "werte_antwort": {
+    "anzahlung": 179.0,
+    "rate": 48.0,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      20.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 50.0
+   },
+   "text": "Monatliche Kosten\nSumme 1. bis 24. Monat\n68,00 €\nGerät\n48,00 €\nin den ersten 24 Monaten\nTarif\n20,00 €\nnach 24 Monaten mtl. kündbar\nSumme ab dem 25. Monat\n20,00 €\nEinmalige Kosten\nSumme einmalig\n194,00 €\nzzgl. 4,99 € Versandkosten\nWeiter zum Warenkorb\nSichere Zahlungsmethoden"
+  },
+  {
+   "datei": "erkundung/congstar/2026-10-07/karte-1.json",
+   "kombination": 4,
+   "karte": "congstar.yaml",
+   "adresse": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/",
+   "auswahl": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat M",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat M",
+    "laufzeit": 36
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 179.0,
+    "rate": 31.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      25.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 125.0
+   },
+   "werte_text": {
+    "anzahlung": 179.0,
+    "rate": 31.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      25.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 125.0
+   },
+   "werte_antwort": {
+    "anzahlung": 179.0,
+    "rate": 31.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      25.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 125.0
+   },
+   "text": "Monatliche Kosten\nSumme 1. bis 36. Monat\n56,00 €\nGerät\n31,00 €\nin den ersten 36 Monaten\nTarif\n25,00 €\nnach 24 Monaten mtl. kündbar\nSumme ab dem 37. Monat\n25,00 €\nEinmalige Kosten\nSumme einmalig\n194,00 €\nzzgl. 4,99 € Versandkosten\nWeiter zum Warenkorb\nSichere Zahlungsmethoden"
+  },
+  {
+   "datei": "erkundung/congstar/2026-10-07/karte-1.json",
+   "kombination": 5,
+   "karte": "congstar.yaml",
+   "adresse": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/",
+   "auswahl": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat M",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat M",
+    "laufzeit": 24
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 179.0,
+    "rate": 46.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      25.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 125.0
+   },
+   "werte_text": {
+    "anzahlung": 179.0,
+    "rate": 46.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      25.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 125.0
+   },
+   "werte_antwort": {
+    "anzahlung": 179.0,
+    "rate": 46.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      25.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 125.0
+   },
+   "text": "Monatliche Kosten\nSumme 1. bis 24. Monat\n71,50 €\nGerät\n46,50 €\nin den ersten 24 Monaten\nTarif\n25,00 €\nnach 24 Monaten mtl. kündbar\nSumme ab dem 25. Monat\n25,00 €\nEinmalige Kosten\nSumme einmalig\n194,00 €\nzzgl. 4,99 € Versandkosten\nWeiter zum Warenkorb\nSichere Zahlungsmethoden"
+  },
+  {
+   "datei": "erkundung/congstar/2026-10-07/karte-1.json",
+   "kombination": 6,
+   "karte": "congstar.yaml",
+   "adresse": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/",
+   "auswahl": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat L",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat L",
+    "laufzeit": 36
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 179.0,
+    "rate": 30.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      30.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 200.0
+   },
+   "werte_text": {
+    "anzahlung": 179.0,
+    "rate": 30.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      30.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 200.0
+   },
+   "werte_antwort": {
+    "anzahlung": 179.0,
+    "rate": 30.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      30.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 200.0
+   },
+   "text": "Monatliche Kosten\nSumme 1. bis 36. Monat\n60,00 €\nGerät\n30,00 €\nin den ersten 36 Monaten\nTarif\n30,00 €\nnach 24 Monaten mtl. kündbar\nSumme ab dem 37. Monat\n30,00 €\nEinmalige Kosten\nSumme einmalig\n194,00 €\nzzgl. 4,99 € Versandkosten\nWeiter zum Warenkorb\nSichere Zahlungsmethoden"
+  },
+  {
+   "datei": "erkundung/congstar/2026-10-07/karte-1.json",
+   "kombination": 7,
+   "karte": "congstar.yaml",
+   "adresse": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/",
+   "auswahl": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat L",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat L",
+    "laufzeit": 24
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 179.0,
+    "rate": 45.0,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      30.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 200.0
+   },
+   "werte_text": {
+    "anzahlung": 179.0,
+    "rate": 45.0,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      30.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 200.0
+   },
+   "werte_antwort": {
+    "anzahlung": 179.0,
+    "rate": 45.0,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      30.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 200.0
+   },
+   "text": "Monatliche Kosten\nSumme 1. bis 24. Monat\n75,00 €\nGerät\n45,00 €\nin den ersten 24 Monaten\nTarif\n30,00 €\nnach 24 Monaten mtl. kündbar\nSumme ab dem 25. Monat\n30,00 €\nEinmalige Kosten\nSumme einmalig\n194,00 €\nzzgl. 4,99 € Versandkosten\nWeiter zum Warenkorb\nSichere Zahlungsmethoden"
+  },
+  {
+   "datei": "erkundung/congstar/2026-10-07/karte-2.json",
+   "kombination": 0,
+   "karte": "congstar.yaml",
+   "adresse": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "Allnet Flat XS",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "Allnet Flat XS",
+    "laufzeit": 36
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 1.0,
+    "rate": 21.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      15.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 15.0
+   },
+   "werte_text": {
+    "anzahlung": 1.0,
+    "rate": 21.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      15.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 15.0
+   },
+   "werte_antwort": {
+    "anzahlung": 1.0,
+    "rate": 21.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      15.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 15.0
+   },
+   "text": "Monatliche Kosten\nSumme 1. bis 36. Monat\n36,00 €\nGerät\n21,00 €\nin den ersten 36 Monaten\nTarif\n15,00 €\nnach 24 Monaten mtl. kündbar\nSumme ab dem 37. Monat\n15,00 €\nEinmalige Kosten\nSumme einmalig\n16,00 €\nzzgl. 4,99 € Versandkosten\nWeiter zum Warenkorb\nSichere Zahlungsmethoden"
+  },
+  {
+   "datei": "erkundung/congstar/2026-10-07/karte-2.json",
+   "kombination": 1,
+   "karte": "congstar.yaml",
+   "adresse": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "Allnet Flat XS",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "Allnet Flat XS",
+    "laufzeit": 24
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 1.0,
+    "rate": 31.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      15.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 15.0
+   },
+   "werte_text": {
+    "anzahlung": 1.0,
+    "rate": 31.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      15.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 15.0
+   },
+   "werte_antwort": {
+    "anzahlung": 1.0,
+    "rate": 31.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      15.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 15.0
+   },
+   "text": "Monatliche Kosten\nSumme 1. bis 24. Monat\n46,50 €\nGerät\n31,50 €\nin den ersten 24 Monaten\nTarif\n15,00 €\nnach 24 Monaten mtl. kündbar\nSumme ab dem 25. Monat\n15,00 €\nEinmalige Kosten\nSumme einmalig\n16,00 €\nzzgl. 4,99 € Versandkosten\nWeiter zum Warenkorb\nSichere Zahlungsmethoden"
+  },
+  {
+   "datei": "erkundung/congstar/2026-10-07/karte-2.json",
+   "kombination": 2,
+   "karte": "congstar.yaml",
+   "adresse": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "Allnet Flat S",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "Allnet Flat S",
+    "laufzeit": 36
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 1.0,
+    "rate": 19.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      20.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 50.0
+   },
+   "werte_text": {
+    "anzahlung": 1.0,
+    "rate": 19.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      20.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 50.0
+   },
+   "werte_antwort": {
+    "anzahlung": 1.0,
+    "rate": 19.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      20.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 50.0
+   },
+   "text": "Monatliche Kosten\nSumme 1. bis 36. Monat\n39,00 €\nGerät\n19,00 €\nin den ersten 36 Monaten\nTarif\n20,00 €\nnach 24 Monaten mtl. kündbar\nSumme ab dem 37. Monat\n20,00 €\nEinmalige Kosten\nSumme einmalig\n16,00 €\nzzgl. 4,99 € Versandkosten\nWeiter zum Warenkorb\nSichere Zahlungsmethoden"
+  },
+  {
+   "datei": "erkundung/congstar/2026-10-07/karte-2.json",
+   "kombination": 3,
+   "karte": "congstar.yaml",
+   "adresse": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "Allnet Flat S",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "Allnet Flat S",
+    "laufzeit": 24
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 1.0,
+    "rate": 28.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      20.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 50.0
+   },
+   "werte_text": {
+    "anzahlung": 1.0,
+    "rate": 28.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      20.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 50.0
+   },
+   "werte_antwort": {
+    "anzahlung": 1.0,
+    "rate": 28.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      20.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 50.0
+   },
+   "text": "Monatliche Kosten\nSumme 1. bis 24. Monat\n48,50 €\nGerät\n28,50 €\nin den ersten 24 Monaten\nTarif\n20,00 €\nnach 24 Monaten mtl. kündbar\nSumme ab dem 25. Monat\n20,00 €\nEinmalige Kosten\nSumme einmalig\n16,00 €\nzzgl. 4,99 € Versandkosten\nWeiter zum Warenkorb\nSichere Zahlungsmethoden"
+  },
+  {
+   "datei": "erkundung/congstar/2026-10-07/karte-2.json",
+   "kombination": 4,
+   "karte": "congstar.yaml",
+   "adresse": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "Allnet Flat M",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "Allnet Flat M",
+    "laufzeit": 36
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 1.0,
+    "rate": 17.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      25.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 125.0
+   },
+   "werte_text": {
+    "anzahlung": 1.0,
+    "rate": 17.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      25.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 125.0
+   },
+   "werte_antwort": {
+    "anzahlung": 1.0,
+    "rate": 17.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      25.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 125.0
+   },
+   "text": "Monatliche Kosten\nSumme 1. bis 36. Monat\n42,00 €\nGerät\n17,00 €\nin den ersten 36 Monaten\nTarif\n25,00 €\nnach 24 Monaten mtl. kündbar\nSumme ab dem 37. Monat\n25,00 €\nEinmalige Kosten\nSumme einmalig\n16,00 €\nzzgl. 4,99 € Versandkosten\nWeiter zum Warenkorb\nSichere Zahlungsmethoden"
+  },
+  {
+   "datei": "erkundung/congstar/2026-10-07/karte-2.json",
+   "kombination": 5,
+   "karte": "congstar.yaml",
+   "adresse": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "Allnet Flat M",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "Allnet Flat M",
+    "laufzeit": 24
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 1.0,
+    "rate": 25.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      25.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 125.0
+   },
+   "werte_text": {
+    "anzahlung": 1.0,
+    "rate": 25.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      25.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 125.0
+   },
+   "werte_antwort": {
+    "anzahlung": 1.0,
+    "rate": 25.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      25.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 125.0
+   },
+   "text": "Monatliche Kosten\nSumme 1. bis 24. Monat\n50,50 €\nGerät\n25,50 €\nin den ersten 24 Monaten\nTarif\n25,00 €\nnach 24 Monaten mtl. kündbar\nSumme ab dem 25. Monat\n25,00 €\nEinmalige Kosten\nSumme einmalig\n16,00 €\nzzgl. 4,99 € Versandkosten\nWeiter zum Warenkorb\nSichere Zahlungsmethoden"
+  },
+  {
+   "datei": "erkundung/congstar/2026-10-07/karte-2.json",
+   "kombination": 6,
+   "karte": "congstar.yaml",
+   "adresse": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "Allnet Flat L",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "Allnet Flat L",
+    "laufzeit": 36
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 1.0,
+    "rate": 15.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      30.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 200.0
+   },
+   "werte_text": {
+    "anzahlung": 1.0,
+    "rate": 15.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      30.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 200.0
+   },
+   "werte_antwort": {
+    "anzahlung": 1.0,
+    "rate": 15.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      30.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 200.0
+   },
+   "text": "Monatliche Kosten\nSumme 1. bis 36. Monat\n45,00 €\nGerät\n15,00 €\nin den ersten 36 Monaten\nTarif\n30,00 €\nnach 24 Monaten mtl. kündbar\nSumme ab dem 37. Monat\n30,00 €\nEinmalige Kosten\nSumme einmalig\n16,00 €\nzzgl. 4,99 € Versandkosten\nWeiter zum Warenkorb\nSichere Zahlungsmethoden"
+  },
+  {
+   "datei": "erkundung/congstar/2026-10-07/karte-2.json",
+   "kombination": 7,
+   "karte": "congstar.yaml",
+   "adresse": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "Allnet Flat L",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "Allnet Flat L",
+    "laufzeit": 24
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 1.0,
+    "rate": 22.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      30.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 200.0
+   },
+   "werte_text": {
+    "anzahlung": 1.0,
+    "rate": 22.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      30.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 200.0
+   },
+   "werte_antwort": {
+    "anzahlung": 1.0,
+    "rate": 22.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      30.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 200.0
+   },
+   "text": "Monatliche Kosten\nSumme 1. bis 24. Monat\n52,50 €\nGerät\n22,50 €\nin den ersten 24 Monaten\nTarif\n30,00 €\nnach 24 Monaten mtl. kündbar\nSumme ab dem 25. Monat\n30,00 €\nEinmalige Kosten\nSumme einmalig\n16,00 €\nzzgl. 4,99 € Versandkosten\nWeiter zum Warenkorb\nSichere Zahlungsmethoden"
+  },
+  {
+   "datei": "erkundung/congstar/2026-10-07/karte-2.json",
+   "kombination": 8,
+   "karte": "congstar.yaml",
+   "adresse": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
+   "auswahl": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat XS",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat XS",
+    "laufzeit": 36
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 1.0,
+    "rate": 27.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      15.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 15.0
+   },
+   "werte_text": {
+    "anzahlung": 1.0,
+    "rate": 27.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      15.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 15.0
+   },
+   "werte_antwort": {
+    "anzahlung": 1.0,
+    "rate": 27.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      15.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 15.0
+   },
+   "text": "Monatliche Kosten\nSumme 1. bis 36. Monat\n42,00 €\nGerät\n27,00 €\nin den ersten 36 Monaten\nTarif\n15,00 €\nnach 24 Monaten mtl. kündbar\nSumme ab dem 37. Monat\n15,00 €\nEinmalige Kosten\nSumme einmalig\n16,00 €\nzzgl. 4,99 € Versandkosten\nWeiter zum Warenkorb\nSichere Zahlungsmethoden"
+  },
+  {
+   "datei": "erkundung/congstar/2026-10-07/karte-2.json",
+   "kombination": 9,
+   "karte": "congstar.yaml",
+   "adresse": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
+   "auswahl": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat XS",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat XS",
+    "laufzeit": 24
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 1.0,
+    "rate": 40.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      15.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 15.0
+   },
+   "werte_text": {
+    "anzahlung": 1.0,
+    "rate": 40.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      15.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 15.0
+   },
+   "werte_antwort": {
+    "anzahlung": 1.0,
+    "rate": 40.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      15.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 15.0
+   },
+   "text": "Monatliche Kosten\nSumme 1. bis 24. Monat\n55,50 €\nGerät\n40,50 €\nin den ersten 24 Monaten\nTarif\n15,00 €\nnach 24 Monaten mtl. kündbar\nSumme ab dem 25. Monat\n15,00 €\nEinmalige Kosten\nSumme einmalig\n16,00 €\nzzgl. 4,99 € Versandkosten\nWeiter zum Warenkorb\nSichere Zahlungsmethoden"
+  },
+  {
+   "datei": "erkundung/congstar/2026-10-07/karte-2.json",
+   "kombination": 10,
+   "karte": "congstar.yaml",
+   "adresse": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
+   "auswahl": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat S",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat S",
+    "laufzeit": 36
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 1.0,
+    "rate": 26.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      20.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 50.0
+   },
+   "werte_text": {
+    "anzahlung": 1.0,
+    "rate": 26.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      20.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 50.0
+   },
+   "werte_antwort": {
+    "anzahlung": 1.0,
+    "rate": 26.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      20.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 50.0
+   },
+   "text": "Monatliche Kosten\nSumme 1. bis 36. Monat\n46,00 €\nGerät\n26,00 €\nin den ersten 36 Monaten\nTarif\n20,00 €\nnach 24 Monaten mtl. kündbar\nSumme ab dem 37. Monat\n20,00 €\nEinmalige Kosten\nSumme einmalig\n16,00 €\nzzgl. 4,99 € Versandkosten\nWeiter zum Warenkorb\nSichere Zahlungsmethoden"
+  },
+  {
+   "datei": "erkundung/congstar/2026-10-07/karte-2.json",
+   "kombination": 11,
+   "karte": "congstar.yaml",
+   "adresse": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
+   "auswahl": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat S",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat S",
+    "laufzeit": 24
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 1.0,
+    "rate": 39.0,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      20.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 50.0
+   },
+   "werte_text": {
+    "anzahlung": 1.0,
+    "rate": 39.0,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      20.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 50.0
+   },
+   "werte_antwort": {
+    "anzahlung": 1.0,
+    "rate": 39.0,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      20.0
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 15.0,
+    "volumen_gb": 50.0
+   },
+   "text": "Monatliche Kosten\nSumme 1. bis 24. Monat\n59,00 €\nGerät\n39,00 €\nin den ersten 24 Monaten\nTarif\n20,00 €\nnach 24 Monaten mtl. kündbar\nSumme ab dem 25. Monat\n20,00 €\nEinmalige Kosten\nSumme einmalig\n16,00 €\nzzgl. 4,99 € Versandkosten\nWeiter zum Warenkorb\nSichere Zahlungsmethoden"
+  },
+  {
+   "datei": "erkundung/o2/2026-10-07/karte-1.json",
+   "kombination": 0,
+   "karte": "o2.yaml",
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile Unlimited L Plus mit 300 MBit/s",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile Unlimited L Plus mit 300 MBit/s",
+    "laufzeit": 36
+   },
+   "status": "befund",
+   "grund": "fehlt im Text, Antwort Monat 1 und danach: 29,99",
+   "werte": {
+    "anzahlung": 1.0,
+    "rate": 36.5,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "werte_text": {
+    "anzahlung": 1.0,
+    "rate": 36.5,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "werte_antwort": {
+    "anzahlung": 1.0,
+    "rate": 36.5,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      29.99
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "text": "Gerät mtl. (36 Raten):\n36,50 €\nTarif mtl. (Mindestlaufzeit 24 Monate):\n29,99 €\nmonatlich gesamt:\n66,49 €\nGerät Anzahlung:\n1,00 €\neinmaliger Anschlusspreis\n0,00 €\nVersandkosten:\n6,99 €\neinmalig gesamt:\n7,99 €"
+  },
+  {
+   "datei": "erkundung/o2/2026-10-07/karte-1.json",
+   "kombination": 1,
+   "karte": "o2.yaml",
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile Unlimited L Plus mit 300 MBit/s",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile Unlimited L Plus mit 300 MBit/s",
+    "laufzeit": 24
+   },
+   "status": "befund",
+   "grund": "fehlt im Text, Antwort Monat 1 und danach: 29,99",
+   "werte": {
+    "anzahlung": 7.0,
+    "rate": 54.5,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "werte_text": {
+    "anzahlung": 7.0,
+    "rate": 54.5,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "werte_antwort": {
+    "anzahlung": 7.0,
+    "rate": 54.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      29.99
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "text": "Gerät mtl. (24 Raten):\n54,50 €\nTarif mtl. (Mindestlaufzeit 24 Monate):\n29,99 €\nmonatlich gesamt:\n84,49 €\nGerät Anzahlung:\n7,00 €\neinmaliger Anschlusspreis\n0,00 €\nVersandkosten:\n6,99 €\neinmalig gesamt:\n13,99 €"
+  },
+  {
+   "datei": "erkundung/o2/2026-10-07/karte-1.json",
+   "kombination": 2,
+   "karte": "o2.yaml",
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s",
+    "laufzeit": 36
+   },
+   "status": "befund",
+   "grund": "fehlt im Text, Antwort Monat 1 und danach: 19,99",
+   "werte": {
+    "anzahlung": 1.0,
+    "rate": 36.5,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "werte_text": {
+    "anzahlung": 1.0,
+    "rate": 36.5,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "werte_antwort": {
+    "anzahlung": 1.0,
+    "rate": 36.5,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      19.99
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "text": "Gerät mtl. (36 Raten):\n36,50 €\nTarif mtl. (Mindestlaufzeit 24 Monate):\n19,99 €\nmonatlich gesamt:\n56,49 €\nGerät Anzahlung:\n1,00 €\neinmaliger Anschlusspreis\n0,00 €\nVersandkosten:\n6,99 €\neinmalig gesamt:\n7,99 €"
+  },
+  {
+   "datei": "erkundung/o2/2026-10-07/karte-1.json",
+   "kombination": 3,
+   "karte": "o2.yaml",
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s",
+    "laufzeit": 24
+   },
+   "status": "befund",
+   "grund": "fehlt im Text, Antwort Monat 1 und danach: 19,99",
+   "werte": {
+    "anzahlung": 7.0,
+    "rate": 54.5,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "werte_text": {
+    "anzahlung": 7.0,
+    "rate": 54.5,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "werte_antwort": {
+    "anzahlung": 7.0,
+    "rate": 54.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      19.99
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "text": "Gerät mtl. (24 Raten):\n54,50 €\nTarif mtl. (Mindestlaufzeit 24 Monate):\n19,99 €\nmonatlich gesamt:\n74,49 €\nGerät Anzahlung:\n7,00 €\neinmaliger Anschlusspreis\n0,00 €\nVersandkosten:\n6,99 €\neinmalig gesamt:\n13,99 €"
+  },
+  {
+   "datei": "erkundung/o2/2026-10-07/karte-1.json",
+   "kombination": 4,
+   "karte": "o2.yaml",
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile Unlimited S Special Plus mit 15 MBit/s",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile Unlimited S Special Plus mit 15 MBit/s",
+    "laufzeit": 36
+   },
+   "status": "befund",
+   "grund": "fehlt im Text, Antwort Monat 1 und danach: 19,99",
+   "werte": {
+    "anzahlung": 1.0,
+    "rate": 36.5,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": 24,
+    "anschluss": 39.99,
+    "volumen_gb": "unbegrenzt"
+   },
+   "werte_text": {
+    "anzahlung": 1.0,
+    "rate": 36.5,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": 24,
+    "anschluss": 39.99,
+    "volumen_gb": "unbegrenzt"
+   },
+   "werte_antwort": {
+    "anzahlung": 1.0,
+    "rate": 36.5,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      19.99
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 39.99,
+    "volumen_gb": "unbegrenzt"
+   },
+   "text": "Gerät mtl. (36 Raten):\n36,50 €\nTarif mtl. (Mindestlaufzeit 24 Monate):\n19,99 €\nmonatlich gesamt:\n56,49 €\nGerät Anzahlung:\n1,00 €\neinmaliger Anschlusspreis\n39,99 €\nVersandkosten:\n6,99 €\neinmalig gesamt:\n47,98 €"
+  },
+  {
+   "datei": "erkundung/o2/2026-10-07/karte-1.json",
+   "kombination": 5,
+   "karte": "o2.yaml",
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile Unlimited S Special Plus mit 15 MBit/s",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile Unlimited S Special Plus mit 15 MBit/s",
+    "laufzeit": 24
+   },
+   "status": "befund",
+   "grund": "fehlt im Text, Antwort Monat 1 und danach: 19,99",
+   "werte": {
+    "anzahlung": 7.0,
+    "rate": 54.5,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": 24,
+    "anschluss": 39.99,
+    "volumen_gb": "unbegrenzt"
+   },
+   "werte_text": {
+    "anzahlung": 7.0,
+    "rate": 54.5,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": 24,
+    "anschluss": 39.99,
+    "volumen_gb": "unbegrenzt"
+   },
+   "werte_antwort": {
+    "anzahlung": 7.0,
+    "rate": 54.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      19.99
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 39.99,
+    "volumen_gb": "unbegrenzt"
+   },
+   "text": "Gerät mtl. (24 Raten):\n54,50 €\nTarif mtl. (Mindestlaufzeit 24 Monate):\n19,99 €\nmonatlich gesamt:\n74,49 €\nGerät Anzahlung:\n7,00 €\neinmaliger Anschlusspreis\n39,99 €\nVersandkosten:\n6,99 €\neinmalig gesamt:\n53,98 €"
+  },
+  {
+   "datei": "erkundung/o2/2026-10-07/karte-1.json",
+   "kombination": 6,
+   "karte": "o2.yaml",
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile L Plus mit 150 GB+",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile L Plus mit 150 GB+",
+    "laufzeit": 36
+   },
+   "status": "befund",
+   "grund": "fehlt im Text, Antwort Monat 1 und danach: 19,99",
+   "werte": {
+    "anzahlung": 1.0,
+    "rate": 36.5,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": 150.0
+   },
+   "werte_text": {
+    "anzahlung": 1.0,
+    "rate": 36.5,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": 150.0
+   },
+   "werte_antwort": {
+    "anzahlung": 1.0,
+    "rate": 36.5,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      19.99
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": 150.0
+   },
+   "text": "Gerät mtl. (36 Raten):\n36,50 €\nTarif mtl. (Mindestlaufzeit 24 Monate):\n19,99 €\nmonatlich gesamt:\n56,49 €\nGerät Anzahlung:\n1,00 €\neinmaliger Anschlusspreis\n0,00 €\nVersandkosten:\n6,99 €\neinmalig gesamt:\n7,99 €"
+  },
+  {
+   "datei": "erkundung/o2/2026-10-07/karte-1.json",
+   "kombination": 7,
+   "karte": "o2.yaml",
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile L Plus mit 150 GB+",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile L Plus mit 150 GB+",
+    "laufzeit": 24
+   },
+   "status": "befund",
+   "grund": "fehlt im Text, Antwort Monat 1 und danach: 19,99",
+   "werte": {
+    "anzahlung": 7.0,
+    "rate": 54.5,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": 150.0
+   },
+   "werte_text": {
+    "anzahlung": 7.0,
+    "rate": 54.5,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": 150.0
+   },
+   "werte_antwort": {
+    "anzahlung": 7.0,
+    "rate": 54.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      19.99
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": 150.0
+   },
+   "text": "Gerät mtl. (24 Raten):\n54,50 €\nTarif mtl. (Mindestlaufzeit 24 Monate):\n19,99 €\nmonatlich gesamt:\n74,49 €\nGerät Anzahlung:\n7,00 €\neinmaliger Anschlusspreis\n0,00 €\nVersandkosten:\n6,99 €\neinmalig gesamt:\n13,99 €"
+  },
+  {
+   "datei": "erkundung/o2/2026-10-07/karte-2.json",
+   "kombination": 0,
+   "karte": "o2.yaml",
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile Unlimited L Plus mit 300 MBit/s",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile Unlimited L Plus mit 300 MBit/s",
+    "laufzeit": 36
+   },
+   "status": "befund",
+   "grund": "fehlt im Text, Antwort Monat 1 und danach: 27,99",
+   "werte": {
+    "anzahlung": 1.0,
+    "rate": 26.5,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "werte_text": {
+    "anzahlung": 1.0,
+    "rate": 26.5,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "werte_antwort": {
+    "anzahlung": 1.0,
+    "rate": 26.5,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      27.99
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "text": "Gerät mtl. (36 Raten):\n26,50 €\nTarif mtl. (Mindestlaufzeit 24 Monate):\n27,99 €\nmonatlich gesamt:\n54,49 €\nGerät Anzahlung:\n1,00 €\neinmaliger Anschlusspreis\n0,00 €\nVersandkosten:\n6,99 €\neinmalig gesamt:\n7,99 €"
+  },
+  {
+   "datei": "erkundung/o2/2026-10-07/karte-2.json",
+   "kombination": 1,
+   "karte": "o2.yaml",
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile Unlimited L Plus mit 300 MBit/s",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile Unlimited L Plus mit 300 MBit/s",
+    "laufzeit": 24
+   },
+   "status": "befund",
+   "grund": "fehlt im Text, Antwort Monat 1 und danach: 27,99",
+   "werte": {
+    "anzahlung": 7.0,
+    "rate": 39.5,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "werte_text": {
+    "anzahlung": 7.0,
+    "rate": 39.5,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "werte_antwort": {
+    "anzahlung": 7.0,
+    "rate": 39.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      27.99
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "text": "Gerät mtl. (24 Raten):\n39,50 €\nTarif mtl. (Mindestlaufzeit 24 Monate):\n27,99 €\nmonatlich gesamt:\n67,49 €\nGerät Anzahlung:\n7,00 €\neinmaliger Anschlusspreis\n0,00 €\nVersandkosten:\n6,99 €\neinmalig gesamt:\n13,99 €"
+  },
+  {
+   "datei": "erkundung/o2/2026-10-07/karte-2.json",
+   "kombination": 2,
+   "karte": "o2.yaml",
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s",
+    "laufzeit": 36
+   },
+   "status": "befund",
+   "grund": "fehlt im Text, Antwort Monat 1 und danach: 17,99",
+   "werte": {
+    "anzahlung": 1.0,
+    "rate": 26.5,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "werte_text": {
+    "anzahlung": 1.0,
+    "rate": 26.5,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "werte_antwort": {
+    "anzahlung": 1.0,
+    "rate": 26.5,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      17.99
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "text": "Gerät mtl. (36 Raten):\n26,50 €\nTarif mtl. (Mindestlaufzeit 24 Monate):\n17,99 €\nmonatlich gesamt:\n44,49 €\nGerät Anzahlung:\n1,00 €\neinmaliger Anschlusspreis\n0,00 €\nVersandkosten:\n6,99 €\neinmalig gesamt:\n7,99 €"
+  },
+  {
+   "datei": "erkundung/o2/2026-10-07/karte-2.json",
+   "kombination": 3,
+   "karte": "o2.yaml",
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s",
+    "laufzeit": 24
+   },
+   "status": "befund",
+   "grund": "fehlt im Text, Antwort Monat 1 und danach: 17,99",
+   "werte": {
+    "anzahlung": 7.0,
+    "rate": 39.5,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "werte_text": {
+    "anzahlung": 7.0,
+    "rate": 39.5,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "werte_antwort": {
+    "anzahlung": 7.0,
+    "rate": 39.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      17.99
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "text": "Gerät mtl. (24 Raten):\n39,50 €\nTarif mtl. (Mindestlaufzeit 24 Monate):\n17,99 €\nmonatlich gesamt:\n57,49 €\nGerät Anzahlung:\n7,00 €\neinmaliger Anschlusspreis\n0,00 €\nVersandkosten:\n6,99 €\neinmalig gesamt:\n13,99 €"
+  },
+  {
+   "datei": "erkundung/o2/2026-10-07/karte-2.json",
+   "kombination": 4,
+   "karte": "o2.yaml",
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile Unlimited S Special Plus mit 15 MBit/s",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile Unlimited S Special Plus mit 15 MBit/s",
+    "laufzeit": 36
+   },
+   "status": "befund",
+   "grund": "fehlt im Text, Antwort Monat 1 und danach: 17,99",
+   "werte": {
+    "anzahlung": 1.0,
+    "rate": 26.5,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": 24,
+    "anschluss": 39.99,
+    "volumen_gb": "unbegrenzt"
+   },
+   "werte_text": {
+    "anzahlung": 1.0,
+    "rate": 26.5,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": 24,
+    "anschluss": 39.99,
+    "volumen_gb": "unbegrenzt"
+   },
+   "werte_antwort": {
+    "anzahlung": 1.0,
+    "rate": 26.5,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      17.99
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 39.99,
+    "volumen_gb": "unbegrenzt"
+   },
+   "text": "Gerät mtl. (36 Raten):\n26,50 €\nTarif mtl. (Mindestlaufzeit 24 Monate):\n17,99 €\nmonatlich gesamt:\n44,49 €\nGerät Anzahlung:\n1,00 €\neinmaliger Anschlusspreis\n39,99 €\nVersandkosten:\n6,99 €\neinmalig gesamt:\n47,98 €"
+  },
+  {
+   "datei": "erkundung/o2/2026-10-07/karte-2.json",
+   "kombination": 5,
+   "karte": "o2.yaml",
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile Unlimited S Special Plus mit 15 MBit/s",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile Unlimited S Special Plus mit 15 MBit/s",
+    "laufzeit": 24
+   },
+   "status": "befund",
+   "grund": "fehlt im Text, Antwort Monat 1 und danach: 17,99",
+   "werte": {
+    "anzahlung": 7.0,
+    "rate": 39.5,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": 24,
+    "anschluss": 39.99,
+    "volumen_gb": "unbegrenzt"
+   },
+   "werte_text": {
+    "anzahlung": 7.0,
+    "rate": 39.5,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": 24,
+    "anschluss": 39.99,
+    "volumen_gb": "unbegrenzt"
+   },
+   "werte_antwort": {
+    "anzahlung": 7.0,
+    "rate": 39.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      17.99
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 39.99,
+    "volumen_gb": "unbegrenzt"
+   },
+   "text": "Gerät mtl. (24 Raten):\n39,50 €\nTarif mtl. (Mindestlaufzeit 24 Monate):\n17,99 €\nmonatlich gesamt:\n57,49 €\nGerät Anzahlung:\n7,00 €\neinmaliger Anschlusspreis\n39,99 €\nVersandkosten:\n6,99 €\neinmalig gesamt:\n53,98 €"
+  },
+  {
+   "datei": "erkundung/o2/2026-10-07/karte-2.json",
+   "kombination": 6,
+   "karte": "o2.yaml",
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile L Plus mit 150 GB+",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile L Plus mit 150 GB+",
+    "laufzeit": 36
+   },
+   "status": "befund",
+   "grund": "fehlt im Text, Antwort Monat 1 und danach: 17,99",
+   "werte": {
+    "anzahlung": 1.0,
+    "rate": 26.5,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": 150.0
+   },
+   "werte_text": {
+    "anzahlung": 1.0,
+    "rate": 26.5,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": 150.0
+   },
+   "werte_antwort": {
+    "anzahlung": 1.0,
+    "rate": 26.5,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      17.99
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": 150.0
+   },
+   "text": "Gerät mtl. (36 Raten):\n26,50 €\nTarif mtl. (Mindestlaufzeit 24 Monate):\n17,99 €\nmonatlich gesamt:\n44,49 €\nGerät Anzahlung:\n1,00 €\neinmaliger Anschlusspreis\n0,00 €\nVersandkosten:\n6,99 €\neinmalig gesamt:\n7,99 €"
+  },
+  {
+   "datei": "erkundung/o2/2026-10-07/karte-2.json",
+   "kombination": 7,
+   "karte": "o2.yaml",
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile L Plus mit 150 GB+",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile L Plus mit 150 GB+",
+    "laufzeit": 24
+   },
+   "status": "befund",
+   "grund": "fehlt im Text, Antwort Monat 1 und danach: 17,99",
+   "werte": {
+    "anzahlung": 7.0,
+    "rate": 39.5,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": 150.0
+   },
+   "werte_text": {
+    "anzahlung": 7.0,
+    "rate": 39.5,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": 150.0
+   },
+   "werte_antwort": {
+    "anzahlung": 7.0,
+    "rate": 39.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      17.99
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": 150.0
+   },
+   "text": "Gerät mtl. (24 Raten):\n39,50 €\nTarif mtl. (Mindestlaufzeit 24 Monate):\n17,99 €\nmonatlich gesamt:\n57,49 €\nGerät Anzahlung:\n7,00 €\neinmaliger Anschlusspreis\n0,00 €\nVersandkosten:\n6,99 €\neinmalig gesamt:\n13,99 €"
+  },
+  {
+   "datei": "erkundung/o2/2026-10-07/karte-2.json",
+   "kombination": 8,
+   "karte": "o2.yaml",
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
+   "auswahl": {
+    "speicher": "512 GB",
+    "tarif": "O2 Mobile Unlimited L Plus mit 300 MBit/s",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "512 GB",
+    "tarif": "O2 Mobile Unlimited L Plus mit 300 MBit/s",
+    "laufzeit": 36
+   },
+   "status": "befund",
+   "grund": "fehlt im Text, Antwort Monat 1 und danach: 27,99",
+   "werte": {
+    "anzahlung": 1.0,
+    "rate": 32.0,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "werte_text": {
+    "anzahlung": 1.0,
+    "rate": 32.0,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "werte_antwort": {
+    "anzahlung": 1.0,
+    "rate": 32.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      27.99
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "text": "Gerät mtl. (36 Raten):\n32,00 €\nTarif mtl. (Mindestlaufzeit 24 Monate):\n27,99 €\nmonatlich gesamt:\n59,99 €\nGerät Anzahlung:\n1,00 €\neinmaliger Anschlusspreis\n0,00 €\nVersandkosten:\n6,99 €\neinmalig gesamt:\n7,99 €"
+  },
+  {
+   "datei": "erkundung/o2/2026-10-07/karte-2.json",
+   "kombination": 9,
+   "karte": "o2.yaml",
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
+   "auswahl": {
+    "speicher": "512 GB",
+    "tarif": "O2 Mobile Unlimited L Plus mit 300 MBit/s",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "512 GB",
+    "tarif": "O2 Mobile Unlimited L Plus mit 300 MBit/s",
+    "laufzeit": 24
+   },
+   "status": "befund",
+   "grund": "fehlt im Text, Antwort Monat 1 und danach: 27,99",
+   "werte": {
+    "anzahlung": 1.0,
+    "rate": 48.0,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "werte_text": {
+    "anzahlung": 1.0,
+    "rate": 48.0,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "werte_antwort": {
+    "anzahlung": 1.0,
+    "rate": 48.0,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      27.99
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "text": "Gerät mtl. (24 Raten):\n48,00 €\nTarif mtl. (Mindestlaufzeit 24 Monate):\n27,99 €\nmonatlich gesamt:\n75,99 €\nGerät Anzahlung:\n1,00 €\neinmaliger Anschlusspreis\n0,00 €\nVersandkosten:\n6,99 €\neinmalig gesamt:\n7,99 €"
+  },
+  {
+   "datei": "erkundung/o2/2026-10-07/karte-2.json",
+   "kombination": 10,
+   "karte": "o2.yaml",
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
+   "auswahl": {
+    "speicher": "512 GB",
+    "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "512 GB",
+    "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s",
+    "laufzeit": 36
+   },
+   "status": "befund",
+   "grund": "fehlt im Text, Antwort Monat 1 und danach: 17,99",
+   "werte": {
+    "anzahlung": 1.0,
+    "rate": 32.0,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "werte_text": {
+    "anzahlung": 1.0,
+    "rate": 32.0,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "werte_antwort": {
+    "anzahlung": 1.0,
+    "rate": 32.0,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      17.99
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "text": "Gerät mtl. (36 Raten):\n32,00 €\nTarif mtl. (Mindestlaufzeit 24 Monate):\n17,99 €\nmonatlich gesamt:\n49,99 €\nGerät Anzahlung:\n1,00 €\neinmaliger Anschlusspreis\n0,00 €\nVersandkosten:\n6,99 €\neinmalig gesamt:\n7,99 €"
+  },
+  {
+   "datei": "erkundung/o2/2026-10-07/karte-2.json",
+   "kombination": 11,
+   "karte": "o2.yaml",
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
+   "auswahl": {
+    "speicher": "512 GB",
+    "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "512 GB",
+    "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s",
+    "laufzeit": 24
+   },
+   "status": "befund",
+   "grund": "fehlt im Text, Antwort Monat 1 und danach: 17,99",
+   "werte": {
+    "anzahlung": 1.0,
+    "rate": 48.0,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "werte_text": {
+    "anzahlung": 1.0,
+    "rate": 48.0,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "werte_antwort": {
+    "anzahlung": 1.0,
+    "rate": 48.0,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      17.99
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "text": "Gerät mtl. (24 Raten):\n48,00 €\nTarif mtl. (Mindestlaufzeit 24 Monate):\n17,99 €\nmonatlich gesamt:\n65,99 €\nGerät Anzahlung:\n1,00 €\neinmaliger Anschlusspreis\n0,00 €\nVersandkosten:\n6,99 €\neinmalig gesamt:\n7,99 €"
+  },
+  {
+   "datei": "erkundung/vodafone/2026-10-07/karte-1.json",
+   "kombination": 0,
+   "karte": "vodafone.yaml",
+   "adresse": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "unbekannt",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "unbekannt",
+    "laufzeit": 36
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 1.0,
+    "rate": 33.0,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_text": {
+    "anzahlung": 1.0,
+    "rate": 33.0,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_antwort": {
+    "anzahlung": 1.0,
+    "rate": 33.0,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "text": "Einmal\n\t\n\n1 € einmal\n\n1 €\n\n\nPro Monat\n\t\n\n33 € pro Monat\n\n33 €\n\nStandard-Versand\t9,98 €"
+  },
+  {
+   "datei": "erkundung/vodafone/2026-10-07/karte-1.json",
+   "kombination": 1,
+   "karte": "vodafone.yaml",
+   "adresse": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "unbekannt",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "unbekannt",
+    "laufzeit": 24
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 1.0,
+    "rate": 49.5,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_text": {
+    "anzahlung": 1.0,
+    "rate": 49.5,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_antwort": {
+    "anzahlung": 1.0,
+    "rate": 49.5,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "text": "Einmal\n\t\n\n1 € einmal\n\n1 €\n\n\nPro Monat\n\t\n\n49,50 € pro Monat\n\n49,50 €\n\nStandard-Versand\t9,98 €"
+  },
+  {
+   "datei": "erkundung/vodafone/2026-10-07/karte-1.json",
+   "kombination": 2,
+   "karte": "vodafone.yaml",
+   "adresse": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "unbekannt",
+    "laufzeit": "12"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "unbekannt",
+    "laufzeit": 12
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 1.0,
+    "rate": 99.0,
+    "ratenzahl": 12,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_text": {
+    "anzahlung": 1.0,
+    "rate": 99.0,
+    "ratenzahl": 12,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_antwort": {
+    "anzahlung": 1.0,
+    "rate": 99.0,
+    "ratenzahl": 12,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "text": "Einmal\n\t\n\n1 € einmal\n\n1 €\n\n\nPro Monat\n\t\n\n99 € pro Monat\n\n99 €\n\nStandard-Versand\t9,98 €"
+  },
+  {
+   "datei": "erkundung/vodafone/2026-10-07/karte-1.json",
+   "kombination": 3,
+   "karte": "vodafone.yaml",
+   "adresse": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
+   "auswahl": {
+    "speicher": "512 GB",
+    "tarif": "unbekannt",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "512 GB",
+    "tarif": "unbekannt",
+    "laufzeit": 36
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 0.99,
+    "rate": 40.0,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_text": {
+    "anzahlung": 0.99,
+    "rate": 40.0,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_antwort": {
+    "anzahlung": 0.99,
+    "rate": 40.0,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "text": "Einmal\n\t\n\n0,99 € einmal\n\n0,99 €\n\n\nPro Monat\n\t\n\n40 € pro Monat\n\n40 €\n\nStandard-Versand\t9,98 €"
+  },
+  {
+   "datei": "erkundung/vodafone/2026-10-07/karte-1.json",
+   "kombination": 4,
+   "karte": "vodafone.yaml",
+   "adresse": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
+   "auswahl": {
+    "speicher": "512 GB",
+    "tarif": "unbekannt",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "512 GB",
+    "tarif": "unbekannt",
+    "laufzeit": 24
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 0.99,
+    "rate": 60.0,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_text": {
+    "anzahlung": 0.99,
+    "rate": 60.0,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_antwort": {
+    "anzahlung": 0.99,
+    "rate": 60.0,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "text": "Einmal\n\t\n\n0,99 € einmal\n\n0,99 €\n\n\nPro Monat\n\t\n\n60 € pro Monat\n\n60 €\n\nStandard-Versand\t9,98 €"
+  },
+  {
+   "datei": "erkundung/vodafone/2026-10-07/karte-1.json",
+   "kombination": 5,
+   "karte": "vodafone.yaml",
+   "adresse": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
+   "auswahl": {
+    "speicher": "512 GB",
+    "tarif": "unbekannt",
+    "laufzeit": "12"
+   },
+   "variante": {
+    "speicher": "512 GB",
+    "tarif": "unbekannt",
+    "laufzeit": 12
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 0.99,
+    "rate": 120.0,
+    "ratenzahl": 12,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_text": {
+    "anzahlung": 0.99,
+    "rate": 120.0,
+    "ratenzahl": 12,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_antwort": {
+    "anzahlung": 0.99,
+    "rate": 120.0,
+    "ratenzahl": 12,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "text": "Einmal\n\t\n\n0,99 € einmal\n\n0,99 €\n\n\nPro Monat\n\t\n\n120 € pro Monat\n\n120 €\n\nStandard-Versand\t9,98 €"
+  },
+  {
+   "datei": "erkundung/vodafone/2026-10-07/karte-1.json",
+   "kombination": 6,
+   "karte": "vodafone.yaml",
+   "adresse": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
+   "auswahl": {
+    "speicher": "1 TB",
+    "tarif": "unbekannt",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "1 TB",
+    "tarif": "unbekannt",
+    "laufzeit": 36
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 1.0,
+    "rate": 47.0,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_text": {
+    "anzahlung": 1.0,
+    "rate": 47.0,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_antwort": {
+    "anzahlung": 1.0,
+    "rate": 47.0,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "text": "Einmal\n\t\n\n1 € einmal\n\n1 €\n\n\nPro Monat\n\t\n\n47 € pro Monat\n\n47 €\n\nStandard-Versand\t9,98 €"
+  },
+  {
+   "datei": "erkundung/vodafone/2026-10-07/karte-1.json",
+   "kombination": 7,
+   "karte": "vodafone.yaml",
+   "adresse": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
+   "auswahl": {
+    "speicher": "1 TB",
+    "tarif": "unbekannt",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "1 TB",
+    "tarif": "unbekannt",
+    "laufzeit": 24
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 1.0,
+    "rate": 70.5,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_text": {
+    "anzahlung": 1.0,
+    "rate": 70.5,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_antwort": {
+    "anzahlung": 1.0,
+    "rate": 70.5,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "text": "Einmal\n\t\n\n1 € einmal\n\n1 €\n\n\nPro Monat\n\t\n\n70,50 € pro Monat\n\n70,50 €\n\nStandard-Versand\t9,98 €"
+  },
+  {
+   "datei": "erkundung/vodafone/2026-10-07/karte-1.json",
+   "kombination": 8,
+   "karte": "vodafone.yaml",
+   "adresse": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
+   "auswahl": {
+    "speicher": "1 TB",
+    "tarif": "unbekannt",
+    "laufzeit": "12"
+   },
+   "variante": {
+    "speicher": "1 TB",
+    "tarif": "unbekannt",
+    "laufzeit": 12
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 1.0,
+    "rate": 141.0,
+    "ratenzahl": 12,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_text": {
+    "anzahlung": 1.0,
+    "rate": 141.0,
+    "ratenzahl": 12,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_antwort": {
+    "anzahlung": 1.0,
+    "rate": 141.0,
+    "ratenzahl": 12,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "text": "Einmal\n\t\n\n1 € einmal\n\n1 €\n\n\nPro Monat\n\t\n\n141 € pro Monat\n\n141 €\n\nStandard-Versand\t9,98 €"
+  },
+  {
+   "datei": "erkundung/vodafone/2026-10-07/karte-2.json",
+   "kombination": 0,
+   "karte": "vodafone.yaml",
+   "adresse": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html",
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "unbekannt",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "unbekannt",
+    "laufzeit": 36
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 0.99,
+    "rate": 21.0,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_text": {
+    "anzahlung": 0.99,
+    "rate": 21.0,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_antwort": {
+    "anzahlung": 0.99,
+    "rate": 21.0,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "text": "Einmal\n\t\n\n0,99 € einmal\n\n0,99 €\n\n\nPro Monat\n\t\n\n21 € pro Monat\n\n21 €\n\nStandard-Versand\t9,98 €"
+  },
+  {
+   "datei": "erkundung/vodafone/2026-10-07/karte-2.json",
+   "kombination": 1,
+   "karte": "vodafone.yaml",
+   "adresse": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html",
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "unbekannt",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "unbekannt",
+    "laufzeit": 24
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 0.99,
+    "rate": 31.5,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_text": {
+    "anzahlung": 0.99,
+    "rate": 31.5,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_antwort": {
+    "anzahlung": 0.99,
+    "rate": 31.5,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "text": "Einmal\n\t\n\n0,99 € einmal\n\n0,99 €\n\n\nPro Monat\n\t\n\n31,50 € pro Monat\n\n31,50 €\n\nStandard-Versand\t9,98 €"
+  },
+  {
+   "datei": "erkundung/vodafone/2026-10-07/karte-2.json",
+   "kombination": 2,
+   "karte": "vodafone.yaml",
+   "adresse": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html",
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "unbekannt",
+    "laufzeit": "12"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "unbekannt",
+    "laufzeit": 12
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 0.99,
+    "rate": 63.0,
+    "ratenzahl": 12,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_text": {
+    "anzahlung": 0.99,
+    "rate": 63.0,
+    "ratenzahl": 12,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_antwort": {
+    "anzahlung": 0.99,
+    "rate": 63.0,
+    "ratenzahl": 12,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "text": "Einmal\n\t\n\n0,99 € einmal\n\n0,99 €\n\n\nPro Monat\n\t\n\n63 € pro Monat\n\n63 €\n\nStandard-Versand\t9,98 €"
+  },
+  {
+   "datei": "erkundung/vodafone/2026-10-07/karte-2.json",
+   "kombination": 3,
+   "karte": "vodafone.yaml",
+   "adresse": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html",
+   "auswahl": {
+    "speicher": "512 GB",
+    "tarif": "unbekannt",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "512 GB",
+    "tarif": "unbekannt",
+    "laufzeit": 36
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 0.99,
+    "rate": 26.0,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_text": {
+    "anzahlung": 0.99,
+    "rate": 26.0,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_antwort": {
+    "anzahlung": 0.99,
+    "rate": 26.0,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "text": "Einmal\n\t\n\n0,99 € einmal\n\n0,99 €\n\n\nPro Monat\n\t\n\n26 € pro Monat\n\n26 €\n\nStandard-Versand\t9,98 €"
+  },
+  {
+   "datei": "erkundung/vodafone/2026-10-07/karte-2.json",
+   "kombination": 4,
+   "karte": "vodafone.yaml",
+   "adresse": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html",
+   "auswahl": {
+    "speicher": "512 GB",
+    "tarif": "unbekannt",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "512 GB",
+    "tarif": "unbekannt",
+    "laufzeit": 24
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 0.99,
+    "rate": 39.0,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_text": {
+    "anzahlung": 0.99,
+    "rate": 39.0,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_antwort": {
+    "anzahlung": 0.99,
+    "rate": 39.0,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "text": "Einmal\n\t\n\n0,99 € einmal\n\n0,99 €\n\n\nPro Monat\n\t\n\n39 € pro Monat\n\n39 €\n\nStandard-Versand\t9,98 €"
+  },
+  {
+   "datei": "erkundung/vodafone/2026-10-07/karte-2.json",
+   "kombination": 5,
+   "karte": "vodafone.yaml",
+   "adresse": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html",
+   "auswahl": {
+    "speicher": "512 GB",
+    "tarif": "unbekannt",
+    "laufzeit": "12"
+   },
+   "variante": {
+    "speicher": "512 GB",
+    "tarif": "unbekannt",
+    "laufzeit": 12
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 0.99,
+    "rate": 78.0,
+    "ratenzahl": 12,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_text": {
+    "anzahlung": 0.99,
+    "rate": 78.0,
+    "ratenzahl": 12,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_antwort": {
+    "anzahlung": 0.99,
+    "rate": 78.0,
+    "ratenzahl": 12,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "text": "Einmal\n\t\n\n0,99 € einmal\n\n0,99 €\n\n\nPro Monat\n\t\n\n78 € pro Monat\n\n78 €\n\nStandard-Versand\t9,98 €"
+  }
+ ]
+}

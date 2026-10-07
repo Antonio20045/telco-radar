@@ -4,8 +4,11 @@ Der Klick-Crawler (``klickcrawler``) füllt diese Typen; dieses Modul ruft keine
 und kein Netz. Je Kombination gilt einer von vier Zuständen: ``erfasst``,
 ``nicht_angeboten`` (die Seite zeigt die Option in Ruhe deaktiviert), ``nicht_erfasst``
 (Knöpfe, Option oder Zusammenfassung nicht gefunden, Laufzeit nicht lesbar, nicht
-besucht, Seite nicht zur Ruhe gekommen, Preisantwort über die Frist offen) oder
-``befund`` (das Echo widerspricht sich). Ein Lauf ist ``gelesen``, ``gestoert``
+besucht, Seite nicht zur Ruhe gekommen, Preisantwort über die Frist offen, kein
+Preiswert gelesen) oder ``befund`` (das Echo widerspricht sich). ``lesestatus`` setzt
+den Zustand einer Lesung: ohne einen der ``PREISFELDER`` (Rate, Ratenzahl, bei
+``ein_vertrag`` Bündelbetrag) ist sie nie erfasst, auch wenn Volumen oder Bindung
+stimmen. Ein Lauf ist ``gelesen``, ``gestoert``
 (Bot-Schutz, fehlender Kanarienwert, offene oder gescheiterte Preisantwort,
 Strukturbruch, keine einzige angebotene Kombination), ``gesperrt`` (robots.txt
 sperrt Seite, Preisantwort oder Besuchszeit) oder ``zeitgrenze`` (die Zeitgrenze des
@@ -34,7 +37,7 @@ nie 0.
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass, field, replace
+from dataclasses import asdict, dataclass, field, replace
 from typing import TYPE_CHECKING
 
 from .klickecho import Befund, Variante
@@ -56,6 +59,10 @@ BELEG_OFFEN = "offen"
 BELEGT = "belegt"
 BELEG_FEHLT = "fehlt"
 OHNE_WERT = "ohne_wert"
+PREISFELDER = ("rate", "ratenzahl", "buendelbetrag")
+"""Felder, von denen eine erfasste Kombination mindestens eines nennt; der Bündelbetrag
+steht nur bei ``ein_vertrag`` (1&1, freenet), wo Rate und Ratenzahl entfallen."""
+GRUND_OHNE_PREISWERT = "keine Werte gelesen: weder Rate, Ratenzahl noch Bündelbetrag"
 CHALLENGE_STATUS = 202
 FEHLER_AB_STATUS = 400
 STRUKTUR_SPRUNG = 0.2
@@ -212,6 +219,24 @@ class Klicklauf:
     gescheitert: list[Gescheitert] = field(default_factory=list)
     hilfsdateien: list[Hilfsdatei] = field(default_factory=list)
     bezug: Strukturbilanz | None = None
+
+
+def nennt_preis(werte: Preiswerte, buendel: Buendelwerte | None) -> bool:
+    """Wahr, wenn ``werte`` oder ``buendel`` eines der ``PREISFELDER`` nennen."""
+    gelesen = asdict(werte) | asdict(Buendelwerte() if buendel is None else buendel)
+    return any(gelesen[feld] is not None for feld in PREISFELDER)
+
+
+def lesestatus(
+    befunde: tuple[Befund, ...], werte: Preiswerte, buendel: Buendelwerte | None
+) -> tuple[str, str | None]:
+    """Zustand und Grund einer Lesung mit Echo: ``befund`` mit dem ersten Grund, ohne
+    Preiswert ``nicht_erfasst`` mit ``GRUND_OHNE_PREISWERT``, sonst ``erfasst``."""
+    if befunde:
+        return BEFUND, befunde[0].grund
+    if not nennt_preis(werte, buendel):
+        return NICHT_ERFASST, GRUND_OHNE_PREISWERT
+    return ERFASST, None
 
 
 def abruf_gestoert(status: int | None) -> str | None:

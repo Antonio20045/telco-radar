@@ -12,9 +12,12 @@ wenn die Zeile „unbegrenzt“ nennt; unbegrenzt ist es nur ohne Zahl (``math.i
 Tarifphasen mit einem Ende vor dem Anfang sind ein Widerspruch: die Zeile ergibt dann
 keine Phasen. Zur Tarifzeile gehören die direkt folgenden Zeilen, die mit „ab (dem)
 N. Monat“ beginnen (o2: eigene Zeile „ab dem 25. Monat: 29,99 €“ unter „Tarif mtl.“).
-Fehlt ein Wert, ist er ``None``, nie 0. Deutsche Zahlen liest
-``tarif_model.zahl``. ``fundstellen`` nennt je Feld den Ausschnitt, aus dem der Wert
-stammt; der Beleg (``klickbeleg``) hält ihn fest.
+Leerraum vor einem Dezimalkomma ist Satz, kein Text: ``zahlen_ohne_leerraum`` macht
+aus „44\n,\n99\n€/Monat“ (1&1 setzt Euro, Komma und Cent in eigene Elemente) „44,99“,
+bevor ein Muster liest; ein Komma ohne Leerraum davor („12, 24 Monate“) und ein
+Zeilenumbruch zwischen zwei Zahlen („36,50 €\nTarif“) bleiben. Fehlt ein Wert, ist er
+``None``, nie 0. Deutsche Zahlen liest ``tarif_model.zahl``. ``fundstellen`` nennt je
+Feld den Ausschnitt, aus dem der Wert stammt; der Beleg (``klickbeleg``) hält ihn fest.
 """
 
 from __future__ import annotations
@@ -61,6 +64,7 @@ _UNBEGRENZT = re.compile(
 """„unbegrenzt“ als Volumen; „Unlimited on demand“ ist bei 1&1 ein Produktname mit
 festem Grundvolumen (S 10, M 50, L 150 GB laut 1&1, tarife.jsonl), kein Volumen."""
 _GEGENWERT = re.compile(r"\b(?:statt|sonst)\b", re.I)
+_LEERRAUM_IN_ZAHL = re.compile(r"(?<=\d)\s+,\s*(?=\d{1,2}(?!\d))")
 
 
 def _posten(wort: str) -> tuple[re.Pattern[str], ...]:
@@ -95,8 +99,19 @@ class Buendelwerte:
     einmalzahlung: float | None = None
 
 
+def zahlen_ohne_leerraum(text: str) -> str:
+    """``text`` ohne Leerraum um ein Komma mit Leerraum davor („44 , 99“ → „44,99“)."""
+    return _LEERRAUM_IN_ZAHL.sub(",", text)
+
+
+def nennt_betrag(text: str) -> bool:
+    """Wahr, wenn ``text`` einen Betrag mit €, EUR oder Euro nennt."""
+    return _BETRAG_RE.search(zahlen_ohne_leerraum(text)) is not None
+
+
 def lies_zusammenfassung(text: str) -> Preiswerte:
     """Liest die Werte aus dem sichtbaren Text der Preiszusammenfassung."""
+    text = zahlen_ohne_leerraum(text)
     rate, ratenzahl = _rate_aus_text(text)
     bindung = _BINDUNG.search(text)
     return Preiswerte(
@@ -116,6 +131,7 @@ def fundstellen(text: str) -> dict[str, str]:
     Allein gelesen nennt ein Ausschnitt sein Feld wie der ganze Text: so findet eine
     Prüfung einen archivierten Wert an seiner Fundstelle wieder.
     """
+    text = zahlen_ohne_leerraum(text)
     zeilen = text.splitlines()
     rate, mal = _RATE.search(text), _MAL_RATE.search(text)
     funde = {
@@ -198,6 +214,12 @@ def phasen_aus_text(text: str) -> tuple[Preisphase, ...] | None:
     """Die Tarifphasen der ersten Tarifzeile mit Betrag samt ihren Folgezeilen."""
     stelle = _tarifstelle(text.splitlines())
     return None if stelle is None else _phasen_aus_zeile(" ".join(stelle.splitlines()))
+
+
+def phasen_der_stelle(stelle: str) -> tuple[Preisphase, ...] | None:
+    """Die Tarifphasen einer Stelle ohne Tarifwort, Zeilenumbrüche als Leerzeichen:
+    die erste Gruppe eines Textmusters (o2 „19,99 €\nab dem 25. Monat: 29,99 €“)."""
+    return _phasen_aus_zeile(" ".join(zahlen_ohne_leerraum(stelle).split()))
 
 
 def _tarifstelle(zeilen: list[str]) -> str | None:

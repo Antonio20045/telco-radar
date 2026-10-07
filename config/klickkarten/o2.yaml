@@ -44,11 +44,17 @@ zusammenfassung:
   # Tabelle #content > section:1 > div:1 > div:2 > div:1 > div:1 > div:1 > div:2 > div:3 > table
   # (P1 Nr. 42–50, P2 Nr. 44–50): „Gerät mtl. (36 Raten): 36,50 €“, „Tarif mtl. (Mindestlaufzeit
   # 24 Monate): 19,99 €“, „Gerät Anzahlung: 1,00 €“, „einmaliger Anschlusspreis 0,00 €“. Daraus
-  # liest der Text ohne Muster Anzahlung, Ratenzahl, Tarifphasen, Bindung und Anschluss.
+  # liest der Text ohne Muster Anzahlung, Ratenzahl, Bindung und Anschluss.
   selektor: '#content table:has-text("Gerät Anzahlung")'
   muster:
     # „Rate“ steht dort nur als „Raten“ (P1 Nr. 42, P2 Nr. 44)
     rate: 'Gerät mtl\.\s*\(\d+\s*Raten\):?\s*([\d.,]+)\s*€'
+    # Im Browser steht der Betrag in eigener Zeile: „Tarif mtl. (Mindestlaufzeit 24 Monate):
+    # \n29,99 €“ (Kartenprobe 07.10.2026, Zweig klick-erkundung, Commit c8ce1f77,
+    # karte-1/-2.json, alle 20 gelesenen Kombinationen); ohne Muster fand der Text keine
+    # Tarifzeile mit Betrag. Die Gruppe hält Betrag samt € und direkt folgende Zeilen
+    # „ab dem 25. Monat: 29,99 €“ (O2 Mobile Special) und ergibt die Phasen wie die Antwort.
+    tarifphasen: 'Tarif mtl\.[^\n€]*:\s*(\d[\d.,]*\s*€(?:\s*ab\s+(?:dem\s+)?\d{1,2}\.\s*Monat:?\s*\d[\d.,]*\s*€)*)'
     # Volumen nur an der gewählten Kachel: „Unlimited“ oder „150 GB+“ (B1 El. 30–36)
     volumen_gb:
       selektor: 'tef-choice-panel:has(input[name="select-tariff"]:checked) > label'

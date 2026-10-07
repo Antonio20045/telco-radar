@@ -762,6 +762,18 @@
       "gzip": true,
       "bytes_abgelegt": 16632,
       "hinweis": "Koerper unveraendert als Text je Antwort (im Mitschnitt nicht gekuerzt), verpackt in ein JSON mit quelle, herkunft und antworten. Seite 1 Apple iPhone 17 Pro 512 GB (Warenkorb-Link mit deviceVariantId), Seite 2 Samsung Galaxy S26 (Kameleoon-Test 453, deviceVariantId in data-kam-dke-453-source). Die Tarif-Antwort von Seite 2 (Nr. 63) gleicht Seite 1 Nr. 62 und fehlt darum. Beleg der Klick-Karte congstar (tests/test_klickkarte_congstar.py)."
+    },
+    {
+      "datei": "kartenprobe_texte_20261007.json",
+      "url": "https://github.com/Antonio20045/telco-radar/tree/c8ce1f77/erkundung (karte-1.json und karte-2.json je Anbieter)",
+      "quelle": "Zweig klick-erkundung, Commit c8ce1f77, erkundung/{1und1,congstar,o2,vodafone}/2026-10-07/karte-1.json und karte-2.json (Kartenprobe der Klick-Erkundung, Actions 07.10.2026 15:30 UTC); je Eintrag Datei und Nummer der Kombination (Feld datei, kombination)",
+      "abgerufen_am": "2026-10-07",
+      "content_type": "application/json",
+      "bytes_roh": 80396,
+      "sha256_roh": "e1d72a707356b6209e91968a881fe46977fbb90539ccc01224204c053bc411cc",
+      "gzip": false,
+      "bytes_abgelegt": 80396,
+      "hinweis": "AUSZUG, nicht byteidentisch: alle 59 Kombinationen mit Text (1&1 4, congstar 20, o2 20, Vodafone 15; ohne die 4 nicht besuchten o2-Kombinationen) mit unveraenderten Werten der Felder auswahl, variante, status, grund, werte, werte_text, werte_antwort und text, dazu karte und adresse der Seite. Beleg fuer die Erfasst-Regel ohne Preiswert, Zahlen mit Leerraum (1&1 „44\\n,\\n99\\n€/Monat“) und das Tarifmuster der Klick-Karte o2 (tests/test_geraete_kartenprobe_texte.py)."
     }
   ]
 }
