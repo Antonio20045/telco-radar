@@ -1,0 +1,180 @@
+name: Klick-Tageslauf
+
+# WAS ER TUT (Datenkonzept Geraeteradar §8 "Betrieb")
+# ---------------------------------------------------
+# Je Anbieter mit Karte (config/klickkarten/<schluessel>.yaml) ein Job der
+# Matrix `klick`: scripts/klick_tageslauf.py klickt die Produktseiten aus
+# config/klick_tageslauf.yaml in Rotation durch (nie gelesene zuerst, dann
+# die aelteste; Lesestand data/state/klick/klick_stand.json) und laedt
+# klick/<schluessel>.json als Artefakt `klick-<schluessel>` hoch. Der Job
+# `ablegen` legt jedes Artefakt nach data/state/klick/<schluessel>.json,
+# fuehrt den Lesestand fort (scripts/klick_ablegen.py) und committet nur
+# diesen Ordner. Der Geraetelauf (geraete.yml, 02:17) liest den Ordner von
+# selbst: eine Datei von heute ersetzt die Adaptersaetze mit gleichem
+# Schluessel, eine von gestern oder vorgestern haelt nur die Ersetzung,
+# eine aeltere (FRISCHEGRENZE_TAGE = 3), gestoerte oder fehlende ersetzt
+# nichts.
+#
+# ZEIT (CLAUDE.md Regel 8): 00:20 UTC, damit alles vor 02:00 fertig ist.
+#   plan       timeout 10 min
+#   klick      timeout 75 min = --job-frist-sekunden 4500 = JOB_FRIST_S
+#              (klicktageslauf.py). Der Lauf rechnet ab JOB_START gegen die
+#              Restzeit, laesst RESERVE_S = 8 min fuer Schreiben und
+#              Hochladen, beginnt eine Seite nur mit >= 3 min Rest und gibt
+#              ihr hoechstens 25 min. Was nicht passt, heisst
+#              `nicht_besucht` und kommt am naechsten Tag zuerst.
+#   ablegen    timeout 10 min
+#   Summe hoechstens 95 min: 00:20 + 95 min = 01:55, vor 02:00.
+# GitHub startet geplante Laeufe oft Stunden spaeter (geraete.yml: 4 h 41
+# bis 5 h 40 gemessen). Dann kann dieser Lauf auf geraete.yml treffen; der
+# Tageslauf fragt darum vor JEDER Seite, ob geraete.yml, klick-erkundung.yml
+# oder radar.yml ansteht oder laeuft (klickparallel.TAGESLAUF_WORKFLOWS),
+# und laesst dann den Rest `nicht_besucht` (Grund "verschoben"). Eine
+# Seite, die schon laeuft, laeuft zu Ende: hoechstens 25 min Ueberlappung.
+# Kam der Klick-Lauf nach dem Geraetelauf, liest der naechste Geraetelauf
+# die Datei als "gestern" (nur Ersetzung, keine Werte mit falschem Datum).
+#
+# PARALLELLAUF: eigene concurrency-Gruppe `klick` ohne Abbruch (Regel 9).
+# Die Klick-Erkundung weicht diesem Lauf aus (klickparallel.WORKFLOWS).
+
+on:
+  schedule:
+    - cron: "20 0 * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: klick
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    outputs:
+      anbieter: ${{ steps.plan.outputs.anbieter }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version-file: .python-version
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # Jeder Anbieter mit Karte als JSON-Liste, ohne Netz.
+      - name: Anbieter mit Klick-Karte
+        id: plan
+        env:
+          PYTHONPATH: src
+        run: echo "anbieter=$(python scripts/klick_tageslauf.py --plan --root .)" >> "$GITHUB_OUTPUT"
+
+  klick:
+    needs: plan
+    if: needs.plan.outputs.anbieter != '[]'
+    runs-on: ubuntu-latest
+    # = --job-frist-sekunden 4500 unten = JOB_FRIST_S in klicktageslauf.py
+    timeout-minutes: 75
+    permissions:
+      contents: read
+      actions: read
+    strategy:
+      fail-fast: false
+      matrix:
+        anbieter: ${{ fromJSON(needs.plan.outputs.anbieter) }}
+    steps:
+      # Erster Schritt: ab hier zaehlt die Restzeit des Jobs.
+      - name: Jobstart merken
+        run: echo "JOB_START=$(date +%s)" >> "$GITHUB_ENV"
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version-file: .python-version
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          python -m playwright install --with-deps chromium
+
+      # Ein gestoerter Anbieter ist ein Ergebnis (Exit 0, Laufstatus in der
+      # Datei); rot wird der Schritt nur bei falscher Auswahl/Konfiguration.
+      - name: Klick-Tageslauf
+        env:
+          PYTHONPATH: src
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python scripts/klick_tageslauf.py --root . \
+            --anbieter "${{ matrix.anbieter }}" --ausgabe klick \
+            --job-start "$JOB_START" --job-frist-sekunden 4500
+
+      # Nur das JSON: keine Screenshots, kein Seitentext, keine Cookies,
+      # Adressen ohne Geheimnisse (klickergebnis). Fehlt die Datei, bleibt
+      # im Repo die alte liegen und verliert nach drei Tagen jede Wirkung.
+      - name: Ergebnis hochladen
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: klick-${{ matrix.anbieter }}
+          path: klick/${{ matrix.anbieter }}.json
+          retention-days: 7
+          if-no-files-found: warn
+
+  ablegen:
+    # Auch wenn ein Matrix-Job scheitert: die anderen Anbieter werden abgelegt.
+    needs: [plan, klick]
+    if: ${{ always() && needs.plan.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Wie in geraete.yml: ohne volle Historie bricht der Rebase unten ab.
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version-file: .python-version
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Klick-Ergebnisse holen
+        uses: actions/download-artifact@v4
+        with:
+          pattern: klick-*
+          path: klick-artefakte
+
+      # Exit 1, wenn eine Datei unlesbar ist; die lesbaren sind dann schon
+      # abgelegt und werden unten trotzdem committet.
+      - name: Ablegen
+        env:
+          PYTHONPATH: src
+        run: python scripts/klick_ablegen.py --root . --quelle klick-artefakte
+
+      - name: Commit state
+        if: ${{ !cancelled() }}
+        run: |
+          git config user.name "telco-radar-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/state/klick/*.json
+          python scripts/waechter_leck.py
+          if git diff --cached --quiet; then
+            echo "Keine Aenderung an den Klick-Ergebnissen."
+            exit 0
+          fi
+          git commit -m "klick: Stand $(date -u +%Y-%m-%d)"
+          BRANCH="${GITHUB_REF_NAME}"
+          for i in 1 2 3 4; do
+            git pull --rebase origin "$BRANCH" && git push origin "HEAD:$BRANCH" && exit 0
+            echo "Push fehlgeschlagen, Versuch $i"
+            sleep $((2 ** i))
+          done
+          exit 1
