@@ -30,9 +30,9 @@ from typing import Any
 from ...textwerkzeug import slug
 from .belegablage import ArchivFehler
 from .belegstempel import Stempel
-from .klickbeleg import BELEG_VERSION, Beleg, Belegdatei, Fundstelle, beleg_id, sha256
+from .klickbeleg import BELEGFELDER, Beleg, Belegdatei, Fundstelle, beleg_id, sha256
 from .klickhar import HarFehler, har_eintrag, zugangskoepfe
-from .klickkarte import DIMENSIONEN, WERTFELDER
+from .klickkarte import DIMENSIONEN
 
 MANIFEST_VERSION = 1
 ART_BELEG = "beleg"
@@ -211,9 +211,9 @@ def _json(nummer: int, zeile: bytes) -> dict[str, Any]:
         raise ManifestFehler(nummer, "kein JSON-Objekt")
     if daten.get("art") not in (ART_BELEG, ART_STEMPEL):
         raise ManifestFehler(nummer, f"unbekannte Art {daten.get('art')!r}")
-    if daten.get("version") != (
-        BELEG_VERSION if daten["art"] == ART_BELEG else MANIFEST_VERSION
-    ):
+    bekannt = BELEGFELDER if daten["art"] == ART_BELEG else (MANIFEST_VERSION,)
+    version = daten.get("version")
+    if not isinstance(version, int) or version not in bekannt:
         raise ManifestFehler(nummer, f"unbekannte Version {daten.get('version')!r}")
     return daten
 
@@ -240,7 +240,8 @@ def _beleg(nummer: int, daten: Mapping) -> Beleg:
         datetime.strptime(roh["zeitpunkt"], ZEITFORMAT).replace(tzinfo=UTC)
     except ValueError as fehler:
         raise ManifestFehler(nummer, "zeitpunkt ist keine UTC-Zeit") from fehler
-    if not isinstance(roh["werte"], dict) or set(roh["werte"]) != set(WERTFELDER):
+    felder = set(BELEGFELDER[roh["version"]])
+    if not isinstance(roh["werte"], dict) or set(roh["werte"]) != felder:
         raise ManifestFehler(nummer, "werte nennt nicht genau die Wertfelder")
     if not isinstance(roh["variante"], dict) or set(roh["variante"]) != set(
         DIMENSIONEN

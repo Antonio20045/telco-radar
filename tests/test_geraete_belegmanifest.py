@@ -101,7 +101,7 @@ def test_archiv_legt_dateien_ab_und_schreibt_eine_zeile_je_beleg(tmp_path):
     assert pruefe_manifest(pfad, ablage.lies) == []
     zeilen = [json.loads(z) for z in pfad.read_text("utf-8").splitlines()]
     assert [z["art"] for z in zeilen] == ["beleg", "beleg", "stempel"]
-    assert all(z["version"] == 1 for z in zeilen)
+    assert [z["version"] for z in zeilen] == [2, 2, 1]
     assert len(digests) == 1
 
 
@@ -195,6 +195,45 @@ def test_unvollstaendige_zeile_schlaegt_an(tmp_path, aendere, befund):
     befunde = pruefe_manifest(pfad, ablage.lies)
 
     assert any(befund in b for b in befunde), befunde
+
+
+def _als_version_1(daten: dict) -> None:
+    daten.update(version=1)
+    for feld in ("buendelbetrag", "einmalzahlung"):
+        del daten["werte"][feld]
+
+
+def test_beleg_version_1_ohne_buendelwerte_bleibt_lesbar(tmp_path):
+    _, ablage, pfad, _ = _archiv(tmp_path, paket())
+    zeilen = pfad.read_text("utf-8").splitlines(keepends=True)
+    daten = json.loads(zeilen[0])
+    assert (daten["version"], daten["werte"]["buendelbetrag"]) == (2, None)
+    _als_version_1(daten)
+    zeilen[0] = json.dumps(daten, ensure_ascii=False) + "\n"
+    pfad.write_text("".join(zeilen), "utf-8")
+
+    alt = lies_manifest(pfad).belege[0]
+
+    assert alt.version == 1
+    assert "buendelbetrag" not in alt.werte
+    assert pruefe_manifest(pfad, ablage.lies) == ["Zeile 2: Stempel-Digest passt nicht"]
+
+
+@pytest.mark.parametrize(
+    "aendere",
+    [
+        lambda d: d["werte"].pop("einmalzahlung"),
+        lambda d: (_als_version_1(d), d["werte"].update(buendelbetrag=None)),
+    ],
+)
+def test_buendelfelder_muessen_zur_version_passen(tmp_path, aendere):
+    _, ablage, pfad, _ = _archiv(tmp_path, paket())
+    daten = json.loads(pfad.read_text("utf-8").splitlines()[0])
+    aendere(daten)
+    pfad.write_text(json.dumps(daten, ensure_ascii=False) + "\n", "utf-8")
+
+    with pytest.raises(ManifestFehler, match="werte nennt nicht genau die Wertfelder"):
+        lies_manifest(pfad)
 
 
 def test_zeile_vor_dem_stempel_geaendert_bricht_den_digest(tmp_path):

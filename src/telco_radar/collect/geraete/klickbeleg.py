@@ -9,10 +9,11 @@ im sichtbaren Text Selektor und Ausschnitt (``klicktext.fundstellen``, bei einem
 Textmuster der Karte dessen Fundort), in der Antwort der JSON-Pfad der Klick-Karte
 (bei mehreren Quellen mit Stelle und Ort davor, ``klickquellen``). Die ``beleg_id``
 ist SHA-256 über beide Dateien, nie aus Titeltext. Fehlt Screenshot, Antwort oder
-eine Fundstelle oder trägt die Kombination Bündelwerte (``ein_vertrag``, das Schema
-kennt sie nicht), gibt es keinen Beleg, sondern einen Grund; ein Wert ohne Beleg ist
+eine Fundstelle, gibt es keinen Beleg, sondern einen Grund; ein Wert ohne Beleg ist
 nicht gültig (``klicklauf.mit_beleg``). ``Beleg`` ist zugleich das Schema einer
-Manifestzeile (``belegmanifest``). Dieses Modul ruft kein Netz.
+Manifestzeile (``belegmanifest``); ``BELEGFELDER`` nennt je Version die Felder von
+``werte``: Version 2 trägt die Bündelwerte (``ein_vertrag``), Version 1 bleibt lesbar.
+Dieses Modul ruft kein Netz.
 """
 
 from __future__ import annotations
@@ -32,7 +33,7 @@ from playwright.sync_api import Error as PlaywrightFehler
 from ...tarif_model import Preisphase
 from .klickecho import Variante
 from .klickhar import Antwortkopie, har_aus
-from .klickkarte import WERTFELDER, Klickkarte, Phasenpfad, Wertpfad
+from .klickkarte import BUENDELFELDER, WERTFELDER, Klickkarte, Phasenpfad, Wertpfad
 from .klicktext import Buendelwerte, Preiswerte, fundstellen
 
 if TYPE_CHECKING:
@@ -40,7 +41,11 @@ if TYPE_CHECKING:
 
 log = logging.getLogger(__name__)
 
-BELEG_VERSION = 1
+BELEG_VERSION = 2
+BELEGFELDER: dict[int, tuple[str, ...]] = {
+    1: WERTFELDER,
+    2: (*WERTFELDER, *BUENDELFELDER),
+}
 WEBP = "image/webp"
 PNG = "image/png"
 HAR = "application/json"
@@ -49,9 +54,6 @@ UNBEGRENZT = "unbegrenzt"
 GRUND_OHNE_BILD = "Beleg fehlt: kein Screenshot des Preisbereichs"
 GRUND_OHNE_ANTWORT = "Beleg fehlt: keine Preisantwort mitgeschnitten"
 GRUND_OHNE_WERTE = "Beleg fehlt: keine gelesenen Werte"
-GRUND_BUENDEL = (
-    f"Beleg fehlt: Bündelwerte passen nicht in Beleg Version {BELEG_VERSION}"
-)
 
 
 @dataclass(frozen=True)
@@ -78,8 +80,8 @@ class Belegdatei:
 class Beleg:
     """Eine Manifestzeile: ein Klick mit Zeitpunkt, Adresse, Werten und Dateien.
 
-    ``werte`` hält jedes Wertfeld, ``None`` ist eine benannte Lücke; ``zeitpunkt`` ist
-    UTC im Format ``JJJJ-MM-TTTHH:MM:SSZ``.
+    ``werte`` hält jedes Feld seiner Version (``BELEGFELDER``), ``None`` ist eine
+    benannte Lücke; ``zeitpunkt`` ist UTC im Format ``JJJJ-MM-TTTHH:MM:SSZ``.
     """
 
     beleg_id: str
@@ -135,14 +137,13 @@ def baue_beleg(
         return None, GRUND_OHNE_BILD
     if quelle.antwort is None:
         return None, GRUND_OHNE_ANTWORT
-    if quelle.buendel is not None and quelle.buendel != Buendelwerte():
-        return None, GRUND_BUENDEL
     stellen, grund = belegstellen(
         quelle.werte,
         quelle.text or "",
         karte,
         json_pfade=quelle.json_pfade,
         fundorte=quelle.fundorte,
+        buendel=quelle.buendel,
     )
     if grund is not None:
         return None, grund
@@ -164,7 +165,7 @@ def baue_beleg(
             "laufzeit": quelle.variante.laufzeit,
         },
         status=quelle.status,
-        werte=werte_als_json(quelle.werte),
+        werte=belegwerte(quelle.werte, quelle.buendel),
         fundstellen=stellen,
         bild=Belegdatei(f"{kennung}.{ENDUNG[typ]}", typ, sha256(bild), len(bild)),
         mitschnitt=Belegdatei(f"{kennung}.{ENDUNG[HAR]}", HAR, sha256(har), len(har)),
@@ -179,13 +180,14 @@ def belegstellen(
     *,
     json_pfade: Mapping[str, str] | None = None,
     fundorte: Mapping[str, tuple[str, str]] | None = None,
+    buendel: Buendelwerte | None = None,
 ) -> tuple[tuple[Fundstelle, ...], str | None]:
-    """Je gelesenem Wert die Fundstellen; fehlt eine, der Grund.
+    """Je gelesenem Wert, auch Bündelwert, die Fundstellen; fehlt eine, der Grund.
 
     ``fundorte`` nennt je Feld Selektor und Ausschnitt aus einem Textmuster,
     ``json_pfade`` je Feld den Pfad; ohne sie gelten Text und Pfade der Karte.
     """
-    gelesen = [f for f in WERTFELDER if getattr(werte, f) is not None]
+    gelesen = [f for f, w in belegwerte(werte, buendel).items() if w is not None]
     if not gelesen:
         return (), GRUND_OHNE_WERTE
     ausschnitte = {f: (karte.zusammenfassung, a) for f, a in fundstellen(text).items()}
@@ -237,6 +239,14 @@ def pfadtext(pfad: str | Wertpfad | Phasenpfad) -> str:
     if isinstance(pfad, Wertpfad):
         return pfad.pfad
     return pfad
+
+
+def belegwerte(werte: Preiswerte, buendel: Buendelwerte | None) -> dict[str, Any]:
+    """``werte`` eines Belegs der aktuellen Version: Wertfelder, dann Bündelwerte."""
+    daten = werte_als_json(werte)
+    for feld in BUENDELFELDER:
+        daten[feld] = None if buendel is None else getattr(buendel, feld)
+    return daten
 
 
 def werte_als_json(werte: Preiswerte) -> dict[str, Any]:

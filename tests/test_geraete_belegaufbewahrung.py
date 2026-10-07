@@ -5,8 +5,10 @@ Stichtag und Zeitpunkte sind fest; kein Test hängt vom heutigen Datum ab.
 
 from __future__ import annotations
 
+from dataclasses import replace
 from datetime import date
 
+import pytest
 from belegbau import beleg
 
 from telco_radar.collect.geraete.belegablage import LokaleAblage
@@ -92,6 +94,22 @@ def test_doppelter_beleg_zaehlt_einmal():
     entscheidungen = aufbewahrung([*belege, belege[0]], STICHTAG)
 
     assert len(entscheidungen) == len(FOLGE)
+
+
+@pytest.mark.parametrize(
+    ("buendel", "grund"),
+    [(None, LOESCHEN), (49.99, WERTAENDERUNG)],
+)
+def test_belegversion_2_mit_leeren_buendelwerten_ist_keine_wertaenderung(
+    buendel, grund
+):
+    alt = replace(beleg("2026-05-01T05:00:00Z", X, "v1"), version=1)
+    werte = {**X, "buendelbetrag": buendel, "einmalzahlung": None}
+    neu = beleg("2026-05-02T05:00:00Z", werte, "v2")
+
+    entscheidungen = {e.beleg_id: e.grund for e in aufbewahrung([alt, neu], STICHTAG)}
+
+    assert entscheidungen == {"v1": ERSTER, "v2": grund}
 
 
 def test_aufraeumen_loescht_nur_dateien_ohne_aufbewahrung(tmp_path):

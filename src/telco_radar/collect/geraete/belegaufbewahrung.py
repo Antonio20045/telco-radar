@@ -5,7 +5,9 @@ Das Manifest bleibt dauerhaft. Über Screenshot und Mitschnitt eines Belegs ents
 vorigen derselben Reihe ändern, bleibt dauerhaft; jeder jüngere als ``TAEGLICH_TAGE``
 Tage bleibt (täglich); danach bleibt je Reihe und ISO-Kalenderwoche einer, der früheste
 noch nicht gedeckten Woche (Wochenbeleg); jeder andere wird gelöscht. Eine Reihe ist
-Anbieter, Produktseite und Variante. Der Stichtag kommt vom Aufrufer, nie von der Uhr.
+Anbieter, Produktseite und Variante. Werte vergleicht sie ohne Lücken, so ändert der
+Wechsel der Belegversion (``klickbeleg.BELEGFELDER``) nichts. Der Stichtag kommt vom
+Aufrufer, nie von der Uhr.
 Dieses Modul ruft kein Netz.
 """
 
@@ -76,10 +78,15 @@ def _grund(
 ) -> str:
     if vorher is None:
         return ERSTER
-    if beleg.werte != vorher.werte:
+    if _gelesen(beleg) != _gelesen(vorher):
         return WERTAENDERUNG
     if (stichtag - tag).days < TAEGLICH_TAGE:
         return TAEGLICH
     if not gedeckt:
         return WOCHENBELEG
     return LOESCHEN
+
+
+def _gelesen(beleg: Beleg) -> dict[str, object]:
+    """Die gelesenen Werte; ein Feld erst einer späteren Version gilt als gleich."""
+    return {f: w for f, w in beleg.werte.items() if w is not None}

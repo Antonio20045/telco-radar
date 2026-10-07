@@ -108,8 +108,7 @@ Stufe 3 von Format 2:
 - ``vertragsform: ein_vertrag`` (1&1, freenet; Standard ``tarif_plus_ratenkauf``):
   die Wertfelder ``buendelbetrag`` und ``einmalzahlung`` in ``antwort.pfade`` und
   ``zusammenfassung.muster``; ``rate`` und ``ratenzahl`` entfallen planmäßig, sind
-  keine Lücke und dort verboten. Beleg Version 1 kennt keine Bündelwerte: die Werte
-  bleiben sichtbar, ohne Beleg aber ein Befund mit Grund (``klickbeleg``).
+  keine Lücke und dort verboten. Der Beleg trägt sie ab Version 2 (``klickbeleg``).
 
 Selektoren der Klickziele sind Playwright-Selektoren (``:text-matches`` und
 ``:has-text`` gehen); ``passt``, ``bis`` und ``wert_in`` sind reines CSS.

@@ -4,8 +4,8 @@ BEISPIEL-Seite nach der Erkundung vom 07.10.2026 (1&1, freenet): Gerät und Tari
 ein Vertrag; die Seite nennt „44 , 99 €/Monat“ in getrennten Elementen und die
 Einmalzahlung in einem eigenen Block, die Werte stehen in Cent in einer globalen
 Variable. Rate und Ratenzahl gibt es nicht; sie entfallen planmäßig und sind keine
-Lücke. Beleg Version 1 kennt keine Bündelwerte: der Beleg fehlt mit Grund, die Werte
-bleiben sichtbar. Keine Anfrage verlässt den Rechner.
+Lücke. Der Beleg (Version 2) trägt die Bündelwerte mit Fundstellen. Keine Anfrage
+verlässt den Rechner.
 """
 
 from __future__ import annotations
@@ -80,8 +80,8 @@ def _laufe(chromium, text_einmal: str = "null"):
     return nach_auswahl(lauf), lauf
 
 
-def test_buendelwerte_bestaetigt_rate_entfaellt_beleg_fehlt_mit_grund(chromium):
-    from telco_radar.collect.geraete.klickbeleg import GRUND_BUENDEL
+def test_buendelwerte_bestaetigt_rate_entfaellt_beleg_traegt_sie(chromium):
+    from telco_radar.collect.geraete.klickbeleg import BELEG_VERSION
     from telco_radar.collect.geraete.klicktext import Buendelwerte
 
     ergebnisse, lauf = _laufe(chromium)
@@ -91,11 +91,18 @@ def test_buendelwerte_bestaetigt_rate_entfaellt_beleg_fehlt_mit_grund(chromium):
     teuer = ergebnisse[("256", "All-Net-Flat S", 24)]
     assert teuer.buendel == Buendelwerte(buendelbetrag=51.99, einmalzahlung=29.99)
     for ergebnis in ergebnisse.values():
-        assert [(b.feld, b.grund) for b in ergebnis.befunde] == [
-            ("beleg", GRUND_BUENDEL)
-        ]
+        assert ergebnis.befunde == ()
         assert not {"rate", "ratenzahl"} & set(ergebnis.luecken)
-        assert ergebnis.beleg_status == "fehlt"
+        assert ergebnis.beleg_status == "offen"
+        assert ergebnis.beleg is not None
+        assert ergebnis.beleg.beleg.version == BELEG_VERSION == 2
+    beleg = teuer.beleg.beleg
+    assert (beleg.werte["buendelbetrag"], beleg.werte["einmalzahlung"]) == (
+        51.99,
+        29.99,
+    )
+    assert beleg.werte["rate"] is None
+    assert {s.feld for s in beleg.fundstellen} == {"buendelbetrag", "einmalzahlung"}
     assert lauf.struktur.anteil_felder == pytest.approx(2 / 7)
 
 
