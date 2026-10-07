@@ -1,0 +1,190 @@
+# =============================================================================
+# TELCO RADAR - Klick-Erkundung (Datenkonzept Geräteradar, Schritt 5a)
+# =============================================================================
+# Holt je Anbieter das Material für die Klick-Karte (scripts/klick_erkunden.py):
+# gerenderte Seite, Bedienelemente, Preis-Kandidaten, Mitschnitt, Klick-Proben,
+# Screenshot. Nur von Hand gestartet; kein Secret, kein LLM, kein Render-Hook.
+#
+# Ablauf: "plan" prüft die Auswahl gegen config/klick_erkundung.yaml, je
+# Anbieter läuft ein eigener Job (andere Hosts, also kein gemeinsamer
+# Crawl-delay), "ablegen" legt alle Ergebnisse in EINEM Commit auf den Zweig
+# klick-erkundung. Der Zweig entsteht beim ersten Lauf ohne Vorgeschichte
+# (orphan) und wird danach fortgeschrieben, nie überschrieben. main, data/ und
+# site/ fasst dieser Workflow nicht an.
+#
+# Parallel: vor jeder Seite fragt das Skript über die GitHub-API (github.token,
+# actions: read), ob geraete.yml oder radar.yml ansteht oder läuft; dann, und
+# wenn die API nicht antwortet, ist der Anbieter "verschoben", ohne Anfrage.
+#
+# Öffentlich: auf den Zweig kommen nur index.json, Bedienelemente, Preise,
+# Klicks und Mitschnitt (scripts/erkundung_ablegen.py einsortieren), nach dem
+# Leckscan (pruefe). Screenshot und Seite bleiben im Artefakt (7 Tage).
+#
+# Zeit: JOB_MINUTEN ist dieselbe Zahl wie timeout-minutes des Erkundungsjobs.
+# Die Frist des Skripts ist die Restzeit des Jobs ab seinem ersten Schritt
+# minus RESERVE_SEKUNDEN für Hochladen und Schließen; jeder Anbieter hat
+# darin höchstens ZEIT_JE_ANBIETER_S (klickerkundung.py). Der Stufe-0-Vertrag
+# scripts/waechter_erkundung.py hält beides zusammen.
+
+name: Klick-Erkundung
+
+on:
+  workflow_dispatch:
+    inputs:
+      anbieter:
+        description: "alle oder Schlüssel mit Komma (o2,vodafone,1und1,telekom,congstar,freenet)"
+        required: false
+        default: "alle"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: klick-erkundung
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    outputs:
+      anbieter: ${{ steps.plan.outputs.anbieter }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version-file: .python-version
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Auswahl prüfen
+        id: plan
+        env:
+          PYTHONPATH: src
+          AUSWAHL: ${{ inputs.anbieter }}
+        run: |
+          liste=$(python scripts/klick_erkunden.py --plan --anbieter "$AUSWAHL")
+          echo "Erkundet werden: $liste"
+          echo "anbieter=$liste" >> "$GITHUB_OUTPUT"
+
+  erkunde:
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    permissions:
+      contents: read
+      actions: read
+    strategy:
+      fail-fast: false
+      matrix:
+        anbieter: ${{ fromJSON(needs.plan.outputs.anbieter) }}
+    steps:
+      - name: Jobbeginn merken
+        run: echo "JOB_START=$(date +%s)" >> "$GITHUB_ENV"
+
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version-file: .python-version
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Install Playwright Chromium
+        run: python -m playwright install --with-deps chromium
+
+      - name: Erkunden
+        env:
+          PYTHONPATH: src
+          ANBIETER: ${{ matrix.anbieter }}
+          GITHUB_TOKEN: ${{ github.token }}
+          JOB_MINUTEN: 75
+          RESERVE_SEKUNDEN: 600
+        run: |
+          set -o pipefail
+          frist=$(( JOB_START + JOB_MINUTEN * 60 - RESERVE_SEKUNDEN - $(date +%s) ))
+          echo "Frist für $ANBIETER: $frist s"
+          python scripts/klick_erkunden.py --anbieter "$ANBIETER" \
+            --ausgabe erkundung --frist-sekunden "$frist" \
+            | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Ergebnis hochladen
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: erkundung-${{ matrix.anbieter }}
+          path: erkundung/
+          if-no-files-found: error
+          retention-days: 7
+
+  ablegen:
+    needs: [plan, erkunde]
+    if: ${{ !cancelled() && needs.plan.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version-file: .python-version
+
+      - name: Zweig klick-erkundung bereitstellen
+        run: |
+          if git ls-remote --exit-code --heads origin klick-erkundung; then
+            git fetch --no-tags origin klick-erkundung
+            git worktree add -B klick-erkundung ablage FETCH_HEAD
+          else
+            echo "Zweig klick-erkundung fehlt - er entsteht ohne Vorgeschichte."
+            git worktree add --orphan -b klick-erkundung ablage
+          fi
+          mkdir -p ablage/scripts
+          cp scripts/waechter_leck.py scripts/waechter_speicher.py \
+            scripts/erkundung_ablegen.py ablage/scripts/
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: erkundung-*
+          path: neu
+
+      - name: Ergebnisse einsortieren
+        run: python scripts/erkundung_ablegen.py einsortieren neu ablage/erkundung
+
+      - name: Erkundung ablegen
+        working-directory: ablage
+        run: |
+          git config user.name "telco-radar-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add erkundung
+          python scripts/waechter_leck.py
+          python scripts/erkundung_ablegen.py pruefe erkundung
+          fremd=$(git diff --cached --name-only -- . ':(exclude)erkundung')
+          if [ -n "$fremd" ]; then
+            echo "::error::Vorgemerkt außerhalb von erkundung/: $fremd"
+            exit 1
+          fi
+          if git diff --cached --quiet; then
+            echo "Keine Änderung an erkundung/."
+            exit 0
+          fi
+          abgelegt=$(git diff --cached --name-only -- erkundung \
+            | cut -d/ -f2 | sort -u | paste -sd, -)
+          git commit -m "klick-erkundung: $(date -u +%Y-%m-%d) $abgelegt"
+          for versuch in 1 2 3; do
+            if git push origin "HEAD:refs/heads/klick-erkundung"; then
+              exit 0
+            fi
+            echo "Push abgelehnt, Versuch $versuch"
+            sleep $(( 2 ** versuch ))
+            git pull --rebase origin klick-erkundung || exit 1
+          done
+          exit 1
