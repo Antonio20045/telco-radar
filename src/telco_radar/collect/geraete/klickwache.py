@@ -68,10 +68,9 @@ class Wache:
     def __init__(
         self, seite: Page, karte: Klickkarte, tor: Tor, lauf: Klicklauf, frist_ms: int
     ) -> None:
-        self.seite, self.tor, self.lauf = seite, tor, lauf
-        quellen = karte.lesequellen
+        self.seite, self.tor, self.lauf, self.karte = seite, tor, lauf, karte
         self.passt: Callable[[str], bool] = lambda url: any(
-            q.passt(url) for q in quellen
+            q.passt(url) for q in self.karte.lesequellen
         )
         self.frist_ms = frist_ms
         self.seit = 0
@@ -92,8 +91,12 @@ class Wache:
             raise Abbruch(LAUF_GESTOERT, grund)
 
     def lade(self, ziel: str) -> None:
-        """Öffnet ``ziel``; die Frist bis zur Antwort trägt den Crawl-delay mit."""
+        """Öffnet ``ziel``; die Frist bis zur Antwort trägt den Crawl-delay mit.
+
+        Antwort und Ausstehendes der vorigen Seite gelten danach nicht mehr.
+        """
         self.tor.umleitung = None
+        self.antwort, self.ausstehend = None, None
         _, verworfen, gescheitert = self.marke()
         frist = SEITEN_FRIST_MS + round(1000 * self.tor.schleuse.abstand(ziel))
         try:
@@ -189,9 +192,10 @@ class Wache:
     def _beobachte(self, antwort: Response) -> None:
         """Setzt die Störung, wenn eine Antwort der eigenen Website Bot-Schutz zeigt.
 
-        Preisantworten prüft ``_pruefe`` vollständig, die Hauptseite das Tor.
+        Auch jede Preisantwort, sobald sie ankommt, ob je Klick oder beim Laden;
+        ``_pruefe`` prüft die genommene zusätzlich am Körper, die Hauptseite das Tor.
         """
-        if self.passt(antwort.url) or self.tor.stoerung is not None:
+        if self.tor.stoerung is not None:
             return
         art = antwort.request.resource_type
         url = ohne_geheimnisse(antwort.url)

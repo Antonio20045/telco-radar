@@ -73,7 +73,7 @@ from .klicklauf import (
     pruefe_struktur,
 )
 from .klicklesung import Leser
-from .klickoptionen import Auswahl, Option, angebotene_werte, naechste, vereinige
+from .klickoptionen import Auswahl, Option, naechste, vereinige
 from .klicktor import (
     GRUND_ZU_VIELE,
     HOECHSTE_UMLEITUNGEN,
@@ -226,7 +226,7 @@ class _Gang:
 
     def _nimm_karte(self, karte: Klickkarte) -> None:
         self.karte = self.leser.karte = self.leser.quellen.karte = karte
-        self.bedienung.karte = karte
+        self.bedienung.karte = self.wache.karte = karte
 
     def _klicke_alle(self, besucht: set[Auswahl]) -> None:
         werte = {d: self._angebotene_werte(d) for d in DIMENSIONEN}
@@ -294,12 +294,7 @@ class _Gang:
         self.unberuehrt = not self.bedienung.bereite_vor()
 
     def _angebotene_werte(self, dimension: str) -> list[str | None]:
-        fest = self.karte.knoepfe[dimension].fest
-        if fest is not None:
-            return [fest]
-        optionen = self.leser.optionen(dimension)
-        self.lauf.struktur.knopf(bool(optionen))
-        return angebotene_werte(optionen)
+        return self.leser.angebotene(dimension, self.lauf.struktur)
 
     def _kombination(self, auswahl: Auswahl, nummer: int) -> Kombiergebnis:
         ziel = dict(zip(DIMENSIONEN, auswahl, strict=True))
@@ -311,6 +306,9 @@ class _Gang:
         if fehlend:
             self.lauf.struktur.knopf(False)
             return Kombiergebnis(variante, NICHT_ERFASST, self._fehlen(fehlend[0]))
+        unlesbar = self.leser.unlesbar_in(ziel)
+        if unlesbar is not None:
+            return Kombiergebnis(variante, NICHT_ERFASST, unlesbar)
         if variante.laufzeit is None:
             grund = f"Laufzeit „{ziel[LAUFZEIT]}“ nicht lesbar"
             return Kombiergebnis(variante, NICHT_ERFASST, grund)

@@ -13,8 +13,9 @@ Dimension müssen alle Quellen dieselbe Variante nennen, sonst ist sie mehrdeuti
 Für den Beleg nimmt der Leser die eine Antwort, aus der alle Werte stammen; kommen sie
 aus mehreren Quellen oder aus der Seite, ist der Mitschnitt eine Lesung: JSON der
 beitragenden Quellen nach Stelle und Ort, Methode ``LESUNG``, Adresse der Seite mit
-``#lesung``. Die Wiedergabe (``route_from_har``) trifft sie nie. ``seitenwerte`` liest
-die benannten Werte der Seite. Dieses Modul ruft kein Netz außer über die Seite.
+``#lesung``, die Cookie- und Zugangswerte aller beitragenden Antworten geschwärzt. Die
+Wiedergabe (``route_from_har``) trifft sie nie. ``seitenwerte`` liest die benannten
+Werte der Seite. Dieses Modul ruft kein Netz außer über die Seite.
 """
 
 from __future__ import annotations
@@ -35,7 +36,7 @@ from .klickecho import (
     gleiche_option,
     lies_antwort,
 )
-from .klickhar import Antwortkopie
+from .klickhar import Antwortkopie, schwaerze
 from .klickkarte import (
     BUENDELFELDER,
     DIMENSIONEN,
@@ -217,6 +218,11 @@ class Quellenleser:
         koerper: dict[str, Any] = {
             _kennung(n.stelle, quellen[n.stelle]): n.daten for n in beitrag
         }
+        kopien = [kopie_aus(n.antwort) for n in beitrag if n.antwort is not None]
+        koepfe = [
+            k for c in kopien if c is not None for k in (c.anfragekopf, c.antwortkopf)
+        ]
+        roh = json.dumps(koerper, ensure_ascii=False, default=str).encode("utf-8")
         return Antwortkopie(
             methode=LESUNG,
             url=f"{self.seite.url.split('#')[0]}#lesung",
@@ -224,9 +230,7 @@ class Quellenleser:
             status=200,
             statustext="OK",
             antwortkopf={"content-type": "application/json"},
-            koerper=json.dumps(koerper, ensure_ascii=False, default=str).encode(
-                "utf-8"
-            ),
+            koerper=schwaerze(roh, *koepfe),
         )
 
     def _json_pfade(self, herkunft: Mapping[str, Nutzlast | None]) -> dict[str, str]:

@@ -72,7 +72,8 @@ def test_adressen_einer_dimension_mit_standardattribut():
     assert karte.adressdimension == "tarif"
     fest = karte.mit_fest("tarif", "MF_1")
     assert fest.knoepfe["tarif"].fest == "MF_1"
-    assert fest.adressdimension is None
+    assert fest.adressdimension == "tarif"
+    assert fest.knoepfe["tarif"].adressen == knopf.adressen
     assert (
         _lade(knoepfe=BASIS["knoepfe"] | {"tarif": {"fest": "M"}}).adressdimension
         is None

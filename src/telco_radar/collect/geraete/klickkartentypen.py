@@ -307,8 +307,13 @@ class Klickkarte:
         return next((d for d, k in self.knoepfe.items() if k.adressen), None)
 
     def mit_fest(self, dimension: str, wert: str) -> Klickkarte:
-        """Dieselbe Karte, in der ``dimension`` den festen Wert ``wert`` hat."""
-        knoepfe = {**self.knoepfe, dimension: Knopf(selektor=None, fest=wert)}
+        """Dieselbe Karte, in der ``dimension`` den festen Wert ``wert`` hat; eine
+        Adressdimension bleibt eine (``adressen``), damit die Lesung ihr Echo prüft."""
+        adressen = self.knoepfe[dimension].adressen
+        knoepfe = {
+            **self.knoepfe,
+            dimension: Knopf(selektor=None, fest=wert, adressen=adressen),
+        }
         return replace(self, knoepfe=knoepfe)
 
     def marke(self, dimension: str) -> Auswahlmarke | None:

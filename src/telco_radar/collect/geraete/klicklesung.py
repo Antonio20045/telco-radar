@@ -10,7 +10,12 @@ als „Seite zeigt“ und das Echo (``klickecho``) und macht einen Screenshot de
 Preisbereichs. Was der Beleg braucht (Mitschnitt, JSON-Pfade, Fundorte der
 Textmuster), legt er in ``belegteile``. Fehlt die Zusammenfassung, heißt die
 Kombination ``nicht_erfasst``; widerspricht sich etwas, ``befund``. Eine feste
-Dimension hat keine Markierung. Gefundene Wertfelder zählt der Strukturwächter.
+Dimension hat keine Markierung. Eine Option als Adresse (``adressen``) braucht ein Echo,
+das nicht aus der eigenen Adresse stammt: einen Seitenwert mit Selektor oder einen
+Variantenwert der Antwort ohne Platzhalter ihrer Dimension; sonst ist sie ein Befund.
+Gefundene Wertfelder zählt der Strukturwächter, ebenso jede angezeigte Option, auf die
+das Muster der Karte nicht passt (``unlesbar``); deren Kombination heißt
+``nicht_erfasst``.
 """
 
 from __future__ import annotations
@@ -25,7 +30,13 @@ from playwright.sync_api import Error as PlaywrightFehler
 from .klickbeleg import Belegquelle, baue_beleg
 from .klickecho import KEINE_AUSWAHL, Befund, Echo, Variante, pruefe_echo, variante_aus
 from .klickhar import Antwortkopie
-from .klickkarte import BUENDELFELDER, DIMENSIONEN, PLATZHALTER_MODELL, Klickkarte
+from .klickkarte import (
+    BUENDELFELDER,
+    DIMENSIONEN,
+    PLATZHALTER_MODELL,
+    Klickkarte,
+    Wertpfad,
+)
 from .klicklauf import (
     BEFUND,
     ERFASST,
@@ -35,7 +46,7 @@ from .klicklauf import (
     Strukturbilanz,
     mit_beleg,
 )
-from .klickoptionen import Option, lies_optionen
+from .klickoptionen import Option, angebotene_werte, lies_optionen
 from .klickquellen import Quellenleser
 from .klicktext import Preiswerte
 from .klicktextleser import Textleser
@@ -44,6 +55,7 @@ from .klicktor import kurz
 if TYPE_CHECKING:
     from playwright.sync_api import Locator, Page
 
+    from .klickantwort import Antwortlesung
     from .klickwache import Wache
 
 _ZWEI_BILDER_JS = (
@@ -75,10 +87,32 @@ class Leser(Textleser):
         self.wache, self.modell = wache, modell
         self.quellen = Quellenleser(seite, karte, wache.mitschnitt)
         self.belegteile = Belegteile()
+        self.unlesbar: dict[str, set[str]] = {d: set() for d in DIMENSIONEN}
 
     def optionen(self, dimension: str) -> list[Option]:
         """Die Knöpfe einer Dimension im aktuellen Zustand der Seite."""
         return lies_optionen(self.seite, self.karte, dimension)
+
+    def angebotene(self, dimension: str, struktur: Strukturbilanz) -> list[str | None]:
+        """Die angebotenen Werte; eine unlesbare Option zählt als fehlender Knopf."""
+        fest = self.karte.knoepfe[dimension].fest
+        if fest is not None:
+            return [fest]
+        optionen = self.optionen(dimension)
+        struktur.knopf(bool(optionen))
+        for option in optionen:
+            if option.unlesbar is not None:
+                struktur.knopf(False)
+                self.unlesbar[dimension].add(option.unlesbar)
+        return angebotene_werte(optionen)
+
+    def unlesbar_in(self, ziel: Mapping[str, str | None]) -> str | None:
+        """Der Grund, wenn ``ziel`` eine Option ohne lesbaren Wert enthält."""
+        for dimension in DIMENSIONEN:
+            wert = ziel[dimension]
+            if wert is not None and wert in self.unlesbar[dimension]:
+                return f"Option „{wert}“ für {dimension} passt nicht auf das Muster"
+        return None
 
     def lies(
         self,
@@ -128,7 +162,9 @@ class Leser(Textleser):
             return Kombiergebnis(
                 variante, BEFUND, grund, befunde=befunde, textwerte=im_text
             )
-        abweichung = self._abweichung(ziel)
+        abweichung = self._abweichung(ziel) + self._ohne_echo(
+            ziel, seitenwerte, zweite.lesung
+        )
         angezeigt = self._angezeigt(variante, seitenwerte)
         echo = (
             Echo(Preiswerte(), abweichung, ())
@@ -213,6 +249,39 @@ class Leser(Textleser):
                 befunde.append(Befund(f"variante.{dimension}", grund))
         return tuple(befunde)
 
+    def _ohne_echo(
+        self,
+        ziel: Mapping[str, str | None],
+        seitenwerte: Mapping[str, str | None],
+        lesung: Antwortlesung | None,
+    ) -> tuple[Befund, ...]:
+        """Ein Befund, wenn nur die eigene Adresse die Option der Adressdimension nennt.
+
+        Die Adresse der Seite (Seitenwert ohne Selektor) und ein Antwortpfad mit dem
+        Platzhalter der Dimension sind kein Echo.
+        """
+        dimension = self.karte.adressdimension
+        if dimension is None:
+            return ()
+        seitenwert = self.karte.seite.get(dimension)
+        auf_seite = (
+            seitenwert is not None
+            and seitenwert.selektor is not None
+            and seitenwerte.get(dimension) is not None
+        )
+        platzhalter = f"{{{dimension}}}"
+        quellen = self.karte.lesequellen
+        pfade = [q.variante[dimension] for q in quellen if dimension in q.variante]
+        in_antwort = (
+            lesung is not None
+            and dimension in lesung.variante
+            and not any(platzhalter in _pfad(p) for p in pfade)
+        )
+        if auf_seite or in_antwort:
+            return ()
+        grund = f"Nur die Adresse nennt {dimension} {ziel[dimension]}, die Seite nicht"
+        return (Befund(f"variante.{dimension}", grund),)
+
     def _gewaehlt(self, dimension: str) -> str | None:
         gewaehlt = [o.wert for o in self.optionen(dimension) if o.gewaehlt]
         return gewaehlt[0] if len(gewaehlt) == 1 else None
@@ -222,3 +291,7 @@ class Leser(Textleser):
             return bereich.screenshot(type="png", timeout=self.frist_ms), ()
         except PlaywrightFehler as fehler:
             return None, (Befund("screenshot", f"Screenshot fehlt: {kurz(fehler)}"),)
+
+
+def _pfad(pfad: str | Wertpfad) -> str:
+    return pfad if isinstance(pfad, str) else pfad.pfad

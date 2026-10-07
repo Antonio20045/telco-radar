@@ -4,11 +4,12 @@ Der Klick-Crawler liest die Knöpfe je Dimension mit Wert, Sperre und Markierung
 (``lies_optionen``) und führt die Werte als wachsende Menge: Erscheint nach einem Klick
 eine neue Option, kommt sie hinzu (``vereinige``), und ``naechste`` liefert die erste
 noch nicht besuchte Kombination. ``[None]`` steht für eine Dimension ohne gefundene
-Knöpfe. Der Wert kommt aus Attribut oder Text des Klickziels oder seines
-Kind-Elements ``wert_in``, ``muster`` nimmt daraus die erste Gruppe; ein Wert, auf den
-das Muster nicht passt, fehlt. Die Marke ist die der Dimension, sonst die der Karte:
-Attribut gleich Wert oder ein CSS-Selektor, auf den das Klickziel passt. Eine feste
-Dimension hat genau eine gewählte Option ohne Knopf. Dieses Modul ruft kein Netz.
+Knöpfe. Der Wert kommt aus Attribut oder Text des Klickziels oder seines Kind-Elements
+``wert_in``, ``muster`` nimmt daraus die erste Gruppe; passt das Muster nicht, hat die
+Option keinen Wert, sondern ihren Text in ``unlesbar`` und läuft mit diesem Text als
+benannte Lücke mit. Die Marke ist die der Dimension, sonst die der Karte: Attribut
+gleich Wert oder ein CSS-Selektor, auf den das Klickziel passt. Eine feste Dimension hat
+genau eine gewählte Option ohne Knopf. Dieses Modul ruft kein Netz.
 """
 
 from __future__ import annotations
@@ -36,11 +37,15 @@ _OPTIONEN_JS = """(knoepfe, art) => knoepfe.map((k) => {
 
 @dataclass(frozen=True)
 class Option:
-    """Ein Optionsknopf: Wert ohne doppelte Leerzeichen, deaktiviert, gewählt."""
+    """Ein Optionsknopf: Wert ohne doppelte Leerzeichen, deaktiviert, gewählt.
+
+    ``unlesbar`` ist der Text, wenn ``muster`` nicht auf ihn passt (dann kein Wert).
+    """
 
     wert: str | None
     deaktiviert: bool
     gewaehlt: bool
+    unlesbar: str | None = None
 
 
 def lies_optionen(seite: Page, karte: Klickkarte, dimension: str) -> list[Option]:
@@ -57,14 +62,20 @@ def lies_optionen(seite: Page, karte: Klickkarte, dimension: str) -> list[Option
         "markenwert": None if marke is None else marke.wert,
     }
     roh = seite.locator(knopf.selektor).evaluate_all(_OPTIONEN_JS, art)
-    return [Option(_wert(w, knopf.muster), bool(a), bool(g)) for w, a, g in roh]
+    optionen = []
+    for w, a, g in roh:
+        text = " ".join(w.split()) if isinstance(w, str) else ""
+        wert = wert_nach_muster(text, knopf.muster) if text else None
+        unlesbar = text if text and wert is None else None
+        optionen.append(Option(wert, bool(a), bool(g), unlesbar))
+    return optionen
 
 
 def angebotene_werte(optionen: list[Option]) -> list[str | None]:
-    """Die Werte der Knöpfe in Reihenfolge; ``[None]``, wenn es keine gibt."""
-    werte: list[str | None] = list(
-        dict.fromkeys(o.wert for o in optionen if o.wert is not None)
-    )
+    """Die Werte der Knöpfe in Reihenfolge, unlesbare mit ihrem Text; ``[None]``,
+    wenn es keine gibt."""
+    lesbar = (o.wert if o.wert is not None else o.unlesbar for o in optionen)
+    werte: list[str | None] = list(dict.fromkeys(w for w in lesbar if w is not None))
     return werte or [None]
 
 
@@ -95,10 +106,3 @@ def wert_nach_muster(roh: str, muster: re.Pattern[str] | None) -> str | None:
     if teil is None or not teil.strip():
         return None
     return teil.strip()
-
-
-def _wert(roh: object, muster: re.Pattern[str] | None) -> str | None:
-    text = " ".join(roh.split()) if isinstance(roh, str) else ""
-    if not text:
-        return None
-    return wert_nach_muster(text, muster)
