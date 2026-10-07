@@ -1,0 +1,333 @@
+{
+ "anfragen": [
+  {
+   "nummer": 1,
+   "methode": "GET",
+   "url": "https://www.telekom.de/shop/geraet/google/google-pixel-11/frost-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false",
+   "art": "document",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 2,
+   "methode": "GET",
+   "url": "https://static.eshop.telekom.de/de/prod/dtdl/new/shop/assets/vendors.472e2679.css",
+   "art": "stylesheet",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 3,
+   "methode": "GET",
+   "url": "https://www2.telekom.de/forward/ablyft-cdn/s/55651514.js",
+   "art": "script",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 4,
+   "methode": "GET",
+   "url": "https://www.telekom.de/resources/ag2/legalnote-replacer/legalnote-replacer-oneshop.js",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 5,
+   "methode": "GET",
+   "url": "https://www.telekom.de/resources/images/974660/telekom-logo.svg",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 6,
+   "methode": "GET",
+   "url": "https://dtdl-static-natco.eshop.yo-digital.com/resize-image?f=de%2F3eII0PI1IDvfUku5kxmOzZyP6ybmJa.png&w=300&q=80&t=png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 7,
+   "methode": "GET",
+   "url": "https://www.telekom.de/resources/ag2/legalnote-replacer/build/legalnote-replacer-components.esm.js",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 8,
+   "methode": "GET",
+   "url": "https://dtdl-static-natco.eshop.yo-digital.com/assets/de/621327981966859_pdp-marketing-content.css",
+   "art": "stylesheet",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 9,
+   "methode": "GET",
+   "url": "https://static.eshop.telekom.de/de/prod/dtdl/new/shop/assets/runtime.235ddb41.js",
+   "art": "script",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 10,
+   "methode": "GET",
+   "url": "https://static.eshop.telekom.de/de/prod/dtdl/new/shop/assets/dt-components.72d42471.js",
+   "art": "script",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 11,
+   "methode": "GET",
+   "url": "https://static.eshop.telekom.de/de/prod/dtdl/new/shop/assets/one-ui-library.8dac447e.js",
+   "art": "script",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 12,
+   "methode": "GET",
+   "url": "https://static.eshop.telekom.de/de/prod/dtdl/new/shop/assets/vendors.472e2679.js",
+   "art": "script",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 13,
+   "methode": "GET",
+   "url": "https://static.eshop.telekom.de/de/prod/dtdl/new/shop/assets/client.c5b8fcd8.js",
+   "art": "script",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 14,
+   "methode": "GET",
+   "url": "https://static.eshop.telekom.de/de/prod/dtdl/new/shop/assets/default-FixedConfiguratorV2-FixedQuickProlongationOrderReview-StreamingOptionConfigurator-fixed-plan-67c35897.7c993944.js",
+   "art": "script",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 15,
+   "methode": "GET",
+   "url": "https://static.eshop.telekom.de/de/prod/dtdl/new/shop/assets/default-ClaimRewardNonLoggedInFlow-RegistrationPage-basket-home-productdetail-productlist.4c86968f.js",
+   "art": "script",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 16,
+   "methode": "GET",
+   "url": "https://static.eshop.telekom.de/de/prod/dtdl/new/shop/assets/default-FixedConfiguratorV2-FixedQuickProlongationOrderReview-fixed-plan-landing-page-v2-productdeta-92520a5a.20801186.js",
+   "art": "script",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 17,
+   "methode": "GET",
+   "url": "https://static.eshop.telekom.de/de/prod/dtdl/new/shop/assets/default-FixedConfigurator-FixedConfiguratorPaymentDetails-FixedTariffPaymentDetails-productdetail-productlist.4b24eb6e.js",
+   "art": "script",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 18,
+   "methode": "GET",
+   "url": "https://static.eshop.telekom.de/de/prod/dtdl/new/shop/assets/productdetail.5dc8c6ed.js",
+   "art": "script",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 19,
+   "methode": "GET",
+   "url": "https://static.eshop.telekom.de/de/prod/dtdl/new/shop/assets/newHeader.fc034a18.js",
+   "art": "script",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 20,
+   "methode": "GET",
+   "url": "https://tags-eu.tiqcdn.com/utag/telekom/oneshop-eu/prod/utag.js",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 21,
+   "methode": "GET",
+   "url": "https://www.telekom.de/resources/images/974660/telekom-logo.svg",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 22,
+   "methode": "GET",
+   "url": "https://dtdl-static-natco.eshop.yo-digital.com/assets/de/115101339863499_google-pixel-11-marketing-page-s.jpg",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 23,
+   "methode": "GET",
+   "url": "https://static.eshop.telekom.de/de/prod/dtdl/new/shop/assets/fonts/TeleNeoVariable-Upright.woff2",
+   "art": "font",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 24,
+   "methode": "POST",
+   "url": "https://bf72977jfz.bf.dynatrace.com/bf?type=js3&sn=[Cookie entfernt]&svrid=-17235&flavor=cors&vi=CTGGMEPCNPODPKTWVPEMJROKMSDGHMEJ-0&modifiedSince=1790854839540&bp=3&app=b05c2f3edf669fad&crc=4187817043&en=p9vvb6ny&end=1",
+   "art": "fetch",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 25,
+   "methode": "GET",
+   "url": "https://www.telekom.de/opt-in/cookie.php",
+   "art": "xhr",
+   "status": 202,
+   "abbruch": null
+  },
+  {
+   "nummer": 26,
+   "methode": "GET",
+   "url": "https://tags-eu.tiqcdn.com/utag/telekom/oneshop-eu/prod/utag.5.js?utv=ut4.54.202610020840",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 27,
+   "methode": "GET",
+   "url": "https://tags-eu.tiqcdn.com/utag/telekom/oneshop-eu/prod/utag.7.js?utv=ut4.54.202607240849",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 28,
+   "methode": "GET",
+   "url": "https://tags-eu.tiqcdn.com/utag/telekom/oneshop-eu/prod/utag.81.js?utv=ut4.54.202609210632",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 29,
+   "methode": "GET",
+   "url": "https://www.telekom.de/resources/ag2/legalnote-replacer/build/p-befae207.js",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 30,
+   "methode": "POST",
+   "url": "https://bf72977jfz.bf.dynatrace.com/bf?type=js3&sn=[Cookie entfernt]&svrid=-17235&flavor=cors&vi=CTGGMEPCNPODPKTWVPEMJROKMSDGHMEJ-0&modifiedSince=1790854839540&bp=3&app=b05c2f3edf669fad&crc=3371281919&en=p9vvb6ny&end=1",
+   "art": "fetch",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 31,
+   "methode": "GET",
+   "url": "https://www.telekom.de/resources/ag2/legalnote-replacer/build/p-39c6a9f7.entry.js",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 32,
+   "methode": "GET",
+   "url": "https://www.telekom.de/resources/ag2/legalnote-replacer/build/p-596b2685.js",
+   "art": "script",
+   "status": 202,
+   "abbruch": null
+  },
+  {
+   "nummer": 33,
+   "methode": "GET",
+   "url": "https://tags-eu.tiqcdn.com/utag/telekom/oneshop-eu/prod/utag.v.js?a=telekom%2Foneshop-eu%2F202610060719&cb=1791355044136",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 34,
+   "methode": "POST",
+   "url": "https://bf72977jfz.bf.dynatrace.com/bf?type=js3&sn=[Cookie entfernt]&svrid=-17235&flavor=cors&vi=CTGGMEPCNPODPKTWVPEMJROKMSDGHMEJ-0&modifiedSince=1790854839540&bp=3&app=b05c2f3edf669fad&crc=3434222078&en=p9vvb6ny&end=1",
+   "art": "fetch",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 35,
+   "methode": "POST",
+   "url": "https://bf72977jfz.bf.dynatrace.com/bf?sc=0&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&cy=event&bc=1536493826&co=snappy&si=[Cookie entfernt]&st=1791355064148&ss=0&qc=3322139378&end=1",
+   "art": "fetch",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 36,
+   "methode": "GET",
+   "url": "https://bf72977jfz.bf.dynatrace.com/bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=1898230977&end=1",
+   "art": "fetch",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 37,
+   "methode": "POST",
+   "url": "https://bf72977jfz.bf.dynatrace.com/bf?type=js3&sn=[Cookie entfernt]&svrid=-17235&flavor=cors&vi=CTGGMEPCNPODPKTWVPEMJROKMSDGHMEJ-0&modifiedSince=1790854839540&bp=3&app=b05c2f3edf669fad&crc=808431344&en=p9vvb6ny&end=1",
+   "art": "fetch",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 38,
+   "methode": "POST",
+   "url": "https://bf72977jfz.bf.dynatrace.com/bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&cy=event&bc=3646641588&co=snappy&si=[Cookie entfernt]&st=1791355066154&ss=0&qc=2346821334&end=1",
+   "art": "fetch",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 39,
+   "methode": "GET",
+   "url": "https://bf72977jfz.bf.dynatrace.com/bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=1898230977&end=1",
+   "art": "fetch",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 40,
+   "methode": "POST",
+   "url": "https://bf72977jfz.bf.dynatrace.com/bf?type=js3&sn=[Cookie entfernt]&svrid=-17235&flavor=cors&vi=CTGGMEPCNPODPKTWVPEMJROKMSDGHMEJ-0&modifiedSince=1790854839540&bp=3&app=b05c2f3edf669fad&crc=3085874766&en=p9vvb6ny&end=1",
+   "art": "fetch",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 41,
+   "methode": "POST",
+   "url": "https://bf72977jfz.bf.dynatrace.com/bf?type=js3&sn=[Cookie entfernt]&svrid=-17235&flavor=cors&vi=CTGGMEPCNPODPKTWVPEMJROKMSDGHMEJ-0&modifiedSince=1790854839540&bp=3&app=b05c2f3edf669fad&crc=817989827&en=p9vvb6ny&end=1",
+   "art": "fetch",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  }
+ ],
+ "antworten": []
+}

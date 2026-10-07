@@ -1,0 +1,367 @@
+{
+ "einwilligung": {
+  "geklickt": null,
+  "grund": "kein Ablehnen-Knopf sichtbar"
+ },
+ "vermerk": null,
+ "proben": [
+  {
+   "gruppe": 15,
+   "art": "speicher",
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(4) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > label:nth-of-type(1)",
+   "text": "256 GB",
+   "wert": null,
+   "fehler": null,
+   "navigiert": null,
+   "umleitung": null,
+   "ruhe": true,
+   "anfragen": [],
+   "preise_geaendert": [],
+   "marke_nachher": null,
+   "uebernommen": "nein"
+  },
+  {
+   "gruppe": 16,
+   "art": "laufzeit",
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(5) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > label:nth-of-type(1)",
+   "text": "36 Monate",
+   "wert": null,
+   "fehler": null,
+   "navigiert": null,
+   "umleitung": null,
+   "ruhe": true,
+   "anfragen": [],
+   "preise_geaendert": [],
+   "marke_nachher": null,
+   "uebernommen": "nein"
+  },
+  {
+   "gruppe": 17,
+   "art": "laufzeit",
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(5) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > label:nth-of-type(1)",
+   "text": "24 Monate",
+   "wert": null,
+   "fehler": null,
+   "navigiert": null,
+   "umleitung": null,
+   "ruhe": true,
+   "anfragen": [
+    {
+     "nummer": 133,
+     "methode": "GET",
+     "url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtMTctcHJvLTI1NmdiLWNvc21pYy1vcmFuZ2UtMjR4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLXVubGltaXRlZC1tLXBsdXMtb25saW5lLWh3di0yNG0tMDUtMDA7cGFja3M9dW10cy1vcHRpb24=",
+     "art": "xhr",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 134,
+     "methode": "GET",
+     "url": "https://www.o2online.de/are-wp/947602/?sid=ENTFERNT&wpt=H&prf%5Bappl%5D=shop&prf%5Bsite%5D=configurator&prf%5Btgr%5D=privatkunden&prf%5Bona%5D=o2shop_privatkunden-o2-mobile-unlimited-m-plus-online-hwv-24m-05-00_privatkunden-apple-iphone-17-pro-256gb-cosmic-orange-24xhigh&prf%5Bdur%5D=fixed&prf%5Bpay%5D=rate&prf%5Bcnt%5D=1&prf%5Bsy%5D=www",
+     "art": "xhr",
+     "status": 200,
+     "abbruch": null
+    }
+   ],
+   "preise_geaendert": [
+    {
+     "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(3) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > tef-choice-panel:nth-of-type(1) > label:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(1)",
+     "vorher": "66,49 €",
+     "nachher": "84,49 €"
+    },
+    {
+     "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(3) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > tef-choice-panel:nth-of-type(1) > label:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(1)",
+     "vorher": "56,49 €",
+     "nachher": "74,49 €"
+    },
+    {
+     "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(3) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > tef-choice-panel:nth-of-type(1) > label:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(1)",
+     "vorher": "56,49 €",
+     "nachher": "74,49 €"
+    },
+    {
+     "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(3) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > tef-choice-panel:nth-of-type(1) > label:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(1)",
+     "vorher": "56,49 €",
+     "nachher": "74,49 €"
+    },
+    {
+     "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(5) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > tef-shop-accessories-slider:nth-of-type(1) > tef-slider:nth-of-type(1) > div:nth-of-type(1) > tef-shop-hardware-teaser:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(2)",
+     "vorher": "39,00 €",
+     "nachher": "58,50 €"
+    },
+    {
+     "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(5) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > tef-shop-accessories-slider:nth-of-type(1) > tef-slider:nth-of-type(1) > div:nth-of-type(1) > tef-shop-hardware-teaser:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(3)",
+     "vorher": "36 Monate Laufzeit, Gesamtpreis: 1405,00 €",
+     "nachher": "24 Monate Laufzeit, Gesamtpreis: 1405,00 €"
+    },
+    {
+     "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(5) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > tef-shop-accessories-slider:nth-of-type(1) > tef-slider:nth-of-type(1) > div:nth-of-type(2) > tef-shop-hardware-teaser:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(2)",
+     "vorher": "7,00 €",
+     "nachher": "10,50 €"
+    },
+    {
+     "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(5) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > tef-shop-accessories-slider:nth-of-type(1) > tef-slider:nth-of-type(1) > div:nth-of-type(2) > tef-shop-hardware-teaser:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(3)",
+     "vorher": "36 Monate Laufzeit, Gesamtpreis: 253,00 €",
+     "nachher": "24 Monate Laufzeit, Gesamtpreis: 253,00 €"
+    },
+    {
+     "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(5) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > tef-shop-accessories-slider:nth-of-type(1) > tef-slider:nth-of-type(1) > div:nth-of-type(3) > tef-shop-hardware-teaser:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(2)",
+     "vorher": "22,50 €",
+     "nachher": "33,00 €"
+    },
+    {
+     "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(5) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > tef-shop-accessories-slider:nth-of-type(1) > tef-slider:nth-of-type(1) > div:nth-of-type(3) > tef-shop-hardware-teaser:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(3)",
+     "vorher": "36 Monate Laufzeit, Gesamtpreis: 811,00 €",
+     "nachher": "24 Monate Laufzeit, Gesamtpreis: 811,00 €"
+    },
+    {
+     "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(5) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > tef-shop-accessories-slider:nth-of-type(1) > tef-slider:nth-of-type(1) > div:nth-of-type(3) > tef-shop-hardware-teaser:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(2) > span:nth-of-type(2)",
+     "vorher": "1,00 €",
+     "nachher": "19,00 €"
+    },
+    {
+     "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(5) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > tef-shop-accessories-slider:nth-of-type(1) > tef-slider:nth-of-type(1) > div:nth-of-type(4) > tef-shop-hardware-teaser:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(2)",
+     "vorher": "39,00 €",
+     "nachher": "58,50 €"
+    },
+    {
+     "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(5) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > tef-shop-accessories-slider:nth-of-type(1) > tef-slider:nth-of-type(1) > div:nth-of-type(4) > tef-shop-hardware-teaser:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(3)",
+     "vorher": "36 Monate Laufzeit, Gesamtpreis: 1405,00 €",
+     "nachher": "24 Monate Laufzeit, Gesamtpreis: 1405,00 €"
+    },
+    {
+     "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(5) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > tef-shop-accessories-slider:nth-of-type(1) > tef-slider:nth-of-type(1) > div:nth-of-type(5) > tef-shop-hardware-teaser:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(2)",
+     "vorher": "13,00 €",
+     "nachher": "19,50 €"
+    },
+    {
+     "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(5) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > tef-shop-accessories-slider:nth-of-type(1) > tef-slider:nth-of-type(1) > div:nth-of-type(5) > tef-shop-hardware-teaser:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(3)",
+     "vorher": "36 Monate Laufzeit, Gesamtpreis: 469,00 €",
+     "nachher": "24 Monate Laufzeit, Gesamtpreis: 469,00 €"
+    },
+    {
+     "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(1) > td:nth-of-type(2)",
+     "vorher": "36,50 €",
+     "nachher": "54,50 €"
+    },
+    {
+     "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(2) > tr:nth-of-type(1) > td:nth-of-type(1) > strong:nth-of-type(1)",
+     "vorher": "56,49 €",
+     "nachher": "74,49 €"
+    },
+    {
+     "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(2) > tr:nth-of-type(1) > td:nth-of-type(2) > strong:nth-of-type(1)",
+     "vorher": "56,49 €",
+     "nachher": "74,49 €"
+    },
+    {
+     "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(3) > tr:nth-of-type(1) > td:nth-of-type(2)",
+     "vorher": "1,00 €",
+     "nachher": "7,00 €"
+    },
+    {
+     "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(4) > tr:nth-of-type(1) > td:nth-of-type(1) > strong:nth-of-type(1)",
+     "vorher": "7,99 €",
+     "nachher": "13,99 €"
+    },
+    {
+     "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(4) > tr:nth-of-type(1) > td:nth-of-type(2) > strong:nth-of-type(1)",
+     "vorher": "7,99 €",
+     "nachher": "13,99 €"
+    },
+    {
+     "pfad": "#info-modal-id > div:nth-of-type(2) > div:nth-of-type(1) > p:nth-of-type(1)",
+     "vorher": "Für Neukunden und besteht aus einem o2 Mein Handyvertrag mit dem Apple iPhone 17 Pro mit Ratenzahlung à 36,50 € monatlich über 36 Monate (Gesamtpreis: 56,49 € ) sowie die o2-mobile-unlimited-m-plus Mobilfunkvertrag mit 24 Monate Mindestlaufzeit von Monaten für monatliche Zahlungen 19,99 € Plus 0,00 ",
+     "nachher": "Für Neukunden und besteht aus einem o2 Mein Handyvertrag mit dem Apple iPhone 17 Pro mit Ratenzahlung à 54,50 € monatlich über 24 Monate (Gesamtpreis: 74,49 € ) sowie die o2-mobile-unlimited-m-plus Mobilfunkvertrag mit 24 Monate Mindestlaufzeit von Monaten für monatliche Zahlungen 19,99 € Plus 0,00 "
+    }
+   ],
+   "marke_nachher": null,
+   "uebernommen": "unbekannt"
+  },
+  {
+   "gruppe": 18,
+   "art": "tarif",
+   "pfad": "#choice-panel-input-410",
+   "text": "select-tariff",
+   "wert": null,
+   "fehler": "Locator.click: Timeout 5000ms exceeded.",
+   "navigiert": null,
+   "umleitung": null,
+   "ruhe": true,
+   "anfragen": [],
+   "preise_geaendert": [],
+   "marke_nachher": null,
+   "uebernommen": "unbekannt"
+  },
+  {
+   "gruppe": 18,
+   "art": "tarif",
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(3) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > tef-choice-panel:nth-of-type(1) > label:nth-of-type(1)",
+   "text": "O2 Mobile Unlimited L Plus mit 300 MBit/s mtl. 66,49 €",
+   "wert": null,
+   "fehler": null,
+   "navigiert": null,
+   "umleitung": null,
+   "ruhe": true,
+   "anfragen": [
+    {
+     "nummer": 135,
+     "methode": "GET",
+     "url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtMTctcHJvLTI1NmdiLWNvc21pYy1vcmFuZ2UtMjR4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLXVubGltaXRlZC1sLXBsdXMtb25saW5lLWh3di0yNG0tMDUtMDA7cGFja3M9aW5rbHVzaXYtdW5iZWdyZW56dGVzLWRhdGVudm9sdW1lbix1bXRzLW9wdGlvbg==",
+     "art": "xhr",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 136,
+     "methode": "GET",
+     "url": "https://www.o2online.de/are-wp/947602/?sid=ENTFERNT&wpt=H&prf%5Bappl%5D=shop&prf%5Bsite%5D=configurator&prf%5Btgr%5D=privatkunden&prf%5Bona%5D=o2shop_privatkunden-o2-mobile-unlimited-l-plus-online-hwv-24m-05-00_privatkunden-apple-iphone-17-pro-256gb-cosmic-orange-24xhigh&prf%5Bdur%5D=fixed&prf%5Bpay%5D=rate&prf%5Bcnt%5D=1&prf%5Bsy%5D=www",
+     "art": "xhr",
+     "status": 200,
+     "abbruch": null
+    }
+   ],
+   "preise_geaendert": [
+    {
+     "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(2)",
+     "vorher": "19,99 €",
+     "nachher": "29,99 €"
+    },
+    {
+     "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(2) > tr:nth-of-type(1) > td:nth-of-type(1) > strong:nth-of-type(1)",
+     "vorher": "74,49 €",
+     "nachher": "84,49 €"
+    },
+    {
+     "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(2) > tr:nth-of-type(1) > td:nth-of-type(2) > strong:nth-of-type(1)",
+     "vorher": "74,49 €",
+     "nachher": "84,49 €"
+    },
+    {
+     "pfad": "#\\32 267892 > p:nth-of-type(2)",
+     "vorher": "O2 Mobile Unlimited M PlusEinmaliger Anschlusspreis 39,99 €. Mindestvertragslaufzeit 24 Monate. Pro Abrechnungsmonat sind enthalten: nationale Gespräche (außer Sonderrufnummern, Rufumleitungen) u. SMS in alle dt. Netze sowie endlos mobil Surfen im dt. O2 Mobilfunknetz mit bis zu 100 MBit/s im Downlo",
+     "nachher": null
+    },
+    {
+     "pfad": "#\\32 226092 > p:nth-of-type(2)",
+     "vorher": "Bei erstmaliger Buchung von O2 TV Classic 24M erhalten Kund:innen optional die Möglichkeit, Netflix Standard mit Werbung drei Monate kostenfrei freizuschalten; die Aktivierung erfolgt separat beim Anbieter. In den ersten 3 Monaten ist es kostenfrei, danach zzgl. 6,99 € mtl. Die Mindestlaufzeit beträ",
+     "nachher": "Bei erstmaliger Buchung von O2 TV Classic 24M erhalten Kund:innen optional die Möglichkeit, Netflix Standard mit Werbung drei Monate kostenfrei freizuschalten; die Aktivierung erfolgt separat beim Anbieter. In den ersten 3 Monaten ist es kostenfrei, danach zzgl. 4,99 € mtl. Die Mindestlaufzeit beträ"
+    },
+    {
+     "pfad": "#info-modal-id > div:nth-of-type(2) > div:nth-of-type(1) > p:nth-of-type(1)",
+     "vorher": "Für Neukunden und besteht aus einem o2 Mein Handyvertrag mit dem Apple iPhone 17 Pro mit Ratenzahlung à 54,50 € monatlich über 24 Monate (Gesamtpreis: 74,49 € ) sowie die o2-mobile-unlimited-m-plus Mobilfunkvertrag mit 24 Monate Mindestlaufzeit von Monaten für monatliche Zahlungen 19,99 € Plus 0,00 ",
+     "nachher": "Für Neukunden und besteht aus einem o2 Mein Handyvertrag mit dem Apple iPhone 17 Pro mit Ratenzahlung à 54,50 € monatlich über 24 Monate (Gesamtpreis: 84,49 € ) sowie die o2-mobile-unlimited-l-plus Mobilfunkvertrag mit 24 Monate Mindestlaufzeit von Monaten für monatliche Zahlungen 29,99 € Plus 0,00 "
+    },
+    {
+     "pfad": "#\\32 267894 > p:nth-of-type(2)",
+     "vorher": null,
+     "nachher": "O2 Mobile Unlimited L PlusEinmaliger Anschlusspreis 39,99 €. Mindestvertragslaufzeit 24 Monate. Pro Abrechnungsmonat sind enthalten: nationale Gespräche (außer Sonderrufnummern, Rufumleitungen) u. SMS in alle dt. Netze sowie endlos mobil Surfen im dt. O2 Mobilfunknetz mit bis zu 300 MBit/s im Downlo"
+    }
+   ],
+   "marke_nachher": "label-checked",
+   "uebernommen": "ja"
+  },
+  {
+   "gruppe": 20,
+   "art": "tarif",
+   "pfad": "#choice-panel-input-741",
+   "text": "select-tariff",
+   "wert": null,
+   "fehler": "Locator.click: Timeout 5000ms exceeded.",
+   "navigiert": null,
+   "umleitung": null,
+   "ruhe": true,
+   "anfragen": [
+    {
+     "nummer": 137,
+     "methode": "GET",
+     "url": "https://static2.o9.de/resource/blob/2104574/267a258d12db1184e2b48acd88a80960/jpg/apple-iphone-17-pro-river-page-bild-data.webp",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    }
+   ],
+   "preise_geaendert": [],
+   "marke_nachher": null,
+   "uebernommen": "unbekannt"
+  },
+  {
+   "gruppe": 20,
+   "art": "tarif",
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(3) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > tef-choice-panel:nth-of-type(1) > label:nth-of-type(1)",
+   "text": "O2 Mobile Unlimited S Special Plus mit 15 MBit/s mtl. 56,49 €",
+   "wert": null,
+   "fehler": null,
+   "navigiert": null,
+   "umleitung": null,
+   "ruhe": true,
+   "anfragen": [
+    {
+     "nummer": 138,
+     "methode": "GET",
+     "url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtMTctcHJvLTI1NmdiLWNvc21pYy1vcmFuZ2UtMjR4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLXVubGltaXRlZC1zLXNwZWNpYWwtcGx1cy1vbmxpbmUtaHd2O3BhY2tzPXVtdHMtb3B0aW9u",
+     "art": "xhr",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 139,
+     "methode": "GET",
+     "url": "https://www.o2online.de/are-wp/947602/?sid=ENTFERNT&wpt=H&prf%5Bappl%5D=shop&prf%5Bsite%5D=configurator&prf%5Btgr%5D=privatkunden&prf%5Bona%5D=o2shop_privatkunden-o2-mobile-unlimited-s-special-plus-online-hwv_privatkunden-apple-iphone-17-pro-256gb-cosmic-orange-24xhigh&prf%5Bdur%5D=fixed&prf%5Bpay%5D=rate&prf%5Bcnt%5D=1&prf%5Bsy%5D=www",
+     "art": "xhr",
+     "status": 200,
+     "abbruch": null
+    }
+   ],
+   "preise_geaendert": [
+    {
+     "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(2)",
+     "vorher": "29,99 €",
+     "nachher": "19,99 €"
+    },
+    {
+     "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(2) > tr:nth-of-type(1) > td:nth-of-type(1) > strong:nth-of-type(1)",
+     "vorher": "84,49 €",
+     "nachher": "74,49 €"
+    },
+    {
+     "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(2) > tr:nth-of-type(1) > td:nth-of-type(2) > strong:nth-of-type(1)",
+     "vorher": "84,49 €",
+     "nachher": "74,49 €"
+    },
+    {
+     "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(3) > tr:nth-of-type(2) > td:nth-of-type(2)",
+     "vorher": "0,00 €",
+     "nachher": "39,99 €"
+    },
+    {
+     "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(4) > tr:nth-of-type(1) > td:nth-of-type(1) > strong:nth-of-type(1)",
+     "vorher": "13,99 €",
+     "nachher": "53,98 €"
+    },
+    {
+     "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(4) > tr:nth-of-type(1) > td:nth-of-type(2) > strong:nth-of-type(1)",
+     "vorher": "13,99 €",
+     "nachher": "53,98 €"
+    },
+    {
+     "pfad": "#\\32 267894 > p:nth-of-type(2)",
+     "vorher": "O2 Mobile Unlimited L PlusEinmaliger Anschlusspreis 39,99 €. Mindestvertragslaufzeit 24 Monate. Pro Abrechnungsmonat sind enthalten: nationale Gespräche (außer Sonderrufnummern, Rufumleitungen) u. SMS in alle dt. Netze sowie endlos mobil Surfen im dt. O2 Mobilfunknetz mit bis zu 300 MBit/s im Downlo",
+     "nachher": null
+    },
+    {
+     "pfad": "#info-modal-id > div:nth-of-type(2) > div:nth-of-type(1) > p:nth-of-type(1)",
+     "vorher": "Für Neukunden und besteht aus einem o2 Mein Handyvertrag mit dem Apple iPhone 17 Pro mit Ratenzahlung à 54,50 € monatlich über 24 Monate (Gesamtpreis: 84,49 € ) sowie die o2-mobile-unlimited-l-plus Mobilfunkvertrag mit 24 Monate Mindestlaufzeit von Monaten für monatliche Zahlungen 29,99 € Plus 0,00 ",
+     "nachher": "Für Neukunden und besteht aus einem o2 Mein Handyvertrag mit dem Apple iPhone 17 Pro mit Ratenzahlung à 54,50 € monatlich über 24 Monate (Gesamtpreis: 74,49 € ) sowie die o2-mobile-unlimited-s-special-plus Mobilfunkvertrag mit 24 Monate Mindestlaufzeit von Monaten für monatliche Zahlungen 19,99 € Pl"
+    },
+    {
+     "pfad": "#\\32 267890 > p:nth-of-type(2)",
+     "vorher": null,
+     "nachher": "O2 Mobile Unlimited S Special PlusEinmaliger Anschlusspreis 39,99 €. Mindestvertragslaufzeit 24 Monate. Pro Abrechnungsmonat sind enthalten: nationale Gespräche (außer Sonderrufnummern, Rufumleitungen) u. SMS in alle dt. Netze sowie endlos mobil Surfen im dt. O2 Mobilfunknetz mit bis zu 15 MBit/s im"
+    }
+   ],
+   "marke_nachher": "label-checked",
+   "uebernommen": "ja"
+  }
+ ]
+}

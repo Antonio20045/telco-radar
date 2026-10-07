@@ -1,0 +1,35 @@
+{
+ "preise_gesamt": 5,
+ "preise": [
+  {
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(4) > form:nth-of-type(1) > label:nth-of-type(1) > span:nth-of-type(1) > strong:nth-of-type(2)",
+   "text": "9.99 €",
+   "kontext": "Ja, ich möchte mein Handy für nur 9.99 € im Monat absichern",
+   "sichtbar": true
+  },
+  {
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2)",
+   "text": ". 99 €",
+   "kontext": "31 . 99 €",
+   "sichtbar": false
+  },
+  {
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2)",
+   "text": ". 00 €",
+   "kontext": "999 . 00 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#\\37 zced9-accordion > p:nth-of-type(1)",
+   "text": "DHL bringt Dein Gerät zu Dir nach Hause. Der Versand kostet faire 4,95 €. Um die Versandkosten zu sparen, hast Du zwei Möglichkeiten:",
+   "kontext": "DHL bringt Dein Gerät zu Dir nach Hause. Der Versand kostet faire 4,95 €. Um die Versandkosten zu sparen, hast Du zwei Möglichkeiten: Du reservierst das gewünschte Gerät unverbindlich in einem unserer Shops bei Dir in der Nähe. Wir legen das Gerät zwei Tage für Dich zurück und Du bezahlst im Shop. D",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#kj2vul-accordion > ul:nth-of-type(1) > li:nth-of-type(4)",
+   "text": "Nachnahme (es fallen zusätzlich 2 € Nachnahmegebühr an)",
+   "kontext": "PayPal Klarna (Rechnung, Lastschrift, Sofortüberweisung, Kreditkarte, Ratenkauf) Kreditkarte (American Express) Nachnahme (es fallen zusätzlich 2 € Nachnahmegebühr an) giropay Finanzierung über unseren Partner Consors Finanz BNP Paribas S.A",
+   "sichtbar": false
+  }
+ ]
+}

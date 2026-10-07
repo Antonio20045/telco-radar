@@ -1,0 +1,7298 @@
+{
+ "elemente_gesamt": 212,
+ "elemente_gelesen": 212,
+ "gruppen": [
+  {
+   "nummer": 0,
+   "pfad": "#osAppInnerContainer",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    0
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 1,
+   "pfad": "#osAppInnerContainer > header:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    1
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 2,
+   "pfad": "#osAppInnerContainer > header:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > nav:nth-of-type(2) > ul:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    2,
+    80,
+    81
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 3,
+   "pfad": "#osAppInnerContainer > header:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    3
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 4,
+   "pfad": "#osAppInnerContainer > header:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > nav:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(2) > div:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    4,
+    85
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 5,
+   "pfad": "#mega-menu-a7751cc3-8a89-426f-812e-f23cf08c6103 > li:nth-of-type(1) > div:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    5,
+    86
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 6,
+   "pfad": "#mega-menu-a7751cc3-8a89-426f-812e-f23cf08c6103 > li:nth-of-type(2) > div:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    6,
+    92
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 7,
+   "pfad": "#mega-menu-a7751cc3-8a89-426f-812e-f23cf08c6103 > li:nth-of-type(3) > div:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    7,
+    98
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 8,
+   "pfad": "#mega-menu-a7751cc3-8a89-426f-812e-f23cf08c6103 > li:nth-of-type(4) > div:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    8,
+    103
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 9,
+   "pfad": "#mega-menu-a7751cc3-8a89-426f-812e-f23cf08c6103 > li:nth-of-type(5) > div:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    9,
+    108
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 10,
+   "pfad": "#osAppInnerContainer > header:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > nav:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(3) > div:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    10,
+    114
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 11,
+   "pfad": "#mega-menu-95a77dd4-d793-4571-b72c-3c053f2778f0 > li:nth-of-type(1) > div:nth-of-type(1)",
+   "name": null,
+   "art": "tarif",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 1.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    11,
+    115
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 12,
+   "pfad": "#mega-menu-95a77dd4-d793-4571-b72c-3c053f2778f0 > li:nth-of-type(2) > div:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    12,
+    120
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 13,
+   "pfad": "#mega-menu-95a77dd4-d793-4571-b72c-3c053f2778f0 > li:nth-of-type(3) > div:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    13,
+    125
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 14,
+   "pfad": "#mega-menu-95a77dd4-d793-4571-b72c-3c053f2778f0 > li:nth-of-type(4) > div:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    14,
+    133
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 15,
+   "pfad": "#mega-menu-95a77dd4-d793-4571-b72c-3c053f2778f0 > li:nth-of-type(5) > div:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    15,
+    139
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 16,
+   "pfad": "#osAppInnerContainer > header:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > nav:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(4) > div:nth-of-type(1)",
+   "name": null,
+   "art": "tarif",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 1.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    16,
+    145
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 17,
+   "pfad": "#mega-menu-82f738ed-015c-4fb6-b64d-b188b51b144e > li:nth-of-type(1) > div:nth-of-type(1)",
+   "name": null,
+   "art": "tarif",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 1.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    17,
+    146
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 18,
+   "pfad": "#mega-menu-82f738ed-015c-4fb6-b64d-b188b51b144e > li:nth-of-type(2) > div:nth-of-type(1)",
+   "name": null,
+   "art": "tarif",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.5,
+    "farbe": 0.0
+   },
+   "elemente": [
+    18,
+    153
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 19,
+   "pfad": "#mega-menu-82f738ed-015c-4fb6-b64d-b188b51b144e > li:nth-of-type(3) > div:nth-of-type(1)",
+   "name": null,
+   "art": "tarif",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.5,
+    "farbe": 0.0
+   },
+   "elemente": [
+    19,
+    162
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 20,
+   "pfad": "#mega-menu-82f738ed-015c-4fb6-b64d-b188b51b144e > li:nth-of-type(4) > div:nth-of-type(1)",
+   "name": null,
+   "art": "tarif",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.5,
+    "farbe": 0.0
+   },
+   "elemente": [
+    20,
+    167
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 21,
+   "pfad": "#osAppInnerContainer > header:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > nav:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(6) > div:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    21,
+    174
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 22,
+   "pfad": "#mega-menu-cf7793fd-729f-4228-894d-f1d2e5924de2 > li:nth-of-type(1) > div:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    22,
+    175
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 23,
+   "pfad": "#mega-menu-cf7793fd-729f-4228-894d-f1d2e5924de2 > li:nth-of-type(2) > div:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    23,
+    181
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 24,
+   "pfad": "#mega-menu-cf7793fd-729f-4228-894d-f1d2e5924de2 > li:nth-of-type(3) > div:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    24,
+    186
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 25,
+   "pfad": "#mega-menu-cf7793fd-729f-4228-894d-f1d2e5924de2 > li:nth-of-type(4) > div:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    25,
+    190
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 26,
+   "pfad": "#osAppInnerContainer > header:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > section:nth-of-type(1) > div:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    26
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 27,
+   "pfad": "#osAppInnerContainer > header:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > section:nth-of-type(1) > div:nth-of-type(1) > nav:nth-of-type(2) > ul:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    27,
+    196,
+    197
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 28,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    28,
+    198
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 29,
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    29,
+    30
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 30,
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1)",
+   "name": null,
+   "art": "farbe",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.67
+   },
+   "elemente": [
+    31,
+    32,
+    33
+   ],
+   "select": false,
+   "mit_marke": true
+  },
+  {
+   "nummer": 31,
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(2) > section:nth-of-type(1)",
+   "name": "Speichergröße",
+   "art": "speicher",
+   "anteile": {
+    "speicher": 1.5,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    34,
+    35
+   ],
+   "select": false,
+   "mit_marke": true
+  },
+  {
+   "nummer": 32,
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    36,
+    37,
+    38
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 33,
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(2)",
+   "name": "Rundumschutz, damit Ihr Smartphone immer für Sie da ist.",
+   "art": "tarif",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.67,
+    "farbe": 0.0
+   },
+   "elemente": [
+    39,
+    42,
+    45
+   ],
+   "select": false,
+   "mit_marke": true
+  },
+  {
+   "nummer": 34,
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(1) > div:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    40,
+    41
+   ],
+   "select": false,
+   "mit_marke": true
+  },
+  {
+   "nummer": 35,
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(2) > section:nth-of-type(2)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    43,
+    44
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 36,
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(3) > section:nth-of-type(2)",
+   "name": "Meist gekauft",
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    46,
+    47
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 37,
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    48
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 38,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > article:nth-of-type(2) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1)",
+   "name": null,
+   "art": "tarif",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 1.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    49
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 39,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > article:nth-of-type(2) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2)",
+   "name": "Unsere Empfehlung50 GBMagentaMobil M49,95 €",
+   "art": "tarif",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 1.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    50,
+    51
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 40,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > article:nth-of-type(2) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1) > div:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    52,
+    53
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 41,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > article:nth-of-type(2) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1)",
+   "name": "Preisübersicht anzeigenIhre Vorteile",
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    54
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 42,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > article:nth-of-type(2) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2)",
+   "name": "Einmalige Zahlung40,95 €inkl. Bereitstellung 39,95 €MONATLICHE ZAHLUNG+49,95 €Monatlich",
+   "art": "laufzeit",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.5,
+    "tarif": 0.5,
+    "farbe": 0.0
+   },
+   "elemente": [
+    55,
+    56
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 43,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > article:nth-of-type(2) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(2)",
+   "name": "Vorteile im Überblick",
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    57,
+    60
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 44,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > article:nth-of-type(2) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1)",
+   "name": "Doppeltes oder unbegrenztes Datenvolumen und Festnetz zu Mobil Flat.",
+   "art": "tarif",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.5,
+    "farbe": 0.0
+   },
+   "elemente": [
+    58,
+    59
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 45,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > article:nth-of-type(2) > section:nth-of-type(1) > article:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    61,
+    203
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 46,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > article:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1) > div:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    62,
+    63
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 47,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > article:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1)",
+   "name": "Preisübersicht anzeigenIhre Vorteile",
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    64
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 48,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > article:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2)",
+   "name": "Einmalige Zahlung40,95 €inkl. Bereitstellung 39,95 €MONATLICHE ZAHLUNG+49,95 €Monatlich",
+   "art": "laufzeit",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.5,
+    "tarif": 0.5,
+    "farbe": 0.0
+   },
+   "elemente": [
+    65,
+    66
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 49,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1)",
+   "name": null,
+   "art": "tarif",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 1.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    67
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 50,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2)",
+   "name": "UNSERE EMPFEHLUNG 50 GB MagentaMobil M 49,95 €",
+   "art": "tarif",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 1.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    68,
+    69
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 51,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1) > div:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    70,
+    71
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 52,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1)",
+   "name": "Preisübersicht anzeigenIhre Vorteile",
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    72
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 53,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2)",
+   "name": "EINMALIGE ZAHLUNG 40,95 € inkl. Bereitstellung 39,95 € MONATLICHE ZAHLUNG + 49,95 € Monatlich",
+   "art": "laufzeit",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.5,
+    "tarif": 0.5,
+    "farbe": 0.0
+   },
+   "elemente": [
+    73,
+    74
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 54,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(2)",
+   "name": "Vorteile im Überblick",
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    75,
+    78
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 55,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1)",
+   "name": "Doppeltes oder unbegrenztes Datenvolumen und Festnetz zu Mobil Flat.",
+   "art": "tarif",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.5,
+    "farbe": 0.0
+   },
+   "elemente": [
+    76,
+    77
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 56,
+   "pfad": "#osAppInnerContainer > header:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    79
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 57,
+   "pfad": "#osAppInnerContainer > header:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > nav:nth-of-type(2)",
+   "name": "Meta-Navigation",
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    82,
+    83
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 58,
+   "pfad": "#osAppInnerContainer > header:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > nav:nth-of-type(1) > ul:nth-of-type(1)",
+   "name": "Hauptmenu",
+   "art": "tarif",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.5,
+    "farbe": 0.0
+   },
+   "elemente": [
+    84,
+    173
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 59,
+   "pfad": "#mega-menu-6fc0dad3-93fb-4cab-8bce-1fb2378f1f9b",
+   "name": "DSL >",
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.4,
+    "farbe": 0.0
+   },
+   "elemente": [
+    87,
+    88,
+    89,
+    90,
+    91
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 60,
+   "pfad": "#mega-menu-b6ad7f60-8896-4f99-b8a6-bcd26abbf1f2",
+   "name": "Glasfaser >",
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.2,
+    "farbe": 0.0
+   },
+   "elemente": [
+    93,
+    94,
+    95,
+    96,
+    97
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 61,
+   "pfad": "#mega-menu-103d87f3-a81e-4b32-80a1-6d1db5393a1f",
+   "name": "Geräte >",
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.25,
+    "farbe": 0.0
+   },
+   "elemente": [
+    99,
+    100,
+    101,
+    102
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 62,
+   "pfad": "#mega-menu-ef025936-9472-42e2-8050-b8167bf41981",
+   "name": "Heimvernetzung >",
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    104,
+    105,
+    106,
+    107
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 63,
+   "pfad": "#mega-menu-b3838cb1-7ed9-4f30-a95c-1cb74d374b44",
+   "name": "Ich möchte... >",
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.2,
+    "farbe": 0.0
+   },
+   "elemente": [
+    109,
+    110,
+    111,
+    112,
+    113
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 64,
+   "pfad": "#mega-menu-250bed25-88bb-46c9-ba87-84e3f0b97611",
+   "name": "Tarife >",
+   "art": "tarif",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 1.5,
+    "farbe": 0.0
+   },
+   "elemente": [
+    116,
+    117,
+    118,
+    119
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 65,
+   "pfad": "#mega-menu-fe7d73a8-8cbe-4af1-a05e-d243f754785f",
+   "name": "Inhalte >",
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.25,
+    "farbe": 0.0
+   },
+   "elemente": [
+    121,
+    122,
+    123,
+    124
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 66,
+   "pfad": "#mega-menu-fb99b641-ffbb-4cda-83d2-4895cede315c",
+   "name": "Entertainment >",
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    126,
+    127,
+    128,
+    129,
+    130,
+    131,
+    132
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 67,
+   "pfad": "#mega-menu-8190dda8-f2e1-4077-a5d2-a2abef18c735",
+   "name": "Geräte >",
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.4,
+    "farbe": 0.0
+   },
+   "elemente": [
+    134,
+    135,
+    136,
+    137,
+    138
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 68,
+   "pfad": "#mega-menu-e8207e0b-d6d9-4c3c-abe7-440e254e8ff1",
+   "name": "Ich möchte... >",
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.2,
+    "farbe": 0.0
+   },
+   "elemente": [
+    140,
+    141,
+    142,
+    143,
+    144
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 69,
+   "pfad": "#mega-menu-f64ec6fb-01b4-4962-a762-aa3c40a9dd96",
+   "name": "Tarife >",
+   "art": "tarif",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 1.5,
+    "farbe": 0.0
+   },
+   "elemente": [
+    147,
+    148,
+    149,
+    150,
+    151,
+    152
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 70,
+   "pfad": "#mega-menu-b6196fdb-2101-4a72-9290-d660edd0da47",
+   "name": "Geräte >",
+   "art": "tarif",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 1.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    154,
+    155,
+    156,
+    157,
+    158,
+    159,
+    160,
+    161
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 71,
+   "pfad": "#mega-menu-68734051-ff22-471d-90bc-938ccfdc1850",
+   "name": "Netz >",
+   "art": "tarif",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 1.0,
+    "farbe": 0.25
+   },
+   "elemente": [
+    163,
+    164,
+    165,
+    166
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 72,
+   "pfad": "#mega-menu-246dcb86-012b-4a52-9bcb-463c1ce62e88",
+   "name": "Ich möchte... >",
+   "art": "tarif",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 1.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    168,
+    169,
+    170,
+    171,
+    172
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 73,
+   "pfad": "#mega-menu-c1337b8b-ac54-49a3-9075-fe3f269cafc8",
+   "name": "Hilfe",
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    176,
+    177,
+    178,
+    179,
+    180
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 74,
+   "pfad": "#mega-menu-7ab221d9-1de2-4374-bc17-2a81ea625c91",
+   "name": "Kontakt",
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    182,
+    183,
+    184,
+    185
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 75,
+   "pfad": "#mega-menu-83e657f0-a35b-435f-82ba-079014fafd30",
+   "name": "Störungen",
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    187,
+    188,
+    189
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 76,
+   "pfad": "#mega-menu-caf713d1-11a6-4efb-89d2-fce542d69ed2",
+   "name": "Ich möchte... >",
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    191,
+    192,
+    193,
+    194,
+    195
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 77,
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    199,
+    200
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 78,
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(2)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    201
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 79,
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(3)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    202
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 80,
+   "pfad": "#osAppInnerContainer > footer:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    204
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 81,
+   "pfad": "#osAppInnerContainer > footer:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > ul:nth-of-type(1)",
+   "name": "© Telekom Deutschland GmbH",
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    205,
+    206,
+    207,
+    208,
+    209,
+    210,
+    211
+   ],
+   "select": false,
+   "mit_marke": false
+  }
+ ],
+ "elemente": [
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "Skip to main content",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "StyledSkipButton-sc-kmrezv-0",
+    "foMyNw"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#osAppInnerContainer > button:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 0
+  },
+  {
+   "tag": "div",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-label": "Customer Search"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#osAppInnerContainer > header:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > nav:nth-of-type(1) > div:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 1
+  },
+  {
+   "tag": "div",
+   "rolle": "button",
+   "text": "Warenkorb",
+   "aria": {
+    "aria-label": ""
+   },
+   "daten": {
+    "data-qa": "HDR_UserIcon",
+    "data-event-message": "login",
+    "data-event-id": "headerClicks"
+   },
+   "id": null,
+   "klassen": [
+    "StyledUserIcon-sc-1aqhypp-0",
+    "eiFNuK"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#osAppInnerContainer > header:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > nav:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(3) > div:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 2
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-label": "main menu"
+   },
+   "daten": {
+    "data-cy": "hamburgerIcon",
+    "data-qa": "HDR_HamburgerIcon"
+   },
+   "id": null,
+   "klassen": [
+    "StyledHamburgerIcon-sc-v6nzbk-0",
+    "fPABji",
+    "icon",
+    "hamburgerIcon"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#osAppInnerContainer > header:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1) > button:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 3
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-label": "Close Submenu Internet"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "angleIconSelector"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": "button",
+   "href": null,
+   "ziel": null,
+   "pfad": "#osAppInnerContainer > header:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > nav:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 4
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-label": "Close Submenu DSL >"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "angleIconSelector"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": "button",
+   "href": null,
+   "ziel": null,
+   "pfad": "#mega-menu-a7751cc3-8a89-426f-812e-f23cf08c6103 > li:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 5
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-label": "Close Submenu Glasfaser >"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "angleIconSelector"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": "button",
+   "href": null,
+   "ziel": null,
+   "pfad": "#mega-menu-a7751cc3-8a89-426f-812e-f23cf08c6103 > li:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 6
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-label": "Close Submenu Geräte >"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "angleIconSelector"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": "button",
+   "href": null,
+   "ziel": null,
+   "pfad": "#mega-menu-a7751cc3-8a89-426f-812e-f23cf08c6103 > li:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 7
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-label": "Close Submenu Heimvernetzung >"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "angleIconSelector"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": "button",
+   "href": null,
+   "ziel": null,
+   "pfad": "#mega-menu-a7751cc3-8a89-426f-812e-f23cf08c6103 > li:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 8
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-label": "Close Submenu Ich möchte... >"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "angleIconSelector"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": "button",
+   "href": null,
+   "ziel": null,
+   "pfad": "#mega-menu-a7751cc3-8a89-426f-812e-f23cf08c6103 > li:nth-of-type(5) > div:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 9
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-label": "Close Submenu TV"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "angleIconSelector"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": "button",
+   "href": null,
+   "ziel": null,
+   "pfad": "#osAppInnerContainer > header:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > nav:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 10
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-label": "Close Submenu Tarife >"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "angleIconSelector"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": "button",
+   "href": null,
+   "ziel": null,
+   "pfad": "#mega-menu-95a77dd4-d793-4571-b72c-3c053f2778f0 > li:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 11
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-label": "Close Submenu Inhalte >"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "angleIconSelector"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": "button",
+   "href": null,
+   "ziel": null,
+   "pfad": "#mega-menu-95a77dd4-d793-4571-b72c-3c053f2778f0 > li:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 12
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-label": "Close Submenu Entertainment >"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "angleIconSelector"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": "button",
+   "href": null,
+   "ziel": null,
+   "pfad": "#mega-menu-95a77dd4-d793-4571-b72c-3c053f2778f0 > li:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 13
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-label": "Close Submenu Geräte >"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "angleIconSelector"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": "button",
+   "href": null,
+   "ziel": null,
+   "pfad": "#mega-menu-95a77dd4-d793-4571-b72c-3c053f2778f0 > li:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 14
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-label": "Close Submenu Ich möchte... >"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "angleIconSelector"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": "button",
+   "href": null,
+   "ziel": null,
+   "pfad": "#mega-menu-95a77dd4-d793-4571-b72c-3c053f2778f0 > li:nth-of-type(5) > div:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 15
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-label": "Close Submenu Mobilfunk"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "angleIconSelector"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": "button",
+   "href": null,
+   "ziel": null,
+   "pfad": "#osAppInnerContainer > header:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > nav:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 16
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-label": "Close Submenu Tarife >"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "angleIconSelector"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": "button",
+   "href": null,
+   "ziel": null,
+   "pfad": "#mega-menu-82f738ed-015c-4fb6-b64d-b188b51b144e > li:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 17
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-label": "Close Submenu Geräte >"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "angleIconSelector"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": "button",
+   "href": null,
+   "ziel": null,
+   "pfad": "#mega-menu-82f738ed-015c-4fb6-b64d-b188b51b144e > li:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 18
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-label": "Close Submenu Netz >"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "angleIconSelector"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": "button",
+   "href": null,
+   "ziel": null,
+   "pfad": "#mega-menu-82f738ed-015c-4fb6-b64d-b188b51b144e > li:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 19
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-label": "Close Submenu Ich möchte... >"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "angleIconSelector"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": "button",
+   "href": null,
+   "ziel": null,
+   "pfad": "#mega-menu-82f738ed-015c-4fb6-b64d-b188b51b144e > li:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 20
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-label": "Close Submenu Service"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "angleIconSelector"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": "button",
+   "href": null,
+   "ziel": null,
+   "pfad": "#osAppInnerContainer > header:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > nav:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(6) > div:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 21
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-label": "Close Submenu Hilfe"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "angleIconSelector"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": "button",
+   "href": null,
+   "ziel": null,
+   "pfad": "#mega-menu-cf7793fd-729f-4228-894d-f1d2e5924de2 > li:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 22
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-label": "Close Submenu Kontakt"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "angleIconSelector"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": "button",
+   "href": null,
+   "ziel": null,
+   "pfad": "#mega-menu-cf7793fd-729f-4228-894d-f1d2e5924de2 > li:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 23
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-label": "Close Submenu Störungen"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "angleIconSelector"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": "button",
+   "href": null,
+   "ziel": null,
+   "pfad": "#mega-menu-cf7793fd-729f-4228-894d-f1d2e5924de2 > li:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 24
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-label": "Close Submenu Ich möchte... >"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "angleIconSelector"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": "button",
+   "href": null,
+   "ziel": null,
+   "pfad": "#mega-menu-cf7793fd-729f-4228-894d-f1d2e5924de2 > li:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 25
+  },
+  {
+   "tag": "div",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-label": "Customer Search"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#osAppInnerContainer > header:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > section:nth-of-type(1) > div:nth-of-type(1) > nav:nth-of-type(1) > div:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 26
+  },
+  {
+   "tag": "div",
+   "rolle": "button",
+   "text": "Warenkorb",
+   "aria": {
+    "aria-label": ""
+   },
+   "daten": {
+    "data-qa": "HDR_UserIcon",
+    "data-event-message": "login",
+    "data-event-id": "headerClicks"
+   },
+   "id": null,
+   "klassen": [
+    "StyledUserIcon-sc-1aqhypp-0",
+    "eiFNuK"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#osAppInnerContainer > header:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > section:nth-of-type(1) > div:nth-of-type(1) > nav:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(3) > div:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 27
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "Anmelden",
+   "aria": {
+    "aria-label": "Anmelden"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "sc-jXbUNg",
+    "bpLBBy",
+    "dt_button",
+    "teaserBoxBtn",
+    "secondary",
+    "btn_large"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > article:nth-of-type(1) > div:nth-of-type(1) > button:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 28
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "",
+   "aria": {},
+   "daten": {
+    "data-qa": "undefined_undefined_PrevButton"
+   },
+   "id": null,
+   "klassen": [
+    "sc-jXbUNg",
+    "igJLeK",
+    "dt_button",
+    "nav-button",
+    "prev-btn",
+    "primary",
+    "btn_medium"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > button:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 29
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "",
+   "aria": {},
+   "daten": {
+    "data-qa": "undefined_undefined_NextButton"
+   },
+   "id": null,
+   "klassen": [
+    "sc-jXbUNg",
+    "igJLeK",
+    "dt_button",
+    "nav-button",
+    "next-btn",
+    "primary",
+    "btn_medium"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > button:nth-of-type(2)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 29
+  },
+  {
+   "tag": "div",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-disabled": "false",
+    "aria-pressed": "false",
+    "aria-label": "Select Obsidian color variant",
+    "aria-describedby": ":Rc8j9icaid2lH1:"
+   },
+   "daten": {
+    "data-qa": "PRD_Color0",
+    "data-state": "closed"
+   },
+   "id": null,
+   "klassen": [
+    "StyledColor-sc-e9yj8w-0",
+    "jAaKZV"
+   ],
+   "name": null,
+   "wert": "#2D2D2D",
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 30
+  },
+  {
+   "tag": "div",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-disabled": "false",
+    "aria-pressed": "false",
+    "aria-label": "Select Pistachio color variant",
+    "aria-describedby": ":Rk8j9icaid2lH1:"
+   },
+   "daten": {
+    "data-qa": "PRD_Color1",
+    "data-state": "closed"
+   },
+   "id": null,
+   "klassen": [
+    "StyledColor-sc-e9yj8w-0",
+    "jpHnoq"
+   ],
+   "name": null,
+   "wert": "#b0ae7d",
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 30
+  },
+  {
+   "tag": "div",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-disabled": "true",
+    "aria-pressed": "true",
+    "aria-label": "Select Frost color variant",
+    "aria-describedby": ":Rs8j9icaid2lH1:"
+   },
+   "daten": {
+    "data-qa": "PRD_Color2",
+    "data-state": "closed"
+   },
+   "id": null,
+   "klassen": [
+    "StyledColor-sc-e9yj8w-0",
+    "kArxLC",
+    "active",
+    "disabled"
+   ],
+   "name": null,
+   "wert": "#dee6f9",
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3)",
+   "sichtbar": true,
+   "deaktiviert": true,
+   "gewaehlt": "aria-pressed",
+   "optionen": null,
+   "behaelter": 30
+  },
+  {
+   "tag": "button",
+   "rolle": "radio",
+   "text": "256 GB",
+   "aria": {
+    "aria-disabled": "false",
+    "aria-checked": "true",
+    "aria-label": "256 GB"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "StyledFilterChips-sc-14akrv0-0",
+    "eNtHeK",
+    "dt_filterChips",
+    "filterChips",
+    "clickable",
+    "selected"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": "button",
+   "href": null,
+   "ziel": null,
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(2) > section:nth-of-type(1) > div:nth-of-type(1) > button:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": "aria-checked",
+   "optionen": null,
+   "behaelter": 31
+  },
+  {
+   "tag": "button",
+   "rolle": "radio",
+   "text": "512 GB + 130 €",
+   "aria": {
+    "aria-disabled": "true",
+    "aria-checked": "false",
+    "aria-label": "512 GB"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "StyledFilterChips-sc-14akrv0-0",
+    "eNtHeK",
+    "dt_filterChips",
+    "filterChips",
+    "clickable"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": "button",
+   "href": null,
+   "ziel": null,
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(2) > section:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": true,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 31
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "Mehr Informationen",
+   "aria": {
+    "aria-label": "More information about Return deal"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "sc-iGgWBj",
+    "bhjLuQ",
+    "dt_anchor",
+    "primary",
+    "moreInformationLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > button:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 32
+  },
+  {
+   "tag": "span",
+   "rolle": "switch",
+   "text": "",
+   "aria": {
+    "aria-checked": "false",
+    "aria-disabled": "false",
+    "aria-readonly": "false",
+    "aria-label": "Telekom Rückgabedeal, deactivated",
+    "aria-live": "polite"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "sc-cHMHOW",
+    "fESXrK",
+    "dt_switch",
+    "forwardTradeInSwitch"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 32
+  },
+  {
+   "tag": "input",
+   "rolle": "checkbox",
+   "text": "on",
+   "aria": {
+    "aria-hidden": "true"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "sc-laNGHT",
+    "ZEBdQ"
+   ],
+   "name": "Telekom Rückgabedeal, deactivated",
+   "wert": null,
+   "typ": "checkbox",
+   "href": null,
+   "ziel": null,
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1) > input:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 32
+  },
+  {
+   "tag": "button",
+   "rolle": "radio",
+   "text": "Ich möchte mein Handy nicht schützen.",
+   "aria": {
+    "aria-checked": "true"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "StyledInsuranceDevice-sc-g49dq-1",
+    "bnHsRT",
+    "active"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": "aria-checked",
+   "optionen": null,
+   "behaelter": 33
+  },
+  {
+   "tag": "label",
+   "rolle": "label",
+   "text": "",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "sc-jkTpcO",
+    "bdXWZT",
+    "dt_radio",
+    "radioType_primary",
+    "checked"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(1) > div:nth-of-type(1) > label:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": "label-checked",
+   "optionen": null,
+   "behaelter": 34
+  },
+  {
+   "tag": "input",
+   "rolle": "radio",
+   "text": "on",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "sc-bcSKrn",
+    "jHwtFU"
+   ],
+   "name": "radio",
+   "wert": null,
+   "typ": "radio",
+   "href": null,
+   "ziel": null,
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(1) > div:nth-of-type(1) > label:nth-of-type(1) > input:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": "checked",
+   "optionen": null,
+   "behaelter": 34
+  },
+  {
+   "tag": "button",
+   "rolle": "radio",
+   "text": "Unfallschutz Insure MyMobile M Schützt bei Displaybruch und Schäden durch Stürze und Flüssigkeiten sowie Express-Gerätetausch. Details 8 € monatlich (inkl. 19 % VerSt.) Unfallschutz",
+   "aria": {
+    "aria-checked": "false"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "StyledInsuranceDevice-sc-g49dq-1",
+    "bnHsRT"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(2)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 33
+  },
+  {
+   "tag": "label",
+   "rolle": "label",
+   "text": "Unfallschutz",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "sc-jkTpcO",
+    "bdXWZT",
+    "dt_radio",
+    "radioType_primary"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(2) > section:nth-of-type(2) > label:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 35
+  },
+  {
+   "tag": "input",
+   "rolle": "radio",
+   "text": "on",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "sc-bcSKrn",
+    "jHwtFU"
+   ],
+   "name": "insurance-option",
+   "wert": null,
+   "typ": "radio",
+   "href": null,
+   "ziel": null,
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(2) > section:nth-of-type(2) > label:nth-of-type(1) > input:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 35
+  },
+  {
+   "tag": "button",
+   "rolle": "radio",
+   "text": "Meist gekauft Unfall- und Diebstahlschutz Insure MyMobile L Schützt bei Diebstahl sowie bei Displaybruch und Schäden durch Stürze und Flüssigkeiten sowie Express-Gerätetausch. Details 10 € monatlich (",
+   "aria": {
+    "aria-checked": "false"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "StyledInsuranceDevice-sc-g49dq-1",
+    "bnHsRT"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(3)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 33
+  },
+  {
+   "tag": "label",
+   "rolle": "label",
+   "text": "Unfall- und Diebstahlschutz",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "sc-jkTpcO",
+    "bdXWZT",
+    "dt_radio",
+    "radioType_primary"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(3) > section:nth-of-type(2) > label:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 36
+  },
+  {
+   "tag": "input",
+   "rolle": "radio",
+   "text": "on",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "sc-bcSKrn",
+    "jHwtFU"
+   ],
+   "name": "insurance-option",
+   "wert": null,
+   "typ": "radio",
+   "href": null,
+   "ziel": null,
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(3) > section:nth-of-type(2) > label:nth-of-type(1) > input:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 36
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "Mehr Informationen",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "sc-iGgWBj",
+    "bhjLuQ",
+    "dt_anchor",
+    "primary"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(1) > article:nth-of-type(1) > div:nth-of-type(1) > button:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 37
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "MagentaMobil M",
+   "aria": {
+    "aria-controls": "accordion-content-fa44phixi",
+    "aria-expanded": "false"
+   },
+   "daten": {},
+   "id": "accordion-header-1wygvgthn",
+   "klassen": [
+    "sc-enkILE",
+    "PrjIX",
+    "accordion-header"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#accordion-header-1wygvgthn",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 38
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "Tarif ändern",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "sc-iGgWBj",
+    "bhjLuQ",
+    "dt_anchor",
+    "primary",
+    "tariff-action-button"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > article:nth-of-type(2) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 39
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "Tarif entfernen",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "sc-iGgWBj",
+    "bhjLuQ",
+    "dt_anchor",
+    "primary",
+    "tariff-action-button"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > article:nth-of-type(2) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(2)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 39
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "Preisübersicht anzeigen",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "sc-iGgWBj",
+    "bhjLuQ",
+    "dt_anchor",
+    "primary",
+    "StyledPaymentDetails-sc-1q9vybn-0",
+    "dCDgyt",
+    "link"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > article:nth-of-type(2) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > button:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 40
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "Ihre Vorteile",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "sc-iGgWBj",
+    "bhjLuQ",
+    "dt_anchor",
+    "primary",
+    "StyledTotalSaving-sc-1t3mw5c-0",
+    "joDOGp"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > article:nth-of-type(2) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1) > div:nth-of-type(1) > button:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 40
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "Preisübersicht anzeigen",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "sc-iGgWBj",
+    "bhjLuQ",
+    "dt_anchor",
+    "primary",
+    "StyledPaymentDetails-sc-1q9vybn-0",
+    "dCDgyt",
+    "link"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > article:nth-of-type(2) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1) > div:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(1) > button:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 41
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "In den Warenkorb",
+   "aria": {},
+   "daten": {
+    "data-qa": "PRD_AddToBasket",
+    "data-tariffstatecategoyid": "smartphone-tarife"
+   },
+   "id": "dyt_addDeviceToCart",
+   "klassen": [
+    "sc-jXbUNg",
+    "dyEXaR",
+    "dt_button",
+    "button",
+    "primary",
+    "btn_large"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > article:nth-of-type(2) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > section:nth-of-type(1) > button:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 42
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "Preisübersicht anzeigen",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "sc-iGgWBj",
+    "bhjLuQ",
+    "dt_anchor",
+    "primary",
+    "StyledPaymentDetails-sc-1q9vybn-0",
+    "dCDgyt",
+    "link"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > article:nth-of-type(2) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > section:nth-of-type(2) > button:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 42
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "Jetzt Handy verkaufen",
+   "aria": {
+    "aria-label": "Jetzt Handy verkaufen - Handyankauf"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "sc-iGgWBj",
+    "bhjLuQ",
+    "dt_anchor",
+    "primary"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > article:nth-of-type(2) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > button:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 43
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "Jetzt aktivieren",
+   "aria": {
+    "aria-label": "Jetzt aktivieren - MagentaEINS Vorteil"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "sc-iGgWBj",
+    "bhjLuQ",
+    "dt_anchor",
+    "primary"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > article:nth-of-type(2) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > button:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 44
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-label": "Mehr Informationen"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "sc-eFRcpv",
+    "ifNrWP",
+    "dt_icon_button",
+    "infoIconWrapper"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > article:nth-of-type(2) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > button:nth-of-type(2)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 44
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "Weitere Informationen",
+   "aria": {
+    "aria-label": "Weitere Informationen - Telekom Rückgabedeal"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "sc-iGgWBj",
+    "bhjLuQ",
+    "dt_anchor",
+    "primary"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > article:nth-of-type(2) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > button:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 43
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "Spezifikationen",
+   "aria": {
+    "aria-controls": "accordion-content-lp3jcllbr",
+    "aria-expanded": "false"
+   },
+   "daten": {},
+   "id": "accordion-header-m9r7k1i62",
+   "klassen": [
+    "sc-enkILE",
+    "PrjIX",
+    "accordion-header"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#accordion-header-m9r7k1i62",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 45
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "Preisübersicht anzeigen",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "sc-iGgWBj",
+    "bhjLuQ",
+    "dt_anchor",
+    "primary",
+    "StyledPaymentDetails-sc-1q9vybn-0",
+    "dCDgyt",
+    "link"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > article:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > button:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 46
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "Ihre Vorteile",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "sc-iGgWBj",
+    "bhjLuQ",
+    "dt_anchor",
+    "primary",
+    "StyledTotalSaving-sc-1t3mw5c-0",
+    "joDOGp"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > article:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1) > div:nth-of-type(1) > button:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 46
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "Preisübersicht anzeigen",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "sc-iGgWBj",
+    "bhjLuQ",
+    "dt_anchor",
+    "primary",
+    "StyledPaymentDetails-sc-1q9vybn-0",
+    "dCDgyt",
+    "link"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > article:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1) > div:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(1) > button:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 47
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "In den Warenkorb",
+   "aria": {},
+   "daten": {
+    "data-qa": "PRD_AddToBasket",
+    "data-tariffstatecategoyid": "smartphone-tarife"
+   },
+   "id": "dyt_addDeviceToCart",
+   "klassen": [
+    "sc-jXbUNg",
+    "dyEXaR",
+    "dt_button",
+    "button",
+    "primary",
+    "btn_large"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > article:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > section:nth-of-type(1) > button:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 48
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "Preisübersicht anzeigen",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "sc-iGgWBj",
+    "bhjLuQ",
+    "dt_anchor",
+    "primary",
+    "StyledPaymentDetails-sc-1q9vybn-0",
+    "dCDgyt",
+    "link"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > article:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > section:nth-of-type(2) > button:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 48
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "MagentaMobil M",
+   "aria": {
+    "aria-controls": "accordion-content-esn0gj308",
+    "aria-expanded": "false"
+   },
+   "daten": {},
+   "id": "accordion-header-e4yho9irb",
+   "klassen": [
+    "sc-enkILE",
+    "PrjIX",
+    "accordion-header"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#accordion-header-e4yho9irb",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 49
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "Tarif ändern",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "sc-iGgWBj",
+    "bhjLuQ",
+    "dt_anchor",
+    "primary",
+    "tariff-action-button"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 50
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "Tarif entfernen",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "sc-iGgWBj",
+    "bhjLuQ",
+    "dt_anchor",
+    "primary",
+    "tariff-action-button"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(2)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 50
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "Preisübersicht anzeigen",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "sc-iGgWBj",
+    "bhjLuQ",
+    "dt_anchor",
+    "primary",
+    "StyledPaymentDetails-sc-1q9vybn-0",
+    "dCDgyt",
+    "link"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > button:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 51
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "Ihre Vorteile",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "sc-iGgWBj",
+    "bhjLuQ",
+    "dt_anchor",
+    "primary",
+    "StyledTotalSaving-sc-1t3mw5c-0",
+    "joDOGp"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1) > div:nth-of-type(1) > button:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 51
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "Preisübersicht anzeigen",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "sc-iGgWBj",
+    "bhjLuQ",
+    "dt_anchor",
+    "primary",
+    "StyledPaymentDetails-sc-1q9vybn-0",
+    "dCDgyt",
+    "link"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1) > div:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(1) > button:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 52
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "In den Warenkorb",
+   "aria": {},
+   "daten": {
+    "data-qa": "PRD_AddToBasket",
+    "data-tariffstatecategoyid": "smartphone-tarife"
+   },
+   "id": "dyt_addDeviceToCart",
+   "klassen": [
+    "sc-jXbUNg",
+    "dyEXaR",
+    "dt_button",
+    "button",
+    "primary",
+    "btn_large"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > section:nth-of-type(1) > button:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 53
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "Preisübersicht anzeigen",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "sc-iGgWBj",
+    "bhjLuQ",
+    "dt_anchor",
+    "primary",
+    "StyledPaymentDetails-sc-1q9vybn-0",
+    "dCDgyt",
+    "link"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > section:nth-of-type(2) > button:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 53
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "Jetzt Handy verkaufen",
+   "aria": {
+    "aria-label": "Jetzt Handy verkaufen - Handyankauf"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "sc-iGgWBj",
+    "bhjLuQ",
+    "dt_anchor",
+    "primary"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > button:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 54
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "Jetzt aktivieren",
+   "aria": {
+    "aria-label": "Jetzt aktivieren - MagentaEINS Vorteil"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "sc-iGgWBj",
+    "bhjLuQ",
+    "dt_anchor",
+    "primary"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > button:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 55
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-label": "Mehr Informationen"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "sc-eFRcpv",
+    "ifNrWP",
+    "dt_icon_button",
+    "infoIconWrapper"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > button:nth-of-type(2)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 55
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "Weitere Informationen",
+   "aria": {
+    "aria-label": "Weitere Informationen - Telekom Rückgabedeal"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "sc-iGgWBj",
+    "bhjLuQ",
+    "dt_anchor",
+    "primary"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > button:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 54
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "",
+   "aria": {
+    "aria-label": "Telekom Home"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "logo",
+    "data-qa": "HDR_HomeIcon",
+    "data-cy": "logoIcon"
+   },
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/start",
+   "ziel": "_self",
+   "pfad": "#osAppInnerContainer > header:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 56
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "",
+   "aria": {
+    "aria-label": "Kundenservice"
+   },
+   "daten": {
+    "data-qa": "HDR_CustomIcon"
+   },
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/bestellung/bestellung-08003308000?samChecked=true",
+   "ziel": null,
+   "pfad": "#osAppInnerContainer > header:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > nav:nth-of-type(2) > ul:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 2
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "",
+   "aria": {
+    "aria-label": "Warenkorb, 0 Artikel"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "warenkorb",
+    "data-qa": "HDR_BasketIcon"
+   },
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/basket",
+   "ziel": null,
+   "pfad": "#osAppInnerContainer > header:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > nav:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(2) > div:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 2
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Telekom Shops",
+   "aria": {},
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Telekom Shops"
+   },
+   "id": null,
+   "klassen": [
+    "marketNavigationLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/telekom-shops",
+   "ziel": "_self",
+   "pfad": "#osAppInnerContainer > header:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > nav:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 57
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Kontakt",
+   "aria": {},
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Kontakt"
+   },
+   "id": null,
+   "klassen": [
+    "marketNavigationLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/kontakt",
+   "ziel": "_self",
+   "pfad": "#osAppInnerContainer > header:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > nav:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 57
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Aktionen %",
+   "aria": {
+    "aria-label": "Aktionen %",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Aktionen %"
+   },
+   "id": "858759bb-93f2-48da-93f8-3956ba493bc1",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/aktionen",
+   "ziel": null,
+   "pfad": "#\\38 58759bb-93f2-48da-93f8-3956ba493bc1",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 58
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Internet",
+   "aria": {
+    "aria-label": "Internet",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Internet"
+   },
+   "id": "a7751cc3-8a89-426f-812e-f23cf08c6103",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/festnetz",
+   "ziel": null,
+   "pfad": "#a7751cc3-8a89-426f-812e-f23cf08c6103",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 4
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "DSL >",
+   "aria": {
+    "aria-label": "DSL >",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Internet/DSL >"
+   },
+   "id": "6fc0dad3-93fb-4cab-8bce-1fb2378f1f9b",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/",
+   "ziel": "_self",
+   "pfad": "#\\36 fc0dad3-93fb-4cab-8bce-1fb2378f1f9b",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 5
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "DSL-Tarife",
+   "aria": {
+    "aria-label": "DSL-Tarife",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Internet/DSL >/DSL-Tarife"
+   },
+   "id": "f3acabad-2d3f-4ea4-a3d7-505431a566f8",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/tarife/internet-tarife",
+   "ziel": null,
+   "pfad": "#f3acabad-2d3f-4ea4-a3d7-505431a566f8",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 59
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Für Junge Leute unter 28",
+   "aria": {
+    "aria-label": "Für Junge Leute unter 28",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Internet/DSL >/Für Junge Leute unter 28"
+   },
+   "id": "b45d6532-5f4b-4959-bb6d-4b3474277d77",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/tarife/internet-tarife-young",
+   "ziel": null,
+   "pfad": "#b45d6532-5f4b-4959-bb6d-4b3474277d77",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 59
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Verfügbarkeitsprüfung",
+   "aria": {
+    "aria-label": "Verfügbarkeitsprüfung",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Internet/DSL >/Verfügbarkeitsprüfung"
+   },
+   "id": "f676fdab-e376-408b-ab80-9a6919f4f645",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/netz/dsl-vdsl-lte-verfuegbarkeit",
+   "ziel": null,
+   "pfad": "#f676fdab-e376-408b-ab80-9a6919f4f645",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 59
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Internet-Tarife ohne Laufzeit",
+   "aria": {
+    "aria-label": "Internet-Tarife ohne Laufzeit",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Internet/DSL >/Internet-Tarife ohne Laufzeit"
+   },
+   "id": "dcdba8e3-62f1-43b2-a554-f2dc2d220384",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/tarife/internet-tarife-flex",
+   "ziel": null,
+   "pfad": "#dcdba8e3-62f1-43b2-a554-f2dc2d220384",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 59
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Zubuchoptionen",
+   "aria": {
+    "aria-label": "Zubuchoptionen",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Internet/DSL >/Zubuchoptionen"
+   },
+   "id": "36efbb40-1863-45a4-a360-361ff78f842d",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/optionen/festnetz-optionen",
+   "ziel": null,
+   "pfad": "#\\33 6efbb40-1863-45a4-a360-361ff78f842d",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 59
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Glasfaser >",
+   "aria": {
+    "aria-label": "Glasfaser >",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Internet/Glasfaser >"
+   },
+   "id": "b6ad7f60-8896-4f99-b8a6-bcd26abbf1f2",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/",
+   "ziel": "_self",
+   "pfad": "#b6ad7f60-8896-4f99-b8a6-bcd26abbf1f2",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 6
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Glasfaser-Tarife",
+   "aria": {
+    "aria-label": "Glasfaser-Tarife",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Internet/Glasfaser >/Glasfaser-Tarife"
+   },
+   "id": "0f055319-9899-45fb-97d1-a01bed5d3749",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/netz/glasfaser?ActiveTabID=glasfaser-tarife&wt_mc=ii_sososoxx_navi-glasfaser-tarife-und-produkte-glasfaser-tarife",
+   "ziel": null,
+   "pfad": "#\\30 f055319-9899-45fb-97d1-a01bed5d3749",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 60
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Für privates Eigentum",
+   "aria": {
+    "aria-label": "Für privates Eigentum",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Internet/Glasfaser >/Für privates Eigentum"
+   },
+   "id": "cc121459-7012-4eda-8ea0-b76f9f4949b4",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/netz/glasfaser/neubauprojekte",
+   "ziel": null,
+   "pfad": "#cc121459-7012-4eda-8ea0-b76f9f4949b4",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 60
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Für gewerbliches Eigentum",
+   "aria": {
+    "aria-label": "Für gewerbliches Eigentum",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Internet/Glasfaser >/Für gewerbliches Eigentum"
+   },
+   "id": "3a76c485-bf46-471d-bb20-c2f373a14fe8",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/netz/glasfaser/glasfaser-gewerbe",
+   "ziel": null,
+   "pfad": "#\\33 a76c485-bf46-471d-bb20-c2f373a14fe8",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 60
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Glasfaser-Ausbau",
+   "aria": {
+    "aria-label": "Glasfaser-Ausbau",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Internet/Glasfaser >/Glasfaser-Ausbau"
+   },
+   "id": "73e85bd1-a680-4059-b020-a45eda59f8fc",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/netz/glasfaser/glasfaserausbau",
+   "ziel": null,
+   "pfad": "#\\37 3e85bd1-a680-4059-b020-a45eda59f8fc",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 60
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Glasfaser-Vorteile",
+   "aria": {
+    "aria-label": "Glasfaser-Vorteile",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Internet/Glasfaser >/Glasfaser-Vorteile"
+   },
+   "id": "18aa46c8-3249-4807-931e-bd18ab9dc676",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/netz/glasfaser-vorteile",
+   "ziel": null,
+   "pfad": "#\\31 8aa46c8-3249-4807-931e-bd18ab9dc676",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 60
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Geräte >",
+   "aria": {
+    "aria-label": "Geräte >",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Internet/Geräte >"
+   },
+   "id": "103d87f3-a81e-4b32-80a1-6d1db5393a1f",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/",
+   "ziel": "_self",
+   "pfad": "#\\31 03d87f3-a81e-4b32-80a1-6d1db5393a1f",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 7
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "WLAN & Router",
+   "aria": {
+    "aria-label": "WLAN & Router",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Internet/Geräte >/WLAN & Router"
+   },
+   "id": "253e404e-97a8-4394-b04c-8c6e156bc402",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraete/wlan-und-router",
+   "ziel": null,
+   "pfad": "#\\32 53e404e-97a8-4394-b04c-8c6e156bc402",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 61
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Mobile Router",
+   "aria": {
+    "aria-label": "Mobile Router",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Internet/Geräte >/Mobile Router"
+   },
+   "id": "be0dcd1b-bf03-442d-93ec-8cc33ff26901",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/shop/geraete/mobile-router",
+   "ziel": null,
+   "pfad": "#be0dcd1b-bf03-442d-93ec-8cc33ff26901",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 61
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Festnetztelefone",
+   "aria": {
+    "aria-label": "Festnetztelefone",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Internet/Geräte >/Festnetztelefone"
+   },
+   "id": "bae82fef-e5b4-4b89-a367-64f17dcf703c",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraete/festnetz-telefone",
+   "ziel": null,
+   "pfad": "#bae82fef-e5b4-4b89-a367-64f17dcf703c",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 61
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Smart Home Geräte",
+   "aria": {
+    "aria-label": "Smart Home Geräte",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Internet/Geräte >/Smart Home Geräte"
+   },
+   "id": "47664d5c-bb71-472d-b83f-d9e406682303",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://shop.telekom.de/smart-home",
+   "ziel": "_self",
+   "pfad": "#\\34 7664d5c-bb71-472d-b83f-d9e406682303",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 61
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Heimvernetzung >",
+   "aria": {
+    "aria-label": "Heimvernetzung >",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Internet/Heimvernetzung >"
+   },
+   "id": "ef025936-9472-42e2-8050-b8167bf41981",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/",
+   "ziel": "_self",
+   "pfad": "#ef025936-9472-42e2-8050-b8167bf41981",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 8
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "WLAN Pakete",
+   "aria": {
+    "aria-label": "WLAN Pakete",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Internet/Heimvernetzung >/WLAN Pakete"
+   },
+   "id": "324825b6-a178-400b-96b9-df66986fa13d",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/festnetz/heimvernetzung/wlan-pakete",
+   "ziel": null,
+   "pfad": "#\\33 24825b6-a178-400b-96b9-df66986fa13d",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 62
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "WLAN Optimierung",
+   "aria": {
+    "aria-label": "WLAN Optimierung",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Internet/Heimvernetzung >/WLAN Optimierung"
+   },
+   "id": "35e35697-cc10-4fd8-9dfe-045e7a8067b3",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/festnetz/heimvernetzung/wlan-optimierung",
+   "ziel": null,
+   "pfad": "#\\33 5e35697-cc10-4fd8-9dfe-045e7a8067b3",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 62
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Mesh WLAN",
+   "aria": {
+    "aria-label": "Mesh WLAN",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Internet/Heimvernetzung >/Mesh WLAN"
+   },
+   "id": "c3b1f928-21c2-45a3-aaa4-481577c775fc",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/festnetz/mesh-wlan",
+   "ziel": null,
+   "pfad": "#c3b1f928-21c2-45a3-aaa4-481577c775fc",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 62
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Smart Home",
+   "aria": {
+    "aria-label": "Smart Home",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Internet/Heimvernetzung >/Smart Home"
+   },
+   "id": "ea854218-05b7-4c0b-98c0-1068bf18743e",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://shop.telekom.de/smart-home-entdecken",
+   "ziel": "_self",
+   "pfad": "#ea854218-05b7-4c0b-98c0-1068bf18743e",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 62
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Ich möchte... >",
+   "aria": {
+    "aria-label": "Ich möchte... >",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Internet/Ich möchte... >"
+   },
+   "id": "b3838cb1-7ed9-4f30-a95c-1cb74d374b44",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/",
+   "ziel": "_self",
+   "pfad": "#b3838cb1-7ed9-4f30-a95c-1cb74d374b44",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 9
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "ins Kundencenter",
+   "aria": {
+    "aria-label": "ins Kundencenter",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Internet/Ich möchte... >/ins Kundencenter"
+   },
+   "id": "7fc16fd1-475d-4ccc-8cfb-27487ec2326c",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/mein-magenta-kundencenter",
+   "ziel": null,
+   "pfad": "#\\37 fc16fd1-475d-4ccc-8cfb-27487ec2326c",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 63
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Auftragsstatus einsehen",
+   "aria": {
+    "aria-label": "Auftragsstatus einsehen",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Internet/Ich möchte... >/Auftragsstatus einsehen"
+   },
+   "id": "03c1fd49-62e9-4583-8e12-0d5d13c17fcc",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/mein-magenta-kundencenter/auftragsstatus",
+   "ziel": null,
+   "pfad": "#\\30 3c1fd49-62e9-4583-8e12-0d5d13c17fcc",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 63
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Rechnung einsehen",
+   "aria": {
+    "aria-label": "Rechnung einsehen",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Internet/Ich möchte... >/Rechnung einsehen"
+   },
+   "id": "fc4461bc-f38b-4e02-b264-b798fd970879",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/mein-magenta-kundencenter/zahlungen",
+   "ziel": null,
+   "pfad": "#fc4461bc-f38b-4e02-b264-b798fd970879",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 63
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Tarif wechseln",
+   "aria": {
+    "aria-label": "Tarif wechseln",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Internet/Ich möchte... >/Tarif wechseln"
+   },
+   "id": "105dbe08-c0e4-455c-a623-26eb5faf106c",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/deep-link?bp=tariffChange&targetedLob=fixed&msisdn=default&showActionSelector=true",
+   "ziel": null,
+   "pfad": "#\\31 05dbe08-c0e4-455c-a623-26eb5faf106c",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 63
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Umzug beauftragen",
+   "aria": {
+    "aria-label": "Umzug beauftragen",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Internet/Ich möchte... >/Umzug beauftragen"
+   },
+   "id": "c128329f-04aa-42ef-8c64-98c0a1cde1d5",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/tarifwechsel/tarifaenderung?journey=move",
+   "ziel": null,
+   "pfad": "#c128329f-04aa-42ef-8c64-98c0a1cde1d5",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 63
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "TV",
+   "aria": {
+    "aria-label": "TV",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "TV"
+   },
+   "id": "95a77dd4-d793-4571-b72c-3c053f2778f0",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/magenta-tv",
+   "ziel": null,
+   "pfad": "#\\39 5a77dd4-d793-4571-b72c-3c053f2778f0",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 10
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Tarife >",
+   "aria": {
+    "aria-label": "Tarife >",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "TV/Tarife >"
+   },
+   "id": "250bed25-88bb-46c9-ba87-84e3f0b97611",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/",
+   "ziel": "_self",
+   "pfad": "#\\32 50bed25-88bb-46c9-ba87-84e3f0b97611",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 11
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "TV mit Telekom Internet",
+   "aria": {
+    "aria-label": "TV mit Telekom Internet",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "TV/Tarife >/TV mit Telekom Internet"
+   },
+   "id": "0cffbf92-f9ab-42e2-a096-d83ac21ec551",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/magenta-tv/tarife-und-optionen/magenta-tv-mit-internet-festnetz?wt_mc=ii_sososoxx_navi-tv-tarife-tv-mit-telekom-internet",
+   "ziel": null,
+   "pfad": "#\\30 cffbf92-f9ab-42e2-a096-d83ac21ec551",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 64
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "TV ohne Telekom Internet",
+   "aria": {
+    "aria-label": "TV ohne Telekom Internet",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "TV/Tarife >/TV ohne Telekom Internet"
+   },
+   "id": "981adfd3-3a86-4367-b6c3-76149309687c",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/magenta-tv/tarife-und-optionen/magenta-tv-mit-app",
+   "ziel": null,
+   "pfad": "#\\39 81adfd3-3a86-4367-b6c3-76149309687c",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 64
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "TV für junge Leute unter 28",
+   "aria": {
+    "aria-label": "TV für junge Leute unter 28",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "TV/Tarife >/TV für junge Leute unter 28"
+   },
+   "id": "09487314-f5db-401d-9563-99b695923a04",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/magenta-tv/tarife-und-optionen/magenta-tv-mit-internet-festnetz?ActiveTabID=young",
+   "ziel": null,
+   "pfad": "#\\30 9487314-f5db-401d-9563-99b695923a04",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 64
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Zubuchoptionen",
+   "aria": {
+    "aria-label": "Zubuchoptionen",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "TV/Tarife >/Zubuchoptionen"
+   },
+   "id": "002c98ac-03d6-4118-8274-4ca00bcb824c",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/optionen/tv-optionen-ohne-festnetz",
+   "ziel": null,
+   "pfad": "#\\30 02c98ac-03d6-4118-8274-4ca00bcb824c",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 64
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Inhalte >",
+   "aria": {
+    "aria-label": "Inhalte >",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "TV/Inhalte >"
+   },
+   "id": "fe7d73a8-8cbe-4af1-a05e-d243f754785f",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/",
+   "ziel": "_self",
+   "pfad": "#fe7d73a8-8cbe-4af1-a05e-d243f754785f",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 12
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Sender",
+   "aria": {
+    "aria-label": "Sender",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "TV/Inhalte >/Sender"
+   },
+   "id": "cb0fd2ee-c588-4f83-990c-6e0951ab7537",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/magenta-tv/inhalte/sender",
+   "ziel": null,
+   "pfad": "#cb0fd2ee-c588-4f83-990c-6e0951ab7537",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 65
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Streaming-Dienste",
+   "aria": {
+    "aria-label": "Streaming-Dienste",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "TV/Inhalte >/Streaming-Dienste"
+   },
+   "id": "357adb02-87b0-4730-9a61-c7303d24c8aa",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/magenta-tv/inhalte/streaming-dienste-partner",
+   "ziel": null,
+   "pfad": "#\\33 57adb02-87b0-4730-9a61-c7303d24c8aa",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 65
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Serien & Filme bei MagentaTV+",
+   "aria": {
+    "aria-label": "Serien & Filme bei MagentaTV+",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "TV/Inhalte >/Serien & Filme bei MagentaTV+"
+   },
+   "id": "f7e4623e-8087-4841-9867-9c9507852f50",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/unterhaltung/serien-und-filme",
+   "ziel": null,
+   "pfad": "#f7e4623e-8087-4841-9867-9c9507852f50",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 65
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Sport",
+   "aria": {
+    "aria-label": "Sport",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "TV/Inhalte >/Sport"
+   },
+   "id": "3b269e7b-6d67-47fd-9292-ad015bed694e",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/sport",
+   "ziel": null,
+   "pfad": "#\\33 b269e7b-6d67-47fd-9292-ad015bed694e",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 65
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Entertainment >",
+   "aria": {
+    "aria-label": "Entertainment >",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "TV/Entertainment >"
+   },
+   "id": "fb99b641-ffbb-4cda-83d2-4895cede315c",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/",
+   "ziel": "_self",
+   "pfad": "#fb99b641-ffbb-4cda-83d2-4895cede315c",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 13
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Disney+",
+   "aria": {
+    "aria-label": "Disney+",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "TV/Entertainment >/Disney+"
+   },
+   "id": "5270fbc9-c7ef-4b3c-b528-c6e351a72a74",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/magenta-tv/inhalte/disney-plus",
+   "ziel": null,
+   "pfad": "#\\35 270fbc9-c7ef-4b3c-b528-c6e351a72a74",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 66
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Netflix",
+   "aria": {
+    "aria-label": "Netflix",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "TV/Entertainment >/Netflix"
+   },
+   "id": "d8801d4a-affd-4e08-855d-b0b59a7bd373",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/magenta-tv/inhalte/netflix",
+   "ziel": null,
+   "pfad": "#d8801d4a-affd-4e08-855d-b0b59a7bd373",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 66
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "RTL+",
+   "aria": {
+    "aria-label": "RTL+",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "TV/Entertainment >/RTL+"
+   },
+   "id": "687c0e03-43e7-4f78-aea9-6f6a00fccdae",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/magenta-tv/inhalte/rtl-plus",
+   "ziel": null,
+   "pfad": "#\\36 87c0e03-43e7-4f78-aea9-6f6a00fccdae",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 66
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Apple TV",
+   "aria": {
+    "aria-label": "Apple TV",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "TV/Entertainment >/Apple TV"
+   },
+   "id": "ed28d7ff-54b3-47d4-976c-cf8eb2e921cf",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/magenta-tv/inhalte/apple-tv",
+   "ziel": null,
+   "pfad": "#ed28d7ff-54b3-47d4-976c-cf8eb2e921cf",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 66
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "DAZN",
+   "aria": {
+    "aria-label": "DAZN",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "TV/Entertainment >/DAZN"
+   },
+   "id": "8693d225-267f-4618-a8b4-cd44dbecd544",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/magenta-tv/inhalte/streaming-dienste-partner/dazn",
+   "ziel": null,
+   "pfad": "#\\38 693d225-267f-4618-a8b4-cd44dbecd544",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 66
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Paramount+",
+   "aria": {
+    "aria-label": "Paramount+",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "TV/Entertainment >/Paramount+"
+   },
+   "id": "a9149b27-2881-45e8-ac69-410b9cf0e991",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/magenta-tv/inhalte/paramount-plus",
+   "ziel": null,
+   "pfad": "#a9149b27-2881-45e8-ac69-410b9cf0e991",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 66
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "WOW",
+   "aria": {
+    "aria-label": "WOW",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "TV/Entertainment >/WOW"
+   },
+   "id": "e05ecf00-257f-4686-8842-8e76b6808c6e",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/magenta-tv/inhalte/streaming-dienste-partner/wow",
+   "ziel": null,
+   "pfad": "#e05ecf00-257f-4686-8842-8e76b6808c6e",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 66
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Geräte >",
+   "aria": {
+    "aria-label": "Geräte >",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "TV/Geräte >"
+   },
+   "id": "8190dda8-f2e1-4077-a5d2-a2abef18c735",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/",
+   "ziel": "_self",
+   "pfad": "#\\38 190dda8-f2e1-4077-a5d2-a2abef18c735",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 14
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "MagentaTV One",
+   "aria": {
+    "aria-label": "MagentaTV One",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "TV/Geräte >/MagentaTV One"
+   },
+   "id": "0e9dcba0-9e64-4110-bff7-757d96c1f0bd",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/magenta-tv/geraete/magenta-tv-one",
+   "ziel": null,
+   "pfad": "#\\30 e9dcba0-9e64-4110-bff7-757d96c1f0bd",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 67
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "MagentaTV Stick",
+   "aria": {
+    "aria-label": "MagentaTV Stick",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "TV/Geräte >/MagentaTV Stick"
+   },
+   "id": "c2a052fb-0f80-45a4-ade4-b235df9e804d",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/magenta-tv/tarife-und-optionen/magenta-tv-mit-stick",
+   "ziel": null,
+   "pfad": "#c2a052fb-0f80-45a4-ade4-b235df9e804d",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 67
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Apple TV 4K",
+   "aria": {
+    "aria-label": "Apple TV 4K",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "TV/Geräte >/Apple TV 4K"
+   },
+   "id": "65150895-0eb4-4814-94f3-c503f6fe23ba",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/magenta-tv/tarife-und-optionen/apple-tv-4k",
+   "ziel": null,
+   "pfad": "#\\36 5150895-0eb4-4814-94f3-c503f6fe23ba",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 67
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "TV-Receiver",
+   "aria": {
+    "aria-label": "TV-Receiver",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "TV/Geräte >/TV-Receiver"
+   },
+   "id": "27a867f3-5601-4fdc-b229-d1c3cfea1db8",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraete/tv-receiver",
+   "ziel": null,
+   "pfad": "#\\32 7a867f3-5601-4fdc-b229-d1c3cfea1db8",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 67
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "WLAN & Router",
+   "aria": {
+    "aria-label": "WLAN & Router",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "TV/Geräte >/WLAN & Router"
+   },
+   "id": "991866b9-5e49-46ca-b1a9-fa862c004a2c",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraete/wlan-und-router",
+   "ziel": null,
+   "pfad": "#\\39 91866b9-5e49-46ca-b1a9-fa862c004a2c",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 67
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Ich möchte... >",
+   "aria": {
+    "aria-label": "Ich möchte... >",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "TV/Ich möchte... >"
+   },
+   "id": "e8207e0b-d6d9-4c3c-abe7-440e254e8ff1",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/",
+   "ziel": "_self",
+   "pfad": "#e8207e0b-d6d9-4c3c-abe7-440e254e8ff1",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 15
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "ins Kundencenter",
+   "aria": {
+    "aria-label": "ins Kundencenter",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "TV/Ich möchte... >/ins Kundencenter"
+   },
+   "id": "28218189-58e6-4d31-9c7c-72743bf685b3",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/mein-magenta-kundencenter",
+   "ziel": null,
+   "pfad": "#\\32 8218189-58e6-4d31-9c7c-72743bf685b3",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 68
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Rechnungen einsehen",
+   "aria": {
+    "aria-label": "Rechnungen einsehen",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "TV/Ich möchte... >/Rechnungen einsehen"
+   },
+   "id": "5bd826e2-5aa0-496e-b00e-4a69275a1244",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/mein-magenta-kundencenter/zahlungen",
+   "ziel": null,
+   "pfad": "#\\35 bd826e2-5aa0-496e-b00e-4a69275a1244",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 68
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Tarif wechseln",
+   "aria": {
+    "aria-label": "Tarif wechseln",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "TV/Ich möchte... >/Tarif wechseln"
+   },
+   "id": "6b35e099-1601-4851-926c-c7c1774c0555",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/deep-link?bp=tariffChange&targetedLob=fixed&msisdn=default&showActionSelector=true",
+   "ziel": null,
+   "pfad": "#\\36 b35e099-1601-4851-926c-c7c1774c0555",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 68
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Auftragsstatus einsehen",
+   "aria": {
+    "aria-label": "Auftragsstatus einsehen",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "TV/Ich möchte... >/Auftragsstatus einsehen"
+   },
+   "id": "a0531d00-c569-4b04-a14d-ed324dda5c81",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/mein-magenta-kundencenter/auftragsstatus",
+   "ziel": null,
+   "pfad": "#a0531d00-c569-4b04-a14d-ed324dda5c81",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 68
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "schneller surfen",
+   "aria": {
+    "aria-label": "schneller surfen",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "TV/Ich möchte... >/schneller surfen"
+   },
+   "id": "86f48944-1870-49b5-adff-55773388d377",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/shop/tarife/tarifwechsel-speedup?bp=tariffChange",
+   "ziel": null,
+   "pfad": "#\\38 6f48944-1870-49b5-adff-55773388d377",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 68
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Mobilfunk",
+   "aria": {
+    "aria-label": "Mobilfunk",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Mobilfunk"
+   },
+   "id": "82f738ed-015c-4fb6-b64d-b188b51b144e",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/mobilfunk",
+   "ziel": null,
+   "pfad": "#\\38 2f738ed-015c-4fb6-b64d-b188b51b144e",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 16
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Tarife >",
+   "aria": {
+    "aria-label": "Tarife >",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Mobilfunk/Tarife >"
+   },
+   "id": "f64ec6fb-01b4-4962-a762-aa3c40a9dd96",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/",
+   "ziel": "_self",
+   "pfad": "#f64ec6fb-01b4-4962-a762-aa3c40a9dd96",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 17
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Handytarife",
+   "aria": {
+    "aria-label": "Handytarife",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Mobilfunk/Tarife >/Handytarife"
+   },
+   "id": "0b1da457-fff7-4bff-87c1-13e2d36fcd03",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/tarife/smartphone-tarife",
+   "ziel": null,
+   "pfad": "#\\30 b1da457-fff7-4bff-87c1-13e2d36fcd03",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 69
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Young-Tarife",
+   "aria": {
+    "aria-label": "Young-Tarife",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Mobilfunk/Tarife >/Young-Tarife"
+   },
+   "id": "7a8383a0-d3f7-471f-9511-66135cb0216e",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/tarife/smartphone-tarife-young",
+   "ziel": null,
+   "pfad": "#\\37 a8383a0-d3f7-471f-9511-66135cb0216e",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 69
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Zusatzkartenab 9.95 €",
+   "aria": {
+    "aria-label": "Zusatzkarten - ab 9.95 €",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Mobilfunk/Tarife >/Zusatzkarten"
+   },
+   "id": "ebf68eae-f1fd-451e-a5e7-4cbeaefd3b80",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/shop/tarife/zusatzkarten",
+   "ziel": null,
+   "pfad": "#ebf68eae-f1fd-451e-a5e7-4cbeaefd3b80",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 69
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Prepaid-Tarife",
+   "aria": {
+    "aria-label": "Prepaid-Tarife",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Mobilfunk/Tarife >/Prepaid-Tarife"
+   },
+   "id": "8d2cebb1-e537-4312-bba7-6f459beab2df",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/tarife/prepaid-tarife",
+   "ziel": null,
+   "pfad": "#\\38 d2cebb1-e537-4312-bba7-6f459beab2df",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 69
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Watch- & Tracker-Tarife",
+   "aria": {
+    "aria-label": "Watch- & Tracker-Tarife",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Mobilfunk/Tarife >/Watch- & Tracker-Tarife"
+   },
+   "id": "0cad9184-6988-47a5-a746-89abe70b1fe0",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/tarife/smart-connect",
+   "ziel": null,
+   "pfad": "#\\30 cad9184-6988-47a5-a746-89abe70b1fe0",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 69
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Zubuchoptionen",
+   "aria": {
+    "aria-label": "Zubuchoptionen",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Mobilfunk/Tarife >/Zubuchoptionen"
+   },
+   "id": "ba3ff960-451a-47b5-b435-938a6e4344e6",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/optionen/mobilfunk-optionen",
+   "ziel": null,
+   "pfad": "#ba3ff960-451a-47b5-b435-938a6e4344e6",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 69
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Geräte >",
+   "aria": {
+    "aria-label": "Geräte >",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Mobilfunk/Geräte >"
+   },
+   "id": "b6196fdb-2101-4a72-9290-d660edd0da47",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/",
+   "ziel": "_self",
+   "pfad": "#b6196fdb-2101-4a72-9290-d660edd0da47",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 18
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Handys",
+   "aria": {
+    "aria-label": "Handys",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Mobilfunk/Geräte >/Handys"
+   },
+   "id": "ab2c53bd-ccef-456a-b940-489dd3f3f8e6",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraete/smartphones",
+   "ziel": null,
+   "pfad": "#ab2c53bd-ccef-456a-b940-489dd3f3f8e6",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 70
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Tablets",
+   "aria": {
+    "aria-label": "Tablets",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Mobilfunk/Geräte >/Tablets"
+   },
+   "id": "ad725173-ec06-4a38-8c9f-400b7765f15a",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraete/tablets",
+   "ziel": null,
+   "pfad": "#ad725173-ec06-4a38-8c9f-400b7765f15a",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 70
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Smartwatches",
+   "aria": {
+    "aria-label": "Smartwatches",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Mobilfunk/Geräte >/Smartwatches"
+   },
+   "id": "6d890611-567f-4ed1-a697-5c6ec7f42a47",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraete/smartwatches",
+   "ziel": null,
+   "pfad": "#\\36 d890611-567f-4ed1-a697-5c6ec7f42a47",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 70
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Mobile Router",
+   "aria": {
+    "aria-label": "Mobile Router",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Mobilfunk/Geräte >/Mobile Router"
+   },
+   "id": "238a7b58-08d2-4ebf-9dec-3e006adc21c7",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraete/mobile-router",
+   "ziel": null,
+   "pfad": "#\\32 38a7b58-08d2-4ebf-9dec-3e006adc21c7",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 70
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "AI Glasses erlebenNEU",
+   "aria": {
+    "aria-label": "AI Glasses erleben - NEU",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Mobilfunk/Geräte >/AI Glasses erleben"
+   },
+   "id": "3f98f80e-b713-494e-b6b2-42a723c0eeda",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraete/ai-glasses-erleben",
+   "ziel": null,
+   "pfad": "#\\33 f98f80e-b713-494e-b6b2-42a723c0eeda",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 70
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "iPhone erleben",
+   "aria": {
+    "aria-label": "iPhone erleben",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Mobilfunk/Geräte >/iPhone erleben"
+   },
+   "id": "7fe19674-b0d4-407f-a479-c51db79b40c5",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraete/iphone-erleben",
+   "ziel": null,
+   "pfad": "#\\37 fe19674-b0d4-407f-a479-c51db79b40c5",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 70
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Android erleben",
+   "aria": {
+    "aria-label": "Android erleben",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Mobilfunk/Geräte >/Android erleben"
+   },
+   "id": "2928779a-df82-4ca9-ab68-262563c5ee4a",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/mobilfunk/android-betriebssystem",
+   "ziel": null,
+   "pfad": "#\\32 928779a-df82-4ca9-ab68-262563c5ee4a",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 70
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Zubehör",
+   "aria": {
+    "aria-label": "Zubehör",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Mobilfunk/Geräte >/Zubehör"
+   },
+   "id": "f5a25047-4376-44fd-8461-df54d336ede2",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://shop.telekom.de/zubehoer",
+   "ziel": "_self",
+   "pfad": "#f5a25047-4376-44fd-8461-df54d336ede2",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 70
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Netz >",
+   "aria": {
+    "aria-label": "Netz >",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Mobilfunk/Netz >"
+   },
+   "id": "68734051-ff22-471d-90bc-938ccfdc1850",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/",
+   "ziel": "_self",
+   "pfad": "#\\36 8734051-ff22-471d-90bc-938ccfdc1850",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 19
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "5G",
+   "aria": {
+    "aria-label": "5G",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Mobilfunk/Netz >/5G"
+   },
+   "id": "906e7d15-9286-4843-8350-a56bed929ca0",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/netz/5g",
+   "ziel": null,
+   "pfad": "#\\39 06e7d15-9286-4843-8350-a56bed929ca0",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 71
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "5G Ausbau",
+   "aria": {
+    "aria-label": "5G Ausbau",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Mobilfunk/Netz >/5G Ausbau"
+   },
+   "id": "9e111dc2-d359-4a03-85a4-c8c9e374f9e6",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/netz/mobilfunk-netzausbau",
+   "ziel": null,
+   "pfad": "#\\39 e111dc2-d359-4a03-85a4-c8c9e374f9e6",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 71
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Grünes Netz",
+   "aria": {
+    "aria-label": "Grünes Netz",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Mobilfunk/Netz >/Grünes Netz"
+   },
+   "id": "25c982e8-fcb9-4f2b-87a3-ceb9136337e0",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/ueber-das-unternehmen/green-magenta",
+   "ziel": null,
+   "pfad": "#\\32 5c982e8-fcb9-4f2b-87a3-ceb9136337e0",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 71
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Roaming & Ausland",
+   "aria": {
+    "aria-label": "Roaming & Ausland",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Mobilfunk/Netz >/Roaming & Ausland"
+   },
+   "id": "cbe81147-d8ff-4e08-8a89-06d95d5330d7",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/mobilfunk/roaming",
+   "ziel": null,
+   "pfad": "#cbe81147-d8ff-4e08-8a89-06d95d5330d7",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 71
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Ich möchte... >",
+   "aria": {
+    "aria-label": "Ich möchte... >",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Mobilfunk/Ich möchte... >"
+   },
+   "id": "246dcb86-012b-4a52-9bcb-463c1ce62e88",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/",
+   "ziel": "_self",
+   "pfad": "#\\32 46dcb86-012b-4a52-9bcb-463c1ce62e88",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 20
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "ins Kundencenter",
+   "aria": {
+    "aria-label": "ins Kundencenter",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Mobilfunk/Ich möchte... >/ins Kundencenter"
+   },
+   "id": "c8484c2e-9621-4eab-ae79-c4381e9bbae9",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/mein-magenta-kundencenter",
+   "ziel": null,
+   "pfad": "#c8484c2e-9621-4eab-ae79-c4381e9bbae9",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 72
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Rechnungen einsehen",
+   "aria": {
+    "aria-label": "Rechnungen einsehen",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Mobilfunk/Ich möchte... >/Rechnungen einsehen"
+   },
+   "id": "49c024db-bafe-4871-97e2-b7fce6525b0e",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/mein-magenta-kundencenter/zahlungen",
+   "ziel": null,
+   "pfad": "#\\34 9c024db-bafe-4871-97e2-b7fce6525b0e",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 72
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Vertrag verlängern",
+   "aria": {
+    "aria-label": "Vertrag verlängern",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Mobilfunk/Ich möchte... >/Vertrag verlängern"
+   },
+   "id": "3a79cdcd-500a-4ffc-8ecb-7a5de82eae2c",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://meinmagenta.go.link/dashboard/mobileTab?adj_t=1k7kabbf&adj_campaign=web_sales_navigation-vertragverlaengern-mobilfunk-20260827&adj_adgroup=mf&adj_deep_link=telekom%3A%2F%2Fdashboard%2FmobileTab&adj_fallback=https%3A%2F%2Fwww.telekom.de%2Fshop%2Fmobilfunk%2Fvertragsverlaengerung%3Fwt_mc%3Dzz_mfsosoxx_sales_web_sales_navigation-vertragverlaengern-mobilfunk-20260827_mf_adj&adj_redirect=https%3A%2F%2Fwww.telekom.de%2Fshop%2Fmobilfunk%2Fvertragsverlaengerung%3Fwt_mc%3Dzz_mfsosoxx_sales_web_sales_navigation-vertragverlaengern-mobilfunk-20260827_mf_adj&adj_redirect_macos=https%3A%2F%2Fwww.telekom.de%2Fshop%2Fmobilfunk%2Fvertragsverlaengerung%3Fwt_mc%3Dzz_mfsosoxx_sales_web_sales_navigation-vertragverlaengern-mobilfunk-20260827_mf_adj&wt_mc=zz_mfsosoxx_sales_web_sales_navigation-vertragverlaengern-mobilfunk-20260827_mf_adj",
+   "ziel": "_self",
+   "pfad": "#\\33 a79cdcd-500a-4ffc-8ecb-7a5de82eae2c",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 72
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Auftragsstatus einsehen",
+   "aria": {
+    "aria-label": "Auftragsstatus einsehen",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Mobilfunk/Ich möchte... >/Auftragsstatus einsehen"
+   },
+   "id": "c35486c9-7ed7-4e94-b097-ccd65a267ec3",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/mein-magenta-kundencenter/auftragsstatus",
+   "ziel": null,
+   "pfad": "#c35486c9-7ed7-4e94-b097-ccd65a267ec3",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 72
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Tarif wechseln",
+   "aria": {
+    "aria-label": "Tarif wechseln",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Mobilfunk/Ich möchte... >/Tarif wechseln"
+   },
+   "id": "46932281-8c57-4614-9dd4-76d33de9763a",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/tarifwechsel",
+   "ziel": null,
+   "pfad": "#\\34 6932281-8c57-4614-9dd4-76d33de9763a",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 72
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "MeinMagenta App",
+   "aria": {
+    "aria-label": "MeinMagenta App",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "MeinMagenta App"
+   },
+   "id": "a2bc5101-665f-4f9b-9ae7-b5f8a77f30ea",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/apps/meinmagenta-app",
+   "ziel": null,
+   "pfad": "#a2bc5101-665f-4f9b-9ae7-b5f8a77f30ea",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 58
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Service",
+   "aria": {
+    "aria-label": "Service",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Service"
+   },
+   "id": "cf7793fd-729f-4228-894d-f1d2e5924de2",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/hilfe/magentaservice",
+   "ziel": null,
+   "pfad": "#cf7793fd-729f-4228-894d-f1d2e5924de2",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 21
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Hilfe",
+   "aria": {
+    "aria-label": "Hilfe",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Service/Hilfe"
+   },
+   "id": "c1337b8b-ac54-49a3-9075-fe3f269cafc8",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/hilfe",
+   "ziel": null,
+   "pfad": "#c1337b8b-ac54-49a3-9075-fe3f269cafc8",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 22
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Vertrag & Rechnung",
+   "aria": {
+    "aria-label": "Vertrag & Rechnung",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Service/Hilfe/Vertrag & Rechnung"
+   },
+   "id": "08744626-147e-4314-aaf7-6de72846c1d9",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/hilfe/vertrag-rechnung",
+   "ziel": null,
+   "pfad": "#\\30 8744626-147e-4314-aaf7-6de72846c1d9",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 73
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Internet & Telefonie",
+   "aria": {
+    "aria-label": "Internet & Telefonie",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Service/Hilfe/Internet & Telefonie"
+   },
+   "id": "ba91c31e-1d3e-4d80-baac-7460dae657ed",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/hilfe/internet-telefonie",
+   "ziel": null,
+   "pfad": "#ba91c31e-1d3e-4d80-baac-7460dae657ed",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 73
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Geräte",
+   "aria": {
+    "aria-label": "Geräte",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Service/Hilfe/Geräte"
+   },
+   "id": "8e8b230a-0ab7-4ec6-9f65-9b76c8b3dfcf",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/hilfe/geraete-zubehoer",
+   "ziel": null,
+   "pfad": "#\\38 e8b230a-0ab7-4ec6-9f65-9b76c8b3dfcf",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 73
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "TV",
+   "aria": {
+    "aria-label": "TV",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Service/Hilfe/TV"
+   },
+   "id": "8d9be282-8d6c-4146-9f47-c996d832d145",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/hilfe/tv",
+   "ziel": null,
+   "pfad": "#\\38 d9be282-8d6c-4146-9f47-c996d832d145",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 73
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Apps & Dienste",
+   "aria": {
+    "aria-label": "Apps & Dienste",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Service/Hilfe/Apps & Dienste"
+   },
+   "id": "f98e8290-2f1a-453f-a9cd-6084421cd2c8",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/hilfe/apps-dienste",
+   "ziel": null,
+   "pfad": "#f98e8290-2f1a-453f-a9cd-6084421cd2c8",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 73
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Kontakt",
+   "aria": {
+    "aria-label": "Kontakt",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Service/Kontakt"
+   },
+   "id": "7ab221d9-1de2-4374-bc17-2a81ea625c91",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/kontakt",
+   "ziel": null,
+   "pfad": "#\\37 ab221d9-1de2-4374-bc17-2a81ea625c91",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 23
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Alle Kontaktmöglichkeiten",
+   "aria": {
+    "aria-label": "Alle Kontaktmöglichkeiten",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Service/Kontakt/Alle Kontaktmöglichkeiten"
+   },
+   "id": "2f50a71f-a355-4a88-a570-60bd2cd2d95a",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/kontakt",
+   "ziel": null,
+   "pfad": "#\\32 f50a71f-a355-4a88-a570-60bd2cd2d95a",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 74
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Kontakt zur Rechnung & Zahlung",
+   "aria": {
+    "aria-label": "Kontakt zur Rechnung & Zahlung",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Service/Kontakt/Kontakt zur Rechnung & Zahlung"
+   },
+   "id": "47ee390e-ae55-4e3b-be9b-8b1f633155a6",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/kontakt",
+   "ziel": null,
+   "pfad": "#\\34 7ee390e-ae55-4e3b-be9b-8b1f633155a6",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 74
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Kontakt zur Produktberatung",
+   "aria": {
+    "aria-label": "Kontakt zur Produktberatung",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Service/Kontakt/Kontakt zur Produktberatung"
+   },
+   "id": "246cf67a-faae-4aaf-8446-11a383a7c007",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/kontakt",
+   "ziel": null,
+   "pfad": "#\\32 46cf67a-faae-4aaf-8446-11a383a7c007",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 74
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Kontakt zur Kündigung",
+   "aria": {
+    "aria-label": "Kontakt zur Kündigung",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Service/Kontakt/Kontakt zur Kündigung"
+   },
+   "id": "0a4b48bb-8066-4ccc-82ba-1131a25a9c97",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/kontakt",
+   "ziel": null,
+   "pfad": "#\\30 a4b48bb-8066-4ccc-82ba-1131a25a9c97",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 74
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Störungen",
+   "aria": {
+    "aria-label": "Störungen",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Service/Störungen"
+   },
+   "id": "83e657f0-a35b-435f-82ba-079014fafd30",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/hilfe/hilfe-bei-stoerungen",
+   "ziel": null,
+   "pfad": "#\\38 3e657f0-a35b-435f-82ba-079014fafd30",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 24
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Diagnose starten",
+   "aria": {
+    "aria-label": "Diagnose starten",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Service/Störungen/Diagnose starten"
+   },
+   "id": "36e1f00f-bb43-45dd-a865-98edfdae3d02",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/hilfe/hilfe-bei-stoerungen/leitungspruefung",
+   "ziel": null,
+   "pfad": "#\\33 6e1f00f-bb43-45dd-a865-98edfdae3d02",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 75
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Hilfe bei Störungen",
+   "aria": {
+    "aria-label": "Hilfe bei Störungen",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Service/Störungen/Hilfe bei Störungen"
+   },
+   "id": "e18a31bc-4b10-4184-8eb2-18b8c58a9a93",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/hilfe/hilfe-bei-stoerungen",
+   "ziel": null,
+   "pfad": "#e18a31bc-4b10-4184-8eb2-18b8c58a9a93",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 75
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Störungsstatus",
+   "aria": {
+    "aria-label": "Störungsstatus",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Service/Störungen/Störungsstatus"
+   },
+   "id": "3f9b243d-57de-40a8-85f6-1571e443b6ac",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/hilfe/hilfe-bei-stoerungen/uebersicht-status",
+   "ziel": null,
+   "pfad": "#\\33 f9b243d-57de-40a8-85f6-1571e443b6ac",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 75
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Ich möchte... >",
+   "aria": {
+    "aria-label": "Ich möchte... >",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Service/Ich möchte... >"
+   },
+   "id": "caf713d1-11a6-4efb-89d2-fce542d69ed2",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/",
+   "ziel": "_self",
+   "pfad": "#caf713d1-11a6-4efb-89d2-fce542d69ed2",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 25
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "ins Kundencenter",
+   "aria": {
+    "aria-label": "ins Kundencenter",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Service/Ich möchte... >/ins Kundencenter"
+   },
+   "id": "588ad7ac-37a8-48e9-b7e6-316501f50242",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/mein-magenta-kundencenter",
+   "ziel": null,
+   "pfad": "#\\35 88ad7ac-37a8-48e9-b7e6-316501f50242",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 76
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Verträge verwalten",
+   "aria": {
+    "aria-label": "Verträge verwalten",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Service/Ich möchte... >/Verträge verwalten"
+   },
+   "id": "837e1cbc-8eab-4acd-afce-daf624c571bf",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/mein-magenta-kundencenter/vertraege",
+   "ziel": null,
+   "pfad": "#\\38 37e1cbc-8eab-4acd-afce-daf624c571bf",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 76
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Rechnungen einsehen",
+   "aria": {
+    "aria-label": "Rechnungen einsehen",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Service/Ich möchte... >/Rechnungen einsehen"
+   },
+   "id": "c26b9ae3-0a2b-466d-9f85-a383c51c3759",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/mein-magenta-kundencenter/zahlungen",
+   "ziel": null,
+   "pfad": "#c26b9ae3-0a2b-466d-9f85-a383c51c3759",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 76
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Persönliche Daten bearbeiten",
+   "aria": {
+    "aria-label": "Persönliche Daten bearbeiten",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Service/Ich möchte... >/Persönliche Daten bearbeiten"
+   },
+   "id": "ea3db2bd-63a5-4c6e-9cd7-7904b70922a0",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/mein-magenta-kundencenter/mein-profil",
+   "ziel": null,
+   "pfad": "#ea3db2bd-63a5-4c6e-9cd7-7904b70922a0",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 76
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Telekom empfehlen",
+   "aria": {
+    "aria-label": "Telekom empfehlen",
+    "aria-current": "false"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "Service/Ich möchte... >/Telekom empfehlen"
+   },
+   "id": "1b736af9-5ec4-437a-8363-7549aa9b6103",
+   "klassen": [
+    "anchorLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom-empfehlen.de/?c=navi_fn_12_25",
+   "ziel": "_self",
+   "pfad": "#\\31 b736af9-5ec4-437a-8363-7549aa9b6103",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 76
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "",
+   "aria": {
+    "aria-label": "Kundenservice"
+   },
+   "daten": {
+    "data-qa": "HDR_CustomIcon"
+   },
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/geraet/google/google-pixel-11/https://www.telekom.de/bestellung/bestellung-08003308000?samChecked=true",
+   "ziel": null,
+   "pfad": "#osAppInnerContainer > header:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > section:nth-of-type(1) > div:nth-of-type(1) > nav:nth-of-type(2) > ul:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 27
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "",
+   "aria": {
+    "aria-label": "Warenkorb, 0 Artikel"
+   },
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "warenkorb",
+    "data-qa": "HDR_BasketIcon"
+   },
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/shop/basket",
+   "ziel": null,
+   "pfad": "#osAppInnerContainer > header:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > section:nth-of-type(1) > div:nth-of-type(1) > nav:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(2) > div:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 27
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Home",
+   "aria": {
+    "aria-label": "Gehe zu Home"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/start",
+   "ziel": "_self",
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > span:nth-of-type(1) > nav:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 28
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "",
+   "aria": {
+    "aria-label": "Rechtlicher Hinweis ansehen"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "sc-dcJsrY",
+    "kSrUSN",
+    "dt_anchor",
+    "primary"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": "primary",
+   "href": "",
+   "ziel": null,
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 77
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Jetzt gebrauchtes Handy verkaufen",
+   "aria": {},
+   "daten": {
+    "data-qa": "TradeIn_Start_Trading"
+   },
+   "id": null,
+   "klassen": [
+    "sc-dcJsrY",
+    "kSrUSN",
+    "dt_anchor",
+    "primary"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": "primary",
+   "href": "",
+   "ziel": null,
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 77
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Details",
+   "aria": {},
+   "daten": {
+    "data-event-id": "learnMore",
+    "data-qa": "insurance_link"
+   },
+   "id": null,
+   "klassen": [
+    "sc-dcJsrY",
+    "kSrUSN",
+    "dt_anchor",
+    "primary",
+    "customLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": "primary",
+   "href": "",
+   "ziel": null,
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(2) > section:nth-of-type(1) > article:nth-of-type(1) > article:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 78
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Details",
+   "aria": {},
+   "daten": {
+    "data-event-id": "learnMore",
+    "data-qa": "insurance_link"
+   },
+   "id": null,
+   "klassen": [
+    "sc-dcJsrY",
+    "kSrUSN",
+    "dt_anchor",
+    "primary",
+    "customLink"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": "primary",
+   "href": "",
+   "ziel": null,
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(3) > section:nth-of-type(1) > article:nth-of-type(1) > article:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 79
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "",
+   "aria": {
+    "aria-label": "Zum Testbericht: Google Pixel 11 Chip Testsiegel Einzeltest Sehr gut (1,4) - Öffnet in neuem Tab"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.chip.de/test-kaufberatung/handy-zubehoer/google-pixel-11-im-test_07659332-7226-49c7-8a5f-5a24e1fa9290.html",
+   "ziel": "_blank",
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > article:nth-of-type(2) > section:nth-of-type(1) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(2) > ol:nth-of-type(2) > li:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 45
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "",
+   "aria": {},
+   "daten": {
+    "data-event-id": "headerClicks",
+    "data-event-message": "logo",
+    "data-qa": "HDR_HomeIcon",
+    "data-cy": "logoIcon"
+   },
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/start",
+   "ziel": "_self",
+   "pfad": "#osAppInnerContainer > footer:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 80
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Impressum",
+   "aria": {},
+   "daten": {
+    "data-event-id": "Footer Clicks",
+    "data-event-message": "Impressum",
+    "data-event-path": "cart.global.footer.simpleFooter.imprint",
+    "data-event-page-name": "deviceDetailed"
+   },
+   "id": null,
+   "klassen": [
+    "tdg-link-txt"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/impressum",
+   "ziel": "_self",
+   "pfad": "#osAppInnerContainer > footer:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 81
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Datenschutz",
+   "aria": {},
+   "daten": {
+    "data-event-id": "Footer Clicks",
+    "data-event-message": "Datenschutz",
+    "data-event-path": "cart.global.footer.simpleFooter.dataProtection",
+    "data-event-page-name": "deviceDetailed"
+   },
+   "id": null,
+   "klassen": [
+    "tdg-link-txt"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/ueber-das-unternehmen/datenschutz",
+   "ziel": "_self",
+   "pfad": "#osAppInnerContainer > footer:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(2) > div:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 81
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "AGB",
+   "aria": {},
+   "daten": {
+    "data-event-id": "Footer Clicks",
+    "data-event-message": "AGB",
+    "data-event-path": "cart.global.footer.simpleFooter.conditions",
+    "data-event-page-name": "deviceDetailed"
+   },
+   "id": null,
+   "klassen": [
+    "tdg-link-txt"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/agb",
+   "ziel": "_self",
+   "pfad": "#osAppInnerContainer > footer:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(3) > div:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 81
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Produktinformationsblatt",
+   "aria": {},
+   "daten": {
+    "data-event-id": "Footer Clicks",
+    "data-event-message": "Produktinformationsblatt",
+    "data-event-path": "cart.global.footer.simpleFooter.productInformationSheet",
+    "data-event-page-name": "deviceDetailed"
+   },
+   "id": null,
+   "klassen": [
+    "tdg-link-txt"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/produktinformationsblatt",
+   "ziel": "_self",
+   "pfad": "#osAppInnerContainer > footer:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(4) > div:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 81
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Verbraucherinformation",
+   "aria": {},
+   "daten": {
+    "data-event-id": "Footer Clicks",
+    "data-event-message": "Verbraucherinformation",
+    "data-event-path": "cart.global.footer.simpleFooter.customerInformation",
+    "data-event-page-name": "deviceDetailed"
+   },
+   "id": null,
+   "klassen": [
+    "tdg-link-txt"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/ueber-das-unternehmen/verbraucherinformationen",
+   "ziel": "_self",
+   "pfad": "#osAppInnerContainer > footer:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(5) > div:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 81
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Verträge hier kündigen",
+   "aria": {},
+   "daten": {
+    "data-event-id": "Footer Clicks",
+    "data-event-message": "Verträge hier kündigen",
+    "data-event-path": "cart.global.footer.simpleFooter.protectionOfMinors",
+    "data-event-page-name": "deviceDetailed"
+   },
+   "id": null,
+   "klassen": [
+    "tdg-link-txt"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/kontakt/kuendigung",
+   "ziel": "_self",
+   "pfad": "#osAppInnerContainer > footer:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(6) > div:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 81
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Vertrag widerrufen",
+   "aria": {},
+   "daten": {
+    "data-event-id": "Footer Clicks",
+    "data-event-message": "Vertrag widerrufen",
+    "data-event-path": "cart.global.footer.simpleFooter.withdraw",
+    "data-event-page-name": "deviceDetailed"
+   },
+   "id": null,
+   "klassen": [
+    "tdg-link-txt",
+    "tdg-link-underline"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.telekom.de/kontakt/e-mail-kontakt/widerruf",
+   "ziel": "_self",
+   "pfad": "#osAppInnerContainer > footer:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(7) > div:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 81
+  }
+ ]
+}

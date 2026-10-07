@@ -1,0 +1,207 @@
+{
+ "anbieter": "freenet",
+ "name": "mobilcom-debitel",
+ "datum": "2026-10-07",
+ "status": "gelesen",
+ "grund": null,
+ "kennung": null,
+ "parallelpruefung": "vor jeder Seite",
+ "robots_gelesen": true,
+ "abstand_sekunden": 2.0,
+ "besuchszeit": null,
+ "dauer_sekunden": 101.5,
+ "zeitgrenze_sekunden": 3000,
+ "seiten": [
+  {
+   "nummer": 1,
+   "geraet": "apple-iphone-17-pro",
+   "speicher_gb": 256,
+   "adresse": "https://www.freenet.de/handys-smartphones/apple/iphone-17-pro-ohne-vertrag/p/P-M-4234664?ds=P-4356815",
+   "endadresse": "https://www.freenet.de/handys-smartphones/apple/iphone-17-pro-ohne-vertrag/p/P-M-4234664?ds=P-4356815",
+   "status": "gelesen",
+   "grund": null,
+   "bot_schutz": false,
+   "http_status": 200,
+   "ruhe": true,
+   "dateien": {
+    "bedienelemente": "bedienelemente-1.json",
+    "preise": "preise-1.json",
+    "klicks": "klicks-1.json",
+    "mitschnitt": "mitschnitt-1.json",
+    "screenshot": "seite-1.png",
+    "html": "seite-1.html.gz"
+   },
+   "zaehlung": {
+    "anfragen": 114,
+    "verworfen": 14,
+    "gescheitert": 0,
+    "mitschnitt": 3,
+    "elemente": 201,
+    "gruppen_je_art": {
+     "unbekannt": 46,
+     "farbe": 3,
+     "tarif": 4,
+     "speicher": 1
+    },
+    "preis_kandidaten": 5,
+    "klicks": 1
+   },
+   "verworfen": [
+    {
+     "url": "https://fnm-prod-components.s3.eu-central-1.amazonaws.com/ecom-order-progressbar/ecom-order-progressbar.styles.css.gz",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://fnm-prod-components.s3.eu-central-1.amazonaws.com/ecom-trusted-badge/ecom-trusted-badge.styles.css.gz",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://fnm-prod-components.s3.eu-central-1.amazonaws.com/ecom-footer/ecom-footer.styles.css.gz",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495",
+     "grund": "ReadTimeout: The read operation timed out"
+    },
+    {
+     "url": "https://fnm-prod-components.s3.eu-central-1.amazonaws.com/ecom-order-progressbar/ecom-order-progressbar.js.gz",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://fnm-prod-components.s3.eu-central-1.amazonaws.com/ecom-trusted-badge/ecom-trusted-badge.js.gz",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://fnm-prod-components.s3.eu-central-1.amazonaws.com/ecom-footer/ecom-footer.js.gz",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://binkiesproductionweu.servicebus.windows.net/binkiesproductionp2weu/messages",
+     "grund": "robots.txt nicht lesbar (HTTP 401)"
+    },
+    {
+     "url": "https://www.freenet.de/cdn-cgi/challenge-platform/scripts/jsd/main.js",
+     "grund": "per robots.txt gesperrt: /cdn-cgi/challenge-platform/scripts/jsd/main.js"
+    },
+    {
+     "url": "https://cdn.privacy-mgmt.com/unified/wrapperMessagingWithoutDetection.js?cb=1791354867536",
+     "grund": "per robots.txt gesperrt: /unified/wrapperMessagingWithoutDetection.js?cb=1791354867536"
+    },
+    {
+     "url": "https://gallery-content.binkies3d.com/maps/L6KoYytu/8yn1qjnc/content-map.json",
+     "grund": "robots.txt nicht lesbar (HTTP 400)"
+    },
+    {
+     "url": "https://gallery-content.binkies3d.com/maps/L6KoYytu/8yn1qjnc/content-map.json",
+     "grund": "robots.txt nicht lesbar (HTTP 400)"
+    },
+    {
+     "url": "https://binkiesproductionweu.servicebus.windows.net/binkiesproductionp2weu/messages",
+     "grund": "robots.txt nicht lesbar (HTTP 401)"
+    },
+    {
+     "url": "https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495",
+     "grund": "ReadTimeout: The read operation timed out"
+    }
+   ],
+   "gescheitert": []
+  },
+  {
+   "nummer": 2,
+   "geraet": "google-pixel-10",
+   "speicher_gb": 256,
+   "adresse": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-ohne-vertrag/p/P-M-4206117?ds=P-4292934",
+   "endadresse": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-ohne-vertrag/p/P-M-4206117?ds=P-4292934",
+   "status": "gelesen",
+   "grund": null,
+   "bot_schutz": false,
+   "http_status": 200,
+   "ruhe": true,
+   "dateien": {
+    "bedienelemente": "bedienelemente-2.json",
+    "preise": "preise-2.json",
+    "klicks": "klicks-2.json",
+    "mitschnitt": "mitschnitt-2.json",
+    "screenshot": "seite-2.png",
+    "html": "seite-2.html.gz"
+   },
+   "zaehlung": {
+    "anfragen": 114,
+    "verworfen": 14,
+    "gescheitert": 0,
+    "mitschnitt": 3,
+    "elemente": 200,
+    "gruppen_je_art": {
+     "unbekannt": 46,
+     "farbe": 3,
+     "tarif": 4,
+     "speicher": 1
+    },
+    "preis_kandidaten": 5,
+    "klicks": 1
+   },
+   "verworfen": [
+    {
+     "url": "https://fnm-prod-components.s3.eu-central-1.amazonaws.com/ecom-order-progressbar/ecom-order-progressbar.styles.css.gz",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://fnm-prod-components.s3.eu-central-1.amazonaws.com/ecom-trusted-badge/ecom-trusted-badge.styles.css.gz",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://fnm-prod-components.s3.eu-central-1.amazonaws.com/ecom-footer/ecom-footer.styles.css.gz",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495",
+     "grund": "ReadTimeout: The read operation timed out"
+    },
+    {
+     "url": "https://fnm-prod-components.s3.eu-central-1.amazonaws.com/ecom-order-progressbar/ecom-order-progressbar.js.gz",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://fnm-prod-components.s3.eu-central-1.amazonaws.com/ecom-trusted-badge/ecom-trusted-badge.js.gz",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://fnm-prod-components.s3.eu-central-1.amazonaws.com/ecom-footer/ecom-footer.js.gz",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://binkiesproductionweu.servicebus.windows.net/binkiesproductionp2weu/messages",
+     "grund": "robots.txt nicht lesbar (HTTP 401)"
+    },
+    {
+     "url": "https://cdn.privacy-mgmt.com/unified/wrapperMessagingWithoutDetection.js?cb=1791354900586",
+     "grund": "per robots.txt gesperrt: /unified/wrapperMessagingWithoutDetection.js?cb=1791354900586"
+    },
+    {
+     "url": "https://gallery-content.binkies3d.com/maps/L6KoYytu/8yn1qjnc/content-map.json",
+     "grund": "robots.txt nicht lesbar (HTTP 400)"
+    },
+    {
+     "url": "https://gallery-content.binkies3d.com/maps/L6KoYytu/8yn1qjnc/content-map.json",
+     "grund": "robots.txt nicht lesbar (HTTP 400)"
+    },
+    {
+     "url": "https://binkiesproductionweu.servicebus.windows.net/binkiesproductionp2weu/messages",
+     "grund": "robots.txt nicht lesbar (HTTP 401)"
+    },
+    {
+     "url": "https://www.freenet.de/cdn-cgi/challenge-platform/scripts/jsd/main.js",
+     "grund": "per robots.txt gesperrt: /cdn-cgi/challenge-platform/scripts/jsd/main.js"
+    },
+    {
+     "url": "https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495",
+     "grund": "ReadTimeout: The read operation timed out"
+    }
+   ],
+   "gescheitert": []
+  }
+ ],
+ "groesse_bytes": 1008502,
+ "groessengrenze_bytes": 8000000,
+ "gekuerzt": []
+}

@@ -1,0 +1,548 @@
+{
+ "anfragen": [
+  {
+   "nummer": 1,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/samsung-galaxy-s26",
+   "art": "document",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 2,
+   "methode": "GET",
+   "url": "https://content.1und1.de/fonts/1und1-web-sans-57-condensed.woff2",
+   "art": "font",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 3,
+   "methode": "GET",
+   "url": "https://content.1und1.de/fonts/1und1-web-sans-77-black-condensed.woff2",
+   "art": "font",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 4,
+   "methode": "GET",
+   "url": "https://content.1und1.de/fonts/1und1-web-sans-87-extra-black-condensed.woff2",
+   "art": "font",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 5,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/609613e56ea5d0ade59b9f2cfade1d9d0bac1d2b/main.css?bust=4",
+   "art": "stylesheet",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 6,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/d04a48664ce34241a000691b96d5c61d876df089/d-t-m-navigation-service-card-mobile-3812-img-service-card-mobilfunk.png?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 7,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/frontend/product-details/images/hwd-first-visit/spotlights-xl.webp",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 8,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/frontend/product-details/images/hwd-first-visit/d-android-hwd-configurator-d44811-optimiert-img-info-zum-eins-und-eins-einfachwechsel.svg",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 9,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/c7671e327ea0c1e6fbb095d579fc9a1c-img-samsung-galaxy-s26-violet-duo-1.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 10,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/frontend/product-details/images/hwd-first-visit/groundlight-xl.webp",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 11,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/frontend/product-details/images/hwd-first-visit/spotlights-sm.webp",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 12,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.AccComponents/1791299594/JavaScript/StickyContactChatGenesys.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 13,
+   "methode": "GET",
+   "url": "https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495",
+   "art": "script",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 14,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/b9e0d709755d7bcdcab6b6567c9877aa2b2f9349/main.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 15,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.NNodeTypes/1791299590/JavaScript/bs-transformer.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 16,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.NNodeTypes/1791299590/JavaScript/shop-general.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 17,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.ReactNodeTypes/1791299590/JavaScript/main.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 18,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.JNodeTypes/1791299590/JavaScript/RecurringModal/RecurringModal.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 19,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.Shop/1791299595/JavaScript/Tealium/video-tracking.min.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 20,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 21,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/d6d8ede50e84ee3006776d88c347bfc819c20756/d-mktbox-4833-img-1und1-wechselverprechen-mobilfunk-1200x550.webp?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 22,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/576ced15f07189968793d877a32c960af64b39be/parallax-device-asset-v4599-img-s26-mit-hintegrundbild-canyons-588x296.webp?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 23,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/dd045d3fc2feec9ee9e39fcf9d8b92ff009deefc/d-t-parallax-container-bsc-bg-v4599-img-canyons-1499x781.webp?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 24,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.JNodeTypes/1791299590/Images/ContactBubble/lg.png?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 25,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.Shop/1791299595/JavaScript/Survey/isurvey.min.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 26,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.Shop/1791299595/JavaScript/Survey/rogator.min.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 27,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/d04a48664ce34241a000691b96d5c61d876df089/d-t-m-navigation-service-card-mobile-3812-img-service-card-mobilfunk.png?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 28,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/c7671e327ea0c1e6fbb095d579fc9a1c-img-samsung-galaxy-s26-violet-duo-1.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 29,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/53ac3ab433514823fc527a02cbd82a19-img-samsung-galaxy-s26-violet-front-badge-1.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 30,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/1cd29eb62dedca4c2b5d118e2bfea17e-img-samsung-galaxy-s26-violet-back.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 31,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/0652976f22e7986c6837768980b7bc1c-img-samsung-galaxy-s26-violet-rechts.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 32,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/84aec9cc5f440c9900f1c4ea274b244e-img-samsung-galaxy-s26-violet-side.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 33,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/fb3a2895723d52388517e025a464b72462042b37/vtr-4118-lieferumfang-ohne.svg?bust=3",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 34,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_svg/10%20-%2025/usb%20pd/ladeeigenschaften.svg",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 35,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/de771b8b5cd77003a308d4c9925815a1-A-Left-DarkGreen-WithAGScale.svg",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 36,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/f49a9b3967d343185e30e77a4c21aab7-d-t-m-produktbild2-v4820-img-galaxy-buds4-schwarz.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 37,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/b8b120aa5e26fbb9e709bf3a3315fbf6-d-t-m-produktbild2-v4820-img-galaxy-buds4-pro-schwarz.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 38,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/f51e04f9974566d6e5338412c94f39cbb59b83d7/d-t-m-img-d48240-wackelfrei-video-animation-slide.png?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 39,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/9645a512daba222c5edb94652e94d6601b03c957/d-t-m-hwd-content2-front-v4599-img-galaxy-s26.webp?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 40,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/9f2cc9b1e66c1961922b43e53715ad290e05587b/d-t-m-hwd-content2-back2-v4599-img-galaxy-s26.webp?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 41,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/63c9b70861cd27e7dc4b9e580cc77fa34b930e1b/d-t-m-hwd-content-img-samsung-galaxy-s26-violet-front.webp?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 42,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/cbe71a44a9a081d018ed22392716aff79850a27c/d-t-m-ssc-content3-v4599-img-akku.webp?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 43,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/b015a129abe3909685c76f198806966f48351f15/icons.svg?bust=4",
+   "art": "xhr",
+   "status": null,
+   "abbruch": "net::ERR_ABORTED"
+  },
+  {
+   "nummer": 44,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/d6d8ede50e84ee3006776d88c347bfc819c20756/d-mktbox-4833-img-1und1-wechselverprechen-mobilfunk-1200x550.webp?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 45,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/c7671e327ea0c1e6fbb095d579fc9a1c-img-samsung-galaxy-s26-violet-duo-1.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 46,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 47,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/frontend/product-details/images/hwd-first-visit/d-android-hwd-configurator-d44811-optimiert-img-info-zum-eins-und-eins-einfachwechsel.svg",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 48,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/1cd29eb62dedca4c2b5d118e2bfea17e-img-samsung-galaxy-s26-violet-back~235x470.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 49,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/0652976f22e7986c6837768980b7bc1c-img-samsung-galaxy-s26-violet-rechts.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 50,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/53ac3ab433514823fc527a02cbd82a19-img-samsung-galaxy-s26-violet-front-badge-1.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 51,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/84aec9cc5f440c9900f1c4ea274b244e-img-samsung-galaxy-s26-violet-side.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 52,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/f49a9b3967d343185e30e77a4c21aab7-d-t-m-produktbild2-v4820-img-galaxy-buds4-schwarz.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 53,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/b8b120aa5e26fbb9e709bf3a3315fbf6-d-t-m-produktbild2-v4820-img-galaxy-buds4-pro-schwarz.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 54,
+   "methode": "GET",
+   "url": "https://content.1und1.de/ctx/dh/libt.min.js?bust=2026100706",
+   "art": "script",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 55,
+   "methode": "POST",
+   "url": "https://api.1und1.de/genesys/channelroutingservice/request/productline",
+   "art": "fetch",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 56,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/f49a9b3967d343185e30e77a4c21aab7-d-t-m-produktbild2-v4820-img-galaxy-buds4-schwarz.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 57,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/cdn-cgi/challenge-platform/scripts/jsd/main.js",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 58,
+   "methode": "POST",
+   "url": "https://api.1und1.de/genesys/channelroutingservice/request/productline",
+   "art": "fetch",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 59,
+   "methode": "POST",
+   "url": "https://mobile.1und1.de/cdn-cgi/challenge-platform/h/g/jsd/oneshot/4df4a60fa397/0.2140082122380329:1791352831:S1b4lX_E_NGVMZRtEP9ZJDN-b5gJv-CrXogL3HFzj9k/a46ae2dd2bcb701a",
+   "art": "xhr",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 60,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/frontend/product-details/images/hwd-first-visit/d-android-hwd-configurator-d44811-optimiert-img-info-zum-eins-und-eins-einfachwechsel.svg",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 61,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/c7671e327ea0c1e6fbb095d579fc9a1c-img-samsung-galaxy-s26-violet-duo-1.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 62,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/1cd29eb62dedca4c2b5d118e2bfea17e-img-samsung-galaxy-s26-violet-back~235x470.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 63,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/0652976f22e7986c6837768980b7bc1c-img-samsung-galaxy-s26-violet-rechts.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 64,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/53ac3ab433514823fc527a02cbd82a19-img-samsung-galaxy-s26-violet-front-badge-1.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 65,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/84aec9cc5f440c9900f1c4ea274b244e-img-samsung-galaxy-s26-violet-side.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  }
+ ],
+ "antworten": [
+  {
+   "nummer": 55,
+   "methode": "POST",
+   "url": "https://api.1und1.de/genesys/channelroutingservice/request/productline",
+   "art": "fetch",
+   "status": 200,
+   "typ": "application/json",
+   "groesse": 265,
+   "gekuerzt": false,
+   "koerper": "{\"requestId\":\"a3d1bf5d-acf5-4049-8abb-b8daafd0b530\",\"accessToken\":\"ENTFERNT\",\"channels\":[{\"channelType\":\"CHAT\",\"available\":true,\"description\":null,\"chatEnvironment\":\"prod-euc1\",\"chatDeploymentId\":\"59ba7a17-2146-40f0-b02a-b833655edb41\"}]}"
+  },
+  {
+   "nummer": 58,
+   "methode": "POST",
+   "url": "https://api.1und1.de/genesys/channelroutingservice/request/productline",
+   "art": "fetch",
+   "status": 200,
+   "typ": "application/json",
+   "groesse": 266,
+   "gekuerzt": false,
+   "koerper": "{\"requestId\":\"178f9e13-0858-4a20-92f3-4b88b52a266b\",\"accessToken\":\"ENTFERNT\",\"channels\":[{\"channelType\":\"CHAT\",\"available\":false,\"description\":null,\"chatEnvironment\":\"prod-euc1\",\"chatDeploymentId\":\"7906e3b6-6f61-4ba1-9d44-de7d69af4a2c\"}]}"
+  }
+ ]
+}

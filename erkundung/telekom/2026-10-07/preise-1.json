@@ -1,0 +1,155 @@
+{
+ "preise_gesamt": 25,
+ "preise": [
+  {
+   "pfad": "#ebf68eae-f1fd-451e-a5e7-4cbeaefd3b80 > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "ab 9.95 €",
+   "kontext": "ab 9.95 €",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(2) > section:nth-of-type(1)",
+   "text": "256 GB 512 GB + 250 € 1 TB + 500 €",
+   "kontext": "Speichergröße 256 GB 512 GB + 250 € 1 TB + 500 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(2) > section:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(1)",
+   "text": "512 GB + 250 €",
+   "kontext": "512 GB + 250 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(2) > section:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(1) > div:nth-of-type(2)",
+   "text": "+ 250 €",
+   "kontext": "512 GB + 250 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(2) > section:nth-of-type(1) > div:nth-of-type(3) > button:nth-of-type(1)",
+   "text": "1 TB + 500 €",
+   "kontext": "1 TB + 500 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(2) > section:nth-of-type(1) > div:nth-of-type(3) > button:nth-of-type(1) > div:nth-of-type(2)",
+   "text": "+ 500 €",
+   "kontext": "1 TB + 500 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > section:nth-of-type(1) > article:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "1.199 €",
+   "kontext": "1.199 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(2) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1)",
+   "text": "13 €",
+   "kontext": "13 € monatlich (inkl. 19 % VerSt.)",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(3) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1)",
+   "text": "15 €",
+   "kontext": "15 € monatlich (inkl. 19 % VerSt.)",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > article:nth-of-type(2) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1)",
+   "text": "49,95 €",
+   "kontext": "49,95 €",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > article:nth-of-type(2) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "zzgl. 39,95 € ⌀ pro Karte einmalig",
+   "kontext": "zzgl. 39,95 € ⌀ pro Karte einmalig",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > article:nth-of-type(2) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1)",
+   "text": "138,95 €",
+   "kontext": "138,95 €",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > article:nth-of-type(2) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > span:nth-of-type(1) > article:nth-of-type(1) > span:nth-of-type(2)",
+   "text": "39,95 €",
+   "kontext": "inkl. Bereitstellung 39,95 €",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > article:nth-of-type(2) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1)",
+   "text": "49,95 €",
+   "kontext": "+49,95 €",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > article:nth-of-type(2) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1)",
+   "text": "-100 €",
+   "kontext": "-100 €",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > article:nth-of-type(2) > section:nth-of-type(1) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(10) > div:nth-of-type(1) > div:nth-of-type(1) > aside:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(13) > div:nth-of-type(1) > span:nth-of-type(1) > p:nth-of-type(1)",
+   "text": "Apple TV+ Angebot: Nur für neue und qualifizierte wiederkehrende Abonnent:innen. 9,99 €/Monat nach Ablauf des kostenlosen Probeabos. Nur ein Angebot pro Apple Account und nur ein Angebot pro Familie, falls du zu einer Familienfreigabe-Gruppe gehörst, unabhängig von der Anzahl der Geräte, die du oder",
+   "kontext": "Apple TV+ Angebot: Nur für neue und qualifizierte wiederkehrende Abonnent:innen. 9,99 €/Monat nach Ablauf des kostenlosen Probeabos. Nur ein Angebot pro Apple Account und nur ein Angebot pro Familie, falls du zu einer Familienfreigabe-Gruppe gehörst, unabhängig von der Anzahl der Geräte, die du oder",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > article:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1)",
+   "text": "138,95 €",
+   "kontext": "138,95 €",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > article:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > span:nth-of-type(1) > article:nth-of-type(1) > span:nth-of-type(2)",
+   "text": "39,95 €",
+   "kontext": "inkl. Bereitstellung 39,95 €",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > article:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1)",
+   "text": "49,95 €",
+   "kontext": "+49,95 €",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1)",
+   "text": "49,95 €",
+   "kontext": "49,95 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "zzgl. 39,95 € ⌀ pro Karte einmalig",
+   "kontext": "zzgl. 39,95 € ⌀ pro Karte einmalig",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1)",
+   "text": "138,95 €",
+   "kontext": "138,95 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > span:nth-of-type(1) > article:nth-of-type(1) > span:nth-of-type(2)",
+   "text": "39,95 €",
+   "kontext": "inkl. Bereitstellung 39,95 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1)",
+   "text": "49,95 €",
+   "kontext": "+ 49,95 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1)",
+   "text": "-100 €",
+   "kontext": "-100 €",
+   "sichtbar": true
+  }
+ ]
+}

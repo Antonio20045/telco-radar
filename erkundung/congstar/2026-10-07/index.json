@@ -1,0 +1,113 @@
+{
+ "anbieter": "congstar",
+ "name": "congstar",
+ "datum": "2026-10-07",
+ "status": "gelesen",
+ "grund": null,
+ "kennung": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)",
+ "parallelpruefung": "vor jeder Seite",
+ "robots_gelesen": true,
+ "abstand_sekunden": 2.0,
+ "besuchszeit": null,
+ "dauer_sekunden": 110.5,
+ "zeitgrenze_sekunden": 3000,
+ "seiten": [
+  {
+   "nummer": 1,
+   "geraet": "apple-iphone-17-pro",
+   "speicher_gb": 256,
+   "adresse": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/",
+   "endadresse": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/",
+   "status": "gelesen",
+   "grund": null,
+   "bot_schutz": false,
+   "http_status": 200,
+   "ruhe": true,
+   "dateien": {
+    "bedienelemente": "bedienelemente-1.json",
+    "preise": "preise-1.json",
+    "klicks": "klicks-1.json",
+    "mitschnitt": "mitschnitt-1.json",
+    "screenshot": "seite-1.png",
+    "html": "seite-1.html.gz"
+   },
+   "zaehlung": {
+    "anfragen": 76,
+    "verworfen": 2,
+    "gescheitert": 0,
+    "mitschnitt": 3,
+    "elemente": 537,
+    "gruppen_je_art": {
+     "tarif": 28,
+     "unbekannt": 134,
+     "farbe": 2,
+     "speicher": 1,
+     "laufzeit": 3
+    },
+    "preis_kandidaten": 48,
+    "klicks": 3
+   },
+   "verworfen": [
+    {
+     "url": "https://api.usercentrics.eu/settings/3DQmSnVkN/latest/languages.json",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://www.congstar.de/checkout/api/cart-state",
+     "grund": "per robots.txt gesperrt: /checkout/api/cart-state"
+    }
+   ],
+   "gescheitert": []
+  },
+  {
+   "nummer": 2,
+   "geraet": "samsung-galaxy-s26",
+   "speicher_gb": 256,
+   "adresse": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
+   "endadresse": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
+   "status": "gelesen",
+   "grund": null,
+   "bot_schutz": false,
+   "http_status": 200,
+   "ruhe": true,
+   "dateien": {
+    "bedienelemente": "bedienelemente-2.json",
+    "preise": "preise-2.json",
+    "klicks": "klicks-2.json",
+    "mitschnitt": "mitschnitt-2.json",
+    "screenshot": "seite-2.png",
+    "html": "seite-2.html.gz"
+   },
+   "zaehlung": {
+    "anfragen": 78,
+    "verworfen": 2,
+    "gescheitert": 0,
+    "mitschnitt": 3,
+    "elemente": 544,
+    "gruppen_je_art": {
+     "tarif": 29,
+     "unbekannt": 135,
+     "farbe": 2,
+     "speicher": 2,
+     "laufzeit": 3
+    },
+    "preis_kandidaten": 48,
+    "klicks": 2
+   },
+   "verworfen": [
+    {
+     "url": "https://api.usercentrics.eu/settings/3DQmSnVkN/latest/languages.json",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://www.congstar.de/checkout/api/cart-state",
+     "grund": "per robots.txt gesperrt: /checkout/api/cart-state"
+    }
+   ],
+   "gescheitert": []
+  }
+ ],
+ "groesse_bytes": 1853219,
+ "groessengrenze_bytes": 8000000,
+ "gekuerzt": []
+}

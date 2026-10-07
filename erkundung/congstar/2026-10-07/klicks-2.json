@@ -1,0 +1,36 @@
+{
+ "einwilligung": {
+  "geklickt": null,
+  "grund": "kein Ablehnen-Knopf sichtbar"
+ },
+ "vermerk": null,
+ "proben": [
+  {
+   "gruppe": 41,
+   "art": "speicher",
+   "pfad": "#device-details > div:nth-of-type(1) > fieldset:nth-of-type(2) > div:nth-of-type(1)",
+   "text": "Speicher: 256 GB 256 GB 512 GB",
+   "wert": null,
+   "fehler": null,
+   "navigiert": null,
+   "umleitung": null,
+   "ruhe": true,
+   "anfragen": [],
+   "preise_geaendert": [],
+   "marke_nachher": null,
+   "uebernommen": "unbekannt"
+  },
+  {
+   "gruppe": 42,
+   "art": "speicher",
+   "pfad": "#device-details > div:nth-of-type(1) > fieldset:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > button:nth-of-type(2)",
+   "text": "512 GB",
+   "wert": null,
+   "fehler": null,
+   "navigiert": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?memorySize=512+GB",
+   "umleitung": null,
+   "ruhe": true,
+   "anfragen": []
+  }
+ ]
+}

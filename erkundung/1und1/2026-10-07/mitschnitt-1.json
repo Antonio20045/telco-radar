@@ -1,0 +1,741 @@
+{
+ "anfragen": [
+  {
+   "nummer": 1,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/iphone-17-pro",
+   "art": "document",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 2,
+   "methode": "GET",
+   "url": "https://content.1und1.de/fonts/1und1-web-sans-57-condensed.woff2",
+   "art": "font",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 3,
+   "methode": "GET",
+   "url": "https://content.1und1.de/fonts/1und1-web-sans-77-black-condensed.woff2",
+   "art": "font",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 4,
+   "methode": "GET",
+   "url": "https://content.1und1.de/fonts/1und1-web-sans-87-extra-black-condensed.woff2",
+   "art": "font",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 5,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/609613e56ea5d0ade59b9f2cfade1d9d0bac1d2b/main.css?bust=4",
+   "art": "stylesheet",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 6,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/d04a48664ce34241a000691b96d5c61d876df089/d-t-m-navigation-service-card-mobile-3812-img-service-card-mobilfunk.png?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 7,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/frontend/product-details/images/hwd-first-visit/d-apple-hwd-configurator-d44811-optimiert-img-info-zum-eins-und-eins-einfachwechsel.svg",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 8,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/9c73aa46f7868272bb266b7a9b5e3781-img-apple-iPhone-17-pro-orange-duo.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 9,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.AccComponents/1791299594/JavaScript/StickyContactChatGenesys.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 10,
+   "methode": "GET",
+   "url": "https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495",
+   "art": "script",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 11,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/b9e0d709755d7bcdcab6b6567c9877aa2b2f9349/main.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 12,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.NNodeTypes/1791299590/JavaScript/bs-transformer.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 13,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.NNodeTypes/1791299590/JavaScript/shop-general.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 14,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.ReactNodeTypes/1791299590/JavaScript/main.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 15,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.JNodeTypes/1791299590/JavaScript/RecurringModal/RecurringModal.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 16,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 17,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.JNodeTypes/1791299590/Images/ContactBubble/lg.png?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 18,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.Shop/1791299595/JavaScript/Survey/isurvey.min.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 19,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.Shop/1791299595/JavaScript/Survey/rogator.min.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 20,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/d04a48664ce34241a000691b96d5c61d876df089/d-t-m-navigation-service-card-mobile-3812-img-service-card-mobilfunk.png?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 21,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/9c73aa46f7868272bb266b7a9b5e3781-img-apple-iPhone-17-pro-orange-duo.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 22,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/c121ffcda457ebac520d62c82b71c551-img-apple-iPhone-17-pro-orange-links.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 23,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/565f4c84055ad48b3b64a8dce9b55b70-img-apple-iPhone-17-pro-orange-back.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 24,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/d54ed2748cd16535af7d0f7da12874a6-img-apple-iPhone-17-pro-orange-front.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 25,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/e6b5ea0b8cd1ff3d0a85b9c6d98f8f97-img-apple-iPhone-17-pro-orange-side.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 26,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/fb3a2895723d52388517e025a464b72462042b37/vtr-4118-lieferumfang-ohne.svg?bust=3",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 27,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_svg/4,5%20-%2035/usb%20pd/ladeeigenschaften.svg",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 28,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/de771b8b5cd77003a308d4c9925815a1-A-Left-DarkGreen-WithAGScale.svg",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 29,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/dac847df244eb8cfa9168801488abc76-d-t-m-produktbild-d47853-img-apple-airpods4.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 30,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/9fcde7ee403e484f0ac51f929dc7bed3-produktbild-v4388-img-apple-airpods-pro-3.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 31,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/b4e6ff6f50a8f44ac22a67bc321ef160ec34b83e/d-hwd-content-v4388-img-iphone17-pro-tapete-1224x4314.webp?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 32,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/c883512add356c4bf085565958b4d682b8c944c2/d-vgl-v4388-img-vergleich-iphone-17-familie-1224x3987.webp?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 33,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_svg/4,5%20-%2035/usb%20pd/ladeeigenschaften.svg?bust=3",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 34,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 35,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/hinweistexte/ssc-allgemein-1?lightbox=true",
+   "art": "document",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 36,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/frontend/product-details/images/hwd-first-visit/d-apple-hwd-configurator-d44811-optimiert-img-info-zum-eins-und-eins-einfachwechsel.svg",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 37,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/9c73aa46f7868272bb266b7a9b5e3781-img-apple-iPhone-17-pro-orange-duo.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 38,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/565f4c84055ad48b3b64a8dce9b55b70-img-apple-iPhone-17-pro-orange-back~235x470.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 39,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/d54ed2748cd16535af7d0f7da12874a6-img-apple-iPhone-17-pro-orange-front.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 40,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/c121ffcda457ebac520d62c82b71c551-img-apple-iPhone-17-pro-orange-links.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 41,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/e6b5ea0b8cd1ff3d0a85b9c6d98f8f97-img-apple-iPhone-17-pro-orange-side.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 42,
+   "methode": "GET",
+   "url": "https://content.1und1.de/ctx/dh/libt.min.js?bust=2026100706",
+   "art": "script",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 43,
+   "methode": "POST",
+   "url": "https://api.1und1.de/genesys/channelroutingservice/request/productline",
+   "art": "fetch",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 44,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/cdn-cgi/challenge-platform/scripts/jsd/main.js",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 45,
+   "methode": "POST",
+   "url": "https://api.1und1.de/genesys/channelroutingservice/request/productline",
+   "art": "fetch",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 46,
+   "methode": "GET",
+   "url": "https://apps.mypurecloud.de/genesys-bootstrap/genesys.min.js",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 47,
+   "methode": "POST",
+   "url": "https://mobile.1und1.de/cdn-cgi/challenge-platform/h/g/jsd/oneshot/4df4a60fa397/0.2140082122380329:1791352831:S1b4lX_E_NGVMZRtEP9ZJDN-b5gJv-CrXogL3HFzj9k/a46ae06cfa880090",
+   "art": "xhr",
+   "status": null,
+   "abbruch": "net::ERR_ABORTED"
+  },
+  {
+   "nummer": 48,
+   "methode": "GET",
+   "url": "https://api-cdn.mypurecloud.de/webdeployments/v1/deployments/7906e3b6-6f61-4ba1-9d44-de7d69af4a2c/domains.json",
+   "art": "xhr",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 49,
+   "methode": "GET",
+   "url": "https://apps.mypurecloud.de/messenger/thirdparty-plugins.html",
+   "art": "document",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 50,
+   "methode": "GET",
+   "url": "https://content.1und1.de/fonts/1und1-web-sans-57-condensed.woff2",
+   "art": "font",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 51,
+   "methode": "GET",
+   "url": "https://content.1und1.de/fonts/1und1-web-sans-77-black-condensed.woff2",
+   "art": "font",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 52,
+   "methode": "GET",
+   "url": "https://content.1und1.de/fonts/1und1-web-sans-87-extra-black-condensed.woff2",
+   "art": "font",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 53,
+   "methode": "GET",
+   "url": "https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495",
+   "art": "script",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 54,
+   "methode": "GET",
+   "url": "https://apps.mypurecloud.de/cxbus/cxbus.min.js",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 55,
+   "methode": "POST",
+   "url": "https://mobile.1und1.de/cdn-cgi/challenge-platform/h/g/jsd/oneshot/4df4a60fa397/0.2140082122380329:1791352831:S1b4lX_E_NGVMZRtEP9ZJDN-b5gJv-CrXogL3HFzj9k/a46ae19fb9e50090",
+   "art": "xhr",
+   "status": null,
+   "abbruch": "net::ERR_ABORTED"
+  },
+  {
+   "nummer": 56,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/b015a129abe3909685c76f198806966f48351f15/icons.svg?bust=4",
+   "art": "xhr",
+   "status": null,
+   "abbruch": "net::ERR_ABORTED"
+  },
+  {
+   "nummer": 57,
+   "methode": "GET",
+   "url": "https://api-cdn.mypurecloud.de/webdeployments/v1/deployments/7906e3b6-6f61-4ba1-9d44-de7d69af4a2c/config.json",
+   "art": "xhr",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 58,
+   "methode": "GET",
+   "url": "https://apps.mypurecloud.de/messenger/thirdpartyplugins.min.js",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 59,
+   "methode": "GET",
+   "url": "https://apps.mypurecloud.de/journey/messenger-plugins/offersHelper.min.js",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 60,
+   "methode": "GET",
+   "url": "https://apps.mypurecloud.de/messenger/messenger.html",
+   "art": "document",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 61,
+   "methode": "GET",
+   "url": "https://apps.mypurecloud.de/messenger/messenger-renderer.html",
+   "art": "document",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 62,
+   "methode": "GET",
+   "url": "https://js-agent.newrelic.com/nr-spa-1.318.0.min.js",
+   "art": "script",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 63,
+   "methode": "GET",
+   "url": "https://apps.mypurecloud.de/messenger/main.css",
+   "art": "stylesheet",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 64,
+   "methode": "GET",
+   "url": "https://apps.mypurecloud.de/cxbus/cxbus.min.js",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 65,
+   "methode": "GET",
+   "url": "https://apps.mypurecloud.de/messenger/messagingMiddleware.min.js",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 66,
+   "methode": "GET",
+   "url": "https://apps.mypurecloud.de/messenger/muiVendor.min.js",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 67,
+   "methode": "GET",
+   "url": "https://apps.mypurecloud.de/messenger/defaultVendors.min.js",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 68,
+   "methode": "GET",
+   "url": "https://apps.mypurecloud.de/messenger/main.min.js",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 69,
+   "methode": "GET",
+   "url": "https://apps.mypurecloud.de/messenger/engage.min.js",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 70,
+   "methode": "GET",
+   "url": "https://apps.mypurecloud.de/messenger/broadcast.min.js",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 71,
+   "methode": "GET",
+   "url": "https://apps.mypurecloud.de/messenger/messengerrenderer.css",
+   "art": "stylesheet",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 72,
+   "methode": "GET",
+   "url": "https://apps.mypurecloud.de/cxbus/cxbus.min.js",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 73,
+   "methode": "GET",
+   "url": "https://apps.mypurecloud.de/messenger/messagingMiddleware.min.js",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 74,
+   "methode": "GET",
+   "url": "https://apps.mypurecloud.de/messenger/muiVendor.min.js",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 75,
+   "methode": "GET",
+   "url": "https://apps.mypurecloud.de/messenger/defaultVendors.min.js",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 76,
+   "methode": "GET",
+   "url": "https://apps.mypurecloud.de/messenger/messengerrenderer.min.js",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 77,
+   "methode": "GET",
+   "url": "https://apps.mypurecloud.de/messenger/i18n/de.json",
+   "art": "xhr",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 78,
+   "methode": "GET",
+   "url": "https://apps.mypurecloud.de/messenger/i18n/vendors/date-de.min.js",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 79,
+   "methode": "GET",
+   "url": "https://apps.mypurecloud.de/messenger/i18n/vendors/date-de.min.js",
+   "art": "script",
+   "status": 304,
+   "abbruch": null
+  },
+  {
+   "nummer": 80,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/frontend/product-details/images/hwd-first-visit/d-apple-hwd-configurator-d44811-optimiert-img-info-zum-eins-und-eins-einfachwechsel.svg",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 81,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/9c73aa46f7868272bb266b7a9b5e3781-img-apple-iPhone-17-pro-orange-duo.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 82,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/565f4c84055ad48b3b64a8dce9b55b70-img-apple-iPhone-17-pro-orange-back~235x470.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 83,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/d54ed2748cd16535af7d0f7da12874a6-img-apple-iPhone-17-pro-orange-front.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 84,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/c121ffcda457ebac520d62c82b71c551-img-apple-iPhone-17-pro-orange-links.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 85,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/e6b5ea0b8cd1ff3d0a85b9c6d98f8f97-img-apple-iPhone-17-pro-orange-side.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  }
+ ],
+ "antworten": [
+  {
+   "nummer": 43,
+   "methode": "POST",
+   "url": "https://api.1und1.de/genesys/channelroutingservice/request/productline",
+   "art": "fetch",
+   "status": 200,
+   "typ": "application/json",
+   "groesse": 265,
+   "gekuerzt": false,
+   "koerper": "{\"requestId\":\"eb7f153d-717d-448e-a367-4ab41df030b6\",\"accessToken\":\"ENTFERNT\",\"channels\":[{\"channelType\":\"CHAT\",\"available\":true,\"description\":null,\"chatEnvironment\":\"prod-euc1\",\"chatDeploymentId\":\"59ba7a17-2146-40f0-b02a-b833655edb41\"}]}"
+  },
+  {
+   "nummer": 45,
+   "methode": "POST",
+   "url": "https://api.1und1.de/genesys/channelroutingservice/request/productline",
+   "art": "fetch",
+   "status": 200,
+   "typ": "application/json",
+   "groesse": 265,
+   "gekuerzt": false,
+   "koerper": "{\"requestId\":\"401ab4c2-e3c6-41b5-a48d-cf50a86962ae\",\"accessToken\":\"ENTFERNT\",\"channels\":[{\"channelType\":\"CHAT\",\"available\":true,\"description\":null,\"chatEnvironment\":\"prod-euc1\",\"chatDeploymentId\":\"7906e3b6-6f61-4ba1-9d44-de7d69af4a2c\"}]}"
+  },
+  {
+   "nummer": 48,
+   "methode": "GET",
+   "url": "https://api-cdn.mypurecloud.de/webdeployments/v1/deployments/7906e3b6-6f61-4ba1-9d44-de7d69af4a2c/domains.json",
+   "art": "xhr",
+   "status": 200,
+   "typ": "application/json",
+   "groesse": 93,
+   "gekuerzt": false,
+   "koerper": "{\"allowAllDomains\":false,\"allowedDomains\":[\"1und1.de\",\"1and1.com\",\"1und1.cloud\",\"1and1.org\"]}"
+  },
+  {
+   "nummer": 57,
+   "methode": "GET",
+   "url": "https://api-cdn.mypurecloud.de/webdeployments/v1/deployments/7906e3b6-6f61-4ba1-9d44-de7d69af4a2c/config.json",
+   "art": "xhr",
+   "status": 200,
+   "typ": "application/json",
+   "groesse": 1275,
+   "gekuerzt": false,
+   "koerper": "{\"id\":\"35a25a54-2da5-4b06-80ce-90100260c041\",\"version\":\"5\",\"headlessMode\":{\"enabled\":false},\"languages\":[\"de\"],\"defaultLanguage\":\"de\",\"apiEndpoint\":\"https://api.mypurecloud.de\",\"messenger\":{\"enabled\":true,\"apps\":{\"conversations\":{\"enabled\":true,\"messagingEndpoint\":\"wss://webmessaging.mypurecloud.de\",\"showAgentTypingIndicator\":true,\"showUserTypingIndicator\":true,\"autoStart\":{\"enabled\":false},\"markdown\":{\"enabled\":true},\"conversationDisconnect\":{\"enabled\":true,\"type\":\"ReadOnly\"},\"conversationClear\":{\"enabled\":true},\"humanize\":{\"enabled\":true,\"bot\":{\"name\":\"\",\"avatarUrl\":\"https://api-cdn.mypurecloud.de/uploads/v1/publicassets/images/5d42c2c4-3c43-40ae-848d-c8eb68b05f89/a5bec6a8-4cbb-4d2a-a1fb-4df154ed21a6.1und1-Logo-Avatar.png\"}}},\"knowledge\":{\"enabled\":false}},\"styles\":{\"primaryColor\":\"#134d9b\"},\"launcherButton\":{\"visibility\":\"Off\"},\"fileUpload\":{\"enableAttachments\":false,\"modes\":[{\"fileTypes\":[],\"maxFileSizeKB\":0}]},\"homeScreen\":{\"enabled\":false,\"logoUrl\":\"\"}},\"position\":{\"alignment\":\"Auto\",\"sideSpace\":56,\"bottomSpace\":50},\"customI18NLabels\":[],\"journeyEvents\":{\"enabled\":false},\"status\":\"Active\",\"cobrowse\":{\"enabled\":false,\"allowAgentControl\":true,\"maskSelectors\":[],\"readonlySelectors\":[],\"channels\":[]},\"auth\":{\"enabled\":false,\"allowSessionUpgrade\":false}}"
+  },
+  {
+   "nummer": 77,
+   "methode": "GET",
+   "url": "https://apps.mypurecloud.de/messenger/i18n/de.json",
+   "art": "xhr",
+   "status": 200,
+   "typ": "application/json",
+   "groesse": 16416,
+   "gekuerzt": false,
+   "koerper": "{\n  \"language\": \"de\",\n  \"home\": {\n    \"headerTitle\": \"Willkommen\",\n    \"headerSubTitle\": \"Wir helfen Ihnen gern\",\n    \"ariaHomeScreenOpenStatus\": \"Startbildschirm ist geöffnet\",\n    \"ariaExpandMenu\": \"Menü erweitern\"\n  },\n  \"conversations\": {\n    \"headerTitle\": \"Schreib uns an\",\n    \"inputMessagePlaceholder\": \"Schreibe eine Nachricht ...\",\n    \"typeMessagePlaceholder\": \"Geben Sie hier Ihre Nachricht ein\",\n    \"inputMessageTitle\": \"Nachrichteneingabefeld\",\n    \"startConversationMessage\": \"Dies ist der Beginn Ihrer Konversation mit uns. Bitte senden Sie eine erste Nachricht an uns.\",\n    \"autoStartConversationMessage\": \"Dies ist der Beginn der Konversation mit uns.\",\n    \"sessionExpirationWarningMessage\": \"ENTFERNT\",\n    \"notSignedInMessage\": \"Sie agieren anonym.\",\n    \"signedInMessage\": \"Sie sind jetzt angemeldet.\",\n    \"signedInMessageWithName\": \"Sie sind als <%username%> angemeldet\",\n    \"signedOutMessage\": \"Sie wurden von dieser Sitzung abgemeldet.\",\n    \"agentDefaultName\": \"Agent\",\n    \"botDefaultName\": \"Bot\",\n    \"customerDefaultName\": \"Sie\",\n    \"cancelButton\": \"Abbrechen\",\n    \"closeButton\": \"Schließen\",\n    \"startConversationButtonTitle\": \"Schreiben Sie uns eine Nachricht\",\n    \"continueConversationButtonTitle\": \"Fortsetzen\",\n    \"openConversationButtonTitle\": \"Öffnen\",\n    \"startNewConversation\": \"Neu beginnen\",\n    \"startConversationCardTitle\": \"Konversation starten\",\n    \"continueConversationCardTitle\": \"Konversation fortführen\",\n    \"yourConversationCardTitle\": \"Ihre Konversation\",\n    \"yesButton\": \"Ja\",\n    \"noButton\": \"Nein\",\n    \"okButton\": \"OK\",\n    \"sureButton\": \"Ja, ich bin sicher\",\n    \"downloadButton\": \"Herunterladen\",\n    \"openInNewTabButton\": \"In neuer Registerkarte öffnen\",\n    \"signInButton\": \"Anmelden\",\n    \"clearButton\": \"Löschen\",\n    \"previewFile\": \"Klicken Sie, um eine Vorschau der Datei anzuzeigen\",\n    \"pdfPreviewTitle\": \"Vorschau Messenger-PDF\",\n    \"textFilePreviewTitle\": \"Vorschau Messenger-Textdatei\",\n    \"disconnectMessage\": \"Ihre Konversation wurde beendet.\",\n    \"disconnectMessageSend\": \"Konversation durch Senden einer neuen Nachricht fortsetzen\",\n    \"videoLabel\": \"Video\",\n    \"audioLabel\": \"Audio\",\n    \"notificationTitle\": \"Sie haben eine neue Nachricht.\",\n    \"notificationBody\": \"Sie haben eine oder mehrere ungelesene Nachrichten.\",\n    \"scheduledMessage\": \"Geplant! Vielen Dank.\",\n    \"submittedMessage\": \"Gesendet! Vielen Dank.\",\n    \"selectTimeButton\": \"Zeit auswählen\",\n    \"getStartedButton\": \"Erste Schritte\",\n    \"viewAnswersButton\": \"Antworten anzeigen\",\n    \"viewSelectionButton\": \"Auswahl anzeigen\",\n    \"timeSelectedText\": \"Zeit ausgewählt\",\n    \"ariaTimeSelectedText\": \"Ihre bevorzugte Zeit wird ausgewählt\",\n    \"ariaSelectTimeButton\": \"Wählen Sie Ihre bevorzugte Uhrzeit aus\",\n    \"ariaMessageSending\": \"Wird gesendet\",\n    \"ariaMessageSent\": \"Gesendet\",\n    \"ariaMessageNotSent\": \"Nicht gesendet\",\n    \"ariaMessageFailed\": \"Senden fehlgeschlagen, bitte erneut eingeben.\",\n    \"ariaReadOnlyError\": \"Sitzung ist schreibgeschützt, keine neuen Nachrichten erlaubt.\",\n    \"ariaSendingMessage\": \"Ihre Nachricht wird gesendet\",\n    \"ariaSendMsgError\": \"Nachricht konnte nicht gesendet werden\",\n    \"ariaMenuTitle\": \"Konversationsmenü\",\n    \"ariaContinueConversation\": \"Konversation fortführen\",\n    \"ariaOpenConversation\": \"Konversation öffnen\",\n    \"ariaStartNewConversation\": \"Neue Konversation starten\",\n    \"ariaSendButton\": \"Ihre Nachricht senden\",\n    \"ariaMinimizeButton\": \"Unterstützungsbereich minimieren\",\n    \"ariaAttachButton\": \"Datei anhängen\",\n    \"ariaRemoveButton\": \"Datei entfernen\",\n    \"ariaDownloadButton\": \"Anhang herunterladen\",\n    \"ariaOpenAttachmentButton\": \"Anhang öffnen\",\n    \"ariaOpenAttachmentButtonNewTab\": \"Anhang in neuem Fenster öffnen\",\n    \"ariaCloseAttachmentButton\": \"Vorschau für Anhang schließen\",\n    \"ariaBackButton\": \"Zurück\",\n    \"ariaExpandButton\": \"Erweitern\",\n    \"ariaCollapseButton\": \"Reduzieren\",\n    \"ariaLoading\": \"Ladevorgang läuft\",\n    \"ariaPercentRemaining\": \"Prozent verbleiben\",\n    \"ariaRemainingSeconds\": \"Sekunden verbleiben\",\n    \"ariaFileUploading\": \"Ihre Datei wird hochgeladen\",\n    \"ariaFileUploadComplete\": \"Datei hochgeladen\",\n    \"ariaActionsAttachFileTitle\": \"Öffnet den Dialog zum Hochladen einer Datei\",\n    \"ariaActionsImagePreviewTitle\": \"Öffnet eine Bildvorschau\",\n    \"ariaActionsClearButtonTitle\": \"Ihre Konversation löschen und verlassen\",\n    \"ariaActionsMenuClearButtonLabel\": \"Schaltfläche „Konversation löschen‟\",\n    \"ariaActionsSignInButtonTitle\": \"Bei Ihrer Konversation anmelden\",\n    \"ariaActionsSignInButtonLabel\": \"Bei der Konversation anmelden\",\n    \"ariaYouAreSignedIn\": \"Sie sind angemeldet als\",\n    \"ariaImagePreviewOpened\": \"Bildvorschau wird geöffnet\",\n    \"ariaImagePreviewClosed\": \"Bildvorschau wird geschlossen\",\n    \"ariaRemovingFile\": \"Ihre Datei wird entfernt\",\n    \"ariaFileRemoved\": \"Datei entfernt\",\n    \"ariaScheduled\": \"Ihr Termin wurde geplant\",\n    \"ariaYouSaid\": \"Sie sagten\",\n    \"ariaBusinessSaid\": \"Unternehmen sagte\",\n    \"ariaAgentSaid\": \"<%Agent%> sagte\",\n    \"ariaBotSaid\": \"<%Bot%> sagte\",\n    \"ariaIsTyping\": \"Schreiben wird ausgeführt\",\n    \"ariaStopTyping\": \"Schreiben wurde unterbrochen\",\n    \"ariaNewMessage\": \"Neue Nachricht\",\n    \"ariaMessengerOpenStatus\": \"Messenger ist geöffnet\",\n    \"ariaMessengerMinimizeStatus\": \"Messenger ist minimiert\",\n    \"ariaImageLabel\": \"Bild\",\n    \"ariaSelectOption\": \"Bitte wählen Sie Ihre Option aus.\",\n    \"ariaQuickReply\": \"Klicken Sie, um mit dieser Nachricht zu antworten\",\n    \"ariaCardActionLink\": \"Klicken Sie, um den Link zu öffnen.\",\n    \"ariaCardActionPostback\": \"Klicken Sie, um mit dieser Nachricht zu antworten.\",\n    \"ariaCobrowseActionPostback\": \"Klicken Sie, um mit dieser Aktion zu antworten.\",\n    \"ariaMessageLengthLimit\": \"Maximale Anzahl an Zeichen erreicht\",\n    \"ariaNextButton\": \"Weiter. Drücken Sie die Eingabe- oder Leertaste, um zur nächsten Folie im Karussell überzugehen.\",\n    \"ariaPreviousButton\": \"Zurück. Drücken Sie die Eingabe- oder Leertaste, um zur vorherigen Folie im Karussell überzugehen.\",\n    \"ariaSlideActive\": \"Folie <%activeSlide%> von <%totalSlides%>.\",\n    \"ariaTabKeyNavigation\": \"Verwenden Sie die Umschalt- und Tabulatortasten, um auf der Folie zu navigieren.\",\n    \"ariaArrowKeyNavigation\": \"Verwenden Sie die Pfeiltasten, um zwischen den Folien zu navigieren.\",\n    \"ariaCarouselMessage\": \"Karussell mit <%totalSlides%> Folien.\",\n    \"offer.cobrowseOfferTitle\": \"Teilungsanfrage\",\n    \"offer.cobrowseOfferDescription\": \"Wir bitten Sie, Ihren Bildschirm zu teilen\",\n    \"offer.videoOfferTitle\": \"Video-Chat-Anfrage\",\n    \"offer.videoOfferDescription\": \"Wir fordern Sie auf, einer Video-Chat-Sitzung mit uns beizutreten\",\n    \"offer.acceptButton\": \"Akzeptieren\",\n    \"offer.declineButton\": \"Ablehnen\",\n    \"offer.accepted\": \"Akzeptiert\",\n    \"offer.rejected\": \"Abgelehnt\",\n    \"offer.expired\": \"Abgelaufen\",\n    \"offer.failed\": \"Fehlgeschlagen\",\n    \"offer.offerStatusNotification\": \"Angebot ist <%state%>\",\n    \"info.authenticating\": \"ENTFERNT\",\n    \"info.reAuthenticating\": \"ENTFERNT\",\n    \"info.previewSuccess\": \"Erfolg\",\n    \"info.previewFailure\": \"Fehler\",\n    \"info.previewCancel\": \"Abbrechen\",\n    \"info.unsupportedFormsMessage\": \"Vorschau unterstützt leider noch keine Formulare.\",\n    \"info.unsupportedAuthenticationMessage\": \"ENTFERNT\",\n    \"info.unsupportedApplePayMessage\": \"Vorschau unterstützt leider noch kein Senden von Zahlungsanfragen.\",\n    \"info.unsupportediMessageAppsMessage\": \"Vorschau unterstützt leider noch kein Senden von Anwendungen.\",\n    \"info.unsupportedListPickerMessage\": \"Vorschau unterstützt leider noch keinen Inhalt einer Listenauswahl, es wird an die erste Auswahl weitergeleitet.\",\n    \"warning.sessionExpiryMessage\": \"ENTFERNT\",\n    \"errors.startFailed\": \"Wir können keine Konversation beginnen. Versuchen Sie es später erneut.\",\n    \"errors.restoreFailed\": \"Wir können Ihre Konversation leider nicht wiederherstellen.\",\n    \"errors.disconnected\": \"Verbindung getrennt\",\n    \"errors.reconnecting\": \"Verbindung wird erneut hergestellt...\",\n    \"errors.cantLoadNewMessages\": \"Neue Nachrichten können nicht geladen werden.\",\n    \"errors.reconnect\": \"ERNEUT VERBINDEN\",\n    \"errors.connectionRestored\": \"Verbindung wurde erfolgreich wiederhergestellt.\",\n    \"errors.generic\": \"Leider ist etwas Unerwartetes passiert. Versuchen Sie es später erneut.\",\n    \"errors.fileNameInvalid\": \"Der Dateiname enthält leider ungültige Zeichen, die wir nicht identifizieren können.\",\n    \"errors.fileNameTooLong\": \"Der Dateiname ist leider zu lang. Bitte versuchen Sie es noch einmal mit einem kürzeren Namen.\",\n    \"errors.fileTypeInvalid\": \"Es werden leider nur die Dateitypen <%allowedFileTypes%> unterstützt.\",\n    \"errors.fileTypeInvalidMultipleFiles\": \"Dieser Dateityp wird leider nicht unterstützt.\",\n    \"errors.fileSizeZero\": \"Die Datei hat leider keinen Inhalt. Bitte versuchen Sie es erneut mit einer Datei, die größer ist als 0 Byte, aber <%maxFileSizeLimit%> nicht überschreitet.\",\n    \"errors.fileTooLarge\": \"Die Datei ist leider zu groß. Bitte versuchen Sie es erneut mit einer Datei, die nicht größer ist als <%maxFileSizeLimit%>.\",\n    \"errors.fileContentInvalid\": \"Die Datei ist wahrscheinlich fehlerhaft. Bitte versuchen Sie es noch einmal mit einer gültigen Datei.\",\n    \"errors.fileNotFound\": \"Wir können die Datei leider nicht abrufen. Wir entschuldigen uns für die Unannehmlichkeiten.\",\n    \"errors.messageLengthExceeded\": \"Nachricht ist länger als <%maxMessageLength%>.\",\n    \"alert.confirmClearConversation\": \"Möchten Sie Ihre Konversation löschen und verlassen? Der Nachrichtenverlauf geht dadurch verloren.\",\n    \"alert.confirmSignIn\": \"Melden Sie sich an, um Ihre Identität für diese Konversation zu bestätigen. Sie werden von anderen Sitzungen abgemeldet.\"\n  },\n  \"launcher\": {\n    \"buttonText\": \"Schreib uns an\",\n    \"inviteMessage\": \"Hallo 👋 Haben Sie Fragen? Wir helfen Ihnen gern!\",\n    \"ariaOpenButton\": \"Unterstützungsbereich öffnen\",\n    \"ariaMinimizeButton\": \"Unterstützungsbereich minimieren\",\n    \"ariaCloseInvite\": \"Schließen\"\n  },\n  \"knowledge\": {\n    \"searchInputTitle\": \"Wonach suchen Sie?\",\n    \"searchInputPlaceholder\": \"Nach einem Thema suchen…\",\n    \"searchResultSummary\": \"Zeige <%resultsCount%> Ergebniss(e) für\",\n    \"searchResultsEmpty\": \"Keine Ergebnisse gefunden\",\n    \"ariaKnowledgeScreenOpenStatus\": \"Suchbildschirm ist geöffnet\",\n    \"ariaArticleScreenOpenStatus\": \"Artikelseite ist geöffnet\",\n    \"ariaAutoCompleteResultsSummary\": \"Zeige <%resultsCount%> automatisch vervollständigte Ergebnis(se) für <%searchInputText%>\",\n    \"ariaSearchResultSummary\": \"Zeige <%resultsCount%> Suchergebnis(se) für <%searchQuery%>\",\n    \"ariaLoading\": \"Ladevorgang läuft\",\n    \"breadcrumbHomeTitle\": \"Startseite\",\n    \"ariaExpandBreadcrumb\": \"Pfad anzeigen\",\n    \"deletedArticleReference\": \"Artikel ist nicht verfügbar\",\n    \"articleNotFound\": \"Dieser Artikel ist leider nicht auffindbar\",\n    \"removedArticle\": \"Dieser Artikel wurde vermutlich entfernt. Versuchen Sie zurückzugehen oder verwenden Sie die Suchleiste.\",\n    \"backButton\": \"Zurück\",\n    \"searchCategoriesTitle\": \"Kategorien\",\n    \"searchArticlesTitle\": \"Artikel\",\n    \"ariaOpenSearchCategory\": \"Kategorie öffnen\",\n    \"ariaOpenSearchCategoryByName\": \"Kategorie öffnen - <%category%>\",\n    \"ariaOpenArticleByName\": \"Artikel öffnen - <%article%>\",\n    \"categoryResultsSummary\": \"Ergebnisse für <%category%>\"\n  },\n  \"toaster\": {\n    \"acceptButton\": \"Akzeptieren\",\n    \"rejectButton\": \"Ablehnen\",\n    \"ariaAcceptButton\": \"Klicken Sie, um die Benachrichtigung zu akzeptieren\",\n    \"ariaRejectButton\": \"Klicken Sie, um die Benachrichtigung abzulehnen\"\n  },\n  \"cobrowse\": {\n    \"headerTitle\": \"Durchsuchen Sie diese Seite mit uns\",\n    \"connect\": \"Durchsuchen Sie diese Seite mit uns\",\n    \"enterPin\": \"Co-Browsing beitreten\",\n    \"enterPinTitle\": \"Geben Sie Ihre Besprechungs-ID ein\",\n    \"otpMessage\": \"Der Agent, mit dem Sie sprechen, gibt eine 6-stellige Besprechungs-ID ein, um diesen Browser mit einer Co-Browsing-Sitzung zu verbinden. Dieser Bildschirm wird dann für den Agenten freigegeben. Die Besprechungs-ID läuft nach 5 Minuten ab, wenn keine Verbindung besteht.\",\n    \"startSharing\": \"Teilen starten\",\n    \"ariaConnect\": \"Drücken Sie die Eingabe- oder Leertaste, um den Verbindungsbildschirm aufzurufen\",\n    \"ariaConnecting\": \"Verbindung wird hergestellt\",\n    \"sharing\": \"Sie teilen Ihren Bildschirm\",\n    \"sharingAgent\": \"Sie teilen mit Ihrem Agenten\",\n    \"errors.cobrowseActive\": \"Co-Browsing konnte nicht gestartet werden, da es bereits eine aktive Sitzung gibt.\",\n    \"errors.joinFailure\": \"Ungültige Besprechungs-ID, versuchen Sie es bitte erneut.\"\n  },\n  \"datePicker\": {\n    \"headerTitle\": \"Einen Termin planen\",\n    \"inputSendTextButton\": \"Senden\",\n    \"showMoreButton\": \"Mehr anzeigen\",\n    \"showLessButton\": \"Weniger anzeigen\",\n    \"timeSlotsUnavailable\": \"Keine Zeitfenster verfügbar\",\n    \"slotsText\": \"Slots\",\n    \"appointmentsTitle\": \"Termine\",\n    \"ariaSelectMonth\": \"Wählen Sie Ihren Monat aus\",\n    \"ariaSelectDay\": \"Wählen Sie Ihren Tag aus\",\n    \"labelMonth\": \"Monat\",\n    \"ariaNextButton\": \"Weiter. Drücken Sie die Eingabe- oder Leertaste, um zum nächsten Tagesblock im Karussell überzugehen.\",\n    \"ariaPreviousButton\": \"Zurück. Drücken Sie die Eingabe- oder Leertaste, um zum vorherigen Tagesblock im Karussell überzugehen.\",\n    \"ariaSelected\": \"ausgewählt\",\n    \"ariaDownArrowKeyNotification\": \"Drücken Sie den Nach unten-Pfeil, um das Zeitfenster auszuwählen.\"\n  },\n  \"listPicker\": {\n    \"ariaInstructions\": \"Verwenden Sie die Pfeiltasten, um zwischen den Optionen zu navigieren, und die Leertaste oder Eingabetaste, um auszuwählen.\",\n    \"ariaLabel\": \"Wählen Sie eine Option aus der Liste\",\n    \"noOptions\": \"Keine Optionen verfügbar\",\n    \"inputSendTextButton\": \"Senden\",\n    \"doneTextButton\": \"Fertig\",\n    \"ariaSelected\": \"Ausgewählt\",\n    \"ariaDeselected\": \"Auswahl aufgehoben\"\n  },\n  \"form\": {\n    \"closeButton\": \"Formular schließen\",\n    \"startButton\": \"Start\",\n    \"sendButton\": \"Senden\",\n    \"nextButton\": \"Weiter\",\n    \"backButton\": \"Zurück\",\n    \"abandonment.message\": \"Ihre eingegebenen Daten werden nicht gespeichert, wenn Sie die Seite verlassen.\",\n    \"abandonment.leave\": \"Verlassen\",\n    \"abandonment.cancel\": \"Abbrechen\",\n    \"optionalLabel\": \"Optional\",\n    \"requiredLabel\": \"Erforderlich\",\n    \"dateLabel\": \"Datum\",\n    \"summaryTitle\": \"Ihre Antworten\",\n    \"navigationLabel\": \"Navigation\",\n    \"formLabel\": \"Formular\",\n    \"pickerOkLabel\": \"OK\",\n    \"pickerCancelLabel\": \"Abbrechen\",\n    \"pickerClearLabel\": \"Löschen\",\n    \"pickerTodayLabel\": \"Heute\",\n    \"pickerPreviousMonth\": \"Vorheriger Monat\",\n    \"pickerNextMonth\": \"Nächster Monat\",\n    \"pickerOpenPreviousView\": \"Vorherige Ansicht öffnen\",\n    \"pickerOpenNextView\": \"Nächste Ansicht öffnen\",\n    \"pickerToolbarTitle\": \"Datum auswählen\",\n    \"pickerFieldYearPlaceholder\": \"YYYY\",\n    \"pickerFieldMonthPlaceholder\": \"MM\",\n    \"pickerFieldDayPlaceholder\": \"DD\"\n  },\n  \"iframe\": {\n    \"launcherFrameTitle\": \"Schaltfläche „Assistenz“\",\n    \"messengerFrameTitle\": \"Bereich „Assistenz“\"\n  },\n  \"video\": {\n    \"headerTitle\": \"Treten Sie einem Videoanruf mit uns bei\",\n    \"connect\": \"Treten Sie einem Videoanruf mit uns bei\",\n    \"enterPin\": \"Betrittscode eingeben\",\n    \"enterPinTitle\": \"Geben Sie Ihre Besprechungs-ID ein\",\n    \"otpMessage\": \"Der Mitarbeiter, mit dem Sie gerade sprechen, wird Ihnen eine 6-stellige Besprechungs-ID mitteilen, mit der Sie sich in die Videokonferenz einwählen können.\",\n    \"startSharing\": \"Video starten\",\n    \"ariaConnect\": \"Drücken Sie die Eingabetaste oder die Leertaste, um über einen Teilnahmecode an einem Videoanruf teilzunehmen\",\n    \"ariaConnecting\": \"Verbindung wird hergestellt\",\n    \"sharingAgent\": \"Sie befinden sich in einer Videositzung\",\n    \"errors.joinFailure\": \"Ungültige Besprechungs-ID, versuchen Sie es bitte erneut.\",\n    \"errors.videoActive\": \"Video konnte nicht gestartet werden, da es bereits eine aktive Sitzung gibt.\"\n  }\n}\n"
+  }
+ ]
+}

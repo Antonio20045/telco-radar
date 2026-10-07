@@ -1,0 +1,77 @@
+{
+ "preise_gesamt": 12,
+ "preise": [
+  {
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(1) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(2) > a:nth-of-type(1)",
+   "text": "AKTION 1&1 DSL ab 34,99 €/Monat – jetzt inklusive 1&1 HomeServer Pro",
+   "kontext": "AKTION 1&1 DSL ab 34,99 €/Monat – jetzt inklusive 1&1 HomeServer Pro",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(2) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(2) > a:nth-of-type(1)",
+   "text": "AKTION 1&1 Glasfaser ab 39,99 €/Monat – jetzt inklusive 1&1 HomeServer Pro",
+   "kontext": "AKTION 1&1 Glasfaser ab 39,99 €/Monat – jetzt inklusive 1&1 HomeServer Pro",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(3) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(2) > a:nth-of-type(1)",
+   "text": "AKTION 1&1 DSL ab 34,99 €/Monat – jetzt inklusive 1&1 HomeServer Pro",
+   "kontext": "AKTION 1&1 DSL ab 34,99 €/Monat – jetzt inklusive 1&1 HomeServer Pro",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(3) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(6) > a:nth-of-type(1)",
+   "text": "AKTION 1&1 Glasfaser ab 39,99 €/Monat – jetzt inklusive 1&1 HomeServer Pro",
+   "kontext": "AKTION 1&1 Glasfaser ab 39,99 €/Monat – jetzt inklusive 1&1 HomeServer Pro",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#navigation > nav:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(9) > div:nth-of-type(1) > ul:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2)",
+   "text": "Zum Surfen mit dem Laptop – auch von unterwegs ab 4,99 €/Monat.",
+   "kontext": "1&1 Daten-FlatZum Surfen mit dem Laptop – auch von unterwegs ab 4,99 €/Monat.",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#hwd-configuration-section > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2)",
+   "text": "99 €/Monat",
+   "kontext": "34 , 99 €/Monat",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#hwd-configuration-section > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2)",
+   "text": "99 €/Monat",
+   "kontext": "34 , 99 €/Monat",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#hwd-configuration-section > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(4) > ul:nth-of-type(1) > li:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(1) > label:nth-of-type(1) > span:nth-of-type(3) > strong:nth-of-type(1)",
+   "text": "0,– €/Monat",
+   "kontext": "Statt UVP (179,–) für 0,– €/Monat.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#hwd-configuration-section > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(4) > ul:nth-of-type(1) > li:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(1) > label:nth-of-type(1) > span:nth-of-type(3) > strong:nth-of-type(1)",
+   "text": "5,– €/Monat",
+   "kontext": "Statt UVP (249,–) für nur 5,– €/Monat",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#hwd-configuration-section > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(4) > ul:nth-of-type(1) > li:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(1) > label:nth-of-type(1) > span:nth-of-type(4) > strong:nth-of-type(1)",
+   "text": "5,– €/Monat",
+   "kontext": "Statt UVP (249,–) für nur 5,– €/Monat",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#hwd-configuration-section > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(4) > ul:nth-of-type(1) > li:nth-of-type(3) > ul:nth-of-type(1) > li:nth-of-type(1) > label:nth-of-type(1) > span:nth-of-type(3)",
+   "text": "Auf Kopfhörer verzichten und stattdessen jeden Monat 2,– € sparen!",
+   "kontext": "Ohne Kopfhörer Auf Kopfhörer verzichten und stattdessen jeden Monat 2,– € sparen!",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#mktbox-einfach-wechseln > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "Jetzt bequem und unterbrechungsfrei zu 1&1 wechseln, sonst gibt's 100,– € für Sie*",
+   "kontext": "Jetzt bequem und unterbrechungsfrei zu 1&1 wechseln, sonst gibt's 100,– € für Sie*",
+   "sichtbar": true
+  }
+ ]
+}

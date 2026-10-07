@@ -1,0 +1,231 @@
+{
+ "einwilligung": {
+  "geklickt": "Nur erforderliche",
+  "ruhe": true,
+  "anfragen": [
+   {
+    "nummer": 47,
+    "methode": "GET",
+    "url": "https://tags-eu.tiqcdn.com/utag/telekom/oneshop-eu/prod/utag.123.js?utv=ut4.54.202610060720",
+    "art": "script",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 48,
+    "methode": "POST",
+    "url": "https://bf72977jfz.bf.dynatrace.com/bf?type=js3&sn=[Cookie entfernt]&svrid=-17473&flavor=cors&vi=KFOFGHQFFMKCPCCOGAUKPWHFMKDJAWCQ-0&modifiedSince=1790854839540&bp=3&app=b05c2f3edf669fad&crc=2861482545&en=p9vvb6ny&end=1",
+    "art": "fetch",
+    "status": null,
+    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+   },
+   {
+    "nummer": 49,
+    "methode": "POST",
+    "url": "https://www2.telekom.de/lib-custom/es",
+    "art": "xhr",
+    "status": null,
+    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+   },
+   {
+    "nummer": 50,
+    "methode": "GET",
+    "url": "https://www.telekom.de/opt-in/set.php?consent=[Cookie entfernt]",
+    "art": "xhr",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 51,
+    "methode": "GET",
+    "url": "https://pix.telekom.de/196380495960676/wt?p=453%2Cwww_telekom_de.shop.geraet.apple.apple-iphone-17-pro.tiefblau-256-gb%2C1%2C1280x900%2C24%2C1%2C1791354942195%2C0%2C1280x900%2C0&nc=1&la=en&cg1=.undefined.undefined&cp11=oneshop-eu&cp30=false%7CAnalytics%3D0%7CMarketing%3D0%7CSocial%3D0%7CUtiq%3D0&cp44=pk-omni-sales&cb131=neugeschaeft&cs27=false%7CAnalytics%3D0%7CMarketing%3D0%7CSocial%3D0%7CUtiq%3D0&np=&pu=https%3A%2F%2Fwww.telekom.de%2Fshop%2Fgeraet%2Fapple%2Fapple-iphone-17-pro%2Ftiefblau-256-gb%3FtariffId%3DMF_17791%26categoryId%3Dsmartphones%26forwardTradeInApplied%3Dfalse",
+    "art": "image",
+    "status": null,
+    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+   },
+   {
+    "nummer": 52,
+    "methode": "GET",
+    "url": "https://pix.telekom.de/316202539684123/wt?p=453%2Cwww_telekom_de.shop.geraet.apple.apple-iphone-17-pro.tiefblau-256-gb%2C1%2C1280x900%2C24%2C1%2C1791354942201%2C0%2C1280x900%2C0&nc=1&la=en&cg1=.undefined.undefined&cp11=oneshop-eu&cb131=neugeschaeft&np=&pu=https%3A%2F%2Fwww.telekom.de%2Fshop%2Fgeraet%2Fapple%2Fapple-iphone-17-pro%2Ftiefblau-256-gb%3FtariffId%3DMF_17791%26categoryId%3Dsmartphones%26forwardTradeInApplied%3Dfalse",
+    "art": "image",
+    "status": null,
+    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+   },
+   {
+    "nummer": 53,
+    "methode": "GET",
+    "url": "https://pix.telekom.de/196380495960676/cc?a=c&c=wteid_196380495960676&rn_wteid_196380495960676=wt3_eid&v=&cp=%2F&cd=180&ccl=180&w=3",
+    "art": "script",
+    "status": null,
+    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+   },
+   {
+    "nummer": 54,
+    "methode": "POST",
+    "url": "https://bf72977jfz.bf.dynatrace.com/bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&cy=event&bc=4028794501&co=snappy&si=[Cookie entfernt]&st=1791354943040&ss=0&qc=3395059637&end=1",
+    "art": "fetch",
+    "status": null,
+    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+   },
+   {
+    "nummer": 55,
+    "methode": "POST",
+    "url": "https://www2.telekom.de/lib-custom/es",
+    "art": "xhr",
+    "status": null,
+    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+   },
+   {
+    "nummer": 56,
+    "methode": "POST",
+    "url": "https://bf72977jfz.bf.dynatrace.com/bf?type=js3&sn=[Cookie entfernt]&svrid=-17473&flavor=cors&vi=KFOFGHQFFMKCPCCOGAUKPWHFMKDJAWCQ-0&modifiedSince=1790854839540&bp=3&app=b05c2f3edf669fad&crc=3514572182&en=p9vvb6ny&end=1",
+    "art": "fetch",
+    "status": null,
+    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+   },
+   {
+    "nummer": 57,
+    "methode": "POST",
+    "url": "https://bf72977jfz.bf.dynatrace.com/bf?type=js3&sn=[Cookie entfernt]&svrid=-17473&flavor=cors&vi=KFOFGHQFFMKCPCCOGAUKPWHFMKDJAWCQ-0&modifiedSince=1790854839540&bp=3&app=b05c2f3edf669fad&crc=3762324288&en=p9vvb6ny&end=1",
+    "art": "fetch",
+    "status": null,
+    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+   },
+   {
+    "nummer": 58,
+    "methode": "GET",
+    "url": "https://bf72977jfz.bf.dynatrace.com/bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=91654271&end=1",
+    "art": "fetch",
+    "status": null,
+    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+   },
+   {
+    "nummer": 59,
+    "methode": "GET",
+    "url": "https://ext.telekom.de/js/exactag.js",
+    "art": "script",
+    "status": null,
+    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+   },
+   {
+    "nummer": 60,
+    "methode": "POST",
+    "url": "https://bf72977jfz.bf.dynatrace.com/bf?type=js3&sn=[Cookie entfernt]&svrid=-17473&flavor=cors&vi=KFOFGHQFFMKCPCCOGAUKPWHFMKDJAWCQ-0&modifiedSince=1790854839540&bp=3&app=b05c2f3edf669fad&crc=3875207217&en=p9vvb6ny&end=1",
+    "art": "fetch",
+    "status": null,
+    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+   }
+  ]
+ },
+ "vermerk": null,
+ "proben": [
+  {
+   "gruppe": 31,
+   "art": "speicher",
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(2) > section:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(1)",
+   "text": "512 GB + 250 €",
+   "wert": null,
+   "fehler": null,
+   "navigiert": null,
+   "umleitung": null,
+   "ruhe": true,
+   "anfragen": [],
+   "preise_geaendert": [],
+   "marke_nachher": null,
+   "uebernommen": "nein"
+  },
+  {
+   "gruppe": 31,
+   "art": "speicher",
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(2) > section:nth-of-type(1) > div:nth-of-type(3) > button:nth-of-type(1)",
+   "text": "1 TB + 500 €",
+   "wert": null,
+   "fehler": null,
+   "navigiert": null,
+   "umleitung": null,
+   "ruhe": true,
+   "anfragen": [],
+   "preise_geaendert": [],
+   "marke_nachher": null,
+   "uebernommen": "nein"
+  },
+  {
+   "gruppe": 34,
+   "art": "tarif",
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(2)",
+   "text": "Unfallschutz Insure MyMobile M Schützt bei Displaybruch und Schäden durch Stürze und Flüssigkeiten, inkl. Express-Gerätetausch und AppleCare Services. Details 13 € monatlich (inkl. 19 % VerSt.) Unfall",
+   "wert": null,
+   "fehler": null,
+   "navigiert": null,
+   "umleitung": null,
+   "ruhe": true,
+   "anfragen": [],
+   "preise_geaendert": [],
+   "marke_nachher": null,
+   "uebernommen": "nein"
+  },
+  {
+   "gruppe": 34,
+   "art": "tarif",
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(3)",
+   "text": "Meist gekauft Unfall- und Diebstahlschutz Insure MyMobile L Schützt bei Diebstahl sowie bei Displaybruch und Schäden durch Stürze und Flüssigkeiten, inkl. Express-Gerätetausch und AppleCare Services. ",
+   "wert": null,
+   "fehler": null,
+   "navigiert": null,
+   "umleitung": null,
+   "ruhe": true,
+   "anfragen": [
+    {
+     "nummer": 64,
+     "methode": "POST",
+     "url": "https://bf72977jfz.bf.dynatrace.com/bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&cy=event&bc=3864663018&co=snappy&si=[Cookie entfernt]&st=1791354956109&ss=0&qc=1461072123&end=1",
+     "art": "fetch",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 65,
+     "methode": "GET",
+     "url": "https://bf72977jfz.bf.dynatrace.com/bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=91654271&end=1",
+     "art": "fetch",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 66,
+     "methode": "GET",
+     "url": "https://pix.telekom.de/196380495960676/wt?p=453%2Cwww_telekom_de.shop.geraet.apple.apple-iphone-17-pro.tiefblau-256-gb%2C1%2C1280x900%2C24%2C1%2C1791354942195%2C0%2C1280x900%2C0&nc=1&la=en&cg1=.undefined.undefined&cp11=oneshop-eu&cp30=false%7CAnalytics%3D0%7CMarketing%3D0%7CSocial%3D0%7CUtiq%3D0&cp44=pk-omni-sales&cb131=neugeschaeft&cs27=false%7CAnalytics%3D0%7CMarketing%3D0%7CSocial%3D0%7CUtiq%3D0&np=&pu=https%3A%2F%2Fwww.telekom.de%2Fshop%2Fgeraet%2Fapple%2Fapple-iphone-17-pro%2Ftiefblau-256-gb%3FtariffId%3DMF_17791%26categoryId%3Dsmartphones%26forwardTradeInApplied%3Dfalse",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 67,
+     "methode": "GET",
+     "url": "https://pix.telekom.de/316202539684123/wt?p=453%2Cwww_telekom_de.shop.geraet.apple.apple-iphone-17-pro.tiefblau-256-gb%2C1%2C1280x900%2C24%2C1%2C1791354942201%2C0%2C1280x900%2C0&nc=1&la=en&cg1=.undefined.undefined&cp11=oneshop-eu&cb131=neugeschaeft&np=&pu=https%3A%2F%2Fwww.telekom.de%2Fshop%2Fgeraet%2Fapple%2Fapple-iphone-17-pro%2Ftiefblau-256-gb%3FtariffId%3DMF_17791%26categoryId%3Dsmartphones%26forwardTradeInApplied%3Dfalse",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    }
+   ],
+   "preise_geaendert": [],
+   "marke_nachher": null,
+   "uebernommen": "nein"
+  },
+  {
+   "gruppe": 62,
+   "art": "tarif",
+   "pfad": "#accordion-header-2y0p02rbp",
+   "text": "MagentaMobil M",
+   "wert": null,
+   "fehler": null,
+   "navigiert": null,
+   "umleitung": null,
+   "ruhe": true,
+   "anfragen": [],
+   "preise_geaendert": [],
+   "marke_nachher": null,
+   "uebernommen": "unbekannt"
+  }
+ ]
+}

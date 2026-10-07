@@ -1,0 +1,121 @@
+{
+ "anbieter": "1und1",
+ "name": "1&1",
+ "datum": "2026-10-07",
+ "status": "gelesen",
+ "grund": null,
+ "kennung": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)",
+ "parallelpruefung": "vor jeder Seite",
+ "robots_gelesen": true,
+ "abstand_sekunden": 2.0,
+ "besuchszeit": null,
+ "dauer_sekunden": 135.7,
+ "zeitgrenze_sekunden": 3000,
+ "seiten": [
+  {
+   "nummer": 1,
+   "geraet": "apple-iphone-17-pro",
+   "speicher_gb": 256,
+   "adresse": "https://mobile.1und1.de/iphone-17-pro",
+   "endadresse": "https://mobile.1und1.de/iphone-17-pro",
+   "status": "gelesen",
+   "grund": null,
+   "bot_schutz": false,
+   "http_status": 200,
+   "ruhe": true,
+   "dateien": {
+    "bedienelemente": "bedienelemente-1.json",
+    "preise": "preise-1.json",
+    "klicks": "klicks-1.json",
+    "mitschnitt": "mitschnitt-1.json",
+    "screenshot": "seite-1.png",
+    "html": "seite-1.html.gz"
+   },
+   "zaehlung": {
+    "anfragen": 85,
+    "verworfen": 4,
+    "gescheitert": 0,
+    "mitschnitt": 5,
+    "elemente": 407,
+    "gruppen_je_art": {
+     "unbekannt": 109,
+     "tarif": 16,
+     "farbe": 1,
+     "speicher": 2,
+     "laufzeit": 1
+    },
+    "preis_kandidaten": 9,
+    "klicks": 1
+   },
+   "verworfen": [
+    {
+     "url": "https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495",
+     "grund": "ReadTimeout: The read operation timed out"
+    },
+    {
+     "url": "https://content.1und1.de/ctx/dh/libt.min.js?bust=2026100706",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495",
+     "grund": "ReadTimeout: The read operation timed out"
+    },
+    {
+     "url": "https://js-agent.newrelic.com/nr-spa-1.318.0.min.js",
+     "grund": "per robots.txt gesperrt: /nr-spa-1.318.0.min.js"
+    }
+   ],
+   "gescheitert": []
+  },
+  {
+   "nummer": 2,
+   "geraet": "samsung-galaxy-s26",
+   "speicher_gb": 256,
+   "adresse": "https://mobile.1und1.de/samsung-galaxy-s26",
+   "endadresse": "https://mobile.1und1.de/samsung-galaxy-s26",
+   "status": "gelesen",
+   "grund": null,
+   "bot_schutz": false,
+   "http_status": 200,
+   "ruhe": true,
+   "dateien": {
+    "bedienelemente": "bedienelemente-2.json",
+    "preise": "preise-2.json",
+    "klicks": "klicks-2.json",
+    "mitschnitt": "mitschnitt-2.json",
+    "screenshot": "seite-2.png",
+    "html": "seite-2.html.gz"
+   },
+   "zaehlung": {
+    "anfragen": 65,
+    "verworfen": 2,
+    "gescheitert": 0,
+    "mitschnitt": 2,
+    "elemente": 429,
+    "gruppen_je_art": {
+     "unbekannt": 112,
+     "tarif": 15,
+     "farbe": 3,
+     "speicher": 2,
+     "laufzeit": 1
+    },
+    "preis_kandidaten": 12,
+    "klicks": 1
+   },
+   "verworfen": [
+    {
+     "url": "https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495",
+     "grund": "ReadTimeout: The read operation timed out"
+    },
+    {
+     "url": "https://content.1und1.de/ctx/dh/libt.min.js?bust=2026100706",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    }
+   ],
+   "gescheitert": []
+  }
+ ],
+ "groesse_bytes": 1365656,
+ "groessengrenze_bytes": 8000000,
+ "gekuerzt": []
+}

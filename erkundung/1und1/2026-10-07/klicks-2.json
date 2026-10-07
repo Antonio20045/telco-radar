@@ -1,0 +1,70 @@
+{
+ "einwilligung": {
+  "geklickt": null,
+  "grund": "kein Ablehnen-Knopf sichtbar"
+ },
+ "vermerk": null,
+ "proben": [
+  {
+   "gruppe": 33,
+   "art": "speicher",
+   "pfad": "#hwd-configuration-section > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > label:nth-of-type(2)",
+   "text": "512 GB",
+   "wert": null,
+   "fehler": null,
+   "navigiert": "https://mobile.1und1.de/samsung-galaxy-s26?color=COBALT_VIOLET&size=512",
+   "umleitung": null,
+   "ruhe": true,
+   "anfragen": [
+    {
+     "nummer": 60,
+     "methode": "GET",
+     "url": "https://mobile.1und1.de/frontend/product-details/images/hwd-first-visit/d-android-hwd-configurator-d44811-optimiert-img-info-zum-eins-und-eins-einfachwechsel.svg",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 61,
+     "methode": "GET",
+     "url": "https://mobile.1und1.de/_catalog/images/c7671e327ea0c1e6fbb095d579fc9a1c-img-samsung-galaxy-s26-violet-duo-1.png",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 62,
+     "methode": "GET",
+     "url": "https://mobile.1und1.de/_catalog/images/1cd29eb62dedca4c2b5d118e2bfea17e-img-samsung-galaxy-s26-violet-back~235x470.png",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 63,
+     "methode": "GET",
+     "url": "https://mobile.1und1.de/_catalog/images/0652976f22e7986c6837768980b7bc1c-img-samsung-galaxy-s26-violet-rechts.png",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 64,
+     "methode": "GET",
+     "url": "https://mobile.1und1.de/_catalog/images/53ac3ab433514823fc527a02cbd82a19-img-samsung-galaxy-s26-violet-front-badge-1.png",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 65,
+     "methode": "GET",
+     "url": "https://mobile.1und1.de/_catalog/images/84aec9cc5f440c9900f1c4ea274b244e-img-samsung-galaxy-s26-violet-side.png",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    }
+   ]
+  }
+ ]
+}

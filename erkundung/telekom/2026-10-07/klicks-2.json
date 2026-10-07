@@ -1,0 +1,88 @@
+{
+ "einwilligung": {
+  "geklickt": null,
+  "grund": "kein Ablehnen-Knopf sichtbar"
+ },
+ "vermerk": null,
+ "proben": [
+  {
+   "gruppe": 33,
+   "art": "tarif",
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(2)",
+   "text": "Unfallschutz Insure MyMobile M Schützt bei Displaybruch und Schäden durch Stürze und Flüssigkeiten sowie Express-Gerätetausch. Details 8 € monatlich (inkl. 19 % VerSt.) Unfallschutz",
+   "wert": null,
+   "fehler": null,
+   "navigiert": null,
+   "umleitung": null,
+   "ruhe": true,
+   "anfragen": [],
+   "preise_geaendert": [],
+   "marke_nachher": null,
+   "uebernommen": "nein"
+  },
+  {
+   "gruppe": 33,
+   "art": "tarif",
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(3)",
+   "text": "Meist gekauft Unfall- und Diebstahlschutz Insure MyMobile L Schützt bei Diebstahl sowie bei Displaybruch und Schäden durch Stürze und Flüssigkeiten sowie Express-Gerätetausch. Details 10 € monatlich (",
+   "wert": null,
+   "fehler": null,
+   "navigiert": null,
+   "umleitung": null,
+   "ruhe": true,
+   "anfragen": [
+    {
+     "nummer": 38,
+     "methode": "POST",
+     "url": "https://bf72977jfz.bf.dynatrace.com/bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&cy=event&bc=3646641588&co=snappy&si=[Cookie entfernt]&st=1791355066154&ss=0&qc=2346821334&end=1",
+     "art": "fetch",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 39,
+     "methode": "GET",
+     "url": "https://bf72977jfz.bf.dynatrace.com/bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1790854839540&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=1898230977&end=1",
+     "art": "fetch",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    }
+   ],
+   "preise_geaendert": [],
+   "marke_nachher": null,
+   "uebernommen": "nein"
+  },
+  {
+   "gruppe": 49,
+   "art": "tarif",
+   "pfad": "#accordion-header-e4yho9irb",
+   "text": "MagentaMobil M",
+   "wert": null,
+   "fehler": null,
+   "navigiert": null,
+   "umleitung": null,
+   "ruhe": true,
+   "anfragen": [
+    {
+     "nummer": 40,
+     "methode": "POST",
+     "url": "https://bf72977jfz.bf.dynatrace.com/bf?type=js3&sn=[Cookie entfernt]&svrid=-17235&flavor=cors&vi=CTGGMEPCNPODPKTWVPEMJROKMSDGHMEJ-0&modifiedSince=1790854839540&bp=3&app=b05c2f3edf669fad&crc=3085874766&en=p9vvb6ny&end=1",
+     "art": "fetch",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 41,
+     "methode": "POST",
+     "url": "https://bf72977jfz.bf.dynatrace.com/bf?type=js3&sn=[Cookie entfernt]&svrid=-17235&flavor=cors&vi=CTGGMEPCNPODPKTWVPEMJROKMSDGHMEJ-0&modifiedSince=1790854839540&bp=3&app=b05c2f3edf669fad&crc=817989827&en=p9vvb6ny&end=1",
+     "art": "fetch",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    }
+   ],
+   "preise_geaendert": [],
+   "marke_nachher": null,
+   "uebernommen": "unbekannt"
+  }
+ ]
+}
