@@ -1,6 +1,6 @@
 {
- "elemente_gesamt": 200,
- "elemente_gelesen": 200,
+ "elemente_gesamt": 199,
+ "elemente_gelesen": 199,
  "gruppen": [
   {
    "nummer": 0,
@@ -154,8 +154,8 @@
   },
   {
    "nummer": 8,
-   "pfad": "#gridSlider0 > div:nth-of-type(1) > div:nth-of-type(2)",
-   "name": null,
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(2)",
+   "name": "Filtern",
    "art": "unbekannt",
    "anteile": {
     "speicher": 0.0,
@@ -165,16 +165,49 @@
    },
    "elemente": [
     12,
-    13,
-    14
+    103
    ],
    "select": false,
-   "mit_marke": true
+   "mit_marke": false
   },
   {
    "nummer": 9,
-   "pfad": "#gridSlider0 > div:nth-of-type(1)",
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1)",
    "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    13
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 10,
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    14
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 11,
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2)",
+   "name": "Beliebteste absteigend",
    "art": "unbekannt",
    "anteile": {
     "speicher": 0.0,
@@ -184,51 +217,20 @@
    },
    "elemente": [
     15,
-    16
-   ],
-   "select": false,
-   "mit_marke": false
-  },
-  {
-   "nummer": 10,
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(4) > form:nth-of-type(1)",
-   "name": null,
-   "art": "unbekannt",
-   "anteile": {
-    "speicher": 0.0,
-    "laufzeit": 0.0,
-    "tarif": 0.0,
-    "farbe": 0.0
-   },
-   "elemente": [
+    16,
     17,
-    18
+    18,
+    19,
+    20,
+    21
    ],
    "select": false,
    "mit_marke": false
-  },
-  {
-   "nummer": 11,
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1)",
-   "name": null,
-   "art": "unbekannt",
-   "anteile": {
-    "speicher": 0.0,
-    "laufzeit": 0.0,
-    "tarif": 0.0,
-    "farbe": 0.0
-   },
-   "elemente": [
-    19,
-    20
-   ],
-   "select": false,
-   "mit_marke": true
   },
   {
    "nummer": 12,
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1)",
-   "name": null,
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(10)",
+   "name": "Google Pixel 10",
    "art": "unbekannt",
    "anteile": {
     "speicher": 0.0,
@@ -237,16 +239,15 @@
     "farbe": 0.0
    },
    "elemente": [
-    21,
-    103
+    22
    ],
    "select": false,
    "mit_marke": false
   },
   {
    "nummer": 13,
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(3) > div:nth-of-type(1) > ul:nth-of-type(1)",
-   "name": "Verfügbarkeit",
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(11)",
+   "name": "Farbe",
    "art": "farbe",
    "anteile": {
     "speicher": 0.0,
@@ -255,7 +256,6 @@
     "farbe": 0.5
    },
    "elemente": [
-    22,
     23
    ],
    "select": false,
@@ -263,8 +263,8 @@
   },
   {
    "nummer": 14,
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1)",
-   "name": null,
+   "pfad": "#uu8ap0-accordion > div:nth-of-type(1)",
+   "name": "0 - 95 €",
    "art": "unbekannt",
    "anteile": {
     "speicher": 0.0,
@@ -273,30 +273,14 @@
     "farbe": 0.0
    },
    "elemente": [
-    24
-   ],
-   "select": false,
-   "mit_marke": false
-  },
-  {
-   "nummer": 15,
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(4) > div:nth-of-type(2) > div:nth-of-type(1)",
-   "name": null,
-   "art": "unbekannt",
-   "anteile": {
-    "speicher": 0.0,
-    "laufzeit": 0.0,
-    "tarif": 0.0,
-    "farbe": 0.0
-   },
-   "elemente": [
+    24,
     25
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 16,
+   "nummer": 15,
    "pfad": "#minimized-trustbadge-98e3dadd90eb493088abdc5597a70810",
    "name": null,
    "art": "unbekannt",
@@ -315,7 +299,7 @@
    "mit_marke": false
   },
   {
-   "nummer": 17,
+   "nummer": 16,
    "pfad": "body > div:nth-of-type(1) > ecom-footer:nth-of-type(1) > section:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
@@ -327,14 +311,14 @@
    },
    "elemente": [
     29,
-    133,
-    134
+    132,
+    133
    ],
    "select": false,
    "mit_marke": true
   },
   {
-   "nummer": 18,
+   "nummer": 17,
    "pfad": "#outdated-browser",
    "name": null,
    "art": "unbekannt",
@@ -352,7 +336,7 @@
    "mit_marke": false
   },
   {
-   "nummer": 19,
+   "nummer": 18,
    "pfad": "body > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
@@ -369,7 +353,7 @@
    "mit_marke": false
   },
   {
-   "nummer": 20,
+   "nummer": 19,
    "pfad": "body > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > div:nth-of-type(2) > ul:nth-of-type(1)",
    "name": "Headline",
    "art": "unbekannt",
@@ -388,7 +372,7 @@
    "mit_marke": false
   },
   {
-   "nummer": 21,
+   "nummer": 20,
    "pfad": "body > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > div:nth-of-type(2) > ul:nth-of-type(2)",
    "name": "Headline",
    "art": "unbekannt",
@@ -406,7 +390,7 @@
    "mit_marke": false
   },
   {
-   "nummer": 22,
+   "nummer": 21,
    "pfad": "body > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > div:nth-of-type(2)",
    "name": "Schließen",
    "art": "unbekannt",
@@ -424,7 +408,7 @@
    "mit_marke": false
   },
   {
-   "nummer": 23,
+   "nummer": 22,
    "pfad": "body > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > div:nth-of-type(2) > ul:nth-of-type(4)",
    "name": null,
    "art": "unbekannt",
@@ -443,7 +427,7 @@
    "mit_marke": false
   },
   {
-   "nummer": 24,
+   "nummer": 23,
    "pfad": "body > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > div:nth-of-type(3) > ul:nth-of-type(1)",
    "name": "Headline",
    "art": "tarif",
@@ -465,7 +449,7 @@
    "mit_marke": false
   },
   {
-   "nummer": 25,
+   "nummer": 24,
    "pfad": "body > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > div:nth-of-type(3) > ul:nth-of-type(2)",
    "name": "Headline",
    "art": "unbekannt",
@@ -487,7 +471,7 @@
    "mit_marke": false
   },
   {
-   "nummer": 26,
+   "nummer": 25,
    "pfad": "body > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > div:nth-of-type(3) > ul:nth-of-type(3)",
    "name": "Headline",
    "art": "unbekannt",
@@ -506,7 +490,7 @@
    "mit_marke": false
   },
   {
-   "nummer": 27,
+   "nummer": 26,
    "pfad": "body > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > div:nth-of-type(3) > ul:nth-of-type(4)",
    "name": null,
    "art": "unbekannt",
@@ -524,7 +508,7 @@
    "mit_marke": false
   },
   {
-   "nummer": 28,
+   "nummer": 27,
    "pfad": "body > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > div:nth-of-type(3)",
    "name": "Schließen",
    "art": "unbekannt",
@@ -541,7 +525,7 @@
    "mit_marke": false
   },
   {
-   "nummer": 29,
+   "nummer": 28,
    "pfad": "body > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > div:nth-of-type(3) > ul:nth-of-type(6)",
    "name": null,
    "art": "unbekannt",
@@ -561,7 +545,7 @@
    "mit_marke": false
   },
   {
-   "nummer": 30,
+   "nummer": 29,
    "pfad": "body > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > div:nth-of-type(3) > ul:nth-of-type(7)",
    "name": null,
    "art": "unbekannt",
@@ -582,7 +566,7 @@
    "mit_marke": false
   },
   {
-   "nummer": 31,
+   "nummer": 30,
    "pfad": "body > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > div:nth-of-type(3) > ul:nth-of-type(8)",
    "name": null,
    "art": "unbekannt",
@@ -606,7 +590,7 @@
    "mit_marke": false
   },
   {
-   "nummer": 32,
+   "nummer": 31,
    "pfad": "body > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > div:nth-of-type(3) > ul:nth-of-type(9)",
    "name": null,
    "art": "unbekannt",
@@ -630,7 +614,7 @@
    "mit_marke": false
   },
   {
-   "nummer": 33,
+   "nummer": 32,
    "pfad": "body > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > div:nth-of-type(3) > ul:nth-of-type(10)",
    "name": null,
    "art": "unbekannt",
@@ -651,7 +635,7 @@
    "mit_marke": false
   },
   {
-   "nummer": 34,
+   "nummer": 33,
    "pfad": "body > div:nth-of-type(1) > div:nth-of-type(3)",
    "name": null,
    "art": "unbekannt",
@@ -668,8 +652,8 @@
    "mit_marke": false
   },
   {
-   "nummer": 35,
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1)",
+   "nummer": 34,
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
    "anteile": {
@@ -685,26 +669,43 @@
    "mit_marke": false
   },
   {
-   "nummer": 36,
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2)",
+   "nummer": 35,
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3)",
    "name": null,
-   "art": "tarif",
+   "art": "unbekannt",
    "anteile": {
     "speicher": 0.0,
     "laufzeit": 0.0,
-    "tarif": 0.5,
+    "tarif": 0.0,
     "farbe": 0.0
    },
    "elemente": [
-    104,
-    105
+    104
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 36,
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2)",
+   "name": "DEIN WUNSCHHANDY",
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    105,
+    112
    ],
    "select": false,
    "mit_marke": false
   },
   {
    "nummer": 37,
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1)",
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(10) > div:nth-of-type(1)",
    "name": "Farbe",
    "art": "farbe",
    "anteile": {
@@ -724,7 +725,7 @@
   },
   {
    "nummer": 38,
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(4) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1)",
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(11) > div:nth-of-type(1)",
    "name": "Speicherplatz",
    "art": "speicher",
    "anteile": {
@@ -742,24 +743,7 @@
   },
   {
    "nummer": 39,
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(4)",
-   "name": "Verfügbarkeit Lieferbar in 1-3 Werktagen In unseren Shops nicht verfügbar",
-   "art": "unbekannt",
-   "anteile": {
-    "speicher": 0.0,
-    "laufzeit": 0.0,
-    "tarif": 0.0,
-    "farbe": 0.0
-   },
-   "elemente": [
-    112
-   ],
-   "select": false,
-   "mit_marke": false
-  },
-  {
-   "nummer": 40,
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(5) > div:nth-of-type(1)",
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
    "anteile": {
@@ -769,7 +753,23 @@
     "farbe": 0.0
    },
    "elemente": [
-    113,
+    113
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 40,
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
     114
    ],
    "select": false,
@@ -777,26 +777,8 @@
   },
   {
    "nummer": 41,
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2)",
-   "name": "Häufig gestellte Fragen",
-   "art": "farbe",
-   "anteile": {
-    "speicher": 0.0,
-    "laufzeit": 0.0,
-    "tarif": 0.0,
-    "farbe": 0.5
-   },
-   "elemente": [
-    115,
-    116
-   ],
-   "select": false,
-   "mit_marke": false
-  },
-  {
-   "nummer": 42,
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3)",
-   "name": "Welche Zahlungsmöglichkeiten sind möglich?",
+   "pfad": "#q9h2qq-accordion > div:nth-of-type(1) > div:nth-of-type(1)",
+   "name": null,
    "art": "unbekannt",
    "anteile": {
     "speicher": 0.0,
@@ -805,6 +787,8 @@
     "farbe": 0.0
    },
    "elemente": [
+    115,
+    116,
     117,
     118
    ],
@@ -812,8 +796,25 @@
    "mit_marke": false
   },
   {
+   "nummer": 42,
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2)",
+   "name": "Netzwahl Telekom Vodafone o2 Telefonica",
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    119
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
    "nummer": 43,
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1)",
+   "pfad": "#r41xa0-accordion > div:nth-of-type(1) > div:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
    "anteile": {
@@ -823,16 +824,18 @@
     "farbe": 0.0
    },
    "elemente": [
-    119,
-    120
+    120,
+    121,
+    122,
+    123
    ],
    "select": false,
-   "mit_marke": true
+   "mit_marke": false
   },
   {
    "nummer": 44,
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(9) > span:nth-of-type(1)",
-   "name": null,
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3)",
+   "name": "Datenvolumen 1 - 4 GB 5 - 10 GB 11 - 20 GB > als 20 GB",
    "art": "unbekannt",
    "anteile": {
     "speicher": 0.0,
@@ -841,20 +844,48 @@
     "farbe": 0.0
    },
    "elemente": [
-    121,
-    122,
-    123,
-    124,
-    125,
-    126,
-    127,
-    128
+    124
    ],
    "select": false,
    "mit_marke": false
   },
   {
    "nummer": 45,
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(4)",
+   "name": "Monatlicher Preis 0 - 95 €",
+   "art": "laufzeit",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.5,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    125
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 46,
+   "pfad": "#s8sdo3-accordion > div:nth-of-type(1) > div:nth-of-type(1)",
+   "name": null,
+   "art": "tarif",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 1.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    126,
+    127
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 47,
    "pfad": "body > div:nth-of-type(1) > ecom-footer:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
@@ -865,16 +896,16 @@
     "farbe": 0.0
    },
    "elemente": [
+    128,
     129,
     130,
-    131,
-    132
+    131
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 46,
+   "nummer": 48,
    "pfad": "body > div:nth-of-type(1) > ecom-footer:nth-of-type(1) > section:nth-of-type(3) > div:nth-of-type(2) > nav:nth-of-type(1) > ul:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
@@ -885,19 +916,19 @@
     "farbe": 0.0
    },
    "elemente": [
+    134,
     135,
     136,
     137,
     138,
     139,
-    140,
-    141
+    140
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 47,
+   "nummer": 49,
    "pfad": "body > div:nth-of-type(1) > ecom-footer:nth-of-type(1) > section:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > footer-ecom-link-container:nth-of-type(1) > nav:nth-of-type(1) > div:nth-of-type(1) > ul:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
@@ -908,6 +939,7 @@
     "farbe": 0.0
    },
    "elemente": [
+    141,
     142,
     143,
     144,
@@ -916,14 +948,13 @@
     147,
     148,
     149,
-    150,
-    151
+    150
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 48,
+   "nummer": 50,
    "pfad": "body > div:nth-of-type(1) > ecom-footer:nth-of-type(1) > section:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > footer-ecom-link-container:nth-of-type(1) > nav:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1)",
    "name": null,
    "art": "tarif",
@@ -934,6 +965,7 @@
     "farbe": 0.0
    },
    "elemente": [
+    151,
     152,
     153,
     154,
@@ -944,14 +976,13 @@
     159,
     160,
     161,
-    162,
-    163
+    162
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 49,
+   "nummer": 51,
    "pfad": "body > div:nth-of-type(1) > ecom-footer:nth-of-type(1) > section:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > footer-ecom-link-container:nth-of-type(1) > nav:nth-of-type(1) > div:nth-of-type(3) > ul:nth-of-type(1)",
    "name": null,
    "art": "tarif",
@@ -962,6 +993,7 @@
     "farbe": 0.0
    },
    "elemente": [
+    163,
     164,
     165,
     166,
@@ -969,14 +1001,13 @@
     168,
     169,
     170,
-    171,
-    172
+    171
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 50,
+   "nummer": 52,
    "pfad": "body > div:nth-of-type(1) > ecom-footer:nth-of-type(1) > section:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > footer-ecom-link-container:nth-of-type(1) > nav:nth-of-type(1) > div:nth-of-type(4) > ul:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
@@ -987,15 +1018,15 @@
     "farbe": 0.0
    },
    "elemente": [
+    172,
     173,
-    174,
-    175
+    174
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 51,
+   "nummer": 53,
    "pfad": "body > div:nth-of-type(1) > ecom-footer:nth-of-type(1) > section:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > footer-ecom-link-container:nth-of-type(1) > nav:nth-of-type(1) > div:nth-of-type(5) > ul:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
@@ -1006,6 +1037,7 @@
     "farbe": 0.0
    },
    "elemente": [
+    175,
     176,
     177,
     178,
@@ -1016,14 +1048,13 @@
     183,
     184,
     185,
-    186,
-    187
+    186
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 52,
+   "nummer": 54,
    "pfad": "body > div:nth-of-type(1) > ecom-footer:nth-of-type(1) > section:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > footer-ecom-link-container:nth-of-type(1) > nav:nth-of-type(1) > div:nth-of-type(6) > ul:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
@@ -1034,6 +1065,7 @@
     "farbe": 0.0
    },
    "elemente": [
+    187,
     188,
     189,
     190,
@@ -1044,15 +1076,14 @@
     195,
     196,
     197,
-    198,
-    199
+    198
    ],
    "select": false,
    "mit_marke": false
   },
   {
-   "nummer": 53,
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > select:nth-of-type(1)",
+   "nummer": 55,
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(1) > select:nth-of-type(1)",
    "name": null,
    "art": "unbekannt",
    "anteile": {
@@ -1062,7 +1093,24 @@
     "farbe": 0.0
    },
    "elemente": [
-    21
+    12
+   ],
+   "select": true,
+   "mit_marke": true
+  },
+  {
+   "nummer": 56,
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > select:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    14
    ],
    "select": true,
    "mit_marke": true
@@ -1361,373 +1409,299 @@
    "behaelter": 7
   },
   {
-   "tag": "span",
-   "rolle": "span",
-   "text": "",
-   "aria": {},
-   "daten": {},
-   "id": null,
-   "klassen": [
-    "swiper-pagination-bullet",
-    "grid-slider__pagination-bullet",
-    "js-grid-slider-pagination-bullet",
-    "swiper-pagination-bullet-active",
-    "grid-slider__pagination-bullet-active",
-    "js-grid-slider-pagination-bullet-active"
-   ],
-   "name": null,
-   "wert": null,
-   "typ": null,
-   "href": null,
-   "ziel": null,
-   "pfad": "#gridSlider0 > div:nth-of-type(1) > div:nth-of-type(2) > span:nth-of-type(1)",
-   "sichtbar": true,
-   "deaktiviert": false,
-   "gewaehlt": "klasse:swiper-pagination-bullet-active",
-   "optionen": null,
-   "behaelter": 8
-  },
-  {
-   "tag": "span",
-   "rolle": "span",
-   "text": "",
-   "aria": {},
-   "daten": {},
-   "id": null,
-   "klassen": [
-    "swiper-pagination-bullet",
-    "grid-slider__pagination-bullet",
-    "js-grid-slider-pagination-bullet"
-   ],
-   "name": null,
-   "wert": null,
-   "typ": null,
-   "href": null,
-   "ziel": null,
-   "pfad": "#gridSlider0 > div:nth-of-type(1) > div:nth-of-type(2) > span:nth-of-type(2)",
-   "sichtbar": true,
-   "deaktiviert": false,
-   "gewaehlt": null,
-   "optionen": null,
-   "behaelter": 8
-  },
-  {
-   "tag": "span",
-   "rolle": "span",
-   "text": "",
-   "aria": {},
-   "daten": {},
-   "id": null,
-   "klassen": [
-    "swiper-pagination-bullet",
-    "grid-slider__pagination-bullet",
-    "js-grid-slider-pagination-bullet"
-   ],
-   "name": null,
-   "wert": null,
-   "typ": null,
-   "href": null,
-   "ziel": null,
-   "pfad": "#gridSlider0 > div:nth-of-type(1) > div:nth-of-type(2) > span:nth-of-type(3)",
-   "sichtbar": true,
-   "deaktiviert": false,
-   "gewaehlt": null,
-   "optionen": null,
-   "behaelter": 8
-  },
-  {
-   "tag": "div",
-   "rolle": "div",
-   "text": "",
-   "aria": {},
-   "daten": {},
-   "id": null,
-   "klassen": [
-    "swiper-button-prev",
-    "grid-slider__pagination-button-prev",
-    "js-grid-slider-pagination-button-prev",
-    "fal",
-    "fa-custom-angle-back",
-    "swiper-button-disabled"
-   ],
-   "name": null,
-   "wert": null,
-   "typ": null,
-   "href": null,
-   "ziel": null,
-   "pfad": "#gridSlider0 > div:nth-of-type(1) > div:nth-of-type(3)",
-   "sichtbar": true,
-   "deaktiviert": false,
-   "gewaehlt": null,
-   "optionen": null,
-   "behaelter": 9
-  },
-  {
-   "tag": "div",
-   "rolle": "div",
-   "text": "",
-   "aria": {},
-   "daten": {},
-   "id": null,
-   "klassen": [
-    "swiper-button-next",
-    "grid-slider__pagination-button-next",
-    "js-grid-slider-pagination-button-next",
-    "fal",
-    "fa-custom-angle-link"
-   ],
-   "name": null,
-   "wert": null,
-   "typ": null,
-   "href": null,
-   "ziel": null,
-   "pfad": "#gridSlider0 > div:nth-of-type(1) > div:nth-of-type(4)",
-   "sichtbar": true,
-   "deaktiviert": false,
-   "gewaehlt": null,
-   "optionen": null,
-   "behaelter": 9
-  },
-  {
-   "tag": "label",
-   "rolle": "label",
-   "text": "Ja, ich möchte mein Handy für nur 9.99 € im Monat absichern",
-   "aria": {},
-   "daten": {},
-   "id": null,
-   "klassen": [
-    "checkbox",
-    "-margin-bottom-0",
-    "-light",
-    "flex-container",
-    "align-top"
-   ],
-   "name": null,
-   "wert": null,
-   "typ": null,
-   "href": null,
-   "ziel": null,
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(4) > form:nth-of-type(1) > label:nth-of-type(1)",
-   "sichtbar": true,
-   "deaktiviert": false,
-   "gewaehlt": null,
-   "optionen": null,
-   "behaelter": 10
-  },
-  {
-   "tag": "input",
-   "rolle": "checkbox",
-   "text": "on",
-   "aria": {},
-   "daten": {
-    "data-ga-click": "Produktdetails|Handyversicherung|Checkbox"
-   },
-   "id": "insurance-checkbox",
-   "klassen": [
-    "checkbox__input",
-    "js-product-detail-device-insurance-checkbox"
-   ],
-   "name": null,
-   "wert": null,
-   "typ": "checkbox",
-   "href": null,
-   "ziel": null,
-   "pfad": "#insurance-checkbox",
-   "sichtbar": true,
-   "deaktiviert": false,
-   "gewaehlt": null,
-   "optionen": null,
-   "behaelter": 10
-  },
-  {
-   "tag": "div",
-   "rolle": "button",
-   "text": "Finanzierung",
-   "aria": {
-    "aria-label": "Finanzierung"
-   },
-   "daten": {},
-   "id": null,
-   "klassen": [
-    "tabcontent__navitem",
-    "js-installment-pay"
-   ],
-   "name": null,
-   "wert": null,
-   "typ": null,
-   "href": null,
-   "ziel": null,
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1)",
-   "sichtbar": true,
-   "deaktiviert": false,
-   "gewaehlt": null,
-   "optionen": null,
-   "behaelter": 11
-  },
-  {
-   "tag": "div",
-   "rolle": "button",
-   "text": "Einmalzahlung",
-   "aria": {
-    "aria-label": "Einmalzahlung"
-   },
-   "daten": {},
-   "id": null,
-   "klassen": [
-    "tabcontent__navitem",
-    "js-not-installment-pay",
-    "-is-active"
-   ],
-   "name": null,
-   "wert": null,
-   "typ": null,
-   "href": null,
-   "ziel": null,
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2)",
-   "sichtbar": true,
-   "deaktiviert": false,
-   "gewaehlt": "klasse:-is-active",
-   "optionen": null,
-   "behaelter": 11
-  },
-  {
    "tag": "select",
    "rolle": "combobox",
-   "text": "6 Monatsraten 12 Monatsraten 24 Monatsraten 36 Monatsraten 48 Monatsraten 60 Monatsraten 72 Monatsraten",
+   "text": "Daten aufsteigend Daten absteigend Preis aufsteigend Preis absteigend Name aufsteigend Name absteigend Beliebteste absteigend",
    "aria": {},
    "daten": {},
    "id": null,
    "klassen": [
-    "select",
-    "js-installment-rate",
-    "-small-font-small"
+    "js-sort-select",
+    "mobile-sort-select"
    ],
    "name": null,
    "wert": null,
    "typ": null,
    "href": null,
    "ziel": null,
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > select:nth-of-type(1)",
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(1) > select:nth-of-type(1)",
    "sichtbar": false,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": [
     {
-     "wert": "6",
-     "text": "6 Monatsraten",
+     "wert": "data",
+     "text": "Daten aufsteigend",
      "gewaehlt": false,
      "deaktiviert": false
     },
     {
-     "wert": "12",
-     "text": "12 Monatsraten",
+     "wert": "data",
+     "text": "Daten absteigend",
      "gewaehlt": false,
      "deaktiviert": false
     },
     {
-     "wert": "24",
-     "text": "24 Monatsraten",
+     "wert": "price",
+     "text": "Preis aufsteigend",
      "gewaehlt": false,
      "deaktiviert": false
     },
     {
-     "wert": "36",
-     "text": "36 Monatsraten",
+     "wert": "price",
+     "text": "Preis absteigend",
+     "gewaehlt": false,
+     "deaktiviert": false
+    },
+    {
+     "wert": "name",
+     "text": "Name aufsteigend",
+     "gewaehlt": false,
+     "deaktiviert": false
+    },
+    {
+     "wert": "name",
+     "text": "Name absteigend",
+     "gewaehlt": false,
+     "deaktiviert": false
+    },
+    {
+     "wert": "custom",
+     "text": "Beliebteste absteigend",
      "gewaehlt": true,
-     "deaktiviert": false
-    },
-    {
-     "wert": "48",
-     "text": "48 Monatsraten",
-     "gewaehlt": false,
-     "deaktiviert": false
-    },
-    {
-     "wert": "60",
-     "text": "60 Monatsraten",
-     "gewaehlt": false,
-     "deaktiviert": false
-    },
-    {
-     "wert": "72",
-     "text": "72 Monatsraten",
-     "gewaehlt": false,
      "deaktiviert": false
     }
    ],
-   "behaelter": 12
+   "behaelter": 8
   },
   {
-   "tag": "span",
-   "rolle": "button",
-   "text": "",
-   "aria": {
-    "aria-haspopup": "true",
-    "aria-describedby": "jm50bq-tooltip-ext"
-   },
-   "daten": {
-    "data-tooltip-ext": "bcnbrc-tooltip-ext",
-    "data-tip-text": "<div class=\"headline4 -padding-top-0 -margin-bottom-0\">Lieferbar in 1-3 Werktagen</div><p class=\"paragraph -no-margin-bottom\">Der Artikel ist in ausreichender Stückzahl verfügbar. Der Versand wird sof",
-    "data-disable-hover": "false",
-    "data-yeti-box": "jm50bq-tooltip-ext",
-    "data-toggle": "jm50bq-tooltip-ext",
-    "data-resize": "jm50bq-tooltip-ext"
-   },
+   "tag": "div",
+   "rolle": "div",
+   "text": "Beliebteste absteigend",
+   "aria": {},
+   "daten": {},
    "id": null,
    "klassen": [
-    "delivery-status__info",
-    "has-tip-ext",
-    "top",
-    "-no-marker",
-    "js-product-detail-device-stock-online-tooltip"
+    "desktop-sort-select",
+    "custom-select",
+    "is-initialized"
    ],
    "name": null,
    "wert": null,
    "typ": null,
    "href": null,
    "ziel": null,
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(3) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(1) > span:nth-of-type(2) > span:nth-of-type(2)",
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1)",
    "sichtbar": true,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 13
+   "behaelter": 9
   },
   {
-   "tag": "span",
-   "rolle": "button",
-   "text": "",
-   "aria": {
-    "aria-haspopup": "true",
-    "aria-describedby": "s5mf3y-tooltip-ext"
-   },
-   "daten": {
-    "data-tooltip-ext": "kng9fe-tooltip-ext",
-    "data-tip-text": "<div class=\"headline4 -padding-top-0 -margin-bottom-0\">In unseren Shops nicht verfügbar</div><p class=\"paragraph -no-margin-bottom\">Dieser Artikel ist in ausgewählten Shops vorrätig und kann dorthin g",
-    "data-disable-hover": "false",
-    "data-yeti-box": "s5mf3y-tooltip-ext",
-    "data-toggle": "s5mf3y-tooltip-ext",
-    "data-resize": "s5mf3y-tooltip-ext"
-   },
+   "tag": "select",
+   "rolle": "combobox",
+   "text": "Daten aufsteigend Daten absteigend Preis aufsteigend Preis absteigend Name aufsteigend Name absteigend Beliebteste absteigend",
+   "aria": {},
+   "daten": {},
    "id": null,
    "klassen": [
-    "delivery-status__info",
-    "has-tip-ext",
-    "top",
-    "-no-marker",
-    "js-product-detail-device-stock-shop-tooltip"
+    "js-sort-select"
    ],
    "name": null,
    "wert": null,
    "typ": null,
    "href": null,
    "ziel": null,
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(3) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(2) > span:nth-of-type(2) > span:nth-of-type(2)",
-   "sichtbar": true,
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > select:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": [
+    {
+     "wert": "data",
+     "text": "Daten aufsteigend",
+     "gewaehlt": false,
+     "deaktiviert": false
+    },
+    {
+     "wert": "data",
+     "text": "Daten absteigend",
+     "gewaehlt": false,
+     "deaktiviert": false
+    },
+    {
+     "wert": "price",
+     "text": "Preis aufsteigend",
+     "gewaehlt": false,
+     "deaktiviert": false
+    },
+    {
+     "wert": "price",
+     "text": "Preis absteigend",
+     "gewaehlt": false,
+     "deaktiviert": false
+    },
+    {
+     "wert": "name",
+     "text": "Name aufsteigend",
+     "gewaehlt": false,
+     "deaktiviert": false
+    },
+    {
+     "wert": "name",
+     "text": "Name absteigend",
+     "gewaehlt": false,
+     "deaktiviert": false
+    },
+    {
+     "wert": "custom",
+     "text": "Beliebteste absteigend",
+     "gewaehlt": true,
+     "deaktiviert": false
+    }
+   ],
+   "behaelter": 10
+  },
+  {
+   "tag": "div",
+   "rolle": "div",
+   "text": "Daten aufsteigend",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1)",
+   "sichtbar": false,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 13
+   "behaelter": 11
+  },
+  {
+   "tag": "div",
+   "rolle": "div",
+   "text": "Daten absteigend",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 11
+  },
+  {
+   "tag": "div",
+   "rolle": "div",
+   "text": "Preis aufsteigend",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 11
+  },
+  {
+   "tag": "div",
+   "rolle": "div",
+   "text": "Preis absteigend",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(4)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 11
+  },
+  {
+   "tag": "div",
+   "rolle": "div",
+   "text": "Name aufsteigend",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(5)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 11
+  },
+  {
+   "tag": "div",
+   "rolle": "div",
+   "text": "Name absteigend",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(6)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 11
+  },
+  {
+   "tag": "div",
+   "rolle": "div",
+   "text": "Beliebteste absteigend",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(7)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 11
   },
   {
    "tag": "label",
@@ -1744,12 +1718,12 @@
    "typ": null,
    "href": null,
    "ziel": null,
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > label:nth-of-type(1)",
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(10) > label:nth-of-type(1)",
    "sichtbar": true,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 14
+   "behaelter": 12
   },
   {
    "tag": "label",
@@ -1766,17 +1740,81 @@
    "typ": null,
    "href": null,
    "ziel": null,
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(4) > div:nth-of-type(2) > div:nth-of-type(1) > label:nth-of-type(1)",
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(11) > label:nth-of-type(1)",
    "sichtbar": true,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 15
+   "behaelter": 13
+  },
+  {
+   "tag": "span",
+   "rolle": "slider",
+   "text": "",
+   "aria": {
+    "aria-controls": "x59rgu-slider",
+    "aria-valuemax": "95",
+    "aria-valuemin": "0",
+    "aria-valuenow": "0",
+    "aria-orientation": "horizontal"
+   },
+   "daten": {
+    "data-slider-handle": "",
+    "data-ga-filter": "Filter|Monatlicher Preis|Preis",
+    "data-ga-filter-slider": "min"
+   },
+   "id": null,
+   "klassen": [
+    "slider-handle"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#uu8ap0-accordion > div:nth-of-type(1) > span:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 14
+  },
+  {
+   "tag": "span",
+   "rolle": "slider",
+   "text": "",
+   "aria": {
+    "aria-controls": "69ondn-slider",
+    "aria-valuemax": "95",
+    "aria-valuemin": "0",
+    "aria-valuenow": "95",
+    "aria-orientation": "horizontal"
+   },
+   "daten": {
+    "data-slider-handle": "",
+    "data-ga-filter": "Filter|Monatlicher Preis|Preis",
+    "data-ga-filter-slider": "max"
+   },
+   "id": null,
+   "klassen": [
+    "slider-handle"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#uu8ap0-accordion > div:nth-of-type(1) > span:nth-of-type(3)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 14
   },
   {
    "tag": "button",
    "rolle": "button",
-   "text": "4,61(45,1k)Hervorragend",
+   "text": "4,61(45k)Hervorragend",
    "aria": {},
    "daten": {},
    "id": null,
@@ -1793,7 +1831,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 16
+   "behaelter": 15
   },
   {
    "tag": "span",
@@ -1820,7 +1858,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 16
+   "behaelter": 15
   },
   {
    "tag": "button",
@@ -1844,7 +1882,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 16
+   "behaelter": 15
   },
   {
    "tag": "button",
@@ -1878,7 +1916,7 @@
    "deaktiviert": true,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 17
+   "behaelter": 16
   },
   {
    "tag": "a",
@@ -1900,7 +1938,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 18
+   "behaelter": 17
   },
   {
    "tag": "a",
@@ -1913,14 +1951,14 @@
    "name": null,
    "wert": null,
    "typ": null,
-   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-ohne-vertrag/p/P-M-4206117?ds=P-4292934",
+   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-mit-vertrag/b/tariffs_postpaid_voice/P-M-4206117/?fl=bundle&v=P-4292934",
    "ziel": null,
    "pfad": "#message-outdatedCloseBtn",
    "sichtbar": false,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 18
+   "behaelter": 17
   },
   {
    "tag": "a",
@@ -1942,7 +1980,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 19
+   "behaelter": 18
   },
   {
    "tag": "a",
@@ -2180,14 +2218,14 @@
    "name": null,
    "wert": null,
    "typ": null,
-   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-ohne-vertrag/p/P-M-4206117?ds=P-4292934",
+   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-mit-vertrag/b/tariffs_postpaid_voice/P-M-4206117/?fl=bundle&v=P-4292934",
    "ziel": null,
    "pfad": "body > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(1) > a:nth-of-type(1)",
    "sichtbar": false,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 20
+   "behaelter": 19
   },
   {
    "tag": "a",
@@ -2205,14 +2243,14 @@
    "name": null,
    "wert": null,
    "typ": null,
-   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-ohne-vertrag/p/P-M-4206117?ds=P-4292934",
+   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-mit-vertrag/b/tariffs_postpaid_voice/P-M-4206117/?fl=bundle&v=P-4292934",
    "ziel": null,
    "pfad": "body > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(2) > a:nth-of-type(1)",
    "sichtbar": false,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 20
+   "behaelter": 19
   },
   {
    "tag": "a",
@@ -2230,14 +2268,14 @@
    "name": null,
    "wert": null,
    "typ": null,
-   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-ohne-vertrag/p/P-M-4206117?ds=P-4292934",
+   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-mit-vertrag/b/tariffs_postpaid_voice/P-M-4206117/?fl=bundle&v=P-4292934",
    "ziel": null,
    "pfad": "body > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(3) > a:nth-of-type(1)",
    "sichtbar": false,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 20
+   "behaelter": 19
   },
   {
    "tag": "a",
@@ -2255,14 +2293,14 @@
    "name": null,
    "wert": null,
    "typ": null,
-   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-ohne-vertrag/p/P-M-4206117?ds=P-4292934",
+   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-mit-vertrag/b/tariffs_postpaid_voice/P-M-4206117/?fl=bundle&v=P-4292934",
    "ziel": null,
    "pfad": "body > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > div:nth-of-type(2) > ul:nth-of-type(2) > li:nth-of-type(1) > a:nth-of-type(1)",
    "sichtbar": false,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 21
+   "behaelter": 20
   },
   {
    "tag": "a",
@@ -2280,14 +2318,14 @@
    "name": null,
    "wert": null,
    "typ": null,
-   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-ohne-vertrag/p/P-M-4206117?ds=P-4292934",
+   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-mit-vertrag/b/tariffs_postpaid_voice/P-M-4206117/?fl=bundle&v=P-4292934",
    "ziel": null,
    "pfad": "body > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > div:nth-of-type(2) > ul:nth-of-type(2) > li:nth-of-type(2) > a:nth-of-type(1)",
    "sichtbar": false,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 21
+   "behaelter": 20
   },
   {
    "tag": "a",
@@ -2305,14 +2343,14 @@
    "name": null,
    "wert": null,
    "typ": null,
-   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-ohne-vertrag/p/P-M-4206117?ds=P-4292934",
+   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-mit-vertrag/b/tariffs_postpaid_voice/P-M-4206117/?fl=bundle&v=P-4292934",
    "ziel": null,
    "pfad": "body > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > div:nth-of-type(2) > ul:nth-of-type(3) > li:nth-of-type(1) > a:nth-of-type(1)",
    "sichtbar": false,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 22
+   "behaelter": 21
   },
   {
    "tag": "a",
@@ -2330,14 +2368,14 @@
    "name": null,
    "wert": null,
    "typ": null,
-   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-ohne-vertrag/p/P-M-4206117?ds=P-4292934",
+   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-mit-vertrag/b/tariffs_postpaid_voice/P-M-4206117/?fl=bundle&v=P-4292934",
    "ziel": null,
    "pfad": "body > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > div:nth-of-type(2) > ul:nth-of-type(4) > li:nth-of-type(1) > a:nth-of-type(1)",
    "sichtbar": false,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 23
+   "behaelter": 22
   },
   {
    "tag": "a",
@@ -2355,14 +2393,14 @@
    "name": null,
    "wert": null,
    "typ": null,
-   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-ohne-vertrag/p/P-M-4206117?ds=P-4292934",
+   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-mit-vertrag/b/tariffs_postpaid_voice/P-M-4206117/?fl=bundle&v=P-4292934",
    "ziel": null,
    "pfad": "body > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > div:nth-of-type(2) > ul:nth-of-type(4) > li:nth-of-type(2) > a:nth-of-type(1)",
    "sichtbar": false,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 23
+   "behaelter": 22
   },
   {
    "tag": "a",
@@ -2380,14 +2418,14 @@
    "name": null,
    "wert": null,
    "typ": null,
-   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-ohne-vertrag/p/P-M-4206117?ds=P-4292934",
+   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-mit-vertrag/b/tariffs_postpaid_voice/P-M-4206117/?fl=bundle&v=P-4292934",
    "ziel": null,
    "pfad": "body > div:nth-of-type(1) > header:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > div:nth-of-type(2) > ul:nth-of-type(4) > li:nth-of-type(3) > a:nth-of-type(1)",
    "sichtbar": false,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 23
+   "behaelter": 22
   },
   {
    "tag": "a",
@@ -2410,7 +2448,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 22
+   "behaelter": 21
   },
   {
    "tag": "a",
@@ -2435,7 +2473,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 24
+   "behaelter": 23
   },
   {
    "tag": "a",
@@ -2460,7 +2498,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 24
+   "behaelter": 23
   },
   {
    "tag": "a",
@@ -2485,7 +2523,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 24
+   "behaelter": 23
   },
   {
    "tag": "a",
@@ -2510,7 +2548,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 24
+   "behaelter": 23
   },
   {
    "tag": "a",
@@ -2535,7 +2573,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 24
+   "behaelter": 23
   },
   {
    "tag": "a",
@@ -2560,7 +2598,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 24
+   "behaelter": 23
   },
   {
    "tag": "a",
@@ -2585,7 +2623,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 25
+   "behaelter": 24
   },
   {
    "tag": "a",
@@ -2610,7 +2648,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 25
+   "behaelter": 24
   },
   {
    "tag": "a",
@@ -2635,7 +2673,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 25
+   "behaelter": 24
   },
   {
    "tag": "a",
@@ -2660,7 +2698,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 25
+   "behaelter": 24
   },
   {
    "tag": "a",
@@ -2685,7 +2723,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 25
+   "behaelter": 24
   },
   {
    "tag": "a",
@@ -2710,7 +2748,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 25
+   "behaelter": 24
   },
   {
    "tag": "a",
@@ -2735,7 +2773,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 26
+   "behaelter": 25
   },
   {
    "tag": "a",
@@ -2760,7 +2798,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 26
+   "behaelter": 25
   },
   {
    "tag": "a",
@@ -2785,7 +2823,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 26
+   "behaelter": 25
   },
   {
    "tag": "a",
@@ -2810,7 +2848,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 27
+   "behaelter": 26
   },
   {
    "tag": "a",
@@ -2835,7 +2873,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 27
+   "behaelter": 26
   },
   {
    "tag": "a",
@@ -2860,7 +2898,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 28
+   "behaelter": 27
   },
   {
    "tag": "a",
@@ -2885,7 +2923,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 29
+   "behaelter": 28
   },
   {
    "tag": "a",
@@ -2910,7 +2948,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 29
+   "behaelter": 28
   },
   {
    "tag": "a",
@@ -2935,7 +2973,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 29
+   "behaelter": 28
   },
   {
    "tag": "a",
@@ -2960,7 +2998,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 29
+   "behaelter": 28
   },
   {
    "tag": "a",
@@ -2985,7 +3023,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 30
+   "behaelter": 29
   },
   {
    "tag": "a",
@@ -3010,7 +3048,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 30
+   "behaelter": 29
   },
   {
    "tag": "a",
@@ -3035,7 +3073,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 30
+   "behaelter": 29
   },
   {
    "tag": "a",
@@ -3060,7 +3098,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 30
+   "behaelter": 29
   },
   {
    "tag": "a",
@@ -3085,7 +3123,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 30
+   "behaelter": 29
   },
   {
    "tag": "a",
@@ -3110,7 +3148,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 31
+   "behaelter": 30
   },
   {
    "tag": "a",
@@ -3135,7 +3173,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 31
+   "behaelter": 30
   },
   {
    "tag": "a",
@@ -3160,7 +3198,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 31
+   "behaelter": 30
   },
   {
    "tag": "a",
@@ -3185,7 +3223,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 31
+   "behaelter": 30
   },
   {
    "tag": "a",
@@ -3210,7 +3248,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 31
+   "behaelter": 30
   },
   {
    "tag": "a",
@@ -3235,7 +3273,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 31
+   "behaelter": 30
   },
   {
    "tag": "a",
@@ -3260,7 +3298,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 31
+   "behaelter": 30
   },
   {
    "tag": "a",
@@ -3285,7 +3323,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 31
+   "behaelter": 30
   },
   {
    "tag": "a",
@@ -3310,7 +3348,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 32
+   "behaelter": 31
   },
   {
    "tag": "a",
@@ -3335,7 +3373,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 32
+   "behaelter": 31
   },
   {
    "tag": "a",
@@ -3360,7 +3398,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 32
+   "behaelter": 31
   },
   {
    "tag": "a",
@@ -3385,7 +3423,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 32
+   "behaelter": 31
   },
   {
    "tag": "a",
@@ -3410,7 +3448,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 32
+   "behaelter": 31
   },
   {
    "tag": "a",
@@ -3435,7 +3473,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 32
+   "behaelter": 31
   },
   {
    "tag": "a",
@@ -3460,7 +3498,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 32
+   "behaelter": 31
   },
   {
    "tag": "a",
@@ -3485,7 +3523,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 32
+   "behaelter": 31
   },
   {
    "tag": "a",
@@ -3510,7 +3548,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 33
+   "behaelter": 32
   },
   {
    "tag": "a",
@@ -3535,7 +3573,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 33
+   "behaelter": 32
   },
   {
    "tag": "a",
@@ -3560,7 +3598,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 33
+   "behaelter": 32
   },
   {
    "tag": "a",
@@ -3585,7 +3623,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 33
+   "behaelter": 32
   },
   {
    "tag": "a",
@@ -3610,7 +3648,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 33
+   "behaelter": 32
   },
   {
    "tag": "a",
@@ -3650,9 +3688,33 @@
    "name": null,
    "wert": null,
    "typ": null,
-   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-ohne-vertrag/p/P-M-4206117?ds=P-4292934",
+   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-mit-vertrag/b/tariffs_postpaid_voice/P-M-4206117/?fl=bundle&v=P-4292934",
    "ziel": null,
    "pfad": "body > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 33
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Filtern",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "config-navigation__button",
+    "button-text",
+    "js-filter-button"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-mit-vertrag/b/tariffs_postpaid_voice/P-M-4206117/?fl=bundle&v=P-4292934",
+   "ziel": null,
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(1)",
    "sichtbar": false,
    "deaktiviert": false,
    "gewaehlt": null,
@@ -3662,24 +3724,46 @@
   {
    "tag": "a",
    "rolle": "link",
-   "text": "mehr erfahren",
+   "text": "Sortieren (1) Daten aufsteigend Daten absteigend Preis aufsteigend Preis absteigend Name aufsteigend Name absteigend Beliebteste absteigend",
    "aria": {},
-   "daten": {
-    "data-ga-click": "Produktdetails|Handyversicherung|Overlay",
-    "data-close-tab-index": "3402"
-   },
+   "daten": {},
    "id": null,
    "klassen": [
-    "link-icon",
-    "js-product-detail-device-insurance-link"
+    "config-navigation__button",
+    "button-text"
    ],
    "name": null,
    "wert": null,
    "typ": null,
-   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-ohne-vertrag/p/P-M-4206117?ds=P-4292934",
+   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-mit-vertrag/b/tariffs_postpaid_voice/P-M-4206117/?fl=bundle&v=P-4292934",
    "ziel": null,
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(3) > a:nth-of-type(1)",
-   "sichtbar": true,
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 8
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "alle aktiven Filter löschen",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "config-navigation__filter-link",
+    "js-delete-filter",
+    "link-icon",
+    "-color-primary"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-mit-vertrag/b/tariffs_postpaid_voice/P-M-4206117/?fl=bundle&v=P-4292934",
+   "ziel": null,
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > a:nth-of-type(1)",
+   "sichtbar": false,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
@@ -3687,106 +3771,127 @@
   },
   {
    "tag": "a",
-   "rolle": "button",
-   "text": "",
-   "aria": {
-    "aria-label": "Informationen zur Ratenzahlung"
-   },
-   "daten": {
-    "data-content-overlay": "ajax",
-    "data-content": "/templates/external/overlays/text-installment/?headline=Unkompliziert in Raten Zahlen&content=Informationen über die ausgewählte Rate konnten nicht geladen werden.",
-    "data-close-tab-index": "3605",
-    "data-events": "{\"opened\":true,\"closed\":true}"
-   },
+   "rolle": "link",
+   "text": "weniger",
+   "aria": {},
+   "daten": {},
    "id": null,
    "klassen": [
-    "js-product-detail-installment-overlay"
+    "link-text",
+    "-color-secondary",
+    "js-config-variant-more"
    ],
    "name": null,
    "wert": null,
    "typ": null,
-   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-ohne-vertrag/p/P-M-4206117?ds=P-4292934",
+   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-mit-vertrag/b/tariffs_postpaid_voice/P-M-4206117/?fl=bundle&v=P-4292934",
    "ziel": null,
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(1)",
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > a:nth-of-type(1)",
    "sichtbar": false,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 12
-  },
-  {
-   "tag": "a",
-   "rolle": "link",
-   "text": "Handy in den Warenkorb legen",
-   "aria": {},
-   "daten": {
-    "data-small": "button-text",
-    "data-medium": "button-text",
-    "data-large": "button-text-secondary",
-    "data-ga-click": "Funnel|nextStep|addtoCartDevice",
-    "data-cart-link": "https://www.freenet.de/shop/cart/modify?products=%device%:1&ga-noa2c"
-   },
-   "id": null,
-   "klassen": [
-    "link-dynamic"
-   ],
-   "name": null,
-   "wert": null,
-   "typ": null,
-   "href": "https://www.freenet.de/shop/cart/modify?products=P-4292934%3A1&ga-noa2c=",
-   "ziel": null,
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > div:nth-of-type(2) > a:nth-of-type(1)",
-   "sichtbar": true,
-   "deaktiviert": false,
-   "gewaehlt": null,
-   "optionen": null,
    "behaelter": 36
   },
   {
    "tag": "a",
    "rolle": "link",
-   "text": "Passenden Vertrag auswählen",
-   "aria": {},
-   "daten": {
-    "data-ga-click": "Funnel|stepswitch|{inline}",
-    "data-initial-price-link": "/b/tariffs_postpaid_voice/P-M-4206117/?fl=bundle&v=%device%"
-   },
-   "id": null,
-   "klassen": [
-    "link-icon"
-   ],
-   "name": null,
-   "wert": null,
-   "typ": null,
-   "href": "https://www.freenet.de/b/tariffs_postpaid_voice/P-M-4206117/?fl=bundle&v=P-4292934",
-   "ziel": null,
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > a:nth-of-type(1)",
-   "sichtbar": true,
-   "deaktiviert": false,
-   "gewaehlt": null,
-   "optionen": null,
-   "behaelter": 36
-  },
-  {
-   "tag": "a",
-   "rolle": "button",
    "text": "",
    "aria": {},
    "daten": {
-    "data-button-value": "Frost"
+    "data-button-value": "obsidian"
    },
    "id": null,
    "klassen": [
     "variant-switch__button-wrapper",
     "js-variant-button",
+    "-color-black"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-mit-vertrag/b/tariffs_postpaid_voice/P-M-4206117/?fl=bundle&v=P-4292934",
+   "ziel": null,
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(10) > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 37
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "",
+   "aria": {},
+   "daten": {
+    "data-button-value": "lemongrass"
+   },
+   "id": null,
+   "klassen": [
+    "variant-switch__button-wrapper",
+    "js-variant-button",
+    "-color-yellow"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-mit-vertrag/b/tariffs_postpaid_voice/P-M-4206117/?fl=bundle&v=P-4292934",
+   "ziel": null,
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(10) > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 37
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "",
+   "aria": {},
+   "daten": {
+    "data-button-value": "indigo"
+   },
+   "id": null,
+   "klassen": [
+    "variant-switch__button-wrapper",
+    "js-variant-button",
+    "-color-blue"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-mit-vertrag/b/tariffs_postpaid_voice/P-M-4206117/?fl=bundle&v=P-4292934",
+   "ziel": null,
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(10) > div:nth-of-type(1) > div:nth-of-type(3) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 37
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "",
+   "aria": {},
+   "daten": {
+    "data-button-value": "frost"
+   },
+   "id": null,
+   "klassen": [
+    "variant-switch__button-wrapper",
+    "js-variant-button",
+    "-color-white",
     "-active"
    ],
    "name": null,
    "wert": null,
    "typ": null,
-   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-ohne-vertrag/p/P-M-4206117?ds=P-4292934",
+   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-mit-vertrag/b/tariffs_postpaid_voice/P-M-4206117/?fl=bundle&v=P-4292934",
    "ziel": null,
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(1)",
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(10) > div:nth-of-type(1) > div:nth-of-type(4) > a:nth-of-type(1)",
    "sichtbar": true,
    "deaktiviert": false,
    "gewaehlt": "klasse:-active",
@@ -3795,86 +3900,11 @@
   },
   {
    "tag": "a",
-   "rolle": "button",
-   "text": "",
-   "aria": {},
-   "daten": {
-    "data-button-value": "Obsidian"
-   },
-   "id": null,
-   "klassen": [
-    "variant-switch__button-wrapper",
-    "js-variant-button"
-   ],
-   "name": null,
-   "wert": null,
-   "typ": null,
-   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-ohne-vertrag/p/P-M-4206117?ds=P-4292934",
-   "ziel": null,
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(1)",
-   "sichtbar": true,
-   "deaktiviert": false,
-   "gewaehlt": null,
-   "optionen": null,
-   "behaelter": 37
-  },
-  {
-   "tag": "a",
-   "rolle": "button",
-   "text": "",
-   "aria": {},
-   "daten": {
-    "data-button-value": "Lemongrass"
-   },
-   "id": null,
-   "klassen": [
-    "variant-switch__button-wrapper",
-    "js-variant-button"
-   ],
-   "name": null,
-   "wert": null,
-   "typ": null,
-   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-ohne-vertrag/p/P-M-4206117?ds=P-4292934",
-   "ziel": null,
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > a:nth-of-type(1)",
-   "sichtbar": true,
-   "deaktiviert": false,
-   "gewaehlt": null,
-   "optionen": null,
-   "behaelter": 37
-  },
-  {
-   "tag": "a",
-   "rolle": "button",
-   "text": "",
-   "aria": {},
-   "daten": {
-    "data-button-value": "Indigo"
-   },
-   "id": null,
-   "klassen": [
-    "variant-switch__button-wrapper",
-    "js-variant-button"
-   ],
-   "name": null,
-   "wert": null,
-   "typ": null,
-   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-ohne-vertrag/p/P-M-4206117?ds=P-4292934",
-   "ziel": null,
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(4) > a:nth-of-type(1)",
-   "sichtbar": true,
-   "deaktiviert": false,
-   "gewaehlt": null,
-   "optionen": null,
-   "behaelter": 37
-  },
-  {
-   "tag": "a",
-   "rolle": "button",
+   "rolle": "link",
    "text": "128 GB",
    "aria": {},
    "daten": {
-    "data-button-value": "128 GB"
+    "data-button-value": "128"
    },
    "id": null,
    "klassen": [
@@ -3884,9 +3914,9 @@
    "name": null,
    "wert": null,
    "typ": null,
-   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-ohne-vertrag/p/P-M-4206117?ds=P-4292934",
+   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-mit-vertrag/b/tariffs_postpaid_voice/P-M-4206117/?fl=bundle&v=P-4292934",
    "ziel": null,
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(4) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(1)",
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(11) > div:nth-of-type(1) > a:nth-of-type(1)",
    "sichtbar": true,
    "deaktiviert": false,
    "gewaehlt": null,
@@ -3895,11 +3925,11 @@
   },
   {
    "tag": "a",
-   "rolle": "button",
+   "rolle": "link",
    "text": "256 GB",
    "aria": {},
    "daten": {
-    "data-button-value": "256 GB"
+    "data-button-value": "256"
    },
    "id": null,
    "klassen": [
@@ -3910,9 +3940,9 @@
    "name": null,
    "wert": null,
    "typ": null,
-   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-ohne-vertrag/p/P-M-4206117?ds=P-4292934",
+   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-mit-vertrag/b/tariffs_postpaid_voice/P-M-4206117/?fl=bundle&v=P-4292934",
    "ziel": null,
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(4) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(2)",
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(11) > div:nth-of-type(1) > a:nth-of-type(2)",
    "sichtbar": true,
    "deaktiviert": false,
    "gewaehlt": "klasse:-active",
@@ -3921,24 +3951,48 @@
   },
   {
    "tag": "a",
-   "rolle": "button",
-   "text": "Alle Details zum Handy",
+   "rolle": "link",
+   "text": "Anderes Handy wählen",
    "aria": {},
-   "daten": {
-    "data-ga-click": "Produktdetails|Sprungmarke|{inline}"
-   },
+   "daten": {},
    "id": null,
    "klassen": [
     "link-icon",
-    "js-product-detail-device-detail-link"
+    "js-change-product"
    ],
    "name": null,
    "wert": null,
    "typ": null,
-   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-ohne-vertrag/p/P-M-4206117?ds=P-4292934",
+   "href": "https://www.freenet.de/handys-smartphones/handys-mit-vertrag/",
    "ziel": null,
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(4) > div:nth-of-type(3) > a:nth-of-type(1)",
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(1)",
    "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 36
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "alle aktiven Filter löschen",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "config-navigation__filter-link",
+    "link-icon",
+    "js-delete-filter",
+    "-color-primary",
+    "small-ph-1"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-mit-vertrag/b/tariffs_postpaid_voice/P-M-4206117/?fl=bundle&v=P-4292934",
+   "ziel": null,
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": false,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
@@ -3947,20 +4001,23 @@
   {
    "tag": "a",
    "rolle": "link",
-   "text": "Produktdatenblatt",
-   "aria": {},
+   "text": "Netzwahl",
+   "aria": {
+    "aria-controls": "q9h2qq-accordion",
+    "aria-expanded": "true"
+   },
    "daten": {},
-   "id": null,
+   "id": "q9h2qq-accordion-label",
    "klassen": [
-    "link-icon",
-    "js-energy-label-link"
+    "accordion-title",
+    "accordion__title-wrapper"
    ],
    "name": null,
    "wert": null,
    "typ": null,
-   "href": "https://media.mdm.freenet.de/cdn?name=google-pixel-10-256-gb-frost-eu-produktdatenblatt&version=37565d5201b768aeb1fac33ac257a0284ea7bde8&extension=pdf",
-   "ziel": "_blank",
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(5) > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(1)",
+   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-mit-vertrag/b/tariffs_postpaid_voice/P-M-4206117/?fl=bundle&v=P-4292934",
+   "ziel": null,
+   "pfad": "#q9h2qq-accordion-label",
    "sichtbar": true,
    "deaktiviert": false,
    "gewaehlt": null,
@@ -3970,42 +4027,22 @@
   {
    "tag": "a",
    "rolle": "link",
-   "text": "",
+   "text": "Telekom",
    "aria": {},
-   "daten": {},
-   "id": null,
-   "klassen": [],
-   "name": null,
-   "wert": null,
-   "typ": null,
-   "href": "https://media.mdm.freenet.de/cdn?name=google-pixel-10-256-gb-frost-energieeffizienzlabel&version=5bf842ffe67b0591862ad658f717ca5ff0c57508&extension=pdf",
-   "ziel": "_blank",
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(5) > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(1)",
-   "sichtbar": true,
-   "deaktiviert": false,
-   "gewaehlt": null,
-   "optionen": null,
-   "behaelter": 40
-  },
-  {
-   "tag": "a",
-   "rolle": "link",
-   "text": "Mit welchem Paketdienst wird geliefert und wie hoch sind die Versandkosten?",
-   "aria": {
-    "aria-controls": "7zced9-accordion",
-    "aria-expanded": "false"
+   "daten": {
+    "data-button-value": "Telekom"
    },
-   "daten": {},
-   "id": "7zced9-accordion-label",
+   "id": null,
    "klassen": [
-    "accordion-title"
+    "variant-switch__button-wrapper",
+    "js-variant-button"
    ],
    "name": null,
    "wert": null,
    "typ": null,
-   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-ohne-vertrag/p/P-M-4206117?ds=P-4292934",
+   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-mit-vertrag/b/tariffs_postpaid_voice/P-M-4206117/?fl=bundle&v=P-4292934",
    "ziel": null,
-   "pfad": "#\\37 zced9-accordion-label",
+   "pfad": "#q9h2qq-accordion > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(1)",
    "sichtbar": true,
    "deaktiviert": false,
    "gewaehlt": null,
@@ -4015,22 +4052,22 @@
   {
    "tag": "a",
    "rolle": "link",
-   "text": "Welche Zahlungsmöglichkeiten sind möglich?",
-   "aria": {
-    "aria-controls": "kj2vul-accordion",
-    "aria-expanded": "false"
+   "text": "Vodafone",
+   "aria": {},
+   "daten": {
+    "data-button-value": "Vodafone"
    },
-   "daten": {},
-   "id": "kj2vul-accordion-label",
+   "id": null,
    "klassen": [
-    "accordion-title"
+    "variant-switch__button-wrapper",
+    "js-variant-button"
    ],
    "name": null,
    "wert": null,
    "typ": null,
-   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-ohne-vertrag/p/P-M-4206117?ds=P-4292934",
+   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-mit-vertrag/b/tariffs_postpaid_voice/P-M-4206117/?fl=bundle&v=P-4292934",
    "ziel": null,
-   "pfad": "#kj2vul-accordion-label",
+   "pfad": "#q9h2qq-accordion > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(2)",
    "sichtbar": true,
    "deaktiviert": false,
    "gewaehlt": null,
@@ -4040,259 +4077,292 @@
   {
    "tag": "a",
    "rolle": "link",
-   "text": "Kann ich mein neues Handy auch versichern?",
+   "text": "o2",
+   "aria": {},
+   "daten": {
+    "data-button-value": "o2"
+   },
+   "id": null,
+   "klassen": [
+    "variant-switch__button-wrapper",
+    "js-variant-button"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-mit-vertrag/b/tariffs_postpaid_voice/P-M-4206117/?fl=bundle&v=P-4292934",
+   "ziel": null,
+   "pfad": "#q9h2qq-accordion > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(3)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 41
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Telefonica",
+   "aria": {},
+   "daten": {
+    "data-button-value": "Telefonica"
+   },
+   "id": null,
+   "klassen": [
+    "variant-switch__button-wrapper",
+    "js-variant-button"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-mit-vertrag/b/tariffs_postpaid_voice/P-M-4206117/?fl=bundle&v=P-4292934",
+   "ziel": null,
+   "pfad": "#q9h2qq-accordion > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(4)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 41
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Datenvolumen",
    "aria": {
-    "aria-controls": "phvpkc-accordion",
+    "aria-controls": "r41xa0-accordion",
+    "aria-expanded": "true"
+   },
+   "daten": {},
+   "id": "r41xa0-accordion-label",
+   "klassen": [
+    "accordion-title",
+    "accordion__title-wrapper"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-mit-vertrag/b/tariffs_postpaid_voice/P-M-4206117/?fl=bundle&v=P-4292934",
+   "ziel": null,
+   "pfad": "#r41xa0-accordion-label",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 42
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "1 - 4 GB",
+   "aria": {},
+   "daten": {
+    "data-button-value": "1-4GB",
+    "data-ga-filter": "Filter|Datenvolumen|1 - 4 GB",
+    "data-ga-filter-class": "-active|activated|deactivated"
+   },
+   "id": null,
+   "klassen": [
+    "variant-switch__button-wrapper",
+    "-only-text",
+    "js-variant-button"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-mit-vertrag/b/tariffs_postpaid_voice/P-M-4206117/?fl=bundle&v=P-4292934",
+   "ziel": null,
+   "pfad": "#r41xa0-accordion > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 43
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "5 - 10 GB",
+   "aria": {},
+   "daten": {
+    "data-button-value": "5-10GB",
+    "data-ga-filter": "Filter|Datenvolumen|5 - 10 GB",
+    "data-ga-filter-class": "-active|activated|deactivated"
+   },
+   "id": null,
+   "klassen": [
+    "variant-switch__button-wrapper",
+    "-only-text",
+    "js-variant-button"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-mit-vertrag/b/tariffs_postpaid_voice/P-M-4206117/?fl=bundle&v=P-4292934",
+   "ziel": null,
+   "pfad": "#r41xa0-accordion > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(2)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 43
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "11 - 20 GB",
+   "aria": {},
+   "daten": {
+    "data-button-value": "11-20GB",
+    "data-ga-filter": "Filter|Datenvolumen|11 - 20 GB",
+    "data-ga-filter-class": "-active|activated|deactivated"
+   },
+   "id": null,
+   "klassen": [
+    "variant-switch__button-wrapper",
+    "-only-text",
+    "js-variant-button"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-mit-vertrag/b/tariffs_postpaid_voice/P-M-4206117/?fl=bundle&v=P-4292934",
+   "ziel": null,
+   "pfad": "#r41xa0-accordion > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(3)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 43
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "> als 20 GB",
+   "aria": {},
+   "daten": {
+    "data-button-value": "mehrals20GB",
+    "data-ga-filter": "Filter|Datenvolumen|> als 20 GB",
+    "data-ga-filter-class": "-active|activated|deactivated"
+   },
+   "id": null,
+   "klassen": [
+    "variant-switch__button-wrapper",
+    "-only-text",
+    "js-variant-button"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-mit-vertrag/b/tariffs_postpaid_voice/P-M-4206117/?fl=bundle&v=P-4292934",
+   "ziel": null,
+   "pfad": "#r41xa0-accordion > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(4)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 43
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Monatlicher Preis",
+   "aria": {
+    "aria-controls": "uu8ap0-accordion",
+    "aria-expanded": "true"
+   },
+   "daten": {},
+   "id": "uu8ap0-accordion-label",
+   "klassen": [
+    "accordion-title",
+    "accordion__title-wrapper"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-mit-vertrag/b/tariffs_postpaid_voice/P-M-4206117/?fl=bundle&v=P-4292934",
+   "ziel": null,
+   "pfad": "#uu8ap0-accordion-label",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 44
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Weitere Merkmale",
+   "aria": {
+    "aria-controls": "s8sdo3-accordion",
     "aria-expanded": "false"
    },
    "daten": {},
-   "id": "phvpkc-accordion-label",
+   "id": "s8sdo3-accordion-label",
    "klassen": [
-    "accordion-title"
+    "accordion-title",
+    "accordion__title-wrapper"
    ],
    "name": null,
    "wert": null,
    "typ": null,
-   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-ohne-vertrag/p/P-M-4206117?ds=P-4292934",
+   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-mit-vertrag/b/tariffs_postpaid_voice/P-M-4206117/?fl=bundle&v=P-4292934",
    "ziel": null,
-   "pfad": "#phvpkc-accordion-label",
+   "pfad": "#s8sdo3-accordion-label",
    "sichtbar": true,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 42
+   "behaelter": 45
   },
   {
    "tag": "a",
    "rolle": "link",
-   "text": "Mehr Informationen zum Thema",
-   "aria": {},
-   "daten": {},
-   "id": null,
-   "klassen": [
-    "button-text"
-   ],
-   "name": null,
-   "wert": null,
-   "typ": null,
-   "href": "https://www.freenet.de/services/handyversicherung/",
-   "ziel": null,
-   "pfad": "#phvpkc-accordion > a:nth-of-type(1)",
-   "sichtbar": false,
-   "deaktiviert": false,
-   "gewaehlt": null,
-   "optionen": null,
-   "behaelter": 42
-  },
-  {
-   "tag": "a",
-   "rolle": "link",
-   "text": "Produktbeschreibung",
+   "text": "Nur Tarife im 5G-Netz",
    "aria": {},
    "daten": {
-    "data-ga-click": "Produktdetails|Reiter|{inline}",
-    "data-tabcontent-target": "js-detail-device-variant"
+    "data-button-value": "5G"
    },
    "id": null,
    "klassen": [
-    "tabcontent__navitem",
-    "-is-active"
+    "variant-switch__button-wrapper",
+    "js-variant-button"
    ],
    "name": null,
    "wert": null,
    "typ": null,
-   "href": "javascript:",
+   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-mit-vertrag/b/tariffs_postpaid_voice/P-M-4206117/?fl=bundle&v=P-4292934",
    "ziel": null,
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(1)",
+   "pfad": "#s8sdo3-accordion > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(1)",
    "sichtbar": true,
    "deaktiviert": false,
-   "gewaehlt": "klasse:-is-active",
+   "gewaehlt": null,
    "optionen": null,
-   "behaelter": 43
+   "behaelter": 46
   },
   {
    "tag": "a",
    "rolle": "link",
-   "text": "Technische Daten",
+   "text": "Nur mit SMS Flat",
    "aria": {},
    "daten": {
-    "data-ga-click": "Produktdetails|Reiter|{inline}"
+    "data-button-value": "SMS-Flat"
    },
    "id": null,
    "klassen": [
-    "tabcontent__navitem"
+    "variant-switch__button-wrapper",
+    "js-variant-button"
    ],
    "name": null,
    "wert": null,
    "typ": null,
-   "href": "javascript:",
+   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-mit-vertrag/b/tariffs_postpaid_voice/P-M-4206117/?fl=bundle&v=P-4292934",
    "ziel": null,
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(2)",
+   "pfad": "#s8sdo3-accordion > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(2)",
    "sichtbar": true,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 43
-  },
-  {
-   "tag": "a",
-   "rolle": "link",
-   "text": "g.co/pixel/battery-tests",
-   "aria": {},
-   "daten": {},
-   "id": null,
-   "klassen": [],
-   "name": null,
-   "wert": null,
-   "typ": null,
-   "href": "https://g.co/pixel/battery-tests",
-   "ziel": "_blank",
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(9) > span:nth-of-type(1) > a:nth-of-type(1)",
-   "sichtbar": true,
-   "deaktiviert": false,
-   "gewaehlt": null,
-   "optionen": null,
-   "behaelter": 44
-  },
-  {
-   "tag": "a",
-   "rolle": "link",
-   "text": "g.co/pixel/batteryhealth",
-   "aria": {},
-   "daten": {},
-   "id": null,
-   "klassen": [],
-   "name": null,
-   "wert": null,
-   "typ": null,
-   "href": "https://g.co/pixel/batteryhealth",
-   "ziel": "_blank",
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(9) > span:nth-of-type(1) > a:nth-of-type(2)",
-   "sichtbar": true,
-   "deaktiviert": false,
-   "gewaehlt": null,
-   "optionen": null,
-   "behaelter": 44
-  },
-  {
-   "tag": "a",
-   "rolle": "link",
-   "text": "g.co/pixel/battery-tests",
-   "aria": {},
-   "daten": {},
-   "id": null,
-   "klassen": [],
-   "name": null,
-   "wert": null,
-   "typ": null,
-   "href": "https://g.co/pixel/battery-tests",
-   "ziel": "_blank",
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(9) > span:nth-of-type(1) > a:nth-of-type(3)",
-   "sichtbar": true,
-   "deaktiviert": false,
-   "gewaehlt": null,
-   "optionen": null,
-   "behaelter": 44
-  },
-  {
-   "tag": "a",
-   "rolle": "link",
-   "text": "g.co/pixel/batteryhealth",
-   "aria": {},
-   "daten": {},
-   "id": null,
-   "klassen": [],
-   "name": null,
-   "wert": null,
-   "typ": null,
-   "href": "https://g.co/pixel/batteryhealth",
-   "ziel": "_blank",
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(9) > span:nth-of-type(1) > a:nth-of-type(4)",
-   "sichtbar": true,
-   "deaktiviert": false,
-   "gewaehlt": null,
-   "optionen": null,
-   "behaelter": 44
-  },
-  {
-   "tag": "a",
-   "rolle": "link",
-   "text": "g.co/pixel/battery-tests",
-   "aria": {},
-   "daten": {},
-   "id": null,
-   "klassen": [],
-   "name": null,
-   "wert": null,
-   "typ": null,
-   "href": "https://g.co/pixel/battery-tests",
-   "ziel": "_blank",
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(9) > span:nth-of-type(1) > a:nth-of-type(5)",
-   "sichtbar": true,
-   "deaktiviert": false,
-   "gewaehlt": null,
-   "optionen": null,
-   "behaelter": 44
-  },
-  {
-   "tag": "a",
-   "rolle": "link",
-   "text": "g.co/pixel/batteryhealth",
-   "aria": {},
-   "daten": {},
-   "id": null,
-   "klassen": [],
-   "name": null,
-   "wert": null,
-   "typ": null,
-   "href": "https://g.co/pixel/batteryhealth",
-   "ziel": "_blank",
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(9) > span:nth-of-type(1) > a:nth-of-type(6)",
-   "sichtbar": true,
-   "deaktiviert": false,
-   "gewaehlt": null,
-   "optionen": null,
-   "behaelter": 44
-  },
-  {
-   "tag": "a",
-   "rolle": "link",
-   "text": "g.co/pixel/updates",
-   "aria": {},
-   "daten": {},
-   "id": null,
-   "klassen": [],
-   "name": null,
-   "wert": null,
-   "typ": null,
-   "href": "https://g.co/pixel/updates",
-   "ziel": "_blank",
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(9) > span:nth-of-type(1) > a:nth-of-type(7)",
-   "sichtbar": true,
-   "deaktiviert": false,
-   "gewaehlt": null,
-   "optionen": null,
-   "behaelter": 44
-  },
-  {
-   "tag": "a",
-   "rolle": "link",
-   "text": "g.co/pixel/water",
-   "aria": {},
-   "daten": {},
-   "id": null,
-   "klassen": [],
-   "name": null,
-   "wert": null,
-   "typ": null,
-   "href": "https://g.co/pixel/water",
-   "ziel": "_blank",
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(9) > span:nth-of-type(1) > a:nth-of-type(8)",
-   "sichtbar": true,
-   "deaktiviert": false,
-   "gewaehlt": null,
-   "optionen": null,
-   "behaelter": 44
+   "behaelter": 46
   },
   {
    "tag": "a",
@@ -4314,7 +4384,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 45
+   "behaelter": 47
   },
   {
    "tag": "a",
@@ -4336,7 +4406,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 45
+   "behaelter": 47
   },
   {
    "tag": "a",
@@ -4358,7 +4428,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 45
+   "behaelter": 47
   },
   {
    "tag": "a",
@@ -4380,7 +4450,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 45
+   "behaelter": 47
   },
   {
    "tag": "a",
@@ -4418,7 +4488,7 @@
    "deaktiviert": false,
    "gewaehlt": "klasse:ecom-fnm-active",
    "optionen": null,
-   "behaelter": 17
+   "behaelter": 16
   },
   {
    "tag": "a",
@@ -4458,7 +4528,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 17
+   "behaelter": 16
   },
   {
    "tag": "a",
@@ -4487,7 +4557,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 46
+   "behaelter": 48
   },
   {
    "tag": "a",
@@ -4516,7 +4586,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 46
+   "behaelter": 48
   },
   {
    "tag": "a",
@@ -4545,7 +4615,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 46
+   "behaelter": 48
   },
   {
    "tag": "a",
@@ -4574,7 +4644,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 46
+   "behaelter": 48
   },
   {
    "tag": "a",
@@ -4603,7 +4673,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 46
+   "behaelter": 48
   },
   {
    "tag": "a",
@@ -4625,14 +4695,14 @@
    "name": null,
    "wert": null,
    "typ": null,
-   "href": "https://www.freenet-digital.de/onlineservice/widerruf/freenet?utm_source=freenet&utm_medium=referral&utm_campaign=ref_widerrufstraffic",
+   "href": "https://www.freenet-digital.de/onlineservice/widerruf/freenet?utm_source=freenet&utm_medium=referral&utm_campaign=ref_widerrufstraffic%2F",
    "ziel": "_self",
    "pfad": "body > div:nth-of-type(1) > ecom-footer:nth-of-type(1) > section:nth-of-type(3) > div:nth-of-type(2) > nav:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(6) > ui-components-link:nth-of-type(1) > a:nth-of-type(1)",
    "sichtbar": true,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 46
+   "behaelter": 48
   },
   {
    "tag": "a",
@@ -4654,14 +4724,14 @@
    "name": null,
    "wert": null,
    "typ": null,
-   "href": "https://www.freenet-digital.de/onlineservice/kuendigung/freenet-mobilfunk?utm_source=freenet-mobilfunk&utm_medium=referral&utm_campaign=ref_kuendigungstraffic",
+   "href": "https://www.freenet-digital.de/onlineservice/kuendigung/freenet-mobilfunk?utm_source=freenet-mobilfunk&utm_medium=referral&utm_campaign=ref_kuendigungstraffic%2F",
    "ziel": "_self",
    "pfad": "body > div:nth-of-type(1) > ecom-footer:nth-of-type(1) > section:nth-of-type(3) > div:nth-of-type(2) > nav:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(7) > ui-components-link:nth-of-type(1) > a:nth-of-type(1)",
    "sichtbar": true,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 46
+   "behaelter": 48
   },
   {
    "tag": "a",
@@ -4690,7 +4760,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 47
+   "behaelter": 49
   },
   {
    "tag": "a",
@@ -4719,7 +4789,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 47
+   "behaelter": 49
   },
   {
    "tag": "a",
@@ -4748,7 +4818,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 47
+   "behaelter": 49
   },
   {
    "tag": "a",
@@ -4777,7 +4847,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 47
+   "behaelter": 49
   },
   {
    "tag": "a",
@@ -4806,7 +4876,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 47
+   "behaelter": 49
   },
   {
    "tag": "a",
@@ -4835,7 +4905,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 47
+   "behaelter": 49
   },
   {
    "tag": "a",
@@ -4864,7 +4934,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 47
+   "behaelter": 49
   },
   {
    "tag": "a",
@@ -4893,7 +4963,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 47
+   "behaelter": 49
   },
   {
    "tag": "a",
@@ -4922,7 +4992,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 47
+   "behaelter": 49
   },
   {
    "tag": "a",
@@ -4951,7 +5021,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 47
+   "behaelter": 49
   },
   {
    "tag": "a",
@@ -4980,7 +5050,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 48
+   "behaelter": 50
   },
   {
    "tag": "a",
@@ -5009,7 +5079,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 48
+   "behaelter": 50
   },
   {
    "tag": "a",
@@ -5038,7 +5108,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 48
+   "behaelter": 50
   },
   {
    "tag": "a",
@@ -5067,7 +5137,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 48
+   "behaelter": 50
   },
   {
    "tag": "a",
@@ -5096,7 +5166,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 48
+   "behaelter": 50
   },
   {
    "tag": "a",
@@ -5125,7 +5195,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 48
+   "behaelter": 50
   },
   {
    "tag": "a",
@@ -5154,7 +5224,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 48
+   "behaelter": 50
   },
   {
    "tag": "a",
@@ -5183,7 +5253,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 48
+   "behaelter": 50
   },
   {
    "tag": "a",
@@ -5212,7 +5282,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 48
+   "behaelter": 50
   },
   {
    "tag": "a",
@@ -5241,7 +5311,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 48
+   "behaelter": 50
   },
   {
    "tag": "a",
@@ -5270,7 +5340,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 48
+   "behaelter": 50
   },
   {
    "tag": "a",
@@ -5299,7 +5369,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 48
+   "behaelter": 50
   },
   {
    "tag": "a",
@@ -5328,7 +5398,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 49
+   "behaelter": 51
   },
   {
    "tag": "a",
@@ -5357,7 +5427,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 49
+   "behaelter": 51
   },
   {
    "tag": "a",
@@ -5386,7 +5456,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 49
+   "behaelter": 51
   },
   {
    "tag": "a",
@@ -5415,7 +5485,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 49
+   "behaelter": 51
   },
   {
    "tag": "a",
@@ -5444,7 +5514,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 49
+   "behaelter": 51
   },
   {
    "tag": "a",
@@ -5473,7 +5543,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 49
+   "behaelter": 51
   },
   {
    "tag": "a",
@@ -5502,7 +5572,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 49
+   "behaelter": 51
   },
   {
    "tag": "a",
@@ -5531,7 +5601,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 49
+   "behaelter": 51
   },
   {
    "tag": "a",
@@ -5560,7 +5630,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 49
+   "behaelter": 51
   },
   {
    "tag": "a",
@@ -5589,7 +5659,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 50
+   "behaelter": 52
   },
   {
    "tag": "a",
@@ -5618,7 +5688,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 50
+   "behaelter": 52
   },
   {
    "tag": "a",
@@ -5647,7 +5717,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 50
+   "behaelter": 52
   },
   {
    "tag": "a",
@@ -5676,7 +5746,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 51
+   "behaelter": 53
   },
   {
    "tag": "a",
@@ -5705,7 +5775,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 51
+   "behaelter": 53
   },
   {
    "tag": "a",
@@ -5734,7 +5804,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 51
+   "behaelter": 53
   },
   {
    "tag": "a",
@@ -5763,7 +5833,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 51
+   "behaelter": 53
   },
   {
    "tag": "a",
@@ -5792,7 +5862,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 51
+   "behaelter": 53
   },
   {
    "tag": "a",
@@ -5821,7 +5891,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 51
+   "behaelter": 53
   },
   {
    "tag": "a",
@@ -5843,14 +5913,14 @@
    "name": null,
    "wert": null,
    "typ": null,
-   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-ohne-vertrag/p/open-privacy-manager-layer/",
+   "href": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-mit-vertrag/b/tariffs_postpaid_voice/P-M-4206117/open-privacy-manager-layer/",
    "ziel": "_self",
    "pfad": "body > div:nth-of-type(1) > ecom-footer:nth-of-type(1) > section:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > footer-ecom-link-container:nth-of-type(1) > nav:nth-of-type(1) > div:nth-of-type(5) > ul:nth-of-type(1) > li:nth-of-type(7) > ui-components-link:nth-of-type(1) > a:nth-of-type(1)",
    "sichtbar": true,
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 51
+   "behaelter": 53
   },
   {
    "tag": "a",
@@ -5879,7 +5949,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 51
+   "behaelter": 53
   },
   {
    "tag": "a",
@@ -5908,7 +5978,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 51
+   "behaelter": 53
   },
   {
    "tag": "a",
@@ -5937,7 +6007,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 51
+   "behaelter": 53
   },
   {
    "tag": "a",
@@ -5966,7 +6036,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 51
+   "behaelter": 53
   },
   {
    "tag": "a",
@@ -5995,7 +6065,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 51
+   "behaelter": 53
   },
   {
    "tag": "a",
@@ -6024,7 +6094,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 52
+   "behaelter": 54
   },
   {
    "tag": "a",
@@ -6053,7 +6123,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 52
+   "behaelter": 54
   },
   {
    "tag": "a",
@@ -6082,7 +6152,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 52
+   "behaelter": 54
   },
   {
    "tag": "a",
@@ -6111,7 +6181,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 52
+   "behaelter": 54
   },
   {
    "tag": "a",
@@ -6140,7 +6210,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 52
+   "behaelter": 54
   },
   {
    "tag": "a",
@@ -6169,7 +6239,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 52
+   "behaelter": 54
   },
   {
    "tag": "a",
@@ -6198,7 +6268,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 52
+   "behaelter": 54
   },
   {
    "tag": "a",
@@ -6227,7 +6297,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 52
+   "behaelter": 54
   },
   {
    "tag": "a",
@@ -6256,7 +6326,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 52
+   "behaelter": 54
   },
   {
    "tag": "a",
@@ -6285,7 +6355,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 52
+   "behaelter": 54
   },
   {
    "tag": "a",
@@ -6314,7 +6384,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 52
+   "behaelter": 54
   },
   {
    "tag": "a",
@@ -6343,7 +6413,7 @@
    "deaktiviert": false,
    "gewaehlt": null,
    "optionen": null,
-   "behaelter": 52
+   "behaelter": 54
   }
  ]
 }

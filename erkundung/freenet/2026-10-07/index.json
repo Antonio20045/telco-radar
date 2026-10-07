@@ -2,27 +2,27 @@
  "anbieter": "freenet",
  "name": "mobilcom-debitel",
  "datum": "2026-10-07",
- "status": "gelesen",
- "grund": null,
+ "status": "gestoert",
+ "grund": "Seite 1: Seite nach 30000 ms nicht geladen",
  "kennung": null,
  "parallelpruefung": "vor jeder Seite",
  "robots_gelesen": true,
  "abstand_sekunden": 2.0,
  "besuchszeit": null,
- "dauer_sekunden": 101.5,
+ "dauer_sekunden": 173.5,
  "zeitgrenze_sekunden": 3000,
  "seiten": [
   {
    "nummer": 1,
    "geraet": "apple-iphone-17-pro",
    "speicher_gb": 256,
-   "adresse": "https://www.freenet.de/handys-smartphones/apple/iphone-17-pro-ohne-vertrag/p/P-M-4234664?ds=P-4356815",
-   "endadresse": "https://www.freenet.de/handys-smartphones/apple/iphone-17-pro-ohne-vertrag/p/P-M-4234664?ds=P-4356815",
-   "status": "gelesen",
-   "grund": null,
+   "adresse": "https://www.freenet.de/b/tariffs_postpaid_voice/P-M-4234664/?fl=bundle&v=P-4356815",
+   "endadresse": "https://www.freenet.de/handys-smartphones/apple/iphone-17-pro-mit-vertrag/b/tariffs_postpaid_voice/P-M-4234664/?desc=custom&fl=bundle&v=P-4356821",
+   "status": "gestoert",
+   "grund": "Seite nach 30000 ms nicht geladen",
    "bot_schutz": false,
    "http_status": 200,
-   "ruhe": true,
+   "ruhe": null,
    "dateien": {
     "bedienelemente": "bedienelemente-1.json",
     "preise": "preise-1.json",
@@ -32,19 +32,20 @@
     "html": "seite-1.html.gz"
    },
    "zaehlung": {
-    "anfragen": 114,
-    "verworfen": 14,
+    "anfragen": 115,
+    "verworfen": 10,
     "gescheitert": 0,
-    "mitschnitt": 3,
-    "elemente": 201,
+    "mitschnitt": 2,
+    "elemente": 199,
     "gruppen_je_art": {
-     "unbekannt": 46,
-     "farbe": 3,
+     "unbekannt": 49,
+     "farbe": 2,
      "tarif": 4,
-     "speicher": 1
+     "speicher": 1,
+     "laufzeit": 1
     },
-    "preis_kandidaten": 5,
-    "klicks": 1
+    "preis_kandidaten": 1,
+    "klicks": 0
    },
    "verworfen": [
     {
@@ -80,43 +81,32 @@
      "grund": "robots.txt nicht lesbar (HTTP 401)"
     },
     {
+     "url": "https://cdn.privacy-mgmt.com/unified/wrapperMessagingWithoutDetection.js?cb=1791360565556",
+     "grund": "per robots.txt gesperrt: /unified/wrapperMessagingWithoutDetection.js?cb=1791360565556"
+    },
+    {
      "url": "https://www.freenet.de/cdn-cgi/challenge-platform/scripts/jsd/main.js",
      "grund": "per robots.txt gesperrt: /cdn-cgi/challenge-platform/scripts/jsd/main.js"
-    },
-    {
-     "url": "https://cdn.privacy-mgmt.com/unified/wrapperMessagingWithoutDetection.js?cb=1791354867536",
-     "grund": "per robots.txt gesperrt: /unified/wrapperMessagingWithoutDetection.js?cb=1791354867536"
-    },
-    {
-     "url": "https://gallery-content.binkies3d.com/maps/L6KoYytu/8yn1qjnc/content-map.json",
-     "grund": "robots.txt nicht lesbar (HTTP 400)"
-    },
-    {
-     "url": "https://gallery-content.binkies3d.com/maps/L6KoYytu/8yn1qjnc/content-map.json",
-     "grund": "robots.txt nicht lesbar (HTTP 400)"
-    },
-    {
-     "url": "https://binkiesproductionweu.servicebus.windows.net/binkiesproductionp2weu/messages",
-     "grund": "robots.txt nicht lesbar (HTTP 401)"
-    },
-    {
-     "url": "https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495",
-     "grund": "ReadTimeout: The read operation timed out"
     }
    ],
-   "gescheitert": []
+   "gescheitert": [],
+   "karte": {
+    "status": "keine_karte",
+    "karte": "freenet.yaml",
+    "grund": "freenet.yaml nicht vorhanden"
+   }
   },
   {
    "nummer": 2,
    "geraet": "google-pixel-10",
    "speicher_gb": 256,
-   "adresse": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-ohne-vertrag/p/P-M-4206117?ds=P-4292934",
-   "endadresse": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-ohne-vertrag/p/P-M-4206117?ds=P-4292934",
+   "adresse": "https://www.freenet.de/b/tariffs_postpaid_voice/P-M-4206117/?fl=bundle&v=P-4292934",
+   "endadresse": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-mit-vertrag/b/tariffs_postpaid_voice/P-M-4206117/?fl=bundle&v=P-4292934",
    "status": "gelesen",
    "grund": null,
    "bot_schutz": false,
    "http_status": 200,
-   "ruhe": true,
+   "ruhe": false,
    "dateien": {
     "bedienelemente": "bedienelemente-2.json",
     "preise": "preise-2.json",
@@ -126,18 +116,19 @@
     "html": "seite-2.html.gz"
    },
    "zaehlung": {
-    "anfragen": 114,
-    "verworfen": 14,
-    "gescheitert": 0,
-    "mitschnitt": 3,
-    "elemente": 200,
+    "anfragen": 121,
+    "verworfen": 10,
+    "gescheitert": 4,
+    "mitschnitt": 1,
+    "elemente": 199,
     "gruppen_je_art": {
-     "unbekannt": 46,
-     "farbe": 3,
+     "unbekannt": 49,
+     "farbe": 2,
      "tarif": 4,
-     "speicher": 1
+     "speicher": 1,
+     "laufzeit": 1
     },
-    "preis_kandidaten": 5,
+    "preis_kandidaten": 1,
     "klicks": 1
    },
    "verworfen": [
@@ -174,34 +165,40 @@
      "grund": "robots.txt nicht lesbar (HTTP 401)"
     },
     {
-     "url": "https://cdn.privacy-mgmt.com/unified/wrapperMessagingWithoutDetection.js?cb=1791354900586",
-     "grund": "per robots.txt gesperrt: /unified/wrapperMessagingWithoutDetection.js?cb=1791354900586"
-    },
-    {
-     "url": "https://gallery-content.binkies3d.com/maps/L6KoYytu/8yn1qjnc/content-map.json",
-     "grund": "robots.txt nicht lesbar (HTTP 400)"
-    },
-    {
-     "url": "https://gallery-content.binkies3d.com/maps/L6KoYytu/8yn1qjnc/content-map.json",
-     "grund": "robots.txt nicht lesbar (HTTP 400)"
-    },
-    {
-     "url": "https://binkiesproductionweu.servicebus.windows.net/binkiesproductionp2weu/messages",
-     "grund": "robots.txt nicht lesbar (HTTP 401)"
+     "url": "https://cdn.privacy-mgmt.com/unified/wrapperMessagingWithoutDetection.js?cb=1791360631089",
+     "grund": "per robots.txt gesperrt: /unified/wrapperMessagingWithoutDetection.js?cb=1791360631089"
     },
     {
      "url": "https://www.freenet.de/cdn-cgi/challenge-platform/scripts/jsd/main.js",
      "grund": "per robots.txt gesperrt: /cdn-cgi/challenge-platform/scripts/jsd/main.js"
-    },
-    {
-     "url": "https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495",
-     "grund": "ReadTimeout: The read operation timed out"
     }
    ],
-   "gescheitert": []
+   "gescheitert": [
+    {
+     "url": "https://www.freenet.de/config/error-codes.php",
+     "grund": "Host freenet.de nach 30000 ms noch belegt"
+    },
+    {
+     "url": "https://www.freenet.de/q/tariff-bundles?fl=bundle&v=P-4292934&f=%7B%220%22%3A%7B%7D%2C%221%22%3A%7B%7D%2C%222%22%3A%7B%7D%2C%22categories%22%3A%22tariffs_postpaid_voice%22%2C%22count%22%3A0%2C%22network%7Ctn%22%3A%5B%5D%2C%22data%7Ctd%22%3A%5B%5D%2C%22price_t%7Ctp%22%3A%5B%5D%2C%22additional%7Cta%22%3A%5B%5D%7D&s=%7B%22desc%22%3A%22custom%22%7D&v=P-4292922&_=1791360628929",
+     "grund": "Host freenet.de nach 30000 ms noch belegt"
+    },
+    {
+     "url": "https://www.freenet.de/shop/_ui/responsive/theme-whitelabel/partials/kameleoon-iframe-md.html",
+     "grund": "Host freenet.de nach 30000 ms noch belegt"
+    },
+    {
+     "url": "https://www.freenet.de/q/e?message=Timeout+PLP",
+     "grund": "Host freenet.de nach 30000 ms noch belegt"
+    }
+   ],
+   "karte": {
+    "status": "keine_karte",
+    "karte": "freenet.yaml",
+    "grund": "freenet.yaml nicht vorhanden"
+   }
   }
  ],
- "groesse_bytes": 1008502,
+ "groesse_bytes": 975262,
  "groessengrenze_bytes": 8000000,
  "gekuerzt": []
 }

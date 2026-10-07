@@ -1,35 +1,11 @@
 {
- "preise_gesamt": 5,
+ "preise_gesamt": 1,
  "preise": [
   {
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(4) > form:nth-of-type(1) > label:nth-of-type(1) > span:nth-of-type(1) > strong:nth-of-type(2)",
-   "text": "11.99 €",
-   "kontext": "Ja, ich möchte mein Handy für nur 11.99 € im Monat absichern",
+   "pfad": "#i6wzgu-accordion > p:nth-of-type(1)",
+   "text": "0 - 95 €",
+   "kontext": "0 - 95 €",
    "sichtbar": true
-  },
-  {
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2)",
-   "text": ". 40 €",
-   "kontext": "46 . 40 €",
-   "sichtbar": false
-  },
-  {
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2)",
-   "text": ". 00 €",
-   "kontext": "1449 . 00 €",
-   "sichtbar": true
-  },
-  {
-   "pfad": "#nmk82v-accordion > p:nth-of-type(1)",
-   "text": "DHL bringt Dein Gerät zu Dir nach Hause. Der Versand kostet faire 4,95 €. Um die Versandkosten zu sparen, hast Du zwei Möglichkeiten:",
-   "kontext": "DHL bringt Dein Gerät zu Dir nach Hause. Der Versand kostet faire 4,95 €. Um die Versandkosten zu sparen, hast Du zwei Möglichkeiten: Du reservierst das gewünschte Gerät unverbindlich in einem unserer Shops bei Dir in der Nähe. Wir legen das Gerät zwei Tage für Dich zurück und Du bezahlst im Shop. D",
-   "sichtbar": false
-  },
-  {
-   "pfad": "#zkc20d-accordion > ul:nth-of-type(1) > li:nth-of-type(4)",
-   "text": "Nachnahme (es fallen zusätzlich 2 € Nachnahmegebühr an)",
-   "kontext": "PayPal Klarna (Rechnung, Lastschrift, Sofortüberweisung, Kreditkarte, Ratenkauf) Kreditkarte (American Express) Nachnahme (es fallen zusätzlich 2 € Nachnahmegebühr an) giropay Finanzierung über unseren Partner Consors Finanz BNP Paribas S.A",
-   "sichtbar": false
   }
  ]
 }

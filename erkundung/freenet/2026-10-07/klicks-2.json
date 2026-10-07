@@ -8,40 +8,16 @@
   {
    "gruppe": 38,
    "art": "speicher",
-   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(2) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(4) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(1)",
+   "pfad": "body > div:nth-of-type(1) > div:nth-of-type(4) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(11) > div:nth-of-type(1) > a:nth-of-type(1)",
    "text": "128 GB",
    "wert": null,
    "fehler": null,
-   "navigiert": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-ohne-vertrag/p/P-M-4206117?ds=P-4292922",
+   "navigiert": "https://www.freenet.de/handys-smartphones/google/google-pixel-10-mit-vertrag/b/tariffs_postpaid_voice/P-M-4206117/?fl=bundle&v=P-4292922",
    "umleitung": null,
-   "ruhe": true,
+   "ruhe": false,
    "anfragen": [
     {
-     "nummer": 107,
-     "methode": "GET",
-     "url": "https://media.mdm.freenet.de/cdn?name=google-pixel-10-128-gb-frost-vorderseite&version=78e28c8c8f6c91e706a6ebe6a0ef0c5578951510&extension=png&width=390&height=520",
-     "art": "image",
-     "status": null,
-     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
-    },
-    {
-     "nummer": 108,
-     "methode": "GET",
-     "url": "https://media.mdm.freenet.de/cdn?name=google-pixel-10-128-gb-frost-rueckseite&version=0ecd9408b7bffed76701134248db90aec390fa66&extension=png&width=390&height=520",
-     "art": "image",
-     "status": null,
-     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
-    },
-    {
-     "nummer": 109,
-     "methode": "GET",
-     "url": "https://media.mdm.freenet.de/cdn?name=google-pixel-10-128-gb-frost-linke-seite&version=540eabb4601cf186d8ad4ae344abe98adfa12222&extension=png&width=390&height=520",
-     "art": "image",
-     "status": null,
-     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
-    },
-    {
-     "nummer": 110,
+     "nummer": 116,
      "methode": "GET",
      "url": "https://images.ctfassets.net/1glbh88h5ua1/1KWAupI1bBZhQWQA4hQMgz/877623ad0886e6b07194caf22b9e5974/md-social-media-bar-digitalrepublic_40_40.svg",
      "art": "image",
@@ -49,7 +25,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 111,
+     "nummer": 117,
      "methode": "GET",
      "url": "https://images.ctfassets.net/1glbh88h5ua1/60utPyNCP0scNf35zeRB9V/413b5d5bdbd68fe13414d2cdde8ebe1a/facebook.svg",
      "art": "image",
@@ -57,7 +33,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 112,
+     "nummer": 118,
      "methode": "GET",
      "url": "https://images.ctfassets.net/1glbh88h5ua1/ZqRcce5aVcZYRxWgt57QN/63d3d77b6763ddac0951aa9c88653fcd/youtube.svg",
      "art": "image",
@@ -65,7 +41,7 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 113,
+     "nummer": 119,
      "methode": "GET",
      "url": "https://images.ctfassets.net/1glbh88h5ua1/4SUNT13zPRpHmg46XADYUo/a0623d2d3ba2149b7e9616a47063c204/instagram.svg",
      "art": "image",
@@ -73,9 +49,17 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 114,
+     "nummer": 120,
      "methode": "GET",
-     "url": "https://media.mdm.freenet.de/cdn?name=google-pixel-10-128-gb-frost-energieeffizienzklasse&version=0aea4664b70abef15706e751fd646e3f58936d7d&extension=svg",
+     "url": "https://www.freenet.de/q/tariff-bundles?fl=bundle&v=P-4292934&f=%7B%220%22%3A%7B%7D%2C%221%22%3A%7B%7D%2C%222%22%3A%7B%7D%2C%22categories%22%3A%22tariffs_postpaid_voice%22%2C%22count%22%3A0%2C%22network%7Ctn%22%3A%5B%5D%2C%22data%7Ctd%22%3A%5B%5D%2C%22price_t%7Ctp%22%3A%5B%5D%2C%22additional%7Cta%22%3A%5B%5D%7D&s=%7B%22desc%22%3A%22custom%22%7D&v=P-4292922&_=1791360628930",
+     "art": "xhr",
+     "status": null,
+     "abbruch": null
+    },
+    {
+     "nummer": 121,
+     "methode": "GET",
+     "url": "https://www.freenet.de/theme/images/loading40.svg",
      "art": "image",
      "status": null,
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
