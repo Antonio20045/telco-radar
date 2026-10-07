@@ -15,9 +15,9 @@ Der Job ``ablegen`` in ``.github/workflows/klick-erkundung.yml`` ruft zwei Schri
 ``pruefe ZIEL``
     Sucht in jeder Datei unter ``ZIEL``, gepackte entpackt, nach Namen außerhalb von
     ``ERLAUBT`` und nach Lecks (``LECKMUSTER``: JSON Web Token, Sitzungskennung,
-    Set-Cookie, Bearer, Brevo-Schlüssel). Jeder Treffer ist eine ``::error::``-Zeile und
-    Exit 1, also kein Commit. Die Ablage schwärzt schon beim Schreiben; dies ist die
-    zweite Linie.
+    Warenkorb-Kennung, auch in einem Antwortkörper als JSON-Text, Set-Cookie, Bearer,
+    Brevo-Schlüssel). Jeder Treffer ist eine ``::error::``-Zeile und Exit 1, also kein
+    Commit. Die Ablage schwärzt schon beim Schreiben; dies ist die zweite Linie.
 """
 
 from __future__ import annotations
@@ -44,6 +44,12 @@ LECKMUSTER = {
     "Sitzungskennung": re.compile(
         rb"(?i)\b(?:jsessionid|phpsessid|asp\.net_sessionid|session_?id|sid)"
         + rb'"?\s*[=:]\s*"?'
+        + ENTFERNT.encode()
+        + rb"[\w%.-]{6,}"
+    ),
+    "Warenkorb-Kennung": re.compile(
+        rb"(?i)(?:(?:cart|basket)[_-]?id|warenkorb(?:[_-]?id)?)"
+        + rb'(?:\\?")?\s*[=:]\s*(?:\\?")?'
         + ENTFERNT.encode()
         + rb"[\w%.-]{6,}"
     ),

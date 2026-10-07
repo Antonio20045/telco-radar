@@ -5,9 +5,12 @@ gegen ``grenze``; ``RESERVE_INDEX`` bleibt für ``index.json``. Passt eine Datei
 mehr, wird sie nicht geschrieben und ``vermerke`` nennt sie; den Mitschnitt kürzt
 ``passe_mitschnitt`` vorher, indem er die größten Körper weglässt, je mit Vermerk am
 Eintrag. Text geht vor dem Schreiben durch ``schwaerze``: jeder je gesehene Cookie-Wert
-ab ``COOKIE_MINDESTLAENGE`` Zeichen, auch URL-kodiert, wird ersetzt, damit kein Cookie
-gespeichert wird, auch keiner, den eine Seite in ihr HTML oder eine Antwort schreibt;
-danach ersetzt ``klickspur.schwaerze_text`` geheime Parameter, JSON-Felder und Tokens.
+und jede Kennung, die irgendwo unter einem geheimen Namen stand
+(``klickspur.geheime_werte``, etwa die Warenkorb-Kennung aus dem Weiter-Klick), ab
+``COOKIE_MINDESTLAENGE`` Zeichen, auch URL-kodiert, wird zu ``GESCHWAERZT``, damit sie
+nirgends gespeichert wird, auch nicht im HTML, im Pfad oder unter einem harmlosen
+Namen; danach ersetzt ``klickspur.schwaerze_text`` geheime Parameter, JSON-Felder und
+Tokens.
 Bei JSON gilt das für jeden Text darin einzeln, auch für Antwortkörper.
 Ein alter Stand desselben Tages wird vorher geleert, damit der Ordner genau einen Lauf
 zeigt. Listen von Adressen (verworfen, gescheitert) stehen mit höchstens
@@ -23,11 +26,10 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from urllib.parse import quote
 
-from .klickspur import schwaerze_text
+from .klickspur import GESCHWAERZT, schwaerze_text
 
 RESERVE_INDEX = 100_000
 COOKIE_MINDESTLAENGE = 8
-GESCHWAERZT = "[Cookie entfernt]"
 INDEX = "index.json"
 GZIP_STUFE = 9
 VERMERK_KOERPER = "Körper wegen Größengrenze je Anbieter nicht gespeichert"
@@ -56,7 +58,7 @@ class Ablage:
         return max(0, self.grenze - RESERVE_INDEX - self.belegt)
 
     def merke_cookies(self, werte: Iterable[str]) -> None:
-        """Merkt Cookie-Werte, die vor jedem Schreiben geschwärzt werden."""
+        """Merkt Cookie-Werte und Kennungen, die jedes Schreiben schwärzt."""
         self.geheim.update(w for w in werte if len(w) >= COOKIE_MINDESTLAENGE)
 
     def schwaerze(self, text: str) -> str:

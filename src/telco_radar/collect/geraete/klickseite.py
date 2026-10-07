@@ -7,10 +7,13 @@ das Tor den Crawl-delay abwartet, zählt nicht) und lehnt eine Einwilligungsabfr
 Dann hält er Seite, Screenshot und Inventar fest und probiert Klicks (``klickproben``).
 Jede Antwort sieht der Lauf schon im Tor (``Tor.beobachter``): eine 403 oder 429 der
 eigenen Website auf eine Daten- oder Dokumentanfrage (``klickspur.bot_verdacht``) ist
-sofort eine Störung, vor jeder weiteren Anfrage, und jeder Set-Cookie-Wert kommt auf die
-Liste zum Schwärzen. In jedem Takt fragt ``pruefe`` die Spur nach Challenge-Mustern und
-das Tor nach Störung; dann geht keine Anfrage mehr hinaus und ``Seitenergebnis.bot`` ist
-wahr, außer die Hauptseite war tot (404, 410). Die ``Fristschleuse`` hält die
+sofort eine Störung, vor jeder weiteren Anfrage. Jeder Set-Cookie-Wert und jede
+Kennung unter einem geheimen Namen (``klickspur.geheime_werte``) in Adresse, Körper der
+Anfrage und Antwort kommt auf die Liste zum Schwärzen. In jedem Takt fragt ``pruefe``
+die Spur nach Challenge-Mustern und das Tor nach Störung; dann geht keine Anfrage mehr
+hinaus. Nach dem Lauf beendet jede Störung des Tors den Anbieter, welchen Status die
+Seite auch hat (``Seitenergebnis.bot``, außer die Hauptseite war tot, 404 oder 410);
+eine gelesene oder leere Seite heißt dann gestört. Die ``Fristschleuse`` hält die
 Zeitgrenze: ``offen`` ist die eine Definition, ob ein Abruf samt Abstand noch vor der
 Grenze hinausginge; danach verwirft das Tor jede Anfrage, und der Lauf endet mit
 ``GRUND_FRIST``. ``beobachte`` ist die Beobachtung des Tors, die auch die Kartenprobe
@@ -18,7 +21,8 @@ nutzt. Eine Seite ohne Bedienelement oder ohne Preis-Kandidat heißt
 ``LAUF_LEER`` mit Grund, nie „gelesen“. Alles, was die Ablage braucht, steht danach im
 ``Seitenergebnis``. Zwischen Einwilligung und Festhalten liegt ``_vor_der_lesung``;
 dort klickt die Folgeseite (``klickfolgeseite.Folgelauf``) weiter und folgt dem Ziel
-mit ``_folge`` wie beim Öffnen.
+mit ``_folge`` wie beim Öffnen. Nach dem Festhalten probiert ``_nach_der_lesung`` die
+Klicks; die Folgeseite probiert nicht, sie prüft dort noch einmal das Streckenende.
 """
 
 from __future__ import annotations
@@ -37,7 +41,14 @@ from .klickinventar import Inventar, lies_inventar
 from .klickkontext import Sitzung, oeffne_sitzung, schliesse
 from .klicklauf import LAUF_GELESEN, LAUF_GESPERRT, LAUF_GESTOERT, Klicklauf
 from .klickproben import lehne_einwilligung_ab, probiere
-from .klickspur import Eintrag, Spur, als_daten, bot_verdacht, ohne_geheimnisse
+from .klickspur import (
+    Eintrag,
+    Spur,
+    als_daten,
+    bot_verdacht,
+    geheime_werte,
+    ohne_geheimnisse,
+)
 from .klicktor import (
     GRUND_ZU_VIELE,
     HOECHSTE_UMLEITUNGEN,
@@ -116,6 +127,7 @@ class Seitenergebnis:
     klicks: list[dict] = field(default_factory=list)
     klick_vermerk: str | None = None
     cookies: set[str] = field(default_factory=set)
+    """Cookie-Werte und Kennungen, die die Ablage überall schwärzt."""
     weiter: dict | None = None
     http_status: int | None = None
     anfragen: list[dict] = field(default_factory=list)
@@ -163,6 +175,7 @@ class Seitenlauf:
             self._raeume(sitzung)
             schliesse(sitzung)
         self._uebernimm()
+        self._werte_stoerung_aus()
         return self.ergebnis
 
     def pruefe(self) -> None:
@@ -172,7 +185,7 @@ class Seitenlauf:
             log.warning("Klick-Erkundung %s: %s", self.adresse, verdacht)
             self.tor.stoerung = verdacht
         if self.tor.stoerung is not None:
-            self.ergebnis.bot = self.tor.haupt_status not in TOTE_STATUS
+            self.ergebnis.bot = self._bot_schutz()
             raise Abbruch(LAUF_GESTOERT, self.tor.stoerung)
         if self.schleuse.abgelaufen or time.monotonic() >= self.schleuse.ende:
             raise Abbruch(ABGELAUFEN, GRUND_FRIST)
@@ -206,21 +219,26 @@ class Seitenlauf:
         self.ergebnis.endadresse = ohne_geheimnisse(self.seite.url)
         self.ergebnis.html = self.seite.content()
         self.ergebnis.bild = self.seite.screenshot(type="png")
-        self.ergebnis.inventar = lies_inventar(self.seite)
+        inventar = lies_inventar(self.seite)
+        self.ergebnis.inventar = inventar
         if self.ergebnis.status != LAUF_GELESEN:
             return
-        try:
-            probiere(self, self.ergebnis.inventar, self.ergebnis.klicks)
-        except Abbruch as abbruch:
-            self.ergebnis.klick_vermerk = abbruch.grund
-            if abbruch.status != ABGELAUFEN:
-                self._halte_an(abbruch)
-        luecke = leer(self.ergebnis.inventar)
+        self._nach_der_lesung(inventar)
+        luecke = leer(inventar)
         if luecke is not None and self.ergebnis.status == LAUF_GELESEN:
             self.ergebnis.status, self.ergebnis.grund = LAUF_LEER, luecke
 
     def _vor_der_lesung(self) -> None:
         """Schritt vor dem Festhalten; eine Produktseite bleibt, wie sie ist."""
+
+    def _nach_der_lesung(self, inventar: Inventar) -> None:
+        """Klick-Proben auf der gelesenen Seite; eine Störung beendet sie."""
+        try:
+            probiere(self, inventar, self.ergebnis.klicks)
+        except Abbruch as abbruch:
+            self.ergebnis.klick_vermerk = abbruch.grund
+            if abbruch.status != ABGELAUFEN:
+                self._halte_an(abbruch)
 
     def _halte_an(self, abbruch: Abbruch) -> None:
         status = LAUF_GESTOERT if abbruch.status == ABGELAUFEN else abbruch.status
@@ -289,6 +307,9 @@ class Seitenlauf:
         self.ergebnis.http_status = self.tor.haupt_status
         self.ergebnis.anfragen = als_daten(self.spur.eintraege)
         self.ergebnis.mitschnitt = self.spur.mitschnitt
+        for satz in self.spur.mitschnitt:
+            if satz.get("koerper") is not None:
+                self.ergebnis.cookies.update(geheime_werte(satz["koerper"]))
         self.ergebnis.verworfen = [
             {"url": ohne_geheimnisse(v.url), "grund": v.grund}
             for v in self.lauf.verworfen
@@ -310,9 +331,25 @@ class Seitenlauf:
                 "Klick-Erkundung %s: nicht aufgeräumt: %s", self.adresse, kurz(fehler)
             )
             return
-        if verdacht is not None and self.ergebnis.status == LAUF_GELESEN:
-            self.ergebnis.status, self.ergebnis.grund = LAUF_GESTOERT, verdacht
-            self.ergebnis.bot = True
+        if verdacht is not None and self.tor.stoerung is None:
+            self.tor.stoerung = verdacht
+
+    def _werte_stoerung_aus(self) -> None:
+        """Jede Störung des Tors beendet den Anbieter, welchen Status die Seite hat.
+
+        Eine gelesene oder leere Seite heißt dann gestört; ein Befund, eine Sperre oder
+        eine schon gestörte Seite behält Status und Grund.
+        """
+        if self.tor.stoerung is None:
+            return
+        self.ergebnis.bot = self._bot_schutz()
+        if self.ergebnis.status in (LAUF_GELESEN, LAUF_LEER):
+            self.ergebnis.status = LAUF_GESTOERT
+            self.ergebnis.grund = self.tor.stoerung
+
+    def _bot_schutz(self) -> bool:
+        """Eine Störung ist Bot-Schutz, außer die Hauptseite war tot (404, 410)."""
+        return self.tor.haupt_status not in TOTE_STATUS
 
 
 def leer(inventar: Inventar | None) -> str | None:
@@ -330,11 +367,15 @@ def leer(inventar: Inventar | None) -> str | None:
 def beobachte(
     anfrage: Request, antwort: APIResponse, adresse: str, cookies: set[str]
 ) -> str | None:
-    """Merkt Set-Cookie-Werte in ``cookies``; Grund, wenn die Antwort nach Bot-Schutz
-    aussieht (``klickspur.bot_verdacht`` gegen die Website von ``adresse``)."""
+    """Merkt Set-Cookie-Werte und Kennungen aus Adresse und Körper der Anfrage in
+    ``cookies``; Grund, wenn die Antwort nach Bot-Schutz aussieht
+    (``klickspur.bot_verdacht`` gegen die Website von ``adresse``)."""
     for kopf in antwort.headers_array:
         if kopf["name"].lower() == SET_COOKIE:
             cookies.add(cookie_wert(kopf["value"]))
+    koerper = anfrage.post_data_buffer
+    for text in (anfrage.url, antwort.url, (koerper or b"").decode(errors="replace")):
+        cookies.update(geheime_werte(text))
     art, url = anfrage.resource_type, ohne_geheimnisse(antwort.url)
     eintrag = Eintrag(0, anfrage.method, url, art, antwort.status)
     return bot_verdacht(eintrag, "", adresse)

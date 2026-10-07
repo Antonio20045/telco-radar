@@ -124,6 +124,9 @@ JWT = b"eyJhbGciOiJIUzI1NiJ9.eyJzaWQiOiI0MiJ9.c2lnbmF0dXJl"
         (b'{"access_token": "' + JWT + b'"}', "JSON Web Token"),
         (b'{"koerper": "JSESSIONID=4F2A9C1B7E"}', "Sitzungskennung"),
         (b'{"sessionId": "SITZUNG0815"}', "Sitzungskennung"),
+        (b'{"url": "/tarife?cartId=K7q2Wm9Zx4"}', "Warenkorb-Kennung"),
+        (b'{"koerper": "{\\"basketId\\": \\"B4sk3tW3rt9Q\\"}"}', "Warenkorb-Kennung"),
+        (b'{"warenkorb": "K7q2Wm9Zx4"}', "Warenkorb-Kennung"),
         (b'{"kopf": "Set-Cookie: a=b"}', "Set-Cookie"),
         (b'{"kopf": "Authorization: Bearer abcdefgh12345"}', "Bearer"),
     ],
@@ -177,7 +180,12 @@ def test_geschwaerzte_werte_sind_kein_leck(tmp_path):
     ordner.mkdir(parents=True)
     sauber = (
         b'{"sessionId": "ENTFERNT", "k": "JSESSIONID=ENTFERNT",'
-        b' "c": "sid=[Cookie entfernt]", "a": "Bearer ENTFERNT"}'
+        b' "c": "sid=[Cookie entfernt]", "a": "Bearer ENTFERNT",'
+        b' "u": "/tarife?cartId=ENTFERNT&warenkorb=[Cookie entfernt]",'
+        b' "koerper": "{\\"basketId\\": \\"ENTFERNT\\"}",'
+        b' "pfad": "add-to-cart-button:nth-of-type(1)",'
+        b' "href": "https://www.vodafone.de/shop/warenkorb.html",'
+        b' "text": "Warenkorb: 2 Artikel"}'
     )
     (ordner / "mitschnitt-1.json").write_bytes(sauber)
 

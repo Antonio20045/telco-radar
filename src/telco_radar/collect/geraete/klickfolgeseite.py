@@ -10,20 +10,25 @@ jede Anfrage, auch ein POST), lehnt die Einwilligung ab und klickt genau einmal:
 den Treffern des Selektors genau einen sichtbaren mit dem erwarteten Text, ein ``a``
 oder ``button`` (oder mit dieser Rolle), ohne neues Fenster und ohne Kauf-, Kassen- oder
 Anmeldewort (``KAUFWORT``). Nur dieser Klick darf serverseitig Zustand ändern
-(Warenkorb); kein Formular wird ausgefüllt. Dann wartet er auf den Wechsel der Adresse,
-folgt Umleitungen geprüft, wartet auf Laden und Ruhe und hält die Folgeseite fest wie
-eine Seite, Klick-Proben eingeschlossen.
+(Warenkorb); kein Formular wird ausgefüllt. Ab dem Klick lässt das Tor nur GET und HEAD
+durch (``klicktor.GRUND_NUR_LESEN``); allein die Anfragen des Klicks bis zur Navigation
+der Hauptseite dürfen schreiben. Dann wartet er auf den Wechsel der Adresse, folgt
+Umleitungen geprüft, wartet auf Laden und Ruhe und hält von der Folgeseite Inventar,
+Preise, Seite und Mitschnitt fest, ohne Klick-Proben und ohne Kartenprobe
+(``OHNE_PROBEN``).
 
 Scheitern ist ein benannter Befund (``LAUF_BEFUND`` mit Grund), kein leeres Ergebnis:
 der Knopf fehlt, ist nicht eindeutig, kein Knopf, nicht klickbar, öffnet ein neues
 Fenster oder führt nirgends hin, oder die Folgeseite zeigt Anmeldung, Checkout oder
 Zahlung (``streckenende``: Wort in Host oder Pfad, sichtbares Passwort-, Karten- oder
-IBAN-Feld, Knopf „zahlungspflichtig bestellen“). Dann endet die Seite dort, ohne
-Klick-Proben. Verwirft das Tor das Ziel des Klicks oder seinen POST (robots.txt), heißt
-die Folgeseite ``gesperrt``; Bot-Schutz heißt ``gestoert``, danach geht für den
-Anbieter keine Anfrage mehr hinaus. Den Körper einer Antwort auf ein POST liest der
-Lauf schon im Tor, auf Challenge-Muster wie jede Antwort und für den Mitschnitt, weil
-die Seite gleich danach wechselt und der Browser ihn dann nicht mehr herausgibt.
+IBAN-Feld, Knopf „zahlungspflichtig bestellen“), geprüft nach dem Laden, nach der Ruhe
+und noch einmal nach dem Festhalten. Verwirft das Tor das Ziel des Klicks oder seinen
+POST (robots.txt), heißt die Folgeseite ``gesperrt``; Bot-Schutz heißt ``gestoert``,
+und jede Störung des Tors beendet den Anbieter, auch nach einem Befund
+(``klickseite.Seitenlauf``). Den Körper einer Antwort auf ein POST liest der Lauf schon
+im Tor, auf Challenge-Muster wie jede Antwort, für den Mitschnitt und für die Kennungen
+zum Schwärzen (``klickspur.geheime_werte``), weil die Seite gleich danach wechselt und
+der Browser ihn dann nicht mehr herausgibt.
 """
 
 from __future__ import annotations
@@ -38,12 +43,19 @@ from urllib.parse import unquote, urldefrag, urlsplit
 
 from playwright.sync_api import Error as PlaywrightFehler
 
+from .klickinventar import Inventar
 from .klickkartenprobe import SEITE_PROBIERBAR
 from .klicklauf import LAUF_GESPERRT, LAUF_GESTOERT
 from .klickproben import KLICK_FRIST_MS
 from .klickseite import Fristschleuse, Seitenergebnis, Seitenlauf
-from .klickspur import HOECHSTE_ANTWORT, Eintrag, bot_verdacht, ohne_geheimnisse
-from .klicktor import WARTE_TAKT_MS, kurz
+from .klickspur import (
+    HOECHSTE_ANTWORT,
+    Eintrag,
+    bot_verdacht,
+    geheime_werte,
+    ohne_geheimnisse,
+)
+from .klicktor import GRUND_NUR_LESEN, WARTE_TAKT_MS, kurz
 from .klickwache import Abbruch
 from .klickziele import Erkundungsziel, Seitenziel, Weiter
 from .robots import RobotsWaechter
@@ -58,6 +70,7 @@ WEITER_FRIST_MS = 20_000
 HOECHSTE_TREFFER = 20
 GRUND_KNOPF = "Weiter-Knopf"
 GRUND_AUSGANG = "Ausgangsseite"
+OHNE_PROBEN = "Folgeseite: keine Klick-Proben"
 WEBSCHEMATA = frozenset({"http", "https"})
 KNOPF_TAGS = frozenset({"a", "button"})
 KNOPF_ROLLEN = frozenset({"button", "link"})
@@ -180,6 +193,7 @@ class Folgelauf(Seitenlauf):
         self.weiter = weiter
         self.protokoll = angabe(weiter)
         self.ergebnis.weiter = self.protokoll
+        self.ergebnis.klick_vermerk = OHNE_PROBEN
         self.koerper: dict[tuple[str, str], bytes] = {}
 
     def _beobachte(self, anfrage: Request, antwort: APIResponse) -> str | None:
@@ -198,6 +212,7 @@ class Folgelauf(Seitenlauf):
         self.koerper[(POST, url)] = koerper
         eintrag = Eintrag(0, POST, url, anfrage.resource_type, antwort.status)
         text = koerper[:HOECHSTE_ANTWORT].decode("utf-8", errors="replace")
+        self.ergebnis.cookies.update(geheime_werte(text))
         return bot_verdacht(eintrag, text, self.adresse)
 
     def _uebernimm(self) -> None:
@@ -217,17 +232,13 @@ class Folgelauf(Seitenlauf):
     def _vor_der_lesung(self) -> None:
         """Klickt den einen Weiter-Knopf und folgt ihm bis zur geladenen Folgeseite."""
         knopf = self._knopf()
-        adresse = _ohne_anker(self.seite.url)
         self.protokoll["von"] = ohne_geheimnisse(self.seite.url)
-        marke, verworfen = self.spur.marke(), len(self.lauf.verworfen)
         gescheitert = len(self.lauf.gescheitert)
-        fenster = len(self.seite.context.pages)
+        self.tor.weiter_klick = True
         try:
-            knopf.click(timeout=KLICK_FRIST_MS, no_wait_after=True)
-        except PlaywrightFehler as fehler:
-            grund = f"{GRUND_KNOPF} nicht klickbar: {kurz(fehler)}"
-            raise Abbruch(LAUF_BEFUND, grund) from fehler
-        self._warte_auf_wechsel(adresse, marke, verworfen, fenster)
+            self._klicke(knopf)
+        finally:
+            self.tor.nur_lesen = True
         if self.tor.umleitung is not None:
             self._folge(self.tor.umleitung)
         elif urlsplit(self.seite.url).scheme not in WEBSCHEMATA:
@@ -237,10 +248,35 @@ class Folgelauf(Seitenlauf):
         else:
             self.pruefe_geladen()
         self.protokoll["nach"] = ohne_geheimnisse(self.seite.url)
+        self._pruefe_strecke()
         self.ergebnis.ruhe = self.ruhe()
+        self._pruefe_strecke()
+
+    def _nach_der_lesung(self, inventar: Inventar) -> None:
+        """Keine Klick-Proben auf ``inventar``; zeigt die Seite jetzt Anmeldung, Kasse
+        oder Zahlung, ist sie ein Befund."""
+        try:
+            self._pruefe_strecke()
+        except Abbruch as abbruch:
+            self._halte_an(abbruch)
+
+    def _pruefe_strecke(self) -> None:
+        """Wirft einen Befund, wenn Adresse oder Seite das Streckenende zeigen."""
         ende = streckenende(self.seite.url, self.seite.evaluate(FELDER_JS))
         if ende is not None:
             raise Abbruch(LAUF_BEFUND, f"Folgeseite zeigt {ende}")
+
+    def _klicke(self, knopf: Locator) -> None:
+        """Klickt einmal und wartet, bis die Adresse wechselt."""
+        adresse = _ohne_anker(self.seite.url)
+        marke, verworfen = self.spur.marke(), len(self.lauf.verworfen)
+        fenster = len(self.seite.context.pages)
+        try:
+            knopf.click(timeout=KLICK_FRIST_MS, no_wait_after=True)
+        except PlaywrightFehler as fehler:
+            grund = f"{GRUND_KNOPF} nicht klickbar: {kurz(fehler)}"
+            raise Abbruch(LAUF_BEFUND, grund) from fehler
+        self._warte_auf_wechsel(adresse, marke, verworfen, fenster)
 
     def _knopf(self) -> Locator:
         """Der eine sichtbare Treffer mit dem erwarteten Text; sonst ein Befund."""
@@ -297,9 +333,12 @@ class Folgelauf(Seitenlauf):
         raise Abbruch(LAUF_BEFUND, grund)
 
     def _gesperrt_seit(self, marke: int, verworfen: int) -> str | None:
-        """Ziel oder POST des Klicks, wenn das Tor sie verwarf; sonst ``None``."""
+        """Ziel oder POST des Klicks, wenn das Tor sie verwarf, nicht wegen
+        ``GRUND_NUR_LESEN``; sonst ``None``."""
         neu = {
-            ohne_geheimnisse(v.url): v.grund for v in self.lauf.verworfen[verworfen:]
+            ohne_geheimnisse(v.url): v.grund
+            for v in self.lauf.verworfen[verworfen:]
+            if v.grund != GRUND_NUR_LESEN
         }
         for eintrag in self.spur.seit(marke):
             if eintrag.url in neu and (

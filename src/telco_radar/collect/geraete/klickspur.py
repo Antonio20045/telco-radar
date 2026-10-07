@@ -8,7 +8,9 @@ anderer Text bleiben draußen), je Antwort höchstens ``HOECHSTE_ANTWORT`` Bytes
 mit Vermerk. Kopfzeilen werden nie gespeichert, also auch kein Cookie und kein
 Set-Cookie; jede Adresse verliert die Werte geheimer Parameter (``ohne_geheimnisse``).
 ``schwaerze_text`` ersetzt in beliebigem Text die Werte geheimer Parameter, geheimer
-JSON-Schlüssel (``GEHEIM``), JSON Web Tokens und Bearer-Kennungen.
+JSON-Schlüssel (``GEHEIM``), JSON Web Tokens und Bearer-Kennungen. ``geheime_werte``
+nennt diese Werte selbst, damit die Ablage sie überall schwärzt, wo sie wieder
+auftauchen (im Pfad, unter einem harmlosen Namen, in der Seite).
 
 ``bot_verdacht`` nennt den Grund, wenn eine Antwort der eigenen Website (dieselben
 letzten zwei Namensteile wie die Seite) nach Bot-Schutz aussieht: HTTP 403 oder 429 auf
@@ -23,7 +25,7 @@ import logging
 import re
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
-from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
+from urllib.parse import parse_qsl, unquote, urlencode, urlsplit, urlunsplit
 
 from playwright.sync_api import Error as PlaywrightFehler
 
@@ -41,17 +43,27 @@ DATENARTEN = frozenset({"xhr", "fetch", "document"})
 BOT_STATUS = frozenset({403, 429})
 GEHEIM = re.compile(
     r"token|secret|passw|session|^sid$|auth(?!or)|signature|^sig$|api[_-]?key|^key$"
-    r"|jwt|csrf|xsrf|nonce|tntid|thirdpartyid|^umid$|visitor_?id|^mcid$|^ecid$",
+    r"|jwt|csrf|xsrf|nonce|tntid|thirdpartyid|^umid$|visitor_?id|^mcid$|^ecid$"
+    r"|cart|basket|warenkorb",
     re.I,
 )
 """Namen geheimer Parameter und JSON-Felder. Dazu die Besucherkennungen der
 Werbe- und Messdienste: Adobe Target schrieb am 07.10.2026 die ``tntId`` des
-Runners in eine Vodafone-Antwort."""
+Runners in eine Vodafone-Antwort. Und Warenkorb-Kennungen (``cartId``, ``basketId``,
+``warenkorb``): der Weiter-Klick der Folgeseite legt einen Warenkorb an."""
 ENTFERNT = "ENTFERNT"
-_PARAMETER = re.compile(r"(?<![\w.\[\]-])([\w.\[\]-]{1,80})=([^&#;,\s\"'<>\\]*)")
+GESCHWAERZT = "[Cookie entfernt]"
+"""Platzhalter der Ablage für einen gemerkten Wert; steht er hinter einem geheimen
+Parameter, wird er wie jeder Wert zu ``ENTFERNT``."""
+_PARAMETER = re.compile(
+    r"(?<![\w.\[\]-])([\w.\[\]-]{1,80})=("
+    + re.escape(GESCHWAERZT)
+    + r"|[^&#;,\s\"'<>\\]*)"
+)
 _JSON_FELD = re.compile(r'"([^"\\]{1,80})"(\s*:\s*)("(?:[^"\\]|\\.)*"|-?\d[\d.eE+-]*)')
 _JWT = re.compile(r"eyJ[\w-]{4,}\.eyJ[\w-]{4,}\.[\w-]*")
 _BEARER = re.compile(r"(?i)\b(bearer\s+)(?!ENTFERNT\b)[\w.~+/=-]{4,}")
+_LEERRAUM = re.compile(r"\s")
 WEB_SCHEMA = ("http", "https")
 NAMENSTEILE_SITE = 2
 
@@ -77,6 +89,17 @@ def schwaerze_text(text: str) -> str:
     text = _BEARER.sub(lambda m: m[1] + ENTFERNT, text)
     text = _PARAMETER.sub(_ohne_wert, text)
     return _JSON_FELD.sub(_ohne_feldwert, text)
+
+
+def geheime_werte(text: str) -> set[str]:
+    """Die Werte geheimer Parameter und JSON-Felder in ``text``, roh und URL-dekodiert.
+
+    Ein Wert mit Leerraum oder schon ``ENTFERNT`` ist keine Kennung.
+    """
+    roh = [t[2] for t in _PARAMETER.finditer(text) if GEHEIM.search(t[1])]
+    roh += [t[3].strip('"') for t in _JSON_FELD.finditer(text) if GEHEIM.search(t[1])]
+    werte = {form for wert in roh for form in (wert, unquote(wert))}
+    return {w for w in werte if w and w != ENTFERNT and not _LEERRAUM.search(w)}
 
 
 def _ohne_wert(treffer: re.Match[str]) -> str:

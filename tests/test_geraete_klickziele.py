@@ -7,6 +7,7 @@ Geprüft wird in einem Wegwerfordner mit Kopien der echten Quellen und des Katal
 
 from __future__ import annotations
 
+import json
 import shutil
 from pathlib import Path
 
@@ -21,7 +22,11 @@ from telco_radar.collect.geraete.klickablage import (
 )
 from telco_radar.collect.geraete.klickerkundung import gesamtstatus
 from telco_radar.collect.geraete.klickinventar import art_der_gruppe
-from telco_radar.collect.geraete.klickspur import ohne_geheimnisse, schwaerze_text
+from telco_radar.collect.geraete.klickspur import (
+    geheime_werte,
+    ohne_geheimnisse,
+    schwaerze_text,
+)
 from telco_radar.collect.geraete.klickziele import (
     ErkundungszielFehler,
     Weiter,
@@ -245,8 +250,54 @@ def test_besucherkennung_wird_geschwaerzt(schluessel):
     )
 
 
-@pytest.mark.parametrize("schluessel", ["id", "deviceVariantId", "planId", "sku"])
+@pytest.mark.parametrize(
+    "schluessel",
+    ["id", "deviceVariantId", "planId", "sku", "tarifCode", "tariffCode"],
+)
 def test_gegenprobe_variantenkennung_bleibt_stehen(schluessel):
     text = f'{{"{schluessel}":"P-4356815"}}'
 
     assert schwaerze_text(text) == text
+    assert geheime_werte(text) == set()
+    assert ohne_geheimnisse(f"https://a.de/t?{schluessel}=P-4356815") == (
+        f"https://a.de/t?{schluessel}=P-4356815"
+    )
+
+
+KORB = "K7q2Wm9Zx4Lp8Tr3"
+
+
+@pytest.mark.parametrize(
+    "schluessel", ["cartId", "basketId", "warenkorb", "warenkorbId", "shoppingCartId"]
+)
+def test_warenkorbkennung_wird_geschwaerzt(schluessel):
+    """Auftrag DKFOLGE2: der Weiter-Klick der Folgeseite legt einen Warenkorb an; seine
+    Kennung steht als Parameter oder JSON-Feld. BEISPIEL-Werte, von Hand geschrieben."""
+    text = f'{{"{schluessel}":"{KORB}","speicher":"256"}}'
+
+    assert schwaerze_text(text) == f'{{"{schluessel}":"ENTFERNT","speicher":"256"}}'
+    assert ohne_geheimnisse(f"https://a.de/t?{schluessel}={KORB}&laufzeit=24") == (
+        f"https://a.de/t?{schluessel}=ENTFERNT&laufzeit=24"
+    )
+
+
+def test_geheime_werte_nennt_kennungen_unter_geheimen_namen():
+    text = (
+        f'{{"cartId":"{KORB}","deviceVariantId":"P-4356815","sessionId":"ENTFERNT",'
+        '"sessionExpiryMessage":"Ihre Sitzung läuft ab",'
+        '"ziel":"/t?basketId=B4sk%2F3tW3rt&laufzeit=24"}'
+    )
+
+    assert geheime_werte(text) == {KORB, "B4sk%2F3tW3rt", "B4sk/3tW3rt"}
+
+
+def test_ablage_schwaerzt_eine_kennung_ueberall_und_hinter_geheimem_namen(tmp_path):
+    ablage = Ablage(tmp_path / "a", RESERVE_INDEX + 10_000)
+    ablage.merke_cookies(geheime_werte(f'{{"cartId":"{KORB}"}}'))
+
+    ablage.schreibe_json("x.json", {"u": f"/t/{KORB}?cartId={KORB}&vorgang={KORB}"})
+
+    text = (tmp_path / "a" / "x.json").read_text(encoding="utf-8")
+    assert json.loads(text) == {
+        "u": f"/t/{GESCHWAERZT}?cartId=ENTFERNT&vorgang={GESCHWAERZT}"
+    }

@@ -6,8 +6,8 @@ Test ein Knopf ist (sein Skript legt per POST einen Warenkorb an und lädt dann 
 Folgeseite, wie „Weiter zur Tarifauswahl“) oder ein Link (über eine Umleitung, wie
 „Zur Tarifauswahl“); die Folgeseite zeigt Laufzeitknöpfe und lädt ihre Rate per
 ``fetch``. Geprüft wird: die Folgeseite steht mit eigener Nummer, eigenen Dateien und
-``folge_von`` im Index, Inventar, Preise, Klick-Proben und Mitschnitt samt POST,
-geschwärzt, Crawl-delay auch für das POST; Anmeldung, Checkout oder Zahlung als
+``folge_von`` im Index, Inventar, Preise und Mitschnitt samt POST, geschwärzt, keine
+Klick-Proben, Crawl-delay auch für das POST; Anmeldung, Checkout oder Zahlung als
 Folgeseite, ein fehlender, mehrdeutiger, untauglicher oder wirkungsloser Knopf sind
 benannte Befunde ohne weiteren Klick; sperrt robots.txt Ziel oder POST, ist die
 Folgeseite ``gesperrt`` und die Anfrage verworfen; Bot-Schutz beendet den Anbieter.
@@ -190,7 +190,7 @@ def test_knopf_mit_post_fuehrt_zur_folgeseite_mit_eigenen_dateien(chromium, tmp_
         "speicher": "256",
     }
     assert server.mit("/handy/") == ["/handy/x", "/handy/x"]
-    assert server.mit("/api/rate") == ["/api/rate?laufzeit=36", "/api/rate?laufzeit=24"]
+    assert server.mit("/api/rate") == ["/api/rate?laufzeit=36"]
     assert all(luecke >= 1 - 0.05 for luecke in server.luecken("/"))
     ordner = neu / "erkundung-beispiel" / "beispiel" / TAG
     dateien = folge["dateien"]
@@ -201,9 +201,9 @@ def test_knopf_mit_post_fuehrt_zur_folgeseite_mit_eigenen_dateien(chromium, tmp_
     assert laufzeit == ["24 Monate", "36 Monate"]
     preise = _lies(ordner, dateien["preise"])["preise"]
     assert any("35,99 €" in p["text"] for p in preise)
-    proben = _lies(ordner, dateien["klicks"])["proben"]
-    assert [p["text"] for p in proben] == ["24 Monate"]
-    assert proben[0]["anfragen"][0]["url"].endswith("/api/rate?laufzeit=24")
+    klicks = _lies(ordner, dateien["klicks"])
+    assert (klicks["proben"], klicks["vermerk"]) == ([], klickfolgeseite.OHNE_PROBEN)
+    assert [p["text"] for p in _lies(ordner, "klicks-1.json")["proben"]] == ["512 GB"]
     mitschnitt = _lies(ordner, dateien["mitschnitt"])
     post = [a for a in mitschnitt["anfragen"] if a["methode"] == "POST"]
     assert [a["url"] for a in post] == [server.adresse(KORB_PFAD)]

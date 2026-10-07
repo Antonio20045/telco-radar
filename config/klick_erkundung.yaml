@@ -28,8 +28,9 @@
 #               genau EINEN Knopf oder Link zum nächsten Schritt der
 #               Bestellstrecke. Nach Seite und Kartenprobe klickt die
 #               Erkundung ihn einmal und hält die Folgeseite als eigene Seite
-#               fest (klickfolgeseite.py); Anmeldung, Checkout oder Zahlung
-#               dort sind ein Befund. Die Element-Nummern im Kommentar
+#               fest, ohne Klick-Proben (klickfolgeseite.py); danach gehen nur
+#               noch GET und HEAD hinaus. Anmeldung, Checkout oder Zahlung dort
+#               sind ein Befund. Die Element-Nummern im Kommentar
 #               stehen in bedienelemente-<n>.json der Erkundung vom
 #               07.10.2026 (Zweig klick-erkundung; 1und1 Commit f31d5543,
 #               vodafone Commit 9dfe7a9e).

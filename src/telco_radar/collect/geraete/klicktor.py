@@ -18,6 +18,11 @@ Ein WebSocket verbindet nie (sperrt robots.txt ihn, steht er in ``verworfen``), 
 Vorabladen (Speculation Rules, ``<link rel=prerender|prefetch>``, Kopfzeile ``Link``)
 entfernt das Tor aus Kopf und Dokument jeder Antwort; was sonst an ``route``
 vorbeiginge, schließt ``klickkontext`` aus.
+
+Für die Folgeseite (``klickfolgeseite``) darf genau ein Klick schreiben: Solange
+``weiter_klick`` gilt, lässt das Tor jede Methode durch; die erste Anfrage der
+Hauptseite danach (die Navigation des Klicks) setzt ``nur_lesen``, und ab dann
+verwirft es jede Anfrage außer GET und HEAD mit ``GRUND_NUR_LESEN``.
 """
 
 from __future__ import annotations
@@ -72,6 +77,8 @@ SEITEN_FRIST_MS = 30000
 ABRUF_FRIST_MS = SEITEN_FRIST_MS
 WARTE_TAKT_MS = 50
 GRUND_ZU_VIELE = f"mehr als {HOECHSTE_UMLEITUNGEN} Umleitungen"
+LESENDE_METHODEN = frozenset({"GET", "HEAD"})
+GRUND_NUR_LESEN = "nach dem Weiter-Klick nur GET und HEAD"
 LEERE_SEITE = 200
 SPEKULATIONSKOPF = "speculation-rules"
 LINKKOPF = "link"
@@ -158,6 +165,7 @@ class Tor:
     nach jedem Warten auf Host und Abstand, unmittelbar vor dem Abruf. ``beobachter``
     sieht jede geholte Antwort, bevor sie in den Browser geht; nennt er einen Grund,
     ist das eine Störung, außer bei der Hauptseite (dort gilt ``bot_schutz``).
+    ``weiter_klick`` und ``nur_lesen`` setzt die Folgeseite (siehe oben).
     """
 
     def __init__(
@@ -175,6 +183,8 @@ class Tor:
         self.umleitung: str | None = None
         self.warte: Callable[[float], None] | None = None
         self.beobachter: Callable[[Request, APIResponse], str | None] | None = None
+        self.weiter_klick = False
+        self.nur_lesen = False
         self._unterwegs: set[str] = set()
 
     def darf(self, url: str) -> tuple[bool, str]:
@@ -187,6 +197,11 @@ class Tor:
         if anfrage.resource_type in ABGEBROCHENE_ARTEN or self.stoerung is not None:
             _schliesse(route, ABBRUCH_CODE)
             return
+        if self.nur_lesen and anfrage.method not in LESENDE_METHODEN:
+            self._verwirf(route, anfrage.url, GRUND_NUR_LESEN, anfrage.url)
+            return
+        if self.weiter_klick and _hauptseite(anfrage):
+            self.nur_lesen = True
         try:
             self._leite(route, anfrage)
         except PlaywrightFehler as fehler:

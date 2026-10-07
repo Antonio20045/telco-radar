@@ -32,8 +32,9 @@ Seite; ihre Cookie-Werte schwärzt die Ablage wie die der Seite.
 
 Trägt eine Seite ``weiter``, folgt nach Seite und Kartenprobe ihre Folgeseite
 (``klickfolgeseite``) als eigener Schritt mit eigener Nummer, eigenen Dateien und
-``folge_von`` im Index, mit denselben Grenzen für Zeit, Parallelläufe und Bot-Schutz.
-Ist die Ausgangsseite weder gelesen noch leer, ist die Folgeseite ``nicht_besucht``.
+``folge_von`` im Index, ohne Klick-Proben und ohne Kartenprobe, mit denselben Grenzen
+für Zeit, Parallelläufe und Bot-Schutz. Ist die Ausgangsseite weder gelesen noch leer,
+ist die Folgeseite ``nicht_besucht``.
 """
 
 from __future__ import annotations
