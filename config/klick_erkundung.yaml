@@ -11,8 +11,12 @@
 # `quelle_url` im Bestand des Geräteradars (data/state/geraete_db.json bzw.
 # geraete_tco.json, Stand 06.10.2026), also auf einer Seite, die der Anbieter
 # selbst verlinkt. Wo der Bestand die Bündelansicht kennt (o2 mit
-# `ohne-tarif=nein`, Telekom mit `tariffId`), steht sie; freenet führt im
-# Bestand nur die Seiten „ohne Vertrag“.
+# `ohne-tarif=nein`, Telekom mit `tariffId`), steht sie. freenet führt im
+# Bestand nur die Seiten „ohne Vertrag“; dort zeigt der Link „Passenden Vertrag
+# auswählen“ die Bündelliste je Gerätevariante. Diese Adressen stehen wörtlich
+# als `href` in der Erkundung vom 07.10.2026 (Zweig klick-erkundung,
+# erkundung/freenet/2026-10-07/bedienelemente-1.json Element 107 und
+# bedienelemente-2.json Element 105).
 #
 # Felder:
 #   schluessel  Ordnername unter erkundung/ und Wert der Workflow-Eingabe
@@ -78,7 +82,7 @@ anbieter:
     seiten:
       - geraet: apple-iphone-17-pro
         speicher_gb: 256
-        url: https://www.freenet.de/handys-smartphones/apple/iphone-17-pro-ohne-vertrag/p/P-M-4234664?ds=P-4356815
+        url: https://www.freenet.de/b/tariffs_postpaid_voice/P-M-4234664/?fl=bundle&v=P-4356815
       - geraet: google-pixel-10
         speicher_gb: 256
-        url: https://www.freenet.de/handys-smartphones/google/google-pixel-10-ohne-vertrag/p/P-M-4206117?ds=P-4292934
+        url: https://www.freenet.de/b/tariffs_postpaid_voice/P-M-4206117/?fl=bundle&v=P-4292934
