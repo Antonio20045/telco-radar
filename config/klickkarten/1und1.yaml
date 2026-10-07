@@ -1,0 +1,87 @@
+# Klick-Karte 1&1 (Format 2) für die Produktseite, Kartenprobe in Actions.
+# Fundstellen: Zweig klick-erkundung, Lauf a9b45f5a, erkundung/1und1/2026-10-07/
+# (B1 = bedienelemente-1.json, iPhone 17 Pro; B2 = bedienelemente-2.json, Galaxy S26;
+# P1/P2 = preise-1/-2.json). Die Seitenskripte stehen in keinem Mitschnitt; sie sind
+# aus den Fixtures tests/fixtures/geraete/einsundeins_produktseite_iphone_17_pro
+# (08.09.) und …_galaxy_s26_ultra_2026-09-29 belegt (Herkunft in _herkunft.json).
+#
+# Ein Vertrag aus Gerät und Tarif: die Seite nennt nur den Bündelbetrag je Monat für
+# 1&1 All-Net-Flat S und 36 Monate. Die Wahl 24 oder 36 Monate und andere Tarife gibt
+# es erst nach „Weiter zur Tarifauswahl“ (Warenkorb, Folgeseite), nicht auf dieser
+# Seite. Bewusst nicht gelesen (Lücke): Einmalzahlung (hwdVariantsOneOffPaymentFees
+# steht nirgends sichtbar), Anzahlung, Tarifphasen, Bindung, Anschluss und Volumen
+# (nur in den Tarifdetails der Lightbox).
+anbieter: 1&1
+vertragsform: ein_vertrag
+
+knoepfe:
+  speicher:
+    # B1 Elemente 49/51 (Label „256 GB“/„512 GB“) mit Input 50/52
+    # name hw-apple-iphone-17-pro.storage value 256/512; B2 56–59. Der Input liegt im
+    # Label (Fixture 08.09.: label.variant-chooser__tile > input).
+    selektor: >-
+      #hwd-configuration-section
+      label.variant-chooser__tile:has(input[name$=".storage"])
+    wert_in: input
+    wert: value
+    gewaehlt: {passt: ":has(input:checked)"}
+  tarif:
+    # chosenTariff im Tarifdetail-Link (B1 Element 40, B2 Element 45): 1&1
+    # All-Net-Flat S.
+    fest: tariff-anf-s-mvl
+  laufzeit:
+    # window.currentHardwareOfferDuration = '36' (Fixtures); siehe antwort.variante.
+    fest: 36
+
+vorbereitung:
+  # Zubehör: B1 Element 61/62 „Ohne AirPods“ mit #no-incentive checked; B2 Element 61
+  # Galaxy Buds vorgewählt (data-auto-add true), 78/79 „Ohne Kopfhörer“ nicht
+  # gewählt, P2 Kandidat 10 „… jeden Monat 2,– € sparen“. Vor jeder Lesung „ohne“.
+  - {klick: 'label.toggle-label:has(#no-incentive)', pruefe: "#no-incentive", bis: ":checked"}
+
+seite:
+  # Der erste Tarifdetail-Link (B1 Element 40 sichtbar, 41 die Kopie der
+  # Klebeleiste); updateTariffDetailsLink() schreibt color= und size= nach jedem
+  # Variantenwechsel neu (Fixture 08.09.).
+  speicher:
+    selektor: "#hwd-tariff-details-link-price-component"
+    attribut: data-iframe
+    parameter: size
+  tarif:
+    selektor: "#hwd-tariff-details-link-price-component"
+    attribut: data-iframe
+    parameter: chosenTariff
+  # B1 Element 44 COSMIC_ORANGE checked, B2 COBALT_VIOLET; Schlüssel von
+  # hwdVariantsPrices ist product-<FARBE>-<Speicher>.
+  farbe:
+    selektor: '#hwd-configuration-section input[name$=".color"]:checked'
+    attribut: value
+
+zusammenfassung:
+  # P1 Kandidat 5 „44 , 99 €/Monat“, P2 Kandidat 5 „34 , 99 €/Monat“, sichtbar, an
+  # #hwd-configuration-section > div:nth-of-type(2) > div:nth-of-type(1) >
+  # div:nth-of-type(2) > div:nth-of-type(1); Kandidat 6 ist die Kopie der
+  # Klebeleiste (unsichtbar, .hwd-monthly-price--stuck).
+  selektor: >-
+    #hwd-configuration-section
+    .hwd-monthly-price:not(.hwd-monthly-price--stuck) > .hwd-monthly-price__content
+  muster:
+    buendelbetrag: '(\d+\s*,\s*\d{2})\s*€/Monat'
+
+antwort:
+  # Globale der Seite (Fixtures): hwdVariantsPrices = {'product-COSMIC_ORANGE-256':
+  # [4499], …} in setHwdPrices() (ohne var, also window), Cent; Bündel mit Zubehör
+  # haben eigene Schlüssel (…-bundle-…). currentHardwareOfferDuration ist die
+  # Gerätelaufzeit der Seite und das Echo für laufzeit.
+  global: [hwdVariantsPrices, currentHardwareOfferDuration]
+  pfade:
+    buendelbetrag: {pfad: "hwdVariantsPrices.product-{farbe}-{speicher}.0", einheit: cent}
+  variante:
+    laufzeit: currentHardwareOfferDuration
+
+kanarie:
+  # B1 Element 49: aria-label „Speicherauswahl iPhone 17 Pro“; B2 Element 56:
+  # „Speicherauswahl Samsung Galaxy S26“ (Katalog: „Galaxy S26“).
+  selektor: "#hwd-configuration-section label.variant-chooser__tile"
+  attribut: aria-label
+  enthaelt: "{modell}"

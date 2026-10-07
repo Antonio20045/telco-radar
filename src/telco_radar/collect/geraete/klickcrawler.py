@@ -21,10 +21,11 @@ Tageslauf. Je Produktseite und Klick-Karte (``klickkarte``):
    (``klickadressen``), lädt er jede Adresse, die die Startseite zeigt, und klickt dort
    die übrigen Dimensionen. Eine gewählte Option klickt er nicht; eine gesperrte heißt
    erst ``nicht_angeboten``, wenn die Seite ruht (keine Anfrage läuft, zwei gleiche
-   Lesungen). Vor jeder Lesung stellt ``klickbedienung`` die Vorbereitung her. Eine
-   Antwort gehört nur zu dem Klick, nach dem ihre Anfrage hinausging; bleibt eine
-   Anfrage über die Frist offen, heißt die Kombination ``nicht_erfasst``, und vor dem
-   nächsten Klick wie am Ende wartet er sie ab oder bricht den Lauf als gestört ab. Dann
+   Lesungen). Nach dem Öffnen lehnt ``klickbedienung`` eine Einwilligungsabfrage ab
+   und stellt vor jeder Lesung die Vorbereitung her. Eine Antwort gehört nur zu dem
+   Klick, nach dem ihre Anfrage hinausging; bleibt eine Anfrage über die Frist offen,
+   heißt die Kombination ``nicht_erfasst``, und vor dem nächsten Klick wie am Ende
+   wartet er sie ab oder bricht den Lauf als gestört ab. Dann
    liest ``klicklesung`` Antwort, Text, Markierung und Echo und macht einen Screenshot.
 4. Je Kombination: erfasst, nicht_angeboten, nicht_erfasst oder befund; dazu der
    Strukturwächter je Lauf (beides in ``klicklauf``). Ist keine Kombination angeboten,
@@ -291,6 +292,7 @@ class _Gang:
             self.wache.nimm_antwort(marke)
         if not self.karte.je_klick:
             self.wache.warte_ruhe()
+        self.bedienung.lehne_einwilligung_ab()
         self.unberuehrt = not self.bedienung.bereite_vor()
 
     def _angebotene_werte(self, dimension: str) -> list[str | None]:

@@ -9,7 +9,10 @@ kamen, welche €-Texte sich änderten (vorher, nachher) und ob die Wahl sichtba
 übernommen wurde: ``ja``, ``nein`` oder ``unbekannt``, wenn die Gruppe keine Marke der
 Wahl zeigt oder das Element fehlt. Wechselt die Seite, endet die Probe dort. Vorher
 lehnt ``lehne_einwilligung_ab`` eine Einwilligungsabfrage ab, wenn ein Knopf dafür
-sichtbar ist. Jede Probe steht im Protokoll, bevor eine Störung den Lauf beendet.
+sichtbar ist (``einwilligungsknopf``, auch für den Klick-Crawler); gesucht wird nach
+dem zugänglichen Namen, den ein ``aria-label`` stellt (1&1: „Ablehnen“ mit
+``aria-label`` „Cookies ablehnen“). Jede Probe steht im Protokoll, bevor eine Störung
+den Lauf beendet.
 """
 
 from __future__ import annotations
@@ -34,7 +37,7 @@ from .klickspur import Spur, als_daten, ohne_geheimnisse
 from .klicktor import kurz
 
 if TYPE_CHECKING:
-    from playwright.sync_api import Page
+    from playwright.sync_api import Locator, Page
 
 HOECHSTE_KLICKS_JE_GRUPPE = 2
 HOECHSTE_GRUPPEN_JE_ART = 2
@@ -46,7 +49,8 @@ AKTIONSWORT = re.compile(
     r"warenkorb|bestell|kaufen|weiter\b|anmeld|login|abschlie|zur kasse", re.I
 )
 EINWILLIGUNG_AB = re.compile(
-    r"^\s*(?:alle\s+)?ablehnen|nur\s+(?:notwendige|erforderliche)|weiter\s+ohne"
+    r"^\s*(?:alle\s+)?(?:cookies\s+)?ablehnen|nur\s+(?:notwendige|erforderliche)"
+    r"|weiter\s+ohne"
     r"|verweigern|^\s*reject",
     re.I,
 )
@@ -68,24 +72,31 @@ class Gang(Protocol):
         """Ziel einer Umleitung der Hauptseite, sonst ``None``."""
 
 
-def lehne_einwilligung_ab(gang: Gang) -> dict:
-    """Klickt den ersten sichtbaren Ablehnen-Knopf einer Einwilligungsabfrage."""
-    knoepfe = gang.seite.get_by_role("button", name=EINWILLIGUNG_AB)
+def einwilligungsknopf(seite: Page) -> Locator | None:
+    """Der erste sichtbare Ablehnen-Knopf einer Einwilligungsabfrage, sonst ``None``."""
+    knoepfe = seite.get_by_role("button", name=EINWILLIGUNG_AB)
     for stelle in range(min(knoepfe.count(), HOECHSTE_EINWILLIGUNGSKNOEPFE)):
         knopf = knoepfe.nth(stelle)
-        if not knopf.is_visible():
-            continue
-        text = knopf.inner_text().strip()
-        marke = gang.spur.marke()
-        try:
-            knopf.click(timeout=KLICK_FRIST_MS)
-        except PlaywrightFehler as fehler:
-            return {"geklickt": None, "text": text, "fehler": kurz(fehler)}
-        gang.pruefe()
-        ruhe = gang.ruhe()
-        anfragen = als_daten(gang.spur.seit(marke))
-        return {"geklickt": text, "ruhe": ruhe, "anfragen": anfragen}
-    return {"geklickt": None, "grund": "kein Ablehnen-Knopf sichtbar"}
+        if knopf.is_visible():
+            return knopf
+    return None
+
+
+def lehne_einwilligung_ab(gang: Gang) -> dict:
+    """Klickt den ersten sichtbaren Ablehnen-Knopf einer Einwilligungsabfrage."""
+    knopf = einwilligungsknopf(gang.seite)
+    if knopf is None:
+        return {"geklickt": None, "grund": "kein Ablehnen-Knopf sichtbar"}
+    text = knopf.inner_text().strip()
+    marke = gang.spur.marke()
+    try:
+        knopf.click(timeout=KLICK_FRIST_MS)
+    except PlaywrightFehler as fehler:
+        return {"geklickt": None, "text": text, "fehler": kurz(fehler)}
+    gang.pruefe()
+    ruhe = gang.ruhe()
+    anfragen = als_daten(gang.spur.seit(marke))
+    return {"geklickt": text, "ruhe": ruhe, "anfragen": anfragen}
 
 
 def probiere(gang: Gang, inventar: Inventar, protokoll: list[dict]) -> None:

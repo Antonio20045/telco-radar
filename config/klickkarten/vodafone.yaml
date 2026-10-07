@@ -1,0 +1,88 @@
+# Klick-Karte Vodafone (Format 2) für die Produktseite, Kartenprobe in Actions.
+# Fundstellen: Zweig klick-erkundung, Lauf a9b45f5a, erkundung/vodafone/2026-10-07/
+# (B1 = bedienelemente-1.json, iPhone 17 Pro; B2 = bedienelemente-2.json, Galaxy S26;
+# P1 = preise-1.json, K1 = klicks-1.json, M1 = mitschnitt-1.json, A = Anfragenummer).
+#
+# Die Produktseite wählt Speicher und Ratenlaufzeit; den Tarif wählt man erst auf der
+# Folgeseite „Zur Tarifauswahl“ (B1 Element 267, B2 Element 230). Die Gerätepreise der
+# Produktseite gelten für jeden Tarif, der Tarif bleibt darum „unbekannt“.
+# Bewusst nicht gelesen (Lücke): Tarifphasen, Tarifbindung, Anschluss, Volumen. Sie
+# stehen nur auf der Tarifauswahl (mitschnitt-3 A337, mitschnitt-4 A324:
+# glados/v2/tariff/v2/hardware; je Tarif Monate 1–24 mit und ohne Rabatt, Anschluss
+# 0 € „statt 39,99 €“, die Gerätelaufzeit aus der Produktseite, ab Monat 25 nur die
+# Rate). Format 2 kann diesen zweiten Schritt nicht: die Tarifauswahl hat für jede
+# Variante dieselbe Adresse, die Gerätewahl reist im Browserzustand mit.
+anbieter: Vodafone
+
+knoepfe:
+  speicher:
+    # B1 Elemente 46/48/50, B2 48/50: Labels „256 GB 1 € einmal“, „512 GB 0,99 €
+    # einmal“, „1 TB 1 € einmal“; K1 Proben 1 und 2: Label-Klick, Marke danach
+    # label-checked, übernommen ja.
+    selektor: "#device-details-option-picker-capacity label.ws10-option-picker__label"
+    muster: '^\s*(\d+\s*[GT]B)\b'
+  tarif:
+    fest: unbekannt
+  laufzeit:
+    # B1 Elemente 51–58, B2 51–58: 36/24/12 Raten; „Einmal“ (Input value 1,
+    # Element 57) ist kein Ratenkauf und fällt weg.
+    selektor: >-
+      #device-details-option-picker-financing-duration
+      div:not(:has(input[value="1"])) > label.ws10-option-picker__label
+    muster: '^\s*(\d+)\s*Raten'
+  # Gruppen 30–36 in B1: Option = div mit input und label; gewählt heißt der Input
+  # darin ist checked (B1 45/51 checked, 46/52 label-checked). Die Klasse „checked“
+  # am Label fehlt auf B2 (Elemente 42, 48, 52) und taugt nicht als Marke.
+  gewaehlt: {passt: "div:has(input:checked) > label"}
+
+seite:
+  # Echo „Seite zeigt“: das Label mit dem gewählten Input.
+  speicher:
+    selektor: >-
+      #device-details-option-picker-capacity
+      div:has(input:checked) > label.ws10-option-picker__label
+    muster: '^\s*(\d+\s*[GT]B)\b'
+  laufzeit:
+    selektor: >-
+      #device-details-option-picker-financing-duration
+      div:has(input:checked) > label.ws10-option-picker__label
+    muster: '^\s*(\d+)\s*Raten'
+  # B1 Element 39, B2 Element 41: name option-picker-color, value „Cosmic Orange“
+  # bzw. „Cobalt Violet“; gleich atomics.color.displayLabel in M1 A149.
+  farbe: {selektor: 'input[name="option-picker-color"]:checked', attribut: value}
+
+zusammenfassung:
+  # P1 Kandidaten 11–15: „1 € einmal“, „33 € pro Monat“, „9,98 €“ (Versand); K1
+  # Probe 1: die Tabelle folgt dem Klick (1 € → 0,99 €, 33 € → 40 €).
+  selektor: "#ws10-offer-summary-card-price-table"
+  muster:
+    anzahlung: '([\d.,]+)\s*€\s*einmal'
+    rate: '([\d.,]+)\s*€\s*pro\s+Monat'
+    ratenzahl:
+      selektor: >-
+        #device-details-option-picker-financing-duration
+        div:has(input:checked) > label.ws10-option-picker__label
+      muster: '^\s*(\d+)\s*Raten'
+
+antwort:
+  # M1 A149 (xhr) und A209 (fetch), mitschnitt-2 A119/A187 (virtualItem/253):
+  # einmal beim Laden, kein Klick fragt nach (K1: nur Bilder). 7 atomics je
+  # Speicher und Farbe, je 3 compositions (financingDuration 12/36/24).
+  url_muster: '^https://api\.vodafone\.de/glados/v2/hardware/v2/virtualItem/\d+\?'
+  laden: true
+  erkennung: data.atomics
+  pfade:
+    anzahlung: >-
+      data.atomics[capacity.displayLabel={speicher}][color.displayLabel={farbe}].prices.composition[financingDuration={laufzeit}].priceByComponent.hardware.priceByType.rate.onetime.withoutDiscounts.gross
+    rate: >-
+      data.atomics[capacity.displayLabel={speicher}][color.displayLabel={farbe}].prices.composition[financingDuration={laufzeit}].priceByComponent.hardware.priceByType.rate.month.withoutDiscounts.gross
+    # Monat, in dem die letzte Rate fällig ist (12/24/36), nicht der Filterwert.
+    ratenzahl: >-
+      data.atomics[capacity.displayLabel={speicher}][color.displayLabel={farbe}].prices.composition[financingDuration={laufzeit}].priceByComponent.hardware.priceByType.rate.month.withoutDiscounts.recurrenceEnd
+
+kanarie:
+  # B1 Element 267: aria-label „Zur Tarifauswahl mit dem iPhone 17 Pro“; B2 230:
+  # „… mit dem Samsung Galaxy S26“ (Katalog: „Galaxy S26“).
+  selektor: '#device-details-offer-summary-card a[aria-label^="Zur Tarifauswahl"]'
+  attribut: aria-label
+  enthaelt: "{modell}"

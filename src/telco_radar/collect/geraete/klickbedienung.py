@@ -1,8 +1,12 @@
-"""Bedienung neben den Knöpfen: Kanarienwert und Vorbereitung vor jeder Lesung.
+"""Bedienung neben den Knöpfen: Kanarienwert, Einwilligung und Vorbereitung.
 
 Der Klick-Crawler (``klickcrawler``) prüft nach dem Öffnen den Kanarienwert der Karte:
 Text oder Attribut am ersten Treffer, ``{modell}`` steht für den Modellnamen aus dem
-Katalog. Fehlt er oder der Modellname, ist der Abruf gestört. Vor jeder Lesung stellt
+Katalog. Fehlt er oder der Modellname, ist der Abruf gestört. Dann lehnt
+``lehne_einwilligung_ab`` eine sichtbare Einwilligungsabfrage ab wie die Erkundung
+(``klickproben.einwilligungsknopf``); hinter ihr nimmt die Seite keinen Klick an (1&1,
+Erkundung 07.10.2026). Ein anderer Knopf der Abfrage wird nie geklickt; lässt sich der
+Ablehnen-Knopf nicht klicken, ist der Lauf gestört. Vor jeder Lesung stellt
 ``bereite_vor`` die Zustände der Karte her (``klickkarte.Vorbereitung``): passt das
 geprüfte Element nicht auf ``bis``, klickt sie ``klick`` und wartet in Takten der Wache
 darauf; fehlt das Element, lässt es sich nicht klicken oder kommt der Zustand nicht, ist
@@ -18,6 +22,7 @@ from playwright.sync_api import Error as PlaywrightFehler
 
 from .klickkarte import PLATZHALTER_MODELL, Kanarie, Klickkarte, Vorbereitung
 from .klicklauf import LAUF_GESTOERT
+from .klickproben import einwilligungsknopf
 from .klicktor import kurz
 from .klickwache import Abbruch, Wache
 
@@ -66,6 +71,22 @@ class Bedienung:
                 stelle = f"{stelle} [{kanarie.attribut}]"
             grund = f"Kanarienwert fehlt: {stelle} ohne „{erwartet}“"
             raise Abbruch(LAUF_GESTOERT, grund)
+
+    def lehne_einwilligung_ab(self) -> None:
+        """Klickt den sichtbaren Ablehnen-Knopf einer Einwilligungsabfrage; ohne ihn
+        nichts. Danach wartet sie auf Ruhe."""
+        knopf = einwilligungsknopf(self.seite)
+        if knopf is None:
+            return
+        self.wache.warte_offen()
+        marke = self.wache.marke()
+        try:
+            knopf.click(timeout=self.wache.frist_ms)
+        except PlaywrightFehler as fehler:
+            grund = f"Einwilligung nicht abgelehnt: {kurz(fehler)}"
+            raise Abbruch(LAUF_GESTOERT, grund) from fehler
+        self.wache.nimm_angefragte(marke)
+        self.wache.warte_ruhe()
 
     def bereite_vor(self) -> bool:
         """Stellt jeden Zustand der Karte her; wahr, wenn dafür geklickt wurde."""

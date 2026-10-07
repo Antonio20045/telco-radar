@@ -723,6 +723,19 @@
       "gzip": false,
       "bytes_abgelegt": 9837,
       "hinweis": "AUSZUG, nicht byteidentisch: die genannten Eintraege des Inventars mit unveraenderten Werten, Schluessel = Nummer im Original. Beleg fuer die Selektoren und Textmuster der Klick-Karte config/klickkarten/telekom.yaml."
+    },
+    {
+      "datei": "vodafone_virtualitem_iphone_17_pro_20261007.json.gz",
+      "url": "https://api.vodafone.de/glados/v2/hardware/v2/virtualItem/226?businessTransaction=newContract&salesChannel=Online.Consumer&financingType=rate",
+      "quelle": "Zweig klick-erkundung, Commit a9b45f5a, erkundung/vodafone/2026-10-07/mitschnitt-1.json, Antwort 149 (xhr; Antwort 209 als fetch mit gleichem Körper; Klick-Erkundung 07.10.2026, Produktseite iPhone 17 Pro)",
+      "abgerufen_am": "2026-10-07",
+      "http_status": 200,
+      "content_type": "application/json;charset=utf-8",
+      "bytes_roh": 103931,
+      "sha256_roh": "0a1ce336548583ce0670f0d37b3d7226c38f846902bc1ce8816c91a39bfc82a4",
+      "gzip": true,
+      "bytes_abgelegt": 7053,
+      "hinweis": "Körper der Antwort unverändert (gekuerzt=false im Mitschnitt), nur gzip-verpackt. Beleg für die Pfade der Klick-Karte config/klickkarten/vodafone.yaml."
     }
   ]
 }
