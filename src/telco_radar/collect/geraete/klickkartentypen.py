@@ -59,8 +59,10 @@ EINHEITEN = (EINHEIT_CENT, EINHEIT_MB)
 GRUND_DIMENSION = "keine Dimension"
 GRUND_KACHEL_KNOPF = "Kacheln brauchen selektor, nicht fest oder adressen"
 GRUND_KACHEL_MARKE = "Kacheln werden nie geklickt und tragen keine Marke"
-GRUND_KACHEL_BEREICH = "erster Bereich muss der Selektor der Kacheln sein"
+GRUND_KACHEL_BEREICH = "einziger Bereich muss der Selektor der Kacheln sein"
+GRUND_KACHEL_MUSTER = "Textmuster lesen in der Kachel, ohne eigenen selektor"
 GRUND_WEITER_ADRESSEN = "weiter schließt adressen aus"
+GRUND_WEITER_KLICK = "weiter erlaubt keinen zweiten Klick (oeffnen, schliessen)"
 
 
 class KlickkartenFehler(ValueError):

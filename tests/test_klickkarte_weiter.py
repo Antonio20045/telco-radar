@@ -3,7 +3,9 @@
 1&1 zeigt die Laufzeit erst nach „Weiter zur Tarifauswahl“ als Kacheln (Erkundung
 07.10.2026, Commit c8ce1f77, Seiten 3/4); „24+12“ zählt als 36 Monate. Die Karten
 hier sind Beispiele. Gegenproben: jede Form, die der Weiter-Schritt nicht lesen kann,
-lehnt der Lader mit Feld und Grund ab.
+lehnt der Lader mit Feld und Grund ab, auch einen zweiten Klick auf der Folgeseite
+(``oeffnen``, ``schliessen``) und Textmuster mit eigenem Selektor, die sonst für jede
+Kachel den ersten Treffer läsen (Prüferbefunde zu 6b9c3dd0).
 """
 
 from __future__ import annotations
@@ -23,11 +25,14 @@ from telco_radar.collect.geraete.klickkartentypen import (
     GRUND_KACHEL_BEREICH,
     GRUND_KACHEL_KNOPF,
     GRUND_KACHEL_MARKE,
+    GRUND_KACHEL_MUSTER,
     GRUND_WEITER_ADRESSEN,
+    GRUND_WEITER_KLICK,
 )
 
 KACHEL = "#kacheln > div.kachel"
 MARKE = {"passt": ".aktiv"}
+EIGENES_MUSTER = {"selektor": "#rate", "muster": r"(\d+,\d{2})"}
 BASIS = {
     "anbieter": "Beispielanbieter",
     "knoepfe": {
@@ -114,12 +119,42 @@ def test_gegenprobe_ohne_weiter_braucht_die_laufzeit_eine_marke():
             GRUND_KACHEL_BEREICH,
         ),
         (
+            {"zusammenfassung__selektor": [KACHEL, "#preis"]},
+            "zusammenfassung.selektor",
+            GRUND_KACHEL_BEREICH,
+        ),
+        (
             {"knoepfe__tarif": {"adressen": {"selektor": "a", "parameter": "t"}}},
             "weiter",
             GRUND_WEITER_ADRESSEN,
         ),
+        (
+            {"zusammenfassung__oeffnen": "#mehr"},
+            "zusammenfassung.oeffnen",
+            GRUND_WEITER_KLICK,
+        ),
+        (
+            {"zusammenfassung__schliessen": "#zu"},
+            "zusammenfassung.schliessen",
+            GRUND_WEITER_KLICK,
+        ),
+        (
+            {"zusammenfassung__muster": {"rate": EIGENES_MUSTER}},
+            "zusammenfassung.muster.rate",
+            GRUND_KACHEL_MUSTER,
+        ),
     ],
-    ids=["dimension", "fest", "marke", "bereich", "adressen"],
+    ids=[
+        "dimension",
+        "fest",
+        "marke",
+        "bereich",
+        "zweiter-bereich",
+        "adressen",
+        "oeffnen",
+        "schliessen",
+        "muster-selektor",
+    ],
 )
 def test_gegenprobe_ungueltiger_weiter_schritt(teile, feld, grund):
     assert _fehler(**teile) == (feld, grund)
@@ -142,3 +177,10 @@ def test_gegenprobe_weiter_ohne_text():
 )
 def test_monate_mit_summe(roh, erwartet):
     assert monate(roh) == erwartet
+
+
+def test_textmuster_ohne_eigenen_selektor_liest_in_der_kachel():
+    karte = _lade(zusammenfassung__muster={"rate": EIGENES_MUSTER["muster"]})
+
+    assert karte.textlesung.muster["rate"].selektor is None
+    assert karte.textlesung.selektoren == (KACHEL,)

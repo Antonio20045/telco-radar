@@ -23,6 +23,7 @@ from .klickkartentypen import (
     GRUND_KACHEL_BEREICH,
     GRUND_KACHEL_KNOPF,
     GRUND_KACHEL_MARKE,
+    GRUND_KACHEL_MUSTER,
     GRUND_KEIN_TEXT,
     GRUND_KEINE_LISTE,
     GRUND_KEINE_ZUORDNUNG,
@@ -31,6 +32,7 @@ from .klickkartentypen import (
     GRUND_PLATZHALTER,
     GRUND_UNBEKANNT,
     GRUND_WEITER_ADRESSEN,
+    GRUND_WEITER_KLICK,
     PLATZHALTER_MODELL,
     Adressen,
     Auswahlmarke,
@@ -232,8 +234,15 @@ class Kartenleser:
             raise self.fehler(ort, GRUND_KACHEL_KNOPF)
         if knopf.marke is not None:
             raise self.fehler(f"{ort}.{GEWAEHLT}", GRUND_KACHEL_MARKE)
-        if textlesung.selektoren[0] != knopf.selektor:
+        if textlesung.selektoren != (knopf.selektor,):
             raise self.fehler("zusammenfassung.selektor", GRUND_KACHEL_BEREICH)
+        klicks = [n for n in ("oeffnen", "schliessen") if getattr(textlesung, n)]
+        if klicks:
+            raise self.fehler(f"zusammenfassung.{klicks[0]}", GRUND_WEITER_KLICK)
+        eigene = [f for f, m in textlesung.muster.items() if m.selektor is not None]
+        if eigene:
+            ort = f"zusammenfassung.muster.{eigene[0]}"
+            raise self.fehler(ort, GRUND_KACHEL_MUSTER)
         return Weiterschritt(
             selektor=self.text(daten, "selektor", feld),
             text=self.text(daten, "text", feld),

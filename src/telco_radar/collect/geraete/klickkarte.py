@@ -122,9 +122,10 @@ Stufe 4 von Format 2 (1&1, Erkundung 07.10.2026, Commit c8ce1f77, Seiten 3 und 4
   übrigen Dimensionen wählt der Crawler sie auf der Startseite, liest dort Seitenwerte
   und zweite Lesung, klickt den einen Weiter-Knopf und liest auf der Folgeseite jede
   Kachel: ``knoepfe.<kacheln>`` trifft die Kacheln (Wert wie bei Knöpfen, keine Marke,
-  nie geklickt), die Zusammenfassung ist die Kachel selbst (erster Bereich gleich dem
-  Selektor der Kacheln). Jede weitere Kombination beginnt in einem frischen Kontext;
-  die Regeln stehen in ``klickweiter``. Schließt ``adressen`` aus.
+  nie geklickt), die Zusammenfassung ist die Kachel selbst (einziger Bereich gleich
+  dem Selektor der Kacheln, Textmuster ohne eigenen Selektor). Jede weitere
+  Kombination beginnt in einem frischen Kontext; die Regeln stehen in ``klickweiter``.
+  Schließt ``adressen`` und jeden zweiten Klick (``oeffnen``, ``schliessen``) aus.
 
 Selektoren der Klickziele sind Playwright-Selektoren (``:text-matches`` und
 ``:has-text`` gehen); ``passt``, ``bis`` und ``wert_in`` sind reines CSS.
