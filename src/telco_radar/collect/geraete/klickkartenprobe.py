@@ -168,6 +168,7 @@ def probiere(
         frist=mittel.schleuse.offen,
         beobachter=beobachter,
         cookies=cookies,
+        modell=seite.modell,
     )
     log.info("Kartenprobe %s %s: %s", ziel.schluessel, seite.adresse, lauf.status)
     kekse = frozenset(cookies)

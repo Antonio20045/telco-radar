@@ -46,12 +46,16 @@ class Weiter:
 
 @dataclass(frozen=True)
 class Seitenziel:
-    """Eine Produktseite: Gerät aus dem Katalog, Speicherstufe, Adresse, Weiter."""
+    """Eine Produktseite: Gerät aus dem Katalog, Speicherstufe, Adresse, Weiter, Modell.
+
+    ``modell`` ist der Modellname aus dem Katalog für ``{modell}`` im Kanarienwert.
+    """
 
     geraet: str
     speicher_gb: int | None
     adresse: str
     weiter: Weiter | None = None
+    modell: str | None = None
 
 
 @dataclass(frozen=True)
@@ -148,7 +152,8 @@ def _seite(roh: object, ort: str, katalog: Katalog, basis_url: str) -> Seitenzie
     if host_von(adresse) != host_von(basis_url):
         grund = f"Host {host_von(adresse)} ist nicht {host_von(basis_url)}"
         raise ErkundungszielFehler(f"{ort}: {grund}")
-    return Seitenziel(geraet_id, speicher, adresse, _weiter(roh.get("weiter"), ort))
+    weiter = _weiter(roh.get("weiter"), ort)
+    return Seitenziel(geraet_id, speicher, adresse, weiter, geraet.modell)
 
 
 def _weiter(roh: object, ort: str) -> Weiter | None:

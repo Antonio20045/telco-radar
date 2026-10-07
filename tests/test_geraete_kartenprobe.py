@@ -86,8 +86,11 @@ def _beispiel(seite: str):
     return antworte
 
 
-def _ziel(server, *pfade: str) -> Erkundungsziel:
-    seiten = tuple(Seitenziel("beispielhandy-x", 256, server.adresse(p)) for p in pfade)
+def _ziel(server, *pfade: str, modell: str | None = None) -> Erkundungsziel:
+    seiten = tuple(
+        Seitenziel("beispielhandy-x", 256, server.adresse(p), modell=modell)
+        for p in pfade
+    )
     return Erkundungsziel("beispiel", "Beispielanbieter", seiten, KENNUNG, 0.0)
 
 
@@ -267,3 +270,21 @@ def test_bot_schutz_in_der_probe_beendet_den_anbieter(chromium, tmp_path):
         "karte": KARTE,
         "grund": GRUND_NACH_BOT,
     }
+
+
+def test_kanarienwert_mit_modellname_kommt_aus_dem_ziel(chromium, tmp_path):
+    karte = (FIXTURES / "beispiel_karte.yaml").read_text("utf-8")
+    assert "  enthaelt: Beispielhandy X\n" in karte
+    karte = karte.replace("  enthaelt: Beispielhandy X\n", '  enthaelt: "{modell}"\n')
+    ergebnisse = {}
+    for modell in ("Beispielhandy X", None):
+        aus = tmp_path / str(modell)
+        aus.mkdir()
+        with klickserver(_beispiel(_seite())) as server:
+            ziel = _ziel(server, "/handy/x", modell=modell)
+            index = _erkunde(chromium, ziel, aus, _karten(aus, karte))
+        ergebnisse[modell] = index["seiten"][0]["karte"]
+
+    assert ergebnisse["Beispielhandy X"]["laufstatus"] == "gelesen"
+    assert ergebnisse[None]["laufstatus"] == "gestoert"
+    assert "Modellnamen" in ergebnisse[None]["grund"]

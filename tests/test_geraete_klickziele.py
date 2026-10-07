@@ -63,6 +63,7 @@ def test_ausgelieferte_ziele_loesen_sich_gegen_quellen_und_katalog(wurzel):
     assert [z.schluessel for z in ziele] == ANBIETER
     assert all(z.seiten[0].geraet == "apple-iphone-17-pro" for z in ziele)
     assert all(z.seiten[0].speicher_gb == 256 for z in ziele)
+    assert all(z.seiten[0].modell == "iPhone 17 Pro" for z in ziele)
     assert all(len(z.seiten) == 2 for z in ziele)
     assert all(s.adresse.startswith("https://") for z in ziele for s in z.seiten)
     kennungen = {z.schluessel: z.kennung for z in ziele}
