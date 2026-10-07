@@ -2,8 +2,8 @@
  "updated": "2026-10-07",
  "anbieter": {
   "ALDI TALK": {
-   "laeufe": 54,
-   "funde_gesamt": 241,
+   "laeufe": 55,
+   "funde_gesamt": 246,
    "letzter_lauf": "2026-10-07",
    "letzte_funde": 5,
    "letzter_fund": "2026-10-07",
@@ -189,8 +189,8 @@
    "tote_adressen": 0
   },
   "Vodafone": {
-   "laeufe": 52,
-   "funde_gesamt": 8834,
+   "laeufe": 53,
+   "funde_gesamt": 9017,
    "letzter_lauf": "2026-10-07",
    "letzte_funde": 183,
    "termine": [
@@ -376,8 +376,8 @@
    "tote_adressen": 0
   },
   "o2": {
-   "laeufe": 52,
-   "funde_gesamt": 3494,
+   "laeufe": 53,
+   "funde_gesamt": 3563,
    "letzter_lauf": "2026-10-07",
    "letzte_funde": 69,
    "termine": [
@@ -555,7 +555,7 @@
      "2026-10-07",
      69,
      "gelesen",
-     1974,
+     1997,
      0,
      null
     ]
@@ -563,9 +563,9 @@
    "tote_adressen": null
   },
   "mobilcom-debitel": {
-   "laeufe": 5,
-   "funde_gesamt": 5978,
-   "letzte_funde": 73,
+   "laeufe": 6,
+   "funde_gesamt": 6113,
+   "letzte_funde": 135,
    "termine": [
     "2026-08-29",
     "2026-08-30",
@@ -739,15 +739,15 @@
     ],
     [
      "2026-10-07",
-     73,
-     "lesefehler",
+     135,
+     "gelesen",
      0,
-     22,
-     4
+     45,
+     11
     ]
    ],
-   "letzter_lauf": "2026-09-29",
-   "tote_adressen": 4
+   "letzter_lauf": "2026-10-07",
+   "tote_adressen": 11
   },
   "ElectronicPartner": {
    "laeufe": 1,
@@ -1047,8 +1047,8 @@
    "tote_adressen": 0
   },
   "congstar": {
-   "laeufe": 30,
-   "funde_gesamt": 6174,
+   "laeufe": 31,
+   "funde_gesamt": 6327,
    "letzter_lauf": "2026-10-07",
    "letzte_funde": 153,
    "termine": [
@@ -1220,7 +1220,7 @@
      "2026-10-07",
      153,
      "gelesen",
-     944,
+     942,
      44,
      0
     ]
@@ -1228,8 +1228,8 @@
    "tote_adressen": 0
   },
   "1&1": {
-   "laeufe": 44,
-   "funde_gesamt": 1578,
+   "laeufe": 45,
+   "funde_gesamt": 1614,
    "letzter_lauf": "2026-10-07",
    "letzte_funde": 36,
    "termine": [
@@ -1546,10 +1546,10 @@
    "tote_adressen": null
   },
   "Saturn": {
-   "laeufe": 40,
-   "funde_gesamt": 781,
+   "laeufe": 41,
+   "funde_gesamt": 804,
    "letzter_lauf": "2026-10-07",
-   "letzte_funde": 16,
+   "letzte_funde": 23,
    "termine": [
     "2026-09-05",
     "2026-09-06",
@@ -1716,7 +1716,7 @@
     ],
     [
      "2026-10-07",
-     16,
+     23,
      "gelesen",
      0,
      0,
@@ -5924,23 +5924,22 @@
    "ean": "",
    "zustand": "neu",
    "first_seen": "2026-09-05",
-   "status": "vermutlich ausgelistet",
-   "missed_checks": 1,
+   "status": "aktiv",
+   "missed_checks": 0,
    "erstpreis": 699.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-05",
-   "last_verified": "2026-10-06",
+   "last_verified": "2026-10-07",
    "letzter_check": "2026-10-07",
    "quelle_url": "https://www.saturn.de/de/product/_apple-iphone-17e-256-gb-hellrosa-dual-sim-3040153.html",
-   "abgerufen_am": "2026-10-06",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "unbekannt",
    "confidence": "hoch",
    "einstiege": [
     "https://www.saturn.de/de/brand/apple/iphone/iphone-17e"
    ],
    "titel_roh": "APPLE iPhone 17e 256 GB Hellrosa Dual SIM",
-   "preis_ohne_vertrag": 839.99,
-   "stale_since": "2026-10-07"
+   "preis_ohne_vertrag": 839.99
   },
   {
    "id": "saturn--apple-iphone-17e-256gb-schwarz",
@@ -6204,24 +6203,23 @@
    "ean": "",
    "zustand": "neu",
    "first_seen": "2026-09-05",
-   "status": "ausgelistet",
-   "missed_checks": 2,
+   "status": "aktiv",
+   "missed_checks": 0,
    "erstpreis": 909.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-05",
-   "last_verified": "2026-09-27",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.saturn.de/de/product/_apple-iphone-air-5g-256-gb-lichtgold-dual-sim-3013608.html",
-   "abgerufen_am": "2026-09-27",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "unbekannt",
    "confidence": "hoch",
    "einstiege": [
     "https://www.saturn.de/de/brand/apple/iphone/iphone-air"
    ],
    "titel_roh": "APPLE iPhone Air 5G 256 GB Lichtgold",
-   "preis_ohne_vertrag": 909.0,
-   "ended_since": "2026-09-29",
-   "stale_since": "2026-09-28"
+   "preis_ohne_vertrag": 929.0,
+   "ended_since": "2026-09-29"
   },
   {
    "id": "saturn--apple-iphone-air-256gb-space-schwarz",
@@ -6236,23 +6234,22 @@
    "ean": "",
    "zustand": "neu",
    "first_seen": "2026-09-12",
-   "status": "ausgelistet",
-   "missed_checks": 2,
+   "status": "aktiv",
+   "missed_checks": 0,
    "erstpreis": 909.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-12",
-   "last_verified": "2026-09-27",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.saturn.de/de/product/_apple-iphone-air-5g-256-gb-space-schwarz-dual-sim-3013606.html",
-   "abgerufen_am": "2026-09-27",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "unbekannt",
    "confidence": "hoch",
    "einstiege": [
     "https://www.saturn.de/de/brand/apple/iphone/iphone-air"
    ],
    "titel_roh": "APPLE iPhone Air 5G 256 GB Space Schwarz",
-   "preis_ohne_vertrag": 909.0,
-   "stale_since": "2026-09-28",
+   "preis_ohne_vertrag": 929.0,
    "ended_since": "2026-09-29"
   },
   {
@@ -6283,7 +6280,7 @@
     "https://www.saturn.de/de/brand/apple/iphone/iphone-air"
    ],
    "titel_roh": "APPLE iPhone Air 5G 256 GB Wolkenweiß",
-   "preis_ohne_vertrag": 1219.0
+   "preis_ohne_vertrag": 929.0
   },
   {
    "id": "saturn--apple-iphone-air-512gb-himmelblau",
@@ -21353,10 +21350,10 @@
    "erstpreis": 429.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-29",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/samsung/samsung-galaxy-a37-5g-ohne-vertrag/p/P-M-4511848?ds=P-4635130",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -21383,10 +21380,10 @@
    "erstpreis": 429.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-29",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/samsung/samsung-galaxy-a37-5g-ohne-vertrag/p/P-M-4511848?ds=P-4635124",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -21413,10 +21410,10 @@
    "erstpreis": 429.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-29",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/samsung/samsung-galaxy-a37-5g-ohne-vertrag/p/P-M-4511848?ds=P-4635127",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -21443,10 +21440,10 @@
    "erstpreis": 429.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-29",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/samsung/samsung-galaxy-a37-5g-ohne-vertrag/p/P-M-4511848?ds=P-4635133",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -21473,10 +21470,10 @@
    "erstpreis": 519.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-29",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/samsung/samsung-galaxy-a37-5g-ohne-vertrag/p/P-M-4511848?ds=P-4635142",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -21503,10 +21500,10 @@
    "erstpreis": 519.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-29",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/samsung/samsung-galaxy-a37-5g-ohne-vertrag/p/P-M-4511848?ds=P-4635136",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -21533,10 +21530,10 @@
    "erstpreis": 519.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-29",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/samsung/samsung-galaxy-a37-5g-ohne-vertrag/p/P-M-4511848?ds=P-4635139",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -21563,10 +21560,10 @@
    "erstpreis": 519.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-29",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/samsung/samsung-galaxy-a37-5g-ohne-vertrag/p/P-M-4511848?ds=P-4635145",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -21593,10 +21590,10 @@
    "erstpreis": 529.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-29",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/samsung/samsung-galaxy-a57-5g-ohne-vertrag/p/P-M-4511851?ds=P-4635154",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -21623,10 +21620,10 @@
    "erstpreis": 529.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-29",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/samsung/samsung-galaxy-a57-5g-ohne-vertrag/p/P-M-4511851?ds=P-4635151",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -21653,10 +21650,10 @@
    "erstpreis": 529.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-29",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/samsung/samsung-galaxy-a57-5g-ohne-vertrag/p/P-M-4511851?ds=P-4635157",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -21683,10 +21680,10 @@
    "erstpreis": 529.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-29",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/samsung/samsung-galaxy-a57-5g-ohne-vertrag/p/P-M-4511851?ds=P-4635148",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -21713,10 +21710,10 @@
    "erstpreis": 589.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-29",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/samsung/samsung-galaxy-a57-5g-ohne-vertrag/p/P-M-4511851?ds=P-4635169",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -21743,10 +21740,10 @@
    "erstpreis": 589.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-29",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/samsung/samsung-galaxy-a57-5g-ohne-vertrag/p/P-M-4511851?ds=P-4635166",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -21773,10 +21770,10 @@
    "erstpreis": 589.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-29",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/samsung/samsung-galaxy-a57-5g-ohne-vertrag/p/P-M-4511851?ds=P-4635172",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -21803,10 +21800,10 @@
    "erstpreis": 589.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-29",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/samsung/samsung-galaxy-a57-5g-ohne-vertrag/p/P-M-4511851?ds=P-4635163",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -22121,17 +22118,17 @@
    "erstpreis": 999.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-10",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/samsung/samsung-galaxy-s26-ohne-vertrag/p/P-M-4466891?ds=P-4587260",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
     "https://www.freenet.de/sitemap.xml"
    ],
    "titel_roh": "Samsung Galaxy S26 256 GB Cobalt Violet",
-   "preis_ohne_vertrag": 999.0
+   "preis_ohne_vertrag": 1099.0
   },
   {
    "id": "mobilcom-debitel--samsung-galaxy-s26-256gb-schwarz",
@@ -22151,17 +22148,17 @@
    "erstpreis": 999.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-10",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/samsung/samsung-galaxy-s26-ohne-vertrag/p/P-M-4466891?ds=P-4587257",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
     "https://www.freenet.de/sitemap.xml"
    ],
    "titel_roh": "Samsung Galaxy S26 256 GB Black",
-   "preis_ohne_vertrag": 999.0
+   "preis_ohne_vertrag": 1099.0
   },
   {
    "id": "mobilcom-debitel--samsung-galaxy-s26-256gb-sky-blue",
@@ -22181,17 +22178,17 @@
    "erstpreis": 999.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-10",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/samsung/samsung-galaxy-s26-ohne-vertrag/p/P-M-4466891?ds=P-4587227",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
     "https://www.freenet.de/sitemap.xml"
    ],
    "titel_roh": "Samsung Galaxy S26 256 GB Sky Blue",
-   "preis_ohne_vertrag": 999.0
+   "preis_ohne_vertrag": 1099.0
   },
   {
    "id": "mobilcom-debitel--samsung-galaxy-s26-256gb-weiss",
@@ -22211,17 +22208,17 @@
    "erstpreis": 999.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-10",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/samsung/samsung-galaxy-s26-ohne-vertrag/p/P-M-4466891?ds=P-4587263",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
     "https://www.freenet.de/sitemap.xml"
    ],
    "titel_roh": "Samsung Galaxy S26 256 GB White",
-   "preis_ohne_vertrag": 999.0
+   "preis_ohne_vertrag": 1099.0
   },
   {
    "id": "mobilcom-debitel--samsung-galaxy-s26-512gb-cobalt-violet",
@@ -22241,17 +22238,17 @@
    "erstpreis": 1199.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-10",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/samsung/samsung-galaxy-s26-ohne-vertrag/p/P-M-4466891?ds=P-4587272",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
     "https://www.freenet.de/sitemap.xml"
    ],
    "titel_roh": "Samsung Galaxy S26 512 GB Cobalt Violet",
-   "preis_ohne_vertrag": 1199.0
+   "preis_ohne_vertrag": 1299.0
   },
   {
    "id": "mobilcom-debitel--samsung-galaxy-s26-512gb-schwarz",
@@ -22271,17 +22268,17 @@
    "erstpreis": 1199.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-10",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/samsung/samsung-galaxy-s26-ohne-vertrag/p/P-M-4466891?ds=P-4587269",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
     "https://www.freenet.de/sitemap.xml"
    ],
    "titel_roh": "Samsung Galaxy S26 512 GB Black",
-   "preis_ohne_vertrag": 1199.0
+   "preis_ohne_vertrag": 1299.0
   },
   {
    "id": "mobilcom-debitel--samsung-galaxy-s26-512gb-sky-blue",
@@ -22301,17 +22298,17 @@
    "erstpreis": 1199.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-10",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/samsung/samsung-galaxy-s26-ohne-vertrag/p/P-M-4466891?ds=P-4587266",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
     "https://www.freenet.de/sitemap.xml"
    ],
    "titel_roh": "Samsung Galaxy S26 512 GB Sky Blue",
-   "preis_ohne_vertrag": 1199.0
+   "preis_ohne_vertrag": 1299.0
   },
   {
    "id": "mobilcom-debitel--samsung-galaxy-s26-512gb-weiss",
@@ -22331,17 +22328,17 @@
    "erstpreis": 1199.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-10",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/samsung/samsung-galaxy-s26-ohne-vertrag/p/P-M-4466891?ds=P-4587275",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
     "https://www.freenet.de/sitemap.xml"
    ],
    "titel_roh": "Samsung Galaxy S26 512 GB White",
-   "preis_ohne_vertrag": 1199.0
+   "preis_ohne_vertrag": 1299.0
   },
   {
    "id": "mobilcom-debitel--samsung-galaxy-s26-plus-256gb-cobalt-violet",
@@ -22361,17 +22358,17 @@
    "erstpreis": 1249.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-30",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/samsung/samsung-galaxy-s26-ohne-vertrag/p/P-M-4466900?ds=P-4587284",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
     "https://www.freenet.de/sitemap.xml"
    ],
    "titel_roh": "Samsung Galaxy S26+ 256 GB Cobalt Violet",
-   "preis_ohne_vertrag": 1249.0
+   "preis_ohne_vertrag": 1349.0
   },
   {
    "id": "mobilcom-debitel--samsung-galaxy-s26-plus-256gb-schwarz",
@@ -22391,17 +22388,17 @@
    "erstpreis": 1249.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-30",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/samsung/samsung-galaxy-s26-ohne-vertrag/p/P-M-4466900?ds=P-4587281",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
     "https://www.freenet.de/sitemap.xml"
    ],
    "titel_roh": "Samsung Galaxy S26+ 256 GB Black",
-   "preis_ohne_vertrag": 1249.0
+   "preis_ohne_vertrag": 1349.0
   },
   {
    "id": "mobilcom-debitel--samsung-galaxy-s26-plus-256gb-sky-blue",
@@ -22421,17 +22418,17 @@
    "erstpreis": 1249.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-30",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/samsung/samsung-galaxy-s26-ohne-vertrag/p/P-M-4466900?ds=P-4587278",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
     "https://www.freenet.de/sitemap.xml"
    ],
    "titel_roh": "Samsung Galaxy S26+ 256 GB Sky Blue",
-   "preis_ohne_vertrag": 1249.0
+   "preis_ohne_vertrag": 1349.0
   },
   {
    "id": "mobilcom-debitel--samsung-galaxy-s26-plus-256gb-weiss",
@@ -22451,17 +22448,17 @@
    "erstpreis": 1249.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-30",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/samsung/samsung-galaxy-s26-ohne-vertrag/p/P-M-4466900?ds=P-4587287",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
     "https://www.freenet.de/sitemap.xml"
    ],
    "titel_roh": "Samsung Galaxy S26+ 256 GB White",
-   "preis_ohne_vertrag": 1249.0
+   "preis_ohne_vertrag": 1349.0
   },
   {
    "id": "mobilcom-debitel--samsung-galaxy-s26-plus-512gb-cobalt-violet",
@@ -22481,17 +22478,17 @@
    "erstpreis": 1449.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-30",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/samsung/samsung-galaxy-s26-ohne-vertrag/p/P-M-4466900?ds=P-4587314",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
     "https://www.freenet.de/sitemap.xml"
    ],
    "titel_roh": "Samsung Galaxy S26+ 512 GB Cobalt Violet",
-   "preis_ohne_vertrag": 1449.0
+   "preis_ohne_vertrag": 1549.0
   },
   {
    "id": "mobilcom-debitel--samsung-galaxy-s26-plus-512gb-schwarz",
@@ -22511,17 +22508,17 @@
    "erstpreis": 1449.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-30",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/samsung/samsung-galaxy-s26-ohne-vertrag/p/P-M-4466900?ds=P-4587311",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
     "https://www.freenet.de/sitemap.xml"
    ],
    "titel_roh": "Samsung Galaxy S26+ 512 GB Black",
-   "preis_ohne_vertrag": 1449.0
+   "preis_ohne_vertrag": 1549.0
   },
   {
    "id": "mobilcom-debitel--samsung-galaxy-s26-plus-512gb-sky-blue",
@@ -22541,17 +22538,17 @@
    "erstpreis": 1449.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-30",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/samsung/samsung-galaxy-s26-ohne-vertrag/p/P-M-4466900?ds=P-4587290",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
     "https://www.freenet.de/sitemap.xml"
    ],
    "titel_roh": "Samsung Galaxy S26+ 512 GB Sky Blue",
-   "preis_ohne_vertrag": 1449.0
+   "preis_ohne_vertrag": 1549.0
   },
   {
    "id": "mobilcom-debitel--samsung-galaxy-s26-plus-512gb-weiss",
@@ -22571,17 +22568,17 @@
    "erstpreis": 1449.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-30",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/samsung/samsung-galaxy-s26-ohne-vertrag/p/P-M-4466900?ds=P-4587317",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
     "https://www.freenet.de/sitemap.xml"
    ],
    "titel_roh": "Samsung Galaxy S26+ 512 GB White",
-   "preis_ohne_vertrag": 1449.0
+   "preis_ohne_vertrag": 1549.0
   },
   {
    "id": "mobilcom-debitel--samsung-galaxy-s26-ultra-256gb-cobalt-violet",
@@ -22601,17 +22598,17 @@
    "erstpreis": 1449.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-10",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/samsung/samsung-galaxy-s26-ultra-ohne-vertrag/p/P-M-4475373?ds=P-4587326",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
     "https://www.freenet.de/sitemap.xml"
    ],
    "titel_roh": "Samsung Galaxy S26 Ultra 256 GB Cobalt Violet",
-   "preis_ohne_vertrag": 1449.0
+   "preis_ohne_vertrag": 1549.0
   },
   {
    "id": "mobilcom-debitel--samsung-galaxy-s26-ultra-256gb-schwarz",
@@ -22631,17 +22628,17 @@
    "erstpreis": 1449.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-10",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/samsung/samsung-galaxy-s26-ultra-ohne-vertrag/p/P-M-4475373?ds=P-4587323",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
     "https://www.freenet.de/sitemap.xml"
    ],
    "titel_roh": "Samsung Galaxy S26 Ultra 256 GB Black",
-   "preis_ohne_vertrag": 1449.0
+   "preis_ohne_vertrag": 1549.0
   },
   {
    "id": "mobilcom-debitel--samsung-galaxy-s26-ultra-256gb-sky-blue",
@@ -22661,17 +22658,17 @@
    "erstpreis": 1449.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-10",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/samsung/samsung-galaxy-s26-ultra-ohne-vertrag/p/P-M-4475373?ds=P-4587320",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
     "https://www.freenet.de/sitemap.xml"
    ],
    "titel_roh": "Samsung Galaxy S26 Ultra 256 GB Sky Blue",
-   "preis_ohne_vertrag": 1449.0
+   "preis_ohne_vertrag": 1549.0
   },
   {
    "id": "mobilcom-debitel--samsung-galaxy-s26-ultra-256gb-weiss",
@@ -22691,17 +22688,17 @@
    "erstpreis": 1449.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-10",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/samsung/samsung-galaxy-s26-ultra-ohne-vertrag/p/P-M-4475373?ds=P-4587329",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
     "https://www.freenet.de/sitemap.xml"
    ],
    "titel_roh": "Samsung Galaxy S26 Ultra 256 GB White",
-   "preis_ohne_vertrag": 1449.0
+   "preis_ohne_vertrag": 1549.0
   },
   {
    "id": "mobilcom-debitel--samsung-galaxy-s26-ultra-512gb-cobalt-violet",
@@ -22721,17 +22718,17 @@
    "erstpreis": 1649.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-10",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/samsung/samsung-galaxy-s26-ultra-ohne-vertrag/p/P-M-4475373?ds=P-4587338",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
     "https://www.freenet.de/sitemap.xml"
    ],
    "titel_roh": "Samsung Galaxy S26 Ultra 512 GB Cobalt Violet",
-   "preis_ohne_vertrag": 1649.0
+   "preis_ohne_vertrag": 1749.0
   },
   {
    "id": "mobilcom-debitel--samsung-galaxy-s26-ultra-512gb-schwarz",
@@ -22751,17 +22748,17 @@
    "erstpreis": 1649.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-10",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/samsung/samsung-galaxy-s26-ultra-ohne-vertrag/p/P-M-4475373?ds=P-4587335",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
     "https://www.freenet.de/sitemap.xml"
    ],
    "titel_roh": "Samsung Galaxy S26 Ultra 512 GB Black",
-   "preis_ohne_vertrag": 1649.0
+   "preis_ohne_vertrag": 1749.0
   },
   {
    "id": "mobilcom-debitel--samsung-galaxy-s26-ultra-512gb-sky-blue",
@@ -22781,17 +22778,17 @@
    "erstpreis": 1649.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-10",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/samsung/samsung-galaxy-s26-ultra-ohne-vertrag/p/P-M-4475373?ds=P-4587332",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
     "https://www.freenet.de/sitemap.xml"
    ],
    "titel_roh": "Samsung Galaxy S26 Ultra 512 GB Sky Blue",
-   "preis_ohne_vertrag": 1649.0
+   "preis_ohne_vertrag": 1749.0
   },
   {
    "id": "mobilcom-debitel--samsung-galaxy-s26-ultra-512gb-weiss",
@@ -22811,17 +22808,17 @@
    "erstpreis": 1649.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-10",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/samsung/samsung-galaxy-s26-ultra-ohne-vertrag/p/P-M-4475373?ds=P-4587341",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
     "https://www.freenet.de/sitemap.xml"
    ],
    "titel_roh": "Samsung Galaxy S26 Ultra 512 GB White",
-   "preis_ohne_vertrag": 1649.0
+   "preis_ohne_vertrag": 1749.0
   },
   {
    "id": "mobilcom-debitel--xiaomi-17t-256gb-blau",
@@ -22841,10 +22838,10 @@
    "erstpreis": 749.9,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-02",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/xiaomi/xiaomi-17t-ohne-vertrag/p/P-M-4548843?ds=P-4673019",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -22871,10 +22868,10 @@
    "erstpreis": 749.9,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-02",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/xiaomi/xiaomi-17t-ohne-vertrag/p/P-M-4548843?ds=P-4673016",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -22901,10 +22898,10 @@
    "erstpreis": 749.9,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-02",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/xiaomi/xiaomi-17t-ohne-vertrag/p/P-M-4548843?ds=P-4673022",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -22931,10 +22928,10 @@
    "erstpreis": 999.9,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-02",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/xiaomi/xiaomi-17t-pro-ohne-vertrag/p/P-M-4548846?ds=P-4673028",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -22961,10 +22958,10 @@
    "erstpreis": 999.9,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-02",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/xiaomi/xiaomi-17t-pro-ohne-vertrag/p/P-M-4548846?ds=P-4673031",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -22991,10 +22988,10 @@
    "erstpreis": 999.9,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-02",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/xiaomi/xiaomi-17t-pro-ohne-vertrag/p/P-M-4548846?ds=P-4673025",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -23021,10 +23018,10 @@
    "erstpreis": 179.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-02",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/xiaomi/xiaomi-redmi-note-15-pro-5g-ohne-vertrag/p/P-M-4408885?ds=P-4511545",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -23051,10 +23048,10 @@
    "erstpreis": 179.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-02",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/xiaomi/xiaomi-redmi-note-15-pro-5g-ohne-vertrag/p/P-M-4408885?ds=P-4511551",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -23081,10 +23078,10 @@
    "erstpreis": 179.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-02",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-09-29",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/xiaomi/xiaomi-redmi-note-15-pro-5g-ohne-vertrag/p/P-M-4408885?ds=P-4511548",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
