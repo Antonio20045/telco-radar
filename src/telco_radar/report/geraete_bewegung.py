@@ -23,11 +23,13 @@ naiven Rechnung. Dieselbe Lehre wie P0-A2 (`_bewegung`): die Differenz
 zweier Angebote ist keine Preisänderung. Ein Angebotswechsel ist deshalb
 „ohne Aussage" und wird gezählt, nie gemeldet (Clean Code 4).
 
-Ebenso ohne Aussage: eine Seite ohne Messung im Toleranzfenster um einen
-der beiden Tage, eine Messung, deren Bündel nicht zählt (Notbremse:
-Schätzung oder abgelaufene Aktion, `zaehlt` aus `_messungen`), und eine
-Leitzahl über einen anderen Zeitraum als den ihrer Ratenlaufzeit (sie ist
-mit Vodafones nicht vergleichbar). Seit Datenkonzept Geräte Schritt 2 ist
+Ebenso ohne Aussage: ein Bruch der Rechenweise (`rechenweise`) auf einer Seite -
+dieselbe Antwort anders gelesen ist keine Preisänderung; ist er der einzige Grund,
+nennt der Ausfall ihn (`AUSFALL_RECHENWEISE`). Ebenso eine Seite ohne Messung im
+Toleranzfenster um einen der beiden Tage, eine Messung, deren Bündel nicht zählt
+(Notbremse: Schätzung oder abgelaufene Aktion, `zaehlt` aus `_messungen`), und eine
+Leitzahl über einen anderen Zeitraum als den ihrer Ratenlaufzeit (sie ist mit
+Vodafones nicht vergleichbar). Seit Datenkonzept Geräte Schritt 2 ist
 jede Reihe eine Ratenlaufzeit (Schlüssel `(modell, band, laufzeit)`): 24
 Raten werden nur mit Vodafones 24 Raten verglichen.
 
@@ -47,6 +49,7 @@ import logging
 from collections import Counter
 from datetime import date, timedelta
 
+from .. import rechenweise
 from ..tco_model import TCO_HORIZONT, zeitraum_vergleichbar
 from . import geraete_notbremse as notbremse
 from .geraete_laufzeit import zeitraum
@@ -65,11 +68,15 @@ AUSFALL_KEINE_MESSUNG = "keine Messung in der Gerätehistorie"
 AUSFALL_NICHT_PRUEFBAR = "kein Vergleich mit Vodafone war prüfbar"
 AUSFALL_AUFBEREITUNG = "die Gerätedaten ließen sich nicht aufbereiten"
 AUSFALL_VERALTET = "die letzte Vodafone-Messung vom {tag} ist veraltet"
+AUSFALL_RECHENWEISE = (
+    f"{rechenweise.BRUCH}: im Wochenfenster kein Vergleich mit gleicher Rechnung"
+)
 
 GRUND_MESSUNG = "messung_fehlt"
 GRUND_WECHSEL = "angebotswechsel"
 GRUND_ZEITRAUM = "anderer_zeitraum"
 GRUND_ZAEHLT_NICHT = "zaehlt_nicht"
+GRUND_RECHENWEISE = "rechenweise_geaendert"
 
 
 def _messung_um(slot: dict, tag: str) -> dict | None:
@@ -112,6 +119,28 @@ def ist_bewegung(delta: float, eigen_wert: float) -> bool:
     return betrag > BEWEGUNG_EURO or betrag > eigen_wert * BEWEGUNG_PROZENT / 100
 
 
+def _ohne_aussage(
+    seiten: tuple[dict, dict, dict, dict], schluessel, h: int
+) -> str | None:
+    """Warum der Vergleich (Vodafone vorher, nachher, Wettbewerber vorher, nachher)
+    keine Aussage trägt - None, wenn er sie trägt."""
+    v0, v1, c0, c1 = seiten
+    if not all(notbremse.zaehlt(m) for m in seiten):
+        return GRUND_ZAEHLT_NICHT
+    if schluessel(c0["satz"]) != schluessel(c1["satz"]) or schluessel(
+        v0["satz"]
+    ) != schluessel(v1["satz"]):
+        return GRUND_WECHSEL
+    if not (
+        rechenweise.gleich(v0["satz"], v1["satz"])
+        and rechenweise.gleich(c0["satz"], c1["satz"])
+    ):
+        return GRUND_RECHENWEISE
+    if not all(zeitraum_vergleichbar(m["monate"], h) for m in seiten):
+        return GRUND_ZEITRAUM
+    return None
+
+
 def bewegungen(
     messungen: dict,
     erlaubt: dict,
@@ -150,16 +179,9 @@ def bewegungen(
             if v0 is None or v1 is None or c0 is None or c1 is None:
                 ohne[GRUND_MESSUNG] += 1
                 continue
-            if not all(notbremse.zaehlt(m or {}) for m in (v0, v1, c0, c1)):
-                ohne[GRUND_ZAEHLT_NICHT] += 1
-                continue
-            if schluessel(c0["satz"]) != schluessel(c1["satz"]) or schluessel(
-                v0["satz"]
-            ) != schluessel(v1["satz"]):
-                ohne[GRUND_WECHSEL] += 1
-                continue
-            if not all(zeitraum_vergleichbar(m["monate"], h) for m in (v0, v1, c0, c1)):
-                ohne[GRUND_ZEITRAUM] += 1
+            grund = _ohne_aussage((v0, v1, c0, c1), schluessel, h)
+            if grund:
+                ohne[grund] += 1
                 continue
             geprueft += 1
             fremd_delta = round(c1["wert"] - c0["wert"], 2)
@@ -190,8 +212,10 @@ def bewegungen(
     treffer.sort(key=lambda t: (-abs(t["delta"]), t["geraet"], t["anbieter"]))
     if not geprueft:
         log.error("Bewegungsblock: kein Vergleich pruefbar (%s)", dict(ohne))
+        grund = AUSFALL_RECHENWEISE if set(ohne) == {GRUND_RECHENWEISE} else None
         return dict(
-            ausfall(AUSFALL_NICHT_PRUEFBAR), ohne_aussage=dict(sorted(ohne.items()))
+            ausfall(grund or AUSFALL_NICHT_PRUEFBAR),
+            ohne_aussage=dict(sorted(ohne.items())),
         )
     return {
         "error": None,

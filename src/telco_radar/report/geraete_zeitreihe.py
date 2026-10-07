@@ -43,6 +43,7 @@ import math
 from datetime import date
 from pathlib import Path
 
+from .. import rechenweise
 from ..analyze.tco_store import basis_aus_satz, id_aus_satz
 from ..tco_model import TCO_HORIZONT, zeitraum_vergleichbar
 from . import geraete_bewegung
@@ -382,18 +383,18 @@ def _messungen(
 def _serien_aus(messungen: dict, tarife: dict | None = None) -> dict:
     """{(modell, band): {anbieter: [[iso, wert], ...]}} - die Punktliste.
 
-    Die reine Ableitung aus `_messungen`: je Datum die HEUTIGE Leitzahl
-    (`wert`; wird sie nicht mitgegeben, rechnet diese Funktion selbst -
-    derselbe Weg ueber `_wert_aus_messung`, keine zweite Formel). Beide
-    Formen entstehen aus EINER Lesung der Historie - zwei Lesungen waeren
-    zwei Zeitreihen, sollte die Datei zwischen ihnen wachsen.
+    Die reine Ableitung aus `_messungen`: je Datum die HEUTIGE Leitzahl (`wert`; wird
+    sie nicht mitgegeben, rechnet diese Funktion selbst - derselbe Weg ueber
+    `_wert_aus_messung`, keine zweite Formel), je Anbieter nur in der juengsten
+    Rechenweise (`rechenweise.juengste`): ein Bruch ist keine Stufe. Beide Formen
+    entstehen aus EINER Lesung der Historie - zwei Lesungen waeren zwei Zeitreihen.
     """
     fertig: dict[tuple, dict] = {}
     for schluessel, anbieter_ in messungen.items():
         punkte = {}
         for an, werte in anbieter_.items():
             reihe = []
-            for d, m in sorted(werte.items()):
+            for d, m in sorted(rechenweise.juengste(werte).items()):
                 wert = m.get("wert")
                 if wert is None:
                     wert = _wert_aus_messung(m, tarife)
@@ -407,11 +408,10 @@ def _serien_aus(messungen: dict, tarife: dict | None = None) -> dict:
 def _zeitraeume_aus(messungen: dict, tarife: dict | None = None) -> dict:
     """{(modell, band): {anbieter: [Monate, ...]}} - DER ZEITRAUM JE KURVE.
 
-    P0-B-z1: der Zeitraum der Punkte, aus DERSELBEN Lesung der Historie
-    wie die Punkte selbst (`_messungen` legt ihn je Messung ab, gelesen
-    aus `Tco.leitzahl_monate`). Keine zweite Ableitung, keine
-    Nachrechnung: `_svg` schreibt ihn ans Kurvenende, `_bewegung` prueft
-    an ihm, ob ein Vorzeichen ueberhaupt eine Aussage ist.
+    P0-B-z1: der Zeitraum der Punkte, aus DERSELBEN Lesung der Historie wie die Punkte
+    selbst (`_messungen` legt ihn je Messung ab, gelesen aus `Tco.leitzahl_monate`).
+    Keine zweite Ableitung, keine Nachrechnung: `_svg` schreibt ihn ans Kurvenende,
+    `_bewegung` prueft an ihm, ob ein Vorzeichen ueberhaupt eine Aussage ist.
 
     Je Anbieter die VERSCHIEDENEN Zeitraeume seiner Reihe, aufsteigend -
     in der Regel genau einer. Zwei heissen: der Anbieter hat die
@@ -425,7 +425,7 @@ def _zeitraeume_aus(messungen: dict, tarife: dict | None = None) -> dict:
         je_anbieter: dict[str, list[int]] = {}
         for an, werte in anbieter_.items():
             monate = set()
-            for m in werte.values():
+            for m in rechenweise.juengste(werte).values():
                 wert, mon = (
                     (m.get("wert"), m.get("monate"))
                     if m.get("monate") is not None

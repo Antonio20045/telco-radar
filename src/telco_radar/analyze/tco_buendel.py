@@ -177,6 +177,7 @@ def aus_rohsaetzen(rohsaetze, bestand: Tarifbestand, heute: str) -> Buendelbilan
                     tarif_id=bezug.tarif_id,
                     tarif_id_guete=bezug.guete,
                     tarif_monatlich=satz.get("tarif_monatlich"),
+                    tarif_listenpreis=satz.get("tarif_listenpreis"),
                     tarif_bindung_monate=satz.get("tarif_bindung_monate"),
                     buendel_monatlich=satz.get("buendel_monatlich"),
                     geraet_zuzahlung=satz.get("geraet_zuzahlung"),

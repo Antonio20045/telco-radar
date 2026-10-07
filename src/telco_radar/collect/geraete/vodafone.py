@@ -36,8 +36,7 @@ Deshalb ruft dieser Adapter je Geraet die Detailnutzlast ab, statt sich die
 Liste zu sparen: die Liste allein haette 1-Euro-Lockpreise geliefert, und
 genau die haelt der Lockpreis-Waechter seit dem 10.08.2026 heraus.
 
-Der Tarif traegt dort zusaetzlich `withDiscounts`: den Aktionspreis mit Dauer.
-`vodafone_aktion.py` legt ihn als Tarifphase ab (Befund 07.10.2026).
+`withDiscounts` des Tarifs (Aktionspreis mit Dauer) liest `vodafone_aktion.py`.
 
 DIE REGEL "NUR VERLINKTE ADRESSEN" GILT UNVERAENDERT
 ----------------------------------------------------
@@ -160,7 +159,7 @@ from typing import Callable, Optional
 from urllib.parse import urlsplit
 
 from .basis import GeraeteAbrufFehler, _preis
-from .vodafone_aktion import tarif_mit_aktion
+from .vodafone_aktion import RABATTPOSTEN, tarif_mit_aktion
 
 from ...tco_model import laufzeit_in_monaten
 
@@ -465,7 +464,9 @@ def _buendelsatz_aus_komposition(
         )
         return None
 
-    tarif, phasen = tarif_mit_aktion(komposition, t_monat, geraet_monatsrate, laufzeit)
+    tarif, liste, phasen = tarif_mit_aktion(
+        komposition, t_monat, geraet_monatsrate, laufzeit
+    )
     return {
         "titel": modell,
         "strukturierter_name": modell,
@@ -475,6 +476,7 @@ def _buendelsatz_aus_komposition(
         "tarif_name": "",
         "tarif_slug": hash_,
         "tarif_monatlich": tarif,
+        "tarif_listenpreis": liste,
         "tarif_phasen": phasen,
         "geraet_zuzahlung": h_einmalig,
         "geraet_monatsrate": geraet_monatsrate,
@@ -531,10 +533,9 @@ def _buendel_aus_tarifantwort(text: str) -> dict:
     Die Tarifschnittstelle nennt je Geraetevariante JEDEN buchbaren Tarif
     (gemessen 29.09.2026: Mobil XS/S/M/L/XL je mit 12/24/36 Monaten
     Ratenlaufzeit plus FamilyCard S/M/L/XL als `sub`) - in derselben
-    `prices.composition`-Form wie die Detailantwort, aber mit `tariffName`.
-    Eine unlesbare Antwort ergibt ein leeres Woerterbuch; der Aufrufer
-    behandelt das als "nicht gelesen" und laesst die bisherigen Saetze
-    stehen.
+    `prices.composition`-Form wie die Detailantwort, aber mit `tariffName`;
+    jede Komposition traegt den Rabattblock ihres Tarifs (`RABATTPOSTEN`).
+    Eine unlesbare Antwort ergibt ein leeres Woerterbuch ("nicht gelesen").
     """
     try:
         daten = json.loads(text or "")
@@ -554,11 +555,10 @@ def _buendel_aus_tarifantwort(text: str) -> dict:
             if not name:
                 continue
             for atom in tarif.get("atomics") or []:
-                if not isinstance(atom, dict):
-                    continue
-                for komposition in _pfad(atom, "prices", "composition") or []:
-                    if isinstance(komposition, dict):
-                        out.setdefault(hwid, []).append((name, komposition))
+                posten = {RABATTPOSTEN: _pfad(atom, RABATTPOSTEN)}
+                for k in _pfad(atom, "prices", "composition") or []:
+                    if isinstance(k, dict):
+                        out.setdefault(hwid, []).append((name, {**k, **posten}))
     return out
 
 

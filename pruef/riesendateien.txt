@@ -14,7 +14,7 @@ src/telco_radar/analyze/geraete_store.py zeilen 1177
 src/telco_radar/analyze/highlight_topics.py zeilen 946
 src/telco_radar/analyze/llm.py zeilen 640
 src/telco_radar/analyze/promo_ranker.py zeilen 559
-src/telco_radar/analyze/tco_store.py zeilen 520
+src/telco_radar/analyze/tco_store.py zeilen 519
 src/telco_radar/collect/ct_log.py zeilen 463
 src/telco_radar/collect/geraete/__init__.py zeilen 1043
 src/telco_radar/collect/geraete/autoerkennung.py zeilen 499
@@ -49,5 +49,5 @@ src/telco_radar/report/html.py zeilen 1852
 src/telco_radar/report/promo.py zeilen 499
 src/telco_radar/report/wettbewerb.py zeilen 424
 src/telco_radar/tarif_bezug.py zeilen 485
-src/telco_radar/tco_model.py zeilen 1288
+src/telco_radar/tco_model.py zeilen 1286
 src/telco_radar/versand.py zeilen 409

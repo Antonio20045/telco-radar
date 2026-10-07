@@ -28,8 +28,9 @@ from __future__ import annotations
 
 from collections.abc import Iterable, Mapping
 
+from .. import rechenweise
 from ..geraete_model import normalisiere
-from ..tarif_model import NUR_MIT_GERAET, vertrag_basis
+from ..tarif_model import BUENDELPHASEN, NUR_MIT_GERAET, vertrag_basis
 from ..tco_model import Buendel, sim_only_id, tco_24
 from ..tco_model import zeitraum as zeitraum_h
 from .geraete_pruefstatus import (
@@ -195,17 +196,18 @@ def _r2_uvp(satz: Mapping, b: Buendel, k: Kontext) -> Befund | None:
 
 
 def _r3_sim_only(satz: Mapping, b: Buendel, k: Kontext) -> Befund | None:
-    if b.tarif_monatlich is None:
+    tarif = b.tarif_monatlich if b.tarif_listenpreis is None else b.tarif_listenpreis
+    if tarif is None:
         return _nicht(3, "kein eigener Tarifpreis")
     sim = sim_only_preis(b, k.sim_only)
     if sim is None:
         return _nicht(3, "SIM-only-Preis desselben Tarifs fehlt")
     nachlass = BUENDEL_NACHLASS.get(normalisiere(b.anbieter), 0.0)
-    if b.tarif_monatlich >= sim - nachlass - CENT:
+    if tarif >= sim - nachlass - CENT:
         return None
     abzug = f" abzüglich {eur(nachlass)} Bündelnachlass" if nachlass else ""
     return _verletzt(
-        3, f"Tarif mit Gerät {eur(b.tarif_monatlich)} unter SIM-only {eur(sim)}{abzug}"
+        3, f"Tarif mit Gerät {eur(tarif)} unter SIM-only {eur(sim)}{abzug}"
     )
 
 
@@ -263,8 +265,10 @@ def _r11_vortag(satz: Mapping, b: Buendel, k: Kontext) -> Befund | None:
     alt = k.vortag.get(str(satz.get("id") or ""))
     if alt is None:
         return _nicht(11, "kein Vortageswert")
+    if not rechenweise.gleich(satz, alt):
+        return _nicht(11, rechenweise.BRUCH)
     try:
-        vorher = tco_24(buendel_aus_satz({**satz, **alt}))
+        vorher = tco_24(buendel_aus_satz({**satz, BUENDELPHASEN: None, **alt}))
     except (TypeError, ValueError):
         return _nicht(11, "Vortageswert unlesbar")
     jetzt = tco_24(b)

@@ -13,6 +13,7 @@ from __future__ import annotations
 import logging
 from datetime import date
 
+from .. import rechenweise
 from ..tarif_model import buendelphasen_aus
 from ..tco_model import (
     POSTEN_ANSCHLUSS,
@@ -353,7 +354,7 @@ def _rechenwege_html(
     """
     bloecke: list[str] = []
     for anbieter in ANBIETER_FOLGE:
-        saetze = messungen_paar.get(anbieter)
+        saetze = rechenweise.juengste(messungen_paar.get(anbieter) or {})
         if not saetze:
             continue
         for datum in sorted(saetze):

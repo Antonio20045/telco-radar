@@ -9,8 +9,10 @@ der Klick-Erkundung (`vodafone_tarif_hardware_iphone_17_pro_20261007.json`, Mobi
 (`vodafone_virtualitem_iphone_17_pro_20261007.json.gz`). Der Tarifrabatt hängt nicht an
 der Ratenzahl (Pixel 11, 05.09.2026: Mobil XS mit 12, 24 und 36 Raten je 23,95 €).
 
-Wo ein Test eine Antwort verändert, steht es am Test: Rabatt ohne Ende, Rabatt an einem
-anderen Posten und ein Rabatt kürzer als die Bindung kommen in keiner Antwort vor.
+`tarif_monatlich` ist der Tarifpreis in Monat 1 wie bei o2 und congstar (23,95 €),
+`tarif_listenpreis` der ohne Rabatt (31,95 €). Wo ein Test eine Antwort verändert, steht
+es am Test: Rabatt ohne Ende, Rabatt an einem anderen Posten, ein Rabatt kürzer als die
+Bindung und ein bedingter Posten mit Betrag kommen in keiner Antwort vor.
 """
 
 import copy
@@ -20,6 +22,11 @@ import logging
 from pathlib import Path
 
 from telco_radar.collect.geraete.vodafone import lies_buendel, loese_tarifnamen
+from telco_radar.collect.geraete.vodafone_aktion import (
+    BEDINGTE_POSTEN,
+    NICHT_GELESEN,
+    ist_bedingt,
+)
 from telco_radar.tarif_model import buendelphasen_aus
 from telco_radar.tco_kosten import kosten_ueber, tarifpreis_im_monat
 from telco_radar.tco_model import POSTEN_TARIF, Buendel
@@ -87,14 +94,19 @@ def _xs_iphone(daten: dict | None = None) -> dict:
 
 
 def test_iphone_17_pro_mobil_xs_traegt_den_aktionspreis_mit_dauer():
-    """Preis danach und Geräterate bleiben wie gemessen: rabattiert ist der Tarif."""
+    """Monat 1 zeigt den Aktionspreis, der Listenpreis steht daneben; die Geräterate
+    bleibt wie gemessen: rabattiert ist der Tarif."""
     satz = _xs_iphone()
     phasen = satz.get("tarif_phasen")
     assert [(p["von_monat"], p["bis_monat"], p["betrag"]) for p in phasen] == [
         (1, 24, 23.95)
     ]
     assert "withDiscounts" in phasen[0]["beleg"]
-    assert (satz["tarif_monatlich"], satz["geraet_monatsrate"]) == (31.95, 33.0)
+    assert (
+        satz["tarif_monatlich"],
+        satz["tarif_listenpreis"],
+        satz["geraet_monatsrate"],
+    ) == (23.95, 31.95, 33.0)
 
 
 def test_der_rabatt_ist_der_benannte_online_vorteil_der_antwort():
@@ -107,9 +119,7 @@ def test_der_rabatt_ist_der_benannte_online_vorteil_der_antwort():
     }
     vorteil = rabatte["24 Monate: 25 % Vorteil auf Tarifpreis ohne Hardwarezuzahlung"]
     satz = _xs_iphone(daten)
-    assert (
-        round(satz["tarif_phasen"][0]["betrag"] - satz["tarif_monatlich"], 2) == vorteil
-    )
+    assert round(satz["tarif_monatlich"] - satz["tarif_listenpreis"], 2) == vorteil
     assert vorteil == -8.0
 
 
@@ -122,8 +132,8 @@ def test_die_summen_der_seite_aus_den_gespeicherten_summanden():
         if s["sku"] == _IPHONE_HW and s["laufzeit_monate"] == 24
     }
     satz = _xs_iphone()
-    assert round(rate + satz["tarif_phasen"][0]["betrag"], 2) == 73.45
-    assert round(rate + satz["tarif_monatlich"], 2) == 81.45
+    assert round(rate + satz["tarif_monatlich"], 2) == 73.45
+    assert round(rate + satz["tarif_listenpreis"], 2) == 81.45
 
 
 def test_die_kernzahl_rechnet_24_monate_aktionspreis():
@@ -152,7 +162,7 @@ def test_zwoelf_raten_tragen_zwei_rabattphasen():
         (1, 12, 27.61),
         (13, 24, 30.61),
     ]
-    assert satz["tarif_monatlich"] == 51.95
+    assert (satz["tarif_monatlich"], satz["tarif_listenpreis"]) == (27.61, 51.95)
 
 
 def test_kein_gespeicherter_rabatt_trifft_die_geraeterate():
@@ -170,14 +180,19 @@ def test_gegenprobe_ohne_rabatt_bleibt_der_satz_wie_gemessen():
     """FamilyCard L (05.09.) hat keinen Rabatt; XS ohne `withDiscounts` (im Test
     entfernt) ist derselbe Satz wie vorher, nur ohne Phase."""
     familycard = _angebote(_daten(_PIXEL_TARIFE), _PIXEL_HW)[("FamilyCard L", 24)]
-    assert (familycard["tarif_monatlich"], familycard["tarif_phasen"]) == (59.99, [])
+    assert (
+        familycard["tarif_monatlich"],
+        familycard["tarif_listenpreis"],
+        familycard["tarif_phasen"],
+    ) == (59.99, 59.99, [])
 
     daten = _daten(_IPHONE_TARIFE)
     k = _komposition(daten, "Mobil XS", 36)
     del k["priceByComponent"]["tariff"]["priceByType"]["rate"]["month"]["withDiscounts"]
     ohne, mit = _xs_iphone(daten), _xs_iphone()
-    assert ohne["tarif_phasen"] == []
-    assert {**ohne, "tarif_phasen": mit["tarif_phasen"]} == mit
+    assert (ohne["tarif_monatlich"], ohne["tarif_phasen"]) == (31.95, [])
+    aktion = {f: mit[f] for f in ("tarif_monatlich", "tarif_phasen")}
+    assert {**ohne, **aktion} == mit
 
 
 def test_rabatt_ohne_dauer_ist_eine_luecke_keine_phase(caplog):
@@ -190,6 +205,7 @@ def test_rabatt_ohne_dauer_ist_eine_luecke_keine_phase(caplog):
     with caplog.at_level(logging.WARNING):
         satz = _xs_iphone(daten)
     assert (satz["tarif_monatlich"], satz["tarif_phasen"]) == (None, [])
+    assert satz["tarif_listenpreis"] == 31.95
     assert "ohne belegte Dauer" in caplog.text
     assert POSTEN_TARIF in kosten_ueber(_buendel(satz)).luecken
 
@@ -220,3 +236,99 @@ def test_ein_kurzer_rabatt_endet_im_listenpreis():
         (13, 24, 31.95),
     ]
     assert "withoutDiscounts" in phasen[1]["beleg"]
+
+
+_WECHSELBONUS = (
+    "Wechselbonus: 5 € Rabatt pro Monat bei Rufnummernmitnahme, 12 Monate lang"
+)
+
+
+def _mit_posten(daten: dict, label: str, monat_1_12: float) -> dict:
+    """Mobil XS (36 Raten) mit einem Posten −5 € in Monat 1–12, wie ihn die Antwort
+    führen würde: im Rabattblock, in `withDiscounts` des Tarifs und der Gesamtrate."""
+    [xs] = [
+        t for e in daten["data"] for t in e["tariffs"] if t["tariffName"] == "Mobil XS"
+    ]
+    xs["atomics"][0]["discount"]["monetary"].append(
+        {
+            "gross": -5.0,
+            "net": -4.2,
+            "displayLabel": label,
+            "discountId": "99999",
+            "mandatory": False,
+            "isFinancingDiscount": False,
+        }
+    )
+    k = _komposition(daten, "Mobil XS", 36)
+    monat = k["priceByComponent"]["tariff"]["priceByType"]["rate"]["month"]
+    [phase] = monat["withDiscounts"]
+    monat["withDiscounts"] = [
+        dict(phase, recurrenceEnd=12, gross=monat_1_12),
+        dict(phase, recurrenceStart=13),
+    ]
+    gesamt = k["totalMonthlyRatePrice"]["withDiscounts"]
+    gesamt[:1] = [
+        dict(gesamt[0], recurrenceEnd=12, gross=round(monat_1_12 + 33.0, 2)),
+        dict(gesamt[0], recurrenceStart=13),
+    ]
+    return daten
+
+
+def _spannen(satz: dict) -> list[tuple]:
+    return [(p["von_monat"], p["bis_monat"], p["betrag"]) for p in satz["tarif_phasen"]]
+
+
+def test_bedingter_wechselbonus_wird_keine_preisphase():
+    """Prüferfall, im Test hinzugefügt: 5 € Wechselbonus in Monat 1–12 stehen in
+    Rabattblock und `withDiscounts`. Er zählt nie; Monat 1–24 bleibt 23,95 €."""
+    satz = _xs_iphone(_mit_posten(_daten(_IPHONE_TARIFE), _WECHSELBONUS, 18.95))
+    assert _spannen(satz) == [(1, 24, 23.95)]
+    assert satz["tarif_monatlich"] == 23.95
+    assert "ohne bedingte Posten (Wechselbonus" in satz["tarif_phasen"][0]["beleg"]
+
+
+def test_gegenprobe_derselbe_posten_ohne_bedingung_geht_ein():
+    satz = _xs_iphone(
+        _mit_posten(_daten(_IPHONE_TARIFE), "12 Monate: 5 € Online-Vorteil", 18.95)
+    )
+    assert _spannen(satz) == [(1, 12, 18.95), (13, 24, 23.95)]
+    assert satz["tarif_monatlich"] == 18.95
+
+
+def test_bedingter_posten_ohne_belegten_preis_ist_eine_luecke(caplog):
+    """Im Test kostet Monat 1–12 17,95 €: weder 23,95 € noch 23,95 € minus 5 €
+    Wechselbonus. Der Preis ohne Bedingung ist nicht belegt."""
+    with caplog.at_level(logging.WARNING):
+        satz = _xs_iphone(_mit_posten(_daten(_IPHONE_TARIFE), _WECHSELBONUS, 17.95))
+    assert (satz["tarif_monatlich"], satz["tarif_listenpreis"]) == (None, 31.95)
+    assert satz["tarif_phasen"] == []
+    assert "Preis ohne Bedingung nicht belegt" in caplog.text
+
+
+def test_die_vorschau_ohne_rabattposten_ist_eine_luecke(caplog):
+    """Die Detailantwort nennt `withDiscounts`, aber keinen Posten: ob ein bedingter
+    darin steckt, ist offen. Gegenprobe: dieselbe Stufe aus der Tarifantwort."""
+    detail = gzip.decompress((_FIX / _IPHONE_DETAIL).read_bytes()).decode("utf-8")
+    with caplog.at_level(logging.INFO):
+        [xs] = [
+            s
+            for s in lies_buendel(detail)
+            if s["sku"] == _IPHONE_HW and s["laufzeit_monate"] == 36
+        ]
+    assert (xs["tarif_monatlich"], xs["tarif_listenpreis"]) == (None, 31.95)
+    assert xs["tarif_phasen"] == []
+    assert NICHT_GELESEN in caplog.text
+    assert _xs_iphone()["tarif_monatlich"] == 23.95
+
+
+def test_kein_gespeicherter_posten_ist_bedingt():
+    """Neukunden-Vorteil, Hardware-Bonus, Ratenzahlungsrabatt, Anschluss zählen; jeder
+    Wortteil von `BEDINGTE_POSTEN` macht einen Posten bedingt."""
+    for datei in (_IPHONE_TARIFE, _PIXEL_TARIFE):
+        for e in _daten(datei)["data"]:
+            for t in e["tariffs"]:
+                for a in t["atomics"]:
+                    for p in a["discount"]["monetary"]:
+                        assert not ist_bedingt(p), p["displayLabel"]
+    for wort in BEDINGTE_POSTEN:
+        assert ist_bedingt({"displayLabel": f"10 € {wort.title()}-Rabatt"}), wort

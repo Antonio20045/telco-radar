@@ -95,7 +95,7 @@ def test_jeder_satz_traegt_zuzahlung_und_anschlusspreis():
     for s in _saetze():
         assert s["geraet_zuzahlung"] == 1.0
         assert s["anschlusspreis"] == 0.0
-        assert s["tarif_monatlich"] is not None
+        assert s["tarif_listenpreis"] is not None
         assert s["laufzeit_monate"] > 0
 
 
@@ -116,7 +116,7 @@ def test_der_subventions_fall_hat_keine_separate_geraeterate():
     ]
     assert len(sub) == 3
     for s in sub:
-        assert s["tarif_monatlich"] == 69.99
+        assert s["tarif_listenpreis"] == 69.99
         assert s["geraet_zuzahlung"] == 1.0
         assert s["geraet_monatsrate"] is None
         assert s["laufzeit_monate"] == 24
@@ -137,7 +137,7 @@ def test_die_ratenfaelle_gehen_gegen_die_gesamtrate_auf():
     for s in rate:
         k = je_hash[s["tarif_slug"]]
         gesamt = k["totalMonthlyRatePrice"]["withoutDiscounts"][0]["gross"]
-        assert s["geraet_monatsrate"] + s["tarif_monatlich"] == pytest.approx(
+        assert s["geraet_monatsrate"] + s["tarif_listenpreis"] == pytest.approx(
             gesamt, abs=0.005
         )
         assert s["laufzeit_monate"] == k["financingDuration"]
@@ -488,7 +488,7 @@ def test_die_vorschau_koppelt_jede_tarifstufe_an_eine_laufzeit():
     (Mobil M) nur mit 24, 31,95 (Mobil XS) nur mit 36 Monaten."""
     saetze = _vorschau_2909()
     assert len(saetze) == 24
-    paare = {(s["tarif_monatlich"], s["laufzeit_monate"]) for s in saetze}
+    paare = {(s["tarif_listenpreis"], s["laufzeit_monate"]) for s in saetze}
     assert paare == {(69.99, 24), (41.95, 12), (51.95, 24), (31.95, 36)}
 
 
@@ -560,7 +560,9 @@ def test_betraege_kommen_unveraendert_aus_der_tarifantwort():
         and s["tarif_name"] == "Mobil L"
         and s["laufzeit_monate"] == 24
     )
-    assert satz["tarif_monatlich"] == erwartet_tarif == 61.95
+    assert satz["tarif_listenpreis"] == erwartet_tarif == 61.95
+    [aktion] = teile["tariff"]["priceByType"]["rate"]["month"]["withDiscounts"]
+    assert satz["tarif_monatlich"] == aktion["gross"] == 35.86
     assert satz["geraet_monatsrate"] == erwartet_rate == 39.75
     assert satz["geraet_zuzahlung"] == erwartet_zuzahlung == 1.0
     assert satz["anschlusspreis"] == 0.0

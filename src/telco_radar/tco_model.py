@@ -47,14 +47,10 @@ Die Felder eines Buendels
 -------------------------
     sku_id            welches GERAET (leer = SIM-only, siehe unten)
     anbieter          wer es verkauft
-    tarif_name        welcher Tarif - Pflicht. "iPhone fuer 1 Euro" ist ohne
-                      den Tarif dahinter eine Zahl ohne Bedeutung (Teil C4,
-                      dieselbe Regel wie bei `Listung.zuzahlung`). Der
-                      Fremdschluessel auf `tarif_model.Tarif` kommt, sobald
-                      es einen gibt (§ 6.2 Nr. 7: Vodafones Nutzlast nennt
-                      keinen Tarifnamen); bis dahin IST der Name der
-                      Schluessel.
-    tarif_monatlich   Grundpreis je Monat, ohne Geraeteanteil
+    tarif_name        welcher Tarif - Pflicht. "iPhone fuer 1 Euro" ist ohne den
+                      Tarif dahinter eine Zahl ohne Bedeutung (Teil C4).
+    tarif_monatlich   Tarifpreis in Monat 1, wie die Seite ihn zeigt, ohne Geraeteanteil
+    tarif_listenpreis derselbe ohne Rabatt, wo der Anbieter ihn getrennt nennt
     tarif_phasen      Preisphasen des Tarifs, PHASENGEWICHTET gerechnet. Die des
                       Tarifbestands (`tarife.jsonl`) sind Stammdaten, kommen beim Lesen
                       dazu und stehen nicht im Store (A1, 20.09.2026), nur ohne
@@ -506,6 +502,7 @@ class Buendel:
     tarif_id: str = ""
     tarif_id_guete: str = ""
     tarif_monatlich: Optional[float] = None
+    tarif_listenpreis: float | None = None
     tarif_bindung_monate: Optional[int] = None
     buendel_monatlich: Optional[float] = None
     geraet_zuzahlung: Optional[float] = None
@@ -535,6 +532,7 @@ class Buendel:
         self.zustand = (self.zustand or "").strip().lower()
         for feld in (
             "tarif_monatlich",
+            "tarif_listenpreis",
             "buendel_monatlich",
             "geraet_zuzahlung",
             "geraet_monatsrate",

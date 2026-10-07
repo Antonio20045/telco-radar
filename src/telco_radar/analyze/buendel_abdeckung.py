@@ -17,7 +17,9 @@ Vier Befundarten, jede für sich rot:
 * ``kombis_weg``        gegenüber dem vorigen Messtag fehlen mehr als
                         `KOMBI_VERLUST_ANTEIL` der Kombinationen
 * ``preissprung``       die Leitzahl einer Kombination springt um mehr als
-                        `PREISSPRUNG_ANTEIL` gegenüber dem vorigen Messtag
+                        `PREISSPRUNG_ANTEIL` gegenüber dem vorigen Messtag; über
+                        einen Bruch der Rechenweise (`rechenweise`) wird nicht
+                        verglichen
 
 Eine belegte Lücke (Anbieter führt das Gerät nicht, Anbieter nicht
 erreichbar) ist kein Befund, sie steht aber mit ihrem Grund in der Matrix.
@@ -34,6 +36,7 @@ from typing import Optional
 
 import yaml
 
+from .. import rechenweise
 from ..geraete_model import normalisiere
 
 KOMBI_VERLUST_ANTEIL = 0.10
@@ -171,7 +174,7 @@ def _vergleiche_vortag(
         anbieter = _anbieter_aus_id(zeile.get("id"), namen)
         if anbieter is None or zeile.get("zustand", "neu") not in ("", "neu"):
             continue
-        je_tag[anbieter][zeile.get("datum")][zeile["id"]] = zeile.get("gesamt")
+        je_tag[anbieter][zeile.get("datum")][zeile["id"]] = zeile
 
     vortage = set()
     for anbieter, tage in je_tag.items():
@@ -198,7 +201,9 @@ def _vergleiche_vortag(
             )
         spruenge = []
         for bid in sorted(set(alt) & set(neu)):
-            a, n = alt[bid], neu[bid]
+            if not rechenweise.gleich(alt[bid], neu[bid]):
+                continue
+            a, n = alt[bid].get("gesamt"), neu[bid].get("gesamt")
             if not a or n is None:
                 continue
             if abs(n - a) / a > PREISSPRUNG_ANTEIL:

@@ -3,8 +3,8 @@
 Warum eine EIGENE Datei
 -----------------------
 `data/state/geraete_db.json` traegt seit dem 10.08.2026 die Listungen, also was ein
-Anbieter fuer ein GERAET verlangt. Ein Buendel ist ein anderer Sachverhalt: es kommt
-von einer Tarifseite, hat einen anderen Lebenszyklus und eine andere Identitaet (SKU x
+Anbieter fuer ein GERAET verlangt. Ein Buendel ist ein anderer Sachverhalt: es kommt von
+einer Tarifseite, hat einen anderen Lebenszyklus und eine andere Identitaet (SKU x
 Anbieter x Tarif x Ratenlaufzeit statt SKU x Anbieter). Es steht deshalb in
 
     data/state/geraete_tco.json    Buendel, SIM-only-Referenzen und unter `pruefung`
@@ -40,8 +40,7 @@ koennte ihm ansehen, dass er aus zwei Messungen stammt. Lieber eine sichtbare Lu
 am 03.09.2026 die Preisform an ihre Zahl gebunden. Ebenso gemeinsam: die Kennzeichen
 eines Klick-Buendels (`tco_buendel.KLICKFELDER`), die ein Adapterwert abraeumt.
 
-`first_seen` bleibt davon unberuehrt: seit wann ein Angebot beobachtet wird, ist
-keine Messung dieses Laufs.
+`first_seen` bleibt unberuehrt: seit wann ein Angebot beobachtet wird, misst kein Lauf.
 
 Was hier bewusst NICHT steht
 ----------------------------
@@ -51,23 +50,20 @@ Keine Loesch- oder Alterungslogik fuer BUENDEL. Die Alterung alter Werte ist sei
 ab-Preis, Delta und Ranking, die Zeile bleibt ausgegraut mit Abrufdatum stehen. Der
 Store haelt die Messung unveraendert bereit - zurueck in den Vergleich kommt ein
 Angebot allein durch einen neuen Lauf, nie durch Loeschen.
-`mark_stale` bleibt fuer LISTUNGEN reserviert (`geraete_pipeline`):
-"Nicht gelesen" ist nicht "leer" (CLAUDE.md, Fallstricke).
+`mark_stale` bleibt fuer LISTUNGEN reserviert (`geraete_pipeline`): "Nicht gelesen"
+ist nicht "leer" (CLAUDE.md, Fallstricke).
 
 Die Preishistorie steht hier sehr wohl - seit P2 (11.09.2026)
 -------------------------------------------------------------
-`geraete_tco.json` bleibt der AKTUELLE Stand je Buendel: die Seite liest
-weiter nur ihn. Daneben waechst
+`geraete_tco.json` bleibt der AKTUELLE Stand je Buendel: die Seite liest weiter nur ihn.
+Daneben waechst `data/state/geraete_tco_historie.jsonl`, eine Zeile je (buendel_id,
+datum) mit den Messfeldern, der gerechneten Leitzahl `gesamt` (eingefroren aus
+`tco_model.tco_24`, damit P5 die Reihe zeichnen kann, ohne die Rechnung frueherer Laeufe
+nachzubauen), `abgerufen_am` und `rechenweise.FELD` (auch im Stand). Die Schreibregeln:
 
-    data/state/geraete_tco_historie.jsonl
-
-eine Zeile je (buendel_id, datum) mit den Messfeldern, der gerechneten Leitzahl
-`gesamt` (eingefroren aus `tco_model.tco_24`, damit P5 die Reihe zeichnen kann, ohne
-die Rechnung frueherer Laeufe nachzubauen) und `abgerufen_am`. Die Schreibregeln:
-
-* gleiches Datum je Buendel -> die Zeile wird ERSETZT. Ein wiederholter
-  Lauf am selben Tag ist dieselbe Messung, kein zweiter Punkt (sonst
-  luege die Reihe ab P5 um die Zahl der Nachtlaeufe, nicht um den Markt).
+* gleiches Datum je Buendel -> die Zeile wird ERSETZT. Ein wiederholter Lauf am selben
+  Tag ist dieselbe Messung, kein zweiter Punkt (sonst luege die Reihe ab P5 um die Zahl
+  der Nachtlaeufe, nicht um den Markt).
 * neues Datum -> neue Zeile dazu; ALTE Tage bleiben unveraendert stehen. Ein Messtag ist
   nicht nachholbar - deshalb wird die Datei beim Zusammenfuehren gelesen und nie blind
   neu geschrieben.
@@ -83,6 +79,7 @@ from dataclasses import asdict
 from pathlib import Path
 from typing import Optional
 
+from .. import rechenweise
 from ..tarif_model import schreibe_buendelphasen
 from ..tco_model import (
     Buendel,
@@ -100,6 +97,7 @@ _MESSFELDER = (
     "tarif_id",
     "tarif_id_guete",
     "tarif_monatlich",
+    "tarif_listenpreis",
     "tarif_bindung_monate",
     "buendel_monatlich",
     "geraet_zuzahlung",
@@ -420,6 +418,7 @@ class TcoDB:
         """Alle Messfelder gemeinsam, auch die leeren - siehe Modulkopf."""
         eintrag.update({feld: getattr(satz, feld) for feld in felder})
         schreibe_buendelphasen(eintrag, satz)
+        eintrag.update(rechenweise.felder(satz))
 
     @staticmethod
     def _historie_zeile(satz: Buendel, datum: str) -> dict:
