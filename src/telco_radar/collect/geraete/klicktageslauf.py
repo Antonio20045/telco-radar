@@ -44,6 +44,7 @@ from .klickergebnis import (
 )
 from .klicklauf import LAUF_GESTOERT, Klicklauf
 from .klickseite import GRUND_FRIST, Fristschleuse, beobachte
+from .klickspur import ohne_geheimnisse
 from .klicktor import Hostschleuse
 from .robots import RobotsWaechter
 
@@ -74,8 +75,11 @@ def budget_ende(job_frist_s: float, verstrichen_s: float, jetzt: float) -> float
 def reihenfolge(
     seiten: tuple[Seitenziel, ...], gelesen: Mapping[str, str]
 ) -> list[Seitenziel]:
-    """Nie gelesene zuerst, dann nach dem ältesten Lesedatum; sonst Konfiguration."""
-    return sorted(seiten, key=lambda s: gelesen.get(s.adresse, ""))
+    """Nie gelesene zuerst, dann nach dem ältesten Lesedatum; sonst Konfiguration.
+
+    Der Lesestand kennt Adressen nur ohne Geheimnisse, wie die Ergebnisdatei.
+    """
+    return sorted(seiten, key=lambda s: gelesen.get(ohne_geheimnisse(s.adresse), ""))
 
 
 def ueberfaellig(
@@ -84,15 +88,16 @@ def ueberfaellig(
     heute_gelesen: set[str],
     heute: str,
 ) -> list[str]:
-    """Adressen, die heute nicht gelesen sind und älter als die Frischegrenze."""
+    """Adressen ohne Geheimnisse, heute ungelesen und älter als die Frischegrenze."""
     tag = date.fromisoformat(heute)
+    adressen = [ohne_geheimnisse(s.adresse) for s in seiten]
     return [
-        s.adresse
-        for s in seiten
-        if s.adresse not in heute_gelesen
+        a
+        for a in adressen
+        if a not in heute_gelesen
         and (
-            s.adresse not in gelesen
-            or (tag - date.fromisoformat(gelesen[s.adresse])).days >= FRISCHEGRENZE_TAGE
+            a not in gelesen
+            or (tag - date.fromisoformat(gelesen[a])).days >= FRISCHEGRENZE_TAGE
         )
     ]
 
