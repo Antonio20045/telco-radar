@@ -36,6 +36,9 @@ Deshalb ruft dieser Adapter je Geraet die Detailnutzlast ab, statt sich die
 Liste zu sparen: die Liste allein haette 1-Euro-Lockpreise geliefert, und
 genau die haelt der Lockpreis-Waechter seit dem 10.08.2026 heraus.
 
+Der Tarif traegt dort zusaetzlich `withDiscounts`: den Aktionspreis mit Dauer.
+`vodafone_aktion.py` legt ihn als Tarifphase ab (Befund 07.10.2026).
+
 DIE REGEL "NUR VERLINKTE ADRESSEN" GILT UNVERAENDERT
 ----------------------------------------------------
 Die `virtualItemId` jedes Geraets steht in der Nutzlast der Einstiegsseite.
@@ -157,6 +160,7 @@ from typing import Callable, Optional
 from urllib.parse import urlsplit
 
 from .basis import GeraeteAbrufFehler, _preis
+from .vodafone_aktion import tarif_mit_aktion
 
 from ...tco_model import laufzeit_in_monaten
 
@@ -165,6 +169,8 @@ log = logging.getLogger(__name__)
 _PARAMETER = "businessTransaction=newContract&salesChannel=Online.Consumer"
 
 _GB_RE = re.compile(r"(\d+)\s*(GB|TB)", re.IGNORECASE)
+
+_GERAETERATE = ("priceByComponent", "hardware", "priceByType", "rate", "month")
 
 
 def _json(text: str, was: str) -> dict:
@@ -380,16 +386,7 @@ def _laufzeit(komposition: dict, geraet_monatsrate: Optional[float]) -> Optional
         return laufzeit
     if geraet_monatsrate is not None:
         return laufzeit_in_monaten(
-            _pfad(
-                komposition,
-                "priceByComponent",
-                "hardware",
-                "priceByType",
-                "rate",
-                "month",
-                "withoutDiscounts",
-                "recurrenceEnd",
-            )
+            _pfad(komposition, *_GERAETERATE, "withoutDiscounts", "recurrenceEnd")
         )
     return _letztes_phasenende(komposition)
 
@@ -463,20 +460,12 @@ def _buendelsatz_aus_komposition(
             hash_,
             komposition.get("financingDuration"),
             geraet_monatsrate,
-            _pfad(
-                komposition,
-                "priceByComponent",
-                "hardware",
-                "priceByType",
-                "rate",
-                "month",
-                "withoutDiscounts",
-                "recurrenceEnd",
-            ),
+            _pfad(komposition, *_GERAETERATE, "withoutDiscounts", "recurrenceEnd"),
             [p.get("recurrenceEnd") for p in _perioden(komposition)],
         )
         return None
 
+    tarif, phasen = tarif_mit_aktion(komposition, t_monat, geraet_monatsrate, laufzeit)
     return {
         "titel": modell,
         "strukturierter_name": modell,
@@ -485,7 +474,8 @@ def _buendelsatz_aus_komposition(
         "sku": hardware_id,
         "tarif_name": "",
         "tarif_slug": hash_,
-        "tarif_monatlich": t_monat,
+        "tarif_monatlich": tarif,
+        "tarif_phasen": phasen,
         "geraet_zuzahlung": h_einmalig,
         "geraet_monatsrate": geraet_monatsrate,
         "anschlusspreis": t_einmalig,

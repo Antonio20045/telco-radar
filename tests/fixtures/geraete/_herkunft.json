@@ -738,6 +738,19 @@
       "hinweis": "Körper der Antwort unverändert (gekuerzt=false im Mitschnitt), nur gzip-verpackt. Beleg für die Pfade der Klick-Karte config/klickkarten/vodafone.yaml."
     },
     {
+      "datei": "vodafone_tarif_hardware_iphone_17_pro_20261007.json",
+      "url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57562&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=36",
+      "quelle": "Zweig klick-erkundung, Commit a9b45f5a, erkundung/vodafone/2026-10-07/mitschnitt-3.json, Antwort 337 (xhr; Commit c8ce1f77 trägt dieselbe Antwort 337 mit gleichem sha256; Klick-Erkundung 07.10.2026, Tarifauswahl iPhone 17 Pro 256 GB Cosmic Orange, 36 Raten)",
+      "abgerufen_am": "2026-10-07",
+      "http_status": 200,
+      "content_type": "application/json;charset=utf-8",
+      "bytes_roh": 13654,
+      "sha256_roh": "097ca7f979a9dd71edc7756cd2b62876bd421946a601dd7f02e6fe1ab17d8808",
+      "gzip": false,
+      "bytes_abgelegt": 13654,
+      "hinweis": "Körper der Antwort unverändert (gekuerzt=false im Mitschnitt). Beleg für den Aktionspreis als Tarifphase (collect/geraete/vodafone_aktion.py): Mobil XS 31,95 € ohne und 23,95 € mit Rabatt in Monat 1–24, discount 11079 „24 Monate: 25 % Vorteil auf Tarifpreis ohne Hardwarezuzahlung“ −8,00 €."
+    },
+    {
       "datei": "o2_konfiguration_20261007.json.gz",
       "url": "https://www.o2online.de/e-shop/rest/configuration/<id> (3 Antworten: iPhone 17 Pro 256 GB 24 Monate mit L Plus und mit S Special Plus, Galaxy S26 512 GB 24 Monate mit L Plus; Adressen in der Datei)",
       "quelle": "Zweig klick-erkundung, Commit f31d5543, erkundung/o2/2026-10-07/mitschnitt-1.json Antworten 135 und 138, mitschnitt-2.json Antwort 135 (Klick-Erkundung, Actions-Lauf 37582071155)",
