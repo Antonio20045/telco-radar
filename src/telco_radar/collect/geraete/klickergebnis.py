@@ -13,10 +13,12 @@ gelesen wurden, aber keine Kombination erfasst ist; ``nicht_gelesen``, wenn kein
 gelesen wurde (gesperrt, nicht besucht, Karte fehlt). Nur ``gelesen`` ersetzt im
 Gerätelauf etwas (``analyze.klick_zusammenfuehrung``).
 
-Der Lesestand (``data/state/klick_stand.json``, ``lies_stand``) hält je Anbieter das
-letzte Lesedatum jeder Produktseite und jeder erfassten Variante; der Tageslauf ordnet
-danach, der Gerätelauf schreibt ihn. ``FRISCHEGRENZE_TAGE`` ist die Frist, in der jede
-Variante wieder gelesen sein soll.
+Im Repo liegen die Dateien unter ``data/state/klick/<schluessel>.json`` (``ORDNER``,
+abgelegt von ``analyze.klick_ablage`` im eigenen Workflow), daneben der Lesestand
+``STAND_DATEI`` (``lies_stand``): je Anbieter das letzte Lesedatum jeder Produktseite
+und jeder erfassten Variante. Der Tageslauf ordnet danach, der Gerätelauf liest ihn.
+``FRISCHEGRENZE_TAGE`` ist die Frist, in der jede Variante wieder gelesen sein soll;
+eine ältere Datei ersetzt nichts mehr.
 """
 
 from __future__ import annotations
@@ -53,6 +55,8 @@ GELESENE_SEITEN = frozenset({LAUF_GELESEN, LAUF_ZEITGRENZE})
 GRUND_NICHTS_ERFASST = "keine Kombination erfasst"
 GRUND_KEINE_SEITE = "keine Seite gelesen"
 STAND_FORMAT = 1
+ORDNER = Path("data") / "state" / "klick"
+STAND_DATEI = "klick_stand.json"
 
 
 def kombination_als_daten(ergebnis: Kombiergebnis) -> dict:
@@ -138,13 +142,16 @@ def lies_ergebnisse(ordner: Path) -> tuple[list[dict], list[str]]:
     """Alle Ergebnisdateien unter ``ordner`` und die unlesbaren mit Grund.
 
     Artefakte liegen je Anbieter in einem Unterordner; gesucht wird darum rekursiv.
-    Eine Datei ohne passendes ``format`` ist unlesbar, nicht leer.
+    Eine Datei ohne passendes ``format`` ist unlesbar, nicht leer; der Lesestand
+    (``STAND_DATEI``) ist keine Ergebnisdatei.
     """
     daten: list[dict] = []
     unlesbar: list[str] = []
     if not ordner.is_dir():
         return daten, [f"{ordner}: kein Ordner"]
     for datei in sorted(ordner.rglob("*.json")):
+        if datei.name == STAND_DATEI:
+            continue
         try:
             inhalt = json.loads(datei.read_text(encoding="utf-8"))
         except (OSError, UnicodeDecodeError, json.JSONDecodeError) as fehler:

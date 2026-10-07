@@ -3,9 +3,9 @@
 # =============================================================================
 # Je Anbieter die Produktseiten, die `scripts/klick_tageslauf.py` täglich mit der
 # Klick-Karte config/klickkarten/<schluessel>.yaml durchklickt (Matrix-Job je
-# Anbieter in geraete.yml). Format und Prüfung wie config/klick_erkundung.yaml
-# (`klickziele.lade_ziele`), aber ohne Grenze der Seitenzahl; `weiter` gibt es
-# hier nicht.
+# Anbieter im eigenen Workflow klick.yml; Ergebnisse in data/state/klick/).
+# Format und Prüfung wie config/klick_erkundung.yaml (`klickziele.lade_ziele`),
+# aber ohne Grenze der Seitenzahl; `weiter` gibt es hier nicht.
 #
 # DIE ADRESSEN SIND NICHT ZUSAMMENGESETZT. Jede steht wörtlich als `quelle_url`
 # im Bestand des Geräteradars (Stand 07.10.2026): o2 und Telekom aus
@@ -16,7 +16,7 @@
 # eigene Seite.
 #
 # Rotation: nie gelesene Seiten zuerst, dann die am längsten nicht gelesenen
-# (data/state/klick_stand.json). Reicht das Zeitbudget nicht für alle Seiten
+# (data/state/klick/klick_stand.json). Reicht das Zeitbudget nicht für alle Seiten
 # eines Tages, liest der nächste Tag die übrigen; jede Seite soll spätestens
 # alle drei Tage gelesen sein (`ueberfaellig` in der Ergebnisdatei).
 #

@@ -9,7 +9,7 @@ startet Chromium ohne Tarnung und stellt die Uhr.
 AUFRUF
 ------
     PYTHONPATH=src python scripts/klick_tageslauf.py --anbieter o2 --ausgabe klick
-        [--stand data/state/klick_stand.json] [--job-frist-sekunden 3600]
+        [--stand data/state/klick/klick_stand.json] [--job-frist-sekunden 4500]
         [--job-start EPOCHE] [--root .] [--chromium PFAD] [--ohne-parallelpruefung]
     PYTHONPATH=src python scripts/klick_tageslauf.py --plan
 
@@ -19,8 +19,9 @@ Schritt); mit ``--job-frist-sekunden`` ergibt er die Restzeit (CLAUDE.md Regel 8
 ohne Netz. Ein gestörter Anbieter ist ein Ergebnis, kein Fehler: Exit-Code 0; 2 heißt,
 die Auswahl oder die Konfiguration ist falsch.
 
-Vor jeder Seite fragt der Lauf mit ``GITHUB_TOKEN`` (``actions: read``), ob die
-Klick-Erkundung oder der Radarlauf ansteht oder läuft (``klickparallel``); dann und
+Vor jeder Seite fragt der Lauf mit ``GITHUB_TOKEN`` (``actions: read``), ob der
+Gerätelauf, die Klick-Erkundung oder der Radarlauf ansteht oder läuft
+(``klickparallel.TAGESLAUF_WORKFLOWS``); dann und
 ohne lesbare API ist der Rest ``nicht_besucht``. ``--ohne-parallelpruefung`` nur von
 Hand außerhalb von Actions.
 """
@@ -42,6 +43,8 @@ from telco_radar.collect import http
 from telco_radar.collect.geraete.klickergebnis import (
     FORMAT,
     LAUF_NICHT_GELESEN,
+    ORDNER,
+    STAND_DATEI,
     lies_stand,
     schreibe,
 )
@@ -63,7 +66,6 @@ from telco_radar.collect.geraete.klickziele import (
 )
 
 FEHLER_AUSWAHL = 2
-STAND = Path("data") / "state" / "klick_stand.json"
 
 
 def _uhr() -> datetime:
@@ -106,7 +108,9 @@ def main(argumente: list[str] | None = None) -> int:
         schreibe(ziel_datei, _ohne_karte(ziel.schluessel, ziel.name, heute, lage))
         print(f"{ziel.schluessel}: {LAUF_NICHT_GELESEN} ({lage.grund})")
         return 0
-    stand = lies_stand(args.stand or args.root / STAND)
+    stand = lies_stand(
+        args.root / ORDNER / STAND_DATEI if args.stand is None else args.stand
+    )
     verstrichen = beginn - (args.job_start if args.job_start is not None else beginn)
     ende = budget_ende(args.job_frist_sekunden, verstrichen, time.monotonic())
     laeufe = (

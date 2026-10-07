@@ -348,8 +348,8 @@ def run_geraete_stage(
     heutige Daten NUR an die Referenzen dieses Anbieters ein. Der Lauf
     vom 15.09.2026 hat ohne diesen Scope 35 Fremd-Referenzen neu datiert
     und 1&1 abgerufen (Befund Runde 2, outputs/telekom-taeglich-2026-09-15.md).
-    `klick` ist der Ordner der Klick-Ergebnisse (`analyze.klick_zusammenfuehrung`);
-    ohne ihn laeuft alles wie ohne Klick-Crawler.
+    `klick` ist der Ordner der Klick-Ergebnisse (`analyze.klick_zusammenfuehrung`),
+    ohne Angabe `data/state/klick`; gibt es keinen, laeuft alles wie bisher.
     """
     beginn = time.monotonic()
     if jetzt is None:
@@ -501,7 +501,7 @@ def run_geraete_stage(
             klickzug = zusammenfuehren(
                 rohbuendel,
                 klick,
-                zustand,
+                root,
                 katalog,
                 heute,
                 lambda sku: geraet_aus_sku(sku, katalog),
@@ -514,7 +514,6 @@ def run_geraete_stage(
             seite = Seite(ist_frisch, geraet_aus_sku, katalog)
             pruefe_buendel(tco, db, bestand, heute, seite, abgesichert)
             tco.save(heute)
-            klickzug.speichere()
             geschrieben = True
     except Exception as exc:  # noqa: BLE001
         log.warning("SIM-only-Referenzen nicht geschrieben: %s", exc)

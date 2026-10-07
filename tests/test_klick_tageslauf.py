@@ -290,7 +290,8 @@ def test_paralleler_lauf_verschiebt_den_rest(o2, karte, gelesen_o2):
     assert len(alle.aufrufe) == len(o2.seiten)
 
 
-def test_tageslauf_fragt_erkundung_und_radar_nicht_sich_selbst():
+def test_tageslauf_weicht_geraetelauf_erkundung_und_radar_aus():
+    """``klick.yml`` darf ``geraete.yml`` nicht überlappen (CLAUDE.md Regel 4)."""
     gefragt = []
 
     def holer(url, kopf):
@@ -302,7 +303,7 @@ def test_tageslauf_fragt_erkundung_und_radar_nicht_sich_selbst():
     )
 
     assert replace(laeufe, holer=holer)() is None
-    assert set(gefragt) == {"klick-erkundung.yml", "radar.yml"}
+    assert set(gefragt) == {"geraete.yml", "klick-erkundung.yml", "radar.yml"}
     assert aus_umgebung({}, TAGESLAUF_WORKFLOWS)() == (
         "GitHub-API nicht lesbar (GITHUB_REPOSITORY, GITHUB_TOKEN fehlt)"
     )

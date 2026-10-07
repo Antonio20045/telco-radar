@@ -5,7 +5,7 @@ Adaptersätze: die 48 echten o2-Rohsätze zum iPhone 17 Pro aus dem Sammler
 ``test_tco_buendel_ohne_tarifblatt``). Klick-Sätze: Lesungen derselben echten Antworten
 (``tests/klickergebnisse.py``). Ein Klick-Satz ersetzt den Adaptersatz mit gleichem
 Schlüssel und übernimmt dessen Bündel-ID; der ersetzte zählt als Gegenprobe. Ein
-gestörter, alter oder fehlender Anbieter ersetzt nichts.
+gestörter, veralteter oder fehlender Anbieter ersetzt nichts.
 """
 
 from __future__ import annotations
@@ -30,7 +30,6 @@ from klickergebnisse import (
 )
 
 from telco_radar.analyze.klick_zusammenfuehrung import (
-    STAND,
     UMGEBUNG,
     fuehre_zusammen,
     klickordner,
@@ -38,7 +37,7 @@ from telco_radar.analyze.klick_zusammenfuehrung import (
 )
 from telco_radar.analyze.tco_buendel import aus_rohsaetzen
 from telco_radar.collect.geraete import sammle_anbieter
-from telco_radar.collect.geraete.klickergebnis import lies_stand, schreibe
+from telco_radar.collect.geraete.klickergebnis import ORDNER, STAND_DATEI, schreibe
 from telco_radar.collect.geraete.klicklauf import LAUF_GESTOERT
 from telco_radar.collect.geraete.robots import RobotsWaechter
 from telco_radar.geraete_config import Anbieter, Einstieg, lade_farben, lade_katalog
@@ -57,6 +56,7 @@ _KATALOG_URL = (
     "__not-specified__/__not-specified__"
 )
 LEER = {"format": 1, "seiten": {}, "varianten": {}}
+_SCHLUESSEL_512 = "o2|apple-iphone-17-pro|512|o2-mobile-unlimited-m-plus|24"
 
 
 @pytest.fixture(scope="module")
@@ -213,24 +213,43 @@ def test_abweichung_wird_je_feld_gezaehlt(katalog):
     ("datei", "warum"),
     [
         ({"status": LAUF_GESTOERT, "grund": "Abruf gestört (HTTP 403)"}, "gestoert"),
-        ({"datum": "2026-09-28"}, "nicht von heute"),
+        ({"datum": "2026-09-26"}, "älter als 3 Tage"),
+        ({"datum": "2026-09-30"}, "nach heute"),
+        ({"datum": "gestern"}, "Datum der Datei unlesbar"),
     ],
-    ids=["gestoert", "gestern"],
+    ids=["gestoert", "veraltet", "zukunft", "kein-datum"],
 )
-def test_gestoerter_oder_alter_anbieter_ersetzt_nichts(adapter, katalog, datei, warum):
+def test_gestoerter_oder_veralteter_anbieter_ersetzt_nichts(
+    adapter, katalog, datei, warum
+):
     datum = datei.pop("datum", HEUTE)
     ergebnis = _o2(erfasst(o2_lesung("256 GB", M_PLUS, 36)), datum=datum, **datei)
     stand = _stand()
-    stand["varianten"]["o2"] = {
-        "o2|apple-iphone-17-pro|512|o2-mobile-unlimited-m-plus|24": "2026-09-28"
-    }
+    stand["varianten"]["o2"] = {_SCHLUESSEL_512: "2026-09-28"}
 
     zug = fuehre_zusammen(adapter, [ergebnis], katalog, HEUTE, _geraet(katalog), stand)
 
     assert zug.rohsaetze == adapter
     assert zug.bilanz["ersetzt"] == 0 and zug.bilanz["frueher_gelesen_ersetzt"] == 0
     assert warum in zug.bilanz["dateien"][0]["warum_nicht"]
-    assert zug.stand["seiten"] == {}
+
+
+@pytest.mark.parametrize(
+    ("datum", "frueher"), [("2026-09-27", 1), ("2026-09-26", 0)], ids=["2", "3"]
+)
+def test_datei_von_vorgestern_haelt_nur_die_ersetzung(adapter, katalog, datum, frueher):
+    """Eine Datei, zwei Tage alt, liefert keine Werte mit heutigem Datum: ihre Variante
+    hält den Adaptersatz nur heraus. Drei Tage alt ersetzt sie nichts mehr."""
+    ergebnis = _o2(erfasst(o2_lesung("256 GB", M_PLUS, 36)), datum=datum)
+
+    zug = fuehre_zusammen(
+        adapter, [ergebnis], katalog, HEUTE, _geraet(katalog), _stand()
+    )
+
+    assert _klick(zug.rohsaetze) == [] and zug.bilanz["ersetzt"] == 0
+    assert zug.bilanz["frueher_gelesen_ersetzt"] == frueher
+    assert len(zug.rohsaetze) == 48 - frueher
+    assert zug.bilanz["dateien"][0]["verwendet"] is bool(frueher)
 
 
 @pytest.mark.parametrize(("gelesen", "ersetzt"), [("2026-09-28", 1), ("2026-09-26", 0)])
@@ -239,53 +258,62 @@ def test_frische_lesung_haelt_die_ersetzung_ueber_die_rotation(
 ):
     """Heute las der Lauf nur 256 GB/36; 512 GB/24 las er vor einem bzw. drei Tagen."""
     stand = _stand()
-    schluessel = "o2|apple-iphone-17-pro|512|o2-mobile-unlimited-m-plus|24"
-    stand["varianten"]["o2"] = {schluessel: gelesen}
+    stand["varianten"]["o2"] = {_SCHLUESSEL_512: gelesen}
     heute = _o2(erfasst(o2_lesung("256 GB", M_PLUS, 36)))
 
     zug = fuehre_zusammen(adapter, [heute], katalog, HEUTE, _geraet(katalog), stand)
 
     assert zug.bilanz["frueher_gelesen_ersetzt"] == ersetzt
     assert len(zug.rohsaetze) == 48 - ersetzt
-    assert (schluessel in zug.stand["varianten"]["o2"]) == bool(ersetzt)
-    neu = "o2|apple-iphone-17-pro|256|o2-mobile-unlimited-m-plus-mit-100-mbit-s|36"
-    assert zug.stand["varianten"]["o2"][neu] == HEUTE
-    assert zug.stand["seiten"]["o2"] == {O2_SEITE.adresse: HEUTE}
+    assert len(_klick(zug.rohsaetze)) == 1
 
 
 def test_ohne_ordner_bleibt_alles_wie_bisher(adapter, katalog, tmp_path):
     zug = zusammenfuehren(adapter, None, tmp_path, katalog, HEUTE, _geraet(katalog))
-    zug.speichere()
 
     assert zug.rohsaetze == adapter and zug.bilanz is None
     assert list(tmp_path.iterdir()) == []
 
 
-def test_ordner_wird_gelesen_und_stand_erst_beim_speichern_geschrieben(
-    adapter, katalog, tmp_path
-):
-    ordner = tmp_path / "klick"
-    schreibe(
-        ordner / "klick-o2" / "o2.json", _o2(erfasst(o2_lesung("256 GB", M_PLUS, 36)))
-    )
+def test_standardordner_wird_gelesen_und_nicht_beschrieben(adapter, katalog, tmp_path):
+    ordner = tmp_path / ORDNER
+    schreibe(ordner / "o2.json", _o2(erfasst(o2_lesung("256 GB", M_PLUS, 36))))
+    stand = _stand()
+    stand["varianten"]["o2"] = {_SCHLUESSEL_512: "2026-09-28"}
+    schreibe(ordner / STAND_DATEI, stand)
     (ordner / "kaputt.json").write_text("{", encoding="utf-8")
-    zustand = tmp_path / "state"
-    zustand.mkdir()
+    vorher = {d.name: d.read_bytes() for d in ordner.iterdir()}
 
-    zug = zusammenfuehren(adapter, ordner, zustand, katalog, HEUTE, _geraet(katalog))
+    zug = zusammenfuehren(adapter, None, tmp_path, katalog, HEUTE, _geraet(katalog))
 
     assert len(_klick(zug.rohsaetze)) == 1
+    assert zug.bilanz["frueher_gelesen_ersetzt"] == 1
     assert zug.bilanz["unlesbar"] == ["kaputt.json: JSONDecodeError"]
-    assert not (zustand / STAND).exists()
-    zug.speichere()
-    assert lies_stand(zustand / STAND)["seiten"]["o2"] == {O2_SEITE.adresse: HEUTE}
+    assert {d.name: d.read_bytes() for d in ordner.iterdir()} == vorher
 
 
-@pytest.mark.parametrize("mit_klick", [True, False], ids=["mit", "ohne"])
-def test_geraetelauf_fuehrt_klick_zusammen(tmp_path, mit_klick):
-    """``run_geraete_stage`` mit dem o2-Mitschnitt als einzigem Anbieter: mit Ordner
-    ersetzt die Klick-Lesung einen der 48 Adaptersätze, ohne Ordner bleibt alles wie
-    bisher und kein Lesestand entsteht."""
+def test_genannter_ordner_geht_vor(adapter, katalog, tmp_path):
+    veraltet = _o2(erfasst(o2_lesung("256 GB", M_PLUS, 36)), datum="2026-09-20")
+    schreibe(tmp_path / ORDNER / "o2.json", veraltet)
+    artefakte = tmp_path / "artefakte"
+    schreibe(
+        artefakte / "klick-o2" / "o2.json",
+        _o2(erfasst(o2_lesung("256 GB", M_PLUS, 36))),
+    )
+
+    genannt = zusammenfuehren(
+        adapter, artefakte, tmp_path, katalog, HEUTE, _geraet(katalog)
+    )
+    standard = zusammenfuehren(
+        adapter, None, tmp_path, katalog, HEUTE, _geraet(katalog)
+    )
+
+    assert genannt.bilanz["ersetzt"] == 1
+    assert standard.bilanz["ersetzt"] == 0
+
+
+def _repo(tmp_path: Path) -> Path:
+    """Ein Repo mit dem o2-Mitschnitt als einzigem Anbieter und echtem Tarifbestand."""
     root = tmp_path / "repo"
     (root / "config").mkdir(parents=True)
     for name in ("geraete_katalog.yaml", "farben.yaml"):
@@ -294,28 +322,32 @@ def test_geraetelauf_fuehrt_klick_zusammen(tmp_path, mit_klick):
     (root / "config" / "geraete_quellen.yaml").write_text(quellen, encoding="utf-8")
     (root / "data" / "state").mkdir(parents=True)
     shutil.copy(ZUSTAND / "tarife.jsonl", root / "data" / "state" / "tarife.jsonl")
-    ordner = tmp_path / "klick"
-    schreibe(
-        ordner / "klick-o2" / "o2.json", _o2(erfasst(o2_lesung("256 GB", M_PLUS, 36)))
-    )
+    return root
 
-    bilanz = run_geraete_stage(
-        root,
-        {},
-        HEUTE,
-        jetzt=_JETZT,
-        hole=_hole(),
-        klick=ordner if mit_klick else None,
-    )
+
+@pytest.mark.parametrize(
+    ("datum", "ersetzt"),
+    [(HEUTE, 1), ("2026-09-26", 0), (None, None)],
+    ids=["heute", "veraltet", "ohne"],
+)
+def test_geraetelauf_liest_den_klick_ordner_im_repo(tmp_path, datum, ersetzt):
+    """``run_geraete_stage`` ohne ``klick``: liegt ``data/state/klick/o2.json`` im Repo,
+    ersetzt die Lesung von heute einen der 48 Adaptersätze, eine veraltete keinen; der
+    Gerätelauf schreibt nichts in den Ordner."""
+    root = _repo(tmp_path)
+    datei = root / ORDNER / "o2.json"
+    if datum is not None:
+        schreibe(datei, _o2(erfasst(o2_lesung("256 GB", M_PLUS, 36)), datum=datum))
+
+    bilanz = run_geraete_stage(root, {}, HEUTE, jetzt=_JETZT, hole=_hole())
 
     assert (bilanz["rohbuendel"], bilanz["buendel"]) == (48, 48)
-    stand = root / "data" / "state" / STAND
-    if not mit_klick:
-        assert bilanz["klick"] is None and not stand.exists()
+    if datum is None:
+        assert bilanz["klick"] is None and not (root / ORDNER).exists()
         return
-    assert bilanz["klick"]["ersetzt"] == 1
-    assert bilanz["klick"]["gegenprobe"]["gleich"] == 1
-    assert lies_stand(stand)["seiten"]["o2"] == {O2_SEITE.adresse: HEUTE}
+    assert bilanz["klick"]["ersetzt"] == ersetzt
+    assert bilanz["klick"]["gegenprobe"]["gleich"] == ersetzt
+    assert [d.name for d in (root / ORDNER).iterdir()] == ["o2.json"]
 
 
 def test_klickordner_nur_aus_gesetzter_umgebung():
