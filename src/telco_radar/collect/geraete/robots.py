@@ -86,7 +86,7 @@ class Regelwerk:
     """Die fuer uns geltenden Regeln EINES Hosts.
 
     `status` ist der HTTP-Status der robots.txt, `None` ohne Antwort; `darf()`
-    liest ihn nicht, nur das Tor des Klick-Crawlers (`klicktor.Tor`).
+    liest ihn nicht, nur das Tor des Klick-Crawlers (`klickhilfe`).
     """
 
     disallow: list = field(default_factory=list)

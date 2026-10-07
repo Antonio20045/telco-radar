@@ -13,7 +13,7 @@ Aufrufers schnitt ihn ab; was er nicht besuchte, heißt so). Bot-Schutz heißt
 ``bot_schutz``: HTTP 202, 4xx oder 5xx, ein bekanntes Challenge-Muster
 (``CHALLENGE_MUSTER``) oder eine HTML-Seite, wo die Preisschnittstelle JSON liefern
 soll. Gescheiterte Anfragen hält der Lauf mit Grund fest, ebenso jede Hilfsdatei, die
-ohne Regeln hinausging (``Hilfsdatei``).
+ohne Regeln in den Browser ging (``Hilfsdatei``, ``klickhilfe``).
 
 Jede Kombination mit gelesenen Werten trägt ihren Beleg (``klickbeleg``) und
 ``beleg_status``: ``offen`` (gebaut, noch nicht im Archiv), ``belegt`` (Dateien in der
@@ -90,7 +90,8 @@ def antworttext(koerper: bytes, typ: str) -> str:
 
 @dataclass(frozen=True)
 class Verworfen:
-    """Eine Adresse, die robots.txt sperrt; sie ging nicht hinaus.
+    """Eine Adresse, die robots.txt sperrt; sie ging nicht hinaus, außer eine
+    Hilfsdatei, deren Antwort keine war (``klickhilfe.KEINE_HILFSDATEI``).
 
     ``anfrage`` ist die Adresse, die die Seite anfragte; nach einer Umleitung weicht
     sie von ``url`` ab.
@@ -116,7 +117,7 @@ class Gescheitert:
 
 @dataclass(frozen=True)
 class Hilfsdatei:
-    """Ein Skript oder Stylesheet, das ohne Regeln hinausging (``klicktor.Tor``).
+    """Ein Skript oder Stylesheet, das ohne Regeln in den Browser ging (``klicktor``).
 
     ``grund`` nennt die Antwort der robots.txt ihres Hosts (401 oder 403); ``anfrage``
     ist die Adresse, die die Seite anfragte; nach einer Umleitung weicht sie von
@@ -195,7 +196,7 @@ class Klicklauf:
     """Ein Lauf über eine Produktseite: Status, Ergebnisse, Struktur, Verworfenes.
 
     ``bezug`` ist die Strukturbilanz, gegen die ``pruefe_struktur`` den Lauf maß;
-    ``hilfsdateien`` sind die Skripte und Stylesheets, die ohne Regeln hinausgingen.
+    ``hilfsdateien`` sind die Skripte und Stylesheets, die ohne Regeln geladen wurden.
     """
 
     anbieter: str

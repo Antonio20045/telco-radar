@@ -6,6 +6,8 @@ Stylesheets; sie stehen in ``Klicklauf.hilfsdateien`` und im Index der Erkundung
 geschwärzten Adressen. Gegenproben: Dokument, xhr und fetch desselben Hosts bleiben
 verworfen; eine lesbare robots.txt mit Disallow, ein Status 500 und ein gescheiterter
 Abruf der robots.txt sperren weiter; der Abstand je Host gilt auch für die Hilfsdatei.
+Liefert eine Skript-Adresse dieses Hosts Daten statt JavaScript oder CSS, auch nach
+einer Umleitung, verwirft das Tor die Antwort: kein Preis, kein Mitschnitt, kein Beleg.
 Ein lokaler Server liefert BEISPIEL-Seiten auf 127.0.0.1, unter ``localhost`` ist er der
 Dateiserver; keine Anfrage verlässt den Rechner.
 """
@@ -18,9 +20,10 @@ from collections.abc import Callable
 from urllib.parse import urlsplit
 
 import pytest
-from klickserver import JETZT, Antwort, html, karte, klickserver
+from klickserver import JETZT, Antwort, html, karte, klickserver, umleitung
 
 from telco_radar.collect.geraete.klickerkundung import erkunde_anbieter
+from telco_radar.collect.geraete.klickhilfe import KEINE_HILFSDATEI
 from telco_radar.collect.geraete.klickziele import Erkundungsziel, Seitenziel
 from telco_radar.collect.geraete.robots import RobotsWaechter
 
@@ -39,6 +42,15 @@ fetch("/api/preis?speicher=128").then(r => r.json()).then(d => {
   document.getElementById("preis").innerText = "Monatliche Rate " + d.rate + ",00 €";
 }).catch(() => {});
 </script></body></html>"""
+SKRIPTSEITE = """<!doctype html><html><head></head><body>
+<h1 id="kanarie">Beispielhandy X</h1>
+<div id="speicher"><button data-wert="128" aria-pressed="true">128 GB</button></div>
+<div id="tarif"><button data-wert="S" aria-pressed="true">Tarif S</button></div>
+<div id="laufzeit"><button data-wert="24" aria-pressed="true">24 Monate</button></div>
+<section id="preis">Monatliche Rate 25,00 €</section>
+<script src="DATEIEN/api/preis?speicher=128"></script>
+<script src="DATEIEN/static/seite.js"></script>
+</body></html>"""
 HILFSDATEIEN = """<link rel="stylesheet" href="DATEIEN/static/seite.css">
 <script src="DATEIEN/static/seite.js"></script>"""
 DATEN = """<iframe src="DATEIEN/rahmen"></iframe>
@@ -55,15 +67,17 @@ ANTWORT = {
 }
 
 
-def _seite(server, kopf: str = "", rumpf: str = "") -> str:
+def _seite(server, kopf: str = "", rumpf: str = "", vorlage: str = SEITE) -> str:
     dateien = server.adresse("", host=DATEIHOST)
-    seite = SEITE.replace("KOPF", kopf).replace("RUMPF", rumpf)
+    seite = vorlage.replace("KOPF", kopf).replace("RUMPF", rumpf)
     return seite.replace("DATEIEN", dateien)
 
 
-def _antworte(seite: str) -> Callable[[str], Antwort]:
+def _antworte(seite: str, **weitere: Antwort) -> Callable[[str], Antwort]:
     def antworte(pfad: str) -> Antwort:
         teil = urlsplit(pfad).path
+        if teil in weitere:
+            return weitere[teil]
         if teil.startswith("/handy/"):
             return html(seite)
         if teil == "/api/preis":
@@ -214,3 +228,81 @@ def test_erkundung_legt_hilfsdateien_geschwaerzt_im_index_ab(chromium, tmp_path)
     ).read_text(encoding="utf-8")
     assert "GEHEIM4711" not in abgelegt
     assert json.loads(abgelegt)["seiten"][0]["hilfsdateien"] == seite["hilfsdateien"]
+
+
+def _raten(lauf) -> list[float | None]:
+    return [e.antwortwerte.rate for e in lauf.ergebnisse if e.antwortwerte is not None]
+
+
+def test_preis_aus_skriptantwort_eines_hosts_ohne_regeln_wird_nicht_gelesen(chromium):
+    with klickserver(lambda pfad: Antwort()) as server:
+        server.antworte = _antworte(_seite(server, vorlage=SKRIPTSEITE))
+        lauf = _laufe(chromium, server, _robots((403, "")))
+
+    assert server.mit("/api/preis") == ["/api/preis?speicher=128"]
+    assert _raten(lauf) == []
+    grund = _pfade(lauf.verworfen)["/api/preis"]
+    assert grund == f"{KEINE_HILFSDATEI} (Content-Type application/json)"
+    assert [urlsplit(h.url).path for h in lauf.hilfsdateien] == ["/static/seite.js"]
+
+
+def test_gegenprobe_mit_offener_robots_wird_der_preis_aus_dem_skript_gelesen(chromium):
+    with klickserver(lambda pfad: Antwort()) as server:
+        server.antworte = _antworte(_seite(server, vorlage=SKRIPTSEITE))
+        lauf = _laufe(chromium, server, _robots((200, OFFEN)))
+
+    assert _raten(lauf) == [25.0]
+    assert lauf.verworfen == []
+
+
+def test_umleitung_auf_dem_ausnahmeweg_laedt_nur_hilfsdateien(chromium):
+    kopf = """<script src="DATEIEN/static/um-daten.js"></script>
+<script src="DATEIEN/static/um-skript.js"></script>"""
+    weitere = {
+        "/static/um-daten.js": umleitung("/daten/preis.json"),
+        "/static/um-skript.js": umleitung("/static/ziel.js"),
+    }
+    with klickserver(lambda pfad: Antwort()) as server:
+        server.antworte = _antworte(_seite(server, kopf), **weitere)
+        lauf = _laufe(chromium, server, _robots((403, "")))
+
+    assert server.mit("/daten/") == ["/daten/preis.json"]
+    assert server.mit("/static/ziel.js") == ["/static/ziel.js"]
+    assert _pfade(lauf.verworfen) == {
+        "/daten/preis.json": f"{KEINE_HILFSDATEI} (Content-Type application/json)"
+    }
+    geladen = [
+        (urlsplit(h.url).path, urlsplit(h.anfrage).path) for h in lauf.hilfsdateien
+    ]
+    assert geladen == [("/static/ziel.js", "/static/um-skript.js")]
+    assert lauf.status == "gelesen"
+
+
+def test_erkundung_legt_daten_eines_hosts_ohne_regeln_nicht_im_mitschnitt_ab(
+    chromium, tmp_path
+):
+    with klickserver(lambda pfad: Antwort()) as server:
+        server.antworte = _antworte(_seite(server, vorlage=SKRIPTSEITE))
+        seiten = (Seitenziel("beispielhandy-x", 128, server.adresse("/handy/x")),)
+        ziel = Erkundungsziel("beispiel", "Beispielanbieter", seiten, None, 0.0)
+        ende = time.monotonic() + 300
+        index = erkunde_anbieter(
+            chromium, ziel, lambda: JETZT, _robots((403, "")), tmp_path, ende
+        )
+
+    ordner = tmp_path / "beispiel" / JETZT.date().isoformat()
+    saetze = []
+    for datei in sorted(ordner.glob("mitschnitt-*.json")):
+        saetze += json.loads(datei.read_text(encoding="utf-8"))["antworten"]
+    vom_dateihost = [
+        s
+        for s in saetze
+        if urlsplit(s.get("url") or "").hostname == DATEIHOST and s.get("koerper")
+    ]
+    assert vom_dateihost == []
+    seite = index["seiten"][0]
+    assert [urlsplit(v["url"]).path for v in seite["verworfen"]] == ["/api/preis"]
+    assert seite["verworfen"][0]["grund"].startswith(KEINE_HILFSDATEI)
+    assert [urlsplit(h["url"]).path for h in seite["hilfsdateien"]] == [
+        "/static/seite.js"
+    ]

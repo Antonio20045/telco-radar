@@ -22,7 +22,7 @@ läuft; dann ist der Rest ``verschoben``, ohne Anfrage. Jeder Anbieter hat
 robots.txt keine Anfrage mehr hinaus. Was nicht gelesen wurde, heißt so und ist nie
 leer: ``nicht_besucht`` mit Grund; Abstand und Besuchszeit stehen nur im Index, wenn
 robots.txt gelesen wurde. Skripte und Stylesheets, die das Tor ohne Regeln hinausließ
-(``klicktor.HILFSDATEI_ARTEN``), stehen je Seite unter ``hilfsdateien``. Screenshot und
+(``klickhilfe``), stehen je Seite unter ``hilfsdateien``. Screenshot und
 Seite gehören nur ins Artefakt des Laufs (``scripts/erkundung_ablegen.py`` lässt sie vom
 öffentlichen Zweig).
 

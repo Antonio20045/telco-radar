@@ -6,11 +6,10 @@ Schriften und Datenkanäle ohne Nutzen für die Lesung (EventSource, Beacon, Pre
 Manifest) bricht das Tor ab. Jede andere Adresse prüft ``RobotsWaechter.darf`` und
 passiert die Schleuse ihres Hosts, die den Crawl-delay abwartet: je Host ist höchstens
 eine Anfrage unterwegs, und der Abstand zählt ab dem Ende der letzten Antwort.
-Antwortet robots.txt eines Hosts mit 401 oder 403 (``ROBOTS_VERWEIGERT``), gilt das
-nach RFC 9309 als „keine Regeln“: Skripte und Stylesheets (``HILFSDATEI_ARTEN``) von
-dort passieren die Schleuse ohne Regeln, mit dem eigenen Abstand, und stehen in
-``Klicklauf.hilfsdateien`` (Entscheidung Antonio 07.10.2026); jede andere Art bleibt
-verworfen, ebenso bei Disallow, Fehler oder anderem Status der robots.txt. Das Tor
+Skripte und Stylesheets eines Hosts, dessen robots.txt mit 401 oder 403 antwortet,
+passieren die Schleuse ohne Regeln, mit dem eigenen Abstand (``klickhilfe``,
+Entscheidung Antonio 07.10.2026); in den Browser kommen davon nur JavaScript und CSS,
+alles andere verwirft das Tor. Das Tor
 holt die Antwort selbst und folgt keiner Umleitung blind: jedes Ziel prüft es wie eine
 neue Anfrage, ein gesperrtes Ziel geht nie hinaus. Leitet die Hauptseite um, merkt es
 das erlaubte Ziel, beantwortet die Umleitung mit einer leeren Seite, und der Crawler
@@ -44,14 +43,8 @@ from playwright.sync_api import Error as PlaywrightFehler
 
 from . import Abrufschleuse
 from .basis import GeraeteAbrufFehler
-from .klicklauf import (
-    Gescheitert,
-    Hilfsdatei,
-    Klicklauf,
-    Verworfen,
-    antworttext,
-    bot_schutz,
-)
+from .klickhilfe import Ausnahmeweg
+from .klicklauf import Gescheitert, Klicklauf, Verworfen, antworttext, bot_schutz
 from .robots import RobotsWaechter, host_von
 
 if TYPE_CHECKING:
@@ -79,8 +72,6 @@ ABGEBROCHENE_ARTEN = frozenset(
         "cspviolationreport",
     }
 )
-HILFSDATEI_ARTEN = frozenset({"script", "stylesheet"})
-ROBOTS_VERWEIGERT = frozenset({401, 403})
 ABBRUCH_CODE = "blockedbyclient"
 FEHLER_CODE = "failed"
 HOECHSTE_UMLEITUNGEN = 5
@@ -129,10 +120,9 @@ class _Hostabruf(Abrufschleuse):
 
     def passiere_ohne_regeln(self, url: str) -> None:
         """Wartet den Abstand ab (``RobotsWaechter.abstand``), ohne ``darf``."""
+        abstand = self._waechter.abstand(url, self._rate_limit)
         if self._letzter_abruf:
-            vergangen = time.monotonic() - self._letzter_abruf
-            abstand = self._waechter.abstand(url, self._rate_limit)
-            time.sleep(max(0.0, abstand - vergangen))
+            time.sleep(max(0.0, abstand + self._letzter_abruf - time.monotonic()))
         self._letzter_abruf = time.monotonic()
 
     def erledigt(self) -> None:
@@ -205,7 +195,7 @@ class Tor:
         lauf: Klicklauf,
     ) -> None:
         self.waechter, self.uhr, self.schleuse = waechter, uhr, schleuse
-        self.lauf = lauf
+        self.lauf, self.ausnahme = lauf, Ausnahmeweg(waechter, lauf)
         self.geschlossen = False
         self.stoerung: str | None = None
         self.haupt_status: int | None = None
@@ -257,7 +247,10 @@ class Tor:
             self._beobachte(anfrage, antwort, hauptseite)
             ort = antwort.headers.get("location")
             if ort is None or not UMLEITUNG_AB <= antwort.status <= UMLEITUNG_BIS:
-                if not hauptseite or self._pruefe_hauptseite(route, antwort):
+                grund = self.ausnahme.pruefe(ziel, anfrage, antwort)
+                if grund is not None:
+                    self._verwirf(route, ziel, grund, anfrage.url)
+                elif not hauptseite or self._pruefe_hauptseite(route, antwort):
                     _gib_weiter(route, antwort)
                 return
             ziel = urljoin(ziel, ort)
@@ -272,11 +265,10 @@ class Tor:
 
         Wahr, wenn ``ziel`` hinaus darf; der Host bleibt belegt, bis ``_hole`` ihn
         freigibt. Sonst ist die Anfrage verworfen oder gescheitert und abgebrochen.
-        Eine Hilfsdatei (``_hilfsdatei``) passiert die Schleuse ohne Regeln.
+        Eine Hilfsdatei (``Ausnahmeweg.darf``) passiert die Schleuse ohne Regeln.
         """
         darf, grund = self.darf(ziel)
-        art = route.request.resource_type
-        hilfe = not darf and self._hilfsdatei(art, ziel)
+        hilfe = not darf and self.ausnahme.darf(route.request.resource_type, ziel)
         if darf or hilfe:
             host = host_von(ziel)
             if not self._frei(host):
@@ -293,20 +285,12 @@ class Tor:
                 grund = str(fehler)
             else:
                 if self.stoerung is None:
-                    if hilfe:
-                        datei = Hilfsdatei(ziel, art, grund, anfrage)
-                        self.lauf.hilfsdateien.append(datei)
                     return True
                 self._unterwegs.discard(host)
                 _schliesse(route, ABBRUCH_CODE)
                 return False
         self._verwirf(route, ziel, grund, anfrage)
         return False
-
-    def _hilfsdatei(self, art: str, ziel: str) -> bool:
-        """Skript oder Stylesheet eines Hosts, dessen robots.txt 401 oder 403 sagt."""
-        verweigert = self.waechter.regeln(ziel).status in ROBOTS_VERWEIGERT
-        return art in HILFSDATEI_ARTEN and verweigert
 
     def _frei(self, host: str) -> bool:
         for _ in range(SEITEN_FRIST_MS // WARTE_TAKT_MS):
