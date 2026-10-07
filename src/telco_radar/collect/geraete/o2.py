@@ -80,6 +80,7 @@ import re
 from typing import Optional
 
 from .basis import GeraeteAbrufFehler, _gleich, _preis
+from .o2_referenz import Referenzstand, passt, tarife_aus
 from .ratenlaufzeit import katalog_mit_phasen, o2_phasen
 from ...geraete_model import probe_geht_auf
 
@@ -487,21 +488,10 @@ def referenz_aus(seiten: list) -> Optional[dict]:
     Laufzeit), je Tarif eine; ein Eintrag `None` ist ein gescheiterter
     Abruf und macht den Durchlauf unvollstaendig. Geliefert wird je
     Tarifanzeige Slug und Anschlusspreis - aber nur, wenn die zwei Befunde
-    aus dem Kopf dieses Abschnitts an diesem Durchlauf halten.
+    aus dem Kopf dieses Abschnitts an diesem Durchlauf halten
+    (`o2_referenz.tarife_aus`).
     """
-    gemessen = [_gemessen(pv) if pv else None for pv in seiten]
-    if len(gemessen) < 2 or any(g is None for g in gemessen):
-        return None
-    if len({g["rate"] for g in gemessen}) != 1:
-        return None
-    if len({g["anzahlung"] for g in gemessen}) != 1:
-        return None
-    tarife: dict = {}
-    for g in gemessen:
-        if not g["slug"] or g["anzeige"] in tarife:
-            return None
-        tarife[g["anzeige"]] = {"slug": g["slug"], "anschluss": g["anschluss"]}
-    return tarife
+    return tarife_aus([_gemessen(pv) if pv else None for pv in seiten])
 
 
 def _rohsatz(
@@ -570,12 +560,7 @@ def saetze_aus_konfiguration(
     _zaehle(z, "gemessen")
     if referenz is None:
         return out
-    eigen = referenz.get(g["anzeige"])
-    if (
-        eigen is None
-        or eigen["slug"] != g["slug"]
-        or not _gleich(eigen["anschluss"], g["anschluss"])
-    ):
+    if not passt(referenz, g):
         _zaehle(z, "referenz_widerspricht")
         return out
     for option in optionen:
@@ -636,14 +621,12 @@ def vertiefe_buendel(
     Zusammenfuehren mit dem Katalog macht `fuehre_zusammen`. Tarife, die
     die Referenz des ersten Geraets nicht kennt, probt `o2_referenz`.
     """
-    from .o2_referenz import ergaenze_referenz, erster_durchlauf
-
     z = zaehler if zaehler is not None else {}
     weiter = weiter or (lambda: True)
-    referenz: Optional[dict] = None
-    referenz_versucht = False
+    stand = Referenzstand(
+        lambda u: _hole_seite(hole, u, z), _gemessen, _link, _ohne_markup, weiter, z
+    )
     gesehen: set = set()
-    geprobt: set = set()
     out: list[dict] = []
     for basis in rohsaetze or []:
         url = str(basis.get("url") or "").strip()
@@ -672,16 +655,14 @@ def vertiefe_buendel(
                 pv = _hole_seite(hole, _link(option), z)
                 if pv is not None:
                     antworten.append(pv)
-        if not referenz_versucht and weiter():
-            referenz_versucht = True
-            referenz = erster_durchlauf(hole, start, weiter, z)
+        stand.erster_durchlauf(start)
         for pv in antworten:
             angebot = str((pv.get("hardware") or {}).get("offerName") or "")
             if angebot in gesehen:
                 continue
             gesehen.add(angebot)
-            ergaenze_referenz(hole, referenz, pv, weiter, geprobt, z)
-            out.extend(saetze_aus_konfiguration(pv, basis, referenz, url, z))
+            stand.ergaenze(pv, url)
+            out.extend(saetze_aus_konfiguration(pv, basis, stand.tarife, url, z))
     return out
 
 
