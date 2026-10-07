@@ -633,13 +633,17 @@ def vertiefe_buendel(
     Abstand, Besuchszeit). `weiter()` sagt, ob noch Zeit ist; ohne Zeit
     hoert die Vertiefung auf und behaelt, was sie hat - die Katalogsaetze
     stehen ohnehin. Geliefert werden NUR die Saetze der Vertiefung; das
-    Zusammenfuehren mit dem Katalog macht `fuehre_zusammen`.
+    Zusammenfuehren mit dem Katalog macht `fuehre_zusammen`. Tarife, die
+    die Referenz des ersten Geraets nicht kennt, probt `o2_referenz`.
     """
+    from .o2_referenz import ergaenze_referenz, erster_durchlauf
+
     z = zaehler if zaehler is not None else {}
     weiter = weiter or (lambda: True)
     referenz: Optional[dict] = None
     referenz_versucht = False
     gesehen: set = set()
+    geprobt: set = set()
     out: list[dict] = []
     for basis in rohsaetze or []:
         url = str(basis.get("url") or "").strip()
@@ -670,27 +674,13 @@ def vertiefe_buendel(
                     antworten.append(pv)
         if not referenz_versucht and weiter():
             referenz_versucht = True
-            durchlauf: list = [start]
-            for option in (start.get("tariff") or {}).get("tariffOptions") or []:
-                if option.get("selected") or not _link(option):
-                    continue
-                if not weiter():
-                    durchlauf.append(None)
-                    break
-                durchlauf.append(_hole_seite(hole, _link(option), z))
-            referenz = referenz_aus(durchlauf)
-            z["referenz_tarife"] = len(referenz or {})
-            if referenz is None:
-                log.warning(
-                    "o2-Vertiefung: der Referenzdurchlauf haelt die "
-                    "Befunde nicht (Rate/Anzahlung tarifabhaengig "
-                    "oder eine Probe faellt) - nur gemessene Saetze"
-                )
+            referenz = erster_durchlauf(hole, start, weiter, z)
         for pv in antworten:
             angebot = str((pv.get("hardware") or {}).get("offerName") or "")
             if angebot in gesehen:
                 continue
             gesehen.add(angebot)
+            ergaenze_referenz(hole, referenz, pv, weiter, geprobt, z)
             out.extend(saetze_aus_konfiguration(pv, basis, referenz, url, z))
     return out
 
