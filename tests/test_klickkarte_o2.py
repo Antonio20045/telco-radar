@@ -93,8 +93,8 @@ class _Ort:
     def first(self) -> _Ort:
         return self
 
-    def inner_text(self, timeout: int) -> str:
-        assert self._text is not None
+    def evaluate_all(self, _skript: str, attribut: str | None) -> str | None:
+        assert attribut is None
         return self._text
 
 

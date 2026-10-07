@@ -7,6 +7,12 @@ kommen einmal beim Laden, als xhr und als fetch mit gleichem Körper; die Werte 
 in ``atomics`` je Speicher und Farbe (Farbe aus dem gewählten Radio) und
 ``composition`` je Laufzeit. Die Zusammenfassung nennt „1 € einmal“ und „33 € pro
 Monat“, die Zahl der Raten nur das gewählte Laufzeit-Label. Tarif fest.
+
+Unter Last antwortet der Browser langsam. Las der Crawler den Fundort mit einer Frist
+von einem Warte-Takt (50 ms), lief sie ab, und die Ratenzahl hieß „fehlt im Text“
+(etwa einer von fünf Lastläufen). ``BESCHAEFTIGT`` hält den Hauptthread der Seite in
+Schüben von 250 ms besetzt und löst das bei fünf Lesungen stets aus; Gegenprobe: ein
+Fundort, den es nicht gibt, bleibt sofort leer.
 """
 
 from __future__ import annotations
@@ -62,6 +68,8 @@ xhr.open("GET", "/glados/virtualItem/7?financingType=rate");
 xhr.send();
 fetch("/glados/virtualItem/7?financingType=rate").then((a) => a.json())
   .then((d) => { daten = d; zeigeVf(); });"""
+BESCHAEFTIGT = """
+setInterval(() => { const bis = Date.now() + 250; while (Date.now() < bis) {} }, 0);"""
 ATOM = "data.atomics[capacity.sortValue={speicher}][color.displayLabel={farbe}]"
 TEIL = ATOM + ".composition[financingDuration={laufzeit}]"
 OPTION = {"wert_in": "input", "wert": "value"}
@@ -174,3 +182,25 @@ def test_ohne_filter_je_farbe_ist_die_antwort_mehrdeutig(chromium):
     assert {e.status for e in ergebnisse.values()} == {"befund"}
     grund = ergebnisse[("262144", "ohne Tarif", 36)].befunde[0].grund
     assert grund == "fehlt in der Antwort, Text 33,00"
+
+
+@pytest.mark.parametrize(
+    ("koerper", "erwartet"),
+    [
+        (KOERPER, [36] * 5),
+        (KOERPER.replace('value="36" checked', 'value="36"'), [None] * 5),
+    ],
+    ids=["gewaehlt", "gegenprobe-ohne-wahl"],
+)
+def test_fundort_wird_auch_unter_last_gelesen(chromium, koerper, erwartet):
+    from telco_radar.collect.geraete.klicktextleser import Textleser
+
+    blatt = chromium.new_page()
+    try:
+        blatt.set_content(seite(koerper, BESCHAEFTIGT))
+        leser = Textleser(blatt, karte(**KARTE), 3000)
+        gelesen = [leser.textwerte("")[0].ratenzahl for _ in range(5)]
+    finally:
+        blatt.close()
+
+    assert gelesen == erwartet

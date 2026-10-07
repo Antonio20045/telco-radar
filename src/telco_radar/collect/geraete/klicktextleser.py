@@ -24,7 +24,6 @@ from dataclasses import replace
 from typing import TYPE_CHECKING, Any
 
 from playwright.sync_api import Error as PlaywrightFehler
-from playwright.sync_api import TimeoutError as PlaywrightZeitueberschreitung
 
 from .klickecho import feldwert
 from .klickkartentypen import BUENDELFELDER, PHASENFELD
@@ -44,6 +43,9 @@ if TYPE_CHECKING:
     from playwright.sync_api import Locator, Page
 
     from .klickkarte import Klickkarte
+
+_ERSTER_JS = """(treffer, attribut) => treffer.length === 0 ? null
+  : attribut === null ? treffer[0].innerText : treffer[0].getAttribute(attribut)"""
 
 
 class Textleser:
@@ -137,15 +139,17 @@ class Textleser:
             raise Abbruch(LAUF_GESTOERT, grund)
 
     def _text(self, bereich: Locator, attribut: str | None = None) -> str:
+        """Text oder Attribut des ersten Treffers in einer Abfrage; leer nur, wenn
+        keiner da ist oder er leer ist.
+
+        Ohne eigene Frist: die Lesung wartet auf kein Element, und eine Frist von
+        ``WARTE_TAKT_MS`` liefe unter Last ab, bevor der Browser antwortet; dann hieße
+        „nicht gelesen“ „leer“ (Vodafone-Ratenzahl „fehlt im Text“).
+        """
         if bereich.count() == 0:
             return ""
-        try:
-            if attribut is None:
-                return bereich.first.inner_text(timeout=WARTE_TAKT_MS)
-            wert = bereich.first.get_attribute(attribut, timeout=WARTE_TAKT_MS)
-        except PlaywrightZeitueberschreitung:
-            return ""
-        return "" if wert is None else wert
+        wert = bereich.evaluate_all(_ERSTER_JS, attribut)
+        return "" if wert is None else str(wert)
 
     def _alle_texte(self, selektor: str) -> list[str]:
         try:
