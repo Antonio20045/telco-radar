@@ -29,7 +29,7 @@ src/telco_radar/collect/promo_snapshot.py zeilen 415
 src/telco_radar/collect/tarif_crawler.py zeilen 895
 src/telco_radar/collect/tarif_pdf.py zeilen 670
 src/telco_radar/geraete_model.py zeilen 1129
-src/telco_radar/geraete_pipeline.py zeilen 747
+src/telco_radar/geraete_pipeline.py zeilen 702
 src/telco_radar/newsletter/filters.py zeilen 401
 src/telco_radar/pipeline.py zeilen 1016
 src/telco_radar/promo_bilder.py zeilen 417
