@@ -190,7 +190,9 @@ class Antwortmuster:
     sie kam; ``start``: die Quelle gilt nur, bis die Seite zum ersten Mal geklickt
     wurde. ``erkennung`` wählt unter Antworten derselben Adresse die mit einem Wert an
     diesem Pfad; ``segment`` nimmt die erste Gruppe aus der Antwortadresse, Base64 mit
-    ``name=wert`` durch ``;`` getrennt, als weitere Parameter.
+    ``name=wert`` durch ``;`` getrennt, als weitere Parameter. ``platzhalter`` nennt
+    Werte dieser Antwort an Pfaden, die ihre Pfade und Varianten als weitere
+    Platzhalter tragen (Telekom: der Ratenplan zu Laufzeit und Anzahlung der Seite).
     """
 
     url_muster: re.Pattern[str] | None
@@ -203,6 +205,7 @@ class Antwortmuster:
     start: bool = False
     erkennung: str | None = None
     segment: re.Pattern[str] | None = None
+    platzhalter: Mapping[str, str] = field(default_factory=dict)
 
     def passt(self, url: str) -> bool:
         """Wahr, wenn ``url`` die mitzuschneidende Antwort ist."""

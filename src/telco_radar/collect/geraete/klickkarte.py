@@ -88,6 +88,10 @@ Zweite Lesung (Stufe 2 von Format 2):
   ``selektor`` aus der Seitenadresse (1&1 ``size``, freenet ``ds``), sonst etwa aus
   dem Warenkorb-Link (congstar ``planId``). Heißt ein Seitenwert wie eine Dimension,
   ist er das Echo „Seite zeigt“; jeder ist Platzhalter.
+- ``antwort.platzhalter``: benannte Pfade in dieselbe Antwort; ihr Wert ist in
+  ``pfade`` und ``variante`` dieser Quelle ein weiterer Platzhalter (Telekom
+  ``/v2/details``: drei Anzahlungsstufen je Laufzeit, der Plan folgt aus Laufzeit und
+  der Anzahlung der Seite, die Rate aus dem Plan).
 - ``zusammenfassung.selektor`` als Liste von Bereichen und ``ohne`` mit Ausschlüssen
   (Telekom: Tarif- und Zahlungsblock ohne Werbeblock); ``zusammenfassung.muster`` je
   Wertfeld ein regulärer Ausdruck oder ``{muster, selektor}`` mit eigenem Fundort

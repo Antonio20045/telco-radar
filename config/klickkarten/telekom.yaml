@@ -1,0 +1,124 @@
+# Klick-Karte Telekom (Format 2). Grundlage: Klick-Erkundung vom 07.10.2026,
+# Zweig klick-erkundung, Commit a9b45f5a, erkundung/telekom/2026-10-07/,
+# Seite 1 (iPhone 17 Pro, tiefblau-256-gb?tariffId=MF_17791, mit Hilfsdateien
+# gerendert). Fundstellen: be = bedienelemente-1.json (Element), pr = preise-1.json
+# (Kandidat), mi = mitschnitt-1.json (Anfrage/Antwort), kl = klicks-1.json.
+#
+# Kombinationen je Seite: 3 Speicher x 1 Tarif x 3 Laufzeiten = 9 (Grenze der
+# Kartenprobe 12). Die Preisantwort /v2/details kommt erst nach einem
+# Speicherklick (kl Probe 0 -> mi 210); beim Laden lädt die Seite keine
+# (mi 99-102). Bis zum ersten Speicherklick (256 GB, 36/24/12) fehlt die Antwort:
+# diese Kombinationen enden als Befund „keine Antwort mitgeschnitten“, außer ein
+# Laufzeitklick lädt /v2/details (unerkundet). Erwartet erfasst: 512 GB und 1 TB
+# je 12/24/36 = 6.
+#
+# Bewusst nicht in der Karte:
+# - Weitere Tarife: die Seite zeigt nur den gewählten (be 63, „Tarif ändern“
+#   be 64 ist unerkundet); Links mit tariffId sind nur Menüköpfe auf diese Seite
+#   (be 173 ff.), keine Tarifwahl. Der Tarif kommt aus der Startadresse.
+# - Weitere Anzahlungsstufen: „Alle Optionen anzeigen“ (be 287) ist unerkundet;
+#   gelesen wird die Stufe, die die Seite je Laufzeit zeigt.
+# - Tarifbindung: die Antwort nennt „24 Monate Vertragslaufzeit“
+#   (tariff.loyalty), die Seite im Inventar nicht; ohne Text kein Echo -> Lücke.
+# - Tarifpreis ab Monat 25: die Antwort nennt eine Phase ohne Ende
+#   (monthlyTariffFee, recurringChargeOccurrence -1), die Seite einen Preis.
+anbieter: Telekom
+
+knoepfe:
+  speicher:
+    # be 36-38 (Gruppe 29): button role=radio, Klasse dt_filterChips,
+    # aria-label „256 GB“/„512 GB“/„1 TB“ (der Text trägt den Aufpreis),
+    # gewählt aria-checked="true". Dieselbe Klasse tragen die Laufzeitknöpfe,
+    # darum die Endung des aria-label.
+    selektor: >-
+      #dyt_productViewDesktop button.dt_filterChips[role="radio"][aria-label$=" GB"],
+      #dyt_productViewDesktop button.dt_filterChips[role="radio"][aria-label$=" TB"]
+    wert: aria-label
+    gewaehlt: {attribut: aria-checked, wert: "true"}
+  tarif:
+    # be 63 (Gruppe 42, #step1): button.accordion-header „MagentaMobil M“, die
+    # Kachel des gewählten Tarifs; die Seite zeigt keinen anderen, darum ist die
+    # einzige Kachel gewählt. Echo: tariff.name der Antwort (mi 210).
+    selektor: "#step1 button.accordion-header"
+    gewaehlt: {passt: "*"}
+  laufzeit:
+    # be 42-44 (Gruppe 31 „Zahlungsoptionen“): aria-label „26,90 € pro Monat
+    # für 36 Monate, zuzüglich 99 € Anzahlung“, ebenso 24 und 12 Monate;
+    # gewählt aria-checked="true" (be 42).
+    selektor: '#dyt_productViewDesktop button.dt_filterChips[role="radio"][aria-label*=" Monate"]'
+    wert: aria-label
+    muster: 'für (\d+) Monate'
+    gewaehlt: {attribut: aria-checked, wert: "true"}
+
+vorbereitung:
+  # be 40: Rückgabedeal-Schalter, aria-checked="false" (Startadresse
+  # forwardTradeInApplied=false).
+  - {klick: "span.dt_switch.forwardTradeInSwitch", bis: '[aria-checked="false"]'}
+
+seite:
+  # Anzahlung des gewählten Laufzeitknopfs (be 42 aria-label „… zuzüglich 99 €
+  # Anzahlung“); sie bestimmt den Ratenplan in der Antwort.
+  anzahlung_gewaehlt:
+    selektor: '#dyt_productViewDesktop button.dt_filterChips[aria-checked="true"][aria-label*="Anzahlung"]'
+    attribut: aria-label
+    muster: 'zuzüglich\s+([\d.]+(?:,\d{1,2})?)\s*€\s*Anzahlung'
+
+zusammenfassung:
+  selektor:
+    # Zahlungsblock der Seitenleiste (Gruppe 44/45, pr 21-23 sichtbar):
+    # „EINMALIGE ZAHLUNG 138,95 € inkl. Bereitstellung 39,95 € GESAMTPREIS
+    # MONATLICH 76,85 €“.
+    - "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(2)"
+    # Tarifkachel (Gruppen 42/43, pr 19/20): „UNSERE EMPFEHLUNG 50 GB
+    # MagentaMobil M 49,95 €“, „zzgl. 39,95 € ⌀ pro Karte einmalig“.
+    - "#step1"
+  muster:
+    # Gewählter Laufzeitknopf, Text „26,90 € mtl. x 36“ und „+99 € Anzahlung“
+    # (pr 6/7, be 42).
+    rate:
+      selektor: '#dyt_productViewDesktop button.dt_filterChips[aria-checked="true"][aria-label*="Anzahlung"]'
+      muster: '([\d.]+,\d{2})\s*€\s*mtl\.'
+    ratenzahl:
+      selektor: '#dyt_productViewDesktop button.dt_filterChips[aria-checked="true"][aria-label*="Anzahlung"]'
+      muster: 'x\s*(\d+)'
+    anzahlung:
+      selektor: '#dyt_productViewDesktop button.dt_filterChips[aria-checked="true"][aria-label*="Anzahlung"]'
+      muster: '\+\s*([\d.]+(?:,\d{1,2})?)\s*€\s*Anzahlung'
+    # pr 22: „inkl. Bereitstellung 39,95 €“ im Zahlungsblock.
+    anschluss: 'Bereitstellung\s*([\d.]+,\d{2})\s*€'
+    # pr 19: Monatspreis der Tarifkachel „49,95 €“.
+    tarifphasen:
+      selektor: "#step1 > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1)"
+      muster: '([\d.]+,\d{2})\s*€'
+    # Gruppe 43: „50 GB MagentaMobil M“ in der Tarifkachel.
+    volumen_gb: '(\d+)\s*GB\s+MagentaMobil'
+
+antwort:
+  # mi Antwort 210: POST /shop/api/eshop/bff-de/productOfferings/v2/details,
+  # HTTP 200, JSON, 109 137 Byte, nicht gekürzt; kam nach dem Klick auf 512 GB
+  # (kl Probe 0). Sie trägt den gewählten Speicher mit allen Ratenplänen
+  # (12/24/36 Monate je drei Anzahlungsstufen) und den gewählten Tarif. Ein
+  # Laufzeitklick lädt sie nicht nachweislich neu, darum gilt die letzte seit
+  # dem Laden (laden).
+  url_muster: '/shop/api/eshop/bff-de/productOfferings/v2/details'
+  laden: true
+  platzhalter:
+    # Plan der Laufzeit mit der Anzahlung, die die Seite zeigt
+    # (variants.0.prices: upfrontPrice RTK-…-36-1 = 199, -36-4 = 458.15, …).
+    plan: 'variants.0.prices[name=upfrontPrice][numberOfInstallment={laufzeit}][actualValue={anzahlung_gewaehlt}].installmentId'
+  pfade:
+    rate: 'variants.0.prices[name=recurringFeePrice][installmentId={plan}].actualValue'
+    ratenzahl: 'variants.0.prices[name=recurringFeePrice][installmentId={plan}].numberOfInstallment'
+    anzahlung: 'variants.0.prices[name=upfrontPrice][installmentId={plan}].actualValue'
+    tarifphasen: 'tariff.prices[name=monthlyTariffFee].actualValue'
+    anschluss: 'tariff.prices[name=oneTimeTariffFee].actualValue'
+    volumen_gb: 'tariff.dataBenefits.0.label'
+  variante:
+    speicher: 'variants.0.characteristics[name=storage].values.0.label'
+    tarif: 'tariff.name'
+
+kanarie:
+  # be 46: aria-label „View energy label for Apple iPhone 17 Pro“.
+  selektor: 'button[aria-label^="View energy label for"]'
+  attribut: aria-label
+  enthaelt: "{modell}"

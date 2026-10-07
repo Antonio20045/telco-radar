@@ -4,7 +4,10 @@ Ergänzt ``klickkartenleser`` um die Teile von Format 2, die ``klickkarte`` besc
 ``antwort`` als eine Quelle oder Liste von Quellen, ``seite`` mit benannten
 Seitenwerten und ``zusammenfassung.muster`` je Wertfeld. Jeder Pfad wird auf Form
 (``klickpfad.pfadfehler``) und Platzhalter geprüft; ein Fehler wirft
-``KlickkartenFehler`` mit Punktpfad. Dieses Modul ruft kein Netz.
+``KlickkartenFehler`` mit Punktpfad. ``platzhalter`` einer Quelle sind benannte Pfade,
+die nur die Platzhalter der Kombination tragen und keinen anderen Namen verdecken;
+ihre Namen gelten in ``pfade`` und ``variante`` derselben Quelle. Dieses Modul ruft
+kein Netz.
 """
 
 from __future__ import annotations
@@ -55,6 +58,7 @@ QUELLENTEILE = (
     "pfade",
     "variante",
     "parameter",
+    "platzhalter",
 )
 WERTPFADTEILE = ("pfad", "muster", "einheit")
 PARAMETERTEILE = ("name", "muster")
@@ -171,10 +175,12 @@ def _quelle(
     erkennung = leser.wahlweise_text(daten, "erkennung", feld)
     if erkennung is not None:
         _pruefe_pfad(leser, erkennung, f"{feld}.erkennung", namen)
+    platzhalter = _platzhalter(leser, daten, feld, namen)
+    eigene = {*namen, *platzhalter}
     return Antwortmuster(
         url_muster=url,
-        pfade={f: _feldpfad(leser, pfade, f, f"{feld}.pfade", namen) for f in pfade},
-        variante=_dimensionen(leser, daten, "variante", feld, namen),
+        pfade={f: _feldpfad(leser, pfade, f, f"{feld}.pfade", eigene) for f in pfade},
+        variante=_dimensionen(leser, daten, "variante", feld, eigene),
         parameter=_dimensionen(leser, daten, "parameter", feld, namen),
         skript=leser.wahlweise_text(daten, "skript", feld),
         globale=_globale(leser, daten, feld),
@@ -182,7 +188,29 @@ def _quelle(
         start=_wahrheitswert(leser, daten, "start", feld),
         erkennung=erkennung,
         segment=leser.wahlweise_muster(daten, "segment", feld),
+        platzhalter=platzhalter,
     )
+
+
+def _platzhalter(
+    leser: Kartenleser, daten: Mapping, feld: str, namen: set[str]
+) -> dict[str, str]:
+    """Benannte Pfade der Quelle; ein Name verdeckt keinen anderen Platzhalter."""
+    roh = daten.get("platzhalter")
+    if roh is None:
+        return {}
+    ort = f"{feld}.platzhalter"
+    if not isinstance(roh, Mapping) or not roh:
+        raise leser.fehler(ort, GRUND_KEINE_ZUORDNUNG)
+    pfade = {}
+    for name in roh:
+        stelle = f"{ort}.{name}"
+        if not _NAME.fullmatch(str(name)) or name in namen:
+            raise leser.fehler(stelle, GRUND_NAME)
+        pfad = leser.text(roh, name, ort)
+        _pruefe_pfad(leser, pfad, stelle, namen)
+        pfade[str(name)] = pfad
+    return pfade
 
 
 def _globale(leser: Kartenleser, daten: Mapping, feld: str) -> tuple[str, ...]:

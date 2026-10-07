@@ -68,9 +68,16 @@ def lies_antwort(
     Die Variante steht an den Pfaden ``muster.variante`` oder in den Parametern
     ``muster.parameter`` der Adresse ``url`` (mit ``muster.segment`` auch in deren
     Pfadsegment); fehlt sie dort, ist sie ``None``. ``platz`` hält die Werte der
-    Platzhalter in den Pfaden.
+    Platzhalter in den Pfaden; ``muster.platzhalter`` fügt Werte dieser Antwort hinzu
+    (fehlt einer oder ist er mehrdeutig, ist er ``None`` und jeder Pfad mit ihm auch).
     """
     platz = {} if platz is None else platz
+    if muster.platzhalter:
+        eigene = {
+            name: _skalar(am_pfad(nutzlast, pfad, platz))
+            for name, pfad in muster.platzhalter.items()
+        }
+        platz = {**platz, **eigene}
     gelesen: dict[str, Any] = {
         feld: _feldwert(feld, nutzlast, pfad, platz)
         for feld, pfad in muster.pfade.items()
@@ -221,3 +228,8 @@ def als_text(roh: object) -> str | None:
     if not text:
         return None
     return text
+
+
+def _skalar(roh: object) -> str | None:
+    """Ein Platzhalterwert: Text oder Zahl als Text, alles andere ``None``."""
+    return als_text(roh) if isinstance(roh, str | int | float) else None

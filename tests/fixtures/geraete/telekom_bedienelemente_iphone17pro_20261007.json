@@ -1,0 +1,351 @@
+{
+ "quelle": "Zweig klick-erkundung, Commit a9b45f5a, erkundung/telekom/2026-10-07/bedienelemente-1.json und preise-1.json",
+ "elemente": {
+  "36": {
+   "tag": "button",
+   "rolle": "radio",
+   "text": "256 GB",
+   "aria": {
+    "aria-disabled": "false",
+    "aria-checked": "true",
+    "aria-label": "256 GB"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "StyledFilterChips-sc-14akrv0-0",
+    "eNtHeK",
+    "dt_filterChips",
+    "filterChips",
+    "clickable",
+    "selected"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": "button",
+   "href": null,
+   "ziel": null,
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(2) > div:nth-of-type(1) > section:nth-of-type(2) > section:nth-of-type(1) > div:nth-of-type(1) > button:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": "aria-checked",
+   "optionen": null,
+   "behaelter": 29
+  },
+  "37": {
+   "tag": "button",
+   "rolle": "radio",
+   "text": "512 GB + 250 €",
+   "aria": {
+    "aria-disabled": "false",
+    "aria-checked": "false",
+    "aria-label": "512 GB"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "StyledFilterChips-sc-14akrv0-0",
+    "eNtHeK",
+    "dt_filterChips",
+    "filterChips",
+    "clickable"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": "button",
+   "href": null,
+   "ziel": null,
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(2) > div:nth-of-type(1) > section:nth-of-type(2) > section:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 29
+  },
+  "38": {
+   "tag": "button",
+   "rolle": "radio",
+   "text": "1 TB + 500 €",
+   "aria": {
+    "aria-disabled": "false",
+    "aria-checked": "false",
+    "aria-label": "1 TB"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "StyledFilterChips-sc-14akrv0-0",
+    "eNtHeK",
+    "dt_filterChips",
+    "filterChips",
+    "clickable"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": "button",
+   "href": null,
+   "ziel": null,
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(2) > div:nth-of-type(1) > section:nth-of-type(2) > section:nth-of-type(1) > div:nth-of-type(3) > button:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 29
+  },
+  "40": {
+   "tag": "span",
+   "rolle": "switch",
+   "text": "",
+   "aria": {
+    "aria-checked": "false",
+    "aria-disabled": "false",
+    "aria-readonly": "false",
+    "aria-label": "Telekom Rückgabedeal, deactivated",
+    "aria-live": "polite"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "sc-DWsrX",
+    "dkAiYm",
+    "dt_switch",
+    "forwardTradeInSwitch"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 30
+  },
+  "42": {
+   "tag": "button",
+   "rolle": "radio",
+   "text": "26,90 € mtl. x 36 +99 € Anzahlung",
+   "aria": {
+    "aria-disabled": "false",
+    "aria-checked": "true",
+    "aria-label": "26,90 € pro Monat für 36 Monate, zuzüglich 99 € Anzahlung"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "StyledFilterChips-sc-14akrv0-0",
+    "eNtHeK",
+    "dt_filterChips",
+    "filterChips",
+    "clickable",
+    "selected"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": "button",
+   "href": null,
+   "ziel": null,
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > section:nth-of-type(1) > button:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": "aria-checked",
+   "optionen": null,
+   "behaelter": 31
+  },
+  "43": {
+   "tag": "button",
+   "rolle": "radio",
+   "text": "40,40 € mtl. x 24 +99 € Anzahlung",
+   "aria": {
+    "aria-disabled": "false",
+    "aria-checked": "false",
+    "aria-label": "40,40 € pro Monat für 24 Monate, zuzüglich 99 € Anzahlung"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "StyledFilterChips-sc-14akrv0-0",
+    "eNtHeK",
+    "dt_filterChips",
+    "filterChips",
+    "clickable"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": "button",
+   "href": null,
+   "ziel": null,
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > section:nth-of-type(1) > button:nth-of-type(2)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 31
+  },
+  "44": {
+   "tag": "button",
+   "rolle": "radio",
+   "text": "80,80 € mtl. x 12 +99 € Anzahlung",
+   "aria": {
+    "aria-disabled": "false",
+    "aria-checked": "false",
+    "aria-label": "80,80 € pro Monat für 12 Monate, zuzüglich 99 € Anzahlung"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "StyledFilterChips-sc-14akrv0-0",
+    "eNtHeK",
+    "dt_filterChips",
+    "filterChips",
+    "clickable"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": "button",
+   "href": null,
+   "ziel": null,
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > section:nth-of-type(1) > button:nth-of-type(3)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 31
+  },
+  "46": {
+   "tag": "button",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-label": "View energy label for Apple iPhone 17 Pro"
+   },
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "StyledEnergyClassButton-sc-1lpgjkf-0",
+    "hcqbvd"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#chargerInfo-Apple\\ iPhone\\ 17\\ Pro > div:nth-of-type(3) > section:nth-of-type(1) > span:nth-of-type(1) > button:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 32
+  },
+  "63": {
+   "tag": "button",
+   "rolle": "button",
+   "text": "MagentaMobil M",
+   "aria": {
+    "aria-controls": "accordion-content-dk5efefz2",
+    "aria-expanded": "false"
+   },
+   "daten": {},
+   "id": "accordion-header-nvgo6tnta",
+   "klassen": [
+    "sc-dOoqMo",
+    "cHMfcM",
+    "accordion-header"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#accordion-header-nvgo6tnta",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 42
+  }
+ },
+ "gruppen": {
+  "42": {
+   "nummer": 42,
+   "pfad": "#step1 > section:nth-of-type(1) > div:nth-of-type(1)",
+   "name": null,
+   "art": "tarif",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 1.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    63
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  "43": {
+   "nummer": 43,
+   "pfad": "#step1 > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2)",
+   "name": "UNSERE EMPFEHLUNG 50 GB MagentaMobil M 49,95 €",
+   "art": "tarif",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 1.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    64,
+    65
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  "45": {
+   "nummer": 45,
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2)",
+   "name": "EINMALIGE ZAHLUNG 138,95 € inkl. Bereitstellung 39,95 € GESAMTPREIS MONATLICH 76,85 € Monatlich",
+   "art": "laufzeit",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.5,
+    "tarif": 0.5,
+    "farbe": 0.0
+   },
+   "elemente": [
+    67,
+    68
+   ],
+   "select": false,
+   "mit_marke": false
+  }
+ },
+ "preise": {
+  "6": {
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > section:nth-of-type(1) > button:nth-of-type(1) > div:nth-of-type(1)",
+   "text": "26,90 € mtl. x 36",
+   "kontext": "26,90 € mtl. x 36 +99 € Anzahlung",
+   "sichtbar": true
+  },
+  "7": {
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > section:nth-of-type(1) > button:nth-of-type(1) > div:nth-of-type(2)",
+   "text": "+99 € Anzahlung",
+   "kontext": "26,90 € mtl. x 36 +99 € Anzahlung",
+   "sichtbar": true
+  },
+  "19": {
+   "pfad": "#step1 > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1)",
+   "text": "49,95 €",
+   "kontext": "49,95 €",
+   "sichtbar": true
+  },
+  "22": {
+   "pfad": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > span:nth-of-type(1) > article:nth-of-type(1) > span:nth-of-type(2)",
+   "text": "39,95 €",
+   "kontext": "inkl. Bereitstellung 39,95 €",
+   "sichtbar": true
+  }
+ }
+}

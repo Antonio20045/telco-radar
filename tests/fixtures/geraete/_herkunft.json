@@ -697,6 +697,32 @@
       "bytes_roh": 93605,
       "sha256_roh": "37c8d2ab71e2070c0e80bdd463f9fb161ff7982dd2212ce8942f72845c334960",
       "nachgetragen": "Paket 11: Herkunft aus Commit, Inhalt und Testdokumentation belegt, nicht neu abgerufen"
+    },
+    {
+      "datei": "telekom_details_iphone17pro_512gb_20261007.json",
+      "url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details (POST der Produktseite https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false nach dem Klick auf 512 GB)",
+      "quelle": "Zweig klick-erkundung, Commit a9b45f5a, erkundung/telekom/2026-10-07/mitschnitt-1.json, Antwort 210 (Klick-Erkundung, Seite 1, Probe 0)",
+      "abgerufen_am": "2026-10-07",
+      "http_status": 200,
+      "content_type": "application/json;charset=UTF-8",
+      "bytes_roh": 109137,
+      "sha256_roh": "78aee9d2ef9a4815f0a33c52e075dcc544d5ad0a2a7d10a73052bd9fc9141dba",
+      "gzip": false,
+      "bytes_abgelegt": 109137,
+      "hinweis": "Byteidentischer Antwortkoerper aus dem Mitschnitt (nicht gekuerzt): iPhone 17 Pro 512 GB mit allen Ratenplaenen (12/24/36 Monate je drei Anzahlungsstufen) und dem Tarif MagentaMobil M."
+    },
+    {
+      "datei": "telekom_bedienelemente_iphone17pro_20261007.json",
+      "url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false",
+      "quelle": "Zweig klick-erkundung, Commit a9b45f5a, erkundung/telekom/2026-10-07/bedienelemente-1.json (Elemente 36-38, 40, 42-44, 46, 63; Gruppen 42, 43, 45) und preise-1.json (Kandidaten 6, 7, 19, 22)",
+      "abgerufen_am": "2026-10-07",
+      "http_status": 200,
+      "content_type": "application/json",
+      "bytes_roh": 9837,
+      "sha256_roh": "304f24f189f7cc1ac6608c385d584511aeb74acefd2ca983ff849f7b8a07052c",
+      "gzip": false,
+      "bytes_abgelegt": 9837,
+      "hinweis": "AUSZUG, nicht byteidentisch: die genannten Eintraege des Inventars mit unveraenderten Werten, Schluessel = Nummer im Original. Beleg fuer die Selektoren und Textmuster der Klick-Karte config/klickkarten/telekom.yaml."
     }
   ]
 }
