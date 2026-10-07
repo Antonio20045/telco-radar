@@ -41,9 +41,12 @@ DATENARTEN = frozenset({"xhr", "fetch", "document"})
 BOT_STATUS = frozenset({403, 429})
 GEHEIM = re.compile(
     r"token|secret|passw|session|^sid$|auth(?!or)|signature|^sig$|api[_-]?key|^key$"
-    r"|jwt|csrf|xsrf|nonce",
+    r"|jwt|csrf|xsrf|nonce|tntid|thirdpartyid|^umid$|visitor_?id|^mcid$|^ecid$",
     re.I,
 )
+"""Namen geheimer Parameter und JSON-Felder. Dazu die Besucherkennungen der
+Werbe- und Messdienste: Adobe Target schrieb am 07.10.2026 die ``tntId`` des
+Runners in eine Vodafone-Antwort."""
 ENTFERNT = "ENTFERNT"
 _PARAMETER = re.compile(r"(?<![\w.\[\]-])([\w.\[\]-]{1,80})=([^&#;,\s\"'<>\\]*)")
 _JSON_FELD = re.compile(r'"([^"\\]{1,80})"(\s*:\s*)("(?:[^"\\]|\\.)*"|-?\d[\d.eE+-]*)')

@@ -21,7 +21,7 @@ from telco_radar.collect.geraete.klickablage import (
 )
 from telco_radar.collect.geraete.klickerkundung import gesamtstatus
 from telco_radar.collect.geraete.klickinventar import art_der_gruppe
-from telco_radar.collect.geraete.klickspur import ohne_geheimnisse
+from telco_radar.collect.geraete.klickspur import ohne_geheimnisse, schwaerze_text
 from telco_radar.collect.geraete.klickziele import (
     ErkundungszielFehler,
     lade_ziele,
@@ -186,3 +186,28 @@ def test_ablage_schwaerzt_cookies_und_haelt_die_grenze(tmp_path):
     assert ablage.vermerke[0].startswith("y.bin nicht gespeichert")
     belegt = sum(d.stat().st_size for d in (tmp_path / "a").iterdir())
     assert belegt == ablage.belegt <= RESERVE_INDEX + 1000
+
+
+@pytest.mark.parametrize(
+    "schluessel", ["tntId", "thirdPartyId", "umid", "visitorId", "mcid", "ecid"]
+)
+def test_besucherkennung_wird_geschwaerzt(schluessel):
+    """Erkundung 07.10.2026: Adobe Target schrieb die Besucherkennung des Runners
+    (``tntId``) in eine Vodafone-Antwort, und sie stand ungeschwärzt im Zweig.
+    BEISPIEL-Werte, von Hand geschrieben."""
+    text = f'{{"id":{{"{schluessel}":"c24aaef64cd1.35_0"}},"speicher":"256"}}'
+
+    sauber = schwaerze_text(text)
+
+    assert "c24aaef64cd1" not in sauber
+    assert '"speicher":"256"' in sauber
+    assert ohne_geheimnisse(f"https://a.de/p?{schluessel}=c24aaef64cd1") == (
+        f"https://a.de/p?{schluessel}=ENTFERNT"
+    )
+
+
+@pytest.mark.parametrize("schluessel", ["id", "deviceVariantId", "planId", "sku"])
+def test_gegenprobe_variantenkennung_bleibt_stehen(schluessel):
+    text = f'{{"{schluessel}":"P-4356815"}}'
+
+    assert schwaerze_text(text) == text
