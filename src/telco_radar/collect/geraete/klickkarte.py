@@ -64,6 +64,36 @@ Anbieter verlangt (Befunde je Anbieter):
 - ``kanarie.enthaelt`` mit ``{modell}`` (Modellname aus dem Katalog, o2 und 1&1) und
   ``kanarie.attribut``: der Wert dieses Attributs statt des Texts (1&1 ``aria-label``).
 
+Zweite Lesung (Stufe 2 von Format 2):
+
+- ``antwort`` als Liste von Quellen; je Wertfeld zählt die erste mit Wert. Je Quelle
+  genau eines von ``url_muster``, ``skript`` (CSS eines Skripts mit JSON: o2
+  ``script#pageValue``, Telekom) und ``global`` (Name oder Liste globaler Variablen,
+  Pfade beginnen mit dem Namen: 1&1 ``hwdVariantsPrices``). ``laden: true``: die
+  Antwort kommt beim Laden und gilt für jede Kombination (congstar, Vodafone);
+  ``start: true``: die Quelle gilt nur bis zum ersten Klick (o2, der Startzustand
+  steht nur im Skript); ``erkennung``: unter Antworten derselben Adresse die mit einem
+  Wert an diesem Pfad (congstar: drei GraphQL-Antworten; Vodafone: dieselbe als xhr
+  und fetch); ``segment``: Muster, dessen erste Gruppe in der Antwortadresse Base64
+  mit ``name=wert;…`` ist, als weitere Parameter (o2 ``/configuration/<base64>``).
+- Pfade (``klickpfad``) mit Filtern ``[feld=wert]``, ``*`` und Platzhaltern
+  ``{speicher}``, ``{tarif}``, ``{laufzeit}`` (geklickte Werte), ``{modell}`` und
+  Seitenwerten (o2 ``paymentOptions[selected=true]``, congstar
+  ``variants[id={plan}]``, Vodafone ``atomics[capacity.sortValue={speicher}]``, 1&1
+  ``product-{farbe}-{speicher}``). Ein Pfad darf ``{pfad, einheit, muster}`` sein:
+  ``einheit: cent`` (1&1) oder ``mb`` (o2), ``muster`` nimmt die erste Gruppe (o2
+  „24xhigh“); ``parameter`` ebenso als ``{name, muster}``. Volumen -1 heißt
+  unbegrenzt (o2); Markup in Varianten fällt weg (o2 „O<sub>2</sub>“).
+- ``seite``: benannte Seitenwerte ``{selektor, attribut, parameter, muster}``, ohne
+  ``selektor`` aus der Seitenadresse (1&1 ``size``, freenet ``ds``), sonst etwa aus
+  dem Warenkorb-Link (congstar ``planId``). Heißt ein Seitenwert wie eine Dimension,
+  ist er das Echo „Seite zeigt“; jeder ist Platzhalter.
+- ``zusammenfassung.selektor`` als Liste von Bereichen und ``ohne`` mit Ausschlüssen
+  (Telekom: Tarif- und Zahlungsblock ohne Werbeblock); ``zusammenfassung.muster`` je
+  Wertfeld ein regulärer Ausdruck oder ``{muster, selektor}`` mit eigenem Fundort
+  (o2 „Gerät mtl. (36 Raten)“, 1&1 „44 , 99 €/Monat“, Vodafone „… € einmal“ und
+  Ratenzahl im gewählten Label).
+
 Selektoren der Klickziele sind Playwright-Selektoren (``:text-matches`` und
 ``:has-text`` gehen); ``passt``, ``bis`` und ``wert_in`` sind reines CSS.
 """
@@ -96,9 +126,13 @@ from .klickkartentypen import (
     KlickkartenFehler,
     Knopf,
     Phasenpfad,
+    Seitenwert,
     Textlesung,
+    Textmuster,
     Vorbereitung,
+    Wertpfad,
 )
+from .klickquellenleser import lies_quellen, lies_seite
 
 __all__ = [
     "DIMENSIONEN",
@@ -122,8 +156,11 @@ __all__ = [
     "Klickkarte",
     "Knopf",
     "Phasenpfad",
+    "Seitenwert",
     "Textlesung",
+    "Textmuster",
     "Vorbereitung",
+    "Wertpfad",
     "klickkarte_aus_daten",
     "lade_klickkarte",
 ]
@@ -135,6 +172,7 @@ KOPFFELDER = (
     "antwort",
     "kanarie",
     "vorbereitung",
+    "seite",
 )
 
 
@@ -156,13 +194,17 @@ def klickkarte_aus_daten(roh: object, quelle: str) -> Klickkarte:
     daten = leser.zuordnung(roh, "", KOPFFELDER)
     knoepfe, gewaehlt = leser.knoepfe(daten.get("knoepfe"))
     textlesung = leser.textlesung(daten.get("zusammenfassung"))
+    seite = lies_seite(leser, daten.get("seite"))
+    quellen = lies_quellen(leser, daten.get("antwort"), seite)
     return Klickkarte(
         anbieter=leser.text(daten, "anbieter", ""),
         knoepfe=knoepfe,
         gewaehlt=gewaehlt,
         zusammenfassung=", ".join(textlesung.selektoren),
-        antwort=leser.antwort(daten.get("antwort")),
+        antwort=quellen[0],
         kanarie=leser.kanarie(daten.get("kanarie")),
         textlesung=textlesung,
         vorbereitung=leser.vorbereitung(daten.get("vorbereitung")),
+        quellen=quellen,
+        seite=seite,
     )

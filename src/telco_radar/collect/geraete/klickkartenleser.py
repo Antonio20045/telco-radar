@@ -21,29 +21,23 @@ from .klickkartentypen import (
     GRUND_KEINE_ZUORDNUNG,
     GRUND_MUSTER,
     GRUND_OHNE_MARKE,
-    GRUND_OHNE_VARIANTE,
     GRUND_PLATZHALTER,
     GRUND_UNBEKANNT,
-    PHASENFELD,
-    PHASENTEILE,
     PLATZHALTER_MODELL,
-    WERTFELDER,
-    Antwortmuster,
     Auswahlmarke,
     Kanarie,
     KlickkartenFehler,
     Knopf,
-    Phasenpfad,
     Textlesung,
     Vorbereitung,
 )
+from .klickquellenleser import lies_textmuster, texte
 
 KNOPFTEILE = ("selektor", "wert", "wert_in", "muster", GEWAEHLT, "fest")
 MARKENTEILE = ("attribut", "wert", "passt")
 VORBEREITUNGSTEILE = ("klick", "bis", "pruefe")
-LESUNGSTEILE = ("selektor", "oeffnen", "schliessen")
+LESUNGSTEILE = ("selektor", "oeffnen", "schliessen", "ohne", "muster")
 KANARIENTEILE = ("selektor", "enthaelt", "attribut")
-ANTWORTTEILE = ("url_muster", "pfade", "variante", "parameter")
 _PLATZHALTER = re.compile(r"\{([^{}]*)\}")
 
 
@@ -171,13 +165,16 @@ class Kartenleser:
         return tuple(schritte)
 
     def textlesung(self, roh: object) -> Textlesung:
-        """Bereiche der Preiszusammenfassung und der Dialog davor."""
+        """Bereiche der Preiszusammenfassung, Ausschlüsse, Muster und Dialog."""
         feld = "zusammenfassung"
         daten = self.zuordnung(roh, feld, LESUNGSTEILE)
+        ohne = () if daten.get("ohne") is None else texte(self, daten, "ohne", feld)
         return Textlesung(
-            selektoren=(self.text(daten, "selektor", feld),),
+            selektoren=texte(self, daten, "selektor", feld),
             oeffnen=self.wahlweise_text(daten, "oeffnen", feld),
             schliessen=self.wahlweise_text(daten, "schliessen", feld),
+            ohne=ohne,
+            muster=lies_textmuster(self, daten.get("muster")),
         )
 
     def kanarie(self, roh: object) -> Kanarie:
@@ -193,39 +190,6 @@ class Kartenleser:
             enthaelt=enthaelt,
             attribut=self.wahlweise_text(daten, "attribut", feld),
         )
-
-    def antwort(self, roh: object) -> Antwortmuster:
-        """Die mitzuschneidende Antwort, ihre Pfade und woran sie die Variante nennt."""
-        antwort = self.zuordnung(roh, "antwort", ANTWORTTEILE)
-        url_muster = self.muster(antwort, "url_muster", "antwort")
-        pfade = self.zuordnung(antwort.get("pfade"), "antwort.pfade", WERTFELDER)
-        if not pfade:
-            raise self.fehler("antwort.pfade", GRUND_FEHLT)
-        variante = self._dimensionen(antwort, "variante")
-        parameter = self._dimensionen(antwort, "parameter")
-        if not variante and not parameter:
-            raise self.fehler("antwort.variante", GRUND_OHNE_VARIANTE)
-        return Antwortmuster(
-            url_muster=url_muster,
-            pfade={feld: self._pfad(pfade, feld) for feld in pfade},
-            variante=variante,
-            parameter=parameter,
-        )
-
-    def _dimensionen(self, antwort: Mapping, schluessel: str) -> dict[str, str]:
-        if antwort.get(schluessel) is None:
-            return {}
-        ort = f"antwort.{schluessel}"
-        zuordnung = self.zuordnung(antwort[schluessel], ort, DIMENSIONEN)
-        return {d: self.text(zuordnung, d, ort) for d in zuordnung}
-
-    def _pfad(self, pfade: Mapping, feld: str) -> str | Phasenpfad:
-        if feld != PHASENFELD or not isinstance(pfade.get(feld), Mapping):
-            return self.text(pfade, feld, "antwort.pfade")
-        ort = f"antwort.pfade.{feld}"
-        teile = self.zuordnung(pfade[feld], ort, PHASENTEILE)
-        liste, von, bis, betrag = (self.text(teile, t, ort) for t in PHASENTEILE)
-        return Phasenpfad(liste=liste, von=von, bis=bis, betrag=betrag)
 
 
 def stelle(feld: str, schluessel: str) -> str:

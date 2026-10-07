@@ -8,13 +8,18 @@ in der JSON-Antwort oder Parameter ihrer Adresse. ``pruefe_echo`` übernimmt ein
 nur, wenn beide ihn gleich nennen und Seite wie Antwort die gewählte Variante zeigen;
 eine gewählte Option, die sich nicht lesen lässt, bestätigt nichts. Sonst entsteht ein
 ``Befund`` mit Grund. Fehlt ein Wert auf beiden Seiten, ist er ``None`` und eine
-benannte Lücke, nie 0. Unbegrenztes Volumen ist ``math.inf`` wie im Tarifmodell. Eine
-Laufzeit gilt nur als Monatsangabe („24 Monate“, „24 x“ oder reine Zahl), sonst ist sie
-``None``. Deutsche Zahlen liest ``tarif_model.zahl``. Dieses Modul ruft kein Netz.
+benannte Lücke, nie 0. Unbegrenztes Volumen ist ``math.inf`` wie im Tarifmodell, in
+der Antwort auch -1 (o2). Eine Laufzeit gilt nur als Monatsangabe („24 Monate“, „24 x“
+oder reine Zahl), sonst ist sie ``None``; ``muster`` eines Pfads nimmt sie aus anderem
+Text (o2 „24xhigh“). Pfade mit Filtern und Platzhaltern liest ``klickpfad``; Optionen
+vergleicht das Echo ohne Markup, Leerraum sowie Groß- und Kleinschreibung. Deutsche
+Zahlen liest ``tarif_model.zahl``. Dieses Modul ruft kein Netz.
 """
 
 from __future__ import annotations
 
+import base64
+import binascii
 import math
 import re
 from collections.abc import Mapping
@@ -23,13 +28,25 @@ from typing import Any
 from urllib.parse import parse_qs, urlsplit
 
 from ...tarif_model import Preisphase, zahl
-from .klickkarte import DIMENSIONEN, PHASENFELD, WERTFELDER, Antwortmuster, Phasenpfad
+from .klickkarte import (
+    DIMENSIONEN,
+    PHASENFELD,
+    WERTFELDER,
+    Antwortmuster,
+    Phasenpfad,
+    Wertpfad,
+)
+from .klickkartentypen import EINHEIT_CENT, EINHEIT_MB
+from .klickoptionen import wert_nach_muster
+from .klickpfad import am_pfad, ohne_markup, vergleichbar
 from .klicktext import Preiswerte, nennt_volumen, phase, volumen_aus_zeile
 from .klicktext import lies_zusammenfassung as lies_zusammenfassung
 
 CENT_TOLERANZ = 0.005
 GANZZAHLFELDER = frozenset({"ratenzahl", "tarifbindung"})
 VOLUMENFELD = "volumen_gb"
+UNBEGRENZT_ZAHL = -1
+MB_JE_GB = 1024
 LAUFZEIT = "laufzeit"
 GRUND_OHNE_ANTWORT = "keine Antwort mitgeschnitten"
 GRUND_KEINE_WERTE = "weder Text noch Antwort nennen Preiswerte"
@@ -86,28 +103,79 @@ def variante_aus(speicher: object, tarif: object, laufzeit: object) -> Variante:
 
 
 def lies_antwort(
-    nutzlast: object, muster: Antwortmuster, url: str | None = None
+    nutzlast: object,
+    muster: Antwortmuster,
+    url: str | None = None,
+    platz: Mapping[str, str | None] | None = None,
 ) -> Antwortlesung:
     """Liest dieselben Werte aus der JSON-Antwort über die Pfade der Klick-Karte.
 
     Die Variante steht an den Pfaden ``muster.variante`` oder in den Parametern
-    ``muster.parameter`` der Adresse ``url``; fehlt sie dort, ist sie ``None``.
+    ``muster.parameter`` der Adresse ``url`` (mit ``muster.segment`` auch in deren
+    Pfadsegment); fehlt sie dort, ist sie ``None``. ``platz`` hält die Werte der
+    Platzhalter in den Pfaden.
     """
+    platz = {} if platz is None else platz
     werte: dict[str, Any] = {
-        feld: _feldwert(feld, nutzlast, pfad) for feld, pfad in muster.pfade.items()
+        feld: _feldwert(feld, nutzlast, pfad, platz)
+        for feld, pfad in muster.pfade.items()
     }
-    frage = parse_qs(urlsplit(url).query) if url is not None else {}
+    frage = adressparameter(url, muster.segment)
     variante = {
-        d: _dimension(d, frage.get(name, [None])[0])
+        d: _dimension(d, _gemustert(frage.get(_pfad(name)), name))
         for d, name in muster.parameter.items()
     }
     variante.update(
         {
-            d: _dimension(d, _am_pfad(nutzlast, pfad))
+            d: _dimension(d, _gemustert(am_pfad(nutzlast, _pfad(pfad), platz), pfad))
             for d, pfad in muster.variante.items()
         }
     )
     return Antwortlesung(werte=Preiswerte(**werte), variante=variante)
+
+
+def adressparameter(url: str | None, segment: re.Pattern[str] | None) -> dict[str, str]:
+    """Die Parameter einer Adresse, je Name der erste Wert.
+
+    Mit ``segment`` dazu die Teile ``name=wert`` (durch ``;`` getrennt) aus der ersten
+    Gruppe des Musters in der Adresse, Base64-kodiert wie bei o2 ``/configuration/…``.
+    """
+    if url is None:
+        return {}
+    frage = {k: v[0] for k, v in parse_qs(urlsplit(url).query).items()}
+    treffer = None if segment is None else segment.search(url)
+    if treffer is None:
+        return frage
+    roh = treffer[1] if treffer.re.groups else treffer[0]
+    try:
+        text = base64.urlsafe_b64decode(roh + "=" * (-len(roh) % 4)).decode("utf-8")
+    except (binascii.Error, UnicodeDecodeError, ValueError):
+        return frage
+    for teil in text.split(";"):
+        name, gleich, wert = teil.partition("=")
+        if gleich and name.strip():
+            frage.setdefault(name.strip(), wert.strip())
+    return frage
+
+
+def feldwert(feld: str, roh: object, einheit: str | None = None) -> object:
+    """Ein Wert als Typ seines Felds: Betrag, Ganzzahl, Volumen in GB oder Phase."""
+    if feld == PHASENFELD:
+        betrag = _umgerechnet(_betrag(roh), einheit)
+        return None if betrag is None else (Preisphase(1, None, betrag),)
+    if feld in GANZZAHLFELDER:
+        return _ganzzahl(roh)
+    if feld == VOLUMENFELD:
+        return _umgerechnet(_volumen(roh), einheit)
+    return _umgerechnet(_betrag(roh), einheit)
+
+
+def gleiche_option(a: object, b: object) -> bool:
+    """Wahr, wenn zwei Optionswerte ohne Markup, Leerraum und Groß-/Kleinschreibung
+    gleich sind; ``None`` ist nur ``None`` gleich."""
+    if a is None or b is None:
+        return a is None and b is None
+    return vergleichbar(a) == vergleichbar(b)
 
 
 def pruefe_echo(
@@ -160,10 +228,10 @@ def _variantenbefunde(
             befunde.append(Befund(f"variante.{dimension}", GRUND_UNLESBAR))
             continue
         ist = getattr(angezeigt, dimension)
-        if ist != soll:
+        if not gleiche_option(ist, soll):
             grund = f"Seite zeigt {_option(ist)} statt {soll}"
             befunde.append(Befund(f"variante.{dimension}", grund))
-        if dimension in genannt and genannt[dimension] != soll:
+        if dimension in genannt and not gleiche_option(genannt[dimension], soll):
             grund = f"Antwort nennt {_option(genannt[dimension])} statt {soll}"
             befunde.append(Befund(f"antwort.{dimension}", grund))
     return befunde
@@ -216,45 +284,54 @@ def _option(wert: object) -> str:
     return KEINE_AUSWAHL if wert is None else str(wert)
 
 
-def _feldwert(feld: str, nutzlast: object, pfad: str | Phasenpfad) -> object:
+def _feldwert(
+    feld: str,
+    nutzlast: object,
+    pfad: str | Wertpfad | Phasenpfad,
+    platz: Mapping[str, str | None],
+) -> object:
     if isinstance(pfad, Phasenpfad):
-        return _phasen_aus_liste(_am_pfad(nutzlast, pfad.liste), pfad)
-    roh = _am_pfad(nutzlast, pfad)
-    if feld == PHASENFELD:
-        betrag = _betrag(roh)
-        return None if betrag is None else (Preisphase(1, None, betrag),)
-    if feld in GANZZAHLFELDER:
-        return _ganzzahl(roh)
-    if feld == VOLUMENFELD:
-        return _volumen(roh)
-    return _betrag(roh)
+        return _phasen_aus_liste(am_pfad(nutzlast, pfad.liste, platz), pfad, platz)
+    roh = _gemustert(am_pfad(nutzlast, _pfad(pfad), platz), pfad)
+    return feldwert(feld, roh, pfad.einheit if isinstance(pfad, Wertpfad) else None)
 
 
-def _phasen_aus_liste(liste: object, pfad: Phasenpfad) -> tuple[Preisphase, ...] | None:
+def _pfad(pfad: str | Wertpfad) -> str:
+    return pfad.pfad if isinstance(pfad, Wertpfad) else pfad
+
+
+def _gemustert(roh: object, pfad: str | Wertpfad) -> object:
+    if not isinstance(pfad, Wertpfad) or pfad.muster is None or roh is None:
+        return roh
+    text = roh if isinstance(roh, str) else vergleichbar(roh)
+    return None if text is None else wert_nach_muster(text, pfad.muster)
+
+
+def _umgerechnet(wert: float | None, einheit: str | None) -> float | None:
+    if wert is None or math.isinf(wert):
+        return wert
+    if einheit == EINHEIT_CENT:
+        return wert / 100
+    if einheit == EINHEIT_MB:
+        return wert / MB_JE_GB
+    return wert
+
+
+def _phasen_aus_liste(
+    liste: object, pfad: Phasenpfad, platz: Mapping[str, str | None]
+) -> tuple[Preisphase, ...] | None:
     if not isinstance(liste, list) or not liste:
         return None
     phasen = []
     for eintrag in liste:
-        von = _ganzzahl(_am_pfad(eintrag, pfad.von))
-        bis = _ganzzahl(_am_pfad(eintrag, pfad.bis))
-        betrag = _betrag(_am_pfad(eintrag, pfad.betrag))
+        von = _ganzzahl(am_pfad(eintrag, pfad.von, platz))
+        bis = _ganzzahl(am_pfad(eintrag, pfad.bis, platz))
+        betrag = _betrag(am_pfad(eintrag, pfad.betrag, platz))
         teil = None if von is None else phase(von, bis, betrag)
         if teil is None:
             return None
         phasen.append(teil)
     return tuple(sorted(phasen, key=lambda p: p.von_monat))
-
-
-def _am_pfad(nutzlast: object, pfad: str) -> object:
-    knoten = nutzlast
-    for teil in pfad.split("."):
-        if isinstance(knoten, Mapping):
-            knoten = knoten.get(teil)
-        elif isinstance(knoten, list) and teil.isdigit() and int(teil) < len(knoten):
-            knoten = knoten[int(teil)]
-        else:
-            return None
-    return knoten
 
 
 def _betrag(roh: object) -> float | None:
@@ -284,11 +361,14 @@ def _monate(roh: object) -> int | None:
 def _volumen(roh: object) -> float | None:
     if isinstance(roh, str) and nennt_volumen(roh):
         return volumen_aus_zeile(roh)
-    return _betrag(roh)
+    menge = _betrag(roh)
+    return math.inf if menge == UNBEGRENZT_ZAHL else menge
 
 
 def _dimension(dimension: str, roh: object) -> str | int | None:
-    return _monate(roh) if dimension == LAUFZEIT else _als_text(roh)
+    if dimension == LAUFZEIT:
+        return _monate(roh)
+    return _als_text(ohne_markup(roh) if isinstance(roh, str) else roh)
 
 
 def _als_text(roh: object) -> str | None:

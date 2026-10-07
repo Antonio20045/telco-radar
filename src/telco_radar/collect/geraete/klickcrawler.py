@@ -51,7 +51,7 @@ from typing import TYPE_CHECKING
 from playwright.sync_api import Error as PlaywrightFehler
 
 from .klickbedienung import Bedienung
-from .klickbeleg import Belegquelle, baue_beleg, kopie_aus
+from .klickbeleg import Belegquelle, baue_beleg
 from .klickecho import LAUFZEIT, Variante, variante_aus
 from .klickkarte import DIMENSIONEN, Klickkarte
 from .klickkontext import Sitzung, cookie_werte, oeffne_sitzung, schliesse
@@ -75,7 +75,6 @@ from .klickoptionen import Auswahl, Option, angebotene_werte, naechste, vereinig
 from .klicktor import (
     GRUND_ZU_VIELE,
     HOECHSTE_UMLEITUNGEN,
-    SEITEN_FRIST_MS,
     Schleuse,
     Tor,
     kurz,
@@ -101,7 +100,6 @@ HOECHSTE_KOMBINATIONEN = 200
 FENSTER: ViewportSize = {"width": 1280, "height": 900}
 GRUND_NICHT_BESUCHT = "nicht besucht"
 GRUND_ZEIT = "Zeitgrenze erreicht"
-_GELADEN_JS = "() => document.readyState === 'complete'"
 
 
 def klicke_durch(
@@ -184,11 +182,12 @@ class _Gang:
     ) -> None:
         self.seite, self.karte, self.tor, self.lauf = seite, karte, tor, lauf
         self.frist_ms, self.hoechste, self.frist = frist_ms, hoechste, frist
-        self.leser = Leser(seite, karte, frist_ms)
         self.wache = Wache(seite, karte, tor, lauf, frist_ms)
+        self.leser = Leser(seite, karte, frist_ms, self.wache, modell)
         self.bedienung = Bedienung(seite, karte, self.wache, self.leser, modell)
         self.geklickt = False
         self.nach_frist = 0
+        self.unberuehrt = True
 
     def laufe(self) -> None:
         try:
@@ -237,7 +236,7 @@ class _Gang:
             darf, grund = self.tor.darf(ziel)
             if not darf:
                 raise Abbruch(LAUF_GESPERRT, grund)
-            self._lade(ziel)
+            self.wache.lade(ziel)
             if self.tor.umleitung is None:
                 break
             ziel = self.tor.umleitung
@@ -249,41 +248,12 @@ class _Gang:
         if not darf:
             raise Abbruch(LAUF_GESPERRT, grund)
         self.bedienung.pruefe_kanarie()
-        self.wache.nimm_antwort((0, 0, 0))
-        self.bedienung.bereite_vor()
-
-    def _lade(self, ziel: str) -> None:
-        """Öffnet ``ziel``; die Frist bis zur Antwort trägt den Crawl-delay mit."""
-        self.tor.umleitung = None
-        _, verworfen, gescheitert = self.wache.marke()
-        frist = SEITEN_FRIST_MS + round(1000 * self.tor.schleuse.abstand(ziel))
-        try:
-            self.seite.goto(ziel, wait_until="commit", timeout=frist)
-        except PlaywrightFehler as fehler:
-            self.lauf.http_status = self.tor.haupt_status
-            self.wache.pruefe_tor()
-            if self.tor.umleitung is not None:
-                return
-            gesperrt = self.lauf.verworfen[verworfen:]
-            if gesperrt:
-                raise Abbruch(LAUF_GESPERRT, gesperrt[0].grund) from fehler
-            ohne = self.lauf.gescheitert[gescheitert:]
-            if ohne:
-                grund = f"Abruf gestört ({ohne[0].grund})"
-                raise Abbruch(LAUF_GESTOERT, grund) from fehler
-            raise
-        self.lauf.http_status = self.tor.haupt_status
-        if self.tor.umleitung is None and not self.wache.warte(
-            self._geladen, SEITEN_FRIST_MS
-        ):
-            grund = f"Seite nach {SEITEN_FRIST_MS} ms nicht geladen"
-            raise Abbruch(LAUF_GESTOERT, grund)
-
-    def _geladen(self) -> bool:
-        try:
-            return self.seite.evaluate(_GELADEN_JS) is True
-        except PlaywrightFehler:
-            return False
+        quellen = self.karte.lesequellen
+        if any(q.url_muster is not None for q in quellen):
+            self.wache.nimm_antwort((0, 0, 0))
+        if not self.karte.je_klick:
+            self.wache.warte_ruhe()
+        self.unberuehrt = not self.bedienung.bereite_vor()
 
     def _angebotene_werte(self, dimension: str) -> list[str | None]:
         fest = self.karte.knoepfe[dimension].fest
@@ -312,12 +282,14 @@ class _Gang:
                 return ergebnis
         if self.bedienung.bereite_vor():
             self.geklickt = True
+            self.unberuehrt = False
         if self.wache.ausstehend is not None:
             return Kombiergebnis(variante, NICHT_ERFASST, self.wache.ausstehend)
-        antwort = self.wache.antwort
-        ergebnis = self.leser.lies(variante, ziel, antwort, self.lauf.struktur)
+        struktur = self.lauf.struktur
+        ergebnis = self.leser.lies(variante, ziel, struktur, self.unberuehrt)
         if ergebnis.status not in (ERFASST, BEFUND):
             return ergebnis
+        teile = self.leser.belegteile
         quelle = Belegquelle(
             anbieter=self.karte.anbieter,
             adresse=self.lauf.adresse,
@@ -328,7 +300,9 @@ class _Gang:
             werte=ergebnis.werte,
             text=ergebnis.text,
             screenshot_png=ergebnis.screenshot_png,
-            antwort=kopie_aus(antwort),
+            antwort=teile.kopie,
+            json_pfade=teile.json_pfade,
+            fundorte=teile.fundorte,
         )
         paket, ohne = baue_beleg(quelle, self.karte, self.tor.uhr())
         return mit_beleg(ergebnis, paket, ohne)
@@ -372,13 +346,13 @@ class _Gang:
     def _klicke(
         self, dimension: str, stelle: int, variante: Variante
     ) -> Kombiergebnis | None:
+        selektor = self.karte.knoepfe[dimension].selektor
+        if selektor is None:
+            return Kombiergebnis(variante, NICHT_ERFASST, self._fehlen(dimension))
         self.wache.warte_offen()
         if self._zeit_um():
             return self._nicht_besucht(variante)
         marke = self.wache.marke()
-        selektor = self.karte.knoepfe[dimension].selektor
-        if selektor is None:
-            return Kombiergebnis(variante, NICHT_ERFASST, self._fehlen(dimension))
         knopf = self.seite.locator(selektor).nth(stelle)
         try:
             self._druecke(knopf)
@@ -386,7 +360,11 @@ class _Gang:
             grund = f"Knopf für {dimension} nicht klickbar: {fehler}"
             return Kombiergebnis(variante, NICHT_ERFASST, grund)
         self.geklickt = True
-        self.wache.nimm_antwort(marke)
+        self.unberuehrt = False
+        if self.karte.je_klick:
+            self.wache.nimm_antwort(marke)
+        else:
+            self.wache.warte_ruhe()
         return None
 
     def _druecke(self, knopf: Locator) -> None:

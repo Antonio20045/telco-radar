@@ -73,9 +73,13 @@ class Mitschnitt:
 
     def letzte_seit(self, seit: int) -> Response | None:
         """Die letzte Antwort auf eine Anfrage seit der Marke, sonst ``None``."""
-        neue = self.anfragen[seit:]
-        eigene = [a for a in self.antworten if _unter(a.request, neue)]
+        eigene = self.antworten_seit(seit)
         return eigene[-1] if eigene else None
+
+    def antworten_seit(self, seit: int) -> list[Response]:
+        """Die Antworten auf Anfragen seit der Marke, in Reihenfolge."""
+        neue = self.anfragen[seit:]
+        return [a for a in self.antworten if _unter(a.request, neue)]
 
     def _schliesse(self, anfrage: Request) -> None:
         self.offen = [a for a in self.offen if a is not anfrage]

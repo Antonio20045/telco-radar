@@ -10,7 +10,9 @@ dem ihre Anfrage hinausging (``klickmitschnitt``); sieht sie nach Bot-Schutz aus
 die Frist offen, heißt die Kombination ``nicht_erfasst`` (``ausstehend``), und vor dem
 nächsten Klick wie am Ende des Laufs wartet die Wache sie ab oder bricht den Lauf als
 gestört ab. Ruhe heißt: keine Anfrage der Seite läuft, und zwei Lesungen im Abstand
-``RUHE_MS`` zeigen dieselben Knöpfe und keine neue Anfrage.
+``RUHE_MS`` zeigen dieselben Knöpfe und keine neue Anfrage. Mitgeschnitten wird jede
+Antwort, die zu einer Quelle der Karte passt; erwartet keine Quelle eine Antwort je
+Klick (congstar, Vodafone, 1&1), wartet die Wache nach einem Klick nur auf Ruhe.
 """
 
 from __future__ import annotations
@@ -29,7 +31,7 @@ from .klicklauf import (
     bot_schutz,
 )
 from .klickmitschnitt import Mitschnitt
-from .klicktor import WARTE_TAKT_MS, Tor, kurz
+from .klicktor import SEITEN_FRIST_MS, WARTE_TAKT_MS, Tor, kurz
 
 if TYPE_CHECKING:
     from playwright.sync_api import Page, Response
@@ -40,6 +42,7 @@ if TYPE_CHECKING:
 log = logging.getLogger(__name__)
 
 RUHE_MS = 500
+_GELADEN_JS = "() => document.readyState === 'complete'"
 MINDESTE_RUHELESUNGEN = 3
 
 Marke = tuple[int, int, int]
@@ -61,8 +64,12 @@ class Wache:
         self, seite: Page, karte: Klickkarte, tor: Tor, lauf: Klicklauf, frist_ms: int
     ) -> None:
         self.seite, self.tor, self.lauf = seite, tor, lauf
-        self.passt = karte.antwort.passt
+        quellen = karte.lesequellen
+        self.passt: Callable[[str], bool] = lambda url: any(
+            q.passt(url) for q in quellen
+        )
         self.frist_ms = frist_ms
+        self.seit = 0
         self.mitschnitt = Mitschnitt(self.passt)
         self.mitschnitt.binde(seite)
         self.antwort: Response | None = None
@@ -76,6 +83,39 @@ class Wache:
         if self.geoeffnet and self.tor.umleitung is not None:
             grund = f"Hauptseite im Lauf umgeleitet ({self.tor.umleitung})"
             raise Abbruch(LAUF_GESTOERT, grund)
+
+    def lade(self, ziel: str) -> None:
+        """Öffnet ``ziel``; die Frist bis zur Antwort trägt den Crawl-delay mit."""
+        self.tor.umleitung = None
+        _, verworfen, gescheitert = self.marke()
+        frist = SEITEN_FRIST_MS + round(1000 * self.tor.schleuse.abstand(ziel))
+        try:
+            self.seite.goto(ziel, wait_until="commit", timeout=frist)
+        except PlaywrightFehler as fehler:
+            self.lauf.http_status = self.tor.haupt_status
+            self.pruefe_tor()
+            if self.tor.umleitung is not None:
+                return
+            gesperrt = self.lauf.verworfen[verworfen:]
+            if gesperrt:
+                raise Abbruch(LAUF_GESPERRT, gesperrt[0].grund) from fehler
+            ohne = self.lauf.gescheitert[gescheitert:]
+            if ohne:
+                grund = f"Abruf gestört ({ohne[0].grund})"
+                raise Abbruch(LAUF_GESTOERT, grund) from fehler
+            raise
+        self.lauf.http_status = self.tor.haupt_status
+        if self.tor.umleitung is None and not self.warte(
+            self._geladen, SEITEN_FRIST_MS
+        ):
+            grund = f"Seite nach {SEITEN_FRIST_MS} ms nicht geladen"
+            raise Abbruch(LAUF_GESTOERT, grund)
+
+    def _geladen(self) -> bool:
+        try:
+            return self.seite.evaluate(_GELADEN_JS) is True
+        except PlaywrightFehler:
+            return False
 
     def warte(self, bedingung: Callable[[], bool], frist_ms: int | None = None) -> bool:
         """Wartet in Takten, bis ``bedingung`` gilt; fragt in jedem Takt das Tor."""
@@ -98,7 +138,7 @@ class Wache:
 
     def nimm_antwort(self, marke: Marke) -> None:
         """Wartet auf die Antwort seit ``marke`` und prüft sie, bevor sie gilt."""
-        seit = marke[0]
+        seit = self.seit = marke[0]
         self.ausstehend = None
         antwort = None
         if self.warte(lambda: self.mitschnitt.fertig_seit(seit)):
@@ -115,6 +155,10 @@ class Wache:
         """Nimmt die Antwort seit ``marke`` nur, wenn seitdem eine Preisanfrage ging."""
         if self.mitschnitt.stand() > marke[0]:
             self.nimm_antwort(marke)
+
+    def warte_ruhe(self) -> None:
+        """Wartet, bis keine Anfrage läuft und keine neue kommt, höchstens die Frist."""
+        self.in_ruhe(lambda: [])
 
     def warte_offen(self) -> None:
         """Wartet offene Preisanfragen ab; bleibt eine offen, ist der Lauf gestört."""

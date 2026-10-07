@@ -122,13 +122,18 @@ def karte(**teile):
 
 def laufe(browser, seite_html: str, rechne, k, frist_ms: int = 3000, **weiter):
     """Lässt den Crawler über die Seite laufen; Lauf und Server."""
+    return laufe_mit(browser, antworter(seite_html, rechne), k, frist_ms, **weiter)
+
+
+def laufe_mit(browser, antworte, k, frist_ms: int = 3000, **weiter):
+    """Lässt den Crawler über ``/handy/x`` mit eigener Antwortfunktion laufen."""
     from telco_radar.collect.geraete.klickcrawler import klicke_durch
     from telco_radar.collect.geraete.klicktor import Hostschleuse
     from telco_radar.collect.geraete.robots import RobotsWaechter
 
     waechter = RobotsWaechter(hole=lambda url: (200, "User-agent: *\n"))
     schleuse = Hostschleuse(waechter, lambda: JETZT)
-    with klickserver(antworter(seite_html, rechne)) as server:
+    with klickserver(antworte) as server:
         lauf = klicke_durch(
             browser,
             server.adresse("/handy/x"),

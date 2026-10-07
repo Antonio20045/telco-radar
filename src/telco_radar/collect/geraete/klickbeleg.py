@@ -5,12 +5,13 @@ Klick-Crawler einen Beleg (``baue_beleg``): den Screenshot des Preisbereichs als
 (kann Pillow kein WebP, bleibt er PNG und heißt so), die Preisantwort als HAR
 (``klickhar``), Zeitpunkt in UTC, Adresse der Produktseite und der Seite beim Lesen,
 HTTP-Status von Seite und Antwort, die gelesenen Werte und je Wert seine Fundstellen:
-im sichtbaren Text Selektor und Ausschnitt (``klicktext.fundstellen``), in der Antwort
-der JSON-Pfad der Klick-Karte. Die ``beleg_id`` ist SHA-256 über beide Dateien, nie
-aus Titeltext. Fehlt Screenshot, Antwort oder eine Fundstelle, gibt es keinen Beleg,
-sondern einen Grund; ein Wert ohne Beleg ist nicht gültig (``klicklauf.mit_beleg``).
-``Beleg`` ist zugleich das Schema einer Manifestzeile (``belegmanifest``). Dieses
-Modul ruft kein Netz.
+im sichtbaren Text Selektor und Ausschnitt (``klicktext.fundstellen``, bei einem
+Textmuster der Karte dessen Fundort), in der Antwort der JSON-Pfad der Klick-Karte
+(bei mehreren Quellen mit Stelle und Ort davor, ``klickquellen``). Die ``beleg_id``
+ist SHA-256 über beide Dateien, nie aus Titeltext. Fehlt Screenshot, Antwort oder
+eine Fundstelle, gibt es keinen Beleg, sondern einen Grund; ein Wert ohne Beleg ist
+nicht gültig (``klicklauf.mit_beleg``). ``Beleg`` ist zugleich das Schema einer
+Manifestzeile (``belegmanifest``). Dieses Modul ruft kein Netz.
 """
 
 from __future__ import annotations
@@ -30,7 +31,7 @@ from playwright.sync_api import Error as PlaywrightFehler
 from ...tarif_model import Preisphase
 from .klickecho import Variante
 from .klickhar import Antwortkopie, har_aus
-from .klickkarte import WERTFELDER, Klickkarte, Phasenpfad
+from .klickkarte import WERTFELDER, Klickkarte, Phasenpfad, Wertpfad
 from .klicktext import Preiswerte, fundstellen
 
 if TYPE_CHECKING:
@@ -117,6 +118,8 @@ class Belegquelle:
     text: str | None
     screenshot_png: bytes | None
     antwort: Antwortkopie | None
+    json_pfade: Mapping[str, str] | None = None
+    fundorte: Mapping[str, tuple[str, str]] = field(default_factory=dict)
 
 
 def baue_beleg(
@@ -127,7 +130,13 @@ def baue_beleg(
         return None, GRUND_OHNE_BILD
     if quelle.antwort is None:
         return None, GRUND_OHNE_ANTWORT
-    stellen, grund = belegstellen(quelle.werte, quelle.text or "", karte)
+    stellen, grund = belegstellen(
+        quelle.werte,
+        quelle.text or "",
+        karte,
+        json_pfade=quelle.json_pfade,
+        fundorte=quelle.fundorte,
+    )
     if grund is not None:
         return None, grund
     bild, typ = bild_fuer_beleg(quelle.screenshot_png, webp)
@@ -157,23 +166,33 @@ def baue_beleg(
 
 
 def belegstellen(
-    werte: Preiswerte, text: str, karte: Klickkarte
+    werte: Preiswerte,
+    text: str,
+    karte: Klickkarte,
+    *,
+    json_pfade: Mapping[str, str] | None = None,
+    fundorte: Mapping[str, tuple[str, str]] | None = None,
 ) -> tuple[tuple[Fundstelle, ...], str | None]:
-    """Je gelesenem Wert die Fundstellen; fehlt eine, der Grund."""
+    """Je gelesenem Wert die Fundstellen; fehlt eine, der Grund.
+
+    ``fundorte`` nennt je Feld Selektor und Ausschnitt aus einem Textmuster,
+    ``json_pfade`` je Feld den Pfad; ohne sie gelten Text und Pfade der Karte.
+    """
     gelesen = [f for f in WERTFELDER if getattr(werte, f) is not None]
     if not gelesen:
         return (), GRUND_OHNE_WERTE
-    ausschnitte = fundstellen(text)
+    ausschnitte = {f: (karte.zusammenfassung, a) for f, a in fundstellen(text).items()}
+    ausschnitte.update({} if fundorte is None else fundorte)
+    if json_pfade is None:
+        json_pfade = {f: pfadtext(p) for f, p in karte.antwort.pfade.items()}
     stellen = []
     for feld in gelesen:
-        pfad = karte.antwort.pfade.get(feld)
         if feld not in ausschnitte:
             return (), f"Beleg fehlt: {feld} ohne Fundstelle im Text"
-        if pfad is None:
+        if feld not in json_pfade:
             return (), f"Beleg fehlt: {feld} ohne Pfad in der Antwort"
-        stellen.append(
-            Fundstelle(feld, karte.zusammenfassung, ausschnitte[feld], pfadtext(pfad))
-        )
+        selektor, ausschnitt = ausschnitte[feld]
+        stellen.append(Fundstelle(feld, selektor, ausschnitt, json_pfade[feld]))
     return tuple(stellen), None
 
 
@@ -204,10 +223,12 @@ def bild_fuer_beleg(png: bytes, webp: bool = True) -> tuple[bytes, str]:
     return ziel.getvalue(), WEBP
 
 
-def pfadtext(pfad: str | Phasenpfad) -> str:
+def pfadtext(pfad: str | Wertpfad | Phasenpfad) -> str:
     """Der JSON-Pfad einer Fundstelle; eine Phasenliste mit ihren Feldnamen."""
     if isinstance(pfad, Phasenpfad):
         return f"{pfad.liste}[*].{{{pfad.von},{pfad.bis},{pfad.betrag}}}"
+    if isinstance(pfad, Wertpfad):
+        return pfad.pfad
     return pfad
 
 
