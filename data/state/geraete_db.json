@@ -2,8 +2,8 @@
  "updated": "2026-10-07",
  "anbieter": {
   "ALDI TALK": {
-   "laeufe": 52,
-   "funde_gesamt": 231,
+   "laeufe": 53,
+   "funde_gesamt": 236,
    "letzter_lauf": "2026-10-07",
    "letzte_funde": 5,
    "letzter_fund": "2026-10-07",
@@ -182,15 +182,15 @@
      5,
      "gelesen",
      0,
-     26,
+     28,
      0
     ]
    ],
    "tote_adressen": 0
   },
   "Vodafone": {
-   "laeufe": 50,
-   "funde_gesamt": 8468,
+   "laeufe": 51,
+   "funde_gesamt": 8651,
    "letzter_lauf": "2026-10-07",
    "letzte_funde": 183,
    "termine": [
@@ -376,10 +376,10 @@
    "tote_adressen": 0
   },
   "o2": {
-   "laeufe": 50,
-   "funde_gesamt": 3357,
+   "laeufe": 51,
+   "funde_gesamt": 3425,
    "letzter_lauf": "2026-10-07",
-   "letzte_funde": 69,
+   "letzte_funde": 68,
    "termine": [
     "2026-08-29",
     "2026-08-30",
@@ -553,9 +553,9 @@
     ],
     [
      "2026-10-07",
-     69,
+     68,
      "gelesen",
-     427,
+     1975,
      0,
      null
     ]
@@ -564,8 +564,8 @@
   },
   "mobilcom-debitel": {
    "laeufe": 5,
-   "funde_gesamt": 5819,
-   "letzte_funde": 75,
+   "funde_gesamt": 5905,
+   "letzte_funde": 86,
    "termine": [
     "2026-08-29",
     "2026-08-30",
@@ -739,15 +739,15 @@
     ],
     [
      "2026-10-07",
-     75,
+     86,
      "lesefehler",
      0,
-     16,
-     3
+     27,
+     5
     ]
    ],
    "letzter_lauf": "2026-09-29",
-   "tote_adressen": 3
+   "tote_adressen": 5
   },
   "ElectronicPartner": {
    "laeufe": 1,
@@ -889,11 +889,11 @@
     ],
     [
      "2026-10-07",
-     20,
-     "lesefehler",
      0,
-     20,
-     0
+     "nicht gelesen",
+     0,
+     0,
+     null
     ]
    ],
    "tote_adressen": 0
@@ -1037,20 +1037,20 @@
     ],
     [
      "2026-10-07",
-     15,
-     "lesefehler",
      0,
-     15,
-     0
+     "nicht gelesen",
+     0,
+     0,
+     null
     ]
    ],
    "tote_adressen": 0
   },
   "congstar": {
-   "laeufe": 28,
-   "funde_gesamt": 5869,
-   "letzter_lauf": "2026-10-05",
-   "letzte_funde": 142,
+   "laeufe": 29,
+   "funde_gesamt": 6021,
+   "letzter_lauf": "2026-10-07",
+   "letzte_funde": 152,
    "termine": [
     "2026-09-03",
     "2026-09-04",
@@ -1218,18 +1218,18 @@
     ],
     [
      "2026-10-07",
-     142,
-     "lesefehler",
-     864,
-     37,
+     152,
+     "gelesen",
+     932,
+     44,
      0
     ]
    ],
    "tote_adressen": 0
   },
   "1&1": {
-   "laeufe": 42,
-   "funde_gesamt": 1506,
+   "laeufe": 43,
+   "funde_gesamt": 1542,
    "letzter_lauf": "2026-10-07",
    "letzte_funde": 36,
    "termine": [
@@ -1546,8 +1546,8 @@
    "tote_adressen": null
   },
   "Saturn": {
-   "laeufe": 38,
-   "funde_gesamt": 745,
+   "laeufe": 39,
+   "funde_gesamt": 765,
    "letzter_lauf": "2026-10-07",
    "letzte_funde": 20,
    "termine": [
@@ -12769,7 +12769,7 @@
     "https://www.congstar.de/sitemap/devices.xml"
    ],
    "titel_roh": "Apple iPhone 16e 128 GB schwarz",
-   "preis_ohne_vertrag": 579.0,
+   "preis_ohne_vertrag": 651.0,
    "ended_since": "2026-09-10"
   },
   {
@@ -12800,7 +12800,7 @@
     "https://www.congstar.de/sitemap/devices.xml"
    ],
    "titel_roh": "Apple iPhone 16e 128 GB weiß",
-   "preis_ohne_vertrag": 579.0
+   "preis_ohne_vertrag": 651.0
   },
   {
    "id": "congstar--apple-iphone-17-256gb-gruen",
@@ -13015,6 +13015,36 @@
     "https://www.congstar.de/sitemap/devices.xml"
    ],
    "titel_roh": "Apple iPhone 17 512 GB salbei",
+   "preis_ohne_vertrag": 1319.0
+  },
+  {
+   "id": "congstar--apple-iphone-17-512gb-mist-blue",
+   "sku_id": "apple-iphone-17-512gb-mist-blue",
+   "device_id": "apple-iphone-17",
+   "anbieter": "congstar",
+   "anbieter_typ": "discount",
+   "netz": "Telekom",
+   "speicher_gb": 512,
+   "farbe_roh": "Mist Blue",
+   "farbe_normalisiert": null,
+   "ean": "0195950644982",
+   "zustand": "neu",
+   "first_seen": "2026-10-07",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "erstpreis": 1319.0,
+   "erstpreis_art": "ohne_vertrag",
+   "erstpreis_am": "2026-10-07",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
+   "quelle_url": "https://www.congstar.de/geraete/apple/apple-iphone-17/",
+   "abgerufen_am": "2026-10-07",
+   "verfuegbarkeit": "nicht_lieferbar",
+   "confidence": "hoch",
+   "einstiege": [
+    "https://www.congstar.de/sitemap/devices.xml"
+   ],
+   "titel_roh": "Apple iPhone 17 512 GB nebelblau",
    "preis_ohne_vertrag": 1319.0
   },
   {
@@ -14755,13 +14785,13 @@
    "ean": "0840353949973",
    "zustand": "neu",
    "first_seen": "2026-09-03",
-   "status": "aktiv",
-   "missed_checks": 0,
+   "status": "vermutlich ausgelistet",
+   "missed_checks": 1,
    "erstpreis": 595.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-03",
    "last_verified": "2026-10-05",
-   "letzter_check": "2026-10-05",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.congstar.de/geraete/google/google-pixel-10a/",
    "abgerufen_am": "2026-10-05",
    "verfuegbarkeit": "lieferbar",
@@ -14771,7 +14801,8 @@
    ],
    "titel_roh": "Google Pixel 10a 256 GB obsidian",
    "preis_ohne_vertrag": 497.0,
-   "ended_since": "2026-09-28"
+   "ended_since": "2026-09-28",
+   "stale_since": "2026-10-07"
   },
   {
    "id": "congstar--google-pixel-10a-256gb-violett",
@@ -17090,13 +17121,13 @@
    "ean": "4021114388170",
    "zustand": "refurbished",
    "first_seen": "2026-10-01",
-   "status": "vermutlich ausgelistet",
-   "missed_checks": 1,
+   "status": "ausgelistet",
+   "missed_checks": 2,
    "erstpreis": 913.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-10-01",
    "last_verified": "2026-10-04",
-   "letzter_check": "2026-10-05",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26-ultra-zustand-wie-neu/",
    "abgerufen_am": "2026-10-04",
    "verfuegbarkeit": "lieferbar",
@@ -17106,7 +17137,8 @@
    ],
    "titel_roh": "Samsung Galaxy S26 Ultra 256 GB sky blue NEUWERTIG",
    "preis_ohne_vertrag": 913.0,
-   "stale_since": "2026-10-05"
+   "stale_since": "2026-10-05",
+   "ended_since": "2026-10-07"
   },
   {
    "id": "congstar--samsung-galaxy-s26-ultra-256gb-weiss",
@@ -17453,13 +17485,13 @@
    "ean": "8806099191832",
    "zustand": "neu",
    "first_seen": "2026-09-03",
-   "status": "aktiv",
-   "missed_checks": 0,
+   "status": "vermutlich ausgelistet",
+   "missed_checks": 1,
    "erstpreis": 1297.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-03",
    "last_verified": "2026-10-05",
-   "letzter_check": "2026-10-05",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-z-flip8/",
    "abgerufen_am": "2026-10-05",
    "verfuegbarkeit": "lieferbar",
@@ -17468,7 +17500,8 @@
     "https://www.congstar.de/sitemap/devices.xml"
    ],
    "titel_roh": "Samsung Galaxy Z Flip8 256 GB graphite",
-   "preis_ohne_vertrag": 1297.0
+   "preis_ohne_vertrag": 1297.0,
+   "stale_since": "2026-10-07"
   },
   {
    "id": "congstar--samsung-galaxy-z-flip8-256gb-rosa",
@@ -18091,10 +18124,10 @@
    "erstpreis": 685.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-03",
-   "last_verified": "2026-10-06",
-   "letzter_check": "2026-10-06",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.congstar.de/geraete/xiaomi/xiaomi-17t/",
-   "abgerufen_am": "2026-10-06",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -18121,10 +18154,10 @@
    "erstpreis": 685.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-03",
-   "last_verified": "2026-10-06",
-   "letzter_check": "2026-10-06",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.congstar.de/geraete/xiaomi/xiaomi-17t/",
-   "abgerufen_am": "2026-10-06",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -18152,10 +18185,10 @@
    "erstpreis": 685.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-03",
-   "last_verified": "2026-10-06",
-   "letzter_check": "2026-10-06",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.congstar.de/geraete/xiaomi/xiaomi-17t/",
-   "abgerufen_am": "2026-10-06",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -18182,10 +18215,10 @@
    "erstpreis": 865.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-03",
-   "last_verified": "2026-10-06",
-   "letzter_check": "2026-10-06",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.congstar.de/geraete/xiaomi/xiaomi-17t-pro/",
-   "abgerufen_am": "2026-10-06",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -18212,10 +18245,10 @@
    "erstpreis": 865.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-03",
-   "last_verified": "2026-10-06",
-   "letzter_check": "2026-10-06",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.congstar.de/geraete/xiaomi/xiaomi-17t-pro/",
-   "abgerufen_am": "2026-10-06",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -18242,10 +18275,10 @@
    "erstpreis": 253.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-03",
-   "last_verified": "2026-10-06",
-   "letzter_check": "2026-10-06",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.congstar.de/geraete/xiaomi/xiaomi-redmi-17-5g/",
-   "abgerufen_am": "2026-10-06",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -18272,10 +18305,10 @@
    "erstpreis": 253.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-03",
-   "last_verified": "2026-10-06",
-   "letzter_check": "2026-10-06",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.congstar.de/geraete/xiaomi/xiaomi-redmi-17-5g/",
-   "abgerufen_am": "2026-10-06",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -18366,10 +18399,10 @@
    "erstpreis": 343.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-03",
-   "last_verified": "2026-10-05",
-   "letzter_check": "2026-10-05",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.congstar.de/geraete/xiaomi/xiaomi-redmi-note-17-5g/",
-   "abgerufen_am": "2026-10-05",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -18396,10 +18429,10 @@
    "erstpreis": 477.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-03",
-   "last_verified": "2026-10-05",
-   "letzter_check": "2026-10-05",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.congstar.de/geraete/xiaomi/xiaomi-redmi-note-17-pro-5g/",
-   "abgerufen_am": "2026-10-05",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -18426,10 +18459,10 @@
    "erstpreis": 477.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-03",
-   "last_verified": "2026-10-05",
-   "letzter_check": "2026-10-05",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.congstar.de/geraete/xiaomi/xiaomi-redmi-note-17-pro-5g/",
-   "abgerufen_am": "2026-10-05",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -18456,10 +18489,10 @@
    "erstpreis": 595.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-03",
-   "last_verified": "2026-10-05",
-   "letzter_check": "2026-10-05",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.congstar.de/geraete/xiaomi/xiaomi-redmi-note-17-pro-max-5g/",
-   "abgerufen_am": "2026-10-05",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -20930,10 +20963,10 @@
    "erstpreis": 549.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-29",
-   "last_verified": "2026-10-04",
-   "letzter_check": "2026-10-04",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/google/google-pixel-10a-ohne-vertrag/p/P-M-4466927?ds=P-4546066",
-   "abgerufen_am": "2026-10-04",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -20960,10 +20993,10 @@
    "erstpreis": 549.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-29",
-   "last_verified": "2026-10-04",
-   "letzter_check": "2026-10-04",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/google/google-pixel-10a-ohne-vertrag/p/P-M-4466927?ds=P-4546060",
-   "abgerufen_am": "2026-10-04",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -20990,10 +21023,10 @@
    "erstpreis": 549.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-29",
-   "last_verified": "2026-10-04",
-   "letzter_check": "2026-10-04",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/google/google-pixel-10a-ohne-vertrag/p/P-M-4466927?ds=P-4546057",
-   "abgerufen_am": "2026-10-04",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -21020,10 +21053,10 @@
    "erstpreis": 549.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-29",
-   "last_verified": "2026-10-04",
-   "letzter_check": "2026-10-04",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/google/google-pixel-10a-ohne-vertrag/p/P-M-4466927?ds=P-4546063",
-   "abgerufen_am": "2026-10-04",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -21050,10 +21083,10 @@
    "erstpreis": 649.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-29",
-   "last_verified": "2026-10-04",
-   "letzter_check": "2026-10-04",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/google/google-pixel-10a-ohne-vertrag/p/P-M-4466927?ds=P-4546078",
-   "abgerufen_am": "2026-10-04",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -21080,10 +21113,10 @@
    "erstpreis": 649.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-29",
-   "last_verified": "2026-10-04",
-   "letzter_check": "2026-10-04",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/google/google-pixel-10a-ohne-vertrag/p/P-M-4466927?ds=P-4546072",
-   "abgerufen_am": "2026-10-04",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -21110,10 +21143,10 @@
    "erstpreis": 649.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-29",
-   "last_verified": "2026-10-04",
-   "letzter_check": "2026-10-04",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/google/google-pixel-10a-ohne-vertrag/p/P-M-4466927?ds=P-4546069",
-   "abgerufen_am": "2026-10-04",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -21140,10 +21173,10 @@
    "erstpreis": 649.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-29",
-   "last_verified": "2026-10-04",
-   "letzter_check": "2026-10-04",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/google/google-pixel-10a-ohne-vertrag/p/P-M-4466927?ds=P-4546075",
-   "abgerufen_am": "2026-10-04",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -21170,10 +21203,10 @@
    "erstpreis": 229.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-29",
-   "last_verified": "2026-10-04",
-   "letzter_check": "2026-10-04",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/samsung/samsung-galaxy-a17-5g-ohne-vertrag/p/P-M-4230290?ds=P-4294647",
-   "abgerufen_am": "2026-10-04",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -21200,10 +21233,10 @@
    "erstpreis": 229.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-29",
-   "last_verified": "2026-10-04",
-   "letzter_check": "2026-10-04",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/samsung/samsung-galaxy-a17-5g-ohne-vertrag/p/P-M-4230290?ds=P-4294644",
-   "abgerufen_am": "2026-10-04",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -21230,10 +21263,10 @@
    "erstpreis": 229.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-29",
-   "last_verified": "2026-10-04",
-   "letzter_check": "2026-10-04",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
    "quelle_url": "https://www.freenet.de/handys-smartphones/samsung/samsung-galaxy-a17-5g-ohne-vertrag/p/P-M-4230290?ds=P-4294650",
-   "abgerufen_am": "2026-10-04",
+   "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -23632,9 +23665,9 @@
     "https://www.o2online.de/e-shop/rest/catalog/o2shop/privatkunden/ratenzahlung/default/__not-specified__/__not-specified__/__not-specified__?hwOnly=true"
    ],
    "titel_roh": "Apple iPhone 16 128 GB schwarz",
-   "preis_ohne_vertrag": 901.0,
-   "anzahlung": 13.0,
-   "monatsrate": 37.0,
+   "preis_ohne_vertrag": 1045.0,
+   "anzahlung": 1.0,
+   "monatsrate": 43.5,
    "laufzeit_monate": 24,
    "zins_effektiv": 0.0
   },
@@ -23770,9 +23803,9 @@
     "https://www.o2online.de/e-shop/rest/catalog/o2shop/privatkunden/ratenzahlung/default/__not-specified__/__not-specified__/__not-specified__?hwOnly=true"
    ],
    "titel_roh": "Apple iPhone 16e 128 GB weiss",
-   "preis_ohne_vertrag": 613.0,
-   "anzahlung": 13.0,
-   "monatsrate": 25.0,
+   "preis_ohne_vertrag": 703.0,
+   "anzahlung": 7.0,
+   "monatsrate": 29.0,
    "laufzeit_monate": 24,
    "zins_effektiv": 0.0
   },
@@ -23873,6 +23906,40 @@
    "preis_ohne_vertrag": 973.0,
    "anzahlung": 1.0,
    "monatsrate": 40.5,
+   "laufzeit_monate": 24,
+   "zins_effektiv": 0.0
+  },
+  {
+   "id": "o2--apple-iphone-17-pro-256gb-cosmic-orange",
+   "sku_id": "apple-iphone-17-pro-256gb-cosmic-orange",
+   "device_id": "apple-iphone-17-pro",
+   "anbieter": "o2",
+   "anbieter_typ": "netzbetreiber",
+   "netz": "",
+   "speicher_gb": 256,
+   "farbe_roh": "cosmic orange",
+   "farbe_normalisiert": null,
+   "ean": "",
+   "zustand": "neu",
+   "first_seen": "2026-10-07",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "erstpreis": 1315.0,
+   "erstpreis_art": "ohne_vertrag",
+   "erstpreis_am": "2026-10-07",
+   "last_verified": "2026-10-07",
+   "letzter_check": "2026-10-07",
+   "quelle_url": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-cosmic-orange-details?ohne-tarif=ja&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung",
+   "abgerufen_am": "2026-10-07",
+   "verfuegbarkeit": "unbekannt",
+   "confidence": "hoch",
+   "einstiege": [
+    "https://www.o2online.de/e-shop/rest/catalog/o2shop/privatkunden/ratenzahlung/default/__not-specified__/__not-specified__/__not-specified__?hwOnly=true"
+   ],
+   "titel_roh": "Apple iPhone 17 Pro 256 GB cosmic orange",
+   "preis_ohne_vertrag": 1315.0,
+   "anzahlung": 7.0,
+   "monatsrate": 54.5,
    "laufzeit_monate": 24,
    "zins_effektiv": 0.0
   },
@@ -24078,9 +24145,9 @@
     "https://www.o2online.de/e-shop/rest/catalog/o2shop/privatkunden/ratenzahlung/default/__not-specified__/__not-specified__/__not-specified__?hwOnly=true"
    ],
    "titel_roh": "Apple iPhone Air 256 GB himmelblau",
-   "preis_ohne_vertrag": 991.0,
+   "preis_ohne_vertrag": 1207.0,
    "anzahlung": 7.0,
-   "monatsrate": 41.0,
+   "monatsrate": 50.0,
    "laufzeit_monate": 24,
    "zins_effektiv": 0.0
   },
@@ -24866,8 +24933,8 @@
    ],
    "titel_roh": "Samsung Galaxy A57 128 GB awesome navy",
    "preis_ohne_vertrag": 505.0,
-   "anzahlung": 13.0,
-   "monatsrate": 20.5,
+   "anzahlung": 1.0,
+   "monatsrate": 21.0,
    "laufzeit_monate": 24,
    "zins_effektiv": 0.0
   },
@@ -25543,9 +25610,9 @@
     "https://www.o2online.de/e-shop/rest/catalog/o2shop/privatkunden/ratenzahlung/default/__not-specified__/__not-specified__/__not-specified__?hwOnly=true"
    ],
    "titel_roh": "Samsung Galaxy S26 FE (Aktion) 128 GB pistachio bk",
-   "preis_ohne_vertrag": 667.0,
+   "preis_ohne_vertrag": 679.0,
    "anzahlung": 7.0,
-   "monatsrate": 27.5,
+   "monatsrate": 28.0,
    "laufzeit_monate": 24,
    "zins_effektiv": 0.0
   },
@@ -25611,9 +25678,9 @@
     "https://www.o2online.de/e-shop/rest/catalog/o2shop/privatkunden/ratenzahlung/default/__not-specified__/__not-specified__/__not-specified__?hwOnly=true"
    ],
    "titel_roh": "Samsung Galaxy S26 Ultra 256 GB cobalt violet",
-   "preis_ohne_vertrag": 1315.0,
+   "preis_ohne_vertrag": 1459.0,
    "anzahlung": 7.0,
-   "monatsrate": 54.5,
+   "monatsrate": 60.5,
    "laufzeit_monate": 24,
    "zins_effektiv": 0.0
   },
