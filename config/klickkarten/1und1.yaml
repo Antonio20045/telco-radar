@@ -57,12 +57,16 @@ knoepfe:
     muster: 'Weiter mit HW(\d+(?:\+\d+)?)$'
 
 weiter:
-  # I Seite 3/4: Selektor 2 Treffer, 1 sichtbar, geklickt „Weiter zur Tarifauswahl“
-  # (B1 Element 67 sichtbar, 42 in der Klebeleiste; B2 83 und 47). M3 Anfrage 62 POST
-  # /frontend/cart-facade/add (Antwort true), 71 GET der Produktseite mit
-  # startPageFlowId, 72 GET /flow2/mobile/ssc-private/tariffContractDuration; danach
-  # nur GET (Anfrage 97 POST verworfen: „nach dem Weiter-Klick nur GET und HEAD“).
-  selektor: "#hwd-configuration-section button.hwd-add-to-cart-button-price-component"
+  # I Seite 3/4: der Klassen-Selektor traf 2 Knöpfe, 1 sichtbar, geklickt „Weiter zur
+  # Tarifauswahl“. Pfade: sichtbar B1 Element 67 / B2 83 „#hwd-configuration-section
+  # > div:nth-of-type(2) > div:nth-of-type(1) > add-to-cart-button > button“, die
+  # Kopie der Klebeleiste B1 42 / B2 47 drei div tiefer; die Kindkette unten trifft
+  # nur den ersten. M3 Anfrage 62 POST /frontend/cart-facade/add (Antwort true), 71
+  # GET der Produktseite mit startPageFlowId, 72 GET /flow2/mobile/ssc-private/
+  # tariffContractDuration; danach nur GET (97 POST verworfen: GRUND_NUR_LESEN).
+  selektor: >-
+    #hwd-configuration-section > div > div > add-to-cart-button >
+    button.hwd-add-to-cart-button-price-component
   text: Weiter zur Tarifauswahl
   kacheln: laufzeit
 

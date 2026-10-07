@@ -47,6 +47,7 @@ EINMAL = re.compile(r"hwdVariantsOneOffPaymentFees\s*=\s*(\{.*?\})")
 KACHEL = re.compile(
     r"^#tariff-cards-container > div:nth-of-type\(\d+\) > div:nth-of-type\(\d+\)"
 )
+STUFE = re.compile(r"([\w-]+):nth-of-type\((\d+)\)")
 PLATZ = {"speicher": "256", "tarif": "tariff-anf-s-mvl", "farbe": "COSMIC_ORANGE"}
 
 
@@ -152,16 +153,37 @@ def test_selektoren_der_karte_treffen_die_produktseite(karte, dom):
     }
 
 
+def _nachbau(knoepfe: dict) -> BeautifulSoup:
+    """Ein DOM aus den Pfaden der Erkundung (``nth-of-type`` mit Platzhaltern davor);
+    jeder Knopf trägt seine Klassen und seine Nummer im Inventar."""
+    dom = BeautifulSoup('<div id="hwd-configuration-section"></div>', "html.parser")
+    for nummer, knopf in knoepfe.items():
+        ort = dom.div
+        for teil in knopf["pfad"].split(" > ")[1:]:
+            tag, stelle = STUFE.fullmatch(teil).groups()
+            kinder = ort.find_all(tag, recursive=False)
+            while len(kinder) < int(stelle):
+                kinder.append(dom.new_tag(tag))
+                ort.append(kinder[-1])
+            ort = kinder[int(stelle) - 1]
+        ort["class"], ort["data-nummer"] = knopf["klassen"], nummer
+    return dom
+
+
 def test_weiter_knopf_wie_in_der_erkundung(karte, weg):
+    """Der Selektor der Karte trifft nur den sichtbaren Knopf; Gegenprobe: der
+    Selektor der Erkundung trifft auch die Kopie in der Klebeleiste."""
     for seite, ausgang in ((3, 1), (4, 2)):
         index = weg[f"seite_{seite}"]["index"]
-        knoepfe = list(weg[f"seite_{ausgang}"]["bedienelemente"].values())
-        sichtbar = [k["text"] for k in knoepfe if k["sichtbar"]]
+        knoepfe = weg[f"seite_{ausgang}"]["bedienelemente"]
+        sichtbar = [n for n, k in knoepfe.items() if k["sichtbar"]]
+        dom = _nachbau(knoepfe)
 
-        assert index["weiter"]["selektor"] == karte.weiter.selektor
         assert index["weiter"]["geklickt"] == karte.weiter.text
         assert "/ssc-private/tariffContractDuration?" in index["endadresse"]
-        assert (len(knoepfe), sichtbar) == (2, [karte.weiter.text])
+        assert {k["text"] for k in knoepfe.values()} == {karte.weiter.text}
+        assert [k["data-nummer"] for k in dom.select(karte.weiter.selektor)] == sichtbar
+        assert len(dom.select(index["weiter"]["selektor"])) == len(knoepfe) == 2
     assert KAUFWORT.search(karte.weiter.text) is None
 
 
