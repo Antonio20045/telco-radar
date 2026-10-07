@@ -4,12 +4,17 @@ Der Klick-Crawler liest die Knöpfe je Dimension mit Wert, Sperre und Markierung
 (``lies_optionen``) und führt die Werte als wachsende Menge: Erscheint nach einem Klick
 eine neue Option, kommt sie hinzu (``vereinige``), und ``naechste`` liefert die erste
 noch nicht besuchte Kombination. ``[None]`` steht für eine Dimension ohne gefundene
-Knöpfe. Dieses Modul ruft kein Netz.
+Knöpfe. Der Wert kommt aus Attribut oder Text des Klickziels oder seines
+Kind-Elements ``wert_in``, ``muster`` nimmt daraus die erste Gruppe; ein Wert, auf den
+das Muster nicht passt, fehlt. Die Marke ist die der Dimension, sonst die der Karte:
+Attribut gleich Wert oder ein CSS-Selektor, auf den das Klickziel passt. Eine feste
+Dimension hat genau eine gewählte Option ohne Knopf. Dieses Modul ruft kein Netz.
 """
 
 from __future__ import annotations
 
 import itertools
+import re
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
@@ -19,11 +24,14 @@ if TYPE_CHECKING:
     from playwright.sync_api import Page
 
 Auswahl = tuple[str | None, ...]
-_OPTIONEN_JS = """(knoepfe, art) => knoepfe.map((k) => [
-  art.wert ? k.getAttribute(art.wert) : k.innerText,
-  k.disabled === true || k.getAttribute("aria-disabled") === "true",
-  k.getAttribute(art.marke) === art.markenwert,
-])"""
+_OPTIONEN_JS = """(knoepfe, art) => knoepfe.map((k) => {
+  const traeger = art.wertIn ? k.querySelector(art.wertIn) : k;
+  const wert = traeger === null ? null
+    : (art.wert ? traeger.getAttribute(art.wert) : traeger.innerText);
+  const an = art.passt ? k.matches(art.passt)
+    : art.marke !== null && k.getAttribute(art.marke) === art.markenwert;
+  return [wert, k.disabled === true || k.getAttribute("aria-disabled") === "true", an];
+})"""
 
 
 @dataclass(frozen=True)
@@ -38,13 +46,18 @@ class Option:
 def lies_optionen(seite: Page, karte: Klickkarte, dimension: str) -> list[Option]:
     """Die Knöpfe einer Dimension im aktuellen Zustand der Seite."""
     knopf = karte.knoepfe[dimension]
+    if knopf.fest is not None or knopf.selektor is None:
+        return [Option(knopf.fest, False, True)]
+    marke = karte.marke(dimension)
     art = {
         "wert": knopf.wert_attribut,
-        "marke": karte.gewaehlt.attribut,
-        "markenwert": karte.gewaehlt.wert,
+        "wertIn": knopf.wert_in,
+        "passt": None if marke is None else marke.passt,
+        "marke": None if marke is None else marke.attribut,
+        "markenwert": None if marke is None else marke.wert,
     }
     roh = seite.locator(knopf.selektor).evaluate_all(_OPTIONEN_JS, art)
-    return [Option(_wert(w), bool(aus), bool(an)) for w, aus, an in roh]
+    return [Option(_wert(w, knopf.muster), bool(a), bool(g)) for w, a, g in roh]
 
 
 def angebotene_werte(optionen: list[Option]) -> list[str | None]:
@@ -70,8 +83,22 @@ def vereinige(alt: list[str | None], neu: list[str | None]) -> list[str | None]:
     return alt + [w for w in neu if w is not None and w not in alt]
 
 
-def _wert(roh: object) -> str | None:
+def wert_nach_muster(roh: str, muster: re.Pattern[str] | None) -> str | None:
+    """Die erste Gruppe von ``muster`` in ``roh`` (ohne Gruppe der Treffer), sonst
+    ``None``; ohne Muster ``roh``."""
+    if muster is None:
+        return roh
+    treffer = muster.search(roh)
+    if treffer is None:
+        return None
+    teil = treffer[1] if muster.groups else treffer[0]
+    if teil is None or not teil.strip():
+        return None
+    return teil.strip()
+
+
+def _wert(roh: object, muster: re.Pattern[str] | None) -> str | None:
     text = " ".join(roh.split()) if isinstance(roh, str) else ""
     if not text:
         return None
-    return text
+    return wert_nach_muster(text, muster)

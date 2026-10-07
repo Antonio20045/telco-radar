@@ -5,12 +5,16 @@ da ist. Der Leser liest erst die mitgeschnittene Antwort, dann nach zwei Bildern
 Text der Preiszusammenfassung (in Takten, der Crawl-delay zählt nicht gegen die Frist),
 prüft die roh markierten Optionen gegen die geklickten und das Echo (``klickecho``) und
 macht einen Screenshot des Preisbereichs; den gelesenen Text gibt er für die Fundstellen
-des Belegs mit. Fehlt die Zusammenfassung, heißt die Kombination ``nicht_erfasst``;
-widerspricht sich etwas, ``befund``. Gefundene Wertfelder zählt der Strukturwächter.
+des Belegs mit. Steht die Zusammenfassung in einem Dialog (``zusammenfassung.oeffnen``,
+Telekom), öffnet er ihn vor dem Text und schließt ihn nach dem Screenshot; lässt er sich
+nicht öffnen oder schließen, ist der Lauf gestört. Fehlt die Zusammenfassung, heißt die
+Kombination ``nicht_erfasst``; widerspricht sich etwas, ``befund``. Eine feste
+Dimension hat keine Markierung. Gefundene Wertfelder zählt der Strukturwächter.
 """
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from typing import TYPE_CHECKING
 
 from playwright.sync_api import Error as PlaywrightFehler
@@ -26,10 +30,18 @@ from .klickecho import (
     pruefe_echo,
 )
 from .klickkarte import DIMENSIONEN, WERTFELDER, Klickkarte
-from .klicklauf import BEFUND, ERFASST, NICHT_ERFASST, Kombiergebnis, Strukturbilanz
+from .klicklauf import (
+    BEFUND,
+    ERFASST,
+    LAUF_GESTOERT,
+    NICHT_ERFASST,
+    Kombiergebnis,
+    Strukturbilanz,
+)
 from .klickoptionen import Option, lies_optionen
 from .klicktext import Preiswerte, lies_zusammenfassung
 from .klicktor import WARTE_TAKT_MS, kurz
+from .klickwache import Abbruch
 
 if TYPE_CHECKING:
     from playwright.sync_api import Locator, Page, Response
@@ -49,26 +61,66 @@ class Leser:
         """Die Knöpfe einer Dimension im aktuellen Zustand der Seite."""
         return lies_optionen(self.seite, self.karte, dimension)
 
-    def text(self, bereich: Locator, gesucht: str = "") -> str:
+    def text(
+        self, bereich: Locator, gesucht: str = "", attribut: str | None = None
+    ) -> str:
         """Sichtbarer Text des ersten Treffers, sobald er ``gesucht`` enthält.
 
-        Wartet in Takten von ``WARTE_TAKT_MS``: Zeit, in der das Tor den Crawl-delay
-        abwartet, zählt nicht gegen die Frist. Leer, wenn kein Text erscheint.
+        Mit ``attribut`` der Wert dieses Attributs statt des Texts. Wartet in Takten von
+        ``WARTE_TAKT_MS``: Zeit, in der das Tor den Crawl-delay abwartet, zählt nicht
+        gegen die Frist. Leer, wenn kein Text erscheint.
         """
         for _ in range(max(1, self.frist_ms // WARTE_TAKT_MS)):
-            jetzt = self._text(bereich)
+            jetzt = self._text(bereich, attribut)
             if jetzt and gesucht in jetzt:
                 return jetzt
             self.seite.wait_for_timeout(WARTE_TAKT_MS)
-        return self._text(bereich)
+        return self._text(bereich, attribut)
 
-    def _text(self, bereich: Locator) -> str:
+    def _text(self, bereich: Locator, attribut: str | None = None) -> str:
         if bereich.count() == 0:
             return ""
         try:
-            return bereich.first.inner_text(timeout=WARTE_TAKT_MS)
+            if attribut is None:
+                return bereich.first.inner_text(timeout=WARTE_TAKT_MS)
+            wert = bereich.first.get_attribute(attribut, timeout=WARTE_TAKT_MS)
         except PlaywrightZeitueberschreitung:
             return ""
+        return "" if wert is None else wert
+
+    def _warte_bis(self, bedingung: Callable[[], bool]) -> bool:
+        for _ in range(max(1, self.frist_ms // WARTE_TAKT_MS)):
+            if bedingung():
+                return True
+            self.seite.wait_for_timeout(WARTE_TAKT_MS)
+        return bedingung()
+
+    def _oeffne_dialog(self, bereich: Locator) -> str | None:
+        """Öffnet den Dialog der Zusammenfassung; der Grund, wenn er nicht aufgeht."""
+        oeffnen = self.karte.textlesung.oeffnen
+        if oeffnen is None or _sichtbar(bereich):
+            return None
+        try:
+            self.seite.locator(oeffnen).first.click(timeout=self.frist_ms)
+        except PlaywrightFehler as fehler:
+            return f"Dialog {oeffnen} nicht klickbar: {kurz(fehler)}"
+        if self._warte_bis(lambda: _sichtbar(bereich)):
+            return None
+        return f"Dialog {oeffnen} zeigt {self.karte.zusammenfassung} nicht"
+
+    def _schliesse_dialog(self, bereich: Locator) -> None:
+        """Schließt den Dialog; bleibt er offen, ist der Lauf gestört."""
+        schliessen = self.karte.textlesung.schliessen
+        if schliessen is None or not _sichtbar(bereich):
+            return
+        try:
+            self.seite.locator(schliessen).first.click(timeout=self.frist_ms)
+        except PlaywrightFehler as fehler:
+            grund = f"Dialog: {schliessen} nicht klickbar: {kurz(fehler)}"
+            raise Abbruch(LAUF_GESTOERT, grund) from fehler
+        if not self._warte_bis(lambda: not _sichtbar(bereich)):
+            grund = f"Dialog: {schliessen} schließt {self.karte.zusammenfassung} nicht"
+            raise Abbruch(LAUF_GESTOERT, grund)
 
     def lies(
         self,
@@ -83,11 +135,15 @@ class Leser:
         url = antwort.url if antwort is not None else None
         in_antwort = lesung.werte if lesung is not None else None
         self.seite.evaluate(_ZWEI_BILDER_JS)
-        text = self.text(bereich)
+        dialog = self._oeffne_dialog(bereich)
+        text = self.text(bereich) if dialog is None else ""
         if not text:
+            self._schliesse_dialog(bereich)
             struktur.felder(0)
             ort = self.karte.zusammenfassung
             grund = f"Preiszusammenfassung nicht gefunden ({ort})"
+            if dialog is not None:
+                grund = dialog
             return Kombiergebnis(
                 variante,
                 NICHT_ERFASST,
@@ -109,6 +165,7 @@ class Leser:
             else pruefe_echo(variante, variante, im_text, lesung)
         )
         bild, bildbefunde = self._screenshot(bereich)
+        self._schliesse_dialog(bereich)
         befunde = echo.befunde + bildbefunde
         erster: str | None = befunde[0].grund if befunde else None
         status = BEFUND if befunde else ERFASST
@@ -130,6 +187,8 @@ class Leser:
         """Befunde, wo die Seite eine andere Option markiert als die geklickte."""
         befunde = []
         for dimension in DIMENSIONEN:
+            if self.karte.knoepfe[dimension].fest is not None:
+                continue
             gezeigt = self._gewaehlt(dimension)
             if gezeigt != ziel[dimension]:
                 zeige = KEINE_AUSWAHL if gezeigt is None else gezeigt
@@ -157,3 +216,7 @@ class Leser:
             return bereich.screenshot(type="png", timeout=self.frist_ms), ()
         except PlaywrightFehler as fehler:
             return None, (Befund("screenshot", f"Screenshot fehlt: {kurz(fehler)}"),)
+
+
+def _sichtbar(bereich: Locator) -> bool:
+    return bereich.count() > 0 and bereich.is_visible()

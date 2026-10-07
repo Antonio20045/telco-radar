@@ -111,6 +111,11 @@ class Wache:
             self._pruefe(antwort)
         self.antwort = antwort
 
+    def nimm_angefragte(self, marke: Marke) -> None:
+        """Nimmt die Antwort seit ``marke`` nur, wenn seitdem eine Preisanfrage ging."""
+        if self.mitschnitt.stand() > marke[0]:
+            self.nimm_antwort(marke)
+
     def warte_offen(self) -> None:
         """Wartet offene Preisanfragen ab; bleibt eine offen, ist der Lauf gestört."""
         if not self.warte(lambda: not self.mitschnitt.offen):
