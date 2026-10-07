@@ -652,8 +652,8 @@ def test_alle_mobil_tarife_werden_buendel_familycard_bleibt_draussen():
     }
     assert {b.laufzeit_monate for b in bilanz.buendel} == {12, 24, 36}
     assert len({b.id for b in bilanz.buendel}) == 6 * 15
-    assert bilanz.ohne_tarif == 6 * 4
-    assert set(bilanz.offene_tarife) == {
+    assert (bilanz.ohne_tarif, bilanz.zusatzkarte) == (0, 6 * 4)
+    assert set(bilanz.zusatzkarten) == {
         "FamilyCard S",
         "FamilyCard M",
         "FamilyCard L",

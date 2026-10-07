@@ -29,7 +29,7 @@ from __future__ import annotations
 from collections.abc import Iterable, Mapping
 
 from ..geraete_model import normalisiere
-from ..tarif_model import vertrag_basis
+from ..tarif_model import NUR_MIT_GERAET, vertrag_basis
 from ..tco_model import Buendel, sim_only_id, tco_24
 from ..tco_model import zeitraum as zeitraum_h
 from .geraete_pruefstatus import (
@@ -142,7 +142,10 @@ def sim_only_tabelle(referenzen: Iterable[Mapping]) -> dict[str, float]:
 
 def sim_only_preis(b: Buendel, tabelle: Mapping[str, float]) -> float | None:
     """Der SIM-only-Preis desselben Tarifs: über Namen, Tarif-ID oder Vertrag; ein Tarif
-    nur mit Gerät (``GERAETETARIF_MERKMAL``) nur über den Namen."""
+    nur mit Gerät (``GERAETETARIF_MERKMAL``) nur über den Namen, einer ohne Tarifblatt
+    (``NUR_MIT_GERAET``) nie."""
+    if b.tarif_id_guete == NUR_MIT_GERAET:
+        return None
     schluessel = [sim_only_id(b.anbieter, b.tarif_name)]
     merkmal = GERAETETARIF_MERKMAL.get(normalisiere(b.anbieter))
     nur_mit_geraet = merkmal is not None and merkmal in (b.tarif_name or "").split()

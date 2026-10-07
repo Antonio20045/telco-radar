@@ -304,10 +304,11 @@ def test_ohne_aufloesbaren_tarif_wird_verworfen_und_gezaehlt():
 
     `TcoDB.upsert_buendel` wuerde bei einem Satz ohne `tarif_id` werfen und
     damit die ganze Uebergabe kosten. Hier faellt einer, die uebrigen
-    bleiben.
+    bleiben. Ohne Slug: mit Slug bekaeme der Satz seit 07.10.2026 eine Tarif-ID
+    ohne Tarifblatt (`test_tco_buendel_ohne_tarifblatt`).
     """
     bilanz = aus_rohsaetzen(
-        [_rohsatz(), _rohsatz(tarif_slug="gibts-nicht", tarif_name="O2 Irgendwas")],
+        [_rohsatz(), _rohsatz(tarif_slug="", tarif_name="O2 Irgendwas")],
         _bestand(),
         "2026-09-04",
     )

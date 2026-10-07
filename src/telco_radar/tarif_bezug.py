@@ -95,7 +95,7 @@ def _ohne_marke(tid: str, anbieter: str) -> str:
     return f"{kopf}:{rumpf}"
 
 
-_SLUG_ALS_ID_ANBIETER = "o2"
+SLUG_ALS_ID_ANBIETER = "o2"
 
 
 @dataclass(frozen=True)
@@ -359,7 +359,7 @@ class Tarifbestand:
         Gemessen ist das nur fuer o2; bei jedem anderen Anbieter greift
         der Weg nicht, bis er dort ebenso belegt ist.
         """
-        if anbieter != _SLUG_ALS_ID_ANBIETER:
+        if anbieter != SLUG_ALS_ID_ANBIETER:
             return None
         kern = f"{tarif_id(anbieter, '')}:{slug}"
         satz = self.je_id_aktuell.get(kern)

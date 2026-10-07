@@ -48,6 +48,10 @@ log = logging.getLogger(__name__)
 PFLICHTFELDER = ("grundgebuehr", "laufzeit_monate")
 
 HOCH, MITTEL, NIEDRIG = "hoch", "mittel", "niedrig"
+NUR_MIT_GERAET = "nur_mit_geraet"
+"""Güte eines Bündeltarifs ohne Tarifblatt im Bestand (`tco_buendel.ohne_tarifblatt`):
+Tarif-ID aus dem Slug des Anbieters, kein SIM-only-Maßstab, keine Bindung aus dem
+Blatt."""
 
 PREISTYP_DOKUMENT = "dokument"
 PREISTYP_LIVE_SHOP = "live_shop"

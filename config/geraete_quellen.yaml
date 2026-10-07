@@ -539,9 +539,8 @@ anbieter:
       12/24/36 Monaten plus FamilyCard S-XL) nennt erst
       `/glados/v2/tariff/v2/hardware?hardwareId=<Liste>`, mit Klarnamen in
       `tariffName`; abgerufen wird sie einmal je Geraet mit allen
-      `hardwareId` seiner Varianten. FamilyCard ist eine Zusatzkarte ohne
-      eigenes Tarifblatt im Bestand und faellt in `tco_buendel` als "ohne
-      aufloesbaren Tarif" heraus.
+      `hardwareId` seiner Varianten. FamilyCard und Red+ sind Zusatzkarten
+      und fallen in `tco_buendel` als Zusatzkarte heraus (`ZUSATZKARTEN`).
     einstiege:
       - url: https://api.vodafone.de/glados/v2/hardware/v2?businessTransaction=newContract&salesChannel=Online.Consumer
         label: Geraeteliste (Schnittstelle der Uebersichtsseite)

@@ -41,7 +41,7 @@ from . import geraete_tco_band, geraete_tco_grafik, geraete_tco_karten
 from . import geraete_laufzeit, geraete_notbremse, geraete_vergleich
 from ..analyze.geraete_pruefstatus import listen_aus_satz
 from ..geraete_model import VERGLEICHBARE_ZUSTAENDE, Ratenzahlung, normalisiere
-from ..tarif_model import PREISTYP_LIVE_SHOP, vertrag_basis
+from ..tarif_model import NUR_MIT_GERAET, PREISTYP_LIVE_SHOP, vertrag_basis
 from ..tco_model import (
     POSTEN_ANSCHLUSS,
     POSTEN_RABATTE,
@@ -618,15 +618,13 @@ def aufbereiten(
     for b in buendel:
         if not isinstance(b, Buendel) or b.ohne_geraet:
             continue
+        anb, tid = normalisiere(b.anbieter), (b.tarif_id or "").strip()
         referenz = referenz_je_schluessel.get(sim_only_id(b.anbieter, b.tarif_name))
-        if referenz is None and (b.tarif_id or "").strip():
-            referenz = referenz_je_id.get(
-                (normalisiere(b.anbieter), b.tarif_id.strip())
-            )
-        if referenz is None and (b.tarif_id or "").strip():
-            referenz = referenz_je_id.get(
-                (normalisiere(b.anbieter), vertrag_basis(b.tarif_id))
-            )
+        for schluessel in [(anb, tid), (anb, vertrag_basis(tid))] if tid else []:
+            if referenz is None:
+                referenz = referenz_je_id.get(schluessel)
+        if b.tarif_id_guete == NUR_MIT_GERAET:
+            referenz = None
         zeilen.append(_zeile(b, referenz, katalog, geraet_je_sku))
 
     zeilen.sort(

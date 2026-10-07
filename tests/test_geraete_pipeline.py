@@ -770,12 +770,10 @@ def test_ein_fehler_der_pruefstelle_kostet_keinen_messtag(
     assert "Prüfstelle gescheitert" in caplog.text
 
 
-def test_ohne_tarif_im_bestand_wird_kein_buendel_geschrieben(tmp_path):
-    """Die Regel von `upsert_buendel`, hier als Auswahl statt als Wurf.
-
-    Ohne sie kostet ein einziger unaufloesbarer Satz die ganze Uebergabe -
-    und der Bestand haette null Buendel statt der uebrigen.
-    """
+def test_ohne_tarifblatt_im_bestand_wird_buendel_ohne_sim_only_bezug(tmp_path):
+    """Kein Tarifblatt zum Slug: das Buendel bleibt (vorher verworfen, Geraetelauf
+    07.10.2026), mit der Tarif-ID aus dem o2-Slug und der Guete `nur_mit_geraet`;
+    `upsert_buendel` nimmt es an, der Lauf schreibt die Datei."""
     root = _o2_root(
         tmp_path,
         tarife=[
@@ -789,11 +787,13 @@ def test_ohne_tarif_im_bestand_wird_kein_buendel_geschrieben(tmp_path):
     )
     bilanz = run_geraete_stage(root, {}, "2026-09-04", jetzt=_jetzt(), hole=_o2_hole())
     assert bilanz["rohbuendel"] == 1
-    assert bilanz["buendel"] == 0 and bilanz["buendel_ohne_tarif"] == 1
+    assert bilanz["buendel"] == 1 and bilanz["buendel_ohne_tarif"] == 0
     tco = json.loads(
         (root / "data" / "state" / "geraete_tco.json").read_text(encoding="utf-8")
     )
-    assert tco["buendel"] == []
+    assert [(s["tarif_id"], s["tarif_id_guete"]) for s in tco["buendel"]] == [
+        ("o2:o2-mobile-on-demand-m-plus", "nur_mit_geraet")
+    ]
 
 
 def test_eine_unlesbare_buendelantwort_schreibt_nichts_und_altert_nicht(tmp_path):

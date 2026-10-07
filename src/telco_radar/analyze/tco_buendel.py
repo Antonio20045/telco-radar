@@ -25,6 +25,15 @@ die ganze Uebergabe kostet. Der Grund wird protokolliert und gezaehlt -
 Arbeitsliste fuer `config/tarif_quellen.yaml`, ein stilles Weglassen ist
 keine.
 
+Zwei Ausnahmen seit dem Geraetelauf vom 07.10.2026 (1056 Saetze verworfen):
+
+* Ein Tarif, den der Anbieter nur mit Geraet fuehrt (o2 "Mobile Special",
+  "Unlimited L Plus"), hat kein Tarifblatt und bleibt trotzdem: Tarif-ID aus
+  dem Slug des Anbieters, Guete `nur_mit_geraet`, kein SIM-only-Vergleich
+  (`ohne_tarifblatt`). Gezaehlt in `nur_mit_geraet`.
+* Eine Zusatzkarte (`ZUSATZKARTEN`) ist kein eigenstaendiger Handytarif und
+  bleibt draussen, mit eigenem Zaehler statt "ohne aufloesbaren Tarif".
+
 WARUM DER SLUG HIER GEBRAUCHT WIRD
 ----------------------------------
 o2 nennt denselben Tarif im Geraetekatalog "O2 Mobile on Demand M Plus mit
@@ -85,11 +94,19 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass, field
 
-from ..tarif_bezug import Tarifbestand
-from ..tarif_model import buendelphasen_aus
+from ..collect.tarif_crawler import tarif_id
+from ..geraete_model import normalisiere
+from ..tarif_bezug import SLUG_ALS_ID_ANBIETER, Bezug, Tarifbestand
+from ..tarif_model import NUR_MIT_GERAET, buendelphasen_aus
 from ..tco_model import Buendel, aktionen_aus
 
 log = logging.getLogger(__name__)
+
+ZUSATZKARTEN = {"vodafone": ("FamilyCard", "Red+")}
+"""Namensanfaenge von Zusatzkarten je Anbieter (normalisierter Name): Vodafone nennt
+die FamilyCard selbst "FamilyCard-Zusatzkarte" (Promo-Seite, Hinweis in
+`config/geraete_quellen.yaml`), Red+ ist Vodafones Zusatzkartenfamilie. Eine
+Zusatzkarte braucht einen Hauptvertrag und ist kein eigenstaendiger Handytarif."""
 
 
 @dataclass
@@ -106,11 +123,16 @@ class Buendelbilanz:
     ohne_geraet: int = 0
     ohne_tarif: int = 0
     ungueltig: int = 0
+    zusatzkarte: int = 0
+    nur_mit_geraet: int = 0
     offene_tarife: dict = field(default_factory=dict)
+    zusatzkarten: dict = field(default_factory=dict)
+    tarife_nur_mit_geraet: dict = field(default_factory=dict)
 
     @property
     def verworfen(self) -> int:
-        return self.ohne_geraet + self.ohne_tarif + self.ungueltig
+        """Alle nicht uebernommenen Saetze, gleich aus welchem Grund."""
+        return self.ohne_geraet + self.ohne_tarif + self.ungueltig + self.zusatzkarte
 
 
 _BEISPIELE = 8
@@ -130,18 +152,18 @@ def aus_rohsaetzen(rohsaetze, bestand: Tarifbestand, heute: str) -> Buendelbilan
             bilanz.ohne_geraet += 1
             continue
 
+        if ist_zusatzkarte(anbieter, tarif_name):
+            bilanz.zusatzkarte += 1
+            _zaehle(bilanz.zusatzkarten, tarif_name)
+            continue
+
+        slug = str(satz.get("tarif_slug") or "")
         bezug = bestand.loese(
-            anbieter,
-            tarif_name,
-            slug=str(satz.get("tarif_slug") or ""),
-            mit_geraet=True,
-        )
+            anbieter, tarif_name, slug=slug, mit_geraet=True
+        ) or ohne_tarifblatt(bestand, anbieter, slug)
         if bezug is None:
             bilanz.ohne_tarif += 1
-            schluessel = tarif_name or str(satz.get("tarif_slug") or "?")
-            bilanz.offene_tarife[schluessel] = (
-                bilanz.offene_tarife.get(schluessel, 0) + 1
-            )
+            _zaehle(bilanz.offene_tarife, tarif_name or slug or "?")
             continue
 
         try:
@@ -170,16 +192,78 @@ def aus_rohsaetzen(rohsaetze, bestand: Tarifbestand, heute: str) -> Buendelbilan
         except (ValueError, TypeError) as exc:
             bilanz.ungueltig += 1
             log.info("Buendel %s/%s verworfen: %s", anbieter, sku, exc)
+            continue
+        if bezug.guete == NUR_MIT_GERAET:
+            bilanz.nur_mit_geraet += 1
+            _zaehle(bilanz.tarife_nur_mit_geraet, tarif_name)
 
     if bilanz.offene_tarife:
-        haeufigste = sorted(bilanz.offene_tarife.items(), key=lambda p: (-p[1], p[0]))[
-            :_BEISPIELE
-        ]
         log.warning(
             "Buendel: %d Saetze ohne aufloesbaren Tarif verworfen - im "
             "Tarifbestand fehlen %d Tarife, haeufigste: %s",
             bilanz.ohne_tarif,
             len(bilanz.offene_tarife),
-            ", ".join(f"{name} ({zahl}x)" for name, zahl in haeufigste),
+            _haeufigste(bilanz.offene_tarife),
+        )
+    if bilanz.zusatzkarten:
+        log.info(
+            "Buendel: %d Saetze mit Zusatzkarte verworfen - kein eigenstaendiger "
+            "Handytarif: %s",
+            bilanz.zusatzkarte,
+            _haeufigste(bilanz.zusatzkarten),
+        )
+    if bilanz.tarife_nur_mit_geraet:
+        log.info(
+            "Buendel: %d Saetze mit Tarif ohne Tarifblatt uebernommen (nur mit "
+            "Geraet, ohne SIM-only-Vergleich): %s",
+            bilanz.nur_mit_geraet,
+            _haeufigste(bilanz.tarife_nur_mit_geraet),
         )
     return bilanz
+
+
+def ohne_tarifblatt(bestand: Tarifbestand, anbieter: str, slug: str) -> Bezug | None:
+    """Ein Buendeltarif ohne Tarifblatt im Bestand - unter dem Slug des Anbieters.
+
+    o2 fuehrt Tarife nur mit Geraet: "O2 Mobile Special" hat keine SIM-only-Kachel,
+    und die Kachel "Unlimited L" verlinkt `o2-mobile-unlimited-l` ohne `-plus`.
+    `Tarifbestand.loese` loest sie nicht auf, und das bleibt so: "Plus" wird nie auf
+    den Tarif ohne "Plus" geraten. Die Tarif-ID ist der Slug, so gebildet wie der
+    Bestand seine IDs bildet; nennt er ihn spaeter, ist es dieselbe ID. Nur fuer den
+    Anbieter, dessen Slug als Tarif-ID belegt ist (`SLUG_ALS_ID_ANBIETER`);
+    Vodafones Slug ist ein Angebots-Hash, der zwischen Tagen wechselt. None, wenn der
+    Bestand den Slug kennt (als Tarif-ID oder Kachel-Link, auch mehrdeutig).
+    """
+    gesucht = (slug or "").strip().lower()
+    if anbieter != SLUG_ALS_ID_ANBIETER or not gesucht:
+        return None
+    tid = tarif_id(anbieter, gesucht)
+    if tid in bestand.je_id_aktuell or any(
+        str(s.get("buendel_slug") or "").strip().lower() == gesucht
+        for s in bestand.saetze(anbieter)
+    ):
+        return None
+    return Bezug(
+        tarif_id=tid,
+        tarif_name="",
+        guete=NUR_MIT_GERAET,
+        grund=f"Kein Tarifblatt im Bestand; Tarif-ID aus dem Slug {gesucht!r}",
+    )
+
+
+def ist_zusatzkarte(anbieter: str, tarif_name: str) -> bool:
+    """Ob der Tarif eine Zusatzkarte ist (`ZUSATZKARTEN`)."""
+    name = (tarif_name or "").strip().casefold()
+    return any(
+        name.startswith(anfang.casefold())
+        for anfang in ZUSATZKARTEN.get(normalisiere(anbieter), ())
+    )
+
+
+def _zaehle(zaehler: dict, schluessel: str) -> None:
+    zaehler[schluessel] = zaehler.get(schluessel, 0) + 1
+
+
+def _haeufigste(zaehler: dict) -> str:
+    paare = sorted(zaehler.items(), key=lambda p: (-p[1], p[0]))[:_BEISPIELE]
+    return ", ".join(f"{name} ({zahl}x)" for name, zahl in paare)
