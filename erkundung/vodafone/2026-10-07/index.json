@@ -1,0 +1,113 @@
+{
+ "anbieter": "vodafone",
+ "name": "Vodafone",
+ "datum": "2026-10-07",
+ "status": "gelesen",
+ "grund": null,
+ "kennung": null,
+ "parallelpruefung": "vor jeder Seite",
+ "robots_gelesen": true,
+ "abstand_sekunden": 2.0,
+ "besuchszeit": null,
+ "dauer_sekunden": 503.3,
+ "zeitgrenze_sekunden": 3000,
+ "seiten": [
+  {
+   "nummer": 1,
+   "geraet": "apple-iphone-17-pro",
+   "speicher_gb": 256,
+   "adresse": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
+   "endadresse": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
+   "status": "gelesen",
+   "grund": null,
+   "bot_schutz": false,
+   "http_status": 200,
+   "ruhe": true,
+   "dateien": {
+    "bedienelemente": "bedienelemente-1.json",
+    "preise": "preise-1.json",
+    "klicks": "klicks-1.json",
+    "mitschnitt": "mitschnitt-1.json",
+    "screenshot": "seite-1.png",
+    "html": "seite-1.html.gz"
+   },
+   "zaehlung": {
+    "anfragen": 365,
+    "verworfen": 2,
+    "gescheitert": 0,
+    "mitschnitt": 6,
+    "elemente": 396,
+    "gruppen_je_art": {
+     "unbekannt": 116,
+     "tarif": 10,
+     "farbe": 4,
+     "speicher": 3,
+     "laufzeit": 5
+    },
+    "preis_kandidaten": 83,
+    "klicks": 5
+   },
+   "verworfen": [
+    {
+     "url": "https://dyn.vodafone.de/csp/csp.php?b_id=&shopid=&referer=&referrer=&protect=",
+     "grund": "per robots.txt gesperrt: /csp/csp.php?b_id=&shopid=&referer=&referrer=&protect="
+    },
+    {
+     "url": "https://cdn.dimml.io/dimml.js",
+     "grund": "robots.txt nicht lesbar (HTTP 400)"
+    }
+   ],
+   "gescheitert": []
+  },
+  {
+   "nummer": 2,
+   "geraet": "samsung-galaxy-s26",
+   "speicher_gb": 256,
+   "adresse": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html",
+   "endadresse": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html",
+   "status": "gelesen",
+   "grund": null,
+   "bot_schutz": false,
+   "http_status": 200,
+   "ruhe": true,
+   "dateien": {
+    "bedienelemente": "bedienelemente-2.json",
+    "preise": "preise-2.json",
+    "klicks": "klicks-2.json",
+    "mitschnitt": "mitschnitt-2.json",
+    "screenshot": "seite-2.png",
+    "html": "seite-2.html.gz"
+   },
+   "zaehlung": {
+    "anfragen": 297,
+    "verworfen": 2,
+    "gescheitert": 0,
+    "mitschnitt": 6,
+    "elemente": 353,
+    "gruppen_je_art": {
+     "unbekannt": 97,
+     "tarif": 10,
+     "farbe": 5,
+     "speicher": 2,
+     "laufzeit": 5
+    },
+    "preis_kandidaten": 90,
+    "klicks": 4
+   },
+   "verworfen": [
+    {
+     "url": "https://dyn.vodafone.de/csp/csp.php?b_id=&shopid=&referer=&referrer=&protect=",
+     "grund": "per robots.txt gesperrt: /csp/csp.php?b_id=&shopid=&referer=&referrer=&protect="
+    },
+    {
+     "url": "https://cdn.dimml.io/dimml.js",
+     "grund": "robots.txt nicht lesbar (HTTP 400)"
+    }
+   ],
+   "gescheitert": []
+  }
+ ],
+ "groesse_bytes": 2250140,
+ "groessengrenze_bytes": 8000000,
+ "gekuerzt": []
+}
