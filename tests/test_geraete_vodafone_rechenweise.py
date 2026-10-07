@@ -113,11 +113,26 @@ def _karte(satz: dict) -> dict:
     return karte
 
 
+def _tarifzeilen(karte: dict) -> list[dict]:
+    """Die Tarif-Summanden der Zeile: eigene Zeile oder Teil des Monatspreises
+    (Gerät und Tarif gleich lang, Antonio 07.10.2026)."""
+    return [
+        {"anzahl": s["anzahl"], "betrag": s["betrag"]}
+        for s in karte["rechnung"]
+        if s["wort"] == "Tarif"
+    ] + [
+        {"anzahl": s["anzahl"], "betrag": t["betrag"]}
+        for s in karte["rechnung"]
+        for t in s["teile"]
+        if t["wort"] == "Tarif"
+    ]
+
+
 def test_die_karte_nennt_als_monatlich_den_tarif_ihrer_rechnung():
     """Mobil XS, 24 Raten: „monatlich …“ und „24 × … Tarif“ sind derselbe Betrag."""
     satz = _satz(_PIXEL_0509, "Mobil XS", 24)
     karte = _karte(satz)
-    [tarif] = [s for s in karte["rechnung"] if s["wort"] == "Tarif"]
+    [tarif] = _tarifzeilen(karte)
     assert tarif["anzahl"] == 24
     erster = tarifpreis_im_monat(_buendel(satz), 1)
     assert karte["monatlich"] == tarif["betrag"] == erster == 23.95
@@ -127,7 +142,7 @@ def test_die_karte_nennt_als_monatlich_den_tarif_ihrer_rechnung():
 def test_gegenprobe_der_listenpreis_als_monatlich_widerspricht_der_rechnung():
     satz = _satz(_PIXEL_0509, "Mobil XS", 24)
     karte = _karte({**satz, "tarif_monatlich": satz["tarif_listenpreis"]})
-    [tarif] = [s for s in karte["rechnung"] if s["wort"] == "Tarif"]
+    [tarif] = _tarifzeilen(karte)
     assert (karte["monatlich"], tarif["betrag"]) == (31.95, 23.95)
 
 
