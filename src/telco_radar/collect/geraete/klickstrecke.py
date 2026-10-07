@@ -9,7 +9,9 @@ ohne Kauf-, Kassen- oder Anmeldewort (``KAUFWORT``); ``kein_weiter`` nennt den M
 fremde Anfrage, etwa ein Zähler, zählt nicht). ``streckenende`` erkennt Anmeldung,
 Checkout oder Zahlung an Host oder Pfad der Adresse oder an sichtbaren Feldern der
 Seite (``FELDER_JS``: Passwort-, Karten- oder IBAN-Feld, Knopf „zahlungspflichtig
-bestellen“). Dieses Modul ruft kein Netz.
+bestellen“). ``hat_gewechselt`` sagt, wann die Navigation des Klicks angekommen ist:
+erst wenn die Hauptseite eine neue Adresse zeigt, nicht schon, wenn das Tor eine
+Umleitung meldet. Dieses Modul ruft kein Netz.
 """
 
 from __future__ import annotations
@@ -102,6 +104,18 @@ def kein_weiter(daten: dict) -> str | None:
     if KAUFWORT.search(daten["text"]):
         return "sieht nach Kauf, Kasse oder Anmeldung aus"
     return None
+
+
+def hat_gewechselt(seite: Page, adresse: str) -> bool:
+    """Ob die Hauptseite eine andere Adresse als ``adresse`` zeigt.
+
+    Leitet der Server die Navigation eines Klicks um, merkt das Tor das Ziel
+    (``Tor.umleitung``) und beantwortet die Navigation mit einer Leerseite; die kommt
+    erst danach im Browser an. Lädt der Crawler das Ziel vorher, unterbricht ihre
+    Ankunft das Laden („interrupted by another navigation“). Erst ein Adresswechsel
+    zeigt, dass sie angekommen ist.
+    """
+    return ohne_anker(seite.url) != adresse
 
 
 def knapp(text: str) -> str:

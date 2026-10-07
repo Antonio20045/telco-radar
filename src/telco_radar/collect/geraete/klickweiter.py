@@ -59,6 +59,7 @@ from .klickstrecke import (
     GRUND_KNOPF,
     POST,
     WEBSCHEMATA,
+    hat_gewechselt,
     ohne_anker,
     sperre_des_klicks,
     streckenende,
@@ -249,7 +250,7 @@ def _klicke_weiter(gang: Gang, weiter: Weiterschritt) -> str | None:
     try:
         wahl.knopf.click(timeout=gang.frist_ms, no_wait_after=True)
         gewechselt = wache.warte(
-            lambda: ohne_anker(seite.url) != adresse, WEITER_FRIST_MS
+            lambda: hat_gewechselt(seite, adresse), WEITER_FRIST_MS
         )
     except PlaywrightFehler as fehler:
         return f"{GRUND_KNOPF} nicht klickbar: {kurz(fehler)}"

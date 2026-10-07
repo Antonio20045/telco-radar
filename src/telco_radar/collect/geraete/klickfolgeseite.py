@@ -12,7 +12,9 @@ oder ``button`` (oder mit dieser Rolle), ohne neues Fenster und ohne Kauf-, Kass
 Anmeldewort (``KAUFWORT``). Nur dieser Klick darf serverseitig Zustand ändern
 (Warenkorb); kein Formular wird ausgefüllt. Ab dem Klick lässt das Tor nur GET und HEAD
 durch (``klicktor.GRUND_NUR_LESEN``); allein die Anfragen des Klicks bis zur Navigation
-der Hauptseite dürfen schreiben. Dann wartet er auf den Wechsel der Adresse, folgt
+der Hauptseite dürfen schreiben. Dann wartet er auf den Wechsel der Adresse
+(``klickstrecke.hat_gewechselt``: bei einer Umleitung erst, wenn die Leerseite des Tors
+angekommen und geladen ist, sonst unterbräche sie das Laden des Ziels), folgt
 Umleitungen geprüft, wartet auf Laden und Ruhe und hält von der Folgeseite Inventar,
 Preise, Seite und Mitschnitt fest, ohne Klick-Proben und ohne Kartenprobe
 (``OHNE_PROBEN``).
@@ -23,8 +25,9 @@ Fenster oder führt nirgends hin, oder die Folgeseite zeigt Anmeldung, Checkout 
 Zahlung (``streckenende``: Wort in Host oder Pfad, sichtbares Passwort-, Karten- oder
 IBAN-Feld, Knopf „zahlungspflichtig bestellen“), geprüft nach dem Laden, nach der Ruhe
 und noch einmal nach dem Festhalten. Verwirft das Tor das Ziel des Klicks oder seinen
-POST (robots.txt), heißt die Folgeseite ``gesperrt``; Bot-Schutz heißt ``gestoert``,
-und jede Störung des Tors beendet den Anbieter, auch nach einem Befund
+POST (robots.txt), heißt die Folgeseite ``gesperrt``, festgehalten erst, wenn die
+Fehlerseite des Browsers da ist (``FEHLERSEITE_FRIST_MS``); Bot-Schutz heißt
+``gestoert``, und jede Störung des Tors beendet den Anbieter, auch nach einem Befund
 (``klickseite.Seitenlauf``). Den Körper einer Antwort auf ein POST liest der Lauf schon
 im Tor, auf Challenge-Muster wie jede Antwort, für den Mitschnitt und für die Kennungen
 zum Schwärzen (``klickspur.geheime_werte``), weil die Seite gleich danach wechselt und
@@ -60,6 +63,7 @@ from .klickstrecke import (
     GRUND_KNOPF,
     POST,
     WEBSCHEMATA,
+    hat_gewechselt,
     ohne_anker,
     sperre_des_klicks,
     streckenende,
@@ -77,7 +81,9 @@ log = logging.getLogger(__name__)
 
 LAUF_BEFUND = "befund"
 WEITER_FRIST_MS = 20_000
+FEHLERSEITE_FRIST_MS = 5_000
 GRUND_AUSGANG = "Ausgangsseite"
+GRUND_LEERSEITE = "Leerseite der Umleitung"
 OHNE_PROBEN = "Folgeseite: keine Klick-Proben"
 
 
@@ -188,6 +194,8 @@ class Folgelauf(Seitenlauf):
         finally:
             self.tor.nur_lesen = True
         if self.tor.umleitung is not None:
+            if not self._warte_geladen():
+                raise Abbruch(LAUF_GESTOERT, f"{GRUND_LEERSEITE} nicht geladen")
             self._folge(self.tor.umleitung)
         elif urlsplit(self.seite.url).scheme not in WEBSCHEMATA:
             ohne = self.lauf.gescheitert[gescheitert:]
@@ -240,16 +248,16 @@ class Folgelauf(Seitenlauf):
     def _warte_auf_wechsel(
         self, adresse: str, marke: int, verworfen: int, fenster: int
     ) -> None:
-        """Wartet, bis die Adresse wechselt; sonst gesperrt oder ein Befund."""
+        """Wartet, bis die Adresse wechselt (``hat_gewechselt``, auch nach einer
+        Umleitung); sonst gesperrt oder ein Befund."""
         frist = WEITER_FRIST_MS + round(2000 * self.schleuse.abstand(adresse))
         for _ in range(frist // WARTE_TAKT_MS):
             self.pruefe()
             gesperrt = self._gesperrt_seit(marke, verworfen)
             if gesperrt is not None:
+                self._warte_auf_fehlerseite(adresse, marke)
                 raise Abbruch(LAUF_GESPERRT, f"{GRUND_KNOPF}: {gesperrt}")
-            if self.tor.umleitung is not None:
-                return
-            if ohne_anker(self.seite.url) != adresse:
+            if hat_gewechselt(self.seite, adresse):
                 return
             if len(self.seite.context.pages) > fenster:
                 raise Abbruch(LAUF_BEFUND, f"{GRUND_KNOPF} öffnete ein neues Fenster")
@@ -258,6 +266,18 @@ class Folgelauf(Seitenlauf):
             f"{GRUND_KNOPF} führt nirgends hin: Adresse nach {frist // 1000} s gleich"
         )
         raise Abbruch(LAUF_BEFUND, grund)
+
+    def _warte_auf_fehlerseite(self, adresse: str, marke: int) -> None:
+        """Sperrt das Tor eine Navigation des Klicks, zeigt der Browser danach eine
+        Fehlerseite; liest die Erkundung die Seite vorher, scheitert das Lesen
+        („page is navigating“). Wartet auf sie, höchstens ``FEHLERSEITE_FRIST_MS``."""
+        if not any(e.art == DOKUMENT for e in self.spur.seit(marke)):
+            return
+        for _ in range(FEHLERSEITE_FRIST_MS // WARTE_TAKT_MS):
+            if hat_gewechselt(self.seite, adresse):
+                self._warte_geladen()
+                return
+            self.seite.wait_for_timeout(WARTE_TAKT_MS)
 
     def _gesperrt_seit(self, marke: int, verworfen: int) -> str | None:
         """Ziel oder POST des Klicks, wenn das Tor sie verwarf, nicht wegen
