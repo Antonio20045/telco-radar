@@ -332,3 +332,32 @@ def test_kein_gespeicherter_posten_ist_bedingt():
                         assert not ist_bedingt(p), p["displayLabel"]
     for wort in BEDINGTE_POSTEN:
         assert ist_bedingt({"displayLabel": f"10 € {wort.title()}-Rabatt"}), wort
+
+
+def _vorschau(aendern) -> list[dict]:
+    """Die Vorschau-Sätze der Detailantwort, jede Tarifphase mit `aendern` verändert."""
+    daten = json.loads(gzip.decompress((_FIX / _IPHONE_DETAIL).read_bytes()))
+    for atom in daten["data"]["atomics"]:
+        for k in atom["prices"]["composition"]:
+            aendern(k["priceByComponent"]["tariff"]["priceByType"]["rate"]["month"])
+    return [s for s in lies_buendel(json.dumps(daten)) if s["sku"] == _IPHONE_HW]
+
+
+def test_ohne_rabatt_bleibt_der_listenpreis_auch_ohne_posten():
+    """Kein Rabatt, also nichts zuzuordnen: keine Lücke, auch ohne Rabattposten. Im
+    Test `withDiscounts` der Vorschau entfernt oder auf den Listenpreis gesetzt;
+    Gegenprobe: unverändert trägt jede Vorschau einen Rabatt und ist eine Lücke."""
+
+    def gleich(monat):
+        monat["withDiscounts"] = [
+            dict(p, gross=monat["withoutDiscounts"]["gross"])
+            for p in monat["withDiscounts"]
+        ]
+
+    for aendern in (lambda monat: monat.pop("withDiscounts"), gleich):
+        saetze = _vorschau(aendern)
+        assert len(saetze) == 3
+        for s in saetze:
+            assert s["tarif_monatlich"] == s["tarif_listenpreis"] is not None
+            assert s["tarif_phasen"] == []
+    assert {s["tarif_monatlich"] for s in _vorschau(lambda monat: None)} == {None}
