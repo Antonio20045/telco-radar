@@ -17,6 +17,8 @@ import pytest
 
 from telco_radar.collect.http import HostGate
 
+SCHRANKE_SEKUNDEN = 30.0
+
 
 class Zaehler:
     """Merkt sich, wie viele Threads gleichzeitig im Gate waren."""
@@ -57,10 +59,41 @@ def test_gleicher_host_wird_begrenzt():
 
 
 def test_verschiedene_hosts_laufen_parallel():
-    """Die Grenze gilt je Host - sonst waere sie nur ein kleinerer Pool."""
+    """Die Grenze gilt je Host - sonst waere sie nur ein kleinerer Pool.
+
+    Alle acht treffen sich im Gate an einer Schranke statt nach fester Wartezeit:
+    unter Last kommt ein Thread sonst erst, wenn ein anderer schon fertig ist.
+    """
     gate = HostGate(max_parallel=1, min_interval=0.0)
     urls = [f"https://host{i}.de/feed" for i in range(8)]
-    assert _durchlauf(gate, urls).maximum == 8
+    schranke = threading.Barrier(len(urls), timeout=SCHRANKE_SEKUNDEN)
+    z = Zaehler()
+
+    def eine(url: str) -> None:
+        with gate.slot(url):
+            z.betreten()
+            schranke.wait()
+            z.verlassen()
+
+    with ThreadPoolExecutor(max_workers=len(urls)) as pool:
+        list(pool.map(eine, urls))
+    assert z.maximum == 8
+
+
+def test_gegenprobe_schranke_scheitert_bei_einem_host():
+    """Teilen sich alle denselben Host, erreicht nie mehr als einer die Schranke."""
+    gate = HostGate(max_parallel=1, min_interval=0.0)
+    schranke = threading.Barrier(2, timeout=0.5)
+
+    def eine(url: str) -> None:
+        with gate.slot(url):
+            schranke.wait()
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        futures = [pool.submit(eine, f"https://beispiel.de/{i}") for i in range(2)]
+        with pytest.raises(threading.BrokenBarrierError):
+            for f in futures:
+                f.result()
 
 
 def test_www_zaehlt_als_derselbe_host():
