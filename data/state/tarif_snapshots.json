@@ -25,11 +25,9 @@
    "max.|100mb",
    "max.|15mb",
    "max.|300mb",
-   "monatlich kündbar. jetzt inkl.|10€",
    "oder hotspot-nutzung empfehlen sich|100gb",
    "plus bundle sparst du|5€",
    "plus bundles spare|5€",
-   "rabatt jeden monat und|0€",
    "surfen reichen häufig bis|20gb",
    "surfgeschwindigkeit bis zu oder|300mb",
    "uns schon für unter|20€",
@@ -61,7 +59,7 @@
    "|59.99€",
    "|5gb"
   ],
-  "stand": "2026-10-02"
+  "stand": "2026-10-07"
  },
  "https://www.o2online.de/mobilfunk/prepaid/": {
   "werte": [
@@ -90,7 +88,7 @@
    "|80gb",
    "|999gb"
   ],
-  "stand": "2026-10-02"
+  "stand": "2026-10-07"
  },
  "https://www.blau.de/tarife/": {
   "werte": [
@@ -121,7 +119,7 @@
    "|8.99€",
    "|9.99€"
   ],
-  "stand": "2026-10-02"
+  "stand": "2026-10-07"
  },
  "https://www.1und1.de/handytarife": {
   "werte": [
@@ -154,7 +152,7 @@
    "|50gb",
    "|9.99€"
   ],
-  "stand": "2026-10-02"
+  "stand": "2026-10-07"
  },
  "https://www.winsim.de/5g-tarife": {
   "werte": [
@@ -163,10 +161,11 @@
    "|10gb",
    "|11.99€",
    "|14.99€",
+   "|15gb",
    "|19.99€",
    "|192€",
    "|20gb",
-   "|264€",
+   "|216€",
    "|30gb",
    "|360€",
    "|40gb",
@@ -177,7 +176,7 @@
    "|8.99€",
    "|9.99€"
   ],
-  "stand": "2026-10-02"
+  "stand": "2026-10-07"
  },
  "https://www.premiumsim.de/": {
   "werte": [
@@ -203,7 +202,7 @@
    "|9.99€",
    "|96€"
   ],
-  "stand": "2026-10-02"
+  "stand": "2026-10-07"
  },
  "https://www.mobilcom-debitel.de/handytarife/": {
   "werte": [
@@ -227,6 +226,7 @@
    "|0€",
    "|14.99€",
    "|24monate",
+   "|25%",
    "|29.99€",
    "|39.99€",
    "|42%",
@@ -238,7 +238,7 @@
    "|59.99€",
    "|99€"
   ],
-  "stand": "2026-10-02"
+  "stand": "2026-10-07"
  },
  "https://www.klarmobil.de/handytarife": {
   "werte": [
@@ -259,7 +259,7 @@
    "|60%",
    "|99€"
   ],
-  "stand": "2026-10-02"
+  "stand": "2026-10-07"
  },
  "https://www.pennymobil.de/tarife": {
   "werte": [
@@ -276,7 +276,7 @@
    "|899€",
    "|9999€"
   ],
-  "stand": "2026-10-02"
+  "stand": "2026-10-07"
  },
  "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html": {
   "werte": [
@@ -491,7 +491,7 @@
    "|9.98€",
    "|999.99€"
   ],
-  "stand": "2026-10-02"
+  "stand": "2026-10-07"
  },
  "https://www.otelo.de/allnet-flat": {
   "werte": [
@@ -510,6 +510,6 @@
    "|30€",
    "|5€"
   ],
-  "stand": "2026-10-02"
+  "stand": "2026-10-07"
  }
 }
