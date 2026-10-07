@@ -8,7 +8,8 @@ Erkundung: robots.txt samt Crawl-delay und Visit-time je Anfrage, eigener Abstan
 Anbieters, User-Agent aus ``geraete_quellen.yaml``, keine Tarnung. Endet eine Seite
 gestört (Bot-Schutz, Challenge, Kanarienwert, Strukturbruch), geht für den Anbieter
 keine Anfrage mehr hinaus (CLAUDE.md Regel 4); die übrigen Seiten heißen
-``nicht_besucht`` mit Grund.
+``nicht_besucht`` mit Grund. Ebenso endet der Lauf, sobald die Parallellauf-Prüfung
+(``klickparallel``, vor jeder Seite) einen anderen Lauf auf denselben Hosts meldet.
 
 Zeitbudget (CLAUDE.md Regel 8): ``budget_ende`` rechnet gegen die Restzeit des Jobs,
 ``job_frist_s`` (Vorgabe ``JOB_FRIST_S``, gleich ``timeout-minutes`` des Matrix-Jobs)
@@ -43,6 +44,7 @@ from .klickergebnis import (
     seite_als_daten,
 )
 from .klicklauf import LAUF_GESTOERT, Klicklauf
+from .klickparallel import Laufpruefung
 from .klickseite import GRUND_FRIST, Fristschleuse, beobachte
 from .klickspur import ohne_geheimnisse
 from .klicktor import Hostschleuse
@@ -62,6 +64,7 @@ MINDESTZEIT_SEITE_S = 3 * 60
 ZEIT_JE_SEITE_S = 25 * 60
 GRUND_BUDGET = "Zeitbudget des Jobs erschöpft"
 GRUND_NACH_STOERUNG = "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4)"
+GRUND_PARALLEL = "verschoben"
 
 Crawler = Callable[["Seitenziel", float], Klicklauf]
 """Liest eine Seite bis zur monotonen Grenze ``ende``; wirft nie."""
@@ -111,9 +114,13 @@ def fahre(
     ende: float,
     *,
     gelesen: Mapping[str, str],
+    laeufe: Laufpruefung | None = None,
     uhr: Callable[[], float] = time.monotonic,
 ) -> dict:
-    """Liest die Seiten eines Anbieters in Rotation; gibt die Ergebnisdatei zurück."""
+    """Liest die Seiten eines Anbieters in Rotation; gibt die Ergebnisdatei zurück.
+
+    ``laeufe`` ist die Parallellauf-Prüfung; ``None`` nur für Läufe ohne Actions.
+    """
     start = uhr()
     seiten: list[dict] = []
     stopp: str | None = None
@@ -121,6 +128,9 @@ def fahre(
         rest = ende - uhr()
         if stopp is None and rest < MINDESTZEIT_SEITE_S:
             stopp = f"{GRUND_BUDGET}: noch {max(0, round(rest))} s"
+        if stopp is None and laeufe is not None:
+            anderer = laeufe()
+            stopp = None if anderer is None else f"{GRUND_PARALLEL}: {anderer}"
         if stopp is not None:
             seiten.append(nicht_besucht(seite, stopp))
             continue

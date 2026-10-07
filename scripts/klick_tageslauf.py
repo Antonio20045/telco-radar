@@ -10,7 +10,7 @@ AUFRUF
 ------
     PYTHONPATH=src python scripts/klick_tageslauf.py --anbieter o2 --ausgabe klick
         [--stand data/state/klick_stand.json] [--job-frist-sekunden 3600]
-        [--job-start EPOCHE] [--root .] [--chromium PFAD]
+        [--job-start EPOCHE] [--root .] [--chromium PFAD] [--ohne-parallelpruefung]
     PYTHONPATH=src python scripts/klick_tageslauf.py --plan
 
 ``--job-start`` ist der Start des Jobs in Sekunden seit 1970 (``date +%s`` im ersten
@@ -18,6 +18,11 @@ Schritt); mit ``--job-frist-sekunden`` ergibt er die Restzeit (CLAUDE.md Regel 8
 ``--plan`` gibt die Schlüssel aller Anbieter mit Karte als JSON-Liste aus (Matrix),
 ohne Netz. Ein gestörter Anbieter ist ein Ergebnis, kein Fehler: Exit-Code 0; 2 heißt,
 die Auswahl oder die Konfiguration ist falsch.
+
+Vor jeder Seite fragt der Lauf mit ``GITHUB_TOKEN`` (``actions: read``), ob die
+Klick-Erkundung oder der Radarlauf ansteht oder läuft (``klickparallel``); dann und
+ohne lesbare API ist der Rest ``nicht_besucht``. ``--ohne-parallelpruefung`` nur von
+Hand außerhalb von Actions.
 """
 
 from __future__ import annotations
@@ -25,6 +30,7 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import os
 import sys
 import time
 from datetime import UTC, datetime
@@ -41,6 +47,7 @@ from telco_radar.collect.geraete.klickergebnis import (
 )
 from telco_radar.collect.geraete.klickerkundung import robots_holer
 from telco_radar.collect.geraete.klickkartenprobe import KARTEN, Kartenlage, lade_karte
+from telco_radar.collect.geraete.klickparallel import TAGESLAUF_WORKFLOWS, aus_umgebung
 from telco_radar.collect.geraete.klicktageslauf import (
     JOB_FRIST_S,
     budget_ende,
@@ -73,6 +80,7 @@ def main(argumente: list[str] | None = None) -> int:
     parser.add_argument("--job-start", type=float)
     parser.add_argument("--plan", action="store_true")
     parser.add_argument("--chromium", type=Path)
+    parser.add_argument("--ohne-parallelpruefung", action="store_true")
     args = parser.parse_args(argumente)
     beginn = time.time()
     try:
@@ -101,6 +109,11 @@ def main(argumente: list[str] | None = None) -> int:
     stand = lies_stand(args.stand or args.root / STAND)
     verstrichen = beginn - (args.job_start if args.job_start is not None else beginn)
     ende = budget_ende(args.job_frist_sekunden, verstrichen, time.monotonic())
+    laeufe = (
+        None
+        if args.ohne_parallelpruefung
+        else aus_umgebung(os.environ, TAGESLAUF_WORKFLOWS)
+    )
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch(executable_path=args.chromium)
         try:
@@ -114,6 +127,7 @@ def main(argumente: list[str] | None = None) -> int:
                 heute,
                 ende,
                 gelesen=stand["seiten"].get(ziel.name, {}),
+                laeufe=laeufe,
             )
         finally:
             browser.close()

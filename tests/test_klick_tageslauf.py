@@ -31,10 +31,12 @@ from telco_radar.collect.geraete.klicklauf import (
     Klicklauf,
     abruf_gestoert,
 )
+from telco_radar.collect.geraete.klickparallel import TAGESLAUF_WORKFLOWS, aus_umgebung
 from telco_radar.collect.geraete.klickrohsatz import LUECKE_SEITE, ausbeute
 from telco_radar.collect.geraete.klicktageslauf import (
     GRUND_BUDGET,
     GRUND_NACH_STOERUNG,
+    GRUND_PARALLEL,
     MINDESTZEIT_SEITE_S,
     RESERVE_S,
     ZEIT_JE_SEITE_S,
@@ -246,3 +248,61 @@ def test_seitenadressen_ohne_geheimnisse(o2, karte, gelesen_o2):
 
     assert "abc123" not in json.dumps(daten)
     assert daten["seiten"][0]["adresse"].endswith("sessionid=ENTFERNT")
+
+
+def test_paralleler_lauf_verschiebt_den_rest(o2, karte, gelesen_o2):
+    meldungen = iter(
+        [None, None, "Klick-Erkundung läuft (klick-erkundung.yml, queued)"]
+    )
+    uhr = Uhr()
+    crawler = Crawler(uhr, gelesen_o2)
+
+    daten = fahre(
+        o2,
+        karte,
+        "o2.yaml",
+        crawler,
+        HEUTE,
+        10**6,
+        gelesen={},
+        laeufe=lambda: next(meldungen),
+        uhr=uhr,
+    )
+
+    assert len(crawler.aufrufe) == 2
+    assert daten["laufstatus"] == LAUF_GELESEN
+    assert {s["grund"] for s in daten["seiten"][2:]} == {
+        f"{GRUND_PARALLEL}: Klick-Erkundung läuft (klick-erkundung.yml, queued)"
+    }
+    frei = Uhr()
+    alle = Crawler(frei, gelesen_o2)
+    fahre(
+        o2,
+        karte,
+        "o2.yaml",
+        alle,
+        HEUTE,
+        10**6,
+        gelesen={},
+        laeufe=lambda: None,
+        uhr=frei,
+    )
+    assert len(alle.aufrufe) == len(o2.seiten)
+
+
+def test_tageslauf_fragt_erkundung_und_radar_nicht_sich_selbst():
+    gefragt = []
+
+    def holer(url, kopf):
+        gefragt.append(url.split("/workflows/")[1].split("/")[0])
+        return (200, '{"total_count": 0}')
+
+    laeufe = aus_umgebung(
+        {"GITHUB_REPOSITORY": "a/b", "GITHUB_TOKEN": "t"}, TAGESLAUF_WORKFLOWS
+    )
+
+    assert replace(laeufe, holer=holer)() is None
+    assert set(gefragt) == {"klick-erkundung.yml", "radar.yml"}
+    assert aus_umgebung({}, TAGESLAUF_WORKFLOWS)() == (
+        "GitHub-API nicht lesbar (GITHUB_REPOSITORY, GITHUB_TOKEN fehlt)"
+    )

@@ -7,7 +7,8 @@ nennt sie den Grund, und der Anbieter ist ``verschoben``. ``GithubLaeufe`` fragt
 Workflow, ob ein Lauf ``queued`` oder ``in_progress`` ist, mit dem ``GITHUB_TOKEN`` des
 Workflows (``actions: read``). Ist die API nicht erreichbar, antwortet sie nicht mit 200
 oder ist die Antwort unlesbar, ist das ebenso ein Grund: nie still weiter. Das Token
-steht in keiner Meldung.
+steht in keiner Meldung. Der Klick-Tageslauf läuft selbst in ``geraete.yml`` und fragt
+umgekehrt nach ``TAGESLAUF_WORKFLOWS``.
 """
 
 from __future__ import annotations
@@ -19,6 +20,10 @@ from dataclasses import dataclass, field
 from .. import http
 
 WORKFLOWS = {"geraete.yml": "Gerätelauf", "radar.yml": "Radarlauf"}
+TAGESLAUF_WORKFLOWS = {
+    "klick-erkundung.yml": "Klick-Erkundung",
+    "radar.yml": "Radarlauf",
+}
 ZUSTAENDE = ("queued", "in_progress")
 API = "https://api.github.com"
 API_FRIST_S = 15.0
@@ -40,12 +45,13 @@ def hole(url: str, kopf: dict[str, str]) -> tuple[int, str]:
 
 @dataclass(frozen=True)
 class GithubLaeufe:
-    """Fragt, ob ein Lauf von ``WORKFLOWS`` ansteht oder läuft; Grund oder ``None``."""
+    """Fragt, ob ein Lauf von ``workflows`` ansteht oder läuft; Grund oder ``None``."""
 
     repo: str
     token: str = field(repr=False)
     api: str = API
     holer: Holer = hole
+    workflows: Mapping[str, str] = field(default_factory=lambda: WORKFLOWS)
 
     def __call__(self) -> str | None:
         """Grund, wenn ein Lauf ansteht oder läuft oder die API nicht lesbar ist."""
@@ -54,7 +60,7 @@ class GithubLaeufe:
             "Accept": ANNAHME,
             "User-Agent": http.BOT_UA,
         }
-        for datei, name in WORKFLOWS.items():
+        for datei, name in self.workflows.items():
             for zustand in ZUSTAENDE:
                 url = (
                     f"{self.api}/repos/{self.repo}/actions/workflows/{datei}/runs"
@@ -81,7 +87,9 @@ class GithubLaeufe:
             return f"{GRUND_API} ({datei}: Antwort ohne total_count)"
 
 
-def aus_umgebung(umgebung: Mapping[str, str]) -> Laufpruefung:
+def aus_umgebung(
+    umgebung: Mapping[str, str], workflows: Mapping[str, str] = WORKFLOWS
+) -> Laufpruefung:
     """Die Prüfung aus den Variablen des Workflows; fehlt eine, ist das der Grund."""
     repo = umgebung.get(REPO_VARIABLE, "")
     token = umgebung.get(TOKEN_VARIABLE, "")
@@ -90,4 +98,4 @@ def aus_umgebung(umgebung: Mapping[str, str]) -> Laufpruefung:
         grund = f"{GRUND_API} ({', '.join(fehlt)} fehlt)"
         return lambda: grund
     api = umgebung[API_VARIABLE] if umgebung.get(API_VARIABLE) else API
-    return GithubLaeufe(repo, token, api)
+    return GithubLaeufe(repo, token, api, workflows=workflows)
