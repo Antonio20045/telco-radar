@@ -1,0 +1,71 @@
+{
+ "anbieter": "o2",
+ "datum": "2026-10-08",
+ "dauer_sekunden": 0.4,
+ "format": 1,
+ "frischegrenze_tage": 3,
+ "grund": "verschoben: Gerätelauf läuft (geraete.yml, queued)",
+ "karte": "o2.yaml",
+ "laufstatus": "nicht_gelesen",
+ "name": "o2",
+ "seiten": [
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
+   "geraet": "apple-iphone-17-pro",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, queued)",
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
+   "geraet": "samsung-galaxy-s26",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, queued)",
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
+   "geraet": "apple-iphone-17",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, queued)",
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-max-256gb-cosmic-orange-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
+   "geraet": "apple-iphone-17-pro-max",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, queued)",
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ultra-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
+   "geraet": "samsung-galaxy-s26-ultra",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, queued)",
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-256gb-frost-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
+   "geraet": "google-pixel-11",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, queued)",
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "status": "nicht_besucht"
+  }
+ ],
+ "ueberfaellig": [
+  "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
+  "https://www.o2online.de/e-shop/apple/apple-iphone-17-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
+  "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-max-256gb-cosmic-orange-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ultra-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
+  "https://www.o2online.de/e-shop/google/google-pixel-11-256gb-frost-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus"
+ ],
+ "vertragsform": "tarif_plus_ratenkauf",
+ "zeitbudget_sekunden": 3978
+}

@@ -1,0 +1,35 @@
+{
+ "anbieter": "vodafone",
+ "datum": "2026-10-08",
+ "dauer_sekunden": 0.4,
+ "format": 1,
+ "frischegrenze_tage": 3,
+ "grund": "verschoben: Gerätelauf läuft (geraete.yml, queued)",
+ "karte": "vodafone.yaml",
+ "laufstatus": "nicht_gelesen",
+ "name": "Vodafone",
+ "seiten": [
+  {
+   "adresse": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
+   "geraet": "apple-iphone-17-pro",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, queued)",
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html",
+   "geraet": "samsung-galaxy-s26",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, queued)",
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "status": "nicht_besucht"
+  }
+ ],
+ "ueberfaellig": [
+  "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
+  "https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html"
+ ],
+ "vertragsform": "tarif_plus_ratenkauf",
+ "zeitbudget_sekunden": 3980
+}

@@ -1,0 +1,80 @@
+{
+ "anbieter": "telekom",
+ "datum": "2026-10-08",
+ "dauer_sekunden": 0.4,
+ "format": 1,
+ "frischegrenze_tage": 3,
+ "grund": "verschoben: Gerätelauf läuft (geraete.yml, queued)",
+ "karte": "telekom.yaml",
+ "laufstatus": "nicht_gelesen",
+ "name": "Telekom",
+ "seiten": [
+  {
+   "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false",
+   "geraet": "apple-iphone-17-pro",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, queued)",
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.telekom.de/shop/geraet/google/google-pixel-11/frost-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false",
+   "geraet": "google-pixel-11",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, queued)",
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17779&categoryId=smartphones&forwardTradeInApplied=false",
+   "geraet": "apple-iphone-17-pro",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, queued)",
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17785&categoryId=smartphones&forwardTradeInApplied=false",
+   "geraet": "apple-iphone-17-pro",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, queued)",
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17797&categoryId=smartphones&forwardTradeInApplied=false",
+   "geraet": "apple-iphone-17-pro",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, queued)",
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17803&categoryId=smartphones&forwardTradeInApplied=false",
+   "geraet": "apple-iphone-17-pro",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, queued)",
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17/lavendel-256-gb?tariffId=MF_17791&categoryId=smartphones",
+   "geraet": "apple-iphone-17",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, queued)",
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "status": "nicht_besucht"
+  }
+ ],
+ "ueberfaellig": [
+  "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false",
+  "https://www.telekom.de/shop/geraet/google/google-pixel-11/frost-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false",
+  "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17779&categoryId=smartphones&forwardTradeInApplied=false",
+  "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17785&categoryId=smartphones&forwardTradeInApplied=false",
+  "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17797&categoryId=smartphones&forwardTradeInApplied=false",
+  "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17803&categoryId=smartphones&forwardTradeInApplied=false",
+  "https://www.telekom.de/shop/geraet/apple/apple-iphone-17/lavendel-256-gb?tariffId=MF_17791&categoryId=smartphones"
+ ],
+ "vertragsform": "tarif_plus_ratenkauf",
+ "zeitbudget_sekunden": 3969
+}

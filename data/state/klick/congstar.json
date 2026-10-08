@@ -1,0 +1,62 @@
+{
+ "anbieter": "congstar",
+ "datum": "2026-10-08",
+ "dauer_sekunden": 0.4,
+ "format": 1,
+ "frischegrenze_tage": 3,
+ "grund": "verschoben: Gerätelauf läuft (geraete.yml, queued)",
+ "karte": "congstar.yaml",
+ "laufstatus": "nicht_gelesen",
+ "name": "congstar",
+ "seiten": [
+  {
+   "adresse": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/",
+   "geraet": "apple-iphone-17-pro",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, queued)",
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
+   "geraet": "samsung-galaxy-s26",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, queued)",
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.congstar.de/geraete/apple/apple-iphone-17/",
+   "geraet": "apple-iphone-17",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, queued)",
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/",
+   "geraet": "apple-iphone-17-pro-max",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, queued)",
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.congstar.de/geraete/google/google-pixel-11/",
+   "geraet": "google-pixel-11",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, queued)",
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "status": "nicht_besucht"
+  }
+ ],
+ "ueberfaellig": [
+  "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/",
+  "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
+  "https://www.congstar.de/geraete/apple/apple-iphone-17/",
+  "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/",
+  "https://www.congstar.de/geraete/google/google-pixel-11/"
+ ],
+ "vertragsform": "tarif_plus_ratenkauf",
+ "zeitbudget_sekunden": 3980
+}

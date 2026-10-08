@@ -1,0 +1,71 @@
+{
+ "anbieter": "1und1",
+ "datum": "2026-10-08",
+ "dauer_sekunden": 0.4,
+ "format": 1,
+ "frischegrenze_tage": 3,
+ "grund": "verschoben: Gerätelauf läuft (geraete.yml, queued)",
+ "karte": "1und1.yaml",
+ "laufstatus": "nicht_gelesen",
+ "name": "1&1",
+ "seiten": [
+  {
+   "adresse": "https://mobile.1und1.de/iphone-17-pro",
+   "geraet": "apple-iphone-17-pro",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, queued)",
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://mobile.1und1.de/samsung-galaxy-s26",
+   "geraet": "samsung-galaxy-s26",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, queued)",
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://mobile.1und1.de/iphone-17",
+   "geraet": "apple-iphone-17",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, queued)",
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://mobile.1und1.de/iphone-17-pro-max",
+   "geraet": "apple-iphone-17-pro-max",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, queued)",
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://mobile.1und1.de/samsung-galaxy-s26-ultra",
+   "geraet": "samsung-galaxy-s26-ultra",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, queued)",
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://mobile.1und1.de/google-pixel-11",
+   "geraet": "google-pixel-11",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, queued)",
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "status": "nicht_besucht"
+  }
+ ],
+ "ueberfaellig": [
+  "https://mobile.1und1.de/iphone-17-pro",
+  "https://mobile.1und1.de/samsung-galaxy-s26",
+  "https://mobile.1und1.de/iphone-17",
+  "https://mobile.1und1.de/iphone-17-pro-max",
+  "https://mobile.1und1.de/samsung-galaxy-s26-ultra",
+  "https://mobile.1und1.de/google-pixel-11"
+ ],
+ "vertragsform": "ein_vertrag",
+ "zeitbudget_sekunden": 3977
+}
