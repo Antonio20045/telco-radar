@@ -58,12 +58,12 @@ from .klicklauf import (
     LAUF_GESPERRT,
     LAUF_GESTOERT,
     LAUF_ZEITGRENZE,
-    NICHT_ANGEBOTEN,
     NICHT_ERFASST,
     Klicklauf,
     Kombiergebnis,
     ergebnisgrund,
     pruefe_struktur,
+    sperre,
 )
 from .klicklesung import Leser
 from .klicknachholen import Nachholen
@@ -121,8 +121,9 @@ def klicke_durch(
     ``uhr`` liefert die Zeit des nächsten Abrufs für robots.txt; ``schleuse`` hält den
     Crawl-delay je Host über Läufe hinweg (``klicktor.Hostschleuse``). ``vorlauf`` ist
     der letzte Lauf derselben Seite (``klicklauf.pruefe_struktur``). Ein Abbruch steht
-    als Status und Grund im Lauf; Kombinationen davor bleiben. ``kennung`` ist der
-    User-Agent aus ``geraete_quellen.yaml``. Nach ``hoechste`` Kombinationen oder wenn
+    als Status und Grund im Lauf, eine Störung im Tor geht jedem anderen vor;
+    Kombinationen davor bleiben. ``kennung`` ist der User-Agent aus
+    ``geraete_quellen.yaml``. Nach ``hoechste`` Kombinationen oder wenn
     ``frist`` vor einem Klick falsch ist, heißt die Kombination ``nicht_erfasst`` mit
     Grund ``nicht besucht``; schneidet die Frist welche ab oder verwirft sie eine
     Anfrage, ist der Lauf ``zeitgrenze``. ``beobachter`` sieht jede Antwort, ``cookies``
@@ -140,10 +141,10 @@ def klicke_durch(
         lauf.status, lauf.grund = abbruch.status, abbruch.grund
     except PlaywrightFehler as fehler:
         lauf.status, lauf.grund = LAUF_GESTOERT, f"Browserfehler: {kurz(fehler)}"
-        if tor.stoerung is not None:
-            lauf.grund = tor.stoerung
     finally:
         kontexte.schliesse()
+    if lauf.status != LAUF_GELESEN and tor.stoerung is not None:
+        lauf.status, lauf.grund, lauf.stoerung = LAUF_GESTOERT, tor.stoerung, None
     bruch = pruefe_struktur(lauf, vorlauf)
     leer = ergebnisgrund(lauf.ergebnisse)
     for grund in (bruch, leer):
@@ -342,8 +343,8 @@ class _Gang:
         """Klickt ``wert``, wenn nötig; sonst das Ergebnis, das den Weg beendet.
 
         Eine gewählte Option bleibt, auch wenn die Seite sie sperrt. Eine gesperrte
-        heißt erst ``nicht_angeboten``, wenn die Seite ruht; kommt sie nicht zur Ruhe,
-        heißt die Kombination ``nicht_erfasst``.
+        heißt erst nach Ruhe ``nicht_angeboten`` (``klicklauf.sperre``), eine nur
+        in anderer Farbe angebotene ``nicht_erfasst``; ohne Ruhe ``nicht_erfasst``.
         """
         if self.karte.knoepfe[dimension].fest is not None:
             return None
@@ -361,11 +362,11 @@ class _Gang:
         if option is None:
             grund = f"Seite zeigt {dimension} {wert} in diesem Zustand nicht"
             return Kombiergebnis(variante, NICHT_ERFASST, grund)
+        gesperrt = sperre(option, dimension, wert)
+        if gesperrt is not None:
+            return Kombiergebnis(variante, *gesperrt)
         if option.gewaehlt:
             return None
-        if option.deaktiviert:
-            grund = f"Seite bietet {dimension} {wert} nicht an"
-            return Kombiergebnis(variante, NICHT_ANGEBOTEN, grund)
         return self._klicke(dimension, optionen.index(option), variante)
 
     def _klicke(

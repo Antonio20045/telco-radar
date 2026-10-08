@@ -8,9 +8,11 @@ Knöpfe. Der Wert kommt aus Attribut oder Text des Klickziels oder seines Kind-E
 ``wert_in``, ``muster`` nimmt daraus die erste Gruppe; passt das Muster nicht, hat die
 Option keinen Wert, sondern ihren Text in ``unlesbar`` und läuft mit diesem Text als
 benannte Lücke mit. Gesperrt ist ein Knopf mit ``disabled``, ``aria-disabled`` oder
-passend auf ``gesperrt`` der Karte. Die Marke ist die der Dimension, sonst die der
-Karte: Attribut gleich Wert oder ein CSS-Selektor, auf den das Klickziel passt. Eine
-feste Dimension hat genau eine gewählte Option ohne Knopf. Dieses Modul ruft kein Netz.
+passend auf ``andere_farbe`` der Karte; dann gibt es die Option nur in einer anderen,
+nicht geklickten Farbe (``klicklauf.sperre``: ``nicht_erfasst``). Die Marke ist die der
+Dimension, sonst die der Karte: Attribut gleich Wert oder ein CSS-Selektor, auf den das
+Klickziel passt. Eine feste Dimension hat genau eine gewählte Option ohne Knopf. Dieses
+Modul ruft kein Netz.
 """
 
 from __future__ import annotations
@@ -32,9 +34,9 @@ _OPTIONEN_JS = """(knoepfe, art) => knoepfe.map((k) => {
     : (art.wert ? traeger.getAttribute(art.wert) : traeger.innerText);
   const an = art.passt ? k.matches(art.passt)
     : art.marke !== null && k.getAttribute(art.marke) === art.markenwert;
-  const aus = k.disabled === true || k.getAttribute("aria-disabled") === "true"
-    || (art.gesperrt !== null && k.matches(art.gesperrt));
-  return [wert, aus, an];
+  const farbe = art.andereFarbe !== null && k.matches(art.andereFarbe);
+  const aus = k.disabled === true || k.getAttribute("aria-disabled") === "true";
+  return [wert, aus || farbe, an, farbe];
 })"""
 
 
@@ -43,12 +45,14 @@ class Option:
     """Ein Optionsknopf: Wert ohne doppelte Leerzeichen, deaktiviert, gewählt.
 
     ``unlesbar`` ist der Text, wenn ``muster`` nicht auf ihn passt (dann kein Wert).
+    ``andere_farbe``: gesperrt, weil es die Option nur in einer anderen Farbe gibt.
     """
 
     wert: str | None
     deaktiviert: bool
     gewaehlt: bool
     unlesbar: str | None = None
+    andere_farbe: bool = False
 
 
 def lies_optionen(seite: Page, karte: Klickkarte, dimension: str) -> list[Option]:
@@ -63,15 +67,15 @@ def lies_optionen(seite: Page, karte: Klickkarte, dimension: str) -> list[Option
         "passt": None if marke is None else marke.passt,
         "marke": None if marke is None else marke.attribut,
         "markenwert": None if marke is None else marke.wert,
-        "gesperrt": knopf.gesperrt,
+        "andereFarbe": knopf.andere_farbe,
     }
     roh = seite.locator(knopf.selektor).evaluate_all(_OPTIONEN_JS, art)
     optionen = []
-    for w, a, g in roh:
+    for w, a, g, f in roh:
         text = " ".join(w.split()) if isinstance(w, str) else ""
         wert = wert_nach_muster(text, knopf.muster) if text else None
         unlesbar = text if text and wert is None else None
-        optionen.append(Option(wert, bool(a), bool(g), unlesbar))
+        optionen.append(Option(wert, bool(a), bool(g), unlesbar, bool(f)))
     return optionen
 
 

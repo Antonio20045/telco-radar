@@ -53,7 +53,7 @@ KNOPFTEILE = (
     GEWAEHLT,
     "fest",
     "adressen",
-    "gesperrt",
+    "andere_farbe",
 )
 ADRESSTEILE = ("selektor", "attribut", "parameter")
 MARKENTEILE = ("attribut", "wert", "passt")
@@ -170,7 +170,7 @@ class Kartenleser:
             wert_in=self.wahlweise_text(daten, "wert_in", feld),
             muster=self.wahlweise_muster(daten, "muster", feld),
             marke=None if marke is None else self.marke(marke, f"{feld}.{GEWAEHLT}"),
-            gesperrt=self.wahlweise_text(daten, "gesperrt", feld),
+            andere_farbe=self.wahlweise_text(daten, "andere_farbe", feld),
         )
 
     def adressen(self, daten: Mapping, feld: str) -> Adressen:

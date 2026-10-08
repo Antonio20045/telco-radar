@@ -28,6 +28,11 @@ import pytest
 from telco_radar.collect.geraete import klicktextleser
 from telco_radar.collect.geraete.klickbedienung import kanarientext
 from telco_radar.collect.geraete.klickkarte import lade_klickkarte
+from telco_radar.collect.geraete.klicklauf import (
+    GRUND_ANDERE_FARBE,
+    NICHT_ERFASST,
+    sperre,
+)
 from telco_radar.collect.geraete.klickoptionen import lies_optionen
 from telco_radar.collect.geraete.klickpfad import am_pfad
 from telco_radar.collect.geraete.klickquellen import Quellenleser
@@ -237,28 +242,74 @@ def test_knoepfe_marken_und_seitenwerte_der_produktseite(chromium):
         seite.close()
 
 
+_VARIANTE = re.compile(
+    r'\\"title\\":\\"[^"\\]*? (\d+ [GT]B) [^"\\]+\\",\\"condition\\":\\"[A-Z]+\\",'
+    r'\\"color\\":\{\\"name\\":\\"([^"\\]+)\\"'
+)
+_FARBE = re.compile(
+    r'<button[^>]*aria-checked="true"[^>]*data-testid="selection-color-item-[^"]*"'
+    r'[^>]*aria-label="([^"]*)"'
+)
+_SPEICHER = re.compile(r'aria-label="([^"]*)" data-testid="memory-size"')
+PRODUKTSEITEN = sorted(p.name for p in _FIX.glob("congstar_produkt_*.html.gz"))
+
+
+def _speicher_je_farbe(html: str) -> dict[str, set[str]]:
+    """Die Speicher je Farbe (``color.name``) aus den eingebetteten Varianten."""
+    farben: dict[str, set[str]] = {}
+    for speicher, farbe in _VARIANTE.findall(html):
+        farben.setdefault(farbe, set()).add(speicher)
+    return farben
+
+
+@pytest.mark.parametrize("datei", PRODUKTSEITEN)
+def test_nicht_vorhanden_heisst_nur_in_anderer_farbe(datei):
+    """Die Speicherknöpfe sind genau die Speicher der Varianten in irgendeiner Farbe;
+    „nicht vorhanden“ steht genau dort, wo die gewählte Farbe den Speicher nicht hat.
+    Ein Speicher, den keine Farbe führt, hat keinen Knopf (Galaxy S25: kein 512 GB)."""
+    html = gzip.decompress((_FIX / datei).read_bytes()).decode("utf-8")
+    je_farbe = _speicher_je_farbe(html)
+    (gewaehlt,) = _FARBE.findall(html)
+    knoepfe = _SPEICHER.findall(html)
+
+    alle = set().union(*je_farbe.values())
+    assert {k.removesuffix(" nicht vorhanden") for k in knoepfe} == alle
+    in_farbe = je_farbe[gewaehlt]
+    assert {k for k in knoepfe if k.endswith(" nicht vorhanden")} == {
+        f"{s} nicht vorhanden" for s in alle - in_farbe
+    }
+
+
 @pytest.mark.parametrize(
-    ("datei", "erwartet"),
+    ("datei", "erwartet", "sperre_512"),
     [
         (
             "congstar_produkt_pixel11.html.gz",
-            [("256 GB", False, True), ("512 GB", True, False)],
+            [("256 GB", False, True, False), ("512 GB", True, False, True)],
+            (NICHT_ERFASST, f"speicher 512 GB {GRUND_ANDERE_FARBE}"),
         ),
         (
             "congstar_produkt_iphone17_20260929.html.gz",
-            [("256 GB", False, True), ("512 GB", False, False)],
+            [("256 GB", False, True, False), ("512 GB", False, False, False)],
+            None,
         ),
     ],
 )
-def test_speicher_nicht_vorhanden_ist_gesperrt(chromium, datei, erwartet):
-    """Pixel 11: aria-label „512 GB nicht vorhanden“ ohne disabled (Tageslauf 08.10.:
-    acht Kombinationen ohne Tarifknöpfe); Gegenprobe iPhone 17, 512 GB lieferbar."""
+def test_speicher_in_anderer_farbe_ist_nicht_erfasst(
+    chromium, datei, erwartet, sperre_512
+):
+    """Pixel 11: Frost gewählt, 512 GB nur in Obsidian (IN_STOCK), Knopf „512 GB nicht
+    vorhanden“ ohne disabled (Tageslauf 08.10.: acht Kombinationen ohne Tarifknöpfe).
+    Nie ``nicht_angeboten``; Gegenprobe iPhone 17 in Weiß, 512 GB dort vorhanden."""
     seite = _ssr(chromium, datei)
     try:
         optionen = lies_optionen(seite, KARTE, "speicher")
-        assert [(o.wert, o.deaktiviert, o.gewaehlt) for o in optionen] == erwartet
     finally:
         seite.close()
+    assert [
+        (o.wert, o.deaktiviert, o.gewaehlt, o.andere_farbe) for o in optionen
+    ] == erwartet
+    assert sperre(optionen[1], "speicher", "512 GB") == sperre_512
 
 
 @pytest.mark.parametrize(

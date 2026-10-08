@@ -126,6 +126,7 @@ class Wache:
         geladen = self.ladung.warte(self.pruefe_tor)
         abstand = self.tor.schleuse.abstand(ziel)
         self.lauf.ladung = self.ladung.diagnose(geladen, abstand)
+        self.pruefe_tor()
         if not geladen:
             self.lauf.stoerung = STOERUNG_ZEIT
             raise Abbruch(LAUF_GESTOERT, self.ladung.grund())

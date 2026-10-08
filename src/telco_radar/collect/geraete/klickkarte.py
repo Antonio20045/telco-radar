@@ -55,8 +55,9 @@ Anbieter verlangt (Befunde je Anbieter):
   den Preis, der mit dem Speicher wechselt; congstar: „36 mtl. Zahlungen“ → 36).
 - ``fest``: eine Dimension ohne Knöpfe mit festem Wert (1&1: Laufzeit 36). Sie wird
   nie geklickt und nie an einer Marke geprüft.
-- ``gesperrt``: CSS-Selektor; ein Klickziel, das darauf passt, gilt wie ``disabled``
-  als nicht angeboten (congstar: ``aria-label`` „512 GB nicht vorhanden“ am Pixel 11).
+- ``andere_farbe``: CSS-Selektor; ein Klickziel, das darauf passt, gibt es nur in einer
+  anderen Farbe. Die Karte klickt keine Farbe, die Kombination heißt ``nicht_erfasst``,
+  nie ``nicht_angeboten`` (congstar: ``aria-label`` „512 GB nicht vorhanden“).
 - ``vorbereitung``: Liste von ``{klick, bis, pruefe}``; vor jeder Lesung muss das
   Element zu ``pruefe`` (ohne: zu ``klick``) auf den CSS-Selektor ``bis`` passen, sonst
   klickt der Crawler ``klick`` (congstar: Rückgabedeal-Schalter aus; 1&1: vorgewähltes

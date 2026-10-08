@@ -3,19 +3,19 @@
 Der Klick-Crawler (``klickcrawler``) füllt diese Typen; dieses Modul ruft keinen Browser
 und kein Netz. Je Kombination gilt einer von vier Zuständen: ``erfasst``,
 ``nicht_angeboten`` (die Seite zeigt die Option in Ruhe deaktiviert), ``nicht_erfasst``
-(Knöpfe, Option oder Zusammenfassung nicht gefunden, Laufzeit nicht lesbar, nicht
-besucht, Seite nicht zur Ruhe gekommen, Preisantwort über die Frist offen, kein
-Preiswert gelesen) oder ``befund`` (das Echo widerspricht sich). ``lesestatus`` setzt
-den Zustand einer Lesung: ohne ``PREISFELD`` (die Gerätrate), bei ``ein_vertrag`` ohne
-``PREISFELD_EIN_VERTRAG`` (den Bündelbetrag) ist sie nie erfasst, auch wenn Tarif,
-Volumen oder Bindung stimmen; die Ratenzahl spiegelt nur den Klick. Ein Lauf ist
-``gelesen``, ``gestoert`` (Bot-Schutz, fehlender Kanarienwert, offene oder gescheiterte
-Preisantwort, Strukturbruch, keine einzige angebotene Kombination), ``gesperrt``
-(robots.txt sperrt Seite, Preisantwort oder Besuchszeit) oder ``zeitgrenze`` (die
-Zeitgrenze des Aufrufers schnitt ihn ab; was er nicht besuchte, heißt so). Lud die
-Hauptseite nicht, ist er gestört mit ``stoerung`` gleich ``STOERUNG_ZEIT``, ohne
-Bot-Schutz (CLAUDE.md Regel 10). Bot-Schutz
-heißt ``bot_schutz``: HTTP 202, 4xx oder 5xx, ein bekanntes Challenge-Muster
+(Knöpfe, Option oder Zusammenfassung nicht gefunden, Option nur in anderer Farbe,
+Laufzeit nicht lesbar, nicht besucht, Seite nicht zur Ruhe gekommen, Preisantwort über
+die Frist offen, kein Preiswert gelesen) oder ``befund`` (das Echo widerspricht sich).
+``lesestatus`` setzt den Zustand einer Lesung: ohne ``PREISFELD`` (die Gerätrate), bei
+``ein_vertrag`` ohne ``PREISFELD_EIN_VERTRAG`` (den Bündelbetrag) ist sie nie erfasst,
+auch wenn Tarif, Volumen oder Bindung stimmen; die Ratenzahl spiegelt nur den Klick. Ein
+Lauf ist ``gelesen``, ``gestoert`` (Bot-Schutz, fehlender Kanarienwert, offene oder
+gescheiterte Preisantwort, Strukturbruch, keine einzige angebotene Kombination),
+``gesperrt`` (robots.txt sperrt Seite, Preisantwort oder Besuchszeit) oder
+``zeitgrenze`` (die Zeitgrenze des Aufrufers schnitt ihn ab; was er nicht besuchte,
+heißt so). Lud die Hauptseite nicht, ist er gestört mit ``stoerung`` gleich
+``STOERUNG_ZEIT``, ohne Bot-Schutz (CLAUDE.md Regel 10). Bot-Schutz heißt
+``bot_schutz``: HTTP 202, 4xx oder 5xx, ein bekanntes Challenge-Muster
 (``CHALLENGE_MUSTER``) oder eine HTML-Seite, wo die Preisschnittstelle JSON liefern
 soll. Gescheiterte Anfragen hält der Lauf mit Grund fest, ebenso jede Hilfsdatei, die
 ohne Regeln in den Browser ging (``Hilfsdatei``, ``klickhilfe``).
@@ -49,6 +49,7 @@ from .klicktext import Buendelwerte, Preiswerte
 if TYPE_CHECKING:
     from .klickbeleg import Belegpaket
     from .klickdiagnose import Diagnose
+    from .klickoptionen import Option
 
 ERFASST = "erfasst"
 NICHT_ANGEBOTEN = "nicht_angeboten"
@@ -59,6 +60,7 @@ LAUF_GESTOERT = "gestoert"
 LAUF_GESPERRT = "gesperrt"
 LAUF_ZEITGRENZE = "zeitgrenze"
 STOERUNG_ZEIT = "zeitueberschreitung"
+GRUND_ANDERE_FARBE = "in der vorgewählten Farbe nicht vorhanden"
 BELEG_OFFEN = "offen"
 BELEGT = "belegt"
 BELEG_FEHLT = "fehlt"
@@ -383,3 +385,16 @@ def _anteil(gefunden: int, gesucht: int) -> float | None:
 
 def _prozent(anteil: float) -> str:
     return f"{round(anteil * 100)} %"
+
+
+def sperre(option: Option, dimension: str, wert: str) -> tuple[str, str] | None:
+    """Status und Grund einer gesperrten, nicht gewählten Option; sonst ``None``.
+
+    Nur in anderer Farbe heißt ``nicht_erfasst``: die Seite führt die Option, der
+    Crawler klickt keine Farbe. Sonst gesperrt heißt ``nicht_angeboten``.
+    """
+    if option.gewaehlt or not option.deaktiviert:
+        return None
+    if option.andere_farbe:
+        return NICHT_ERFASST, f"{dimension} {wert} {GRUND_ANDERE_FARBE}"
+    return NICHT_ANGEBOTEN, f"Seite bietet {dimension} {wert} nicht an"
