@@ -117,6 +117,7 @@ def test_gleicher_geraetepreis_ohne_tarif(katalog, karte, adapter):
         "gleich": 1,
         "abweichend": 0,
         "ohne_gegenstueck": 0,
+        "ohne_ratenzahl": 0,
         "beispiele": [],
     }
     assert zug.rohsaetze == adapter
@@ -145,15 +146,67 @@ def test_ungelesene_anzahlung_wird_nicht_verglichen(katalog, karte, adapter):
     assert zug.bilanz["gegenprobe_geraet"]["gleich"] == 1
 
 
-def test_andere_ratenzahl_ist_ohne_gegenstueck(katalog, karte, adapter):
+def _zahlen(zug) -> tuple[int, int, int]:
+    probe = zug.bilanz["gegenprobe_geraet"]
+    return probe["gleich"], probe["abweichend"], probe["ohne_gegenstueck"]
+
+
+def _zeile(caplog):
+    (zeile,) = [r for r in caplog.records if "Gerätepreise ohne Tarif" in r.message]
+    return zeile
+
+
+def test_andere_ratenzahl_ist_ohne_gegenstueck_und_steht_im_protokoll(
+    katalog, karte, adapter, caplog
+):
+    caplog.set_level(logging.INFO)
+
     zug = _zusammen(katalog, adapter, _datei(karte, "256 GB", "24"))
 
+    assert _zahlen(zug) == (0, 0, 1)
+    zeile = _zeile(caplog)
+    assert zeile.levelno == logging.WARNING and "'ohne_gegenstueck': 1" in zeile.message
+
+
+def test_gleich_steht_als_info_im_protokoll(katalog, karte, adapter, caplog):
+    caplog.set_level(logging.INFO)
+
+    _zusammen(katalog, adapter, _datei(karte, "256 GB", "36"))
+
+    zeile = _zeile(caplog)
+    assert zeile.levelno == logging.INFO and "'gleich': 1" in zeile.message
+
+
+def test_unbekannte_ratenzahl_faellt_aus_dem_vergleich(katalog, karte, adapter):
+    """Weder Ratenzahl noch Laufzeit gelesen, im Adapter keine Laufzeit: unbekannt
+    gegen unbekannt ist kein Vergleich."""
+    ohne = [{**s, "laufzeit_monate": None} for s in adapter]
+    datei = _datei(karte, "256 GB", "36")
+    (kombination,) = datei["seiten"][0]["kombinationen"]
+    kombination["variante"]["laufzeit"] = None
+    kombination["werte"]["ratenzahl"] = None
+
+    zug = _zusammen(katalog, ohne, datei)
+
     probe = zug.bilanz["gegenprobe_geraet"]
-    assert (probe["gleich"], probe["abweichend"], probe["ohne_gegenstueck"]) == (
-        0,
-        0,
-        1,
-    )
+    assert (probe["gleich"], probe["ohne_ratenzahl"]) == (0, 1)
+
+
+@pytest.mark.parametrize(
+    ("feld", "erwartet"),
+    [("geraet_zuzahlung", (1, 0, 0)), ("geraet_monatsrate", (0, 0, 1))],
+    ids=["ohne-anzahlung", "ohne-rate"],
+)
+def test_luecke_im_adapter_ist_keine_abweichung(
+    katalog, karte, adapter, feld, erwartet
+):
+    """Ohne Anzahlung im Adapter zählt die Rate allein; ohne Rate ist der Satz kein
+    Gegenstück. Eine Lücke ist nie eine Abweichung."""
+    luecke = [{**s, feld: None} for s in adapter]
+
+    zug = _zusammen(katalog, luecke, _datei(karte, "256 GB", "36"))
+
+    assert _zahlen(zug) == erwartet
 
 
 def test_ohne_dateien_leer(katalog, adapter):
@@ -163,5 +216,6 @@ def test_ohne_dateien_leer(katalog, adapter):
         "gleich": 0,
         "abweichend": 0,
         "ohne_gegenstueck": 0,
+        "ohne_ratenzahl": 0,
         "beispiele": [],
     }
