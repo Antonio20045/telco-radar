@@ -27,9 +27,10 @@ Jede andere Kombination wird gezählt, nie zu einem Nullwert: ``befund``,
 ``nicht_erfasst``, ``nicht_angeboten``, ``nicht_besucht`` (Grund beginnt mit „nicht
 besucht“), dazu Seiten, die der Lauf nicht öffnete. Ein erfasster Wert ohne Tarif
 (Vodafone: ``unbekannt``), ohne bekannten Speicher oder ohne Preis ist ebenfalls eine
-benannte Lücke. Ein Tarif, den der Tarifbestand nicht kennt, bleibt im Satz; über ihn
-entscheidet ``aus_rohsaetzen`` mit derselben Regel wie für jeden Adapter
-(``ohne_tarifblatt``).
+benannte Lücke; ohne Tarif gehen Anzahlung, Rate und Ratenzahl als ``ohne_tarif`` in die
+Gegenprobe der Gerätepreise (``analyze.klick_geraetepreis``). Ein Tarif, den der
+Tarifbestand nicht kennt, bleibt im Satz; über ihn entscheidet ``aus_rohsaetzen`` mit
+derselben Regel wie für jeden Adapter (``ohne_tarifblatt``).
 """
 
 from __future__ import annotations
@@ -68,11 +69,12 @@ _BINDUNG_IM_NAMEN = re.compile(r"\(\s*\d+\s*Mon\.?\s*\)\s*$", re.I)
 
 @dataclass
 class Klickausbeute:
-    """Die Rohsätze eines Anbieters und je Lücke ihre Zahl."""
+    """Die Rohsätze eines Anbieters, je Lücke ihre Zahl und Gerätepreise ohne Tarif."""
 
     anbieter: str
     rohsaetze: list[dict] = field(default_factory=list)
     luecken: Counter[str] = field(default_factory=Counter)
+    ohne_tarif: list[dict] = field(default_factory=list)
 
     def als_daten(self) -> dict:
         """Zahlen für Bilanz und Protokoll."""
@@ -106,9 +108,37 @@ def ausbeute(daten: dict, katalog: Katalog) -> Klickausbeute:
             satz = rohsatz(kombination, seite, daten, katalog)
             if isinstance(satz, dict):
                 ergebnis.rohsaetze.append(satz)
-            else:
-                ergebnis.luecken[satz] += 1
+                continue
+            ergebnis.luecken[satz] += 1
+            preis = geraetepreis(kombination, seite, daten, katalog)
+            if satz == LUECKE_TARIF and preis is not None:
+                ergebnis.ohne_tarif.append(preis)
     return ergebnis
+
+
+def geraetepreis(
+    kombination: dict, seite: dict, daten: dict, katalog: Katalog
+) -> dict | None:
+    """Anzahlung, Rate und Ratenzahl einer erfassten Kombination in getrennter
+    Preisform; ``None`` ohne Gerät, Speicher aus dem Katalog oder Rate."""
+    if kombination.get("status") != ERFASST or daten.get("vertragsform") == EIN_VERTRAG:
+        return None
+    variante = kombination.get("variante") or {}
+    geraet = katalog.nach_id(str(seite.get("geraet") or ""))
+    gb = speicher_gb(variante.get("speicher"))
+    werte = kombination.get("werte") or {}
+    if geraet is None or gb not in (geraet.speicher or []) or werte.get("rate") is None:
+        return None
+    laufzeit = werte.get("ratenzahl")
+    return {
+        "anbieter": str(daten.get("name") or ""),
+        "device_id": geraet.device_id,
+        "speicher_gb": gb,
+        "laufzeit_monate": variante.get("laufzeit") if laufzeit is None else laufzeit,
+        "geraet_zuzahlung": werte.get("anzahlung"),
+        "geraet_monatsrate": werte.get("rate"),
+        "quelle_url": _quelle(kombination, seite),
+    }
 
 
 def rohsatz(

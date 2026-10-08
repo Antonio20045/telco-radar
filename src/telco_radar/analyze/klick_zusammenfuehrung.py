@@ -24,7 +24,8 @@ Feldern: zwei Quellen werden nie feldweise gemischt. Ohne Gegenstück kommt ein
 Klick-Satz, wie er ist (Lücken bleiben ``None``), nur mit dem Namen eines
 Adaptersatzes anderer Laufzeit (``klick_geschwister``).
 Nennen zwei Klick-Sätze denselben Schlüssel, gilt einer, wenn ihre Werte gleich sind,
-sonst keiner (``mehrdeutig``). Jeder ersetzte Adaptersatz ist Gegenprobe.
+sonst keiner (``mehrdeutig``). Jeder ersetzte Adaptersatz ist Gegenprobe, Gerätepreise
+ohne Tarif sind es über ``klick_geraetepreis``.
 
 Vorrang steht im Bestand, nicht im Lesestand: ``Zusammenfuehrung.buendel`` lässt jedes
 Adapterbündel weg, dessen Eintrag im Bestand eine Klick-Messung jünger als
@@ -55,6 +56,7 @@ from ..collect.geraete.klickziele import geplante_anbieter
 from ..geraete_model import Katalog
 from ..tarif_bezug import Tarifbestand
 from ..tco_model import Buendel, laufzeit_in_monaten
+from .klick_geraetepreis import gegenprobe_geraet
 from .klick_geschwister import Schluessel, geschwister, mit_namen
 from .klick_vollstaendig import CENT, VERGLEICHSFELDER, begleitend, fehlend, nennt
 from .tco_buendel import Buendelbilanz, aus_rohsaetzen
@@ -184,10 +186,12 @@ def fuehre_zusammen(
     """Klick-Sätze ersetzen Adaptersätze mit gleichem Schlüssel (siehe Modulkopf)."""
     eintraege: list[dict] = []
     saetze: list[dict] = []
+    ohne_tarif: list[dict] = []
     for daten in ergebnisse:
-        eintrag, aus_datei = _datei(daten, katalog, heute)
+        eintrag, aus_datei, geraetepreise = _datei(daten, katalog, heute)
         eintraege.append(eintrag)
         saetze.extend(aus_datei)
+        ohne_tarif.extend(geraetepreise)
     eindeutig, mehrdeutig = _eindeutig(saetze)
     index: dict[Schluessel, list[int]] = {}
     for stelle, satz in enumerate(adapter):
@@ -228,6 +232,7 @@ def fuehre_zusammen(
         "ohne_gegenstueck": ohne_gegenstueck,
         "klick_vorrang": 0,
         "gegenprobe": probe.als_daten(),
+        "gegenprobe_geraet": gegenprobe_geraet(ohne_tarif, adapter, geraet),
     }
     _protokolliere(bilanz)
     bleiben = [satz for stelle, satz in enumerate(adapter) if stelle not in ersetzt]
@@ -258,8 +263,11 @@ def alter_tage(datum: object, heute: str) -> int | None:
         return None
 
 
-def _datei(daten: dict, katalog: Katalog, heute: str) -> tuple[dict, list[dict]]:
-    """Kopf einer Ergebnisdatei für die Bilanz und, wenn verwendet, ihre Rohsätze."""
+def _datei(
+    daten: dict, katalog: Katalog, heute: str
+) -> tuple[dict, list[dict], list[dict]]:
+    """Kopf einer Ergebnisdatei für die Bilanz und, wenn verwendet, ihre Rohsätze und
+    Gerätepreise ohne Tarif."""
     status = daten.get("laufstatus")
     datum = daten.get("datum")
     alter = alter_tage(datum, heute)
@@ -285,10 +293,10 @@ def _datei(daten: dict, katalog: Katalog, heute: str) -> tuple[dict, list[dict]]
     elif status != LAUF_GELESEN:
         eintrag["warum_nicht"] = f"Lauf {status}: {daten.get('grund')}"
     if eintrag["warum_nicht"] is not None:
-        return eintrag, []
+        return eintrag, [], []
     aus = ausbeute(daten, katalog)
     eintrag.update(aus.als_daten(), verwendet=True)
-    return eintrag, aus.rohsaetze
+    return eintrag, aus.rohsaetze, aus.ohne_tarif
 
 
 def _eindeutig(saetze: list[dict]) -> tuple[list[dict], list[str]]:
