@@ -31,6 +31,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from .klickbeleg import werte_als_json
+from .klickdiagnose import diagnose_als_daten
 from .klickkarte import DIMENSIONEN
 from .klicklauf import (
     ERFASST,
@@ -62,10 +63,11 @@ STAND_DATEI = "klick_stand.json"
 
 
 def kombination_als_daten(ergebnis: Kombiergebnis) -> dict:
-    """Eine Kombination als JSON ohne Screenshot, Text und Belegdateien."""
+    """Eine Kombination als JSON ohne Screenshot, Text und Belegdateien; eine Kachel
+    des Weiter-Schritts mit ``diagnose`` (``klickdiagnose``)."""
     beleg = ergebnis.beleg.beleg if ergebnis.beleg is not None else None
     url = ergebnis.antwort_url
-    return {
+    daten = {
         "auswahl": dict(zip(DIMENSIONEN, ergebnis.auswahl, strict=False)),
         "variante": asdict(ergebnis.variante),
         "status": ergebnis.status,
@@ -84,6 +86,9 @@ def kombination_als_daten(ergebnis: Kombiergebnis) -> dict:
         },
         "beleg_status": ergebnis.beleg_status,
     }
+    if ergebnis.diagnose is not None:
+        daten["diagnose"] = diagnose_als_daten(ergebnis.diagnose)
+    return daten
 
 
 def seite_als_daten(ziel: Seitenziel, lauf: Klicklauf) -> dict:

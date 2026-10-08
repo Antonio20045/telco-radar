@@ -46,6 +46,7 @@ from .klicktext import Buendelwerte, Preiswerte
 
 if TYPE_CHECKING:
     from .klickbeleg import Belegpaket
+    from .klickdiagnose import Diagnose
 
 ERFASST = "erfasst"
 NICHT_ANGEBOTEN = "nicht_angeboten"
@@ -149,7 +150,8 @@ class Kombiergebnis:
     was Text und Antwort gleich nennen; ``textwerte`` und ``antwortwerte`` sind die
     beiden Lesungen davor, ``None`` heißt nicht gelesen. ``buendel`` hat nur eine
     Karte mit ``vertragsform`` ``ein_vertrag``, ebenso ``textbuendel`` und
-    ``antwortbuendel``, die beiden Lesungen der Bündelwerte.
+    ``antwortbuendel``, die beiden Lesungen der Bündelwerte. ``diagnose`` hat nur eine
+    Kachel des Weiter-Schritts (``klickdiagnose``).
     """
 
     variante: Variante
@@ -169,6 +171,7 @@ class Kombiergebnis:
     buendel: Buendelwerte | None = None
     textbuendel: Buendelwerte | None = None
     antwortbuendel: Buendelwerte | None = None
+    diagnose: Diagnose | None = None
 
     @property
     def gueltig(self) -> bool:

@@ -7,13 +7,16 @@ Die Produktseite wählt den Speicher und hält Bündelbetrag, Einmalzahlung und 
 („HW24“, „HW24+12“). Die Folgeseite schickt selbst ein POST, das nie hinausgehen darf.
 Erwartet: je Speicher ein frischer Kontext (der Warenkorb-POST sieht kein Cookie), die
 Kachel 24+12 erfasst mit Bündelbetrag und Einmalzahlung, die Kachel 24 bleibt Befund
-(die Globale nennt 36). Gegenproben: eine Folgeseite mit Passwortfeld beendet den Lauf,
-ein Weiter-Knopf mit Kaufwort wird nie geklickt. Keine Anfrage verlässt den Rechner.
+(die Globale nennt 36). Jede Kachel trägt ihre Diagnose: Folgeseite, beide Lesungen
+und wo ihr Betrag auf der Folgeseite sonst steht, nicht auf der Startseite.
+Gegenproben: eine Folgeseite mit Passwortfeld beendet den Lauf, ein Weiter-Knopf mit
+Kaufwort wird nie geklickt. Keine Anfrage verlässt den Rechner.
 """
 
 from __future__ import annotations
 
 import json
+import re
 from urllib.parse import urlsplit
 
 import pytest
@@ -164,6 +167,46 @@ def test_je_speicher_frischer_kontext_kachel_36_erfasst_24_befund(chromium):
     assert [p for p, _ in server.posts if p != "/korb"] == []
     assert {v.grund for v in lauf.verworfen} == {GRUND_NUR_LESEN}
     assert {"128", "256"} <= cookies
+
+
+def test_diagnose_je_kachel_folgeseite_lesungen_und_fundstellen(chromium):
+    """Nur die Folgeseite zählt: 44,99 steht als Globale auf der Startseite und ist
+    dort keine Fundstelle; 59,99 steht im JSON-LD der Folgeseite, 66,99 nirgends."""
+    from telco_radar.collect.geraete.klickergebnis import kombination_als_daten
+    from telco_radar.collect.geraete.klicktext import Buendelwerte
+
+    angebot = '<script type="application/ld+json">{"price": "59.99"}</script>'
+    lauf, _, _ = _laufe(chromium, zusatz=angebot)
+    ergebnisse = nach_auswahl(lauf)
+    diagnosen = {k: e.diagnose for k, e in ergebnisse.items()}
+
+    assert lauf.status == "gelesen", lauf.grund
+    for (speicher, _, monate), diagnose in diagnosen.items():
+        adresse = urlsplit(diagnose.folgeseite)
+        assert (adresse.path, adresse.query) == (
+            "/bestellung/laufzeit",
+            f"speicher={speicher}",
+        )
+        assert diagnose.antwort_laufzeit == 36
+        assert diagnose.ohne_suche is None
+        if monate == 36:
+            assert diagnose.kachel == diagnose.antwort
+            assert diagnose.fundstellen == ()
+    kurz = diagnosen[("128", "S", 24)]
+    assert kurz.kachel == Buendelwerte(buendelbetrag=59.99)
+    assert kurz.antwort == Buendelwerte(buendelbetrag=44.99, einmalzahlung=300.0)
+    assert len(kurz.fundstellen) == 1
+    assert re.fullmatch(
+        r"script \d+ \(application/ld\+json\) bei price", kurz.fundstellen[0]
+    )
+    assert diagnosen[("256", "S", 24)].kachel == Buendelwerte(buendelbetrag=66.99)
+    assert diagnosen[("256", "S", 24)].fundstellen == ()
+    daten = kombination_als_daten(ergebnisse[("128", "S", 24)])["diagnose"]
+    assert daten["kachel"] == {"buendelbetrag": 59.99, "einmalzahlung": None}
+    assert (daten["antwort_laufzeit"], daten["fundstellen"]) == (
+        36,
+        list(kurz.fundstellen),
+    )
 
 
 def test_gegenprobe_folgeseite_mit_passwortfeld_beendet_den_lauf(chromium):

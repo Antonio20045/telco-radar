@@ -21,7 +21,7 @@ Klick-Crawler (``klickcrawler``) je Kombination der übrigen Dimensionen so vor:
 5. Er liest jede Kachel (``knoepfe.<kacheln>``): Wert wie bei Knöpfen, nie geklickt;
    die Zusammenfassung ist die Kachel an derselben Stelle. Einen zweiten Klick gibt
    es nicht: der Lader lehnt ``oeffnen``, ``schliessen`` und Textmuster mit eigenem
-   Selektor ab.
+   Selektor ab. Jede gelesene Kachel trägt ihre ``klickdiagnose.Diagnose``.
 
 Scheitert der Weiter-Klick (Knopf fehlt, nicht eindeutig, verboten, nicht klickbar,
 keine neue Adresse), heißt die Kombination ``nicht_erfasst`` mit Grund, und die
@@ -41,6 +41,7 @@ from urllib.parse import urlsplit
 
 from playwright.sync_api import Error as PlaywrightFehler
 
+from .klickdiagnose import diagnose
 from .klickecho import LAUFZEIT, Variante, variante_aus
 from .klickkarte import DIMENSIONEN
 from .klickkontext import Sitzung, cookie_werte, schliesse
@@ -313,6 +314,7 @@ def _kacheln(
         variante = variante_aus(*(ziel[d] for d in DIMENSIONEN))
         return [Kombiergebnis(variante, NICHT_ERFASST, fehlen(gang.karte, kachel))]
     ergebnisse: list[Kombiergebnis] = []
+    selektor = gang.karte.knoepfe[kachel].selektor
     for stelle, option in enumerate(optionen):
         wert = option.unlesbar if option.wert is None else option.wert
         kombi = {**ziel, kachel: wert}
@@ -330,6 +332,8 @@ def _kacheln(
             ergebnis = _zu_viele(gang, variante)
         else:
             ergebnis = _lies(gang, variante, kombi, vorab, stelle)
+            befund = diagnose(gang.seite, ergebnis, vorab, selektor)
+            ergebnis = replace(ergebnis, diagnose=befund)
         auswahl = tuple(kombi[d] for d in DIMENSIONEN)
         ergebnisse.append(replace(ergebnis, auswahl=auswahl))
     return ergebnisse

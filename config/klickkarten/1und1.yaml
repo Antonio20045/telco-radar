@@ -20,6 +20,8 @@
 # 24: Betrag steht in der Kachel (P3 „59 , 99 €/Mon.“), aber keine zweite Quelle ist
 # belegt (die Globalen gelten für 24+12, currentHardwareOfferDuration '36'); die
 # Kombination bleibt Befund „Antwort nennt 36 statt 24“ statt eines ungeprüften Werts.
+# Tageslauf 08.10. (Actions 37740022815): so bei allen 15 Starts. Je Kachel steht nun
+# im Ergebnis ``diagnose`` (klickdiagnose): wo der Kachelbetrag auf der Folgeseite steht.
 # Bewusst nicht gelesen (Lücke):
 # - andere Tarife: Beide Kacheln tragen nur chosenTariff=tariff-anf-s-mvl (B3/B4
 #   Elemente 1 und 5); die Tarifauswahl ist der nächste Schritt hinter „Weiter“ in
