@@ -39,7 +39,7 @@ from .klickkachel import (
     QUELLE_KACHEL,
     kachel_echo,
     kacheldimension,
-    kachellabel,
+    kachellabels,
     kachelpfade,
 )
 from .klickkarte import (
@@ -217,8 +217,8 @@ class Leser(Textleser):
         if abweichung:
             echo = Echo(Preiswerte(), abweichung, ())
         elif kachel is not None:
-            label = kachellabel(bereich, self.karte, kachel)
-            auswahl = (kachel, ziel[kachel], label)
+            labels = kachellabels(bereich, self.karte, kachel)
+            auswahl = (kachel, ziel[kachel], labels)
             entfallen = self.karte.entfallen
             echo = kachel_echo(variante, angezeigt, auswahl, textbuendel, entfallen)
             pfade = kachelpfade(echo.buendel)

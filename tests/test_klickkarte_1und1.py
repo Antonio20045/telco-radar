@@ -10,8 +10,10 @@ vom 08.09.2026 (``einsundeins_produktseite_iphone_17_pro.html.gz``). Ihre Werte 
 und 360 € sind dieselben, die die Kachel „24+12“ am 07.10. zeigte. Herkunft beider
 Dateien in ``tests/fixtures/geraete/_herkunft.json``. Die Kachel 24 bestätigt die
 Globale nie (sie nennt 36); seit dem 08.10.2026 bestätigt die Kachel sich selbst
-(``klickkachel``): Label und Betrag in derselben Kachel, 59,99 € ohne Einmalzahlung.
-Gegenproben: ein anderes Label oder keines ist Befund, die Kachel 24+12 bleibt beim
+(``klickkachel``): Label und Betrag in derselben Kachel, 59,99 € ohne Einmalzahlung;
+die Einmalzahlung kommt nie aus dem Kacheltext, auch wenn er eine nennt (24+12: 360 €).
+Gegenproben: ein anderes Label, keines oder mehr als eines (beide Labels der Erkundung
+in einer Kachel) ist Befund, die Kachel 24+12 bleibt beim
 Echo gegen die Globale (eine fremde Kachel ist dort Befund), 512 GB liest seinen
 eigenen Betrag, nie den eines Zubehör-Bündels, und eine Farbe, die es nicht gibt,
 liest keinen.
@@ -247,10 +249,10 @@ def test_globale_bestaetigt_kachel_24_nie(karte, weg, globale):
     assert echo.buendel == Buendelwerte()
 
 
-def _kachel(karte, globale, gewaehlt: str, label: str | None, gezeigt):
+def _kachel(karte, globale, gewaehlt: str, labels, gezeigt):
     lesung = lies_antwort(globale, karte.antwort, None, PLATZ)
     variante = variante_aus("256", "tariff-anf-s-mvl", gewaehlt)
-    auswahl = ("laufzeit", gewaehlt, label)
+    auswahl = ("laufzeit", gewaehlt, labels)
     echo = kachel_echo(variante, variante, auswahl, gezeigt, karte.entfallen)
     return kacheldimension(karte, variante, lesung), lesung, echo
 
@@ -268,21 +270,38 @@ def test_kachel_24_bestaetigt_sich_selbst_ohne_einmalzahlung(karte, globale):
     assert kachelpfade(echo.buendel) == {"buendelbetrag": QUELLE_KACHEL}
 
 
+def test_kachel_als_quelle_nimmt_nie_eine_einmalzahlung(karte, globale):
+    """Der Text der Kachel 24+12 nennt 360 €; als eigene Quelle übernimmt sie nur den
+    Bündelbetrag, die Einmalzahlung bleibt Lücke (Prüferbefund zu a1ed9e94)."""
+    label, gezeigt = einsundeins_kachel(1)
+
+    _, _, echo = _kachel(karte, globale, label, (label,), gezeigt)
+
+    assert gezeigt == Buendelwerte(buendelbetrag=44.99, einmalzahlung=360.0)
+    assert echo.stimmt, echo.befunde
+    assert echo.buendel == Buendelwerte(buendelbetrag=44.99)
+    assert "einmalzahlung" in echo.luecken
+    assert kachelpfade(echo.buendel) == {"buendelbetrag": QUELLE_KACHEL}
+
+
 @pytest.mark.parametrize(
-    ("label", "grund"),
+    ("labels", "grund"),
     [
-        ("24+12", "Kachel nennt 24+12 statt 24"),
-        (None, "Kachel nennt keine Option für laufzeit"),
+        (("24+12",), "Kachel nennt 24+12 statt 24"),
+        ((), "Kachel nennt keine Option für laufzeit"),
+        ((None,), "Kachel nennt keine Option für laufzeit"),
+        (("24", "24+12"), "Kachel nennt 2 Optionen für laufzeit: 24, 24+12"),
+        (("24", "24"), "Kachel nennt 2 Optionen für laufzeit: 24, 24"),
     ],
-    ids=["label-36", "ohne-label"],
+    ids=["label-36", "ohne-label", "label-ohne-wert", "zwei-labels", "doppelt"],
 )
-def test_gegenprobe_kachel_mit_anderem_oder_ohne_label_ist_befund(
-    karte, globale, label, grund
+def test_gegenprobe_kachel_mit_anderem_ohne_oder_mehr_als_einem_label_ist_befund(
+    karte, globale, labels, grund
 ):
     anderes, _ = einsundeins_kachel(1)
     _, gezeigt = einsundeins_kachel(0)
 
-    _, _, echo = _kachel(karte, globale, "24", label, gezeigt)
+    _, _, echo = _kachel(karte, globale, "24", labels, gezeigt)
 
     assert anderes == "24+12"
     assert [(b.feld, b.grund) for b in echo.befunde] == [("kachel.laufzeit", grund)]

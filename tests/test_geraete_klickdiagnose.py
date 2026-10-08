@@ -8,7 +8,10 @@ Netz; die Beträge der Kacheln stammen aus der Erkundung vom 07.10.2026
 (``einsundeins_bestellweg_laufzeit_20261007.json``, Seite 3). Die Suche findet den
 Betrag der Kachel 24+12 in ``hwdVariantsPrices`` und im JSON-LD; Gegenprobe: den
 Betrag der Kachel 24 nennt die Produktseite nirgends. Ohne Betrag oder bei einem
-Fehler wird nicht gesucht, mit Grund, nie „nichts gefunden“.
+Fehler wird nicht gesucht, mit Grund, nie „nichts gefunden“; ebenso, wenn die Suche
+an ``HOECHSTE_KNOTEN`` abbricht (Prüferbefund zu 3da878d3: ein Array mit 60 000
+Einträgen vor der Globalen mit dem Betrag; Gegenprobe mit 600). Gespeichert werden nur
+Orte und Ja/Nein-Merkmale, nie Beträge; Kennungen in Orten werden ``*``, Namen nicht.
 """
 
 from __future__ import annotations
@@ -23,12 +26,16 @@ from playwright.sync_api import Error as PlaywrightFehler
 
 from telco_radar.collect.geraete.klickantwort import Antwortlesung
 from telco_radar.collect.geraete.klickdiagnose import (
+    GRUND_ABGEBROCHEN,
     GRUND_GESCHEITERT,
     GRUND_OHNE_BETRAG,
+    KENNUNG,
+    Suche,
     betragsmuster,
     diagnose,
     diagnose_als_daten,
     fundstellen,
+    ohne_kennungen,
 )
 from telco_radar.collect.geraete.klickecho import variante_aus
 from telco_radar.collect.geraete.klicklauf import BEFUND, Kombiergebnis
@@ -64,7 +71,8 @@ def produktseite(chromium):
 def test_produktseite_nennt_nur_den_betrag_der_kachel_24_plus_12(produktseite):
     kurz, lang = _kachelbetraege()
 
-    funde = fundstellen(produktseite, lang, KACHEL)
+    suche = fundstellen(produktseite, lang, KACHEL)
+    funde = suche.funde
 
     assert (kurz, lang) == (59.99, 44.99)
     assert 'window.hwdVariantsPrices["product-COSMIC_ORANGE-256"][0]' in funde
@@ -74,7 +82,8 @@ def test_produktseite_nennt_nur_den_betrag_der_kachel_24_plus_12(produktseite):
     preise = [f for f in funde if f.startswith("window.hwdVariantsPrices")]
     assert preise and all(f.endswith('-256"][0]') for f in preise)
     assert produktseite.evaluate("() => window.currentHardwareOfferDuration") == "36"
-    assert fundstellen(produktseite, kurz, KACHEL) == ()
+    assert suche.abgebrochen is None
+    assert fundstellen(produktseite, kurz, KACHEL) == Suche(())
 
 
 def test_betragsmuster_nur_als_ganzer_betrag():
@@ -92,11 +101,11 @@ class _Seite:
     def __init__(self, fehler: BaseException | None = None) -> None:
         self.fehler, self.aufrufe = fehler, 0
 
-    def evaluate(self, *_: object) -> list[str]:
+    def evaluate(self, *_: object) -> dict:
         self.aufrufe += 1
         if self.fehler is not None:
             raise self.fehler
-        return []
+        return {"funde": [], "abgebrochen": False}
 
 
 def _vorab() -> Vorlesung:
@@ -132,11 +141,72 @@ def test_ohne_betrag_oder_bei_fehler_keine_fundstellen_sondern_grund():
     assert fehler.ohne_suche == f"{GRUND_GESCHEITERT}: Execution context was destroyed"
     assert (nichts.fundstellen, nichts.ohne_suche) == ((), None)
     assert daten == {
-        "kachel": {"buendelbetrag": 59.99, "einmalzahlung": None},
-        "antwort": {"buendelbetrag": 44.99, "einmalzahlung": None},
+        "kachel_betrag": True,
+        "kachel_einmalzahlung": False,
+        "antwort_betrag": True,
+        "antwort_einmalzahlung": False,
+        "gleicher_betrag": False,
         "antwort_laufzeit": 36,
         "fundstellen": [],
         "ohne_suche": None,
     }
     assert folgeseite.startswith(f"{FOLGESEITE}?traceId=x&token=")
     assert "geheim" not in folgeseite
+
+
+ABBRUCH = """<!doctype html><html><body>
+<div id="tariff-cards-container"><div><div>
+<add-to-cart-button data-linkid="content_tile :: button :: Weiter mit HW24">Weiter
+</add-to-cart-button><p>59 , 99 €/Mon.</p></div></div></div>
+<script>
+window.angebot = {laufzeit24: {monatlich: (6000 - 1) / 100}};
+window.verlauf = new Array(@ANZAHL@).fill(1);
+</script></body></html>"""
+
+
+@pytest.mark.browser
+@pytest.mark.parametrize(
+    ("anzahl", "funde", "grund"),
+    [
+        (60_000, None, GRUND_ABGEBROCHEN),
+        (600, ("window.angebot.laufzeit24.monatlich",), None),
+    ],
+    ids=["abgebrochen", "gegenprobe-ganz-durchsucht"],
+)
+def test_abgebrochene_suche_ist_nicht_nichts_gefunden(chromium, anzahl, funde, grund):
+    blatt = chromium.new_page()
+    try:
+        blatt.set_content(ABBRUCH.replace("@ANZAHL@", str(anzahl)))
+        gezeigt = Buendelwerte(buendelbetrag=59.99)
+        befund = diagnose(blatt, _ergebnis(gezeigt), _vorab(), KACHEL)
+    finally:
+        blatt.close()
+
+    assert (befund.fundstellen, befund.ohne_suche) == (funde, grund)
+
+
+def test_kennungen_in_orten_werden_maskiert_namen_bleiben():
+    korb, jwt = (
+        "Qx7LmN2pRzWkTv",
+        "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJrdW5kZSJ9.c2lnbmF0dXI",
+    )
+    uuid = "3f2b8c1e-4d5a-4b6c-9e7f-0a1b2c3d4e5f"
+    orte = {
+        f"window.shop.cart.{korb}.items[0].price": "window.shop.cart.*.items[0].price",
+        f'window.shop.sitzung["{jwt}"].preis': 'window.shop.sitzung["*"].preis',
+        f'window.korb["{uuid}"].summe': 'window.korb["*"].summe',
+        "window.k.a1b2c3d4e5f6g7h8z": "window.k.*",
+        "window.bestellung[88123456]": "window.bestellung[*]",
+    }
+    gegenprobe = [
+        'window.hwdVariantsPrices["product-COSMIC_ORANGE-256"][0]',
+        "window.currentHardwareOfferDuration",
+        "window.laufzeit24",
+        "window.verlauf[59999]",
+        "script 3 (application/ld+json) bei price",
+        "add-to-cart-button[data-linkid] in Kachel 1",
+    ]
+
+    assert KENNUNG == "*"
+    assert {ort: ohne_kennungen(ort) for ort in orte} == orte
+    assert [ohne_kennungen(ort) for ort in gegenprobe] == gegenprobe

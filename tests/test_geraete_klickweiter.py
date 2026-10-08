@@ -9,10 +9,11 @@ Erwartet: je Speicher ein frischer Kontext (der Warenkorb-POST sieht kein Cookie
 Kachel 24+12 erfasst mit Bündelbetrag und Einmalzahlung gegen die Globale, die Kachel
 24 erfasst aus der Kachel selbst (die Globale nennt 36): Bündelbetrag, Einmalzahlung als
 Lücke, Herkunft „Kachel der Folgeseite“ in Ergebnis und Beleg. Jede Kachel trägt ihre
-Diagnose: Folgeseite, beide Lesungen und wo ihr Betrag auf der Folgeseite sonst steht,
-nicht auf der Startseite. Gegenproben: weicht die Kachel 24+12 von der Globalen ab, ist
-sie Befund; eine Folgeseite mit Passwortfeld beendet den Lauf, ein Weiter-Knopf mit
-Kaufwort wird nie geklickt. Keine Anfrage verlässt den Rechner.
+Diagnose: Folgeseite, was beide Lesungen nennen (ohne Beträge) und wo ihr Betrag auf
+der Folgeseite sonst steht, nicht auf der Startseite. Gegenproben: weicht die Kachel
+24+12 von der Globalen ab, ist sie Befund; eine Folgeseite mit Passwortfeld beendet den
+Lauf, ein Weiter-Knopf mit Kaufwort wird nie geklickt. Keine Anfrage verlässt den
+Rechner.
 """
 
 from __future__ import annotations
@@ -198,7 +199,6 @@ def test_diagnose_je_kachel_folgeseite_lesungen_und_fundstellen(chromium):
     """Nur die Folgeseite zählt: 44,99 steht als Globale auf der Startseite und ist
     dort keine Fundstelle; 59,99 steht im JSON-LD der Folgeseite, 66,99 nirgends."""
     from telco_radar.collect.geraete.klickergebnis import kombination_als_daten
-    from telco_radar.collect.geraete.klicktext import Buendelwerte
 
     angebot = '<script type="application/ld+json">{"price": "59.99"}</script>'
     lauf, _, _ = _laufe(chromium, zusatz=angebot)
@@ -214,20 +214,24 @@ def test_diagnose_je_kachel_folgeseite_lesungen_und_fundstellen(chromium):
         )
         assert diagnose.antwort_laufzeit == 36
         assert diagnose.ohne_suche is None
+        merkmale = (
+            diagnose.kachel_betrag,
+            diagnose.kachel_einmalzahlung,
+            diagnose.antwort_betrag,
+            diagnose.antwort_einmalzahlung,
+            diagnose.gleicher_betrag,
+        )
+        assert merkmale == (True, monate == 36, True, True, monate == 36)
         if monate == 36:
-            assert diagnose.kachel == diagnose.antwort
             assert diagnose.fundstellen == ()
     kurz = diagnosen[("128", "S", 24)]
-    assert kurz.kachel == Buendelwerte(buendelbetrag=59.99)
-    assert kurz.antwort == Buendelwerte(buendelbetrag=44.99, einmalzahlung=300.0)
     assert len(kurz.fundstellen) == 1
     assert re.fullmatch(
         r"script \d+ \(application/ld\+json\) bei price", kurz.fundstellen[0]
     )
-    assert diagnosen[("256", "S", 24)].kachel == Buendelwerte(buendelbetrag=66.99)
     assert diagnosen[("256", "S", 24)].fundstellen == ()
     daten = kombination_als_daten(ergebnisse[("128", "S", 24)])["diagnose"]
-    assert daten["kachel"] == {"buendelbetrag": 59.99, "einmalzahlung": None}
+    assert (daten["kachel_betrag"], daten["gleicher_betrag"]) == (True, False)
     assert (daten["antwort_laufzeit"], daten["fundstellen"]) == (
         36,
         list(kurz.fundstellen),

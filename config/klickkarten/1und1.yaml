@@ -20,9 +20,10 @@
 # 24: Betrag steht nur in der Kachel (P3 „59 , 99 €/Mon.“); die Globalen gelten für
 # 24+12 (currentHardwareOfferDuration '36') und bestätigen 24 nie (Tageslauf 08.10.,
 # Actions 37740022815, alle 15 Starts). Seit 08.10. ist die Kachel dafür eigene Quelle
-# (klickkachel): Label in der Kachel = gewählte Laufzeit, Bündelbetrag aus ihrem Text,
-# Einmalzahlung Lücke; ohne oder mit anderem Label bleibt es Befund. Je Kachel steht
-# im Ergebnis ``diagnose`` (klickdiagnose): wo der Kachelbetrag auf der Folgeseite steht.
+# (klickkachel): genau ein Label in der Kachel = gewählte Laufzeit, Bündelbetrag aus
+# ihrem Text, Einmalzahlung immer Lücke; ohne, mit anderem oder mehr als einem Label
+# bleibt es Befund. Je Kachel steht im Ergebnis ``diagnose`` (klickdiagnose): wo der
+# Kachelbetrag auf der Folgeseite steht, ohne Beträge.
 # Bewusst nicht gelesen (Lücke):
 # - andere Tarife: Beide Kacheln tragen nur chosenTariff=tariff-anf-s-mvl (B3/B4
 #   Elemente 1 und 5); die Tarifauswahl ist der nächste Schritt hinter „Weiter“ in

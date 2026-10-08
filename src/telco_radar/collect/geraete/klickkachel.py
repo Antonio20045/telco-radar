@@ -11,24 +11,28 @@ mit ``weiter``, nur wenn die zweite Lesung gelesen ist und für die Kacheldimens
 andere Option nennt als die gewählte. Nennt sie dieselbe (1&1: 24+12) oder keine, gilt
 das Echo gegen die zweite Lesung wie bisher; eine Abweichung bleibt dort Befund.
 
-``kachel_echo`` übernimmt dann nur, was die Kachel selbst nennt: Das Label in der
-Kachel, beim Lesen erneut gelesen, muss genau die gewählte Option nennen (sonst
-Befund ``GRUND_ANDERES_LABEL`` oder ohne Label ``GRUND_OHNE_LABEL``), und der
-Bündelbetrag muss im Text der Kachel stehen (sonst ``GRUND_OHNE_BETRAG``). Die
-Einmalzahlung kommt nur aus derselben Kachel; nennt sie keine, ist sie die benannte
-Lücke ``einmalzahlung``, nie der Wert der zweiten Lesung. Die übrigen Wertfelder
-bestätigt keine zweite Quelle; sie sind Lücken. Herkunft im Ergebnis
-(``Kombiergebnis.echo_quelle``) und im Beleg statt eines JSON-Pfads ist
+``kachellabels`` liest beim Lesen erneut jedes Label in der Kachel: jedes Element
+``wert_in`` darin (ohne ``wert_in`` die Kachel selbst), je Treffer des Musters ein
+Wert, ein Element ohne Treffer als ``None``. ``kachel_echo`` übernimmt dann nur den
+Bündelbetrag aus dem Text der Kachel, und nur wenn sie genau ein Label nennt und das
+genau die gewählte Option ist (sonst Befund ``GRUND_OHNE_LABEL``,
+``GRUND_MEHRERE_LABEL`` oder ``GRUND_ANDERES_LABEL``) und der Bündelbetrag im Text
+steht (sonst ``GRUND_OHNE_BETRAG``). Die Einmalzahlung ist immer die benannte Lücke
+``einmalzahlung``, auch wenn der Text der Kachel eine nennt: Ein Hinweis in der Kachel
+kann die Einmalzahlung einer anderen Laufzeit nennen (Prüferbefund zu a1ed9e94), und
+keine zweite Quelle ordnet sie zu. Die übrigen Wertfelder sind ebenso Lücken. Herkunft
+im Ergebnis (``Kombiergebnis.echo_quelle``) und im Beleg statt eines JSON-Pfads ist
 ``QUELLE_KACHEL``. Die Prüfung der Seitenwerte (Speicher, Tarif) gilt wie im Echo.
 """
 
 from __future__ import annotations
 
+import re
+from dataclasses import replace
 from typing import TYPE_CHECKING
 
 from .klickecho import Befund, Echo, Variante, gleiche_option, seitenbefunde
 from .klickkarte import BUENDELFELDER, WERTFELDER
-from .klickoptionen import optionen_in
 from .klicktext import Buendelwerte, Preiswerte
 
 if TYPE_CHECKING:
@@ -38,9 +42,17 @@ if TYPE_CHECKING:
     from .klickkarte import Klickkarte
 
 QUELLE_KACHEL = "Kachel der Folgeseite"
+NUR_AUS_DER_KACHEL = frozenset({"buendelbetrag"})
 GRUND_OHNE_LABEL = "Kachel nennt keine Option für {dimension}"
+GRUND_MEHRERE_LABEL = "Kachel nennt {anzahl} Optionen für {dimension}: {labels}"
 GRUND_ANDERES_LABEL = "Kachel nennt {label} statt {gewaehlt}"
 GRUND_OHNE_BETRAG = "Kachel nennt keinen Bündelbetrag"
+Labels = str | tuple[str | None, ...] | None
+_LABELS_JS = """(kacheln, art) => kacheln.flatMap((k) => {
+  const traeger = !art.wertIn ? [k]
+    : [...(k.matches(art.wertIn) ? [k] : []), ...k.querySelectorAll(art.wertIn)];
+  return traeger.map((t) => art.wert ? t.getAttribute(art.wert) : t.innerText);
+})"""
 
 
 def kacheldimension(
@@ -57,37 +69,69 @@ def kacheldimension(
     return dimension
 
 
-def kachellabel(kachel: Locator, karte: Klickkarte, dimension: str) -> str | None:
-    """Die Option, die das Label in der Kachel jetzt nennt; ``None`` ohne Label."""
-    optionen = optionen_in(kachel, karte, dimension)
-    return optionen[0].wert if len(optionen) == 1 else None
+def kachellabels(
+    kachel: Locator, karte: Klickkarte, dimension: str
+) -> tuple[str | None, ...]:
+    """Jedes Label in der Kachel (siehe Modulkopf); leer ohne Label-Element."""
+    knopf = karte.knoepfe[dimension]
+    art = {"wert": knopf.wert_attribut, "wertIn": knopf.wert_in}
+    roh = kachel.evaluate_all(_LABELS_JS, art)
+    return tuple(w for r in roh for w in labels_in(r, knopf.muster))
+
+
+def labels_in(roh: object, muster: re.Pattern[str] | None) -> list[str | None]:
+    """Jeder Wert, den ``muster`` in ``roh`` findet; ``[None]`` ohne Treffer."""
+    text = " ".join(roh.split()) if isinstance(roh, str) else ""
+    if not text:
+        return [None]
+    if muster is None:
+        return [text]
+    teile = (t[1] if muster.groups else t[0] for t in muster.finditer(text))
+    werte: list[str | None] = [t.strip() for t in teile if t is not None and t.strip()]
+    return werte or [None]
+
+
+def _labelbefund(dimension: str, option: str | None, gelesen: Labels) -> Befund | None:
+    feld = f"kachel.{dimension}"
+    labels = gelesen if isinstance(gelesen, tuple) else (gelesen,)
+    if len(labels) > 1:
+        genannt = ", ".join("ohne Wert" if x is None else x for x in labels)
+        grund = GRUND_MEHRERE_LABEL.format(
+            anzahl=len(labels), dimension=dimension, labels=genannt
+        )
+        return Befund(feld, grund)
+    label = labels[0] if labels else None
+    if label is None:
+        return Befund(feld, GRUND_OHNE_LABEL.format(dimension=dimension))
+    if not gleiche_option(label, option):
+        return Befund(feld, GRUND_ANDERES_LABEL.format(label=label, gewaehlt=option))
+    return None
 
 
 def kachel_echo(
     gewaehlt: Variante,
     angezeigt: Variante,
-    auswahl: tuple[str, str | None, str | None],
+    auswahl: tuple[str, str | None, Labels],
     buendel: Buendelwerte | None,
     entfallen: tuple[str, ...] = (),
 ) -> Echo:
     """Das Echo aus der Kachel allein; ``auswahl`` ist (Dimension, gewählte Option,
-    Label der Kachel)."""
-    dimension, option, label = auswahl
+    alle Labels der Kachel aus ``kachellabels`` oder ihr einziges Label)."""
+    dimension, option, labels = auswahl
     befunde = list(seitenbefunde(gewaehlt, angezeigt))
-    if label is None:
-        grund = GRUND_OHNE_LABEL.format(dimension=dimension)
-        befunde.append(Befund(f"kachel.{dimension}", grund))
-    elif not gleiche_option(label, option):
-        grund = GRUND_ANDERES_LABEL.format(label=label, gewaehlt=option)
-        befunde.append(Befund(f"kachel.{dimension}", grund))
+    labelbefund = _labelbefund(dimension, option, labels)
+    if labelbefund is not None:
+        befunde.append(labelbefund)
     betrag = None if buendel is None else buendel.buendelbetrag
     if betrag is None:
         befunde.append(Befund("buendelbetrag", GRUND_OHNE_BETRAG))
     if befunde or buendel is None:
         return Echo(Preiswerte(), tuple(befunde), ())
+    ohne = {f: None for f in BUENDELFELDER if f not in NUR_AUS_DER_KACHEL}
+    uebernommen = replace(buendel, **ohne)
     luecken = [f for f in WERTFELDER if f not in entfallen]
-    luecken += [f for f in BUENDELFELDER if getattr(buendel, f) is None]
-    return Echo(Preiswerte(), (), tuple(luecken), buendel)
+    luecken += [f for f in BUENDELFELDER if getattr(uebernommen, f) is None]
+    return Echo(Preiswerte(), (), tuple(luecken), uebernommen)
 
 
 def kachelpfade(buendel: Buendelwerte) -> dict[str, str]:
