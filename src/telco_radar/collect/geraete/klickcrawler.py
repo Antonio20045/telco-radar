@@ -20,7 +20,8 @@ Datenkonzept Geräteradar, Abschnitt 8. Je Produktseite und Klick-Karte (``klick
    heißt erst ``nicht_angeboten``, wenn die Seite ruht. ``klickbedienung`` lehnt die
    Einwilligung ab und stellt die Vorbereitung her. Eine Antwort gehört nur zum Klick,
    nach dem ihre Anfrage hinausging, sonst ``nicht_erfasst``. Dann liest ``klicklesung``
-   Antwort, Text, Markierung und Echo und macht einen Screenshot.
+   Antwort, Text, Markierung und Echo und macht einen Screenshot. Eine Kombination ohne
+   Antwort besucht er am Ende einmal neu (``klicknachholen``).
 4. Je Kombination: erfasst, nicht_angeboten, nicht_erfasst oder befund; dazu der
    Strukturwächter je Lauf (beides in ``klicklauf``). Ist keine Kombination angeboten,
    ist der Lauf gestört.
@@ -65,7 +66,8 @@ from .klicklauf import (
     pruefe_struktur,
 )
 from .klicklesung import Leser
-from .klickoptionen import Auswahl, Option, naechste, vereinige
+from .klicknachholen import Nachholen
+from .klickoptionen import Auswahl, Option, naechste, option_mit, vereinige
 from .klicktor import (
     GRUND_ZU_VIELE,
     HOECHSTE_UMLEITUNGEN,
@@ -227,7 +229,8 @@ class _Gang:
 
     def _klicke_alle(self, besucht: set[Auswahl]) -> None:
         werte = {d: self._angebotene_werte(d) for d in DIMENSIONEN}
-        while (auswahl := naechste(werte, besucht)) is not None:
+        nachholen = Nachholen(self)
+        while (auswahl := naechste(werte, besucht) or nachholen.naechste()) is not None:
             self.wache.pruefe_tor()
             besucht.add(auswahl)
             self.geklickt = False
@@ -237,7 +240,7 @@ class _Gang:
                 if self.nach_zeitgrenze(abbruch) is None:
                     raise
                 ergebnis = self.nicht_besucht(variante_aus(*auswahl))
-            self.lauf.ergebnisse.append(replace(ergebnis, auswahl=auswahl))
+            nachholen.lege_ab(replace(ergebnis, auswahl=auswahl))
             if self.geklickt:
                 for d in DIMENSIONEN:
                     werte[d] = vereinige(werte[d], self._angebotene_werte(d))
@@ -348,13 +351,13 @@ class _Gang:
         self.lauf.struktur.knopf(bool(optionen))
         if not optionen:
             return Kombiergebnis(variante, NICHT_ERFASST, fehlen(self.karte, dimension))
-        option = _option(optionen, wert)
+        option = option_mit(optionen, wert)
         if option is not None and option.deaktiviert and not option.gewaehlt:
             optionen = self.wache.in_ruhe(lambda: self.leser.optionen(dimension))
             if optionen is None:
                 grund = f"Seite kam für {dimension} {wert} nicht zur Ruhe"
                 return Kombiergebnis(variante, NICHT_ERFASST, grund)
-            option = _option(optionen, wert)
+            option = option_mit(optionen, wert)
         if option is None:
             grund = f"Seite zeigt {dimension} {wert} in diesem Zustand nicht"
             return Kombiergebnis(variante, NICHT_ERFASST, grund)
@@ -394,7 +397,3 @@ class _Gang:
             knopf.click(timeout=self.frist_ms)
         except PlaywrightFehler as fehler:
             raise _Klickfehler(kurz(fehler)) from fehler
-
-
-def _option(optionen: list[Option], wert: str) -> Option | None:
-    return next((o for o in optionen if o.wert == wert), None)

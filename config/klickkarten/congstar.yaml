@@ -20,9 +20,14 @@ anbieter: congstar
 knoepfe:
   speicher:
     # button role=radio, aria-label „512 GB“ (B1 El. 73; B2 El. 75/76). Ein Klick ändert nur die
-    # Adresse (?memorySize=512+GB), ohne Anfrage (K2 Probe 2).
+    # Adresse (?memorySize=512+GB), ohne Anfrage (K2 Probe 2). Nicht lieferbar: aria-label
+    # „512 GB nicht vorhanden“ ohne disabled (Pixel 11 in tests/fixtures/geraete/
+    # congstar_produkt_pixel11.html.gz und im Tageslauf vom 08.10.2026, Actions-Lauf
+    # 37740022815); der Klick zeigt dann keine Tarifknöpfe.
     selektor: '[data-testid="memory-size"]'
     wert: aria-label
+    muster: '^(\d+\s*[GT]B)\b'
+    gesperrt: '[aria-label$=" nicht vorhanden"]'
     gewaehlt: {attribut: aria-checked, wert: "true"}
   tarif:
     # Label mit Input aria-label „Tarifoption Allnet Flat XS/S/M/L“ (B1 El. 99–106, B2 El.

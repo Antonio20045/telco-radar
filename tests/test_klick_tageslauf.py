@@ -29,6 +29,7 @@ from telco_radar.collect.geraete.klicklauf import (
     LAUF_GESPERRT,
     LAUF_GESTOERT,
     LAUF_ZEITGRENZE,
+    STOERUNG_ZEIT,
     Klicklauf,
     abruf_gestoert,
 )
@@ -38,6 +39,8 @@ from telco_radar.collect.geraete.klicktageslauf import (
     GRUND_BUDGET,
     GRUND_NACH_STOERUNG,
     GRUND_PARALLEL,
+    GRUND_ZEITUEBERSCHREITUNGEN,
+    HOECHSTE_ZEITUEBERSCHREITUNGEN,
     MINDESTZEIT_SEITE_S,
     RESERVE_S,
     ZEIT_JE_SEITE_S,
@@ -52,6 +55,7 @@ from telco_radar.collect.geraete.klickziele import (
 from telco_radar.geraete_config import lade_katalog
 
 HEUTE = "2026-09-29"
+NICHT_GELADEN = "Seite nach 30000 ms nicht geladen (30000 ms ohne neue Antwort)"
 MINUTE = 60.0
 _SKRIPT = WURZEL / "scripts" / "klick_tageslauf.py"
 
@@ -104,6 +108,9 @@ class Crawler:
         status = self.status.get(seite.adresse, LAUF_GELESEN)
         if status == LAUF_GESTOERT:
             return Klicklauf("o2", seite.adresse, status, abruf_gestoert(403), 403)
+        if status == STOERUNG_ZEIT:
+            lauf = Klicklauf("o2", seite.adresse, LAUF_GESTOERT, NICHT_GELADEN, 200)
+            return replace(lauf, stoerung=STOERUNG_ZEIT)
         if status == LAUF_GESPERRT:
             return Klicklauf("o2", seite.adresse, status, "robots.txt verbietet", None)
         if status == LAUF_ZEITGRENZE:
@@ -206,6 +213,56 @@ def test_bot_schutz_beendet_den_anbieter(o2, karte, gelesen_o2):
     assert {s["grund"] for s in rest} == {
         f"{GRUND_NACH_STOERUNG}: Abruf gestört (HTTP 403)"
     }
+
+
+def test_zeitueberschreitung_beendet_den_anbieter_nicht(o2, karte, gelesen_o2):
+    """Vodafone 08.10.2026: HTTP 200, Seite lud nicht. Kein Bot-Schutz (CLAUDE.md
+    Regel 10): die nächste Seite folgt, gelesene Seiten zählen."""
+    erste = o2.seiten[0].adresse
+    uhr = Uhr()
+    crawler = Crawler(uhr, gelesen_o2, status={erste: STOERUNG_ZEIT})
+
+    daten = _fahre(o2, karte, crawler, uhr)
+
+    assert len(crawler.aufrufe) == len(o2.seiten)
+    seite = daten["seiten"][0]
+    assert (seite["status"], seite["stoerung"], seite["grund"]) == (
+        LAUF_GESTOERT,
+        STOERUNG_ZEIT,
+        NICHT_GELADEN,
+    )
+    assert daten["laufstatus"] == LAUF_GELESEN
+    assert daten["ueberfaellig"] == [erste]
+
+
+@pytest.mark.parametrize(
+    ("status", "aufrufe", "laufstatus"),
+    [
+        ((STOERUNG_ZEIT, LAUF_GELESEN, STOERUNG_ZEIT), 3, LAUF_GELESEN),
+        ((STOERUNG_ZEIT, STOERUNG_ZEIT), 2, LAUF_GESTOERT),
+        ((STOERUNG_ZEIT, LAUF_GESTOERT), 2, LAUF_GESTOERT),
+    ],
+)
+def test_nach_zwei_zeitueberschreitungen_oder_bot_schutz_ist_schluss(
+    o2, karte, gelesen_o2, status, aufrufe, laufstatus
+):
+    """Höchstens zwei Seiten ohne Laden; Gegenprobe: Bot-Schutz nach einer
+    Zeitüberschreitung beendet den Anbieter sofort und bestimmt den Grund."""
+    adressen = [s.adresse for s in o2.seiten]
+    uhr = Uhr()
+    crawler = Crawler(uhr, gelesen_o2, status=dict(zip(adressen, status, strict=False)))
+
+    daten = _fahre(o2, karte, crawler, uhr)
+
+    assert len(crawler.aufrufe) == aufrufe
+    assert daten["laufstatus"] == laufstatus
+    rest = {s["grund"] for s in daten["seiten"][aufrufe:]}
+    if status[-1] == LAUF_GESTOERT:
+        assert rest == {f"{GRUND_NACH_STOERUNG}: Abruf gestört (HTTP 403)"}
+        assert daten["grund"] == f"{adressen[1]}: Abruf gestört (HTTP 403)"
+    else:
+        zahl = HOECHSTE_ZEITUEBERSCHREITUNGEN
+        assert rest == {f"{zahl} {GRUND_ZEITUEBERSCHREITUNGEN}: {NICHT_GELADEN}"}
 
 
 def test_gesperrte_seite_beendet_den_anbieter_nicht(o2, karte, gelesen_o2):

@@ -98,6 +98,7 @@ class Knopf:
     erstem Kind-Element ``wert_in``; ``muster`` nimmt daraus die erste Gruppe.
     ``marke`` ist die eigene Auswahlmarke der Dimension, ``None`` heißt: die der Karte.
     ``adressen``: die Optionen sind eigene Seiten (dann ist ``selektor`` ``None``).
+    ``gesperrt``: CSS-Selektor für Klickziele, die die Seite als nicht angeboten zeigt.
     """
 
     selektor: str | None
@@ -107,6 +108,7 @@ class Knopf:
     marke: Auswahlmarke | None = None
     fest: str | None = None
     adressen: Adressen | None = None
+    gesperrt: str | None = None
 
 
 @dataclass(frozen=True)

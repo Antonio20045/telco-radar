@@ -238,6 +238,30 @@ def test_knoepfe_marken_und_seitenwerte_der_produktseite(chromium):
 
 
 @pytest.mark.parametrize(
+    ("datei", "erwartet"),
+    [
+        (
+            "congstar_produkt_pixel11.html.gz",
+            [("256 GB", False, True), ("512 GB", True, False)],
+        ),
+        (
+            "congstar_produkt_iphone17_20260929.html.gz",
+            [("256 GB", False, True), ("512 GB", False, False)],
+        ),
+    ],
+)
+def test_speicher_nicht_vorhanden_ist_gesperrt(chromium, datei, erwartet):
+    """Pixel 11: aria-label „512 GB nicht vorhanden“ ohne disabled (Tageslauf 08.10.:
+    acht Kombinationen ohne Tarifknöpfe); Gegenprobe iPhone 17, 512 GB lieferbar."""
+    seite = _ssr(chromium, datei)
+    try:
+        optionen = lies_optionen(seite, KARTE, "speicher")
+        assert [(o.wert, o.deaktiviert, o.gewaehlt) for o in optionen] == erwartet
+    finally:
+        seite.close()
+
+
+@pytest.mark.parametrize(
     ("datei", "rueckgabedeal"),
     [
         ("congstar_produkt_iphone17_20260929.html.gz", True),

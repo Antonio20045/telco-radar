@@ -7,7 +7,9 @@ Adressen nur ohne Geheimnisse (``klickspur.ohne_geheimnisse``); vom Beleg bleibe
 ``beleg_id``, Seitenadresse und Zeitpunkt.
 
 Der Laufstatus des Anbieters (``laufstatus``) ist ``gestoert``, sobald eine Seite
-gestört endete (Bot-Schutz, Challenge, Kanarienwert, Strukturbruch); ``gelesen``, wenn
+gestört endete (Bot-Schutz, Challenge, Kanarienwert, Strukturbruch); eine Seite, die
+nur nicht lud (``stoerung`` gleich ``klicklauf.STOERUNG_ZEIT``), zählt so erst, wenn
+keine Seite gelesen wurde. Sonst ist er ``gelesen``, wenn
 eine gelesene Seite mindestens eine Kombination ``erfasst`` hat; ``leer``, wenn Seiten
 gelesen wurden, aber keine Kombination erfasst ist; ``nicht_gelesen``, wenn keine Seite
 gelesen wurde (gesperrt, nicht besucht, Karte fehlt). Nur ``gelesen`` ersetzt im
@@ -38,6 +40,7 @@ from .klicklauf import (
     LAUF_GELESEN,
     LAUF_GESTOERT,
     LAUF_ZEITGRENZE,
+    STOERUNG_ZEIT,
     Klicklauf,
     Kombiergebnis,
 )
@@ -109,6 +112,8 @@ def seite_als_daten(ziel: Seitenziel, lauf: Klicklauf) -> dict:
             "anteil_knoepfe": bilanz.anteil_knoepfe,
             "anteil_felder": bilanz.anteil_felder,
         },
+        "stoerung": lauf.stoerung,
+        "ladung": lauf.ladung,
         "verworfen": len(lauf.verworfen),
         "gescheitert": len(lauf.gescheitert),
         "kombinationen": [kombination_als_daten(e) for e in lauf.ergebnisse],
@@ -129,10 +134,12 @@ def nicht_besucht(ziel: Seitenziel, grund: str) -> dict:
 
 def laufstatus(seiten: list[dict]) -> tuple[str, str | None]:
     """Status und Grund des Anbieters aus seinen Seiten (siehe Modulkopf)."""
-    gestoert = next((s for s in seiten if s["status"] == LAUF_GESTOERT), None)
-    if gestoert is not None:
-        return LAUF_GESTOERT, f"{gestoert['adresse']}: {gestoert['grund']}"
     gelesen = [s for s in seiten if s["status"] in GELESENE_SEITEN]
+    gestoert = [s for s in seiten if s["status"] == LAUF_GESTOERT]
+    sperre = [s for s in gestoert if s.get("stoerung") != STOERUNG_ZEIT]
+    if sperre or (gestoert and not gelesen):
+        stoerung = (sperre or gestoert)[0]
+        return LAUF_GESTOERT, f"{stoerung['adresse']}: {stoerung['grund']}"
     if not gelesen:
         erste = seiten[0] if seiten else None
         grund = GRUND_KEINE_SEITE if erste is None else f"{erste['grund']}"

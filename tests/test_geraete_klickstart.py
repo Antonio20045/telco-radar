@@ -17,6 +17,8 @@ import pytest
 from klickbeispiel import RATE, karte, laufe_mit, nach_auswahl, preis, seite
 from klickserver import Antwort, html
 
+from telco_radar.collect.geraete.klickecho import Variante
+
 pytestmark = pytest.mark.browser
 
 KNOEPFE = {
@@ -188,11 +190,15 @@ def test_o2_start_im_skript_dann_antwort_mit_base64_echo(chromium):
     assert "/configuration/" in m.beleg.beleg.antwort_url
 
 
-def test_o2_ohne_startquelle_hat_der_start_keine_antwort(chromium):
-    ergebnisse, _ = _o2(chromium, O2_ANTWORT)
+def test_o2_ohne_startquelle_holt_der_lauf_den_start_nach(chromium):
+    """Ohne Startquelle hat der Start beim ersten Besuch keine Antwort; am Ende klickt
+    der Lauf ihn aus einem anderen Zustand wieder an (``klicknachholen``)."""
+    ergebnisse, lauf = _o2(chromium, O2_ANTWORT)
 
+    assert lauf.ergebnisse[0].variante == Variante("128", "O2 Mobile S", 36)
     start = ergebnisse.pop(("128", "O2 Mobile S", 36))
-    assert start.grund == "keine Antwort mitgeschnitten"
+    assert (start.status, start.werte.rate) == ("erfasst", 30.0)
+    assert "/configuration/" in start.antwort_url
     assert {e.status for e in ergebnisse.values()} == {"erfasst"}
 
 

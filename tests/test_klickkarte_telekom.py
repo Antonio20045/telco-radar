@@ -220,6 +220,21 @@ def test_textmuster_lesen_die_werte_der_seite(karte, inventar):
     }
 
 
+@pytest.mark.parametrize(
+    ("rate", "erwartet"), [("26,90", 26.9), ("52", 52.0), (None, None)]
+)
+def test_rate_auch_in_vollen_euro(karte, inventar, rate, erwartet):
+    """Tageslauf 08.10.2026, 1 TB/24: Antwort 52,00, Seitenadresse installmentValue=52,
+    der Knopf schreibt volle Euro ohne Cent wie seine „+99 € Anzahlung“ (be 42).
+    Gegenprobe: ohne Monatsrate liest das Muster nicht die Anzahlung."""
+    knopf = inventar["elemente"]["42"]["text"]
+    assert "26,90 € mtl." in knopf
+    text = knopf.split("mtl.")[1] if rate is None else knopf.replace("26,90", rate)
+    treffer = karte.textlesung.muster["rate"].muster.search(text)
+    gelesen = None if treffer is None else feldwert("rate", treffer[1])
+    assert gelesen == erwartet
+
+
 def test_strukturselektoren_stehen_im_inventar(karte, inventar):
     preise, gruppen = inventar["preise"], inventar["gruppen"]
     erster, tarifblock = karte.textlesung.selektoren

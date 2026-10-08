@@ -12,7 +12,9 @@ Volumen oder Bindung stimmen; die Ratenzahl spiegelt nur den Klick. Ein Lauf ist
 ``gelesen``, ``gestoert`` (Bot-Schutz, fehlender Kanarienwert, offene oder gescheiterte
 Preisantwort, Strukturbruch, keine einzige angebotene Kombination), ``gesperrt``
 (robots.txt sperrt Seite, Preisantwort oder Besuchszeit) oder ``zeitgrenze`` (die
-Zeitgrenze des Aufrufers schnitt ihn ab; was er nicht besuchte, heißt so). Bot-Schutz
+Zeitgrenze des Aufrufers schnitt ihn ab; was er nicht besuchte, heißt so). Lud die
+Hauptseite nicht, ist er gestört mit ``stoerung`` gleich ``STOERUNG_ZEIT``, ohne
+Bot-Schutz (CLAUDE.md Regel 10). Bot-Schutz
 heißt ``bot_schutz``: HTTP 202, 4xx oder 5xx, ein bekanntes Challenge-Muster
 (``CHALLENGE_MUSTER``) oder eine HTML-Seite, wo die Preisschnittstelle JSON liefern
 soll. Gescheiterte Anfragen hält der Lauf mit Grund fest, ebenso jede Hilfsdatei, die
@@ -56,6 +58,7 @@ LAUF_GELESEN = "gelesen"
 LAUF_GESTOERT = "gestoert"
 LAUF_GESPERRT = "gesperrt"
 LAUF_ZEITGRENZE = "zeitgrenze"
+STOERUNG_ZEIT = "zeitueberschreitung"
 BELEG_OFFEN = "offen"
 BELEGT = "belegt"
 BELEG_FEHLT = "fehlt"
@@ -217,6 +220,8 @@ class Klicklauf:
 
     ``bezug`` ist die Strukturbilanz, gegen die ``pruefe_struktur`` den Lauf maß;
     ``hilfsdateien`` sind die Skripte und Stylesheets, die ohne Regeln geladen wurden.
+    ``stoerung`` benennt eine Störung ohne Bot-Schutz, ``ladung`` ist die Diagnose
+    des letzten Ladens der Hauptseite (``klickladung``).
     """
 
     anbieter: str
@@ -230,6 +235,8 @@ class Klicklauf:
     gescheitert: list[Gescheitert] = field(default_factory=list)
     hilfsdateien: list[Hilfsdatei] = field(default_factory=list)
     bezug: Strukturbilanz | None = None
+    stoerung: str | None = None
+    ladung: dict[str, object] | None = None
 
 
 def fehlender_preis(

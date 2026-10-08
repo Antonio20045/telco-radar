@@ -7,10 +7,9 @@
 # Kombinationen je Seite: 3 Speicher x 1 Tarif x 3 Laufzeiten = 9 (Grenze der
 # Kartenprobe 12). Die Preisantwort /v2/details kommt erst nach einem
 # Speicherklick (kl Probe 0 -> mi 210); beim Laden lädt die Seite keine
-# (mi 99-102). Bis zum ersten Speicherklick (256 GB, 36/24/12) fehlt die Antwort:
-# diese Kombinationen enden als Befund „keine Antwort mitgeschnitten“, außer ein
-# Laufzeitklick lädt /v2/details (unerkundet). Erwartet erfasst: 512 GB und 1 TB
-# je 12/24/36 = 6.
+# (mi 99-102), ein Laufzeitklick auch nicht (Tageslauf 08.10.2026, 256 GB 24/12).
+# Darum holt der Crawler Kombinationen ohne Antwort am Ende einmal nach: dann
+# ist 256 GB nicht mehr vorgewählt, und sein Klick lädt die Antwort.
 #
 # Bewusst nicht in der Karte:
 # - Weitere Tarife: die Seite zeigt nur den gewählten (be 63, „Tarif ändern“
@@ -74,10 +73,12 @@ zusammenfassung:
     - "#step1"
   muster:
     # Gewählter Laufzeitknopf, Text „26,90 € mtl. x 36“ und „+99 € Anzahlung“
-    # (pr 6/7, be 42).
+    # (pr 6/7, be 42). Volle Euro ohne Cent wie „+99 €“: Tageslauf 08.10.2026
+    # (Actions-Lauf 37740022815), 1 TB/24 Monate, Antwort 52,00, Seitenadresse
+    # installmentValue=52, der Text las nichts.
     rate:
       selektor: '#dyt_productViewDesktop button.dt_filterChips[aria-checked="true"][aria-label*="Anzahlung"]'
-      muster: '([\d.]+,\d{2})\s*€\s*mtl\.'
+      muster: '([\d.]+(?:,\d{1,2})?)\s*€\s*mtl\.'
     ratenzahl:
       selektor: '#dyt_productViewDesktop button.dt_filterChips[aria-checked="true"][aria-label*="Anzahlung"]'
       muster: 'x\s*(\d+)'

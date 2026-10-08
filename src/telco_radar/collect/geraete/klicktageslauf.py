@@ -8,8 +8,11 @@ Erkundung: robots.txt samt Crawl-delay und Visit-time je Anfrage, eigener Abstan
 Anbieters, User-Agent aus ``geraete_quellen.yaml``, keine Tarnung. Endet eine Seite
 gestört (Bot-Schutz, Challenge, Kanarienwert, Strukturbruch), geht für den Anbieter
 keine Anfrage mehr hinaus (CLAUDE.md Regel 4); die übrigen Seiten heißen
-``nicht_besucht`` mit Grund. Ebenso endet der Lauf, sobald die Parallellauf-Prüfung
-(``klickparallel``, vor jeder Seite) einen anderen Lauf auf denselben Hosts meldet.
+``nicht_besucht`` mit Grund. Lud eine Seite nur nicht (``klicklauf.STOERUNG_ZEIT``,
+kein Bot-Schutz, CLAUDE.md Regel 10), folgt die nächste Seite unter derselben
+Hostschleuse samt Crawl-delay; nach ``HOECHSTE_ZEITUEBERSCHREITUNGEN`` solchen Seiten
+endet er. Ebenso endet der Lauf, sobald die Parallellauf-Prüfung (``klickparallel``,
+vor jeder Seite) einen anderen Lauf auf denselben Hosts meldet.
 
 Zeitbudget (CLAUDE.md Regel 8): ``budget_ende`` rechnet gegen die Restzeit des Jobs,
 ``job_frist_s`` (Vorgabe ``JOB_FRIST_S``, gleich ``timeout-minutes`` des Matrix-Jobs)
@@ -45,7 +48,7 @@ from .klickergebnis import (
     nicht_besucht,
     seite_als_daten,
 )
-from .klicklauf import LAUF_GESTOERT, Klicklauf
+from .klicklauf import LAUF_GESTOERT, STOERUNG_ZEIT, Klicklauf
 from .klickparallel import Laufpruefung
 from .klickseite import GRUND_FRIST, Fristschleuse, beobachte
 from .klickspur import ohne_geheimnisse
@@ -67,6 +70,8 @@ ZEIT_JE_SEITE_S = 25 * 60
 GRUND_BUDGET = "Zeitbudget des Jobs erschöpft"
 GRUND_NACH_STOERUNG = "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4)"
 GRUND_PARALLEL = "verschoben"
+HOECHSTE_ZEITUEBERSCHREITUNGEN = 2
+GRUND_ZEITUEBERSCHREITUNGEN = "Seiten luden nicht"
 
 Crawler = Callable[["Seitenziel", float], Klicklauf]
 """Liest eine Seite bis zur monotonen Grenze ``ende``; wirft nie."""
@@ -126,6 +131,7 @@ def fahre(
     start = uhr()
     seiten: list[dict] = []
     stopp: str | None = None
+    zeit = 0
     for seite in reihenfolge(ziel.seiten, gelesen):
         rest = ende - uhr()
         if stopp is None and rest < MINDESTZEIT_SEITE_S:
@@ -138,7 +144,11 @@ def fahre(
             continue
         lauf = crawle(seite, min(ende, uhr() + ZEIT_JE_SEITE_S))
         seiten.append(seite_als_daten(seite, lauf))
-        if lauf.status == LAUF_GESTOERT:
+        if lauf.status == LAUF_GESTOERT and lauf.stoerung == STOERUNG_ZEIT:
+            zeit += 1
+            if zeit >= HOECHSTE_ZEITUEBERSCHREITUNGEN:
+                stopp = f"{zeit} {GRUND_ZEITUEBERSCHREITUNGEN}: {lauf.grund}"
+        elif lauf.status == LAUF_GESTOERT:
             stopp = f"{GRUND_NACH_STOERUNG}: {lauf.grund}"
     status, grund = laufstatus(seiten)
     heute_gelesen = {s["adresse"] for s in seiten if s["status"] in ROTATION_GELESEN}

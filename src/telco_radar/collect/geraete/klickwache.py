@@ -2,7 +2,8 @@
 
 ``Wache`` gehört zu einem Lauf (``klickcrawler``) und wartet in Takten von
 ``klicktor.WARTE_TAKT_MS``: Zeit, in der das Tor den Crawl-delay abwartet, zählt so
-nicht gegen die Frist. In jedem Takt fragt sie das Tor: zeigte eine Hauptseite
+nicht gegen die Frist, die Abrufzeit aber schon; das Laden der Hauptseite misst darum
+``klickladung`` am Fortschritt. In jedem Takt fragt sie das Tor: zeigte eine Hauptseite
 Bot-Schutz (``Tor.stoerung``) oder leitet die Hauptseite nach dem Öffnen um, endet der
 Lauf sofort als gestört (CLAUDE.md Regel 4). Dasselbe gilt, wenn irgendeine andere
 Antwort der eigenen Website nach Bot-Schutz aussieht (``klickspur.status_verdacht``:
@@ -27,9 +28,11 @@ from typing import TYPE_CHECKING
 
 from playwright.sync_api import Error as PlaywrightFehler
 
+from .klickladung import Ladung
 from .klicklauf import (
     LAUF_GESPERRT,
     LAUF_GESTOERT,
+    STOERUNG_ZEIT,
     Klicklauf,
     antworttext,
     bot_schutz,
@@ -47,7 +50,6 @@ if TYPE_CHECKING:
 log = logging.getLogger(__name__)
 
 RUHE_MS = 500
-_GELADEN_JS = "() => document.readyState === 'complete'"
 MINDESTE_RUHELESUNGEN = 3
 
 Marke = tuple[int, int, int]
@@ -78,6 +80,7 @@ class Wache:
         self.mitschnitt = Mitschnitt(self.passt)
         self.mitschnitt.binde(seite)
         seite.on("response", self._beobachte)
+        self.ladung = Ladung(seite)
         self.antwort: Response | None = None
         self.ausstehend: str | None = None
         self.geoeffnet = False
@@ -93,9 +96,12 @@ class Wache:
     def lade(self, ziel: str) -> None:
         """Öffnet ``ziel``; die Frist bis zur Antwort trägt den Crawl-delay mit.
 
-        Antwort und Ausstehendes der vorigen Seite gelten danach nicht mehr.
+        Antwort und Ausstehendes der vorigen Seite gelten danach nicht mehr. Bis
+        ``load`` wartet ``klickladung`` am Fortschritt; lädt die Seite nicht, ist sie
+        gestört mit ``STOERUNG_ZEIT``, und ``lauf.ladung`` nennt die Umstände.
         """
         self.tor.umleitung = None
+        self.ladung.beginne()
         self.antwort, self.ausstehend = None, None
         _, verworfen, gescheitert = self.marke()
         frist = SEITEN_FRIST_MS + round(1000 * self.tor.schleuse.abstand(ziel))
@@ -115,17 +121,14 @@ class Wache:
                 raise Abbruch(LAUF_GESTOERT, grund) from fehler
             raise
         self.lauf.http_status = self.tor.haupt_status
-        if self.tor.umleitung is None and not self.warte(
-            self._geladen, SEITEN_FRIST_MS
-        ):
-            grund = f"Seite nach {SEITEN_FRIST_MS} ms nicht geladen"
-            raise Abbruch(LAUF_GESTOERT, grund)
-
-    def _geladen(self) -> bool:
-        try:
-            return self.seite.evaluate(_GELADEN_JS) is True
-        except PlaywrightFehler:
-            return False
+        if self.tor.umleitung is not None:
+            return
+        geladen = self.ladung.warte(self.pruefe_tor)
+        abstand = self.tor.schleuse.abstand(ziel)
+        self.lauf.ladung = self.ladung.diagnose(geladen, abstand)
+        if not geladen:
+            self.lauf.stoerung = STOERUNG_ZEIT
+            raise Abbruch(LAUF_GESTOERT, self.ladung.grund())
 
     def warte(self, bedingung: Callable[[], bool], frist_ms: int | None = None) -> bool:
         """Wartet in Takten, bis ``bedingung`` gilt; fragt in jedem Takt das Tor."""

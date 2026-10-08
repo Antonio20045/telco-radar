@@ -7,9 +7,10 @@ noch nicht besuchte Kombination. ``[None]`` steht für eine Dimension ohne gefun
 Knöpfe. Der Wert kommt aus Attribut oder Text des Klickziels oder seines Kind-Elements
 ``wert_in``, ``muster`` nimmt daraus die erste Gruppe; passt das Muster nicht, hat die
 Option keinen Wert, sondern ihren Text in ``unlesbar`` und läuft mit diesem Text als
-benannte Lücke mit. Die Marke ist die der Dimension, sonst die der Karte: Attribut
-gleich Wert oder ein CSS-Selektor, auf den das Klickziel passt. Eine feste Dimension hat
-genau eine gewählte Option ohne Knopf. Dieses Modul ruft kein Netz.
+benannte Lücke mit. Gesperrt ist ein Knopf mit ``disabled``, ``aria-disabled`` oder
+passend auf ``gesperrt`` der Karte. Die Marke ist die der Dimension, sonst die der
+Karte: Attribut gleich Wert oder ein CSS-Selektor, auf den das Klickziel passt. Eine
+feste Dimension hat genau eine gewählte Option ohne Knopf. Dieses Modul ruft kein Netz.
 """
 
 from __future__ import annotations
@@ -31,7 +32,9 @@ _OPTIONEN_JS = """(knoepfe, art) => knoepfe.map((k) => {
     : (art.wert ? traeger.getAttribute(art.wert) : traeger.innerText);
   const an = art.passt ? k.matches(art.passt)
     : art.marke !== null && k.getAttribute(art.marke) === art.markenwert;
-  return [wert, k.disabled === true || k.getAttribute("aria-disabled") === "true", an];
+  const aus = k.disabled === true || k.getAttribute("aria-disabled") === "true"
+    || (art.gesperrt !== null && k.matches(art.gesperrt));
+  return [wert, aus, an];
 })"""
 
 
@@ -60,6 +63,7 @@ def lies_optionen(seite: Page, karte: Klickkarte, dimension: str) -> list[Option
         "passt": None if marke is None else marke.passt,
         "marke": None if marke is None else marke.attribut,
         "markenwert": None if marke is None else marke.wert,
+        "gesperrt": knopf.gesperrt,
     }
     roh = seite.locator(knopf.selektor).evaluate_all(_OPTIONEN_JS, art)
     optionen = []
@@ -106,3 +110,8 @@ def wert_nach_muster(roh: str, muster: re.Pattern[str] | None) -> str | None:
     if teil is None or not teil.strip():
         return None
     return teil.strip()
+
+
+def option_mit(optionen: list[Option], wert: str) -> Option | None:
+    """Die erste Option mit ``wert``, sonst ``None``."""
+    return next((o for o in optionen if o.wert == wert), None)

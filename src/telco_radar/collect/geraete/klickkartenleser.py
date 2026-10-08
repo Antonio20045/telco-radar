@@ -45,7 +45,16 @@ from .klickkartentypen import (
 )
 from .klickquellenleser import lies_textmuster, texte
 
-KNOPFTEILE = ("selektor", "wert", "wert_in", "muster", GEWAEHLT, "fest", "adressen")
+KNOPFTEILE = (
+    "selektor",
+    "wert",
+    "wert_in",
+    "muster",
+    GEWAEHLT,
+    "fest",
+    "adressen",
+    "gesperrt",
+)
 ADRESSTEILE = ("selektor", "attribut", "parameter")
 MARKENTEILE = ("attribut", "wert", "passt")
 VORBEREITUNGSTEILE = ("klick", "bis", "pruefe")
@@ -161,6 +170,7 @@ class Kartenleser:
             wert_in=self.wahlweise_text(daten, "wert_in", feld),
             muster=self.wahlweise_muster(daten, "muster", feld),
             marke=None if marke is None else self.marke(marke, f"{feld}.{GEWAEHLT}"),
+            gesperrt=self.wahlweise_text(daten, "gesperrt", feld),
         )
 
     def adressen(self, daten: Mapping, feld: str) -> Adressen:
