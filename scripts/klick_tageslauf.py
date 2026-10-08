@@ -116,7 +116,7 @@ def main(argumente: list[str] | None = None) -> int:
     laeufe = (
         None
         if args.ohne_parallelpruefung
-        else aus_umgebung(os.environ, TAGESLAUF_WORKFLOWS)
+        else aus_umgebung(os.environ, TAGESLAUF_WORKFLOWS, _uhr)
     )
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch(executable_path=args.chromium)

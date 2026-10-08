@@ -80,7 +80,7 @@ def main(argumente: list[str] | None = None) -> int:
         level=logging.INFO, format="%(levelname)s %(name)s: %(message)s"
     )
     ende = time.monotonic() + args.frist_sekunden
-    laeufe = None if args.ohne_parallelpruefung else aus_umgebung(os.environ)
+    laeufe = None if args.ohne_parallelpruefung else aus_umgebung(os.environ, uhr=_uhr)
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch(executable_path=args.chromium)
         try:
