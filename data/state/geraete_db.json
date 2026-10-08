@@ -2,8 +2,8 @@
  "updated": "2026-10-08",
  "anbieter": {
   "ALDI TALK": {
-   "laeufe": 56,
-   "funde_gesamt": 251,
+   "laeufe": 57,
+   "funde_gesamt": 256,
    "letzter_lauf": "2026-10-08",
    "letzte_funde": 5,
    "letzter_fund": "2026-10-08",
@@ -198,8 +198,8 @@
    "tote_adressen": 0
   },
   "Vodafone": {
-   "laeufe": 54,
-   "funde_gesamt": 9200,
+   "laeufe": 55,
+   "funde_gesamt": 9383,
    "letzter_lauf": "2026-10-08",
    "letzte_funde": 183,
    "termine": [
@@ -394,8 +394,8 @@
    "tote_adressen": 0
   },
   "o2": {
-   "laeufe": 54,
-   "funde_gesamt": 3632,
+   "laeufe": 55,
+   "funde_gesamt": 3701,
    "letzter_lauf": "2026-10-08",
    "letzte_funde": 69,
    "termine": [
@@ -590,8 +590,8 @@
    "tote_adressen": null
   },
   "mobilcom-debitel": {
-   "laeufe": 7,
-   "funde_gesamt": 6248,
+   "laeufe": 8,
+   "funde_gesamt": 6383,
    "letzte_funde": 135,
    "termine": [
     "2026-08-29",
@@ -1099,8 +1099,8 @@
    "tote_adressen": 0
   },
   "congstar": {
-   "laeufe": 32,
-   "funde_gesamt": 6480,
+   "laeufe": 33,
+   "funde_gesamt": 6633,
    "letzter_lauf": "2026-10-08",
    "letzte_funde": 153,
    "termine": [
@@ -1289,8 +1289,8 @@
    "tote_adressen": 0
   },
   "1&1": {
-   "laeufe": 46,
-   "funde_gesamt": 1650,
+   "laeufe": 47,
+   "funde_gesamt": 1686,
    "letzter_lauf": "2026-10-08",
    "letzte_funde": 36,
    "termine": [
@@ -1624,10 +1624,10 @@
    "tote_adressen": null
   },
   "Saturn": {
-   "laeufe": 42,
-   "funde_gesamt": 823,
+   "laeufe": 43,
+   "funde_gesamt": 843,
    "letzter_lauf": "2026-10-08",
-   "letzte_funde": 19,
+   "letzte_funde": 20,
    "termine": [
     "2026-09-05",
     "2026-09-06",
@@ -1803,7 +1803,7 @@
     ],
     [
      "2026-10-08",
-     19,
+     20,
      "gelesen",
      0,
      0,
@@ -4971,7 +4971,7 @@
    "erstpreis_am": "2026-09-02",
    "last_verified": "2026-10-08",
    "letzter_check": "2026-10-08",
-   "quelle_url": "https://www.alditalk.de/p/fairphone-fairphone-gen-6-256-gb-horizon-black-model-fp6-30042277A1?FF_QUERY=*%3Acategory_id%3BG5DE0Z0SIKUBHRGTNF411A7XPLN9RV3D&FF_POS=28&FF_PAGE=1&FF_PAGESIZE=30&FF_SCORE=100.0&FF_CAMPAIGN=&FF_CAMPAIGN_PAGE_ID=",
+   "quelle_url": "https://www.alditalk.de/p/fairphone-fairphone-gen-6-256-gb-horizon-black-model-fp6-30042277A1?FF_QUERY=*%3Acategory_id%3BG5DE0Z0SIKUBHRGTNF411A7XPLN9RV3D&FF_POS=27&FF_PAGE=1&FF_PAGESIZE=30&FF_SCORE=100.0&FF_CAMPAIGN=&FF_CAMPAIGN_PAGE_ID=",
    "abgerufen_am": "2026-10-08",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
@@ -5903,15 +5903,15 @@
    "ean": "",
    "zustand": "neu",
    "first_seen": "2026-09-05",
-   "status": "ausgelistet",
-   "missed_checks": 2,
+   "status": "aktiv",
+   "missed_checks": 0,
    "erstpreis": 1419.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-05",
-   "last_verified": "2026-09-25",
-   "letzter_check": "2026-09-27",
+   "last_verified": "2026-10-08",
+   "letzter_check": "2026-10-08",
    "quelle_url": "https://www.saturn.de/de/product/_apple-iphone-17-pro-5g-512-gb-silber-dual-sim-3013588.html",
-   "abgerufen_am": "2026-09-25",
+   "abgerufen_am": "2026-10-08",
    "verfuegbarkeit": "unbekannt",
    "confidence": "hoch",
    "einstiege": [
@@ -5919,7 +5919,6 @@
    ],
    "titel_roh": "APPLE iPhone 17 Pro 5G 512 GB Silber Dual SIM",
    "preis_ohne_vertrag": 1419.0,
-   "stale_since": "2026-09-26",
    "ended_since": "2026-09-27"
   },
   {
