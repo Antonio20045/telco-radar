@@ -1,46 +1,657 @@
 {
  "anbieter": "vodafone",
  "datum": "2026-10-08",
- "dauer_sekunden": 62.2,
+ "dauer_sekunden": 752.7,
  "format": 1,
  "frischegrenze_tage": 3,
- "grund": "https://www.vodafone.de/privat/handys/iphone-17-pro.html: Seite nach 30000 ms nicht geladen",
+ "grund": null,
  "karte": "vodafone.yaml",
- "laufstatus": "gestoert",
+ "laufstatus": "gelesen",
  "name": "Vodafone",
  "seiten": [
   {
    "adresse": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
    "geraet": "apple-iphone-17-pro",
    "gescheitert": 0,
-   "grund": "Seite nach 30000 ms nicht geladen",
+   "grund": null,
    "http_status": 200,
-   "kombinationen": [],
-   "speicher_gb": 256,
-   "status": "gestoert",
-   "struktur": {
-    "anteil_felder": null,
-    "anteil_knoepfe": null,
-    "felder_gefunden": 0,
-    "felder_gesucht": 0,
-    "knoepfe_gefunden": 0,
-    "knoepfe_gesucht": 0
+   "kombinationen": [
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/hardware/v2/virtualItem/226?businessTransaction=newContract&salesChannel=Online.Consumer&financingType=rate",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "unbekannt"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "36181ec2d2cd502a1333be09cf4f2a3b0806f76569b80a4e8734688efc4c2f1b",
+      "seite": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
+      "zeitpunkt": "2026-10-08T09:42:28Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "unbekannt"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 33.0,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/hardware/v2/virtualItem/226?businessTransaction=newContract&salesChannel=Online.Consumer&financingType=rate",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "unbekannt"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "651d543e3dca08291b117d5e3e3d15e72acae47e5dd1d987efd2f80da74bd552",
+      "seite": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
+      "zeitpunkt": "2026-10-08T09:42:47Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "unbekannt"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 49.5,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/hardware/v2/virtualItem/226?businessTransaction=newContract&salesChannel=Online.Consumer&financingType=rate",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "256 GB",
+      "tarif": "unbekannt"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "5c725b2cf16532910205b41bf182c70df4c82fc20bcf0da9d9d3aceb518cbd93",
+      "seite": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
+      "zeitpunkt": "2026-10-08T09:43:07Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "256 GB",
+      "tarif": "unbekannt"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 99.0,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/hardware/v2/virtualItem/226?businessTransaction=newContract&salesChannel=Online.Consumer&financingType=rate",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "unbekannt"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "8a2c41021cb0c67fc3f7edc4ef4b1d50b582e0b0aa892714bf459d960fe02ce7",
+      "seite": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
+      "zeitpunkt": "2026-10-08T09:44:06Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "unbekannt"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 0.99,
+      "rate": 40.0,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/hardware/v2/virtualItem/226?businessTransaction=newContract&salesChannel=Online.Consumer&financingType=rate",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "unbekannt"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "2fef1e351a101747eea7669e0425308235673322e321a3741392b8a5db06b340",
+      "seite": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
+      "zeitpunkt": "2026-10-08T09:44:25Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "unbekannt"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 0.99,
+      "rate": 60.0,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/hardware/v2/virtualItem/226?businessTransaction=newContract&salesChannel=Online.Consumer&financingType=rate",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "512 GB",
+      "tarif": "unbekannt"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "d426f9b1b3596df4f0fb8bd6cfa9638c0d442b99b83de77c99d74cc375993cd0",
+      "seite": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
+      "zeitpunkt": "2026-10-08T09:44:44Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "512 GB",
+      "tarif": "unbekannt"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 0.99,
+      "rate": 120.0,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/hardware/v2/virtualItem/226?businessTransaction=newContract&salesChannel=Online.Consumer&financingType=rate",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "1 TB",
+      "tarif": "unbekannt"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "a61573538c27fb526f1e38be18217977fa5584197495055b797bf20ee94626d4",
+      "seite": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
+      "zeitpunkt": "2026-10-08T09:45:43Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "1 TB",
+      "tarif": "unbekannt"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 47.0,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/hardware/v2/virtualItem/226?businessTransaction=newContract&salesChannel=Online.Consumer&financingType=rate",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "1 TB",
+      "tarif": "unbekannt"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "df3c6faed54319a196ebab25aa0305166b1c69d62040ab9c4aa6f10ff6b1e932",
+      "seite": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
+      "zeitpunkt": "2026-10-08T09:46:02Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "1 TB",
+      "tarif": "unbekannt"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 70.5,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/hardware/v2/virtualItem/226?businessTransaction=newContract&salesChannel=Online.Consumer&financingType=rate",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "1 TB",
+      "tarif": "unbekannt"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "01a1bb71377d035968ea3abb03793248d7648cf5b6aa23ba3b077286e0c1dc91",
+      "seite": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
+      "zeitpunkt": "2026-10-08T09:46:22Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "1 TB",
+      "tarif": "unbekannt"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 141.0,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 2.0,
+    "anfragen": 231,
+    "beendet": 227,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "tags.vodafone.de": 1,
+     "www.vodafone.de": 3
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 149.7,
+    "takte_ms": 14200,
+    "wartet_auf": "load"
    },
-   "verworfen": 1
+   "speicher_gb": 256,
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 0.42857142857142855,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 27,
+    "felder_gesucht": 63,
+    "knoepfe_gefunden": 36,
+    "knoepfe_gesucht": 36
+   },
+   "verworfen": 2
   },
   {
    "adresse": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html",
    "geraet": "samsung-galaxy-s26",
-   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Seite nach 30000 ms nicht geladen",
-   "kombinationen": [],
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/hardware/v2/virtualItem/253?businessTransaction=newContract&salesChannel=Online.Consumer&financingType=rate",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "unbekannt"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "d53cad6fb7cf3872194488af79af97410396f316d87226acd19d5de6becf5eed",
+      "seite": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html",
+      "zeitpunkt": "2026-10-08T09:49:31Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "unbekannt"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 0.99,
+      "rate": 21.0,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/hardware/v2/virtualItem/253?businessTransaction=newContract&salesChannel=Online.Consumer&financingType=rate",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "unbekannt"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "663a12fd7d633350c662f1b667e83a06c0cf269a578c473a476e158aca1a6ab0",
+      "seite": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html",
+      "zeitpunkt": "2026-10-08T09:49:50Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "unbekannt"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 0.99,
+      "rate": 31.5,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/hardware/v2/virtualItem/253?businessTransaction=newContract&salesChannel=Online.Consumer&financingType=rate",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "256 GB",
+      "tarif": "unbekannt"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "8a7c6cb0302a968dc49eef64ced435ae8e636499f0cc41692ca2a5ff678cba72",
+      "seite": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html",
+      "zeitpunkt": "2026-10-08T09:50:10Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "256 GB",
+      "tarif": "unbekannt"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 0.99,
+      "rate": 63.0,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/hardware/v2/virtualItem/253?businessTransaction=newContract&salesChannel=Online.Consumer&financingType=rate",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "unbekannt"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "70f0b01b4d2660b06404f18f8f157e92345931b02b9e1cd90e2029b4fb8f6acd",
+      "seite": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html",
+      "zeitpunkt": "2026-10-08T09:51:10Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "unbekannt"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 0.99,
+      "rate": 26.0,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/hardware/v2/virtualItem/253?businessTransaction=newContract&salesChannel=Online.Consumer&financingType=rate",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "unbekannt"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "3ae55d4ccee166f9c002a5c9eb023ba5194ca1e4f37e74d043c71d95886e3ac5",
+      "seite": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html",
+      "zeitpunkt": "2026-10-08T09:51:30Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "unbekannt"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 0.99,
+      "rate": 39.0,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/hardware/v2/virtualItem/253?businessTransaction=newContract&salesChannel=Online.Consumer&financingType=rate",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "512 GB",
+      "tarif": "unbekannt"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "49692b57e75d6577e7ce4fd439816f7a1c6da942c0694d23422f37f16f219d2b",
+      "seite": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html",
+      "zeitpunkt": "2026-10-08T09:51:49Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "512 GB",
+      "tarif": "unbekannt"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 0.99,
+      "rate": 78.0,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 2.0,
+    "anfragen": 209,
+    "beendet": 208,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "tags.vodafone.de": 1
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 167.4,
+    "takte_ms": 17000,
+    "wartet_auf": "load"
+   },
    "speicher_gb": 256,
-   "status": "nicht_besucht"
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 0.42857142857142855,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 18,
+    "felder_gesucht": 42,
+    "knoepfe_gefunden": 24,
+    "knoepfe_gesucht": 24
+   },
+   "verworfen": 2
   }
  ],
- "ueberfaellig": [
-  "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
-  "https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html"
- ],
+ "ueberfaellig": [],
  "vertragsform": "tarif_plus_ratenkauf",
- "zeitbudget_sekunden": 3976
+ "zeitbudget_sekunden": 3673
 }
