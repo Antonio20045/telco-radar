@@ -9,7 +9,8 @@ im Katalog, der Speicher beim Gerät, die Adresse ist https (http nur für
 Seite darf ``weiter`` tragen (``Weiter``): Selektor und, wenn angegeben, sichtbarer Text
 genau eines Knopfs oder Links zum nächsten Schritt der Bestellstrecke
 (``klickfolgeseite``). Jeder Verstoß wirft ``ErkundungszielFehler`` mit der Stelle; ein
-Ziel wird nie still übergangen. User-Agent und Abrufabstand kommen aus den Quellen.
+Ziel wird nie still übergangen. User-Agent und Abrufabstand kommen aus den Quellen;
+``seitenabstand_sekunden`` (Zahl ab 0, Vorgabe 0) ist die Pause zwischen zwei Seiten.
 Der Klick-Tageslauf liest dasselbe Format aus ``TAGESDATEI``, ohne Seitengrenze
 (``klicktageslauf``); ``geplante_anbieter`` nennt, wer darin eine Karte unter
 ``KARTEN`` hat und darum jeden Tag ein Ergebnis liefern soll.
@@ -65,13 +66,14 @@ class Seitenziel:
 
 @dataclass(frozen=True)
 class Erkundungsziel:
-    """Ein Anbieter mit seinen Seiten, Kennung und eigenem Abrufabstand."""
+    """Ein Anbieter mit seinen Seiten, Kennung, Abrufabstand und Seitenabstand."""
 
     schluessel: str
     name: str
     seiten: tuple[Seitenziel, ...]
     kennung: str | None
     rate_limit_sekunden: float
+    seitenabstand_sekunden: float = 0.0
 
 
 def lade_ziele(
@@ -117,6 +119,7 @@ def lade_ziele(
                 seiten=seiten,
                 kennung=anbieter.user_agent if anbieter.user_agent else None,
                 rate_limit_sekunden=anbieter.rate_limit_sekunden,
+                seitenabstand_sekunden=_seitenabstand(eintrag, ort),
             )
         )
     schluessel_alle = [z.schluessel for z in ziele]
@@ -177,6 +180,13 @@ def _weiter(roh: object, ort: str) -> Weiter | None:
         raise ErkundungszielFehler(f"{ort}: unbekanntes Feld {', '.join(fremd)}")
     text = _text(roh, "text", ort) if "text" in roh else None
     return Weiter(_text(roh, "selektor", ort), text)
+
+
+def _seitenabstand(eintrag: dict, ort: str) -> float:
+    wert = eintrag.get("seitenabstand_sekunden", 0)
+    if isinstance(wert, bool) or not isinstance(wert, int | float) or wert < 0:
+        raise ErkundungszielFehler(f"{ort}: seitenabstand_sekunden keine Zahl ab 0")
+    return float(wert)
 
 
 def _text(daten: dict, feld: str, ort: str) -> str:

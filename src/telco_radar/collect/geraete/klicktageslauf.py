@@ -19,7 +19,9 @@ Zeitbudget (CLAUDE.md Regel 8): ``budget_ende`` rechnet gegen die Restzeit des J
 minus der schon verstrichenen Jobzeit minus ``RESERVE_S`` für Schreiben und Hochladen.
 Eine Seite beginnt nur mit mindestens ``MINDESTZEIT_SEITE_S`` Rest und bekommt höchstens
 ``ZEIT_JE_SEITE_S``; danach lässt die Fristschleuse keine Anfrage mehr hinaus und der
-Crawler nennt den Rest ``nicht besucht``.
+Crawler nennt den Rest ``nicht besucht``. Zwischen zwei besuchten Seiten wartet der
+Lauf ``Erkundungsziel.seitenabstand_sekunden`` (ruhiges Tempo, keine Anpassung an
+eine Sperre); vor der ersten und nach dem Ende wartet er nicht.
 
 Rotation: Einheit ist die Produktseite, denn der Crawler klickt alle Varianten einer
 Seite in einem Gang. Zuerst kommen nie gelesene Seiten, dann die am längsten nicht
@@ -123,16 +125,21 @@ def fahre(
     gelesen: Mapping[str, str],
     laeufe: Laufpruefung | None = None,
     uhr: Callable[[], float] = time.monotonic,
+    schlafe: Callable[[float], None] = time.sleep,
 ) -> dict:
     """Liest die Seiten eines Anbieters in Rotation; gibt die Ergebnisdatei zurück.
 
     ``laeufe`` ist die Parallellauf-Prüfung; ``None`` nur für Läufe ohne Actions.
+    ``schlafe`` wartet den Seitenabstand ab.
     """
     start = uhr()
     seiten: list[dict] = []
     stopp: str | None = None
     zeit = 0
+    besucht = False
     for seite in reihenfolge(ziel.seiten, gelesen):
+        if stopp is None and besucht and ziel.seitenabstand_sekunden > 0:
+            schlafe(ziel.seitenabstand_sekunden)
         rest = ende - uhr()
         if stopp is None and rest < MINDESTZEIT_SEITE_S:
             stopp = f"{GRUND_BUDGET}: noch {max(0, round(rest))} s"
@@ -143,6 +150,7 @@ def fahre(
             seiten.append(nicht_besucht(seite, stopp))
             continue
         lauf = crawle(seite, min(ende, uhr() + ZEIT_JE_SEITE_S))
+        besucht = True
         seiten.append(seite_als_daten(seite, lauf))
         if lauf.status == LAUF_GESTOERT and lauf.stoerung == STOERUNG_ZEIT:
             zeit += 1

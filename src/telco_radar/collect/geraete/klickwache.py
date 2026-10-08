@@ -15,9 +15,11 @@ gestört. Bleibt sie über die Frist offen, heißt die Kombination ``nicht_erfas
 (``ausstehend``), und vor dem nächsten Klick wie am Ende des Laufs wartet die Wache sie
 ab oder bricht den Lauf als gestört ab. Ruhe heißt: keine Anfrage der Seite läuft, und
 zwei Lesungen im Abstand ``RUHE_MS`` zeigen dieselben Knöpfe und keine neue Anfrage.
-Mitgeschnitten wird jede Antwort, die zu einer Quelle der Karte passt; erwartet keine
-Quelle eine Antwort je Klick (congstar, Vodafone, 1&1), wartet die Wache nach einem
-Klick nur auf Ruhe.
+Ließ das Tor eine JavaScript-Prüfung in den Browser (``klicksperre``), zählt ihre 202
+nicht als Verdacht, und ``lade`` wartet höchstens ``PRUEFUNG_FRIST_MS``, bis die Seite
+danach neu geladen ist; sonst ist der Lauf gestört. Mitgeschnitten wird jede Antwort,
+die zu einer Quelle der Karte passt; erwartet keine Quelle eine Antwort je Klick
+(congstar, Vodafone, 1&1), wartet die Wache nach einem Klick nur auf Ruhe.
 """
 
 from __future__ import annotations
@@ -30,6 +32,7 @@ from playwright.sync_api import Error as PlaywrightFehler
 
 from .klickladung import Ladung
 from .klicklauf import (
+    CHALLENGE_STATUS,
     LAUF_GESPERRT,
     LAUF_GESTOERT,
     STOERUNG_ZEIT,
@@ -42,7 +45,7 @@ from .klickspur import ohne_geheimnisse, status_verdacht
 from .klicktor import SEITEN_FRIST_MS, WARTE_TAKT_MS, Tor, kurz
 
 if TYPE_CHECKING:
-    from playwright.sync_api import Page, Response
+    from playwright.sync_api import Frame, Page, Response
 
     from .klickkarte import Klickkarte
     from .klickoptionen import Option
@@ -51,6 +54,11 @@ log = logging.getLogger(__name__)
 
 RUHE_MS = 500
 MINDESTE_RUHELESUNGEN = 3
+PRUEFUNG_FRIST_MS = 2 * SEITEN_FRIST_MS
+GRUND_PRUEFUNG = (
+    f"Abruf gestört (JavaScript-Prüfung nach {PRUEFUNG_FRIST_MS} ms nicht bestanden,"
+    f" HTTP {CHALLENGE_STATUS})"
+)
 
 Marke = tuple[int, int, int]
 
@@ -80,6 +88,8 @@ class Wache:
         self.mitschnitt = Mitschnitt(self.passt)
         self.mitschnitt.binde(seite)
         seite.on("response", self._beobachte)
+        self.navigationen = 0
+        seite.on("framenavigated", self._navigiert)
         self.ladung = Ladung(seite)
         self.antwort: Response | None = None
         self.ausstehend: str | None = None
@@ -123,6 +133,7 @@ class Wache:
         self.lauf.http_status = self.tor.haupt_status
         if self.tor.umleitung is not None:
             return
+        self._warte_pruefung()
         geladen = self.ladung.warte(self.pruefe_tor)
         abstand = self.tor.schleuse.abstand(ziel)
         self.lauf.ladung = self.ladung.diagnose(geladen, abstand)
@@ -130,6 +141,23 @@ class Wache:
         if not geladen:
             self.lauf.stoerung = STOERUNG_ZEIT
             raise Abbruch(LAUF_GESTOERT, self.ladung.grund())
+
+    def _warte_pruefung(self) -> None:
+        """Wartet nach einer JavaScript-Prüfung, bis die Seite danach geladen hat."""
+        if not self.tor.pruefung.offen:
+            return
+        stand = self.navigationen
+        if not self.warte(
+            lambda: not self.tor.pruefung.offen and self.navigationen > stand,
+            PRUEFUNG_FRIST_MS,
+        ):
+            raise Abbruch(LAUF_GESTOERT, GRUND_PRUEFUNG)
+        self.lauf.http_status = self.tor.haupt_status
+        self.ladung.beginne()
+
+    def _navigiert(self, rahmen: Frame) -> None:
+        if rahmen.parent_frame is None:
+            self.navigationen += 1
 
     def warte(self, bedingung: Callable[[], bool], frist_ms: int | None = None) -> bool:
         """Wartet in Takten, bis ``bedingung`` gilt; fragt in jedem Takt das Tor."""
@@ -200,6 +228,8 @@ class Wache:
         ``_pruefe`` prüft die genommene zusätzlich am Körper, die Hauptseite das Tor.
         """
         if self.tor.stoerung is not None:
+            return
+        if antwort.status == CHALLENGE_STATUS and antwort.url == self.tor.pruefung.url:
             return
         art = antwort.request.resource_type
         url = ohne_geheimnisse(antwort.url)

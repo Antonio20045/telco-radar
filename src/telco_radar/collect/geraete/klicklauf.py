@@ -220,10 +220,9 @@ class Strukturbilanz:
 class Klicklauf:
     """Ein Lauf über eine Produktseite: Status, Ergebnisse, Struktur, Verworfenes.
 
-    ``bezug`` ist die Strukturbilanz, gegen die ``pruefe_struktur`` den Lauf maß;
-    ``hilfsdateien`` sind die Skripte und Stylesheets, die ohne Regeln geladen wurden.
-    ``stoerung`` benennt eine Störung ohne Bot-Schutz, ``ladung`` ist die Diagnose
-    des letzten Ladens der Hauptseite (``klickladung``).
+    ``bezug``: Bilanz, gegen die ``pruefe_struktur`` maß; ``hilfsdateien``: ohne
+    Regeln geladene Skripte, Stylesheets; ``stoerung``: Störung ohne Bot-Schutz;
+    ``ladung``: letztes Laden der Hauptseite (``klickladung``); ``sperre``: Sperre.
     """
 
     anbieter: str
@@ -239,6 +238,7 @@ class Klicklauf:
     bezug: Strukturbilanz | None = None
     stoerung: str | None = None
     ladung: dict[str, object] | None = None
+    sperre: str | None = None
 
 
 def fehlender_preis(

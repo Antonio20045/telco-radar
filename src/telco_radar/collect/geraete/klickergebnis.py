@@ -2,9 +2,10 @@
 
 Je Anbieter schreibt der Tageslauf (``klicktageslauf``) ein JSON: Kopf mit Anbieter,
 Datum, Karte, Vertragsform, Laufstatus und Zeitbudget, je Produktseite ihr Klicklauf
-mit allen Kombinationen. Screenshots, HAR, Seitentext und Cookies stehen nie darin,
-Adressen nur ohne Geheimnisse (``klickspur.ohne_geheimnisse``); vom Beleg bleiben
-``beleg_id``, Seitenadresse und Zeitpunkt.
+mit HTTP-Status, Art der Sperre (``klicksperre.sperrart``, ``None`` ohne Sperre oder
+nicht besucht) und allen Kombinationen. Screenshots, HAR, Seitentext und Cookies
+stehen nie darin, Adressen nur ohne Geheimnisse (``klickspur.ohne_geheimnisse``); vom
+Beleg bleiben ``beleg_id``, Seitenadresse und Zeitpunkt.
 
 Der Laufstatus des Anbieters (``laufstatus``) ist ``gestoert``, sobald eine Seite
 gestört endete (Bot-Schutz, Challenge, Kanarienwert, Strukturbruch); eine Seite, die
@@ -107,6 +108,7 @@ def seite_als_daten(ziel: Seitenziel, lauf: Klicklauf) -> dict:
         "status": lauf.status,
         "grund": lauf.grund,
         "http_status": lauf.http_status,
+        "sperre": lauf.sperre,
         "struktur": {
             **asdict(bilanz),
             "anteil_knoepfe": bilanz.anteil_knoepfe,
@@ -128,6 +130,8 @@ def nicht_besucht(ziel: Seitenziel, grund: str) -> dict:
         "adresse": ohne_geheimnisse(ziel.adresse),
         "status": SEITE_NICHT_BESUCHT,
         "grund": grund,
+        "http_status": None,
+        "sperre": None,
         "kombinationen": [],
     }
 

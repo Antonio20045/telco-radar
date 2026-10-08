@@ -17,7 +17,8 @@ das erlaubte Ziel, beantwortet die Umleitung mit einer leeren Seite, und der Cra
 in ``Klicklauf.gescheitert``.
 
 Antwortet die Hauptseite mit Bot-Schutz (``klicklauf.bot_schutz``), beim Öffnen wie
-mitten im Lauf, kommt die Seite nie im Browser an, und danach geht nichts mehr hinaus.
+mitten im Lauf, kommt die Seite nie im Browser an, und danach geht nichts mehr hinaus;
+die erste JavaScript-Prüfung je Seite geht in den Browser (``klicksperre``).
 Ein WebSocket verbindet nie (sperrt robots.txt ihn, steht er in ``verworfen``), und
 Vorabladen (Speculation Rules, ``<link rel=prerender|prefetch>``, Kopfzeile ``Link``)
 entfernt das Tor aus Kopf und Dokument jeder Antwort; was sonst an ``route``
@@ -45,6 +46,7 @@ from . import Abrufschleuse
 from .basis import GeraeteAbrufFehler
 from .klickhilfe import Ausnahmeweg
 from .klicklauf import Gescheitert, Klicklauf, Verworfen, antworttext, bot_schutz
+from .klicksperre import Pruefung
 from .robots import RobotsWaechter, host_von
 
 if TYPE_CHECKING:
@@ -199,6 +201,7 @@ class Tor:
         self.geschlossen = False
         self.stoerung: str | None = None
         self.haupt_status: int | None = None
+        self.pruefung = Pruefung(lauf)
         self.umleitung: str | None = None
         self.warte: Callable[[float], None] | None = None
         self.beobachter: Callable[[Request, APIResponse], str | None] | None = None
@@ -325,7 +328,7 @@ class Tor:
         typ = antwort.headers.get("content-type", "")
         text = antworttext(antwort.body(), typ) if "html" in typ.lower() else ""
         grund = bot_schutz(antwort.status, typ, text)
-        if grund is None:
+        if self.pruefung.laesst_durch(antwort, text, grund):
             return True
         log.warning("Klick-Crawler: %s, %s; Lauf endet", antwort.url, grund)
         if self.stoerung is None:
