@@ -17,8 +17,8 @@
 #
 # Rotation: nie gelesene Seiten zuerst, dann die am längsten nicht gelesenen
 # (data/state/klick/klick_stand.json). Reicht das Zeitbudget nicht für alle Seiten
-# eines Tages, liest der nächste Tag die übrigen; jede Seite soll spätestens
-# alle drei Tage gelesen sein (`ueberfaellig` in der Ergebnisdatei).
+# eines Tages, liest der nächste Tag die übrigen; jede Seite soll jeden Tag
+# gelesen sein (`ueberfaellig` nach einem Tag ohne Lesung, in der Ergebnisdatei).
 #
 # `seitenabstand_sekunden` (Vorgabe 0): Pause zwischen zwei Seiten eines Anbieters,
 # ruhiges Tempo als Normalfall, keine Anpassung an eine Sperre (Pitch 1, 08.10.2026).

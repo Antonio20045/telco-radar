@@ -102,6 +102,16 @@
   Diese Marken vermarkten ausschließlich SIM-only. Das ist selbst ein Befund
   und steht deshalb hier – als eine Zeile, nicht als leere Kachel.</p>
   {% endif %}
+
+  {# Schnitt 5: je Anbieter mit Klick-Lauf der Lesestand des Tages; Zahl und
+     Satz kommen fertig aus `analyze.klick_lesestand`. #}
+  {% set klick = geraete.quellenlage.klick %}
+  {% if klick and (klick.zeilen or klick.unlesbar) %}
+  <ul class="gr-ruhe gr-klick">
+    {% for z in klick.zeilen %}<li><b>{{ z.name }}</b> · {{ z.satz }}</li>{% endfor %}
+    {% for u in klick.unlesbar %}<li>{{ u }}</li>{% endfor %}
+  </ul>
+  {% endif %}
 </section>
 
 {# D4a (24.09.2026, Erklärtext-Inventur der Geräteseite): DIE METHODIK-

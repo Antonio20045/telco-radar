@@ -21,8 +21,11 @@ abgelegt von ``analyze.klick_ablage`` im eigenen Workflow), daneben der Lesestan
 ``STAND_DATEI`` (``lies_stand``): je Anbieter das Datum, an dem jede Produktseite
 zuletzt ganz gelesen wurde (``ROTATION_GELESEN``; eine an der Zeitgrenze abgeschnittene
 Seite liefert ihre besuchten Varianten, gilt aber nicht als gelesen). Der Tageslauf
-ordnet danach. ``FRISCHEGRENZE_TAGE`` ist die Frist, in der jede Seite wieder gelesen
-sein soll und in der eine Klick-Messung im Bestand Vorrang vor dem Adapter behält.
+ordnet danach. Jede Seite soll jeden Tag gelesen sein: nach ``LESEFRIST_TAGE`` ohne
+ganze Lesung ist sie überfällig. Getrennt davon ist ``FRISCHEGRENZE_TAGE`` die Frist,
+in der eine Klick-Messung im Bestand nutzbar bleibt und Vorrang vor dem Adapter
+behält, damit ein ausgefallener Tag die Seite nicht leert. ``ganz_gelesen`` ist die
+eine Definition einer heute gelesenen Seite, für Rotation und Quellenseite.
 """
 
 from __future__ import annotations
@@ -54,6 +57,7 @@ log = logging.getLogger(__name__)
 
 FORMAT = 1
 FRISCHEGRENZE_TAGE = 3
+LESEFRIST_TAGE = 1
 LAUF_LEER = "leer"
 LAUF_NICHT_GELESEN = "nicht_gelesen"
 SEITE_NICHT_BESUCHT = "nicht_besucht"
@@ -134,6 +138,11 @@ def nicht_besucht(ziel: Seitenziel, grund: str) -> dict:
         "sperre": None,
         "kombinationen": [],
     }
+
+
+def ganz_gelesen(seiten: list[dict]) -> list[dict]:
+    """Die Seiten, die der Lauf ganz gelesen hat (``ROTATION_GELESEN``)."""
+    return [s for s in seiten if s["status"] in ROTATION_GELESEN]
 
 
 def laufstatus(seiten: list[dict]) -> tuple[str, str | None]:

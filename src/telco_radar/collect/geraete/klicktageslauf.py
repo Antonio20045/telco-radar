@@ -27,8 +27,9 @@ Rotation: Einheit ist die Produktseite, denn der Crawler klickt alle Varianten e
 Seite in einem Gang. Zuerst kommen nie gelesene Seiten, dann die am längsten nicht
 gelesenen (Lesestand, ``klickergebnis.lies_stand``); bei Gleichstand gilt die
 Reihenfolge der Konfiguration. Seiten, die heute nicht ganz gelesen wurden (eine an der
-Zeitgrenze abgeschnittene zählt nicht, ``klickergebnis.ROTATION_GELESEN``) und deren
-letzte Lesung ``FRISCHEGRENZE_TAGE`` oder älter ist, stehen unter ``ueberfaellig``.
+Zeitgrenze abgeschnittene zählt nicht, ``klickergebnis.ganz_gelesen``) und deren
+letzte Lesung ``LESEFRIST_TAGE`` oder älter ist, stehen unter ``ueberfaellig``: jede
+Seite soll jeden Tag gelesen sein.
 Kein LLM.
 """
 
@@ -45,7 +46,8 @@ from .klickcrawler import klicke_durch
 from .klickergebnis import (
     FORMAT,
     FRISCHEGRENZE_TAGE,
-    ROTATION_GELESEN,
+    LESEFRIST_TAGE,
+    ganz_gelesen,
     laufstatus,
     nicht_besucht,
     seite_als_daten,
@@ -100,7 +102,7 @@ def ueberfaellig(
     heute_gelesen: set[str],
     heute: str,
 ) -> list[str]:
-    """Adressen ohne Geheimnisse, heute ungelesen und älter als die Frischegrenze."""
+    """Adressen ohne Geheimnisse, heute ungelesen und älter als die Lesefrist."""
     tag = date.fromisoformat(heute)
     adressen = [ohne_geheimnisse(s.adresse) for s in seiten]
     return [
@@ -109,7 +111,7 @@ def ueberfaellig(
         if a not in heute_gelesen
         and (
             a not in gelesen
-            or (tag - date.fromisoformat(gelesen[a])).days >= FRISCHEGRENZE_TAGE
+            or (tag - date.fromisoformat(gelesen[a])).days >= LESEFRIST_TAGE
         )
     ]
 
@@ -159,7 +161,7 @@ def fahre(
         elif lauf.status == LAUF_GESTOERT:
             stopp = f"{GRUND_NACH_STOERUNG}: {lauf.grund}"
     status, grund = laufstatus(seiten)
-    heute_gelesen = {s["adresse"] for s in seiten if s["status"] in ROTATION_GELESEN}
+    heute_gelesen = {s["adresse"] for s in ganz_gelesen(seiten)}
     faellig = ueberfaellig(ziel.seiten, gelesen, heute_gelesen, heute)
     daten = {
         "format": FORMAT,
@@ -171,6 +173,7 @@ def fahre(
         "laufstatus": status,
         "grund": grund,
         "frischegrenze_tage": FRISCHEGRENZE_TAGE,
+        "lesefrist_tage": LESEFRIST_TAGE,
         "zeitbudget_sekunden": round(max(0.0, ende - start)),
         "dauer_sekunden": round(uhr() - start, 1),
         "seiten": seiten,

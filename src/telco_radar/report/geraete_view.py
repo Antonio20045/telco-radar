@@ -64,7 +64,7 @@ from .geraete_laufzeit import LAUFZEIT_STANDARD, ansicht, rang_der_monatsangabe
 from .geraete_tco_band import _MONATE, band_label
 from ..analyze import geraete_lifecycle, klick_erfassung as erfassung
 from ..analyze.tco_store import TcoDB
-
+from ..analyze.klick_lesestand import mit_klick
 from ..tco_model import TCO_HORIZONT, zeitraum_vergleichbar
 from ..tarif_bezug import Tarifbestand
 from .ausfall import Ausfall
@@ -1780,5 +1780,5 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         "katalog_obj": katalog,
         "vergleich": vergleich,
         "lifecycle": lifecycle,
-        "quellenlage": _quellenlage(quellen, db, bestand),
+        "quellenlage": mit_klick(_quellenlage(quellen, db, bestand), state_dir),
     }
