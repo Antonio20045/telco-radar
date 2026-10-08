@@ -195,7 +195,8 @@ class Antwortmuster:
     """Eine Quelle der zweiten Lesung und wo ihre Werte stehen.
 
     Genau eines von ``url_muster`` (mitgeschnittene Antwort), ``skript`` (JSON im
-    ersten Treffer des CSS-Selektors) und ``globale`` (globale Variablen der Seite).
+    ersten Treffer des CSS-Selektors), ``globale`` (globale Variablen der Seite) und
+    ``seitenwerte`` (die benannten Seitenwerte, Pfad ist ihr Name).
     ``laden``: die Antwort gilt für jede Kombination, nicht nur für den Klick, nach dem
     sie kam; ``start``: die Quelle gilt nur, bis die Seite zum ersten Mal geklickt
     wurde. ``erkennung`` wählt unter Antworten derselben Adresse die mit einem Wert an
@@ -211,6 +212,7 @@ class Antwortmuster:
     parameter: Mapping[str, str | Wertpfad]
     skript: str | None = None
     globale: tuple[str, ...] = ()
+    seitenwerte: bool = False
     laden: bool = False
     start: bool = False
     erkennung: str | None = None
@@ -233,6 +235,8 @@ class Antwortmuster:
             return f"skript {self.skript}"
         if self.globale:
             return f"global {', '.join(self.globale)}"
+        if self.seitenwerte:
+            return "seitenwerte"
         return "" if self.url_muster is None else self.url_muster.pattern
 
 

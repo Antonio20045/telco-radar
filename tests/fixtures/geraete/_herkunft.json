@@ -712,6 +712,19 @@
       "hinweis": "Byteidentischer Antwortkoerper aus dem Mitschnitt (nicht gekuerzt): iPhone 17 Pro 512 GB mit allen Ratenplaenen (12/24/36 Monate je drei Anzahlungsstufen) und dem Tarif MagentaMobil M."
     },
     {
+      "datei": "telekom_tarife_iphone17pro_20261007.json",
+      "url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/tariffs (POST der Produktseite https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false beim Laden, vor jedem Klick)",
+      "quelle": "Zweig klick-erkundung, Commit a9b45f5a, erkundung/telekom/2026-10-07/mitschnitt-1.json, Antwort 100 (Klick-Erkundung, Seite 1)",
+      "abgerufen_am": "2026-10-07",
+      "http_status": 200,
+      "content_type": "application/json;charset=UTF-8",
+      "bytes_roh": 110788,
+      "sha256_roh": "2f1cba6e0e8ff5a4caed174b6cf2ab614cc2c0f79abeaafd62e4700b53521053",
+      "gzip": false,
+      "bytes_abgelegt": 110788,
+      "hinweis": "Byteidentischer Antwortkoerper aus dem Mitschnitt (nicht gekuerzt): fuenf MagentaMobil-Tarife, MagentaMobil M (MF_17791) isSelected true mit 49,95 EUR monatlich, 39,95 EUR Bereitstellung, 50 GB."
+    },
+    {
       "datei": "telekom_bedienelemente_iphone17pro_20261007.json",
       "url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false",
       "quelle": "Zweig klick-erkundung, Commit a9b45f5a, erkundung/telekom/2026-10-07/bedienelemente-1.json (Elemente 36-38, 40, 42-44, 46, 63; Gruppen 42, 43, 45) und preise-1.json (Kandidaten 6, 7, 19, 22)",

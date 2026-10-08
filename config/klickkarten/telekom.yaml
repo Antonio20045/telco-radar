@@ -8,8 +8,12 @@
 # Kartenprobe 12). Die Preisantwort /v2/details kommt erst nach einem
 # Speicherklick (kl Probe 0 -> mi 210); beim Laden lädt die Seite keine
 # (mi 99-102), ein Laufzeitklick auch nicht (Tageslauf 08.10.2026, 256 GB 24/12).
-# Darum holt der Crawler Kombinationen ohne Antwort am Ende einmal nach: dann
-# ist 256 GB nicht mehr vorgewählt, und sein Klick lädt die Antwort.
+# Ohne sie lesen die zwei Ladequellen (antwort.1 /v2/tariffs, antwort.2 Label des
+# Laufzeitknopfs) alle Werte; so auch eine Seite mit nur einem Speicher (Pixel 11,
+# Tageslauf 08.10.2026 Commit 19f92ac3: „keine Antwort mitgeschnitten“, 512 GB nicht
+# angeboten). Die Seitenadresse ist keine Quelle: installmentValue/instalmentId
+# hinken Klicks nach (Tageslauf 08.10.2026, MagentaMobil XS 36 Monate, Rate 29,70,
+# Adresse installmentValue=112.5&instalmentId=12).
 #
 # Bewusst nicht in der Karte:
 # - Weitere Tarife: die Seite zeigt nur den gewählten (be 63, „Tarif ändern“
@@ -61,6 +65,13 @@ seite:
     selektor: '#dyt_productViewDesktop button.dt_filterChips[aria-checked="true"][aria-label*="Anzahlung"]'
     attribut: aria-label
     muster: 'zuzüglich\s+([\d.]+(?:,\d{1,2})?)\s*€\s*Anzahlung'
+  # be 42: aria-label des gewählten Laufzeitknopfs „26,90 € pro Monat für 36
+  # Monate, zuzüglich 99 € Anzahlung“ (aria-checked="true"); be 43/44 nicht gewählt.
+  # Steht vor jedem Klick auf der Seite (Seitenadresse installmentValue=26.9&
+  # instalmentId=36, ohne /v2/details: mi 99-102).
+  laufzeit_gewaehlt:
+    selektor: '#dyt_productViewDesktop button.dt_filterChips[role="radio"][aria-checked="true"][aria-label*=" Monate"]'
+    attribut: aria-label
 
 zusammenfassung:
   selektor:
@@ -95,13 +106,14 @@ zusammenfassung:
     volumen_gb: '(\d+)\s*GB\s+MagentaMobil'
 
 antwort:
+  # Je Wertfeld gilt die erste Quelle mit Wert: /v2/details vor den Ladequellen.
   # mi Antwort 210: POST /shop/api/eshop/bff-de/productOfferings/v2/details,
   # HTTP 200, JSON, 109 137 Byte, nicht gekürzt; kam nach dem Klick auf 512 GB
   # (kl Probe 0). Sie trägt den gewählten Speicher mit allen Ratenplänen
   # (12/24/36 Monate je drei Anzahlungsstufen) und den gewählten Tarif. Ein
   # Laufzeitklick lädt sie nicht nachweislich neu, darum gilt die letzte seit
   # dem Laden (laden).
-  url_muster: '/shop/api/eshop/bff-de/productOfferings/v2/details'
+- url_muster: '/shop/api/eshop/bff-de/productOfferings/v2/details'
   laden: true
   platzhalter:
     # Plan der Laufzeit mit der Anzahlung, die die Seite zeigt
@@ -117,6 +129,28 @@ antwort:
   variante:
     speicher: 'variants.0.characteristics[name=storage].values.0.label'
     tarif: 'tariff.name'
+# Commit a9b45f5a mi Antwort 100: POST /productOfferings/v2/tariffs, HTTP 200,
+# 110 788 Byte, nicht gekürzt, beim Laden vor jedem Klick. tariffs[2] „MagentaMobil
+# M“ isSelected true: monthlyTariffFee 49.95 (Seite pr 19), oneTimeTariffFee 39.95
+# (pr 22), dataBenefits.0.label „50 GB“ (Gruppe 43); gleiche Werte wie mi 210.
+- url_muster: '/shop/api/eshop/bff-de/productOfferings/v2/tariffs'
+  laden: true
+  pfade:
+    tarifphasen: 'tariffs[isSelected=true].prices[name=monthlyTariffFee].actualValue'
+    anschluss: 'tariffs[isSelected=true].prices[name=oneTimeTariffFee].actualValue'
+    volumen_gb: 'tariffs[isSelected=true].dataBenefits.0.label'
+  variante:
+    tarif: 'tariffs[isSelected=true].name'
+# seite.laufzeit_gewaehlt (be 42 aria-label): Rate „26,90 € pro Monat“, Ratenzahl
+# „für 36 Monate“, Anzahlung „zuzüglich 99 €“; der Text des Knopfs (pr 6/7) ist die
+# erste Lesung, das Label die zweite (Gegenprobe: anderes Label -> Befund).
+- seitenwerte: true
+  pfade:
+    rate: {pfad: laufzeit_gewaehlt, muster: '^([\d.]+(?:,\d{1,2})?)\s*€\s*pro Monat'}
+    ratenzahl: {pfad: laufzeit_gewaehlt, muster: 'für (\d+) Monate'}
+    anzahlung:
+      pfad: laufzeit_gewaehlt
+      muster: 'zuzüglich\s+([\d.]+(?:,\d{1,2})?)\s*€\s*Anzahlung'
 
 kanarie:
   # be 46: aria-label „View energy label for Apple iPhone 17 Pro“.

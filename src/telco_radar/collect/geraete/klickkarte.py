@@ -71,8 +71,9 @@ Zweite Lesung (Stufe 2 von Format 2):
 
 - ``antwort`` als Liste von Quellen; je Wertfeld zählt die erste mit Wert. Je Quelle
   genau eines von ``url_muster``, ``skript`` (CSS eines Skripts mit JSON: o2
-  ``script#pageValue``, Telekom) und ``global`` (Name oder Liste globaler Variablen,
-  Pfade beginnen mit dem Namen: 1&1 ``hwdVariantsPrices``). ``laden: true``: die
+  ``script#pageValue``, Telekom), ``global`` (Name oder Liste globaler Variablen,
+  Pfade beginnen mit dem Namen: 1&1 ``hwdVariantsPrices``) und ``seitenwerte: true``
+  (Pfade sind Namen aus ``seite``: Telekom ohne ``/v2/details``). ``laden: true``: die
   Antwort kommt beim Laden und gilt für jede Kombination (congstar, Vodafone);
   ``start: true``: die Quelle gilt nur bis zum ersten Klick (o2, der Startzustand
   steht nur im Skript); ``erkennung``: unter Antworten derselben Adresse die mit einem

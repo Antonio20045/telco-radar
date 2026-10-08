@@ -6,8 +6,8 @@ Seitenwerten und ``zusammenfassung.muster`` je Wertfeld. Jeder Pfad wird auf For
 (``klickpfad.pfadfehler``) und Platzhalter geprüft; ein Fehler wirft
 ``KlickkartenFehler`` mit Punktpfad. ``platzhalter`` einer Quelle sind benannte Pfade,
 die nur die Platzhalter der Kombination tragen und keinen anderen Namen verdecken;
-ihre Namen gelten in ``pfade`` und ``variante`` derselben Quelle. Dieses Modul ruft
-kein Netz.
+ihre Namen gelten in ``pfade`` und ``variante`` derselben Quelle. Die Pfade einer
+``seitenwerte``-Quelle sind Namen aus ``seite``. Dieses Modul ruft kein Netz.
 """
 
 from __future__ import annotations
@@ -48,7 +48,7 @@ from .klickpfad import pfadfehler, platzhalter
 if TYPE_CHECKING:
     from .klickkartenleser import Kartenleser
 
-QUELLENARTEN = ("url_muster", "skript", "global")
+QUELLENARTEN = ("url_muster", "skript", "global", "seitenwerte")
 QUELLENTEILE = (
     *QUELLENARTEN,
     "laden",
@@ -66,6 +66,7 @@ SEITENTEILE = ("selektor", "attribut", "parameter", "muster")
 MUSTERTEILE = ("muster", "selektor")
 GRUND_PFAD = "kein gültiger Pfad"
 GRUND_GLOBAL = "kein Bezeichner einer globalen Variable"
+GRUND_KEIN_SEITENWERT = "kein Seitenwert dieses Namens"
 FELDER = (*WERTFELDER, *BUENDELFELDER)
 _NAME = re.compile(r"[a-z_][a-z0-9_]*")
 _GLOBAL = re.compile(r"[A-Za-z_$][\w$]*")
@@ -84,6 +85,8 @@ def lies_quellen(
     else:
         orte = ["antwort"]
         quellen = (_quelle(leser, roh, "antwort", namen),)
+    for quelle, ort in zip(quellen, orte, strict=True):
+        _pruefe_seitenquelle(leser, quelle, ort, seite)
     echo = any(q.variante or q.parameter for q in quellen)
     if not echo and not any(n in DIMENSIONEN for n in seite):
         raise leser.fehler(f"{orte[0]}.variante", GRUND_OHNE_VARIANTE)
@@ -184,12 +187,25 @@ def _quelle(
         parameter=_dimensionen(leser, daten, "parameter", feld, namen),
         skript=leser.wahlweise_text(daten, "skript", feld),
         globale=_globale(leser, daten, feld),
+        seitenwerte=_wahrheitswert(leser, daten, "seitenwerte", feld),
         laden=_wahrheitswert(leser, daten, "laden", feld),
         start=_wahrheitswert(leser, daten, "start", feld),
         erkennung=erkennung,
         segment=leser.wahlweise_muster(daten, "segment", feld),
         platzhalter=platzhalter,
     )
+
+
+def _pruefe_seitenquelle(
+    leser: Kartenleser, quelle: Antwortmuster, ort: str, seite: Mapping[str, Seitenwert]
+) -> None:
+    """Jeder Pfad einer ``seitenwerte``-Quelle ist der Name eines Seitenwerts."""
+    if not quelle.seitenwerte:
+        return
+    for feld, pfad in quelle.pfade.items():
+        name = pfad if isinstance(pfad, str) else getattr(pfad, "pfad", None)
+        if name not in seite:
+            raise leser.fehler(f"{ort}.pfade.{feld}", GRUND_KEIN_SEITENWERT)
 
 
 def _platzhalter(

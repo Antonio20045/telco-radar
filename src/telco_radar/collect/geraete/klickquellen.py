@@ -5,10 +5,12 @@ letzte passende Antwort seit dem Klick (``je_klick``) oder seit dem Laden (``lad
 congstar und Vodafone laden die Preise einmal), unter Antworten derselben Adresse die
 mit einem Wert an ``erkennung`` (congstar: drei GraphQL-Antworten, Vodafone: dieselbe
 Antwort als xhr und fetch); JSON in einem Skript der Seite (o2 ``script#pageValue``)
-oder globale Variablen (1&1 ``hwdVariantsPrices``). Eine ``start``-Quelle gilt nur,
-solange niemand geklickt hat. Die Werte liest ``klickecho.lies_antwort`` mit den
-Platzhaltern der Kombination; je Wertfeld zählt die erste Quelle mit einem Wert, je
-Dimension müssen alle Quellen dieselbe Variante nennen, sonst ist sie mehrdeutig.
+oder globale Variablen (1&1 ``hwdVariantsPrices``) oder die benannten Seitenwerte
+(Telekom: ``aria-label`` des gewählten Laufzeitknopfs, wenn ``/v2/details`` fehlt).
+Eine ``start``-Quelle gilt nur, solange niemand geklickt hat. Die Werte liest
+``klickecho.lies_antwort`` mit den Platzhaltern der Kombination; je Wertfeld zählt
+die erste Quelle mit einem Wert, je Dimension müssen alle Quellen dieselbe Variante
+nennen, sonst ist sie mehrdeutig.
 
 Für den Beleg nimmt der Leser die eine Antwort, aus der alle Werte stammen; kommen sie
 aus mehreren Quellen oder aus der Seite, ist der Mitschnitt eine Lesung: JSON der
@@ -154,6 +156,11 @@ class Quellenleser:
             return self._skript(stelle, quelle.skript)
         if quelle.globale:
             return self._globale(stelle, quelle.globale)
+        if quelle.seitenwerte:
+            werte = {name: platz.get(name) for name in self.karte.seite}
+            if all(w is None for w in werte.values()):
+                return None, None
+            return Nutzlast(stelle, werte), None
         alle = self.mitschnitt.antworten_seit(seit)
         passend = [a for a in alle if quelle.passt(a.url)]
         for antwort in reversed(passend):
