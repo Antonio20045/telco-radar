@@ -8,9 +8,13 @@ der Produktseite (``hwdVariantsPrices``, ``hwdVariantsOneOffPaymentFees``), gele
 dem Weiter; kein Mitschnitt hält das Dokument, Beleg ist die Produktseite iPhone 17 Pro
 vom 08.09.2026 (``einsundeins_produktseite_iphone_17_pro.html.gz``). Ihre Werte 44,99 €
 und 360 € sind dieselben, die die Kachel „24+12“ am 07.10. zeigte. Herkunft beider
-Dateien in ``tests/fixtures/geraete/_herkunft.json``. Gegenproben: die Kachel 24 bleibt
-Befund (die Globale nennt 36), 512 GB liest seinen eigenen Betrag, nie den eines
-Zubehör-Bündels, und eine Farbe, die es nicht gibt, liest keinen.
+Dateien in ``tests/fixtures/geraete/_herkunft.json``. Die Kachel 24 bestätigt die
+Globale nie (sie nennt 36); seit dem 08.10.2026 bestätigt die Kachel sich selbst
+(``klickkachel``): Label und Betrag in derselben Kachel, 59,99 € ohne Einmalzahlung.
+Gegenproben: ein anderes Label oder keines ist Befund, die Kachel 24+12 bleibt beim
+Echo gegen die Globale (eine fremde Kachel ist dort Befund), 512 GB liest seinen
+eigenen Betrag, nie den eines Zubehör-Bündels, und eine Farbe, die es nicht gibt,
+liest keinen.
 """
 
 from __future__ import annotations
@@ -23,6 +27,7 @@ from urllib.parse import parse_qs, urljoin, urlparse
 
 import pytest
 from bs4 import BeautifulSoup
+from klickergebnisse import einsundeins_kachel
 
 from telco_radar.collect.geraete.klickantwort import monate
 from telco_radar.collect.geraete.klickecho import (
@@ -30,6 +35,12 @@ from telco_radar.collect.geraete.klickecho import (
     lies_antwort,
     pruefe_echo,
     variante_aus,
+)
+from telco_radar.collect.geraete.klickkachel import (
+    QUELLE_KACHEL,
+    kachel_echo,
+    kacheldimension,
+    kachelpfade,
 )
 from telco_radar.collect.geraete.klickkartenprobe import GELADEN, lade_karte
 from telco_radar.collect.geraete.klickstrecke import KAUFWORT
@@ -222,7 +233,7 @@ def test_galaxy_s26_kacheln_lesen_eigene_werte(karte, weg):
     ]
 
 
-def test_gegenprobe_kachel_24_bleibt_befund(karte, weg, globale):
+def test_globale_bestaetigt_kachel_24_nie(karte, weg, globale):
     kachel, linkid = _kacheln(weg, 3)[0]
     im_text = _textwerte(karte, _kacheltext(weg, 3, kachel))
 
@@ -233,6 +244,69 @@ def test_gegenprobe_kachel_24_bleibt_befund(karte, weg, globale):
     assert [(b.feld, b.grund) for b in echo.befunde] == [
         ("antwort.laufzeit", "Antwort nennt 36 statt 24")
     ]
+    assert echo.buendel == Buendelwerte()
+
+
+def _kachel(karte, globale, gewaehlt: str, label: str | None, gezeigt):
+    lesung = lies_antwort(globale, karte.antwort, None, PLATZ)
+    variante = variante_aus("256", "tariff-anf-s-mvl", gewaehlt)
+    auswahl = ("laufzeit", gewaehlt, label)
+    echo = kachel_echo(variante, variante, auswahl, gezeigt, karte.entfallen)
+    return kacheldimension(karte, variante, lesung), lesung, echo
+
+
+def test_kachel_24_bestaetigt_sich_selbst_ohne_einmalzahlung(karte, globale):
+    label, gezeigt = einsundeins_kachel(0)
+
+    dimension, lesung, echo = _kachel(karte, globale, "24", label, gezeigt)
+
+    assert (label, dimension) == ("24", "laufzeit")
+    assert echo.stimmt, echo.befunde
+    assert echo.buendel == Buendelwerte(buendelbetrag=59.99)
+    assert lesung.buendel.einmalzahlung == 360.0
+    assert "einmalzahlung" in echo.luecken
+    assert kachelpfade(echo.buendel) == {"buendelbetrag": QUELLE_KACHEL}
+
+
+@pytest.mark.parametrize(
+    ("label", "grund"),
+    [
+        ("24+12", "Kachel nennt 24+12 statt 24"),
+        (None, "Kachel nennt keine Option für laufzeit"),
+    ],
+    ids=["label-36", "ohne-label"],
+)
+def test_gegenprobe_kachel_mit_anderem_oder_ohne_label_ist_befund(
+    karte, globale, label, grund
+):
+    anderes, _ = einsundeins_kachel(1)
+    _, gezeigt = einsundeins_kachel(0)
+
+    _, _, echo = _kachel(karte, globale, "24", label, gezeigt)
+
+    assert anderes == "24+12"
+    assert [(b.feld, b.grund) for b in echo.befunde] == [("kachel.laufzeit", grund)]
+    assert echo.buendel == Buendelwerte()
+
+
+def test_gegenprobe_kachel_36_bleibt_beim_echo_gegen_die_globale(karte, globale):
+    """Die Kachel 24+12 der Galaxy S26 (34,99 €, 220 €) gegen die Globale des iPhone
+    17 Pro (44,99 €, 360 €): Befund, kein Wert aus der Kachel allein."""
+    label, gezeigt = einsundeins_kachel(1, seite=4)
+    lesung = lies_antwort(globale, karte.antwort, None, PLATZ)
+    variante = variante_aus("256", "tariff-anf-s-mvl", label)
+
+    echo = pruefe_echo(
+        variante,
+        variante,
+        Preiswerte(),
+        lesung,
+        buendel=gezeigt,
+        entfallen=karte.entfallen,
+    )
+
+    assert kacheldimension(karte, variante, lesung) is None
+    assert {b.feld for b in echo.befunde} == {"buendelbetrag", "einmalzahlung"}
     assert echo.buendel == Buendelwerte()
 
 

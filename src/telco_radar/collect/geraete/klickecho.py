@@ -123,6 +123,12 @@ def pruefe_echo(
     )
 
 
+def seitenbefunde(gewaehlt: Variante, angezeigt: Variante) -> tuple[Befund, ...]:
+    """Befunde, wo die Seite eine andere als die gewählte Variante zeigt oder eine
+    gewählte Option unlesbar ist; ohne Antwort."""
+    return tuple(_variantenbefunde(gewaehlt, angezeigt, None))
+
+
 def _bestaetige(
     felder: tuple[str, ...],
     text: object,

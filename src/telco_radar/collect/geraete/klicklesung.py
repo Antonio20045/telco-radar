@@ -18,7 +18,9 @@ Gefundene Wertfelder zählt der Strukturwächter, ebenso jede angezeigte Option,
 das Muster der Karte nicht passt (``unlesbar``); deren Kombination heißt
 ``nicht_erfasst``. Mit ``weiter`` (``klickweiter``) liest ``vorlesung`` Seitenwerte,
 zweite Lesung und Markierung auf der Startseite vor dem Weiter-Klick; ``lies`` nimmt
-sie mit und liest auf der Folgeseite nur die Kachel an ``stelle``.
+sie mit und liest auf der Folgeseite nur die Kachel an ``stelle``. Nennt die zweite
+Lesung für die Kacheldimension eine andere Option, ist die Kachel selbst die Quelle
+(``klickkachel``).
 """
 
 from __future__ import annotations
@@ -33,6 +35,13 @@ from playwright.sync_api import Error as PlaywrightFehler
 from .klickbeleg import Belegquelle, baue_beleg
 from .klickecho import KEINE_AUSWAHL, Befund, Echo, Variante, pruefe_echo, variante_aus
 from .klickhar import Antwortkopie
+from .klickkachel import (
+    QUELLE_KACHEL,
+    kachel_echo,
+    kacheldimension,
+    kachellabel,
+    kachelpfade,
+)
 from .klickkarte import (
     BUENDELFELDER,
     DIMENSIONEN,
@@ -204,10 +213,18 @@ class Leser(Textleser):
             markierung = self._abweichung(ziel)
         abweichung = markierung + self._ohne_echo(ziel, seitenwerte, zweite.lesung)
         angezeigt = self._angezeigt(variante, seitenwerte)
-        echo = (
-            Echo(Preiswerte(), abweichung, ())
-            if abweichung
-            else pruefe_echo(
+        kachel = kacheldimension(self.karte, variante, zweite.lesung)
+        if abweichung:
+            echo = Echo(Preiswerte(), abweichung, ())
+        elif kachel is not None:
+            label = kachellabel(bereich, self.karte, kachel)
+            auswahl = (kachel, ziel[kachel], label)
+            entfallen = self.karte.entfallen
+            echo = kachel_echo(variante, angezeigt, auswahl, textbuendel, entfallen)
+            pfade = kachelpfade(echo.buendel)
+            self.belegteile = Belegteile(zweite.kopie, pfade, fundorte)
+        else:
+            echo = pruefe_echo(
                 variante,
                 angezeigt,
                 im_text,
@@ -215,7 +232,6 @@ class Leser(Textleser):
                 buendel=textbuendel,
                 entfallen=self.karte.entfallen,
             )
-        )
         bild, bildbefunde = self._screenshot(bereich)
         self.schliesse_dialog(bereich)
         befunde = echo.befunde + bildbefunde
@@ -241,6 +257,7 @@ class Leser(Textleser):
             buendel=gebuendelt,
             textbuendel=textbuendel,
             antwortbuendel=antwortbuendel,
+            echo_quelle=None if kachel is None or echo.befunde else QUELLE_KACHEL,
         )
 
     def belege(

@@ -20,7 +20,8 @@ mit seinem Schlüssel (nur Zustand neu), wenn er jedes Wertfeld nennt, das der
 Adaptersatz nennt (``WERTFELDER``); dann übernimmt er dessen SKU, Tarifnamen und Slug,
 die Bündel-ID bleibt. Sonst bleibt der Adaptersatz ganz, und die Bilanz zählt ihn unter
 ``unvollstaendig`` mit den fehlenden Feldern: zwei Quellen werden nie feldweise
-gemischt. Ohne Gegenstück kommt ein Klick-Satz, wie er ist (Lücken bleiben ``None``).
+gemischt. Ohne Gegenstück kommt ein Klick-Satz, wie er ist (Lücken bleiben ``None``),
+nur mit dem Namen eines Adaptersatzes anderer Laufzeit (``klick_geschwister``).
 Nennen zwei Klick-Sätze denselben Schlüssel, gilt einer, wenn ihre Werte gleich sind,
 sonst keiner (``mehrdeutig``). Jeder ersetzte Adaptersatz ist Gegenprobe.
 
@@ -53,6 +54,7 @@ from ..collect.geraete.klickziele import geplante_anbieter
 from ..geraete_model import Katalog
 from ..tarif_bezug import Tarifbestand
 from ..tco_model import Buendel, laufzeit_in_monaten
+from .klick_geschwister import Schluessel, geschwister, mit_namen
 from .tco_buendel import Buendelbilanz, aus_rohsaetzen
 
 log = logging.getLogger(__name__)
@@ -78,7 +80,6 @@ GRUND_DATUM = "Datum der Datei unlesbar: {datum!r}"
 UEBERNOMMEN = ("sku_id", "tarif_name", "tarif_slug")
 
 Geraet = Callable[[str], tuple[str, int | None]]
-Schluessel = tuple[str, str, int | None, str, int | None]
 
 
 @dataclass
@@ -203,14 +204,16 @@ def fuehre_zusammen(
         for schluessel in _adapterschluessel(satz, geraet):
             index.setdefault(schluessel, []).append(stelle)
     probe = Gegenprobe()
+    andere_laufzeit = geschwister(index)
     ersetzt: set[int] = set()
     neu: list[dict] = []
     ohne_gegenstueck = 0
     for satz in eindeutig:
-        treffer = sorted(set(index.get(klickschluessel(satz), [])))
+        schluessel = klickschluessel(satz)
+        treffer = sorted(set(index.get(schluessel, [])))
         if not treffer:
             ohne_gegenstueck += 1
-            neu.append(satz)
+            neu += mit_namen(satz, schluessel, adapter, andere_laufzeit, UEBERNOMMEN)
         for stelle in treffer:
             alt = adapter[stelle]
             if probe.unvollstaendig_fuer(satz, alt):

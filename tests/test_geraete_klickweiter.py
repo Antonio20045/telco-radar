@@ -6,10 +6,12 @@ Die Produktseite wählt den Speicher und hält Bündelbetrag, Einmalzahlung und 
 über eine Umleitung auf die Folgeseite, und dort stehen zwei Laufzeit-Kacheln
 („HW24“, „HW24+12“). Die Folgeseite schickt selbst ein POST, das nie hinausgehen darf.
 Erwartet: je Speicher ein frischer Kontext (der Warenkorb-POST sieht kein Cookie), die
-Kachel 24+12 erfasst mit Bündelbetrag und Einmalzahlung, die Kachel 24 bleibt Befund
-(die Globale nennt 36). Jede Kachel trägt ihre Diagnose: Folgeseite, beide Lesungen
-und wo ihr Betrag auf der Folgeseite sonst steht, nicht auf der Startseite.
-Gegenproben: eine Folgeseite mit Passwortfeld beendet den Lauf, ein Weiter-Knopf mit
+Kachel 24+12 erfasst mit Bündelbetrag und Einmalzahlung gegen die Globale, die Kachel
+24 erfasst aus der Kachel selbst (die Globale nennt 36): Bündelbetrag, Einmalzahlung als
+Lücke, Herkunft „Kachel der Folgeseite“ in Ergebnis und Beleg. Jede Kachel trägt ihre
+Diagnose: Folgeseite, beide Lesungen und wo ihr Betrag auf der Folgeseite sonst steht,
+nicht auf der Startseite. Gegenproben: weicht die Kachel 24+12 von der Globalen ab, ist
+sie Befund; eine Folgeseite mit Passwortfeld beendet den Lauf, ein Weiter-Knopf mit
 Kaufwort wird nie geklickt. Keine Anfrage verlässt den Rechner.
 """
 
@@ -102,8 +104,10 @@ KARTE = {
 }
 
 
-def _folgeseite(speicher: str, zusatz: str) -> str:
-    preis = f"{BUENDEL[speicher] // 100} , {BUENDEL[speicher] % 100:02d}"
+def _folgeseite(speicher: str, zusatz: str, abzug: int = 0) -> str:
+    """Die Folgeseite; ``abzug`` Cent weniger in der Kachel 24+12 als in der Globale."""
+    cent = BUENDEL[speicher] - abzug
+    preis = f"{cent // 100} , {cent % 100:02d}"
     kacheln = [
         ("24", f"{OHNE_VERLAENGERUNG[speicher]} €/Mon."),
         ("24+12", f"{preis} €/Mon. Gerät einmalig {EINMAL[speicher]} € behalten."),
@@ -114,7 +118,7 @@ def _folgeseite(speicher: str, zusatz: str) -> str:
     return seite(f'<div id="kacheln">{koerper}</div>{zusatz}', FOLGE_SKRIPT)
 
 
-def _antworter(text: str = "Weiter zur Tarifauswahl", zusatz: str = ""):
+def _antworter(text: str = "Weiter zur Tarifauswahl", zusatz: str = "", abzug: int = 0):
     start = seite(START.replace("@TEXT@", text), START_SKRIPT)
 
     def antworte(pfad: str) -> Antwort:
@@ -126,21 +130,29 @@ def _antworter(text: str = "Weiter zur Tarifauswahl", zusatz: str = ""):
         if ort == "/bestellung/start":
             return umleitung(f"/bestellung/laufzeit?speicher={frage(pfad)['speicher']}")
         if ort == "/bestellung/laufzeit":
-            return html(_folgeseite(frage(pfad)["speicher"], zusatz))
+            return html(_folgeseite(frage(pfad)["speicher"], zusatz, abzug))
         return Antwort(204)
 
     return antworte
 
 
-def _laufe(chromium, text: str = "Weiter zur Tarifauswahl", zusatz: str = ""):
+def _laufe(
+    chromium, text: str = "Weiter zur Tarifauswahl", zusatz: str = "", abzug: int = 0
+):
     cookies: set[str] = set()
-    antworte = _antworter(text, zusatz)
+    antworte = _antworter(text, zusatz, abzug)
     lauf, server = laufe_mit(chromium, antworte, karte(**KARTE), cookies=cookies)
     return lauf, server, cookies
 
 
-def test_je_speicher_frischer_kontext_kachel_36_erfasst_24_befund(chromium):
-    from telco_radar.collect.geraete.klicklauf import BEFUND, ERFASST
+def _herkunft(ergebnis) -> list[str]:
+    return [f.json_pfad for f in ergebnis.beleg.beleg.fundstellen]
+
+
+def test_je_speicher_frischer_kontext_kachel_36_globale_24_aus_der_kachel(chromium):
+    from telco_radar.collect.geraete.klickergebnis import kombination_als_daten
+    from telco_radar.collect.geraete.klickkachel import QUELLE_KACHEL
+    from telco_radar.collect.geraete.klicklauf import ERFASST
     from telco_radar.collect.geraete.klicktext import Buendelwerte
     from telco_radar.collect.geraete.klicktor import GRUND_NUR_LESEN
 
@@ -149,16 +161,29 @@ def test_je_speicher_frischer_kontext_kachel_36_erfasst_24_befund(chromium):
 
     assert lauf.status == "gelesen", lauf.grund
     assert set(ergebnisse) == {(s, "S", m) for s in ("128", "256") for m in (24, 36)}
-    for speicher, betrag, einmal in (("128", 44.99, 300.0), ("256", 51.99, 360.0)):
+    for speicher, betrag, einmal, ohne in (
+        ("128", 44.99, 300.0, 59.99),
+        ("256", 51.99, 360.0, 66.99),
+    ):
         lang = ergebnisse[(speicher, "S", 36)]
         kurz = ergebnisse[(speicher, "S", 24)]
         assert lang.status == ERFASST, lang.befunde
         assert lang.auswahl == (speicher, "S", "24+12")
         assert lang.buendel == Buendelwerte(buendelbetrag=betrag, einmalzahlung=einmal)
-        assert kurz.status == BEFUND
-        assert [(b.feld, b.grund) for b in kurz.befunde] == [
-            ("antwort.laufzeit", "Antwort nennt 36 statt 24")
-        ]
+        assert (lang.echo_quelle, _herkunft(lang)) == (
+            None,
+            ["buendel.{speicher}", "einmal.{speicher}"],
+        )
+        assert kurz.status == ERFASST, kurz.befunde
+        assert kurz.auswahl == (speicher, "S", "24")
+        assert kurz.buendel == Buendelwerte(buendelbetrag=ohne)
+        assert "einmalzahlung" in kurz.luecken
+        assert (kurz.echo_quelle, _herkunft(kurz)) == (QUELLE_KACHEL, [QUELLE_KACHEL])
+        daten = kombination_als_daten(kurz)
+        assert (daten["echo_quelle"], daten["buendel"]["einmalzahlung"]) == (
+            QUELLE_KACHEL,
+            None,
+        )
     koerbe = [json.loads(k) for p, k in server.posts if p == "/korb"]
     assert koerbe == [
         {"speicher": "128", "cookie": ""},
@@ -207,6 +232,30 @@ def test_diagnose_je_kachel_folgeseite_lesungen_und_fundstellen(chromium):
         36,
         list(kurz.fundstellen),
     )
+
+
+def test_gegenprobe_kachel_36_anders_als_globale_ist_befund(chromium):
+    """Ein Cent weniger in der Kachel 24+12 als in der Globale: Befund; die Kachel 24
+    bleibt aus sich selbst erfasst, der Wert von 36 Monaten geht nie in sie über."""
+    from telco_radar.collect.geraete.klicklauf import BEFUND, ERFASST
+
+    lauf, _, _ = _laufe(chromium, abzug=1)
+    ergebnisse = nach_auswahl(lauf)
+
+    for speicher, text, antwort in (
+        ("128", "44,98", "44,99"),
+        ("256", "51,98", "51,99"),
+    ):
+        lang = ergebnisse[(speicher, "S", 36)]
+        assert lang.status == BEFUND
+        assert (lang.befunde[0].feld, lang.befunde[0].grund) == (
+            "buendelbetrag",
+            f"Text {text}, Antwort {antwort}",
+        )
+        assert lang.echo_quelle is None
+        kurz = ergebnisse[(speicher, "S", 24)]
+        assert kurz.status == ERFASST, kurz.befunde
+        assert kurz.buendel.einmalzahlung is None
 
 
 def test_gegenprobe_folgeseite_mit_passwortfeld_beendet_den_lauf(chromium):

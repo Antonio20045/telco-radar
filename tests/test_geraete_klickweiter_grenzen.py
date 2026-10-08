@@ -4,8 +4,9 @@ BEISPIEL-Seiten aus ``test_geraete_klickweiter``. ``klicke_durch`` verspricht: s
 die Frist Kombinationen ab, ist der Lauf ``zeitgrenze``, und jede nicht besuchte heißt
 „nicht besucht: Zeitgrenze erreicht“; das gilt auch, wenn die Frist genau nach dem
 Warenkorb-POST abläuft und das Tor die Navigation in die Strecke verwirft. Gelesene
-Kacheln bleiben. Gegenprobe: derselbe Ablauf ohne ``weiter``. Nur eine Sperre von
-Dokument oder POST des Klicks beendet den Lauf als gesperrt; sperrt robots.txt nur einen
+Kacheln bleiben, die Kachel 24 seit 08.10.2026 aus sich selbst (``klickkachel``).
+Gegenprobe: derselbe Ablauf ohne ``weiter``. Nur eine Sperre von Dokument oder POST des
+Klicks beendet den Lauf als gesperrt; sperrt robots.txt nur einen
 Zähler, den die Seite beim Klick holt, heißt die Kombination „führt nirgends hin“, und
 der nächste Speicher wird versucht. Keine Anfrage verlässt den Rechner.
 """
@@ -99,7 +100,7 @@ def test_frist_endet_im_zweiten_weiter_gelesene_kacheln_bleiben(chromium):
         if e.status == "erfasst"
     }
     assert lauf.status == "zeitgrenze", lauf.grund
-    assert erfasst == {("128", 36)}
+    assert erfasst == {("128", 24), ("128", 36)}
     assert server.mit("/korb") == ["/korb", "/korb"]
     assert {e.grund for e in lauf.ergebnisse if e.variante.speicher == "256"} == {
         "nicht besucht: Zeitgrenze erreicht"

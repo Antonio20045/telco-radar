@@ -22,7 +22,7 @@ from typing import TYPE_CHECKING
 from .klickkarte import DIMENSIONEN, Klickkarte
 
 if TYPE_CHECKING:
-    from playwright.sync_api import Page
+    from playwright.sync_api import Locator, Page
 
 Auswahl = tuple[str | None, ...]
 _OPTIONEN_JS = """(knoepfe, art) => knoepfe.map((k) => {
@@ -53,6 +53,13 @@ def lies_optionen(seite: Page, karte: Klickkarte, dimension: str) -> list[Option
     knopf = karte.knoepfe[dimension]
     if knopf.fest is not None or knopf.selektor is None:
         return [Option(knopf.fest, False, True)]
+    return optionen_in(seite.locator(knopf.selektor), karte, dimension)
+
+
+def optionen_in(ort: Locator, karte: Klickkarte, dimension: str) -> list[Option]:
+    """Die Elemente an ``ort`` als Knöpfe der Dimension gelesen (Wert, Sperre,
+    Markierung), etwa eine einzelne Kachel."""
+    knopf = karte.knoepfe[dimension]
     marke = karte.marke(dimension)
     art = {
         "wert": knopf.wert_attribut,
@@ -61,7 +68,7 @@ def lies_optionen(seite: Page, karte: Klickkarte, dimension: str) -> list[Option
         "marke": None if marke is None else marke.attribut,
         "markenwert": None if marke is None else marke.wert,
     }
-    roh = seite.locator(knopf.selektor).evaluate_all(_OPTIONEN_JS, art)
+    roh = ort.evaluate_all(_OPTIONEN_JS, art)
     optionen = []
     for w, a, g in roh:
         text = " ".join(w.split()) if isinstance(w, str) else ""

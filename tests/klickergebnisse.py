@@ -10,7 +10,8 @@ Die Werte jeder Kombination sind die zweite Lesung des Klick-Crawlers
 - Telekom: ``telekom_details_iphone17pro_512gb_20261007.json`` (07.10.2026),
   ``/v2/details`` zu iPhone 17 Pro 512 GB und MagentaMobil M.
 - 1&1: ``einsundeins_produktseite_iphone_17_pro.html.gz`` (08.09.2026), die Globale
-  ``hwdVariantsPrices`` der Produktseite.
+  ``hwdVariantsPrices`` der Produktseite; die Kacheln der Folgeseite aus
+  ``einsundeins_bestellweg_laufzeit_20261007.json`` (Erkundung 07.10.2026, c8ce1f77).
 
 Seitenadressen stehen wörtlich in ``config/klick_tageslauf.yaml``.
 """
@@ -23,7 +24,7 @@ import re
 from pathlib import Path
 
 from telco_radar.collect.geraete.klickantwort import Antwortlesung, lies_antwort
-from telco_radar.collect.geraete.klickecho import variante_aus
+from telco_radar.collect.geraete.klickecho import feldwert, variante_aus
 from telco_radar.collect.geraete.klickergebnis import (
     FORMAT,
     laufstatus,
@@ -31,6 +32,8 @@ from telco_radar.collect.geraete.klickergebnis import (
 )
 from telco_radar.collect.geraete.klickkarte import lade_klickkarte
 from telco_radar.collect.geraete.klicklauf import ERFASST, Klicklauf, Kombiergebnis
+from telco_radar.collect.geraete.klickoptionen import wert_nach_muster
+from telco_radar.collect.geraete.klicktext import Buendelwerte
 from telco_radar.collect.geraete.klickziele import Seitenziel
 
 WURZEL = Path(__file__).resolve().parents[1]
@@ -68,6 +71,9 @@ TELEKOM_SPEICHER = "512 GB"
 _PREISE = re.compile(r"hwdVariantsPrices\s*=\s*\{(.*?)\};", re.S)
 _EINTRAG = re.compile(r"'([^']+)'\s*:\s*\[\s*(\d+)\s*,?\s*\]")
 _LAUFZEIT = re.compile(r"window\.currentHardwareOfferDuration\s*=\s*'(\d+)'")
+_KACHEL = re.compile(
+    r"^#tariff-cards-container > div:nth-of-type\(\d+\) > div:nth-of-type\(\d+\)"
+)
 
 
 def o2_lesungen() -> list[Antwortlesung]:
@@ -133,6 +139,28 @@ def einsundeins_lesung(speicher: str = "256") -> Antwortlesung:
         "farbe": "COSMIC_ORANGE",
     }
     return lies_antwort(globale, EINSUNDEINS_KARTE.antwort, None, platz)
+
+
+def einsundeins_kachel(stelle: int, seite: int = 3) -> tuple[str | None, Buendelwerte]:
+    """Label und Bündelwerte der Kachel ``stelle`` der Folgeseite, wie die Erkundung
+    sie las: Label aus ``data-linkid``, Werte aus den Preis-Kandidaten der Kachel, je
+    mit den Mustern der Karte (Seite 3 iPhone 17 Pro, Seite 4 Galaxy S26)."""
+    datei = FIX / "einsundeins_bestellweg_laufzeit_20261007.json"
+    weg = json.loads(datei.read_text(encoding="utf-8"))[f"seite_{seite}"]
+    elemente = weg["bedienelemente"].values()
+    knopf = [e for e in elemente if e["tag"] == "add-to-cart-button"][stelle]
+    treffer = _KACHEL.match(knopf["pfad"])
+    assert treffer is not None
+    preise = weg["preise"].values()
+    text = "\n".join(p["kontext"] for p in preise if p["pfad"].startswith(treffer[0]))
+    muster = EINSUNDEINS_KARTE.knoepfe["laufzeit"].muster
+    label = wert_nach_muster(knopf["daten"]["data-linkid"], muster)
+    werte = {}
+    for feld, textmuster in EINSUNDEINS_KARTE.textlesung.muster.items():
+        gefunden = textmuster.muster.search(text)
+        roh = None if gefunden is None else "".join(gefunden[1].split())
+        werte[feld] = None if roh is None else feldwert(feld, roh)
+    return label, Buendelwerte(**werte)
 
 
 def erfasst(

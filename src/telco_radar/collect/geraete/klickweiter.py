@@ -21,7 +21,8 @@ Klick-Crawler (``klickcrawler``) je Kombination der übrigen Dimensionen so vor:
 5. Er liest jede Kachel (``knoepfe.<kacheln>``): Wert wie bei Knöpfen, nie geklickt;
    die Zusammenfassung ist die Kachel an derselben Stelle. Einen zweiten Klick gibt
    es nicht: der Lader lehnt ``oeffnen``, ``schliessen`` und Textmuster mit eigenem
-   Selektor ab. Jede gelesene Kachel trägt ihre ``klickdiagnose.Diagnose``.
+   Selektor ab. Jede gelesene Kachel trägt ihre ``klickdiagnose.Diagnose``; nennt die
+   zweite Lesung eine andere Laufzeit, ist die Kachel eigene Quelle (``klickkachel``).
 
 Scheitert der Weiter-Klick (Knopf fehlt, nicht eindeutig, verboten, nicht klickbar,
 keine neue Adresse), heißt die Kombination ``nicht_erfasst`` mit Grund, und die

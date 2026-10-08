@@ -151,7 +151,8 @@ class Kombiergebnis:
     beiden Lesungen davor, ``None`` heißt nicht gelesen. ``buendel`` hat nur eine
     Karte mit ``vertragsform`` ``ein_vertrag``, ebenso ``textbuendel`` und
     ``antwortbuendel``, die beiden Lesungen der Bündelwerte. ``diagnose`` hat nur eine
-    Kachel des Weiter-Schritts (``klickdiagnose``).
+    Kachel des Weiter-Schritts (``klickdiagnose``); ``echo_quelle`` nennt die Quelle,
+    die statt der zweiten Lesung bestätigt hat (``klickkachel.QUELLE_KACHEL``).
     """
 
     variante: Variante
@@ -172,6 +173,7 @@ class Kombiergebnis:
     textbuendel: Buendelwerte | None = None
     antwortbuendel: Buendelwerte | None = None
     diagnose: Diagnose | None = None
+    echo_quelle: str | None = None
 
     @property
     def gueltig(self) -> bool:

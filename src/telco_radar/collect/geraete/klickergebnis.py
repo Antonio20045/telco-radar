@@ -64,7 +64,8 @@ STAND_DATEI = "klick_stand.json"
 
 def kombination_als_daten(ergebnis: Kombiergebnis) -> dict:
     """Eine Kombination als JSON ohne Screenshot, Text und Belegdateien; eine Kachel
-    des Weiter-Schritts mit ``diagnose`` (``klickdiagnose``)."""
+    des Weiter-Schritts mit ``diagnose`` (``klickdiagnose``), eine aus der Kachel
+    bestätigte mit ``echo_quelle``."""
     beleg = ergebnis.beleg.beleg if ergebnis.beleg is not None else None
     url = ergebnis.antwort_url
     daten = {
@@ -88,6 +89,8 @@ def kombination_als_daten(ergebnis: Kombiergebnis) -> dict:
     }
     if ergebnis.diagnose is not None:
         daten["diagnose"] = diagnose_als_daten(ergebnis.diagnose)
+    if ergebnis.echo_quelle is not None:
+        daten["echo_quelle"] = ergebnis.echo_quelle
     return daten
 
 

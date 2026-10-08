@@ -17,10 +17,11 @@
 #
 # Erwartet je Gerät: Speicher × Tarif 1 × Laufzeit 2 (heute 2 Speicher, also 4).
 # 24+12: Bündelbetrag und Einmalzahlung aus Kachel und Globalen der Produktseite.
-# 24: Betrag steht in der Kachel (P3 „59 , 99 €/Mon.“), aber keine zweite Quelle ist
-# belegt (die Globalen gelten für 24+12, currentHardwareOfferDuration '36'); die
-# Kombination bleibt Befund „Antwort nennt 36 statt 24“ statt eines ungeprüften Werts.
-# Tageslauf 08.10. (Actions 37740022815): so bei allen 15 Starts. Je Kachel steht nun
+# 24: Betrag steht nur in der Kachel (P3 „59 , 99 €/Mon.“); die Globalen gelten für
+# 24+12 (currentHardwareOfferDuration '36') und bestätigen 24 nie (Tageslauf 08.10.,
+# Actions 37740022815, alle 15 Starts). Seit 08.10. ist die Kachel dafür eigene Quelle
+# (klickkachel): Label in der Kachel = gewählte Laufzeit, Bündelbetrag aus ihrem Text,
+# Einmalzahlung Lücke; ohne oder mit anderem Label bleibt es Befund. Je Kachel steht
 # im Ergebnis ``diagnose`` (klickdiagnose): wo der Kachelbetrag auf der Folgeseite steht.
 # Bewusst nicht gelesen (Lücke):
 # - andere Tarife: Beide Kacheln tragen nur chosenTariff=tariff-anf-s-mvl (B3/B4
