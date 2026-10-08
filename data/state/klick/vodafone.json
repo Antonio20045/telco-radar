@@ -1,26 +1,37 @@
 {
  "anbieter": "vodafone",
  "datum": "2026-10-08",
- "dauer_sekunden": 0.4,
+ "dauer_sekunden": 62.2,
  "format": 1,
  "frischegrenze_tage": 3,
- "grund": "verschoben: Gerätelauf läuft (geraete.yml, queued)",
+ "grund": "https://www.vodafone.de/privat/handys/iphone-17-pro.html: Seite nach 30000 ms nicht geladen",
  "karte": "vodafone.yaml",
- "laufstatus": "nicht_gelesen",
+ "laufstatus": "gestoert",
  "name": "Vodafone",
  "seiten": [
   {
    "adresse": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
    "geraet": "apple-iphone-17-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, queued)",
+   "gescheitert": 0,
+   "grund": "Seite nach 30000 ms nicht geladen",
+   "http_status": 200,
    "kombinationen": [],
    "speicher_gb": 256,
-   "status": "nicht_besucht"
+   "status": "gestoert",
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 1
   },
   {
    "adresse": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html",
    "geraet": "samsung-galaxy-s26",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, queued)",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Seite nach 30000 ms nicht geladen",
    "kombinationen": [],
    "speicher_gb": 256,
    "status": "nicht_besucht"
@@ -31,5 +42,5 @@
   "https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html"
  ],
  "vertragsform": "tarif_plus_ratenkauf",
- "zeitbudget_sekunden": 3980
+ "zeitbudget_sekunden": 3976
 }

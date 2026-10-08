@@ -1,71 +1,1321 @@
 {
  "anbieter": "1und1",
  "datum": "2026-10-08",
- "dauer_sekunden": 0.4,
+ "dauer_sekunden": 1225.5,
  "format": 1,
  "frischegrenze_tage": 3,
- "grund": "verschoben: Gerätelauf läuft (geraete.yml, queued)",
+ "grund": null,
  "karte": "1und1.yaml",
- "laufstatus": "nicht_gelesen",
+ "laufstatus": "gelesen",
  "name": "1&1",
  "seiten": [
   {
    "adresse": "https://mobile.1und1.de/iphone-17-pro",
    "geraet": "apple-iphone-17-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, queued)",
-   "kombinationen": [],
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://mobile.1und1.de/iphone-17-pro",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [
+      {
+       "feld": "antwort.laufzeit",
+       "grund": "Antwort nennt 36 statt 24"
+      }
+     ],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": {
+      "buendelbetrag": null,
+      "einmalzahlung": null
+     },
+     "grund": "Antwort nennt 36 statt 24",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/iphone-17-pro",
+     "auswahl": {
+      "laufzeit": "24+12",
+      "speicher": "256",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "7249fe956a98a1aa76a0cbce0dfe4de16f95a3809ece604939eda27d9160260d",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=60449353-abea-42a8-94c5-e70f30e81431",
+      "zeitpunkt": "2026-10-08T06:55:42Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 44.99,
+      "einmalzahlung": 360.0
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/iphone-17-pro?color=COSMIC_ORANGE&size=512",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [
+      {
+       "feld": "antwort.laufzeit",
+       "grund": "Antwort nennt 36 statt 24"
+      }
+     ],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": {
+      "buendelbetrag": null,
+      "einmalzahlung": null
+     },
+     "grund": "Antwort nennt 36 statt 24",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/iphone-17-pro?color=COSMIC_ORANGE&size=512",
+     "auswahl": {
+      "laufzeit": "24+12",
+      "speicher": "512",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "d20b2d3ae4f5895a2a9ce8eb6761e2b1a750a01eecf91a804fefbb4e1f2cc39a",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=50a4c7f0-dd32-49de-b896-c94c2f11bf0e",
+      "zeitpunkt": "2026-10-08T06:56:59Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 51.99,
+      "einmalzahlung": 450.0
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    }
+   ],
    "speicher_gb": 256,
-   "status": "nicht_besucht"
+   "status": "gelesen",
+   "struktur": {
+    "anteil_felder": 0.21428571428571427,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 6,
+    "felder_gesucht": 28,
+    "knoepfe_gefunden": 5,
+    "knoepfe_gesucht": 5
+   },
+   "verworfen": 13
   },
   {
    "adresse": "https://mobile.1und1.de/samsung-galaxy-s26",
    "geraet": "samsung-galaxy-s26",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, queued)",
-   "kombinationen": [],
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://mobile.1und1.de/samsung-galaxy-s26",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [
+      {
+       "feld": "antwort.laufzeit",
+       "grund": "Antwort nennt 36 statt 24"
+      }
+     ],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": {
+      "buendelbetrag": null,
+      "einmalzahlung": null
+     },
+     "grund": "Antwort nennt 36 statt 24",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/samsung-galaxy-s26",
+     "auswahl": {
+      "laufzeit": "24+12",
+      "speicher": "256",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "1abbdb4a4d62b1f9e3b7e487f481180d781bda0e6439273017750b8a24c464bb",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=1eb5f195-df6a-4567-8109-5f4e7d3f90c5",
+      "zeitpunkt": "2026-10-08T06:58:13Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 32.99,
+      "einmalzahlung": 220.0
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/samsung-galaxy-s26?color=COBALT_VIOLET&size=512",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [
+      {
+       "feld": "antwort.laufzeit",
+       "grund": "Antwort nennt 36 statt 24"
+      }
+     ],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": {
+      "buendelbetrag": null,
+      "einmalzahlung": null
+     },
+     "grund": "Antwort nennt 36 statt 24",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/samsung-galaxy-s26?color=COBALT_VIOLET&size=512",
+     "auswahl": {
+      "laufzeit": "24+12",
+      "speicher": "512",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "f709d12e075770ca20fb241b1fd1f109bd889a29837d1125bb8c40397b004dba",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=5cc73906-c797-4820-a959-97cbd821c53d",
+      "zeitpunkt": "2026-10-08T06:59:26Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 38.99,
+      "einmalzahlung": 290.0
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    }
+   ],
    "speicher_gb": 256,
-   "status": "nicht_besucht"
+   "status": "gelesen",
+   "struktur": {
+    "anteil_felder": 0.21428571428571427,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 6,
+    "felder_gesucht": 28,
+    "knoepfe_gefunden": 5,
+    "knoepfe_gesucht": 5
+   },
+   "verworfen": 10
   },
   {
    "adresse": "https://mobile.1und1.de/iphone-17",
    "geraet": "apple-iphone-17",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, queued)",
-   "kombinationen": [],
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://mobile.1und1.de/iphone-17",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [
+      {
+       "feld": "antwort.laufzeit",
+       "grund": "Antwort nennt 36 statt 24"
+      }
+     ],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": {
+      "buendelbetrag": null,
+      "einmalzahlung": null
+     },
+     "grund": "Antwort nennt 36 statt 24",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/iphone-17",
+     "auswahl": {
+      "laufzeit": "24+12",
+      "speicher": "256",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "5b513491dcbcc1e25774c38d9b2ab58d1a014fc88b1d8d0f11be6ef06ee7fbe4",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=52ffeb23-a0f0-4855-97d1-640428351050",
+      "zeitpunkt": "2026-10-08T07:00:43Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 42.99,
+      "einmalzahlung": 340.0
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/iphone-17?color=LAVENDEL&size=512",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [
+      {
+       "feld": "antwort.laufzeit",
+       "grund": "Antwort nennt 36 statt 24"
+      }
+     ],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": {
+      "buendelbetrag": null,
+      "einmalzahlung": null
+     },
+     "grund": "Antwort nennt 36 statt 24",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/iphone-17?color=LAVENDEL&size=512",
+     "auswahl": {
+      "laufzeit": "24+12",
+      "speicher": "512",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "cb1df14ab9201a55229a0a15df3eb4d0c12fe822bbf59fbfb391005108ac7dca",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=df27b1b5-be97-4927-b45b-488002ef2202",
+      "zeitpunkt": "2026-10-08T07:02:13Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 49.99,
+      "einmalzahlung": 420.0
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    }
+   ],
    "speicher_gb": 256,
-   "status": "nicht_besucht"
+   "status": "gelesen",
+   "struktur": {
+    "anteil_felder": 0.21428571428571427,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 6,
+    "felder_gesucht": 28,
+    "knoepfe_gefunden": 5,
+    "knoepfe_gesucht": 5
+   },
+   "verworfen": 13
   },
   {
    "adresse": "https://mobile.1und1.de/iphone-17-pro-max",
    "geraet": "apple-iphone-17-pro-max",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, queued)",
-   "kombinationen": [],
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://mobile.1und1.de/iphone-17-pro-max",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [
+      {
+       "feld": "antwort.laufzeit",
+       "grund": "Antwort nennt 36 statt 24"
+      }
+     ],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": {
+      "buendelbetrag": null,
+      "einmalzahlung": null
+     },
+     "grund": "Antwort nennt 36 statt 24",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/iphone-17-pro-max",
+     "auswahl": {
+      "laufzeit": "24+12",
+      "speicher": "256",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "fe2cfc2be434473cefcc4415e2715ee3c7b21dc1f97e976a6c93ee154d833681",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=0a5ea905-a623-4480-a5ba-99a532713db7",
+      "zeitpunkt": "2026-10-08T07:03:49Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 49.99,
+      "einmalzahlung": 420.0
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/iphone-17-pro-max?color=COSMIC_ORANGE&size=512",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [
+      {
+       "feld": "antwort.laufzeit",
+       "grund": "Antwort nennt 36 statt 24"
+      }
+     ],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": {
+      "buendelbetrag": null,
+      "einmalzahlung": null
+     },
+     "grund": "Antwort nennt 36 statt 24",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/iphone-17-pro-max?color=COSMIC_ORANGE&size=512",
+     "auswahl": {
+      "laufzeit": "24+12",
+      "speicher": "512",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "ba5497f6ca57424471121e6cc60e86821a5c0cf119ac6685051df2d3a6eee3dc",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=dd5e1e57-37df-4f1f-99d6-f8d6f00d67c9",
+      "zeitpunkt": "2026-10-08T07:05:06Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 58.99,
+      "einmalzahlung": 530.0
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/iphone-17-pro-max?color=COSMIC_ORANGE&size=1024",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "1024",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [
+      {
+       "feld": "antwort.laufzeit",
+       "grund": "Antwort nennt 36 statt 24"
+      }
+     ],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": {
+      "buendelbetrag": null,
+      "einmalzahlung": null
+     },
+     "grund": "Antwort nennt 36 statt 24",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "1024",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/iphone-17-pro-max?color=COSMIC_ORANGE&size=1024",
+     "auswahl": {
+      "laufzeit": "24+12",
+      "speicher": "1024",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "02c5419d1c3fe6b0844844973ea4b1344b768c1e00e7907bb184f726545b1725",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=c3c7fa2e-7cec-4d2a-9847-33b52b0349fa",
+      "zeitpunkt": "2026-10-08T07:06:24Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 65.99,
+      "einmalzahlung": 620.0
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "1024",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/iphone-17-pro-max?color=COSMIC_ORANGE&size=2048",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "2048",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [
+      {
+       "feld": "antwort.laufzeit",
+       "grund": "Antwort nennt 36 statt 24"
+      }
+     ],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": {
+      "buendelbetrag": null,
+      "einmalzahlung": null
+     },
+     "grund": "Antwort nennt 36 statt 24",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "2048",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/iphone-17-pro-max?color=COSMIC_ORANGE&size=2048",
+     "auswahl": {
+      "laufzeit": "24+12",
+      "speicher": "2048",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "e54683db3df709ce0101ea81602941ae5509a7b7b925b808ca920393528a3afc",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=350ae125-1326-4bc5-b333-4552eae4ab9c",
+      "zeitpunkt": "2026-10-08T07:07:37Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 78.99,
+      "einmalzahlung": 770.0
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "2048",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    }
+   ],
    "speicher_gb": 256,
-   "status": "nicht_besucht"
+   "status": "gelesen",
+   "struktur": {
+    "anteil_felder": 0.21428571428571427,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 12,
+    "felder_gesucht": 56,
+    "knoepfe_gefunden": 9,
+    "knoepfe_gesucht": 9
+   },
+   "verworfen": 23
   },
   {
    "adresse": "https://mobile.1und1.de/samsung-galaxy-s26-ultra",
    "geraet": "samsung-galaxy-s26-ultra",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, queued)",
-   "kombinationen": [],
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://mobile.1und1.de/samsung-galaxy-s26-ultra",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [
+      {
+       "feld": "antwort.laufzeit",
+       "grund": "Antwort nennt 36 statt 24"
+      }
+     ],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": {
+      "buendelbetrag": null,
+      "einmalzahlung": null
+     },
+     "grund": "Antwort nennt 36 statt 24",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/samsung-galaxy-s26-ultra",
+     "auswahl": {
+      "laufzeit": "24+12",
+      "speicher": "256",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "bcc0ca79488676d5a1e897db7d268d0fccaaf91dceb058c82a76d1606452849e",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=bcb84876-9ee2-408e-a04e-09d11f3559f6",
+      "zeitpunkt": "2026-10-08T07:08:52Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 42.99,
+      "einmalzahlung": 340.0
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/samsung-galaxy-s26-ultra?color=COBALT_VIOLET&size=512",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [
+      {
+       "feld": "antwort.laufzeit",
+       "grund": "Antwort nennt 36 statt 24"
+      }
+     ],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": {
+      "buendelbetrag": null,
+      "einmalzahlung": null
+     },
+     "grund": "Antwort nennt 36 statt 24",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/samsung-galaxy-s26-ultra?color=COBALT_VIOLET&size=512",
+     "auswahl": {
+      "laufzeit": "24+12",
+      "speicher": "512",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "54bdee455336a63eb18bc5508373f9780d20c9b3661a66f4ffb29f7cf32eb739",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=0631fa83-9326-4247-be1a-74fe3826a61d",
+      "zeitpunkt": "2026-10-08T07:10:05Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 48.99,
+      "einmalzahlung": 410.0
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/samsung-galaxy-s26-ultra?color=COBALT_VIOLET&size=1024",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "1024",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [
+      {
+       "feld": "antwort.laufzeit",
+       "grund": "Antwort nennt 36 statt 24"
+      }
+     ],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": {
+      "buendelbetrag": null,
+      "einmalzahlung": null
+     },
+     "grund": "Antwort nennt 36 statt 24",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "1024",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/samsung-galaxy-s26-ultra?color=COBALT_VIOLET&size=1024",
+     "auswahl": {
+      "laufzeit": "24+12",
+      "speicher": "1024",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "52560c5fb4b3c0989c7123f00d7374aa34cbe0585c9c90308a45d1d40eb591a0",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=c3f090d1-54fb-4252-b8ac-60d644a5c357",
+      "zeitpunkt": "2026-10-08T07:11:20Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 56.99,
+      "einmalzahlung": 510.0
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "1024",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    }
+   ],
    "speicher_gb": 256,
-   "status": "nicht_besucht"
+   "status": "gelesen",
+   "struktur": {
+    "anteil_felder": 0.21428571428571427,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 9,
+    "felder_gesucht": 42,
+    "knoepfe_gefunden": 7,
+    "knoepfe_gesucht": 7
+   },
+   "verworfen": 15
   },
   {
    "adresse": "https://mobile.1und1.de/google-pixel-11",
    "geraet": "google-pixel-11",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, queued)",
-   "kombinationen": [],
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://mobile.1und1.de/google-pixel-11",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [
+      {
+       "feld": "antwort.laufzeit",
+       "grund": "Antwort nennt 36 statt 24"
+      }
+     ],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": {
+      "buendelbetrag": null,
+      "einmalzahlung": null
+     },
+     "grund": "Antwort nennt 36 statt 24",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/google-pixel-11",
+     "auswahl": {
+      "laufzeit": "24+12",
+      "speicher": "256",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "2a80f3d3ce733e3b8ef2da984472ad8c9c7fb72d7916d89aec45f9567b9897bd",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-11&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-11&addFlowStates=tradeInAvailable%2CbrandGoogle%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=ef3e4ede-933e-48c7-a307-320d9eb548db",
+      "zeitpunkt": "2026-10-08T07:12:35Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 37.99,
+      "einmalzahlung": 280.0
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/google-pixel-11?color=FROST&size=512",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [
+      {
+       "feld": "antwort.laufzeit",
+       "grund": "Antwort nennt 36 statt 24"
+      }
+     ],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": {
+      "buendelbetrag": null,
+      "einmalzahlung": null
+     },
+     "grund": "Antwort nennt 36 statt 24",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/google-pixel-11?color=FROST&size=512",
+     "auswahl": {
+      "laufzeit": "24+12",
+      "speicher": "512",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "8608eda1548977cc732259b6c3f8fa1072bae2d63f4954c4eb7f67feb3d7014b",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-11&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-11&addFlowStates=tradeInAvailable%2CbrandGoogle%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=44fe8e27-425a-4293-83c9-9466d4c90d32",
+      "zeitpunkt": "2026-10-08T07:13:48Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 40.99,
+      "einmalzahlung": 320.0
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    }
+   ],
    "speicher_gb": 256,
-   "status": "nicht_besucht"
+   "status": "gelesen",
+   "struktur": {
+    "anteil_felder": 0.21428571428571427,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 6,
+    "felder_gesucht": 28,
+    "knoepfe_gefunden": 5,
+    "knoepfe_gesucht": 5
+   },
+   "verworfen": 10
   }
  ],
- "ueberfaellig": [
-  "https://mobile.1und1.de/iphone-17-pro",
-  "https://mobile.1und1.de/samsung-galaxy-s26",
-  "https://mobile.1und1.de/iphone-17",
-  "https://mobile.1und1.de/iphone-17-pro-max",
-  "https://mobile.1und1.de/samsung-galaxy-s26-ultra",
-  "https://mobile.1und1.de/google-pixel-11"
- ],
+ "ueberfaellig": [],
  "vertragsform": "ein_vertrag",
- "zeitbudget_sekunden": 3977
+ "zeitbudget_sekunden": 3982
 }

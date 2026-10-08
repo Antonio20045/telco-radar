@@ -1,62 +1,2844 @@
 {
  "anbieter": "congstar",
  "datum": "2026-10-08",
- "dauer_sekunden": 0.4,
+ "dauer_sekunden": 334.0,
  "format": 1,
  "frischegrenze_tage": 3,
- "grund": "verschoben: Gerätelauf läuft (geraete.yml, queued)",
+ "grund": null,
  "karte": "congstar.yaml",
- "laufstatus": "nicht_gelesen",
+ "laufstatus": "gelesen",
  "name": "congstar",
  "seiten": [
   {
    "adresse": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/",
    "geraet": "apple-iphone-17-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, queued)",
-   "kombinationen": [],
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/?paymentVariantBenefits=&planId=543",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "f2c60629822ecfa93141580fad78b4749f93fcfb7924224af11535ddf306fce0",
+      "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/?paymentVariantBenefits=&planId=543",
+      "zeitpunkt": "2026-10-08T06:54:19Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat XS"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 179.0,
+      "rate": 34.0,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        15.0
+       ]
+      ],
+      "volumen_gb": 15.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/?paymentVariantBenefits=&planId=543&installmentPlanId=500",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "7c8db94151fd1148880704a683dd7101fbe85b4fd875f4c1cc7dcea538b1d9b7",
+      "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/?paymentVariantBenefits=&planId=543&installmentPlanId=500",
+      "zeitpunkt": "2026-10-08T06:54:20Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat XS"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 179.0,
+      "rate": 51.0,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        15.0
+       ]
+      ],
+      "volumen_gb": 15.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/?paymentVariantBenefits=&planId=560&installmentPlanId=501",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "66347d0312c757ae04ce0bc5613ae684843db6931b8ebf8bc80d238a2063dda7",
+      "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/?paymentVariantBenefits=&planId=560&installmentPlanId=501",
+      "zeitpunkt": "2026-10-08T06:54:22Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat S"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 179.0,
+      "rate": 32.0,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        20.0
+       ]
+      ],
+      "volumen_gb": 50.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/?paymentVariantBenefits=&planId=560&installmentPlanId=500",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "72dd65aa7c5b37ac607ef0bfb212be6f4762e06929ef63985b4839bc1e7f7962",
+      "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/?paymentVariantBenefits=&planId=560&installmentPlanId=500",
+      "zeitpunkt": "2026-10-08T06:54:23Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat S"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 179.0,
+      "rate": 48.0,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        20.0
+       ]
+      ],
+      "volumen_gb": 50.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/?paymentVariantBenefits=&planId=540&installmentPlanId=501",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat M"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "4c2d7400ae2bbb90111e5c2fe2a87e4dcce948e14ab2d95a0a3033abc3a0f43f",
+      "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/?paymentVariantBenefits=&planId=540&installmentPlanId=501",
+      "zeitpunkt": "2026-10-08T06:54:24Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat M"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 179.0,
+      "rate": 31.0,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        25.0
+       ]
+      ],
+      "volumen_gb": 125.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/?paymentVariantBenefits=&planId=540&installmentPlanId=500",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat M"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "c65a586fe07c524287dcd2b785d20f76071e1d6a509eb97b13f15cbccbf9b039",
+      "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/?paymentVariantBenefits=&planId=540&installmentPlanId=500",
+      "zeitpunkt": "2026-10-08T06:54:25Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat M"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 179.0,
+      "rate": 46.5,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        25.0
+       ]
+      ],
+      "volumen_gb": 125.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/?paymentVariantBenefits=&planId=545&installmentPlanId=501",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "7d365bb8f1e0196c52febf030e91f4841e4ef0e2979d489f017369de5ba7cf81",
+      "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/?paymentVariantBenefits=&planId=545&installmentPlanId=501",
+      "zeitpunkt": "2026-10-08T06:54:27Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat L"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 179.0,
+      "rate": 30.0,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        30.0
+       ]
+      ],
+      "volumen_gb": 200.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/?paymentVariantBenefits=&planId=545&installmentPlanId=500",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "a6503c318cc25000aeb8a8d10a9b6aac886392ecc281b5386a8d9d39a442a890",
+      "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/?paymentVariantBenefits=&planId=545&installmentPlanId=500",
+      "zeitpunkt": "2026-10-08T06:54:28Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat L"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 179.0,
+      "rate": 45.0,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        30.0
+       ]
+      ],
+      "volumen_gb": 200.0
+     }
+    }
+   ],
    "speicher_gb": 256,
-   "status": "nicht_besucht"
+   "status": "gelesen",
+   "struktur": {
+    "anteil_felder": 1.0,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 56,
+    "felder_gesucht": 56,
+    "knoepfe_gefunden": 51,
+    "knoepfe_gesucht": 51
+   },
+   "verworfen": 2
   },
   {
    "adresse": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
    "geraet": "samsung-galaxy-s26",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, queued)",
-   "kombinationen": [],
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=543",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "897617655b47b0ab86ecb6763b7465a9349b4264f5b62d6d78e024365aab6ee4",
+      "seite": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=543",
+      "zeitpunkt": "2026-10-08T06:55:18Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat XS"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 1.0,
+      "rate": 21.0,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        15.0
+       ]
+      ],
+      "volumen_gb": 15.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=543&installmentPlanId=500",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "a052abd4d8d94565e0f4a2f533bbda3c1943da3887411d975070472e49f1ab7c",
+      "seite": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=543&installmentPlanId=500",
+      "zeitpunkt": "2026-10-08T06:55:19Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat XS"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 1.0,
+      "rate": 31.5,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        15.0
+       ]
+      ],
+      "volumen_gb": 15.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=560&installmentPlanId=501",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "547ca5d98f35e952713e69ea375f462bc0f805eaff214723018d76864cbf2bd2",
+      "seite": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=560&installmentPlanId=501",
+      "zeitpunkt": "2026-10-08T06:55:21Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat S"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 1.0,
+      "rate": 19.0,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        20.0
+       ]
+      ],
+      "volumen_gb": 50.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=560&installmentPlanId=500",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "61512203c9f94d8e6c7dc9101fab2f4114810df63bc3bb5ce04fc086495d4870",
+      "seite": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=560&installmentPlanId=500",
+      "zeitpunkt": "2026-10-08T06:55:21Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat S"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 1.0,
+      "rate": 28.5,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        20.0
+       ]
+      ],
+      "volumen_gb": 50.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=540&installmentPlanId=501",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat M"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "c001dd001ec2836c07edf8d74825c528ddc47f5c1da65636ea22cf66894006bb",
+      "seite": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=540&installmentPlanId=501",
+      "zeitpunkt": "2026-10-08T06:55:23Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat M"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 1.0,
+      "rate": 17.0,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        25.0
+       ]
+      ],
+      "volumen_gb": 125.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=540&installmentPlanId=500",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat M"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "73d719a684eeadf11373ebcf7ded2882bad9a56e50d3d1a77afe1a03e1687217",
+      "seite": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=540&installmentPlanId=500",
+      "zeitpunkt": "2026-10-08T06:55:24Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat M"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 1.0,
+      "rate": 25.5,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        25.0
+       ]
+      ],
+      "volumen_gb": 125.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=545&installmentPlanId=501",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "d1524bcf071f40ced696df33985ff3ab0dff567b54a20e3086bfa00f4feefa22",
+      "seite": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=545&installmentPlanId=501",
+      "zeitpunkt": "2026-10-08T06:55:26Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat L"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 1.0,
+      "rate": 15.0,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        30.0
+       ]
+      ],
+      "volumen_gb": 200.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=545&installmentPlanId=500",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "d5b19a647c092f2e1941979e6c0a4793b578212add4be41cdc2f149427493522",
+      "seite": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=545&installmentPlanId=500",
+      "zeitpunkt": "2026-10-08T06:55:26Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat L"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 1.0,
+      "rate": 22.5,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        30.0
+       ]
+      ],
+      "volumen_gb": 200.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=543&installmentPlanId=501&memorySize=512+GB",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "81d580821af2469be68ab7499426c94325aba56f746b9e9b9dd67d1f03b279e8",
+      "seite": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=543&installmentPlanId=501&memorySize=512+GB",
+      "zeitpunkt": "2026-10-08T06:55:29Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat XS"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 1.0,
+      "rate": 27.0,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        15.0
+       ]
+      ],
+      "volumen_gb": 15.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=543&installmentPlanId=500&memorySize=512+GB",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "123843bce057cf7eeccf1bb0f1e25278ac747564adfdf7ff6967d292f711c344",
+      "seite": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=543&installmentPlanId=500&memorySize=512+GB",
+      "zeitpunkt": "2026-10-08T06:55:29Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat XS"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 1.0,
+      "rate": 40.5,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        15.0
+       ]
+      ],
+      "volumen_gb": 15.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=560&installmentPlanId=501&memorySize=512+GB",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "01955df41f84f58e418db97a9cac430c727e3cc112bdda7d1ac877821c87753e",
+      "seite": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=560&installmentPlanId=501&memorySize=512+GB",
+      "zeitpunkt": "2026-10-08T06:55:31Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat S"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 1.0,
+      "rate": 26.0,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        20.0
+       ]
+      ],
+      "volumen_gb": 50.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=560&installmentPlanId=500&memorySize=512+GB",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "94bb523635e7deeab69e0c228dc9f48f3c2e0e5d2f2df655bcba3ed7a44d4954",
+      "seite": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=560&installmentPlanId=500&memorySize=512+GB",
+      "zeitpunkt": "2026-10-08T06:55:32Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat S"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 1.0,
+      "rate": 39.0,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        20.0
+       ]
+      ],
+      "volumen_gb": 50.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=540&installmentPlanId=501&memorySize=512+GB",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat M"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "05ca7a09523fe120311fe221e1802bcfc28cbd9c3da5ab65197e410c2c042549",
+      "seite": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=540&installmentPlanId=501&memorySize=512+GB",
+      "zeitpunkt": "2026-10-08T06:55:33Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat M"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 1.0,
+      "rate": 24.0,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        25.0
+       ]
+      ],
+      "volumen_gb": 125.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=540&installmentPlanId=500&memorySize=512+GB",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat M"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "5419f0b5127b7cc35901147b4092d15c601b2987a293c4dd38b79bf9fee0e03e",
+      "seite": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=540&installmentPlanId=500&memorySize=512+GB",
+      "zeitpunkt": "2026-10-08T06:55:34Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat M"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 1.0,
+      "rate": 36.0,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        25.0
+       ]
+      ],
+      "volumen_gb": 125.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=545&installmentPlanId=501&memorySize=512+GB",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "69079c5e308225992332afd55582a860a41f698e51b67c760cfcedc0f35974fd",
+      "seite": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=545&installmentPlanId=501&memorySize=512+GB",
+      "zeitpunkt": "2026-10-08T06:55:35Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat L"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 1.0,
+      "rate": 23.0,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        30.0
+       ]
+      ],
+      "volumen_gb": 200.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=545&installmentPlanId=500&memorySize=512+GB",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "9de0ee35d03de572b30144a89c8558cd36efebfa51fcd0537bbfa38fb91f0d41",
+      "seite": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=545&installmentPlanId=500&memorySize=512+GB",
+      "zeitpunkt": "2026-10-08T06:55:36Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat L"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 1.0,
+      "rate": 34.5,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        30.0
+       ]
+      ],
+      "volumen_gb": 200.0
+     }
+    }
+   ],
    "speicher_gb": 256,
-   "status": "nicht_besucht"
+   "status": "gelesen",
+   "struktur": {
+    "anteil_felder": 1.0,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 112,
+    "felder_gesucht": 112,
+    "knoepfe_gefunden": 99,
+    "knoepfe_gesucht": 99
+   },
+   "verworfen": 2
   },
   {
    "adresse": "https://www.congstar.de/geraete/apple/apple-iphone-17/",
    "geraet": "apple-iphone-17",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, queued)",
-   "kombinationen": [],
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=543",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "4e3d3332950e0df7e7b5d1db220b656e03fade4931061c08599d67314c0a3864",
+      "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=543",
+      "zeitpunkt": "2026-10-08T06:56:27Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat XS"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 79.0,
+      "rate": 26.0,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        15.0
+       ]
+      ],
+      "volumen_gb": 15.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=543&installmentPlanId=500",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "6bc9dd2626425e921ae7fc8da866a5b8f0c138ab064e960985a06d7d3ec72871",
+      "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=543&installmentPlanId=500",
+      "zeitpunkt": "2026-10-08T06:56:28Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat XS"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 79.0,
+      "rate": 39.0,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        15.0
+       ]
+      ],
+      "volumen_gb": 15.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=560&installmentPlanId=501",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "33b7768bfd1cc991df93ddb15eba387c1c694d92833e535a5b3daa7ac926768f",
+      "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=560&installmentPlanId=501",
+      "zeitpunkt": "2026-10-08T06:56:30Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat S"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 79.0,
+      "rate": 25.0,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        20.0
+       ]
+      ],
+      "volumen_gb": 50.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=560&installmentPlanId=500",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "2789fe54284b2dba13dc0ba64f4014f4ef92cd8928d2ac7f1e95cd989b21e13b",
+      "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=560&installmentPlanId=500",
+      "zeitpunkt": "2026-10-08T06:56:31Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat S"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 79.0,
+      "rate": 37.5,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        20.0
+       ]
+      ],
+      "volumen_gb": 50.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=540&installmentPlanId=501",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat M"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "b36cde5d8da5c0cb85184fa846cfca339a76e1fcc6741b46425952f5d8328768",
+      "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=540&installmentPlanId=501",
+      "zeitpunkt": "2026-10-08T06:56:32Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat M"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 79.0,
+      "rate": 24.0,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        25.0
+       ]
+      ],
+      "volumen_gb": 125.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=540&installmentPlanId=500",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat M"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "d65e99a922d8950afa9e9365f497873d033c73d7bb82eb3466acde1941da2e4d",
+      "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=540&installmentPlanId=500",
+      "zeitpunkt": "2026-10-08T06:56:33Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat M"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 79.0,
+      "rate": 36.0,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        25.0
+       ]
+      ],
+      "volumen_gb": 125.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=545&installmentPlanId=501",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "8acf07854db0913f39a01fa0f5efefd3d611c16437e206c0b0c89c9d34d14f98",
+      "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=545&installmentPlanId=501",
+      "zeitpunkt": "2026-10-08T06:56:35Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat L"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 79.0,
+      "rate": 23.0,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        30.0
+       ]
+      ],
+      "volumen_gb": 200.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=545&installmentPlanId=500",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "395299f1c1f3b8a972b15888843bf0304c6313e7d69b904f8b420a1846545f79",
+      "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=545&installmentPlanId=500",
+      "zeitpunkt": "2026-10-08T06:56:36Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat L"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 79.0,
+      "rate": 34.5,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        30.0
+       ]
+      ],
+      "volumen_gb": 200.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=543&installmentPlanId=501&memorySize=512+GB",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "107b11fe3fe82709a35a17090194bdd207304ffaf5c5448d53b34dfef4ce744e",
+      "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=543&installmentPlanId=501&memorySize=512+GB",
+      "zeitpunkt": "2026-10-08T06:56:38Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat XS"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 149.0,
+      "rate": 31.5,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        15.0
+       ]
+      ],
+      "volumen_gb": 15.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=543&installmentPlanId=500&memorySize=512+GB",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "cdc38cdf22e529924812cc60864045719ee2f1c6e7656783c872bd9f5ea1c87a",
+      "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=543&installmentPlanId=500&memorySize=512+GB",
+      "zeitpunkt": "2026-10-08T06:56:39Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat XS"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 149.0,
+      "rate": 47.25,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        15.0
+       ]
+      ],
+      "volumen_gb": 15.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=560&installmentPlanId=501&memorySize=512+GB",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "248e37e1464d8269bbbc3f658aef470c0de27fb779e7ab7dbbd42ca16acfca51",
+      "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=560&installmentPlanId=501&memorySize=512+GB",
+      "zeitpunkt": "2026-10-08T06:56:40Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat S"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 149.0,
+      "rate": 30.5,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        20.0
+       ]
+      ],
+      "volumen_gb": 50.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=560&installmentPlanId=500&memorySize=512+GB",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "c22d7814ba61a54758a17c3f5de5bc985fe854b56320993ad3e0fd6a2a2b70f5",
+      "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=560&installmentPlanId=500&memorySize=512+GB",
+      "zeitpunkt": "2026-10-08T06:56:41Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat S"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 149.0,
+      "rate": 45.75,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        20.0
+       ]
+      ],
+      "volumen_gb": 50.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=540&installmentPlanId=501&memorySize=512+GB",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat M"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "24fcd8961793673ac8595c3b0828365bec6b3c52bd60215272b90885259daca6",
+      "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=540&installmentPlanId=501&memorySize=512+GB",
+      "zeitpunkt": "2026-10-08T06:56:42Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat M"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 149.0,
+      "rate": 29.5,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        25.0
+       ]
+      ],
+      "volumen_gb": 125.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=540&installmentPlanId=500&memorySize=512+GB",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat M"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "45303f81c701270fb0899ee99a5879c3b2db8cd0828a1a7af85cf246e55f9bb8",
+      "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=540&installmentPlanId=500&memorySize=512+GB",
+      "zeitpunkt": "2026-10-08T06:56:43Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat M"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 149.0,
+      "rate": 44.25,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        25.0
+       ]
+      ],
+      "volumen_gb": 125.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=545&installmentPlanId=501&memorySize=512+GB",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "4620c0fa525db4188a5cb7b41594a6aafb193b071a44ffa080bcfb92ef20b4eb",
+      "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=545&installmentPlanId=501&memorySize=512+GB",
+      "zeitpunkt": "2026-10-08T06:56:45Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat L"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 149.0,
+      "rate": 28.5,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        30.0
+       ]
+      ],
+      "volumen_gb": 200.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=545&installmentPlanId=500&memorySize=512+GB",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "acc268e7834295e7fe0cf754ebec1b0af12bdce88cd142c9a094e1f96b664ca0",
+      "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=545&installmentPlanId=500&memorySize=512+GB",
+      "zeitpunkt": "2026-10-08T06:56:46Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat L"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 149.0,
+      "rate": 42.75,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        30.0
+       ]
+      ],
+      "volumen_gb": 200.0
+     }
+    }
+   ],
    "speicher_gb": 256,
-   "status": "nicht_besucht"
+   "status": "gelesen",
+   "struktur": {
+    "anteil_felder": 1.0,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 112,
+    "felder_gesucht": 112,
+    "knoepfe_gefunden": 99,
+    "knoepfe_gesucht": 99
+   },
+   "verworfen": 2
   },
   {
    "adresse": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/",
    "geraet": "apple-iphone-17-pro-max",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, queued)",
-   "kombinationen": [],
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=543",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "d1c14f7003c0bed63acb2e05400f2822aca2e7a061281a6be292bd6613e6cabb",
+      "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=543",
+      "zeitpunkt": "2026-10-08T06:57:44Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat XS"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 79.0,
+      "rate": 33.5,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        15.0
+       ]
+      ],
+      "volumen_gb": 15.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=543&installmentPlanId=500",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "27d12aa9e1bb18aa4dc2714efd2cdcb1ee430f6e6b64f5d717a534d19e669d2f",
+      "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=543&installmentPlanId=500",
+      "zeitpunkt": "2026-10-08T06:57:45Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat XS"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 79.0,
+      "rate": 50.25,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        15.0
+       ]
+      ],
+      "volumen_gb": 15.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=560&installmentPlanId=501",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "de91ff8a545a0a9b29f79dc919aad36827098b27e5d37ee72edb479ae3e3faf9",
+      "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=560&installmentPlanId=501",
+      "zeitpunkt": "2026-10-08T06:57:47Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat S"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 79.0,
+      "rate": 32.5,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        20.0
+       ]
+      ],
+      "volumen_gb": 50.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=560&installmentPlanId=500",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "60a8deebe5b65b7ca5851561dc5a162994e1bd3e5cb45051025d153335420c0a",
+      "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=560&installmentPlanId=500",
+      "zeitpunkt": "2026-10-08T06:57:47Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat S"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 79.0,
+      "rate": 48.75,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        20.0
+       ]
+      ],
+      "volumen_gb": 50.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=540&installmentPlanId=501",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat M"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "9a396ad1192366380bae1f405111a59f62ed125710e37ebcaff3c6cef84ebc36",
+      "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=540&installmentPlanId=501",
+      "zeitpunkt": "2026-10-08T06:57:49Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat M"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 79.0,
+      "rate": 30.5,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        25.0
+       ]
+      ],
+      "volumen_gb": 125.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=540&installmentPlanId=500",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat M"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "5d9f8acc6583556566291af0eed146a618bc9f9a19f843065660f4ad2bfec23e",
+      "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=540&installmentPlanId=500",
+      "zeitpunkt": "2026-10-08T06:57:50Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat M"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 79.0,
+      "rate": 45.75,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        25.0
+       ]
+      ],
+      "volumen_gb": 125.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=545&installmentPlanId=501",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "8d7829fd5cdd700f52a1954f0a5bd5cc7d71d9b17b9bfd9a398b518f84188997",
+      "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=545&installmentPlanId=501",
+      "zeitpunkt": "2026-10-08T06:57:52Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat L"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 79.0,
+      "rate": 29.5,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        30.0
+       ]
+      ],
+      "volumen_gb": 200.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=545&installmentPlanId=500",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "b8e0084be6c10b4c113ea6da2bf9019dc21bd7563840437e2316d32702534158",
+      "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=545&installmentPlanId=500",
+      "zeitpunkt": "2026-10-08T06:57:52Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat L"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 79.0,
+      "rate": 44.25,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        30.0
+       ]
+      ],
+      "volumen_gb": 200.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=543&installmentPlanId=501&memorySize=512+GB",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "0ce8ec8286d760e8eca737e3b29ef94598604c2dc62e7d48f7f8604a96916dac",
+      "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=543&installmentPlanId=501&memorySize=512+GB",
+      "zeitpunkt": "2026-10-08T06:57:54Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat XS"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 79.0,
+      "rate": 40.5,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        15.0
+       ]
+      ],
+      "volumen_gb": 15.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=543&installmentPlanId=500&memorySize=512+GB",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "14cebd32fba6f2614a49e003e4a395b72c519884817d4064e0522999745a7b7f",
+      "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=543&installmentPlanId=500&memorySize=512+GB",
+      "zeitpunkt": "2026-10-08T06:57:55Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat XS"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 79.0,
+      "rate": 60.75,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        15.0
+       ]
+      ],
+      "volumen_gb": 15.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=560&installmentPlanId=501&memorySize=512+GB",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "93515d0d8480722965c8bc117cab17155b94aa2697b222ff295ba6cbab5c1ee4",
+      "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=560&installmentPlanId=501&memorySize=512+GB",
+      "zeitpunkt": "2026-10-08T06:57:57Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat S"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 79.0,
+      "rate": 39.5,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        20.0
+       ]
+      ],
+      "volumen_gb": 50.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=560&installmentPlanId=500&memorySize=512+GB",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "42dd60363a877db03163cdebd03bee7970c70e39b665a72cc1ca3f908bee2052",
+      "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=560&installmentPlanId=500&memorySize=512+GB",
+      "zeitpunkt": "2026-10-08T06:57:57Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat S"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 79.0,
+      "rate": 59.25,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        20.0
+       ]
+      ],
+      "volumen_gb": 50.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=540&installmentPlanId=501&memorySize=512+GB",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat M"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "96b2e12290522d77e977722bd9c4f3185e999554293f9cbb24a6e0edb8d6eb2c",
+      "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=540&installmentPlanId=501&memorySize=512+GB",
+      "zeitpunkt": "2026-10-08T06:57:59Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat M"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 79.0,
+      "rate": 37.5,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        25.0
+       ]
+      ],
+      "volumen_gb": 125.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=540&installmentPlanId=500&memorySize=512+GB",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat M"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "770330c71d191c6d5dd152f27c2e4d9e0df790b5d56fc7f3a6235f665f2913e7",
+      "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=540&installmentPlanId=500&memorySize=512+GB",
+      "zeitpunkt": "2026-10-08T06:58:00Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat M"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 79.0,
+      "rate": 56.25,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        25.0
+       ]
+      ],
+      "volumen_gb": 125.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=545&installmentPlanId=501&memorySize=512+GB",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "b3664ece19b858da9193ef65412998d4e3257f9ad02c8b12d5ad6a80bf4e835f",
+      "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=545&installmentPlanId=501&memorySize=512+GB",
+      "zeitpunkt": "2026-10-08T06:58:01Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat L"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 79.0,
+      "rate": 36.5,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        30.0
+       ]
+      ],
+      "volumen_gb": 200.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=545&installmentPlanId=500&memorySize=512+GB",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "b7f8bd470e3dc1f550c715afac097d0c24dadf078049238bc6342026e537b3db",
+      "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=545&installmentPlanId=500&memorySize=512+GB",
+      "zeitpunkt": "2026-10-08T06:58:02Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "Allnet Flat L"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 79.0,
+      "rate": 54.75,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        30.0
+       ]
+      ],
+      "volumen_gb": 200.0
+     }
+    }
+   ],
    "speicher_gb": 256,
-   "status": "nicht_besucht"
+   "status": "gelesen",
+   "struktur": {
+    "anteil_felder": 1.0,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 112,
+    "felder_gesucht": 112,
+    "knoepfe_gefunden": 99,
+    "knoepfe_gesucht": 99
+   },
+   "verworfen": 2
   },
   {
    "adresse": "https://www.congstar.de/geraete/google/google-pixel-11/",
    "geraet": "google-pixel-11",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, queued)",
-   "kombinationen": [],
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://www.congstar.de/geraete/google/google-pixel-11/?paymentVariantBenefits=&planId=543",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "9a5ae6aa78765337d13da48419302372543ad5046c865797c85cd97770bf39cd",
+      "seite": "https://www.congstar.de/geraete/google/google-pixel-11/?paymentVariantBenefits=&planId=543",
+      "zeitpunkt": "2026-10-08T06:58:52Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat XS"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 1.0,
+      "rate": 21.0,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        15.0
+       ]
+      ],
+      "volumen_gb": 15.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/google/google-pixel-11/?paymentVariantBenefits=&planId=543&installmentPlanId=500",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "6880b26aa4cd6decb8a73b1dda299ac090a65a2eab99ea48df403c3538f22286",
+      "seite": "https://www.congstar.de/geraete/google/google-pixel-11/?paymentVariantBenefits=&planId=543&installmentPlanId=500",
+      "zeitpunkt": "2026-10-08T06:58:53Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat XS"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 1.0,
+      "rate": 31.5,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        15.0
+       ]
+      ],
+      "volumen_gb": 15.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/google/google-pixel-11/?paymentVariantBenefits=&planId=560&installmentPlanId=501",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "4b9e8a7f6ef69c1c5162140b02a678a7f278300ba95e53b2ed1c91be64860119",
+      "seite": "https://www.congstar.de/geraete/google/google-pixel-11/?paymentVariantBenefits=&planId=560&installmentPlanId=501",
+      "zeitpunkt": "2026-10-08T06:58:55Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat S"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 1.0,
+      "rate": 20.0,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        20.0
+       ]
+      ],
+      "volumen_gb": 50.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/google/google-pixel-11/?paymentVariantBenefits=&planId=560&installmentPlanId=500",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "24b43e10a8799deccdad84a0470e639ff5884ab0240b17c24f7bc7c543700541",
+      "seite": "https://www.congstar.de/geraete/google/google-pixel-11/?paymentVariantBenefits=&planId=560&installmentPlanId=500",
+      "zeitpunkt": "2026-10-08T06:58:56Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat S"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 1.0,
+      "rate": 30.0,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        20.0
+       ]
+      ],
+      "volumen_gb": 50.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/google/google-pixel-11/?paymentVariantBenefits=&planId=540&installmentPlanId=501",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat M"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "2f60d399d0cd746eebad0830c11b0f2f76c12f3c92062f3d1effd748e4907252",
+      "seite": "https://www.congstar.de/geraete/google/google-pixel-11/?paymentVariantBenefits=&planId=540&installmentPlanId=501",
+      "zeitpunkt": "2026-10-08T06:58:57Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat M"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 1.0,
+      "rate": 19.0,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        25.0
+       ]
+      ],
+      "volumen_gb": 125.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/google/google-pixel-11/?paymentVariantBenefits=&planId=540&installmentPlanId=500",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat M"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "1d842aeec8b467465aeeb9b5cf4f36059effcab480ac10a0c321f1a458c0ea40",
+      "seite": "https://www.congstar.de/geraete/google/google-pixel-11/?paymentVariantBenefits=&planId=540&installmentPlanId=500",
+      "zeitpunkt": "2026-10-08T06:58:58Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat M"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 1.0,
+      "rate": 28.5,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        25.0
+       ]
+      ],
+      "volumen_gb": 125.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/google/google-pixel-11/?paymentVariantBenefits=&planId=545&installmentPlanId=501",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "c94aa263c6d4df96979a22f7bd35659d5fa25ff482c3f27f9303918dfbd72ed2",
+      "seite": "https://www.congstar.de/geraete/google/google-pixel-11/?paymentVariantBenefits=&planId=545&installmentPlanId=501",
+      "zeitpunkt": "2026-10-08T06:59:00Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat L"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 1.0,
+      "rate": 17.0,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        30.0
+       ]
+      ],
+      "volumen_gb": 200.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/google/google-pixel-11/?paymentVariantBenefits=&planId=545&installmentPlanId=500",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "dbb6f044c3b8086a24d9ced54562a8d4530c93f62635808a5ba4b0e38b2e5252",
+      "seite": "https://www.congstar.de/geraete/google/google-pixel-11/?paymentVariantBenefits=&planId=545&installmentPlanId=500",
+      "zeitpunkt": "2026-10-08T06:59:01Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat L"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 1.0,
+      "rate": 25.5,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        30.0
+       ]
+      ],
+      "volumen_gb": 200.0
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB nicht vorhanden",
+      "tarif": "Allnet Flat XS"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Knöpfe für tarif nicht gefunden (label:has(input[aria-label^=\"Tarifoption \"]))",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB nicht vorhanden",
+      "tarif": "Allnet Flat XS"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB nicht vorhanden",
+      "tarif": "Allnet Flat XS"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Knöpfe für tarif nicht gefunden (label:has(input[aria-label^=\"Tarifoption \"]))",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB nicht vorhanden",
+      "tarif": "Allnet Flat XS"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB nicht vorhanden",
+      "tarif": "Allnet Flat S"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Knöpfe für tarif nicht gefunden (label:has(input[aria-label^=\"Tarifoption \"]))",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB nicht vorhanden",
+      "tarif": "Allnet Flat S"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB nicht vorhanden",
+      "tarif": "Allnet Flat S"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Knöpfe für tarif nicht gefunden (label:has(input[aria-label^=\"Tarifoption \"]))",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB nicht vorhanden",
+      "tarif": "Allnet Flat S"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB nicht vorhanden",
+      "tarif": "Allnet Flat M"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Knöpfe für tarif nicht gefunden (label:has(input[aria-label^=\"Tarifoption \"]))",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB nicht vorhanden",
+      "tarif": "Allnet Flat M"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB nicht vorhanden",
+      "tarif": "Allnet Flat M"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Knöpfe für tarif nicht gefunden (label:has(input[aria-label^=\"Tarifoption \"]))",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB nicht vorhanden",
+      "tarif": "Allnet Flat M"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB nicht vorhanden",
+      "tarif": "Allnet Flat L"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Knöpfe für tarif nicht gefunden (label:has(input[aria-label^=\"Tarifoption \"]))",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB nicht vorhanden",
+      "tarif": "Allnet Flat L"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB nicht vorhanden",
+      "tarif": "Allnet Flat L"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Knöpfe für tarif nicht gefunden (label:has(input[aria-label^=\"Tarifoption \"]))",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB nicht vorhanden",
+      "tarif": "Allnet Flat L"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    }
+   ],
    "speicher_gb": 256,
-   "status": "nicht_besucht"
+   "status": "gelesen",
+   "struktur": {
+    "anteil_felder": 1.0,
+    "anteil_knoepfe": 0.8571428571428571,
+    "felder_gefunden": 56,
+    "felder_gesucht": 56,
+    "knoepfe_gefunden": 60,
+    "knoepfe_gesucht": 70
+   },
+   "verworfen": 2
   }
  ],
- "ueberfaellig": [
-  "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/",
-  "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
-  "https://www.congstar.de/geraete/apple/apple-iphone-17/",
-  "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/",
-  "https://www.congstar.de/geraete/google/google-pixel-11/"
- ],
+ "ueberfaellig": [],
  "vertragsform": "tarif_plus_ratenkauf",
- "zeitbudget_sekunden": 3980
+ "zeitbudget_sekunden": 3977
 }
