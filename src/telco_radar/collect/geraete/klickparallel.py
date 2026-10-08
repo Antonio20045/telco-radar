@@ -14,10 +14,12 @@ Ein Lauf, der länger als ``WARTET_HOECHSTENS`` nur ``queued`` steht, hängt bei
 und sperrt nichts: Gerätelauf #89 vom 07.10.2026 16:57 stand so über 13 Stunden, ließ
 sich weder abbrechen noch löschen und verschob den ersten Klick-Tageslauf ganz. Eine
 legitime Wartezeit endet spätestens mit dem längsten Job einer Gruppe (``radar.yml``,
-180 min). Gezählt wird nur, was die Antwort mit ``created_at`` auflistet; was sie nicht
-auflistet oder ohne lesbares Datum, sperrt weiter; ohne ``uhr`` (die Einstiege
-reichen ihre herein) sperrt jeder wartende Lauf. Jeder übergangene Lauf steht als
-Warnung im Protokoll.
+180 min). Das Alter zählt ab ``run_started_at``, dem Beginn des jüngsten Versuchs: ein
+neu gestarteter alter Lauf behält ``created_at`` und wartet zu Recht. Übergangen wird
+nur, was die Antwort mit lesbarem Zeitpunkt auflistet, jede ``id`` einmal; was sie
+nicht auflistet oder ohne lesbaren Zeitpunkt, sperrt weiter; ohne ``uhr`` (die
+Einstiege reichen ihre herein) sperrt jeder wartende Lauf. Jeder übergangene Lauf
+steht als Warnung im Protokoll.
 """
 
 from __future__ import annotations
@@ -116,30 +118,31 @@ class GithubLaeufe:
             return anzahl
         return anzahl - len(self._haengende(antwort, datei))
 
-    def _haengende(self, antwort: dict, datei: str) -> list[dict]:
-        """Aufgelistete Läufe, die länger als ``WARTET_HOECHSTENS`` warten."""
+    def _haengende(self, antwort: dict, datei: str) -> dict[object, dict]:
+        """Aufgelistete Läufe je ``id``, die länger als ``WARTET_HOECHSTENS`` warten."""
         if self.uhr is None:
-            return []
+            return {}
         grenze = self.uhr() - WARTET_HOECHSTENS
-        haengend = []
+        haengend: dict[object, dict] = {}
         laeufe = antwort.get("workflow_runs")
         for lauf in laeufe if isinstance(laeufe, list) else []:
-            if not isinstance(lauf, dict):
+            if not isinstance(lauf, dict) or lauf.get("id") is None:
                 continue
-            erstellt = _zeitpunkt(lauf.get("created_at"))
-            if erstellt is not None and erstellt < grenze:
-                haengend.append(lauf)
-                log.warning(
-                    "%s: Lauf %s wartet seit %s - hängt, sperrt nicht",
-                    datei,
-                    lauf.get("id"),
-                    lauf.get("created_at"),
-                )
+            versuch = _zeitpunkt(lauf.get("run_started_at"))
+            if versuch is not None and versuch < grenze:
+                haengend[lauf["id"]] = lauf
+        for kennung, lauf in haengend.items():
+            log.warning(
+                "%s: Lauf %s wartet seit %s - hängt, sperrt nicht",
+                datei,
+                kennung,
+                lauf.get("run_started_at"),
+            )
         return haengend
 
 
 def _zeitpunkt(wert: object) -> datetime | None:
-    """``created_at`` der API als Zeitpunkt; unlesbar ist ``None``."""
+    """Ein Zeitpunkt der API; unlesbar oder ohne Zeitzone ist ``None``."""
     if not isinstance(wert, str):
         return None
     try:

@@ -97,7 +97,13 @@ def test_ein_anstehender_oder_laufender_lauf_ist_der_grund(laeufe, grund):
     assert _pruefung(Api(laeufe))() == grund
 
 
-HAENGT = {"id": 37655532485, "status": "queued", "created_at": "2026-10-07T16:57:03Z"}
+HAENGT = {
+    "id": 37655532485,
+    "run_attempt": 1,
+    "status": "queued",
+    "created_at": "2026-10-07T16:57:03Z",
+    "run_started_at": "2026-10-07T16:57:03Z",
+}
 TAGESLAUF = datetime(2026, 10, 8, 6, 17, 3, tzinfo=UTC)
 
 
@@ -150,10 +156,12 @@ def test_die_grenze_ist_wartet_hoechstens(alter, grund):
     ("laeufe", "gesamt"),
     [
         ([HAENGT], 2),
-        ([HAENGT, {**HAENGT, "id": 2, "created_at": "2026-10-08T06:00:00Z"}], None),
-        ([{**HAENGT, "created_at": "gestern"}], None),
-        ([{**HAENGT, "created_at": "2026-10-07T16:57:03"}], None),
-        ([{key: v for key, v in HAENGT.items() if key != "created_at"}], None),
+        ([HAENGT, {**HAENGT, "id": 2, "run_started_at": "2026-10-08T06:00:00Z"}], None),
+        ([{**HAENGT, "run_started_at": "gestern"}], None),
+        ([{**HAENGT, "run_started_at": "2026-10-07T16:57:03"}], None),
+        ([{key: v for key, v in HAENGT.items() if key != "run_started_at"}], None),
+        ([{key: v for key, v in HAENGT.items() if key != "id"}], None),
+        ([HAENGT, dict(HAENGT)], 2),
     ],
     ids=[
         "nicht-aufgelistet",
@@ -161,12 +169,23 @@ def test_die_grenze_ist_wartet_hoechstens(alter, grund):
         "datum-unlesbar",
         "ohne-zone",
         "ohne-datum",
+        "ohne-id",
+        "doppelt-gelistet",
     ],
 )
 def test_was_nicht_als_haengend_belegt_ist_sperrt_weiter(laeufe, gesamt):
     assert _um(_wartend(laeufe, gesamt), TAGESLAUF) == (
         "Gerätelauf läuft (geraete.yml, queued)"
     )
+
+
+def test_ein_neu_gestarteter_alter_lauf_wartet_zu_recht():
+    """GitHub behält beim neuen Start ``created_at`` des ersten Versuchs; nur
+    ``run_started_at`` und ``run_attempt`` wechseln (belegt am Repo: „Telco Radar
+    Run“ #29, Versuch 2). Gegenprobe: der nie gestartete #89 sperrt nicht."""
+    neu = {**HAENGT, "run_attempt": 2, "run_started_at": "2026-10-08T06:16:50Z"}
+    assert _um(_wartend([HAENGT]), TAGESLAUF) is None
+    assert _um(_wartend([neu]), TAGESLAUF) == "Gerätelauf läuft (geraete.yml, queued)"
 
 
 def test_ohne_uhr_sperrt_jeder_wartende_lauf():
