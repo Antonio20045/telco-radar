@@ -24,6 +24,7 @@ from __future__ import annotations
 import logging
 from collections import Counter
 from collections.abc import Callable
+from typing import TypeGuard
 
 from ..tco_model import laufzeit_in_monaten
 from .klick_vollstaendig import CENT
@@ -101,7 +102,7 @@ def _gleich(preis: dict, satz: dict) -> bool:
     return _betrag(preis.get(RATE))
 
 
-def _betrag(wert: object) -> bool:
+def _betrag(wert: object) -> TypeGuard[int | float]:
     return isinstance(wert, int | float) and not isinstance(wert, bool)
 
 
