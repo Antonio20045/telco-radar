@@ -13,7 +13,7 @@ from __future__ import annotations
 from datetime import date
 from pathlib import Path
 
-from ..collect.geraete.klickergebnis import ORDNER, ganz_gelesen, lies_ergebnisse
+from ..klick_vertrag import ORDNER, ganz_gelesen, lies_ergebnisse
 
 SATZ = "Crawler heute: {n} von {m} Seiten gelesen ({datum})"
 SATZ_UNLESBAR = "Crawler-Ergebnis unlesbar: {grund}"

@@ -42,6 +42,10 @@ import re
 from dataclasses import dataclass, field, replace
 from typing import TYPE_CHECKING
 
+from ...klick_vertrag import CHALLENGE_STATUS as CHALLENGE_STATUS
+from ...klick_vertrag import FEHLER_AB_STATUS as FEHLER_AB_STATUS
+from ...klick_vertrag import LAUF_GELESEN, abruf_gestoert
+from ...klick_vertrag import LAUF_GESTOERT as LAUF_GESTOERT
 from .klickecho import Befund, Variante
 from .klickkarte import WERTFELDER
 from .klicktext import Buendelwerte, Preiswerte
@@ -55,8 +59,6 @@ ERFASST = "erfasst"
 NICHT_ANGEBOTEN = "nicht_angeboten"
 NICHT_ERFASST = "nicht_erfasst"
 BEFUND = "befund"
-LAUF_GELESEN = "gelesen"
-LAUF_GESTOERT = "gestoert"
 LAUF_GESPERRT = "gesperrt"
 LAUF_ZEITGRENZE = "zeitgrenze"
 STOERUNG_ZEIT = "zeitueberschreitung"
@@ -72,8 +74,6 @@ PREISFELD_EIN_VERTRAG = "buendelbetrag"
 (``Buendelwerte``)."""
 GRUND_OHNE_RATE = "kein Gerätepreis gelesen (Rate)"
 GRUND_OHNE_BUENDELBETRAG = "kein Bündelbetrag gelesen"
-CHALLENGE_STATUS = 202
-FEHLER_AB_STATUS = 400
 STRUKTUR_SPRUNG = 0.2
 MINDESTANTEIL_KNOEPFE = 0.5
 MINDESTANTEIL_FELDER = 0.1
@@ -271,15 +271,6 @@ def lesestatus(
     if fehlt is not None:
         return NICHT_ERFASST, fehlt
     return ERFASST, None
-
-
-def abruf_gestoert(status: int | None) -> str | None:
-    """Grund, wenn der HTTP-Status den Abruf stört (202, 4xx, 5xx), sonst ``None``."""
-    if status is None:
-        return "Abruf gestört (keine Antwort)"
-    if status == CHALLENGE_STATUS or status >= FEHLER_AB_STATUS:
-        return f"Abruf gestört (HTTP {status})"
-    return None
 
 
 def bot_schutz(

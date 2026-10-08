@@ -13,10 +13,10 @@ from __future__ import annotations
 import re
 from datetime import date
 
-from ..collect.geraete.klickergebnis import FRISCHEGRENZE_TAGE
-from ..collect.geraete.klicklauf import (
+from ..klick_vertrag import (
     CHALLENGE_STATUS,
     FEHLER_AB_STATUS,
+    FRISCHEGRENZE_TAGE,
     LAUF_GESTOERT,
 )
 

@@ -36,6 +36,14 @@ from dataclasses import asdict
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from ...klick_vertrag import FORMAT as FORMAT
+from ...klick_vertrag import FRISCHEGRENZE_TAGE as FRISCHEGRENZE_TAGE
+from ...klick_vertrag import LESEFRIST_TAGE as LESEFRIST_TAGE
+from ...klick_vertrag import ORDNER as ORDNER
+from ...klick_vertrag import ROTATION_GELESEN as ROTATION_GELESEN
+from ...klick_vertrag import STAND_DATEI as STAND_DATEI
+from ...klick_vertrag import ganz_gelesen as ganz_gelesen
+from ...klick_vertrag import lies_ergebnisse as lies_ergebnisse
 from .klickbeleg import werte_als_json
 from .klickdiagnose import diagnose_als_daten
 from .klickkarte import DIMENSIONEN
@@ -55,19 +63,13 @@ if TYPE_CHECKING:
 
 log = logging.getLogger(__name__)
 
-FORMAT = 1
-FRISCHEGRENZE_TAGE = 3
-LESEFRIST_TAGE = 1
 LAUF_LEER = "leer"
 LAUF_NICHT_GELESEN = "nicht_gelesen"
 SEITE_NICHT_BESUCHT = "nicht_besucht"
 GELESENE_SEITEN = frozenset({LAUF_GELESEN, LAUF_ZEITGRENZE})
-ROTATION_GELESEN = frozenset({LAUF_GELESEN})
 GRUND_NICHTS_ERFASST = "keine Kombination erfasst"
 GRUND_KEINE_SEITE = "keine Seite gelesen"
 STAND_FORMAT = 1
-ORDNER = Path("data") / "state" / "klick"
-STAND_DATEI = "klick_stand.json"
 
 
 def kombination_als_daten(ergebnis: Kombiergebnis) -> dict:
@@ -140,11 +142,6 @@ def nicht_besucht(ziel: Seitenziel, grund: str) -> dict:
     }
 
 
-def ganz_gelesen(seiten: list[dict]) -> list[dict]:
-    """Die Seiten, die der Lauf ganz gelesen hat (``ROTATION_GELESEN``)."""
-    return [s for s in seiten if s["status"] in ROTATION_GELESEN]
-
-
 def laufstatus(seiten: list[dict]) -> tuple[str, str | None]:
     """Status und Grund des Anbieters aus seinen Seiten (siehe Modulkopf)."""
     gelesen = [s for s in seiten if s["status"] in GELESENE_SEITEN]
@@ -166,34 +163,6 @@ def schreibe(pfad: Path, daten: dict) -> None:
     pfad.parent.mkdir(parents=True, exist_ok=True)
     text = json.dumps(daten, ensure_ascii=False, indent=1, sort_keys=True)
     pfad.write_text(text + "\n", encoding="utf-8")
-
-
-def lies_ergebnisse(ordner: Path) -> tuple[list[dict], list[str]]:
-    """Alle Ergebnisdateien unter ``ordner`` und die unlesbaren mit Grund.
-
-    Artefakte liegen je Anbieter in einem Unterordner; gesucht wird darum rekursiv.
-    Eine Datei ohne passendes ``format`` ist unlesbar, nicht leer; der Lesestand
-    (``STAND_DATEI``) ist keine Ergebnisdatei.
-    """
-    daten: list[dict] = []
-    unlesbar: list[str] = []
-    if not ordner.is_dir():
-        return daten, [f"{ordner}: kein Ordner"]
-    for datei in sorted(ordner.rglob("*.json")):
-        if datei.name == STAND_DATEI:
-            continue
-        try:
-            inhalt = json.loads(datei.read_text(encoding="utf-8"))
-        except (OSError, UnicodeDecodeError, json.JSONDecodeError) as fehler:
-            unlesbar.append(f"{datei.name}: {type(fehler).__name__}")
-            continue
-        if not isinstance(inhalt, dict) or inhalt.get("format") != FORMAT:
-            unlesbar.append(f"{datei.name}: Format nicht {FORMAT}")
-            continue
-        daten.append(inhalt)
-    for zeile in unlesbar:
-        log.warning("Klick-Ergebnis unlesbar: %s", zeile)
-    return daten, unlesbar
 
 
 def lies_stand(pfad: Path) -> dict:
