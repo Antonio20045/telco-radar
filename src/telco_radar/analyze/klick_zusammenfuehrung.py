@@ -17,11 +17,12 @@ Schlüssel ist (Anbieter, Gerät, Speicher, Tarif, Ratenzahl); der Tarif gilt al
 wenn der gelesene Tarif in Vergleichsform (``klickrohsatz.tarifschluessel``) dem Namen
 oder dem Slug des Adaptersatzes entspricht. Ein Klick-Satz ersetzt einen Adaptersatz
 mit seinem Schlüssel (nur Zustand neu), wenn er jedes Wertfeld nennt, das der
-Adaptersatz nennt (``WERTFELDER``); dann übernimmt er dessen SKU, Tarifnamen und Slug,
-die Bündel-ID bleibt. Sonst bleibt der Adaptersatz ganz, und die Bilanz zählt ihn unter
-``unvollstaendig`` mit den fehlenden Feldern: zwei Quellen werden nie feldweise
-gemischt. Ohne Gegenstück kommt ein Klick-Satz, wie er ist (Lücken bleiben ``None``),
-nur mit dem Namen eines Adaptersatzes anderer Laufzeit (``klick_geschwister``).
+Adaptersatz nennt (``klick_vollstaendig``); dann übernimmt er dessen SKU, Tarifnamen,
+Slug und nicht eingerechnete Aktionen, die Bündel-ID bleibt. Sonst bleibt der
+Adaptersatz ganz, und die Bilanz zählt ihn unter ``unvollstaendig`` mit den fehlenden
+Feldern: zwei Quellen werden nie feldweise gemischt. Ohne Gegenstück kommt ein
+Klick-Satz, wie er ist (Lücken bleiben ``None``), nur mit dem Namen eines
+Adaptersatzes anderer Laufzeit (``klick_geschwister``).
 Nennen zwei Klick-Sätze denselben Schlüssel, gilt einer, wenn ihre Werte gleich sind,
 sonst keiner (``mehrdeutig``). Jeder ersetzte Adaptersatz ist Gegenprobe.
 
@@ -55,23 +56,12 @@ from ..geraete_model import Katalog
 from ..tarif_bezug import Tarifbestand
 from ..tco_model import Buendel, laufzeit_in_monaten
 from .klick_geschwister import Schluessel, geschwister, mit_namen
+from .klick_vollstaendig import CENT, VERGLEICHSFELDER, begleitend, fehlend, nennt
 from .tco_buendel import Buendelbilanz, aus_rohsaetzen
 
 log = logging.getLogger(__name__)
 
 UMGEBUNG = "TELCO_KLICK_ERGEBNISSE"
-VERGLEICHSFELDER = (
-    "geraet_zuzahlung",
-    "geraet_monatsrate",
-    "tarif_monatlich",
-    "buendel_monatlich",
-    "anschlusspreis",
-    "tarif_bindung_monate",
-)
-WERTFELDER = (*VERGLEICHSFELDER, "tarif_phasen", "aktionen")
-"""Was ein Satz zum Bündel beiträgt; ein Klick-Satz muss alle nennen, die der Adapter
-nennt, um ihn zu ersetzen."""
-CENT = 0.005
 BEISPIELE = 8
 GRUND_NICHT_HEUTE = "Datei vom {datum}, nicht von heute"
 GRUND_VERALTET = "Datei vom {datum}, älter als {tage} Tage"
@@ -96,14 +86,14 @@ class Gegenprobe:
 
     def unvollstaendig_fuer(self, klick: dict, adapter: dict) -> bool:
         """Zählt einen Adaptersatz mit Wertfeldern, die der Klick-Satz nicht nennt."""
-        fehlend = [f for f in WERTFELDER if _nennt(adapter, f) and not _nennt(klick, f)]
-        self.unvollstaendig += bool(fehlend)
-        self.fehlend.update(fehlend)
-        return bool(fehlend)
+        felder = fehlend(klick, adapter)
+        self.unvollstaendig += bool(felder)
+        self.fehlend.update(felder)
+        return bool(felder)
 
     def vergleiche(self, klick: dict, adapter: dict) -> None:
         """Zählt einen ersetzten Adaptersatz; Felder nur, wo beide einen Wert haben."""
-        beide = [f for f in VERGLEICHSFELDER if _nennt(klick, f) and _nennt(adapter, f)]
+        beide = [f for f in VERGLEICHSFELDER if nennt(klick, f) and nennt(adapter, f)]
         anders = [f for f in beide if abs(klick[f] - adapter[f]) > CENT]
         if not beide:
             self.ohne_vergleich += 1
@@ -220,7 +210,8 @@ def fuehre_zusammen(
                 continue
             probe.vergleiche(satz, alt)
             ersetzt.add(stelle)
-            neu.append({**satz, **{f: alt.get(f) for f in UEBERNOMMEN}})
+            uebernommen = {f: alt.get(f) for f in UEBERNOMMEN}
+            neu.append({**satz, **uebernommen, **begleitend(satz, alt)})
     vorhanden = {e["anbieter"] for e in eintraege}
     bilanz = {
         "dateien": eintraege,
@@ -318,11 +309,6 @@ def _werte(satz: dict) -> tuple:
         for p in satz.get("tarif_phasen") or []
     )
     return (*(satz.get(f) for f in VERGLEICHSFELDER), phasen)
-
-
-def _nennt(satz: dict, feld: str) -> bool:
-    wert = satz.get(feld)
-    return wert is not None and wert != []
 
 
 def _vorrang(buendel: Buendel, eintrag: dict | None, heute: str) -> bool:
