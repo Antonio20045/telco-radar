@@ -9,9 +9,9 @@ Anbieter aus ``klickziele.TAGESDATEI``; fehlt die Datei eines geplanten Anbieter
 nennt ihn die Bilanz unter ``fehlt``. Aus den Dateien werden Rohsätze
 (``klickrohsatz``), gemischt unter die Rohsätze der Adapter.
 
-Messung ist nur eine Datei von heute mit Laufstatus ``gelesen``. Eine ältere liefert
-nichts: was sie gemessen hat, steht mit ihrem Datum im Bestand, wenn ein Gerätelauf
-sie an ihrem Tag gelesen hat. Ab ``FRISCHEGRENZE_TAGE`` heißt sie veraltet.
+Messung ist eine Datei von heute, ``gelesen`` oder ``gestoert`` (``klick_teillauf``).
+Eine ältere liefert nichts: was sie gemessen hat, steht mit ihrem Datum im Bestand,
+wenn ein Gerätelauf sie an ihrem Tag gelesen hat. Ab ``FRISCHEGRENZE_TAGE`` veraltet.
 
 Schlüssel ist (Anbieter, Gerät, Speicher, Tarif, Ratenzahl); der Tarif gilt als gleich,
 wenn der gelesene Tarif in Vergleichsform (``klickrohsatz.tarifschluessel``) dem Namen
@@ -45,11 +45,10 @@ from datetime import date
 from pathlib import Path
 
 from ..collect.geraete.klickergebnis import FRISCHEGRENZE_TAGE, ORDNER, lies_ergebnisse
-from ..collect.geraete.klicklauf import LAUF_GELESEN
+from ..collect.geraete.klicklauf import LAUF_GELESEN, LAUF_GESTOERT
 from ..collect.geraete.klickrohsatz import (
     QUELLE,
     ZUSTAND_NEU,
-    ausbeute,
     tarifschluessel,
 )
 from ..collect.geraete.klickziele import geplante_anbieter
@@ -59,6 +58,7 @@ from ..tco_model import Buendel, laufzeit_in_monaten
 from .klick_erfassung import erfassungsgruende
 from .klick_geraetepreis import gegenprobe_geraet
 from .klick_geschwister import Schluessel, geschwister, mit_namen
+from .klick_teillauf import ausbeute_der_seiten
 from .klick_vollstaendig import CENT, VERGLEICHSFELDER, begleitend, fehlend, nennt
 from .tco_buendel import Buendelbilanz, aus_rohsaetzen
 
@@ -298,10 +298,11 @@ def _datei(
         eintrag["warum_nicht"] = GRUND_NICHT_HEUTE.format(datum=datum)
     elif status != LAUF_GELESEN:
         eintrag["warum_nicht"] = f"Lauf {status}: {daten.get('grund')}"
-    if eintrag["warum_nicht"] is not None:
+    teil = status == LAUF_GESTOERT and alter == 0
+    if eintrag["warum_nicht"] is not None and not teil:
         return eintrag, [], []
-    aus = ausbeute(daten, katalog)
-    eintrag.update(aus.als_daten(), verwendet=True)
+    aus, felder = ausbeute_der_seiten(daten, katalog, teil)
+    eintrag.update(aus.als_daten(), **felder)
     return eintrag, aus.rohsaetze, aus.ohne_tarif
 
 

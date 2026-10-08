@@ -57,3 +57,10 @@ def erfassungsgruende(bilanz: dict | None) -> dict[str, str]:
         if (satz := erfassungsgrund(eintrag)) is not None:
             gruende[str(eintrag.get("anbieter"))] = satz
     return gruende
+
+
+def ohne_karte(gruende: dict[str, str], karten: list[dict]) -> dict[str, str]:
+    """Die Gründe der Anbieter ohne Karte mit Betrag im Modell: wer die Seite gelesen
+    hat, zeigt seine Zeile statt des Grundes; ein Platzhalter zählt nicht."""
+    mit_karte = {k.get("anbieter") for k in karten if k.get("gesamt") is not None}
+    return {a: satz for a, satz in gruende.items() if a not in mit_karte}
