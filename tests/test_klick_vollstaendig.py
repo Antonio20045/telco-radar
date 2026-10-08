@@ -5,8 +5,9 @@ Klick-Satz: die echte o2-Lesung zu iPhone 17 Pro 512 GB, M Plus, 24 Raten
 Preisphase oder eine Aktion, wie sie der Gerätelauf am 08.10.2026 bei congstar und o2
 las: die Phase 1–24 zum Grundpreis bei 24 Monaten Bindung oder ein nicht
 eingerechneter Trade-in. Beide sagen nichts über die Werte hinaus und halten den
-Klick-Satz nicht zurück; eine Phase über die Bindung hinaus, ein anderer Betrag, zwei
-Phasen oder eine eingerechnete Aktion schon. Die Leitzahl bleibt dieselbe.
+Klick-Satz nicht zurück; eine Phase über die Bindung hinaus, ein anderer Betrag auch um
+einen halben Cent, zwei Phasen, ein Listenpreis daneben oder eine eingerechnete Aktion
+schon. Die Leitzahl bleibt dieselbe.
 """
 
 from __future__ import annotations
@@ -91,14 +92,19 @@ def _zusammen(katalog, alt: dict):
 
 
 @pytest.mark.parametrize(
-    "phasen",
-    [[_phase(1, 24, 19.99)], [_phase(1, None, 19.99)], [_phase(1, 24, 19.994)]],
-    ids=["bis-bindung", "offen", "unter-einem-cent"],
+    ("phasen", "bindung"),
+    [
+        ([_phase(1, 24, 19.99)], 24),
+        ([_phase(1, None, 19.99)], 24),
+        ([_phase(1, 24, 19.99)], None),
+        ([_phase(1, 24, 19.99)], 0),
+    ],
+    ids=["bis-bindung", "offen", "ohne-bindung", "bindung-null"],
 )
 def test_grundpreisphase_haelt_den_klick_nicht_zurueck(
-    katalog, bestand, klicksatz, phasen
+    katalog, bestand, klicksatz, phasen, bindung
 ):
-    alt = _adapter(klicksatz, tarif_phasen=phasen)
+    alt = _adapter(klicksatz, tarif_phasen=phasen, tarif_bindung_monate=bindung)
 
     zug = _zusammen(katalog, alt)
 
@@ -121,6 +127,8 @@ def test_grundpreisphase_haelt_den_klick_nicht_zurueck(
         ([_phase(1, 12, 19.99)], 24),
         ([_phase(2, 24, 19.99)], 24),
         ([_phase(1, 24, 19.99)], 12),
+        ([_phase(1, 24, 19.985)], 24),
+        ([_phase(1, 36, 19.99)], None),
     ],
     ids=[
         "ueber-die-bindung",
@@ -129,6 +137,8 @@ def test_grundpreisphase_haelt_den_klick_nicht_zurueck(
         "vor-der-bindung-zu-ende",
         "nicht-ab-monat-eins",
         "bindung-kuerzer",
+        "halber-cent",
+        "ohne-bindung-bis-36",
     ],
 )
 def test_gemessene_phase_haelt_den_klick_zurueck(katalog, klicksatz, phasen, bindung):
@@ -139,6 +149,23 @@ def test_gemessene_phase_haelt_den_klick_zurueck(katalog, klicksatz, phasen, bin
     assert zug.rohsaetze == [alt]
     assert zug.bilanz["ersetzt"] == 0
     assert zug.bilanz["unvollstaendig"]["felder"]["tarif_phasen"] == 1
+
+
+def test_aktionspreis_mit_listenpreis_haelt_den_klick_zurueck(katalog, klicksatz):
+    """Vodafone, Rechenweise 2: die Phase zu 19,99 € ist der Aktionspreis, der
+    Listenpreis 29,99 € steht daneben. Ohne Listenpreis im Klick bliebe Regel 3 ohne
+    Maßstab; der Adaptersatz bleibt ganz."""
+    alt = _adapter(
+        klicksatz, tarif_listenpreis=29.99, tarif_phasen=[_phase(1, 24, 19.99)]
+    )
+
+    zug = _zusammen(katalog, alt)
+
+    assert zug.rohsaetze == [alt]
+    assert zug.bilanz["unvollstaendig"] == {
+        "nicht_ersetzt": 1,
+        "felder": {"tarif_listenpreis": 1, "tarif_phasen": 1},
+    }
 
 
 def test_nicht_eingerechnete_aktion_reist_mit(katalog, bestand, klicksatz):
