@@ -56,6 +56,7 @@ from ..collect.geraete.klickziele import geplante_anbieter
 from ..geraete_model import Katalog
 from ..tarif_bezug import Tarifbestand
 from ..tco_model import Buendel, laufzeit_in_monaten
+from .klick_erfassung import erfassungsgruende
 from .klick_geraetepreis import gegenprobe_geraet
 from .klick_geschwister import Schluessel, geschwister, mit_namen
 from .klick_vollstaendig import CENT, VERGLEICHSFELDER, begleitend, fehlend, nennt
@@ -127,6 +128,11 @@ class Zusammenfuehrung:
 
     rohsaetze: list[dict]
     bilanz: dict | None = None
+
+    @property
+    def erfassung(self) -> dict[str, str]:
+        """Je Anbieter der Grund eines gestörten Klick-Laufs (``klick_erfassung``)."""
+        return erfassungsgruende(self.bilanz)
 
     def buendel(
         self,

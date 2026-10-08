@@ -173,24 +173,21 @@ def basis_aus_satz(satz: dict) -> Optional[str]:
 class TcoDB:
     """data/state/geraete_tco.json - Buendel und SIM-only-Referenzen.
 
-    Format: {"updated": "YYYY-MM-DD", "buendel": [...], "sim_only": [...]}.
+    Format: {"updated", "buendel", "sim_only", "pruefung"}, unter "erfassung" je
+    Anbieter der Grund eines gestoerten Klick-Laufs (`analyze.klick_erfassung`).
 
-    Daneben fuehrt der Store die Preishistorie
-    `geraete_tco_historie.jsonl` (Attribut `historie_path`): eine Zeile je
-    (buendel_id, datum), siehe Modulkopf.
+    Daneben fuehrt der Store die Preishistorie `geraete_tco_historie.jsonl` (Attribut
+    `historie_path`): eine Zeile je (buendel_id, datum), siehe Modulkopf.
     """
 
     def __init__(self, path: Path, historie_path: Optional[Path] = None):
         self.path = Path(path)
-        self.historie_path = (
-            Path(historie_path)
-            if historie_path is not None
-            else self.path.parent / _HISTORIE_NAME
-        )
+        self.historie_path = Path(historie_path or self.path.parent / _HISTORIE_NAME)
         self._buendel: dict[str, dict] = {}
         self._referenzen: dict[str, dict] = {}
         self.updated = ""
         self.pruefung: dict | None = None
+        self.erfassung: dict[str, str] = {}
         self._historie_pendente: dict[tuple[str, str], dict] = {}
         self.lesbar = True
         if not self.path.exists():
@@ -204,6 +201,8 @@ class TcoDB:
         self.updated = roh.get("updated", "")
         pruefung = roh.get("pruefung")
         self.pruefung = pruefung if isinstance(pruefung, dict) else None
+        erfassung = roh.get("erfassung")
+        self.erfassung = erfassung if isinstance(erfassung, dict) else {}
         migriert = 0
         for eintrag in roh.get("buendel") or []:
             bid = id_aus_satz(eintrag)
@@ -458,6 +457,7 @@ class TcoDB:
             "buendel": self.buendel(),
             "sim_only": self.referenzen(),
             **({"pruefung": self.pruefung} if self.pruefung else {}),
+            **({"erfassung": self.erfassung} if self.erfassung else {}),
         }
         self.path.write_text(
             json.dumps(daten, ensure_ascii=False, indent=1), encoding="utf-8"

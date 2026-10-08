@@ -415,7 +415,8 @@ def netzbetreiber_gruppen(
     Die Paare kommen aus `_paar_zeilen` (Band und Ratenlaufzeit, RAD-1b),
     gruppiert werden nur Karten, die zaehlen (NOTBREMSE im Modulkopf). Ein
     erneuertes Geraet steht als nicht vergleichbare Zeile mit Grund daneben
-    (B1). Ohne gemeinsames Band: Band-Mismatch mit der GUENSTIGSTEN Karte."""
+    (B1). Ohne gemeinsames Band: Band-Mismatch mit der GUENSTIGSTEN Karte. Ohne
+    Karte nennt `modell["erfassung"]` den gestörten Klick-Lauf (`klick_erfassung`)."""
     band_rang = band_rang or {}
     gruppen = []
     for modell in modelle:
@@ -429,6 +430,7 @@ def netzbetreiber_gruppen(
         uebrig = _guenstigste_echte_karte_je_anbieter(zaehlend)
         ungefiltert = _guenstigste_echte_karte_je_anbieter(modell)
         hat_karte = {k.get("anbieter") for k in karten}
+        erfasst = {a: {"leer_grund": g} for a, g in modell.get("erfassung", {}).items()}
         if basis is None:
             zeilen = [
                 {
@@ -439,7 +441,8 @@ def netzbetreiber_gruppen(
                     "tarif": (uebrig.get(a) or {}).get("tarif", ""),
                     "band": None,
                     "band_label": "",
-                    "grund": _notbremse_satz(uebrig.get(a) or ungefiltert.get(a)),
+                    "grund": _notbremse_satz(uebrig.get(a) or ungefiltert.get(a))
+                    or (erfasst.get(a) or {}).get("leer_grund", ""),
                     **_beleg("", ""),
                 }
                 for a in ALLE_WETTBEWERBER
@@ -470,7 +473,7 @@ def netzbetreiber_gruppen(
             if paare := _paar_zeilen(a, alle_je, band_rang):
                 zeilen += paare
                 continue
-            karte = uebrig.get(a) or ungefiltert.get(a)
+            karte = uebrig.get(a) or ungefiltert.get(a) or erfasst.get(a)
             zeilen.append(_zeile_fuer_anbieter(a, karte, basis, band_je_tarif))
         zeilen.sort(
             key=lambda z: z["prozent"] if z["prozent"] is not None else float("inf")
@@ -539,10 +542,9 @@ def modellliste(gruppen: list[dict]) -> dict:
         getragen von dem Anbieter-Paar, das sie gerechnet hat,
       * oder das Lueckenwort, wenn kein vergleichbares Paar steht,
 
-    und dazu alles, was die Detailzeile braucht (VF-Basis und ALLE
-    Anbieter-Zeilen der Gruppe - kein Anbieter wird weggedeckelt, B.2.5).
-    KEINE zweite Rechnung: Prozent und Euro-Betraege sind die Werte der
-    Paarzeile, ungekuerzt uebernommen.
+    und dazu alles, was die Detailzeile braucht (VF-Basis und ALLE Anbieter-Zeilen der
+    Gruppe - kein Anbieter wird weggedeckelt, B.2.5). KEINE zweite Rechnung: Prozent und
+    Euro-Betraege sind die Werte der Paarzeile, ungekuerzt uebernommen.
 
     `sichtbar`/`rest` kappen nur die ANSICHT (`MODELLISTE_SICHTBAR`,
     Knopf „alle N anzeigen") - `zeilen` bleibt die vollstaendige Liste.
@@ -961,20 +963,18 @@ def radar(
 ) -> dict:
     """Alles fuer die Radar-Tafel der EINEN Geräteseite (#tafel-radar).
 
-    `gruppen`/`haendler` bleiben die VOLLSTAENDIGEN Listen (Test c: nichts
-    wird entfernt); `gruppen_sichtbar`/`gruppen_rest` und
-    `haendler_sichtbar`/`haendler_rest` sind nur die Kappung der
-    ANSICHT - dieselbe Bauform wie `geraete_alarme.zeilen()`
+    `gruppen`/`haendler` bleiben die VOLLSTAENDIGEN Listen (Test c: nichts wird
+    entfernt); `gruppen_sichtbar`/`gruppen_rest` und `haendler_sichtbar`/`haendler_rest`
+    sind nur die Kappung der ANSICHT - dieselbe Bauform wie `geraete_alarme.zeilen()`
     (`sichtbar`/`rest`).
 
-    `alarme` (seit O2, 11.09.2026) ist die Aufbereitung aus
-    `geraete_view.aufbereiten` - die Alarmtabelle steht seither HIER und
-    nicht mehr in der Vergleichsansicht der Geraeteseite. Sie wird als
-    GANZES durchgereicht, nicht neu gerechnet: dieselbe Tabelle, derselbe
-    Deckel, derselbe Ort - nur die Seite ist eine andere. Dazu
-    `ohne_vodafone` aus demselben Vergleich: der Sortiments-Aufklapper
-    "Bei Wettbewerbern gelistet" antwortet dieselbe Frage ueber das
-    Sortiment, die der Radar ueber den Preis stellt.
+    `alarme` (seit O2, 11.09.2026) ist die Aufbereitung aus `geraete_view.aufbereiten` -
+    die Alarmtabelle steht seither HIER und nicht mehr in der Vergleichsansicht der
+    Geraeteseite. Sie wird als GANZES durchgereicht, nicht neu gerechnet: dieselbe
+    Tabelle, derselbe Deckel, derselbe Ort - nur die Seite ist eine andere. Dazu
+    `ohne_vodafone` aus demselben Vergleich: der Sortiments-Aufklapper "Bei
+    Wettbewerbern gelistet" antwortet dieselbe Frage ueber das Sortiment, die der Radar
+    ueber den Preis stellt.
     """
     band_je_tarif = tco.get("band_je_tarif") or {}
     gruppen = netzbetreiber_gruppen(

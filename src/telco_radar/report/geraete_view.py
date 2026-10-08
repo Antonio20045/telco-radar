@@ -1520,19 +1520,17 @@ def bestand_und_belastbar(sichtbar: list, katalog) -> tuple[dict, list, list]:
     Zustandswort, keine Zeile "Zustand = neu" auf Gebrauchtdaten, keine
     Dublette -, denn `bereinige()` laeuft in beiden.
 
-    ZUR REIHENFOLGE INNERHALB VON `belastbar`. Sie bleibt: erst `pruefe()`,
-    dann `bereinige()`. Der Grund ist ein anderer, als bis zum 31.08.2026
-    hier stand - die alte Begruendung ("vertauscht stuenden die zwei
-    o2-Gebrauchtpreise wieder als Neupreise in `geraete-aktuell.csv`")
-    reproduziert NICHT: nachgemessen liefern beide Reihenfolgen denselben
-    Bestand, Zeile fuer Zeile, weil die zwei Giftzeilen Zwillinge sind und
-    so oder so fallen. Was sich messbar unterscheidet, ist der PRUEFBERICHT:
-    `zustand_veraltet` steht in dieser Reihenfolge auf 2, vertauscht auf 0.
-    `pruefe()` erkennt die falsch gespeicherte Zustandsangabe an genau dem
-    Wort, das `bereinige()` aus der Farbe raeumt - laeuft die Bereinigung
-    zuerst, findet die Pruefung nichts mehr zu melden. Ein Befund, den
-    niemand mehr meldet, ist der Fehler, den beim naechsten Mal niemand
-    findet.
+    ZUR REIHENFOLGE INNERHALB VON `belastbar`. Sie bleibt: erst `pruefe()`, dann
+    `bereinige()`. Der Grund ist ein anderer, als bis zum 31.08.2026 hier stand - die
+    alte Begruendung ("vertauscht stuenden die zwei o2-Gebrauchtpreise wieder als
+    Neupreise in `geraete-aktuell.csv`") reproduziert NICHT: nachgemessen liefern beide
+    Reihenfolgen denselben Bestand, Zeile fuer Zeile, weil die zwei Giftzeilen Zwillinge
+    sind und so oder so fallen. Was sich messbar unterscheidet, ist der PRUEFBERICHT:
+    `zustand_veraltet` steht in dieser Reihenfolge auf 2, vertauscht auf 0. `pruefe()`
+    erkennt die falsch gespeicherte Zustandsangabe an genau dem Wort, das `bereinige()`
+    aus der Farbe raeumt - laeuft die Bereinigung zuerst, findet die Pruefung nichts
+    mehr zu melden. Ein Befund, den niemand mehr meldet, ist der Fehler, den beim
+    naechsten Mal niemand findet.
 
     Und die Reihenfolge traegt ueber den heutigen Bestand hinaus: eine
     Giftzeile OHNE Zwilling faellt nur so heraus. Genau die bauen die zwei
@@ -1689,6 +1687,8 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         tco_historie=tco_db.historie_lage(),
         heute=tco_heute,
     )
+    for modell in tco["modelle"]:
+        modell["erfassung"] = tco_db.erfassung
     ausfaelle: list[Ausfall] = []
     try:
         zeitreihe = geraete_zeitreihe.aufbereiten(

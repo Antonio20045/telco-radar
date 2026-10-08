@@ -508,7 +508,7 @@ def run_geraete_stage(
                 buendelbilanz = klickzug.buendel(bestand, heute, tco.nach_id)
                 if buendelbilanz.buendel:
                     neue_buendel, _ = tco.upsert_buendel(buendelbilanz.buendel, heute)
-            klickbilanz = klickzug.bilanz
+            klickbilanz, tco.erfassung = klickzug.bilanz, klickzug.erfassung
             seite = Seite(ist_frisch, geraet_aus_sku, katalog)
             pruefe_buendel(tco, db, bestand, heute, seite, abgesichert)
             tco.save(heute)
