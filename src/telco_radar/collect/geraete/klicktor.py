@@ -18,7 +18,7 @@ in ``Klicklauf.gescheitert``.
 
 Antwortet die Hauptseite mit Bot-Schutz (``klicklauf.bot_schutz``), beim Öffnen wie
 mitten im Lauf, kommt die Seite nie im Browser an, und danach geht nichts mehr hinaus;
-die erste JavaScript-Prüfung je Seite geht in den Browser (``klicksperre``).
+die erste JavaScript-Prüfung je Seite, auch eines Nebenabrufs, geht in den Browser.
 Ein WebSocket verbindet nie (sperrt robots.txt ihn, steht er in ``verworfen``), und
 Vorabladen (Speculation Rules, ``<link rel=prerender|prefetch>``, Kopfzeile ``Link``)
 entfernt das Tor aus Kopf und Dokument jeder Antwort; was sonst an ``route``
@@ -185,7 +185,7 @@ class Tor:
     und keine weitere Anfrage geht hinaus; geprüft wird beim Eintritt und noch einmal
     nach jedem Warten auf Host und Abstand, unmittelbar vor dem Abruf. ``beobachter``
     sieht jede geholte Antwort, bevor sie in den Browser geht; nennt er einen Grund,
-    ist das eine Störung, außer bei der Hauptseite (dort gilt ``bot_schutz``).
+    ist das eine Störung, außer bei der Hauptseite und der ersten Prüfung (oben).
     ``weiter_klick`` und ``nur_lesen`` setzt die Folgeseite (siehe oben).
     """
 
@@ -306,7 +306,8 @@ class Tor:
         self, anfrage: Request, antwort: APIResponse, hauptseite: bool
     ) -> None:
         grund = None if self.beobachter is None else self.beobachter(anfrage, antwort)
-        if grund is not None and not hauptseite and self.stoerung is None:
+        frei = grund is None or hauptseite or self.stoerung is not None
+        if not frei and not self.pruefung.laesst_neben_durch(anfrage.url, antwort):
             log.warning("Klick-Crawler: %s; Lauf endet", grund)
             self.stoerung = grund
 

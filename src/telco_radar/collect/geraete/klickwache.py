@@ -15,11 +15,12 @@ gestört. Bleibt sie über die Frist offen, heißt die Kombination ``nicht_erfas
 (``ausstehend``), und vor dem nächsten Klick wie am Ende des Laufs wartet die Wache sie
 ab oder bricht den Lauf als gestört ab. Ruhe heißt: keine Anfrage der Seite läuft, und
 zwei Lesungen im Abstand ``RUHE_MS`` zeigen dieselben Knöpfe und keine neue Anfrage.
-Ließ das Tor eine JavaScript-Prüfung in den Browser (``klicksperre``), zählt ihre 202
-nicht als Verdacht, und ``lade`` wartet höchstens ``PRUEFUNG_FRIST_MS``, bis die Seite
-danach neu geladen ist; sonst ist der Lauf gestört. Mitgeschnitten wird jede Antwort,
-die zu einer Quelle der Karte passt; erwartet keine Quelle eine Antwort je Klick
-(congstar, Vodafone, 1&1), wartet die Wache nach einem Klick nur auf Ruhe.
+Ließ das Tor eine JavaScript-Prüfung in den Browser (``klicksperre``), auch die eines
+Nebenabrufs, zählt ihre 202 nicht als Verdacht; nach der Prüfung der Hauptseite wartet
+``lade`` höchstens ``PRUEFUNG_FRIST_MS``, bis die Seite danach neu geladen ist; sonst
+ist der Lauf gestört. Mitgeschnitten wird jede Antwort, die zu einer Quelle der Karte
+passt; erwartet keine Quelle eine Antwort je Klick (congstar, Vodafone, 1&1), wartet
+die Wache nach einem Klick nur auf Ruhe.
 """
 
 from __future__ import annotations
