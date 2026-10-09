@@ -767,7 +767,8 @@ geraete:
   - hersteller: Nothing
     modell: Nothing Phone (4a) Pro
     generation: 4
-    speicher: [256]
+    # 128 GB: 1&1-Produktseite, Klick-Tageslauf 09.10.2026 (25,99 €/Monat, 24+12).
+    speicher: [128, 256]
     segment: mid
 
   # -------------------------------------------------------------- Fairphone
