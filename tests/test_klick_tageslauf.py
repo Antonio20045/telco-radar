@@ -68,7 +68,9 @@ def ziele():
 
 @pytest.fixture(scope="module")
 def o2(ziele):
-    return ziele["o2"]
+    """Die ersten sechs o2-Seiten der Tagesdatei: Rotation und Budget unabhängig
+    davon, wie viele Seiten die Datei heute nennt."""
+    return replace(ziele["o2"], seiten=ziele["o2"].seiten[:6])
 
 
 @pytest.fixture(scope="module")
