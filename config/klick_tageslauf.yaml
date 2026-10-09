@@ -25,7 +25,8 @@
 #
 # `uebersichten` (nur Telekom): Smartphone-Übersicht je Tarif, wörtlich ein Einstieg
 # aus config/geraete_quellen.yaml; gelesen vor den Produktseiten, im selben Zeitbudget
-# (`klickuebersicht`). Pitch 4, Schnitt 2: zuerst MagentaMobil M, erste Seite.
+# (`klickuebersicht`), samt Folgeseiten über ihren gelesenen Folgelink. Alle fünf
+# MagentaMobil-Tarife, M zuerst (Pitch 4, Schnitt 3).
 #
 # Vodafone: die Produktseite wählt den Tarif nicht (Karte: tarif fest
 # „unbekannt“); erfasste Werte bleiben darum ohne Bündel und zählen als Lücke
@@ -91,6 +92,10 @@ anbieter:
     seitenabstand_sekunden: 60
     uebersichten:
       - https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17791
+      - https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17779
+      - https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17785
+      - https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17797
+      - https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17803
     seiten:
       - geraet: apple-iphone-17-pro
         speicher_gb: 256

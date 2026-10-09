@@ -24,7 +24,11 @@ Lauf ``Erkundungsziel.seitenabstand_sekunden`` (ruhiges Tempo, keine Anpassung a
 eine Sperre); vor der ersten und nach dem Ende wartet er nicht. Die Übersichten des
 Anbieters (``Erkundungsziel.uebersichten``, ``klickuebersicht``) liest der Lauf vor den
 Produktseiten, unter denselben Grenzen, Abständen und Stopps; sie stehen unter
-``uebersichten`` in der Ergebnisdatei und zählen für den Laufstatus mit.
+``uebersichten`` in der Ergebnisdatei und zählen für den Laufstatus mit. Eine Übersicht
+samt Folgeseiten hat eine Grenze; jede gestörte Folgeseite hält den Anbieter an.
+Telekom (Pitch 4, Schnitt 3): 5 Tarife × ~3 Seiten × ~100 s plus 14 × 60 s Abstand
+≈ 39 min von 67 min Budget; der Rest reicht für etwa 4 der 7 Produktseiten (je ~280 s),
+die übrigen bleiben ``nicht besucht`` und kommen in der Rotation am nächsten Tag.
 
 Rotation: Einheit ist die Produktseite, denn der Crawler klickt alle Varianten einer
 Seite in einem Gang. Zuerst kommen nie gelesene Seiten, dann die am längsten nicht
@@ -139,13 +143,18 @@ def _uebersicht_nicht_besucht(adresse: str, grund: str) -> dict:
         "status": SEITE_NICHT_BESUCHT,
         "grund": grund,
         "saetze": [],
+        "vollstaendig": False,
     }
 
 
-def _als_seite(uebersicht: dict) -> dict:
-    """Eine Übersicht in der Form, die ``laufstatus`` liest: jeder Satz erfasst."""
+def _als_seiten(uebersicht: dict) -> list[dict]:
+    """Eine Übersicht in der Form, die ``laufstatus`` liest: jeder Satz erfasst,
+    jede Folgeseite eine Seite ohne Kombination."""
     erfasst = [{"status": ERFASST} for _ in uebersicht.get("saetze") or []]
-    return {**uebersicht, "kombinationen": erfasst}
+    folge = (uebersicht.get("seiten") or [])[1:]
+    return [{**uebersicht, "kombinationen": erfasst}] + [
+        {**s, "kombinationen": []} for s in folge
+    ]
 
 
 def budget_ende(job_frist_s: float, verstrichen_s: float, jetzt: float) -> float:
@@ -216,7 +225,8 @@ def fahre(
             continue
         ergebnis = lies_uebersicht(adresse, gang.grenze())
         uebersichten.append(ergebnis)
-        gang.nach(ergebnis["status"], ergebnis.get("stoerung"), ergebnis["grund"])
+        for teil in ergebnis.get("seiten") or [ergebnis]:
+            gang.nach(teil["status"], teil.get("stoerung"), teil["grund"])
     for seite in reihenfolge(ziel.seiten, gelesen):
         stopp = gang.vor()
         if stopp is not None:
@@ -225,7 +235,9 @@ def fahre(
         lauf = crawle(seite, gang.grenze())
         seiten.append(seite_als_daten(seite, lauf))
         gang.nach(lauf.status, lauf.stoerung, lauf.grund)
-    status, grund = laufstatus(seiten + [_als_seite(u) for u in uebersichten])
+    status, grund = laufstatus(
+        seiten + [s for u in uebersichten for s in _als_seiten(u)]
+    )
     heute_gelesen = {s["adresse"] for s in ganz_gelesen(seiten)}
     faellig = ueberfaellig(ziel.seiten, gelesen, heute_gelesen, heute)
     daten = {
@@ -309,7 +321,14 @@ def leser_im_browser(
         schleuse.setze(ende)
         kennung = ziel.kennung
         return lies_uebersicht(
-            browser, adresse, karte, waechter, uhr, schleuse=schleuse, kennung=kennung
+            browser,
+            adresse,
+            karte,
+            waechter,
+            uhr,
+            schleuse=schleuse,
+            kennung=kennung,
+            abstand_s=ziel.seitenabstand_sekunden,
         )
 
     return crawle, lies

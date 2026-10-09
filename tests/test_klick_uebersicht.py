@@ -12,6 +12,7 @@ fremde Hosts sperrt robots.txt im Test, es geht nichts ins Netz.
 
 from __future__ import annotations
 
+import dataclasses
 import gzip
 from datetime import UTC, datetime
 
@@ -180,7 +181,7 @@ def test_auto_katalog_und_unbekannter_titel_als_luecke(katalog):
 
 
 def test_tagesdatei_nennt_die_uebersicht_wortlich_aus_den_quellen(telekom):
-    assert telekom.uebersichten == (UEBERSICHT_M,)
+    assert telekom.uebersichten[0] == UEBERSICHT_M
 
 
 def test_zusammengesetzte_uebersicht_wird_abgelehnt(tmp_path):
@@ -204,6 +205,7 @@ class _Uhr:
 
 
 def test_uebersicht_vor_den_produktseiten_und_im_zeitbudget(telekom, karte):
+    telekom = dataclasses.replace(telekom, uebersichten=(UEBERSICHT_M,))
     uhr = _Uhr()
     reihe: list[str] = []
 

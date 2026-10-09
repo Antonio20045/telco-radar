@@ -20,7 +20,9 @@ Nebenabrufs, zählt ihre 202 nicht als Verdacht; nach der Prüfung der Hauptseit
 ``lade`` höchstens ``PRUEFUNG_FRIST_MS``, bis die Seite danach neu geladen ist; sonst
 ist der Lauf gestört. Mitgeschnitten wird jede Antwort, die zu einer Quelle der Karte
 passt; erwartet keine Quelle eine Antwort je Klick (congstar, Vodafone, 1&1), wartet
-die Wache nach einem Klick nur auf Ruhe.
+die Wache nach einem Klick nur auf Ruhe. Mit ``bereit`` (Übersicht, ``klickuebersicht``)
+wartet ``lade`` nicht auf ``load``: nach der Prüfung und einem Hauptdokument ohne
+Störung (``abruf_gestoert``) nur, bis der JavaScript-Ausdruck ``bereit`` wahr ist.
 """
 
 from __future__ import annotations
@@ -31,7 +33,8 @@ from typing import TYPE_CHECKING
 
 from playwright.sync_api import Error as PlaywrightFehler
 
-from .klickladung import Ladung
+from ...klick_vertrag import abruf_gestoert
+from .klickladung import LADE_HOECHSTENS_MS, Ladung
 from .klicklauf import (
     CHALLENGE_STATUS,
     LAUF_GESPERRT,
@@ -104,12 +107,13 @@ class Wache:
             grund = f"Hauptseite im Lauf umgeleitet ({self.tor.umleitung})"
             raise Abbruch(LAUF_GESTOERT, grund)
 
-    def lade(self, ziel: str) -> None:
+    def lade(self, ziel: str, bereit: str | None = None) -> None:
         """Öffnet ``ziel``; die Frist bis zur Antwort trägt den Crawl-delay mit.
 
         Antwort und Ausstehendes der vorigen Seite gelten danach nicht mehr. Bis
         ``load`` wartet ``klickladung`` am Fortschritt; lädt die Seite nicht, ist sie
         gestört mit ``STOERUNG_ZEIT``, und ``lauf.ladung`` nennt die Umstände.
+        ``bereit`` ersetzt das Warten auf ``load`` (``_warte_bereit``).
         """
         self.tor.umleitung = None
         self.ladung.beginne()
@@ -135,6 +139,9 @@ class Wache:
         if self.tor.umleitung is not None:
             return
         self._warte_pruefung()
+        if bereit is not None:
+            self._warte_bereit(bereit)
+            return
         geladen = self.ladung.warte(self.pruefe_tor)
         abstand = self.tor.schleuse.abstand(ziel)
         self.lauf.ladung = self.ladung.diagnose(geladen, abstand)
@@ -155,6 +162,22 @@ class Wache:
             raise Abbruch(LAUF_GESTOERT, GRUND_PRUEFUNG)
         self.lauf.http_status = self.tor.haupt_status
         self.ladung.beginne()
+
+    def _warte_bereit(self, bereit: str) -> None:
+        """Hauptdokument ohne Störung, dann bis ``bereit`` im Browser wahr ist."""
+        gestoert = abruf_gestoert(self.tor.haupt_status)
+        if gestoert is not None:
+            raise Abbruch(LAUF_GESTOERT, gestoert)
+        if not self.warte(lambda: self._gilt(bereit), LADE_HOECHSTENS_MS):
+            self.lauf.stoerung = STOERUNG_ZEIT
+            grund = f"Seite nach {LADE_HOECHSTENS_MS} ms nicht bereit ({bereit})"
+            raise Abbruch(LAUF_GESTOERT, grund)
+
+    def _gilt(self, ausdruck: str) -> bool:
+        try:
+            return self.seite.evaluate(ausdruck) is True
+        except PlaywrightFehler:
+            return False
 
     def _navigiert(self, rahmen: Frame) -> None:
         if rahmen.parent_frame is None:
