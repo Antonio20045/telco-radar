@@ -55,6 +55,7 @@ from collections import Counter
 from dataclasses import dataclass, field
 
 from ...geraete_model import Katalog, erkenne_geraet, normalisiere, sku_id
+from ...tarif_model import QUELLE_KLICK
 from .klickanschluss import ART_ANSCHLUSS
 from .klickcrawler import GRUND_NICHT_BESUCHT
 from .klickergebnis import GELESENE_SEITEN
@@ -72,7 +73,7 @@ from .klickraster import ART_RASTER, raster_roh
 
 log = logging.getLogger(__name__)
 
-QUELLE = "klick"
+QUELLE = QUELLE_KLICK
 ZUSTAND_NEU = "neu"
 TARIF_UNBEKANNT = "unbekannt"
 TB_IN_GB = 1024

@@ -56,6 +56,8 @@ Blatt."""
 PREISTYP_DOKUMENT = "dokument"
 PREISTYP_LIVE_SHOP = "live_shop"
 PREISTYPEN = (PREISTYP_DOKUMENT, PREISTYP_LIVE_SHOP)
+QUELLE_KLICK = "klick"
+"""`quelle_art` eines Bündels vom Klick-Crawler (`klickrohsatz`)."""
 
 
 def ist_zurueckgezogen(satz: dict) -> bool:

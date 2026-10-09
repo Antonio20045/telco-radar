@@ -51,7 +51,7 @@ from datetime import date as _datum
 from typing import Optional
 
 from ..geraete_model import VERGLEICHBARE_ZUSTAENDE, ZUSTAENDE, normalisiere
-from ..tarif_model import Preisphase, vor_dem_blatt
+from ..tarif_model import QUELLE_KLICK, Preisphase, vor_dem_blatt
 from ..tco_kosten import POSTEN_ZEITRAUM, belegte_phasen, tarifpreis_im_monat
 from ..tco_model import (
     AKTION_ANSCHLUSS_ERLASSEN,
@@ -671,12 +671,11 @@ def _karte(
 ) -> dict:
     """Aus einem Buendel wird eine Karte - gerechnet wird in `tco_kosten`.
 
-    Diese Funktion addiert keinen Euro. Die Kernzahl ist `kosten_ueber` ueber den
-    Zeitraum H des Buendels (Datenkonzept Geraete 5.3: 12 und 24 Raten 24 Monate,
-    36 Raten 36 Monate, 1&1 sein Vertrag), ihre Summanden `rechnung`; fehlt ein
-    Posten, steht keine Zahl, sondern die benannte Luecke. `laufzeit` und
-    `leitzahl_monate` sind H. A3: `heute` entscheidet über die Frische (`ist_frisch`).
-    """
+    Diese Funktion addiert keinen Euro. Die Kernzahl ist `kosten_ueber` ueber H
+    (Datenkonzept Geraete 5.3: 12/24 Raten 24 Monate, 36 Raten 36, 1&1 sein Vertrag),
+    ihre Summanden `rechnung`; fehlt ein Posten, steht die benannte Luecke. `laufzeit`
+    und `leitzahl_monate` sind H, `heute` entscheidet die Frische (`ist_frisch`),
+    `quelle_art` allein `vom_crawler` (Hinweis neben dem Beleg der Zeile)."""
     from . import geraete_laufzeit
 
     frisch = ist_frisch(b.abgerufen_am, heute)
@@ -746,6 +745,7 @@ def _karte(
         "aktion_ueberhang": aktion_ueberhang,
         "quelle_url": b.quelle_url,
         "abgerufen_am": b.abgerufen_am,
+        "vom_crawler": b.quelle_art == QUELLE_KLICK,
         "tarif_quelle_url": (tarif or {}).get("dokument_url", ""),
         "naeherung": False,
         **notbremse.felder(b, heute),
