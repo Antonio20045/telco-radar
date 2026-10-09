@@ -1,8 +1,65 @@
 {
  "einwilligung": {
-  "geklickt": null,
-  "text": "Weiter ohne Gerät",
-  "fehler": "Locator.click: Timeout 5000ms exceeded."
+  "geklickt": "Nur erforderliche",
+  "ruhe": true,
+  "anfragen": [
+   {
+    "nummer": 136,
+    "methode": "GET",
+    "url": "https://tags-eu.tiqcdn.com/utag/telekom/oneshop-eu/prod/utag.123.js?utv=ut4.54.202610091229",
+    "art": "script",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 137,
+    "methode": "POST",
+    "url": "https://www2.telekom.de/lib-custom/es",
+    "art": "xhr",
+    "status": null,
+    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+   },
+   {
+    "nummer": 138,
+    "methode": "GET",
+    "url": "https://www.telekom.de/opt-in/set.php?consent=[Cookie entfernt]",
+    "art": "xhr",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 139,
+    "methode": "GET",
+    "url": "https://ext.telekom.de/js/exactag.js",
+    "art": "script",
+    "status": null,
+    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+   },
+   {
+    "nummer": 140,
+    "methode": "POST",
+    "url": "https://bf72977jfz.bf.dynatrace.com/bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&cy=event&bc=2851937038&co=snappy&si=[Cookie entfernt]&st=1791565622537&ss=0&qc=3647104732&end=1",
+    "art": "fetch",
+    "status": null,
+    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+   },
+   {
+    "nummer": 141,
+    "methode": "POST",
+    "url": "https://www2.telekom.de/lib-custom/es",
+    "art": "xhr",
+    "status": null,
+    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+   },
+   {
+    "nummer": 142,
+    "methode": "GET",
+    "url": "https://bf72977jfz.bf.dynatrace.com/bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=1084568230&end=1",
+    "art": "fetch",
+    "status": null,
+    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+   }
+  ]
  },
  "vermerk": null,
  "proben": [
@@ -12,45 +69,29 @@
    "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(9) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > button:nth-of-type(1)",
    "text": "",
    "wert": null,
-   "fehler": "Locator.click: Timeout 5000ms exceeded.",
+   "fehler": null,
    "navigiert": null,
    "umleitung": null,
    "ruhe": true,
    "anfragen": [
     {
-     "nummer": 135,
-     "methode": "GET",
-     "url": "https://dtdl-static-natco.eshop.yo-digital.com/resize-image?f=de%2F0QimzwCP8Cb3K98eu1W3ujMO9KzwyT.png&q=80&w=190",
-     "art": "image",
+     "nummer": 143,
+     "methode": "POST",
+     "url": "https://www2.telekom.de/lib-custom/es",
+     "art": "xhr",
      "status": null,
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 136,
+     "nummer": 144,
      "methode": "GET",
-     "url": "https://static.eshop.telekom.de/resize-image?f=de%2FQ0yAYTXFpQgZre69N30KkeiB6FLbWC.png&q=80&w=190",
-     "art": "image",
-     "status": null,
-     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+     "url": "https://static.eshop.telekom.de/de/prod/dtdl/new/shop/assets/PDFViewer.a14aa0d1.js",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
     },
     {
-     "nummer": 137,
-     "methode": "GET",
-     "url": "https://static.eshop.telekom.de/resize-image?f=de%2FnnKLHe76YctAbxlMcjECZrkhXqTEjS.png&q=80&w=190",
-     "art": "image",
-     "status": null,
-     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
-    },
-    {
-     "nummer": 138,
-     "methode": "GET",
-     "url": "https://dtdl-static-natco.eshop.yo-digital.com/resize-image?f=de%2FmjTAd7hfETGUxoOTZLYbKsUCQb2meM.png&q=80&w=190",
-     "art": "image",
-     "status": null,
-     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
-    },
-    {
-     "nummer": 139,
+     "nummer": 145,
      "methode": "GET",
      "url": "https://static.eshop.telekom.de/resize-image?f=de%2FLDppfdhp3vIyTvhQZoiG717fxTL3AR.png&q=80&w=190",
      "art": "image",
@@ -58,57 +99,9 @@
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-     "nummer": 140,
-     "methode": "GET",
-     "url": "https://s3.eu-central-1.amazonaws.com/dtdl-eshop-sales-catalog-sylius-prod/de/nnKLHe76YctAbxlMcjECZrkhXqTEjS.png",
-     "art": "image",
-     "status": null,
-     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
-    },
-    {
-     "nummer": 141,
-     "methode": "GET",
-     "url": "https://s3.eu-central-1.amazonaws.com/dtdl-eshop-sales-catalog-sylius-prod/de/LDppfdhp3vIyTvhQZoiG717fxTL3AR.png",
-     "art": "image",
-     "status": null,
-     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
-    },
-    {
-     "nummer": 142,
-     "methode": "GET",
-     "url": "https://s3.eu-central-1.amazonaws.com/dtdl-eshop-sales-catalog-sylius-prod/de/Q0yAYTXFpQgZre69N30KkeiB6FLbWC.png",
-     "art": "image",
-     "status": null,
-     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
-    },
-    {
-     "nummer": 143,
-     "methode": "GET",
-     "url": "https://s3.eu-central-1.amazonaws.com/dtdl-eshop-sales-catalog-sylius-prod/de/0QimzwCP8Cb3K98eu1W3ujMO9KzwyT.png",
-     "art": "image",
-     "status": null,
-     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
-    },
-    {
-     "nummer": 144,
-     "methode": "GET",
-     "url": "https://s3.eu-central-1.amazonaws.com/dtdl-eshop-sales-catalog-sylius-prod/de/mjTAd7hfETGUxoOTZLYbKsUCQb2meM.png",
-     "art": "image",
-     "status": null,
-     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
-    },
-    {
-     "nummer": 145,
-     "methode": "GET",
-     "url": "https://static.eshop.telekom.de/resize-image?f=de%2FT71V1nVbROXrjzMOKyCXAWd6Kz0AE0.png&q=80&w=190",
-     "art": "image",
-     "status": null,
-     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
-    },
-    {
      "nummer": 146,
      "methode": "GET",
-     "url": "https://dtdl-static-natco.eshop.yo-digital.com/resize-image?f=de%2F3eII0PI1IDvfUku5kxmOzZyP6ybmJa.png&q=80&w=190",
+     "url": "https://dtdl-static-natco.eshop.yo-digital.com/resize-image?f=de%2FmjTAd7hfETGUxoOTZLYbKsUCQb2meM.png&q=80&w=190",
      "art": "image",
      "status": null,
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
@@ -116,7 +109,7 @@
     {
      "nummer": 147,
      "methode": "GET",
-     "url": "https://s3.eu-central-1.amazonaws.com/dtdl-eshop-sales-catalog-sylius-prod/de/ozaeXiPLZlnw9z2ROUtvWPHo3dUaAL.png",
+     "url": "https://static.eshop.telekom.de/resize-image?f=de%2FnnKLHe76YctAbxlMcjECZrkhXqTEjS.png&q=80&w=190",
      "art": "image",
      "status": null,
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
@@ -124,7 +117,7 @@
     {
      "nummer": 148,
      "methode": "GET",
-     "url": "https://dtdl-static-natco.eshop.yo-digital.com/resize-image?f=de%2FIaSyzCxGFCy8iic9LMgulPv1d6klIp.png&q=80&w=190",
+     "url": "https://static.eshop.telekom.de/resize-image?f=de%2FQ0yAYTXFpQgZre69N30KkeiB6FLbWC.png&q=80&w=190",
      "art": "image",
      "status": null,
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
@@ -132,7 +125,7 @@
     {
      "nummer": 149,
      "methode": "GET",
-     "url": "https://s3.eu-central-1.amazonaws.com/dtdl-eshop-sales-catalog-sylius-prod/de/IaSyzCxGFCy8iic9LMgulPv1d6klIp.png",
+     "url": "https://dtdl-static-natco.eshop.yo-digital.com/resize-image?f=de%2F0QimzwCP8Cb3K98eu1W3ujMO9KzwyT.png&q=80&w=190",
      "art": "image",
      "status": null,
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
@@ -140,7 +133,7 @@
     {
      "nummer": 150,
      "methode": "GET",
-     "url": "https://s3.eu-central-1.amazonaws.com/dtdl-eshop-sales-catalog-sylius-prod/de/3eII0PI1IDvfUku5kxmOzZyP6ybmJa.png",
+     "url": "https://s3.eu-central-1.amazonaws.com/dtdl-eshop-sales-catalog-sylius-prod/de/nnKLHe76YctAbxlMcjECZrkhXqTEjS.png",
      "art": "image",
      "status": null,
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
@@ -148,32 +141,32 @@
     {
      "nummer": 151,
      "methode": "GET",
-     "url": "https://s3.eu-central-1.amazonaws.com/dtdl-eshop-sales-catalog-sylius-prod/de/T71V1nVbROXrjzMOKyCXAWd6Kz0AE0.png",
+     "url": "https://s3.eu-central-1.amazonaws.com/dtdl-eshop-sales-catalog-sylius-prod/de/mjTAd7hfETGUxoOTZLYbKsUCQb2meM.png",
      "art": "image",
      "status": null,
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
      "nummer": 152,
-     "methode": "POST",
-     "url": "https://www2.telekom.de/lib-custom/es",
-     "art": "xhr",
+     "methode": "GET",
+     "url": "https://s3.eu-central-1.amazonaws.com/dtdl-eshop-sales-catalog-sylius-prod/de/LDppfdhp3vIyTvhQZoiG717fxTL3AR.png",
+     "art": "image",
      "status": null,
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
      "nummer": 153,
-     "methode": "POST",
-     "url": "https://www2.telekom.de/lib-custom/es",
-     "art": "xhr",
+     "methode": "GET",
+     "url": "https://s3.eu-central-1.amazonaws.com/dtdl-eshop-sales-catalog-sylius-prod/de/0QimzwCP8Cb3K98eu1W3ujMO9KzwyT.png",
+     "art": "image",
      "status": null,
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
      "nummer": 154,
-     "methode": "POST",
-     "url": "https://www2.telekom.de/lib-custom/es",
-     "art": "xhr",
+     "methode": "GET",
+     "url": "https://s3.eu-central-1.amazonaws.com/dtdl-eshop-sales-catalog-sylius-prod/de/Q0yAYTXFpQgZre69N30KkeiB6FLbWC.png",
+     "art": "image",
      "status": null,
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
@@ -203,88 +196,88 @@
     },
     {
      "nummer": 158,
-     "methode": "GET",
-     "url": "https://dtdl-static-natco.eshop.yo-digital.com/resize-image?f=de%2FVMiyTx6Yynw3jLz7qSsyecbQWQgawu.png&q=80&w=190",
-     "art": "image",
+     "methode": "POST",
+     "url": "https://www2.telekom.de/lib-custom/es",
+     "art": "xhr",
      "status": null,
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
      "nummer": 159,
-     "methode": "GET",
-     "url": "https://dtdl-static-natco.eshop.yo-digital.com/resize-image?f=de%2FGEgTb9jNycDuvUQhaCBbGIFM6Ox8dU.png&q=80&w=190",
-     "art": "image",
+     "methode": "POST",
+     "url": "https://www2.telekom.de/lib-custom/es",
+     "art": "xhr",
      "status": null,
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
      "nummer": 160,
-     "methode": "GET",
-     "url": "https://dtdl-static-natco.eshop.yo-digital.com/resize-image?f=de%2FYMHrsuOntlQmZvZiOOFhp81ei0req8.png&q=80&w=190",
-     "art": "image",
+     "methode": "POST",
+     "url": "https://www2.telekom.de/lib-custom/es",
+     "art": "xhr",
      "status": null,
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
      "nummer": 161,
-     "methode": "GET",
-     "url": "https://dtdl-static-natco.eshop.yo-digital.com/resize-image?f=de%2FKNdi0SvzfTArbHOpY9tYMTAhRegOiK.png&q=80&w=190",
-     "art": "image",
+     "methode": "POST",
+     "url": "https://bf72977jfz.bf.dynatrace.com/bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&cy=event&bc=140849554&co=snappy&si=[Cookie entfernt]&st=1791565625196&ss=0&qc=3414238865&end=1",
+     "art": "fetch",
      "status": null,
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
      "nummer": 162,
      "methode": "GET",
-     "url": "https://s3.eu-central-1.amazonaws.com/dtdl-eshop-sales-catalog-sylius-prod/de/VMiyTx6Yynw3jLz7qSsyecbQWQgawu.png",
-     "art": "image",
+     "url": "https://bf72977jfz.bf.dynatrace.com/bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=1084568230&end=1",
+     "art": "fetch",
      "status": null,
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
      "nummer": 163,
      "methode": "GET",
-     "url": "https://s3.eu-central-1.amazonaws.com/dtdl-eshop-sales-catalog-sylius-prod/de/GEgTb9jNycDuvUQhaCBbGIFM6Ox8dU.png",
-     "art": "image",
-     "status": null,
-     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+     "url": "https://static.eshop.telekom.de/de/prod/dtdl/new/shop/assets/pdf-viewer.49a2c176.js",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
     },
     {
      "nummer": 164,
      "methode": "GET",
-     "url": "https://s3.eu-central-1.amazonaws.com/dtdl-eshop-sales-catalog-sylius-prod/de/YMHrsuOntlQmZvZiOOFhp81ei0req8.png",
-     "art": "image",
-     "status": null,
-     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+     "url": "https://static.eshop.telekom.de/de/prod/dtdl/new/shop/assets/239.839c93a8.js",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
     },
     {
      "nummer": 165,
      "methode": "GET",
-     "url": "https://s3.eu-central-1.amazonaws.com/dtdl-eshop-sales-catalog-sylius-prod/de/KNdi0SvzfTArbHOpY9tYMTAhRegOiK.png",
-     "art": "image",
-     "status": null,
-     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+     "url": "https://eprel.ec.europa.eu/labels/smartphonestablets20231669/Label_2647670.pdf",
+     "art": "document",
+     "status": 200,
+     "abbruch": "net::ERR_ABORTED"
     },
     {
      "nummer": 166,
-     "methode": "POST",
-     "url": "https://bf72977jfz.bf.dynatrace.com/bf?sc=3&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&cy=event&bc=396845137&co=snappy&si=[Cookie entfernt]&st=1791542492718&ss=0&qc=317652739&end=1",
-     "art": "fetch",
+     "methode": "GET",
+     "url": "https://pix.telekom.de/196380495960676/wt?p=453%2Cwww.telekom.de.privatkunden.oneshop.mobilfunk.eg-katalog%2C1%2C1280x900%2C24%2C1%2C1791565537793%2C0%2C1280x900%2C0&nc=1&la=en&cg1=www.telekom.de&cg2=oneshop&cg3=mobilfunk&cg4=eg-katalog&cg8=privatkunden&cg9=eg-katalog&cg10=product.category&cg14=sales&cg15=mobilfunk&cg16=hardware&cp11=oneshop-eu&cp30=false%7CAnalytics%3D0%7CMarketing%3D0%7CSocial%3D0%7CUtiq%3D0&cp44=pk-mf-sales&cp54=not-logged-in&cp96=%2Fshop%2Fgeraete%2Fsmartphones&cb1=OS000&cb31=samsung+galaxy+z+fold8+ultra%3Bsamsung+galaxy+z+flip8%3Bapple+iphone+17%3Bxiaomi+17t+pro%3Bsamsung+galaxy+s26%3Bgoogle+pixel+10+pro%3Bsamsung+galaxy+a57+5g%3Bmotorola+edge+70+fusion+fifa+edition%3Bmotorola+signature%3Bapple+iphone+16e%3Bapple+iphone+17e%3Bsamsung+galaxy+s26%2B%3Bxiaomi+redmi+note+17+pro+max+5g%3Bmotorola+edge+70&cb41=A123&cb130=tarif&cb131=neugeschaeft&cs1=nicht-bestandskunde&cs3=pk&cs27=false%7CAnalytics%3D0%7CMarketing%3D0%7CSocial%3D0%7CUtiq%3D0&np=&pu=https%3A%2F%2Fwww.telekom.de%2Fshop%2Fgeraete%2Fsmartphones%3FtariffId%3DMF_17791",
+     "art": "image",
      "status": null,
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
      "nummer": 167,
      "methode": "GET",
-     "url": "https://bf72977jfz.bf.dynatrace.com/bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=431656291&end=1",
-     "art": "fetch",
+     "url": "https://pix.telekom.de/316202539684123/wt?p=453%2Cwww.telekom.de.privatkunden.oneshop.mobilfunk.eg-katalog%2C1%2C1280x900%2C24%2C1%2C1791565537797%2C0%2C1280x900%2C0&nc=1&la=en&cg1=www.telekom.de&cg2=oneshop&cg3=mobilfunk&cg4=eg-katalog&cg8=privatkunden&cg9=eg-katalog&cg10=product.category&cg14=sales&cg15=mobilfunk&cg16=hardware&cp11=oneshop-eu&cp54=not-logged-in&cp96=%2Fshop%2Fgeraete%2Fsmartphones&cb1=OS000&cb31=samsung+galaxy+z+fold8+ultra%3Bsamsung+galaxy+z+flip8%3Bapple+iphone+17%3Bxiaomi+17t+pro%3Bsamsung+galaxy+s26%3Bgoogle+pixel+10+pro%3Bsamsung+galaxy+a57+5g%3Bmotorola+edge+70+fusion+fifa+edition%3Bmotorola+signature%3Bapple+iphone+16e%3Bapple+iphone+17e%3Bsamsung+galaxy+s26%2B%3Bxiaomi+redmi+note+17+pro+max+5g%3Bmotorola+edge+70&cb41=A123&cb130=tarif&cb131=neugeschaeft&cs1=nicht-bestandskunde&cs3=pk&np=&pu=https%3A%2F%2Fwww.telekom.de%2Fshop%2Fgeraete%2Fsmartphones%3FtariffId%3DMF_17791",
+     "art": "image",
      "status": null,
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
      "nummer": 168,
      "methode": "POST",
-     "url": "https://bf72977jfz.bf.dynatrace.com/bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&cy=event&bc=1446110572&co=snappy&si=[Cookie entfernt]&st=1791542492886&ss=0&qc=1755766739&end=1",
+     "url": "https://bf72977jfz.bf.dynatrace.com/bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&cy=event&bc=258296206&co=snappy&si=[Cookie entfernt]&st=1791565627346&ss=0&qc=1920899776&end=1",
      "art": "fetch",
      "status": null,
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
@@ -292,24 +285,40 @@
     {
      "nummer": 169,
      "methode": "GET",
-     "url": "https://bf72977jfz.bf.dynatrace.com/bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=431656291&end=1",
+     "url": "https://bf72977jfz.bf.dynatrace.com/bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=1084568230&end=1",
      "art": "fetch",
      "status": null,
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
      "nummer": 170,
-     "methode": "GET",
-     "url": "https://pix.telekom.de/196380495960676/wt?p=453%2Cwww.telekom.de.privatkunden.oneshop.mobilfunk.eg-katalog%2C1%2C1280x900%2C24%2C1%2C1791542421470%2C0%2C1280x900%2C0&nc=1&la=en&cg1=www.telekom.de&cg2=oneshop&cg3=mobilfunk&cg4=eg-katalog&cg8=privatkunden&cg9=eg-katalog&cg10=product.category&cg14=sales&cg15=mobilfunk&cg16=hardware&cp11=oneshop-eu&cp30=false%7CAnalytics%3D0%7CMarketing%3D0%7CSocial%3D0%7CUtiq%3D0&cp44=pk-mf-sales&cp54=not-logged-in&cp96=%2Fshop%2Fgeraete%2Fsmartphones&cb1=OS000&cb31=samsung+galaxy+z+fold8+ultra%3Bsamsung+galaxy+z+flip8%3Bapple+iphone+17%3Bxiaomi+17t+pro%3Bsamsung+galaxy+s26%3Bgoogle+pixel+10+pro%3Bsamsung+galaxy+a57+5g%3Bmotorola+edge+70+fusion+fifa+edition%3Bmotorola+signature%3Bapple+iphone+16e%3Bapple+iphone+17e%3Bsamsung+galaxy+s26%2B%3Bsamsung+galaxy+s26+fe%3Bxiaomi+redmi+note+17+pro+max+5g&cb41=A123&cb130=tarif&cb131=neugeschaeft&cs1=nicht-bestandskunde&cs3=pk&cs27=false%7CAnalytics%3D0%7CMarketing%3D0%7CSocial%3D0%7CUtiq%3D0&np=&pu=https%3A%2F%2Fwww.telekom.de%2Fshop%2Fgeraete%2Fsmartphones%3FtariffId%3DMF_17791",
-     "art": "image",
+     "methode": "POST",
+     "url": "https://bf72977jfz.bf.dynatrace.com/bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&cy=event&bc=1681553293&co=snappy&si=[Cookie entfernt]&st=1791565639220&ss=0&qc=3315604840&end=1",
+     "art": "fetch",
      "status": null,
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
      "nummer": 171,
      "methode": "GET",
-     "url": "https://pix.telekom.de/316202539684123/wt?p=453%2Cwww.telekom.de.privatkunden.oneshop.mobilfunk.eg-katalog%2C1%2C1280x900%2C24%2C1%2C1791542421475%2C0%2C1280x900%2C0&nc=1&la=en&cg1=www.telekom.de&cg2=oneshop&cg3=mobilfunk&cg4=eg-katalog&cg8=privatkunden&cg9=eg-katalog&cg10=product.category&cg14=sales&cg15=mobilfunk&cg16=hardware&cp11=oneshop-eu&cp54=not-logged-in&cp96=%2Fshop%2Fgeraete%2Fsmartphones&cb1=OS000&cb31=samsung+galaxy+z+fold8+ultra%3Bsamsung+galaxy+z+flip8%3Bapple+iphone+17%3Bxiaomi+17t+pro%3Bsamsung+galaxy+s26%3Bgoogle+pixel+10+pro%3Bsamsung+galaxy+a57+5g%3Bmotorola+edge+70+fusion+fifa+edition%3Bmotorola+signature%3Bapple+iphone+16e%3Bapple+iphone+17e%3Bsamsung+galaxy+s26%2B%3Bsamsung+galaxy+s26+fe%3Bxiaomi+redmi+note+17+pro+max+5g&cb41=A123&cb130=tarif&cb131=neugeschaeft&cs1=nicht-bestandskunde&cs3=pk&np=&pu=https%3A%2F%2Fwww.telekom.de%2Fshop%2Fgeraete%2Fsmartphones%3FtariffId%3DMF_17791",
+     "url": "https://pix.telekom.de/196380495960676/wt?p=453%2Cwww.telekom.de.privatkunden.oneshop.mobilfunk.eg-katalog%2C1%2C1280x900%2C24%2C1%2C1791565537793%2C0%2C1280x900%2C0&nc=1&la=en&cg1=www.telekom.de&cg2=oneshop&cg3=mobilfunk&cg4=eg-katalog&cg8=privatkunden&cg9=eg-katalog&cg10=product.category&cg14=sales&cg15=mobilfunk&cg16=hardware&cp11=oneshop-eu&cp30=false%7CAnalytics%3D0%7CMarketing%3D0%7CSocial%3D0%7CUtiq%3D0&cp44=pk-mf-sales&cp54=not-logged-in&cp96=%2Fshop%2Fgeraete%2Fsmartphones&cb1=OS000&cb31=samsung+galaxy+z+fold8+ultra%3Bsamsung+galaxy+z+flip8%3Bapple+iphone+17%3Bxiaomi+17t+pro%3Bsamsung+galaxy+s26%3Bgoogle+pixel+10+pro%3Bsamsung+galaxy+a57+5g%3Bmotorola+edge+70+fusion+fifa+edition%3Bmotorola+signature%3Bapple+iphone+16e%3Bapple+iphone+17e%3Bsamsung+galaxy+s26%2B%3Bxiaomi+redmi+note+17+pro+max+5g%3Bmotorola+edge+70&cb41=A123&cb130=tarif&cb131=neugeschaeft&cs1=nicht-bestandskunde&cs3=pk&cs27=false%7CAnalytics%3D0%7CMarketing%3D0%7CSocial%3D0%7CUtiq%3D0&np=&pu=https%3A%2F%2Fwww.telekom.de%2Fshop%2Fgeraete%2Fsmartphones%3FtariffId%3DMF_17791",
      "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 172,
+     "methode": "GET",
+     "url": "https://pix.telekom.de/316202539684123/wt?p=453%2Cwww.telekom.de.privatkunden.oneshop.mobilfunk.eg-katalog%2C1%2C1280x900%2C24%2C1%2C1791565537797%2C0%2C1280x900%2C0&nc=1&la=en&cg1=www.telekom.de&cg2=oneshop&cg3=mobilfunk&cg4=eg-katalog&cg8=privatkunden&cg9=eg-katalog&cg10=product.category&cg14=sales&cg15=mobilfunk&cg16=hardware&cp11=oneshop-eu&cp54=not-logged-in&cp96=%2Fshop%2Fgeraete%2Fsmartphones&cb1=OS000&cb31=samsung+galaxy+z+fold8+ultra%3Bsamsung+galaxy+z+flip8%3Bapple+iphone+17%3Bxiaomi+17t+pro%3Bsamsung+galaxy+s26%3Bgoogle+pixel+10+pro%3Bsamsung+galaxy+a57+5g%3Bmotorola+edge+70+fusion+fifa+edition%3Bmotorola+signature%3Bapple+iphone+16e%3Bapple+iphone+17e%3Bsamsung+galaxy+s26%2B%3Bxiaomi+redmi+note+17+pro+max+5g%3Bmotorola+edge+70&cb41=A123&cb130=tarif&cb131=neugeschaeft&cs1=nicht-bestandskunde&cs3=pk&np=&pu=https%3A%2F%2Fwww.telekom.de%2Fshop%2Fgeraete%2Fsmartphones%3FtariffId%3DMF_17791",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 173,
+     "methode": "GET",
+     "url": "https://bf72977jfz.bf.dynatrace.com/bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=1084568230&end=1",
+     "art": "fetch",
      "status": null,
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     }
@@ -319,9 +328,9 @@
    "uebernommen": "unbekannt"
   },
   {
-   "gruppe": 79,
+   "gruppe": 78,
    "art": "tarif",
-   "pfad": "#accordion-header-2boge650b",
+   "pfad": "#accordion-header-4zezurj07",
    "text": "MagentaMobil M",
    "wert": null,
    "fehler": "Locator.click: Timeout 5000ms exceeded.",
@@ -330,82 +339,34 @@
    "ruhe": true,
    "anfragen": [
     {
-     "nummer": 172,
-     "methode": "POST",
-     "url": "https://bf72977jfz.bf.dynatrace.com/bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&cy=event&bc=1849569050&co=snappy&si=[Cookie entfernt]&st=1791542497893&ss=0&qc=3619509226&end=1",
-     "art": "fetch",
-     "status": null,
-     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
-    },
-    {
-     "nummer": 173,
-     "methode": "GET",
-     "url": "https://bf72977jfz.bf.dynatrace.com/bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=431656291&end=1",
-     "art": "fetch",
-     "status": null,
-     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
-    },
-    {
      "nummer": 174,
-     "methode": "GET",
-     "url": "https://pix.telekom.de/196380495960676/wt?p=453%2Cwww.telekom.de.privatkunden.oneshop.mobilfunk.eg-katalog%2C1%2C1280x900%2C24%2C1%2C1791542421470%2C0%2C1280x900%2C0&nc=1&la=en&cg1=www.telekom.de&cg2=oneshop&cg3=mobilfunk&cg4=eg-katalog&cg8=privatkunden&cg9=eg-katalog&cg10=product.category&cg14=sales&cg15=mobilfunk&cg16=hardware&cp11=oneshop-eu&cp30=false%7CAnalytics%3D0%7CMarketing%3D0%7CSocial%3D0%7CUtiq%3D0&cp44=pk-mf-sales&cp54=not-logged-in&cp96=%2Fshop%2Fgeraete%2Fsmartphones&cb1=OS000&cb31=samsung+galaxy+z+fold8+ultra%3Bsamsung+galaxy+z+flip8%3Bapple+iphone+17%3Bxiaomi+17t+pro%3Bsamsung+galaxy+s26%3Bgoogle+pixel+10+pro%3Bsamsung+galaxy+a57+5g%3Bmotorola+edge+70+fusion+fifa+edition%3Bmotorola+signature%3Bapple+iphone+16e%3Bapple+iphone+17e%3Bsamsung+galaxy+s26%2B%3Bsamsung+galaxy+s26+fe%3Bxiaomi+redmi+note+17+pro+max+5g&cb41=A123&cb130=tarif&cb131=neugeschaeft&cs1=nicht-bestandskunde&cs3=pk&cs27=false%7CAnalytics%3D0%7CMarketing%3D0%7CSocial%3D0%7CUtiq%3D0&np=&pu=https%3A%2F%2Fwww.telekom.de%2Fshop%2Fgeraete%2Fsmartphones%3FtariffId%3DMF_17791",
-     "art": "image",
+     "methode": "POST",
+     "url": "https://bf72977jfz.bf.dynatrace.com/bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&cy=event&bc=3828039320&co=snappy&si=[Cookie entfernt]&st=1791565648443&ss=0&qc=2594554489&end=1",
+     "art": "fetch",
      "status": null,
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
      "nummer": 175,
      "methode": "GET",
-     "url": "https://pix.telekom.de/316202539684123/wt?p=453%2Cwww.telekom.de.privatkunden.oneshop.mobilfunk.eg-katalog%2C1%2C1280x900%2C24%2C1%2C1791542421475%2C0%2C1280x900%2C0&nc=1&la=en&cg1=www.telekom.de&cg2=oneshop&cg3=mobilfunk&cg4=eg-katalog&cg8=privatkunden&cg9=eg-katalog&cg10=product.category&cg14=sales&cg15=mobilfunk&cg16=hardware&cp11=oneshop-eu&cp54=not-logged-in&cp96=%2Fshop%2Fgeraete%2Fsmartphones&cb1=OS000&cb31=samsung+galaxy+z+fold8+ultra%3Bsamsung+galaxy+z+flip8%3Bapple+iphone+17%3Bxiaomi+17t+pro%3Bsamsung+galaxy+s26%3Bgoogle+pixel+10+pro%3Bsamsung+galaxy+a57+5g%3Bmotorola+edge+70+fusion+fifa+edition%3Bmotorola+signature%3Bapple+iphone+16e%3Bapple+iphone+17e%3Bsamsung+galaxy+s26%2B%3Bsamsung+galaxy+s26+fe%3Bxiaomi+redmi+note+17+pro+max+5g&cb41=A123&cb130=tarif&cb131=neugeschaeft&cs1=nicht-bestandskunde&cs3=pk&np=&pu=https%3A%2F%2Fwww.telekom.de%2Fshop%2Fgeraete%2Fsmartphones%3FtariffId%3DMF_17791",
-     "art": "image",
+     "url": "https://bf72977jfz.bf.dynatrace.com/bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=1084568230&end=1",
+     "art": "fetch",
      "status": null,
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
      "nummer": 176,
      "methode": "GET",
-     "url": "https://20994a22678a.edge.sdk.awswaf.com/20994a22678a/inputs?client=browser",
-     "art": "fetch",
-     "status": 200,
-     "abbruch": null
+     "url": "https://pix.telekom.de/196380495960676/wt?p=453%2Cwww.telekom.de.privatkunden.oneshop.mobilfunk.eg-katalog%2C1%2C1280x900%2C24%2C1%2C1791565537793%2C0%2C1280x900%2C0&nc=1&la=en&cg1=www.telekom.de&cg2=oneshop&cg3=mobilfunk&cg4=eg-katalog&cg8=privatkunden&cg9=eg-katalog&cg10=product.category&cg14=sales&cg15=mobilfunk&cg16=hardware&cp11=oneshop-eu&cp30=false%7CAnalytics%3D0%7CMarketing%3D0%7CSocial%3D0%7CUtiq%3D0&cp44=pk-mf-sales&cp54=not-logged-in&cp96=%2Fshop%2Fgeraete%2Fsmartphones&cb1=OS000&cb31=samsung+galaxy+z+fold8+ultra%3Bsamsung+galaxy+z+flip8%3Bapple+iphone+17%3Bxiaomi+17t+pro%3Bsamsung+galaxy+s26%3Bgoogle+pixel+10+pro%3Bsamsung+galaxy+a57+5g%3Bmotorola+edge+70+fusion+fifa+edition%3Bmotorola+signature%3Bapple+iphone+16e%3Bapple+iphone+17e%3Bsamsung+galaxy+s26%2B%3Bxiaomi+redmi+note+17+pro+max+5g%3Bmotorola+edge+70&cb41=A123&cb130=tarif&cb131=neugeschaeft&cs1=nicht-bestandskunde&cs3=pk&cs27=false%7CAnalytics%3D0%7CMarketing%3D0%7CSocial%3D0%7CUtiq%3D0&np=&pu=https%3A%2F%2Fwww.telekom.de%2Fshop%2Fgeraete%2Fsmartphones%3FtariffId%3DMF_17791",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
      "nummer": 177,
-     "methode": "POST",
-     "url": "https://20994a22678a.edge.sdk.awswaf.com/20994a22678a/mp_verify",
-     "art": "fetch",
-     "status": 200,
-     "abbruch": null
-    },
-    {
-     "nummer": 178,
-     "methode": "POST",
-     "url": "https://bf72977jfz.bf.dynatrace.com/bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&cy=event&bc=519565056&co=snappy&si=[Cookie entfernt]&st=1791542501514&ss=0&qc=2939122599&end=1",
-     "art": "fetch",
-     "status": null,
-     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
-    },
-    {
-     "nummer": 179,
      "methode": "GET",
-     "url": "https://pix.telekom.de/196380495960676/wt?p=453%2Cwww.telekom.de.privatkunden.oneshop.mobilfunk.eg-katalog%2C1%2C1280x900%2C24%2C1%2C1791542421470%2C0%2C1280x900%2C0&nc=1&la=en&cg1=www.telekom.de&cg2=oneshop&cg3=mobilfunk&cg4=eg-katalog&cg8=privatkunden&cg9=eg-katalog&cg10=product.category&cg14=sales&cg15=mobilfunk&cg16=hardware&cp11=oneshop-eu&cp30=false%7CAnalytics%3D0%7CMarketing%3D0%7CSocial%3D0%7CUtiq%3D0&cp44=pk-mf-sales&cp54=not-logged-in&cp96=%2Fshop%2Fgeraete%2Fsmartphones&cb1=OS000&cb31=samsung+galaxy+z+fold8+ultra%3Bsamsung+galaxy+z+flip8%3Bapple+iphone+17%3Bxiaomi+17t+pro%3Bsamsung+galaxy+s26%3Bgoogle+pixel+10+pro%3Bsamsung+galaxy+a57+5g%3Bmotorola+edge+70+fusion+fifa+edition%3Bmotorola+signature%3Bapple+iphone+16e%3Bapple+iphone+17e%3Bsamsung+galaxy+s26%2B%3Bsamsung+galaxy+s26+fe%3Bxiaomi+redmi+note+17+pro+max+5g&cb41=A123&cb130=tarif&cb131=neugeschaeft&cs1=nicht-bestandskunde&cs3=pk&cs27=false%7CAnalytics%3D0%7CMarketing%3D0%7CSocial%3D0%7CUtiq%3D0&np=&pu=https%3A%2F%2Fwww.telekom.de%2Fshop%2Fgeraete%2Fsmartphones%3FtariffId%3DMF_17791",
+     "url": "https://pix.telekom.de/316202539684123/wt?p=453%2Cwww.telekom.de.privatkunden.oneshop.mobilfunk.eg-katalog%2C1%2C1280x900%2C24%2C1%2C1791565537797%2C0%2C1280x900%2C0&nc=1&la=en&cg1=www.telekom.de&cg2=oneshop&cg3=mobilfunk&cg4=eg-katalog&cg8=privatkunden&cg9=eg-katalog&cg10=product.category&cg14=sales&cg15=mobilfunk&cg16=hardware&cp11=oneshop-eu&cp54=not-logged-in&cp96=%2Fshop%2Fgeraete%2Fsmartphones&cb1=OS000&cb31=samsung+galaxy+z+fold8+ultra%3Bsamsung+galaxy+z+flip8%3Bapple+iphone+17%3Bxiaomi+17t+pro%3Bsamsung+galaxy+s26%3Bgoogle+pixel+10+pro%3Bsamsung+galaxy+a57+5g%3Bmotorola+edge+70+fusion+fifa+edition%3Bmotorola+signature%3Bapple+iphone+16e%3Bapple+iphone+17e%3Bsamsung+galaxy+s26%2B%3Bxiaomi+redmi+note+17+pro+max+5g%3Bmotorola+edge+70&cb41=A123&cb130=tarif&cb131=neugeschaeft&cs1=nicht-bestandskunde&cs3=pk&np=&pu=https%3A%2F%2Fwww.telekom.de%2Fshop%2Fgeraete%2Fsmartphones%3FtariffId%3DMF_17791",
      "art": "image",
-     "status": null,
-     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
-    },
-    {
-     "nummer": 180,
-     "methode": "GET",
-     "url": "https://pix.telekom.de/316202539684123/wt?p=453%2Cwww.telekom.de.privatkunden.oneshop.mobilfunk.eg-katalog%2C1%2C1280x900%2C24%2C1%2C1791542421475%2C0%2C1280x900%2C0&nc=1&la=en&cg1=www.telekom.de&cg2=oneshop&cg3=mobilfunk&cg4=eg-katalog&cg8=privatkunden&cg9=eg-katalog&cg10=product.category&cg14=sales&cg15=mobilfunk&cg16=hardware&cp11=oneshop-eu&cp54=not-logged-in&cp96=%2Fshop%2Fgeraete%2Fsmartphones&cb1=OS000&cb31=samsung+galaxy+z+fold8+ultra%3Bsamsung+galaxy+z+flip8%3Bapple+iphone+17%3Bxiaomi+17t+pro%3Bsamsung+galaxy+s26%3Bgoogle+pixel+10+pro%3Bsamsung+galaxy+a57+5g%3Bmotorola+edge+70+fusion+fifa+edition%3Bmotorola+signature%3Bapple+iphone+16e%3Bapple+iphone+17e%3Bsamsung+galaxy+s26%2B%3Bsamsung+galaxy+s26+fe%3Bxiaomi+redmi+note+17+pro+max+5g&cb41=A123&cb130=tarif&cb131=neugeschaeft&cs1=nicht-bestandskunde&cs3=pk&np=&pu=https%3A%2F%2Fwww.telekom.de%2Fshop%2Fgeraete%2Fsmartphones%3FtariffId%3DMF_17791",
-     "art": "image",
-     "status": null,
-     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
-    },
-    {
-     "nummer": 181,
-     "methode": "GET",
-     "url": "https://bf72977jfz.bf.dynatrace.com/bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=431656291&end=1",
-     "art": "fetch",
      "status": null,
      "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
     }
