@@ -13,11 +13,55 @@ report_language: "de"
 #   bedrock    Amazon Bedrock (AWS_BEARER_TOKEN_BEDROCK)
 #   auto       nimmt, was gerade an Schluesseln da ist: bedrock > openai >
 #              anthropic
+#   frei       kostenlose Modelle mehrerer Anbieter als Kette (seit 09.10.2026,
+#              Pitch 4 "Meldungen kostenlos"); Liste unten in frei_endpunkte
 # Bewusst explizit: unter "auto" gewinnt der zuerst gefundene Schluessel, und
 # ein Anbieterwechsel soll eine Zeile hier sein, kein Loeschen von Secrets.
 # ACHTUNG: deepseek und openai teilen sich das Secret LLM_API_KEY - dort muss
 # der Schluessel des Anbieters liegen, der hier eingetragen ist.
-llm_provider: "deepseek"
+llm_provider: "frei"
+
+# ---------------------------------------------------------------------------
+# Anbieter "frei" (analyze/llm_frei.py). Quelle der Modelle und Gratis-Limits:
+# Antonios Recherche vom 09.10.2026 (pitches/4-meldungen-kostenlos-design.md).
+# Ein Glied ohne gesetzten Schluessel (GitHub-Secret, in radar.yml
+# weitergereicht) wird ohne Anfrage uebersprungen. Ein Glied, das 401/402/403/
+# 404 oder "Tageskontingent leer" meldet, ist fuer den Rest des Laufs tot; die
+# Kette geht weiter. Reihenfolge = Vorrang. Stufen:
+#   mechanik   viele kurze Aufrufe: Vorsortierung, Analyst, Uebersetzung, Promo
+#   redaktion  wenige lange Aufrufe: Wochenbericht, Wettbewerber; danach die
+#              ganze Mechanik-Kette als Reserve
+# rpm haelt das Minutenlimit ein; max_output kappt max_tokens (Groq zaehlt
+# max_tokens gegen 8000 Token je Minute). system_im_user: Gemma ueber die
+# Gemini-API kennt keine Systemanweisung.
+# Modell tauschen = eine Zeile hier. Google nennt die echten Gratis-Limits nur
+# im AI Studio (Projekt -> Rate limits).
+frei_anbieter:
+  google: {base_url: "https://generativelanguage.googleapis.com/v1beta/openai", key_env: GEMINI_API_KEY}
+  groq: {base_url: "https://api.groq.com/openai/v1", key_env: GROQ_API_KEY}
+  mistral: {base_url: "https://api.mistral.ai/v1", key_env: MISTRAL_API_KEY, rpm: 50}
+  cloudflare: {base_url: "https://api.cloudflare.com/client/v4/accounts/{CLOUDFLARE_ACCOUNT_ID}/ai/v1", key_env: CLOUDFLARE_API_TOKEN}
+  openrouter: {base_url: "https://openrouter.ai/api/v1", key_env: OPENROUTER_API_KEY, rpm: 20}
+  ovh: {base_url: "https://oai.endpoints.kepler.ai.cloud.ovh.net/v1", key_env: "", rpm: 2}
+frei_endpunkte:
+  - {anbieter: google, modell: gemini-3.8-flash, stufen: [redaktion], rpm: 5, params: {reasoning_effort: low}}
+  - {anbieter: google, modell: gemini-3.7-flash, stufen: [redaktion], rpm: 5, params: {reasoning_effort: low}}
+  - {anbieter: google, modell: gemini-3.6-flash, stufen: [redaktion], rpm: 5, params: {reasoning_effort: low}}
+  - {anbieter: google, modell: gemini-3.5-flash, stufen: [redaktion], rpm: 5, params: {reasoning_effort: low}}
+  - {anbieter: mistral, modell: mistral-medium-latest, stufen: [redaktion], rpm: 20}
+  - {anbieter: openrouter, modell: "nvidia/nemotron-3-ultra-550b-a55b:free", stufen: [redaktion]}
+  - {anbieter: google, modell: gemini-3.5-flash-lite, stufen: [mechanik], rpm: 15}
+  - {anbieter: google, modell: gemini-3.1-flash-lite, stufen: [mechanik], rpm: 15}
+  - {anbieter: google, modell: gemma-4-31b-it, stufen: [mechanik], rpm: 30, system_im_user: true}
+  - {anbieter: google, modell: gemma-4-26b-a4b-it, stufen: [mechanik], rpm: 30, system_im_user: true}
+  - {anbieter: groq, modell: openai/gpt-oss-120b, stufen: [mechanik, redaktion], rpm: 30, max_output: 3000, params: {reasoning_effort: low}}
+  - {anbieter: groq, modell: qwen/qwen3.8-27b, stufen: [mechanik], rpm: 30, max_output: 3000}
+  - {anbieter: mistral, modell: mistral-small-latest, stufen: [mechanik], rpm: 30}
+  - {anbieter: cloudflare, modell: "@cf/zai-org/glm-4.7-flash", stufen: [mechanik], rpm: 60}
+  - {anbieter: cloudflare, modell: "@cf/google/gemma-4-26b-a4b-it", stufen: [mechanik], rpm: 60}
+  - {anbieter: groq, modell: openai/gpt-oss-20b, stufen: [mechanik], rpm: 30, max_output: 3000, params: {reasoning_effort: low}}
+  - {anbieter: ovh, modell: gpt-oss-120b, stufen: [mechanik]}
+  - {anbieter: ovh, modell: qwen3.5-397b-a17b, stufen: [mechanik]}
 
 # ---------------------------------------------------------------------------
 # Models (fallback Anthropic; OpenAI-compatible provider used when LLM_API_KEY

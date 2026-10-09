@@ -21,7 +21,7 @@ from pathlib import Path
 from typing import TypeVar
 
 from .analyze import bewertung as bewertung_mod
-from .analyze import clustering, llm
+from .analyze import clustering, llm, llm_frei
 from .analyze import ctm as ctm_mod
 from .analyze import einordnung as einordnung_mod
 from .analyze import vorsortierung as vorsortierung_mod
@@ -78,7 +78,7 @@ OPENAI_KOMPATIBEL = {
     ),
 }
 
-ANBIETER = ("auto", "anthropic", "bedrock", *OPENAI_KOMPATIBEL)
+ANBIETER = ("auto", "anthropic", "bedrock", "frei", *OPENAI_KOMPATIBEL)
 
 
 def _waehle_anbieter(settings: dict) -> str:
@@ -129,6 +129,8 @@ def _modelle_fuer_anbieter(
             (settings.get("bedrock_analyst_model") or chain_head or fallback_model),
             (settings.get("bedrock_editor_model") or chain_head or fallback_model),
         )
+    if anbieter == "frei":
+        return llm_frei.einrichten(settings, llm.set_model_chain, fallback_model)
     if anbieter in OPENAI_KOMPATIBEL:
         _, analyst_key, editor_key = OPENAI_KOMPATIBEL[anbieter]
         return (
@@ -162,9 +164,8 @@ def anker_modelle(settings: dict) -> tuple[str, str]:
 def _registriere_ausweichmodell(
     settings: dict, analyst_model: str, editor_model: str
 ) -> bool:
-    if not (settings.get("editor_model_fallback", True) and analyst_model):
-        return False
-    if any(anker_modelle(settings)):
+    erlaubt = settings.get("editor_model_fallback", True) and analyst_model
+    if not erlaubt or any(anker_modelle(settings)):
         return False
     llm.set_fallback(editor_model, analyst_model)
     return True
@@ -186,10 +187,8 @@ def _registriere_anker(
         if not modell or not anker:
             continue
         kette = llm._chain_from(modell)
-        if anker in kette:
-            continue
         ende = kette[-1]
-        if ende in gesetzt or ende in anker_namen:
+        if anker in kette or ende in gesetzt or ende in anker_namen:
             continue
         llm.set_fallback(ende, anker)
         gesetzt[ende] = anker

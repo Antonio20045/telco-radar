@@ -28,6 +28,12 @@ import time
 import httpx
 
 from ..textwerkzeug import extract_json as extract_json
+from . import llm_frei
+from .llm_kosten import _zaehle_usage as _zaehle_usage
+from .llm_kosten import budget_setzen as budget_setzen
+from .llm_kosten import budget_ueberschritten as budget_ueberschritten
+from .llm_kosten import kosten_reset as kosten_reset
+from .llm_kosten import kosten_stand as kosten_stand
 from .llm_sitzung import LlmSitzung
 
 log = logging.getLogger(__name__)
@@ -86,10 +92,17 @@ def _use_openai() -> bool:
 
 
 def llm_available() -> bool:
-    return _use_bedrock() or _use_openai() or bool(os.environ.get("ANTHROPIC_API_KEY"))
+    return (
+        llm_frei.verfuegbar()
+        or _use_bedrock()
+        or _use_openai()
+        or bool(os.environ.get("ANTHROPIC_API_KEY"))
+    )
 
 
 def active_backend() -> str:
+    if llm_frei.registriert():
+        return "frei (kostenlose Modelle mehrerer Anbieter)"
     if _use_bedrock():
         return f"bedrock ({_bedrock_region()})"
     if _use_openai():
@@ -116,6 +129,10 @@ def _s() -> LlmSitzung:
 
 class _FatalHTTP(Exception):
     pass
+
+
+class LLMAnfrageZuGross(Exception):
+    """HTTP 413: nur DIESE Anfrage ist zu groß; das Modell bleibt lebendig."""
 
 
 class LLMFatalError(RuntimeError):
@@ -249,127 +266,6 @@ def dead_models() -> set[str]:
     return set(_s().tote_modelle)
 
 
-def _zaehle_usage(model: str, data: dict) -> None:
-    """Den Verbrauch EINER Antwort mitschreiben.
-
-    Gezaehlt wird, bevor der Aufrufer den Inhalt beurteilt: eine Antwort, die
-    nur aus Denkspur besteht (Laeufe #83-85, #97), ist bezahlt und muss im
-    Zaehler stehen - sonst waere ausgerechnet der teuerste Fehlerfall
-    kostenlos.
-
-    DeepSeek weist die Denkspur nicht getrennt aus, sie steckt in
-    `completion_tokens` und wird als Ausgabe abgerechnet. Genau das ist der
-    Posten, den dieser Zaehler sichtbar machen soll.
-    """
-    usage = data.get("usage") if isinstance(data, dict) else None
-    if not isinstance(usage, dict):
-        return
-    ein = usage.get("prompt_tokens")
-    if ein is None:
-        ein = usage.get("input_tokens") or 0
-    aus = usage.get("completion_tokens")
-    if aus is None:
-        aus = usage.get("output_tokens") or 0
-    ein = (
-        int(ein)
-        + int(usage.get("cache_read_input_tokens") or 0)
-        + int(usage.get("cache_creation_input_tokens") or 0)
-    )
-    eintrag = _s().verbrauch.setdefault(
-        model, {"aufrufe": 0, "prompt_tokens": 0, "completion_tokens": 0}
-    )
-    eintrag["aufrufe"] += 1
-    eintrag["prompt_tokens"] += ein
-    eintrag["completion_tokens"] += int(aus)
-
-
-def _usd(model: str, prompt_tokens: int, completion_tokens: int) -> float | None:
-    """USD-Schaetzung, oder None fuer ein Modell ohne Preiszeile."""
-    preis = _s().preise.get(model)
-    if not preis:
-        return None
-    return (
-        prompt_tokens * preis.get("ein", 0.0)
-        + completion_tokens * preis.get("aus", 0.0)
-    ) / 1_000_000
-
-
-def _summe_usd() -> float:
-    return sum(
-        _usd(name, v["prompt_tokens"], v["completion_tokens"]) or 0.0
-        for name, v in _s().verbrauch.items()
-    )
-
-
-def kosten_reset() -> None:
-    """Zaehler leeren. Ein Lauf zaehlt seinen eigenen Verbrauch."""
-    _s().verbrauch.clear()
-
-
-def budget_setzen(usd_limit: float | None, preistabelle: dict | None = None) -> None:
-    """Warnschwelle und Preistabelle setzen. 0/leer heisst: keine Schwelle.
-
-    Warnschwelle, nicht Not-Aus: der Zaehler greift NIE in den Lauf ein
-    (Antonios Entscheidung vom 27.08.2026). Siehe budget_ueberschritten().
-    """
-    sitzung = _s()
-    try:
-        limit = float(usd_limit or 0)
-    except (TypeError, ValueError):
-        limit = 0.0
-    sitzung.budget_usd = limit if limit > 0 else None
-    sitzung.preise.clear()
-    for name, preis in (preistabelle or {}).items():
-        if not isinstance(preis, dict):
-            continue
-        try:
-            sitzung.preise[str(name)] = {
-                "ein": float(preis.get("ein", preis.get("input", 0)) or 0),
-                "aus": float(preis.get("aus", preis.get("output", 0)) or 0),
-            }
-        except (TypeError, ValueError):
-            log.warning(
-                "Unbrauchbare Preiszeile fuer %s - Modell bleibt unbeziffert", name
-            )
-
-
-def budget_ueberschritten() -> bool:
-    """True, sobald die BEZIFFERBAREN Kosten die Warnschwelle erreichen.
-
-    Es passiert dann NICHTS ausser einer Zeile im Protokoll und einer auf
-    transparenz.html. Die erste Fassung dieses Zaehlers stoppte weitere
-    Analysten-Stapel; Antonio hat das am 27.08.2026 verworfen, und die
-    Begruendung steht in den degenerierten Laeufen vom 15.-27.08.: ein Lauf,
-    der auf halber Strecke aufhoert zu lesen, ist von einer duennen
-    Nachrichtenwoche nicht zu unterscheiden. Die harte Grenze ist das
-    Guthaben des Anbieters; stirbt es, faengt der Anker die sichtbaren
-    Stufen.
-
-    Ein Modell ohne Preiszeile geht mit 0 $ ein - geraten wird nichts. Die
-    Luecke steht als `ohne_preis` im Kostenblock und faellt am Token-Ist auf.
-    """
-    budget = _s().budget_usd
-    return bool(budget) and _summe_usd() >= budget
-
-
-def kosten_stand() -> dict:
-    """Was der Lauf bisher verbraucht hat - je Modell, in Token und USD."""
-    modelle: dict[str, dict] = {}
-    ohne_preis: list[str] = []
-    for name, v in sorted(_s().verbrauch.items()):
-        usd = _usd(name, v["prompt_tokens"], v["completion_tokens"])
-        modelle[name] = {**v, "usd": None if usd is None else round(usd, 4)}
-        if usd is None:
-            ohne_preis.append(name)
-    return {
-        "modelle": modelle,
-        "summe_usd": round(_summe_usd(), 4),
-        "ohne_preis": ohne_preis,
-        "budget_usd": _s().budget_usd,
-        "budget_ueberschritten": budget_ueberschritten(),
-    }
-
-
 def _anthropic_text(data: dict) -> str:
     """Text aus einer Anthropic-Antwort ziehen - und erklaeren, wenn keiner da ist.
 
@@ -395,8 +291,29 @@ def _is_daily_quota(resp) -> bool:
     """A 429 that means "come back tomorrow", not "come back in a second"."""
     if resp.status_code != 429:
         return False
-    body = resp.text[:300].lower()
-    return "per day" in body or "daily" in body
+    body = resp.text.lower()
+    return "per day" in body or "perday" in body or "daily" in body
+
+
+def _pruefe_status(resp) -> None:
+    """Wirft je nach Status: endgültig, dieses Modell tot, zu groß oder wiederholbar."""
+    if resp.status_code == 402:
+        raise LLMModelUnavailable(
+            f"HTTP 402 Payment Required (Guthaben aufgebraucht): {resp.text[:200]}"
+        )
+    if resp.status_code == 413:
+        raise LLMAnfrageZuGross(f"HTTP 413: {resp.text[:200]}")
+    if resp.status_code in _FATAL_STATUSES:
+        raise _FatalHTTP(f"HTTP {resp.status_code}: {resp.text[:300]}")
+    if _is_daily_quota(resp):
+        raise RuntimeError(f"daily token quota exhausted: {resp.text[:200]}")
+    if resp.status_code in (429, 529) or resp.status_code >= 500:
+        raise httpx.HTTPStatusError(
+            f"retryable status {resp.status_code}: {resp.text[:200]}",
+            request=resp.request,
+            response=resp,
+        )
+    resp.raise_for_status()
 
 
 def _post_with_retries(url, payload, headers, retries, parse):
@@ -419,22 +336,7 @@ def _post_with_retries(url, payload, headers, retries, parse):
             transport = _s().transport
             post = httpx.Client(transport=transport).post if transport else httpx.post
             resp = post(url, json=payload, headers=headers, timeout=http_timeout())
-            if resp.status_code == 402:
-                raise LLMModelUnavailable(
-                    f"HTTP 402 Payment Required (Guthaben aufgebraucht): "
-                    f"{resp.text[:200]}"
-                )
-            if resp.status_code in _FATAL_STATUSES:
-                raise _FatalHTTP(f"HTTP {resp.status_code}: {resp.text[:300]}")
-            if _is_daily_quota(resp):
-                raise RuntimeError(f"daily token quota exhausted: {resp.text[:200]}")
-            if resp.status_code in (429, 529) or resp.status_code >= 500:
-                raise httpx.HTTPStatusError(
-                    f"retryable status {resp.status_code}: {resp.text[:200]}",
-                    request=resp.request,
-                    response=resp,
-                )
-            resp.raise_for_status()
+            _pruefe_status(resp)
             return parse(resp.json())
         except _FatalHTTP as exc:
             if _is_model_access_error(str(exc)):
@@ -494,6 +396,17 @@ def _complete_openai(
     if "deepseek" in model.lower():
         payload["chat_template_kwargs"] = {"thinking": False}
     headers = {"Authorization": f"Bearer {key}", "Content-Type": "application/json"}
+    return _post_with_retries(
+        _openai_base() + "/chat/completions",
+        payload,
+        headers,
+        retries,
+        _openai_parser(model, max_tokens),
+    )
+
+
+def _openai_parser(model: str, max_tokens: int):
+    """Liest den Antworttext; Denkspur ohne Antwort ist ein Fehler, kein Text."""
 
     def parse(data):
         _zaehle_usage(model, data)
@@ -517,9 +430,32 @@ def _complete_openai(
             f"(finish_reason={grund}, max_tokens={max_tokens})."
         )
 
-    return _post_with_retries(
-        _openai_base() + "/chat/completions", payload, headers, retries, parse
-    )
+    return parse
+
+
+def _complete_frei(
+    system: str, user: str, model: str, max_tokens: int, retries: int
+) -> str:
+    """Ein Glied von ``frei``; ein 401 tötet nur dieses Glied (Fehler 07.10.2026)."""
+    ep = llm_frei.endpunkt(model)
+    if ep is None:
+        raise LLMModelUnavailable(f"{model} ist kein Glied von frei_endpunkte")
+    key = ep.schluessel()
+    if key is None:
+        raise LLMModelUnavailable(f"Schluessel {ep.key_env} fehlt fuer {model}")
+    headers = {"Content-Type": "application/json"}
+    if key:
+        headers["Authorization"] = f"Bearer {key}"
+    payload = llm_frei.nutzlast(ep, system, user, max_tokens)
+    llm_frei.drosseln(ep)
+    try:
+        return _post_with_retries(
+            ep.url(), payload, headers, retries, _openai_parser(model, max_tokens)
+        )
+    except LLMModelUnavailable:
+        raise
+    except LLMFatalError as exc:
+        raise LLMModelUnavailable(str(exc)) from exc
 
 
 def _complete_anthropic(
@@ -572,6 +508,8 @@ def _complete_bedrock(
 
 
 def _dispatch(system: str, user: str, model: str, max_tokens: int, retries: int) -> str:
+    if llm_frei.endpunkt(model):
+        return _complete_frei(system, user, model, max_tokens, retries)
     if model.startswith("claude") and os.environ.get("ANTHROPIC_API_KEY"):
         return _complete_anthropic(system, user, model, max_tokens, retries)
     if _use_bedrock():
@@ -630,6 +568,9 @@ def complete(
                 "for the rest of this run",
                 candidate,
             )
+        except LLMAnfrageZuGross as exc:
+            last_exc = exc
+            log.warning("Anfrage zu gross fuer %s - naechstes Glied", candidate)
         except LLMFatalError:
             raise
         except RuntimeError as exc:
@@ -637,4 +578,6 @@ def complete(
             last_exc = exc
             log.warning("Model %s did not answer (%s)", candidate, str(exc)[:160])
 
+    if isinstance(last_exc, LLMAnfrageZuGross):
+        raise RuntimeError(str(last_exc)) from last_exc
     raise last_exc if last_exc else RuntimeError(f"no model answered for {model}")
