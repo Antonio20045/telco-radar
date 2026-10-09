@@ -1,0 +1,1330 @@
+{
+ "anfragen": [
+  {
+   "nummer": 1,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de[Cookie entfernt]",
+   "art": "document",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 2,
+   "methode": "GET",
+   "url": "https://content.1und1.de/fonts/1und1-web-sans-57-condensed.woff2",
+   "art": "font",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 3,
+   "methode": "GET",
+   "url": "https://content.1und1.de/fonts/1und1-web-sans-77-black-condensed.woff2",
+   "art": "font",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 4,
+   "methode": "GET",
+   "url": "https://content.1und1.de/fonts/1und1-web-sans-87-extra-black-condensed.woff2",
+   "art": "font",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 5,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/94402f5adbd3cbe020facfe94425960a45c8d3c4/main.css?bust=4",
+   "art": "stylesheet",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 6,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/d04a48664ce34241a000691b96d5c61d876df089/d-t-m-navigation-service-card-mobile-3812-img-service-card-mobilfunk.png?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 7,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.AccComponents/1791378825/JavaScript/StickyContactChatGenesys.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 8,
+   "methode": "GET",
+   "url": "https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920",
+   "art": "script",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 9,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/7417d0629ccd01519edc3dcad3dfb419bcee634e/main.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 10,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.NNodeTypes/1791378824/JavaScript/bs-transformer.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 11,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.NNodeTypes/1791378824/JavaScript/shop-general.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 12,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.ReactNodeTypes/1791378824/JavaScript/main.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 13,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.JNodeTypes/1791378824/JavaScript/RecurringModal/RecurringModal.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 14,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.Shop/1791378826/JavaScript/Tealium/video-tracking.min.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 15,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/f9c171a4f39dc9d2289a36d5828421d71172c908/d-section-headline-background-image-d47740-img-service-card-mobilfunk-1200x440.png?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 16,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/fe452826e9987673f3dc2bbb0473e2b8a08eb9b8/d-t-sc-fc-30-tage-testen-45921-img-796x218.webp?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 17,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/36f4b848d66ddcd5a85712764be86eb1787ad657/d-t-m-mobile-card-d38221-img-fair-alt-gegen-neu.webp?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 18,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/93a818889f80323f722284e67b82049437cd2df7/d-t-m-mobile-card-d47739-img-kulant-24-h-austausch-service.webp?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 19,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/7b5df5d7115ea6830f15e32771af46dde0ec6f02/d-t-m-mobile-card-d38221-img-schnell-overnight-lieferung.webp?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 20,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/fff1ab727b6362d8b3c189f9d7dfe5582895b3a6/d-t-m-mobile-card-d38221-img-persoenlich-priority-hotline.webp?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 21,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/49bdaebaa68744d6cfc65a405fcc037ad615e659/img-connect-netz-qualitaet-sehr-gut.svg?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 22,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/585a70e4836a533368b56463dfde3eb47fd1aaa7/img-fomo-siegel-fairrster-mobilfunkanbieter-2026.svg?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 23,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/df577116db62cb6da1130d357fb54ff42a72a20b/d-t-m-einbau-siegel-d41483-img-connect-service-app.svg?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 24,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/8a3b87755ee96b2ffd0e3b9ce3a60efe2edf2d84/award-d48979-img-wiwo-bester-kundenservice-2026.svg?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 25,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/9850b41a60b6b312aad12afd1495ac4a4b5bb9e1/award-d51291-deutschlands-beste-branchensieger-2026.svg?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 26,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/9df89dfb74de56ac65ad8572f33417dc42139300/award-d51277-img-chip-juli-2026-hoechste-kundenorierntierung.svg?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 27,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/0b35501fab884743419a3712842dd1de017a802a/welt-img-award-preischampion-04-2026-1.svg?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 28,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/dcb04d1f2ed2abdc643b84ef157774a38145cf6f/img-award-focus-money-kundenzufriedenheit.svg?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 29,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/c1fc487c7819b0ac61726626466ad482a81779b9/award-d47751-img-wiwo-siegel-platz-1-deutschlands-preisfavorit-telekommunikations-anbieter-2026.svg?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 30,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/2be4d68c32e2ec93b32dc22bbbcc36c4e01f97a8/sz-institut-kundenloyalitaet.svg?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 31,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.JNodeTypes/1791378824/Images/ContactBubble/lg.png?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 32,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.Shop/1791378826/JavaScript/Survey/isurvey.min.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 33,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.Shop/1791378826/JavaScript/Survey/rogator.min.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 34,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/d04a48664ce34241a000691b96d5c61d876df089/d-t-m-navigation-service-card-mobile-3812-img-service-card-mobilfunk.png?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 35,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/frontend/product-list/public/images/filter/filter-apple.svg",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 36,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/frontend/product-list/public/images/filter/filter-samsung.svg",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 37,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/frontend/product-list/public/images/filter/filter-google.svg",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 38,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/frontend/product-list/public/images/filter/filter-xiaomi.svg",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 39,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/frontend/product-list/public/images/filter/filter-motorola.svg",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 40,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/frontend/product-list/public/images/filter/filter-fairphone.svg",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 41,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/frontend/product-list/public/images/filter/filter-honor.svg",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 42,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/frontend/product-list/public/images/filter/filter-nothing.svg",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 43,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/34a26bc9932f4a16fc2965d5f9b85969-img-apple-iPhone-18-pro-max-silver-duo.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 44,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/3b2c3266f62816d31650ef4b071e881d-badge-d51720-img-3-monate-apple-one.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 45,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/fb3a2895723d52388517e025a464b72462042b37/vtr-4118-lieferumfang-ohne.svg?bust=3",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 46,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_svg/5%20-%2060/usb%20pd/ladeeigenschaften.svg",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 47,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/de771b8b5cd77003a308d4c9925815a1-A-Left-DarkGreen-WithAGScale.svg",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 48,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/b5872f3b77ecf1d3a5a0c1ba21523830-img-apple-iPhone-18-pro-silver-duo.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 49,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/565f4c84055ad48b3b64a8dce9b55b70-img-apple-iPhone-17-pro-max-orange-back~235x470.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 50,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/d54ed2748cd16535af7d0f7da12874a6-img-apple-iPhone-17-pro-max-orange-front~235x470.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 51,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_svg/4,5%20-%2042/usb%20pd/ladeeigenschaften.svg",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 52,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/565f4c84055ad48b3b64a8dce9b55b70-img-apple-iPhone-17-pro-orange-back~235x470.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 53,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/d54ed2748cd16535af7d0f7da12874a6-img-apple-iPhone-17-pro-orange-front~235x470.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 54,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_svg/4,5%20-%2035/usb%20pd/ladeeigenschaften.svg",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 55,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/96afdbb3bfa292bcef443d0be8dc0ea2-img-apple-iPhone-17-lavendel-back~235x470.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 56,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/a2e361d9a2b848390cc7b71021200334-img-apple-iPhone-17-lavendel-front~235x470.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 57,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_svg/4,5%20-%2029/usb%20pd/ladeeigenschaften.svg",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 58,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/b1a6f5ab7645fba98d073a477251c88c-img-apple-iphone-17e-white-back~235x470.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 59,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/8fcf5456c9ed507d7873ec1f57c80a9b-img-apple-iphone-17e-white-front~235x470.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 60,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_svg/4,5%20-%2026/usb%20pd/ladeeigenschaften.svg",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 61,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/ac89d376d52dfb8a7eab008d5f48b6dc-img-apple-iphone-16-schwarz-back~235x470.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 62,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/5b3090f8e6748e564fe5ed1aa557ceec-img-apple-iphone-16-schwarz-front~235x470.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 63,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_svg/4,5%20-%2023/usb%20pd/ladeeigenschaften.svg",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 64,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/1958f25f93635fe2b564cbf2410f6b65-B-Left-MediumGreen-WithAGScale.svg",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 65,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/b43e1f0a24057f1f1d9b844f62f44a7a-img-apple-iPhone-air-spaceschwarz-neu-back~235x470.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 66,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/04d62252cb2e410bc3a746d8df46219b-img-apple-iPhone-air-spaceschwarz-neu-front~235x470.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 67,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_svg/4,5%20-%2018/usb%20pd/ladeeigenschaften.svg",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 68,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/017fb4465ee036115cfd2d325e9e1e05-img-apple-iphone-16-plus-weiss-back~235x470.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 69,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/d5394ce8bb9f103573891aa60479136c-img-apple-iphone-16-plus-weiss-front~235x470.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 70,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_svg/4,5%20-%2030/usb%20pd/ladeeigenschaften.svg",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 71,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/eb0d1e814437a77d99315cd1d0f06c61-img-iphone-16e-black-back~235x470.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 72,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/0222e7c5aec6b6e5bce2c2b21765cf75-img-iphone-16e-black-front~235x470.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 73,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/dce0e055ddfad153f7d6ad2248f307ed-img-samsung-galaxy-s26-ultra-violet-back~235x470.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 74,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/d2d6b9f44748c50f713543e82c17feec-img-samsung-galaxy-s26-ultra-violet-front~235x470.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 75,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/e2ec3903738bf5039048e9c5a092a1a0-d-t-m-hwbox-v4820-img-galaxy-buds-4.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 76,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_svg/10%20-%2060/usb%20pd/ladeeigenschaften.svg",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 77,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/1cd29eb62dedca4c2b5d118e2bfea17e-img-samsung-galaxy-s26-violet-back~235x470.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 78,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/a16d69d7b154aa5e88ec23e260cc069e-img-samsung-galaxy-s26-violet-front~235x470.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 79,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_svg/10%20-%2025/usb%20pd/ladeeigenschaften.svg",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 80,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/7fafaa127906d90d21db3c87b47476ab-img-samsung-galaxy-s26-plus-violet-back~235x470.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 81,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/133e336bc5357bf1ee629c1b060a0e0a-img-samsung-galaxy-s26-plus-violet-front~235x470.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 82,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_svg/10%20-%2045/usb%20pd/ladeeigenschaften.svg",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 83,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/fb13ae0dc80b60473eedf9fddafdb48f-hwd-content-img-galaxy-a57-5g-gray-back~235x470.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 84,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/b76ae57837f8a3f0b48ad23d4c541e20-img-galaxy-a57-5g-gray-front~235x470.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 85,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/f408c02d9aa74694e27d5c56edd91125-img-samsung-a17-5g-black-back~235x470.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 86,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/d90e54a2fd77c88aaefc7581c6c05a81-img-samsung-a17-5g-black-front~235x470.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 87,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/b785360e9793dfd03eab5d994753bd24-img-galaxy-z-flip8-pink-duo.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 88,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/04163adc2bddef45b72d3e57da9dba0b-d-t-m-hw-box-d50317-img-6-monate-gratis-google-ai-pro.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 89,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/6c3355f19f4b21f1ab3fc108ba5e6c40-1-img-galaxy-z-fold8-lavender-duo.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 90,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/ef9dd9e30429923cd58aee71f8a31ce0-img-galaxy-z-fold8-ultra-violet-duo.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 91,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/eec43193f876b040c2b54f88cb8116bb-img-samsung-S25-edge-jetblack-back-2~235x470.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 92,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/600a6b0f7fba6a570d65a59b81e6648e-img-samsung-S25-edge-jetblack-front~235x470.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 93,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/a11d85eb047aed8bcf9e00570558c26c-img-samsung-galaxy-s26-fe-green-back~235x470.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 94,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/8f19df45dabc20aff2573faac88c075e-img-samsung-galaxy-s26-fe-green-front~235x470.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 95,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/0b870ec499211692ae6c15261e34b20f-img-samsung-a27-5g-black-back~235x470.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 96,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/e066d3f6ea2b298fa812bc1a57314ce2-hwd-img-samsung-a27-5g-black-front~235x470.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 97,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/d72dc94ff95d2e80fd965f2c244b301a8551da98/icons.svg?bust=4",
+   "art": "xhr",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 98,
+   "methode": "GET",
+   "url": "https://content.1und1.de/ctx/dh/libt.min.js?bust=2026100910",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 99,
+   "methode": "POST",
+   "url": "https://api.1und1.de/genesys/channelroutingservice/request/productline",
+   "art": "fetch",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 100,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/cdn-cgi/challenge-platform/scripts/jsd/main.js",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 101,
+   "methode": "POST",
+   "url": "https://api.1und1.de/genesys/channelroutingservice/request/productline",
+   "art": "fetch",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 102,
+   "methode": "GET",
+   "url": "https://api.1und1.de/ctx/dh/cdn/onlineshop/prod/cdh.js",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 103,
+   "methode": "POST",
+   "url": "https://mobile.1und1.de/cdn-cgi/challenge-platform/h/g/jsd/oneshot/4df4a60fa397/0.5519335346569038:1791540048:YmaOnmP6lICm1Y93nGBAOmDhi7xkRqcRefBA_pmG9Vw/a47cdee7a84818ba",
+   "art": "xhr",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 104,
+   "methode": "POST",
+   "url": "https://api.1und1.de/ctx/dh/cs/event",
+   "art": "xhr",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 105,
+   "methode": "GET",
+   "url": "https://content.1und1.de/fonts/1und1-web-sans-77-90-black-condensed.woff2",
+   "art": "font",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 106,
+   "methode": "GET",
+   "url": "https://api.1und1.de/ctx/dh/cdn/onlineshop/prod/cdh.v.js?a=1und1%2Fonlineshop%2F202608121058&cb=1791543546284",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 107,
+   "methode": "POST",
+   "url": "https://api.1und1.de/ctx/dh/cs/event",
+   "art": "xhr",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 108,
+   "methode": "GET",
+   "url": "https://cdn.appdynamics.com/adrum/adrum-latest.js",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 109,
+   "methode": "GET",
+   "url": "https://cdn.appdynamics.com/adrum-ext.b5670ee02cea89158a710705f2152002.js",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 110,
+   "methode": "GET",
+   "url": "https://cdn.appdynamics.com/adrum-xd.b5670ee02cea89158a710705f2152002.html",
+   "art": "document",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT"
+  },
+  {
+   "nummer": 111,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/iphone-17-pro?tariffFirst=true",
+   "art": "document",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 112,
+   "methode": "GET",
+   "url": "https://content.1und1.de/fonts/1und1-web-sans-57-condensed.woff2",
+   "art": "font",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 113,
+   "methode": "GET",
+   "url": "https://content.1und1.de/fonts/1und1-web-sans-77-black-condensed.woff2",
+   "art": "font",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 114,
+   "methode": "GET",
+   "url": "https://content.1und1.de/fonts/1und1-web-sans-87-extra-black-condensed.woff2",
+   "art": "font",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 115,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/94402f5adbd3cbe020facfe94425960a45c8d3c4/main.css?bust=4",
+   "art": "stylesheet",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 116,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/d04a48664ce34241a000691b96d5c61d876df089/d-t-m-navigation-service-card-mobile-3812-img-service-card-mobilfunk.png?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 117,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/9c73aa46f7868272bb266b7a9b5e3781-img-apple-iPhone-17-pro-orange-duo.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 118,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.AccComponents/1791378825/JavaScript/StickyContactChatGenesys.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 119,
+   "methode": "GET",
+   "url": "https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920",
+   "art": "script",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 120,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/7417d0629ccd01519edc3dcad3dfb419bcee634e/main.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 121,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.NNodeTypes/1791378824/JavaScript/bs-transformer.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 122,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.NNodeTypes/1791378824/JavaScript/shop-general.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 123,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.ReactNodeTypes/1791378824/JavaScript/main.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 124,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.JNodeTypes/1791378824/JavaScript/RecurringModal/RecurringModal.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 125,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 126,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.JNodeTypes/1791378824/Images/ContactBubble/lg.png?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 127,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.Shop/1791378826/JavaScript/Survey/isurvey.min.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 128,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Static/Packages/ONEANDONE.Shop/1791378826/JavaScript/Survey/rogator.min.js?bust=4",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 129,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/d04a48664ce34241a000691b96d5c61d876df089/d-t-m-navigation-service-card-mobile-3812-img-service-card-mobilfunk.png?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 130,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/9c73aa46f7868272bb266b7a9b5e3781-img-apple-iPhone-17-pro-orange-duo.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 131,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/c121ffcda457ebac520d62c82b71c551-img-apple-iPhone-17-pro-orange-links.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 132,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/565f4c84055ad48b3b64a8dce9b55b70-img-apple-iPhone-17-pro-orange-back.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 133,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/d54ed2748cd16535af7d0f7da12874a6-img-apple-iPhone-17-pro-orange-front.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 134,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/e6b5ea0b8cd1ff3d0a85b9c6d98f8f97-img-apple-iPhone-17-pro-orange-side.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 135,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/fb3a2895723d52388517e025a464b72462042b37/vtr-4118-lieferumfang-ohne.svg?bust=3",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 136,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_svg/4,5%20-%2035/usb%20pd/ladeeigenschaften.svg",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 137,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/de771b8b5cd77003a308d4c9925815a1-A-Left-DarkGreen-WithAGScale.svg",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 138,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/dac847df244eb8cfa9168801488abc76-d-t-m-produktbild-d47853-img-apple-airpods4.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 139,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/9fcde7ee403e484f0ac51f929dc7bed3-produktbild-v4388-img-apple-airpods-pro-3.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 140,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/b4e6ff6f50a8f44ac22a67bc321ef160ec34b83e/d-hwd-content-v4388-img-iphone17-pro-tapete-1224x4314.webp?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 141,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/c883512add356c4bf085565958b4d682b8c944c2/d-vgl-v4388-img-vergleich-iphone-17-familie-1224x3987.webp?bust=4",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 142,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_svg/4,5%20-%2035/usb%20pd/ladeeigenschaften.svg?bust=3",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 143,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/d72dc94ff95d2e80fd965f2c244b301a8551da98/icons.svg?bust=4",
+   "art": "xhr",
+   "status": null,
+   "abbruch": "net::ERR_ABORTED"
+  },
+  {
+   "nummer": 144,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/hinweistexte/ssc-allgemein-1?lightbox=true",
+   "art": "document",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 145,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/9c73aa46f7868272bb266b7a9b5e3781-img-apple-iPhone-17-pro-orange-duo.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 146,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/d54ed2748cd16535af7d0f7da12874a6-img-apple-iPhone-17-pro-orange-front.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 147,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/c121ffcda457ebac520d62c82b71c551-img-apple-iPhone-17-pro-orange-links.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 148,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/e6b5ea0b8cd1ff3d0a85b9c6d98f8f97-img-apple-iPhone-17-pro-orange-side.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 149,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_catalog/images/565f4c84055ad48b3b64a8dce9b55b70-img-apple-iPhone-17-pro-orange-back.png",
+   "art": "image",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 150,
+   "methode": "GET",
+   "url": "https://content.1und1.de/ctx/dh/libt.min.js?bust=2026100910",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 151,
+   "methode": "POST",
+   "url": "https://api.1und1.de/genesys/channelroutingservice/request/productline",
+   "art": "fetch",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 152,
+   "methode": "GET",
+   "url": "https://api.1und1.de/ctx/dh/cdn/onlineshop/prod/cdh.js",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 153,
+   "methode": "GET",
+   "url": "https://cdn.appdynamics.com/adrum/adrum-latest.js",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 154,
+   "methode": "GET",
+   "url": "https://content.1und1.de/fonts/1und1-web-sans-57-condensed.woff2",
+   "art": "font",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 155,
+   "methode": "GET",
+   "url": "https://content.1und1.de/fonts/1und1-web-sans-77-black-condensed.woff2",
+   "art": "font",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 156,
+   "methode": "GET",
+   "url": "https://content.1und1.de/fonts/1und1-web-sans-87-extra-black-condensed.woff2",
+   "art": "font",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 157,
+   "methode": "GET",
+   "url": "https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920",
+   "art": "script",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  },
+  {
+   "nummer": 158,
+   "methode": "GET",
+   "url": "https://cdn.appdynamics.com/adrum-ext.b5670ee02cea89158a710705f2152002.js",
+   "art": "script",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 159,
+   "methode": "GET",
+   "url": "https://mobile.1und1.de/_Resources/Persistent/d72dc94ff95d2e80fd965f2c244b301a8551da98/icons.svg?bust=4",
+   "art": "xhr",
+   "status": 200,
+   "abbruch": null
+  },
+  {
+   "nummer": 160,
+   "methode": "GET",
+   "url": "https://cdn.appdynamics.com/adrum-xd.b5670ee02cea89158a710705f2152002.html",
+   "art": "document",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT"
+  }
+ ],
+ "antworten": [
+  {
+   "nummer": 99,
+   "methode": "POST",
+   "url": "https://api.1und1.de/genesys/channelroutingservice/request/productline",
+   "art": "fetch",
+   "status": 200,
+   "typ": "application/json",
+   "groesse": 266,
+   "gekuerzt": false,
+   "koerper": "{\"requestId\":\"13995fbc-e484-4cab-9935-1f414314f571\",\"accessToken\":\"ENTFERNT\",\"channels\":[{\"channelType\":\"CHAT\",\"available\":false,\"description\":null,\"chatEnvironment\":\"prod-euc1\",\"chatDeploymentId\":\"59ba7a17-2146-40f0-b02a-b833655edb41\"}]}"
+  },
+  {
+   "nummer": 101,
+   "methode": "POST",
+   "url": "https://api.1und1.de/genesys/channelroutingservice/request/productline",
+   "art": "fetch",
+   "status": 200,
+   "typ": "application/json",
+   "groesse": 265,
+   "gekuerzt": false,
+   "koerper": "{\"requestId\":\"acb0f1ce-c17c-4384-9423-b69bd77b5713\",\"accessToken\":\"ENTFERNT\",\"channels\":[{\"channelType\":\"CHAT\",\"available\":true,\"description\":null,\"chatEnvironment\":\"prod-euc1\",\"chatDeploymentId\":\"7906e3b6-6f61-4ba1-9d44-de7d69af4a2c\"}]}"
+  },
+  {
+   "nummer": 104,
+   "methode": "POST",
+   "url": "https://api.1und1.de/ctx/dh/cs/event",
+   "art": "xhr",
+   "status": 200,
+   "typ": "application/json",
+   "groesse": 0,
+   "gekuerzt": false,
+   "koerper": ""
+  },
+  {
+   "nummer": 107,
+   "methode": "POST",
+   "url": "https://api.1und1.de/ctx/dh/cs/event",
+   "art": "xhr",
+   "status": 200,
+   "typ": "application/json",
+   "groesse": 0,
+   "gekuerzt": false,
+   "koerper": ""
+  }
+ ]
+}

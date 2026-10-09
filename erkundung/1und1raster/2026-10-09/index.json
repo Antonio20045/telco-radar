@@ -1,0 +1,403 @@
+{
+ "anbieter": "1und1raster",
+ "name": "1&1",
+ "datum": "2026-10-09",
+ "status": "gelesen",
+ "grund": null,
+ "kennung": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)",
+ "parallelpruefung": "vor jeder Seite",
+ "robots_gelesen": true,
+ "abstand_sekunden": 2.0,
+ "besuchszeit": null,
+ "dauer_sekunden": 317.1,
+ "zeitgrenze_sekunden": 3000,
+ "seiten": [
+  {
+   "nummer": 1,
+   "geraet": "apple-iphone-17-pro",
+   "speicher_gb": 256,
+   "adresse": "https://mobile.1und1.de[Cookie entfernt]",
+   "endadresse": "https://mobile.1und1.de[Cookie entfernt]",
+   "status": "gelesen",
+   "grund": null,
+   "bot_schutz": false,
+   "http_status": 200,
+   "ruhe": true,
+   "dateien": {
+    "bedienelemente": "bedienelemente-1.json",
+    "preise": "preise-1.json",
+    "klicks": "klicks-1.json",
+    "mitschnitt": "mitschnitt-1.json",
+    "screenshot": "seite-1.png",
+    "html": "seite-1.html.gz"
+   },
+   "zaehlung": {
+    "anfragen": 189,
+    "verworfen": 5,
+    "gescheitert": 0,
+    "hilfsdateien": 4,
+    "mitschnitt": 4,
+    "elemente": 859,
+    "gruppen_je_art": {
+     "unbekannt": 311,
+     "tarif": 61,
+     "laufzeit": 1
+    },
+    "preis_kandidaten": 47,
+    "klicks": 3
+   },
+   "verworfen": [
+    {
+     "url": "https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920",
+     "grund": "ReadTimeout: The read operation timed out"
+    },
+    {
+     "url": "https://cdn.appdynamics.com/adrum-xd.b5670ee02cea89158a710705f2152002.html",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920",
+     "grund": "ReadTimeout: The read operation timed out"
+    },
+    {
+     "url": "https://cdn.appdynamics.com/adrum-xd.b5670ee02cea89158a710705f2152002.html",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920",
+     "grund": "ReadTimeout: The read operation timed out"
+    }
+   ],
+   "gescheitert": [],
+   "hilfsdateien": [
+    {
+     "url": "https://content.1und1.de/ctx/dh/libt.min.js?bust=2026100910",
+     "art": "script",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://cdn.appdynamics.com/adrum/adrum-latest.js",
+     "art": "script",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://cdn.appdynamics.com/adrum-ext.b5670ee02cea89158a710705f2152002.js",
+     "art": "script",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://cdn.appdynamics.com/adrum/adrum-latest.js",
+     "art": "script",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    }
+   ],
+   "karte": {
+    "status": "keine_karte",
+    "karte": "1und1raster.yaml",
+    "grund": "1und1raster.yaml nicht vorhanden"
+   }
+  },
+  {
+   "nummer": 3,
+   "geraet": "apple-iphone-17-pro",
+   "speicher_gb": 256,
+   "adresse": "https://mobile.1und1.de[Cookie entfernt]",
+   "endadresse": "https://mobile.1und1.de/iphone-17-pro?tariffFirst=true",
+   "status": "gelesen",
+   "grund": null,
+   "bot_schutz": false,
+   "http_status": 200,
+   "ruhe": true,
+   "dateien": {
+    "bedienelemente": "bedienelemente-3.json",
+    "preise": "preise-3.json",
+    "klicks": "klicks-3.json",
+    "mitschnitt": "mitschnitt-3.json",
+    "screenshot": "seite-3.png",
+    "html": "seite-3.html.gz"
+   },
+   "zaehlung": {
+    "anfragen": 165,
+    "verworfen": 6,
+    "gescheitert": 0,
+    "hilfsdateien": 6,
+    "mitschnitt": 4,
+    "elemente": 406,
+    "gruppen_je_art": {
+     "unbekannt": 109,
+     "tarif": 14,
+     "farbe": 1,
+     "speicher": 2,
+     "laufzeit": 2
+    },
+    "preis_kandidaten": 9,
+    "klicks": 0
+   },
+   "verworfen": [
+    {
+     "url": "https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920",
+     "grund": "ReadTimeout: The read operation timed out"
+    },
+    {
+     "url": "https://cdn.appdynamics.com/adrum-xd.b5670ee02cea89158a710705f2152002.html",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920",
+     "grund": "ReadTimeout: The read operation timed out"
+    },
+    {
+     "url": "https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920",
+     "grund": "ReadTimeout: The read operation timed out"
+    },
+    {
+     "url": "https://api.1und1.de/genesys/channelroutingservice/request/productline",
+     "grund": "nach dem Weiter-Klick nur GET und HEAD"
+    },
+    {
+     "url": "https://cdn.appdynamics.com/adrum-xd.b5670ee02cea89158a710705f2152002.html",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    }
+   ],
+   "gescheitert": [],
+   "hilfsdateien": [
+    {
+     "url": "https://content.1und1.de/ctx/dh/libt.min.js?bust=2026100910",
+     "art": "script",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://cdn.appdynamics.com/adrum/adrum-latest.js",
+     "art": "script",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://cdn.appdynamics.com/adrum-ext.b5670ee02cea89158a710705f2152002.js",
+     "art": "script",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://content.1und1.de/ctx/dh/libt.min.js?bust=2026100910",
+     "art": "script",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://cdn.appdynamics.com/adrum/adrum-latest.js",
+     "art": "script",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://cdn.appdynamics.com/adrum-ext.b5670ee02cea89158a710705f2152002.js",
+     "art": "script",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    }
+   ],
+   "karte": null,
+   "folge_von": 1,
+   "weiter": {
+    "selektor": "form.hardware-box:has(a.hardware-box__heading[href=\"https://mobile.1und1.de/iphone-17-pro?tariffFirst=true\"]) .hardware-box__button a.btn",
+    "text": "Smartphone wählen",
+    "treffer": 1,
+    "sichtbar": 1,
+    "geklickt": "Smartphone wählen",
+    "von": "https://mobile.1und1.de[Cookie entfernt]",
+    "nach": "https://mobile.1und1.de/iphone-17-pro?tariffFirst=true"
+   }
+  },
+  {
+   "nummer": 2,
+   "geraet": "apple-iphone-17-pro",
+   "speicher_gb": 256,
+   "adresse": "https://mobile.1und1.de[Cookie entfernt]",
+   "endadresse": "https://mobile.1und1.de[Cookie entfernt]",
+   "status": "gelesen",
+   "grund": null,
+   "bot_schutz": false,
+   "http_status": 200,
+   "ruhe": true,
+   "dateien": {
+    "bedienelemente": "bedienelemente-2.json",
+    "preise": "preise-2.json",
+    "klicks": "klicks-2.json",
+    "mitschnitt": "mitschnitt-2.json",
+    "screenshot": "seite-2.png",
+    "html": "seite-2.html.gz"
+   },
+   "zaehlung": {
+    "anfragen": 190,
+    "verworfen": 5,
+    "gescheitert": 0,
+    "hilfsdateien": 4,
+    "mitschnitt": 4,
+    "elemente": 859,
+    "gruppen_je_art": {
+     "unbekannt": 312,
+     "tarif": 60,
+     "laufzeit": 1
+    },
+    "preis_kandidaten": 47,
+    "klicks": 3
+   },
+   "verworfen": [
+    {
+     "url": "https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920",
+     "grund": "ReadTimeout: The read operation timed out"
+    },
+    {
+     "url": "https://cdn.appdynamics.com/adrum-xd.b5670ee02cea89158a710705f2152002.html",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920",
+     "grund": "ReadTimeout: The read operation timed out"
+    },
+    {
+     "url": "https://cdn.appdynamics.com/adrum-xd.b5670ee02cea89158a710705f2152002.html",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920",
+     "grund": "ReadTimeout: The read operation timed out"
+    }
+   ],
+   "gescheitert": [],
+   "hilfsdateien": [
+    {
+     "url": "https://content.1und1.de/ctx/dh/libt.min.js?bust=2026100910",
+     "art": "script",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://cdn.appdynamics.com/adrum/adrum-latest.js",
+     "art": "script",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://cdn.appdynamics.com/adrum-ext.b5670ee02cea89158a710705f2152002.js",
+     "art": "script",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://cdn.appdynamics.com/adrum/adrum-latest.js",
+     "art": "script",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    }
+   ],
+   "karte": {
+    "status": "keine_karte",
+    "karte": "1und1raster.yaml",
+    "grund": "1und1raster.yaml nicht vorhanden"
+   }
+  },
+  {
+   "nummer": 4,
+   "geraet": "apple-iphone-17-pro",
+   "speicher_gb": 256,
+   "adresse": "https://mobile.1und1.de[Cookie entfernt]",
+   "endadresse": "https://mobile.1und1.de/iphone-17-pro?tariffFirst=true",
+   "status": "gelesen",
+   "grund": null,
+   "bot_schutz": false,
+   "http_status": 200,
+   "ruhe": true,
+   "dateien": {
+    "bedienelemente": "bedienelemente-4.json",
+    "preise": "preise-4.json",
+    "klicks": "klicks-4.json",
+    "mitschnitt": "mitschnitt-4.json",
+    "screenshot": "seite-4.png",
+    "html": "seite-4.html.gz"
+   },
+   "zaehlung": {
+    "anfragen": 160,
+    "verworfen": 6,
+    "gescheitert": 0,
+    "hilfsdateien": 6,
+    "mitschnitt": 4,
+    "elemente": 406,
+    "gruppen_je_art": {
+     "unbekannt": 109,
+     "tarif": 14,
+     "farbe": 1,
+     "speicher": 2,
+     "laufzeit": 2
+    },
+    "preis_kandidaten": 9,
+    "klicks": 0
+   },
+   "verworfen": [
+    {
+     "url": "https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920",
+     "grund": "ReadTimeout: The read operation timed out"
+    },
+    {
+     "url": "https://cdn.appdynamics.com/adrum-xd.b5670ee02cea89158a710705f2152002.html",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920",
+     "grund": "ReadTimeout: The read operation timed out"
+    },
+    {
+     "url": "https://api.1und1.de/genesys/channelroutingservice/request/productline",
+     "grund": "nach dem Weiter-Klick nur GET und HEAD"
+    },
+    {
+     "url": "https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920",
+     "grund": "ReadTimeout: The read operation timed out"
+    },
+    {
+     "url": "https://cdn.appdynamics.com/adrum-xd.b5670ee02cea89158a710705f2152002.html",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    }
+   ],
+   "gescheitert": [],
+   "hilfsdateien": [
+    {
+     "url": "https://content.1und1.de/ctx/dh/libt.min.js?bust=2026100910",
+     "art": "script",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://cdn.appdynamics.com/adrum/adrum-latest.js",
+     "art": "script",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://cdn.appdynamics.com/adrum-ext.b5670ee02cea89158a710705f2152002.js",
+     "art": "script",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://content.1und1.de/ctx/dh/libt.min.js?bust=2026100910",
+     "art": "script",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://cdn.appdynamics.com/adrum/adrum-latest.js",
+     "art": "script",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://cdn.appdynamics.com/adrum-ext.b5670ee02cea89158a710705f2152002.js",
+     "art": "script",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    }
+   ],
+   "karte": null,
+   "folge_von": 2,
+   "weiter": {
+    "selektor": "form.hardware-box:has(a.hardware-box__heading[href=\"https://mobile.1und1.de/iphone-17-pro?tariffFirst=true\"]) .hardware-box__button a.btn",
+    "text": "Smartphone wählen",
+    "treffer": 1,
+    "sichtbar": 1,
+    "geklickt": "Smartphone wählen",
+    "von": "https://mobile.1und1.de[Cookie entfernt]",
+    "nach": "https://mobile.1und1.de/iphone-17-pro?tariffFirst=true"
+   }
+  }
+ ],
+ "groesse_bytes": 2899410,
+ "groessengrenze_bytes": 8000000,
+ "gekuerzt": []
+}
