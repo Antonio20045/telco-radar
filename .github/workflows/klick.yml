@@ -15,16 +15,16 @@ name: Klick-Tageslauf
 # eine aeltere (FRISCHEGRENZE_TAGE = 3), gestoerte oder fehlende ersetzt
 # nichts.
 #
-# ZEIT (CLAUDE.md Regel 8): 00:20 UTC, damit alles vor 02:00 fertig ist.
+# ZEIT (CLAUDE.md Regel 8): 00:05 UTC, fertig spaetestens 03:25.
 #   plan       timeout 10 min
-#   klick      timeout 75 min = --job-frist-sekunden 4500 = JOB_FRIST_S
+#   klick      timeout 180 min = --job-frist-sekunden 10800 = JOB_FRIST_S
 #              (klicktageslauf.py). Der Lauf rechnet ab JOB_START gegen die
 #              Restzeit, laesst RESERVE_S = 8 min fuer Schreiben und
 #              Hochladen, beginnt eine Seite nur mit >= 3 min Rest und gibt
 #              ihr hoechstens 25 min. Was nicht passt, heisst
 #              `nicht_besucht` und kommt am naechsten Tag zuerst.
 #   ablegen    timeout 10 min
-#   Summe hoechstens 95 min: 00:20 + 95 min = 01:55, vor 02:00.
+#   Summe hoechstens 200 min: 00:05 + 200 min = 03:25.
 # GitHub startet geplante Laeufe oft Stunden spaeter (geraete.yml: 4 h 41
 # bis 5 h 40 gemessen). Dann kann dieser Lauf auf geraete.yml treffen; der
 # Tageslauf fragt darum vor JEDER Seite, ob geraete.yml, klick-erkundung.yml
@@ -39,7 +39,7 @@ name: Klick-Tageslauf
 
 on:
   schedule:
-    - cron: "20 0 * * *"
+    - cron: "5 0 * * *"
   workflow_dispatch:
 
 permissions: {}
@@ -77,8 +77,8 @@ jobs:
     needs: plan
     if: needs.plan.outputs.anbieter != '[]'
     runs-on: ubuntu-latest
-    # = --job-frist-sekunden 4500 unten = JOB_FRIST_S in klicktageslauf.py
-    timeout-minutes: 75
+    # = --job-frist-sekunden 10800 unten = JOB_FRIST_S in klicktageslauf.py
+    timeout-minutes: 180
     permissions:
       contents: read
       actions: read
@@ -111,7 +111,7 @@ jobs:
         run: |
           python scripts/klick_tageslauf.py --root . \
             --anbieter "${{ matrix.anbieter }}" --ausgabe klick \
-            --job-start "$JOB_START" --job-frist-sekunden 4500
+            --job-start "$JOB_START" --job-frist-sekunden 10800
 
       # Nur das JSON: keine Screenshots, kein Seitentext, keine Cookies,
       # Adressen ohne Geheimnisse (klickergebnis). Fehlt die Datei, bleibt
