@@ -64,7 +64,7 @@ from telco_radar.report.html import render_site; render_site(Path('/tmp/site'), 
 1. `site/` und `data/` werden nie von Hand bearbeitet, nie gelöscht oder gekürzt (`seen.jsonl`!) und Daten aus lokalen Läufen nie committet. Produktionsdaten entstehen nur in Actions; nach einem lokalen Lauf `git restore site data`.
 2. Keine Secrets, Tokens oder Deploy-Hooks in Dateien, Logs, Commits oder Chat-Ausgaben; sie liegen nur als GitHub-Secrets vor.
 3. Gearbeitet und gepusht wird auf `main`, `git add` nur mit Dateinamen. Bei einem Bot-Commit `git pull --rebase origin main`, nie force-pushen.
-4. Bot-Schutz (403, 202-Challenge, Radware) wird nicht umgangen. robots.txt samt Crawl-delay und Visit-time gilt, IDs werden nie hochgezählt.
+4. Bot-Schutz (403, Captcha, Radware) wird nicht umgangen. Eine JavaScript-Prüfung (202) darf der echte Browser mit ehrlicher Kennung durchlaufen, ohne Tarnung, Proxy oder Captcha-Löser (Antonio, 08.10.2026). robots.txt samt Crawl-delay und Visit-time gilt, IDs werden nie hochgezählt.
 5. Keine Bibliotheken oder Skripte von CDNs; JavaScript bleibt Vanilla in `app.js`, Grafiken rechnet der Server.
 6. Alles rendert ohne LLM. Fällt eine Stufe aus, nennt die Seite den Ausfall, statt „nichts gefunden“ vorzutäuschen.
 7. Jede Zahl auf einer Seite hat einen Test gegen die Daten, mit Gegenprobe. Tests hängen nie vom heutigen Datum ab.
