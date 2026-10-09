@@ -120,12 +120,17 @@ def raster_roh(daten: dict, produktsaetze: list[dict], katalog: Katalog) -> list
     return [
         {
             **roh,
-            "speicher_gb": speicher.get(_geraet(roh, katalog)),
+            "speicher_gb": _gemessen(speicher, _geraet(roh, katalog)),
             "anschlusspreis": anschluss.get(_tarif(roh["tarif_name"])),
         }
         for roh in raster
         if _tarif(roh["tarif_name"]) != basis
     ]
+
+
+def _gemessen(speicher: dict[str, int], geraet: str | None) -> int | None:
+    """Die gemessene Größe eines erkannten Geräts; unbekanntes Gerät ``None``."""
+    return None if geraet is None else speicher.get(geraet)
 
 
 def _speicher(
