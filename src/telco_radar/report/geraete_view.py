@@ -58,7 +58,7 @@ from . import (
     geraete_verlauf,
     geraete_zeitreihe,
 )
-from . import geraete_notbremse as notbremse
+from . import geraete_notbremse as notbremse, klick_ueberholt
 
 from .geraete_laufzeit import LAUFZEIT_STANDARD, ansicht, rang_der_monatsangabe
 from .geraete_tco_band import _MONATE, band_label
@@ -1677,7 +1677,7 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
     tco_heute = _spaeterer_tag(heute, tco_db.updated) if heute else ""
     bestand_heute = _spaeterer_tag(heute, db.updated) if heute else ""
     tco = geraete_tco_view.aufbereiten(
-        tco_db.buendel(),
+        (sichtbar := klick_ueberholt.ohne_ueberholte(tco_db.buendel())),
         tco_db.referenzen(),
         belastbar,
         katalog,
@@ -1711,7 +1711,7 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         bestand,
         katalog,
         (tco or {}).get("modelle"),
-        tco_db.buendel() if tco_db.lesbar else _buendel_aus_listungen(bestand),
+        sichtbar if tco_db.lesbar else _buendel_aus_listungen(bestand),
         zr_erlaubt=zr_erlaubt,
         heute=bestand_heute,
     )
