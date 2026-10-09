@@ -3,17 +3,18 @@
 Die Übersicht (``uebersichten:`` in ``config/klick_tageslauf.yaml``) nennt jedes Gerät
 mit Anzahlung, Rate, Tarifpreis und Produktlink. Wie sie zu lesen ist, sagt die
 ``Lesart`` des Anbieters (``LESARTEN``, Schlüssel ``Klickkarte.anbieter``): Sätze aus
-dem Seitentext, Folgelink, Bereitschaft der Seite. Telekom: ``telekom.lies_buendel``
-auf ``window.__INITIAL_STATE__.productList``, Folgelink ``<link rel="next">``, sonst
-der Link ``WEITER_TEXT``; bereit, sobald der Zustand im Hauptdokument steht, ohne auf
-``load`` zu warten. 1&1: Tarifdetail-Seiten und Geräteraster (``klickraster``), ohne
-Folgeseite. ``lies_uebersicht`` öffnet jede Seite wie eine Produktseite:
-eigener Kontext (``klickkontext.oeffne_sitzung``), jede Anfrage am ``klicktor.Tor``
-(robots.txt samt Crawl-delay, Abstand je Host, Sperrerkennung), Laden und
-JavaScript-Prüfung über ``klickwache.Wache.lade``. Geklickt wird nichts; gelesen wird
-``page.content()``. Eine Seite ohne lesbaren Zustand, ohne Gerät, mit Bot-Schutz,
-Umleitung oder ohne Lesart ist ``gestoert`` mit Grund und trägt keinen Satz;
-robots.txt-Sperre heißt ``gesperrt``.
+dem Seitentext und Folgelink oder Datenantworten (``klickliste``), Bereitschaft der
+Seite. Telekom (``TELEKOM_LISTE``): Datenantwort ``productOfferings/listing`` nach dem
+Ausschalten des Rückgabedeals, „Weitere Geräte anzeigen“ in der Seite, gelesen von
+``telekom_liste.lies_listing``; ``telekom_folgelink`` liest den Folgelink der
+serverseitigen Übersicht bis September 2026. 1&1: Tarifdetail-Seiten und Geräteraster
+(``klickraster``), ohne Folgeseite. ``lies_uebersicht`` öffnet jede Seite wie
+eine Produktseite: eigener Kontext (``klickkontext.oeffne_sitzung``), jede Anfrage am
+``klicktor.Tor`` (robots.txt samt Crawl-delay, Abstand je Host, Sperrerkennung), Laden
+und JavaScript-Prüfung über ``klickwache.Wache.lade``; gelesen wird
+``page.content()``. Eine Seite ohne Gerät ist ``leer``; mit Bot-Schutz, Umleitung oder
+ohne Lesart ist sie ``gestoert`` mit Grund und trägt keinen Satz; robots.txt-Sperre
+heißt ``gesperrt``.
 
 Danach folgt sie dem gelesenen Folgelink, aufgelöst gegen die Seitenadresse, nur auf
 demselben Host und mit Erlaubnis von robots.txt, höchstens ``HOECHSTE_SEITEN`` Seiten;
@@ -44,12 +45,13 @@ from .klickcrawler import ANTWORT_FRIST_MS, FENSTER
 from .klickergebnis import LAUF_LEER
 from .klickkontext import Sitzung, oeffne_sitzung, schliesse
 from .klicklauf import LAUF_GELESEN, LAUF_GESTOERT, Klicklauf
+from .klickliste import Datenliste, Listenlauf
 from .klickraster import BEREIT_JS, einsundeins_saetze
 from .klickspur import ohne_geheimnisse
 from .klicktor import Schleuse, Tor, kurz
 from .klickwache import Abbruch, Wache
 from .robots import RobotsWaechter
-from .telekom import lies_buendel
+from .telekom_liste import lies_listing
 
 if TYPE_CHECKING:
     from playwright.sync_api import Browser
@@ -77,11 +79,14 @@ class Lesart:
     """Wie die Übersicht eines Anbieters gelesen wird (``LESARTEN``): ``saetze``
     macht aus Seitentext und Adresse die Sätze und wirft ``GeraeteAbrufFehler``,
     ``folgelink`` gibt das gelesene ``href`` der Folgeseite oder ``None``, ``bereit``
-    ersetzt das Warten auf ``load`` (``Wache.lade``), ``None`` wartet darauf."""
+    ersetzt das Warten auf ``load`` (``Wache.lade``), ``None`` wartet darauf. Mit
+    ``liste`` kommen die Sätze aus Datenantworten (``klickliste``) und die Seite
+    blättert selbst; ``saetze`` und ``folgelink`` sind dann ``None``."""
 
-    saetze: Callable[[str, str], list[dict]]
-    folgelink: Callable[[str], str | None]
+    saetze: Callable[[str, str], list[dict]] | None
+    folgelink: Callable[[str], str | None] | None
     bereit: str | None = None
+    liste: Datenliste | None = None
 
 
 def lies_uebersicht(
@@ -116,6 +121,8 @@ def lies_uebersicht(
         href = seite.pop("folgelink")
         seiten.append({**seite, "saetze_neu": len(frisch)})
         ziel, fehlt = _folge(seite, href, gelesen, waechter, uhr)
+        if fehlt is None and "liste" in seite:
+            fehlt = seite["liste"]["unvollstaendig"]
     erste = seiten[0]
     return {
         **{k: erste[k] for k in ("adresse", "status", "grund", "stoerung")},
@@ -167,16 +174,22 @@ def _lies_seite(
     lauf = Klicklauf(anbieter=karte.anbieter, adresse=adresse)
     tor = Tor(waechter, uhr, schleuse, lauf)
     sitzung: Sitzung | None = None
+    liste: Listenlauf | None = None
     text = ""
     try:
         if lesart is None:
             raise Abbruch(LAUF_GESTOERT, f"{GRUND_OHNE_LESART} ({karte.anbieter})")
         sitzung = oeffne_sitzung(browser, tor, FENSTER, kennung)
         wache = Wache(sitzung.seite, karte, tor, lauf, ANTWORT_FRIST_MS)
+        if lesart.liste is not None:
+            liste = Listenlauf(sitzung.seite, wache, lesart.liste)
         wache.lade(adresse, bereit=lesart.bereit)
         if tor.umleitung is not None:
             raise Abbruch(LAUF_GESTOERT, f"{GRUND_UMLEITUNG} ({tor.umleitung})")
         wache.pruefe_tor()
+        if liste is not None:
+            liste.bediene()
+            wache.pruefe_tor()
         text = sitzung.seite.content()
     except Abbruch as abbruch:
         lauf.status, lauf.grund = abbruch.status, abbruch.grund
@@ -187,15 +200,12 @@ def _lies_seite(
         schliesse(sitzung)
     if lauf.status == LAUF_GELESEN and tor.stoerung is not None:
         lauf.status, lauf.grund = LAUF_GESTOERT, tor.stoerung
-    saetze: list[dict] = []
-    folge: str | None = None
-    if lesart is not None and lauf.status == LAUF_GELESEN:
-        saetze, folge = _saetze(lesart, lauf, text, adresse), lesart.folgelink(text)
+    saetze, folge = _lies_saetze(lesart, liste, lauf, text, adresse)
     if lauf.status != LAUF_GELESEN:
         log.warning("Klick-Übersicht %s: %s", ohne_geheimnisse(adresse), lauf.grund)
     seite = ohne_geheimnisse(adresse)
     zeitpunkt = uhr().astimezone(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
-    eintrag = {
+    eintrag: dict[str, object] = {
         "adresse": seite,
         "status": lauf.status,
         "grund": lauf.grund,
@@ -204,10 +214,14 @@ def _lies_seite(
         "beleg": {"seite": seite, "zeitpunkt": zeitpunkt},
         "folgelink": folge,
     }
+    if liste is not None:
+        eintrag["liste"] = liste.diagnose
     return eintrag, saetze
 
 
-def _saetze(lesart: Lesart, lauf: Klicklauf, text: str, adresse: str) -> list[dict]:
+def _saetze(
+    lies: Callable[[str, str], list[dict]], lauf: Klicklauf, text: str, adresse: str
+) -> list[dict]:
     """Die Sätze aus ``text``; ohne lesbaren Zustand oder Gerät ist die Übersicht leer.
 
     Leer, nicht gestört: die Seite kam ohne Bot-Schutz, nur unsere Lesart fand nichts
@@ -215,13 +229,45 @@ def _saetze(lesart: Lesart, lauf: Klicklauf, text: str, adresse: str) -> list[di
     09.10.2026). Darum hält das den Anbieter nicht an; die Produktseiten laufen weiter.
     """
     try:
-        saetze = lesart.saetze(text, adresse)
+        saetze = lies(text, adresse)
     except GeraeteAbrufFehler as fehler:
         lauf.status, lauf.grund = LAUF_LEER, str(fehler)
         return []
     if not saetze:
         lauf.status, lauf.grund = LAUF_LEER, GRUND_LEER
     return saetze
+
+
+def _lies_saetze(
+    lesart: Lesart | None,
+    liste: Listenlauf | None,
+    lauf: Klicklauf,
+    text: str,
+    adresse: str,
+) -> tuple[list[dict], str | None]:
+    """Die Sätze einer gelesenen Seite und ihr Folgelink."""
+    if lesart is None or lauf.status != LAUF_GELESEN:
+        return [], None
+    saetze: list[dict] = []
+    if liste is not None:
+        saetze = _listensaetze(liste, lauf, text, adresse)
+    elif lesart.saetze is not None:
+        saetze = _saetze(lesart.saetze, lauf, text, adresse)
+    if lauf.status != LAUF_GELESEN or lesart.folgelink is None:
+        return saetze, None
+    return saetze, lesart.folgelink(text)
+
+
+def _listensaetze(
+    liste: Listenlauf, lauf: Klicklauf, text: str, adresse: str
+) -> list[dict]:
+    """Die Sätze aus den Datenantworten; die Zahlen dazu gehen in die Diagnose."""
+    lesung = liste.liste.saetze(liste.nutzlasten, text, adresse)
+    liste.diagnose.update(lesung.zahlen())
+    if not lesung.saetze:
+        lauf.status = LAUF_LEER
+        lauf.grund = f"{GRUND_LEER} ({lesung.mit_rueckgabedeal} mit Rückgabedeal)"
+    return lesung.saetze
 
 
 def _schluessel(satz: dict) -> tuple:
@@ -261,8 +307,19 @@ class _Folgelink(HTMLParser):
             self.knopf = self._href
 
 
+TELEKOM_LISTE = Datenliste(
+    url_teil="/shop/api/eshop/bff-de/productOfferings/listing",
+    schalter="span.dt_switch.forwardTradeInSwitch",
+    aus='[aria-checked="false"]',
+    weiter_text=WEITER_TEXT,
+    saetze=lies_listing,
+)
+"""Telekom seit Oktober 2026 (Zweig klick-erkundung, Commit b335c6ec): Liste per
+Datenantwort, beim Laden mit „Telekom Rückgabedeal“ (bedienelemente-1.json Element 52),
+Schalter wie in ``vorbereitung`` der Klick-Karte."""
+
 LESARTEN: dict[str, Lesart] = {
-    "Telekom": Lesart(lies_buendel, telekom_folgelink, TELEKOM_BEREIT_JS),
+    "Telekom": Lesart(None, None, TELEKOM_BEREIT_JS, TELEKOM_LISTE),
     "1&1": Lesart(einsundeins_saetze, kein_folgelink, BEREIT_JS),
 }
 """Lesart je Anbieter (``Klickkarte.anbieter``); ohne Eintrag ist die Übersicht

@@ -9,7 +9,9 @@ wahr nur, wenn die letzte gelesene Seite keinen Folgelink trägt. Gelesen wird, 
 Seite 1 ist die gespeicherte echte Übersicht
 ``tests/fixtures/geraete/telekom_kategorie_buendel_magentamobil_s.html.gz``
 (MagentaMobil S, 08.09.2026) mit ihrem eigenen Folgelink, ausgeliefert auf 127.0.0.1;
-fremde Hosts sperrt robots.txt, es geht nichts ins Netz.
+fremde Hosts sperrt robots.txt, es geht nichts ins Netz. Gelesen wird mit der Lesart
+des serverseitigen Zustands (``ZUSTAND``); die Telekom liest seit Oktober 2026 die
+Datenantwort und blättert in der Seite (``test_klick_uebersicht_liste``).
 """
 
 from __future__ import annotations
@@ -34,10 +36,14 @@ from telco_radar.collect.geraete.klickuebersicht import (
     GRUND_OHNE_LESART,
     HOECHSTE_SEITEN,
     LESARTEN,
+    TELEKOM_BEREIT_JS,
+    Lesart,
     lies_uebersicht,
+    telekom_folgelink,
 )
 from telco_radar.collect.geraete.klickziele import TAGESDATEI, lade_ziele
 from telco_radar.collect.geraete.robots import RobotsWaechter
+from telco_radar.collect.geraete.telekom import lies_buendel
 
 FIXTURE = (
     WURZEL / "tests/fixtures/geraete/telekom_kategorie_buendel_magentamobil_s.html.gz"
@@ -54,6 +60,13 @@ OFFEN = "User-agent: *\nDisallow:\n"
 ZU = "User-agent: *\nDisallow: /\n"
 TARIFE = ("MF_17791", "MF_17779", "MF_17785", "MF_17797", "MF_17803")
 VERZUG_S = 20.0
+ZUSTAND = Lesart(lies_buendel, telekom_folgelink, TELEKOM_BEREIT_JS)
+"""Telekom bis September 2026: ``window.__INITIAL_STATE__.productList`` im Dokument."""
+
+
+@pytest.fixture(autouse=True)
+def zustand(monkeypatch):
+    monkeypatch.setitem(LESARTEN, "Telekom", ZUSTAND)
 
 
 @pytest.fixture(scope="module")

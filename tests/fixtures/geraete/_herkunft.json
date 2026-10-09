@@ -813,6 +813,19 @@
       "gzip": false,
       "bytes_abgelegt": 20463,
       "hinweis": "AUSZUG, nicht byteidentisch: die genannten Eintraege von Inventar, Gruppen, Preis-Kandidaten und Index mit unveraenderten Werten, Schluessel = Nummer im Original. Beleg fuer Weiter-Knopf, Kacheln, Textmuster und Laufzeitwerte der Klick-Karte config/klickkarten/1und1.yaml (tests/test_klickkarte_1und1.py)."
+    },
+    {
+      "datei": "telekom_listing_rueckgabedeal_20261009.json",
+      "url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/listing",
+      "quelle": "Zweig klick-erkundung, Commit b335c6ec, erkundung/telekom/2026-10-09/mitschnitt-1.json, antworten[4] (Anfrage-Nummer 62, POST, xhr, vom Browser der Seite https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17791 beim Laden ausgeloest; Klick-Erkundung 09.10.2026)",
+      "abgerufen_am": "2026-10-09",
+      "http_status": 200,
+      "content_type": "application/json;charset=UTF-8",
+      "bytes_roh": 63715,
+      "sha256_roh": "2b6860ecc9cff24bc5fb26b5fd4cb04a152f17d1cea7193a07b80453b5b9c03d",
+      "gzip": false,
+      "bytes_abgelegt": 63715,
+      "hinweis": "Feld koerper des Mitschnitteintrags unveraendert (gekuerzt false); schon im Mitschnitt von klickspur.schwaerze_text geschwaerzt ('[Cookie entfernt]', 'ENTFERNT'), darum 63715 statt groesse 63927 Byte und nicht byteidentisch mit der Leitung; sha256_roh gilt fuer den abgelegten Text. Preise MIT 'Telekom Rueckgabedeal' (Schalter span.dt_switch.forwardTradeInSwitch aria-checked=true, bedienelemente-1.json Element 52): 35 Raten plus Restzahlung buyBackPrice. Beleg fuer collect/geraete/telekom_liste.py (tests/test_klick_uebersicht_liste.py)."
     }
   ]
 }

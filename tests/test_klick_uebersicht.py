@@ -7,7 +7,9 @@ dasselbe Tor und dieselbe Wache wie eine Produktseite, und gibt ``page.content()
 ``klick``. Die Übersicht ist die gespeicherte echte Antwort
 ``tests/fixtures/geraete/telekom_kategorie_buendel_magentamobil_s.html.gz``
 (MagentaMobil S, 08.09.2026), ausgeliefert von einem lokalen Server auf 127.0.0.1;
-fremde Hosts sperrt robots.txt im Test, es geht nichts ins Netz.
+fremde Hosts sperrt robots.txt im Test, es geht nichts ins Netz. Seit Oktober 2026
+liest die Telekom-Lesart die Datenantwort (``test_klick_uebersicht_liste``); die
+Browsertests hier lesen mit der Lesart des serverseitigen Zustands (``ZUSTAND``).
 """
 
 from __future__ import annotations
@@ -40,13 +42,20 @@ from telco_radar.collect.geraete.klicktageslauf import (
     fahre,
 )
 from telco_radar.collect.geraete.klicktor import Hostschleuse
-from telco_radar.collect.geraete.klickuebersicht import lies_uebersicht
+from telco_radar.collect.geraete.klickuebersicht import (
+    LESARTEN,
+    TELEKOM_BEREIT_JS,
+    Lesart,
+    lies_uebersicht,
+    telekom_folgelink,
+)
 from telco_radar.collect.geraete.klickziele import (
     TAGESDATEI,
     ErkundungszielFehler,
     lade_ziele,
 )
 from telco_radar.collect.geraete.robots import RobotsWaechter
+from telco_radar.collect.geraete.telekom import lies_buendel
 from telco_radar.geraete_config import lade_katalog
 
 FIXTURE = (
@@ -58,6 +67,13 @@ HEUTE = "2026-10-09"
 OFFEN = "User-agent: *\nDisallow:\n"
 ZU = "User-agent: *\nDisallow: /\n"
 UEBERSICHT_M = "https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17791"
+ZUSTAND = Lesart(lies_buendel, telekom_folgelink, TELEKOM_BEREIT_JS)
+"""Telekom bis September 2026: ``window.__INITIAL_STATE__.productList`` im Dokument."""
+
+
+@pytest.fixture
+def zustand(monkeypatch):
+    monkeypatch.setitem(LESARTEN, "Telekom", ZUSTAND)
 
 
 @pytest.fixture(scope="module")
@@ -95,7 +111,9 @@ def _fixture_antwort(pfad: str) -> Antwort:
     return html("", 404)
 
 
-def test_uebersicht_im_browser_ergibt_rohsatz_pixel_11_pro(chromium, karte, katalog):
+def test_uebersicht_im_browser_ergibt_rohsatz_pixel_11_pro(
+    chromium, karte, katalog, zustand
+):
     with klickserver(_fixture_antwort) as server:
         ergebnis = _lies(chromium, karte, server.adresse(PFAD))
     assert ergebnis["status"] == LAUF_GELESEN, ergebnis["grund"]
@@ -131,7 +149,7 @@ def test_uebersicht_im_browser_ergibt_rohsatz_pixel_11_pro(chromium, karte, kata
     assert satz["sku_id"].startswith("google-pixel-11-pro")
 
 
-def test_seite_ohne_zustand_ist_leer_ohne_saetze(chromium, karte):
+def test_seite_ohne_zustand_ist_leer_ohne_saetze(chromium, karte, zustand):
     with klickserver(lambda p: html("<html><body>Kein Zustand</body></html>")) as s:
         ergebnis = _lies(chromium, karte, s.adresse(PFAD))
     assert ergebnis["status"] == "leer"
