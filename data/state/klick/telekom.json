@@ -1,10 +1,10 @@
 {
  "anbieter": "telekom",
  "datum": "2026-10-09",
- "dauer_sekunden": 67.0,
+ "dauer_sekunden": 701.9,
  "format": 1,
  "frischegrenze_tage": 3,
- "grund": "https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17791: Übersicht ohne Gerät",
+ "grund": "https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17785: Abruf gestört (HTTP 202 auf https://www.telekom.de/resources/ag2/legalnote-replacer/build/p-befae207.js)",
  "karte": "telekom.yaml",
  "laufstatus": "gestoert",
  "lesefrist_tage": 1,
@@ -13,7 +13,7 @@
   {
    "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false",
    "geraet": "apple-iphone-17-pro",
-   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Übersicht ohne Gerät",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 202 auf https://www.telekom.de/resources/ag2/legalnote-replacer/build/p-befae207.js)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -23,7 +23,7 @@
   {
    "adresse": "https://www.telekom.de/shop/geraet/google/google-pixel-11/frost-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false",
    "geraet": "google-pixel-11",
-   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Übersicht ohne Gerät",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 202 auf https://www.telekom.de/resources/ag2/legalnote-replacer/build/p-befae207.js)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -33,7 +33,7 @@
   {
    "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17779&categoryId=smartphones&forwardTradeInApplied=false",
    "geraet": "apple-iphone-17-pro",
-   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Übersicht ohne Gerät",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 202 auf https://www.telekom.de/resources/ag2/legalnote-replacer/build/p-befae207.js)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -43,7 +43,7 @@
   {
    "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17785&categoryId=smartphones&forwardTradeInApplied=false",
    "geraet": "apple-iphone-17-pro",
-   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Übersicht ohne Gerät",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 202 auf https://www.telekom.de/resources/ag2/legalnote-replacer/build/p-befae207.js)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -53,7 +53,7 @@
   {
    "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17797&categoryId=smartphones&forwardTradeInApplied=false",
    "geraet": "apple-iphone-17-pro",
-   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Übersicht ohne Gerät",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 202 auf https://www.telekom.de/resources/ag2/legalnote-replacer/build/p-befae207.js)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -63,7 +63,7 @@
   {
    "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17803&categoryId=smartphones&forwardTradeInApplied=false",
    "geraet": "apple-iphone-17-pro",
-   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Übersicht ohne Gerät",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 202 auf https://www.telekom.de/resources/ag2/legalnote-replacer/build/p-befae207.js)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -73,7 +73,7 @@
   {
    "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17/lavendel-256-gb?tariffId=MF_17791&categoryId=smartphones",
    "geraet": "apple-iphone-17",
-   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Übersicht ohne Gerät",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 202 auf https://www.telekom.de/resources/ag2/legalnote-replacer/build/p-befae207.js)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -87,9 +87,9 @@
    "adresse": "https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17791",
    "beleg": {
     "seite": "https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17791",
-    "zeitpunkt": "2026-10-09T11:30:15Z"
+    "zeitpunkt": "2026-10-09T13:28:45Z"
    },
-   "grund": "Übersicht ohne Gerät",
+   "grund": "Rückgabedeal-Schalter lässt sich nicht ausschalten: Locator.click: Timeout 15000ms exceeded.",
    "http_status": 200,
    "saetze": [],
    "seiten": [
@@ -97,10 +97,90 @@
      "adresse": "https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17791",
      "beleg": {
       "seite": "https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17791",
-      "zeitpunkt": "2026-10-09T11:30:15Z"
+      "zeitpunkt": "2026-10-09T13:28:45Z"
      },
-     "grund": "Übersicht ohne Gerät",
+     "grund": "Rückgabedeal-Schalter lässt sich nicht ausschalten: Locator.click: Timeout 15000ms exceeded.",
      "http_status": 200,
+     "liste": {
+      "antworten": 0,
+      "antworten_beim_laden": 1,
+      "schalter_nachher": null,
+      "schalter_vorher": "true",
+      "unvollstaendig": null,
+      "weiter_klicks": 0
+     },
+     "saetze_neu": 0,
+     "status": "leer",
+     "stoerung": null
+    }
+   ],
+   "status": "leer",
+   "stoerung": null,
+   "unvollstaendig": "leer: Rückgabedeal-Schalter lässt sich nicht ausschalten: Locator.click: Timeout 15000ms exceeded.",
+   "vollstaendig": false
+  },
+  {
+   "adresse": "https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17779",
+   "beleg": {
+    "seite": "https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17779",
+    "zeitpunkt": "2026-10-09T13:33:21Z"
+   },
+   "grund": "Rückgabedeal-Schalter lässt sich nicht ausschalten: Locator.click: Timeout 15000ms exceeded.",
+   "http_status": 200,
+   "saetze": [],
+   "seiten": [
+    {
+     "adresse": "https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17779",
+     "beleg": {
+      "seite": "https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17779",
+      "zeitpunkt": "2026-10-09T13:33:21Z"
+     },
+     "grund": "Rückgabedeal-Schalter lässt sich nicht ausschalten: Locator.click: Timeout 15000ms exceeded.",
+     "http_status": 200,
+     "liste": {
+      "antworten": 0,
+      "antworten_beim_laden": 1,
+      "schalter_nachher": null,
+      "schalter_vorher": "true",
+      "unvollstaendig": null,
+      "weiter_klicks": 0
+     },
+     "saetze_neu": 0,
+     "status": "leer",
+     "stoerung": null
+    }
+   ],
+   "status": "leer",
+   "stoerung": null,
+   "unvollstaendig": "leer: Rückgabedeal-Schalter lässt sich nicht ausschalten: Locator.click: Timeout 15000ms exceeded.",
+   "vollstaendig": false
+  },
+  {
+   "adresse": "https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17785",
+   "beleg": {
+    "seite": "https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17785",
+    "zeitpunkt": "2026-10-09T13:36:46Z"
+   },
+   "grund": "Abruf gestört (HTTP 202 auf https://www.telekom.de/resources/ag2/legalnote-replacer/build/p-befae207.js)",
+   "http_status": 200,
+   "saetze": [],
+   "seiten": [
+    {
+     "adresse": "https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17785",
+     "beleg": {
+      "seite": "https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17785",
+      "zeitpunkt": "2026-10-09T13:36:46Z"
+     },
+     "grund": "Abruf gestört (HTTP 202 auf https://www.telekom.de/resources/ag2/legalnote-replacer/build/p-befae207.js)",
+     "http_status": 200,
+     "liste": {
+      "antworten": 0,
+      "antworten_beim_laden": 0,
+      "schalter_nachher": null,
+      "schalter_vorher": null,
+      "unvollstaendig": null,
+      "weiter_klicks": 0
+     },
      "saetze_neu": 0,
      "status": "gestoert",
      "stoerung": null
@@ -108,38 +188,24 @@
    ],
    "status": "gestoert",
    "stoerung": null,
-   "unvollstaendig": "gestoert: Übersicht ohne Gerät",
-   "vollstaendig": false
-  },
-  {
-   "adresse": "https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17779",
-   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Übersicht ohne Gerät",
-   "saetze": [],
-   "status": "nicht_besucht",
-   "vollstaendig": false
-  },
-  {
-   "adresse": "https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17785",
-   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Übersicht ohne Gerät",
-   "saetze": [],
-   "status": "nicht_besucht",
+   "unvollstaendig": "gestoert: Abruf gestört (HTTP 202 auf https://www.telekom.de/resources/ag2/legalnote-replacer/build/p-befae207.js)",
    "vollstaendig": false
   },
   {
    "adresse": "https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17797",
-   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Übersicht ohne Gerät",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 202 auf https://www.telekom.de/resources/ag2/legalnote-replacer/build/p-befae207.js)",
    "saetze": [],
    "status": "nicht_besucht",
    "vollstaendig": false
   },
   {
    "adresse": "https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17803",
-   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Übersicht ohne Gerät",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 202 auf https://www.telekom.de/resources/ag2/legalnote-replacer/build/p-befae207.js)",
    "saetze": [],
    "status": "nicht_besucht",
    "vollstaendig": false
   }
  ],
  "vertragsform": "tarif_plus_ratenkauf",
- "zeitbudget_sekunden": 3981
+ "zeitbudget_sekunden": 10283
 }
