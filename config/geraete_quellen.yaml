@@ -744,6 +744,32 @@ anbieter:
       - url: https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-xl-ovl&chosenNet=1u1&lightbox=true&bk=false
         label: Tarifdetails Unlimited XL
         kind: klick
+      # Geräteraster je Tarif (kind klick, Pitch 2 Schnitt 4): je Gerät eine Kachel mit
+      # Monatspreis inklusive Tarif (36 Monate), gelesen von `klickraster`. Adressen
+      # wörtlich als targetpage der Tarifübersichten vom 29.09.2026 (Fixtures
+      # einsundeins_tarifuebersicht_*); der Gerätelauf ruft sie seit 29.09.2026
+      # robots-geprüft ab (`einsundeins.ergaenze_tarifstufen`).
+      - url: https://mobile.1und1.de/smartphones-all-net-flat-s
+        label: Geräteraster All-Net-Flat S
+        kind: klick
+      - url: https://mobile.1und1.de/smartphones-all-net-flat-m
+        label: Geräteraster All-Net-Flat M
+        kind: klick
+      - url: https://mobile.1und1.de/smartphones-all-net-flat-l
+        label: Geräteraster All-Net-Flat L
+        kind: klick
+      - url: https://mobile.1und1.de/smartphones-unlimited-s
+        label: Geräteraster Unlimited S
+        kind: klick
+      - url: https://mobile.1und1.de/smartphones-unlimited-m
+        label: Geräteraster Unlimited M
+        kind: klick
+      - url: https://mobile.1und1.de/smartphones-unlimited-l
+        label: Geräteraster Unlimited L
+        kind: klick
+      - url: https://mobile.1und1.de/smartphones-unlimited-xl
+        label: Geräteraster Unlimited XL
+        kind: klick
 
   # ===================================================== DISCOUNT & ZWEITMARKEN
 

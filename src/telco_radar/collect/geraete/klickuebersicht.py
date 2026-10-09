@@ -6,7 +6,8 @@ mit Anzahlung, Rate, Tarifpreis und Produktlink. Wie sie zu lesen ist, sagt die
 dem Seitentext, Folgelink, Bereitschaft der Seite. Telekom: ``telekom.lies_buendel``
 auf ``window.__INITIAL_STATE__.productList``, Folgelink ``<link rel="next">``, sonst
 der Link ``WEITER_TEXT``; bereit, sobald der Zustand im Hauptdokument steht, ohne auf
-``load`` zu warten. ``lies_uebersicht`` öffnet jede Seite wie eine Produktseite:
+``load`` zu warten. 1&1: Tarifdetail-Seiten und Geräteraster (``klickraster``), ohne
+Folgeseite. ``lies_uebersicht`` öffnet jede Seite wie eine Produktseite:
 eigener Kontext (``klickkontext.oeffne_sitzung``), jede Anfrage am ``klicktor.Tor``
 (robots.txt samt Crawl-delay, Abstand je Host, Sperrerkennung), Laden und
 JavaScript-Prüfung über ``klickwache.Wache.lade``. Geklickt wird nichts; gelesen wird
@@ -38,11 +39,12 @@ from urllib.parse import urljoin, urlsplit
 from playwright.sync_api import Error as PlaywrightFehler
 
 from .basis import GeraeteAbrufFehler
-from .klickanschluss import anschluss_saetze, kein_folgelink
+from .klickanschluss import kein_folgelink
 from .klickcrawler import ANTWORT_FRIST_MS, FENSTER
 from .klickergebnis import LAUF_LEER
 from .klickkontext import Sitzung, oeffne_sitzung, schliesse
 from .klicklauf import LAUF_GELESEN, LAUF_GESTOERT, Klicklauf
+from .klickraster import BEREIT_JS, einsundeins_saetze
 from .klickspur import ohne_geheimnisse
 from .klicktor import Schleuse, Tor, kurz
 from .klickwache import Abbruch, Wache
@@ -261,7 +263,7 @@ class _Folgelink(HTMLParser):
 
 LESARTEN: dict[str, Lesart] = {
     "Telekom": Lesart(lies_buendel, telekom_folgelink, TELEKOM_BEREIT_JS),
-    "1&1": Lesart(anschluss_saetze, kein_folgelink),
+    "1&1": Lesart(einsundeins_saetze, kein_folgelink, BEREIT_JS),
 }
 """Lesart je Anbieter (``Klickkarte.anbieter``); ohne Eintrag ist die Übersicht
 gestört mit ``GRUND_OHNE_LESART``."""

@@ -81,6 +81,18 @@ anbieter:
       - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-m-mvl&chosenNet=1u1&lightbox=true&bk=false
       - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-l-mvl&chosenNet=1u1&lightbox=true&bk=false
       - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-xl-ovl&chosenNet=1u1&lightbox=true&bk=false
+      # Danach die sieben Geräteraster (Pitch 2, Schnitt 4; `klickraster`): je Tarif
+      # alle Geräte an der vorausgewählten Speichergröße. Nach den Detailseiten: deren
+      # Anschluss tragen seit Schnitt 3 auch die Produktseiten-Sätze, er bleibt vorn. Das
+      # Raster All-Net-Flat S zuerst, denn ohne es ist keine Größe gemessen und kein
+      # anderes Raster wird Rohsatz. Seine Sätze selbst werden keine Rohsätze.
+      - https://mobile.1und1.de/smartphones-all-net-flat-s
+      - https://mobile.1und1.de/smartphones-all-net-flat-m
+      - https://mobile.1und1.de/smartphones-all-net-flat-l
+      - https://mobile.1und1.de/smartphones-unlimited-s
+      - https://mobile.1und1.de/smartphones-unlimited-m
+      - https://mobile.1und1.de/smartphones-unlimited-l
+      - https://mobile.1und1.de/smartphones-unlimited-xl
     seiten:
       - geraet: apple-iphone-17-pro
         speicher_gb: 256
