@@ -10,7 +10,9 @@ Ausschalten des Rückgabedeals, „Weitere Geräte anzeigen“ in der Seite, gel
 serverseitigen Übersicht bis September 2026. 1&1: Tarifdetail-Seiten und Geräteraster
 (``klickraster``), ohne Folgeseite. ``lies_uebersicht`` öffnet jede Seite wie
 eine Produktseite: eigener Kontext (``klickkontext.oeffne_sitzung``), jede Anfrage am
-``klicktor.Tor`` (robots.txt samt Crawl-delay, Abstand je Host, Sperrerkennung), Laden
+``klicktor.Tor`` (robots.txt samt Crawl-delay, Abstand je Host, Sperrerkennung, mit
+der Beobachtung ``klickseite.beobachte``: eine JavaScript-Prüfung auf einem Nebenabruf
+geht wie auf Produktseiten in den Browser, Klick-Tageslauf 09.10.2026), Laden
 und JavaScript-Prüfung über ``klickwache.Wache.lade``; gelesen wird
 ``page.content()``. Eine Seite ohne Gerät ist ``leer``; mit Bot-Schutz, Umleitung oder
 ohne Lesart ist sie ``gestoert`` mit Grund und trägt keinen Satz; robots.txt-Sperre
@@ -47,6 +49,7 @@ from .klickkontext import Sitzung, oeffne_sitzung, schliesse
 from .klicklauf import LAUF_GELESEN, LAUF_GESTOERT, Klicklauf
 from .klickliste import Datenliste, Listenlauf
 from .klickraster import BEREIT_JS, einsundeins_saetze
+from .klickseite import beobachte
 from .klickspur import ohne_geheimnisse
 from .klicktor import Schleuse, Tor, kurz
 from .klickwache import Abbruch, Wache
@@ -173,6 +176,10 @@ def _lies_seite(
     """Eine Seite der Übersicht: ihr Eintrag unter ``seiten`` und ihre Sätze."""
     lauf = Klicklauf(anbieter=karte.anbieter, adresse=adresse)
     tor = Tor(waechter, uhr, schleuse, lauf)
+    cookies: set[str] = set()
+    tor.beobachter = lambda anfrage, antwort: beobachte(
+        anfrage, antwort, adresse, cookies
+    )
     sitzung: Sitzung | None = None
     liste: Listenlauf | None = None
     text = ""

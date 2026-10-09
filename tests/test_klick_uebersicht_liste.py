@@ -150,7 +150,7 @@ weiter.addEventListener('click', () => {
 </script></body></html>""".replace("IPHONE", IPHONE_17).replace("LISTING", LISTING)
 
 
-def _seiten(echt: dict) -> dict[str, dict]:
+def listenseiten(echt: dict) -> dict[str, dict]:
     """Rückgabedeal beim Laden; ohne Deal zwei Seiten zu je sieben Geräten (Ableitung,
     auf Seite 2 iPhone 17e 1,00 + 36 × 17,20 = 620,20)."""
     ohne = _ohne_rueckgabedeal(echt)
@@ -165,7 +165,7 @@ def _seiten(echt: dict) -> dict[str, dict]:
     }
 
 
-def _antworte(seite: str, listen: dict[str, dict]):
+def antworte_liste(seite: str, listen: dict[str, dict]):
     def antworte(pfad: str) -> Antwort:
         if pfad == PFAD:
             return html(seite)
@@ -178,7 +178,7 @@ def _antworte(seite: str, listen: dict[str, dict]):
     return antworte
 
 
-def _lies(chromium, karte, adresse: str) -> dict:
+def lies_testseite(chromium, karte, adresse: str) -> dict:
     def robots(url: str) -> tuple[int, str]:
         return 200, OFFEN if "127.0.0.1" in url else ZU
 
@@ -192,8 +192,8 @@ def _lies(chromium, karte, adresse: str) -> dict:
 def test_browser_liest_nur_antworten_nach_dem_ausschalten(
     chromium, karte, katalog, echt
 ):
-    with klickserver(_antworte(SEITE, _seiten(echt))) as server:
-        ergebnis = _lies(chromium, karte, server.adresse(PFAD))
+    with klickserver(antworte_liste(SEITE, listenseiten(echt))) as server:
+        ergebnis = lies_testseite(chromium, karte, server.adresse(PFAD))
         listings = server.mit(LISTING)
     assert ergebnis["status"] == LAUF_GELESEN, ergebnis["grund"]
     assert ergebnis["vollstaendig"] is True, ergebnis["unvollstaendig"]
@@ -208,6 +208,7 @@ def test_browser_liest_nur_antworten_nach_dem_ausschalten(
     assert seite["liste"] == {
         "result_count": 14,
         "antworten_beim_laden": 1,
+        "einwilligung": None,
         "antworten": 2,
         "geraete": 14,
         "mit_rueckgabedeal": 0,
@@ -229,8 +230,8 @@ def test_ohne_schalter_leer_mit_grund_und_ohne_rueckgabedeal_preise(
     chromium, karte, echt
 ):
     ohne = SEITE.split("<span", 1)[0] + SEITE.split("</span>", 1)[1]
-    with klickserver(_antworte(ohne, _seiten(echt))) as server:
-        ergebnis = _lies(chromium, karte, server.adresse(PFAD))
+    with klickserver(antworte_liste(ohne, listenseiten(echt))) as server:
+        ergebnis = lies_testseite(chromium, karte, server.adresse(PFAD))
     assert ergebnis["status"] == LAUF_LEER
     assert ergebnis["grund"] == GRUND_OHNE_SCHALTER
     assert ergebnis["saetze"] == []

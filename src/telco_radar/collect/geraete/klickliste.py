@@ -3,7 +3,10 @@
 Rendert ein Anbieter die Übersicht clientseitig (Telekom seit Oktober 2026), stehen
 die Geräte in Datenantworten, die der Browser der Seite selbst anfragt. ``Listenlauf``
 schneidet sie mit (``klickmitschnitt.Mitschnitt``, gebunden vor dem Laden), wartet
-die erste ab, schaltet den Schalter der ``Datenliste`` aus (klicken, bis er auf
+die erste ab, lehnt eine Einwilligungsabfrage ab wie der Klick-Crawler (hinter ihr
+nimmt Telekom keinen Klick an, Klick-Tageslauf 09.10.2026: Klick auf den Schalter nach
+15 s abgelaufen; ``klickbedienung.lehne_einwilligung_ab``), schaltet den Schalter der
+``Datenliste`` aus (klicken, bis er auf
 ``aus`` passt; fehlt er, ist die Übersicht leer mit ``GRUND_OHNE_SCHALTER``) und
 wartet die neue Antwort ab. Dann klickt er „Weitere Geräte anzeigen“ im selben
 Seitenzustand, bis die letzte Antwort ``(pageNumber+1)*itemsPerPage >= resultCount``
@@ -24,6 +27,7 @@ from typing import TYPE_CHECKING
 
 from playwright.sync_api import Error as PlaywrightFehler
 
+from .klickbedienung import lehne_einwilligung_ab
 from .klickergebnis import LAUF_LEER
 from .klicklauf import LAUF_GESTOERT, antworttext, bot_schutz
 from .klickmitschnitt import Mitschnitt
@@ -69,6 +73,7 @@ class Listenlauf:
         self.klicks = 0
         self.diagnose: dict[str, object] = {
             "antworten_beim_laden": 0,
+            "einwilligung": None,
             "antworten": 0,
             "schalter_vorher": None,
             "schalter_nachher": None,
@@ -84,6 +89,7 @@ class Listenlauf:
         schalter = self.seite.locator(self.liste.schalter).first
         if not self.wache.warte(lambda: schalter.count() > 0):
             raise Abbruch(LAUF_LEER, GRUND_OHNE_SCHALTER)
+        d["einwilligung"] = lehne_einwilligung_ab(self.seite, self.wache)
         d["schalter_vorher"] = self._zustand(schalter)
         marke = 0
         if not self._aus(schalter):

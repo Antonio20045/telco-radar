@@ -73,20 +73,8 @@ class Bedienung:
             raise Abbruch(LAUF_GESTOERT, grund)
 
     def lehne_einwilligung_ab(self) -> None:
-        """Klickt den sichtbaren Ablehnen-Knopf einer Einwilligungsabfrage; ohne ihn
-        nichts. Danach wartet sie auf Ruhe."""
-        knopf = einwilligungsknopf(self.seite)
-        if knopf is None:
-            return
-        self.wache.warte_offen()
-        marke = self.wache.marke()
-        try:
-            knopf.click(timeout=self.wache.frist_ms)
-        except PlaywrightFehler as fehler:
-            grund = f"Einwilligung nicht abgelehnt: {kurz(fehler)}"
-            raise Abbruch(LAUF_GESTOERT, grund) from fehler
-        self.wache.nimm_angefragte(marke)
-        self.wache.warte_ruhe()
+        """Lehnt eine sichtbare Einwilligungsabfrage ab (``lehne_einwilligung_ab``)."""
+        lehne_einwilligung_ab(self.seite, self.wache)
 
     def bereite_vor(self) -> bool:
         """Stellt jeden Zustand der Karte her; wahr, wenn dafür geklickt wurde."""
@@ -117,6 +105,25 @@ class Bedienung:
             grund = f"Vorbereitung: {schritt.klick} erreicht „{schritt.bis}“ nicht"
             raise Abbruch(LAUF_GESTOERT, grund)
         self.wache.nimm_angefragte(marke)
+
+
+def lehne_einwilligung_ab(seite: Page, wache: Wache) -> str | None:
+    """Klickt den sichtbaren Ablehnen-Knopf einer Einwilligungsabfrage und wartet
+    auf Ruhe; ohne ihn nichts. Der Text des geklickten Knopfs, sonst ``None``."""
+    knopf = einwilligungsknopf(seite)
+    if knopf is None:
+        return None
+    text = knopf.inner_text().strip()
+    wache.warte_offen()
+    marke = wache.marke()
+    try:
+        knopf.click(timeout=wache.frist_ms)
+    except PlaywrightFehler as fehler:
+        grund = f"Einwilligung nicht abgelehnt: {kurz(fehler)}"
+        raise Abbruch(LAUF_GESTOERT, grund) from fehler
+    wache.nimm_angefragte(marke)
+    wache.warte_ruhe()
+    return text
 
 
 def _passt(element: Locator, css: str) -> bool:
