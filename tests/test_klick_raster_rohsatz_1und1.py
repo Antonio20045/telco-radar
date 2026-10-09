@@ -315,3 +315,42 @@ def test_rastersatz_ersetzt_adaptersatz_all_net_flat_m(
     )
     assert "herleitung" not in satz
     assert zug.bilanz["ersetzt"] == 1 and zug.bilanz["gegenprobe"]["gleich"] == 1
+
+
+def _ganz(eintrag: dict, erkannt=None) -> dict:
+    saetze = eintrag["saetze"] if erkannt is None else eintrag["saetze"][:erkannt]
+    return {**eintrag, "saetze": saetze, "vollstaendig": True}
+
+
+def test_rastergeraet_ist_angeboten(katalog):
+    voll = _ganz(raster(RASTER[0]))
+    bekannt = [s for s in voll["saetze"] if "iPhone 18 Pro" in s["titel"]]
+    daten = klickdatei([], {**voll, "saetze": bekannt})
+
+    aus = ausbeute(daten, katalog)
+
+    assert "apple-iphone-18-pro" in aus.angeboten
+    assert aus.nicht_im_angebot is not None
+    assert "apple-iphone-18-pro" not in aus.nicht_im_angebot
+    assert "apple-iphone-17-pro" in aus.nicht_im_angebot
+
+
+def test_unbekanntes_rastergeraet_laesst_angebot_offen(katalog):
+    daten = klickdatei([], _ganz(raster(RASTER[0])), _ganz(raster(RASTER[1])))
+
+    aus = ausbeute(daten, katalog)
+
+    assert "apple-iphone-18-pro" in aus.angeboten
+    assert aus.nicht_im_angebot is None
+
+
+def test_anschlussseite_zaehlt_nicht_als_geraet(katalog):
+    voll = _ganz(raster(RASTER[0]))
+    bekannt = [s for s in voll["saetze"] if "iPhone 18 Pro" in s["titel"]]
+    detail = _ganz(details(DETAILS_S, "1&1 All-Net-Flat S"))
+    daten = klickdatei([], detail, {**voll, "saetze": bekannt})
+
+    aus = ausbeute(daten, katalog)
+
+    assert aus.nicht_im_angebot is not None
+    assert "apple-iphone-18-pro" not in aus.nicht_im_angebot

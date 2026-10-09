@@ -157,21 +157,30 @@ def ausbeute(daten: dict, katalog: Katalog) -> Klickausbeute:
         if uebersicht.get("status") not in GELESENE_SEITEN:
             ergebnis.luecken[LUECKE_SEITE] += 1
             continue
-        for roh in uebersicht.get("saetze") or []:
-            if roh.get("art") == ART_ANSCHLUSS:
-                continue
-            geraet = erkenne_geraet(str(roh.get("titel") or ""), katalog)
-            ganz = ganz and geraet is not None
-            ergebnis.angeboten.update([geraet.device_id] if geraet else [])
-            if roh.get("art") == ART_RASTER:
-                continue
-            _nimm(ergebnis, uebersicht_rohsatz(roh, uebersicht, daten, katalog))
+        ganz = _nimm_uebersicht(ergebnis, uebersicht, daten, katalog) and ganz
     for roh in raster_roh(daten, list(ergebnis.rohsaetze), katalog):
         _nimm(ergebnis, uebersicht_rohsatz(roh, {}, daten, katalog))
     if ganz:
         alle = (g.device_id for g in katalog.geraete)
         ergebnis.nicht_im_angebot = sorted(set(alle) - ergebnis.angeboten)
     return ergebnis
+
+
+def _nimm_uebersicht(
+    ergebnis: Klickausbeute, uebersicht: dict, daten: dict, katalog: Katalog
+) -> bool:
+    """Rohsätze und angebotene Geräte einer gelesenen Übersicht; wahr, wenn jeder
+    Gerätetitel im Katalog steht. Rastersätze zählen nur als angeboten."""
+    erkannt = True
+    for roh in uebersicht.get("saetze") or []:
+        if roh.get("art") == ART_ANSCHLUSS:
+            continue
+        geraet = erkenne_geraet(str(roh.get("titel") or ""), katalog)
+        erkannt = erkannt and geraet is not None
+        ergebnis.angeboten.update([geraet.device_id] if geraet else [])
+        if roh.get("art") != ART_RASTER:
+            _nimm(ergebnis, uebersicht_rohsatz(roh, uebersicht, daten, katalog))
+    return erkannt
 
 
 def _nimm(ergebnis: Klickausbeute, satz: dict | str) -> None:
