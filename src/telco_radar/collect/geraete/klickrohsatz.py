@@ -39,6 +39,10 @@ hält jedes Gerät, das mit irgendeinem Speicher in einer Übersicht steht.
 ``nicht_im_angebot`` nennt die Katalog-Geräte außerhalb davon nur, wenn alle
 Übersichten der Datei gelesen und vollständig sind und kein Titel unbekannt blieb;
 sonst ist es ``None`` (unbekannt, nie leer).
+
+Ein Satz einer 1&1-Tarifdetail-Seite (``art`` ``anschluss``) ist kein Rohsatz: sein
+Anschlusspreis kommt auf jeden Produktseiten-Satz mit demselben Tarif-Slug, nur wenn
+die Seite gelesen ist; sonst bleibt ``anschlusspreis`` ``None``.
 """
 
 from __future__ import annotations
@@ -49,6 +53,7 @@ from collections import Counter
 from dataclasses import dataclass, field
 
 from ...geraete_model import Katalog, erkenne_geraet, normalisiere, sku_id
+from .klickanschluss import ART_ANSCHLUSS
 from .klickcrawler import GRUND_NICHT_BESUCHT
 from .klickergebnis import GELESENE_SEITEN
 from .klickkarte import EIN_VERTRAG
@@ -125,6 +130,7 @@ def speicher_gb(text: object) -> int | None:
 def ausbeute(daten: dict, katalog: Katalog) -> Klickausbeute:
     """Alle Rohsätze und Lücken einer Ergebnisdatei."""
     ergebnis = Klickausbeute(anbieter=str(daten.get("name") or ""))
+    anschluss = _anschluesse(daten)
     for seite in daten.get("seiten") or []:
         if seite.get("status") not in GELESENE_SEITEN:
             ergebnis.luecken[LUECKE_SEITE] += 1
@@ -132,6 +138,8 @@ def ausbeute(daten: dict, katalog: Katalog) -> Klickausbeute:
         for kombination in seite.get("kombinationen") or []:
             satz = rohsatz(kombination, seite, daten, katalog)
             if isinstance(satz, dict):
+                if satz["anschlusspreis"] is None:
+                    satz["anschlusspreis"] = anschluss.get(satz["tarif_name"])
                 ergebnis.rohsaetze.append(satz)
                 continue
             ergebnis.luecken[satz] += 1
@@ -147,6 +155,8 @@ def ausbeute(daten: dict, katalog: Katalog) -> Klickausbeute:
             ergebnis.luecken[LUECKE_SEITE] += 1
             continue
         for roh in uebersicht.get("saetze") or []:
+            if roh.get("art") == ART_ANSCHLUSS:
+                continue
             geraet = erkenne_geraet(str(roh.get("titel") or ""), katalog)
             ganz = ganz and geraet is not None
             ergebnis.angeboten.update([geraet.device_id] if geraet else [])
@@ -159,6 +169,20 @@ def ausbeute(daten: dict, katalog: Katalog) -> Klickausbeute:
         alle = (g.device_id for g in katalog.geraete)
         ergebnis.nicht_im_angebot = sorted(set(alle) - ergebnis.angeboten)
     return ergebnis
+
+
+def _anschluesse(daten: dict) -> dict[str, float]:
+    """Anschlusspreis je Tarif-Slug aus heute gelesenen Tarifdetail-Seiten (1&1,
+    ``klickanschluss.anschluss_saetze``), nur bei ``ein_vertrag``."""
+    if daten.get("vertragsform") != EIN_VERTRAG:
+        return {}
+    return {
+        str(roh.get("tarif_slug")): roh["anschlusspreis"]
+        for u in daten.get("uebersichten") or []
+        if u.get("status") in GELESENE_SEITEN
+        for roh in u.get("saetze") or []
+        if roh.get("art") == ART_ANSCHLUSS
+    }
 
 
 def uebersicht_rohsatz(
