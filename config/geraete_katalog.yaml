@@ -163,6 +163,24 @@ geraete:
     speicher: [256, 512, 1024, 2048]
     segment: flagship
 
+  # iPhone 18 Pro und Pro Max: bisher nur Auto-Eintrag (data/state/
+  # geraete_katalog_auto.json, 17.09.2026, Speicher nur 256). Von Hand übernommen
+  # (09.10.2026), damit der Klick-Tageslauf sie auch ohne State lädt; Speicher wie
+  # bei 1&1 im Bestand (data/state/geraete_db.json: 256 bis 2048 GB).
+  - hersteller: Apple
+    modell: iPhone 18 Pro
+    generation: 18
+    vorgaenger: iPhone 17 Pro
+    speicher: [256, 512, 1024, 2048]
+    segment: flagship
+
+  - hersteller: Apple
+    modell: iPhone 18 Pro Max
+    generation: 18
+    vorgaenger: iPhone 17 Pro Max
+    speicher: [256, 512, 1024, 2048]
+    segment: flagship
+
   # ---------------------------------------------------------------- Samsung
   - hersteller: Samsung
     modell: Galaxy S24

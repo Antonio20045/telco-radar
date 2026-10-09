@@ -86,6 +86,79 @@ anbieter:
       - geraet: google-pixel-11
         speicher_gb: 256
         url: https://mobile.1und1.de/google-pixel-11
+      # Ab hier alle übrigen Geräte, die 1&1 am 09.10.2026 auf der Übersicht
+      # https://mobile.1und1.de/smartphones führt und die im Katalog stehen (Klick-
+      # Erkundung 09.10.2026, Zweig klick-erkundung,
+      # erkundung/1und1raster/2026-10-09/bedienelemente-1.json). Adressen wörtlich aus
+      # data/state/geraete_db.json. Ohne speicher_gb: die Karte klickt jede Speichergröße.
+      # `modell` nur, wo 1&1 das Gerät anders nennt als der Katalog (aria-label
+      # „Speicherauswahl <Name>“ ist der Kanarienwert).
+      # Benannte Lücke, nicht im Katalog, Umfang legt Antonio fest: HONOR 600,
+      # HONOR Magic V6, HONOR Magic8 Lite, Motorola moto g77, Motorola razr 70,
+      # Samsung Galaxy S25 Edge, Xiaomi REDMI 17C 5G.
+      - geraet: fairphone-6
+        modell: "Fairphone (Gen. 6)"
+        url: https://mobile.1und1.de/fairphone-6
+      - geraet: google-pixel-10a
+        url: https://mobile.1und1.de/google-pixel-10a
+      - geraet: google-pixel-11-pro
+        url: https://mobile.1und1.de/google-pixel-11-pro
+      - geraet: google-pixel-11-pro-fold
+        url: https://mobile.1und1.de/google-pixel-11-pro-fold
+      - geraet: google-pixel-11-pro-xl
+        url: https://mobile.1und1.de/google-pixel-11-pro-xl
+      - geraet: apple-iphone-16
+        url: https://mobile.1und1.de/iphone-16
+      - geraet: apple-iphone-16-plus
+        url: https://mobile.1und1.de/iphone-16-plus
+      - geraet: apple-iphone-16e
+        url: https://mobile.1und1.de/iphone-16e
+      - geraet: apple-iphone-17e
+        url: https://mobile.1und1.de/iphone-17e
+      - geraet: apple-iphone-18-pro
+        url: https://mobile.1und1.de/iphone-18-pro
+      - geraet: apple-iphone-18-pro-max
+        url: https://mobile.1und1.de/iphone-18-pro-max
+      - geraet: apple-iphone-air
+        url: https://mobile.1und1.de/iphone-air
+      - geraet: nothing-phone-3
+        url: https://mobile.1und1.de/nothing-phone-3
+      - geraet: nothing-phone-4a-pro
+        url: https://mobile.1und1.de/nothing-phone-4a-pro
+      - geraet: samsung-galaxy-a17
+        url: https://mobile.1und1.de/samsung-galaxy-a17-5g
+      - geraet: samsung-galaxy-a27
+        url: https://mobile.1und1.de/samsung-galaxy-a27-5g
+      - geraet: samsung-galaxy-a57
+        url: https://mobile.1und1.de/samsung-galaxy-a57
+      - geraet: samsung-galaxy-s26-fe
+        url: https://mobile.1und1.de/samsung-galaxy-s26-fe
+      - geraet: samsung-galaxy-s26-plus
+        modell: "Samsung Galaxy S26+"
+        url: https://mobile.1und1.de/samsung-galaxy-s26-plus
+      - geraet: samsung-galaxy-z-flip8
+        url: https://mobile.1und1.de/samsung-galaxy-z-flip8
+      - geraet: samsung-galaxy-z-fold8
+        url: https://mobile.1und1.de/samsung-galaxy-z-fold8
+      - geraet: samsung-galaxy-z-fold8-ultra
+        url: https://mobile.1und1.de/samsung-galaxy-z-fold8-ultra
+      - geraet: xiaomi-17
+        url: https://mobile.1und1.de/xiaomi-17
+      - geraet: xiaomi-17-ultra
+        url: https://mobile.1und1.de/xiaomi-17-ultra
+      - geraet: xiaomi-17t
+        url: https://mobile.1und1.de/xiaomi-17t
+      - geraet: xiaomi-17t-pro
+        url: https://mobile.1und1.de/xiaomi-17t-pro
+      - geraet: xiaomi-redmi-note-17
+        modell: "Xiaomi REDMI Note 17 5G"
+        url: https://mobile.1und1.de/xiaomi-redmi-note-17-5g
+      - geraet: xiaomi-redmi-note-17-pro
+        modell: "Xiaomi REDMI Note 17 Pro 5G"
+        url: https://mobile.1und1.de/xiaomi-redmi-note-17-pro-5g
+      - geraet: xiaomi-redmi-note-17-pro-max
+        modell: "Xiaomi REDMI Note 17 Pro Max 5G"
+        url: https://mobile.1und1.de/xiaomi-redmi-note-17-pro-max-5g
 
   - schluessel: telekom
     name: Telekom

@@ -8,8 +8,10 @@ im Katalog, der Speicher beim Gerät, die Adresse ist https (http nur für
 ``LOKALE_HOSTS``, den Trockenlauf) und liegt auf dem Host der ``basis_url``. Eine
 Seite darf ``weiter`` tragen (``Weiter``): Selektor und, wenn angegeben, sichtbarer Text
 genau eines Knopfs oder Links zum nächsten Schritt der Bestellstrecke
-(``klickfolgeseite``). Jeder Verstoß wirft ``ErkundungszielFehler`` mit der Stelle; ein
-Ziel wird nie still übergangen. User-Agent und Abrufabstand kommen aus den Quellen;
+(``klickfolgeseite``), dazu ``modell``: den Namen, unter dem die Anbieterseite das
+Gerät führt, wenn er vom Katalog abweicht (Kanarienwert). Jeder Verstoß wirft
+``ErkundungszielFehler`` mit der Stelle; ein Ziel wird nie still übergangen.
+User-Agent und Abrufabstand kommen aus den Quellen;
 ``seitenabstand_sekunden`` (Zahl ab 0, Vorgabe 0) ist die Pause zwischen zwei Seiten;
 ``uebersichten`` nennt Übersichtsseiten, jede wörtlich ein Einstieg aus den Quellen.
 Der Klick-Tageslauf liest dasselbe Format aus ``TAGESDATEI``, ohne Seitengrenze
@@ -55,7 +57,8 @@ class Weiter:
 class Seitenziel:
     """Eine Produktseite: Gerät aus dem Katalog, Speicherstufe, Adresse, Weiter, Modell.
 
-    ``modell`` ist der Modellname aus dem Katalog für ``{modell}`` im Kanarienwert.
+    ``modell`` ist der Name für ``{modell}`` im Kanarienwert: das Feld ``modell`` der
+    Seite (wie die Anbieterseite das Gerät nennt), sonst der Modellname aus dem Katalog.
     """
 
     geraet: str
@@ -169,7 +172,8 @@ def _seite(roh: object, ort: str, katalog: Katalog, basis_url: str) -> Seitenzie
         grund = f"Host {host_von(adresse)} ist nicht {host_von(basis_url)}"
         raise ErkundungszielFehler(f"{ort}: {grund}")
     weiter = _weiter(roh.get("weiter"), ort)
-    return Seitenziel(geraet_id, speicher, adresse, weiter, geraet.modell)
+    modell = _text(roh, "modell", ort) if "modell" in roh else geraet.modell
+    return Seitenziel(geraet_id, speicher, adresse, weiter, modell)
 
 
 def _weiter(roh: object, ort: str) -> Weiter | None:
