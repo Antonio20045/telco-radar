@@ -93,12 +93,21 @@ anbieter:
   - schluessel: telekom
     name: Telekom
     seiten:
+      # Probe Pitch 4 (09.10.2026): die Smartphone-Übersicht je Tarif statt einer
+      # Produktseite. Adresse wörtlich aus config/geraete_quellen.yaml (Einstieg
+      # „Bündel MagentaMobil M“). Die Seite zeigt alle Geräte; `geraet` ist nur
+      # Pflichtfeld (Katalog). Gesucht wird u. a. das iPhone 18 Pro, das am 09.10.
+      # bei Telekom ganz fehlte. Nach der Probe gehört die Übersicht in
+      # klick_tageslauf.yaml.
       - geraet: apple-iphone-17-pro
         speicher_gb: 256
-        url: https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
-      - geraet: google-pixel-11
+        url: https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17791
+      # Zweite Übersicht (MagentaMobil XL, ebenfalls wörtlich aus
+      # geraete_quellen.yaml): zeigt, ob eine zweite Seite durchkommt und ob die
+      # Gerätezahl je Tarif gleich ist.
+      - geraet: apple-iphone-17-pro
         speicher_gb: 256
-        url: https://www.telekom.de/shop/geraet/google/google-pixel-11/frost-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+        url: https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17803
 
   - schluessel: congstar
     name: congstar
