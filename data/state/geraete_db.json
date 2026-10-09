@@ -2,8 +2,8 @@
  "updated": "2026-10-09",
  "anbieter": {
   "ALDI TALK": {
-   "laeufe": 58,
-   "funde_gesamt": 261,
+   "laeufe": 59,
+   "funde_gesamt": 266,
    "letzter_lauf": "2026-10-09",
    "letzte_funde": 5,
    "letzter_fund": "2026-10-09",
@@ -207,8 +207,8 @@
    "tote_adressen": 0
   },
   "Vodafone": {
-   "laeufe": 56,
-   "funde_gesamt": 9566,
+   "laeufe": 57,
+   "funde_gesamt": 9749,
    "letzter_lauf": "2026-10-09",
    "letzte_funde": 183,
    "termine": [
@@ -412,8 +412,8 @@
    "tote_adressen": 0
   },
   "o2": {
-   "laeufe": 56,
-   "funde_gesamt": 3770,
+   "laeufe": 57,
+   "funde_gesamt": 3839,
    "letzter_lauf": "2026-10-09",
    "letzte_funde": 69,
    "termine": [
@@ -609,7 +609,7 @@
      "2026-10-09",
      69,
      "gelesen",
-     1997,
+     1999,
      0,
      null
     ]
@@ -617,8 +617,8 @@
    "tote_adressen": null
   },
   "mobilcom-debitel": {
-   "laeufe": 9,
-   "funde_gesamt": 6518,
+   "laeufe": 10,
+   "funde_gesamt": 6653,
    "letzte_funde": 135,
    "termine": [
     "2026-08-29",
@@ -1151,10 +1151,10 @@
    "tote_adressen": 0
   },
   "congstar": {
-   "laeufe": 33,
-   "funde_gesamt": 6786,
-   "letzter_lauf": "2026-10-08",
-   "letzte_funde": 153,
+   "laeufe": 34,
+   "funde_gesamt": 6929,
+   "letzter_lauf": "2026-10-09",
+   "letzte_funde": 143,
    "termine": [
     "2026-09-03",
     "2026-09-04",
@@ -1340,18 +1340,18 @@
     ],
     [
      "2026-10-09",
-     153,
-     "lesefehler",
-     944,
-     44,
-     0
+     143,
+     "gelesen",
+     880,
+     43,
+     2
     ]
    ],
-   "tote_adressen": 0
+   "tote_adressen": 2
   },
   "1&1": {
-   "laeufe": 48,
-   "funde_gesamt": 1721,
+   "laeufe": 49,
+   "funde_gesamt": 1756,
    "letzter_lauf": "2026-10-09",
    "letzte_funde": 35,
    "termine": [
@@ -1702,10 +1702,10 @@
    "tote_adressen": null
   },
   "Saturn": {
-   "laeufe": 44,
-   "funde_gesamt": 862,
+   "laeufe": 45,
+   "funde_gesamt": 882,
    "letzter_lauf": "2026-10-09",
-   "letzte_funde": 19,
+   "letzte_funde": 20,
    "termine": [
     "2026-09-05",
     "2026-09-06",
@@ -1890,7 +1890,7 @@
     ],
     [
      "2026-10-09",
-     19,
+     20,
      "gelesen",
      0,
      0,
@@ -5193,7 +5193,7 @@
    "erstpreis_am": "2026-08-29",
    "last_verified": "2026-10-09",
    "letzter_check": "2026-10-09",
-   "quelle_url": "https://www.alditalk.de/p/samsung-samsung-galaxy-a17-lte-128-gb-black-sm-a175f-dsb-30042091A1?FF_QUERY=*%3Acategory_id%3BG5DE0Z0SIKUBHRGTNF411A7XPLN9RV3D&FF_POS=3&FF_PAGE=1&FF_PAGESIZE=30&FF_SCORE=100.0&FF_CAMPAIGN=&FF_CAMPAIGN_PAGE_ID=",
+   "quelle_url": "https://www.alditalk.de/p/samsung-samsung-galaxy-a17-lte-128-gb-black-sm-a175f-dsb-30042091A1?FF_QUERY=*%3Acategory_id%3BG5DE0Z0SIKUBHRGTNF411A7XPLN9RV3D&FF_POS=2&FF_PAGE=1&FF_PAGESIZE=30&FF_SCORE=100.0&FF_CAMPAIGN=&FF_CAMPAIGN_PAGE_ID=",
    "abgerufen_am": "2026-10-09",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
@@ -5970,15 +5970,15 @@
    "ean": "",
    "zustand": "neu",
    "first_seen": "2026-09-17",
-   "status": "vermutlich ausgelistet",
-   "missed_checks": 1,
+   "status": "aktiv",
+   "missed_checks": 0,
    "erstpreis": 1179.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-17",
-   "last_verified": "2026-10-08",
+   "last_verified": "2026-10-09",
    "letzter_check": "2026-10-09",
    "quelle_url": "https://www.saturn.de/de/product/_apple-iphone-17-pro-5g-256-gb-cosmic-orange-dual-sim-3013586.html",
-   "abgerufen_am": "2026-10-08",
+   "abgerufen_am": "2026-10-09",
    "verfuegbarkeit": "unbekannt",
    "confidence": "hoch",
    "einstiege": [
@@ -5986,8 +5986,7 @@
    ],
    "titel_roh": "APPLE iPhone 17 Pro 5G 256 GB Cosmic Orange Dual SIM",
    "preis_ohne_vertrag": 1179.0,
-   "ended_since": "2026-09-19",
-   "stale_since": "2026-10-09"
+   "ended_since": "2026-09-19"
   },
   {
    "id": "saturn--apple-iphone-17-pro-256gb-silber",
@@ -6280,15 +6279,15 @@
    "ean": "",
    "zustand": "neu",
    "first_seen": "2026-09-18",
-   "status": "vermutlich ausgelistet",
-   "missed_checks": 1,
+   "status": "aktiv",
+   "missed_checks": 0,
    "erstpreis": 1569.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-18",
-   "last_verified": "2026-10-08",
+   "last_verified": "2026-10-09",
    "letzter_check": "2026-10-09",
    "quelle_url": "https://www.saturn.de/de/product/_apple-iphone-17-pro-max-5g-512-gb-silber-dual-sim-3013597.html",
-   "abgerufen_am": "2026-10-08",
+   "abgerufen_am": "2026-10-09",
    "verfuegbarkeit": "unbekannt",
    "confidence": "hoch",
    "einstiege": [
@@ -6296,8 +6295,7 @@
    ],
    "titel_roh": "APPLE iPhone 17 Pro Max 5G 512 GB Silber Dual SIM",
    "preis_ohne_vertrag": 1569.0,
-   "ended_since": "2026-10-03",
-   "stale_since": "2026-10-09"
+   "ended_since": "2026-10-03"
   },
   {
    "id": "saturn--apple-iphone-17e-256gb-hellrosa",
@@ -15107,13 +15105,13 @@
    "ean": "0840353949799",
    "zustand": "neu",
    "first_seen": "2026-09-04",
-   "status": "vermutlich ausgelistet",
-   "missed_checks": 1,
+   "status": "ausgelistet",
+   "missed_checks": 2,
    "erstpreis": 487.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-04",
    "last_verified": "2026-10-07",
-   "letzter_check": "2026-10-08",
+   "letzter_check": "2026-10-09",
    "quelle_url": "https://www.congstar.de/geraete/google/google-pixel-10a/",
    "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
@@ -15123,7 +15121,7 @@
    ],
    "titel_roh": "Google Pixel 10a 128 GB fog",
    "preis_ohne_vertrag": 397.0,
-   "ended_since": "2026-09-15",
+   "ended_since": "2026-10-09",
    "stale_since": "2026-10-08"
   },
   {
@@ -16383,13 +16381,13 @@
    "ean": "8806095851488",
    "zustand": "neu",
    "first_seen": "2026-09-03",
-   "status": "vermutlich ausgelistet",
-   "missed_checks": 1,
+   "status": "ausgelistet",
+   "missed_checks": 2,
    "erstpreis": 759.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-03",
    "last_verified": "2026-10-07",
-   "letzter_check": "2026-10-08",
+   "letzter_check": "2026-10-09",
    "quelle_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s25/",
    "abgerufen_am": "2026-10-07",
    "verfuegbarkeit": "lieferbar",
@@ -16399,7 +16397,8 @@
    ],
    "titel_roh": "Samsung Galaxy S25 256 GB silver shadow",
    "preis_ohne_vertrag": 759.0,
-   "stale_since": "2026-10-08"
+   "stale_since": "2026-10-08",
+   "ended_since": "2026-10-09"
   },
   {
    "id": "congstar--samsung-galaxy-s25-fe-128gb-jetblack",
