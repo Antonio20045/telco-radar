@@ -31,20 +31,27 @@ benannte Lücke; ohne Tarif gehen Anzahlung, Rate und Ratenzahl als ``ohne_tarif
 Gegenprobe der Gerätepreise (``analyze.klick_geraetepreis``). Ein Tarif, den der
 Tarifbestand nicht kennt, bleibt im Satz; über ihn entscheidet ``aus_rohsaetzen`` mit
 derselben Regel wie für jeden Adapter (``ohne_tarifblatt``).
+
+Dazu kommen die Sätze gelesener Übersichten (``uebersichten[]``, ``klickuebersicht``):
+Gerät über den Titel (``erkenne_geraet``, Katalog samt Auto-Einträgen), Werte wie
+gelesen, Quelle die Produktadresse aus dem Satz, sonst die Übersicht.
 """
 
 from __future__ import annotations
 
+import logging
 import re
 from collections import Counter
 from dataclasses import dataclass, field
 
-from ...geraete_model import Katalog, normalisiere, sku_id
+from ...geraete_model import Katalog, erkenne_geraet, normalisiere, sku_id
 from .klickcrawler import GRUND_NICHT_BESUCHT
 from .klickergebnis import GELESENE_SEITEN
 from .klickkarte import EIN_VERTRAG
-from .klicklauf import BEFUND, ERFASST, NICHT_ANGEBOTEN, NICHT_ERFASST
+from .klicklauf import BEFUND, BELEG_OFFEN, ERFASST, NICHT_ANGEBOTEN, NICHT_ERFASST
 from .klickpfad import ohne_markup
+
+log = logging.getLogger(__name__)
 
 QUELLE = "klick"
 ZUSTAND_NEU = "neu"
@@ -113,7 +120,64 @@ def ausbeute(daten: dict, katalog: Katalog) -> Klickausbeute:
             preis = geraetepreis(kombination, seite, daten, katalog)
             if satz == LUECKE_TARIF and preis is not None:
                 ergebnis.ohne_tarif.append(preis)
+    for uebersicht in daten.get("uebersichten") or []:
+        if uebersicht.get("status") not in GELESENE_SEITEN:
+            ergebnis.luecken[LUECKE_SEITE] += 1
+            continue
+        for roh in uebersicht.get("saetze") or []:
+            satz = uebersicht_rohsatz(roh, uebersicht, daten, katalog)
+            if isinstance(satz, dict):
+                ergebnis.rohsaetze.append(satz)
+            else:
+                ergebnis.luecken[satz] += 1
     return ergebnis
+
+
+def uebersicht_rohsatz(
+    roh: dict, uebersicht: dict, daten: dict, katalog: Katalog
+) -> dict | str:
+    """Der Rohsatz eines Satzes aus ``telekom.lies_buendel`` oder seine Lücke.
+
+    Das Gerät kommt über den Titel aus dem Katalog samt Auto-Einträgen; ein
+    unbekannter Titel ist die Lücke ``geraet_unbekannt`` und steht im Protokoll.
+    """
+    titel = str(roh.get("titel") or "")
+    geraet = erkenne_geraet(titel, katalog)
+    if geraet is None:
+        log.info(
+            "Klick-Übersicht %s: Gerät %r nicht im Katalog", daten.get("name"), titel
+        )
+        return LUECKE_GERAET
+    gb = roh.get("speicher_gb")
+    if gb not in (geraet.speicher or []):
+        return LUECKE_SPEICHER
+    satz: dict[str, object] = {
+        "sku_id": sku_id(geraet.device_id, gb, None, ZUSTAND_NEU),
+        "anbieter": str(daten.get("name") or ""),
+        "zustand": ZUSTAND_NEU,
+        "device_id": geraet.device_id,
+        "speicher_gb": gb,
+        "tarif_name": str(roh.get("tarif_name") or ""),
+        "tarif_slug": str(roh.get("tarif_slug") or ""),
+        "laufzeit_monate": roh.get("laufzeit_monate"),
+        "tarif_bindung_monate": None,
+        "anschlusspreis": roh.get("anschlusspreis"),
+        "volumen_gb": None,
+        "quelle_url": str(roh.get("url") or uebersicht.get("adresse") or ""),
+        "quelle": QUELLE,
+        "quelle_art": QUELLE,
+        "beleg_id": None,
+        "beleg_status": BELEG_OFFEN,
+        "abgerufen_am": daten.get("datum"),
+        "geraet_zuzahlung": roh.get("geraet_zuzahlung"),
+        "geraet_monatsrate": roh.get("geraet_monatsrate"),
+        "tarif_monatlich": roh.get("tarif_monatlich"),
+        "buendel_monatlich": None,
+        "tarif_phasen": [],
+    }
+    if all(satz.get(f) is None for f in PREISFELDER):
+        return LUECKE_OHNE_PREIS
+    return satz
 
 
 def geraetepreis(

@@ -1,6 +1,7 @@
 """Klick-Tageslauf eines Anbieters (Datenkonzept Geräteradar §8 „Betrieb“).
 
-Liest die Produktseiten des Anbieters aus ``config/klick_tageslauf.yaml``, klickt sie
+Liest zuerst die Übersichten (``uebersichten:``), dann die Produktseiten des Anbieters
+aus ``config/klick_tageslauf.yaml``, klickt sie
 mit ``config/klickkarten/<schluessel>.yaml`` in Rotation durch und schreibt
 ``<ausgabe>/<schluessel>.json`` (``klickergebnis``). Die Logik steht in
 ``telco_radar.collect.geraete.klicktageslauf``; dieses Skript liest nur die Eingaben,
@@ -54,8 +55,8 @@ from telco_radar.collect.geraete.klickparallel import TAGESLAUF_WORKFLOWS, aus_u
 from telco_radar.collect.geraete.klicktageslauf import (
     JOB_FRIST_S,
     budget_ende,
-    crawler_im_browser,
     fahre,
+    leser_im_browser,
 )
 from telco_radar.collect.geraete.klickziele import (
     TAGESDATEI,
@@ -122,7 +123,7 @@ def main(argumente: list[str] | None = None) -> int:
         browser = playwright.chromium.launch(executable_path=args.chromium)
         try:
             holer = robots_holer(ziel.kennung or http.BOT_UA)
-            crawle = crawler_im_browser(browser, ziel, lage.karte, _uhr, holer)
+            crawle, lies = leser_im_browser(browser, ziel, lage.karte, _uhr, holer)
             daten = fahre(
                 ziel,
                 lage.karte,
@@ -132,6 +133,7 @@ def main(argumente: list[str] | None = None) -> int:
                 ende,
                 gelesen=stand["seiten"].get(ziel.name, {}),
                 laeufe=laeufe,
+                lies_uebersicht=lies,
             )
         finally:
             browser.close()

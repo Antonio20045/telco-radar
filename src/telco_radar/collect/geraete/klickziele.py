@@ -10,7 +10,8 @@ Seite darf ``weiter`` tragen (``Weiter``): Selektor und, wenn angegeben, sichtba
 genau eines Knopfs oder Links zum nächsten Schritt der Bestellstrecke
 (``klickfolgeseite``). Jeder Verstoß wirft ``ErkundungszielFehler`` mit der Stelle; ein
 Ziel wird nie still übergangen. User-Agent und Abrufabstand kommen aus den Quellen;
-``seitenabstand_sekunden`` (Zahl ab 0, Vorgabe 0) ist die Pause zwischen zwei Seiten.
+``seitenabstand_sekunden`` (Zahl ab 0, Vorgabe 0) ist die Pause zwischen zwei Seiten;
+``uebersichten`` nennt Übersichtsseiten, jede wörtlich ein Einstieg aus den Quellen.
 Der Klick-Tageslauf liest dasselbe Format aus ``TAGESDATEI``, ohne Seitengrenze
 (``klicktageslauf``); ``geplante_anbieter`` nennt, wer darin eine Karte unter
 ``KARTEN`` hat und darum jeden Tag ein Ergebnis liefern soll.
@@ -74,6 +75,7 @@ class Erkundungsziel:
     kennung: str | None
     rate_limit_sekunden: float
     seitenabstand_sekunden: float = 0.0
+    uebersichten: tuple[str, ...] = ()
 
 
 def lade_ziele(
@@ -120,6 +122,7 @@ def lade_ziele(
                 kennung=anbieter.user_agent if anbieter.user_agent else None,
                 rate_limit_sekunden=anbieter.rate_limit_sekunden,
                 seitenabstand_sekunden=_seitenabstand(eintrag, ort),
+                uebersichten=_uebersichten(eintrag, ort, anbieter.einstiege),
             )
         )
     schluessel_alle = [z.schluessel for z in ziele]
@@ -180,6 +183,16 @@ def _weiter(roh: object, ort: str) -> Weiter | None:
         raise ErkundungszielFehler(f"{ort}: unbekanntes Feld {', '.join(fremd)}")
     text = _text(roh, "text", ort) if "text" in roh else None
     return Weiter(_text(roh, "selektor", ort), text)
+
+
+def _uebersichten(eintrag: dict, ort: str, einstiege: list) -> tuple[str, ...]:
+    """Die Übersichten; jede steht wörtlich als Einstieg in den Quellen."""
+    roh = eintrag.get("uebersichten") or []
+    bekannt = {e.url for e in einstiege}
+    if not isinstance(roh, list) or any(u not in bekannt for u in roh):
+        grund = "uebersichten nicht wörtlich als Einstieg in geraete_quellen.yaml"
+        raise ErkundungszielFehler(f"{ort}: {grund}")
+    return tuple(roh)
 
 
 def _seitenabstand(eintrag: dict, ort: str) -> float:
