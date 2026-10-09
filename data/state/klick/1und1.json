@@ -1,7 +1,7 @@
 {
  "anbieter": "1und1",
  "datum": "2026-10-09",
- "dauer_sekunden": 1193.2,
+ "dauer_sekunden": 1171.6,
  "format": 1,
  "frischegrenze_tage": 3,
  "grund": null,
@@ -26,9 +26,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "74ca6fdd96ba1156837410b7236fb67a8af8c0fd9009fe879015a07b7e6e5394",
-      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=686affbb-8245-4c3e-b6fb-fe745d8d9c79",
-      "zeitpunkt": "2026-10-09T06:22:02Z"
+      "beleg_id": "6c01de27e0329e90274c1df55ff7710f03906cd9b3fd18bb1517055e4a05cfd1",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=b3748e47-c2c1-4894-9ab5-cdba3b3bd857",
+      "zeitpunkt": "2026-10-09T11:30:43Z"
      },
      "beleg_status": "offen",
      "buendel": {
@@ -39,7 +39,7 @@
       "antwort_betrag": true,
       "antwort_einmalzahlung": true,
       "antwort_laufzeit": 36,
-      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=686affbb-8245-4c3e-b6fb-fe745d8d9c79",
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=b3748e47-c2c1-4894-9ab5-cdba3b3bd857",
       "fundstellen": [],
       "gleicher_betrag": false,
       "kachel_betrag": true,
@@ -81,9 +81,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "bc2d58a84932b64e4875a3df947abf95304f7e8bbaae64a779fa1196ec4d356a",
-      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=686affbb-8245-4c3e-b6fb-fe745d8d9c79",
-      "zeitpunkt": "2026-10-09T06:22:02Z"
+      "beleg_id": "53367ad59856d5d3c79185fa4e324fc5df6fe6c6e4ee09e9a6a26c20840408b4",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=b3748e47-c2c1-4894-9ab5-cdba3b3bd857",
+      "zeitpunkt": "2026-10-09T11:30:43Z"
      },
      "beleg_status": "offen",
      "buendel": {
@@ -94,7 +94,7 @@
       "antwort_betrag": true,
       "antwort_einmalzahlung": true,
       "antwort_laufzeit": 36,
-      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=686affbb-8245-4c3e-b6fb-fe745d8d9c79",
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=b3748e47-c2c1-4894-9ab5-cdba3b3bd857",
       "fundstellen": [
        "window.oResult.data[\"product.tariff.monthlycostsgross.2.cost\"]",
        "window.oResult.data[\"productlist.vendors.multi.tariff.monthlycostsgross.DE.3.cost\"][0]",
@@ -147,9 +147,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "5c164d197e707bed4e87cdab8658e56cd5f92f242c25c94ca06b2257cb8e1efd",
-      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=0f0ed4cc-3778-4db6-b2db-2deb48ee6751",
-      "zeitpunkt": "2026-10-09T06:23:24Z"
+      "beleg_id": "8b0e1af650004fdf4fdb898cc026edaf1b0019472b9581d2986049b5b86c0c59",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=388df1bf-d3a7-4f34-8354-6c7d95ea1cf5",
+      "zeitpunkt": "2026-10-09T11:31:55Z"
      },
      "beleg_status": "offen",
      "buendel": {
@@ -160,7 +160,7 @@
       "antwort_betrag": true,
       "antwort_einmalzahlung": true,
       "antwort_laufzeit": 36,
-      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=0f0ed4cc-3778-4db6-b2db-2deb48ee6751",
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=388df1bf-d3a7-4f34-8354-6c7d95ea1cf5",
       "fundstellen": [],
       "gleicher_betrag": false,
       "kachel_betrag": true,
@@ -202,9 +202,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "e1cf583f252428e641cb4a69dd0068aa316059b6b75e046789d76ccb484410d7",
-      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=0f0ed4cc-3778-4db6-b2db-2deb48ee6751",
-      "zeitpunkt": "2026-10-09T06:23:24Z"
+      "beleg_id": "39d9921611795ccfb69d60892cf1d080f9cf5c12816d6410100b8fb67ed4220b",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=388df1bf-d3a7-4f34-8354-6c7d95ea1cf5",
+      "zeitpunkt": "2026-10-09T11:31:55Z"
      },
      "beleg_status": "offen",
      "buendel": {
@@ -215,7 +215,7 @@
       "antwort_betrag": true,
       "antwort_einmalzahlung": true,
       "antwort_laufzeit": 36,
-      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=0f0ed4cc-3778-4db6-b2db-2deb48ee6751",
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=388df1bf-d3a7-4f34-8354-6c7d95ea1cf5",
       "fundstellen": [
        "window.oResult.data[\"product.tariff.monthlycostsgross.2.cost\"]",
        "window.oResult.data[\"productlist.vendors.multi.tariff.monthlycostsgross.DE.3.cost\"][0]",
@@ -262,16 +262,14 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 29,
-    "beendet": 28,
+    "anfragen": 30,
+    "beendet": 30,
     "dokument": "complete",
     "geladen": true,
-    "offen": {
-     "cdn.appdynamics.com": 1
-    },
+    "offen": {},
     "ohne_antwort_ms": 0,
-    "sekunden": 25.9,
-    "takte_ms": 1100,
+    "sekunden": 23.5,
+    "takte_ms": 1300,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -286,7 +284,7 @@
     "knoepfe_gefunden": 5,
     "knoepfe_gesucht": 5
    },
-   "verworfen": 12
+   "verworfen": 11
   },
   {
    "adresse": "https://mobile.1und1.de/samsung-galaxy-s26",
@@ -304,9 +302,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "3e5cd7ec1abf17d3667c5fd5bc44f5388617e4c3913268390133b5ec5bf7bcda",
-      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=23c61c70-66f4-47e2-b978-3ffab9e8b48c",
-      "zeitpunkt": "2026-10-09T06:24:38Z"
+      "beleg_id": "f480495db2661352efff876be9db9c3a01fae3e11cfde40e9b9f238db05a84e7",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=4a22d30d-0a51-428b-a9d1-5a509e7b1d85",
+      "zeitpunkt": "2026-10-09T11:33:09Z"
      },
      "beleg_status": "offen",
      "buendel": {
@@ -317,7 +315,7 @@
       "antwort_betrag": true,
       "antwort_einmalzahlung": true,
       "antwort_laufzeit": 36,
-      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=23c61c70-66f4-47e2-b978-3ffab9e8b48c",
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=4a22d30d-0a51-428b-a9d1-5a509e7b1d85",
       "fundstellen": [],
       "gleicher_betrag": false,
       "kachel_betrag": true,
@@ -359,9 +357,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "c38e8c9821814ccd5b2157f77e9fbd10bca59fd0493d3dfb452d7fc09d1d39af",
-      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=23c61c70-66f4-47e2-b978-3ffab9e8b48c",
-      "zeitpunkt": "2026-10-09T06:24:39Z"
+      "beleg_id": "dd40818610b365a6778d9dd1b015f8a4c8667887166cc86d96fe8aa4637a8173",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=4a22d30d-0a51-428b-a9d1-5a509e7b1d85",
+      "zeitpunkt": "2026-10-09T11:33:09Z"
      },
      "beleg_status": "offen",
      "buendel": {
@@ -372,7 +370,7 @@
       "antwort_betrag": true,
       "antwort_einmalzahlung": true,
       "antwort_laufzeit": 36,
-      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=23c61c70-66f4-47e2-b978-3ffab9e8b48c",
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=4a22d30d-0a51-428b-a9d1-5a509e7b1d85",
       "fundstellen": [
        "window.oResult.data[\"product.tariff.monthlycostsgross.2.cost\"]",
        "window.oResult.data[\"productlist.vendors.multi.tariff.monthlycostsgross.DE.3.cost\"][0]",
@@ -425,9 +423,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "d49b7c9fc3099a7e90cbf79f2a342a8262547e8e56ca59fb017e32bd3c081403",
-      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=ac22f78a-4bc9-48ea-8bd2-7b78bca5612c",
-      "zeitpunkt": "2026-10-09T06:25:52Z"
+      "beleg_id": "ce2cfdc3d953cd0706de3fc325a7ebee9b08178c5bfe691bfdf237515137464f",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=7bf31d13-3b83-414a-910b-70e7b7a9a958",
+      "zeitpunkt": "2026-10-09T11:34:26Z"
      },
      "beleg_status": "offen",
      "buendel": {
@@ -438,7 +436,7 @@
       "antwort_betrag": true,
       "antwort_einmalzahlung": true,
       "antwort_laufzeit": 36,
-      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=ac22f78a-4bc9-48ea-8bd2-7b78bca5612c",
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=7bf31d13-3b83-414a-910b-70e7b7a9a958",
       "fundstellen": [],
       "gleicher_betrag": false,
       "kachel_betrag": true,
@@ -480,9 +478,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "5163c472b58fdcf58a15be3fe03fbcdd555e8469d6ae7b79a8194dc618e1c551",
-      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=ac22f78a-4bc9-48ea-8bd2-7b78bca5612c",
-      "zeitpunkt": "2026-10-09T06:25:52Z"
+      "beleg_id": "9309680b06c252d432879296e4b21c369d669cbb42fa1c988d5d3b1089a76025",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=7bf31d13-3b83-414a-910b-70e7b7a9a958",
+      "zeitpunkt": "2026-10-09T11:34:26Z"
      },
      "beleg_status": "offen",
      "buendel": {
@@ -493,7 +491,7 @@
       "antwort_betrag": true,
       "antwort_einmalzahlung": true,
       "antwort_laufzeit": 36,
-      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=ac22f78a-4bc9-48ea-8bd2-7b78bca5612c",
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=7bf31d13-3b83-414a-910b-70e7b7a9a958",
       "fundstellen": [
        "window.oResult.data[\"product.tariff.monthlycostsgross.2.cost\"]",
        "window.oResult.data[\"productlist.vendors.multi.tariff.monthlycostsgross.DE.3.cost\"][0]",
@@ -548,8 +546,8 @@
      "cdn.appdynamics.com": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 25.8,
-    "takte_ms": 1100,
+    "sekunden": 25.5,
+    "takte_ms": 1450,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -582,9 +580,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "8912cc428e57535ac06338f09b1170678784fc50b6f48b63c923f8cb74c5e806",
-      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=76fb39b7-e3e5-4e91-9ac8-8888a988d1e3",
-      "zeitpunkt": "2026-10-09T06:27:23Z"
+      "beleg_id": "05c2155bddb04d76fc3a62776e06d3f040d02011f654c71a29306321c3c789e6",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=1a77a0a2-9434-4da3-91fa-f6ddde45ec56",
+      "zeitpunkt": "2026-10-09T11:35:55Z"
      },
      "beleg_status": "offen",
      "buendel": {
@@ -595,7 +593,7 @@
       "antwort_betrag": true,
       "antwort_einmalzahlung": true,
       "antwort_laufzeit": 36,
-      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=76fb39b7-e3e5-4e91-9ac8-8888a988d1e3",
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=1a77a0a2-9434-4da3-91fa-f6ddde45ec56",
       "fundstellen": [],
       "gleicher_betrag": false,
       "kachel_betrag": true,
@@ -637,9 +635,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "0a0095a74f8ea4dc6ae310831ca9651918bec4c63996e20d2c65124a31cdc8b2",
-      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=76fb39b7-e3e5-4e91-9ac8-8888a988d1e3",
-      "zeitpunkt": "2026-10-09T06:27:23Z"
+      "beleg_id": "61fb5fe308e6a3d8354e71d9e3ceef001dee2a5d7db40d9d43b7507b9b54b78c",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=1a77a0a2-9434-4da3-91fa-f6ddde45ec56",
+      "zeitpunkt": "2026-10-09T11:35:56Z"
      },
      "beleg_status": "offen",
      "buendel": {
@@ -650,7 +648,7 @@
       "antwort_betrag": true,
       "antwort_einmalzahlung": true,
       "antwort_laufzeit": 36,
-      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=76fb39b7-e3e5-4e91-9ac8-8888a988d1e3",
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=1a77a0a2-9434-4da3-91fa-f6ddde45ec56",
       "fundstellen": [
        "window.oResult.data[\"product.tariff.monthlycostsgross.2.cost\"]",
        "window.oResult.data[\"productlist.vendors.multi.tariff.monthlycostsgross.DE.3.cost\"][0]",
@@ -703,9 +701,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "5aa821e6c32b42a7a03a77085e30f4fe2a6979daa3205bec3be51590508d2233",
-      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=49a2443a-01e9-4d32-95bc-6221c1aed6b3",
-      "zeitpunkt": "2026-10-09T06:28:36Z"
+      "beleg_id": "9f61524ac84e10759b6fda5aab9b640dd12882544b82e31a20c95b90292b80dc",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=3d1606d2-d0f9-4306-a76c-5ae795ad68d0",
+      "zeitpunkt": "2026-10-09T11:37:05Z"
      },
      "beleg_status": "offen",
      "buendel": {
@@ -716,7 +714,7 @@
       "antwort_betrag": true,
       "antwort_einmalzahlung": true,
       "antwort_laufzeit": 36,
-      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=49a2443a-01e9-4d32-95bc-6221c1aed6b3",
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=3d1606d2-d0f9-4306-a76c-5ae795ad68d0",
       "fundstellen": [],
       "gleicher_betrag": false,
       "kachel_betrag": true,
@@ -758,9 +756,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "10aa9dcbc5e713f9301e597e5200b983bee81d4c82f3e77ff5f4270302a1caf6",
-      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=49a2443a-01e9-4d32-95bc-6221c1aed6b3",
-      "zeitpunkt": "2026-10-09T06:28:36Z"
+      "beleg_id": "8bdabe22dcf8fa103effcf86fc35217d31c3b463a4593e02df73ee1f5c5d8628",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=3d1606d2-d0f9-4306-a76c-5ae795ad68d0",
+      "zeitpunkt": "2026-10-09T11:37:05Z"
      },
      "beleg_status": "offen",
      "buendel": {
@@ -771,7 +769,7 @@
       "antwort_betrag": true,
       "antwort_einmalzahlung": true,
       "antwort_laufzeit": 36,
-      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=49a2443a-01e9-4d32-95bc-6221c1aed6b3",
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=3d1606d2-d0f9-4306-a76c-5ae795ad68d0",
       "fundstellen": [
        "window.oResult.data[\"product.tariff.monthlycostsgross.2.cost\"]",
        "window.oResult.data[\"productlist.vendors.multi.tariff.monthlycostsgross.DE.3.cost\"][0]",
@@ -826,8 +824,8 @@
      "cdn.appdynamics.com": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 26.0,
-    "takte_ms": 1100,
+    "sekunden": 23.8,
+    "takte_ms": 1400,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -860,9 +858,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "14e4772b4148dbbbaf2666ce055c277292de94a52a10ef062e2ff19ad081c59b",
-      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=b2a60b7a-478e-40a3-bee6-6f97ed42c9bc",
-      "zeitpunkt": "2026-10-09T06:29:51Z"
+      "beleg_id": "fa599b5472fcd1a0643413f96617fe7a284634343be4313279aae3654c2a60d9",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=d8a5a2fd-f1b4-4e7c-9fb9-9efe0fb03a4d",
+      "zeitpunkt": "2026-10-09T11:38:18Z"
      },
      "beleg_status": "offen",
      "buendel": {
@@ -873,7 +871,7 @@
       "antwort_betrag": true,
       "antwort_einmalzahlung": true,
       "antwort_laufzeit": 36,
-      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=b2a60b7a-478e-40a3-bee6-6f97ed42c9bc",
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=d8a5a2fd-f1b4-4e7c-9fb9-9efe0fb03a4d",
       "fundstellen": [],
       "gleicher_betrag": false,
       "kachel_betrag": true,
@@ -915,9 +913,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "e99ce75ee5742a296ebd0da48d34d9351fdcbfd6b555ce5f8248aa1294af4559",
-      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=b2a60b7a-478e-40a3-bee6-6f97ed42c9bc",
-      "zeitpunkt": "2026-10-09T06:29:51Z"
+      "beleg_id": "8d1aef011c343f647f0709fdc5a468417b4543ee6a11518af8a62e414488fdc2",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=d8a5a2fd-f1b4-4e7c-9fb9-9efe0fb03a4d",
+      "zeitpunkt": "2026-10-09T11:38:18Z"
      },
      "beleg_status": "offen",
      "buendel": {
@@ -928,7 +926,7 @@
       "antwort_betrag": true,
       "antwort_einmalzahlung": true,
       "antwort_laufzeit": 36,
-      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=b2a60b7a-478e-40a3-bee6-6f97ed42c9bc",
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=d8a5a2fd-f1b4-4e7c-9fb9-9efe0fb03a4d",
       "fundstellen": [
        "window.oResult.data[\"product.tariff.monthlycostsgross.2.cost\"]",
        "window.oResult.data[\"productlist.vendors.multi.tariff.monthlycostsgross.DE.3.cost\"][0]",
@@ -981,9 +979,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "356283f082d7424acde7bd8a5f5f8000370549870a353ea4f0a71da4e9ecc9c1",
-      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=443294e1-f565-4b00-a5e1-b30fdff37f68",
-      "zeitpunkt": "2026-10-09T06:31:04Z"
+      "beleg_id": "8e48dc2e2962edb8033c32ab1885ae8378e83eba51dbc0a36c7b2ea417e2ce94",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=11f7c5a2-ce76-49a6-899e-93da8740eb41",
+      "zeitpunkt": "2026-10-09T11:39:48Z"
      },
      "beleg_status": "offen",
      "buendel": {
@@ -994,7 +992,7 @@
       "antwort_betrag": true,
       "antwort_einmalzahlung": true,
       "antwort_laufzeit": 36,
-      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=443294e1-f565-4b00-a5e1-b30fdff37f68",
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=11f7c5a2-ce76-49a6-899e-93da8740eb41",
       "fundstellen": [],
       "gleicher_betrag": false,
       "kachel_betrag": true,
@@ -1036,9 +1034,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "4cd8b68e7596cb5e33eddbfa34614e9f7fe4dcf99127e04d390c77ef5f9eaebe",
-      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=443294e1-f565-4b00-a5e1-b30fdff37f68",
-      "zeitpunkt": "2026-10-09T06:31:04Z"
+      "beleg_id": "6dbfbad71acc40b1dd1e58008b602fe552b7d4b4fd28241901baf538fc8631bd",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=11f7c5a2-ce76-49a6-899e-93da8740eb41",
+      "zeitpunkt": "2026-10-09T11:39:49Z"
      },
      "beleg_status": "offen",
      "buendel": {
@@ -1049,20 +1047,20 @@
       "antwort_betrag": true,
       "antwort_einmalzahlung": true,
       "antwort_laufzeit": 36,
-      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=443294e1-f565-4b00-a5e1-b30fdff37f68",
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=11f7c5a2-ce76-49a6-899e-93da8740eb41",
       "fundstellen": [
        "window.oResult.data[\"product.tariff.monthlycostsgross.2.cost\"]",
        "window.oResult.data[\"productlist.vendors.multi.tariff.monthlycostsgross.DE.3.cost\"][0]",
        "window.oResult.data[\"productlist.vendors.multi.tariff.monthlycostsgross.DE.2.cost\"][0]",
        "window.oResult.data[\"productlist.tariff.monthlycostsgross.3.cost\"][0]",
        "window.oResult.data[\"productlist.tariff.monthlycostsgross.2.cost\"][0]",
-       "window.iTealiumInterface.history[2].final_dictionary[\"productlist.tariff.monthlycostsgross.1.3.cost\"]",
-       "window.iTealiumInterface.history[2].final_dictionary[\"productlist.tariff.monthlycostsgross.1.2.cost\"]",
        "window.iTealiumInterface.history[2].input_dictionary[\"productlist.tariff.monthlycostsgross.1.3.cost\"]",
        "window.iTealiumInterface.history[2].input_dictionary[\"productlist.tariff.monthlycostsgross.1.2.cost\"]",
        "window.iTealiumInterface.history[2].input_object.productlist[\"tariff.monthlycostsgross\"][0][\"3\"].cost",
        "window.iTealiumInterface.history[2].input_object.productlist[\"tariff.monthlycostsgross\"][0][\"2\"].cost",
-       "window.iTealiumInterface.history[1].final_dictionary[\"productlist.tariff.monthlycostsgross.1.3.cost\"]"
+       "window.iTealiumInterface.history[1].final_dictionary[\"productlist.tariff.monthlycostsgross.1.3.cost\"]",
+       "window.iTealiumInterface.history[1].final_dictionary[\"productlist.tariff.monthlycostsgross.1.2.cost\"]",
+       "window.iTealiumInterface.history[1].input_dictionary[\"productlist.tariff.monthlycostsgross.1.3.cost\"]"
       ],
       "gleicher_betrag": true,
       "kachel_betrag": true,
@@ -1102,9 +1100,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "cf4f7aecaf876c2c354708e603e27e7be81979f755d3733a3726cc9dc571fcca",
-      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=72717396-65a3-4895-b7f2-fff718e917c0",
-      "zeitpunkt": "2026-10-09T06:32:18Z"
+      "beleg_id": "2f4218fe7c1de0c36bbdf376b84b441d349be8bb950e4e530e1117397144d3a7",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=464cc067-ec30-4e27-b429-0827aacf2bf1",
+      "zeitpunkt": "2026-10-09T11:41:18Z"
      },
      "beleg_status": "offen",
      "buendel": {
@@ -1115,7 +1113,7 @@
       "antwort_betrag": true,
       "antwort_einmalzahlung": true,
       "antwort_laufzeit": 36,
-      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=72717396-65a3-4895-b7f2-fff718e917c0",
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=464cc067-ec30-4e27-b429-0827aacf2bf1",
       "fundstellen": [],
       "gleicher_betrag": false,
       "kachel_betrag": true,
@@ -1157,9 +1155,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "6c19af6a8b93f271bd220b46a2ec66dd2cc7e0af64dff4514d793afc38965184",
-      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=72717396-65a3-4895-b7f2-fff718e917c0",
-      "zeitpunkt": "2026-10-09T06:32:18Z"
+      "beleg_id": "233e7e549bff8cf4bf629f35054d70e26b3e08e75eb4b0681cb34dfa282bdcab",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=464cc067-ec30-4e27-b429-0827aacf2bf1",
+      "zeitpunkt": "2026-10-09T11:41:18Z"
      },
      "beleg_status": "offen",
      "buendel": {
@@ -1170,20 +1168,20 @@
       "antwort_betrag": true,
       "antwort_einmalzahlung": true,
       "antwort_laufzeit": 36,
-      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=72717396-65a3-4895-b7f2-fff718e917c0",
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=464cc067-ec30-4e27-b429-0827aacf2bf1",
       "fundstellen": [
        "window.oResult.data[\"product.tariff.monthlycostsgross.2.cost\"]",
        "window.oResult.data[\"productlist.vendors.multi.tariff.monthlycostsgross.DE.3.cost\"][0]",
        "window.oResult.data[\"productlist.vendors.multi.tariff.monthlycostsgross.DE.2.cost\"][0]",
        "window.oResult.data[\"productlist.tariff.monthlycostsgross.3.cost\"][0]",
        "window.oResult.data[\"productlist.tariff.monthlycostsgross.2.cost\"][0]",
-       "window.iTealiumInterface.history[2].final_dictionary[\"productlist.tariff.monthlycostsgross.1.3.cost\"]",
-       "window.iTealiumInterface.history[2].final_dictionary[\"productlist.tariff.monthlycostsgross.1.2.cost\"]",
        "window.iTealiumInterface.history[2].input_dictionary[\"productlist.tariff.monthlycostsgross.1.3.cost\"]",
        "window.iTealiumInterface.history[2].input_dictionary[\"productlist.tariff.monthlycostsgross.1.2.cost\"]",
        "window.iTealiumInterface.history[2].input_object.productlist[\"tariff.monthlycostsgross\"][0][\"3\"].cost",
        "window.iTealiumInterface.history[2].input_object.productlist[\"tariff.monthlycostsgross\"][0][\"2\"].cost",
-       "window.iTealiumInterface.history[1].final_dictionary[\"productlist.tariff.monthlycostsgross.1.3.cost\"]"
+       "window.iTealiumInterface.history[1].final_dictionary[\"productlist.tariff.monthlycostsgross.1.3.cost\"]",
+       "window.iTealiumInterface.history[1].final_dictionary[\"productlist.tariff.monthlycostsgross.1.2.cost\"]",
+       "window.iTealiumInterface.history[1].input_dictionary[\"productlist.tariff.monthlycostsgross.1.3.cost\"]"
       ],
       "gleicher_betrag": true,
       "kachel_betrag": true,
@@ -1223,9 +1221,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "4aef2dbaa43abfb6195d880da78a4a304bfff1efae63fc3a9d7e99d56d547efa",
-      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=d078a832-6d34-4201-a4d7-ad1da13bc432",
-      "zeitpunkt": "2026-10-09T06:34:08Z"
+      "beleg_id": "ba4b30804a03912cb52a4d787e018197d93bfe19af8e46889692aa92fd707ad3",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=1ba6160c-3d3d-4406-a1e7-426b3234c5ac",
+      "zeitpunkt": "2026-10-09T11:42:34Z"
      },
      "beleg_status": "offen",
      "buendel": {
@@ -1236,7 +1234,7 @@
       "antwort_betrag": true,
       "antwort_einmalzahlung": true,
       "antwort_laufzeit": 36,
-      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=d078a832-6d34-4201-a4d7-ad1da13bc432",
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=1ba6160c-3d3d-4406-a1e7-426b3234c5ac",
       "fundstellen": [],
       "gleicher_betrag": false,
       "kachel_betrag": true,
@@ -1278,9 +1276,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "198bd23ee62c80a4a542f3f0c3f4837e8436517523ee89a793282da390d593ed",
-      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=d078a832-6d34-4201-a4d7-ad1da13bc432",
-      "zeitpunkt": "2026-10-09T06:34:08Z"
+      "beleg_id": "62a43845e956af3444f9980f981ae31f47731600bf47230db6e925335f07d3f8",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=1ba6160c-3d3d-4406-a1e7-426b3234c5ac",
+      "zeitpunkt": "2026-10-09T11:42:34Z"
      },
      "beleg_status": "offen",
      "buendel": {
@@ -1291,7 +1289,7 @@
       "antwort_betrag": true,
       "antwort_einmalzahlung": true,
       "antwort_laufzeit": 36,
-      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=d078a832-6d34-4201-a4d7-ad1da13bc432",
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-17-pro-max&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=1ba6160c-3d3d-4406-a1e7-426b3234c5ac",
       "fundstellen": [
        "window.oResult.data[\"product.tariff.monthlycostsgross.2.cost\"]",
        "window.oResult.data[\"productlist.vendors.multi.tariff.monthlycostsgross.DE.3.cost\"][0]",
@@ -1323,405 +1321,6 @@
      "variante": {
       "laufzeit": 36,
       "speicher": "2048",
-      "tarif": "tariff-anf-s-mvl"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    }
-   ],
-   "ladung": {
-    "abstand_s": 2.0,
-    "anfragen": 29,
-    "beendet": 28,
-    "dokument": "complete",
-    "geladen": true,
-    "offen": {
-     "cdn.appdynamics.com": 1
-    },
-    "ohne_antwort_ms": 0,
-    "sekunden": 24.1,
-    "takte_ms": 1050,
-    "wartet_auf": "load"
-   },
-   "speicher_gb": 256,
-   "sperre": null,
-   "status": "gelesen",
-   "stoerung": null,
-   "struktur": {
-    "anteil_felder": 0.21428571428571427,
-    "anteil_knoepfe": 1.0,
-    "felder_gefunden": 12,
-    "felder_gesucht": 56,
-    "knoepfe_gefunden": 9,
-    "knoepfe_gesucht": 9
-   },
-   "verworfen": 21
-  },
-  {
-   "adresse": "https://mobile.1und1.de/samsung-galaxy-s26-ultra",
-   "geraet": "samsung-galaxy-s26-ultra",
-   "gescheitert": 0,
-   "grund": null,
-   "http_status": 200,
-   "kombinationen": [
-    {
-     "antwort_url": "https://mobile.1und1.de/samsung-galaxy-s26-ultra",
-     "auswahl": {
-      "laufzeit": "24",
-      "speicher": "256",
-      "tarif": "tariff-anf-s-mvl"
-     },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "c4cb2e649dfc1481b724bf3f76e01725f4243950ffdea48facf9a7bb5ed658da",
-      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=c27b11c0-7179-476e-96ab-224e27a7f950",
-      "zeitpunkt": "2026-10-09T06:35:21Z"
-     },
-     "beleg_status": "offen",
-     "buendel": {
-      "buendelbetrag": 57.99,
-      "einmalzahlung": null
-     },
-     "diagnose": {
-      "antwort_betrag": true,
-      "antwort_einmalzahlung": true,
-      "antwort_laufzeit": 36,
-      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=c27b11c0-7179-476e-96ab-224e27a7f950",
-      "fundstellen": [],
-      "gleicher_betrag": false,
-      "kachel_betrag": true,
-      "kachel_einmalzahlung": false,
-      "ohne_suche": null
-     },
-     "echo_quelle": "Kachel der Folgeseite",
-     "grund": null,
-     "luecken": [
-      "anzahlung",
-      "tarifphasen",
-      "tarifbindung",
-      "anschluss",
-      "volumen_gb",
-      "einmalzahlung"
-     ],
-     "status": "erfasst",
-     "variante": {
-      "laufzeit": 24,
-      "speicher": "256",
-      "tarif": "tariff-anf-s-mvl"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": "https://mobile.1und1.de/samsung-galaxy-s26-ultra",
-     "auswahl": {
-      "laufzeit": "24+12",
-      "speicher": "256",
-      "tarif": "tariff-anf-s-mvl"
-     },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "c1885fbd5706cd1ce2f78a3ba747ab4af8cb4eae34ba93c488f1852194689462",
-      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=c27b11c0-7179-476e-96ab-224e27a7f950",
-      "zeitpunkt": "2026-10-09T06:35:21Z"
-     },
-     "beleg_status": "offen",
-     "buendel": {
-      "buendelbetrag": 42.99,
-      "einmalzahlung": 340.0
-     },
-     "diagnose": {
-      "antwort_betrag": true,
-      "antwort_einmalzahlung": true,
-      "antwort_laufzeit": 36,
-      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=c27b11c0-7179-476e-96ab-224e27a7f950",
-      "fundstellen": [
-       "window.oResult.data[\"product.tariff.monthlycostsgross.2.cost\"]",
-       "window.oResult.data[\"productlist.vendors.multi.tariff.monthlycostsgross.DE.3.cost\"][0]",
-       "window.oResult.data[\"productlist.vendors.multi.tariff.monthlycostsgross.DE.2.cost\"][0]",
-       "window.oResult.data[\"productlist.tariff.monthlycostsgross.3.cost\"][0]",
-       "window.oResult.data[\"productlist.tariff.monthlycostsgross.2.cost\"][0]",
-       "window.iTealiumInterface.history[2].final_dictionary[\"productlist.tariff.monthlycostsgross.1.3.cost\"]",
-       "window.iTealiumInterface.history[2].final_dictionary[\"productlist.tariff.monthlycostsgross.1.2.cost\"]",
-       "window.iTealiumInterface.history[2].input_dictionary[\"productlist.tariff.monthlycostsgross.1.3.cost\"]",
-       "window.iTealiumInterface.history[2].input_dictionary[\"productlist.tariff.monthlycostsgross.1.2.cost\"]",
-       "window.iTealiumInterface.history[2].input_object.productlist[\"tariff.monthlycostsgross\"][0][\"3\"].cost",
-       "window.iTealiumInterface.history[2].input_object.productlist[\"tariff.monthlycostsgross\"][0][\"2\"].cost",
-       "window.iTealiumInterface.history[1].final_dictionary[\"productlist.tariff.monthlycostsgross.1.3.cost\"]"
-      ],
-      "gleicher_betrag": true,
-      "kachel_betrag": true,
-      "kachel_einmalzahlung": true,
-      "ohne_suche": null
-     },
-     "grund": null,
-     "luecken": [
-      "anzahlung",
-      "tarifphasen",
-      "tarifbindung",
-      "anschluss",
-      "volumen_gb"
-     ],
-     "status": "erfasst",
-     "variante": {
-      "laufzeit": 36,
-      "speicher": "256",
-      "tarif": "tariff-anf-s-mvl"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": "https://mobile.1und1.de/samsung-galaxy-s26-ultra?color=COBALT_VIOLET&size=512",
-     "auswahl": {
-      "laufzeit": "24",
-      "speicher": "512",
-      "tarif": "tariff-anf-s-mvl"
-     },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "9ed6bf46cf49dc7897ab3297dd1bc24e26f8aa6e58eb8c94a6ab13c95954dd1d",
-      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=10b48929-04f8-47bb-8f13-fc6f204deec9",
-      "zeitpunkt": "2026-10-09T06:36:35Z"
-     },
-     "beleg_status": "offen",
-     "buendel": {
-      "buendelbetrag": 65.99,
-      "einmalzahlung": null
-     },
-     "diagnose": {
-      "antwort_betrag": true,
-      "antwort_einmalzahlung": true,
-      "antwort_laufzeit": 36,
-      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=10b48929-04f8-47bb-8f13-fc6f204deec9",
-      "fundstellen": [],
-      "gleicher_betrag": false,
-      "kachel_betrag": true,
-      "kachel_einmalzahlung": false,
-      "ohne_suche": null
-     },
-     "echo_quelle": "Kachel der Folgeseite",
-     "grund": null,
-     "luecken": [
-      "anzahlung",
-      "tarifphasen",
-      "tarifbindung",
-      "anschluss",
-      "volumen_gb",
-      "einmalzahlung"
-     ],
-     "status": "erfasst",
-     "variante": {
-      "laufzeit": 24,
-      "speicher": "512",
-      "tarif": "tariff-anf-s-mvl"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": "https://mobile.1und1.de/samsung-galaxy-s26-ultra?color=COBALT_VIOLET&size=512",
-     "auswahl": {
-      "laufzeit": "24+12",
-      "speicher": "512",
-      "tarif": "tariff-anf-s-mvl"
-     },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "f17d08a4c728d8ab57db61c757595f96d7938198166c1b55726100e2efd75d4e",
-      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=10b48929-04f8-47bb-8f13-fc6f204deec9",
-      "zeitpunkt": "2026-10-09T06:36:35Z"
-     },
-     "beleg_status": "offen",
-     "buendel": {
-      "buendelbetrag": 48.99,
-      "einmalzahlung": 410.0
-     },
-     "diagnose": {
-      "antwort_betrag": true,
-      "antwort_einmalzahlung": true,
-      "antwort_laufzeit": 36,
-      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=10b48929-04f8-47bb-8f13-fc6f204deec9",
-      "fundstellen": [
-       "window.oResult.data[\"product.tariff.monthlycostsgross.2.cost\"]",
-       "window.oResult.data[\"productlist.vendors.multi.tariff.monthlycostsgross.DE.3.cost\"][0]",
-       "window.oResult.data[\"productlist.vendors.multi.tariff.monthlycostsgross.DE.2.cost\"][0]",
-       "window.oResult.data[\"productlist.tariff.monthlycostsgross.3.cost\"][0]",
-       "window.oResult.data[\"productlist.tariff.monthlycostsgross.2.cost\"][0]",
-       "window.iTealiumInterface.history[2].final_dictionary[\"productlist.tariff.monthlycostsgross.1.3.cost\"]",
-       "window.iTealiumInterface.history[2].final_dictionary[\"productlist.tariff.monthlycostsgross.1.2.cost\"]",
-       "window.iTealiumInterface.history[2].input_dictionary[\"productlist.tariff.monthlycostsgross.1.3.cost\"]",
-       "window.iTealiumInterface.history[2].input_dictionary[\"productlist.tariff.monthlycostsgross.1.2.cost\"]",
-       "window.iTealiumInterface.history[2].input_object.productlist[\"tariff.monthlycostsgross\"][0][\"3\"].cost",
-       "window.iTealiumInterface.history[2].input_object.productlist[\"tariff.monthlycostsgross\"][0][\"2\"].cost",
-       "window.iTealiumInterface.history[1].final_dictionary[\"productlist.tariff.monthlycostsgross.1.3.cost\"]"
-      ],
-      "gleicher_betrag": true,
-      "kachel_betrag": true,
-      "kachel_einmalzahlung": true,
-      "ohne_suche": null
-     },
-     "grund": null,
-     "luecken": [
-      "anzahlung",
-      "tarifphasen",
-      "tarifbindung",
-      "anschluss",
-      "volumen_gb"
-     ],
-     "status": "erfasst",
-     "variante": {
-      "laufzeit": 36,
-      "speicher": "512",
-      "tarif": "tariff-anf-s-mvl"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": "https://mobile.1und1.de/samsung-galaxy-s26-ultra?color=COBALT_VIOLET&size=1024",
-     "auswahl": {
-      "laufzeit": "24",
-      "speicher": "1024",
-      "tarif": "tariff-anf-s-mvl"
-     },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "124000eb7e4d63d34216d7a1e9415cd8754baf6d762d7ba51576c551ba3f9b08",
-      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=654ab084-fcce-4142-8ab2-b01da5005a5e",
-      "zeitpunkt": "2026-10-09T06:37:52Z"
-     },
-     "beleg_status": "offen",
-     "buendel": {
-      "buendelbetrag": 77.99,
-      "einmalzahlung": null
-     },
-     "diagnose": {
-      "antwort_betrag": true,
-      "antwort_einmalzahlung": true,
-      "antwort_laufzeit": 36,
-      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=654ab084-fcce-4142-8ab2-b01da5005a5e",
-      "fundstellen": [],
-      "gleicher_betrag": false,
-      "kachel_betrag": true,
-      "kachel_einmalzahlung": false,
-      "ohne_suche": null
-     },
-     "echo_quelle": "Kachel der Folgeseite",
-     "grund": null,
-     "luecken": [
-      "anzahlung",
-      "tarifphasen",
-      "tarifbindung",
-      "anschluss",
-      "volumen_gb",
-      "einmalzahlung"
-     ],
-     "status": "erfasst",
-     "variante": {
-      "laufzeit": 24,
-      "speicher": "1024",
-      "tarif": "tariff-anf-s-mvl"
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": "https://mobile.1und1.de/samsung-galaxy-s26-ultra?color=COBALT_VIOLET&size=1024",
-     "auswahl": {
-      "laufzeit": "24+12",
-      "speicher": "1024",
-      "tarif": "tariff-anf-s-mvl"
-     },
-     "befunde": [],
-     "beleg": {
-      "beleg_id": "d6d8bbe29c01e391114a7407e22e1070c3c6f927c194f1ca9a1cb5dd6044ff06",
-      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=654ab084-fcce-4142-8ab2-b01da5005a5e",
-      "zeitpunkt": "2026-10-09T06:37:52Z"
-     },
-     "beleg_status": "offen",
-     "buendel": {
-      "buendelbetrag": 56.99,
-      "einmalzahlung": 510.0
-     },
-     "diagnose": {
-      "antwort_betrag": true,
-      "antwort_einmalzahlung": true,
-      "antwort_laufzeit": 36,
-      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=654ab084-fcce-4142-8ab2-b01da5005a5e",
-      "fundstellen": [
-       "window.oResult.data[\"product.tariff.monthlycostsgross.2.cost\"]",
-       "window.oResult.data[\"productlist.vendors.multi.tariff.monthlycostsgross.DE.3.cost\"][0]",
-       "window.oResult.data[\"productlist.vendors.multi.tariff.monthlycostsgross.DE.2.cost\"][0]",
-       "window.oResult.data[\"productlist.tariff.monthlycostsgross.3.cost\"][0]",
-       "window.oResult.data[\"productlist.tariff.monthlycostsgross.2.cost\"][0]",
-       "window.iTealiumInterface.history[2].final_dictionary[\"productlist.tariff.monthlycostsgross.1.3.cost\"]",
-       "window.iTealiumInterface.history[2].final_dictionary[\"productlist.tariff.monthlycostsgross.1.2.cost\"]",
-       "window.iTealiumInterface.history[2].input_dictionary[\"productlist.tariff.monthlycostsgross.1.3.cost\"]",
-       "window.iTealiumInterface.history[2].input_dictionary[\"productlist.tariff.monthlycostsgross.1.2.cost\"]",
-       "window.iTealiumInterface.history[2].input_object.productlist[\"tariff.monthlycostsgross\"][0][\"3\"].cost",
-       "window.iTealiumInterface.history[2].input_object.productlist[\"tariff.monthlycostsgross\"][0][\"2\"].cost",
-       "window.iTealiumInterface.history[1].final_dictionary[\"productlist.tariff.monthlycostsgross.1.3.cost\"]"
-      ],
-      "gleicher_betrag": true,
-      "kachel_betrag": true,
-      "kachel_einmalzahlung": true,
-      "ohne_suche": null
-     },
-     "grund": null,
-     "luecken": [
-      "anzahlung",
-      "tarifphasen",
-      "tarifbindung",
-      "anschluss",
-      "volumen_gb"
-     ],
-     "status": "erfasst",
-     "variante": {
-      "laufzeit": 36,
-      "speicher": "1024",
       "tarif": "tariff-anf-s-mvl"
      },
      "werte": {
@@ -1746,7 +1345,406 @@
     },
     "ohne_antwort_ms": 0,
     "sekunden": 25.4,
-    "takte_ms": 2150,
+    "takte_ms": 2400,
+    "wartet_auf": "load"
+   },
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 0.21428571428571427,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 12,
+    "felder_gesucht": 56,
+    "knoepfe_gefunden": 9,
+    "knoepfe_gesucht": 9
+   },
+   "verworfen": 26
+  },
+  {
+   "adresse": "https://mobile.1und1.de/samsung-galaxy-s26-ultra",
+   "geraet": "samsung-galaxy-s26-ultra",
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://mobile.1und1.de/samsung-galaxy-s26-ultra",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "ab167a7e258ed239283612ed1a240b3dc1704325eda349af4cb09e46324c39bf",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=b221ea64-89fa-4ec0-850a-a9872c7a3605",
+      "zeitpunkt": "2026-10-09T11:43:49Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 57.99,
+      "einmalzahlung": null
+     },
+     "diagnose": {
+      "antwort_betrag": true,
+      "antwort_einmalzahlung": true,
+      "antwort_laufzeit": 36,
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=b221ea64-89fa-4ec0-850a-a9872c7a3605",
+      "fundstellen": [],
+      "gleicher_betrag": false,
+      "kachel_betrag": true,
+      "kachel_einmalzahlung": false,
+      "ohne_suche": null
+     },
+     "echo_quelle": "Kachel der Folgeseite",
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/samsung-galaxy-s26-ultra",
+     "auswahl": {
+      "laufzeit": "24+12",
+      "speicher": "256",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "e8fdd1afed5298e645682cd51bb8945732ddfd5e1862a2c8e8acb585d13b20e2",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=b221ea64-89fa-4ec0-850a-a9872c7a3605",
+      "zeitpunkt": "2026-10-09T11:43:49Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 42.99,
+      "einmalzahlung": 340.0
+     },
+     "diagnose": {
+      "antwort_betrag": true,
+      "antwort_einmalzahlung": true,
+      "antwort_laufzeit": 36,
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=b221ea64-89fa-4ec0-850a-a9872c7a3605",
+      "fundstellen": [
+       "window.oResult.data[\"product.tariff.monthlycostsgross.2.cost\"]",
+       "window.oResult.data[\"productlist.vendors.multi.tariff.monthlycostsgross.DE.3.cost\"][0]",
+       "window.oResult.data[\"productlist.vendors.multi.tariff.monthlycostsgross.DE.2.cost\"][0]",
+       "window.oResult.data[\"productlist.tariff.monthlycostsgross.3.cost\"][0]",
+       "window.oResult.data[\"productlist.tariff.monthlycostsgross.2.cost\"][0]",
+       "window.iTealiumInterface.history[2].final_dictionary[\"productlist.tariff.monthlycostsgross.1.3.cost\"]",
+       "window.iTealiumInterface.history[2].final_dictionary[\"productlist.tariff.monthlycostsgross.1.2.cost\"]",
+       "window.iTealiumInterface.history[2].input_dictionary[\"productlist.tariff.monthlycostsgross.1.3.cost\"]",
+       "window.iTealiumInterface.history[2].input_dictionary[\"productlist.tariff.monthlycostsgross.1.2.cost\"]",
+       "window.iTealiumInterface.history[2].input_object.productlist[\"tariff.monthlycostsgross\"][0][\"3\"].cost",
+       "window.iTealiumInterface.history[2].input_object.productlist[\"tariff.monthlycostsgross\"][0][\"2\"].cost",
+       "window.iTealiumInterface.history[1].final_dictionary[\"productlist.tariff.monthlycostsgross.1.3.cost\"]"
+      ],
+      "gleicher_betrag": true,
+      "kachel_betrag": true,
+      "kachel_einmalzahlung": true,
+      "ohne_suche": null
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/samsung-galaxy-s26-ultra?color=COBALT_VIOLET&size=512",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "1fc8a2108d114bc4fe447e16ddd53cd72fb2ac4608addc4c15a2c9b2dd24abf4",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=19f0d717-9c58-4bd7-b0fc-cc2afbecc460",
+      "zeitpunkt": "2026-10-09T11:45:05Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 65.99,
+      "einmalzahlung": null
+     },
+     "diagnose": {
+      "antwort_betrag": true,
+      "antwort_einmalzahlung": true,
+      "antwort_laufzeit": 36,
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=19f0d717-9c58-4bd7-b0fc-cc2afbecc460",
+      "fundstellen": [],
+      "gleicher_betrag": false,
+      "kachel_betrag": true,
+      "kachel_einmalzahlung": false,
+      "ohne_suche": null
+     },
+     "echo_quelle": "Kachel der Folgeseite",
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/samsung-galaxy-s26-ultra?color=COBALT_VIOLET&size=512",
+     "auswahl": {
+      "laufzeit": "24+12",
+      "speicher": "512",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "8aeafd22cf2684e56a91d9bb47a1fbc33561a0cdecf112e13e44043ddbb407ab",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=19f0d717-9c58-4bd7-b0fc-cc2afbecc460",
+      "zeitpunkt": "2026-10-09T11:45:05Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 48.99,
+      "einmalzahlung": 410.0
+     },
+     "diagnose": {
+      "antwort_betrag": true,
+      "antwort_einmalzahlung": true,
+      "antwort_laufzeit": 36,
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=19f0d717-9c58-4bd7-b0fc-cc2afbecc460",
+      "fundstellen": [
+       "window.oResult.data[\"product.tariff.monthlycostsgross.2.cost\"]",
+       "window.oResult.data[\"productlist.vendors.multi.tariff.monthlycostsgross.DE.3.cost\"][0]",
+       "window.oResult.data[\"productlist.vendors.multi.tariff.monthlycostsgross.DE.2.cost\"][0]",
+       "window.oResult.data[\"productlist.tariff.monthlycostsgross.3.cost\"][0]",
+       "window.oResult.data[\"productlist.tariff.monthlycostsgross.2.cost\"][0]",
+       "window.iTealiumInterface.history[2].final_dictionary[\"productlist.tariff.monthlycostsgross.1.3.cost\"]",
+       "window.iTealiumInterface.history[2].final_dictionary[\"productlist.tariff.monthlycostsgross.1.2.cost\"]",
+       "window.iTealiumInterface.history[2].input_dictionary[\"productlist.tariff.monthlycostsgross.1.3.cost\"]",
+       "window.iTealiumInterface.history[2].input_dictionary[\"productlist.tariff.monthlycostsgross.1.2.cost\"]",
+       "window.iTealiumInterface.history[2].input_object.productlist[\"tariff.monthlycostsgross\"][0][\"3\"].cost",
+       "window.iTealiumInterface.history[2].input_object.productlist[\"tariff.monthlycostsgross\"][0][\"2\"].cost",
+       "window.iTealiumInterface.history[1].final_dictionary[\"productlist.tariff.monthlycostsgross.1.3.cost\"]"
+      ],
+      "gleicher_betrag": true,
+      "kachel_betrag": true,
+      "kachel_einmalzahlung": true,
+      "ohne_suche": null
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/samsung-galaxy-s26-ultra?color=COBALT_VIOLET&size=1024",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "1024",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "ead596203b00da17bf92ec8c18f15a45dc823d7deeb3bd1a4af5c2ac387c7fe8",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=379592d8-cf8e-4346-b364-cb62d7a61d53",
+      "zeitpunkt": "2026-10-09T11:46:18Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 77.99,
+      "einmalzahlung": null
+     },
+     "diagnose": {
+      "antwort_betrag": true,
+      "antwort_einmalzahlung": true,
+      "antwort_laufzeit": 36,
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=379592d8-cf8e-4346-b364-cb62d7a61d53",
+      "fundstellen": [],
+      "gleicher_betrag": false,
+      "kachel_betrag": true,
+      "kachel_einmalzahlung": false,
+      "ohne_suche": null
+     },
+     "echo_quelle": "Kachel der Folgeseite",
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "1024",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/samsung-galaxy-s26-ultra?color=COBALT_VIOLET&size=1024",
+     "auswahl": {
+      "laufzeit": "24+12",
+      "speicher": "1024",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "8354c23ac853ade518e8de32fac5fe579d5894d24d20db214d9b40520fc2462a",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=379592d8-cf8e-4346-b364-cb62d7a61d53",
+      "zeitpunkt": "2026-10-09T11:46:18Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 56.99,
+      "einmalzahlung": 510.0
+     },
+     "diagnose": {
+      "antwort_betrag": true,
+      "antwort_einmalzahlung": true,
+      "antwort_laufzeit": 36,
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26-ultra&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=379592d8-cf8e-4346-b364-cb62d7a61d53",
+      "fundstellen": [
+       "window.oResult.data[\"product.tariff.monthlycostsgross.2.cost\"]",
+       "window.oResult.data[\"productlist.vendors.multi.tariff.monthlycostsgross.DE.3.cost\"][0]",
+       "window.oResult.data[\"productlist.vendors.multi.tariff.monthlycostsgross.DE.2.cost\"][0]",
+       "window.oResult.data[\"productlist.tariff.monthlycostsgross.3.cost\"][0]",
+       "window.oResult.data[\"productlist.tariff.monthlycostsgross.2.cost\"][0]",
+       "window.iTealiumInterface.history[2].final_dictionary[\"productlist.tariff.monthlycostsgross.1.3.cost\"]",
+       "window.iTealiumInterface.history[2].final_dictionary[\"productlist.tariff.monthlycostsgross.1.2.cost\"]",
+       "window.iTealiumInterface.history[2].input_dictionary[\"productlist.tariff.monthlycostsgross.1.3.cost\"]",
+       "window.iTealiumInterface.history[2].input_dictionary[\"productlist.tariff.monthlycostsgross.1.2.cost\"]",
+       "window.iTealiumInterface.history[2].input_object.productlist[\"tariff.monthlycostsgross\"][0][\"3\"].cost",
+       "window.iTealiumInterface.history[2].input_object.productlist[\"tariff.monthlycostsgross\"][0][\"2\"].cost",
+       "window.iTealiumInterface.history[1].final_dictionary[\"productlist.tariff.monthlycostsgross.1.3.cost\"]"
+      ],
+      "gleicher_betrag": true,
+      "kachel_betrag": true,
+      "kachel_einmalzahlung": true,
+      "ohne_suche": null
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "1024",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 2.0,
+    "anfragen": 29,
+    "beendet": 28,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "cdn.appdynamics.com": 1
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 25.3,
+    "takte_ms": 1100,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -1779,9 +1777,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "580070c21213b04563ae5e2e0f91dac5fe8ee86d91df9ff3a367b54133c83621",
-      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-11&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-11&addFlowStates=tradeInAvailable%2CbrandGoogle%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=670b4c84-d335-4c39-bf7a-7bed0e4b3c0f",
-      "zeitpunkt": "2026-10-09T06:39:03Z"
+      "beleg_id": "504001e249c5cf240b091dbea5acf34abcf31dd742cf0311001ed3c833a614e3",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-11&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-11&addFlowStates=tradeInAvailable%2CbrandGoogle%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=b8096db3-372c-4167-b2e8-70a346499e68",
+      "zeitpunkt": "2026-10-09T11:47:30Z"
      },
      "beleg_status": "offen",
      "buendel": {
@@ -1792,7 +1790,7 @@
       "antwort_betrag": true,
       "antwort_einmalzahlung": true,
       "antwort_laufzeit": 36,
-      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-11&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-11&addFlowStates=tradeInAvailable%2CbrandGoogle%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=670b4c84-d335-4c39-bf7a-7bed0e4b3c0f",
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-11&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-11&addFlowStates=tradeInAvailable%2CbrandGoogle%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=b8096db3-372c-4167-b2e8-70a346499e68",
       "fundstellen": [],
       "gleicher_betrag": false,
       "kachel_betrag": true,
@@ -1834,9 +1832,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "4f23bdaab8487804634305a66fdd1e98ec780260d83914c17d0ed4d72dbc79c0",
-      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-11&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-11&addFlowStates=tradeInAvailable%2CbrandGoogle%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=670b4c84-d335-4c39-bf7a-7bed0e4b3c0f",
-      "zeitpunkt": "2026-10-09T06:39:03Z"
+      "beleg_id": "4888746889bb4164c15470429168fe250716144092da77bff86bb6de0a459ef7",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-11&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-11&addFlowStates=tradeInAvailable%2CbrandGoogle%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=b8096db3-372c-4167-b2e8-70a346499e68",
+      "zeitpunkt": "2026-10-09T11:47:30Z"
      },
      "beleg_status": "offen",
      "buendel": {
@@ -1847,7 +1845,7 @@
       "antwort_betrag": true,
       "antwort_einmalzahlung": true,
       "antwort_laufzeit": 36,
-      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-11&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-11&addFlowStates=tradeInAvailable%2CbrandGoogle%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=670b4c84-d335-4c39-bf7a-7bed0e4b3c0f",
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-11&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-11&addFlowStates=tradeInAvailable%2CbrandGoogle%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=b8096db3-372c-4167-b2e8-70a346499e68",
       "fundstellen": [
        "window.oResult.data[\"product.tariff.monthlycostsgross.2.cost\"]",
        "window.oResult.data[\"productlist.vendors.multi.tariff.monthlycostsgross.DE.3.cost\"][0]",
@@ -1900,9 +1898,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "3e6bfec9a9b21adece80f649451d38873e57f8f01569be4cc8420710c4b730d4",
-      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-11&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-11&addFlowStates=tradeInAvailable%2CbrandGoogle%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=4bf40891-81bf-4358-95b0-49d50053096d",
-      "zeitpunkt": "2026-10-09T06:40:21Z"
+      "beleg_id": "ee5a1a9768a7cd15cf13c9837ccf8592697e2c3e613a52ad8e6ef16f557d9291",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-11&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-11&addFlowStates=tradeInAvailable%2CbrandGoogle%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=f3b2d322-1bd0-4049-b91d-ab37bcf0a72a",
+      "zeitpunkt": "2026-10-09T11:48:42Z"
      },
      "beleg_status": "offen",
      "buendel": {
@@ -1913,7 +1911,7 @@
       "antwort_betrag": true,
       "antwort_einmalzahlung": true,
       "antwort_laufzeit": 36,
-      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-11&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-11&addFlowStates=tradeInAvailable%2CbrandGoogle%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=4bf40891-81bf-4358-95b0-49d50053096d",
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-11&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-11&addFlowStates=tradeInAvailable%2CbrandGoogle%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=f3b2d322-1bd0-4049-b91d-ab37bcf0a72a",
       "fundstellen": [],
       "gleicher_betrag": false,
       "kachel_betrag": true,
@@ -1955,9 +1953,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "16877dc60c3213392ca94d95c2db92d4d09215ad572c586a97f3b44688eeb023",
-      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-11&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-11&addFlowStates=tradeInAvailable%2CbrandGoogle%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=4bf40891-81bf-4358-95b0-49d50053096d",
-      "zeitpunkt": "2026-10-09T06:40:21Z"
+      "beleg_id": "f3b6e2d57b1033d5ec7818f4fe1c09f84b4ae4fbb5a0f0410870336697c8971b",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-11&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-11&addFlowStates=tradeInAvailable%2CbrandGoogle%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=f3b2d322-1bd0-4049-b91d-ab37bcf0a72a",
+      "zeitpunkt": "2026-10-09T11:48:42Z"
      },
      "beleg_status": "offen",
      "buendel": {
@@ -1968,7 +1966,7 @@
       "antwort_betrag": true,
       "antwort_einmalzahlung": true,
       "antwort_laufzeit": 36,
-      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-11&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-11&addFlowStates=tradeInAvailable%2CbrandGoogle%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=4bf40891-81bf-4358-95b0-49d50053096d",
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-11&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fgoogle-pixel-11&addFlowStates=tradeInAvailable%2CbrandGoogle%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=f3b2d322-1bd0-4049-b91d-ab37bcf0a72a",
       "fundstellen": [
        "window.oResult.data[\"product.tariff.monthlycostsgross.2.cost\"]",
        "window.oResult.data[\"productlist.vendors.multi.tariff.monthlycostsgross.DE.3.cost\"][0]",
@@ -2015,16 +2013,16 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 28,
-    "beendet": 27,
+    "anfragen": 29,
+    "beendet": 28,
     "dokument": "complete",
     "geladen": true,
     "offen": {
      "cdn.appdynamics.com": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 25.4,
-    "takte_ms": 2600,
+    "sekunden": 23.6,
+    "takte_ms": 1400,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -2043,6 +2041,7 @@
   }
  ],
  "ueberfaellig": [],
+ "uebersichten": [],
  "vertragsform": "ein_vertrag",
- "zeitbudget_sekunden": 3971
+ "zeitbudget_sekunden": 3977
 }
