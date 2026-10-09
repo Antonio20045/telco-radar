@@ -50,7 +50,9 @@ def bericht_schreiben(
     grund = (
         "es gab keine neuen Meldungen zu bewerten"
         if not neue
-        else "eine vorübergehende Störung des Analyse-Dienstes"
+        else redaktion_kontinuitaet.ausfallgrund(
+            llm.LlmSitzung.aktive().tote_modelle, llm.llm_available()
+        )
     )
     regional, body, competitor_profiles, redaktion_ausfall = (
         redaktion_kontinuitaet.uebernehmen(

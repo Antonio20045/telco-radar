@@ -184,6 +184,9 @@ vorsortierung_frist_sekunden: 480
 # Ein leerer Wert (oder llm_anker: false) schaltet den Anker ab - dann
 # verhaelt sich der Lauf wie vor dem 27.08.2026.
 # "claude-haiku-4-5" ist derselbe Stand ohne Datumskennung.
+# Seit 09.10.2026 aus (Pitch 4): unter llm_provider frei soll nichts Geld
+# kosten. Ein Anthropic-Konto mit Guthaben wuerde sonst am Kettenende zahlen.
+llm_anker: false
 anker_redaktion_model: "claude-sonnet-5"
 anker_mechanik_model: "claude-haiku-4-5-20251001"
 

@@ -125,3 +125,28 @@ def uebernehmen(
         list(vorheriger.get("competitors") or []),
         {"stand": stand, "grund": grund},
     )
+
+
+GRUND_KEIN_SCHLUESSEL = "kein KI-Schlüssel ist hinterlegt"
+GRUND_ABGELEHNT = "der KI-Anbieter hat den Schlüssel abgelehnt"
+GRUND_KONTINGENT = "das kostenlose KI-Kontingent war aufgebraucht"
+GRUND_STOERUNG = "eine vorübergehende Störung des Analyse-Dienstes"
+_ABGELEHNT = ("HTTP 401", "HTTP 403", "authentication", "api key", "fehlt fuer")
+_KONTINGENT = ("quota", "per day", "perday", "HTTP 402", "HTTP 429", "rate limit")
+
+
+def ausfallgrund(tote_modelle: dict[str, str], schluessel_da: bool) -> str:
+    """Warum eine Runde ohne Bewertung blieb, als Satzteil für die Seite.
+
+    Liest die Gründe, aus denen die Modelle des Laufs ausfielen
+    (``LlmSitzung.tote_modelle``). Sagt nur, was alle Gründe belegen; ein
+    Gemisch ohne Kontingent bleibt die allgemeine Störung.
+    """
+    if not schluessel_da:
+        return GRUND_KEIN_SCHLUESSEL
+    gruende = [g.lower() for g in tote_modelle.values()]
+    if gruende and all(any(m.lower() in g for m in _ABGELEHNT) for g in gruende):
+        return GRUND_ABGELEHNT
+    if any(any(m.lower() in g for m in _KONTINGENT) for g in gruende):
+        return GRUND_KONTINGENT
+    return GRUND_STOERUNG

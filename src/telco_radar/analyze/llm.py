@@ -561,7 +561,7 @@ def complete(
             aufruf = sitzung.client or _dispatch
             return aufruf(system, user, candidate, max_tokens, retries)
         except LLMModelUnavailable as exc:
-            sitzung.tote_modelle.add(candidate)
+            sitzung.tote_modelle[candidate] = str(exc)[:300]
             last_exc = exc
             log.warning(
                 "Model %s is not usable on this account - skipping it "
@@ -574,7 +574,7 @@ def complete(
         except LLMFatalError:
             raise
         except RuntimeError as exc:
-            sitzung.tote_modelle.add(candidate)
+            sitzung.tote_modelle[candidate] = str(exc)[:300]
             last_exc = exc
             log.warning("Model %s did not answer (%s)", candidate, str(exc)[:160])
 

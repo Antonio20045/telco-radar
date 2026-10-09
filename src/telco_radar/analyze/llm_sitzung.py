@@ -42,7 +42,8 @@ class LlmSitzung:
     verbrauch: dict[str, dict[str, int]] = field(default_factory=dict)
     preise: dict[str, dict[str, float]] = field(default_factory=dict)
     budget_usd: float | None = None
-    tote_modelle: set[str] = field(default_factory=set)
+    tote_modelle: dict[str, str] = field(default_factory=dict)
+    """Modell -> Grund seines Ausfalls (für ``ausfallgrund`` auf der Seite)."""
     _aktiv: ClassVar[LlmSitzung | None] = None
 
     @classmethod
