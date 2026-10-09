@@ -68,7 +68,7 @@ anbieter:
           selektor: "#device-details-offer-summary-card a.ws10-button--primary"
           text: Zur Tarifauswahl
 
-  - schluessel: 1und1
+  - schluessel: 1und1raster
     name: 1&1
     seiten:
       # PROBE Pitch 2 Schnitt 1 (nur auf dem Probezweig): Geräteraster je Tarif
@@ -77,7 +77,7 @@ anbieter:
       # nach dem Raster den Tarif des Rasters?
       - geraet: apple-iphone-17-pro
         speicher_gb: 256
-        url: https://mobile.1und1.de/smartphones-unlimited-m
+        url: https://mobile.1und1.de/smartphones-unlimited-xl
         weiter:
           selektor: 'form.hardware-box:has(a.hardware-box__heading[href="https://mobile.1und1.de/iphone-17-pro?tariffFirst=true"]) .hardware-box__button a.btn'
           text: Smartphone wählen

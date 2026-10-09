@@ -35,7 +35,7 @@ from telco_radar.collect.geraete.klickziele import (
 )
 
 WURZEL = Path(__file__).resolve().parents[1]
-ANBIETER = ["o2", "vodafone", "1und1", "telekom", "congstar", "freenet"]
+ANBIETER = ["o2", "vodafone", "1und1raster", "telekom", "congstar", "freenet"]
 
 
 @pytest.fixture
@@ -83,7 +83,7 @@ def test_weiter_steht_bei_1und1_und_vodafone_auf_beiden_seiten(wurzel):
     vodafone = Weiter(
         "#device-details-offer-summary-card a.ws10-button--primary", "Zur Tarifauswahl"
     )
-    assert weiter.pop("1und1") == [einsundeins, einsundeins]
+    assert weiter.pop("1und1raster") == [einsundeins, einsundeins]
     assert weiter.pop("vodafone") == [vodafone, vodafone]
     assert all(w is None for liste in weiter.values() for w in liste)
 
