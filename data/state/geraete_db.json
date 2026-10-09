@@ -2,10 +2,10 @@
  "updated": "2026-10-09",
  "anbieter": {
   "ALDI TALK": {
-   "laeufe": 59,
-   "funde_gesamt": 266,
+   "laeufe": 60,
+   "funde_gesamt": 270,
    "letzter_lauf": "2026-10-09",
-   "letzte_funde": 5,
+   "letzte_funde": 4,
    "letzter_fund": "2026-10-09",
    "termine": [
     "2026-08-29",
@@ -197,7 +197,7 @@
     ],
     [
      "2026-10-09",
-     5,
+     4,
      "gelesen",
      0,
      30,
@@ -207,8 +207,8 @@
    "tote_adressen": 0
   },
   "Vodafone": {
-   "laeufe": 57,
-   "funde_gesamt": 9749,
+   "laeufe": 58,
+   "funde_gesamt": 9932,
    "letzter_lauf": "2026-10-09",
    "letzte_funde": 183,
    "termine": [
@@ -412,8 +412,8 @@
    "tote_adressen": 0
   },
   "o2": {
-   "laeufe": 57,
-   "funde_gesamt": 3839,
+   "laeufe": 58,
+   "funde_gesamt": 3908,
    "letzter_lauf": "2026-10-09",
    "letzte_funde": 69,
    "termine": [
@@ -609,7 +609,7 @@
      "2026-10-09",
      69,
      "gelesen",
-     1999,
+     2000,
      0,
      null
     ]
@@ -617,8 +617,8 @@
    "tote_adressen": null
   },
   "mobilcom-debitel": {
-   "laeufe": 10,
-   "funde_gesamt": 6653,
+   "laeufe": 11,
+   "funde_gesamt": 6788,
    "letzte_funde": 135,
    "termine": [
     "2026-08-29",
@@ -1151,10 +1151,10 @@
    "tote_adressen": 0
   },
   "congstar": {
-   "laeufe": 34,
-   "funde_gesamt": 6929,
+   "laeufe": 35,
+   "funde_gesamt": 7079,
    "letzter_lauf": "2026-10-09",
-   "letzte_funde": 143,
+   "letzte_funde": 150,
    "termine": [
     "2026-09-03",
     "2026-09-04",
@@ -1340,18 +1340,18 @@
     ],
     [
      "2026-10-09",
-     143,
+     150,
      "gelesen",
-     880,
+     944,
      43,
-     2
+     0
     ]
    ],
-   "tote_adressen": 2
+   "tote_adressen": 0
   },
   "1&1": {
-   "laeufe": 49,
-   "funde_gesamt": 1756,
+   "laeufe": 50,
+   "funde_gesamt": 1791,
    "letzter_lauf": "2026-10-09",
    "letzte_funde": 35,
    "termine": [
@@ -1702,10 +1702,10 @@
    "tote_adressen": null
   },
   "Saturn": {
-   "laeufe": 45,
-   "funde_gesamt": 882,
+   "laeufe": 46,
+   "funde_gesamt": 903,
    "letzter_lauf": "2026-10-09",
-   "letzte_funde": 20,
+   "letzte_funde": 21,
    "termine": [
     "2026-09-05",
     "2026-09-06",
@@ -1890,7 +1890,7 @@
     ],
     [
      "2026-10-09",
-     20,
+     21,
      "gelesen",
      0,
      0,
@@ -5133,7 +5133,7 @@
    "erstpreis_am": "2026-09-01",
    "last_verified": "2026-10-09",
    "letzter_check": "2026-10-09",
-   "quelle_url": "https://www.alditalk.de/p/fairphone-fairphone-gen-6-256-gb-forest-green-model-fp6-30042279A1?FF_QUERY=*%3Acategory_id%3BG5DE0Z0SIKUBHRGTNF411A7XPLN9RV3D&FF_POS=21&FF_PAGE=1&FF_PAGESIZE=30&FF_SCORE=100.0&FF_CAMPAIGN=&FF_CAMPAIGN_PAGE_ID=",
+   "quelle_url": "https://www.alditalk.de/p/fairphone-fairphone-gen-6-256-gb-forest-green-model-fp6-30042279A1?FF_QUERY=*%3Acategory_id%3BG5DE0Z0SIKUBHRGTNF411A7XPLN9RV3D&FF_POS=22&FF_PAGE=1&FF_PAGESIZE=30&FF_SCORE=100.0&FF_CAMPAIGN=&FF_CAMPAIGN_PAGE_ID=",
    "abgerufen_am": "2026-10-09",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
@@ -5843,15 +5843,15 @@
    "ean": "",
    "zustand": "neu",
    "first_seen": "2026-09-05",
-   "status": "vermutlich ausgelistet",
-   "missed_checks": 1,
+   "status": "aktiv",
+   "missed_checks": 0,
    "erstpreis": 939.99,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-05",
-   "last_verified": "2026-10-08",
+   "last_verified": "2026-10-09",
    "letzter_check": "2026-10-09",
    "quelle_url": "https://www.saturn.de/de/product/_apple-iphone-17-5g-256-gb-weiss-dual-sim-3013576.html",
-   "abgerufen_am": "2026-10-08",
+   "abgerufen_am": "2026-10-09",
    "verfuegbarkeit": "unbekannt",
    "confidence": "hoch",
    "einstiege": [
@@ -5859,8 +5859,7 @@
    ],
    "titel_roh": "APPLE iPhone 17 5G 256 GB Weiß Dual SIM",
    "preis_ohne_vertrag": 1089.0,
-   "ended_since": "2026-09-27",
-   "stale_since": "2026-10-09"
+   "ended_since": "2026-09-27"
   },
   {
    "id": "saturn--apple-iphone-17-512gb-schwarz",
@@ -6371,15 +6370,15 @@
    "ean": "",
    "zustand": "neu",
    "first_seen": "2026-09-05",
-   "status": "ausgelistet",
-   "missed_checks": 2,
+   "status": "aktiv",
+   "missed_checks": 0,
    "erstpreis": 699.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-05",
-   "last_verified": "2026-10-05",
-   "letzter_check": "2026-10-07",
+   "last_verified": "2026-10-09",
+   "letzter_check": "2026-10-09",
    "quelle_url": "https://www.saturn.de/de/product/_apple-iphone-17e-256-gb-weiss-dual-sim-3040152.html",
-   "abgerufen_am": "2026-10-05",
+   "abgerufen_am": "2026-10-09",
    "verfuegbarkeit": "unbekannt",
    "confidence": "hoch",
    "einstiege": [
@@ -6387,8 +6386,7 @@
    ],
    "titel_roh": "APPLE iPhone 17e 256 GB Weiß Dual SIM",
    "preis_ohne_vertrag": 839.99,
-   "ended_since": "2026-10-07",
-   "stale_since": "2026-10-06"
+   "ended_since": "2026-10-07"
   },
   {
    "id": "saturn--apple-iphone-17e-512gb-hellrosa",
