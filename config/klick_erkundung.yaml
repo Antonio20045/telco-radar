@@ -71,24 +71,22 @@ anbieter:
   - schluessel: 1und1
     name: 1&1
     seiten:
-      # Die Wahl 24 oder 36 Monate kommt erst nach „Weiter zur
-      # Tarifauswahl“ (<add-to-cart-button>, legt per POST
-      # /frontend/cart-facade/add einen Warenkorb an). Der Selektor trifft
-      # zwei Knöpfe: Element 66 (Seite 1) bzw. 83 (Seite 2) sichtbar, 42
-      # bzw. 47 in der unsichtbaren mitlaufenden Leiste; geklickt wird nur
-      # der eine sichtbare.
+      # PROBE Pitch 2 Schnitt 1 (nur auf dem Probezweig): Geräteraster je Tarif
+      # (Adressen wörtlich im Bestand, data/state/geraete_db.json) und der Link
+      # „Smartphone wählen“ der iPhone-17-Pro-Kachel. Frage: trägt die Produktseite
+      # nach dem Raster den Tarif des Rasters?
       - geraet: apple-iphone-17-pro
         speicher_gb: 256
-        url: https://mobile.1und1.de/iphone-17-pro
+        url: https://mobile.1und1.de/smartphones-unlimited-m
         weiter:
-          selektor: "#hwd-configuration-section button.hwd-add-to-cart-button-price-component"
-          text: Weiter zur Tarifauswahl
-      - geraet: samsung-galaxy-s26
+          selektor: 'form.hardware-box:has(a.hardware-box__heading[href="https://mobile.1und1.de/iphone-17-pro?tariffFirst=true"]) .hardware-box__button a.btn'
+          text: Smartphone wählen
+      - geraet: apple-iphone-17-pro
         speicher_gb: 256
-        url: https://mobile.1und1.de/samsung-galaxy-s26
+        url: https://mobile.1und1.de/smartphones-all-net-flat-l
         weiter:
-          selektor: "#hwd-configuration-section button.hwd-add-to-cart-button-price-component"
-          text: Weiter zur Tarifauswahl
+          selektor: 'form.hardware-box:has(a.hardware-box__heading[href="https://mobile.1und1.de/iphone-17-pro?tariffFirst=true"]) .hardware-box__button a.btn'
+          text: Smartphone wählen
 
   - schluessel: telekom
     name: Telekom
