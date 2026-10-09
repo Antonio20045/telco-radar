@@ -1,0 +1,587 @@
+{
+ "preise_gesamt": 97,
+ "preise": [
+  {
+   "pfad": "#ebf68eae-f1fd-451e-a5e7-4cbeaefd3b80 > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "ab 9.95 €",
+   "kontext": "ab 9.95 €",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#main-content > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1)",
+   "text": "100€ Geräte-Rabatt bereits enthalten",
+   "kontext": "100€ Geräte-Rabatt bereits enthalten Attraktiver Preisvorteil auf Ihr neues Gerät",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)",
+   "text": "937 € zahlbar in 36 Monaten, sowie zusätzlich 326 € Schlussrate im 37. Monat (oder Verrechnung der Schlussrate bei Rückgabe im Zustand gebraucht).",
+   "kontext": "937 € zahlbar in 36 Monaten, sowie zusätzlich 326 € Schlussrate im 37. Monat (oder Verrechnung der Schlussrate bei Rückgabe im Zustand gebraucht). -150 € RABATT ABGEZOGEN 199 € Anzahlung + 20,50 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "-150 € RABATT ABGEZOGEN",
+   "kontext": "-150 € RABATT ABGEZOGEN",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "199 € Anzahlung",
+   "kontext": "199 € Anzahlung + 20,50 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(2)",
+   "text": "+ 20,50 € mtl.",
+   "kontext": "199 € Anzahlung + 20,50 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(3) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)",
+   "text": "862,20 € zahlbar in 36 Monaten, sowie zusätzlich 206 € Schlussrate im 37. Monat (oder Verrechnung der Schlussrate bei Rückgabe im Zustand gebraucht).",
+   "kontext": "862,20 € zahlbar in 36 Monaten, sowie zusätzlich 206 € Schlussrate im 37. Monat (oder Verrechnung der Schlussrate bei Rückgabe im Zustand gebraucht). -100 € RABATT ABGEZOGEN 99 € Anzahlung + 21,20 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(3) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "-100 € RABATT ABGEZOGEN",
+   "kontext": "-100 € RABATT ABGEZOGEN",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(3) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "99 € Anzahlung",
+   "kontext": "99 € Anzahlung + 21,20 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(3) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(2)",
+   "text": "+ 21,20 € mtl.",
+   "kontext": "99 € Anzahlung + 21,20 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(4) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)",
+   "text": "988,20 € zahlbar in 36 Monaten, sowie zusätzlich 230 € Schlussrate im 37. Monat (oder Verrechnung der Schlussrate bei Rückgabe im Zustand gebraucht).",
+   "kontext": "988,20 € zahlbar in 36 Monaten, sowie zusätzlich 230 € Schlussrate im 37. Monat (oder Verrechnung der Schlussrate bei Rückgabe im Zustand gebraucht). -100 € RABATT ABGEZOGEN 99 € Anzahlung + 24,70 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(4) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "-100 € RABATT ABGEZOGEN",
+   "kontext": "-100 € RABATT ABGEZOGEN",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(4) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "99 € Anzahlung",
+   "kontext": "99 € Anzahlung + 24,70 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(4) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(2)",
+   "text": "+ 24,70 € mtl.",
+   "kontext": "99 € Anzahlung + 24,70 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(5) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)",
+   "text": "418,60 € zahlbar in 36 Monaten, sowie zusätzlich 159 € Schlussrate im 37. Monat (oder Verrechnung der Schlussrate bei Rückgabe im Zustand gebraucht).",
+   "kontext": "418,60 € zahlbar in 36 Monaten, sowie zusätzlich 159 € Schlussrate im 37. Monat (oder Verrechnung der Schlussrate bei Rückgabe im Zustand gebraucht). -300 € RABATT ABGEZOGEN 1 € Anzahlung + 11,60 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(5) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "-300 € RABATT ABGEZOGEN",
+   "kontext": "-300 € RABATT ABGEZOGEN",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(5) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "1 € Anzahlung",
+   "kontext": "1 € Anzahlung + 11,60 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(5) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(2)",
+   "text": "+ 11,60 € mtl.",
+   "kontext": "1 € Anzahlung + 11,60 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(6) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)",
+   "text": "1.109 € zahlbar in 36 Monaten, sowie zusätzlich 360 € Schlussrate im 37. Monat (oder Verrechnung der Schlussrate bei Rückgabe im Zustand gebraucht).",
+   "kontext": "1.109 € zahlbar in 36 Monaten, sowie zusätzlich 360 € Schlussrate im 37. Monat (oder Verrechnung der Schlussrate bei Rückgabe im Zustand gebraucht). -100 € RABATT ABGEZOGEN 299 € Anzahlung + 22,50 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(6) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "-100 € RABATT ABGEZOGEN",
+   "kontext": "-100 € RABATT ABGEZOGEN",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(6) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "299 € Anzahlung",
+   "kontext": "299 € Anzahlung + 22,50 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(6) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(2)",
+   "text": "+ 22,50 € mtl.",
+   "kontext": "299 € Anzahlung + 22,50 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(7) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)",
+   "text": "515,80 € zahlbar in 36 Monaten, sowie zusätzlich 178 € Schlussrate im 37. Monat (oder Verrechnung der Schlussrate bei Rückgabe im Zustand gebraucht).",
+   "kontext": "515,80 € zahlbar in 36 Monaten, sowie zusätzlich 178 € Schlussrate im 37. Monat (oder Verrechnung der Schlussrate bei Rückgabe im Zustand gebraucht). -754 € RABATT ABGEZOGEN 1 € Anzahlung + 14,30 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(7) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "-754 € RABATT ABGEZOGEN",
+   "kontext": "-754 € RABATT ABGEZOGEN",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(7) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "1 € Anzahlung",
+   "kontext": "1 € Anzahlung + 14,30 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(7) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(2)",
+   "text": "+ 14,30 € mtl.",
+   "kontext": "1 € Anzahlung + 14,30 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(8) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)",
+   "text": "523 € zahlbar in 36 Monaten, sowie zusätzlich 193 € Schlussrate im 37. Monat (oder Verrechnung der Schlussrate bei Rückgabe im Zustand gebraucht).",
+   "kontext": "523 € zahlbar in 36 Monaten, sowie zusätzlich 193 € Schlussrate im 37. Monat (oder Verrechnung der Schlussrate bei Rückgabe im Zustand gebraucht). -400 € RABATT ABGEZOGEN 1 € Anzahlung + 14,50 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(8) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "-400 € RABATT ABGEZOGEN",
+   "kontext": "-400 € RABATT ABGEZOGEN",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(8) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "1 € Anzahlung",
+   "kontext": "1 € Anzahlung + 14,50 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(8) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(2)",
+   "text": "+ 14,50 € mtl.",
+   "kontext": "1 € Anzahlung + 14,50 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(9) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)",
+   "text": "512,20 € zahlbar in 36 Monaten, sowie zusätzlich 226 € Schlussrate im 37. Monat (oder Verrechnung der Schlussrate bei Rückgabe im Zustand gebraucht).",
+   "kontext": "512,20 € zahlbar in 36 Monaten, sowie zusätzlich 226 € Schlussrate im 37. Monat (oder Verrechnung der Schlussrate bei Rückgabe im Zustand gebraucht). -500 € RABATT ABGEZOGEN 1 € Anzahlung + 14,20 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(9) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "-500 € RABATT ABGEZOGEN",
+   "kontext": "-500 € RABATT ABGEZOGEN",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(9) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "1 € Anzahlung",
+   "kontext": "1 € Anzahlung + 14,20 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(9) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(2)",
+   "text": "+ 14,20 € mtl.",
+   "kontext": "1 € Anzahlung + 14,20 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(10) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)",
+   "text": "1.001,80 € zahlbar in 36 Monaten, sowie zusätzlich 294 € Schlussrate im 37. Monat (oder Verrechnung der Schlussrate bei Rückgabe im Zustand gebraucht).",
+   "kontext": "1.001,80 € zahlbar in 36 Monaten, sowie zusätzlich 294 € Schlussrate im 37. Monat (oder Verrechnung der Schlussrate bei Rückgabe im Zustand gebraucht). -580 € RABATT ABGEZOGEN 199 € Anzahlung + 22,30 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(10) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "-580 € RABATT ABGEZOGEN",
+   "kontext": "-580 € RABATT ABGEZOGEN",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(10) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "199 € Anzahlung",
+   "kontext": "199 € Anzahlung + 22,30 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(10) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(2)",
+   "text": "+ 22,30 € mtl.",
+   "kontext": "199 € Anzahlung + 22,30 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(11) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)",
+   "text": "1.102,60 € zahlbar in 36 Monaten, sowie zusätzlich 325 € Schlussrate im 37. Monat (oder Verrechnung der Schlussrate bei Rückgabe im Zustand gebraucht).",
+   "kontext": "1.102,60 € zahlbar in 36 Monaten, sowie zusätzlich 325 € Schlussrate im 37. Monat (oder Verrechnung der Schlussrate bei Rückgabe im Zustand gebraucht). -630 € RABATT ABGEZOGEN 199 € Anzahlung + 25,10 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(11) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "-630 € RABATT ABGEZOGEN",
+   "kontext": "-630 € RABATT ABGEZOGEN",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(11) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "199 € Anzahlung",
+   "kontext": "199 € Anzahlung + 25,10 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(11) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(2)",
+   "text": "+ 25,10 € mtl.",
+   "kontext": "199 € Anzahlung + 25,10 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(12) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)",
+   "text": "649 € zahlbar in 36 Monaten, sowie zusätzlich 189 € Schlussrate im 37. Monat (oder Verrechnung der Schlussrate bei Rückgabe im Zustand gebraucht).",
+   "kontext": "649 € zahlbar in 36 Monaten, sowie zusätzlich 189 € Schlussrate im 37. Monat (oder Verrechnung der Schlussrate bei Rückgabe im Zustand gebraucht). -400 € RABATT ABGEZOGEN 1 € Anzahlung + 18 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(12) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "-400 € RABATT ABGEZOGEN",
+   "kontext": "-400 € RABATT ABGEZOGEN",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(12) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "1 € Anzahlung",
+   "kontext": "1 € Anzahlung + 18 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(12) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(2)",
+   "text": "+ 18 € mtl.",
+   "kontext": "1 € Anzahlung + 18 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(13) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)",
+   "text": "808,20 € zahlbar in 36 Monaten, sowie zusätzlich 148 € Schlussrate im 37. Monat (oder Verrechnung der Schlussrate bei Rückgabe im Zustand gebraucht).",
+   "kontext": "808,20 € zahlbar in 36 Monaten, sowie zusätzlich 148 € Schlussrate im 37. Monat (oder Verrechnung der Schlussrate bei Rückgabe im Zustand gebraucht). -100 € RABATT ABGEZOGEN 99 € Anzahlung + 19,70 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(13) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "-100 € RABATT ABGEZOGEN",
+   "kontext": "-100 € RABATT ABGEZOGEN",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(13) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "99 € Anzahlung",
+   "kontext": "99 € Anzahlung + 19,70 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(13) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(2)",
+   "text": "+ 19,70 € mtl.",
+   "kontext": "99 € Anzahlung + 19,70 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(14) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)",
+   "text": "353,80 € zahlbar in 36 Monaten, sowie zusätzlich 116 € Schlussrate im 37. Monat (oder Verrechnung der Schlussrate bei Rückgabe im Zustand gebraucht).",
+   "kontext": "353,80 € zahlbar in 36 Monaten, sowie zusätzlich 116 € Schlussrate im 37. Monat (oder Verrechnung der Schlussrate bei Rückgabe im Zustand gebraucht). -357 € RABATT ABGEZOGEN 1 € Anzahlung + 9,80 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(14) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "-357 € RABATT ABGEZOGEN",
+   "kontext": "-357 € RABATT ABGEZOGEN",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(14) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "1 € Anzahlung",
+   "kontext": "1 € Anzahlung + 9,80 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(14) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(2)",
+   "text": "+ 9,80 € mtl.",
+   "kontext": "1 € Anzahlung + 9,80 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(15) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)",
+   "text": "478,60 € zahlbar in 24 Monaten, sowie zusätzlich 190 € Schlussrate im 25. Monat (oder Verrechnung der Schlussrate bei Rückgabe im Zustand gebraucht).",
+   "kontext": "478,60 € zahlbar in 24 Monaten, sowie zusätzlich 190 € Schlussrate im 25. Monat (oder Verrechnung der Schlussrate bei Rückgabe im Zustand gebraucht). -380 € RABATT ABGEZOGEN 1 € Anzahlung + 19,90 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(15) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "-380 € RABATT ABGEZOGEN",
+   "kontext": "-380 € RABATT ABGEZOGEN",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(15) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "1 € Anzahlung",
+   "kontext": "1 € Anzahlung + 19,90 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(15) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(2)",
+   "text": "+ 19,90 € mtl.",
+   "kontext": "1 € Anzahlung + 19,90 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(16) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)",
+   "text": "663,40 € zahlbar in 36 Monaten, sowie zusätzlich 133 € Schlussrate im 37. Monat (oder Verrechnung der Schlussrate bei Rückgabe im Zustand gebraucht).",
+   "kontext": "663,40 € zahlbar in 36 Monaten, sowie zusätzlich 133 € Schlussrate im 37. Monat (oder Verrechnung der Schlussrate bei Rückgabe im Zustand gebraucht). -100 € RABATT ABGEZOGEN 1 € Anzahlung + 18,40 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(16) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "-100 € RABATT ABGEZOGEN",
+   "kontext": "-100 € RABATT ABGEZOGEN",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(16) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "1 € Anzahlung",
+   "kontext": "1 € Anzahlung + 18,40 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(16) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(2)",
+   "text": "+ 18,40 € mtl.",
+   "kontext": "1 € Anzahlung + 18,40 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(17) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)",
+   "text": "133 € zahlbar in 24 Monaten, sowie zusätzlich 106 € Schlussrate im 25. Monat (oder Verrechnung der Schlussrate bei Rückgabe im Zustand gebraucht).",
+   "kontext": "133 € zahlbar in 24 Monaten, sowie zusätzlich 106 € Schlussrate im 25. Monat (oder Verrechnung der Schlussrate bei Rückgabe im Zustand gebraucht). -230 € RABATT ABGEZOGEN 1 € Anzahlung + 5,50 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(17) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "-230 € RABATT ABGEZOGEN",
+   "kontext": "-230 € RABATT ABGEZOGEN",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(17) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "1 € Anzahlung",
+   "kontext": "1 € Anzahlung + 5,50 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(17) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(2)",
+   "text": "+ 5,50 € mtl.",
+   "kontext": "1 € Anzahlung + 5,50 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(18) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)",
+   "text": "206,20 € zahlbar in 36 Monaten, sowie zusätzlich 50 € Schlussrate im 37. Monat (oder Verrechnung der Schlussrate bei Rückgabe im Zustand gebraucht).",
+   "kontext": "206,20 € zahlbar in 36 Monaten, sowie zusätzlich 50 € Schlussrate im 37. Monat (oder Verrechnung der Schlussrate bei Rückgabe im Zustand gebraucht). -100 € RABATT ABGEZOGEN 1 € Anzahlung + 5,70 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(18) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "-100 € RABATT ABGEZOGEN",
+   "kontext": "-100 € RABATT ABGEZOGEN",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(18) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "1 € Anzahlung",
+   "kontext": "1 € Anzahlung + 5,70 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(18) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(2)",
+   "text": "+ 5,70 € mtl.",
+   "kontext": "1 € Anzahlung + 5,70 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(19) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)",
+   "text": "631 € zahlbar in 36 Monaten, sowie zusätzlich 108 € Schlussrate im 37. Monat (oder Verrechnung der Schlussrate bei Rückgabe im Zustand gebraucht).",
+   "kontext": "631 € zahlbar in 36 Monaten, sowie zusätzlich 108 € Schlussrate im 37. Monat (oder Verrechnung der Schlussrate bei Rückgabe im Zustand gebraucht). -100 € RABATT ABGEZOGEN 1 € Anzahlung + 17,50 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(19) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "-100 € RABATT ABGEZOGEN",
+   "kontext": "-100 € RABATT ABGEZOGEN",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(19) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "1 € Anzahlung",
+   "kontext": "1 € Anzahlung + 17,50 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(19) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(2)",
+   "text": "+ 17,50 € mtl.",
+   "kontext": "1 € Anzahlung + 17,50 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(20) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)",
+   "text": "476,20 € zahlbar in 36 Monaten, sowie zusätzlich 91 € Schlussrate im 37. Monat (oder Verrechnung der Schlussrate bei Rückgabe im Zustand gebraucht).",
+   "kontext": "476,20 € zahlbar in 36 Monaten, sowie zusätzlich 91 € Schlussrate im 37. Monat (oder Verrechnung der Schlussrate bei Rückgabe im Zustand gebraucht). -100 € RABATT ABGEZOGEN 1 € Anzahlung + 13,20 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(20) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "-100 € RABATT ABGEZOGEN",
+   "kontext": "-100 € RABATT ABGEZOGEN",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(20) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "1 € Anzahlung",
+   "kontext": "1 € Anzahlung + 13,20 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(20) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(2)",
+   "text": "+ 13,20 € mtl.",
+   "kontext": "1 € Anzahlung + 13,20 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(21) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)",
+   "text": "620,20 € zahlbar in 36 Monaten, sowie zusätzlich 127 € Schlussrate im 37. Monat (oder Verrechnung der Schlussrate bei Rückgabe im Zustand gebraucht).",
+   "kontext": "620,20 € zahlbar in 36 Monaten, sowie zusätzlich 127 € Schlussrate im 37. Monat (oder Verrechnung der Schlussrate bei Rückgabe im Zustand gebraucht). -100 € RABATT ABGEZOGEN 1 € Anzahlung + 17,20 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(21) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "-100 € RABATT ABGEZOGEN",
+   "kontext": "-100 € RABATT ABGEZOGEN",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(21) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "1 € Anzahlung",
+   "kontext": "1 € Anzahlung + 17,20 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(21) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(2)",
+   "text": "+ 17,20 € mtl.",
+   "kontext": "1 € Anzahlung + 17,20 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(22) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)",
+   "text": "765 € zahlbar in 36 Monaten, sowie zusätzlich 152 € Schlussrate im 37. Monat (oder Verrechnung der Schlussrate bei Rückgabe im Zustand gebraucht).",
+   "kontext": "765 € zahlbar in 36 Monaten, sowie zusätzlich 152 € Schlussrate im 37. Monat (oder Verrechnung der Schlussrate bei Rückgabe im Zustand gebraucht). -380 € RABATT ABGEZOGEN 99 € Anzahlung + 18,50 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(22) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "-380 € RABATT ABGEZOGEN",
+   "kontext": "-380 € RABATT ABGEZOGEN",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(22) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "99 € Anzahlung",
+   "kontext": "99 € Anzahlung + 18,50 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(22) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(2)",
+   "text": "+ 18,50 € mtl.",
+   "kontext": "99 € Anzahlung + 18,50 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(23) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)",
+   "text": "407,80 € zahlbar in 36 Monaten, sowie zusätzlich 128 € Schlussrate im 37. Monat (oder Verrechnung der Schlussrate bei Rückgabe im Zustand gebraucht).",
+   "kontext": "407,80 € zahlbar in 36 Monaten, sowie zusätzlich 128 € Schlussrate im 37. Monat (oder Verrechnung der Schlussrate bei Rückgabe im Zustand gebraucht). -300 € RABATT ABGEZOGEN 1 € Anzahlung + 11,30 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(23) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "-300 € RABATT ABGEZOGEN",
+   "kontext": "-300 € RABATT ABGEZOGEN",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(23) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "1 € Anzahlung",
+   "kontext": "1 € Anzahlung + 11,30 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(23) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(2)",
+   "text": "+ 11,30 € mtl.",
+   "kontext": "1 € Anzahlung + 11,30 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(24) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)",
+   "text": "353,80 € zahlbar in 36 Monaten, sowie zusätzlich 73 € Schlussrate im 37. Monat (oder Verrechnung der Schlussrate bei Rückgabe im Zustand gebraucht).",
+   "kontext": "353,80 € zahlbar in 36 Monaten, sowie zusätzlich 73 € Schlussrate im 37. Monat (oder Verrechnung der Schlussrate bei Rückgabe im Zustand gebraucht). -100 € RABATT ABGEZOGEN 1 € Anzahlung + 9,80 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(24) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "-100 € RABATT ABGEZOGEN",
+   "kontext": "-100 € RABATT ABGEZOGEN",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(24) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "1 € Anzahlung",
+   "kontext": "1 € Anzahlung + 9,80 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#dyt_productsGrid > div:nth-of-type(2) > div:nth-of-type(24) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(3) > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2) > span:nth-of-type(1) > span:nth-of-type(2)",
+   "text": "+ 9,80 € mtl.",
+   "kontext": "1 € Anzahlung + 9,80 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#step1 > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1)",
+   "text": "49,95 €",
+   "kontext": "49,95 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#step1 > section:nth-of-type(1) > div:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "zzgl. 39,95 € ⌀ pro Karte einmalig",
+   "kontext": "zzgl. 39,95 € ⌀ pro Karte einmalig",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#main-content > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(2) > span:nth-of-type(2) > aside:nth-of-type(1) > div:nth-of-type(2) > section:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1)",
+   "text": "-100 €",
+   "kontext": "-100 €",
+   "sichtbar": true
+  }
+ ]
+}

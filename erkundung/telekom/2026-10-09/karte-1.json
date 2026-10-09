@@ -1,0 +1,124 @@
+{
+ "karte": "telekom.yaml",
+ "anbieter": "Telekom",
+ "adresse": "https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17791",
+ "status": "gestoert",
+ "grund": "Abruf gestört (HTTP 202 auf https://www.telekom.de/opt-in/cookie.php)",
+ "bot_schutz": true,
+ "http_status": 200,
+ "hoechste_kombinationen": 12,
+ "belege": "nicht archiviert (kein Konto)",
+ "zaehlung": {
+  "kombinationen": 0,
+  "erfasst": 0,
+  "nicht_angeboten": 0,
+  "nicht_erfasst": 0,
+  "befund": 0,
+  "nicht_besucht": 0,
+  "verworfen": 3,
+  "gescheitert": 0
+ },
+ "struktur": {
+  "knoepfe_gesucht": 0,
+  "knoepfe_gefunden": 0,
+  "felder_gesucht": 0,
+  "felder_gefunden": 0,
+  "anteil_knoepfe": null,
+  "anteil_felder": null
+ },
+ "gefunden": {
+  "knoepfe": {
+   "speicher": {
+    "selektor": "#dyt_productViewDesktop button.dt_filterChips[role=\"radio\"][aria-label$=\" GB\"], #dyt_productViewDesktop button.dt_filterChips[role=\"radio\"][aria-label$=\" TB\"]",
+    "werte": []
+   },
+   "tarif": {
+    "selektor": "#step1 button.accordion-header",
+    "werte": []
+   },
+   "laufzeit": {
+    "selektor": "#dyt_productViewDesktop button.dt_filterChips[role=\"radio\"][aria-label*=\" Monate\"]",
+    "werte": []
+   }
+  },
+  "zusammenfassung": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(2), #step1",
+  "felder": {
+   "anzahlung": {
+    "text": 0,
+    "antwort": 0
+   },
+   "rate": {
+    "text": 0,
+    "antwort": 0
+   },
+   "ratenzahl": {
+    "text": 0,
+    "antwort": 0
+   },
+   "tarifphasen": {
+    "text": 0,
+    "antwort": 0
+   },
+   "tarifbindung": {
+    "text": 0,
+    "antwort": 0
+   },
+   "anschluss": {
+    "text": 0,
+    "antwort": 0
+   },
+   "volumen_gb": {
+    "text": 0,
+    "antwort": 0
+   }
+  }
+ },
+ "kombinationen": [],
+ "verworfen": [
+  {
+   "url": "https://www2.telekom.de/forward/ablyft-cdn/s/55651514.js",
+   "grund": "per robots.txt gesperrt: /forward/ablyft-cdn/s/55651514.js"
+  },
+  {
+   "url": "https://bf72977jfz.bf.dynatrace.com/bf?type=js3&sn=[Cookie entfernt]&svrid=-12059&flavor=cors&vi=PUHIDHMLVBVGLSASWAGHMQLCKLMMFUPA-0&modifiedSince=1791528588609&bp=3&app=b05c2f3edf669fad&crc=3492771476&en=p9vvb6ny&end=1",
+   "grund": "per robots.txt gesperrt: /bf?type=js3&sn=[Cookie entfernt]&svrid=-12059&flavor=cors&vi=PUHIDHMLVBVGLSASWAGHMQLCKLMMFUPA-0&modifiedSince=1791528588609&bp=3&app=b05c2f3edf669fad&crc=3492771476&en=p9vvb6ny&end=1"
+  },
+  {
+   "url": "https://bf72977jfz.bf.dynatrace.com/bf?type=js3&sn=[Cookie entfernt]&svrid=-12059&flavor=cors&vi=PUHIDHMLVBVGLSASWAGHMQLCKLMMFUPA-0&modifiedSince=1791528588609&bp=3&app=b05c2f3edf669fad&crc=2732434542&en=p9vvb6ny&end=1",
+   "grund": "per robots.txt gesperrt: /bf?type=js3&sn=[Cookie entfernt]&svrid=-12059&flavor=cors&vi=PUHIDHMLVBVGLSASWAGHMQLCKLMMFUPA-0&modifiedSince=1791528588609&bp=3&app=b05c2f3edf669fad&crc=2732434542&en=p9vvb6ny&end=1"
+  }
+ ],
+ "gescheitert": [],
+ "hilfsdateien": [
+  {
+   "url": "https://static.eshop.telekom.de/de/prod/dtdl/new/shop/assets/vendors.ee942fcf.css",
+   "art": "stylesheet",
+   "grund": "robots.txt nicht lesbar (HTTP 403)"
+  },
+  {
+   "url": "https://static.eshop.telekom.de/de/prod/dtdl/new/shop/assets/runtime.c816e3ae.js",
+   "art": "script",
+   "grund": "robots.txt nicht lesbar (HTTP 403)"
+  },
+  {
+   "url": "https://static.eshop.telekom.de/de/prod/dtdl/new/shop/assets/dt-components.72d42471.js",
+   "art": "script",
+   "grund": "robots.txt nicht lesbar (HTTP 403)"
+  },
+  {
+   "url": "https://static.eshop.telekom.de/de/prod/dtdl/new/shop/assets/one-ui-library.8dac447e.js",
+   "art": "script",
+   "grund": "robots.txt nicht lesbar (HTTP 403)"
+  },
+  {
+   "url": "https://static.eshop.telekom.de/de/prod/dtdl/new/shop/assets/vendors.ee942fcf.js",
+   "art": "script",
+   "grund": "robots.txt nicht lesbar (HTTP 403)"
+  },
+  {
+   "url": "https://static.eshop.telekom.de/de/prod/dtdl/new/shop/assets/client.e1d8cf85.js",
+   "art": "script",
+   "grund": "robots.txt nicht lesbar (HTTP 403)"
+  }
+ ]
+}
