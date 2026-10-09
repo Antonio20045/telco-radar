@@ -92,6 +92,7 @@ class Anbieter:
     kopfzeilen: dict = field(default_factory=dict)
     user_agent: str = ""
     einstiege: list = field(default_factory=list)
+    klick_einstiege: list = field(default_factory=list)
 
     @property
     def schluessel(self) -> str:
@@ -244,7 +245,7 @@ def lade_farben(root: Path) -> dict:
     return tabelle
 
 
-EINSTIEG_ARTEN = ("static", "sitemap", "shopify", "js", "buendel")
+EINSTIEG_ARTEN = ("static", "sitemap", "shopify", "js", "buendel", "klick")
 
 
 def _parse_einstiege(raw_liste, basis_url: str, anbieter: str = "") -> list:
@@ -353,7 +354,8 @@ def lade_quellen(root: Path) -> QuellenConfig:
             typ = "handel"
         basis_url = str(a.get("basis_url") or "").strip()
         name = str(a["name"]).strip()
-        einstiege = _parse_einstiege(a.get("einstiege"), basis_url, name)
+        alle = _parse_einstiege(a.get("einstiege"), basis_url, name)
+        einstiege = [e for e in alle if e.kind != "klick"]
         if aktiv and methode not in _NICHT_CRAWLBAR and not einstiege:
             grund = grund or (
                 "keine Einstiegsseite konfiguriert - der Anbieter wird nicht abgefragt"
@@ -392,6 +394,7 @@ def lade_quellen(root: Path) -> QuellenConfig:
                 },
                 user_agent=str(a.get("user_agent") or "").strip(),
                 einstiege=einstiege,
+                klick_einstiege=[e for e in alle if e.kind == "klick"],
             )
         )
     return QuellenConfig(anbieter=out)

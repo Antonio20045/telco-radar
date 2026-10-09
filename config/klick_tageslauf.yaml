@@ -23,10 +23,11 @@
 # `seitenabstand_sekunden` (Vorgabe 0): Pause zwischen zwei Seiten eines Anbieters,
 # ruhiges Tempo als Normalfall, keine Anpassung an eine Sperre (Pitch 1, 08.10.2026).
 #
-# `uebersichten` (nur Telekom): Smartphone-Übersicht je Tarif, wörtlich ein Einstieg
+# `uebersichten` (Telekom): Smartphone-Übersicht je Tarif, wörtlich ein Einstieg
 # aus config/geraete_quellen.yaml; gelesen vor den Produktseiten, im selben Zeitbudget
 # (`klickuebersicht`), samt Folgeseiten über ihren gelesenen Folgelink. Alle fünf
-# MagentaMobil-Tarife, M zuerst (Pitch 4, Schnitt 3).
+# MagentaMobil-Tarife, M zuerst (Pitch 4, Schnitt 3). 1&1: Tarifdetail-Seiten mit
+# dem Anschlusspreis je Tarif, eigene Lesart (`klickuebersicht.LESARTEN`).
 #
 # Vodafone: die Produktseite wählt den Tarif nicht (Karte: tarif fest
 # „unbekannt“); erfasste Werte bleiben darum ohne Bündel und zählen als Lücke
@@ -67,6 +68,19 @@ anbieter:
 
   - schluessel: 1und1
     name: 1&1
+    # Tarifdetail-Seiten je Tarif mit Smartphone (Einstiege `kind: klick` in
+    # config/geraete_quellen.yaml, wörtlich die data-iframe-Adressen der
+    # Tarifübersichten vom 29.09.2026, ohne Unlimited XS „Ohne Handy“). Gelesen
+    # wird nur der Anschlusspreis je Tarif-Slug (`einsundeins.anschluss_saetze`);
+    # er kommt auf jeden Produktseiten-Satz mit demselben Tarif (Pitch 2, Schnitt 3).
+    uebersichten:
+      - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-s-mvl&chosenNet=1u1&lightbox=true&bk=false
+      - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-m-mvl&chosenNet=1u1&lightbox=true&bk=false
+      - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-l-mvl&chosenNet=1u1&lightbox=true&bk=false
+      - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-s-mvl&chosenNet=1u1&lightbox=true&bk=false
+      - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-m-mvl&chosenNet=1u1&lightbox=true&bk=false
+      - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-l-mvl&chosenNet=1u1&lightbox=true&bk=false
+      - https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-xl-ovl&chosenNet=1u1&lightbox=true&bk=false
     seiten:
       - geraet: apple-iphone-17-pro
         speicher_gb: 256

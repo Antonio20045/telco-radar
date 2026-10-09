@@ -716,6 +716,34 @@ anbieter:
       - url: https://mobile.1und1.de/smartphones
         label: Smartphones
         kind: static
+      # Tarifdetail-Seiten (kind klick: nur der Klick-Tageslauf liest sie, als
+      # `uebersichten` in config/klick_tageslauf.yaml; der Gerätelauf ruft sie
+      # nicht ab). Jede Adresse steht wörtlich als data-iframe auf den
+      # Tarifübersichten /all-net-flat-vergleich und /unbegrenztes-datenvolumen
+      # (Fixtures einsundeins_tarifuebersicht_*_2026-09-29). Gelesen wird die
+      # einmalige Bereitstellungsgebühr „Tarif mit Smartphone“ (39,90 € bei S).
+      # Ohne Unlimited XS: 1&1 verkauft ihn nur „Ohne Handy“, kein Geräteraster.
+      - url: https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-s-mvl&chosenNet=1u1&lightbox=true&bk=false
+        label: Tarifdetails All-Net-Flat S
+        kind: klick
+      - url: https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-m-mvl&chosenNet=1u1&lightbox=true&bk=false
+        label: Tarifdetails All-Net-Flat M
+        kind: klick
+      - url: https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-l-mvl&chosenNet=1u1&lightbox=true&bk=false
+        label: Tarifdetails All-Net-Flat L
+        kind: klick
+      - url: https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-s-mvl&chosenNet=1u1&lightbox=true&bk=false
+        label: Tarifdetails Unlimited S
+        kind: klick
+      - url: https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-m-mvl&chosenNet=1u1&lightbox=true&bk=false
+        label: Tarifdetails Unlimited M
+        kind: klick
+      - url: https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-l-mvl&chosenNet=1u1&lightbox=true&bk=false
+        label: Tarifdetails Unlimited L
+        kind: klick
+      - url: https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-xl-ovl&chosenNet=1u1&lightbox=true&bk=false
+        label: Tarifdetails Unlimited XL
+        kind: klick
 
   # ===================================================== DISCOUNT & ZWEITMARKEN
 

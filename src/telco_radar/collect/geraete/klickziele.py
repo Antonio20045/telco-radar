@@ -125,7 +125,9 @@ def lade_ziele(
                 kennung=anbieter.user_agent if anbieter.user_agent else None,
                 rate_limit_sekunden=anbieter.rate_limit_sekunden,
                 seitenabstand_sekunden=_seitenabstand(eintrag, ort),
-                uebersichten=_uebersichten(eintrag, ort, anbieter.einstiege),
+                uebersichten=_uebersichten(
+                    eintrag, ort, [*anbieter.einstiege, *anbieter.klick_einstiege]
+                ),
             )
         )
     schluessel_alle = [z.schluessel for z in ziele]

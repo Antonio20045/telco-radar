@@ -38,6 +38,7 @@ from urllib.parse import urljoin, urlsplit
 from playwright.sync_api import Error as PlaywrightFehler
 
 from .basis import GeraeteAbrufFehler
+from .klickanschluss import anschluss_saetze, kein_folgelink
 from .klickcrawler import ANTWORT_FRIST_MS, FENSTER
 from .klickergebnis import LAUF_LEER
 from .klickkontext import Sitzung, oeffne_sitzung, schliesse
@@ -260,6 +261,7 @@ class _Folgelink(HTMLParser):
 
 LESARTEN: dict[str, Lesart] = {
     "Telekom": Lesart(lies_buendel, telekom_folgelink, TELEKOM_BEREIT_JS),
+    "1&1": Lesart(anschluss_saetze, kein_folgelink),
 }
 """Lesart je Anbieter (``Klickkarte.anbieter``); ohne Eintrag ist die Übersicht
 gestört mit ``GRUND_OHNE_LESART``."""
