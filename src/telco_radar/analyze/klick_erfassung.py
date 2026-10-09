@@ -6,6 +6,12 @@ Grundlage ist der Bilanzeintrag einer Klick-Ergebnisdatei (``klick_zusammenfuehr
 Seite sperrt automatisches Lesen (HTTP 202, 08.10.2026)“; Anbieter, HTTP-Status und
 Datum stammen aus der Datei. HTTP 202, 4xx oder eine Challenge heißen Sperre, alles
 andere Störung. Ein gelesener, veralteter oder datumloser Lauf hat keinen Grund.
+
+Trägt der Eintrag einer Datei von heute ``nicht_im_angebot`` (``klickrohsatz``: alle
+Übersichten ganz gelesen, das Gerät in keiner), bekommt jedes dieser Geräte den Satz
+„Bei Telekom nicht im Angebot (Übersicht vom 09.10.2026 ganz gelesen)“ unter dem
+Schlüssel ``Anbieter|device_id`` (``TRENNER``); ``fuer_modell`` gibt ihn dem Modell
+mit dieser Geräte-ID statt eines Anbietergrundes.
 """
 
 from __future__ import annotations
@@ -26,6 +32,10 @@ ART_STOERUNG = "Lesen gestört"
 SERVERFEHLER_AB = 500
 CHALLENGE = "Challenge"
 _HTTP = re.compile(r"HTTP (\d{3})")
+SATZ_NICHT_IM_ANGEBOT = (
+    "Bei {anbieter} nicht im Angebot (Übersicht vom {datum} ganz gelesen)"
+)
+TRENNER = "|"
 
 
 def erfassungsgrund(eintrag: dict) -> str | None:
@@ -56,11 +66,36 @@ def erfassungsgruende(bilanz: dict | None) -> dict[str, str]:
     for eintrag in (bilanz or {}).get("dateien", []):
         if (satz := erfassungsgrund(eintrag)) is not None:
             gruende[str(eintrag.get("anbieter"))] = satz
+        gruende.update(nicht_im_angebot(eintrag))
     return gruende
 
 
-def ohne_karte(gruende: dict[str, str], karten: list[dict]) -> dict[str, str]:
+def nicht_im_angebot(eintrag: dict) -> dict[str, str]:
+    """Je Gerät außerhalb ganz gelesener Übersichten von heute sein Satz."""
+    geraete = eintrag.get("nicht_im_angebot")
+    if eintrag.get("alter_tage") != 0 or not isinstance(geraete, list):
+        return {}
+    anbieter = str(eintrag.get("anbieter"))
+    datum = date.fromisoformat(str(eintrag.get("datum"))).strftime("%d.%m.%Y")
+    satz = SATZ_NICHT_IM_ANGEBOT.format(anbieter=anbieter, datum=datum)
+    return {f"{anbieter}{TRENNER}{g}": satz for g in geraete}
+
+
+def ohne_karte(
+    gruende: dict[str, str], karten: list[dict], device_id: str | None = None
+) -> dict[str, str]:
     """Die Gründe der Anbieter ohne Karte mit Betrag im Modell: wer die Seite gelesen
-    hat, zeigt seine Zeile statt des Grundes; ein Platzhalter zählt nicht."""
+    hat, zeigt seine Zeile statt des Grundes; ein Platzhalter zählt nicht. Ein Satz
+    zum Gerät ``device_id`` geht dem Grund seines Anbieters vor."""
     mit_karte = {k.get("anbieter") for k in karten if k.get("gesamt") is not None}
-    return {a: satz for a, satz in gruende.items() if a not in mit_karte}
+    eigene = {a: s for a, s in gruende.items() if TRENNER not in a}
+    for schluessel, satz in gruende.items():
+        anbieter, _, geraet = schluessel.partition(TRENNER)
+        if geraet and geraet == device_id:
+            eigene[anbieter] = satz
+    return {a: satz for a, satz in eigene.items() if a not in mit_karte}
+
+
+def fuer_modell(gruende: dict[str, str], modell: dict) -> dict[str, str]:
+    """``ohne_karte`` für ein Modell der Geräteseite (Karten und Geräte-ID)."""
+    return ohne_karte(gruende, modell.get("karten") or [], modell.get("device_id"))

@@ -164,11 +164,7 @@ def alt_marke_fuer(abgerufen_am: str) -> str:
 LEITFRAGE_MODELL = "apple-iphone-17-pro-256"
 
 LEER_GRUND = {
-    "Telekom": (
-        "Für dieses Modell ist bei Telekom noch kein Bündelpreis "
-        "erhoben – die Vergleichszahl folgt mit der nächsten "
-        "wöchentlichen Messung."
-    ),
+    "Telekom": "Für dieses Modell ist bei Telekom kein Bündel erhoben.",
     "1&1": (
         "Für dieses Modell ist bei 1&1 kein Bündel erhoben – die "
         "Kategorieseite führt es nicht als eigene Produktkachel."
@@ -1532,6 +1528,7 @@ def modelle(
         fertig.append(
             {
                 "id": mid,
+                "device_id": gruppe["device_id"],
                 "name": name,
                 "hersteller": hersteller,
                 "titel": titel(hersteller, name),

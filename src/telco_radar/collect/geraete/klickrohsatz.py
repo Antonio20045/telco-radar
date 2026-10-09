@@ -34,7 +34,11 @@ derselben Regel wie für jeden Adapter (``ohne_tarifblatt``).
 
 Dazu kommen die Sätze gelesener Übersichten (``uebersichten[]``, ``klickuebersicht``):
 Gerät über den Titel (``erkenne_geraet``, Katalog samt Auto-Einträgen), Werte wie
-gelesen, Quelle die Produktadresse aus dem Satz, sonst die Übersicht.
+gelesen, Quelle die Produktadresse aus dem Satz, sonst die Übersicht. ``angeboten``
+hält jedes Gerät, das mit irgendeinem Speicher in einer Übersicht steht.
+``nicht_im_angebot`` nennt die Katalog-Geräte außerhalb davon nur, wenn alle
+Übersichten der Datei gelesen und vollständig sind und kein Titel unbekannt blieb;
+sonst ist es ``None`` (unbekannt, nie leer).
 """
 
 from __future__ import annotations
@@ -48,7 +52,14 @@ from ...geraete_model import Katalog, erkenne_geraet, normalisiere, sku_id
 from .klickcrawler import GRUND_NICHT_BESUCHT
 from .klickergebnis import GELESENE_SEITEN
 from .klickkarte import EIN_VERTRAG
-from .klicklauf import BEFUND, BELEG_OFFEN, ERFASST, NICHT_ANGEBOTEN, NICHT_ERFASST
+from .klicklauf import (
+    BEFUND,
+    BELEG_OFFEN,
+    ERFASST,
+    LAUF_GELESEN,
+    NICHT_ANGEBOTEN,
+    NICHT_ERFASST,
+)
 from .klickpfad import ohne_markup
 
 log = logging.getLogger(__name__)
@@ -82,10 +93,17 @@ class Klickausbeute:
     rohsaetze: list[dict] = field(default_factory=list)
     luecken: Counter[str] = field(default_factory=Counter)
     ohne_tarif: list[dict] = field(default_factory=list)
+    angeboten: set[str] = field(default_factory=set)
+    nicht_im_angebot: list[str] | None = None
 
     def als_daten(self) -> dict:
-        """Zahlen für Bilanz und Protokoll."""
-        return {"rohsaetze": len(self.rohsaetze), "luecken": dict(self.luecken)}
+        """Zahlen für Bilanz und Protokoll, dazu das Angebot der Übersichten."""
+        return {
+            "rohsaetze": len(self.rohsaetze),
+            "luecken": dict(self.luecken),
+            "angeboten": sorted(self.angeboten),
+            "nicht_im_angebot": self.nicht_im_angebot,
+        }
 
 
 def tarifschluessel(text: object) -> str:
@@ -120,16 +138,26 @@ def ausbeute(daten: dict, katalog: Katalog) -> Klickausbeute:
             preis = geraetepreis(kombination, seite, daten, katalog)
             if satz == LUECKE_TARIF and preis is not None:
                 ergebnis.ohne_tarif.append(preis)
-    for uebersicht in daten.get("uebersichten") or []:
+    uebersichten = daten.get("uebersichten") or []
+    ganz = bool(uebersichten)
+    for uebersicht in uebersichten:
+        ganz = ganz and uebersicht.get("status") == LAUF_GELESEN
+        ganz = ganz and uebersicht.get("vollstaendig") is True
         if uebersicht.get("status") not in GELESENE_SEITEN:
             ergebnis.luecken[LUECKE_SEITE] += 1
             continue
         for roh in uebersicht.get("saetze") or []:
+            geraet = erkenne_geraet(str(roh.get("titel") or ""), katalog)
+            ganz = ganz and geraet is not None
+            ergebnis.angeboten.update([geraet.device_id] if geraet else [])
             satz = uebersicht_rohsatz(roh, uebersicht, daten, katalog)
             if isinstance(satz, dict):
                 ergebnis.rohsaetze.append(satz)
             else:
                 ergebnis.luecken[satz] += 1
+    if ganz:
+        alle = (g.device_id for g in katalog.geraete)
+        ergebnis.nicht_im_angebot = sorted(set(alle) - ergebnis.angeboten)
     return ergebnis
 
 

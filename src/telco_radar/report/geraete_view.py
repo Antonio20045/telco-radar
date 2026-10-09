@@ -1688,7 +1688,7 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         heute=tco_heute,
     )
     for modell in tco["modelle"]:
-        modell["erfassung"] = erfassung.ohne_karte(tco_db.erfassung, modell["karten"])
+        modell["erfassung"] = erfassung.fuer_modell(tco_db.erfassung, modell)
     ausfaelle: list[Ausfall] = []
     try:
         zeitreihe = geraete_zeitreihe.aufbereiten(
