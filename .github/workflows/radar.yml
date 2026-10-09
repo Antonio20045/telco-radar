@@ -10,7 +10,9 @@ on:
     # Peking - mitten in DeepSeeks Stosszeit (9-12 und 14-18 Uhr CST), in
     # der ALLE Tokenpreise verdoppelt sind. 11:00 UTC = 19:00 CST liegt
     # dahinter und halbiert die Laufkosten mit einer Zeile.
-    - cron: "0 11 * * 3,5" # every Wednesday and Friday 11:00 UTC (~13:00 DE summer / 12:00 winter), off-peak fuer DeepSeek
+    # Taeglich seit 09.10.2026 (Pitch 4 "Meldungen kostenlos"): die KI laeuft
+    # ueber kostenlose Modelle (llm_provider: frei), ein Lauf kostet nichts mehr.
+    - cron: "0 11 * * *" # taeglich 11:00 UTC
   workflow_dispatch:
     inputs:
       lookback_days:
@@ -146,9 +148,13 @@ jobs:
         env:
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' && secrets.ANTHROPIC_API_KEY || secrets.ANTHROPIC }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
         run: |
           if [ -n "$LLM_API_KEY" ]; then echo "LLM_API_KEY is present"; else echo "LLM_API_KEY is missing"; fi
           if [ -n "$ANTHROPIC_API_KEY" ]; then echo "ANTHROPIC_API_KEY fallback is present"; else echo "ANTHROPIC_API_KEY fallback is missing"; fi
+          if [ -n "$GEMINI_API_KEY" ]; then echo "GEMINI_API_KEY is present"; else echo "GEMINI_API_KEY is missing"; fi
+          if [ -n "$GROQ_API_KEY" ]; then echo "GROQ_API_KEY is present"; else echo "GROQ_API_KEY is missing"; fi
 
       - name: Run pipeline
         id: pipeline
@@ -159,6 +165,14 @@ jobs:
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' && secrets.ANTHROPIC_API_KEY || secrets.ANTHROPIC }}
           BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}
+          # Kostenlose KI-Anbieter (llm_provider: frei, config/settings.yaml
+          # frei_endpunkte). Ein leeres Secret ueberspringt den Anbieter.
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           # Push statt Pull (src/telco_radar/versand.py). Fehlen diese
           # Secrets, verschickt der Lauf nichts und schreibt den Grund ins
           # Laufprotokoll - er scheitert deswegen nicht. Genau deshalb stehen
