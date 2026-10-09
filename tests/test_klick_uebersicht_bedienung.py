@@ -11,8 +11,12 @@ nicht durch ``klicksperre.Pruefung`` wie auf Produktseiten (Entscheidung Antonio
 weiter. Der Lauf 37951203094 (15:22 UTC) lehnte dann „Weiter ohne Gerät“ ab, einen
 Shop-Knopf unter der Abfrage (Erkundung b335c6ec: ``#rejectAll`` heißt „Nur
 erforderliche“); „weiter ohne“ zählt nur noch mit Zustimmung, Einwilligung, Cookies
-oder Akzeptieren. Ein lokaler Server auf 127.0.0.1 liefert BEISPIEL-Seiten, von Hand
-geschrieben, und die abgeleitete Listenantwort aus ``test_klick_uebersicht_liste``.
+oder Akzeptieren. Im Lauf 37972947069 (18:24 UTC) kam MF_17791 durch, MF_17779 endete
+mit einer zweiten Prüfung (Skript, dann ``/opt-in/cookie.php``) in einem frischen
+Kontext; die Übersichten behalten jetzt Cookies und Speicher wie ein Browser, der
+weiterklickt (``klickkontext.Browserzustand``). Ein lokaler Server auf 127.0.0.1
+liefert BEISPIEL-Seiten, von Hand geschrieben, und die abgeleitete Listenantwort aus
+``test_klick_uebersicht_liste``.
 """
 
 from __future__ import annotations
@@ -33,6 +37,7 @@ from test_klick_uebersicht_liste import (
 )
 
 from telco_radar.collect.geraete.klickkarte import lade_klickkarte
+from telco_radar.collect.geraete.klickkontext import Browserzustand
 from telco_radar.collect.geraete.klicklauf import LAUF_GELESEN, LAUF_GESTOERT
 from telco_radar.collect.geraete.klickproben import EINWILLIGUNG_AB
 
@@ -113,3 +118,27 @@ def test_weiter_ohne_geraet_ist_keine_einwilligung():
     assert EINWILLIGUNG_AB.search("Weiter ohne Gerät") is None
     assert EINWILLIGUNG_AB.search("Weiter ohne Zustimmung") is not None
     assert EINWILLIGUNG_AB.search("Nur erforderliche") is not None
+
+
+MERKT = "<script>document.cookie = 'aws-waf-token=probe; path=/';</script>"
+
+
+def _zwei_tarife(chromium, karte, echt, zustand):
+    seite = SEITE.replace("<body>", "<body>" + MERKT)
+    with klickserver(antworte_liste(seite, listenseiten(echt))) as server:
+        for _ in range(2):
+            ergebnis = lies_testseite(
+                chromium, karte, server.adresse(PFAD), zustand=zustand
+            )
+            assert ergebnis["status"] == LAUF_GELESEN, ergebnis["grund"]
+        return [c for pfad, c in server.cookies if pfad == PFAD]
+
+
+def test_zweiter_tarif_behaelt_die_cookies_des_ersten(chromium, karte, echt):
+    erste, zweite = _zwei_tarife(chromium, karte, echt, Browserzustand())
+    assert "aws-waf-token" not in erste
+    assert "aws-waf-token=probe" in zweite
+
+
+def test_ohne_browserzustand_kommt_jeder_tarif_ohne_cookie(chromium, karte, echt):
+    assert _zwei_tarife(chromium, karte, echt, None) == ["", ""]

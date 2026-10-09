@@ -60,6 +60,7 @@ from .klickergebnis import (
     nicht_besucht,
     seite_als_daten,
 )
+from .klickkontext import Browserzustand
 from .klicklauf import ERFASST, LAUF_GESTOERT, STOERUNG_ZEIT, Klicklauf
 from .klickparallel import Laufpruefung
 from .klickseite import GRUND_FRIST, Fristschleuse, beobachte
@@ -317,6 +318,8 @@ def leser_im_browser(
             modell=seite.modell,
         )
 
+    zustand = Browserzustand()
+
     def lies(adresse: str, ende: float) -> dict:
         schleuse.setze(ende)
         kennung = ziel.kennung
@@ -329,6 +332,7 @@ def leser_im_browser(
             schleuse=schleuse,
             kennung=kennung,
             abstand_s=ziel.seitenabstand_sekunden,
+            zustand=zustand,
         )
 
     return crawle, lies

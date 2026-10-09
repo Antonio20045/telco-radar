@@ -11,6 +11,11 @@ Chromium an beiden vorbei; die entfernt das Tor aus jeder Antwort und ``OHNE_VOR
 aus nachgeladenen Elementen, auch in Shadow Roots, bevor der Browser sie liest.
 ``schliesse`` verlässt die Seite, schließt den Kontext und gibt das Vorabladen frei;
 ``cookie_werte`` liest vorher die Cookie-Werte des Kontexts zum Schwärzen.
+``Browserzustand`` trägt Cookies und Speicher eines Kontexts in den nächsten, wie ein
+Browser, der beim Weiterklicken seine Cookies behält (Telekom-Übersichten: das Token
+der JavaScript-Prüfung und die abgelehnte Einwilligung gelten so für den nächsten
+Tarif, Klick-Tageslauf 09.10.2026 18:24 UTC: zweite Prüfung auf MF_17779 in einem
+frischen Kontext).
 HAR-Belege in ``wiedergabe`` beantworten ihre Anfragen ohne Netz und vor dem Tor; was
 sie nicht kennen, geht an das Tor. Grenze: ein HAR-Beleg hält nur die Preisantwort, die
 Produktseite selbst kommt weiter aus dem Netz. Ohne erreichbare Seite liest die
@@ -36,6 +41,7 @@ if TYPE_CHECKING:
         BrowserContext,
         CDPSession,
         Page,
+        StorageState,
         ViewportSize,
     )
 
@@ -78,6 +84,23 @@ OHNE_VORAB_JS = """(() => {
 })();"""
 
 
+class Browserzustand:
+    """Cookies und Speicher des letzten Kontexts (``storage_state``) für den
+    nächsten."""
+
+    def __init__(self) -> None:
+        self.stand: StorageState | None = None
+
+    def merke(self, sitzung: Sitzung | None) -> None:
+        """Hält den Zustand von ``sitzung`` fest; ohne lesbaren Kontext bleibt er."""
+        if sitzung is None:
+            return
+        try:
+            self.stand = sitzung.kontext.storage_state()
+        except PlaywrightFehler as fehler:
+            log.warning("Klick-Crawler: Browserzustand nicht gelesen: %s", kurz(fehler))
+
+
 @dataclass(frozen=True)
 class Sitzung:
     """Kontext, Seite und Vorab-Sperre eines Laufs."""
@@ -94,18 +117,24 @@ def oeffne_sitzung(
     kennung: str | None = None,
     *,
     wiedergabe: tuple[Path, ...] = (),
+    zustand: Browserzustand | None = None,
 ) -> Sitzung:
     """Eigener Kontext ohne Service Worker und ohne Vorabladen, alles am Tor.
 
     ``kennung`` ist der User-Agent aus ``geraete_quellen.yaml``, sonst der des Browsers;
     eine andere Kopfzeile setzt der Kontext nicht. Die HAR-Dateien in ``wiedergabe``
-    stehen vor dem Tor.
+    stehen vor dem Tor. ``zustand`` bringt Cookies und Speicher des vorigen Kontexts
+    mit.
     """
     wache = sperre_vorabladen(browser)
     kontext: BrowserContext | None = None
     try:
+        stand = None if zustand is None else zustand.stand
         kontext = browser.new_context(
-            service_workers="block", viewport=fenster, user_agent=kennung
+            service_workers="block",
+            viewport=fenster,
+            user_agent=kennung,
+            storage_state=stand,
         )
         kontext.add_init_script(script=OHNE_VORAB_JS)
         kontext.route_web_socket("**/*", tor.websocket)

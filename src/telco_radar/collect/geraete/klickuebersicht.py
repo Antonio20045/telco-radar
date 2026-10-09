@@ -14,9 +14,10 @@ eine Produktseite: eigener Kontext (``klickkontext.oeffne_sitzung``), jede Anfra
 der Beobachtung ``klickseite.beobachte``: eine JavaScript-Prüfung auf einem Nebenabruf
 geht wie auf Produktseiten in den Browser, Klick-Tageslauf 09.10.2026), Laden
 und JavaScript-Prüfung über ``klickwache.Wache.lade``; gelesen wird
-``page.content()``. Eine Seite ohne Gerät ist ``leer``; mit Bot-Schutz, Umleitung oder
-ohne Lesart ist sie ``gestoert`` mit Grund und trägt keinen Satz; robots.txt-Sperre
-heißt ``gesperrt``.
+``page.content()``. Mit ``zustand`` behält jede Seite Cookies und Speicher der vorigen
+(``klickkontext.Browserzustand``), auch über Tarife hinweg. Eine Seite ohne Gerät
+ist ``leer``; mit Bot-Schutz, Umleitung oder ohne Lesart ist sie ``gestoert`` mit
+Grund und trägt keinen Satz; robots.txt-Sperre heißt ``gesperrt``.
 
 Danach folgt sie dem gelesenen Folgelink, aufgelöst gegen die Seitenadresse, nur auf
 demselben Host und mit Erlaubnis von robots.txt, höchstens ``HOECHSTE_SEITEN`` Seiten;
@@ -45,7 +46,7 @@ from .basis import GeraeteAbrufFehler
 from .klickanschluss import kein_folgelink
 from .klickcrawler import ANTWORT_FRIST_MS, FENSTER
 from .klickergebnis import LAUF_LEER
-from .klickkontext import Sitzung, oeffne_sitzung, schliesse
+from .klickkontext import Browserzustand, Sitzung, oeffne_sitzung, schliesse
 from .klicklauf import LAUF_GELESEN, LAUF_GESTOERT, Klicklauf
 from .klickliste import Datenliste, Listenlauf
 from .klickraster import BEREIT_JS, einsundeins_saetze
@@ -103,6 +104,7 @@ def lies_uebersicht(
     kennung: str | None = None,
     abstand_s: float = 0.0,
     schlafe: Callable[[float], None] = time.sleep,
+    zustand: Browserzustand | None = None,
 ) -> dict:
     """Liest die Übersicht ``adresse`` samt Folgeseiten; der Eintrag für
     ``uebersichten[]``."""
@@ -116,7 +118,7 @@ def lies_uebersicht(
         if gelesen and abstand_s > 0:
             schlafe(abstand_s)
         seite, neu = _lies_seite(
-            browser, ziel, karte, lesart, waechter, uhr, schleuse, kennung
+            browser, ziel, karte, lesart, waechter, uhr, schleuse, kennung, zustand
         )
         gelesen.append(ziel)
         frisch = {_schluessel(s): s for s in neu if _schluessel(s) not in saetze}
@@ -172,6 +174,7 @@ def _lies_seite(
     uhr: Callable[[], datetime],
     schleuse: Schleuse,
     kennung: str | None,
+    zustand: Browserzustand | None,
 ) -> tuple[dict, list[dict]]:
     """Eine Seite der Übersicht: ihr Eintrag unter ``seiten`` und ihre Sätze."""
     lauf = Klicklauf(anbieter=karte.anbieter, adresse=adresse)
@@ -186,7 +189,7 @@ def _lies_seite(
     try:
         if lesart is None:
             raise Abbruch(LAUF_GESTOERT, f"{GRUND_OHNE_LESART} ({karte.anbieter})")
-        sitzung = oeffne_sitzung(browser, tor, FENSTER, kennung)
+        sitzung = oeffne_sitzung(browser, tor, FENSTER, kennung, zustand=zustand)
         wache = Wache(sitzung.seite, karte, tor, lauf, ANTWORT_FRIST_MS)
         if lesart.liste is not None:
             liste = Listenlauf(sitzung.seite, wache, lesart.liste)
@@ -203,6 +206,8 @@ def _lies_seite(
     except PlaywrightFehler as fehler:
         lauf.status, lauf.grund = LAUF_GESTOERT, f"Browserfehler: {kurz(fehler)}"
     finally:
+        if zustand is not None:
+            zustand.merke(sitzung)
         tor.geschlossen = True
         schliesse(sitzung)
     if lauf.status == LAUF_GELESEN and tor.stoerung is not None:

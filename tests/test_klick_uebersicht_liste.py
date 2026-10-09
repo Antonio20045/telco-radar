@@ -178,14 +178,20 @@ def antworte_liste(seite: str, listen: dict[str, dict]):
     return antworte
 
 
-def lies_testseite(chromium, karte, adresse: str) -> dict:
+def lies_testseite(chromium, karte, adresse: str, zustand=None) -> dict:
     def robots(url: str) -> tuple[int, str]:
         return 200, OFFEN if "127.0.0.1" in url else ZU
 
     waechter = RobotsWaechter(hole=robots)
     schleuse = Hostschleuse(waechter, lambda: JETZT)
     return lies_uebersicht(
-        chromium, adresse, karte, waechter, lambda: JETZT, schleuse=schleuse
+        chromium,
+        adresse,
+        karte,
+        waechter,
+        lambda: JETZT,
+        schleuse=schleuse,
+        zustand=zustand,
     )
 
 

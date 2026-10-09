@@ -4,10 +4,10 @@ Eine Antwortfunktion bekommt den Pfad samt Anfrage und liefert eine ``Antwort``;
 Server merkt jeden Abruf mit Pfad und Zeitpunkt (``time.monotonic``), beim Eingang und
 am Ende der Antwort; ``luecken`` misst den Crawl-delay vom Ende der vorigen Antwort.
 Schließt der Browser die Verbindung vor dem Ende, steht der Pfad in ``abgebrochen``;
-``kennungen`` hält je Abruf den User-Agent. Ein POST zählt wie ein Abruf; Pfad und
-Körper stehen zusätzlich in ``posts``. Unter ``localhost`` ist derselbe Server als
-zweiter Host erreichbar. ``karte`` und ``laufe`` bauen eine Prüfkarte und rufen den
-Crawler mit eigener Hostschleuse.
+``kennungen`` hält je Abruf den User-Agent, ``cookies`` Pfad und Cookie-Kopf. Ein
+POST zählt wie ein Abruf; Pfad und Körper stehen zusätzlich in ``posts``. Unter
+``localhost`` ist derselbe Server als zweiter Host erreichbar. ``karte`` und ``laufe``
+bauen eine Prüfkarte und rufen den Crawler mit eigener Hostschleuse.
 """
 
 from __future__ import annotations
@@ -48,6 +48,7 @@ class Klickserver:
     fertig: list[tuple[float, str]] = field(default_factory=list)
     abgebrochen: list[str] = field(default_factory=list)
     kennungen: list[str | None] = field(default_factory=list)
+    cookies: list[tuple[str, str]] = field(default_factory=list)
     posts: list[tuple[str, str]] = field(default_factory=list)
 
     def adresse(self, pfad: str, host: str = "127.0.0.1") -> str:
@@ -74,6 +75,7 @@ def klickserver(antworte: Callable[[str], Antwort]) -> Iterator[Klickserver]:
         def do_GET(self) -> None:
             server.abrufe.append(self.path)
             server.kennungen.append(self.headers.get("User-Agent"))
+            server.cookies.append((self.path, self.headers.get("Cookie") or ""))
             server.zeiten.append((time.monotonic(), self.path))
             antwort = server.antworte(self.path)
             if antwort.verzug:
