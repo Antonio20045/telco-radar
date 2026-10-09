@@ -10,7 +10,7 @@ startet Chromium ohne Tarnung und stellt die Uhr.
 AUFRUF
 ------
     PYTHONPATH=src python scripts/klick_tageslauf.py --anbieter o2 --ausgabe klick
-        [--stand data/state/klick/klick_stand.json] [--job-frist-sekunden 4500]
+        [--stand data/state/klick/klick_stand.json] [--job-frist-sekunden 10800]
         [--job-start EPOCHE] [--root .] [--chromium PFAD] [--ohne-parallelpruefung]
     PYTHONPATH=src python scripts/klick_tageslauf.py --plan
 

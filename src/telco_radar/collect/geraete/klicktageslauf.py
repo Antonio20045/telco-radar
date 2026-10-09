@@ -76,7 +76,7 @@ if TYPE_CHECKING:
 
 log = logging.getLogger(__name__)
 
-JOB_FRIST_S = 75 * 60
+JOB_FRIST_S = 180 * 60
 RESERVE_S = 8 * 60
 MINDESTZEIT_SEITE_S = 3 * 60
 ZEIT_JE_SEITE_S = 25 * 60
