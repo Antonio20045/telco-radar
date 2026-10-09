@@ -83,6 +83,7 @@ LUECKE_TARIF = "tarif_unbekannt"
 LUECKE_SPEICHER = "speicher_unbekannt"
 LUECKE_GERAET = "geraet_unbekannt"
 LUECKE_OHNE_PREIS = "ohne_preis"
+LUECKE_ZUBEHOER = "buendel_mit_zubehoer"
 LUECKEN_JE_STATUS = {
     BEFUND: BEFUND,
     NICHT_ERFASST: NICHT_ERFASST,
@@ -220,6 +221,8 @@ def uebersicht_rohsatz(
             "Klick-Übersicht %s: Gerät %r nicht im Katalog", daten.get("name"), titel
         )
         return LUECKE_GERAET
+    if roh.get("zubehoer"):
+        return LUECKE_ZUBEHOER
     gb = roh.get("speicher_gb")
     if gb not in (geraet.speicher or []):
         return LUECKE_SPEICHER

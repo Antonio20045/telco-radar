@@ -147,7 +147,8 @@ def test_speicher_passt_keine_groesse_ist_luecke(katalog):
     aus = ausbeute(daten, katalog)
 
     assert rastersaetze(aus, "samsung-galaxy-s26-ultra") == []
-    assert aus.luecken["speicher_unbekannt"] == 36
+    assert aus.luecken["buendel_mit_zubehoer"] == 25
+    assert aus.luecken["speicher_unbekannt"] == 11
 
 
 def test_speicher_mehrdeutig_ist_luecke(katalog):
@@ -165,7 +166,8 @@ def test_ohne_produktseite_ist_speicher_luecke(katalog):
     aus = ausbeute(daten, katalog)
 
     assert aus.rohsaetze == []
-    assert aus.luecken["speicher_unbekannt"] == 36
+    assert aus.luecken["speicher_unbekannt"] == 11
+    assert aus.luecken["buendel_mit_zubehoer"] == 25
     assert aus.luecken["geraet_unbekannt"] == 7
     assert sum(aus.luecken.values()) == 43
 

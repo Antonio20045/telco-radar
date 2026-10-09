@@ -20,6 +20,11 @@ immer All-Net-Flat S). Sätze dieses Rasters werden kein Rohsatz: die Produktsei
 nennt denselben Tarif genauer. Der Anschluss kommt von der heute gelesenen
 Tarifdetail-Seite mit demselben Tarifnamen, sonst bleibt er ``None``.
 
+Eine Kachel, die das Gerät mit Zubehör bündelt („und Samsung Galaxy Buds 4“ in
+``…-bundle-description``), trägt ``zubehoer``: ihr Preis gilt nicht für das Gerät
+allein, sie misst keinen Speicher und wird kein Rohsatz (``klickrohsatz``, Lücke
+``buendel_mit_zubehoer``; Regel: Bündel aus Gerät plus Zubehör werden verworfen).
+
 Das Raster nennt die Schlusszahlung von „24+12“ nicht. Sie hängt bei 1&1 nur an der
 Gerätevariante (``hwdVariantsOneOffPaymentFees.product-<Farbe>-<Speicher>`` ohne
 Tarif, Karte ``config/klickkarten/1und1.yaml``): ein Rastersatz mit gemessenem Speicher
@@ -61,6 +66,9 @@ _CENT = re.compile(r'class="price__decimals\b[^"]*"[^>]*>\s*([0-9]{2}|[–-])\s*
 _EINHEIT = re.compile(r'class="price__unit"[^>]*>\s*€/Monat\*\s*<')
 _MONATE = re.compile(r'data-hardware-months="(\d+)"')
 _TARIF = re.compile(r"Inkl\.\s*([^<]+)")
+_ZUBEHOER = re.compile(
+    r'-bundle-description"[^>]*>\s*(?:<br\s*/?>)?\s*und\s+([^<]*\S)\s*<'
+)
 
 
 def einsundeins_saetze(text: str, adresse: str) -> list[dict]:
@@ -100,7 +108,14 @@ def _kachel(kachel: str) -> dict:
         "tarif_name": tarifname_bereinigt(tarif[1]),
         "laufzeit_monate": int(monate[1]),
         "buendel_monatlich": (int(euro[1]) * 100 + rest) / 100,
+        "zubehoer": _zubehoer(kachel),
     }
+
+
+def _zubehoer(kachel: str) -> str | None:
+    """Das Zubehör, das die Kachel mit dem Gerät bündelt („und Galaxy Buds 4“)."""
+    treffer = _ZUBEHOER.search(kachel)
+    return None if treffer is None else " ".join(html.unescape(treffer[1]).split())
 
 
 def raster_roh(daten: dict, produktsaetze: list[dict], katalog: Katalog) -> list[dict]:
@@ -115,6 +130,7 @@ def raster_roh(daten: dict, produktsaetze: list[dict], katalog: Katalog) -> list
         for roh in u.get("saetze") or []
     ]
     raster = [r for r in gelesen if r.get("art") == ART_RASTER]
+    ohne_zubehoer = [r for r in raster if not r.get("zubehoer")]
     anschluss = {
         _tarif(r.get("tarif_name")): r.get("anschlusspreis")
         for r in gelesen
@@ -122,7 +138,9 @@ def raster_roh(daten: dict, produktsaetze: list[dict], katalog: Katalog) -> list
     }
     basis = _tarif(PRODUKTSEITE_TARIF)
     speicher = _speicher(
-        [r for r in raster if _tarif(r["tarif_name"]) == basis], produktsaetze, katalog
+        [r for r in ohne_zubehoer if _tarif(r["tarif_name"]) == basis],
+        produktsaetze,
+        katalog,
     )
     saetze = []
     for roh in raster:

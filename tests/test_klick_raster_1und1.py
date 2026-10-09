@@ -83,7 +83,17 @@ def test_raster_iphone_17_pro_in_unlimited_m(unlimited_m):
         "tarif_name": "1&1 Unlimited on demand M",
         "laufzeit_monate": 36,
         "buendel_monatlich": 54.99,
+        "zubehoer": None,
     }
+
+
+def test_kachel_mit_zubehoer_nennt_es():
+    saetze = raster(RASTER[0])
+
+    zubehoer = {s["titel"]: s["zubehoer"] for s in saetze}
+    assert zubehoer["Samsung Galaxy A57 5G"] == "Samsung Galaxy Buds 4"
+    assert zubehoer["Google Pixel 10a"] == "Google Pixel Buds 2a"
+    assert zubehoer["iPhone 17 Pro"] is None
 
 
 @pytest.mark.parametrize(
