@@ -35,14 +35,16 @@ derselben Regel wie für jeden Adapter (``ohne_tarifblatt``).
 Dazu kommen die Sätze gelesener Übersichten (``uebersichten[]``, ``klickuebersicht``):
 Gerät über den Titel (``erkenne_geraet``, Katalog samt Auto-Einträgen), Werte wie
 gelesen, Quelle die Produktadresse aus dem Satz, sonst die Übersicht. ``angeboten``
-hält jedes Gerät, das mit irgendeinem Speicher in einer Übersicht steht.
-``nicht_im_angebot`` nennt die Katalog-Geräte außerhalb davon nur, wenn alle
-Übersichten der Datei gelesen und vollständig sind und kein Titel unbekannt blieb;
-sonst ist es ``None`` (unbekannt, nie leer).
+hält jedes Gerät, das mit irgendeinem Speicher in einer Übersicht steht (auch in einem
+1&1-Geräteraster). ``nicht_im_angebot`` nennt die Katalog-Geräte außerhalb davon nur,
+wenn alle Übersichten der Datei gelesen und vollständig sind und kein Titel unbekannt
+blieb; sonst ist es ``None`` (unbekannt, nie leer).
 
 Ein Satz einer 1&1-Tarifdetail-Seite (``art`` ``anschluss``) ist kein Rohsatz: sein
 Anschlusspreis kommt auf jeden Produktseiten-Satz mit demselben Tarif-Slug, nur wenn
-die Seite gelesen ist; sonst bleibt ``anschlusspreis`` ``None``.
+die Seite gelesen ist; sonst bleibt ``anschlusspreis`` ``None``. Ein Satz eines
+1&1-Geräterasters (``art`` ``raster``) wird erst nach den Produktseiten Rohsatz, mit dem
+Speicher, den ``klickraster.raster_roh`` an ihnen misst.
 """
 
 from __future__ import annotations
@@ -66,6 +68,7 @@ from .klicklauf import (
     NICHT_ERFASST,
 )
 from .klickpfad import ohne_markup
+from .klickraster import ART_RASTER, raster_roh
 
 log = logging.getLogger(__name__)
 
@@ -160,15 +163,22 @@ def ausbeute(daten: dict, katalog: Katalog) -> Klickausbeute:
             geraet = erkenne_geraet(str(roh.get("titel") or ""), katalog)
             ganz = ganz and geraet is not None
             ergebnis.angeboten.update([geraet.device_id] if geraet else [])
-            satz = uebersicht_rohsatz(roh, uebersicht, daten, katalog)
-            if isinstance(satz, dict):
-                ergebnis.rohsaetze.append(satz)
-            else:
-                ergebnis.luecken[satz] += 1
+            if roh.get("art") == ART_RASTER:
+                continue
+            _nimm(ergebnis, uebersicht_rohsatz(roh, uebersicht, daten, katalog))
+    for roh in raster_roh(daten, list(ergebnis.rohsaetze), katalog):
+        _nimm(ergebnis, uebersicht_rohsatz(roh, {}, daten, katalog))
     if ganz:
         alle = (g.device_id for g in katalog.geraete)
         ergebnis.nicht_im_angebot = sorted(set(alle) - ergebnis.angeboten)
     return ergebnis
+
+
+def _nimm(ergebnis: Klickausbeute, satz: dict | str) -> None:
+    if isinstance(satz, dict):
+        ergebnis.rohsaetze.append(satz)
+    else:
+        ergebnis.luecken[satz] += 1
 
 
 def _anschluesse(daten: dict) -> dict[str, float]:
@@ -224,7 +234,7 @@ def uebersicht_rohsatz(
         "geraet_zuzahlung": roh.get("geraet_zuzahlung"),
         "geraet_monatsrate": roh.get("geraet_monatsrate"),
         "tarif_monatlich": roh.get("tarif_monatlich"),
-        "buendel_monatlich": None,
+        "buendel_monatlich": roh.get("buendel_monatlich"),
         "tarif_phasen": [],
     }
     if all(satz.get(f) is None for f in PREISFELDER):
