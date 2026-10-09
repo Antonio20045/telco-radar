@@ -1,12 +1,13 @@
 {
  "anbieter": "congstar",
- "datum": "2026-10-08",
- "dauer_sekunden": 347.7,
+ "datum": "2026-10-09",
+ "dauer_sekunden": 353.6,
  "format": 1,
  "frischegrenze_tage": 3,
  "grund": null,
  "karte": "congstar.yaml",
  "laufstatus": "gelesen",
+ "lesefrist_tage": 1,
  "name": "congstar",
  "seiten": [
   {
@@ -25,9 +26,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "73d33a5a8dbdf73649f8953965bcdf47d71ef77ecb41fb7724bca13cf2c1ff4f",
+      "beleg_id": "bcf8a5f17b318a463675422df6f7316ab06f07037e40b229a28fba6630901e9b",
       "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/?paymentVariantBenefits=&planId=543",
-      "zeitpunkt": "2026-10-08T15:02:54Z"
+      "zeitpunkt": "2026-10-09T06:21:13Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -64,9 +65,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "651d24b7dd1fa8e518387c6d8857f5b16597cd84d24ab271e56f74327056b765",
+      "beleg_id": "0cdddd3754c765b08b42adfc54fecabedd57cc3f24c89b248ea850f9e46a501c",
       "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/?paymentVariantBenefits=&planId=543&installmentPlanId=500",
-      "zeitpunkt": "2026-10-08T15:02:55Z"
+      "zeitpunkt": "2026-10-09T06:21:14Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -103,9 +104,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a9f8daa2d57706bf59641a58e06396f91b5889967c9e5c885980dbadc792e68d",
+      "beleg_id": "a0bb446f619a0c6402e9530d6a54c4038d2ec60f576fa80f32f02bf8649790c4",
       "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/?paymentVariantBenefits=&planId=560&installmentPlanId=501",
-      "zeitpunkt": "2026-10-08T15:02:57Z"
+      "zeitpunkt": "2026-10-09T06:21:16Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -142,9 +143,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "313608c986234f1bb24fe7de4b514a3787c6da5244c5e9f44b159b484db697b3",
+      "beleg_id": "9a7619e64c6b1f824e2b584cb6d2cee22e8ed1fc02538744efd40e8b047c809e",
       "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/?paymentVariantBenefits=&planId=560&installmentPlanId=500",
-      "zeitpunkt": "2026-10-08T15:02:58Z"
+      "zeitpunkt": "2026-10-09T06:21:17Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -181,9 +182,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "e1317f2c9b16c19062dbfa38c4f5905099365b41acb482848108c862bdbb16c5",
+      "beleg_id": "efffe5633bfdb5535e25e4c79f280f2f58ee5006686f1fb0f5744349be956763",
       "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/?paymentVariantBenefits=&planId=540&installmentPlanId=501",
-      "zeitpunkt": "2026-10-08T15:02:59Z"
+      "zeitpunkt": "2026-10-09T06:21:18Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -220,9 +221,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "4ec0ec96fb3a7f58aea2306cc9d68d73c58c40d8b428d7b684e1d2f11f74b659",
+      "beleg_id": "cbad246dfec1b673e9aec0a5aeb6e723e23b11a55152d8c7b41b9560953f9d56",
       "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/?paymentVariantBenefits=&planId=540&installmentPlanId=500",
-      "zeitpunkt": "2026-10-08T15:03:00Z"
+      "zeitpunkt": "2026-10-09T06:21:19Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -259,9 +260,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "7f269b88c0a02cdbab30699ee77f5eb2ece3d711b1156708ab4b14cb34927eca",
+      "beleg_id": "ba5072b4a6c1acb2572c17070fda6b2b06b63bfac3d858a255026001696bb98a",
       "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/?paymentVariantBenefits=&planId=545&installmentPlanId=501",
-      "zeitpunkt": "2026-10-08T15:03:02Z"
+      "zeitpunkt": "2026-10-09T06:21:21Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -298,9 +299,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a3e5abde79958b79f24372bbbb96ebf713bbcad1f733368bbb4925147d21823b",
+      "beleg_id": "19f4be7f7a97c7bcec034019fff520d8b4fc815e66ed1114f52d0c69a2f68d5f",
       "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/?paymentVariantBenefits=&planId=545&installmentPlanId=500",
-      "zeitpunkt": "2026-10-08T15:03:03Z"
+      "zeitpunkt": "2026-10-09T06:21:22Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -331,14 +332,17 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 61,
-    "beendet": 61,
+    "anfragen": 67,
+    "beendet": 64,
     "dokument": "complete",
     "geladen": true,
-    "offen": {},
+    "offen": {
+     "images.congstar.de": 9,
+     "www.congstar.de": 4
+    },
     "ohne_antwort_ms": 0,
-    "sekunden": 41.4,
-    "takte_ms": 3350,
+    "sekunden": 40.6,
+    "takte_ms": 3050,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -371,9 +375,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "5aeee55a9dad952e5da9bf683e28686e89d4025c3ea335c65caa3be2c8d907c6",
+      "beleg_id": "c8a804d833d15928f3300f5e4f330426baa4b5ff1e3234962e5a22211e5b884f",
       "seite": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=543",
-      "zeitpunkt": "2026-10-08T15:03:55Z"
+      "zeitpunkt": "2026-10-09T06:22:14Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -410,9 +414,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "5bf2d91f38708ea96724b8ad06e3b1cf95cd1947106c29d8ef3a7dcf1861b271",
+      "beleg_id": "8d197af5bc61e68ff6d3d30978df789b48f3cd782a65155d9ef4f9480dd3dfd2",
       "seite": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=543&installmentPlanId=500",
-      "zeitpunkt": "2026-10-08T15:03:56Z"
+      "zeitpunkt": "2026-10-09T06:22:15Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -449,9 +453,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "66014bbcae90929bc273dc13e82da8e4243617579f17f6b1fea7eef380c06bed",
+      "beleg_id": "366e06ee8c83d1293f3ba55220943079edbae1246957053932b48bd1757c23b5",
       "seite": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=560&installmentPlanId=501",
-      "zeitpunkt": "2026-10-08T15:03:58Z"
+      "zeitpunkt": "2026-10-09T06:22:17Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -488,9 +492,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "cc5d5e670bbb65bd9caf19b7d94d22584083d434767f96bf79880cf6b44b08e8",
+      "beleg_id": "255129722bc7582b4c0d932a51142b3ae7c4f625e8c3139f5e115f803b3f5629",
       "seite": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=560&installmentPlanId=500",
-      "zeitpunkt": "2026-10-08T15:03:59Z"
+      "zeitpunkt": "2026-10-09T06:22:18Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -527,9 +531,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a5f19aa80887608249eeb720f462a6d1756c6722a7d49631f473cf1397783a1f",
+      "beleg_id": "78e7208f73f87b704fdfe2fb3caead157b08996d60044e356f3b225f5a7e26b2",
       "seite": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=540&installmentPlanId=501",
-      "zeitpunkt": "2026-10-08T15:04:00Z"
+      "zeitpunkt": "2026-10-09T06:22:19Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -566,9 +570,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "c217b6e645b67333f94320ca1c6b5c524e337312bb0cd4218d09006789207dab",
+      "beleg_id": "605c15814e17b60eb656a787a45e133ff166a533784986c77ec5ca60cf20c391",
       "seite": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=540&installmentPlanId=500",
-      "zeitpunkt": "2026-10-08T15:04:01Z"
+      "zeitpunkt": "2026-10-09T06:22:20Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -605,9 +609,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "5934c44df31595c3ff040d959aad34569265bd5c9821e3d89bd46894a19f1849",
+      "beleg_id": "f51b29b1bfe09a5b1c440578af468fd4460f78006dc03543a3b73d1d25993410",
       "seite": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=545&installmentPlanId=501",
-      "zeitpunkt": "2026-10-08T15:04:03Z"
+      "zeitpunkt": "2026-10-09T06:22:22Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -644,9 +648,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "6f314e3c2a9fa6a73a0980d96402f6de52131ba0f655d599434bc35099835467",
+      "beleg_id": "8e5734d80cfe36ed0a43e47e28674bc6c85fe7d8c89b8f83804a91694a58a195",
       "seite": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=545&installmentPlanId=500",
-      "zeitpunkt": "2026-10-08T15:04:04Z"
+      "zeitpunkt": "2026-10-09T06:22:23Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -683,9 +687,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "5a2dd42d2b40632329e03b3077019fd41bc529b30c2252a9cc0968d9d2171004",
+      "beleg_id": "6fb9a955441c300b5392285775f0b1bf3eb4942a25ccf6cdd69938946eea6e68",
       "seite": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=543&installmentPlanId=501&memorySize=512+GB",
-      "zeitpunkt": "2026-10-08T15:04:06Z"
+      "zeitpunkt": "2026-10-09T06:22:25Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -722,9 +726,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "b41bc6d65a93a21cb925d11070a266c1641e62298b2330be28b265878994c333",
+      "beleg_id": "0bb476e936434faabe436246821d6ac1c5c6150af053ff7b4fd06d79f89e3f4f",
       "seite": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=543&installmentPlanId=500&memorySize=512+GB",
-      "zeitpunkt": "2026-10-08T15:04:07Z"
+      "zeitpunkt": "2026-10-09T06:22:26Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -761,9 +765,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "d9da2ffbce2d1c8ce67e46eb442dc822b104ef980c055938e127c490cb902a60",
+      "beleg_id": "4a0551dc83b5cf021c710fb6d473124b254a195a2d9d589aefb54eeca5ea674d",
       "seite": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=560&installmentPlanId=501&memorySize=512+GB",
-      "zeitpunkt": "2026-10-08T15:04:08Z"
+      "zeitpunkt": "2026-10-09T06:22:27Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -800,9 +804,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "4dc60066d26b9ad3ba155578d5f54a4b96bd18af19d89caab80971fc0d1be19d",
+      "beleg_id": "1db668e1979b85475a520ea42525c7a9c85edfebf39a37ac9370626e68c850fe",
       "seite": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=560&installmentPlanId=500&memorySize=512+GB",
-      "zeitpunkt": "2026-10-08T15:04:09Z"
+      "zeitpunkt": "2026-10-09T06:22:28Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -839,9 +843,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "5df9190286f12570ef5a5a1972a042ae8cf83a83a9d9d06951753b571650a895",
+      "beleg_id": "308615a03fd77994ee9e98334a3160c6a7ba5e0154f1af43de4922bab5d567ac",
       "seite": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=540&installmentPlanId=501&memorySize=512+GB",
-      "zeitpunkt": "2026-10-08T15:04:11Z"
+      "zeitpunkt": "2026-10-09T06:22:30Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -878,9 +882,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "c05ea788d83f79327f2153976212618e39bfe4f67632fcf2c370b052ee685d83",
+      "beleg_id": "881919f7763caaa6b5ec7c9d1aa6c14cb70a3607b55c8ae229406c311c72e998",
       "seite": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=540&installmentPlanId=500&memorySize=512+GB",
-      "zeitpunkt": "2026-10-08T15:04:11Z"
+      "zeitpunkt": "2026-10-09T06:22:30Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -917,9 +921,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "e88d3e5c9d8e70deffaea331f60333a680a4f6e32f25a7c269cc0700f5313259",
+      "beleg_id": "f242972e00834771bc61cee52dac44c0bd1349e4d7be596ae45c5b4fc47506fd",
       "seite": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=545&installmentPlanId=501&memorySize=512+GB",
-      "zeitpunkt": "2026-10-08T15:04:13Z"
+      "zeitpunkt": "2026-10-09T06:22:32Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -956,9 +960,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "0685227f3dc67c1f9300ea2064fe0e036db8601d7fdb435061fab4e1ea751a0c",
+      "beleg_id": "38e77e0543c6ea1866bb4099c6a1d8261025c067595ddc2fa69a9dc5df6659c8",
       "seite": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?paymentVariantBenefits=&planId=545&installmentPlanId=500&memorySize=512+GB",
-      "zeitpunkt": "2026-10-08T15:04:14Z"
+      "zeitpunkt": "2026-10-09T06:22:33Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -990,15 +994,16 @@
    "ladung": {
     "abstand_s": 2.0,
     "anfragen": 77,
-    "beendet": 74,
+    "beendet": 73,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "www.congstar.de": 3
+     "images.congstar.de": 10,
+     "www.congstar.de": 4
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 42.2,
-    "takte_ms": 3650,
+    "sekunden": 42.0,
+    "takte_ms": 3350,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -1031,9 +1036,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "65103267f4a27ca8e0df8f97386917d070c7c52d3dcaf828dcf352a1a1e6a5f6",
+      "beleg_id": "469ac21d4fb34a6ecb74ea005562ee39b66fbe834abe6abef022b09a01da0c9d",
       "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=543",
-      "zeitpunkt": "2026-10-08T15:05:14Z"
+      "zeitpunkt": "2026-10-09T06:23:33Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1070,9 +1075,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "3048f9e7747fa74bfad3db57b3658b66201d179c34e38d9f641a6fc7973fda7f",
+      "beleg_id": "cfaa018a134dae59979c9ff835eb7067dbdabff2d7e729c27f47957dbc9e8ff5",
       "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=543&installmentPlanId=500",
-      "zeitpunkt": "2026-10-08T15:05:15Z"
+      "zeitpunkt": "2026-10-09T06:23:34Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1109,9 +1114,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "5f0f1257b3c7d8ce6e5b19247f486fb0900adcf5ec1fad6771a6bc4c3aa68c38",
+      "beleg_id": "21b19a30cab1e71f3bb762dbe3eb7c3900ab219ae861b3f1f1570631a19f8b5e",
       "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=560&installmentPlanId=501",
-      "zeitpunkt": "2026-10-08T15:05:17Z"
+      "zeitpunkt": "2026-10-09T06:23:36Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1148,9 +1153,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "8c0aa1f2870fd0bb5638d845606ca89e170bed0b5a2aab38220cb1ed69445337",
+      "beleg_id": "d6c3b023fa4871c2652460d7b08630e557c4cb48cfa38ca201162d5132ebcf65",
       "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=560&installmentPlanId=500",
-      "zeitpunkt": "2026-10-08T15:05:18Z"
+      "zeitpunkt": "2026-10-09T06:23:37Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1187,9 +1192,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "b72db93d118e961d686d1f47b27e2127fb78275b7f73059705b29e52ab97290a",
+      "beleg_id": "4c58ab6665302b4d2af8a30ffb88c38fc35b42a6d05068627991e2adfab010a7",
       "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=540&installmentPlanId=501",
-      "zeitpunkt": "2026-10-08T15:05:19Z"
+      "zeitpunkt": "2026-10-09T06:23:38Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1226,9 +1231,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "ffd60ecb07a728dbf217e1ebb1227d323f52afa8b0649cb33e364b2a74473e43",
+      "beleg_id": "1ab010ba18b97027fc28008b9be453e51bb82d5b92a20a30f797863dcfc7359f",
       "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=540&installmentPlanId=500",
-      "zeitpunkt": "2026-10-08T15:05:20Z"
+      "zeitpunkt": "2026-10-09T06:23:39Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1265,9 +1270,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "92583c1ecf77e49992a297776b25e509d3f662678f71ad1b53f9dde2a08c8d28",
+      "beleg_id": "bc6ad51b8ac8ece6be177444ba2a89849ae07fc217409540f63e2ed9eb8dce9d",
       "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=545&installmentPlanId=501",
-      "zeitpunkt": "2026-10-08T15:05:22Z"
+      "zeitpunkt": "2026-10-09T06:23:41Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1304,9 +1309,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "2df9211a5b0c31f06cdb6c3b8db199b860a806b67f1f5958ae40d41ddb6e42a8",
+      "beleg_id": "22b99fee911d5ba7d2f700f858006736eac068fec5404796d5342b02103549ba",
       "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=545&installmentPlanId=500",
-      "zeitpunkt": "2026-10-08T15:05:23Z"
+      "zeitpunkt": "2026-10-09T06:23:42Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1343,9 +1348,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "1d8723134850ec8d3d89906bfe4abafd2a057f989c72f3c3be9984093cda5b74",
+      "beleg_id": "89f344ae8116d010e5f871d620f9397edd3b1267d57bd5741ab95501d95b5fb6",
       "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=543&installmentPlanId=501&memorySize=512+GB",
-      "zeitpunkt": "2026-10-08T15:05:25Z"
+      "zeitpunkt": "2026-10-09T06:23:44Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1382,9 +1387,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "0bc2e3fcc6cd903e85e2ececbcbe0807c5af245eb127d76b8b92016322e703f4",
+      "beleg_id": "57b70dc0264d08a20dce029ede96849c9b22ab42ad7dcca3e243fa3faea65b38",
       "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=543&installmentPlanId=500&memorySize=512+GB",
-      "zeitpunkt": "2026-10-08T15:05:26Z"
+      "zeitpunkt": "2026-10-09T06:23:45Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1421,9 +1426,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "825f66b2b87709a15539d80f007f5a42d5ea75618f20a0dd8854f6187078a8d4",
+      "beleg_id": "0d5ef49d5db1e822194c7316cac8e5f37c7917584a8189830c42006a1bfe0415",
       "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=560&installmentPlanId=501&memorySize=512+GB",
-      "zeitpunkt": "2026-10-08T15:05:27Z"
+      "zeitpunkt": "2026-10-09T06:23:46Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1460,9 +1465,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "d6bb14bcce00a44eaa13201e90c6305b907bdc21bbd1d097ac968da4dc053fff",
+      "beleg_id": "0449b3167d2d9bc87343519e1b8e06dc6f8edb6e8a5d9211b23dda57858c9fee",
       "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=560&installmentPlanId=500&memorySize=512+GB",
-      "zeitpunkt": "2026-10-08T15:05:28Z"
+      "zeitpunkt": "2026-10-09T06:23:47Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1499,9 +1504,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "e2859ebd202b266db7f2b716c5d28b5ff286bbaf9daf04b9a2fe2b66350d8bf3",
+      "beleg_id": "cf5b51dbbc50fdee72671ccae0016fe870402558a0413e934eb93b30a611bcf6",
       "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=540&installmentPlanId=501&memorySize=512+GB",
-      "zeitpunkt": "2026-10-08T15:05:30Z"
+      "zeitpunkt": "2026-10-09T06:23:49Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1538,9 +1543,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "fbda8cc9f5df59456933f7d40ea73d556e8dc42339520168ffaf4cee3b479e4f",
+      "beleg_id": "3fe756d52cf9df586aad2edcdad86db3650b9b83c2216585b3ba77e2ceba7165",
       "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=540&installmentPlanId=500&memorySize=512+GB",
-      "zeitpunkt": "2026-10-08T15:05:31Z"
+      "zeitpunkt": "2026-10-09T06:23:49Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1577,9 +1582,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "62ead3f1340bbf81c5d3d8a6b507633717a218b7de30032fa7c21af10ac947da",
+      "beleg_id": "d5060a1d5bd1cce61f67c5352485dbbd81ce0b3a7516e416e57bcf6bb1e8a0d2",
       "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=545&installmentPlanId=501&memorySize=512+GB",
-      "zeitpunkt": "2026-10-08T15:05:32Z"
+      "zeitpunkt": "2026-10-09T06:23:51Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1616,9 +1621,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "8b0c958c42dcc2c971fa74dca5cf6cb576ef8bc154e83aecf915a449305ecc62",
+      "beleg_id": "095901fb915d4ae89d0efe4c97ec1da83393818e4a6f0bde9ca6f89f2ac0d704",
       "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17/?paymentVariantBenefits=&planId=545&installmentPlanId=500&memorySize=512+GB",
-      "zeitpunkt": "2026-10-08T15:05:33Z"
+      "zeitpunkt": "2026-10-09T06:23:52Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1649,14 +1654,17 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 61,
-    "beendet": 61,
+    "anfragen": 75,
+    "beendet": 69,
     "dokument": "complete",
     "geladen": true,
-    "offen": {},
+    "offen": {
+     "images.congstar.de": 10,
+     "www.congstar.de": 4
+    },
     "ohne_antwort_ms": 0,
-    "sekunden": 48.5,
-    "takte_ms": 3600,
+    "sekunden": 49.8,
+    "takte_ms": 3300,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -1689,9 +1697,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "9333beba6b034b6ef6587154829715846c6c6bf05b48b590ffcb7e6cc7bbd065",
+      "beleg_id": "2d09497ef1cac25005490a660f09bef4219af7202cca3825e7a9915fdc7e2703",
       "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=543",
-      "zeitpunkt": "2026-10-08T15:06:25Z"
+      "zeitpunkt": "2026-10-09T06:24:52Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1728,9 +1736,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "2c849d213618b24bfb2771ac5eca024bb071463aa441288374caefb0fa654a49",
+      "beleg_id": "b0a9d3deaa56997052ec4100dec04b9ee76a8d866055049617f522335d3d6d4c",
       "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=543&installmentPlanId=500",
-      "zeitpunkt": "2026-10-08T15:06:26Z"
+      "zeitpunkt": "2026-10-09T06:24:53Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1767,9 +1775,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "fddb292a9d6468262ec0831c3d96ba8c59b4c92e126bf351094e0a58ff7be3ca",
+      "beleg_id": "d72d6f5cb5769fcec42ecafb12ab56742b7ac0a11317db65b73ae05497445ceb",
       "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=560&installmentPlanId=501",
-      "zeitpunkt": "2026-10-08T15:06:28Z"
+      "zeitpunkt": "2026-10-09T06:24:55Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1806,9 +1814,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "d30a195db7289317b32468a82cddbe59728915ca44a38c85b998c41233a7771f",
+      "beleg_id": "1b83d948f8d8eb2f615595e9e04c86fa1c981543c85d938463b494be2323c0e2",
       "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=560&installmentPlanId=500",
-      "zeitpunkt": "2026-10-08T15:06:29Z"
+      "zeitpunkt": "2026-10-09T06:24:56Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1845,9 +1853,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "476da2dc6e3cbf88aac97e7c0838a73cb6d3536de9df34a9b1fcf59c2e951e13",
+      "beleg_id": "6a9df3e486480362c6681d3370f57f7f2bd76c6d65bdccb347382854a2e4a5dd",
       "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=540&installmentPlanId=501",
-      "zeitpunkt": "2026-10-08T15:06:30Z"
+      "zeitpunkt": "2026-10-09T06:24:57Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1884,9 +1892,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "5df8b2b9ad7be8682c9dee5d2721d3403b4f9e2eb98055cde44412bf02fd9e1f",
+      "beleg_id": "bd54e70064be9b4241633523e1ca61fd9a81ba99bc76e4ca8ffcb4493a3e66d3",
       "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=540&installmentPlanId=500",
-      "zeitpunkt": "2026-10-08T15:06:31Z"
+      "zeitpunkt": "2026-10-09T06:24:58Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1923,9 +1931,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "bfeb92f211d38340547b5ae420ca8f8b0117985020b64cd9a926d7200c92e9c7",
+      "beleg_id": "ab36b26852f24c922709b5a3774ae0601e056d61c6329023257baa01b9d7a659",
       "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=545&installmentPlanId=501",
-      "zeitpunkt": "2026-10-08T15:06:33Z"
+      "zeitpunkt": "2026-10-09T06:25:00Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1962,9 +1970,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "9e79c8456fef7c2ddd27d3e70405429861905328e911c7bfecd7112901215075",
+      "beleg_id": "f88ffa01b0718835c92bc487aa25422a4c2ec120bea86051090f349e718b9a6c",
       "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=545&installmentPlanId=500",
-      "zeitpunkt": "2026-10-08T15:06:34Z"
+      "zeitpunkt": "2026-10-09T06:25:01Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2001,9 +2009,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "984c14ab38c23311ba5e34f28c6e3d7fea59e46d4991ddb9059942a1539e1fe5",
+      "beleg_id": "f9e3c3abad977657bcaae8fbe023e7ed375fec148ab44d4da391c852f6805181",
       "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=543&installmentPlanId=501&memorySize=512+GB",
-      "zeitpunkt": "2026-10-08T15:06:36Z"
+      "zeitpunkt": "2026-10-09T06:25:03Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2040,9 +2048,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "265930c4ac5fde00990b6128a389cc8701c2dd8a684c0b7ad784ea3bab801e7b",
+      "beleg_id": "d3548f2a54528c4702f84e930e9def05d6083c87e2b60653d374ba265459fa44",
       "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=543&installmentPlanId=500&memorySize=512+GB",
-      "zeitpunkt": "2026-10-08T15:06:37Z"
+      "zeitpunkt": "2026-10-09T06:25:04Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2079,9 +2087,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "955fd0d81f68e326d18f755835c6149b6f59cc78583202c95ab198aa6eb3192a",
+      "beleg_id": "70a0b9e56f4ce87b7c27014aff10bcf58ae71344e9099d888626d7a4e052ca9b",
       "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=560&installmentPlanId=501&memorySize=512+GB",
-      "zeitpunkt": "2026-10-08T15:06:38Z"
+      "zeitpunkt": "2026-10-09T06:25:05Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2118,9 +2126,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "294c6261fd50c1d47a10649ef8cfa86f6e078eb7b0ab1c886aab8b873067b9d3",
+      "beleg_id": "0781cefcd0df36b057309bd0827df571a23d02b4ce8664538f46d6f0ed61402e",
       "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=560&installmentPlanId=500&memorySize=512+GB",
-      "zeitpunkt": "2026-10-08T15:06:39Z"
+      "zeitpunkt": "2026-10-09T06:25:06Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2157,9 +2165,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "05c77efc3ceecf39e4692a3ddd074bdd2fec215a218761fbd2c89c1f4f23c823",
+      "beleg_id": "03cee745cd1cd66e830a3857feabafa525196f1bd40f50fee2b50b71143c651c",
       "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=540&installmentPlanId=501&memorySize=512+GB",
-      "zeitpunkt": "2026-10-08T15:06:40Z"
+      "zeitpunkt": "2026-10-09T06:25:07Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2196,9 +2204,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "c17e64a4fbb6b7cd63c74def42f1c8b901b37bdc4ca3f88fb761680f80429204",
+      "beleg_id": "5595299da1fb466108d0e1cb8d41338b10c12666b2ba870ebe7143416449c19d",
       "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=540&installmentPlanId=500&memorySize=512+GB",
-      "zeitpunkt": "2026-10-08T15:06:41Z"
+      "zeitpunkt": "2026-10-09T06:25:08Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2235,9 +2243,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "f3857b09f9d9eb0b5f7a9aa80cd1f53963a7ce040aa9b65ebb809265e3d3a6c9",
+      "beleg_id": "11c30d9beaff28b2282eaaea88393e7d1171b8d03f3a769f927562c603523558",
       "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=545&installmentPlanId=501&memorySize=512+GB",
-      "zeitpunkt": "2026-10-08T15:06:43Z"
+      "zeitpunkt": "2026-10-09T06:25:10Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2274,9 +2282,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "16a9d8a1c0f87d3b7a4f28e0c23e2454df228882b486943ae07346890813b65e",
+      "beleg_id": "74b626b7f6a5c6639f7455bb2ba3fb0c04861869922520d8750beea40c3ee07a",
       "seite": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?paymentVariantBenefits=&planId=545&installmentPlanId=500&memorySize=512+GB",
-      "zeitpunkt": "2026-10-08T15:06:43Z"
+      "zeitpunkt": "2026-10-09T06:25:10Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2313,8 +2321,8 @@
     "geladen": true,
     "offen": {},
     "ohne_antwort_ms": 0,
-    "sekunden": 40.2,
-    "takte_ms": 3350,
+    "sekunden": 48.2,
+    "takte_ms": 3400,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -2347,9 +2355,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "e83661020164435891d746c58a97adaacbd997408db18d6b66d86d980a2e0a19",
+      "beleg_id": "cb42308e558f9f9958e30484450d2676b848ae3be8ad2fd99b640404025c78c7",
       "seite": "https://www.congstar.de/geraete/google/google-pixel-11/?paymentVariantBenefits=&planId=543",
-      "zeitpunkt": "2026-10-08T15:07:36Z"
+      "zeitpunkt": "2026-10-09T06:26:02Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2386,9 +2394,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "5c657a29431b05d4870564f69b454402d10fb78534440d190c5855795365cec8",
+      "beleg_id": "e1d8d685ba1e017812f04a845e3f6eae41740fc8d284f27afd3761cafd46b373",
       "seite": "https://www.congstar.de/geraete/google/google-pixel-11/?paymentVariantBenefits=&planId=543&installmentPlanId=500",
-      "zeitpunkt": "2026-10-08T15:07:36Z"
+      "zeitpunkt": "2026-10-09T06:26:03Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2425,9 +2433,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "309bfc73a2a7b0e801d34aaebda5f89f08618993956e65db91aa91f7d87c0c3f",
+      "beleg_id": "8eb24916a458182aaf58f7159ef3782926a399b2160a0b4b6ff85bc872ad09b0",
       "seite": "https://www.congstar.de/geraete/google/google-pixel-11/?paymentVariantBenefits=&planId=560&installmentPlanId=501",
-      "zeitpunkt": "2026-10-08T15:07:38Z"
+      "zeitpunkt": "2026-10-09T06:26:05Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2464,9 +2472,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "1e4699a8b15f69519181870228ecc5e2f8dee37f4037f59bbb44735791045be1",
+      "beleg_id": "6af4d3f97de2945e70bb612b5715fa6e00ade94519f217a8c34c981512e75349",
       "seite": "https://www.congstar.de/geraete/google/google-pixel-11/?paymentVariantBenefits=&planId=560&installmentPlanId=500",
-      "zeitpunkt": "2026-10-08T15:07:39Z"
+      "zeitpunkt": "2026-10-09T06:26:06Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2503,9 +2511,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "057602ed02ae85b673300ceac5a8102875c9fbe6df4405dfa5f0a83086366a3a",
+      "beleg_id": "6d65cf1f449a59324705067170cdb768749e798e40d8aa01ac2e34a75b35933e",
       "seite": "https://www.congstar.de/geraete/google/google-pixel-11/?paymentVariantBenefits=&planId=540&installmentPlanId=501",
-      "zeitpunkt": "2026-10-08T15:07:41Z"
+      "zeitpunkt": "2026-10-09T06:26:07Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2542,9 +2550,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "088ae666dc7633ec6656aefe0988aa628759ec8f2aa2898fdcfa54c3a27dc3e6",
+      "beleg_id": "df63f4bd9bc2867fdd41f773eb33dfb7fe86dee21cf6cd638b8300bce2520ede",
       "seite": "https://www.congstar.de/geraete/google/google-pixel-11/?paymentVariantBenefits=&planId=540&installmentPlanId=500",
-      "zeitpunkt": "2026-10-08T15:07:41Z"
+      "zeitpunkt": "2026-10-09T06:26:08Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2581,9 +2589,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "2fa6bea7655c10e5d7a4a267bc76b308e26c63c1c74a70d6726aaefa8d6f283b",
+      "beleg_id": "69bb86610ef5c5ae08d41812b7286a91ea8a1a744a770a8881e882897c0db211",
       "seite": "https://www.congstar.de/geraete/google/google-pixel-11/?paymentVariantBenefits=&planId=545&installmentPlanId=501",
-      "zeitpunkt": "2026-10-08T15:07:43Z"
+      "zeitpunkt": "2026-10-09T06:26:10Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2620,9 +2628,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "d389b060f719978e195b1c96227e7e828c5502a656245aac717c1e2a837d2cb5",
+      "beleg_id": "d0885fec440357b5c895336f75f53543a4b7c6f4ed4917c8d9b22bab622a034b",
       "seite": "https://www.congstar.de/geraete/google/google-pixel-11/?paymentVariantBenefits=&planId=545&installmentPlanId=500",
-      "zeitpunkt": "2026-10-08T15:07:44Z"
+      "zeitpunkt": "2026-10-09T06:26:11Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2885,14 +2893,17 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 63,
-    "beendet": 63,
+    "anfragen": 79,
+    "beendet": 76,
     "dokument": "complete",
     "geladen": true,
-    "offen": {},
+    "offen": {
+     "images.congstar.de": 11,
+     "www.congstar.de": 4
+    },
     "ohne_antwort_ms": 0,
-    "sekunden": 40.1,
-    "takte_ms": 3500,
+    "sekunden": 41.8,
+    "takte_ms": 3050,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -2912,5 +2923,5 @@
  ],
  "ueberfaellig": [],
  "vertragsform": "tarif_plus_ratenkauf",
- "zeitbudget_sekunden": 3969
+ "zeitbudget_sekunden": 3977
 }

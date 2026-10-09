@@ -1,12 +1,13 @@
 {
  "anbieter": "o2",
- "datum": "2026-10-08",
- "dauer_sekunden": 1461.9,
+ "datum": "2026-10-09",
+ "dauer_sekunden": 1423.5,
  "format": 1,
  "frischegrenze_tage": 3,
  "grund": null,
  "karte": "o2.yaml",
  "laufstatus": "gelesen",
+ "lesefrist_tage": 1,
  "name": "o2",
  "seiten": [
   {
@@ -25,9 +26,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "d41bcdafb00c125bac8c5b7e9c155cc6da30209a54bc899fa81ee5297c53732c",
+      "beleg_id": "b925af3cc91ca288c75296c6e149925c0ef65b168e1b26ebe389f6ab56d3a1bc",
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:04:13Z"
+      "zeitpunkt": "2026-10-09T06:29:41Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -64,9 +65,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "89c3fb869cafc5c54243a8a38e262a8268de233eca8e52624d9b65e19c862af8",
+      "beleg_id": "cc59583fc4a280d009a8040d7184a6f2d1988df83fb78ca2361eb66e9fde5a1b",
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:04:19Z"
+      "zeitpunkt": "2026-10-09T06:29:46Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -103,9 +104,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "f8d1ed3e849d0785a0d1845a083795b3ef13148597ec630086762f9d8cf9620c",
+      "beleg_id": "3ec4539c5d409e129ff1ab2bbae66c885ff64fc008394d0312af4095a8327bd6",
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:04:30Z"
+      "zeitpunkt": "2026-10-09T06:29:58Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -142,9 +143,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "d8570862426db80625dd83081665483e53a3f7b4b4d34e651b73edc7324aa95a",
+      "beleg_id": "cf8b11f08657bc9ea6927f0a77422840a24f473224f3bea801d2935553580d71",
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:04:37Z"
+      "zeitpunkt": "2026-10-09T06:30:07Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -181,9 +182,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "719089bc988ddf9a673bfcfe3e4c04b6554d5349f7df42389dad7a354965dff4",
+      "beleg_id": "5bb25282a4212add1b016035acc1e659daad56ed0f69a5d40683172c176d0904",
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:04:49Z"
+      "zeitpunkt": "2026-10-09T06:30:19Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -220,9 +221,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a8bde9434bfee7cef61b5bbb9bb619677182c772963b0b9f302c2616d9a10823",
+      "beleg_id": "f4557914243d17eb242779f08f44e46fa555bcf3dd72a315cf42a7429484273f",
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:04:55Z"
+      "zeitpunkt": "2026-10-09T06:30:24Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -259,9 +260,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "01ac082131a5664bc22525f1cc97e019abb1567a74629537524086fa88a0bf9c",
+      "beleg_id": "69b244836b21d1f44eae9c22e6cdd674e94eced779c038e77bf89ce180ee59bb",
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:05:07Z"
+      "zeitpunkt": "2026-10-09T06:30:35Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -298,9 +299,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "8cc447f17250770a8b895d7ceb6b55c263b1d04552ded02bc69d8cb71d9621a0",
+      "beleg_id": "d4ee71484c9aa0996165ecd58e80025c496fffd287b8c53c49843a76e8a78ffb",
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:05:13Z"
+      "zeitpunkt": "2026-10-09T06:30:41Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -331,16 +332,14 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 132,
-    "beendet": 127,
+    "anfragen": 131,
+    "beendet": 131,
     "dokument": "complete",
     "geladen": true,
-    "offen": {
-     "library.telefonica.de": 5
-    },
+    "offen": {},
     "ohne_antwort_ms": 0,
-    "sekunden": 109.8,
-    "takte_ms": 7300,
+    "sekunden": 125.6,
+    "takte_ms": 9300,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -373,9 +372,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "87886b4fcc608701faaca6028d48087abf3f93dccaae33986d5ef700ce5b5632",
+      "beleg_id": "96275f9901501368cd0b946729fbd62e600d7e1eb9141fcc40caeff0ca402bbc",
       "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:07:33Z"
+      "zeitpunkt": "2026-10-09T06:33:01Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -412,9 +411,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "ce81597d98705350b525bc408f3260dc3bf3053b21ced259aa1f065923df021b",
+      "beleg_id": "6772038f7c73216d1533e7f65b403490d0cc783afc54e40dc0587c95876fb23f",
       "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:07:40Z"
+      "zeitpunkt": "2026-10-09T06:33:08Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -451,9 +450,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "73df9487dc6e7871ecd0b46e9dbd63e9ae71a38f73e5970cbfb5fce39d9466b1",
+      "beleg_id": "9243e85c993663420542d24303a9a92212cbfee6dd1c2ddeb06fc8ab61f9d9fa",
       "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:07:52Z"
+      "zeitpunkt": "2026-10-09T06:33:20Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -490,9 +489,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "0d79ce560263b4f4c1bca24b2da94275f486cd774e32aefb1ea6859acc26dc70",
+      "beleg_id": "924099763229a332a821e30f3df13d70b3f5d590adf056dd2da8b3a292fa26e2",
       "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:07:59Z"
+      "zeitpunkt": "2026-10-09T06:33:25Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -529,9 +528,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "21b3b1fa6f5b215889814b9ab0d1b0cc57a68096058e09205f7ec1d6abe1a1cf",
+      "beleg_id": "805bbfec0be0b45c2ff7bf11d5af29e9796569728199383576e46c541b968c8d",
       "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:08:10Z"
+      "zeitpunkt": "2026-10-09T06:33:37Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -568,9 +567,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "f6f00e6386aaf47ee0edd14fe685b04d5dd27258e4fcd5083f86947f8fdf2599",
+      "beleg_id": "e4614a2ebdb8b0fb3854e9f859be0fff34447c17132217e9d9cd65132bd2bb18",
       "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:08:16Z"
+      "zeitpunkt": "2026-10-09T06:33:42Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -607,9 +606,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "0df6deaa553031a29938d20d29ed87f451f49adad7c54035f929f92f5fa46a3f",
+      "beleg_id": "c3ea059be96c8d8a78e93f36c6a4f2931117a01fcee7091bcd345c3690cf1eec",
       "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:08:28Z"
+      "zeitpunkt": "2026-10-09T06:33:54Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -646,9 +645,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "99c4a1eb88f598e40936b804de1d981b3c3df0e6c1e4334787fd70241aec7773",
+      "beleg_id": "f90b61636741bcadece0e1febeb580ba80652ded5168601674158556145b3f16",
       "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:08:35Z"
+      "zeitpunkt": "2026-10-09T06:34:00Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -685,9 +684,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "b67b08efad5ba1864a8ec835a23289eb20c11d3e01f05442805eb31f583f4a2d",
+      "beleg_id": "aadc7c5c6b9000e1e89c1631016e6c13644b072a7457c860783c9ac6630c69b3",
       "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:08:55Z"
+      "zeitpunkt": "2026-10-09T06:34:18Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -724,9 +723,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "9b071289e39cdebbaeadbac56673e6082ff5fd3b0c1cfffbdd859e3cb50d0131",
+      "beleg_id": "855b89754779207a224509609a30b24b7a2b3a8169377202b366c2e038ef915d",
       "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:09:02Z"
+      "zeitpunkt": "2026-10-09T06:34:23Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -763,9 +762,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "318391cea2c16148e084da0168a570c988ca873d58c741e1122fa5c19f341dd7",
+      "beleg_id": "d89139d97f14a6ed781b612c1318be85fb27feb4973e970372e149815499927d",
       "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:09:14Z"
+      "zeitpunkt": "2026-10-09T06:34:34Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -802,9 +801,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "7c8c9544f8b32083a3b7d936a806cb20055e2f7deb0caa6e2d85365492dd7f85",
+      "beleg_id": "49c95fbb5bdacf7387f782dbff5d4469e6f87804ad00bbec6e25bc50dcdee8e1",
       "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:09:21Z"
+      "zeitpunkt": "2026-10-09T06:34:40Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -841,9 +840,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "99b643be8691659900b7e4d7015ff239f2826a0c48d7f18b97d3bfe80253f4ad",
+      "beleg_id": "bd07d298c244f7b778bc3b94e86b0ac02599ae7045f76672e01e6e2e43738a2c",
       "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:09:34Z"
+      "zeitpunkt": "2026-10-09T06:34:52Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -880,9 +879,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a3c3e31d97bc94ac81a77106d94e9c8ac5f6db7adbf912e968ed930a2b924b6b",
+      "beleg_id": "0180a647bfe1ee8864a5ad741cba6e5cfddc3fb1f7ca5105a012e2bfd326cc80",
       "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:09:41Z"
+      "zeitpunkt": "2026-10-09T06:34:58Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -919,9 +918,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "3993c5ac3b43816f835991de447463000fb0ebe125aab4c0c81eab81f3c1d913",
+      "beleg_id": "2748b14cd8905c2d8dd32d1d5612046d1470ebe3146af7053f61075695f5cc57",
       "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:09:53Z"
+      "zeitpunkt": "2026-10-09T06:35:09Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -958,9 +957,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a2b92e85178daded923cc2ff792f44a75117f4ddc6982c537809d82ae81e9785",
+      "beleg_id": "1ad5b24f98bb581128599788e713d2db7ec2470d6adb85ea0da5b9fd1978f145",
       "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:09:59Z"
+      "zeitpunkt": "2026-10-09T06:35:15Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -992,7 +991,7 @@
    "ladung": {
     "abstand_s": 2.0,
     "anfragen": 131,
-    "beendet": 125,
+    "beendet": 124,
     "dokument": "complete",
     "geladen": true,
     "offen": {
@@ -1000,9 +999,9 @@
      "static2.o9.de": 1,
      "www.o2online.de": 1
     },
-    "ohne_antwort_ms": 50,
-    "sekunden": 107.3,
-    "takte_ms": 6950,
+    "ohne_antwort_ms": 0,
+    "sekunden": 109.2,
+    "takte_ms": 5600,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -1035,9 +1034,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "b9ffddd35bf954c84ea974de61969470b9b0807e3e72332cf092fb0da957c114",
+      "beleg_id": "e583988fc969866fb1599258560cd07a31be5150378feac2f592a4229929a765",
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-17-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-      "zeitpunkt": "2026-10-08T15:12:22Z"
+      "zeitpunkt": "2026-10-09T06:37:36Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1074,9 +1073,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "5165bd201fdc8bdfc90e97b56f1cf92f0275144f25cb41da892425d6547694c8",
+      "beleg_id": "10612db22b96ec74d7d40e74379dcf0962e9bae8400fe6ccf046f0f21a241cf6",
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-17-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-      "zeitpunkt": "2026-10-08T15:12:29Z"
+      "zeitpunkt": "2026-10-09T06:37:41Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1113,9 +1112,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "541133b13b181d3a37794a97052a1cee2cf3188f2268f27dbbdaf0c09b1ab89f",
+      "beleg_id": "e8b78f63873d5af22fb93ac7c63c4b5b7ac1c5c312f30d6e8f927fa5b97dff5a",
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-17-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-      "zeitpunkt": "2026-10-08T15:12:42Z"
+      "zeitpunkt": "2026-10-09T06:37:53Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1152,9 +1151,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a29ae70dc70beb6e847f75032f8c4d844251658134ee9e1d08b87799488786f7",
+      "beleg_id": "035d317bcc10ee04e3acfa060116f1bcef99bf4083994eb68c67a82c6930bf87",
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-17-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-      "zeitpunkt": "2026-10-08T15:12:48Z"
+      "zeitpunkt": "2026-10-09T06:37:59Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1191,9 +1190,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "c6f55dd885cdab82206a0e25195e1d5118e53aea3cd10e3b79591aaaad3ccfde",
+      "beleg_id": "c6ed9fa7c4630dfc644cb3c9a736aa59fb4141b348e2c47edf03342ade92e782",
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-17-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-      "zeitpunkt": "2026-10-08T15:13:01Z"
+      "zeitpunkt": "2026-10-09T06:38:10Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1230,9 +1229,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "b1f9905cc55a6860f62ce113c02dc530f59f8b808462edff37dd620b039d4d0f",
+      "beleg_id": "406da9bb278ab155a5ad66bfa94b8e58543c9973961e37286e079e4131092235",
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-17-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-      "zeitpunkt": "2026-10-08T15:13:07Z"
+      "zeitpunkt": "2026-10-09T06:38:15Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1269,9 +1268,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "889c26d9031a13113349d24c30202224e779d8e41851a7628100b0ff4e4d533b",
+      "beleg_id": "78f7216138833cc590b24a6689f5198080237c5ae48f7521c1beda0a6beeaa1a",
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-17-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-      "zeitpunkt": "2026-10-08T15:13:19Z"
+      "zeitpunkt": "2026-10-09T06:38:26Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1308,9 +1307,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "e0f70dded3e71541786e0cf0031be3cd624b2ab1f9dbfbac9410606a733cdf83",
+      "beleg_id": "89efdc23f4bc2c414f5e8a47081aa82974f0b4c97e1159642adf490c0ab39205",
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-17-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-      "zeitpunkt": "2026-10-08T15:13:24Z"
+      "zeitpunkt": "2026-10-09T06:38:32Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1341,8 +1340,8 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 134,
-    "beendet": 128,
+    "anfragen": 133,
+    "beendet": 126,
     "dokument": "complete",
     "geladen": true,
     "offen": {
@@ -1350,8 +1349,8 @@
      "www.o2online.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 111.4,
-    "takte_ms": 6750,
+    "sekunden": 109.7,
+    "takte_ms": 5750,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -1384,9 +1383,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "f50536ad872c3fe6d7027673ed4175621dd81e7d033f803ce4d41a766ce4badc",
+      "beleg_id": "f6384ebad04e7a6d111e8ed4a3ba756ccbfeff40d50c471d42e3abdd6eb4af44",
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-max-256gb-cosmic-orange-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:15:46Z"
+      "zeitpunkt": "2026-10-09T06:40:52Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1423,9 +1422,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "c61e3e45d795b9b84d03db195dbf82800b160117e0ed5190dc0bf026a4eace53",
+      "beleg_id": "4234f633594408af7b260dd976722b4480aec8efddd37722cf33fe705e0aabd0",
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-max-256gb-cosmic-orange-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:15:52Z"
+      "zeitpunkt": "2026-10-09T06:40:58Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1462,9 +1461,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "0c8882badb266b848635a7cb5a9b0699641834dd5eeec36d60fae26dc56c1dc1",
+      "beleg_id": "bd918d03e2243ab6540346d2dc78ad1062fbf61b6db5f2c460f1c4d3fcf21386",
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-max-256gb-cosmic-orange-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:16:04Z"
+      "zeitpunkt": "2026-10-09T06:41:09Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1501,9 +1500,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "68e0a2d229adc66b38dd228bf84c7f23880e70d4d8d17962942c073967d69c09",
+      "beleg_id": "8c8a67bd30044e67bfcd86f6f46b70d755b9dd24f9eb5433c69bdd21a0b3bb0f",
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-max-256gb-cosmic-orange-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:16:09Z"
+      "zeitpunkt": "2026-10-09T06:41:15Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1540,9 +1539,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "bf2ef5a8b8553bd0a1d23c936f2364a15f2a34ed2cd2b10be6bfe4044985bbf4",
+      "beleg_id": "cd1acea5174fb0f6a473359200e8ba3da909c4c7ee807812b0e9010cf617d8ef",
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-max-256gb-cosmic-orange-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:16:21Z"
+      "zeitpunkt": "2026-10-09T06:41:26Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1579,9 +1578,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "d36f184400bc1870b45bbb93feb98327cf71b54a2171e36e788b0acc3b1801a6",
+      "beleg_id": "c74e039e90f53ee380117fbcf419b258ea7f589ab16f0d964e8dd9e509442808",
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-max-256gb-cosmic-orange-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:16:27Z"
+      "zeitpunkt": "2026-10-09T06:41:32Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1618,9 +1617,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "47fe6b802e7f9cd4f2967862a33beb0e704fb72fcbedf1873513d4d1e91b0965",
+      "beleg_id": "6d8c28acd8f5316c04b1c6833159c9ea6947f89b6f378a651b505dddfc21d743",
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-max-256gb-cosmic-orange-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:16:38Z"
+      "zeitpunkt": "2026-10-09T06:41:43Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1657,9 +1656,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "478fcb77432fced66c7d0fbaf2ae771dda2fa621c82fde58b3543dcc98f4f6ef",
+      "beleg_id": "05c0b35c3d97068b0cb1946742dfcd56ce1b41233f1e37055aaaebea5a20a0c4",
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-max-256gb-cosmic-orange-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:16:44Z"
+      "zeitpunkt": "2026-10-09T06:41:48Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1696,9 +1695,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "bd12e288fbe3b807abdbb3d08e672cab8153b8c7cb8aeefd4de3ea21b8910abb",
+      "beleg_id": "946d179a93679175685a96986de291f15a0984b7b1bdca469f87a1697c61d362",
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-max-256gb-cosmic-orange-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:17:03Z"
+      "zeitpunkt": "2026-10-09T06:42:05Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1735,9 +1734,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "b916a4c0cb7bd3cb6d07afd8b875b3c29f195c3d8ab2b2395dd305900025dad0",
+      "beleg_id": "dd70fd3553d04842a6675d82912171f33131e287f510bb04d8f7b0f98d6477e5",
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-max-256gb-cosmic-orange-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:17:10Z"
+      "zeitpunkt": "2026-10-09T06:42:11Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1774,9 +1773,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "004867abc1effbfe48f52535eb2d12f92ba1827d73d9ebc45ddacf3963827504",
+      "beleg_id": "f85b130072910d8e84c4219d3fa5a79d07d6d8df88ddd0c2493c142a3a4ea786",
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-max-256gb-cosmic-orange-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:17:22Z"
+      "zeitpunkt": "2026-10-09T06:42:22Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1813,9 +1812,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "cbeae455b3835b6eba2bcbaf27a72ec678a34bae5ca17e7f3fe26776f5b70cd1",
+      "beleg_id": "345ef32c03b1aa6c7657a1ca3c76e6e6a421d260698e1054dfa097e229cee8c4",
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-max-256gb-cosmic-orange-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:17:28Z"
+      "zeitpunkt": "2026-10-09T06:42:27Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1852,9 +1851,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "accc8ff086e71878975669deacef01bcee8d1823632df7a8d9ddf640e58f4ea0",
+      "beleg_id": "b650c81f0946597e9a13f5052c39581f155dd6226013fcea0f2e63bd5b110bef",
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-max-256gb-cosmic-orange-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:17:40Z"
+      "zeitpunkt": "2026-10-09T06:42:38Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1891,9 +1890,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "7687af809078cebfcd2674b5fcb4391ae9e31e328960b4b9643c513e7696d9d6",
+      "beleg_id": "0591a8af301ed8aedb7e36e628d2554bd1d8d1fe8173e4530b2fdcdba771a954",
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-max-256gb-cosmic-orange-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:17:46Z"
+      "zeitpunkt": "2026-10-09T06:42:45Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1930,9 +1929,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "31bd259367d785ea6412c65bd312fa70f7a82493fe16176fbfa03a1c0971cd8c",
+      "beleg_id": "60237eabe9db290e546d54fa51b5e7db57c3b3d1bb27bf6cf3c2d77ca50e94e2",
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-max-256gb-cosmic-orange-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:17:57Z"
+      "zeitpunkt": "2026-10-09T06:42:56Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1969,9 +1968,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "e2d98d6b4522fb77c8e4898184de60e881569429dbdc09706ec571f4220d6904",
+      "beleg_id": "31a75c58cdf402757868039322052174ca99f834aaece0e89fea3c51105237d3",
       "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-max-256gb-cosmic-orange-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:18:04Z"
+      "zeitpunkt": "2026-10-09T06:43:01Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2011,8 +2010,8 @@
      "www.o2online.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 110.5,
-    "takte_ms": 6800,
+    "sekunden": 109.0,
+    "takte_ms": 6550,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -2045,9 +2044,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "d1dc42e7926903c1b1316c3668a69339cf79f8afd8058e1301118f69da551351",
+      "beleg_id": "c9897a28a94791ec72f4fc8bfe5ae13622940d8fb85f7fdfd551127d1cc0b5ba",
       "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ultra-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:20:25Z"
+      "zeitpunkt": "2026-10-09T06:45:19Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2084,9 +2083,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "f2a5122a27353d0bbe6f0f7bf53f9d3d5090c76f9211affd840ddd548b23dfc6",
+      "beleg_id": "1be21b5b9463fe2f07d7f7a75dda8d0f6740b07895d6f04df199e3d6d44686b5",
       "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ultra-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:20:32Z"
+      "zeitpunkt": "2026-10-09T06:45:25Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2123,9 +2122,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "231c009026dcc92a3cb128f108129bd8dc366e1144782e82e98cd7c44c34a0cd",
+      "beleg_id": "024718ec47664f920d719461a87984443d2bc5ed46d9aeb7ea3df8254a01d84a",
       "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ultra-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:20:43Z"
+      "zeitpunkt": "2026-10-09T06:45:36Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2162,9 +2161,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "2eb7241576fe1dc1308b61fbd66fc4b6f8a6c8d124597c6295c6f81150882ecb",
+      "beleg_id": "0b4b3c3f33a8a68f6aa9016daecd62cce45507e6b21ef4fd871900dd174c2924",
       "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ultra-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:20:49Z"
+      "zeitpunkt": "2026-10-09T06:45:42Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2201,9 +2200,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "aa5f93a5e041d94736dda0ba6f9cbd0e8d0a5a1697989a6acd789135f97e8463",
+      "beleg_id": "78cf1a067a11b3d4174cbd2d091e1cad5164fd36b564b194f26174354c87e4fb",
       "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ultra-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:21:03Z"
+      "zeitpunkt": "2026-10-09T06:45:53Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2240,9 +2239,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "f7700bf7d051c53fca3a339ff68fbabf5c016d7e463bb02c9281cd00e36f6a05",
+      "beleg_id": "f56b6b4be4fb66aea20f41aec390485a8f7418a536a0f8a5d79605032036e3fb",
       "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ultra-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:21:11Z"
+      "zeitpunkt": "2026-10-09T06:46:00Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2279,9 +2278,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "26eaef341a4f5ba2db640852d11e09a949314c04c0680040f1aab3ad66b335f7",
+      "beleg_id": "5504adc47d74de9fa708e4088ba23298c8726cd57358294a2b3fe5bb83524b0e",
       "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ultra-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:21:23Z"
+      "zeitpunkt": "2026-10-09T06:46:11Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2318,9 +2317,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "87c74e1924b37926f8d7892238f109875956e6582f19381c3a60375de0caf109",
+      "beleg_id": "9421404d0cb7cb7557c21e594196695b2da0a65cb17e26c6e9d049481d144f30",
       "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ultra-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:21:28Z"
+      "zeitpunkt": "2026-10-09T06:46:19Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2357,9 +2356,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "c88580ffb4bc818d39cc6c561d3fd3b8e795b201c7ca820e2c41fe5736a7de1a",
+      "beleg_id": "70d11d9ac4818597a48677bafc93752cef079c74ebf1b444f4f920c0b4705928",
       "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ultra-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:21:47Z"
+      "zeitpunkt": "2026-10-09T06:46:37Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2396,9 +2395,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "fa34548ecc6794c6a6af4482411b59052d3255d815c6fe96bae2308ab38822d1",
+      "beleg_id": "14f2330b5edfbe4dd840ff90dfdb6d5699f784f17576783355b02326a71f383e",
       "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ultra-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:21:53Z"
+      "zeitpunkt": "2026-10-09T06:46:42Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2435,9 +2434,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "73d42fb8fdc719ff77c13ce270547f40de8a4fdeb302e1a9325442c1f80b7ed2",
+      "beleg_id": "ddc559020749168e5c6d7c70593613614bc5220776da4a4fcdaf7aa57463140b",
       "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ultra-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:22:05Z"
+      "zeitpunkt": "2026-10-09T06:46:54Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2474,9 +2473,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "4a4311a0ccc52e449f0e66553757da878064dbd9a11395e6bdc107664a194d29",
+      "beleg_id": "f783d313cb2f0c143cc5f167f87779154b0a21e950ebcc6e48160d66a60facae",
       "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ultra-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:22:11Z"
+      "zeitpunkt": "2026-10-09T06:46:59Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2513,9 +2512,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "777c84192761869631c0b530eefc80c9d22e7cd2a8d63b48f41280ea50a9a42c",
+      "beleg_id": "dfdb6d39eb933312d0724558188f5197c4ad872405060ae27e694eccac18d494",
       "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ultra-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:22:24Z"
+      "zeitpunkt": "2026-10-09T06:47:11Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2552,9 +2551,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "2145206bcbd045d86d975e699b0514cbfa082098ae3c130bdd5fdc195cddeee5",
+      "beleg_id": "87837176310e5ea2a3ac0afe7acd660eedbe78efb3b12896d12604d5380862f2",
       "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ultra-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:22:30Z"
+      "zeitpunkt": "2026-10-09T06:47:17Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2591,9 +2590,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "280a1c3a5b8cfcc91aa8453e12606e25829eced07acad66b7a8dcd91430ce17b",
+      "beleg_id": "a3e6efc036b072c91515d31c130c42fb0b0c7d2cd30a2bc0a098e9de8ebc4c0b",
       "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ultra-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:22:42Z"
+      "zeitpunkt": "2026-10-09T06:47:28Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2630,9 +2629,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "7d85a7561a5785f6eb52c37000aa16d04b32a0674e55bc7c8c5cf3059fad8cdd",
+      "beleg_id": "0158e97618e1f7fafb3bde2a3d11fba58018c41cc3e67a5a9fc702c951dab2e5",
       "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ultra-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
-      "zeitpunkt": "2026-10-08T15:22:48Z"
+      "zeitpunkt": "2026-10-09T06:47:34Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2673,8 +2672,8 @@
      "www.o2online.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 109.7,
-    "takte_ms": 7000,
+    "sekunden": 106.4,
+    "takte_ms": 6200,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -2707,9 +2706,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "c71ad3b1e01017617de07a654ca2be969e9a89221ffa7132d5e17634bfa089be",
+      "beleg_id": "831ec1ca53a6421b741dc347b5619d724da1eb51d806d31acebdbf0f5885b476",
       "seite": "https://www.o2online.de/e-shop/google/google-pixel-11-256gb-frost-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-      "zeitpunkt": "2026-10-08T15:25:10Z"
+      "zeitpunkt": "2026-10-09T06:49:55Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2746,9 +2745,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "aabcbe973a5f1f361c26bbe7cc73cbf332823598b2b1c25c0105b377ab1191a4",
+      "beleg_id": "b345ef4feb5a5f997c59262497ffe95663e95e810059b314eeea22d0156d8644",
       "seite": "https://www.o2online.de/e-shop/google/google-pixel-11-256gb-frost-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-      "zeitpunkt": "2026-10-08T15:25:17Z"
+      "zeitpunkt": "2026-10-09T06:50:01Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2785,9 +2784,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "c653e01bc72bddf864492c9438c292d9c4b40d735d7bc3c77c5cd20255d9ed1e",
+      "beleg_id": "33719f8b069ba8a3c06c698850553b7946d3bec0a31d35f94d9589cf38f4cb1d",
       "seite": "https://www.o2online.de/e-shop/google/google-pixel-11-256gb-frost-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-      "zeitpunkt": "2026-10-08T15:25:29Z"
+      "zeitpunkt": "2026-10-09T06:50:14Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2824,9 +2823,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "c6dfc37233ab17e8c5cdc753c9f26de35cb0199fe4b75a320a621386b47c3fa4",
+      "beleg_id": "cae8a02fd17af1f6298f79d9daabd447fb4c98a157a81dc34441ccd597e2de90",
       "seite": "https://www.o2online.de/e-shop/google/google-pixel-11-256gb-frost-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-      "zeitpunkt": "2026-10-08T15:25:36Z"
+      "zeitpunkt": "2026-10-09T06:50:21Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2863,9 +2862,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "73b3a23de79275889743e907c05b71bc42b0f13b54f6afb770afb280a60351ed",
+      "beleg_id": "8af1d90b677453f763199730eb87362ef938b4d173066bd80366afd1edb241c8",
       "seite": "https://www.o2online.de/e-shop/google/google-pixel-11-256gb-frost-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-      "zeitpunkt": "2026-10-08T15:25:49Z"
+      "zeitpunkt": "2026-10-09T06:50:33Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2902,9 +2901,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "0b7ab2765098ca1394c8b3daebc3b8984b23a521e1d10679775b9012ba58c51f",
+      "beleg_id": "d4b5fa8de1edb649ff3acddf0a063521b7647193a6f4423fb607a9bc40d435f5",
       "seite": "https://www.o2online.de/e-shop/google/google-pixel-11-256gb-frost-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-      "zeitpunkt": "2026-10-08T15:25:55Z"
+      "zeitpunkt": "2026-10-09T06:50:39Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2941,9 +2940,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "3eb5aa101a68f41839e9abc6d8d1c8f46624943aed44538ee3d6d8839a8b2846",
+      "beleg_id": "0d2295bca268d4b3cd2d108d39ada4a530d0e4b3ebcbf7583545b2e0aab7c363",
       "seite": "https://www.o2online.de/e-shop/google/google-pixel-11-256gb-frost-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-      "zeitpunkt": "2026-10-08T15:26:07Z"
+      "zeitpunkt": "2026-10-09T06:50:51Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2980,9 +2979,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "6cd7fac11e28b9c1ddcbe508d465b2e4a96b33af789b9065de8625526e3b0ab2",
+      "beleg_id": "3a1cd75430e55c817b7dda2228b8fc2772406bc9f887c5d450c71e1dfdbbd43b",
       "seite": "https://www.o2online.de/e-shop/google/google-pixel-11-256gb-frost-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-      "zeitpunkt": "2026-10-08T15:26:14Z"
+      "zeitpunkt": "2026-10-09T06:50:57Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3022,8 +3021,8 @@
      "www.o2online.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 110.0,
-    "takte_ms": 6950,
+    "sekunden": 109.3,
+    "takte_ms": 5950,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -3043,5 +3042,5 @@
  ],
  "ueberfaellig": [],
  "vertragsform": "tarif_plus_ratenkauf",
- "zeitbudget_sekunden": 3978
+ "zeitbudget_sekunden": 3566
 }

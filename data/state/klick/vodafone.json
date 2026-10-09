@@ -1,12 +1,13 @@
 {
  "anbieter": "vodafone",
- "datum": "2026-10-08",
- "dauer_sekunden": 731.2,
+ "datum": "2026-10-09",
+ "dauer_sekunden": 683.6,
  "format": 1,
  "frischegrenze_tage": 3,
  "grund": null,
  "karte": "vodafone.yaml",
  "laufstatus": "gelesen",
+ "lesefrist_tage": 1,
  "name": "Vodafone",
  "seiten": [
   {
@@ -25,9 +26,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "7ea9d709afd654e1dc30bd7849ae3917734425d8c7757fab9759e7cc4af475b7",
+      "beleg_id": "ca78a9a22064c756699c0f3e543488015321769cd93890f482c0ffe32e00786e",
       "seite": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
-      "zeitpunkt": "2026-10-08T15:04:59Z"
+      "zeitpunkt": "2026-10-09T06:23:23Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -63,9 +64,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "68264c52b38029798f61108f153f40753db39fcaf1e5f79d37a14001f3883058",
+      "beleg_id": "a58dec92f5ae79d065796ba3f8b000da22af161fbe71f44c7914070b9cf7a13f",
       "seite": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
-      "zeitpunkt": "2026-10-08T15:05:18Z"
+      "zeitpunkt": "2026-10-09T06:23:42Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -101,9 +102,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "7bb98099eb667f43c2eead8761995275105d06ddf4659d21239e56da098f3f06",
+      "beleg_id": "94a934410fb893c00fb056395f2d78304bb151bdf20aabc9b26ea01fdb481d28",
       "seite": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
-      "zeitpunkt": "2026-10-08T15:05:37Z"
+      "zeitpunkt": "2026-10-09T06:24:01Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -139,9 +140,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "4b74087bcdd0391ad69773ae9a7d745c531cb6ce9b33e3c120e2ba21edb51a92",
+      "beleg_id": "b34b6d6418c51726cdcf2648f7383c08e977a095f206d979480498b909947e5f",
       "seite": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
-      "zeitpunkt": "2026-10-08T15:06:35Z"
+      "zeitpunkt": "2026-10-09T06:24:43Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -177,9 +178,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "99cb9f6efb9cfc14994d2e17f12fc7d2da66dc1302c3a824b3554c3fc8add7b3",
+      "beleg_id": "41cac52cc421341fb019a7f79f7460d11186442aaa2aa142726c7c516ee0b681",
       "seite": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
-      "zeitpunkt": "2026-10-08T15:06:54Z"
+      "zeitpunkt": "2026-10-09T06:25:02Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -215,9 +216,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "fe234cf9eff7e0b18fc78f27e96e215ec76bcd4837c6da9512f0f5213b451b25",
+      "beleg_id": "4b98ab73c89bd644df0d9d58ad382e4319a526aff3fdd0849b5ae48d7a27722f",
       "seite": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
-      "zeitpunkt": "2026-10-08T15:07:13Z"
+      "zeitpunkt": "2026-10-09T06:25:21Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -253,9 +254,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "8b46c78d92f4b9efd40ba9984ccf70d47c8716ab6c5c38c8d72429ff46076645",
+      "beleg_id": "c50fc4d0c78a342e18ccb21ae5ed780ae08cc0bcf2efd2dfb61aeea0561bb4e0",
       "seite": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
-      "zeitpunkt": "2026-10-08T15:08:11Z"
+      "zeitpunkt": "2026-10-09T06:26:03Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -291,9 +292,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "2dccee079434be70f3a094c0453900ded4531f613e779a3bc3042c9a6e463aff",
+      "beleg_id": "b16b95a50d37d652232b4a38919cdc6b114ca2f0fe03f0b116c80c54cb194367",
       "seite": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
-      "zeitpunkt": "2026-10-08T15:08:30Z"
+      "zeitpunkt": "2026-10-09T06:26:22Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -329,9 +330,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "60319d81143e365158ca0baf8572631ab9c2b3f62fa307ebe982602f82feecc0",
+      "beleg_id": "5370bf6db44ea83f1a561b1b65a96ffe5ca5972ef5a43e85dd0ae1e957cae3ef",
       "seite": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
-      "zeitpunkt": "2026-10-08T15:08:49Z"
+      "zeitpunkt": "2026-10-09T06:26:41Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -361,17 +362,17 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 223,
-    "beendet": 223,
+    "anfragen": 232,
+    "beendet": 224,
     "dokument": "complete",
     "geladen": true,
     "offen": {
      "tags.vodafone.de": 1,
-     "www.vodafone.de": 1
+     "www.vodafone.de": 8
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 161.0,
-    "takte_ms": 11650,
+    "sekunden": 155.0,
+    "takte_ms": 12150,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -404,9 +405,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "28af35e49a860ac6c11e1f49fcec549e51b328b0f3ee6d8718cced930405f0a1",
+      "beleg_id": "a3e7d6eac0a448750b2d18e8d81bd42dcd704172cea570ce919f42990b6829cd",
       "seite": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html",
-      "zeitpunkt": "2026-10-08T15:11:52Z"
+      "zeitpunkt": "2026-10-09T06:29:43Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -442,9 +443,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "9898151952aa2680114e0b6e2a1bbc8469311e667271166fb7cfa1a9dbb3e4c3",
+      "beleg_id": "4dd4d70705fa98d4323d93764a0221b74f78edbc4abc3dc4690d29bac0e40d72",
       "seite": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html",
-      "zeitpunkt": "2026-10-08T15:12:11Z"
+      "zeitpunkt": "2026-10-09T06:30:02Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -480,9 +481,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "49123d6a511d2408a9cff7d4a5ca85c2ad2a6d1f1e2c9c3eeaae72d27f38eade",
+      "beleg_id": "592dbfbfb7e11acada0f725ad0e8e886517ce61c442481faf3220da2de499bd9",
       "seite": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html",
-      "zeitpunkt": "2026-10-08T15:12:30Z"
+      "zeitpunkt": "2026-10-09T06:30:21Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -518,9 +519,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "e935cfc20903925d8ac24bb8dfa08f0c4da2c2952ad972ee45a53a552c4aa0b6",
+      "beleg_id": "e5eb6deaf85898bd03f8949912118de6f966f40b593ce2a82b75546e9dcdcf64",
       "seite": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html",
-      "zeitpunkt": "2026-10-08T15:13:30Z"
+      "zeitpunkt": "2026-10-09T06:31:03Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -556,9 +557,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "6aaf0410700fd9e2b8ce87c7625a79aee2786abbd4aacd272afd0e6b2e532111",
+      "beleg_id": "f9874aa94a62cbd98b136575f40cccf2636d45be5e7108f8c83d04e6fdd578f4",
       "seite": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html",
-      "zeitpunkt": "2026-10-08T15:13:49Z"
+      "zeitpunkt": "2026-10-09T06:31:22Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -594,9 +595,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "33579acfa8b87d2e97aa4ed73a3da0e8781f165f4681e71cb852b32bd18a3b90",
+      "beleg_id": "8fa04dc4ccd6cae3b6af7cb39097207c1ec51d9c291c77dd258033b832766c04",
       "seite": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html",
-      "zeitpunkt": "2026-10-08T15:14:08Z"
+      "zeitpunkt": "2026-10-09T06:31:41Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -626,17 +627,17 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 212,
-    "beendet": 209,
+    "anfragen": 213,
+    "beendet": 213,
     "dokument": "complete",
     "geladen": true,
     "offen": {
      "tags.vodafone.de": 1,
-     "www.vodafone.de": 4
+     "www.vodafone.de": 2
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 146.7,
-    "takte_ms": 11600,
+    "sekunden": 160.4,
+    "takte_ms": 12750,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -656,5 +657,5 @@
  ],
  "ueberfaellig": [],
  "vertragsform": "tarif_plus_ratenkauf",
- "zeitbudget_sekunden": 3972
+ "zeitbudget_sekunden": 3981
 }
