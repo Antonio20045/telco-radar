@@ -18,10 +18,17 @@ from __future__ import annotations
 import hashlib
 import json
 import logging
+import re
 from dataclasses import dataclass, asdict, field
 from pathlib import Path
 
 log = logging.getLogger(__name__)
+
+ADRESSE = re.compile(r"[A-Za-z0-9_.+-]+@[A-Za-z][A-Za-z0-9-]*\.[A-Za-z]{2,}")
+"""Dasselbe Muster wie ``scripts/waechter_leck.py``: Pressetexte nennen oft eine
+Kontaktadresse, und eine Adresse in ``data/*.jsonl`` hält den Bot-Commit an
+(Lauf 117 vom 09.10.2026 verlor so seinen ganzen Bericht)."""
+ADRESSE_ERSATZ = "[E-Mail-Adresse entfernt]"
 
 
 def text_hash(text: str) -> str:
@@ -121,7 +128,7 @@ class UebersetzungsStore:
         """
         self.pfad.parent.mkdir(parents=True, exist_ok=True)
         zeilen = [
-            json.dumps(u.to_dict(), ensure_ascii=False)
+            ADRESSE.sub(ADRESSE_ERSATZ, json.dumps(u.to_dict(), ensure_ascii=False))
             for u in self._eintraege.values()
         ]
         self.pfad.write_text(
