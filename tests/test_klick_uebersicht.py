@@ -131,10 +131,10 @@ def test_uebersicht_im_browser_ergibt_rohsatz_pixel_11_pro(chromium, karte, kata
     assert satz["sku_id"].startswith("google-pixel-11-pro")
 
 
-def test_seite_ohne_zustand_ist_gestoert_ohne_saetze(chromium, karte):
+def test_seite_ohne_zustand_ist_leer_ohne_saetze(chromium, karte):
     with klickserver(lambda p: html("<html><body>Kein Zustand</body></html>")) as s:
         ergebnis = _lies(chromium, karte, s.adresse(PFAD))
-    assert ergebnis["status"] == LAUF_GESTOERT
+    assert ergebnis["status"] == "leer"
     assert "__INITIAL_STATE__" in ergebnis["grund"]
     assert ergebnis["saetze"] == []
 
@@ -262,3 +262,32 @@ def test_gestoerte_uebersicht_haelt_den_anbieter_an(telekom, karte):
     )
     assert daten["laufstatus"] == LAUF_GESTOERT
     assert all(s["grund"].startswith(GRUND_NACH_STOERUNG) for s in daten["seiten"])
+
+
+def test_leere_uebersicht_haelt_die_produktseiten_nicht_an(telekom, karte):
+    """Klick-Tageslauf 09.10.2026: Übersicht ohne Gerät, danach blieb jede
+    Produktseite ungelesen."""
+
+    def lies(adresse: str, ende: float) -> dict:
+        return {**_uebersicht([], "leer"), "grund": "Übersicht ohne Gerät"}
+
+    besucht: list[str] = []
+
+    def crawle(seite, ende):
+        besucht.append(seite.adresse)
+        return Klicklauf("Telekom", seite.adresse)
+
+    daten = fahre(
+        telekom,
+        karte,
+        "k",
+        crawle,
+        HEUTE,
+        10**6,
+        gelesen={},
+        uhr=_Uhr(),
+        schlafe=lambda s: None,
+        lies_uebersicht=lies,
+    )
+    assert len(besucht) == len(telekom.seiten)
+    assert all(u["status"] == "leer" for u in daten["uebersichten"])

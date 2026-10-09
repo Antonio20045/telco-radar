@@ -39,6 +39,7 @@ from playwright.sync_api import Error as PlaywrightFehler
 
 from .basis import GeraeteAbrufFehler
 from .klickcrawler import ANTWORT_FRIST_MS, FENSTER
+from .klickergebnis import LAUF_LEER
 from .klickkontext import Sitzung, oeffne_sitzung, schliesse
 from .klicklauf import LAUF_GELESEN, LAUF_GESTOERT, Klicklauf
 from .klickspur import ohne_geheimnisse
@@ -204,14 +205,19 @@ def _lies_seite(
 
 
 def _saetze(lesart: Lesart, lauf: Klicklauf, text: str, adresse: str) -> list[dict]:
-    """Die Sätze aus ``text``; ohne lesbaren Zustand oder Gerät ist der Lauf gestört."""
+    """Die Sätze aus ``text``; ohne lesbaren Zustand oder Gerät ist die Übersicht leer.
+
+    Leer, nicht gestört: die Seite kam ohne Bot-Schutz, nur unsere Lesart fand nichts
+    (Telekom lädt die Liste seit Oktober 2026 per Datenantwort nach, Klick-Tageslauf
+    09.10.2026). Darum hält das den Anbieter nicht an; die Produktseiten laufen weiter.
+    """
     try:
         saetze = lesart.saetze(text, adresse)
     except GeraeteAbrufFehler as fehler:
-        lauf.status, lauf.grund = LAUF_GESTOERT, str(fehler)
+        lauf.status, lauf.grund = LAUF_LEER, str(fehler)
         return []
     if not saetze:
-        lauf.status, lauf.grund = LAUF_GESTOERT, GRUND_LEER
+        lauf.status, lauf.grund = LAUF_LEER, GRUND_LEER
     return saetze
 
 
