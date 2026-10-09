@@ -8,7 +8,10 @@ endete gestört mit „HTTP 202 auf …/legalnote-replacer/build/p-befae207.js�
 Übersicht hatte keinen Beobachter, also ging die JavaScript-Prüfung des Nebenabrufs
 nicht durch ``klicksperre.Pruefung`` wie auf Produktseiten (Entscheidung Antonio
 08.10.2026, eine Prüfung je Seite). Eine zweite 202 derselben Seite beendet den Lauf
-weiter. Ein lokaler Server auf 127.0.0.1 liefert BEISPIEL-Seiten, von Hand
+weiter. Der Lauf 37951203094 (15:22 UTC) lehnte dann „Weiter ohne Gerät“ ab, einen
+Shop-Knopf unter der Abfrage (Erkundung b335c6ec: ``#rejectAll`` heißt „Nur
+erforderliche“); „weiter ohne“ zählt nur noch mit Zustimmung, Einwilligung, Cookies
+oder Akzeptieren. Ein lokaler Server auf 127.0.0.1 liefert BEISPIEL-Seiten, von Hand
 geschrieben, und die abgeleitete Listenantwort aus ``test_klick_uebersicht_liste``.
 """
 
@@ -31,11 +34,13 @@ from test_klick_uebersicht_liste import (
 
 from telco_radar.collect.geraete.klickkarte import lade_klickkarte
 from telco_radar.collect.geraete.klicklauf import LAUF_GELESEN, LAUF_GESTOERT
+from telco_radar.collect.geraete.klickproben import EINWILLIGUNG_AB
 
 SKRIPT = "/resources/ag2/legalnote-replacer/build/p-befae207.js"
 ZWEITES = "/resources/ag2/legalnote-replacer/build/p-596b2685.js"
 WAF = "x-amzn-waf-action"
-EINWILLIGUNG = """<div id="einwilligung" style="position:fixed;inset:0;z-index:9;
+EINWILLIGUNG = """<button id="ohne">Weiter ohne Gerät</button>
+<div id="einwilligung" style="position:fixed;inset:0;z-index:9;
  background:#fff"><p>Cookies</p><button id="alle">Alle akzeptieren</button>
 <button id="ab">Nur erforderliche</button></div>
 <script>
@@ -102,3 +107,9 @@ def test_zweite_pruefung_derselben_seite_bleibt_gestoert(chromium, karte, echt):
         ergebnis = lies_testseite(chromium, karte, server.adresse(PFAD))
     assert ergebnis["status"] == LAUF_GESTOERT
     assert ergebnis["saetze"] == []
+
+
+def test_weiter_ohne_geraet_ist_keine_einwilligung():
+    assert EINWILLIGUNG_AB.search("Weiter ohne Gerät") is None
+    assert EINWILLIGUNG_AB.search("Weiter ohne Zustimmung") is not None
+    assert EINWILLIGUNG_AB.search("Nur erforderliche") is not None

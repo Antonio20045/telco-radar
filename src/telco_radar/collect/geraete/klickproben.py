@@ -50,7 +50,7 @@ AKTIONSWORT = re.compile(
 )
 EINWILLIGUNG_AB = re.compile(
     r"^\s*(?:alle\s+)?(?:cookies\s+)?ablehnen|nur\s+(?:notwendige|erforderliche)"
-    r"|weiter\s+ohne"
+    r"|weiter\s+ohne\s+(?:zustimmung|einwilligung|cookies|akzeptieren)"
     r"|verweigern|^\s*reject",
     re.I,
 )
