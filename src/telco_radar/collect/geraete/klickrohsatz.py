@@ -54,7 +54,13 @@ import re
 from collections import Counter
 from dataclasses import dataclass, field
 
-from ...geraete_model import Katalog, erkenne_geraet, normalisiere, sku_id
+from ...geraete_model import (
+    Katalog,
+    erkenne_geraet,
+    normalisiere,
+    sku_id,
+    zustand_aus_titel,
+)
 from ...tarif_model import QUELLE_KLICK
 from .klickanschluss import ART_ANSCHLUSS
 from .klickcrawler import GRUND_NICHT_BESUCHT
@@ -213,6 +219,7 @@ def uebersicht_rohsatz(
 
     Das Gerät kommt über den Titel aus dem Katalog samt Auto-Einträgen; ein
     unbekannter Titel ist die Lücke ``geraet_unbekannt`` und steht im Protokoll.
+    Auch der Zustand kommt aus dem Titel („Erneuert Premium“ ist refurbished).
     """
     titel = str(roh.get("titel") or "")
     geraet = erkenne_geraet(titel, katalog)
@@ -226,10 +233,11 @@ def uebersicht_rohsatz(
     gb = roh.get("speicher_gb")
     if gb not in (geraet.speicher or []):
         return LUECKE_SPEICHER
+    zustand = zustand_aus_titel(titel)
     satz: dict[str, object] = {
-        "sku_id": sku_id(geraet.device_id, gb, None, ZUSTAND_NEU),
+        "sku_id": sku_id(geraet.device_id, gb, None, zustand),
         "anbieter": str(daten.get("name") or ""),
-        "zustand": ZUSTAND_NEU,
+        "zustand": zustand,
         "device_id": geraet.device_id,
         "speicher_gb": gb,
         "tarif_name": str(roh.get("tarif_name") or ""),
