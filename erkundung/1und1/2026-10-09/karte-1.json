@@ -1,0 +1,99 @@
+{
+ "karte": "1und1.yaml",
+ "anbieter": "1&1",
+ "adresse": "https://mobile.1und1.de[Cookie entfernt]",
+ "status": "gestoert",
+ "grund": "Kanarienwert fehlt: #hwd-configuration-section label.variant-chooser__tile [aria-label] ohne „iPhone 17 Pro“",
+ "bot_schutz": true,
+ "http_status": 200,
+ "hoechste_kombinationen": 12,
+ "belege": "nicht archiviert (kein Konto)",
+ "zaehlung": {
+  "kombinationen": 0,
+  "erfasst": 0,
+  "nicht_angeboten": 0,
+  "nicht_erfasst": 0,
+  "befund": 0,
+  "nicht_besucht": 0,
+  "verworfen": 1,
+  "gescheitert": 0
+ },
+ "struktur": {
+  "knoepfe_gesucht": 0,
+  "knoepfe_gefunden": 0,
+  "felder_gesucht": 0,
+  "felder_gefunden": 0,
+  "anteil_knoepfe": null,
+  "anteil_felder": null
+ },
+ "gefunden": {
+  "knoepfe": {
+   "speicher": {
+    "selektor": "#hwd-configuration-section label.variant-chooser__tile:has(input[name$=\".storage\"])",
+    "werte": []
+   },
+   "tarif": {
+    "selektor": null,
+    "werte": []
+   },
+   "laufzeit": {
+    "selektor": "#tariff-cards-container > div > div:has(add-to-cart-button)",
+    "werte": []
+   }
+  },
+  "zusammenfassung": "#tariff-cards-container > div > div:has(add-to-cart-button)",
+  "felder": {
+   "anzahlung": {
+    "text": 0,
+    "antwort": 0
+   },
+   "rate": {
+    "text": 0,
+    "antwort": 0
+   },
+   "ratenzahl": {
+    "text": 0,
+    "antwort": 0
+   },
+   "tarifphasen": {
+    "text": 0,
+    "antwort": 0
+   },
+   "tarifbindung": {
+    "text": 0,
+    "antwort": 0
+   },
+   "anschluss": {
+    "text": 0,
+    "antwort": 0
+   },
+   "volumen_gb": {
+    "text": 0,
+    "antwort": 0
+   },
+   "buendelbetrag": {
+    "text": 0,
+    "antwort": 0
+   },
+   "einmalzahlung": {
+    "text": 0,
+    "antwort": 0
+   }
+  }
+ },
+ "kombinationen": [],
+ "verworfen": [
+  {
+   "url": "https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920",
+   "grund": "ReadTimeout: The read operation timed out"
+  }
+ ],
+ "gescheitert": [],
+ "hilfsdateien": [
+  {
+   "url": "https://content.1und1.de/ctx/dh/libt.min.js?bust=2026100910",
+   "art": "script",
+   "grund": "robots.txt nicht lesbar (HTTP 403)"
+  }
+ ]
+}
