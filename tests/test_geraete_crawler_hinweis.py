@@ -76,3 +76,33 @@ def test_die_zeile_nennt_den_crawler_neben_dem_beleg():
         zeile = str(modul.buendelzeile(je[anbieter]))
         assert "vom Crawler" not in zeile
         assert "abgerufen 8. Oktober 2026" in zeile
+
+
+def test_der_hinweis_kommt_aus_dem_gespeicherten_buendel():
+    from telco_radar.report.geraete_tco_view import aufbereiten
+
+    satz = {
+        "id": "buendel--telekom--x",
+        "first_seen": TAG,
+        **{
+            f: getattr(_buendel("Telekom", "tk:m", QUELLE_KLICK), f)
+            for f in (
+                "sku_id",
+                "anbieter",
+                "tarif_name",
+                "tarif_id",
+                "tarif_monatlich",
+                "geraet_zuzahlung",
+                "geraet_monatsrate",
+                "laufzeit_monate",
+                "anschlusspreis",
+                "quelle_url",
+                "abgerufen_am",
+                "quelle_art",
+            )
+        },
+    }
+    ergebnis = aufbereiten([satz], [], [], lade_katalog(lese_wurzel()), heute=TAG)
+
+    karte = [k for m in ergebnis["modelle"] for k in m["karten"] if k.get("sku_id")]
+    assert [k["vom_crawler"] for k in karte] == [True]

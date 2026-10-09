@@ -15,8 +15,8 @@ als Zuzahlung, wenn keine Anzahlung gelesen ist. Tarifphasen werden zu Bündelph
 („ab dem 25. Monat …“) bleibt offen (``bis_monat`` ``None``): ihr Ende steht nicht
 auf der Seite, und ``buendelphasen_aus`` lässt sie mit Protokoll fallen; ein einzelner
 Preis ohne Phasen ist keine. Quelle ist die Seitenadresse des Belegs, sonst die Adresse
-der Produktseite; ``quelle_art`` ist ``klick``. Eine ``herleitung`` trägt kein
-Klick-Satz: er ist gemessen.
+der Produktseite; ``quelle_art`` ist ``klick``. Eine ``herleitung`` trägt ein
+Klick-Satz nur mit übernommenem Wert (``klickraster.HERLEITUNG_SCHLUSSZAHLUNG``).
 
 Rohsatz wird jede Kombination mit Status ``erfasst``, auch mit ``beleg_status``
 ``offen``: das Belegarchiv (``belegablage``) braucht Antonios Speicherkonto und ist im
@@ -247,6 +247,8 @@ def uebersicht_rohsatz(
         "buendel_monatlich": roh.get("buendel_monatlich"),
         "tarif_phasen": [],
     }
+    if roh.get("herleitung"):
+        satz["herleitung"] = roh["herleitung"]
     if all(satz.get(f) is None for f in PREISFELDER):
         return LUECKE_OHNE_PREIS
     return satz

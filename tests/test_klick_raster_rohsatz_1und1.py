@@ -32,11 +32,13 @@ from telco_radar.collect.geraete.einsundeins import (
 from telco_radar.collect.geraete.klickantwort import lies_antwort
 from telco_radar.collect.geraete.klickergebnis import schreibe
 from telco_radar.collect.geraete.klicklauf import LAUF_GELESEN, LAUF_GESTOERT
+from telco_radar.collect.geraete.klickraster import HERLEITUNG_SCHLUSSZAHLUNG
 from telco_radar.collect.geraete.klickrohsatz import ausbeute
 from telco_radar.collect.geraete.klickuebersicht import LESARTEN
 from telco_radar.collect.geraete.klickziele import Seitenziel
 from telco_radar.geraete_config import lade_katalog
 from telco_radar.geraete_model import sku_id
+from telco_radar.report.geraete_notbremse import HERLEITUNG_SATZ
 from telco_radar.report.geraete_tco_karten import geraet_aus_sku
 
 _PREISE = re.compile(r"hwdVariantsPrices\s*=\s*\{(.*?)\};", re.S)
@@ -63,7 +65,9 @@ def katalog():
     return lade_katalog(lese_wurzel())
 
 
-def produktseite(geraet: tuple[str, Seitenziel], **betrag: float):
+def produktseite(
+    geraet: tuple[str, Seitenziel], einmal: float | None = None, **betrag: float
+):
     datei, ziel = geraet
     html = text(datei)
     preise = _PREISE.search(html)
@@ -83,6 +87,9 @@ def produktseite(geraet: tuple[str, Seitenziel], **betrag: float):
         lesung = lies_antwort(globale, EINSUNDEINS_KARTE.antwort, None, platz)
         if f"gb{gb}" in betrag:
             buendel = replace(lesung.buendel, buendelbetrag=betrag[f"gb{gb}"])
+            lesung = replace(lesung, buendel=buendel)
+        if einmal is not None:
+            buendel = replace(lesung.buendel, einmalzahlung=einmal)
             lesung = replace(lesung, buendel=buendel)
         kombinationen.append(erfasst(lesung, str(gb), S_SLUG, 36))
     return ziel, lauf(ziel, kombinationen)
@@ -354,3 +361,36 @@ def test_anschlussseite_zaehlt_nicht_als_geraet(katalog):
 
     assert aus.nicht_im_angebot is not None
     assert "apple-iphone-18-pro" not in aus.nicht_im_angebot
+
+
+def test_schlusszahlung_kommt_vom_grundtarif(katalog):
+    seite = produktseite(IPHONE_18, einmal=410.0)
+    daten = klickdatei([seite], raster(RASTER[0]), raster(RASTER[1]))
+
+    aus = ausbeute(daten, katalog)
+
+    (satz,) = rastersaetze(aus, "apple-iphone-18-pro")
+    assert satz["geraet_zuzahlung"] == 410.0
+    assert satz["herleitung"] == HERLEITUNG_SCHLUSSZAHLUNG
+    assert HERLEITUNG_SCHLUSSZAHLUNG in HERLEITUNG_SATZ
+    grund = [s for s in aus.rohsaetze if s["tarif_name"] == S_SLUG]
+    assert {s["geraet_zuzahlung"] for s in grund} == {410.0}
+    assert all("herleitung" not in s for s in grund)
+
+
+def test_ohne_schlusszahlung_am_grundtarif_bleibt_sie_offen(katalog):
+    daten = klickdatei([produktseite(IPHONE_18)], raster(RASTER[0]), raster(RASTER[1]))
+
+    (satz,) = rastersaetze(ausbeute(daten, katalog), "apple-iphone-18-pro")
+
+    assert satz["geraet_zuzahlung"] is None
+    assert "herleitung" not in satz
+
+
+def test_schlusszahlung_nur_mit_gemessenem_speicher(katalog):
+    seite = produktseite(S26_ULTRA, einmal=300.0)
+    daten = klickdatei([seite], raster(RASTER[0]), raster(RASTER[1]))
+
+    aus = ausbeute(daten, katalog)
+
+    assert rastersaetze(aus, "samsung-galaxy-s26-ultra") == []

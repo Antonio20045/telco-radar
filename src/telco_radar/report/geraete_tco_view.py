@@ -320,6 +320,7 @@ _BUENDEL_FELDER = (
     "anschlusspreis",
     "quelle_url",
     "abgerufen_am",
+    "quelle_art",
     "zustand",
     "herleitung",
     "pruefung",
@@ -566,9 +567,8 @@ def aufbereiten(
 ) -> dict:
     """Alles, was der Reiter "Was kostet es" braucht.
 
-    `buendel` und `referenzen` sind die Datensaetze aus
-    `analyze/tco_store.TcoDB` - also Woerterbuecher, wie der Speicher sie
-    ablegt.
+    `buendel` und `referenzen` sind die Datensaetze aus `analyze/tco_store.TcoDB`
+    - also Woerterbuecher, wie der Speicher sie ablegt.
 
     `anbieter_typen` (O4) ist {Name: Typ} aus der Quellenkonfiguration -
     der TCO-Export braucht die Spalte, und der Store trägt sie nicht.

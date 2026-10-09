@@ -19,6 +19,12 @@ Paarung: Tarifübersicht 29.09.2026 („Tarifdetails 1&1 All-Net-Flat S“ →
 immer All-Net-Flat S). Sätze dieses Rasters werden kein Rohsatz: die Produktseite
 nennt denselben Tarif genauer. Der Anschluss kommt von der heute gelesenen
 Tarifdetail-Seite mit demselben Tarifnamen, sonst bleibt er ``None``.
+
+Das Raster nennt die Schlusszahlung von „24+12“ nicht. Sie hängt bei 1&1 nur an der
+Gerätevariante (``hwdVariantsOneOffPaymentFees.product-<Farbe>-<Speicher>`` ohne
+Tarif, Karte ``config/klickkarten/1und1.yaml``): ein Rastersatz mit gemessenem Speicher
+übernimmt sie vom Produktseiten-Satz, der den Speicher bestimmt hat, mit
+``herleitung`` ``HERLEITUNG_SCHLUSSZAHLUNG``. Ohne diesen Satz bleibt sie ``None``.
 """
 
 from __future__ import annotations
@@ -38,6 +44,7 @@ ART_RASTER = "raster"
 PRODUKTSEITE_SLUG = "tariff-anf-s-mvl"
 PRODUKTSEITE_TARIF = "1&1 All-Net-Flat S"
 CENT = 0.005
+HERLEITUNG_SCHLUSSZAHLUNG = "schlusszahlung_aus_grundtarif"
 BEREIT_JS = (
     "() => document.readyState === 'complete' || ("
     "location.pathname.startsWith('/smartphones-') && "
@@ -117,15 +124,42 @@ def raster_roh(daten: dict, produktsaetze: list[dict], katalog: Katalog) -> list
     speicher = _speicher(
         [r for r in raster if _tarif(r["tarif_name"]) == basis], produktsaetze, katalog
     )
-    return [
-        {
+    saetze = []
+    for roh in raster:
+        if _tarif(roh["tarif_name"]) == basis:
+            continue
+        geraet = _geraet(roh, katalog)
+        gb = _gemessen(speicher, geraet)
+        satz = {
             **roh,
-            "speicher_gb": _gemessen(speicher, _geraet(roh, katalog)),
+            "speicher_gb": gb,
             "anschlusspreis": anschluss.get(_tarif(roh["tarif_name"])),
         }
-        for roh in raster
-        if _tarif(roh["tarif_name"]) != basis
-    ]
+        zahlung = _schlusszahlung(produktsaetze, geraet, gb, roh["laufzeit_monate"])
+        if zahlung is not None:
+            satz.update(geraet_zuzahlung=zahlung, herleitung=HERLEITUNG_SCHLUSSZAHLUNG)
+        saetze.append(satz)
+    return saetze
+
+
+def _schlusszahlung(
+    produktsaetze: list[dict], geraet: str | None, gb: int | None, monate: object
+) -> float | None:
+    """Die Zuzahlung des Produktseiten-Satzes (Grundtarif), der den Speicher bestimmt;
+    ohne genau einen solchen Satz mit Zuzahlung ``None``."""
+    slug = _tarif(PRODUKTSEITE_SLUG)
+    werte = {
+        satz["geraet_zuzahlung"]
+        for satz in produktsaetze
+        if geraet is not None
+        and gb is not None
+        and satz.get("device_id") == geraet
+        and satz.get("speicher_gb") == gb
+        and _tarif(satz.get("tarif_name")) == slug
+        and str(satz.get("laufzeit_monate")) == str(monate)
+        and satz.get("geraet_zuzahlung") is not None
+    }
+    return werte.pop() if len(werte) == 1 else None
 
 
 def _gemessen(speicher: dict[str, int], geraet: str | None) -> int | None:

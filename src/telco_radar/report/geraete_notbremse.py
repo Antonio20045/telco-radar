@@ -44,6 +44,9 @@ HERLEITUNG_SATZ = {
         "{anbieter} nennt den Monatspreis für diesen Tarif nicht beim Gerät – "
         "berechnet aus dem Grundangebot plus Tarifaufschlag der Preisliste."
     ),
+    "schlusszahlung_aus_grundtarif": (
+        "{anbieter} nennt die Schlusszahlung nur beim Grundtarif – von dort übernommen."
+    ),
 }
 HERLEITUNG_SATZ_SONST = (
     "{anbieter} nennt diesen Preis nicht direkt – berechnet aus seinen Angaben."
