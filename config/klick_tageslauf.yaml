@@ -55,6 +55,227 @@ anbieter:
       - geraet: google-pixel-11
         speicher_gb: 256
         url: https://www.o2online.de/e-shop/google/google-pixel-11-256gb-frost-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      # Pitch 3 (09.10.2026): alle übrigen o2-Geräte je Speicher, Adresse wörtlich
+      # `quelle_url` eines gültigen Bündels in data/state/geraete_tco.json (Stand 09.10.).
+      - geraet: apple-iphone-14
+        speicher_gb: 128
+        url: https://www.o2online.de/e-shop/apple/apple-iphone-14-128gb-mitternacht-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: apple-iphone-14-pro
+        speicher_gb: 128
+        url: https://www.o2online.de/e-shop/apple/apple-iphone-14-pro-128gb-dunkellila-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: apple-iphone-14-pro-max
+        speicher_gb: 512
+        url: https://www.o2online.de/e-shop/apple/apple-iphone-14-pro-max-512gb-gold-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: apple-iphone-15
+        speicher_gb: 128
+        url: https://www.o2online.de/e-shop/apple/apple-iphone-15-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: apple-iphone-15-plus
+        speicher_gb: 128
+        url: https://www.o2online.de/e-shop/apple/apple-iphone-15-plus-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: apple-iphone-15-pro
+        speicher_gb: 128
+        url: https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-128gb-titan-natur-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: apple-iphone-15-pro-max
+        speicher_gb: 256
+        url: https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-max-256gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: apple-iphone-16
+        speicher_gb: 128
+        url: https://www.o2online.de/e-shop/apple/apple-iphone-16-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: apple-iphone-16-plus
+        speicher_gb: 128
+        url: https://www.o2online.de/e-shop/apple/apple-iphone-16-plus-128gb-ultramarin-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: apple-iphone-16-pro
+        speicher_gb: 128
+        url: https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-128gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: apple-iphone-16-pro-max
+        speicher_gb: 256
+        url: https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-max-256gb-titan-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: apple-iphone-16-pro-max
+        speicher_gb: 512
+        url: https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-max-256gb-titan-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: apple-iphone-16e
+        speicher_gb: 128
+        url: https://www.o2online.de/e-shop/apple/apple-iphone-16e-128gb-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: apple-iphone-17-pro-max
+        speicher_gb: 512
+        url: https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-max-256gb-cosmic-orange-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus
+      - geraet: apple-iphone-17e
+        speicher_gb: 256
+        url: https://www.o2online.de/e-shop/apple/apple-iphone-17e-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus
+      - geraet: apple-iphone-17e
+        speicher_gb: 512
+        url: https://www.o2online.de/e-shop/apple/apple-iphone-17e-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus
+      - geraet: apple-iphone-18-pro
+        speicher_gb: 256
+        url: https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-256gb-burgunder-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m
+      - geraet: apple-iphone-18-pro
+        speicher_gb: 512
+        url: https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-256gb-burgunder-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m
+      - geraet: apple-iphone-18-pro
+        speicher_gb: 1024
+        url: https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-256gb-burgunder-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m
+      - geraet: apple-iphone-18-pro
+        speicher_gb: 2048
+        url: https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-256gb-burgunder-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m
+      - geraet: apple-iphone-18-pro-max
+        speicher_gb: 256
+        url: https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-max-256gb-polar-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m
+      - geraet: apple-iphone-18-pro-max
+        speicher_gb: 512
+        url: https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-max-256gb-polar-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m
+      - geraet: apple-iphone-18-pro-max
+        speicher_gb: 1024
+        url: https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-max-256gb-polar-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m
+      - geraet: apple-iphone-18-pro-max
+        speicher_gb: 2048
+        url: https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-max-256gb-polar-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m
+      - geraet: apple-iphone-air
+        speicher_gb: 256
+        url: https://www.o2online.de/e-shop/apple/apple-iphone-air-256gb-himmelblau-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: fairphone-6
+        speicher_gb: 256
+        url: https://www.o2online.de/e-shop/fairphone/fairphone-6-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: google-pixel-10
+        speicher_gb: 128
+        url: https://www.o2online.de/e-shop/google/google-pixel-10-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: google-pixel-10-pro
+        speicher_gb: 128
+        url: https://www.o2online.de/e-shop/google/google-pixel-10-pro-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: google-pixel-10-pro
+        speicher_gb: 256
+        url: https://www.o2online.de/e-shop/google/google-pixel-10-pro-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: google-pixel-10a
+        speicher_gb: 128
+        url: https://www.o2online.de/e-shop/google/google-pixel-10a-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: google-pixel-10a
+        speicher_gb: 256
+        url: https://www.o2online.de/e-shop/google/google-pixel-10a-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: google-pixel-11-pro
+        speicher_gb: 256
+        url: https://www.o2online.de/e-shop/google/google-pixel-11-pro-256gb-canyon-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: google-pixel-11-pro
+        speicher_gb: 512
+        url: https://www.o2online.de/e-shop/google/google-pixel-11-pro-256gb-canyon-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: google-pixel-11-pro-fold
+        speicher_gb: 256
+        url: https://www.o2online.de/e-shop/google/google-pixel-11-pro-fold-256gb-olive-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: google-pixel-11-pro-xl
+        speicher_gb: 256
+        url: https://www.o2online.de/e-shop/google/google-pixel-11-pro-xl-256gb-canyon-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: nothing-phone-3
+        speicher_gb: 256
+        url: https://www.o2online.de/e-shop/nothing/nothing-phone-3-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: nothing-phone-4a
+        speicher_gb: 128
+        url: https://www.o2online.de/e-shop/nothing/nothing-phone-4a-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: nothing-phone-4a-pro
+        speicher_gb: 256
+        url: https://www.o2online.de/e-shop/nothing/nothing-phone-4a-pro-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: samsung-galaxy-a17
+        speicher_gb: 128
+        url: https://www.o2online.de/e-shop/samsung/samsung-galaxy-a17-128gb-5g-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m
+      - geraet: samsung-galaxy-a27
+        speicher_gb: 128
+        url: https://www.o2online.de/e-shop/samsung/samsung-galaxy-a27-5g-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m
+      - geraet: samsung-galaxy-a37
+        speicher_gb: 128
+        url: https://www.o2online.de/e-shop/samsung/samsung-galaxy-a37-128gb-awesome-charcoal-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: samsung-galaxy-a37
+        speicher_gb: 256
+        url: https://www.o2online.de/e-shop/samsung/samsung-galaxy-a37-128gb-awesome-charcoal-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: samsung-galaxy-a56
+        speicher_gb: 128
+        url: https://www.o2online.de/e-shop/samsung/samsung-galaxy-a56-128gb-awesome-graphite-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: samsung-galaxy-a57
+        speicher_gb: 128
+        url: https://www.o2online.de/e-shop/samsung/samsung-galaxy-a57-128gb-awesome-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: samsung-galaxy-a57
+        speicher_gb: 256
+        url: https://www.o2online.de/e-shop/samsung/samsung-galaxy-a57-128gb-awesome-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: samsung-galaxy-s23
+        speicher_gb: 128
+        url: https://www.o2online.de/e-shop/samsung/samsung-galaxy-s23-128gb-pink-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: samsung-galaxy-s24
+        speicher_gb: 128
+        url: https://www.o2online.de/e-shop/samsung/samsung-galaxy-s24-128gb-onyx-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: samsung-galaxy-s24-ultra
+        speicher_gb: 256
+        url: https://www.o2online.de/e-shop/samsung/samsung-galaxy-s24-ultra-256gb-titanium-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: samsung-galaxy-s25
+        speicher_gb: 128
+        url: https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-128gb-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: samsung-galaxy-s25
+        speicher_gb: 256
+        url: https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-256gb-blueblack-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: samsung-galaxy-s25-fe
+        speicher_gb: 128
+        url: https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-fe-128gb-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: samsung-galaxy-s25-ultra
+        speicher_gb: 256
+        url: https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: samsung-galaxy-s26
+        speicher_gb: 512
+        url: https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus
+      - geraet: samsung-galaxy-s26-fe
+        speicher_gb: 128
+        url: https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-fe-128gb-pistachio-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: samsung-galaxy-s26-fe
+        speicher_gb: 256
+        url: https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-fe-128gb-pistachio-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: samsung-galaxy-s26-plus
+        speicher_gb: 256
+        url: https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-plus-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus
+      - geraet: samsung-galaxy-s26-plus
+        speicher_gb: 512
+        url: https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-plus-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus
+      - geraet: samsung-galaxy-s26-ultra
+        speicher_gb: 512
+        url: https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ultra-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus
+      - geraet: samsung-galaxy-z-flip8
+        speicher_gb: 256
+        url: https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-flip8-256gb-pink-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: samsung-galaxy-z-flip8
+        speicher_gb: 512
+        url: https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-flip8-256gb-pink-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: samsung-galaxy-z-fold8
+        speicher_gb: 256
+        url: https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-fold8-256gb-lavender-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: samsung-galaxy-z-fold8
+        speicher_gb: 512
+        url: https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-fold8-256gb-lavender-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: samsung-galaxy-z-fold8-ultra
+        speicher_gb: 256
+        url: https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-fold8-ultra-256gb-violet-shadow-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: samsung-galaxy-z-fold8-ultra
+        speicher_gb: 512
+        url: https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-fold8-ultra-256gb-violet-shadow-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: xiaomi-17
+        speicher_gb: 512
+        url: https://www.o2online.de/e-shop/xiaomi/xiaomi-17-512gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: xiaomi-17-ultra
+        speicher_gb: 512
+        url: https://www.o2online.de/e-shop/xiaomi/xiaomi-17-ultra-512gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: xiaomi-17t
+        speicher_gb: 256
+        url: https://www.o2online.de/e-shop/xiaomi/xiaomi-17t-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: xiaomi-17t-pro
+        speicher_gb: 512
+        url: https://www.o2online.de/e-shop/xiaomi/xiaomi-17t-pro-512gb-violett-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: xiaomi-redmi-17
+        speicher_gb: 128
+        url: https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-17-128gb-blue-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m
+      - geraet: xiaomi-redmi-note-15-pro
+        speicher_gb: 256
+        url: https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-15-pro-256gb-schwarz-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: xiaomi-redmi-note-17
+        speicher_gb: 128
+        url: https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-128gb-purple-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m
+      - geraet: xiaomi-redmi-note-17-pro
+        speicher_gb: 256
+        url: https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-pro-256gb-blue-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
+      - geraet: xiaomi-redmi-note-17-pro-max
+        speicher_gb: 256
+        url: https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-pro-max-256gb-cloud-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus
 
   - schluessel: vodafone
     name: Vodafone
@@ -236,3 +457,86 @@ anbieter:
       - geraet: google-pixel-11
         speicher_gb: 256
         url: https://www.congstar.de/geraete/google/google-pixel-11/
+      # Pitch 3 (09.10.2026): alle übrigen congstar-Geräte, Adresse wörtlich aus
+      # data/state/geraete_db.json (Stand 09.10.); den Speicher liest die Karte.
+      - geraet: apple-iphone-16
+        speicher_gb: 128
+        url: https://www.congstar.de/geraete/apple/apple-iphone-16/
+      - geraet: apple-iphone-16e
+        speicher_gb: 128
+        url: https://www.congstar.de/geraete/apple/apple-iphone-16e/
+      - geraet: apple-iphone-17e
+        speicher_gb: 256
+        url: https://www.congstar.de/geraete/apple/apple-iphone-17e/
+      - geraet: apple-iphone-18-pro
+        speicher_gb: 1024
+        url: https://www.congstar.de/geraete/apple/apple-iphone-18-pro/
+      - geraet: apple-iphone-18-pro-max
+        speicher_gb: 1024
+        url: https://www.congstar.de/geraete/apple/apple-iphone-18-pro-max/
+      - geraet: apple-iphone-air
+        speicher_gb: 256
+        url: https://www.congstar.de/geraete/apple/apple-iphone-air/
+      - geraet: fairphone-6
+        speicher_gb: 256
+        url: https://www.congstar.de/geraete/fairphone/fairphone-gen-6-1/
+      - geraet: google-pixel-10a
+        speicher_gb: 128
+        url: https://www.congstar.de/geraete/google/google-pixel-10a/
+      - geraet: google-pixel-11-pro
+        speicher_gb: 256
+        url: https://www.congstar.de/geraete/google/google-pixel-11-pro/
+      - geraet: google-pixel-11-pro-xl
+        speicher_gb: 256
+        url: https://www.congstar.de/geraete/google/google-pixel-11-pro-xl/
+      - geraet: nothing-phone-4a-pro
+        speicher_gb: 256
+        url: https://www.congstar.de/geraete/nothing/nothing-phone-4a-pro/
+      - geraet: samsung-galaxy-a17
+        speicher_gb: 128
+        url: https://www.congstar.de/geraete/samsung/samsung-galaxy-a17-5g/
+      - geraet: samsung-galaxy-a37
+        speicher_gb: 128
+        url: https://www.congstar.de/geraete/samsung/samsung-galaxy-a37/
+      - geraet: samsung-galaxy-a57
+        speicher_gb: 128
+        url: https://www.congstar.de/geraete/samsung/samsung-galaxy-a57/
+      - geraet: samsung-galaxy-s26-fe
+        speicher_gb: 128
+        url: https://www.congstar.de/geraete/samsung/samsung-galaxy-s26-fe/
+      - geraet: samsung-galaxy-s26-plus
+        speicher_gb: 256
+        url: https://www.congstar.de/geraete/samsung/samsung-galaxy-s26-1/
+      - geraet: samsung-galaxy-s26-ultra
+        speicher_gb: 1024
+        url: https://www.congstar.de/geraete/samsung/samsung-galaxy-s26-ultra/
+      - geraet: samsung-galaxy-z-flip8
+        speicher_gb: 256
+        url: https://www.congstar.de/geraete/samsung/samsung-galaxy-z-flip8/
+      - geraet: samsung-galaxy-z-fold8
+        speicher_gb: 256
+        url: https://www.congstar.de/geraete/samsung/samsung-galaxy-z-fold8/
+      - geraet: samsung-galaxy-z-fold8-ultra
+        speicher_gb: 256
+        url: https://www.congstar.de/geraete/samsung/samsung-galaxy-z-fold8-ultra/
+      - geraet: xiaomi-17-ultra
+        speicher_gb: 512
+        url: https://www.congstar.de/geraete/xiaomi/xiaomi-17-ultra/
+      - geraet: xiaomi-17t
+        speicher_gb: 256
+        url: https://www.congstar.de/geraete/xiaomi/xiaomi-17t/
+      - geraet: xiaomi-17t-pro
+        speicher_gb: 512
+        url: https://www.congstar.de/geraete/xiaomi/xiaomi-17t-pro/
+      - geraet: xiaomi-redmi-17
+        speicher_gb: 128
+        url: https://www.congstar.de/geraete/xiaomi/xiaomi-redmi-17-5g/
+      - geraet: xiaomi-redmi-note-17
+        speicher_gb: 128
+        url: https://www.congstar.de/geraete/xiaomi/xiaomi-redmi-note-17-5g/
+      - geraet: xiaomi-redmi-note-17-pro
+        speicher_gb: 256
+        url: https://www.congstar.de/geraete/xiaomi/xiaomi-redmi-note-17-pro-5g/
+      - geraet: xiaomi-redmi-note-17-pro-max
+        speicher_gb: 256
+        url: https://www.congstar.de/geraete/xiaomi/xiaomi-redmi-note-17-pro-max-5g/
