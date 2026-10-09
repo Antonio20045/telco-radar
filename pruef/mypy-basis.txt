@@ -17,7 +17,6 @@ src/telco_radar/analyze/geraete_lifecycle.py index 1
 src/telco_radar/analyze/geraete_store.py arg-type 3
 src/telco_radar/analyze/highlight_topics.py arg-type 2
 src/telco_radar/analyze/highlight_topics.py assignment 1
-src/telco_radar/analyze/llm.py operator 1
 src/telco_radar/analyze/promo_analyst.py var-annotated 1
 src/telco_radar/analyze/promo_ranker.py arg-type 1
 src/telco_radar/analyze/tco_store.py assignment 1

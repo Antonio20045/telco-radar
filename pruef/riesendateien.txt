@@ -12,7 +12,7 @@ src/telco_radar/analyze/editor.py zeilen 717
 src/telco_radar/analyze/geraete_lifecycle.py zeilen 736
 src/telco_radar/analyze/geraete_store.py zeilen 1177
 src/telco_radar/analyze/highlight_topics.py zeilen 946
-src/telco_radar/analyze/llm.py zeilen 640
+src/telco_radar/analyze/llm.py zeilen 583
 src/telco_radar/analyze/promo_ranker.py zeilen 559
 src/telco_radar/analyze/tco_store.py zeilen 519
 src/telco_radar/collect/ct_log.py zeilen 463
@@ -31,7 +31,7 @@ src/telco_radar/collect/tarif_pdf.py zeilen 670
 src/telco_radar/geraete_model.py zeilen 1129
 src/telco_radar/geraete_pipeline.py zeilen 700
 src/telco_radar/newsletter/filters.py zeilen 401
-src/telco_radar/pipeline.py zeilen 1016
+src/telco_radar/pipeline.py zeilen 1015
 src/telco_radar/promo_bilder.py zeilen 417
 src/telco_radar/report/bilder.py zeilen 432
 src/telco_radar/report/differentiation.py zeilen 427
