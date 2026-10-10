@@ -19,14 +19,11 @@
     if (h >= 17 && h < 21) return 'abend';
     return 'nacht';
   }
-  /* Ein ferngesteuerter Browser (Tests, Screenshots) sieht die Tagesansicht:
-     eine Messung darf nicht davon abhaengen, wann sie laeuft. `?zeit=`
-     waehlt jede Ansicht ausdruecklich. */
-  var zeit = navigator.webdriver ? 'tag' : tageszeit();
-  try {
-    var wunsch = new URLSearchParams(location.search).get('zeit');
-    if (wunsch && /^(morgen|tag|abend|nacht)$/.test(wunsch)) zeit = wunsch;
-  } catch (e) { /* aeltere Browser: Uhrzeit gilt */ }
+  /* NUR TAG (Antonio, 10.10.2026): Farben und Startbild sind immer die
+     Tagesansicht, egal wann gelesen wird. Die Uhrzeit waehlt nur noch den
+     Gruss auf der Startseite. */
+  var zeit = 'tag';
+  var stunde = navigator.webdriver ? 'tag' : tageszeit();
   wurzel.setAttribute('data-zeit', zeit);
 
   var ruhig = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -37,7 +34,7 @@
   if (buehne) {
     var gruss = buehne.querySelector('[data-gruss]');
     var GRUSS = { morgen: 'Guten Morgen', tag: 'Guten Tag', abend: 'Guten Abend', nacht: 'Guten Abend' };
-    if (gruss && gruss.textContent.trim() === 'Ausgabe') gruss.textContent = GRUSS[zeit];
+    if (gruss && gruss.textContent.trim() === 'Ausgabe') gruss.textContent = GRUSS[stunde];
     var ebenen = buehne.querySelectorAll('.buehne-ebene[data-zeit-bild]');
     var bild = null;
     for (var i = 0; i < ebenen.length; i++) {
@@ -419,6 +416,127 @@
       });
     })(filter[f]);
   }
+})();
+
+/* QUELLEN (10.10.2026): der Lauf als Filter. Der Scrollfortschritt waehlt
+   die Stufe; Zahl, Titel und Satz kommen aus der Stufe selbst. */
+(function () {
+  var f = document.querySelector('[data-filter]');
+  if (!f) return;
+  var lis = [].slice.call(f.querySelectorAll('.qf-leiter li'));
+  var zahl = f.querySelector('[data-filter-zahl]');
+  var titel = f.querySelector('[data-filter-titel]');
+  var satz = f.querySelector('[data-filter-satz]');
+  var leiter = f.querySelector('.qf-leiter');
+  if (!lis.length || !zahl) return;
+  var ruhig = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  var akt = -1, anim = 0, ANTEIL = 0.86;
+  function fmt(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
+  function wert(i) { return parseInt(lis[i].getAttribute('data-zahl'), 10) || 0; }
+  function zaehle(von, i) {
+    var bis = wert(i), ende = lis[i].querySelector('b').textContent;
+    cancelAnimationFrame(anim);
+    if (ruhig) { zahl.textContent = ende; return; }
+    var t0 = null;
+    function s(t) {
+      if (!t0) t0 = t;
+      var k = Math.min(1, (t - t0) / 700), e = 1 - Math.pow(1 - k, 3);
+      zahl.textContent = k < 1 ? fmt(Math.round(von + (bis - von) * e)) : ende;
+      if (k < 1) anim = requestAnimationFrame(s);
+    }
+    anim = requestAnimationFrame(s);
+  }
+  function stufe(i) {
+    if (i === akt) return;
+    var alt = akt; akt = i;
+    lis.forEach(function (l, j) { l.classList.toggle('erreicht', j <= i); l.classList.toggle('jetzt', j === i); });
+    leiter.style.setProperty('--fort', (lis.length > 1 ? i / (lis.length - 1) : 1).toFixed(3));
+    titel.textContent = lis[i].querySelector('span').textContent;
+    satz.textContent = lis[i].getAttribute('data-satz');
+    zaehle(alt < 0 ? wert(i) : wert(alt), i);
+  }
+  var geplant = false;
+  function rechnen() {
+    geplant = false;
+    var r = f.getBoundingClientRect(), weg = Math.max(1, r.height - window.innerHeight);
+    var p = Math.min(1, Math.max(0, -r.top / weg));
+    var q = Math.max(0, (p - ANTEIL) / (1 - ANTEIL));
+    f.style.setProperty('--p', Math.min(1, p / ANTEIL).toFixed(3));
+    f.style.setProperty('--q', q.toFixed(3));
+    stufe(Math.min(lis.length - 1, Math.floor(Math.min(0.999, p / ANTEIL) * lis.length)));
+  }
+  window.addEventListener('scroll', function () {
+    if (!geplant) { geplant = true; requestAnimationFrame(rechnen); }
+  }, { passive: true });
+  window.addEventListener('resize', rechnen);
+  lis.forEach(function (l, j) {
+    l.addEventListener('click', function () {
+      var weg = f.offsetHeight - window.innerHeight;
+      window.scrollTo({ top: f.offsetTop + weg * ANTEIL * (j + 0.5) / lis.length, behavior: ruhig ? 'auto' : 'smooth' });
+    });
+  });
+  rechnen();
+})();
+
+/* KINOSTRECKE (Wettbewerb, 10.10.2026): Buehnen mit data-buehne bekommen
+   ihren Scrollfortschritt als --p; der Puls zeichnet sich, wenn er ins Bild
+   kommt; Zahlen mit data-zaehler zaehlen bis zu ihrem eigenen Text hoch. */
+(function () {
+  var buehnen = document.querySelectorAll('[data-buehne]');
+  var puls = document.querySelectorAll('[data-puls]');
+  if (!buehnen.length && !puls.length) return;
+  var ruhig = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  var ziele = [];
+  for (var i = 0; i < buehnen.length; i++) ziele.push(buehnen[i].closest('.wa-kapitel') || buehnen[i]);
+  var geplant = false;
+  function rechnen() {
+    geplant = false;
+    var h = window.innerHeight;
+    ziele.forEach(function (s) {
+      var r = s.getBoundingClientRect();
+      if (r.bottom < -h || r.top > h * 2) return;
+      var weg = s.classList.contains('wa-kapitel') ? h * 0.9 : Math.max(1, r.height - h);
+      s.style.setProperty('--p', Math.min(1, Math.max(0, -r.top / weg)).toFixed(3));
+    });
+  }
+  if (!ruhig && ziele.length) {
+    window.addEventListener('scroll', function () {
+      if (!geplant) { geplant = true; requestAnimationFrame(rechnen); }
+    }, { passive: true });
+    window.addEventListener('resize', rechnen);
+    rechnen();
+  }
+  function zaehlen(el) {
+    var ziel = el.textContent, n = parseInt(ziel, 10), t0 = null;
+    if (ruhig || !n) return;
+    function schritt(t) {
+      if (!t0) t0 = t;
+      var k = Math.min(1, (t - t0) / 1100);
+      el.textContent = k < 1 ? String(Math.round(n * (1 - Math.pow(1 - k, 3)))) : ziel;
+      if (k < 1) requestAnimationFrame(schritt);
+    }
+    requestAnimationFrame(schritt);
+  }
+  var pause = document.querySelector('[data-wand-pause]');
+  if (pause) pause.addEventListener('click', function () {
+    var an = pause.parentNode.classList.toggle('angehalten');
+    pause.setAttribute('aria-pressed', an ? 'true' : 'false');
+    pause.textContent = an ? 'Weiterlaufen' : 'Anhalten';
+  });
+  var beobachtet = document.querySelectorAll('[data-puls],[data-zaehler]');
+  if (!('IntersectionObserver' in window)) {
+    for (var j = 0; j < puls.length; j++) puls[j].classList.add('sichtbar');
+    return;
+  }
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      e.target.classList.add('sichtbar');
+      if (e.target.hasAttribute('data-zaehler')) zaehlen(e.target);
+      io.unobserve(e.target);
+    });
+  }, { threshold: 0.18 });
+  for (var k = 0; k < beobachtet.length; k++) io.observe(beobachtet[k]);
 })();
 
 /* DIE ANKUNFTS-ADRESSE, EINMAL GESICHERT (P2, 17.09.2026). Die Zeitreihen-
@@ -1295,8 +1413,15 @@ var TelcoFrage = (function () {
   var leiste = document.querySelector('.gr-reiter');
   if (!leiste) return;
   var knoepfe = leiste.querySelectorAll('button[data-tafel]');
+  document.documentElement.setAttribute('data-art', 'tarif');
 
+  var ARTEN = {'tafel-tco': 'tarif', 'tafel-verlauf': 'geraet'};
   function zeige(knopf) {
+    var art = ARTEN[knopf.getAttribute('data-tafel')];
+    if (art) {
+      document.documentElement.setAttribute('data-art', art);
+      document.dispatchEvent(new CustomEvent('gr-art', {detail: {art: art}}));
+    }
     Array.prototype.forEach.call(knoepfe, function (k) {
       var ziel = document.getElementById(k.getAttribute('data-tafel'));
       var aktiv = k === knopf;
@@ -1384,7 +1509,7 @@ var TelcoFrage = (function () {
     } catch (e) { /* offline / file://: kein replaceState noetig */ }
   }
 
-  function zeige(knopf) {
+  function zeige(knopf, still) {
     tabelle.classList.toggle('gr-katalog--tco',
                              knopf.getAttribute('data-ansicht') === 'tco');
     Array.prototype.forEach.call(knoepfe, function (k) {
@@ -1392,7 +1517,7 @@ var TelcoFrage = (function () {
       k.classList.toggle('is-aktiv', aktiv);
       k.setAttribute('aria-pressed', aktiv ? 'true' : 'false');
     });
-    urlAnsicht(knopf.getAttribute('data-ansicht'));
+    if (!still) urlAnsicht(knopf.getAttribute('data-ansicht'));
     /* P3-Fix (Sicht-Pruefung Wesentliches 1, 18.09.2026): die Sortierung
        darf nicht an einer jetzt UNSICHTBAREN Spalte haengen bleiben.
        Gemessen am Live-Stand: nach "Einzelgeraepreis" (ab) sortiert und
@@ -1421,6 +1546,17 @@ var TelcoFrage = (function () {
       '.gr-kansicht button[data-ansicht="' + wunsch + '"]');
     if (ziel) zeige(ziel);
   } catch (e) { /* aeltere Browser: Grundansicht bleibt */ }
+
+  /* Der Seitenschalter Mit Tarif / Einzelgerät (10.10.2026) gilt auch für
+     die Tabelle "Alle Geräte": Tarif zeigt die Kosten über den Zeitraum,
+     Einzelgerät den Gerätepreis. Ohne eigenen Leserwunsch keine URL. */
+  function folgeArt(art) {
+    var k = tafel.querySelector('.gr-kansicht button[data-ansicht="' +
+      (art === 'geraet' ? 'barpreis' : 'tco') + '"]');
+    if (k && k.getAttribute('aria-pressed') !== 'true') zeige(k, true);
+  }
+  document.addEventListener('gr-art', function (ev) { folgeArt(ev.detail.art); });
+  if (!ziel) folgeArt(document.documentElement.getAttribute('data-art'));
 })();
 
 /* P4 SCHRITT 2c (STRATEGIE_GERAETE_V3, 18.09.2026): DER SPRUNG VOM RADAR
@@ -1567,30 +1703,36 @@ var TelcoFrage = (function () {
      Rueckweg nach einem Wechsel hat damit genau EINE Quelle - der alte
      Vorgabe-Klon (der bei einem Deep-Link Fremdes als "Vorgabe" einfrieren
      liess, S2) entfaellt fuer den Graphen komplett. */
-  var zrLager = null;
-  var zrVersprechen = null;
-  function holeZr() {
-    if (zrLager) return Promise.resolve(zrLager);
-    if (!zrVersprechen) {
-      zrVersprechen = fetch('data/geraete-zeitreihe.html')
+  /* Seite schneller (10.10.2026): je Modell eine kleine Datei statt
+     einer 47-MB-Gesamtdatei; ein fehlendes Modell (404) ist ein leeres
+     Lager, kein Fehler. */
+  var lagerCache = {};
+  function holeLager(ordner, modell, auswahl, schluessel) {
+    var url = 'data/' + ordner + '/' + encodeURIComponent(modell) + '.html';
+    if (!lagerCache[url]) {
+      lagerCache[url] = fetch(url)
         .then(function (r) {
+          if (r.status === 404) return '';
           if (!r.ok) throw new Error(r.status);
           return r.text();
         })
         .then(function (txt) {
           var doc = new DOMParser().parseFromString(txt, 'text/html');
-          zrLager = {};
-          Array.prototype.forEach.call(
-            doc.querySelectorAll('.gr-zr-lager[data-modell]'),
-            function (l) {
-              zrLager[l.getAttribute('data-modell') + '::' +
-                      l.getAttribute('data-band') + '::' +
-                      l.getAttribute('data-laufzeit')] = l;
-            });
-          return zrLager;
+          var lager = {};
+          Array.prototype.forEach.call(doc.querySelectorAll(auswahl),
+            function (l) { lager[schluessel(l)] = l; });
+          return lager;
         });
+      lagerCache[url].catch(function () { delete lagerCache[url]; });
     }
-    return zrVersprechen;
+    return lagerCache[url];
+  }
+  function holeZr(modell) {
+    return holeLager('zr', modell, '.gr-zr-lager[data-modell]', function (l) {
+      return l.getAttribute('data-modell') + '::' +
+             l.getAttribute('data-band') + '::' +
+             l.getAttribute('data-laufzeit');
+    });
   }
 
   var zrFolge = 0;
@@ -1626,7 +1768,7 @@ var TelcoFrage = (function () {
       zrGruppe.appendChild(satz);
       return;
     }
-    holeZr().then(function (lager) {
+    holeZr(modell).then(function (lager) {
       if (folge !== zrFolge) return;
       var block = lager && lager[modell + '::' + band + '::' +
                                  zustand.laufzeit];
@@ -1889,8 +2031,6 @@ var TelcoFrage = (function () {
      G0-Block des Verlaufs-Reiters ist gefallen - er zeigte den Barpreis
      des VERGLEICHS-Reiter-Modells neben der eigenen Auswahl desselben
      Reiters (Doppel-Darstellung, §4.6/§4.8). */
-  var fragmentLager = null;
-  var fragmentVersprechen = null;
   var vorgabeGruppe = null;
   var wechselFolge = 0;
   var zuletztModell = null;
@@ -1901,26 +2041,10 @@ var TelcoFrage = (function () {
     if (anfangsGruppe) vorgabeGruppe = anfangsGruppe.cloneNode(true);
   })();
 
-  function holeFragment() {
-    if (fragmentLager) return Promise.resolve(fragmentLager);
-    if (!fragmentVersprechen) {
-      fragmentVersprechen = fetch('data/geraete-buendel.html')
-        .then(function (r) {
-          if (!r.ok) throw new Error(r.status);
-          return r.text();
-        })
-        .then(function (txt) {
-          var doc = new DOMParser().parseFromString(txt, 'text/html');
-          fragmentLager = {};
-          Array.prototype.forEach.call(
-            doc.querySelectorAll('.gr-bnd-lager[data-modell]'),
-            function (l) {
-              fragmentLager[l.getAttribute('data-modell')] = l;
-            });
-          return fragmentLager;
-        });
-    }
-    return fragmentVersprechen;
+  function holeFragment(modell) {
+    return holeLager('bnd', modell, '.gr-bnd-lager[data-modell]', function (l) {
+      return l.getAttribute('data-modell');
+    });
   }
 
   function gruppeLeeren(gruppe) {
@@ -1948,17 +2072,15 @@ var TelcoFrage = (function () {
     if (!gruppe) return;
     var fertig = function (knotenB, fehler) {
       gruppeLeeren(gruppe);
+      /* Die Bündelliste ist weg (Antonio, 10.10.2026): vom Lager kommt nur
+         die Zeile der fehlenden Anbieter auf die Seite. */
       if (knotenB) {
         var klon = document.importNode(knotenB, true);
-        while (klon.firstChild) gruppe.appendChild(klon.firstChild);
+        Array.prototype.forEach.call(
+          klon.querySelectorAll('.gr-anb-fehlliste'),
+          function (f) { gruppe.appendChild(f); });
       } else if (fehler) {
-        leerSatz(gruppe, 'Die Bündel-Zeilen dieses Geräts konnten nicht ' +
-                         'geladen werden – der Graph oben nennt je Tarif' +
-                         'band die Werte aller Anbieter.');
-      } else {
-        leerSatz(gruppe, 'Für dieses Gerät steht noch keine Bündel-Zeile ' +
-                         'da – der Graph oben nennt je Tarifband, welche ' +
-                         'Anbieter eine Zahl tragen.');
+        leerSatz(gruppe, 'Fehlende Anbieter nicht geladen.');
       }
       setzeBndTitel(mid, bandKey);
       stelleZeilen(bandKey);
@@ -1969,7 +2091,7 @@ var TelcoFrage = (function () {
       return;
     }
     var meineFolge = ++wechselFolge;
-    holeFragment().then(function (lager) {
+    holeFragment(mid).then(function (lager) {
       if (meineFolge !== wechselFolge) return;
       fertig(lager ? lager[mid] : null, false);
     }, function () {
@@ -4250,5 +4372,24 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
         zeichne(gewaehlt);
       }
     }, 150);
+  });
+
+  /* Sprung aus der Liste "Über 10 % teurer" (Einzelgerät) in den
+     Preisverlauf: Schalter auf Einzelgerät, Gerät wählen, hinscrollen. */
+  document.addEventListener('click', function (ev) {
+    var a = ev.target.closest ? ev.target.closest('a.gx-vsprung') : null;
+    if (!a) return;
+    var id = a.getAttribute('data-geraet'), g = null;
+    for (var k = 0; k < GERAETE.length; k++) {
+      if (GERAETE[k].id === id) { g = GERAETE[k]; break; }
+    }
+    if (!g) return;
+    ev.preventDefault();
+    var knopf = document.querySelector(
+      '.gr-reiter button[data-tafel="tafel-verlauf"]');
+    if (knopf && knopf.getAttribute('aria-selected') !== 'true') knopf.click();
+    waehle(g, true);
+    var ziel = document.getElementById('verlauf');
+    if (ziel) ziel.scrollIntoView({behavior: 'smooth', block: 'start'});
   });
 })();
