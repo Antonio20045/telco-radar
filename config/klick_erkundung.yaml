@@ -43,9 +43,13 @@ anbieter:
       - geraet: apple-iphone-17-pro
         speicher_gb: 256
         url: https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus
-      - geraet: samsung-galaxy-s26
+      # Abgleich 10.10.2026: die Produktseite zeigt vier Plus-Tarife, der Altleser führt
+      # acht Tarife mehr ohne „Plus“ (etwa „O2 Mobile Unlimited M mit 100 MBit/s“). Die
+      # zweite Seite ist dieselbe wie die erste, nur mit einem Tarif ohne Plus in der
+      # Adresse: zeigt o2 dann andere Kacheln?
+      - geraet: apple-iphone-17-pro
         speicher_gb: 256
-        url: https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus
+        url: https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m
 
   - schluessel: vodafone
     name: Vodafone
@@ -119,9 +123,14 @@ anbieter:
       - geraet: apple-iphone-17-pro
         speicher_gb: 256
         url: https://www.congstar.de/geraete/apple/apple-iphone-17-pro/
-      - geraet: samsung-galaxy-s26
+      # Abgleich 10.10.2026: die Flex-Tarife (ohne Laufzeit) wählt man über die Radios
+      # „24 Monate Laufzeit“/„Ohne Laufzeit (mtl. kündbar)“ (Erkundung 07.10.,
+      # bedienelemente-1.json Element 108–111); planId 548 ist „Allnet Flat M Flex“
+      # (mitschnitt-1.json, minimumContractDuration 0). Zeigt die Seite mit dieser
+      # planId die Flex-Tarife als Tarifknöpfe?
+      - geraet: apple-iphone-17-pro
         speicher_gb: 256
-        url: https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/
+        url: https://www.congstar.de/geraete/apple/apple-iphone-17-pro/?planId=548
 
   - schluessel: freenet
     name: mobilcom-debitel
