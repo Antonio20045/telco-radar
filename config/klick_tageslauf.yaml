@@ -726,3 +726,121 @@ anbieter:
       - geraet: xiaomi-redmi-note-15-pro-plus
         speicher_gb: 256
         url: https://www.congstar.de/geraete/xiaomi/xiaomi-redmi-note-15-pro-5g/
+      # Flex-Tarife (Abgleich 10.10.2026): dieselbe Seite mit planId 548 („Allnet Flat M
+      # Flex“) stellt „Ohne Laufzeit (mtl. kündbar)“ ein, die Tarifknöpfe sind dann die vier
+      # Flex-Tarife (Erkundung 10.10.2026, Zweig klick-erkundung 0e0d2207,
+      # congstar/2026-10-10/bedienelemente-2.json).
+      - geraet: apple-iphone-17-pro
+        speicher_gb: 256
+        url: https://www.congstar.de/geraete/apple/apple-iphone-17-pro/?planId=548
+      - geraet: samsung-galaxy-s26
+        speicher_gb: 256
+        url: https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/?planId=548
+      - geraet: apple-iphone-17
+        speicher_gb: 256
+        url: https://www.congstar.de/geraete/apple/apple-iphone-17/?planId=548
+      - geraet: apple-iphone-17-pro-max
+        speicher_gb: 256
+        url: https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/?planId=548
+      - geraet: google-pixel-11
+        speicher_gb: 256
+        url: https://www.congstar.de/geraete/google/google-pixel-11/?planId=548
+      - geraet: apple-iphone-16
+        speicher_gb: 128
+        url: https://www.congstar.de/geraete/apple/apple-iphone-16/?planId=548
+      - geraet: apple-iphone-16e
+        speicher_gb: 128
+        url: https://www.congstar.de/geraete/apple/apple-iphone-16e/?planId=548
+      - geraet: apple-iphone-17e
+        speicher_gb: 256
+        url: https://www.congstar.de/geraete/apple/apple-iphone-17e/?planId=548
+      - geraet: apple-iphone-18-pro
+        speicher_gb: 1024
+        url: https://www.congstar.de/geraete/apple/apple-iphone-18-pro/?planId=548
+      - geraet: apple-iphone-18-pro-max
+        speicher_gb: 1024
+        url: https://www.congstar.de/geraete/apple/apple-iphone-18-pro-max/?planId=548
+      - geraet: apple-iphone-air
+        speicher_gb: 256
+        url: https://www.congstar.de/geraete/apple/apple-iphone-air/?planId=548
+      - geraet: fairphone-6
+        speicher_gb: 256
+        url: https://www.congstar.de/geraete/fairphone/fairphone-gen-6-1/?planId=548
+      - geraet: google-pixel-10a
+        speicher_gb: 128
+        url: https://www.congstar.de/geraete/google/google-pixel-10a/?planId=548
+      - geraet: google-pixel-11-pro
+        speicher_gb: 256
+        url: https://www.congstar.de/geraete/google/google-pixel-11-pro/?planId=548
+      - geraet: google-pixel-11-pro-xl
+        speicher_gb: 256
+        url: https://www.congstar.de/geraete/google/google-pixel-11-pro-xl/?planId=548
+      - geraet: nothing-phone-4a-pro
+        speicher_gb: 256
+        url: https://www.congstar.de/geraete/nothing/nothing-phone-4a-pro/?planId=548
+      - geraet: samsung-galaxy-a17
+        speicher_gb: 128
+        url: https://www.congstar.de/geraete/samsung/samsung-galaxy-a17-5g/?planId=548
+      - geraet: samsung-galaxy-a37
+        speicher_gb: 128
+        url: https://www.congstar.de/geraete/samsung/samsung-galaxy-a37/?planId=548
+      - geraet: samsung-galaxy-a57
+        speicher_gb: 128
+        url: https://www.congstar.de/geraete/samsung/samsung-galaxy-a57/?planId=548
+      - geraet: samsung-galaxy-s26-fe
+        speicher_gb: 128
+        url: https://www.congstar.de/geraete/samsung/samsung-galaxy-s26-fe/?planId=548
+      - geraet: samsung-galaxy-s26-plus
+        speicher_gb: 256
+        url: https://www.congstar.de/geraete/samsung/samsung-galaxy-s26-1/?planId=548
+      - geraet: samsung-galaxy-s26-ultra
+        speicher_gb: 1024
+        url: https://www.congstar.de/geraete/samsung/samsung-galaxy-s26-ultra/?planId=548
+      - geraet: samsung-galaxy-z-flip8
+        speicher_gb: 256
+        url: https://www.congstar.de/geraete/samsung/samsung-galaxy-z-flip8/?planId=548
+      - geraet: samsung-galaxy-z-fold8
+        speicher_gb: 256
+        url: https://www.congstar.de/geraete/samsung/samsung-galaxy-z-fold8/?planId=548
+      - geraet: samsung-galaxy-z-fold8-ultra
+        speicher_gb: 256
+        url: https://www.congstar.de/geraete/samsung/samsung-galaxy-z-fold8-ultra/?planId=548
+      - geraet: xiaomi-17-ultra
+        speicher_gb: 512
+        url: https://www.congstar.de/geraete/xiaomi/xiaomi-17-ultra/?planId=548
+      - geraet: xiaomi-17t
+        speicher_gb: 256
+        url: https://www.congstar.de/geraete/xiaomi/xiaomi-17t/?planId=548
+      - geraet: xiaomi-17t-pro
+        speicher_gb: 512
+        url: https://www.congstar.de/geraete/xiaomi/xiaomi-17t-pro/?planId=548
+      - geraet: xiaomi-redmi-17
+        speicher_gb: 128
+        url: https://www.congstar.de/geraete/xiaomi/xiaomi-redmi-17-5g/?planId=548
+      - geraet: xiaomi-redmi-note-17
+        speicher_gb: 128
+        url: https://www.congstar.de/geraete/xiaomi/xiaomi-redmi-note-17-5g/?planId=548
+      - geraet: xiaomi-redmi-note-17-pro
+        speicher_gb: 256
+        url: https://www.congstar.de/geraete/xiaomi/xiaomi-redmi-note-17-pro-5g/?planId=548
+      - geraet: xiaomi-redmi-note-17-pro-max
+        speicher_gb: 256
+        url: https://www.congstar.de/geraete/xiaomi/xiaomi-redmi-note-17-pro-max-5g/?planId=548
+      - geraet: fairphone-6-plus
+        speicher_gb: 256
+        url: https://www.congstar.de/geraete/fairphone/fairphone-gen-6/?planId=548
+      - geraet: motorola-edge-70-fusion
+        speicher_gb: 256
+        url: https://www.congstar.de/geraete/motorola/motorola-edge-70-fusion/?planId=548
+      - geraet: motorola-signature
+        speicher_gb: 512
+        url: https://www.congstar.de/geraete/motorola/motorola-signature/?planId=548
+      - geraet: samsung-galaxy-s25
+        speicher_gb: 128
+        url: https://www.congstar.de/geraete/samsung/samsung-galaxy-s25/?planId=548
+      - geraet: samsung-galaxy-xcover-7-ee
+        speicher_gb: 128
+        url: https://www.congstar.de/geraete/samsung/samsung-galaxy-xcover-7-ee/?planId=548
+      - geraet: xiaomi-redmi-note-15-pro-plus
+        speicher_gb: 256
+        url: https://www.congstar.de/geraete/xiaomi/xiaomi-redmi-note-15-pro-5g/?planId=548
