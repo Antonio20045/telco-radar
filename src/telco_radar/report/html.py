@@ -18,15 +18,13 @@ from bs4 import BeautifulSoup
 from . import anbieter_farben as _anbieter_farben
 from .ausfall import NEWSLETTER_TEIL, Ausfall, ohne_konfiguration
 from . import bilder as report_bilder
-from . import diff_bilder
-from . import differenzierung_bericht
-from . import differenzierung_view
+from . import diff_bilder, differenzierung_bericht
+from . import differenzierung_view, wettbewerb_puls
 from . import geraete_tco_grafik as _geraete_tco_grafik
 from . import fruehwarnung as fruehwarnung_mod
 from . import lieferzeit_view as lieferzeit_view_mod
 from . import luecken as luecken_mod
-from . import newsletter_protokoll
-from . import rechtstexte as rechtstexte_mod
+from . import newsletter_protokoll, rechtstexte as rechtstexte_mod
 from . import seit as seit_mod
 from . import meldungen_seite, startseite as startseite_mod, statik
 from . import verlauf as verlauf_mod
@@ -1304,6 +1302,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
             {
                 "date": report["date"],
                 "highlights": highlights,
+                "ausfall": bool(report.get("redaktion_ausfall")),
                 "competitors": [] if report.get("redaktion_ausfall") else competitors,
             }
         )
@@ -1641,6 +1640,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
         diff_bestand=diff["bestand"],
         theme_label=theme_label_map,
     )
+    wettbewerb_view["puls"] = wettbewerb_puls.aus_ansicht(wettbewerb_view, wochen)
     (site_dir / "wettbewerb.html").write_text(
         env.get_template("wettbewerb.html.j2").render(
             prefix="",
