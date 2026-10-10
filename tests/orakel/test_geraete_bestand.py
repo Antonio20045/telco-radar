@@ -932,6 +932,14 @@ def test_tor_geraete_leitzahl_je_band_am_bestand(gw_seite, modell, band):
             gw_vergleiche(falsch, min_cent, "Gegenprobe")
 
 
+def _gw_modell_ohne_speicher(sku_id: str) -> str:
+    """`samsung-galaxy-xcover-7-ee-ohne-speicher-ohne-farbe` ->
+    `samsung-galaxy-xcover-7-ee`: ohne Speicher trägt die Seite das Gerät
+    ohne Stufe als eigenes Modell (`modell_schluessel`)."""
+    treffer = _PF_OHNE_SPEICHER_RE.match(sku_id or "")
+    return treffer.group("basis") if treffer else ""
+
+
 def _gw_baender_je_modell(tco: dict, blaetter: dict, heute: str) -> tuple[dict, dict]:
     """({modell: Stufen mit irgendeinem neu-Bündel},
     {modell: Stufen mit frischem neu-Bündel und Leitzahl}) - EIGEN."""
@@ -943,7 +951,7 @@ def _gw_baender_je_modell(tco: dict, blaetter: dict, heute: str) -> tuple[dict, 
         if b.get("zustand") != "neu":
             continue
         band = _gw_band_satz(aktuell.get(b.get("tarif_id") or ""), leiter)
-        modell = _pf_modell(b["sku_id"])
+        modell = _pf_modell(b["sku_id"]) or _gw_modell_ohne_speicher(b["sku_id"])
         if not band or not modell:
             continue
         alle.setdefault(modell, set()).add(band)
@@ -1431,6 +1439,7 @@ def test_ein_verfaelschter_schnappschuss_macht_den_pflichtfall_rot(gw_seite, tmp
 
 
 _PF_MODELL_RE = re.compile(r"^(?P<basis>.+)-(?P<gb>\d+)gb(?:-.*)?$")
+_PF_OHNE_SPEICHER_RE = re.compile(r"^(?P<basis>.+?)-ohne-speicher(?:-.*)?$")
 _PF_LAGER_RE = re.compile(r'<div class="gr-bnd-lager" data-modell="')
 _PF_DETAIL_RE = re.compile(
     r'<details class="gr-bnd(?: gr-bnd--leer)?"(.*?)</details>', re.S
