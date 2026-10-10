@@ -37,7 +37,9 @@ def ratenplan_phasen(
 ) -> list[dict]:
     """Die Phase 1 bis ``laufzeit`` zum Tarifpreis ``betrag``, nur mit Beleg."""
     satz = (kombination.get("nachweise") or {}).get(NACHWEIS)
-    if not satz or not isinstance(laufzeit, int) or not _betrag(betrag):
+    if not satz or not isinstance(laufzeit, int) or isinstance(betrag, bool):
+        return []
+    if not isinstance(betrag, int | float):
         return []
     if anbieter == ANBIETER_OHNE_RABATTPHASE:
         return _ohne_rabattphase(satz, laufzeit, betrag)
@@ -60,7 +62,3 @@ def _ohne_rabattphase(satz: str, laufzeit: int, betrag: float) -> list[dict]:
     preis = f"{betrag:.2f}".replace(".", ",")
     beleg = f"prices.recurring: discounted {preis} €, discounts [] (keine Rabattphase)"
     return ganze_ratenlaufzeit(beleg, laufzeit, betrag)
-
-
-def _betrag(wert: object) -> bool:
-    return isinstance(wert, int | float) and not isinstance(wert, bool)
