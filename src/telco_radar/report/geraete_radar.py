@@ -101,7 +101,7 @@ def _grund_anderer_zeitraum(
     """
     monate = karte.get("leitzahl_monate")
     if geraete_laufzeit.nur_ueber_24(karte):
-        lz = karte.get("raten_laufzeit")
+        lz = karte["raten_laufzeit"]
         return geraete_laufzeit.fehlt_satz(anbieter, [karte], lz)
     dieses, gegen = (
         (f"{r} Raten über " if r is not None else "")

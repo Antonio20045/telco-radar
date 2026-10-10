@@ -213,7 +213,7 @@ def _rechung(messung: dict, tarife: dict | None = None) -> dict | None:
             einzeln=b.buendel_monatlich,
         )
     else:
-        t = min(h, tarifmonate(b))
+        t = tarifmonate(b) if h is None else min(h, tarifmonate(b))
         _posten(
             "Tarif",
             kosten.posten.get(f"Tarif über {t} Monate"),
