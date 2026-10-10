@@ -39,7 +39,8 @@ gelesen, Quelle die Produktadresse aus dem Satz, sonst die Übersicht. ``angebot
 hält jedes Gerät, das mit irgendeinem Speicher in einer Übersicht steht (auch in einem
 1&1-Geräteraster). ``nicht_im_angebot`` nennt die Katalog-Geräte außerhalb davon nur,
 wenn alle Übersichten der Datei gelesen und vollständig sind und kein Titel unbekannt
-blieb; sonst ist es ``None`` (unbekannt, nie leer).
+blieb; sonst ist es ``None`` (unbekannt, nie leer). Ein unbekannter erneuerter Titel
+zählt nicht, der Katalog führt nur Neuware (Antonio, 10.10.2026).
 
 Ein Satz einer 1&1-Tarifdetail-Seite (``art`` ``anschluss``) ist kein Rohsatz: sein
 Anschlusspreis kommt auf jeden Produktseiten-Satz mit demselben Tarif-Slug, nur wenn
@@ -185,8 +186,10 @@ def _nimm_uebersicht(
     for roh in uebersicht.get("saetze") or []:
         if roh.get("art") == ART_ANSCHLUSS:
             continue
-        geraet = erkenne_geraet(str(roh.get("titel") or ""), katalog)
-        erkannt = erkannt and geraet is not None
+        titel = str(roh.get("titel") or "")
+        geraet = erkenne_geraet(titel, katalog)
+        neuware = zustand_aus_titel(titel) == ZUSTAND_NEU
+        erkannt = erkannt and (geraet is not None or not neuware)
         ergebnis.angeboten.update([geraet.device_id] if geraet else [])
         if roh.get("art") != ART_RASTER:
             _nimm(ergebnis, uebersicht_rohsatz(roh, uebersicht, daten, katalog))
