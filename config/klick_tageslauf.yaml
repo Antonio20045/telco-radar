@@ -340,9 +340,8 @@ anbieter:
       # data/state/geraete_db.json. Ohne speicher_gb: die Karte klickt jede Speichergröße.
       # `modell` nur, wo 1&1 das Gerät anders nennt als der Katalog (aria-label
       # „Speicherauswahl <Name>“ ist der Kanarienwert).
-      # Benannte Lücke, nicht im Katalog, Umfang legt Antonio fest: HONOR 600,
-      # HONOR Magic V6, HONOR Magic8 Lite, Motorola moto g77, Motorola razr 70,
-      # Samsung Galaxy S25 Edge, Xiaomi REDMI 17C 5G.
+      # HONOR 600 bis Xiaomi REDMI 17C (am Ende) seit Antonios Katalogentscheidung
+      # vom 10.10.2026; Adressen wörtlich aus den Rasterkacheln vom 09.10.2026.
       - geraet: fairphone-6
         modell: "Fairphone (Gen. 6)"
         url: https://mobile.1und1.de/fairphone-6
@@ -408,6 +407,21 @@ anbieter:
       - geraet: xiaomi-redmi-note-17-pro-max
         modell: "Xiaomi REDMI Note 17 Pro Max 5G"
         url: https://mobile.1und1.de/xiaomi-redmi-note-17-pro-max-5g
+      - geraet: honor-600
+        url: https://mobile.1und1.de/honor-600
+      - geraet: honor-magic-v6
+        url: https://mobile.1und1.de/honor-magic-v6
+      - geraet: honor-magic8-lite
+        url: https://mobile.1und1.de/honor-magic8-lite
+      - geraet: motorola-moto-g77
+        url: https://mobile.1und1.de/motorola-moto-g77
+      - geraet: motorola-razr-70
+        url: https://mobile.1und1.de/motorola-razr-70
+      - geraet: samsung-galaxy-s25-edge
+        url: https://mobile.1und1.de/samsung-galaxy-s25-edge
+      - geraet: xiaomi-redmi-17c
+        modell: "Xiaomi REDMI 17C"
+        url: https://mobile.1und1.de/xiaomi-redmi-17c-5g
 
   - schluessel: telekom
     name: Telekom

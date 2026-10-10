@@ -1,7 +1,9 @@
 """Klick-Tageslauf für 1&1: alle 35 Geräte der Übersicht, die im Katalog stehen, dazu
-das iPhone 15, das 1&1 noch verkauft, aber nicht in der Übersicht zeigt (Pitch 3).
+das iPhone 15, das 1&1 noch verkauft, aber nicht in der Übersicht zeigt (Pitch 3), und
+die sieben Neugeräte aus Antonios Katalogentscheidung vom 10.10.2026.
 
-Jede Adresse steht wörtlich im Bestand (``geraete_db.json`` des Schnappschusses);
+Jede Adresse steht wörtlich im Bestand (``geraete_db.json`` des Schnappschusses), die
+der Neugeräte wörtlich in den Rasterkacheln des Klick-Laufs vom 09.10.2026;
 ``modell`` je Seite ersetzt den Katalognamen im Kanarienwert, wo 1&1 das Gerät
 anders nennt.
 """
@@ -31,12 +33,22 @@ ALTE_SEITEN = [
     ("samsung-galaxy-s26-ultra", "https://mobile.1und1.de/samsung-galaxy-s26-ultra"),
     ("google-pixel-11", "https://mobile.1und1.de/google-pixel-11"),
 ]
+NEUE_SEITEN = [
+    ("honor-600", "https://mobile.1und1.de/honor-600"),
+    ("honor-magic-v6", "https://mobile.1und1.de/honor-magic-v6"),
+    ("honor-magic8-lite", "https://mobile.1und1.de/honor-magic8-lite"),
+    ("motorola-moto-g77", "https://mobile.1und1.de/motorola-moto-g77"),
+    ("motorola-razr-70", "https://mobile.1und1.de/motorola-razr-70"),
+    ("samsung-galaxy-s25-edge", "https://mobile.1und1.de/samsung-galaxy-s25-edge"),
+    ("xiaomi-redmi-17c", "https://mobile.1und1.de/xiaomi-redmi-17c-5g"),
+]
 ANBIETERNAMEN = {
     "fairphone-6": "Fairphone (Gen. 6)",
     "samsung-galaxy-s26-plus": "Samsung Galaxy S26+",
     "xiaomi-redmi-note-17": "Xiaomi REDMI Note 17 5G",
     "xiaomi-redmi-note-17-pro": "Xiaomi REDMI Note 17 Pro 5G",
     "xiaomi-redmi-note-17-pro-max": "Xiaomi REDMI Note 17 Pro Max 5G",
+    "xiaomi-redmi-17c": "Xiaomi REDMI 17C",
 }
 
 
@@ -63,15 +75,17 @@ def _nicht_im_bestand(adressen: list[str]) -> list[str]:
 def test_1und1_liest_alle_35_geraete_der_uebersicht(einsundeins):
     seiten = einsundeins.seiten
 
-    assert len(seiten) == 36
+    assert len(seiten) == 43
     assert {urlsplit(s.adresse).hostname for s in seiten} == {"mobile.1und1.de"}
-    assert len({s.geraet for s in seiten}) == 36
+    assert len({s.geraet for s in seiten}) == 43
+    assert [(s.geraet, s.adresse) for s in seiten[-7:]] == NEUE_SEITEN
     assert [(s.geraet, s.adresse) for s in seiten[:6]] == ALTE_SEITEN
     assert all(s.speicher_gb == 256 for s in seiten[:6])
 
 
 def test_jede_1und1_adresse_steht_woertlich_im_bestand(einsundeins):
-    adressen = [s.adresse for s in einsundeins.seiten]
+    neu = {a for _, a in NEUE_SEITEN}
+    adressen = [s.adresse for s in einsundeins.seiten if s.adresse not in neu]
     erfunden = "https://mobile.1und1.de/iphone-99-pro"
 
     assert _nicht_im_bestand(adressen) == []

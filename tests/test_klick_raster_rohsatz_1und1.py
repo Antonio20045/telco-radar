@@ -147,7 +147,7 @@ def test_speicher_passt_keine_groesse_ist_luecke(katalog):
     aus = ausbeute(daten, katalog)
 
     assert rastersaetze(aus, "samsung-galaxy-s26-ultra") == []
-    assert aus.luecken["buendel_mit_zubehoer"] == 25
+    assert aus.luecken["buendel_mit_zubehoer"] == 32
     assert aus.luecken["speicher_unbekannt"] == 11
 
 
@@ -167,8 +167,8 @@ def test_ohne_produktseite_ist_speicher_luecke(katalog):
 
     assert aus.rohsaetze == []
     assert aus.luecken["speicher_unbekannt"] == 11
-    assert aus.luecken["buendel_mit_zubehoer"] == 25
-    assert aus.luecken["geraet_unbekannt"] == 7
+    assert aus.luecken["buendel_mit_zubehoer"] == 32
+    assert aus.luecken["geraet_unbekannt"] == 0
     assert sum(aus.luecken.values()) == 43
 
 
@@ -345,12 +345,17 @@ def test_rastergeraet_ist_angeboten(katalog):
 
 
 def test_unbekanntes_rastergeraet_laesst_angebot_offen(katalog):
-    daten = klickdatei([], _ganz(raster(RASTER[0])), _ganz(raster(RASTER[1])))
+    voll = _ganz(raster(RASTER[0]))
+    fremd = {**voll["saetze"][0], "titel": "Phantasiefon 9"}
+    mit_fremdem = {**voll, "saetze": [*voll["saetze"], fremd]}
+    daten = klickdatei([], mit_fremdem, _ganz(raster(RASTER[1])))
+    ohne = klickdatei([], voll, _ganz(raster(RASTER[1])))
 
     aus = ausbeute(daten, katalog)
 
     assert "apple-iphone-18-pro" in aus.angeboten
     assert aus.nicht_im_angebot is None
+    assert ausbeute(ohne, katalog).nicht_im_angebot is not None
 
 
 def test_anschlussseite_zaehlt_nicht_als_geraet(katalog):

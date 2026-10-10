@@ -781,3 +781,140 @@ geraete:
     aliase: ["Fairphone (Gen.6)"]
     speicher: [256]
     segment: mid
+
+  # ---------------------------------------------------------------------------
+  # Neuware, die 1&1 oder die Telekom am 09.10.2026 führten und die hier fehlte
+  # (Titel ohne Katalogtreffer in data/state/klick/1und1.json und telekom.json).
+  # Antonio, Entscheidungskarte 10.10.2026: „Nur Neuware“ - alle außer erneuerten
+  # Geräten (iPhone 13 Erneuert Basic bleibt draußen). Speicher: Telekom-Größen
+  # abgelesen, 1&1-Größen weit gefasst (der Speicher ist nur ein Filter, und die
+  # 1&1-Raster nennen keine Größe). Motorola x8 kam in keinem Klick-Lauf vor.
+  - hersteller: HONOR
+    modell: HONOR 600
+    generation: 600
+    speicher: [256, 512]
+    segment: mid
+
+  - hersteller: HONOR
+    modell: HONOR Magic V6
+    generation: 6
+    speicher: [256, 512, 1024]
+    segment: flagship
+
+  - hersteller: HONOR
+    modell: HONOR Magic8 Lite
+    generation: 8
+    speicher: [128, 256, 512]
+    segment: mid
+
+  - hersteller: Motorola
+    modell: Motorola moto g77
+    generation: 77
+    speicher: [128, 256]
+    segment: mid
+
+  - hersteller: Motorola
+    modell: Motorola moto g37
+    generation: 37
+    speicher: [128]
+    segment: entry
+
+  - hersteller: Motorola
+    modell: Motorola razr 70
+    generation: 70
+    speicher: [256, 512]
+    segment: premium
+
+  - hersteller: Motorola
+    modell: Motorola razr fold
+    aliase: ["Motorola razr fold FIFA Edition"]
+    speicher: [512]
+    segment: flagship
+
+  - hersteller: Motorola
+    modell: Motorola edge 70
+    generation: 70
+    speicher: [512]
+    segment: premium
+
+  - hersteller: Motorola
+    modell: Motorola edge 70 fusion
+    generation: 70
+    aliase: ["Motorola edge 70 fusion FIFA Edition"]
+    speicher: [256]
+    segment: mid
+
+  - hersteller: Motorola
+    modell: Motorola edge 60 neo
+    generation: 60
+    speicher: [256]
+    segment: mid
+
+  - hersteller: Motorola
+    modell: Motorola signature
+    speicher: [512]
+    segment: flagship
+
+  - hersteller: Samsung
+    modell: Galaxy S25 Edge
+    generation: 25
+    speicher: [256, 512]
+    segment: flagship
+
+  - hersteller: Samsung
+    modell: Galaxy A26
+    generation: 26
+    speicher: [128, 256]
+    segment: entry
+
+  - hersteller: Samsung
+    modell: Galaxy XCover7
+    generation: 7
+    aliase: ["Galaxy XCover7 Enterprise Edition"]
+    speicher: [128]
+    segment: entry
+
+  - hersteller: Samsung
+    modell: Galaxy XCover7 Pro
+    generation: 7
+    aliase: ["Galaxy XCover7 Pro Enterprise Edition"]
+    speicher: [128]
+    segment: entry
+
+  - hersteller: Telekom
+    modell: T Phone 3
+    generation: 3
+    speicher: [128]
+    segment: entry
+
+  - hersteller: Telekom
+    modell: T Phone 3 Pro
+    generation: 3
+    speicher: [256]
+    segment: mid
+
+  - hersteller: Xiaomi
+    modell: Xiaomi 15T
+    generation: 15
+    speicher: [256, 512]
+    segment: premium
+
+  - hersteller: Xiaomi
+    modell: Redmi Note 15 Pro Plus
+    generation: 15
+    aliase: ["Redmi Note 15 Pro+"]
+    speicher: [256, 512]
+    segment: mid
+
+  - hersteller: Xiaomi
+    modell: Redmi 17C
+    generation: 17
+    speicher: [64, 128, 256]
+    segment: entry
+
+  - hersteller: Fairphone
+    modell: Fairphone 6 Plus
+    generation: 6
+    aliase: ["Fairphone (Gen. 6+)"]
+    speicher: [256]
+    segment: mid
