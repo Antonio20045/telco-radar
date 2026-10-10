@@ -84,7 +84,7 @@ def test_tageslauf_wartet_zwischen_den_seiten_den_seitenabstand(telekom, karte):
         "telekom.yaml",
         crawle,
         HEUTE,
-        10_000.0,
+        1_000_000.0,
         gelesen={},
         uhr=uhr,
         schlafe=uhr.schlafe,
