@@ -8,7 +8,7 @@ verdrängt seine Fehlzeile.
 
 from __future__ import annotations
 
-from telco_radar.analyze.klick_erfassung import SATZ_NICHT_IM_ANGEBOT
+from telco_radar.analyze.klick_erfassung import SATZ_NICHT_IM_ANGEBOT, SATZ_SPEICHER
 from telco_radar.report.geraete_luecken import (
     NICHT_IM_ANGEBOT,
     NOCH_NICHT_ERFASST,
@@ -64,6 +64,17 @@ def test_alternative_baender_stehen_mit_betrag_an_der_zeile():
     )
     (zeile,) = fehlzeilen([lu], {"l": {"label": "L"}}, 24)
     assert zeile["kurz"] == "Nur in anderen Bändern: L 1.234,50 €"
+
+
+def test_nur_mit_anderem_speicher_gelesen_steht_kurz_an_der_zeile():
+    erfassung = {
+        "Telekom": SATZ_SPEICHER.format(
+            anbieter="Telekom", speicher="256 GB", datum="10.10.2026"
+        )
+    }
+    (zeile,) = fehlzeilen([_luecke("Telekom")], {}, 24, erfassung)
+    assert zeile["kurz"] == "Nur mit 256 GB gelesen"
+    assert zeile["satz"] == erfassung["Telekom"]
 
 
 def _paar(band: str, laufzeit: int, fehlen: list) -> dict:

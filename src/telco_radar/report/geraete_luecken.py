@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import re
 
-from ..analyze.klick_erfassung import SATZ_NICHT_IM_ANGEBOT
+from ..analyze.klick_erfassung import SATZ_NICHT_IM_ANGEBOT, SATZ_SPEICHER
 from ..tco_model import TCO_HORIZONT, zeitraum_vergleichbar
 from . import geraete_notbremse as notbremse
 from .anbieter_farben import farbe_fuer
@@ -201,6 +201,12 @@ _NICHT_IM_ANGEBOT_MUSTER = re.compile(
     .replace(re.escape("{anbieter}"), ".+")
     .replace(re.escape("{datum}"), ".+")
 )
+_SPEICHER_MUSTER = re.compile(
+    re.escape(SATZ_SPEICHER)
+    .replace(re.escape("{anbieter}"), ".+")
+    .replace(re.escape("{speicher}"), "(?P<speicher>.+)")
+    .replace(re.escape("{datum}"), ".+")
+)
 _KURZ = {
     "anderes-band": "Nur in anderen Bändern",
     "anderer-zeitraum": "Nur über eine andere Laufzeit",
@@ -221,6 +227,8 @@ def _fehlzeile(lu: dict, band_labels: dict, h: int, erfassung: dict) -> dict:
         satz = erfassung.get(anbieter)
         if satz and _NICHT_IM_ANGEBOT_MUSTER.fullmatch(satz):
             return _zeile(lu, NICHT_IM_ANGEBOT, satz)
+        if satz and (treffer := _SPEICHER_MUSTER.fullmatch(satz)):
+            return _zeile(lu, f"Nur mit {treffer['speicher']} gelesen", satz)
         satz = satz or KEIN_ANGEBOT_GELESEN.format(anbieter=anbieter)
         return _zeile(lu, NOCH_NICHT_ERFASST, satz)
     if grund == "nicht-erfasst":
