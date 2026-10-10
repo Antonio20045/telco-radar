@@ -7,7 +7,8 @@ wandelt einen Wert in den Typ seines Felds: Betrag, Ganzzahl, Volumen in GB (``-
 heißt unbegrenzt, o2) oder eine Phase ohne Ende, aus einer Liste von Posten die
 Phasen wie im Text (o2 ``priceSummary.recurringChargesListEntries`` mit der Zeile „ab
 dem 25. Monat: 29,99 €“); Bündelfelder (1&1, freenet) sind
-Beträge in ``Antwortlesung.buendel``; ``einheit`` rechnet Cent in Euro
+Beträge in ``Antwortlesung.buendel``, Nachweise Wortlaute in
+``Antwortlesung.nachweise``; ``einheit`` rechnet Cent in Euro
 (1&1) und MB in GB (o2). Eine Laufzeit gilt nur als Monatsangabe („24 Monate“, „24 x“
 oder reine Zahl), sonst ist sie ``None``; ``muster`` eines Pfads nimmt sie aus anderem
 Text (o2 „24xhigh“). Markup in Varianten fällt weg (o2 „O<sub>2</sub>“). Fehlt ein
@@ -22,13 +23,13 @@ import binascii
 import math
 import re
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
 from urllib.parse import parse_qs, urlsplit
 
 from ...tarif_model import Preisphase, zahl
 from .klickkarte import PHASENFELD, Antwortmuster, Phasenpfad, Wertpfad
-from .klickkartentypen import BUENDELFELDER, EINHEIT_CENT, EINHEIT_MB
+from .klickkartentypen import BUENDELFELDER, EINHEIT_CENT, EINHEIT_MB, NACHWEISFELDER
 from .klickoptionen import wert_nach_muster
 from .klickpfad import am_pfad, ohne_markup, vergleichbar
 from .klicktext import (
@@ -54,11 +55,13 @@ _SUMME = re.compile(r"\s*(\d+)\s*\+\s*(\d+)\s*")
 
 @dataclass(frozen=True)
 class Antwortlesung:
-    """Werte der Antwort und die Variante, die sie nennt (nur abgebildete Teile)."""
+    """Werte der Antwort und die Variante, die sie nennt (nur abgebildete Teile);
+    ``nachweise`` hält je gelesenem Nachweisfeld seinen Wortlaut."""
 
     werte: Preiswerte
     variante: Mapping[str, str | int | None]
     buendel: Buendelwerte = Buendelwerte()
+    nachweise: Mapping[str, str] = field(default_factory=dict)
 
 
 def lies_antwort(
@@ -86,6 +89,7 @@ def lies_antwort(
         feld: _feldwert(feld, nutzlast, pfad, platz)
         for feld, pfad in muster.pfade.items()
     }
+    nachweise = {f: gelesen.pop(f) for f in NACHWEISFELDER if f in gelesen}
     werte = {f: w for f, w in gelesen.items() if f not in BUENDELFELDER}
     buendel = {f: w for f, w in gelesen.items() if f in BUENDELFELDER}
     frage = adressparameter(url, muster.segment)
@@ -99,7 +103,12 @@ def lies_antwort(
             for d, pfad in muster.variante.items()
         }
     )
-    return Antwortlesung(Preiswerte(**werte), variante, Buendelwerte(**buendel))
+    return Antwortlesung(
+        Preiswerte(**werte),
+        variante,
+        Buendelwerte(**buendel),
+        {f: w for f, w in nachweise.items() if w is not None},
+    )
 
 
 def adressparameter(url: str | None, segment: re.Pattern[str] | None) -> dict[str, str]:
@@ -127,7 +136,10 @@ def adressparameter(url: str | None, segment: re.Pattern[str] | None) -> dict[st
 
 
 def feldwert(feld: str, roh: object, einheit: str | None = None) -> object:
-    """Ein Wert als Typ seines Felds: Betrag, Ganzzahl, Volumen in GB oder Phase."""
+    """Ein Wert als Typ seines Felds: Betrag, Ganzzahl, Volumen in GB, Phase oder
+    der Wortlaut eines Nachweises in einer Zeile."""
+    if feld in NACHWEISFELDER:
+        return als_text(" ".join(str(roh).split())) if isinstance(roh, str) else None
     if feld == PHASENFELD and isinstance(roh, list):
         return phasen_aus_text(_postenzeilen(roh))
     if feld == PHASENFELD:

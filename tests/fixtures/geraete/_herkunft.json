@@ -826,6 +826,19 @@
       "gzip": false,
       "bytes_abgelegt": 63715,
       "hinweis": "Feld koerper des Mitschnitteintrags unveraendert (gekuerzt false); schon im Mitschnitt von klickspur.schwaerze_text geschwaerzt ('[Cookie entfernt]', 'ENTFERNT'), darum 63715 statt groesse 63927 Byte und nicht byteidentisch mit der Leitung; sha256_roh gilt fuer den abgelegten Text. Preise MIT 'Telekom Rueckgabedeal' (Schalter span.dt_switch.forwardTradeInSwitch aria-checked=true, bedienelemente-1.json Element 52): 35 Raten plus Restzahlung buyBackPrice. Beleg fuer collect/geraete/telekom_liste.py (tests/test_klick_uebersicht_liste.py)."
+    },
+    {
+      "datei": "klick_ergebnisse_20261010.json.gz",
+      "url": "https://www.o2online.de/e-shop/ , https://www.congstar.de/geraete/ , https://mobile.1und1.de/ , https://www.telekom.de/shop/ , https://www.vodafone.de/ (Produktseiten aus config/klick_tageslauf.yaml)",
+      "quelle": "Commit 6a0ab4f5, data/state/klick/o2.json, congstar.json, 1und1.json, telekom.json und vodafone.json (Ergebnisdateien des Klick-Tageslaufs klick.yml vom 10.10.2026)",
+      "abgerufen_am": "2026-10-10",
+      "http_status": 200,
+      "content_type": "application/json",
+      "bytes_roh": 1350300,
+      "sha256_roh": "25a9c9e79f7195ff5a3adaae46e3e2f0b940e9c7014c33c49c227616a2681eb0",
+      "gzip": true,
+      "bytes_abgelegt": 85693,
+      "hinweis": "Die fünf Ergebnisdateien unverändert als ein JSON-Objekt {Name: Datei}, Schlüssel sortiert. Ergebnisdateien vor dem Kanal Nachweise: keine Kombination trägt nachweise. Beleg für tests/test_klick_ratenplan.py (alte Dateien lesbar, keine neuen Lücken, 120 o2-Kombinationen mit Tarifcode -hwv-<n>m-)."
     }
   ]
 }

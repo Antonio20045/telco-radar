@@ -2,7 +2,8 @@
 
 Ergänzt ``klickkartenleser`` um die Teile von Format 2, die ``klickkarte`` beschreibt:
 ``antwort`` als eine Quelle oder Liste von Quellen, ``seite`` mit benannten
-Seitenwerten und ``zusammenfassung.muster`` je Wertfeld. Jeder Pfad wird auf Form
+Seitenwerten und ``zusammenfassung.muster`` je Wertfeld; ``pfade`` nennen dazu Nachweise
+(``NACHWEISFELDER``), die nur die Antwort trägt. Jeder Pfad wird auf Form
 (``klickpfad.pfadfehler``) und Platzhalter geprüft; ein Fehler wirft
 ``KlickkartenFehler`` mit Punktpfad. ``platzhalter`` einer Quelle sind benannte Pfade,
 die nur die Platzhalter der Kombination tragen und keinen anderen Namen verdecken;
@@ -33,6 +34,7 @@ from .klickkartentypen import (
     GRUND_PLATZHALTER,
     GRUND_SEITENWERT,
     GRUND_WAHRHEITSWERT,
+    NACHWEISFELDER,
     PHASENFELD,
     PHASENTEILE,
     PLATZHALTER_MODELL,
@@ -68,6 +70,7 @@ GRUND_PFAD = "kein gültiger Pfad"
 GRUND_GLOBAL = "kein Bezeichner einer globalen Variable"
 GRUND_KEIN_SEITENWERT = "kein Seitenwert dieses Namens"
 FELDER = (*WERTFELDER, *BUENDELFELDER)
+ANTWORTFELDER = (*FELDER, *NACHWEISFELDER)
 _NAME = re.compile(r"[a-z_][a-z0-9_]*")
 _GLOBAL = re.compile(r"[A-Za-z_$][\w$]*")
 
@@ -172,7 +175,7 @@ def _quelle(
     for nur in ("laden", "segment"):
         if url is None and daten.get(nur) is not None:
             raise leser.fehler(f"{feld}.{nur}", GRUND_NUR_URL)
-    pfade = leser.zuordnung(daten.get("pfade"), f"{feld}.pfade", FELDER)
+    pfade = leser.zuordnung(daten.get("pfade"), f"{feld}.pfade", ANTWORTFELDER)
     if not pfade:
         raise leser.fehler(f"{feld}.pfade", GRUND_FEHLT)
     erkennung = leser.wahlweise_text(daten, "erkennung", feld)

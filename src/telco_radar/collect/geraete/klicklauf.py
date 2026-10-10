@@ -39,6 +39,7 @@ nie 0.
 from __future__ import annotations
 
 import re
+from collections.abc import Mapping
 from dataclasses import dataclass, field, replace
 from typing import TYPE_CHECKING
 
@@ -158,6 +159,8 @@ class Kombiergebnis:
     ``antwortbuendel``, die beiden Lesungen der Bündelwerte. ``diagnose`` hat nur eine
     Kachel des Weiter-Schritts (``klickdiagnose``); ``echo_quelle`` nennt die Quelle,
     die statt der zweiten Lesung bestätigt hat (``klickkachel.QUELLE_KACHEL``).
+    ``nachweise`` sind die Wortlaute der Antwort (``klickkarte.NACHWEISFELDER``) einer
+    erfassten Kombination, sonst leer.
     """
 
     variante: Variante
@@ -179,6 +182,7 @@ class Kombiergebnis:
     antwortbuendel: Buendelwerte | None = None
     diagnose: Diagnose | None = None
     echo_quelle: str | None = None
+    nachweise: Mapping[str, str] = field(default_factory=dict)
 
     @property
     def gueltig(self) -> bool:

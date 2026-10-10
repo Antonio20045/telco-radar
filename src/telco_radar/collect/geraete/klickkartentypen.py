@@ -22,6 +22,9 @@ WERTFELDER = (
     "volumen_gb",
 )
 BUENDELFELDER = ("buendelbetrag", "einmalzahlung")
+NACHWEISFELDER = ("ratenplan",)
+"""Wortlaute nur aus der Antwort, kein Wertfeld: weder Echo noch Lesefeld noch Beleg.
+``ratenplan`` ist der Satz, der den Tarifpreis an die Ratenlaufzeit bindet (o2)."""
 EIN_VERTRAG = "ein_vertrag"
 VERTRAGSFORMEN = ("tarif_plus_ratenkauf", EIN_VERTRAG)
 ENTFALLEN_IM_BUENDEL = ("rate", "ratenzahl")

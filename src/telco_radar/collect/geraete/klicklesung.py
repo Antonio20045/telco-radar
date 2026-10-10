@@ -33,7 +33,15 @@ from typing import TYPE_CHECKING
 from playwright.sync_api import Error as PlaywrightFehler
 
 from .klickbeleg import Belegquelle, baue_beleg
-from .klickecho import KEINE_AUSWAHL, Befund, Echo, Variante, pruefe_echo, variante_aus
+from .klickecho import (
+    KEINE_AUSWAHL,
+    Antwortlesung,
+    Befund,
+    Echo,
+    Variante,
+    pruefe_echo,
+    variante_aus,
+)
 from .klickhar import Antwortkopie
 from .klickkachel import (
     QUELLE_KACHEL,
@@ -51,6 +59,7 @@ from .klickkarte import (
 )
 from .klicklauf import (
     BEFUND,
+    ERFASST,
     NICHT_ERFASST,
     Klicklauf,
     Kombiergebnis,
@@ -258,6 +267,7 @@ class Leser(Textleser):
             textbuendel=textbuendel,
             antwortbuendel=antwortbuendel,
             echo_quelle=None if kachel is None or echo.befunde else QUELLE_KACHEL,
+            nachweise=_nachweise(status, zweite.lesung),
         )
 
     def belege(
@@ -358,3 +368,10 @@ class Leser(Textleser):
 
 def _pfad(pfad: str | Wertpfad) -> str:
     return pfad if isinstance(pfad, str) else pfad.pfad
+
+
+def _nachweise(status: str, lesung: Antwortlesung | None) -> dict[str, str]:
+    """Die Nachweise der Antwort, nur für eine erfasste Kombination."""
+    if status != ERFASST or lesung is None:
+        return {}
+    return dict(lesung.nachweise)

@@ -79,6 +79,11 @@ antwort:
       anschluss: 'priceSummary.nonRecurringChargesListEntries[description=einmaliger Anschlusspreis].amount'
       # „-1“ unbegrenzt, „153600+“ = 150 GB (M1 Nr. 133, 135, 138)
       volumen_gb: {pfad: 'tariff.tariffOptions[selected=true].dataVolumeMbNumeric', einheit: mb}
+      # Pitch 3 (10.10.2026): Satz des Ratenplan-Hinweises, gemessen am 07.10.2026
+      # (ratenlaufzeit.py); mit dem Tarifcode "-hwv-<n>m-" Beleg für Monat 1 bis n.
+      ratenplan:
+        pfad: hardware.contents.selectedHardwareRateDurationModal.infoBody
+        muster: '([^.<>]*über die gesamte Laufzeit deines Geräte-Ratenplans[^.<>]*Rabatt auf deinen Tarif\.)'
     variante: &variante
       # „256 GB“, „24 Monate“, „O<sub>2</sub> Mobile Unlimited L Plus mit 300 MBit/s“
       speicher: 'hardware.storageOptions[selected=true].displayValue'

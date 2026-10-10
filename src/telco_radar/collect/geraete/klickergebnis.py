@@ -75,7 +75,8 @@ STAND_FORMAT = 1
 def kombination_als_daten(ergebnis: Kombiergebnis) -> dict:
     """Eine Kombination als JSON ohne Screenshot, Text und Belegdateien; eine Kachel
     des Weiter-Schritts mit ``diagnose`` (``klickdiagnose``), eine aus der Kachel
-    bestätigte mit ``echo_quelle``."""
+    bestätigte mit ``echo_quelle``, eine mit Wortlauten der Antwort mit
+    ``nachweise``."""
     beleg = ergebnis.beleg.beleg if ergebnis.beleg is not None else None
     url = ergebnis.antwort_url
     daten = {
@@ -101,6 +102,8 @@ def kombination_als_daten(ergebnis: Kombiergebnis) -> dict:
         daten["diagnose"] = diagnose_als_daten(ergebnis.diagnose)
     if ergebnis.echo_quelle is not None:
         daten["echo_quelle"] = ergebnis.echo_quelle
+    if ergebnis.nachweise:
+        daten["nachweise"] = dict(ergebnis.nachweise)
     return daten
 
 

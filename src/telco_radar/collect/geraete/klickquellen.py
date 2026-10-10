@@ -8,9 +8,9 @@ Antwort als xhr und fetch); JSON in einem Skript der Seite (o2 ``script#pageValu
 oder globale Variablen (1&1 ``hwdVariantsPrices``) oder die benannten Seitenwerte
 (Telekom: ``aria-label`` des gewählten Laufzeitknopfs, wenn ``/v2/details`` fehlt).
 Eine ``start``-Quelle gilt nur, solange niemand geklickt hat. Die Werte liest
-``klickecho.lies_antwort`` mit den Platzhaltern der Kombination; je Wertfeld zählt
-die erste Quelle mit einem Wert, je Dimension müssen alle Quellen dieselbe Variante
-nennen, sonst ist sie mehrdeutig.
+``klickecho.lies_antwort`` mit den Platzhaltern der Kombination; je Wertfeld und je
+Nachweis zählt die erste Quelle mit einem Wert, je Dimension müssen alle Quellen
+dieselbe Variante nennen, sonst ist sie mehrdeutig.
 
 Für den Beleg nimmt der Leser die eine Antwort, aus der alle Werte stammen; kommen sie
 aus mehreren Quellen oder aus der Seite, ist der Mitschnitt eine Lesung: JSON der
@@ -46,6 +46,7 @@ from .klickkarte import (
     Antwortmuster,
     Klickkarte,
 )
+from .klickkartentypen import NACHWEISFELDER
 from .klickoptionen import wert_nach_muster
 from .klickpfad import am_pfad
 from .klicktext import Buendelwerte, Preiswerte
@@ -290,8 +291,14 @@ def _vereint(lesungen: list[Antwortlesung]) -> Antwortlesung:
         elif verschieden:
             liste = " | ".join(str(w) for w in verschieden)
             variante[dimension] = f"{MEHRDEUTIG}: {liste}"
+    nachweise = {
+        f: w
+        for f in NACHWEISFELDER
+        if (w := next((x.nachweise[f] for x in lesungen if f in x.nachweise), None))
+    }
     return Antwortlesung(
         Preiswerte(**{f: werte[f] for f in WERTFELDER}),
         variante,
         Buendelwerte(**{f: werte[f] for f in BUENDELFELDER}),
+        nachweise,
     )

@@ -14,7 +14,8 @@ als Zuzahlung, wenn keine Anzahlung gelesen ist. Tarifphasen werden zu Bündelph
 (``tarif_model.Buendelphase``) mit dem Beleg als Wortlaut. Eine offene letzte Phase
 („ab dem 25. Monat …“) bleibt offen (``bis_monat`` ``None``): ihr Ende steht nicht
 auf der Seite, und ``buendelphasen_aus`` lässt sie mit Protokoll fallen; ein einzelner
-Preis ohne Phasen ist keine. Quelle ist die Seitenadresse des Belegs, sonst die Adresse
+Preis ohne Phasen ist keine, außer der Ratenplan-Beleg (``klickratenplan``) bindet ihn
+bis zur letzten Rate. Quelle ist die Seitenadresse des Belegs, sonst die Adresse
 der Produktseite; ``quelle_art`` ist ``klick``. Eine ``herleitung`` trägt ein
 Klick-Satz nur mit übernommenem Wert (``klickraster.HERLEITUNG_SCHLUSSZAHLUNG``).
 
@@ -76,6 +77,7 @@ from .klicklauf import (
 )
 from .klickpfad import ohne_markup
 from .klickraster import ART_RASTER, raster_roh
+from .klickratenplan import ratenplan_phasen
 
 log = logging.getLogger(__name__)
 
@@ -333,7 +335,7 @@ def rohsatz(
         "abgerufen_am": daten.get("datum"),
         **_preise(werte, kombination.get("buendel"), daten.get("vertragsform")),
     }
-    satz["tarif_phasen"] = _phasen(werte, satz)
+    satz["tarif_phasen"] = _phasen(werte, satz, kombination)
     if all(satz.get(f) is None for f in PREISFELDER):
         return LUECKE_OHNE_PREIS
     return satz
@@ -367,14 +369,17 @@ def _ab_monat_eins(phasen: object) -> float | None:
     return None
 
 
-def _phasen(werte: dict, satz: dict) -> list[dict]:
+def _phasen(werte: dict, satz: dict, kombination: dict) -> list[dict]:
     """Bündelphasen wie gelesen, eine offene bleibt offen; ein einzelner offener Preis
-    ab Monat 1 ist keine."""
+    ab Monat 1 ist keine, außer mit Ratenplan-Beleg (``klickratenplan``)."""
     roh = werte.get("tarifphasen")
     if satz.get("buendel_monatlich") is not None or not isinstance(roh, list):
         return []
     if len(roh) == 1 and roh[0][1] is None:
-        return []
+        if roh[0][0] != 1:
+            return []
+        laufzeit, betrag = satz["laufzeit_monate"], roh[0][2]
+        return ratenplan_phasen(satz["anbieter"], kombination, laufzeit, betrag)
     beleg = f"Klick-Beleg {satz['beleg_id'] or satz['quelle_url']}"
     return [
         {"von_monat": von, "bis_monat": bis, "betrag": betrag, "beleg": beleg}
