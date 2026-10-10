@@ -839,6 +839,19 @@
       "gzip": true,
       "bytes_abgelegt": 85693,
       "hinweis": "Die fünf Ergebnisdateien unverändert als ein JSON-Objekt {Name: Datei}, Schlüssel sortiert. Ergebnisdateien vor dem Kanal Nachweise: keine Kombination trägt nachweise. Beleg für tests/test_klick_ratenplan.py (alte Dateien lesbar, keine neuen Lücken, 120 o2-Kombinationen mit Tarifcode -hwv-<n>m-)."
+    },
+    {
+      "datei": "congstar_tarifpreise_20261007.json.gz",
+      "url": "https://www.congstar.de/webshop-graphql/graphql",
+      "quelle": "Zweig klick-erkundung, Commit 3d128090, erkundung/congstar/2026-10-07/mitschnitt-1.json, antworten[0] (Anfrage-Nummer 53, POST, fetch, gekuerzt false; Klick-Erkundung 07.10.2026, Seite Apple iPhone 17 Pro)",
+      "abgerufen_am": "2026-10-07",
+      "http_status": 200,
+      "content_type": "application/json",
+      "bytes_roh": 11501,
+      "sha256_roh": "9079eea6f1b16dcb94b887ecdad8e56a0ba8900c1acebd4324b28e2d90bdf768",
+      "gzip": true,
+      "bytes_abgelegt": 1328,
+      "hinweis": "AUSZUG, nicht byteidentisch: data.plans[].variants[] nur mit id, title und prices.recurring, Werte unveraendert. Alle acht Tarife mit discounts [] und listed = discounted. Beleg fuer den Nachweis ratenplan der Klick-Karte congstar (tests/test_klick_ratenplan_congstar.py)."
     }
   ]
 }

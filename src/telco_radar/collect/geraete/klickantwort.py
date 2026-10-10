@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import base64
 import binascii
+import json
 import math
 import re
 from collections.abc import Mapping
@@ -137,9 +138,9 @@ def adressparameter(url: str | None, segment: re.Pattern[str] | None) -> dict[st
 
 def feldwert(feld: str, roh: object, einheit: str | None = None) -> object:
     """Ein Wert als Typ seines Felds: Betrag, Ganzzahl, Volumen in GB, Phase oder
-    der Wortlaut eines Nachweises in einer Zeile."""
+    der Wortlaut eines Nachweises in einer Zeile (Liste oder Zuordnung als JSON)."""
     if feld in NACHWEISFELDER:
-        return als_text(" ".join(str(roh).split())) if isinstance(roh, str) else None
+        return _nachweis(roh)
     if feld == PHASENFELD and isinstance(roh, list):
         return phasen_aus_text(_postenzeilen(roh))
     if feld == PHASENFELD:
@@ -267,6 +268,13 @@ def als_text(roh: object) -> str | None:
     if not text:
         return None
     return text
+
+
+def _nachweis(roh: object) -> str | None:
+    """Ein Nachweis als Text in einer Zeile; eine Liste oder Zuordnung als JSON."""
+    if isinstance(roh, list | dict):
+        return json.dumps(roh, ensure_ascii=False, sort_keys=True)
+    return als_text(" ".join(roh.split())) if isinstance(roh, str) else None
 
 
 def _skalar(roh: object) -> str | None:

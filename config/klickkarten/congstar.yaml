@@ -129,6 +129,9 @@ antwort:
       anschluss: 'data.plans.*.variants[id={plan}].prices.activation.discounted'
       tarifbindung: 'data.plans.*.variants[id={plan}].minimumContractDuration'
       volumen_gb: 'data.plans.*.variants[id={plan}].contingents[type=DATA_VOLUME].discountedAmount'
+      # Pitch 3 (10.10.2026): Rabatte des Tarifpreises; leer heißt keine Rabattphase und
+      # ist der Beleg für den Tarifpreis bis zur letzten Rate (klickratenplan.py).
+      ratenplan: 'data.plans.*.variants[id={plan}].prices.recurring.discounts'
     variante:
       tarif: 'data.plans.*.variants[id={plan}].title'
   # Gerätepreise je PlanVariant und Gerätevariante (M1 Nr. 64, M2 Nr. 65): Zahlweise ohne
