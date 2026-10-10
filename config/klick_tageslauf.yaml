@@ -452,6 +452,152 @@ anbieter:
       - geraet: apple-iphone-17
         speicher_gb: 256
         url: https://www.telekom.de/shop/geraet/apple/apple-iphone-17/lavendel-256-gb?tariffId=MF_17791&categoryId=smartphones
+      # 10.10.2026: je Gerät mit mehreren Speichern die Produktseite im Tarif M, Pfad
+      # wörtlich aus der Übersicht vom 10.10.; die Rotation liest sie im Wechsel.
+      - geraet: apple-iphone-18-pro
+        speicher_gb: 256
+        url: https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro/polar-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: apple-iphone-17-pro-max
+        speicher_gb: 256
+        url: https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro-max/cosmic-orange-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: apple-iphone-18-pro-max
+        speicher_gb: 256
+        url: https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: samsung-galaxy-s26-ultra
+        speicher_gb: 256
+        url: https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26-ultra/sky-blue-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: google-pixel-11-pro
+        speicher_gb: 256
+        url: https://www.telekom.de/shop/geraet/google/google-pixel-11-pro/olive-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: google-pixel-11-pro-xl
+        speicher_gb: 256
+        url: https://www.telekom.de/shop/geraet/google/google-pixel-11-pro-xl/obsidian-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: samsung-galaxy-z-fold8
+        speicher_gb: 256
+        url: https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-z-fold8/cream-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: samsung-galaxy-z-fold8-ultra
+        speicher_gb: 256
+        url: https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-z-fold8-ultra/violet-shadow-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: samsung-galaxy-z-flip8
+        speicher_gb: 256
+        url: https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-z-flip8/pink-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: xiaomi-17t-pro
+        speicher_gb: 512
+        url: https://www.telekom.de/shop/geraet/xiaomi/xiaomi-17t-pro/black-512-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: samsung-galaxy-s26
+        speicher_gb: 256
+        url: https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26/cobalt-violet-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: google-pixel-10-pro
+        speicher_gb: 128
+        url: https://www.telekom.de/shop/geraet/google/google-pixel-10-pro/obsidian-128-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: samsung-galaxy-a57
+        speicher_gb: 128
+        url: https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-a57-5g/awesome-navy-128-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: apple-iphone-16e
+        speicher_gb: 128
+        url: https://www.telekom.de/shop/geraet/apple/apple-iphone-16e/weiss-128-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: samsung-galaxy-s26-plus
+        speicher_gb: 256
+        url: https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26plus/white-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: samsung-galaxy-a17
+        speicher_gb: 128
+        url: https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-a17-5g/black-128-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: apple-iphone-17e
+        speicher_gb: 256
+        url: https://www.telekom.de/shop/geraet/apple/apple-iphone-17e/weiss-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: xiaomi-redmi-note-17-pro-max
+        speicher_gb: 256
+        url: https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-17-pro-max-5g/black-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: samsung-galaxy-s26-fe
+        speicher_gb: 128
+        url: https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26-fe/enterprise-edition-graphite-128-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: xiaomi-redmi-note-17
+        speicher_gb: 128
+        url: https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-17-5g/black-128-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: motorola-moto-g77
+        speicher_gb: 256
+        url: https://www.telekom.de/shop/geraet/motorola/motorola-moto-g77/pantone-black-olive-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: xiaomi-17t
+        speicher_gb: 256
+        url: https://www.telekom.de/shop/geraet/xiaomi/xiaomi-17t/violet-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: nothing-phone-4a-pro
+        speicher_gb: 256
+        url: https://www.telekom.de/shop/geraet/nothing/nothing-phone-4a-pro/silber-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: samsung-galaxy-a37
+        speicher_gb: 128
+        url: https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-a37-5g/awesome-lavender-128-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: xiaomi-redmi-note-15-pro-plus
+        speicher_gb: 256
+        url: https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-15-proplus-5g/glacier-blue-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: google-pixel-10-pro-xl
+        speicher_gb: 256
+        url: https://www.telekom.de/shop/geraet/google/google-pixel-10-pro-xl/obsidian-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: google-pixel-11-pro-fold
+        speicher_gb: 256
+        url: https://www.telekom.de/shop/geraet/google/google-pixel-11-pro-fold/obsidian-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: samsung-galaxy-a27
+        speicher_gb: 128
+        url: https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-a27-5g/black-128-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: apple-iphone-air
+        speicher_gb: 256
+        url: https://www.telekom.de/shop/geraet/apple/apple-iphone-air/himmelblau-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: xiaomi-redmi-note-17-pro
+        speicher_gb: 256
+        url: https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-17-pro-5g/black-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: xiaomi-17-ultra
+        speicher_gb: 512
+        url: https://www.telekom.de/shop/geraet/xiaomi/xiaomi-17-ultra/starlit-green-512-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: xiaomi-redmi-note-15
+        speicher_gb: 256
+        url: https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-15-5g/black-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: google-pixel-10
+        speicher_gb: 256
+        url: https://www.telekom.de/shop/geraet/google/google-pixel-10/obsidian-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: apple-iphone-16
+        speicher_gb: 128
+        url: https://www.telekom.de/shop/geraet/apple/apple-iphone-16/ultramarin-128-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: google-pixel-10a
+        speicher_gb: 128
+        url: https://www.telekom.de/shop/geraet/google/google-pixel-10a/lavender-128-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: samsung-galaxy-s25
+        speicher_gb: 128
+        url: https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25/silver-shadow-128-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: xiaomi-redmi-17
+        speicher_gb: 128
+        url: https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-17-5g/deep-blue-128-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: samsung-galaxy-z-fold-7
+        speicher_gb: 256
+        url: https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-z-fold7/silver-shadow-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: apple-iphone-15
+        speicher_gb: 128
+        url: https://www.telekom.de/shop/geraet/apple/apple-iphone-15/blau-128-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: nothing-phone-3
+        speicher_gb: 256
+        url: https://www.telekom.de/shop/geraet/nothing/nothing-phone-3/schwarz-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: google-pixel-10-pro-fold
+        speicher_gb: 256
+        url: https://www.telekom.de/shop/geraet/google/google-pixel-10-pro-fold/moonstone-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: apple-iphone-16-plus
+        speicher_gb: 128
+        url: https://www.telekom.de/shop/geraet/apple/apple-iphone-16-plus/weiss-128-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: xiaomi-15t
+        speicher_gb: 256
+        url: https://www.telekom.de/shop/geraet/xiaomi/xiaomi-15t/black-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: samsung-galaxy-a56
+        speicher_gb: 128
+        url: https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-a56-5g/awesome-lightgray-128-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: samsung-galaxy-z-flip-7
+        speicher_gb: 256
+        url: https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-z-flip7/jetblack-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: xiaomi-17
+        speicher_gb: 512
+        url: https://www.telekom.de/shop/geraet/xiaomi/xiaomi-17/black-512-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: samsung-galaxy-a26
+        speicher_gb: 128
+        url: https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-a26-5g/black-128-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: samsung-galaxy-s25-ultra
+        speicher_gb: 256
+        url: https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25-ultra/titanium-black-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
 
   - schluessel: congstar
     name: congstar

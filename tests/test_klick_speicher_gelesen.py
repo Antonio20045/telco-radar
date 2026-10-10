@@ -6,8 +6,10 @@ nicht erfasst: Seite sperrt automatisches Lesen (HTTP 202, 10.10.2026)“. Die T
 Produktseite war gestört. Ein Gerät, das der Lauf von heute mit anderem Speicher gelesen
 hat, bekommt darum den Satz mit diesen Speichern; der Anbietergrund bleibt für Geräte,
 die der Lauf gar nicht gelesen hat (ein unbekannter Titel lässt „nicht im Angebot“
-offen, wie am 10.10.). Gegenprobe: eine Datei von gestern gibt keinen Satz.
-Datum fest.
+offen, wie am 10.10.). Nach dem ungestörten Lauf vom 10.10. 15:59 UTC stand beim
+Pixel 10 (128 GB) „Für dieses Modell ist bei Telekom kein Bündel erhoben“: der Satz gilt
+für jeden Lauf von heute, gestört oder nicht. Gegenprobe: eine Datei von gestern gibt
+keinen Satz. Datum fest.
 """
 
 from __future__ import annotations
@@ -35,7 +37,7 @@ def katalog():
     return lade_katalog(lese_wurzel())
 
 
-def _datei(datum: str = TAG) -> dict:
+def _datei(datum: str = TAG, laufstatus: str = LAUF_GESTOERT) -> dict:
     satz = {
         "titel": "Google Pixel 10 256 GB",
         "speicher_gb": 256,
@@ -61,8 +63,8 @@ def _datei(datum: str = TAG) -> dict:
         "name": "Telekom",
         "datum": datum,
         "format": 1,
-        "laufstatus": LAUF_GESTOERT,
-        "grund": GESPERRT,
+        "laufstatus": laufstatus,
+        "grund": GESPERRT if laufstatus == LAUF_GESTOERT else None,
         "seiten": [],
         "uebersichten": [uebersicht],
     }
@@ -87,3 +89,9 @@ def test_gegenprobe_datei_von_gestern_kein_speichersatz(katalog):
     gestern = _datei("2026-10-09")
     zug = fuehre_zusammen([], [gestern], katalog, TAG, lambda s: ("", None))
     assert _modell(zug.erfassung, PIXEL).get("Telekom") != SATZ
+
+
+def test_ungestoerter_lauf_nennt_die_speicher(katalog):
+    datei = _datei(laufstatus=LAUF_GELESEN)
+    zug = fuehre_zusammen([], [datei], katalog, TAG, lambda sku: ("", None))
+    assert _modell(zug.erfassung, PIXEL) == {"Telekom": SATZ}

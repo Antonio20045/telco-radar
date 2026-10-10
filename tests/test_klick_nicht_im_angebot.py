@@ -25,6 +25,7 @@ from telco_radar.report.html import render_site
 
 TAG = "2026-10-09"
 SATZ = "Bei Telekom nicht im Angebot (Übersicht vom 09.10.2026 ganz gelesen)"
+NUR_256 = "Bei Telekom nur mit 256 GB gelesen (09.10.2026)"
 X = "apple-iphone-17-pro"
 Y = "apple-iphone-17"
 TARIFE = ("MF_17791", "MF_17779", "MF_17785", "MF_17797", "MF_17803")
@@ -95,10 +96,10 @@ def test_ausbeute_meldet_angebotene_geraete_und_vollstaendigkeit(katalog):
     assert Y not in daten["nicht_im_angebot"]
 
 
-def test_satz_bei_x_mit_datum_kein_satz_bei_y(katalog):
+def test_satz_bei_x_mit_datum_bei_y_nur_der_speicher(katalog):
     gruende = _erfassung(_datei(), katalog)
     assert fuer_modell(gruende, {"karten": [], "device_id": X}) == {"Telekom": SATZ}
-    assert fuer_modell(gruende, {"karten": [], "device_id": Y}) == {}
+    assert fuer_modell(gruende, {"karten": [], "device_id": Y}) == {"Telekom": NUR_256}
 
 
 def test_karte_mit_betrag_verdraengt_den_satz(katalog):
@@ -147,3 +148,11 @@ def test_gerenderte_seite_zeigt_den_satz_in_der_telekom_zeile(tmp_path, katalog)
     render_site(tmp_path / "site", berichte, load_config(tmp_path))
     seite = (tmp_path / "site" / "geraete.html").read_text(encoding="utf-8")
     assert f'<span class="wr-grund">{SATZ}</span>' in seite
+
+
+def test_unbekannter_erneuerter_titel_haelt_den_satz_nicht_auf(katalog):
+    """Telekom 10.10.2026: „Apple iPhone 13 (Erneuert Basic) 128 GB“ fehlt im Katalog,
+    der nur Neuware führt; der Satz bleibt."""
+    datei = _datei(extra=[_satz("Apple iPhone 13 (Erneuert Basic) 128 GB", 128)])
+    gruende = _erfassung(datei, katalog)
+    assert fuer_modell(gruende, {"karten": [], "device_id": X}) == {"Telekom": SATZ}

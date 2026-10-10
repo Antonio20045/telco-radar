@@ -9,6 +9,8 @@ wieder gelesen hat: dieselbe Geräteseite (ein jüngeres Klick-Bündel desselben
 derselben Speichergröße) und denselben Tarif (ein jüngeres Klick-Bündel dieses Tarifs) -
 und das Bündel dabei nicht wieder vorkam. Fehlt einer der beiden Belege, war die Seite
 vielleicht nur nicht gelesen; „nicht gelesen“ ist nicht „leer“, das Bündel bleibt.
+Die Geräteseite zählt je Ratenzahl: Ein Bündel mit 24 Raten von einer Telekom-
+Produktseite überholt erst ein jüngeres mit 24 Raten, nicht die Übersicht mit 36.
 """
 
 from __future__ import annotations
@@ -30,6 +32,10 @@ def _juengster(tage: dict, schluessel: tuple, datum: str) -> None:
         tage[schluessel] = datum
 
 
+def _seite(eintrag: dict, geraet: str) -> tuple:
+    return eintrag.get("anbieter"), geraet, eintrag.get("laufzeit_monate")
+
+
 def ueberholt(eintraege: list[dict]) -> set[str]:
     """Die IDs der überholten Klick-Bündel (Regel im Modulkopf)."""
     klick = [
@@ -45,7 +51,7 @@ def ueberholt(eintraege: list[dict]) -> set[str]:
         datum = str(e["abgerufen_am"])
         geraet = _geraet_speicher(e.get("sku_id"))
         if geraet is not None:
-            _juengster(je_geraet, (e.get("anbieter"), geraet), datum)
+            _juengster(je_geraet, _seite(e, geraet), datum)
         _juengster(je_tarif, (e.get("anbieter"), e.get("tarif_name")), datum)
     weg: set[str] = set()
     for e in klick:
@@ -53,7 +59,7 @@ def ueberholt(eintraege: list[dict]) -> set[str]:
         geraet = _geraet_speicher(e.get("sku_id"))
         if geraet is None:
             continue
-        seite = je_geraet.get((e.get("anbieter"), geraet), "")
+        seite = je_geraet.get(_seite(e, geraet), "")
         tarif = je_tarif.get((e.get("anbieter"), e.get("tarif_name")), "")
         if seite > datum and tarif > datum:
             weg.add(str(e.get("id")))

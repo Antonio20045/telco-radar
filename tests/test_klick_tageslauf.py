@@ -132,7 +132,7 @@ def test_tagesdatei_hat_alle_anbieter_mit_karte_und_keine_seitengrenze(ziele):
     for schluessel in ziele:
         assert (WURZEL / "config" / "klickkarten" / f"{schluessel}.yaml").is_file()
     assert O2_SEITE.adresse in {s.adresse for s in ziele["o2"].seiten}
-    assert len(ziele["telekom"].seiten) == 7
+    assert len(ziele["telekom"].seiten) == 55
     with pytest.raises(ErkundungszielFehler, match="höchstens 2"):
         lade_ziele(lese_wurzel(), TAGESDATEI)
 

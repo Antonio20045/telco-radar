@@ -12,9 +12,9 @@ Trägt der Eintrag einer Datei von heute ``nicht_im_angebot`` (``klickrohsatz``:
 „Bei Telekom nicht im Angebot (Übersicht vom 09.10.2026 ganz gelesen)“ unter dem
 Schlüssel ``Anbieter|device_id`` (``TRENNER``); ``fuer_modell`` gibt ihn dem Modell
 mit dieser Geräte-ID statt eines Anbietergrundes. Ebenso bekommt jedes Gerät, das ein
-gestörter Lauf von heute gelesen hat (``speicher_gelesen``), den Satz „Bei Telekom nur
-mit 256 GB gelesen (10.10.2026)“: ein Modell mit anderem Speicher fehlt dort, weil die
-Übersicht je Gerät einen Speicher zeigt, nicht weil die Seite sperrt.
+Lauf von heute gelesen hat (``speicher_gelesen``), gestört oder nicht, den Satz „Bei
+Telekom nur mit 256 GB gelesen (10.10.2026)“: ein Modell mit anderem Speicher fehlt
+dort, weil die Übersicht je Gerät einen Speicher zeigt, nicht weil die Seite sperrt.
 """
 
 from __future__ import annotations
@@ -87,10 +87,10 @@ def nicht_im_angebot(eintrag: dict) -> dict[str, str]:
 
 
 def speicher_gelesen(eintrag: dict) -> dict[str, str]:
-    """Je Gerät, das ein gestörter Lauf von heute gelesen hat, die gelesenen Speicher;
-    ein Modell mit anderem Speicher zeigt sie statt des Anbietergrundes."""
+    """Je Gerät, das ein Lauf von heute gelesen hat, die gelesenen Speicher; ein
+    Modell mit anderem Speicher zeigt sie statt des Anbietergrundes oder der Lücke."""
     je_geraet = eintrag.get("speicher_gelesen")
-    if erfassungsgrund(eintrag) is None or not isinstance(je_geraet, dict):
+    if eintrag.get("alter_tage") != 0 or not isinstance(je_geraet, dict):
         return {}
     anbieter = str(eintrag.get("anbieter"))
     datum = date.fromisoformat(str(eintrag.get("datum"))).strftime("%d.%m.%Y")
