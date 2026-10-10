@@ -1,0 +1,130 @@
+{
+ "einwilligung": {
+  "geklickt": "Alle ablehnen",
+  "ruhe": true,
+  "anfragen": [
+   {
+    "nummer": 220,
+    "methode": "POST",
+    "url": "https://fc.vodafone.de/op/vfde-web/info?attributes=&notifications=&permissions=&identifiers=&nbidentifiers=&out=json",
+    "art": "xhr",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 221,
+    "methode": "POST",
+    "url": "https://collect.vodafone.de/vodafone/de-main/2/i.gif",
+    "art": "ping",
+    "status": null,
+    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+   },
+   {
+    "nummer": 222,
+    "methode": "GET",
+    "url": "https://cdn.dimml.io/dimml.js",
+    "art": "script",
+    "status": null,
+    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+   },
+   {
+    "nummer": 223,
+    "methode": "GET",
+    "url": "https://tags.vodafone.de/de-main/prod/utag.954.js?utv=ut4.53.202609301401",
+    "art": "script",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 224,
+    "methode": "POST",
+    "url": "https://collect.vodafone.de/vodafone/de-main-cdp/2/i.gif",
+    "art": "xhr",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 225,
+    "methode": "GET",
+    "url": "https://visitor-service.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791654622614",
+    "art": "script",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 226,
+    "methode": "GET",
+    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791654623014",
+    "art": "script",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 227,
+    "methode": "POST",
+    "url": "https://at.vodafone.de/rest/v1/delivery?client=vodafonegroupservice&sessionId=ENTFERNT&version=2.6.1",
+    "art": "xhr",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 228,
+    "methode": "GET",
+    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791654623575",
+    "art": "script",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 229,
+    "methode": "GET",
+    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791654624359",
+    "art": "script",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 230,
+    "methode": "GET",
+    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791654625457",
+    "art": "script",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 231,
+    "methode": "GET",
+    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791654626993",
+    "art": "script",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 232,
+    "methode": "GET",
+    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791654629145",
+    "art": "script",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 233,
+    "methode": "GET",
+    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791654632157",
+    "art": "script",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 234,
+    "methode": "GET",
+    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791654636373",
+    "art": "script",
+    "status": 200,
+    "abbruch": null
+   }
+  ]
+ },
+ "vermerk": "Folgeseite: keine Klick-Proben",
+ "proben": []
+}

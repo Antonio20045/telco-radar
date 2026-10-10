@@ -1,0 +1,423 @@
+{
+ "karte": "vodafone.yaml",
+ "anbieter": "Vodafone",
+ "adresse": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html",
+ "status": "gelesen",
+ "grund": null,
+ "bot_schutz": false,
+ "http_status": 200,
+ "hoechste_kombinationen": 12,
+ "belege": "nicht archiviert (kein Konto)",
+ "zaehlung": {
+  "kombinationen": 6,
+  "erfasst": 6,
+  "nicht_angeboten": 0,
+  "nicht_erfasst": 0,
+  "befund": 0,
+  "nicht_besucht": 0,
+  "verworfen": 2,
+  "gescheitert": 0
+ },
+ "struktur": {
+  "knoepfe_gesucht": 24,
+  "knoepfe_gefunden": 24,
+  "felder_gesucht": 42,
+  "felder_gefunden": 18,
+  "anteil_knoepfe": 1.0,
+  "anteil_felder": 0.42857142857142855
+ },
+ "gefunden": {
+  "knoepfe": {
+   "speicher": {
+    "selektor": "#device-details-option-picker-capacity label.ws10-option-picker__label",
+    "werte": [
+     "256 GB",
+     "512 GB"
+    ]
+   },
+   "tarif": {
+    "selektor": null,
+    "werte": [
+     "unbekannt"
+    ]
+   },
+   "laufzeit": {
+    "selektor": "#device-details-option-picker-financing-duration div:not(:has(input[value=\"1\"])) > label.ws10-option-picker__label",
+    "werte": [
+     "36",
+     "24",
+     "12"
+    ]
+   }
+  },
+  "zusammenfassung": "#ws10-offer-summary-card-price-table",
+  "felder": {
+   "anzahlung": {
+    "text": 6,
+    "antwort": 6
+   },
+   "rate": {
+    "text": 6,
+    "antwort": 6
+   },
+   "ratenzahl": {
+    "text": 6,
+    "antwort": 6
+   },
+   "tarifphasen": {
+    "text": 0,
+    "antwort": 0
+   },
+   "tarifbindung": {
+    "text": 0,
+    "antwort": 0
+   },
+   "anschluss": {
+    "text": 0,
+    "antwort": 0
+   },
+   "volumen_gb": {
+    "text": 0,
+    "antwort": 0
+   }
+  }
+ },
+ "kombinationen": [
+  {
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "unbekannt",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "unbekannt",
+    "laufzeit": 36
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 0.99,
+    "rate": 21.0,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_text": {
+    "anzahlung": 0.99,
+    "rate": 21.0,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_antwort": {
+    "anzahlung": 0.99,
+    "rate": 21.0,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "buendel": null,
+   "echo": {
+    "befunde": [],
+    "luecken": [
+     "tarifphasen",
+     "tarifbindung",
+     "anschluss",
+     "volumen_gb"
+    ]
+   },
+   "text": "Einmal\n\t\n\n0,99 € einmal\n\n0,99 €\n\n\nPro Monat\n\t\n\n21 € pro Monat\n\n21 €\n\nStandard-Versand\t9,98 €",
+   "antwort_url": "https://api.vodafone.de/glados/v2/hardware/v2/virtualItem/253?businessTransaction=newContract&salesChannel=Online.Consumer&financingType=rate",
+   "beleg_status": "offen"
+  },
+  {
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "unbekannt",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "unbekannt",
+    "laufzeit": 24
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 0.99,
+    "rate": 31.5,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_text": {
+    "anzahlung": 0.99,
+    "rate": 31.5,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_antwort": {
+    "anzahlung": 0.99,
+    "rate": 31.5,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "buendel": null,
+   "echo": {
+    "befunde": [],
+    "luecken": [
+     "tarifphasen",
+     "tarifbindung",
+     "anschluss",
+     "volumen_gb"
+    ]
+   },
+   "text": "Einmal\n\t\n\n0,99 € einmal\n\n0,99 €\n\n\nPro Monat\n\t\n\n31,50 € pro Monat\n\n31,50 €\n\nStandard-Versand\t9,98 €",
+   "antwort_url": "https://api.vodafone.de/glados/v2/hardware/v2/virtualItem/253?businessTransaction=newContract&salesChannel=Online.Consumer&financingType=rate",
+   "beleg_status": "offen"
+  },
+  {
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "unbekannt",
+    "laufzeit": "12"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "unbekannt",
+    "laufzeit": 12
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 0.99,
+    "rate": 63.0,
+    "ratenzahl": 12,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_text": {
+    "anzahlung": 0.99,
+    "rate": 63.0,
+    "ratenzahl": 12,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_antwort": {
+    "anzahlung": 0.99,
+    "rate": 63.0,
+    "ratenzahl": 12,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "buendel": null,
+   "echo": {
+    "befunde": [],
+    "luecken": [
+     "tarifphasen",
+     "tarifbindung",
+     "anschluss",
+     "volumen_gb"
+    ]
+   },
+   "text": "Einmal\n\t\n\n0,99 € einmal\n\n0,99 €\n\n\nPro Monat\n\t\n\n63 € pro Monat\n\n63 €\n\nStandard-Versand\t9,98 €",
+   "antwort_url": "https://api.vodafone.de/glados/v2/hardware/v2/virtualItem/253?businessTransaction=newContract&salesChannel=Online.Consumer&financingType=rate",
+   "beleg_status": "offen"
+  },
+  {
+   "auswahl": {
+    "speicher": "512 GB",
+    "tarif": "unbekannt",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "512 GB",
+    "tarif": "unbekannt",
+    "laufzeit": 36
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 0.99,
+    "rate": 26.0,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_text": {
+    "anzahlung": 0.99,
+    "rate": 26.0,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_antwort": {
+    "anzahlung": 0.99,
+    "rate": 26.0,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "buendel": null,
+   "echo": {
+    "befunde": [],
+    "luecken": [
+     "tarifphasen",
+     "tarifbindung",
+     "anschluss",
+     "volumen_gb"
+    ]
+   },
+   "text": "Einmal\n\t\n\n0,99 € einmal\n\n0,99 €\n\n\nPro Monat\n\t\n\n26 € pro Monat\n\n26 €\n\nStandard-Versand\t9,98 €",
+   "antwort_url": "https://api.vodafone.de/glados/v2/hardware/v2/virtualItem/253?businessTransaction=newContract&salesChannel=Online.Consumer&financingType=rate",
+   "beleg_status": "offen"
+  },
+  {
+   "auswahl": {
+    "speicher": "512 GB",
+    "tarif": "unbekannt",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "512 GB",
+    "tarif": "unbekannt",
+    "laufzeit": 24
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 0.99,
+    "rate": 39.0,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_text": {
+    "anzahlung": 0.99,
+    "rate": 39.0,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_antwort": {
+    "anzahlung": 0.99,
+    "rate": 39.0,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "buendel": null,
+   "echo": {
+    "befunde": [],
+    "luecken": [
+     "tarifphasen",
+     "tarifbindung",
+     "anschluss",
+     "volumen_gb"
+    ]
+   },
+   "text": "Einmal\n\t\n\n0,99 € einmal\n\n0,99 €\n\n\nPro Monat\n\t\n\n39 € pro Monat\n\n39 €\n\nStandard-Versand\t9,98 €",
+   "antwort_url": "https://api.vodafone.de/glados/v2/hardware/v2/virtualItem/253?businessTransaction=newContract&salesChannel=Online.Consumer&financingType=rate",
+   "beleg_status": "offen"
+  },
+  {
+   "auswahl": {
+    "speicher": "512 GB",
+    "tarif": "unbekannt",
+    "laufzeit": "12"
+   },
+   "variante": {
+    "speicher": "512 GB",
+    "tarif": "unbekannt",
+    "laufzeit": 12
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 0.99,
+    "rate": 78.0,
+    "ratenzahl": 12,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_text": {
+    "anzahlung": 0.99,
+    "rate": 78.0,
+    "ratenzahl": 12,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_antwort": {
+    "anzahlung": 0.99,
+    "rate": 78.0,
+    "ratenzahl": 12,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "buendel": null,
+   "echo": {
+    "befunde": [],
+    "luecken": [
+     "tarifphasen",
+     "tarifbindung",
+     "anschluss",
+     "volumen_gb"
+    ]
+   },
+   "text": "Einmal\n\t\n\n0,99 € einmal\n\n0,99 €\n\n\nPro Monat\n\t\n\n78 € pro Monat\n\n78 €\n\nStandard-Versand\t9,98 €",
+   "antwort_url": "https://api.vodafone.de/glados/v2/hardware/v2/virtualItem/253?businessTransaction=newContract&salesChannel=Online.Consumer&financingType=rate",
+   "beleg_status": "offen"
+  }
+ ],
+ "verworfen": [
+  {
+   "url": "https://dyn.vodafone.de/csp/csp.php?b_id=&shopid=&referer=&referrer=&protect=",
+   "grund": "per robots.txt gesperrt: /csp/csp.php?b_id=&shopid=&referer=&referrer=&protect="
+  },
+  {
+   "url": "https://cdn.dimml.io/dimml.js",
+   "grund": "robots.txt nicht lesbar (HTTP 400)"
+  }
+ ],
+ "gescheitert": [],
+ "hilfsdateien": []
+}

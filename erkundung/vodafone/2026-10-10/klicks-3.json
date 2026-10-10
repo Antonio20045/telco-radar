@@ -1,0 +1,804 @@
+{
+ "einwilligung": {
+  "geklickt": "Alle ablehnen",
+  "ruhe": true,
+  "anfragen": [
+   {
+    "nummer": 239,
+    "methode": "POST",
+    "url": "https://fc.vodafone.de/op/vfde-web/info?attributes=&notifications=&permissions=&identifiers=&nbidentifiers=&out=json",
+    "art": "xhr",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 240,
+    "methode": "POST",
+    "url": "https://collect.vodafone.de/vodafone/de-main/2/i.gif",
+    "art": "ping",
+    "status": null,
+    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+   },
+   {
+    "nummer": 241,
+    "methode": "GET",
+    "url": "https://cdn.dimml.io/dimml.js",
+    "art": "script",
+    "status": null,
+    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+   },
+   {
+    "nummer": 242,
+    "methode": "GET",
+    "url": "https://tags.vodafone.de/de-main/prod/utag.954.js?utv=ut4.53.202609301401",
+    "art": "script",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 243,
+    "methode": "POST",
+    "url": "https://collect.vodafone.de/vodafone/de-main-cdp/2/i.gif",
+    "art": "xhr",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 244,
+    "methode": "GET",
+    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653641407",
+    "art": "script",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 245,
+    "methode": "GET",
+    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653641807",
+    "art": "script",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 246,
+    "methode": "GET",
+    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653642368",
+    "art": "script",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 247,
+    "methode": "GET",
+    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653643153",
+    "art": "script",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 248,
+    "methode": "GET",
+    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653644251",
+    "art": "script",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 249,
+    "methode": "GET",
+    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653645787",
+    "art": "script",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 250,
+    "methode": "GET",
+    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653647939",
+    "art": "script",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 251,
+    "methode": "POST",
+    "url": "https://at.vodafone.de/rest/v1/delivery?client=vodafonegroupservice&sessionId=ENTFERNT&version=2.6.1",
+    "art": "xhr",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 252,
+    "methode": "GET",
+    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653650951",
+    "art": "script",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 253,
+    "methode": "GET",
+    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653655167",
+    "art": "script",
+    "status": 200,
+    "abbruch": null
+   }
+  ]
+ },
+ "vermerk": "Folgeseite: Proben auf label[id^=\"ws10-option-picker-item-label-option-picker-gm-tariff-\"]",
+ "proben": [
+  {
+   "art": "tarif",
+   "pfad": "label[id^=\"ws10-option-picker-item-label-option-picker-gm-tariff-\"] >> nth=0",
+   "text": "28 GB statt 18 GB",
+   "wert": "267",
+   "fehler": null,
+   "navigiert": null,
+   "umleitung": null,
+   "ruhe": true,
+   "anfragen": [
+    {
+     "nummer": 391,
+     "methode": "POST",
+     "url": "https://collect.vodafone.de/vodafone/de-main/2/i.gif",
+     "art": "ping",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 392,
+     "methode": "POST",
+     "url": "https://collect.vodafone.de/vodafone/de-main-cdp/2/i.gif",
+     "art": "ping",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 393,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653822283",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 394,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653822683",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 395,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653823244",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 396,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653824028",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 397,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653825126",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 398,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653826663",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 399,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653828815",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 400,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653831826",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 401,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653836043",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    }
+   ],
+   "preise_geaendert": [
+    {
+     "pfad": "#ws10-offer-summary-card-price-table > tr:nth-of-type(2) > td:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)",
+     "vorher": "Standardpreis 84,95 € – Angebotspreis 62,61 €",
+     "nachher": "Standardpreis 64,95 € – Angebotspreis 56,95 €"
+    },
+    {
+     "pfad": "#ws10-offer-summary-card-price-table > tr:nth-of-type(2) > td:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > s:nth-of-type(1)",
+     "vorher": "84,95 €",
+     "nachher": "64,95 €"
+    },
+    {
+     "pfad": "#ws10-offer-summary-card-price-table > tr:nth-of-type(2) > td:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)",
+     "vorher": "62,61 €",
+     "nachher": "56,95 €"
+    },
+    {
+     "pfad": "#tariff-details-sticky-price-bar > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > span:nth-of-type(1)",
+     "vorher": "62,61 €",
+     "nachher": "56,95 €"
+    }
+   ],
+   "uebernommen": "ja"
+  },
+  {
+   "art": "tarif",
+   "pfad": "label[id^=\"ws10-option-picker-item-label-option-picker-gm-tariff-\"] >> nth=1",
+   "text": "40 GB statt 35 GB",
+   "wert": "268",
+   "fehler": null,
+   "navigiert": null,
+   "umleitung": null,
+   "ruhe": true,
+   "anfragen": [
+    {
+     "nummer": 402,
+     "methode": "POST",
+     "url": "https://collect.vodafone.de/vodafone/de-main/2/i.gif",
+     "art": "ping",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 403,
+     "methode": "POST",
+     "url": "https://collect.vodafone.de/vodafone/de-main-cdp/2/i.gif",
+     "art": "ping",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 404,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653841074",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 405,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653841475",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 406,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653842035",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 407,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653842820",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 408,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653843918",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 409,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653845454",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 410,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653847606",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 411,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653850617",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 412,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653854834",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    }
+   ],
+   "preise_geaendert": [
+    {
+     "pfad": "#ws10-offer-summary-card-price-table > tr:nth-of-type(2) > td:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)",
+     "vorher": "Standardpreis 64,95 € – Angebotspreis 56,95 €",
+     "nachher": "Standardpreis 74,95 € – Angebotspreis 64,45 €"
+    },
+    {
+     "pfad": "#ws10-offer-summary-card-price-table > tr:nth-of-type(2) > td:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > s:nth-of-type(1)",
+     "vorher": "64,95 €",
+     "nachher": "74,95 €"
+    },
+    {
+     "pfad": "#ws10-offer-summary-card-price-table > tr:nth-of-type(2) > td:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)",
+     "vorher": "56,95 €",
+     "nachher": "64,45 €"
+    },
+    {
+     "pfad": "#tariff-details-sticky-price-bar > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > span:nth-of-type(1)",
+     "vorher": "56,95 €",
+     "nachher": "64,45 €"
+    }
+   ],
+   "uebernommen": "ja"
+  },
+  {
+   "art": "tarif",
+   "pfad": "label[id^=\"ws10-option-picker-item-label-option-picker-gm-tariff-\"] >> nth=2",
+   "text": "Beliebt 100 GB statt 60 GB",
+   "wert": "269",
+   "fehler": null,
+   "navigiert": null,
+   "umleitung": null,
+   "ruhe": true,
+   "anfragen": [
+    {
+     "nummer": 413,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/simplicity/icons/lifetime-warranty.svg",
+     "art": "other",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 414,
+     "methode": "POST",
+     "url": "https://collect.vodafone.de/vodafone/de-main/2/i.gif",
+     "art": "ping",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 415,
+     "methode": "POST",
+     "url": "https://collect.vodafone.de/vodafone/de-main-cdp/2/i.gif",
+     "art": "ping",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 416,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653860142",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 417,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653860542",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 418,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653861103",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 419,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653861888",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 420,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653862985",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 421,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653864522",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 422,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653866673",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 423,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653869685",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 424,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653873902",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    }
+   ],
+   "preise_geaendert": [
+    {
+     "pfad": "#ws10-offer-summary-card-price-table > tr:nth-of-type(2) > td:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)",
+     "vorher": "Standardpreis 74,95 € – Angebotspreis 64,45 €",
+     "nachher": "Standardpreis 84,95 € – Angebotspreis 62,61 €"
+    },
+    {
+     "pfad": "#ws10-offer-summary-card-price-table > tr:nth-of-type(2) > td:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > s:nth-of-type(1)",
+     "vorher": "74,95 €",
+     "nachher": "84,95 €"
+    },
+    {
+     "pfad": "#ws10-offer-summary-card-price-table > tr:nth-of-type(2) > td:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)",
+     "vorher": "64,45 €",
+     "nachher": "62,61 €"
+    },
+    {
+     "pfad": "#tariff-details-sticky-price-bar > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > span:nth-of-type(1)",
+     "vorher": "64,45 €",
+     "nachher": "62,61 €"
+    }
+   ],
+   "uebernommen": "ja"
+  },
+  {
+   "art": "tarif",
+   "pfad": "label[id^=\"ws10-option-picker-item-label-option-picker-gm-tariff-\"] >> nth=3",
+   "text": "120 GB",
+   "wert": "270",
+   "fehler": null,
+   "navigiert": null,
+   "umleitung": null,
+   "ruhe": true,
+   "anfragen": [
+    {
+     "nummer": 425,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/simplicity/icons/lifetime-warranty.svg",
+     "art": "other",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 426,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/simplicity/icons/roaming.svg",
+     "art": "other",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 427,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/simplicity/icons/all-rewards.svg",
+     "art": "other",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 428,
+     "methode": "POST",
+     "url": "https://collect.vodafone.de/vodafone/de-main/2/i.gif",
+     "art": "ping",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 429,
+     "methode": "POST",
+     "url": "https://collect.vodafone.de/vodafone/de-main-cdp/2/i.gif",
+     "art": "ping",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 430,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653879224",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 431,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653879624",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 432,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653880185",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 433,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653880970",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 434,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653882067",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 435,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653883604",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 436,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653885756",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 437,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653888767",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 438,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653892984",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 439,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653898887",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    }
+   ],
+   "preise_geaendert": [
+    {
+     "pfad": "#financing-promotional-card > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)",
+     "vorher": "Du sparst 1 € pro Monat auf Deinen Tarifpreis. 36 Monate lang.10",
+     "nachher": "Du sparst 1,50 € pro Monat auf Deinen Tarifpreis. 36 Monate lang.10"
+    },
+    {
+     "pfad": "#ws10-offer-summary-card-price-table > tr:nth-of-type(2) > td:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)",
+     "vorher": "Standardpreis 84,95 € – Angebotspreis 62,61 €",
+     "nachher": "Standardpreis 94,95 € – Angebotspreis 69,61 €"
+    },
+    {
+     "pfad": "#ws10-offer-summary-card-price-table > tr:nth-of-type(2) > td:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > s:nth-of-type(1)",
+     "vorher": "84,95 €",
+     "nachher": "94,95 €"
+    },
+    {
+     "pfad": "#ws10-offer-summary-card-price-table > tr:nth-of-type(2) > td:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)",
+     "vorher": "62,61 €",
+     "nachher": "69,61 €"
+    },
+    {
+     "pfad": "#tariff-details-sticky-price-bar > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > span:nth-of-type(1)",
+     "vorher": "62,61 €",
+     "nachher": "69,61 €"
+    }
+   ],
+   "uebernommen": "ja"
+  },
+  {
+   "art": "tarif",
+   "pfad": "label[id^=\"ws10-option-picker-item-label-option-picker-gm-tariff-\"] >> nth=4",
+   "text": "Unbegrenzt",
+   "wert": "271",
+   "fehler": null,
+   "navigiert": null,
+   "umleitung": null,
+   "ruhe": true,
+   "anfragen": [
+    {
+     "nummer": 440,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/simplicity/icons/all-rewards.svg",
+     "art": "other",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 441,
+     "methode": "POST",
+     "url": "https://collect.vodafone.de/vodafone/de-main/2/i.gif",
+     "art": "ping",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 442,
+     "methode": "POST",
+     "url": "https://collect.vodafone.de/vodafone/de-main-cdp/2/i.gif",
+     "art": "ping",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 443,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653903437",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 444,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653903838",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 445,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653904398",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 446,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653905183",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 447,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653906281",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 448,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653907817",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 449,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653909969",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 450,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653912980",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 451,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791653917197",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    }
+   ],
+   "preise_geaendert": [
+    {
+     "pfad": "#financing-promotional-card > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)",
+     "vorher": "Du sparst 1,50 € pro Monat auf Deinen Tarifpreis. 36 Monate lang.10",
+     "nachher": "Du sparst 3 € pro Monat auf Deinen Tarifpreis. 36 Monate lang.10"
+    },
+    {
+     "pfad": "#ws10-offer-summary-card-price-table > tr:nth-of-type(2) > td:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)",
+     "vorher": "Standardpreis 94,95 € – Angebotspreis 69,61 €",
+     "nachher": "Standardpreis 114,95 € – Angebotspreis 83,11 €"
+    },
+    {
+     "pfad": "#ws10-offer-summary-card-price-table > tr:nth-of-type(2) > td:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > s:nth-of-type(1)",
+     "vorher": "94,95 €",
+     "nachher": "114,95 €"
+    },
+    {
+     "pfad": "#ws10-offer-summary-card-price-table > tr:nth-of-type(2) > td:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)",
+     "vorher": "69,61 €",
+     "nachher": "83,11 €"
+    },
+    {
+     "pfad": "#tariff-details-sticky-price-bar > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > span:nth-of-type(1)",
+     "vorher": "69,61 €",
+     "nachher": "83,11 €"
+    }
+   ],
+   "uebernommen": "ja"
+  }
+ ]
+}

@@ -1,0 +1,729 @@
+{
+ "einwilligung": {
+  "geklickt": "Alle ablehnen",
+  "ruhe": true,
+  "anfragen": [
+   {
+    "nummer": 214,
+    "methode": "POST",
+    "url": "https://fc.vodafone.de/op/vfde-web/info?attributes=&notifications=&permissions=&identifiers=&nbidentifiers=&out=json",
+    "art": "xhr",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 215,
+    "methode": "POST",
+    "url": "https://collect.vodafone.de/vodafone/de-main/2/i.gif",
+    "art": "ping",
+    "status": null,
+    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+   },
+   {
+    "nummer": 216,
+    "methode": "GET",
+    "url": "https://cdn.dimml.io/dimml.js",
+    "art": "script",
+    "status": null,
+    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+   },
+   {
+    "nummer": 217,
+    "methode": "GET",
+    "url": "https://tags.vodafone.de/de-main/prod/utag.954.js?utv=ut4.53.202609301401",
+    "art": "script",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 218,
+    "methode": "POST",
+    "url": "https://collect.vodafone.de/vodafone/de-main-cdp/2/i.gif",
+    "art": "xhr",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 219,
+    "methode": "GET",
+    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791654092464",
+    "art": "script",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 220,
+    "methode": "GET",
+    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791654092864",
+    "art": "script",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 221,
+    "methode": "POST",
+    "url": "https://at.vodafone.de/rest/v1/delivery?client=vodafonegroupservice&sessionId=ENTFERNT&version=2.6.1",
+    "art": "xhr",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 222,
+    "methode": "GET",
+    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791654093425",
+    "art": "script",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 223,
+    "methode": "GET",
+    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791654094210",
+    "art": "script",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 224,
+    "methode": "GET",
+    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791654095307",
+    "art": "script",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 225,
+    "methode": "GET",
+    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791654096844",
+    "art": "script",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 226,
+    "methode": "GET",
+    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791654098995",
+    "art": "script",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 227,
+    "methode": "GET",
+    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791654102007",
+    "art": "script",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 228,
+    "methode": "GET",
+    "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791654106224",
+    "art": "script",
+    "status": 200,
+    "abbruch": null
+   }
+  ]
+ },
+ "vermerk": null,
+ "proben": [
+  {
+   "gruppe": 32,
+   "art": "speicher",
+   "pfad": "#ws10-option-picker-item-label-option-picker-capacity-1",
+   "text": "512 GB 0,99 € einmal",
+   "wert": null,
+   "fehler": null,
+   "navigiert": null,
+   "umleitung": null,
+   "ruhe": true,
+   "anfragen": [
+    {
+     "nummer": 229,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/simplicity/icons/mobile-info.svg",
+     "art": "other",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 230,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/simplicity/icons/chevron-down.svg",
+     "art": "other",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 231,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/simplicity/icons/screen-size.svg",
+     "art": "other",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 232,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/simplicity/icons/camera.svg",
+     "art": "other",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 233,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/simplicity/icons/e-sim.svg",
+     "art": "other",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 234,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/simplicity/icons/sim.svg",
+     "art": "other",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 235,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/simplicity/icons/connectivity.svg",
+     "art": "other",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 236,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/simplicity/icons/touch-screen.svg",
+     "art": "other",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 237,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/simplicity/icons/box.svg",
+     "art": "other",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 238,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/simplicity/icons/favorite.svg",
+     "art": "other",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 239,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/simplicity/icons/sync.svg",
+     "art": "other",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 240,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/media/img/products/NSF-288x320/s26-violet-288x320-01.png",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 241,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/media/img/products/NSF-288x320/s26-violet-288x320-02.png",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 242,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/media/img/products/NSF-288x320/s26-violet-288x320-03.png",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 243,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/media/img/chargerIncluded/charger-not-included.svg",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 244,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/media/img/products/compatibleCharger/s26-charger.svg",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 245,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/01.jpg",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 246,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/award_S26_1.png",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 247,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/award_S26_2.png",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 248,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/11.jpg",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 249,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/02.jpg",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 250,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/03.jpg",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 251,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/04.jpg",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 252,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/05.jpg",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 253,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/06.jpg",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 254,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/07.jpg",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 255,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/08.jpg",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 256,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/09.jpg",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 257,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/10.jpg",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 258,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/12.jpg",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 259,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/13.jpg",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 260,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/14.jpg",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 261,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/15.jpg",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 262,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/16.jpg",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 263,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/17.jpg",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 264,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/18.jpg",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 265,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/19.jpg",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 266,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/20.jpg",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 267,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/22.jpg",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 268,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/thumb_S26.jpg",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 269,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/thumb_S25.jpg",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 270,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/thumb_S24.jpg",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 271,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/ic_camera.png",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 272,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/ic_battery.png",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 273,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/ic_ai.png",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 274,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/samsung/samsung-2026/samsung-s26/img/ic_processor.png",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 275,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/media/img/teaser/re-trade-mt-1248x600-dt.jpg",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 276,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/media/img/teaser/ELEKTROGERATE-RUCKNAHME-mt-1248x600-dt.png",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 277,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/media/img/teaser/BATTERIE-RUCKNAHME-Edited-mt-1248x600-dt.jpg",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 278,
+     "methode": "GET",
+     "url": "https://www.vodafone.de/media/img/teaser/Imagery-mt-1248x600-dt.jpg",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 279,
+     "methode": "POST",
+     "url": "https://collect.vodafone.de/vodafone/de-main/2/i.gif",
+     "art": "ping",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 280,
+     "methode": "POST",
+     "url": "https://collect.vodafone.de/vodafone/de-main-cdp/2/i.gif",
+     "art": "ping",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 281,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791654111705",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 282,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791654112106",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 283,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791654112667",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 284,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791654113451",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 285,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791654114549",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 286,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791654116086",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 287,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791654118237",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 288,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791654121249",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 289,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791654125466",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 290,
+     "methode": "GET",
+     "url": "https://visitor-service-eu-central-1.tealiumiq.com/vodafone/de-main-cdp/[Cookie entfernt]?callback=adv_lib.dle.callback&rnd=1791654131369",
+     "art": "script",
+     "status": 200,
+     "abbruch": null
+    }
+   ],
+   "preise_geaendert": [
+    {
+     "pfad": "#ws10-option-picker-item-label-option-picker-financing-duration-0 > span:nth-of-type(1) > span:nth-of-type(2)",
+     "vorher": "21 €",
+     "nachher": "26 €"
+    },
+    {
+     "pfad": "#ws10-option-picker-item-label-option-picker-financing-duration-1 > span:nth-of-type(1) > span:nth-of-type(2)",
+     "vorher": "31,50 €",
+     "nachher": "39 €"
+    },
+    {
+     "pfad": "#ws10-option-picker-item-label-option-picker-financing-duration-2 > span:nth-of-type(1) > span:nth-of-type(2)",
+     "vorher": "63 €",
+     "nachher": "78 €"
+    },
+    {
+     "pfad": "#ws10-option-picker-item-label-option-picker-financing-duration-3 > span:nth-of-type(1) > span:nth-of-type(2)",
+     "vorher": "899,90 €",
+     "nachher": "1099,90 €"
+    },
+    {
+     "pfad": "#ws10-offer-summary-card-price-table > tr:nth-of-type(2) > td:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)",
+     "vorher": "21 € pro Monat",
+     "nachher": "26 € pro Monat"
+    },
+    {
+     "pfad": "#ws10-offer-summary-card-price-table > tr:nth-of-type(2) > td:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)",
+     "vorher": "21 €",
+     "nachher": "26 €"
+    },
+    {
+     "pfad": "#device-details-sticky-price-bar > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > span:nth-of-type(1)",
+     "vorher": "21 €",
+     "nachher": "26 €"
+    },
+    {
+     "pfad": "#sr-only-price-announcer",
+     "vorher": null,
+     "nachher": "Liefertermin ca. 14.10.2026 Einmal: 0,99 € einmal. Pro Monat: 21 € pro Monat. Standard-Versand: 9,98 €."
+    }
+   ],
+   "marke_nachher": "label-checked",
+   "uebernommen": "ja"
+  },
+  {
+   "gruppe": 46,
+   "art": "tarif",
+   "pfad": "#ws10-accordion-summary-faq-galaxy-s26-kombinieren",
+   "text": "Welche Mobilfunk-Tarife kann ich mit dem Samsung Galaxy S26 kombinieren?",
+   "wert": null,
+   "fehler": null,
+   "navigiert": null,
+   "umleitung": null,
+   "ruhe": true,
+   "anfragen": [],
+   "preise_geaendert": [],
+   "marke_nachher": null,
+   "uebernommen": "unbekannt"
+  },
+  {
+   "gruppe": 49,
+   "art": "tarif",
+   "pfad": "#ws10-accordion-summary-laenger-oder-kuerzer",
+   "text": "Kann ich das Samsung Galaxy S26 länger oder kürzer als die Mindestlaufzeit des Tarifs abbezahlen?",
+   "wert": null,
+   "fehler": null,
+   "navigiert": null,
+   "umleitung": null,
+   "ruhe": true,
+   "anfragen": [],
+   "preise_geaendert": [],
+   "marke_nachher": null,
+   "uebernommen": "unbekannt"
+  },
+  {
+   "gruppe": 49,
+   "art": "tarif",
+   "pfad": "#ws10-accordion-summary-ratenzahlung-laenger",
+   "text": "Was passiert, wenn die Ratenzahlung für das Samsung Galaxy S26 länger oder kürzer als die Mindestlaufzeit des Tarifs läuft?",
+   "wert": null,
+   "fehler": null,
+   "navigiert": null,
+   "umleitung": null,
+   "ruhe": true,
+   "anfragen": [],
+   "preise_geaendert": [],
+   "marke_nachher": null,
+   "uebernommen": "unbekannt"
+  }
+ ]
+}

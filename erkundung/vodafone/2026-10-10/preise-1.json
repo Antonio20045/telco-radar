@@ -1,0 +1,503 @@
+{
+ "preise_gesamt": 83,
+ "preise": [
+  {
+   "pfad": "#ws10-option-picker-item-label-option-picker-capacity-0 > span:nth-of-type(1) > span:nth-of-type(2)",
+   "text": "1 € einmal",
+   "kontext": "256 GB 1 € einmal",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#ws10-option-picker-item-label-option-picker-capacity-1 > span:nth-of-type(1) > span:nth-of-type(2)",
+   "text": "0,99 € einmal",
+   "kontext": "512 GB 0,99 € einmal",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#ws10-option-picker-item-label-option-picker-capacity-2 > span:nth-of-type(1) > span:nth-of-type(2)",
+   "text": "1 € einmal",
+   "kontext": "1 TB 1 € einmal",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#ws10-option-picker-item-label-option-picker-financing-duration-0 > span:nth-of-type(1) > span:nth-of-type(2)",
+   "text": "33 €",
+   "kontext": "36 Raten 33 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#ws10-option-picker-item-label-option-picker-financing-duration-1 > span:nth-of-type(1) > span:nth-of-type(2)",
+   "text": "49,50 €",
+   "kontext": "24 Raten 49,50 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#ws10-option-picker-item-label-option-picker-financing-duration-2 > span:nth-of-type(1) > span:nth-of-type(2)",
+   "text": "99 €",
+   "kontext": "12 Raten 99 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#ws10-option-picker-item-label-option-picker-financing-duration-3 > span:nth-of-type(1) > span:nth-of-type(2)",
+   "text": "1199,90 €",
+   "kontext": "Einmal 1199,90 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#device-details-tauschbonus-promotional-card > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > h4:nth-of-type(1)",
+   "text": "Restwert + garantiert 0 € Tauschbonus sichern",
+   "kontext": "Restwert + garantiert 0 € Tauschbonus sichern Verkauf Dein Smartphone. Und sicher Dir zusätzlich zum Restwert den Tauschbonus.4",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#device-details-hw-dfp-bonus-promo > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > h4:nth-of-type(1)",
+   "text": "Smartphone mit Tarif buchen und 200 € sparen",
+   "kontext": "Smartphone mit Tarif buchen und 200 € sparen Spar zusätzlich 8,34 € pro Monat, wenn Du ein Smartphone dazubuchst. 24 Monate lang. Das sind insgesamt 200 €. Das gilt in den Tarifen Mobil M bis XL.4",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#device-details-hw-dfp-bonus-promo > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1) > strong:nth-of-type(1)",
+   "text": "8,34 €",
+   "kontext": "Spar zusätzlich 8,34 € pro Monat, wenn Du ein Smartphone dazubuchst. 24 Monate lang. Das sind insgesamt 200 €. Das gilt in den Tarifen Mobil M bis XL.4",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#device-details-hw-dfp-bonus-promo > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)",
+   "text": "Spar zusätzlich 8,34 € pro Monat, wenn Du ein Smartphone dazubuchst. 24 Monate lang. Das sind insgesamt 200 €. Das gilt in den Tarifen Mobil M bis XL.4",
+   "kontext": "Spar zusätzlich 8,34 € pro Monat, wenn Du ein Smartphone dazubuchst. 24 Monate lang. Das sind insgesamt 200 €. Das gilt in den Tarifen Mobil M bis XL.4",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#ws10-offer-summary-card-price-table > tr:nth-of-type(1) > td:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)",
+   "text": "1 € einmal",
+   "kontext": "1 € einmal 1 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#ws10-offer-summary-card-price-table > tr:nth-of-type(1) > td:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "1 €",
+   "kontext": "1 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#ws10-offer-summary-card-price-table > tr:nth-of-type(2) > td:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)",
+   "text": "33 € pro Monat",
+   "kontext": "33 € pro Monat 33 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#ws10-offer-summary-card-price-table > tr:nth-of-type(2) > td:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "33 €",
+   "kontext": "33 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#ws10-offer-summary-card-price-table > tr:nth-of-type(3) > td:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "9,98 €",
+   "kontext": "9,98 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#device-details-sticky-price-bar > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > span:nth-of-type(1)",
+   "text": "1 €",
+   "kontext": "1 €",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#device-details-sticky-price-bar > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > span:nth-of-type(1)",
+   "text": "33 €",
+   "kontext": "33 €",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(2) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(2)",
+   "text": "Nimmst Du ein Handy dazu, erhöht sich Dein Tarifpreis um 2 € pro Monat. Du zahlst außerdem den Einmalpreis und 12, 24 oder 36 monatliche Raten. Wie hoch Deine monatliche Rate ist, hängt vom Handy und der Laufzeit ab.",
+   "kontext": "Du zahlst den Tarifpreis pro Monat immer im Voraus. Und auf Deiner 1. Rechnung zusätzlich den anteiligen Tarifpreis für den 1. Monat. Nimmst Du ein Handy dazu, erhöht sich Dein Tarifpreis um 2 € pro Monat. Du zahlst außerdem den Einmalpreis und 12, 24 oder 36 monatliche Raten. Wie hoch Deine monatli",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(2) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(3)",
+   "text": "Bist Du neu bei uns, zahlst Du einmalig 39,99 Euro als Anschlusspreis.",
+   "kontext": "Du zahlst den Tarifpreis pro Monat immer im Voraus. Und auf Deiner 1. Rechnung zusätzlich den anteiligen Tarifpreis für den 1. Monat. Nimmst Du ein Handy dazu, erhöht sich Dein Tarifpreis um 2 € pro Monat. Du zahlst außerdem den Einmalpreis und 12, 24 oder 36 monatliche Raten. Wie hoch Deine monatli",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(2) > div:nth-of-type(1) > ul:nth-of-type(5) > li:nth-of-type(4) > strong:nth-of-type(2)",
+   "text": "Fehlt er, erhöht sich der Tarifpreis um 15 Euro pro Monat.",
+   "kontext": "Schick uns bitte innerhalb von 14 Tagen einen Legitimationsnachweis: also Deinen Schüler:innenausweis, Studierendenausweis oder Deine Geburtsurkunde. Den Nachweis speichern wir zusammen mit den Vertragsdokumenten. Fehlt er, erhöht sich der Tarifpreis um 15 Euro pro Monat.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(2) > div:nth-of-type(1) > ul:nth-of-type(5) > li:nth-of-type(6)",
+   "text": "Nimmst Du ein Handy dazu, erhöht sich Dein Tarifpreis um 2 € pro Monat. Du zahlst außerdem den Einmalpreis und 12, 24 oder 36 monatliche Raten. Wie hoch Deine monatliche Rate ist, hängt vom Handy und der Laufzeit ab.",
+   "kontext": "Mindestalter: 10 Jahre, Höchstalter: 27 Jahre Bist Du minderjährig, dürfen nur Erziehungsberechtigte buchen. Sie sind auch die Vertragspartner:in. Pro Person (unter 28 Jahre) kannst Du nur einen GigaMobil Young-Tarif buchen und uneingeschränkt nutzen. Schick uns bitte innerhalb von 14 Tagen einen Le",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(2) > div:nth-of-type(1) > ul:nth-of-type(10) > li:nth-of-type(1) > strong:nth-of-type(1)",
+   "text": "15,99 Euro pro Monat:",
+   "kontext": "Smart Tech OneNumber gibt's ab 15,99 Euro pro Monat: Du zahlst 5,99 Euro Tarifpreis und mindestens 10 Euro für Deine Smartwatch. Wie viel genau, hängt vom Modell ab.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(2) > div:nth-of-type(1) > ul:nth-of-type(10) > li:nth-of-type(1) > strong:nth-of-type(2)",
+   "text": "5,99 Euro Tarifpreis und mindestens 10 Euro für Deine Smartwatch. Wie viel genau, hängt vom Modell ab.",
+   "kontext": "Smart Tech OneNumber gibt's ab 15,99 Euro pro Monat: Du zahlst 5,99 Euro Tarifpreis und mindestens 10 Euro für Deine Smartwatch. Wie viel genau, hängt vom Modell ab.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(2) > div:nth-of-type(1) > ul:nth-of-type(10) > li:nth-of-type(4)",
+   "text": "Alle monatlichen Entgelte des Smart Tech OneNumber-Tarifs entfallen mit Laufzeitende nach 24 Monaten. Danach nutzt Du auf Deinem smarten Gerät automatisch Deine Mobilfunknummer und das Datenvolumen Deines Mobilfunktarifs. OneNumber Flex wird dann kostenpflichtig. Du zahlst dafür 5,99 Euro pro Monat.",
+   "kontext": "Smart Tech OneNumber gibt's ab 15,99 Euro pro Monat: Du zahlst 5,99 Euro Tarifpreis und mindestens 10 Euro für Deine Smartwatch. Wie viel genau, hängt vom Modell ab. Um Smart Tech OneNumber nutzen zu können, brauchst Du einen Vertrag mit einem der untenstehenden Mobilfunktarife mit weiteren monatlic",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(2) > div:nth-of-type(1) > ul:nth-of-type(12) > li:nth-of-type(2) > strong:nth-of-type(3)",
+   "text": "5,99 Euro pro Monat.",
+   "kontext": "Pro Vodafone OneNumber Flex MultiSIM zahlst Du 5,99 Euro pro Monat.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(2) > div:nth-of-type(1) > ul:nth-of-type(12) > li:nth-of-type(3) > strong:nth-of-type(1)",
+   "text": "19,99 Euro",
+   "kontext": "Du zahlst einmalig 19,99 Euro als Anschlusspreis.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(2) > div:nth-of-type(1) > ul:nth-of-type(16) > li:nth-of-type(6)",
+   "text": "In den Vodafone Mobil- und GigaMobil Young-Tarifen XS und S kannst Du es als Option dazubuchen – für 3,99 Euro pro Monat. Du kannst sie jeden Monat kündigen.",
+   "kontext": "Zum 5 Jahres-Versprechen gehören die Verlängerung der Hersteller-Garantie und ein kostenloser Akku-Tausch. Garantie-Verlängerung: Wir reparieren Dein Smartphone auch nach Ablauf der Hersteller-Garantie zu denselben Bedingungen – also bis zu 5 Jahre nachdem Du's gekauft hast. Akku-Tausch: Die Batteri",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(3) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(1)",
+   "text": "10 € im GigaMobil Young S",
+   "kontext": "10 € im GigaMobil Young S 12 € im GigaMobil Young S mit Smartphone 40 € im GigaMobil Young XL 42 € im GigaMobil Young XL mit Smartphone",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(3) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(2)",
+   "text": "12 € im GigaMobil Young S mit Smartphone",
+   "kontext": "10 € im GigaMobil Young S 12 € im GigaMobil Young S mit Smartphone 40 € im GigaMobil Young XL 42 € im GigaMobil Young XL mit Smartphone",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(3) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(3)",
+   "text": "40 € im GigaMobil Young XL",
+   "kontext": "10 € im GigaMobil Young S 12 € im GigaMobil Young S mit Smartphone 40 € im GigaMobil Young XL 42 € im GigaMobil Young XL mit Smartphone",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(3) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(4)",
+   "text": "42 € im GigaMobil Young XL mit Smartphone",
+   "kontext": "10 € im GigaMobil Young S 12 € im GigaMobil Young S mit Smartphone 40 € im GigaMobil Young XL 42 € im GigaMobil Young XL mit Smartphone",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(3) > div:nth-of-type(1) > ul:nth-of-type(6) > li:nth-of-type(1)",
+   "text": "15 € Rabatt pro Monat auf den Tarifpreis, wenn Du kein Smartphone kaufst",
+   "kontext": "15 € Rabatt pro Monat auf den Tarifpreis, wenn Du kein Smartphone kaufst 16 € Rabatt pro Monat auf den Tarifpreis, wenn Du ein Smartphone mit Ratenzahlungsvereinbarung kaufst",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(3) > div:nth-of-type(1) > ul:nth-of-type(6) > li:nth-of-type(2)",
+   "text": "16 € Rabatt pro Monat auf den Tarifpreis, wenn Du ein Smartphone mit Ratenzahlungsvereinbarung kaufst",
+   "kontext": "15 € Rabatt pro Monat auf den Tarifpreis, wenn Du kein Smartphone kaufst 16 € Rabatt pro Monat auf den Tarifpreis, wenn Du ein Smartphone mit Ratenzahlungsvereinbarung kaufst",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(3) > div:nth-of-type(1) > ul:nth-of-type(7) > li:nth-of-type(2)",
+   "text": "15 € Rabatt pro Monat auf den Tarifpreis, wenn Du kein Smartphone kaufst",
+   "kontext": "Zusätzlich 70 GB Datenvolumen pro Monat – auch fürs EU-Roaming 15 € Rabatt pro Monat auf den Tarifpreis, wenn Du kein Smartphone kaufst 16 € Rabatt pro Monat auf den Tarifpreis, wenn Du ein Smartphone mit Ratenzahlungsvereinbarung kaufst",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(3) > div:nth-of-type(1) > ul:nth-of-type(7) > li:nth-of-type(3)",
+   "text": "16 € Rabatt pro Monat auf den Tarifpreis, wenn Du ein Smartphone mit Ratenzahlungsvereinbarung kaufst",
+   "kontext": "Zusätzlich 70 GB Datenvolumen pro Monat – auch fürs EU-Roaming 15 € Rabatt pro Monat auf den Tarifpreis, wenn Du kein Smartphone kaufst 16 € Rabatt pro Monat auf den Tarifpreis, wenn Du ein Smartphone mit Ratenzahlungsvereinbarung kaufst",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(3) > div:nth-of-type(1) > ul:nth-of-type(8) > li:nth-of-type(1)",
+   "text": "20 € Rabatt pro Monat auf den Tarifpreis, wenn Du kein Smartphone kaufst",
+   "kontext": "20 € Rabatt pro Monat auf den Tarifpreis, wenn Du kein Smartphone kaufst 12,66 € Rabatt pro Monat auf den Tarifpreis, wenn Du ein Smartphone mit Ratenzahlungsvereinbarung kaufst",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(3) > div:nth-of-type(1) > ul:nth-of-type(8) > li:nth-of-type(2)",
+   "text": "12,66 € Rabatt pro Monat auf den Tarifpreis, wenn Du ein Smartphone mit Ratenzahlungsvereinbarung kaufst",
+   "kontext": "20 € Rabatt pro Monat auf den Tarifpreis, wenn Du kein Smartphone kaufst 12,66 € Rabatt pro Monat auf den Tarifpreis, wenn Du ein Smartphone mit Ratenzahlungsvereinbarung kaufst",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(3) > div:nth-of-type(1) > p:nth-of-type(16)",
+   "text": "Aktion bis einschließlich 14. Oktober 2026: Wenn Du einen Mobilfunk-Vertrag in einem Vodafone Mobil- oder GigaMobil Young-Tarif abschließt und dabei eins dieser Smartphones bestellst, zahlst Du einmal 1 € – und im Monat:",
+   "kontext": "4 Aktionen Rabatt für Privatkund:innen in den GigaMobil Young-Tarifen S und XL Aktion Stand September 2026: Wenn Du neu bei uns bist, bekommst Du in den GigaMobil Young-Tarifen S und XL jeden Monat Rabatt auf den Tarifpreis – über die komplette Mindestlaufzeit von 24 Monaten. Du sparst jeden Monat: ",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(3) > div:nth-of-type(1) > ul:nth-of-type(9) > li:nth-of-type(1)",
+   "text": "Samsung Galaxy S26 256 GB: Beim Mobil M und einer Ratenzahlungsvereinbarung von 36 Monaten für das Smartphone zahlst Du im Monat 71,95 € statt 77,95 €, solange der Mobilfunk-Vertrag besteht: 50,95 € Tarifpreis + 21 € Smartphone-Rate.",
+   "kontext": "Samsung Galaxy S26 256 GB: Beim Mobil M und einer Ratenzahlungsvereinbarung von 36 Monaten für das Smartphone zahlst Du im Monat 71,95 € statt 77,95 €, solange der Mobilfunk-Vertrag besteht: 50,95 € Tarifpreis + 21 € Smartphone-Rate. Samsung Galaxy Galaxy Z Flip8 256 GB: Beim Mobil M und einer Raten",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(3) > div:nth-of-type(1) > ul:nth-of-type(9) > li:nth-of-type(2)",
+   "text": "Samsung Galaxy Galaxy Z Flip8 256 GB: Beim Mobil M und einer Ratenzahlungsvereinbarung von 36 Monaten für das Smartphone zahlst Du im Monat 81,45 € statt 86,95 €, solange der Mobilfunk-Vertrag besteht: 50,95 € Tarifpreis + 30,50 € Smartphone-Rate.",
+   "kontext": "Samsung Galaxy S26 256 GB: Beim Mobil M und einer Ratenzahlungsvereinbarung von 36 Monaten für das Smartphone zahlst Du im Monat 71,95 € statt 77,95 €, solange der Mobilfunk-Vertrag besteht: 50,95 € Tarifpreis + 21 € Smartphone-Rate. Samsung Galaxy Galaxy Z Flip8 256 GB: Beim Mobil M und einer Raten",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(3) > div:nth-of-type(1) > ul:nth-of-type(9) > li:nth-of-type(3)",
+   "text": "Samsung Galaxy A57 5G 256 GB: Beim Mobil M und einer Ratenzahlungsvereinbarung von 36 Monaten für das Smartphone zahlst Du im Monat 61,45 € statt 64,45 €, solange der Mobilfunk-Vertrag besteht: 50,95 € Tarifpreis + 10,50 € Smartphone-Rate.",
+   "kontext": "Samsung Galaxy S26 256 GB: Beim Mobil M und einer Ratenzahlungsvereinbarung von 36 Monaten für das Smartphone zahlst Du im Monat 71,95 € statt 77,95 €, solange der Mobilfunk-Vertrag besteht: 50,95 € Tarifpreis + 21 € Smartphone-Rate. Samsung Galaxy Galaxy Z Flip8 256 GB: Beim Mobil M und einer Raten",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(3) > div:nth-of-type(1) > ul:nth-of-type(10) > li:nth-of-type(1) > strong:nth-of-type(2)",
+   "text": "reduziert sich der Einmalpreis um bis zu 238,90 €",
+   "kontext": "Bestellst Du im Aktionszeitraum das Samsung Galaxy S26 mit 256 GB in den Tarifen FamilyCard S bis XL, reduziert sich der Einmalpreis um bis zu 238,90 €: Im Tarif FamilyCard M zahlst Du z.B. 1 € statt 239,90 €.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(3) > div:nth-of-type(1) > ul:nth-of-type(10) > li:nth-of-type(1)",
+   "text": "Bestellst Du im Aktionszeitraum das Samsung Galaxy S26 mit 256 GB in den Tarifen FamilyCard S bis XL, reduziert sich der Einmalpreis um bis zu 238,90 €: Im Tarif FamilyCard M zahlst Du z.B. 1 € statt 239,90 €.",
+   "kontext": "Bestellst Du im Aktionszeitraum das Samsung Galaxy S26 mit 256 GB in den Tarifen FamilyCard S bis XL, reduziert sich der Einmalpreis um bis zu 238,90 €: Im Tarif FamilyCard M zahlst Du z.B. 1 € statt 239,90 €. Bestellst Du im Aktionszeitraum das Samsung Galaxy Z Flip8 mit 256 GB in den Tarifen Famil",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(3) > div:nth-of-type(1) > ul:nth-of-type(10) > li:nth-of-type(2) > strong:nth-of-type(2)",
+   "text": "reduziert sich der Einmalpreis um bis zu 200 €",
+   "kontext": "Bestellst Du im Aktionszeitraum das Samsung Galaxy Z Flip8 mit 256 GB in den Tarifen FamilyCard S bis XL, reduziert sich der Einmalpreis um bis zu 200 €: Im Tarif FamilyCard M zahlst Du z.B. 79,90 € statt 279,90 €.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(3) > div:nth-of-type(1) > ul:nth-of-type(10) > li:nth-of-type(2)",
+   "text": "Bestellst Du im Aktionszeitraum das Samsung Galaxy Z Flip8 mit 256 GB in den Tarifen FamilyCard S bis XL, reduziert sich der Einmalpreis um bis zu 200 €: Im Tarif FamilyCard M zahlst Du z.B. 79,90 € statt 279,90 €.",
+   "kontext": "Bestellst Du im Aktionszeitraum das Samsung Galaxy S26 mit 256 GB in den Tarifen FamilyCard S bis XL, reduziert sich der Einmalpreis um bis zu 238,90 €: Im Tarif FamilyCard M zahlst Du z.B. 1 € statt 239,90 €. Bestellst Du im Aktionszeitraum das Samsung Galaxy Z Flip8 mit 256 GB in den Tarifen Famil",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(3) > div:nth-of-type(1) > ul:nth-of-type(10) > li:nth-of-type(3) > strong:nth-of-type(2)",
+   "text": "reduziert sich der Einmalpreis um bis zu 110 €",
+   "kontext": "Bestellst Du im Aktionszeitraum das Samsung Galaxy A57 5G mit 256 GB in den Tarifen FamilyCard S bis XL, reduziert sich der Einmalpreis um bis zu 110 €: Im Tarif FamilyCard M zahlst Du z.B. 59,90 € statt 169,90 €.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(3) > div:nth-of-type(1) > ul:nth-of-type(10) > li:nth-of-type(3)",
+   "text": "Bestellst Du im Aktionszeitraum das Samsung Galaxy A57 5G mit 256 GB in den Tarifen FamilyCard S bis XL, reduziert sich der Einmalpreis um bis zu 110 €: Im Tarif FamilyCard M zahlst Du z.B. 59,90 € statt 169,90 €.",
+   "kontext": "Bestellst Du im Aktionszeitraum das Samsung Galaxy S26 mit 256 GB in den Tarifen FamilyCard S bis XL, reduziert sich der Einmalpreis um bis zu 238,90 €: Im Tarif FamilyCard M zahlst Du z.B. 1 € statt 239,90 €. Bestellst Du im Aktionszeitraum das Samsung Galaxy Z Flip8 mit 256 GB in den Tarifen Famil",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(3) > div:nth-of-type(1) > h4:nth-of-type(9)",
+   "text": "Samsung Galaxy S26 und Galaxy Z Flip8: bis zu 400 € zusätzlich zum Restwert für Dein altes Handy",
+   "kontext": "4 Aktionen Rabatt für Privatkund:innen in den GigaMobil Young-Tarifen S und XL Aktion Stand September 2026: Wenn Du neu bei uns bist, bekommst Du in den GigaMobil Young-Tarifen S und XL jeden Monat Rabatt auf den Tarifpreis – über die komplette Mindestlaufzeit von 24 Monaten. Du sparst jeden Monat: ",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(3) > div:nth-of-type(1) > p:nth-of-type(18)",
+   "text": "Aktion bis einschließlich 9. November 2026: Du kaufst ein Samsung Galaxy S26 oder Galaxy Z Flip8. Dazu buchst Du den Tarif Vodafone Mobil, GigaMobil Young oder FamilyCard. Und Du verkaufst Dein altes Handy mit einem Mindestwert von 1 € an unseren Partner Recommerce. Dann bekommst Du einen Zusatzbonu",
+   "kontext": "4 Aktionen Rabatt für Privatkund:innen in den GigaMobil Young-Tarifen S und XL Aktion Stand September 2026: Wenn Du neu bei uns bist, bekommst Du in den GigaMobil Young-Tarifen S und XL jeden Monat Rabatt auf den Tarifpreis – über die komplette Mindestlaufzeit von 24 Monaten. Du sparst jeden Monat: ",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(3) > div:nth-of-type(1) > ul:nth-of-type(11) > li:nth-of-type(1)",
+   "text": "Bei Kauf eines Samsung Galaxy S26: 60 € Zusatzbonus – zusätzlich zum Restwert. Zusammen mit dem Tauschbonus von 240 € sind das 300 €.",
+   "kontext": "Bei Kauf eines Samsung Galaxy S26: 60 € Zusatzbonus – zusätzlich zum Restwert. Zusammen mit dem Tauschbonus von 240 € sind das 300 €. Bei Kauf eines Samsung Galaxy Z Flip8: 160 € Zusatzbonus – zusätzlich zum Restwert. Zusammen mit dem Tauschbonus von 240 € sind das 400 €.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(3) > div:nth-of-type(1) > ul:nth-of-type(11) > li:nth-of-type(2)",
+   "text": "Bei Kauf eines Samsung Galaxy Z Flip8: 160 € Zusatzbonus – zusätzlich zum Restwert. Zusammen mit dem Tauschbonus von 240 € sind das 400 €.",
+   "kontext": "Bei Kauf eines Samsung Galaxy S26: 60 € Zusatzbonus – zusätzlich zum Restwert. Zusammen mit dem Tauschbonus von 240 € sind das 300 €. Bei Kauf eines Samsung Galaxy Z Flip8: 160 € Zusatzbonus – zusätzlich zum Restwert. Zusammen mit dem Tauschbonus von 240 € sind das 400 €.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(3) > div:nth-of-type(1) > h4:nth-of-type(10)",
+   "text": "240 € Tauschbonus für ausgewählte Samsung Galaxy-Smartphones",
+   "kontext": "4 Aktionen Rabatt für Privatkund:innen in den GigaMobil Young-Tarifen S und XL Aktion Stand September 2026: Wenn Du neu bei uns bist, bekommst Du in den GigaMobil Young-Tarifen S und XL jeden Monat Rabatt auf den Tarifpreis – über die komplette Mindestlaufzeit von 24 Monaten. Du sparst jeden Monat: ",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(3) > div:nth-of-type(1) > p:nth-of-type(21)",
+   "text": "Aktion bis einschließlich 9. November 2026: Du kaufst ein Samsung Galaxy S26 oder Galaxy Z Flip8. Du nimmst im Aktionszeitraum den Tarif Vodafone Mobil, GigaMobil Young oder FamilyCard dazu. Und Du verkaufst Dein Altgerät mit einem Mindestwert von 1 Euro an unseren Partner Recommerce. Dann bekommst ",
+   "kontext": "4 Aktionen Rabatt für Privatkund:innen in den GigaMobil Young-Tarifen S und XL Aktion Stand September 2026: Wenn Du neu bei uns bist, bekommst Du in den GigaMobil Young-Tarifen S und XL jeden Monat Rabatt auf den Tarifpreis – über die komplette Mindestlaufzeit von 24 Monaten. Du sparst jeden Monat: ",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(3) > div:nth-of-type(1) > p:nth-of-type(21) > strong:nth-of-type(2)",
+   "text": "12 Monate lang jeden Monat 20 Euro Tauschbonus",
+   "kontext": "Aktion bis einschließlich 9. November 2026: Du kaufst ein Samsung Galaxy S26 oder Galaxy Z Flip8. Du nimmst im Aktionszeitraum den Tarif Vodafone Mobil, GigaMobil Young oder FamilyCard dazu. Und Du verkaufst Dein Altgerät mit einem Mindestwert von 1 Euro an unseren Partner Recommerce. Dann bekommst ",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(3) > div:nth-of-type(1) > h4:nth-of-type(11)",
+   "text": "Google AI Pro: 6 Monate im Wert von insgesamt 131,94 € kostenlos testen",
+   "kontext": "4 Aktionen Rabatt für Privatkund:innen in den GigaMobil Young-Tarifen S und XL Aktion Stand September 2026: Wenn Du neu bei uns bist, bekommst Du in den GigaMobil Young-Tarifen S und XL jeden Monat Rabatt auf den Tarifpreis – über die komplette Mindestlaufzeit von 24 Monaten. Du sparst jeden Monat: ",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(3) > div:nth-of-type(1) > p:nth-of-type(25)",
+   "text": "Gemini ist eine Marke von Google LLC. Verfügbar ab 18 Jahren. Mit einem Abo werden die Bedingungen für Google One, YouTube und Angebote akzeptiert. Angebot endet am 1. August 2027, um 23.59 Uhr. Nach Ablauf des Probezeitraums fällt automatisch die monatliche Abogebühr von derzeit 21,99 € an, sofern ",
+   "kontext": "4 Aktionen Rabatt für Privatkund:innen in den GigaMobil Young-Tarifen S und XL Aktion Stand September 2026: Wenn Du neu bei uns bist, bekommst Du in den GigaMobil Young-Tarifen S und XL jeden Monat Rabatt auf den Tarifpreis – über die komplette Mindestlaufzeit von 24 Monaten. Du sparst jeden Monat: ",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(3) > div:nth-of-type(1) > h4:nth-of-type(12)",
+   "text": "Hardware-Bonus: 200 € Rabatt in den Vodafone Mobil -Tarifen M bis XL bei Kauf eines Smartphones",
+   "kontext": "4 Aktionen Rabatt für Privatkund:innen in den GigaMobil Young-Tarifen S und XL Aktion Stand September 2026: Wenn Du neu bei uns bist, bekommst Du in den GigaMobil Young-Tarifen S und XL jeden Monat Rabatt auf den Tarifpreis – über die komplette Mindestlaufzeit von 24 Monaten. Du sparst jeden Monat: ",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(3) > div:nth-of-type(1) > p:nth-of-type(26)",
+   "text": "Aktion bis einschließlich 14. Oktober 2026: Wenn Du einen Vodafone Mobil-Tarif M, L oder XL mit einem Smartphone neu abschließt, bekommst Du 200 € Geräte-Rabatt – als monatliche Gutschrift von 8,34 € auf Deiner Mobilfunk-Rechnung. Der Rabatt gilt beim Kauf eines Smartphones mit Ratenzahlungsvereinba",
+   "kontext": "4 Aktionen Rabatt für Privatkund:innen in den GigaMobil Young-Tarifen S und XL Aktion Stand September 2026: Wenn Du neu bei uns bist, bekommst Du in den GigaMobil Young-Tarifen S und XL jeden Monat Rabatt auf den Tarifpreis – über die komplette Mindestlaufzeit von 24 Monaten. Du sparst jeden Monat: ",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(3) > div:nth-of-type(1) > h4:nth-of-type(13)",
+   "text": "120 € Tauschbonus für ausgewählte iPhones",
+   "kontext": "4 Aktionen Rabatt für Privatkund:innen in den GigaMobil Young-Tarifen S und XL Aktion Stand September 2026: Wenn Du neu bei uns bist, bekommst Du in den GigaMobil Young-Tarifen S und XL jeden Monat Rabatt auf den Tarifpreis – über die komplette Mindestlaufzeit von 24 Monaten. Du sparst jeden Monat: ",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(3) > div:nth-of-type(1) > p:nth-of-type(27)",
+   "text": "Aktion bis einschließlich 14. Oktober 2026 Du kaufst ein iPhone 18 Pro oder iPhone 18 Pro Max. Du nimmst im Aktionszeitraum den Tarif Vodafone Mobil, GigaMobil Young oder FamilyCard dazu. Und Du verkaufst Dein Altgerät mit einem Mindestwert von 1 Euro an unseren Partner Recommerce. Dann bekommst Du ",
+   "kontext": "4 Aktionen Rabatt für Privatkund:innen in den GigaMobil Young-Tarifen S und XL Aktion Stand September 2026: Wenn Du neu bei uns bist, bekommst Du in den GigaMobil Young-Tarifen S und XL jeden Monat Rabatt auf den Tarifpreis – über die komplette Mindestlaufzeit von 24 Monaten. Du sparst jeden Monat: ",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(3) > div:nth-of-type(1) > p:nth-of-type(30)",
+   "text": "Stand Oktober 2026: Du kaufst ein Samsung Galaxy Z Flip8, Z Fold8, Z Fold8 Ultra, Galaxy S26 Ultra, Galaxy S26+, Galaxy S26, Galaxy S26 FE, Galaxy A57, Google Pixel 11, Pixel 11 Pro, Pixel 11 Pro XL, Pixel 11 Pro Fold, Pixel 10a, Xiaomi 17, 17 Ultra, 17T, 17T Pro oder Fairphone 6. Du nimmst im Aktio",
+   "kontext": "4 Aktionen Rabatt für Privatkund:innen in den GigaMobil Young-Tarifen S und XL Aktion Stand September 2026: Wenn Du neu bei uns bist, bekommst Du in den GigaMobil Young-Tarifen S und XL jeden Monat Rabatt auf den Tarifpreis – über die komplette Mindestlaufzeit von 24 Monaten. Du sparst jeden Monat: ",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(3) > div:nth-of-type(1) > ul:nth-of-type(13) > li:nth-of-type(1) > strong:nth-of-type(1)",
+   "text": "12 Monate lang jeden Monat 5 € Tauschbonus",
+   "kontext": "Dann bekommst Du 12 Monate lang jeden Monat 5 € Tauschbonus, wenn Du das Samsung Galaxy A57 oder Google Pixel 10a kaufst.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(3) > div:nth-of-type(1) > ul:nth-of-type(13) > li:nth-of-type(2) > strong:nth-of-type(1)",
+   "text": "12 Monate lang jeden Monat 10 € Tauschbonus",
+   "kontext": "Du bekommst 12 Monate lang jeden Monat 10 € Tauschbonus, wenn Du das Google Pixel 11, Xiaomi 17, 17 Ultra, 17T, 17T Pro oder Fairphone 6 kaufst.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(3) > div:nth-of-type(1) > ul:nth-of-type(13) > li:nth-of-type(3) > strong:nth-of-type(1)",
+   "text": "12 Monate lang jeden Monat 20 € Tauschbonus",
+   "kontext": "Du bekommst 12 Monate lang jeden Monat 20 € Tauschbonus, wenn Du das Samsung Galaxy S26 FE, Galaxy S26 Ultra, Galaxy S26+, Galaxy S26, Galaxy Z Flip8, Z Fold8, Z Fold8 Ultra, Google Pixel 11 Pro, Pixel 11 Pro XL oder Pixel 11 Pro Fold kaufst.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(3) > div:nth-of-type(1) > p:nth-of-type(35)",
+   "text": "Aktion bis einschließlich 9. November 2026: Du kaufst ein Samsung Galaxy S26 Ultra, S26+, S26 FE, Z Fold8 oder Z Fold8 Ultra. Dazu buchst Du den Tarif Vodafone Mobil, GigaMobil Young oder FamilyCard. Und Du verkaufst Dein altes Handy mit einem Mindestwert von 1 € an unseren Partner Recommerce. Dann ",
+   "kontext": "4 Aktionen Rabatt für Privatkund:innen in den GigaMobil Young-Tarifen S und XL Aktion Stand September 2026: Wenn Du neu bei uns bist, bekommst Du in den GigaMobil Young-Tarifen S und XL jeden Monat Rabatt auf den Tarifpreis – über die komplette Mindestlaufzeit von 24 Monaten. Du sparst jeden Monat: ",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(3) > div:nth-of-type(1) > ul:nth-of-type(14) > li:nth-of-type(1)",
+   "text": "Bei Kauf eines Samsung Galaxy S26 Ultra, S26+ oder S26 FE: 60 € Zusatzbonus – zusätzlich zum Restwert. Zusammen mit dem Tauschbonus von 240 € sind das 300 €.",
+   "kontext": "Bei Kauf eines Samsung Galaxy S26 Ultra, S26+ oder S26 FE: 60 € Zusatzbonus – zusätzlich zum Restwert. Zusammen mit dem Tauschbonus von 240 € sind das 300 €. Bei Kauf eines Samsung Galaxy Z Fold8 oder Z Fold8 Ultra: 160 € Zusatzbonus – zusätzlich zum Restwert. Zusammen mit dem Tauschbonus von 240 € ",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(3) > div:nth-of-type(1) > ul:nth-of-type(14) > li:nth-of-type(2)",
+   "text": "Bei Kauf eines Samsung Galaxy Z Fold8 oder Z Fold8 Ultra: 160 € Zusatzbonus – zusätzlich zum Restwert. Zusammen mit dem Tauschbonus von 240 € sind das 400 €.",
+   "kontext": "Bei Kauf eines Samsung Galaxy S26 Ultra, S26+ oder S26 FE: 60 € Zusatzbonus – zusätzlich zum Restwert. Zusammen mit dem Tauschbonus von 240 € sind das 300 €. Bei Kauf eines Samsung Galaxy Z Fold8 oder Z Fold8 Ultra: 160 € Zusatzbonus – zusätzlich zum Restwert. Zusammen mit dem Tauschbonus von 240 € ",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(3) > div:nth-of-type(1) > p:nth-of-type(38)",
+   "text": "Aktion Stand September 2026: Du bist neu bei uns? Dann entfällt für Dich der einmalige Anschlusspreis von 39,99 € in den Tarifen Mobil XS bis XL und GigaMobil Young XS bis XL. Der Anschlusspreis wird Dir auf Deiner ersten oder zweiten Mobilfunk-Rechnung gutgeschrieben. Das gilt für Bestellungen auf ",
+   "kontext": "4 Aktionen Rabatt für Privatkund:innen in den GigaMobil Young-Tarifen S und XL Aktion Stand September 2026: Wenn Du neu bei uns bist, bekommst Du in den GigaMobil Young-Tarifen S und XL jeden Monat Rabatt auf den Tarifpreis – über die komplette Mindestlaufzeit von 24 Monaten. Du sparst jeden Monat: ",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(3) > div:nth-of-type(1) > h4:nth-of-type(18)",
+   "text": "24 x 15 € Rabatt auf die FamilyCard XL:",
+   "kontext": "4 Aktionen Rabatt für Privatkund:innen in den GigaMobil Young-Tarifen S und XL Aktion Stand September 2026: Wenn Du neu bei uns bist, bekommst Du in den GigaMobil Young-Tarifen S und XL jeden Monat Rabatt auf den Tarifpreis – über die komplette Mindestlaufzeit von 24 Monaten. Du sparst jeden Monat: ",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(3) > div:nth-of-type(1) > p:nth-of-type(40)",
+   "text": "Aktion Stand August 2026: Neukund:innen bekommen im Tarif FamilyCard XL 15 € Rabatt pro Monat auf den Tarifpreis: Du zahlst 24,99 € statt 39,99 € pro Monat. Der Rabatt entfällt nach 24 Monaten automatisch – oder wenn Du den Tarif wechselst",
+   "kontext": "4 Aktionen Rabatt für Privatkund:innen in den GigaMobil Young-Tarifen S und XL Aktion Stand September 2026: Wenn Du neu bei uns bist, bekommst Du in den GigaMobil Young-Tarifen S und XL jeden Monat Rabatt auf den Tarifpreis – über die komplette Mindestlaufzeit von 24 Monaten. Du sparst jeden Monat: ",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(4) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(2)",
+   "text": "Du zahlst einmalig 39,99 Euro als Anschlusspreis.",
+   "kontext": "Du zahlst den Tarifpreis pro Monat immer im Voraus. Und auf Deiner 1. Rechnung zusätzlich den anteiligen Tarifpreis für den 1. Monat. Du zahlst einmalig 39,99 Euro als Anschlusspreis. Die Hauptkarte und die Zusatzkarte(n) bilden eine FamilyCard-Gruppe mit maximal 4 Karten. Der Vertrag für Deine Fami",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(4) > div:nth-of-type(1) > ul:nth-of-type(2) > li:nth-of-type(3)",
+   "text": "Kündigst Du Deinen Vodafone Mobil-, GigaMobil-, GigaMobil Young-, Red-, Young-, Black- oder Smart-Tarif, dann wird die älteste Red+ Karte oder FamilyCard automatisch zur neuen Hauptkarte. Ist das eine FamilyCard S oder M, dann wechselt diese in den Tarif Vodafone Mobil S – für 39,95 Euro pro Monat m",
+   "kontext": "Mindestlaufzeit: 24 Monate Kündigungsfrist beträgt 1 Monat zum Ende der Mindestlaufzeit. Kündigst Du Deinen Vodafone Mobil-, GigaMobil-, GigaMobil Young-, Red-, Young-, Black- oder Smart-Tarif, dann wird die älteste Red+ Karte oder FamilyCard automatisch zur neuen Hauptkarte. Ist das eine FamilyCard",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(4) > div:nth-of-type(1) > ul:nth-of-type(3) > li:nth-of-type(3)",
+   "text": "Du hast SpeedGo. Das heißt: Du bekommst eine SMS, wenn Du 80 % Deines Datenvolumens verbraucht hast. Bei 100 % schalten wir Dir weitere 250 MB frei. Höchstens 3-mal in einem Rechnungsmonat für je 3 Euro. Du kannst immer per SMS ablehnen. Dann surfst Du langsamer, sobald Du 100 % Deines Datenvolumens",
+   "kontext": "Flat für Standard-Gespräche und eine SMS-Flat in alle deutschen Mobilfunknetze: Konferenzverbindungen, Anrufe und SMS zu Sondernummern und im Internet sind davon ausgeschlossen. Pro Monat hast Du 5 GB im Tarif FamilyCard S 20 GB im Tarif FamilyCard M oder unbegrenztes Datenvolumen im Tarif FamilyCar",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(4) > div:nth-of-type(1) > p:nth-of-type(3) > strong:nth-of-type(1)",
+   "text": "24 x 15 € Rabatt auf die FamilyCard XL",
+   "kontext": "24 x 15 € Rabatt auf die FamilyCard XL",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(4) > div:nth-of-type(1) > p:nth-of-type(4)",
+   "text": "Aktion Stand August 2026: Neukund:innen bekommen im Tarif FamilyCard XL 15 € Rabatt pro Monat auf den Tarifpreis: Du zahlst 24,99 € statt 39,99 € pro Monat. Der Rabatt entfällt nach 24 Monaten automatisch – oder wenn Du den Tarif wechselst",
+   "kontext": "5 Für die FamilyCard gilt: Um eine FamilyCard-Zusatzkarte nutzen zu können, brauchst Du einen Vodafone Mobil-, GigaMobil-, GigaMobil Young-, Red-, Young- oder Smart-Tarif. Der Tarif Smart XS ist davon ausgenommen. Du zahlst den Tarifpreis pro Monat immer im Voraus. Und auf Deiner 1. Rechnung zusätzl",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(4) > div:nth-of-type(1) > p:nth-of-type(5)",
+   "text": "Aktion Stand September 2026: Du hast noch keine FamilyCard? Dann entfällt für Dich der einmalige Anschlusspreis von 39,99 Euro in den Tarifen FamilyCard S, M, L & XL. Der Anschlusspreis wird Dir auf Deiner ersten oder zweiten Mobilfunk-Rechnung gutgeschrieben. Das gilt für Bestellungen auf vodafone.",
+   "kontext": "5 Für die FamilyCard gilt: Um eine FamilyCard-Zusatzkarte nutzen zu können, brauchst Du einen Vodafone Mobil-, GigaMobil-, GigaMobil Young-, Red-, Young- oder Smart-Tarif. Der Tarif Smart XS ist davon ausgenommen. Du zahlst den Tarifpreis pro Monat immer im Voraus. Und auf Deiner 1. Rechnung zusätzl",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(5) > div:nth-of-type(1) > ul:nth-of-type(2) > li:nth-of-type(1)",
+   "text": "5 Euro pro Monat in den Vodafone Mobil- und Smart Tarifen",
+   "kontext": "5 Euro pro Monat in den Vodafone Mobil- und Smart Tarifen 10 Euro pro Monat in den GigaMobil, GigaMobil Young-, Red- und Young-Tarifen",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(5) > div:nth-of-type(1) > ul:nth-of-type(2) > li:nth-of-type(2)",
+   "text": "10 Euro pro Monat in den GigaMobil, GigaMobil Young-, Red- und Young-Tarifen",
+   "kontext": "5 Euro pro Monat in den Vodafone Mobil- und Smart Tarifen 10 Euro pro Monat in den GigaMobil, GigaMobil Young-, Red- und Young-Tarifen",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(5) > div:nth-of-type(1) > p:nth-of-type(4) > strong:nth-of-type(2)",
+   "text": "5 Euro Rabatt",
+   "kontext": "Für die Kombination eines Kabel-Internet-Vertrags mit einem GigaTV Cable-Vertrag bekommst Du jeden Monat 5 Euro Rabatt auf Deine Kabel-Internet-Rechnung oder TV-Rechnung.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(5) > div:nth-of-type(1) > ul:nth-of-type(3) > li:nth-of-type(1)",
+   "text": "10 Euro pro Monat in den Vodafone Mobil und Smart Tarifen",
+   "kontext": "10 Euro pro Monat in den Vodafone Mobil und Smart Tarifen 15 Euro pro Monat in den GigaMobil-, GigaMobil Young-, Red- und Young-Tarifen",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(5) > div:nth-of-type(1) > ul:nth-of-type(3) > li:nth-of-type(2)",
+   "text": "15 Euro pro Monat in den GigaMobil-, GigaMobil Young-, Red- und Young-Tarifen",
+   "kontext": "10 Euro pro Monat in den Vodafone Mobil und Smart Tarifen 15 Euro pro Monat in den GigaMobil-, GigaMobil Young-, Red- und Young-Tarifen",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#footnotes-container > aside:nth-of-type(1) > details:nth-of-type(5) > div:nth-of-type(1) > p:nth-of-type(6) > strong:nth-of-type(2)",
+   "text": "10 € Rabatt auf Deine GigaCube-Rechnung",
+   "kontext": "Für die Kombination eines Mobilfunk- und eines GigaCube-Vertrags bekommst Du jeden Monat 10 € Rabatt auf Deine GigaCube-Rechnung. Der Rabatt gilt nur für die Monate, in denen Du den GigaCube nutzt.",
+   "sichtbar": true
+  }
+ ]
+}
