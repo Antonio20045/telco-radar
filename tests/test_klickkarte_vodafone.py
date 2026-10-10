@@ -1,5 +1,8 @@
 """Klick-Karte Vodafone gegen die echte Preisantwort der Klick-Erkundung, ohne Browser.
 
+Die Karte ist die eingefrorene Produktseiten-Karte (``fixtures/geraete/
+klickkarten_produktseite``); die Tarifauswahl prüft ``test_klick_karte_vodafone_tarif``.
+
 Die Antwort ist ``virtualItem/226`` aus ``mitschnitt-1.json`` Antwort 149 (Zweig
 ``klick-erkundung``, Commit a9b45f5a, Produktseite iPhone 17 Pro, 07.10.2026; Herkunft
 in ``tests/fixtures/geraete/_herkunft.json``). Die Texte sind die sichtbaren Kandidaten
@@ -27,7 +30,7 @@ from telco_radar.collect.geraete.klickkartenprobe import GELADEN, lade_karte
 from telco_radar.collect.geraete.klickoptionen import wert_nach_muster
 from telco_radar.collect.geraete.klicktext import Preiswerte
 
-KARTEN = Path(__file__).resolve().parents[1] / "config" / "klickkarten"
+KARTEN = Path(__file__).parent / "fixtures" / "geraete" / "klickkarten_produktseite"
 FIXTURE = (
     Path(__file__).parent
     / "fixtures"

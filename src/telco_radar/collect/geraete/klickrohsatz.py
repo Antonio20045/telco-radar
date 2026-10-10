@@ -26,8 +26,10 @@ ins Bündel, damit sichtbar bleibt, welche Messung noch ohne Beleg ist.
 
 Jede andere Kombination wird gezählt, nie zu einem Nullwert: ``befund``,
 ``nicht_erfasst``, ``nicht_angeboten``, ``nicht_besucht`` (Grund beginnt mit „nicht
-besucht“), dazu Seiten, die der Lauf nicht öffnete. Ein erfasster Wert ohne Tarif
-(Vodafone: ``unbekannt``), ohne bekannten Speicher oder ohne Preis ist ebenfalls eine
+besucht“), dazu Seiten, die der Lauf nicht öffnete. Trägt die Kombination den
+Nachweis ``tarifname`` (Vodafone: der Name zum Radio-Wert der Tarifauswahl), ist er der
+Tarifname. Ein erfasster Wert ohne Tarif (``unbekannt``), ohne bekannten Speicher oder
+ohne Preis ist ebenfalls eine
 benannte Lücke; ohne Tarif gehen Anzahlung, Rate und Ratenzahl als ``ohne_tarif`` in die
 Gegenprobe der Gerätepreise (``analyze.klick_geraetepreis``). Ein Tarif, den der
 Tarifbestand nicht kennt, bleibt im Satz; über ihn entscheidet ``aus_rohsaetzen`` mit
@@ -89,6 +91,7 @@ TB_IN_GB = 1024
 LUECKE_NICHT_BESUCHT = "nicht_besucht"
 LUECKE_SEITE = "seite_nicht_gelesen"
 LUECKE_TARIF = "tarif_unbekannt"
+NACHWEIS_TARIFNAME = "tarifname"
 LUECKE_SPEICHER = "speicher_unbekannt"
 LUECKE_GERAET = "geraet_unbekannt"
 LUECKE_OHNE_PREIS = "ohne_preis"
@@ -315,6 +318,8 @@ def rohsatz(
     tarif = str(variante.get("tarif") or "").strip()
     if not tarif or tarif.casefold() == TARIF_UNBEKANNT:
         return LUECKE_TARIF
+    name = (kombination.get("nachweise") or {}).get(NACHWEIS_TARIFNAME)
+    tarif = name.strip() if isinstance(name, str) and name.strip() else tarif
     werte = kombination.get("werte") or {}
     laufzeit = werte.get("ratenzahl")
     laufzeit = variante.get("laufzeit") if laufzeit is None else laufzeit

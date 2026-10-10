@@ -1,7 +1,8 @@
 """Gerätepreise ohne Tarif als Gegenprobe (``analyze.klick_geraetepreis``).
 
 Klick-Seite: die echte Preisantwort ``virtualItem/226`` der Vodafone-Produktseite
-iPhone 17 Pro, gelesen mit der Klick-Karte (``vodafone_virtualitem_iphone_17_pro_
+iPhone 17 Pro, gelesen mit der eingefrorenen Produktseiten-Karte
+(``fixtures/geraete/klickkarten_produktseite``; ``vodafone_virtualitem_iphone_17_pro_
 20261007.json.gz``, 256 GB, 36 Raten: 1 € einmal, 33 € im Monat; Tarif ``unbekannt``).
 Adapter-Seite: die echte Tarifantwort derselben Erkundung (``vodafone_tarif_hardware_
 iphone_17_pro_20261007.json``, Anfrage 337), gelesen von ``vodafone.loese_tarifnamen``:
@@ -32,7 +33,7 @@ from telco_radar.report.geraete_tco_karten import geraet_aus_sku
 
 HEUTE = "2026-10-07"
 FIX = Path(__file__).parent / "fixtures" / "geraete"
-KARTEN = Path(__file__).resolve().parents[1] / "config" / "klickkarten"
+KARTEN = Path(__file__).parent / "fixtures" / "geraete" / "klickkarten_produktseite"
 PREISE = FIX / "vodafone_virtualitem_iphone_17_pro_20261007.json.gz"
 TARIFE = FIX / "vodafone_tarif_hardware_iphone_17_pro_20261007.json"
 URL = (

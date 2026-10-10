@@ -63,6 +63,7 @@ from telco_radar.tarif_model import Preisphase
 
 WURZEL = Path(__file__).parent.parent
 KARTEN = WURZEL / "config" / "klickkarten"
+PRODUKTSEITE = WURZEL / "tests" / "fixtures" / "geraete" / "klickkarten_produktseite"
 FIXTURE = (
     Path(__file__).parent / "fixtures" / "geraete" / "kartenprobe_texte_20261007.json"
 )
@@ -96,7 +97,8 @@ def _id(kombination: dict) -> str:
 
 
 def _karte(anbieter: str) -> Klickkarte:
-    return lade_klickkarte(KARTEN / f"{anbieter}.yaml")
+    ort = PRODUKTSEITE if anbieter == "vodafone" else KARTEN
+    return lade_klickkarte(ort / f"{anbieter}.yaml")
 
 
 def _textwerte(karte: Klickkarte, text: str) -> tuple[Preiswerte, Buendelwerte]:

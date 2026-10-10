@@ -1,17 +1,25 @@
-# Klick-Karte Vodafone (Format 2) für die Produktseite, Kartenprobe in Actions.
-# Fundstellen: Zweig klick-erkundung, Lauf a9b45f5a, erkundung/vodafone/2026-10-07/
-# (B1 = bedienelemente-1.json, iPhone 17 Pro; B2 = bedienelemente-2.json, Galaxy S26;
-# P1 = preise-1.json, K1 = klicks-1.json, M1 = mitschnitt-1.json, A = Anfragenummer).
+# Klick-Karte Vodafone (Format 2) für Produktseite und Tarifauswahl, Kartenprobe in
+# Actions. Fundstellen auf dem Zweig klick-erkundung:
+# Lauf a9b45f5a, erkundung/vodafone/2026-10-07/ (B1 = bedienelemente-1.json, iPhone 17
+# Pro; B2 = bedienelemente-2.json, Galaxy S26; P1 = preise-1.json, K1 = klicks-1.json,
+# M1 = mitschnitt-1.json, A = Anfragenummer).
+# Lauf d969c6e1, erkundung/vodafone/2026-10-10/ (Schnitt 8a, Proben auf der
+# Tarifauswahl): B3 = bedienelemente-3.json, P3 = preise-3.json, K3 = klicks-3.json,
+# M3 = mitschnitt-3.json (Tarifauswahl zum iPhone 17 Pro).
 #
 # Die Produktseite wählt Speicher und Ratenlaufzeit; den Tarif wählt man erst auf der
-# Folgeseite „Zur Tarifauswahl“ (B1 Element 267, B2 Element 230). Die Gerätepreise der
-# Produktseite gelten für jeden Tarif, der Tarif bleibt darum „unbekannt“.
-# Bewusst nicht gelesen (Lücke): Tarifphasen, Tarifbindung, Anschluss, Volumen. Sie
-# stehen nur auf der Tarifauswahl (mitschnitt-3 A337, mitschnitt-4 A324:
-# glados/v2/tariff/v2/hardware; je Tarif Monate 1–24 mit und ohne Rabatt, Anschluss
-# 0 € „statt 39,99 €“, die Gerätelaufzeit aus der Produktseite, ab Monat 25 nur die
-# Rate). Format 2 kann diesen zweiten Schritt nicht: die Tarifauswahl hat für jede
-# Variante dieselbe Adresse, die Gerätewahl reist im Browserzustand mit.
+# Folgeseite „Zur Tarifauswahl“ (B1 Element 267, B2 Element 230). Der Crawler wählt
+# Speicher und Laufzeit, klickt einmal weiter (danach nur GET/HEAD) und klickt dort
+# jeden Tarif (weiter.klicken, klickfolgeklick). K3: fünf Klicks, jeder übernommen,
+# keiner fragt nach; alle Tarife stehen in einer Antwort beim Laden der Tarifauswahl
+# (M3: glados/v2/tariff/v2/hardware, virtualItemId 267–271, financingDuration aus der
+# Produktseite).
+# Die Zusammenfassung der Tarifauswahl nennt nur Anzahlung und die Monatssumme aus
+# Rate und Tarif für Monat 1–24 („Standardpreis 84,95 € – Angebotspreis 62,61 €“,
+# P3); Rate und Tarif allein stehen nirgends auf der Seite (P3, 89 Kandidaten). Sie
+# gelten über die Summe (klickecho, summe): Text gleich Antwort und Rate + Tarif = Summe.
+# Bewusst nicht gelesen (Lücke): Ratenzahl (Laufzeit der Produktseite gilt),
+# Tarifbindung, Anschluss, Volumen.
 anbieter: Vodafone
 
 knoepfe:
@@ -22,7 +30,13 @@ knoepfe:
     selektor: "#device-details-option-picker-capacity label.ws10-option-picker__label"
     muster: '^\s*(\d+\s*[GT]B)\b'
   tarif:
-    fest: unbekannt
+    # Tarifauswahl, B3: je Tarif ein div mit Radio name option-picker-gm-tariff
+    # (Wert 267–271 = virtualItemId in M3) und Label „ws10-option-picker__label“
+    # („28 GB statt 18 GB“ … „Unbegrenzt“, ohne Tarifnamen und ohne Preis).
+    selektor: 'div:has(> input[name="option-picker-gm-tariff"])'
+    wert_in: input
+    wert: value
+    gewaehlt: {passt: ":has(> input:checked)"}
   laufzeit:
     # B1 Elemente 51–58, B2 51–58: 36/24/12 Raten; „Einmal“ (Input value 1,
     # Element 57) ist kein Ratenkauf und fällt weg.
@@ -34,6 +48,14 @@ knoepfe:
   # darin ist checked (B1 45/51 checked, 46/52 label-checked). Die Klasse „checked“
   # am Label fehlt auf B2 (Elemente 42, 48, 52) und taugt nicht als Marke.
   gewaehlt: {passt: "div:has(input:checked) > label"}
+
+weiter:
+  # B1 Element 267 / B2 230: „Zur Tarifauswahl“, Link auf
+  # /privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html; die Gerätewahl reist
+  # im Browserzustand mit.
+  selektor: "#device-details-offer-summary-card a.ws10-button--primary"
+  text: Zur Tarifauswahl
+  klicken: tarif
 
 seite:
   # Echo „Seite zeigt“: das Label mit dem gewählten Input.
@@ -52,33 +74,42 @@ seite:
   farbe: {selektor: 'input[name="option-picker-color"]:checked', attribut: value}
 
 zusammenfassung:
-  # P1 Kandidaten 11–15: „1 € einmal“, „33 € pro Monat“, „9,98 €“ (Versand); K1
-  # Probe 1: die Tabelle folgt dem Klick (1 € → 0,99 €, 33 € → 40 €).
+  # Tarifauswahl, P3: Zeile 1 „1 €“ (Anzahlung), Zeile 2 „Standardpreis 84,95 € –
+  # Angebotspreis 62,61 €“ (Mobil M, Rate + Tarif Monat 1–24), Zeile 3 „9,98 €“
+  # (Versand). K3: Zeile 2 folgt jedem Tarifklick (64,95/56,95 … 114,95/83,11).
   selektor: "#ws10-offer-summary-card-price-table"
   muster:
-    anzahlung: '([\d.,]+)\s*€\s*einmal'
-    rate: '([\d.,]+)\s*€\s*pro\s+Monat'
-    ratenzahl:
-      selektor: >-
-        #device-details-option-picker-financing-duration
-        div:has(input:checked) > label.ws10-option-picker__label
-      muster: '^\s*(\d+)\s*Raten'
+    anzahlung:
+      selektor: "#ws10-offer-summary-card-price-table > tr:nth-of-type(1)"
+      muster: '([\d.,]+)\s*€'
+    buendelbetrag: 'Angebotspreis\s*([\d.,]+)\s*€'
 
 antwort:
-  # M1 A149 (xhr) und A209 (fetch), mitschnitt-2 A119/A187 (virtualItem/253):
-  # einmal beim Laden, kein Klick fragt nach (K1: nur Bilder). 7 atomics je
-  # Speicher und Farbe, je 3 compositions (financingDuration 12/36/24).
-  url_muster: '^https://api\.vodafone\.de/glados/v2/hardware/v2/virtualItem/\d+\?'
+  # M3: einmal beim Laden der Tarifauswahl, kein Tarifklick fragt nach (K3). Je
+  # Tarif atomics.0.prices.composition mit financingDuration der Produktseite.
+  # Mobil M am 10.10.2026: Anzahlung 1, Rate 33 (Monat 1–36), Tarif 29,61 (Monat
+  # 1–24), Summe 62,61 (Monat 1–24), ab Monat 25 nur die Rate.
+  url_muster: '^https://api\.vodafone\.de/glados/v2/tariff/v2/hardware\?'
   laden: true
-  erkennung: data.atomics
+  erkennung: data.0.tariffs
   pfade:
     anzahlung: >-
-      data.atomics[capacity.displayLabel={speicher}][color.displayLabel={farbe}].prices.composition[financingDuration={laufzeit}].priceByComponent.hardware.priceByType.rate.onetime.withoutDiscounts.gross
+      data.0.tariffs[virtualItemId={tarif}].atomics.0.prices.composition[financingDuration={laufzeit}].priceByComponent.hardware.priceByType.rate.onetime.withoutDiscounts.gross
     rate: >-
-      data.atomics[capacity.displayLabel={speicher}][color.displayLabel={farbe}].prices.composition[financingDuration={laufzeit}].priceByComponent.hardware.priceByType.rate.month.withoutDiscounts.gross
-    # Monat, in dem die letzte Rate fällig ist (12/24/36), nicht der Filterwert.
-    ratenzahl: >-
-      data.atomics[capacity.displayLabel={speicher}][color.displayLabel={farbe}].prices.composition[financingDuration={laufzeit}].priceByComponent.hardware.priceByType.rate.month.withoutDiscounts.recurrenceEnd
+      data.0.tariffs[virtualItemId={tarif}].atomics.0.prices.composition[financingDuration={laufzeit}].priceByComponent.hardware.priceByType.rate.month.withoutDiscounts.gross
+    tarifphasen:
+      liste: >-
+        data.0.tariffs[virtualItemId={tarif}].atomics.0.prices.composition[financingDuration={laufzeit}].priceByComponent.tariff.priceByType.rate.month.withDiscounts
+      von: recurrenceStart
+      bis: recurrenceEnd
+      betrag: gross
+    buendelbetrag: >-
+      data.0.tariffs[virtualItemId={tarif}].atomics.0.prices.composition[financingDuration={laufzeit}].totalMonthlyRatePrice.withDiscounts[recurrenceStart=1].gross
+    # Nachweis, kein Wert: der Name zum Radio-Wert („Mobil M“ zu 269), für den Rohsatz.
+    tarifname: 'data.0.tariffs[virtualItemId={tarif}].tariffName'
+  variante:
+    # M3: hardware.capacity „256 GB“ wie das Label der Produktseite.
+    speicher: data.0.hardware.capacity
 
 kanarie:
   # B1 Element 267: aria-label „Zur Tarifauswahl mit dem iPhone 17 Pro“; B2 230:

@@ -852,6 +852,19 @@
       "gzip": true,
       "bytes_abgelegt": 1328,
       "hinweis": "AUSZUG, nicht byteidentisch: data.plans[].variants[] nur mit id, title und prices.recurring, Werte unveraendert. Alle acht Tarife mit discounts [] und listed = discounted. Beleg fuer den Nachweis ratenplan der Klick-Karte congstar (tests/test_klick_ratenplan_congstar.py)."
+    },
+    {
+      "datei": "vodafone_tarifauswahl_20261010.json.gz",
+      "url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57562&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=36",
+      "quelle": "Zweig klick-erkundung, Commit d969c6e1, erkundung/vodafone/2026-10-10/mitschnitt-3.json, Antwort Nummer 343 (GET, xhr, gekuerzt false; Klick-Erkundung 10.10.2026, Tarifauswahl nach Zur Tarifauswahl, Apple iPhone 17 Pro 256 GB, 36 Raten)",
+      "abgerufen_am": "2026-10-10",
+      "http_status": 200,
+      "content_type": "application/json;charset=utf-8",
+      "bytes_roh": 13654,
+      "sha256_roh": "097ca7f979a9dd71edc7756cd2b62876bd421946a601dd7f02e6fe1ab17d8808",
+      "gzip": true,
+      "bytes_abgelegt": 1937,
+      "hinweis": "Koerper unveraendert wie im Mitschnitt. Fuenf Tarife Mobil XS bis XL (virtualItemId 267 bis 271); Beleg fuer die Klick-Karte Vodafone auf der Tarifauswahl (Schnitt 8b Teil 2b) und das Summen-Echo."
     }
   ]
 }

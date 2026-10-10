@@ -22,7 +22,7 @@ WERTFELDER = (
     "volumen_gb",
 )
 BUENDELFELDER = ("buendelbetrag", "einmalzahlung")
-NACHWEISFELDER = ("ratenplan",)
+NACHWEISFELDER = ("ratenplan", "tarifname")
 SUMMENFELD = BUENDELFELDER[0]
 """Wortlaute nur aus der Antwort, kein Wertfeld: weder Echo noch Lesefeld noch Beleg.
 ``ratenplan`` ist der Satz, der den Tarifpreis an die Ratenlaufzeit bindet (o2)."""
