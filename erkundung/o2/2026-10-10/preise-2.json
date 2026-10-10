@@ -1,0 +1,491 @@
+{
+ "preise_gesamt": 81,
+ "preise": [
+  {
+   "pfad": "#layer-menu-Mobilfunk > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > tef-teaser-nav:nth-of-type(1) > div:nth-of-type(2) > tef-scope:nth-of-type(1) > div:nth-of-type(1)",
+   "text": "0,- € Anschlusspreis",
+   "kontext": "0,- € Anschlusspreis",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#layer-menu-Kombi-Angebote > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > tef-teaser-nav:nth-of-type(1) > div:nth-of-type(3)",
+   "text": "Dauerhaft bis zu 25 € monatlichen Rabatt auf jeden weiteren Mobilfunk-Tarif",
+   "kontext": "Exklusiv für O2 Kunden Dauerhaft bis zu 25 € monatlichen Rabatt auf jeden weiteren Mobilfunk-Tarif Bis zu 25 € Rabatt ab dem 2. Tarif",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#layer-menu-Kombi-Angebote > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > tef-teaser-nav:nth-of-type(1) > div:nth-of-type(4) > a:nth-of-type(1)",
+   "text": "Bis zu 25 € Rabatt ab dem 2. Tarif",
+   "kontext": "Bis zu 25 € Rabatt ab dem 2. Tarif",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#id-1897576",
+   "text": "10 € mtl. Ersparnis auf die Grundgebühr",
+   "kontext": "10 € mtl. Ersparnis auf die Grundgebühr",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#layer-menu-TV\\%20\\%26\\%20Extras > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > tef-teaser-nav:nth-of-type(1) > div:nth-of-type(2) > tef-scope:nth-of-type(1) > div:nth-of-type(1)",
+   "text": "Ab 4,99 € mtl.",
+   "kontext": "Ab 4,99 € mtl.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#layer-menu-Ger\\%C3\\%A4te > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(4) > tef-teaser-nav:nth-of-type(1) > div:nth-of-type(2) > tef-scope:nth-of-type(1) > div:nth-of-type(1)",
+   "text": "Nur 1 € einmalig",
+   "kontext": "Nur 1 € einmalig",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#id-2276546",
+   "text": "15 € mtl. sparen",
+   "kontext": "15 € mtl. sparen",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#id-2293018 > div:nth-of-type(3)",
+   "text": "Sichere dir bis zu 5 x 50 € Gutschrift fürs Weiterempfehlen von O2.",
+   "kontext": "Freunde werben Freunde Sichere dir bis zu 5 x 50 € Gutschrift fürs Weiterempfehlen von O2. Freunde werben Freunde",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#id-587534 > div:nth-of-type(1) > ul:nth-of-type(2) > li:nth-of-type(1)",
+   "text": "Datennutzung (Roaming Standard): 500 MB/Tag für 4,99 € (nur bei Nutzung am jeweiligen Kalendertag)",
+   "kontext": "Datennutzung (Roaming Standard): 500 MB/Tag für 4,99 € (nur bei Nutzung am jeweiligen Kalendertag) Eingehende Anrufe: 0,26 €/Min Abgehende Telefonate: 0,54 €/Min SMS: 0,39 €",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#id-587534 > div:nth-of-type(1) > ul:nth-of-type(2) > li:nth-of-type(2)",
+   "text": "Eingehende Anrufe: 0,26 €/Min",
+   "kontext": "Datennutzung (Roaming Standard): 500 MB/Tag für 4,99 € (nur bei Nutzung am jeweiligen Kalendertag) Eingehende Anrufe: 0,26 €/Min Abgehende Telefonate: 0,54 €/Min SMS: 0,39 €",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#id-587534 > div:nth-of-type(1) > ul:nth-of-type(2) > li:nth-of-type(3)",
+   "text": "Abgehende Telefonate: 0,54 €/Min",
+   "kontext": "Datennutzung (Roaming Standard): 500 MB/Tag für 4,99 € (nur bei Nutzung am jeweiligen Kalendertag) Eingehende Anrufe: 0,26 €/Min Abgehende Telefonate: 0,54 €/Min SMS: 0,39 €",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#id-587534 > div:nth-of-type(1) > ul:nth-of-type(2) > li:nth-of-type(4)",
+   "text": "SMS: 0,39 €",
+   "kontext": "Datennutzung (Roaming Standard): 500 MB/Tag für 4,99 € (nur bei Nutzung am jeweiligen Kalendertag) Eingehende Anrufe: 0,26 €/Min Abgehende Telefonate: 0,54 €/Min SMS: 0,39 €",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#id-350334 > div:nth-of-type(1) > p:nth-of-type(1) > strong:nth-of-type(1)",
+   "text": "0,00 € (Allnet-Flat):",
+   "kontext": "0,00 € (Allnet-Flat): Kostenlos telefonieren in alle deutschen Netze und Mobilfunknetze",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#id-181606 > div:nth-of-type(1) > p:nth-of-type(1) > strong:nth-of-type(1)",
+   "text": "0,00 € (Allnet-Flat):",
+   "kontext": "0,00 € (Allnet-Flat): Kostenlos SMS verschicken in alle deutschen Mobilfunknetze.",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#id-368774 > div:nth-of-type(1) > div:nth-of-type(1) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(1) > td:nth-of-type(2) > strong:nth-of-type(1)",
+   "text": "0,- €",
+   "kontext": "0,- €",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#id-369070 > div:nth-of-type(1) > div:nth-of-type(1) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(1) > td:nth-of-type(2) > strong:nth-of-type(1)",
+   "text": "0,- €",
+   "kontext": "0,- €",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#id-369070 > div:nth-of-type(1) > div:nth-of-type(1) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(2) > strong:nth-of-type(1)",
+   "text": "0,- €",
+   "kontext": "0,- €",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#id-368798 > div:nth-of-type(1) > div:nth-of-type(1) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(1) > td:nth-of-type(2) > p:nth-of-type(1) > strong:nth-of-type(1)",
+   "text": "0,- €",
+   "kontext": "0,- €",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#id-368798 > div:nth-of-type(1) > div:nth-of-type(1) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(2) > strong:nth-of-type(1)",
+   "text": "0,- €",
+   "kontext": "0,- €",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#id-368798 > div:nth-of-type(1) > div:nth-of-type(1) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(3) > td:nth-of-type(2) > strong:nth-of-type(1)",
+   "text": "0,- €",
+   "kontext": "0,- €",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#id-368798 > div:nth-of-type(1) > div:nth-of-type(1) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(4) > td:nth-of-type(2) > strong:nth-of-type(1)",
+   "text": "0,- €",
+   "kontext": "0,- €",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(6) > div:nth-of-type(1) > tef-promo-box:nth-of-type(1) > div:nth-of-type(2) > strong:nth-of-type(1)",
+   "text": "800 €",
+   "kontext": "Handy verkaufen & bis zu 800 € sichern",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(3) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > tef-choice-panel:nth-of-type(1) > label:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "56,49 €",
+   "kontext": "56,49 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(3) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > tef-choice-panel:nth-of-type(1) > label:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "56,49 €",
+   "kontext": "56,49 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(3) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > tef-choice-panel:nth-of-type(1) > label:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "51,49 €",
+   "kontext": "51,49 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(3) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(4) > tef-choice-panel:nth-of-type(1) > label:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "66,49 €",
+   "kontext": "66,49 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(4) > div:nth-of-type(3) > div:nth-of-type(1) > tef-choice-panel:nth-of-type(1) > label:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "2,49 €",
+   "kontext": "2,49 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(4) > div:nth-of-type(3) > div:nth-of-type(2) > tef-choice-panel:nth-of-type(1) > label:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "1,99 €",
+   "kontext": "1,99 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(4) > div:nth-of-type(3) > div:nth-of-type(3) > tef-choice-panel:nth-of-type(1) > label:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "5 €",
+   "kontext": "5 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(4) > div:nth-of-type(3) > div:nth-of-type(4) > tef-choice-panel:nth-of-type(1) > label:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "5 €",
+   "kontext": "5 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(4) > div:nth-of-type(3) > div:nth-of-type(5) > tef-choice-panel:nth-of-type(1) > label:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "1,99 €",
+   "kontext": "1,99 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(4) > div:nth-of-type(3) > div:nth-of-type(6) > tef-choice-panel:nth-of-type(1) > label:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "2,49 €",
+   "kontext": "2,49 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(5) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > tef-shop-accessories-slider:nth-of-type(1) > tef-slider:nth-of-type(1) > div:nth-of-type(1) > tef-shop-hardware-teaser:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(2)",
+   "text": "7,00 €",
+   "kontext": "Monatlich7,00 €36 Monate Laufzeit, Gesamtpreis: 253,00 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(5) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > tef-shop-accessories-slider:nth-of-type(1) > tef-slider:nth-of-type(1) > div:nth-of-type(1) > tef-shop-hardware-teaser:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(3)",
+   "text": "36 Monate Laufzeit, Gesamtpreis: 253,00 €",
+   "kontext": "Monatlich7,00 €36 Monate Laufzeit, Gesamtpreis: 253,00 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(5) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > tef-shop-accessories-slider:nth-of-type(1) > tef-slider:nth-of-type(1) > div:nth-of-type(1) > tef-shop-hardware-teaser:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(2) > span:nth-of-type(2)",
+   "text": "1,00 €",
+   "kontext": "Einmalig1,00 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(5) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > tef-shop-accessories-slider:nth-of-type(1) > tef-slider:nth-of-type(1) > div:nth-of-type(2) > tef-shop-hardware-teaser:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(2)",
+   "text": "127,00 €",
+   "kontext": "Monatlich127,00 €36 Monate Laufzeit, Gesamtpreis: 4573,00 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(5) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > tef-shop-accessories-slider:nth-of-type(1) > tef-slider:nth-of-type(1) > div:nth-of-type(2) > tef-shop-hardware-teaser:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(3)",
+   "text": "36 Monate Laufzeit, Gesamtpreis: 4573,00 €",
+   "kontext": "Monatlich127,00 €36 Monate Laufzeit, Gesamtpreis: 4573,00 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(5) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > tef-shop-accessories-slider:nth-of-type(1) > tef-slider:nth-of-type(1) > div:nth-of-type(2) > tef-shop-hardware-teaser:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(2) > span:nth-of-type(2)",
+   "text": "1,00 €",
+   "kontext": "Einmalig1,00 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(5) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > tef-shop-accessories-slider:nth-of-type(1) > tef-slider:nth-of-type(1) > div:nth-of-type(3) > tef-shop-hardware-teaser:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(2)",
+   "text": "18,99 €",
+   "kontext": "Einmalig18,99 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(5) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > tef-shop-accessories-slider:nth-of-type(1) > tef-slider:nth-of-type(1) > div:nth-of-type(4) > tef-shop-hardware-teaser:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(2)",
+   "text": "39,00 €",
+   "kontext": "Monatlich39,00 €36 Monate Laufzeit, Gesamtpreis: 1405,00 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(5) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > tef-shop-accessories-slider:nth-of-type(1) > tef-slider:nth-of-type(1) > div:nth-of-type(4) > tef-shop-hardware-teaser:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(3)",
+   "text": "36 Monate Laufzeit, Gesamtpreis: 1405,00 €",
+   "kontext": "Monatlich39,00 €36 Monate Laufzeit, Gesamtpreis: 1405,00 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(5) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > tef-shop-accessories-slider:nth-of-type(1) > tef-slider:nth-of-type(1) > div:nth-of-type(4) > tef-shop-hardware-teaser:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(2) > span:nth-of-type(2)",
+   "text": "1,00 €",
+   "kontext": "Einmalig1,00 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(5) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > tef-shop-accessories-slider:nth-of-type(1) > tef-slider:nth-of-type(1) > div:nth-of-type(5) > tef-shop-hardware-teaser:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(2)",
+   "text": "22,50 €",
+   "kontext": "Monatlich22,50 €36 Monate Laufzeit, Gesamtpreis: 811,00 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(5) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > tef-shop-accessories-slider:nth-of-type(1) > tef-slider:nth-of-type(1) > div:nth-of-type(5) > tef-shop-hardware-teaser:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(1) > span:nth-of-type(3)",
+   "text": "36 Monate Laufzeit, Gesamtpreis: 811,00 €",
+   "kontext": "Monatlich22,50 €36 Monate Laufzeit, Gesamtpreis: 811,00 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ol:nth-of-type(1) > li:nth-of-type(5) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > tef-shop-accessories-slider:nth-of-type(1) > tef-slider:nth-of-type(1) > div:nth-of-type(5) > tef-shop-hardware-teaser:nth-of-type(1) > div:nth-of-type(2) > tef-price:nth-of-type(2) > span:nth-of-type(2)",
+   "text": "1,00 €",
+   "kontext": "Einmalig1,00 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(1) > td:nth-of-type(2)",
+   "text": "36,50 €",
+   "kontext": "Gerät mtl. (36 Raten): 36,50 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(2)",
+   "text": "29,99 €",
+   "kontext": "Tarif mtl. (Mindestlaufzeit 24 Monate): 29,99 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(2) > tr:nth-of-type(1) > td:nth-of-type(1) > strong:nth-of-type(1)",
+   "text": "66,49 €",
+   "kontext": "66,49 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(3) > tr:nth-of-type(1) > td:nth-of-type(2)",
+   "text": "1,00 €",
+   "kontext": "Gerät Anzahlung: 1,00 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(3) > tr:nth-of-type(2) > td:nth-of-type(2)",
+   "text": "0,00 €",
+   "kontext": "einmaliger Anschlusspreis 0,00 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(3) > tr:nth-of-type(3) > td:nth-of-type(2)",
+   "text": "6,99 €",
+   "kontext": "Versandkosten: 6,99 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#content > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > table:nth-of-type(1) > tbody:nth-of-type(4) > tr:nth-of-type(1) > td:nth-of-type(1) > strong:nth-of-type(1)",
+   "text": "7,99 €",
+   "kontext": "7,99 €",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#\\32 267870 > p:nth-of-type(2)",
+   "text": "O2 Mobile on Demand MEinmaliger Anschlusspreis 39,99 €. Mindestvertragslaufzeit 24 Monate. Pro Abrechnungsmonat sind enthalten: nationale Gespräche (außer Sonderrufnummern, Rufumleitungen) u. SMS in alle dt. Netze sowie monatlich unlimitiertes Highspeed-Datenvolumen für mobiles Surfen im dt. O2 Mobi",
+   "kontext": "* Weitere Hinweise und FußnotenO2 Mobile on Demand MEinmaliger Anschlusspreis 39,99 €. Mindestvertragslaufzeit 24 Monate. Pro Abrechnungsmonat sind enthalten: nationale Gespräche (außer Sonderrufnummern, Rufumleitungen) u. SMS in alle dt. Netze sowie monatlich unlimitiertes Highspeed-Datenvolumen fü",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#\\31 817562 > p:nth-of-type(1)",
+   "text": "O2 Care | Travel Family 65+ Family Promo ist zu allen O2 Mobilfunk Postpaidverträgen buchbar. O2 Care | Travel Family 65+ hat keine Mindestlaufzeit und ist täglich kündbar. Preis je Reisetag 2,99 € für Travel Family, bis zu 4 Tage kostenlos. Das gilt nur einmalig für die erste Reise, bei kürzerer Re",
+   "kontext": "O2 Care | Travel Family 65+ Family Promo ist zu allen O2 Mobilfunk Postpaidverträgen buchbar. O2 Care | Travel Family 65+ hat keine Mindestlaufzeit und ist täglich kündbar. Preis je Reisetag 2,99 € für Travel Family, bis zu 4 Tage kostenlos. Das gilt nur einmalig für die erste Reise, bei kürzerer Re",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#\\31 817586 > p:nth-of-type(1)",
+   "text": "O2 Care | Travel Promo ist zu allen O2 Mobilfunk Postpaidverträgen buchbar. O2 Care | Travel hat keine Mindestlaufzeit und ist täglich kündbar. Preis je Reisetag 1,29 € für Travel, Travel bis zu 7 Tage kostenlos. Das gilt nur einmalig für die erste Reise, bei kürzerer Reisedauer verfallen die Restta",
+   "kontext": "O2 Care | Travel Promo ist zu allen O2 Mobilfunk Postpaidverträgen buchbar. O2 Care | Travel hat keine Mindestlaufzeit und ist täglich kündbar. Preis je Reisetag 1,29 € für Travel, Travel bis zu 7 Tage kostenlos. Das gilt nur einmalig für die erste Reise, bei kürzerer Reisedauer verfallen die Restta",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#\\31 817578 > p:nth-of-type(1)",
+   "text": "O2 Care | Travel 65+ Promo ist zu allen O2 Mobilfunk Postpaidverträgen buchbar. O2 Care | Travel hat keine Mindestlaufzeit und ist täglich kündbar. Preis je Reisetag 3,99 € für Travel 65+, bis zu 3 Tage kostenlos. Das gilt nur einmalig für die erste Reise, bei kürzerer Reisedauer verfallen die Restt",
+   "kontext": "O2 Care | Travel 65+ Promo ist zu allen O2 Mobilfunk Postpaidverträgen buchbar. O2 Care | Travel hat keine Mindestlaufzeit und ist täglich kündbar. Preis je Reisetag 3,99 € für Travel 65+, bis zu 3 Tage kostenlos. Das gilt nur einmalig für die erste Reise, bei kürzerer Reisedauer verfallen die Restt",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#\\31 817546 > p:nth-of-type(1)",
+   "text": "O2 Care | Travel Family ist zu allen O2 Mobilfunk (Postpaid-)Verträgen buchbar. O2 Care | Travel Family hat keine Mindestlaufzeit und ist täglich kündbar. Preis je Reisetag 2,99 €.",
+   "kontext": "O2 Care | Travel Family ist zu allen O2 Mobilfunk (Postpaid-)Verträgen buchbar. O2 Care | Travel Family hat keine Mindestlaufzeit und ist täglich kündbar. Preis je Reisetag 2,99 €. O2 vermittelt das Produkt O2 Care | Travel Family als gebundener Versicherungsvertreter nach § 34d Absatz 7 Satz 1 Numm",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#\\31 817476 > p:nth-of-type(1)",
+   "text": "O2 Care | Travel ist zu allen O2 Mobilfunk (Postpaid-)Verträgen buchbar. O2 Care | Travel hat keine Mindestlaufzeit und ist täglich kündbar. Preis je Reisetag 1,29 €.",
+   "kontext": "O2 Care | Travel ist zu allen O2 Mobilfunk (Postpaid-)Verträgen buchbar. O2 Care | Travel hat keine Mindestlaufzeit und ist täglich kündbar. Preis je Reisetag 1,29 €.O2 vermittelt das Produkt O2 Care | Travel als gebundener Versicherungsvertreter nach § 34d Absatz 7 Satz 1 Nummer 1 der Gewerbeordnun",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#\\31 817538 > p:nth-of-type(1)",
+   "text": "O2 Care | Travel 65+ ist zu allen O2 Mobilfunk (Postpaid-)Verträgen buchbar. O2 Care | Travel 65+ hat keine Mindestlaufzeit und ist täglich kündbar. Preis je Reisetag 3,99 €.",
+   "kontext": "O2 Care | Travel 65+ ist zu allen O2 Mobilfunk (Postpaid-)Verträgen buchbar. O2 Care | Travel 65+ hat keine Mindestlaufzeit und ist täglich kündbar. Preis je Reisetag 3,99 €.O2 vermittelt das Produkt O2 Care | Travel 65+ als gebundener Versicherungsvertreter nach § 34d Absatz 7 Satz 1 Nummer 1 der G",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#\\31 723944 > p:nth-of-type(1)",
+   "text": "O2 Onlineschutz 12 Monate ist für 1,99 €/Monat nur zu O2 Mobilfunk-Tarifen buchbar. O2 Onlineschutz 12 Monate hat eine Mindestlaufzeit von 12 Monaten und verlängert sich danach jeweils um einen weiteren Monat, sofern er nicht vor Ablauf des jeweiligen Verlängerungsmonats gekündigt wird. O2 Onlinesch",
+   "kontext": "O2 Onlineschutz 12 Monate ist für 1,99 €/Monat nur zu O2 Mobilfunk-Tarifen buchbar. O2 Onlineschutz 12 Monate hat eine Mindestlaufzeit von 12 Monaten und verlängert sich danach jeweils um einen weiteren Monat, sofern er nicht vor Ablauf des jeweiligen Verlängerungsmonats gekündigt wird. O2 Onlinesch",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#\\31 724124 > p:nth-of-type(1)",
+   "text": "O2 Onlineschutz Mobile 24 Monate ist für 1,99 €/Monat nur zu O2 Mobilfunk-Tarifen buchbar. O2 Onlineschutz 24 Monate hat eine Mindestlaufzeit von 24 Monaten und verlängert sich danach jeweils um einen weiteren Monat, sofern er nicht vor Ablauf des jeweiligen Verlängerungsmonats gekündigt wird. O2 On",
+   "kontext": "O2 Onlineschutz Mobile 24 Monate ist für 1,99 €/Monat nur zu O2 Mobilfunk-Tarifen buchbar. O2 Onlineschutz 24 Monate hat eine Mindestlaufzeit von 24 Monaten und verlängert sich danach jeweils um einen weiteren Monat, sofern er nicht vor Ablauf des jeweiligen Verlängerungsmonats gekündigt wird. O2 On",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#\\32 302152 > p:nth-of-type(1)",
+   "text": "O2 Onlineschutz Mobile Flex (6M Free)Für 2,49 €/Monat ist bei erstmaliger Buchung 6 Monate kostenfrei und nur zu O2 Mobilfunk-Tarifen buchbar. O2 Onlineschutz Flex hat eine Mindestlaufzeit von 6 Monaten und ist danach jederzeit kündbar. O2 Onlineschutz umfasst den Schutz vor unsicheren Webseiten, Fi",
+   "kontext": "O2 Onlineschutz Mobile Flex (6M Free)Für 2,49 €/Monat ist bei erstmaliger Buchung 6 Monate kostenfrei und nur zu O2 Mobilfunk-Tarifen buchbar. O2 Onlineschutz Flex hat eine Mindestlaufzeit von 6 Monaten und ist danach jederzeit kündbar. O2 Onlineschutz umfasst den Schutz vor unsicheren Webseiten, Fi",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#\\31 723754 > p:nth-of-type(1)",
+   "text": "O2 Onlineschutz Mobile Flex für 2,49 €/Monat ist bei erstmaliger Buchung einen Monat kostenfrei und nur zu O2 Mobilfunk-Tarifen buchbar. O2 Onlineschutz Flex hat eine Mindestlaufzeit von einem Monat und ist danach monatlich kündbar. O2 Onlineschutz umfasst den Schutz vor unsicheren Webseiten, Filter",
+   "kontext": "O2 Onlineschutz Mobile Flex für 2,49 €/Monat ist bei erstmaliger Buchung einen Monat kostenfrei und nur zu O2 Mobilfunk-Tarifen buchbar. O2 Onlineschutz Flex hat eine Mindestlaufzeit von einem Monat und ist danach monatlich kündbar. O2 Onlineschutz umfasst den Schutz vor unsicheren Webseiten, Filter",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#\\32 226092 > p:nth-of-type(1)",
+   "text": "O2 TV Classic 24 M für 4,99 € mtl. ist nur zu O2 Mobilfunk-, Home Tarifen buchbar; Mindestlaufzeit 24 Monate, danach jederzeit kündbar. O2 TV Classic kann auf Smartphone und Tablets (nur iOS und Android), Amazon Fire TV, Apple TV oder ausgewählten Smart TVs über die kostenfrei herunterladbare O2 TV ",
+   "kontext": "O2 TV Classic 24 M für 4,99 € mtl. ist nur zu O2 Mobilfunk-, Home Tarifen buchbar; Mindestlaufzeit 24 Monate, danach jederzeit kündbar. O2 TV Classic kann auf Smartphone und Tablets (nur iOS und Android), Amazon Fire TV, Apple TV oder ausgewählten Smart TVs über die kostenfrei herunterladbare O2 TV ",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#\\32 226092 > p:nth-of-type(2)",
+   "text": "Bei erstmaliger Buchung von O2 TV Classic 24M erhalten Kund:innen optional die Möglichkeit, Netflix Standard mit Werbung drei Monate kostenfrei freizuschalten; die Aktivierung erfolgt separat beim Anbieter. In den ersten 3 Monaten ist es kostenfrei, danach zzgl. 6,99 € mtl. Die Mindestlaufzeit beträ",
+   "kontext": "O2 TV Classic 24 M für 4,99 € mtl. ist nur zu O2 Mobilfunk-, Home Tarifen buchbar; Mindestlaufzeit 24 Monate, danach jederzeit kündbar. O2 TV Classic kann auf Smartphone und Tablets (nur iOS und Android), Amazon Fire TV, Apple TV oder ausgewählten Smart TVs über die kostenfrei herunterladbare O2 TV ",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#\\32 247450 > p:nth-of-type(1)",
+   "text": "O2 TV Classic Flex für 6,99 € mtl. ist bei erstmaliger Buchung eines O2 TV Paketes 1 Monat kostenfrei und nur zu O2 Mobilfunk-, Home Tarifen buchbar; Mindestlaufzeit 1 Monat, danach jederzeit kündbar. O2 TV Classic kann auf Smartphone und Tablets (nur iOS und Android), Amazon Fire TV, Apple TV oder ",
+   "kontext": "O2 TV Classic Flex für 6,99 € mtl. ist bei erstmaliger Buchung eines O2 TV Paketes 1 Monat kostenfrei und nur zu O2 Mobilfunk-, Home Tarifen buchbar; Mindestlaufzeit 1 Monat, danach jederzeit kündbar. O2 TV Classic kann auf Smartphone und Tablets (nur iOS und Android), Amazon Fire TV, Apple TV oder ",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#\\32 247542 > p:nth-of-type(1)",
+   "text": "O2 TV Smart 24M für 8,99 € mtl. ist nur zu O2 Mobilfunk-, Home Tarifen buchbar; Mindestlaufzeit 24 Monate, danach jederzeit kündbar. O2 TV Smart kann auf Smartphone und Tablets (nur iOS und Android), Amazon Fire TV, Apple TV oder ausgewählten Smart TVs über die kostenfrei herunterladbare O2 TV App u",
+   "kontext": "O2 TV Smart 24M für 8,99 € mtl. ist nur zu O2 Mobilfunk-, Home Tarifen buchbar; Mindestlaufzeit 24 Monate, danach jederzeit kündbar. O2 TV Smart kann auf Smartphone und Tablets (nur iOS und Android), Amazon Fire TV, Apple TV oder ausgewählten Smart TVs über die kostenfrei herunterladbare O2 TV App u",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#\\32 247542 > p:nth-of-type(2)",
+   "text": "Bei erstmaliger Buchung von O2 TV Smart 24M erhalten Kund:innen optional die Möglichkeit, die Services Netflix Standard mit Werbung sowie Disney+ Standard mit Werbung kostenfrei freizuschalten. Ab dem 4. Monat kostet Netflix Standard mit Werbung zzgl. 6,99 € mtl.; Disney+ Standard mit Werbung kostet",
+   "kontext": "O2 TV Smart 24M für 8,99 € mtl. ist nur zu O2 Mobilfunk-, Home Tarifen buchbar; Mindestlaufzeit 24 Monate, danach jederzeit kündbar. O2 TV Smart kann auf Smartphone und Tablets (nur iOS und Android), Amazon Fire TV, Apple TV oder ausgewählten Smart TVs über die kostenfrei herunterladbare O2 TV App u",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#\\32 247478 > p:nth-of-type(1)",
+   "text": "O2 TV Smart Flex für 9,99 € mtl. ist bei erstmaliger Buchung eines O2 TV Paketes 1 Monat kostenfrei und nur zu O2 Mobilfunk-, Home Tarifen buchbar; Mindestlaufzeit 1 Monat, danach jederzeit kündbar. O2 TV Smart kann auf Smartphone und Tablets (nur iOS und Android), Amazon Fire TV, Apple TV oder ausg",
+   "kontext": "O2 TV Smart Flex für 9,99 € mtl. ist bei erstmaliger Buchung eines O2 TV Paketes 1 Monat kostenfrei und nur zu O2 Mobilfunk-, Home Tarifen buchbar; Mindestlaufzeit 1 Monat, danach jederzeit kündbar. O2 TV Smart kann auf Smartphone und Tablets (nur iOS und Android), Amazon Fire TV, Apple TV oder ausg",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#\\32 324374 > p:nth-of-type(2)",
+   "text": "mit 24 Monaten Mindestvertragslaufzeit ist buchbar für alle O2 Mobilfunk für 14,99 € mtl. und ist danach jederzeit kündbar. O2 TV Classic bietet Zugang zu zwei separaten Diensten, O2 TV und Disney+. O2 TV Classic kann auf Smartphone und Tablets (nur iOS und Android), Amazon Fire TV, Apple TV oder au",
+   "kontext": "O2 TV Classic und Disney+ Standardmit 24 Monaten Mindestvertragslaufzeit ist buchbar für alle O2 Mobilfunk für 14,99 € mtl. und ist danach jederzeit kündbar. O2 TV Classic bietet Zugang zu zwei separaten Diensten, O2 TV und Disney+. O2 TV Classic kann auf Smartphone und Tablets (nur iOS und Android)",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#\\32 324348 > p:nth-of-type(2)",
+   "text": "mit 24 Monaten Mindestvertragslaufzeit ist buchbar für alle O2 Mobilfunk für 14,99 € mtl. und ist danach jederzeit kündbar. O2 TV Classic bietet Zugang zu zwei separaten Diensten, O2 TV und Netflix. O2 TV Classic kann auf Smartphone und Tablets (nur iOS und Android), Amazon Fire TV, Apple TV oder au",
+   "kontext": "O2 TV Classic und Netflix Standard-Abomit 24 Monaten Mindestvertragslaufzeit ist buchbar für alle O2 Mobilfunk für 14,99 € mtl. und ist danach jederzeit kündbar. O2 TV Classic bietet Zugang zu zwei separaten Diensten, O2 TV und Netflix. O2 TV Classic kann auf Smartphone und Tablets (nur iOS und Andr",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#\\32 247560 > p:nth-of-type(1)",
+   "text": "O2 TV Premium mit Netflix Standard mit Werbung und Disney+ Standard mit Werbung mit 24 Monaten Mindestvertragslaufzeit ist hinzubuchbar für alle O2 Mobilfunk und O2 Home Tarife für 14,99 € mtl. und ist danach jederzeit kündbar.",
+   "kontext": "O2 TV Premium mit Netflix Standard mit Werbung und Disney+ Standard mit Werbung mit 24 Monaten Mindestvertragslaufzeit ist hinzubuchbar für alle O2 Mobilfunk und O2 Home Tarife für 14,99 € mtl. und ist danach jederzeit kündbar.O2 TV Premium bietet Zugang zu drei separaten Diensten, O2 TV Premium, Ne",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#\\32 247568 > p:nth-of-type(1)",
+   "text": "O2 TV Premium Pro mit Netflix Standard und Disney+ Standard mit 24 Monaten Mindestvertragslaufzeit ist buchbar für alle O2 Mobilfunk und O2 Home Tarife für 24,99 € mtl. und ist danach jederzeit kündbar.",
+   "kontext": "O2 TV Premium Pro mit Netflix Standard und Disney+ Standard mit 24 Monaten Mindestvertragslaufzeit ist buchbar für alle O2 Mobilfunk und O2 Home Tarife für 24,99 € mtl. und ist danach jederzeit kündbar.O2 TV Premium Pro bietet Zugang zu drei separaten Diensten, O2 TV Premium, Netflix und Disney+. O2",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#info-modal-id > div:nth-of-type(2) > div:nth-of-type(1) > p:nth-of-type(1)",
+   "text": "Für Neukunden und besteht aus einem o2 Mein Handyvertrag mit dem Apple iPhone 17 Pro mit Ratenzahlung à 36,50 € monatlich über 36 Monate (Gesamtpreis: 66,49 € ) sowie die o2-mobile-unlimited-m Mobilfunkvertrag mit 24 Monate Mindestlaufzeit von Monaten für monatliche Zahlungen 29,99 € Plus 0,00 €. So",
+   "kontext": "Für Neukunden und besteht aus einem o2 Mein Handyvertrag mit dem Apple iPhone 17 Pro mit Ratenzahlung à 36,50 € monatlich über 36 Monate (Gesamtpreis: 66,49 € ) sowie die o2-mobile-unlimited-m Mobilfunkvertrag mit 24 Monate Mindestlaufzeit von Monaten für monatliche Zahlungen 29,99 € Plus 0,00 €. So",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#trboModule_12897_505694_105_container > tef-teaser-nav:nth-of-type(1) > div:nth-of-type(2) > tef-scope:nth-of-type(1) > div:nth-of-type(1)",
+   "text": "Nur 1 € einmalig",
+   "kontext": "Nur 1 € einmalig",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#trboModule_12897_549249_105_container > tef-teaser-nav:nth-of-type(1) > div:nth-of-type(2) > tef-scope:nth-of-type(1) > div:nth-of-type(1)",
+   "text": "Ab 4,99 € mtl.",
+   "kontext": "Ab 4,99 € mtl.",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#trboModule_12897_554969_105_container > tef-teaser-nav:nth-of-type(1) > div:nth-of-type(3)",
+   "text": "Dauerhaft bis zu 25 € monatlichen Rabatt auf jeden weiteren Mobilfunk-Tarif",
+   "kontext": "Exklusiv für O2 Kunden Dauerhaft bis zu 25 € monatlichen Rabatt auf jeden weiteren Mobilfunk-Tarif Bis zu 25 € Rabatt ab dem 2. Tarif",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#trboModule_12897_554969_105_container > tef-teaser-nav:nth-of-type(1) > div:nth-of-type(4) > a:nth-of-type(1)",
+   "text": "Bis zu 25 € Rabatt ab dem 2. Tarif",
+   "kontext": "Bis zu 25 € Rabatt ab dem 2. Tarif",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#id-2315288 > div:nth-of-type(2) > tef-scope:nth-of-type(1) > div:nth-of-type(1)",
+   "text": "0,- € Anschlusspreis",
+   "kontext": "0,- € Anschlusspreis",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#id-2315340 > div:nth-of-type(2) > tef-scope:nth-of-type(1) > div:nth-of-type(1)",
+   "text": "0,- € Anschlusspreis",
+   "kontext": "0,- € Anschlusspreis",
+   "sichtbar": false
+  },
+  {
+   "pfad": "#trboModule_12897_567347_105_container > tef-teaser-nav:nth-of-type(1) > div:nth-of-type(2) > tef-scope:nth-of-type(1) > div:nth-of-type(1)",
+   "text": "0,- € Anschlusspreis",
+   "kontext": "0,- € Anschlusspreis",
+   "sichtbar": false
+  }
+ ]
+}

@@ -1,0 +1,45 @@
+{
+ "einwilligung": {
+  "geklickt": null,
+  "grund": "kein Ablehnen-Knopf sichtbar"
+ },
+ "vermerk": null,
+ "proben": [
+  {
+   "gruppe": 41,
+   "art": "speicher",
+   "pfad": "#device-details > div:nth-of-type(1) > fieldset:nth-of-type(2) > div:nth-of-type(1)",
+   "text": "Speicher: 512 GB 512 GB",
+   "wert": null,
+   "fehler": null,
+   "navigiert": null,
+   "umleitung": null,
+   "ruhe": true,
+   "anfragen": [],
+   "preise_geaendert": [],
+   "marke_nachher": null,
+   "uebernommen": "nein"
+  },
+  {
+   "gruppe": 59,
+   "art": "laufzeit",
+   "pfad": "#react-aria6754392607-_r_28_ > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > label:nth-of-type(1)",
+   "text": "24 Monate Laufzeit",
+   "wert": null,
+   "fehler": null,
+   "navigiert": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/?planId=540",
+   "umleitung": null,
+   "ruhe": true,
+   "anfragen": [
+    {
+     "nummer": 77,
+     "methode": "POST",
+     "url": "https://www.congstar.de/webshop-graphql/graphql",
+     "art": "fetch",
+     "status": 200,
+     "abbruch": null
+    }
+   ]
+  }
+ ]
+}

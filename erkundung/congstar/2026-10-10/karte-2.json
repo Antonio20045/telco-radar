@@ -1,0 +1,612 @@
+{
+ "karte": "congstar.yaml",
+ "anbieter": "congstar",
+ "adresse": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/?planId=548",
+ "status": "gelesen",
+ "grund": null,
+ "bot_schutz": false,
+ "http_status": 200,
+ "hoechste_kombinationen": 12,
+ "belege": "nicht archiviert (kein Konto)",
+ "zaehlung": {
+  "kombinationen": 8,
+  "erfasst": 0,
+  "nicht_angeboten": 0,
+  "nicht_erfasst": 0,
+  "befund": 8,
+  "nicht_besucht": 0,
+  "verworfen": 2,
+  "gescheitert": 0
+ },
+ "struktur": {
+  "knoepfe_gesucht": 51,
+  "knoepfe_gefunden": 51,
+  "felder_gesucht": 56,
+  "felder_gefunden": 40,
+  "anteil_knoepfe": 1.0,
+  "anteil_felder": 0.7142857142857143
+ },
+ "gefunden": {
+  "knoepfe": {
+   "speicher": {
+    "selektor": "[data-testid=\"memory-size\"]",
+    "werte": [
+     "512 GB"
+    ]
+   },
+   "tarif": {
+    "selektor": "label:has(input[aria-label^=\"Tarifoption \"])",
+    "werte": [
+     "Allnet Flat XS Flex",
+     "Allnet Flat S Flex",
+     "Allnet Flat M Flex",
+     "Allnet Flat L Flex"
+    ]
+   },
+   "laufzeit": {
+    "selektor": "label:has(input[aria-label$=\"mtl. Zahlungen\"])",
+    "werte": [
+     "36",
+     "24"
+    ]
+   }
+  },
+  "zusammenfassung": "[data-testid=\"sticky-box-side-postpaid\"], #layout > main > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(3)",
+  "felder": {
+   "anzahlung": {
+    "text": 8,
+    "antwort": 8
+   },
+   "rate": {
+    "text": 8,
+    "antwort": 8
+   },
+   "ratenzahl": {
+    "text": 8,
+    "antwort": 8
+   },
+   "tarifphasen": {
+    "text": 0,
+    "antwort": 8
+   },
+   "tarifbindung": {
+    "text": 0,
+    "antwort": 8
+   },
+   "anschluss": {
+    "text": 8,
+    "antwort": 8
+   },
+   "volumen_gb": {
+    "text": 8,
+    "antwort": 8
+   }
+  }
+ },
+ "kombinationen": [
+  {
+   "auswahl": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat XS Flex",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat XS Flex",
+    "laufzeit": 36
+   },
+   "status": "befund",
+   "grund": "fehlt im Text, Antwort Monat 1 und danach: 15,00",
+   "werte": {
+    "anzahlung": 179.0,
+    "rate": 37.5,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": 35.0,
+    "volumen_gb": 15.0
+   },
+   "werte_text": {
+    "anzahlung": 179.0,
+    "rate": 37.5,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": 35.0,
+    "volumen_gb": 15.0
+   },
+   "werte_antwort": {
+    "anzahlung": 179.0,
+    "rate": 37.5,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      15.0
+     ]
+    ],
+    "tarifbindung": 0,
+    "anschluss": 35.0,
+    "volumen_gb": 15.0
+   },
+   "buendel": null,
+   "echo": {
+    "befunde": [
+     {
+      "feld": "tarifphasen",
+      "grund": "fehlt im Text, Antwort Monat 1 und danach: 15,00"
+     },
+     {
+      "feld": "tarifbindung",
+      "grund": "fehlt im Text, Antwort 0"
+     }
+    ],
+    "luecken": []
+   },
+   "text": "Monatliche Kosten\nSumme 1. bis 36. Monat\n52,50 €\nGerät\n37,50 €\nin den ersten 36 Monaten\nTarif (mtl. kündbar)\n15,00 €\nSumme ab dem 37. Monat\n15,00 €\nEinmalige Kosten\nSumme einmalig\n214,00 €\nzzgl. 4,99 € Versandkosten\nWeiter zum Warenkorb\nSichere Zahlungsmethoden",
+   "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/?planId=544&paymentVariantBenefits=",
+   "beleg_status": "offen"
+  },
+  {
+   "auswahl": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat XS Flex",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat XS Flex",
+    "laufzeit": 24
+   },
+   "status": "befund",
+   "grund": "fehlt im Text, Antwort Monat 1 und danach: 15,00",
+   "werte": {
+    "anzahlung": 179.0,
+    "rate": 56.25,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": 35.0,
+    "volumen_gb": 15.0
+   },
+   "werte_text": {
+    "anzahlung": 179.0,
+    "rate": 56.25,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": 35.0,
+    "volumen_gb": 15.0
+   },
+   "werte_antwort": {
+    "anzahlung": 179.0,
+    "rate": 56.25,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      15.0
+     ]
+    ],
+    "tarifbindung": 0,
+    "anschluss": 35.0,
+    "volumen_gb": 15.0
+   },
+   "buendel": null,
+   "echo": {
+    "befunde": [
+     {
+      "feld": "tarifphasen",
+      "grund": "fehlt im Text, Antwort Monat 1 und danach: 15,00"
+     },
+     {
+      "feld": "tarifbindung",
+      "grund": "fehlt im Text, Antwort 0"
+     }
+    ],
+    "luecken": []
+   },
+   "text": "Monatliche Kosten\nSumme 1. bis 24. Monat\n71,25 €\nGerät\n56,25 €\nin den ersten 24 Monaten\nTarif (mtl. kündbar)\n15,00 €\nSumme ab dem 25. Monat\n15,00 €\nEinmalige Kosten\nSumme einmalig\n214,00 €\nzzgl. 4,99 € Versandkosten\nWeiter zum Warenkorb\nSichere Zahlungsmethoden",
+   "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/?planId=544&paymentVariantBenefits=&installmentPlanId=500",
+   "beleg_status": "offen"
+  },
+  {
+   "auswahl": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat S Flex",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat S Flex",
+    "laufzeit": 36
+   },
+   "status": "befund",
+   "grund": "fehlt im Text, Antwort Monat 1 und danach: 20,00",
+   "werte": {
+    "anzahlung": 179.0,
+    "rate": 37.5,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": 35.0,
+    "volumen_gb": 50.0
+   },
+   "werte_text": {
+    "anzahlung": 179.0,
+    "rate": 37.5,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": 35.0,
+    "volumen_gb": 50.0
+   },
+   "werte_antwort": {
+    "anzahlung": 179.0,
+    "rate": 37.5,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      20.0
+     ]
+    ],
+    "tarifbindung": 0,
+    "anschluss": 35.0,
+    "volumen_gb": 50.0
+   },
+   "buendel": null,
+   "echo": {
+    "befunde": [
+     {
+      "feld": "tarifphasen",
+      "grund": "fehlt im Text, Antwort Monat 1 und danach: 20,00"
+     },
+     {
+      "feld": "tarifbindung",
+      "grund": "fehlt im Text, Antwort 0"
+     }
+    ],
+    "luecken": []
+   },
+   "text": "Monatliche Kosten\nSumme 1. bis 36. Monat\n57,50 €\nGerät\n37,50 €\nin den ersten 36 Monaten\nTarif (mtl. kündbar)\n20,00 €\nSumme ab dem 37. Monat\n20,00 €\nEinmalige Kosten\nSumme einmalig\n214,00 €\nzzgl. 4,99 € Versandkosten\nWeiter zum Warenkorb\nSichere Zahlungsmethoden",
+   "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/?planId=559&paymentVariantBenefits=&installmentPlanId=501",
+   "beleg_status": "offen"
+  },
+  {
+   "auswahl": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat S Flex",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat S Flex",
+    "laufzeit": 24
+   },
+   "status": "befund",
+   "grund": "fehlt im Text, Antwort Monat 1 und danach: 20,00",
+   "werte": {
+    "anzahlung": 179.0,
+    "rate": 56.25,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": 35.0,
+    "volumen_gb": 50.0
+   },
+   "werte_text": {
+    "anzahlung": 179.0,
+    "rate": 56.25,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": 35.0,
+    "volumen_gb": 50.0
+   },
+   "werte_antwort": {
+    "anzahlung": 179.0,
+    "rate": 56.25,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      20.0
+     ]
+    ],
+    "tarifbindung": 0,
+    "anschluss": 35.0,
+    "volumen_gb": 50.0
+   },
+   "buendel": null,
+   "echo": {
+    "befunde": [
+     {
+      "feld": "tarifphasen",
+      "grund": "fehlt im Text, Antwort Monat 1 und danach: 20,00"
+     },
+     {
+      "feld": "tarifbindung",
+      "grund": "fehlt im Text, Antwort 0"
+     }
+    ],
+    "luecken": []
+   },
+   "text": "Monatliche Kosten\nSumme 1. bis 24. Monat\n76,25 €\nGerät\n56,25 €\nin den ersten 24 Monaten\nTarif (mtl. kündbar)\n20,00 €\nSumme ab dem 25. Monat\n20,00 €\nEinmalige Kosten\nSumme einmalig\n214,00 €\nzzgl. 4,99 € Versandkosten\nWeiter zum Warenkorb\nSichere Zahlungsmethoden",
+   "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/?planId=559&paymentVariantBenefits=&installmentPlanId=500",
+   "beleg_status": "offen"
+  },
+  {
+   "auswahl": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat M Flex",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat M Flex",
+    "laufzeit": 36
+   },
+   "status": "befund",
+   "grund": "fehlt im Text, Antwort Monat 1 und danach: 25,00",
+   "werte": {
+    "anzahlung": 179.0,
+    "rate": 37.5,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": 35.0,
+    "volumen_gb": 125.0
+   },
+   "werte_text": {
+    "anzahlung": 179.0,
+    "rate": 37.5,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": 35.0,
+    "volumen_gb": 125.0
+   },
+   "werte_antwort": {
+    "anzahlung": 179.0,
+    "rate": 37.5,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      25.0
+     ]
+    ],
+    "tarifbindung": 0,
+    "anschluss": 35.0,
+    "volumen_gb": 125.0
+   },
+   "buendel": null,
+   "echo": {
+    "befunde": [
+     {
+      "feld": "tarifphasen",
+      "grund": "fehlt im Text, Antwort Monat 1 und danach: 25,00"
+     },
+     {
+      "feld": "tarifbindung",
+      "grund": "fehlt im Text, Antwort 0"
+     }
+    ],
+    "luecken": []
+   },
+   "text": "Monatliche Kosten\nSumme 1. bis 36. Monat\n62,50 €\nGerät\n37,50 €\nin den ersten 36 Monaten\nTarif (mtl. kündbar)\n25,00 €\nSumme ab dem 37. Monat\n25,00 €\nEinmalige Kosten\nSumme einmalig\n214,00 €\nzzgl. 4,99 € Versandkosten\nWeiter zum Warenkorb\nSichere Zahlungsmethoden",
+   "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/?planId=548&paymentVariantBenefits=&installmentPlanId=501",
+   "beleg_status": "offen"
+  },
+  {
+   "auswahl": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat M Flex",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat M Flex",
+    "laufzeit": 24
+   },
+   "status": "befund",
+   "grund": "fehlt im Text, Antwort Monat 1 und danach: 25,00",
+   "werte": {
+    "anzahlung": 179.0,
+    "rate": 56.25,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": 35.0,
+    "volumen_gb": 125.0
+   },
+   "werte_text": {
+    "anzahlung": 179.0,
+    "rate": 56.25,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": 35.0,
+    "volumen_gb": 125.0
+   },
+   "werte_antwort": {
+    "anzahlung": 179.0,
+    "rate": 56.25,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      25.0
+     ]
+    ],
+    "tarifbindung": 0,
+    "anschluss": 35.0,
+    "volumen_gb": 125.0
+   },
+   "buendel": null,
+   "echo": {
+    "befunde": [
+     {
+      "feld": "tarifphasen",
+      "grund": "fehlt im Text, Antwort Monat 1 und danach: 25,00"
+     },
+     {
+      "feld": "tarifbindung",
+      "grund": "fehlt im Text, Antwort 0"
+     }
+    ],
+    "luecken": []
+   },
+   "text": "Monatliche Kosten\nSumme 1. bis 24. Monat\n81,25 €\nGerät\n56,25 €\nin den ersten 24 Monaten\nTarif (mtl. kündbar)\n25,00 €\nSumme ab dem 25. Monat\n25,00 €\nEinmalige Kosten\nSumme einmalig\n214,00 €\nzzgl. 4,99 € Versandkosten\nWeiter zum Warenkorb\nSichere Zahlungsmethoden",
+   "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/?planId=548&paymentVariantBenefits=&installmentPlanId=500",
+   "beleg_status": "offen"
+  },
+  {
+   "auswahl": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat L Flex",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat L Flex",
+    "laufzeit": 36
+   },
+   "status": "befund",
+   "grund": "fehlt im Text, Antwort Monat 1 und danach: 30,00",
+   "werte": {
+    "anzahlung": 179.0,
+    "rate": 37.5,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": 35.0,
+    "volumen_gb": 200.0
+   },
+   "werte_text": {
+    "anzahlung": 179.0,
+    "rate": 37.5,
+    "ratenzahl": 36,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": 35.0,
+    "volumen_gb": 200.0
+   },
+   "werte_antwort": {
+    "anzahlung": 179.0,
+    "rate": 37.5,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      30.0
+     ]
+    ],
+    "tarifbindung": 0,
+    "anschluss": 35.0,
+    "volumen_gb": 200.0
+   },
+   "buendel": null,
+   "echo": {
+    "befunde": [
+     {
+      "feld": "tarifphasen",
+      "grund": "fehlt im Text, Antwort Monat 1 und danach: 30,00"
+     },
+     {
+      "feld": "tarifbindung",
+      "grund": "fehlt im Text, Antwort 0"
+     }
+    ],
+    "luecken": []
+   },
+   "text": "Monatliche Kosten\nSumme 1. bis 36. Monat\n67,50 €\nGerät\n37,50 €\nin den ersten 36 Monaten\nTarif (mtl. kündbar)\n30,00 €\nSumme ab dem 37. Monat\n30,00 €\nEinmalige Kosten\nSumme einmalig\n214,00 €\nzzgl. 4,99 € Versandkosten\nWeiter zum Warenkorb\nSichere Zahlungsmethoden",
+   "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/?planId=549&paymentVariantBenefits=&installmentPlanId=501",
+   "beleg_status": "offen"
+  },
+  {
+   "auswahl": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat L Flex",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "512 GB",
+    "tarif": "Allnet Flat L Flex",
+    "laufzeit": 24
+   },
+   "status": "befund",
+   "grund": "fehlt im Text, Antwort Monat 1 und danach: 30,00",
+   "werte": {
+    "anzahlung": 179.0,
+    "rate": 56.25,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": 35.0,
+    "volumen_gb": 200.0
+   },
+   "werte_text": {
+    "anzahlung": 179.0,
+    "rate": 56.25,
+    "ratenzahl": 24,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": 35.0,
+    "volumen_gb": 200.0
+   },
+   "werte_antwort": {
+    "anzahlung": 179.0,
+    "rate": 56.25,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      30.0
+     ]
+    ],
+    "tarifbindung": 0,
+    "anschluss": 35.0,
+    "volumen_gb": 200.0
+   },
+   "buendel": null,
+   "echo": {
+    "befunde": [
+     {
+      "feld": "tarifphasen",
+      "grund": "fehlt im Text, Antwort Monat 1 und danach: 30,00"
+     },
+     {
+      "feld": "tarifbindung",
+      "grund": "fehlt im Text, Antwort 0"
+     }
+    ],
+    "luecken": []
+   },
+   "text": "Monatliche Kosten\nSumme 1. bis 24. Monat\n86,25 €\nGerät\n56,25 €\nin den ersten 24 Monaten\nTarif (mtl. kündbar)\n30,00 €\nSumme ab dem 25. Monat\n30,00 €\nEinmalige Kosten\nSumme einmalig\n214,00 €\nzzgl. 4,99 € Versandkosten\nWeiter zum Warenkorb\nSichere Zahlungsmethoden",
+   "antwort_url": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/?planId=549&paymentVariantBenefits=&installmentPlanId=500",
+   "beleg_status": "offen"
+  }
+ ],
+ "verworfen": [
+  {
+   "url": "https://api.usercentrics.eu/settings/3DQmSnVkN/latest/languages.json",
+   "grund": "robots.txt nicht lesbar (HTTP 403)"
+  },
+  {
+   "url": "https://www.congstar.de/checkout/api/cart-state",
+   "grund": "per robots.txt gesperrt: /checkout/api/cart-state"
+  }
+ ],
+ "gescheitert": [],
+ "hilfsdateien": []
+}

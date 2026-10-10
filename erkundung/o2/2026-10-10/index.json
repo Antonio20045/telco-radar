@@ -1,0 +1,171 @@
+{
+ "anbieter": "o2",
+ "name": "o2",
+ "datum": "2026-10-10",
+ "status": "gelesen",
+ "grund": null,
+ "kennung": null,
+ "parallelpruefung": "vor jeder Seite",
+ "robots_gelesen": true,
+ "abstand_sekunden": 2.0,
+ "besuchszeit": null,
+ "dauer_sekunden": 704.5,
+ "zeitgrenze_sekunden": 3000,
+ "seiten": [
+  {
+   "nummer": 1,
+   "geraet": "apple-iphone-17-pro",
+   "speicher_gb": 256,
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
+   "endadresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
+   "status": "gelesen",
+   "grund": null,
+   "bot_schutz": false,
+   "http_status": 200,
+   "ruhe": true,
+   "dateien": {
+    "bedienelemente": "bedienelemente-1.json",
+    "preise": "preise-1.json",
+    "klicks": "klicks-1.json",
+    "karte": "karte-1.json",
+    "mitschnitt": "mitschnitt-1.json",
+    "screenshot": "seite-1.png",
+    "html": "seite-1.html.gz"
+   },
+   "zaehlung": {
+    "anfragen": 139,
+    "verworfen": 4,
+    "gescheitert": 0,
+    "hilfsdateien": 0,
+    "mitschnitt": 4,
+    "elemente": 314,
+    "gruppen_je_art": {
+     "tarif": 10,
+     "farbe": 46,
+     "unbekannt": 49,
+     "speicher": 1,
+     "laufzeit": 2
+    },
+    "preis_kandidaten": 78,
+    "klicks": 7
+   },
+   "verworfen": [
+    {
+     "url": "https://www.o2online.de/assets/code/tracking/alert/alert-tracking-js-code",
+     "grund": "per robots.txt gesperrt: /assets/code/tracking/alert/alert-tracking-js-code"
+    },
+    {
+     "url": "https://www.o2online.de/assets/code/tracking/vertrag-kuendigen-js-code",
+     "grund": "per robots.txt gesperrt: /assets/code/tracking/vertrag-kuendigen-js-code"
+    },
+    {
+     "url": "https://static.trbo.com/assets/trbo-icons.css",
+     "grund": "per robots.txt gesperrt: /assets/trbo-icons.css"
+    },
+    {
+     "url": "https://config.eu.usercentrics.eu/settings/2BGLbVtv/latest/languages.json",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    }
+   ],
+   "gescheitert": [],
+   "hilfsdateien": [],
+   "karte": {
+    "status": "gelaufen",
+    "karte": "o2.yaml",
+    "grund": null,
+    "datei": "karte-1.json",
+    "laufstatus": "gelesen",
+    "bot_schutz": false,
+    "zaehlung": {
+     "kombinationen": 8,
+     "erfasst": 8,
+     "nicht_angeboten": 0,
+     "nicht_erfasst": 0,
+     "befund": 0,
+     "nicht_besucht": 0,
+     "verworfen": 4,
+     "gescheitert": 0
+    }
+   }
+  },
+  {
+   "nummer": 2,
+   "geraet": "apple-iphone-17-pro",
+   "speicher_gb": 256,
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m",
+   "endadresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m",
+   "status": "gelesen",
+   "grund": null,
+   "bot_schutz": false,
+   "http_status": 200,
+   "ruhe": true,
+   "dateien": {
+    "bedienelemente": "bedienelemente-2.json",
+    "preise": "preise-2.json",
+    "klicks": "klicks-2.json",
+    "karte": "karte-2.json",
+    "mitschnitt": "mitschnitt-2.json",
+    "screenshot": "seite-2.png",
+    "html": "seite-2.html.gz"
+   },
+   "zaehlung": {
+    "anfragen": 138,
+    "verworfen": 4,
+    "gescheitert": 0,
+    "hilfsdateien": 0,
+    "mitschnitt": 4,
+    "elemente": 325,
+    "gruppen_je_art": {
+     "tarif": 17,
+     "farbe": 46,
+     "unbekannt": 49,
+     "speicher": 1,
+     "laufzeit": 2
+    },
+    "preis_kandidaten": 81,
+    "klicks": 7
+   },
+   "verworfen": [
+    {
+     "url": "https://www.o2online.de/assets/code/tracking/alert/alert-tracking-js-code",
+     "grund": "per robots.txt gesperrt: /assets/code/tracking/alert/alert-tracking-js-code"
+    },
+    {
+     "url": "https://www.o2online.de/assets/code/tracking/vertrag-kuendigen-js-code",
+     "grund": "per robots.txt gesperrt: /assets/code/tracking/vertrag-kuendigen-js-code"
+    },
+    {
+     "url": "https://static.trbo.com/assets/trbo-icons.css",
+     "grund": "per robots.txt gesperrt: /assets/trbo-icons.css"
+    },
+    {
+     "url": "https://config.eu.usercentrics.eu/settings/2BGLbVtv/latest/languages.json",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    }
+   ],
+   "gescheitert": [],
+   "hilfsdateien": [],
+   "karte": {
+    "status": "gelaufen",
+    "karte": "o2.yaml",
+    "grund": null,
+    "datei": "karte-2.json",
+    "laufstatus": "gelesen",
+    "bot_schutz": false,
+    "zaehlung": {
+     "kombinationen": 8,
+     "erfasst": 8,
+     "nicht_angeboten": 0,
+     "nicht_erfasst": 0,
+     "befund": 0,
+     "nicht_besucht": 0,
+     "verworfen": 4,
+     "gescheitert": 0
+    }
+   }
+  }
+ ],
+ "groesse_bytes": 2636250,
+ "groessengrenze_bytes": 8000000,
+ "gekuerzt": []
+}

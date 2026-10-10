@@ -1,0 +1,644 @@
+{
+ "karte": "o2.yaml",
+ "anbieter": "o2",
+ "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m",
+ "status": "gelesen",
+ "grund": null,
+ "bot_schutz": false,
+ "http_status": 200,
+ "hoechste_kombinationen": 12,
+ "belege": "nicht archiviert (kein Konto)",
+ "zaehlung": {
+  "kombinationen": 8,
+  "erfasst": 8,
+  "nicht_angeboten": 0,
+  "nicht_erfasst": 0,
+  "befund": 0,
+  "nicht_besucht": 0,
+  "verworfen": 4,
+  "gescheitert": 0
+ },
+ "struktur": {
+  "knoepfe_gesucht": 51,
+  "knoepfe_gefunden": 51,
+  "felder_gesucht": 56,
+  "felder_gefunden": 56,
+  "anteil_knoepfe": 1.0,
+  "anteil_felder": 1.0
+ },
+ "gefunden": {
+  "knoepfe": {
+   "speicher": {
+    "selektor": "#content div:has(> input[type=\"radio\"]:not([name])) > label:not(:has-text(\"Monate\"))",
+    "werte": [
+     "256 GB"
+    ]
+   },
+   "tarif": {
+    "selektor": "tef-choice-panel:has(input[name=\"select-tariff\"]) > label",
+    "werte": [
+     "O2 Mobile Unlimited M Plus mit 100 MBit/s",
+     "O2 Mobile L Plus mit 150 GB+",
+     "O2 Mobile on Demand M Plus mit 50 GB+",
+     "O2 Mobile Unlimited M mit 100 MBit/s"
+    ]
+   },
+   "laufzeit": {
+    "selektor": "#content div:has(> input[type=\"radio\"]:not([name])) > label:has-text(\"Monate\")",
+    "werte": [
+     "36",
+     "24"
+    ]
+   }
+  },
+  "zusammenfassung": "#content table:has-text(\"Gerät Anzahlung\")",
+  "felder": {
+   "anzahlung": {
+    "text": 8,
+    "antwort": 8
+   },
+   "rate": {
+    "text": 8,
+    "antwort": 8
+   },
+   "ratenzahl": {
+    "text": 8,
+    "antwort": 8
+   },
+   "tarifphasen": {
+    "text": 8,
+    "antwort": 8
+   },
+   "tarifbindung": {
+    "text": 8,
+    "antwort": 8
+   },
+   "anschluss": {
+    "text": 8,
+    "antwort": 8
+   },
+   "volumen_gb": {
+    "text": 8,
+    "antwort": 8
+   }
+  }
+ },
+ "kombinationen": [
+  {
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s",
+    "laufzeit": 36
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 1.0,
+    "rate": 36.5,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      19.99
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "werte_text": {
+    "anzahlung": 1.0,
+    "rate": 36.5,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      19.99
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "werte_antwort": {
+    "anzahlung": 1.0,
+    "rate": 36.5,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      19.99
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "buendel": null,
+   "echo": {
+    "befunde": [],
+    "luecken": []
+   },
+   "text": "Gerät mtl. (36 Raten):\n36,50 €\nTarif mtl. (Mindestlaufzeit 24 Monate):\n19,99 €\nmonatlich gesamt:\n56,49 €\nGerät Anzahlung:\n1,00 €\neinmaliger Anschlusspreis\n0,00 €\nVersandkosten:\n6,99 €\neinmalig gesamt:\n7,99 €",
+   "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtMTctcHJvLTI1NmdiLWNvc21pYy1vcmFuZ2UtMzZ4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLXVubGltaXRlZC1tLXBsdXMtb25saW5lLWh3di0zNm0tMDUtMDA7cGFja3M9dW10cy1vcHRpb24=",
+   "beleg_status": "offen"
+  },
+  {
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile Unlimited M Plus mit 100 MBit/s",
+    "laufzeit": 24
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 7.0,
+    "rate": 54.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      19.99
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "werte_text": {
+    "anzahlung": 7.0,
+    "rate": 54.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      19.99
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "werte_antwort": {
+    "anzahlung": 7.0,
+    "rate": 54.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      19.99
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "buendel": null,
+   "echo": {
+    "befunde": [],
+    "luecken": []
+   },
+   "text": "Gerät mtl. (24 Raten):\n54,50 €\nTarif mtl. (Mindestlaufzeit 24 Monate):\n19,99 €\nmonatlich gesamt:\n74,49 €\nGerät Anzahlung:\n7,00 €\neinmaliger Anschlusspreis\n0,00 €\nVersandkosten:\n6,99 €\neinmalig gesamt:\n13,99 €",
+   "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtMTctcHJvLTI1NmdiLWNvc21pYy1vcmFuZ2UtMjR4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLXVubGltaXRlZC1tLXBsdXMtb25saW5lLWh3di0yNG0tMDUtMDA7cGFja3M9dW10cy1vcHRpb24=",
+   "beleg_status": "offen"
+  },
+  {
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile L Plus mit 150 GB+",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile L Plus mit 150 GB+",
+    "laufzeit": 36
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 1.0,
+    "rate": 36.5,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      19.99
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": 150.0
+   },
+   "werte_text": {
+    "anzahlung": 1.0,
+    "rate": 36.5,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      19.99
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": 150.0
+   },
+   "werte_antwort": {
+    "anzahlung": 1.0,
+    "rate": 36.5,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      19.99
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": 150.0
+   },
+   "buendel": null,
+   "echo": {
+    "befunde": [],
+    "luecken": []
+   },
+   "text": "Gerät mtl. (36 Raten):\n36,50 €\nTarif mtl. (Mindestlaufzeit 24 Monate):\n19,99 €\nmonatlich gesamt:\n56,49 €\nGerät Anzahlung:\n1,00 €\neinmaliger Anschlusspreis\n0,00 €\nVersandkosten:\n6,99 €\neinmalig gesamt:\n7,99 €",
+   "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtMTctcHJvLTI1NmdiLWNvc21pYy1vcmFuZ2UtMzZ4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLWwtcGx1cy1vbmxpbmUtaHd2O3BhY2tzPXVtdHMtb3B0aW9u",
+   "beleg_status": "offen"
+  },
+  {
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile L Plus mit 150 GB+",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile L Plus mit 150 GB+",
+    "laufzeit": 24
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 7.0,
+    "rate": 54.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      19.99
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": 150.0
+   },
+   "werte_text": {
+    "anzahlung": 7.0,
+    "rate": 54.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      19.99
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": 150.0
+   },
+   "werte_antwort": {
+    "anzahlung": 7.0,
+    "rate": 54.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      19.99
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": 150.0
+   },
+   "buendel": null,
+   "echo": {
+    "befunde": [],
+    "luecken": []
+   },
+   "text": "Gerät mtl. (24 Raten):\n54,50 €\nTarif mtl. (Mindestlaufzeit 24 Monate):\n19,99 €\nmonatlich gesamt:\n74,49 €\nGerät Anzahlung:\n7,00 €\neinmaliger Anschlusspreis\n0,00 €\nVersandkosten:\n6,99 €\neinmalig gesamt:\n13,99 €",
+   "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtMTctcHJvLTI1NmdiLWNvc21pYy1vcmFuZ2UtMjR4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLWwtcGx1cy1vbmxpbmUtaHd2O3BhY2tzPXVtdHMtb3B0aW9u",
+   "beleg_status": "offen"
+  },
+  {
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile on Demand M Plus mit 50 GB+",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile on Demand M Plus mit 50 GB+",
+    "laufzeit": 36
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 1.0,
+    "rate": 36.5,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      14.99
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 39.99,
+    "volumen_gb": 50.0
+   },
+   "werte_text": {
+    "anzahlung": 1.0,
+    "rate": 36.5,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      14.99
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 39.99,
+    "volumen_gb": 50.0
+   },
+   "werte_antwort": {
+    "anzahlung": 1.0,
+    "rate": 36.5,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      14.99
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 39.99,
+    "volumen_gb": 50.0
+   },
+   "buendel": null,
+   "echo": {
+    "befunde": [],
+    "luecken": []
+   },
+   "text": "Gerät mtl. (36 Raten):\n36,50 €\nTarif mtl. (Mindestlaufzeit 24 Monate):\n14,99 €\nmonatlich gesamt:\n51,49 €\nGerät Anzahlung:\n1,00 €\neinmaliger Anschlusspreis\n39,99 €\nVersandkosten:\n6,99 €\neinmalig gesamt:\n47,98 €",
+   "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtMTctcHJvLTI1NmdiLWNvc21pYy1vcmFuZ2UtMzZ4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLW9uLWRlbWFuZC1tLXBsdXMtb25saW5lLWh3djtwYWNrcz11bXRzLW9wdGlvbg==",
+   "beleg_status": "offen"
+  },
+  {
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile on Demand M Plus mit 50 GB+",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile on Demand M Plus mit 50 GB+",
+    "laufzeit": 24
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 7.0,
+    "rate": 54.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      14.99
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 39.99,
+    "volumen_gb": 50.0
+   },
+   "werte_text": {
+    "anzahlung": 7.0,
+    "rate": 54.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      14.99
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 39.99,
+    "volumen_gb": 50.0
+   },
+   "werte_antwort": {
+    "anzahlung": 7.0,
+    "rate": 54.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      14.99
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 39.99,
+    "volumen_gb": 50.0
+   },
+   "buendel": null,
+   "echo": {
+    "befunde": [],
+    "luecken": []
+   },
+   "text": "Gerät mtl. (24 Raten):\n54,50 €\nTarif mtl. (Mindestlaufzeit 24 Monate):\n14,99 €\nmonatlich gesamt:\n69,49 €\nGerät Anzahlung:\n7,00 €\neinmaliger Anschlusspreis\n39,99 €\nVersandkosten:\n6,99 €\neinmalig gesamt:\n53,98 €",
+   "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtMTctcHJvLTI1NmdiLWNvc21pYy1vcmFuZ2UtMjR4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLW9uLWRlbWFuZC1tLXBsdXMtb25saW5lLWh3djtwYWNrcz11bXRzLW9wdGlvbg==",
+   "beleg_status": "offen"
+  },
+  {
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile Unlimited M mit 100 MBit/s",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile Unlimited M mit 100 MBit/s",
+    "laufzeit": 36
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 1.0,
+    "rate": 36.5,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      29.99
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "werte_text": {
+    "anzahlung": 1.0,
+    "rate": 36.5,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      29.99
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "werte_antwort": {
+    "anzahlung": 1.0,
+    "rate": 36.5,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      29.99
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "buendel": null,
+   "echo": {
+    "befunde": [],
+    "luecken": []
+   },
+   "text": "Gerät mtl. (36 Raten):\n36,50 €\nTarif mtl. (Mindestlaufzeit 24 Monate):\n29,99 €\nmonatlich gesamt:\n66,49 €\nGerät Anzahlung:\n1,00 €\neinmaliger Anschlusspreis\n0,00 €\nVersandkosten:\n6,99 €\neinmalig gesamt:\n7,99 €",
+   "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtMTctcHJvLTI1NmdiLWNvc21pYy1vcmFuZ2UtMzZ4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLXVubGltaXRlZC1tLW9ubGluZS1wcm9tbztwYWNrcz11bXRzLW9wdGlvbg==",
+   "beleg_status": "offen"
+  },
+  {
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile Unlimited M mit 100 MBit/s",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "O2 Mobile Unlimited M mit 100 MBit/s",
+    "laufzeit": 24
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 7.0,
+    "rate": 54.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      29.99
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "werte_text": {
+    "anzahlung": 7.0,
+    "rate": 54.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      29.99
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "werte_antwort": {
+    "anzahlung": 7.0,
+    "rate": 54.5,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      29.99
+     ]
+    ],
+    "tarifbindung": 24,
+    "anschluss": 0.0,
+    "volumen_gb": "unbegrenzt"
+   },
+   "buendel": null,
+   "echo": {
+    "befunde": [],
+    "luecken": []
+   },
+   "text": "Gerät mtl. (24 Raten):\n54,50 €\nTarif mtl. (Mindestlaufzeit 24 Monate):\n29,99 €\nmonatlich gesamt:\n84,49 €\nGerät Anzahlung:\n7,00 €\neinmaliger Anschlusspreis\n0,00 €\nVersandkosten:\n6,99 €\neinmalig gesamt:\n13,99 €",
+   "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtMTctcHJvLTI1NmdiLWNvc21pYy1vcmFuZ2UtMjR4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLXVubGltaXRlZC1tLW9ubGluZS1wcm9tbztwYWNrcz11bXRzLW9wdGlvbg==",
+   "beleg_status": "offen"
+  }
+ ],
+ "verworfen": [
+  {
+   "url": "https://www.o2online.de/assets/code/tracking/alert/alert-tracking-js-code",
+   "grund": "per robots.txt gesperrt: /assets/code/tracking/alert/alert-tracking-js-code"
+  },
+  {
+   "url": "https://www.o2online.de/assets/code/tracking/vertrag-kuendigen-js-code",
+   "grund": "per robots.txt gesperrt: /assets/code/tracking/vertrag-kuendigen-js-code"
+  },
+  {
+   "url": "https://static.trbo.com/assets/trbo-icons.css",
+   "grund": "per robots.txt gesperrt: /assets/trbo-icons.css"
+  },
+  {
+   "url": "https://config.eu.usercentrics.eu/settings/2BGLbVtv/latest/languages.json",
+   "grund": "robots.txt nicht lesbar (HTTP 403)"
+  }
+ ],
+ "gescheitert": [],
+ "hilfsdateien": []
+}
