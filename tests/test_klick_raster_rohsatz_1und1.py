@@ -295,7 +295,8 @@ def test_rastersatz_ersetzt_adaptersatz_all_net_flat_m(
     (alt,) = _adapter(anschluss)
     assert alt["herleitung"] == "tarifaufschlag_aus_tarifraster"
     assert (alt["buendel_monatlich"], alt["laufzeit_monate"]) == (49.99, 36)
-    seiten = [produktseite(IPHONE_17)] if produktseite_da else []
+    assert alt["geraet_zuzahlung"] == 360.0
+    seiten = [produktseite(IPHONE_17, einmal=360.0)] if produktseite_da else []
     uebersichten = [raster(RASTER[0]), raster(RASTER[1])]
     if details_da:
         uebersichten.insert(0, details(DETAILS_M, "1&1 All-Net-Flat M"))
@@ -319,10 +320,11 @@ def test_rastersatz_ersetzt_adaptersatz_all_net_flat_m(
     (satz,) = m
     assert satz in neu and satz["sku_id"] == alt["sku_id"]
     assert (satz["buendel_monatlich"], satz["anschlusspreis"]) == (49.99, 39.9)
+    assert satz["geraet_zuzahlung"] == 360.0
     assert (
         satz["quelle_url"] == "https://mobile.1und1.de/iphone-17-pro?tariffFirst=true"
     )
-    assert "herleitung" not in satz
+    assert satz["herleitung"] == "schlusszahlung_aus_grundtarif"
     assert zug.bilanz["ersetzt"] == 1 and zug.bilanz["gegenprobe"]["gleich"] == 1
 
 

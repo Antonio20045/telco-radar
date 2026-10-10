@@ -746,9 +746,9 @@ def ergaenze_tarifstufen(hole: Callable, kopfzeilen: dict, rohbuendel: list) -> 
 
     Rechnung, Gegenprobe und Grenzen stehen im Kopf dieses Abschnitts.
     Abrufe: die zwei Tarifuebersichten plus ein Raster je verlinktem
-    Tarif (am 29.09.2026: 2 + 7). Haengt die neuen Saetze an `rohbuendel`
-    an und gibt ihre Zahl zurueck. Ein fehlendes Default-Raster heisst:
-    nichts herleiten - ohne die Gegenprobe ist ein Aufschlag keiner.
+    Tarif (am 29.09.2026: 2 + 7). Haengt die neuen Saetze an `rohbuendel` an,
+    gibt ihre Zahl zurueck. Ohne Default-Raster keine Gegenprobe, also
+    nichts. Die Ablöse hängt nur an der Gerätevariante (`klickraster`).
     """
     basis = [
         s
@@ -862,7 +862,6 @@ def ergaenze_tarifstufen(hole: Callable, kopfzeilen: dict, rohbuendel: list) -> 
                         "tarifdetails_url": detail_url,
                         "buendel_monatlich": round(cent / 100.0, 2),
                         "laufzeit_monate": monate,
-                        "geraet_zuzahlung": None,
                         "herleitung": HERLEITUNG_TARIFAUFSCHLAG,
                         "url": adresse,
                         "quelle_url": adresse,

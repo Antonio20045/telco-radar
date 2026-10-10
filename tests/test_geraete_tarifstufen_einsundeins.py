@@ -189,9 +189,15 @@ def test_der_aufschlag_kommt_auf_die_preiskarte_der_groesse():
     m512 = _satz(saetze, "iPhone 18 Pro 512 GB", "1&1 All-Net-Flat M")
     assert m512["buendel_monatlich"] == 61.99
     assert m512["laufzeit_monate"] == 36
-    assert m512["geraet_zuzahlung"] is None
+    assert m512["geraet_zuzahlung"] == 510.0
     assert (
         _satz(saetze, "iPhone 18 Pro 512 GB", "1&1 All-Net-Flat S")["geraet_zuzahlung"]
+        == 510.0
+    )
+    assert (
+        _satz(saetze, "Galaxy S26 Ultra 1024 GB", "1&1 All-Net-Flat M")[
+            "geraet_zuzahlung"
+        ]
         == 510.0
     )
     assert m512["tarif_slug"] == "tariff-anf-m-mvl"
@@ -223,8 +229,8 @@ def test_das_zubehoer_des_rasters_landet_nicht_im_preis():
 
 def test_ein_geraeteabhaengiger_aufschlag_bleibt_bei_der_vorauswahl():
     """Unlimited XL: Apple +25,00, alle anderen +30,00 - der Aufschlag hängt
-    am Gerät. Nur die vorausgewählte Größe, und die Einmalzahlungs-Karte
-    des Default-Tarifs wird nicht übertragen."""
+    am Gerät. Nur die vorausgewählte Größe; die Ablöse nach Monat 24 hängt
+    nur an der Gerätevariante und kommt vom Default-Satz derselben Größe."""
     saetze = _basis()
     E.ergaenze_tarifstufen(_Hole(), {}, saetze)
     xl = [s for s in saetze if s["tarif_name"] == "1&1 Unlimited XL"]
@@ -234,7 +240,10 @@ def test_ein_geraeteabhaengiger_aufschlag_bleibt_bei_der_vorauswahl():
         ("hw-apple-iphone-18-pro", 256, 74.99),
         ("hw-samsung-galaxy-s26-ultra", 256, 72.99),
     ]
-    assert all(s["geraet_zuzahlung"] is None for s in xl)
+    assert sorted((s["hw_id"], s["geraet_zuzahlung"]) for s in xl) == [
+        ("hw-apple-iphone-18-pro", 420.0),
+        ("hw-samsung-galaxy-s26-ultra", 340.0),
+    ]
 
 
 def test_ohne_default_raster_wird_nichts_hergeleitet():
