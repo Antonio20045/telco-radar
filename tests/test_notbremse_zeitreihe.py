@@ -229,29 +229,28 @@ def _panels(fragment: BeautifulSoup) -> list[tuple[str, BeautifulSoup]]:
     ]
 
 
-def test_panel_von_eins_und_eins_nennt_36_monate(gerendert):
+def test_panel_von_eins_und_eins_traegt_nie_36_monate(gerendert):
+    """1&1 trägt den Tarif bis Monat 36 und wird nur über 24 Monate verglichen
+    (Antonio, 10.10.2026): kein Rechenweg-Panel von 1&1 über 36 Monate."""
     _, fragment = gerendert
     etiketten: dict[str, set] = {"1&1": set(), "o2": set()}
     for anbieter, inhalt in _panels(fragment):
         etikett = inhalt.select_one(".gr-zr-plabel")
         if anbieter in etiketten and etikett is not None:
             etiketten[anbieter].add(etikett.get_text(strip=True))
-    assert etiketten["1&1"], "keine Rechenweg-Panels von 1&1 im Bestand"
-    falsch = sorted(etiketten["1&1"] - {"Kosten über 36 Monate"})
-    assert not falsch, (
-        f"Kosten über 36 Monate: erwartet im Panel von 1&1, steht {falsch}"
-    )
+    assert "Kosten über 36 Monate" not in etiketten["1&1"], etiketten["1&1"]
+    assert "Kosten über 36 Monate" in etiketten["o2"], "Gegenprobe: o2 mit 36 Raten"
 
 
 def test_panel_von_o2_bleibt_bei_24_monaten(gerendert):
-    """Gegenprobe: die aufgeteilte Preisform trägt weiter 24 Monate."""
+    """Gegenprobe: die aufgeteilte Preisform trägt 24 Monate, mit 36 Raten 36."""
     _, fragment = gerendert
     etiketten = {
         etikett.get_text(strip=True)
         for anbieter, inhalt in _panels(fragment)
         if anbieter == "o2" and (etikett := inhalt.select_one(".gr-zr-plabel"))
     }
-    assert etiketten == {"Kosten über 24 Monate"}, etiketten
+    assert etiketten == {"Kosten über 24 Monate", "Kosten über 36 Monate"}, etiketten
 
 
 def test_monatsnamen_sind_deutsch_auch_unter_englischem_locale(gerendert):

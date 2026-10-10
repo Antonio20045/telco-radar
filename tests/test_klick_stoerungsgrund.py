@@ -168,9 +168,23 @@ def _mit_grund(zustand) -> None:
     pfad.write_text(json.dumps(daten, ensure_ascii=False), encoding="utf-8")
 
 
+def _ohne_telekom_buendel(zustand) -> None:
+    """Der Fall „kein Bündel“: Telekom ohne Bündel zum Modell. Seit der Tarif nur
+    seine 24 Monate zählt, trägt der Bestand sonst eine Telekom-Zahl."""
+    pfad = zustand / "geraete_tco.json"
+    daten = json.loads(pfad.read_text(encoding="utf-8"))
+    daten["buendel"] = [
+        b
+        for b in daten["buendel"]
+        if not (b["anbieter"] == "Telekom" and b["sku_id"].startswith(f"{MODELL}gb-"))
+    ]
+    pfad.write_text(json.dumps(daten, ensure_ascii=False), encoding="utf-8")
+
+
 def test_radar_nennt_den_grund_statt_kein_buendel(tmp_path):
     zustand = tmp_path / "state"
     shutil.copytree(ZUSTAND, zustand)
+    _ohne_telekom_buendel(zustand)
     vorher = _telekom_iphone(zustand)
     assert (vorher["status"], vorher["grund"]) == ("kein_buendel", ALT)
 

@@ -146,11 +146,14 @@ def test_die_kernzahl_rechnet_24_monate_aktionspreis():
     assert k.luecken == []
 
 
-def test_nach_der_bindung_bleibt_es_bei_der_luecke():
-    """Ab Monat 25 nennt die Antwort nur die Geräterate - kein erfundener Tarifpreis."""
+def test_nach_der_bindung_zaehlt_nur_die_geraeterate():
+    """Ab Monat 25 nennt die Antwort nur die Geräterate - kein erfundener Tarifpreis,
+    und die Summe braucht keinen: Monat 25 bis 36 zählt nur die Rate."""
     b = _buendel(_xs_iphone())
     assert tarifpreis_im_monat(b, 25) is None
-    assert f"{POSTEN_TARIF} Monat 25–36" in kosten_ueber(b).luecken
+    k = kosten_ueber(b)
+    assert f"{POSTEN_TARIF} Monat 25–36" not in k.luecken
+    assert k.gesamt is not None and k.posten["Tarif über 24 Monate"] > 0
 
 
 def test_zwoelf_raten_tragen_zwei_rabattphasen():

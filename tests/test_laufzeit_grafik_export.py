@@ -87,8 +87,7 @@ def test_das_delta_des_bandgraphen_gilt_nur_gegen_vodafone_derselben_laufzeit(g)
                 betrag - soll["Vodafone"], 2
             ), (laufzeit, anbieter)
     assert _band(g, 36)["balken"]["zeilen"][0]["anbieter"] == "congstar"
-    eins = next(z for z in _band(g, 36)["balken"]["zeilen"] if z["anbieter"] == "1&1")
-    assert eins["delta_text"].startswith("−267,66 €")
+    assert "1&1" not in {z["anbieter"] for z in _band(g, 36)["balken"]["zeilen"]}
 
 
 def test_ein_anbieter_ohne_buendel_dieser_laufzeit_heisst_nicht_erfasst(g):
@@ -102,7 +101,10 @@ def test_ein_anbieter_ohne_buendel_dieser_laufzeit_heisst_nicht_erfasst(g):
         a: f"{a} ist mit 12 Raten nicht erfasst." for a in ("Telekom", "1&1", "o2")
     }
     sechsunddreissig = {f["anbieter"]: f["grund"] for f in _band(g, 36)["fehlend"]}
-    assert sechsunddreissig == {"o2": "o2 ist mit 36 Raten nicht erfasst."}
+    assert sechsunddreissig == {
+        "o2": "o2 ist mit 36 Raten nicht erfasst.",
+        "1&1": "1&1 wird nur über 24 Monate verglichen.",
+    }
 
 
 def test_der_graph_knoten_traegt_jede_laufzeit_getrennt(g):
@@ -126,7 +128,8 @@ def test_der_export_je_laufzeit_traegt_genau_ihre_buendel(g, tmp_path):
     tco = g["tco"]["export"]
     info = geraete_export.schreibe_exporte(tmp_path, [], [], None, tco=tco)
     alle = _buendelzeilen(tmp_path / info["tco"]["datei"])
-    assert len(alle) == sum(len(s) for s in SOLL.values())
+    assert len(alle) == sum(len(s) for s in SOLL.values()) + 1
+    assert [z["Laufzeit Monate"] for z in alle if z["Anbieter"] == "1&1"] == ["36"]
     assert set(info["tco_je_laufzeit"]) == set(SOLL)
     for laufzeit, soll in SOLL.items():
         eintrag = info["tco_je_laufzeit"][laufzeit]

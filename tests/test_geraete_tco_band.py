@@ -159,10 +159,9 @@ def test_telekom_congstar_und_11_stehen_als_benannte_luecke(bestand):
     (Lookup-Zeile, sonst pruefte der Test nur einen von beiden).
     Datenkonzept Geräte 5.4: der Graph zeichnet je Ratenlaufzeit - die Regel
     gilt deshalb je Laufzeit, gegen die Karten DIESER Laufzeit. Seit der
-    Prüfrunde DK23 ist Telekom im Bestand nirgends zeichenbar: sie führt nur
-    36 Raten, und kein Telekom-Blatt nennt den Tarif ab Monat 25. Die
-    Lookup-Zeile verlangt deshalb einen Anbieter in BEIDEN Zuständen, und
-    Telekom steht überall benannt."""
+    Tarif nur seine 24 Monate zählt (Antonio, 10.10.2026), ist Telekom mit
+    36 Raten wieder zeichenbar. Die Lookup-Zeile verlangt einen Anbieter in
+    BEIDEN Zuständen."""
     modell = _modell(bestand, VORGABE_MODELL)
     je_laufzeit = [
         (
@@ -198,7 +197,7 @@ def test_telekom_congstar_und_11_stehen_als_benannte_luecke(bestand):
         f"kein Anbieter gezeichnet UND benannt - der Test prüft einen Zustand: "
         f"{zustaende}"
     )
-    assert zustaende.get("Telekom") == {"fehlend"}, zustaende.get("Telekom")
+    assert "gezeichnet" in zustaende.get("Telekom", set()), zustaende.get("Telekom")
 
 
 def test_leerzustand_modell_ohne_buendel_in_keinem_band(bestand, tarife):
@@ -218,8 +217,8 @@ def test_leerzustand_modell_ohne_buendel_in_keinem_band(bestand, tarife):
     Zuzahlung und Anschlusspreis: `kosten_ueber` nennt beide sonst als
     Luecke statt sie als 0 zu zaehlen, und ohne Zahl gaebe es kein echtes
     Buendel. Seit Datenkonzept 5.4 zeichnet der Graph je Ratenlaufzeit:
-    beide Faelle laufen in der Laufzeit des Vertrags (36), sonst waere die
-    Leere trivial."""
+    beide Faelle laufen in der Laufzeit des Vertrags (24; 1&1 wird nur ueber
+    24 Monate verglichen), sonst waere die Leere trivial."""
     sku = "apple-iphone-15-999gb-schwarz"
     listung = {
         "sku_id": sku,
@@ -238,7 +237,7 @@ def test_leerzustand_modell_ohne_buendel_in_keinem_band(bestand, tarife):
                 tarif_id=tarif_id,
                 buendel_monatlich=54.99,
                 geraet_zuzahlung=0.0,
-                laufzeit_monate=36,
+                laufzeit_monate=24,
                 anschlusspreis=39.9,
                 abgerufen_am="2026-09-08",
             )
@@ -254,14 +253,14 @@ def test_leerzustand_modell_ohne_buendel_in_keinem_band(bestand, tarife):
     assert echte, "das konstruierte Modell hat kein echtes Buendel - kein Fall"
     assert (
         band.baender_fuer_modell(
-            ohne, bestand["band_je_tarif"], leiter=bestand["leiter"], laufzeit=36
+            ohne, bestand["band_je_tarif"], leiter=bestand["leiter"], laufzeit=24
         )
         == []
     ), "ein Tarif ohne Datenvolumen darf kein Band gebaeren"
 
     mit_band = _modell_mit("11:1-1-all-net-flat-s", "1&1 All-Net-Flat S")
     assert band.baender_fuer_modell(
-        mit_band, bestand["band_je_tarif"], leiter=bestand["leiter"], laufzeit=36
+        mit_band, bestand["band_je_tarif"], leiter=bestand["leiter"], laufzeit=24
     ), "Gegenprobe: die All-Net-Flat S (10 GB) muss Stufe XS gebaeren"
 
 

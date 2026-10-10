@@ -327,7 +327,7 @@ def _messungen(
         laufzeit = satz.get("laufzeit_monate")
         if laufzeit is None:
             laufzeit = b.get("laufzeit_monate")
-        if laufzeit not in LAUFZEITEN:
+        if ansicht({**b, **satz, "raten_laufzeit": laufzeit}) is None:
             fremde_laufzeit += 1
             continue
         h = zeitraum(laufzeit)

@@ -12,7 +12,7 @@
 
 ## Leitzahl der Geräteseite
 
-Kernzahl jeder Bündelzeile ist `tco_model.kosten_ueber()`: Anzahlung + Tarif über H Monate + alle Geräteraten + Anschlusspreis, H = größerer Wert aus Ratenlaufzeit und Tarifbindung (12 → 24, 24 → 24, 36 → 36; 1&1 ein Vertrag über 36). Ein Tarifmonat nach der Bindung zählt nur mit gemessener Preisphase, sonst ist die Zeile eine benannte Lücke ohne Zahl. Karte, Zeitreihe, Rechenweg und Export rufen dieselbe Funktion (`docs/datenkonzept-geraete.md` Abschnitt 5).
+Kernzahl jeder Bündelzeile ist `tco_model.kosten_ueber()`: Anzahlung + Tarif über H Monate + alle Geräteraten + Anschlusspreis, H = größerer Wert aus Ratenlaufzeit und Tarifbindung (12 → 24, 24 → 24, 36 → 36; 1&1 ein Vertrag über 36). Der Tarif zählt nur seine Bindung (höchstens 24 Monate, § 56 TKG); bei 36 Raten zählen Monat 25–36 nur die Rate (Antonio, 10.10.2026). Karte, Zeitreihe, Rechenweg und Export rufen dieselbe Funktion (`docs/datenkonzept-geraete.md` Abschnitt 5).
 
 Erfasst werden alle angebotenen Ratenlaufzeiten: Telekom 6/12/24/36, o2 24/36, congstar 24/36, 1&1 „24+12“ mit Schlusszahlung, Vodafone 12/24/36. Die Laufzeit gehört in den Bündelschlüssel, sonst überschreiben sich die Varianten.
 

@@ -15,6 +15,7 @@ from datetime import date
 
 from .. import rechenweise
 from ..tarif_model import buendelphasen_aus
+from ..tco_kosten import tarifmonate
 from ..tco_model import (
     POSTEN_ANSCHLUSS,
     POSTEN_BUENDEL,
@@ -212,10 +213,11 @@ def _rechung(messung: dict, tarife: dict | None = None) -> dict | None:
             einzeln=b.buendel_monatlich,
         )
     else:
+        t = min(h, tarifmonate(b))
         _posten(
             "Tarif",
-            kosten.posten.get(f"Tarif über {h} Monate"),
-            anzahl=h,
+            kosten.posten.get(f"Tarif über {t} Monate"),
+            anzahl=t,
             einzeln=b.tarif_monatlich,
             klammer="phasengewichtet" if b.tarif_phasen else "",
         )

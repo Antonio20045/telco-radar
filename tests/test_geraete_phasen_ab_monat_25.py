@@ -1,7 +1,8 @@
 """Monat 25 bis 36: Karte, Tarifblatt und o2-Preiszusammenfassung gegen die Bündelphase.
 
 Reproduktionen der Prüferrunde zu 99398e8d. Die Zeile „ab Monat 25“ liest aus
-denselben Phasen wie `kosten_ueber`; ein Tarifblatt mit Phasentabelle bleibt vor der
+denselben Phasen wie `kosten_ueber`, die Summe zählt davon nur die 24 Monate der
+Bindung (Antonio, 10.10.2026); ein Tarifblatt mit Phasentabelle bleibt vor der
 Bündelphase; nennt o2 „ab dem 25. Monat: 29,99 €“, gilt der alte Preis nur bis
 Monat 24. Fixtures: `congstar_produkt_iphone17_20260929.html.gz`,
 `o2_vertiefung_iphone17pro.json.gz`, `o2_ratenplan_galaxy_s26_20261007.json.gz`
@@ -75,16 +76,19 @@ def test_gegenprobe_24_raten_die_luecke_ab_monat_25_ist_wahr():
     assert NICHT_BELEGT in zeile
 
 
-def test_36_raten_zeile_rechnet_monat_25_bis_36_und_nennt_ihn_nicht_unbelegt():
+def test_36_raten_zeile_rechnet_24_tarifmonate_und_nennt_monat_25_nicht_unbelegt():
+    """19 + 24 × (28,50 + 15,00) + 12 × 28,50 = 1.405,00 €: ab Monat 25 nur die Rate."""
     k, zeile = _zeile(36)
-    assert (k["laufzeit"], k["gesamt"], k["nach_bindung"]) == (36, 1585.0, 15.0)
-    assert "<span>Tarif über 36 Monate</span><em>540,00" in zeile
+    assert (k["laufzeit"], k["gesamt"], k["nach_bindung"]) == (36, 1405.0, 15.0)
+    assert 'title="Tarif über 24 Monate: 360,00 €"' in zeile
+    assert '12 × 28,50 € <span class="gr-bnd-wort">nur Gerät</span>' in zeile
     assert [s for s in (NICHT_BELEGT, LUECKENSATZ) if s in zeile] == []
 
 
 def _tarif_ueber_36(b) -> float | None:
+    """Der Tarif, den `kosten_ueber` über 36 Monate zählt: nur seine 24 Monate."""
     k = kosten_ueber(b, 36)
-    return None if k.luecken else k.posten.get("Tarif über 36 Monate")
+    return None if k.luecken else k.posten.get("Tarif über 24 Monate")
 
 
 def test_gegenprobe_blatt_nur_mit_grundpreis_die_buendelphase_traegt_36_monate():
@@ -92,17 +96,20 @@ def test_gegenprobe_blatt_nur_mit_grundpreis_die_buendelphase_traegt_36_monate()
     karten.tarif_anreichern(
         b, {**blatt, "preisphasen": [{**TABELLE[0], "bis_monat": None}]}
     )
-    assert _tarif_ueber_36(b) == 36 * 15.0
+    assert [(p.von_monat, p.bis_monat, p.betrag) for p in b.tarif_phasen] == [
+        (1, 36, 15.0)
+    ]
+    assert _tarif_ueber_36(b) == 24 * 15.0
 
 
-def test_blatt_nennt_ab_monat_25_zwanzig_euro_dann_nicht_36_mal_fuenfzehn():
+def test_blatt_nennt_ab_monat_25_zwanzig_euro_die_summe_zaehlt_24_monate():
     b, blatt = _xs(36)
     karten.tarif_anreichern(b, {**blatt, "preisphasen": TABELLE})
     assert [(p.von_monat, p.bis_monat, p.betrag) for p in b.tarif_phasen] == [
         (1, 24, 15.0),
         (25, None, 20.0),
     ]
-    assert _tarif_ueber_36(b) == 24 * 15.0 + 12 * 20.0
+    assert _tarif_ueber_36(b) == 24 * 15.0
 
 
 def _o2_saetze(mit_zeile_ab_25: bool) -> list[dict]:

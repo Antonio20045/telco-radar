@@ -20,6 +20,7 @@ from .geraete_laufzeit import (
     LAUFZEITEN,
     NICHT_ERFASST,
     ansicht,
+    nur_ueber_24,
 )
 from .geraete_rechenweg import ANBIETER_FOLGE, _euro, _zeitraum_wort
 from .geraete_tco_band import band_label
@@ -139,6 +140,10 @@ def _luecken(
         )
         if not alle:
             grund = "gar-kein-buendel"
+        elif not eigene and any(
+            nur_ueber_24(k) and k.get("raten_laufzeit") == laufzeit for k in alle
+        ):
+            grund = "nur-24"
         elif not eigene:
             grund = "nicht-erfasst"
         elif not any(k.get("band") == band for k in eigene):
@@ -213,6 +218,7 @@ _KURZ = {
     "zaehlt-nicht": "Nicht im Vergleich",
     "kein-belastbares": "Kein vollständiger Preis",
     "nur-alte": "Kein aktueller Stand",
+    "nur-24": "Nur über 24 Monate verglichen",
 }
 
 

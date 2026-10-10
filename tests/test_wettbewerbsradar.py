@@ -1045,7 +1045,9 @@ def test_am_echten_bestand_steht_jedes_band_paar_auf_der_seite(echt):
     Datenkonzept Geräte Schritt 3: ein Paar ist erst eines in derselben
     Ratenlaufzeit (Regel 5). Gezählt wird deshalb je Laufzeit gegen
     Vodafones Karte dieser Laufzeit; eine Karte ohne Vodafone-Gegenstück in
-    ihrer Laufzeit gehört zu den benannten Zeilen."""
+    ihrer Laufzeit gehört zu den benannten Zeilen. Seit der Tarif nur 24
+    Monate zählt, trägt auch Vodafone mit 36 Raten eine Zahl, und der Bestand
+    hat keine solche Karte mehr; den Fall prüfen die `test_h3_…` gestellt."""
     by_id = {m["id"]: m for m in echt["modelle"]}
     paare = 0
     gezeichnet = 0
@@ -1103,9 +1105,6 @@ def test_am_echten_bestand_steht_jedes_band_paar_auf_der_seite(echt):
     assert paare, "kein Paar im Bestand - Datenlage gemaess Brief geprueft?"
     assert gezeichnet == paare, (
         f"{paare - gezeichnet} Paare im Bestand fehlen auf der Seite"
-    )
-    assert fremder_zeitraum, (
-        "keine Karte mit fremdem Zeitraum im Bestand - die Gegenprobe prueft nichts"
     )
     assert benannt == fremder_zeitraum, (
         f"{fremder_zeitraum - benannt} gesperrte Karten ohne benannten Grund"

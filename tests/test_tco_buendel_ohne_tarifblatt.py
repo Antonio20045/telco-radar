@@ -151,11 +151,14 @@ def test_kosten_ueber_24_monate_wie_im_shop(o2_bilanz):
     assert (special.monate, special.gesamt) == (24, 1674.76)
 
 
-def test_36_raten_ohne_tarifblatt_nennen_die_luecke(o2_bilanz):
-    """Ohne Tarifblatt ist der Tarifpreis nach Monat 24 nicht belegt."""
-    kosten = kosten_ueber(_eines(o2_bilanz, _L_PLUS, 256, 36))
-    assert kosten.monate == 36 and kosten.gesamt is None
-    assert kosten.luecken == [f"{POSTEN_TARIF} Monat 25–36"]
+def test_36_raten_ohne_tarifblatt_zaehlen_24_tarifmonate(o2_bilanz):
+    """Ohne Tarifblatt ist der Tarifpreis nach Monat 24 nicht belegt; gebraucht wird
+    er nicht, ab Monat 25 zählt nur die Rate (Antonio, 10.10.2026)."""
+    b = _eines(o2_bilanz, _L_PLUS, 256, 36)
+    kosten = kosten_ueber(b)
+    assert kosten.monate == 36 and kosten.luecken == []
+    assert kosten.posten["Tarif über 24 Monate"] == round(24 * b.tarif_monatlich, 2)
+    assert f"{POSTEN_TARIF} Monat 25–36" not in kosten.luecken
 
 
 def test_plus_wird_nie_auf_den_tarif_ohne_plus_abgebildet(o2_bilanz, bestand):
@@ -269,7 +272,8 @@ def test_ab_monat_25_ohne_tarifblatt_nennt_keine_tarifquelle(ab_monat):
     Tarifblatt und behält den Quellengrund."""
     ohne = [z for tarif, z in ab_monat if tarif in (_SPECIAL, _L_PLUS)]
     mit = [z for tarif, z in ab_monat if tarif == _L]
-    assert len(ohne) == 4 and mit
+    assert len(ohne) == 8 and mit
+    assert not [z for z in ohne + mit if "ab Monat 37" in z]
     for zeile in ohne:
         assert "Tarifquelle" not in zeile and "nicht im Tarifbestand" in zeile, zeile
     assert not [z for z in mit if "nicht im Tarifbestand" in z]

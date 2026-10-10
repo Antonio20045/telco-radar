@@ -1,12 +1,15 @@
 """Was ein Bündel über H Monate kostet: die Kernzahl je Ratenlaufzeit.
 
-Datenkonzept Geräte 5.3 und Entscheidung 1 (die 36er-Ansicht rechnet 36 Tarifmonate):
+Datenkonzept Geräte 5.3 (Antonio, 10.10.2026: der Tarif endet nach seiner Bindung,
+die Raten laufen weiter):
 
     Kosten über H Monate = Anzahlung + Anschluss + N Geräteraten
-                         + Tarif in jedem Monat 1 bis H zum Preis seiner Phase
+                         + Tarif in jedem Monat 1 bis T zum Preis seiner Phase
     ein Vertrag (1&1):   = Anzahlung + Anschluss + H × Bündelbetrag
 
-H ist der größere Wert aus Ratenlaufzeit N und Tarifbindung (`zeitraum`). Ein
+H ist der größere Wert aus Ratenlaufzeit N und Tarifbindung (`zeitraum`), T der
+kleinere aus H und den Tarifmonaten (`tarifmonate`, höchstens 24 nach § 56 TKG):
+bei 36 Raten zählen Monat 1 bis 24 Tarif und Rate, Monat 25 bis 36 nur die Rate. Ein
 gemessener Grundpreis ohne Preisphasen ist nur bis zum Ende der Bindung belegt (ohne
 Bindung 24 Monate); die Bestellstrecke nennt ihn nicht für die Monate danach. Dasselbe
 gilt für eine einzige Phase ab Monat 1 ohne Ende (`belegte_phasen`). Fehlt
@@ -39,6 +42,7 @@ SCHRITT_ANZAHLUNG = "anzahlung"
 SCHRITT_ANSCHLUSS = "anschluss"
 SCHRITT_BARPREIS = "barpreis"
 SCHRITT_MONAT = "monat"
+SCHRITT_NUR_GERAET = "nur_geraet"
 REIHENFOLGE_SCHRITTE = (
     SCHRITT_BARPREIS,
     SCHRITT_GERAET,
@@ -106,7 +110,7 @@ def zeitraum(buendel: Buendel) -> int | None:
 def kosten_ueber(buendel: Buendel, monate: int | None = None) -> Kosten:
     """Was `buendel` über `monate` Monate kostet, ohne `monate` über `zeitraum`.
 
-    Getrennte Preisform: der Tarif in jedem Monat 1 bis H, alle N Raten (auch die
+    Getrennte Preisform: der Tarif in jedem Monat 1 bis T, alle N Raten (auch die
     nach Monat H), Anzahlung und Anschluss; endet H vor der Tarifbindung, fehlen die
     geschuldeten Tarifmonate danach. Ein Vertrag (`buendel_monatlich`) trägt
     H × Bündelbetrag nur für H = N: davor fehlt die Einmalzahlung bei Kündigung,
@@ -165,7 +169,7 @@ def _vertrag(k: Kosten, betrag: float, laufzeit: int | None, h: int) -> None:
 
 
 def _tarif(k: Kosten, buendel: Buendel, h: int) -> None:
-    """Der Tarif in jedem Monat 1 bis H zum Preis der einen Phase, die ihn nennt.
+    """Der Tarif in jedem Monat 1 bis T zum Preis der einen Phase, die ihn nennt.
 
     Ohne Phasen ist der gemessene Grundpreis eine Phase bis zum Ende der Bindung.
     Ein Monat ohne genau eine Phase wird nicht gefüllt, sondern Lücke, ebenso jeder
@@ -178,12 +182,13 @@ def _tarif(k: Kosten, buendel: Buendel, h: int) -> None:
     if not phasen:
         k.luecken.append(POSTEN_TARIF)
         return
-    offen = [m for m in range(1, h + 1) if _preise_im_monat(phasen, m) != 1]
+    t = min(h, tarifmonate(buendel))
+    offen = [m for m in range(1, t + 1) if _preise_im_monat(phasen, m) != 1]
     k.luecken += [f"{POSTEN_TARIF} Monat {s}" for s in _spannen(offen)]
-    summe = None if offen else phasensumme(phasen, h)
+    summe = None if offen else phasensumme(phasen, t)
     if summe is not None:
-        k.posten[f"Tarif über {h} Monate"] = summe
-        k.rechnung += tarifschritte(phasen, h)
+        k.posten[f"Tarif über {t} Monate"] = summe
+        k.rechnung += tarifschritte(phasen, t)
     elif not offen:
         k.luecken.append(POSTEN_TARIF)
     elif offen[0] > 1:
@@ -193,21 +198,37 @@ def _tarif(k: Kosten, buendel: Buendel, h: int) -> None:
 
 
 def monatsschritte(schritte: list[Rechenschritt]) -> list[Rechenschritt]:
-    """Gerät und Tarif über gleich viele Monate als ein Monatspreis, wie der
-    Anbieter ihn nennt; Gerät und Tarif bleiben als `teile`. Sonst unverändert."""
+    """Gerät und Tarif im selben Monat als ein Monatspreis, wie der Anbieter ihn
+    nennt; Gerät und Tarif bleiben als `teile`. Laufen die Raten länger als der
+    Tarif, folgen die übrigen Monate als „nur Gerät“. Sonst unverändert."""
     geraet = [s for s in schritte if s.art == SCHRITT_GERAET]
     tarif = [s for s in schritte if s.art == SCHRITT_TARIF]
-    if len(geraet) != 1 or len(tarif) != 1 or geraet[0].anzahl != tarif[0].anzahl:
+    if len(geraet) != 1 or len(tarif) != 1:
         return list(schritte)
     g, t = geraet[0], tarif[0]
-    monat = Rechenschritt(
-        SCHRITT_MONAT,
-        g.anzahl,
-        round(g.betrag + t.betrag, 2),
-        round(g.summe + t.summe, 2),
-        (g, t),
-    )
-    return [monat, *(s for s in schritte if s is not g and s is not t)]
+    if g.anzahl is None or t.anzahl is None or g.anzahl < t.anzahl:
+        return list(schritte)
+    zusammen = round(g.betrag * t.anzahl, 2) if g.anzahl > t.anzahl else g.summe
+    teil = Rechenschritt(SCHRITT_GERAET, t.anzahl, g.betrag, zusammen)
+    neu = [
+        Rechenschritt(
+            SCHRITT_MONAT,
+            t.anzahl,
+            round(g.betrag + t.betrag, 2),
+            round(zusammen + t.summe, 2),
+            (teil, t),
+        )
+    ]
+    if g.anzahl > t.anzahl:
+        neu.append(
+            Rechenschritt(
+                SCHRITT_NUR_GERAET,
+                g.anzahl - t.anzahl,
+                g.betrag,
+                round(g.summe - zusammen, 2),
+            )
+        )
+    return [*neu, *(s for s in schritte if s is not g and s is not t)]
 
 
 def tarifschritte(phasen: list[Preisphase], h: int) -> list[Rechenschritt]:
@@ -232,6 +253,17 @@ def tarifschritte(phasen: list[Preisphase], h: int) -> list[Rechenschritt]:
             Rechenschritt(SCHRITT_TARIF, monate, betrag, round(monate * betrag, 2))
         )
     return schritte
+
+
+def tarifmonate(buendel: Buendel) -> int:
+    """Wie viele Monate der Tarif zählt: seine Mindestlaufzeit, ohne Angabe oder
+    ohne Bindung `ZEITRAUM_OHNE_BINDUNG` Monate (§ 56 TKG: höchstens 24).
+
+    Laufen die Raten länger, zahlt man danach nur noch die Rate: der Ratenkauf ist
+    ein eigener Vertrag, der Tarif ab dann monatlich kündbar (Antonio, 10.10.2026).
+    """
+    pflicht = _pflicht(buendel)
+    return pflicht if pflicht > 0 else ZEITRAUM_OHNE_BINDUNG
 
 
 def _pflicht(buendel: Buendel) -> int:

@@ -1,8 +1,9 @@
 """Preisphase über die ganze Ratenlaufzeit, nur wo der Anbieter sie fürs Bündel nennt.
 
-Datenkonzept Geräte 5.3, Regel 8 und Entscheidung 1: die 36er-Ansicht rechnet 36
-Tarifmonate. Ein gemessener Tarifpreis ohne Phase ist nur für die Bindung belegt, Monat
-25 bis 36 sind eine Lücke. o2 nennt im Ratenplan-Hinweis den Tarifrabatt „über die
+Datenkonzept Geräte 5.3, Regel 8. Ein gemessener Tarifpreis ohne Phase ist nur für die
+Bindung belegt. Die Summe über 36 Monate zählt den Tarif ohnehin nur 24 Monate
+(Antonio, 10.10.2026); die Phase bleibt der Beleg für den Preis danach. o2 nennt im
+Ratenplan-Hinweis den Tarifrabatt „über die
 gesamte Laufzeit deines Geräte-Ratenplans“, und der Tarif der Konfiguration trägt die
 Ratenzahl („…-hwv-36m-05-00“); congstar führt den Tarifpreis ohne Rabattphase. Dann
 trägt das Bündel eine Phase von Monat 1 bis N mit Beleg, nie darüber hinaus.
@@ -29,12 +30,12 @@ from telco_radar.collect.geraete import GeraeteAbrufFehler, congstar, o2
 from telco_radar.report import geraete_rechenweg, geraete_tco_view
 from telco_radar.report.geraete_tco_karten import tarif_anreichern
 from telco_radar.tarif_bezug import Tarifbestand
-from telco_radar.tco_model import POSTEN_TARIF, Buendel, kosten_ueber, tco_24
+from telco_radar.tco_kosten import tarifphasen
+from telco_radar.tco_model import Buendel, kosten_ueber, tco_24
 
 FIX = Path(__file__).parent / "fixtures" / "geraete"
 CONGSTAR_URL = "https://www.congstar.de/geraete/apple/apple-iphone-17/"
 CONGSTAR_SKU = "apple-iphone-17-256gb-weiss"
-AB_25 = f"{POSTEN_TARIF} Monat 25–36"
 O2_MIT_RATENZAHL = {
     "o2-mobile-unlimited-m-plus",
     "o2-mobile-unlimited-l-plus",
@@ -201,31 +202,36 @@ def _buendel(roh: dict, bestand: Tarifbestand) -> Buendel:
 
 
 def _ueber_36(b: Buendel) -> tuple:
+    """Die Summe über 36 Monate und ob eine belegte Tarifphase Monat 36 nennt."""
     k = kosten_ueber(b, 36)
-    return k.gesamt, k.luecken
+    return k.gesamt, any(
+        p.von_monat <= 36 and (p.bis_monat is None or p.bis_monat >= 36)
+        for p in tarifphasen(b)
+    )
 
 
-def test_mit_beleg_ist_die_36er_zahl_eine_zahl_ohne_beleg_eine_luecke():
+def test_mit_beleg_traegt_die_phase_monat_36_die_summe_bleibt_bei_24_tarifmonaten():
     """Allnet Flat XS zu 15,00 € mit 36 Raten: das Tarifblatt nennt nur den Grundpreis
-    (eine Phase ohne Ende), die Messung die Phase 1 bis 36 - sie bleibt stehen."""
+    (eine Phase ohne Ende), die Messung die Phase 1 bis 36 - sie bleibt stehen. Die
+    Summe über 36 Monate ist mit und ohne Beleg `tco_24`."""
     bestand = _bestand()
     xs = _buendel(_congstar_roh("Allnet Flat XS", 36), bestand)
-    assert _ueber_36(xs) == (round(tco_24(xs).gesamt + 12 * 15.0, 2), [])
+    assert _ueber_36(xs) == (tco_24(xs).gesamt, True)
     assert [(p.von_monat, p.bis_monat) for p in xs.tarif_phasen] == [(1, 36)]
 
     m = _buendel(_congstar_roh("Allnet Flat M", 36), bestand)
-    assert _ueber_36(m) == (None, [AB_25])
+    assert _ueber_36(m) == (tco_24(m).gesamt, False)
     xs_ohne = _buendel(
         {**_congstar_roh("Allnet Flat XS", 36), "tarif_phasen": []}, bestand
     )
-    assert _ueber_36(xs_ohne) == (None, [AB_25])
+    assert _ueber_36(xs_ohne) == (tco_24(xs).gesamt, False)
     assert tco_24(xs).gesamt == tco_24(xs_ohne).gesamt
 
 
 def test_ein_24_raten_buendel_bekommt_keine_36er_phase():
     b = _buendel(_congstar_roh("Allnet Flat XS", 24), _bestand())
     assert [(p.von_monat, p.bis_monat) for p in b.tarif_phasen] == [(1, 24)]
-    assert _ueber_36(b) == (None, [AB_25])
+    assert _ueber_36(b) == (tco_24(b).gesamt, False)
     assert kosten_ueber(b).gesamt == tco_24(b).gesamt
 
 
@@ -241,7 +247,8 @@ def test_ein_24_raten_buendel_bekommt_keine_36er_phase():
 )
 def test_eine_phase_ohne_beleg_oder_monate_belegt_nichts(phase):
     roh = {**_congstar_roh("Allnet Flat XS", 36), "tarif_phasen": [phase]}
-    assert _ueber_36(_buendel(roh, _bestand())) == (None, [AB_25])
+    b = _buendel(roh, _bestand())
+    assert _ueber_36(b) == (tco_24(b).gesamt, False)
 
 
 def test_die_phase_geht_durch_speicher_historie_und_ansicht(tmp_path):
@@ -272,7 +279,7 @@ def test_die_phase_geht_durch_speicher_historie_und_ansicht(tmp_path):
     )
     pruefung = buendel_aus_satz(satz)
     erwartet = _ueber_36(_buendel(roh, bestand))
-    assert erwartet[1] == []
+    assert erwartet[1] is True
     for gelesen in (karte, zeitreihe, pruefung):
         assert _ueber_36(gelesen) == erwartet
 
@@ -287,4 +294,4 @@ def test_die_phase_geht_durch_speicher_historie_und_ansicht(tmp_path):
         [satz], Buendel, geraete_tco_view._BUENDEL_FELDER
     )
     tarif_anreichern(karte, blatt)
-    assert _ueber_36(karte) == (None, [AB_25])
+    assert _ueber_36(karte) == (erwartet[0], False)

@@ -200,20 +200,20 @@ def test_ein_36_raten_buendel_erscheint_nicht_in_der_24er_ansicht(_basis):
         assert _euro(SOLL[36]["congstar"]) in s.inner_text("#tafel-tco")
 
 
-def test_laufzeit_36_zeigt_1und1_mit_delta(_basis):
-    """1&1 gegen die Vodafone-Karte mit 36 Raten im selben Band - ein Betrag,
-    nicht mehr „andere Laufzeit“. Gegenprobe: in der 24er-Ansicht keine
-    1&1-Zeile, also auch kein Δ."""
-    soll = round(SOLL[36]["1&1"] - SOLL[36]["Vodafone"], 2)
+def test_1und1_steht_in_keinem_laufzeitvergleich(_basis):
+    """Ein Betrag für Tarif und Gerät über 36 Monate wird nur über 24 Monate
+    verglichen (Antonio 10.10.2026): keine 1&1-Zeile unter 24 oder 36, die
+    36er-Ansicht nennt den Grund, unter „alle“ steht die Zeile ohne Δ."""
     with _oeffne(_basis, "?laufzeit=36") as s:
         assert _gedrueckt(s) == ["36"]
-        eins = [z for z in _zeilen(s) if z["anbieter"] == "1&1"]
-        assert len(eins) == 1, eins
-        delta = " ".join(eins[0]["delta"].split())
-        assert delta.startswith(f"−{_euro(-soll)} €"), delta
-        assert "andere Laufzeit" not in delta
+        assert not [z for z in _zeilen(s) if z["anbieter"] == "1&1"]
+        assert _fehlend(s).get("1&1", "").startswith("Nur über 24 Monate verglichen")
         _waehle(s, "24")
         assert not [z for z in _zeilen(s) if z["anbieter"] == "1&1"]
+        assert _fehlend(s).get("1&1", "").startswith("Mit 24 Raten nicht erfasst")
+        _waehle(s, "alle")
+        eins = [z for z in _zeilen(s) if z["anbieter"] == "1&1"]
+        assert [(z["lz"], z["deltaSichtbar"]) for z in eins] == [("alle", "hidden")]
 
 
 @pytest.mark.parametrize("laufzeit", [12, 24, 36])
@@ -257,15 +257,21 @@ def test_alle_gruppiert_die_zeilen_ohne_sieger_und_ohne_delta(_basis):
         assert _antwort(s) == ALLE_TEXT
         assert s.query_selector("#gr-zr-gruppe .gr-leit-zahl") is None
         zeilen = _zeilen(s)
-        folge = [int(z["lz"]) for z in zeilen]
+        folge = [int(z["lz"]) for z in zeilen if z["lz"] != "alle"]
         assert folge == sorted(folge) and set(folge) == {12, 24, 36}, folge
-        assert len(zeilen) == sum(len(v) for v in SOLL.values()), zeilen
+        assert len(folge) == sum(len(v) for v in SOLL.values()), zeilen
+        assert [z["anbieter"] for z in zeilen if z["lz"] == "alle"] == ["1&1"]
         assert {z["deltaSichtbar"] for z in zeilen} == {"hidden"}
         koepfe = s.evaluate("""() => [...document.querySelectorAll(
             '#gr-bndliste .gr-bnd-lzkopf')].filter(k => !k.hidden).map(k => [
               k.textContent.trim(),
               k.nextElementSibling && k.nextElementSibling.dataset.lz])""")
-        assert koepfe == [["12 Raten", "12"], ["24 Raten", "24"], ["36 Raten", "36"]]
+        assert koepfe == [
+            ["12 Raten", "12"],
+            ["24 Raten", "24"],
+            ["36 Raten", "36"],
+            ["andere Laufzeit", "alle"],
+        ]
         assert "ab" not in _kachelpreis(s), "unter „alle“ kein ab-Preis"
         _waehle(s, "24")
         assert {z["deltaSichtbar"] for z in _zeilen(s)} == {"visible"}
@@ -407,7 +413,7 @@ def test_kriterium_11_haelt_an_der_gerenderten_seite(_basis):
     seite = BeautifulSoup(_laden(basis, "geraete.html"), "html.parser")
     tafel = seite.select_one("#tafel-tco")
     mit_zahl = tafel.select(".gr-bnd[data-gesamt]:not([data-gesamt=''])")
-    assert len(mit_zahl) == sum(len(v) for v in SOLL.values()), len(mit_zahl)
+    assert len(mit_zahl) == sum(len(v) for v in SOLL.values()) + 1, len(mit_zahl)
     assert portal.zeitraum_maengel(tafel) == []
     for etikett in tafel.select(".gr-bnd-tco .gr-bnd-label"):
         etikett.decompose()

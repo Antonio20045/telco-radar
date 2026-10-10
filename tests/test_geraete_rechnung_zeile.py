@@ -109,13 +109,16 @@ def test_ungleich_lange_raten_bleiben_getrennt():
 
 
 def test_rechnung_teilt_den_tarif_nach_preisphasen():
-    b = _buendel(
-        laufzeit_monate=36,
-        tarif_phasen=[Preisphase(1, 24, 14.99), Preisphase(25, None, 19.99)],
-    )
-    k = kosten_ueber(b)
+    """Phasen bis Monat 24 teilen den Tarif; ein Preis ab Monat 25 zählt bei 36
+    Raten nicht mit (Antonio, 10.10.2026)."""
+    phasen = [
+        Preisphase(1, 12, 9.99),
+        Preisphase(13, 24, 14.99),
+        Preisphase(25, None, 19.99),
+    ]
+    k = kosten_ueber(_buendel(laufzeit_monate=36, tarif_phasen=phasen))
     tarif = [(s.anzahl, s.betrag) for s in k.rechnung if s.art == "tarif"]
-    assert tarif == [(24, 14.99), (12, 19.99)]
+    assert tarif == [(12, 9.99), (12, 14.99)]
     assert round(sum(s.summe for s in k.rechnung), 2) == k.gesamt
 
 
@@ -148,13 +151,23 @@ def test_ohne_gesamtpreis_nur_die_gemessenen_posten():
     assert k.luecken == ["Geräterate"]
 
 
-def test_luecke_nach_der_bindung_verschweigt_den_belegten_tarif_nicht():
-    """36 Raten, Tarifpreis nur bis Monat 24 belegt: die Rechnung nennt den
-    belegten Tarif und die Lücke danach, keine Kernzahl."""
+def test_36_raten_sind_24_monatspreise_und_12_monate_nur_geraet():
+    """Antonio, 10.10.2026: Monat 1 bis 24 Tarif und Rate, Monat 25 bis 36 nur die
+    Rate. 24 × 69,49 € + 12 × 54,50 € + 7,00 € + 39,99 € = 2.368,75 €."""
     k = kosten_ueber(_buendel(laufzeit_monate=36))
-    assert k.gesamt is None
-    assert (24, 14.99, "tarif") in _schritte(k)
-    assert "Tarifgrundpreis Monat 25–36" in k.luecken
+    assert k.gesamt == 2368.75 and k.luecken == []
+    schritte = monatsschritte(k.rechnung)
+    assert [(s.art, s.anzahl, s.betrag) for s in schritte] == [
+        ("monat", 24, 69.49),
+        ("nur_geraet", 12, 54.5),
+        ("anzahlung", None, 7.0),
+        ("anschluss", None, 39.99),
+    ]
+    assert [(t.art, t.anzahl, t.betrag) for t in schritte[0].teile] == [
+        ("geraet", 24, 54.5),
+        ("tarif", 24, 14.99),
+    ]
+    assert round(sum(s.summe for s in schritte), 2) == k.gesamt
 
 
 @pytest.mark.parametrize(
@@ -268,7 +281,8 @@ def test_zeile_ohne_kernzahl_nennt_was_fehlt(bestand):
     assert offen, "Bestand ohne Zeile mit Lücke – der Test prüft nichts"
     texte = [_text(r) for r in soup.select(".gr-bnd-rechnung") if "=" not in _text(r)]
     assert texte and all("nicht genannt" in t for t in texte), texte[:3]
-    assert any("Tarif Monat 25–36 nicht genannt" in t for t in texte), texte[:3]
+    assert any("Anzahlung nicht genannt" in t for t in texte), texte[:3]
+    assert not any("Monat 25–36" in t for t in texte), texte[:3]
 
 
 def test_kein_wort_schaetzung_auf_der_geraeteseite(bestand):

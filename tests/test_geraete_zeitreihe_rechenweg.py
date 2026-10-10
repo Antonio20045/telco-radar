@@ -83,10 +83,9 @@ O2_TARIFE = {
         ],
     }
 }
-"""Der Tarifbestand zur o2-Messung: die Phasentabelle nennt 14,99 € auch ab Monat 25,
-also sind die Monate 25 bis 36 belegt. Ohne sie hätte die 36-Raten-Messung keine
-Kernzahl (Datenkonzept Geräte 5.3: die 36er-Ansicht rechnet 36 Tarifmonate; eine
-einzige Phase ohne Ende nennt Monat 25 nicht, Prüfrunde DK23)."""
+"""Der Tarifbestand zur o2-Messung: die Phasentabelle nennt 14,99 € auch ab Monat 25.
+Gezählt werden nur die 24 Monate der Bindung (Datenkonzept Geräte 5.3, Antonio
+10.10.2026: Monat 25 bis 36 nur die Rate)."""
 
 
 def _messung(satz, *, anbieter="o2", tarif="O2 Mobile on Demand M Plus"):
@@ -100,12 +99,12 @@ def _messung(satz, *, anbieter="o2", tarif="O2 Mobile on Demand M Plus"):
 
 
 def test_die_posten_der_o2_messung_ergeben_die_heutige_summe():
-    """A1: das Panel zerlegt die HEUTIGE Rechnung - alle 36 Raten und 36
-    Tarifmonate - und geht mit ihr auf (37 + 39,99 + 36 × 14,99 + 36 × 19,00)."""
+    """A1: das Panel zerlegt die HEUTIGE Rechnung - alle 36 Raten und 24
+    Tarifmonate - und geht mit ihr auf (37 + 39,99 + 24 × 14,99 + 36 × 19,00)."""
     r = zr._rechung(_messung(O2_MESSUNG), O2_TARIFE)
     assert r is not None
-    assert round(sum(p["betrag"] for p in r["posten"]), 2) == 1300.63
-    assert r["gesamt"] == 1300.63
+    assert round(sum(p["betrag"] for p in r["posten"]), 2) == 1120.75
+    assert r["gesamt"] == 1120.75
     assert r["gesamt"] != O2_MESSUNG["gesamt"]
 
 
@@ -177,7 +176,7 @@ def test_die_serie_rechnet_die_punkte_mit_der_heutigen_leitzahl():
     nicht die eingefrorene 892,75 der gekappten Rechnung."""
     messungen = {("m", "b"): {"o2": {"2026-09-12": _messung(O2_MESSUNG)}}}
     assert zr._serien_aus(messungen, O2_TARIFE) == {
-        ("m", "b"): {"o2": [("2026-09-12", 1300.63)]}
+        ("m", "b"): {"o2": [("2026-09-12", 1120.75)]}
     }
 
 
@@ -216,7 +215,7 @@ def test_die_aufgeteilte_form_nennt_ihre_24_monate_genauso():
     kurz = _messung(dict(O2_MESSUNG, laufzeit_monate=24))
     assert zr._messwert(kurz, O2_TARIFE) == (892.75, 24)
     assert kosten_ueber(zr._buendel_aus_messung(kurz, O2_TARIFE)).monate == 24
-    assert zr._messwert(_messung(O2_MESSUNG), O2_TARIFE) == (1300.63, 36)
+    assert zr._messwert(_messung(O2_MESSUNG), O2_TARIFE) == (1120.75, 36)
 
 
 def test_ohne_belastbare_zahl_gibt_es_weiter_keinen_punkt():
@@ -281,7 +280,7 @@ def test_die_auswahl_des_guenstigsten_buendels_je_tag_rechnet_neu(tmp_path):
     }
     messungen = zr._messungen(tmp_path, tco, O2_TARIFE)
     assert zr._serien_aus(messungen) == {
-        ("m", "b", O2_MESSUNG["laufzeit_monate"]): {"o2": [("2026-09-12", 1159.63)]}
+        ("m", "b", O2_MESSUNG["laufzeit_monate"]): {"o2": [("2026-09-12", 979.75)]}
     }, "Teil B: die Reihe trägt ihre Ratenlaufzeit im Schlüssel"
     zeilen = [
         json.loads(z)
@@ -348,9 +347,9 @@ def test_der_block_zeigt_das_mal_muster_und_die_summe():
     1 680 €"), keine prose Erklärung - und die Werte genau dieser
     Messung. A1: alle 36 Raten, Summe mit dem Etikett der Leitzahl."""
     html = zr._rechung_html("o2", _messung(O2_MESSUNG), O2_TARIFE)
-    assert "36 × 14,99 €" in html and "= 539,64 €" in html
+    assert "24 × 14,99 €" in html and "= 359,76 €" in html
     assert "36 × 19,00 €" in html and "= 684,00 €" in html
-    assert "= <b>1.300,63 €</b>" in html
+    assert "= <b>1.120,75 €</b>" in html
     assert "Kosten über 36 Monate" in html
     assert "TCO-24" not in html
 
@@ -419,7 +418,7 @@ def test_der_klammer_text_und_das_label_erfuellen_die_12_px_regel(
     def mit_klammer(*args, **kwargs):
         r = original(*args, **kwargs)
         for p in r["posten"]:
-            if p["anzahl"] == 36:
+            if p["anzahl"]:
                 p["klammer"] = "24 von 36 Raten"
         return r
 

@@ -15,6 +15,7 @@ from ..tco_kosten import (
     SCHRITT_BARPREIS,
     SCHRITT_GERAET,
     SCHRITT_MONAT,
+    SCHRITT_NUR_GERAET,
     SCHRITT_TARIF,
     SCHRITT_VERTRAG,
     Kosten,
@@ -32,6 +33,7 @@ WORT_JE_SCHRITT = {
     SCHRITT_ANZAHLUNG: "Anzahlung",
     SCHRITT_ANSCHLUSS: "Anschluss",
     SCHRITT_MONAT: "Monatspreis",
+    SCHRITT_NUR_GERAET: "nur Gerät",
 }
 WORT_JE_LUECKE = {
     POSTEN_TARIF: "Tarif",

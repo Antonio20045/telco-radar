@@ -2,14 +2,15 @@
 
 Gerechnet wird über H = größerer Wert aus Ratenlaufzeit N und Tarifbindung (12 → 24,
 24 → 24, 36 → 36; 1&1 ein Vertrag über 36). Die Karte, die Zeitreihe und der Export
-lesen dieselbe Zahl aus `tco_kosten.kosten_ueber`; ein Monat ohne gemessenen
-Tarifpreis ist eine benannte Lücke und keine Zahl. Gegenproben: 12 und 24 Raten
-tragen weiter dieselbe Zahl wie bisher, 1&1 ebenso.
+lesen dieselbe Zahl aus `tco_kosten.kosten_ueber`. Der Tarif zählt nur seine
+Bindung: bei 36 Raten Monat 1 bis 24 Tarif und Rate, Monat 25 bis 36 nur die Rate
+(Antonio, 10.10.2026). Gegenproben: 12 und 24 Raten tragen weiter dieselbe Zahl wie
+bisher, 1&1 ebenso.
 
 Prüfrunde DK23: für jeden Anbieter gilt dieselbe Regel für die Monate nach der
 Bindung. Eine einzige Phase „ab Monat 1, ohne Ende“ (so schreibt der Leser eines
-Produktinformationsblatts ohne Phasentabelle den Grundpreis) nennt Monat 25 nicht;
-nur eine Tabelle, die einen späteren Monat ausdrücklich nennt, trägt die 36er-Zahl.
+Produktinformationsblatts ohne Phasentabelle den Grundpreis) und eine Tabelle, die
+Monat 25 ausdrücklich nennt, ergeben dieselbe 36er-Zahl.
 """
 
 from __future__ import annotations
@@ -91,25 +92,25 @@ def test_aus_rohsaetzen_reicht_die_tarifbindung_durch():
     assert [b.tarif_bindung_monate for b in ohne_bindung] == [None]
 
 
-def test_36_raten_rechnen_36_tarifmonate():
+def test_36_raten_rechnen_24_tarifmonate():
+    """1 + 24 × 15 + 36 × 30,50 = 1.459,00 €: Monat 25 bis 36 nur die Rate."""
     b = _getrennt(36, 30.5)
     k = _karte(b)
-    assert k["gesamt"] == 1639.0 == kosten_ueber(b).gesamt
+    assert k["gesamt"] == 1459.0 == kosten_ueber(b).gesamt
     assert k["leitzahl_monate"] == 36
     assert k["label"] == "Kosten über 36 Monate"
-    assert k["schnitt_monat"] == round(1639.0 / 36, 2)
+    assert k["schnitt_monat"] == round(1459.0 / 36, 2)
     assert k["belastbar"]
     assert round(sum(s["betrag"] for s in k["zerlegung"]), 2) == k["gesamt"]
     assert not any(s["offen"] for s in k["zerlegung"])
 
 
-def test_ohne_preis_ab_monat_25_ist_die_36er_karte_eine_luecke():
+def test_ohne_preis_ab_monat_25_traegt_die_36er_karte_ihre_zahl():
     k = _karte(_getrennt(36, 30.5, phasen=False))
-    assert k["gesamt"] is None
-    assert not k["belastbar"]
+    assert k["gesamt"] == 1459.0
+    assert k["belastbar"]
     assert k["label"] == "Kosten über 36 Monate"
-    assert f"{POSTEN_TARIF} Monat 25–36" in k["luecken"]
-    assert "Monat 25–36" in k["leer_grund"]
+    assert f"{POSTEN_TARIF} Monat 25–36" not in k["luecken"]
 
 
 def test_12_und_24_raten_tragen_weiter_24_monate():
@@ -147,7 +148,7 @@ def test_die_zeitreihe_rechnet_dieselbe_zahl():
     satz = {
         "id": b.id,
         "datum": HEUTE,
-        "gesamt": 1459.0,
+        "gesamt": 1639.0,
         "tarif_id": b.tarif_id,
         "tarif_monatlich": 15.0,
         "geraet_zuzahlung": 1.0,
@@ -167,10 +168,10 @@ def test_die_zeitreihe_rechnet_dieselbe_zahl():
         }
     }
     messung = {"satz": satz, "stand": stand}
-    assert geraete_zeitreihe._messwert(messung, tarife) == (1639.0, 36)
+    assert geraete_zeitreihe._messwert(messung, tarife) == (1459.0, 36)
     rechnung = geraete_zeitreihe._rechung(messung, tarife)
-    assert rechnung["gesamt"] == 1639.0
-    assert round(sum(p["betrag"] for p in rechnung["posten"]), 2) == 1639.0
+    assert rechnung["gesamt"] == 1459.0
+    assert round(sum(p["betrag"] for p in rechnung["posten"]), 2) == 1459.0
 
 
 def test_der_export_traegt_dieselbe_zahl():
@@ -178,7 +179,7 @@ def test_der_export_traegt_dieselbe_zahl():
     zeilen = geraete_tco_view._export_zeilen([b], [], [], None, {}, None, HEUTE)
     text, _ = geraete_export.tco_csv(zeilen)
     gelesen = next(csv.DictReader(io.StringIO(text.lstrip("\ufeff")), delimiter=";"))
-    assert geraete_export.leitzahl_aus_zeile(gelesen) == "1639,00"
+    assert geraete_export.leitzahl_aus_zeile(gelesen) == "1459,00"
     assert gelesen["Leitzahl-Zeitraum Monate"] == "36"
     assert gelesen["Laufzeit Monate"] == "36"
 
@@ -228,11 +229,12 @@ def _karten_je_anbieter(tarife: dict, laufzeit: int) -> dict:
     }
 
 
-def test_dieselbe_auskunft_ergibt_bei_jedem_anbieter_die_luecke_ab_monat_25():
+def test_dieselbe_auskunft_ergibt_bei_jedem_anbieter_dieselbe_36er_zahl():
     """congstar: das Produktinformationsblatt ohne Phasentabelle, gelesen vom
     PIB-Leser (er schreibt den Grundpreis als Phase „ab Monat 1, ohne Ende“);
     o2: dieselben Angaben ohne Phasen. Beide nennen 15,00 €, 24 Monate Bindung und
-    nichts zu Monat 25 bis 36. Vorher trug congstar 1.639,00 €, o2 die Lücke."""
+    nichts zu Monat 25 bis 36; beide tragen 1.459,00 €. Vorher trug congstar
+    1.639,00 €, o2 die Lücke."""
     congstar = lies_text(PIB_OHNE_PHASEN, url="https://example.de/pib").als_dict()
     assert congstar["preisphasen"] == [
         {"von_monat": 1, "bis_monat": None, "betrag": 15.0}
@@ -241,8 +243,8 @@ def test_dieselbe_auskunft_ergibt_bei_jedem_anbieter_die_luecke_ab_monat_25():
     sechsunddreissig = _karten_je_anbieter(tarife, 36)
     for anbieter in ("congstar", "o2"):
         k = sechsunddreissig[anbieter]
-        assert k["gesamt"] is None, (anbieter, k["gesamt"])
-        assert k["luecken"][0] == f"{POSTEN_TARIF} Monat 25–36", k["luecken"]
+        assert k["gesamt"] == 1459.0, (anbieter, k["gesamt"])
+        assert f"{POSTEN_TARIF} Monat 25–36" not in k["luecken"], k["luecken"]
         assert k["nach_bindung"] is None, (anbieter, k["nach_bindung"])
     assert sechsunddreissig["congstar"]["luecken"] == sechsunddreissig["o2"]["luecken"]
     vierundzwanzig = _karten_je_anbieter(tarife, 24)
@@ -252,10 +254,10 @@ def test_dieselbe_auskunft_ergibt_bei_jedem_anbieter_die_luecke_ab_monat_25():
     }
 
 
-def test_nur_eine_quelle_die_monat_25_nennt_traegt_die_36er_zahl():
+def test_eine_quelle_die_monat_25_nennt_aendert_die_36er_zahl_nicht():
     """Gegenprobe: nennt die Phasentabelle den Preis ab Monat 25 ausdrücklich,
-    tragen beide Anbieter dieselbe Zahl über 36 Monate und die Zeile „ab Monat
-    25“ ihren Betrag."""
+    tragen beide Anbieter dieselbe Zahl über 36 Monate wie ohne Tabelle; die
+    Zeile „ab Monat 25“ behält ihren Betrag."""
     tabelle = [
         {"von_monat": 1, "bis_monat": 24, "betrag": 15.0},
         {"von_monat": 25, "bis_monat": None, "betrag": 15.0},
@@ -263,7 +265,7 @@ def test_nur_eine_quelle_die_monat_25_nennt_traegt_die_36er_zahl():
     tarife = {f"{a}:xs": _blatt(a, tabelle) for a in ("congstar", "o2")}
     karten36 = _karten_je_anbieter(tarife, 36)
     assert {a: k["gesamt"] for a, k in karten36.items()} == {
-        "congstar": 1639.0,
-        "o2": 1639.0,
+        "congstar": 1459.0,
+        "o2": 1459.0,
     }
     assert {k["nach_bindung"] for k in karten36.values()} == {15.0}

@@ -96,21 +96,24 @@ Je Ratenlaufzeit N gibt es eine eigene Ansicht. Gerechnet wird über den Zeitrau
 ```
 Kosten über H Monate = Anzahlung + Anschluss
                      + N Geräteraten
-                     + Tarif in jedem Monat 1 bis H zum Preis, der in diesem Monat gilt (Preisphasen)
+                     + Tarif in jedem Monat 1 bis T zum Preis, der in diesem Monat gilt (Preisphasen)
+                       T = kleinerer Wert aus H und Tarifbindung (ohne Angabe 24)
   bei 1&1:           = Anzahlung + Anschluss + H × Bündelbetrag
 ```
 
-| Ansicht | Anbieter mit Daten heute | Zeitraum H | Tarifmonate | Raten | Unterschied zu heute |
-|---|---|---|---|---|---|
-| 12 Monate | Vodafone | 24 | 24 | 12 | keiner |
-| 24 Monate | Vodafone, o2, congstar (Telekom fehlt) | 24 | 24 | 24 | keiner |
-| 36 Monate | Vodafone, o2, congstar, 1&1, Telekom | 36 | 36 | 36 | Tarif zählt 36 statt 24 Monate |
+| Ansicht | Zeitraum H | Tarifmonate | Raten |
+|---|---|---|---|
+| 12 Monate | 24 | 24 | 12 |
+| 24 Monate | 24 | 24 | 24 |
+| 36 Monate | 36 | 24 | 36 |
 
-Warum der Tarif in der 36er-Ansicht 36 Monate zählt: 1&1 ist ein einziger Vertrag über 36 Monate und rechnet den Tarif ohnehin mit. Zählten die anderen nur 24 Tarifmonate, wäre 1&1 in jedem Vergleich um zwölf Monate Tarif benachteiligt. Voraussetzung sind die Tarifpreise der Monate 25 bis 36. Der Klick-Crawler liest sie aus den Preisdetails der Bestellstrecke („ab dem 25. Monat …“); bei o2 gilt der Rabatt so lange wie die Raten, bei Vodafone endet die GigaMobil-Aktion nach 24 Monaten. Nennt die Seite den Preis ab Monat 25 nicht, ist das Bündel eine Lücke und nicht im Sieger.
+Warum der Tarif in der 36er-Ansicht nur 24 Monate zählt (Antonio, 10.10.2026): Ein Mobilfunkvertrag hat höchstens 24 Monate Mindestlaufzeit und ist danach monatlich kündbar ([§ 56 TKG](https://www.gesetze-im-internet.de/tkg_2021/__56.html)). Der Ratenkauf über 36 Monate ist bei Telekom, Vodafone, o2 und congstar ein eigener Vertrag; die Raten laufen nach einer Tarifkündigung weiter. Also zählen Monat 1 bis 24 Tarif und Rate, Monat 25 bis 36 nur die Rate. Die Zeile zeigt das als „24 × Monatspreis (Gerät + Tarif) + 12 × nur Gerät“. Ein Tarifpreis ab Monat 25 wird dafür nicht gebraucht.
+
+1&1 nennt nur einen Monatsbetrag für Tarif und Gerät und trägt den Tarif bis zur letzten Rate. Das wären zwölf Tarifmonate mehr als bei den anderen, also wird 1&1 nur über 24 Monate verglichen (Antonio, 10.10.2026): seine 36er-Bündel stehen nur unter „alle“, die 36er-Ansicht nennt „Nur über 24 Monate verglichen: 1&1“ (`geraete_laufzeit.nur_ueber_24`).
 
 Zweitzahl ist Ø/Monat = Kosten ÷ H, immer mit „über H Monate“ beschriftet. Laufzeitübergreifend gibt es keinen Sieger.
 
-**Alternative (Entscheidung 1):** Die 36er-Ansicht rechnet „Ausstieg nach 24 Monaten“: 24 Tarifmonate plus alle 36 Raten, also die heutige Zahl. Dann fehlt 1&1 so lange, bis die Einmalzahlung je Gerät gemessen ist, und die Zahl ist kein Preis für 36 Monate Mobilfunk. Empfehlung und Entscheidung: die Variante oben.
+**Entscheidung 1** (bis 10.10.2026: 36 Tarifmonate) ist durch Antonios Regel oben ersetzt.
 
 ### 5.4 Seite
 

@@ -313,23 +313,23 @@ def test_ueber_zwei_zeitraeume_steht_der_zustand_statt_eines_vorzeichens():
     verschiedener Zeitraeume).
 
     Seit Datenkonzept Geräte Schritt 2 rechnet auch congstar mit 36 Raten über
-    36 Monate (1 + 36 × 15,00 + 36 × 25,50 = 1.459,00 EUR) und trägt kein Δ
+    36 Monate (1 + 24 × 15,00 + 36 × 25,50 = 1.279,00 EUR) und trägt kein Δ
     gegen die 24-Monats-Referenz; die Gegenprobe mit Vorzeichen ist congstar mit
     24 Raten.
 
-    Teil B: verglichen wird nur innerhalb einer Ratenlaufzeit. Ohne
-    Vodafone-Bündel mit 36 Raten im Band heißt der Zustand „Vodafone nicht
-    erfasst“ - weiter ohne Vorzeichen.
+    Teil B: verglichen wird nur innerhalb einer Ratenlaufzeit. 1&1 trägt den
+    Tarif bis Monat 36 und wird nur über 24 Monate verglichen (Antonio,
+    10.10.2026): der Zustand heißt „nur 24 Monate“ - weiter ohne Vorzeichen.
     """
     modell = _modell([_einsundeins(), _vodafone()])
     eins = next(k for k in modell["karten"] if k["anbieter"] == "1&1")
     assert eins["delta"] is None, "kein Betrag ueber zwei Zeitraeume"
-    assert eins["delta_zustand"]["kurz"] == "Vodafone nicht erfasst"
-    assert "Vodafone-Bündel mit 36 Raten" in eins["delta_zustand"]["satz"]
+    assert eins["delta_zustand"]["kurz"] == "nur 24 Monate"
+    assert "nur über 24 Monate verglichen" in eins["delta_zustand"]["satz"]
 
     zeile = zeile_html(eins)
     zelle = zeile.select_one(".gr-bnd-delta")
-    assert zelle.get_text(strip=True) == "Vodafone nicht erfasst"
+    assert zelle.get_text(strip=True) == "nur 24 Monate"
     assert "gr-bnd-delta--wert" not in (zelle.get("class") or [])
     assert zeile.select_one(".gr-bnd")["data-delta"] == ""
     assert "über der Vodafone-Referenz" not in vorlage_text(zeile)
@@ -341,7 +341,7 @@ def test_ueber_zwei_zeitraeume_steht_der_zustand_statt_eines_vorzeichens():
 
     sechsunddreissig = _modell([_congstar(36, 25.5), _vodafone()])
     cs36 = next(k for k in sechsunddreissig["karten"] if k["anbieter"] == "congstar")
-    assert cs36["leitzahl_monate"] == 36 and cs36["gesamt"] == 1459.0
+    assert cs36["leitzahl_monate"] == 36 and cs36["gesamt"] == 1279.0
     assert cs36["delta"] is None, "36 Raten stehen nie gegen eine 24-Monats-Zahl"
 
     modell2 = _modell([_congstar(24, 38.25), _vodafone()])

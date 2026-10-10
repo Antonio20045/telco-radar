@@ -402,9 +402,9 @@ def test_die_tco_werte_des_bands_stehen_ohne_hover_im_dom(_seite):
     SVG der Zeitreihe trägt seine Werte ebenfalls als <text>, niemals
     nur als Tooltip.
 
-    Seit Datenkonzept Geräte Schritt 2 rechnet die congstar-Zeile mit 36
-    Raten auch 36 Tarifmonate: 1 + 36x24,00 + 36x25,00 = 1.765,00 statt
-    der alten 1.477,00, die nur 24 Tarifmonate neben 36 Raten zählte."""
+    Die congstar-Zeile mit 36 Raten zählt den Tarif nur über seine 24
+    Monate (Antonio 10.10.2026): 1 + 24x24,00 + 36x25,00 = 1.477,00, nicht
+    1.765,00 mit 36 Tarifmonaten. Sie steht nur in der 36er-Ansicht."""
     waehle_band(_seite, "xs")
     _seite.wait_for_timeout(250)
     tafel = _seite.eval_on_selector("#tafel-tco", "e => e.innerText")
@@ -417,11 +417,12 @@ def test_die_tco_werte_des_bands_stehen_ohne_hover_im_dom(_seite):
     _seite.wait_for_timeout(250)
     tafel = _seite.eval_on_selector("#tafel-tco", "e => e.innerText")
     assert "1.008,76" in tafel, tafel[:200]
-    assert "1.765,00" not in tafel, "die 36-Raten-Zeile steht in der 24er-Ansicht"
+    assert "1.477,00" not in tafel, "die 36-Raten-Zeile steht in der 24er-Ansicht"
     waehle_laufzeit(_seite, "36")
     try:
         tafel = _seite.eval_on_selector("#tafel-tco", "e => e.innerText")
-        assert "1.765,00" in tafel and "1.008,76" not in tafel, tafel[:200]
+        assert "1.477,00" in tafel and "1.008,76" not in tafel, tafel[:200]
+        assert "1.765,00" not in tafel, "36 Tarifmonate gezählt"
     finally:
         waehle_laufzeit(_seite, "24")
 
@@ -478,9 +479,8 @@ def test_die_finanzierungssumme_heisst_so_und_nicht_geraetepreis(_seite):
     nie vermischt: die Finanzierung heißt Finanzierung, und der reine
     Gerätepreis ohne Vertrag wird als eigene Aussage benannt - hier als
     benannte Lücke, weil congstar dazu nichts gemessen hat. Die Kernzahl
-    der 36-Raten-Zeile läuft seit Datenkonzept Geräte Schritt 2 über 36
-    Monate (1.765,00 statt 1.477,00 über „24 Monate“) und steht deshalb in
-    der 36er-Ansicht."""
+    der 36-Raten-Zeile läuft über 36 Monate, der Tarif zählt davon 24
+    (1.477,00, nicht 1.765,00), und steht in der 36er-Ansicht."""
     waehle_band(_seite, "m")
     waehle_laufzeit(_seite, "36")
     _seite.wait_for_timeout(120)
@@ -512,7 +512,7 @@ def test_die_finanzierungssumme_heisst_so_und_nicht_geraetepreis(_seite):
     )
     assert (
         "Kosten über 36 Monate" in congstar["summary"]
-        and "1.765,00" in congstar["summary"]
+        and "1.477,00" in congstar["summary"]
     )
 
 

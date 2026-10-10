@@ -11,8 +11,9 @@ Fixture mit GENAU diesem Fall - denselben Zahlen wie der reale Pflichtfall
 
 Seit Datenkonzept Geräte Schritt 2 rechnet jede Zahlweise über ihren eigenen
 Zeitraum H: 24 Raten 1 + 24×15,00 + 24×45,75 = 1.459,00 EUR, 36 Raten
-1 + 36×15,00 + 36×30,50 = 1.639,00 EUR (das Tarifblatt der Fixture nennt
-15,00 EUR ohne Ende). Eine Restschuld gibt es nicht mehr, und 24 Raten
+1 + 24×15,00 + 36×30,50 = 1.459,00 EUR (der Tarif zählt nur seine 24 Monate,
+Antonio 10.10.2026; zinsfrei ist die Summe wieder gleich). Eine Restschuld gibt es nicht
+mehr, und 24 Raten
 werden nie gegen 36 gestellt: Δ zu Vodafone trägt nur die 24er.
 
 Drei weitere Punkte desselben Auftrags, an derselben Fixture:
@@ -53,7 +54,7 @@ MODELL = "apple-iphone-17-pro-256"
 ZUZAHLUNG = 1.0
 TARIF_MONATLICH = 15.0
 RATEN = {24: 45.75, 36: 30.50}
-SOLL_GESAMT = {24: 1459.00, 36: 1639.00}
+SOLL_GESAMT = {24: 1459.00, 36: 1459.00}
 TARIFBLATT = {
     "tarif_id": "cs:xs",
     "anbieter": "congstar",
@@ -423,8 +424,8 @@ def test_punkt4_kein_offenes_segment_alle_raten_im_zeitraum(site):
     """Bis Datenkonzept Geräte Schritt 2 trug die 36-Raten-Zeile ein
     `--offen`-Segment (Restschuld nach Monat 24, 366,00 EUR). Jetzt liegen
     alle Raten im Zeitraum der Zahl: kein Segment ist offen, und die 36er
-    trägt ihre Raten (36 × 30,50 = 1.098,00 EUR) und 36 Tarifmonate
-    (36 × 15,00 = 540,00 EUR) als eigene Segmente."""
+    trägt ihre Raten (36 × 30,50 = 1.098,00 EUR) und 24 Tarifmonate
+    (24 × 15,00 = 360,00 EUR) als eigene Segmente."""
     html = (site / "geraete.html").read_text(encoding="utf-8")
     zeilen = _congstar_zeilen(html)
     for n, (_klassen, _text, block) in zeilen.items():
@@ -432,7 +433,8 @@ def test_punkt4_kein_offenes_segment_alle_raten_im_zeitraum(site):
         assert seg and not [s for s in seg if s["offen"]], (n, seg)
     je_name = {s["name"]: s["betrag"] for s in _zerlegung(zeilen[36][2])}
     assert je_name["Geräteraten über 36 Monate"] == pytest.approx(1098.0)
-    assert je_name["Tarif über 36 Monate"] == pytest.approx(540.0)
+    assert je_name["Tarif über 24 Monate"] == pytest.approx(360.0)
+    assert "Tarif über 36 Monate" not in je_name
 
 
 def test_mutationsprobe_punkt1_erkennt_wortgleiche_zeilen():

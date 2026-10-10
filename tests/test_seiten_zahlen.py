@@ -1446,10 +1446,11 @@ def test_pf_beide_ratenlaufzeiten_eines_congstar_abrufs_werden_zwei_zeilen(
       Zuzahlung, Tarif 24,00 EUR, Anschlusspreis 0,00 EUR.
     Seit Datenkonzept Geraete Schritt 2 rechnet jede Zeile ueber ihren eigenen
     Zeitraum H (24 Raten: 24 Monate, 36 Raten: 36 Monate). Das Tarifblatt
-    nennt 24,00 EUR ohne Phasentabelle, also nur fuer die 24 Monate Bindung:
-    die 24er traegt 1.879,00 EUR, die 36er ist die benannte Luecke
-    „Tarifgrundpreis Monat 25–36“ (Pruefrunde DK23; vorher 2.167,00 EUR mit
-    fortgeschriebenem Grundpreis). Eine Restschuld gibt es nicht mehr: alle
+    nennt 24,00 EUR ohne Phasentabelle, also nur fuer die 24 Monate Bindung;
+    gezaehlt wird der Tarif ohnehin nur 24 Monate (Antonio, 10.10.2026): beide
+    Zeilen tragen 1.879,00 EUR (97 + 24 x 24 + 24 x 50,25 und 97 + 24 x 24 +
+    36 x 33,50), unterscheidbar an Rate und Ratenzahl. Eine Restschuld gibt es nicht
+    mehr: alle
     Raten liegen im Zeitraum. Geprueft werden Zahl, Rate, Ratenzahl und
     Zeitraum je Zeile, damit der Test nicht auf zwei identischen Zeilen
     gruen wird.
@@ -1553,16 +1554,10 @@ def test_pf_beide_ratenlaufzeiten_eines_congstar_abrufs_werden_zwei_zeilen(
         soll = pf_leitzahl_cent(
             {**satz, "id": f"congstar/{laufzeit}m", "tarif_id": _PF_CS_BLATT}, blaetter
         )
-        assert (soll is None) == (laufzeit == 36), (
-            f"{laufzeit} Raten: eigene Rechnung {soll} - das Blatt nennt den "
-            "Tarif nur fuer die 24 Monate Bindung"
+        assert soll == 187900, (
+            f"{laufzeit} Raten: eigene Rechnung {soll} - der Tarif zaehlt nur "
+            "die 24 Monate Bindung"
         )
-        if soll is None:
-            assert zeile["gesamt_cent"] is None, (
-                f"{laufzeit} Raten: die Seite zeigt {zeile['gesamt_cent']} Cent, "
-                "obwohl Monat 25 bis 36 nicht belegt sind"
-            )
-            continue
         gw_vergleiche(
             Decimal(zeile["gesamt_cent"]) / 100,
             soll,
@@ -1575,19 +1570,20 @@ def test_pf_beide_ratenlaufzeiten_eines_congstar_abrufs_werden_zwei_zeilen(
         )
     assert (je_laufzeit[24]["gesamt_cent"], je_laufzeit[36]["gesamt_cent"]) == (
         187900,
-        None,
+        187900,
     ), (
-        "die 24er traegt 1.879,00 EUR, die 36er hat ohne Preis ab Monat 25 keine "
-        f"Zahl: {je_laufzeit[24]['gesamt_cent']} gegen "
+        "beide Zeilen tragen 1.879,00 EUR, die 36er ohne Tarif ab Monat 25: "
+        f"{je_laufzeit[24]['gesamt_cent']} gegen "
         f"{je_laufzeit[36]['gesamt_cent']}"
     )
 
     inline = (site / "geraete.html").read_text(encoding="utf-8")
     assert "danach noch offen" not in inline, "eine Restschuld gibt es nicht mehr"
     assert "Kosten über 24 Monate" in inline, "die 24er nennt ihren Zeitraum nicht"
-    assert "Tarifgrundpreis Monat 25–36 nicht gemessen" in inline, (
-        "die 36-Raten-Zeile nennt ihre Luecke nicht"
+    assert "Tarifgrundpreis Monat 25–36" not in inline, (
+        "die 36-Raten-Zeile braucht den Tarif ab Monat 25 nicht"
     )
+    assert "Kosten über 36 Monate" in inline, "die 36er nennt ihren Zeitraum nicht"
 
 
 def test_pf_ohne_tarifleiter_nennt_die_seite_den_grund(tmp_path, bestand):

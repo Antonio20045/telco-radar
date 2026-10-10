@@ -40,7 +40,7 @@ from typing import Optional
 
 from . import geraete_tco_grafik
 from .anbieter_farben import farbe_fuer
-from .geraete_laufzeit import LAUFZEIT_STANDARD, NICHT_ERFASST, ansicht, zeitraum
+from .geraete_laufzeit import LAUFZEIT_STANDARD, ansicht, fehlt_satz, zeitraum
 from .geraete_tco_karten import ANBIETER_REIHENFOLGE, HAENDLER_OHNE_BUENDEL
 
 log = logging.getLogger(__name__)
@@ -250,7 +250,7 @@ def _reihe(anbieter: str, karte: dict) -> dict:
     }
 
 
-def _grund(anbieter: str, mit_buendel: set, in_laufzeit: set, laufzeit: int) -> str:
+def _grund(anbieter: str, modell: dict, in_laufzeit: set, laufzeit: int) -> str:
     """Warum dieser Anbieter in diesem Band keine Linie traegt.
 
     Drei Faelle: der Anbieter liefert fuer dieses Geraet UEBERHAUPT kein
@@ -258,10 +258,10 @@ def _grund(anbieter: str, mit_buendel: set, in_laufzeit: set, laufzeit: int) -> 
     vorgibt), keins mit der gewaehlten Ratenlaufzeit („nicht erfasst“,
     Datenkonzept 5.4), oder keins in DIESEM Band (ein anderes Datenvolumen).
     """
-    if anbieter not in mit_buendel:
+    if anbieter not in anbieter_mit_irgendeinem_buendel(modell):
         return f"Bündel seitens {anbieter} noch nicht erhoben."
     if anbieter not in in_laufzeit:
-        return f"{anbieter} ist mit {laufzeit} Raten {NICHT_ERFASST}."
+        return fehlt_satz(anbieter, modell.get("karten") or [], laufzeit)
     return f"{anbieter} führt für dieses Gerät kein Bündel in diesem Band."
 
 
@@ -578,7 +578,6 @@ def baender_fuer_modell(
     gb_je_tarif = gb_je_tarif or {}
     je_band = karten_je_band(modell, band_je_tarif, laufzeit)
     alle_je_band = alle_karten_je_band(modell, band_je_tarif, laufzeit)
-    mit_buendel = anbieter_mit_irgendeinem_buendel(modell)
     in_laufzeit = anbieter_mit_irgendeinem_buendel(modell, laufzeit)
 
     ergebnis = []
@@ -593,7 +592,7 @@ def baender_fuer_modell(
         reihen = [_reihe(anbieter, karte) for anbieter, karte in geordnet]
         vorhanden = set(karten_je_anbieter)
         fehlend = [
-            {"anbieter": a, "grund": _grund(a, mit_buendel, in_laufzeit, laufzeit)}
+            {"anbieter": a, "grund": _grund(a, modell, in_laufzeit, laufzeit)}
             for a in ERWARTETE_ANBIETER
             if a not in vorhanden
         ]

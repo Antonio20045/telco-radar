@@ -205,10 +205,10 @@ def test_telekom_steht_ueberall_mit_ihrem_datenstand(bestand):
     technische Ursache steht in `config/geraete_quellen.yaml`, nicht im
     Nutzer-Sichtbaren.
 
-    Seit der Prüfrunde DK23 hat keine Telekom-Karte des Bestands eine Zahl:
     Telekom führt nur 36 Raten, und kein Telekom-Blatt nennt den Tarif ab Monat
-    25. Jede ihrer 45 Bündelkarten nennt diese Lücke, jede andere Karte den
-    fehlenden Bündelpreis."""
+    25. Seit der Tarif nur seine 24 Monate zählt (Antonio 10.10.2026), braucht
+    die Zahl diesen Preis nicht mehr: alle 45 Bündelkarten tragen eine Zahl,
+    keine nennt die alte Lücke, jede andere Karte den fehlenden Bündelpreis."""
     mit_zahl = leer = luecke_ab_25 = 0
     for modell in bestand["modelle"]:
         karten = [k for k in modell["karten"] if k["anbieter"] == "Telekom"]
@@ -223,9 +223,9 @@ def test_telekom_steht_ueberall_mit_ihrem_datenstand(bestand):
                 for jargon in ("GitHub Actions", "202-Challenge", "Phase T"):
                     assert jargon not in karte["leer_grund"]
                 luecke_ab_25 += "Tarifgrundpreis Monat 25–36" in karte["leer_grund"]
-    assert mit_zahl == 0, f"{mit_zahl} Telekom-Karten mit Zahl ohne Preis ab Monat 25"
-    assert luecke_ab_25 == 45, luecke_ab_25
-    assert leer > luecke_ab_25, "kein Telekom-Modell ohne Bündel im Bestand"
+    assert mit_zahl == 45, f"{mit_zahl} Telekom-Karten mit Zahl"
+    assert luecke_ab_25 == 0, luecke_ab_25
+    assert leer > 0, "kein Telekom-Modell ohne Bündel im Bestand"
 
 
 def test_antwortzeile_nennt_je_metrik_die_guenstigste_zahl_mit_anbieter(bestand):
@@ -376,9 +376,9 @@ def test_die_rechenprobe_steht_auf_der_karte(bestand):
 
     Datenkonzept Geräte 5.3 (H je Ratenlaufzeit): 24 Raten (Zuzahlung 7,00,
     Rate 54,50) rechnen 24 Tarifmonate, 1.794,76 EUR über 24 Monate. 36 Raten
-    (1,00 und 36,50) rechnen 36 Tarifmonate; der Bestand nennt den Tarifpreis ab
-    Monat 25 nicht, also steht statt der alten 24-Monats-Zahl samt Restschuld die
-    benannte Lücke."""
+    (1,00 und 36,50) rechnen ebenfalls nur 24 Tarifmonate, Monat 25–36 nur die
+    Rate (Antonio 10.10.2026): 1,00 + 36 × 36,50 + 24 × 19,99 = 1.794,76 EUR über
+    36 Monate; o2 finanziert zinsfrei."""
     karten_l_plus = {
         k["raten_laufzeit"]: k
         for k in _modell(bestand, "apple-iphone-17-pro-256")["karten"]
@@ -394,9 +394,9 @@ def test_die_rechenprobe_steht_auf_der_karte(bestand):
     assert vier["schnitt_monat"] == 74.78
     assert (sechs["zuzahlung"], sechs["rate"], sechs["monatlich"]) == (1.0, 36.5, 19.99)
     assert sechs["label"] == "Kosten über 36 Monate"
-    assert sechs["gesamt"] is None and not sechs["belastbar"]
-    assert "Tarifgrundpreis Monat 25–36" in sechs["luecken"]
-    assert "Monat 25–36" in sechs["leer_grund"]
+    assert sechs["gesamt"] == round(1.0 + 36 * 36.5 + 24 * 19.99, 2) == 1794.76
+    assert sechs["belastbar"]
+    assert "Tarifgrundpreis Monat 25–36" not in sechs["luecken"]
 
 
 def test_der_geraetepreis_fuehrt_wo_er_ausgewiesen_ist(bestand):
@@ -554,11 +554,8 @@ def test_die_beschriftung_der_referenz_aendert_kein_delta(bestand):
     wieder mit ALLEN Geraeteraten (und Referenz-Buendeln ihrer eigenen
     Laufzeit), beide Werte sind neu gemessen.
 
-    Datenkonzept Geräte 5.3: 36 Raten rechnen 36 Tarifmonate. Vodafones
-    Mobil XS mit 36 Raten (beim iPhone 15 die alte Referenz, 1.469,80 EUR über
-    24 Monate) hat ohne Tarifpreis ab Monat 25 keine Zahl mehr; die Referenz ist
-    Mobil S mit 12 Raten (1.709,80 EUR über 24 Monate). Gezählt werden nur Karten
-    mit Zahl - eine 36-Raten-Karte ohne Zahl hat kein Delta.
+    Datenkonzept Geräte 5.3: eine 36-Raten-Karte vergleicht nur gegen
+    Vodafones 36er; gezählt wird hier die 24er-Karte des Tarifs.
 
     Datenkonzept Geräte Teil B: Δ nur gegen die Vodafone-Karte mit gleichem
     Band und gleicher Ratenlaufzeit; die Referenz des Modells ist die
@@ -574,6 +571,7 @@ def test_die_beschriftung_der_referenz_aendert_kein_delta(bestand):
             and k["zustand"] == "neu"
             and k["tarif"] == tarif
             and k["belastbar"]
+            and k["raten_laufzeit"] == 24
         }
         return betrag
 
@@ -737,14 +735,7 @@ def test_g1_zeichnet_keine_karte_ohne_zahl(bestand):
     """Gemessen wird die REGEL statt eines festen Modells: ein Modell MIT
     belastbarer Karte eines Anbieters zeichnet ihren Balken, ein Modell OHNE
     zeichnet keinen (ein Balken der Laenge null mit Namen liest sich als
-    kostenlos). Bis zur Prüfrunde DK23 an Telekom gemessen; seitdem hat keine
-    Telekom-Karte des Bestands eine Zahl (nur 36 Raten, kein Blatt nennt
-    Monat 25), und congstar trägt beide Zustände."""
-    assert not any(
-        k["anbieter"] == "Telekom" and k["belastbar"]
-        for m in bestand["modelle"]
-        for k in m["karten"]
-    )
+    kostenlos). Gemessen an congstar, das beide Zustände trägt."""
     mit = [
         m
         for m in bestand["modelle"]
@@ -1149,9 +1140,8 @@ def test_die_referenz_des_iphone_17_ist_die_aktuelle_messung(bestand):
     Live-Befunds (1.391,79 bzw. korrekt 1.487,80 EUR vor A1) war dieselbe
     Geist-Messung, noch mit 24 statt 36 Raten.
 
-    Datenkonzept Geräte 5.3: 12 und 24 Raten tragen weiter diese Zahl über 24
-    Monate; 36 Raten rechnen 36 Tarifmonate, und der Mobil-XS-Preis ab Monat 25
-    ist nicht erhoben - dort steht die benannte Lücke."""
+    Datenkonzept Geräte 5.3: 12, 24 und 36 Raten tragen dieselbe Zahl, der
+    Tarif zählt immer nur seine 24 Monate (Antonio 10.10.2026)."""
     modell = _modell(bestand, "apple-iphone-17-256")
     ref = modell["referenz"]
     assert ref["tarif"] == "Mobil XS"
@@ -1172,15 +1162,13 @@ def test_die_referenz_des_iphone_17_ist_die_aktuelle_messung(bestand):
         sorted(xs, key=lambda k: k["raten_laufzeit"]), (90.0, 45.0, 30.0), strict=True
     ):
         assert (k["zuzahlung"], k["rate"], k["monatlich"]) == (1.0, rate, 31.95)
+        assert (
+            k["gesamt"]
+            == round(1.0 + k["raten_laufzeit"] * rate + 24 * 31.95, 2)
+            == 1847.8
+        )
         if k["raten_laufzeit"] == 36:
-            assert k["gesamt"] is None and k["label"] == "Kosten über 36 Monate"
-            assert "Tarifgrundpreis Monat 25–36" in k["luecken"]
-        else:
-            assert (
-                k["gesamt"]
-                == round(1.0 + k["raten_laufzeit"] * rate + 24 * 31.95, 2)
-                == 1847.8
-            )
+            assert k["label"] == "Kosten über 36 Monate"
         assert k["abgerufen_am"] == ref["tarif_abgerufen_am"]
     assert all(
         k.get("abgerufen_am") != "2026-09-06"
