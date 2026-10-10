@@ -23,9 +23,9 @@ Adaptersatz ganz, und die Bilanz zählt ihn unter ``unvollstaendig`` mit den feh
 Feldern: zwei Quellen werden nie feldweise gemischt. Ohne Gegenstück kommt ein
 Klick-Satz, wie er ist (Lücken bleiben ``None``), nur mit dem Namen eines
 Adaptersatzes anderer Laufzeit (``klick_geschwister``).
-Nennen zwei Klick-Sätze denselben Schlüssel, gilt einer, wenn ihre Werte gleich sind,
-sonst keiner (``mehrdeutig``). Jeder ersetzte Adaptersatz ist Gegenprobe, Gerätepreise
-ohne Tarif sind es über ``klick_geraetepreis``.
+Nennen zwei Klick-Sätze denselben Schlüssel (ein Zustand außer neu zählt mit), gilt
+einer, wenn ihre Werte gleich sind, sonst keiner (``mehrdeutig``). Jeder ersetzte
+Adaptersatz ist Gegenprobe, Gerätepreise ohne Tarif sind es über ``klick_geraetepreis``.
 
 Vorrang steht im Bestand, nicht im Lesestand: ``Zusammenfuehrung.buendel`` lässt jedes
 Adapterbündel weg, dessen Eintrag im Bestand eine Klick-Messung jünger als
@@ -46,11 +46,7 @@ from pathlib import Path
 
 from ..collect.geraete.klickergebnis import FRISCHEGRENZE_TAGE, ORDNER, lies_ergebnisse
 from ..collect.geraete.klicklauf import LAUF_GELESEN, LAUF_GESTOERT
-from ..collect.geraete.klickrohsatz import (
-    QUELLE,
-    ZUSTAND_NEU,
-    tarifschluessel,
-)
+from ..collect.geraete.klickrohsatz import QUELLE, ZUSTAND_NEU, tarifschluessel
 from ..collect.geraete.klickziele import geplante_anbieter
 from ..geraete_model import Katalog
 from ..tarif_bezug import Tarifbestand
@@ -210,7 +206,7 @@ def fuehre_zusammen(
     ohne_gegenstueck = 0
     for satz in eindeutig:
         schluessel = klickschluessel(satz)
-        treffer = sorted(set(index.get(schluessel, [])))
+        treffer = sorted(set(index.get(schluessel, []) if _neu(satz) else []))
         if not treffer:
             ohne_gegenstueck += 1
             neu += mit_namen(satz, schluessel, adapter, andere_laufzeit, UEBERNOMMEN)
@@ -245,15 +241,18 @@ def fuehre_zusammen(
     return Zusammenfuehrung(bleiben + neu, bilanz)
 
 
-def klickschluessel(satz: dict) -> Schluessel:
-    """Der Schlüssel eines Klick-Rohsatzes (siehe Modulkopf)."""
-    return (
-        str(satz.get("anbieter")),
-        str(satz.get("device_id")),
-        satz.get("speicher_gb"),
-        tarifschluessel(satz.get("tarif_name")),
-        laufzeit_in_monaten(satz.get("laufzeit_monate")),
-    )
+def klickschluessel(satz: dict, mit_zustand: bool = False) -> Schluessel:
+    """Der Schlüssel eines Klick-Rohsatzes (Modulkopf), ``mit_zustand`` samt Zustand."""
+    zustand = () if not mit_zustand or _neu(satz) else (str(satz.get("zustand")),)
+    anbieter, device = str(satz.get("anbieter")), str(satz.get("device_id"))
+    tarif = tarifschluessel(satz.get("tarif_name"))
+    laufzeit = laufzeit_in_monaten(satz.get("laufzeit_monate"))
+    return (anbieter, device, satz.get("speicher_gb"), tarif, laufzeit, *zustand)
+
+
+def _neu(satz: dict) -> bool:
+    """Zustand neu („iPhone 15 Erneuert“ neben „iPhone 15“, Telekom 10.10.2026)."""
+    return str(satz.get("zustand") or ZUSTAND_NEU) == ZUSTAND_NEU
 
 
 def schluesseltext(schluessel: Schluessel) -> str:
@@ -310,7 +309,7 @@ def _eindeutig(saetze: list[dict]) -> tuple[list[dict], list[str]]:
     """Je Schlüssel ein Satz; verschiedene Werte auf einem Schlüssel gelten nicht."""
     gruppen: dict[Schluessel, list[dict]] = {}
     for satz in saetze:
-        gruppen.setdefault(klickschluessel(satz), []).append(satz)
+        gruppen.setdefault(klickschluessel(satz, mit_zustand=True), []).append(satz)
     eindeutig = [g[0] for g in gruppen.values() if len({_werte(s) for s in g}) == 1]
     mehrdeutig = [
         schluesseltext(k) for k, g in gruppen.items() if len({_werte(s) for s in g}) > 1
