@@ -320,24 +320,21 @@ def test_der_karten_hinweis_ist_weg(geraete):
     assert "Vorgabegerät" not in geraete.get_text()
 
 
-def test_der_lueckenwortlaut_ist_der_genehmigte_sammelsatz(site, geraete):
-    """E2 ersetzt den D1-Wortlaut („Vodafone fehlt in diesem Band – keine
-    Δ-Angabe", Balkenzeit) durch Antonios 9b.7/§4.5: EIN Sammelsatz unter
-    dem Graphen, fehlende Anbieter MIT NAMEN, Alternativ-Bänder samt
-    Betrag in Klammern - und was gar nichts hat, nur EIN Mal im selben
-    Satz. Geprüft am Server-Startzustand UND am Zeitreihen-Fragment (die
-    Lücken aller übrigen Paare stehen nur dort)."""
+def test_fehlende_anbieter_stehen_als_zeilen_statt_im_sammelsatz(site, geraete):
+    """Antonio 10.10.2026 ersetzt den Sammelsatz unter dem Graphen: jeder
+    fehlende Anbieter steht als eigene Zeile in der Bündelliste. „Führt das
+    Gerät gar nicht“ behauptete der Satz auch, wo nur nicht gelesen wurde."""
     quellen = [geraete.get_text(" ", strip=True)]
-    fragment = site / "data" / "geraete-zeitreihe.html"
-    assert fragment.exists(), "Zeitreihen-Fragment fehlt"
-    quellen.append(fragment.read_text(encoding="utf-8"))
-    for text in quellen:
-        assert "führt kein Bündel" not in text, "alter Wortlaut ist zurück"
+    for name in ("geraete-zeitreihe.html", "geraete-buendel.html"):
+        fragment = site / "data" / name
+        assert fragment.exists(), f"{name} fehlt"
+        quellen.append(fragment.read_text(encoding="utf-8"))
     gesamt = " ".join(quellen)
-    assert "Kein Bündel in diesem Band:" in gesamt, (
-        "der Sammelsatz fehlt am echten Bestand"
-    )
-    assert "gar nicht im Bündel" in gesamt
+    for alt in ("führt kein Bündel", "gar nicht im Bündel", "gr-lueckenzeile"):
+        assert alt not in gesamt, f"alter Wortlaut ist zurück: {alt}"
+    assert "gr-anb-fehlt" in gesamt, "keine Zeile eines fehlenden Anbieters"
+    assert "Nur in anderen Bändern" in gesamt
+    assert "Noch nicht erfasst" in gesamt
 
 
 def test_die_tco_view_liefert_keine_leserlosen_felder_mehr():

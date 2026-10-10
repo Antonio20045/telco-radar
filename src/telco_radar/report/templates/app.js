@@ -2086,12 +2086,16 @@ var TelcoFrage = (function () {
     var alle = lz === 'alle';
     var sektion = element('gr-buendel');
     if (sektion) sektion.classList.toggle('gr-buendel--alle', alle);
-    var zeilen = document.querySelectorAll('#gr-bnd-gruppe .gr-bnd');
+    var zeilen = document.querySelectorAll(
+      '#gr-bnd-gruppe .gr-bnd, #gr-bnd-gruppe .gr-anb-fehlt');
     Array.prototype.forEach.call(zeilen, function (z) {
       var bandAus = !!band && z.hasAttribute('data-band')
         && z.getAttribute('data-band') !== band;
       var lzAus = !alle && z.hasAttribute('data-lz')
         && z.getAttribute('data-lz') !== lz;
+      if (z.hasAttribute('data-fehlt-lz')) {
+        lzAus = z.getAttribute('data-fehlt-lz') !== lz;
+      }
       z.hidden = bandAus || lzAus;
     });
     Array.prototype.forEach.call(

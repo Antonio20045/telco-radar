@@ -451,28 +451,27 @@ def test_keine_leeren_platzhalterkarten_mehr(tmp_path):
     tafel = s.select_one("#tafel-tco")
     assert not tafel.select(".gr-kkarte--leer")
     assert "noch kein Bündelpreis erhoben" not in tafel.get_text(" ")
-    legende = _text(tafel.select_one(".gr-lueckenzeile"))
-    assert legende.count("Kein Bündel") <= 1
-    assert ". ." not in legende
+    fehlend = tafel.select(".gr-anb-fehlt")
+    assert fehlend, "die fehlenden Anbieter stehen nicht als Zeilen da"
+    je_ansicht = [
+        (z["data-band"], z["data-fehlt-lz"], z["data-anbieter"]) for z in fehlend
+    ]
+    assert len(je_ansicht) == len(set(je_ansicht)), je_ansicht
 
 
-def test_die_lueckensaetze_des_fragments_bleiben_fuer_das_umschalten(tmp_path):
-    """E2: das Modell-/Band-Umschalten versorgt das lazy Fragment
-    `data/geraete-zeitreihe.html` - JEDES (Modell, Band) trägt seinen
-    Lückensatz dort (und der Server-Startzustand seinen auf der Seite).
-    Dieselbe Regel wie O1, am neuen Ort: EIN Satz je Paar, nicht je
-    Anbieter; Alternativ-Bänder mit Betrag in Klammern, gruppiert."""
+def test_fehlende_anbieter_stehen_je_band_und_ansicht_in_der_liste(tmp_path):
+    """Antonio 10.10.2026: jeder große Anbieter steht in der Bündelliste, auch
+    ohne Bündel. Je Band und Ansicht (12, 24, 36, alle) genau einmal, und nur
+    die fünf Bündelanbieter - kein Händler."""
     s = _baue_ohne_band(tmp_path)
-    zustand = _zr_fragment(tmp_path)
-    assert zustand, "das Zeitreihen-Fragment trägt keine Paare"
-    for lager in zustand:
-        satz = _text(lager.select_one(".gr-lueckenzeile"))
-        if not satz:
-            continue
-        assert satz.count("Kein Bündel") <= 1, satz
-        assert ", " in satz or "·" in satz, (
-            "der Sammelsatz gruppiert, er listet nicht je Anbieter"
-        )
+    zeilen = s.select("#gr-bnd-gruppe .gr-anb-fehlt")
+    assert zeilen, "keine Zeile eines fehlenden Anbieters"
+    for z in zeilen:
+        assert z["data-fehlt-lz"] in ("12", "24", "36", "alle"), z
+        assert z["data-anbieter"] in ("Telekom", "Vodafone", "o2", "1&1", "congstar")
+        assert _text(z.select_one(".gr-anb-fehlt-zustand")), z
+    ansichten = {z["data-fehlt-lz"] for z in zeilen}
+    assert {"24", "alle"} <= ansichten, ansichten
 
 
 def test_ohne_tarifband_ist_eigene_gruppe_unter_der_bandliste(tmp_path):

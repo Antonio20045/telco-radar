@@ -56,8 +56,8 @@ from .geraete_antwort import _rechnung_html as _rechnung_html
 from .geraete_laufzeit import ALLE_TEXT as ALLE_TEXT
 from .geraete_laufzeit import LAUFZEIT_STANDARD, LAUFZEITEN, ansicht, zeitraum
 from .geraete_luecken import _alternativen as _alternativen
-from .geraete_luecken import _luecke_text as _luecke_text
 from .geraete_luecken import _luecken as _luecken
+from .geraete_luecken import fehlen_im_paar, haenge_an
 from .geraete_rechenweg import _NAEHERUNG_SATZ as _NAEHERUNG_SATZ
 from .geraete_rechenweg import (
     ANBIETER_FOLGE,
@@ -1127,14 +1127,6 @@ def _paar(
     zeilen, fremde = satz["zeilen"], satz.get("fremd") or []
     h = zeitraum(laufzeit)
     band_info = band_katalog.get(band, {})
-    luecken = _luecken(
-        zeilen,
-        modell.get("karten") or [],
-        band,
-        fremd=fremde,
-        gesperrt=satz.get("gesperrt"),
-        laufzeit=laufzeit,
-    )
     beleg_je = {
         z["anbieter"]: (z.get("quelle_url") or "", z.get("abgerufen_am") or "")
         for z in zeilen
@@ -1175,7 +1167,7 @@ def _paar(
         "svg_breit": _svg(serien, True, beleg_je, zeitraeume, laufzeit=laufzeit),
         "svg_schmal": _svg(serien, False, beleg_je, zeitraeume, laufzeit=laufzeit),
         "rechenweg_html": _rechenwege_html(mess, zeilen, tarife),
-        "luecke_text": _luecke_text(luecken, band_katalog, h),
+        "fehlen": fehlen_im_paar(modell, satz, band, laufzeit, band_katalog, h),
         "leer_text": leer,
         "anbieter": [a for a in ANBIETER_FOLGE if serien.get(a)],
         "punkte": sum(len(v) for v in serien.values()),
@@ -1279,6 +1271,7 @@ def aufbereiten(
                 )
             )
 
+    haenge_an(modelle, paare)
     vorlagen = sum(p["rechenweg_html"].count("<template") for p in paare)
     if vorlagen:
         log.info(

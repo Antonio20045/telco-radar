@@ -434,14 +434,17 @@ def test_antwortsatz_und_grafikachse_nennen_die_laufzeit(g, laufzeit):
 def test_telekom_ist_in_der_24er_ansicht_nicht_erfasst(g):
     """Telekom und 1&1 führen nur 36 Raten: in der 24er-Ansicht stehen sie
     benannt als „nicht erfasst“ - nicht als „andere Laufzeit“ und nicht stumm."""
-    text = _paar(g, 24)["luecke_text"] or ""
-    assert re.search(r"24 Raten nicht erfasst: [^.]*Telekom", text), text
-    assert "1&1" in text.split("nicht erfasst:", 1)[1], text
-    assert "andere Laufzeit" not in text
-    zwoelf = _paar(g, 12)["luecke_text"] or ""
-    assert re.search(r"12 Raten nicht erfasst: [^.]*o2", zwoelf), zwoelf
-    sechsunddreissig = _paar(g, 36)["luecke_text"] or ""
-    assert "Telekom" not in sechsunddreissig, sechsunddreissig
+
+    def zustand(laufzeit: int) -> dict:
+        return {f["anbieter"]: f["kurz"] for f in _paar(g, laufzeit)["fehlen"]}
+
+    vier = zustand(24)
+    assert vier["Telekom"].startswith("Mit 24 Raten nicht erfasst"), vier
+    assert vier["1&1"].startswith("Mit 24 Raten nicht erfasst"), vier
+    assert not any("andere Laufzeit" in k for k in vier.values()), vier
+    zwoelf = zustand(12)
+    assert zwoelf["o2"].startswith("Mit 12 Raten nicht erfasst"), zwoelf
+    assert "Telekom" not in zustand(36)
 
 
 def test_spanne_und_kacheln_je_laufzeit(g):

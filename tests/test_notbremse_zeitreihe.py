@@ -41,7 +41,6 @@ DEUTSCHE_MONATE = {
 }
 DATUM = re.compile(r"\b\d{1,2}\. ([A-Za-zä]+) \d{4}\b")
 BETRAG = re.compile(r"([\d.]+,\d{2}) €")
-ALTERNATIVEN = re.compile(r"(1&1|o2|Telekom|congstar|Vodafone) \(([^()]*€[^()]*)\)")
 
 
 @pytest.fixture(scope="module")
@@ -165,62 +164,61 @@ def test_band_nur_mit_schaetzungen_bleibt_und_nennt_den_grund(gerendert, karten)
     )
 
 
-def test_luecke_nennt_schaetzung_nicht_als_fehlendes_buendel(gerendert, karten):
-    _, fragment = gerendert
+@pytest.fixture(scope="module")
+def fehlen(tmp_path_factory):
+    """Die Zeilen fehlender Anbieter je (Modell, Band, Ratenlaufzeit)."""
+    zustand = tmp_path_factory.mktemp("notbremse-zr-fehlen") / "state"
+    shutil.copytree(ZUSTAND, zustand)
+    wurzel = lese_wurzel()
+    geraete = geraete_view.aufbereiten(
+        zustand, lade_quellen(wurzel), lade_katalog(wurzel), heute=HEUTE
+    )
+    return {
+        (p["modell"], p["band"], p["laufzeit"]): p["fehlen"]
+        for p in geraete["zeitreihe"]["paare"]
+    }
+
+
+def test_luecke_nennt_schaetzung_nicht_als_fehlendes_buendel(fehlen, karten):
     falsch, benannt = [], 0
-    for block in fragment.select(".gr-zr-lager"):
-        luecke = block.select_one(".gr-lueckenzeile")
-        if luecke is None:
-            continue
-        paar = (block["data-modell"], block["data-band"], int(block["data-laufzeit"]))
+    for paar, zeilen in fehlen.items():
         gesperrt = {
             k["anbieter"]
             for k in karten.get(paar, [])
             if _brauchbar(k) and not k.get("zaehlt", True)
         }
-        text = luecke.get_text()
-        benannt += "Nicht im Vergleich: " in text
-        kein = re.search(r"Kein Bündel in diesem Band: ([^.]*)\.", text)
-        if kein and any(a in kein.group(1) for a in gesperrt):
-            falsch.append(f"{paar}: {text}")
+        for f in zeilen:
+            benannt += f["kurz"] == "Nicht im Vergleich"
+            if f["anbieter"] in gesperrt and f["kurz"].startswith("Nur in anderen"):
+                falsch.append(f"{paar}: {f}")
     assert not falsch, (
-        f"Lücke: {len(falsch)} Sätze nennen eine Schätzung „kein Bündel“ "
+        f"Lücke: {len(falsch)} Zeilen nennen eine Schätzung „kein Bündel“ "
         f"(z. B. {falsch[:2]})"
     )
-    assert benannt, "Lücke: erwartet „Nicht im Vergleich: …“ im Bestand"
+    assert benannt, "Lücke: erwartet „Nicht im Vergleich“ im Bestand"
 
 
-def test_alternativen_im_lueckensatz_zaehlen(gerendert, karten):
-    """Die Alternativ-Beträge anderer Bänder im Lückensatz („o2 (M 958,75 €)“)
-    stammen nur aus Karten, die zählen; gemessene Alternativen bleiben."""
-    _, fragment = gerendert
+def test_alternativen_der_fehlzeilen_zaehlen(fehlen, karten):
+    """Die Alternativ-Beträge anderer Bänder („o2: Nur in anderen Bändern:
+    M 958,75 €“) stammen nur aus Karten, die zählen; gemessene bleiben."""
     gesperrt, gemessen = [], 0
-    for block in fragment.select(".gr-zr-lager"):
-        luecke = block.select_one(".gr-lueckenzeile")
-        if luecke is None:
-            continue
-        for anbieter, teil in ALTERNATIVEN.findall(luecke.get_text()):
-            for stufe, betrag in re.findall(r"([A-Z]+) ([\d.]+,\d{2}) €", teil):
+    for (modell, _, laufzeit), zeilen in fehlen.items():
+        for f in zeilen:
+            anbieter = f["anbieter"]
+            for stufe, betrag in re.findall(r"([A-Z]+) ([\d.]+,\d{2}) €", f["kurz"]):
                 traeger = [
                     k
-                    for k in karten.get(
-                        (
-                            block["data-modell"],
-                            stufe.lower(),
-                            int(block["data-laufzeit"]),
-                        ),
-                        [],
-                    )
+                    for k in karten.get((modell, stufe.lower(), laufzeit), [])
                     if k["anbieter"] == anbieter and k.get("gesamt") == _euro(betrag)
                 ]
                 if traeger and not any(k.get("zaehlt", True) for k in traeger):
-                    gesperrt.append(f"{block['data-modell']} {anbieter} {stufe}")
+                    gesperrt.append(f"{modell} {anbieter} {stufe}")
                 gemessen += bool(traeger) and anbieter == "congstar"
     assert not gesperrt, (
-        f"Alternative zählt nicht: {len(gesperrt)} Beträge im Lückensatz aus "
-        f"Schätzungen (z. B. {gesperrt[:3]})"
+        f"Alternative zählt nicht: {len(gesperrt)} Beträge aus Schätzungen "
+        f"(z. B. {gesperrt[:3]})"
     )
-    assert gemessen, "keine gemessene Alternative im Lückensatz - Fall fehlt"
+    assert gemessen, "keine gemessene Alternative in den Fehlzeilen - Fall fehlt"
 
 
 def _panels(fragment: BeautifulSoup) -> list[tuple[str, BeautifulSoup]]:

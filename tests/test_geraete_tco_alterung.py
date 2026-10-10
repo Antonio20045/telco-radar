@@ -407,9 +407,14 @@ def test_zeitreihe_band_mit_nur_alten_angeboten_bleibt_waehlbar(tmp_path):
     kachel = zr["kacheln"][0]["baender"]["m"][24]
     assert kachel["ab"] is None
     assert kachel["alt_text"] == "kein aktueller Stand seit 16.09.2026"
-    assert paar["luecke_text"] is not None
-    assert "Kein aktueller Stand: Telekom, Vodafone, o2." in paar["luecke_text"]
-    assert "1&1, congstar führen das Gerät gar nicht im Bündel." in paar["luecke_text"]
+    zustand = {f["anbieter"]: f["kurz"] for f in paar["fehlen"]}
+    assert zustand == {
+        "Telekom": "Kein aktueller Stand",
+        "Vodafone": "Kein aktueller Stand",
+        "o2": "Kein aktueller Stand",
+        "1&1": "Noch nicht erfasst",
+        "congstar": "Noch nicht erfasst",
+    }
 
 
 def test_zeitreihe_gemischtes_band_ignoriert_das_alte_angebot(tmp_path):
@@ -424,7 +429,8 @@ def test_zeitreihe_gemischtes_band_ignoriert_das_alte_angebot(tmp_path):
     kachel = zr["kacheln"][0]["baender"]["m"][24]
     assert kachel["ab"] == "1.224,76 €"
     assert kachel.get("alt_text") is None
-    assert "Kein aktueller Stand: o2." in (paar["luecke_text"] or "")
+    zustand = {f["anbieter"]: f["kurz"] for f in paar["fehlen"]}
+    assert zustand.get("o2") == "Kein aktueller Stand"
 
 
 def test_band_zeilen_trennen_frisch_und_alt():
@@ -1129,8 +1135,9 @@ def test_zeitreihe_nennt_den_alten_stand_statt_ein_buendel_abzustreiten(tmp_path
     }
     zr = geraete_zeitreihe.aufbereiten(tmp_path / "state", tco)
     paar = next(p for p in zr["paare"] if p["band"] == "xs")
-    assert "Kein aktueller Stand: Telekom" in paar["luecke_text"]
-    assert "Kein Bündel in diesem Band: Telekom" not in paar["luecke_text"]
+    zustand = {f["anbieter"]: f["kurz"] for f in paar["fehlen"]}
+    assert zustand["Telekom"].startswith("Kein aktueller Stand")
+    assert not zustand["Telekom"].startswith("Nur in anderen Bändern")
     assert "15.09.2026" in paar["antwort_html"]
 
 

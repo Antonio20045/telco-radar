@@ -3128,6 +3128,13 @@ b,strong{font-weight:700}
 .gr-bnd summary:hover{background:var(--paper-2)}
 .gr-bnd summary:focus-visible{outline:2px solid var(--red);outline-offset:-2px}
 .gr-bnd-name{font-weight:700;color:var(--anb,var(--anb-ersatz))}
+/* Ein großer Anbieter ohne Bündel in dieser Ansicht steht trotzdem in der
+   Liste, mit seinem Zustand (Antonio 10.10.2026, `geraete_luecken.tafelzeilen`). */
+.gr-anb-fehlt{display:grid;grid-template-columns:132px minmax(0,1fr);
+  gap:0 14px;align-items:baseline;margin:0;padding:9px 6px;line-height:1.45;
+  border-bottom:1px solid var(--rule);border-left:3px solid
+  var(--anb,var(--anb-ersatz))}
+.gr-anb-fehlt-zustand{font-family:var(--serif);font-size:13px;color:var(--ink-3)}
 .gr-bnd-tarif{font-family:var(--serif);font-size:13px;color:var(--ink-2);
   min-width:0}
 .gr-bnd-tco{text-align:right;font-family:var(--serif);font-size:15px;

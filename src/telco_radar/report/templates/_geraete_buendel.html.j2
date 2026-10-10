@@ -427,6 +427,16 @@
   class="gr-bnd-lzkopf" data-lz-kopf="{{ lz }}" hidden>{{ 'andere Laufzeit'
   if lz == 'alle' else lz ~ ' Raten' }}</h4>{% endfor %}{% endmacro %}
 
+{# Antonio 10.10.2026: jeder große Anbieter steht in der Liste, auch ohne
+   Preis, mit seinem Zustand (`geraete_luecken.tafelzeilen`). `data-fehlt-lz`
+   statt `data-lz`: app.js zeigt die Zeile nur unter genau ihrer Ansicht, auch
+   unter „alle“. Eigene Liste hinter den Bündelzeilen: die Sortierung ordnet
+   nur Bündel. Der ganze Grund steht im `title`. #}
+{% macro fehlzeile(f) %}<p class="gr-anb-fehlt" data-anbieter="{{ f.anbieter }}"
+  data-band="{{ f.band }}" data-fehlt-lz="{{ f.laufzeit }}" style="--anb:{{
+  f.anb_farbe }}" title="{{ f.satz }}"><span class="gr-bnd-name">{{ f.anbieter
+  }}</span><span class="gr-anb-fehlt-zustand">{{ f.kurz }}</span></p>{% endmacro %}
+
 {% macro buendelgruppe(m, ids=false) %}
       {# A3: „alles alt“ steht als EIN Satz über den Zeilen des Modells
          (`alt_hinweis`, in Python gebaut, mit Datum und Grenze) - nicht
@@ -441,6 +451,8 @@
         {{ laufzeitkoepfe(m.zeilen_band) }}
         {% for k in m.zeilen_band %}{{ buendelzeile(k) }}{% endfor %}
       </div>
+      {% if m.fehlzeilen %}<div class="gr-anb-fehlliste">{% for f in m.fehlzeilen
+        %}{{ fehlzeile(f) }}{% endfor %}</div>{% endif %}
 
       {# OHNE TARIFBAND (§ 7): unbegrenzte Tarife und Tarife ohne erhobenes
          Datenvolumen gehören zu keiner Stufe der Vodafone-Tarifleiter - sie stehen als

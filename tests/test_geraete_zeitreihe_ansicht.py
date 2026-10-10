@@ -32,6 +32,7 @@ import yaml
 
 from telco_radar.geraete_config import lade_katalog, lade_quellen
 from telco_radar.report import geraete_view, geraete_zeitreihe
+from telco_radar.report.geraete_luecken import fehlzeilen
 
 HEUTE = "2026-09-16"
 
@@ -449,6 +450,11 @@ _ZEILE = {
 }
 
 
+def _zeilen_text(fehlen: list) -> str:
+    """Die Zeilen fehlender Anbieter eines Paares als ein prüfbarer Text."""
+    return " | ".join(f"{f['anbieter']}: {f['kurz']}" for f in fehlen)
+
+
 def _text(html):
     return __import__("re").sub(r"<[^>]+>", "", html)
 
@@ -481,18 +487,18 @@ def test_der_antwort_satz_mit_hersteller_die_kachel_ohne(ansicht):
 
 def test_ein_lueckensatz_mit_alternativbaendern_statt_zeilen(ansicht):
     paar = _paar(ansicht, ("apple-iphone-17-pro-256", "m"))
-    luecke = paar["luecke_text"]
+    luecke = _zeilen_text(paar["fehlen"])
     assert luecke
     assert "Telekom" in luecke and luecke.count("Telekom") == 1
-    assert "o2 (XS 913,00 €)" in luecke
-    assert "1&1 (XS 841,00 €)" in luecke
-    assert "Vodafone (XS 1.105,00 €)" in luecke
+    assert "o2: Nur in anderen Bändern: XS 913,00 €" in luecke
+    assert "1&1: Nur in anderen Bändern: XS 841,00 €" in luecke
+    assert "Vodafone: Nur in anderen Bändern: XS 1.105,00 €" in luecke
 
 
 def test_der_lueckensatz_nennt_nur_anbieter_ohne_zeile(ansicht):
     paar = _paar(ansicht, ("apple-iphone-17-pro-256", "xs"))
     for name in ("1&1", "congstar"):
-        assert name not in paar["luecke_text"]
+        assert name not in _zeilen_text(paar["fehlen"])
 
 
 def test_jede_linie_endet_in_einem_beleglink_mit_datum(ansicht):
@@ -1139,9 +1145,9 @@ def test_h3_der_luecken_satz_nennt_anbieter_und_zeitraum():
     )
     eins = next(l for l in luecken if l["anbieter"] == "1&1")
     assert (eins["grund"], eins["monate"]) == ("nicht-erfasst", None)
-    text = geraete_zeitreihe._luecke_text(luecken, {})
-    assert "Mit 24 Raten nicht erfasst: 1&1 (36 Raten erfasst)." in text, text
-    assert "Kein Bündel in diesem Band: 1&1" not in text
+    text = _zeilen_text(fehlzeilen(luecken, {}))
+    assert "1&1: Mit 24 Raten nicht erfasst (36 Raten erfasst)" in text, text
+    assert "1&1: Nur in anderen Bändern" not in text
 
 
 def test_h3_ein_band_mit_nur_fremdem_zeitraum_verschwindet_nicht():
@@ -1174,9 +1180,8 @@ def test_h3_ein_band_mit_nur_fremdem_zeitraum_verschwindet_nicht():
     assert "führt kein Anbieter ein Bündel" not in leer
     assert "mit 24 Raten ist kein Bündel erfasst" in leer, leer
     luecken = geraete_zeitreihe._luecken([], modell["karten"], "xs", laufzeit=24)
-    assert (
-        "Mit 24 Raten nicht erfasst: 1&1 (36 Raten erfasst)."
-        in geraete_zeitreihe._luecke_text(luecken, {})
+    assert "1&1: Mit 24 Raten nicht erfasst (36 Raten erfasst)" in _zeilen_text(
+        fehlzeilen(luecken, {})
     )
 
 
@@ -1230,16 +1235,18 @@ def test_z1_der_alternativ_betrag_nennt_seinen_abweichenden_zeitraum():
     alternativen = geraete_zeitreihe._alternativen(karten, "xs", "1&1")
     assert alternativen == [{"band": "m", "tco": 2019.54, "monate": 36}]
     luecken = geraete_zeitreihe._luecken([{"anbieter": "Vodafone"}], karten, "xs")
-    text = geraete_zeitreihe._luecke_text(luecken, {})
-    assert "1&1 (M 2.019,54 € über 36 Monate)" in text, text
+    text = _zeilen_text(fehlzeilen(luecken, {}))
+    assert "1&1: Nur in anderen Bändern: M 2.019,54 € über 36 Monate" in text, text
     karten24 = [
         _h3_karte("1&1", 1700.00, 24, band="m"),
         _h3_karte("Vodafone", 1433.80, 24, band="xs"),
     ]
-    text24 = geraete_zeitreihe._luecke_text(
-        geraete_zeitreihe._luecken([{"anbieter": "Vodafone"}], karten24, "xs"), {}
+    text24 = _zeilen_text(
+        fehlzeilen(
+            geraete_zeitreihe._luecken([{"anbieter": "Vodafone"}], karten24, "xs"), {}
+        )
     )
-    assert "1&1 (M 1.700,00 €)" in text24, text24
+    assert "1&1: Nur in anderen Bändern: M 1.700,00 €" in text24, text24
 
 
 def test_z1_die_alternative_vergleicht_nur_innerhalb_eines_zeitraums():
