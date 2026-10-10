@@ -19,14 +19,23 @@ from ..geraete_model import Katalog
 def ausbeute_der_seiten(
     daten: dict, katalog: Katalog, gestoert: bool
 ) -> tuple[Klickausbeute, dict]:
-    """Die Ausbeute der verwendbaren Seiten und die Felder ``verwendet`` und
-    ``seiten_verwendet`` für den Bilanzeintrag; ein gestörter Lauf ohne ganz
-    gelesene Seite ist nicht verwendet."""
+    """Die Ausbeute der verwendbaren Seiten und die Felder ``verwendet``,
+    ``seiten_verwendet`` und ``speicher_gelesen`` für den Bilanzeintrag; ein gestörter
+    Lauf ohne ganz gelesene Seite ist nicht verwendet."""
     seiten = verwendbare_seiten(daten, gestoert)
     aus = ausbeute({**daten, "seiten": seiten}, katalog)
     verwendet = not gestoert or bool(aus.rohsaetze or aus.ohne_tarif)
     anzahl = gelesene_seiten(seiten) if verwendet else 0
-    return aus, {"verwendet": verwendet, "seiten_verwendet": anzahl}
+    felder = {"verwendet": verwendet, "seiten_verwendet": anzahl}
+    return aus, {**felder, "speicher_gelesen": speicher_gelesen(aus.rohsaetze)}
+
+
+def speicher_gelesen(rohsaetze: list[dict]) -> dict[str, list[int]]:
+    """Je Gerät die Speicher, die der Lauf gelesen hat (``klick_erfassung``)."""
+    je_geraet: dict[str, set[int]] = {}
+    for satz in rohsaetze:
+        je_geraet.setdefault(str(satz["device_id"]), set()).add(satz["speicher_gb"])
+    return {g: sorted(gb) for g, gb in je_geraet.items()}
 
 
 def verwendbare_seiten(daten: dict, gestoert: bool) -> list[dict]:

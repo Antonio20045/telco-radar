@@ -11,7 +11,10 @@ Trägt der Eintrag einer Datei von heute ``nicht_im_angebot`` (``klickrohsatz``:
 Übersichten ganz gelesen, das Gerät in keiner), bekommt jedes dieser Geräte den Satz
 „Bei Telekom nicht im Angebot (Übersicht vom 09.10.2026 ganz gelesen)“ unter dem
 Schlüssel ``Anbieter|device_id`` (``TRENNER``); ``fuer_modell`` gibt ihn dem Modell
-mit dieser Geräte-ID statt eines Anbietergrundes.
+mit dieser Geräte-ID statt eines Anbietergrundes. Ebenso bekommt jedes Gerät, das ein
+gestörter Lauf von heute gelesen hat (``speicher_gelesen``), den Satz „Bei Telekom nur
+mit 256 GB gelesen (10.10.2026)“: ein Modell mit anderem Speicher fehlt dort, weil die
+Übersicht je Gerät einen Speicher zeigt, nicht weil die Seite sperrt.
 """
 
 from __future__ import annotations
@@ -35,6 +38,7 @@ _HTTP = re.compile(r"HTTP (\d{3})")
 SATZ_NICHT_IM_ANGEBOT = (
     "Bei {anbieter} nicht im Angebot (Übersicht vom {datum} ganz gelesen)"
 )
+SATZ_SPEICHER = "Bei {anbieter} nur mit {speicher} gelesen ({datum})"
 TRENNER = "|"
 
 
@@ -67,6 +71,7 @@ def erfassungsgruende(bilanz: dict | None) -> dict[str, str]:
         if (satz := erfassungsgrund(eintrag)) is not None:
             gruende[str(eintrag.get("anbieter"))] = satz
         gruende.update(nicht_im_angebot(eintrag))
+        gruende.update(speicher_gelesen(eintrag))
     return gruende
 
 
@@ -79,6 +84,27 @@ def nicht_im_angebot(eintrag: dict) -> dict[str, str]:
     datum = date.fromisoformat(str(eintrag.get("datum"))).strftime("%d.%m.%Y")
     satz = SATZ_NICHT_IM_ANGEBOT.format(anbieter=anbieter, datum=datum)
     return {f"{anbieter}{TRENNER}{g}": satz for g in geraete}
+
+
+def speicher_gelesen(eintrag: dict) -> dict[str, str]:
+    """Je Gerät, das ein gestörter Lauf von heute gelesen hat, die gelesenen Speicher;
+    ein Modell mit anderem Speicher zeigt sie statt des Anbietergrundes."""
+    je_geraet = eintrag.get("speicher_gelesen")
+    if erfassungsgrund(eintrag) is None or not isinstance(je_geraet, dict):
+        return {}
+    anbieter = str(eintrag.get("anbieter"))
+    datum = date.fromisoformat(str(eintrag.get("datum"))).strftime("%d.%m.%Y")
+    return {
+        f"{anbieter}{TRENNER}{geraet}": SATZ_SPEICHER.format(
+            anbieter=anbieter, speicher=_gb(speicher), datum=datum
+        )
+        for geraet, speicher in je_geraet.items()
+    }
+
+
+def _gb(speicher: list[int]) -> str:
+    texte = [f"{gb // 1024} TB" if gb >= 1024 else f"{gb} GB" for gb in speicher]
+    return " und ".join([", ".join(texte[:-1]), texte[-1]] if len(texte) > 1 else texte)
 
 
 def ohne_karte(
