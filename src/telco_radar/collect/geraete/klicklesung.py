@@ -20,7 +20,8 @@ das Muster der Karte nicht passt (``unlesbar``); deren Kombination heißt
 zweite Lesung und Markierung auf der Startseite vor dem Weiter-Klick; ``lies`` nimmt
 sie mit und liest auf der Folgeseite nur die Kachel an ``stelle``. Nennt die zweite
 Lesung für die Kacheldimension eine andere Option, ist die Kachel selbst die Quelle
-(``klickkachel``).
+(``klickkachel``). Mit ``weiter.klicken`` liest ``folgelesung`` nach jedem Klick auf
+der Folgeseite die zweite Lesung neu, mit den Seitenwerten der Startseite.
 """
 
 from __future__ import annotations
@@ -159,6 +160,21 @@ class Leser(Textleser):
         )
         abweichung = self._abweichung(ziel) if markiert else None
         return Vorlesung(seitenwerte, zweite, abweichung)
+
+    def folgelesung(
+        self, vorab: Vorlesung, ziel: Mapping[str, str | None], dimension: str
+    ) -> Vorlesung:
+        """Die Vorlesung nach einem Klick auf der Folgeseite: Seitenwerte der
+        Startseite, zweite Lesung jetzt, Markierung der geklickten ``dimension``."""
+        platz = {**vorab.seitenwerte, **ziel, PLATZHALTER_MODELL: self.modell}
+        zweite = self.quellen.lies(self.wache.seit, False, platz, self.wache.geladen)
+        gezeigt = self._gewaehlt(dimension)
+        markierung = vorab.abweichung or ()
+        if gezeigt != ziel[dimension]:
+            zeige = KEINE_AUSWAHL if gezeigt is None else gezeigt
+            grund = f"Seite zeigt {zeige} statt {ziel[dimension]}"
+            markierung += (Befund(f"variante.{dimension}", grund),)
+        return Vorlesung(vorab.seitenwerte, zweite, markierung)
 
     def lies(
         self,

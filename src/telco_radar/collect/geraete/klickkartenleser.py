@@ -27,11 +27,13 @@ from .klickkartentypen import (
     GRUND_KEIN_TEXT,
     GRUND_KEINE_LISTE,
     GRUND_KEINE_ZUORDNUNG,
+    GRUND_KLICKEN_KNOPF,
     GRUND_MUSTER,
     GRUND_OHNE_MARKE,
     GRUND_PLATZHALTER,
     GRUND_UNBEKANNT,
     GRUND_WEITER_ADRESSEN,
+    GRUND_WEITER_DIMENSION,
     GRUND_WEITER_KLICK,
     PLATZHALTER_MODELL,
     Adressen,
@@ -60,7 +62,9 @@ MARKENTEILE = ("attribut", "wert", "passt")
 VORBEREITUNGSTEILE = ("klick", "bis", "pruefe")
 LESUNGSTEILE = ("selektor", "oeffnen", "schliessen", "ohne", "muster")
 KANARIENTEILE = ("selektor", "enthaelt", "attribut")
-WEITERTEILE = ("selektor", "text", "kacheln")
+KACHELN = "kacheln"
+KLICKEN = "klicken"
+WEITERTEILE = ("selektor", "text", KACHELN, KLICKEN)
 _PLATZHALTER = re.compile(r"\{([^{}]*)\}")
 
 
@@ -229,35 +233,50 @@ class Kartenleser:
     def weiter(
         self, roh: object, knoepfe: Mapping[str, Knopf], textlesung: Textlesung
     ) -> Weiterschritt | None:
-        """Der Klick in die Bestellstrecke und die Kacheln der Folgeseite."""
+        """Der Klick in die Bestellstrecke und die Dimension der Folgeseite."""
         if roh is None:
             return None
         feld = "weiter"
         daten = self.zuordnung(roh, feld, WEITERTEILE)
-        kacheln = self.text(daten, "kacheln", feld)
-        if kacheln not in DIMENSIONEN:
-            raise self.fehler(f"{feld}.kacheln", f"{GRUND_DIMENSION} {kacheln}")
+        if KLICKEN in daten and KACHELN in daten:
+            raise self.fehler(feld, GRUND_WEITER_DIMENSION)
+        art = KLICKEN if KLICKEN in daten else KACHELN
+        dimension = self.text(daten, art, feld)
+        if dimension not in DIMENSIONEN:
+            raise self.fehler(f"{feld}.{art}", f"{GRUND_DIMENSION} {dimension}")
         if any(k.adressen is not None for k in knoepfe.values()):
             raise self.fehler(feld, GRUND_WEITER_ADRESSEN)
-        knopf, ort = knoepfe[kacheln], f"knoepfe.{kacheln}"
+        knopf, ort = knoepfe[dimension], f"knoepfe.{dimension}"
+        if art == KLICKEN:
+            if knopf.selektor is None:
+                raise self.fehler(ort, GRUND_KLICKEN_KNOPF)
+            self._ohne_zweiten_klick(textlesung)
+        else:
+            self._kacheln(knopf, ort, textlesung)
+        return Weiterschritt(
+            selektor=self.text(daten, "selektor", feld),
+            text=self.text(daten, "text", feld),
+            **{art: dimension},
+        )
+
+    def _kacheln(self, knopf: Knopf, ort: str, textlesung: Textlesung) -> None:
+        """Kacheln: Selektor ohne Marke, Bereich gleich den Kacheln, Muster darin."""
         if knopf.selektor is None:
             raise self.fehler(ort, GRUND_KACHEL_KNOPF)
         if knopf.marke is not None:
             raise self.fehler(f"{ort}.{GEWAEHLT}", GRUND_KACHEL_MARKE)
         if textlesung.selektoren != (knopf.selektor,):
             raise self.fehler("zusammenfassung.selektor", GRUND_KACHEL_BEREICH)
-        klicks = [n for n in ("oeffnen", "schliessen") if getattr(textlesung, n)]
-        if klicks:
-            raise self.fehler(f"zusammenfassung.{klicks[0]}", GRUND_WEITER_KLICK)
+        self._ohne_zweiten_klick(textlesung)
         eigene = [f for f, m in textlesung.muster.items() if m.selektor is not None]
         if eigene:
             ort = f"zusammenfassung.muster.{eigene[0]}"
             raise self.fehler(ort, GRUND_KACHEL_MUSTER)
-        return Weiterschritt(
-            selektor=self.text(daten, "selektor", feld),
-            text=self.text(daten, "text", feld),
-            kacheln=kacheln,
-        )
+
+    def _ohne_zweiten_klick(self, textlesung: Textlesung) -> None:
+        klicks = [n for n in ("oeffnen", "schliessen") if getattr(textlesung, n)]
+        if klicks:
+            raise self.fehler(f"zusammenfassung.{klicks[0]}", GRUND_WEITER_KLICK)
 
     def kanarie(self, roh: object) -> Kanarie:
         """Kanarienwert mit erlaubtem Platzhalter ``{modell}``."""

@@ -130,6 +130,11 @@ Stufe 4 von Format 2 (1&1, Erkundung 07.10.2026, Commit c8ce1f77, Seiten 3 und 4
   dem Selektor der Kacheln, Textmuster ohne eigenen Selektor). Jede weitere
   Kombination beginnt in einem frischen Kontext; die Regeln stehen in ``klickweiter``.
   Schließt ``adressen`` und jeden zweiten Klick (``oeffnen``, ``schliessen``) aus.
+- ``weiter: {selektor, text, klicken}`` (Vodafone, Erkundung 10.10.2026, Zweig
+  klick-erkundung d969c6e1): statt Kacheln zu lesen, klickt der Crawler die Optionen
+  der Dimension ``klicken`` auf der Folgeseite einzeln (Knopf mit Selektor und Marke
+  wie auf einer Startseite) und liest nach jedem Klick Quellen und Zusammenfassung neu
+  (``klickfolgeklick``). Genau eins von ``kacheln`` und ``klicken``.
 
 Selektoren der Klickziele sind Playwright-Selektoren (``:text-matches`` und
 ``:has-text`` gehen); ``passt``, ``bis`` und ``wert_in`` sind reines CSS.

@@ -66,6 +66,8 @@ GRUND_KACHEL_BEREICH = "einziger Bereich muss der Selektor der Kacheln sein"
 GRUND_KACHEL_MUSTER = "Textmuster lesen in der Kachel, ohne eigenen selektor"
 GRUND_WEITER_ADRESSEN = "weiter schließt adressen aus"
 GRUND_WEITER_KLICK = "weiter erlaubt keinen zweiten Klick (oeffnen, schliessen)"
+GRUND_WEITER_DIMENSION = "weiter braucht genau eins von kacheln und klicken"
+GRUND_KLICKEN_KNOPF = "klicken braucht selektor, nicht fest oder adressen"
 
 
 class KlickkartenFehler(ValueError):
@@ -277,12 +279,22 @@ class Weiterschritt:
 
     ``selektor`` und ``text`` nennen den Weiter-Knopf der Startseite; die Optionen von
     ``kacheln`` stehen auf der Folgeseite als Kacheln nebeneinander und werden gelesen,
-    nie geklickt.
+    nie geklickt. Statt ``kacheln`` nennt ``klicken`` eine Dimension, deren Optionen auf
+    der Folgeseite einzeln geklickt werden (Vodafone: Tarif); genau eins von beiden.
     """
 
     selektor: str
     text: str
-    kacheln: str
+    kacheln: str | None = None
+    klicken: str | None = None
+
+    @property
+    def dimension(self) -> str:
+        """Die Dimension der Folgeseite, gelesen oder geklickt."""
+        dimension = self.kacheln if self.kacheln is not None else self.klicken
+        if dimension is None:
+            raise ValueError(GRUND_WEITER_DIMENSION)
+        return dimension
 
 
 @dataclass(frozen=True)

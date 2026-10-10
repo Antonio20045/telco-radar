@@ -23,6 +23,8 @@ Klick-Crawler (``klickcrawler``) je Kombination der übrigen Dimensionen so vor:
    es nicht: der Lader lehnt ``oeffnen``, ``schliessen`` und Textmuster mit eigenem
    Selektor ab. Jede gelesene Kachel trägt ihre ``klickdiagnose.Diagnose``; nennt die
    zweite Lesung eine andere Laufzeit, ist die Kachel eigene Quelle (``klickkachel``).
+   Mit ``weiter.klicken`` statt ``kacheln`` klickt er die Optionen dieser Dimension
+   auf der Folgeseite einzeln und liest nach jedem Klick (``klickfolgeklick``).
 
 Scheitert der Weiter-Klick (Knopf fehlt, nicht eindeutig, verboten, nicht klickbar,
 keine neue Adresse), heißt die Kombination ``nicht_erfasst`` mit Grund, und die
@@ -37,18 +39,25 @@ from __future__ import annotations
 import itertools
 from collections.abc import Callable
 from dataclasses import replace
-from typing import TYPE_CHECKING, Protocol
+from typing import TYPE_CHECKING
 from urllib.parse import urlsplit
 
 from playwright.sync_api import Error as PlaywrightFehler
 
 from .klickdiagnose import diagnose
 from .klickecho import LAUFZEIT, Variante, variante_aus
+from .klickfolgeklick import GRUND_NICHT_BESUCHT as GRUND_NICHT_BESUCHT
+from .klickfolgeklick import (
+    Gang,
+    fehlen,
+    folgeklicks,
+    lies_kombination,
+    pruefe_strecke,
+    zu_viele,
+)
 from .klickkarte import DIMENSIONEN
 from .klickkontext import Browserzustand, Sitzung, cookie_werte, schliesse
 from .klicklauf import (
-    BEFUND,
-    ERFASST,
     LAUF_GESPERRT,
     LAUF_GESTOERT,
     LAUF_ZEITGRENZE,
@@ -57,14 +66,12 @@ from .klicklauf import (
 )
 from .klickstrecke import (
     DOKUMENT,
-    FELDER_JS,
     GRUND_KNOPF,
     POST,
     WEBSCHEMATA,
     hat_gewechselt,
     ohne_anker,
     sperre_des_klicks,
-    streckenende,
     waehle_knopf,
 )
 from .klicktor import GRUND_ZU_VIELE, HOECHSTE_UMLEITUNGEN, SEITEN_FRIST_MS, kurz
@@ -73,14 +80,10 @@ from .klickwache import Abbruch
 if TYPE_CHECKING:
     from playwright.sync_api import Page, Request
 
-    from .klickbedienung import Bedienung
-    from .klickkarte import Klickkarte, Weiterschritt
-    from .klicklauf import Klicklauf
-    from .klicklesung import Leser, Vorlesung
+    from .klickkarte import Weiterschritt
+    from .klicklesung import Vorlesung
     from .klicktor import Tor
-    from .klickwache import Wache
 
-GRUND_NICHT_BESUCHT = "nicht besucht"
 WEITER_FRIST_MS = 20_000
 _GELADEN_JS = "() => document.readyState === 'complete'"
 
@@ -124,50 +127,12 @@ class Kontexte:
         self.aktuell = None
 
 
-class Gang(Protocol):
-    """Was der Weiter-Schritt vom Lauf des Klick-Crawlers braucht."""
-
-    seite: Page
-    karte: Klickkarte
-    tor: Tor
-    lauf: Klicklauf
-    wache: Wache
-    leser: Leser
-    bedienung: Bedienung
-    frist_ms: int
-    hoechste: int
-    unberuehrt: bool
-
-    def oeffne_neu(self) -> None:
-        """Ein frischer Kontext mit geladener Startseite."""
-
-    def waehle(
-        self, dimension: str, wert: str, variante: Variante
-    ) -> Kombiergebnis | None:
-        """Klickt ``wert``, wenn nötig; sonst das Ergebnis, das den Weg beendet."""
-
-    def zeit_um(self) -> bool:
-        """Ob die Frist des Laufs abgelaufen ist."""
-
-    def nicht_besucht(self, variante: Variante) -> Kombiergebnis:
-        """Die Kombination als „nicht besucht: Zeitgrenze erreicht“."""
-
-    def nach_zeitgrenze(self, abbruch: Abbruch) -> Abbruch | None:
-        """Eine Sperre bei geschlossener Frist als ``zeitgrenze``; sonst ``None``."""
-
-
-def fehlen(karte: Klickkarte, dimension: str) -> str:
-    """Der Grund, wenn die Knöpfe einer Dimension fehlen."""
-    selektor = karte.knoepfe[dimension].selektor
-    return f"Knöpfe für {dimension} nicht gefunden ({selektor})"
-
-
 def je_weiter(gang: Gang, weiter: Weiterschritt) -> None:
     """Je Kombination der Startseite: wählen, vorlesen, weiterklicken, Kacheln lesen."""
-    vorn = [d for d in DIMENSIONEN if d != weiter.kacheln]
+    vorn = [d for d in DIMENSIONEN if d != weiter.dimension]
     angeboten = [gang.leser.angebotene(d, gang.lauf.struktur) for d in vorn]
     starts = [dict(zip(vorn, w, strict=True)) for w in itertools.product(*angeboten)]
-    ziele = [{**s, weiter.kacheln: None} for s in starts]
+    ziele = [{**s, weiter.dimension: None} for s in starts]
     unlesbar = [gang.leser.unlesbar_in(z) for z in ziele]
     for nummer, (ziel, grund) in enumerate(zip(ziele, unlesbar, strict=True)):
         gang.wache.pruefe_tor()
@@ -175,7 +140,7 @@ def je_weiter(gang: Gang, weiter: Weiterschritt) -> None:
         if grund is not None:
             ergebnisse = [Kombiergebnis(variante, NICHT_ERFASST, grund)]
         elif len(gang.lauf.ergebnisse) >= gang.hoechste:
-            ergebnisse = [_zu_viele(gang, variante)]
+            ergebnisse = [zu_viele(gang, variante)]
         elif gang.zeit_um():
             ergebnisse = [gang.nicht_besucht(variante)]
         else:
@@ -212,8 +177,8 @@ def _start(
     ziel: dict[str, str | None],
     variante: Variante,
 ) -> list[Kombiergebnis]:
-    """Wählt die Startseite, liest vor, klickt weiter und liest die Kacheln."""
-    vorn = [d for d in DIMENSIONEN if d != weiter.kacheln]
+    """Wählt die Startseite, liest vor, klickt weiter und liest Kacheln oder Klicks."""
+    vorn = [d for d in DIMENSIONEN if d != weiter.dimension]
     fehlend = [d for d in vorn if ziel[d] is None]
     if fehlend:
         gang.lauf.struktur.knopf(False)
@@ -230,8 +195,11 @@ def _start(
     grund = _klicke_weiter(gang, weiter)
     if grund is not None:
         return [Kombiergebnis(variante, NICHT_ERFASST, grund)]
-    ergebnisse = _kacheln(gang, weiter.kacheln, ziel, vorab)
-    _pruefe_strecke(gang.seite)
+    if weiter.klicken is not None:
+        ergebnisse = folgeklicks(gang, weiter.klicken, ziel, vorab)
+    else:
+        ergebnisse = _kacheln(gang, weiter.dimension, ziel, vorab)
+    pruefe_strecke(gang.seite)
     return ergebnisse
 
 
@@ -279,9 +247,9 @@ def _klicke_weiter(gang: Gang, weiter: Weiterschritt) -> str | None:
         sekunden = WEITER_FRIST_MS // 1000
         return f"{GRUND_KNOPF} führt nirgends hin: Adresse nach {sekunden} s gleich"
     _folge(gang)
-    _pruefe_strecke(seite)
+    pruefe_strecke(seite)
     wache.warte_ruhe()
-    _pruefe_strecke(seite)
+    pruefe_strecke(seite)
     return None
 
 
@@ -338,41 +306,14 @@ def _kacheln(
             grund = f"Laufzeit „{kombi[LAUFZEIT]}“ nicht lesbar"
             ergebnis = Kombiergebnis(variante, NICHT_ERFASST, grund)
         elif len(gang.lauf.ergebnisse) + len(ergebnisse) >= gang.hoechste:
-            ergebnis = _zu_viele(gang, variante)
+            ergebnis = zu_viele(gang, variante)
         else:
-            ergebnis = _lies(gang, variante, kombi, vorab, stelle)
+            ergebnis = lies_kombination(gang, variante, kombi, vorab, stelle)
             befund = diagnose(gang.seite, ergebnis, vorab, selektor)
             ergebnis = replace(ergebnis, diagnose=befund)
         auswahl = tuple(kombi[d] for d in DIMENSIONEN)
         ergebnisse.append(replace(ergebnis, auswahl=auswahl))
     return ergebnisse
-
-
-def _lies(
-    gang: Gang,
-    variante: Variante,
-    kombi: dict[str, str | None],
-    vorab: Vorlesung,
-    stelle: int,
-) -> Kombiergebnis:
-    struktur = gang.lauf.struktur
-    ergebnis = gang.leser.lies(variante, kombi, struktur, vorab=vorab, stelle=stelle)
-    if ergebnis.status not in (ERFASST, BEFUND):
-        return ergebnis
-    return gang.leser.belege(ergebnis, variante, gang.lauf, gang.tor.uhr())
-
-
-def _zu_viele(gang: Gang, variante: Variante) -> Kombiergebnis:
-    grund = f"{GRUND_NICHT_BESUCHT}: mehr als {gang.hoechste} Kombinationen"
-    return Kombiergebnis(variante, NICHT_ERFASST, grund)
-
-
-def _pruefe_strecke(seite: Page) -> None:
-    """Beendet den Lauf, wenn Adresse oder Seite Anmeldung, Checkout oder Zahlung
-    zeigen."""
-    ende = streckenende(seite.url, seite.evaluate(FELDER_JS))
-    if ende is not None:
-        raise Abbruch(LAUF_GESTOERT, f"Folgeseite zeigt {ende}")
 
 
 def _im_netz(adresse: str) -> bool:
