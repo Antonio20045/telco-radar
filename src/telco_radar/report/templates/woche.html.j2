@@ -27,7 +27,7 @@
 <section class="buehne" aria-label="Ausgabe vom {{ date_de }}">
   {# Vier Stimmungen desselben Bildes. app.js waehlt nach der Uhrzeit des
      Lesers EINE davon und laedt nur diese; ohne JavaScript steht der Tag. #}
-  <div class="buehne-bild" aria-hidden="true">
+  <div class="buehne-bild" aria-hidden="true"{% if 'campus-tag' in bilder %} style="background:url({{ bilder['campus-tag'] }}) center/cover"{% endif %}>
     {% for z in ('morgen', 'tag', 'abend', 'nacht') %}
     {% if ('campus-' ~ z) in bilder %}
     <img class="buehne-ebene" data-zeit-bild="{{ z }}" data-src="{{ prefix }}static/bilder/campus-{{ z }}.jpg" alt="" width="2400" height="1357" decoding="async">

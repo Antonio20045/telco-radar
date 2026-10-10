@@ -1135,7 +1135,7 @@ def _prep_competitors(report: dict) -> list[dict]:
     return out
 
 
-def schreibe_statische_dateien(site_dir: Path) -> set[str]:
+def schreibe_statische_dateien(site_dir: Path) -> dict[str, str]:
     """Schreibt CSS, JS, Logo, Schrift und Bilder; nennt die vorhandenen Bilder."""
     for asset in ("style.css", "app.js"):
         inhalt = (_TEMPLATES / asset).read_text(encoding="utf-8")

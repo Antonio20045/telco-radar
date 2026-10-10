@@ -99,7 +99,10 @@
   --mg-warm:#efe8dc; --mg-warm-linie:#dcd3c4;
 }
 *{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
+html{-webkit-text-size-adjust:100%;background:var(--paper)}
+/* Kein Gummiband am Seitenrand (Antonio, 10.10.2026): Safari zog oben einen
+   dunklen Streifen mit Ladekreis ueber das Bild. */
+html,body{overscroll-behavior-y:none}
 /* P4b-Fix (Re-Check 18.09.2026, S1): [hidden] gilt GANZHEITLICH.
 
    Die Browser-Vorgabe `[hidden]{display:none}` verliert gegen JEDE
@@ -5616,11 +5619,7 @@ body.mit-hintergrund main{padding-top:max(150px,30vh);padding-bottom:120px}
 @media (max-width:520px){
   .gr-reiter{display:flex;width:100%;gap:0;padding:4px}
   .gr-reiter button{flex:1 1 auto;height:38px;padding:0 6px;font-size:13.5px}
-  /* Die Geraeteseite traegt am Telefon kein Bildband: ihre Antwort und die
-     Kurve muessen im ersten Bildschirm stehen (Falz 844 px). Der Ort steht
-     in der Navigation, Quellen und Methodik am Seitenende. */
   .seite-geraete .band{display:none}
-  .seite-geraete.mit-buehne main{padding-top:134px}
   .seite-geraete .band + .wrap{padding-top:0}
   .mw-filter .chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:0 -16px;padding:0 16px}
   .mw-filter .chip{flex:none}
@@ -5934,3 +5933,11 @@ html:not([data-art="geraet"]) .gx-held .gx-art--tarif,html[data-art="geraet"] .g
   .gx-held b,.gx-held b + span{animation:none}
   .gx-teuer[data-puls]:not(.sichtbar) .gx-teuer-liste li{opacity:1;transform:none}
 }
+
+/* MELDUNGEN: grosses Bild mit dem Zeitungskopf (Antonio, 10.10.2026) */
+.seite-meldungen{--wa-rand:clamp(16px,4vw,64px)}
+.mg-auftakt{height:180vh}
+.mg-auftakt .mg-kopf{top:50%;margin:0;padding:0 0 30px;translate:0 -50%}
+.mg-auftakt .mg-kopf::after{border-color:var(--bildtext)}
+.mg-auftakt .mg-woche,.mg-auftakt .mg-titel,.mg-auftakt .mg-datum{color:var(--bildtext)}
+@media (max-width:820px){.mg-auftakt{height:160vh}}

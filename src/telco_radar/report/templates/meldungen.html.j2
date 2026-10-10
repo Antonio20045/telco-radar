@@ -12,7 +12,9 @@
    Wahrheitstests. #}
 {% extends "base.html.j2" %}
 {% import "_uebersetzung.html.j2" as ueb %}
+{% import "_design.html.j2" as d %}
 {% set active = 'meldungen' %}
+{% set buehne = true %}
 {% block title %}Vodafone Product and Services Insights · Alle Meldungen{% endblock %}
 
 {% macro detail(h) %}
@@ -59,12 +61,27 @@
 </article>
 {% endmacro %}
 
+{# Das grosse Bild wie auf den anderen Seiten (Antonio, 10.10.2026): nur
+   der Zeitungskopf liegt darauf, keine Schlagworte; beim Scrollen wird es
+   zum Fenster, darunter steht die Ausgabe unveraendert. #}
+{% block buehne %}
+<section class="wa-auftakt mg-auftakt" data-buehne>
+  <div class="wa-auftakt-buehne">
+    <div class="wa-rahmen">
+      <div class="wa-bild" aria-hidden="true">{{ d.motiv('band-meldungen', prefix, 'wa-motiv', eager=true) }}</div>
+      <div class="wa-schleier" aria-hidden="true"></div>
+      <header class="mg-kopf wa-text">
+        {% if ausgabe.kw %}<p class="mg-woche">Kalenderwoche {{ ausgabe.kw }}</p>{% endif %}
+        <h1 class="mg-titel" aria-label="Meldungen">{% for c in 'Meldungen' %}<span style="--i:{{ loop.index0 }}" aria-hidden="true">{{ c }}</span>{% endfor %}</h1>
+        {% if date_de %}<p class="mg-datum">Ausgabe vom {{ date_de }}</p>{% endif %}
+      </header>
+      <div class="wa-hinweis" aria-hidden="true"></div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
 {% block content %}
-<header class="mg-kopf">
-  {% if ausgabe.kw %}<p class="mg-woche">Kalenderwoche {{ ausgabe.kw }}</p>{% endif %}
-  <h1 class="mg-titel" aria-label="Meldungen">{% for c in 'Meldungen' %}<span style="--i:{{ loop.index0 }}" aria-hidden="true">{{ c }}</span>{% endfor %}</h1>
-  {% if date_de %}<p class="mg-datum">Ausgabe vom {{ date_de }}</p>{% endif %}
-</header>
 
 {% if redaktion_ausfall %}
 <p class="ausfall-hinweis">Stand: {{ redaktion_ausfall.stand_de }} –

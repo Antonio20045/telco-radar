@@ -2,12 +2,14 @@
 
    Ein Motiv steht nur, wenn seine Datei unter templates/static/bilder/
    liegt (`bilder` setzt render_site). Fehlt sie, steht eine ruhige
-   Flaeche in der Farbe der Tageszeit - nie ein kaputtes Bild. #}
+   Flaeche in der Farbe der Tageszeit - nie ein kaputtes Bild. Unter jedem
+   Bild liegt seine Vorschau (statik.vorschau), bis es geladen ist. #}
 
 {% macro motiv(slug, prefix, klasse='', eager=false, breite=2400, hoehe=1357) -%}
 {%- if slug and slug in bilder -%}
 <img class="motiv {{ klasse }}" src="{{ prefix }}static/bilder/{{ slug }}.jpg" alt=""
-     width="{{ breite }}" height="{{ hoehe }}" decoding="async" loading="{{ 'eager' if eager else 'lazy' }}">
+     width="{{ breite }}" height="{{ hoehe }}" decoding="async" loading="{{ 'eager' if eager else 'lazy' }}"{% if eager %} fetchpriority="high"{% endif %}
+     style="background:url({{ bilder[slug] }}) center/cover">
 {%- else -%}
 <span class="motiv motiv--leer {{ klasse }}" aria-hidden="true"></span>
 {%- endif -%}
