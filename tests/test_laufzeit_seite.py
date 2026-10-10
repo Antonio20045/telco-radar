@@ -135,6 +135,15 @@ def _zeilen(s) -> list[dict]:
     return s.evaluate(_ZEILEN)
 
 
+def _fehlend(s) -> dict:
+    """Die sichtbaren Zeilen fehlender Anbieter, gemessen an ``display``."""
+    return s.evaluate("""() => Object.fromEntries(
+      [...document.querySelectorAll('#gr-bnd-gruppe .gr-anb-fehlt')]
+        .filter(z => getComputedStyle(z).display !== 'none')
+        .map(z => [z.dataset.anbieter, z.textContent.replace(z.dataset.anbieter, '')
+          .trim()]))""")
+
+
 def _antwort(s) -> str:
     return " ".join(s.inner_text("#gr-zr-gruppe").split())
 
@@ -231,15 +240,13 @@ def test_antwortsatz_und_grafikachse_nennen_die_laufzeit(_basis, laufzeit):
 
 def test_telekom_ist_in_der_24er_ansicht_nicht_erfasst(_basis):
     with _oeffne(_basis) as s:
-        text = _antwort(s)
-        assert re.search(r"24 Raten nicht erfasst: [^.]*Telekom", text), text
+        fehlend = _fehlend(s)
+        assert fehlend.get("Telekom", "").startswith("Mit 24 Raten nicht erfasst"), (
+            fehlend
+        )
         assert "Telekom" not in {z["anbieter"] for z in _zeilen(s)}
         _waehle(s, "36")
-        text = _antwort(s)
-        assert (
-            "nicht erfasst: " not in text
-            or "Telekom" not in text.split("nicht erfasst: ", 1)[1].split(".")[0]
-        ), text
+        assert "Telekom" not in _fehlend(s)
         telekom = [z for z in _zeilen(s) if z["anbieter"] == "Telekom"]
         assert [float(z["gesamt"]) for z in telekom] == [SOLL[36]["Telekom"]]
 
