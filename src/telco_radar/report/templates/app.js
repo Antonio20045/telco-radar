@@ -19,14 +19,11 @@
     if (h >= 17 && h < 21) return 'abend';
     return 'nacht';
   }
-  /* Ein ferngesteuerter Browser (Tests, Screenshots) sieht die Tagesansicht:
-     eine Messung darf nicht davon abhaengen, wann sie laeuft. `?zeit=`
-     waehlt jede Ansicht ausdruecklich. */
-  var zeit = navigator.webdriver ? 'tag' : tageszeit();
-  try {
-    var wunsch = new URLSearchParams(location.search).get('zeit');
-    if (wunsch && /^(morgen|tag|abend|nacht)$/.test(wunsch)) zeit = wunsch;
-  } catch (e) { /* aeltere Browser: Uhrzeit gilt */ }
+  /* NUR TAG (Antonio, 10.10.2026): Farben und Startbild sind immer die
+     Tagesansicht, egal wann gelesen wird. Die Uhrzeit waehlt nur noch den
+     Gruss auf der Startseite. */
+  var zeit = 'tag';
+  var stunde = navigator.webdriver ? 'tag' : tageszeit();
   wurzel.setAttribute('data-zeit', zeit);
 
   var ruhig = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -37,7 +34,7 @@
   if (buehne) {
     var gruss = buehne.querySelector('[data-gruss]');
     var GRUSS = { morgen: 'Guten Morgen', tag: 'Guten Tag', abend: 'Guten Abend', nacht: 'Guten Abend' };
-    if (gruss && gruss.textContent.trim() === 'Ausgabe') gruss.textContent = GRUSS[zeit];
+    if (gruss && gruss.textContent.trim() === 'Ausgabe') gruss.textContent = GRUSS[stunde];
     var ebenen = buehne.querySelectorAll('.buehne-ebene[data-zeit-bild]');
     var bild = null;
     for (var i = 0; i < ebenen.length; i++) {
