@@ -123,6 +123,8 @@ def _luecken(
     Karten dieser Ratenlaufzeit. Führt ein Anbieter das Gerät nur mit anderen
     Raten, heißt das `nicht-erfasst` - „bietet 12 Monate nicht an“ dürfte nur
     stehen, wenn der Sammler die fehlende Option auf der Seite gesehen hätte.
+    Ebenso, wenn das Band selbst nur mit anderen Raten erfasst ist: „Nur in
+    anderen Bändern“ wäre dann falsch.
     """
     gesehen = {z["anbieter"] for z in zeilen}
     luecken = []
@@ -147,7 +149,8 @@ def _luecken(
         elif not eigene:
             grund = "nicht-erfasst"
         elif not any(k.get("band") == band for k in eigene):
-            grund = "anderes-band"
+            im_band = [k for k in alle if k.get("band") == band]
+            grund = "nicht-erfasst" if im_band else "anderes-band"
         elif not any(k.get("frisch", True) for k in eigene if k.get("band") == band):
             grund = "nur-alte"
         elif namen:
@@ -170,12 +173,25 @@ def _luecken(
                 "alternativ": _alternativen(karten, band, anbieter, laufzeit),
                 "gesperrt": namen,
                 "laufzeit": laufzeit,
-                "andere_laufzeiten": sorted(
-                    {a for k in alle if (a := ansicht(k)) is not None} - {laufzeit}
-                ),
+                "andere_laufzeiten": _andere_laufzeiten(alle, band, laufzeit),
             }
         )
     return luecken
+
+
+def _andere_laufzeiten(alle: list, band: str, laufzeit: int | None) -> list:
+    """Die Ratenlaufzeiten, mit denen der Anbieter erfasst ist: im Band die
+    gemessenen Raten (Telekom A17 L nur mit 6), sonst die Ansichten."""
+    im_band = {
+        k["raten_laufzeit"]
+        for k in alle
+        if k.get("band") == band
+        and k.get("raten_laufzeit")
+        and ansicht(k) not in (None, laufzeit)
+    }
+    if im_band:
+        return sorted(im_band)
+    return sorted({a for k in alle if (a := ansicht(k)) is not None} - {laufzeit})
 
 
 def _alt_zeitraum(monate, h: int = TCO_HORIZONT) -> str:

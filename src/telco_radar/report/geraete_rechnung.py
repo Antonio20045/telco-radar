@@ -10,6 +10,8 @@ from __future__ import annotations
 
 from ..tarif_model import Preisphase
 from ..tco_kosten import (
+    POSTEN_EINMALZAHLUNG,
+    SCHRITT_ABLOESE,
     SCHRITT_ANSCHLUSS,
     SCHRITT_ANZAHLUNG,
     SCHRITT_BARPREIS,
@@ -34,12 +36,14 @@ WORT_JE_SCHRITT = {
     SCHRITT_ANSCHLUSS: "Anschluss",
     SCHRITT_MONAT: "Monatspreis",
     SCHRITT_NUR_GERAET: "nur Gerät",
+    SCHRITT_ABLOESE: "Ablöse nach Monat 24",
 }
 WORT_JE_LUECKE = {
     POSTEN_TARIF: "Tarif",
     POSTEN_ZUZAHLUNG: "Anzahlung",
     POSTEN_ANSCHLUSS: "Anschluss",
     POSTEN_BUENDEL: "Tarif mit Gerät",
+    POSTEN_EINMALZAHLUNG: "Ablöse nach Monat 24",
 }
 
 

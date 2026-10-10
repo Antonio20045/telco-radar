@@ -98,7 +98,7 @@ Kosten über H Monate = Anzahlung + Anschluss
                      + N Geräteraten
                      + Tarif in jedem Monat 1 bis T zum Preis, der in diesem Monat gilt (Preisphasen)
                        T = kleinerer Wert aus H und Tarifbindung (ohne Angabe 24)
-  bei 1&1:           = Anzahlung + Anschluss + H × Bündelbetrag
+  bei 1&1:           = Anschluss + 24 × Bündelbetrag + Ablöse nach Monat 24
 ```
 
 | Ansicht | Zeitraum H | Tarifmonate | Raten |
@@ -109,7 +109,7 @@ Kosten über H Monate = Anzahlung + Anschluss
 
 Warum der Tarif in der 36er-Ansicht nur 24 Monate zählt (Antonio, 10.10.2026): Ein Mobilfunkvertrag hat höchstens 24 Monate Mindestlaufzeit und ist danach monatlich kündbar ([§ 56 TKG](https://www.gesetze-im-internet.de/tkg_2021/__56.html)). Der Ratenkauf über 36 Monate ist bei Telekom, Vodafone, o2 und congstar ein eigener Vertrag; die Raten laufen nach einer Tarifkündigung weiter. Also zählen Monat 1 bis 24 Tarif und Rate, Monat 25 bis 36 nur die Rate. Die Zeile zeigt das als „24 × Monatspreis (Gerät + Tarif) + 12 × nur Gerät“. Ein Tarifpreis ab Monat 25 wird dafür nicht gebraucht.
 
-1&1 nennt nur einen Monatsbetrag für Tarif und Gerät und trägt den Tarif bis zur letzten Rate. Das wären zwölf Tarifmonate mehr als bei den anderen, also wird 1&1 nur über 24 Monate verglichen (Antonio, 10.10.2026): seine 36er-Bündel stehen nur unter „alle“, die 36er-Ansicht nennt „Nur über 24 Monate verglichen: 1&1“ (`geraete_laufzeit.nur_ueber_24`).
+1&1 nennt nur einen Monatsbetrag für Tarif und Gerät; nach 24 Monaten kann man kündigen und das Gerät gegen eine Ablöse behalten („24+12“). Also wird 1&1 nur über 24 Monate verglichen (Antonio, 10.10.2026): 24 × Bündelbetrag + Ablöse + Anschluss in der 24er-Ansicht (`tco_kosten.zeitraum`, `geraete_laufzeit.ansicht`). Die gemessene Zuzahlung eines solchen Vertrags ist die Ablöse, keine Anzahlung; fehlt sie, ist die Zahl die Lücke „Einmalzahlung bei Kündigung“. Die 36er-Ansicht nennt „1&1 wird nur über 24 Monate verglichen“.
 
 Zweitzahl ist Ø/Monat = Kosten ÷ H, immer mit „über H Monate“ beschriftet. Laufzeitübergreifend gibt es keinen Sieger.
 

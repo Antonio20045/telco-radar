@@ -15,7 +15,7 @@ from datetime import date
 
 from .. import rechenweise
 from ..tarif_model import buendelphasen_aus
-from ..tco_kosten import tarifmonate
+from ..tco_kosten import POSTEN_EINMALZAHLUNG, tarifmonate
 from ..tco_model import (
     POSTEN_ANSCHLUSS,
     POSTEN_BUENDEL,
@@ -176,7 +176,8 @@ def _rechung(messung: dict, tarife: dict | None = None) -> dict | None:
     Gerechnet wird nur in `kosten_ueber`; hier wird ZERLEGT, der `betrag` je
     Posten kommt aus `Kosten.posten` (Schluessel EXAKT wie dort, sonst fehlt ein
     Posten und die Summe geht nicht auf). Zwei Preisformen: aufgeteilt (Tarif und
-    Rate) und zusammen (1&1, ein Bündelbetrag); Boni stehen nicht in der Historie.
+    Rate) und zusammen (1&1, ein Bündelbetrag, über 24 Monate plus Ablöse); Boni
+    stehen nicht in der Historie.
     `monate` ist der Zeitraum H der Zahl fuer ihr Etikett.
     """
     satz = messung["satz"]
@@ -212,6 +213,7 @@ def _rechung(messung: dict, tarife: dict | None = None) -> dict | None:
             anzahl=h,
             einzeln=b.buendel_monatlich,
         )
+        _posten(f"Ablöse nach Monat {h}", kosten.posten.get(POSTEN_EINMALZAHLUNG))
     else:
         t = tarifmonate(b) if h is None else min(h, tarifmonate(b))
         _posten(

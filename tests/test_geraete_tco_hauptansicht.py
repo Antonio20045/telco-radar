@@ -653,7 +653,8 @@ def test_jede_belastbare_karte_traegt_das_label_der_leitzahl(bestand):
     nennt jetzt den Zeitraum, den die Zahl WIRKLICH traegt
     (`leitzahl_monate`). Seit `kosten_ueber` ist auch die Tariflaufzeit der
     Rechnung und der Teiler des Ø/Monat dieser Zeitraum H: 36 bei 36 Raten,
-    24 bei 12 und 24 Raten (Datenkonzept Geräte 5.3)."""
+    24 bei 12 und 24 Raten (Datenkonzept Geräte 5.3). Ein Bündelmonatspreis
+    (1&1) zählt seit 10.10.2026 nur 24 Monate plus Ablöse."""
     geprueft = 0
     for modell in bestand["modelle"]:
         for karte in modell["karten"]:
@@ -667,11 +668,12 @@ def test_jede_belastbare_karte_traegt_das_label_der_leitzahl(bestand):
             assert karte["label"] == f"Kosten über {monate} Monate", (
                 f"{modell['id']}/{karte['anbieter']}: {karte['label']!r}"
             )
-            assert (
-                karte["laufzeit"]
-                == monate
-                == (36 if karte["raten_laufzeit"] == 36 else 24)
-            ), f"{modell['id']}/{karte['anbieter']}: {karte['raten_laufzeit']} Raten"
+            soll = 36 if karte["raten_laufzeit"] == 36 else 24
+            if karte["buendel_monatlich"] is not None:
+                soll = 24
+            assert karte["laufzeit"] == monate == soll, (
+                f"{modell['id']}/{karte['anbieter']}: {karte['raten_laufzeit']} Raten"
+            )
     assert geprueft, "kein belastbares Angebot - der Test prueft nichts"
 
 

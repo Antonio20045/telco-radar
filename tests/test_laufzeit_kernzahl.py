@@ -120,7 +120,8 @@ def test_12_und_24_raten_tragen_weiter_24_monate():
     assert {_karte(b)["leitzahl_monate"] for b in (zwoelf, vierundzwanzig)} == {24}
 
 
-def test_ein_vertrag_rechnet_seinen_betrag_ueber_36_monate():
+def test_ein_vertrag_ueber_36_monate_rechnet_24_betraege_und_die_abloese():
+    """Antonio 10.10.2026: 1&1 nur über 24 Monate, die 360 € sind die Ablöse."""
     b = Buendel(
         sku_id="apple-iphone-17-pro-256gb-silber",
         anbieter="1&1",
@@ -133,8 +134,8 @@ def test_ein_vertrag_rechnet_seinen_betrag_ueber_36_monate():
         abgerufen_am=HEUTE,
     )
     k = _karte(b)
-    assert k["gesamt"] == round(360.0 + 39.9 + 36 * 44.99, 2)
-    assert k["leitzahl_monate"] == 36
+    assert k["gesamt"] == round(360.0 + 39.9 + 24 * 44.99, 2) == 1479.66
+    assert k["leitzahl_monate"] == 24
 
 
 def test_ein_fehlender_anschlusspreis_ist_keine_null():

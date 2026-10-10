@@ -114,10 +114,13 @@ def _gw_bindung(buendel: dict, blaetter: dict) -> int | None:
 def gw_zeitraum(buendel: dict, blaetter: dict) -> int | None:
     """H der Soll-Definition (Datenkonzept Geräte 5.3): der größere Wert aus
     Ratenlaufzeit und Tarifbindung, eine unbekannte Bindung zählt 24 Monate.
-    Ohne Ratenlaufzeit gibt es keinen Zeitraum."""
+    Ohne Ratenlaufzeit gibt es keinen Zeitraum. Ein Betrag für Tarif und Gerät
+    über mehr als 24 Monate (1&1) zählt nur 24 (Antonio, 10.10.2026)."""
     laufzeit = buendel.get("laufzeit_monate")
     if laufzeit is None:
         return None
+    if buendel.get("buendel_monatlich") is not None and int(laufzeit) > _GW_HORIZONT:
+        return _GW_HORIZONT
     bindung = _gw_bindung(buendel, blaetter)
     return max(int(laufzeit), _GW_HORIZONT if bindung is None else bindung)
 
@@ -170,7 +173,8 @@ def _gw_leitzahl(buendel: dict, blaetter: dict) -> tuple:
     Kosten über H Monate = Anzahlung + Anschlusspreis + alle N Geräteraten +
     Tarif in jedem Monat 1 bis T, T der kleinere Wert aus H und der Bindung (ohne
     Bindung 24; Antonio, 10.10.2026: ab Monat 25 nur die Rate); ein
-    zusammengelegter Bündelbetrag (1&1) trägt H × Betrag und gilt nur für H = N.
+    zusammengelegter Bündelbetrag (1&1) trägt H × Betrag und gilt nur für H = N
+    oder H = 24 < N; dann ist die Zuzahlung die Ablöse nach Monat 24.
     Fehlt ein Posten, gibt es keine Zahl."""
     monate = gw_zeitraum(buendel, blaetter)
     if monate is None:
@@ -179,7 +183,7 @@ def _gw_leitzahl(buendel: dict, blaetter: dict) -> tuple:
     if buendel.get("buendel_monatlich") is not None:
         teile = [
             gw_cent(buendel["buendel_monatlich"]) * monate
-            if monate == laufzeit
+            if monate <= laufzeit
             else None
         ]
     else:
@@ -462,10 +466,12 @@ def _gw_antwort(block: str) -> dict | None:
     if not m:
         return None
     return {
-        "anb": (m.group("anb1") or m.group("anb2") or m.group("anb3")).strip(),
+        "anb": _pr_html.unescape(
+            (m.group("anb1") or m.group("anb2") or m.group("anb3")).strip()
+        ),
         "gesamt": _gw_dezimal(m.group("gesamt")),
         "o": _gw_dezimal(m.group("o")),
-        "klammer": m.group("klammer"),
+        "klammer": _pr_html.unescape(m.group("klammer")),
     }
 
 
@@ -948,19 +954,14 @@ def _gw_baender_je_modell(tco: dict, blaetter: dict, heute: str) -> tuple[dict, 
     """({modell: Stufen mit irgendeinem neu-Bündel},
     {modell: Stufen mit frischem neu-Bündel und Leitzahl}) - EIGEN.
 
-    Ein Betrag für Tarif und Gerät über mehr als 24 Monate (1&1) steht in
-    keiner Laufzeit-Ansicht (Antonio, 10.10.2026) und trägt keine Stufe."""
+    Ein Betrag für Tarif und Gerät über mehr als 24 Monate (1&1) steht seit
+    10.10.2026 in der 24er-Ansicht und trägt seine Stufe."""
     aktuell = _gw_aktuell(blaetter)
     leiter = _gw_leiter(aktuell)
     alle: dict = {}
     frisch: dict = {}
     for b in tco["buendel"]:
         if b.get("zustand") != "neu":
-            continue
-        if (
-            b.get("buendel_monatlich") is not None
-            and (b.get("laufzeit_monate") or 0) > _GW_HORIZONT
-        ):
             continue
         band = _gw_band_satz(aktuell.get(b.get("tarif_id") or ""), leiter)
         modell = _pf_modell(b["sku_id"]) or _gw_modell_ohne_speicher(b["sku_id"])
@@ -1199,8 +1200,9 @@ def test_geraete_tco_csv_gegen_die_eigene_rechnung(gw_seite):
         if r["Art"] == "SIM-only":
             continue
         monate = max(int(lz), _GW_HORIZONT) if lz else None
-        if buendel is not None:
-            soll = buendel * int(lz) + (zu or 0) + (anschluss or 0)
+        if buendel is not None and lz:
+            monate = min(int(lz), _GW_HORIZONT)
+            soll = buendel * monate + (zu or 0) + (anschluss or 0)
         elif lz and tarif is not None and rate is not None:
             tarifmonate = min(monate, _GW_HORIZONT)
             soll = (zu or 0) + tarif * tarifmonate + rate * int(lz) + (anschluss or 0)
@@ -1464,6 +1466,7 @@ _PF_BAU_RE = re.compile(r'gr-kk-bau">(.*?)</p>', re.S)
 _PF_RATEN_RE = re.compile(r"in (\d+) Raten")
 _PF_BMONATE_RE = re.compile(r"zusammen · (\d+) Monate")
 _PF_KOPFRATEN_RE = re.compile(r'gr-bnd-raten">\s*(\d+) ')
+_PF_ABLOESE_RE = re.compile(r'gr-bnd-raten">\s*\d+ Monate \+ Ablöse')
 
 _PF_FAELLE = (
     ("apple-iphone-18-pro-256", "Vodafone", "Mobil XS"),
@@ -1650,6 +1653,7 @@ def _pf_zeilen_aus_block(block: str) -> list:
                 else "",
                 "gesamt_cent": gw_cent(attr["gesamt"]) if attr.get("gesamt") else None,
                 "laufzeit_raten": int(raten.group(1)) if raten else None,
+                "abloese": bool(_PF_ABLOESE_RE.search(roh)),
                 "bau": text,
             }
         )
@@ -1750,7 +1754,8 @@ def test_pf_die_gezeigte_ratenlaufzeit_ist_eine_gemessene(gw_seite):
     muss die GEMESSENE `laufzeit_monate` eines Buendels desselben
     (Anbieter, Modell, Tarif, Zustand) sein - eine geratene
     Standardlaufzeit im Rechenweg waere eine erfundene Aussage
-    (CLAUDE.md Clean Code 3/4).
+    (CLAUDE.md Clean Code 3/4). „24 Monate + Ablöse“ (1&1 seit 10.10.2026)
+    behauptet eine gemessene Laufzeit über 24 Monaten.
 
     Gegenprobe gegen einen leeren Lauf: der Test zaehlt die gepruefte
     Menge und haelt sie exakt am Schnappschuss fest."""
@@ -1793,6 +1798,9 @@ def test_pf_die_gezeigte_ratenlaufzeit_ist_eine_gemessene(gw_seite):
                 ohne_historie += 1
                 continue
             geprueft += 1
+            laenger = any(t and t > z["laufzeit_raten"] for t in treffer)
+            if z["abloese"] and laenger:
+                continue
             if z["laufzeit_raten"] not in treffer:
                 fehler.append(
                     (
@@ -2063,7 +2071,8 @@ def test_pr_fuenf_leitzahlen_gegen_die_historie_nachgerechnet(gw_seite):
     max(Ratenlaufzeit, Tarifbindung) Monate = Anzahlung + Tarif in jedem Monat
     der Bindung (24) + ALLE Geraeteraten + Anschlusspreis; ab Monat 25 nur die
     Rate. Bei einem zusammengelegten Buendelmonatspreis (1&1) tritt dieser
-    Betrag ueber H an die Stelle von Tarif UND Rate.
+    Betrag ueber H an die Stelle von Tarif UND Rate; ueber mehr als 24 Monate
+    zaehlen 24 Betraege und die Abloese.
 
     Rundung offen benannt: jeder Monatsbetrag wird als ganze Cent gelesen
     und danach multipliziert (eine Rate von 30,50 EUR ist 3050 Cent), die
@@ -2081,7 +2090,8 @@ def test_pr_fuenf_leitzahlen_gegen_die_historie_nachgerechnet(gw_seite):
         24 Raten: 0,99 + 24 x 31,95 + 24 x 60,00 + 0,00     = 2.207,79 EUR
         36 Raten: 0,99 + 24 x 31,95 + 36 x 40,00 + 0,00     = 2.207,79 EUR
       1&1 / iPhone 18 Pro 256 / All-Net-Flat S, Buendelbetrag
-        36 Monate: 420,00 + 36 x 49,99 + 39,90              = 2.259,54 EUR
+        36 Monate, gerechnet 24 (Antonio 10.10.2026: nur über 24 Monate):
+                   420,00 Ablöse + 24 x 49,99 + 39,90       = 1.659,66 EUR
       congstar / Galaxy S26 Ultra 256 / Allnet Flat S
         24 Raten: 119,00 + 24 x 20,00 + 24 x 43,50 + 15,00  = 1.658,00 EUR
         36 Raten: 119,00 + 24 x 20,00 + 36 x 29,00 + 15,00  = 1.658,00 EUR
@@ -2098,7 +2108,7 @@ def test_pr_fuenf_leitzahlen_gegen_die_historie_nachgerechnet(gw_seite):
         ("apple-iphone-18-pro-256", "vodafone", "mobil-xs", 12, 220779),
         ("apple-iphone-18-pro-256", "vodafone", "mobil-xs", 24, 220779),
         ("apple-iphone-18-pro-256", "vodafone", "mobil-xs", 36, 220779),
-        ("apple-iphone-18-pro-256", "1-1", "1-1-all-net-flat-s", 36, 225954),
+        ("apple-iphone-18-pro-256", "1-1", "1-1-all-net-flat-s", 36, 165966),
         ("samsung-galaxy-s26-ultra-256", "congstar", "allnet-flat-s", 24, 165800),
         ("samsung-galaxy-s26-ultra-256", "congstar", "allnet-flat-s", 36, 165800),
     )

@@ -2,9 +2,9 @@
 
 Die Buendeltafel ist die einzige Tafel der Seite, in der beide Zeitraeume
 der Leitzahl wirklich untereinander stehen: getrennt gezahlte Angebote
-tragen 24 Monate, ein zusammengelegter Buendelmonatspreis (1&1) traegt
-seine eigene Ratenlaufzeit - heute 36. Genau dort standen zwei Aussagen,
-die niemand gemessen hat:
+tragen 24 Monate, ein Angebot mit 36 Raten 36 Monate (seit 10.10.2026 wird
+1&1 nur ueber 24 Monate verglichen; die Fixture mischt darum mit Telekom).
+Genau dort standen zwei Aussagen, die niemand gemessen hat:
 
   1. Der Spaltenkopf behauptete fest "Kosten über 24 Monate" - auch ueber
      einer Zeile, deren Etikett "Kosten über 36 Monate" sagt.
@@ -55,9 +55,9 @@ _RATEN = [
     ("congstar", "cs:klein", "Allnet Flat XS", 15, 10.0),
     ("Vodafone", "vf:klein", "Vodafone Mobil XS", 18, 26.0),
 ]
-_ZUSAMMEN = ("1&1", "11:klein", "All-Net-Flat S", 12, 30.0, 100.0, 36)
+_ZUSAMMEN = ("Telekom", "tk:klein", "MagentaMobil S", 12, 16.0, 1.0, 36)
 
-_SOLL = {"congstar": 840.76, "o2": 1032.76, "1&1": 1180.00, "Vodafone": 1224.76}
+_SOLL = {"congstar": 840.76, "o2": 1032.76, "Telekom": 1176.76, "Vodafone": 1224.76}
 
 
 def _baue(tmp_path: pathlib.Path) -> pathlib.Path:
@@ -79,7 +79,7 @@ def _baue(tmp_path: pathlib.Path) -> pathlib.Path:
                 "updated": HEUTE,
                 "anbieter": {
                     n: {"laeufe": 4, "funde_gesamt": 1}
-                    for n in ("Vodafone", "o2", "1&1", "congstar")
+                    for n in ("Vodafone", "o2", "Telekom", "congstar")
                 },
                 "listungen": [
                     _listung("Vodafone", DEVICE, 256, 1199.90),
@@ -115,23 +115,24 @@ def _baue(tmp_path: pathlib.Path) -> pathlib.Path:
                 "last_verified": HEUTE,
             }
         )
-    anbieter, tarif_id, tarif, _gb, monatlich, zuzahlung, laufzeit = _ZUSAMMEN
+    anbieter, tarif_id, tarif, _gb, rate, zuzahlung, laufzeit = _ZUSAMMEN
     buendel.append(
         {
-            "id": f"buendel--1und1--{_sku(DEVICE, 256)}--{tarif_id}--{laufzeit}",
+            "id": f"buendel--telekom--{_sku(DEVICE, 256)}--{tarif_id}--{laufzeit}",
             "sku_id": _sku(DEVICE, 256),
             "anbieter": anbieter,
             "tarif_name": tarif,
             "tarif_id": tarif_id,
             "tarif_id_guete": "hoch",
-            "buendel_monatlich": monatlich,
+            "tarif_monatlich": 24.99,
+            "geraet_monatsrate": rate,
             "tarif_bindung_monate": 24,
             "geraet_zuzahlung": zuzahlung,
             "laufzeit_monate": laufzeit,
             "anschlusspreis": 0.0,
             "zustand": "neu",
             "rabatte": [],
-            "quelle_url": "https://example.de/1und1/anf-s",
+            "quelle_url": "https://example.de/telekom/s",
             "abgerufen_am": HEUTE,
             "first_seen": HEUTE,
             "last_verified": HEUTE,
@@ -218,9 +219,9 @@ def test_die_fixture_mischt_wirklich_zwei_zeitraeume(suppe):
     betraege = {z["data-anbieter"]: float(z["data-gesamt"]) for z in zeilen}
     assert betraege == pytest.approx(_SOLL), betraege
     monate = {z["data-anbieter"]: _etikett_monate(z) for z in zeilen}
-    assert monate == {"congstar": 24, "o2": 24, "Vodafone": 24, "1&1": 36}, monate
+    assert monate == {"congstar": 24, "o2": 24, "Vodafone": 24, "Telekom": 36}, monate
     rang = sorted(betraege, key=lambda a: betraege[a])
-    assert rang == ["congstar", "o2", "1&1", "Vodafone"], rang
+    assert rang == ["congstar", "o2", "Telekom", "Vodafone"], rang
 
 
 def test_der_spaltenkopf_der_buendeltafel_nennt_keine_monatszahl(suppe):
@@ -363,17 +364,17 @@ def _reihe(s):
 
 def test_die_sortierung_stellt_zwei_zeitraeume_nicht_in_einen_rang(seite):
     """Der Befund im Browser: ein Klick auf den Kopf stellte die
-    36-Monats-Summe (1.180,00 EUR) zwischen o2 (1.032,76) und Vodafone
+    36-Monats-Summe (1.176,76 EUR) zwischen o2 (1.032,76) und Vodafone
     (1.224,76) - als waere sie teurer als die eine und guenstiger als die
     andere. Beides ist nicht gemessen.
 
     Gegen den alten Stand rot: dort lautete die Reihe nach dem Klick
-    [congstar, o2, 1&1, Vodafone].
+    [congstar, o2, Telekom, Vodafone].
     """
     seite.click("#gr-buendel .gr-bnd-kopf button[data-bsort='tco']")
     seite.wait_for_timeout(120)
     reihe = _reihe(seite)
-    assert [z[0] for z in reihe] == ["congstar", "o2", "Vodafone", "1&1"], reihe
+    assert [z[0] for z in reihe] == ["congstar", "o2", "Vodafone", "Telekom"], reihe
     assert [z[1] for z in reihe] == ["24", "24", "24", "36"], reihe
     je_zeitraum = {}
     for _a, mon, betrag in reihe:
@@ -385,7 +386,8 @@ def test_die_sortierung_stellt_zwei_zeitraeume_nicht_in_einen_rang(seite):
         "#gr-bndliste .gr-bnd:not([hidden]) .gr-bnd-label",
         "e => e.map(x => x.textContent.trim())",
     )
-    assert etikett[-1] == "Kosten über 36 Monate", etikett
+    kosten = [e for e in etikett if e.startswith("Kosten über")]
+    assert kosten[-1] == "Kosten über 36 Monate", etikett
 
 
 def test_die_umgekehrte_richtung_dreht_nur_innerhalb_des_zeitraums(seite):
@@ -399,7 +401,7 @@ def test_die_umgekehrte_richtung_dreht_nur_innerhalb_des_zeitraums(seite):
     seite.click(knopf)
     seite.wait_for_timeout(120)
     reihe = _reihe(seite)
-    assert [z[0] for z in reihe] == ["Vodafone", "o2", "congstar", "1&1"], reihe
+    assert [z[0] for z in reihe] == ["Vodafone", "o2", "congstar", "Telekom"], reihe
     assert [z[1] for z in reihe] == ["24", "24", "24", "36"], reihe
 
 
@@ -435,7 +437,7 @@ def test_die_anbieter_sortierung_bleibt_eine_reine_namensfolge(seite):
     reihe = _reihe(seite)
     namen = [z[0] for z in reihe if z[1] == "24"]
     assert namen == sorted(namen, key=str.lower) == ["congstar", "o2", "Vodafone"]
-    assert [z[0] for z in reihe][-1] == "1&1", reihe
+    assert [z[0] for z in reihe][-1] == "Telekom", reihe
 
 
 def _zeile_text(karte: dict) -> str:

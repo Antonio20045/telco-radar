@@ -133,7 +133,8 @@ def test_rechnung_eines_vertrags_mit_einem_monatsbetrag():
         tarif_bindung_monate=24,
     )
     k = kosten_ueber(b)
-    assert (36, 61.99, "vertrag") in _schritte(k)
+    assert (24, 61.99, "vertrag") in _schritte(k)
+    assert k.gesamt == round(24 * 61.99 + 39.99, 2)
     assert round(sum(s.summe for s in k.rechnung), 2) == k.gesamt
 
 
@@ -281,7 +282,7 @@ def test_zeile_ohne_kernzahl_nennt_was_fehlt(bestand):
     assert offen, "Bestand ohne Zeile mit Lücke – der Test prüft nichts"
     texte = [_text(r) for r in soup.select(".gr-bnd-rechnung") if "=" not in _text(r)]
     assert texte and all("nicht genannt" in t for t in texte), texte[:3]
-    assert any("Anzahlung nicht genannt" in t for t in texte), texte[:3]
+    assert any("Ablöse nach Monat 24 nicht genannt" in t for t in texte), texte[:3]
     assert not any("Monat 25–36" in t for t in texte), texte[:3]
 
 

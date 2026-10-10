@@ -257,7 +257,9 @@ def test_die_paradox_zeile_nennt_den_zeitraum_ihrer_raten(tmp_path):
     Monatsraten"; seit A1 ist die Pruefung zweigeteilt wie die Erklearzeile
     selbst: der Finanzierungszweig nennt "alle N Raten plus M Monate Tarif"
     (N = Ratenzahl des Bau-Satzes), der Barpreis-Zweig nennt "Gerät + M
-    Monate Tarif" (M = der Horizont des Labels "Kosten über 24 Monate")."""
+    Monate Tarif". M ist der Horizont des Labels, aber höchstens 24: der Tarif
+    zählt nur seine Bindung, Monat 25-36 nur die Rate (Antonio 10.10.2026); ein
+    Betrag für Tarif und Gerät zusammen (1&1) läuft über den ganzen Horizont."""
     s = _baue(tmp_path)
     geprueft = 0
     for zeile in _zeilen_mit_zwei_preisen(s):
@@ -272,6 +274,10 @@ def test_die_paradox_zeile_nennt_den_zeitraum_ihrer_raten(tmp_path):
         label_monate = re.search(r"über (\d+) Monate", label.get_text(" ", strip=True))
         assert label_monate, label.get_text(" ", strip=True)
         monate = label_monate.group(1)
+        if "für Tarif und Gerät zusammen" not in bau_fluss and int(monate) > 24:
+            monate = "24"
+            basis = zeile.select_one(".gr-kk-basis")
+            assert basis is not None and "Monat 25–" in vorlage_text(basis), fluss
         if "Geräteraten plus" in fluss:
             geprueft += 1
             assert raten, f"Bau-Satz ohne Ratenzahl: {bau_fluss!r}"

@@ -89,9 +89,10 @@
        Raten und den Tarif ueber H Monate. #}
     <span class="gr-bnd-tarif">{{ k.tarif }}{% if k.band_gb_text %} ·
       {{ k.band_gb_text }}{% endif %}{% if k.raten_laufzeit %} · <span
-      class="gr-bnd-raten">{{ k.raten_laufzeit }} {{ kurzraten
-      }}{% if k.tarif_bindung %} · Tarif {{ k.tarif_bindung }} Monate{% endif
-      %}</span>{% endif %}</span>
+      class="gr-bnd-raten">{% if k.buendel_monatlich is not none and k.laufzeit
+      and k.raten_laufzeit and k.laufzeit < k.raten_laufzeit %}{{ k.laufzeit }} Monate + Ablöse{% else
+      %}{{ k.raten_laufzeit }} {{ kurzraten }}{% if k.tarif_bindung %} · Tarif {{
+      k.tarif_bindung }} Monate{% endif %}{% endif %}</span>{% endif %}</span>
     {# DIE TCO TRAEGT IHRE LAUFZEIT IM ETIKETT (A5.1) - eine unbeschriftete
        Gesamtsumme ist ueber zwei Bindungsdauern nicht lesbar. #}
     {# P3-E3: der UEBERHANG - die groesste nicht eingerechnete Aktion
@@ -224,23 +225,25 @@
     <p class="gr-kk-paradox">„mit Tarif“ = alle {% if k.raten_laufzeit
       %}{{ k.raten_laufzeit }} Geräteraten{% else %}Geräteraten (<span
       class="gr-t-luecke">Anzahl nicht gemessen</span>){% endif %}
-    plus {{ k.laufzeit }} Monate
+    plus {{ k.tarif_monate if k.tarif_monate is not none
+      else k.laufzeit }} Monate
     Tarif – deshalb ein anderer Betrag als die
     Finanzierung gesamt</p>
     {% elif k.geraetepreis is not none %}
     {# P0-B-fix2: der Zeitraum, den die Zahl traegt (`leitzahl_monate`) -
        bei einem zusammengelegten Buendelmonatspreis ueber 36 Monate sind
-       in "mit Tarif" 36 Monate Tarif enthalten, nicht 24. #}
-    <p class="gr-kk-paradox">„mit Tarif“ = Gerät + {{ k.leitzahl_monate }}
+       in "mit Tarif" 36 Monate Tarif enthalten, sonst hoechstens 24. #}
+    <p class="gr-kk-paradox">„mit Tarif“ = Gerät + {{ k.tarif_monate if
+    k.tarif_monate is not none else k.leitzahl_monate }}
     Monate Tarif – deshalb ein anderer Betrag als der Gerätepreis allein</p>
     {% endif %}
     {# WORAUS DAS Ø BESTEHT, steht daneben - sonst vergleicht jemand zwei
-       Ø-Werte, in denen verschieden viele Tarifmonate stecken. Seit A1
-       rechnet die Leitzahl IMMER {{ k.laufzeit }} Monate Tarif; bindet der
-       Tarif laenger, sagt das diese Zeile. #}
-    {% if k.tarif_bindung and k.laufzeit and k.tarif_bindung != k.laufzeit %}
-    <p class="gr-kk-basis">der Tarif bindet {{ k.tarif_bindung }} Monate –
-    gerechnet sind {{ k.laufzeit }} Monate Tarif</p>
+       Ø-Werte, in denen verschieden viele Tarifmonate stecken. Laufen die
+       Raten laenger als der Tarif, sagt diese Zeile, ab wann nur die Rate
+       zaehlt (Antonio 10.10.2026). #}
+    {% if k.tarif_monate and k.laufzeit and k.tarif_monate < k.laufzeit %}
+    <p class="gr-kk-basis">Tarif {{ k.tarif_monate }} Monate – Monat {{
+    k.tarif_monate + 1 }}–{{ k.laufzeit }} nur die Rate</p>
     {% endif %}
 
     {# P0-B-z2, MITNEHMEN: auch hier fiel die Laufzeit des EINEN
@@ -255,7 +258,10 @@
     <p class="gr-kk-bau">{% if k.buendel_monatlich is not none %}monatlich {{
       k.buendel_monatlich | euro }} für Tarif und Gerät zusammen · {% if
       k.raten_laufzeit %}{{ k.raten_laufzeit }} Monate{% else %}<span
-      class="gr-t-luecke">Laufzeit nicht gemessen</span>{% endif %}{% if k.zuzahlung is not none %} · Gerät
+      class="gr-t-luecke">Laufzeit nicht gemessen</span>{% endif %}{% if
+      k.zuzahlung is not none and k.laufzeit and k.raten_laufzeit
+      and k.raten_laufzeit and k.laufzeit < k.raten_laufzeit %} · gerechnet {{ k.laufzeit }} Monate,
+      dann Ablöse {{ k.zuzahlung | euro }}{% elif k.zuzahlung is not none %} · Gerät
       einmalig {{ k.zuzahlung | euro }}{% endif %}{% if k.anschlusspreis is not
       none %} · Anschlusspreis {{ k.anschlusspreis | euro }}{% endif %}{% else
       %}monatlich {{ k.monatlich | euro }}{% if k.zuzahlung is not none %} ·
@@ -384,8 +390,10 @@
       k.tarif_bindung and k.raten_laufzeit and k.tarif_bindung !=
       k.raten_laufzeit %} – der Tarif bindet {{ k.tarif_bindung }} Monate, die
       {{ raten_wort }} laufen {{ k.raten_laufzeit }}{% endif %}. Enthalten sind
-      alle fest anfallenden Kosten, auch alle {{ raten_wort }} der eigenen
-      Laufzeit. Nicht enthalten sind Versand,
+      alle fest anfallenden Kosten, {% if k.buendel_monatlich is not none
+      and k.laufzeit and k.raten_laufzeit and k.laufzeit < k.raten_laufzeit %}auch die Ablöse nach
+      Monat {{ k.laufzeit }}{% else %}auch alle {{ raten_wort }} der eigenen
+      Laufzeit{% endif %}. Nicht enthalten sind Versand,
       Nutzungsentgelte über den Tarif hinaus und jeder Bonus, der hier nicht
       beim Namen steht.</p>
     {% endif %}

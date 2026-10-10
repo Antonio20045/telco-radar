@@ -194,26 +194,27 @@ def test_ein_36_raten_buendel_erscheint_nicht_in_der_24er_ansicht(_basis):
     with _oeffne(_basis) as s:
         zeilen = _zeilen(s)
         assert not [z for z in zeilen if not z["raten"].startswith("24 ")], zeilen
-        assert {"Telekom", "1&1"}.isdisjoint(z["anbieter"] for z in zeilen)
+        assert "Telekom" not in {z["anbieter"] for z in zeilen}
         assert _euro(SOLL[36]["congstar"]) not in s.inner_text("#tafel-tco")
         _waehle(s, "36")
         assert _euro(SOLL[36]["congstar"]) in s.inner_text("#tafel-tco")
 
 
-def test_1und1_steht_in_keinem_laufzeitvergleich(_basis):
+def test_1und1_steht_unter_24_monaten_mit_delta(_basis):
     """Ein Betrag für Tarif und Gerät über 36 Monate wird nur über 24 Monate
-    verglichen (Antonio 10.10.2026): keine 1&1-Zeile unter 24 oder 36, die
-    36er-Ansicht nennt den Grund, unter „alle“ steht die Zeile ohne Δ."""
+    verglichen (Antonio 10.10.2026): 24 Beträge plus Ablöse stehen unter 24 mit
+    Δ gegen Vodafone 24, die 36er-Ansicht nennt den Grund."""
     with _oeffne(_basis, "?laufzeit=36") as s:
         assert _gedrueckt(s) == ["36"]
         assert not [z for z in _zeilen(s) if z["anbieter"] == "1&1"]
         assert _fehlend(s).get("1&1", "").startswith("Nur über 24 Monate verglichen")
         _waehle(s, "24")
-        assert not [z for z in _zeilen(s) if z["anbieter"] == "1&1"]
-        assert _fehlend(s).get("1&1", "").startswith("Mit 24 Raten nicht erfasst")
-        _waehle(s, "alle")
         eins = [z for z in _zeilen(s) if z["anbieter"] == "1&1"]
-        assert [(z["lz"], z["deltaSichtbar"]) for z in eins] == [("alle", "hidden")]
+        assert [float(z["gesamt"]) for z in eins] == [SOLL[24]["1&1"]], eins
+        assert eins[0]["raten"].startswith("24 Monate + Ablöse"), eins
+        assert eins[0]["deltaSichtbar"] == "visible"
+        delta = " ".join(eins[0]["delta"].split())
+        assert delta.startswith(f"−{_euro(SOLL[24]['Vodafone'] - SOLL[24]['1&1'])} €")
 
 
 @pytest.mark.parametrize("laufzeit", [12, 24, 36])
@@ -257,10 +258,9 @@ def test_alle_gruppiert_die_zeilen_ohne_sieger_und_ohne_delta(_basis):
         assert _antwort(s) == ALLE_TEXT
         assert s.query_selector("#gr-zr-gruppe .gr-leit-zahl") is None
         zeilen = _zeilen(s)
-        folge = [int(z["lz"]) for z in zeilen if z["lz"] != "alle"]
+        folge = [int(z["lz"]) for z in zeilen]
         assert folge == sorted(folge) and set(folge) == {12, 24, 36}, folge
         assert len(folge) == sum(len(v) for v in SOLL.values()), zeilen
-        assert [z["anbieter"] for z in zeilen if z["lz"] == "alle"] == ["1&1"]
         assert {z["deltaSichtbar"] for z in zeilen} == {"hidden"}
         koepfe = s.evaluate("""() => [...document.querySelectorAll(
             '#gr-bndliste .gr-bnd-lzkopf')].filter(k => !k.hidden).map(k => [
@@ -270,7 +270,6 @@ def test_alle_gruppiert_die_zeilen_ohne_sieger_und_ohne_delta(_basis):
             ["12 Raten", "12"],
             ["24 Raten", "24"],
             ["36 Raten", "36"],
-            ["andere Laufzeit", "alle"],
         ]
         assert "ab" not in _kachelpreis(s), "unter „alle“ kein ab-Preis"
         _waehle(s, "24")
@@ -413,10 +412,32 @@ def test_kriterium_11_haelt_an_der_gerenderten_seite(_basis):
     seite = BeautifulSoup(_laden(basis, "geraete.html"), "html.parser")
     tafel = seite.select_one("#tafel-tco")
     mit_zahl = tafel.select(".gr-bnd[data-gesamt]:not([data-gesamt=''])")
-    assert len(mit_zahl) == sum(len(v) for v in SOLL.values()) + 1, len(mit_zahl)
+    assert len(mit_zahl) == sum(len(v) for v in SOLL.values()), len(mit_zahl)
     assert portal.zeitraum_maengel(tafel) == []
     for etikett in tafel.select(".gr-bnd-tco .gr-bnd-label"):
         etikett.decompose()
     assert portal.zeitraum_maengel(tafel) == [
         f"{len(mit_zahl)} Bündelzeilen ohne 'über H Monate'"
     ]
+
+
+def test_die_36er_zeile_sagt_ab_wann_nur_die_rate_zaehlt(_basis):
+    """Antonio 10.10.2026: der Rechenweg einer 36-Raten-Zeile nennt 24 Monate
+    Tarif und „Monat 25–36 nur die Rate“, nicht 36 Monate Tarif. Gegenprobe:
+    die 24er-Zeilen tragen den Satz nicht, 1&1 (ein Betrag) auch nicht."""
+    _browser, basis = _basis
+    seite = BeautifulSoup(_laden(basis, "geraete.html"), "html.parser")
+    gesehen = set()
+    for zeile in seite.select("#tafel-tco .gr-bnd[data-gesamt]"):
+        text = " ".join(
+            "".join(t.decode_contents() for t in zeile.select("template")).split()
+        )
+        text = " ".join(re.sub(r"<[^>]+>", " ", text).split())
+        satz = "Tarif 24 Monate – Monat 25–36 nur die Rate"
+        if zeile["data-laufzeit"] == "36" and zeile["data-anbieter"] != "1&1":
+            gesehen.add(zeile["data-anbieter"])
+            assert satz in text, (zeile["data-anbieter"], text[:400])
+            assert "36 Monate Tarif" not in text, text[:400]
+        else:
+            assert "nur die Rate" not in text, (zeile["data-anbieter"], text[:400])
+    assert gesehen >= {"congstar", "Telekom", "Vodafone"}, gesehen

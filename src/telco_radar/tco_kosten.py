@@ -5,7 +5,7 @@ die Raten laufen weiter):
 
     Kosten über H Monate = Anzahlung + Anschluss + N Geräteraten
                          + Tarif in jedem Monat 1 bis T zum Preis seiner Phase
-    ein Vertrag (1&1):   = Anzahlung + Anschluss + H × Bündelbetrag
+    ein Vertrag (1&1):   = Anschluss + 24 × Bündelbetrag + Ablöse nach Monat 24
 
 H ist der größere Wert aus Ratenlaufzeit N und Tarifbindung (`zeitraum`), T der
 kleinere aus H und den Tarifmonaten (`tarifmonate`, höchstens 24 nach § 56 TKG):
@@ -16,6 +16,11 @@ gilt für eine einzige Phase ab Monat 1 ohne Ende (`belegte_phasen`). Fehlt
 ein Posten oder der Preis eines Monats, ist `Kosten.gesamt` None und die Lücke
 benannt; Boni und Aktionen gehen nie ein, eingerechnete Aktionen stecken schon in der
 gemessenen Rate. Für H = 24 ist es dieselbe Zahl wie `tco_24`.
+
+Ein Vertrag über mehr als 24 Monate (1&1 „24+12“) wird über 24 Monate gerechnet
+(Antonio, 10.10.2026): Tarif nach Monat 24 gekündigt, Gerät behalten. Seine
+`geraet_zuzahlung` ist dann die Ablöse nach Monat 24, keine Anzahlung; ohne sie ist
+die Zahl die Lücke `POSTEN_EINMALZAHLUNG`.
 
 `tco_model` reexportiert `Kosten`, `kosten_ueber` und `zeitraum` und lädt dieses Modul
 dafür beim eigenen Laden. Die Namen aus `tco_model` liest dieses Modul deshalb erst
@@ -43,12 +48,14 @@ SCHRITT_ANSCHLUSS = "anschluss"
 SCHRITT_BARPREIS = "barpreis"
 SCHRITT_MONAT = "monat"
 SCHRITT_NUR_GERAET = "nur_geraet"
+SCHRITT_ABLOESE = "abloese"
 REIHENFOLGE_SCHRITTE = (
     SCHRITT_BARPREIS,
     SCHRITT_GERAET,
     SCHRITT_VERTRAG,
     SCHRITT_TARIF,
     SCHRITT_ANZAHLUNG,
+    SCHRITT_ABLOESE,
     SCHRITT_ANSCHLUSS,
 )
 
@@ -78,7 +85,8 @@ class Kosten:
     Schnitt über H, `posten` Name → Betrag in der Reihenfolge von `tco_24`.
     `rechnung` sind dieselben Posten als Summanden (Gerät, Tarif, einmalig, ohne
     Nullbeträge); ihre Summe ist `gesamt`. Ohne `gesamt` stehen darin nur die
-    gemessenen Posten, die fehlenden nennt `luecken`.
+    gemessenen Posten, die fehlenden nennt `luecken`. `tarifmonate` sind die Monate
+    mit Tarif in der Zahl (`tarifmonate`; ein Bündelbetrag läuft über H).
     """
 
     gesamt: float | None = None
@@ -88,6 +96,7 @@ class Kosten:
     posten: dict[str, float] = field(default_factory=dict)
     luecken: list[str] = field(default_factory=list)
     rechnung: list[Rechenschritt] = field(default_factory=list)
+    tarifmonate: int | None = None
 
 
 def zeitraum(buendel: Buendel) -> int | None:
@@ -97,6 +106,8 @@ def zeitraum(buendel: Buendel) -> int | None:
     Bündel ein Gerät hat und seine Ratenlaufzeit fehlt, oder wenn ohne Gerät und ohne
     Mindestlaufzeit kein Monat bleibt.
     """
+    if _mit_abloese(buendel, ZEITRAUM_OHNE_BINDUNG):
+        return ZEITRAUM_OHNE_BINDUNG
     bindung = buendel.tarif_bindung_monate
     laengen = [ZEITRAUM_OHNE_BINDUNG if bindung is None else bindung]
     if not buendel.ohne_geraet:
@@ -155,10 +166,9 @@ def _vertrag(k: Kosten, betrag: float, laufzeit: int | None, h: int) -> None:
     """Ein Monatsbetrag für Tarif und Gerät, belegt für die Vertragslaufzeit N."""
     from .tco_model import POSTEN_BUENDEL, POSTEN_LAUFZEIT
 
+    k.tarifmonate = h
     if laufzeit is None:
         k.luecken.append(POSTEN_LAUFZEIT)
-    elif h < laufzeit:
-        k.luecken.append(POSTEN_EINMALZAHLUNG)
     elif h > laufzeit:
         k.luecken.append(f"{POSTEN_BUENDEL} Monat {_spanne(laufzeit + 1, h)}")
     else:
@@ -182,7 +192,7 @@ def _tarif(k: Kosten, buendel: Buendel, h: int) -> None:
     if not phasen:
         k.luecken.append(POSTEN_TARIF)
         return
-    t = min(h, tarifmonate(buendel))
+    t = k.tarifmonate = min(h, tarifmonate(buendel))
     offen = [m for m in range(1, t + 1) if _preise_im_monat(phasen, m) != 1]
     k.luecken += [f"{POSTEN_TARIF} Monat {s}" for s in _spannen(offen)]
     summe = None if offen else phasensumme(phasen, t)
@@ -325,7 +335,9 @@ def _geraet_und_anschluss(k: Kosten, buendel: Buendel) -> None:
         POSTEN_ZUZAHLUNG,
     )
 
-    if not buendel.ohne_geraet:
+    if _mit_abloese(buendel, k.monate):
+        _posten(k, POSTEN_EINMALZAHLUNG, buendel.geraet_zuzahlung, SCHRITT_ABLOESE)
+    elif not buendel.ohne_geraet:
         _posten(k, POSTEN_ZUZAHLUNG, buendel.geraet_zuzahlung, SCHRITT_ANZAHLUNG)
     if not buendel.ohne_geraet and buendel.buendel_monatlich is None:
         rate, laufzeit = buendel.geraet_monatsrate, buendel.laufzeit_monate
@@ -338,6 +350,17 @@ def _geraet_und_anschluss(k: Kosten, buendel: Buendel) -> None:
             k.posten[f"Geräteraten über {laufzeit} Monate"] = summe
             k.rechnung.append(Rechenschritt(SCHRITT_GERAET, laufzeit, rate, summe))
     _posten(k, POSTEN_ANSCHLUSS, buendel.anschlusspreis, SCHRITT_ANSCHLUSS)
+
+
+def _mit_abloese(buendel: Buendel, h: int | None) -> bool:
+    """Ein Vertrag, der vor seinem Ende gerechnet wird: die Zuzahlung ist die Ablöse."""
+    laufzeit = buendel.laufzeit_monate
+    return (
+        buendel.buendel_monatlich is not None
+        and laufzeit is not None
+        and h is not None
+        and h < laufzeit
+    )
 
 
 def _posten(k: Kosten, name: str, betrag: float | None, art: str) -> None:

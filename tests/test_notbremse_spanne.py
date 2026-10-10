@@ -66,7 +66,9 @@ def test_spanne_nimmt_nur_karten_die_zaehlen(modelle):
 
 def test_schaetzungen_bleiben_zeilen_ausserhalb_der_spanne(modelle):
     """Gegenprobe: die Notbremse greift am Bestand, und sie leert die Spanne
-    nicht - die Schätzung bleibt Zeile, sie zählt nur nicht mit."""
+    nicht - die Schätzung bleibt Zeile, sie zählt nur nicht mit. Beim iPhone 17
+    Pro liegt sie seit 10.10.2026 innerhalb: 1&1 steht mit 24 Monaten plus
+    Ablöse in der Spanne und weitet sie."""
     mit_spanne = [m for m in modelle if m["spanne"]]
     ausserhalb = [
         m["id"]
@@ -80,6 +82,4 @@ def test_schaetzungen_bleiben_zeilen_ausserhalb_der_spanne(modelle):
     ]
     assert len(mit_spanne) >= 90, f"nur {len(mit_spanne)} Modelle mit Spanne"
     assert ausserhalb, "keine Schätzung außerhalb einer Spanne - Fall fehlt"
-    assert {"apple-iphone-17-pro-256", "samsung-galaxy-s25-fe-128"} <= set(
-        ausserhalb
-    ), ausserhalb
+    assert "samsung-galaxy-s25-fe-128" in ausserhalb, ausserhalb

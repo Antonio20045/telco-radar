@@ -273,23 +273,19 @@ def test_zwei_farben_derselben_laufzeit_bleiben_eine_zeile():
     assert len(cs) == 1, "zwei Farben sind EIN Angebot"
 
 
-def test_ein_buendelmonatspreis_ueber_36_monate_nennt_seinen_zeitraum():
-    """Befund 3a: 340,00 + 36 × 42,99 + 39,90 = 1.927,54 EUR sind KEINE
-    "Kosten über 24 Monate" - in dieser Summe stecken 36 Monate Tarif und
-    Geraet zusammen.
-
-    Gegen den alten Stand rot: `label` war die Konstante "Kosten über 24
-    Monate" fuer jede Karte.
-    """
+def test_ein_buendelmonatspreis_ueber_36_monate_zaehlt_24_monate_und_abloese():
+    """Antonio 10.10.2026: 1&1 wird nur über 24 Monate verglichen. 24 × 42,99 +
+    340,00 Ablöse + 39,90 = 1.411,66 EUR „Kosten über 24 Monate“, nicht mehr
+    340,00 + 36 × 42,99 + 39,90 = 1.927,54 EUR über 36 Monate."""
     modell = _modell([_einsundeins(), _vodafone()])
     eins = next(k for k in modell["karten"] if k["anbieter"] == "1&1")
-    assert eins["belastbar"] and eins["gesamt"] == 1927.54
-    assert eins["leitzahl_monate"] == 36
-    assert eins["label"] == "Kosten über 36 Monate"
+    assert eins["belastbar"] and eins["gesamt"] == 1411.66
+    assert eins["leitzahl_monate"] == 24
+    assert eins["label"] == "Kosten über 24 Monate"
     text = vorlage_text(zeile_html(eins))
-    assert "1.927,54 € Kosten über 36 Monate" in text, text
-    assert "Kosten über 24 Monate" not in text, text
-    assert "Gerechnet über 36 Monate" in text, text
+    assert "1.411,66 € Kosten über 24 Monate" in text, text
+    assert "24 Monate + Ablöse" in text, text
+    assert "Kosten über 36 Monate" not in text, text
 
     vf = next(
         k for k in modell["karten"] if k["anbieter"] == "Vodafone" and k["sku_id"]
@@ -298,60 +294,19 @@ def test_ein_buendelmonatspreis_ueber_36_monate_nennt_seinen_zeitraum():
     assert vf["label"] == "Kosten über 24 Monate"
 
 
-def test_ueber_zwei_zeitraeume_steht_der_zustand_statt_eines_vorzeichens():
-    """Befund 3b: das Delta gegen die 24-Monats-Referenz wird fuer so ein
-    Buendel NICHT als Zahl gefuehrt.
-
-    Die Unvergleichbarkeit ist GROESSER als der Abstand: 12 × 42,99 =
-    515,88 EUR liegen jenseits des Horizonts, davon nach dem Tarifstamm
-    mindestens 12 × 14,99 = 179,88 EUR reiner Tarif - gegen ein
-    ausgewiesenes Delta von 79,74 EUR. Ein Vorzeichen, das nicht belegt
-    ist, wird nicht angezeigt (Clean Code 4).
-
-    Gegen den alten Stand rot: dort stand ein Δ mit Vorzeichen (bis B1 ein
-    Euro-Betrag, danach der Ø/Monat-Abstand - beide aus zwei Summen
-    verschiedener Zeitraeume).
-
-    Seit Datenkonzept Geräte Schritt 2 rechnet auch congstar mit 36 Raten über
-    36 Monate (1 + 24 × 15,00 + 36 × 25,50 = 1.279,00 EUR) und trägt kein Δ
-    gegen die 24-Monats-Referenz; die Gegenprobe mit Vorzeichen ist congstar mit
-    24 Raten.
-
-    Teil B: verglichen wird nur innerhalb einer Ratenlaufzeit. 1&1 trägt den
-    Tarif bis Monat 36 und wird nur über 24 Monate verglichen (Antonio,
-    10.10.2026): der Zustand heißt „nur 24 Monate“ - weiter ohne Vorzeichen.
-    """
+def test_1und1_steht_nicht_mehr_ueber_zwei_zeitraeume():
+    """Befund 3b galt, solange 1&1 über 36 Monate rechnete: gegen die
+    24-Monats-Referenz stand kein Vorzeichen. Seit 1&1 nur über 24 Monate
+    verglichen wird (Antonio 10.10.2026), ist seine Zahl in der 24er-Ansicht;
+    ohne Tarifband trägt es den Grund „Vodafone nicht erfasst“, nie „andere
+    Laufzeit“."""
     modell = _modell([_einsundeins(), _vodafone()])
     eins = next(k for k in modell["karten"] if k["anbieter"] == "1&1")
-    assert eins["delta"] is None, "kein Betrag ueber zwei Zeitraeume"
-    assert eins["delta_zustand"]["kurz"] == "nur 24 Monate"
-    assert "nur über 24 Monate verglichen" in eins["delta_zustand"]["satz"]
-
-    zeile = zeile_html(eins)
-    zelle = zeile.select_one(".gr-bnd-delta")
-    assert zelle.get_text(strip=True) == "nur 24 Monate"
-    assert "gr-bnd-delta--wert" not in (zelle.get("class") or [])
-    assert zeile.select_one(".gr-bnd")["data-delta"] == ""
-    assert "über der Vodafone-Referenz" not in vorlage_text(zeile)
-    assert "unter der Vodafone-Referenz" not in vorlage_text(zeile)
-    assert zeile.select_one(".gr-kk-delta") is None
-    assert (
-        vorlage_text(zeile.select_one(".gr-kk-luecke")) == eins["delta_zustand"]["satz"]
-    )
-
-    sechsunddreissig = _modell([_congstar(36, 25.5), _vodafone()])
-    cs36 = next(k for k in sechsunddreissig["karten"] if k["anbieter"] == "congstar")
-    assert cs36["leitzahl_monate"] == 36 and cs36["gesamt"] == 1279.0
-    assert cs36["delta"] is None, "36 Raten stehen nie gegen eine 24-Monats-Zahl"
-
-    modell2 = _modell([_congstar(24, 38.25), _vodafone()])
-    cs = next(k for k in modell2["karten"] if k["anbieter"] == "congstar")
-    assert cs["leitzahl_monate"] == 24
-    assert cs["delta_zustand"] is None
-    assert cs["delta"]["betrag"] is not None
-    assert cs["delta"]["gleiche_laufzeit"] is True
-    zeile2 = zeile_html(cs)
-    assert zeile2.select_one(".gr-bnd")["data-delta"] == str(cs["delta"]["betrag"])
+    assert eins["delta"] is None
+    assert eins["delta_zustand"]["kurz"] == "Vodafone nicht erfasst"
+    zelle = zeile_html(eins).select_one(".gr-bnd-delta")
+    assert zelle.get_text(strip=True) == "Vodafone nicht erfasst"
+    assert zeile_html(eins).select_one(".gr-bnd")["data-lz"] == "24"
 
 
 def test_eine_listung_ohne_laufzeit_bekommt_keine_geratene_24():

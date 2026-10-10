@@ -50,6 +50,7 @@ import re
 from datetime import date as _datum
 from typing import Optional
 
+from .. import tco_kosten as _kosten
 from ..geraete_model import VERGLEICHBARE_ZUSTAENDE, ZUSTAENDE, normalisiere
 from ..tarif_model import QUELLE_KLICK, Preisphase, vor_dem_blatt
 from ..tco_kosten import POSTEN_ZEITRAUM, belegte_phasen, tarifpreis_im_monat
@@ -510,12 +511,11 @@ def buendel_aus_listungen(listungen: list) -> list[Buendel]:
 
 
 def _bestandteile_mit_kategorie(posten_je_name: dict) -> list:
-    """Die Posten von `kosten_ueber` (Name -> Betrag, in Rechenreihenfolge) mit
-    ihrer Kostenart, als Liste fuer Zerlegungsbalken und Rechenweg - Formatierung,
-    keine zweite Rechnung."""
+    """Die Posten von `kosten_ueber` mit Kostenart - Formatierung, keine Rechnung."""
     posten = []
+    einmalig = (POSTEN_ZUZAHLUNG, POSTEN_ANSCHLUSS, _kosten.POSTEN_EINMALZAHLUNG)
     for name, betrag in posten_je_name.items():
-        if name in (POSTEN_ZUZAHLUNG, POSTEN_ANSCHLUSS):
+        if name in einmalig:
             kat = "einmalig"
         elif name.startswith(POSTEN_BUENDEL):
             kat = "buendel"
@@ -721,7 +721,7 @@ def _karte(
         "label": label_der_leitzahl(monate),
         "laufzeit": monate,
         "leitzahl_monate": monate,
-        "ab_monat": AB_MONAT,
+        "tarif_monate": kosten.tarifmonate,
         "tarif_bindung": b.tarif_bindung_monate,
         "raten_laufzeit": geraete_laufzeit.raten_laufzeit(b),
         "belastbar": belastbar,
@@ -808,7 +808,7 @@ def _leere_karte(anbieter: str, grund: str = "") -> dict:
         "label": "",
         "laufzeit": None,
         "leitzahl_monate": None,
-        "ab_monat": None,
+        "tarif_monate": None,
         "belastbar": False,
         "gesamt": None,
         "schnitt_monat": None,
@@ -1068,7 +1068,7 @@ def _referenzkarte(ref: dict, heute: str = "") -> dict:
             "tarif": ref["tarif"],
             "tarif_id": ref.get("tarif_id", ""),
             "label": label_der_leitzahl(ref["tarif_monate"]),
-            "ab_monat": AB_MONAT,
+            "tarif_monate": ref["tarif_monate"],
             "laufzeit": ref["tarif_monate"],
             "leitzahl_monate": ref["tarif_monate"],
             "fenster": ref["monate"],
@@ -1150,13 +1150,13 @@ def gleicher_horizont(karte: dict, referenz: Optional[dict]) -> bool:
 
     DAS EINE TOR: Euro-Delta (`_delta`), benannter Ersatzzustand
     (`delta_zustand`) und jeder Leser, der eine Kartenzeile gegen die Referenz
-    stellt, fragt diese Funktion. Datenkonzept Geraete Schritt 2: 12 und 24
-    Raten rechnen beide 24 Monate und werden trotzdem nicht verglichen - die
-    Ratenlaufzeit der Zeile muss die Ansicht der Referenz sein
-    (`referenz["ansicht"]`; die Naeherung gehoert zur 24er-Ansicht), und der
-    Zeitraum beider Zahlen gleich (`tco_model.zeitraum_vergleichbar`).
+    stellt, fragt diese Funktion. 12 und 24 Raten rechnen beide 24 Monate und
+    werden nicht verglichen: gleich sein muessen die Ansicht (`ansicht`, die der
+    Referenz in `referenz["ansicht"]`) und der Zeitraum beider Zahlen.
     """
-    if referenz is None or karte.get("raten_laufzeit") != referenz.get("ansicht"):
+    from . import geraete_laufzeit
+
+    if referenz is None or geraete_laufzeit.ansicht(karte) != referenz.get("ansicht"):
         return False
     return zeitraum_vergleichbar(karte.get("leitzahl_monate"), referenz.get("monate"))
 

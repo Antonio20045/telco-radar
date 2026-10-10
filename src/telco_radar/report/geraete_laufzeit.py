@@ -22,8 +22,6 @@ LAUFZEIT_STANDARD = karten_modul.LAUFZEIT_STANDARD
 NICHT_ERFASST = "nicht erfasst"
 DELTA_VF_NICHT_ERFASST = "Vodafone nicht erfasst"
 DELTA_VF_OHNE_ZAHL = "Vodafone ohne Zahl"
-NUR_24 = "nur 24 Monate"
-NUR_24_SATZ = "darum nur über 24 Monate verglichen"
 ALLE = "alle"
 ALLE_TEXT = (
     "Über alle Laufzeiten gibt es keinen Sieger: verglichen wird nur innerhalb "
@@ -61,9 +59,9 @@ def nur_ueber_24(karte: dict) -> bool:
     """Ein Betrag für Tarif und Gerät (1&1) über mehr als 24 Monate.
 
     Antonio, 10.10.2026: die anderen rechnen ab Monat 25 nur die Rate, weil der
-    Tarif dann kündbar ist; 1&1 trägt den Tarif bis zur letzten Rate. Das wäre
-    ein Vergleich mit zwölf Tarifmonaten mehr, also wird 1&1 nur über 24
-    Monate verglichen.
+    Tarif dann kündbar ist; 1&1 trägt den Tarif bis zur letzten Rate. Also wird
+    1&1 nur über 24 Monate verglichen: 24 Bündelbeträge plus Ablöse, in der
+    24er-Ansicht (`tco_kosten.zeitraum`).
     """
     return (
         karte.get("buendel_monatlich") is not None
@@ -86,15 +84,16 @@ def fehlt_satz(anbieter: str, karten: list, laufzeit: int) -> str:
 def ansicht(karte: dict) -> int | None:
     """Die Laufzeit-Ansicht, in der diese Karte steht, oder `None`.
 
-    Eine Karte ohne Ratenlaufzeit, mit einer, die die Seite nicht als Ansicht
-    führt, oder `nur_ueber_24` steht nur unter „alle“ und in keinem Vergleich
-    (Clean Code 4).
+    Eine Karte ohne Ratenlaufzeit oder mit einer, die die Seite nicht als Ansicht
+    führt, steht nur unter „alle“ und in keinem Vergleich (Clean Code 4);
+    `nur_ueber_24` steht unter 24, ebenso weniger als 12 Raten (Telekom 6): der
+    Tarif bindet 24 Monate, die Zahl trägt 24 Monate.
     """
-    if karte.get("naeherung"):
+    if karte.get("naeherung") or nur_ueber_24(karte):
         return LAUFZEIT_STANDARD
-    if nur_ueber_24(karte):
-        return None
     laufzeit = karte.get("raten_laufzeit")
+    if laufzeit is not None and 0 < laufzeit < LAUFZEITEN[0]:
+        return LAUFZEIT_STANDARD
     return laufzeit if laufzeit in LAUFZEITEN else None
 
 
@@ -159,11 +158,6 @@ def _ohne_referenz(karte: dict, karten: list) -> dict | None:
     if gesperrt := notbremse.zustand(karte):
         return gesperrt
     band, laufzeit = gruppe(karte)
-    if nur_ueber_24(karte):
-        return {
-            "kurz": NUR_24,
-            "satz": f"Kein Abstand: Tarif und Gerät in einem Betrag, {NUR_24_SATZ}.",
-        }
     if laufzeit is None:
         return {
             "kurz": karten_modul.DELTA_ANDERE_LAUFZEIT,

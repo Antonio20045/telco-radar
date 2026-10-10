@@ -11,13 +11,14 @@ Rechnung aus den Rohwerten im Test, nicht aus dem Produktcode:
   24 Raten (H 24): congstar 1 + 24 × 15 + 24 × 38,25 = 1.279,00
                    o2       1 + 24 × 25 + 24 × 40 = 1.561,00
                    Vodafone 1 + 24 × 29,95 + 24 × 45 = 1.799,80
+                   1&1      24 × 42,99 + 340 Ablöse + 39,90 = 1.411,66
   36 Raten (H 36): congstar 1 + 24 × 15 + 36 × 26 = 1.297,00
                    Telekom  1 + 24 × 20 + 36 × 31 = 1.597,00
                    Vodafone 1 + 24 × 29,95 + 36 × 31 = 1.835,80
 
 Der Tarif zählt nur seine 24 Monate, ab Monat 25 nur die Rate; 1&1 (Tarif und
-Gerät in einem Betrag, 340 + 39,90 + 36 × 42,99 = 1.927,54) wird nur über 24
-Monate verglichen und steht in keiner 36er-Rechnung (Antonio, 10.10.2026).
+Gerät in einem Betrag über 36 Monate) wird nur über 24 Monate verglichen: 24
+Beträge plus Ablöse, in der 24er-Ansicht (Antonio, 10.10.2026).
 
 Vor Teil B stellte die 12er-Karte von congstar den Sieger der 24-Monats-Tafel,
 Δ rechnete gegen die günstigste Vodafone-Karte über alle Laufzeiten, und 1&1
@@ -40,6 +41,7 @@ from tarifleiter_testbestand import mit_leiter
 from telco_radar.geraete_config import lade_katalog, lade_quellen
 from telco_radar.report import (
     geraete_export,
+    geraete_laufzeit,
     geraete_radar,
     geraete_tco_karten,
     geraete_view,
@@ -72,7 +74,7 @@ GETRENNT = (
 
 SOLL = {
     12: {"congstar": 1201.0, "Vodafone": 1679.8},
-    24: {"congstar": 1279.0, "o2": 1561.0, "Vodafone": 1799.8},
+    24: {"congstar": 1279.0, "o2": 1561.0, "Vodafone": 1799.8, "1&1": 1411.66},
     36: {"congstar": 1297.0, "Telekom": 1597.0, "Vodafone": 1835.8},
 }
 
@@ -320,7 +322,7 @@ def _karte(g, anbieter, laufzeit):
     return next(
         k
         for k in karten
-        if k["anbieter"] == anbieter and k["raten_laufzeit"] == laufzeit
+        if k["anbieter"] == anbieter and geraete_laufzeit.ansicht(k) == laufzeit
     )
 
 
@@ -360,17 +362,18 @@ def test_ein_36_raten_buendel_steht_nicht_in_der_24er_ansicht(g):
     assert _rund(1597.0) in sechsunddreissig["svg_breit"]
 
 
-def test_die_36er_ansicht_vergleicht_1und1_nicht():
+def test_1und1_wird_ueber_24_monate_gegen_vodafone_24_verglichen():
     """?laufzeit=36: Telekom trägt Δ gegen die Vodafone-Karte mit 36 Raten im selben
-    Band (1.597,00 − 1.835,80 = −238,80). 1&1 trägt den Tarif bis Monat 36 und
-    wird nur über 24 Monate verglichen: kein Δ, der Grund steht benannt."""
+    Band (1.597,00 − 1.835,80 = −238,80). 1&1 wird nur über 24 Monate verglichen:
+    Δ gegen Vodafone mit 24 Raten (1.411,66 − 1.799,80 = −388,14)."""
     k = _karte_aus(bestand(), "Telekom", 36)
     assert k["delta"] is not None, k["delta_zustand"]
     assert k["delta"]["betrag"] == round(1597.0 - 1835.8, 2)
     assert k["delta_zustand"] is None
-    eins = _karte_aus(bestand(), "1&1", 36)
-    assert eins["delta"] is None
-    assert "nur über 24 Monate verglichen" in eins["delta_zustand"]["satz"]
+    eins = _karte_aus(bestand(), "1&1", 24)
+    assert eins["delta_zustand"] is None, eins["delta_zustand"]
+    assert eins["delta"]["betrag"] == round(1411.66 - 1799.8, 2)
+    assert eins["leitzahl_monate"] == 24
     cs12 = _karte_aus(bestand(), "congstar", 12)
     assert cs12["delta"]["betrag"] == round(1201.0 - 1679.8, 2)
 
@@ -407,7 +410,7 @@ def _karte_aus(buendel, anbieter, laufzeit):
     return next(
         k
         for k in modell["karten"]
-        if k["anbieter"] == anbieter and k["raten_laufzeit"] == laufzeit
+        if k["anbieter"] == anbieter and geraete_laufzeit.ansicht(k) == laufzeit
     )
 
 
@@ -436,15 +439,16 @@ def test_antwortsatz_und_grafikachse_nennen_die_laufzeit(g, laufzeit):
 
 
 def test_telekom_ist_in_der_24er_ansicht_nicht_erfasst(g):
-    """Telekom und 1&1 führen nur 36 Raten: in der 24er-Ansicht stehen sie
-    benannt als „nicht erfasst“ - nicht als „andere Laufzeit“ und nicht stumm."""
+    """Telekom führt nur 36 Raten: in der 24er-Ansicht steht sie benannt als
+    „nicht erfasst“ - nicht als „andere Laufzeit“ und nicht stumm. 1&1 steht
+    unter 24 mit Zahl und unter 36 mit seinem Grund."""
 
     def zustand(laufzeit: int) -> dict:
         return {f["anbieter"]: f["kurz"] for f in _paar(g, laufzeit)["fehlen"]}
 
     vier = zustand(24)
     assert vier["Telekom"].startswith("Mit 24 Raten nicht erfasst"), vier
-    assert vier["1&1"].startswith("Mit 24 Raten nicht erfasst"), vier
+    assert "1&1" not in vier, vier
     assert not any("andere Laufzeit" in k for k in vier.values()), vier
     zwoelf = zustand(12)
     assert zwoelf["o2"].startswith("Mit 12 Raten nicht erfasst"), zwoelf
@@ -510,6 +514,7 @@ def test_der_wettbewerbsradar_vergleicht_je_laufzeit(g):
     assert telekom["vf_gesamt"] == 1835.8
     assert telekom["prozent"] == round((1597.0 - 1835.8) / 1835.8 * 100, 1)
     assert ("1&1", 36) not in paare
+    assert paare[("1&1", 24)]["vf_gesamt"] == 1799.8
     assert paares_vf(paare, 24) == {1799.8}
     assert paares_vf(paare, 12) == {1679.8}
 

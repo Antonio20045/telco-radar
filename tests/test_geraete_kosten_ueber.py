@@ -234,26 +234,31 @@ def test_ein_zeitraum_unter_der_bindung_laesst_keine_tarifmonate_weg(
     assert kosten_ueber(b, 24).gesamt == tco_24(b).gesamt == 1961.80
 
 
-def test_ein_vertrag_zaehlt_h_mal_den_buendelbetrag():
-    """0 + 39,90 + 36 × 42,99 = 1.587,54 €, dieselbe Zahl wie `tco_24` für 1&1."""
+def test_ein_vertrag_ueber_36_monate_zaehlt_24_betraege_und_die_abloese():
+    """Antonio 10.10.2026, 1&1 nur über 24 Monate: 24 × 42,99 + Ablöse 0,00 +
+    39,90 = 1.071,66 €. Die Zuzahlung ist die Ablöse nach Monat 24."""
+    from telco_radar.tco_kosten import POSTEN_EINMALZAHLUNG
     from telco_radar.tco_model import kosten_ueber, zeitraum
 
     b = _einsundeins()
-    assert zeitraum(b) == 36
+    assert zeitraum(b) == 24
     k = kosten_ueber(b)
     assert k.posten == {
-        f"{POSTEN_BUENDEL} über 36 Monate": 1547.64,
-        POSTEN_ZUZAHLUNG: 0.00,
+        f"{POSTEN_BUENDEL} über 24 Monate": 1031.76,
+        POSTEN_EINMALZAHLUNG: 0.00,
         POSTEN_ANSCHLUSS: 39.90,
     }
-    assert (k.gesamt, k.monate, k.ratenlaufzeit) == (1587.54, 36, 36)
-    assert k.gesamt == tco_24(b).gesamt
-    assert k.monatlich == 44.10
+    assert (k.gesamt, k.monate, k.ratenlaufzeit) == (1071.66, 24, 36)
+    assert k.monatlich == 44.65
+    abloese = kosten_ueber(_einsundeins(geraet_zuzahlung=360.0))
+    assert abloese.gesamt == round(24 * 42.99 + 360.0 + 39.90, 2) == 1431.66
+    assert POSTEN_ZUZAHLUNG not in abloese.posten
 
 
 @pytest.mark.parametrize("monate", [24, 48])
 def test_ein_vertrag_ueber_einen_anderen_zeitraum_ist_eine_luecke(monate):
-    """Vor Monat 36 fehlt die Einmalzahlung bei Kündigung, nach Monat 36 der Preis."""
+    """Vor Monat 36 ohne gemessene Ablöse fehlt die Einmalzahlung bei Kündigung,
+    nach Monat 36 der Preis."""
     from telco_radar.tco_kosten import POSTEN_EINMALZAHLUNG
     from telco_radar.tco_model import kosten_ueber
 
@@ -261,8 +266,8 @@ def test_ein_vertrag_ueber_einen_anderen_zeitraum_ist_eine_luecke(monate):
         24: POSTEN_EINMALZAHLUNG,
         48: f"{POSTEN_BUENDEL} Monat 37–48",
     }[monate]
-    k = kosten_ueber(_einsundeins(), monate)
-    assert (k.gesamt, k.monate, k.luecken) == (None, monate, [erwartet])
+    k = kosten_ueber(_einsundeins(geraet_zuzahlung=None), monate)
+    assert (k.gesamt, k.monate) == (None, monate) and erwartet in k.luecken
     assert kosten_ueber(_einsundeins(), 36).gesamt == 1587.54
 
 
@@ -508,18 +513,22 @@ def test_eine_phase_ohne_ende_ist_der_grundpreis_der_bindung():
 
 
 def test_am_bestand_rechnet_ein_vertrag_seine_laufzeit_wie_tco_24():
-    """1&1: 36 × Bündelbetrag wie `tco_24`; ohne gemessene Anzahlung eine Lücke."""
+    """1&1 über 24 Monate (Antonio 10.10.2026): 24 × Bündelbetrag + Ablöse +
+    Anschluss; ohne gemessene Ablöse eine Lücke."""
+    from telco_radar.tco_kosten import POSTEN_EINMALZAHLUNG
     from telco_radar.tco_model import kosten_ueber
 
     vertraege = [b for b in _bestand() if b.buendel_monatlich is not None]
     vollstaendig = 0
     for b in vertraege:
-        k, t = kosten_ueber(b), tco_24(b)
-        assert (k.monate, k.ratenlaufzeit) == (36, 36), b.id
+        k = kosten_ueber(b)
+        assert (k.monate, k.ratenlaufzeit) == (24, 36), b.id
         if b.geraet_zuzahlung is None:
-            assert (k.gesamt, k.luecken) == (None, [POSTEN_ZUZAHLUNG]), b.id
-            assert POSTEN_ZUZAHLUNG in t.luecken, b.id
+            assert (k.gesamt, k.luecken) == (None, [POSTEN_EINMALZAHLUNG]), b.id
             continue
-        assert (k.gesamt, k.posten, k.luecken) == (t.gesamt, t.bestandteile, []), b.id
+        soll = round(
+            24 * b.buendel_monatlich + b.geraet_zuzahlung + b.anschlusspreis, 2
+        )
+        assert (k.gesamt, k.luecken) == (soll, []), b.id
         vollstaendig += 1
     assert (len(vertraege), vollstaendig) == (456, 75)

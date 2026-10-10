@@ -4,7 +4,7 @@ Sieger, Antwortsatz und Alternativ-Beträge der Zeitreihe nehmen nur Karten, die
 zählen: eine Schätzung oder ein Satz mit abgelaufener Aktion stellt nie den
 günstigsten Preis. Ein Band, in dem nur solche Karten stehen, bleibt wählbar und
 nennt den Grund. Das Rechenweg-Panel nennt den Zeitraum seiner Zahl mit demselben
-Etikett wie die Karten (1&1: „Kosten über 36 Monate“) und schreibt Monatsnamen
+Etikett wie die Karten (1&1: „Kosten über 24 Monate“) und schreibt Monatsnamen
 deutsch, auch unter englischem Locale. Gerendert aus dem Bestand vom 2026-10-03;
 der Bezugstag kommt aus dem Bestand, nie vom heutigen Datum.
 """
@@ -22,6 +22,7 @@ from bs4 import BeautifulSoup
 from telco_radar.config import load_config
 from telco_radar.geraete_config import lade_katalog, lade_quellen
 from telco_radar.report import geraete_view
+from telco_radar.report.geraete_laufzeit import ansicht
 from telco_radar.report.html import render_site
 
 HEUTE = "2026-10-03"
@@ -63,7 +64,7 @@ def gerendert(tmp_path_factory):
 @pytest.fixture(scope="module")
 def karten(tmp_path_factory):
     """Die Karten je (Modell, Band, Ratenlaufzeit) mit ``zaehlt`` aus dem
-    öffentlichen Eingang; die Näherung steht in der 24er-Ansicht."""
+    öffentlichen Eingang; Näherung und 1&1 stehen in der 24er-Ansicht."""
     zustand = tmp_path_factory.mktemp("notbremse-zr-karten") / "state"
     shutil.copytree(ZUSTAND, zustand)
     wurzel = lese_wurzel()
@@ -74,8 +75,7 @@ def karten(tmp_path_factory):
     for modell in geraete["tco"]["modelle"]:
         for karte in modell["karten"]:
             if karte.get("band"):
-                lz = 24 if karte.get("naeherung") else karte.get("raten_laufzeit")
-                paar = (modell["id"], karte["band"], lz)
+                paar = (modell["id"], karte["band"], ansicht(karte))
                 je_band.setdefault(paar, []).append(karte)
     return je_band
 

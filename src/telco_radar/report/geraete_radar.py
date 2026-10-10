@@ -68,8 +68,8 @@ from __future__ import annotations
 from typing import Optional
 
 from ..tco_model import zeitraum_vergleichbar
-from . import geraete_laufzeit, geraete_tco_band, geraete_tco_karten
 from . import geraete_notbremse as notbremse
+from . import geraete_tco_band, geraete_tco_karten
 from .geraete_laufzeit import LAUFZEIT_STANDARD, LAUFZEITEN, ansicht
 
 NETZ_WETTBEWERBER = tuple(
@@ -97,12 +97,8 @@ def _grund_anderer_zeitraum(
     (`geraete_tco_karten.delta_zustand`), nur an dieser Tabelle in einem
     Satz statt in zwei Feldern. Ein unbekannter Zeitraum wird benannt,
     nicht als 24 geraten (Clean Code 3/4); `raten` nennt beide Ratenlaufzeiten.
-    Ein Betrag für Tarif und Gerät über 36 Monate nennt `fehlt_satz`.
     """
     monate = karte.get("leitzahl_monate")
-    if geraete_laufzeit.nur_ueber_24(karte):
-        lz = karte["raten_laufzeit"]
-        return geraete_laufzeit.fehlt_satz(anbieter, [karte], lz)
     dieses, gegen = (
         (f"{r} Raten über " if r is not None else "")
         + (f"{m} Monate" if m is not None else "eine nicht gemessene Laufzeit")
