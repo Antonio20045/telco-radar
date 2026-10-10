@@ -35,7 +35,7 @@ from telco_radar.collect.geraete.klickziele import (
 )
 
 WURZEL = Path(__file__).resolve().parents[1]
-ANBIETER = ["o2", "vodafone", "1und1", "telekom", "congstar", "freenet"]
+ANBIETER = ["o2", "vodafone", "1und1raster", "telekom", "congstar", "freenet"]
 
 
 @pytest.fixture
@@ -76,13 +76,14 @@ def test_weiter_steht_bei_1und1_und_vodafone_auf_beiden_seiten(wurzel):
     weiter = {z.schluessel: [s.weiter for s in z.seiten] for z in lade_ziele(wurzel)}
 
     einsundeins = Weiter(
-        "#hwd-configuration-section button.hwd-add-to-cart-button-price-component",
-        "Weiter zur Tarifauswahl",
+        'form.hardware-box:has(a.hardware-box__heading[href="https://mobile.1und1.de/'
+        'iphone-17-pro?tariffFirst=true"]) .hardware-box__button a.btn',
+        "Smartphone wählen",
     )
     vodafone = Weiter(
         "#device-details-offer-summary-card a.ws10-button--primary", "Zur Tarifauswahl"
     )
-    assert weiter.pop("1und1") == [einsundeins, einsundeins]
+    assert weiter.pop("1und1raster") == [einsundeins, einsundeins]
     assert weiter.pop("vodafone") == [vodafone, vodafone]
     assert all(w is None for liste in weiter.values() for w in liste)
 
