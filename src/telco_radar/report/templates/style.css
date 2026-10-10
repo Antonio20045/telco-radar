@@ -4616,6 +4616,8 @@ body:not(.mit-buehne) main{padding-top:112px}
 .band-titel{margin:0;font-size:clamp(44px,5.2vw,80px);font-weight:500;line-height:.98;letter-spacing:-.045em;color:var(--bildtext)}
 .band-stand{margin:12px 0 0;font-size:14px;opacity:.88}
 .band + .wrap{padding-top:40px}
+/* Die Geraeteseite oeffnet mit dem Preisgraphen: ihr Band ist flacher. */
+.seite-geraete .band{height:32vh;min-height:280px}
 
 /* --------------------------------------------------------- UMSCHALTER -- */
 .umschalter{display:inline-flex;gap:2px;padding:5px;border-radius:var(--radius-pille);

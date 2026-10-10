@@ -114,7 +114,7 @@ src/telco_radar/report/geraete_view.py breite-ausnahme 1
 src/telco_radar/report/geraete_view.py noqa:BLE001 1
 src/telco_radar/report/geraete_zeitreihe.py dateizugriff 2
 src/telco_radar/report/html.py breite-ausnahme 5
-src/telco_radar/report/html.py dateizugriff 35
+src/telco_radar/report/html.py dateizugriff 34
 src/telco_radar/report/html.py noqa:BLE001 5
 src/telco_radar/report/luecken.py dateizugriff 1
 src/telco_radar/report/newsletter_protokoll.py dateizugriff 2
