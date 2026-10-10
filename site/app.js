@@ -236,10 +236,9 @@
 })();
 
 
-/* MELDUNGEN (Redesign 09.10.2026): Leseansicht und Filter der Bildwand. */
+/* MELDUNGEN (Magazin 10.10.2026): Leseansicht, Schwerpunkt, Scrollfortschritt. */
 (function () {
   var panel = document.getElementById('lesepanel');
-  var wand = document.getElementById('bildwand');
   if (!panel) return;
   var inhalt = panel.querySelector('.lesepanel-inhalt');
   var zuletzt = null;
@@ -292,37 +291,70 @@
     }
   }
 
-  /* Filter: Ressort und Region wirken zusammen; die Wand ordnet sich weich
-     neu (View Transitions, wo der Browser sie kennt). */
-  var wahl = { ressort: '', region: '' };
-  var knoepfe = document.querySelectorAll('.mw-filter [data-filter]');
-  var leer = document.querySelector('.mw-leer');
-  function anwenden() {
-    var sichtbar = 0;
-    var alle = document.querySelectorAll('.meldung[data-ressort]');
-    for (var i = 0; i < alle.length; i++) {
-      var m = alle[i];
-      var passt = (!wahl.ressort || m.getAttribute('data-ressort') === wahl.ressort) &&
-                  (!wahl.region || m.getAttribute('data-region') === wahl.region);
-      m.hidden = !passt;
-      if (passt) sichtbar++;
-    }
-    if (leer) leer.hidden = sichtbar > 0;
+  /* Schwerpunkt: ein Verweis oeffnet die Meldung, die weiter oben oder
+     unten vollstaendig steht; die Knoepfe wechseln Thema und Farbe. */
+  document.addEventListener('click', function (ev) {
+    var verweis = ev.target.closest && ev.target.closest('a[data-zu]');
+    if (!verweis || ev.metaKey || ev.ctrlKey || ev.shiftKey) return;
+    var meldung = document.getElementById(verweis.getAttribute('data-zu'));
+    if (meldung && oeffne(meldung)) ev.preventDefault();
+  });
+  var schwerpunkt = document.querySelector('[data-schwerpunkt]');
+  if (schwerpunkt) {
+    var knoepfe = schwerpunkt.querySelectorAll('.mg-sp-themen [data-thema]');
+    var tafeln = schwerpunkt.querySelectorAll('.mg-sp-tafel');
+    for (var k = 0; k < knoepfe.length; k++) (function (b) {
+      b.addEventListener('click', function () {
+        var thema = b.getAttribute('data-thema');
+        for (var j = 0; j < knoepfe.length; j++) knoepfe[j].setAttribute('aria-pressed', knoepfe[j] === b ? 'true' : 'false');
+        for (var t = 0; t < tafeln.length; t++) {
+          var an = tafeln[t].getAttribute('data-thema') === thema;
+          tafeln[t].hidden = !an;
+          tafeln[t].classList.toggle('neu', an && !ruhig);
+        }
+        schwerpunkt.className = schwerpunkt.className.replace(/\bsp--\S+/, 'sp--' + thema);
+      });
+    })(knoepfe[k]);
   }
-  for (var k = 0; k < knoepfe.length; k++) (function (b) {
-    b.addEventListener('click', function () {
-      var art = b.getAttribute('data-filter');
-      wahl[art] = b.getAttribute('data-wert');
-      var gruppe = document.querySelectorAll('.mw-filter [data-filter="' + art + '"]');
-      for (var j = 0; j < gruppe.length; j++) {
-        var an = gruppe[j] === b;
-        gruppe[j].classList.toggle('on', an);
-        gruppe[j].setAttribute('aria-pressed', an ? 'true' : 'false');
+
+  /* Weitere Meldungen: ab der achtzehnten zugeklappt, ein Knopf zeigt alle. */
+  var strom = document.getElementById('mg-strom');
+  var mehr = document.getElementById('mg-mehr');
+  if (strom && mehr) {
+    strom.classList.add('zu');
+    mehr.hidden = false;
+    mehr.addEventListener('click', function () { strom.classList.remove('zu'); mehr.hidden = true; });
+  }
+
+  /* Scrollfortschritt: der Titel wird kleiner, Bilder ziehen leicht mit,
+     der Schwerpunkt waechst auf volle Breite, Deutschland faerbt sich ein. */
+  if (ruhig) return;
+  var kopf = document.querySelector('.mg-kopf');
+  var aufmacher = document.querySelector('.mg--aufmacher');
+  var deutschland = document.querySelector('.mg-deutschland');
+  var bewegt = [kopf, aufmacher, schwerpunkt, deutschland].filter(Boolean);
+  if (!bewegt.length) return;
+  var geplant = false;
+  function fortschritt() {
+    geplant = false;
+    var vh = window.innerHeight;
+    for (var i = 0; i < bewegt.length; i++) {
+      var el = bewegt[i];
+      var r = el.getBoundingClientRect();
+      if (r.bottom < -vh || r.top > vh * 2) continue;
+      var p = el === kopf ? -r.top / Math.max(1, r.height) : (vh - r.top) / (vh + r.height);
+      el.style.setProperty('--p', Math.min(1, Math.max(0, p)).toFixed(4));
+      if (el === schwerpunkt) {
+        el.style.setProperty('--rest', Math.min(1, Math.max(0, (r.top - vh * 0.3) / (vh * 0.55))).toFixed(4));
+        if (r.top < vh * 0.7) el.classList.add('da');
       }
-      if (document.startViewTransition && !ruhig && wand) document.startViewTransition(anwenden);
-      else anwenden();
-    });
-  })(knoepfe[k]);
+    }
+  }
+  window.addEventListener('scroll', function () {
+    if (!geplant) { geplant = true; requestAnimationFrame(fortschritt); }
+  }, { passive: true });
+  window.addEventListener('resize', fortschritt);
+  fortschritt();
 })();
 
 /* WETTBEWERB WELT und PROMO (Redesign 09.10.2026): Hebel oeffnen, Marken filtern. */
@@ -2086,12 +2118,16 @@ var TelcoFrage = (function () {
     var alle = lz === 'alle';
     var sektion = element('gr-buendel');
     if (sektion) sektion.classList.toggle('gr-buendel--alle', alle);
-    var zeilen = document.querySelectorAll('#gr-bnd-gruppe .gr-bnd');
+    var zeilen = document.querySelectorAll(
+      '#gr-bnd-gruppe .gr-bnd, #gr-bnd-gruppe .gr-anb-fehlt');
     Array.prototype.forEach.call(zeilen, function (z) {
       var bandAus = !!band && z.hasAttribute('data-band')
         && z.getAttribute('data-band') !== band;
       var lzAus = !alle && z.hasAttribute('data-lz')
         && z.getAttribute('data-lz') !== lz;
+      if (z.hasAttribute('data-fehlt-lz')) {
+        lzAus = z.getAttribute('data-fehlt-lz') !== lz;
+      }
       z.hidden = bandAus || lzAus;
     });
     Array.prototype.forEach.call(
