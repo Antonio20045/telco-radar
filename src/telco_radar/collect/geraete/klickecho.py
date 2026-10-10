@@ -10,7 +10,11 @@ Antwort die gewählte Variante zeigen; eine gewählte Option, die sich nicht les
 lässt, bestätigt nichts. Sonst entsteht ein ``Befund`` mit Grund. Fehlt ein Wert auf
 beiden Seiten, ist er ``None`` und eine benannte Lücke, nie 0. Bei ``ein_vertrag``
 (1&1, freenet) entfallen Rate und Ratenzahl planmäßig, verglichen werden dafür
-Bündelbetrag und Einmalzahlung. Unbegrenztes Volumen
+Bündelbetrag und Einmalzahlung. Mit ``summe`` (Vodafone-Tarifauswahl, zwei Verträge)
+nennt der Text nur die Monatssumme aus Rate und Tarif als Bündelbetrag: Rate und Tarif
+von Monat 1 gelten aus der Antwort nur, wenn der Text dieselbe Summe nennt wie die
+Antwort und Rate plus Tarif sie auf den Cent ergeben; sonst bleibt es ein Befund.
+Unbegrenztes Volumen
 ist ``math.inf`` wie im Tarifmodell. Optionen vergleicht das Echo ohne Markup,
 Leerraum sowie Groß- und Kleinschreibung. Dieses Modul ruft kein Netz.
 """
@@ -18,7 +22,8 @@ Leerraum sowie Groß- und Kleinschreibung. Dieses Modul ruft kein Netz.
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from collections.abc import Mapping
+from dataclasses import dataclass, replace
 from typing import Any
 
 from ...tarif_model import Preisphase
@@ -29,6 +34,7 @@ from .klickantwort import als_text, monate
 from .klickantwort import feldwert as feldwert
 from .klickantwort import lies_antwort as lies_antwort
 from .klickkarte import BUENDELFELDER, DIMENSIONEN, WERTFELDER
+from .klickkartentypen import SUMMENFELD
 from .klickpfad import vergleichbar
 from .klicktext import Buendelwerte, Preiswerte
 from .klicktext import lies_zusammenfassung as lies_zusammenfassung
@@ -38,6 +44,7 @@ GRUND_OHNE_ANTWORT = "keine Antwort mitgeschnitten"
 GRUND_KEINE_WERTE = "weder Text noch Antwort nennen Preiswerte"
 KEINE_AUSWAHL = "keine Auswahl"
 GRUND_UNLESBAR = "gewählte Option nicht lesbar"
+UEBER_DIE_SUMME = ("rate", "tarifphasen")
 
 
 @dataclass(frozen=True)
@@ -93,11 +100,13 @@ def pruefe_echo(
     *,
     buendel: Buendelwerte | None = None,
     entfallen: tuple[str, ...] = (),
+    summe: bool = False,
 ) -> Echo:
     """Übernimmt jeden Wert, den Text und Antwort zur Variante gleich nennen.
 
-    ``buendel`` sind die Bündelwerte aus dem Text (``ein_vertrag``); Felder in
-    ``entfallen`` fallen planmäßig weg und sind weder Befund noch Lücke.
+    ``buendel`` sind die Bündelwerte aus dem Text (``ein_vertrag`` oder ``summe``);
+    Felder in ``entfallen`` fallen planmäßig weg und sind weder Befund noch Lücke.
+    Mit ``summe`` bestätigt die Monatssumme Rate und Tarif (``_ueber_die_summe``).
     """
     befunde = _variantenbefunde(gewaehlt, angezeigt, antwort)
     if antwort is None:
@@ -106,6 +115,8 @@ def pruefe_echo(
         return Echo(Preiswerte(), tuple(befunde), ())
     luecken: list[str] = []
     felder = tuple(f for f in WERTFELDER if f not in entfallen)
+    if summe:
+        text = _ueber_die_summe(text, buendel, antwort, befunde)
     bestaetigt = _bestaetige(felder, text, antwort.werte, befunde, luecken)
     buendelfelder = BUENDELFELDER if buendel is not None else ()
     gebuendelt = _bestaetige(buendelfelder, buendel, antwort.buendel, befunde, luecken)
@@ -127,6 +138,50 @@ def seitenbefunde(gewaehlt: Variante, angezeigt: Variante) -> tuple[Befund, ...]
     """Befunde, wo die Seite eine andere als die gewählte Variante zeigt oder eine
     gewählte Option unlesbar ist; ohne Antwort."""
     return tuple(_variantenbefunde(gewaehlt, angezeigt, None))
+
+
+def summenfundorte(
+    fundorte: Mapping[str, tuple[str, str]], werte: Preiswerte
+) -> dict[str, tuple[str, str]]:
+    """Die Fundorte des Texts; über die Summe bestätigte Felder ohne eigenen Fundort
+    tragen den Fundort der Summe (``pruefe_echo`` mit ``summe``)."""
+    ort = fundorte.get(SUMMENFELD)
+    if ort is None:
+        return dict(fundorte)
+    ueber = [f for f in UEBER_DIE_SUMME if getattr(werte, f) is not None]
+    return {**{f: ort for f in ueber}, **fundorte}
+
+
+def _ueber_die_summe(
+    text: Preiswerte,
+    buendel: Buendelwerte | None,
+    antwort: Antwortlesung,
+    befunde: list[Befund],
+) -> Preiswerte:
+    """``text`` mit Rate und Tarif der Antwort, wo der Text sie nicht nennt, nur wenn
+    Text und Antwort dieselbe Summe nennen, der Tarif eine einzige Phase ab Monat 1 hat
+    und Rate plus Tarif die Summe auf den Cent ergeben; ergeben sie sie nicht, ein
+    Befund an der Summe. Sonst bleibt ``text`` unverändert (dann „fehlt im Text“)."""
+    im_text = None if buendel is None else getattr(buendel, SUMMENFELD)
+    in_antwort = getattr(antwort.buendel, SUMMENFELD)
+    rate = antwort.werte.rate
+    phasen = antwort.werte.tarifphasen or ()
+    einzeln = len(phasen) == 1 and phasen[0].von_monat == 1
+    if im_text is None or in_antwort is None or rate is None or not einzeln:
+        return text
+    tarif = phasen[0].betrag
+    if not _gleich(im_text, in_antwort):
+        return text
+    if abs(rate + tarif - in_antwort) >= CENT_TOLERANZ:
+        grund = (
+            f"Rate {_deutsch(rate)} + Tarif {_deutsch(tarif)} ergibt nicht die "
+            f"Summe {_deutsch(in_antwort)}"
+        )
+        befunde.append(Befund(SUMMENFELD, grund))
+        return text
+    ergaenzt = {f: getattr(antwort.werte, f) for f in UEBER_DIE_SUMME}
+    fehlend = {f: w for f, w in ergaenzt.items() if getattr(text, f) is None}
+    return replace(text, **fehlend)
 
 
 def _bestaetige(

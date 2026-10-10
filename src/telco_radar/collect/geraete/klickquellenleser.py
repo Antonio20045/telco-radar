@@ -38,6 +38,7 @@ from .klickkartentypen import (
     PHASENFELD,
     PHASENTEILE,
     PLATZHALTER_MODELL,
+    SUMMENFELD,
     WERTFELDER,
     Antwortmuster,
     Phasenpfad,
@@ -121,11 +122,18 @@ def lies_seite(leser: Kartenleser, roh: object) -> dict[str, Seitenwert]:
 
 
 def pruefe_felder(
-    leser: Kartenleser, felder: Mapping[str, object], ort: str, ein_vertrag: bool
+    leser: Kartenleser,
+    felder: Mapping[str, object],
+    ort: str,
+    ein_vertrag: bool,
+    summe: bool = False,
 ) -> None:
-    """Bündelfelder nur bei ``ein_vertrag``; dort entfallen Rate und Ratenzahl."""
+    """Bündelfelder nur bei ``ein_vertrag``; dort entfallen Rate und Ratenzahl. Mit
+    ``summe`` (Textmuster und Antwortpfad nennen ihn) ist der Bündelbetrag bei zwei
+    Verträgen die Monatssumme aus Rate und Tarif (``klickecho.pruefe_echo``)."""
     for feld in felder:
-        if feld in BUENDELFELDER and not ein_vertrag:
+        als_summe = summe and feld == SUMMENFELD
+        if feld in BUENDELFELDER and not ein_vertrag and not als_summe:
             raise leser.fehler(f"{ort}.{feld}", GRUND_NUR_BUENDEL)
         if feld in ENTFALLEN_IM_BUENDEL and ein_vertrag:
             raise leser.fehler(f"{ort}.{feld}", GRUND_ENTFAELLT)

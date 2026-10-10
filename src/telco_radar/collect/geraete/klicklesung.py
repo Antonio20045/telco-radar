@@ -41,6 +41,7 @@ from .klickecho import (
     Echo,
     Variante,
     pruefe_echo,
+    summenfundorte,
     variante_aus,
 )
 from .klickhar import Antwortkopie
@@ -221,7 +222,7 @@ class Leser(Textleser):
         )
         struktur.felder(gefunden, len(felder))
         ein_vertrag = self.karte.ein_vertrag
-        textbuendel = buendel if ein_vertrag else None
+        textbuendel = buendel if ein_vertrag or self.karte.summe else None
         if zweite.befund is not None:
             befunde: tuple[Befund, ...] = (zweite.befund,)
             grund = zweite.befund.grund
@@ -256,7 +257,11 @@ class Leser(Textleser):
                 zweite.lesung,
                 buendel=textbuendel,
                 entfallen=self.karte.entfallen,
+                summe=self.karte.summe,
             )
+            if self.karte.summe:
+                orte = summenfundorte(fundorte, echo.werte)
+                self.belegteile = Belegteile(zweite.kopie, zweite.json_pfade, orte)
         bild, bildbefunde = self._screenshot(bereich)
         self.schliesse_dialog(bereich)
         befunde = echo.befunde + bildbefunde

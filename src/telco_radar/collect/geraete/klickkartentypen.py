@@ -23,6 +23,7 @@ WERTFELDER = (
 )
 BUENDELFELDER = ("buendelbetrag", "einmalzahlung")
 NACHWEISFELDER = ("ratenplan",)
+SUMMENFELD = BUENDELFELDER[0]
 """Wortlaute nur aus der Antwort, kein Wertfeld: weder Echo noch Lesefeld noch Beleg.
 ``ratenplan`` ist der Satz, der den Tarifpreis an die Ratenlaufzeit bindet (o2)."""
 EIN_VERTRAG = "ein_vertrag"
@@ -352,6 +353,14 @@ class Klickkarte:
     def adressdimension(self) -> str | None:
         """Die Dimension, deren Optionen eigene Adressen sind; ``None`` ohne."""
         return next((d for d, k in self.knoepfe.items() if k.adressen), None)
+
+    @property
+    def summe(self) -> bool:
+        """Wahr, wenn Text und Antwort bei zwei Verträgen die Monatssumme aus Rate und
+        Tarif als Bündelbetrag nennen (``klickecho.pruefe_echo``)."""
+        in_antwort = any(SUMMENFELD in q.pfade for q in self.lesequellen)
+        im_text = SUMMENFELD in self.textlesung.muster
+        return not self.ein_vertrag and im_text and in_antwort
 
     @property
     def kacheldimension(self) -> str | None:

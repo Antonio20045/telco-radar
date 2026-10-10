@@ -163,6 +163,7 @@ from .klickkartentypen import (
     PHASENFELD,
     PHASENTEILE,
     PLATZHALTER_MODELL,
+    SUMMENFELD,
     VERTRAGSFORMEN,
     WERTFELDER,
     Adressen,
@@ -257,13 +258,17 @@ def klickkarte_aus_daten(roh: object, quelle: str) -> Klickkarte:
     if vertragsform not in VERTRAGSFORMEN:
         raise leser.fehler("vertragsform", f"{GRUND_VERTRAGSFORM} {vertragsform}")
     ein_vertrag = vertragsform == EIN_VERTRAG
-    pruefe_felder(leser, textlesung.muster, "zusammenfassung.muster", ein_vertrag)
     seite = lies_seite(leser, daten.get("seite"))
     quellen = lies_quellen(leser, daten.get("antwort"), seite)
+    summe = SUMMENFELD in textlesung.muster and any(
+        SUMMENFELD in q.pfade for q in quellen
+    )
+    ort = "zusammenfassung.muster"
+    pruefe_felder(leser, textlesung.muster, ort, ein_vertrag, summe)
     liste = isinstance(daten.get("antwort"), list)
     for stelle, antwort in enumerate(quellen):
         ort = f"antwort.{stelle}.pfade" if liste else "antwort.pfade"
-        pruefe_felder(leser, antwort.pfade, ort, ein_vertrag)
+        pruefe_felder(leser, antwort.pfade, ort, ein_vertrag, summe)
     return Klickkarte(
         anbieter=leser.text(daten, "anbieter", ""),
         knoepfe=knoepfe,

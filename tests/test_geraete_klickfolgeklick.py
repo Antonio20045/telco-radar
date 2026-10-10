@@ -44,10 +44,15 @@ FOLGE = """
 </div>
 <div id="preis"></div>"""
 FOLGE_SKRIPT = """
+function summe(d) {
+  const p = d.preis;
+  document.getElementById("preis").innerText =
+    "Einmalig " + euro(p.anzahlung) + "\\nAngebotspreis " + euro(p.summe) + " mtl.";
+}
 const speicher = new URLSearchParams(location.search).get("speicher");
 fetch("/api/tarife?speicher=" + speicher).then((a) => a.json()).then((d) => {
   window.tarife = d;
-  zeige({preis: d.tarife.S});
+  @ZEIGE@({preis: d.tarife.S});
 });
 for (const k of document.querySelectorAll("#tarif button")) {
   k.addEventListener("click", () => {
@@ -56,7 +61,7 @@ for (const k of document.querySelectorAll("#tarif button")) {
         a.setAttribute("aria-pressed", String(a === k));
       }
     }
-    if (@FOLGT@) zeige({preis: window.tarife.tarife[k.dataset.wert]});
+    if (@FOLGT@) @ZEIGE@({preis: window.tarife.tarife[k.dataset.wert]});
     fetch("/zaehlung", {method: "POST", body: k.dataset.wert});
   });
 }"""
@@ -92,10 +97,33 @@ KARTE = {
 }
 
 
-def _antworter(folgt: bool = True, markiert: bool = True):
+SUMMENKARTE = {
+    **KARTE,
+    "zusammenfassung": {
+        "selektor": "#preis",
+        "muster": {
+            "anzahlung": r"Einmalig\s*([\d.,]+)\s*€",
+            "buendelbetrag": r"Angebotspreis\s*([\d.,]+)\s*€",
+        },
+    },
+    "antwort": {
+        **KARTE["antwort"],
+        "pfade": {
+            "anzahlung": "tarife.{tarif}.anzahlung",
+            "rate": "tarife.{tarif}.rate",
+            "tarifphasen": "tarife.{tarif}.tarif",
+            "buendelbetrag": "tarife.{tarif}.summe",
+        },
+    },
+}
+
+
+def _antworter(folgt: bool = True, markiert: bool = True, zeige: str = "zeige"):
     start = seite(START, START_SKRIPT)
-    skript = FOLGE_SKRIPT.replace("@FOLGT@", json.dumps(folgt)).replace(
-        "@MARKIERT@", json.dumps(markiert)
+    skript = (
+        FOLGE_SKRIPT.replace("@FOLGT@", json.dumps(folgt))
+        .replace("@MARKIERT@", json.dumps(markiert))
+        .replace("@ZEIGE@", zeige)
     )
     folge = seite(FOLGE, skript)
 
@@ -108,6 +136,8 @@ def _antworter(folgt: bool = True, markiert: bool = True):
         if ort == "/api/tarife":
             speicher = frage(pfad)["speicher"]
             tarife = {t: preis(speicher, t, 36) for t in ("S", "M")}
+            for werte in tarife.values():
+                werte["summe"] = round(werte["rate"] + werte["tarif"], 2)
             daten = {"speicher": speicher, "tarife": tarife}
             return Antwort(200, "application/json", json.dumps(daten))
         return Antwort(204)
@@ -115,8 +145,8 @@ def _antworter(folgt: bool = True, markiert: bool = True):
     return antworte
 
 
-def _laufe(chromium, **schalter):
-    return laufe_mit(chromium, _antworter(**schalter), karte(**KARTE))
+def _laufe(chromium, daten=KARTE, **schalter):
+    return laufe_mit(chromium, _antworter(**schalter), karte(**daten))
 
 
 def test_je_speicher_jeder_tarif_der_folgeseite_geklickt_und_erfasst(chromium):
@@ -161,3 +191,20 @@ def test_gegenprobe_seite_markiert_den_geklickten_tarif_nicht(chromium):
         ergebnis = ergebnisse[(speicher, "M", 36)]
         assert ergebnis.status == BEFUND
         assert "Seite zeigt S statt M" in ergebnis.grund
+
+
+def test_summe_der_folgeseite_bestaetigt_rate_und_tarif(chromium):
+    """Wie Vodafone: der Text nennt nur Anzahlung und Monatssumme (Teil 2a)."""
+    from telco_radar.collect.geraete.klicklauf import ERFASST
+
+    lauf, _ = _laufe(chromium, SUMMENKARTE, zeige="summe")
+    ergebnisse = nach_auswahl(lauf)
+
+    assert len(ergebnisse) == 4
+    for (speicher, tarif, _), ergebnis in ergebnisse.items():
+        erwartet = preis(speicher, tarif, 36)
+        assert ergebnis.status == ERFASST, (speicher, tarif, ergebnis.befunde)
+        assert ergebnis.werte.rate == erwartet["rate"]
+        assert ergebnis.werte.tarifphasen[0].betrag == erwartet["tarif"]
+        assert ergebnis.werte.anzahlung == erwartet["anzahlung"]
+        assert ergebnis.beleg is not None
