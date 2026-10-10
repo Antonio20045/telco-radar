@@ -107,6 +107,9 @@ class _Kontext:
     def cookies(self) -> list:
         return []
 
+    def storage_state(self) -> dict:
+        return {"cookies": [], "origins": []}
+
     def close(self) -> None:
         return None
 
@@ -132,7 +135,7 @@ def test_stoerung_im_tor_geht_der_zeitueberschreitung_vor(
 ):
     tore = []
 
-    def oeffne(_browser, tor, _fenster, _kennung=None, *, wiedergabe=()):
+    def oeffne(_browser, tor, _fenster, _kennung=None, *, wiedergabe=(), zustand=None):
         tore.append(tor)
         seite = _Seite(status)
         tor.warte = seite.wait_for_timeout

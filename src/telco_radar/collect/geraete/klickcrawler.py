@@ -2,15 +2,14 @@
 
 Datenkonzept Geräteradar, Abschnitt 8. Je Produktseite und Klick-Karte (``klickkarte``):
 
-1. Der Crawler legt einen eigenen Browserkontext ohne Vorabladen an (``klickkontext``).
-   Jede Anfrage geht durch das Tor (``klicktor``): robots.txt für jede Adresse und jedes
-   Ziel einer Umleitung, Crawl-delay je Host. Gesperrte Adressen stehen in
-   ``verworfen``, gescheiterte in ``gescheitert``; Fristen ohne Crawl-delay.
-2. Zeigen Hauptseite oder Preisantwort Bot-Schutz (202-Challenge, 4xx, 5xx,
-   Challenge-Muster), antwortet die eigene Website mit HTTP 202 (``klickwache``) oder
-   fehlt der Kanarienwert, ist der Abruf gestört und der Lauf endet sofort, ohne zweiten
-   Versuch und ohne Umgehung (CLAUDE.md Regel 4). Sperrt robots.txt Seite oder
-   Preisantwort, ist er gesperrt; scheitert die Preisanfrage, gestört.
+1. Eigener Browserkontext ohne Vorabladen, Cookies aus ``zustand`` (``klickkontext``).
+   Jede Anfrage geht durchs Tor (``klicktor``): robots.txt je Adresse und Umleitung,
+   Crawl-delay je Host; gesperrte Adressen in ``verworfen``, gescheiterte in
+   ``gescheitert``, Fristen ohne Crawl-delay.
+2. Bot-Schutz an Seite oder Preisantwort (202-Challenge, 4xx, 5xx, Muster), HTTP 202
+   der eigenen Website (``klickwache``) oder ein fehlender Kanarienwert: gestört, der
+   Lauf endet sofort, ohne zweiten Versuch und ohne Umgehung (CLAUDE.md Regel 4). Sperrt
+   robots.txt Seite oder Preisantwort: gesperrt; scheitert die Preisanfrage: gestört.
 3. Er liest die angebotenen Optionen je Dimension und klickt jede Kombination; nach
    jedem Klick liest er die Optionen neu und führt neu erschienene Werte mit. Eine feste
    Dimension hat keinen Knopf. Sind die Optionen einer Dimension eigene Adressen
@@ -50,7 +49,7 @@ from .klickadressen import Adresse, lies_adressen, ohne_adresse, pruefe_robots
 from .klickbedienung import Bedienung
 from .klickecho import LAUFZEIT, Variante, variante_aus
 from .klickkarte import DIMENSIONEN, Adressen, Klickkarte
-from .klickkontext import oeffne_sitzung
+from .klickkontext import Browserzustand, oeffne_sitzung
 from .klicklauf import (
     BEFUND,
     ERFASST,
@@ -115,6 +114,7 @@ def klicke_durch(
     beobachter: Callable[[Request, APIResponse], str | None] | None = None,
     cookies: set[str] | None = None,
     modell: str | None = None,
+    zustand: Browserzustand | None = None,
 ) -> Klicklauf:
     """Klickt alle angebotenen Kombinationen auf ``adresse``; wirft nie.
 
@@ -132,8 +132,8 @@ def klicke_durch(
     lauf = Klicklauf(anbieter=karte.anbieter, adresse=adresse)
     tor = Tor(waechter, uhr, schleuse, lauf)
     tor.beobachter = beobachter
-    oeffne = partial(oeffne_sitzung, browser, tor, FENSTER, kennung)
-    kontexte = Kontexte(partial(oeffne, wiedergabe=wiedergabe), tor, cookies)
+    oeffne = partial(oeffne_sitzung, browser, tor, FENSTER, kennung, zustand=zustand)
+    kontexte = Kontexte(partial(oeffne, wiedergabe=wiedergabe), tor, cookies, zustand)
     try:
         gang = _Gang(kontexte, karte, tor, frist_ms, lauf, hoechste, frist, modell)
         gang.laufe()

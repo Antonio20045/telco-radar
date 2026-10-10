@@ -297,6 +297,8 @@ def leser_im_browser(
     waechter = RobotsWaechter(hole=hole_mit_frist)
     schleuse = Fristschleuse(Hostschleuse(waechter, uhr, ziel.rate_limit_sekunden), 0.0)
 
+    zustand = Browserzustand()
+
     def crawle(seite: Seitenziel, ende: float) -> Klicklauf:
         schleuse.setze(ende)
         cookies: set[str] = set()
@@ -316,9 +318,8 @@ def leser_im_browser(
             beobachter=beobachter,
             cookies=cookies,
             modell=seite.modell,
+            zustand=zustand,
         )
-
-    zustand = Browserzustand()
 
     def lies(adresse: str, ende: float) -> dict:
         schleuse.setze(ende)

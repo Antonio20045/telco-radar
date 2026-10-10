@@ -15,7 +15,7 @@ aus nachgeladenen Elementen, auch in Shadow Roots, bevor der Browser sie liest.
 Browser, der beim Weiterklicken seine Cookies behält (Telekom-Übersichten: das Token
 der JavaScript-Prüfung und die abgelehnte Einwilligung gelten so für den nächsten
 Tarif, Klick-Tageslauf 09.10.2026 18:24 UTC: zweite Prüfung auf MF_17779 in einem
-frischen Kontext).
+frischen Kontext; ebenso die Produktseiten, Klick-Tageslauf 10.10.2026).
 HAR-Belege in ``wiedergabe`` beantworten ihre Anfragen ohne Netz und vor dem Tor; was
 sie nicht kennen, geht an das Tor. Grenze: ein HAR-Beleg hält nur die Preisantwort, die
 Produktseite selbst kommt weiter aus dem Netz. Ohne erreichbare Seite liest die

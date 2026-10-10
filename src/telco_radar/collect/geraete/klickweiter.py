@@ -45,7 +45,7 @@ from playwright.sync_api import Error as PlaywrightFehler
 from .klickdiagnose import diagnose
 from .klickecho import LAUFZEIT, Variante, variante_aus
 from .klickkarte import DIMENSIONEN
-from .klickkontext import Sitzung, cookie_werte, schliesse
+from .klickkontext import Browserzustand, Sitzung, cookie_werte, schliesse
 from .klicklauf import (
     BEFUND,
     ERFASST,
@@ -89,13 +89,19 @@ class Kontexte:
     """Die Browserkontexte eines Laufs; ``neu`` schließt den alten und öffnet einen.
 
     Beim Schließen gilt das Tor als geschlossen (was dann scheitert, zählt nicht), und
-    die Cookie-Werte gehen in ``cookies`` zum Schwärzen.
+    die Cookie-Werte gehen in ``cookies`` zum Schwärzen; ``zustand`` merkt sich Cookies
+    und Speicher für den nächsten Kontext.
     """
 
     def __init__(
-        self, oeffne: Callable[[], Sitzung], tor: Tor, cookies: set[str] | None
+        self,
+        oeffne: Callable[[], Sitzung],
+        tor: Tor,
+        cookies: set[str] | None,
+        zustand: Browserzustand | None = None,
     ) -> None:
         self._oeffne, self.tor, self.cookies = oeffne, tor, cookies
+        self.zustand = zustand
         self.aktuell: Sitzung | None = None
 
     def neu(self) -> Page:
@@ -112,6 +118,8 @@ class Kontexte:
         self.tor.geschlossen = True
         if self.cookies is not None:
             self.cookies.update(cookie_werte(self.aktuell))
+        if self.zustand is not None:
+            self.zustand.merke(self.aktuell)
         schliesse(self.aktuell)
         self.aktuell = None
 
