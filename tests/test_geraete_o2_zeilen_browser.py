@@ -390,6 +390,24 @@ def test_der_modellwechsel_setzt_die_eigenen_zeilen_ein(seite, fragment):
     )
 
 
+def test_der_modellwechsel_laedt_nur_das_gewaehlte_modell(seite):
+    """Seite schneller (10.10.2026): ein Modellwechsel holt nur die Dateien
+    des gewählten Modells aus `data/zr/` und `data/bnd/`, nie die
+    Gesamtfragmente mit allen Geräten (47 MB und 24 MB am echten Bestand)."""
+    daten = seite.eval_on_selector(
+        "#gr-zeitreihe-daten", "k => JSON.parse(k.textContent)"
+    )
+    fremd = [o for o in daten["erlaubt"] if o != daten["vorgabe"]]
+    anfragen: list[str] = []
+    seite.on("request", lambda r: anfragen.append(r.url))
+    waehle_modell(seite, fremd[0])
+    seite.wait_for_timeout(300)
+    geholt = [u.split("/data/", 1)[1] for u in anfragen if "/data/" in u]
+    assert f"zr/{fremd[0]}.html" in geholt, geholt
+    assert f"bnd/{fremd[0]}.html" in geholt, geholt
+    assert not [u for u in geholt if u.startswith("geraete-")], geholt
+
+
 def test_der_zeilen_aufklapper_oeffnet_ohne_netzwerk(vorgabe):
     """E1: alles bleibt im Dokument erreichbar - das Öffnen einer Zeile ist
     reines UI (derselbe Maßstab wie der OPTIK-6-Klapptest, nur an der

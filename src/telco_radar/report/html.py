@@ -18,7 +18,7 @@ from bs4 import BeautifulSoup
 from . import anbieter_farben as _anbieter_farben
 from .ausfall import NEWSLETTER_TEIL, Ausfall, ohne_konfiguration
 from . import bilder as report_bilder
-from . import diff_bilder, differenzierung_bericht
+from . import diff_bilder, differenzierung_bericht, geraete_fragmente
 from . import differenzierung_view, geraete_teurer, wettbewerb_puls
 from . import geraete_tco_grafik as _geraete_tco_grafik
 from . import fruehwarnung as fruehwarnung_mod, lieferzeit_view as lieferzeit_view_mod
@@ -1720,25 +1720,8 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
         ),
         encoding="utf-8",
     )
-    _tco = geraete.get("tco") or {}
-    if _tco.get("modelle"):
-        (site_dir / "data").mkdir(exist_ok=True)
-        _zr_start = (geraete.get("zeitreihe") or {}).get("start") or {}
-        _start_modell = _zr_start.get("modell") or _tco["modell_vorgabe"]
-        (site_dir / "data" / "geraete-buendel.html").write_text(
-            env.get_template("geraete_buendel_fragment.html.j2").render(
-                modelle=_tco["modelle"], vorgabe=_start_modell
-            ),
-            encoding="utf-8",
-        )
-        _zr = geraete.get("zeitreihe") or {}
-        if _zr.get("paare"):
-            (site_dir / "data" / "geraete-zeitreihe.html").write_text(
-                env.get_template("geraete_zeitreihe_fragment.html.j2").render(
-                    paare=_zr["paare"]
-                ),
-                encoding="utf-8",
-            )
+    for pfad, inhalt in geraete_fragmente.vorbereiten(site_dir, env, geraete).items():
+        pfad.write_text(inhalt, encoding="utf-8")
     (site_dir / "geraete-quellen.html").write_text(
         env.get_template("geraete_quellen.html.j2").render(prefix="", geraete=geraete),
         encoding="utf-8",

@@ -1703,30 +1703,36 @@ var TelcoFrage = (function () {
      Rueckweg nach einem Wechsel hat damit genau EINE Quelle - der alte
      Vorgabe-Klon (der bei einem Deep-Link Fremdes als "Vorgabe" einfrieren
      liess, S2) entfaellt fuer den Graphen komplett. */
-  var zrLager = null;
-  var zrVersprechen = null;
-  function holeZr() {
-    if (zrLager) return Promise.resolve(zrLager);
-    if (!zrVersprechen) {
-      zrVersprechen = fetch('data/geraete-zeitreihe.html')
+  /* Seite schneller (10.10.2026): je Modell eine kleine Datei statt
+     einer 47-MB-Gesamtdatei; ein fehlendes Modell (404) ist ein leeres
+     Lager, kein Fehler. */
+  var lagerCache = {};
+  function holeLager(ordner, modell, auswahl, schluessel) {
+    var url = 'data/' + ordner + '/' + encodeURIComponent(modell) + '.html';
+    if (!lagerCache[url]) {
+      lagerCache[url] = fetch(url)
         .then(function (r) {
+          if (r.status === 404) return '';
           if (!r.ok) throw new Error(r.status);
           return r.text();
         })
         .then(function (txt) {
           var doc = new DOMParser().parseFromString(txt, 'text/html');
-          zrLager = {};
-          Array.prototype.forEach.call(
-            doc.querySelectorAll('.gr-zr-lager[data-modell]'),
-            function (l) {
-              zrLager[l.getAttribute('data-modell') + '::' +
-                      l.getAttribute('data-band') + '::' +
-                      l.getAttribute('data-laufzeit')] = l;
-            });
-          return zrLager;
+          var lager = {};
+          Array.prototype.forEach.call(doc.querySelectorAll(auswahl),
+            function (l) { lager[schluessel(l)] = l; });
+          return lager;
         });
+      lagerCache[url].catch(function () { delete lagerCache[url]; });
     }
-    return zrVersprechen;
+    return lagerCache[url];
+  }
+  function holeZr(modell) {
+    return holeLager('zr', modell, '.gr-zr-lager[data-modell]', function (l) {
+      return l.getAttribute('data-modell') + '::' +
+             l.getAttribute('data-band') + '::' +
+             l.getAttribute('data-laufzeit');
+    });
   }
 
   var zrFolge = 0;
@@ -1762,7 +1768,7 @@ var TelcoFrage = (function () {
       zrGruppe.appendChild(satz);
       return;
     }
-    holeZr().then(function (lager) {
+    holeZr(modell).then(function (lager) {
       if (folge !== zrFolge) return;
       var block = lager && lager[modell + '::' + band + '::' +
                                  zustand.laufzeit];
@@ -2025,8 +2031,6 @@ var TelcoFrage = (function () {
      G0-Block des Verlaufs-Reiters ist gefallen - er zeigte den Barpreis
      des VERGLEICHS-Reiter-Modells neben der eigenen Auswahl desselben
      Reiters (Doppel-Darstellung, §4.6/§4.8). */
-  var fragmentLager = null;
-  var fragmentVersprechen = null;
   var vorgabeGruppe = null;
   var wechselFolge = 0;
   var zuletztModell = null;
@@ -2037,26 +2041,10 @@ var TelcoFrage = (function () {
     if (anfangsGruppe) vorgabeGruppe = anfangsGruppe.cloneNode(true);
   })();
 
-  function holeFragment() {
-    if (fragmentLager) return Promise.resolve(fragmentLager);
-    if (!fragmentVersprechen) {
-      fragmentVersprechen = fetch('data/geraete-buendel.html')
-        .then(function (r) {
-          if (!r.ok) throw new Error(r.status);
-          return r.text();
-        })
-        .then(function (txt) {
-          var doc = new DOMParser().parseFromString(txt, 'text/html');
-          fragmentLager = {};
-          Array.prototype.forEach.call(
-            doc.querySelectorAll('.gr-bnd-lager[data-modell]'),
-            function (l) {
-              fragmentLager[l.getAttribute('data-modell')] = l;
-            });
-          return fragmentLager;
-        });
-    }
-    return fragmentVersprechen;
+  function holeFragment(modell) {
+    return holeLager('bnd', modell, '.gr-bnd-lager[data-modell]', function (l) {
+      return l.getAttribute('data-modell');
+    });
   }
 
   function gruppeLeeren(gruppe) {
@@ -2103,7 +2091,7 @@ var TelcoFrage = (function () {
       return;
     }
     var meineFolge = ++wechselFolge;
-    holeFragment().then(function (lager) {
+    holeFragment(mid).then(function (lager) {
       if (meineFolge !== wechselFolge) return;
       fertig(lager ? lager[mid] : null, false);
     }, function () {
