@@ -73,8 +73,9 @@ def test_die_titelseite_traegt_die_ressortbloecke_nicht_mehr(tmp_path):
     )
     echt = _nach_ressort(_flatten(bericht))
     meldungen = BeautifulSoup(lies_seite(site, "meldungen.html"), "html.parser")
-    assert len(meldungen.select(".mressort")) == len(echt)
-    assert len(meldungen.select(".mressort .meldung")) == len(PORTAL)
+    ressorts = meldungen.select('.chip[data-filter="ressort"]:not([data-wert=""])')
+    assert len(ressorts) == len(echt)
+    assert len(meldungen.select(".meldung")) == len(PORTAL)
 
     assert "ressorts" not in _titelseite(_flatten(bericht))
     assert ".ressort-raster" not in lies_seite(site, "style.css")
@@ -99,11 +100,12 @@ def test_meldungsseite_zeigt_jedes_ressort_in_der_uebersicht(tmp_path):
     """Abnahmekriterium 3: erst die Ressorts, dann auf Klick die Tiefe.
 
     Die Seite war 12 249 px hoch; wer wissen wollte, was unter "Geld &
-    Uebernahmen" steht, scrollte acht Bildschirmhoehen. Jetzt hat jedes
-    Ressort eine Uebersichtskachel mit zwei bis drei Meldungen und EINEN
-    Weg in die Tiefe. Die Pixelmessung dazu macht scripts/pruefe_portal.py
-    im echten Browser; dieser Test haelt die Struktur fest, die sie
-    voraussetzt."""
+    Uebernahmen" steht, scrollte acht Bildschirmhoehen. Bis zum 09.10.2026
+    hatte deshalb jedes Ressort eine Uebersichtskachel. Seit dem Redesign
+    steht die Woche als EINE Bildwand, und die Ressorts sind die Filter
+    darueber: jedes Ressort hat genau einen, mit seinem Namen und seiner
+    Zahl, in der Reihenfolge von `_nach_ressort`. Die Zahl ist gegen die
+    Berichtsdatei gerechnet, nicht gegen die Vorlage."""
     from telco_radar.report.html import _flatten, _nach_ressort
 
     site = render(tmp_path, highlights=PORTAL)
@@ -113,18 +115,16 @@ def test_meldungsseite_zeigt_jedes_ressort_in_der_uebersicht(tmp_path):
     )
     echt = _nach_ressort(_flatten(bericht))
 
-    kacheln = soup.select(".rkachel")
-    assert len(kacheln) == len(echt), "Nicht jedes Ressort hat eine Kachel"
-    for kachel, r in zip(kacheln, echt):
-        assert kachel.select_one(".rubrik h2").get_text(strip=True) == r["label"]
-        stuecke = kachel.select(".rk-stueck")
-        assert 2 <= len(stuecke) <= 3 or len(stuecke) == r["n"], (
-            f"{r['label']}: {len(stuecke)} Meldungen in der Kachel"
-        )
-        alle = kachel.select("a.rkachel-alle")
-        assert len(alle) == 1
-        assert alle[0]["href"] == f"#ressort-{r['key']}"
-        assert soup.select_one(f"details#ressort-{r['key']}") is not None
+    filter_ = soup.select('.chip[data-filter="ressort"]:not([data-wert=""])')
+    assert len(filter_) == len(echt), "Nicht jedes Ressort hat einen Filter"
+    for chip, r in zip(filter_, echt):
+        zahl = chip.select_one(".rubrik-zahl").get_text(strip=True)
+        name = chip.get_text(" ", strip=True).removesuffix(zahl).strip()
+        assert name == r["label"]
+        assert int(zahl) == r["n"], r["label"]
+        gezeigt = soup.select(f'.meldung[data-ressort="{chip["data-wert"]}"]')
+        assert len(gezeigt) == r["n"], r["label"]
+    assert sum(r["n"] for r in echt) == len(soup.select(".meldung")) == len(PORTAL)
 
 
 @pytest.mark.parametrize(

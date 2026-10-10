@@ -324,38 +324,56 @@ def test_ohne_promo_stats_bleibt_die_seite_wie_vorher(tmp_path):
     assert "Aktionsseiten gelesen" not in html
 
 
-def test_oberhalb_der_falz_stehen_mindestens_sechs_geschichten(tmp_path):
-    """Abnahmekriterium 1 des Auftrags, als Test.
+def test_der_erste_bildschirm_traegt_die_meldung_der_woche(tmp_path):
+    """Abnahmekriterium 1 des Auftrags, neu gefasst mit dem Redesign vom
+    09.10.2026.
 
-    Bis zum 06.08.2026 standen dort vier: ein Aufmacher und drei gleich
-    grosse Anreisser. Das war der Kern von Antonios Befund - eine
-    Titelseite mit vier Geschichten ist keine.
+    Bis zum 06.08.2026 standen oberhalb der Falz vier Geschichten, danach
+    sechs in einem Zeitungsraster. Seit dem Redesign traegt der erste
+    Bildschirm drei Fenster ueber dem Campusbild - Meldung der Woche,
+    Geraete-Leitzahl, Promo-Zahl -, und die Schlagzeile dort ist die erste
+    der Seite und eine der staerksten der Ausgabe, nicht irgendeine.
     """
     html = lies_seite(render(tmp_path, highlights=PORTAL), "index.html")
-    oben = _schlagzeilen(html, ".front-oben")
-    assert len(oben) >= 6, f"Nur {len(oben)} Geschichten oberhalb der Falz"
+    soup = BeautifulSoup(html, "html.parser")
+    assert soup.select(".buehne .fenster"), "der erste Bildschirm traegt keine Fenster"
+    titel = _schlagzeilen(html, ".buehne .fenster--meldung")
+    assert len(titel) == 1, titel
+    staerkste = {
+        f"Meldung {100 + i}" for i, h in enumerate(PORTAL) if h["relevance"] == 5
+    }
+    assert titel[0] in staerkste, titel[0]
+    assert _schlagzeilen(html)[0] == titel[0], "vor der Meldung der Woche steht eine"
 
 
 def test_kein_kleines_bild_in_einer_grossen_position(tmp_path):
-    """Abnahmekriterium 3: kein Bild im Aufmacher oder in der zweiten Reihe
-    unter 800 px Breite.
+    """Abnahmekriterium 3: kein Bild unter 800 px Breite in einer grossen
+    Position.
 
     Am 06.08.2026 war der Aufmacher der Ausgabe ein 120x90-Vorschaubild aus
-    einem Feed, auf rund 620 px hochskaliert. Die Ursache war die Auswahl
-    ("Feed-Bild zuerst"), aber die Seite muss sich auch dann wehren, wenn
-    die Beschaffung wieder etwas Kleines liefert.
+    einem Feed, auf rund 620 px hochskaliert. Die grosse Position ist seit
+    dem Redesign vom 09.10.2026 die doppelt grosse Kachel der Bildwand auf
+    meldungen.html: eine Meldung mit kleinem Bild rueckt dort eine Stufe
+    herunter, statt hochskaliert zu werden. Die Gegenprobe haelt fest, dass
+    es kleine Bilder in der Ausgabe gibt - sonst prueft der Test nichts.
     """
     from telco_radar.report.bilder import MIND_BREITE_GROSS
 
     site = render(tmp_path, highlights=PORTAL)
-    soup = BeautifulSoup(lies_seite(site, "index.html"), "html.parser")
-    gross = soup.select(".aufmacher-bild img, .reihe-zwei .stueck-bild img")
-    assert gross, "Weder Aufmacher noch zweite Reihe tragen ein Bild"
+    soup = BeautifulSoup(lies_seite(site, "meldungen.html"), "html.parser")
+    gross = soup.select(".mw--gross .mw-bild img")
+    assert gross, "keine grosse Kachel traegt ein Bild"
     for img in gross:
         breite = int(img.get("width") or 0)
         assert breite >= MIND_BREITE_GROSS, (
             f"Bild mit {breite} px in einer grossen Position ({img.get('src')})"
         )
+    klein = [
+        img
+        for img in soup.select(".mw .mw-bild img")
+        if int(img.get("width") or 0) < MIND_BREITE_GROSS
+    ]
+    assert klein, "Gegenprobe: die Ausgabe traegt kein kleines Bild"
 
 
 def test_geloeschtes_bild_hinterlaesst_keinen_leeren_kasten(tmp_path):
@@ -416,22 +434,20 @@ def test_kopfzeile_nennt_gelesen_und_relevant_getrennt(tmp_path):
 def test_meldungsseite_zeigt_wirklich_alle_meldungen(tmp_path):
     """Keine Meldung darf beim Umbau verschwinden.
 
-    Seit dem 07.08.2026 stehen die Ressortbloecke in einem <details>: oben
-    die Uebersicht, die Tiefe auf Klick. Zugeklappt heisst NICHT weg - die
-    Belegebene ist Antonios ausdrueckliche Anforderung (CLAUDE.md §8), und
-    alle Meldungen stehen vollstaendig im Quelltext, also auch im Suchlauf
-    des Browsers.
-
-    Gezaehlt wird ueber die Klasse `meldung`, die jede der drei
-    Gewichtungen traegt (Ressortaufmacher, mittel, Zeile). Vorher lief die
-    Zaehlung ueber `data-such` - ein Attribut, das es nur fuer den
-    inzwischen entfernten Filter gab."""
+    Seit dem Redesign vom 09.10.2026 steht die Woche als Bildwand, die
+    Randnotizen als Liste darunter; die Ressorts sind Filter. Gezaehlt wird
+    ueber die Klasse `meldung`, die jede Kachel und jede Randnotiz traegt -
+    und gegen die Zahlen der Filter: "Alle" und die Summe der Ressorts."""
     site = render(tmp_path, highlights=PORTAL)
     soup = BeautifulSoup(lies_seite(site, "meldungen.html"), "html.parser")
-    assert len(soup.select(".mressort .meldung")) == len(PORTAL)
+    assert len(soup.select(".meldung")) == len(PORTAL)
+    alle = soup.select_one('.chip[data-filter="ressort"][data-wert=""] .rubrik-zahl')
+    assert int(alle.get_text(strip=True)) == len(PORTAL)
     aus_ressorts = [
-        int(re.search(r"\d+", z.get_text(" ", strip=True)).group())
-        for z in soup.select(".mressort > summary .rubrik-zahl")
+        int(z.get_text(strip=True))
+        for z in soup.select(
+            '.chip[data-filter="ressort"]:not([data-wert=""]) .rubrik-zahl'
+        )
     ]
     assert sum(aus_ressorts) == len(PORTAL)
 
@@ -456,36 +472,39 @@ def test_meldungsseite_traegt_den_entfernten_filter_nicht_mehr(tmp_path):
 
 
 def test_meldungsseite_gruppiert_und_gewichtet(tmp_path):
-    """Abnahmekriterium 4: Ressorts statt einer flachen Liste, und innerhalb
-    eines Ressorts drei Groessen statt einer.
+    """Abnahmekriterium 4: Ressorts statt einer flachen Liste, und drei
+    Groessen statt einer.
 
     Vorher rendete die Seite 193-mal denselben Block. Antonio nannte das
     "extrem beschissenes Layout" - zu Recht, das war eine Datenbankausgabe.
+    Seit dem Redesign vom 09.10.2026 gewichtet die Prioritaet die Kachel
+    (5 gross, 4 mittel, 3 klein), und die Ressorts filtern die Wand; jede
+    Meldung gehoert genau einem Ressort, und jeder Filter zaehlt, was er
+    zeigt.
     """
     soup = BeautifulSoup(
         lies_seite(render(tmp_path, highlights=PORTAL), "meldungen.html"), "html.parser"
     )
 
-    ressorts = soup.select(".mressort")
+    ressorts = soup.select('.chip[data-filter="ressort"]:not([data-wert=""])')
     assert len(ressorts) >= 3, "Die Seite ist nicht nach Ressorts gegliedert"
-    assert all(sec.name == "details" for sec in ressorts), (
-        "Die Ressortbloecke sind nicht aufklappbar"
-    )
-    for sec in ressorts:
-        assert len(sec.select(".mlead")) == 1
-    assert any(
-        sec.select(".mlead") and sec.select(".mzwei") and sec.select(".mz")
-        for sec in ressorts
-    )
-    links = soup.select(".rkachel .rkachel-alle")
-    assert len(links) == len(soup.select(".rkachel"))
-    aus_kacheln = [
-        int(re.search(r"\d+", a.get_text(" ", strip=True)).group()) for a in links
-    ]
-    assert sum(aus_kacheln) == len(PORTAL)
-    assert not soup.select(".rkachel .rubrik-zahl"), (
-        "Die Ressortzahl steht wieder zweimal in derselben Kachel"
-    )
+    werte = {c["data-wert"] for c in ressorts}
+    meldungen = soup.select(".meldung")
+    assert all(m["data-ressort"] in werte for m in meldungen)
+    for chip in ressorts:
+        n = int(chip.select_one(".rubrik-zahl").get_text(strip=True))
+        unter = [m for m in meldungen if m["data-ressort"] == chip["data-wert"]]
+        assert n == len(unter), chip["data-wert"]
+
+    groessen = {
+        g
+        for m in soup.select(".bildwand .meldung")
+        for g in ("mw--gross", "mw--mittel", "mw--klein")
+        if g in m["class"]
+    }
+    assert groessen == {"mw--gross", "mw--mittel", "mw--klein"}
+    for kachel in soup.select(".mw--gross"):
+        assert kachel.select_one(".punkt--r5"), "grosse Kachel ohne Prioritaet 5"
 
 
 def test_wochenseite_traegt_die_explorer_daten_nicht_mehr(tmp_path):
@@ -563,13 +582,19 @@ def test_ohne_profile_kein_leerer_block(tmp_path):
 def test_bericht_bekommt_ein_inhaltsverzeichnis_mit_ankern(tmp_path):
     """2863 Woerter in elf Abschnitten standen als ein Block ohne Einstieg
     da. Jede Ueberschrift braucht einen Anker, damit man aus einer Mail in
-    einen Abschnitt verlinken kann."""
-    html = lies_seite(render(tmp_path), "index.html")
+    einen Abschnitt verlinken kann. Seit dem Redesign vom 09.10.2026 ist
+    jeder Abschnitt eine Szene mit eigenem Anker, und das Verzeichnis steht
+    am Rand (`kapitel-marke`)."""
+    soup = BeautifulSoup(lies_seite(render(tmp_path), "index.html"), "html.parser")
 
-    assert '<nav class="toc"' in html
+    verzeichnis = soup.select_one("nav.kapitel-marke")
+    assert verzeichnis is not None
+    ziele = [a["href"] for a in verzeichnis.select("a")]
     for titel, anker in (("Auf einen Blick", "auf-einen-blick"), ("Europa", "europa")):
-        assert f'href="#{anker}"' in html
-        assert f'<h2 id="{anker}">{titel}</h2>' in html
+        assert f"#{anker}" in ziele
+        szene = soup.select_one(f"section#{anker}")
+        assert szene is not None, anker
+        assert szene.select_one("h2").get_text(strip=True) == titel
 
 
 def test_lesezeit_wird_genannt(tmp_path):
@@ -1254,27 +1279,36 @@ def test_die_schriftkachel_wiederholt_den_absender_nicht(tmp_path):
             assert not karte.select_one(".dzk-op"), karte.get_text(" ", strip=True)[:80]
 
 
-def test_das_marktbild_zaehlt_was_die_bibliothek_zeigt(tmp_path):
-    """Die Auswertung steht vor den Beispielen und muss dieselben Zahlen
-    nennen wie die Rubriken darunter - sonst hat die Seite zwei Wahrheiten."""
+def test_jede_hebelkachel_zaehlt_die_anbieter_unter_ihr(tmp_path):
+    """Die Statistik des Marktbilds ist mit dem Redesign vom 09.10.2026
+    gefallen (Antonio: Statistiken und Tabellen "nicht so cool"). Geblieben
+    ist EINE Zahl je Hebel: wie viele verschiedene Anbieter ihn ziehen.
+    Gerechnet gegen die beiden Speicher, nicht gegen die Vorlage - und mit
+    einem Anbieter, der zweimal denselben Hebel zieht, damit sich die Zahl
+    von der Zahl der Beispiele unterscheidet."""
+    doppelt = dict(
+        DIFF_DB[0],
+        id="https://sweep-doppelt.example.com/x",
+        url="https://sweep-doppelt.example.com/x",
+        what="Zweites Beispiel desselben Anbieters als Zusatzleistung.",
+    )
+    db = [*DIFF_DB, doppelt]
     soup = BeautifulSoup(
-        lies_seite(_mit_differenzierung(tmp_path), "differenzierung.html"),
+        lies_seite(_mit_differenzierung(tmp_path, db=db), "differenzierung.html"),
         "html.parser",
     )
-    marktbild = soup.select_one(".dz-marktbild")
-    gesamt = marktbild.select_one(".rubrik-zahl").get_text(" ", strip=True)
-    assert gesamt == f"{len(DIFF_DB) + len(DIFF_STORE)} Beispiele"
-
-    balken = {
-        li.select_one(".dz-balken-name").get_text(strip=True): int(
-            li.select_one(".dz-balken-n").get_text(strip=True)
-        )
-        for li in marktbild.select(".dz-mb-block")[0].select("li")
+    erwartet: dict[str, set[str]] = {}
+    for e in db + DIFF_STORE:
+        erwartet.setdefault(e["theme"], set()).add(e["operator"])
+    gesehen = {
+        k["data-hebel"]: k.select_one(".hebel-zahl").get_text(" ", strip=True)
+        for k in soup.select(".hebel-kachel")
     }
-    for abschnitt in soup.select(".dz-hebel"):
-        label = abschnitt.select_one("h2").get_text(strip=True)
-        n = len(abschnitt.select(".dzk"))
-        assert balken[label] == n, label
+    assert gesehen == {
+        key: f"{len(anbieter)} Anbieter" for key, anbieter in erwartet.items()
+    }
+    ki = soup.select_one("#dz-theme-ki")
+    assert len(ki.select(".dzk")) > len(erwartet["ki"])
 
 
 def test_jeder_hebel_sagt_in_einem_satz_was_er_bedeutet(tmp_path):
@@ -1416,29 +1450,38 @@ def test_keine_seite_erklaert_ihre_eigene_bedienung(tmp_path):
 
 
 def test_meldungskopf_ist_kicker_und_ueberschrift(tmp_path):
-    """Kein Erklaersatz unter der H1 - Antonios woertliches Beispiel."""
+    """Kein Erklaersatz unter der H1 - Antonios woertliches Beispiel.
+
+    Seit dem Redesign vom 09.10.2026 steht der Kopf im Bildband: die
+    Ausgabe, der Titel und als einzige weitere Zeile die Zahl der Meldungen
+    - gegen die Berichtsdatei gezaehlt."""
     soup = BeautifulSoup(
         lies_seite(render(tmp_path, highlights=PORTAL), "meldungen.html"), "html.parser"
     )
-    kopf = soup.select_one(".meldungen-kopf")
+    kopf = soup.select_one(".band .band-text")
     kinder = [k.name for k in kopf.find_all(recursive=False)]
-    assert kinder == ["p", "h1"], kinder
-    assert kopf.select_one("p")["class"] == ["page-kicker"]
+    assert kinder == ["p", "h1", "p"], kinder
+    assert kopf.select_one("p")["class"] == ["band-kicker"]
+    assert kopf.select_one("h1").get_text(strip=True) == "Meldungen"
+    assert kopf.select_one(".band-stand").get_text(strip=True) == (
+        f"{len(PORTAL)} Meldungen dieser Woche"
+    )
 
 
-def test_archivzeile_nennt_nur_die_neuen_meldungen(tmp_path):
+def test_archivzeile_nennt_nur_das_datum(tmp_path):
     """ "3447 gesammelt · 381 neu" waren zwei Zahlen je Zeile, von denen eine
     (die gesammelten) eine Transparenzfrage beantwortet und dort auch
-    steht."""
+    steht. Seit dem Redesign vom 09.10.2026 nennt das Archiv nur noch die
+    Ausgabe selbst: ihr Datum, als Link auf die Woche."""
     site = render(tmp_path, highlights=PORTAL)
     soup = BeautifulSoup(lies_seite(site, "meldungen.html"), "html.parser")
-    zeilen = soup.select("#archiv .list-row")
-    assert zeilen
-    for z in zeilen:
-        felder = [s["class"][0] for s in z.select("span")]
-        assert felder == ["list-row-date", "list-row-new"], felder
+    daten = soup.select("#archiv .archiv-datum")
+    assert daten
+    for a in daten:
+        assert re.fullmatch(r"reports/\d{4}-\d{2}-\d{2}\.html", a["href"]), a["href"]
+        assert not a.select("span")
+    assert daten[0]["href"] == "reports/2026-08-05.html"
     assert "gesammelt" not in lies_seite(site, "meldungen.html")
-    assert f"{NEU_GESAMMELT} neue Meldungen" in zeilen[0].get_text(" ", strip=True)
 
 
 def test_zaehlwerte_tragen_ueberall_dieselbe_klasse(tmp_path):
@@ -1468,20 +1511,15 @@ def _ctm_highlight(i, *, ctm_bezug, relevance=3, satz=None, operator=None):
     return h
 
 
-def test_zwei_minuten_steht_in_der_spalte_ueber_was_wichtig_ist(tmp_path):
-    """Bis zum 09.08.2026 stand der Kasten UEBER dem Aufmacher, und dieser
-    Test hat genau das festgehalten ("wer zwei Minuten hat, soll nicht erst
-    eine Zeitungsseite durchqueren").
+def test_zwei_minuten_steht_nach_der_buehne_und_vor_was_wichtig_ist(tmp_path):
+    """Bis zum 09.08.2026 stand der Kasten UEBER dem Aufmacher und hat die
+    Schlagzeile aus dem ersten Bildschirm gedraengt; danach stand er in der
+    rechten Spalte ueber "Was wichtig ist".
 
-    Die Rechnung ging nicht auf: fuenf Eintraege zu je einem Absatz plus
-    Belegzeile haben die Schlagzeile des Aufmachers aus dem ersten
-    Bildschirm gedraengt - der Kurzpfad hat nicht den Weg zur Titelseite
-    abgekuerzt, sondern sie ersetzt. Er steht jetzt in der rechten Spalte
-    ueber "Was wichtig ist": derselbe erste Bildschirm, aber neben der
-    Nachricht statt vor ihr.
-
-    Geprueft wird die Reihenfolge INNERHALB der Spalte mit - die beiden
-    Module sortieren nach derselben Achse, und der kuerzere fuehrt."""
+    Seit dem Redesign vom 09.10.2026 ist er die erste Szene des Berichts:
+    unter dem ersten Bildschirm (die Meldung der Woche bleibt dort) und vor
+    "Was wichtig ist" - die beiden sortieren nach derselben Achse, und der
+    kuerzere fuehrt."""
     hs = [
         _ctm_highlight(
             1,
@@ -1493,12 +1531,13 @@ def test_zwei_minuten_steht_in_der_spalte_ueber_was_wichtig_ist(tmp_path):
     ] + PORTAL
     html = lies_seite(render(tmp_path, highlights=hs), "index.html")
     assert "In zwei Minuten" in html
-    assert html.index("front-oben") < html.index("kurzpfad")
     soup = BeautifulSoup(html, "html.parser")
-    spalte = soup.select_one(".front-wichtig")
-    assert spalte.select_one(".kurzpfad") is not None
-    rubriken = [h2.get_text(strip=True) for h2 in spalte.select("h2")]
-    assert rubriken[:2] == ["In zwei Minuten", "Was wichtig ist"]
+    szenen = [s.get("id") for s in soup.select(".bericht > section.szene")]
+    assert szenen[0] == "in-zwei-minuten", szenen
+    assert soup.select_one("#in-zwei-minuten .kurzpfad") is not None
+    assert soup.select_one(".buehne .kurzpfad") is None
+    assert html.index('class="buehne"') < html.index("kurzpfad")
+    assert html.index("kurzpfad") < html.index("wichtig-liste")
 
 
 def test_zwei_minuten_zeigt_nur_saetze_mit_quelle(tmp_path):

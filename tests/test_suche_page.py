@@ -124,7 +124,11 @@ def test_navigation_hat_fuenf_eintraege(tmp_path):
     eigener Nav-Eintrag wäre eine zweite Adresse für dieselbe Antwort
     (Antonio: „Geräte, Wettbewerbs-Radar, eine Unterseite"). Die Alt-URL
     bleibt als Weiterleitung erreichbar; der Eintrag kommt nicht wieder,
-    solange es keine achte FRAGE gibt."""
+    solange es keine achte FRAGE gibt.
+
+    Seit dem Redesign vom 09.10.2026 ist "Welt" (differenzierung.html) die
+    zweite Ansicht von "Wettbewerb" - ein Umschalter auf der Seite, kein
+    eigener Eintrag -, und Promo steht als Eintrag wie jeder andere da."""
     reports_dir = tmp_path / "data" / "reports"
     reports_dir.mkdir(parents=True)
     site_dir = tmp_path / "site"
@@ -136,11 +140,12 @@ def test_navigation_hat_fuenf_eintraege(tmp_path):
     for ziel in (
         "index.html",
         "meldungen.html",
-        "differenzierung.html",
         "wettbewerb.html",
+        "promo/index.html",
         "transparenz.html",
     ):
         assert f'href="{ziel}"' in nav
+    assert 'href="differenzierung.html"' not in nav
     assert ">Quellen</a>" in nav
     assert ">Transparenz</a>" not in nav
     assert nav.count("<a ") == 5

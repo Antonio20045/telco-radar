@@ -1,5 +1,7 @@
 {% extends "base.html.j2" %}
+{% import "_design.html.j2" as d %}
 {% set usecase = 'promo' %}
+{% set buehne = true %}
 {% set active = 'promo_quellen' %}
 {% block title %}Promo Übersicht · Quellen{% endblock %}
 {% set kmap = {'static': 'Aktionsseite', 'js': 'Aktionsseite (JS)', 'skip': 'Referenz (nicht automatisiert)'} %}
@@ -19,10 +21,15 @@
       {% if s.note %}<p class="source-domain">{{ s.note }}</p>{% endif %}
     </div>
 {% endmacro %}
+{% block buehne %}
+{% call d.band('band-promo', 'Promo · Transparenz', 'Beobachtete Anbieter', prefix) %}
+{{ d.umschalter([{'key': 'aktionen', 'href': 'promo/index.html', 'label': 'Aktionen'},
+                 {'key': 'quellen', 'href': 'promo/quellen.html', 'label': 'Quellen'}], 'quellen', prefix, 'Ansicht') }}
+{% endcall %}
+{% endblock %}
+
 {% block content %}
-<section class="page-hero wide">
-  <p class="page-kicker">Transparenz</p>
-  <h1>Beobachtete Anbieter</h1>
+<section class="page-hero wide page-hero--leise">
   <p class="page-lead">Jede Zeile ist die <b>eigene Aktions-/Tarifseite</b> des Anbieters – keine Preisvergleichsseite gilt hier als Quelle eines Anbieters. Vergleichsportale und Fachpresse dienen höchstens als ergänzende, klar getrennte Diskoveryschicht (nicht automatisiert eingebunden).</p>
   <p class="page-lead">Ein Anbieter zeigt seine laufenden Aktionen selten auf einer einzigen Seite: der Gerätedeal steht unter „Handys“, der Wechselbonus auf einer eigenen Landingpage, die Prepaid-Aktion wieder woanders. Deshalb werden je Marke <b>mehrere Seiten</b> abgefragt – zusammen <b>{{ sources | map(attribute='crawled_pages') | map('length') | sum }} Seiten</b> bei {{ sources | length }} Marken. Steht bei einer Marke nur eine Seite, hat die Prüfung dort keine zweite gefunden, die etwas anderes zeigt.</p>
 </section>

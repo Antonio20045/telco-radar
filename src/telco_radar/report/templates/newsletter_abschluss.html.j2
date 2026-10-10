@@ -1,5 +1,8 @@
 {% extends "base.html.j2" %}
+{% import "_design.html.j2" as d %}
+{% set hintergrund = true %}
 {% block title %}{{ titel }} – Vodafone Product and Services Insights{% endblock %}
+{% block buehne %}{{ d.hintergrund('band-newsletter', prefix) }}{% endblock %}
 {% block content %}
 {# STATISCH, und das ist der ganze Punkt.
 

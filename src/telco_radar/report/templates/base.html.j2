@@ -1,130 +1,68 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" class="ohne-js">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}Vodafone Product and Services Insights{% endblock %}</title>
   <meta name="robots" content="noindex">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  {# Zeitungssatz: eine Serife fuer alles, was gelesen wird, eine Grotesk
-     (Franklin - die klassische Zeitungs-Etikettenschrift) fuer alles, was
-     benennt. Beide mit lokalen Rueckfallschriften im CSS, damit die Seite
-     ohne Google Fonts nicht zusammenbricht. #}
-  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400;1,8..60,600&family=Libre+Franklin:wght@600;700;800&display=swap" rel="stylesheet">
+  {# Eine Schrift fuer alles (Instrument Sans, SIL OFL), selbst gehostet:
+     keine Schrift und kein Skript von einem CDN (CLAUDE.md, Regel 5). #}
+  <link rel="preload" href="{{ prefix }}static/schrift/instrument-sans.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="{{ prefix }}style.css">
   <link rel="icon" type="image/png" href="{{ prefix }}logo.png">
 </head>
-<body class="uc-{{ usecase | default('markt') }}">
-  {% set uc = usecase | default('markt') %}
-  <header class="topbar">
-    <div class="topbar-inner">
+{% set uc = usecase | default('markt') %}
+<body class="uc-{{ uc }} seite-{{ active | default('seite') }}{% if buehne %} mit-buehne{% endif %}{% if hintergrund %} mit-hintergrund{% endif %}">
+  <a class="sprungmarke" href="#inhalt">Zum Inhalt</a>
+  {# Der Kopf schwebt ueber dem Bild jeder Seite: Marke links, EINE
+     Navigation in der Mitte, Suche und Newsletter rechts. Die Trennung
+     "Marktrecherche | Promo Übersicht" ist mit dem Redesign vom 09.10.2026
+     gefallen - Promo ist ein Eintrag wie jeder andere. #}
+  <header class="topbar kopf" id="kopf">
+    <div class="topbar-inner kopf-inner">
       <a class="brand" href="{{ prefix }}index.html" aria-label="Vodafone Product and Services Insights">
         <span class="brand-logo-wrap"><img class="brand-logo" src="{{ prefix }}logo.png" alt="" width="15" height="15"></span>
         <span class="brand-name">Vodafone <span class="brand-zusatz">Product and Services</span> <em>Insights</em></span>
       </a>
-      <div class="topbar-right">
-        <nav class="usecases" aria-label="Anwendungsfälle">
-          <a class="uc {% if uc=='markt' %}active{% endif %}" href="{{ prefix }}index.html">Marktrecherche</a>
-          <a class="uc {% if uc=='promo' %}active{% endif %}" href="{{ prefix }}promo/index.html">Promo Übersicht</a>
-        </nav>
-        {# Das Feld fuehrt auf `suche.html` - die Dossier-Seite. Bis zum
-           08.08.2026 zeigte es auf `meldungen.html`, und der Suchende landete
-           auf einer Seite voller Ressortkacheln, deren Treffer erst nach rund
-           2400 px kamen. Antonio: "Ich verstehe nicht, warum ich da
-           weitergeleitet werde."
-
-           Auf der Suchseite selbst faellt es weg (`ohne_topbar_suche`): dort
-           steht das grosse Feld im Seitenkopf, und zwei Suchfelder auf einer
-           Seite sind zwei Bedienelemente fuer eine Handlung. #}
+      <nav class="subbar subnav navi" aria-label="Marktrecherche">
+        <a href="{{ prefix }}index.html" {% if active=='woche' %}class="on" aria-current="page"{% endif %}>Diese Woche</a>
+        <a href="{{ prefix }}meldungen.html" {% if active=='meldungen' %}class="on" aria-current="page"{% endif %}>Meldungen</a>
+        <a href="{{ prefix }}wettbewerb.html" {% if active in ('wettbewerb', 'differenzierung') %}class="on" aria-current="page"{% endif %}>Wettbewerb</a>
+        {# "Geräte" erscheint, sobald die Seite ihre Frage beantworten kann
+           (`geraete_view.schwelle_erreicht()` -> `geraete_verlinkt`). #}
+        {% if geraete_verlinkt %}
+        <a href="{{ prefix }}geraete.html" {% if active=='geraete' %}class="on" aria-current="page"{% endif %}>Geräte</a>
+        {% endif %}
+        <a href="{{ prefix }}promo/index.html" {% if uc=='promo' %}class="on" aria-current="page"{% endif %}>Promo</a>
+        <a href="{{ prefix }}transparenz.html" {% if active=='transparenz' %}class="on" aria-current="page"{% endif %}>Quellen</a>
+      </nav>
+      <div class="topbar-right kopf-rechts">
+        {# Auf der Suchseite selbst faellt das Feld weg: dort steht das grosse
+           Feld im Seitenkopf. ⌘K oder Strg+K setzt den Fokus hierher. #}
         {% if not ohne_topbar_suche %}
         <form class="gsearch" id="gsearch" role="search" action="{{ prefix }}suche.html" autocomplete="off">
+          <svg class="gsearch-lupe" viewBox="0 0 20 20" width="15" height="15" fill="none" aria-hidden="true">
+            <circle cx="9" cy="9" r="6.2" stroke="currentColor" stroke-width="1.7"/>
+            <line x1="13.6" y1="13.6" x2="18" y2="18" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+          </svg>
           <input type="search" id="gsearch-input" name="q" class="gsearch-input" autocomplete="off"
-                 placeholder="Im Archiv suchen …"
+                 placeholder="Suchen"
                  aria-label="Marktrecherche durchsuchen">
-          <button type="submit" class="gsearch-btn" aria-label="Suchen">
-            <svg viewBox="0 0 20 20" width="14" height="14" fill="none" aria-hidden="true">
-              <circle cx="9" cy="9" r="6.2" stroke="currentColor" stroke-width="1.8"/>
-              <line x1="13.6" y1="13.6" x2="18" y2="18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-            </svg>
-          </button>
+          <kbd class="gsearch-taste" aria-hidden="true">⌘K</kbd>
+          <button type="submit" class="gsearch-btn" aria-label="Suchen"><span aria-hidden="true">→</span></button>
         </form>
+        {% endif %}
+        {# "Newsletter" erscheint erst, wenn die Seite Adressen entgegennehmen
+           darf - Impressum und Datenschutz vollstaendig
+           (`rechtstexte.vollstaendig()`), Art. 13 DSGVO. #}
+        {% if newsletter_verlinkt %}
+        <a class="kopf-newsletter{% if active=='newsletter' %} on{% endif %}" href="{{ prefix }}newsletter.html">Newsletter</a>
         {% endif %}
       </div>
     </div>
-    {# Hier stand bis zum 07.08.2026 eine Datumszeile ("Ausgabe vom ... ·
-       Wettbewerbsbeobachtung · 205 Quellen beobachtet") auf JEDER Seite.
-       Antonio: "Loesch diese Zeile, das ist unnoetig." Der Ausgabetag steht
-       weiterhin dort, wo er gebraucht wird - im Kopf der Meldungsseite und
-       im Titel der Wochenseite. Die Globals ausgabe_datum/ausgabe_quellen
-       sind mit dieser Zeile aus html.py entfernt worden. #}
-    {% if uc == 'promo' %}
-    <nav class="subbar subnav" aria-label="Promo Übersicht">
-      <a href="{{ prefix }}promo/index.html" {% if active=='promo_uebersicht' %}class="on"{% endif %}>Übersicht</a>
-      <a href="{{ prefix }}promo/quellen.html" {% if active=='promo_quellen' %}class="on"{% endif %}>Quellen</a>
-    </nav>
-    {% else %}
-    {# Geschnitten nach der Frage des Lesers (PLAN_MARKTRECHERCHE_REDESIGN.md,
-       Abschnitt 3): vier Eintraege statt der sieben alten Dateien, seit dem
-       08.08.2026 fuenf - "Wettbewerb" beantwortet eine eigene Frage ("was
-       machen Telekom, O2 und 1&1 ueber die Wochen") und ist die einzige
-       Seite, die nicht die aktuelle Woche zeigt. Die alten Dateinamen leben
-       als Weiterleitungen weiter - sie stehen in Lesezeichen und Mails. #}
-    <nav class="subbar subnav" aria-label="Marktrecherche">
-      <a href="{{ prefix }}index.html" {% if active=='woche' %}class="on"{% endif %}>Diese Woche</a>
-      <a href="{{ prefix }}meldungen.html" {% if active=='meldungen' %}class="on"{% endif %}>Meldungen</a>
-      <a href="{{ prefix }}differenzierung.html" {% if active=='differenzierung' %}class="on"{% endif %}>Differenzierung</a>
-      <a href="{{ prefix }}wettbewerb.html" {% if active=='wettbewerb' %}class="on"{% endif %}>Wettbewerb</a>
-      {# "Geraete" erscheint, sobald die Seite ihre Frage beantworten kann -
-         die Schwelle rechnet `geraete_view.schwelle_erreicht()`, und
-         `render_site()` setzt daraus `geraete_verlinkt`. Bis zum 11.08.2026
-         stand die Schwelle nur im Test: die Seite war fertig, live und
-         vollstaendig, und kein Leser konnte sie finden, weil das Eintragen
-         Handarbeit blieb. Eine Regel, die nur ein Test kennt, schaltet
-         keine Navigation. #}
-      {% if geraete_verlinkt %}
-      <a href="{{ prefix }}geraete.html" {% if active=='geraete' %}class="on"{% endif %}>Geräte</a>
-      {% endif %}
-      {# "Wettbewerbs-Radar" stand hier vom 08.09. bis zum 17.09.2026 und
-         ist gefallen: Seit E3 (AUFTRAG_GERAETE_EINE_SEITE_V2 §1d) ist der
-         Radar der Reiter "Radar" der EINEN Geräteseite - ein zweiter
-         Eintrag wäre eine zweite Adresse für dieselbe Antwort (Antonios
-         Wortlaut dazu: Geräte als EINE Seite mit Reitern). Die Alt-URL
-         leitet als Weiterleitung auf geraete.html#tafel-radar weiter;
-         die Schwelle `radar_verlinkt` schaltet nur noch den
-         Fußlink der Geräteseite. #}
-      {# "Lieferzeiten" und "Tarife" standen hier vom 08.08. bis zum
-         09.08.2026 und sind wieder heraus. Nicht geloescht - beide Seiten
-         werden weiter gebaut, getestet und sind ueber ihren direkten Link
-         erreichbar. Sie sind nur nicht verlinkt, weil sie ihre Frage
-         derzeit nicht beantworten koennen: die Tarifseite kennt zwei
-         o2-Tarife und keinen einzigen von Telekom, Vodafone oder 1&1, die
-         Lieferzeitseite keinen der drei grossen Anbieter. Eine verlinkte
-         Seite verspricht eine Antwort; eine Seite mit einem Viertel des
-         Marktes gibt eine falsche.
-
-         Die Schwelle steht in CLAUDE.md §5 und ist zahlenmaessig: Tarife
-         drei Anbieter, zwoelf Mobilfunktarife, ein Tarif mit echter
-         Rabattphase - Lieferzeiten Telekom, o2 und 1&1 erfasst. Wer sie
-         wieder eintraegt, misst vorher nach. #}
-      <a href="{{ prefix }}transparenz.html" {% if active=='transparenz' %}class="on"{% endif %}>Quellen</a>
-      {# "Newsletter" erscheint erst, wenn die Seite Adressen entgegennehmen
-         DARF - also wenn Impressum und Datenschutzerklaerung vollstaendig
-         sind (`rechtstexte.vollstaendig()`). Bis dahin wird die Seite
-         gebaut, sagt sichtbar warum sie gesperrt ist, und ist nur ueber
-         ihren direkten Link erreichbar.
-
-         Dieselbe Mechanik wie bei "Geraete" und aus demselben Grund im CODE
-         statt in einem Test: eine Regel, die nur ein Test kennt, schaltet
-         keine Navigation. Der Unterschied ist der Grund - bei den Geraeten
-         geht es um Aussagekraft, hier um Art. 13 DSGVO. #}
-      {% if newsletter_verlinkt %}
-      <a href="{{ prefix }}newsletter.html" {% if active=='newsletter' %}class="on"{% endif %}>Newsletter</a>
-      {% endif %}
-    </nav>
-    {% endif %}
   </header>
-  <main>
+  <main id="inhalt">
+    {% block buehne %}{% endblock %}
     <div class="{{ wrap_class | default('wrap') }}">
       {% if ausfaelle %}<p class="ausfall-hinweis" id="ausfaelle">Nicht neu gebaut: {% for a in ausfaelle %}{{ a.teil }} ({{ a.grund | truncate(160) }}){% if not loop.last %} · {% endif %}{% endfor %}</p>{% endif %}
       {% block content %}{% endblock %}
@@ -132,16 +70,9 @@
   </main>
   <footer class="foot">
     <div class="foot-inner">
-      Vodafone Product and Services Insights &middot; {% if uc == 'promo' %}Promo Übersicht{% else %}Marktrecherche{% endif %} &middot; automatisch erstellt, jede Aussage mit Quelle
-      {# Impressum und Datenschutz stehen seit dem 11.08.2026 hier - auf JEDER
-         Seite, nicht nur auf der Startseite. Sobald das Portal eine einzige
-         E-Mail-Adresse entgegennimmt, sind die Informationspflichten nach
-         Art. 13 DSGVO faellig, und sie sind zum Zeitpunkt der Erhebung
-         faellig: der Link muss dort stehen, wo das Formular steht.
-
-         Verlinkt wird nur, was auch gerendert wurde (`rechtstexte_verlinkt`
-         kommt aus `render_site()`). Eine Fusszeile, die auf eine 404 zeigt,
-         ist schlechter als eine ohne Link. #}
+      <span>Vodafone Product and Services Insights &middot; automatisch erstellt, jede Aussage mit Quelle</span>
+      {# Impressum und Datenschutz auf JEDER Seite (Art. 13 DSGVO); verlinkt
+         wird nur, was auch gerendert wurde (`rechtstexte_verlinkt`). #}
       {% set rv = rechtstexte_verlinkt | default([]) %}
       {% if rv %}
       <span class="foot-recht">
@@ -150,6 +81,9 @@
       </span>
       {% endif %}
     </div>
+    <p class="foot-bildnachweis">Bilder: generiert für dieses Portal. Campus-Motiv nach einer Vorlage von
+      <a href="https://commons.wikimedia.org/wiki/File:Vodafone-Campus_D%C3%BCsseldorf.jpg" target="_blank" rel="noopener">Wikimedia Commons</a>.
+      Schrift: Instrument Sans (SIL Open Font License).</p>
   </footer>
   <script src="{{ prefix }}app.js"></script>
 </body>

@@ -116,24 +116,38 @@ def _site(tmp_path_factory):
 
 @pytest.fixture(scope="module")
 def _links(_site, chromium):
-    """Ein Browserstart, zwei Seiten, alle Linkmasse."""
+    """Ein Browserstart, zwei Seiten in zwei Breiten, alle Linkmasse.
+
+    Die Telefonbreite steht seit dem Redesign vom 09.10.2026 mit drin: die
+    170-px-Karten der dritten Reihe gibt es nicht mehr, die engste Stelle
+    des Links ist jetzt die Spalte am Telefon. Auf meldungen.html steht der
+    Link in der Leseansicht der Meldung, nicht auf der Kachel: gemessen
+    wird nach dem Klick auf eine Meldung mit Uebersetzung."""
     site = _site
 
     messung: dict[str, list[dict]] = {}
     with _server(site) as wurzel:
-        for seite_name in ("index.html", "meldungen.html"):
-            seite = chromium.new_page(viewport={"width": 1440, "height": 900})
+        for seite_name, breite, hoehe in (
+            ("index.html", 1440, 900),
+            ("meldungen.html", 1440, 900),
+            ("index.html", 390, 844),
+            ("meldungen.html", 390, 844),
+        ):
+            schluessel = seite_name if breite > 400 else f"{seite_name}@{breite}"
+            seite = chromium.new_page(viewport={"width": breite, "height": hoehe})
             try:
                 seite.goto(f"{wurzel}/{seite_name}", wait_until="load")
                 seite.evaluate(
                     "document.querySelectorAll('details').forEach(d=>d.open=true)"
                 )
+                if seite_name == "meldungen.html":
+                    seite.locator(".meldung:has(.ueb-link) [data-panel]").first.click()
                 seite.wait_for_timeout(400)
-                messung[seite_name] = seite.evaluate("""(() => {
+                messung[schluessel] = seite.evaluate("""(() => {
                     const raus = [];
                     document.querySelectorAll('.ueb-link').forEach(p => {
                         const a = p.querySelector('a');
-                        if (!a) return;
+                        if (!a || !p.getClientRects().length) return;
                         const r = a.getBoundingClientRect();
                         const s = getComputedStyle(a);
                         raus.push({
@@ -185,10 +199,12 @@ def test_der_link_ist_so_breit_wie_sein_text_nicht_wie_die_karte(_links):
 def test_der_link_passt_in_die_schmalste_karte(_links):
     """Die eigentliche Masszahl dieser Datei.
 
-    Die vier kleinen Karten der dritten Reihe sind 170 px breit - die
-    schmalste Stelle, an der der Link vorkommt. "Vollständige Übersetzung
-    lesen" brauchte 195 px und stand dort zweizeilig; deshalb heisst die
-    Beschriftung "Übersetzung lesen". Wer sie verlaengert, sieht es hier.
+    Bis zum Redesign vom 09.10.2026 waren die vier kleinen Karten der
+    dritten Reihe 170 px breit - die schmalste Stelle, an der der Link
+    vorkam. "Vollständige Übersetzung lesen" brauchte 195 px und stand dort
+    zweizeilig; deshalb heisst die Beschriftung "Übersetzung lesen". Heute
+    ist die schmalste Stelle die Spalte am Telefon. Wer die Beschriftung
+    verlaengert, sieht es hier.
 
     Verglichen wird gegen die KARTE und nicht gegen einen festen Wert: die
     echte Schrift laedt in der Sandbox nicht, ein Pixelmass waere eine Wette
@@ -196,7 +212,7 @@ def test_der_link_passt_in_die_schmalste_karte(_links):
     """
     alle = [lk for seite in _links.values() for lk in seite]
     schmalste = min(lk["eltern_breite"] for lk in alle)
-    assert schmalste < 260, (
+    assert schmalste <= 400, (
         "die schmalste Karte ist breiter als erwartet - dieser Test misst "
         f"dann nicht mehr den engen Fall ({schmalste} px)"
     )

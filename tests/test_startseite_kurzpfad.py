@@ -215,9 +215,13 @@ def _kurzpfad_saetze(soup: BeautifulSoup) -> list[str]:
     return saetze
 
 
-def test_der_kasten_steht_in_der_spalte_nicht_ueber_der_seite(tmp_path):
+def test_der_kasten_steht_nach_dem_ersten_bildschirm_nicht_darin(tmp_path):
+    """Seit dem Redesign vom 09.10.2026 ist der Kurzpfad die erste Szene des
+    Berichts, unter dem ersten Bildschirm - nie auf der Buehne, wo er die
+    Meldung der Woche verdraengen wuerde (der Befund vom 08.08.2026)."""
     soup = _render(tmp_path)
-    assert soup.select_one(".front-wichtig .kurzpfad") is not None
+    assert soup.select_one("#in-zwei-minuten .kurzpfad") is not None
+    assert soup.select_one(".buehne .kurzpfad") is None
     assert len(soup.select(".kurzpfad")) == 1
 
 

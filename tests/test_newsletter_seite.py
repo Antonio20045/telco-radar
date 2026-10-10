@@ -140,7 +140,7 @@ def test_ohne_vollstaendiges_impressum_kein_nav_eintrag(tmp_path_factory):
     site = _projekt(tmp_path_factory, vollstaendig=False)
     nav = BeautifulSoup(
         (site / "index.html").read_text(encoding="utf-8"), "html.parser"
-    ).select(".subnav a")
+    ).select(".kopf a")
     assert "newsletter.html" not in {a["href"] for a in nav}
 
 
@@ -151,7 +151,7 @@ def test_mit_vollstaendigem_impressum_steht_der_eintrag_da(tmp_path_factory):
     for seite in ("index.html", "meldungen.html", "transparenz.html"):
         nav = BeautifulSoup(
             (site / seite).read_text(encoding="utf-8"), "html.parser"
-        ).select(".subnav a")
+        ).select(".kopf a")
         assert "newsletter.html" in {a["href"] for a in nav}, seite
 
 

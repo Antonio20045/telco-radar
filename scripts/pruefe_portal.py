@@ -6,16 +6,16 @@ Satz gescheitert: "Jetzt sind ueberall Bilder" - tatsaechlich hatten 31 von
 193 Meldungen eins. Dieses Skript prueft gegen die WIRKLICH gerenderte
 Seite:
 
-  1. Oberhalb der Falz stehen bei 1440 px Breite >= 6 Geschichten.
+  1. Die Meldung der Woche steht ganz im ersten Bildschirm (1440 und 390 px).
   2. Mindestens 57 % der Meldungen haben ein Bild.
-  3. Kein Bild im Aufmacher oder in der zweiten Reihe ist schmaler als 800 px.
-  4. Die Meldungsseite ist nach Ressorts gruppiert und gewichtet.
+  3. Kein Bild in einer grossen Kachel der Bildwand ist schmaler als 800 px.
+  4. Die Meldungsseite ist nach Ressorts gefiltert und gewichtet.
   5. Keine Schlagzeile endet auf "…".
   6. Kein Bild wird hochskaliert dargestellt (Anzeigebreite > Dateibreite).
 
 Dazu die zwei Kriterien aus AUFTRAG_PORTAL_WELLE2.md §7 (07.08.2026):
 
-  7. Alle Ressorts der Meldungsseite sind ohne Scrollen sichtbar, und alle
+  7. Alle Ressortfilter der Meldungsseite sind ohne Scrollen sichtbar, und alle
      Meldungen sind weiterhin auf der Seite.
   8. Die Promo Uebersicht zeigt >= 10 verschiedene echte Bilder, keines
      davon leer, und JEDE Karte traegt entweder ein Bild oder eine
@@ -47,11 +47,10 @@ Dazu das Kriterium des Geraeteradars (10.08.2026):
 
 Dazu das Kriterium der Umbenennung (11.08.2026):
 
- 12. Der Zeitungskopf traegt auf 1440 UND auf 390 px den vollen Namen
-     "Vodafone Product and Services Insights", steht vollstaendig im Bild,
-     erzeugt keinen Seitwaertslauf und sitzt nicht weiter als 90 px aus der
-     Mitte. Der laengere Name hat in seiner ersten Fassung alle drei Zahlen
-     gerissen: 169 px aus der Mitte und 61 px aus dem Bild heraus.
+ 12. Der Kopf traegt auf 1440 UND auf 390 px den vollen Namen
+     "Vodafone Product and Services Insights", steht ganz im Bild, ohne
+     Seitwaertslauf, und die Marke sitzt links oben (seit 09.10.2026;
+     vorher mittig) - hoechstens 90 px vom linken Rand des Kopfs.
 
 Kriterium 1, 6, 7, 10 und 12 brauchen einen echten Browser - Chromium liegt
 unter /opt/pw-browsers. Ohne Browser laufen die uebrigen trotzdem durch.
@@ -89,7 +88,6 @@ from telco_radar.report.bilder import (  # noqa: E402
 
 _FALZ = 900
 _BREITE = 1440
-_MIND_OBEN = 6
 _MOBIL_BREITE = 390
 _MARKE = "Vodafone Product and Services Insights"
 _MAX_KOPF_VERSATZ = 90
@@ -131,6 +129,13 @@ def zeitraum_maengel(tafel) -> list[str]:
         for z in tafel.select(".gr-bnd[data-gesamt]:not([data-gesamt=''])")
     )
     return [f"{stumm} Bündelzeilen ohne 'über H Monate'"] if stumm else []
+
+
+def ressorts_zahlen(meldungen: BeautifulSoup) -> list:
+    """4: die Zahlen der Ressortfilter (ohne "Alle")."""
+    return meldungen.select(
+        '.chip[data-filter="ressort"]:not([data-wert=""]) .rubrik-zahl'
+    )
 
 
 def _rendern(ziel: Path, root: Path) -> None:
@@ -455,18 +460,20 @@ def _browser_messungen(site: Path, b: Bilanz) -> None:
             seite.evaluate("window.scrollTo(0,0)")
             seite.wait_for_timeout(300)
 
-        seite.goto(f"{wurzel}/index.html")
-        seite.wait_for_timeout(400)
-        oben = seite.evaluate(
-            """(falz) => [...document.querySelectorAll('.szl')]
-                 .filter(e => { const r = e.getBoundingClientRect();
-                                return r.top < falz && r.bottom > 0 &&
-                                       e.textContent.trim().length > 0; }).length""",
-            _FALZ,
-        )
+        unten = {}
+        for breite, hoehe in ((_BREITE, _FALZ), (_MOBIL_BREITE, 844)):
+            probe = browser.new_page(viewport={"width": breite, "height": hoehe})
+            probe.goto(f"{wurzel}/index.html")
+            probe.wait_for_timeout(400)
+            e = probe.locator(".fenster--meldung .szl").first.bounding_box()
+            unten[breite] = (round(e["y"] + e["height"]) if e else None, hoehe)
+            probe.close()
         b.prueft(
-            oben >= _MIND_OBEN,
-            f"1. Oberhalb der Falz: {oben} Geschichten (>= {_MIND_OBEN})",
+            all(u is not None and u <= h for u, h in unten.values()),
+            "1. Meldung der Woche im ersten Bildschirm: "
+            + ", ".join(
+                f"{br} px endet bei {u} (Falz {h})" for br, (u, h) in unten.items()
+            ),
         )
 
         schlimmster = 0
@@ -505,15 +512,16 @@ def _browser_messungen(site: Path, b: Bilanz) -> None:
         seite.goto(f"{wurzel}/meldungen.html")
         seite.wait_for_timeout(500)
         kacheln = seite.evaluate(
-            """() => [...document.querySelectorAll('.rkachel')]
+            """() => [...document.querySelectorAll(
+                    '.chip[data-filter="ressort"]')]
                  .map(e => Math.round(
-                      e.getBoundingClientRect().top + window.scrollY))"""
+                      e.getBoundingClientRect().bottom + window.scrollY))"""
         )
         letzte = max(kacheln) if kacheln else -1
         b.prueft(
             bool(kacheln) and letzte < _FALZ,
-            f"7. Letztes Ressort beginnt bei {letzte} px "
-            f"({len(kacheln)} Ressorts, < {_FALZ})",
+            f"7. Letzter Ressortfilter endet bei {letzte} px "
+            f"({len(kacheln) - 1} Ressorts, < {_FALZ})",
         )
 
         if not begriff:
@@ -555,15 +563,15 @@ def _browser_messungen(site: Path, b: Bilanz) -> None:
                 """() => {
                      const n = document.querySelector('.brand-name');
                      const bar = document.querySelector('.topbar-inner');
+                     const br0 = document.querySelector('.brand')
+                                         .getBoundingClientRect();
                      if (!n || !bar) return null;
                      const nb = n.getBoundingClientRect();
                      const bb = bar.getBoundingClientRect();
-                     const br = document.querySelector('.brand').getBoundingClientRect();
                      return {name: n.textContent.replace(/\\s+/g, ' ').trim(),
                              links: Math.round(nb.left),
                              rechts: Math.round(nb.right),
-                             versatz: Math.round((br.left + br.width / 2) -
-                                                 (bb.left + bb.width / 2)),
+                             versatz: Math.round(br0.left - bb.left),
                              docW: document.documentElement.scrollWidth,
                              winW: window.innerWidth};
                    }"""
@@ -585,17 +593,17 @@ def _browser_messungen(site: Path, b: Bilanz) -> None:
                 )
             if abs(m["versatz"]) > _MAX_KOPF_VERSATZ:
                 fehler.append(
-                    f"{breite}px: Kopf {abs(m['versatz'])} px aus der "
-                    f"Mitte (max {_MAX_KOPF_VERSATZ})"
+                    f"{breite}px: Marke {abs(m['versatz'])} px vom linken Rand "
+                    f"des Kopfs (max {_MAX_KOPF_VERSATZ})"
                 )
         b.prueft(
             not fehler,
-            "12. Zeitungskopf: "
+            "12. Kopf: "
             + (
                 "; ".join(fehler)
                 if fehler
                 else ", ".join(
-                    f"{breite}px Versatz {int(abs(m['versatz']))} px, "
+                    f"{breite}px Marke {int(abs(m['versatz']))} px vom Rand, "
                     f"Breite {m['rechts'] - m['links']} px"
                     for breite, m in kopf.items()
                     if m
@@ -650,25 +658,21 @@ def main() -> int:
         (site / "meldungen.html").read_text(encoding="utf-8"), "html.parser"
     )
 
-    gross = index.select(".aufmacher-bild img, .reihe-zwei .stueck-bild img")
+    gross = meldungen.select(".mw--gross .mw-bild img")
     zu_klein = [img for img in gross if int(img.get("width") or 0) < MIND_BREITE_GROSS]
     b.prueft(
         bool(gross) and not zu_klein,
-        f"3. Bilder in Aufmacher/zweiter Reihe: {len(gross)}, "
+        f"3. Bilder in den grossen Kacheln der Bildwand: {len(gross)}, "
         f"davon unter {MIND_BREITE_GROSS} px: {len(zu_klein)}",
     )
 
-    ressorts = meldungen.select(".mressort")
-    stufen = all(sec.select(".mlead") for sec in ressorts)
-    summe = sum(
-        int(m.group())
-        for x in meldungen.select(".rkachel .rkachel-alle")
-        if (m := re.search(r"\d+", x.get_text(" ", strip=True)))
-    )
-    gerendert = len(meldungen.select(".mressort .meldung"))
+    ressorts = meldungen.select('.chip[data-filter="ressort"]:not([data-wert=""])')
+    stufen = {g for g in ("gross", "mittel", "klein") if meldungen.select(f".mw--{g}")}
+    summe = sum(int(z.get_text(strip=True)) for z in ressorts_zahlen(meldungen))
+    gerendert = len(meldungen.select(".meldung"))
     b.prueft(
-        len(ressorts) >= 3 and stufen and summe == len(hs) and gerendert == len(hs),
-        f"4. Meldungsseite: {len(ressorts)} Ressorts, "
+        len(ressorts) >= 3 and len(stufen) >= 2 and summe == gerendert == len(hs),
+        f"4. Meldungsseite: {len(ressorts)} Ressorts, {len(stufen)} Groessen, "
         f"Ressortzahlen {summe}, gerendert {gerendert}, Daten {len(hs)}",
     )
 
@@ -761,24 +765,17 @@ def main() -> int:
             f"mit Bild ({quote} %, >= {_MIND_DIFF_BILDQUOTE} %), "
             f"{len(ohne_motiv)} ohne Motiv, {len(leere_kaesten)} leere Kaesten",
         )
-        marktbild = dz.select_one(".dz-marktbild")
-        balken = {
-            li.select_one(".dz-balken-name").get_text(strip=True): int(
-                li.select_one(".dz-balken-n").get_text(strip=True)
-            )
-            for li in (
-                marktbild.select(".dz-mb-block")[0].select("li") if marktbild else []
-            )
+        kacheln = {k["data-hebel"] for k in dz.select(".hebel-kachel")}
+        rubriken = {
+            a["id"].removeprefix("dz-theme-"): a for a in dz.select(".dz-hebel")
         }
-        falsch = []
-        for abschnitt in dz.select(".dz-hebel"):
-            label = abschnitt.select_one("h2").get_text(strip=True)
-            if balken.get(label) != len(abschnitt.select(".dzk")):
-                falsch.append(label)
+        falsch = [
+            k for k, a in rubriken.items() if k not in kacheln or not a.select(".dzk")
+        ]
         b.prueft(
-            bool(balken) and not falsch,
-            f"9b. Marktbild gegen die Rubriken: {len(balken)} Hebel, "
-            f"{len(falsch)} widersprechen"
+            bool(kacheln) and not falsch and kacheln == set(rubriken),
+            f"9b. Hebelwand gegen die Rubriken: {len(kacheln)} Kacheln, "
+            f"{len(falsch)} ohne Rubrik oder ohne Beispiel"
             + (f" ({', '.join(falsch)})" if falsch else ""),
         )
 

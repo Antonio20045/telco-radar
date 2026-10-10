@@ -77,6 +77,16 @@
    aber aufgerufen im REITER PREISVERLAUF (siehe den Kommentar dort). #}
 {% from "_geraete_radar.html.j2" import radar_tafel, wochenkarte with context %}
 
+{% import "_design.html.j2" as d %}
+{% set buehne = true %}
+{% block buehne %}
+{% call d.band('band-geraete', 'Deutschland · Geräte', 'Gerätepreise', prefix,
+               ('Preise vom ' ~ (geraete.abgerufen_bis | date_de)) if geraete.abgerufen_bis else '') %}
+{{ d.umschalter([{'key': 'preise', 'href': 'geraete.html', 'label': 'Preise'},
+                 {'key': 'quellen', 'href': 'geraete-quellen.html', 'label': 'Quellen & Methodik'}], 'preise', prefix, 'Ansicht') }}
+{% endcall %}
+{% endblock %}
+
 {% block content %}
 <section class="page-hero wide gr-hero-export">
   <div class="page-hero-row">

@@ -28,6 +28,7 @@ from . import luecken as luecken_mod
 from . import newsletter_protokoll
 from . import rechtstexte as rechtstexte_mod
 from . import seit as seit_mod
+from . import startseite as startseite_mod, statik
 from . import verlauf as verlauf_mod
 from . import suchindex
 from .differentiation import DIFF_THEMES
@@ -131,6 +132,7 @@ def _env() -> Environment:
     env.filters["date_de"] = _fmt_date_de
     env.filters["euro"] = _geraete_tco_grafik.euro
     env.filters["monat_de"] = _fmt_monat_de
+    env.globals.update(startseite_mod.VORLAGEN_HELFER)
     return env
 
 
@@ -1138,17 +1140,14 @@ def _prep_competitors(report: dict) -> list[dict]:
     return out
 
 
-def schreibe_statische_dateien(site_dir: Path) -> None:
-    """Schreibt ``style.css``, ``app.js`` und Logo, wie die Website sie ausliefert."""
+def schreibe_statische_dateien(site_dir: Path) -> set[str]:
+    """Schreibt CSS, JS, Logo, Schrift und Bilder; nennt die vorhandenen Bilder."""
     for asset in ("style.css", "app.js"):
         inhalt = (_TEMPLATES / asset).read_text(encoding="utf-8")
         if asset == "style.css":
             inhalt = _anbieter_farben.in_stylesheet(inhalt)
         (site_dir / asset).write_text(inhalt, encoding="utf-8")
-    for binasset in ("logo.png",):
-        src = _TEMPLATES / binasset
-        if src.exists():
-            shutil.copy(src, site_dir / binasset)
+    return statik.kopiere(_TEMPLATES, site_dir)
 
 
 def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
@@ -1163,7 +1162,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
     folien_dir = site_dir / "folien"
     folien_dir.mkdir(exist_ok=True)
     (site_dir / ".nojekyll").write_text("")
-    schreibe_statische_dateien(site_dir)
+    env.globals["bilder"] = schreibe_statische_dateien(site_dir)
     bild_quelle = report_bilder.bildordner(reports_dir.parent.parent)
     diff_bild_quelle = diff_bilder.bildordner(reports_dir.parent.parent)
     bild_quellen = [q for q in (bild_quelle, diff_bild_quelle) if q.exists()]
@@ -1323,6 +1322,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
             "competitors": competitors,
             "dash": _stats(report) if (i == 0 and highlights) else None,
             "briefing_html": briefing_html,
+            "kapitel": startseite_mod.kapitel(briefing_html),
             "toc": toc,
             "lesezeit": _lesezeit(briefing_md),
             "zwei_minuten": kurzpfad,
@@ -1357,17 +1357,6 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
             ausfaelle.append(Ausfall.aus_ausnahme(f"Foliensatz {report['date']}", exc))
         if i == 0:
             latest_ctx = ctx
-            (site_dir / "index.html").write_text(
-                woche_tpl.render(prefix="", show_explorer=False, **ctx),
-                encoding="utf-8",
-            )
-
-    if latest_ctx is not None:
-        latest_ctx["fruehwarnung"] = fruehwarnung_mod.aufbereiten(wochen, _wurzel)
-        (site_dir / "index.html").write_text(
-            woche_tpl.render(prefix="", show_explorer=False, **latest_ctx),
-            encoding="utf-8",
-        )
 
     latest = reports[0] if reports else None
     diff_report = _load_latest_diff_report(reports_dir / "differenzierung")
@@ -1473,6 +1462,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
                     veraltet.unlink()
 
         promo_view = prepare_promo_view(promo_entries, promo_cfg.sources, promo_updated)
+        startseite_mod.fristen_markieren(promo_view, promo_updated)
 
         promo_report_dir = reports_dir / "promo"
         promo_report = None
@@ -1511,6 +1501,16 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
             env.get_template("promo_quellen.html.j2").render(
                 prefix="../", sources=promo_cfg.sources
             ),
+            encoding="utf-8",
+        )
+
+    if latest_ctx is not None:
+        latest_ctx["fruehwarnung"] = fruehwarnung_mod.aufbereiten(wochen, _wurzel)
+        latest_ctx["fenster"] = startseite_mod.fenster(
+            latest_ctx, geraete, cfg and promo_view, cfg and promo_updated
+        )
+        (site_dir / "index.html").write_text(
+            woche_tpl.render(prefix="", show_explorer=False, **latest_ctx),
             encoding="utf-8",
         )
 

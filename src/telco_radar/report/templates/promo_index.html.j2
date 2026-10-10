@@ -1,4 +1,11 @@
-{# Die Promo Uebersicht: wer wirbt gerade womit.
+{# Die Promo Uebersicht (Redesign 09.10.2026): oben eine Zeile - was neu ist,
+   was bald endet -, darunter je Marke eine Reihe Aktionskarten. Jede Karte
+   zeigt den Kern als grosse Zahl. Nur zwei Markierungen: Neu und Endet bald
+   (`startseite.fristen_markieren`). Vermutlich ausgelaufene Aktionen stehen
+   nicht mehr auf der Seite.
+
+   Frueherer Kopf dieser Datei:
+   Die Promo Uebersicht: wer wirbt gerade womit.
 
    Dritter Anlauf, 08.08.2026. Der zweite (Vortag) hatte die Kampagnenmotive
    eingefuehrt und die vier Bauformen auf eine Karte reduziert - aber er
@@ -31,7 +38,9 @@
    Jede Schlagzeile traegt `szl` (Wahrheitstests, siehe CLAUDE.md §5). #}
 {% extends "base.html.j2" %}
 {% from "_seit.html.j2" import seit_block %}
+{% import "_design.html.j2" as d %}
 {% set usecase = 'promo' %}
+{% set buehne = true %}
 {% set active = 'promo_uebersicht' %}
 {% block title %}Promo Übersicht · Wer wirbt gerade womit{% endblock %}
 
@@ -86,23 +95,17 @@
 {# Eine Aktion als Karte. Dieselbe Form und dieselbe Feldreihenfolge fuer
    jede Marke und jedes Gewicht - das ist der Punkt der Seite. #}
 {% macro karte(k, gross=false, hoch=false) %}
-{# `gross` und `hoch` rechnet report/promo.gewichte() - sie haengen an der
-   Motivbreite und an der Zahl der uebrigen Karten. Eine Vorlage, die Zahlen
-   vergleicht, ist eine Vorlage, die niemand testet. #}
-<article class="pkarte{% if gross %} pkarte--gross{% if hoch %} pkarte--hoch{% endif %}{% endif %}{% if k.offer.fading %} pkarte--fading{% endif %}">
+<article class="pkarte{% if gross %} pkarte--gross{% if hoch %} pkarte--hoch{% endif %}{% endif %}{% if k.neu %} pkarte--neu{% endif %}{% if k.endet_bald %} pkarte--endet{% endif %}">
   <a class="pk-flaeche" href="{{ k.offer.url }}" target="_blank" rel="noopener">
     {{ motiv(k, gross) }}
+    {% if k.bild %}<span class="pk-zahl">{{ k.kachel }}</span>{% endif %}
     <span class="pk-titel szl">{{ k.offer.headline }}</span>
     {% if gross and k.offer.description %}<span class="pk-text">{{ k.offer.description }}</span>{% endif %}
   </a>
   <p class="pk-fuss">
-    {# Der Mechanik-Chip entfaellt, wenn die Schriftkachel derselben Karte
-       schon die Mechanik ist - sonst steht sie zweimal auf einer Karte. #}
-    {% if k.mechanic and not (not k.bild and k.kachel == k.mechanic) %}<span class="pmech">{{ k.mechanic }}</span>{% endif %}
+    {% if k.neu %}<span class="pk-flag pk-flag--neu">Neu</span>{% endif %}
+    {% if k.endet_bald %}<span class="pk-flag pk-flag--endet">Endet bald</span>{% endif %}
     {% if k.frist %}<span class="pk-frist">bis {{ k.frist | date_de }}</span>{% endif %}
-    {%- if k.offer.fading %}<span class="pk-flag pk-flag--weg">vermutlich ausgelaufen</span>
-    {%- elif k.offer.neu %}<span class="pk-flag pk-flag--neu">neu</span>{% endif %}
-    {% if k.highlight %}<span class="pk-wichtig">wichtig</span>{% endif %}
   </p>
 </article>
 {% endmacro %}
@@ -117,56 +120,62 @@
    Serife, gross, mit der Konzernzugehoerigkeit als Etikett daneben - denn
    dass congstar zur Telekom gehoert, ist die halbe Aussage. #}
 {% macro block(b, eigen=false) %}
-<section class="pmarke{% if eigen %} pmarke--eigen{% endif %}" id="{{ b.anker }}" style="--c:{{ b.color }}">
+{% if b.karten | rejectattr('offer.fading') | list %}
+<section class="pmarke{% if eigen %} pmarke--eigen{% endif %}" id="{{ b.anker }}" style="--c:{{ b.color }}" data-tier="{{ b.tier }}" data-auftritt>
   <div class="pmarke-kopf">
     <h2 class="pmarke-name"><a href="{{ b.url }}" target="_blank" rel="noopener">{{ b.name }}</a></h2>
     <span class="pmarke-zusatz">{% if eigen %}Vergleichsanker, nicht als Wettbewerber gezählt{% else %}{{ b.tier_label }}{% if b.group and b.group != b.name %} · {{ b.group }}{% endif %}{% endif %}</span>
   </div>
   <div class="promo-karten">
-    {{ karte(b.lead, b.lead_gross, b.lead_hoch) }}
-    {% for k in b.weitere %}{{ karte(k) }}{% endfor %}
+    {% if not b.lead.offer.fading %}{{ karte(b.lead, b.lead_gross, b.lead_hoch) }}{% endif %}
+    {% for k in b.weitere if not k.offer.fading %}{{ karte(k) }}{% endfor %}
   </div>
 </section>
+{% endif %}
 {% endmacro %}
 
+{% block buehne %}
+{% call d.band('band-promo', 'Deutschland · Aktionen der Wettbewerber', 'Promo', prefix, 'Stand ' ~ date_de) %}
+{{ d.umschalter([{'key': 'aktionen', 'href': 'promo/index.html', 'label': 'Aktionen'},
+                 {'key': 'quellen', 'href': 'promo/quellen.html', 'label': 'Quellen'}], 'aktionen', prefix, 'Ansicht') }}
+{% endcall %}
+{% endblock %}
+
 {% block content %}
-
-<section class="page-hero wide">
-  <div class="page-hero-row">
-    <div>
-      <p class="page-kicker">Deutschland · Promo-Aktionen</p>
-      <h1>Wer wirbt gerade womit</h1>
-    </div>
-    {{ seit_block(seit, date_de) }}
-  </div>
-  {% if promo_lead %}<p class="page-lead">{{ promo_lead }}</p>{% endif %}
+{% set aktiv_karten = promo_view.karten | rejectattr('offer.fading') | list %}
+{% set n_neu = aktiv_karten | selectattr('neu') | list | length %}
+{% set n_bald = aktiv_karten | selectattr('endet_bald') | list | length %}
+<section class="promo-zeile" data-auftritt>
+  <div class="promo-kennzahl{% if n_neu %} promo-kennzahl--neu{% endif %}"><b>{{ n_neu }}</b><span>neu diese Woche</span></div>
+  <div class="promo-kennzahl"><b>{{ n_bald }}</b><span>enden in 7 Tagen</span></div>
+  <div class="promo-kennzahl"><b>{{ promo_view.active_total }}</b><span>Aktionen bei {{ promo_view.brands_active }} Marken</span></div>
+  <div class="promo-stand">{{ seit_block(seit, date_de) }}</div>
 </section>
-
-{# ============================================================== DIE LAGE #}
+{% if promo_lead %}<p class="wb-lead promo-lead" data-auftritt>{{ promo_lead }}</p>{% endif %}
+{# Was der Markt gerade faehrt: je Mechanik, wie viele MARKEN sie fahren.
+   Eine schmale Zeile, keine Balkengrafik. #}
 {% if promo_view.mechaniken %}
-<section class="promo-lage">
+<section class="promo-lage" data-auftritt>
   <p class="lage-titel">Was der Markt gerade fährt</p>
   {% for m in promo_view.mechaniken[:5] %}
-  <div class="lage-zeile">
-    <span class="lage-label">{{ m.label }}</span>
-    <span class="lage-track"><span class="lage-fill" style="width:{{ m.w }}%"></span></span>
-    <span class="lage-zahl">{{ m.marken }} {{ 'Marken' if m.marken != 1 else 'Marke' }}</span>
-  </div>
+  <div class="lage-zeile"><span class="lage-label">{{ m.label }}</span>
+    <span class="lage-zahl">{{ m.marken }} {{ 'Marken' if m.marken != 1 else 'Marke' }}</span></div>
   {% endfor %}
 </section>
 {% endif %}
 
-{# =========================================================== DIE MARKEN #}
+<div class="chips promo-filter" role="group" aria-label="Nach Anbieterart filtern" data-auftritt>
+  <button type="button" class="chip on" data-tier-filter="" aria-pressed="true">Alle</button>
+  <button type="button" class="chip" data-tier-filter="1" aria-pressed="false">Netzbetreiber</button>
+  <button type="button" class="chip" data-tier-filter="2" aria-pressed="false">Discount &amp; Zweitmarken</button>
+</div>
+
 <div id="marken" style="scroll-margin-top:90px"></div>
 {% for b in promo_view.bloecke %}{{ block(b) }}{% else %}
 <p class="empty-note">Zurzeit ist bei keinem beobachteten Wettbewerber eine Aktion bestätigt.
   Welche Seiten geprüft werden, steht auf der <a href="{{ prefix }}promo/quellen.html">Quellenseite</a>.</p>
 {% endfor %}
-
-{# Vodafone selbst: bewusst am Ende und markiert - sonst gestaltete die
-   eigene Marke die Wettbewerbsbeobachtung mit. #}
 {% if promo_view.eigen %}{{ block(promo_view.eigen, true) }}{% endif %}
-
 {% if promo_view.ohne_aktion %}
 {# Beobachtet, aber ohne bestaetigte Aktion. Eine Zeile sagt das und
    behauptet nicht, es gaebe etwas zu sehen. Die Marken bleiben genannt:
@@ -179,7 +188,6 @@
 </p>
 {% endif %}
 
-{# ============================================================= DIE TIEFE #}
 <div class="promo-tiefe">
   <details class="promo-method">
     <summary>Wie die Reihenfolge entsteht</summary>

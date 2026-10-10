@@ -59,6 +59,15 @@
 </tr>
 {% endmacro %}
 
+{% import "_design.html.j2" as d %}
+{% set buehne = true %}
+{% block buehne %}
+{% call d.band('band-geraete', 'Geräte', 'Quellen & Methodik', prefix) %}
+{{ d.umschalter([{'key': 'preise', 'href': 'geraete.html', 'label': 'Preise'},
+                 {'key': 'quellen', 'href': 'geraete-quellen.html', 'label': 'Quellen & Methodik'}], 'quellen', prefix, 'Ansicht') }}
+{% endcall %}
+{% endblock %}
+
 {% block content %}
 <section class="page-hero wide">
   <div class="page-hero-row">

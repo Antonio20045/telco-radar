@@ -1,5 +1,394 @@
 /* Telco Radar - Explorer (Vanilla JS, kein Framework) */
 
+/* REDESIGN 09.10.2026 - Tageszeit, Auftritt, Szenen, Lesefluss, Suche.
+
+   Steht GANZ OBEN, weil `data-zeit` gesetzt sein muss, bevor der Browser
+   das erste Mal malt: an ihr haengen Farben und das Startbild. Alles hier
+   ist Darstellung - keine Zahl entsteht im Browser; das Hochzaehlen einer
+   Zahl im Bericht endet exakt beim Originaltext. Bewegung gibt es nur,
+   wenn das System keine reduzierte Bewegung wuenscht. */
+(function () {
+  var wurzel = document.documentElement;
+  wurzel.classList.remove('ohne-js');
+  wurzel.classList.add('js');
+
+  function tageszeit() {
+    var h = new Date().getHours();
+    if (h >= 5 && h < 10) return 'morgen';
+    if (h >= 10 && h < 17) return 'tag';
+    if (h >= 17 && h < 21) return 'abend';
+    return 'nacht';
+  }
+  /* Ein ferngesteuerter Browser (Tests, Screenshots) sieht die Tagesansicht:
+     eine Messung darf nicht davon abhaengen, wann sie laeuft. `?zeit=`
+     waehlt jede Ansicht ausdruecklich. */
+  var zeit = navigator.webdriver ? 'tag' : tageszeit();
+  try {
+    var wunsch = new URLSearchParams(location.search).get('zeit');
+    if (wunsch && /^(morgen|tag|abend|nacht)$/.test(wunsch)) zeit = wunsch;
+  } catch (e) { /* aeltere Browser: Uhrzeit gilt */ }
+  wurzel.setAttribute('data-zeit', zeit);
+
+  var ruhig = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  if (!ruhig) wurzel.classList.add('bewegt');
+
+  /* DIE BUEHNE: genau EIN Bild laden - das der Tageszeit. */
+  var buehne = document.querySelector('.buehne');
+  if (buehne) {
+    var gruss = buehne.querySelector('[data-gruss]');
+    var GRUSS = { morgen: 'Guten Morgen', tag: 'Guten Tag', abend: 'Guten Abend', nacht: 'Guten Abend' };
+    if (gruss && gruss.textContent.trim() === 'Ausgabe') gruss.textContent = GRUSS[zeit];
+    var ebenen = buehne.querySelectorAll('.buehne-ebene[data-zeit-bild]');
+    var bild = null;
+    for (var i = 0; i < ebenen.length; i++) {
+      if (ebenen[i].getAttribute('data-zeit-bild') === zeit) bild = ebenen[i];
+    }
+    if (!bild && ebenen.length) bild = ebenen[0];
+    if (bild) {
+      bild.classList.add('aktiv');
+      bild.setAttribute('fetchpriority', 'high');
+      bild.addEventListener('load', function () { bild.classList.add('geladen'); });
+      bild.src = bild.getAttribute('data-src');
+      if (bild.complete && bild.naturalWidth) bild.classList.add('geladen');
+    }
+    var stufen = buehne.querySelectorAll('.buehne-kopf > *, .fenster, .buehne-weiter');
+    for (var s = 0; s < stufen.length; s++) {
+      stufen[s].style.setProperty('--verzug', Math.min(s, 6) * 70 + 'ms');
+    }
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () { buehne.classList.add('buehne--da'); });
+    });
+    var pause = buehne.querySelector('.buehne-pause');
+    if (pause && !ruhig && bild) {
+      pause.hidden = false;
+      pause.addEventListener('click', function () {
+        var an = buehne.classList.toggle('angehalten');
+        pause.setAttribute('aria-pressed', an ? 'true' : 'false');
+        pause.setAttribute('aria-label', an ? 'Bildbewegung fortsetzen' : 'Bildbewegung anhalten');
+      });
+    }
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (e) {
+        buehne.classList.toggle('verdeckt', !e[0].isIntersecting);
+      }).observe(buehne);
+    }
+  }
+
+  /* DER KOPF wird beim Scrollen etwas deckender. */
+  var kopf = document.getElementById('kopf');
+  if (kopf) {
+    var rolle = function () { kopf.classList.toggle('kopf--gerollt', window.scrollY > 24); };
+    window.addEventListener('scroll', rolle, { passive: true });
+    rolle();
+  }
+
+  /* ⌘K / Strg+K setzt den Fokus in die Suche. */
+  var taste = document.querySelector('.gsearch-taste');
+  if (taste && !/Mac|iPhone|iPad/.test(navigator.platform || '')) taste.textContent = 'Strg K';
+  document.addEventListener('keydown', function (ev) {
+    if ((ev.metaKey || ev.ctrlKey) && (ev.key === 'k' || ev.key === 'K')) {
+      var feld = document.getElementById('gsearch-input') || document.querySelector('input[type="search"]');
+      if (feld) { ev.preventDefault(); feld.focus(); if (feld.select) feld.select(); }
+    }
+  });
+
+  /* ZAHLEN zaehlen einmal kurz hoch und enden beim Originaltext. */
+  function zaehle(el) {
+    if (ruhig || !window.Intl) return;
+    var werte = el.classList && el.classList.contains('zahl-wert') ? [el] : el.querySelectorAll('.zahl-wert');
+    for (var i = 0; i < werte.length; i++) (function (z) {
+      if (z.getAttribute('data-gezaehlt')) return;
+      z.setAttribute('data-gezaehlt', '1');
+      var ziel = parseFloat(z.getAttribute('data-wert'));
+      var stellen = parseInt(z.getAttribute('data-stellen') || '0', 10);
+      if (!isFinite(ziel) || ziel < 10) return;
+      var original = z.textContent;
+      var fmt = new Intl.NumberFormat('de-DE', { minimumFractionDigits: stellen, maximumFractionDigits: stellen });
+      z.style.display = 'inline-block';
+      z.style.minWidth = z.getBoundingClientRect().width + 'px';
+      var start = null;
+      var DAUER = 900;
+      function schritt(t) {
+        if (start === null) start = t;
+        var p = Math.min(1, (t - start) / DAUER);
+        z.textContent = fmt.format(ziel * (1 - Math.pow(1 - p, 3)));
+        if (p < 1) requestAnimationFrame(schritt);
+        else z.textContent = original;
+      }
+      requestAnimationFrame(schritt);
+    })(werte[i]);
+  }
+
+  /* LESEFLUSS: Absaetze und Aufzaehlungen erscheinen, wenn der Leser sie
+     erreicht - einmal, dann bleiben sie. Was beim Laden schon im Bild ist,
+     wird nie versteckt. */
+  var LESESTUECKE = [
+    '.szene-text > p', '.szene-text > ul > li', '.szene-text > ol > li',
+    '.szene-text > h3', '.szene-text > blockquote', '.szene-text > .rubrik',
+    '.szene-text .wichtig-zeile', '.szene-text > .ex-count', '.szene-text .wb-kurz-zeile',
+    '.szene-text .fwb-frage', '.szene-text .fwb-stand', '.themen-zeile',
+    '.szene-text .kurzpfad-zeile', '.szene-weiter', '[data-auftritt]'
+  ].join(',');
+  var lesen = null;
+  function aufdecken(el, sofort) {
+    if (!el.classList.contains('vorher') || el.classList.contains('sichtbar')) return;
+    if (sofort) el.style.transition = 'none';
+    el.classList.add('sichtbar');
+    if (lesen) lesen.unobserve(el);
+    if (!sofort) zaehle(el);
+  }
+  function alleBis(ziel) {
+    var stuecke = document.querySelectorAll('.vorher:not(.sichtbar)');
+    for (var i = 0; i < stuecke.length; i++) {
+      var lage = ziel.compareDocumentPosition(stuecke[i]);
+      if (lage & Node.DOCUMENT_POSITION_PRECEDING || ziel.contains(stuecke[i])) aufdecken(stuecke[i], true);
+    }
+  }
+  if (!ruhig && 'IntersectionObserver' in window) {
+    var hoehe = window.innerHeight;
+    var kandidaten = document.querySelectorAll(LESESTUECKE);
+    for (var k = 0; k < kandidaten.length; k++) {
+      if (kandidaten[k].getBoundingClientRect().top > hoehe * 0.92) kandidaten[k].classList.add('vorher');
+    }
+    lesen = new IntersectionObserver(function (eintraege) {
+      var rein = [];
+      eintraege.forEach(function (e) {
+        if (e.isIntersecting) rein.push(e.target);
+        else if (e.boundingClientRect.bottom < 0) aufdecken(e.target, true);
+      });
+      rein.sort(function (a, b) { return a.getBoundingClientRect().top - b.getBoundingClientRect().top; });
+      rein.forEach(function (el, i) {
+        el.style.setProperty('--verzug', (i < 5 ? i * 70 : 0) + 'ms');
+        aufdecken(el, false);
+      });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0 });
+    var verdeckt = document.querySelectorAll('.vorher');
+    for (var v = 0; v < verdeckt.length; v++) lesen.observe(verdeckt[v]);
+  } else {
+    var alle = document.querySelectorAll('.szene-text .zahl-wert');
+    for (var a = 0; a < alle.length; a++) alle[a].setAttribute('data-gezaehlt', '1');
+  }
+  function sprungZiel() {
+    if (!location.hash || location.hash.length < 2) return;
+    var ziel = null;
+    try { ziel = document.querySelector(location.hash); } catch (e) { ziel = null; }
+    if (ziel) alleBis(ziel);
+  }
+  sprungZiel();
+  window.addEventListener('hashchange', sprungZiel);
+
+  /* DIE SZENEN: wo der Browser scrollgebundene Animationen nicht kennt,
+     schneidet eine Klasse das Bild auf die linke Haelfte. */
+  var szenen = document.querySelectorAll('.szene');
+  var nativ = !!(window.CSS && CSS.supports && CSS.supports('animation-timeline: view()'));
+  if (szenen.length && 'IntersectionObserver' in window) {
+    if (!nativ && !ruhig) {
+      var schnitt = new IntersectionObserver(function (eintraege) {
+        eintraege.forEach(function (e) {
+          var szene = e.target.parentNode;
+          szene.classList.toggle('szene--geschnitten', e.isIntersecting || e.boundingClientRect.top < 0);
+        });
+      }, { rootMargin: '0px 0px -30% 0px' });
+      for (var n = 0; n < szenen.length; n++) {
+        var text = szenen[n].querySelector(':scope > .szene-text');
+        if (text && szenen[n].querySelector(':scope > .szene-bild')) schnitt.observe(text);
+      }
+    }
+    var marke = document.querySelector('.kapitel-marke');
+    if (marke) {
+      var name = marke.querySelector('[data-kapitel-name]');
+      var knopf = marke.querySelector('.kapitel-aktuell');
+      var verweise = marke.querySelectorAll('.kapitel-liste a');
+      var kapitel = new IntersectionObserver(function (eintraege) {
+        eintraege.forEach(function (e) {
+          if (!e.isIntersecting) return;
+          name.textContent = e.target.getAttribute('data-szene');
+          for (var i = 0; i < verweise.length; i++) {
+            verweise[i].classList.toggle('on', verweise[i].getAttribute('href') === '#' + e.target.id);
+          }
+        });
+      }, { rootMargin: '-45% 0px -55% 0px' });
+      for (var m = 0; m < szenen.length; m++) if (szenen[m].id) kapitel.observe(szenen[m]);
+      var bericht = document.getElementById('der-wochenbericht');
+      if (bericht) {
+        new IntersectionObserver(function (e) {
+          marke.classList.toggle('sichtbar', e[0].isIntersecting && e[0].intersectionRect.height > 0);
+        }, { rootMargin: '-60% 0px 0px 0px' }).observe(bericht);
+      }
+      knopf.addEventListener('click', function () {
+        var offen = marke.classList.toggle('offen');
+        knopf.setAttribute('aria-expanded', offen ? 'true' : 'false');
+      });
+      for (var w = 0; w < verweise.length; w++) (function (a) {
+        a.addEventListener('click', function (ev) {
+          var ziel = document.querySelector(a.getAttribute('href'));
+          if (!ziel) return;
+          ev.preventDefault();
+          alleBis(ziel);
+          ziel.scrollIntoView({ behavior: 'instant', block: 'start' });
+          if (history.replaceState) history.replaceState(null, '', a.getAttribute('href'));
+          marke.classList.remove('offen');
+          knopf.setAttribute('aria-expanded', 'false');
+        });
+      })(verweise[w]);
+    }
+  }
+})();
+
+
+/* MELDUNGEN (Redesign 09.10.2026): Leseansicht und Filter der Bildwand. */
+(function () {
+  var panel = document.getElementById('lesepanel');
+  var wand = document.getElementById('bildwand');
+  if (!panel) return;
+  var inhalt = panel.querySelector('.lesepanel-inhalt');
+  var zuletzt = null;
+  var ruhig = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+  function oeffne(meldung, alsVerlauf) {
+    var vorlage = meldung.querySelector('.mw-detail');
+    if (!vorlage) return false;
+    inhalt.innerHTML = '';
+    var kopie = vorlage.cloneNode(true);
+    while (kopie.firstChild) inhalt.appendChild(kopie.firstChild);
+    var titel = inhalt.querySelector('.lp-titel');
+    if (titel) titel.id = 'lesepanel-titel';
+    zuletzt = document.activeElement;
+    panel.hidden = false;
+    document.documentElement.classList.add('panel-offen');
+    requestAnimationFrame(function () { requestAnimationFrame(function () { panel.classList.add('offen'); }); });
+    panel.querySelector('.lesepanel-blatt').scrollTop = 0;
+    var zu = panel.querySelector('.lesepanel-zu');
+    if (zu) zu.focus({ preventScroll: true });
+    if (alsVerlauf !== false && history.replaceState) history.replaceState(null, '', '#' + meldung.id);
+    return true;
+  }
+  function schliesse() {
+    if (panel.hidden) return;
+    panel.classList.remove('offen');
+    document.documentElement.classList.remove('panel-offen');
+    var weg = function () { panel.hidden = true; inhalt.innerHTML = ''; };
+    if (ruhig) weg(); else setTimeout(weg, 320);
+    if (history.replaceState) history.replaceState(null, '', location.pathname + location.search);
+    if (zuletzt && zuletzt.focus) zuletzt.focus({ preventScroll: true });
+  }
+  document.addEventListener('click', function (ev) {
+    var link = ev.target.closest && ev.target.closest('a[data-panel]');
+    if (link && !ev.metaKey && !ev.ctrlKey && !ev.shiftKey) {
+      var meldung = link.closest('.meldung');
+      if (meldung && oeffne(meldung)) ev.preventDefault();
+      return;
+    }
+    if (ev.target.closest && ev.target.closest('[data-schliessen]')) schliesse();
+  });
+  document.addEventListener('keydown', function (ev) {
+    if (ev.key === 'Escape') schliesse();
+  });
+  if (location.hash && /^#m-[0-9a-f]+$/.test(location.hash)) {
+    var ziel = document.getElementById(location.hash.slice(1));
+    if (ziel) {
+      ziel.scrollIntoView({ block: 'center' });
+      oeffne(ziel, false);
+    }
+  }
+
+  /* Filter: Ressort und Region wirken zusammen; die Wand ordnet sich weich
+     neu (View Transitions, wo der Browser sie kennt). */
+  var wahl = { ressort: '', region: '' };
+  var knoepfe = document.querySelectorAll('.mw-filter [data-filter]');
+  var leer = document.querySelector('.mw-leer');
+  function anwenden() {
+    var sichtbar = 0;
+    var alle = document.querySelectorAll('.meldung[data-ressort]');
+    for (var i = 0; i < alle.length; i++) {
+      var m = alle[i];
+      var passt = (!wahl.ressort || m.getAttribute('data-ressort') === wahl.ressort) &&
+                  (!wahl.region || m.getAttribute('data-region') === wahl.region);
+      m.hidden = !passt;
+      if (passt) sichtbar++;
+    }
+    if (leer) leer.hidden = sichtbar > 0;
+  }
+  for (var k = 0; k < knoepfe.length; k++) (function (b) {
+    b.addEventListener('click', function () {
+      var art = b.getAttribute('data-filter');
+      wahl[art] = b.getAttribute('data-wert');
+      var gruppe = document.querySelectorAll('.mw-filter [data-filter="' + art + '"]');
+      for (var j = 0; j < gruppe.length; j++) {
+        var an = gruppe[j] === b;
+        gruppe[j].classList.toggle('on', an);
+        gruppe[j].setAttribute('aria-pressed', an ? 'true' : 'false');
+      }
+      if (document.startViewTransition && !ruhig && wand) document.startViewTransition(anwenden);
+      else anwenden();
+    });
+  })(knoepfe[k]);
+})();
+
+/* WETTBEWERB WELT und PROMO (Redesign 09.10.2026): Hebel oeffnen, Marken filtern. */
+(function () {
+  var ansichten = document.querySelector('.hebel-ansichten');
+  var kacheln = document.querySelectorAll('.hebel-kachel[data-hebel]');
+  if (ansichten && kacheln.length) {
+    var zeige = function (key, rollen) {
+      var ziel = key && document.getElementById('dz-theme-' + key);
+      var abschnitte = ansichten.querySelectorAll('.dz-hebel');
+      for (var i = 0; i < abschnitte.length; i++) abschnitte[i].classList.toggle('on', abschnitte[i] === ziel);
+      for (var k = 0; k < kacheln.length; k++) kacheln[k].classList.toggle('on', kacheln[k].getAttribute('data-hebel') === key);
+      ansichten.classList.toggle('gewaehlt', !!ziel);
+      if (ziel && rollen) ziel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+    var ausAdresse = function (rollen) {
+      var m = /^#dz-theme-(.+)$/.exec(location.hash || '');
+      zeige(m ? m[1] : '', rollen);
+    };
+    for (var i = 0; i < kacheln.length; i++) (function (a) {
+      a.addEventListener('click', function (ev) {
+        ev.preventDefault();
+        var key = a.getAttribute('data-hebel');
+        if (history.pushState) history.pushState(null, '', '#dz-theme-' + key);
+        var lauf = function () { zeige(key, true); };
+        if (document.startViewTransition && !matchMedia('(prefers-reduced-motion: reduce)').matches) document.startViewTransition(lauf);
+        else lauf();
+      });
+    })(kacheln[i]);
+    var zurueck = document.querySelectorAll('.hebel-zurueck');
+    for (var z = 0; z < zurueck.length; z++) zurueck[z].addEventListener('click', function (ev) {
+      ev.preventDefault();
+      if (history.pushState) history.pushState(null, '', location.pathname);
+      zeige('', false);
+      var wand = document.getElementById('hebel-wand');
+      if (wand) wand.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    window.addEventListener('popstate', function () { ausAdresse(false); });
+    window.addEventListener('hashchange', function () { ausAdresse(true); });
+    ausAdresse(false);
+    if (location.hash) {
+      var anfang = document.getElementById(location.hash.slice(1));
+      if (anfang) setTimeout(function () { anfang.scrollIntoView({ block: 'start' }); }, 0);
+    }
+  }
+
+  var filter = document.querySelectorAll('[data-tier-filter]');
+  if (filter.length) {
+    for (var f = 0; f < filter.length; f++) (function (b) {
+      b.addEventListener('click', function () {
+        var tier = b.getAttribute('data-tier-filter');
+        for (var j = 0; j < filter.length; j++) {
+          filter[j].classList.toggle('on', filter[j] === b);
+          filter[j].setAttribute('aria-pressed', filter[j] === b ? 'true' : 'false');
+        }
+        var lauf = function () {
+          var marken = document.querySelectorAll('.pmarke[data-tier]:not(.pmarke--eigen)');
+          for (var m = 0; m < marken.length; m++) marken[m].hidden = !!tier && marken[m].getAttribute('data-tier') !== tier;
+        };
+        if (document.startViewTransition && !matchMedia('(prefers-reduced-motion: reduce)').matches) document.startViewTransition(lauf);
+        else lauf();
+      });
+    })(filter[f]);
+  }
+})();
+
 /* DIE ANKUNFTS-ADRESSE, EINMAL GESICHERT (P2, 17.09.2026). Die Zeitreihen-
    Steuerung des Vergleichs-Reiters schreibt beim Laden ihren Startzustand
    per history.replaceState in die URL ("?modell=...&band=...") - auch wenn

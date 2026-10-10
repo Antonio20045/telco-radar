@@ -1,35 +1,22 @@
-{# Die Dauerseite zum deutschen Wettbewerb - Telekom, O2 und 1&1.
+{# Wettbewerb · Deutschland (Redesign 09.10.2026).
 
-   Antonio am 08.08.2026: "Eine ganz genaue Wettbewerbsseite, wo ich fuer
-   Deutschland ueber Telekom, O2 und 1&1 sehe, was sie gerade machen ...
-   Interessant auch im historischen Kontext: nicht nur die Meldung dieser
-   Woche, sondern ueber die Wochen und Monate - wie passt die Meldung dieser
-   Woche zu dem, was davor kam? Eine ganz neue Unterseite, die fuer immer da
-   ist."
+   Ein Tab mit zwei Ansichten: Deutschland (diese Seite: Telekom, O2, 1&1)
+   und Welt (differenzierung.html: die zwoelf Hebel weltweit). Beide
+   Dateien bleiben bestehen - ihre Anker stehen in Mails und im Suchindex.
 
-   Jeder Wettbewerber bekommt denselben Aufbau, in dieser Reihenfolge:
-
-     LAGE      Das aktuelle Profil in einem Absatz, darunter die Themen der
-               letzten vier Ausgaben untereinander - daran liest man die
-               Verschiebung ab, ohne einen Satz darueber schreiben zu muessen.
-     AKTIONEN  Was gerade beworben wird, aus der Promo-Uebersicht.
-     CHRONIK   Jede Meldung seit Beobachtungsbeginn, nach Monaten. Der
-               laufende Monat steht offen, aeltere klappen auf - sonst waere
-               die Seite in einem halben Jahr unlesbar lang.
-
-   Die Chronik ist der Punkt der Seite, deshalb bekommt sie die volle
-   Satzbreite und die Lage nur den Kopf. Jede Schlagzeile traegt `szl`
-   (CLAUDE.md §5). #}
+   Jeder Wettbewerber ist ein ruhiges Portraet: der Name gross, die Lage in
+   wenigen Saetzen, die drei letzten Schritte als kurzer Zeitstrahl, seine
+   Hebel als schlichte Woerter, ein Verweis auf seine laufenden Aktionen.
+   Die lange Chronik liegt zugeklappt darunter. Jede Schlagzeile traegt
+   `szl` (CLAUDE.md §5). #}
 {% extends "base.html.j2" %}
 {% from "_seit.html.j2" import seit_block %}
+{% import "_design.html.j2" as d %}
 {% set active = 'wettbewerb' %}
+{% set buehne = true %}
 {% block title %}Marktrecherche · Wettbewerb{% endblock %}
+{% set ANBIETER_KLASSE = {'deutsche-telekom': 'telekom', 'telefonica-o2': 'o2', '1-1': '1-1'} %}
 
-{# Die Chronik in ZWEI Spalten (CSS-Spalten, siehe .wb-liste). Dieselben
-   Meldungen, halbe Hoehe: eine Chronikzeile ist schmal gesetzt und braucht
-   keine 1180 px Satzbreite. Datum und Ressort stehen deshalb als eine
-   leise Kopfzeile ueber der Schlagzeile statt als zwei Spalten davor -
-   nebeneinander blieben in einer 570-px-Spalte 400 px fuer den Text. #}
 {% macro chronik_liste(eintraege) %}
 <ol class="wb-liste">
   {% for e in eintraege %}
@@ -44,155 +31,90 @@
 </ol>
 {% endmacro %}
 
-{# Ein Monat der Chronik. Der laufende steht offen, aber nur mit seinem
-   Anfang - der Rest liegt einen Klick tiefer (siehe _OFFEN_JE_MONAT). #}
-{% macro chronik_monat(m) %}
-<p class="wb-monat">{{ m.monat | monat_de }}<span>{{ m.n }}</span></p>
-{{ chronik_liste(m.offen) }}
-{% if m.rest %}
-<details class="wb-mehr-monat">
-  <summary>{{ m.rest | length }} weitere</summary>
-  {{ chronik_liste(m.rest) }}
-</details>
-{% endif %}
-{% endmacro %}
+{% block buehne %}
+{% call d.band('band-wettbewerb', 'Wettbewerb', 'Deutschland', prefix) %}
+{{ d.umschalter([{'key': 'de', 'href': 'wettbewerb.html', 'label': 'Deutschland'},
+                 {'key': 'welt', 'href': 'differenzierung.html', 'label': 'Welt'}], 'de', prefix, 'Ansicht') }}
+{% endcall %}
+{% endblock %}
 
 {% block content %}
-
-<section class="page-hero wide">
-  <div class="page-hero-row">
-    <div>
-      <p class="page-kicker">Deutschland</p>
-      <h1>Der deutsche Wettbewerb.</h1>
-    </div>
-    {{ seit_block(seit, date_de) }}
-  </div>
-  <p class="page-lead">Was Telekom, O2 und 1&amp;1 gerade tun – und wie es zu dem passt, was in den Wochen davor kam.</p>
-  {% if wettbewerb.wettbewerber %}
-  <nav class="toc" aria-label="Die drei Wettbewerber">
-    {% for c in wettbewerb.wettbewerber %}<a href="#{{ c.anker }}">{{ c.name }}</a>{% endfor %}
-  </nav>
-  {% endif %}
-</section>
-
+<div class="wb-einstieg" data-auftritt>
+  <p class="wb-lead">Was Telekom, O2 und 1&amp;1 gerade tun – und wie es zu den Wochen davor passt.</p>
+  {{ seit_block(seit, date_de) }}
+</div>
+{% if wettbewerb.wettbewerber %}
+<nav class="wb-sprung" aria-label="Die drei Wettbewerber" data-auftritt>
+  {% for c in wettbewerb.wettbewerber %}<a href="#{{ c.anker }}"><span class="anb-punkt gr-anb--{{ ANBIETER_KLASSE.get(c.anker, 'ohne-farbe') }}" aria-hidden="true"></span>{{ c.name }}</a>{% endfor %}
+</nav>
+{% endif %}
 <div id="chronik" style="scroll-margin-top:90px"></div>
+
 {% for c in wettbewerb.wettbewerber %}
-<section class="wb{% if loop.first %} wb--erste{% endif %}" id="{{ c.anker }}" style="scroll-margin-top:16px">
-  {# Der Name traegt den Abschnitt. Als 11,5-px-Etikett stand er kleiner
-     auf der Seite als jede Schlagzeile darunter, und die Seite heisst nach
-     ihm - Antonio: "die Namen prominenter." #}
-  <div class="wb-kopf"><h2 class="wb-name">{{ c.name }}</h2>
+{% set erste = (c.monate[0].offen if c.monate else []) %}
+<section class="wb portraet{% if loop.first %} wb--erste{% endif %}" id="{{ c.anker }}" style="scroll-margin-top:96px">
+  <div class="portraet-kopf" data-auftritt>
+    <h2 class="wb-name"><span class="anb-punkt gr-anb--{{ ANBIETER_KLASSE.get(c.anker, 'ohne-farbe') }}" aria-hidden="true"></span>{{ c.name }}</h2>
     {% if c.n_chronik %}<span class="rubrik-zahl">{{ c.n_chronik }}
       Meldung{{ 'en' if c.n_chronik != 1 else '' }} seit {{ c.seit | date_de }}</span>{% endif %}
   </div>
-
-  <div class="wb-lage{% if not wettbewerb.promo_bekannt %} wb-lage--einspaltig{% endif %}">
-    <div class="wb-profil">
+  <div class="portraet-raster">
+    <div class="portraet-lage" data-auftritt>
       {% if c.summary %}
       <p class="wb-summary">{{ c.summary }}</p>
       {% elif c.fehler %}
-      {# Ein Teilausfall darf nicht aussehen wie ein ruhiger Wettbewerber. #}
       <p class="empty-note"><b>Für diesen Lauf liegt kein Profil vor.</b>
-        Die Auswertung vom {{ c.fehler_datum | date_de }} hat keine Antwort geliefert.
-        Die Chronik darunter steht trotzdem – sie kommt aus dem Archiv.
         Der Fehler steht im <a href="{{ prefix }}transparenz.html">Laufprotokoll</a>.</p>
       {% else %}
       <p class="muted-note">Für diesen Wettbewerber liegt noch kein Profil vor.</p>
       {% endif %}
-
-      {% if c.themen_verlauf %}
-      <div class="wb-themen">
-        {% for w in c.themen_verlauf %}
-        <div class="wb-themenzeile">
-          <span class="wb-themendatum">{{ w.datum | date_de }}</span>
-          <span class="wb-tags">{% for t in w.themen %}<span class="comp-tag">{{ t }}</span>{% endfor %}</span>
-        </div>
-        {% endfor %}
-      </div>
-      {% endif %}
-
-      {# Womit sich dieser Anbieter abhebt - und wo eine Flanke offen ist.
-         Die Hebel standen bis zum 08.08.2026 eine Seite weiter und dort nach
-         THEMA sortiert, also genau nicht nach der Frage "was macht dieser
-         eine Anbieter". Zusammen mit Lage, Aktionen und Chronik darüber ist
-         das der Steckbrief - abgeleitet, nicht gepflegt. #}
       {% if c.hebel %}
       <div class="wb-hebel">
         <p class="wb-spaltentitel">Womit er sich abhebt</p>
-        <ul class="wb-hebelliste">
-          {% for h in c.hebel %}
-          <li>
-            <a href="{{ prefix }}differenzierung.html#dz-theme-{{ h.key }}">{{ h.label }}</a>
-            <span class="wb-hebel-n">{{ h.n }}</span>
-            {% if h.beispiel %}<span class="wb-hebel-beispiel">{% if h.url %}<a
-              href="{{ h.url }}" target="_blank" rel="noopener">{{ h.beispiel }}</a>{% else %}{{ h.beispiel }}{% endif %}</span>{% endif %}
-          </li>
-          {% endfor %}
-        </ul>
+        <p class="hebel-woerter">{% for h in c.hebel %}<a href="{{ prefix }}differenzierung.html#dz-theme-{{ h.key }}" title="{{ h.n }} Beispiel{{ 'e' if h.n != 1 else '' }}{% if h.beispiel %}: {{ h.beispiel }}{% endif %}">{{ h.label }}</a>{% endfor %}</p>
         {% if c.flanken %}
-        {# Nur gegen die anderen FOKUS-Wettbewerber. "Telkomsel hat das auch"
-           ist im deutschen Markt keine Flanke. #}
         <p class="wb-flanken">Ohne Beispiel bei diesem Anbieter, aber bei
           {% for f in c.flanken[:3] %}<b>{{ f.label }}</b> ({{ f.wer | join(', ') }}){{ ", " if not loop.last }}{% endfor %}.</p>
         {% endif %}
       </div>
       {% endif %}
+      {% if wettbewerb.promo_bekannt %}
+      <p class="portraet-aktionen">{% if c.aktionen %}<a class="knopf" href="{{ prefix }}promo/index.html">{{ c.aktionen_n }}
+        laufende Aktion{{ 'en' if c.aktionen_n != 1 else '' }} &rarr;</a>
+        {% else %}<span class="muted-note">Zurzeit ist keine Aktion bestätigt.</span>{% endif %}
+        {% if c.marken %}<span class="wb-marken">Marken: {{ c.marken | join(', ') }}</span>{% endif %}</p>
+      {% endif %}
     </div>
-
-    {% if wettbewerb.promo_bekannt %}
-    <aside class="wb-aktionen">
-      <p class="wb-spaltentitel">Laufende Aktionen</p>
-      {% if c.aktionen %}
-      <ul class="wb-aktionsliste">
-        {% for a in c.aktionen %}
-        <li class="wb-aktion">
-          <a href="{{ a.url }}" target="_blank" rel="noopener">
-            <span class="wb-aktion-titel szl">{{ a.headline }}</span>
-            <span class="wb-aktion-meta">{{ a.marke }}{% if a.mechanik %} · {{ a.mechanik }}{% endif %}</span>
-          </a>
+    <div class="portraet-zeit" data-auftritt>
+      <p class="wb-spaltentitel">Die letzten Schritte</p>
+      {% if erste %}
+      <ol class="zeitstrahl">
+        {% for e in erste[:3] %}
+        <li class="zeitstrahl-punkt">
+          <span class="zeitstrahl-tag">{{ e.tag }}</span>
+          <a class="zeitstrahl-titel wb-titel szl" href="{{ e.url }}" target="_blank" rel="noopener">{{ e.titel }}</a>
+          <span class="zeitstrahl-meta">{{ e.rubrik }}{% if e.quelle %} · {{ e.quelle }}{% endif %}</span>
         </li>
         {% endfor %}
-      </ul>
-      <p class="wb-mehr"><a href="{{ prefix }}promo/index.html">Alle {{ c.aktionen_n }}
-        Aktion{{ 'en' if c.aktionen_n != 1 else '' }} &nearr;</a></p>
+      </ol>
       {% else %}
-      <p class="wb-leer">Zurzeit ist keine Aktion bestätigt.
-        <a href="{{ prefix }}promo/index.html">Promo Übersicht &nearr;</a></p>
+      <p class="muted-note">Seit Beobachtungsbeginn ist zu {{ c.name }} keine Meldung eingegangen.</p>
       {% endif %}
-      {% if c.marken %}
-      {# Welche Marken hier mitgezaehlt werden, gehoert dazu: dass congstar
-         unter der Telekom steht, ist eine Zuordnung und keine Selbstverstaendlichkeit. #}
-      <p class="wb-marken">Marken: {{ c.marken | join(', ') }}</p>
-      {% endif %}
-    </aside>
-    {% endif %}
+    </div>
   </div>
-
   {% if c.monate %}
-  <div class="wb-chronik">
+  <details class="wb-chronik portraet-chronik">
+    <summary>Alle Meldungen von {{ c.name }}<span>{{ c.n_chronik }}</span></summary>
     {% for m in c.monate %}
-    {% if loop.first %}
-    {{ chronik_monat(m) }}
-    {% else %}
-    <details class="wb-aelter">
-      <summary>{{ m.monat | monat_de }}<span>{{ m.n }}
-        Meldung{{ 'en' if m.n != 1 else '' }}</span></summary>
-      {{ chronik_liste(m.eintraege) }}
-    </details>
-    {% endif %}
+    <p class="wb-monat">{{ m.monat | monat_de }}<span>{{ m.n }}</span></p>
+    {{ chronik_liste(m.eintraege if m.eintraege else (m.offen + (m.rest or []))) }}
     {% endfor %}
-  </div>
-  {% else %}
-  <p class="muted-note">Seit Beobachtungsbeginn ist zu {{ c.name }} keine Meldung eingegangen.</p>
+  </details>
   {% endif %}
 </section>
 {% else %}
 <p class="empty-note">Für diese Seite liegt noch kein Bericht im Archiv.</p>
 {% endfor %}
-
 <p class="dz-foot">Diese Seite baut sich bei jedem Lauf neu aus dem Berichtsarchiv auf – aus den
-  Wettbewerber-Profilen und allen Meldungen, deren Absender zum jeweiligen Konzern gehört. Eine
-  Meldung trägt das Datum, an dem sie zum ersten Mal im Radar auftauchte; jede verlinkt auf die
-  Originalquelle. Die laufenden Aktionen stammen aus der
-  <a href="{{ prefix }}promo/index.html">Promo Übersicht</a>.</p>
+  Wettbewerbsprofilen der Ausgaben und der <a href="{{ prefix }}promo/index.html">Promo Übersicht</a>.</p>
 {% endblock %}

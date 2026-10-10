@@ -1,4 +1,11 @@
-{# Das Inspirations-Radar: womit heben sich Telkos ab, jenseits von Preis
+{# Wettbewerb · Welt (Redesign 09.10.2026): die zwoelf Hebel als Bildkacheln.
+   Ein Klick oeffnet den Hebel und zeigt, wer was macht. Marktbild,
+   "Was waechst, was kippt", Monatstabelle und die Vergleichstabelle sind
+   mit dem Redesign gefallen (Antonio: "diese Statistiken finde ich blöd");
+   je Hebel bleibt eine Zahl - wie viele Anbieter ihn ziehen.
+
+   Frueherer Kopf dieser Datei:
+   Das Inspirations-Radar: womit heben sich Telkos ab, jenseits von Preis
    und Datenvolumen?
 
    Antonio am 08.08.2026, nach dem ersten Umbau: "Es ist total
@@ -41,7 +48,9 @@
    wirklich gerenderten Beispiele haelt. #}
 {% extends "base.html.j2" %}
 {% from "_seit.html.j2" import seit_block %}
+{% import "_design.html.j2" as d %}
 {% set active = 'differenzierung' %}
+{% set buehne = true %}
 {% block title %}Marktrecherche · Differenzierung{% endblock %}
 
 {% macro motiv(e) %}
@@ -78,244 +87,50 @@
 </article>
 {% endmacro %}
 
+{% block buehne %}
+{% call d.band('band-wettbewerb', 'Wettbewerb', 'Welt', prefix) %}
+{{ d.umschalter([{'key': 'de', 'href': 'wettbewerb.html', 'label': 'Deutschland'},
+                 {'key': 'welt', 'href': 'differenzierung.html', 'label': 'Welt'}], 'welt', prefix, 'Ansicht') }}
+{% endcall %}
+{% endblock %}
+
 {% block content %}
-
-<section class="page-hero wide">
-  <div class="page-hero-row">
-    <div>
-      <p class="page-kicker">Differenzierung</p>
-      <h1>Womit sich Telkos weltweit abheben.</h1>
-    </div>
-    {{ seit_block(seit, date_de) }}
-  </div>
-  {# Der Satz, der die kognitive Arbeit abnimmt: was auf dieser Seite
-     ueberhaupt gesammelt wird, an drei Beispielen statt an einer Definition. #}
-  <p class="page-lead">Alles, womit ein Netzbetreiber Kunden gewinnt und hält, das <em>nicht</em>
-  Preis oder Datenvolumen ist – eine Perplexity-Lizenz im Tarif, fünf Jahre Garantie
-  aufs Gerät, ein Streaming-Abo, Betrugsschutz im Netz. Gesammelt aus aller Welt,
-  jedes Beispiel mit Originalquelle.</p>
-</section>
-
+<div class="wb-einstieg" data-auftritt>
+  <p class="wb-lead">Womit sich Telkos weltweit abheben – jenseits von Preis und Datenvolumen. Jedes Beispiel mit Originalquelle.</p>
+  {{ seit_block(seit, date_de) }}
+</div>
 {% if diff_lage_html %}
-{# Die Lage aus dem Bericht - der Einstieg, nicht der Anhang. #}
-<section class="dz-lage">
+<section class="dz-lage" data-auftritt>
   <article class="prose">{{ diff_lage_html | safe }}</article>
 </section>
 {% endif %}
 
-{% set mb = diff.marktbild %}
-<section class="dz-marktbild" id="marktbild" style="scroll-margin-top:90px">
-  <div class="rubrik">
-    <h2>Das Marktbild</h2>
-    <span class="rubrik-zahl">{{ mb.gesamt }} Beispiele</span>
-  </div>
-  <div class="dz-mb-raster">
-
-    <div class="dz-mb-block">
-      <h3 class="dz-mb-titel">Welcher Hebel gezogen wird</h3>
-      <ul class="dz-balken">
-        {% for b in mb.hebel_balken %}
-        <li><span class="dz-balken-name">{{ b.name }}</span>
-          <span class="dz-balken-spur"><span class="dz-balken-fuell" style="width:{{ b.w }}%"></span></span>
-          <span class="dz-balken-n">{{ b.n }}</span></li>
-        {% endfor %}
-      </ul>
-    </div>
-
-    <div class="dz-mb-block">
-      <h3 class="dz-mb-titel">Wer am breitesten aufgestellt ist</h3>
-      {# Gereiht nach der Zahl VERSCHIEDENER Hebel: wer denselben Hebel
-         achtmal zieht, fährt eine Kampagne; wer vier verschiedene zieht,
-         eine Strategie. Genau das ist die Frage der Seite. #}
-      <ol class="dz-anbieter">
-        {% for a in mb.aktivste %}
-        <li>
-          <span class="dz-anbieter-name">{{ a.name }}</span>
-          <span class="dz-anbieter-hebel">{{ a.hebel | join(' · ') }}</span>
-        </li>
-        {% endfor %}
-      </ol>
-    </div>
-
-    <div class="dz-mb-block">
-      <h3 class="dz-mb-titel">Woher die Beispiele kommen</h3>
-      <ul class="dz-balken">
-        {% for b in mb.regionen %}
-        <li><span class="dz-balken-name">{{ b.name }}</span>
-          <span class="dz-balken-spur"><span class="dz-balken-fuell" style="width:{{ b.w }}%"></span></span>
-          <span class="dz-balken-n">{{ b.n }}</span></li>
-        {% endfor %}
-      </ul>
-    </div>
-
-  </div>
-
-  {# Die Muster aus dem Bericht stehen unter den gerechneten Spalten und ueber
-     die volle Breite: sie sind Prosa, keine Zahlenreihe, und in einer 370 px
-     schmalen Spalte waeren zwei Saetze mit Quellenlinks unlesbar. Sie
-     ERSETZEN keine der drei Spalten - das Marktbild wird gerechnet, die
-     Muster werden geschrieben, und beide sagen etwas anderes. #}
-  {% if diff_muster %}
-  <div class="dz-muster-band">
-    <h3 class="dz-mb-titel">Was sich wiederholt</h3>
-    <ul class="dz-muster">
-      {% for m in diff_muster %}
-      <li>{% if m.titel %}<b>{{ m.titel }}</b> {% endif %}{{ m.text_html | safe }}</li>
-      {% endfor %}
-    </ul>
-  </div>
-  {% endif %}
-</section>
-
-{% if diff.neu %}
-<section class="dz-radar" id="neu" style="scroll-margin-top:90px">
-  <div class="rubrik">
-    <h2>{% if diff.neu_ist_rueckfall %}Zuletzt nachgeprüft{% else %}Neu auf dem Radar{% endif %}</h2>
-  </div>
-  <div class="dz-raster dz-raster--gross">
-    {% for e in diff.neu %}{{ karte(e, 'gross') }}{% endfor %}
-  </div>
-</section>
-{% endif %}
-
-{# ========================================================= DER VERLAUF == #}
-{# Bis zum 08.08.2026 zeigte jede Ansicht dieser Seite einen ZUSTAND: "71
-   Beispiele, Entertainment 17, KI 12". Ob KI im Juni noch 4 war, stand
-   nirgends - und genau diese Ableitung ist der Wert einer Datenbank, die
-   seit Juli laeuft.
-
-   Verglichen werden ANTEILE, nicht Zahlen: die Bibliothek waechst, absolute
-   Zahlen zeigten deshalb immer "alles waechst" - eine Aussage ueber die
-   Sammelmenge, nicht ueber den Markt. #}
-{% if verlauf and verlauf.aktiv %}
-<section class="dz-verlauf" id="verlauf" style="scroll-margin-top:90px">
-  <div class="rubrik"><h2>Was wächst, was kippt</h2>
-    <span class="rubrik-zusatz">Anteil an den Aufnahmen des Monats</span></div>
-
-  {% if verlauf.waechst or verlauf.kippt %}
-  <div class="vl-bewegung">
-    {% for e in verlauf.waechst %}
-    <a class="vl-move vl-auf" href="#dz-theme-{{ e.key }}">
-      <span class="vl-move-label">{{ e.label }}</span>
-      <span class="vl-move-delta">+{{ e.delta }} Punkte</span>
-      <span class="vl-move-detail">{{ e.vorher }} % → {{ e.jetzt }} %</span>
-    </a>
-    {% endfor %}
-    {% for e in verlauf.kippt %}
-    <a class="vl-move vl-ab" href="#dz-theme-{{ e.key }}">
-      <span class="vl-move-label">{{ e.label }}</span>
-      <span class="vl-move-delta">{{ e.delta }} Punkte</span>
-      <span class="vl-move-detail">{{ e.vorher }} % → {{ e.jetzt }} %</span>
-    </a>
-    {% endfor %}
-  </div>
-  {% endif %}
-
-  <div class="vl-gitter">
-    <div class="vl-kopf">
-      <span class="vl-name"></span>
-      {% for m in verlauf.monate %}<span class="vl-monat{% if not m.belastbar %} vl-duenn{% endif %}">{{ m.label }}</span>{% endfor %}
-    </div>
-    {% for r in verlauf.reihen %}
-    <div class="vl-zeile">
-      <span class="vl-name"><a href="#dz-theme-{{ r.key }}">{{ r.label }}</a></span>
-      {% for p in r.punkte %}
-      <span class="vl-zelle" title="{{ p.label }}: {{ p.n }} Aufnahmen ({{ p.anteil }} %)">
-        <span class="vl-balken" style="height:{{ [p.anteil * 2, 100] | min | round }}%"></span>
-        <span class="vl-zahl">{{ p.n or '' }}</span>
-      </span>
-      {% endfor %}
-    </div>
-    {% endfor %}
-  </div>
-
-  {% if verlauf.duenne_monate %}
-  <p class="muted-note" style="margin:12px 0 0;max-width:760px">
-    Monate mit weniger als {{ verlauf.mind_je_monat }} Aufnahmen zählen für die
-    Bewegung oben nicht mit ({{ verlauf.duenne_monate | join(', ') }}) – ein
-    Anteil aus zwei Beispielen ist eine Rundung, keine Beobachtung.
-  </p>
-  {% endif %}
-</section>
-{% endif %}
-
-{# ======================================================= WER WAS HAT ==== #}
-{# Die Gegenfrage. Bis zum 08.08.2026 zeigte diese Seite 71 Beispiele und wer
-   am breitesten aufgestellt ist - und beantwortete nie die eine Frage, wegen
-   der ein Portfolio-Manager sie aufschlaegt: wer hat einen Hebel, den WIR
-   nicht haben?
-
-   Was hier NICHT passiert: raten. "Wir haben das nicht" steht nur da, wo es
-   in config/vodafone_hebel.yaml mit Datum gepflegt ist. Alles andere heisst
-   "noch nicht erfasst" - siehe report/luecken.py. #}
-{% if luecken and luecken.aktiv %}
-<section class="dz-luecken" id="luecken" style="scroll-margin-top:90px">
-  <div class="rubrik">
-    <h2>Wer was hat{% if luecken.markt %} – und was {{ luecken.markt }} dazu{% endif %}</h2>
-    <span class="rubrik-zahl">{{ luecken.n_erfasst }} von {{ luecken.n_hebel }} Hebeln erfasst</span>
-  </div>
-
-  {% if luecken.flecken %}
-  <p class="dz-luecken-lead">Hebel, die mehrere Wettbewerber ziehen und die auf
-  eigener Seite als <b>nicht vorhanden</b> erfasst sind – der stärkste zuerst.</p>
-  <ul class="dz-fleck-liste">
-    {% for z in luecken.flecken %}
-    <li><a href="#dz-theme-{{ z.key }}">
-      <span class="dz-fleck-label">{{ z.label }}</span>
-      <span class="dz-fleck-n">{{ z.n_wettbewerber }} Wettbewerber</span>
-      <span class="dz-fleck-wer">{{ z.wettbewerber | join(', ') }}</span>
-    </a></li>
-    {% endfor %}
-  </ul>
-  {% endif %}
-
-  <div class="rowtable dz-vergleich">
-    <div class="rowtable-head">
-      <span class="col-region">Hebel</span>
-      <span class="col-flex">Wettbewerber</span>
-      <span class="col-kept">{{ luecken.markt or 'eigene Seite' }}</span>
-    </div>
-    {% for z in luecken.vergleich %}
-    <div class="rowtable-row">
-      <span class="col-region"><a href="#dz-theme-{{ z.key }}">{{ z.label }}</a></span>
-      <span class="col-flex">{{ z.n_wettbewerber }}{% if z.wettbewerber %} · {{ z.wettbewerber[:3] | join(', ') }}{% endif %}</span>
-      <span class="col-kept">
-        {%- if z.zustand == 'ja' %}{{ z.eigenes or 'vorhanden' }} <i>({{ z.stand }})</i>
-        {%- elif z.zustand == 'nein' %}nicht vorhanden <i>({{ z.stand }})</i>
-        {%- else %}noch nicht erfasst{% endif -%}
-      </span>
-    </div>
-    {% endfor %}
-  </div>
-
-  {% if luecken.unvollstaendig %}
-  <p class="muted-note" style="margin:14px 0 0;max-width:760px">
-    Ein Hebel gilt erst dann als Lücke, wenn die eigene Seite mit Datum
-    gepflegt ist. Was hier „noch nicht erfasst“ heißt, ist ungeprüft – nicht
-    fehlend. Die Liste steht in <code>config/vodafone_hebel.yaml</code>.
-  </p>
-  {% endif %}
-</section>
-{% endif %}
-
 {% if diff.hebel %}
-<nav class="toc dz-nav" aria-label="Die Differenzierungs-Hebel">
-  {% for h in diff.hebel %}<a href="#dz-theme-{{ h.key }}">{{ h.label }}</a>{% endfor %}
+<nav class="hebel-wand dz-nav" id="hebel-wand" aria-label="Die Differenzierungs-Hebel" style="scroll-margin-top:96px">
+  {% for h in diff.hebel %}
+  {% set beispiele = ([h.lead] if h.lead else []) + (h.karten or []) + (h.zeilen_offen or []) + (h.zeilen_rest or []) %}
+  {% set anbieter = beispiele | map(attribute='operator') | reject('none') | unique | list | length %}
+  <a class="hebel-kachel" href="#dz-theme-{{ h.key }}" data-hebel="{{ h.key }}" data-auftritt>
+    <span class="hebel-bild">{{ d.motiv('hebel-' ~ h.key, prefix, 'hebel-motiv', breite=900, hoehe=1125) }}</span>
+    <span class="hebel-text">
+      <span class="hebel-name">{{ h.label }}</span>
+      <span class="hebel-zahl">{{ anbieter }} Anbieter</span>
+    </span>
+  </a>
+  {% endfor %}
 </nav>
 {% endif %}
 
+<div class="hebel-ansichten">
 {% for h in diff.hebel %}
 <section class="dz-hebel" id="dz-theme-{{ h.key }}"{% if h.farbe %} style="--c:{{ h.farbe }}"{% endif %}>
-  <div class="rubrik dz-rubrik">
+  <div class="hebel-kopf">
     <h2>{{ h.label }}</h2>
     <span class="rubrik-zahl">{{ h.n }} Beispiel{{ 'e' if h.n != 1 else '' }}</span>
+    <a class="hebel-zurueck" href="#hebel-wand">Alle Hebel</a>
   </div>
-  {# Zwei Saetze, zwei Rollen: was der Hebel BEDEUTET (steht fest) und was
-     an ihm gerade auffaellt (kommt aus dem Bericht dieser Woche). Fehlt der
-     zweite, steht der erste allein - das ist kein Mangel. #}
   {% if h.erklaerung %}<p class="dz-hebel-was">{{ h.erklaerung }}</p>{% endif %}
   {% if h.einordnung %}<p class="dz-hebel-einordnung">{{ h.einordnung }}</p>{% endif %}
-
   {% if h.lead %}
   <div class="dz-hebel-oben">{{ karte(h.lead, 'lead') }}</div>
   {% endif %}
@@ -330,8 +145,6 @@
   </div>
   {% endif %}
   {% if h.zeilen_rest %}
-  {# Der Rest bleibt auf der Seite, nur nicht im Weg - dieselbe Bauform wie
-     die Chronik der Wettbewerbsseite. #}
   <details class="dz-mehr">
     <summary>{{ h.zeilen_rest | length }} weitere</summary>
     <div class="dz-zeilen">
@@ -343,11 +156,33 @@
 {% else %}
 <p class="empty-note">Für dieses Ressort liegt noch kein belegtes Beispiel vor.</p>
 {% endfor %}
+</div>
 
+{# Was neu dazukam - oder, in einer ruhigen Woche, was zuletzt geprueft
+   wurde. Eine Reihe Karten, keine Statistik. #}
+{% if diff.neu %}
+<section class="dz-radar" id="neu" style="scroll-margin-top:96px" data-auftritt>
+  <div class="rubrik">
+    <h2>{% if diff.neu_ist_rueckfall %}Zuletzt nachgeprüft{% else %}Neu auf dem Radar{% endif %}</h2>
+  </div>
+  <div class="dz-raster dz-raster--gross">
+    {% for e in diff.neu %}{{ karte(e, 'gross') }}{% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{# Die Muster aus dem Bericht: Prosa, keine Zahlenreihe. #}
+{% if diff_muster %}
+<section class="dz-muster-band" data-auftritt>
+  <h2 class="abschnitt-titel">Was sich wiederholt</h2>
+  <ul class="dz-muster">
+    {% for m in diff_muster %}
+    <li>{% if m.titel %}<b>{{ m.titel }}</b> {% endif %}{{ m.text_html | safe }}</li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
 {% if diff_report_html %}
-{# Nur noch der Rueckfall: ein Bericht in der alten Gliederung, den die Seite
-   nicht verteilen kann. Ein Bericht in der neuen steht oben, in den Mustern
-   und ueber den Hebeln - dann faellt dieser Block ersatzlos weg. #}
 <details class="evidence dz-essay">
   <summary><span>Der Differenzierungsbericht</span><small>Bericht vom {{ diff_report_date }}</small></summary>
   <div class="evidence-body">
@@ -355,7 +190,6 @@
   </div>
 </details>
 {% endif %}
-
 <p class="dz-foot">Zwei Quellen speisen diese Seite: der wöchentliche Presse-Crawl der beobachteten Netzbetreiber
 und ein rotierender Web-Sweep (Brave Search + KI-Prüfung), der gezielt nach Differenzierung jenseits des Preises
 sucht. Jedes Beispiel trägt eine Originalquelle und ein Prüfdatum; nicht belegte Beispiele werden nicht aufgenommen.</p>

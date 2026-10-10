@@ -599,9 +599,13 @@ def test_die_archivwoche_verweist_mit_richtigem_pfad(tmp_path):
     assert 'href="../wettbewerb.html#deutsche-telekom"' in archiv
 
 
-def test_der_laufende_monat_steht_offen_und_aeltere_klappen_zu(tmp_path):
+def test_die_chronik_steht_zugeklappt_der_laufende_monat_zuerst(tmp_path):
     """Sonst waere die Seite nach einem Jahr unlesbar lang - und der Monat,
-    um den es meistens geht, staende ganz oben in einem Meer aus Archiv."""
+    um den es meistens geht, staende ganz oben in einem Meer aus Archiv.
+
+    Seit dem Redesign vom 09.10.2026 stehen oben im Portraet die drei
+    letzten Schritte; die ganze Chronik liegt zugeklappt darunter, und in
+    ihr steht der laufende Monat zuerst, aeltere folgen."""
     zwei_monate = dict(BERICHT)
     site = tmp_path / "site"
     reports = tmp_path / "data" / "reports"
@@ -637,10 +641,13 @@ def test_der_laufende_monat_steht_offen_und_aeltere_klappen_zu(tmp_path):
     )
     offen = soup.select_one(".wb-chronik > .wb-monat")
     assert "August 2026" in offen.get_text(" ", strip=True)
-    aelter = soup.select(".wb-chronik details.wb-aelter")
-    assert len(aelter) == 1
-    assert "Juli 2026" in aelter[0].summary.get_text(" ", strip=True)
-    assert "Alte Meldung" in aelter[0].get_text(" ", strip=True)
+    chronik = soup.select_one("details.wb-chronik")
+    assert not chronik.has_attr("open")
+    monate = [m.get_text(" ", strip=True) for m in chronik.select(".wb-monat")]
+    assert len(monate) == 2
+    assert "August 2026" in monate[0]
+    assert "Juli 2026" in monate[1]
+    assert "Alte Meldung" in chronik.get_text(" ", strip=True)
 
 
 def test_die_seite_steht_auch_ohne_einen_einzigen_bericht(tmp_path):
@@ -725,10 +732,11 @@ def test_keine_meldung_geht_beim_einklappen_verloren(tmp_path):
         (site / "wettbewerb.html").read_text(encoding="utf-8"), "html.parser"
     )
     abschnitt = soup.select_one("section.wb")
-    assert len(abschnitt.select(".wb-zeile")) == 21
-    rest = abschnitt.select_one("details.wb-mehr-monat")
-    assert rest is not None
-    assert len(rest.select(".wb-zeile")) == 21 - 12
+    chronik = abschnitt.select_one("details.wb-chronik")
+    assert chronik is not None and not chronik.has_attr("open")
+    assert len(chronik.select(".wb-zeile")) == 21
+    assert chronik.summary.select_one("span").get_text(strip=True) == "21"
+    assert len(abschnitt.select(".zeitstrahl-punkt")) == 3
 
 
 def test_der_name_traegt_den_abschnitt(tmp_path):

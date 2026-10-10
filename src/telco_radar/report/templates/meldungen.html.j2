@@ -1,199 +1,139 @@
-{# Alle Meldungen der Woche - erst die Ressorts als Uebersicht, dann auf
-   Klick die Tiefe.
+{# Meldungen - die Woche als Bildwand (Redesign 09.10.2026).
 
-   Bis zum 06.08.2026 standen hier 193 identisch gebaute Bloecke
-   untereinander. Das wurde am 06.08. zu einer Zeitungsseite mit Ressorts und
-   Gewichtung - besser, aber immer noch 12 249 px hoch: wer wissen wollte, was
-   unter "Geld & Uebernahmen" steht, scrollte acht Bildschirmhoehen. Antonio:
-   "so muss man auch viel runterscrollen und viel entdecken bei den einzelnen
-   Kategorien."
+   Die Prioritaet bestimmt die Groesse: 5 gross, 4 mittel, 3 klein.
+   Randnotizen (1-2) stehen als ruhige Liste am Ende. Ein Klick oeffnet
+   die Meldung in einer Leseansicht, die von rechts hereingleitet; ohne
+   JavaScript fuehrt derselbe Link zur Originalquelle. Jede Meldung hat
+   einen festen Anker (`meldung_id`), Links aus Mails oeffnen sie direkt.
 
-   Jetzt zweistufig, und zwar per <details> statt ueber sieben eigene
-   Ressortseiten (Begruendung in outputs/portal-welle2-2026-08-07.md):
-   alle 193 Meldungen bleiben in EINER Datei und damit in einem Suchlauf des
-   Browsers, es gibt keinen zweiten Ladevorgang, und `render_site()` bleibt
-   bei einer Ausgabedatei je Woche.
-
-     RESSORTUEBERSICHT  sieben Kacheln, je Ressort drei Meldungen mit Bild
-                        und Schlagzeile. Alle sieben ohne Scrollen sichtbar.
-     RESSORTBLOCK       je Ressort ein <details> mit ALLEN Meldungen in drei
-                        Gewichtungen (Aufmacher, mittlere, Zeilen).
-
-   Der Filter neben "Alle Meldungen" ist am 07.08.2026 entfernt worden
-   (Antonio: "das ist unnoetig") - samt seiner data-such-Attribute und dem
-   zugehoerigen Block in app.js. Die wochenuebergreifende Volltextsuche unten
-   bleibt, sie beantwortet eine andere Frage.
-
-   Jede Schlagzeile traegt `szl` und jede vollstaendig gelistete Meldung die
-   Klasse `meldung` - daran haengen die Wahrheitstests. #}
+   Jede Meldung traegt die Klasse `meldung` - daran haengen die
+   Wahrheitstests. #}
 {% extends "base.html.j2" %}
+{% import "_uebersetzung.html.j2" as ueb %}
+{% import "_design.html.j2" as d %}
 {% set active = 'meldungen' %}
+{% set buehne = true %}
 {% block title %}Vodafone Product and Services Insights · Alle Meldungen{% endblock %}
 
-{% import "_uebersetzung.html.j2" as ueb %}
-
-{% macro zeile(h) %}
-<article class="mz meldung">
-  <a href="{{ h.url }}" target="_blank" rel="noopener">
-    {% if h.image %}<span class="mz-bild"><img src="{{ prefix }}images/{{ h.image }}" alt=""
-       {% if h.image_w %}width="{{ h.image_w }}" height="{{ h.image_h }}"{% endif %} loading="lazy"></span>{% endif %}
-    <span class="mz-text">
-      <span class="mz-titel szl">{{ h.schlagzeile }}</span>
-      <span class="mz-meta"><span class="mz-rel r{{ h.relevance }}">{{ h.relevance }}</span>{{ h.operator or h.source_label }}{% if h.date %} · {{ h.date }}{% endif %}</span>
-    </span>
-  </a>
-  {# Die weiteren Quellen desselben Ereignisses. Sie stehen AUSSERHALB des
-     Links darueber - ein Link in einem Link ist kein gueltiges HTML, und die
-     Belege sollen einzeln anklickbar sein. Bis zum 08.08.2026 waren diese
-     Meldungen eigene Zeilen; dass drei Fachmedien dieselbe Sache melden, ist
-     aber keine dreifache Nachricht, sondern eine dreifach belegte. #}
-  {% if h.ctm_satz %}
-  <p class="ctm-satz"><span class="ctm-marke">Was das für uns heißt</span>{{ h.ctm_satz }}</p>
-  {% endif %}
+{% macro detail(h) %}
+<div class="mw-detail" hidden>
+  {% if h.image %}<figure class="lp-bild"><img src="{{ prefix }}images/{{ h.image }}" alt=""
+    {% if h.image_w %}width="{{ h.image_w }}" height="{{ h.image_h }}"{% endif %} loading="lazy" decoding="async"></figure>{% endif %}
+  <p class="lp-kicker">{{ h.ressort_label }}{% if h.region %} · {{ h.region }}{% endif %}</p>
+  <h2 class="lp-titel">{{ h.schlagzeile }}</h2>
+  <p class="lp-meta"><span class="punkt punkt--r{{ h.relevance }}" aria-hidden="true"></span>
+    <b>{{ h.operator or h.source_label }}</b> · Priorität {{ h.relevance }}/5{% if h.date %} · {{ h.date | date_de }}{% endif %}</p>
+  {% if h.summary %}<p class="lp-text">{{ h.summary }}</p>{% endif %}
+  {% if h.ctm_satz %}<p class="ctm-satz"><span class="ctm-marke">Was das für uns heißt</span>{{ h.ctm_satz }}</p>{% endif %}
+  <p class="lp-aktionen"><a class="knopf knopf--voll" href="{{ h.url }}" target="_blank" rel="noopener">Originalquelle öffnen &nearr;</a>
+    <span class="lp-quelle">{{ h.source_label }}</span></p>
+  {{ ueb.uebersetzung_link(h, prefix) }}
   {% if h.weitere_quellen %}
   <p class="mz-belege">Auch berichtet von {% for q in h.weitere_quellen %}<a
      href="{{ q.url }}" target="_blank" rel="noopener">{{ q.source }}</a>{{ ", " if not loop.last }}{% endfor %}</p>
   {% endif %}
-  {{ ueb.uebersetzung_link(h, prefix) }}
-</article>
+</div>
 {% endmacro %}
 
-{% block content %}
+{% block buehne %}
+{{ d.band('band-meldungen', 'Ausgabe vom ' ~ date_de if date_de else '', 'Meldungen', prefix,
+          (highlights|length) ~ ' Meldungen dieser Woche' if highlights else '') }}
+{% endblock %}
 
-<div class="meldungen-kopf">
-  <p class="page-kicker">Ausgabe vom {{ date_de }}</p>
-  <h1>Alle Meldungen</h1>
-  {# E3B-R2: dieselbe Ausnahme wie am Aufmacher der Titelseite
-     (woche.html.j2) - eine Runde ohne bewertete Meldung zeigt hier
-     weiterhin die letzte gueltige Redaktion, und das muss an der Stelle
-     stehen, wo der Leser die Ausgabe-Datierung liest. Ohne diesen Hinweis
-     stand "Ausgabe vom 4. September" ueber Meldungen vom 28.08. #}
-  {% if redaktion_ausfall %}
-  <p class="ausfall-hinweis">Stand: {{ redaktion_ausfall.stand_de }} –
-    die Runde vom {{ date_de }} blieb ohne Bewertung:
-    {{ redaktion_ausfall.grund }}. Diese Seite zeigt weiterhin die
-    zuletzt vollständig redigierte Ausgabe.</p>
+{% block content %}
+{% if redaktion_ausfall %}
+<p class="ausfall-hinweis">Stand: {{ redaktion_ausfall.stand_de }} –
+  {{ redaktion_ausfall.grund }}. Diese Seite zeigt weiterhin die
+  zuletzt vollständig redigierte Ausgabe.</p>
+{% endif %}
+
+{% if highlights %}
+{% set wand = highlights | selectattr('relevance', 'ge', 3) | list %}
+{% set rand = highlights | rejectattr('relevance', 'ge', 3) | list %}
+<div class="mw-filter" data-auftritt>
+  <div class="chips" role="group" aria-label="Nach Ressort filtern">
+    <button type="button" class="chip on" data-filter="ressort" data-wert="" aria-pressed="true">Alle <span class="rubrik-zahl">{{ highlights|length }}</span></button>
+    {% for r in ressorts %}
+    <button type="button" class="chip" data-filter="ressort" data-wert="{{ r.key }}" aria-pressed="false">{{ r.label }} <span class="rubrik-zahl">{{ r.n }}</span></button>
+    {% endfor %}
+  </div>
+  {% if regions|length > 1 %}
+  <div class="chips chips--leise" role="group" aria-label="Nach Region filtern">
+    <button type="button" class="chip on" data-filter="region" data-wert="" aria-pressed="true">Alle Regionen</button>
+    {% for r in regions %}
+    <button type="button" class="chip" data-filter="region" data-wert="{{ r }}" aria-pressed="false">{{ r }} <span class="rubrik-zahl">{{ highlights | selectattr('region', 'equalto', r) | list | length }}</span></button>
+    {% endfor %}
+  </div>
   {% endif %}
 </div>
 
-{% if ressorts %}
-{# Die Uebersicht: sieben Kacheln, keine Sprungleiste. Eine Sprungleiste war
-   die Kruecke einer zu langen Seite - sie bewies das Problem, statt es zu
-   loesen. #}
-<div class="ressort-kacheln">
-  {% for r in ressorts %}
-  <section class="rkachel">
-    <div class="rubrik">
-      <h2>{{ r.label }}</h2>
-    </div>
-    {% for h in r.kachel %}
-    <article class="rk-stueck{% if loop.first %} rk-lead{% endif %}{% if not h.image %} ohne-bild{% endif %}">
-      <a href="{{ h.url }}" target="_blank" rel="noopener">
-        {% if h.image %}<span class="rk-bild"><img src="{{ prefix }}images/{{ h.image }}" alt=""
-           {% if h.image_w %}width="{{ h.image_w }}" height="{{ h.image_h }}"{% endif %}
-           loading="{{ 'eager' if loop.first else 'lazy' }}"></span>{% endif %}
-        <span class="rk-text">
-          <span class="rk-titel szl">{{ h.schlagzeile }}</span>
-          <span class="rk-meta">{{ h.operator or h.source_label }}</span>
-        </span>
+<div class="bildwand" id="bildwand">
+  {% for h in wand %}
+  {# Ein kleines Bild steht nie in der grossen Kachel - es waere dort
+     hochskaliert (bilder.MIND_BREITE_GROSS). #}
+  {% set gr = 'gross' if h.relevance >= 5 else ('mittel' if h.relevance == 4 else 'klein') %}
+  {% if gr == 'gross' and h.image and (h.image_w or 0) < MIND_BREITE_GROSS %}{% set gr = 'mittel' %}{% endif %}
+  <article class="mw mw--{{ gr }} meldung{% if not h.image %} mw--ohne-bild{% endif %}" id="{{ meldung_id(h) }}"
+           data-ressort="{{ h.ressort }}" data-region="{{ h.region }}">
+    <a class="mw-link" href="{{ h.url }}" target="_blank" rel="noopener" data-panel>
+      {% if h.image %}<span class="mw-bild"><img src="{{ prefix }}images/{{ h.image }}" alt=""
+        {% if h.image_w %}width="{{ h.image_w }}" height="{{ h.image_h }}"{% endif %}
+        loading="{{ 'eager' if loop.index <= 4 else 'lazy' }}" decoding="async"></span>{% endif %}
+      <span class="mw-text">
+        <span class="mw-kicker"><span class="punkt punkt--r{{ h.relevance }}" aria-hidden="true"></span>{{ h.operator or h.source_label }}</span>
+        <span class="mw-titel szl">{{ h.schlagzeile }}</span>
+      </span>
+    </a>
+    {{ detail(h) }}
+  </article>
+  {% endfor %}
+</div>
+
+{% if rand %}
+<section class="randnotizen" data-auftritt>
+  <h2 class="abschnitt-titel">Randnotizen</h2>
+  <ol class="rn-liste">
+    {% for h in rand %}
+    <li class="rn meldung" id="{{ meldung_id(h) }}" data-ressort="{{ h.ressort }}" data-region="{{ h.region }}">
+      <a class="mw-link rn-link" href="{{ h.url }}" target="_blank" rel="noopener" data-panel>
+        <span class="rn-titel szl">{{ h.schlagzeile }}</span>
+        <span class="rn-meta">{{ h.operator or h.source_label }} · {{ h.ressort_label }}</span>
       </a>
-    </article>
+      {{ detail(h) }}
+    </li>
     {% endfor %}
-    {# Die EINZIGE Zahl der Kachel. Bis zum 08.08.2026 stand sie zweimal:
-       als Chip neben der Rubrik und noch einmal im Link darunter. #}
-    <a class="rkachel-alle" href="#ressort-{{ r.key }}" data-oeffnet="ressort-{{ r.key }}">alle {{ r.n }} Meldungen &darr;</a>
-  </section>
-  {% endfor %}
-</div>
-
-{# Die Tiefe. Zugeklappt, aber vollstaendig im Quelltext: keine Meldung
-   verschwindet, die Browsersuche findet weiterhin alles, und der Suchindex
-   liest ohnehin die Berichtsdatei. #}
-<div class="ressort-tiefe">
-  {% for r in ressorts %}
-  <details class="mressort" id="ressort-{{ r.key }}">
-    <summary class="rubrik">
-      <h2>{{ r.label }}</h2>
-      <span class="rubrik-zahl">{{ r.n }} Meldungen</span>
-    </summary>
-
-    <div class="mressort-oben">
-      <article class="mlead meldung{% if not r.lead.image %} ohne-bild{% endif %}">
-        <a href="{{ r.lead.url }}" target="_blank" rel="noopener">
-          {% if r.lead.image %}<span class="mlead-bild"><img src="{{ prefix }}images/{{ r.lead.image }}" alt=""
-             {% if r.lead.image_w %}width="{{ r.lead.image_w }}" height="{{ r.lead.image_h }}"{% endif %} loading="lazy"></span>{% endif %}
-          <span class="stueck-kicker">{{ r.lead.operator or r.lead.source_label }}{% if r.lead.date %} · {{ r.lead.date }}{% endif %}</span>
-          <span class="mlead-titel szl">{{ r.lead.schlagzeile }}</span>
-          {% if r.lead.summary %}<span class="mlead-anriss">{{ r.lead.summary }}</span>{% endif %}
-        </a>
-        {# Ausserhalb des Links wie die Belege unten: der Satz gehoert zur
-           Meldung, ist aber kein Teil ihrer Ueberschrift. #}
-        {% if r.lead.ctm_satz %}
-        <p class="ctm-satz"><span class="ctm-marke">Was das für uns heißt</span>{{ r.lead.ctm_satz }}</p>
-        {% endif %}
-        {% if r.lead.weitere_quellen %}
-        <p class="mz-belege">Auch berichtet von {% for q in r.lead.weitere_quellen %}<a
-           href="{{ q.url }}" target="_blank" rel="noopener">{{ q.source }}</a>{{ ", " if not loop.last }}{% endfor %}</p>
-        {% endif %}
-        {{ ueb.uebersetzung_link(r.lead, prefix) }}
-      </article>
-      {% if r.mittel %}
-      <div class="mmittel">
-        {% for h in r.mittel %}
-        <article class="mzwei meldung{% if not h.image %} ohne-bild{% endif %}">
-          <a href="{{ h.url }}" target="_blank" rel="noopener">
-            {% if h.image %}<span class="mzwei-bild"><img src="{{ prefix }}images/{{ h.image }}" alt=""
-               {% if h.image_w %}width="{{ h.image_w }}" height="{{ h.image_h }}"{% endif %} loading="lazy"></span>{% endif %}
-            <span class="mzwei-text">
-              <span class="mzwei-titel szl">{{ h.schlagzeile }}</span>
-              <span class="mz-meta"><span class="mz-rel r{{ h.relevance }}">{{ h.relevance }}</span>{{ h.operator or h.source_label }}</span>
-            </span>
-          </a>
-          {{ ueb.uebersetzung_link(h, prefix) }}
-        </article>
-        {% endfor %}
-      </div>
-      {% endif %}
-    </div>
-
-    {% if r.zeilen %}
-    <div class="mzeilen">
-      {% for h in r.zeilen %}{{ zeile(h) }}{% endfor %}
-    </div>
-    {% endif %}
-  </details>
-  {% endfor %}
-</div>
+  </ol>
+</section>
+{% endif %}
+<p class="mw-leer" hidden>Keine Meldung passt zu dieser Auswahl.</p>
 {% else %}
 <p class="empty-note">Für die aktuelle Woche liegen noch keine bewerteten Meldungen vor.</p>
 {% endif %}
 
-<div class="card" id="archiv" style="scroll-margin-top:24px">
-  <div class="card-head"><h2>Frühere Ausgaben</h2></div>
+<section class="archiv" id="archiv" style="scroll-margin-top:96px" data-auftritt>
+  <h2 class="abschnitt-titel">Frühere Ausgaben</h2>
   {% if archive %}
-  <div class="list-card">
+  <div class="archiv-reihe">
     {% for e in archive %}
-    {# Nur die neuen Meldungen. Wie viele insgesamt gesammelt wurden, ist
-       eine Frage der Quellenseite - hier stand sie in jeder Zeile daneben
-       und liess die Liste wie eine Tabelle aussehen. #}
-    <a class="list-row" href="{{ prefix }}reports/{{ e.date }}.html">
-      <span class="list-row-date">{{ e.date_de }}</span>
-      <span class="list-row-new">{{ e.stats.get('new','–') }} neue Meldungen</span>
-    </a>
+    <a class="archiv-datum" href="{{ prefix }}reports/{{ e.date }}.html">{{ e.date_de }}</a>
     {% endfor %}
   </div>
   {% else %}
-  <p class="empty-note" style="margin:0">Noch keine Berichte im Archiv.</p>
+  <p class="empty-note">Noch keine Berichte im Archiv.</p>
   {% endif %}
+</section>
+
+{# Die Leseansicht: EIN Panel fuer alle Meldungen; app.js setzt den Inhalt
+   aus dem verborgenen Detailblock der angeklickten Meldung ein. Der Block
+   steht im Dokument, nicht in einem <template>: so ist jede Meldung mit
+   Zusammenfassung und Folgerungssatz Teil des Quelltexts. #}
+<div class="lesepanel" id="lesepanel" hidden>
+  <div class="lesepanel-schleier" data-schliessen></div>
+  <aside class="lesepanel-blatt" role="dialog" aria-modal="true" aria-labelledby="lesepanel-titel">
+    <button type="button" class="lesepanel-zu" data-schliessen aria-label="Schließen">
+      <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
+    <div class="lesepanel-inhalt"></div>
+  </aside>
 </div>
-
-{# Hier stand bis zum 08.08.2026 die wochenuebergreifende Suche - ein
-   Eingabefeld, Bereichsfilter und eine Trefferliste, ganz am Fuss dieser
-   Seite. Das war der Ort, an dem das Suchfeld der Topbar landete, und damit
-   der Grund fuer Antonios Satz: "Wenn ich was suche, werde ich auf die
-   Unterseite Meldungen weitergeleitet ... ich verstehe nicht, warum."
-
-   Die Suche hat jetzt ihre eigene Seite (`suche.html`, als Dossier gebaut).
-   Was hier stand, ist dorthin gewandert - nicht geloescht, sondern an den
-   Ort gebracht, an dem es die einzige Frage der Seite ist. #}
 {% endblock %}

@@ -1,5 +1,8 @@
 {% extends "base.html.j2" %}
+{% import "_design.html.j2" as d %}
+{% set hintergrund = true %}
 {% block title %}Newsletter – Vodafone Product and Services Insights{% endblock %}
+{% block buehne %}{{ d.hintergrund('band-newsletter', prefix) }}{% endblock %}
 {% block content %}
 {# Die Anmeldeseite. Drei Dinge sind hier anders als auf jeder anderen Seite
    des Portals, und alle drei aus einem Grund:

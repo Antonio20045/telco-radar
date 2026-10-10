@@ -1,464 +1,299 @@
-{# Die Titelseite der Ausgabe - ein Zeitungsraster mit vier Gewichtsstufen.
+{# Diese Woche - die Startseite im Kinoformat (Redesign 09.10.2026).
 
-   Bis zum 06.08.2026 standen hier zwei Stufen: ein Aufmacher, drei gleich
-   grosse Anreisser, dann der Fliesstext. Antonio nach fuenf Runden: "Mir
-   gefaellt die Seite immer noch ueberhaupt nicht." Der Grund war nicht die
-   Schrift und nicht das Bild, sondern das fehlende RASTER MIT GEWICHTUNG -
-   eine Zeitungsseite entsteht daraus, dass eine Geschichte dominiert, zwei
-   mittel sind und zwanzig Zeilen sind.
+   ERSTER BILDSCHIRM  Der Campus in der Stimmung der Tageszeit, gross das
+                      Datum der Ausgabe, darunter drei Fenster: die
+                      Meldung der Woche, wo Vodafone bei den Geraeten
+                      steht, die auffaelligste Promo.
+   DARUNTER           Der Wochenbericht als Folge von Szenen: jedes
+                      Kapitel beginnt mit seinem Bild ueber den ganzen
+                      Bildschirm, beim Weiterscrollen gibt das Bild die
+                      rechte Haelfte frei und der Text erscheint Absatz
+                      fuer Absatz. Reihenfolge: `startseite.szenen()`.
 
-     AUFMACHER      gross, Bild >= 800 px, Vorspann.
-     WAS WICHTIG IST  daneben, sieben nummerierte Textzeilen. Ohne diese
-                    Spalte stehen oberhalb der Falz nur vier Geschichten.
-     ZWEITE REIHE   zwei mittlere Bildgeschichten.
-     DRITTE REIHE   vier kleine.
-     RESSORTS       je Ressort ein Aufmacher plus vier Zeilen.
-     WOCHENBERICHT  vollstaendig, zweispaltig - das Herzstueck (CLAUDE.md
-                    §8), aber eine Titelseite fuehrt mit Nachrichten, nicht
-                    mit einem Essay.
-
-   Jede Schlagzeile traegt die Klasse `szl`. Daran haengt der Wahrheitstest
-   in tests/test_seiten_zahlen.py: keine doppelte Meldung, keine
-   abgeschnittene Ueberschrift. Wer eine Schlagzeile ergaenzt und die Klasse
-   vergisst, faellt aus beiden Pruefungen heraus.
-
-   Das Datum steht EINMAL, in der Datumszeile des Zeitungskopfs.
-   Dieselbe Vorlage rendert die Archivwochen unter reports/<datum>.html. #}
+   Dieselbe Vorlage rendert die Archivwochen unter reports/<datum>.html -
+   dort ohne Fenster (die Geraete- und Promozahlen sind die von heute,
+   nicht die der Archivwoche) und mit dem Explorer aller Meldungen. #}
 {% extends "base.html.j2" %}
 {% import "_uebersetzung.html.j2" as ueb %}
+{% import "_design.html.j2" as d %}
 {% set active = 'woche' %}
+{% set buehne = report is not none %}
+{% set wrap_class = 'voll' %}
 {% block title %}{% if is_latest %}Vodafone Product and Services Insights · Ausgabe vom {{ date_de }}{% else %}Vodafone Product and Services Insights · Archiv {{ report.date if report else '' }}{% endif %}{% endblock %}
 
-{% macro bild(h, klasse, eager=false) %}
-{%- if h.image %}<span class="{{ klasse }}"><img src="{{ prefix }}images/{{ h.image }}" alt=""
-     {% if h.image_w %}width="{{ h.image_w }}" height="{{ h.image_h }}"{% endif %}
-     loading="{{ 'eager' if eager else 'lazy' }}"></span>{% endif -%}
-{% endmacro %}
+{% block buehne %}
+{% if report %}
+{% set teile = (date_de or '').rsplit(' ', 1) %}
+<section class="buehne" aria-label="Ausgabe vom {{ date_de }}">
+  {# Vier Stimmungen desselben Bildes. app.js waehlt nach der Uhrzeit des
+     Lesers EINE davon und laedt nur diese; ohne JavaScript steht der Tag. #}
+  <div class="buehne-bild" aria-hidden="true">
+    {% for z in ('morgen', 'tag', 'abend', 'nacht') %}
+    {% if ('campus-' ~ z) in bilder %}
+    <img class="buehne-ebene" data-zeit-bild="{{ z }}" data-src="{{ prefix }}static/bilder/campus-{{ z }}.jpg" alt="" width="2400" height="1357" decoding="async">
+    {% endif %}
+    {% endfor %}
+    {% if 'campus-tag' in bilder %}<noscript><img class="buehne-ebene geladen" src="{{ prefix }}static/bilder/campus-tag.jpg" alt=""></noscript>{% endif %}
+  </div>
+  <div class="buehne-inhalt">
+    <div class="buehne-kopf">
+      <p class="buehne-gruss" data-gruss>{% if is_latest %}Ausgabe{% else %}Archiv{% endif %}</p>
+      <h1 class="buehne-datum">{{ teile[0] }}<span class="buehne-jahr"> {{ teile[1] if teile|length > 1 else '' }}</span></h1>
+      {# Ein Halbsatz mit zwei Zahlen: relevant behalten und neu gelesen. Bei
+         einer uebernommenen Ausgabe faellt "aus N neuen" weg - das waere die
+         Zahl der HEUTIGEN Runde neben Meldungen einer frueheren. #}
+      <p class="buehne-unter">{% if report and report.stats %}<b>{{ highlights|length }} relevante Meldungen</b>
+        {% if not redaktion_ausfall %}aus {{ report.stats.get('new', '–') }} neuen{% endif -%}
+        {% else %}{{ highlights|length }} Meldungen{% endif %}{% if lesezeit %} · Lesezeit ca. {{ lesezeit }} Minuten{% endif %}</p>
+      {% if redaktion_ausfall %}
+      <p class="ausfall-hinweis buehne-hinweis">Stand: {{ redaktion_ausfall.stand_de }} –
+        die Runde vom {{ date_de }} blieb ohne Bewertung:
+        {{ redaktion_ausfall.grund }}. Diese Seite zeigt weiterhin die
+        zuletzt vollständig redigierte Ausgabe.</p>
+      {% endif %}
+      {% if not is_latest %}
+      <p class="archivhinweis buehne-hinweis">Archivierter Bericht vom {{ date_de }} –
+        <a href="{{ prefix }}index.html">zur aktuellen Ausgabe</a></p>
+      {% endif %}
+      {% if is_latest and themen %}
+      <nav class="fokusband fokusband--oben" aria-label="Laufende Themen">
+        {% for t in themen %}
+        <a href="{{ prefix }}thema/{{ t.slug }}.html">
+          <span class="fokusband-kicker">Im Fokus</span>
+          <span class="fokusband-titel">{{ t.titel }}</span>
+          <span class="fokusband-zahl">{{ t.n }} Meldungen &nearr;</span>
+        </a>
+        {% endfor %}
+      </nav>
+      {% endif %}
+    </div>
+
+    {% if is_latest and fenster %}
+    <div class="fenster-reihe">
+      {% set m = fenster.meldung %}
+      {% if m %}
+      {% set h = m.h %}
+      <a class="fenster fenster--meldung" href="{{ prefix }}meldungen.html">
+        <span class="fenster-kopf"><span class="fenster-art">Meldung der Woche</span>
+          <span class="fenster-zahl">{{ m.anzahl }} Meldungen</span></span>
+        <span class="fenster-koerper">
+          {% if h.image %}<span class="fenster-bild"><img src="{{ prefix }}images/{{ h.image }}" alt=""
+            {% if h.image_w %}width="{{ h.image_w }}" height="{{ h.image_h }}"{% endif %} loading="eager" decoding="async"></span>{% endif %}
+          <span class="fenster-titel szl">{{ h.schlagzeile }}</span>
+        </span>
+        {% if h.ctm_satz %}<span class="ctm-satz fenster-ctm"><span class="ctm-marke">Was das für uns heißt</span>{{ h.ctm_satz }}</span>{% endif %}
+        <span class="fenster-fuss"><span class="punkt punkt--r{{ h.relevance }}" aria-hidden="true"></span>{{ h.operator or h.source_label }} · Priorität {{ h.relevance }}/5</span>
+      </a>
+      {% endif %}
+      {% set g = fenster.geraete %}
+      {% if g %}
+      <a class="fenster fenster--geraete" href="{{ prefix }}geraete.html">
+        <span class="fenster-kopf"><span class="fenster-art">Wo steht Vodafone?</span>
+          <span class="fenster-zahl">{{ g.modell }}</span></span>
+        <span class="fenster-koerper">
+          {% if g.leitzahl_html %}<span class="fenster-leit">{{ g.leitzahl_html | safe }}</span>
+          {% else %}<span class="fenster-satz">{{ g.antwort_html | safe }}</span>{% endif %}
+        </span>
+        <span class="fenster-fuss">Band {{ g.band }} · {{ g.laufzeit }} Raten{% if g.stand %} · Preise vom {{ g.stand | date_de }}{% endif %}</span>
+      </a>
+      {% endif %}
+      {% set p = fenster.promo %}
+      {% if p %}
+      {% set k = p.karte %}
+      <a class="fenster fenster--promo" href="{{ prefix }}promo/index.html">
+        <span class="fenster-kopf"><span class="fenster-art">Promo</span>
+          <span class="fenster-zahl">{% if p.neu %}{{ p.neu }} neu{% elif p.aktiv %}{{ p.aktiv }} Aktionen aktiv{% endif %}{% if p.endet_bald %} · {{ p.endet_bald }} enden bald{% endif %}</span></span>
+        <span class="fenster-koerper">
+          <span class="fenster-gross">{{ k.kachel }}</span>
+          <span class="fenster-titel fenster-titel--klein"><b>{{ k.brand.name }}</b> {{ k.offer.headline }}</span>
+        </span>
+        <span class="fenster-fuss">Stand {{ p.stand | date_de }}</span>
+      </a>
+      {% endif %}
+    </div>
+    {% endif %}
+    <a class="buehne-weiter" href="#der-wochenbericht">Der Wochenbericht<span aria-hidden="true">↓</span></a>
+  </div>
+  {# Die langsame Bildbewegung laesst sich anhalten (WCAG 2.2.2). #}
+  <button type="button" class="buehne-pause" aria-pressed="false" aria-label="Bildbewegung anhalten" hidden>
+    <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><rect x="3" y="2" width="3.4" height="12" rx="1" fill="currentColor"/><rect x="9.6" y="2" width="3.4" height="12" rx="1" fill="currentColor"/></svg>
+  </button>
+</section>
+{% endif %}
+{% endblock %}
 
 {% block content %}
 {% if report %}
+{% set hat_land = competitors and competitors|selectattr('summary')|list %}
+{% set land_gescheitert = competitors and competitors|selectattr('error')|list %}
+{% set warten = is_latest and fruehwarnung and fruehwarnung.aktiv %}
+{% set folge = szenen(kapitel or [],
+     themen=(dash is not none and dash.tech_radar|length > 0),
+     deutschland=(hat_land or land_gescheitert)|length > 0,
+     warten=warten|default(false, true),
+     zwei_minuten=(zwei_minuten|length > 0)) %}
 
-{% if not is_latest %}
-<p class="archivhinweis">Archivierter Bericht vom {{ date_de }} –
-  <a href="{{ prefix }}index.html">zur aktuellen Ausgabe</a></p>
-{% endif %}
+<div class="bericht" id="der-wochenbericht" style="scroll-margin-top:0">
+  {% if folge %}
+  {# Am Rand steht nur das aktuelle Kapitel; die Liste klappt erst beim
+     Ueberfahren auf. Keine Fortschrittsleiste. #}
+  <nav class="kapitel-marke" aria-label="Kapitel des Berichts">
+    <button type="button" class="kapitel-aktuell" aria-expanded="false"><span data-kapitel-name>{{ folge[0].titel }}</span></button>
+    <ol class="kapitel-liste">
+      {% for s in folge %}<li><a href="#{{ s.id }}">{{ s.titel }}</a></li>{% endfor %}
+    </ol>
+  </nav>
+  {% endif %}
+  {# Zweiter "Stand:"-Hinweis: wer per Sprungmarke direkt in den Bericht
+     kommt, soll das Alter des Textes nicht erst oben auf der Buehne lesen
+     muessen. #}
+  {% if redaktion_ausfall %}
+  <p class="ausfall-hinweis bericht-stand">Stand: {{ redaktion_ausfall.stand_de }}</p>
+  {% endif %}
 
-{# Der Foliensatz stand hier bis zum 09.08.2026, zwischen Subnav und
-   Titelseite. Er steht jetzt am FUSS des Berichts (weiter unten in dieser
-   Datei), und das ist nicht nur eine Abstandsfrage: als erste Zeile der
-   Seite las er sich wie ein achter Navigationspunkt, und er kostete den
-   Platz, um den es beim Rueckbau des Kurzpfads ging - gemessen 1440x900
-   standen mit ihm fuenf Geschichten oberhalb der Falz, ohne ihn acht
-   (scripts/pruefe_portal.py, Kriterium 1).
-
-   Am Berichtsfuss steht er ausserdem an der richtigen Stelle: wer den
-   Bericht gelesen hat, ist der, der ihn am Montag vortraegt. #}
-
-{# ==================================================== DER ROTE FADEN ==== #}
-{# Der Faden ist geblieben, seine Anzeige nicht. `_faden()` sorgt weiterhin
-   dafuer, dass Aufmacher und zweite Reihe GENAU die Meldungen sind, die der
-   Fuehrungsabsatz des Berichts meint - die Reihenfolge der Seite folgt also
-   dem Bericht.
-
-   Was hier bis zum 07.08.2026 zusaetzlich stand, war eine Abschrift dieses
-   Absatzes ueber der Ausgabe ("Worum es diese Woche geht") samt Sprunglink.
-   Antonio hat sie kassiert: derselbe Text steht zwei Bildschirme weiter
-   unten noch einmal, vollstaendig. Ein Ausschnitt eines Textes, der auf
-   derselben Seite ohnehin komplett steht, ist keine Zusammenfassung,
-   sondern eine Wiederholung. #}
-
-{# Der Zwei-Minuten-Pfad stand hier bis zum 09.08.2026, ueber dem Aufmacher.
-   Er hat genau das getan, was ein Kasten an dieser Stelle tut: die
-   Titelseite aus dem ersten Bildschirm gedraengt. Fuenf Eintraege, jeder ein
-   Absatz plus Belegzeile - die Schlagzeile des Aufmachers begann erst
-   darunter. Er steht jetzt in der rechten Spalte ueber "Was wichtig ist"
-   (weiter unten in dieser Datei), kompakt und auf drei Zeilen begrenzt. #}
-
-{# ================================================= OBERHALB DER FALZ ==== #}
-<div class="front-oben">
-  <div class="front-haupt">
-
-    {# Der Verweis auf die laufenden Themenseiten. Eine Linie, kein Kasten -
-       die Seiten sind temporaer und bekommen deshalb auch keinen
-       Navigationspunkt (analyze/highlight_topics.py).
-
-       Er stand bis zum 29.08.2026 am ENDE dieser Spalte, hinter Aufmacher,
-       zweiter und dritter Reihe. Gemessen an der Ausgabe vom 28.08.: auf
-       dem Schreibtisch y=1316 px bei 900 px Falz, auf dem Telefon
-       y=3031 px bei 844 px. Wer die Domain aufrief, sah die Themenseite
-       also nie - und im HTML war das nicht zu sehen, der Link war da.
-       Die rechte Spalte waere billiger gewesen (sie beginnt bei y=132 px),
-       faellt auf dem Telefon aber unter das ganze Raster.
-
-       Ueber dem Aufmacher steht sonst nichts, und das hat einen Grund:
-       der Zwei-Minuten-Kasten hat hier am 09.08.2026 die Titelseite von
-       zehn auf drei Geschichten oberhalb der Falz gedrueckt. Der
-       Unterschied ist die Bauform - fuenf Absaetze mit Belegzeile gegen
-       EINE Zeile je Thema. Wer hier etwas ergaenzt, misst
-       `pruefe_portal.py` Kriterium 1 nach. #}
-    {% if is_latest and themen %}
-    <nav class="fokusband fokusband--oben" aria-label="Laufende Themen">
-      {% for t in themen %}
-      <a href="{{ prefix }}thema/{{ t.slug }}.html">
-        <span class="fokusband-kicker">Im Fokus</span>
-        <span class="fokusband-titel">{{ t.titel }}</span>
-        <span class="fokusband-zahl">{{ t.n }} Meldungen &nearr;</span>
-      </a>
-      {% endfor %}
-    </nav>
-    {% endif %}
-
-    {# E3B, 05.09.2026: 0 bewertete Meldungen sollen die Titelseite nicht
-       leerraeumen (analyze/redaktion_kontinuitaet.py). Der Aufmacher und der
-       Wochenbericht weiter unten zeigen dann weiterhin die letzte gueltige
-       Ausgabe - dieser Hinweis sagt VOR dem Aufmacher, dass und seit wann.
-       Er steht nur, wenn die Uebernahme wirklich stattgefunden hat: an
-       jeder normalen Woche ist `redaktion_ausfall` None und hier steht
-       nichts - Kriterium 1 aus `pruefe_portal.py` bleibt unberuehrt. #}
-    {% if redaktion_ausfall %}
-    <p class="ausfall-hinweis">Stand: {{ redaktion_ausfall.stand_de }} –
-      die Runde vom {{ date_de }} blieb ohne Bewertung:
-      {{ redaktion_ausfall.grund }}. Diese Seite zeigt weiterhin die
-      zuletzt vollständig redigierte Ausgabe.</p>
-    {% endif %}
-
-    {% if front.aufmacher %}
-    {% set a = front.aufmacher %}
-    <article class="aufmacher{% if not a.image %} ohne-bild{% endif %}{% if (a.schlagzeile or '')|length <= 70 %} kurz{% endif %}">
-      <p class="page-kicker">{{ a.ressort_label }}{% if a.operator %} · {{ a.operator }}{% endif %}</p>
-      <h1 class="szl"><a href="{{ a.url }}" target="_blank" rel="noopener">{{ a.schlagzeile }}</a></h1>
-      {% if a.image %}
-      <figure class="aufmacher-bild">
-        <img src="{{ prefix }}images/{{ a.image }}" alt=""
-             {% if a.image_w %}width="{{ a.image_w }}" height="{{ a.image_h }}"{% endif %}
-             loading="eager">
-        <figcaption>{{ a.operator or a.source_label }} · Bild: {{ a.source_label }}</figcaption>
-      </figure>
+  {% for s in folge %}
+  {% if s.art == 'text' %}
+  <section class="szene{% if s.bild not in bilder %} szene--ohne-motiv{% endif %}" id="{{ s.id }}" data-szene="{{ s.titel }}">
+    <div class="szene-bild" aria-hidden="true">{{ d.motiv(s.bild, prefix, 'szene-motiv') }}
+      <span class="szene-marke">{{ s.titel }}</span></div>
+    <h2 class="szene-titel">{{ s.titel }}</h2>
+    <div class="szene-text prose">
+      {{ s.html | safe }}
+      {% if s.wichtig and front.wichtig %}
+      <div class="rubrik"><h3>Was wichtig ist</h3></div>
+      <ol class="wichtig-liste">
+        {% for h in front.wichtig %}
+        <li class="wichtig-zeile">
+          <a href="{{ h.url }}" target="_blank" rel="noopener">
+            <span class="wichtig-kicker">{{ h.operator or h.source_label }}</span>
+            <span class="wichtig-titel szl">{{ h.schlagzeile }}</span>
+          </a>
+          {{ ueb.uebersetzung_link(h, prefix) }}
+          {% if h.ctm_satz %}<p class="ctm-satz"><span class="ctm-marke">Was das für uns heißt</span>{{ h.ctm_satz }}</p>{% endif %}
+        </li>
+        {% endfor %}
+      </ol>
+      <p class="ex-count">
+        {% if show_explorer %}<a href="#alle-meldungen" class="source-link">alle {{ highlights|length }} Meldungen &darr;</a>
+        {% else %}<a href="{{ prefix }}meldungen.html" class="source-link">alle {{ highlights|length }} Meldungen &nearr;</a>{% endif %}
+      </p>
       {% endif %}
-      <div class="aufmacher-text">
-        {% if a.vorspann %}<p class="aufmacher-vorspann">{{ a.vorspann }}</p>{% endif %}
-        {# Der eine Satz, der aus einer Meldung eine Konsequenz macht. Er
-           steht nur da, wenn er die Pruefung gegen den Originaltext
-           bestanden hat. #}
-        {% if a.ctm_satz %}<p class="ctm-satz"><span class="ctm-marke">Was das für uns heißt</span>{{ a.ctm_satz }}</p>{% endif %}
-        <p class="aufmacher-meta">
-          <b>{{ a.operator or a.source_label }}</b>
-          <span class="rel-badge r{{ a.relevance }}">Priorität {{ a.relevance }}/5</span>
-          {# Dass mehrere unabhaengige Redaktionen dieselbe Sache melden, ist
-             in der Regel der bessere Wichtigkeitsbeleg als jede
-             Modelleinschaetzung - deshalb steht die Zahl neben der
-             Prioritaet, nicht in einer Fussnote. #}
-          {% if a.quellenzahl and a.quellenzahl > 1 %}<span class="rubrik-zahl">{{ a.quellenzahl }} Quellen</span>{% endif %}
-          <a href="{{ a.url }}" target="_blank" rel="noopener">Originalquelle öffnen &nearr;</a>
-        </p>
-        {{ ueb.uebersetzung_link(a, prefix) }}
-      </div>
-    </article>
-    {% else %}
-    <section class="page-hero"><h1 class="szl">Diese Woche keine priorisierte Meldung.</h1></section>
-    {% endif %}
-
-    {% if front.zwei %}
-    <div class="reihe reihe-zwei">
-      {% for h in front.zwei %}
-      <article class="stueck stueck-mittel{% if not h.image %} ohne-bild{% endif %}">
-        <a href="{{ h.url }}" target="_blank" rel="noopener">
-          {{ bild(h, 'stueck-bild') }}
-          <span class="stueck-kicker">{{ h.ressort_label }} · {{ h.operator or h.source_label }}{% if h.quellenzahl and h.quellenzahl > 1 %} · {{ h.quellenzahl }} Quellen{% endif %}</span>
-          <span class="stueck-titel szl">{{ h.schlagzeile }}</span>
-          {% if h.anriss %}<span class="stueck-anriss">{{ h.anriss }}</span>{% endif %}
-        </a>
-        {# AUSSERHALB des Links darueber - ein Link in einem Link ist kein
-           gueltiges HTML. Bis zum 15.08.2026 trug auf dieser Seite nur der
-           Aufmacher den roten Link, und damit erschien er auf der
-           Titelseite genau dann, wenn die staerkste Meldung der Woche
-           zufaellig fremdsprachig war. An der Ausgabe vom 14.08. gemessen:
-           elf Uebersetzungen, davon null auf der Startseite sichtbar -
-           acht polnische und zwei franzoesische Meldungen standen in diesen
-           beiden Reihen. #}
-        {{ ueb.uebersetzung_link(h, prefix) }}
-      </article>
-      {% endfor %}
     </div>
-    {% endif %}
+  </section>
 
-    {% if front.vier %}
-    <div class="reihe reihe-vier">
-      {% for h in front.vier %}
-      <article class="stueck stueck-klein{% if not h.image %} ohne-bild{% endif %}">
-        <a href="{{ h.url }}" target="_blank" rel="noopener">
-          {{ bild(h, 'stueck-bild') }}
-          <span class="stueck-kicker">{{ h.ressort_label }}</span>
-          <span class="stueck-titel szl">{{ h.schlagzeile }}</span>
-        </a>
-        {{ ueb.uebersetzung_link(h, prefix) }}
-      </article>
-      {% endfor %}
-    </div>
-    {% endif %}
-
-  </div>
-
-  {# Die Textspalte neben dem Aufmacher. Ohne sie stehen oberhalb der Falz
-     vier Geschichten; mit ihr elf. Bewusst OHNE Bilder - die gehoeren in
-     die Bildpositionen links, nicht in eine Digest-Spalte. #}
-  {% if front.wichtig or zwei_minuten %}
-  <aside class="front-wichtig">
-
-    {# ================================================ IN ZWEI MINUTEN ==== #}
-    {# Der kurze Weg durch die Ausgabe - in der Spalte, nicht ueber der
-       Seite. Was hier steht, ist nicht die Zusammenfassung des Berichts
-       (die stuende zwei Bildschirme weiter noch einmal - genau der Fehler,
-       den Antonio am 07.08.2026 kassiert hat), sondern eine ANDERE Auswahl
-       nach einem anderen Massstab: Meldungen, die das eigene Portfolio
-       unmittelbar beruehren, je mit dem einen Satz, was sie dafuer
-       bedeuten. Jeder dieser Saetze ist gegen seinen Originaltext geprueft
-       (analyze/faithfulness.py); was nicht belegt war, steht hier nicht.
-
-       EINE Zeile je Eintrag, hoechstens 20 Woerter, hoechstens drei
-       Eintraege - und kein Auffuellen. Gibt es nur einen, steht einer da;
-       gibt es keinen, faellt der Kasten weg. Eine Woche ohne direkte
-       Portfoliofrage ist ein Befund, kein Loch, das man fuellt. #}
-    {% if zwei_minuten %}
-    <section class="kurzpfad">
-      <div class="rubrik"><h2>In zwei Minuten</h2></div>
+  {% elif s.art == 'zwei' %}
+  <section class="szene szene--blatt" id="{{ s.id }}" data-szene="{{ s.titel }}">
+    <h2 class="szene-titel szene-titel--blatt">{{ s.titel }}</h2>
+    <div class="szene-text kurzpfad">
       <ol class="kurzpfad-liste">
         {% for h in zwei_minuten %}
         <li class="kurzpfad-zeile">
-          {# Ein Absatz, eine Zeile. Der Beleg haengt am Satz statt darunter
-             zu stehen - eine zweite Zeile je Eintrag waere wieder ein
-             Block, und drei Bloecke sind derselbe Kasten wie vorher. #}
           <p class="kurzpfad-satz">{{ h.ctm_satz }}<span class="kurzpfad-beleg"><a
             href="{{ h.url }}" target="_blank" rel="noopener">{{ h.operator or h.source_label }} &nearr;</a></span></p>
         </li>
         {% endfor %}
       </ol>
-    </section>
-    {% endif %}
+    </div>
+  </section>
 
-    {% if front.wichtig %}
-    <div class="rubrik"><h2>Was wichtig ist</h2></div>
-    <ol class="wichtig-liste">
-      {% for h in front.wichtig %}
-      <li class="wichtig-zeile">
-        <a href="{{ h.url }}" target="_blank" rel="noopener">
-          <span class="wichtig-kicker">{{ h.operator or h.source_label }}</span>
-          <span class="wichtig-titel szl">{{ h.schlagzeile }}</span>
-        </a>
-      </li>
-      {% endfor %}
-    </ol>
-    <p class="ex-count">
-      {% if show_explorer %}<a href="#alle-meldungen" class="source-link">alle {{ highlights|length }} Meldungen &darr;</a>
-      {% else %}<a href="{{ prefix }}meldungen.html" class="source-link">alle {{ highlights|length }} Meldungen &nearr;</a>{% endif %}
-    </p>
-    {% endif %}
-
-    {# Der Themenradar steht hier oben, nicht unten neben dem Bericht: die
-       Rail neben Aufmacher und den beiden Reihen waere sonst ab der Haelfte
-       leer, und Weissraum an dieser Stelle liest sich als Fehler. #}
-    {% if dash and dash.tech_radar %}
-    <div class="card">
-      <div class="card-head"><h2>Themen der Woche</h2></div>
+  {% elif s.art == 'themen' %}
+  <section class="szene szene--blatt" id="{{ s.id }}" data-szene="{{ s.titel }}">
+    <h2 class="szene-titel szene-titel--blatt">{{ s.titel }}</h2>
+    <div class="szene-text themen">
       {% for t in dash.tech_radar[:7] %}
-      <div class="bento-bar">
-        <div class="bento-bar-top"><b>{{ t.theme }}</b><span>{{ t.n }}</span></div>
+      <div class="bento-bar themen-zeile">
+        <div class="bento-bar-top"><b>{{ t.theme }}</b><span class="themen-zahl">{{ t.n }}</span></div>
         <div class="bento-bar-track"><span class="bento-bar-fill" style="width:{{ t.w }}%"></span></div>
       </div>
       {% endfor %}
     </div>
-    {% endif %}
-  </aside>
-  {% endif %}
-</div>
+  </section>
 
-{# ====================================================== FRÜHWARN-BOARD == #}
-{# Die Fragen, die dauerhaft offen sind - und wie es diese Woche um sie
-   steht. Der Bericht darunter beantwortet "was ist passiert?"; er kann nicht
-   beantworten "wie steht es um die Fragen, die uns seit Monaten
-   beschäftigen?".
-
-   Es steht UNTER der Titelseite, nicht darüber: `pruefe_portal.py`
-   Kriterium 1 verlangt mindestens sechs Geschichten oberhalb der Falz, und
-   mit dem Board davor waren es drei. Das ist die richtige Reihenfolge und
-   nicht nur die messbare - eine Zeitung führt mit Nachrichten, nicht mit
-   ihrer Beobachtungsliste.
-
-   Der Wert steckt darin, dass die Indikatoren VORHER feststehen
-   (config/fruehwarnung.yaml) - einer, der nach dem Ereignis formuliert wird,
-   ist keine Warnung, sondern eine Erklärung. Deshalb rechnet das hier ein
-   Wortabgleich und kein Modell: sonst gäbe es jede Woche eine andere
-   Auslegung derselben Frage.
-
-   „Ruhend" bleibt stehen. Eine Frage, zu der seit Wochen nichts kommt, ist
-   beantwortet - es passiert gerade nichts. #}
-{% if is_latest and fruehwarnung and fruehwarnung.aktiv %}
-<section class="fwb">
-  <div class="rubrik"><h2>Worauf wir warten</h2>
-    <span class="rubrik-zahl">{{ fruehwarnung.n_aktiv }} von {{ fruehwarnung.fragen | length }} in Bewegung</span></div>
-  <div class="fwb-gitter">
-    {% for f in fruehwarnung.fragen %}
-    <article class="fwb-frage fwb-{{ f.zustand }}">
-      <h3 class="fwb-titel">{{ f.frage }}</h3>
-      {% if f.warum %}<p class="fwb-warum">{{ f.warum }}</p>{% endif %}
-      <ul class="fwb-liste">
-        {% for i in f.indikatoren %}
-        <li class="fwb-ind fwb-{{ i.zustand }}">
-          <span class="fwb-punkt" aria-hidden="true"></span>
-          <span class="fwb-name">{{ i.name }}</span>
-          <span class="fwb-zustand">{{ i.zustand }}</span>
-          {% for b in i.belege %}
-          <span class="fwb-beleg"><a href="{{ b.url }}" target="_blank" rel="noopener">{{ b.titel }}</a>
-            <i>{{ b.absender }}{% if b.datum %} · {{ b.datum }}{% endif %}</i></span>
-          {% endfor %}
+  {% elif s.art == 'deutschland' %}
+  <section class="szene{% if s.bild not in bilder %} szene--ohne-motiv{% endif %}" id="{{ s.id }}" data-szene="{{ s.titel }}" style="scroll-margin-top:24px">
+    <div class="szene-bild" aria-hidden="true">{{ d.motiv(s.bild, prefix, 'szene-motiv') }}
+      <span class="szene-marke">{{ s.titel }}</span></div>
+    <h2 class="szene-titel">{{ s.titel }}</h2>
+    <div class="szene-text">
+      {% if hat_land %}
+      <ul class="wb-kurz">
+        {% for c in competitors %}
+        {% if c.satz %}
+        <li class="wb-kurz-zeile">
+          <a href="{{ prefix }}wettbewerb.html#{{ c.anker }}">
+            <span class="wb-kurz-name">{{ c.name }}</span>
+            <span class="wb-kurz-satz">{{ c.satz }}</span>
+          </a>
         </li>
+        {% endif %}
         {% endfor %}
       </ul>
-    </article>
-    {% endfor %}
-  </div>
-</section>
-{% endif %}
-
-{# ================================================== DER WOCHENBERICHT == #}
-{# Hier standen bis zum 07.08.2026 sechs Ressortbloecke - je Ressort ein
-   Aufmacher und vier Zeilen, zusammen rund 3 500 px zwischen dem Ueberblick
-   und dem Bericht. Antonio: "die haben genau das Gleiche, habe ich ja auf
-   der naechsten Unterseite bei Meldungen. Das ist unnoetig, das ist doppelt
-   gemoppelt."
-
-   Er hat recht: meldungen.html gliedert ALLE Meldungen nach denselben
-   Ressorts, mit denselben Ueberschriften aus derselben Quelle - die
-   Titelseite zeigte davon eine Teilmenge. Diese Seite beantwortet jetzt
-   genau zwei Fragen, in dieser Reihenfolge: der Ueberblick oben ("was ist
-   diese Woche passiert") und danach ohne Zwischenstueck der Bericht ("was
-   heisst das"). Wer die Einzelmeldung sucht, geht auf Meldungen - dafuer
-   ist die Seite da. #}
-<div class="frontpage" id="der-wochenbericht" style="scroll-margin-top:20px">
-  <div class="frontpage-main">
-    {% if briefing_html %}
-    <div class="card">
-      <div class="card-head"><h2>Der Wochenbericht</h2>
-        <a href="{{ prefix }}transparenz.html">Quellen</a></div>
-      {# Zweiter "Stand:"-Hinweis (E3B) - der erste steht oben beim
-         Aufmacher. Beide sind noetig: Aufmacher und Wochenbericht sind zwei
-         eigenstaendige Bloecke, und wer per Sprungmarke direkt hierher
-         kommt, soll das Alter des Textes nicht erst am Aufmacher lesen
-         muessen. #}
-      {% if redaktion_ausfall %}
-      <p class="ausfall-hinweis">Stand: {{ redaktion_ausfall.stand_de }}</p>
+      {% set gescheitert = competitors|selectattr('error')|rejectattr('summary')|list %}
+      {% if gescheitert %}
+      {# Ein Teilausfall darf nicht aussehen wie ein kleineres Wettbewerbsfeld. #}
+      <p class="muted-note">Für {{ gescheitert|map(attribute='name')|join(' und ') }}
+        hat die Auswertung dieses Laufs keine Antwort geliefert
+        ({{ gescheitert|length }} von {{ competitors|length }} Profilen).
+        Der Fehler steht im Laufprotokoll unter
+        <a href="{{ prefix }}transparenz.html">Quellen</a>.</p>
       {% endif %}
-      {# Ein Halbsatz, keine Bilanz. Hier standen bis zum 08.08.2026 drei
-         Saetze mit vier Zahlen; die Zahl "13 zum sofortigen Ansehen" stand
-         ausserdem an jeder betroffenen Meldung noch einmal als Prioritaet
-         5/5. #}
-      <p class="berichtszeile">
-        {% if report.stats %}<b>{{ highlights|length }} relevante Meldungen</b>
-        {% if redaktion_ausfall %}{# E3B: "aus 877 neuen" waere die Zahl der
-           HEUTIGEN Runde neben Meldungen einer FRUEHEREN - zwei Zahlen aus
-           zwei verschiedenen Laeufen in einem Satz. #}
-        {% else %}aus {{ report.stats.get('new', '–') }} neuen{% endif -%}
-        {% endif %}{% if lesezeit %}
-        &middot; Lesezeit ca. {{ lesezeit }} Minuten{% endif %}
-      </p>
-      {% if toc %}
-      <nav class="toc" aria-label="Abschnitte des Berichts">
-        {% for s in toc %}<a href="#{{ s.id }}">{{ s.title }}</a>{% endfor %}
-      </nav>
+      {% else %}
+      {# Ein gescheiterter Lauf darf nicht aussehen wie ein Lauf, der noch aussteht. #}
+      <p class="empty-note"><b>Die Auswertung dieses Laufs ist gescheitert.</b>
+        Die Meldungen wurden gesammelt und zugeordnet
+        ({{ competitors|sum(attribute='n_items') }} Treffer), aber die Analyse
+        hat keine Antwort geliefert. Der Fehler steht im Laufprotokoll unter
+        <a href="{{ prefix }}transparenz.html">Quellen</a>.</p>
       {% endif %}
-      <article class="prose prose-zwei">{{ briefing_html | safe }}</article>
+      <p class="szene-weiter"><a href="{{ prefix }}wettbewerb.html">Zur Wettbewerbsseite &rarr;</a></p>
     </div>
-    {% endif %}
-    {# Der Foliensatz. Kein Navigationseintrag: er ist kein Ort zum Lesen,
-       sondern eine Datei zum Mitnehmen - vier Folien im Vodafone-Design,
-       mit der Quellenfolie, die sich nicht abschalten laesst.
+  </section>
 
-       Bewusst AUSSERHALB von `briefing_html`: die Foliendatei entsteht je
-       Ausgabe unbedingt (html.py), der Bericht nicht. Faellt der Editor
-       aus, waere der Foliensatz sonst von der Seite aus unerreichbar,
-       obwohl die Datei daliegt - und es gibt keinen zweiten Weg dorthin. #}
-    {% if report.date %}
-    <p class="folienlink"><a href="{{ prefix }}folien/{{ report.date }}.html">
-      Diese Ausgabe als Foliensatz</a> <span>4 Folien, für den Montagstermin</span></p>
-    {% endif %}
-  </div>
-  {# Hier stand bis zum 07.08.2026 eine Beistellspalte "Zahlen der Woche" mit
-     fuenf Kacheln. Zwei ihrer Werte (gelesen / relevant) standen im selben
-     Bildschirm noch einmal als Satz ueber dem Bericht, ein dritter
-     (Top-Technologiethema) als erste Zeile des Themenradars oberhalb der
-     Falz. Dieselbe Zahl in zwei Formen ist genau die Unruhe, die Antonio
-     benannt hat. Die eine Zahl, die nur hier stand, ist in den Berichtskopf
-     gezogen. #}
-</div>
+  {% elif s.art == 'warten' %}
+  <section class="szene fwb{% if s.bild not in bilder %} szene--ohne-motiv{% endif %}" id="{{ s.id }}" data-szene="{{ s.titel }}">
+    <div class="szene-bild" aria-hidden="true">{{ d.motiv(s.bild, prefix, 'szene-motiv') }}
+      <span class="szene-marke">{{ s.titel }}</span></div>
+    <h2 class="szene-titel">{{ s.titel }}</h2>
+    <div class="szene-text">
+      <p class="fwb-stand"><span class="rubrik-zahl">{{ fruehwarnung.n_aktiv }} von {{ fruehwarnung.fragen | length }} in Bewegung</span></p>
+      <div class="fwb-gitter">
+        {% for f in fruehwarnung.fragen %}
+        <details class="fwb-frage fwb-{{ f.zustand }}">
+          <summary><span class="fwb-licht" aria-hidden="true"></span><h3 class="fwb-titel">{{ f.frage }}</h3></summary>
+          {% if f.warum %}<p class="fwb-warum">{{ f.warum }}</p>{% endif %}
+          <ul class="fwb-liste">
+            {% for i in f.indikatoren %}
+            <li class="fwb-ind fwb-{{ i.zustand }}">
+              <span class="fwb-punkt" aria-hidden="true"></span>
+              <span class="fwb-name">{{ i.name }}</span>
+              <span class="fwb-zustand">{{ i.zustand }}</span>
+              {% for b in i.belege %}
+              <span class="fwb-beleg"><a href="{{ b.url }}" target="_blank" rel="noopener">{{ b.titel }}</a>
+                <i>{{ b.absender }}{% if b.datum %} · {{ b.datum }}{% endif %}</i></span>
+              {% endfor %}
+            </li>
+            {% endfor %}
+          </ul>
+        </details>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  {% endif %}
+  {% endfor %}
 
-{# Deutschland-Fokus: ein Verweis, keine zweite Wettbewerbsseite.
+  {% if not folge %}
+  <section class="szene szene--blatt"><p class="empty-note">Für diese Ausgabe liegt kein Wochenbericht vor.</p></section>
+  {% endif %}
 
-   Hier standen bis zum 08.08.2026 drei Detailkarten mit Profil, Themen und
-   je bis zu acht Moves - rund ein Drittel der Titelseite fuer etwas, das
-   ueber die Wochen erzaehlt werden muss und nicht in einer Ausgabe. Antonio
-   wollte "eine ganz neue Unterseite, die fuer immer da ist"; die Karten sind
-   dorthin umgezogen und stehen dort mit ihrer Chronik. Geblieben ist eine
-   Zeile je Wettbewerber - Name und Lage in einem Satz.
-
-   Der Anker #deutschland-fokus bleibt: er ist das Ziel der alten
-   Weiterleitung und steht in Mails. #}
-<section id="deutschland-fokus" style="scroll-margin-top:24px">
-{% if competitors and competitors|selectattr('summary')|list %}
-<div class="card">
-  <div class="rubrik"><h2>Deutschland</h2>
-    <a href="{{ prefix }}wettbewerb.html">Zur Wettbewerbsseite</a></div>
-  <ul class="wb-kurz">
-    {% for c in competitors %}
-    {% if c.satz %}
-    <li class="wb-kurz-zeile">
-      <a href="{{ prefix }}wettbewerb.html#{{ c.anker }}">
-        <span class="wb-kurz-name">{{ c.name }}</span>
-        <span class="wb-kurz-satz">{{ c.satz }}</span>
-      </a>
-    </li>
-    {% endif %}
-    {% endfor %}
-  </ul>
-  {% set gescheitert = competitors|selectattr('error')|rejectattr('summary')|list %}
-  {% if gescheitert %}
-  {# Ein Teilausfall darf nicht aussehen wie ein kleineres Wettbewerbsfeld. #}
-  <p class="muted-note" style="margin-top:14px">
-    Für {{ gescheitert|map(attribute='name')|join(' und ') }}
-    hat die Auswertung dieses Laufs keine Antwort geliefert
-    ({{ gescheitert|length }} von {{ competitors|length }} Profilen).
-    Der Fehler steht im Laufprotokoll unter
-    <a href="{{ prefix }}transparenz.html">Quellen</a>.
-  </p>
+  {% if report.date %}
+  <p class="folienlink"><a href="{{ prefix }}folien/{{ report.date }}.html">
+    Diese Ausgabe als Foliensatz</a> <span>4 Folien, für den Montagstermin</span></p>
   {% endif %}
 </div>
-{% elif competitors and competitors|selectattr('error')|list %}
-{# Ein gescheiterter Lauf darf nicht aussehen wie ein Lauf, der noch aussteht. #}
-<div class="card">
-  <div class="rubrik"><h2>Deutschland</h2>
-    <a href="{{ prefix }}wettbewerb.html">Zur Wettbewerbsseite</a></div>
-  <p class="empty-note">
-    <b>Die Auswertung dieses Laufs ist gescheitert.</b>
-    Die Meldungen wurden gesammelt und zugeordnet
-    ({{ competitors|sum(attribute='n_items') }} Treffer), aber die Analyse
-    hat keine Antwort geliefert. Der Fehler steht im Laufprotokoll unter
-    <a href="{{ prefix }}transparenz.html">Transparenz</a>.
-    Die Chronik der Wettbewerber steht davon unberührt auf der
-    <a href="{{ prefix }}wettbewerb.html">Wettbewerbsseite</a>.
-  </p>
-</div>
-{% endif %}
-</section>
-
-{# "Auswertung je Bereich" stand hier UND wortgleich auf transparenz.html
-   (dort ab Zeile 62, dieselben vier Spalten aus derselben Quelle). Eine
-   Tabelle mit Modell-IDs beantwortet "kann ich dem Ding trauen" - das ist
-   die Frage der Quellenseite, nicht die der Titelseite. Der Bericht
-   verlinkt sie im Kopf. #}
 
 {% if show_explorer and highlights %}
 <details class="evidence" id="alle-meldungen">
-  {# Ohne Zusatz: "bei Bedarf oeffnen" erklaerte die Bedienung eines
-     Aufklappers - das Plus daneben sagt dasselbe ohne Worte. #}
   <summary><span>Alle {{ highlights | length }} Meldungen dieser Woche</span></summary>
   <div class="evidence-body">
     {% include "_explorer.html.j2" %}

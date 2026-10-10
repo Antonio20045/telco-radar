@@ -5,9 +5,14 @@
    Lauf daraus gemacht. Reihenfolge deshalb: erst der Lauf (die frische
    Zahl), dann der Bestand. #}
 {% extends "base.html.j2" %}
+{% import "_design.html.j2" as d %}
 {% set active = 'transparenz' %}
+{% set buehne = true %}
 {% block title %}Vodafone Product and Services Insights · Quellen{% endblock %}
 {% set kmap = {'rss':'Feed','json_api':'Feed (API)','newsroom':'Newsroom','newsroom_js':'Newsroom','official':'Referenz','trade_press':'Fachpresse'} %}
+{% block buehne %}
+{{ d.band('band-quellen', 'Nachprüfbarkeit', 'Quellen', prefix, ('Lauf vom ' ~ date_de) if date_de else '') }}
+{% endblock %}
 {% block content %}
 
 <section class="page-hero wide">

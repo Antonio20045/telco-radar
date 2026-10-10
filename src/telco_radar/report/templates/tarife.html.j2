@@ -15,6 +15,14 @@
 {% set active = 'tarife' %}
 {% block title %}Vodafone Product and Services Insights · Tarife{% endblock %}
 
+{% import "_design.html.j2" as d %}
+{% set buehne = true %}
+{% block buehne %}
+{% call d.band('band-geraete', 'Geräte', 'Tarife', prefix) %}
+
+{% endcall %}
+{% endblock %}
+
 {% block content %}
 <section class="page-hero wide">
   <div class="page-hero-row">

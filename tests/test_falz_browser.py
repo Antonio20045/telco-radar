@@ -16,6 +16,10 @@ an einem echten Chromium auf zwei Formaten:
 Er ist die Gegenprobe zu jeder kuenftigen Ergaenzung oberhalb der Falz. Wer
 dort etwas einfuegt, sieht hier, was es kostet - `pruefe_portal.py`
 Kriterium 1 zaehlt Geschichten, dieses hier misst Pixel.
+
+Seit dem Redesign vom 09.10.2026 steht die Schlagzeile der Ausgabe im
+Fenster "Meldung der Woche" auf der Buehne (`.fenster--meldung`); der
+Kurzpfad ist die erste Szene darunter.
 """
 
 from __future__ import annotations
@@ -103,7 +107,7 @@ def _gemessen(tmp_path_factory, chromium):
             try:
                 seite.goto(f"{wurzel}/index.html", wait_until="load")
                 seite.wait_for_timeout(400)
-                szl = seite.locator(".aufmacher .szl").first
+                szl = seite.locator(".fenster--meldung .szl").first
                 werte[name] = {
                     "hoehe": hoehe,
                     "kasten": szl.bounding_box(),

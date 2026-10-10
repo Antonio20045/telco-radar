@@ -1,0 +1,46 @@
+{# Bausteine des Designs vom 09.10.2026: Motivbild, Bildband, Umschalter.
+
+   Ein Motiv steht nur, wenn seine Datei unter templates/static/bilder/
+   liegt (`bilder` setzt render_site). Fehlt sie, steht eine ruhige
+   Flaeche in der Farbe der Tageszeit - nie ein kaputtes Bild. #}
+
+{% macro motiv(slug, prefix, klasse='', eager=false, breite=2400, hoehe=1357) -%}
+{%- if slug and slug in bilder -%}
+<img class="motiv {{ klasse }}" src="{{ prefix }}static/bilder/{{ slug }}.jpg" alt=""
+     width="{{ breite }}" height="{{ hoehe }}" decoding="async" loading="{{ 'eager' if eager else 'lazy' }}">
+{%- else -%}
+<span class="motiv motiv--leer {{ klasse }}" aria-hidden="true"></span>
+{%- endif -%}
+{%- endmacro %}
+
+{# Das Bildband oben auf jeder Unterseite: ein Drittel Bildschirmhoehe,
+   der Titel liegt unten links im Bild, ein optionaler Umschalter daneben. #}
+{% macro band(slug, kicker, titel, prefix, stand='') -%}
+<section class="band">
+  <div class="band-bild" aria-hidden="true">{{ motiv(slug, prefix, 'band-motiv', eager=true, breite=2400, hoehe=1029) }}</div>
+  <div class="band-inhalt">
+    <div class="band-text">
+      {% if kicker %}<p class="band-kicker">{{ kicker }}</p>{% endif %}
+      <h1 class="band-titel">{{ titel }}</h1>
+      {% if stand %}<p class="band-stand">{{ stand }}</p>{% endif %}
+    </div>
+    {% if caller %}<div class="band-extra">{{ caller() }}</div>{% endif %}
+  </div>
+</section>
+{%- endmacro %}
+
+{# Ein Motiv, das als ruhender Hintergrund hinter der ganzen Seite steht
+   (Newsletter): das Formular liegt als Glasflaeche darueber. #}
+{% macro hintergrund(slug, prefix) -%}
+<div class="hintergrund" aria-hidden="true">{{ motiv(slug, prefix, 'hintergrund-motiv', eager=true, breite=2400, hoehe=1357) }}</div>
+{%- endmacro %}
+
+{# Ein schlichter Umschalter zwischen zwei Ansichten einer Seite, z. B.
+   Wettbewerb Deutschland | Welt. Jeder Eintrag ist ein echter Link. #}
+{% macro umschalter(eintraege, aktiv, prefix, label) -%}
+<nav class="umschalter" aria-label="{{ label }}">
+  {% for e in eintraege %}
+  <a href="{{ prefix }}{{ e.href }}" {% if e.key == aktiv %}class="on" aria-current="page"{% endif %}>{{ e.label }}</a>
+  {% endfor %}
+</nav>
+{%- endmacro %}
