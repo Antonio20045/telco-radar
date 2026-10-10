@@ -1,81 +1,88 @@
 
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" class="ohne-js">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Marktrecherche · Wettbewerb</title>
   <meta name="robots" content="noindex">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   
-  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400;1,8..60,600&family=Libre+Franklin:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="preload" href="static/schrift/instrument-sans.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="style.css">
   <link rel="icon" type="image/png" href="logo.png">
 </head>
-<body class="uc-markt">
+
+<body class="uc-markt seite-wettbewerb mit-buehne">
+  <a class="sprungmarke" href="#inhalt">Zum Inhalt</a>
   
-  <header class="topbar">
-    <div class="topbar-inner">
+  <header class="topbar kopf" id="kopf">
+    <div class="topbar-inner kopf-inner">
       <a class="brand" href="index.html" aria-label="Vodafone Product and Services Insights">
         <span class="brand-logo-wrap"><img class="brand-logo" src="logo.png" alt="" width="15" height="15"></span>
         <span class="brand-name">Vodafone <span class="brand-zusatz">Product and Services</span> <em>Insights</em></span>
       </a>
-      <div class="topbar-right">
-        <nav class="usecases" aria-label="Anwendungsfälle">
-          <a class="uc active" href="index.html">Marktrecherche</a>
-          <a class="uc " href="promo/index.html">Promo Übersicht</a>
-        </nav>
+      <nav class="subbar subnav navi" aria-label="Marktrecherche">
+        <a href="index.html" >Diese Woche</a>
+        <a href="meldungen.html" >Meldungen</a>
+        <a href="wettbewerb.html" class="on" aria-current="page">Wettbewerb</a>
+        
+        
+        <a href="geraete.html" >Geräte</a>
+        
+        <a href="promo/index.html" >Promo</a>
+        <a href="transparenz.html" >Quellen</a>
+      </nav>
+      <div class="topbar-right kopf-rechts">
         
         
         <form class="gsearch" id="gsearch" role="search" action="suche.html" autocomplete="off">
+          <svg class="gsearch-lupe" viewBox="0 0 20 20" width="15" height="15" fill="none" aria-hidden="true">
+            <circle cx="9" cy="9" r="6.2" stroke="currentColor" stroke-width="1.7"/>
+            <line x1="13.6" y1="13.6" x2="18" y2="18" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+          </svg>
           <input type="search" id="gsearch-input" name="q" class="gsearch-input" autocomplete="off"
-                 placeholder="Im Archiv suchen …"
+                 placeholder="Suchen"
                  aria-label="Marktrecherche durchsuchen">
-          <button type="submit" class="gsearch-btn" aria-label="Suchen">
-            <svg viewBox="0 0 20 20" width="14" height="14" fill="none" aria-hidden="true">
-              <circle cx="9" cy="9" r="6.2" stroke="currentColor" stroke-width="1.8"/>
-              <line x1="13.6" y1="13.6" x2="18" y2="18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-            </svg>
-          </button>
+          <kbd class="gsearch-taste" aria-hidden="true">⌘K</kbd>
+          <button type="submit" class="gsearch-btn" aria-label="Suchen"><span aria-hidden="true">→</span></button>
         </form>
+        
+        
+        
+        <a class="kopf-newsletter" href="newsletter.html">Newsletter</a>
         
       </div>
     </div>
-    
-    
-    
-    <nav class="subbar subnav" aria-label="Marktrecherche">
-      <a href="index.html" >Diese Woche</a>
-      <a href="meldungen.html" >Meldungen</a>
-      <a href="differenzierung.html" >Differenzierung</a>
-      <a href="wettbewerb.html" class="on">Wettbewerb</a>
-      
-      
-      <a href="geraete.html" >Geräte</a>
-      
-      
-      
-      <a href="transparenz.html" >Quellen</a>
-      
-      
-      <a href="newsletter.html" >Newsletter</a>
-      
-    </nav>
-    
   </header>
-  <main>
+  <main id="inhalt">
+    
+<section class="band">
+  <div class="band-bild" aria-hidden="true"><img class="motiv band-motiv" src="static/bilder/band-wettbewerb.jpg" alt=""
+     width="2400" height="1029" decoding="async" loading="eager"></div>
+  <div class="band-inhalt">
+    <div class="band-text">
+      <p class="band-kicker">Wettbewerb</p>
+      <h1 class="band-titel">Deutschland</h1>
+      
+    </div>
+    <div class="band-extra">
+<nav class="umschalter" aria-label="Ansicht">
+  
+  <a href="wettbewerb.html" class="on" aria-current="page">Deutschland</a>
+  
+  <a href="differenzierung.html" >Welt</a>
+  
+</nav>
+</div>
+  </div>
+</section>
+
     <div class="wrap">
       
       
-
-<section class="page-hero wide">
-  <div class="page-hero-row">
-    <div>
-      <p class="page-kicker">Deutschland</p>
-      <h1>Der deutsche Wettbewerb.</h1>
-    </div>
-    
+<div class="wb-einstieg" data-auftritt>
+  <p class="wb-lead">Was Telekom, O2 und 1&amp;1 gerade tun – und wie es zu den Wochen davor passt.</p>
+  
 
 <aside class="seit">
   <p class="seit-kopf">Neu seit der letzten Ausgabe</p>
@@ -90,169 +97,77 @@
 </aside>
 
 
-  </div>
-  <p class="page-lead">Was Telekom, O2 und 1&amp;1 gerade tun – und wie es zu dem passt, was in den Wochen davor kam.</p>
-  
-  <nav class="toc" aria-label="Die drei Wettbewerber">
-    <a href="#deutsche-telekom">Deutsche Telekom</a><a href="#telefonica-o2">Telefónica / O2</a><a href="#1-1">1&amp;1</a>
-  </nav>
-  
-</section>
+</div>
+
+<nav class="wb-sprung" aria-label="Die drei Wettbewerber" data-auftritt>
+  <a href="#deutsche-telekom"><span class="anb-punkt gr-anb--telekom" aria-hidden="true"></span>Deutsche Telekom</a><a href="#telefonica-o2"><span class="anb-punkt gr-anb--o2" aria-hidden="true"></span>Telefónica / O2</a><a href="#1-1"><span class="anb-punkt gr-anb--1-1" aria-hidden="true"></span>1&amp;1</a>
+</nav>
 
 <div id="chronik" style="scroll-margin-top:90px"></div>
 
-<section class="wb wb--erste" id="deutsche-telekom" style="scroll-margin-top:16px">
-  
-  <div class="wb-kopf"><h2 class="wb-name">Deutsche Telekom</h2>
+
+
+<section class="wb portraet wb--erste" id="deutsche-telekom" style="scroll-margin-top:96px">
+  <div class="portraet-kopf" data-auftritt>
+    <h2 class="wb-name"><span class="anb-punkt gr-anb--telekom" aria-hidden="true"></span>Deutsche Telekom</h2>
     <span class="rubrik-zahl">111
       Meldungen seit 16. Juli 2026</span>
   </div>
-
-  <div class="wb-lage">
-    <div class="wb-profil">
+  <div class="portraet-raster">
+    <div class="portraet-lage" data-auftritt>
       
       <p class="wb-summary">Die Deutsche Telekom forciert derzeit den massiven Glasfaserausbau in Deutschland und setzt strategisch auf KI-basierte Effizienzsteigerungen mit einem Ziel von 2,5 Mrd. Euro Einsparungen bis 2030. Neben dem Ausbau der digitalen Infrastruktur investiert das Unternehmen gezielt in Partnerschaften für Cybersicherheit sowie exklusive Inhalte wie die 3. Liga bis 2031. Während die Investoren den KI-Ambitionen noch skeptisch gegenüberstehen, bleibt der Wettbewerbsdruck durch Frequenzdeals und neue Marktteilnehmer hoch.</p>
-      
-
-      
-      <div class="wb-themen">
-        
-        <div class="wb-themenzeile">
-          <span class="wb-themendatum">9. Oktober 2026</span>
-          <span class="wb-tags"><span class="comp-tag">Glasfaser-Offensive</span><span class="comp-tag">KI-Strategie</span><span class="comp-tag">Cybersicherheit</span><span class="comp-tag">Content-Rechte</span><span class="comp-tag">Infrastruktur-Partnerschaften</span></span>
-        </div>
-        
-        <div class="wb-themenzeile">
-          <span class="wb-themendatum">28. August 2026</span>
-          <span class="wb-tags"><span class="comp-tag">Glasfaserausbau</span><span class="comp-tag">5G/Event-Versorgung</span><span class="comp-tag">KI-Sicherheit</span><span class="comp-tag">KI-Modelle</span><span class="comp-tag">Sportsponsoring</span><span class="comp-tag">Retail/Vertrieb</span></span>
-        </div>
-        
-        <div class="wb-themenzeile">
-          <span class="wb-themendatum">14. August 2026</span>
-          <span class="wb-tags"><span class="comp-tag">KI-Offensive</span><span class="comp-tag">Spektrum-Deal</span><span class="comp-tag">Kostensenkung</span><span class="comp-tag">Festnetz-Migration</span><span class="comp-tag">Geräte-Promos</span><span class="comp-tag">B2B-Enterprise-KI</span></span>
-        </div>
-        
-      </div>
-      
-
       
       
       <div class="wb-hebel">
         <p class="wb-spaltentitel">Womit er sich abhebt</p>
-        <ul class="wb-hebelliste">
-          
-          <li>
-            <a href="differenzierung.html#dz-theme-entertainment">Entertainment &amp; Streaming</a>
-            <span class="wb-hebel-n">7</span>
-            <span class="wb-hebel-beispiel"><a
-              href="https://www.hollywoodreporter.com/lifestyle/lifestyle-news/best-t-mobile-streaming-deal-plans-free-netflix-hulu-apple-tv-1236419303/" target="_blank" rel="noopener">Netflix, Hulu und Apple TV+ kostenlos in den Tarifen.</a></span>
-          </li>
-          
-          <li>
-            <a href="differenzierung.html#dz-theme-loyalty">Loyalty &amp; Perks</a>
-            <span class="wb-hebel-n">7</span>
-            <span class="wb-hebel-beispiel"><a
-              href="https://www.telekom.hu/lakossagi/szolgaltatasok/magenta-moments" target="_blank" rel="noopener">Magenta Moments: täglich wechselnde Vorteile und Presales.</a></span>
-          </li>
-          
-          <li>
-            <a href="differenzierung.html#dz-theme-garantie">Garantie &amp; Service-Versprechen</a>
-            <span class="wb-hebel-n">3</span>
-            <span class="wb-hebel-beispiel"><a
-              href="https://www.t-mobile.com/cell-phone-plans/price-lock-faqs" target="_blank" rel="noopener">5-Jahres-Preisgarantie als Vertrauens-Signal (2025/26 teils aufgeweicht).</a></span>
-          </li>
-          
-          <li>
-            <a href="differenzierung.html#dz-theme-security">Security &amp; Betrugsschutz</a>
-            <span class="wb-hebel-n">3</span>
-            <span class="wb-hebel-beispiel"><a
-              href="https://www.t-mobile.com/benefits/scam-shield" target="_blank" rel="noopener">Scam Shield: kostenloser Scam- und Spam-Anrufschutz.</a></span>
-          </li>
-          
-          <li>
-            <a href="differenzierung.html#dz-theme-geraete">Geräte-Programme &amp; Zubehör</a>
-            <span class="wb-hebel-n">2</span>
-            <span class="wb-hebel-beispiel"><a
-              href="https://www.t-mobile.com/support/plans-features/upgrade-ready-every-year" target="_blank" rel="noopener">Yearly Upgrade: garantiert jedes Jahr ein neues Top-Smartphone.</a></span>
-          </li>
-          
-          <li>
-            <a href="differenzierung.html#dz-theme-ki">KI &amp; Assistenten</a>
-            <span class="wb-hebel-n">2</span>
-            <span class="wb-hebel-beispiel"><a
-              href="https://www.telekom.com/en/media/media-information/archive/perplexity-now-in-the-meinmagenta-app-1083480" target="_blank" rel="noopener">Perplexity fest in die MeinMagenta-App integriert (Magenta AI).</a></span>
-          </li>
-          
-          <li>
-            <a href="differenzierung.html#dz-theme-smarthome">Smart Home &amp; IoT</a>
-            <span class="wb-hebel-n">2</span>
-            <span class="wb-hebel-beispiel"><a
-              href="https://omdia.tech.informa.com/om022869/the-new-magenta-home-app-marks-the-launch-of-deutsche-telekoms-unified-service-approach-for-the-smart-home" target="_blank" rel="noopener">Neue Magenta-Home-App: vereinheitlichte Smart-Home-Steuerung.</a></span>
-          </li>
-          
-          <li>
-            <a href="differenzierung.html#dz-theme-gaming">Gaming</a>
-            <span class="wb-hebel-n">1</span>
-            <span class="wb-hebel-beispiel"><a
-              href="https://www.thefastmode.com/technology-solutions/46296-deutsche-telekom-brings-geforce-now-cloud-gaming-to-5g-mobile-users-in-germany" target="_blank" rel="noopener">5G+ Gaming: NVIDIA GeForce NOW gebündelt, über niedrige Latenz vermarktet.</a></span>
-          </li>
-          
-        </ul>
-        
+        <p class="hebel-woerter"><a href="differenzierung.html#dz-theme-entertainment" title="7 Beispiele: Netflix, Hulu und Apple TV+ kostenlos in den Tarifen.">Entertainment &amp; Streaming</a><a href="differenzierung.html#dz-theme-loyalty" title="7 Beispiele: Magenta Moments: täglich wechselnde Vorteile und Presales.">Loyalty &amp; Perks</a><a href="differenzierung.html#dz-theme-garantie" title="3 Beispiele: 5-Jahres-Preisgarantie als Vertrauens-Signal (2025/26 teils aufgeweicht).">Garantie &amp; Service-Versprechen</a><a href="differenzierung.html#dz-theme-security" title="3 Beispiele: Scam Shield: kostenloser Scam- und Spam-Anrufschutz.">Security &amp; Betrugsschutz</a><a href="differenzierung.html#dz-theme-geraete" title="2 Beispiele: Yearly Upgrade: garantiert jedes Jahr ein neues Top-Smartphone.">Geräte-Programme &amp; Zubehör</a><a href="differenzierung.html#dz-theme-ki" title="2 Beispiele: Perplexity fest in die MeinMagenta-App integriert (Magenta AI).">KI &amp; Assistenten</a><a href="differenzierung.html#dz-theme-smarthome" title="2 Beispiele: Neue Magenta-Home-App: vereinheitlichte Smart-Home-Steuerung.">Smart Home &amp; IoT</a><a href="differenzierung.html#dz-theme-gaming" title="1 Beispiel: 5G+ Gaming: NVIDIA GeForce NOW gebündelt, über niedrige Latenz vermarktet.">Gaming</a></p>
         
         <p class="wb-flanken">Ohne Beispiel bei diesem Anbieter, aber bei
           <b>Cloud &amp; Speicher</b> (Telefónica / O2).</p>
         
       </div>
       
+      
+      <p class="portraet-aktionen"><a class="knopf" href="promo/index.html">20
+        laufende Aktionen &rarr;</a>
+        
+        <span class="wb-marken">Marken: Telekom Deutschland, congstar</span></p>
+      
     </div>
-
-    
-    <aside class="wb-aktionen">
-      <p class="wb-spaltentitel">Laufende Aktionen</p>
+    <div class="portraet-zeit" data-auftritt>
+      <p class="wb-spaltentitel">Die letzten Schritte</p>
       
-      <ul class="wb-aktionsliste">
+      <ol class="zeitstrahl">
         
-        <li class="wb-aktion">
-          <a href="https://www.telekom.de/shop/tarife/smartphone-tarife" target="_blank" rel="noopener">
-            <span class="wb-aktion-titel szl">Mobilfunk-Cashback Aktion</span>
-            <span class="wb-aktion-meta">Telekom Deutschland · Wechsel- oder Altgerätprämie</span>
-          </a>
+        <li class="zeitstrahl-punkt">
+          <span class="zeitstrahl-tag">9.10.</span>
+          <a class="zeitstrahl-titel wb-titel szl" href="https://www.t-mobile.com/news/offers/mint-mobile-turns-10-and-celebrates-with-its-best-deal-ever-any-plan-for-10-month" target="_blank" rel="noopener">Mint Mobile bietet zum Jubiläum jeden Tarif für 10 Dollar</a>
+          <span class="zeitstrahl-meta">Tarif/Pricing · t-mobile.com</span>
         </li>
         
-        <li class="wb-aktion">
-          <a href="https://www.telekom.de/shop/tarife/zusatzkarten" target="_blank" rel="noopener">
-            <span class="wb-aktion-titel szl">PlusKarten-Vorteil: Unlimited-Daten und Preisvorteil</span>
-            <span class="wb-aktion-meta">Telekom Deutschland · ohne Bindung</span>
-          </a>
+        <li class="zeitstrahl-punkt">
+          <span class="zeitstrahl-tag">9.10.</span>
+          <a class="zeitstrahl-titel wb-titel szl" href="https://www.telecoms.com/ai/deutsche-telekom-eyes-2-5-billion-in-savings-from-ai-to-provide-fibre-boost" target="_blank" rel="noopener">Deutsche Telekom plant 2,5 Milliarden Euro Einsparung durch KI</a>
+          <span class="zeitstrahl-meta">Netz/Technologie · telecoms.com</span>
         </li>
         
-        <li class="wb-aktion">
-          <a href="https://www.telekom.de/shop/tarife/zusatzkarten" target="_blank" rel="noopener">
-            <span class="wb-aktion-titel szl">iPad zum Aktionspreis mit PlusKarte Data</span>
-            <span class="wb-aktion-meta">Telekom Deutschland · Gerät vergünstigt</span>
-          </a>
+        <li class="zeitstrahl-punkt">
+          <span class="zeitstrahl-tag">9.10.</span>
+          <a class="zeitstrahl-titel wb-titel szl" href="https://www.mobileeurope.co.uk/a1-ibm-austria-ai/" target="_blank" rel="noopener">A1 und IBM bringen souveräne KI für Unternehmen</a>
+          <span class="zeitstrahl-meta">Partnerschaft · mobileeurope.co.uk</span>
         </li>
         
-      </ul>
-      <p class="wb-mehr"><a href="promo/index.html">Alle 20
-        Aktionen &nearr;</a></p>
+      </ol>
       
-      
-      
-      <p class="wb-marken">Marken: Telekom Deutschland, congstar</p>
-      
-    </aside>
-    
+    </div>
   </div>
-
   
-  <div class="wb-chronik">
+  <details class="wb-chronik portraet-chronik">
+    <summary>Alle Meldungen von Deutsche Telekom<span>111</span></summary>
     
+    <p class="wb-monat">Oktober 2026<span>8</span></p>
     
-    
-<p class="wb-monat">Oktober 2026<span>8</span></p>
-
 <ol class="wb-liste">
   
   <li class="wb-zeile">
@@ -321,15 +236,9 @@
   
 </ol>
 
-
-
     
+    <p class="wb-monat">September 2026<span>7</span></p>
     
-    
-    <details class="wb-aelter">
-      <summary>September 2026<span>7
-        Meldungen</span></summary>
-      
 <ol class="wb-liste">
   
   <li class="wb-zeile">
@@ -390,14 +299,9 @@
   
 </ol>
 
-    </details>
     
+    <p class="wb-monat">August 2026<span>70</span></p>
     
-    
-    <details class="wb-aelter">
-      <summary>August 2026<span>70
-        Meldungen</span></summary>
-      
 <ol class="wb-liste">
   
   <li class="wb-zeile">
@@ -962,14 +866,9 @@
   
 </ol>
 
-    </details>
     
+    <p class="wb-monat">Juli 2026<span>26</span></p>
     
-    
-    <details class="wb-aelter">
-      <summary>Juli 2026<span>26
-        Meldungen</span></summary>
-      
 <ol class="wb-liste">
   
   <li class="wb-zeile">
@@ -1182,130 +1081,73 @@
   
 </ol>
 
-    </details>
     
-    
-  </div>
+  </details>
   
 </section>
 
-<section class="wb" id="telefonica-o2" style="scroll-margin-top:16px">
-  
-  <div class="wb-kopf"><h2 class="wb-name">Telefónica / O2</h2>
+
+<section class="wb portraet" id="telefonica-o2" style="scroll-margin-top:96px">
+  <div class="portraet-kopf" data-auftritt>
+    <h2 class="wb-name"><span class="anb-punkt gr-anb--o2" aria-hidden="true"></span>Telefónica / O2</h2>
     <span class="rubrik-zahl">113
       Meldungen seit 16. Juli 2026</span>
   </div>
-
-  <div class="wb-lage">
-    <div class="wb-profil">
+  <div class="portraet-raster">
+    <div class="portraet-lage" data-auftritt>
       
       <p class="wb-summary">Telefónica/O2 fokussiert sich aktuell auf die Konsolidierung seines Geschäftsmodells durch Desinvestitionen in Hispanoamerika und den Ausbau profitabler Mehrwertdienste wie Sicherheitssysteme (Movistar Prosegur Alarms). Gleichzeitig treibt das Unternehmen technologische Innovationen durch 5G-Pilotprojekte und KI-Initiativen voran, während es auf dem UK-Markt regulatorischen Druck durch die BT/TalkTalk-Übernahme ausübt. Strategisch positioniert sich der Konzern verstärkt als integrierter Service-Anbieter mit Fokus auf Entertainment und Kundenbindung.</p>
-      
-
-      
-      <div class="wb-themen">
-        
-        <div class="wb-themenzeile">
-          <span class="wb-themendatum">9. Oktober 2026</span>
-          <span class="wb-tags"><span class="comp-tag">Asset-Rationalisierung</span><span class="comp-tag">Diversifikation</span><span class="comp-tag">5G-Innovation</span><span class="comp-tag">Regulatorischer Druck</span><span class="comp-tag">Kundenbindung</span></span>
-        </div>
-        
-        <div class="wb-themenzeile">
-          <span class="wb-themendatum">28. August 2026</span>
-          <span class="wb-tags"><span class="comp-tag">5G-Standalone</span><span class="comp-tag">Small-Cell-Ausbau</span><span class="comp-tag">Glasfaserausbau</span><span class="comp-tag">Event-Netze</span><span class="comp-tag">Asset-Verkauf</span><span class="comp-tag">Roaming-Wachstum</span></span>
-        </div>
-        
-        <div class="wb-themenzeile">
-          <span class="wb-themendatum">14. August 2026</span>
-          <span class="wb-tags"><span class="comp-tag">KI-Sprachdienste</span><span class="comp-tag">WiFi-7-Ausbau</span><span class="comp-tag">Geräte-Bundles/Preisoffensive</span><span class="comp-tag">Content-Partnerschaften</span><span class="comp-tag">Nachhaltigkeit/Kreislaufwirtschaft</span><span class="comp-tag">B2B-Differenzierung</span></span>
-        </div>
-        
-      </div>
-      
-
       
       
       <div class="wb-hebel">
         <p class="wb-spaltentitel">Womit er sich abhebt</p>
-        <ul class="wb-hebelliste">
-          
-          <li>
-            <a href="differenzierung.html#dz-theme-loyalty">Loyalty &amp; Perks</a>
-            <span class="wb-hebel-n">2</span>
-            <span class="wb-hebel-beispiel"><a
-              href="https://news.virginmediao2.co.uk/april-giveaways-on-priority-from-o2-win-a-10000-vip-weekend-in-london-free-sweet-treats-discounted-cinema-tickets-and-more/" target="_blank" rel="noopener">Priority: exklusive Gewinnspiele, Ticket-Presales und tägliche Perks.</a></span>
-          </li>
-          
-          <li>
-            <a href="differenzierung.html#dz-theme-cloud">Cloud &amp; Speicher</a>
-            <span class="wb-hebel-n">1</span>
-            <span class="wb-hebel-beispiel"><a
-              href="https://www.thefastmode.com/technology-solutions/49163-o2-expands-cloud-storage-service-with-10-tb-free-space-for-mobile-fiber-customers" target="_blank" rel="noopener">O2 Cloud: bis zu 10 TB Gratis-Speicher für Mobil- und Fiber-Kunden.</a></span>
-          </li>
-          
-          <li>
-            <a href="differenzierung.html#dz-theme-entertainment">Entertainment &amp; Streaming</a>
-            <span class="wb-hebel-n">1</span>
-            <span class="wb-hebel-beispiel"><a
-              href="https://www.xatakamovil.com/multimedia/arranca-champions-2026-2027-este-ano-puedes-ver-sorteo-gratis-seas-operador-que-seas" target="_blank" rel="noopener">Movistar Plus überträgt die Auslosungen von Champions League, Europa League und Conference League am 27. und 28.</a></span>
-          </li>
-          
-        </ul>
-        
+        <p class="hebel-woerter"><a href="differenzierung.html#dz-theme-loyalty" title="2 Beispiele: Priority: exklusive Gewinnspiele, Ticket-Presales und tägliche Perks.">Loyalty &amp; Perks</a><a href="differenzierung.html#dz-theme-cloud" title="1 Beispiel: O2 Cloud: bis zu 10 TB Gratis-Speicher für Mobil- und Fiber-Kunden.">Cloud &amp; Speicher</a><a href="differenzierung.html#dz-theme-entertainment" title="1 Beispiel: Movistar Plus überträgt die Auslosungen von Champions League, Europa League und Conference League am 27. und 28.">Entertainment &amp; Streaming</a></p>
         
         <p class="wb-flanken">Ohne Beispiel bei diesem Anbieter, aber bei
           <b>Gaming</b> (Deutsche Telekom), <b>Garantie &amp; Service-Versprechen</b> (Deutsche Telekom), <b>Geräte-Programme &amp; Zubehör</b> (Deutsche Telekom).</p>
         
       </div>
       
+      
+      <p class="portraet-aktionen"><a class="knopf" href="promo/index.html">19
+        laufende Aktionen &rarr;</a>
+        
+        <span class="wb-marken">Marken: Blau, O2 / Telefónica Deutschland</span></p>
+      
     </div>
-
-    
-    <aside class="wb-aktionen">
-      <p class="wb-spaltentitel">Laufende Aktionen</p>
+    <div class="portraet-zeit" data-auftritt>
+      <p class="wb-spaltentitel">Die letzten Schritte</p>
       
-      <ul class="wb-aktionsliste">
+      <ol class="zeitstrahl">
         
-        <li class="wb-aktion">
-          <a href="https://www.o2online.de/priority/vorteile/freunde-werben-freunde" target="_blank" rel="noopener">
-            <span class="wb-aktion-titel szl">Freunde werben Freunde</span>
-            <span class="wb-aktion-meta">O2 / Telefónica Deutschland · Wechsel- oder Altgerätprämie</span>
-          </a>
+        <li class="zeitstrahl-punkt">
+          <span class="zeitstrahl-tag">9.10.</span>
+          <a class="zeitstrahl-titel wb-titel szl" href="https://news.virginmediao2.co.uk/virgin-media-o2-creates-new-dedicated-customer-hub-in-newcastle-to-handle-repeat-calls-and-boost-first-time-resolution-for-all-customers/" target="_blank" rel="noopener">Virgin Media O2 gründet neuen Kundenservice-Hub</a>
+          <span class="zeitstrahl-meta">Produktlaunch · news.virginmediao2.co.uk</span>
         </li>
         
-        <li class="wb-aktion">
-          <a href="https://www.o2online.de/e-shop" target="_blank" rel="noopener">
-            <span class="wb-aktion-titel szl">Handyvertrag mit Top-Smartphone ab 51,49 €/Monat</span>
-            <span class="wb-aktion-meta">O2 / Telefónica Deutschland · Gerät vergünstigt</span>
-          </a>
+        <li class="zeitstrahl-punkt">
+          <span class="zeitstrahl-tag">9.10.</span>
+          <a class="zeitstrahl-titel wb-titel szl" href="https://news.virginmediao2.co.uk/newsroom/grand-theft-auto-upgrade-gamers-could-unlock-293-with-unused-consoles-ahead-of-gta-vi/" target="_blank" rel="noopener">Virgin Media O2 startet Gaming-Rücknahmekampagne vor GTA VI</a>
+          <span class="zeitstrahl-meta">Kampagne · news.virginmediao2.co.uk</span>
         </li>
         
-        <li class="wb-aktion">
-          <a href="https://www.o2online.de/e-shop/apple/apple-watch-ultra-4-5g-natur-details?tarif=o2-mobile-on-demand-m-plus&amp;ratenzahlung=36&amp;zielgruppe=privatkunden" target="_blank" rel="noopener">
-            <span class="wb-aktion-titel szl">Gadget Deals: Apple Watch, MacBook &amp; Smartwatch</span>
-            <span class="wb-aktion-meta">O2 / Telefónica Deutschland · Preisnachlass auf den Tarif</span>
-          </a>
+        <li class="zeitstrahl-punkt">
+          <span class="zeitstrahl-tag">9.10.</span>
+          <a class="zeitstrahl-titel wb-titel szl" href="https://news.virginmediao2.co.uk/a1-naming-rights-partnership-until-2038/" target="_blank" rel="noopener">O2 verlängert Namensrechte für The O2 bis 2038</a>
+          <span class="zeitstrahl-meta">Kampagne · news.virginmediao2.co.uk</span>
         </li>
         
-      </ul>
-      <p class="wb-mehr"><a href="promo/index.html">Alle 19
-        Aktionen &nearr;</a></p>
+      </ol>
       
-      
-      
-      <p class="wb-marken">Marken: Blau, O2 / Telefónica Deutschland</p>
-      
-    </aside>
-    
+    </div>
   </div>
-
   
-  <div class="wb-chronik">
+  <details class="wb-chronik portraet-chronik">
+    <summary>Alle Meldungen von Telefónica / O2<span>113</span></summary>
     
+    <p class="wb-monat">Oktober 2026<span>14</span></p>
     
-    
-<p class="wb-monat">Oktober 2026<span>14</span></p>
-
 <ol class="wb-liste">
   
   <li class="wb-zeile">
@@ -1404,14 +1246,6 @@
     <span class="wb-note">Telefónica setzt den Rückzug aus Hispanoamerika durch den Verkauf von OnNet in Chile fort, was eine Fokussierung auf Kernmärkte signalisiert.</span>
   </li>
   
-</ol>
-
-
-<details class="wb-mehr-monat">
-  <summary>2 weitere</summary>
-  
-<ol class="wb-liste">
-  
   <li class="wb-zeile">
     <span class="wb-zeile-kopf"><span class="wb-tag">9.10.</span>
       <span class="wb-ressort">Partnerschaft</span>
@@ -1430,16 +1264,9 @@
   
 </ol>
 
-</details>
-
-
     
+    <p class="wb-monat">September 2026<span>2</span></p>
     
-    
-    <details class="wb-aelter">
-      <summary>September 2026<span>2
-        Meldungen</span></summary>
-      
 <ol class="wb-liste">
   
   <li class="wb-zeile">
@@ -1460,14 +1287,9 @@
   
 </ol>
 
-    </details>
     
+    <p class="wb-monat">August 2026<span>58</span></p>
     
-    
-    <details class="wb-aelter">
-      <summary>August 2026<span>58
-        Meldungen</span></summary>
-      
 <ol class="wb-liste">
   
   <li class="wb-zeile">
@@ -1936,14 +1758,9 @@
   
 </ol>
 
-    </details>
     
+    <p class="wb-monat">Juli 2026<span>39</span></p>
     
-    
-    <details class="wb-aelter">
-      <summary>Juli 2026<span>39
-        Meldungen</span></summary>
-      
 <ol class="wb-liste">
   
   <li class="wb-zeile">
@@ -2260,97 +2077,64 @@
   
 </ol>
 
-    </details>
     
-    
-  </div>
+  </details>
   
 </section>
 
-<section class="wb" id="1-1" style="scroll-margin-top:16px">
-  
-  <div class="wb-kopf"><h2 class="wb-name">1&amp;1</h2>
+
+<section class="wb portraet" id="1-1" style="scroll-margin-top:96px">
+  <div class="portraet-kopf" data-auftritt>
+    <h2 class="wb-name"><span class="anb-punkt gr-anb--1-1" aria-hidden="true"></span>1&amp;1</h2>
     <span class="rubrik-zahl">25
       Meldungen seit 19. Juli 2026</span>
   </div>
-
-  <div class="wb-lage">
-    <div class="wb-profil">
+  <div class="portraet-raster">
+    <div class="portraet-lage" data-auftritt>
       
       <p class="wb-summary">1&amp;1 forciert derzeit eine zweigleisige Strategie aus gezielten Hardware-Upgrades, wie neuen Glasfaser-Routern, und einer konsequenten Stärkung seiner regionalen Glasfaserpräsenz durch Partnerschaften wie mit der Thüringer Netkom. Gleichzeitig festigt der Anbieter seine Kundenbindung durch eine ausgezeichnete App-Experience und eine aggressivere Personalsuche im Management, um die operative Schlagkraft zu erhöhen. Der Fokus liegt dabei klar auf einem schnellen, digitalen Onboarding für Mobilfunkkunden und einer attraktiven Hardware-Bündelung.</p>
       
-
       
-      <div class="wb-themen">
-        
-        <div class="wb-themenzeile">
-          <span class="wb-themendatum">9. Oktober 2026</span>
-          <span class="wb-tags"><span class="comp-tag">Glasfaser-Kooperationen</span><span class="comp-tag">Hardware-Bündelung</span><span class="comp-tag">Digitales Onboarding</span><span class="comp-tag">Führungswechsel</span><span class="comp-tag">Service-Exzellenz</span></span>
-        </div>
-        
-        <div class="wb-themenzeile">
-          <span class="wb-themendatum">28. August 2026</span>
-          <span class="wb-tags"><span class="comp-tag">Hardware-Bundles</span><span class="comp-tag">Zugabe-Aktionen</span><span class="comp-tag">TV/Streaming</span><span class="comp-tag">Router/Wi-Fi-7</span><span class="comp-tag">Test-Awards</span><span class="comp-tag">Finanzstabilität</span></span>
-        </div>
-        
-        <div class="wb-themenzeile">
-          <span class="wb-themendatum">8. August 2026</span>
-          <span class="wb-tags"><span class="comp-tag">Glasfaser-Kooperation</span><span class="comp-tag">Wi‑Fi 7 &amp; Router</span><span class="comp-tag">TV-Integration</span><span class="comp-tag">Smartphone-Bundles</span><span class="comp-tag">Netztests</span><span class="comp-tag">Finanzprognose</span></span>
-        </div>
-        
-      </div>
       
-
-      
+      <p class="portraet-aktionen"><a class="knopf" href="promo/index.html">21
+        laufende Aktionen &rarr;</a>
+        
+        <span class="wb-marken">Marken: 1&amp;1 Mobilfunk, Lidl Connect, PremiumSIM, simplytel, winSIM</span></p>
       
     </div>
-
-    
-    <aside class="wb-aktionen">
-      <p class="wb-spaltentitel">Laufende Aktionen</p>
+    <div class="portraet-zeit" data-auftritt>
+      <p class="wb-spaltentitel">Die letzten Schritte</p>
       
-      <ul class="wb-aktionsliste">
+      <ol class="zeitstrahl">
         
-        <li class="wb-aktion">
-          <a href="https://mobile.1und1.de/datenflat-ohne-vertragslaufzeit" target="_blank" rel="noopener">
-            <span class="wb-aktion-titel szl">1&amp;1 Daten-Flat für Tablets und Notebooks</span>
-            <span class="wb-aktion-meta">1&amp;1 Mobilfunk · ohne Bindung</span>
-          </a>
+        <li class="zeitstrahl-punkt">
+          <span class="zeitstrahl-tag">9.10.</span>
+          <a class="zeitstrahl-titel wb-titel szl" href="https://unternehmen.1und1.de/produkt-news/2026/1-1-fuehrt-neuen-premium-router-ein-1-1-homeserver-pro-ab-oktober-exklusiv-bei-1-1-verfuegbar" target="_blank" rel="noopener">1&amp;1 startet exklusiven FRITZ!Box Premium-Router mit Wi-Fi 7</a>
+          <span class="zeitstrahl-meta">Produktlaunch · unternehmen.1und1.de</span>
         </li>
         
-        <li class="wb-aktion">
-          <a href="https://mobile.1und1.de/refurbished-smartphones/" target="_blank" rel="noopener">
-            <span class="wb-aktion-titel szl">Refurbished Smartphones: bis zu 20 % günstiger</span>
-            <span class="wb-aktion-meta">1&amp;1 Mobilfunk · Gerät vergünstigt</span>
-          </a>
+        <li class="zeitstrahl-punkt">
+          <span class="zeitstrahl-tag">9.10.</span>
+          <a class="zeitstrahl-titel wb-titel szl" href="https://www.vatm.de/christoph-kull-wird-neuer-ceo-von-11-versatel/" target="_blank" rel="noopener">Christoph Kull wird neuer CEO von 1&amp;1 Versatel</a>
+          <span class="zeitstrahl-meta">Sonstiges · vatm.de</span>
         </li>
         
-        <li class="wb-aktion">
-          <a href="https://mobile.1und1.de/handyvertrag" target="_blank" rel="noopener">
-            <span class="wb-aktion-titel szl">Handy mit Vertrag: Top-Smartphones ab 27,99 € pro Monat</span>
-            <span class="wb-aktion-meta">1&amp;1 Mobilfunk · Gerät vergünstigt</span>
-          </a>
+        <li class="zeitstrahl-punkt">
+          <span class="zeitstrahl-tag">9.10.</span>
+          <a class="zeitstrahl-titel wb-titel szl" href="https://www.telecom-handel.de/themen/consumer-communications/michael-kieninger-wechselt-von-o2-zu-1und1" target="_blank" rel="noopener">Michael Kieninger wechselt von O2 zu 1&amp;1</a>
+          <span class="zeitstrahl-meta">Sonstiges · telecom-handel.de</span>
         </li>
         
-      </ul>
-      <p class="wb-mehr"><a href="promo/index.html">Alle 21
-        Aktionen &nearr;</a></p>
+      </ol>
       
-      
-      
-      <p class="wb-marken">Marken: 1&amp;1 Mobilfunk, Lidl Connect, PremiumSIM, simplytel, winSIM</p>
-      
-    </aside>
-    
+    </div>
   </div>
-
   
-  <div class="wb-chronik">
+  <details class="wb-chronik portraet-chronik">
+    <summary>Alle Meldungen von 1&amp;1<span>25</span></summary>
     
+    <p class="wb-monat">Oktober 2026<span>6</span></p>
     
-    
-<p class="wb-monat">Oktober 2026<span>6</span></p>
-
 <ol class="wb-liste">
   
   <li class="wb-zeile">
@@ -2403,15 +2187,9 @@
   
 </ol>
 
-
-
     
+    <p class="wb-monat">September 2026<span>2</span></p>
     
-    
-    <details class="wb-aelter">
-      <summary>September 2026<span>2
-        Meldungen</span></summary>
-      
 <ol class="wb-liste">
   
   <li class="wb-zeile">
@@ -2432,14 +2210,9 @@
   
 </ol>
 
-    </details>
     
+    <p class="wb-monat">August 2026<span>5</span></p>
     
-    
-    <details class="wb-aelter">
-      <summary>August 2026<span>5
-        Meldungen</span></summary>
-      
 <ol class="wb-liste">
   
   <li class="wb-zeile">
@@ -2484,14 +2257,9 @@
   
 </ol>
 
-    </details>
     
+    <p class="wb-monat">Juli 2026<span>12</span></p>
     
-    
-    <details class="wb-aelter">
-      <summary>Juli 2026<span>12
-        Meldungen</span></summary>
-      
 <ol class="wb-liste">
   
   <li class="wb-zeile">
@@ -2592,25 +2360,19 @@
   
 </ol>
 
-    </details>
     
-    
-  </div>
+  </details>
   
 </section>
 
-
 <p class="dz-foot">Diese Seite baut sich bei jedem Lauf neu aus dem Berichtsarchiv auf – aus den
-  Wettbewerber-Profilen und allen Meldungen, deren Absender zum jeweiligen Konzern gehört. Eine
-  Meldung trägt das Datum, an dem sie zum ersten Mal im Radar auftauchte; jede verlinkt auf die
-  Originalquelle. Die laufenden Aktionen stammen aus der
-  <a href="promo/index.html">Promo Übersicht</a>.</p>
+  Wettbewerbsprofilen der Ausgaben und der <a href="promo/index.html">Promo Übersicht</a>.</p>
 
     </div>
   </main>
   <footer class="foot">
     <div class="foot-inner">
-      Vodafone Product and Services Insights &middot; Marktrecherche &middot; automatisch erstellt, jede Aussage mit Quelle
+      <span>Vodafone Product and Services Insights &middot; automatisch erstellt, jede Aussage mit Quelle</span>
       
       
       
@@ -2620,6 +2382,9 @@
       </span>
       
     </div>
+    <p class="foot-bildnachweis">Bilder: generiert für dieses Portal. Campus-Motiv nach einer Vorlage von
+      <a href="https://commons.wikimedia.org/wiki/File:Vodafone-Campus_D%C3%BCsseldorf.jpg" target="_blank" rel="noopener">Wikimedia Commons</a>.
+      Schrift: Instrument Sans (SIL Open Font License).</p>
   </footer>
   <script src="app.js"></script>
 </body>

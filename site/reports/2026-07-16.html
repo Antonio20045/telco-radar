@@ -1,306 +1,132 @@
 
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" class="ohne-js">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Vodafone Product and Services Insights · Archiv 2026-07-16</title>
   <meta name="robots" content="noindex">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   
-  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400;1,8..60,600&family=Libre+Franklin:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="preload" href="../static/schrift/instrument-sans.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="../style.css">
   <link rel="icon" type="image/png" href="../logo.png">
 </head>
-<body class="uc-markt">
+
+<body class="uc-markt seite-woche mit-buehne">
+  <a class="sprungmarke" href="#inhalt">Zum Inhalt</a>
   
-  <header class="topbar">
-    <div class="topbar-inner">
+  <header class="topbar kopf" id="kopf">
+    <div class="topbar-inner kopf-inner">
       <a class="brand" href="../index.html" aria-label="Vodafone Product and Services Insights">
         <span class="brand-logo-wrap"><img class="brand-logo" src="../logo.png" alt="" width="15" height="15"></span>
         <span class="brand-name">Vodafone <span class="brand-zusatz">Product and Services</span> <em>Insights</em></span>
       </a>
-      <div class="topbar-right">
-        <nav class="usecases" aria-label="Anwendungsfälle">
-          <a class="uc active" href="../index.html">Marktrecherche</a>
-          <a class="uc " href="../promo/index.html">Promo Übersicht</a>
-        </nav>
+      <nav class="subbar subnav navi" aria-label="Marktrecherche">
+        <a href="../index.html" class="on" aria-current="page">Diese Woche</a>
+        <a href="../meldungen.html" >Meldungen</a>
+        <a href="../wettbewerb.html" >Wettbewerb</a>
+        
+        
+        <a href="../geraete.html" >Geräte</a>
+        
+        <a href="../promo/index.html" >Promo</a>
+        <a href="../transparenz.html" >Quellen</a>
+      </nav>
+      <div class="topbar-right kopf-rechts">
         
         
         <form class="gsearch" id="gsearch" role="search" action="../suche.html" autocomplete="off">
+          <svg class="gsearch-lupe" viewBox="0 0 20 20" width="15" height="15" fill="none" aria-hidden="true">
+            <circle cx="9" cy="9" r="6.2" stroke="currentColor" stroke-width="1.7"/>
+            <line x1="13.6" y1="13.6" x2="18" y2="18" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+          </svg>
           <input type="search" id="gsearch-input" name="q" class="gsearch-input" autocomplete="off"
-                 placeholder="Im Archiv suchen …"
+                 placeholder="Suchen"
                  aria-label="Marktrecherche durchsuchen">
-          <button type="submit" class="gsearch-btn" aria-label="Suchen">
-            <svg viewBox="0 0 20 20" width="14" height="14" fill="none" aria-hidden="true">
-              <circle cx="9" cy="9" r="6.2" stroke="currentColor" stroke-width="1.8"/>
-              <line x1="13.6" y1="13.6" x2="18" y2="18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-            </svg>
-          </button>
+          <kbd class="gsearch-taste" aria-hidden="true">⌘K</kbd>
+          <button type="submit" class="gsearch-btn" aria-label="Suchen"><span aria-hidden="true">→</span></button>
         </form>
         
+        
+        
+        <a class="kopf-newsletter" href="../newsletter.html">Newsletter</a>
+        
       </div>
     </div>
-    
-    
-    
-    <nav class="subbar subnav" aria-label="Marktrecherche">
-      <a href="../index.html" class="on">Diese Woche</a>
-      <a href="../meldungen.html" >Meldungen</a>
-      <a href="../differenzierung.html" >Differenzierung</a>
-      <a href="../wettbewerb.html" >Wettbewerb</a>
-      
-      
-      <a href="../geraete.html" >Geräte</a>
-      
-      
-      
-      <a href="../transparenz.html" >Quellen</a>
-      
-      
-      <a href="../newsletter.html" >Newsletter</a>
-      
-    </nav>
-    
   </header>
-  <main>
-    <div class="wrap">
-      
-      
-
-
-
-<p class="archivhinweis">Archivierter Bericht vom 16. Juli 2026 –
-  <a href="../index.html">zur aktuellen Ausgabe</a></p>
-
-
-
-
-
-
-
-
-
-
-<div class="front-oben">
-  <div class="front-haupt">
-
-    
+  <main id="inhalt">
     
 
+
+<section class="buehne" aria-label="Ausgabe vom 16. Juli 2026">
+  
+  <div class="buehne-bild" aria-hidden="true">
     
     
-
     
     
-    <article class="aufmacher ohne-bild kurz">
-      <p class="page-kicker">Satellit &amp; Direct-to-Cell · NTT Docomo</p>
-      <h1 class="szl"><a href="https://news.google.com/rss/articles/CBMinAFBVV95cUxQY3VqV0FiRnZRdU9nUTVCQzkyaWRsRWVzbjktdEdQWjRoWFBWblR2SUhSTFNjUWhXOXZMNWFYWDJ0NWdrajcwUUlMZ0JQdElpcm1BQnp6OWdWcXhaeWNCTUFkV0p3NVpteVpMQVE5ek5yOGhuOG5vQTdZbHVMOEkxcF8xb21Ec2lWZGRBd05xbGRrLURHaTdGMWR2bzPSAaIBQVVfeXFMTWlocFVBY2VlX0pjc1Nfa0xJSnpMZXhWWlU1MUYtQTVneDNOdmcyay1CZWRDS2YyY3JCWmJGWWJBVGpXcEFIUzVfVHBXdmxhN2RVNTAtUGpxdFhMd3VaT0MyRFJtV2tyNXdJaVJDN3FYbEFoUC1lZUhkeEY2TXVNWTctamx5SU84UTNMRHM3OE5UalkzYU9HVy1aV1JUOHJ4bV9n?oc=5" target="_blank" rel="noopener">Starlink Direct hits 5 million users in Japan in just two months</a></h1>
-      
-      <div class="aufmacher-text">
-        <p class="aufmacher-vorspann">Der Satelliten-Direktdienst Starlink Direct (Satellit-zu-Handy) erreicht in Japan über Partner NTT Docomo innerhalb von nur zwei Monaten 5 Millionen Nutzer.</p>
-        
-        
-        <p class="aufmacher-meta">
-          <b>NTT Docomo</b>
-          <span class="rel-badge r5">Priorität 5/5</span>
-          
-          
-          <a href="https://news.google.com/rss/articles/CBMinAFBVV95cUxQY3VqV0FiRnZRdU9nUTVCQzkyaWRsRWVzbjktdEdQWjRoWFBWblR2SUhSTFNjUWhXOXZMNWFYWDJ0NWdrajcwUUlMZ0JQdElpcm1BQnp6OWdWcXhaeWNCTUFkV0p3NVpteVpMQVE5ek5yOGhuOG5vQTdZbHVMOEkxcF8xb21Ec2lWZGRBd05xbGRrLURHaTdGMWR2bzPSAaIBQVVfeXFMTWlocFVBY2VlX0pjc1Nfa0xJSnpMZXhWWlU1MUYtQTVneDNOdmcyay1CZWRDS2YyY3JCWmJGWWJBVGpXcEFIUzVfVHBXdmxhN2RVNTAtUGpxdFhMd3VaT0MyRFJtV2tyNXdJaVJDN3FYbEFoUC1lZUhkeEY2TXVNWTctamx5SU84UTNMRHM3OE5UalkzYU9HVy1aV1JUOHJ4bV9n?oc=5" target="_blank" rel="noopener">Originalquelle öffnen &nearr;</a>
-        </p>
-        
-
-
-      </div>
-    </article>
     
-
     
-    <div class="reihe reihe-zwei">
-      
-      <article class="stueck stueck-mittel ohne-bild">
-        <a href="https://news.google.com/rss/articles/CBMixgFBVV95cUxNV0l3OHNhNFZLNm1pMUMyU05zenBvd3RVRWRnend0WllnNEt6OEZEUEppUDhSLUk4VGt5Tzk5SzdNSFVfbjQxNUtDQjZwOTFxVUFWclFWVmRVLVJoR0FZWGZ2WkNfSUNnMDFtenM1c2xRdXl5RU1wTHp2anBhdUc5RTd0aUt5WjgtTDBUNGZrX3RrUk5aS000WWFVRDR5b0xYSTFWelppWG0zV2FFN0wwRS1GR2dFd3BaOGdtNmxfRVoyX1JzaHc?oc=5" target="_blank" rel="noopener">
-          
-          <span class="stueck-kicker">Tarife &amp; Angebote · Telefónica</span>
-          <span class="stueck-titel szl">O2 Mobile Unlimited by Telefónica S.A. - flat-rate data for heavy users</span>
-          <span class="stueck-anriss">Telefónica launcht mit O2 Mobile Unlimited einen neuen Mobilfunktarif mit unbegrenztem Datenvolumen speziell für Vielnutzer, die hohe Datenmengen…</span>
-        </a>
-        
-        
-
-
-      </article>
-      
-      <article class="stueck stueck-mittel ohne-bild">
-        <a href="https://news.google.com/rss/articles/CBMiowFBVV95cUxPekxxZ2hhblRSNU56bVIxVnFRcjZDekMxYmhwQy13V1VSeEVUWFY4U3JqZEdFTHlBQm9hNV81aDlSbjlzY0xZNmpoOFJXMjc3cjFZWVZpVkFud2otS3RNakZYY0p1c21JNnFFcVF2VWtVX2NMSXVYU0o4dW51X0xLYnNOUDhZUGFHWHJoS3BibXl1b04yeTNIcmR1a1AyYnpZV1NZ?oc=5" target="_blank" rel="noopener">
-          
-          <span class="stueck-kicker">Netz &amp; Technik · Telstra</span>
-          <span class="stueck-titel szl">Some Triple Zero calls impacted, minister confirms, as Telstra says software glitch caused major outage</span>
-          <span class="stueck-anriss">Ein Software-Fehler bei Telstra fuehrte zu einem grossflaechigen Netzausfall in Australien, bei dem auch Notrufe (Triple Zero) betroffen waren; die…</span>
-        </a>
-        
-        
-
-
-      </article>
-      
-    </div>
     
-
     
-    <div class="reihe reihe-vier">
-      
-      <article class="stueck stueck-klein ohne-bild">
-        <a href="https://news.google.com/rss/articles/CBMihgFBVV95cUxPWTgtb29iT2J5OUNac08xblJSU0RlOUdoSU1IRVpGckdhWXh3MHV2R1hRMUJyVHlDVGxXUWZpZmZWMTFhQ0VldU9RLURRdnlwNFJndzBLbjdNeDl0dTJIWjFIaHpTUllNV3FkQTVjNkVxdFh1ZkRPUUx3eWRLYURlcHJSQ284QQ?oc=5" target="_blank" rel="noopener">
-          
-          <span class="stueck-kicker">Netz &amp; Technik</span>
-          <span class="stueck-titel szl">Three FWA beats UK fibre altnets on market share</span>
-        </a>
-        
-
-
-      </article>
-      
-      <article class="stueck stueck-klein ohne-bild">
-        <a href="https://news.google.com/rss/articles/CBMisgFBVV95cUxQWElCaXBZNFVxcEVic2x0QVJkUVpHSGkwYmV1bFFuQUN2NGREdTN0R18zWGgtUHBnUU54QnNkTEJrWkZYUEdlbzhMZjJvcjYtYmdZQnN6RmdHS2FBTERBVy05RVR6YW9vNnpmTzRBYXpIOHBKUFNBXzNPLXdpMGI2UWNTdWU0U0szYURyMkxHcW84RDFFc24zdzZiNkpqemJMdDA0ZWlDUnZ6Q0RGVWpMUWJn?oc=5" target="_blank" rel="noopener">
-          
-          <span class="stueck-kicker">Vermischtes</span>
-          <span class="stueck-titel szl">Verizon to Cut About 3,000 Jobs, Divest Itself of Some Retail Stores</span>
-        </a>
-        
-
-
-      </article>
-      
-      <article class="stueck stueck-klein ohne-bild">
-        <a href="https://news.google.com/rss/articles/CBMilwFBVV95cUxNZjFXU19JQWhnN2NjQ3M4MS0tMGhmUVhkbmxzN2FHMkVuYmRBZUJpaTg0al83ejNxemhwMHVhVnRNMVpxSWhlVEJua2lwaXZjcUFkalR2S200dFlRUDNqenhYTTFyQTNZRFJ2V0tFbUFsQ2xUUmZuMUNxOGI2czJ0NmhMOEVicWtvbEhHSE9NZVZmd3d2MXBj?oc=5" target="_blank" rel="noopener">
-          
-          <span class="stueck-kicker">Geld &amp; Übernahmen</span>
-          <span class="stueck-titel szl">US wireless carrier Verizon to sell 274 stores, lay off another 500 corporate employees</span>
-        </a>
-        
-
-
-      </article>
-      
-      <article class="stueck stueck-klein ohne-bild">
-        <a href="https://news.google.com/rss/articles/CBMikAFBVV95cUxOSm9wQmotaGVVcTdDQ2dmQlZGWGQ0emVabjUxUnRCaXFxT3Z4Q3VFdU03Z1QxWVFNNmpBY2pUSHE5aHNEdW9MQWp1c0tBbnAzUDliSkFFbzA2WTZJUnRVMmx3RzJPV2xnbktHUnBCMVpQSThRSWU1emRsQ0lhbkNBZV91Z0hMR1R0REV5N1JBY3M?oc=5" target="_blank" rel="noopener">
-          
-          <span class="stueck-kicker">Geld &amp; Übernahmen</span>
-          <span class="stueck-titel szl">Charter-Cox merger is a chance for California to score a win</span>
-        </a>
-        
-
-
-      </article>
-      
-    </div>
     
-
+    
   </div>
+  <div class="buehne-inhalt">
+    <div class="buehne-kopf">
+      <p class="buehne-gruss" data-gruss>Archiv</p>
+      <h1 class="buehne-datum">16. Juli<span class="buehne-jahr"> 2026</span></h1>
+      
+      <p class="buehne-unter"><b>90 relevante Meldungen</b>
+        aus 1991 neuen · Lesezeit ca. 52 Minuten</p>
+      
+      
+      <p class="archivhinweis buehne-hinweis">Archivierter Bericht vom 16. Juli 2026 –
+        <a href="../index.html">zur aktuellen Ausgabe</a></p>
+      
+      
+    </div>
 
+    
+    <a class="buehne-weiter" href="#der-wochenbericht">Der Wochenbericht<span aria-hidden="true">↓</span></a>
+  </div>
+  
+  <button type="button" class="buehne-pause" aria-pressed="false" aria-label="Bildbewegung anhalten" hidden>
+    <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><rect x="3" y="2" width="3.4" height="12" rx="1" fill="currentColor"/><rect x="9.6" y="2" width="3.4" height="12" rx="1" fill="currentColor"/></svg>
+  </button>
+</section>
+
+
+    <div class="voll">
+      
+      
+
+
+
+
+
+
+<div class="bericht" id="der-wochenbericht" style="scroll-margin-top:0">
   
   
-  <aside class="front-wichtig">
-
-    
-    
-    
-
-    
-    <div class="rubrik"><h2>Was wichtig ist</h2></div>
-    <ol class="wichtig-liste">
-      
-      <li class="wichtig-zeile">
-        <a href="https://news.google.com/rss/articles/CBMixgFBVV95cUxOcGZMcHlyR0xSWWV6R2Iyb1hKck1YT3ltOF9yZkJZREdWbE91dl9LcHBiNkVSbVlEUjVFYlhmejFTajZFaFFGbkFFQU1DTy0xa19IRjdteVNaMmFWSmJPbzVlLXZCaUZoVk5jbmpfamlXR2dYSTk1Yzl1TW02MkJRbXJjRGJzMGpfbFhBSEtYdWhPc3NSOWdrRFhJd2NQTk9UTGVTbzEwdHlrbjQ0NGVoalN0T0RoMHNmakFYbDV6OFRVNWpNblE?oc=5" target="_blank" rel="noopener">
-          <span class="wichtig-kicker">SK Telecom</span>
-          <span class="wichtig-titel szl">SK Telecom AI-RAN Pilot Goes Live as Nokia Targets Double Spectrum Capacity</span>
-        </a>
-      </li>
-      
-      <li class="wichtig-zeile">
-        <a href="https://news.google.com/rss/articles/CBMizAFBVV95cUxQQXNfdmdPck1YQ2M2bVZma2tYTkx2YWJlZ3c2UmJXX2U2ZW1wUnBPVURKenJrSHlXUWJUVmtRN3RVcjhGeTZkWEY0VXJhckZZa2tIN0Z5WlhHaDJFbXM4LWlVXzVRckFod1BFMENMV2YzRkhsNmthX3ZIRW1JcDFNRW0tWlNWQkJpTkZXZnlBOFZKUG1ydEZsb0xRNmkzTVN1eTgtR3VKMFoyRXI0ZFlmZ0taM1VWVFJrZ2c5eVhIb2hXTVIyRFlqZFhGWWI?oc=5" target="_blank" rel="noopener">
-          <span class="wichtig-kicker">Indosat Ooredoo Hutchison</span>
-          <span class="wichtig-titel szl">Nokia and NVIDIA Launch First GPU-Based AI-RAN, Targeting Double Spectrum Capacity</span>
-        </a>
-      </li>
-      
-      <li class="wichtig-zeile">
-        <a href="https://news.google.com/rss/articles/CBMiigFBVV95cUxQdnJ5bHlvR0dPZFZBaHZPaVBlaHFFVW9HWTQ2aF9za0ZtTXJyTXJIdE54SUF2eXNwVUFOV29jOWZVUnI2eGNSX01BeExYclQ3Vl9kUmRscTdWaExlZWR4U0IzSVZDejl2aXJMd01VVjZNV1R2Y2tRR3dlRzI5Y1g3d3lVakNSVERQa0E?oc=5" target="_blank" rel="noopener">
-          <span class="wichtig-kicker">CelcomDigi</span>
-          <span class="wichtig-titel szl">CelcomDigi Brings Network-Level ID Checks to Social Apps</span>
-        </a>
-      </li>
-      
-      <li class="wichtig-zeile">
-        <a href="https://news.google.com/rss/articles/CBMie0FVX3lxTE1fZTNyeEwxV0xhajBlbFRtUTdmYnNVZ0J3eGltOFJTa2ZYWUNwWWZZSUJTR1l4RUZvSjhtc3FrLS10N2pvTzRILXdhMVlTNmFfRy13RTlZcUhrQ1g4d1FpNWV1ZDVPZkJUUUxZRlBkSHVvQktCNC1oYUhXaw?oc=5" target="_blank" rel="noopener">
-          <span class="wichtig-kicker">SoftBank</span>
-          <span class="wichtig-titel szl">SoftBank&#39;s OpenAI patching service targets 3,000 firms</span>
-        </a>
-      </li>
-      
-      <li class="wichtig-zeile">
-        <a href="https://www.rcrwireless.com/20260716/carriers/deutsche-telekom-ai-apis" target="_blank" rel="noopener">
-          <span class="wichtig-kicker">Deutsche Telekom</span>
-          <span class="wichtig-titel szl">The Agentic Network — Deutsche Telekom on APIs for trusted AI</span>
-        </a>
-      </li>
-      
-      <li class="wichtig-zeile">
-        <a href="https://news.google.com/rss/articles/CBMiekFVX3lxTE1vMm0zMk5BbEVrUnRveldlMGJZZ3NxVzYtS19jN3RNVDlBeE5HODJRc19kMXZiM0xMcXJ2TXQzRXhKbUFrczl1VExKdjZHSV9xQXJSZGVwZmJqTjBwN0tKNGgwOHQxTjZlSEhraDdXWEt4WFNvRUs4TDRn?oc=5" target="_blank" rel="noopener">
-          <span class="wichtig-kicker">Deutsche Telekom</span>
-          <span class="wichtig-titel szl">The Agentic Network — Deutsche Telekom on APIs for trusted AI</span>
-        </a>
-      </li>
-      
-      <li class="wichtig-zeile">
-        <a href="https://news.google.com/rss/articles/CBMi8wFBVV95cUxPRGRRMkhWYkZYT2NmQkZVVkRNdGdHa2xsdVdENWRQV0MzaDlucXVxdEp5M1RzMzVOZHg0LVh2UjZEYjFxVWduTjV4MGxOZWoxVDU2TDlLVEtERmRVN0t2V0taM3FmWTVmN2h4Ujl5MU82Wmd0eTIzUlVQM3h3cHVxeGFNS3VRS2k4elkwRXR1NjF6TXNhMUJRMXhxWnJPNHdLaVEwQ0NDc245YWVRcFVwUFlxb2F2bkI1bm1wNHZ2LTQ2cWNUeVdGWGdVcjhaYmMyTUtUT29pOEZhOWlGZ2wxeFVnRXZYNkhWWnBPNGxPcHFSVU0?oc=5" target="_blank" rel="noopener">
-          <span class="wichtig-kicker">Iliad</span>
-          <span class="wichtig-titel szl">EU Commission refers proposed acquisition of certain assets of SFR by Iliad to France</span>
-        </a>
-      </li>
-      
+  <nav class="kapitel-marke" aria-label="Kapitel des Berichts">
+    <button type="button" class="kapitel-aktuell" aria-expanded="false"><span data-kapitel-name>Wochenueberblick</span></button>
+    <ol class="kapitel-liste">
+      <li><a href="#wochenueberblick">Wochenueberblick</a></li>
     </ol>
-    <p class="ex-count">
-      <a href="#alle-meldungen" class="source-link">alle 90 Meldungen &darr;</a>
-      
-    </p>
-    
-
-    
-    
-  </aside>
+  </nav>
   
-</div>
+  
+  
 
-
-
-
-
-
-
-<div class="frontpage" id="der-wochenbericht" style="scroll-margin-top:20px">
-  <div class="frontpage-main">
-    
-    <div class="card">
-      <div class="card-head"><h2>Der Wochenbericht</h2>
-        <a href="../transparenz.html">Quellen</a></div>
-      
-      
-      
-      <p class="berichtszeile">
-        <b>90 relevante Meldungen</b>
-        aus 1991 neuen
-        &middot; Lesezeit ca. 52 Minuten
-      </p>
-      
-      <nav class="toc" aria-label="Abschnitte des Berichts">
-        <a href="#wochenueberblick">Wochenueberblick</a>
-      </nav>
-      
-      <article class="prose prose-zwei"><h2 id="wochenueberblick">Wochenueberblick</h2>
-<h3>Europa (546 neu)</h3>
+  
+  
+  <section class="szene szene--ohne-motiv" id="wochenueberblick" data-szene="Wochenueberblick">
+    <div class="szene-bild" aria-hidden="true"><span class="motiv motiv--leer szene-motiv" aria-hidden="true"></span>
+      <span class="szene-marke">Wochenueberblick</span></div>
+    <h2 class="szene-titel">Wochenueberblick</h2>
+    <div class="szene-text prose">
+      <h3>Europa (546 neu)</h3>
 <ul>
 <li><strong>A1 Telekom Austria</strong>: <a href="https://news.google.com/rss/articles/CBMiswFBVV95cUxOZG5TekczZnZrcHpkdFlaX21ZVmdYVnBJcEN6QUFVRU9sM2pkZUthQVpLYmVRMUR2T2ZTXzJEalFIRGtvQmttMF9vb3Q3UWlKQVpVVGVTbEVMa3gtQkIzUE8wQnZNVXd1SUFvdURpYUc3RHVxVVNjNUhMYk9IRXV2SUk4YjZUQXgwWlRrTlhjYURUVFR0RGx6dnc2MF9GMEtOa1R5cDJYUm1jUlZ5cnltaG5HVQ?oc=5">A1 Digital bets on Spain, expand Exoscale cloud infrastructure into country</a> (2026-07-14)</li>
 <li><strong>A1 Telekom Austria</strong>: <a href="https://news.google.com/rss/articles/CBMijAJBVV95cUxNNmp3MmtGYmtORHpXNlVBZm1PWklrSmpScW5qOC1KNWUyckJLdkVNbUxtZ2xvbUo4aFZmcWJaSkNfaW1mWFAwWk80ZDdPODQyM09DZ3YzVUZsRkZqdWE0VXlOMGpEM0oxdFIzQ2NRbzR2anpna2E3dXNFUWtsUU1nRUZSVlhUYXNJeVFFaGQtRG1UUURrOFY5TjBTS2FMNVlZU1lVdi1iUFdwN2JzaTY2ZWxQdmpZcDlYMGNwdUI4Mmp5NXB5Umh3bVBRd1pxeURMR2piNGtWaE5jcHlfNEpJOGVnakNLY3o4RGw3TEp1Vkx6MWx3UTc1UHNGRVZHSjNrNEpmWXNKaHMxcmx00gGMAkFVX3lxTE02ancya0Zia05Eelc2VUFmbU9aSWtKalJxbmo4LUo1ZTJyQkt2RU1tTG1nbG9tSjhoVmZxYlpKQ19pbWZYUDBaTzRkN084NDIzT0NndjNVRmxGRmp1YTRVeU4wakQzSjF0UjNDY1FvNHZqemdrYTd1c0VRa2xRTWdFRlJWWFRhc0l5UUVoZC1EbVRRRGs4VjlOMFNLYUw1WVlTWVV2LWJQV3A3YnNpNjZlbFB2allwOVgwY3B1Qjgyank1cHlSaHdtUFF3WnF5RExHamI0a1ZoTmNweV80Skk4ZWdqQ0tjejhEbDdMSnVWTHoxbHdRNzVQc0ZFVkdKM2s0SmZZc0poczFybHQ?oc=5">Best ISPs in Austria in 2026: How to Choose the Right Internet Provider for Fiber, Gigabit Broadband, 5G FWA, and Smart Home Connectivity</a> (2026-07-14)</li>
@@ -343,7 +169,7 @@
 <li><strong>Elisa</strong>: <a href="https://news.google.com/rss/articles/CBMiuAFBVV95cUxOSWh1a0xGYjZUX1g4WHBBRHMyRmc5Nm1TZ21WUHVhalVFQVYzYjd4Q1RLUklkUkJwNE84aG5KS1I1RGxIY1E1NGpUQzdxYTN5V0Jubm1fdVpLMWlmYW1PTXREMWRQVUZBZUFJSnJIVkNzeFI5czZNVGpUUkJsLURINTYwdThnQlpQSmdBdFhYanlTRElSM2plVDZJNFhfc1lTOEx5Nnd0RE9tMFAwY3BKUWxKX1M0ZDk4?oc=5">Danske Bank upgrades Elisa to buy (hold), target price €42.50 - BN</a> (2026-07-16)</li>
 <li><strong>Elisa</strong>: <a href="https://news.google.com/rss/articles/CBMiqgFBVV95cUxQLUlvck9oOHZJT1ZhQUp1TXZfdGtWX3RtS3Q4ZWNTYzNzX0hVbDhBUld0NkV2SXZwc3RTX0hsRm5QWkI2YTlkaUVIc1o3dWhQWDJQN1hRcXpPZFotbmNqcWtkU09sMk1xeHAwX2tGMlkwcWpqYXlzbjg0dm1jZHpyenhnSGRCaFRjbUc0aEotc1AxVGN1S0MxbnVzZXBTOURhZTJfd1lhbFI5Zw?oc=5">Nordea upgrades Elisa to buy (hold), target price €39</a> (2026-07-16)</li>
 <li><strong>Elisa</strong>: <a href="https://news.google.com/rss/articles/CBMiqgFBVV95cUxPSndRX3oyVnJtZ2ZwdkRvb3g5cmVQc0w5clBvSWluSlI2Tmk4M1pTYWlOUjRPeVBSbHprME5NZHd3R3k1NlpZSm1QU1RaNDc4aUNybGx4NmtOQ3ZNNDVaUmhMd3kzbjlCOGhPOXhhb3VsbFJVamVvWlRlT2doalJWWV9KMEZEM2doeGZjSGZqRGVjX2JVS2lPcHpnd0tReUFzV0NTWVlOdF9Kdw?oc=5">Discover Lionel Scaloni's Family: Wife, Kids, and Background Revealed</a> (2026-07-15)</li>
-<li><strong>Elisa</strong>: <a href="https://news.google.com/rss/articles/CBMixAFBVV95cUxPUGhFY1RlQ3Q5bmJvTG12akVXeE9kRXRSbGZ0Q0FjV1BEWUR4d2JtdFhvOGdhNlpwT1cyQ2kyYXMxNVh3VXpZQm9QcG4tdmE3US12QWZHdEszMzNDcXdtazNYZF9SLW8tdG9qa05xZU9Qazlab2xuNDBMTkdSeS1wdExaVlJxcXUzN19iVUxjUHdqVU9Hd2w1clVud3ZnVlMyS01hN2t0SWFxRG9WaHh2aXB0Ukg2SklWQ1NGM0ppdDB3OXlN?oc=5">Earnings call transcript: Elisa Q2 2026 profit holds up as stock falls 5%</a> (2026-07-15)</li>
+<li><strong>Elisa</strong>: <a href="https://news.google.com/rss/articles/CBMixAFBVV95cUxPUGhFY1RlQ3Q5bmJvTG12akVXeE9kRXRSbGZ0Q0FjV1BEWUR4d2JtdFhvOGdhNlpwT1cyQ2kyYXMxNVh3VXpZQm9QcG4tdmE3US12QWZHdEszMzNDcXdtazNYZF9SLW8tdG9qa05xZU9Qazlab2xuNDBMTkdSeS1wdExaVlJxcXUzN19iVUxjUHdqVU9Hd2w1clVud3ZnVlMyS01hN2t0SWFxRG9WaHh2aXB0Ukg2SklWQ1NGM0ppdDB3OXlN?oc=5">Earnings call transcript: Elisa Q2 2026 profit holds up as stock falls <span class="zahl"><span class="zahl-wert" data-wert="5" data-stellen="0">5</span>%</span></a> (2026-07-15)</li>
 <li><strong>Elisa</strong>: <a href="https://news.google.com/rss/articles/CBMi1wFBVV95cUxOcG12ZWtQaHpYeldVOVZ1ZTlJQlR5NWNnQV9DWjNJM3BDUEp3S210aWhULXZFeFZqZjlUdTNJNTVyWGFrZDdLQ3JTT0staTItazNaeHJZbDIwZlFuREVIWTNTZ3NwVE1KMl93M2dzeTNTV0pGSG96bHNUSjhyX0RRVG5EbjQzeUduaDhfQmZENm1TMFBpUE9WX2RhSUdkSklwUC0yeXlxQVBpbmc1RzFXUUN4c1FERWh5RmVuRzNEMzlwRjZKdHp2eFFDejlmNHo3M3ZfVkpuWQ?oc=5">Elisa Oyj (ELMUF) Q2 2026 Earnings Call Highlights: Steady EBITD</a> (2026-07-15)</li>
 <li><strong>Elisa</strong>: <a href="https://news.google.com/rss/articles/CBMimAFBVV95cUxPSHVjV01iT0FGbmJGMmxrSjFVMHlTeFF5MHBfOVdmMzg4OVo2UkIxVVZVWVhHRmRGQ3hkckVoZXJEbzVHQ1E4MXF4Z1pocVZSeUFVdVo0MS1NdnNzUlpBQldRNGpFbjR4LVhHbHFlQmlHdVdubTA2a0ZGZjg1TjZxM1F1c255dC1aNGhkeU1reXhSRnRrYkNWaQ?oc=5">Why is Elisa stock sliding today? By Investing.com</a> (2026-07-15)</li>
 <li><strong>Elisa</strong>: <a href="https://news.google.com/rss/articles/CBMiuwFBVV95cUxNdkg4SGNCYlA5RDR3WDBrOXlVSG01UFdvY2s2XzEwejk5NlV3QU1yQjFtb1Z0dmdWZXdTV0J1U0xSTkFwZWlNei13cjEzTmZTR3J5M3c2LWZ2UjItOWpuTWZUNkVxbld6WkQxR09SN2xRMVV6SWl6bXN2Z0xrWGpnLXVqaGRIMDVaLXNKZW5MTjAwN1B3NFRfQzR2dE1VclV3Qm50YlpNcVdCRkJoY3BadEdtOFY5Zzc0S2hB?oc=5">SEB cuts its price target for Elisa to €41.50 (43), reiterates buy</a> (2026-07-15)</li>
@@ -379,7 +205,7 @@
 <li><strong>Liberty Global</strong>: <a href="https://news.google.com/rss/articles/CBMirwFBVV95cUxQRE8zQzRLNGNtUVd0NlVRaUg1ZkJDQ2hwNWRJeHd2eVRGdXpxNFk1STBZb2JRRmxmNVlkNlB6Tlc2N2FIQnZ2cHlxVWZkLWRWejA3SDl0YWFkQk03SXBrLTZKZ3BMUzZfaTBrVEozRk8yYUM5WmpfOWNZVVZEUTBJYXU2ZEREeS1PT1NYbWI5Z1JjbTNzMU1zcmh5WHNkTmoySFpTZ2VqVndHRzhETzEw?oc=5">Liberty Global (LBTYA) Slips 1.27% as Shares Test Key Support Near $10.00 - Hedge Fund Favorites</a> (2026-07-10)</li>
 <li><strong>Liberty Global</strong>: <a href="https://news.google.com/rss/articles/CBMivAFBVV95cUxQcFVPV3p5aHFEU2xZYXdMT2NnYmVFdEU0ZEZLTFFIMkFhalUyd2JibFY2RmdlYXBiS2VPOWZuZExQdnZkWWg0d3dPNnJFYmJRbTl3X3JVS3puMGI0Yk9DNjZ3NDk4bm54OXJQaGFYMzdGYUdrMHZxZ29ac2pSUWUtOXNmc0tTcnlkQ3o2NlJuVG9tZlR0TXNxaWNob2MxZEtoYS13TjhEVlZTTmN0RGZJUU9MQVhodl9uU043Zw?oc=5">Citigroup Reiterates "Neutral" Rating for Liberty Global (NASDAQ:LILAK)</a> (2026-07-10)</li>
 <li><strong>Liberty Global</strong>: <a href="https://news.google.com/rss/articles/CBMimAFBVV95cUxPSzF3blRiUVdnMF9pV2JhbTFIUnlaUG9KR1gtdmhzSFhRa0JMZTRVbGRGMFlFOXlwU2tyUE4wcGwyX1IyenBTZGp1ZXZjZjBydVl6cTNoWEgxSHdEM0tVWEZkQm9DaXRlZWk3NWdtU3BoNm53X09Ha1RsWGRJaHYtOXlHWmRmbUxBODB6Z2l1TEhVNlNCMmpvZA?oc=5">Liberty Global (LBTYK): The Largest Onshore Wind Deal in UK History and Amazon Is the Buyer</a> (2026-07-09)</li>
-<li><strong>Liberty Global</strong>: <a href="https://news.google.com/rss/articles/CBMi2gFBVV95cUxPQVFQUV9paDBwdjhxSWpiekpOT2k1ODVSclJSdHFrR0JHVGVBRnNVSmhrYl84dTc0STh0aUtIdVlMMTNnWmZKVDVsY1NyZGk4WU9Sb25EYldMVFJXSDFhMVZnLWltYlVMMlpKblQ1XzlfVUk4c2FWM19Nc1RnLThjczRIbHg1NGJFX0dEZ1BHRGhBV19rb1BRVGc3MklLTnV1bm5UQk52dDJYR1N5OGhxTkJ0eTI2WTRpVUlaNm8wS3VsTmlNelBmVXBoR1hHR3F5dWVnaVJpY2ZKUQ?oc=5">Liberty Global Ltd. Stock 12‑Month Price Target Raised to $16.02, Implies 52% Upside</a> (2026-07-09)</li>
+<li><strong>Liberty Global</strong>: <a href="https://news.google.com/rss/articles/CBMi2gFBVV95cUxPQVFQUV9paDBwdjhxSWpiekpOT2k1ODVSclJSdHFrR0JHVGVBRnNVSmhrYl84dTc0STh0aUtIdVlMMTNnWmZKVDVsY1NyZGk4WU9Sb25EYldMVFJXSDFhMVZnLWltYlVMMlpKblQ1XzlfVUk4c2FWM19Nc1RnLThjczRIbHg1NGJFX0dEZ1BHRGhBV19rb1BRVGc3MklLTnV1bm5UQk52dDJYR1N5OGhxTkJ0eTI2WTRpVUlaNm8wS3VsTmlNelBmVXBoR1hHR3F5dWVnaVJpY2ZKUQ?oc=5">Liberty Global Ltd. Stock 12‑Month Price Target Raised to $16.02, Implies <span class="zahl"><span class="zahl-wert" data-wert="52" data-stellen="0">52</span>%</span> Upside</a> (2026-07-09)</li>
 <li><strong>Liberty Global</strong>: <a href="https://news.google.com/rss/articles/CBMiiwFBVV95cUxPWUx0UVVBYm1CNEZsRjdYYnhPMURRak11dEhRcTQzNDR4bWFoejFoQ1R1MU5IQmJsbkZlU05ucDZLOUxDdnNMai1zWVNoWDJGbVBxQ01rSk01SDJYdmstemQ5TXQ4eEstd28yWFU2U3pfZFJLZWRYWEI1MXhEcm1feTZDc0NSRnVyR1A4?oc=5">Liberty Global C Slides As UBS Trims Outlook</a> (2026-07-08)</li>
 <li><strong>Orange</strong>: <a href="https://news.google.com/rss/articles/CBMisAFBVV95cUxPSTk4M2ZUOU1wV0hrTHpFRUVJVWJJS19ONnl4VTBzd3hfMWREWkNQOGJlSTFvZ1BsUU1Bc3dWc3ZPbE8xOXltZU9oc3RHYXVTSFl6dTZmcGtHOWRJTjdaOXg4R1d6bHdjQ0JPWWpCazJrWFZnVVo4aFhxUEtHeXBRSkNNNzdsaDNWQUFwWTZxcjRoZDludnBXU3V6YUJOZGJKdm41NjM1UkJkWUpRREhkSdIBuAFBVV95cUxQRExqNnpaWFZpekc3bE1oXzdLd3VkUFUwMEJYeGxSZXVkQUhNQllncW1EQWJfMExDdUt3ekRRcVJONlNTMGNsbWNESEp3WVZsdkVtcWtKR0s5SUU4VDhfUmpKVnVFYVM1Ym9LYVJiMVFqdnFPYUk0cWUyR1NlYUlLZkQzN1RaV3llUFNzc190SHJfU2lWUkM2cFhOalNEYkpZVUJSaHNtWWxBTDdNcGdRSmd4cnpFVXhQ?oc=5">Code Orange: Wildfire smoke affects air quality in the DC area</a> (2026-07-16)</li>
 <li><strong>Orange</strong>: <a href="https://news.google.com/rss/articles/CBMi8gFBVV95cUxNakFVaHlMU1RVSEJtNVVpUjkweG5ZYVhmQ1RzZGFzSVpoeXZkV3R6cy1yRkUwMUdfX1o4dWNJR3F1X1RmM1pfbmYxWDNaZ1JoRkdaX1JXNHJCOFhONlBlSWRIeDFpcjZxQVM3ZEdiX185aTRRcWhuQ3REVWhiV09LWHNuclhRVW9mZGhLSzlNV2VPOVRfYUM5NUxrZElQMzdMbEIyaV94amF6N1VBQllnQnJWSWcwZUJaUGp2SE1WYkJNVV95QzMxRDhYdHoxNG81NnZWNXI3R1FKb0dxUjZvTWxyeUtVaV95endweEpFVV9nUQ?oc=5">Mayor’s Office, District 6 Commissioner, Orange County Utilities Commemorate Completion of the Pine Hills Septic 2 Sewer Project</a> (2026-07-16)</li>
@@ -425,14 +251,14 @@
 <li><strong>TIM</strong>: <a href="https://news.google.com/rss/articles/CBMijAFBVV95cUxPeVUyaTh6WDFSaE9uWWwwQnlHRndsS1U1YWRzYU51MmtaOFNsSHdRUnI1M2ZkdnY1bUZFVnkzSDVIVU9xZkJpejN2VU5nSTUxRWNTd0gyN2Y3LXNoeDVFV2ZOSjFXZk42SmN0Zmk0bHlpUzU3ZUFOdWpKZVQtcmt2N2RCNkJyWUxIZDNvQQ?oc=5">Opinion | Goalkeepers Don’t Need Your Sympathy</a> (2026-07-15)</li>
 <li><em>... und 30 weitere</em></li>
 <li><strong>Tele2</strong>: <a href="https://news.google.com/rss/articles/CBMiekFVX3lxTE9CVGs3VkRac0FxUnloM0xRaXlOVEJ5SmR3VngzaVl5MElFSUpHejFGWHRKR1IwZmdVdUZJUzYza1g3VnJaX3FGQklBM3RCOUpNckViaTVELTF3dDBXMFdGcS0yR1NGUnZmVUhiQ2RsRHROcnhkZUlfUFdR?oc=5">XS2482533127 Bond Coupon Profile — Rate &amp; Payments</a> (2026-07-16)</li>
-<li><strong>Tele2</strong>: <a href="https://news.google.com/rss/articles/CBMilgFBVV95cUxPSHNrNmRVOW5BVUVJZHZWOU9HdnMzbWRkcGtYY2M5SzdRam9DTFlmd044MElucjRrMVY4eU5uMjNpdDFxSkhLNWNoZDctYnJ3UUZLRWhmel9sMWdUYkJyZTd6NXpWT3hTckpobDcxOFhxRFRTLXcxMzIzODhqbFVrWm4yd2VRUkRZM0gwcXc3b1N3WlM2V1E?oc=5">Tele2 Latvia revenues up 6% in H1, EBITDA grows 13%</a> (2026-07-16)</li>
+<li><strong>Tele2</strong>: <a href="https://news.google.com/rss/articles/CBMilgFBVV95cUxPSHNrNmRVOW5BVUVJZHZWOU9HdnMzbWRkcGtYY2M5SzdRam9DTFlmd044MElucjRrMVY4eU5uMjNpdDFxSkhLNWNoZDctYnJ3UUZLRWhmel9sMWdUYkJyZTd6NXpWT3hTckpobDcxOFhxRFRTLXcxMzIzODhqbFVrWm4yd2VRUkRZM0gwcXc3b1N3WlM2V1E?oc=5">Tele2 Latvia revenues up <span class="zahl"><span class="zahl-wert" data-wert="6" data-stellen="0">6</span>%</span> in H1, EBITDA grows <span class="zahl"><span class="zahl-wert" data-wert="13" data-stellen="0">13</span>%</span></a> (2026-07-16)</li>
 <li><strong>Tele2</strong>: <a href="https://news.google.com/rss/articles/CBMilAFBVV95cUxNQjRsM3JheGFUREJvYUZSTXZJb0g4anV1OXltODB3TlpPUU5MSGx4SHFzeVlZRTFaNWd6dV93ejFaelYzU0JlSEZTb2dla1lqeWFmSHdYQUw3aFVuMjBsN3RXOUNsc29rUVBxaEV5SzdoUlo1SkdlMXpHTFNKTC1Rd2pMdkpqZ1VXLWNOU3BETzIxWjlI?oc=5">Tele2 Estonia revenues up, margins improve in Q2</a> (2026-07-16)</li>
 <li><strong>Tele2</strong>: <a href="https://news.google.com/rss/articles/CBMixAFBVV95cUxPZlUyWFUxRUl2UWhsS0hweVYyVGJnVlVSMjNPSzlJMG83bEZ5X09tbTRVYnlfbWhOMHJHcVk1OXM2dG05dHhpN09JRmpJcUtCNzNQemVSSms4dFZUeHhhSVJ6M0NnV0JnOUhMdFdwLWxWR3NkYzJrU1dla3J3R1dNOURvTE9OcU1nTG1keHhEVzRNOEtsc0pmZlZEVmZpenFYUTlzNVh5NnBROXJxTUNDWnpmcDM3dXZ3d2cxVkNWTGxsR0lB?oc=5">Goldman Sachs cuts Tele2 price target to 215 kronor (225), reiterates buy - BN</a> (2026-07-16)</li>
 <li><strong>Tele2</strong>: <a href="https://news.google.com/rss/articles/CBMi3gFBVV95cUxQNmU5WEJkSXdZTkVZWjVFZlZiRUNQUjZCZmNuUzdaNDU1N0ZoSGtLQ2RaLXRlbk5JS0lhaVcyMnRweDQyY1BWY2NlRUh3WjFmbHBCS01vdF96dElaOFBvd3dVZHhIQVA1NmZaVlUyM3NrNk1kS19jaHpSLU5ka0xtUml6Y1dCQTNaVlY0WlpQcVcxbll3RmhhaVhLOXBPMEFVSG1fYkN2ZWc2RVdUUWhEWFlRdzZURHJrSHROeTE2YURHMHNXeHV3X0xCaWhaTTB6SGd2SG5RdUhqUHVRbGc?oc=5">Tele2 AB (TLTZF) Q2 2026 Earnings Call Highlights: Strategic Gro</a> (2026-07-16)</li>
 <li><strong>Tele2</strong>: <a href="https://news.google.com/rss/articles/CBMimwFBVV95cUxNQXlYLWtZWWhOS2dfVXBxaVVUS0J5RnN6S29UVzFIVG51T3BuWkIzSUpXa0dGa3dUeWJ6U2pIWm8zUXpfTllzb0hlcFhCNl9LSktDdXVTdmtvX3ZJdmxWd3FPUUktSktISVhUT0dtQUtqV1QySVZhSXprS1V5Vy1VV0xkeUtZWXFobWprZHhKUkFjWkFjVEZGLXN5RQ?oc=5">Why is Tele2 stock dropping today?</a> (2026-07-16)</li>
 <li><strong>Tele2</strong>: <a href="https://news.google.com/rss/articles/CBMixAFBVV95cUxNM09nVDNzSDdva3gwemtjbjh5djBkZS02SDlJdUxZQk9tOEQxRDlyTXRsd2xwV1lRQXJoTlp6cDEzMGJjUjc3OFBNamNFWFlENm9nY3RxR29WR0Ixd05rU2VXQm9NdnZuUWtpX1BwNUFrYWdKWHNOQ20yTXVsaUFmcVc3NV9ORko1Z2p4cjV1WUVQTndtRloxN3ZacWU0Q0szTEh4ejlGSE56bk5sNGd1eGxNVV8tcWJPcDI3eWhqc0kxT2do?oc=5">Earnings call transcript: Tele2 Q2 2026 shares fall as competition bites</a> (2026-07-16)</li>
 <li><strong>Tele2</strong>: <a href="https://news.google.com/rss/articles/CBMikgJBVV95cUxPMndZbFpseXY3WWotRTRaQ3p5b0drU3BiWFhncTJBbGFfODZrVG9tTUxpbVpNbmFZQ0FXd1RqM2RDcmNVTVljbWpQd3pwMzJDSFVBcXJqWkRybVpGS0NhTWNmTEZ3V1lmNWd1RzJVMFFQaktGZTN1cGFpN3ZhTTdGSUt5RXJMLUdwSW5MT3czMHlIWDc0cnp1b3Z1MlVOaUFqalN1TmFJMFJGXzgwYXhWWkhJVkt0aVBFcm9ESFNVSUJjRnQ5VTBMOXRrZ3Q2U25oRHlYd3k3bDktaEJfbHlPQVA5Q1JGTG8ta0RoOTAxejJhMVFuODd0M20xUEZSbldkY3d2ZXQ3eGcwUncteFRVdk1B?oc=5">Tele2: Revenue and EBITDA grew, guidance reaffirmed, and cost discipline maintained amid competition</a> (2026-07-16)</li>
-<li><strong>Tele2</strong>: <a href="https://news.google.com/rss/articles/CBMixgFBVV95cUxQcmlVdTRHVDVqb0RXRnliOGE3Q0swaVNQOFpEaFAtNzNERkVaMTVWYTUzVjRRVFRrNktzUVd0THJ0dG85S3lKX1ZudGlKTlVnTUwtVmRsQmgzN3RLcVE0dUh1a3B4anBlYmM4SXRXcXNaSjNrT0ZFSVFfaVowRlNYT1N4UWMzcVMydUIxNGU2M0h4VUJwSjVHTjBHYnVpR3VnQnowcDhWTUhlYXRSUkZ2dkRIMmMzdHhWU0dhTDZwZWpUcEFINHc?oc=5">Tele2 shares fall 4% after Q2 profit misses forecasts, outlook maintained</a> (2026-07-16)</li>
+<li><strong>Tele2</strong>: <a href="https://news.google.com/rss/articles/CBMixgFBVV95cUxQcmlVdTRHVDVqb0RXRnliOGE3Q0swaVNQOFpEaFAtNzNERkVaMTVWYTUzVjRRVFRrNktzUVd0THJ0dG85S3lKX1ZudGlKTlVnTUwtVmRsQmgzN3RLcVE0dUh1a3B4anBlYmM4SXRXcXNaSjNrT0ZFSVFfaVowRlNYT1N4UWMzcVMydUIxNGU2M0h4VUJwSjVHTjBHYnVpR3VnQnowcDhWTUhlYXRSUkZ2dkRIMmMzdHhWU0dhTDZwZWpUcEFINHc?oc=5">Tele2 shares fall <span class="zahl"><span class="zahl-wert" data-wert="4" data-stellen="0">4</span>%</span> after Q2 profit misses forecasts, outlook maintained</a> (2026-07-16)</li>
 <li><strong>Tele2</strong>: <a href="https://news.google.com/rss/articles/CBMijwJBVV95cUxNUUVjTFJtc2toVWN4amF0WUttV0ZuQTFEa28wOUJvN1JiN05yZmJrUjUwN1FfZlVldUZWTnc0ZEx0dVhnSVk1aGJCV19EZ01mQmh1MGVPNlIxbzNiS2lXWlBuZXR0TXFRRVV4a3h5OGZEZFBKVjlNLVNBWWhQQUZnZDNDMDl5cjhiT0lWeW11VXVzQllEVVNVNllYOEpNVThnNEtSU01ubi1qUF9yVUYzaXhSUHdkc2c4X1AySFhNZU90UlNRazNJamwza2VpUWREM0RNQTdlVFczVXk5TFB6d1pTcGJldG51ZzdzX0xXSlFLdExzQmd3Qi1WVzJ0NDlvTFdsaDl1OHhHMjRkSTFN?oc=5">Tele2: Q2 delivered solid revenue and EBITA growth, strong cash flow, and reaffirmed 2026 guidance</a> (2026-07-16)</li>
 <li><em>... und 30 weitere</em></li>
 <li><strong>Telefónica</strong>: <a href="https://news.google.com/rss/articles/CBMikAFBVV95cUxQSGlybE56U3JJSmM0elhuYlJkRGdmXzB5QzM1ODVYYWVGMUdLaTJac1RFbGV5d0ZFWWI4QjUwM0w2VV93VUhseTk3Y0lJZUlmV1FnMGJjMG1MeGp6NVFEMEx1N2J0UVhlNlVndFlZZVV1d1NKaFI3RWNSWkFRSk91UkZKakFMVjNUb1Bpcm1QeUg?oc=5">Telefónica Spain and Amper's aviation upgrade</a> (2026-07-16)</li>
@@ -454,7 +280,7 @@
 <li><strong>Telenor</strong>: <a href="https://news.google.com/rss/articles/CBMioAFBVV95cUxQblVBX295RFJ6RWh6QVpjdDZ2MjZScllvZ2xoUWtUc3ZTOUVVajlqSHdYZkJQSXhlVDBsZ2Y5ZTR2azBmWGo1S25TLVV1MDJSVkRxZHhsX1cwSXZ2RHdtblEzRU5HM2gtck5GbkNIR3BGTTVwclQ2LXhiLVM2a0oyWjR6R2M1c2FmTXpnRXM1RTFSN2VyY3p5YUFULVdUVWlZ?oc=5">Telenor Sees Free Cash Flow Before M&amp;A, Dividends, Spectrum of Around NOK10B, Had Seen NOK10B-NOK11B</a> (2026-07-16)</li>
 <li><strong>Telenor</strong>: <a href="https://news.google.com/rss/articles/CBMi4gFBVV95cUxOcXhvWmQtR01kUTdMQVlVZDVXbTZEX25DUG9KUHVibFNlOTFwcmFWMUh5WFhHVV9uN0NSUExtUEJLd01ES0VlZnFsQmxRNmlfYlNQemZTMk5VSVRxbEV2X2hIYmZoSUVXVFR5a2x0Y2FDR1Z5WldFS2ZZamFWMGxuZXVtdXJwYXJBZWNUTHc2VUlTbl9uZjlJS00wOGNyc3hMTmM1OEZqdXNpTFo1dV91ajVRZ01qUVFva2ZLNEpxdWJlaU5iMld4ZGNtNzBTNjJIZi1XeVJJcGNTUVp4UjZYMHZR?oc=5">Norne Securities cuts its target price for Telenor to 165 Norwegian kroner (180), reiterates buy - BN</a> (2026-07-16)</li>
 <li><strong>Telenor</strong>: <a href="https://news.google.com/rss/articles/CBMingFBVV95cUxPWURIbkt4Z01WdmFIMmVtblROU2F1LVZKWnZvUV9tTHFpTFVNdEZIcDhudHhqLUpQbndxc0lTNXJVczR2RUR6NnAwdW40Mnd1WUtFeloxcDFjdU9CaXlFMF9SUHpjOHVoSVljbEtBbnJ1UkVJSnlUQ21zbFd3ckN3T0FCaWF5bHFTTDJJM2VqZGdzSk5yd1JFZWRoNXlzdw?oc=5">Telenor cuts guidance for second time in two quarters</a> (2026-07-16)</li>
-<li><strong>Telenor</strong>: <a href="https://news.google.com/rss/articles/CBMiwAFBVV95cUxPTkc4UTVjSUNPX3ZEUmtESWVHOGVjeHI3Y3hBbFRpeHBPUXJXVXN1dnd2aTFjWmFhanlHVThTOUFKZzJkejBfa0tCWkh2dHJmOFMyNlluazlJYU9ON0l0V3R5Z3lyMDQtdjJfbDVNV2U4OXlRLUhwZjBkVUpoeXlUQzZqOWgzay1OZk1WNVJWSGd4NlRQY3JaaXN4M3NfMXBJOVFmeG5DWnpGQ010V3NUVm1vMWl5ME5jc3NuSnZfTGI?oc=5">Telenor Denmark lifts local currency revenue 5% in Q2 amid mobile business growth</a> (2026-07-16)</li>
+<li><strong>Telenor</strong>: <a href="https://news.google.com/rss/articles/CBMiwAFBVV95cUxPTkc4UTVjSUNPX3ZEUmtESWVHOGVjeHI3Y3hBbFRpeHBPUXJXVXN1dnd2aTFjWmFhanlHVThTOUFKZzJkejBfa0tCWkh2dHJmOFMyNlluazlJYU9ON0l0V3R5Z3lyMDQtdjJfbDVNV2U4OXlRLUhwZjBkVUpoeXlUQzZqOWgzay1OZk1WNVJWSGd4NlRQY3JaaXN4M3NfMXBJOVFmeG5DWnpGQ010V3NUVm1vMWl5ME5jc3NuSnZfTGI?oc=5">Telenor Denmark lifts local currency revenue <span class="zahl"><span class="zahl-wert" data-wert="5" data-stellen="0">5</span>%</span> in Q2 amid mobile business growth</a> (2026-07-16)</li>
 <li><strong>Telenor</strong>: <a href="https://news.google.com/rss/articles/CBMivwFBVV95cUxPalZuYlk1dGlJemRhRnNHdlJSRklWQWQxRGRFTGw2TG1nS1FqNTMzckd5OTZKSnQxMVRSVElHR2hlX0RPWUtucnVpNy1jbWJDenhKQWczR25rdHp0YmNCRU9SNDcwRlNzUVR1c1ZuT2dDUkJQOU1XanBJd1Nfb0YteHFPUF9fM0ZoVWhHSnI0RXQ3cHQxOVA4YS1KY0VzanVrQ2l6QklzeDE5b3lFN2ZvQlJZdUkzSllMMmI3UkV6VQ?oc=5">Telenor chair, CFO and board member buy shares amid the selloff (update)</a> (2026-07-16)</li>
 <li><em>... und 30 weitere</em></li>
 <li><strong>Telia</strong>: <a href="https://news.google.com/rss/articles/CBMidEFVX3lxTE9ZQ3ViNy1lQUd6OVhCMUdBMXNKWHRJRFM1QlhsZVZaMkxidDFqTmpuTThtT0RDVTFQRUx3RDJ6RUtSRWdoM2JlbFVQVl9MRE5uLWtCZmNXZncycjNVeDFRazc2ekYwcnBPU2FleDRDVU9uYjhz?oc=5">XS82618902 Bond Coupon Profile — Rate &amp; Payments</a> (2026-07-15)</li>
@@ -472,7 +298,7 @@
 <li><strong>Three UK</strong>: <a href="https://news.google.com/rss/articles/CBMifkFVX3lxTE5MSmtMRy00ck1qZDZlYW1kQTRRcnp5RjlrQkI5cFZKRTFOYWQ3RFFENDZKOFplRTNSaERmaS1mR21MS050Z1lHYVc0MXByS2tKcUwxM19fWHNEcktVd1VHZk5oTkkxQmZJdFowV3J5Y25TMURXNmhPVXpFajh0dw?oc=5">Fun-filled film afternoon coming to Inverkip village</a> (2026-07-16)</li>
 <li><strong>Three UK</strong>: <a href="https://news.google.com/rss/articles/CBMihgFBVV95cUxPWTgtb29iT2J5OUNac08xblJSU0RlOUdoSU1IRVpGckdhWXh3MHV2R1hRMUJyVHlDVGxXUWZpZmZWMTFhQ0VldU9RLURRdnlwNFJndzBLbjdNeDl0dTJIWjFIaHpTUllNV3FkQTVjNkVxdFh1ZkRPUUx3eWRLYURlcHJSQ284QQ?oc=5">Three FWA beats UK fibre altnets on market share</a> (2026-07-16)</li>
 <li><strong>Three UK</strong>: <a href="https://news.google.com/rss/articles/CBMigwFBVV95cUxOV2ozM3hjVEl6WVl4R2R4QU9CQ3Z6M2FWUzN5ZkpvRDVETGxBZU5rck1Ud09TNld4OG9sc08zNk5zY1ZSS2VpNUhERzF6NkZtZHVjREFSMmp2NXpXaFpDSHdMVkxFazBrRC01RUh2UWlpSTZvS1B3YXRRQlFCUnJySzB3d9IBgwFBVV95cUxOV2ozM3hjVEl6WVl4R2R4QU9CQ3Z6M2FWUzN5ZkpvRDVETGxBZU5rck1Ud09TNld4OG9sc08zNk5zY1ZSS2VpNUhERzF6NkZtZHVjREFSMmp2NXpXaFpDSHdMVkxFazBrRC01RUh2UWlpSTZvS1B3YXRRQlFCUnJySzB3dw?oc=5">More than 100 Londoners have drowned since 2020</a> (2026-07-16)</li>
-<li><strong>Three UK</strong>: <a href="https://news.google.com/rss/articles/CBMihAFBVV95cUxQNHhFaGFtSEoyUzZGLXhGU1E0UEU1MjNsd0JmWDZDdm5YNzJ4R1JGNF96cTY5WVh3NmFfcjJwYTkxOXZVSjRZOVkteW5PUXNYWlpQTVYxWElsQ0VkMWFRNlBjZXBqSUt5WU16NEtSLWFDS21nd2ZOZ0ZjSV9fU3RRUnVrT2g?oc=5">3 second-income shares tipped to grow dividends by 10%-20% over the next 3 years</a> (2026-07-16)</li>
+<li><strong>Three UK</strong>: <a href="https://news.google.com/rss/articles/CBMihAFBVV95cUxQNHhFaGFtSEoyUzZGLXhGU1E0UEU1MjNsd0JmWDZDdm5YNzJ4R1JGNF96cTY5WVh3NmFfcjJwYTkxOXZVSjRZOVkteW5PUXNYWlpQTVYxWElsQ0VkMWFRNlBjZXBqSUt5WU16NEtSLWFDS21nd2ZOZ0ZjSV9fU3RRUnVrT2g?oc=5">3 second-income shares tipped to grow dividends by <span class="zahl"><span class="zahl-wert" data-wert="10" data-stellen="0">10</span>%</span>-20% over the next 3 years</a> (2026-07-16)</li>
 <li><strong>Three UK</strong>: <a href="https://news.google.com/rss/articles/CBMiogFBVV95cUxNQ0p5dTh2Vmp1TzNNcE1XU0tfM0puSklpTXJfSTZPMUxwd1ZpWjgxTi1odnViSF9NaWxzc2NSN2ttR09JQ3FkZXhZa0Q3bldLcDZIUTM4XzF6UzEtM1VWY24zU3pqRFV3Y3RwX1RHUzZWM0NGUk82TlhsOTREOGliOTVhLXdEeTh5ODh4cFJYUnFQUGtvb0pZZXUwNEp0Y2llUkHSAa8BQVVfeXFMTXBVTmxzM3YzNks5WE9DWGQycl8wNEM5ZnBUSURtaFVFLWxEUzdxclRmeFdIR1VwckFNcDRMbHZPWTc2cHFTREdwM2RDTlhaRnlmWHhTWk5SU0swc253RXF2a2oyWmNtXzJuMjJZbXRoWElvU3Y0ekUtRTA5VjlMWDh3RVd0bUZseFN4LTJoMXVEdnZCNTZNX28xV0RGNzF5NXBjWFZOcVNPRl95cmRyWQ?oc=5">Three UK naval bases to be modernised under £26b program</a> (2026-07-16)</li>
 <li><strong>Three UK</strong>: <a href="https://news.google.com/rss/articles/CBMiswFBVV95cUxPc0h5bUtGUFl4MUxEbnViZ3hTSTdsWEtNRDNHT0Zkd0cyTEd6bjdPa2JWa3pRMTdwdnVzeWxELVdCc2hKZnljaXFnWXAzY2hOLWlaR25heHdiZll5M25NMmNuMjdyd1A4NlBBbUdIMFBnWTAxOWZEXzN1akpZZ0JUVTU5LV9BeGZCNE1OeVhvZVFxLUloN1BTeHFQNTJWUEtpcGl4X3o3RkZSM19YRUJ4b2xROA?oc=5">Supermarket Income REIT buys three UK grocery stores for £118m</a> (2026-07-15)</li>
 <li><strong>Three UK</strong>: <a href="https://news.google.com/rss/articles/CBMiyAFBVV95cUxPNFBfckhPUTh5OWRVMWtLQmNXSzNmMHVWXzEyMUJNS0dYTnVqXy1iX0VzaktfS2VUN1NvWW9ldDU3TEVRdS11S01Ea3h1SmRfNk1tbDZXWlVEejV3NTl6amJNa2RBSUxqd3NOeW84VVJNcU9TVGgtX0RMZkd4UlNaSERNTVY2NEIxR0ttNEhtQ2xFWkg3Zms3VDBJQWswdjB5V3lBSnRBTFpkS05fZ2syOVJZT09lZHBmQ2pNcDJhb1l6VkJyWnBVYg?oc=5">Tesco superstitions, Asda Wonderwall, Hellmann's 'eggs-factor' – Campaigns round-up (part one)</a> (2026-07-15)</li>
@@ -587,7 +413,7 @@
 <li><strong>Indosat Ooredoo Hutchison</strong>: <a href="https://news.google.com/rss/articles/CBMib0FVX3lxTFBZQTVSTWRJQ1FyeTQtS19MdGZfMEJXVjh3NERXTkE0YXFuVGNacU1nNWNjQVJUeFBhUUd6NkM1SS1QSTBHdnMwcWFNTk4xRm9ZeWtQazBxY2FLODlPWjFVS0wtaGY5VUxOVEtsaWltZw?oc=5">Indonesia’s AHP powers Indosat, Lintasarta’s launch of IFT</a> (2026-07-14)</li>
 <li><strong>Indosat Ooredoo Hutchison</strong>: <a href="https://news.google.com/rss/articles/CBMiugFBVV95cUxOTFVkMG4wbUZ0a1E2dElMeUtWM19qb0lsUTQxdWJyY2ZCM2E5d0YwYzhSX2Fhc3h0c203Q3RlbVQxWE40T0xQcVNKeUhQVVJ0eGlhWVkxVXZmZTl6cHNoVUNoOUI4aHNkOVdLTnVwaEpVMHQyUm9sX2xSRjBWN3NvNUxLOEl3eDJnbXczZW1CRy1pdnBLZFVMTWZYMkhsVTAwR1EwcVlDM2d5cHoycHYzWnhKeHZMdmxYMnc?oc=5">Indosat extends CEO Vikram Sinha's term to advance AI transformation</a> (2026-07-10)</li>
 <li><strong>KDDI</strong>: <a href="https://news.google.com/rss/articles/CBMipAFBVV95cUxPZDlTYlRoWEI5LXE1cVNnWWNmYlVyMVEyQlJnc0pRRHNraEpuVnpqdnFLTmRBdndsWjU2Z3RCS3JXUGIxbjFtSEh5eXh5c3poMWQtZENHRG85QUNMR3hocTdXbFdyeWRUQzVNV0djeTBUMVNqd3JxUzZraDdWUG5rZGd3OU9BN1dPdjFURmJFcHItVjhzS0hpRE5NanFxQ3kzTEQxSw?oc=5">KDDI joins blockchain-based conservation project in Okinawa</a> (2026-07-16)</li>
-<li><strong>KDDI</strong>: <a href="https://news.google.com/rss/articles/CBMidkFVX3lxTE5mRTItY3loWDhzaW5sYjFBWHN6RGVqYkFHLV9pTG9haVRnalhPNlRTaXJhdVQ2M1d1TDNHTFlSV2hpWE1OdVktTjZkUU1zdThfWGJNME11WVZkdGE1UEJKaWFHYW51blQ0OXFTaEJSSVNKLWZZRlE?oc=5">Gunosy Shares Plunge on Termination of Capital and Business Alliance with KDDI; Revenue Forecast to Drop 20% in Fiscal 2027</a> (2026-07-16)</li>
+<li><strong>KDDI</strong>: <a href="https://news.google.com/rss/articles/CBMidkFVX3lxTE5mRTItY3loWDhzaW5sYjFBWHN6RGVqYkFHLV9pTG9haVRnalhPNlRTaXJhdVQ2M1d1TDNHTFlSV2hpWE1OdVktTjZkUU1zdThfWGJNME11WVZkdGE1UEJKaWFHYW51blQ0OXFTaEJSSVNKLWZZRlE?oc=5">Gunosy Shares Plunge on Termination of Capital and Business Alliance with KDDI; Revenue Forecast to Drop <span class="zahl"><span class="zahl-wert" data-wert="20" data-stellen="0">20</span>%</span> in Fiscal 2027</a> (2026-07-16)</li>
 <li><strong>KDDI</strong>: <a href="https://news.google.com/rss/articles/CBMiqgFBVV95cUxQbXhVdEZyZk92SG81eGplS0xSd0FKQ3NUMXJnNGhicDkweHFGWXZTTnRKUjRIVndfMmZEVTAwOEw2VVVxY0RzZHhIM0tRNHhMa2tnVTRYcDk4X3lua3M1QzhDVXlFbjBHa3A4Qm9GaWdkbnN0U1B1QWNlQTE3Q3RrUzBIX0tpTy1aSExRSHQ3clFtUERFVGttS1g2R0dYak1BcmFWUlNubGxJQQ?oc=5">Gunosy to End Long-Running Business Alliance with KDDI</a> (2026-07-15)</li>
 <li><strong>KDDI</strong>: <a href="https://news.google.com/rss/articles/CBMi1AFBVV95cUxOWFphcHBvSDZPU19SQ3oxVVp3Yk1sZzd4OW5QSzBnakxNRy1Xd01ZNDVtamxEaEhSZzg4aWNiaE0tS1hVWlZnczRFcXlHM1JiWUpDTUZ6aWJ6aFNLMXh2dDd2OC1nWVBFenFTNkRscV9DZThEeW5qak96Mzg0X0hfbFJjR3U5dC1BX2lOTlZ5R3NfWFd1WDg0NmNsU2JnQ18zZnB4TEtfalhfYkxCRFIwYWxYMWhIUks4MFFfc1N1ZXJTMklkYmxGQVhfVXR2MU04Ri1HUA?oc=5">Gunosy Inc - Notice Of Termination Of Business Alliance With Kddi Corp</a> (2026-07-15)</li>
 <li><strong>KDDI</strong>: <a href="https://news.google.com/rss/articles/CBMikwFBVV95cUxONjQxVDVaUlJ0M1VDR1NJX0d2ZEI0OVdXUDBQTXNZTVNPdFNfSTBaTHVja3pNVmZDNTJOV3NOc21PaGZoTjgzaVVJTmZLblIzancxYlVoYWF4ZE02U0JrWk01TkR5QlZ1UUtBOGt6ajUyTS1JUUQ2anRXbnB2Uk10d0NPc3dzZ01rdEhTUkFiZWJ6YjA?oc=5">Can Verizon's KDDI Tie-Up for Latest BMW Vehicles Boost Its Profits?</a> (2026-07-13)</li>
@@ -649,7 +475,7 @@
 <li><strong>Rakuten Mobile</strong>: <a href="https://news.google.com/rss/articles/CBMifEFVX3lxTE1DVDhMU3JRU0ZibWVUczFLenBKVEtra0xvSXo0ZnR4VGo4MFdENG9WTEJKSmIzNXkzbW1iVVV2MkdlQm82WVpCMXB1WHByZzJsenFjMFBqU3h4UENCYldQUWk4UGZMNzhMNEJiVHJfY2hXVVJOZWlFaDkwWWbSAYIBQVVfeXFMTzZfRFVlUTJtU0RmVzVpZ2xQX0RmdFloODFZQ2VIbHlCTlFSOG50QWxUM1MxWEtxN05JQzdJbWtFNTZ5enVUSDVzdjJyamo2c192RG02eXpJbXRxWlNydk1aNFRaNWt4ZWNLWGRteWtGel9xQTN4bnMxSlZocjhhLURJQQ?oc=5">Brightspeed Business Launches 8 Gig Fiber</a> (2026-07-13)</li>
 <li><strong>Rakuten Mobile</strong>: <a href="https://news.google.com/rss/articles/CBMilgFBVV95cUxPQkRqRHBCTW54S1FQbDNBNmJuc2J2Z3lxRElBaUlxWlRwUFdaa21ZRzdNME1NQm1razFzclkwSmxib1BPR0ZnS3JFNWlZODA4dFdYN2JWWjFVNDN3LTZIa0VtaXZmSmdzNFBkdnVXWEhzRjNiWDc5VklJeGpCYlJLWDBPai11eExQMUJlY01Pb2RUUU54WXc?oc=5">NTT Docomo Starlink Direct soars past 5M subscribers</a> (2026-07-13)</li>
 <li><strong>Rakuten Mobile</strong>: <a href="https://news.google.com/rss/articles/CBMibkFVX3lxTE9Md2JKTENXZTdRSjI0TVYzX1RtUE9ZdjdXeXlYbUtuMldvcE9FX1M5Ty1TYWo0NExiY3lpenJCWXk5dGRVaHZlb3FPeExFSlkybEJTWE0yaFpaZ3Ytc2U5QTZkZ2ZFeU1ZRzRnMURR?oc=5">Stop Overpaying on Hotel Bookings in Japan: All You Need To Know To Get Massive Travel Rewards</a> (2026-07-12)</li>
-<li><strong>Rakuten Mobile</strong>: <a href="https://news.google.com/rss/articles/CBMisgFBVV95cUxPOWlJQWZsb3NzdVN1VGZGay11V2JXT2Nvc011dmdhdGluOWY0TUw3ajB0NXFYa3JFT3BRTFdieEhwMk5iV3hqTV9LMGVMcmlFaWViQlg4MEpyeGZ6THhQVGZqSTV5MjRYVFlRUHZGaml0WEd1OVFJR0NVY21Bb2gtUFBpYWhxY2ZzaDloME5KVjZLdFh2aUhnOVRGajctRk4wV3NwTmNwc2FwNjUteGg3eGNB?oc=5">Why Is RKLB Stock Down Nearly 2% In Overnight Trading?</a> (2026-07-11)</li>
+<li><strong>Rakuten Mobile</strong>: <a href="https://news.google.com/rss/articles/CBMisgFBVV95cUxPOWlJQWZsb3NzdVN1VGZGay11V2JXT2Nvc011dmdhdGluOWY0TUw3ajB0NXFYa3JFT3BRTFdieEhwMk5iV3hqTV9LMGVMcmlFaWViQlg4MEpyeGZ6THhQVGZqSTV5MjRYVFlRUHZGaml0WEd1OVFJR0NVY21Bb2gtUFBpYWhxY2ZzaDloME5KVjZLdFh2aUhnOVRGajctRk4wV3NwTmNwc2FwNjUteGg3eGNB?oc=5">Why Is RKLB Stock Down Nearly <span class="zahl"><span class="zahl-wert" data-wert="2" data-stellen="0">2</span>%</span> In Overnight Trading?</a> (2026-07-11)</li>
 <li><strong>Rakuten Mobile</strong>: <a href="https://news.google.com/rss/articles/CBMigAFBVV95cUxQSmpKVnl6NWJyRENpOUdLVmlQMEtmVzZSbHNsVlh6OGhzRHlsQTJRdVFHYmotcWpaYVR5WW83bXFycUhJNDhPM19rWTlfWUJkdVVNbXAzdy1EdmNaYXRLYWxnSHotbl81bklIemdvaVlTUmJTRVZsSVdON05hRUNtbg?oc=5">Quebec gov’t to invest CA$27.7m on tower builds</a> (2026-07-09)</li>
 <li><strong>Reliance Jio</strong>: <a href="https://news.google.com/rss/articles/CBMi7AFBVV95cUxORlJvOG1LZzlraDVSaW9mWVVhQmlXMlhkY2EyVENVZm53Mm9iME9WeTdyUXU3UzAxOUx5TUJnYUV6aTlPSkxqU2J6TE9sbUxnV3M4QmtELUp6eTFyNkhSVkdQOURqQm83T05oR0VhRHVUcmRSVXVRT2MwVzFzVlBXM2J1OE4tbFhRMnBZc2ZFQmZ5bEkwa1VFeHQwZXVsNDFKa0oyNHNmcWI4OUM0Um5lOThOQTFsZzNHR2s2dXNOWTlhbjFtZlFrYzVzV0JsZ19QNVYzYndjcm1KV21KMUhTRWVuY2ZSVTY5c1BkTtIB7AFBVV95cUxORlJvOG1LZzlraDVSaW9mWVVhQmlXMlhkY2EyVENVZm53Mm9iME9WeTdyUXU3UzAxOUx5TUJnYUV6aTlPSkxqU2J6TE9sbUxnV3M4QmtELUp6eTFyNkhSVkdQOURqQm83T05oR0VhRHVUcmRSVXVRT2MwVzFzVlBXM2J1OE4tbFhRMnBZc2ZFQmZ5bEkwa1VFeHQwZXVsNDFKa0oyNHNmcWI4OUM0Um5lOThOQTFsZzNHR2s2dXNOWTlhbjFtZlFrYzVzV0JsZ19QNVYzYndjcm1KV21KMUhTRWVuY2ZSVTY5c1BkTg?oc=5">CCI junks separate cases against Jio and DIAL for alleged violations of antitrust rules</a> (2026-07-16)</li>
 <li><strong>Reliance Jio</strong>: <a href="https://news.google.com/rss/articles/CBMi-gFBVV95cUxNWW9lQktfWFBaNk5vUHNTZF9JaVFIM015UlhaWEtWMmNPd2ZMREtwZjg1SUoxMENJVndxOXROZk5qZmNUcXBfV3RWeTFyQlhTUVN0TGtDY0FPZHpNeFQtZS1fa3ZOYVhBdEZYU1Nsd3F0LWFNNVJUa1FWdFlDb0NhYzhzTGtzV0JwME9rdjAyVGFndk5QZ094VUVvZnlNYmk5VHpOM2Ytb2VIMlFLSnhEVVkxN2otaGJOY3J3YktzVWp3bGp5aVFvOENDTnRpY1ZzZ1VMeTRFeFYyakxFeEJ4STdITV9TODZ6X05La3BaaTdhY0hOVXR3eUxR0gGCAkFVX3lxTFBqZ1lzNEZ5ckJEQmprZ3hhakNEVlh0NHdlRlQzRnZKTGJMQXFjVmh5U01KRTR3bXpsVG1scmt4ZVZoZi0tU25MV0pJUXowQ2tVaXB6NlNxVG91dVVmVGRLV2xfU1lsa2xVeXVSMXRaVjRpQ3JTU05oVWdKVjIwN0FZZlhvZkcwT3hoOXJCeGxpdmdlRHNuNWlzZkl4LV9CQ1Y4OW44QncxLVd3ZGhyU2VpLUhORWFMU1EzaVNZeXF5OFc4MmpSTURWZUV5Y3M5d2l6czlhM1JXd3FVZllzM1pneWprbm9XZ1dnb01vNjViRjIxQVQ1S1JqeUJheHJUZE1mUQ?oc=5">TRAI Drive Test: Reliance Jio Leads Mobile Network Performance in Uttara Kannada, Airtel Excels in Upload Speeds, BSNL Falls Behind</a> (2026-07-16)</li>
@@ -664,14 +490,14 @@
 <li><em>... und 29 weitere</em></li>
 <li><strong>SK Telecom</strong>: <a href="https://news.google.com/rss/articles/CBMixgFBVV95cUxOcGZMcHlyR0xSWWV6R2Iyb1hKck1YT3ltOF9yZkJZREdWbE91dl9LcHBiNkVSbVlEUjVFYlhmejFTajZFaFFGbkFFQU1DTy0xa19IRjdteVNaMmFWSmJPbzVlLXZCaUZoVk5jbmpfamlXR2dYSTk1Yzl1TW02MkJRbXJjRGJzMGpfbFhBSEtYdWhPc3NSOWdrRFhJd2NQTk9UTGVTbzEwdHlrbjQ0NGVoalN0T0RoMHNmakFYbDV6OFRVNWpNblE?oc=5">SK Telecom AI-RAN Pilot Goes Live as Nokia Targets Double Spectrum Capacity</a> (2026-07-16)</li>
 <li><strong>SK Telecom</strong>: <a href="https://news.google.com/rss/articles/CBMirAFBVV95cUxPd3BLZ2VvdVJRcnBoc3FVdUhmdElOcWMtSGhOTXNHTVo4WDhVa1R3SEdCRWJoSGNYYXd6SjByMTNWd1JjNmE1Q05POXBhNUJtcVlqLW5VOXFTblY3Y0dLNkhtZS1DUVk2OGVHMlhjVGhFb01iXy16bWlKVzNnOEYxWkNvX0EyVUdNeXRqRjRuZkpXaTVZbjkzYlIwdjhOWFYxYVdlRTRLOVI3QWVz?oc=5">SK Telecom (NYSE:SKM) Shares Gap Up After Analyst Upgrade</a> (2026-07-16)</li>
-<li><strong>SK Telecom</strong>: <a href="https://news.google.com/rss/articles/CBMi2AFBVV95cUxNUzBFWDFIa2dqb1dFRzZxbHpYWUtqeWlrNE00S1JoaGtQQVNPa05DVWprWUtaNmttZnNfV0VaOEFnV01XZVNfbVVOajdfT2YxZjUzYVF1eVlCQy1Ob2oxb05STTExZVhqZVNTMFZOZlRwWGZkNkxWcGpBS21UZ0EtVDFKRU0zcEZ1WlZNUEMtZFZOM2h6Mk5wYVB4eHl5MVBwS3lEN3BKUE4tcEZ0U2hlclBBYV9EWi1fZHZhQUhzcEp2amYtdmg0WERXS08tZWFrRC1QMThsTzQ?oc=5">SK Telecom Co., Ltd. Stock 12‑Month Price Target Raised to $38.11, Implies 18% Upside</a> (2026-07-16)</li>
+<li><strong>SK Telecom</strong>: <a href="https://news.google.com/rss/articles/CBMi2AFBVV95cUxNUzBFWDFIa2dqb1dFRzZxbHpYWUtqeWlrNE00S1JoaGtQQVNPa05DVWprWUtaNmttZnNfV0VaOEFnV01XZVNfbVVOajdfT2YxZjUzYVF1eVlCQy1Ob2oxb05STTExZVhqZVNTMFZOZlRwWGZkNkxWcGpBS21UZ0EtVDFKRU0zcEZ1WlZNUEMtZFZOM2h6Mk5wYVB4eHl5MVBwS3lEN3BKUE4tcEZ0U2hlclBBYV9EWi1fZHZhQUhzcEp2amYtdmg0WERXS08tZWFrRC1QMThsTzQ?oc=5">SK Telecom Co., Ltd. Stock 12‑Month Price Target Raised to $38.11, Implies <span class="zahl"><span class="zahl-wert" data-wert="18" data-stellen="0">18</span>%</span> Upside</a> (2026-07-16)</li>
 <li><strong>SK Telecom</strong>: <a href="https://news.google.com/rss/articles/CBMidkFVX3lxTE05QmE4aTlQZ3YtaTNjcko5TkhaOGZzZlNIQmhubWhPQ184OGFqLXFxT1IzU0VUVV9ySFg0U0lLUzBaNE1BaUQ4aGpaODRRTGFSejVicURYa3hUekZjcUw5MXl2cUtfeG1NYjU0bjZFVE1MaDNuYnc?oc=5">SKM3856888 Bond Risk Profile</a> (2026-07-16)</li>
 <li><strong>SK Telecom</strong>: <a href="https://news.google.com/rss/articles/CBMitwFBVV95cUxOOUNHcTJNd0JwYTRZV284TE4wZTdlOXlOZUgxcjFyaGd2dmxQcUxwTXhnUHdfbi1xYWYxMkZ6SC1tTXRtN2FBUVNUSlE2ZU5EQ3BoZGUyU095V1JaZjl1QUJHbFN3d3Z0ZzhaT3V3Z0ZWeHBqWW5SMmxNOXdaTmsyV255UTNYNHhVdjA3dGVkWE1qajZNRzFNSWFJRXpkRWp4TTBBQkI4TUlMVDUyLVh1cFRnTmRyUlU?oc=5">SK Telecom (NYSE:SKM) Upgraded to Overweight at JPMorgan Chase &amp; Co.</a> (2026-07-16)</li>
 <li><strong>SK Telecom</strong>: <a href="https://news.google.com/rss/articles/CBMid0FVX3lxTFBKS2toQV9YV2k0SDJXX1FfUTB0LXdfdmNPa0pGRUJjbmhzekxNRVpMZTg5VWF6T0pzWm5lUVpET2kzN01nbEt2THhaRkhOZkh6Umw4VmZjVldRa2gxZkRBV1VpUjlkVGx4TUk0WlROaXlfN0xiR19F?oc=5">SK Telecom to use AI to maintain network quality in summer</a> (2026-07-16)</li>
 <li><strong>SK Telecom</strong>: <a href="https://news.google.com/rss/articles/CBMirwFBVV95cUxPOWtUaVY1empzWHB3QWZidmVNb09pWEUtTVNTTFMwTEVBYjNXYkRtUjZEOVZ4cVpsa1FQNEx4cV9FVlpCTU1hRDA1VDJRV1ZHU3VGQmtnalRUYzNlUlVhTW91ZGhlUFV0YmhiUkxtVjRMTHg2eWd3eXBqYkc5aUZ1cUM2cmZxTEh5ZkZOUmlVSDlBM2kwSXdrUFdHdG0ySGtpSktReXNzQTlLYVJfNzNN?oc=5">SK Telecom to use AI-based network management during holiday period</a> (2026-07-16)</li>
 <li><strong>SK Telecom</strong>: <a href="https://news.google.com/rss/articles/CBMigAFBVV95cUxQY0VTdlBuQUc5U3dSSk9feEVzT19pakwxbTZZQ0NCM21RNXRiVWxTX2pqY21YT2xlR05QVDZmNnZ6S3pibVZSSzVEeTFCSW9OcmprbExnc0dLVHJKS0d3THZZck1fZTZXeU0xSmhjUy14Z1FrbzVkZXVqYnFmVnRwddIBlAFBVV95cUxQWTNFV0pGRGhxM3RGdU9SQm12UEtUeUpraFU4UDhjM0ZMY0hUWG81RHh3S0FTT012X3N5ckdOOXd1ZHJDb2p2NkRWdm4yb080ZWpfcjNiWjk1b20xOUdRY3VPYV96elFMbFBabVEtT2ZSckR3WWpXd1Jqa3cwZVZmVFE2Nk04X0MyVVNzQWVmd0tTbEpG?oc=5">SK Telecom rallies as South Korea drives AI data center push - CHOSUNBIZ</a> (2026-07-16)</li>
 <li><strong>SK Telecom</strong>: <a href="https://news.google.com/rss/articles/CBMigAFBVV95cUxQQUFHN0h3X3VYQmdiVldSaHlxdy02cFdmbHNhS1dIMVl2U0RBSW1Cd3c3YUpRRFpsSG9ZYUhxQVZxNEt5UVNFQUE1OElVV0RIOEo1VzBWQzJfMEt4RWZGR0dVSGFoNjVUc0VQWjBGTWQ0bWRCRWhWMmw4VTRlSlVSNdIBlAFBVV95cUxOc0VrOXVTX2dneTl2b2RnOVRKR3YyUFc4Zlk0SXNoWGZuc29VY1RhQk55RkFxcUxFZWhHMC02X0paWGFuQjdYZ2VZNFNFVTZBb2h0U05NVTFDamVqdENEWGJMcGNXUEcySFY3cUN2Mi03cktLNGhVNkFwdTl4RWF3bVplNGlrOEpZWXYwUldlUk8yVzNi?oc=5">Meritz Securities upgrades SK Telecom as Korea earnings and dividends rebound - CHOSUNBIZ</a> (2026-07-15)</li>
-<li><strong>SK Telecom</strong>: <a href="https://news.google.com/rss/articles/CBMidkFVX3lxTE50M3EyT0ZSODRjdkNjYTN5RGdnRzdWeWpVRXoyVHFoN0VpcC16TXRjTU94cmw5M3E5enBGbjZsUXZFeVVNdXF5RXpsdVpQSjBoX1Q1c3A2T09LeVlHOW82aFI1T2tNZ2hXdUVwVVRlbUtDRXJUckE?oc=5">SK Telecom, SK Biopharmaceuticals Use AI to Discover Cancer Drug Candidates, Slashing Research Time by 60%</a> (2026-07-15)</li>
+<li><strong>SK Telecom</strong>: <a href="https://news.google.com/rss/articles/CBMidkFVX3lxTE50M3EyT0ZSODRjdkNjYTN5RGdnRzdWeWpVRXoyVHFoN0VpcC16TXRjTU94cmw5M3E5enBGbjZsUXZFeVVNdXF5RXpsdVpQSjBoX1Q1c3A2T09LeVlHOW82aFI1T2tNZ2hXdUVwVVRlbUtDRXJUckE?oc=5">SK Telecom, SK Biopharmaceuticals Use AI to Discover Cancer Drug Candidates, Slashing Research Time by <span class="zahl"><span class="zahl-wert" data-wert="60" data-stellen="0">60</span>%</span></a> (2026-07-15)</li>
 <li><em>... und 28 weitere</em></li>
 <li><strong>Singtel</strong>: <a href="https://news.google.com/rss/articles/CBMixgFBVV95cUxPVmhidDRnZTNDYVpfbmtxMEZVZGFST2hWRk0zT2VaZllZQjJ0eHAyNXZNRmlwTFFfZzdGNkdQdlE2VEJUWmdFcHVPZGFWcjh6ckVOaUlWVFdpWmpJaWZoaENfVFVTd21HYlJJVnZMd1NkcWZmcldkSjU5cTdyb0NPZlR4Mktremk2Y3BTLWdDeHFzREt3UThkeldqMW1jWVdXSXhLWWlDZU83WUxjV3lTSFFmeTJXYUFvRVpfbHh6WDJjX3Q2Qmc?oc=5">Telco firm Singtel eyes data center expansion in the Philippines Singapore telecommunications giant Singtel reaffirms its commitment to expanding its investments in the Philippines. These investments involve artificial intelligence, cloud technologies and data</a> (2026-07-16)</li>
 <li><strong>Singtel</strong>: <a href="https://news.google.com/rss/articles/CBMitgFBVV95cUxPYTRELXg3eExGb05yUGh3UXdqRVdhbHkwTzluOHVaWHM3a1RWU2RUZXY4OXBjbll1ZWFtWHVseVBwaHhBTkk1NzViN1ZYSmFYbnNSWlgxTlFKTF9BR2kzVWg4dF9BQmRTM05LTktEX1dRYmpQbmJpWHBXc1FXbmh4NVFzYWtjNnVfZnZkMDhkSFU5OXR1VXV1UTFSMjhTRmxjMS1lSUlRbmlGU2dneG94Q0FEOFRyQdIBtgFBVV95cUxPYTRELXg3eExGb05yUGh3UXdqRVdhbHkwTzluOHVaWHM3a1RWU2RUZXY4OXBjbll1ZWFtWHVseVBwaHhBTkk1NzViN1ZYSmFYbnNSWlgxTlFKTF9BR2kzVWg4dF9BQmRTM05LTktEX1dRYmpQbmJpWHBXc1FXbmh4NVFzYWtjNnVfZnZkMDhkSFU5OXR1VXV1UTFSMjhTRmxjMS1lSUlRbmlGU2dneG94Q0FEOFRyQQ?oc=5">Singapore companies commit to invest in PH</a> (2026-07-16)</li>
@@ -700,7 +526,7 @@
 <li><strong>Telkomsel</strong>: <a href="https://news.google.com/rss/articles/CBMiWEFVX3lxTE9XU1pGemREMDZDdW1hSm02TmtfWTBPREpibUFob1JRMjB2SjBMc1Z3Y0dmXzlLY3BwRXJyRzRUR1BXaVc5eWx0aXVKU2YzeFJlMU02MXprWEM?oc=5">DBS crowned Southeast Asia's most valuable brand in Kantar BrandZ 2026 ranking</a> (2026-07-15)</li>
 <li><strong>Telkomsel</strong>: <a href="https://news.google.com/rss/articles/CBMiYEFVX3lxTE93dEZ4UlpPaHFkak1KWUU1QXFDVzVSQ2dCN201Um0xRVZyS0dhSjhGN3ozc1F5V290aFI4ZnphaXJ6eGJ4OVE4RTdEelVEckZkWFZxVHB3dFN0OW9IOTJWRQ?oc=5">Aek Sigarani Api - Henry Manullang &amp; Yanti Sitohang Vijay (EOlx2Y6cHh)</a> (2026-07-15)</li>
 <li><strong>Telkomsel</strong>: <a href="https://news.google.com/rss/articles/CBMiqgFBVV95cUxQdUFYdjljdXMwV19URDFBLXpqOWZ6ZlVObEdTanA5Q2lHVWlQUlYwYWNQZmF2WEYxY211OVczaUZUeDk0dDdIU0J0N1l1MTFrd0VJSExtTVRBYklhQ2M4Sm55TW9JNGhPVnNFV1g4enJNb1p4WHJYYlV2RmlMNGh5VzZPeVZadzBUVUVZTU0weUhEYUQ5WDdpc0NXemJ5T053MmxFRDNpMHBQUdIBqgFBVV95cUxQdUFYdjljdXMwV19URDFBLXpqOWZ6ZlVObEdTanA5Q2lHVWlQUlYwYWNQZmF2WEYxY211OVczaUZUeDk0dDdIU0J0N1l1MTFrd0VJSExtTVRBYklhQ2M4Sm55TW9JNGhPVnNFV1g4enJNb1p4WHJYYlV2RmlMNGh5VzZPeVZadzBUVUVZTU0weUhEYUQ5WDdpc0NXemJ5T053MmxFRDNpMHBQUQ?oc=5">5G Is Closing In, Why Pure 4G Phones Are Losing Appeal Fast</a> (2026-07-13)</li>
-<li><strong>Telkomsel</strong>: <a href="https://news.google.com/rss/articles/CBMiS0FVX3lxTE9IeGpxSnFlbk12UHA5eVIzempxNFI4aU5BYmdlcTZqYU9DdWZBN2UzYU5VV2RoRWtWNkh4QzNpanpIbGhFU1lTOVg2RdIBQkFVX3lxTE9FYkN4QTVKUXJWX091cFducXBFQ1ZPRkVvU040c3pBSU4zNmJhQ1dES0o2V19uclZENXZWR0RRT3hPUQ?oc=5">XLSMART Leads the Selection of 700 MHz Frequencies, Telkomsel is Superior in the 2.6 GHz Band</a> (2026-07-12)</li>
+<li><strong>Telkomsel</strong>: <a href="https://news.google.com/rss/articles/CBMiS0FVX3lxTE9IeGpxSnFlbk12UHA5eVIzempxNFI4aU5BYmdlcTZqYU9DdWZBN2UzYU5VV2RoRWtWNkh4QzNpanpIbGhFU1lTOVg2RdIBQkFVX3lxTE9FYkN4QTVKUXJWX091cFducXBFQ1ZPRkVvU040c3pBSU4zNmJhQ1dES0o2V19uclZENXZWR0RRT3hPUQ?oc=5">XLSMART Leads the Selection of <span class="zahl"><span class="zahl-wert" data-wert="700" data-stellen="0">700</span> MHz</span> Frequencies, Telkomsel is Superior in the 2.6 GHz Band</a> (2026-07-12)</li>
 <li><strong>Telkomsel</strong>: <a href="https://news.google.com/rss/articles/CBMihwFBVV95cUxPSjJBUHg2UEoyaXlMbGtVdGppaUVhby0xN0p1VFgtOExxX1ZSaEwxSHljR0NKNzNJUUNTX2JkSGVKU0hvRHJkOTZCRmZCOTBBbTQyemJ3ZWFkX2VmU1NINzBGME1fck9yYnNFalhZa1RGejhfNVVTSmRnYWpibXhjTWRIMWo4anM?oc=5">Telkomsel Updates 2026 Data Plans, Drops OMG Packages</a> (2026-07-10)</li>
 <li><strong>Telkomsel</strong>: <a href="https://news.google.com/rss/articles/CBMi8wFBVV95cUxQRDNtTjFEM1hISlFjZzhIQUVyd1c4bktFR3NGSUttUzAzS2p1amRYTDZWSHF1N0FqWUJMQ0ZPejVLMnFpdkdUbnlGMElMdG9iaXVGb3VEcEtPemRiZFVhVmxtLVotNTJ6NkRjcXpVMy00TDFOWEpHQWFrNlRRVF9paXdqQXZGTUxlM0kxSFVOX3lxYXFsbFRuTmxQLTl0VlFhemM4aUxQUjVadDhEMG9LNVNBQ1lpZWEzUXlGTjNscnZDTUVyZlNLaGh6MmJKNFhFQTdoY1VaSy1iYVRoSC1JTUJjSTBqQ1psc1N3X3lSUUN0bms?oc=5">Strengthening the Competitiveness of MSMEs, BCA Holds a Halal Certification Workshop in Kubu Raya</a> (2026-07-10)</li>
 <li><strong>Telkomsel</strong>: <a href="https://news.google.com/rss/articles/CBMiwwFBVV95cUxNbndzWFdSTkZvaDdkc003ZmNTSkYzQkFzLVR0eE82bXZ0RVdiaExvOFFycHZSellHaGxKTWxjS2NMT1dRUEpjX3huaXpwYzBXbXdDX3J5emg4QnhiOUJ4RWh1Tlc0ZjlIZWxGWWh5SEJkdWxNQnpKTmVRNkl3dVRHOWFQbElrd0JfWXJnOFZSSG91d2pSV2Nyc0xCUDhqcWQ0QWgzZ2xCeE5yT0lqV1ozWmh1SnNHTXo5Q0UxUVdWS0Q0TkU?oc=5">Dukung Produktivitas Kurir Logistik, Telkomsel dan SiCepat Hadirkan Paket Siap Antar</a> (2026-07-09)</li>
@@ -892,7 +718,7 @@
 <li><strong>Comcast</strong>: <a href="https://news.google.com/rss/articles/CBMif0FVX3lxTE9nTkc4WHdmS2RzUVZtVjRKa0FXcVhTa3dPT2RtMElPM3JwWGlrV05sWXlBRXNBU0RlVTNTSEcxNjNTNmV6SkIyOEJBLThtanlWSEpOYmIxNlJGTXM5U3lGOFVoY2dUbUVjemFjcl9xZnJZREQ0RnhuSmtHVmZkY2M?oc=5">Comcast Xfinity Settlement: How to File Claim in $117M Lawsuit</a> (2026-07-15)</li>
 <li><strong>Comcast</strong>: <a href="https://news.google.com/rss/articles/CBMilAFBVV95cUxNWExRMkZzVndJcUNlME0wZng4RFh4dTMzaDFZczM1bjlUTXdrUFAzWEVoU285aUpkUkEyNEIwZ3B2NXotTDhTMkpVenoyQWdiWDZGLXB0SlJiUWRpVkIwTlRiTTRJS0FvMGVVQVRGbjRsQ1N3eDVYVlB3V1BGY2ZXaW9pSEMtY3NJWnRfZHBNVW85SWR10gGoAUFVX3lxTE1pOW1tUVU4bEIzLUIzM1FLTU90eFlsd2RwSU5HRGh6LXVJYzdCeWR2S05ieTZ6WDM0aks5M1BvZktoTS1CVGxaSm1EMDRwVVFMdkFBYmdTTldyTzBZMWtMZ1d3UnN5dVJGaklLUVJkWHYxeGQ0WlJZSk5JUG1ROGhMdW0yRzFobFlHVnFRTVFIWFN2bGlFM0ZvNWYwR2ZEaWRiMkRVS0RaWg?oc=5">Comcast settlement could spell $10K for victims</a> (2026-07-15)</li>
 <li><strong>Comcast</strong>: <a href="https://news.google.com/rss/articles/CBMiUkFVX3lxTE1tWTRZLVJ5Yy1pTUFuYVRreW1HRk1ubGxzbkNLelNGaGxLSHBtdndDa052Szh3dzNVQ1p1QlpOcTlnQzVNQi1Pd3FId2JyVW16LUE?oc=5">symbol__ Stock Quote Price and Forecast</a> (2026-07-15)</li>
-<li><strong>Comcast</strong>: <a href="https://news.google.com/rss/articles/CBMinAFBVV95cUxOX3QzUjNHWDZtVTM4bVZjZUdrT1ljbThLZlpkdzZkcHFZdU1NT2VjcjRIb250OFVnbUlrbHVjZVlGV1lyMXZkWlRXaENXc0ZNOGFMM28xMlpnRzlpMklOQXdIUnZYSi1xVmZQbjA3YWdRNEVhN1JSTUN6cVlhZ0V5Zko5ekp4VTZzWkliVDNWNEtZcno5aDdVTV9HWDE?oc=5">Can Comcast (CMCSA) Regain Fair Value After Its 49% Slide?</a> (2026-07-15)</li>
+<li><strong>Comcast</strong>: <a href="https://news.google.com/rss/articles/CBMinAFBVV95cUxOX3QzUjNHWDZtVTM4bVZjZUdrT1ljbThLZlpkdzZkcHFZdU1NT2VjcjRIb250OFVnbUlrbHVjZVlGV1lyMXZkWlRXaENXc0ZNOGFMM28xMlpnRzlpMklOQXdIUnZYSi1xVmZQbjA3YWdRNEVhN1JSTUN6cVlhZ0V5Zko5ekp4VTZzWkliVDNWNEtZcno5aDdVTV9HWDE?oc=5">Can Comcast (CMCSA) Regain Fair Value After Its <span class="zahl"><span class="zahl-wert" data-wert="49" data-stellen="0">49</span>%</span> Slide?</a> (2026-07-15)</li>
 <li><em>... und 29 weitere</em></li>
 <li><strong>DISH Wireless</strong>: <a href="https://news.google.com/rss/articles/CBMinwFBVV95cUxNSFcxaWtXR0w1MG93eGNReVdmU083Z2l2S3RCWGM4b1JNU1pDMUZZNTV5VnVzT1ZEYk8ydDU1TWlwTDM2enZRWDdpZGFlX1oyZVhQZHh0RDRoazdtSngzaVlSTFl6dTJVQ0NLZ3JtZVF5WE84aENYNkIxMzJZWHZXZWw0V3hNaFBxcGE4MU5QbnRSN0RSajRkWEhqelJiWnM?oc=5">Dish Network files for bankruptcy after 45 years</a> (2026-07-15)</li>
 <li><strong>DISH Wireless</strong>: <a href="https://news.google.com/rss/articles/CBMingFBVV95cUxQMnRiaDFXTmJ5ZFNuVThEa0xkTnNGczNyYlQ5UHhkd3Juc2habXVleFJLSU83RE8xLTJ3ZnM1dXdsZndfM01JVGgxTEt1NHpvWWtXeXdDV1JtRmd0NldDVFlKeU41TlRMVmFNdjdJWmltbjlqSjZTVjVOZVE2SFBYaDZheDdOaWtyelh0Q001eWpobkp3WkkwclBVZWlWdw?oc=5">Judge Slows DISH Bankruptcy, Giving Tower Companies Time to Press Claims</a> (2026-07-14)</li>
@@ -908,7 +734,7 @@
 <li><strong>Rogers</strong>: <a href="https://news.google.com/rss/articles/CBMirAFBVV95cUxPRV9jclZDVktpTzhIMGNXdGhTOHJWM0xod3BnR01HdlIzVHlCaW5xNGVEM1BaX2U3VWFnMnl2TzdYVTV2M2lqTnBsbjV1TEZQWHRCeEk3TzdGdGVXUGE5bkZENnBCVlAzZGRhN0ZjQndGbV94YnRlT0VfcFByNzMzcGxrbW0tRWRzWF9GbHFEYmgwQlVjU1d2c2FoMF9tWG1WNFRFRU9jZzYzX2M20gGyAUFVX3lxTE1ERmt5dHJMVzRaSzJZYVY1a2tZd3hlQlNuLUNZOGIxOXBPWmVwOXAybDNNUUZERnpNbmVCTFZ4MkpDN3hobjdrb0pnOG0tZllKX0tjcXEtMVB6ekt1dkh5bmM3Y1JVMHdEM2RXZXN2bXAxM1JBVmF3bWJpLURScGN2TFdNWjgyek9PLTR2MGZzWF9FX0p1ZG53MXdBYWRjM29fd24yLWdhOVhzWWN0LVhYd3c?oc=5">Suspect arrested after swimming into ocean to evade Los Angeles police</a> (2026-07-16)</li>
 <li><strong>Rogers</strong>: <a href="https://news.google.com/rss/articles/CBMi3gFBVV95cUxQNHVjQWxYNm9EcEhub2wtZEdTclFKVTJnMW9GNmhYSkJYRmV1VC11YkhtRDJ5QlpSWGZzUnA2cDNPUHRKVmpvbGxSMnp0Y3pkTERkUjNpNFVmRlg5RDNjR2JzMl82azhkcGoxMmdOZEM0QVkxLTNiQTI5aTMySUpfLVNZWUhyUnFhanFQTk9iY0dERWRwSkxmREJReVVhckxRRTVKdkpBcmgxd0JsNUpoWnJSVV8xd0h4c2kxMXhTdkItX1NVUG42MnpnUmN0ekxNMHUxNmMySFZ5ZEEyRnc?oc=5">Abdul El-Sayed tops rivals with fundraising haul for Michigan Senate bid</a> (2026-07-16)</li>
 <li><strong>Rogers</strong>: <a href="https://news.google.com/rss/articles/CBMirAFBVV95cUxOQW11SkpyTTVNV2dMQTBaeXF0V2QzOU1kZFh5dTdybmotVjUzRlk4LU5yb1I5T1JydjdKaFJfZjBYSE5FZHFpUTJjY2E4OVVibFpCTWNoMTBZeWpxcHFfTzNMdjN6dl9VNG14N0xwVVk1TDhtOTVuVkpsYUkzTVlSV2l5ZkJtRXhlQ3ZMekViX2JnRWJDWElWRTdVYlByYVV5UnZUejRpNEFNMUFj0gGyAUFVX3lxTE96eGJXWVd6RW84cF9jd0ozODRDSkRielI1d29xMTBfY1BFSkJXNWtncjdLSDZLVmZubzIzTHQxdElBLVA1dmptRTBhSFFSUE9iRWUzSHp3ZkRUeHgzeENSejExbmYxc3ZHamxUQ001SmpUa3pJdzh1WnZlM2hmaFdUbkhRZ1RYc3U1WXVCaUJqcThmSlZKTzlmN0F5d1ljUlkwNjVpZVl5aVBwMkxqLWJoZGc?oc=5">Ex-Fed advisor gets over three years in prison for lying about China ties</a> (2026-07-16)</li>
-<li><strong>Rogers</strong>: <a href="https://news.google.com/rss/articles/CBMipAFBVV95cUxOMjdIbGpnM3pUbkdJbXY5bFhRdXRNcEtVRVNOUktmbTRjMHlQUXFTVWtmbDdoS00wUXFSQkZCeTZPU05MclZBLUhBczdBZV9waVdXcUlucXFvc0xENENTMHJwam9JSXlRUnBTRGhCQ2oyWXlpbWNoTUo4eUhnZC1adGlSWDlLQmRrVlhOQjkwNjhENU95cEdvYVRPSjlNVlZDN29OXw?oc=5">Mike Rogers’ Price Hikes Contributed to 27% Decline in Michigan ACA Enrollment</a> (2026-07-15)</li>
+<li><strong>Rogers</strong>: <a href="https://news.google.com/rss/articles/CBMipAFBVV95cUxOMjdIbGpnM3pUbkdJbXY5bFhRdXRNcEtVRVNOUktmbTRjMHlQUXFTVWtmbDdoS00wUXFSQkZCeTZPU05MclZBLUhBczdBZV9waVdXcUlucXFvc0xENENTMHJwam9JSXlRUnBTRGhCQ2oyWXlpbWNoTUo4eUhnZC1adGlSWDlLQmRrVlhOQjkwNjhENU95cEdvYVRPSjlNVlZDN29OXw?oc=5">Mike Rogers’ Price Hikes Contributed to <span class="zahl"><span class="zahl-wert" data-wert="27" data-stellen="0">27</span>%</span> Decline in Michigan ACA Enrollment</a> (2026-07-15)</li>
 <li><strong>Rogers</strong>: <a href="https://news.google.com/rss/articles/CBMizgFBVV95cUxNMHI1THp5RkQxWjRkU2NQbVl2N0J0VTY1SjZZWHlYSXlTcy05d2pyczZtUlJfRmdyam1vYUVNRGJnWUFlY3p5ZkJ1SnFGUFpfV2Z6VUJpOVlrWVN4Q0MyRXNNZ1kxYjcyZjFGdkZac2gySTh6VXRxWl8yWG5NLTNWa3pocDhPeWxkNHNoX2xESk5NQnJWX21mQm01SGloRGpDQjBPZGEwWTRwRmJiQzIwM3AwNzNDcFNXZTQzZGlOaXpDYVRKcUFJdFpwc1RBQQ?oc=5">‘They failed my son’: Sebastian Rogers’ dad sues sheriff, state agency over Tennessee teen’s disappearance</a> (2026-07-15)</li>
 <li><strong>Rogers</strong>: <a href="https://news.google.com/rss/articles/CBMi2AFBVV95cUxNZXhEQS1yYWYwLTZRVkZoeDFid0hpM29VazVBYVVtTGprUUdUeC1GTUVYeWhKOEk3ZnJvS3VHdkVxaDV1cVlaWWpuVmVVTWZtbThyTHlzbUsycVdrWko2Vmw0SFZUZjhzaWJtbUV5a1BUNUtzYXJpRUtsZ0dDM0lqd2MwVjZ3RktRWW1NcWVOdVl2Sm50REUxV1ZEeTdEbGVkYTc3VUJyMS1pU0ZvRlB1Ujhqc1VOTEl6TTVGOHNicFJZSE9oNk5WSDdfZ3B0RjRNa2lEek9hd3Y?oc=5">Purcellville hires Michael Rogers as interim town manager</a> (2026-07-15)</li>
 <li><strong>Rogers</strong>: <a href="https://news.google.com/rss/articles/CBMiqAFBVV95cUxQTmNXelprT1RTaG50Ri1mUFZhcURaOUh6OExnell3TEVSZk1RZmRuNzhXbmVsdmVSOEQ2WV9OMUoxdVdwVTVlclF3dW5WNHlwWDAxM1dxa256SERSUG1yRXJwTUktNWZBTksxMEZuQ1BYci1IRjB2ZU5mZVN1cm5aV2VRdnFIelhhVnVxcDktMnRiVy15SGc0NE5ScFpjd2psR2tIcTE2T1I?oc=5">Ira Clayborn Rogers</a> (2026-07-15)</li>
@@ -928,7 +754,7 @@
 <li><strong>Telus</strong>: <a href="https://news.google.com/rss/articles/CBMiuAFBVV95cUxQQWZuRVRHYzRjZkkzT3lzWHdMM0NENzhsbG1pdGE1SGxsajBaQ2diS3ZWbkUyYmJ4eDlFSENoTXFNbHhGNVNITWduTHJMaTk2b3U1TlNjNlhpS1I3QUxfV1lwajhvVXBrUTlqc200WFdkandVdGxXZmhOZTcya3I5ZW1fUHVEM2x3V0huUk55NHBNcEtpVGJDTDlvc3IyQTFUdmlkNjloVUN3U0x2ZUhsMWpvYjZqajNh?oc=5">Barclays Issues Pessimistic Forecast for TELUS (TSE:T) Stock Price</a> (2026-07-16)</li>
 <li><strong>Telus</strong>: <a href="https://news.google.com/rss/articles/CBMiugFBVV95cUxPZUNZaEYwUWlPejM2S253a3N4ZG96NE5hOU13Um80NjNvSHdzbTNSbklHNV94WnRoOTlTQjA4dlRya2szY3VGSk9LSzBBcF8taXpydjh2SHl4MFhlRkFyUlRPWlJTam9zY2Y1UGwzV2szSXdxa25CX2czYmk2c2hyclJiLTlOZno2cEFUa3N5WWlFWHJ5VlZUeGRFZnM4Q2dwZEFHWkdCVDREQWZESEtFLXYyaE5BVVpyYVE?oc=5">TELUS (TSE:T) Given a C$18.50 Price Target at Raymond James Financial</a> (2026-07-16)</li>
 <li><strong>Telus</strong>: <a href="https://news.google.com/rss/articles/CBMixwFBVV95cUxQX2ljOWxyOWdENlp5R0xRMzJqaVdGSjh6d3JfZ05fWE8yQ0MtMUZmaDR5ekplU0JEZ3RwQUdJVmxOLTNzRjNUSVBLVUVleWZSQmt4b2NuaFhCSFBjQk5yX2JoWE5HWnhzUTdKRTF4Ymg0ZDhzamhmeWVkMWFNUGhsVEJQMUlDM25zM2FEbTdfR1ZVRy1fUTBtVHhGbnpHbDVrZXMxSEFBRWRHS2diUGY5eUVPdzBxQlZlNFJMaXc4NUk4UjVGZk1J?oc=5">Telus proposing to build three new data centres in British Columbia</a> (2026-07-16)</li>
-<li><strong>Telus</strong>: <a href="https://news.google.com/rss/articles/CBMid0FVX3lxTE50SkpCT1FqdFFqTzdzNDdGVzZGcFNELVhva3BWZnAzLThwMmM5TEdyZjdGd1c0TmF6YzFiS29nc3BmSGRpblJWa1ZyVDNIcWtVVExGYTNBWVBQeWVCNW9acUNUUGFlcGRTdEx3MXVER3pJRFlFa3Fn?oc=5">Flooding damage closes Telus World of Science for months, 68% of staff laid off</a> (2026-07-16)</li>
+<li><strong>Telus</strong>: <a href="https://news.google.com/rss/articles/CBMid0FVX3lxTE50SkpCT1FqdFFqTzdzNDdGVzZGcFNELVhva3BWZnAzLThwMmM5TEdyZjdGd1c0TmF6YzFiS29nc3BmSGRpblJWa1ZyVDNIcWtVVExGYTNBWVBQeWVCNW9acUNUUGFlcGRTdEx3MXVER3pJRFlFa3Fn?oc=5">Flooding damage closes Telus World of Science for months, <span class="zahl"><span class="zahl-wert" data-wert="68" data-stellen="0">68</span>%</span> of staff laid off</a> (2026-07-16)</li>
 <li><strong>Telus</strong>: <a href="https://news.google.com/rss/articles/CBMilwFBVV95cUxQZWRhRF9DdkVYWm1FaEdTNklEcGcyNk5rM2FzVThqRDhBNUh3S0p1VHBRRW02TUh2X1BoUVhLSG5sejl5TjZHSm1UR3FSUjRwYlh6dnc1VktGNDdidkdDSkIwRFhVZm8yQ05ISnVXaEkzNG4xc3dmeXNkN1ZBc2pSZjV2TnVKZ2ttQzd1UHh4aGZfMmpQTmRv?oc=5">All It Takes Is $3,000 in Telus to Generate Hundreds in Passive Income</a> (2026-07-16)</li>
 <li><strong>Telus</strong>: <a href="https://news.google.com/rss/articles/CBMixgFBVV95cUxNTkZteHRpaUxoY2p5RGoybGlEekQzX0NsT1R0d3dCMC0ycFJtdzZpZ2RjaG1VZTFOQ3RYZVdFR2pTNDR4VFpUbXRjWGV0cFIxQXFJUjBWWHRWM3lzZ3I4T19tcDhhb1ItZkxmTmVuTHVxMDkxVjlodXQ1Q1gzODNfbEs1d2I1Nm44Zk9XOGp5eThkamRiazF2bm5LbUdkSnpQWUYzVTE0dlh3eXBVcFZUMFBCMGNma25felNUSC0yalRnbnJsX1HSAcYBQVVfeXFMTU5GbXh0aWlMaGNqeURqMmxpRHpEM19DbE9UdHd3QjAtMnBSbXc2aWdkY2htVWUxTkN0WGVXRUdqUzQ0eFRaVG10Y1hldHBSMUFxSVIwVlh0VjN5c2dyOE9fbXA4YW9SLWZMZk5lbkx1cTA5MVY5aHV0NUNYMzgzX2xLNXdiNTZuOGZPVzhqeXk4ZGpkYmsxdm5uS21HZEp6UFlGM1UxNHZYd3lwVXBWVDBQQjBjZmtuX3pTVEgtMmpUZ25ybF9R?oc=5">TELUS' Role In New AI Governance Consortium Might Change The Case For Investing In TELUS (TSX:T)</a> (2026-07-15)</li>
 <li><strong>Telus</strong>: <a href="https://news.google.com/rss/articles/CBMirAFBVV95cUxOV2tUMEdVa2lONE9vU2ZWbTA1SnYxUVdraEN2MmN4YnhiV0RrUW9NQk1uZkRlYS1sT1l2bi1FVm1ONEdlRkxHYzhuVHFvSXp1UTNla3BldGFTellOcTRKY2Jka2ExQzJUN0pxSVF2M1M4Ny1FblhBODBLRVlJQU1UbzEtTUNLaTkwWENabzhrTEVoZTBZT2UwZUJsYmF0Y2MwdzNpdEdETTRUTWI0?oc=5">Flooding damage closes Telus World of Science for months, staff laid off</a> (2026-07-15)</li>
@@ -1002,7 +828,7 @@
 <li><strong>TPG Telecom</strong>: <a href="https://news.google.com/rss/articles/CBMimgFBVV95cUxNUlN3UklmMVREQktuUG1fTDhJQVB3S3NzeUlnQ1dkLVpmX2pSazFwMjdfWnlXVWszblRTOGdUZ3p3NWdwbXVSbTVPY0ZhZUstVVI0MDdlbkVKUW9zOXY5VC0yWEVlOEpRVEF2eE1RQmhtSGpmZ3prcUd6NmV5ZHRMREhLSE5SS2M5MkswWGx1UHNyS1lJLXBRVTdn?oc=5">Why Is TPG a Top Communication Stock to Watch?</a> (2026-07-15)</li>
 <li><strong>TPG Telecom</strong>: <a href="https://news.google.com/rss/articles/CBMisgFBVV95cUxNU19oRENmZDVLTzN4dXR1T3RzeDhoSHE1SDhocVF6QjZHMjVLSi1Ga0hrOVJTSmZubnA1bWxZVTI0Qm1XeWpXZzhfVmFIQk1SM3BfMUNZcHM4R3l6Z1RuNkR4c3JTdnV3cjE1Si1WMUdzR3pjQ2pWNGpCMU5mSU0wV3hkckZYRGF4ZFh6Q1ZhSFk0Y1QybFRzYXpKdTFpekE5azdoNUdKczl5MEowNUQydGR3?oc=5">Best ASX Communication Stocks: Is TPG Leading the Network Debate?</a> (2026-07-15)</li>
 <li><strong>TPG Telecom</strong>: <a href="https://news.google.com/rss/articles/CBMipgFBVV95cUxQN2VUWWNPT3Y1ZF9RM2x1QnFGV25GeUdvMWlEVjdoaWYtU2UxQm9QV0JvdVNNalZiRE16ZHFqenhjZHhRQ0cyWnNLZnV5aE1SNWhBWjR3UG80YVZnWDFBdDdJT0FReUFCc1BZTl9JR29rNVZOTWwxZTRhS2JoVi14dE1wNXg5Wm1kRFlKckQydWFlS3p5ODh4WjFhYlFIRTF4TU0tLVFR?oc=5">TPG Telecom Mobile Growth Steadies ASX Telco Sentiment</a> (2026-07-14)</li>
-<li><strong>TPG Telecom</strong>: <a href="https://news.google.com/rss/articles/CBMiuAFBVV95cUxNb2V1eWxBZW5XcEVzZl9XdTlNeG1EVWN2OEJqVVFaRzdnbFBpWjhPemRvVFpEc2U3WnhIUWxZTFFUWTNlNEdsemVsVkI5cFRxZnk5TkxnQWZKcUF2V09IcTVwajJ2WWcxV3p5UHkySHRqQzNfVUdWTTF2WU5HdjE4OTNnckc1NjdaMVFLMlQ2YkgyanpjOEVCZFdkTGc1X0Z1TTNHWEpFeE1KYzZxei02dTltZUNyUEpt?oc=5">TPG Telecom Price Target Cut 9% to A$4.00/Share by Morgans</a> (2026-07-14)</li>
+<li><strong>TPG Telecom</strong>: <a href="https://news.google.com/rss/articles/CBMiuAFBVV95cUxNb2V1eWxBZW5XcEVzZl9XdTlNeG1EVWN2OEJqVVFaRzdnbFBpWjhPemRvVFpEc2U3WnhIUWxZTFFUWTNlNEdsemVsVkI5cFRxZnk5TkxnQWZKcUF2V09IcTVwajJ2WWcxV3p5UHkySHRqQzNfVUdWTTF2WU5HdjE4OTNnckc1NjdaMVFLMlQ2YkgyanpjOEVCZFdkTGc1X0Z1TTNHWEpFeE1KYzZxei02dTltZUNyUEpt?oc=5">TPG Telecom Price Target Cut <span class="zahl"><span class="zahl-wert" data-wert="9" data-stellen="0">9</span>%</span> to A$4.00/Share by Morgans</a> (2026-07-14)</li>
 <li><strong>TPG Telecom</strong>: <a href="https://news.google.com/rss/articles/CBMicEFVX3lxTE5OMzY4TTNoREpKZDVUaE9EVGlpcDhCOEdha21ZQ09ITm1TNVFsNW1UdEJnVHVtT3JxYlloVUV6aWxQZnVzcU1TQ2pwb242WU1faGp0T0RlcVNONHdmNnlsRzYyTmdZczQ1SzFmSHFfdm0?oc=5">TPG Options Volatility — ASX:TPG</a> (2026-07-13)</li>
 <li><strong>TPG Telecom</strong>: <a href="https://news.google.com/rss/articles/CBMipAFBVV95cUxOSTdnejFYaWZZZldsUmtldDd0QXZLTXZ5dWlqVXBfMjFxT19yR2dCWkpJcENyTTU1N2lKSGp0MnRjUHpoNHVNQW5pc2syWFRFbnRHMlROelFyYUU0bTM5YkxiRDdGZERwU05jcFBtZWpsQzlrR0IxamZVY3RxZ19JVTVSU3B2V2EyQ1otNzhORTIyS19idmlFZ1V3VFFFM1NveFNxUA?oc=5">TPG Telecom (ASX:TPG) Wins Moose Mobile in Budget Battle</a> (2026-07-13)</li>
 <li><em>... und 3 weitere</em></li>
@@ -1030,7 +856,7 @@
 <li><strong>América Móvil</strong>: <a href="https://news.google.com/rss/articles/CBMi1gFBVV95cUxPdU5fVUVCZTB4bnJHVTVXSGdVWUJ6N2g0Z0xHYTRqV3JNaFhIbXhJQ2hkcFR0U1VXOUVnN0xjOWxSd3RFVW14Q3N1dkNvWW1tcmQwR19famlIWHZxNVV2Z09iU092ajlrY2stY2VOa0NOZWlYZ3NvZmF1bVJnSDB5NmVQVS1fZ1ZfMU0zSmdEekQzQXlJQ1hneGNqS1E5TzMyMUJVUXhmX1phZDJjWVNtN2JNZUJuZ242NWl3eVQ1UXJBcDNFci1iSmptRmY3YXpMc3dXbWhn0gHbAUFVX3lxTE9tYm5FWDFfS0NNT3FsWFBSdkhvdXpnd1ZxQ0FWbDBVT3ByUm9aNjBtNVlHYkZSZVhheTRTNURXQUozUHBYUDBsQmxMYmVuRkp0RFBEN0U4OHZmelZuUWZTQnNxMGxHSGdILXRCcW5WeTZGQXl0eUhtelJ4ZV9hWDBDcW1pWGpVVmJ1VTlrVVFfMGkxSFZ1QktJMlZ1SkZiRHo5UEQ1NzZoSHY2ZzIwdE1oYmlmaklUcHplRmhldXd6VnBuSm1TTy1Ya3paTWFUZWx4UjEycG1iSmlnWQ?oc=5">América Móvil, S.A.B. de C.V. (BMV:AMXB) Looks Like A Good Stock, And It's Going Ex-Dividend Soon</a> (2026-07-09)</li>
 <li><strong>Entel</strong>: <a href="https://news.google.com/rss/articles/CBMiqgFBVV95cUxPNDFEVGNCNkdKanQ5WVR0MHhqc0k5aEVLS3lBVjFKVEpEVENLMm1aWi1ETnMxM19nbFQ3MlJXdENpNVliWkFDc1FjYnZ5MHlJVF94UVQtVjE0QmtDU2M2U3c1V1dHOTh5bFhRUloxQkNjS0RmMVNic09mZXYxN252T3FRNUZCQ0VFR0swQThta19HR3N0T183VTl6QXVaQ1NQTGI1YktVeGxoQQ?oc=5">Chile storm knocks out 284 antennas, triggers emergency measures</a> (2026-07-16)</li>
 <li><strong>Entel</strong>: <a href="https://news.google.com/rss/articles/CBMihwFBVV95cUxPX3NoaWd3MndGRnl1RDV1Z2hudF9QRDA1X1haVmIxRUs2aGRheExucmFGX3pGTFhmM2NrZTdlMWFaSHhzazF4TTNhS21PR2F6OWR2bFI2V082TjdrclYzc2x6TTFLRGpNYzFNU2c2QmdFZ3U1REpnWGt5bTdfLXRNbEp4YWlmSFU?oc=5">Beatles Museum is almost ready for its St. Pete debut</a> (2026-07-15)</li>
-<li><strong>Entel</strong>: <a href="https://news.google.com/rss/articles/CBMijAFBVV95cUxPSFBFMzBYVjVVbFZQZVJkZDZjZXM4VmJNakVVRW02eUJiSFU4OXJGUHNnazQzYVBTaGw0UVZHclhxMERwNmF0TEplel94OGoyTFNwMnRHQ21hMFdJQzJtaTIyLUFWcUdzYV9ZalRLMVFIbXkyZkl4N2RQZnoxNU90SmI2Qy1POFNFZ01ZUg?oc=5">Peruvians port 3.1 mln lines in H1, down 12%</a> (2026-07-13)</li>
+<li><strong>Entel</strong>: <a href="https://news.google.com/rss/articles/CBMijAFBVV95cUxPSFBFMzBYVjVVbFZQZVJkZDZjZXM4VmJNakVVRW02eUJiSFU4OXJGUHNnazQzYVBTaGw0UVZHclhxMERwNmF0TEplel94OGoyTFNwMnRHQ21hMFdJQzJtaTIyLUFWcUdzYV9ZalRLMVFIbXkyZkl4N2RQZnoxNU90SmI2Qy1POFNFZ01ZUg?oc=5">Peruvians port 3.1 mln lines in H1, down <span class="zahl"><span class="zahl-wert" data-wert="12" data-stellen="0">12</span>%</span></a> (2026-07-13)</li>
 <li><strong>Entel</strong>: <a href="https://news.google.com/rss/articles/CBMiywFBVV95cUxQTWg4MWp1cGNrWW5BdmpVeElRcjlwbGQ5NlJpUVVZUEVRODBxVHYtaTVXa3I0dHlydm5MTVFMTEFPN2p0dDYtU29PdmFteGVCdldZeFhjdHhUa1ZjaVN1UEhmQXNUQ2FBcHFyT1AybmNEaGt3eTFKbEVKZTFLR3hIenJMRldxWHJSbmpGdTRDRVp2Nkl1TFdnTWo2M3ZfRFVfdHp1WmdPNEIwcTVEMW5SQ2lxWGNyUU90ZmVkWG82WktabGRSUDRYQmFkRQ?oc=5">Tampa Bay locals share their Rowdies, Beatles and glass art collections</a> (2026-07-10)</li>
 <li><strong>Millicom</strong>: <a href="https://news.google.com/rss/articles/CBMi1AFBVV95cUxNUGQxaHRpYlhPX05wRjNKdDlEbmd2QThhdjlDWnlySGF6R3ZLcldtTDRKam45blUzTlhZejVDcFNyR3FwZ2JCVHZYcjROdXhXSWVCOTl3Wnd2enVqWWF0dVkwY2RJSThqQWdZclVJLUJFdmUtNnZLSFRUTUFwTDB1a2NJSWppemFwalg2WEZlMjd3MFlPdEhoei1ndjNLd29lTjloX1AtVFVuM1Z5LVRLdE14amN1amd6bEZSaHo3dkRaMGVHc0dFWlNseUh6Q21MbVd4bQ?oc=5">Millicom International Cellular (NASDAQ:TIGO) Price Target Raised to $100.00 at UBS Group</a> (2026-07-16)</li>
 <li><strong>Millicom</strong>: <a href="https://news.google.com/rss/articles/CBMiygFBVV95cUxPY1lKNDV6WE9QNDNiM1BWUDJSWUZEX0ZVLUkzVGhaQmhEaHZrSXlROEg0cERYVDNLZGk5NzZOd2dSaHhFaUVVamR2VHF0cDg3MXVNTzJMR2lVMUJMaXV5T0JBb2VCY2pXbkpaMmtwOFFDcWJvOW9IT3BCbkdNa1dpSktsZEVnaDU4ay1oa1F1bGdPTW1vYVptTWFGNGpfUkZ5bERmVjVkcWJiNlhHem01cnp6MXhBS1pKeTZRek5rdTB2VFVvZk82ZTVB?oc=5">Millicom stock reflects its telecom footprint and Latin American growth ambitions</a> (2026-07-16)</li>
@@ -1087,28 +913,110 @@
 <li><strong>Telecoms Tech News</strong>: <a href="https://www.telecomstechnews.com/news/viasat-and-bmw-test-first-integrated-satellite-voice-call/">Viasat and BMW test first integrated satellite voice call</a> (2026-07-16)</li>
 <li><strong>Telecoms Tech News</strong>: <a href="https://www.telecomstechnews.com/news/russia-fsb-center-16-exploits-vulnerable-routers-with-snmp/">Russia’s FSB Center 16 exploits vulnerable routers with SNMP</a> (2026-07-15)</li>
 <li><strong>Telecoms Tech News</strong>: <a href="https://www.telecomstechnews.com/news/us-leads-internet-outage-preparedness-ranking/">US leads internet outage preparedness ranking</a> (2026-07-13)</li>
-</ul></article>
+</ul>
+      
+      <div class="rubrik"><h3>Was wichtig ist</h3></div>
+      <ol class="wichtig-liste">
+        
+        <li class="wichtig-zeile">
+          <a href="https://news.google.com/rss/articles/CBMixgFBVV95cUxOcGZMcHlyR0xSWWV6R2Iyb1hKck1YT3ltOF9yZkJZREdWbE91dl9LcHBiNkVSbVlEUjVFYlhmejFTajZFaFFGbkFFQU1DTy0xa19IRjdteVNaMmFWSmJPbzVlLXZCaUZoVk5jbmpfamlXR2dYSTk1Yzl1TW02MkJRbXJjRGJzMGpfbFhBSEtYdWhPc3NSOWdrRFhJd2NQTk9UTGVTbzEwdHlrbjQ0NGVoalN0T0RoMHNmakFYbDV6OFRVNWpNblE?oc=5" target="_blank" rel="noopener">
+            <span class="wichtig-kicker">SK Telecom</span>
+            <span class="wichtig-titel szl">SK Telecom AI-RAN Pilot Goes Live as Nokia Targets Double Spectrum Capacity</span>
+          </a>
+          
+
+
+          
+        </li>
+        
+        <li class="wichtig-zeile">
+          <a href="https://news.google.com/rss/articles/CBMizAFBVV95cUxQQXNfdmdPck1YQ2M2bVZma2tYTkx2YWJlZ3c2UmJXX2U2ZW1wUnBPVURKenJrSHlXUWJUVmtRN3RVcjhGeTZkWEY0VXJhckZZa2tIN0Z5WlhHaDJFbXM4LWlVXzVRckFod1BFMENMV2YzRkhsNmthX3ZIRW1JcDFNRW0tWlNWQkJpTkZXZnlBOFZKUG1ydEZsb0xRNmkzTVN1eTgtR3VKMFoyRXI0ZFlmZ0taM1VWVFJrZ2c5eVhIb2hXTVIyRFlqZFhGWWI?oc=5" target="_blank" rel="noopener">
+            <span class="wichtig-kicker">Indosat Ooredoo Hutchison</span>
+            <span class="wichtig-titel szl">Nokia and NVIDIA Launch First GPU-Based AI-RAN, Targeting Double Spectrum Capacity</span>
+          </a>
+          
+
+
+          
+        </li>
+        
+        <li class="wichtig-zeile">
+          <a href="https://news.google.com/rss/articles/CBMiigFBVV95cUxQdnJ5bHlvR0dPZFZBaHZPaVBlaHFFVW9HWTQ2aF9za0ZtTXJyTXJIdE54SUF2eXNwVUFOV29jOWZVUnI2eGNSX01BeExYclQ3Vl9kUmRscTdWaExlZWR4U0IzSVZDejl2aXJMd01VVjZNV1R2Y2tRR3dlRzI5Y1g3d3lVakNSVERQa0E?oc=5" target="_blank" rel="noopener">
+            <span class="wichtig-kicker">CelcomDigi</span>
+            <span class="wichtig-titel szl">CelcomDigi Brings Network-Level ID Checks to Social Apps</span>
+          </a>
+          
+
+
+          
+        </li>
+        
+        <li class="wichtig-zeile">
+          <a href="https://news.google.com/rss/articles/CBMie0FVX3lxTE1fZTNyeEwxV0xhajBlbFRtUTdmYnNVZ0J3eGltOFJTa2ZYWUNwWWZZSUJTR1l4RUZvSjhtc3FrLS10N2pvTzRILXdhMVlTNmFfRy13RTlZcUhrQ1g4d1FpNWV1ZDVPZkJUUUxZRlBkSHVvQktCNC1oYUhXaw?oc=5" target="_blank" rel="noopener">
+            <span class="wichtig-kicker">SoftBank</span>
+            <span class="wichtig-titel szl">SoftBank&#39;s OpenAI patching service targets 3,000 firms</span>
+          </a>
+          
+
+
+          
+        </li>
+        
+        <li class="wichtig-zeile">
+          <a href="https://www.rcrwireless.com/20260716/carriers/deutsche-telekom-ai-apis" target="_blank" rel="noopener">
+            <span class="wichtig-kicker">Deutsche Telekom</span>
+            <span class="wichtig-titel szl">The Agentic Network — Deutsche Telekom on APIs for trusted AI</span>
+          </a>
+          
+
+
+          
+        </li>
+        
+        <li class="wichtig-zeile">
+          <a href="https://news.google.com/rss/articles/CBMiekFVX3lxTE1vMm0zMk5BbEVrUnRveldlMGJZZ3NxVzYtS19jN3RNVDlBeE5HODJRc19kMXZiM0xMcXJ2TXQzRXhKbUFrczl1VExKdjZHSV9xQXJSZGVwZmJqTjBwN0tKNGgwOHQxTjZlSEhraDdXWEt4WFNvRUs4TDRn?oc=5" target="_blank" rel="noopener">
+            <span class="wichtig-kicker">Deutsche Telekom</span>
+            <span class="wichtig-titel szl">The Agentic Network — Deutsche Telekom on APIs for trusted AI</span>
+          </a>
+          
+
+
+          
+        </li>
+        
+        <li class="wichtig-zeile">
+          <a href="https://news.google.com/rss/articles/CBMi8wFBVV95cUxPRGRRMkhWYkZYT2NmQkZVVkRNdGdHa2xsdVdENWRQV0MzaDlucXVxdEp5M1RzMzVOZHg0LVh2UjZEYjFxVWduTjV4MGxOZWoxVDU2TDlLVEtERmRVN0t2V0taM3FmWTVmN2h4Ujl5MU82Wmd0eTIzUlVQM3h3cHVxeGFNS3VRS2k4elkwRXR1NjF6TXNhMUJRMXhxWnJPNHdLaVEwQ0NDc245YWVRcFVwUFlxb2F2bkI1bm1wNHZ2LTQ2cWNUeVdGWGdVcjhaYmMyTUtUT29pOEZhOWlGZ2wxeFVnRXZYNkhWWnBPNGxPcHFSVU0?oc=5" target="_blank" rel="noopener">
+            <span class="wichtig-kicker">Iliad</span>
+            <span class="wichtig-titel szl">EU Commission refers proposed acquisition of certain assets of SFR by Iliad to France</span>
+          </a>
+          
+
+
+          
+        </li>
+        
+      </ol>
+      <p class="ex-count">
+        <a href="#alle-meldungen" class="source-link">alle 90 Meldungen &darr;</a>
+        
+      </p>
+      
     </div>
-    
-    
-    
-    <p class="folienlink"><a href="../folien/2026-07-16.html">
-      Diese Ausgabe als Foliensatz</a> <span>4 Folien, für den Montagstermin</span></p>
-    
-  </div>
+  </section>
+
+  
+  
+
+  
+
+  
+  <p class="folienlink"><a href="../folien/2026-07-16.html">
+    Diese Ausgabe als Foliensatz</a> <span>4 Folien, für den Montagstermin</span></p>
   
 </div>
 
 
-<section id="deutschland-fokus" style="scroll-margin-top:24px">
-
-</section>
-
-
-
-
 <details class="evidence" id="alle-meldungen">
-  
   <summary><span>Alle 90 Meldungen dieser Woche</span></summary>
   <div class="evidence-body">
     
@@ -1135,7 +1043,7 @@
   </main>
   <footer class="foot">
     <div class="foot-inner">
-      Vodafone Product and Services Insights &middot; Marktrecherche &middot; automatisch erstellt, jede Aussage mit Quelle
+      <span>Vodafone Product and Services Insights &middot; automatisch erstellt, jede Aussage mit Quelle</span>
       
       
       
@@ -1145,6 +1053,9 @@
       </span>
       
     </div>
+    <p class="foot-bildnachweis">Bilder: generiert für dieses Portal. Campus-Motiv nach einer Vorlage von
+      <a href="https://commons.wikimedia.org/wiki/File:Vodafone-Campus_D%C3%BCsseldorf.jpg" target="_blank" rel="noopener">Wikimedia Commons</a>.
+      Schrift: Instrument Sans (SIL Open Font License).</p>
   </footer>
   <script src="../app.js"></script>
 </body>

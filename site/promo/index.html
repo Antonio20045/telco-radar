@@ -1,67 +1,93 @@
 
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" class="ohne-js">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Promo Übersicht · Wer wirbt gerade womit</title>
   <meta name="robots" content="noindex">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   
-  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400;1,8..60,600&family=Libre+Franklin:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="preload" href="../static/schrift/instrument-sans.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="../style.css">
   <link rel="icon" type="image/png" href="../logo.png">
 </head>
-<body class="uc-promo">
+
+<body class="uc-promo seite-promo_uebersicht mit-buehne">
+  <a class="sprungmarke" href="#inhalt">Zum Inhalt</a>
   
-  <header class="topbar">
-    <div class="topbar-inner">
+  <header class="topbar kopf" id="kopf">
+    <div class="topbar-inner kopf-inner">
       <a class="brand" href="../index.html" aria-label="Vodafone Product and Services Insights">
         <span class="brand-logo-wrap"><img class="brand-logo" src="../logo.png" alt="" width="15" height="15"></span>
         <span class="brand-name">Vodafone <span class="brand-zusatz">Product and Services</span> <em>Insights</em></span>
       </a>
-      <div class="topbar-right">
-        <nav class="usecases" aria-label="Anwendungsfälle">
-          <a class="uc " href="../index.html">Marktrecherche</a>
-          <a class="uc active" href="../promo/index.html">Promo Übersicht</a>
-        </nav>
+      <nav class="subbar subnav navi" aria-label="Marktrecherche">
+        <a href="../index.html" >Diese Woche</a>
+        <a href="../meldungen.html" >Meldungen</a>
+        <a href="../wettbewerb.html" >Wettbewerb</a>
+        
+        
+        <a href="../geraete.html" >Geräte</a>
+        
+        <a href="../promo/index.html" class="on" aria-current="page">Promo</a>
+        <a href="../transparenz.html" >Quellen</a>
+      </nav>
+      <div class="topbar-right kopf-rechts">
         
         
         <form class="gsearch" id="gsearch" role="search" action="../suche.html" autocomplete="off">
+          <svg class="gsearch-lupe" viewBox="0 0 20 20" width="15" height="15" fill="none" aria-hidden="true">
+            <circle cx="9" cy="9" r="6.2" stroke="currentColor" stroke-width="1.7"/>
+            <line x1="13.6" y1="13.6" x2="18" y2="18" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+          </svg>
           <input type="search" id="gsearch-input" name="q" class="gsearch-input" autocomplete="off"
-                 placeholder="Im Archiv suchen …"
+                 placeholder="Suchen"
                  aria-label="Marktrecherche durchsuchen">
-          <button type="submit" class="gsearch-btn" aria-label="Suchen">
-            <svg viewBox="0 0 20 20" width="14" height="14" fill="none" aria-hidden="true">
-              <circle cx="9" cy="9" r="6.2" stroke="currentColor" stroke-width="1.8"/>
-              <line x1="13.6" y1="13.6" x2="18" y2="18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-            </svg>
-          </button>
+          <kbd class="gsearch-taste" aria-hidden="true">⌘K</kbd>
+          <button type="submit" class="gsearch-btn" aria-label="Suchen"><span aria-hidden="true">→</span></button>
         </form>
+        
+        
+        
+        <a class="kopf-newsletter" href="../newsletter.html">Newsletter</a>
         
       </div>
     </div>
-    
-    
-    <nav class="subbar subnav" aria-label="Promo Übersicht">
-      <a href="../promo/index.html" class="on">Übersicht</a>
-      <a href="../promo/quellen.html" >Quellen</a>
-    </nav>
-    
   </header>
-  <main>
+  <main id="inhalt">
+    
+<section class="band">
+  <div class="band-bild" aria-hidden="true"><img class="motiv band-motiv" src="../static/bilder/band-promo.jpg" alt=""
+     width="2400" height="1029" decoding="async" loading="eager"></div>
+  <div class="band-inhalt">
+    <div class="band-text">
+      <p class="band-kicker">Deutschland · Aktionen der Wettbewerber</p>
+      <h1 class="band-titel">Promo</h1>
+      <p class="band-stand">Stand 9. Oktober 2026</p>
+    </div>
+    <div class="band-extra">
+<nav class="umschalter" aria-label="Ansicht">
+  
+  <a href="../promo/index.html" class="on" aria-current="page">Aktionen</a>
+  
+  <a href="../promo/quellen.html" >Quellen</a>
+  
+</nav>
+</div>
+  </div>
+</section>
+
     <div class="wrap">
       
       
 
-<section class="page-hero wide">
-  <div class="page-hero-row">
-    <div>
-      <p class="page-kicker">Deutschland · Promo-Aktionen</p>
-      <h1>Wer wirbt gerade womit</h1>
-    </div>
-    
+
+
+<section class="promo-zeile" data-auftritt>
+  <div class="promo-kennzahl promo-kennzahl--neu"><b>25</b><span>neu diese Woche</span></div>
+  <div class="promo-kennzahl"><b>1</b><span>enden in 7 Tagen</span></div>
+  <div class="promo-kennzahl"><b>80</b><span>Aktionen bei 14 Marken</span></div>
+  <div class="promo-stand">
 
 <aside class="seit">
   <p class="seit-kopf">Neu seit der letzten Ausgabe</p>
@@ -75,60 +101,48 @@
   <p class="seit-stand">Stand 9. Oktober 2026</p>
 </aside>
 
-
-  </div>
-  <p class="page-lead">Der deutsche Mobilfunkmarkt ist derzeit durch eine intensive Kopplung von Hardware-Promotionen und direkten Tarifnachlässen geprägt.</p>
+</div>
 </section>
+<p class="wb-lead promo-lead" data-auftritt>Der deutsche Mobilfunkmarkt ist derzeit durch eine intensive Kopplung von Hardware-Promotionen und direkten Tarifnachlässen geprägt.</p>
 
 
-
-<section class="promo-lage">
+<section class="promo-lage" data-auftritt>
   <p class="lage-titel">Was der Markt gerade fährt</p>
   
-  <div class="lage-zeile">
-    <span class="lage-label">Preisnachlass auf den Tarif</span>
-    <span class="lage-track"><span class="lage-fill" style="width:100%"></span></span>
-    <span class="lage-zahl">11 Marken</span>
-  </div>
+  <div class="lage-zeile"><span class="lage-label">Preisnachlass auf den Tarif</span>
+    <span class="lage-zahl">11 Marken</span></div>
   
-  <div class="lage-zeile">
-    <span class="lage-label">Gerät vergünstigt</span>
-    <span class="lage-track"><span class="lage-fill" style="width:91%"></span></span>
-    <span class="lage-zahl">10 Marken</span>
-  </div>
+  <div class="lage-zeile"><span class="lage-label">Gerät vergünstigt</span>
+    <span class="lage-zahl">10 Marken</span></div>
   
-  <div class="lage-zeile">
-    <span class="lage-label">Wechsel- oder Altgerätprämie</span>
-    <span class="lage-track"><span class="lage-fill" style="width:82%"></span></span>
-    <span class="lage-zahl">9 Marken</span>
-  </div>
+  <div class="lage-zeile"><span class="lage-label">Wechsel- oder Altgerätprämie</span>
+    <span class="lage-zahl">9 Marken</span></div>
   
-  <div class="lage-zeile">
-    <span class="lage-label">mehr Datenvolumen</span>
-    <span class="lage-track"><span class="lage-fill" style="width:73%"></span></span>
-    <span class="lage-zahl">8 Marken</span>
-  </div>
+  <div class="lage-zeile"><span class="lage-label">mehr Datenvolumen</span>
+    <span class="lage-zahl">8 Marken</span></div>
   
-  <div class="lage-zeile">
-    <span class="lage-label">ohne Bindung</span>
-    <span class="lage-track"><span class="lage-fill" style="width:64%"></span></span>
-    <span class="lage-zahl">7 Marken</span>
-  </div>
+  <div class="lage-zeile"><span class="lage-label">ohne Bindung</span>
+    <span class="lage-zahl">7 Marken</span></div>
   
 </section>
 
 
+<div class="chips promo-filter" role="group" aria-label="Nach Anbieterart filtern" data-auftritt>
+  <button type="button" class="chip on" data-tier-filter="" aria-pressed="true">Alle</button>
+  <button type="button" class="chip" data-tier-filter="1" aria-pressed="false">Netzbetreiber</button>
+  <button type="button" class="chip" data-tier-filter="2" aria-pressed="false">Discount &amp; Zweitmarken</button>
+</div>
 
 <div id="marken" style="scroll-margin-top:90px"></div>
 
-<section class="pmarke" id="marke-telekom-deutschland" style="--c:#3860be">
+
+<section class="pmarke" id="marke-telekom-deutschland" style="--c:#3860be" data-tier="1" data-auftritt>
   <div class="pmarke-kopf">
     <h2 class="pmarke-name"><a href="https://www.telekom.de/unterwegs/aktionen" target="_blank" rel="noopener">Telekom Deutschland</a></h2>
     <span class="pmarke-zusatz">Netzbetreiber · Deutsche Telekom</span>
   </div>
   <div class="promo-karten">
     
-
 <article class="pkarte pkarte--gross pkarte--hoch">
   <a class="pk-flaeche" href="https://www.telekom.de/shop/tarife/smartphone-tarife" target="_blank" rel="noopener">
     
@@ -140,19 +154,18 @@
 
 <span class="pk-bildquelle">Motiv der Aktionsseite</span>
 
+    <span class="pk-zahl">Wechsel- oder Altgerätprämie</span>
     <span class="pk-titel szl">Mobilfunk-Cashback Aktion</span>
     <span class="pk-text">Bis zu 240 Euro Cashback beim Abschluss eines neuen MagentaMobil Vertrags (Tarife XS bis XL).</span>
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Wechsel- oder Altgerätprämie</span>
     
-    <span class="pk-wichtig">wichtig</span>
+    
   </p>
 </article>
 
     
-
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.telekom.de/shop/tarife/zusatzkarten" target="_blank" rel="noopener">
     
@@ -162,19 +175,18 @@
   loading="lazy">
 </span>
 
+    <span class="pk-zahl">PlusKarten-Vorteil</span>
     <span class="pk-titel szl">PlusKarten-Vorteil: Unlimited-Daten und Preisvorteil</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">ohne Bindung</span>
     
-    <span class="pk-wichtig">wichtig</span>
+    
   </p>
 </article>
 
-
-<article class="pkarte">
+<article class="pkarte pkarte--neu">
   <a class="pk-flaeche" href="https://www.telekom.de/shop/iot/kids-watch" target="_blank" rel="noopener">
     
 <span class="pk-bild pk-bild--typo pk-bild--typo-klein">
@@ -183,17 +195,16 @@
   
 </span>
 
+    
     <span class="pk-titel szl">Xplora Kinderuhr-Aktion</span>
     
   </a>
   <p class="pk-fuss">
+    <span class="pk-flag pk-flag--neu">Neu</span>
     
     
-    <span class="pk-flag pk-flag--neu">neu</span>
-    <span class="pk-wichtig">wichtig</span>
   </p>
 </article>
-
 
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.telekom.de/shop/tarife/zusatzkarten" target="_blank" rel="noopener">
@@ -204,19 +215,18 @@
   loading="lazy">
 </span>
 
+    <span class="pk-zahl">iPad</span>
     <span class="pk-titel szl">iPad zum Aktionspreis mit PlusKarte Data</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Gerät vergünstigt</span>
     
-    <span class="pk-wichtig">wichtig</span>
+    
   </p>
 </article>
 
-
-<article class="pkarte">
+<article class="pkarte pkarte--neu">
   <a class="pk-flaeche" href="https://www.telekom.de/shop/geraete/rueckgabedeal" target="_blank" rel="noopener">
     
 <span class="pk-bild pk-bild--typo pk-bild--typo-klein">
@@ -225,19 +235,18 @@
   <span class="pk-typo-mechanik">Gerät vergünstigt</span>
 </span>
 
+    
     <span class="pk-titel szl">Telekom Rückgabedeal für Smartphones</span>
     
   </a>
   <p class="pk-fuss">
+    <span class="pk-flag pk-flag--neu">Neu</span>
     
-    <span class="pmech">Gerät vergünstigt</span>
-    <span class="pk-flag pk-flag--neu">neu</span>
     
   </p>
 </article>
 
-
-<article class="pkarte">
+<article class="pkarte pkarte--neu">
   <a class="pk-flaeche" href="https://www.telekom.de/shop/tarife/smartphone-tarife?adult=2&amp;tariffId=MF_17791" target="_blank" rel="noopener">
     
 
@@ -246,19 +255,18 @@
   loading="lazy">
 </span>
 
+    <span class="pk-zahl">Preisnachlass auf den Tarif</span>
     <span class="pk-titel szl">MagentaMobil Unlimited Duo-Vorteil</span>
     
   </a>
   <p class="pk-fuss">
+    <span class="pk-flag pk-flag--neu">Neu</span>
     
-    <span class="pmech">Preisnachlass auf den Tarif</span>
-    <span class="pk-flag pk-flag--neu">neu</span>
     
   </p>
 </article>
 
-
-<article class="pkarte">
+<article class="pkarte pkarte--neu">
   <a class="pk-flaeche" href="https://www.telekom.de/shop/tarife/smartphone-tarife-young?tariffId=MF_17743" target="_blank" rel="noopener">
     
 
@@ -267,19 +275,18 @@
   loading="lazy">
 </span>
 
+    <span class="pk-zahl">Zielgruppentarif</span>
     <span class="pk-titel szl">MagentaMobil Young Unlimited-Tarife</span>
     
   </a>
   <p class="pk-fuss">
+    <span class="pk-flag pk-flag--neu">Neu</span>
     
-    <span class="pmech">Zielgruppentarif</span>
-    <span class="pk-flag pk-flag--neu">neu</span>
     
   </p>
 </article>
 
-
-<article class="pkarte">
+<article class="pkarte pkarte--neu">
   <a class="pk-flaeche" href="https://www.telekom.de/shop/tarife/magenta-mobil-prepaid" target="_blank" rel="noopener">
     
 <span class="pk-bild pk-bild--typo pk-bild--typo-klein">
@@ -288,17 +295,16 @@
   
 </span>
 
+    
     <span class="pk-titel szl">MagentaMobil Prepaid Daten-Bonus</span>
     
   </a>
   <p class="pk-fuss">
+    <span class="pk-flag pk-flag--neu">Neu</span>
     
-    
-    <span class="pk-flag pk-flag--neu">neu</span>
     
   </p>
 </article>
-
 
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.telekom.de/shop/tarife/zusatzkarten" target="_blank" rel="noopener">
@@ -309,17 +315,16 @@
   <span class="pk-typo-mechanik">Gebühren erlassen</span>
 </span>
 
+    
     <span class="pk-titel szl">Online-Aktion: PlusKarten ohne Bereitstellungspreis</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Gebühren erlassen</span>
     
     
   </p>
 </article>
-
 
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.telekom.de/shop/tarife/handyvertrag" target="_blank" rel="noopener">
@@ -330,12 +335,12 @@
   <span class="pk-typo-mechanik">sonstiges</span>
 </span>
 
+    
     <span class="pk-titel szl">MagentaMobil-Tarifreihe mit 5G</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">sonstiges</span>
     
     
   </p>
@@ -344,14 +349,15 @@
   </div>
 </section>
 
-<section class="pmarke" id="marke-o2-telefónica-deutschland" style="--c:#3860be">
+
+
+<section class="pmarke" id="marke-o2-telefónica-deutschland" style="--c:#3860be" data-tier="1" data-auftritt>
   <div class="pmarke-kopf">
     <h2 class="pmarke-name"><a href="https://www.o2online.de/deals/" target="_blank" rel="noopener">O2 / Telefónica Deutschland</a></h2>
     <span class="pmarke-zusatz">Netzbetreiber · Telefónica Deutschland</span>
   </div>
   <div class="promo-karten">
     
-
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.o2online.de/priority/vorteile/freunde-werben-freunde" target="_blank" rel="noopener">
     
@@ -361,20 +367,19 @@
   loading="lazy">
 </span>
 
+    <span class="pk-zahl">Wechsel- oder Altgerätprämie</span>
     <span class="pk-titel szl">Freunde werben Freunde</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Wechsel- oder Altgerätprämie</span>
     
-    <span class="pk-wichtig">wichtig</span>
+    
   </p>
 </article>
 
     
-
-<article class="pkarte">
+<article class="pkarte pkarte--neu">
   <a class="pk-flaeche" href="https://www.o2online.de/e-shop/apple/apple-watch-ultra-4-5g-natur-details?tarif=o2-mobile-on-demand-m-plus&amp;ratenzahlung=36&amp;zielgruppe=privatkunden" target="_blank" rel="noopener">
     
 
@@ -383,17 +388,16 @@
   loading="lazy">
 </span>
 
+    <span class="pk-zahl">Gadget Deals</span>
     <span class="pk-titel szl">Gadget Deals: Apple Watch, MacBook &amp; Smartwatch</span>
     
   </a>
   <p class="pk-fuss">
+    <span class="pk-flag pk-flag--neu">Neu</span>
     
-    <span class="pmech">Preisnachlass auf den Tarif</span>
-    <span class="pk-flag pk-flag--neu">neu</span>
-    <span class="pk-wichtig">wichtig</span>
+    
   </p>
 </article>
-
 
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.o2online.de/e-shop" target="_blank" rel="noopener">
@@ -404,17 +408,16 @@
   <span class="pk-typo-mechanik">Gerät vergünstigt</span>
 </span>
 
+    
     <span class="pk-titel szl">Handyvertrag mit Top-Smartphone ab 51,49 €/Monat</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Gerät vergünstigt</span>
     
-    <span class="pk-wichtig">wichtig</span>
+    
   </p>
 </article>
-
 
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.o2online.de/e-shop" target="_blank" rel="noopener">
@@ -425,19 +428,18 @@
   loading="lazy">
 </span>
 
+    <span class="pk-zahl">Junge-Leute-Tarife</span>
     <span class="pk-titel szl">Junge-Leute-Tarife mit extra Datenvolumen</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Zielgruppentarif</span>
     
-    <span class="pk-wichtig">wichtig</span>
+    
   </p>
 </article>
 
-
-<article class="pkarte">
+<article class="pkarte pkarte--neu">
   <a class="pk-flaeche" href="https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-max-256gb-tiefblau-mit-airpods-pro-3-weiss-details?tarif=o2-mobile-on-demand-m-plus&amp;ohne-tarif=nein&amp;zielgruppe=privatkunden" target="_blank" rel="noopener">
     
 
@@ -446,19 +448,18 @@
   loading="lazy">
 </span>
 
+    <span class="pk-zahl">Smartphone-Bundles</span>
     <span class="pk-titel szl">Smartphone-Bundles mit AirPods Pro 3 oder Watch</span>
     
   </a>
   <p class="pk-fuss">
+    <span class="pk-flag pk-flag--neu">Neu</span>
     
-    <span class="pmech">Gratis-Zugabe</span>
-    <span class="pk-flag pk-flag--neu">neu</span>
     
   </p>
 </article>
 
-
-<article class="pkarte">
+<article class="pkarte pkarte--neu">
   <a class="pk-flaeche" href="https://www.o2online.de/tarife/" target="_blank" rel="noopener">
     
 <span class="pk-bild pk-bild--typo pk-bild--typo-klein">
@@ -467,19 +468,18 @@
   <span class="pk-typo-mechanik">ohne Bindung</span>
 </span>
 
+    
     <span class="pk-titel szl">O2 Mobilfunk-Tarife mit Grow-Vorteil</span>
     
   </a>
   <p class="pk-fuss">
+    <span class="pk-flag pk-flag--neu">Neu</span>
     
-    <span class="pmech">ohne Bindung</span>
-    <span class="pk-flag pk-flag--neu">neu</span>
     
   </p>
 </article>
 
-
-<article class="pkarte">
+<article class="pkarte pkarte--neu">
   <a class="pk-flaeche" href="https://www.o2online.de/kombiangebote" target="_blank" rel="noopener">
     
 <span class="pk-bild pk-bild--typo pk-bild--typo-klein">
@@ -488,17 +488,16 @@
   <span class="pk-typo-mechanik">Preisnachlass auf den Tarif</span>
 </span>
 
+    
     <span class="pk-titel szl">O2 Kombi-Vorteil für Bestandskunden</span>
     
   </a>
   <p class="pk-fuss">
+    <span class="pk-flag pk-flag--neu">Neu</span>
     
-    <span class="pmech">Preisnachlass auf den Tarif</span>
-    <span class="pk-flag pk-flag--neu">neu</span>
     
   </p>
 </article>
-
 
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.o2online.de/mobilfunk/prepaid/prepaid-m" target="_blank" rel="noopener">
@@ -509,19 +508,18 @@
   loading="lazy">
 </span>
 
+    <span class="pk-zahl">10 GB</span>
     <span class="pk-titel szl">O2 Prepaid M: 10 GB Bonus-Daten</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">mehr Datenvolumen</span>
     
     
   </p>
 </article>
 
-
-<article class="pkarte">
+<article class="pkarte pkarte--neu">
   <a class="pk-flaeche" href="https://www.o2online.de/deals/" target="_blank" rel="noopener">
     
 
@@ -530,19 +528,18 @@
   loading="lazy">
 </span>
 
+    <span class="pk-zahl">Gebühren erlassen</span>
     <span class="pk-titel szl">O2 Mobile Unlimited M Aktion</span>
     
   </a>
   <p class="pk-fuss">
+    <span class="pk-flag pk-flag--neu">Neu</span>
     
-    <span class="pmech">Gebühren erlassen</span>
-    <span class="pk-flag pk-flag--neu">neu</span>
     
   </p>
 </article>
 
-
-<article class="pkarte">
+<article class="pkarte pkarte--neu">
   <a class="pk-flaeche" href="https://www.o2online.de/e-shop/directbuy/offer;name=privatkunden-o2-mobile-on-demand-m-online-promo;shopContext=o2shop?menuType=RadioButtonsMenu&amp;tileItemIndex=1" target="_blank" rel="noopener">
     
 <span class="pk-bild pk-bild--typo pk-bild--typo-klein">
@@ -551,17 +548,16 @@
   <span class="pk-typo-mechanik">mehr Datenvolumen</span>
 </span>
 
+    
     <span class="pk-titel szl">O2 Mobile on Demand M: Flexibles Datenvolumen-Konzept</span>
     
   </a>
   <p class="pk-fuss">
+    <span class="pk-flag pk-flag--neu">Neu</span>
     
-    <span class="pmech">mehr Datenvolumen</span>
-    <span class="pk-flag pk-flag--neu">neu</span>
     
   </p>
 </article>
-
 
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.o2online.de/vorteile/apps-zusatzdienste/mein-o2-app/" target="_blank" rel="noopener">
@@ -572,19 +568,18 @@
   loading="lazy">
 </span>
 
+    <span class="pk-zahl">Mein O2 App</span>
     <span class="pk-titel szl">Mein O2 App: Bonus-Datenvolumen sichern</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">mehr Datenvolumen</span>
     
     
   </p>
 </article>
 
-
-<article class="pkarte">
+<article class="pkarte pkarte--neu">
   <a class="pk-flaeche" href="https://www.o2online.de/kombiangebote" target="_blank" rel="noopener">
     
 <span class="pk-bild pk-bild--typo pk-bild--typo-klein">
@@ -593,19 +588,18 @@
   
 </span>
 
+    
     <span class="pk-titel szl">App-Bonus für Mein O2 Nutzer</span>
     
   </a>
   <p class="pk-fuss">
+    <span class="pk-flag pk-flag--neu">Neu</span>
     
-    
-    <span class="pk-flag pk-flag--neu">neu</span>
     
   </p>
 </article>
 
-
-<article class="pkarte">
+<article class="pkarte pkarte--neu">
   <a class="pk-flaeche" href="https://www.o2online.de/tarife/plusbundles/" target="_blank" rel="noopener">
     
 
@@ -614,17 +608,16 @@
   loading="lazy">
 </span>
 
+    <span class="pk-zahl">O2 Plus Bundles</span>
     <span class="pk-titel szl">O2 Plus Bundles: Monatlicher Preisvorteil</span>
     
   </a>
   <p class="pk-fuss">
+    <span class="pk-flag pk-flag--neu">Neu</span>
     
-    <span class="pmech">Preisnachlass auf den Tarif</span>
-    <span class="pk-flag pk-flag--neu">neu</span>
     
   </p>
 </article>
-
 
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.o2online.de/tarife/datentarife/" target="_blank" rel="noopener">
@@ -635,139 +628,13 @@
   loading="lazy">
 </span>
 
+    <span class="pk-zahl">400 GB</span>
     <span class="pk-titel szl">O2 Data 5G-Datentarife mit 5 bis 400 GB</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">sonstiges</span>
     
-    
-  </p>
-</article>
-
-
-<article class="pkarte pkarte--fading">
-  <a class="pk-flaeche" href="https://www.o2online.de/deals/" target="_blank" rel="noopener">
-    
-
-<span class="pk-bild"><img src="images/296ec985941bebfc-1280.jpg" alt=""
-  width="560" height="280"
-  loading="lazy">
-</span>
-
-    <span class="pk-titel szl">Smartphone-Deals mit 0 € Anschlusspreis</span>
-    
-  </a>
-  <p class="pk-fuss">
-    
-    <span class="pmech">Wechsel- oder Altgerätprämie</span>
-    <span class="pk-flag pk-flag--weg">vermutlich ausgelaufen</span>
-    <span class="pk-wichtig">wichtig</span>
-  </p>
-</article>
-
-
-<article class="pkarte pkarte--fading">
-  <a class="pk-flaeche" href="https://www.o2online.de/deals/" target="_blank" rel="noopener">
-    
-
-<span class="pk-bild"><img src="images/f811e59d5a28e12f-1280.jpg" alt=""
-  width="560" height="280"
-  loading="lazy">
-</span>
-
-    <span class="pk-titel szl">Gadget-Deals: Technik-Bundles mit Mobilfunktarif</span>
-    
-  </a>
-  <p class="pk-fuss">
-    
-    <span class="pmech">Gratis-Zugabe</span>
-    <span class="pk-flag pk-flag--weg">vermutlich ausgelaufen</span>
-    <span class="pk-wichtig">wichtig</span>
-  </p>
-</article>
-
-
-<article class="pkarte pkarte--fading">
-  <a class="pk-flaeche" href="https://www.o2online.de/kombiangebote/?activeSwitcherCardItem=1#id-1211358" target="_blank" rel="noopener">
-    
-<span class="pk-bild pk-bild--typo pk-bild--typo-klein">
-  <span class="pk-typo-zahl">25 €</span>
-  
-  <span class="pk-typo-mechanik">Preisnachlass auf den Tarif</span>
-</span>
-
-    <span class="pk-titel szl">O2 Kombi-Vorteil: dauerhaft bis zu 25 € Rabatt auf weitere Mobilfunktarife</span>
-    
-  </a>
-  <p class="pk-fuss">
-    
-    <span class="pmech">Preisnachlass auf den Tarif</span>
-    <span class="pk-flag pk-flag--weg">vermutlich ausgelaufen</span>
-    
-  </p>
-</article>
-
-
-<article class="pkarte pkarte--fading">
-  <a class="pk-flaeche" href="https://www.o2online.de/kombiangebote" target="_blank" rel="noopener">
-    
-
-<span class="pk-bild pk-bild--banner"><img src="images/0046de06df83d553-1280.jpg" alt=""
-  width="1280" height="213"
-  loading="lazy">
-</span>
-
-    <span class="pk-titel szl">O2 Datentarif: 50 % Rabatt auf Tablet-Daten-SIM</span>
-    
-  </a>
-  <p class="pk-fuss">
-    
-    <span class="pmech">Preisnachlass auf den Tarif</span>
-    <span class="pk-flag pk-flag--weg">vermutlich ausgelaufen</span>
-    
-  </p>
-</article>
-
-
-<article class="pkarte pkarte--fading">
-  <a class="pk-flaeche" href="https://www.o2online.de/deals/" target="_blank" rel="noopener">
-    
-<span class="pk-bild pk-bild--typo pk-bild--typo-klein">
-  <span class="pk-typo-zahl">19,99 €</span>
-  
-  <span class="pk-typo-mechanik">Preisnachlass auf den Tarif</span>
-</span>
-
-    <span class="pk-titel szl">50-GB-Tarif: &#39;GB wie ich sie will&#39; für 19,99 €</span>
-    
-  </a>
-  <p class="pk-fuss">
-    
-    <span class="pmech">Preisnachlass auf den Tarif</span>
-    <span class="pk-flag pk-flag--weg">vermutlich ausgelaufen</span>
-    
-  </p>
-</article>
-
-
-<article class="pkarte pkarte--fading">
-  <a class="pk-flaeche" href="https://www.o2online.de/vorteile/apps-zusatzdienste/mein-o2-app/mein-o2-app-browser-detection-page/meino2flyout-page/?referrer=meino2flyout" target="_blank" rel="noopener">
-    
-<span class="pk-bild pk-bild--typo pk-bild--typo-klein">
-  <span class="pk-typo-zahl">10 GB · 500 MB</span>
-  
-  <span class="pk-typo-mechanik">mehr Datenvolumen</span>
-</span>
-
-    <span class="pk-titel szl">Mein-O2-App-Bonus: 10 GB einmalig + 500 MB monatlich</span>
-    
-  </a>
-  <p class="pk-fuss">
-    
-    <span class="pmech">mehr Datenvolumen</span>
-    <span class="pk-flag pk-flag--weg">vermutlich ausgelaufen</span>
     
   </p>
 </article>
@@ -775,14 +642,15 @@
   </div>
 </section>
 
-<section class="pmarke" id="marke-1-1-mobilfunk" style="--c:#3860be">
+
+
+<section class="pmarke" id="marke-1-1-mobilfunk" style="--c:#3860be" data-tier="1" data-auftritt>
   <div class="pmarke-kopf">
     <h2 class="pmarke-name"><a href="https://mobile.1und1.de/handyvertrag" target="_blank" rel="noopener">1&amp;1 Mobilfunk</a></h2>
     <span class="pmarke-zusatz">Netzbetreiber · 1&amp;1 / United Internet</span>
   </div>
   <div class="promo-karten">
     
-
 <article class="pkarte pkarte--gross pkarte--hoch">
   <a class="pk-flaeche" href="https://mobile.1und1.de/datenflat-ohne-vertragslaufzeit" target="_blank" rel="noopener">
     
@@ -794,19 +662,18 @@
 
 <span class="pk-bildquelle">Motiv der Aktionsseite</span>
 
+    <span class="pk-zahl">1&amp;1 Daten-Flat</span>
     <span class="pk-titel szl">1&amp;1 Daten-Flat für Tablets und Notebooks</span>
     <span class="pk-text">Mobile Datentarife mit 10 GB (12,99 €), 30 GB (14,99 €), 60 GB (19,99 €) oder 120 GB (24,99 €) pro Monat inklusive 5G-Nutzung, wahlweise ohne Vertragslaufzeit.</span>
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">ohne Bindung</span>
     
-    <span class="pk-wichtig">wichtig</span>
+    
   </p>
 </article>
 
     
-
 <article class="pkarte">
   <a class="pk-flaeche" href="https://mobile.1und1.de/refurbished-smartphones/" target="_blank" rel="noopener">
     
@@ -816,17 +683,16 @@
   loading="lazy">
 </span>
 
+    <span class="pk-zahl">20 %</span>
     <span class="pk-titel szl">Refurbished Smartphones: bis zu 20 % günstiger</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Gerät vergünstigt</span>
     
-    <span class="pk-wichtig">wichtig</span>
+    
   </p>
 </article>
-
 
 <article class="pkarte">
   <a class="pk-flaeche" href="https://mobile.1und1.de/handyvertrag" target="_blank" rel="noopener">
@@ -837,17 +703,16 @@
   loading="lazy">
 </span>
 
+    <span class="pk-zahl">27,99 €</span>
     <span class="pk-titel szl">Handy mit Vertrag: Top-Smartphones ab 27,99 € pro Monat</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Gerät vergünstigt</span>
     
     
   </p>
 </article>
-
 
 <article class="pkarte">
   <a class="pk-flaeche" href="https://mobile.1und1.de/tarife-fuer-junge-leute" target="_blank" rel="noopener">
@@ -858,17 +723,16 @@
   <span class="pk-typo-mechanik">Zielgruppentarif</span>
 </span>
 
+    
     <span class="pk-titel szl">Junge-Leute-Tarife: dauerhaft günstigere Konditionen</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Zielgruppentarif</span>
     
     
   </p>
 </article>
-
 
 <article class="pkarte">
   <a class="pk-flaeche" href="https://mobile.1und1.de/familientarife" target="_blank" rel="noopener">
@@ -879,19 +743,18 @@
   loading="lazy">
 </span>
 
+    <span class="pk-zahl">Family-Vorteil</span>
     <span class="pk-titel szl">Family-Vorteil: bis zu fünf Zusatzkarten dauerhaft günstiger</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Preisnachlass auf den Tarif</span>
     
     
   </p>
 </article>
 
-
-<article class="pkarte">
+<article class="pkarte pkarte--neu">
   <a class="pk-flaeche" href="https://mobile.1und1.de/datenflat" target="_blank" rel="noopener">
     
 <span class="pk-bild pk-bild--typo pk-bild--typo-klein">
@@ -900,76 +763,13 @@
   <span class="pk-typo-mechanik">sonstiges</span>
 </span>
 
+    
     <span class="pk-titel szl">1&amp;1 Daten-Flats mit Hardware-Option</span>
     
   </a>
   <p class="pk-fuss">
+    <span class="pk-flag pk-flag--neu">Neu</span>
     
-    <span class="pmech">sonstiges</span>
-    <span class="pk-flag pk-flag--neu">neu</span>
-    
-  </p>
-</article>
-
-
-<article class="pkarte pkarte--fading">
-  <a class="pk-flaeche" href="https://mobile.1und1.de/prepaid-internet-flat" target="_blank" rel="noopener">
-    
-
-<span class="pk-bild"><img src="images/ab1ba592467c46c0-1280.jpg" alt=""
-  width="1280" height="693"
-  loading="lazy">
-</span>
-
-    <span class="pk-titel szl">Alt gegen Neu: Tauschprämie für altes Gerät</span>
-    
-  </a>
-  <p class="pk-fuss">
-    
-    <span class="pmech">Wechsel- oder Altgerätprämie</span>
-    <span class="pk-flag pk-flag--weg">vermutlich ausgelaufen</span>
-    <span class="pk-wichtig">wichtig</span>
-  </p>
-</article>
-
-
-<article class="pkarte pkarte--fading">
-  <a class="pk-flaeche" href="https://mobile.1und1.de/datenflat" target="_blank" rel="noopener">
-    
-
-<span class="pk-bild"><img src="images/dba92ae9ddb22621-1280.jpg" alt=""
-  width="1280" height="587"
-  loading="lazy">
-</span>
-
-    <span class="pk-titel szl">Tablet oder Laptop ab 0 € Zuzahlung zu Daten-Flats mit Vertragslaufzeit</span>
-    
-  </a>
-  <p class="pk-fuss">
-    
-    <span class="pmech">Gerät vergünstigt</span>
-    <span class="pk-flag pk-flag--weg">vermutlich ausgelaufen</span>
-    <span class="pk-wichtig">wichtig</span>
-  </p>
-</article>
-
-
-<article class="pkarte pkarte--fading">
-  <a class="pk-flaeche" href="https://mobile.1und1.de/handyvertrag" target="_blank" rel="noopener">
-    
-
-<span class="pk-bild"><img src="images/be967cd779511826-1280.jpg" alt=""
-  width="1280" height="693"
-  loading="lazy">
-</span>
-
-    <span class="pk-titel szl">Handyvertrag mit Top-Smartphone ab 27,99 €/Monat</span>
-    
-  </a>
-  <p class="pk-fuss">
-    
-    <span class="pmech">Gerät vergünstigt</span>
-    <span class="pk-flag pk-flag--weg">vermutlich ausgelaufen</span>
     
   </p>
 </article>
@@ -977,14 +777,15 @@
   </div>
 </section>
 
-<section class="pmarke" id="marke-congstar" style="--c:#e07a00">
+
+
+<section class="pmarke" id="marke-congstar" style="--c:#e07a00" data-tier="2" data-auftritt>
   <div class="pmarke-kopf">
     <h2 class="pmarke-name"><a href="https://www.congstar.de/handytarife/angebote/" target="_blank" rel="noopener">congstar</a></h2>
     <span class="pmarke-zusatz">Discount- und Zweitmarke · Deutsche Telekom</span>
   </div>
   <div class="promo-karten">
     
-
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.congstar.de/prepaid" target="_blank" rel="noopener">
     
@@ -994,19 +795,18 @@
   loading="lazy">
 </span>
 
+    <span class="pk-zahl">40 €</span>
     <span class="pk-titel szl">Bis zu 40 € Wechselbonus bei Rufnummernmitnahme</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Wechsel- oder Altgerätprämie</span>
+    
     <span class="pk-frist">bis 18.08.</span>
-    <span class="pk-wichtig">wichtig</span>
   </p>
 </article>
 
     
-
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.congstar.de/congstar-kennenlernen/" target="_blank" rel="noopener">
     
@@ -1016,17 +816,16 @@
   loading="lazy">
 </span>
 
+    <span class="pk-zahl">ohne Bindung</span>
     <span class="pk-titel szl">congstar Kennenlernen Angebot</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">ohne Bindung</span>
     
     
   </p>
 </article>
-
 
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.congstar.de/young/" target="_blank" rel="noopener">
@@ -1037,6 +836,7 @@
   
 </span>
 
+    
     <span class="pk-titel szl">Young Tarifangebot für junge Leute</span>
     
   </a>
@@ -1044,10 +844,8 @@
     
     
     
-    
   </p>
 </article>
-
 
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.congstar.de/prepaid/tarife/prepaid-jahrespaket/" target="_blank" rel="noopener">
@@ -1058,17 +856,16 @@
   <span class="pk-typo-mechanik">Preisnachlass auf den Tarif</span>
 </span>
 
+    
     <span class="pk-titel szl">Prepaid Jahrespaket: 100 € für 12 Monate</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Preisnachlass auf den Tarif</span>
     
     
   </p>
 </article>
-
 
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.congstar.de/das-ist-congstar/newsletter/" target="_blank" rel="noopener">
@@ -1079,19 +876,18 @@
   loading="lazy">
 </span>
 
+    <span class="pk-zahl">Preisnachlass auf den Tarif</span>
     <span class="pk-titel szl">Newsletter-Abonnement mit Rabatt</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Preisnachlass auf den Tarif</span>
     
     
   </p>
 </article>
 
-
-<article class="pkarte">
+<article class="pkarte pkarte--neu">
   <a class="pk-flaeche" href="https://www.congstar.de/handytarife/allnet-flat-tarife/allnet-flat-m" target="_blank" rel="noopener">
     
 <span class="pk-bild pk-bild--typo pk-bild--typo-klein">
@@ -1100,19 +896,18 @@
   <span class="pk-typo-mechanik">mehr Datenvolumen</span>
 </span>
 
+    
     <span class="pk-titel szl">Allnet Flat M mit Aktions-Datenvolumen</span>
     
   </a>
   <p class="pk-fuss">
+    <span class="pk-flag pk-flag--neu">Neu</span>
     
-    <span class="pmech">mehr Datenvolumen</span>
-    <span class="pk-flag pk-flag--neu">neu</span>
     
   </p>
 </article>
 
-
-<article class="pkarte">
+<article class="pkarte pkarte--neu">
   <a class="pk-flaeche" href="https://www.congstar.de/handys" target="_blank" rel="noopener">
     
 <span class="pk-bild pk-bild--typo pk-bild--typo-klein">
@@ -1121,17 +916,16 @@
   <span class="pk-typo-mechanik">Gerät vergünstigt</span>
 </span>
 
+    
     <span class="pk-titel szl">Tarifrabatte bei Kauf von Smartphones und Wearables</span>
     
   </a>
   <p class="pk-fuss">
+    <span class="pk-flag pk-flag--neu">Neu</span>
     
-    <span class="pmech">Gerät vergünstigt</span>
-    <span class="pk-flag pk-flag--neu">neu</span>
     
   </p>
 </article>
-
 
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.congstar.de/prepaid/tarife/prepaid-wie-ich-will/" target="_blank" rel="noopener">
@@ -1142,19 +936,18 @@
   loading="lazy">
 </span>
 
+    <span class="pk-zahl">2 €</span>
     <span class="pk-titel szl">Prepaid wie ich will ab 2 €/4 Wochen</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Preisnachlass auf den Tarif</span>
     
     
   </p>
 </article>
 
-
-<article class="pkarte">
+<article class="pkarte pkarte--neu">
   <a class="pk-flaeche" href="https://www.congstar.de/handys" target="_blank" rel="noopener">
     
 <span class="pk-bild pk-bild--typo pk-bild--typo-klein">
@@ -1163,97 +956,13 @@
   <span class="pk-typo-mechanik">Gerät vergünstigt</span>
 </span>
 
+    
     <span class="pk-titel szl">congstar Rückgabedeal für Smartphones</span>
     
   </a>
   <p class="pk-fuss">
+    <span class="pk-flag pk-flag--neu">Neu</span>
     
-    <span class="pmech">Gerät vergünstigt</span>
-    <span class="pk-flag pk-flag--neu">neu</span>
-    
-  </p>
-</article>
-
-
-<article class="pkarte pkarte--fading">
-  <a class="pk-flaeche" href="https://www.congstar.de/prepaid/tarife/prepaid-jahrespaket/" target="_blank" rel="noopener">
-    
-<span class="pk-bild pk-bild--typo pk-bild--typo-klein">
-  <span class="pk-typo-zahl">240 GB · 100 €</span>
-  
-  <span class="pk-typo-mechanik">Wechsel- oder Altgerätprämie</span>
-</span>
-
-    <span class="pk-titel szl">Prepaid Jahrespaket mit 240 GB für 100 € und 40 € Wechselbonus</span>
-    
-  </a>
-  <p class="pk-fuss">
-    
-    <span class="pmech">Wechsel- oder Altgerätprämie</span>
-    <span class="pk-flag pk-flag--weg">vermutlich ausgelaufen</span>
-    <span class="pk-wichtig">wichtig</span>
-  </p>
-</article>
-
-
-<article class="pkarte pkarte--fading">
-  <a class="pk-flaeche" href="https://www.congstar.de/handys" target="_blank" rel="noopener">
-    
-
-<span class="pk-bild"><img src="images/abda4b75f3293efe-1280.jpg" alt=""
-  width="573" height="621"
-  loading="lazy">
-</span>
-
-    <span class="pk-titel szl">Geräterabatt mit Allnet Flat M</span>
-    
-  </a>
-  <p class="pk-fuss">
-    
-    <span class="pmech">Gerät vergünstigt</span>
-    <span class="pk-flag pk-flag--weg">vermutlich ausgelaufen</span>
-    <span class="pk-wichtig">wichtig</span>
-  </p>
-</article>
-
-
-<article class="pkarte pkarte--fading">
-  <a class="pk-flaeche" href="https://www.congstar.de/handys" target="_blank" rel="noopener">
-    
-
-<span class="pk-bild"><img src="images/274a2244f330ce3d-1280.jpg" alt=""
-  width="1280" height="618"
-  loading="lazy">
-</span>
-
-    <span class="pk-titel szl">congstar Rückgabedeal: 20 % günstigere Monatsraten</span>
-    
-  </a>
-  <p class="pk-fuss">
-    
-    <span class="pmech">Gerät vergünstigt</span>
-    <span class="pk-flag pk-flag--weg">vermutlich ausgelaufen</span>
-    
-  </p>
-</article>
-
-
-<article class="pkarte pkarte--fading">
-  <a class="pk-flaeche" href="https://www.congstar.de/prepaid/tarife/prepaid-allnet-m/" target="_blank" rel="noopener">
-    
-<span class="pk-bild pk-bild--typo pk-bild--typo-klein">
-  <span class="pk-typo-zahl">25 GB · 10 €</span>
-  
-  <span class="pk-typo-mechanik">Preisnachlass auf den Tarif</span>
-</span>
-
-    <span class="pk-titel szl">Prepaid Allnet M mit 25 GB für 10 €/4 Wochen</span>
-    
-  </a>
-  <p class="pk-fuss">
-    
-    <span class="pmech">Preisnachlass auf den Tarif</span>
-    <span class="pk-flag pk-flag--weg">vermutlich ausgelaufen</span>
     
   </p>
 </article>
@@ -1261,14 +970,15 @@
   </div>
 </section>
 
-<section class="pmarke" id="marke-otelo" style="--c:#e07a00">
+
+
+<section class="pmarke" id="marke-otelo" style="--c:#e07a00" data-tier="2" data-auftritt>
   <div class="pmarke-kopf">
     <h2 class="pmarke-name"><a href="https://www.otelo.de/" target="_blank" rel="noopener">Otelo</a></h2>
     <span class="pmarke-zusatz">Discount- und Zweitmarke · Vodafone</span>
   </div>
   <div class="promo-karten">
     
-
 <article class="pkarte pkarte--gross pkarte--hoch">
   <a class="pk-flaeche" href="https://www.otelo.de/freunde-werben" target="_blank" rel="noopener">
     
@@ -1280,19 +990,18 @@
 
 <span class="pk-bildquelle">Motiv der Aktionsseite</span>
 
+    <span class="pk-zahl">30 € · 120 €</span>
     <span class="pk-titel szl">Freunde werben: 30 € für dich, 120 € für Freunde</span>
     <span class="pk-text">Empfehlungsaktion: Du erhältst 3 × 30 € Gutschrift, deine geworbenen Freunde insgesamt 120 €.</span>
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Wechsel- oder Altgerätprämie</span>
     
-    <span class="pk-wichtig">wichtig</span>
+    
   </p>
 </article>
 
     
-
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.otelo.de/handy-mit-vertrag" target="_blank" rel="noopener">
     
@@ -1302,17 +1011,16 @@
   loading="lazy">
 </span>
 
+    <span class="pk-zahl">Gerät vergünstigt</span>
     <span class="pk-titel szl">Smartphone-Bundles mit Vertrag</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Gerät vergünstigt</span>
     
     
   </p>
 </article>
-
 
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.otelo.de/" target="_blank" rel="noopener">
@@ -1323,17 +1031,16 @@
   loading="lazy">
 </span>
 
+    <span class="pk-zahl">1 €</span>
     <span class="pk-titel szl">Smartphone Deals ab 1 € einmalig</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Gerät vergünstigt</span>
     
     
   </p>
 </article>
-
 
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.otelo.de/handy-mit-vertrag/1euro-deals" target="_blank" rel="noopener">
@@ -1344,17 +1051,16 @@
   <span class="pk-typo-mechanik">Gerät vergünstigt</span>
 </span>
 
+    
     <span class="pk-titel szl">1 € Deals für ausgewählte Smartphones</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Gerät vergünstigt</span>
     
     
   </p>
 </article>
-
 
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.otelo.de/handy-mit-vertrag/google/pixel-11/tarife?selectedHardware=N6662&amp;selectedTariff=N43" target="_blank" rel="noopener">
@@ -1365,17 +1071,16 @@
   <span class="pk-typo-mechanik">Gerät vergünstigt</span>
 </span>
 
+    
     <span class="pk-titel szl">Google Pixel 11 mit Unlimited on Demand 200 GB</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Gerät vergünstigt</span>
     
     
   </p>
 </article>
-
 
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.otelo.de/handytarife?selectedTariff=N2429" target="_blank" rel="noopener">
@@ -1386,6 +1091,7 @@
   
 </span>
 
+    
     <span class="pk-titel szl">Young Unlimited Deal für unter 30</span>
     
   </a>
@@ -1393,63 +1099,21 @@
     
     
     
-    
-  </p>
-</article>
-
-
-<article class="pkarte pkarte--fading">
-  <a class="pk-flaeche" href="https://www.otelo.de/handy-mit-vertrag/samsung/galaxy-a57/tarife?selectedHardware=N6565&amp;selectedTariff=N43" target="_blank" rel="noopener">
-    
-
-<span class="pk-bild"><img src="images/75fe7cfc85e1e164-1280.jpg" alt=""
-  width="1280" height="933"
-  loading="lazy">
-</span>
-
-    <span class="pk-titel szl">Unschlagbares Duo: Galaxy A57 + Unlimited on Demand</span>
-    
-  </a>
-  <p class="pk-fuss">
-    
-    <span class="pmech">Gerät vergünstigt</span>
-    <span class="pk-flag pk-flag--weg">vermutlich ausgelaufen</span>
-    
-  </p>
-</article>
-
-
-<article class="pkarte pkarte--fading">
-  <a class="pk-flaeche" href="https://www.otelo.de/" target="_blank" rel="noopener">
-    
-<span class="pk-bild pk-bild--typo pk-bild--typo-klein">
-  <span class="pk-typo-zahl">mehr Datenvolumen</span>
-  
-  
-</span>
-
-    <span class="pk-titel szl">Dauerhaft mehr Daten</span>
-    
-  </a>
-  <p class="pk-fuss">
-    
-    
-    <span class="pk-flag pk-flag--weg">vermutlich ausgelaufen</span>
-    
   </p>
 </article>
 
   </div>
 </section>
 
-<section class="pmarke" id="marke-blau" style="--c:#e07a00">
+
+
+<section class="pmarke" id="marke-blau" style="--c:#e07a00" data-tier="2" data-auftritt>
   <div class="pmarke-kopf">
     <h2 class="pmarke-name"><a href="https://www.blau.de/handy-angebote/" target="_blank" rel="noopener">Blau</a></h2>
     <span class="pmarke-zusatz">Discount- und Zweitmarke · Telefónica Deutschland</span>
   </div>
   <div class="promo-karten">
     
-
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.blau.de/freunde-werben/" target="_blank" rel="noopener">
     
@@ -1459,19 +1123,18 @@
   loading="lazy">
 </span>
 
+    <span class="pk-zahl">25 €</span>
     <span class="pk-titel szl">Freunde werben und 25 € Prämie sichern</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Wechsel- oder Altgerätprämie</span>
     
     
   </p>
 </article>
 
     
-
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.blau.de/user/auth/change-offer-plp/" target="_blank" rel="noopener">
     
@@ -1481,17 +1144,16 @@
   loading="lazy">
 </span>
 
+    <span class="pk-zahl">2 GB · 1 GB</span>
     <span class="pk-titel szl">Roaming Plus World: Sommer-Aktion mit 2 GB statt 1 GB</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">mehr Datenvolumen</span>
-    <span class="pk-frist">bis 31.08.2026</span>
     
+    <span class="pk-frist">bis 31.08.2026</span>
   </p>
 </article>
-
 
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.blau.de/e-shop/directbuy/offer;name=privatkunden-blau-allnet-xl-speed-promo-100gb-24x11;shopContext=blau" target="_blank" rel="noopener">
@@ -1502,17 +1164,16 @@
   <span class="pk-typo-mechanik">mehr Datenvolumen</span>
 </span>
 
+    
     <span class="pk-titel szl">Blau Allnet XL Promo: 100 GB für 14,99 € (20 GB mehr)</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">mehr Datenvolumen</span>
     
     
   </p>
 </article>
-
 
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.blau.de/e-shop/directbuy/offer;name=privatkunden-blau-allnet-s-speed-promo-20gb-24x3;shopContext=blau" target="_blank" rel="noopener">
@@ -1523,55 +1184,13 @@
   <span class="pk-typo-mechanik">Preisnachlass auf den Tarif</span>
 </span>
 
+    
     <span class="pk-titel szl">Blau Allnet S: 20 GB für 6,99 € monatlich</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Preisnachlass auf den Tarif</span>
     
-    
-  </p>
-</article>
-
-
-<article class="pkarte pkarte--fading">
-  <a class="pk-flaeche" href="https://www.blau.de/handy-angebote/" target="_blank" rel="noopener">
-    
-
-<span class="pk-bild pk-bild--banner"><img src="images/6513402f2d1248dc-1280.jpg" alt=""
-  width="1280" height="457"
-  loading="lazy">
-</span>
-
-    <span class="pk-titel szl">Blau Flex-Tarife: jederzeit kündbar</span>
-    
-  </a>
-  <p class="pk-fuss">
-    
-    <span class="pmech">ohne Bindung</span>
-    <span class="pk-flag pk-flag--weg">vermutlich ausgelaufen</span>
-    
-  </p>
-</article>
-
-
-<article class="pkarte pkarte--fading">
-  <a class="pk-flaeche" href="https://www.blau.de/handy-angebote/" target="_blank" rel="noopener">
-    
-
-<span class="pk-bild pk-bild--banner"><img src="images/25383e2a068a8572-1280.jpg" alt=""
-  width="1280" height="457"
-  loading="lazy">
-</span>
-
-    <span class="pk-titel szl">Gebrauchte Handys in sehr gutem Zustand mit Tarif</span>
-    
-  </a>
-  <p class="pk-fuss">
-    
-    <span class="pmech">Gerät vergünstigt</span>
-    <span class="pk-flag pk-flag--weg">vermutlich ausgelaufen</span>
     
   </p>
 </article>
@@ -1579,14 +1198,15 @@
   </div>
 </section>
 
-<section class="pmarke" id="marke-aldi-talk" style="--c:#e07a00">
+
+
+<section class="pmarke" id="marke-aldi-talk" style="--c:#e07a00" data-tier="2" data-auftritt>
   <div class="pmarke-kopf">
     <h2 class="pmarke-name"><a href="https://www.alditalk.de/angebote" target="_blank" rel="noopener">ALDI TALK</a></h2>
     <span class="pmarke-zusatz">Discount- und Zweitmarke · MEDION / Telefónica-Netz</span>
   </div>
   <div class="promo-karten">
     
-
 <article class="pkarte pkarte--gross pkarte--hoch">
   <a class="pk-flaeche" href="https://www.alditalk.de/mini" target="_blank" rel="noopener">
     
@@ -1596,19 +1216,18 @@
   <span class="pk-typo-mechanik">ohne Bindung</span>
 </span>
 
+    
     <span class="pk-titel szl">ALDI TALK mini für 2,99 €</span>
     <span class="pk-text">Tarifoption mit 4-wöchiger Flatrate für Telefonie und SMS innerhalb Deutschlands zu ALDI TALK. Kosten: 2,99 € pro 4-Wochen-Zyklus, keine Mindestlaufzeit, jederzeit kündbar.</span>
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">ohne Bindung</span>
     
     
   </p>
 </article>
 
     
-
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.alditalk.de/wechselbonus" target="_blank" rel="noopener">
     
@@ -1618,17 +1237,16 @@
   <span class="pk-typo-mechanik">Wechsel- oder Altgerätprämie</span>
 </span>
 
+    
     <span class="pk-titel szl">Starter-Set für 2,99 € mit 10 € Startguthaben und 30 € Wechselbonus bei Rufnummernmitnahme</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Wechsel- oder Altgerätprämie</span>
-    <span class="pk-frist">bis 1. März 2026</span>
     
+    <span class="pk-frist">bis 1. März 2026</span>
   </p>
 </article>
-
 
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.alditalk.de/angebote" target="_blank" rel="noopener">
@@ -1639,70 +1257,29 @@
   <span class="pk-typo-mechanik">Gratis-Zugabe</span>
 </span>
 
+    
     <span class="pk-titel szl">imoo Kinder-Smartwatches mit 2 Kinogutscheinen</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Gratis-Zugabe</span>
+    
     <span class="pk-frist">bis 16.08.2026</span>
-    
-  </p>
-</article>
-
-
-<article class="pkarte pkarte--fading">
-  <a class="pk-flaeche" href="https://www.alditalk.de/smartphones" target="_blank" rel="noopener">
-    
-
-<span class="pk-bild pk-bild--banner"><img src="images/cd86b7f42e7be528-1280.jpg" alt=""
-  width="1280" height="118"
-  loading="lazy">
-</span>
-
-    <span class="pk-titel szl">Motorola-Smartphones mit Moto Buds im Bundle-Aktionspreis</span>
-    
-  </a>
-  <p class="pk-fuss">
-    
-    <span class="pmech">Gerät vergünstigt</span>
-    <span class="pk-flag pk-flag--weg">vermutlich ausgelaufen</span>
-    
-  </p>
-</article>
-
-
-<article class="pkarte pkarte--fading">
-  <a class="pk-flaeche" href="https://www.alditalk.de/p/samsung-samsung-galaxy-a17-lte-128-gb-black-sm-a175f-dsb--beclad-starter-kit-fur-samsung-galaxy-a17-330042091A1?FF_QUERY=*%3Acategory_id%3BG5DE0Z0SIKUBHRGTNF411A7XPLN9RV3D&amp;FF_POS=21&amp;FF_PAGE=1&amp;FF_PAGESIZE=30&amp;FF_SCORE=100.0&amp;FF_CAMPAIGN=&amp;FF_CAMPAIGN_PAGE_ID=" target="_blank" rel="noopener">
-    
-<span class="pk-bild pk-bild--typo pk-bild--typo-klein">
-  <span class="pk-typo-zahl">129 Euro</span>
-  
-  <span class="pk-typo-mechanik">Gerät vergünstigt</span>
-</span>
-
-    <span class="pk-titel szl">Samsung Galaxy A17 LTE mit Beclad Starter Kit für 129 Euro</span>
-    
-  </a>
-  <p class="pk-fuss">
-    
-    <span class="pmech">Gerät vergünstigt</span>
-    <span class="pk-flag pk-flag--weg">vermutlich ausgelaufen</span>
-    
   </p>
 </article>
 
   </div>
 </section>
 
-<section class="pmarke" id="marke-mobilcom-debitel" style="--c:#e07a00">
+
+
+<section class="pmarke" id="marke-mobilcom-debitel" style="--c:#e07a00" data-tier="2" data-auftritt>
   <div class="pmarke-kopf">
     <h2 class="pmarke-name"><a href="https://www.mobilcom-debitel.de/handytarife/" target="_blank" rel="noopener">mobilcom-debitel</a></h2>
     <span class="pmarke-zusatz">Discount- und Zweitmarke · freenet Group</span>
   </div>
   <div class="promo-karten">
     
-
 <article class="pkarte pkarte--gross pkarte--hoch">
   <a class="pk-flaeche" href="https://www.mobilcom-debitel.de/handys-smartphones/handys-mit-vertrag" target="_blank" rel="noopener">
     
@@ -1712,19 +1289,18 @@
   <span class="pk-typo-mechanik">Wechsel- oder Altgerätprämie</span>
 </span>
 
+    
     <span class="pk-titel szl">Google Pixel 11 Pro: Bis zu 500 € Bonus bei Altgeräteeinsendung</span>
     <span class="pk-text">Für das Google Pixel 11 Pro mit Vertrag gibt es bei Einsendung eines Altgeräts einen Bonus von bis zu 500 €. Einmalige Zuzahlung 9,99 €.</span>
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Wechsel- oder Altgerätprämie</span>
     
-    <span class="pk-wichtig">wichtig</span>
+    
   </p>
 </article>
 
     
-
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.mobilcom-debitel.de/handys-smartphones/handys-mit-vertrag" target="_blank" rel="noopener">
     
@@ -1734,17 +1310,16 @@
   <span class="pk-typo-mechanik">Gerät vergünstigt</span>
 </span>
 
+    
     <span class="pk-titel szl">Handys mit Vertrag: Einmalige Zuzahlung ab 9,99 €</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Gerät vergünstigt</span>
     
     
   </p>
 </article>
-
 
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.mobilcom-debitel.de/handytarife/" target="_blank" rel="noopener">
@@ -1755,17 +1330,16 @@
   <span class="pk-typo-mechanik">Preisnachlass auf den Tarif</span>
 </span>
 
+    
     <span class="pk-titel szl">Unlimited L mit 47% Rabatt für 31,99 €/Monat</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Preisnachlass auf den Tarif</span>
     
     
   </p>
 </article>
-
 
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.mobilcom-debitel.de/handys-smartphones/handys-mit-vertrag" target="_blank" rel="noopener">
@@ -1776,6 +1350,7 @@
   
 </span>
 
+    
     <span class="pk-titel szl">Samsung Galaxy S26 Ultra + Gratis Galaxy Buds4</span>
     
   </a>
@@ -1783,12 +1358,10 @@
     
     
     
-    
   </p>
 </article>
 
-
-<article class="pkarte">
+<article class="pkarte pkarte--neu">
   <a class="pk-flaeche" href="https://www.mobilcom-debitel.de/p/P-4168967?tcl=tariffs_postpaid_voice&amp;fl=" target="_blank" rel="noopener">
     
 <span class="pk-bild pk-bild--typo pk-bild--typo-klein">
@@ -1797,17 +1370,16 @@
   
 </span>
 
+    
     <span class="pk-titel szl">Freenet Allnet Flat Kennenlern-Rabatte</span>
     
   </a>
   <p class="pk-fuss">
+    <span class="pk-flag pk-flag--neu">Neu</span>
     
-    
-    <span class="pk-flag pk-flag--neu">neu</span>
     
   </p>
 </article>
-
 
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.mobilcom-debitel.de/handytarife/junge-leute" target="_blank" rel="noopener">
@@ -1818,17 +1390,16 @@
   <span class="pk-typo-mechanik">Zielgruppentarif</span>
 </span>
 
+    
     <span class="pk-titel szl">Magenta Mobil Young 5G: Kennenlern-Rabatt und Anschlusspreis-Rabatt</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Zielgruppentarif</span>
     
     
   </p>
 </article>
-
 
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.mobilcom-debitel.de/handytarife/" target="_blank" rel="noopener">
@@ -1839,55 +1410,13 @@
   <span class="pk-typo-mechanik">Preisnachlass auf den Tarif</span>
 </span>
 
+    
     <span class="pk-titel szl">Allnet Flat mit 50% Rabatt: 25 GB oder 40 GB für 14,99 €/Monat</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Preisnachlass auf den Tarif</span>
     
-    
-  </p>
-</article>
-
-
-<article class="pkarte pkarte--fading">
-  <a class="pk-flaeche" href="https://www.mobilcom-debitel.de/p/P-4401584?tcl=sub_tariff_junge_leute&amp;fl=tariff" target="_blank" rel="noopener">
-    
-<span class="pk-bild pk-bild--typo pk-bild--typo-klein">
-  <span class="pk-typo-zahl">34,95 € · 84,95 €</span>
-  
-  <span class="pk-typo-mechanik">Preisnachlass auf den Tarif</span>
-</span>
-
-    <span class="pk-titel szl">Magenta Mobil XL Young 5G: unbegrenzt für 34,95 € statt 84,95 €</span>
-    
-  </a>
-  <p class="pk-fuss">
-    
-    <span class="pmech">Preisnachlass auf den Tarif</span>
-    <span class="pk-flag pk-flag--weg">vermutlich ausgelaufen</span>
-    
-  </p>
-</article>
-
-
-<article class="pkarte pkarte--fading">
-  <a class="pk-flaeche" href="https://www.mobilcom-debitel.de/handytarife/5g-tarife" target="_blank" rel="noopener">
-    
-<span class="pk-bild pk-bild--typo pk-bild--typo-klein">
-  <span class="pk-typo-zahl">Allnet-Flats</span>
-  
-  <span class="pk-typo-mechanik">Preisnachlass auf den Tarif</span>
-</span>
-
-    <span class="pk-titel szl">Allnet-Flats mit Kennenlern-Rabatt für 24 Monate</span>
-    
-  </a>
-  <p class="pk-fuss">
-    
-    <span class="pmech">Preisnachlass auf den Tarif</span>
-    <span class="pk-flag pk-flag--weg">vermutlich ausgelaufen</span>
     
   </p>
 </article>
@@ -1895,15 +1424,16 @@
   </div>
 </section>
 
-<section class="pmarke" id="marke-klarmobil" style="--c:#e07a00">
+
+
+<section class="pmarke" id="marke-klarmobil" style="--c:#e07a00" data-tier="2" data-auftritt>
   <div class="pmarke-kopf">
     <h2 class="pmarke-name"><a href="https://www.klarmobil.de/unternehmen/presse/" target="_blank" rel="noopener">klarmobil</a></h2>
     <span class="pmarke-zusatz">Discount- und Zweitmarke · freenet Group</span>
   </div>
   <div class="promo-karten">
     
-
-<article class="pkarte pkarte--gross pkarte--hoch">
+<article class="pkarte pkarte--gross pkarte--hoch pkarte--neu">
   <a class="pk-flaeche" href="https://www.klarmobil.de/shop/cart/modify/?products=(P-4796321:1)&amp;kmrc=true&amp;dMnp=false" target="_blank" rel="noopener">
     
 <span class="pk-bild pk-bild--typo">
@@ -1912,20 +1442,19 @@
   <span class="pk-typo-mechanik">ohne Bindung</span>
 </span>
 
+    
     <span class="pk-titel szl">Monatlich kündbare Allnet Flat Tarife mit 75, 150 oder 200 GB</span>
     <span class="pk-text">Flexible SIM-Only Tarife mit 75 GB, 150 GB oder 200 GB im 5G D-Netz, die monatlich kündbar sind. Bei einer Anschlussgebühr von 19,99 € liegen die monatlichen Kosten zwischen 9,99 € und 19,99 €.</span>
   </a>
   <p class="pk-fuss">
+    <span class="pk-flag pk-flag--neu">Neu</span>
     
-    <span class="pmech">ohne Bindung</span>
-    <span class="pk-flag pk-flag--neu">neu</span>
     
   </p>
 </article>
 
     
-
-<article class="pkarte">
+<article class="pkarte pkarte--neu">
   <a class="pk-flaeche" href="https://www.klarmobil.de/shop/cart/modify/?products=(P-4796297:1)&amp;kmrc=true&amp;dMnp=false" target="_blank" rel="noopener">
     
 <span class="pk-bild pk-bild--typo pk-bild--typo-klein">
@@ -1934,19 +1463,18 @@
   <span class="pk-typo-mechanik">Gebühren erlassen</span>
 </span>
 
+    
     <span class="pk-titel szl">Allnet Flat Tarife mit 24 Monaten Laufzeit</span>
     
   </a>
   <p class="pk-fuss">
+    <span class="pk-flag pk-flag--neu">Neu</span>
     
-    <span class="pmech">Gebühren erlassen</span>
-    <span class="pk-flag pk-flag--neu">neu</span>
     
   </p>
 </article>
 
-
-<article class="pkarte">
+<article class="pkarte pkarte--neu">
   <a class="pk-flaeche" href="https://www.klarmobil.de/shop/cart/modify/?products=(P-4796297:1)&amp;kmrc=true&amp;dMnp=false" target="_blank" rel="noopener">
     
 <span class="pk-bild pk-bild--typo pk-bild--typo-klein">
@@ -1955,97 +1483,13 @@
   <span class="pk-typo-mechanik">Gebühren erlassen</span>
 </span>
 
+    
     <span class="pk-titel szl">Allnet Flat Tarife mit 75, 150 oder 200 GB (24 Monate)</span>
     
   </a>
   <p class="pk-fuss">
+    <span class="pk-flag pk-flag--neu">Neu</span>
     
-    <span class="pmech">Gebühren erlassen</span>
-    <span class="pk-flag pk-flag--neu">neu</span>
-    
-  </p>
-</article>
-
-
-<article class="pkarte pkarte--fading">
-  <a class="pk-flaeche" href="https://www.klarmobil.de/tarife/d-netz-tarife" target="_blank" rel="noopener">
-    
-<span class="pk-bild pk-bild--typo pk-bild--typo-klein">
-  <span class="pk-typo-zahl">Preisnachlass auf den Tarif</span>
-  
-  
-</span>
-
-    <span class="pk-titel szl">Monatlich kündbare D-Netz Allnet Flats mit Rabatt</span>
-    
-  </a>
-  <p class="pk-fuss">
-    
-    
-    <span class="pk-flag pk-flag--weg">vermutlich ausgelaufen</span>
-    <span class="pk-wichtig">wichtig</span>
-  </p>
-</article>
-
-
-<article class="pkarte pkarte--fading">
-  <a class="pk-flaeche" href="https://www.klarmobil.de/handytarife" target="_blank" rel="noopener">
-    
-<span class="pk-bild pk-bild--typo pk-bild--typo-klein">
-  <span class="pk-typo-zahl">120 GB</span>
-  
-  <span class="pk-typo-mechanik">ohne Bindung</span>
-</span>
-
-    <span class="pk-titel szl">Monatlich kündbare Allnet-Flats: 30/80/120 GB zum Sonderpreis</span>
-    
-  </a>
-  <p class="pk-fuss">
-    
-    <span class="pmech">ohne Bindung</span>
-    <span class="pk-flag pk-flag--weg">vermutlich ausgelaufen</span>
-    
-  </p>
-</article>
-
-
-<article class="pkarte pkarte--fading">
-  <a class="pk-flaeche" href="https://www.klarmobil.de/shop/cart/modify/?products=(P-4748330:1)&amp;kmrc=true&amp;dMnp=false" target="_blank" rel="noopener">
-    
-<span class="pk-bild pk-bild--typo pk-bild--typo-klein">
-  <span class="pk-typo-zahl">9,99 €</span>
-  
-  <span class="pk-typo-mechanik">ohne Bindung</span>
-</span>
-
-    <span class="pk-titel szl">Monatlich kündbare Sim-Only-Tarife ab 9,99 €</span>
-    
-  </a>
-  <p class="pk-fuss">
-    
-    <span class="pmech">ohne Bindung</span>
-    <span class="pk-flag pk-flag--weg">vermutlich ausgelaufen</span>
-    
-  </p>
-</article>
-
-
-<article class="pkarte pkarte--fading">
-  <a class="pk-flaeche" href="https://www.klarmobil.de/handytarife" target="_blank" rel="noopener">
-    
-<span class="pk-bild pk-bild--typo pk-bild--typo-klein">
-  <span class="pk-typo-zahl">Allnet-Flats</span>
-  
-  <span class="pk-typo-mechanik">Preisnachlass auf den Tarif</span>
-</span>
-
-    <span class="pk-titel szl">Allnet-Flats mit 24 Monaten Laufzeit: 30/80/120 GB reduziert</span>
-    
-  </a>
-  <p class="pk-fuss">
-    
-    <span class="pmech">Preisnachlass auf den Tarif</span>
-    <span class="pk-flag pk-flag--weg">vermutlich ausgelaufen</span>
     
   </p>
 </article>
@@ -2053,14 +1497,15 @@
   </div>
 </section>
 
-<section class="pmarke" id="marke-lidl-connect" style="--c:#e07a00">
+
+
+<section class="pmarke" id="marke-lidl-connect" style="--c:#e07a00" data-tier="2" data-auftritt>
   <div class="pmarke-kopf">
     <h2 class="pmarke-name"><a href="https://www.lidl-connect.de/" target="_blank" rel="noopener">Lidl Connect</a></h2>
     <span class="pmarke-zusatz">Discount- und Zweitmarke · Lidl / Drillisch</span>
   </div>
   <div class="promo-karten">
     
-
 <article class="pkarte pkarte--gross pkarte--hoch">
   <a class="pk-flaeche" href="https://www.lidl-connect.de/" target="_blank" rel="noopener">
     
@@ -2070,19 +1515,18 @@
   <span class="pk-typo-mechanik">mehr Datenvolumen</span>
 </span>
 
+    
     <span class="pk-titel szl">Unlimited on Demand: Unendlich oft 1 GB nachbuchen</span>
     <span class="pk-text">In den Unlimited-Tarifen kann man nach Verbrauch des Inklusiv-Volumens unbegrenzt oft 1 GB kostenlos nachbuchen. Die Tarife kosten 9,99 € (50 Mbit/s), 14,99 € (100 Mbit/s) oder 19,99 € (150 Mbit/s) pro 4 Wochen.</span>
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">mehr Datenvolumen</span>
     
     
   </p>
 </article>
 
     
-
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.lidl-connect.de/" target="_blank" rel="noopener">
     
@@ -2092,17 +1536,16 @@
   <span class="pk-typo-mechanik">Gebühren erlassen</span>
 </span>
 
+    
     <span class="pk-titel szl">5,95 € Versand sparen – Newsletter-Gutschein</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Gebühren erlassen</span>
     
     
   </p>
 </article>
-
 
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.lidl-connect.de/" target="_blank" rel="noopener">
@@ -2113,17 +1556,16 @@
   <span class="pk-typo-mechanik">Preisnachlass auf den Tarif</span>
 </span>
 
+    
     <span class="pk-titel szl">10 € Startguthaben bei Aktivierung</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Preisnachlass auf den Tarif</span>
     
     
   </p>
 </article>
-
 
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.lidl-connect.de/" target="_blank" rel="noopener">
@@ -2134,17 +1576,16 @@
   <span class="pk-typo-mechanik">Preisnachlass auf den Tarif</span>
 </span>
 
+    
     <span class="pk-titel szl">Jahrestarife: Einmal zahlen, ein Jahr mobil sein</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Preisnachlass auf den Tarif</span>
     
     
   </p>
 </article>
-
 
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.lidl-connect.de/" target="_blank" rel="noopener">
@@ -2155,6 +1596,7 @@
   
 </span>
 
+    
     <span class="pk-titel szl">SMART-Tarife mit 5G und Flatrate</span>
     
   </a>
@@ -2162,63 +1604,21 @@
     
     
     
-    
-  </p>
-</article>
-
-
-<article class="pkarte pkarte--fading">
-  <a class="pk-flaeche" href="https://www.lidl-connect.de/" target="_blank" rel="noopener">
-    
-<span class="pk-bild pk-bild--typo pk-bild--typo-klein">
-  <span class="pk-typo-zahl">Unlimited on Demand Tarife</span>
-  
-  <span class="pk-typo-mechanik">mehr Datenvolumen</span>
-</span>
-
-    <span class="pk-titel szl">Unlimited on Demand Tarife mit 1 GB kostenlos nachbuchbar</span>
-    
-  </a>
-  <p class="pk-fuss">
-    
-    <span class="pmech">mehr Datenvolumen</span>
-    <span class="pk-flag pk-flag--weg">vermutlich ausgelaufen</span>
-    
-  </p>
-</article>
-
-
-<article class="pkarte pkarte--fading">
-  <a class="pk-flaeche" href="https://www.lidl-connect.de/" target="_blank" rel="noopener">
-    
-<span class="pk-bild pk-bild--typo pk-bild--typo-klein">
-  <span class="pk-typo-zahl">50 % · 100 %</span>
-  
-  <span class="pk-typo-mechanik">Preisnachlass auf den Tarif</span>
-</span>
-
-    <span class="pk-titel szl">50 % sparen, 100 % surfen</span>
-    
-  </a>
-  <p class="pk-fuss">
-    
-    <span class="pmech">Preisnachlass auf den Tarif</span>
-    <span class="pk-flag pk-flag--weg">vermutlich ausgelaufen</span>
-    
   </p>
 </article>
 
   </div>
 </section>
 
-<section class="pmarke" id="marke-penny-mobil" style="--c:#e07a00">
+
+
+<section class="pmarke" id="marke-penny-mobil" style="--c:#e07a00" data-tier="2" data-auftritt>
   <div class="pmarke-kopf">
     <h2 class="pmarke-name"><a href="https://www.pennymobil.de/" target="_blank" rel="noopener">Penny Mobil</a></h2>
     <span class="pmarke-zusatz">Discount- und Zweitmarke · Telekom-Netz (D1)</span>
   </div>
   <div class="promo-karten">
     
-
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.pennymobil.de/hilfe-und-service/rufnummernmitnahme/" target="_blank" rel="noopener">
     
@@ -2228,19 +1628,18 @@
   loading="lazy">
 </span>
 
+    <span class="pk-zahl">10 €</span>
     <span class="pk-titel szl">10 € Wechselbonus bei Rufnummernmitnahme</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Wechsel- oder Altgerätprämie</span>
     
     
   </p>
 </article>
 
     
-
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.pennymobil.de/tarife/prepaid-basic" target="_blank" rel="noopener">
     
@@ -2250,17 +1649,16 @@
   <span class="pk-typo-mechanik">mehr Datenvolumen</span>
 </span>
 
+    
     <span class="pk-titel szl">Doppeltes Datenvolumen im Prepaid Basic</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">mehr Datenvolumen</span>
     
     
   </p>
 </article>
-
 
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.pennymobil.de/optionen/datenvolumen/smart-tarife/" target="_blank" rel="noopener">
@@ -2271,55 +1669,13 @@
   <span class="pk-typo-mechanik">mehr Datenvolumen</span>
 </span>
 
+    
     <span class="pk-titel szl">25 GB Extra-Datenpolster kostenlos für ein Jahr</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">mehr Datenvolumen</span>
     
-    
-  </p>
-</article>
-
-
-<article class="pkarte pkarte--fading">
-  <a class="pk-flaeche" href="https://www.pennymobil.de/" target="_blank" rel="noopener">
-    
-<span class="pk-bild pk-bild--typo pk-bild--typo-klein">
-  <span class="pk-typo-zahl">5 GB</span>
-  
-  <span class="pk-typo-mechanik">mehr Datenvolumen</span>
-</span>
-
-    <span class="pk-titel szl">5 GB extra für Neukunden</span>
-    
-  </a>
-  <p class="pk-fuss">
-    
-    <span class="pmech">mehr Datenvolumen</span>
-    <span class="pk-flag pk-flag--weg">vermutlich ausgelaufen</span>
-    
-  </p>
-</article>
-
-
-<article class="pkarte pkarte--fading">
-  <a class="pk-flaeche" href="https://www.pennymobil.de/" target="_blank" rel="noopener">
-    
-
-<span class="pk-bild"><img src="images/728d12a19c6420a1-1280.jpg" alt=""
-  width="774" height="635"
-  loading="lazy">
-</span>
-
-    <span class="pk-titel szl">Starter-Paket 50% reduziert</span>
-    
-  </a>
-  <p class="pk-fuss">
-    
-    <span class="pmech">Gebühren erlassen</span>
-    <span class="pk-frist">bis 26.07.</span><span class="pk-flag pk-flag--weg">vermutlich ausgelaufen</span>
     
   </p>
 </article>
@@ -2327,14 +1683,15 @@
   </div>
 </section>
 
-<section class="pmarke" id="marke-winsim" style="--c:#e07a00">
+
+
+<section class="pmarke" id="marke-winsim" style="--c:#e07a00" data-tier="2" data-auftritt>
   <div class="pmarke-kopf">
     <h2 class="pmarke-name"><a href="https://www.winsim.de/" target="_blank" rel="noopener">winSIM</a></h2>
     <span class="pmarke-zusatz">Discount- und Zweitmarke · 1&amp;1 / Drillisch</span>
   </div>
   <div class="promo-karten">
     
-
 <article class="pkarte pkarte--gross pkarte--hoch">
   <a class="pk-flaeche" href="https://www.winsim.de/handys" target="_blank" rel="noopener">
     
@@ -2344,19 +1701,18 @@
   loading="lazy">
 </span>
 
+    <span class="pk-zahl">1 €</span>
     <span class="pk-titel szl">Handy mit Vertrag: Top-Smartphones ab 1 € Gerätepreis</span>
     <span class="pk-text">winSIM kombiniert aktuelle Smartphones wie Samsung Galaxy S26, iPhone 17 Pro, Galaxy A57 5G oder Xiaomi 17T Pro mit einem Allnet-Flat-Tarif. Der einmalige Gerätepreis liegt ab 1 €, der monatliche Tarifpreis je nach Modell ab 12,99 €; auch Top-Modelle wie Galaxy S26 Ultra oder iPhone 17 Pro Max sind enthalten.</span>
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Gerät vergünstigt</span>
     
     
   </p>
 </article>
 
     
-
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.winsim.de/tablets" target="_blank" rel="noopener">
     
@@ -2366,19 +1722,18 @@
   loading="lazy">
 </span>
 
+    <span class="pk-zahl">Gerät vergünstigt</span>
     <span class="pk-titel szl">Tablets mit SIM-Karte</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Gerät vergünstigt</span>
     
     
   </p>
 </article>
 
-
-<article class="pkarte">
+<article class="pkarte pkarte--neu">
   <a class="pk-flaeche" href="https://www.winsim.de/handys" target="_blank" rel="noopener">
     
 
@@ -2387,19 +1742,18 @@
   loading="lazy">
 </span>
 
+    <span class="pk-zahl">Handy-Bundles</span>
     <span class="pk-titel szl">Handy-Bundles: Smartphones verschiedener Hersteller mit Mobilfunkvertrag</span>
     
   </a>
   <p class="pk-fuss">
+    <span class="pk-flag pk-flag--neu">Neu</span>
     
-    <span class="pmech">Gerät vergünstigt</span>
-    <span class="pk-flag pk-flag--neu">neu</span>
     
   </p>
 </article>
 
-
-<article class="pkarte">
+<article class="pkarte pkarte--neu">
   <a class="pk-flaeche" href="https://www.winsim.de/tarife" target="_blank" rel="noopener">
     
 
@@ -2408,19 +1762,18 @@
   loading="lazy">
 </span>
 
+    <span class="pk-zahl">10 GB · 60 GB</span>
     <span class="pk-titel szl">winSIM SIM-only Aktions-Tarife (10 GB bis 60 GB)</span>
     
   </a>
   <p class="pk-fuss">
+    <span class="pk-flag pk-flag--neu">Neu</span>
     
-    <span class="pmech">mehr Datenvolumen</span>
-    <span class="pk-flag pk-flag--neu">neu</span>
     
   </p>
 </article>
 
-
-<article class="pkarte">
+<article class="pkarte pkarte--neu pkarte--endet">
   <a class="pk-flaeche" href="https://www.winsim.de/handys" target="_blank" rel="noopener">
     
 <span class="pk-bild pk-bild--typo pk-bild--typo-klein">
@@ -2429,17 +1782,16 @@
   <span class="pk-typo-mechanik">Gebühren erlassen</span>
 </span>
 
+    
     <span class="pk-titel szl">winSIM Mobilfunktarife mit 10 GB bis 60 GB sowie Unlimited-Option</span>
     
   </a>
   <p class="pk-fuss">
-    
-    <span class="pmech">Gebühren erlassen</span>
-    <span class="pk-frist">bis 13.10. 11 Uhr</span><span class="pk-flag pk-flag--neu">neu</span>
-    
+    <span class="pk-flag pk-flag--neu">Neu</span>
+    <span class="pk-flag pk-flag--endet">Endet bald</span>
+    <span class="pk-frist">bis 13.10. 11 Uhr</span>
   </p>
 </article>
-
 
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.winsim.de/unbegrenztes-datenvolumen" target="_blank" rel="noopener">
@@ -2450,19 +1802,18 @@
   <span class="pk-typo-mechanik">mehr Datenvolumen</span>
 </span>
 
+    
     <span class="pk-titel szl">Unlimited on demand Tarif mit flexiblem Datenvolumen</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">mehr Datenvolumen</span>
     
     
   </p>
 </article>
 
-
-<article class="pkarte">
+<article class="pkarte pkarte--neu">
   <a class="pk-flaeche" href="https://www.winsim.de/tarife" target="_blank" rel="noopener">
     
 <span class="pk-bild pk-bild--typo pk-bild--typo-klein">
@@ -2471,196 +1822,29 @@
   <span class="pk-typo-mechanik">Preisnachlass auf den Tarif</span>
 </span>
 
+    
     <span class="pk-titel szl">Günstige Allnet-Flat Tarife mit 10 GB bis 60 GB</span>
     
   </a>
   <p class="pk-fuss">
+    <span class="pk-flag pk-flag--neu">Neu</span>
     
-    <span class="pmech">Preisnachlass auf den Tarif</span>
-    <span class="pk-frist">bis 13.10.2024</span><span class="pk-flag pk-flag--neu">neu</span>
-    
-  </p>
-</article>
-
-
-<article class="pkarte pkarte--fading">
-  <a class="pk-flaeche" href="https://www.winsim.de/handytarife-mit-handy" target="_blank" rel="noopener">
-    
-
-<span class="pk-bild"><img src="images/c6da7e791566dcec-1280.jpg" alt=""
-  width="1280" height="2119"
-  loading="lazy">
-</span>
-
-    <span class="pk-titel szl">Unlimited-on-demand-Tarif für 19,99 €/Monat</span>
-    
-  </a>
-  <p class="pk-fuss">
-    
-    <span class="pmech">Preisnachlass auf den Tarif</span>
-    <span class="pk-frist">bis 01.09. 11 Uhr</span><span class="pk-flag pk-flag--weg">vermutlich ausgelaufen</span>
-    
-  </p>
-</article>
-
-
-<article class="pkarte pkarte--fading">
-  <a class="pk-flaeche" href="https://www.winsim.de/" target="_blank" rel="noopener">
-    
-
-<span class="pk-bild pk-bild--banner"><img src="images/cd7b66e7499cd111-1280.jpg" alt=""
-  width="1280" height="320"
-  loading="lazy">
-</span>
-
-    <span class="pk-titel szl">5G-Aktionstarife 10–60 GB stark reduziert</span>
-    
-  </a>
-  <p class="pk-fuss">
-    
-    <span class="pmech">Preisnachlass auf den Tarif</span>
-    <span class="pk-flag pk-flag--weg">vermutlich ausgelaufen</span>
-    
-  </p>
-</article>
-
-
-<article class="pkarte pkarte--fading">
-  <a class="pk-flaeche" href="https://www.winsim.de/unbegrenztes-datenvolumen" target="_blank" rel="noopener">
-    
-
-<span class="pk-bild pk-bild--banner"><img src="images/b61a33eceeb8ec99-1280.jpg" alt=""
-  width="1280" height="244"
-  loading="lazy">
-</span>
-
-    <span class="pk-titel szl">Unlimited on demand: 30 GB + unbegrenzt zubuchbar</span>
-    
-  </a>
-  <p class="pk-fuss">
-    
-    <span class="pmech">Preisnachlass auf den Tarif</span>
-    <span class="pk-flag pk-flag--weg">vermutlich ausgelaufen</span>
-    
-  </p>
-</article>
-
-
-<article class="pkarte pkarte--fading">
-  <a class="pk-flaeche" href="https://www.winsim.de/tarife" target="_blank" rel="noopener">
-    
-<span class="pk-bild pk-bild--typo pk-bild--typo-klein">
-  <span class="pk-typo-zahl">60 GB</span>
-  
-  <span class="pk-typo-mechanik">Preisnachlass auf den Tarif</span>
-</span>
-
-    <span class="pk-titel szl">Allnet-Flat Aktion: 10/40/60 GB zum Sonderpreis</span>
-    
-  </a>
-  <p class="pk-fuss">
-    
-    <span class="pmech">Preisnachlass auf den Tarif</span>
-    <span class="pk-flag pk-flag--weg">vermutlich ausgelaufen</span>
-    
-  </p>
-</article>
-
-
-<article class="pkarte pkarte--fading">
-  <a class="pk-flaeche" href="https://www.winsim.de/" target="_blank" rel="noopener">
-    
-
-<span class="pk-bild"><img src="images/410bf547c0d1ac0f-1280.jpg" alt=""
-  width="1280" height="1885"
-  loading="lazy">
-</span>
-
-    <span class="pk-titel szl">Smartphone-Bundles mit Allnet Flat ab 14,99 €</span>
-    
-  </a>
-  <p class="pk-fuss">
-    
-    <span class="pmech">Gerät vergünstigt</span>
-    <span class="pk-flag pk-flag--weg">vermutlich ausgelaufen</span>
-    
-  </p>
-</article>
-
-
-<article class="pkarte pkarte--fading">
-  <a class="pk-flaeche" href="https://www.winsim.de/handytarife-mit-handy" target="_blank" rel="noopener">
-    
-<span class="pk-bild pk-bild--typo pk-bild--typo-klein">
-  <span class="pk-typo-zahl">60 GB · 6,99 €</span>
-  
-  <span class="pk-typo-mechanik">Gebühren erlassen</span>
-</span>
-
-    <span class="pk-titel szl">winSIM Aktions-Tarife: 10, 40 und 60 GB ab 6,99 €/Monat</span>
-    
-  </a>
-  <p class="pk-fuss">
-    
-    <span class="pmech">Gebühren erlassen</span>
-    <span class="pk-flag pk-flag--weg">vermutlich ausgelaufen</span>
-    
-  </p>
-</article>
-
-
-<article class="pkarte pkarte--fading">
-  <a class="pk-flaeche" href="https://www.winsim.de/tarife" target="_blank" rel="noopener">
-    
-
-<span class="pk-bild pk-bild--banner"><img src="images/1aa1f818632ff1a8-1280.jpg" alt=""
-  width="1280" height="244"
-  loading="lazy">
-</span>
-
-    <span class="pk-titel szl">20-GB-Allnet-Flat für 8,99 € statt 19,99 €</span>
-    
-  </a>
-  <p class="pk-fuss">
-    
-    <span class="pmech">Preisnachlass auf den Tarif</span>
-    <span class="pk-frist">bis 01.09. 11 Uhr</span><span class="pk-flag pk-flag--weg">vermutlich ausgelaufen</span>
-    
-  </p>
-</article>
-
-
-<article class="pkarte pkarte--fading">
-  <a class="pk-flaeche" href="https://www.winsim.de/handytarife-ohne-handy" target="_blank" rel="noopener">
-    
-
-<span class="pk-bild pk-bild--banner"><img src="images/5917b6d371470efc-1280.jpg" alt=""
-  width="1280" height="501"
-  loading="lazy">
-</span>
-
-    <span class="pk-titel szl">SIM-only Aktionspreise: 10 GB bis Unlimited günstig</span>
-    
-  </a>
-  <p class="pk-fuss">
-    
-    <span class="pmech">Preisnachlass auf den Tarif</span>
-    <span class="pk-flag pk-flag--weg">vermutlich ausgelaufen</span>
-    
+    <span class="pk-frist">bis 13.10.2024</span>
   </p>
 </article>
 
   </div>
 </section>
 
-<section class="pmarke" id="marke-premiumsim" style="--c:#e07a00">
+
+
+<section class="pmarke" id="marke-premiumsim" style="--c:#e07a00" data-tier="2" data-auftritt>
   <div class="pmarke-kopf">
     <h2 class="pmarke-name"><a href="https://www.premiumsim.de/" target="_blank" rel="noopener">PremiumSIM</a></h2>
     <span class="pmarke-zusatz">Discount- und Zweitmarke · 1&amp;1 / Drillisch</span>
   </div>
   <div class="promo-karten">
     
-
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.premiumsim.de/handys/apple/iphone-17-pro-max" target="_blank" rel="noopener">
     
@@ -2670,19 +1854,18 @@
   loading="lazy">
 </span>
 
+    <span class="pk-zahl">54,99 €</span>
     <span class="pk-titel szl">iPhone 17 Pro Max inkl. Allnet Flat ab 54,99 €</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Gerät vergünstigt</span>
     
     
   </p>
 </article>
 
     
-
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.premiumsim.de/" target="_blank" rel="noopener">
     
@@ -2692,12 +1875,12 @@
   loading="lazy">
 </span>
 
+    <span class="pk-zahl">60 GB · 10 GB</span>
     <span class="pk-titel szl">Allnet-Flat-Tarife: 6–60 GB mit Rabatt &amp; 3x10 GB gratis</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Preisnachlass auf den Tarif</span>
     
     
   </p>
@@ -2706,14 +1889,15 @@
   </div>
 </section>
 
-<section class="pmarke" id="marke-simplytel" style="--c:#e07a00">
+
+
+<section class="pmarke" id="marke-simplytel" style="--c:#e07a00" data-tier="2" data-auftritt>
   <div class="pmarke-kopf">
     <h2 class="pmarke-name"><a href="https://www.simplytel.de/" target="_blank" rel="noopener">simplytel</a></h2>
     <span class="pmarke-zusatz">Discount- und Zweitmarke · 1&amp;1 / Drillisch</span>
   </div>
   <div class="promo-karten">
     
-
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.simplytel.de/" target="_blank" rel="noopener">
     
@@ -2723,53 +1907,31 @@
   loading="lazy">
 </span>
 
+    <span class="pk-zahl">Einfach Mega</span>
     <span class="pk-titel szl">Einfach Mega: 5G-Allnet-Flats mit Rabatt und Datenbonus</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Preisnachlass auf den Tarif</span>
+    
     <span class="pk-frist">bis 01.09. 11 Uhr</span>
-    
   </p>
 </article>
 
     
-
-<article class="pkarte pkarte--fading">
-  <a class="pk-flaeche" href="https://www.simplytel.de/" target="_blank" rel="noopener">
-    
-
-<span class="pk-bild pk-bild--banner"><img src="images/12580271ba732998-1280.jpg" alt=""
-  width="1280" height="410"
-  loading="lazy">
-</span>
-
-    <span class="pk-titel szl">Einfach Mega: 5G Allnet-Flats mit Datenvolumen-Bonus reduziert</span>
-    
-  </a>
-  <p class="pk-fuss">
-    
-    <span class="pmech">Preisnachlass auf den Tarif</span>
-    <span class="pk-frist">bis 01.09. 11 Uhr</span><span class="pk-flag pk-flag--weg">vermutlich ausgelaufen</span>
-    <span class="pk-wichtig">wichtig</span>
-  </p>
-</article>
-
   </div>
 </section>
 
 
 
 
-<section class="pmarke pmarke--eigen" id="marke-vodafone-deutschland" style="--c:#e60000">
+<section class="pmarke pmarke--eigen" id="marke-vodafone-deutschland" style="--c:#e60000" data-tier="1" data-auftritt>
   <div class="pmarke-kopf">
     <h2 class="pmarke-name"><a href="https://www.vodafone.de/handy/angebote.html" target="_blank" rel="noopener">Vodafone Deutschland</a></h2>
     <span class="pmarke-zusatz">Vergleichsanker, nicht als Wettbewerber gezählt</span>
   </div>
   <div class="promo-karten">
     
-
 <article class="pkarte pkarte--gross pkarte--hoch">
   <a class="pk-flaeche" href="https://www.vodafone.de/privat/handys/google-pixel-11-pro.html" target="_blank" rel="noopener">
     
@@ -2779,20 +1941,19 @@
   <span class="pk-typo-mechanik">Wechsel- oder Altgerätprämie</span>
 </span>
 
+    
     <span class="pk-titel szl">Google Pixel 11 Serie: Tauschbonus und 25% Tarifrabatt</span>
     <span class="pk-text">Beim Kauf eines Google Pixel 11 (z.B. Pixel 11 Pro) erhalten Kunden bis zu 500 € Tauschbonus für ihr altes Handy zusätzlich zum Restwert. Neukunden sparen außerdem 25 % auf den Mobilfunktarif, 24 Monate lang.</span>
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Wechsel- oder Altgerätprämie</span>
+    
     <span class="pk-frist">bis 9. September</span>
-    <span class="pk-wichtig">wichtig</span>
   </p>
 </article>
 
     
-
-<article class="pkarte">
+<article class="pkarte pkarte--neu pkarte--endet">
   <a class="pk-flaeche" href="https://www.vodafone.de/privat/handys/samsung-galaxy-a57-5g.html?salesChannel=redplus&amp;tariffId=94" target="_blank" rel="noopener">
     
 <span class="pk-bild pk-bild--typo pk-bild--typo-klein">
@@ -2801,19 +1962,18 @@
   
 </span>
 
+    
     <span class="pk-titel szl">Samsung Galaxy A57 Aktionsangebot</span>
     
   </a>
   <p class="pk-fuss">
-    
-    
-    <span class="pk-frist">bis 14. Oktober</span><span class="pk-flag pk-flag--neu">neu</span>
-    <span class="pk-wichtig">wichtig</span>
+    <span class="pk-flag pk-flag--neu">Neu</span>
+    <span class="pk-flag pk-flag--endet">Endet bald</span>
+    <span class="pk-frist">bis 14. Oktober</span>
   </p>
 </article>
 
-
-<article class="pkarte">
+<article class="pkarte pkarte--endet">
   <a class="pk-flaeche" href="https://www.vodafone.de/privat/handys-tablets-tarife/junge-leute.html" target="_blank" rel="noopener">
     
 
@@ -2822,17 +1982,16 @@
   loading="lazy">
 </span>
 
+    <span class="pk-zahl">960 €</span>
     <span class="pk-titel szl">GigaMobil Young XL/S: bis zu 960 € sparen für unter 28</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Zielgruppentarif</span>
+    <span class="pk-flag pk-flag--endet">Endet bald</span>
     <span class="pk-frist">bis 14. Oktober</span>
-    <span class="pk-wichtig">wichtig</span>
   </p>
 </article>
-
 
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.vodafone.de/privat/handys-tablets-tarife/handyvertrag-12-monate.html" target="_blank" rel="noopener">
@@ -2843,17 +2002,16 @@
   loading="lazy">
 </span>
 
+    <span class="pk-zahl">49,99 €</span>
     <span class="pk-titel szl">GigaMobil S mit 12 Monaten Laufzeit für 49,99 €</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">ohne Bindung</span>
     
-    <span class="pk-wichtig">wichtig</span>
+    
   </p>
 </article>
-
 
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html" target="_blank" rel="noopener">
@@ -2864,17 +2022,16 @@
   loading="lazy">
 </span>
 
+    <span class="pk-zahl">200 €</span>
     <span class="pk-titel szl">200 € sparen beim Smartphone-Dazubuchen</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Gerät vergünstigt</span>
     
-    <span class="pk-wichtig">wichtig</span>
+    
   </p>
 </article>
-
 
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.vodafone.de/privat/handys-tablets-tarife/selbstaendig.html" target="_blank" rel="noopener">
@@ -2885,17 +2042,16 @@
   <span class="pk-typo-mechanik">Zielgruppentarif</span>
 </span>
 
+    
     <span class="pk-titel szl">Selbständigen-Vorteil: 10 % + 25 % Rabatt</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Zielgruppentarif</span>
-    <span class="pk-frist">bis 9. September</span>
     
+    <span class="pk-frist">bis 9. September</span>
   </p>
 </article>
-
 
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.vodafone.de/privat/smartphones-tarife/smartphones-fuer-junge-leute.html" target="_blank" rel="noopener">
@@ -2906,17 +2062,16 @@
   loading="lazy">
 </span>
 
+    <span class="pk-zahl">GigaMobil-Young-Tarife</span>
     <span class="pk-titel szl">GigaMobil-Young-Tarife mit Smartphone für unter 28-Jährige</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Zielgruppentarif</span>
     
     
   </p>
 </article>
-
 
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.vodafone.de/handy/angebote.html" target="_blank" rel="noopener">
@@ -2927,17 +2082,16 @@
   <span class="pk-typo-mechanik">Gerät vergünstigt</span>
 </span>
 
+    
     <span class="pk-titel szl">Aktionswoche: Smartphones mit Vertrag ab einmal 1 €</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Gerät vergünstigt</span>
     
-    <span class="pk-wichtig">wichtig</span>
+    
   </p>
 </article>
-
 
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html" target="_blank" rel="noopener">
@@ -2948,17 +2102,16 @@
   <span class="pk-typo-mechanik">Preisnachlass auf den Tarif</span>
 </span>
 
+    
     <span class="pk-titel szl">Neukunden: 25 % Tarifrabatt plus Extra-Datenvolumen</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Preisnachlass auf den Tarif</span>
     
     
   </p>
 </article>
-
 
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html" target="_blank" rel="noopener">
@@ -2969,17 +2122,16 @@
   <span class="pk-typo-mechanik">Gebühren erlassen</span>
 </span>
 
+    
     <span class="pk-titel szl">25 % Rabatt, Extradaten und Anschlusspreis geschenkt</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Gebühren erlassen</span>
     
     
   </p>
 </article>
-
 
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.vodafone.de/privat/handys-tablets-tarife/handy-bundles.html" target="_blank" rel="noopener">
@@ -2990,17 +2142,16 @@
   <span class="pk-typo-mechanik">Gratis-Zugabe</span>
 </span>
 
+    
     <span class="pk-titel szl">Handy-Bundle mit kostenloser Zugabe</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Gratis-Zugabe</span>
     
     
   </p>
 </article>
-
 
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.vodafone.de/privat/handys-tablets-tarife/alle-smartphones.html" target="_blank" rel="noopener">
@@ -3011,17 +2162,16 @@
   <span class="pk-typo-mechanik">Gerät vergünstigt</span>
 </span>
 
+    
     <span class="pk-titel szl">Smartphones mit Vodafone-Tarif schon ab 1 Euro</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Gerät vergünstigt</span>
     
     
   </p>
 </article>
-
 
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.vodafone.de/privat/smartphones-tarife/smartphones-fuer-selbstaendige.html" target="_blank" rel="noopener">
@@ -3032,19 +2182,18 @@
   <span class="pk-typo-mechanik">Zielgruppentarif</span>
 </span>
 
+    
     <span class="pk-titel szl">10 % Selbständigen-Rabatt auf Handy-Tarif</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Zielgruppentarif</span>
     
     
   </p>
 </article>
 
-
-<article class="pkarte">
+<article class="pkarte pkarte--neu">
   <a class="pk-flaeche" href="https://www.vodafone.de/privat/handys-tablets-tarife/zusatzkarten.html" target="_blank" rel="noopener">
     
 
@@ -3053,19 +2202,18 @@
   loading="lazy">
 </span>
 
+    <span class="pk-zahl">20 %</span>
     <span class="pk-titel szl">FamilyCard Zusatzkarten mit 20 % Online-Rabatt</span>
     
   </a>
   <p class="pk-fuss">
+    <span class="pk-flag pk-flag--neu">Neu</span>
     
-    <span class="pmech">Preisnachlass auf den Tarif</span>
-    <span class="pk-flag pk-flag--neu">neu</span>
     
   </p>
 </article>
 
-
-<article class="pkarte">
+<article class="pkarte pkarte--neu">
   <a class="pk-flaeche" href="https://www.vodafone.de/privat/handys-tablets-tarife/zusatzkarten.html" target="_blank" rel="noopener">
     
 <span class="pk-bild pk-bild--typo pk-bild--typo-klein">
@@ -3074,17 +2222,16 @@
   <span class="pk-typo-mechanik">Preisnachlass auf den Tarif</span>
 </span>
 
+    
     <span class="pk-titel szl">FamilyCard XL Unlimited mit 15 Euro Rabatt</span>
     
   </a>
   <p class="pk-fuss">
+    <span class="pk-flag pk-flag--neu">Neu</span>
     
-    <span class="pmech">Preisnachlass auf den Tarif</span>
-    <span class="pk-flag pk-flag--neu">neu</span>
     
   </p>
 </article>
-
 
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.vodafone.de/privat/handys-tablets-tarife/zusatzkarten.html" target="_blank" rel="noopener">
@@ -3095,17 +2242,16 @@
   <span class="pk-typo-mechanik">Preisnachlass auf den Tarif</span>
 </span>
 
+    
     <span class="pk-titel szl">FamilyCard XL Unlimited für 24,99 €/Monat</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Preisnachlass auf den Tarif</span>
     
     
   </p>
 </article>
-
 
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.vodafone.de/privat/smartphones-tarife/alle-smartphones-zusatzkarten.html" target="_blank" rel="noopener">
@@ -3116,17 +2262,16 @@
   <span class="pk-typo-mechanik">Gerät vergünstigt</span>
 </span>
 
+    
     <span class="pk-titel szl">FamilyCard mit Handy für zusätzliche SIM-Karte</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">Gerät vergünstigt</span>
     
     
   </p>
 </article>
-
 
 <article class="pkarte">
   <a class="pk-flaeche" href="https://www.vodafone.de/privat/vodafonekombi.html" target="_blank" rel="noopener">
@@ -3137,41 +2282,19 @@
   <span class="pk-typo-mechanik">sonstiges</span>
 </span>
 
+    
     <span class="pk-titel szl">Vodafone Kombi: bis zu 10 € Rabatt und mehr Datenvolumen</span>
     
   </a>
   <p class="pk-fuss">
     
-    <span class="pmech">sonstiges</span>
     
     
-  </p>
-</article>
-
-
-<article class="pkarte pkarte--fading">
-  <a class="pk-flaeche" href="https://www.vodafone.de/handy/angebote.html" target="_blank" rel="noopener">
-    
-
-<span class="pk-bild"><img src="images/aa9009a20e760dc7-1280.jpg" alt=""
-  width="580" height="318"
-  loading="lazy">
-</span>
-
-    <span class="pk-titel szl">Samsung Galaxy Z Fold8: bis 500 € Trade-in, 1 € Gerätepreis &amp; 25 % Tarif-Rabatt</span>
-    
-  </a>
-  <p class="pk-fuss">
-    
-    <span class="pmech">Wechsel- oder Altgerätprämie</span>
-    <span class="pk-frist">bis 12. August 2026</span><span class="pk-flag pk-flag--weg">vermutlich ausgelaufen</span>
-    <span class="pk-wichtig">wichtig</span>
   </p>
 </article>
 
   </div>
 </section>
-
 
 
 
@@ -3276,7 +2399,7 @@
   </main>
   <footer class="foot">
     <div class="foot-inner">
-      Vodafone Product and Services Insights &middot; Promo Übersicht &middot; automatisch erstellt, jede Aussage mit Quelle
+      <span>Vodafone Product and Services Insights &middot; automatisch erstellt, jede Aussage mit Quelle</span>
       
       
       
@@ -3286,6 +2409,9 @@
       </span>
       
     </div>
+    <p class="foot-bildnachweis">Bilder: generiert für dieses Portal. Campus-Motiv nach einer Vorlage von
+      <a href="https://commons.wikimedia.org/wiki/File:Vodafone-Campus_D%C3%BCsseldorf.jpg" target="_blank" rel="noopener">Wikimedia Commons</a>.
+      Schrift: Instrument Sans (SIL Open Font License).</p>
   </footer>
   <script src="../app.js"></script>
 </body>

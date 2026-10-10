@@ -1,81 +1,88 @@
 
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" class="ohne-js">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Marktrecherche · Differenzierung</title>
   <meta name="robots" content="noindex">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   
-  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400;1,8..60,600&family=Libre+Franklin:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="preload" href="static/schrift/instrument-sans.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="style.css">
   <link rel="icon" type="image/png" href="logo.png">
 </head>
-<body class="uc-markt">
+
+<body class="uc-markt seite-differenzierung mit-buehne">
+  <a class="sprungmarke" href="#inhalt">Zum Inhalt</a>
   
-  <header class="topbar">
-    <div class="topbar-inner">
+  <header class="topbar kopf" id="kopf">
+    <div class="topbar-inner kopf-inner">
       <a class="brand" href="index.html" aria-label="Vodafone Product and Services Insights">
         <span class="brand-logo-wrap"><img class="brand-logo" src="logo.png" alt="" width="15" height="15"></span>
         <span class="brand-name">Vodafone <span class="brand-zusatz">Product and Services</span> <em>Insights</em></span>
       </a>
-      <div class="topbar-right">
-        <nav class="usecases" aria-label="Anwendungsfälle">
-          <a class="uc active" href="index.html">Marktrecherche</a>
-          <a class="uc " href="promo/index.html">Promo Übersicht</a>
-        </nav>
+      <nav class="subbar subnav navi" aria-label="Marktrecherche">
+        <a href="index.html" >Diese Woche</a>
+        <a href="meldungen.html" >Meldungen</a>
+        <a href="wettbewerb.html" class="on" aria-current="page">Wettbewerb</a>
+        
+        
+        <a href="geraete.html" >Geräte</a>
+        
+        <a href="promo/index.html" >Promo</a>
+        <a href="transparenz.html" >Quellen</a>
+      </nav>
+      <div class="topbar-right kopf-rechts">
         
         
         <form class="gsearch" id="gsearch" role="search" action="suche.html" autocomplete="off">
+          <svg class="gsearch-lupe" viewBox="0 0 20 20" width="15" height="15" fill="none" aria-hidden="true">
+            <circle cx="9" cy="9" r="6.2" stroke="currentColor" stroke-width="1.7"/>
+            <line x1="13.6" y1="13.6" x2="18" y2="18" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+          </svg>
           <input type="search" id="gsearch-input" name="q" class="gsearch-input" autocomplete="off"
-                 placeholder="Im Archiv suchen …"
+                 placeholder="Suchen"
                  aria-label="Marktrecherche durchsuchen">
-          <button type="submit" class="gsearch-btn" aria-label="Suchen">
-            <svg viewBox="0 0 20 20" width="14" height="14" fill="none" aria-hidden="true">
-              <circle cx="9" cy="9" r="6.2" stroke="currentColor" stroke-width="1.8"/>
-              <line x1="13.6" y1="13.6" x2="18" y2="18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-            </svg>
-          </button>
+          <kbd class="gsearch-taste" aria-hidden="true">⌘K</kbd>
+          <button type="submit" class="gsearch-btn" aria-label="Suchen"><span aria-hidden="true">→</span></button>
         </form>
+        
+        
+        
+        <a class="kopf-newsletter" href="newsletter.html">Newsletter</a>
         
       </div>
     </div>
-    
-    
-    
-    <nav class="subbar subnav" aria-label="Marktrecherche">
-      <a href="index.html" >Diese Woche</a>
-      <a href="meldungen.html" >Meldungen</a>
-      <a href="differenzierung.html" class="on">Differenzierung</a>
-      <a href="wettbewerb.html" >Wettbewerb</a>
-      
-      
-      <a href="geraete.html" >Geräte</a>
-      
-      
-      
-      <a href="transparenz.html" >Quellen</a>
-      
-      
-      <a href="newsletter.html" >Newsletter</a>
-      
-    </nav>
-    
   </header>
-  <main>
+  <main id="inhalt">
+    
+<section class="band">
+  <div class="band-bild" aria-hidden="true"><img class="motiv band-motiv" src="static/bilder/band-wettbewerb.jpg" alt=""
+     width="2400" height="1029" decoding="async" loading="eager"></div>
+  <div class="band-inhalt">
+    <div class="band-text">
+      <p class="band-kicker">Wettbewerb</p>
+      <h1 class="band-titel">Welt</h1>
+      
+    </div>
+    <div class="band-extra">
+<nav class="umschalter" aria-label="Ansicht">
+  
+  <a href="wettbewerb.html" >Deutschland</a>
+  
+  <a href="differenzierung.html" class="on" aria-current="page">Welt</a>
+  
+</nav>
+</div>
+  </div>
+</section>
+
     <div class="wrap">
       
       
-
-<section class="page-hero wide">
-  <div class="page-hero-row">
-    <div>
-      <p class="page-kicker">Differenzierung</p>
-      <h1>Womit sich Telkos weltweit abheben.</h1>
-    </div>
-    
+<div class="wb-einstieg" data-auftritt>
+  <p class="wb-lead">Womit sich Telkos weltweit abheben – jenseits von Preis und Datenvolumen. Jedes Beispiel mit Originalquelle.</p>
+  
 
 <aside class="seit">
   <p class="seit-kopf">Neu seit der letzten Ausgabe</p>
@@ -90,692 +97,160 @@
 </aside>
 
 
-  </div>
-  
-  <p class="page-lead">Alles, womit ein Netzbetreiber Kunden gewinnt und hält, das <em>nicht</em>
-  Preis oder Datenvolumen ist – eine Perplexity-Lizenz im Tarif, fünf Jahre Garantie
-  aufs Gerät, ein Streaming-Abo, Betrugsschutz im Netz. Gesammelt aus aller Welt,
-  jedes Beispiel mit Originalquelle.</p>
-</section>
+</div>
 
-
-
-<section class="dz-lage">
+<section class="dz-lage" data-auftritt>
   <article class="prose"><p>Die globale Telekommunikationsbranche wandelt sich zunehmend von reinen Infrastrukturbetreibern zu Anbietern digitaler Lebenswelten. Die Betreiber integrieren eine Vielzahl an Mehrwertdiensten wie Cloud-Speicher, KI-Funktionen, Entertainment-Streaming und Smart-Home-Lösungen fest in ihre Mobilfunk- und Festnetztarife, um Kundenbindung jenseits von Preiswettbewerb zu erzielen. Während sich in Nordamerika die Bündelung von Streaming-Diensten (z. B. <a href="https://www.hollywoodreporter.com/lifestyle/lifestyle-news/best-t-mobile-streaming-deal-plans-free-netflix-hulu-apple-tv-1236419303/">T-Mobile US</a>) und Preisgarantien (z. B. <a href="https://www.mobileworldlive.com/verizon/verizon-offers-3-year-price-lock-for-some-plans/">Verizon</a>) stark verbreiten, setzen Akteure in Schwellenländern wie <a href="https://play.google.com/store/apps/details?id=com.orange.myorange.ojo">Orange</a> verstärkt auf Super-Apps, die Finanz-, Handels- und Unterhaltungsdienste in einem einzigen digitalen Zugang bündeln.</p></article>
 </section>
 
 
 
-<section class="dz-marktbild" id="marktbild" style="scroll-margin-top:90px">
-  <div class="rubrik">
-    <h2>Das Marktbild</h2>
-    <span class="rubrik-zahl">112 Beispiele</span>
-  </div>
-  <div class="dz-mb-raster">
-
-    <div class="dz-mb-block">
-      <h3 class="dz-mb-titel">Welcher Hebel gezogen wird</h3>
-      <ul class="dz-balken">
-        
-        <li><span class="dz-balken-name">Entertainment &amp; Streaming</span>
-          <span class="dz-balken-spur"><span class="dz-balken-fuell" style="width:100%"></span></span>
-          <span class="dz-balken-n">28</span></li>
-        
-        <li><span class="dz-balken-name">KI &amp; Assistenten</span>
-          <span class="dz-balken-spur"><span class="dz-balken-fuell" style="width:71%"></span></span>
-          <span class="dz-balken-n">20</span></li>
-        
-        <li><span class="dz-balken-name">Loyalty &amp; Perks</span>
-          <span class="dz-balken-spur"><span class="dz-balken-fuell" style="width:36%"></span></span>
-          <span class="dz-balken-n">10</span></li>
-        
-        <li><span class="dz-balken-name">Garantie &amp; Service-Versprechen</span>
-          <span class="dz-balken-spur"><span class="dz-balken-fuell" style="width:32%"></span></span>
-          <span class="dz-balken-n">9</span></li>
-        
-        <li><span class="dz-balken-name">Smart Home &amp; IoT</span>
-          <span class="dz-balken-spur"><span class="dz-balken-fuell" style="width:32%"></span></span>
-          <span class="dz-balken-n">9</span></li>
-        
-        <li><span class="dz-balken-name">Fintech &amp; Payment</span>
-          <span class="dz-balken-spur"><span class="dz-balken-fuell" style="width:29%"></span></span>
-          <span class="dz-balken-n">8</span></li>
-        
-        <li><span class="dz-balken-name">Geräte-Programme &amp; Zubehör</span>
-          <span class="dz-balken-spur"><span class="dz-balken-fuell" style="width:25%"></span></span>
-          <span class="dz-balken-n">7</span></li>
-        
-        <li><span class="dz-balken-name">Super-App &amp; Ökosystem</span>
-          <span class="dz-balken-spur"><span class="dz-balken-fuell" style="width:21%"></span></span>
-          <span class="dz-balken-n">6</span></li>
-        
-        <li><span class="dz-balken-name">Security &amp; Betrugsschutz</span>
-          <span class="dz-balken-spur"><span class="dz-balken-fuell" style="width:18%"></span></span>
-          <span class="dz-balken-n">5</span></li>
-        
-        <li><span class="dz-balken-name">Cloud &amp; Speicher</span>
-          <span class="dz-balken-spur"><span class="dz-balken-fuell" style="width:14%"></span></span>
-          <span class="dz-balken-n">4</span></li>
-        
-        <li><span class="dz-balken-name">Gaming</span>
-          <span class="dz-balken-spur"><span class="dz-balken-fuell" style="width:14%"></span></span>
-          <span class="dz-balken-n">4</span></li>
-        
-        <li><span class="dz-balken-name">Health &amp; Wellbeing</span>
-          <span class="dz-balken-spur"><span class="dz-balken-fuell" style="width:7%"></span></span>
-          <span class="dz-balken-n">2</span></li>
-        
-      </ul>
-    </div>
-
-    <div class="dz-mb-block">
-      <h3 class="dz-mb-titel">Wer am breitesten aufgestellt ist</h3>
-      
-      <ol class="dz-anbieter">
-        
-        <li>
-          <span class="dz-anbieter-name">Deutsche Telekom</span>
-          <span class="dz-anbieter-hebel">Entertainment &amp; Streaming · Gaming · KI &amp; Assistenten · Loyalty &amp; Perks · Security &amp; Betrugsschutz · Smart Home &amp; IoT</span>
-        </li>
-        
-        <li>
-          <span class="dz-anbieter-name">T-Mobile US</span>
-          <span class="dz-anbieter-hebel">Entertainment &amp; Streaming · Garantie &amp; Service-Versprechen · Geräte-Programme &amp; Zubehör · Loyalty &amp; Perks · Security &amp; Betrugsschutz</span>
-        </li>
-        
-        <li>
-          <span class="dz-anbieter-name">Verizon</span>
-          <span class="dz-anbieter-hebel">Cloud &amp; Speicher · Entertainment &amp; Streaming · Garantie &amp; Service-Versprechen · Geräte-Programme &amp; Zubehör · KI &amp; Assistenten</span>
-        </li>
-        
-        <li>
-          <span class="dz-anbieter-name">T-Mobile</span>
-          <span class="dz-anbieter-hebel">Entertainment &amp; Streaming · Garantie &amp; Service-Versprechen · Loyalty &amp; Perks</span>
-        </li>
-        
-        <li>
-          <span class="dz-anbieter-name">Reliance Jio</span>
-          <span class="dz-anbieter-hebel">Cloud &amp; Speicher · KI &amp; Assistenten · Super-App &amp; Ökosystem</span>
-        </li>
-        
-        <li>
-          <span class="dz-anbieter-name">AT&amp;T</span>
-          <span class="dz-anbieter-hebel">Cloud &amp; Speicher · Garantie &amp; Service-Versprechen · Smart Home &amp; IoT</span>
-        </li>
-        
-        <li>
-          <span class="dz-anbieter-name">Vodafone UK</span>
-          <span class="dz-anbieter-hebel">Entertainment &amp; Streaming · Garantie &amp; Service-Versprechen · Health &amp; Wellbeing</span>
-        </li>
-        
-        <li>
-          <span class="dz-anbieter-name">Telkomsel</span>
-          <span class="dz-anbieter-hebel">Entertainment &amp; Streaming · KI &amp; Assistenten · Super-App &amp; Ökosystem</span>
-        </li>
-        
-      </ol>
-    </div>
-
-    <div class="dz-mb-block">
-      <h3 class="dz-mb-titel">Woher die Beispiele kommen</h3>
-      <ul class="dz-balken">
-        
-        <li><span class="dz-balken-name">Europa</span>
-          <span class="dz-balken-spur"><span class="dz-balken-fuell" style="width:100%"></span></span>
-          <span class="dz-balken-n">35</span></li>
-        
-        <li><span class="dz-balken-name">Nordamerika</span>
-          <span class="dz-balken-spur"><span class="dz-balken-fuell" style="width:100%"></span></span>
-          <span class="dz-balken-n">35</span></li>
-        
-        <li><span class="dz-balken-name">Asien</span>
-          <span class="dz-balken-spur"><span class="dz-balken-fuell" style="width:51%"></span></span>
-          <span class="dz-balken-n">18</span></li>
-        
-        <li><span class="dz-balken-name">Afrika &amp; Naher Osten</span>
-          <span class="dz-balken-spur"><span class="dz-balken-fuell" style="width:34%"></span></span>
-          <span class="dz-balken-n">12</span></li>
-        
-        <li><span class="dz-balken-name">Global</span>
-          <span class="dz-balken-spur"><span class="dz-balken-fuell" style="width:29%"></span></span>
-          <span class="dz-balken-n">10</span></li>
-        
-        <li><span class="dz-balken-name">Lateinamerika</span>
-          <span class="dz-balken-spur"><span class="dz-balken-fuell" style="width:3%"></span></span>
-          <span class="dz-balken-n">1</span></li>
-        
-        <li><span class="dz-balken-name">Ozeanien</span>
-          <span class="dz-balken-spur"><span class="dz-balken-fuell" style="width:3%"></span></span>
-          <span class="dz-balken-n">1</span></li>
-        
-      </ul>
-    </div>
-
-  </div>
-
+<nav class="hebel-wand dz-nav" id="hebel-wand" aria-label="Die Differenzierungs-Hebel" style="scroll-margin-top:96px">
   
   
-  <div class="dz-muster-band">
-    <h3 class="dz-mb-titel">Was sich wiederholt</h3>
-    <ul class="dz-muster">
-      
-      <li><b>KI-Integrierung als Kundenbindung:</b> Mehrere Betreiber nutzen Premium-KI-Dienste als exklusives Inklusivmerkmal ihrer Tarife, um den Nutzwert der Verbindung zu steigern. Dabei werden Plattformen wie Perplexity Pro bei Anbietern wie <a href="https://telecomtalk.info/airtel-perplexity-pro-customers-jio-gemini3-5g-users/1001760/">Bharti Airtel</a> und <a href="https://www.telekom.com/en/media/media-information/archive/perplexity-now-in-the-meinmagenta-app-1083480">Deutsche Telekom</a> direkt in die Kundenschnittstellen integriert oder als Abo-Erweiterung angeboten.</li>
-      
-      <li><b>Preissicherheit als Differenzierungsmerkmal:</b> Um Vertrauen und Planbarkeit zu vermitteln, positionieren Unternehmen eine langjährige Preisstabilität als zentrales Service-Versprechen. Diese Garantieansätze finden sich beispielsweise bei <a href="https://www.reviews.org/internet-service/t-mobile-price-guarantee/">T-Mobile</a> und <a href="https://www.telecompetitor.com/att-expands-its-guarantee-to-almost-50m-more-customers/">AT&amp;T</a> in Nordamerika, wo sie Kunden vor unerwarteten Erhöhungen über mehrere Jahre hinweg schützen sollen.</li>
-      
-      <li><b>Sicherheits-Ökosysteme gegen neue Bedrohungen:</b> Gemeinsame Anstrengungen zur Abwehr digitaler Gefahren gewinnen an Bedeutung, insbesondere beim Schutz vor KI-gestütztem Betrug. So haben Akteure wie <a href="https://aimagazine.com/news/telco-giants-launch-network-ai-to-stop-deepfake-vocie-scams">Deutsche Telekom</a> und <a href="https://cybermagazine.com/news/syntelligence-ai-tackles-deepfakes">SK Telecom</a> internationale Allianzen geschlossen, um Deepfake-Sprachbetrug mittels technischer KI-Lösungen direkt auf Netzebene zu unterbinden.</li>
-      
-    </ul>
-  </div>
   
-</section>
-
-
-<section class="dz-radar" id="neu" style="scroll-margin-top:90px">
-  <div class="rubrik">
-    <h2>Neu auf dem Radar</h2>
-  </div>
-  <div class="dz-raster dz-raster--gross">
-    
-<article class="dzk dzk--gross" style="--c:#b5551d">
+  <a class="hebel-kachel" href="#dz-theme-ki" data-hebel="ki" data-auftritt>
+    <span class="hebel-bild"><img class="motiv hebel-motiv" src="static/bilder/hebel-ki.jpg" alt=""
+     width="900" height="1125" decoding="async" loading="lazy"></span>
+    <span class="hebel-text">
+      <span class="hebel-name">KI &amp; Assistenten</span>
+      <span class="hebel-zahl">15 Anbieter</span>
+    </span>
+  </a>
   
-
-<span class="dzk-motiv">
-  <img src="images/5f128abbb81cdd38-800.jpg" alt=""
-     width="460" height="325"
-     loading="lazy">
   
-</span>
-
-  <div class="dzk-text">
-    
-    <p class="dzk-kopf"><b class="dzk-op">Xfinity</b><span class="dzk-reg">Nordamerika</span></p>
-    <a class="dzk-what szl" href="https://www.security.org/home-security-systems/xfinity/" target="_blank" rel="noopener">Xfinity bietet seinen Internetkunden ein integriertes Home-Security-System mit 24/7-Überwachung an, das als Bundle mit anderen Comcast-Diensten vertrieben wird.</a>
-    <p class="dzk-why">Dieser Ansatz zeigt die Nutzung des bestehenden Kundenstamms für den Cross-Selling-Vertrieb von sicherheitsrelevanten Mehrwertdiensten (Value-Added Services).</p>
-    <p class="dzk-fuss">
-      
-      <a class="dzk-hebel" href="#dz-theme-smarthome">Smart Home &amp; IoT</a>
-      <a class="dzk-quelle" href="https://www.security.org/home-security-systems/xfinity/" target="_blank" rel="noopener">security.org &nearr;</a>
-      <span class="dz-new">neu</span>
-    </p>
-  </div>
-</article>
-
-<article class="dzk dzk--gross" style="--c:#c2185b">
   
-
-<span class="dzk-motiv">
-  <img src="images/6069847e32fcf589-800.jpg" alt=""
-     width="800" height="533"
-     loading="lazy">
+  <a class="hebel-kachel" href="#dz-theme-entertainment" data-hebel="entertainment" data-auftritt>
+    <span class="hebel-bild"><span class="motiv motiv--leer hebel-motiv" aria-hidden="true"></span></span>
+    <span class="hebel-text">
+      <span class="hebel-name">Entertainment &amp; Streaming</span>
+      <span class="hebel-zahl">20 Anbieter</span>
+    </span>
+  </a>
   
-</span>
-
-  <div class="dzk-text">
-    
-    <p class="dzk-kopf"><b class="dzk-op">Vodafone UK</b><span class="dzk-reg">Europa</span></p>
-    <a class="dzk-what szl" href="https://www.vodafone.co.uk/newscentre/press-release/new-vodafone-tv-netflix-hbo-max-17quid-a-month/" target="_blank" rel="noopener">Vodafone UK bringt eine neue TV-Box auf den Markt, die Streaming-Dienste wie Netflix und HBO Max, Live-TV und Gaming vereint.</a>
-    <p class="dzk-why">Exzellente Vorlage für die Bündelung von Festnetz, Mobilfunk und Entertainment in Europa, die Vodafone auch in anderen Märkten ausrollen kann.</p>
-    <p class="dzk-fuss">
-      
-      <a class="dzk-hebel" href="#dz-theme-entertainment">Entertainment &amp; Streaming</a>
-      <a class="dzk-quelle" href="https://www.vodafone.co.uk/newscentre/press-release/new-vodafone-tv-netflix-hbo-max-17quid-a-month/" target="_blank" rel="noopener">vodafone.co.uk &nearr;</a>
-      <span class="dz-new">neu</span>
-    </p>
-  </div>
-</article>
-
-<article class="dzk dzk--gross ohne-bild" style="--c:#e07a00">
   
-
-<span class="dzk-motiv">
-  <span class="dzk-kachel">Virgin Media O2</span>
-</span>
-
-  <div class="dzk-text">
-    
-    <p class="dzk-kopf"><span class="dzk-reg">Europa</span></p>
-    <a class="dzk-what szl" href="https://news.virginmediao2.co.uk/a1-naming-rights-partnership-until-2038/" target="_blank" rel="noopener">AEG und O2 haben ihre Partnerschaft um die Namensrechte für The O2 bis zum Jahr 2038 verlängert.</a>
-    <p class="dzk-why">Zeigt den langfristigen Wert von Event-Sponsoring zur Kundengewinnung.</p>
-    <p class="dzk-fuss">
-      
-      <a class="dzk-hebel" href="#dz-theme-loyalty">Loyalty &amp; Perks</a>
-      <a class="dzk-quelle" href="https://news.virginmediao2.co.uk/a1-naming-rights-partnership-until-2038/" target="_blank" rel="noopener">news.virginmediao2.co.uk &nearr;</a>
-      <span class="dz-new">neu</span>
-    </p>
-  </div>
-</article>
-
-  </div>
-</section>
-
-
-
-
-
-<section class="dz-verlauf" id="verlauf" style="scroll-margin-top:90px">
-  <div class="rubrik"><h2>Was wächst, was kippt</h2>
-    <span class="rubrik-zusatz">Anteil an den Aufnahmen des Monats</span></div>
-
   
-  <div class="vl-bewegung">
-    
-    <a class="vl-move vl-auf" href="#dz-theme-loyalty">
-      <span class="vl-move-label">Loyalty &amp; Perks</span>
-      <span class="vl-move-delta">+22.0 Punkte</span>
-      <span class="vl-move-detail">6.6 % → 28.6 %</span>
-    </a>
-    
-    <a class="vl-move vl-auf" href="#dz-theme-gaming">
-      <span class="vl-move-label">Gaming</span>
-      <span class="vl-move-delta">+11.1 Punkte</span>
-      <span class="vl-move-detail">3.2 % → 14.3 %</span>
-    </a>
-    
-    <a class="vl-move vl-auf" href="#dz-theme-smarthome">
-      <span class="vl-move-label">Smart Home &amp; IoT</span>
-      <span class="vl-move-delta">+8.4 Punkte</span>
-      <span class="vl-move-detail">5.9 % → 14.3 %</span>
-    </a>
-    
-    
-    <a class="vl-move vl-ab" href="#dz-theme-ki">
-      <span class="vl-move-label">KI &amp; Assistenten</span>
-      <span class="vl-move-delta">-19.0 Punkte</span>
-      <span class="vl-move-detail">19.0 % → 0.0 %</span>
-    </a>
-    
-    <a class="vl-move vl-ab" href="#dz-theme-garantie">
-      <span class="vl-move-label">Garantie &amp; Service-Versprechen</span>
-      <span class="vl-move-delta">-10.1 Punkte</span>
-      <span class="vl-move-detail">10.1 % → 0.0 %</span>
-    </a>
-    
-    <a class="vl-move vl-ab" href="#dz-theme-superapp">
-      <span class="vl-move-label">Super-App &amp; Ökosystem</span>
-      <span class="vl-move-delta">-6.9 Punkte</span>
-      <span class="vl-move-detail">6.9 % → 0.0 %</span>
-    </a>
-    
-  </div>
+  <a class="hebel-kachel" href="#dz-theme-garantie" data-hebel="garantie" data-auftritt>
+    <span class="hebel-bild"><img class="motiv hebel-motiv" src="static/bilder/hebel-garantie.jpg" alt=""
+     width="900" height="1125" decoding="async" loading="lazy"></span>
+    <span class="hebel-text">
+      <span class="hebel-name">Garantie &amp; Service-Versprechen</span>
+      <span class="hebel-zahl">7 Anbieter</span>
+    </span>
+  </a>
   
-
-  <div class="vl-gitter">
-    <div class="vl-kopf">
-      <span class="vl-name"></span>
-      <span class="vl-monat">Jun 26</span><span class="vl-monat">Jul 26</span><span class="vl-monat">Aug 26</span><span class="vl-monat vl-duenn">Sep 26</span><span class="vl-monat">Okt 26</span>
-    </div>
-    
-    <div class="vl-zeile">
-      <span class="vl-name"><a href="#dz-theme-entertainment">Entertainment &amp; Streaming</a></span>
-      
-      <span class="vl-zelle" title="Jun 26: 3 Aufnahmen (12.0 %)">
-        <span class="vl-balken" style="height:24.0%"></span>
-        <span class="vl-zahl">3</span>
-      </span>
-      
-      <span class="vl-zelle" title="Jul 26: 8 Aufnahmen (28.6 %)">
-        <span class="vl-balken" style="height:57.0%"></span>
-        <span class="vl-zahl">8</span>
-      </span>
-      
-      <span class="vl-zelle" title="Aug 26: 15 Aufnahmen (29.4 %)">
-        <span class="vl-balken" style="height:59.0%"></span>
-        <span class="vl-zahl">15</span>
-      </span>
-      
-      <span class="vl-zelle" title="Sep 26: 0 Aufnahmen (0.0 %)">
-        <span class="vl-balken" style="height:0.0%"></span>
-        <span class="vl-zahl"></span>
-      </span>
-      
-      <span class="vl-zelle" title="Okt 26: 2 Aufnahmen (28.6 %)">
-        <span class="vl-balken" style="height:57.0%"></span>
-        <span class="vl-zahl">2</span>
-      </span>
-      
-    </div>
-    
-    <div class="vl-zeile">
-      <span class="vl-name"><a href="#dz-theme-ki">KI &amp; Assistenten</a></span>
-      
-      <span class="vl-zelle" title="Jun 26: 4 Aufnahmen (16.0 %)">
-        <span class="vl-balken" style="height:32.0%"></span>
-        <span class="vl-zahl">4</span>
-      </span>
-      
-      <span class="vl-zelle" title="Jul 26: 6 Aufnahmen (21.4 %)">
-        <span class="vl-balken" style="height:43.0%"></span>
-        <span class="vl-zahl">6</span>
-      </span>
-      
-      <span class="vl-zelle" title="Aug 26: 10 Aufnahmen (19.6 %)">
-        <span class="vl-balken" style="height:39.0%"></span>
-        <span class="vl-zahl">10</span>
-      </span>
-      
-      <span class="vl-zelle" title="Sep 26: 0 Aufnahmen (0.0 %)">
-        <span class="vl-balken" style="height:0.0%"></span>
-        <span class="vl-zahl"></span>
-      </span>
-      
-      <span class="vl-zelle" title="Okt 26: 0 Aufnahmen (0.0 %)">
-        <span class="vl-balken" style="height:0.0%"></span>
-        <span class="vl-zahl"></span>
-      </span>
-      
-    </div>
-    
-    <div class="vl-zeile">
-      <span class="vl-name"><a href="#dz-theme-loyalty">Loyalty &amp; Perks</a></span>
-      
-      <span class="vl-zelle" title="Jun 26: 2 Aufnahmen (8.0 %)">
-        <span class="vl-balken" style="height:16.0%"></span>
-        <span class="vl-zahl">2</span>
-      </span>
-      
-      <span class="vl-zelle" title="Jul 26: 0 Aufnahmen (0.0 %)">
-        <span class="vl-balken" style="height:0.0%"></span>
-        <span class="vl-zahl"></span>
-      </span>
-      
-      <span class="vl-zelle" title="Aug 26: 6 Aufnahmen (11.8 %)">
-        <span class="vl-balken" style="height:24.0%"></span>
-        <span class="vl-zahl">6</span>
-      </span>
-      
-      <span class="vl-zelle" title="Sep 26: 0 Aufnahmen (0.0 %)">
-        <span class="vl-balken" style="height:0.0%"></span>
-        <span class="vl-zahl"></span>
-      </span>
-      
-      <span class="vl-zelle" title="Okt 26: 2 Aufnahmen (28.6 %)">
-        <span class="vl-balken" style="height:57.0%"></span>
-        <span class="vl-zahl">2</span>
-      </span>
-      
-    </div>
-    
-    <div class="vl-zeile">
-      <span class="vl-name"><a href="#dz-theme-garantie">Garantie &amp; Service-Versprechen</a></span>
-      
-      <span class="vl-zelle" title="Jun 26: 3 Aufnahmen (12.0 %)">
-        <span class="vl-balken" style="height:24.0%"></span>
-        <span class="vl-zahl">3</span>
-      </span>
-      
-      <span class="vl-zelle" title="Jul 26: 4 Aufnahmen (14.3 %)">
-        <span class="vl-balken" style="height:29.0%"></span>
-        <span class="vl-zahl">4</span>
-      </span>
-      
-      <span class="vl-zelle" title="Aug 26: 2 Aufnahmen (3.9 %)">
-        <span class="vl-balken" style="height:8.0%"></span>
-        <span class="vl-zahl">2</span>
-      </span>
-      
-      <span class="vl-zelle" title="Sep 26: 0 Aufnahmen (0.0 %)">
-        <span class="vl-balken" style="height:0.0%"></span>
-        <span class="vl-zahl"></span>
-      </span>
-      
-      <span class="vl-zelle" title="Okt 26: 0 Aufnahmen (0.0 %)">
-        <span class="vl-balken" style="height:0.0%"></span>
-        <span class="vl-zahl"></span>
-      </span>
-      
-    </div>
-    
-    <div class="vl-zeile">
-      <span class="vl-name"><a href="#dz-theme-smarthome">Smart Home &amp; IoT</a></span>
-      
-      <span class="vl-zelle" title="Jun 26: 2 Aufnahmen (8.0 %)">
-        <span class="vl-balken" style="height:16.0%"></span>
-        <span class="vl-zahl">2</span>
-      </span>
-      
-      <span class="vl-zelle" title="Jul 26: 0 Aufnahmen (0.0 %)">
-        <span class="vl-balken" style="height:0.0%"></span>
-        <span class="vl-zahl"></span>
-      </span>
-      
-      <span class="vl-zelle" title="Aug 26: 5 Aufnahmen (9.8 %)">
-        <span class="vl-balken" style="height:20.0%"></span>
-        <span class="vl-zahl">5</span>
-      </span>
-      
-      <span class="vl-zelle" title="Sep 26: 1 Aufnahmen (100.0 %)">
-        <span class="vl-balken" style="height:100%"></span>
-        <span class="vl-zahl">1</span>
-      </span>
-      
-      <span class="vl-zelle" title="Okt 26: 1 Aufnahmen (14.3 %)">
-        <span class="vl-balken" style="height:29.0%"></span>
-        <span class="vl-zahl">1</span>
-      </span>
-      
-    </div>
-    
-    <div class="vl-zeile">
-      <span class="vl-name"><a href="#dz-theme-fintech">Fintech &amp; Payment</a></span>
-      
-      <span class="vl-zelle" title="Jun 26: 2 Aufnahmen (8.0 %)">
-        <span class="vl-balken" style="height:16.0%"></span>
-        <span class="vl-zahl">2</span>
-      </span>
-      
-      <span class="vl-zelle" title="Jul 26: 1 Aufnahmen (3.6 %)">
-        <span class="vl-balken" style="height:7.0%"></span>
-        <span class="vl-zahl">1</span>
-      </span>
-      
-      <span class="vl-zelle" title="Aug 26: 4 Aufnahmen (7.8 %)">
-        <span class="vl-balken" style="height:16.0%"></span>
-        <span class="vl-zahl">4</span>
-      </span>
-      
-      <span class="vl-zelle" title="Sep 26: 0 Aufnahmen (0.0 %)">
-        <span class="vl-balken" style="height:0.0%"></span>
-        <span class="vl-zahl"></span>
-      </span>
-      
-      <span class="vl-zelle" title="Okt 26: 1 Aufnahmen (14.3 %)">
-        <span class="vl-balken" style="height:29.0%"></span>
-        <span class="vl-zahl">1</span>
-      </span>
-      
-    </div>
-    
-    <div class="vl-zeile">
-      <span class="vl-name"><a href="#dz-theme-geraete">Geräte-Programme &amp; Zubehör</a></span>
-      
-      <span class="vl-zelle" title="Jun 26: 1 Aufnahmen (4.0 %)">
-        <span class="vl-balken" style="height:8.0%"></span>
-        <span class="vl-zahl">1</span>
-      </span>
-      
-      <span class="vl-zelle" title="Jul 26: 1 Aufnahmen (3.6 %)">
-        <span class="vl-balken" style="height:7.0%"></span>
-        <span class="vl-zahl">1</span>
-      </span>
-      
-      <span class="vl-zelle" title="Aug 26: 5 Aufnahmen (9.8 %)">
-        <span class="vl-balken" style="height:20.0%"></span>
-        <span class="vl-zahl">5</span>
-      </span>
-      
-      <span class="vl-zelle" title="Sep 26: 0 Aufnahmen (0.0 %)">
-        <span class="vl-balken" style="height:0.0%"></span>
-        <span class="vl-zahl"></span>
-      </span>
-      
-      <span class="vl-zelle" title="Okt 26: 0 Aufnahmen (0.0 %)">
-        <span class="vl-balken" style="height:0.0%"></span>
-        <span class="vl-zahl"></span>
-      </span>
-      
-    </div>
-    
-    <div class="vl-zeile">
-      <span class="vl-name"><a href="#dz-theme-superapp">Super-App &amp; Ökosystem</a></span>
-      
-      <span class="vl-zelle" title="Jun 26: 2 Aufnahmen (8.0 %)">
-        <span class="vl-balken" style="height:16.0%"></span>
-        <span class="vl-zahl">2</span>
-      </span>
-      
-      <span class="vl-zelle" title="Jul 26: 3 Aufnahmen (10.7 %)">
-        <span class="vl-balken" style="height:21.0%"></span>
-        <span class="vl-zahl">3</span>
-      </span>
-      
-      <span class="vl-zelle" title="Aug 26: 1 Aufnahmen (2.0 %)">
-        <span class="vl-balken" style="height:4.0%"></span>
-        <span class="vl-zahl">1</span>
-      </span>
-      
-      <span class="vl-zelle" title="Sep 26: 0 Aufnahmen (0.0 %)">
-        <span class="vl-balken" style="height:0.0%"></span>
-        <span class="vl-zahl"></span>
-      </span>
-      
-      <span class="vl-zelle" title="Okt 26: 0 Aufnahmen (0.0 %)">
-        <span class="vl-balken" style="height:0.0%"></span>
-        <span class="vl-zahl"></span>
-      </span>
-      
-    </div>
-    
-  </div>
-
   
-  <p class="muted-note" style="margin:12px 0 0;max-width:760px">
-    Monate mit weniger als 5 Aufnahmen zählen für die
-    Bewegung oben nicht mit (Sep 26) – ein
-    Anteil aus zwei Beispielen ist eine Rundung, keine Beobachtung.
-  </p>
   
-</section>
-
-
-
-
-
-<section class="dz-luecken" id="luecken" style="scroll-margin-top:90px">
-  <div class="rubrik">
-    <h2>Wer was hat – und was Vodafone Deutschland dazu</h2>
-    <span class="rubrik-zahl">0 von 12 Hebeln erfasst</span>
-  </div>
-
+  <a class="hebel-kachel" href="#dz-theme-geraete" data-hebel="geraete" data-auftritt>
+    <span class="hebel-bild"><img class="motiv hebel-motiv" src="static/bilder/hebel-geraete.jpg" alt=""
+     width="900" height="1125" decoding="async" loading="lazy"></span>
+    <span class="hebel-text">
+      <span class="hebel-name">Geräte-Programme &amp; Zubehör</span>
+      <span class="hebel-zahl">6 Anbieter</span>
+    </span>
+  </a>
   
-
-  <div class="rowtable dz-vergleich">
-    <div class="rowtable-head">
-      <span class="col-region">Hebel</span>
-      <span class="col-flex">Wettbewerber</span>
-      <span class="col-kept">Vodafone Deutschland</span>
-    </div>
-    
-    <div class="rowtable-row">
-      <span class="col-region"><a href="#dz-theme-entertainment">Entertainment &amp; Streaming</a></span>
-      <span class="col-flex">20 · A1 Telekom Austria, AIS, Deutsche Telekom</span>
-      <span class="col-kept">noch nicht erfasst</span>
-    </div>
-    
-    <div class="rowtable-row">
-      <span class="col-region"><a href="#dz-theme-ki">KI &amp; Assistenten</a></span>
-      <span class="col-flex">15 · Airtel, Bharti Airtel, Checkers / Sixty60 (Pixie)</span>
-      <span class="col-kept">noch nicht erfasst</span>
-    </div>
-    
-    <div class="rowtable-row">
-      <span class="col-region"><a href="#dz-theme-fintech">Fintech &amp; Payment</a></span>
-      <span class="col-flex">8 · MTN, MTN Group, Mukuru</span>
-      <span class="col-kept">noch nicht erfasst</span>
-    </div>
-    
-    <div class="rowtable-row">
-      <span class="col-region"><a href="#dz-theme-garantie">Garantie &amp; Service-Versprechen</a></span>
-      <span class="col-flex">7 · AT&amp;T, Breezeline / DIRECTV, Spectrum</span>
-      <span class="col-kept">noch nicht erfasst</span>
-    </div>
-    
-    <div class="rowtable-row">
-      <span class="col-region"><a href="#dz-theme-geraete">Geräte-Programme &amp; Zubehör</a></span>
-      <span class="col-flex">6 · A1 Telekom Austria, Apple, MediaMarkt / Google</span>
-      <span class="col-kept">noch nicht erfasst</span>
-    </div>
-    
-    <div class="rowtable-row">
-      <span class="col-region"><a href="#dz-theme-loyalty">Loyalty &amp; Perks</a></span>
-      <span class="col-flex">6 · Bharti Airtel, Deutsche Telekom, O2 / Virgin Media O2</span>
-      <span class="col-kept">noch nicht erfasst</span>
-    </div>
-    
-    <div class="rowtable-row">
-      <span class="col-region"><a href="#dz-theme-smarthome">Smart Home &amp; IoT</a></span>
-      <span class="col-flex">6 · AT&amp;T, Comcast (Xfinity), Deutsche Telekom</span>
-      <span class="col-kept">noch nicht erfasst</span>
-    </div>
-    
-    <div class="rowtable-row">
-      <span class="col-region"><a href="#dz-theme-superapp">Super-App &amp; Ökosystem</a></span>
-      <span class="col-flex">5 · MTN Group, Orange, Reliance Jio</span>
-      <span class="col-kept">noch nicht erfasst</span>
-    </div>
-    
-    <div class="rowtable-row">
-      <span class="col-region"><a href="#dz-theme-cloud">Cloud &amp; Speicher</a></span>
-      <span class="col-flex">4 · AT&amp;T, O2 / Telefónica, Reliance Jio</span>
-      <span class="col-kept">noch nicht erfasst</span>
-    </div>
-    
-    <div class="rowtable-row">
-      <span class="col-region"><a href="#dz-theme-gaming">Gaming</a></span>
-      <span class="col-flex">4 · Bouygues Telecom, Deutsche Telekom, Microsoft</span>
-      <span class="col-kept">noch nicht erfasst</span>
-    </div>
-    
-    <div class="rowtable-row">
-      <span class="col-region"><a href="#dz-theme-security">Security &amp; Betrugsschutz</a></span>
-      <span class="col-flex">4 · 2degrees, Deutsche Telekom, e&amp;, Singtel Group, SK Telecom, SoftBank, Globe Telecom</span>
-      <span class="col-kept">noch nicht erfasst</span>
-    </div>
-    
-    <div class="rowtable-row">
-      <span class="col-region"><a href="#dz-theme-health">Health &amp; Wellbeing</a></span>
-      <span class="col-flex">2 · NTT Docomo, Vodafone UK</span>
-      <span class="col-kept">noch nicht erfasst</span>
-    </div>
-    
-  </div>
-
   
-  <p class="muted-note" style="margin:14px 0 0;max-width:760px">
-    Ein Hebel gilt erst dann als Lücke, wenn die eigene Seite mit Datum
-    gepflegt ist. Was hier „noch nicht erfasst“ heißt, ist ungeprüft – nicht
-    fehlend. Die Liste steht in <code>config/vodafone_hebel.yaml</code>.
-  </p>
   
-</section>
-
-
-
-<nav class="toc dz-nav" aria-label="Die Differenzierungs-Hebel">
-  <a href="#dz-theme-ki">KI &amp; Assistenten</a><a href="#dz-theme-entertainment">Entertainment &amp; Streaming</a><a href="#dz-theme-garantie">Garantie &amp; Service-Versprechen</a><a href="#dz-theme-geraete">Geräte-Programme &amp; Zubehör</a><a href="#dz-theme-security">Security &amp; Betrugsschutz</a><a href="#dz-theme-fintech">Fintech &amp; Payment</a><a href="#dz-theme-superapp">Super-App &amp; Ökosystem</a><a href="#dz-theme-cloud">Cloud &amp; Speicher</a><a href="#dz-theme-smarthome">Smart Home &amp; IoT</a><a href="#dz-theme-gaming">Gaming</a><a href="#dz-theme-loyalty">Loyalty &amp; Perks</a><a href="#dz-theme-health">Health &amp; Wellbeing</a>
+  <a class="hebel-kachel" href="#dz-theme-security" data-hebel="security" data-auftritt>
+    <span class="hebel-bild"><img class="motiv hebel-motiv" src="static/bilder/hebel-security.jpg" alt=""
+     width="900" height="1125" decoding="async" loading="lazy"></span>
+    <span class="hebel-text">
+      <span class="hebel-name">Security &amp; Betrugsschutz</span>
+      <span class="hebel-zahl">4 Anbieter</span>
+    </span>
+  </a>
+  
+  
+  
+  <a class="hebel-kachel" href="#dz-theme-fintech" data-hebel="fintech" data-auftritt>
+    <span class="hebel-bild"><img class="motiv hebel-motiv" src="static/bilder/hebel-fintech.jpg" alt=""
+     width="900" height="1125" decoding="async" loading="lazy"></span>
+    <span class="hebel-text">
+      <span class="hebel-name">Fintech &amp; Payment</span>
+      <span class="hebel-zahl">8 Anbieter</span>
+    </span>
+  </a>
+  
+  
+  
+  <a class="hebel-kachel" href="#dz-theme-superapp" data-hebel="superapp" data-auftritt>
+    <span class="hebel-bild"><img class="motiv hebel-motiv" src="static/bilder/hebel-superapp.jpg" alt=""
+     width="900" height="1125" decoding="async" loading="lazy"></span>
+    <span class="hebel-text">
+      <span class="hebel-name">Super-App &amp; Ökosystem</span>
+      <span class="hebel-zahl">5 Anbieter</span>
+    </span>
+  </a>
+  
+  
+  
+  <a class="hebel-kachel" href="#dz-theme-cloud" data-hebel="cloud" data-auftritt>
+    <span class="hebel-bild"><img class="motiv hebel-motiv" src="static/bilder/hebel-cloud.jpg" alt=""
+     width="900" height="1125" decoding="async" loading="lazy"></span>
+    <span class="hebel-text">
+      <span class="hebel-name">Cloud &amp; Speicher</span>
+      <span class="hebel-zahl">4 Anbieter</span>
+    </span>
+  </a>
+  
+  
+  
+  <a class="hebel-kachel" href="#dz-theme-smarthome" data-hebel="smarthome" data-auftritt>
+    <span class="hebel-bild"><img class="motiv hebel-motiv" src="static/bilder/hebel-smarthome.jpg" alt=""
+     width="900" height="1125" decoding="async" loading="lazy"></span>
+    <span class="hebel-text">
+      <span class="hebel-name">Smart Home &amp; IoT</span>
+      <span class="hebel-zahl">6 Anbieter</span>
+    </span>
+  </a>
+  
+  
+  
+  <a class="hebel-kachel" href="#dz-theme-gaming" data-hebel="gaming" data-auftritt>
+    <span class="hebel-bild"><img class="motiv hebel-motiv" src="static/bilder/hebel-gaming.jpg" alt=""
+     width="900" height="1125" decoding="async" loading="lazy"></span>
+    <span class="hebel-text">
+      <span class="hebel-name">Gaming</span>
+      <span class="hebel-zahl">4 Anbieter</span>
+    </span>
+  </a>
+  
+  
+  
+  <a class="hebel-kachel" href="#dz-theme-loyalty" data-hebel="loyalty" data-auftritt>
+    <span class="hebel-bild"><img class="motiv hebel-motiv" src="static/bilder/hebel-loyalty.jpg" alt=""
+     width="900" height="1125" decoding="async" loading="lazy"></span>
+    <span class="hebel-text">
+      <span class="hebel-name">Loyalty &amp; Perks</span>
+      <span class="hebel-zahl">6 Anbieter</span>
+    </span>
+  </a>
+  
+  
+  
+  <a class="hebel-kachel" href="#dz-theme-health" data-hebel="health" data-auftritt>
+    <span class="hebel-bild"><img class="motiv hebel-motiv" src="static/bilder/hebel-health.jpg" alt=""
+     width="900" height="1125" decoding="async" loading="lazy"></span>
+    <span class="hebel-text">
+      <span class="hebel-name">Health &amp; Wellbeing</span>
+      <span class="hebel-zahl">2 Anbieter</span>
+    </span>
+  </a>
+  
 </nav>
 
 
+<div class="hebel-ansichten">
 
 <section class="dz-hebel" id="dz-theme-ki" style="--c:#7b3fe4">
-  <div class="rubrik dz-rubrik">
+  <div class="hebel-kopf">
     <h2>KI &amp; Assistenten</h2>
     <span class="rubrik-zahl">20 Beispiele</span>
+    <a class="hebel-zurueck" href="#hebel-wand">Alle Hebel</a>
   </div>
-  
   <p class="dz-hebel-was">Wettbewerber verschenken eine kostenpflichtige Premium-KI oder bauen sie fest ins Gerät ein und machen den Assistenten zum Tarif-Vorteil.</p>
   <p class="dz-hebel-einordnung">Dieser Hebel ist derzeit von einer starken Kooperation mit führenden KI-Entwicklern geprägt, wobei Betreiber den Zugang zu Premium-Diensten wie Google Gemini oder Perplexity demokratisieren. Die Strategie zielt darauf ab, den Telekommunikationsvertrag zur primären Anlaufstelle für generative Produktivität im Alltag der Nutzer zu machen.</p>
-
   
   <div class="dz-hebel-oben">
 <article class="dzk dzk--lead" style="--c:#7b3fe4">
@@ -958,7 +433,6 @@
 </article>
 
   </div>
-  
   
   
   <details class="dz-mehr">
@@ -1147,14 +621,13 @@
 </section>
 
 <section class="dz-hebel" id="dz-theme-entertainment" style="--c:#c2185b">
-  <div class="rubrik dz-rubrik">
+  <div class="hebel-kopf">
     <h2>Entertainment &amp; Streaming</h2>
     <span class="rubrik-zahl">28 Beispiele</span>
+    <a class="hebel-zurueck" href="#hebel-wand">Alle Hebel</a>
   </div>
-  
   <p class="dz-hebel-was">Streaming, Sport- und TV-Rechte als Bindungsanker. Die Besten bündeln nicht nur ein Abo, sondern ein Aggregator-Erlebnis.</p>
   
-
   
   <div class="dz-hebel-oben">
 <article class="dzk dzk--lead" style="--c:#c2185b">
@@ -1340,7 +813,6 @@
 </article>
 
   </div>
-  
   
   
   <details class="dz-mehr">
@@ -1657,14 +1129,13 @@
 </section>
 
 <section class="dz-hebel" id="dz-theme-garantie" style="--c:#e60000">
-  <div class="rubrik dz-rubrik">
+  <div class="hebel-kopf">
     <h2>Garantie &amp; Service-Versprechen</h2>
     <span class="rubrik-zahl">9 Beispiele</span>
+    <a class="hebel-zurueck" href="#hebel-wand">Alle Hebel</a>
   </div>
-  
   <p class="dz-hebel-was">„Sorglos&#34;-Versprechen differenzieren ohne Preisnachlass und zahlen voll auf Vertrauen ein: verlaengerte Garantie, Akkutausch, Preis-, Netz- und Zufriedenheitsgarantien.</p>
   
-
   
   <div class="dz-hebel-oben">
 <article class="dzk dzk--lead" style="--c:#e60000">
@@ -1855,14 +1326,13 @@
 </section>
 
 <section class="dz-hebel" id="dz-theme-geraete" style="--c:#ac1811">
-  <div class="rubrik dz-rubrik">
+  <div class="hebel-kopf">
     <h2>Geräte-Programme &amp; Zubehör</h2>
     <span class="rubrik-zahl">7 Beispiele</span>
+    <a class="hebel-zurueck" href="#hebel-wand">Alle Hebel</a>
   </div>
-  
   <p class="dz-hebel-was">Der Gerätekauf als Bindungsanker: jährliches Upgrade, faire Inzahlungnahme, refurbished, exklusive Geräte und gebündeltes Zubehör – Value ohne Preiskampf.</p>
   
-
   
   <div class="dz-hebel-oben">
 <article class="dzk dzk--lead" style="--c:#ac1811">
@@ -2015,14 +1485,13 @@
 </section>
 
 <section class="dz-hebel" id="dz-theme-security" style="--c:#2f8f5b">
-  <div class="rubrik dz-rubrik">
+  <div class="hebel-kopf">
     <h2>Security &amp; Betrugsschutz</h2>
     <span class="rubrik-zahl">5 Beispiele</span>
+    <a class="hebel-zurueck" href="#hebel-wand">Alle Hebel</a>
   </div>
-  
   <p class="dz-hebel-was">Schutz vor Betrug, Spam und Deepfakes wird vom Add-on zum Marken-Asset – oft kostenlos und automatisch im Netz.</p>
   
-
   
   <div class="dz-hebel-oben">
 <article class="dzk dzk--lead" style="--c:#2f8f5b">
@@ -2143,14 +1612,13 @@
 </section>
 
 <section class="dz-hebel" id="dz-theme-fintech" style="--c:#c98a00">
-  <div class="rubrik dz-rubrik">
+  <div class="hebel-kopf">
     <h2>Fintech &amp; Payment</h2>
     <span class="rubrik-zahl">8 Beispiele</span>
+    <a class="hebel-zurueck" href="#hebel-wand">Alle Hebel</a>
   </div>
-  
   <p class="dz-hebel-was">Wallet, Kredit, Versicherung und Banking direkt in der Telco-App – in Wachstumsmärkten die stärksten Ökosysteme überhaupt.</p>
   
-
   
   <div class="dz-hebel-oben">
 <article class="dzk dzk--lead" style="--c:#c98a00">
@@ -2325,14 +1793,13 @@
 </section>
 
 <section class="dz-hebel" id="dz-theme-superapp" style="--c:#3860be">
-  <div class="rubrik dz-rubrik">
+  <div class="hebel-kopf">
     <h2>Super-App &amp; Ökosystem</h2>
     <span class="rubrik-zahl">6 Beispiele</span>
+    <a class="hebel-zurueck" href="#hebel-wand">Alle Hebel</a>
   </div>
-  
   <p class="dz-hebel-was">Die Telco-App wird von der Selfcare-App zur Alltags-Plattform mit eingebauten Partner-Diensten.</p>
   <p class="dz-hebel-einordnung">Vor allem in Afrika und Asien bilden Super-Apps das Herzstück der Differenzierung, da sie Mobilfunk, Fintech-Dienste und Alltagsbedarfe in einer zentralen Anwendung vereinen. Anbieter wie [Safaricom](https://techtrendske.co.ke/2026/04/24/super-apps-africa-viability-orange-safaricom/) und [MTN](https://www.kavout.com/market-lens/is-mtn-group-fintech-s-super-app-strategy-a-game-changer-for-africa) nutzen diese Plattformen, um die Hürde für alltägliche digitale Transaktionen signifikant zu senken und sich vom Wettbewerb abzuheben.</p>
-
   
   <div class="dz-hebel-oben">
 <article class="dzk dzk--lead" style="--c:#3860be">
@@ -2472,14 +1939,13 @@
 </section>
 
 <section class="dz-hebel" id="dz-theme-cloud" style="--c:#0d9488">
-  <div class="rubrik dz-rubrik">
+  <div class="hebel-kopf">
     <h2>Cloud &amp; Speicher</h2>
     <span class="rubrik-zahl">4 Beispiele</span>
+    <a class="hebel-zurueck" href="#hebel-wand">Alle Hebel</a>
   </div>
-  
   <p class="dz-hebel-was">Kostenloser, oft datensouveräner Cloud-Speicher als Tarif-Extra – günstig und ein guter Bindungsanker.</p>
   <p class="dz-hebel-einordnung">Der Fokus verschiebt sich von einfachen Speicherlösungen hin zu massiven Gratis-Kontingenten, mit denen Betreiber wie [O2 / Telefónica](https://www.thefastmode.com/technology-solutions/49163-o2-expands-cloud-storage-service-with-10-tb-free-space-for-mobile-fiber-customers) oder [Reliance Jio](https://finshots.in/archive/jios-free-storage-to-beat-google-and-apple-100-gb-free-cloud-storage/) die direkte Konkurrenz zu etablierten Tech-Giganten suchen. Das Ziel ist es, die Datenhoheit und Kundenbeziehung innerhalb des eigenen Ökosystems zu halten.</p>
-
   
   <div class="dz-hebel-oben">
 <article class="dzk dzk--lead" style="--c:#0d9488">
@@ -2583,14 +2049,13 @@
 </section>
 
 <section class="dz-hebel" id="dz-theme-smarthome" style="--c:#b5551d">
-  <div class="rubrik dz-rubrik">
+  <div class="hebel-kopf">
     <h2>Smart Home &amp; IoT</h2>
     <span class="rubrik-zahl">9 Beispiele</span>
+    <a class="hebel-zurueck" href="#hebel-wand">Alle Hebel</a>
   </div>
-  
   <p class="dz-hebel-was">Sicherheit und Steuerung fürs Zuhause am Anschluss – margenstark und bindet den ganzen Haushalt.</p>
   
-
   
   <div class="dz-hebel-oben">
 <article class="dzk dzk--lead" style="--c:#b5551d">
@@ -2778,14 +2243,13 @@
 </section>
 
 <section class="dz-hebel" id="dz-theme-gaming" style="--c:#8a2be2">
-  <div class="rubrik dz-rubrik">
+  <div class="hebel-kopf">
     <h2>Gaming</h2>
     <span class="rubrik-zahl">4 Beispiele</span>
+    <a class="hebel-zurueck" href="#hebel-wand">Alle Hebel</a>
   </div>
-  
   <p class="dz-hebel-was">Cloud-Gaming als greifbarer Netz-Beweis – niedrige Latenz wird zum Erlebnis statt zur Technik-Folie.</p>
   
-
   
   <div class="dz-hebel-oben">
 <article class="dzk dzk--lead" style="--c:#8a2be2">
@@ -2889,14 +2353,13 @@
 </section>
 
 <section class="dz-hebel" id="dz-theme-loyalty" style="--c:#e07a00">
-  <div class="rubrik dz-rubrik">
+  <div class="hebel-kopf">
     <h2>Loyalty &amp; Perks</h2>
     <span class="rubrik-zahl">10 Beispiele</span>
+    <a class="hebel-zurueck" href="#hebel-wand">Alle Hebel</a>
   </div>
-  
   <p class="dz-hebel-was">Erlebnis-Perks und exklusive Vorverkäufe machen das tägliche App-Öffnen zur Gewohnheit – Bindung über Nutzen.</p>
   
-
   
   <div class="dz-hebel-oben">
 <article class="dzk dzk--lead" style="--c:#e07a00">
@@ -3078,7 +2541,6 @@
   </div>
   
   
-  
   <details class="dz-mehr">
     <summary>1 weitere</summary>
     <div class="dz-zeilen">
@@ -3105,14 +2567,13 @@
 </section>
 
 <section class="dz-hebel" id="dz-theme-health" style="--c:#2b7a9e">
-  <div class="rubrik dz-rubrik">
+  <div class="hebel-kopf">
     <h2>Health &amp; Wellbeing</h2>
     <span class="rubrik-zahl">2 Beispiele</span>
+    <a class="hebel-zurueck" href="#hebel-wand">Alle Hebel</a>
   </div>
-  
   <p class="dz-hebel-was">Telemedizin und Wellbeing als Differenzierung mit Nutzenversprechen – in Wachstumsmärkten erprobt.</p>
   
-
   
   <div class="dz-hebel-oben">
 <article class="dzk dzk--lead" style="--c:#2b7a9e">
@@ -3170,7 +2631,103 @@
   
 </section>
 
+</div>
 
+
+
+<section class="dz-radar" id="neu" style="scroll-margin-top:96px" data-auftritt>
+  <div class="rubrik">
+    <h2>Neu auf dem Radar</h2>
+  </div>
+  <div class="dz-raster dz-raster--gross">
+    
+<article class="dzk dzk--gross" style="--c:#b5551d">
+  
+
+<span class="dzk-motiv">
+  <img src="images/5f128abbb81cdd38-800.jpg" alt=""
+     width="460" height="325"
+     loading="lazy">
+  
+</span>
+
+  <div class="dzk-text">
+    
+    <p class="dzk-kopf"><b class="dzk-op">Xfinity</b><span class="dzk-reg">Nordamerika</span></p>
+    <a class="dzk-what szl" href="https://www.security.org/home-security-systems/xfinity/" target="_blank" rel="noopener">Xfinity bietet seinen Internetkunden ein integriertes Home-Security-System mit 24/7-Überwachung an, das als Bundle mit anderen Comcast-Diensten vertrieben wird.</a>
+    <p class="dzk-why">Dieser Ansatz zeigt die Nutzung des bestehenden Kundenstamms für den Cross-Selling-Vertrieb von sicherheitsrelevanten Mehrwertdiensten (Value-Added Services).</p>
+    <p class="dzk-fuss">
+      
+      <a class="dzk-hebel" href="#dz-theme-smarthome">Smart Home &amp; IoT</a>
+      <a class="dzk-quelle" href="https://www.security.org/home-security-systems/xfinity/" target="_blank" rel="noopener">security.org &nearr;</a>
+      <span class="dz-new">neu</span>
+    </p>
+  </div>
+</article>
+
+<article class="dzk dzk--gross" style="--c:#c2185b">
+  
+
+<span class="dzk-motiv">
+  <img src="images/6069847e32fcf589-800.jpg" alt=""
+     width="800" height="533"
+     loading="lazy">
+  
+</span>
+
+  <div class="dzk-text">
+    
+    <p class="dzk-kopf"><b class="dzk-op">Vodafone UK</b><span class="dzk-reg">Europa</span></p>
+    <a class="dzk-what szl" href="https://www.vodafone.co.uk/newscentre/press-release/new-vodafone-tv-netflix-hbo-max-17quid-a-month/" target="_blank" rel="noopener">Vodafone UK bringt eine neue TV-Box auf den Markt, die Streaming-Dienste wie Netflix und HBO Max, Live-TV und Gaming vereint.</a>
+    <p class="dzk-why">Exzellente Vorlage für die Bündelung von Festnetz, Mobilfunk und Entertainment in Europa, die Vodafone auch in anderen Märkten ausrollen kann.</p>
+    <p class="dzk-fuss">
+      
+      <a class="dzk-hebel" href="#dz-theme-entertainment">Entertainment &amp; Streaming</a>
+      <a class="dzk-quelle" href="https://www.vodafone.co.uk/newscentre/press-release/new-vodafone-tv-netflix-hbo-max-17quid-a-month/" target="_blank" rel="noopener">vodafone.co.uk &nearr;</a>
+      <span class="dz-new">neu</span>
+    </p>
+  </div>
+</article>
+
+<article class="dzk dzk--gross ohne-bild" style="--c:#e07a00">
+  
+
+<span class="dzk-motiv">
+  <span class="dzk-kachel">Virgin Media O2</span>
+</span>
+
+  <div class="dzk-text">
+    
+    <p class="dzk-kopf"><span class="dzk-reg">Europa</span></p>
+    <a class="dzk-what szl" href="https://news.virginmediao2.co.uk/a1-naming-rights-partnership-until-2038/" target="_blank" rel="noopener">AEG und O2 haben ihre Partnerschaft um die Namensrechte für The O2 bis zum Jahr 2038 verlängert.</a>
+    <p class="dzk-why">Zeigt den langfristigen Wert von Event-Sponsoring zur Kundengewinnung.</p>
+    <p class="dzk-fuss">
+      
+      <a class="dzk-hebel" href="#dz-theme-loyalty">Loyalty &amp; Perks</a>
+      <a class="dzk-quelle" href="https://news.virginmediao2.co.uk/a1-naming-rights-partnership-until-2038/" target="_blank" rel="noopener">news.virginmediao2.co.uk &nearr;</a>
+      <span class="dz-new">neu</span>
+    </p>
+  </div>
+</article>
+
+  </div>
+</section>
+
+
+
+
+<section class="dz-muster-band" data-auftritt>
+  <h2 class="abschnitt-titel">Was sich wiederholt</h2>
+  <ul class="dz-muster">
+    
+    <li><b>KI-Integrierung als Kundenbindung:</b> Mehrere Betreiber nutzen Premium-KI-Dienste als exklusives Inklusivmerkmal ihrer Tarife, um den Nutzwert der Verbindung zu steigern. Dabei werden Plattformen wie Perplexity Pro bei Anbietern wie <a href="https://telecomtalk.info/airtel-perplexity-pro-customers-jio-gemini3-5g-users/1001760/">Bharti Airtel</a> und <a href="https://www.telekom.com/en/media/media-information/archive/perplexity-now-in-the-meinmagenta-app-1083480">Deutsche Telekom</a> direkt in die Kundenschnittstellen integriert oder als Abo-Erweiterung angeboten.</li>
+    
+    <li><b>Preissicherheit als Differenzierungsmerkmal:</b> Um Vertrauen und Planbarkeit zu vermitteln, positionieren Unternehmen eine langjährige Preisstabilität als zentrales Service-Versprechen. Diese Garantieansätze finden sich beispielsweise bei <a href="https://www.reviews.org/internet-service/t-mobile-price-guarantee/">T-Mobile</a> und <a href="https://www.telecompetitor.com/att-expands-its-guarantee-to-almost-50m-more-customers/">AT&amp;T</a> in Nordamerika, wo sie Kunden vor unerwarteten Erhöhungen über mehrere Jahre hinweg schützen sollen.</li>
+    
+    <li><b>Sicherheits-Ökosysteme gegen neue Bedrohungen:</b> Gemeinsame Anstrengungen zur Abwehr digitaler Gefahren gewinnen an Bedeutung, insbesondere beim Schutz vor KI-gestütztem Betrug. So haben Akteure wie <a href="https://aimagazine.com/news/telco-giants-launch-network-ai-to-stop-deepfake-vocie-scams">Deutsche Telekom</a> und <a href="https://cybermagazine.com/news/syntelligence-ai-tackles-deepfakes">SK Telecom</a> internationale Allianzen geschlossen, um Deepfake-Sprachbetrug mittels technischer KI-Lösungen direkt auf Netzebene zu unterbinden.</li>
+    
+  </ul>
+</section>
 
 
 <p class="dz-foot">Zwei Quellen speisen diese Seite: der wöchentliche Presse-Crawl der beobachteten Netzbetreiber
@@ -3181,7 +2738,7 @@ sucht. Jedes Beispiel trägt eine Originalquelle und ein Prüfdatum; nicht beleg
   </main>
   <footer class="foot">
     <div class="foot-inner">
-      Vodafone Product and Services Insights &middot; Marktrecherche &middot; automatisch erstellt, jede Aussage mit Quelle
+      <span>Vodafone Product and Services Insights &middot; automatisch erstellt, jede Aussage mit Quelle</span>
       
       
       
@@ -3191,6 +2748,9 @@ sucht. Jedes Beispiel trägt eine Originalquelle und ein Prüfdatum; nicht beleg
       </span>
       
     </div>
+    <p class="foot-bildnachweis">Bilder: generiert für dieses Portal. Campus-Motiv nach einer Vorlage von
+      <a href="https://commons.wikimedia.org/wiki/File:Vodafone-Campus_D%C3%BCsseldorf.jpg" target="_blank" rel="noopener">Wikimedia Commons</a>.
+      Schrift: Instrument Sans (SIL Open Font License).</p>
   </footer>
   <script src="app.js"></script>
 </body>

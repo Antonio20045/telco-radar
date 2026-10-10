@@ -1,70 +1,74 @@
 
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" class="ohne-js">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Vodafone Product and Services Insights · Quellen</title>
   <meta name="robots" content="noindex">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   
-  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400;1,8..60,600&family=Libre+Franklin:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="preload" href="static/schrift/instrument-sans.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="style.css">
   <link rel="icon" type="image/png" href="logo.png">
 </head>
-<body class="uc-markt">
+
+<body class="uc-markt seite-transparenz mit-buehne">
+  <a class="sprungmarke" href="#inhalt">Zum Inhalt</a>
   
-  <header class="topbar">
-    <div class="topbar-inner">
+  <header class="topbar kopf" id="kopf">
+    <div class="topbar-inner kopf-inner">
       <a class="brand" href="index.html" aria-label="Vodafone Product and Services Insights">
         <span class="brand-logo-wrap"><img class="brand-logo" src="logo.png" alt="" width="15" height="15"></span>
         <span class="brand-name">Vodafone <span class="brand-zusatz">Product and Services</span> <em>Insights</em></span>
       </a>
-      <div class="topbar-right">
-        <nav class="usecases" aria-label="Anwendungsfälle">
-          <a class="uc active" href="index.html">Marktrecherche</a>
-          <a class="uc " href="promo/index.html">Promo Übersicht</a>
-        </nav>
+      <nav class="subbar subnav navi" aria-label="Marktrecherche">
+        <a href="index.html" >Diese Woche</a>
+        <a href="meldungen.html" >Meldungen</a>
+        <a href="wettbewerb.html" >Wettbewerb</a>
+        
+        
+        <a href="geraete.html" >Geräte</a>
+        
+        <a href="promo/index.html" >Promo</a>
+        <a href="transparenz.html" class="on" aria-current="page">Quellen</a>
+      </nav>
+      <div class="topbar-right kopf-rechts">
         
         
         <form class="gsearch" id="gsearch" role="search" action="suche.html" autocomplete="off">
+          <svg class="gsearch-lupe" viewBox="0 0 20 20" width="15" height="15" fill="none" aria-hidden="true">
+            <circle cx="9" cy="9" r="6.2" stroke="currentColor" stroke-width="1.7"/>
+            <line x1="13.6" y1="13.6" x2="18" y2="18" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+          </svg>
           <input type="search" id="gsearch-input" name="q" class="gsearch-input" autocomplete="off"
-                 placeholder="Im Archiv suchen …"
+                 placeholder="Suchen"
                  aria-label="Marktrecherche durchsuchen">
-          <button type="submit" class="gsearch-btn" aria-label="Suchen">
-            <svg viewBox="0 0 20 20" width="14" height="14" fill="none" aria-hidden="true">
-              <circle cx="9" cy="9" r="6.2" stroke="currentColor" stroke-width="1.8"/>
-              <line x1="13.6" y1="13.6" x2="18" y2="18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-            </svg>
-          </button>
+          <kbd class="gsearch-taste" aria-hidden="true">⌘K</kbd>
+          <button type="submit" class="gsearch-btn" aria-label="Suchen"><span aria-hidden="true">→</span></button>
         </form>
+        
+        
+        
+        <a class="kopf-newsletter" href="newsletter.html">Newsletter</a>
         
       </div>
     </div>
-    
-    
-    
-    <nav class="subbar subnav" aria-label="Marktrecherche">
-      <a href="index.html" >Diese Woche</a>
-      <a href="meldungen.html" >Meldungen</a>
-      <a href="differenzierung.html" >Differenzierung</a>
-      <a href="wettbewerb.html" >Wettbewerb</a>
-      
-      
-      <a href="geraete.html" >Geräte</a>
-      
-      
-      
-      <a href="transparenz.html" class="on">Quellen</a>
-      
-      
-      <a href="newsletter.html" >Newsletter</a>
-      
-    </nav>
-    
   </header>
-  <main>
+  <main id="inhalt">
+    
+<section class="band">
+  <div class="band-bild" aria-hidden="true"><img class="motiv band-motiv" src="static/bilder/band-quellen.jpg" alt=""
+     width="2400" height="1029" decoding="async" loading="eager"></div>
+  <div class="band-inhalt">
+    <div class="band-text">
+      <p class="band-kicker">Nachprüfbarkeit</p>
+      <h1 class="band-titel">Quellen</h1>
+      <p class="band-stand">Lauf vom 9. Oktober 2026</p>
+    </div>
+    
+  </div>
+</section>
+
     <div class="wrap">
       
       
@@ -2251,14 +2255,14 @@
 
 <div class="card" id="geraete-pruefung">
   <div class="card-head"><h2>Geräte-Bündel: Prüfung</h2>
-    <span class="rubrik-zahl">Lauf 9. Oktober 2026</span></div>
+    <span class="rubrik-zahl">Lauf 10. Oktober 2026</span></div>
   
   
   
   <div class="t-bilanz-reihe">
-    <div class="t-kennzahl"><b>6194</b><span>gültig</span></div>
+    <div class="t-kennzahl"><b>6155</b><span>gültig</span></div>
     <div class="t-kennzahl"><b>100</b><span>Quarantäne</span></div>
-    <div class="t-kennzahl"><b>357</b><span>veraltet</span></div>
+    <div class="t-kennzahl"><b>396</b><span>veraltet</span></div>
     
     
   </div>
@@ -2325,8 +2329,8 @@
       <p class="fwb-warum">6 und 12 Monate nicht erfasst</p>
       <ul class="fwb-liste">
         <li class="fwb-ind"><span class="fwb-punkt" aria-hidden="true"></span><span class="fwb-name">Bündel</span><span class="fwb-zustand">2230</span></li>
-        <li class="fwb-ind"><span class="fwb-punkt" aria-hidden="true"></span><span class="fwb-name">gültig 24 Monate</span><span class="fwb-zustand">1064</span></li><li class="fwb-ind"><span class="fwb-punkt" aria-hidden="true"></span><span class="fwb-name">gültig 36 Monate</span><span class="fwb-zustand">1066</span></li>
-        <li class="fwb-ind"><span class="fwb-punkt" aria-hidden="true"></span><span class="fwb-name">frisch</span><span class="fwb-zustand">96 %</span></li>
+        <li class="fwb-ind"><span class="fwb-punkt" aria-hidden="true"></span><span class="fwb-name">gültig 24 Monate</span><span class="fwb-zustand">1044</span></li><li class="fwb-ind"><span class="fwb-punkt" aria-hidden="true"></span><span class="fwb-name">gültig 36 Monate</span><span class="fwb-zustand">1047</span></li>
+        <li class="fwb-ind"><span class="fwb-punkt" aria-hidden="true"></span><span class="fwb-name">frisch</span><span class="fwb-zustand">94 %</span></li>
         <li class="fwb-ind"><span class="fwb-punkt" aria-hidden="true"></span><span class="fwb-name">Quarantäne</span><span class="fwb-zustand">0 %</span></li>
         <li class="fwb-ind"><span class="fwb-punkt" aria-hidden="true"></span><span class="fwb-name">Konflikte</span><span class="fwb-zustand">nicht prüfbar</span></li>
         <li class="fwb-ind"><span class="fwb-punkt" aria-hidden="true"></span><span class="fwb-name">Belege</span><span class="fwb-zustand">nicht prüfbar</span></li>
@@ -2374,7 +2378,7 @@
           <td class="num">0</td><td class="num">0</td></tr>
         
         <tr><td>11 Sprung zum Vortag</td><td class="num">40</td>
-          <td class="num">0</td><td class="num">308</td></tr>
+          <td class="num">0</td><td class="num">284</td></tr>
         
         <tr><td>12 Gleicher Wert überall</td><td class="num">0</td>
           <td class="num">8</td><td class="num">0</td></tr>
@@ -2388,7 +2392,7 @@
         <tr><td>15 Zeitraum</td><td class="num">0</td>
           <td class="num">0</td><td class="num">0</td></tr>
         
-        <tr><td>16 Frische</td><td class="num">385</td>
+        <tr><td>16 Frische</td><td class="num">424</td>
           <td class="num">0</td><td class="num">0</td></tr>
         
       </tbody>
@@ -3750,7 +3754,7 @@
   </main>
   <footer class="foot">
     <div class="foot-inner">
-      Vodafone Product and Services Insights &middot; Marktrecherche &middot; automatisch erstellt, jede Aussage mit Quelle
+      <span>Vodafone Product and Services Insights &middot; automatisch erstellt, jede Aussage mit Quelle</span>
       
       
       
@@ -3760,6 +3764,9 @@
       </span>
       
     </div>
+    <p class="foot-bildnachweis">Bilder: generiert für dieses Portal. Campus-Motiv nach einer Vorlage von
+      <a href="https://commons.wikimedia.org/wiki/File:Vodafone-Campus_D%C3%BCsseldorf.jpg" target="_blank" rel="noopener">Wikimedia Commons</a>.
+      Schrift: Instrument Sans (SIL Open Font License).</p>
   </footer>
   <script src="app.js"></script>
 </body>

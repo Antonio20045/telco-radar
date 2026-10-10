@@ -1,618 +1,510 @@
 
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" class="ohne-js">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Vodafone Product and Services Insights · Ausgabe vom 9. Oktober 2026</title>
   <meta name="robots" content="noindex">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   
-  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400;1,8..60,600&family=Libre+Franklin:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="preload" href="static/schrift/instrument-sans.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="style.css">
   <link rel="icon" type="image/png" href="logo.png">
 </head>
-<body class="uc-markt">
+
+<body class="uc-markt seite-woche mit-buehne">
+  <a class="sprungmarke" href="#inhalt">Zum Inhalt</a>
   
-  <header class="topbar">
-    <div class="topbar-inner">
+  <header class="topbar kopf" id="kopf">
+    <div class="topbar-inner kopf-inner">
       <a class="brand" href="index.html" aria-label="Vodafone Product and Services Insights">
         <span class="brand-logo-wrap"><img class="brand-logo" src="logo.png" alt="" width="15" height="15"></span>
         <span class="brand-name">Vodafone <span class="brand-zusatz">Product and Services</span> <em>Insights</em></span>
       </a>
-      <div class="topbar-right">
-        <nav class="usecases" aria-label="Anwendungsfälle">
-          <a class="uc active" href="index.html">Marktrecherche</a>
-          <a class="uc " href="promo/index.html">Promo Übersicht</a>
-        </nav>
+      <nav class="subbar subnav navi" aria-label="Marktrecherche">
+        <a href="index.html" class="on" aria-current="page">Diese Woche</a>
+        <a href="meldungen.html" >Meldungen</a>
+        <a href="wettbewerb.html" >Wettbewerb</a>
+        
+        
+        <a href="geraete.html" >Geräte</a>
+        
+        <a href="promo/index.html" >Promo</a>
+        <a href="transparenz.html" >Quellen</a>
+      </nav>
+      <div class="topbar-right kopf-rechts">
         
         
         <form class="gsearch" id="gsearch" role="search" action="suche.html" autocomplete="off">
+          <svg class="gsearch-lupe" viewBox="0 0 20 20" width="15" height="15" fill="none" aria-hidden="true">
+            <circle cx="9" cy="9" r="6.2" stroke="currentColor" stroke-width="1.7"/>
+            <line x1="13.6" y1="13.6" x2="18" y2="18" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+          </svg>
           <input type="search" id="gsearch-input" name="q" class="gsearch-input" autocomplete="off"
-                 placeholder="Im Archiv suchen …"
+                 placeholder="Suchen"
                  aria-label="Marktrecherche durchsuchen">
-          <button type="submit" class="gsearch-btn" aria-label="Suchen">
-            <svg viewBox="0 0 20 20" width="14" height="14" fill="none" aria-hidden="true">
-              <circle cx="9" cy="9" r="6.2" stroke="currentColor" stroke-width="1.8"/>
-              <line x1="13.6" y1="13.6" x2="18" y2="18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-            </svg>
-          </button>
+          <kbd class="gsearch-taste" aria-hidden="true">⌘K</kbd>
+          <button type="submit" class="gsearch-btn" aria-label="Suchen"><span aria-hidden="true">→</span></button>
         </form>
         
+        
+        
+        <a class="kopf-newsletter" href="newsletter.html">Newsletter</a>
+        
       </div>
     </div>
-    
-    
-    
-    <nav class="subbar subnav" aria-label="Marktrecherche">
-      <a href="index.html" class="on">Diese Woche</a>
-      <a href="meldungen.html" >Meldungen</a>
-      <a href="differenzierung.html" >Differenzierung</a>
-      <a href="wettbewerb.html" >Wettbewerb</a>
-      
-      
-      <a href="geraete.html" >Geräte</a>
-      
-      
-      
-      <a href="transparenz.html" >Quellen</a>
-      
-      
-      <a href="newsletter.html" >Newsletter</a>
-      
-    </nav>
-    
   </header>
-  <main>
-    <div class="wrap">
-      
-      
-
-
-
-
-
-
-
-
-
-
-
-
-<div class="front-oben">
-  <div class="front-haupt">
-
-    
-    
-    <nav class="fokusband fokusband--oben" aria-label="Laufende Themen">
-      
-      <a href="thema/bt-uebernimmt-talktalk.html">
-        <span class="fokusband-kicker">Im Fokus</span>
-        <span class="fokusband-titel">BT übernimmt TalkTalk</span>
-        <span class="fokusband-zahl">10 Meldungen &nearr;</span>
-      </a>
-      
-      <a href="thema/netzausbau-und-service-initiativen-bei-virgin-media-o2.html">
-        <span class="fokusband-kicker">Im Fokus</span>
-        <span class="fokusband-titel">Netzausbau und Service-Initiativen bei Virgin Media O2</span>
-        <span class="fokusband-zahl">7 Meldungen &nearr;</span>
-      </a>
-      
-    </nav>
+  <main id="inhalt">
     
 
+
+<section class="buehne" aria-label="Ausgabe vom 9. Oktober 2026">
+  
+  <div class="buehne-bild" aria-hidden="true">
     
     
-
     
     
-    <article class="aufmacher kurz">
-      <p class="page-kicker">Tarife &amp; Angebote · Vodafone UK</p>
-      <h1 class="szl"><a href="https://www.vodafone.co.uk/newscentre/press-release/new-vodafone-tv-netflix-hbo-max-17quid-a-month/" target="_blank" rel="noopener">Vodafone UK startet neue TV-Box ab 10 Pfund monatlich</a></h1>
-      
-      <figure class="aufmacher-bild">
-        <img src="images/6069847e32fcf589-1280.jpg" alt=""
-             width="1280" height="853"
-             loading="eager">
-        <figcaption>Vodafone UK · Bild: Vodafone UK</figcaption>
-      </figure>
-      
-      <div class="aufmacher-text">
-        <p class="aufmacher-vorspann">Vodafone UK bringt eine neue TV-Box auf den Markt, die Streaming-Dienste wie Netflix und HBO Max, Live-TV und Gaming vereint. Tarife starten ab 10 Pfund pro Monat, die Variante Vodafone TV Essential mit Netflix und HBO Max kostet 17 Pfund monatlich.</p>
-        
-        
-        <p class="aufmacher-meta">
-          <b>Vodafone UK</b>
-          <span class="rel-badge r5">Priorität 5/5</span>
-          
-          
-          <a href="https://www.vodafone.co.uk/newscentre/press-release/new-vodafone-tv-netflix-hbo-max-17quid-a-month/" target="_blank" rel="noopener">Originalquelle öffnen &nearr;</a>
-        </p>
-        
-
-
-      </div>
-    </article>
     
-
     
-    <div class="reihe reihe-zwei">
-      
-      <article class="stueck stueck-mittel">
-        <a href="https://telecomtalk.info/airtel-hikes-postpaid-tariffs-by-rs-50/1012664/" target="_blank" rel="noopener">
-          <span class="stueck-bild"><img src="images/844a43e78e930519-1280.jpg" alt=""
-     width="1200" height="800"
-     loading="lazy"></span>
-          <span class="stueck-kicker">Tarife &amp; Angebote · Bharti Airtel · 2 Quellen</span>
-          <span class="stueck-titel szl">Bharti Airtel erhöht Postpaid-Preise um 50 Rupien</span>
-          <span class="stueck-anriss">Bharti Airtel hat seine Postpaid-Tarife um 50 Rupien erhöht und gleichzeitig kostenloses internationales Roaming sowie netzwerkgeslicte…</span>
-        </a>
-        
-        
-
-<p class="ueb-link"><a href="uebersetzung/bed5c76c1a80f540.html">Übersetzung lesen</a></p>
-
-
-      </article>
-      
-      <article class="stueck stueck-mittel">
-        <a href="https://www.mobiletime.com.br/noticias/09/10/2026/clickbus-agente-de-ia/" target="_blank" rel="noopener">
-          <span class="stueck-bild"><img src="images/3507971431a92382-1280.jpg" alt=""
-     width="1165" height="656"
-     loading="lazy"></span>
-          <span class="stueck-kicker">Tarife &amp; Angebote · ClickBus</span>
-          <span class="stueck-titel szl">KI-Agent automatisiert Marketing-Kampagnen 300-mal schneller als Menschen</span>
-          <span class="stueck-anriss">Die Plattform ClickBus nutzt einen KI-Agenten, um personalisierte Rabattkampagnen für tausende verschiedene Busrouten zu erstellen; eine Aufgabe…</span>
-        </a>
-        
-        
-
-<p class="ueb-link"><a href="uebersetzung/61539a094061cca6.html">Übersetzung lesen</a></p>
-
-
-      </article>
-      
-    </div>
     
-
     
-    <div class="reihe reihe-vier">
-      
-      <article class="stueck stueck-klein">
-        <a href="https://www.mobileeurope.co.uk/openreach-copper-broadband-uk/" target="_blank" rel="noopener">
-          <span class="stueck-bild"><img src="images/798b27be196bad8b-1280.jpg" alt=""
-     width="667" height="374"
-     loading="lazy"></span>
-          <span class="stueck-kicker">Netz &amp; Technik</span>
-          <span class="stueck-titel szl">Openreach beendet Kupfer-Vertrieb in 112 weiteren Gebieten</span>
-        </a>
-        
-
-<p class="ueb-link"><a href="uebersetzung/eb16a01b059b2200.html">Übersetzung lesen</a></p>
-
-
-      </article>
-      
-      <article class="stueck stueck-klein">
-        <a href="https://www.mobileworldlive.com/ai-cloud/the-friday-file-starlink-talktalk-dt/" target="_blank" rel="noopener">
-          <span class="stueck-bild"><img src="images/2eac8225e4aa6e42-1280.jpg" alt=""
-     width="650" height="400"
-     loading="lazy"></span>
-          <span class="stueck-kicker">Geld &amp; Übernahmen</span>
-          <span class="stueck-titel szl">BT übernimmt TalkTalk für 400 Millionen Pfund</span>
-        </a>
-        
-
-
-      </article>
-      
-      <article class="stueck stueck-klein">
-        <a href="https://www.thefastmode.com/technology-solutions/50955-samsung-solana-bring-stablecoin-transfers-to-82-million-galaxy-devices" target="_blank" rel="noopener">
-          <span class="stueck-bild"><img src="images/6fae0e8ae59a1d36-1280.jpg" alt=""
-     width="752" height="408"
-     loading="lazy"></span>
-          <span class="stueck-kicker">Tarife &amp; Angebote</span>
-          <span class="stueck-titel szl">Samsung integriert Krypto-Zahlungen in 82 Millionen Galaxy-Geräte</span>
-        </a>
-        
-
-
-      </article>
-      
-      <article class="stueck stueck-klein">
-        <a href="https://www.universfreebox.com/article/598225/orange-lance-un-pass-5g-temporaire-avec-un-debit-potentiellement-double" target="_blank" rel="noopener">
-          <span class="stueck-bild"><img src="images/892a7cd3ca7ee37d-1280.jpg" alt=""
-     width="1280" height="722"
-     loading="lazy"></span>
-          <span class="stueck-kicker">Tarife &amp; Angebote</span>
-          <span class="stueck-titel szl">Orange startet zeitlich begrenzten 5G-Geschwindigkeitspass für 5 Euro</span>
-        </a>
-        
-
-
-      </article>
-      
-    </div>
     
-
+    
   </div>
+  <div class="buehne-inhalt">
+    <div class="buehne-kopf">
+      <p class="buehne-gruss" data-gruss>Ausgabe</p>
+      <h1 class="buehne-datum">9. Oktober<span class="buehne-jahr"> 2026</span></h1>
+      
+      <p class="buehne-unter"><b>131 relevante Meldungen</b>
+        aus 1086 neuen · Lesezeit ca. 14 Minuten</p>
+      
+      
+      
+      <nav class="fokusband fokusband--oben" aria-label="Laufende Themen">
+        
+        <a href="thema/bt-uebernimmt-talktalk.html">
+          <span class="fokusband-kicker">Im Fokus</span>
+          <span class="fokusband-titel">BT übernimmt TalkTalk</span>
+          <span class="fokusband-zahl">10 Meldungen &nearr;</span>
+        </a>
+        
+        <a href="thema/netzausbau-und-service-initiativen-bei-virgin-media-o2.html">
+          <span class="fokusband-kicker">Im Fokus</span>
+          <span class="fokusband-titel">Netzausbau und Service-Initiativen bei Virgin Media O2</span>
+          <span class="fokusband-zahl">7 Meldungen &nearr;</span>
+        </a>
+        
+      </nav>
+      
+    </div>
+
+    
+    <div class="fenster-reihe">
+      
+      
+      
+      <a class="fenster fenster--meldung" href="meldungen.html">
+        <span class="fenster-kopf"><span class="fenster-art">Meldung der Woche</span>
+          <span class="fenster-zahl">131 Meldungen</span></span>
+        <span class="fenster-koerper">
+          <span class="fenster-bild"><img src="images/6069847e32fcf589-1280.jpg" alt=""
+            width="1280" height="853" loading="eager" decoding="async"></span>
+          <span class="fenster-titel szl">Vodafone UK startet neue TV-Box ab 10 Pfund monatlich</span>
+        </span>
+        
+        <span class="fenster-fuss"><span class="punkt punkt--r5" aria-hidden="true"></span>Vodafone UK · Priorität 5/5</span>
+      </a>
+      
+      
+      
+      <a class="fenster fenster--geraete" href="geraete.html">
+        <span class="fenster-kopf"><span class="fenster-art">Wo steht Vodafone?</span>
+          <span class="fenster-zahl">Samsung Galaxy A17 128 GB</span></span>
+        <span class="fenster-koerper">
+          <span class="fenster-leit"><b class='gr-leit-zahl'>321,64 €</b><span class='gr-leit-label'>congstar unter Vodafone (897,64 €)</span></span>
+          
+        </span>
+        <span class="fenster-fuss">Band M · 24 Raten · Preise vom 10. Oktober 2026</span>
+      </a>
+      
+      
+      
+      
+      <a class="fenster fenster--promo" href="promo/index.html">
+        <span class="fenster-kopf"><span class="fenster-art">Promo</span>
+          <span class="fenster-zahl">25 neu · 1 enden bald</span></span>
+        <span class="fenster-koerper">
+          <span class="fenster-gross">Wechsel- oder Altgerätprämie</span>
+          <span class="fenster-titel fenster-titel--klein"><b>Telekom Deutschland</b> Mobilfunk-Cashback Aktion</span>
+        </span>
+        <span class="fenster-fuss">Stand 9. Oktober 2026</span>
+      </a>
+      
+    </div>
+    
+    <a class="buehne-weiter" href="#der-wochenbericht">Der Wochenbericht<span aria-hidden="true">↓</span></a>
+  </div>
+  
+  <button type="button" class="buehne-pause" aria-pressed="false" aria-label="Bildbewegung anhalten" hidden>
+    <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><rect x="3" y="2" width="3.4" height="12" rx="1" fill="currentColor"/><rect x="9.6" y="2" width="3.4" height="12" rx="1" fill="currentColor"/></svg>
+  </button>
+</section>
+
+
+    <div class="voll">
+      
+      
+
+
+
+
+
+
+<div class="bericht" id="der-wochenbericht" style="scroll-margin-top:0">
+  
+  
+  <nav class="kapitel-marke" aria-label="Kapitel des Berichts">
+    <button type="button" class="kapitel-aktuell" aria-expanded="false"><span data-kapitel-name>In zwei Minuten</span></button>
+    <ol class="kapitel-liste">
+      <li><a href="#in-zwei-minuten">In zwei Minuten</a></li><li><a href="#auf-einen-blick">Auf einen Blick</a></li><li><a href="#themen-der-woche">Themen der Woche</a></li><li><a href="#das-wichtigste">Das Wichtigste</a></li><li><a href="#die-wichtigsten-signale">Die wichtigsten Meldungen</a></li><li><a href="#europa">Europa</a></li><li><a href="#deutschland-fokus">Deutschland</a></li><li><a href="#global">Global</a></li><li><a href="#asien">Asien</a></li><li><a href="#lateinamerika">Lateinamerika</a></li><li><a href="#afrika-naher-osten">Afrika &amp; Naher Osten</a></li><li><a href="#nordamerika">Nordamerika</a></li><li><a href="#ozeanien">Ozeanien</a></li><li><a href="#technologie-geraete-regulierung">Technologie, Geräte &amp; Regulierung</a></li><li><a href="#muster-der-woche">Muster der Woche</a></li><li><a href="#worauf-wir-warten">Worauf wir warten</a></li>
+    </ol>
+  </nav>
+  
+  
+  
 
   
   
-  <aside class="front-wichtig">
-
-    
-    
-    
-    <section class="kurzpfad">
-      <div class="rubrik"><h2>In zwei Minuten</h2></div>
+  <section class="szene szene--blatt" id="in-zwei-minuten" data-szene="In zwei Minuten">
+    <h2 class="szene-titel szene-titel--blatt">In zwei Minuten</h2>
+    <div class="szene-text kurzpfad">
       <ol class="kurzpfad-liste">
         
         <li class="kurzpfad-zeile">
-          
           <p class="kurzpfad-satz">Aggressive Händler-Bundles mit negativem Effektivpreis setzen unser direktes Postpaid-Portfolio stark unter Rechtfertigungsdruck.<span class="kurzpfad-beleg"><a
             href="https://www.teltarif.de/nr0/deinhandy-vodafone-google-pixel-11-samsung-honor/news/106680.html" target="_blank" rel="noopener">Vodafone Group &nearr;</a></span></p>
         </li>
         
         <li class="kurzpfad-zeile">
-          
           <p class="kurzpfad-satz">Neuer 5G-Tarif mit vierfach höheren Geschwindigkeiten in UK - Vorlage für eine vergleichbare Performance-Kampagne im deutschen Netz.<span class="kurzpfad-beleg"><a
             href="https://www.vodafone.co.uk/newscentre/press-release/supermobile-v-superhuman-dina-asher-smith-races-5gplus-fast-track/" target="_blank" rel="noopener">Vodafone UK &nearr;</a></span></p>
         </li>
         
         <li class="kurzpfad-zeile">
-          
           <p class="kurzpfad-satz">Exklusive Hardware-Launches mit Triband und Wi-Fi 7 erhöhen den Wechseldruck im Festnetz - wir müssen vergleichbare Bundle-Vorteile bieten.<span class="kurzpfad-beleg"><a
             href="https://unternehmen.1und1.de/produkt-news/2026/1-1-fuehrt-neuen-premium-router-ein-1-1-homeserver-pro-ab-oktober-exklusiv-bei-1-1-verfuegbar" target="_blank" rel="noopener">1&amp;1 &nearr;</a></span></p>
         </li>
         
       </ol>
-    </section>
-    
-
-    
-    <div class="rubrik"><h2>Was wichtig ist</h2></div>
-    <ol class="wichtig-liste">
-      
-      <li class="wichtig-zeile">
-        <a href="https://news.virginmediao2.co.uk/virgin-media-o2-creates-new-dedicated-customer-hub-in-newcastle-to-handle-repeat-calls-and-boost-first-time-resolution-for-all-customers/" target="_blank" rel="noopener">
-          <span class="wichtig-kicker">Virgin Media O2</span>
-          <span class="wichtig-titel szl">Virgin Media O2 gründet neuen Kundenservice-Hub</span>
-        </a>
-      </li>
-      
-      <li class="wichtig-zeile">
-        <a href="https://www.telecomtv.com/content/access-evolution/bt-takeover-deal-saves-broadband-player-talktalk-from-collapse-56385/" target="_blank" rel="noopener">
-          <span class="wichtig-kicker">EU Regulierungsbehörden</span>
-          <span class="wichtig-titel szl">EU-Regulierer warnen vor Preiserhöhungen durch Telekom-Fusionen</span>
-        </a>
-      </li>
-      
-      <li class="wichtig-zeile">
-        <a href="https://news.virginmediao2.co.uk/newsroom/grand-theft-auto-upgrade-gamers-could-unlock-293-with-unused-consoles-ahead-of-gta-vi/" target="_blank" rel="noopener">
-          <span class="wichtig-kicker">Virgin Media O2</span>
-          <span class="wichtig-titel szl">Virgin Media O2 startet Gaming-Rücknahmekampagne vor GTA VI</span>
-        </a>
-      </li>
-      
-      <li class="wichtig-zeile">
-        <a href="https://www.o2online.de/tarife/handyvertrag-ohne-handy/" target="_blank" rel="noopener">
-          <span class="wichtig-kicker">o2</span>
-          <span class="wichtig-titel szl">o2 erhöht Anschlusspreis für Tarif-Variante auf 39,99 Euro</span>
-        </a>
-      </li>
-      
-      <li class="wichtig-zeile">
-        <a href="https://news.virginmediao2.co.uk/a1-naming-rights-partnership-until-2038/" target="_blank" rel="noopener">
-          <span class="wichtig-kicker">Virgin Media O2</span>
-          <span class="wichtig-titel szl">O2 verlängert Namensrechte für The O2 bis 2038</span>
-        </a>
-      </li>
-      
-      <li class="wichtig-zeile">
-        <a href="https://news.virginmediao2.co.uk/virgin-media-o2/v-gives-tv-customers-access-to-kids-channels-at-no-extra-cost-october-2/" target="_blank" rel="noopener">
-          <span class="wichtig-kicker">Virgin Media O2</span>
-          <span class="wichtig-titel szl">Virgin Media O2 schenkt TV-Kunden Kinderkanäle im Oktober</span>
-        </a>
-      </li>
-      
-      <li class="wichtig-zeile">
-        <a href="https://developingtelecoms.com/telecom-technology/financial-services/20940-safaricom-and-gcib-launch-shariah-compliant-investment-fund-for-m-pesa.html" target="_blank" rel="noopener">
-          <span class="wichtig-kicker">Safaricom</span>
-          <span class="wichtig-titel szl">Safaricom führt KI-gestützte Scan-to-Pay-Zahlungen in Kenia ein</span>
-        </a>
-      </li>
-      
-    </ol>
-    <p class="ex-count">
-      <a href="meldungen.html" class="source-link">alle 131 Meldungen &nearr;</a>
-    </p>
-    
-
-    
-    
-    <div class="card">
-      <div class="card-head"><h2>Themen der Woche</h2></div>
-      
-      <div class="bento-bar">
-        <div class="bento-bar-top"><b>KI / AI</b><span>16</span></div>
-        <div class="bento-bar-track"><span class="bento-bar-fill" style="width:100%"></span></div>
-      </div>
-      
-      <div class="bento-bar">
-        <div class="bento-bar-top"><b>Glasfaser / FTTH</b><span>14</span></div>
-        <div class="bento-bar-track"><span class="bento-bar-fill" style="width:88%"></span></div>
-      </div>
-      
-      <div class="bento-bar">
-        <div class="bento-bar-top"><b>Satellit / NTN</b><span>14</span></div>
-        <div class="bento-bar-track"><span class="bento-bar-fill" style="width:88%"></span></div>
-      </div>
-      
-      <div class="bento-bar">
-        <div class="bento-bar-top"><b>IoT / eSIM</b><span>8</span></div>
-        <div class="bento-bar-track"><span class="bento-bar-fill" style="width:50%"></span></div>
-      </div>
-      
-      <div class="bento-bar">
-        <div class="bento-bar-top"><b>5G Standalone</b><span>7</span></div>
-        <div class="bento-bar-track"><span class="bento-bar-fill" style="width:44%"></span></div>
-      </div>
-      
-      <div class="bento-bar">
-        <div class="bento-bar-top"><b>Open RAN</b><span>6</span></div>
-        <div class="bento-bar-track"><span class="bento-bar-fill" style="width:38%"></span></div>
-      </div>
-      
-      <div class="bento-bar">
-        <div class="bento-bar-top"><b>Cloud / Edge</b><span>5</span></div>
-        <div class="bento-bar-track"><span class="bento-bar-fill" style="width:31%"></span></div>
-      </div>
-      
     </div>
-    
-  </aside>
+  </section>
+
   
-</div>
-
-
-
-
-<section class="fwb">
-  <div class="rubrik"><h2>Worauf wir warten</h2>
-    <span class="rubrik-zahl">5 von 5 in Bewegung</span></div>
-  <div class="fwb-gitter">
-    
-    <article class="fwb-frage fwb-aktiv">
-      <h3 class="fwb-titel">Kippt die Preisuntergrenze im deutschen Markt?</h3>
-      <p class="fwb-warum">Eine Unlimited-Flat unter 35 Euro oder ein Anschlusspreis von null verschiebt die Untergrenze fuer das ganze Portfolio - und beides wird selten als Pressemitteilung angekuendigt.</p>
-      <ul class="fwb-liste">
-        
-        <li class="fwb-ind fwb-ruhend">
-          <span class="fwb-punkt" aria-hidden="true"></span>
-          <span class="fwb-name">Unlimited-Tarif unter 35 Euro</span>
-          <span class="fwb-zustand">ruhend</span>
-          
-        </li>
-        
-        <li class="fwb-ind fwb-aktiv">
-          <span class="fwb-punkt" aria-hidden="true"></span>
-          <span class="fwb-name">Anschlusspreis faellt weg</span>
-          <span class="fwb-zustand">aktiv</span>
-          
-          <span class="fwb-beleg"><a href="https://www.o2online.de/tarife/handyvertrag-ohne-handy/" target="_blank" rel="noopener">o2 erhöht Anschlusspreis für Tarif-Variante auf 39,99 Euro</a>
-            <i>o2 · 2026-10-09</i></span>
-          
-        </li>
-        
-        <li class="fwb-ind fwb-ruhend">
-          <span class="fwb-punkt" aria-hidden="true"></span>
-          <span class="fwb-name">Preiserhöhung angekündigt</span>
-          <span class="fwb-zustand">ruhend</span>
-          
-        </li>
-        
-      </ul>
-    </article>
-    
-    <article class="fwb-frage fwb-aktiv">
-      <h3 class="fwb-titel">Wird Satellit zum Endkundenprodukt?</h3>
-      <p class="fwb-warum">Solange Direct-to-Cell ein Notrufdienst ist, ist es Technik. Sobald es ein buchbarer Tarifbestandteil mit Preis wird, ist es Portfolio.</p>
-      <ul class="fwb-liste">
-        
-        <li class="fwb-ind fwb-aktiv">
-          <span class="fwb-punkt" aria-hidden="true"></span>
-          <span class="fwb-name">Direct-to-Cell wird buchbar</span>
-          <span class="fwb-zustand">aktiv</span>
-          
-          <span class="fwb-beleg"><a href="https://telesintese.com.br/d2d-pode-chegar-ao-brasil-em-2027/" target="_blank" rel="noopener">AST plant Direkt-Satellitenanbindung für Smartphones bis 2027</a>
-            <i>AST SpaceMobile · 2026-10-09</i></span>
-          
-          <span class="fwb-beleg"><a href="https://www.bics.com/blog/d2d-satellite-applications-how-5g-ntn-bridges-the-gap-for-satellite-operators/" target="_blank" rel="noopener">5G-Satellitenstandards ermöglichen flächendeckende direkte Mobilfunkverbindungen</a>
-            <i>BICS · 2026-10-09</i></span>
-          
-        </li>
-        
-        <li class="fwb-ind fwb-beobachtet">
-          <span class="fwb-punkt" aria-hidden="true"></span>
-          <span class="fwb-name">Satellit im Tarif eines europäischen Anbieters</span>
-          <span class="fwb-zustand">beobachtet</span>
-          
-          <span class="fwb-beleg"><a href="https://www.telecomtv.com/content/security/what-s-up-with-ai-security-iliad-starlink-56147/" target="_blank" rel="noopener">Iliad drängt auf Europas dritten Platz</a>
-            <i>Iliad · 2026-10-07</i></span>
-          
-          <span class="fwb-beleg"><a href="https://www.telecomtv.com/content/security/what-s-up-with-ai-security-iliad-starlink-56147/" target="_blank" rel="noopener">Iliad drängt auf Europas dritten Platz</a>
-            <i>Iliad · 2026-10-02</i></span>
-          
-        </li>
-        
-      </ul>
-    </article>
-    
-    <article class="fwb-frage fwb-aktiv">
-      <h3 class="fwb-titel">Erodiert eSIM das Roaming-Geschäft?</h3>
-      <p class="fwb-warum">Reise-eSIMs nehmen Roaming-Erloese ab, ohne dass ein Betreiber den Vertrag sieht. Die Bewegung ist gut belegt, der Zeitpunkt nicht.</p>
-      <ul class="fwb-liste">
-        
-        <li class="fwb-ind fwb-ruhend">
-          <span class="fwb-punkt" aria-hidden="true"></span>
-          <span class="fwb-name">Travel-eSIM-Anbieter wächst oder wird gekauft</span>
-          <span class="fwb-zustand">ruhend</span>
-          
-        </li>
-        
-        <li class="fwb-ind fwb-aktiv">
-          <span class="fwb-punkt" aria-hidden="true"></span>
-          <span class="fwb-name">Roaming-Preise oder -Erlöse verändern sich</span>
-          <span class="fwb-zustand">aktiv</span>
-          
-          <span class="fwb-beleg"><a href="https://telecomtalk.info/airtel-hikes-postpaid-tariffs-by-rs-50/1012664/" target="_blank" rel="noopener">Bharti Airtel erhöht Postpaid-Preise um 50 Rupien</a>
-            <i>Bharti Airtel · 2026-10-09</i></span>
-          
-          <span class="fwb-beleg"><a href="https://www.tatacommunications.com/press-release/air-india-and-tata-communications-for-easyroam-travel-sim" target="_blank" rel="noopener">Air India und Tata starten gebrandete Travel-eSIM</a>
-            <i>Tata Communications · 2026-10-09</i></span>
-          
-        </li>
-        
-      </ul>
-    </article>
-    
-    <article class="fwb-frage fwb-aktiv">
-      <h3 class="fwb-titel">Wird KI zum bezahlten Tarifbestandteil?</h3>
-      <p class="fwb-warum">Eine KI-Lizenz im Tarif ist der erste Differenzierungs-Hebel seit Jahren, den Kunden auf der Rechnung sehen - und der erste, bei dem Vodafones Wettbewerber im deutschen Markt vorgelegt haben.</p>
-      <ul class="fwb-liste">
-        
-        <li class="fwb-ind fwb-aktiv">
-          <span class="fwb-punkt" aria-hidden="true"></span>
-          <span class="fwb-name">KI-Assistent im Tarif enthalten</span>
-          <span class="fwb-zustand">aktiv</span>
-          
-          <span class="fwb-beleg"><a href="https://openai.com/index/new-chatgpt-ads-format-and-measurement" target="_blank" rel="noopener">OpenAI führt neue Werbeformate in ChatGPT ein</a>
-            <i>OpenAI · 2026-10-09</i></span>
-          
-        </li>
-        
-        <li class="fwb-ind fwb-ruhend">
-          <span class="fwb-punkt" aria-hidden="true"></span>
-          <span class="fwb-name">KI-Gerät eines Netzbetreibers</span>
-          <span class="fwb-zustand">ruhend</span>
-          
-        </li>
-        
-      </ul>
-    </article>
-    
-    <article class="fwb-frage fwb-aktiv">
-      <h3 class="fwb-titel">Zwingt die Regulierung zu einer Portfolio-Änderung?</h3>
-      <p class="fwb-warum">Vorgaben zu Preisklauseln, Vertragslaufzeiten oder Kuendigungsfristen wirken unmittelbar auf jeden Tarif - und sie kommen mit Vorlauf, wenn man den Vorlauf beobachtet.</p>
-      <ul class="fwb-liste">
-        
-        <li class="fwb-ind fwb-aktiv">
-          <span class="fwb-punkt" aria-hidden="true"></span>
-          <span class="fwb-name">Vorgabe zu Preisklauseln oder Laufzeiten</span>
-          <span class="fwb-zustand">aktiv</span>
-          
-          <span class="fwb-beleg"><a href="https://www.xatakamovil.com/grid/digi/chollo-digi-se-desinfla-su-modelo-low-cost-se-pone-a-prueba-al-cobrar-que-antes-era-gratis" target="_blank" rel="noopener">Digi verlangt monatliche Miete für 4K-Receiver und Festnetztelefone</a>
-            <i>Digi · 2026-10-09</i></span>
-          
-        </li>
-        
-        <li class="fwb-ind fwb-aktiv">
-          <span class="fwb-punkt" aria-hidden="true"></span>
-          <span class="fwb-name">Digital Networks Act / TKG-Novelle</span>
-          <span class="fwb-zustand">aktiv</span>
-          
-          <span class="fwb-beleg"><a href="https://brekoverband.de/2026/10/08/gutachten-warnt-und-fordert-kurskorrektur-tkg-novelle-darf-nicht-zur-investitions-und-ausbaubremse-werden/" target="_blank" rel="noopener">Verbände warnen vor zu starker Regulierung bei Glasfaser</a>
-            <i>BREKO · 2026-10-09</i></span>
-          
-          <span class="fwb-beleg"><a href="https://brekoverband.de/2026/10/07/gemeinsames-statement-zum-digital-networks-act-mobilfunkdiensteanbieter-glasfasernetzbetreiber-und-stadtwerke-fordern-eu-weites-recht-auf-mobilfunk-vorleistungszugang/" target="_blank" rel="noopener">Verbände fordern Vorleistungszugang im EU Digital Networks Act</a>
-            <i>BREKO · 2026-10-09</i></span>
-          
-        </li>
-        
-      </ul>
-    </article>
-    
-  </div>
-</section>
-
-
-
-
-<div class="frontpage" id="der-wochenbericht" style="scroll-margin-top:20px">
-  <div class="frontpage-main">
-    
-    <div class="card">
-      <div class="card-head"><h2>Der Wochenbericht</h2>
-        <a href="transparenz.html">Quellen</a></div>
-      
-      
-      
-      <p class="berichtszeile">
-        <b>131 relevante Meldungen</b>
-        aus 1086 neuen
-        &middot; Lesezeit ca. 14 Minuten
-      </p>
-      
-      <nav class="toc" aria-label="Abschnitte des Berichts">
-        <a href="#auf-einen-blick">Auf einen Blick</a><a href="#das-wichtigste">Das Wichtigste</a><a href="#die-wichtigsten-signale">Die wichtigsten Signale</a><a href="#europa">Europa</a><a href="#global">Global</a><a href="#asien">Asien</a><a href="#lateinamerika">Lateinamerika</a><a href="#afrika-naher-osten">Afrika &amp; Naher Osten</a><a href="#nordamerika">Nordamerika</a><a href="#ozeanien">Ozeanien</a><a href="#technologie-geraete-regulierung">Technologie, Geräte &amp; Regulierung</a><a href="#muster-der-woche">Muster der Woche</a>
-      </nav>
-      
-      <article class="prose prose-zwei"><h2 id="auf-einen-blick">Auf einen Blick</h2>
-<ul>
+  
+  
+  <section class="szene szene--ohne-motiv" id="auf-einen-blick" data-szene="Auf einen Blick">
+    <div class="szene-bild" aria-hidden="true"><span class="motiv motiv--leer szene-motiv" aria-hidden="true"></span>
+      <span class="szene-marke">Auf einen Blick</span></div>
+    <h2 class="szene-titel">Auf einen Blick</h2>
+    <div class="szene-text prose">
+      <ul>
 <li>Die Konsolidierung schreitet durch die Übernahme von TalkTalk durch BT voran, während Regulatoren vor einer Preisspirale bei fusionierten Anbietern warnen.</li>
 <li>Betreiber nutzen zunehmend KI-Agenten und Bündel-Modelle mit Premium-Streaming, um Kundenbindung zu sichern und Betriebskosten effizienter zu senken.</li>
 <li>Die direkte Satellitenkommunikation (D2D) wird durch Frequenzkäufe von SpaceX und Bodenstationen in Brasilien zur realen Bedrohung für klassische Mobilfunker.</li>
 </ul>
-<h2 id="das-wichtigste">Das Wichtigste</h2>
-<p>Die globale Branche befindet sich in einer Phase der infrastrukturellen Bereinigung und technologischen Differenzierung. Während BT mit der Übernahme von TalkTalk (1,5 Millionen Privatkunden) den britischen Markt konsolidiert, zwingen Openreach und regionale Akteure Kunden per „Stop Sell“ aktiv zum Glasfaserumstieg. Gleichzeitig etablieren sich hybride Konnektivitätsmodelle, bei denen klassische Netze mit 5G-Non-Terrestrial-Networks (NTN) verschmelzen. Auf der Erlösseite zeigen Anbieter wie Bharti Airtel in Indien, dass Kunden bereit sind, höhere Preise für integrierte Mehrwerte – wie Netz-Slicing oder internationales Roaming – zu zahlen, statt abzuwandern. KI-Integrationen bei Betreibern wandeln sich dabei von reinen Chatbots hin zu operativen Werkzeugen für Netzmanagement und Betrugsabwehr.</p>
-<h2 id="die-wichtigsten-signale">Die wichtigsten Signale</h2>
-<p><strong>BT - Übernahme von TalkTalk</strong> (M&amp;A, 5/5)
-BT übernimmt die Privatkunden- und Großhandelssparten von TalkTalk schuldenfrei. Die Transaktion umfasst 1,5 Millionen Privatkunden und 1 Million Großhandelskunden und belastet das Ergebnis für 2027 mit geschätzt 400 Millionen Pfund. <a href="https://totaltele.com/bt-swoops-in-to-acquire-talktalk/">Quelle</a></p>
+      
+    </div>
+  </section>
+
+  
+  
+  
+  <section class="szene szene--blatt" id="themen-der-woche" data-szene="Themen der Woche">
+    <h2 class="szene-titel szene-titel--blatt">Themen der Woche</h2>
+    <div class="szene-text themen">
+      
+      <div class="bento-bar themen-zeile">
+        <div class="bento-bar-top"><b>KI / AI</b><span class="themen-zahl">16</span></div>
+        <div class="bento-bar-track"><span class="bento-bar-fill" style="width:100%"></span></div>
+      </div>
+      
+      <div class="bento-bar themen-zeile">
+        <div class="bento-bar-top"><b>Glasfaser / FTTH</b><span class="themen-zahl">14</span></div>
+        <div class="bento-bar-track"><span class="bento-bar-fill" style="width:88%"></span></div>
+      </div>
+      
+      <div class="bento-bar themen-zeile">
+        <div class="bento-bar-top"><b>Satellit / NTN</b><span class="themen-zahl">14</span></div>
+        <div class="bento-bar-track"><span class="bento-bar-fill" style="width:88%"></span></div>
+      </div>
+      
+      <div class="bento-bar themen-zeile">
+        <div class="bento-bar-top"><b>IoT / eSIM</b><span class="themen-zahl">8</span></div>
+        <div class="bento-bar-track"><span class="bento-bar-fill" style="width:50%"></span></div>
+      </div>
+      
+      <div class="bento-bar themen-zeile">
+        <div class="bento-bar-top"><b>5G Standalone</b><span class="themen-zahl">7</span></div>
+        <div class="bento-bar-track"><span class="bento-bar-fill" style="width:44%"></span></div>
+      </div>
+      
+      <div class="bento-bar themen-zeile">
+        <div class="bento-bar-top"><b>Open RAN</b><span class="themen-zahl">6</span></div>
+        <div class="bento-bar-track"><span class="bento-bar-fill" style="width:38%"></span></div>
+      </div>
+      
+      <div class="bento-bar themen-zeile">
+        <div class="bento-bar-top"><b>Cloud / Edge</b><span class="themen-zahl">5</span></div>
+        <div class="bento-bar-track"><span class="bento-bar-fill" style="width:31%"></span></div>
+      </div>
+      
+    </div>
+  </section>
+
+  
+  
+  
+  <section class="szene szene--ohne-motiv" id="das-wichtigste" data-szene="Das Wichtigste">
+    <div class="szene-bild" aria-hidden="true"><span class="motiv motiv--leer szene-motiv" aria-hidden="true"></span>
+      <span class="szene-marke">Das Wichtigste</span></div>
+    <h2 class="szene-titel">Das Wichtigste</h2>
+    <div class="szene-text prose">
+      <p>Die globale Branche befindet sich in einer Phase der infrastrukturellen Bereinigung und technologischen Differenzierung. Während BT mit der Übernahme von TalkTalk (<span class="zahl"><span class="zahl-wert" data-wert="1.5" data-stellen="1">1,5</span> Millionen</span> Privatkunden) den britischen Markt konsolidiert, zwingen Openreach und regionale Akteure Kunden per „Stop Sell“ aktiv zum Glasfaserumstieg. Gleichzeitig etablieren sich hybride Konnektivitätsmodelle, bei denen klassische Netze mit 5G-Non-Terrestrial-Networks (NTN) verschmelzen. Auf der Erlösseite zeigen Anbieter wie Bharti Airtel in Indien, dass Kunden bereit sind, höhere Preise für integrierte Mehrwerte – wie Netz-Slicing oder internationales Roaming – zu zahlen, statt abzuwandern. KI-Integrationen bei Betreibern wandeln sich dabei von reinen Chatbots hin zu operativen Werkzeugen für Netzmanagement und Betrugsabwehr.</p>
+      
+      <div class="rubrik"><h3>Was wichtig ist</h3></div>
+      <ol class="wichtig-liste">
+        
+        <li class="wichtig-zeile">
+          <a href="https://news.virginmediao2.co.uk/virgin-media-o2-creates-new-dedicated-customer-hub-in-newcastle-to-handle-repeat-calls-and-boost-first-time-resolution-for-all-customers/" target="_blank" rel="noopener">
+            <span class="wichtig-kicker">Virgin Media O2</span>
+            <span class="wichtig-titel szl">Virgin Media O2 gründet neuen Kundenservice-Hub</span>
+          </a>
+          
+
+
+          
+        </li>
+        
+        <li class="wichtig-zeile">
+          <a href="https://www.telecomtv.com/content/access-evolution/bt-takeover-deal-saves-broadband-player-talktalk-from-collapse-56385/" target="_blank" rel="noopener">
+            <span class="wichtig-kicker">EU Regulierungsbehörden</span>
+            <span class="wichtig-titel szl">EU-Regulierer warnen vor Preiserhöhungen durch Telekom-Fusionen</span>
+          </a>
+          
+
+
+          
+        </li>
+        
+        <li class="wichtig-zeile">
+          <a href="https://news.virginmediao2.co.uk/newsroom/grand-theft-auto-upgrade-gamers-could-unlock-293-with-unused-consoles-ahead-of-gta-vi/" target="_blank" rel="noopener">
+            <span class="wichtig-kicker">Virgin Media O2</span>
+            <span class="wichtig-titel szl">Virgin Media O2 startet Gaming-Rücknahmekampagne vor GTA VI</span>
+          </a>
+          
+
+
+          <p class="ctm-satz"><span class="ctm-marke">Was das für uns heißt</span>Gezielte Trade-in-Aktion für Konsolen vor einem Blockbuster-Spielelaunch - Vorlage für die Vermarktung unseres eigenen Geräte-Ankaufs.</p>
+        </li>
+        
+        <li class="wichtig-zeile">
+          <a href="https://www.o2online.de/tarife/handyvertrag-ohne-handy/" target="_blank" rel="noopener">
+            <span class="wichtig-kicker">o2</span>
+            <span class="wichtig-titel szl">o2 erhöht Anschlusspreis für Tarif-Variante auf 39,99 Euro</span>
+          </a>
+          
+
+
+          <p class="ctm-satz"><span class="ctm-marke">Was das für uns heißt</span>Anschlusspreiserhöhung auf 39,99 Euro bei o2 - deutlicher Hinweis, dass wir unsere Aktivierungsgebühren auf diesem Niveau stabil halten können.</p>
+        </li>
+        
+        <li class="wichtig-zeile">
+          <a href="https://news.virginmediao2.co.uk/a1-naming-rights-partnership-until-2038/" target="_blank" rel="noopener">
+            <span class="wichtig-kicker">Virgin Media O2</span>
+            <span class="wichtig-titel szl">O2 verlängert Namensrechte für The O2 bis 2038</span>
+          </a>
+          
+
+
+          <p class="ctm-satz"><span class="ctm-marke">Was das für uns heißt</span>Exklusive Ticket-Vorteile für die eigenen Kunden bis 2038 verlängert - demonstriktive Treueprogramme stärken die Abwanderungsprävention massiv.</p>
+        </li>
+        
+        <li class="wichtig-zeile">
+          <a href="https://news.virginmediao2.co.uk/virgin-media-o2/v-gives-tv-customers-access-to-kids-channels-at-no-extra-cost-october-2/" target="_blank" rel="noopener">
+            <span class="wichtig-kicker">Virgin Media O2</span>
+            <span class="wichtig-titel szl">Virgin Media O2 schenkt TV-Kunden Kinderkanäle im Oktober</span>
+          </a>
+          
+
+
+          <p class="ctm-satz"><span class="ctm-marke">Was das für uns heißt</span>Gratis-Freischaltung von Premiinkanälen als Ferienaktion – ein effektives Mittel zur Kundenbindung, das wir für unser TV-Portfolio prüfen sollten.</p>
+        </li>
+        
+        <li class="wichtig-zeile">
+          <a href="https://developingtelecoms.com/telecom-technology/financial-services/20940-safaricom-and-gcib-launch-shariah-compliant-investment-fund-for-m-pesa.html" target="_blank" rel="noopener">
+            <span class="wichtig-kicker">Safaricom</span>
+            <span class="wichtig-titel szl">Safaricom führt KI-gestützte Scan-to-Pay-Zahlungen in Kenia ein</span>
+          </a>
+          
+
+
+          <p class="ctm-satz"><span class="ctm-marke">Was das für uns heißt</span>Die KI-gestützte automatische Erfassung von Rechnungsdetails in der App senkt die Fehlerquote bei Zahlungen und könnte die Adoptionsrate unserer eigenen Payment-Lösungen massiv erhöhen.</p>
+        </li>
+        
+      </ol>
+      <p class="ex-count">
+        <a href="meldungen.html" class="source-link">alle 131 Meldungen &nearr;</a>
+      </p>
+      
+    </div>
+  </section>
+
+  
+  
+  
+  <section class="szene szene--ohne-motiv" id="die-wichtigsten-signale" data-szene="Die wichtigsten Meldungen">
+    <div class="szene-bild" aria-hidden="true"><span class="motiv motiv--leer szene-motiv" aria-hidden="true"></span>
+      <span class="szene-marke">Die wichtigsten Meldungen</span></div>
+    <h2 class="szene-titel">Die wichtigsten Meldungen</h2>
+    <div class="szene-text prose">
+      <p><strong>BT - Übernahme von TalkTalk</strong> (M&amp;A, 5/5)
+BT übernimmt die Privatkunden- und Großhandelssparten von TalkTalk schuldenfrei. Die Transaktion umfasst <span class="zahl"><span class="zahl-wert" data-wert="1.5" data-stellen="1">1,5</span> Millionen</span> Privatkunden und 1 Million Großhandelskunden und belastet das Ergebnis für 2027 mit geschätzt <span class="zahl"><span class="zahl-wert" data-wert="400" data-stellen="0">400</span> Millionen</span> Pfund. <a href="https://totaltele.com/bt-swoops-in-to-acquire-talktalk/">Quelle</a></p>
 <p><strong>SpaceX - Erwerb 800-MHz-Frequenzen</strong> (Netz/Technologie, 5/5)
 SpaceX kauft das landesweite 800-MHz-Frequenzportfolio von Grain Management, um Starlink-Mobilfunkdienste terrestrisch zu skalieren. Die Frequenzen stammen ursprünglich aus einem Verkauf von T-Mobile US. <a href="https://bbcmag.com/grain-will-sell-nationwide-800-mhz-spectrum-portfolio-to-spacex/">Quelle</a></p>
 <p><strong>e&amp; - Kommerzieller Start 6-GHz-Band</strong> (Netz/Technologie, 5/5)
-In den VAE hat e&amp; das 6-GHz-Band (6425–7125 MHz) kommerziell für Mobilfunk gestartet. Es werden Kapazitäten von 10 Gbit/s pro Nutzer und über 50 Gbit/s pro Zelle erreicht. <a href="https://www.telecomreview.com/articles/telecom-vendors/30437-e-launches-worlds-first-commercial-u6ghz-network-opening-a-new-chapter-for-wireless-connectivity/">Quelle</a></p>
+In den VAE hat e&amp; das 6-GHz-Band (6425–<span class="zahl"><span class="zahl-wert" data-wert="7125" data-stellen="0">7125</span> MHz</span>) kommerziell für Mobilfunk gestartet. Es werden Kapazitäten von <span class="zahl"><span class="zahl-wert" data-wert="10" data-stellen="0">10</span> Gbit/s</span> pro Nutzer und über <span class="zahl"><span class="zahl-wert" data-wert="50" data-stellen="0">50</span> Gbit/s</span> pro Zelle erreicht. <a href="https://www.telecomreview.com/articles/telecom-vendors/30437-e-launches-worlds-first-commercial-u6ghz-network-opening-a-new-chapter-for-wireless-connectivity/">Quelle</a></p>
 <p><strong>BREKO/VATM - Kritik an TKG-Novelle</strong> (Regulierung, 5/5)
 Die Verbände fordern eine Kurskorrektur bei der TKG-Novelle, da sie eine Gefährdung privater Glasfaserinvestitionen durch zu frühe Zugangsregulierungen befürchten. Zudem wird ein verbindliches Recht auf Mobilfunk-Vorleistungszugang auf EU-Ebene gefordert. <a href="https://brekoverband.de/2026/10/08/gutachten-warnt-und-fordert-kurskorrektur-tkg-novelle-darf-nicht-zur-investitions-und-ausbaubremse-werden/">Quelle</a></p>
 <p><strong>Bharti Airtel - Postpaid-Preiserhöhung</strong> (Tarif/Pricing, 5/5)
 Airtel erhöht die monatlichen Postpaid-Gebühren um 50 Rupien und bündelt dies mit Roaming-Leistungen sowie netzwerkgeslicten Diensten. Die Strategie der Bereinigung günstiger Tarife führt laut Betreiber bisher nicht zu Kundenabwanderung. <a href="https://telecomtalk.info/airtel-hikes-postpaid-tariffs-by-rs-50/1012664/">Quelle</a></p>
 <p><strong>Orange - Fast Pass 5G+</strong> (Produktlaunch, 5/5)
-Orange führt in Frankreich einen temporären 5G-Geschwindigkeitspass für 5 Euro ein. Kunden erhalten bei Netzüberlastung eine dedizierte Bandbreite mit potenziell verdoppelter Geschwindigkeit. <a href="https://www.universfreebox.com/article/598225/orange-lance-un-pass-5g-temporaire-avec-un-debit-potentiellement-double">Quelle</a></p>
-<h2 id="europa">Europa</h2>
-<p>Die europäische Telekommunikationsbranche steht derzeit stark unter dem Zeichen strategischer Konsolidierung und einer konsequenten Monetarisierung von Hardware und Mehrwertdiensten. Netzbetreiber reagieren auf Preisdruck im Mobilfunk mit gezielten Bündelangeboten und investieren massiv in automatisierte Sicherheit, während der regulatorische Druck bei Festnetzpreisen und Infrastrukturbeteiligungen zunimmt.</p>
+Orange führt in Frankreich einen temporären 5G-Geschwindigkeitspass für <span class="zahl"><span class="zahl-wert" data-wert="5" data-stellen="0">5</span> Euro</span> ein. Kunden erhalten bei Netzüberlastung eine dedizierte Bandbreite mit potenziell verdoppelter Geschwindigkeit. <a href="https://www.universfreebox.com/article/598225/orange-lance-un-pass-5g-temporaire-avec-un-debit-potentiellement-double">Quelle</a></p>
+      
+    </div>
+  </section>
+
+  
+  
+  
+  <section class="szene szene--ohne-motiv" id="europa" data-szene="Europa">
+    <div class="szene-bild" aria-hidden="true"><span class="motiv motiv--leer szene-motiv" aria-hidden="true"></span>
+      <span class="szene-marke">Europa</span></div>
+    <h2 class="szene-titel">Europa</h2>
+    <div class="szene-text prose">
+      <p>Die europäische Telekommunikationsbranche steht derzeit stark unter dem Zeichen strategischer Konsolidierung und einer konsequenten Monetarisierung von Hardware und Mehrwertdiensten. Netzbetreiber reagieren auf Preisdruck im Mobilfunk mit gezielten Bündelangeboten und investieren massiv in automatisierte Sicherheit, während der regulatorische Druck bei Festnetzpreisen und Infrastrukturbeteiligungen zunimmt.</p>
 <ul>
-<li><strong>BT Group</strong>: Nach der Übernahme von TalkTalk sichert BT die Versorgung von 2,5 Millionen Kunden und integriert kritische Infrastrukturen in den Konzern. <a href="https://newsroom.bt.com/bt-group-has-acquired-talktalk-and-platformx-ensuring-continuity-of-service-for-millions-of-customers/">Quelle</a></li>
+<li><strong>BT Group</strong>: Nach der Übernahme von TalkTalk sichert BT die Versorgung von <span class="zahl"><span class="zahl-wert" data-wert="2.5" data-stellen="1">2,5</span> Millionen</span> Kunden und integriert kritische Infrastrukturen in den Konzern. <a href="https://newsroom.bt.com/bt-group-has-acquired-talktalk-and-platformx-ensuring-continuity-of-service-for-millions-of-customers/">Quelle</a></li>
 <li><strong>VodafoneThree (UK)</strong>: Der Konzern hat nach dem Zusammenschluss die Kosteneinsparziele auf eine Milliarde Pfund angehoben und plant ein umfangreiches Investitionsprogramm in die Netzinfrastruktur bis 2032. <a href="https://www.mobileworldlive.com/vodafone/vodafonethre-ups-cost-savings-target-to-1b/">Quelle</a></li>
-<li><strong>Deutsche Telekom</strong>: Der Konzern strebt bis zum Ende des Jahrzehnts Einsparungen von 2,5 Milliarden Euro durch KI und Automatisierung an, um diese Mittel direkt in den Glasfaserausbau umzuleiten. <a href="https://www.telecoms.com/ai/deutsche-telekom-eyes-2-5-billion-in-savings-from-ai-to-provide-fibre-boost">Quelle</a></li>
-<li><strong>Orange (Frankreich)</strong>: Der Netzbetreiber bietet nun einen „Fast Pass 5G+“ für 5 Euro an, der bei Netzüberlastung temporär eine exklusive Bandbreite mit verdoppelter Geschwindigkeit garantiert. <a href="https://www.universfreebox.com/article/598225/orange-lance-un-pass-5g-temporaire-avec-un-debit-potentiellement-double">Quelle</a></li>
+<li><strong>Deutsche Telekom</strong>: Der Konzern strebt bis zum Ende des Jahrzehnts Einsparungen von <span class="zahl"><span class="zahl-wert" data-wert="2.5" data-stellen="1">2,5</span> Milliarden</span> Euro durch KI und Automatisierung an, um diese Mittel direkt in den Glasfaserausbau umzuleiten. <a href="https://www.telecoms.com/ai/deutsche-telekom-eyes-2-5-billion-in-savings-from-ai-to-provide-fibre-boost">Quelle</a></li>
+<li><strong>Orange (Frankreich)</strong>: Der Netzbetreiber bietet nun einen „Fast Pass 5G+“ für <span class="zahl"><span class="zahl-wert" data-wert="5" data-stellen="0">5</span> Euro</span> an, der bei Netzüberlastung temporär eine exklusive Bandbreite mit verdoppelter Geschwindigkeit garantiert. <a href="https://www.universfreebox.com/article/598225/orange-lance-un-pass-5g-temporaire-avec-un-debit-potentiellement-double">Quelle</a></li>
 <li><strong>Telia (Schweden)</strong>: Ein neu eingeführter automatischer Internetfilter blockiert Betrugsseiten netzseitig für alle Mobilfunkkunden, ohne dass eine App-Installation erforderlich ist. <a href="https://www.mynewsdesk.com/se/telia/pressreleases/telia-stoppar-bedraegerisajter-automatiskt-foer-alla-mobilkunder-i-ny-saekerhetstjaenst-3470701?utm_source=rss&amp;utm_medium=rss&amp;utm_campaign=Subscription&amp;utm_content=current_news">Quelle</a></li>
 <li><strong>Swisscom</strong>: Die Regulierungsbehörde hat den monatlichen Mietpreis für den Glasfaserzugang durch Drittanbieter auf maximal 24 Franken für die kommenden zwei Jahre begrenzt. <a href="https://www.netzwoche.ch/news/2026-10-09/swisscom-darf-preisobergrenze-fuer-glasfasernetz-nicht-erhoehen">Quelle</a></li>
 <li><strong>1&amp;1</strong>: Der Anbieter vermarktet exklusiv für mindestens sechs Monate den neuen „HomeServer Pro“ mit Wi-Fi 7 und Triband-WLAN für DSL- sowie Glasfaseranschlüsse. <a href="https://unternehmen.1und1.de/produkt-news/2026/1-1-fuehrt-neuen-premium-router-ein-1-1-homeserver-pro-ab-oktober-exklusiv-bei-1-1-verfuegbar">Quelle</a></li>
 <li><strong>Digi</strong>: Der Billiganbieter beginnt bei Glasfaseranschlüssen damit, monatliche Gebühren für Hardware wie 4K-Receiver und Telefone zu erheben, um den Ertrag pro Kunde zu steigern. <a href="https://www.xatakamovil.com/grid/digi/chollo-digi-se-desinfla-su-modelo-low-cost-se-pone-a-prueba-al-cobrar-que-antes-era-gratis">Quelle</a></li>
 </ul>
-<h2 id="global">Global</h2>
-<p>Die globale Telekommunikationsbranche steht unter dem Druck zunehmender Konsolidierung und schwindender Margen im klassischen Konnektivitätsgeschäft, was Anbieter zu aggressiven Bündelstrategien und Effizienzmaßnahmen zwingt. Während Regulierungsbehörden vor steigenden Endkundenpreisen durch Marktkonzentration warnen, forcieren Betreiber den Umstieg auf KI-gestützte Betriebsprozesse und investieren massiv in alternative Einnahmequellen wie Streaming-Integrationen.</p>
+      
+    </div>
+  </section>
+
+  
+  
+  
+  <section class="szene szene--ohne-motiv" id="deutschland-fokus" data-szene="Deutschland" style="scroll-margin-top:24px">
+    <div class="szene-bild" aria-hidden="true"><span class="motiv motiv--leer szene-motiv" aria-hidden="true"></span>
+      <span class="szene-marke">Deutschland</span></div>
+    <h2 class="szene-titel">Deutschland</h2>
+    <div class="szene-text">
+      
+      <ul class="wb-kurz">
+        
+        
+        <li class="wb-kurz-zeile">
+          <a href="wettbewerb.html#deutsche-telekom">
+            <span class="wb-kurz-name">Deutsche Telekom</span>
+            <span class="wb-kurz-satz">Die Deutsche Telekom forciert derzeit den massiven Glasfaserausbau in Deutschland und setzt strategisch auf KI-basierte Effizienzsteigerungen mit einem Ziel von 2,5 Mrd. Euro Einsparungen…</span>
+          </a>
+        </li>
+        
+        
+        
+        <li class="wb-kurz-zeile">
+          <a href="wettbewerb.html#telefonica-o2">
+            <span class="wb-kurz-name">Telefónica / O2</span>
+            <span class="wb-kurz-satz">Telefónica/O2 fokussiert sich aktuell auf die Konsolidierung seines Geschäftsmodells durch Desinvestitionen in Hispanoamerika und den Ausbau profitabler Mehrwertdienste wie…</span>
+          </a>
+        </li>
+        
+        
+        
+        <li class="wb-kurz-zeile">
+          <a href="wettbewerb.html#1-1">
+            <span class="wb-kurz-name">1&amp;1</span>
+            <span class="wb-kurz-satz">1&amp;1 forciert derzeit eine zweigleisige Strategie aus gezielten Hardware-Upgrades, wie neuen Glasfaser-Routern, und einer konsequenten Stärkung seiner regionalen Glasfaserpräsenz durch…</span>
+          </a>
+        </li>
+        
+        
+      </ul>
+      
+      
+      
+      <p class="szene-weiter"><a href="wettbewerb.html">Zur Wettbewerbsseite &rarr;</a></p>
+    </div>
+  </section>
+
+  
+  
+  
+  <section class="szene" id="global" data-szene="Global">
+    <div class="szene-bild" aria-hidden="true"><img class="motiv szene-motiv" src="static/bilder/kapitel-global.jpg" alt=""
+     width="2400" height="1357" decoding="async" loading="lazy">
+      <span class="szene-marke">Global</span></div>
+    <h2 class="szene-titel">Global</h2>
+    <div class="szene-text prose">
+      <p>Die globale Telekommunikationsbranche steht unter dem Druck zunehmender Konsolidierung und schwindender Margen im klassischen Konnektivitätsgeschäft, was Anbieter zu aggressiven Bündelstrategien und Effizienzmaßnahmen zwingt. Während Regulierungsbehörden vor steigenden Endkundenpreisen durch Marktkonzentration warnen, forcieren Betreiber den Umstieg auf KI-gestützte Betriebsprozesse und investieren massiv in alternative Einnahmequellen wie Streaming-Integrationen.</p>
 <ul>
-<li><strong>BT übernimmt TalkTalk:</strong> Um einen Zusammenbruch zu verhindern, erwirbt die BT Group das Privat- und Großhandelsgeschäft von TalkTalk. Diese Konsolidierung umfasst 2,5 Millionen Kunden und unterstreicht den hohen Preisdruck im britischen Breitbandmarkt <a href="https://totaltele.com/bt-swoops-in-to-acquire-talktalk/">Quelle</a>.</li>
-<li><strong>Kupfer-Aus für Openreach:</strong> In 112 weiteren Regionen Großbritanniens beendet Openreach den Vertrieb von Kupferanschlüssen, sobald 75 Prozent der Haushalte über Glasfaser verfügen. Dies erzwingt die Migration der Bestandskunden auf die moderne Glasfaserinfrastruktur <a href="https://www.mobileeurope.co.uk/openreach-copper-broadband-uk/">Quelle</a>.</li>
-<li><strong>Samsung integriert Krypto-Zahlungen:</strong> Über 82 Millionen Samsung-Galaxy-Geräte unterstützen künftig Stablecoin-Transfers via Solana. Die Integration von Finanzdienstleistungen in mobile Endgeräte signalisiert eine Ausweitung von Mobilfunk-Wallets zur vollwertigen Finanzplattform <a href="https://www.thefastmode.com/technology-solutions/50955-samsung-solana-bring-stablecoin-transfers-to-82-million-galaxy-devices">Quelle</a>.</li>
-<li><strong>Streaming als Differenzierungsfaktor:</strong> Mediacom bindet den Dienst ESPN Unlimited kostenlos in TV-Basispakete ein, während MyBundle Mobilfunktarife ab 20 Dollar mit einjährigen Streaming-Abos kombiniert. Diese Bündelungsstrategien zielen darauf ab, Kunden bei stagnierenden Mobilfunkpreisen über exklusive Content-Mehrwerte zu binden <a href="https://lightreading.com/video-streaming/mediacom-subs-on-variety-package-get-espn-unlimited">Quelle</a>, <a href="https://lightreading.com/5g/mybundle-reveals-mobile-pricing-and-packaging-streaming-perks-for-new-subs">Quelle</a>.</li>
+<li><strong>BT übernimmt TalkTalk:</strong> Um einen Zusammenbruch zu verhindern, erwirbt die BT Group das Privat- und Großhandelsgeschäft von TalkTalk. Diese Konsolidierung umfasst <span class="zahl"><span class="zahl-wert" data-wert="2.5" data-stellen="1">2,5</span> Millionen</span> Kunden und unterstreicht den hohen Preisdruck im britischen Breitbandmarkt <a href="https://totaltele.com/bt-swoops-in-to-acquire-talktalk/">Quelle</a>.</li>
+<li><strong>Kupfer-Aus für Openreach:</strong> In 112 weiteren Regionen Großbritanniens beendet Openreach den Vertrieb von Kupferanschlüssen, sobald <span class="zahl"><span class="zahl-wert" data-wert="75" data-stellen="0">75</span> Prozent</span> der Haushalte über Glasfaser verfügen. Dies erzwingt die Migration der Bestandskunden auf die moderne Glasfaserinfrastruktur <a href="https://www.mobileeurope.co.uk/openreach-copper-broadband-uk/">Quelle</a>.</li>
+<li><strong>Samsung integriert Krypto-Zahlungen:</strong> Über <span class="zahl"><span class="zahl-wert" data-wert="82" data-stellen="0">82</span> Millionen</span> Samsung-Galaxy-Geräte unterstützen künftig Stablecoin-Transfers via Solana. Die Integration von Finanzdienstleistungen in mobile Endgeräte signalisiert eine Ausweitung von Mobilfunk-Wallets zur vollwertigen Finanzplattform <a href="https://www.thefastmode.com/technology-solutions/50955-samsung-solana-bring-stablecoin-transfers-to-82-million-galaxy-devices">Quelle</a>.</li>
+<li><strong>Streaming als Differenzierungsfaktor:</strong> Mediacom bindet den Dienst ESPN Unlimited kostenlos in TV-Basispakete ein, während MyBundle Mobilfunktarife ab <span class="zahl"><span class="zahl-wert" data-wert="20" data-stellen="0">20</span> Dollar</span> mit einjährigen Streaming-Abos kombiniert. Diese Bündelungsstrategien zielen darauf ab, Kunden bei stagnierenden Mobilfunkpreisen über exklusive Content-Mehrwerte zu binden <a href="https://lightreading.com/video-streaming/mediacom-subs-on-variety-package-get-espn-unlimited">Quelle</a>, <a href="https://lightreading.com/5g/mybundle-reveals-mobile-pricing-and-packaging-streaming-perks-for-new-subs">Quelle</a>.</li>
 <li><strong>Regulatorische Bedenken bei Fusionen:</strong> Europäische Regulierungsbehörden warnen vor negativen Folgen von Marktübernahmen, da Daten eine Tendenz zu Preiserhöhungen nach Konsolidierungsprozessen belegen. Dies erschwert künftige strategische M&amp;A-Vorhaben <a href="https://www.telecomtv.com/content/access-evolution/bt-takeover-deal-saves-broadband-player-talktalk-from-collapse-56385/">Quelle</a>.</li>
 <li><strong>Adtran automatisiert mit KI-Agenten:</strong> Adtran führt KI-gestützte Agenten ein, die Netzbetreiber bei der Verwaltung der Netzwerkinfrastruktur und im Kundensupport entlasten sollen. Dieser Schritt spiegelt den Branchentrend zur Kostensenkung durch Automatisierung wider <a href="https://lightreading.com/ai-machine-learning/adtran-deploys-ai-agents-to-assist-service-provider-operations">Quelle</a>.</li>
 </ul>
-<h2 id="asien">Asien</h2>
-<p>Asiatische Betreiber nutzen die hohe Akzeptanz für Tariferhöhungen, indem sie Preisanpassungen gezielt mit Premium-Mehrwerten wie weltweitem Roaming und reservierten Netzressourcen verknüpfen. Gleichzeitig vertiefen die Netzbetreiber ihre Branchenpartnerschaften, um Vertriebskanäle über Fluggesellschaften zu erschließen und maßgeschneiderte Industrienetze für den Rohstoffsektor aufzubauen. Ergänzend investieren regionale Akteure in eigene Satellitenkonstellationen, KI-Kundenservices und krisenfeste Notfallnetze, um ihre Abhängigkeit von externen Technologielieferanten zu verringern.</p>
+      
+    </div>
+  </section>
+
+  
+  
+  
+  <section class="szene szene--ohne-motiv" id="asien" data-szene="Asien">
+    <div class="szene-bild" aria-hidden="true"><span class="motiv motiv--leer szene-motiv" aria-hidden="true"></span>
+      <span class="szene-marke">Asien</span></div>
+    <h2 class="szene-titel">Asien</h2>
+    <div class="szene-text prose">
+      <p>Asiatische Betreiber nutzen die hohe Akzeptanz für Tariferhöhungen, indem sie Preisanpassungen gezielt mit Premium-Mehrwerten wie weltweitem Roaming und reservierten Netzressourcen verknüpfen. Gleichzeitig vertiefen die Netzbetreiber ihre Branchenpartnerschaften, um Vertriebskanäle über Fluggesellschaften zu erschließen und maßgeschneiderte Industrienetze für den Rohstoffsektor aufzubauen. Ergänzend investieren regionale Akteure in eigene Satellitenkonstellationen, KI-Kundenservices und krisenfeste Notfallnetze, um ihre Abhängigkeit von externen Technologielieferanten zu verringern.</p>
 <p>Bharti Airtel hat die Preise für sämtliche Postpaid-Verträge (Laufzeitverträge) um 50 indische Rupien pro Monat angehoben und bündelt im Gegenzug ein jährliches Gratis-Kontingent für weltweites Roaming sowie priorisierte Datenraten über Network Slicing (Aufteilung des Mobilfunknetzes in garantierte Teilbereiche) <a href="https://telecomtalk.info/airtel-hikes-postpaid-tariffs-by-rs-50/1012664/">Quelle</a>. Eine vorangegangene Bereinigung günstiger Einstiegstarife führte beim Betreiber zu keinerlei nennenswerter Kundenabwanderung <a href="https://telecomtalk.info/airtel-removing-affordable-plans-did-not/1012647/">Quelle</a>.</p>
 <p>Tata Communications und die Fluggesellschaft Air India vermarkten gemeinsam die Reise-SIM „EasyRoam“, die Fluggästen über die Ticketbuchung als physische Karte oder digitale eSIM (fest verbaute SIM-Karte) weltweiten Datenzugriff in bis zu 190 Ländern bietet <a href="https://www.tatacommunications.com/press-release/air-india-and-tata-communications-for-easyroam-travel-sim">Quelle</a>.</p>
 <p>Reliance Jio plant den Aufbau eines eigenen Satellitennetzwerks mit rund 1.600 Satelliten im erdnahen Orbit, um über 600.000 bisher unversorgte Dörfer sowie maritime Zonen direkt anzubinden <a href="https://telecomtalk.info/imc2026-jio-plans-satellite-network-connect-600000villages/1012635/">Quelle</a>. Zugleich demonstrierte das Unternehmen eine eigenentwickelte Antenneneinheit für den kommenden Mobilfunkstandard 6G <a href="https://telecomtalk.info/reliance-jio-6g-nr-mimo-unit-showcased/1012667/">Quelle</a>.</p>
 <p>Vi Business, der Geschäftskundenbereich von Vodafone Idea, stattet eine Bauxit-Mine von Hindalco im Bundesstaat Odisha mit einem privaten Campusnetz aus, das als Komplettlösung inklusive Kernnetz und Funkanbindung industrielle Steuerungsanwendungen unterstützt <a href="https://telecomtalk.info/imc2026-vibusiness-hindalco-private-network-odisha-mine/1012643/">Quelle</a>.</p>
 <p>Der staatliche Anbieter Bharat Sanchar Nigam Limited (BSNL) integriert neue Funktionen in seinen KI-Chatbot Vaani, darunter mehrsprachige Beschwerdeerfassung per Sprache und die Anzeige lokaler Netzstörungen in der Kunden-App <a href="https://telecomtalk.info/bsnl-vaani-upgrade-ai-security-bharatsandesh-imc2026/1012641/">Quelle</a>.</p>
-<p>Der japanische Konzern SoftBank erprobte ein luftgestütztes Mobilfunknetz über eine Drohne in 3.000 Metern Höhe, die nach Naturkatastrophen ein Notfallnetz mit einem Radius von über fünf Kilometern aufspannt <a href="https://www.telecomreviewasia.com/news/technology-news/30472-softbank-tests-aerial-mobile-coverage-for-disaster-response/">Quelle</a>. In Thailand verzeichnete True Corporation während schwerer Überschwemmungen einen sprunghaften Anstieg des mobilen Sprachverkehrs um regional mehr als 600 Prozent <a href="https://www.true.th/blog/en/true-corporation-unveils-data-insight-into-thai-communication-behavior-during-flood-crisis-with-voice-traffic-surging-over-600/">Quelle</a>.</p>
-<p>Der malaysische Großhandelsanbieter Digital Nasional Berhad hat sich eine Finanzierung über 1,27 Milliarden US-Dollar gesichert, um den landesweiten 5G-Ausbau weiter voranzutreiben <a href="https://www.telecomreviewasia.com/news/industry-news/30467-dnb-secures-usd-1-27b-financing-for-malaysias-next-5g-phase/">Quelle</a>.</p>
-<h2 id="lateinamerika">Lateinamerika</h2>
-<p>In Lateinamerika treiben Telekommunikationsanbieter die Verknüpfung von terrestrischen Netzen mit Satelliteninfrastruktur voran, insbesondere für das Internet der Dinge (Internet of Things, IoT). Gleichzeitig erweitern Betreiber ihre Geschäftskundenangebote um Cloud-Dienste führender Hyperscaler und setzen auf künstliche Intelligenz (KI) zur Betrugsabwehr und Monetarisierung. Diese Entwicklungen zeigen den Wandel der regionalen Netzbetreiber vom reinen Konnektivitätsanbieter hin zu umfassenden IT-Dienstleistern.</p>
+<p>Der japanische Konzern SoftBank erprobte ein luftgestütztes Mobilfunknetz über eine Drohne in 3.000 Metern Höhe, die nach Naturkatastrophen ein Notfallnetz mit einem Radius von über fünf Kilometern aufspannt <a href="https://www.telecomreviewasia.com/news/technology-news/30472-softbank-tests-aerial-mobile-coverage-for-disaster-response/">Quelle</a>. In Thailand verzeichnete True Corporation während schwerer Überschwemmungen einen sprunghaften Anstieg des mobilen Sprachverkehrs um regional mehr als <span class="zahl"><span class="zahl-wert" data-wert="600" data-stellen="0">600</span> Prozent</span> <a href="https://www.true.th/blog/en/true-corporation-unveils-data-insight-into-thai-communication-behavior-during-flood-crisis-with-voice-traffic-surging-over-600/">Quelle</a>.</p>
+<p>Der malaysische Großhandelsanbieter Digital Nasional Berhad hat sich eine Finanzierung über <span class="zahl"><span class="zahl-wert" data-wert="1.27" data-stellen="2">1,27</span> Milliarden</span> US-Dollar gesichert, um den landesweiten 5G-Ausbau weiter voranzutreiben <a href="https://www.telecomreviewasia.com/news/industry-news/30467-dnb-secures-usd-1-27b-financing-for-malaysias-next-5g-phase/">Quelle</a>.</p>
+      
+    </div>
+  </section>
+
+  
+  
+  
+  <section class="szene szene--ohne-motiv" id="lateinamerika" data-szene="Lateinamerika">
+    <div class="szene-bild" aria-hidden="true"><span class="motiv motiv--leer szene-motiv" aria-hidden="true"></span>
+      <span class="szene-marke">Lateinamerika</span></div>
+    <h2 class="szene-titel">Lateinamerika</h2>
+    <div class="szene-text prose">
+      <p>In Lateinamerika treiben Telekommunikationsanbieter die Verknüpfung von terrestrischen Netzen mit Satelliteninfrastruktur voran, insbesondere für das Internet der Dinge (Internet of Things, IoT). Gleichzeitig erweitern Betreiber ihre Geschäftskundenangebote um Cloud-Dienste führender Hyperscaler und setzen auf künstliche Intelligenz (KI) zur Betrugsabwehr und Monetarisierung. Diese Entwicklungen zeigen den Wandel der regionalen Netzbetreiber vom reinen Konnektivitätsanbieter hin zu umfassenden IT-Dienstleistern.</p>
 <p>Der Satellitenbetreiber AST SpaceMobile baut vier Bodenstationen in Brasilien auf, um ab 2027 direkte Mobilfunkverbindungen via Satellit (Direct-to-Device, D2D) für herkömmliche Smartphones in Partnerschaft mit lokalen Netzbetreibern anzubieten <a href="https://telesintese.com.br/d2d-pode-chegar-ao-brasil-em-2027/">Quelle</a>.</p>
 <p>In Brasilien kooperiert der Anbieter Arqia mit Sateliot, um NB-IoT-Geräte (Narrowband Internet of Things) in der Agrarwirtschaft, Logistik und Versorgungswirtschaft über nicht-terrestrische 5G-Netze (Non-Terrestrial Networks, NTN) lückenlos anzubinden <a href="https://mobiletime.com.br/noticias/08/10/2026/arqia-sateliot-5g-ntn/">Quelle</a>.</p>
 <p>NLT Telecom führt in Zusammenarbeit mit dem Satellitenbetreiber Skylo eine Hybridlösung ein, die Standard-IoT-Geräte bei fehlendem terrestrischem Mobilfunkempfang automatisch und standardkonform auf Satellitenverbindungen umschaltet <a href="https://telesintese.com.br/nlt-telecom-integra-satélite-à-oferta-de-iot-no-brasil/">Quelle</a>.</p>
@@ -621,37 +513,83 @@ Orange führt in Frankreich einen temporären 5G-Geschwindigkeitspass für 5 Eur
 <p>Das Softwareunternehmen DMA bringt die Verbraucher-App „My Ozz“ heraus, die betrügerische Anrufe auf Android- und iOS-Geräten anhand von Verhaltensmustern und einer Datenbank mit sieben Millionen bekannten Rufnummern bereits vor dem Klingeln blockiert <a href="https://telesintese.com.br/dma-lanca-aplicativo-para-bloquear-golpes-e-spam-em-chamadas/">Quelle</a>.</p>
 <p>Der brasilianische Regionalanbieter Algar Telecom bündelt seine Festnetz-Breitbandtarife ab sofort mit der Bildungsplattform Kiddle Pass, die interaktive Lerninhalte für Kinder zwischen 3 und 12 Jahren enthält <a href="https://teletime.com.br/08/10/2026/algar-educacao-infantil-banda-larga/">Quelle</a>.</p>
 <p>Der Dienstleister Blip führt ein Prepaid-Modell für KI-gestützte Audiotranskriptionen im Messenger WhatsApp ein (50 Transkriptionen für 5 brasilianische Real), um gestiegene Plattformkosten von Meta direkt auf die Nutzerschaft umzulegen <a href="https://www.mobiletime.com.br/noticias/08/10/2026/blip-viratexto-whatsapp/">Quelle</a>.</p>
-<h2 id="afrika-naher-osten">Afrika &amp; Naher Osten</h2>
-<p>Die Region setzt verstärkt auf die digitale Transformation durch KI-gestützte Finanzdienste und den Ausbau hochleistungsfähiger Netz-Infrastrukturen. Betreiber positionieren sich zunehmend als Plattformanbieter, während technologische Sprünge bei der Frequenznutzung neue Maßstäbe für Kapazität und Datenhoheit setzen.</p>
+      
+    </div>
+  </section>
+
+  
+  
+  
+  <section class="szene szene--ohne-motiv" id="afrika-naher-osten" data-szene="Afrika &amp; Naher Osten">
+    <div class="szene-bild" aria-hidden="true"><span class="motiv motiv--leer szene-motiv" aria-hidden="true"></span>
+      <span class="szene-marke">Afrika &amp; Naher Osten</span></div>
+    <h2 class="szene-titel">Afrika &amp; Naher Osten</h2>
+    <div class="szene-text prose">
+      <p>Die Region setzt verstärkt auf die digitale Transformation durch KI-gestützte Finanzdienste und den Ausbau hochleistungsfähiger Netz-Infrastrukturen. Betreiber positionieren sich zunehmend als Plattformanbieter, während technologische Sprünge bei der Frequenznutzung neue Maßstäbe für Kapazität und Datenhoheit setzen.</p>
 <ul>
 <li>Safaricom hat in Kenia eine KI-gestützte Bezahlplattform gestartet, die mittels NFC-Terminals und automatischer OCR-Rechnungsdatenerfassung die M-Pesa-Akzeptanz massiv ausbauen soll <a href="https://developingtelecoms.com/telecom-technology/financial-services/20940-safaricom-and-gcib-launch-shariah-compliant-investment-fund-for-m-pesa.html">Quelle</a>.</li>
-<li>e&amp; ist in den Vereinigten Arabischen Emiraten der weltweit erste Betreiber, der das obere 6-GHz-Band für Mobilfunk nutzt und damit Spitzenraten von 10 Gbit/s erreicht <a href="https://www.telecomreview.com/articles/telecom-vendors/30437-e-launches-worlds-first-commercial-u6ghz-network-opening-a-new-chapter-for-wireless-connectivity/">Quelle</a>.</li>
+<li>e&amp; ist in den Vereinigten Arabischen Emiraten der weltweit erste Betreiber, der das obere 6-GHz-Band für Mobilfunk nutzt und damit Spitzenraten von <span class="zahl"><span class="zahl-wert" data-wert="10" data-stellen="0">10</span> Gbit/s</span> erreicht <a href="https://www.telecomreview.com/articles/telecom-vendors/30437-e-launches-worlds-first-commercial-u6ghz-network-opening-a-new-chapter-for-wireless-connectivity/">Quelle</a>.</li>
 <li>Der Einzelhändler Shoprite integriert den Verkauf von Prepaid-Guthaben und Datenpaketen direkt in seine Lebensmittel-Liefer-App „Sixty60“ und dringt damit in das Kerngeschäft der Mobilfunker ein <a href="https://techcentral.co.za/shoprite-banking-apps-sixty60-airtime/287138/">Quelle</a>.</li>
 <li>Die VAE-Gruppe e&amp; kehrt offiziell zur Traditionsmarke „Etisalat“ zurück, um 50 Jahre Markengeschichte mit einer neuen KI-Strategie zu verknüpfen <a href="https://www.telecomreview.com/articles/telecom-operators/30441-etisalat-is-back-e-revives-iconic-telecom-brand/">Quelle</a>.</li>
-<li>Der Betreiber „du“ erreicht in einem Einkaufszentrum in Dubai durch den Einsatz von 5G-Advanced-Technologie eine konstante Indoor-Geschwindigkeit von 3,5 Gbit/s <a href="https://www.telecomreview.com/articles/telecom-operators/30450-du-records-high-speed-on-its-5g-indoor-network-at-mall-of-the-emirates/">Quelle</a>.</li>
+<li>Der Betreiber „du“ erreicht in einem Einkaufszentrum in Dubai durch den Einsatz von 5G-Advanced-Technologie eine konstante Indoor-Geschwindigkeit von <span class="zahl"><span class="zahl-wert" data-wert="3.5" data-stellen="1">3,5</span> Gbit/s</span> <a href="https://www.telecomreview.com/articles/telecom-operators/30450-du-records-high-speed-on-its-5g-indoor-network-at-mall-of-the-emirates/">Quelle</a>.</li>
 <li>„du“ baut zudem seine B2B-Sparte durch eine Kooperation mit Rilian aus, um souveräne, KI-gestützte Cybersicherheitsdienste für kritische Infrastrukturen anzubieten <a href="https://www.telecomreview.com/articles/telecom-operators/30432-du-tech-and-rilian-partner-to-advance-sovereign-ai-driven-cybersecurity-in-the-uae/">Quelle</a>.</li>
-<li>In Ghana verschärft sich der Wettbewerb um 5G-Lizenzen: MTN Ghana investierte 202 Millionen US-Dollar in Spektrum, während Telecel Ghana den Marktstart für Dezember angekündigt hat <a href="https://www.connectingafrica.com/5g-networks/ghana-s-5g-battle-heats-up">Quelle</a>.</li>
+<li>In Ghana verschärft sich der Wettbewerb um 5G-Lizenzen: MTN Ghana investierte <span class="zahl"><span class="zahl-wert" data-wert="202" data-stellen="0">202</span> Millionen</span> US-Dollar in Spektrum, während Telecel Ghana den Marktstart für Dezember angekündigt hat <a href="https://www.connectingafrica.com/5g-networks/ghana-s-5g-battle-heats-up">Quelle</a>.</li>
 </ul>
-<h2 id="nordamerika">Nordamerika</h2>
-<p>In Nordamerika verschmilzt der Mobilfunk zunehmend mit Satellitentechnologien, während große Infrastrukturprojekte und KI-gestützte Effizienzsteigerungen die Strategien dominieren. Gleichzeitig führt ein intensiver Wettbewerb im Prepaid-Segment zu aggressiven Rabattaktionen, die den Preisdruck im gesamten Markt weiter verschärfen.</p>
+      
+    </div>
+  </section>
+
+  
+  
+  
+  <section class="szene szene--ohne-motiv" id="nordamerika" data-szene="Nordamerika">
+    <div class="szene-bild" aria-hidden="true"><span class="motiv motiv--leer szene-motiv" aria-hidden="true"></span>
+      <span class="szene-marke">Nordamerika</span></div>
+    <h2 class="szene-titel">Nordamerika</h2>
+    <div class="szene-text prose">
+      <p>In Nordamerika verschmilzt der Mobilfunk zunehmend mit Satellitentechnologien, während große Infrastrukturprojekte und KI-gestützte Effizienzsteigerungen die Strategien dominieren. Gleichzeitig führt ein intensiver Wettbewerb im Prepaid-Segment zu aggressiven Rabattaktionen, die den Preisdruck im gesamten Markt weiter verschärfen.</p>
 <ul>
 <li><strong>SpaceX kauft 800-MHz-Frequenzen für Satellitenfunk:</strong> Charter Communications verkauft sein bundesweites 800-MHz-Frequenzspektrum an SpaceX, um dort Starlink-Direktverbindungen für Mobiltelefone zu ermöglichen <a href="https://bbcmag.com/grain-will-sell-nationwide-800-mhz-spectrum-portfolio-to-spacex/">Quelle</a>.</li>
-<li><strong>AT&amp;T gründet Glasfaser-Joint-Venture mit Investoren:</strong> Gemeinsam mit Infrastrukturfonds plant AT&amp;T den Ausbau von über 60 Millionen Glasfaser-Standorten bis 2030, um Kapitalbedarf und Rollout-Geschwindigkeit zu optimieren <a href="https://bbcmag.com/att-announces-new-jv-type-accelerate-us-fiber-adoption/">Quelle</a>.</li>
-<li><strong>Mint Mobile bietet zum Jubiläum jeden Tarif für 10 Dollar:</strong> Die T-Mobile US-Tochter Mint Mobile unterbietet mit ihrer Jubiläumsaktion den Wettbewerb massiv und verdeutlicht den hohen Preisdruck im US-Prepaid-Markt <a href="https://www.t-mobile.com/news/offers/mint-mobile-turns-10-and-celebrates-with-its-best-deal-ever-any-plan-for-10-month">Quelle</a>.</li>
+<li><strong>AT&amp;T gründet Glasfaser-Joint-Venture mit Investoren:</strong> Gemeinsam mit Infrastrukturfonds plant AT&amp;T den Ausbau von über <span class="zahl"><span class="zahl-wert" data-wert="60" data-stellen="0">60</span> Millionen</span> Glasfaser-Standorten bis 2030, um Kapitalbedarf und Rollout-Geschwindigkeit zu optimieren <a href="https://bbcmag.com/att-announces-new-jv-type-accelerate-us-fiber-adoption/">Quelle</a>.</li>
+<li><strong>Mint Mobile bietet zum Jubiläum jeden Tarif für <span class="zahl"><span class="zahl-wert" data-wert="10" data-stellen="0">10</span> Dollar</span>:</strong> Die T-Mobile US-Tochter Mint Mobile unterbietet mit ihrer Jubiläumsaktion den Wettbewerb massiv und verdeutlicht den hohen Preisdruck im US-Prepaid-Markt <a href="https://www.t-mobile.com/news/offers/mint-mobile-turns-10-and-celebrates-with-its-best-deal-ever-any-plan-for-10-month">Quelle</a>.</li>
 <li><strong>AT&amp;T kooperiert mit OpenAI für juristische Abläufe:</strong> Durch den Einsatz generativer Künstlicher Intelligenz automatisiert AT&amp;T interne Compliance-Prozesse und juristische Arbeitsabläufe <a href="https://www.mobileeurope.co.uk/att-openai-legal-partnership/">Quelle</a>.</li>
 <li><strong>Verizon bietet unbegrenzte Dienste im Sturmgebiet:</strong> Angesichts des Hurrikans Isaias schaltet Verizon kostenlose Daten und Gespräche für betroffene Kunden frei und stationiert mobile Satelliteneinheiten zur Notversorgung <a href="https://bbcmag.com/verizon-prepares-gulf-coast-for-arrival-of-hurricane-isaias/">Quelle</a>.</li>
 <li><strong>Verizon beantragt erste 6G-Testlizenz bei der FCC:</strong> Verizon plant unter Nutzung der Ericsson-Technik im 4,8- bis 4,9-GHz-Band erste Feldversuche für 6G-Sensorik und Objekterkennung <a href="https://www.policytracker.com/verizon-seeks-permission-to-test-6g-in-4-8-4-9-ghz-band/">Quelle</a>.</li>
 <li><strong>Luftfahrtindustrie kritisiert SpaceX-Frequenzpläne:</strong> Sicherheitsbedenken der Luftfahrtbehörden bezüglich elektromagnetischer Interferenzen bremsen die ambitionierten Frequenzpläne von SpaceX <a href="https://www.mobileworldlive.com/starlink/spacex-backed-spectrum-push-draws-aerospace-opposition/">Quelle</a>.</li>
 </ul>
-<h2 id="ozeanien">Ozeanien</h2>
-<p>In Ozeanien liegt der Fokus derzeit auf der Stärkung physischer Netzstrukturen als Voraussetzung für künstliche Intelligenz und der verbesserten Resilienz bei Notfällen. Die Betreiber priorisieren die operative Netzstabilität, um eine solide Basis für künftige Automatisierung zu schaffen.</p>
+      
+    </div>
+  </section>
+
+  
+  
+  
+  <section class="szene" id="ozeanien" data-szene="Ozeanien">
+    <div class="szene-bild" aria-hidden="true"><img class="motiv szene-motiv" src="static/bilder/kapitel-global.jpg" alt=""
+     width="2400" height="1357" decoding="async" loading="lazy">
+      <span class="szene-marke">Ozeanien</span></div>
+    <h2 class="szene-titel">Ozeanien</h2>
+    <div class="szene-text prose">
+      <p>In Ozeanien liegt der Fokus derzeit auf der Stärkung physischer Netzstrukturen als Voraussetzung für künstliche Intelligenz und der verbesserten Resilienz bei Notfällen. Die Betreiber priorisieren die operative Netzstabilität, um eine solide Basis für künftige Automatisierung zu schaffen.</p>
 <ul>
 <li>Telstra baut sein „Aura“-Glasfasernetz weiter aus und hat nun den Abschnitt zwischen Perth und Sydney aktiviert, um Kapazitäten für die steigende Datenlast durch KI zu sichern <a href="https://www.lightreading.com/cable-technology/telstra-activates-perth-sydney-route-aura-network-65-complete-ahead-of-2028-target">Quelle</a>.</li>
 <li>Der Technikvorstand von Telstra mahnt zur Vorsicht bei KI-Experimenten und betont, dass erst die grundlegende Netzautomatisierung und Systemstabilität gefestigt werden müssen <a href="https://www.lightreading.com/ai-machine-learning/telstra-s-tech-chief-asks-telcos-to-fix-basics-before-chasing-ai">Quelle</a>.</li>
 <li>Telstra fördert ein Programm für temporäres Notfall-Roaming bei Naturkatastrophen, um die Kundenbindung durch garantierte Erreichbarkeit zu stärken <a href="https://www.telstra.com.au/exchange/temporary-disaster-roaming">Quelle</a>.</li>
 </ul>
-<h2 id="technologie-geraete-regulierung">Technologie, Geräte &amp; Regulierung</h2>
-<h3>Regulierung &amp; Verbände</h3>
+      
+    </div>
+  </section>
+
+  
+  
+  
+  <section class="szene" id="technologie-geraete-regulierung" data-szene="Technologie, Geräte &amp; Regulierung">
+    <div class="szene-bild" aria-hidden="true"><img class="motiv szene-motiv" src="static/bilder/kapitel-technologie.jpg" alt=""
+     width="2400" height="1357" decoding="async" loading="lazy">
+      <span class="szene-marke">Technologie, Geräte &amp; Regulierung</span></div>
+    <h2 class="szene-titel">Technologie, Geräte &amp; Regulierung</h2>
+    <div class="szene-text prose">
+      <h3>Regulierung &amp; Verbände</h3>
 <p>Die Regulierungsdebatte konzentriert sich diese Woche auf den Schutz von Investitionen in den Glasfaserausbau sowie die Forderung nach vereinfachten Netzanschlüssen für Mobilfunk. Branchenverbände warnen vor einer verfrühten Regulierung, die den Infrastrukturausbau bremsen könnte, während auf EU-Ebene neue Vorleistungszugangsrechte für den Mobilfunk diskutiert werden.</p>
 <ul>
 <li>Der BREKO warnt vor der TKG-Novelle (Telekommunikationsgesetz), da zu frühe Zugangsregulierungen laut einem Gutachten von Professor Justus Haucap den privaten Glasfaserausbau gefährden könnten. <a href="https://brekoverband.de/2026/10/08/gutachten-warnt-und-fordert-kurskorrektur-tkg-novelle-darf-nicht-zur-investitions-und-ausbaubremse-werden/">Quelle</a></li>
@@ -687,66 +625,202 @@ Orange führt in Frankreich einen temporären 5G-Geschwindigkeitspass für 5 Eur
 <li><strong>Samsung</strong> erweitert seinen Art Store um 30 exklusive Exponate des British Museum, die Abonnenten direkt auf ihren TV-Geräten anzeigen können. Damit festigt das Unternehmen die Position der Hardware als Plattform für digitale Kulturdienste <a href="https://news.samsung.com/global/samsung-art-store-expands-its-collection-with-30-exclusive-works-from-the-british-museum">Quelle</a>.</li>
 <li><strong>Lenovo</strong> implementiert für DKSH intelligente Parklösungen durch das Modell „TruScale Infrastructure as a Service“. Hierbei bündelt der Hersteller Hardware-Infrastruktur und technischen Support als ganzheitliches Dienstleistungspaket für Unternehmenskunden <a href="https://lenovo.com/dksh-accelerates-smart-parking-deployment-with-lenovo-truscale-iaas/">Quelle</a>.</li>
 </ul>
-<h2 id="muster-der-woche">Muster der Woche</h2>
-<ul>
+      
+    </div>
+  </section>
+
+  
+  
+  
+  <section class="szene" id="muster-der-woche" data-szene="Muster der Woche">
+    <div class="szene-bild" aria-hidden="true"><img class="motiv szene-motiv" src="static/bilder/kapitel-muster.jpg" alt=""
+     width="2400" height="1357" decoding="async" loading="lazy">
+      <span class="szene-marke">Muster der Woche</span></div>
+    <h2 class="szene-titel">Muster der Woche</h2>
+    <div class="szene-text prose">
+      <ul>
 <li><strong>Monetarisierung von Netzqualität:</strong> Betreiber wie Orange (Frankreich) und Bharti Airtel (Indien) beginnen, spezifische Netz-Features wie temporäre Geschwindigkeits-Boosts oder dediziertes Network-Slicing gezielt als Zusatzleistung zu bepreisen.</li>
 <li><strong>Streaming-Bündelung als Standard:</strong> Anbieter wie Vodafone UK, MyBundle und Bouygues Telecom integrieren zunehmend Premium-Streaming-Dienste (Netflix, HBO Max, Sport) direkt in ihre Basistarife, um den Abwanderungsdruck im hart umkämpften Consumer-Markt zu mindern.</li>
 <li><strong>Souveränität durch KI-Modelle:</strong> Telekommunikationsbetreiber setzen vermehrt auf offene, eigene KI-Modelle statt auf Standard-Cloud-KI, um die Souveränität über sensible Netzwerk- und Kundendaten zu behalten (siehe Nvidia/Operator-Analyse).</li>
-</ul></article>
+</ul>
+      
     </div>
-    
-    
-    
-    <p class="folienlink"><a href="folien/2026-10-09.html">
-      Diese Ausgabe als Foliensatz</a> <span>4 Folien, für den Montagstermin</span></p>
-    
-  </div>
+  </section>
+
+  
+  
+  
+  <section class="szene fwb szene--ohne-motiv" id="worauf-wir-warten" data-szene="Worauf wir warten">
+    <div class="szene-bild" aria-hidden="true"><span class="motiv motiv--leer szene-motiv" aria-hidden="true"></span>
+      <span class="szene-marke">Worauf wir warten</span></div>
+    <h2 class="szene-titel">Worauf wir warten</h2>
+    <div class="szene-text">
+      <p class="fwb-stand"><span class="rubrik-zahl">5 von 5 in Bewegung</span></p>
+      <div class="fwb-gitter">
+        
+        <details class="fwb-frage fwb-aktiv">
+          <summary><span class="fwb-licht" aria-hidden="true"></span><h3 class="fwb-titel">Kippt die Preisuntergrenze im deutschen Markt?</h3></summary>
+          <p class="fwb-warum">Eine Unlimited-Flat unter 35 Euro oder ein Anschlusspreis von null verschiebt die Untergrenze fuer das ganze Portfolio - und beides wird selten als Pressemitteilung angekuendigt.</p>
+          <ul class="fwb-liste">
+            
+            <li class="fwb-ind fwb-ruhend">
+              <span class="fwb-punkt" aria-hidden="true"></span>
+              <span class="fwb-name">Unlimited-Tarif unter 35 Euro</span>
+              <span class="fwb-zustand">ruhend</span>
+              
+            </li>
+            
+            <li class="fwb-ind fwb-aktiv">
+              <span class="fwb-punkt" aria-hidden="true"></span>
+              <span class="fwb-name">Anschlusspreis faellt weg</span>
+              <span class="fwb-zustand">aktiv</span>
+              
+              <span class="fwb-beleg"><a href="https://www.o2online.de/tarife/handyvertrag-ohne-handy/" target="_blank" rel="noopener">o2 erhöht Anschlusspreis für Tarif-Variante auf 39,99 Euro</a>
+                <i>o2 · 2026-10-09</i></span>
+              
+            </li>
+            
+            <li class="fwb-ind fwb-ruhend">
+              <span class="fwb-punkt" aria-hidden="true"></span>
+              <span class="fwb-name">Preiserhöhung angekündigt</span>
+              <span class="fwb-zustand">ruhend</span>
+              
+            </li>
+            
+          </ul>
+        </details>
+        
+        <details class="fwb-frage fwb-aktiv">
+          <summary><span class="fwb-licht" aria-hidden="true"></span><h3 class="fwb-titel">Wird Satellit zum Endkundenprodukt?</h3></summary>
+          <p class="fwb-warum">Solange Direct-to-Cell ein Notrufdienst ist, ist es Technik. Sobald es ein buchbarer Tarifbestandteil mit Preis wird, ist es Portfolio.</p>
+          <ul class="fwb-liste">
+            
+            <li class="fwb-ind fwb-aktiv">
+              <span class="fwb-punkt" aria-hidden="true"></span>
+              <span class="fwb-name">Direct-to-Cell wird buchbar</span>
+              <span class="fwb-zustand">aktiv</span>
+              
+              <span class="fwb-beleg"><a href="https://telesintese.com.br/d2d-pode-chegar-ao-brasil-em-2027/" target="_blank" rel="noopener">AST plant Direkt-Satellitenanbindung für Smartphones bis 2027</a>
+                <i>AST SpaceMobile · 2026-10-09</i></span>
+              
+              <span class="fwb-beleg"><a href="https://www.bics.com/blog/d2d-satellite-applications-how-5g-ntn-bridges-the-gap-for-satellite-operators/" target="_blank" rel="noopener">5G-Satellitenstandards ermöglichen flächendeckende direkte Mobilfunkverbindungen</a>
+                <i>BICS · 2026-10-09</i></span>
+              
+            </li>
+            
+            <li class="fwb-ind fwb-beobachtet">
+              <span class="fwb-punkt" aria-hidden="true"></span>
+              <span class="fwb-name">Satellit im Tarif eines europäischen Anbieters</span>
+              <span class="fwb-zustand">beobachtet</span>
+              
+              <span class="fwb-beleg"><a href="https://www.telecomtv.com/content/security/what-s-up-with-ai-security-iliad-starlink-56147/" target="_blank" rel="noopener">Iliad drängt auf Europas dritten Platz</a>
+                <i>Iliad · 2026-10-07</i></span>
+              
+              <span class="fwb-beleg"><a href="https://www.telecomtv.com/content/security/what-s-up-with-ai-security-iliad-starlink-56147/" target="_blank" rel="noopener">Iliad drängt auf Europas dritten Platz</a>
+                <i>Iliad · 2026-10-02</i></span>
+              
+            </li>
+            
+          </ul>
+        </details>
+        
+        <details class="fwb-frage fwb-aktiv">
+          <summary><span class="fwb-licht" aria-hidden="true"></span><h3 class="fwb-titel">Erodiert eSIM das Roaming-Geschäft?</h3></summary>
+          <p class="fwb-warum">Reise-eSIMs nehmen Roaming-Erloese ab, ohne dass ein Betreiber den Vertrag sieht. Die Bewegung ist gut belegt, der Zeitpunkt nicht.</p>
+          <ul class="fwb-liste">
+            
+            <li class="fwb-ind fwb-ruhend">
+              <span class="fwb-punkt" aria-hidden="true"></span>
+              <span class="fwb-name">Travel-eSIM-Anbieter wächst oder wird gekauft</span>
+              <span class="fwb-zustand">ruhend</span>
+              
+            </li>
+            
+            <li class="fwb-ind fwb-aktiv">
+              <span class="fwb-punkt" aria-hidden="true"></span>
+              <span class="fwb-name">Roaming-Preise oder -Erlöse verändern sich</span>
+              <span class="fwb-zustand">aktiv</span>
+              
+              <span class="fwb-beleg"><a href="https://telecomtalk.info/airtel-hikes-postpaid-tariffs-by-rs-50/1012664/" target="_blank" rel="noopener">Bharti Airtel erhöht Postpaid-Preise um 50 Rupien</a>
+                <i>Bharti Airtel · 2026-10-09</i></span>
+              
+              <span class="fwb-beleg"><a href="https://www.tatacommunications.com/press-release/air-india-and-tata-communications-for-easyroam-travel-sim" target="_blank" rel="noopener">Air India und Tata starten gebrandete Travel-eSIM</a>
+                <i>Tata Communications · 2026-10-09</i></span>
+              
+            </li>
+            
+          </ul>
+        </details>
+        
+        <details class="fwb-frage fwb-aktiv">
+          <summary><span class="fwb-licht" aria-hidden="true"></span><h3 class="fwb-titel">Wird KI zum bezahlten Tarifbestandteil?</h3></summary>
+          <p class="fwb-warum">Eine KI-Lizenz im Tarif ist der erste Differenzierungs-Hebel seit Jahren, den Kunden auf der Rechnung sehen - und der erste, bei dem Vodafones Wettbewerber im deutschen Markt vorgelegt haben.</p>
+          <ul class="fwb-liste">
+            
+            <li class="fwb-ind fwb-aktiv">
+              <span class="fwb-punkt" aria-hidden="true"></span>
+              <span class="fwb-name">KI-Assistent im Tarif enthalten</span>
+              <span class="fwb-zustand">aktiv</span>
+              
+              <span class="fwb-beleg"><a href="https://openai.com/index/new-chatgpt-ads-format-and-measurement" target="_blank" rel="noopener">OpenAI führt neue Werbeformate in ChatGPT ein</a>
+                <i>OpenAI · 2026-10-09</i></span>
+              
+            </li>
+            
+            <li class="fwb-ind fwb-ruhend">
+              <span class="fwb-punkt" aria-hidden="true"></span>
+              <span class="fwb-name">KI-Gerät eines Netzbetreibers</span>
+              <span class="fwb-zustand">ruhend</span>
+              
+            </li>
+            
+          </ul>
+        </details>
+        
+        <details class="fwb-frage fwb-aktiv">
+          <summary><span class="fwb-licht" aria-hidden="true"></span><h3 class="fwb-titel">Zwingt die Regulierung zu einer Portfolio-Änderung?</h3></summary>
+          <p class="fwb-warum">Vorgaben zu Preisklauseln, Vertragslaufzeiten oder Kuendigungsfristen wirken unmittelbar auf jeden Tarif - und sie kommen mit Vorlauf, wenn man den Vorlauf beobachtet.</p>
+          <ul class="fwb-liste">
+            
+            <li class="fwb-ind fwb-aktiv">
+              <span class="fwb-punkt" aria-hidden="true"></span>
+              <span class="fwb-name">Vorgabe zu Preisklauseln oder Laufzeiten</span>
+              <span class="fwb-zustand">aktiv</span>
+              
+              <span class="fwb-beleg"><a href="https://www.xatakamovil.com/grid/digi/chollo-digi-se-desinfla-su-modelo-low-cost-se-pone-a-prueba-al-cobrar-que-antes-era-gratis" target="_blank" rel="noopener">Digi verlangt monatliche Miete für 4K-Receiver und Festnetztelefone</a>
+                <i>Digi · 2026-10-09</i></span>
+              
+            </li>
+            
+            <li class="fwb-ind fwb-aktiv">
+              <span class="fwb-punkt" aria-hidden="true"></span>
+              <span class="fwb-name">Digital Networks Act / TKG-Novelle</span>
+              <span class="fwb-zustand">aktiv</span>
+              
+              <span class="fwb-beleg"><a href="https://brekoverband.de/2026/10/08/gutachten-warnt-und-fordert-kurskorrektur-tkg-novelle-darf-nicht-zur-investitions-und-ausbaubremse-werden/" target="_blank" rel="noopener">Verbände warnen vor zu starker Regulierung bei Glasfaser</a>
+                <i>BREKO · 2026-10-09</i></span>
+              
+              <span class="fwb-beleg"><a href="https://brekoverband.de/2026/10/07/gemeinsames-statement-zum-digital-networks-act-mobilfunkdiensteanbieter-glasfasernetzbetreiber-und-stadtwerke-fordern-eu-weites-recht-auf-mobilfunk-vorleistungszugang/" target="_blank" rel="noopener">Verbände fordern Vorleistungszugang im EU Digital Networks Act</a>
+                <i>BREKO · 2026-10-09</i></span>
+              
+            </li>
+            
+          </ul>
+        </details>
+        
+      </div>
+    </div>
+  </section>
+  
+  
+
+  
+
+  
+  <p class="folienlink"><a href="folien/2026-10-09.html">
+    Diese Ausgabe als Foliensatz</a> <span>4 Folien, für den Montagstermin</span></p>
   
 </div>
-
-
-<section id="deutschland-fokus" style="scroll-margin-top:24px">
-
-<div class="card">
-  <div class="rubrik"><h2>Deutschland</h2>
-    <a href="wettbewerb.html">Zur Wettbewerbsseite</a></div>
-  <ul class="wb-kurz">
-    
-    
-    <li class="wb-kurz-zeile">
-      <a href="wettbewerb.html#deutsche-telekom">
-        <span class="wb-kurz-name">Deutsche Telekom</span>
-        <span class="wb-kurz-satz">Die Deutsche Telekom forciert derzeit den massiven Glasfaserausbau in Deutschland und setzt strategisch auf KI-basierte Effizienzsteigerungen mit einem Ziel von 2,5 Mrd. Euro Einsparungen…</span>
-      </a>
-    </li>
-    
-    
-    
-    <li class="wb-kurz-zeile">
-      <a href="wettbewerb.html#telefonica-o2">
-        <span class="wb-kurz-name">Telefónica / O2</span>
-        <span class="wb-kurz-satz">Telefónica/O2 fokussiert sich aktuell auf die Konsolidierung seines Geschäftsmodells durch Desinvestitionen in Hispanoamerika und den Ausbau profitabler Mehrwertdienste wie…</span>
-      </a>
-    </li>
-    
-    
-    
-    <li class="wb-kurz-zeile">
-      <a href="wettbewerb.html#1-1">
-        <span class="wb-kurz-name">1&amp;1</span>
-        <span class="wb-kurz-satz">1&amp;1 forciert derzeit eine zweigleisige Strategie aus gezielten Hardware-Upgrades, wie neuen Glasfaser-Routern, und einer konsequenten Stärkung seiner regionalen Glasfaserpräsenz durch…</span>
-      </a>
-    </li>
-    
-    
-  </ul>
-  
-  
-</div>
-
-</section>
-
-
 
 
 
@@ -756,7 +830,7 @@ Orange führt in Frankreich einen temporären 5G-Geschwindigkeitspass für 5 Eur
   </main>
   <footer class="foot">
     <div class="foot-inner">
-      Vodafone Product and Services Insights &middot; Marktrecherche &middot; automatisch erstellt, jede Aussage mit Quelle
+      <span>Vodafone Product and Services Insights &middot; automatisch erstellt, jede Aussage mit Quelle</span>
       
       
       
@@ -766,6 +840,9 @@ Orange führt in Frankreich einen temporären 5G-Geschwindigkeitspass für 5 Eur
       </span>
       
     </div>
+    <p class="foot-bildnachweis">Bilder: generiert für dieses Portal. Campus-Motiv nach einer Vorlage von
+      <a href="https://commons.wikimedia.org/wiki/File:Vodafone-Campus_D%C3%BCsseldorf.jpg" target="_blank" rel="noopener">Wikimedia Commons</a>.
+      Schrift: Instrument Sans (SIL Open Font License).</p>
   </footer>
   <script src="app.js"></script>
 </body>
