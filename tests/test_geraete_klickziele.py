@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import shutil
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -83,7 +84,8 @@ def test_weiter_steht_bei_1und1_und_vodafone_auf_beiden_seiten(wurzel):
         "#device-details-offer-summary-card a.ws10-button--primary", "Zur Tarifauswahl"
     )
     assert weiter.pop("1und1") == [einsundeins, einsundeins]
-    assert weiter.pop("vodafone") == [vodafone, vodafone]
+    proben = 'label[id^="ws10-option-picker-item-label-option-picker-gm-tariff-"]'
+    assert weiter.pop("vodafone") == [replace(vodafone, proben=proben), vodafone]
     assert all(w is None for liste in weiter.values() for w in liste)
 
 

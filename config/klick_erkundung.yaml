@@ -55,12 +55,16 @@ anbieter:
       # Gerätewahl reist im Browserzustand mit. Element 267 (Seite 1) bzw.
       # 230 (Seite 2), sichtbar, target _self; der Link daneben
       # (268 bzw. 231, „Vertrag verlängern“, Anmeldung) trägt die Klasse nicht.
+      # Proben (Schnitt 8a, 10.10.2026): die fünf Tarif-Labels der Tarifauswahl
+      # (Erkundung 07.10., bedienelemente-3.json: Eingaben option-picker-gm-tariff
+      # mit Werten 267–271, je ein Label „ws10-option-picker-item-label-…“).
       - geraet: apple-iphone-17-pro
         speicher_gb: 256
         url: https://www.vodafone.de/privat/handys/iphone-17-pro.html
         weiter:
           selektor: "#device-details-offer-summary-card a.ws10-button--primary"
           text: Zur Tarifauswahl
+          proben: 'label[id^="ws10-option-picker-item-label-option-picker-gm-tariff-"]'
       - geraet: samsung-galaxy-s26
         speicher_gb: 256
         url: https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html

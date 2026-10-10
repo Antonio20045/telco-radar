@@ -16,8 +16,11 @@ der Hauptseite dürfen schreiben. Dann wartet er auf den Wechsel der Adresse
 (``klickstrecke.hat_gewechselt``: bei einer Umleitung erst, wenn die Leerseite des Tors
 angekommen und geladen ist, sonst unterbräche sie das Laden des Ziels), folgt
 Umleitungen geprüft, wartet auf Laden und Ruhe und hält von der Folgeseite Inventar,
-Preise, Seite und Mitschnitt fest, ohne Klick-Proben und ohne Kartenprobe
-(``OHNE_PROBEN``).
+Preise, Seite und Mitschnitt fest, ohne Kartenprobe und ohne Klick-Proben
+(``OHNE_PROBEN``), außer ``weiter.proben`` nennt Optionen: dann klickt er nach dem
+Festhalten höchstens ``HOECHSTE_PROBEN`` nicht gewählte davon (Vodafone: die Tarife der
+Tarifauswahl), ohne Kauf- oder Anmeldewort, nur noch mit GET und HEAD, und hält je Probe
+Anfragen, geänderte €-Texte und die Übernahme der Wahl fest wie die Startseite.
 
 Scheitern ist ein benannter Befund (``LAUF_BEFUND`` mit Grund), kein leeres Ergebnis:
 der Knopf fehlt, ist nicht eindeutig, kein Knopf, nicht klickbar, öffnet ein neues
@@ -45,14 +48,22 @@ from urllib.parse import urlsplit
 
 from playwright.sync_api import Error as PlaywrightFehler
 
-from .klickinventar import Inventar
+from .klickinventar import Inventar, preistexte
 from .klickkartenprobe import SEITE_PROBIERBAR
 from .klicklauf import LAUF_GESPERRT, LAUF_GESTOERT
-from .klickproben import KLICK_FRIST_MS
-from .klickseite import Fristschleuse, Seitenergebnis, Seitenlauf
+from .klickproben import (
+    AKTIONSWORT,
+    JA,
+    KLICK_FRIST_MS,
+    NEIN,
+    UNBEKANNT,
+    unterschiede,
+)
+from .klickseite import ABGELAUFEN, Fristschleuse, Seitenergebnis, Seitenlauf
 from .klickspur import (
     HOECHSTE_ANTWORT,
     Eintrag,
+    als_daten,
     bot_verdacht,
     geheime_werte,
     ohne_geheimnisse,
@@ -85,6 +96,14 @@ FEHLERSEITE_FRIST_MS = 5_000
 GRUND_AUSGANG = "Ausgangsseite"
 GRUND_LEERSEITE = "Leerseite der Umleitung"
 OHNE_PROBEN = "Folgeseite: keine Klick-Proben"
+MIT_PROBEN = "Folgeseite: Proben auf"
+HOECHSTE_PROBEN = 6
+PROBENART = "tarif"
+_WAHL_JS = """e => {
+  const i = e.matches("input") ? e
+    : (e.control || (e.parentElement && e.parentElement.querySelector("input")));
+  return i ? {gewaehlt: i.checked === true, wert: i.value || null} : null;
+}"""
 
 
 @dataclass(frozen=True)
@@ -126,8 +145,12 @@ def ohne_ausgang(ausgang: Seitenergebnis | None, von: int) -> str | None:
 
 
 def angabe(weiter: Weiter) -> dict:
-    """Selektor und Text aus der Konfiguration, wie sie im Index stehen."""
-    return {"selektor": weiter.selektor, "text": weiter.text}
+    """Selektor, Text und, wenn angegeben, Proben aus der Konfiguration, wie sie im
+    Index stehen."""
+    daten = {"selektor": weiter.selektor, "text": weiter.text}
+    if weiter.proben is not None:
+        daten["proben"] = weiter.proben
+    return daten
 
 
 class Folgelauf(Seitenlauf):
@@ -147,7 +170,9 @@ class Folgelauf(Seitenlauf):
         self.weiter = weiter
         self.protokoll = angabe(weiter)
         self.ergebnis.weiter = self.protokoll
-        self.ergebnis.klick_vermerk = OHNE_PROBEN
+        self.ergebnis.klick_vermerk = (
+            OHNE_PROBEN if weiter.proben is None else f"{MIT_PROBEN} {weiter.proben}"
+        )
         self.koerper: dict[tuple[str, str], bytes] = {}
 
     def _beobachte(self, anfrage: Request, antwort: APIResponse) -> str | None:
@@ -209,12 +234,74 @@ class Folgelauf(Seitenlauf):
         self._pruefe_strecke()
 
     def _nach_der_lesung(self, inventar: Inventar) -> None:
-        """Keine Klick-Proben auf ``inventar``; zeigt die Seite jetzt Anmeldung, Kasse
-        oder Zahlung, ist sie ein Befund."""
+        """Keine Klick-Proben auf ``inventar``, nur auf den Optionen von
+        ``weiter.proben``; zeigt die Seite Anmeldung, Kasse oder Zahlung, ist sie ein
+        Befund. Eine erreichte Zeitgrenze beendet nur die Proben."""
         try:
             self._pruefe_strecke()
+            if self.weiter.proben is not None:
+                self._proben(self.weiter.proben)
+                self._pruefe_strecke()
         except Abbruch as abbruch:
-            self._halte_an(abbruch)
+            if self.weiter.proben is not None:
+                self.ergebnis.klick_vermerk = abbruch.grund
+            if abbruch.status != ABGELAUFEN:
+                self._halte_an(abbruch)
+
+    def _proben(self, selektor: str) -> None:
+        """Klickt höchstens ``HOECHSTE_PROBEN`` nicht gewählte Optionen von
+        ``selektor``, ohne Kauf- oder Anmeldewort; das Tor lässt danach nur GET und
+        HEAD durch. Wechselt die Seite, enden die Proben dort."""
+        ziele = self.seite.locator(selektor)
+        for stelle in range(min(ziele.count(), HOECHSTE_PROBEN)):
+            self.pruefe()
+            ort = ziele.nth(stelle)
+            wahl = ort.evaluate(_WAHL_JS) or {}
+            text = " ".join((ort.text_content() or "").split())
+            if wahl.get("gewaehlt") or AKTIONSWORT.search(text):
+                continue
+            probe = self._probe(ort, selektor, stelle, text, wahl.get("wert"))
+            if probe["navigiert"] is not None or probe["umleitung"] is not None:
+                return
+
+    def _probe(
+        self, ort: Locator, selektor: str, stelle: int, text: str, wert: str | None
+    ) -> dict:
+        vorher, adresse, marke = (
+            preistexte(self.seite),
+            self.seite.url,
+            self.spur.marke(),
+        )
+        probe: dict = {
+            "art": PROBENART,
+            "pfad": f"{selektor} >> nth={stelle}",
+            "text": text,
+            "wert": wert,
+            "fehler": None,
+            "navigiert": None,
+            "umleitung": None,
+        }
+        self.ergebnis.klicks.append(probe)
+        try:
+            ort.click(timeout=KLICK_FRIST_MS)
+        except PlaywrightFehler as fehler:
+            probe["fehler"] = kurz(fehler)
+        try:
+            self.pruefe()
+            probe["ruhe"] = self.ruhe()
+        finally:
+            probe["anfragen"] = als_daten(self.spur.seit(marke))
+        umleitung = self.umgeleitet()
+        probe["umleitung"] = ohne_geheimnisse(umleitung) if umleitung else None
+        if self.seite.url != adresse:
+            probe["navigiert"] = ohne_geheimnisse(self.seite.url)
+            return probe
+        probe["preise_geaendert"] = unterschiede(vorher, preistexte(self.seite))
+        jetzt = ort.evaluate(_WAHL_JS) if ort.count() else None
+        probe["uebernommen"] = (
+            UNBEKANNT if jetzt is None else JA if jetzt["gewaehlt"] else NEIN
+        )
+        return probe
 
     def _pruefe_strecke(self) -> None:
         """Wirft einen Befund, wenn Adresse oder Seite das Streckenende zeigen."""

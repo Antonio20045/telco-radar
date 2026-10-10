@@ -8,7 +8,8 @@ im Katalog, der Speicher beim Gerät, die Adresse ist https (http nur für
 ``LOKALE_HOSTS``, den Trockenlauf) und liegt auf dem Host der ``basis_url``. Eine
 Seite darf ``weiter`` tragen (``Weiter``): Selektor und, wenn angegeben, sichtbarer Text
 genau eines Knopfs oder Links zum nächsten Schritt der Bestellstrecke
-(``klickfolgeseite``), dazu ``modell``: den Namen, unter dem die Anbieterseite das
+(``klickfolgeseite``) und wahlweise ``proben``, die Optionen für Klick-Proben auf der
+Folgeseite, dazu ``modell``: den Namen, unter dem die Anbieterseite das
 Gerät führt, wenn er vom Katalog abweicht (Kanarienwert). Jeder Verstoß wirft
 ``ErkundungszielFehler`` mit der Stelle; ein Ziel wird nie still übergangen.
 User-Agent und Abrufabstand kommen aus den Quellen;
@@ -38,7 +39,7 @@ HOECHSTE_SEITEN = 2
 ALLE = "alle"
 SCHEMA = "https"
 LOKALE_HOSTS = frozenset({"127.0.0.1", "localhost"})
-WEITER_FELDER = frozenset({"selektor", "text"})
+WEITER_FELDER = frozenset({"selektor", "text", "proben"})
 
 
 class ErkundungszielFehler(ValueError):
@@ -47,10 +48,12 @@ class ErkundungszielFehler(ValueError):
 
 @dataclass(frozen=True)
 class Weiter:
-    """Der eine Knopf oder Link zur Folgeseite: CSS-Selektor, erwarteter Text."""
+    """Der eine Knopf oder Link zur Folgeseite: CSS-Selektor, erwarteter Text und,
+    wenn angegeben, der CSS-Selektor der Optionen für Proben auf der Folgeseite."""
 
     selektor: str
     text: str | None = None
+    proben: str | None = None
 
 
 @dataclass(frozen=True)
@@ -188,7 +191,8 @@ def _weiter(roh: object, ort: str) -> Weiter | None:
     if fremd:
         raise ErkundungszielFehler(f"{ort}: unbekanntes Feld {', '.join(fremd)}")
     text = _text(roh, "text", ort) if "text" in roh else None
-    return Weiter(_text(roh, "selektor", ort), text)
+    proben = _text(roh, "proben", ort) if "proben" in roh else None
+    return Weiter(_text(roh, "selektor", ort), text, proben)
 
 
 def _uebersichten(eintrag: dict, ort: str, einstiege: list) -> tuple[str, ...]:
