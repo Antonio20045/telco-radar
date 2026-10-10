@@ -99,6 +99,7 @@ from ..geraete_model import normalisiere
 from ..tarif_bezug import SLUG_ALS_ID_ANBIETER, Bezug, Tarifbestand
 from ..tarif_model import NUR_MIT_GERAET, buendelphasen_aus
 from ..tco_model import Buendel, aktionen_aus
+from .klick_tarifslug import klick_slug
 
 log = logging.getLogger(__name__)
 
@@ -159,7 +160,7 @@ def aus_rohsaetzen(rohsaetze, bestand: Tarifbestand, heute: str) -> Buendelbilan
             _zaehle(bilanz.zusatzkarten, tarif_name)
             continue
 
-        slug = str(satz.get("tarif_slug") or "")
+        slug = str(satz.get("tarif_slug") or "") or klick_slug(satz)
         bezug = bestand.loese(
             anbieter, tarif_name, slug=slug, mit_geraet=True
         ) or ohne_tarifblatt(bestand, anbieter, slug)
