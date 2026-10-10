@@ -5923,7 +5923,7 @@ html:not([data-art="geraet"]) .gx-held .gx-art--tarif,html[data-art="geraet"] .g
   .gx-held .gx-art{grid-template-columns:1fr;row-gap:10px}
   .gx-held b{font-size:clamp(110px,34vw,160px)}
   .gx-held b + span{font-size:26px;max-width:none}
-  .gr-reiter.gx-modus{margin:-26px auto 32px}
+  .gr-reiter.gx-modus{position:relative;top:auto;margin:-26px auto 32px}
   .gx-modus button{height:44px;padding:0 18px;font-size:16px}
   .gx-t{column-gap:14px;padding:14px 2px}
   .gx-t-name{font-size:17px}
