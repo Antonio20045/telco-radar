@@ -1,15 +1,1972 @@
 {
  "anbieter": "telekom",
  "datum": "2026-10-10",
- "dauer_sekunden": 2942.1,
+ "dauer_sekunden": 4710.7,
  "format": 1,
  "frischegrenze_tage": 3,
- "grund": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17779&categoryId=smartphones&forwardTradeInApplied=false: Abruf gestört (HTTP 202 auf https://www.telekom.de/resources/ag2/legalnote-replacer/build/p-befae207.js)",
+ "grund": null,
  "karte": "telekom.yaml",
- "laufstatus": "gestoert",
+ "laufstatus": "gelesen",
  "lesefrist_tage": 1,
  "name": "Telekom",
  "seiten": [
+  {
+   "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17779&categoryId=smartphones&forwardTradeInApplied=false",
+   "geraet": "apple-iphone-17-pro",
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17779&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=29.7&instalmentId=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "f89d47b17a49b0984d98b6f96e33e0ecf04cd1c4f3ff448be609e71a760f6c5e",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17779&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=29.7&instalmentId=36",
+      "zeitpunkt": "2026-10-10T13:46:37Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 99.0,
+      "rate": 29.7,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        29.95
+       ]
+      ],
+      "volumen_gb": 20.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17779&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=44.5&instalmentId=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "659907c2df737ddd1b2b5e10f5ff95a73fc24cd279602c63ef0a4478b9c800a0",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17779&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=44.5&instalmentId=24",
+      "zeitpunkt": "2026-10-10T13:46:38Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 99.0,
+      "rate": 44.5,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        29.95
+       ]
+      ],
+      "volumen_gb": 20.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17779&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=89.1&instalmentId=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "bf3a23d2e69f4942927eb5b60b2ff7573bdd279db451d813fd7a47d9513b37d9",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17779&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=89.1&instalmentId=12",
+      "zeitpunkt": "2026-10-10T13:46:39Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 99.0,
+      "rate": 89.1,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        29.95
+       ]
+      ],
+      "volumen_gb": 20.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "421401620511b4c7e6727e23a313b43d69b036803e1df8c6ae54c220e5341173",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-512-gb?tariffId=MF_17779&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=89.1&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D512_GB",
+      "zeitpunkt": "2026-10-10T13:46:52Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 199.0,
+      "rate": 33.6,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        29.95
+       ]
+      ],
+      "volumen_gb": 20.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "95ca3c6fc988cddb8233a2d0adbcc5c4c2be392cb5108f28f4d844dd2de7edf0",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-512-gb?tariffId=MF_17779&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=50.4&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
+      "zeitpunkt": "2026-10-10T13:46:53Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 199.0,
+      "rate": 50.4,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        29.95
+       ]
+      ],
+      "volumen_gb": 20.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "971046d144df32739caa457ab1eb10752b8faaa6976f693ecce44733bc873862",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-512-gb?tariffId=MF_17779&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=100.8&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
+      "zeitpunkt": "2026-10-10T13:46:54Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 199.0,
+      "rate": 100.8,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        29.95
+       ]
+      ],
+      "volumen_gb": 20.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "37aa88903aa8d0b81cc87dfd451bcd8a98f6468ddf9c765cc7c3c8c1e86b5905",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-1-tb?tariffId=MF_17779&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=100.8&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D1_TB",
+      "zeitpunkt": "2026-10-10T13:47:12Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil XS"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 299.0,
+      "rate": 37.5,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        29.95
+       ]
+      ],
+      "volumen_gb": 20.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "7e7cbc45b9f0f88183164a2f31d4238e3e12adcd5210f2fcc7483691ea981bea",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-1-tb?tariffId=MF_17779&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=56.2&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
+      "zeitpunkt": "2026-10-10T13:47:13Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil XS"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 299.0,
+      "rate": 56.2,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        29.95
+       ]
+      ],
+      "volumen_gb": 20.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "0e8f9e15778be13e7cbca5d7be81b090655f4269ffc61272c0fe4c3b33c2c814",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-1-tb?tariffId=MF_17779&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=112.5&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
+      "zeitpunkt": "2026-10-10T13:47:15Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil XS"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 299.0,
+      "rate": 112.5,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        29.95
+       ]
+      ],
+      "volumen_gb": 20.0
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 10.0,
+    "anfragen": 170,
+    "beendet": 168,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "binkiesproductionweu.servicebus.windows.net": 1,
+     "pix.telekom.de": 2,
+     "www.telekom.de": 2
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 264.2,
+    "takte_ms": 1250,
+    "wartet_auf": "load"
+   },
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 0.8571428571428571,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 54,
+    "felder_gesucht": 63,
+    "knoepfe_gefunden": 54,
+    "knoepfe_gesucht": 54
+   },
+   "verworfen": 22
+  },
+  {
+   "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17785&categoryId=smartphones&forwardTradeInApplied=false",
+   "geraet": "apple-iphone-17-pro",
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17785&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=29.7&instalmentId=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "3dd96d8283db47d24189fb3fb9e9a8fa5ca0c5f647f86fb8335f1b6fbf9a2f7e",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17785&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=29.7&instalmentId=36",
+      "zeitpunkt": "2026-10-10T13:53:21Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 99.0,
+      "rate": 29.7,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        39.95
+       ]
+      ],
+      "volumen_gb": 30.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17785&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=44.5&instalmentId=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "ddceb77cc52e48aac1ec9e0e00115a1b7abf5fba7d73fb06dc68d1d9b0412084",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17785&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=44.5&instalmentId=24",
+      "zeitpunkt": "2026-10-10T13:53:22Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 99.0,
+      "rate": 44.5,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        39.95
+       ]
+      ],
+      "volumen_gb": 30.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17785&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=89.1&instalmentId=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "aa663c97aff8e9e8614dbbc54a4cc936dafdb108b31810c347fa8589dbe52c25",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17785&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=89.1&instalmentId=12",
+      "zeitpunkt": "2026-10-10T13:53:24Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 99.0,
+      "rate": 89.1,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        39.95
+       ]
+      ],
+      "volumen_gb": 30.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "25b0f574c660bccdd9774ca2bad37c1940f817848d009890531a31d8002e6b94",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-512-gb?tariffId=MF_17785&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=89.1&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D512_GB",
+      "zeitpunkt": "2026-10-10T13:53:36Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 199.0,
+      "rate": 33.6,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        39.95
+       ]
+      ],
+      "volumen_gb": 30.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "f801f9f4da1e1c8ac61fb8b16478b589c0385b9e07046b197e48f1f5f66f125d",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-512-gb?tariffId=MF_17785&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=50.4&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
+      "zeitpunkt": "2026-10-10T13:53:37Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 199.0,
+      "rate": 50.4,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        39.95
+       ]
+      ],
+      "volumen_gb": 30.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "4b1642f2038b35305127fa32b89dc0f3da22d6e372f92ff71fd78b1acf87da65",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-512-gb?tariffId=MF_17785&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=100.8&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
+      "zeitpunkt": "2026-10-10T13:53:38Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 199.0,
+      "rate": 100.8,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        39.95
+       ]
+      ],
+      "volumen_gb": 30.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "26a13078bf026b24c56db4bf3df0eb21db85a6665074d455313922ad2ea41262",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-1-tb?tariffId=MF_17785&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=100.8&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D1_TB",
+      "zeitpunkt": "2026-10-10T13:53:57Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil S"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 299.0,
+      "rate": 37.5,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        39.95
+       ]
+      ],
+      "volumen_gb": 30.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "2ea7c352561633eaf14f1fc8ec317d679fed3f3653499ea2255f29c8eb1377e8",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-1-tb?tariffId=MF_17785&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=56.2&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
+      "zeitpunkt": "2026-10-10T13:53:58Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil S"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 299.0,
+      "rate": 56.2,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        39.95
+       ]
+      ],
+      "volumen_gb": 30.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "6bae728a5e15573b90ecc29f3d6bca02e146fe3f7e5c2c5b826f554aad60832c",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-1-tb?tariffId=MF_17785&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=112.5&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
+      "zeitpunkt": "2026-10-10T13:53:59Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil S"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 299.0,
+      "rate": 112.5,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        39.95
+       ]
+      ],
+      "volumen_gb": 30.0
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 10.0,
+    "anfragen": 163,
+    "beendet": 159,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "20994a22678a.edge.sdk.awswaf.com": 1,
+     "pix.telekom.de": 2,
+     "www.telekom.de": 1
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 282.9,
+    "takte_ms": 1500,
+    "wartet_auf": "load"
+   },
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 0.8571428571428571,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 54,
+    "felder_gesucht": 63,
+    "knoepfe_gefunden": 54,
+    "knoepfe_gesucht": 54
+   },
+   "verworfen": 22
+  },
+  {
+   "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17797&categoryId=smartphones&forwardTradeInApplied=false",
+   "geraet": "apple-iphone-17-pro",
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17797&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=24.1&instalmentId=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "0e8d5b299a01047d5b0f9503df50c2889757d3794ff224e39f8125d3d032dadf",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17797&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=24.1&instalmentId=36",
+      "zeitpunkt": "2026-10-10T13:59:55Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 99.0,
+      "rate": 24.1,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        59.95
+       ]
+      ],
+      "volumen_gb": 100.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17797&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=36.2&instalmentId=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "b8acecdee91aa8623612aa91411a8029921d8b2f3e96f793a7fea38020093819",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17797&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=36.2&instalmentId=24",
+      "zeitpunkt": "2026-10-10T13:59:57Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 99.0,
+      "rate": 36.2,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        59.95
+       ]
+      ],
+      "volumen_gb": 100.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17797&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=72.5&instalmentId=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "3b92b3d3cf124bf52b9270cfb77029f9870b8f77857cd4aa4f9012c2e5aa0ddc",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17797&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=72.5&instalmentId=12",
+      "zeitpunkt": "2026-10-10T13:59:58Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 99.0,
+      "rate": 72.5,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        59.95
+       ]
+      ],
+      "volumen_gb": 100.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "31a79cfaed7aeb59ddea011fff892274f4340341942c53bb603ca4181a3d127f",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-512-gb?tariffId=MF_17797&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=72.5&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D512_GB",
+      "zeitpunkt": "2026-10-10T14:00:10Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 99.0,
+      "rate": 30.8,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        59.95
+       ]
+      ],
+      "volumen_gb": 100.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "3f3693487ca0817c06fa43bd57da9d0324a6f3a1bf79dab9452a341ccea45b32",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-512-gb?tariffId=MF_17797&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=46.2&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
+      "zeitpunkt": "2026-10-10T14:00:11Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 99.0,
+      "rate": 46.2,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        59.95
+       ]
+      ],
+      "volumen_gb": 100.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "0d93649cb4abe741e2742c609b32c2abac976bf9dff8b8387f2e33ea77fd2455",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-512-gb?tariffId=MF_17797&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=92.5&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
+      "zeitpunkt": "2026-10-10T14:00:12Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 99.0,
+      "rate": 92.5,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        59.95
+       ]
+      ],
+      "volumen_gb": 100.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "7eef8c82a810493e2007eb9ce22c5ed94ab46a543f49d61cd93ba93f5dc127ca",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-1-tb?tariffId=MF_17797&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=92.5&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D1_TB",
+      "zeitpunkt": "2026-10-10T14:00:31Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 199.0,
+      "rate": 34.7,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        59.95
+       ]
+      ],
+      "volumen_gb": 100.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "fe2ca10f43bffd6fa61f7756310f28ae208ac8dfd6deddc66c6549aead780bc0",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-1-tb?tariffId=MF_17797&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=52&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
+      "zeitpunkt": "2026-10-10T14:00:32Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 199.0,
+      "rate": 52.0,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        59.95
+       ]
+      ],
+      "volumen_gb": 100.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "ea0134c48dcf20c577ef6c66fb784f6def2673a61bf3f98ad3d384a4ef322b15",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-1-tb?tariffId=MF_17797&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=104.1&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
+      "zeitpunkt": "2026-10-10T14:00:33Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 199.0,
+      "rate": 104.1,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        59.95
+       ]
+      ],
+      "volumen_gb": 100.0
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 10.0,
+    "anfragen": 154,
+    "beendet": 151,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "binkiesproductionweu.servicebus.windows.net": 1,
+     "pix.telekom.de": 2,
+     "www.telekom.de": 2
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 263.0,
+    "takte_ms": 1300,
+    "wartet_auf": "load"
+   },
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 0.8571428571428571,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 54,
+    "felder_gesucht": 63,
+    "knoepfe_gefunden": 54,
+    "knoepfe_gesucht": 54
+   },
+   "verworfen": 22
+  },
+  {
+   "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17803&categoryId=smartphones&forwardTradeInApplied=false",
+   "geraet": "apple-iphone-17-pro",
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17803&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=24.1&instalmentId=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XL"
+     },
+     "befunde": [
+      {
+       "feld": "volumen_gb",
+       "grund": "fehlt im Text, Antwort unbegrenzt"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "10367528524ec031935a2c1a5c834ad8ad2f7a756cd8a8b2c78f03cd5bdb4918",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17803&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=24.1&instalmentId=36",
+      "zeitpunkt": "2026-10-10T14:06:40Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort unbegrenzt",
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XL"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 24.1,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        84.95
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17803&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=36.1&instalmentId=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XL"
+     },
+     "befunde": [
+      {
+       "feld": "volumen_gb",
+       "grund": "fehlt im Text, Antwort unbegrenzt"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "de20e1eb9bde7b879b893f50af1922ab6d708ac1016c579a3afe3f6c66e48faf",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17803&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=36.1&instalmentId=24",
+      "zeitpunkt": "2026-10-10T14:06:41Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort unbegrenzt",
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XL"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 36.1,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        84.95
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17803&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=72.3&instalmentId=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XL"
+     },
+     "befunde": [
+      {
+       "feld": "volumen_gb",
+       "grund": "fehlt im Text, Antwort unbegrenzt"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "35ef4b66bfb1f0c958a30ea9feb09ac9f9b3be92e2cb04399bba37b2edab7808",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17803&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=72.3&instalmentId=12",
+      "zeitpunkt": "2026-10-10T14:06:42Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort unbegrenzt",
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XL"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 72.3,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        84.95
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil XL"
+     },
+     "befunde": [
+      {
+       "feld": "volumen_gb",
+       "grund": "fehlt im Text, Antwort unbegrenzt"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "ec92547ee107de721a64a040284332d66fdcafa88d60bdae57be92acab21a6fd",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-512-gb?tariffId=MF_17803&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=72.3&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D512_GB",
+      "zeitpunkt": "2026-10-10T14:06:55Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort unbegrenzt",
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil XL"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 99.0,
+      "rate": 28.0,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        84.95
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil XL"
+     },
+     "befunde": [
+      {
+       "feld": "volumen_gb",
+       "grund": "fehlt im Text, Antwort unbegrenzt"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "5bbedfd5a678c09f0ee90a4f9256753fdcfebf7756d6c949859550e64a9d9098",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-512-gb?tariffId=MF_17803&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=42&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
+      "zeitpunkt": "2026-10-10T14:06:55Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort unbegrenzt",
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil XL"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 99.0,
+      "rate": 42.0,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        84.95
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil XL"
+     },
+     "befunde": [
+      {
+       "feld": "volumen_gb",
+       "grund": "fehlt im Text, Antwort unbegrenzt"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "c6450ed08bbc0bdc00166a93b83f7e0f8ed63f15bba8350fd314bdf8c763ab5a",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-512-gb?tariffId=MF_17803&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=84.1&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
+      "zeitpunkt": "2026-10-10T14:06:57Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort unbegrenzt",
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil XL"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 99.0,
+      "rate": 84.1,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        84.95
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil XL"
+     },
+     "befunde": [
+      {
+       "feld": "volumen_gb",
+       "grund": "fehlt im Text, Antwort unbegrenzt"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "8d14b3be21f6e0ccded363c3e1bfa64944edbcc2e40365feab111aa034340bb4",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-1-tb?tariffId=MF_17803&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=84.1&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D1_TB",
+      "zeitpunkt": "2026-10-10T14:07:15Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort unbegrenzt",
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil XL"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 199.0,
+      "rate": 31.9,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        84.95
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil XL"
+     },
+     "befunde": [
+      {
+       "feld": "volumen_gb",
+       "grund": "fehlt im Text, Antwort unbegrenzt"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "50afd6b8dab85320e875fc8bf33a90d8a3602ed07e123dd079ade6b178524c9d",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-1-tb?tariffId=MF_17803&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=47.9&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
+      "zeitpunkt": "2026-10-10T14:07:16Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort unbegrenzt",
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil XL"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 199.0,
+      "rate": 47.9,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        84.95
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil XL"
+     },
+     "befunde": [
+      {
+       "feld": "volumen_gb",
+       "grund": "fehlt im Text, Antwort unbegrenzt"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "ffb3ca417029c4b2ae3746e60f1d3f79cdd5c5306c4458e19ceba83cfaa9d88d",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-1-tb?tariffId=MF_17803&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=95.8&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
+      "zeitpunkt": "2026-10-10T14:07:17Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort unbegrenzt",
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil XL"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 199.0,
+      "rate": 95.8,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        84.95
+       ]
+      ],
+      "volumen_gb": null
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 10.0,
+    "anfragen": 164,
+    "beendet": 160,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "20994a22678a.edge.sdk.awswaf.com": 1,
+     "pix.telekom.de": 2,
+     "www.telekom.de": 1
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 283.0,
+    "takte_ms": 1550,
+    "wartet_auf": "load"
+   },
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 0.7142857142857143,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 45,
+    "felder_gesucht": 63,
+    "knoepfe_gefunden": 54,
+    "knoepfe_gesucht": 54
+   },
+   "verworfen": 22
+  },
+  {
+   "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17/lavendel-256-gb?tariffId=MF_17791&categoryId=smartphones",
+   "geraet": "apple-iphone-17",
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17/lavendel-256-gb?tariffId=MF_17791&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=23.8&instalmentId=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil M"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "795b9f2eff61abe9f241fbc55c77492b35b5ca83456501c71d4da027e0341846",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17/lavendel-256-gb?tariffId=MF_17791&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=23.8&instalmentId=36",
+      "zeitpunkt": "2026-10-10T14:13:34Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil M"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 99.0,
+      "rate": 23.8,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        49.95
+       ]
+      ],
+      "volumen_gb": 50.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17/lavendel-256-gb?tariffId=MF_17791&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=35.8&instalmentId=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil M"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "d5652d3ecf6e05fd5dc1a909318cee40f0457439de487ae0976b59fd8123ec77",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17/lavendel-256-gb?tariffId=MF_17791&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=35.8&instalmentId=24",
+      "zeitpunkt": "2026-10-10T14:13:35Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil M"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 99.0,
+      "rate": 35.8,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        49.95
+       ]
+      ],
+      "volumen_gb": 50.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17/lavendel-256-gb?tariffId=MF_17791&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=71.6&instalmentId=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil M"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "4ff4eaac3334252075d446f9bd40bbf5e1ea67e67a747856d2e7acee5e5787a5",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17/lavendel-256-gb?tariffId=MF_17791&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=71.6&instalmentId=12",
+      "zeitpunkt": "2026-10-10T14:13:37Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil M"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 99.0,
+      "rate": 71.6,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        49.95
+       ]
+      ],
+      "volumen_gb": 50.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil M"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "54919fe9f8835e0503b3650986fe834f62a16cc6555f3098ba51ec65eeb123fd",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17/lavendel-512-gb?tariffId=MF_17791&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=71.6&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D512_GB",
+      "zeitpunkt": "2026-10-10T14:13:55Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil M"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 99.0,
+      "rate": 30.8,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        49.95
+       ]
+      ],
+      "volumen_gb": 50.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil M"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "44063ab73e94b123aced455e871441ea7cba7cf8c83ac5d8652f75165e7c5284",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17/lavendel-512-gb?tariffId=MF_17791&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=46.2&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
+      "zeitpunkt": "2026-10-10T14:13:56Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil M"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 99.0,
+      "rate": 46.2,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        49.95
+       ]
+      ],
+      "volumen_gb": 50.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil M"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "94f3016121e96747e6456a8e95708f5509bc81fbf713c42fcc6db3dfa583b56d",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17/lavendel-512-gb?tariffId=MF_17791&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=92.5&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
+      "zeitpunkt": "2026-10-10T14:13:57Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil M"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 99.0,
+      "rate": 92.5,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        49.95
+       ]
+      ],
+      "volumen_gb": 50.0
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 10.0,
+    "anfragen": 165,
+    "beendet": 160,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "20994a22678a.edge.sdk.awswaf.com": 1,
+     "pix.telekom.de": 2,
+     "www.telekom.de": 1
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 303.0,
+    "takte_ms": 1450,
+    "wartet_auf": "load"
+   },
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 0.8571428571428571,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 36,
+    "felder_gesucht": 42,
+    "knoepfe_gefunden": 36,
+    "knoepfe_gesucht": 36
+   },
+   "verworfen": 18
+  },
   {
    "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false",
    "geraet": "apple-iphone-17-pro",
@@ -26,9 +1983,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "f1bd51cf21252cb473fbb96ecafde14deddd892aaa92be8e294732ff563cefd5",
+      "beleg_id": "fae25757da5ac195a9ad5ec5479fe087ebc591bceb2929b8394ad6a9421c2a96",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=26.9&instalmentId=36",
-      "zeitpunkt": "2026-10-10T06:17:41Z"
+      "zeitpunkt": "2026-10-10T14:19:53Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -67,9 +2024,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "189abe6422b2b18c42a9c727cda5ba842db4cf0a8b93b9a1ac9502c6fa20574e",
+      "beleg_id": "149d083c49b4a90e64b8c6d3dcb4daedca6db986b02da15ff33c1acfc2f17fe4",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=40.4&instalmentId=24",
-      "zeitpunkt": "2026-10-10T06:17:43Z"
+      "zeitpunkt": "2026-10-10T14:19:54Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -108,9 +2065,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "22b94667ff2eba86be08d22271624b38c49c0bdbea821898db4c04875a6c74fa",
+      "beleg_id": "2252f74cb7dc7aa41ddd389d65d363a0c720139fdc92401514ebcffa40fa3f7d",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=80.8&instalmentId=12",
-      "zeitpunkt": "2026-10-10T06:17:44Z"
+      "zeitpunkt": "2026-10-10T14:19:55Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -149,9 +2106,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "161c8d2f82a0c24e277a46dd70fa12d577affabd9e0761578174a41435ddfbf2",
+      "beleg_id": "dbbc78227b0ab7a37b84b11badd2fe281ac24668fb1a93e39bf0b4f2cec80086",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-512-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=80.8&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D512_GB",
-      "zeitpunkt": "2026-10-10T06:18:02Z"
+      "zeitpunkt": "2026-10-10T14:20:13Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -190,9 +2147,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a732331a83ba9dc222dc01c9333f2c46327552b834f425966d082ff60a17d21c",
+      "beleg_id": "d8466551cfc473a01a011a62a6096a0d4261ec5abd6fad86cd5679a7e81f288d",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-512-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=46.2&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-10-10T06:18:03Z"
+      "zeitpunkt": "2026-10-10T14:20:14Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -231,9 +2188,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "38c0f325c36a71c4af8fbd5c8ff1f05d1f94e3569005968c4983b0e1ce49b2eb",
+      "beleg_id": "b4666d44edabb34c7fbd5ca6f0a7f5a053a1bb3f9b26e2eeaed440a9a8aa0b92",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-512-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=92.5&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-10-10T06:18:04Z"
+      "zeitpunkt": "2026-10-10T14:20:16Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -272,9 +2229,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "df8fc0910d0cff1a6e1e1628142fe81a72f0d73fca1bca61099441b60b8353f1",
+      "beleg_id": "01b2c05ccf26f8b0a8d19d8ce342c375831b8d7a034fb5340329b7155f0ebbdd",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-1-tb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=92.5&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D1_TB",
-      "zeitpunkt": "2026-10-10T06:18:22Z"
+      "zeitpunkt": "2026-10-10T14:20:34Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -313,9 +2270,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "047b7cda26d624e34bc613021a39d5899b1766ef101be32e94ae520342d54325",
+      "beleg_id": "de5b79ce3936ab0f70981f7b54a2ad896fc6031dbe662f4d8717840ba7755acc",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-1-tb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=52&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
-      "zeitpunkt": "2026-10-10T06:18:23Z"
+      "zeitpunkt": "2026-10-10T14:20:35Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -354,9 +2311,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "911864bc904583407e203285223d1955d46824b4d36e2f56efa46098c8321dca",
+      "beleg_id": "6d2188b2f4c9588919e7a171c6f4e1f621c3b85a6b192c0a0d84828635c6a6bf",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-1-tb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=104.1&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
-      "zeitpunkt": "2026-10-10T06:18:24Z"
+      "zeitpunkt": "2026-10-10T14:20:36Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -389,22 +2346,22 @@
    ],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 193,
-    "beendet": 189,
+    "anfragen": 151,
+    "beendet": 146,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "20994a22678a.edge.sdk.awswaf.com": 1,
-     "binkiesproductionweu.servicebus.windows.net": 1,
-     "pix.telekom.de": 2
+     "onebot-webfrontend.oneai.yo-digital.com": 1,
+     "pix.telekom.de": 2,
+     "www.telekom.de": 4
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 282.2,
-    "takte_ms": 1500,
+    "sekunden": 242.8,
+    "takte_ms": 1150,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
-   "sperre": "challenge_bestanden",
+   "sperre": null,
    "status": "gelesen",
    "stoerung": null,
    "struktur": {
@@ -415,7 +2372,7 @@
     "knoepfe_gefunden": 54,
     "knoepfe_gesucht": 54
    },
-   "verworfen": 59
+   "verworfen": 22
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/google/google-pixel-11/frost-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false",
@@ -433,9 +2390,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "b39946a50e22cbfaee990c5bee5a6eedd6939c442c4c3b3c33d53f0dbc727b0f",
+      "beleg_id": "880e0b858d16c19357b1bf1da14045e45728b5ccf865ba3947ee52bf79180783",
       "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-11/frost-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=21.6&instalmentId=36",
-      "zeitpunkt": "2026-10-10T06:24:42Z"
+      "zeitpunkt": "2026-10-10T14:26:32Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -474,9 +2431,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "9cd9cc3be7f5fae0f47c309ad01a7a515774493869a15d4e7cefa92f35563c8c",
+      "beleg_id": "542c8aa2b8766a45dbe8f222bddc6566f0eec0d2033bdda9147b838578995593",
       "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-11/frost-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=32.4&instalmentId=24",
-      "zeitpunkt": "2026-10-10T06:24:43Z"
+      "zeitpunkt": "2026-10-10T14:26:33Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -515,9 +2472,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "9f9250c19199d4b4db1b77a214cb9e23ab9e98b569fc55fb75bdb96f0b18d8b9",
+      "beleg_id": "bdc009698578b973c7d5d663fbd221cf35c569ad82e741e23e267ab1cfb8ded1",
       "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-11/frost-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=64.8&instalmentId=12",
-      "zeitpunkt": "2026-10-10T06:24:45Z"
+      "zeitpunkt": "2026-10-10T14:26:34Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -637,22 +2594,22 @@
    ],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 100,
-    "beendet": 97,
+    "anfragen": 122,
+    "beendet": 121,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "gallery-content.binkies3d.com": 3,
+     "binkiesproductionweu.servicebus.windows.net": 1,
      "pix.telekom.de": 2,
-     "www.telekom.de": 2
+     "www.telekom.de": 1
     },
-    "ohne_antwort_ms": 0,
-    "sekunden": 190.3,
-    "takte_ms": 750,
+    "ohne_antwort_ms": 50,
+    "sekunden": 292.4,
+    "takte_ms": 1400,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
-   "sperre": "challenge_bestanden",
+   "sperre": null,
    "status": "gelesen",
    "stoerung": null,
    "struktur": {
@@ -663,84 +2620,16 @@
     "knoepfe_gefunden": 21,
     "knoepfe_gesucht": 21
    },
-   "verworfen": 53
-  },
-  {
-   "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17779&categoryId=smartphones&forwardTradeInApplied=false",
-   "geraet": "apple-iphone-17-pro",
-   "gescheitert": 0,
-   "grund": "Abruf gestört (HTTP 202 auf https://www.telekom.de/resources/ag2/legalnote-replacer/build/p-befae207.js)",
-   "http_status": 200,
-   "kombinationen": [],
-   "ladung": null,
-   "speicher_gb": 256,
-   "sperre": "challenge",
-   "status": "gestoert",
-   "stoerung": null,
-   "struktur": {
-    "anteil_felder": null,
-    "anteil_knoepfe": null,
-    "felder_gefunden": 0,
-    "felder_gesucht": 0,
-    "knoepfe_gefunden": 0,
-    "knoepfe_gesucht": 0
-   },
-   "verworfen": 3
-  },
-  {
-   "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17785&categoryId=smartphones&forwardTradeInApplied=false",
-   "geraet": "apple-iphone-17-pro",
-   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 202 auf https://www.telekom.de/resources/ag2/legalnote-replacer/build/p-befae207.js)",
-   "http_status": null,
-   "kombinationen": [],
-   "speicher_gb": 256,
-   "sperre": null,
-   "status": "nicht_besucht"
-  },
-  {
-   "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17797&categoryId=smartphones&forwardTradeInApplied=false",
-   "geraet": "apple-iphone-17-pro",
-   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 202 auf https://www.telekom.de/resources/ag2/legalnote-replacer/build/p-befae207.js)",
-   "http_status": null,
-   "kombinationen": [],
-   "speicher_gb": 256,
-   "sperre": null,
-   "status": "nicht_besucht"
-  },
-  {
-   "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17803&categoryId=smartphones&forwardTradeInApplied=false",
-   "geraet": "apple-iphone-17-pro",
-   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 202 auf https://www.telekom.de/resources/ag2/legalnote-replacer/build/p-befae207.js)",
-   "http_status": null,
-   "kombinationen": [],
-   "speicher_gb": 256,
-   "sperre": null,
-   "status": "nicht_besucht"
-  },
-  {
-   "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17/lavendel-256-gb?tariffId=MF_17791&categoryId=smartphones",
-   "geraet": "apple-iphone-17",
-   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 202 auf https://www.telekom.de/resources/ag2/legalnote-replacer/build/p-befae207.js)",
-   "http_status": null,
-   "kombinationen": [],
-   "speicher_gb": 256,
-   "sperre": null,
-   "status": "nicht_besucht"
+   "verworfen": 14
   }
  ],
- "ueberfaellig": [
-  "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17779&categoryId=smartphones&forwardTradeInApplied=false",
-  "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17785&categoryId=smartphones&forwardTradeInApplied=false",
-  "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17797&categoryId=smartphones&forwardTradeInApplied=false",
-  "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17803&categoryId=smartphones&forwardTradeInApplied=false",
-  "https://www.telekom.de/shop/geraet/apple/apple-iphone-17/lavendel-256-gb?tariffId=MF_17791&categoryId=smartphones"
- ],
+ "ueberfaellig": [],
  "uebersichten": [
   {
    "adresse": "https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17791",
    "beleg": {
     "seite": "https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17791",
-    "zeitpunkt": "2026-10-10T05:44:37Z"
+    "zeitpunkt": "2026-10-10T13:13:45Z"
    },
    "grund": null,
    "http_status": 200,
@@ -975,15 +2864,15 @@
     },
     {
      "anschlusspreis": 39.95,
-     "geraet_monatsrate": 20.7,
-     "geraet_zuzahlung": 1.0,
+     "geraet_monatsrate": 30.5,
+     "geraet_zuzahlung": 99.0,
      "laufzeit_monate": 36,
      "speicher_gb": 256,
      "tarif_monatlich": 49.95,
      "tarif_name": "MagentaMobil M",
      "tarif_slug": "MF_17791",
-     "titel": "Apple iPhone 17e 256 GB",
-     "url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17e/weiss-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
+     "titel": "Samsung Galaxy S26+ 256 GB",
+     "url": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26plus/white-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
     },
     {
      "anschlusspreis": 39.95,
@@ -999,30 +2888,6 @@
     },
     {
      "anschlusspreis": 39.95,
-     "geraet_monatsrate": 30.5,
-     "geraet_zuzahlung": 99.0,
-     "laufzeit_monate": 36,
-     "speicher_gb": 256,
-     "tarif_monatlich": 49.95,
-     "tarif_name": "MagentaMobil M",
-     "tarif_slug": "MF_17791",
-     "titel": "Samsung Galaxy S26+ 256 GB",
-     "url": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26plus/white-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
-    },
-    {
-     "anschlusspreis": 39.95,
-     "geraet_monatsrate": 18.0,
-     "geraet_zuzahlung": 1.0,
-     "laufzeit_monate": 36,
-     "speicher_gb": 128,
-     "tarif_monatlich": 49.95,
-     "tarif_name": "MagentaMobil M",
-     "tarif_slug": "MF_17791",
-     "titel": "Samsung Galaxy S26 FE 128 GB Enterprise Edition 128 GB",
-     "url": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26-fe/enterprise-edition-graphite-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
-    },
-    {
-     "anschlusspreis": 39.95,
      "geraet_monatsrate": 9.3,
      "geraet_zuzahlung": 1.0,
      "laufzeit_monate": 36,
@@ -1032,6 +2897,18 @@
      "tarif_slug": "MF_17791",
      "titel": "Apple iPhone 13 (Erneuert Basic) 128 GB",
      "url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-13-erneuert-basic/mitternacht-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
+    },
+    {
+     "anschlusspreis": 39.95,
+     "geraet_monatsrate": 20.7,
+     "geraet_zuzahlung": 1.0,
+     "laufzeit_monate": 36,
+     "speicher_gb": 256,
+     "tarif_monatlich": 49.95,
+     "tarif_name": "MagentaMobil M",
+     "tarif_slug": "MF_17791",
+     "titel": "Apple iPhone 17e 256 GB",
+     "url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17e/weiss-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
     },
     {
      "anschlusspreis": 39.95,
@@ -1059,15 +2936,15 @@
     },
     {
      "anschlusspreis": 39.95,
-     "geraet_monatsrate": 6.0,
+     "geraet_monatsrate": 18.0,
      "geraet_zuzahlung": 1.0,
      "laufzeit_monate": 36,
-     "speicher_gb": 256,
+     "speicher_gb": 128,
      "tarif_monatlich": 49.95,
      "tarif_name": "MagentaMobil M",
      "tarif_slug": "MF_17791",
-     "titel": "motorola moto g77 256 GB",
-     "url": "https://www.telekom.de/shop/geraet/motorola/motorola-moto-g77/pantone-black-olive-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
+     "titel": "Samsung Galaxy S26 FE 128 GB Enterprise Edition 128 GB",
+     "url": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26-fe/enterprise-edition-graphite-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
     },
     {
      "anschlusspreis": 39.95,
@@ -1083,18 +2960,6 @@
     },
     {
      "anschlusspreis": 39.95,
-     "geraet_monatsrate": 16.0,
-     "geraet_zuzahlung": 1.0,
-     "laufzeit_monate": 36,
-     "speicher_gb": 256,
-     "tarif_monatlich": 49.95,
-     "tarif_name": "MagentaMobil M",
-     "tarif_slug": "MF_17791",
-     "titel": "Xiaomi 17T 256 GB",
-     "url": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-17t/violet-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
-    },
-    {
-     "anschlusspreis": 39.95,
      "geraet_monatsrate": 5.2,
      "geraet_zuzahlung": 1.0,
      "laufzeit_monate": 36,
@@ -1104,6 +2969,30 @@
      "tarif_slug": "MF_17791",
      "titel": "motorola moto g37 128 GB",
      "url": "https://www.telekom.de/shop/geraet/motorola/motorola-moto-g37/pantone-impenetrable-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
+    },
+    {
+     "anschlusspreis": 39.95,
+     "geraet_monatsrate": 6.0,
+     "geraet_zuzahlung": 1.0,
+     "laufzeit_monate": 36,
+     "speicher_gb": 256,
+     "tarif_monatlich": 49.95,
+     "tarif_name": "MagentaMobil M",
+     "tarif_slug": "MF_17791",
+     "titel": "motorola moto g77 256 GB",
+     "url": "https://www.telekom.de/shop/geraet/motorola/motorola-moto-g77/pantone-black-olive-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
+    },
+    {
+     "anschlusspreis": 39.95,
+     "geraet_monatsrate": 16.0,
+     "geraet_zuzahlung": 1.0,
+     "laufzeit_monate": 36,
+     "speicher_gb": 256,
+     "tarif_monatlich": 49.95,
+     "tarif_name": "MagentaMobil M",
+     "tarif_slug": "MF_17791",
+     "titel": "Xiaomi 17T 256 GB",
+     "url": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-17t/violet-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
     },
     {
      "anschlusspreis": 39.95,
@@ -1203,18 +3092,6 @@
     },
     {
      "anschlusspreis": 39.95,
-     "geraet_monatsrate": 24.1,
-     "geraet_zuzahlung": 1.0,
-     "laufzeit_monate": 36,
-     "speicher_gb": 256,
-     "tarif_monatlich": 49.95,
-     "tarif_name": "MagentaMobil M",
-     "tarif_slug": "MF_17791",
-     "titel": "Apple iPhone Air 256 GB",
-     "url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-air/himmelblau-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
-    },
-    {
-     "anschlusspreis": 39.95,
      "geraet_monatsrate": 8.0,
      "geraet_zuzahlung": 1.0,
      "laufzeit_monate": 6,
@@ -1224,6 +3101,18 @@
      "tarif_slug": "MF_17791",
      "titel": "Telekom T Phone 3 128 GB",
      "url": "https://www.telekom.de/shop/geraet/telekom/telekom-t-phone-3/icy-silver-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
+    },
+    {
+     "anschlusspreis": 39.95,
+     "geraet_monatsrate": 24.1,
+     "geraet_zuzahlung": 1.0,
+     "laufzeit_monate": 36,
+     "speicher_gb": 256,
+     "tarif_monatlich": 49.95,
+     "tarif_name": "MagentaMobil M",
+     "tarif_slug": "MF_17791",
+     "titel": "Apple iPhone Air 256 GB",
+     "url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-air/himmelblau-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
     },
     {
      "anschlusspreis": 39.95,
@@ -1239,18 +3128,6 @@
     },
     {
      "anschlusspreis": 39.95,
-     "geraet_monatsrate": 26.6,
-     "geraet_zuzahlung": 99.0,
-     "laufzeit_monate": 36,
-     "speicher_gb": 512,
-     "tarif_monatlich": 49.95,
-     "tarif_name": "MagentaMobil M",
-     "tarif_slug": "MF_17791",
-     "titel": "Xiaomi 17 Ultra 512 GB",
-     "url": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-17-ultra/starlit-green-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
-    },
-    {
-     "anschlusspreis": 39.95,
      "geraet_monatsrate": 8.2,
      "geraet_zuzahlung": 1.0,
      "laufzeit_monate": 36,
@@ -1263,6 +3140,18 @@
     },
     {
      "anschlusspreis": 39.95,
+     "geraet_monatsrate": 26.6,
+     "geraet_zuzahlung": 99.0,
+     "laufzeit_monate": 36,
+     "speicher_gb": 512,
+     "tarif_monatlich": 49.95,
+     "tarif_name": "MagentaMobil M",
+     "tarif_slug": "MF_17791",
+     "titel": "Xiaomi 17 Ultra 512 GB",
+     "url": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-17-ultra/starlit-green-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
+    },
+    {
+     "anschlusspreis": 39.95,
      "geraet_monatsrate": 7.0,
      "geraet_zuzahlung": 1.0,
      "laufzeit_monate": 24,
@@ -1272,30 +3161,6 @@
      "tarif_slug": "MF_17791",
      "titel": "Xiaomi Redmi Note 15 5G 256 GB",
      "url": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-15-5g/black-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
-    },
-    {
-     "anschlusspreis": 39.95,
-     "geraet_monatsrate": 17.1,
-     "geraet_zuzahlung": 1.0,
-     "laufzeit_monate": 36,
-     "speicher_gb": 128,
-     "tarif_monatlich": 49.95,
-     "tarif_name": "MagentaMobil M",
-     "tarif_slug": "MF_17791",
-     "titel": "Samsung Galaxy S25 FE 128 GB",
-     "url": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25-fe/jetblack-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
-    },
-    {
-     "anschlusspreis": 39.95,
-     "geraet_monatsrate": 5.5,
-     "geraet_zuzahlung": 1.0,
-     "laufzeit_monate": 36,
-     "speicher_gb": 256,
-     "tarif_monatlich": 49.95,
-     "tarif_name": "MagentaMobil M",
-     "tarif_slug": "MF_17791",
-     "titel": "Xiaomi Redmi Note 15 Pro 5G 256 GB",
-     "url": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-15-pro-5g/titanium-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
     },
     {
      "anschlusspreis": 39.95,
@@ -1591,7 +3456,7 @@
      "adresse": "https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17791",
      "beleg": {
       "seite": "https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17791",
-      "zeitpunkt": "2026-10-10T05:44:37Z"
+      "zeitpunkt": "2026-10-10T13:13:45Z"
      },
      "grund": null,
      "http_status": 200,
@@ -1599,19 +3464,19 @@
       "antworten": 3,
       "antworten_beim_laden": 1,
       "einwilligung": "Nur erforderliche",
-      "geraete": 72,
+      "geraete": 69,
       "luecken": {
-       "speicher_unbekannt": 2
+       "speicher_unbekannt": 1
       },
       "mit_rueckgabedeal": 0,
-      "ohne_rueckgabedeal": 72,
+      "ohne_rueckgabedeal": 69,
       "result_count": 72,
       "schalter_nachher": "false",
       "schalter_vorher": "true",
       "unvollstaendig": null,
       "weiter_klicks": 2
      },
-     "saetze_neu": 70,
+     "saetze_neu": 68,
      "status": "gelesen",
      "stoerung": null
     }
@@ -1625,7 +3490,7 @@
    "adresse": "https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17779",
    "beleg": {
     "seite": "https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17779",
-    "zeitpunkt": "2026-10-10T05:51:28Z"
+    "zeitpunkt": "2026-10-10T13:20:03Z"
    },
    "grund": null,
    "http_status": 200,
@@ -1860,15 +3725,15 @@
     },
     {
      "anschlusspreis": 39.95,
-     "geraet_monatsrate": 23.5,
-     "geraet_zuzahlung": 1.0,
+     "geraet_monatsrate": 30.5,
+     "geraet_zuzahlung": 199.0,
      "laufzeit_monate": 36,
      "speicher_gb": 256,
      "tarif_monatlich": 29.95,
      "tarif_name": "MagentaMobil XS",
      "tarif_slug": "MF_17779",
-     "titel": "Apple iPhone 17e 256 GB",
-     "url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17e/weiss-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
+     "titel": "Samsung Galaxy S26+ 256 GB",
+     "url": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26plus/white-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
     },
     {
      "anschlusspreis": 39.95,
@@ -1896,15 +3761,15 @@
     },
     {
      "anschlusspreis": 39.95,
-     "geraet_monatsrate": 30.5,
-     "geraet_zuzahlung": 199.0,
+     "geraet_monatsrate": 23.5,
+     "geraet_zuzahlung": 1.0,
      "laufzeit_monate": 36,
      "speicher_gb": 256,
      "tarif_monatlich": 29.95,
      "tarif_name": "MagentaMobil XS",
      "tarif_slug": "MF_17779",
-     "titel": "Samsung Galaxy S26+ 256 GB",
-     "url": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26plus/white-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
+     "titel": "Apple iPhone 17e 256 GB",
+     "url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17e/weiss-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
     },
     {
      "anschlusspreis": 39.95,
@@ -1956,6 +3821,18 @@
     },
     {
      "anschlusspreis": 39.95,
+     "geraet_monatsrate": 8.0,
+     "geraet_zuzahlung": 1.0,
+     "laufzeit_monate": 36,
+     "speicher_gb": 128,
+     "tarif_monatlich": 29.95,
+     "tarif_name": "MagentaMobil XS",
+     "tarif_slug": "MF_17779",
+     "titel": "motorola moto g37 128 GB",
+     "url": "https://www.telekom.de/shop/geraet/motorola/motorola-moto-g37/pantone-impenetrable-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
+    },
+    {
+     "anschlusspreis": 39.95,
      "geraet_monatsrate": 8.8,
      "geraet_zuzahlung": 1.0,
      "laufzeit_monate": 36,
@@ -1977,18 +3854,6 @@
      "tarif_slug": "MF_17779",
      "titel": "Xiaomi 17T 256 GB",
      "url": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-17t/violet-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
-    },
-    {
-     "anschlusspreis": 39.95,
-     "geraet_monatsrate": 8.0,
-     "geraet_zuzahlung": 1.0,
-     "laufzeit_monate": 36,
-     "speicher_gb": 128,
-     "tarif_monatlich": 29.95,
-     "tarif_name": "MagentaMobil XS",
-     "tarif_slug": "MF_17779",
-     "titel": "motorola moto g37 128 GB",
-     "url": "https://www.telekom.de/shop/geraet/motorola/motorola-moto-g37/pantone-impenetrable-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
     },
     {
      "anschlusspreis": 39.95,
@@ -2196,6 +4061,30 @@
     },
     {
      "anschlusspreis": 39.95,
+     "geraet_monatsrate": 6.3,
+     "geraet_zuzahlung": 1.0,
+     "laufzeit_monate": 36,
+     "speicher_gb": 256,
+     "tarif_monatlich": 29.95,
+     "tarif_name": "MagentaMobil XS",
+     "tarif_slug": "MF_17779",
+     "titel": "Telekom T Phone 3 Pro 256 GB",
+     "url": "https://www.telekom.de/shop/geraet/telekom/telekom-t-phone-3-pro/graphite-gray-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
+    },
+    {
+     "anschlusspreis": 39.95,
+     "geraet_monatsrate": 19.9,
+     "geraet_zuzahlung": 1.0,
+     "laufzeit_monate": 36,
+     "speicher_gb": 128,
+     "tarif_monatlich": 29.95,
+     "tarif_name": "MagentaMobil XS",
+     "tarif_slug": "MF_17779",
+     "titel": "Samsung Galaxy S25 FE 128 GB",
+     "url": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25-fe/jetblack-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
+    },
+    {
+     "anschlusspreis": 39.95,
      "geraet_monatsrate": 8.2,
      "geraet_zuzahlung": 1.0,
      "laufzeit_monate": 36,
@@ -2352,18 +4241,6 @@
     },
     {
      "anschlusspreis": 39.95,
-     "geraet_monatsrate": 22.7,
-     "geraet_zuzahlung": 99.0,
-     "laufzeit_monate": 36,
-     "speicher_gb": 128,
-     "tarif_monatlich": 29.95,
-     "tarif_name": "MagentaMobil XS",
-     "tarif_slug": "MF_17779",
-     "titel": "Apple iPhone 16 Plus 128 GB",
-     "url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-16-plus/weiss-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
-    },
-    {
-     "anschlusspreis": 39.95,
      "geraet_monatsrate": 38.8,
      "geraet_zuzahlung": 299.0,
      "laufzeit_monate": 36,
@@ -2373,6 +4250,18 @@
      "tarif_slug": "MF_17779",
      "titel": "Google Pixel 10 Pro Fold 256 GB",
      "url": "https://www.telekom.de/shop/geraet/google/google-pixel-10-pro-fold/moonstone-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
+    },
+    {
+     "anschlusspreis": 39.95,
+     "geraet_monatsrate": 22.7,
+     "geraet_zuzahlung": 99.0,
+     "laufzeit_monate": 36,
+     "speicher_gb": 128,
+     "tarif_monatlich": 29.95,
+     "tarif_name": "MagentaMobil XS",
+     "tarif_slug": "MF_17779",
+     "titel": "Apple iPhone 16 Plus 128 GB",
+     "url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-16-plus/weiss-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
     },
     {
      "anschlusspreis": 39.95,
@@ -2452,7 +4341,7 @@
      "adresse": "https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17779",
      "beleg": {
       "seite": "https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17779",
-      "zeitpunkt": "2026-10-10T05:51:28Z"
+      "zeitpunkt": "2026-10-10T13:20:03Z"
      },
      "grund": null,
      "http_status": 200,
@@ -2460,19 +4349,19 @@
       "antworten": 3,
       "antworten_beim_laden": 1,
       "einwilligung": null,
-      "geraete": 70,
+      "geraete": 72,
       "luecken": {
        "speicher_unbekannt": 2
       },
       "mit_rueckgabedeal": 0,
-      "ohne_rueckgabedeal": 70,
+      "ohne_rueckgabedeal": 72,
       "result_count": 72,
       "schalter_nachher": "false",
       "schalter_vorher": "true",
       "unvollstaendig": null,
       "weiter_klicks": 2
      },
-     "saetze_neu": 68,
+     "saetze_neu": 70,
      "status": "gelesen",
      "stoerung": null
     }
@@ -2486,7 +4375,7 @@
    "adresse": "https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17785",
    "beleg": {
     "seite": "https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17785",
-    "zeitpunkt": "2026-10-10T05:58:05Z"
+    "zeitpunkt": "2026-10-10T13:26:42Z"
    },
    "grund": null,
    "http_status": 200,
@@ -2745,6 +4634,18 @@
     },
     {
      "anschlusspreis": 39.95,
+     "geraet_monatsrate": 12.1,
+     "geraet_zuzahlung": 1.0,
+     "laufzeit_monate": 36,
+     "speicher_gb": 128,
+     "tarif_monatlich": 39.95,
+     "tarif_name": "MagentaMobil S",
+     "tarif_slug": "MF_17785",
+     "titel": "Apple iPhone 13 (Erneuert Basic) 128 GB",
+     "url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-13-erneuert-basic/mitternacht-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
+    },
+    {
+     "anschlusspreis": 39.95,
      "geraet_monatsrate": 30.5,
      "geraet_zuzahlung": 199.0,
      "laufzeit_monate": 36,
@@ -2754,18 +4655,6 @@
      "tarif_slug": "MF_17785",
      "titel": "Samsung Galaxy S26+ 256 GB",
      "url": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26plus/white-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
-    },
-    {
-     "anschlusspreis": 39.95,
-     "geraet_monatsrate": 20.7,
-     "geraet_zuzahlung": 1.0,
-     "laufzeit_monate": 36,
-     "speicher_gb": 128,
-     "tarif_monatlich": 39.95,
-     "tarif_name": "MagentaMobil S",
-     "tarif_slug": "MF_17785",
-     "titel": "Samsung Galaxy S26 FE 128 GB Enterprise Edition 128 GB",
-     "url": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26-fe/enterprise-edition-graphite-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
     },
     {
      "anschlusspreis": 39.95,
@@ -2790,6 +4679,18 @@
      "tarif_slug": "MF_17785",
      "titel": "Motorola edge 70 512 GB",
      "url": "https://www.telekom.de/shop/geraet/motorola/motorola-edge-70/pantone-gadget-grey-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
+    },
+    {
+     "anschlusspreis": 39.95,
+     "geraet_monatsrate": 20.7,
+     "geraet_zuzahlung": 1.0,
+     "laufzeit_monate": 36,
+     "speicher_gb": 128,
+     "tarif_monatlich": 39.95,
+     "tarif_name": "MagentaMobil S",
+     "tarif_slug": "MF_17785",
+     "titel": "Samsung Galaxy S26 FE 128 GB Enterprise Edition 128 GB",
+     "url": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26-fe/enterprise-edition-graphite-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
     },
     {
      "anschlusspreis": 39.95,
@@ -2937,18 +4838,6 @@
     },
     {
      "anschlusspreis": 39.95,
-     "geraet_monatsrate": 6.1,
-     "geraet_zuzahlung": 1.0,
-     "laufzeit_monate": 24,
-     "speicher_gb": 128,
-     "tarif_monatlich": 39.95,
-     "tarif_name": "MagentaMobil S",
-     "tarif_slug": "MF_17785",
-     "titel": "Telekom T Phone 3 128 GB",
-     "url": "https://www.telekom.de/shop/geraet/telekom/telekom-t-phone-3/icy-silver-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
-    },
-    {
-     "anschlusspreis": 39.95,
      "geraet_monatsrate": 24.1,
      "geraet_zuzahlung": 99.0,
      "laufzeit_monate": 36,
@@ -2958,6 +4847,18 @@
      "tarif_slug": "MF_17785",
      "titel": "Apple iPhone Air 256 GB",
      "url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-air/himmelblau-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
+    },
+    {
+     "anschlusspreis": 39.95,
+     "geraet_monatsrate": 6.1,
+     "geraet_zuzahlung": 1.0,
+     "laufzeit_monate": 24,
+     "speicher_gb": 128,
+     "tarif_monatlich": 39.95,
+     "tarif_name": "MagentaMobil S",
+     "tarif_slug": "MF_17785",
+     "titel": "Telekom T Phone 3 128 GB",
+     "url": "https://www.telekom.de/shop/geraet/telekom/telekom-t-phone-3/icy-silver-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
     },
     {
      "anschlusspreis": 39.95,
@@ -2973,18 +4874,6 @@
     },
     {
      "anschlusspreis": 39.95,
-     "geraet_monatsrate": 11.0,
-     "geraet_zuzahlung": 1.0,
-     "laufzeit_monate": 36,
-     "speicher_gb": 256,
-     "tarif_monatlich": 39.95,
-     "tarif_name": "MagentaMobil S",
-     "tarif_slug": "MF_17785",
-     "titel": "Xiaomi Redmi Note 17 Pro 5G 256 GB",
-     "url": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-17-pro-5g/black-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
-    },
-    {
-     "anschlusspreis": 39.95,
      "geraet_monatsrate": 29.4,
      "geraet_zuzahlung": 99.0,
      "laufzeit_monate": 36,
@@ -2994,6 +4883,18 @@
      "tarif_slug": "MF_17785",
      "titel": "Xiaomi 17 Ultra 512 GB",
      "url": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-17-ultra/starlit-green-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
+    },
+    {
+     "anschlusspreis": 39.95,
+     "geraet_monatsrate": 11.0,
+     "geraet_zuzahlung": 1.0,
+     "laufzeit_monate": 36,
+     "speicher_gb": 256,
+     "tarif_monatlich": 39.95,
+     "tarif_name": "MagentaMobil S",
+     "tarif_slug": "MF_17785",
+     "titel": "Xiaomi Redmi Note 17 Pro 5G 256 GB",
+     "url": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-17-pro-5g/black-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
     },
     {
      "anschlusspreis": 39.95,
@@ -3009,6 +4910,18 @@
     },
     {
      "anschlusspreis": 39.95,
+     "geraet_monatsrate": 6.3,
+     "geraet_zuzahlung": 1.0,
+     "laufzeit_monate": 36,
+     "speicher_gb": 256,
+     "tarif_monatlich": 39.95,
+     "tarif_name": "MagentaMobil S",
+     "tarif_slug": "MF_17785",
+     "titel": "Telekom T Phone 3 Pro 256 GB",
+     "url": "https://www.telekom.de/shop/geraet/telekom/telekom-t-phone-3-pro/graphite-gray-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
+    },
+    {
+     "anschlusspreis": 39.95,
      "geraet_monatsrate": 19.9,
      "geraet_zuzahlung": 1.0,
      "laufzeit_monate": 36,
@@ -3021,6 +4934,18 @@
     },
     {
      "anschlusspreis": 39.95,
+     "geraet_monatsrate": 16.0,
+     "geraet_zuzahlung": 1.0,
+     "laufzeit_monate": 36,
+     "speicher_gb": 128,
+     "tarif_monatlich": 39.95,
+     "tarif_name": "MagentaMobil S",
+     "tarif_slug": "MF_17785",
+     "titel": "Apple iPhone 15 Erneuert 128 GB",
+     "url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-15-erneuert/zufallsfarbe-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
+    },
+    {
+     "anschlusspreis": 39.95,
      "geraet_monatsrate": 8.2,
      "geraet_zuzahlung": 1.0,
      "laufzeit_monate": 36,
@@ -3030,30 +4955,6 @@
      "tarif_slug": "MF_17785",
      "titel": "Xiaomi Redmi Note 15 Pro 5G 256 GB",
      "url": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-15-pro-5g/titanium-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
-    },
-    {
-     "anschlusspreis": 39.95,
-     "geraet_monatsrate": 23.0,
-     "geraet_zuzahlung": 1.0,
-     "laufzeit_monate": 36,
-     "speicher_gb": 256,
-     "tarif_monatlich": 39.95,
-     "tarif_name": "MagentaMobil S",
-     "tarif_slug": "MF_17785",
-     "titel": "Google Pixel 10 256 GB",
-     "url": "https://www.telekom.de/shop/geraet/google/google-pixel-10/obsidian-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
-    },
-    {
-     "anschlusspreis": 39.95,
-     "geraet_monatsrate": 10.5,
-     "geraet_zuzahlung": 1.0,
-     "laufzeit_monate": 36,
-     "speicher_gb": 256,
-     "tarif_monatlich": 39.95,
-     "tarif_name": "MagentaMobil S",
-     "tarif_slug": "MF_17785",
-     "titel": "motorola edge 70 fusion 256 GB",
-     "url": "https://www.telekom.de/shop/geraet/motorola/motorola-edge-70-fusion/pantone-silhouette-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
     },
     {
      "anschlusspreis": 39.95,
@@ -3301,7 +5202,7 @@
      "adresse": "https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17785",
      "beleg": {
       "seite": "https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17785",
-      "zeitpunkt": "2026-10-10T05:58:05Z"
+      "zeitpunkt": "2026-10-10T13:26:42Z"
      },
      "grund": null,
      "http_status": 200,
@@ -3309,19 +5210,19 @@
       "antworten": 3,
       "antworten_beim_laden": 1,
       "einwilligung": null,
-      "geraete": 69,
+      "geraete": 70,
       "luecken": {
        "speicher_unbekannt": 2
       },
       "mit_rueckgabedeal": 0,
-      "ohne_rueckgabedeal": 69,
+      "ohne_rueckgabedeal": 70,
       "result_count": 72,
       "schalter_nachher": "false",
       "schalter_vorher": "true",
       "unvollstaendig": null,
       "weiter_klicks": 2
      },
-     "saetze_neu": 67,
+     "saetze_neu": 68,
      "status": "gelesen",
      "stoerung": null
     }
@@ -3335,7 +5236,7 @@
    "adresse": "https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17797",
    "beleg": {
     "seite": "https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17797",
-    "zeitpunkt": "2026-10-10T06:04:32Z"
+    "zeitpunkt": "2026-10-10T13:33:29Z"
    },
    "grund": null,
    "http_status": 200,
@@ -3810,18 +5711,6 @@
     },
     {
      "anschlusspreis": 39.95,
-     "geraet_monatsrate": 5.5,
-     "geraet_zuzahlung": 1.0,
-     "laufzeit_monate": 36,
-     "speicher_gb": 256,
-     "tarif_monatlich": 59.95,
-     "tarif_name": "MagentaMobil L",
-     "tarif_slug": "MF_17797",
-     "titel": "Xiaomi Redmi Note 17 Pro 5G 256 GB",
-     "url": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-17-pro-5g/black-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
-    },
-    {
-     "anschlusspreis": 39.95,
      "geraet_monatsrate": 23.8,
      "geraet_zuzahlung": 99.0,
      "laufzeit_monate": 36,
@@ -3831,6 +5720,18 @@
      "tarif_slug": "MF_17797",
      "titel": "Xiaomi 17 Ultra 512 GB",
      "url": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-17-ultra/starlit-green-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
+    },
+    {
+     "anschlusspreis": 39.95,
+     "geraet_monatsrate": 5.5,
+     "geraet_zuzahlung": 1.0,
+     "laufzeit_monate": 36,
+     "speicher_gb": 256,
+     "tarif_monatlich": 59.95,
+     "tarif_name": "MagentaMobil L",
+     "tarif_slug": "MF_17797",
+     "titel": "Xiaomi Redmi Note 17 Pro 5G 256 GB",
+     "url": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-17-pro-5g/black-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
     },
     {
      "anschlusspreis": 39.95,
@@ -4038,18 +5939,6 @@
     },
     {
      "anschlusspreis": 39.95,
-     "geraet_monatsrate": 19.9,
-     "geraet_zuzahlung": 1.0,
-     "laufzeit_monate": 36,
-     "speicher_gb": 128,
-     "tarif_monatlich": 59.95,
-     "tarif_name": "MagentaMobil L",
-     "tarif_slug": "MF_17797",
-     "titel": "Apple iPhone 16 Plus 128 GB",
-     "url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-16-plus/weiss-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
-    },
-    {
-     "anschlusspreis": 39.95,
      "geraet_monatsrate": 33.3,
      "geraet_zuzahlung": 299.0,
      "laufzeit_monate": 36,
@@ -4059,6 +5948,18 @@
      "tarif_slug": "MF_17797",
      "titel": "Google Pixel 10 Pro Fold 256 GB",
      "url": "https://www.telekom.de/shop/geraet/google/google-pixel-10-pro-fold/moonstone-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
+    },
+    {
+     "anschlusspreis": 39.95,
+     "geraet_monatsrate": 19.9,
+     "geraet_zuzahlung": 1.0,
+     "laufzeit_monate": 36,
+     "speicher_gb": 128,
+     "tarif_monatlich": 59.95,
+     "tarif_name": "MagentaMobil L",
+     "tarif_slug": "MF_17797",
+     "titel": "Apple iPhone 16 Plus 128 GB",
+     "url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-16-plus/weiss-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
     },
     {
      "anschlusspreis": 39.95,
@@ -4150,7 +6051,7 @@
      "adresse": "https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17797",
      "beleg": {
       "seite": "https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17797",
-      "zeitpunkt": "2026-10-10T06:04:32Z"
+      "zeitpunkt": "2026-10-10T13:33:29Z"
      },
      "grund": null,
      "http_status": 200,
@@ -4184,7 +6085,7 @@
    "adresse": "https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17803",
    "beleg": {
     "seite": "https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17803",
-    "zeitpunkt": "2026-10-10T06:11:12Z"
+    "zeitpunkt": "2026-10-10T13:40:19Z"
    },
    "grund": null,
    "http_status": 200,
@@ -4431,30 +6332,6 @@
     },
     {
      "anschlusspreis": 39.95,
-     "geraet_monatsrate": 25.0,
-     "geraet_zuzahlung": 99.0,
-     "laufzeit_monate": 36,
-     "speicher_gb": 256,
-     "tarif_monatlich": 84.95,
-     "tarif_name": "MagentaMobil XL",
-     "tarif_slug": "MF_17803",
-     "titel": "Samsung Galaxy S26+ 256 GB",
-     "url": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26plus/white-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
-    },
-    {
-     "anschlusspreis": 39.95,
-     "geraet_monatsrate": 12.4,
-     "geraet_zuzahlung": 1.0,
-     "laufzeit_monate": 36,
-     "speicher_gb": 128,
-     "tarif_monatlich": 84.95,
-     "tarif_name": "MagentaMobil XL",
-     "tarif_slug": "MF_17803",
-     "titel": "Samsung Galaxy S26 FE 128 GB Enterprise Edition 128 GB",
-     "url": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26-fe/enterprise-edition-graphite-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
-    },
-    {
-     "anschlusspreis": 39.95,
      "geraet_monatsrate": 5.7,
      "geraet_zuzahlung": 1.0,
      "laufzeit_monate": 24,
@@ -4467,6 +6344,30 @@
     },
     {
      "anschlusspreis": 39.95,
+     "geraet_monatsrate": 25.0,
+     "geraet_zuzahlung": 99.0,
+     "laufzeit_monate": 36,
+     "speicher_gb": 256,
+     "tarif_monatlich": 84.95,
+     "tarif_name": "MagentaMobil XL",
+     "tarif_slug": "MF_17803",
+     "titel": "Samsung Galaxy S26+ 256 GB",
+     "url": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26plus/white-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
+    },
+    {
+     "anschlusspreis": 39.95,
+     "geraet_monatsrate": 6.3,
+     "geraet_zuzahlung": 1.0,
+     "laufzeit_monate": 36,
+     "speicher_gb": 256,
+     "tarif_monatlich": 84.95,
+     "tarif_name": "MagentaMobil XL",
+     "tarif_slug": "MF_17803",
+     "titel": "Xiaomi Redmi Note 17 Pro Max 5G 256 GB",
+     "url": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-17-pro-max-5g/black-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
+    },
+    {
+     "anschlusspreis": 39.95,
      "geraet_monatsrate": 8.5,
      "geraet_zuzahlung": 1.0,
      "laufzeit_monate": 36,
@@ -4476,6 +6377,18 @@
      "tarif_slug": "MF_17803",
      "titel": "Motorola edge 70 512 GB",
      "url": "https://www.telekom.de/shop/geraet/motorola/motorola-edge-70/pantone-gadget-grey-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
+    },
+    {
+     "anschlusspreis": 39.95,
+     "geraet_monatsrate": 12.4,
+     "geraet_zuzahlung": 1.0,
+     "laufzeit_monate": 36,
+     "speicher_gb": 128,
+     "tarif_monatlich": 84.95,
+     "tarif_name": "MagentaMobil XL",
+     "tarif_slug": "MF_17803",
+     "titel": "Samsung Galaxy S26 FE 128 GB Enterprise Edition 128 GB",
+     "url": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26-fe/enterprise-edition-graphite-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
     },
     {
      "anschlusspreis": 39.95,
@@ -4575,18 +6488,6 @@
     },
     {
      "anschlusspreis": 39.95,
-     "geraet_monatsrate": 18.5,
-     "geraet_zuzahlung": 1.0,
-     "laufzeit_monate": 36,
-     "speicher_gb": 256,
-     "tarif_monatlich": 84.95,
-     "tarif_name": "MagentaMobil XL",
-     "tarif_slug": "MF_17803",
-     "titel": "Apple iPhone Air 256 GB",
-     "url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-air/himmelblau-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
-    },
-    {
-     "anschlusspreis": 39.95,
      "geraet_monatsrate": 9.6,
      "geraet_zuzahlung": 1.0,
      "laufzeit_monate": 36,
@@ -4599,18 +6500,6 @@
     },
     {
      "anschlusspreis": 39.95,
-     "geraet_monatsrate": 8.1,
-     "geraet_zuzahlung": 1.0,
-     "laufzeit_monate": 12,
-     "speicher_gb": 256,
-     "tarif_monatlich": 84.95,
-     "tarif_name": "MagentaMobil XL",
-     "tarif_slug": "MF_17803",
-     "titel": "Xiaomi Redmi Note 17 Pro 5G 256 GB",
-     "url": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-17-pro-5g/black-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
-    },
-    {
-     "anschlusspreis": 39.95,
      "geraet_monatsrate": 23.8,
      "geraet_zuzahlung": 1.0,
      "laufzeit_monate": 36,
@@ -4620,6 +6509,30 @@
      "tarif_slug": "MF_17803",
      "titel": "Xiaomi 17 Ultra 512 GB",
      "url": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-17-ultra/starlit-green-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
+    },
+    {
+     "anschlusspreis": 39.95,
+     "geraet_monatsrate": 18.5,
+     "geraet_zuzahlung": 1.0,
+     "laufzeit_monate": 36,
+     "speicher_gb": 256,
+     "tarif_monatlich": 84.95,
+     "tarif_name": "MagentaMobil XL",
+     "tarif_slug": "MF_17803",
+     "titel": "Apple iPhone Air 256 GB",
+     "url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-air/himmelblau-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
+    },
+    {
+     "anschlusspreis": 39.95,
+     "geraet_monatsrate": 8.1,
+     "geraet_zuzahlung": 1.0,
+     "laufzeit_monate": 12,
+     "speicher_gb": 256,
+     "tarif_monatlich": 84.95,
+     "tarif_name": "MagentaMobil XL",
+     "tarif_slug": "MF_17803",
+     "titel": "Xiaomi Redmi Note 17 Pro 5G 256 GB",
+     "url": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-17-pro-5g/black-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
     },
     {
      "anschlusspreis": 39.95,
@@ -4791,18 +6704,6 @@
     },
     {
      "anschlusspreis": 39.95,
-     "geraet_monatsrate": 33.3,
-     "geraet_zuzahlung": 199.0,
-     "laufzeit_monate": 36,
-     "speicher_gb": 256,
-     "tarif_monatlich": 84.95,
-     "tarif_name": "MagentaMobil XL",
-     "tarif_slug": "MF_17803",
-     "titel": "Google Pixel 10 Pro Fold 256 GB",
-     "url": "https://www.telekom.de/shop/geraet/google/google-pixel-10-pro-fold/moonstone-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
-    },
-    {
-     "anschlusspreis": 39.95,
      "geraet_monatsrate": 17.1,
      "geraet_zuzahlung": 1.0,
      "laufzeit_monate": 36,
@@ -4812,6 +6713,18 @@
      "tarif_slug": "MF_17803",
      "titel": "Apple iPhone 16 Plus 128 GB",
      "url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-16-plus/weiss-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
+    },
+    {
+     "anschlusspreis": 39.95,
+     "geraet_monatsrate": 33.3,
+     "geraet_zuzahlung": 199.0,
+     "laufzeit_monate": 36,
+     "speicher_gb": 256,
+     "tarif_monatlich": 84.95,
+     "tarif_name": "MagentaMobil XL",
+     "tarif_slug": "MF_17803",
+     "titel": "Google Pixel 10 Pro Fold 256 GB",
+     "url": "https://www.telekom.de/shop/geraet/google/google-pixel-10-pro-fold/moonstone-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
     },
     {
      "anschlusspreis": 39.95,
@@ -4891,7 +6804,7 @@
      "adresse": "https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17803",
      "beleg": {
       "seite": "https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17803",
-      "zeitpunkt": "2026-10-10T06:11:12Z"
+      "zeitpunkt": "2026-10-10T13:40:19Z"
      },
      "grund": null,
      "http_status": 200,
@@ -4899,20 +6812,20 @@
       "antworten": 3,
       "antworten_beim_laden": 1,
       "einwilligung": null,
-      "geraete": 61,
+      "geraete": 62,
       "luecken": {
        "ratenzahl_ohne_rechenprobe": 1,
        "speicher_unbekannt": 2
       },
       "mit_rueckgabedeal": 0,
-      "ohne_rueckgabedeal": 61,
+      "ohne_rueckgabedeal": 62,
       "result_count": 61,
       "schalter_nachher": "false",
       "schalter_vorher": "true",
       "unvollstaendig": null,
       "weiter_klicks": 2
      },
-     "saetze_neu": 58,
+     "saetze_neu": 59,
      "status": "gelesen",
      "stoerung": null
     }
@@ -4924,5 +6837,5 @@
   }
  ],
  "vertragsform": "tarif_plus_ratenkauf",
- "zeitbudget_sekunden": 10278
+ "zeitbudget_sekunden": 10280
 }
