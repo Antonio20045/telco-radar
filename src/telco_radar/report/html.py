@@ -28,7 +28,7 @@ from . import luecken as luecken_mod
 from . import newsletter_protokoll
 from . import rechtstexte as rechtstexte_mod
 from . import seit as seit_mod
-from . import startseite as startseite_mod, statik
+from . import meldungen_seite, startseite as startseite_mod, statik
 from . import verlauf as verlauf_mod
 from . import suchindex
 from .differentiation import DIFF_THEMES
@@ -1415,7 +1415,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
             date_de=(latest_ctx or {}).get("date_de", ""),
             redaktion_ausfall=(latest_ctx or {}).get("redaktion_ausfall"),
             highlights=(latest_ctx or {}).get("highlights", []),
-            ressorts=_nach_ressort((latest_ctx or {}).get("highlights", [])),
+            ausgabe=meldungen_seite.ausgabe(latest_ctx, cfg),
             explorer_json=(latest_ctx or {}).get("explorer_json", "[]"),
             regions=(latest_ctx or {}).get("regions", []),
             categories=(latest_ctx or {}).get("categories", []),

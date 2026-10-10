@@ -8,15 +8,16 @@ Seite:
 
   1. Die Meldung der Woche steht ganz im ersten Bildschirm (1440 und 390 px).
   2. Mindestens 57 % der Meldungen haben ein Bild.
-  3. Kein Bild in einer grossen Kachel der Bildwand ist schmaler als 800 px.
-  4. Die Meldungsseite ist nach Ressorts gefiltert und gewichtet.
+  3. Kein Bild in Aufmacher oder Schwerpunkt der Meldungsseite ist schmaler
+     als 800 px.
+  4. Die Meldungsseite zeigt jede Meldung genau einmal und Schwerpunkte.
   5. Keine Schlagzeile endet auf "…".
   6. Kein Bild wird hochskaliert dargestellt (Anzeigebreite > Dateibreite).
 
 Dazu die zwei Kriterien aus AUFTRAG_PORTAL_WELLE2.md §7 (07.08.2026):
 
-  7. Alle Ressortfilter der Meldungsseite sind ohne Scrollen sichtbar, und alle
-     Meldungen sind weiterhin auf der Seite.
+  7. Die Schlagzeile des Aufmachers der Meldungsseite beginnt ohne Scrollen
+     (seit dem Magazin vom 10.10.2026 statt der Ressortfilter).
   8. Die Promo Uebersicht zeigt >= 10 verschiedene echte Bilder, keines
      davon leer, und JEDE Karte traegt entweder ein Bild oder eine
      Schriftkachel - nie einen leeren Kasten (seit 08.08.2026 alle Karten,
@@ -129,13 +130,6 @@ def zeitraum_maengel(tafel) -> list[str]:
         for z in tafel.select(".gr-bnd[data-gesamt]:not([data-gesamt=''])")
     )
     return [f"{stumm} Bündelzeilen ohne 'über H Monate'"] if stumm else []
-
-
-def ressorts_zahlen(meldungen: BeautifulSoup) -> list:
-    """4: die Zahlen der Ressortfilter (ohne "Alle")."""
-    return meldungen.select(
-        '.chip[data-filter="ressort"]:not([data-wert=""]) .rubrik-zahl'
-    )
 
 
 def _rendern(ziel: Path, root: Path) -> None:
@@ -511,17 +505,15 @@ def _browser_messungen(site: Path, b: Bilanz) -> None:
 
         seite.goto(f"{wurzel}/meldungen.html")
         seite.wait_for_timeout(500)
-        kacheln = seite.evaluate(
-            """() => [...document.querySelectorAll(
-                    '.chip[data-filter="ressort"]')]
-                 .map(e => Math.round(
-                      e.getBoundingClientRect().bottom + window.scrollY))"""
+        oben = seite.evaluate(
+            """() => { const s = document.querySelector(
+                   '.mg--aufmacher .mg-schlag');
+                 return s ? Math.round(
+                   s.getBoundingClientRect().top + window.scrollY) : -1; }"""
         )
-        letzte = max(kacheln) if kacheln else -1
         b.prueft(
-            bool(kacheln) and letzte < _FALZ,
-            f"7. Letzter Ressortfilter endet bei {letzte} px "
-            f"({len(kacheln) - 1} Ressorts, < {_FALZ})",
+            0 <= oben < _FALZ,
+            f"7. Schlagzeile des Aufmachers beginnt bei {oben} px (< {_FALZ})",
         )
 
         if not begriff:
@@ -658,22 +650,23 @@ def main() -> int:
         (site / "meldungen.html").read_text(encoding="utf-8"), "html.parser"
     )
 
-    gross = meldungen.select(".mw--gross .mw-bild img")
+    gross = meldungen.select(".mg--aufmacher .mg-bild img, .mg-sp-bild img")
     zu_klein = [img for img in gross if int(img.get("width") or 0) < MIND_BREITE_GROSS]
     b.prueft(
         bool(gross) and not zu_klein,
-        f"3. Bilder in den grossen Kacheln der Bildwand: {len(gross)}, "
+        f"3. Bilder in Aufmacher und Schwerpunkt: {len(gross)}, "
         f"davon unter {MIND_BREITE_GROSS} px: {len(zu_klein)}",
     )
 
-    ressorts = meldungen.select('.chip[data-filter="ressort"]:not([data-wert=""])')
-    stufen = {g for g in ("gross", "mittel", "klein") if meldungen.select(f".mw--{g}")}
-    summe = sum(int(z.get_text(strip=True)) for z in ressorts_zahlen(meldungen))
-    gerendert = len(meldungen.select(".meldung"))
+    themen = meldungen.select(".mg-sp-tafel")
+    ids = [m.get("id") for m in meldungen.select(".meldung")]
+    verweise = {a.get("data-zu") for a in meldungen.select(".mg-sp-link")}
     b.prueft(
-        len(ressorts) >= 3 and len(stufen) >= 2 and summe == gerendert == len(hs),
-        f"4. Meldungsseite: {len(ressorts)} Ressorts, {len(stufen)} Groessen, "
-        f"Ressortzahlen {summe}, gerendert {gerendert}, Daten {len(hs)}",
+        len(themen) >= 3
+        and len(set(ids)) == len(ids) == len(hs)
+        and verweise <= set(ids),
+        f"4. Meldungsseite: {len(themen)} Schwerpunkte, gerendert {len(ids)} "
+        f"({len(set(ids))} verschieden), Daten {len(hs)}",
     )
 
     seiten = [index, meldungen]

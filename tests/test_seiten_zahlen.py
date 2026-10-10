@@ -73,8 +73,9 @@ def test_die_titelseite_traegt_die_ressortbloecke_nicht_mehr(tmp_path):
     )
     echt = _nach_ressort(_flatten(bericht))
     meldungen = BeautifulSoup(lies_seite(site, "meldungen.html"), "html.parser")
-    ressorts = meldungen.select('.chip[data-filter="ressort"]:not([data-wert=""])')
-    assert len(ressorts) == len(echt)
+    for r in echt:
+        gezeigt = meldungen.select(f'.meldung[data-ressort="{r["key"]}"]')
+        assert len(gezeigt) == r["n"], r["label"]
     assert len(meldungen.select(".meldung")) == len(PORTAL)
 
     assert "ressorts" not in _titelseite(_flatten(bericht))
@@ -97,15 +98,15 @@ def test_jede_meldung_bekommt_genau_ein_ressort():
 
 
 def test_meldungsseite_zeigt_jedes_ressort_in_der_uebersicht(tmp_path):
-    """Abnahmekriterium 3: erst die Ressorts, dann auf Klick die Tiefe.
+    """Abnahmekriterium 3: erst der Ueberblick, dann auf Klick die Tiefe.
 
-    Die Seite war 12 249 px hoch; wer wissen wollte, was unter "Geld &
-    Uebernahmen" steht, scrollte acht Bildschirmhoehen. Bis zum 09.10.2026
-    hatte deshalb jedes Ressort eine Uebersichtskachel. Seit dem Redesign
-    steht die Woche als EINE Bildwand, und die Ressorts sind die Filter
-    darueber: jedes Ressort hat genau einen, mit seinem Namen und seiner
-    Zahl, in der Reihenfolge von `_nach_ressort`. Die Zahl ist gegen die
-    Berichtsdatei gerechnet, nicht gegen die Vorlage."""
+    Die Seite war 12 249 px hoch; bis zum 09.10.2026 hatte deshalb jedes
+    Ressort eine Uebersichtskachel, danach einen Filter mit Zahl. Seit dem
+    Magazin vom 10.10.2026 hat jedes Ressort mit mindestens drei Meldungen
+    einen Schwerpunkt, in der Reihenfolge, die `meldungen_seite` setzt, mit
+    seinem Namen und ohne Zahl. Jede Meldung nennt ihr Ressort ueber der
+    Schlagzeile. Gerechnet gegen die Berichtsdatei, nicht gegen die Vorlage."""
+    from telco_radar.report import meldungen_seite
     from telco_radar.report.html import _flatten, _nach_ressort
 
     site = render(tmp_path, highlights=PORTAL)
@@ -114,16 +115,18 @@ def test_meldungsseite_zeigt_jedes_ressort_in_der_uebersicht(tmp_path):
         (tmp_path / "data" / "reports" / "2026-08-05.json").read_text(encoding="utf-8")
     )
     echt = _nach_ressort(_flatten(bericht))
+    mit_schwerpunkt = {
+        r["key"]: r["label"] for r in echt if r["n"] >= meldungen_seite.SCHWERPUNKT_MIND
+    }
 
-    filter_ = soup.select('.chip[data-filter="ressort"]:not([data-wert=""])')
-    assert len(filter_) == len(echt), "Nicht jedes Ressort hat einen Filter"
-    for chip, r in zip(filter_, echt):
-        zahl = chip.select_one(".rubrik-zahl").get_text(strip=True)
-        name = chip.get_text(" ", strip=True).removesuffix(zahl).strip()
-        assert name == r["label"]
-        assert int(zahl) == r["n"], r["label"]
-        gezeigt = soup.select(f'.meldung[data-ressort="{chip["data-wert"]}"]')
-        assert len(gezeigt) == r["n"], r["label"]
+    knoepfe = soup.select(".mg-sp-themen [data-thema]")
+    assert {k["data-thema"] for k in knoepfe} == set(mit_schwerpunkt)
+    for k in knoepfe:
+        assert k.get_text(strip=True) == mit_schwerpunkt[k["data-thema"]]
+        assert not any(c.isdigit() for c in k.get_text())
+    for m in soup.select(".meldung"):
+        label = next(r["label"] for r in echt if r["key"] == m["data-ressort"])
+        assert m.select_one(".mg-kicker").get_text(strip=True) == label
     assert sum(r["n"] for r in echt) == len(soup.select(".meldung")) == len(PORTAL)
 
 

@@ -1,18 +1,18 @@
-{# Meldungen - die Woche als Bildwand (Redesign 09.10.2026).
+{# Meldungen - die Woche als Magazin (Antonio, 10.10.2026; Vorbild ist die
+   Weltseite von The Atlantic).
 
-   Die Prioritaet bestimmt die Groesse: 5 gross, 4 mittel, 3 klein.
-   Randnotizen (1-2) stehen als ruhige Liste am Ende. Ein Klick oeffnet
-   die Meldung in einer Leseansicht, die von rechts hereingleitet; ohne
-   JavaScript fuehrt derselbe Link zur Originalquelle. Jede Meldung hat
-   einen festen Anker (`meldung_id`), Links aus Mails oeffnen sie direkt.
+   Oben drei Spalten mit dem Aufmacher in der Mitte (im Quelltext zuerst), darunter eine
+   Bildreihe, ein farbiger Schwerpunkt je Thema, die uebrigen Meldungen als
+   Liste und am Ende Deutschland. Die Verteilung rechnet
+   `meldungen_seite.ausgabe()`; jede Meldung steht genau einmal, der
+   Schwerpunkt verweist nur auf sie. Ein Klick oeffnet die Leseansicht;
+   ohne JavaScript fuehrt derselbe Link zur Originalquelle.
 
    Jede Meldung traegt die Klasse `meldung` - daran haengen die
    Wahrheitstests. #}
 {% extends "base.html.j2" %}
 {% import "_uebersetzung.html.j2" as ueb %}
-{% import "_design.html.j2" as d %}
 {% set active = 'meldungen' %}
-{% set buehne = true %}
 {% block title %}Vodafone Product and Services Insights · Alle Meldungen{% endblock %}
 
 {% macro detail(h) %}
@@ -35,12 +35,37 @@
 </div>
 {% endmacro %}
 
-{% block buehne %}
-{{ d.band('band-meldungen', 'Ausgabe vom ' ~ date_de if date_de else '', 'Meldungen', prefix,
-          (highlights|length) ~ ' Meldungen dieser Woche' if highlights else '') }}
-{% endblock %}
+{% macro wer(h) -%}
+<span class="mg-wer">{{ h.operator or h.source_label }}{% if h.region %} · {{ h.region }}{% endif %}</span>
+{%- endmacro %}
+
+{# Eine Meldung im Lauf der Seite. `art` waehlt die Groesse, `bild` und
+   `dek` schalten Bild und Kurztext. #}
+{% macro meldung(h, art, bild=true, dek=false, klasse='') %}
+<article class="mg mg--{{ art }} meldung{% if not (bild and h.image) %} mg--ohne-bild{% endif %} {{ klasse }}" id="{{ meldung_id(h) }}"
+         data-ressort="{{ h.ressort }}" data-region="{{ h.region }}" data-auftritt>
+  <a class="mw-link mg-link" href="{{ h.url }}" target="_blank" rel="noopener" data-panel>
+    {% if bild and h.image %}<span class="mg-bild"><img src="{{ prefix }}images/{{ h.image }}" alt=""
+      {% if h.image_w %}width="{{ h.image_w }}" height="{{ h.image_h }}"{% endif %}
+      loading="{{ 'eager' if art == 'aufmacher' else 'lazy' }}" decoding="async"></span>{% endif %}
+    <span class="mg-text">
+      <span class="mg-kicker">{{ h.ressort_label }}</span>
+      <span class="mg-schlag szl">{{ h.schlagzeile }}</span>
+      {% if dek and h.summary %}<span class="mg-dek">{{ h.summary }}</span>{% endif %}
+      {{ wer(h) }}
+    </span>
+  </a>
+  {{ detail(h) }}
+</article>
+{% endmacro %}
 
 {% block content %}
+<header class="mg-kopf">
+  {% if ausgabe.kw %}<p class="mg-woche">Kalenderwoche {{ ausgabe.kw }}</p>{% endif %}
+  <h1 class="mg-titel" aria-label="Meldungen">{% for c in 'Meldungen' %}<span style="--i:{{ loop.index0 }}" aria-hidden="true">{{ c }}</span>{% endfor %}</h1>
+  {% if date_de %}<p class="mg-datum">Ausgabe vom {{ date_de }}</p>{% endif %}
+</header>
+
 {% if redaktion_ausfall %}
 <p class="ausfall-hinweis">Stand: {{ redaktion_ausfall.stand_de }} –
   {{ redaktion_ausfall.grund }}. Diese Seite zeigt weiterhin die
@@ -48,68 +73,96 @@
 {% endif %}
 
 {% if highlights %}
-{% set wand = highlights | selectattr('relevance', 'ge', 3) | list %}
-{% set rand = highlights | rejectattr('relevance', 'ge', 3) | list %}
-<div class="mw-filter" data-auftritt>
-  <div class="chips" role="group" aria-label="Nach Ressort filtern">
-    <button type="button" class="chip on" data-filter="ressort" data-wert="" aria-pressed="true">Alle <span class="rubrik-zahl">{{ highlights|length }}</span></button>
-    {% for r in ressorts %}
-    <button type="button" class="chip" data-filter="ressort" data-wert="{{ r.key }}" aria-pressed="false">{{ r.label }} <span class="rubrik-zahl">{{ r.n }}</span></button>
-    {% endfor %}
+<section class="mg-oben" aria-label="Die wichtigsten Meldungen">
+  {% if ausgabe.aufmacher %}{{ meldung(ausgabe.aufmacher, 'aufmacher', dek=true) }}{% endif %}
+  <div class="mg-links">
+    {% for h in ausgabe.links %}{{ meldung(h, 'links', dek=true) }}{% endfor %}
   </div>
-  {% if regions|length > 1 %}
-  <div class="chips chips--leise" role="group" aria-label="Nach Region filtern">
-    <button type="button" class="chip on" data-filter="region" data-wert="" aria-pressed="true">Alle Regionen</button>
-    {% for r in regions %}
-    <button type="button" class="chip" data-filter="region" data-wert="{{ r }}" aria-pressed="false">{{ r }} <span class="rubrik-zahl">{{ highlights | selectattr('region', 'equalto', r) | list | length }}</span></button>
-    {% endfor %}
-  </div>
+  {% if ausgabe.unter %}
+  <div class="mg-unter">{% for h in ausgabe.unter %}{{ meldung(h, 'unter', bild=false) }}{% endfor %}</div>
   {% endif %}
-</div>
+  <div class="mg-rechts">
+    {% if ausgabe.rechts %}<h2 class="mg-spaltenkopf">Auch wichtig</h2>{% endif %}
+    {% for h in ausgabe.rechts %}{{ meldung(h, 'rechts', bild=false) }}{% endfor %}
+  </div>
+</section>
 
-<div class="bildwand" id="bildwand">
-  {% for h in wand %}
-  {# Ein kleines Bild steht nie in der grossen Kachel - es waere dort
-     hochskaliert (bilder.MIND_BREITE_GROSS). #}
-  {% set gr = 'gross' if h.relevance >= 5 else ('mittel' if h.relevance == 4 else 'klein') %}
-  {% if gr == 'gross' and h.image and (h.image_w or 0) < MIND_BREITE_GROSS %}{% set gr = 'mittel' %}{% endif %}
-  <article class="mw mw--{{ gr }} meldung{% if not h.image %} mw--ohne-bild{% endif %}" id="{{ meldung_id(h) }}"
-           data-ressort="{{ h.ressort }}" data-region="{{ h.region }}">
-    <a class="mw-link" href="{{ h.url }}" target="_blank" rel="noopener" data-panel>
-      {% if h.image %}<span class="mw-bild"><img src="{{ prefix }}images/{{ h.image }}" alt=""
-        {% if h.image_w %}width="{{ h.image_w }}" height="{{ h.image_h }}"{% endif %}
-        loading="{{ 'eager' if loop.index <= 4 else 'lazy' }}" decoding="async"></span>{% endif %}
-      <span class="mw-text">
-        <span class="mw-kicker"><span class="punkt punkt--r{{ h.relevance }}" aria-hidden="true"></span>{{ h.operator or h.source_label }}</span>
-        <span class="mw-titel szl">{{ h.schlagzeile }}</span>
-      </span>
-    </a>
-    {{ detail(h) }}
-  </article>
-  {% endfor %}
-</div>
-
-{% if rand %}
-<section class="randnotizen" data-auftritt>
-  <h2 class="abschnitt-titel">Randnotizen</h2>
-  <ol class="rn-liste">
-    {% for h in rand %}
-    <li class="rn meldung" id="{{ meldung_id(h) }}" data-ressort="{{ h.ressort }}" data-region="{{ h.region }}">
-      <a class="mw-link rn-link" href="{{ h.url }}" target="_blank" rel="noopener" data-panel>
-        <span class="rn-titel szl">{{ h.schlagzeile }}</span>
-        <span class="rn-meta">{{ h.operator or h.source_label }} · {{ h.ressort_label }}</span>
-      </a>
-      {{ detail(h) }}
-    </li>
-    {% endfor %}
-  </ol>
+{% if ausgabe.reihe %}
+<section class="mg-reihe" aria-label="Weitere Meldungen mit Bild">
+  {% for h in ausgabe.reihe %}{{ meldung(h, 'reihe') }}{% endfor %}
 </section>
 {% endif %}
-<p class="mw-leer" hidden>Keine Meldung passt zu dieser Auswahl.</p>
+{% endif %}
+</div>
+
+{% if ausgabe.schwerpunkte %}
+{% set erster = ausgabe.schwerpunkte[0] %}
+<section class="mg-schwerpunkt sp--{{ erster.key }}" id="schwerpunkt" aria-label="Schwerpunkt" data-schwerpunkt>
+  <div class="mg-sp-innen">
+    <p class="mg-sp-zeile">Schwerpunkt</p>
+    {% for s in ausgabe.schwerpunkte %}
+    <div class="mg-sp-tafel" data-thema="{{ s.key }}"{% if not loop.first %} hidden{% endif %}>
+      <div class="mg-sp-kopf">
+        <h2 class="mg-sp-titel">{{ s.label }}</h2>
+        {% if s.bild %}<figure class="mg-sp-bild"><img src="{{ prefix }}images/{{ s.bild.image }}" alt=""
+          {% if s.bild.image_w %}width="{{ s.bild.image_w }}" height="{{ s.bild.image_h }}"{% endif %} loading="lazy" decoding="async"></figure>{% endif %}
+      </div>
+      <ol class="mg-sp-liste">
+        {% for h in s.meldungen %}
+        <li><a class="mg-sp-link" href="#{{ meldung_id(h) }}" data-zu="{{ meldung_id(h) }}">
+          <span class="mg-sp-schlag szl">{{ h.schlagzeile }}</span>
+          {% if h.summary %}<span class="mg-sp-dek">{{ h.summary }}</span>{% endif %}
+          {{ wer(h) }}
+        </a></li>
+        {% endfor %}
+      </ol>
+    </div>
+    {% endfor %}
+    {% if ausgabe.schwerpunkte|length > 1 %}
+    <div class="mg-sp-themen" role="group" aria-label="Thema des Schwerpunkts">
+      {% for s in ausgabe.schwerpunkte %}
+      <button type="button" data-thema="{{ s.key }}" aria-pressed="{{ 'true' if loop.first else 'false' }}">{{ s.label }}</button>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endif %}
+
+<div class="wrap">
+{% if highlights %}
+{% if ausgabe.strom %}
+<section class="mg-weiter" aria-labelledby="mg-weiter-titel">
+  <div class="mg-abschnitt" data-auftritt><h2 id="mg-weiter-titel">Weitere Meldungen</h2></div>
+  <div class="mg-strom" id="mg-strom">
+    {% for h in ausgabe.strom %}{{ meldung(h, 'strom', klasse=('mg-spaeter' if loop.index > ausgabe.strom_sichtbar else '')) }}{% endfor %}
+  </div>
+  {% if ausgabe.strom|length > ausgabe.strom_sichtbar %}
+  <button type="button" class="mg-mehr" id="mg-mehr" hidden>Mehr Meldungen</button>
+  {% endif %}
+</section>
+{% endif %}
 {% else %}
 <p class="empty-note">Für die aktuelle Woche liegen noch keine bewerteten Meldungen vor.</p>
 {% endif %}
+</div>
 
+{% if ausgabe.deutschland %}
+<section class="mg-deutschland" aria-labelledby="mg-de-titel">
+  <div class="wrap">
+    <div class="mg-abschnitt" data-auftritt><h2 id="mg-de-titel">Deutschland</h2></div>
+    <div class="mg-de-raster">
+      {{ meldung(ausgabe.deutschland[0], 'de-gross', dek=true) }}
+      {% set rest = ausgabe.deutschland[1:] %}
+      {% set haelfte = ((rest|length) + 1) // 2 %}
+      <div class="mg-de-spalte">{% for h in rest[:haelfte] %}{{ meldung(h, 'de', bild=false) }}{% endfor %}</div>
+      <div class="mg-de-spalte">{% for h in rest[haelfte:] %}{{ meldung(h, 'de', bild=false) }}{% endfor %}</div>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<div class="wrap">
 <section class="archiv" id="archiv" style="scroll-margin-top:96px" data-auftritt>
   <h2 class="abschnitt-titel">Frühere Ausgaben</h2>
   {% if archive %}
@@ -124,9 +177,7 @@
 </section>
 
 {# Die Leseansicht: EIN Panel fuer alle Meldungen; app.js setzt den Inhalt
-   aus dem verborgenen Detailblock der angeklickten Meldung ein. Der Block
-   steht im Dokument, nicht in einem <template>: so ist jede Meldung mit
-   Zusammenfassung und Folgerungssatz Teil des Quelltexts. #}
+   aus dem verborgenen Detailblock der angeklickten Meldung ein. #}
 <div class="lesepanel" id="lesepanel" hidden>
   <div class="lesepanel-schleier" data-schliessen></div>
   <aside class="lesepanel-blatt" role="dialog" aria-modal="true" aria-labelledby="lesepanel-titel">

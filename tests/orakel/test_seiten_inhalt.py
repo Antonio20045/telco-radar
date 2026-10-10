@@ -351,18 +351,17 @@ def test_kein_kleines_bild_in_einer_grossen_position(tmp_path):
     Position.
 
     Am 06.08.2026 war der Aufmacher der Ausgabe ein 120x90-Vorschaubild aus
-    einem Feed, auf rund 620 px hochskaliert. Die grosse Position ist seit
-    dem Redesign vom 09.10.2026 die doppelt grosse Kachel der Bildwand auf
-    meldungen.html: eine Meldung mit kleinem Bild rueckt dort eine Stufe
-    herunter, statt hochskaliert zu werden. Die Gegenprobe haelt fest, dass
-    es kleine Bilder in der Ausgabe gibt - sonst prueft der Test nichts.
+    einem Feed, auf rund 620 px hochskaliert. Seit dem Magazin vom
+    10.10.2026 sind die grossen Positionen der Aufmacher in der Mitte und das
+    Bild des Schwerpunkts. Die Gegenprobe haelt fest, dass es kleine Bilder in
+    der Ausgabe gibt - sonst prueft der Test nichts.
     """
     from telco_radar.report.bilder import MIND_BREITE_GROSS
 
     site = render(tmp_path, highlights=PORTAL)
     soup = BeautifulSoup(lies_seite(site, "meldungen.html"), "html.parser")
-    gross = soup.select(".mw--gross .mw-bild img")
-    assert gross, "keine grosse Kachel traegt ein Bild"
+    gross = soup.select(".mg--aufmacher .mg-bild img, .mg-sp-bild img")
+    assert soup.select(".mg--aufmacher .mg-bild img"), "der Aufmacher traegt kein Bild"
     for img in gross:
         breite = int(img.get("width") or 0)
         assert breite >= MIND_BREITE_GROSS, (
@@ -370,7 +369,7 @@ def test_kein_kleines_bild_in_einer_grossen_position(tmp_path):
         )
     klein = [
         img
-        for img in soup.select(".mw .mw-bild img")
+        for img in soup.select(".mg .mg-bild img")
         if int(img.get("width") or 0) < MIND_BREITE_GROSS
     ]
     assert klein, "Gegenprobe: die Ausgabe traegt kein kleines Bild"
@@ -432,24 +431,21 @@ def test_kopfzeile_nennt_gelesen_und_relevant_getrennt(tmp_path):
 
 
 def test_meldungsseite_zeigt_wirklich_alle_meldungen(tmp_path):
-    """Keine Meldung darf beim Umbau verschwinden.
+    """Keine Meldung darf beim Umbau verschwinden oder doppelt stehen.
 
-    Seit dem Redesign vom 09.10.2026 steht die Woche als Bildwand, die
-    Randnotizen als Liste darunter; die Ressorts sind Filter. Gezaehlt wird
-    ueber die Klasse `meldung`, die jede Kachel und jede Randnotiz traegt -
-    und gegen die Zahlen der Filter: "Alle" und die Summe der Ressorts."""
+    Seit dem Magazin vom 10.10.2026 verteilt `meldungen_seite.ausgabe()` die
+    Woche auf Aufmacher, Spalten, Bildreihe, Liste und Deutschland. Gezaehlt
+    wird ueber die Klasse `meldung`; der Schwerpunkt traegt sie nicht, er
+    verweist nur auf Meldungen, die auf der Seite vollstaendig stehen."""
     site = render(tmp_path, highlights=PORTAL)
     soup = BeautifulSoup(lies_seite(site, "meldungen.html"), "html.parser")
-    assert len(soup.select(".meldung")) == len(PORTAL)
-    alle = soup.select_one('.chip[data-filter="ressort"][data-wert=""] .rubrik-zahl')
-    assert int(alle.get_text(strip=True)) == len(PORTAL)
-    aus_ressorts = [
-        int(z.get_text(strip=True))
-        for z in soup.select(
-            '.chip[data-filter="ressort"]:not([data-wert=""]) .rubrik-zahl'
-        )
-    ]
-    assert sum(aus_ressorts) == len(PORTAL)
+    ids = [m["id"] for m in soup.select(".meldung")]
+    assert len(ids) == len(PORTAL)
+    assert len(set(ids)) == len(ids), "eine Meldung steht doppelt"
+    verweise = [a["data-zu"] for a in soup.select(".mg-sp-link")]
+    assert verweise, "Gegenprobe: die Ausgabe hat keinen Schwerpunkt"
+    assert set(verweise) <= set(ids), "der Schwerpunkt verweist ins Leere"
+    assert not soup.select(".mg-schwerpunkt .meldung")
 
 
 def test_meldungsseite_traegt_den_entfernten_filter_nicht_mehr(tmp_path):
@@ -471,40 +467,37 @@ def test_meldungsseite_traegt_den_entfernten_filter_nicht_mehr(tmp_path):
     assert 'action="suche.html"' in html
 
 
-def test_meldungsseite_gruppiert_und_gewichtet(tmp_path):
-    """Abnahmekriterium 4: Ressorts statt einer flachen Liste, und drei
-    Groessen statt einer.
+def test_meldungsseite_fuehrt_mit_dem_wichtigsten_und_zeigt_schwerpunkte(tmp_path):
+    """Abnahmekriterium 4, seit dem 10.10.2026 als Magazin: die wichtigste
+    Meldung ist der Aufmacher, und jedes Thema mit mindestens drei Meldungen
+    hat einen Schwerpunkt mit hoechstens fuenf Verweisen.
 
-    Vorher rendete die Seite 193-mal denselben Block. Antonio nannte das
-    "extrem beschissenes Layout" - zu Recht, das war eine Datenbankausgabe.
-    Seit dem Redesign vom 09.10.2026 gewichtet die Prioritaet die Kachel
-    (5 gross, 4 mittel, 3 klein), und die Ressorts filtern die Wand; jede
-    Meldung gehoert genau einem Ressort, und jeder Filter zaehlt, was er
-    zeigt.
-    """
+    Vorher rendete die Seite 193-mal denselben Block; danach filterten
+    Ressort-Chips eine Bildwand - Antonio nannte beides unlesbar. Jede
+    Meldung traegt ihr Thema als Zeile ueber der Schlagzeile."""
+    from telco_radar.report import meldungen_seite
+
     soup = BeautifulSoup(
         lies_seite(render(tmp_path, highlights=PORTAL), "meldungen.html"), "html.parser"
     )
-
-    ressorts = soup.select('.chip[data-filter="ressort"]:not([data-wert=""])')
-    assert len(ressorts) >= 3, "Die Seite ist nicht nach Ressorts gegliedert"
-    werte = {c["data-wert"] for c in ressorts}
     meldungen = soup.select(".meldung")
-    assert all(m["data-ressort"] in werte for m in meldungen)
-    for chip in ressorts:
-        n = int(chip.select_one(".rubrik-zahl").get_text(strip=True))
-        unter = [m for m in meldungen if m["data-ressort"] == chip["data-wert"]]
-        assert n == len(unter), chip["data-wert"]
+    aufmacher = soup.select_one(".mg--aufmacher")
+    assert aufmacher is meldungen[0], "der Aufmacher steht nicht zuerst"
+    hoechste = max(h["relevance"] for h in PORTAL)
+    assert aufmacher.select_one(f".punkt--r{hoechste}")
 
-    groessen = {
-        g
-        for m in soup.select(".bildwand .meldung")
-        for g in ("mw--gross", "mw--mittel", "mw--klein")
-        if g in m["class"]
-    }
-    assert groessen == {"mw--gross", "mw--mittel", "mw--klein"}
-    for kachel in soup.select(".mw--gross"):
-        assert kachel.select_one(".punkt--r5"), "grosse Kachel ohne Prioritaet 5"
+    tafeln = soup.select(".mg-sp-tafel")
+    knoepfe = soup.select(".mg-sp-themen [data-thema]")
+    assert len(tafeln) >= 3, "Die Seite zeigt keine Schwerpunkte"
+    assert [k["data-thema"] for k in knoepfe] == [t["data-thema"] for t in tafeln]
+    for tafel in tafeln:
+        n = len([m for m in meldungen if m["data-ressort"] == tafel["data-thema"]])
+        assert n >= meldungen_seite.SCHWERPUNKT_MIND, tafel["data-thema"]
+        verweise = tafel.select(".mg-sp-link")
+        assert 0 < len(verweise) <= min(n, meldungen_seite.SCHWERPUNKT_TIEFE)
+    assert sum(not t.has_attr("hidden") for t in tafeln) == 1
+    for m in meldungen:
+        assert m.select_one(".mg-kicker").get_text(strip=True), m["id"]
 
 
 def test_wochenseite_traegt_die_explorer_daten_nicht_mehr(tmp_path):
@@ -1452,20 +1445,22 @@ def test_keine_seite_erklaert_ihre_eigene_bedienung(tmp_path):
 def test_meldungskopf_ist_kicker_und_ueberschrift(tmp_path):
     """Kein Erklaersatz unter der H1 - Antonios woertliches Beispiel.
 
-    Seit dem Redesign vom 09.10.2026 steht der Kopf im Bildband: die
-    Ausgabe, der Titel und als einzige weitere Zeile die Zahl der Meldungen
-    - gegen die Berichtsdatei gezaehlt."""
+    Seit dem Magazin vom 10.10.2026 steht der Kopf zentriert: Kalenderwoche,
+    Titel, Ausgabedatum. Die Zahl der Meldungen steht nicht mehr da
+    (Antonio: "131 Meldungen moechte ich nicht sehen")."""
     soup = BeautifulSoup(
         lies_seite(render(tmp_path, highlights=PORTAL), "meldungen.html"), "html.parser"
     )
-    kopf = soup.select_one(".band .band-text")
+    kopf = soup.select_one(".mg-kopf")
     kinder = [k.name for k in kopf.find_all(recursive=False)]
     assert kinder == ["p", "h1", "p"], kinder
-    assert kopf.select_one("p")["class"] == ["band-kicker"]
+    assert kopf.select_one(".mg-woche").get_text(strip=True) == "Kalenderwoche 32"
     assert kopf.select_one("h1").get_text(strip=True) == "Meldungen"
-    assert kopf.select_one(".band-stand").get_text(strip=True) == (
-        f"{len(PORTAL)} Meldungen dieser Woche"
+    assert (
+        kopf.select_one(".mg-datum").get_text(strip=True)
+        == "Ausgabe vom 5. August 2026"
     )
+    assert str(len(PORTAL)) not in kopf.get_text(" ")
 
 
 def test_archivzeile_nennt_nur_das_datum(tmp_path):
@@ -1498,8 +1493,7 @@ def test_zaehlwerte_tragen_ueberall_dieselbe_klasse(tmp_path):
         assert "count-badge" not in lies_seite(site, name), name
     css = re.sub(r"(?s)/\*.*?\*/", "", lies_seite(site, "style.css"))
     assert "count-badge" not in css
-    soup = BeautifulSoup(lies_seite(site, "meldungen.html"), "html.parser")
-    assert soup.select(".rubrik-zahl")
+    assert ".rubrik-zahl" in css, "Gegenprobe: das eine Zaehletikett fehlt"
 
 
 def _ctm_highlight(i, *, ctm_bezug, relevance=3, satz=None, operator=None):
