@@ -318,6 +318,7 @@ def test_rechnung_ist_zugeklappt_sichtbar_ohne_querscroll(
         try:
             seite.goto(f"{basis}/geraete.html")
             seite.wait_for_selector("details.gr-bnd .gr-bnd-rechnung", state="attached")
+            seite.click(".gx-bnd-auf")
             mass = seite.evaluate(
                 """() => {
                   const r = [...document.querySelectorAll(

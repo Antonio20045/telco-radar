@@ -113,7 +113,7 @@ def test_der_beginn_der_tco_historie_ist_der_echte(geraete):
             tage.add(json.loads(zeile).get("datum"))
     knopf = geraete.select_one('.gr-reiter [data-tafel="tafel-verlauf"]')
     assert knopf is not None
-    assert knopf.get_text(" ", strip=True) == "Ohne Vertrag", (
+    assert knopf.get_text(" ", strip=True) == "Einzelgerät", (
         "der Verlaufs-Reiter benennt nicht die Barpreis-Frage (E3/S1)"
     )
     assert "TCO-24-Historie" not in text, (

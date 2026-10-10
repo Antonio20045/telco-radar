@@ -107,6 +107,11 @@ def telefon(_browser_seite):
 
 def test_am_telefon_steht_die_antwort_ueber_der_falz(telefon):
     s, _ = telefon
+    s.evaluate(
+        "() => window.scrollTo(0, document.getElementById('tco')"
+        ".getBoundingClientRect().top + window.scrollY)"
+    )
+    s.wait_for_timeout(120)
     box = s.evaluate("""() => {
       const a = document.querySelector('#tafel-tco .gr-zr-antwort');
       // Seit dem Wegfall der Messtag-Zeile (28.09.2026, Achse traegt die
@@ -146,6 +151,11 @@ def test_am_telefon_beginnt_die_kurve_oberhalb_der_falz(telefon):
     und `test_der_kopf_laeuft_auch_mit_breiterer_schrift_nicht_aus_dem_bild`
     in test_marke.py), nicht mit einer bestimmten Schriftart."""
     s, _ = telefon
+    s.evaluate(
+        "() => window.scrollTo(0, document.getElementById('tco')"
+        ".getBoundingClientRect().top + window.scrollY)"
+    )
+    s.wait_for_timeout(120)
     s.add_style_tag(
         content=(
             ".gr-reiter button,.gr-reiter .gr-reiter-seite"
@@ -165,7 +175,7 @@ def test_am_telefon_beginnt_die_kurve_oberhalb_der_falz(telefon):
       };
       const leiste = document.querySelector('.gr-reiter');
       const reiterZeilen = leiste ? new Set(
-        [...leiste.querySelectorAll('button')].map(
+        [...leiste.querySelectorAll('button:not([hidden])')].map(
           b => Math.round(b.getBoundingClientRect().top))).size : null;
       return {svg: Math.round(svg.getBoundingClientRect().top),
               punkt: top('circle.gr-zr-punkt'),
@@ -203,6 +213,11 @@ def test_die_kachelzeile_drueckt_die_falz_nicht_unter_844(telefon):
     geht weiter vor - die Kartenreihe bleibt im ersten Viewport und
     drueckt weder sich selbst noch den Antwort-Satz unter die Falz."""
     s, _ = telefon
+    s.evaluate(
+        "() => window.scrollTo(0, document.getElementById('tco')"
+        ".getBoundingClientRect().top + window.scrollY)"
+    )
+    s.wait_for_timeout(120)
     box = s.evaluate("""() => {
       const k = document.querySelector('#tafel-tco .gr-zr-kacheln');
       return {karten: k ? Math.round(k.getBoundingClientRect().bottom) : null,
@@ -230,6 +245,11 @@ def test_alle_karten_im_ersten_viewport_beim_schreibtisch(schreibtisch):
     """P1/F3-Messlatte: alle sechs Karten stehen IM ERSTEN Viewport
     (1440x900) - der Schnelleingang ist kein Scroll-Fund."""
     s, _ = schreibtisch
+    s.evaluate(
+        "() => window.scrollTo(0, document.getElementById('tco')"
+        ".getBoundingClientRect().top + window.scrollY)"
+    )
+    s.wait_for_timeout(120)
     erg = s.evaluate("""() => {
       const knoepfe = [...document.querySelectorAll(
         '#gr-zr-kacheln button[data-modell]')];
@@ -437,6 +457,10 @@ def test_der_bandtitel_und_die_sichtbaren_zeilen_meinen_dasselbe_band(schreibtis
     Bandblock, nicht heimlich in einem Band). Dieser Test nagelt die
     Zusicherung fest, damit der Filter nicht still entfallen kann."""
     s, _ = schreibtisch
+    s.evaluate(
+        "() => {const b = document.querySelector('.gx-bnd-auf');"
+        " if (b && b.getAttribute('aria-expanded') !== 'true') b.click();}"
+    )
     s.click("#gr-zr-baender button[data-band='m']")
     s.wait_for_timeout(500)
     titel = s.eval_on_selector("#gr-bnd-titel", "e => e.textContent")
@@ -664,7 +688,7 @@ def test_kein_reitertext_wird_abgeschnitten(telefon):
         bereich.selectNodeContents(textknoten);
         return bereich.getBoundingClientRect();
       };
-      const knoepfe = [...leiste.querySelectorAll('button')];
+      const knoepfe = [...leiste.querySelectorAll('button:not([hidden])')];
       return {
         leiste: { left: lr.left, right: lr.right },
         zeilen: new Set(knoepfe.map(

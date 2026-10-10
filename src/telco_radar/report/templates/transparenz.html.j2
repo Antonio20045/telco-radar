@@ -10,45 +10,58 @@
 {% set buehne = true %}
 {% block title %}Vodafone Product and Services Insights · Quellen{% endblock %}
 {% set kmap = {'rss':'Feed','json_api':'Feed (API)','newsroom':'Newsroom','newsroom_js':'Newsroom','official':'Referenz','trade_press':'Fachpresse'} %}
+{% macro tsd(n) %}{{ "{:,}".format(n) | replace(",", ".") if n is number else n }}{% endmacro %}
 {% block buehne %}
+{% if run %}
+{# Der Lauf als Filter (Antonio, 10.10.2026): beim Scrollen wird aus den
+   abgefragten Quellen Stufe fuer Stufe, was uebrig bleibt. Ohne JavaScript
+   steht die erste Stufe; jede Stufe traegt ihre Zahl und ihren Satz. #}
+{% set ss = run.source_summary %}
+{% set st = report.stats if report and report.stats else {} %}
+{% set stufen = [
+  {'zahl': ss.total, 'titel': 'Quellen abgefragt',
+   'satz': ss.ok ~ ' haben geliefert, ' ~ ss.empty ~ ' kam' ~ ('en' if ss.empty != 1 else '') ~ ' leer zurück, ' ~ ss.failed ~ ' ' ~ ('sind' if ss.failed != 1 else 'ist') ~ ' gescheitert.' ~ ((' ' ~ ss.quarantaene ~ ' weitere sind stillgelegt, weil sie seit Wochen nichts liefern.') if ss.get('quarantaene') else '')},
+  {'zahl': st.get('collected'), 'titel': 'Meldungen gefunden', 'satz': 'Alles, was die Quellen heute auf ihren Seiten und in ihren Feeds führen.'},
+  {'zahl': st.get('new'), 'titel': 'neue Meldungen gelesen', 'satz': 'Gelesen wird nur, was noch nie da war.'},
+  {'zahl': st.get('events'), 'titel': 'Ereignisse', 'satz': ((st.get('bundled') ~ ' Meldungen berichten über dasselbe und werden gebündelt.') if st.get('bundled') else 'Keine Meldung berichtet über dasselbe wie eine andere.')},
+  {'zahl': n_bewertet, 'titel': 'davon relevant', 'satz': ('Jede neue Meldung liest ein Analyst, gekappt wird nichts; behalten wird, was für Vodafone eine Nachricht ist.' if st.get('new') and n_bewertet < st.get('new') else 'Behalten wird, was für Vodafone eine Nachricht ist.')},
+] | selectattr('zahl', 'ne', none) | list %}
+<section class="qf" id="lauf-filter" data-filter>
+  <div class="qf-buehne">
+    <div class="qf-rahmen">
+      <div class="qf-bild" aria-hidden="true">{{ d.motiv('band-quellen', prefix, 'wa-motiv', eager=true) }}</div>
+      <div class="qf-schleier" aria-hidden="true"></div>
+      <div class="qf-stufe">
+        <div>
+          <div class="wa-dach"><span>Quellen</span>{% if date_de %}<span class="wa-stand">Lauf vom {{ date_de }}</span>{% endif %}</div>
+          <div class="qf-wechsel" data-filter-anzeige>
+            <p class="qf-zahl" data-filter-zahl>{{ tsd(stufen[0].zahl) }}</p>
+            <p class="qf-titel" data-filter-titel>{{ stufen[0].titel }}</p>
+            <p class="qf-satz" data-filter-satz>{{ stufen[0].satz }}</p>
+          </div>
+        </div>
+        <ol class="qf-leiter" aria-label="Stufen des Laufs">
+          {% for s in stufen %}<li data-zahl="{{ s.zahl }}" data-satz="{{ s.satz }}"><b>{{ tsd(s.zahl) }}</b><span>{{ s.titel }}</span></li>{% endfor %}
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+{% else %}
 {{ d.band('band-quellen', 'Nachprüfbarkeit', 'Quellen', prefix, ('Lauf vom ' ~ date_de) if date_de else '') }}
+{% endif %}
 {% endblock %}
 {% block content %}
 
-<section class="page-hero wide">
-  <p class="page-kicker">Nachprüfbarkeit</p>
-  <h1>Quellen</h1>
-  <p class="page-lead">Welche Quelle abgefragt wurde, was sie geliefert hat, und was die
-  Auswertung daraus gemacht hat.</p>
-</section>
-
-{# ------------------------------------------------------------ der Lauf #}
 {% if run %}
-<div class="tile-grid">
-  <div class="tile"><b>{{ run.source_summary.total }}</b><span>Quellen abgefragt</span></div>
-  {% if run.source_summary.get('quarantaene') %}<div class="tile"><b>{{ run.source_summary.quarantaene }}</b><span>stillgelegt (liefern seit Wochen nichts)</span></div>{% endif %}
-  <div class="tile accent"><b>{{ run.source_summary.ok }} / {{ run.source_summary.empty }} / {{ run.source_summary.failed }}</b><span>ok / leer / fehlgeschlagen</span></div>
-  <div class="tile"><b>{{ (run.duration_seconds / 60) | round(1) }} min</b><span>Laufzeit ({{ date_de }})</span></div>
-  <div class="tile"><b>{{ report.stats.get('new', '–') }}</b><span>neue Meldungen gelesen</span></div>
-  {# Meldungen und Ereignisse sind zwei Zahlen. Ihr Abstand ist die
-     Mehrfachberichterstattung: drei Fachmedien ueber dieselbe Sache waren bis
-     zum 08.08.2026 drei Meldungen im Bericht (analyze/clustering.py). #}
-  {% if report.stats.get('bundled') %}
-  <div class="tile"><b>{{ report.stats.get('events') }}</b><span>Ereignisse daraus ({{ report.stats.get('bundled') }} Mehrfachmeldungen gebündelt)</span></div>
-  {% endif %}
-  <div class="tile tint"><b>{{ n_bewertet }}</b><span>davon relevant</span></div>
-</div>
-{# Bis zum 06.08.2026 stand hier EINE Kachel: "426 neue Meldungen bewertet".
-   Das waren zwei verschiedene Zahlen unter einem Label - am 05.08. wurden
-   426 neue Meldungen gelesen und 92 davon als relevant behalten. Getrennt
-   ausweisen und den Abstand erklaeren, statt ihn zu verstecken. #}
-{% if report and report.stats and report.stats.get('new') and n_bewertet < report.stats.get('new') %}
-<p class="muted-note" style="margin:14px 0 0;max-width:760px">
-  <b>Jede</b> neue Meldung wird einem Analysten vorgelegt, gekappt wird nichts;
-  behalten wird, was für Vodafone eine Nachricht ist.
-</p>
-{% endif %}
-
+<section class="qf-lauf">
+  <h2>So lief <i>der Lauf</i></h2>
+  <dl><div><dt>Laufzeit</dt><dd>{{ (run.duration_seconds / 60) | round(1) | string | replace(".", ",") }} min</dd></div>
+  {% if run.kosten and run.kosten.summe_usd is not none %}<div><dt>Kosten</dt><dd>{{ "%.2f"|format(run.kosten.summe_usd) | replace(".", ",") }} $</dd></div>{% endif %}</dl>
+  {% set ss = run.source_summary %}
+  {% if ss.total %}<p class="qf-bilanz"><b>{{ ss.ok }} / {{ ss.empty }} / {{ ss.failed }}</b><span>ok / leer / fehlgeschlagen</span>{% if ss.get('quarantaene') %}
+    <b>{{ ss.quarantaene }}</b><span>stillgelegt</span>{% endif %}</p>{% endif %}
+</section>
 <div class="card">
   <div class="card-head"><h2>Ablauf dieses Laufs</h2></div>
   <div class="step-grid">

@@ -165,9 +165,8 @@ def test_die_reiterleiste_traegt_vergleich_radar_verlauf_katalog(tmp_path):
     beschriftungen = [(k.get("data-tafel"), k.get_text(strip=True)) for k in knoepfe]
     assert beschriftungen == [
         ("tafel-tco", "Mit Tarif"),
-        ("tafel-verlauf", "Ohne Vertrag"),
+        ("tafel-verlauf", "Einzelgerät"),
         ("tafel-radar", "Übersicht"),
-        ("tafel-katalog", "Katalog"),
     ]
     assert s.select_one(".gr-reiter a") is None, (
         "die Reiterleiste trägt noch einen Link (E3: vier Tafeln)"

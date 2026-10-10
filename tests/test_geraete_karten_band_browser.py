@@ -365,6 +365,10 @@ def test_zeilen_ohne_tarifband_bilden_eine_markierte_gruppe(_seite):
     dem Bandraster - seit O2 stehen sie in der eigenen Gruppe 'Ohne
     Tarifband' UNTER der Bandliste (#gr-ohneband), nicht heimlich in einem
     Band (o2-Unlimited-Zeile, UX-1)."""
+    _seite.evaluate(
+        "() => {const b = document.querySelector('.gx-bnd-auf');"
+        " if (b && b.getAttribute('aria-expanded') !== 'true') b.click();}"
+    )
     waehle_band(_seite, "m")
     _seite.wait_for_timeout(120)
     lage = _seite.evaluate("""() => {
@@ -481,6 +485,10 @@ def test_die_finanzierungssumme_heisst_so_und_nicht_geraetepreis(_seite):
     benannte Lücke, weil congstar dazu nichts gemessen hat. Die Kernzahl
     der 36-Raten-Zeile läuft über 36 Monate, der Tarif zählt davon 24
     (1.477,00, nicht 1.765,00), und steht in der 36er-Ansicht."""
+    _seite.evaluate(
+        "() => {const b = document.querySelector('.gx-bnd-auf');"
+        " if (b && b.getAttribute('aria-expanded') !== 'true') b.click();}"
+    )
     waehle_band(_seite, "m")
     waehle_laufzeit(_seite, "36")
     _seite.wait_for_timeout(120)

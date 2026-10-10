@@ -19,16 +19,13 @@ from . import anbieter_farben as _anbieter_farben
 from .ausfall import NEWSLETTER_TEIL, Ausfall, ohne_konfiguration
 from . import bilder as report_bilder
 from . import diff_bilder, differenzierung_bericht
-from . import differenzierung_view, wettbewerb_puls
+from . import differenzierung_view, geraete_teurer, wettbewerb_puls
 from . import geraete_tco_grafik as _geraete_tco_grafik
-from . import fruehwarnung as fruehwarnung_mod
-from . import lieferzeit_view as lieferzeit_view_mod
+from . import fruehwarnung as fruehwarnung_mod, lieferzeit_view as lieferzeit_view_mod
 from . import luecken as luecken_mod
 from . import newsletter_protokoll, rechtstexte as rechtstexte_mod
-from . import seit as seit_mod
-from . import meldungen_seite, startseite as startseite_mod, statik
-from . import verlauf as verlauf_mod
-from . import suchindex
+from . import seit as seit_mod, verlauf as verlauf_mod
+from . import meldungen_seite, startseite as startseite_mod, statik, suchindex
 from .differentiation import DIFF_THEMES
 from .promo import prepare_promo_view
 from .thema import build_thema_view
@@ -1716,7 +1713,10 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
 
     (site_dir / "geraete.html").write_text(
         env.get_template("geraete.html.j2").render(
-            prefix="", geraete=geraete, radar=radar_view
+            prefix="",
+            geraete=geraete,
+            radar=radar_view,
+            teurer=geraete_teurer.listen(geraete),
         ),
         encoding="utf-8",
     )

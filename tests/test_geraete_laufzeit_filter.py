@@ -253,6 +253,7 @@ def seite(_browser_seite, request):
     s = browser.new_page(viewport={"width": breite, "height": hoehe})
     s.goto(f"{basis}/geraete.html", wait_until="load")
     s.click(".gr-reiter button[data-tafel='tafel-tco']")
+    s.click(".gx-bnd-auf")
     try:
         yield s
     finally:

@@ -118,8 +118,8 @@ def test_der_hinweis_springt_auf_die_katalog_zeile(paar):
     paar.wait_for_timeout(200)
     assert (
         paar.eval_on_selector(
-            '.gr-reiter button[data-tafel="tafel-katalog"]',
-            "e => e.getAttribute('aria-selected')",
+            "#tafel-katalog",
+            "e => String(getComputedStyle(e).display !== 'none' && e.offsetHeight > 0)",
         )
         == "true"
     ), "der Katalog-Reiter ist nach dem Klick nicht aktiv"

@@ -1963,7 +1963,7 @@ def test_kein_iso_datum_steht_sichtbar_auf_der_geraeteseite(tmp_path):
 
     site = _baue(tmp_path)
     s = _suppe(site, "geraete.html")
-    for knoten in s.select(".page-date, .gr-export-meta, .gr-v-datum"):
+    for knoten in s.select(".wa-stand, .gr-export-meta, .gr-v-datum"):
         text = knoten.get_text(" ", strip=True)
         assert not re.search(r"\d{4}-\d{2}-\d{2}", text), (
             f"ISO-Datum sichtbar: {text!r}"
@@ -2372,7 +2372,9 @@ def test_das_kopfdatum_ist_das_abrufdatum(tmp_path):
     )
 
     kopf = (
-        _suppe(site, "geraete.html").select_one(".page-date").get_text(" ", strip=True)
+        _suppe(site, "geraete.html")
+        .select_one(".gx-auftakt .wa-stand")
+        .get_text(" ", strip=True)
     )
     assert "Preise vom" in kopf, kopf
     assert str(int(abruf.split("-")[2])) in kopf, (

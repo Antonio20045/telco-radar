@@ -65,7 +65,7 @@ def _radar_zeigen(seite):
     seit dem Design-Durchlauf IM AUFKLAPPER unter der Balkengrafik -
     Sprung- und Zeilenklick-Tests oeffnen ihn hier, sonst wartet der
     Klick auf eine unsichtbare Zeile."""
-    seite.click('.gr-reiter button[data-tafel="tafel-radar"]')
+    seite.evaluate("location.hash = '#tafel-radar'")
     seite.wait_for_timeout(80)
     auf = seite.query_selector("#wr-abweichung details.gr-auf:not([open])")
     if auf:
@@ -135,7 +135,7 @@ def test_der_katalog_sprung_legt_filter_und_zeile_frei(paar):
     legt Filter und Deckel frei, statt an einer unsichtbaren Zeile zu
     enden."""
     paar.goto(paar.url.split("#")[0].split("?")[0], wait_until="load")
-    paar.click('.gr-reiter button[data-tafel="tafel-katalog"]')
+    paar.evaluate("document.getElementById('tafel-katalog').scrollIntoView()")
     paar.select_option('#tafel-katalog select[data-filter="marke"]', label="Samsung")
     _radar_zeigen(paar)
     link = next(
@@ -148,8 +148,8 @@ def test_der_katalog_sprung_legt_filter_und_zeile_frei(paar):
     paar.wait_for_timeout(250)
     assert (
         paar.eval_on_selector(
-            '.gr-reiter button[data-tafel="tafel-katalog"]',
-            "e => e.getAttribute('aria-selected')",
+            "#tafel-katalog",
+            "e => String(getComputedStyle(e).display !== 'none' && e.offsetHeight > 0)",
         )
         == "true"
     ), "der Katalog-Reiter ist nach dem Sprung nicht aktiv"
@@ -174,7 +174,7 @@ def test_der_katalog_graph_sprung_waehlt_das_modell(paar):
     Vergleichs-Reiter ist aktiv und die URL traegt das GEWAEHLTE Modell -
     der dritte Reiter der Kette am selben Schluessel."""
     paar.goto(paar.url.split("#")[0].split("?")[0], wait_until="load")
-    paar.click('.gr-reiter button[data-tafel="tafel-katalog"]')
+    paar.evaluate("document.getElementById('tafel-katalog').scrollIntoView()")
     link = paar.query_selector(
         "#gr-katalogtabelle tr.gr-k-zeile a.gr-sprung[data-modell]"
     )
@@ -216,13 +216,15 @@ def test_ansicht_deep_link_schaltet_und_ueberlebt(paar):
         )
         == "true"
     )
-    paar.click('.gr-reiter button[data-tafel="tafel-katalog"]')
-    paar.click('.gr-kansicht button[data-ansicht="barpreis"]')
+    paar.evaluate("document.getElementById('tafel-katalog').scrollIntoView()")
+    paar.eval_on_selector(
+        '.gr-kansicht button[data-ansicht="barpreis"]', "e => e.click()"
+    )
     paar.wait_for_timeout(120)
     assert "ansicht=" not in paar.url, (
         f"ansicht-Parameter bleibt nach barpreis-Klick stehen: {paar.url}"
     )
-    paar.click('.gr-kansicht button[data-ansicht="tco"]')
+    paar.eval_on_selector('.gr-kansicht button[data-ansicht="tco"]', "e => e.click()")
     paar.wait_for_timeout(80)
     paar.click('.gr-reiter button[data-tafel="tafel-tco"]')
     paar.wait_for_timeout(80)

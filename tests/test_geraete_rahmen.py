@@ -173,7 +173,8 @@ def test_die_grafik_nennt_nur_buendel_anbieter(tmp_path):
 def test_die_ueberschrift_ist_sachlich_nicht_die_gescheiterte_frage(tmp_path):
     s = _baue(tmp_path)
     h1 = s.select_one("h1")
-    assert h1.get_text(strip=True) == "Gerätepreise"
+    assert "gx-held" in h1.get("class")
+    assert "Geräte sind mit Tarif bei Vodafone über 10" in h1.get_text(" ", strip=True)
     titel = s.select_one("title").get_text(strip=True)
     assert titel.endswith("· Gerätepreise")
     assert "Dieses Gerät" not in str(s)

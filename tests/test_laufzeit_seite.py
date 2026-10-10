@@ -110,6 +110,7 @@ def _oeffne(_basis, abfrage="", breite=1440, hoehe=900):
     try:
         s.goto(f"{basis}/geraete.html{abfrage}", wait_until="networkidle")
         s.click(".gr-reiter button[data-tafel='tafel-tco']")
+        s.click(".gx-bnd-auf")
         s.wait_for_timeout(300)
         yield s
     finally:

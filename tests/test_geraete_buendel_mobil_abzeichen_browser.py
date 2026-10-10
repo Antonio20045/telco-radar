@@ -251,6 +251,7 @@ def zeilen(tmp_path_factory, chromium):
         try:
             s = ctx.new_page()
             s.goto(f"{wurzel}/geraete.html", wait_until="networkidle")
+            s.click(".gx-bnd-auf")
             s.wait_for_timeout(300)
             daten = s.evaluate("""() => {
               const rows = [...document.querySelectorAll('#gr-buendel .gr-bnd')];

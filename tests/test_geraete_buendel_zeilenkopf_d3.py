@@ -298,6 +298,7 @@ def test_punkt1_ohne_ratenzahl_waeren_die_zeilen_wortgleich(site, chromium):
         seite = chromium.new_page(viewport={"width": breite, "height": 900})
         try:
             seite.goto((site / "geraete.html").as_uri())
+            seite.click(".gx-bnd-auf")
             gemessen = seite.eval_on_selector_all(
                 'details.gr-bnd[data-anbieter="congstar"]:not([open]) '
                 "summary .gr-bnd-raten",

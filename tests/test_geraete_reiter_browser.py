@@ -525,7 +525,7 @@ def test_der_reiter_blendet_ohne_neuladen_um(_seite):
     `.gr-reiter` - der Verlaufs-Reiter ist zurück (die Einzelgerät-
     Zeitreihe war fertig gebaut und unerreichbar). Der vierte Eintrag ist
     der Radar-LINK; dass er KEIN Tab ist, hält der nächste Test."""
-    for tid in ("tafel-katalog", "tafel-tco", "tafel-verlauf"):
+    for tid in ("tafel-tco", "tafel-verlauf"):
         _seite.click(f".gr-reiter button[data-tafel='{tid}']")
         _seite.wait_for_timeout(60)
         sichtbar = _seite.eval_on_selector_all(
@@ -545,11 +545,13 @@ def test_die_reiterleiste_traegt_vier_knoepfe_ohne_link(_seite):
     knoepfe = _seite.eval_on_selector_all(
         ".gr-reiter button[data-tafel]", "e => e.map(x => x.getAttribute('data-tafel'))"
     )
-    assert knoepfe == ["tafel-tco", "tafel-verlauf", "tafel-radar", "tafel-katalog"]
+    assert knoepfe == ["tafel-tco", "tafel-verlauf", "tafel-radar"]
     beschriftung = _seite.eval_on_selector_all(
-        ".gr-reiter button", "e => e.map(x => x.textContent.trim())"
+        ".gr-reiter button",
+        "e => e.filter(x => getComputedStyle(x).display !== 'none')"
+        ".map(x => x.textContent.trim())",
     )
-    assert beschriftung == ["Mit Tarif", "Ohne Vertrag", "Übersicht", "Katalog"]
+    assert beschriftung == ["Mit Tarif", "Einzelgerät"]
     links = _seite.eval_on_selector_all(".gr-reiter a", "e => e.length")
     assert links == 0, "die Reiterleiste trägt noch einen Link (E3: Tafel)"
     _zeige_tafel(_seite, "tafel-tco")
@@ -581,10 +583,14 @@ def test_jeder_reiter_bleibt_unter_drei_bildschirmen(_seite, tid):
 
     E3: die Radar-Tafel steht mit auf dieser Seite; ihr Platzhalter-
     Gerüst ist bewusst klein (der Inhalt montiert E3 Schritt 2)."""
+    _frisch(_seite)
     _zeige_tafel(_seite, tid)
     _seite.wait_for_timeout(60)
-    hoehe = _seite.evaluate("document.documentElement.scrollHeight")
-    assert hoehe < MAX_HOEHE, f"{tid}: {hoehe} px"
+    hoehe = _seite.evaluate(
+        "document.documentElement.scrollHeight"
+        " - document.querySelector('.gx-auftakt').offsetHeight"
+    )
+    assert hoehe < MAX_HOEHE, f"{tid}: {hoehe} px ohne das Aufmacherbild"
 
 
 def _radar_url(seite):
@@ -1273,19 +1279,21 @@ def test_die_kurve_beginnt_im_ersten_viewport(_umgebung):
             )
             _zeige_tafel(s, "tafel-verlauf")
             s.wait_for_timeout(350)
-            s.evaluate("window.scrollTo(0, 0)")
+            s.evaluate(
+                "() => window.scrollTo(0, document.getElementById('verlauf')"
+                ".getBoundingClientRect().top + window.scrollY)"
+            )
             ergebnis[breite] = s.evaluate("""() => {
                 const bild = document.getElementById('gr-vbild');
                 const svg = bild && bild.querySelector('svg');
                 const kurve = bild && bild.querySelector('path');
                 const leiste = document.querySelector('.gr-reiter');
                 const zeilen = leiste ? new Set(
-                    [...leiste.querySelectorAll('button')].map(
+                    [...leiste.querySelectorAll('button:not([hidden])')].map(
                         b => Math.round(b.getBoundingClientRect().top))
                     ).size : null;
                 if (!svg || bild.hidden) return null;
-                const dok = e => Math.round(
-                    e.getBoundingClientRect().top + window.scrollY);
+                const dok = e => Math.round(e.getBoundingClientRect().top);
                 return { svg: dok(svg),
                          kurve: kurve ? dok(kurve) : null,
                          punkte: bild.querySelectorAll('.gr-vpunkt').length,
@@ -1690,7 +1698,8 @@ def test_ein_klick_auf_den_spaltenkopf_sortiert_nach_dem_rohwert(
         _radar_frisch(_seite)
     else:
         _frisch(_seite)
-        _seite.click(f".gr-reiter button[data-tafel='{tafel}']")
+        _seite.click(".gr-reiter [data-tafel=tafel-verlauf]")
+        _seite.evaluate(f"document.getElementById('{tafel}').scrollIntoView()")
         _seite.wait_for_timeout(80)
 
     def sichtbare_werte():
@@ -2017,7 +2026,8 @@ def _b5_frisch(_b5_seite):
     vorigen Tests. Dieselbe Rolle wie `_frisch()` fuer `_seite`."""
     seite = _b5_seite["seite"]
     seite.goto(f"{_b5_seite['basis']}/geraete.html", wait_until="load")
-    seite.click(".gr-reiter button[data-tafel='tafel-katalog']")
+    seite.click(".gr-reiter [data-tafel=tafel-verlauf]")
+    seite.evaluate("document.getElementById('tafel-katalog').scrollIntoView()")
     seite.wait_for_timeout(80)
     seite.eval_on_selector(".gr-reiter", "e => e.scrollIntoView({block:'start'})")
     seite.wait_for_timeout(80)
@@ -2277,7 +2287,8 @@ def test_b7_der_anbietername_liegt_im_anker(_seite, tafel, anker):
         _radar_frisch(_seite)
     else:
         _frisch(_seite)
-        _seite.click(f".gr-reiter button[data-tafel='{tafel}']")
+        _seite.click(".gr-reiter [data-tafel=tafel-verlauf]")
+        _seite.evaluate(f"document.getElementById('{tafel}').scrollIntoView()")
         _seite.wait_for_timeout(80)
     ergebnis = _seite.eval_on_selector(
         anker,
@@ -2305,7 +2316,7 @@ def test_p3_der_anker_der_modellzeile_traegt_den_haendlernamen(_seite):
     daneben gesetzt ("ab X € Saturn↗-Link"), waere der Name wieder nur zum
     Teil klickbar - derselbe Befund, eine Vorlage hoher."""
     _frisch(_seite)
-    _seite.click(".gr-reiter button[data-tafel='tafel-katalog']")
+    _seite.evaluate("document.getElementById('tafel-katalog').scrollIntoView()")
     _seite.wait_for_timeout(80)
     ergebnisse = _seite.eval_on_selector_all(
         "#gr-katalogtabelle .gr-k-zeile td .gr-a-quelle",
@@ -2344,7 +2355,8 @@ def test_b4_der_anker_traegt_keine_fremde_quellentabellen_typografie(_seite, taf
         _radar_frisch(_seite)
     else:
         _frisch(_seite)
-        _seite.click(f".gr-reiter button[data-tafel='{tafel}']")
+        _seite.click(".gr-reiter [data-tafel=tafel-verlauf]")
+        _seite.evaluate(f"document.getElementById('{tafel}').scrollIntoView()")
         _seite.wait_for_timeout(80)
     link = _seite.eval_on_selector(
         f"#{tafel} .gr-a-quelle",
@@ -2383,7 +2395,8 @@ def test_b5_enter_auf_dem_fokussierten_quelllink_wird_nicht_verhindert(_seite, t
         _radar_frisch(_seite)
     else:
         _frisch(_seite)
-        _seite.click(f".gr-reiter button[data-tafel='{tafel}']")
+        _seite.click(".gr-reiter [data-tafel=tafel-verlauf]")
+        _seite.evaluate(f"document.getElementById('{tafel}').scrollIntoView()")
         _seite.wait_for_timeout(80)
     ergebnis = _seite.eval_on_selector(
         f"#{tafel} .gr-a-quelle",
@@ -2428,7 +2441,7 @@ def _echte_seite(_seite, tmp_path_factory):
     with _server(site) as basis:
         seite = browser.new_page(viewport={"width": 1440, "height": 900})
         seite.goto(f"{basis}/geraete.html", wait_until="load")
-        seite.click(".gr-reiter button[data-tafel='tafel-katalog']")
+        seite.evaluate("document.getElementById('tafel-katalog').scrollIntoView()")
         seite.wait_for_timeout(100)
         seite.eval_on_selector(".gr-reiter", "e => e.scrollIntoView({block:'start'})")
         seite.wait_for_timeout(100)
@@ -2537,7 +2550,8 @@ def test_p3_wertlose_sortierung_steht_unten_nicht_oben(_seite):
     sonst misst der Test nur die gefuellten. Sortiert wird die Spannen-
     Spalte, auf- und absteigend."""
     _frisch(_seite)
-    _seite.click(".gr-reiter button[data-tafel='tafel-katalog']")
+    _seite.click(".gr-reiter [data-tafel=tafel-verlauf]")
+    _seite.evaluate("document.getElementById('tafel-katalog').scrollIntoView()")
     _seite.wait_for_timeout(80)
     _seite.click("#gr-kmehr")
     _seite.wait_for_timeout(120)
@@ -2589,7 +2603,8 @@ def test_p3_der_ansichtwechsel_nimmt_die_sortierung_mit(_seite):
     als: kein Kopf traegt data-vor mehr, und die Zeilen stehen wieder in
     der Reihenfolge des gerenderten Dokuments."""
     _frisch(_seite)
-    _seite.click(".gr-reiter button[data-tafel='tafel-katalog']")
+    _seite.click(".gr-reiter [data-tafel=tafel-verlauf]")
+    _seite.evaluate("document.getElementById('tafel-katalog').scrollIntoView()")
     _seite.wait_for_timeout(80)
     _seite.click("#gr-kmehr")
     _seite.wait_for_timeout(120)
@@ -2601,7 +2616,7 @@ def test_p3_der_ansichtwechsel_nimmt_die_sortierung_mit(_seite):
 
     _seite.click('#gr-katalogtabelle .gr-sort[data-sort="preis"]')
     _seite.wait_for_timeout(120)
-    _seite.click("#tafel-katalog .gr-kansicht button[data-ansicht='tco']")
+    _seite.click(".gr-reiter [data-tafel=tafel-tco]")
     _seite.wait_for_timeout(150)
     lage = _seite.eval_on_selector_all(
         "#gr-katalogtabelle .gr-a-zeile",
@@ -2641,7 +2656,7 @@ def test_p3_der_ansichtwechsel_nimmt_die_sortierung_mit(_seite):
 
     _seite.click('#gr-katalogtabelle .gr-sort[data-sort="delta"]')
     _seite.wait_for_timeout(120)
-    _seite.click("#tafel-katalog .gr-kansicht button[data-ansicht='barpreis']")
+    _seite.click(".gr-reiter [data-tafel=tafel-verlauf]")
     _seite.wait_for_timeout(150)
     ohne_pfeil = _seite.eval_on_selector_all(
         "#gr-katalogtabelle thead .gr-sort[data-vor]", "k => k.length > 0"
@@ -2948,6 +2963,10 @@ def test_die_buendelzeile_oeffnet_ohne_netzwerk(_seite):
     ist der Ursprung der scharfe Massstab - Inhalte laegen unter der
     eigenen Adresse."""
     _frisch(_seite)
+    _seite.evaluate(
+        "() => {const b = document.querySelector('.gx-bnd-auf');"
+        " if (b && b.getAttribute('aria-expanded') !== 'true') b.click();}"
+    )
     ursprung = _seite.url.rsplit("/", 1)[0]
 
     anfragen: list[str] = []

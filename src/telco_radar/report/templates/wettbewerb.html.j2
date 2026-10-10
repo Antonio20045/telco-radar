@@ -1,21 +1,25 @@
-{# Wettbewerb · Deutschland (Redesign 09.10.2026).
+{# Wettbewerb · Deutschland als Kinostrecke (Antonio, 10.10.2026).
 
-   Ein Tab mit zwei Ansichten: Deutschland (diese Seite: Telekom, O2, 1&1)
-   und Welt (differenzierung.html: die zwoelf Hebel weltweit). Beide
-   Dateien bleiben bestehen - ihre Anker stehen in Mails und im Suchindex.
-
-   Jeder Wettbewerber ist ein ruhiges Portraet: der Name gross, die Lage in
-   wenigen Saetzen, die drei letzten Schritte als kurzer Zeitstrahl, seine
-   Hebel als schlichte Woerter, ein Verweis auf seine laufenden Aktionen.
-   Die lange Chronik liegt zugeklappt darunter. Jede Schlagzeile traegt
-   `szl` (CLAUDE.md §5). #}
+   AUFTAKT   Vollbild, das beim Scrollen zum Fenster schrumpft; unten die
+             Meldungen dieser Woche je Wettbewerber.
+   PULS      Meldungen je Kalenderwoche (`wettbewerb_puls`), Ausfallwochen
+             als beschriftete Luecke.
+   KAPITEL   Je Wettbewerber ein Vollbild, ueber das ein Blatt faehrt: Lage,
+             Themen, Hebel, die letzten drei Schritte, die ganze Chronik
+             zugeklappt. Jede Schlagzeile traegt `szl` (CLAUDE.md §5). #}
 {% extends "base.html.j2" %}
 {% from "_seit.html.j2" import seit_block %}
 {% import "_design.html.j2" as d %}
 {% set active = 'wettbewerb' %}
 {% set buehne = true %}
+{% set wrap_class = 'voll' %}
 {% block title %}Marktrecherche · Wettbewerb{% endblock %}
 {% set ANBIETER_KLASSE = {'deutsche-telekom': 'telekom', 'telefonica-o2': 'o2', '1-1': '1-1'} %}
+{% set KURZ = {'deutsche-telekom': 'Telekom', 'telefonica-o2': 'O2', '1-1': '1&1'} %}
+{% set KAPITELBILD = {'deutsche-telekom': 'kapitel-das-wichtigste', 'telefonica-o2': 'kapitel-deutschland', '1-1': 'kapitel-auf-einen-blick'} %}
+{% set puls = wettbewerb.puls or {} %}
+{% set reihe_je = {} %}
+{% for r in puls.reihen or [] %}{% set _ = reihe_je.update({r.anker: r}) %}{% endfor %}
 
 {% macro chronik_liste(eintraege) %}
 <ol class="wb-liste">
@@ -32,89 +36,124 @@
 {% endmacro %}
 
 {% block buehne %}
-{% call d.band('band-wettbewerb', 'Wettbewerb', 'Deutschland', prefix) %}
-{{ d.umschalter([{'key': 'de', 'href': 'wettbewerb.html', 'label': 'Deutschland'},
-                 {'key': 'welt', 'href': 'differenzierung.html', 'label': 'Welt'}], 'de', prefix, 'Ansicht') }}
-{% endcall %}
-{% endblock %}
-
-{% block content %}
-<div class="wb-einstieg" data-auftritt>
-  <p class="wb-lead">Was Telekom, O2 und 1&amp;1 gerade tun – und wie es zu den Wochen davor passt.</p>
-  {{ seit_block(seit, date_de) }}
-</div>
-{% if wettbewerb.wettbewerber %}
-<nav class="wb-sprung" aria-label="Die drei Wettbewerber" data-auftritt>
-  {% for c in wettbewerb.wettbewerber %}<a href="#{{ c.anker }}"><span class="anb-punkt gr-anb--{{ ANBIETER_KLASSE.get(c.anker, 'ohne-farbe') }}" aria-hidden="true"></span>{{ c.name }}</a>{% endfor %}
-</nav>
-{% endif %}
-<div id="chronik" style="scroll-margin-top:90px"></div>
-
-{% for c in wettbewerb.wettbewerber %}
-{% set erste = (c.monate[0].offen if c.monate else []) %}
-<section class="wb portraet{% if loop.first %} wb--erste{% endif %}" id="{{ c.anker }}" style="scroll-margin-top:96px">
-  <div class="portraet-kopf" data-auftritt>
-    <h2 class="wb-name"><span class="anb-punkt gr-anb--{{ ANBIETER_KLASSE.get(c.anker, 'ohne-farbe') }}" aria-hidden="true"></span>{{ c.name }}</h2>
-    {% if c.n_chronik %}<span class="rubrik-zahl">{{ c.n_chronik }}
-      Meldung{{ 'en' if c.n_chronik != 1 else '' }} seit {{ c.seit | date_de }}</span>{% endif %}
-  </div>
-  <div class="portraet-raster">
-    <div class="portraet-lage" data-auftritt>
-      {% if c.summary %}
-      <p class="wb-summary">{{ c.summary }}</p>
-      {% elif c.fehler %}
-      <p class="empty-note"><b>Für diesen Lauf liegt kein Profil vor.</b>
-        Der Fehler steht im <a href="{{ prefix }}transparenz.html">Laufprotokoll</a>.</p>
-      {% else %}
-      <p class="muted-note">Für diesen Wettbewerber liegt noch kein Profil vor.</p>
-      {% endif %}
-      {% if c.hebel %}
-      <div class="wb-hebel">
-        <p class="wb-spaltentitel">Womit er sich abhebt</p>
-        <p class="hebel-woerter">{% for h in c.hebel %}<a href="{{ prefix }}differenzierung.html#dz-theme-{{ h.key }}" title="{{ h.n }} Beispiel{{ 'e' if h.n != 1 else '' }}{% if h.beispiel %}: {{ h.beispiel }}{% endif %}">{{ h.label }}</a>{% endfor %}</p>
-        {% if c.flanken %}
-        <p class="wb-flanken">Ohne Beispiel bei diesem Anbieter, aber bei
-          {% for f in c.flanken[:3] %}<b>{{ f.label }}</b> ({{ f.wer | join(', ') }}){{ ", " if not loop.last }}{% endfor %}.</p>
-        {% endif %}
+<section class="wa-auftakt" data-buehne>
+  <div class="wa-auftakt-buehne">
+    <div class="wa-rahmen">
+      <div class="wa-bild" aria-hidden="true">{{ d.motiv('band-wettbewerb', prefix, 'wa-motiv', eager=true) }}</div>
+      <div class="wa-schleier" aria-hidden="true"></div>
+      <div class="wa-text">
+        <div class="wa-dach"><span>Wettbewerb</span>
+          {{ d.umschalter([{'key': 'de', 'href': 'wettbewerb.html', 'label': 'Deutschland'},
+                           {'key': 'welt', 'href': 'differenzierung.html', 'label': 'Welt'}], 'de', prefix, 'Ansicht') }}
+          {% if wettbewerb.stand %}<span class="wa-stand">Stand {{ wettbewerb.stand | date_de }}</span>{% endif %}</div>
+        <h1 class="wa-titel">{% for c in wettbewerb.wettbewerber %}<span><em class="gr-anb--{{ ANBIETER_KLASSE.get(c.anker, 'ohne-farbe') }}" style="--i:{{ loop.index0 }}">{{ KURZ.get(c.anker, c.name) }}</em></span>{% else %}<span><em>Wettbewerb</em></span>{% endfor %}</h1>
       </div>
-      {% endif %}
-      {% if wettbewerb.promo_bekannt %}
-      <p class="portraet-aktionen">{% if c.aktionen %}<a class="knopf" href="{{ prefix }}promo/index.html">{{ c.aktionen_n }}
-        laufende Aktion{{ 'en' if c.aktionen_n != 1 else '' }} &rarr;</a>
-        {% else %}<span class="muted-note">Zurzeit ist keine Aktion bestätigt.</span>{% endif %}
-        {% if c.marken %}<span class="wb-marken">Marken: {{ c.marken | join(', ') }}</span>{% endif %}</p>
-      {% endif %}
-    </div>
-    <div class="portraet-zeit" data-auftritt>
-      <p class="wb-spaltentitel">Die letzten Schritte</p>
-      {% if erste %}
-      <ol class="zeitstrahl">
-        {% for e in erste[:3] %}
-        <li class="zeitstrahl-punkt">
-          <span class="zeitstrahl-tag">{{ e.tag }}</span>
-          <a class="zeitstrahl-titel wb-titel szl" href="{{ e.url }}" target="_blank" rel="noopener">{{ e.titel }}</a>
-          <span class="zeitstrahl-meta">{{ e.rubrik }}{% if e.quelle %} · {{ e.quelle }}{% endif %}</span>
+      {% if puls.reihen %}
+      <ol class="wa-anzeige">
+        {% for r in puls.reihen %}
+        <li class="gr-anb--{{ r.klasse }}" style="--i:{{ loop.index0 }}">
+          <span class="wa-anz-name">{{ r.name }}</span>
+          {% if r.diese_woche is none %}<span class="wa-anz-zahl">–</span><span class="wa-anz-text">diese Woche nicht bewertet</span>
+          {% else %}<span class="wa-anz-zahl" data-zaehler="{{ r.diese_woche }}">{{ r.diese_woche }}</span><span class="wa-anz-text">Meldungen diese Woche (KW {{ puls.wochen[-1].kw }})</span>{% endif %}
         </li>
         {% endfor %}
       </ol>
-      {% else %}
-      <p class="muted-note">Seit Beobachtungsbeginn ist zu {{ c.name }} keine Meldung eingegangen.</p>
       {% endif %}
+      <div class="wa-hinweis" aria-hidden="true"></div>
     </div>
+    <p class="wa-satz">Was Telekom, O2 und 1&amp;1 gerade tun und wie es zu den Wochen davor passt.</p>
   </div>
-  {% if c.monate %}
-  <details class="wb-chronik portraet-chronik">
-    <summary>Alle Meldungen von {{ c.name }}<span>{{ c.n_chronik }}</span></summary>
-    {% for m in c.monate %}
-    <p class="wb-monat">{{ m.monat | monat_de }}<span>{{ m.n }}</span></p>
-    {{ chronik_liste(m.eintraege if m.eintraege else (m.offen + (m.rest or []))) }}
-    {% endfor %}
-  </details>
-  {% endif %}
+</section>
+{% endblock %}
+
+{% block content %}
+{% if puls.wochen %}
+<section class="wa-puls" id="puls" data-puls>
+  <div class="wa-puls-kopf">
+    <h2>Wer wie oft <i>in den Meldungen steht</i></h2>
+    <p>Meldungen je Kalenderwoche, KW {{ puls.wochen[0].kw }} bis KW {{ puls.wochen[-1].kw }}.</p>
+  </div>
+  <div class="wa-puls-rahmen">{{ puls.svg }}</div>
+  <nav class="wa-sprung" aria-label="Zu den Wettbewerbern">
+    {% for c in wettbewerb.wettbewerber %}<a class="gr-anb--{{ ANBIETER_KLASSE.get(c.anker, 'ohne-farbe') }}" href="#{{ c.anker }}"><span aria-hidden="true"></span>{{ KURZ.get(c.anker, c.name) }}</a>{% endfor %}
+  </nav>
+  {{ seit_block(seit, date_de) }}
 </section>
 {% else %}
-<p class="empty-note">Für diese Seite liegt noch kein Bericht im Archiv.</p>
+<div class="wa-puls">{{ seit_block(seit, date_de) }}</div>
+{% endif %}
+<div id="chronik"></div>
+
+{% for c in wettbewerb.wettbewerber %}
+{% set erste = (c.monate[0].offen if c.monate else []) %}
+{% set themen = (puls.themen or {}).get(c.anker, []) %}
+<section class="wb wa-kapitel gr-anb--{{ ANBIETER_KLASSE.get(c.anker, 'ohne-farbe') }}" id="{{ c.anker }}">
+  <div class="wa-kapitel-buehne" data-buehne>
+    <div class="wa-kapitel-bild" aria-hidden="true">{{ d.motiv(KAPITELBILD.get(c.anker), prefix, 'wa-motiv') }}</div>
+    <div class="wa-schleier" aria-hidden="true"></div>
+    <div class="wa-kapitel-titel">
+      <p class="wa-nr">{{ loop.index }} / {{ loop.length }}</p>
+      <h2 class="wb-name">{{ c.name }}</h2>
+      {% if c.n_chronik %}<p class="wa-kapitel-zahl"><span class="rubrik-zahl"><b data-zaehler="{{ c.n_chronik }}">{{ c.n_chronik }}</b>
+        Meldung{{ 'en' if c.n_chronik != 1 else '' }} seit {{ c.seit | date_de }}</span></p>{% endif %}
+    </div>
+  </div>
+  <div class="wa-blatt">
+    <div class="wa-blatt-innen">
+      <div class="wa-lage" data-auftritt>
+        <p class="wa-etikett">Die Lage</p>
+        {% if c.summary %}
+        <p class="wb-summary">{{ c.summary }}</p>
+        {% elif c.fehler %}
+        <p class="empty-note"><b>Für diesen Lauf liegt kein Profil vor.</b>
+          Der Fehler steht im <a href="{{ prefix }}transparenz.html">Laufprotokoll</a>.</p>
+        {% else %}
+        <p class="muted-note">Für diesen Wettbewerber liegt noch kein Profil vor.</p>
+        {% endif %}
+        {% if themen %}
+        <p class="wa-etikett">Worüber berichtet wird</p>
+        <div class="wa-themen">{% for t in themen %}<span class="wa-thema" style="--anteil:{{ t.anteil }}"><b>{{ t.name }}</b><i>{{ t.prozent }} %</i></span>{% endfor %}</div>
+        {% endif %}
+        <p class="wa-etikett">Womit {{ KURZ.get(c.anker, c.name) }} sich abhebt</p>
+        {% if c.hebel %}
+        <p class="hebel-woerter">{% for h in c.hebel %}<a href="{{ prefix }}differenzierung.html#dz-theme-{{ h.key }}">{{ h.label }}</a>{% endfor %}</p>
+        {% else %}
+        <p class="hebel-woerter"><span class="wa-leer">Noch kein Beispiel erfasst</span></p>
+        {% endif %}
+      </div>
+      <div class="wa-schritte-spalte" data-auftritt>
+        <p class="wa-etikett">Die letzten Schritte</p>
+        {% if erste %}
+        <ol class="zeitstrahl wa-schritte">
+          {% for e in erste[:3] %}
+          <li class="zeitstrahl-punkt" style="--v:{{ loop.index0 * 0.12 }}s">
+            <span class="zeitstrahl-tag">{{ e.tag }}</span>
+            <a class="zeitstrahl-titel wb-titel szl" href="{{ e.url }}" target="_blank" rel="noopener">{{ e.titel }}</a>
+            <span class="zeitstrahl-meta">{{ e.rubrik }}{% if e.quelle %} · {{ e.quelle }}{% endif %}</span>
+          </li>
+          {% endfor %}
+        </ol>
+        {% else %}
+        <p class="muted-note">Seit Beobachtungsbeginn ist zu {{ c.name }} keine Meldung eingegangen.</p>
+        {% endif %}
+        {% if wettbewerb.promo_bekannt and c.aktionen %}
+        <p class="wa-fuss"><a class="wa-knopf" href="{{ prefix }}promo/index.html">{{ c.aktionen_n }} laufende Aktion{{ 'en' if c.aktionen_n != 1 else '' }}</a></p>
+        {% endif %}
+        {% if c.marken %}<p class="wa-marken">Marken: {{ c.marken | join(', ') }}</p>{% endif %}
+      </div>
+    </div>
+    {% if c.monate %}
+    <details class="wb-chronik wa-chronik">
+      <summary>Alle Meldungen von {{ KURZ.get(c.anker, c.name) }}<span>{{ c.n_chronik }}</span></summary>
+      {% for m in c.monate %}
+      <p class="wb-monat">{{ m.monat | monat_de }}<span>{{ m.n }}</span></p>
+      {{ chronik_liste(m.eintraege if m.eintraege else (m.offen + (m.rest or []))) }}
+      {% endfor %}
+    </details>
+    {% endif %}
+  </div>
+</section>
+{% else %}
+<p class="empty-note wa-leer-seite">Für diese Seite liegt noch kein Bericht im Archiv.</p>
 {% endfor %}
-<p class="dz-foot">Diese Seite baut sich bei jedem Lauf neu aus dem Berichtsarchiv auf – aus den
-  Wettbewerbsprofilen der Ausgaben und der <a href="{{ prefix }}promo/index.html">Promo Übersicht</a>.</p>
 {% endblock %}

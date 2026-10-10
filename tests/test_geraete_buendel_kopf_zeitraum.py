@@ -371,6 +371,10 @@ def test_die_sortierung_stellt_zwei_zeitraeume_nicht_in_einen_rang(seite):
     Gegen den alten Stand rot: dort lautete die Reihe nach dem Klick
     [congstar, o2, Telekom, Vodafone].
     """
+    seite.evaluate(
+        "() => {const b = document.querySelector('.gx-bnd-auf');"
+        " if (b && b.getAttribute('aria-expanded') !== 'true') b.click();}"
+    )
     seite.click("#gr-buendel .gr-bnd-kopf button[data-bsort='tco']")
     seite.wait_for_timeout(120)
     reihe = _reihe(seite)
@@ -395,6 +399,10 @@ def test_die_umgekehrte_richtung_dreht_nur_innerhalb_des_zeitraums(seite):
     rangiert wird: der zweite Klick dreht die Betraege INNERHALB der
     24-Monats-Gruppe - die 36er bleibt fuer sich und wandert nicht als
     "guenstigstes Angebot" nach vorn."""
+    seite.evaluate(
+        "() => {const b = document.querySelector('.gx-bnd-auf');"
+        " if (b && b.getAttribute('aria-expanded') !== 'true') b.click();}"
+    )
     knopf = "#gr-buendel .gr-bnd-kopf button[data-bsort='tco']"
     seite.click(knopf)
     seite.wait_for_timeout(120)
@@ -412,6 +420,10 @@ def test_eine_zeile_ohne_gemessenen_zeitraum_rangiert_hinten_und_bleibt(seite):
     deren Attribut im DOM geleert wird: der Bestand kennt diesen Fall
     heute nicht (ohne gemessene Laufzeit ist die Kennzahl unbelastbar),
     die Sortierung muss ihn trotzdem tragen."""
+    seite.evaluate(
+        "() => {const b = document.querySelector('.gx-bnd-auf');"
+        " if (b && b.getAttribute('aria-expanded') !== 'true') b.click();}"
+    )
     seite.eval_on_selector(
         "#gr-bndliste .gr-bnd[data-anbieter='congstar']",
         "z => z.setAttribute('data-leitzahl-monate', '')",
@@ -432,6 +444,10 @@ def test_die_anbieter_sortierung_bleibt_eine_reine_namensfolge(seite):
     Kostenrang. Unter „alle“ steht zuerst die Laufzeit-Gruppe (Datenkonzept
     Geräte 5.4: 24 Raten nie in einem Rang mit 36); innerhalb der Gruppe ist
     die Anbieterfolge eine reine Namensfolge."""
+    seite.evaluate(
+        "() => {const b = document.querySelector('.gx-bnd-auf');"
+        " if (b && b.getAttribute('aria-expanded') !== 'true') b.click();}"
+    )
     seite.click("#gr-buendel .gr-bnd-kopf button[data-bsort='anbieter']")
     seite.wait_for_timeout(120)
     reihe = _reihe(seite)

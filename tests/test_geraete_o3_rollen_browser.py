@@ -305,6 +305,10 @@ def test_die_sortierung_ordnet_ohne_reload(seite):
     Kopfknopf — ohne Reload. Ein gesetztes window-Flag überlebt nur ohne
     Navigation. Gemessen wird die BANDLISTE (`#gr-bndliste`): die
     Ohne-Band-Gruppe darunter ist eine eigene Liste mit eigenem Kopf."""
+    seite.evaluate(
+        "() => {const b = document.querySelector('.gx-bnd-auf');"
+        " if (b && b.getAttribute('aria-expanded') !== 'true') b.click();}"
+    )
     seite.evaluate("window.__o3_kein_reload = 1")
     werte = seite.eval_on_selector_all(
         "#gr-bndliste .gr-bnd:not([hidden])",
@@ -337,6 +341,10 @@ def test_die_sortierung_ordnet_ohne_reload(seite):
 def test_die_delta_sortierung_stellt_den_guenstigsten_nach_vorn(seite):
     """C: Δ aufsteigend heißt: der negativste Abstand zur Vodafone-Referenz
     zuerst. Zeilen ohne Δ (Referenz, Näherung) stehen dahinter."""
+    seite.evaluate(
+        "() => {const b = document.querySelector('.gx-bnd-auf');"
+        " if (b && b.getAttribute('aria-expanded') !== 'true') b.click();}"
+    )
     seite.click("#gr-buendel .gr-bnd-kopf button[data-bsort='delta']")
     seite.wait_for_timeout(120)
     deltas = seite.eval_on_selector_all(
@@ -515,6 +523,10 @@ def test_jede_buendelzeile_traegt_genau_ein_aufklappzeichen(ctx, breite):
     s = browser.new_page(viewport={"width": breite, "height": 900})
     try:
         s.goto(f"{wurzel}/geraete.html", wait_until="load")
+        s.evaluate(
+            "() => {const b = document.querySelector('.gx-bnd-auf');"
+            " if (b && b.getAttribute('aria-expanded') !== 'true') b.click();}"
+        )
         s.wait_for_timeout(300)
         lies = """() => [...document.querySelectorAll(
             '#tafel-tco details.gr-bnd')].filter(d => d.offsetParent)
@@ -556,6 +568,10 @@ def test_der_zweite_preis_der_buendelzeile_ist_am_telefon_benannt(ctx, breite):
     s = browser.new_page(viewport={"width": breite, "height": 844})
     try:
         s.goto(f"{wurzel}/geraete.html", wait_until="load")
+        s.evaluate(
+            "() => {const b = document.querySelector('.gx-bnd-auf');"
+            " if (b && b.getAttribute('aria-expanded') !== 'true') b.click();}"
+        )
         s.wait_for_timeout(300)
         m = s.evaluate("""() => [...document.querySelectorAll(
             '#tafel-tco details.gr-bnd')].filter(d => d.offsetParent)
@@ -619,21 +635,23 @@ def test_der_katalog_steht_am_telefon_als_karten(ctx):
     s = browser.new_page(viewport={"width": 390, "height": 844})
     try:
         s.goto(f"{wurzel}/geraete.html#tafel-katalog", wait_until="load")
-        s.click(".gr-reiter [data-tafel=tafel-katalog]")
+        s.evaluate("document.getElementById('tafel-katalog').scrollIntoView()")
         s.wait_for_timeout(300)
         m = s.evaluate(_KATALOG_MESSEN)
         an = [z for z in m["zeilen"] if z["an"]]
         assert an, "keine sichtbare Katalogzeile"
         for z in an:
             assert z["rechts"] <= m["boxRechts"] + 1, (z, m["boxRechts"])
-            assert all(d == "block" for d in z["bar"]), z
-            assert all(d == "none" for d in z["tco"]), z
-        s.click(".gr-kansicht [data-ansicht=tco]")
+            assert all(d == "none" for d in z["bar"]), z
+            assert all(d == "block" for d in z["tco"]), z
+        s.click(".gr-reiter [data-tafel=tafel-verlauf]")
         s.wait_for_timeout(200)
         m = s.evaluate(_KATALOG_MESSEN)
         for z in (z for z in m["zeilen"] if z["an"]):
-            assert all(d == "none" for d in z["bar"]), z
-            assert all(d == "block" for d in z["tco"]), z
+            assert all(d == "block" for d in z["bar"]), z
+            assert all(d == "none" for d in z["tco"]), z
+        s.click(".gr-reiter [data-tafel=tafel-tco]")
+        s.wait_for_timeout(200)
         etikett = s.evaluate("""() => getComputedStyle(document.querySelector(
           '#gr-katalogtabelle tr.gr-a-zeile td.gr-sp--tco'), '::before').content""")
         kopf = s.evaluate("""() => document.querySelector(
@@ -645,11 +663,11 @@ def test_der_katalog_steht_am_telefon_als_karten(ctx):
     s = browser.new_page(viewport={"width": 1440, "height": 900})
     try:
         s.goto(f"{wurzel}/geraete.html#tafel-katalog", wait_until="load")
-        s.click(".gr-reiter [data-tafel=tafel-katalog]")
+        s.evaluate("document.getElementById('tafel-katalog').scrollIntoView()")
         s.wait_for_timeout(300)
         m = s.evaluate(_KATALOG_MESSEN)
         an = [z for z in m["zeilen"] if z["an"]]
-        assert an and all(d == "table-cell" for z in an for d in z["bar"]), an
+        assert an and all(d == "table-cell" for z in an for d in z["tco"]), an
     finally:
         s.close()
 
@@ -670,7 +688,7 @@ def test_katalogkarten_folgen_den_sichtbarkeitsregeln_der_tabelle(ctx):
     s = browser.new_page(viewport={"width": 390, "height": 844})
     try:
         s.goto(f"{wurzel}/geraete.html#tafel-katalog", wait_until="load")
-        s.click(".gr-reiter [data-tafel=tafel-katalog]")
+        s.evaluate("document.getElementById('tafel-katalog').scrollIntoView()")
         s.wait_for_timeout(300)
         assert s.evaluate(_KARTE_ANZEIGE) != "none"
         s.evaluate("""() => { document.querySelector(
@@ -696,7 +714,7 @@ def test_aufgeklappte_katalogkarte_rollt_in_sich_und_ziel_ist_markiert(ctx):
     s = browser.new_page(viewport={"width": 390, "height": 844})
     try:
         s.goto(f"{wurzel}/geraete.html#tafel-katalog", wait_until="load")
-        s.click(".gr-reiter [data-tafel=tafel-katalog]")
+        s.evaluate("document.getElementById('tafel-katalog').scrollIntoView()")
         s.wait_for_timeout(300)
         s.focus("#gr-katalogtabelle tbody tr.gr-a-zeile:not(.gr-k--ohne-details)")
         s.keyboard.press("Enter")
@@ -742,6 +760,10 @@ def test_die_erste_balkenzeile_bleibt_ueber_der_telefon_falz(ctx):
     s = browser.new_page(viewport={"width": 390, "height": 844})
     try:
         s.goto(f"{wurzel}/geraete.html", wait_until="load")
+        s.evaluate(
+            "() => window.scrollTo(0, document.getElementById('tco')"
+            ".getBoundingClientRect().top + window.scrollY)"
+        )
         s.wait_for_timeout(400)
         box = s.evaluate("""() => {
           const e = document.querySelector('#tafel-tco .gr-zr-antwort');

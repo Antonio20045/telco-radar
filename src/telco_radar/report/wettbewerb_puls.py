@@ -14,6 +14,9 @@ from datetime import date, timedelta
 from markupsafe import Markup, escape
 
 WOCHEN = 13
+THEMEN = 4
+WEITERE = "Weitere"
+SONSTIGES = "Sonstiges"
 
 KLASSE = {"deutsche-telekom": "telekom", "telefonica-o2": "o2", "1-1": "1-1"}
 KURZNAME = {"deutsche-telekom": "Telekom", "telefonica-o2": "O2", "1-1": "1&1"}
@@ -89,13 +92,52 @@ def puls(daten_je_anker: dict[str, list[str]], wochen: list[dict], stand: str) -
     return {"wochen": spalten, "reihen": reihen, "ausfall": ausfall}
 
 
+def themen(rubriken: list[str]) -> list[dict]:
+    """Worüber berichtet wird: die häufigsten Rubriken, der Rest als "Weitere".
+
+    Die Anteile summieren sich auf die Zahl der Einträge; Prozent gerundet.
+    """
+    gesamt = len(rubriken)
+    if not gesamt:
+        return []
+    zaehler: dict[str, int] = {}
+    for r in rubriken:
+        zaehler[r] = zaehler.get(r, 0) + 1
+    reihe = sorted(zaehler.items(), key=lambda t: (-t[1], t[0]))
+    oben = reihe[:THEMEN]
+    rest = gesamt - sum(n for _, n in oben)
+    if rest:
+        oben.append((WEITERE, rest))
+    return [
+        {
+            "name": t,
+            "n": n,
+            "anteil": round(n / gesamt, 3),
+            "prozent": round(100 * n / gesamt),
+        }
+        for t, n in oben
+    ]
+
+
 def aus_ansicht(ansicht: dict, wochen: list[dict]) -> dict:
     """Der Puls zur fertigen Wettbewerbsansicht: Daten aus ihrer Chronik."""
     daten = {
         w["anker"]: [e["datum"] for m in w["monate"] for e in m["eintraege"]]
         for w in ansicht["wettbewerber"]
     }
-    return puls(daten, wochen, ansicht["stand"])
+    ergebnis = puls(daten, wochen, ansicht["stand"])
+    ergebnis["themen"] = {
+        w["anker"]: themen(
+            [
+                e.get("rubrik") or "Sonstiges"
+                for m in w["monate"]
+                for e in m["eintraege"]
+            ]
+        )
+        for w in ansicht["wettbewerber"]
+    }
+    ergebnis["svg"] = svg(ergebnis)
+    return ergebnis
 
 
 def _stuecke(spalten: list[dict]) -> list[list[int]]:
@@ -230,7 +272,12 @@ def _linien(daten: dict, a: _Achsen) -> list[str]:
 
 def _enden(daten: dict, a: _Achsen) -> list[str]:
     enden = sorted(
-        (a.y(r["werte"][-1]), r) for r in daten["reihen"] if r["werte"][-1] is not None
+        (
+            (a.y(r["werte"][-1]), r)
+            for r in daten["reihen"]
+            if r["werte"][-1] is not None
+        ),
+        key=lambda t: (t[0], t[1]["name"]),
     )
     teile, vorher = [], -99.0
     for y, r in enden:

@@ -78,3 +78,44 @@ def test_aus_ansicht_liest_chronik():
     p = wp.aus_ansicht(ansicht, _laeufe())
     assert p["reihen"][0]["diese_woche"] == 2
     assert p["reihen"][0]["klasse"] == "o2"
+
+
+def test_themen_summieren_auf_alle_eintraege():
+    rubriken = ["Tarif"] * 5 + ["Netz"] * 3 + ["KI", "Geräte", "Marke", "Sport"]
+    t = wp.themen(rubriken)
+    assert [x["name"] for x in t] == ["Tarif", "Netz", "Geräte", "KI", wp.WEITERE]
+    assert sum(x["n"] for x in t) == len(rubriken)
+    assert t[0]["prozent"] == 42
+    assert t[-1]["n"] == 2
+    assert wp.themen([]) == []
+
+
+def test_aus_ansicht_haengt_themen_je_wettbewerber_an():
+    ansicht = {
+        "stand": "2026-10-07",
+        "wettbewerber": [
+            {
+                "anker": "1-1",
+                "monate": [
+                    {
+                        "eintraege": [
+                            {"datum": "2026-10-06", "rubrik": "Netz"},
+                            {"datum": "2026-10-05", "rubrik": ""},
+                        ]
+                    }
+                ],
+            }
+        ],
+    }
+    t = wp.aus_ansicht(ansicht, _laeufe())["themen"]["1-1"]
+    assert {x["name"]: x["n"] for x in t} == {"Netz": 1, "Sonstiges": 1}
+
+
+def test_gleichstand_am_ende_zeichnet_beide_namen():
+    daten = wp.puls(
+        {"telefonica-o2": ["2026-10-06"], "1-1": ["2026-10-06"]},
+        _laeufe(),
+        "2026-10-07",
+    )
+    bild = str(wp.svg(daten))
+    assert "O2 1" in bild and "1&amp;1 1" in bild

@@ -681,7 +681,7 @@ def test_die_export_links_stehen_in_der_fusszeile(geraete):
     assert links, "kein Export-Link auf der Geräteseite"
     for a in links:
         assert fuss in a.parents, f"Export-Link außerhalb der Fußzeile: {a.get('href')}"
-    hero = geraete.select_one("section.page-hero")
+    hero = geraete.select_one("section.gx-auftakt")
     assert hero is not None
     assert not hero.select("a[href^='exporte/']"), (
         "Export-Knöpfe stehen noch in der Kopfzeile (P4/D4: Fußzeile)"

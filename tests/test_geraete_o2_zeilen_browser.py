@@ -321,6 +321,10 @@ def test_der_zeilen_aufklapper_oeffnet_ohne_netzwerk(seite):
     """E1: alles bleibt im Dokument erreichbar - das Öffnen einer Zeile ist
     reines UI (derselbe Maßstab wie der OPTIK-6-Klapptest, nur an der
     Zeile)."""
+    seite.evaluate(
+        "() => {const b = document.querySelector('.gx-bnd-auf');"
+        " if (b && b.getAttribute('aria-expanded') !== 'true') b.click();}"
+    )
     ursprung = seite.url.rsplit("/", 1)[0]
     anfragen: list[str] = []
 
@@ -427,6 +431,10 @@ def test_zeilen_stapeln_sich_auf_dem_telefon_ohne_querscroll(telefon):
     Scroll-Container NUR wenn unvermeidbar - bevorzugt Zeilen-Stapel wie
     im Entwurf.' Gemessen: keine Zeile läuft aus dem 390-px-Rahmen, und
     die Seite rollt nicht waagerecht."""
+    telefon.evaluate(
+        "() => {const b = document.querySelector('.gx-bnd-auf');"
+        " if (b && b.getAttribute('aria-expanded') !== 'true') b.click();}"
+    )
     quer = telefon.evaluate(
         "() => Math.max(document.documentElement.scrollWidth,"
         "               document.body.scrollWidth)"

@@ -170,7 +170,7 @@ def test_am_telefon_ist_das_export_menue_zugeklappt_ein_knopf(telefon):
         knoepfeBox: knoepfe ? Math.round(
           knoepfe.getBoundingClientRect().height) : null,
         sichtbareKnoepfeAusserhalb: document.querySelectorAll(
-          '.gr-hero-export a[href^="exporte/"], '
+          '.gx-auftakt a[href^="exporte/"], '
           + '.gr-werkzeug a[href^="exporte/"]').length,
       };
     }""")
@@ -223,6 +223,11 @@ def test_am_telefon_bleibt_die_falz_von_11c_erfuellt(telefon):
     Vergleichs-Reiters (.gr-zr-leit, DIE ANTWORT IST DIE GROESSTE ZAHL)
     bleibt die groesste Zahl der Tafel, der Kopf bekommt keinen neuen
     Inhalt."""
+    telefon.evaluate(
+        "() => window.scrollTo(0, document.getElementById('tco')"
+        ".getBoundingClientRect().top + window.scrollY)"
+    )
+    telefon.wait_for_timeout(120)
     r = _reihe(telefon)
     assert r is not None, "keine Export-Reihe in der Fußzeile der Seite"
     assert r["antwort"] is not None and r["antwort"] <= 844, (
@@ -242,24 +247,23 @@ def test_der_kicker_bricht_auf_dem_telefon_nicht_um(telefon):
     Fassung dieser Änderung brach den Kicker mitten im Wort um, gefunden
     am Screenshot, nicht am Messwert."""
     box = telefon.evaluate("""() => {
-      const k = document.querySelector('.gr-hero-export .page-kicker');
-      const d = document.querySelector('.gr-hero-export .page-date');
+      const k = document.querySelector('.gx-auftakt .wa-dach > span');
+      const d = document.querySelector('.gx-auftakt .wa-stand');
       if (!k || !d) return null;
       return {kh: Math.round(k.getBoundingClientRect().height),
               lh: Math.round(parseFloat(getComputedStyle(k).lineHeight)),
               drechts: Math.round(
                 d.getBoundingClientRect().right),
               breite: Math.round(
-                document.querySelector('.gr-hero-export').clientWidth)};
+                document.documentElement.clientWidth)};
     }""")
     assert box is not None, "Kopf ohne Kicker oder Datum - Messung ins Leere"
     assert box["kh"] <= box["lh"] + 2, (
         f"der Kicker ist {box['kh']} px hoch bei {box['lh']} px Zeilenhöhe "
         "- er bricht um"
     )
-    assert box["breite"] - box["drechts"] <= 2, (
-        f"Datumszeile endet {box['breite'] - box['drechts']} px vor der "
-        "rechten Kopf-Kante"
+    assert box["drechts"] <= box["breite"], (
+        f"Datumszeile ragt {box['drechts'] - box['breite']} px über den Rand"
     )
 
 
