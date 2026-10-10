@@ -1,5 +1,4 @@
-"""Klick-Tageslauf für 1&1: alle 35 Geräte der Übersicht, die im Katalog stehen, dazu
-das iPhone 15, das 1&1 noch verkauft, aber nicht in der Übersicht zeigt (Pitch 3), und
+"""Klick-Tageslauf für 1&1: alle 35 Geräte der Übersicht, die im Katalog stehen, und
 die sieben Neugeräte aus Antonios Katalogentscheidung vom 10.10.2026.
 
 Jede Adresse steht wörtlich im Bestand (``geraete_db.json`` des Schnappschusses), die
@@ -75,9 +74,9 @@ def _nicht_im_bestand(adressen: list[str]) -> list[str]:
 def test_1und1_liest_alle_35_geraete_der_uebersicht(einsundeins):
     seiten = einsundeins.seiten
 
-    assert len(seiten) == 43
+    assert len(seiten) == 42
     assert {urlsplit(s.adresse).hostname for s in seiten} == {"mobile.1und1.de"}
-    assert len({s.geraet for s in seiten}) == 43
+    assert len({s.geraet for s in seiten}) == 42
     assert [(s.geraet, s.adresse) for s in seiten[-7:]] == NEUE_SEITEN
     assert [(s.geraet, s.adresse) for s in seiten[:6]] == ALTE_SEITEN
     assert all(s.speicher_gb == 256 for s in seiten[:6])
