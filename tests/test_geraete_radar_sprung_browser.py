@@ -76,7 +76,10 @@ def _radar_zeigen(seite):
 def test_der_sprung_stellt_reiter_modell_und_band_ein(paar):
     """EIN Klick auf „Mit Tarif →": der Reiter „Mit Tarif" ist aktiv,
     die URL trägt ?modell= und &band= (die Deep-Link-Mechanik von E2), und
-    der Bündel-Titel nennt das GEWÄHLTE Modell - nicht das Startgerät."""
+    die Wahl-Leiste nennt das GEWÄHLTE Modell und Band. Seit 10.10.2026
+    steht die Bündelliste samt Titel nicht mehr auf der Seite; geprüft
+    werden Suchfeld, gedrückter Bandknopf und die sichtbaren Zeilen der
+    fehlenden Anbieter, die alle im gewählten Band stehen."""
     _radar_zeigen(paar)
     links = paar.query_selector_all("#wr-abweichung a.gr-sprung[data-band]")
     assert links, "keine vergleichbare Zeile mit Band-Sprung in der Fixture"
@@ -94,8 +97,18 @@ def test_der_sprung_stellt_reiter_modell_und_band_ein(paar):
     url = paar.url
     assert f"modell={ziel_id}" in url, url
     assert f"band={ziel_band}" in url, url
-    titel = paar.eval_on_selector("#gr-bnd-titel", "e => e.textContent")
-    assert titel and titel.strip(), "kein Bündel-Titel nach dem Sprung"
+    feld = paar.eval_on_selector("#gr-zr-suche", "e => e.value")
+    assert feld and feld.strip(), "das Suchfeld nennt kein Modell nach dem Sprung"
+    gedrueckt = paar.eval_on_selector_all(
+        "#gr-zr-baender button[data-band][aria-pressed='true']",
+        "e => e.map(x => x.dataset.band)",
+    )
+    assert gedrueckt == [ziel_band], gedrueckt
+    baender = paar.eval_on_selector_all(
+        "#gr-bnd-gruppe .gr-anb-fehlt:not([hidden])",
+        "e => e.map(x => x.dataset.band)",
+    )
+    assert all(b == ziel_band for b in baender), baender
 
 
 def test_der_zeilenklick_oeffnet_die_detailzeile(paar):

@@ -38,6 +38,7 @@ from pathlib import Path
 import pytest
 import yaml
 from bestand_pfad import ZUSTAND, lese_wurzel
+from bs4 import BeautifulSoup
 from tarifleiter_testbestand import mit_leiter
 from test_geraete_zeitreihe_browser import waehle_modell
 
@@ -2877,15 +2878,25 @@ def test_jede_breite_tabelle_liegt_in_ihrem_rollbehaelter(_seite):
     assert not ohne_v, f"Verlaufstabellen ohne Rollbehaelter: {ohne_v}"
 
 
+def _fragment(seite) -> BeautifulSoup:
+    """Das Bündel-Fragment, das die Seite lädt, über denselben Server."""
+    basis = seite.url.split("/geraete.html")[0]
+    antwort = seite.request.get(f"{basis}/data/geraete-buendel.html")
+    assert antwort.ok, antwort.status
+    return BeautifulSoup(antwort.text(), "html.parser")
+
+
 def test_die_zeilen_stehen_nach_tco24_sortiert(_seite):
-    """Der Entwurf sortiert die Bandliste aufsteigend nach TCO-24 - im
-    Browser nachgemessen, nicht nur im Markup (ein Server-Sortierfehler
-    stuende auch im Markup, aber der Blick gehoert dazu)."""
+    """Der Entwurf sortiert die Bandliste aufsteigend nach TCO-24. Seit
+    10.10.2026 steht die Bündelliste nicht mehr auf der Seite; geprüft wird
+    das Fragment, das der Server unter derselben Adresse ausliefert."""
     _frisch(_seite)
-    werte = _seite.evaluate("""() => Array.from(
-      document.querySelectorAll('#gr-bndliste .gr-bnd[data-gesamt]'))
-        .map(z => parseFloat(z.getAttribute('data-gesamt')))
-        .filter(v => !isNaN(v))""")
+    assert _seite.eval_on_selector_all("#gr-buendel .gr-bnd", "e => e.length") == 0
+    werte = [
+        float(z["data-gesamt"])
+        for z in _fragment(_seite).select("#gr-bnd-vorgabe #gr-bndliste .gr-bnd")
+        if z.get("data-gesamt")
+    ]
     assert len(werte) >= 2, "die Fixture braucht mindestens zwei Zeilen"
     assert werte == sorted(werte), werte
 
@@ -2895,7 +2906,9 @@ def test_die_modellauswahl_blendet_ohne_neuladen_um(_seite):
     Graph-Zustand (Antwort-Satz, Messtag-Zeile, SVG) aus dem Fragment ein
     und die Bündel-Zeilen desselben Modells - ohne Neuladen, mit demselben
     Markup wie der Server-Render (kein Client-Renderer, keine Zahl im
-    Client)."""
+    Client). Seit 10.10.2026 steht die Bündelliste nicht mehr auf der
+    Seite; aus dem Fragment kommt nur die Zeile der fehlenden Anbieter des
+    gewählten Modells, die Zeilen selbst stehen im Fragment."""
     _zeige_tafel(_seite, "tafel-tco")
     auswahl = _seite.eval_on_selector(
         "#gr-zeitreihe-daten", "k => Object.keys(JSON.parse(k.textContent).erlaubt)"
@@ -2915,11 +2928,20 @@ def test_die_modellauswahl_blendet_ohne_neuladen_um(_seite):
         fremd,
     )
     assert erwartete, "keine Bänder im Knoten"
-    zeilen = _seite.eval_on_selector_all(
-        "#gr-buendel .gr-bnd:not([hidden])",
-        "e => e.map(x => x.getAttribute('data-anbieter'))",
+    _seite.wait_for_timeout(300)
+    lager = _fragment(_seite).select_one(f'.gr-bnd-lager[data-modell="{fremd}"]')
+    assert lager is not None, f"{fremd} fehlt im Fragment"
+    assert lager.select(".gr-bnd"), "keine Bündel-Zeilen des gewaehlten Modells"
+    erwartet = [
+        [f["data-anbieter"], f["data-band"], f["data-fehlt-lz"]]
+        for f in lager.select(".gr-anb-fehlt")
+    ]
+    gezeigt = _seite.eval_on_selector_all(
+        "#gr-bnd-gruppe .gr-anb-fehlt",
+        "e => e.map(x => [x.dataset.anbieter, x.dataset.band, x.dataset.fehltLz])",
     )
-    assert zeilen, "keine sichtbaren Bündel-Zeilen des gewaehlten Modells"
+    assert gezeigt == erwartet, (gezeigt, erwartet)
+    assert _seite.eval_on_selector_all("#gr-buendel .gr-bnd", "e => e.length") == 0
 
 
 def test_jede_zeile_mit_zahl_beantwortet_die_leitfrage(_seite):
@@ -2937,69 +2959,36 @@ def test_jede_zeile_mit_zahl_beantwortet_die_leitfrage(_seite):
 def test_die_buendelzeilen_starten_geschlossen(_seite):
     """Der Anfangszustand ist der, den 11b misst: stünde eine Zeile im HTML
     offen (`open`-Attribut), klaffte ihr Rechenweg in der Anfangshöhe -
-    die Kompaktheit wäre nur gerendert, nicht gebaut."""
+    die Kompaktheit wäre nur gerendert, nicht gebaut. Seit 10.10.2026 steht
+    die Bündelliste nicht mehr auf der Seite; geprüft wird das Fragment."""
     _seite.goto(_seite.url.rsplit("/", 1)[0] + "/geraete.html", wait_until="load")
-    _seite.click(".gr-reiter button[data-tafel='tafel-tco']")
-    _seite.wait_for_timeout(60)
-    zustand = _seite.evaluate("""() => {
-      const zeilen = document.querySelectorAll('#gr-bndliste .gr-bnd');
-      return {zahl: zeilen.length,
-              offen: [...zeilen].filter(z => z.open).length};
-    }""")
-    assert zustand["zahl"] > 0, "keine Bündelzeile im Dokument"
-    assert zustand["offen"] == 0, "Zeilen starten offen"
+    zeilen = _fragment(_seite).select("details.gr-bnd")
+    assert zeilen, "keine Bündelzeile im Fragment"
+    offen = [z.get("data-anbieter") for z in zeilen if z.has_attr("open")]
+    assert offen == [], f"Zeilen starten offen: {offen}"
 
 
 def test_die_buendelzeile_oeffnet_ohne_netzwerk(_seite):
     """E1 + Aufklapp-Pflicht aus dem Auftrag: alles bleibt im Dokument
     erreichbar, und das Oeffnen ist reines UI - kein Nachladen, keine
-    Serverinteraktion. Jede Anfrage, die waehrend des Oeffnens entsteht,
-    macht diesen Test rot.
-
-    Gezaehlt werden nur SAME-ORIGIN-Anfragen: die Webfonts der Seite
-    (Google Fonts, display=swap) duerfen auch NACH dem load-Event noch
-    einsetzen, und auf einem kalten Runner wuerde genau so eine den Test
-    falsch rot machen. Fuer die Zusicherung "kein Nachladen von Inhalten"
-    ist der Ursprung der scharfe Massstab - Inhalte laegen unter der
-    eigenen Adresse."""
-    _frisch(_seite)
-    _seite.evaluate(
-        "() => {const b = document.querySelector('.gx-bnd-auf');"
-        " if (b && b.getAttribute('aria-expanded') !== 'true') b.click();}"
-    )
-    ursprung = _seite.url.rsplit("/", 1)[0]
-
-    anfragen: list[str] = []
-
-    def _zaehle(anfrage) -> None:
-        if anfrage.url.startswith(ursprung):
-            anfragen.append(anfrage.url)
-
-    _seite.on("request", _zaehle)
-    try:
-        ergebnis = _seite.evaluate("""() => {
-          const z = document.querySelector('#gr-bndliste .gr-bnd');
-          if (!z) return null;
-          // P4-Fix (Sicht-Pruefung 18.09.): Rechenweg-Montage beim
-          // OEFFNEN - summary.click() ist der Nutzerweg (Default-Action
-          // oeffnet synchron nach dem click-Dispatch, die Montage laeuft
-          // im Delegaten desselben Dispatches).
-          z.querySelector('summary').click();
-          const rw = z.querySelector('.gr-bnd-rw');
-          return {sichtbar: !!rw.offsetParent,
-                  hoehe: Math.round(rw.getBoundingClientRect().height)};
-        }""")
-        _seite.wait_for_timeout(200)
-    finally:
-        _seite.remove_listener("request", _zaehle)
-        _seite.evaluate(
-            "() => document.querySelectorAll('.gr-bnd')"
-            ".forEach(z => { z.open = false; })"
-        )
-    assert ergebnis is not None, "keine Bündelzeile im Modellblock"
-    assert ergebnis["sichtbar"], "der Rechenweg bleibt unsichtbar"
-    assert ergebnis["hoehe"] > 60, f"der Rechenweg hat nur {ergebnis['hoehe']} px Höhe"
-    assert anfragen == [], f"das Oeffnen hat Netzwerkanfragen ausgeloest: {anfragen}"
+    Serverinteraktion. Seit 10.10.2026 steht die Bündelliste nicht mehr auf
+    der Seite; geprüft wird das Fragment: jede Zeile trägt ihren Rechenweg
+    als `template.gr-bnd-rw-vorlage` selbst mit (ein leerer Montagepunkt
+    `.gr-bnd-rw` daneben), und die Vorlage lädt nichts nach (kein `src`,
+    kein `srcset`, kein `data-src`)."""
+    zeilen = _fragment(_seite).select("#gr-bnd-vorgabe details.gr-bnd")
+    assert zeilen, "keine Bündelzeile im Modellblock"
+    for z in zeilen:
+        rw = z.select(".gr-bnd-rw")
+        vorlage = z.select("template.gr-bnd-rw-vorlage")
+        assert len(rw) == 1 and not rw[0].get_text(strip=True), z.attrs
+        assert len(vorlage) == 1, z.attrs
+        text = " ".join(vorlage[0].get_text(" ", strip=True).split())
+        assert len(text) > 60, f"der Rechenweg ist leer: {text!r}"
+        if z.get("data-gesamt"):
+            assert f"Gerechnet über {z['data-leitzahl-monate']} Monate" in text, text
+        nachladend = vorlage[0].select("[src], [srcset], [data-src]")
+        assert nachladend == [], nachladend
 
 
 def test_die_alt_url_landet_im_radar_reiter(_umgebung):

@@ -1474,19 +1474,6 @@ var TelcoFrage = (function () {
   window.addEventListener('hashchange', ausHash);
 })();
 
-/* Die Bündelzeilen stehen hinter einem Klick (Antonio, 10.10.2026): unter
- * dem Graphen bleibt nur die Zeile der fehlenden Anbieter offen. */
-(function () {
-  var knopf = document.querySelector('.gx-bnd-auf');
-  var teil = document.getElementById('gr-buendel');
-  if (!knopf || !teil) return;
-  knopf.addEventListener('click', function () {
-    var offen = !teil.classList.contains('gx-offen');
-    teil.classList.toggle('gx-offen', offen);
-    knopf.setAttribute('aria-expanded', offen ? 'true' : 'false');
-  });
-})();
-
 /* P3 (Strategie Geraete v3, 17.09.2026): der EINE Ansichts-Umschalter
  * des Gerätekatalogs - Einzelgerätpreis <-> Gesamtkosten (TCO-24).
  *
@@ -2097,17 +2084,15 @@ var TelcoFrage = (function () {
     if (!gruppe) return;
     var fertig = function (knotenB, fehler) {
       gruppeLeeren(gruppe);
+      /* Die Bündelliste ist weg (Antonio, 10.10.2026): vom Lager kommt nur
+         die Zeile der fehlenden Anbieter auf die Seite. */
       if (knotenB) {
         var klon = document.importNode(knotenB, true);
-        while (klon.firstChild) gruppe.appendChild(klon.firstChild);
+        Array.prototype.forEach.call(
+          klon.querySelectorAll('.gr-anb-fehlliste'),
+          function (f) { gruppe.appendChild(f); });
       } else if (fehler) {
-        leerSatz(gruppe, 'Die Bündel-Zeilen dieses Geräts konnten nicht ' +
-                         'geladen werden – der Graph oben nennt je Tarif' +
-                         'band die Werte aller Anbieter.');
-      } else {
-        leerSatz(gruppe, 'Für dieses Gerät steht noch keine Bündel-Zeile ' +
-                         'da – der Graph oben nennt je Tarifband, welche ' +
-                         'Anbieter eine Zahl tragen.');
+        leerSatz(gruppe, 'Fehlende Anbieter nicht geladen.');
       }
       setzeBndTitel(mid, bandKey);
       stelleZeilen(bandKey);

@@ -452,39 +452,44 @@ def test_der_bandtitel_und_die_sichtbaren_zeilen_meinen_dasselbe_band(schreibtis
     fällt auf display:none-Elemente auf textContent zurück) und zählte
     DOM-Reihenfolge statt Sichtbarkeit. Gemessen mit offsetParent: im
     Band-Zustand sind genau die Zeilen sichtbar, deren data-band dem
-    gewählten Band entspricht - plus die eigenüberschriebene Gruppe
-    „Ohne Tarifband" (§7: unbegrenzte Tarife stehen bewusst UNTER dem
-    Bandblock, nicht heimlich in einem Band). Dieser Test nagelt die
-    Zusicherung fest, damit der Filter nicht still entfallen kann."""
+    gewählten Band entspricht. Dieser Test nagelt die Zusicherung fest,
+    damit der Filter nicht still entfallen kann.
+
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; gemessen
+    werden die Zeilen der fehlenden Anbieter unter dem Graphen, und das
+    gewählte Band nennt der gedrückte Band-Knopf statt eines Listentitels."""
     s, _ = schreibtisch
-    s.evaluate(
-        "() => {const b = document.querySelector('.gx-bnd-auf');"
-        " if (b && b.getAttribute('aria-expanded') !== 'true') b.click();}"
-    )
     s.click("#gr-zr-baender button[data-band='m']")
     s.wait_for_timeout(500)
-    titel = s.eval_on_selector("#gr-bnd-titel", "e => e.textContent")
-    assert "Band M" in titel
+    gedrueckt = s.evaluate(
+        "() => Array.from(document.querySelectorAll("
+        "'#gr-zr-baender button[aria-pressed=\"true\"]'))"
+        ".map(k => k.getAttribute('data-band'))"
+    )
+    assert gedrueckt == ["m"], gedrueckt
+    assert s.evaluate("() => !document.getElementById('gr-bnd-titel')"), (
+        "der Listentitel steht noch"
+    )
     zeilen = s.evaluate("""() => Array.from(
-      document.querySelectorAll('#gr-bnd-gruppe .gr-bnd')).map(z => ({
+      document.querySelectorAll('#gr-bnd-gruppe .gr-bnd, '
+                                + '#gr-bnd-gruppe .gr-anb-fehlt')).map(z => ({
+        bnd: z.classList.contains('gr-bnd'),
         band: z.getAttribute('data-band'),
-        sichtbar: !!(z.offsetParent || z.getClientRects().length),
-        ohneband: !!z.closest('.gr-ohneband')}))""")
-    assert zeilen, "keine Bündel-Zeilen im DOM"
+        sichtbar: !!(z.offsetParent || z.getClientRects().length)}))""")
+    assert zeilen, "keine Zeile fehlender Anbieter im DOM"
+    assert not [z for z in zeilen if z["bnd"]], "Bündelzeilen stehen auf der Seite"
     sichtbar = [z for z in zeilen if z["sichtbar"]]
     assert sichtbar, "im Band-Zustand ist keine Zeile sichtbar"
     for z in sichtbar:
-        if z["ohneband"]:
-            assert z["band"] is None, "eine Band-Zeile steht in der Ohne-Band-Gruppe"
-        else:
-            assert z["band"] == "m", (
-                f"sichtbare Zeile mit data-band={z['band']!r} unter dem Titel 'Band M'"
-            )
-    for z in zeilen:
-        if z["band"] not in (None, "m"):
-            assert not z["sichtbar"], (
-                f"Zeile data-band={z['band']!r} ist sichtbar geblieben"
-            )
+        assert z["band"] == "m", (
+            f"sichtbare Zeile mit data-band={z['band']!r} unter dem Band M"
+        )
+    anderes = [z for z in zeilen if z["band"] not in (None, "m")]
+    assert anderes, "die Gegenprobe braucht Zeilen eines anderen Bandes"
+    for z in anderes:
+        assert not z["sichtbar"], (
+            f"Zeile data-band={z['band']!r} ist sichtbar geblieben"
+        )
 
 
 def test_keine_schrift_unter_zwoelf_pixel_im_sichtbaren_graphen(schreibtisch):

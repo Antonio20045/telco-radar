@@ -512,13 +512,22 @@ def test_die_naeherung_bekommt_einen_benannten_leerzustand():
 def test_der_leerzustands_text_steht_woertlich_in_der_buendel_vorlage(tmp_path):
     """Der Satz ist der Hinweis von der Bündel-Karte (`gr-kk-hinweis`), nicht
     neu erfunden: in einem Render stehen die Referenzkarte der Geräteseite
-    und der Leerzustand im Zeitreihen-Fragment wortgleich mit ihm da."""
+    und der Leerzustand im Zeitreihen-Fragment wortgleich mit ihm da.
+
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; geprüft
+    wird das Fragment."""
     import test_geraete_tco_zustand as tco_zustand
 
     vorlage_text = tco_zustand.vorlage_text
-    seite = tco_zustand._baue(tmp_path)
-    hinweis = seite.select_one(
-        '#tafel-tco .gr-bnd[data-anbieter="Vodafone"] .gr-kk-hinweis'
+    tco_zustand._baue(tmp_path)
+    buendel = BeautifulSoup(
+        (tmp_path / "mit" / "site" / "data" / "geraete-buendel.html").read_text(
+            encoding="utf-8"
+        ),
+        "html.parser",
+    )
+    hinweis = buendel.select_one(
+        '#gr-bnd-vorgabe .gr-bnd[data-anbieter="Vodafone"] .gr-kk-hinweis'
     )
     assert hinweis is not None, "die Fixture trägt keine Referenzkarte"
     fragment = BeautifulSoup(

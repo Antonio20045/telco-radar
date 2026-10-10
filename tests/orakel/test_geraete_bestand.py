@@ -529,11 +529,23 @@ trägt und den Tarif ab Monat 25 nicht nennt (`_gw_nur_grundpreis`)."""
 _GW_LUECKE_AB_25 = "Tarifgrundpreis Monat 25–{} nicht gemessen"
 
 
-def _gw_ist_startpaar(titel: str) -> bool:
-    """Ob der Server-Startblock mit Modell und Stufe des Pflichtfalls beginnt."""
+def _gw_ist_startpaar(geraete_html: str) -> bool:
+    """Ob der Server-Startblock mit Modell und Stufe des Pflichtfalls beginnt.
+
+    Seit 10.10.2026 steht die Bündelliste samt Titel nicht mehr auf der
+    Seite; Modell und Stufe des Starts stehen im JSON-Block
+    `gr-zeitreihe-daten` (`vorgabe`, `start_band`)."""
+    daten = re.search(
+        r'<script type="application/json" id="gr-zeitreihe-daten">(.*?)</script>',
+        geraete_html,
+        re.S,
+    )
+    if daten is None:
+        return False
+    knoten = json.loads(daten.group(1))
     return (
-        _GW_PFLICHT_TITEL in titel
-        and f"Band {_GW_PFLICHT_BAND.upper()}" in " ".join(titel.split())
+        knoten.get("vorgabe") == _GW_PFLICHT_MODELL
+        and knoten.get("start_band") == _GW_PFLICHT_BAND
     )
 
 
@@ -605,20 +617,16 @@ def _gw_pflicht_soll(je_laufzeit: dict, blaetter: dict) -> dict:
 
 def _gw_modell_zeilen(gw_seite: dict, modell: str) -> list[str]:
     """Die Bündelzeilen (`<details class="gr-bnd">`, auch die ohne Zahl mit
-    `gr-bnd--leer`) eines Modells - aus seinem Block im Nachladefragment, beim
-    Startmodell aus `geraete.html`."""
+    `gr-bnd--leer`) eines Modells - aus seinem Block im Nachladefragment.
+
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; auch das
+    Startmodell steht im Fragment (`#gr-bnd-vorgabe`)."""
     lager = re.split(r'<div class="gr-bnd-lager" data-modell="', gw_seite["buendel"])
     for block in lager[1:]:
         if block[: block.index('"')] == modell:
             return re.findall(
                 r'<details class="gr-bnd(?: gr-bnd--leer)?".*?</details>', block, re.S
             )
-    vorgabe = re.search(r'"vorgabe":\s*"([^"]+)"', gw_seite["geraete"])
-    if vorgabe and vorgabe.group(1) == modell:
-        start = gw_seite["geraete"][gw_seite["geraete"].find('id="gr-bndliste"') :]
-        return re.findall(
-            r'<details class="gr-bnd(?: gr-bnd--leer)?".*?</details>', start, re.S
-        )
     return []
 
 
@@ -749,8 +757,7 @@ def test_leitzahl_des_pflichtfalls_am_bestand(gw_seite):
         "Bestand misst und die Seite verschweigt, ist ein Datenverlust"
     )
 
-    titel = re.search(r'class="gr-bnd-titel"[^>]*>([^<]+)<', gw_seite["geraete"])
-    if titel and _gw_ist_startpaar(titel.group(1)):
+    if _gw_ist_startpaar(gw_seite["geraete"]):
         fp_antwort = _gw_antwort(gw_seite["geraete"])
         assert fp_antwort and fp_antwort["anb"] == _GW_PFLICHT_ANBIETER
         gw_vergleiche(
@@ -1599,10 +1606,11 @@ def pf_seitenzeilen(fragment: str, geraete_html: str = "") -> dict:
 
     Gelesen wird das GERENDERTE HTML, nie ein Python-Objekt. Die
     Buendelliste steht je Modell in einem `gr-bnd-lager`-Block des
-    Nachladefragments; das STARTMODELL bringt keinen Lager-Block mit -
-    seine zwoelf Zeilen stehen inline in geraete.html, und seine Modell-ID
-    steht dort als `vorgabe` im JSON-Block `gr-zeitreihe-daten`. Ohne
-    diesen Zweig fehlt genau das Geraet, das die Seite zuerst zeigt."""
+    Nachladefragments. Seit 10.10.2026 steht die Bündelliste nicht mehr auf
+    der Seite; geprüft wird das Fragment, in dem auch das STARTMODELL seinen
+    Lager-Block (`#gr-bnd-vorgabe`) trägt. Seine Modell-ID steht in
+    geraete.html als `vorgabe` im JSON-Block `gr-zeitreihe-daten`; ohne
+    seine Zeilen fehlt genau das Geraet, das die Seite zuerst zeigt."""
     zeilen: dict = {}
     for block in _PF_LAGER_RE.split(fragment)[1:]:
         modell = block[: block.index('"')]
@@ -1621,12 +1629,13 @@ def pf_seitenzeilen(fragment: str, geraete_html: str = "") -> dict:
     )
     start = json.loads(daten.group(1)).get("vorgabe") or ""
     assert start, "kein `vorgabe`-Modell im JSON-Block der Startansicht"
-    inline = _pf_zeilen_aus_block(geraete_html)
-    assert inline, (
+    assert not _pf_zeilen_aus_block(geraete_html), (
+        "geraete.html trägt wieder Bündelzeilen - sie gehören ins Fragment"
+    )
+    assert zeilen.get(start), (
         f"die Startansicht ({start}) rendert keine einzige Buendelzeile - "
         "der Lookup greift ins Leere"
     )
-    zeilen.setdefault(start, []).extend(inline)
     return zeilen
 
 
@@ -2002,8 +2011,9 @@ def _pr_betrag_cent(text: str) -> int:
 def _pr_abschnitte(gw_seite: dict) -> list[tuple]:
     """[(modell, quelle, html)] - je Modell der Block mit seinen Zeilen.
 
-    Das Startgeraet steht inline in `geraete.html` (seine ID steht dort im
-    JSON-Block als `vorgabe`), alle anderen Modelle in je einem
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; geprüft
+    wird das Fragment: jedes Modell, auch das Startgeraet (seine ID steht
+    in `geraete.html` im JSON-Block als `vorgabe`), in je einem
     `gr-bnd-lager`-Block des Nachladefragments. Der Block wird MIT seinem
     Modell gefuehrt und nicht hinterher ueber den Betrag gesucht: zwei
     Modelle koennen denselben Betrag tragen, und eine Suche nach dem
@@ -2012,15 +2022,19 @@ def _pr_abschnitte(gw_seite: dict) -> list[tuple]:
     1.615,00 EUR am Galaxy S26 Ultra)."""
     vorgabe = re.search(r'"vorgabe":\s*"([^"]+)"', gw_seite["geraete"])
     assert vorgabe, "kein `vorgabe`-Modell in geraete.html gefunden"
-    stelle = gw_seite["geraete"].find('id="gr-bndliste"')
-    assert stelle > 0, "keine Inline-Buendelliste in geraete.html"
-    abschnitte = [(vorgabe.group(1), "geraete.html", gw_seite["geraete"][stelle:])]
+    assert 'id="gr-bndliste"' not in gw_seite["geraete"], (
+        "geraete.html trägt wieder eine Inline-Buendelliste"
+    )
+    abschnitte = []
     for block in re.split(
         r'<div class="gr-bnd-lager" data-modell="', gw_seite["buendel"]
     )[1:]:
         abschnitte.append(
             (block[: block.index('"')], "data/geraete-buendel.html", block)
         )
+    assert vorgabe.group(1) in {m for m, _q, _t in abschnitte}, (
+        f"das Startmodell {vorgabe.group(1)} fehlt im Fragment"
+    )
     assert len(abschnitte) >= 90, (
         f"nur {len(abschnitte)} Modellbloecke gelesen - der Parser greift ins Leere"
     )
@@ -2477,6 +2491,10 @@ def test_pruefer_jede_leitzahl_der_seite_gegen_eine_eigene_rechnung(gw_seite):
 def test_pruefer_kein_spaltenkopf_behauptet_24_ueber_einer_36_monats_zahl(gw_seite):
     """Der Spaltenkopf IST eine Aussage ueber jede Zahl unter ihm.
 
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; geprüft
+    wird das Fragment: der Spaltenkopf seiner Gruppen und die Zeilen des
+    Startmodells (`#gr-bnd-vorgabe`). Den Sortierknopf gibt es nicht mehr.
+
     Geprueft wird die Buendeltafel des Startmodells: nennt der Kopf der
     TCO-Spalte eine Monatszahl, dann muss JEDE Zeile unter ihm genau
     diesen Zeitraum tragen. Der Sortierknopf dieses Kopfes
@@ -2504,11 +2522,29 @@ def test_pruefer_kein_spaltenkopf_behauptet_24_ueber_einer_36_monats_zahl(gw_sei
     MEHRERE Zeitraeume tragen (sonst koennte eine Monatszahl im Kopf
     ueberhaupt nicht widersprechen und der Test prueft nichts).
     """
-    seite = gw_seite["geraete"]
-    koepfe = re.findall(r'data-bsort="tco"[^>]*aria-label=\s*"([^"]*)"', seite)
-    assert koepfe, "Sortierkopf der TCO-Spalte nicht gefunden - Lookup leer"
+    assert 'data-bsort="tco"' not in gw_seite["geraete"], (
+        "geraete.html trägt wieder den Sortierkopf der Bündelliste"
+    )
+    koepfe = [
+        " ".join(re.sub("<[^>]+>", " ", kopf).split())
+        for kopf in re.findall(
+            r'<div class="gr-bnd-kopf[^"]*"[^>]*>(.*?)</div>', gw_seite["buendel"], re.S
+        )
+    ]
+    assert koepfe, "Spaltenkopf der Bündelzeilen nicht gefunden - Lookup leer"
+    assert all("Kosten mit Tarif" in kopf for kopf in koepfe), koepfe[:3]
 
-    spaltenzeilen = [z for z in _pz_zeilen(seite) if z["gesamt"]]
+    vorgabe = re.search(r'"vorgabe":\s*"([^"]+)"', gw_seite["geraete"])
+    assert vorgabe, "kein `vorgabe`-Modell in geraete.html gefunden"
+    startblock = next(
+        (
+            text
+            for modell, _quelle, text in _pr_abschnitte(gw_seite)
+            if modell == vorgabe.group(1)
+        ),
+        "",
+    )
+    spaltenzeilen = [z for z in _pz_zeilen(startblock) if z["gesamt"]]
     assert spaltenzeilen, (
         "keine Buendelzeile mit data-gesamt in der Startansicht - der "
         "Lookup greift ins Leere und dieser Test wuerde sonst gruen "

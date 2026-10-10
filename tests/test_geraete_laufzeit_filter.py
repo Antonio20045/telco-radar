@@ -10,7 +10,10 @@ Ansicht („Mit 24 Raten nicht erfasst: …“). Der Umschalter steht seither
 einmal für die ganze Tafel in der Wahl-Leiste (`#gr-zr-laufzeiten`).
 
 Die Browser-Tests laufen im echten Chromium auf eigenem Server - dieselbe
-Bauform wie `tests/test_geraete_o2_zeilen_browser.py`.
+Bauform wie `tests/test_geraete_o2_zeilen_browser.py`. Seit 10.10.2026 steht
+die Bündelliste nicht mehr auf der Seite; geprüft wird das Fragment: der
+Browser zeigt Wahl, Adresse und Knöpfe, die Zeilen dieser Wahl kommen aus
+`data/geraete-buendel.html` über denselben Server.
 """
 
 from __future__ import annotations
@@ -20,6 +23,7 @@ import json
 
 import pytest
 import yaml
+from bs4 import BeautifulSoup, NavigableString
 
 from telco_radar.report import geraete_laufzeit
 from telco_radar.report import geraete_tco_karten as karten
@@ -253,18 +257,79 @@ def seite(_browser_seite, request):
     s = browser.new_page(viewport={"width": breite, "height": hoehe})
     s.goto(f"{basis}/geraete.html", wait_until="load")
     s.click(".gr-reiter button[data-tafel='tafel-tco']")
-    s.click(".gx-bnd-auf")
+    s.wait_for_timeout(300)
     try:
         yield s
     finally:
         s.close()
 
 
-_SICHTBAR = """() => Array.from(document.querySelectorAll('#gr-bnd-gruppe .gr-bnd'))
-  .filter(z => z.getBoundingClientRect().height > 0)
-  .map(z => z.dataset.anbieter + ' ' + z.querySelector('.gr-bnd-raten')
-                                       .textContent.trim().split(' ')[0])
-  .sort()"""
+def _fragment(seite) -> BeautifulSoup:
+    """Das Bündel-Fragment, das die Seite lädt, über denselben Server."""
+    basis = seite.url.split("/geraete.html")[0]
+    antwort = seite.request.get(f"{basis}/data/geraete-buendel.html")
+    assert antwort.ok, antwort.status
+    return BeautifulSoup(antwort.text(), "html.parser")
+
+
+def _wahl(seite) -> dict:
+    """Modell, Band und Laufzeit, wie der Browser sie gerade zeigt: die
+    Adresse und der gedrückte Laufzeit-Knopf müssen übereinstimmen."""
+    wahl = seite.evaluate(
+        "() => Object.fromEntries(new URLSearchParams(location.search))"
+    )
+    gedrueckt = seite.eval_on_selector_all(
+        "#gr-zr-laufzeiten button[aria-pressed='true']",
+        "e => e.map(k => k.dataset.lz)",
+    )
+    assert gedrueckt == [wahl.get("laufzeit")], (gedrueckt, wahl)
+    assert wahl.get("modell"), wahl
+    return wahl
+
+
+def _zeilen(seite) -> list:
+    """Die Bündelzeilen des Fragments, die unter der Wahl des Browsers
+    stehen - dieselbe Regel wie `stelleZeilen` in app.js: ein anderes Band
+    oder eine andere Ratenlaufzeit (außer unter „alle“) blendet aus."""
+    assert seite.eval_on_selector_all("#gr-bnd-gruppe .gr-bnd", "e => e.length") == 0
+    wahl = _wahl(seite)
+    lager = _fragment(seite).select_one(
+        f'.gr-bnd-lager[data-modell="{wahl["modell"]}"]'
+    )
+    assert lager is not None, f"{wahl['modell']} fehlt im Fragment"
+    band, lz = wahl.get("band"), wahl["laufzeit"]
+    return [
+        z
+        for z in lager.select("details.gr-bnd")
+        if not (band and z.has_attr("data-band") and z["data-band"] != band)
+        and not (lz != "alle" and z.has_attr("data-lz") and z["data-lz"] != lz)
+    ]
+
+
+def _sichtbar(seite) -> list:
+    """Anbieter und Ratenzahl der Zeilen unter der Wahl. Gegenprobe im
+    Browser: wer eine Zeile hat, steht nicht zugleich sichtbar in der Zeile
+    der fehlenden Anbieter."""
+    zeilen = _zeilen(seite)
+    fehlend = seite.eval_on_selector_all(
+        "#gr-bnd-gruppe .gr-anb-fehlt:not([hidden])",
+        "e => e.map(z => z.dataset.anbieter)",
+    )
+    mit_zeile = {z["data-anbieter"] for z in zeilen}
+    assert not mit_zeile & set(fehlend), (mit_zeile, fehlend)
+    return sorted(
+        z["data-anbieter"]
+        + " "
+        + z.select_one(".gr-bnd-raten").get_text(" ", strip=True).split(" ")[0]
+        for z in zeilen
+    )
+
+
+def _text(knoten) -> str:
+    """Der Text eines Knotens, auch in einer `template`-Vorlage: dort sind
+    die Zeichenketten `TemplateString`, die `get_text` am Kind übergeht."""
+    teile = (s for s in knoten.descendants if isinstance(s, NavigableString))
+    return " ".join(" ".join(teile).split())
 
 
 def _waehle(seite, lz):
@@ -273,20 +338,28 @@ def _waehle(seite, lz):
 
 
 def test_ohne_klick_stehen_24_monate(seite):
+    """Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite;
+    geprüft wird das Fragment: gedrückter Knopf und Adresse im Browser, die
+    Zeilen dieser Wahl aus `data-lz` und `data-anbieter` des Fragments."""
     gedrueckt = seite.eval_on_selector_all(
         "#gr-zr-laufzeiten button[aria-pressed='true']",
         "e => e.map(k => k.dataset.lz)",
     )
     assert gedrueckt == ["24"]
-    assert seite.evaluate(_SICHTBAR) == ["Vodafone 24", "congstar 24"]
+    assert seite.query_selector(".gx-bnd-auf") is None
+    assert _sichtbar(seite) == ["Vodafone 24", "congstar 24"]
     assert "laufzeit=24" in seite.evaluate("location.search")
 
 
 def test_die_wahl_36_zeigt_nur_36_raten(seite):
+    """Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite;
+    geprüft wird das Fragment unter der Wahl, die der Browser zeigt."""
     _waehle(seite, "36")
-    assert seite.evaluate(_SICHTBAR) == ["congstar 36", "o2 36"]
+    assert "laufzeit=36" in seite.evaluate("location.search")
+    assert _sichtbar(seite) == ["congstar 36", "o2 36"]
     _waehle(seite, "alle")
-    assert seite.evaluate(_SICHTBAR) == [
+    assert "laufzeit=alle" in seite.evaluate("location.search")
+    assert _sichtbar(seite) == [
         "Vodafone 24",
         "congstar 24",
         "congstar 36",
@@ -295,10 +368,14 @@ def test_die_wahl_36_zeigt_nur_36_raten(seite):
 
 
 def test_die_laufzeitwahl_ueberlebt_den_bandwechsel(seite):
+    """Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite;
+    geprüft wird das Fragment unter der Wahl, die der Browser nach dem
+    Bandwechsel zeigt."""
     _waehle(seite, "36")
     waehle_band(seite, "xs")
-    assert seite.evaluate(_SICHTBAR) == ["congstar 36", "o2 36"]
+    assert _sichtbar(seite) == ["congstar 36", "o2 36"]
     assert "laufzeit=36" in seite.evaluate("location.search")
+    assert "band=xs" in seite.evaluate("location.search")
 
 
 def test_der_filter_laeuft_nicht_aus_dem_bild(seite):
@@ -316,25 +393,26 @@ def test_der_filter_laeuft_nicht_aus_dem_bild(seite):
 
 
 def test_der_trade_in_steht_neben_der_leitzahl_und_im_rechenweg(seite):
-    zeile = seite.query_selector(
-        "#gr-bnd-gruppe .gr-bnd[data-anbieter='congstar']:not([hidden])"
-    )
-    assert (
-        zeile.query_selector(".gr-bnd-aktion").inner_text()
-        == "bis −324,00 € mit Altgerät"
-    )
-    assert "1.567,00 €" in zeile.query_selector(".gr-bnd-tco").inner_text()
-    zeile.query_selector("summary").click()
-    seite.wait_for_timeout(150)
-    text = zeile.query_selector(".gr-kk-aktion").inner_text()
+    """Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite;
+    geprüft wird das Fragment: die congstar-Zeile unter der Wahl des
+    Browsers trägt den Trade-in neben der Leitzahl und in der Vorlage ihres
+    Rechenwegs, unter 36 Monaten steht die congstar-Zeile ohne ihn."""
+    zeilen = [z for z in _zeilen(seite) if z["data-anbieter"] == "congstar"]
+    assert len(zeilen) == 1, zeilen
+    zeile = zeilen[0]
+    assert _text(zeile.select_one(".gr-bnd-aktion")) == "bis −324,00 € mit Altgerät"
+    assert "1.567,00 €" in _text(zeile.select_one(".gr-bnd-tco"))
+    vorlage = zeile.select_one("template.gr-bnd-rw-vorlage")
+    assert vorlage is not None, zeile.attrs
+    text = _text(vorlage.select_one(".gr-kk-aktion"))
     assert "Trade-in −324,00 €" in text and "nicht eingerechnet" in text
     assert (
-        zeile.query_selector(".gr-kk-aktion a")
-        .get_attribute("href")
+        vorlage.select_one(".gr-kk-aktion a")
+        .get("href", "")
         .startswith("https://www.congstar.de/")
     )
     _waehle(seite, "36")
-    ohne = seite.query_selector(
-        "#gr-bnd-gruppe .gr-bnd[data-anbieter='congstar']:not([hidden])"
-    )
-    assert ohne.query_selector(".gr-bnd-aktion") is None
+    ohne = [z for z in _zeilen(seite) if z["data-anbieter"] == "congstar"]
+    assert len(ohne) == 1, ohne
+    assert ohne[0]["data-lz"] == "36"
+    assert ohne[0].select_one(".gr-bnd-aktion") is None

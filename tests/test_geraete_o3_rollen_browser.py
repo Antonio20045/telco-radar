@@ -11,6 +11,10 @@ Die EIGENE Fixture erweitert die O2-Lage um ein DRITTES Modell mit zwei
 eigenen Bündeln: der S3-Test braucht drei Stichproben mit
 UNTERSCHIEDLICHEN Zeilen je Modell, und die O2-Lage trägt nur zwei
 Modelle (das zweite mit einer einzigen Zeile).
+
+Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; geprüft
+wird das Fragment `data/geraete-buendel.html`. Im Browser bleibt, was die
+Seite noch zeigt: die Zeile der fehlenden Anbieter je Modell.
 """
 
 from __future__ import annotations
@@ -18,11 +22,13 @@ from __future__ import annotations
 import contextlib
 import json
 import math
+import re
 
 import pytest
 
 from tarifleiter_testbestand import mit_leiter
 import yaml
+from bs4 import BeautifulSoup
 
 from telco_radar.report.html import render_site
 
@@ -179,17 +185,45 @@ def seite(ctx):
         s.close()
 
 
-def _zeilen_anbieter(s):
-    """Die Anbieter ALLER Bündelzeilen des gewählten Modells - OHNE
-    hidden-Filter: die Bandwahl versteckt Zeilen anderer Bänder, und der
-    Test misst die EIGENTÜMERSCHAFT der Zeilen (gehören sie zum gewählten
-    Modell?), nicht ihre Sichtbarkeit im aktuellen Band."""
-    return s.eval_on_selector_all(
-        "#gr-buendel .gr-bnd", "e => e.map(z => z.dataset.anbieter)"
+VORGABE = "apple-iphone-17-pro-256"
+
+
+def _lager(site) -> BeautifulSoup:
+    return BeautifulSoup(
+        (site / "data" / "geraete-buendel.html").read_text(encoding="utf-8"),
+        "html.parser",
     )
 
 
-def test_rueckwechsel_nach_deep_link_zeigt_die_vorgabezeilen(seite):
+def _lager_modell(site, mid):
+    knoten = _lager(site).select_one(f'.gr-bnd-lager[data-modell="{mid}"]')
+    assert knoten is not None, f"{mid} fehlt im Fragment"
+    return knoten
+
+
+def _lager_anbieter(site, mid) -> set:
+    """Die Anbieter ALLER Bündelzeilen eines Modells im Fragment - die
+    EIGENTÜMERSCHAFT der Zeilen, nicht ihre Sichtbarkeit im Band."""
+    return {z["data-anbieter"] for z in _lager_modell(site, mid).select(".gr-bnd")}
+
+
+def _lager_fehlzeilen(site, mid) -> list:
+    return [
+        [f["data-anbieter"], f["data-band"], f["data-fehlt-lz"]]
+        for f in _lager_modell(site, mid).select(".gr-anb-fehlt")
+    ]
+
+
+def _fehlzeilen(s) -> list:
+    """Die Zeilen der fehlenden Anbieter, die die Seite für das gewählte
+    Modell trägt - OHNE hidden-Filter (Band und Laufzeit blenden nur)."""
+    return s.eval_on_selector_all(
+        "#gr-bnd-gruppe .gr-anb-fehlt",
+        "e => e.map(z => [z.dataset.anbieter, z.dataset.band, z.dataset.fehltLz])",
+    )
+
+
+def test_rueckwechsel_nach_deep_link_zeigt_die_vorgabezeilen(ctx, seite):
     """S2 (O3-Evaluation): der Vorgabe-Klon wurde bislang erst IM Vorgabe-
     Durchlauf von `setzeBuendel` gezogen - bei einem Deep-Link auf ein
     FREMDmodell (genau das, was jeder der 88 Radar-Querlinks tut) war der
@@ -197,65 +231,75 @@ def test_rueckwechsel_nach_deep_link_zeigt_die_vorgabezeilen(seite):
     Zeilen als „Vorgabe". Der Evaluationsfall am echten Bestand: Deep-Link
     auf samsung-galaxy-a56-128, Rückkehr zum Vorgabegerät - Titel und
     Graph sagten iPhone 17 Pro, die Tabelle zeigte die EINE a56-Zeile
-    (664,75 €), die 19 Zeilen des Vorgabegeräts fehlten. Hier dieselbe
-    Kombination an der Fixture: Zeilenzahl UND Werte müssen nach dem
-    Rückweg dem Server-Stand des Vorgabemodells entsprechen."""
-    ursprung = seite.eval_on_selector_all(
-        "#gr-buendel .gr-bnd", "e => e.map(z => z.dataset.gesamt)"
-    )
-    assert len(ursprung) == 4, (
-        f"die Vorgabe-Fixture trägt 4 Zeilen, nicht {len(ursprung)}"
-    )
+    (664,75 €), die 19 Zeilen des Vorgabegeräts fehlten. Seit 10.10.2026
+    steht die Bündelliste nicht mehr auf der Seite; gemessen wird die Zeile
+    der fehlenden Anbieter, die nach dem Rückweg wieder die des
+    Vorgabemodells im Fragment sein muss, und die Zeilenzahl im Fragment."""
+    site = ctx[0]
+    assert len(_lager_modell(site, VORGABE).select(".gr-bnd")) == 4
+    assert len(_lager_modell(site, "samsung-galaxy-s26-256").select(".gr-bnd")) == 1
+    ursprung = _fehlzeilen(seite)
+    assert ursprung == _lager_fehlzeilen(site, VORGABE), ursprung
     seite.goto(
         seite.url.split("?")[0] + "?modell=samsung-galaxy-s26-256",
         wait_until="networkidle",
     )
     seite.wait_for_timeout(300)
-    fremd = seite.eval_on_selector_all(
-        "#gr-buendel .gr-bnd", "e => e.map(z => z.dataset.gesamt)"
+    fremd = _fehlzeilen(seite)
+    assert fremd == _lager_fehlzeilen(site, "samsung-galaxy-s26-256"), (
+        f"Deep-Link zeigt nicht das Fremdmodell: {fremd}"
     )
-    assert len(fremd) == 1, f"Deep-Link zeigt nicht das Fremdmodell: {fremd}"
-    waehle_modell(seite, "apple-iphone-17-pro-256")
+    assert fremd != ursprung, "Gegenprobe: beide Modelle tragen dieselbe Zeile"
+    waehle_modell(seite, VORGABE)
     seite.wait_for_timeout(300)
-    danach = seite.eval_on_selector_all(
-        "#gr-buendel .gr-bnd", "e => e.map(z => z.dataset.gesamt)"
-    )
+    danach = _fehlzeilen(seite)
     assert danach == ursprung, (
         f"Rückweg nach Deep-Link: {danach} statt dem Vorgabe-Stand {ursprung}"
     )
 
 
 @pytest.mark.parametrize("mid,erwartet", sorted(_ERWARTET.items()))
-def test_der_modellwechsel_zeigt_die_eigenen_zeilen(seite, mid, erwartet):
+def test_der_modellwechsel_zeigt_die_eigenen_zeilen(ctx, seite, mid, erwartet):
     """S3, die Evaluator-Auflage: Für JEDES wählbare Gerät stehen seine
-    eigenen Bündelzeilen da — nicht die des Vorgabegeräts, nicht eine
-    Fehlermeldung, nicht versteckt."""
+    eigenen Bündelzeilen bereit — nicht die des Vorgabegeräts, nicht eine
+    Fehlermeldung, nicht versteckt. Seit 10.10.2026 steht die Bündelliste
+    nicht mehr auf der Seite; geprüft wird das Fragment, und im Browser die
+    Zeile der fehlenden Anbieter und der Antwortsatz des gewählten
+    Modells."""
+    site = ctx[0]
+    assert _lager_anbieter(site, mid) == erwartet
     waehle_modell(seite, mid)
     seite.wait_for_timeout(300)
     assert seite.eval_on_selector("#gr-buendel", "e => !e.hidden")
-    anbieter = set(_zeilen_anbieter(seite))
-    assert anbieter == erwartet, f"{mid}: {sorted(anbieter)} statt {sorted(erwartet)}"
-    titel = seite.eval_on_selector("#gr-bnd-titel", "e => e.textContent")
-    assert mid.split("-256")[0].replace("-", " ") in " ".join(titel.lower().split()), (
-        titel
-    )
+    assert _fehlzeilen(seite) == _lager_fehlzeilen(site, mid), mid
+    antwort = seite.eval_on_selector("#tafel-tco .gr-zr-antwort", "e => e.textContent")
+    assert mid.split("-256")[0].replace("-", " ") in " ".join(
+        antwort.lower().split()
+    ), antwort
 
 
-def test_zurueck_zur_vorgabe_zeigt_die_vorgabezeilen(seite):
+def test_zurueck_zur_vorgabe_zeigt_die_vorgabezeilen(ctx, seite):
     """Der Weg zurück darf kein Modell 'stehen lassen': nach zwei Wechseln
     steht wieder der Original-Inhalt der Seite (aus dem Cache, ohne neue
-    Anfrage)."""
+    Anfrage). Seit 10.10.2026 steht die Bündelliste nicht mehr auf der
+    Seite; gemessen wird die Zeile der fehlenden Anbieter."""
+    site = ctx[0]
+    ursprung = _fehlzeilen(seite)
     waehle_modell(seite, "samsung-galaxy-s26-256")
     seite.wait_for_timeout(250)
-    waehle_modell(seite, "apple-iphone-17-pro-256")
+    assert _fehlzeilen(seite) != ursprung
+    waehle_modell(seite, VORGABE)
     seite.wait_for_timeout(250)
-    assert set(_zeilen_anbieter(seite)) == _ERWARTET["apple-iphone-17-pro-256"]
+    assert _fehlzeilen(seite) == ursprung == _lager_fehlzeilen(site, VORGABE)
+    assert _lager_anbieter(site, VORGABE) == _ERWARTET[VORGABE]
 
 
 def test_der_deep_link_oeffnet_das_angegebene_modell(ctx):
     """B5: geraete.html?modell=<id> öffnet die Seite MIT DIESEM Modell —
-    der Selektor, der Titel und die Zeilen gehören zusammen."""
-    _site, wurzel, browser = ctx
+    der Selektor, der Antwortsatz und die Zeilen gehören zusammen. Seit
+    10.10.2026 steht die Bündelliste nicht mehr auf der Seite; gemessen
+    wird die Zeile der fehlenden Anbieter gegen das Fragment."""
+    site, wurzel, browser = ctx
     s = browser.new_page(viewport={"width": 1440, "height": 900})
     try:
         s.goto(
@@ -266,7 +310,11 @@ def test_der_deep_link_oeffnet_das_angegebene_modell(ctx):
         assert "modell=google-pixel-11-256" in s.url
         antwort = s.eval_on_selector("#tafel-tco .gr-zr-antwort", "e => e.textContent")
         assert "Pixel 11" in antwort, antwort
-        assert set(_zeilen_anbieter(s)) == _ERWARTET["google-pixel-11-256"]
+        assert _fehlzeilen(s) == _lager_fehlzeilen(site, "google-pixel-11-256")
+        assert (
+            _lager_anbieter(site, "google-pixel-11-256")
+            == _ERWARTET["google-pixel-11-256"]
+        )
     finally:
         s.close()
 
@@ -276,8 +324,10 @@ def test_der_querlink_des_radars_deep_linket(ctx):
     Abweichungsliste trägt ?modell=<id>, und der führt zu genau dem
     Modell, dessen Zeile ihn trägt. Bis E3 Schritt 3 standen die Links auf
     wettbewerbsradar.html (Seitenwechsel); der Radar ist jetzt der Reiter
-    - der Sprung bleibt ein Deep-Link, app.js wechselt nur in-page."""
-    _site, wurzel, browser = ctx
+    - der Sprung bleibt ein Deep-Link, app.js wechselt nur in-page. Seit
+    10.10.2026 steht die Bündelliste nicht mehr auf der Seite; gemessen
+    wird die Zeile der fehlenden Anbieter gegen das Fragment."""
+    site, wurzel, browser = ctx
     s = browser.new_page(viewport={"width": 1440, "height": 900})
     try:
         s.goto(f"{wurzel}/geraete.html#tafel-radar", wait_until="networkidle")
@@ -292,69 +342,56 @@ def test_der_querlink_des_radars_deep_linket(ctx):
         s.wait_for_timeout(300)
         gewollt = ziel.split("modell=", 1)[1].split("&", 1)[0]
         assert f"modell={gewollt}" in s.url
-        assert set(_zeilen_anbieter(s)) == _ERWARTET[gewollt], (
-            gewollt,
-            sorted(_zeilen_anbieter(s)),
-        )
+        assert _fehlzeilen(s) == _lager_fehlzeilen(site, gewollt), gewollt
+        assert _lager_anbieter(site, gewollt) == _ERWARTET[gewollt]
     finally:
         s.close()
 
 
-def test_die_sortierung_ordnet_ohne_reload(seite):
-    """C: TCO-24 (Server-Default, bleibt), Δ und Anbieter sortierbar per
-    Kopfknopf — ohne Reload. Ein gesetztes window-Flag überlebt nur ohne
-    Navigation. Gemessen wird die BANDLISTE (`#gr-bndliste`): die
-    Ohne-Band-Gruppe darunter ist eine eigene Liste mit eigenem Kopf."""
-    seite.evaluate(
-        "() => {const b = document.querySelector('.gx-bnd-auf');"
-        " if (b && b.getAttribute('aria-expanded') !== 'true') b.click();}"
+def test_die_sortierung_ordnet_ohne_reload(ctx):
+    """C: TCO-24 (Server-Default, bleibt), Δ und Anbieter als Sortier-
+    schlüssel an jeder Zeile. Gemessen wird die BANDLISTE (`#gr-bndliste`):
+    die Ohne-Band-Gruppe darunter ist eine eigene Liste. Seit 10.10.2026
+    steht die Bündelliste nicht mehr auf der Seite; geprüft wird das
+    Fragment: Vorsortierung nach der Leitzahl, Schlüssel als Daten, und
+    die Seite trägt keinen Sortierknopf mehr, der neu laden könnte."""
+    site = ctx[0]
+    seite = BeautifulSoup(
+        (site / "geraete.html").read_text(encoding="utf-8"), "html.parser"
     )
-    seite.evaluate("window.__o3_kein_reload = 1")
-    werte = seite.eval_on_selector_all(
-        "#gr-bndliste .gr-bnd:not([hidden])",
-        "e => e.map(z => parseFloat(z.dataset.gesamt))",
-    )
-    assert len([w for w in werte if w is not None]) >= 2
+    assert seite.select(".gr-bsort") == [] and seite.select(".gr-bnd") == []
+    zeilen = _lager(site).select("#gr-bnd-vorgabe #gr-bndliste > .gr-bnd")
+    werte = [float(z["data-gesamt"]) for z in zeilen if z.get("data-gesamt")]
+    assert len(werte) >= 2
     assert werte == sorted(werte), "Server-Vorsortierung nach TCO-24 fehlt"
-
-    seite.click("#gr-buendel .gr-bnd-kopf button[data-bsort='anbieter']")
-    seite.wait_for_timeout(120)
-    namen = seite.eval_on_selector_all(
-        "#gr-bndliste .gr-bnd:not([hidden])", "e => e.map(z => z.dataset.anbieter)"
-    )
-    assert namen == sorted(namen, key=str.lower), (
-        f"Anbieter-Sortierung greift nicht: {namen}"
-    )
-
-    seite.click("#gr-buendel .gr-bnd-kopf button[data-bsort='tco']")
-    seite.wait_for_timeout(120)
-    werte = seite.eval_on_selector_all(
-        "#gr-bndliste .gr-bnd:not([hidden])",
-        "e => e.map(z => parseFloat(z.dataset.gesamt))",
-    )
-    assert werte == sorted(werte), "TCO-Sortierung greift nicht"
-    assert seite.evaluate("window.__o3_kein_reload") == 1, (
-        "die Sortierung hat die Seite neu geladen"
-    )
+    for z in zeilen:
+        assert z["data-anbieter"] == z.select_one(".gr-bnd-name").get_text(strip=True)
+        assert z.has_attr("data-delta"), "Zeile ohne Δ-Schlüssel"
 
 
-def test_die_delta_sortierung_stellt_den_guenstigsten_nach_vorn(seite):
+def test_die_delta_sortierung_stellt_den_guenstigsten_nach_vorn(ctx):
     """C: Δ aufsteigend heißt: der negativste Abstand zur Vodafone-Referenz
-    zuerst. Zeilen ohne Δ (Referenz, Näherung) stehen dahinter."""
-    seite.evaluate(
-        "() => {const b = document.querySelector('.gx-bnd-auf');"
-        " if (b && b.getAttribute('aria-expanded') !== 'true') b.click();}"
+    zuerst. Zeilen ohne Δ (Referenz, Näherung) tragen keinen Schlüssel und
+    stehen dahinter. Seit 10.10.2026 steht die Bündelliste nicht mehr auf
+    der Seite; geprüft wird das Fragment: das Δ ist der Abstand zur
+    Vodafone-Zeile desselben Bands, also ordnet es wie der Betrag."""
+    zeilen = _lager(ctx[0]).select("#gr-bnd-vorgabe #gr-bndliste > .gr-bnd")
+    vodafone = {
+        z.get("data-band"): float(z["data-gesamt"])
+        for z in zeilen
+        if z["data-anbieter"] == "Vodafone"
+    }
+    mit = [z for z in zeilen if z.get("data-delta")]
+    assert mit, "keine Zeile mit Δ in der Fixture"
+    for z in mit:
+        assert float(z["data-delta"]) == pytest.approx(
+            float(z["data-gesamt"]) - vodafone[z.get("data-band")], abs=0.01
+        ), z.attrs
+    nach_delta = sorted(mit, key=lambda z: float(z["data-delta"]))
+    assert nach_delta[0]["data-anbieter"] == "o2", [z.attrs for z in nach_delta]
+    assert all(
+        z.get("data-delta") == "" for z in zeilen if z["data-anbieter"] == "Vodafone"
     )
-    seite.click("#gr-buendel .gr-bnd-kopf button[data-bsort='delta']")
-    seite.wait_for_timeout(120)
-    deltas = seite.eval_on_selector_all(
-        "#gr-bndliste .gr-bnd:not([hidden])",
-        "e => e.map(z => z.dataset.delta === '' ? null : parseFloat(z.dataset.delta))",
-    )
-    zahlwerte = [d for d in deltas if d is not None]
-    assert zahlwerte, "keine Zeile mit Δ in der Fixture"
-    assert zahlwerte == sorted(zahlwerte), deltas
-    assert deltas[len(zahlwerte) :] == [None] * (len(deltas) - len(zahlwerte)), deltas
 
 
 def test_der_verlaufs_reiter_ist_erreichbar(seite):
@@ -511,92 +548,93 @@ def test_die_balkenwerte_links_laufen_nicht_in_die_modellnamen(ctx):
         s.close()
 
 
+def _css_fuer(site, breite) -> str:
+    """Die Regeln von style.css, die bei dieser Breite gelten: alles außerhalb
+    von @media plus die Blöcke `max-width` >= breite und `min-width` <= breite.
+    Leerraum ist zu einem Zeichen gefaltet."""
+    css = re.sub(r"\s+", " ", (site / "style.css").read_text(encoding="utf-8"))
+    css = re.sub(r"/\*.*?\*/", "", css)
+    teile, rest, pos = [], [], 0
+    for treffer in re.finditer(r"@media([^{]*)\{", css):
+        if treffer.start() < pos:
+            continue
+        tiefe, ende = 1, treffer.end()
+        while tiefe:
+            tiefe += {"{": 1, "}": -1}.get(css[ende], 0)
+            ende += 1
+        rest.append(css[pos : treffer.start()])
+        bedingung = treffer.group(1)
+        maxi = re.search(r"max-width:\s*(\d+)px", bedingung)
+        mini = re.search(r"min-width:\s*(\d+)px", bedingung)
+        passt = (not maxi or int(maxi.group(1)) >= breite) and (
+            not mini or int(mini.group(1)) <= breite
+        )
+        if passt and "print" not in bedingung and "hover" not in bedingung:
+            teile.append(css[treffer.end() : ende - 1])
+        pos = ende
+    rest.append(css[pos:])
+    return " ".join(rest + teile)
+
+
 @pytest.mark.parametrize("breite", [1440, 390])
 def test_jede_buendelzeile_traegt_genau_ein_aufklappzeichen(ctx, breite):
     """28.09.2026: jede Bündelzeile trug zwei Aufklappzeichen - das „+"
     der Chevron-Zelle und das rote „▾" der Tafel-Regel, das als eigenes
     Grid-Element in eine neue Zeile unter den Anbieternamen rutschte.
-    Gemessen: das ::after der Zeile IST das „+"/„−" und sitzt in der
-    Chevron-Spalte, die Chevron-Zelle nimmt keinen Platz; geöffnet steht
-    „−" (nicht das „▴" der Tafel-Regel), wieder zu „+"."""
-    _site, wurzel, browser = ctx
-    s = browser.new_page(viewport={"width": breite, "height": 900})
-    try:
-        s.goto(f"{wurzel}/geraete.html", wait_until="load")
-        s.evaluate(
-            "() => {const b = document.querySelector('.gx-bnd-auf');"
-            " if (b && b.getAttribute('aria-expanded') !== 'true') b.click();}"
-        )
-        s.wait_for_timeout(300)
-        lies = """() => [...document.querySelectorAll(
-            '#tafel-tco details.gr-bnd')].filter(d => d.offsetParent)
-          .map(d => {
-            const su = d.querySelector(':scope>summary');
-            const nach = getComputedStyle(su, '::after');
-            const chev = d.querySelector('.gr-bnd-chev');
-            return {inhalt: nach.content, spalte: nach.gridColumnStart,
-                    zeile: nach.gridRowStart,
-                    chev: chev ? getComputedStyle(chev).display : 'none'};
-          })"""
-        m = s.evaluate(lies)
-        assert m, "keine sichtbare Bündelzeile"
-        for z in m:
-            assert z["inhalt"] == '"+"', z
-            assert z["chev"] == "none", z
-            if breite > 900:
-                assert z["spalte"] == "6" and z["zeile"] == "1", z
-            else:
-                assert z["spalte"] == "chev", z
-        erste = s.locator("#tafel-tco details.gr-bnd > summary").first
-        erste.click()
-        s.wait_for_timeout(150)
-        assert s.evaluate(lies)[0]["inhalt"] == '"−"'
-        erste.click()
-        s.wait_for_timeout(150)
-        assert s.evaluate(lies)[0]["inhalt"] == '"+"'
-    finally:
-        s.close()
+    Das ::after der Zeile IST das „+"/„−" und sitzt in der Chevron-Spalte,
+    die Chevron-Zelle nimmt keinen Platz. Seit 10.10.2026 steht die
+    Bündelliste nicht mehr auf der Seite; geprüft werden das Fragment (eine
+    leere Chevron-Zelle je Zeilenkopf) und die Regeln von style.css, die
+    bei dieser Breite gelten."""
+    site = ctx[0]
+    zeilen = _lager(site).select("details.gr-bnd")
+    assert zeilen, "keine Bündelzeile im Fragment"
+    for d in zeilen:
+        kopf = d.find("summary", recursive=False)
+        assert kopf is not None, d.attrs
+        chev = kopf.select(".gr-bnd-chev")
+        assert len(chev) == 1 and not chev[0].get_text(strip=True), d.attrs
+        assert chev[0].get("aria-hidden") == "true"
+    css = _css_fuer(site, breite)
+    assert ".gr-bnd-chev{display:none}" in css
+    assert '.gr-tafel .gr-bnd>summary::after{content:"+";' in css
+    assert '.gr-tafel .gr-bnd[open]>summary::after{content:"−"}' in css
+    zeichen = " ".join(re.findall(r"\.gr-bnd[^{]*::after\{[^}]*\}", css))
+    assert zeichen and "▾" not in zeichen, zeichen
+    if breite > 900:
+        assert "grid-column:6;grid-row:1;" in css
+        assert ".gr-tafel .gr-bnd>summary::after{grid-area:chev}" not in css
+    else:
+        assert ".gr-tafel .gr-bnd>summary::after{grid-area:chev}" in css
+        assert '"dl chev"' in css
 
 
 @pytest.mark.parametrize("breite", [390, 360, 320])
 def test_der_zweite_preis_der_buendelzeile_ist_am_telefon_benannt(ctx, breite):
     """Mobil fehlt der Spaltenkopf „Gerät ohne Vertrag" - der zweite
     Euro-Betrag der Zeile stand nackt neben dem Tarif. Jetzt steht sein
-    Name als eigene Zeile darüber, vor „–" steht nichts. Die Zeile läuft auch bei 320 px nicht über, und
-    das Δ steht links wie sein Präfix."""
-    _site, wurzel, browser = ctx
+    Name als eigene Zeile darüber, vor „–" steht nichts, und das Δ steht
+    links wie sein Präfix. Seit 10.10.2026 steht die Bündelliste nicht mehr
+    auf der Seite; geprüft werden das Fragment (nur ein Euro-Betrag trägt
+    die Klasse, die den Namen bekommt), die Regeln von style.css bei dieser
+    Breite und im Browser, dass die Seite nicht waagerecht rollt."""
+    site, wurzel, browser = ctx
+    bars = _lager(site).select("details.gr-bnd > summary .gr-bnd-bar")
+    assert bars, "keine Bündelzeile im Fragment"
+    zahlen = [b for b in bars if b.get_text(strip=True).endswith("€")]
+    assert zahlen, [b.get_text(strip=True) for b in bars]
+    for b in bars:
+        wert = "gr-bnd-bar--wert" in b.get("class", [])
+        assert wert == b.get_text(strip=True).endswith("€"), b
+    css = _css_fuer(site, breite)
+    assert '.gr-bnd-bar--wert::before{content:"ohne Vertrag";display:block;' in css
+    assert ".gr-bnd-delta{text-align:left}" in css
     s = browser.new_page(viewport={"width": breite, "height": 844})
     try:
         s.goto(f"{wurzel}/geraete.html", wait_until="load")
-        s.evaluate(
-            "() => {const b = document.querySelector('.gx-bnd-auf');"
-            " if (b && b.getAttribute('aria-expanded') !== 'true') b.click();}"
-        )
         s.wait_for_timeout(300)
-        m = s.evaluate("""() => [...document.querySelectorAll(
-            '#tafel-tco details.gr-bnd')].filter(d => d.offsetParent)
-          .map(d => {
-            const su = d.querySelector(':scope>summary');
-            const bar = su.querySelector('.gr-bnd-bar');
-            const dl = su.querySelector('.gr-bnd-delta');
-            const rechts = Math.max(...[...su.querySelectorAll('*')]
-              .map(e => e.getBoundingClientRect().right));
-            return {text: bar.textContent.trim(),
-                    vor: getComputedStyle(bar, '::before').content,
-                    ausrichtung: getComputedStyle(dl).textAlign,
-                    ueber: rechts - su.getBoundingClientRect().right};
-          })""")
         quer = s.evaluate("document.documentElement.scrollWidth")
         assert quer <= breite, f"die Seite rollt waagerecht: {quer} px"
-        zahlen = [z for z in m if z["text"].endswith("€")]
-        assert zahlen, m
-        for z in m:
-            assert z["ueber"] <= 1, z
-            assert z["ausrichtung"] in ("left", "start"), z
-            if z["text"].endswith("€"):
-                assert z["vor"] == '"ohne Vertrag"', z
-            else:
-                assert z["vor"] in ("none", "normal"), z
     finally:
         s.close()
 

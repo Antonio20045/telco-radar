@@ -26,7 +26,7 @@ from test_geraete_zeitreihe_ansicht import HEUTE, _baue
 
 
 @pytest.fixture(scope="module")
-def seite_html(tmp_path_factory):
+def gebaute_site(tmp_path_factory):
     root, state = _baue(tmp_path_factory.mktemp("zrseite"))
     reports = root / "data" / "reports"
     reports.mkdir(parents=True, exist_ok=True)
@@ -45,7 +45,19 @@ def seite_html(tmp_path_factory):
     (reports / f"{HEUTE}.md").write_text("# B\n", encoding="utf-8")
     site = root / "site"
     render_site(site, reports)
-    return (site / "geraete.html").read_text(encoding="utf-8")
+    return site
+
+
+@pytest.fixture(scope="module")
+def seite_html(gebaute_site):
+    return (gebaute_site / "geraete.html").read_text(encoding="utf-8")
+
+
+@pytest.fixture(scope="module")
+def fragment(gebaute_site):
+    """Das Bündel-Fragment mit den Zeilen aller Modelle."""
+    pfad = gebaute_site / "data" / "geraete-buendel.html"
+    return BeautifulSoup(pfad.read_text(encoding="utf-8"), "html.parser")
 
 
 @pytest.fixture(scope="module")
@@ -185,10 +197,18 @@ def test_zwei_separate_fuss_aufklapper_gibt_es_nicht_mehr(tafel):
     assert tafel.select_one("details#gr-datenlage") is None
 
 
-def test_die_buendel_zeilen_bleiben_unter_dem_graphen(tafel):
-    assert tafel.select_one("#gr-buendel") is not None
-    assert tafel.select(".gr-bnd"), "die Anbieterzeilen fehlen"
-    assert tafel.select(".gr-bnd .gr-bnd-rw"), (
+def test_die_buendel_zeilen_bleiben_unter_dem_graphen(tafel, fragment):
+    """Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; geprüft
+    wird das Fragment. Unter dem Graphen bleibt der Abschnitt mit der Zeile
+    der fehlenden Anbieter."""
+    block = tafel.select_one("#gr-buendel")
+    assert block is not None
+    assert block.select_one("#gr-bnd-gruppe") is not None
+    assert not tafel.select(".gr-bnd"), "Bündelzeilen stehen noch auf der Seite"
+    lager = fragment.select_one("#gr-bnd-vorgabe")
+    assert lager is not None, "das Fragment trägt kein Startmodell"
+    assert lager.select(".gr-bnd"), "die Anbieterzeilen fehlen"
+    assert lager.select(".gr-bnd .gr-bnd-rw"), (
         "der Rechenweg-Aufklapper je Zeile fehlt (§3.1b)"
     )
 

@@ -312,40 +312,62 @@ def test_berechneter_preis_sagt_wie(bestand):
 def test_rechnung_ist_zugeklappt_sichtbar_ohne_querscroll(
     bestand, chromium, breite, hoehe
 ):
+    """Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; geprüft
+    wird das Fragment: jede Rechnung steht im Kopf (`summary`) ihrer Zeile,
+    nicht im Rechenweg-Template, ist also zugeklappt lesbar. Die Seite selbst
+    hat bei dieser Breite keinen Querscroll und trägt keine Bündelzeile."""
     site, _, _ = bestand
+    lager = BeautifulSoup(
+        (site / "data" / "geraete-buendel.html").read_text(encoding="utf-8"),
+        "html.parser",
+    )
+    rechnungen = lager.select("details.gr-bnd .gr-bnd-rechnung")
+    assert rechnungen, "keine Zeile mit Rechnung im Fragment"
+    ausserhalb = [
+        r
+        for r in rechnungen
+        if r.find_parent("summary") is None or r.find_parent("template") is not None
+    ]
+    assert not ausserhalb, f"{len(ausserhalb)} Rechnungen nicht im Zeilenkopf"
     with _server(site) as basis:
         seite = chromium.new_page(viewport={"width": breite, "height": hoehe})
         try:
-            seite.goto(f"{basis}/geraete.html")
-            seite.wait_for_selector("details.gr-bnd .gr-bnd-rechnung", state="attached")
-            seite.click(".gx-bnd-auf")
+            seite.goto(f"{basis}/geraete.html", wait_until="networkidle")
             mass = seite.evaluate(
-                """() => {
-                  const r = [...document.querySelectorAll(
-                    'details.gr-bnd:not([open]) .gr-bnd-rechnung')]
-                    .filter(e => e.closest('details').offsetParent !== null);
-                  return {
-                    n: r.length,
-                    unsichtbar: r.filter(e => getComputedStyle(e).display === 'none'
-                      || e.getBoundingClientRect().height < 8).length,
-                    ueberlauf: r.filter(e => e.scrollWidth > e.clientWidth + 1).length,
-                    quer: document.documentElement.scrollWidth > innerWidth + 1,
-                  };
-                }"""
+                """() => ({
+                  zeilen: document.querySelectorAll('details.gr-bnd').length,
+                  quer: document.documentElement.scrollWidth > innerWidth + 1,
+                })"""
             )
         finally:
             seite.close()
-    assert mass["n"] > 0, "keine sichtbare Zeile mit Rechnung"
-    assert mass["unsichtbar"] == 0
-    assert mass["ueberlauf"] == 0
+    assert mass["zeilen"] == 0, "die Seite trägt wieder Bündelzeilen"
     assert not mass["quer"]
 
 
 def test_tafel_sagt_einmal_ohne_versandkosten(bestand):
-    """Versand rechnet bei keinem Anbieter mit; die Tafel sagt es einmal."""
-    site, _, _ = bestand
+    """Versand rechnet bei keinem Anbieter mit. Seit 10.10.2026 steht die
+    Bündelliste nicht mehr auf der Seite und mit ihr der Vermerk; geprüft
+    werden die Daten: kein Summand und kein Posten einer Karte ist Versand,
+    und die Summanden ergeben die Kernzahl ohne weiteren Betrag."""
+    site, karten, soup = bestand
     seite = BeautifulSoup(
         (site / "geraete.html").read_text(encoding="utf-8"), "html.parser"
     )
-    vermerke = [_text(v) for v in seite.select(".gr-bnd-versand")]
-    assert vermerke == ["ohne Versandkosten"]
+    assert seite.select(".gr-bnd-versand") == []
+    belastbar = [k for k in karten if k["belastbar"] and k.get("rechnung")]
+    assert belastbar, "Bestand ohne belastbare Rechnung - der Test prüft nichts"
+    worte = [
+        w
+        for k in karten
+        for w in [
+            *(s["wort"] for s in k.get("rechnung") or []),
+            *(t["wort"] for s in k.get("rechnung") or [] for t in s["teile"]),
+            *(p["name"] for p in k.get("bestandteile") or []),
+        ]
+    ]
+    assert worte, "keine Summanden gelesen - der Test prüft nichts"
+    assert not [w for w in worte if "versand" in w.lower()], worte
+    for k in belastbar:
+        summe = sum(s["betrag"] * (s["anzahl"] or 1) for s in k["rechnung"])
+        assert round(summe, 2) == pytest.approx(k["gesamt"], abs=0.011), k["tarif"]

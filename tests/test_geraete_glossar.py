@@ -51,7 +51,7 @@ import re
 import socket
 import threading
 
-from test_geraete_tco_zustand import _baue, vorlage_text
+from test_geraete_tco_zustand import _baue, lager, vorlage_text
 
 BEGRIFFE = {"TCO-24", "Tarifband", "Bündel", "Abweichungs-Vorzeichen (+/−) zu Vodafone"}
 
@@ -198,9 +198,12 @@ def _zeilen_mit_zwei_preisen(soup):
     """Belastbare Zeilen, die einen GERAETEPREIS tragen (Barpreis oder
     Finanzierungssumme) - nur sie zeigen das Paradox zweier Zahlen. Die
     1&1-Zeile der Fixture (ein Monatspreis fuer Tarif und Geraet
-    zusammen, kein Geraetepreis) bleibt bewusst aussen vor."""
+    zusammen, kein Geraetepreis) bleibt bewusst aussen vor.
+
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; der
+    Aufrufer reicht die Zeilen des Fragments (`lager`)."""
     ergebnis = []
-    for zeile in soup.select("#tafel-tco .gr-bnd"):
+    for zeile in soup.select(".gr-bnd"):
         bar = zeile.select_one(".gr-bnd-bar")
         if bar is None:
             continue
@@ -215,8 +218,13 @@ def test_jede_zeile_mit_zwei_preisen_traegt_die_paradox_zeile(tmp_path):
     einem Satz, was die zweite Zahl enthaelt - mit dem Zeitraum, der sie
     traegt. Seit O2 stehen die fuenf Kernangaben offen und ALLES weitere
     im EINEN Rechenweg-Aufklapper der Zeile (A6); die Erklaerung der
-    BEGRIFFE ohne Klick leistet die Antwortzeile ueber dem Graph."""
-    s = _baue(tmp_path, eins_und_eins=True)
+    BEGRIFFE ohne Klick leistet die Antwortzeile ueber dem Graph.
+
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; geprüft
+    wird das Fragment."""
+    seite = _baue(tmp_path, eins_und_eins=True)
+    assert not seite.select("#tafel-tco .gr-bnd"), "Bündelzeilen stehen auf der Seite"
+    s = lager(tmp_path)
     zeilen = _zeilen_mit_zwei_preisen(s)
     assert zeilen, "die Fixture traegt keine Zeile mit zwei Preisen"
     for zeile in zeilen:
@@ -240,9 +248,7 @@ def test_jede_zeile_mit_zwei_preisen_traegt_die_paradox_zeile(tmp_path):
                 assert "gr-bnd" in (ahne.get("class") or []), (
                     "die Paradox-Zeile steckt in einer weiteren Aufklappung"
                 )
-    eins_und_eins = [
-        z for z in s.select("#tafel-tco .gr-bnd") if z.get("data-anbieter") == "1&1"
-    ]
+    eins_und_eins = [z for z in s.select(".gr-bnd") if z.get("data-anbieter") == "1&1"]
     assert eins_und_eins, "die Fixture traegt keine 1&1-Zeile"
     for zeile in eins_und_eins:
         assert zeile.select_one(".gr-kk-paradox") is None, (
@@ -259,8 +265,12 @@ def test_die_paradox_zeile_nennt_den_zeitraum_ihrer_raten(tmp_path):
     (N = Ratenzahl des Bau-Satzes), der Barpreis-Zweig nennt "Gerät + M
     Monate Tarif". M ist der Horizont des Labels, aber höchstens 24: der Tarif
     zählt nur seine Bindung, Monat 25-36 nur die Rate (Antonio 10.10.2026); ein
-    Betrag für Tarif und Gerät zusammen (1&1) läuft über den ganzen Horizont."""
-    s = _baue(tmp_path)
+    Betrag für Tarif und Gerät zusammen (1&1) läuft über den ganzen Horizont.
+
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; geprüft
+    wird das Fragment."""
+    _baue(tmp_path)
+    s = lager(tmp_path)
     geprueft = 0
     for zeile in _zeilen_mit_zwei_preisen(s):
         label = zeile.select_one(".gr-bnd-label")

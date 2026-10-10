@@ -59,12 +59,8 @@ def paare(tmp_path_factory) -> list[tuple[dict, list[str]]]:
         heute=heute,
     )
     tco = geraete["tco"]
-    start = ((geraete.get("zeitreihe") or {}).get("start") or {}).get("modell")
-    start = start or tco["modell_vorgabe"]
-    karten_seite = [k for m in tco["modelle"] if m["id"] == start for k in _zeilen(m)]
-    karten_fragment = [
-        k for m in tco["modelle"] if m["id"] != start for k in _zeilen(m)
-    ]
+    karten_seite: list[dict] = []
+    karten_fragment = [k for m in tco["modelle"] for k in _zeilen(m)]
 
     seite = BeautifulSoup(
         (site / "geraete.html").read_text(encoding="utf-8"),

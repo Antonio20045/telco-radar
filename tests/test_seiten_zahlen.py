@@ -1455,6 +1455,9 @@ def test_pf_beide_ratenlaufzeiten_eines_congstar_abrufs_werden_zwei_zeilen(
     Zeitraum je Zeile, damit der Test nicht auf zwei identischen Zeilen
     gruen wird.
 
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; den
+    Zeitraum der Zeilen prüft das Fragment.
+
     NICHT GEMESSEN wird die Bestandslage: ob der Produktionsbestand
     ueberhaupt Gruppen mit zwei Laufzeiten kennt, sagt
     `test_pf_bestand_zaehlt_seine_ratenlaufzeiten_und_haelt_die_luecke_fest`.
@@ -1578,12 +1581,14 @@ def test_pf_beide_ratenlaufzeiten_eines_congstar_abrufs_werden_zwei_zeilen(
     )
 
     inline = (site / "geraete.html").read_text(encoding="utf-8")
-    assert "danach noch offen" not in inline, "eine Restschuld gibt es nicht mehr"
-    assert "Kosten über 24 Monate" in inline, "die 24er nennt ihren Zeitraum nicht"
-    assert "Tarifgrundpreis Monat 25–36" not in inline, (
-        "die 36-Raten-Zeile braucht den Tarif ab Monat 25 nicht"
-    )
-    assert "Kosten über 36 Monate" in inline, "die 36er nennt ihren Zeitraum nicht"
+    fragment = (site / "data" / "geraete-buendel.html").read_text(encoding="utf-8")
+    for text in (inline, fragment):
+        assert "danach noch offen" not in text, "eine Restschuld gibt es nicht mehr"
+        assert "Tarifgrundpreis Monat 25–36" not in text, (
+            "die 36-Raten-Zeile braucht den Tarif ab Monat 25 nicht"
+        )
+    assert "Kosten über 24 Monate" in fragment, "die 24er nennt ihren Zeitraum nicht"
+    assert "Kosten über 36 Monate" in fragment, "die 36er nennt ihren Zeitraum nicht"
 
 
 def test_pf_ohne_tarifleiter_nennt_die_seite_den_grund(tmp_path, bestand):

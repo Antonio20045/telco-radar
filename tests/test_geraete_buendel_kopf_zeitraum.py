@@ -13,9 +13,9 @@ Genau dort standen zwei Aussagen, die niemand gemessen hat:
      Rang mit den 24-Monats-Summen.
 
 Beides wird hier an einer Fixture mit GEMISCHTEN Zeitraeumen gemessen -
-am echten Makro und im echten Chromium, weil die Sortierung im Browser
-laeuft (CLAUDE.md: eine Rechnung, die im Browser laeuft, wird im Browser
-getestet).
+am echten Makro. Seit 10.10.2026 steht die Bündelliste nicht mehr auf der
+Seite; geprüft wird das Fragment `data/geraete-buendel.html` (Zeilen,
+Daten-Attribute, Laufzeit-Gruppen) und die Server-Vorsortierung.
 
 Die GEGENPROBEN stehen je Test: eine Fixture ohne 36-Monats-Zeile waere
 mit jeder Sortierung gruen, und ein Kopf ohne Monatszahl ist nur dann eine
@@ -24,27 +24,24 @@ Aussage, wenn die Zeilen darunter ihren Zeitraum selbst nennen.
 
 from __future__ import annotations
 
-import contextlib
 import json
 import pathlib
 
 import pytest
-
-from tarifleiter_testbestand import mit_leiter
 import yaml
 from bs4 import BeautifulSoup
-
-from telco_radar.report.html import _env, render_site
-
+from tarifleiter_testbestand import mit_leiter
 from test_geraete_browser_fixture import (
-    HEUTE,
-    _KATALOG,
     _FARBEN,
+    _KATALOG,
     _QUELLEN,
+    HEUTE,
     _listung,
-    _server,
     _sku,
 )
+
+from telco_radar.report.geraete_tco_view import _zeilen_rang
+from telco_radar.report.html import _env, render_site
 
 WURZEL = pathlib.Path(__file__).resolve().parents[1]
 DEVICE = "apple-iphone-17-pro"
@@ -196,8 +193,24 @@ def suppe(site):
     )
 
 
-def _zeilen(suppe):
-    return suppe.select("#gr-buendel #gr-bndliste .gr-bnd")
+@pytest.fixture(scope="module")
+def lager(site):
+    return BeautifulSoup(
+        (site / "data" / "geraete-buendel.html").read_text(encoding="utf-8"),
+        "html.parser",
+    )
+
+
+def _zeilen(lager):
+    return lager.select("#gr-bnd-vorgabe #gr-bndliste .gr-bnd")
+
+
+def _gruppen(lager) -> dict[str, list]:
+    """Die Zeilen je Laufzeit-Gruppe (`data-lz`), in Fragment-Reihenfolge."""
+    gruppen: dict[str, list] = {}
+    for z in _zeilen(lager):
+        gruppen.setdefault(z.get("data-lz", ""), []).append(z)
+    return gruppen
 
 
 def _etikett_monate(zeile) -> int | None:
@@ -209,12 +222,13 @@ def _etikett_monate(zeile) -> int | None:
     return int(text.split()[2])
 
 
-def test_die_fixture_mischt_wirklich_zwei_zeitraeume(suppe):
+def test_die_fixture_mischt_wirklich_zwei_zeitraeume(lager):
     """GEGENPROBE zu allem, was folgt: vier Zeilen in EINEM Band, drei mit
     24 und eine mit 36 Monaten - und die 36er faellt nach Betrag MITTEN in
     die Reihe. Traegt die Fixture das nicht, sind die Tests darunter mit
-    jedem Kopf und jeder Sortierung gruen."""
-    zeilen = _zeilen(suppe)
+    jedem Kopf und jeder Sortierung gruen. Seit 10.10.2026 steht die
+    Bündelliste nicht mehr auf der Seite; geprüft wird das Fragment."""
+    zeilen = _zeilen(lager)
     assert len(zeilen) == 4, [z.get("data-anbieter") for z in zeilen]
     betraege = {z["data-anbieter"]: float(z["data-gesamt"]) for z in zeilen}
     assert betraege == pytest.approx(_SOLL), betraege
@@ -224,29 +238,56 @@ def test_die_fixture_mischt_wirklich_zwei_zeitraeume(suppe):
     assert rang == ["congstar", "o2", "Telekom", "Vodafone"], rang
 
 
-def test_der_spaltenkopf_der_buendeltafel_nennt_keine_monatszahl(suppe):
+def test_der_spaltenkopf_der_buendeltafel_nennt_keine_monatszahl(suppe, lager):
     """Gegen den alten Stand rot: dort stand fest "Kosten über 24 Monate"
     im Kopf UND in seinem `aria-label`, ueber einer Zeile mit dem Etikett
-    "Kosten über 36 Monate" in derselben Spalte."""
-    kopf = suppe.select_one("#gr-buendel .gr-bnd-kopf")
-    assert kopf, "Kopf der Buendeltafel nicht gefunden - Lookup leer"
-    knopf = kopf.select_one("button[data-bsort='tco']")
-    assert knopf, "der Sortierknopf der Kostenspalte fehlt"
-    text = knopf.get_text(" ", strip=True)
-    beschriftung = f"{text} {knopf.get('aria-label', '')}"
-    assert "Monate" not in beschriftung, beschriftung
-    assert "24" not in beschriftung and "36" not in beschriftung, beschriftung
-    assert text == "Kosten mit Tarif", text
-    assert knopf.get("aria-label"), "der Knopf braucht seine Vorlesehilfe"
+    "Kosten über 36 Monate" in derselben Spalte. Seit 10.10.2026 steht die
+    Bündelliste nicht mehr auf der Seite; geprüft wird, dass der Teil unter
+    dem Graphen keinen Kopf und keinen Zeitraum mehr behauptet und der
+    Zeitraum im Fragment an jeder Zeile steht."""
+    teil = suppe.select_one("#gr-buendel")
+    assert teil is not None, "#gr-buendel fehlt - Lookup leer"
+    assert teil.select_one(".gr-bnd-kopf") is None, "der Spaltenkopf ist zurück"
+    assert teil.select_one("button[data-bsort]") is None, "ein Sortierknopf ist zurück"
+    text = " ".join(teil.get_text(" ", strip=True).split())
+    assert "Kosten über" not in text and "Monate" not in text, text
 
-    monate = sorted({_etikett_monate(z) for z in _zeilen(suppe)})
+    monate = sorted({_etikett_monate(z) for z in _zeilen(lager)})
     assert monate == [24, 36], monate
+
+
+def _ohneband_kopf() -> str:
+    """Der Kopf der Gruppe „Ohne Tarifband“ am ECHTEN Makro - die Fixture
+    trägt keine Zeile ohne Band, die Gruppe wird darum direkt gebaut."""
+    karte = _finanzierungskarte(36)
+    karte["band"] = None
+    modell = {
+        "alt_hinweis": "",
+        "zeilen_band": [],
+        "fehlzeilen": [],
+        "zeilen_ohne_band": [karte],
+        "haendler_ohne_buendel": {},
+    }
+    gruppe = BeautifulSoup(
+        _env()
+        .from_string(
+            '{% from "_geraete_buendel.html.j2" import buendelgruppe %}'
+            "{{ buendelgruppe(m) }}"
+        )
+        .render(m=modell),
+        "html.parser",
+    )
+    kopf = gruppe.select_one(".gr-ohneband .gr-bnd-kopf")
+    assert kopf is not None, "die Gruppe ohne Tarifband trägt keinen Kopf"
+    return " ".join(kopf.get_text(" ", strip=True).split())
 
 
 def test_auch_die_gruppe_ohne_tarifband_nennt_die_spalte_ohne_zeitraum(site):
     """Dieselbe Spalte, zweiter Kopf: die Gruppe "Ohne Tarifband" trug die
     24 als eigene Textkopie. Zwei Koepfe mit zwei Texten waeren die
-    naechste Stelle, an der Tafel und Gruppe auseinanderlaufen."""
+    naechste Stelle, an der Tafel und Gruppe auseinanderlaufen. Seit
+    10.10.2026 steht die Bündelliste nicht mehr auf der Seite; geprüft
+    werden Seite, Fragment und der Kopf am echten Makro."""
     texte = []
     for pfad in ("geraete.html", "data/geraete-buendel.html"):
         datei = site / pfad
@@ -254,12 +295,12 @@ def test_auch_die_gruppe_ohne_tarifband_nennt_die_spalte_ohne_zeitraum(site):
             continue
         suppe = BeautifulSoup(datei.read_text(encoding="utf-8"), "html.parser")
         texte += [k.get_text(" ", strip=True) for k in suppe.select(".gr-bnd-kopf")]
-    assert texte, "kein einziger Spaltenkopf gefunden - Lookup leer"
+    texte.append(_ohneband_kopf())
     assert all("Monate" not in t for t in texte), texte
     assert all("Kosten mit Tarif" in t for t in texte), texte
 
 
-def test_jede_zeile_traegt_ihren_zeitraum_als_sortiergruppe(suppe):
+def test_jede_zeile_traegt_ihren_zeitraum_als_sortiergruppe(lager):
     """`data-leitzahl-monate` ist das Feld, das app.js liest - es MUSS
     dieselbe Zahl sein, die das Etikett derselben Zeile nennt (eine
     Beschriftungsregel, eine Gruppierung).
@@ -267,9 +308,10 @@ def test_jede_zeile_traegt_ihren_zeitraum_als_sortiergruppe(suppe):
     Gegen den alten Stand rot: das Attribut gab es nicht, und `data-
     laufzeit` daneben war fuer JEDE Zeile 24 - auch fuer die 36er. Seit
     Datenkonzept Geräte Schritt 2 ist `karte["laufzeit"]` der Zeitraum H der
-    Kernzahl und damit dieselbe Zahl wie das Etikett.
+    Kernzahl und damit dieselbe Zahl wie das Etikett. Seit 10.10.2026 steht
+    die Bündelliste nicht mehr auf der Seite; geprüft wird das Fragment.
     """
-    zeilen = _zeilen(suppe)
+    zeilen = _zeilen(lager)
     paare = [(z.get("data-leitzahl-monate"), _etikett_monate(z)) for z in zeilen]
     assert all(a for a, _e in paare), paare
     assert all(int(a) == e for a, e in paare), paare
@@ -327,133 +369,109 @@ def test_ohne_gemessenen_zeitraum_bleibt_die_sortiergruppe_leer():
     assert "Kein Bündel erhoben" in "".join(zeile.find_all(string=True))
 
 
-@contextlib.contextmanager
-def _browser_ctx(site, chromium):
-    with _server(site) as wurzel:
-        yield wurzel, chromium
-
-
-@pytest.fixture(scope="module")
-def ctx(site, chromium):
-    with _browser_ctx(site, chromium) as c:
-        yield c
-
-
-@pytest.fixture()
-def seite(ctx):
-    """Die Tafel unter „alle“: nur dort stehen 24 und 36 Raten untereinander
-    (Datenkonzept Geräte 5.4), nach Laufzeit gruppiert."""
-    wurzel, browser = ctx
-    s = browser.new_page(viewport={"width": 1440, "height": 900})
-    try:
-        s.goto(f"{wurzel}/geraete.html?laufzeit=alle", wait_until="networkidle")
-        yield s
-    finally:
-        s.close()
-
-
-def _reihe(s):
-    """(Anbieter, Zeitraum, Betrag) je sichtbarer Zeile, in DOM-Reihenfolge."""
-    return s.eval_on_selector_all(
-        "#gr-bndliste .gr-bnd:not([hidden])",
-        "e => e.map(z => [z.dataset.anbieter, "
-        "z.getAttribute('data-leitzahl-monate'), "
-        "parseFloat(z.dataset.gesamt)])",
-    )
-
-
-def test_die_sortierung_stellt_zwei_zeitraeume_nicht_in_einen_rang(seite):
+def test_die_sortierung_stellt_zwei_zeitraeume_nicht_in_einen_rang(lager):
     """Der Befund im Browser: ein Klick auf den Kopf stellte die
     36-Monats-Summe (1.176,76 EUR) zwischen o2 (1.032,76) und Vodafone
     (1.224,76) - als waere sie teurer als die eine und guenstiger als die
     andere. Beides ist nicht gemessen.
 
-    Gegen den alten Stand rot: dort lautete die Reihe nach dem Klick
-    [congstar, o2, Telekom, Vodafone].
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; geprüft
+    wird das Fragment: jeder Zeitraum ist eine eigene Laufzeit-Gruppe mit
+    eigenem Kopf, und innerhalb der Gruppe steht die Vorsortierung nach
+    Betrag. Der alte Rang [congstar, o2, Telekom, Vodafone] ist keine
+    Gruppenfolge.
     """
-    seite.evaluate(
-        "() => {const b = document.querySelector('.gx-bnd-auf');"
-        " if (b && b.getAttribute('aria-expanded') !== 'true') b.click();}"
-    )
-    seite.click("#gr-buendel .gr-bnd-kopf button[data-bsort='tco']")
-    seite.wait_for_timeout(120)
-    reihe = _reihe(seite)
-    assert [z[0] for z in reihe] == ["congstar", "o2", "Vodafone", "Telekom"], reihe
-    assert [z[1] for z in reihe] == ["24", "24", "24", "36"], reihe
-    je_zeitraum = {}
-    for _a, mon, betrag in reihe:
-        je_zeitraum.setdefault(mon, []).append(betrag)
-    for mon, betraege in je_zeitraum.items():
-        assert betraege == sorted(betraege), (mon, betraege)
-    assert len(reihe) == 4, reihe
-    etikett = seite.eval_on_selector_all(
-        "#gr-bndliste .gr-bnd:not([hidden]) .gr-bnd-label",
-        "e => e.map(x => x.textContent.trim())",
-    )
-    kosten = [e for e in etikett if e.startswith("Kosten über")]
-    assert kosten[-1] == "Kosten über 36 Monate", etikett
+    gruppen = _gruppen(lager)
+    assert sorted(gruppen) == ["24", "36"], sorted(gruppen)
+    for lz, zeilen in gruppen.items():
+        assert {z.get("data-leitzahl-monate") for z in zeilen} == {lz}, lz
+        betraege = [float(z["data-gesamt"]) for z in zeilen]
+        assert betraege == sorted(betraege), (lz, betraege)
+    reihe = [z["data-anbieter"] for lz in ("24", "36") for z in gruppen[lz]]
+    assert reihe == ["congstar", "o2", "Vodafone", "Telekom"], reihe
+    koepfe = [
+        h.get("data-lz-kopf")
+        for h in lager.select("#gr-bnd-vorgabe #gr-bndliste h4[data-lz-kopf]")
+    ]
+    assert koepfe == ["24", "36"], koepfe
+    etikett = gruppen["36"][-1].select_one(".gr-bnd-label").get_text(strip=True)
+    assert etikett == "Kosten über 36 Monate", etikett
 
 
-def test_die_umgekehrte_richtung_dreht_nur_innerhalb_des_zeitraums(seite):
+def test_die_umgekehrte_richtung_dreht_nur_innerhalb_des_zeitraums(lager):
     """Der Zeitraum ist kein Wert, der rangiert, sondern der Rahmen, in dem
-    rangiert wird: der zweite Klick dreht die Betraege INNERHALB der
+    rangiert wird: die umgekehrte Folge dreht die Betraege INNERHALB der
     24-Monats-Gruppe - die 36er bleibt fuer sich und wandert nicht als
-    "guenstigstes Angebot" nach vorn."""
-    seite.evaluate(
-        "() => {const b = document.querySelector('.gx-bnd-auf');"
-        " if (b && b.getAttribute('aria-expanded') !== 'true') b.click();}"
+    "guenstigstes Angebot" nach vorn. Seit 10.10.2026 steht die
+    Bündelliste nicht mehr auf der Seite; geprüft wird die Gruppe im
+    Fragment, die die 36er nicht enthält."""
+    gruppen = _gruppen(lager)
+    rueckwaerts = sorted(
+        gruppen["24"], key=lambda z: float(z["data-gesamt"]), reverse=True
     )
-    knopf = "#gr-buendel .gr-bnd-kopf button[data-bsort='tco']"
-    seite.click(knopf)
-    seite.wait_for_timeout(120)
-    seite.click(knopf)
-    seite.wait_for_timeout(120)
-    reihe = _reihe(seite)
-    assert [z[0] for z in reihe] == ["Vodafone", "o2", "congstar", "Telekom"], reihe
-    assert [z[1] for z in reihe] == ["24", "24", "24", "36"], reihe
+    assert [z["data-anbieter"] for z in rueckwaerts] == ["Vodafone", "o2", "congstar"]
+    assert [z["data-anbieter"] for z in gruppen["36"]] == ["Telekom"]
+    assert all(z.get("data-leitzahl-monate") == "24" for z in rueckwaerts)
 
 
-def test_eine_zeile_ohne_gemessenen_zeitraum_rangiert_hinten_und_bleibt(seite):
+def test_eine_zeile_ohne_gemessenen_zeitraum_rangiert_hinten_und_bleibt():
     """Der dritte Zustand: kein gemessener Zeitraum (leeres Attribut). Er
     wird nicht als 24 angenommen (Clean Code 4) - die Zeile steht hinter
-    allen Zeitraeumen und bleibt in der Liste. Gemessen an einer Zeile,
-    deren Attribut im DOM geleert wird: der Bestand kennt diesen Fall
-    heute nicht (ohne gemessene Laufzeit ist die Kennzahl unbelastbar),
-    die Sortierung muss ihn trotzdem tragen."""
-    seite.evaluate(
-        "() => {const b = document.querySelector('.gx-bnd-auf');"
-        " if (b && b.getAttribute('aria-expanded') !== 'true') b.click();}"
-    )
-    seite.eval_on_selector(
-        "#gr-bndliste .gr-bnd[data-anbieter='congstar']",
-        "z => z.setAttribute('data-leitzahl-monate', '')",
-    )
-    seite.click("#gr-buendel .gr-bnd-kopf button[data-bsort='tco']")
-    seite.wait_for_timeout(120)
-    reihe = _reihe(seite)
+    allen gemessenen Zeilen und bleibt in der Liste. Seit 10.10.2026 steht
+    die Bündelliste nicht mehr auf der Seite; geprüft wird die
+    Server-Vorsortierung (`_zeilen_rang`) und das Attribut am echten Makro."""
+
+    def karte(anbieter, gesamt):
+        k = _finanzierungskarte(24)
+        k.update({"anbieter": anbieter, "gesamt": gesamt})
+        if gesamt is None:
+            k.update(
+                {
+                    "belastbar": False,
+                    "leitzahl_monate": None,
+                    "laufzeit": None,
+                    "leer_grund": "Kein Bündel erhoben",
+                }
+            )
+        return k
+
+    karten = [
+        karte("congstar", None),
+        karte("o2", 1032.76),
+        karte("Vodafone", 1224.76),
+        karte("Telekom", 840.76),
+    ]
+    reihe = sorted(karten, key=_zeilen_rang)
     assert len(reihe) == 4, reihe
-    assert [z[1] for z in reihe] == ["24", "24", "", "36"], (
-        "hinten in ihrer Laufzeit-Gruppe (24 Raten), vor der Gruppe 36",
-        reihe,
-    )
-    assert reihe[2][0] == "congstar", reihe
+    assert [k["anbieter"] for k in reihe] == ["Telekom", "o2", "Vodafone", "congstar"]
+    zeile = BeautifulSoup(
+        _env()
+        .from_string(
+            '{% from "_geraete_buendel.html.j2" import buendelzeile %}'
+            "{{ buendelzeile(k) }}"
+        )
+        .render(k=reihe[-1]),
+        "html.parser",
+    ).select_one(".gr-bnd")
+    assert zeile.get("data-leitzahl-monate") == "", zeile.attrs
 
 
-def test_die_anbieter_sortierung_bleibt_eine_reine_namensfolge(seite):
+def test_die_anbieter_sortierung_bleibt_eine_reine_namensfolge(lager):
     """GEGENPROBE zur Gruppierung nach Zeitraum: sie gilt NUR fuer den
     Kostenrang. Unter „alle“ steht zuerst die Laufzeit-Gruppe (Datenkonzept
     Geräte 5.4: 24 Raten nie in einem Rang mit 36); innerhalb der Gruppe ist
-    die Anbieterfolge eine reine Namensfolge."""
-    seite.evaluate(
-        "() => {const b = document.querySelector('.gx-bnd-auf');"
-        " if (b && b.getAttribute('aria-expanded') !== 'true') b.click();}"
-    )
-    seite.click("#gr-buendel .gr-bnd-kopf button[data-bsort='anbieter']")
-    seite.wait_for_timeout(120)
-    reihe = _reihe(seite)
-    namen = [z[0] for z in reihe if z[1] == "24"]
-    assert namen == sorted(namen, key=str.lower) == ["congstar", "o2", "Vodafone"]
-    assert [z[0] for z in reihe][-1] == "Telekom", reihe
+    die Anbieterfolge eine reine Namensfolge. Seit 10.10.2026 steht die
+    Bündelliste nicht mehr auf der Seite; geprüft wird das Fragment: der
+    Sortierschlüssel `data-anbieter` ist der angezeigte Name selbst."""
+    gruppen = _gruppen(lager)
+    for zeilen in gruppen.values():
+        for z in zeilen:
+            assert z["data-anbieter"] == z.select_one(".gr-bnd-name").get_text(
+                strip=True
+            )
+    namen = [z["data-anbieter"] for z in gruppen["24"]]
+    assert sorted(namen, key=str.lower) == ["congstar", "o2", "Vodafone"], namen
+    assert [z["data-anbieter"] for z in gruppen[max(gruppen)]] == ["Telekom"]
 
 
 def _zeile_text(karte: dict) -> str:

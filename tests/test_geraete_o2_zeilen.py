@@ -32,7 +32,7 @@ from tarifleiter_testbestand import mit_leiter
 from telco_radar.geraete_config import lade_katalog, lade_quellen
 from telco_radar.report import geraete_view
 from telco_radar.report.html import render_site
-from test_geraete_tco_zustand import HEUTE, _baue, vorlage_text
+from test_geraete_tco_zustand import HEUTE, _baue, lager, vorlage_text
 
 
 def _zr_fragment(tmp_path: pathlib.Path) -> list:
@@ -43,6 +43,18 @@ def _zr_fragment(tmp_path: pathlib.Path) -> list:
     return BeautifulSoup(fragment.read_text(encoding="utf-8"), "html.parser").select(
         ".gr-zr-lager"
     )
+
+
+def _lager_ohne_band(tmp_path: pathlib.Path):
+    """Die Bündelzeilen des Startmodells aus dem Fragment, das
+    `_baue_ohne_band` neben die Seite schreibt (`#gr-bnd-vorgabe`)."""
+    pfad = tmp_path / "ohne_band" / "site" / "data" / "geraete-buendel.html"
+    assert pfad.exists(), "Bündel-Fragment fehlt"
+    vorgabe = BeautifulSoup(pfad.read_text(encoding="utf-8"), "html.parser").select_one(
+        "#gr-bnd-vorgabe"
+    )
+    assert vorgabe is not None, "das Fragment trägt kein Startmodell"
+    return vorgabe
 
 
 WURZEL = pathlib.Path(__file__).resolve().parents[1]
@@ -269,10 +281,14 @@ def test_je_buendel_eine_zeile_mit_vier_kernangaben_und_aufklapper(tmp_path):
     Volumen, Kosten über 24 Monate, Δ zur Vodafone-Referenz, Gerät ohne
     Vertrag - und je Zeile EIN schmaler Rechenweg-Aufklapper (Entwurf
     `.bnd`). Das Etikett der Leitzahl heisst seit A1 "Kosten über
-    24 Monate" (vorher "TCO-24")."""
+    24 Monate" (vorher "TCO-24").
+
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; geprüft
+    wird das Fragment."""
     s = _baue(tmp_path)
     tafel = s.select_one("#tafel-tco")
-    zeilen = tafel.select("#gr-bndliste .gr-bnd")
+    assert not tafel.select(".gr-bnd"), "Bündelzeilen stehen noch auf der Seite"
+    zeilen = lager(tmp_path).select("#gr-bndliste .gr-bnd")
     assert len(zeilen) == 3, "o2 neu, o2 erneuert und die Referenz"
     for z in zeilen:
         summary = z.select_one("summary")
@@ -304,10 +320,13 @@ def test_je_buendel_eine_zeile_mit_vier_kernangaben_und_aufklapper(tmp_path):
 
 def test_die_zeilen_stehen_nach_gesamtkosten_sortiert(tmp_path):
     """Der Entwurf sortiert die Bandliste aufsteigend nach TCO-24 - die
-    günstigste Zeile zuerst (kein Sortier-Control, §4 Entscheidung 3)."""
-    s = _baue(tmp_path)
+    günstigste Zeile zuerst (kein Sortier-Control, §4 Entscheidung 3).
+
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; geprüft
+    wird das Fragment."""
+    _baue(tmp_path)
     werte = []
-    for z in s.select("#gr-bndliste .gr-bnd"):
+    for z in lager(tmp_path).select("#gr-bndliste .gr-bnd"):
         roh = z.get("data-gesamt")
         werte.append(float(roh) if roh else None)
     assert werte, "keine Zeile in der Bandliste - der Test misst nichts"
@@ -344,12 +363,17 @@ def _vorgabe_daten(root: pathlib.Path) -> dict:
 def test_jede_karte_der_aufbereitung_ist_eine_zeile(tmp_path):
     """A6, der Zähltest: die Karten des Vorgabemodells aus der Aufbereitung
     (vorher) und die Zeilen des gerenderten HTML (nachher) sind dieselbe
-    Menge - je (Anbieter, Tarif, Gesamt) genau eine Zeile."""
-    s = _baue(tmp_path)
+    Menge - je (Anbieter, Tarif, Gesamt) genau eine Zeile.
+
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; geprüft
+    wird das Fragment."""
+    _baue(tmp_path)
     modell = _vorgabe_daten(tmp_path / "mit")
     karten = [k for k in modell["karten"] if k["belastbar"]]
     assert len(karten) == 3
-    zeilen = s.select("#tafel-tco .gr-bnd")
+    vorgabe = lager(tmp_path)
+    assert vorgabe["data-modell"] == modell["id"]
+    zeilen = vorgabe.select(".gr-bnd")
     assert len(zeilen) == len(karten), (
         f"{len(karten)} Karten stehen {len(zeilen)} Zeilen gegenüber"
     )
@@ -380,9 +404,12 @@ def test_jede_zeile_traegt_rechenweg_pflichtzeile_und_belege(tmp_path):
     Die Pflichtzeile aus A5.2 ("nach 24 Monaten gezahlt … noch offen") ist mit
     Datenkonzept Geräte Schritt 2 gefallen: die Zahl rechnet alle Raten und
     den Tarif über H Monate, offen bleibt nichts. An ihrer Stelle steht der
-    Zeitraum ("Gerechnet über H Monate") - dieselbe Zahl wie das Etikett."""
-    s = _baue(tmp_path)
-    zeilen = s.select("#tafel-tco .gr-bnd")
+    Zeitraum ("Gerechnet über H Monate") - dieselbe Zahl wie das Etikett.
+
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; geprüft
+    wird das Fragment."""
+    _baue(tmp_path)
+    zeilen = lager(tmp_path).select(".gr-bnd")
     assert zeilen
     for z in zeilen:
         rw = z.select_one("template.gr-bnd-rw-vorlage")
@@ -404,9 +431,12 @@ def test_jede_zeile_traegt_rechenweg_pflichtzeile_und_belege(tmp_path):
 
 def test_der_zustand_steht_auf_der_zeile(tmp_path):
     """A6: 'erneuert' ist eine Preisdimension - das Etikett steht im
-    Anbieter-Feld der Zeile (nicht erst im Rechenweg)."""
-    s = _baue(tmp_path)
-    tafel = s.select_one("#tafel-tco")
+    Anbieter-Feld der Zeile (nicht erst im Rechenweg).
+
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; geprüft
+    wird das Fragment."""
+    _baue(tmp_path)
+    tafel = lager(tmp_path)
     erneuert = tafel.select_one('.gr-bnd[data-zustand="refurbished"]')
     assert erneuert is not None
     assert _text(erneuert.select_one(".gr-bnd-an")).endswith("erneuert")
@@ -418,15 +448,19 @@ def test_der_zustand_steht_auf_der_zeile(tmp_path):
 
 def test_die_referenz_nennt_ihre_naehrung_im_rechenweg(tmp_path):
     """F1 Stufe 1 bleibt: die Referenzzeile heißt 'Referenzrechnung' und
-    sagt im Rechenweg, dass der eigene Bündelpreis nicht erhoben ist."""
+    sagt im Rechenweg, dass der eigene Bündelpreis nicht erhoben ist.
+
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; geprüft
+    wird das Fragment."""
     s = _baue(tmp_path)
     tafel = s.select_one("#tafel-tco")
-    ref = tafel.select_one('.gr-bnd[data-anbieter="Vodafone"]')
+    ref = lager(tmp_path).select_one('.gr-bnd[data-anbieter="Vodafone"]')
     assert ref is not None
     assert "Referenzrechnung" in _text(ref.select_one(".gr-bnd-an"))
     rw = vorlage_text(ref.select_one("template.gr-bnd-rw-vorlage"))
     assert "noch nicht erhoben" in rw
     assert "weist zu diesem Gerät keinen Bündelpreis aus" not in tafel.get_text(" ")
+    assert "weist zu diesem Gerät keinen Bündelpreis aus" not in rw
 
 
 def test_beschaffung_laeuft_steht_nicht_mehr_in_der_leseflaeche(tmp_path):
@@ -477,9 +511,13 @@ def test_fehlende_anbieter_stehen_je_band_und_ansicht_in_der_liste(tmp_path):
 def test_ohne_tarifband_ist_eigene_gruppe_unter_der_bandliste(tmp_path):
     """Unbegrenzte Tarife und Tarife ohne erhobenes Volumen stehen in
     einer klar getrennten Gruppe UNTER der Band-Tabelle - als Zeilen
-    derselben Form, nicht heimlich in einem Band."""
+    derselben Form, nicht heimlich in einem Band.
+
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; geprüft
+    wird das Fragment."""
     s = _baue_ohne_band(tmp_path)
-    tafel = s.select_one("#tafel-tco")
+    assert s.select_one("#tafel-tco #gr-ohneband") is None
+    tafel = _lager_ohne_band(tmp_path)
     gruppe = tafel.select_one("#gr-ohneband")
     assert gruppe is not None, "die Gruppe 'Ohne Tarifband' fehlt"
     ohueberschrift = _text(gruppe.find(["h3", "h4"]))
@@ -499,9 +537,12 @@ def test_ohne_tarifband_ist_eigene_gruppe_unter_der_bandliste(tmp_path):
 def test_haendler_barpreise_stehen_kompakt_mit_beleg(tmp_path):
     """Händler ohne Tarifbündel: Saturns Barpreis als kompakte Zeile MIT
     Beleg und Abrufdatum (was die Händlerkarte trug) - Amazon und Expert
-    ohne Preis stehen NICHT als leere Karten, die Legende nennt sie."""
+    ohne Preis stehen NICHT als leere Karten, die Legende nennt sie.
+
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; geprüft
+    wird das Fragment."""
     s = _baue_ohne_band(tmp_path)
-    gruppe = s.select_one("#gr-ohneband")
+    gruppe = _lager_ohne_band(tmp_path).select_one("#gr-ohneband")
     zeilen = gruppe.select(".gr-haendlerzeile")
     assert len(zeilen) == 1, "nur Saturn hat einen Preis"
     saturn = _text(zeilen[0])
@@ -517,9 +558,12 @@ def test_haendler_barpreise_stehen_kompakt_mit_beleg(tmp_path):
 
 def test_die_bandliste_traegt_ihr_band_als_attribut(tmp_path):
     """app.js versteckt Zeilen anderer Bänder - das Band steht als
-    data-band AN der Zeile (kein zweiter Gruppierungspfad im DOM)."""
-    s = _baue_ohne_band(tmp_path)
-    zeilen = s.select("#gr-bndliste .gr-bnd")
+    data-band AN der Zeile (kein zweiter Gruppierungspfad im DOM).
+
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; geprüft
+    wird das Fragment."""
+    _baue_ohne_band(tmp_path)
+    zeilen = _lager_ohne_band(tmp_path).select("#gr-bndliste .gr-bnd")
     assert zeilen
     for z in zeilen:
         assert z.get("data-band") in ("xs", "m", "l"), z.get("data-band")

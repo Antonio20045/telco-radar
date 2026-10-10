@@ -11,6 +11,11 @@ Rechnungen und das Umblenden laufen im Browser und werden im echten Chromium
 geprüft. Vor Schritt 3 gab es den Umschalter nicht: die Tafel zeigte immer die
 24er-Ansicht, die Zeilen blendete ein eigener Filter je Modell und stellte
 dabei 36 Raten als „nächstgelegene“ unter „24 Monate“.
+
+Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite (Antonio):
+unter dem Graphen folgt nur die Zeile der fehlenden Anbieter dem Umschalter.
+Die Bündelzeilen prüfen die Tests am Fragment `data/geraete-buendel.html`
+(`_lager_zeilen`), je Zeile mit ihrer Laufzeit `data-lz`.
 """
 
 from __future__ import annotations
@@ -110,7 +115,6 @@ def _oeffne(_basis, abfrage="", breite=1440, hoehe=900):
     try:
         s.goto(f"{basis}/geraete.html{abfrage}", wait_until="networkidle")
         s.click(".gr-reiter button[data-tafel='tafel-tco']")
-        s.click(".gx-bnd-auf")
         s.wait_for_timeout(300)
         yield s
     finally:
@@ -123,17 +127,49 @@ def _waehle(s, laufzeit: str) -> None:
 
 
 _ZEILEN = """() => [...document.querySelectorAll('#gr-bnd-gruppe .gr-bnd')]
-  .filter(z => !z.hidden)
-  .map(z => ({anbieter: z.dataset.anbieter, lz: z.dataset.lz,
-              gesamt: z.dataset.gesamt,
-              raten: (z.querySelector('.gr-bnd-raten') || {}).textContent || '',
-              delta: (z.querySelector('.gr-bnd-delta') || {}).textContent || '',
-              deltaSichtbar: getComputedStyle(z.querySelector('.gr-bnd-delta'))
-                .visibility}))"""
+  .filter(z => !z.hidden).map(z => z.dataset.anbieter)"""
 
 
-def _zeilen(s) -> list[dict]:
+def _zeilen(s) -> list[str]:
+    """Bündelzeilen auf der Seite - seit 10.10.2026 keine mehr."""
     return s.evaluate(_ZEILEN)
+
+
+def _lager(basis: str):
+    """Die Bündelzeilen des Startmodells im Fragment (`#gr-bnd-vorgabe`)."""
+    fragment = BeautifulSoup(_laden(basis, "data/geraete-buendel.html"), "html.parser")
+    vorgabe = fragment.select_one("#gr-bnd-vorgabe")
+    assert vorgabe is not None, "das Fragment trägt kein Startmodell"
+    assert vorgabe["data-modell"] == MODELL, vorgabe["data-modell"]
+    return vorgabe
+
+
+def _lager_zeilen(basis: str, lz: str | None = None) -> list[dict]:
+    """Die Bündelzeilen des Fragments, auf Wunsch nur die einer Laufzeit."""
+    zeilen = []
+    for z in _lager(basis).select(".gr-bnd"):
+        if lz is not None and z.get("data-lz") != lz:
+            continue
+        raten = z.select_one(".gr-bnd-raten")
+        delta = z.select_one(".gr-bnd-delta")
+        zeilen.append(
+            {
+                "anbieter": z["data-anbieter"],
+                "lz": z.get("data-lz"),
+                "gesamt": z.get("data-gesamt"),
+                "raten": raten.get_text(" ", strip=True) if raten else "",
+                "delta": delta.get_text(" ", strip=True) if delta else "",
+            }
+        )
+    return zeilen
+
+
+def _fehlend_lz(s) -> list[dict]:
+    """Die sichtbaren Zeilen fehlender Anbieter samt ihrer Ansicht."""
+    return s.evaluate("""() => [...document.querySelectorAll(
+      '#gr-bnd-gruppe .gr-anb-fehlt')]
+      .filter(z => getComputedStyle(z).display !== 'none')
+      .map(z => ({anbieter: z.dataset.anbieter, lz: z.dataset.fehltLz}))""")
 
 
 def _fehlend(s) -> dict:
@@ -164,17 +200,29 @@ def _kachelpreis(s) -> str:
 
 
 def test_ohne_parameter_gilt_24_und_der_link_traegt_die_laufzeit(_basis):
+    """Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite: die
+    Zeile der fehlenden Anbieter zeigt die 24er-Ansicht, die Bündelzeilen
+    der 24er prüft das Fragment."""
+    _browser, basis = _basis
     with _oeffne(_basis) as s:
         assert _gedrueckt(s) == ["24"]
         assert "laufzeit=24" in s.evaluate("location.search")
-        zeilen = _zeilen(s)
-        assert zeilen and {z["lz"] for z in zeilen} == {"24"}, zeilen
+        assert _zeilen(s) == [], "Bündelzeilen stehen noch auf der Seite"
+        fehlend = _fehlend_lz(s)
+        assert fehlend and {z["lz"] for z in fehlend} == {"24"}, fehlend
+    zeilen = _lager_zeilen(basis, "24")
+    assert sorted(z["anbieter"] for z in zeilen) == sorted(SOLL[24]), zeilen
+    assert {z["lz"] for z in _lager_zeilen(basis)} == {"12", "24", "36"}
 
 
 @pytest.mark.parametrize("laufzeit", [12, 24, 36])
 def test_der_sieger_jeder_ansicht_hat_ihre_raten(_basis, laufzeit):
     """Antwortsatz, Kachel und günstigste Zeile nennen dieselbe Zahl - die
-    kleinste der Ansicht aus dem Modulkopf von `test_laufzeit_vergleich`."""
+    kleinste der Ansicht aus dem Modulkopf von `test_laufzeit_vergleich`.
+
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; die
+    günstigste Zeile der Ansicht prüft das Fragment."""
+    _browser, basis = _basis
     soll = SOLL[laufzeit]
     sieger = min(soll, key=soll.get)
     with _oeffne(_basis, f"?laufzeit={laufzeit}") as s:
@@ -183,19 +231,24 @@ def test_der_sieger_jeder_ansicht_hat_ihre_raten(_basis, laufzeit):
         assert f"{_euro(soll[sieger])} € Kosten über {max(laufzeit, 24)} Monate" in (
             antwort
         )
-        zeilen = _zeilen(s)
-        guenstigste = min(zeilen, key=lambda z: float(z["gesamt"]))
-        assert guenstigste["anbieter"] == sieger, zeilen
-        assert guenstigste["raten"].startswith(f"{laufzeit} "), guenstigste
         assert f"ab{_euro(soll[sieger])}€" in _kachelpreis(s).replace(" ", "")
-        assert sorted(z["anbieter"] for z in zeilen) == sorted(soll), zeilen
+    zeilen = _lager_zeilen(basis, str(laufzeit))
+    guenstigste = min(zeilen, key=lambda z: float(z["gesamt"]))
+    assert guenstigste["anbieter"] == sieger, zeilen
+    assert guenstigste["raten"].startswith(f"{laufzeit} "), guenstigste
+    assert float(guenstigste["gesamt"]) == soll[sieger], guenstigste
+    assert sorted(z["anbieter"] for z in zeilen) == sorted(soll), zeilen
 
 
 def test_ein_36_raten_buendel_erscheint_nicht_in_der_24er_ansicht(_basis):
+    """Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; die
+    24er-Zeilen prüft das Fragment, die Tafel weiter der Browser."""
+    _browser, basis = _basis
+    zeilen = _lager_zeilen(basis, "24")
+    assert zeilen
+    assert not [z for z in zeilen if not z["raten"].startswith("24 ")], zeilen
+    assert "Telekom" not in {z["anbieter"] for z in zeilen}
     with _oeffne(_basis) as s:
-        zeilen = _zeilen(s)
-        assert not [z for z in zeilen if not z["raten"].startswith("24 ")], zeilen
-        assert "Telekom" not in {z["anbieter"] for z in zeilen}
         assert _euro(SOLL[36]["congstar"]) not in s.inner_text("#tafel-tco")
         _waehle(s, "36")
         assert _euro(SOLL[36]["congstar"]) in s.inner_text("#tafel-tco")
@@ -204,18 +257,22 @@ def test_ein_36_raten_buendel_erscheint_nicht_in_der_24er_ansicht(_basis):
 def test_1und1_steht_unter_24_monaten_mit_delta(_basis):
     """Ein Betrag für Tarif und Gerät über 36 Monate wird nur über 24 Monate
     verglichen (Antonio 10.10.2026): 24 Beträge plus Ablöse stehen unter 24 mit
-    Δ gegen Vodafone 24, die 36er-Ansicht nennt den Grund."""
+    Δ gegen Vodafone 24, die 36er-Ansicht nennt den Grund.
+
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; die
+    1&1-Zeile prüft das Fragment."""
+    _browser, basis = _basis
     with _oeffne(_basis, "?laufzeit=36") as s:
         assert _gedrueckt(s) == ["36"]
-        assert not [z for z in _zeilen(s) if z["anbieter"] == "1&1"]
         assert _fehlend(s).get("1&1", "").startswith("Nur über 24 Monate verglichen")
         _waehle(s, "24")
-        eins = [z for z in _zeilen(s) if z["anbieter"] == "1&1"]
-        assert [float(z["gesamt"]) for z in eins] == [SOLL[24]["1&1"]], eins
-        assert eins[0]["raten"].startswith("24 Monate + Ablöse"), eins
-        assert eins[0]["deltaSichtbar"] == "visible"
-        delta = " ".join(eins[0]["delta"].split())
-        assert delta.startswith(f"−{_euro(SOLL[24]['Vodafone'] - SOLL[24]['1&1'])} €")
+        assert "1&1" not in _fehlend(s)
+    assert not [z for z in _lager_zeilen(basis, "36") if z["anbieter"] == "1&1"]
+    eins = [z for z in _lager_zeilen(basis, "24") if z["anbieter"] == "1&1"]
+    assert [float(z["gesamt"]) for z in eins] == [SOLL[24]["1&1"]], eins
+    assert eins[0]["raten"].startswith("24 Monate + Ablöse"), eins
+    delta = " ".join(eins[0]["delta"].split())
+    assert delta.startswith(f"−{_euro(SOLL[24]['Vodafone'] - SOLL[24]['1&1'])} €")
 
 
 @pytest.mark.parametrize("laufzeit", [12, 24, 36])
@@ -241,44 +298,55 @@ def test_antwortsatz_und_grafikachse_nennen_die_laufzeit(_basis, laufzeit):
 
 
 def test_telekom_ist_in_der_24er_ansicht_nicht_erfasst(_basis):
+    """Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; die
+    Telekom-Zeile prüft das Fragment."""
+    _browser, basis = _basis
     with _oeffne(_basis) as s:
         fehlend = _fehlend(s)
         assert fehlend.get("Telekom", "").startswith("Mit 24 Raten nicht erfasst"), (
             fehlend
         )
-        assert "Telekom" not in {z["anbieter"] for z in _zeilen(s)}
         _waehle(s, "36")
         assert "Telekom" not in _fehlend(s)
-        telekom = [z for z in _zeilen(s) if z["anbieter"] == "Telekom"]
-        assert [float(z["gesamt"]) for z in telekom] == [SOLL[36]["Telekom"]]
+    assert "Telekom" not in {z["anbieter"] for z in _lager_zeilen(basis, "24")}
+    telekom = [z for z in _lager_zeilen(basis, "36") if z["anbieter"] == "Telekom"]
+    assert [float(z["gesamt"]) for z in telekom] == [SOLL[36]["Telekom"]]
 
 
 def test_alle_gruppiert_die_zeilen_ohne_sieger_und_ohne_delta(_basis):
+    """Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite: unter
+    „alle“ zeigt die Seite weder Sieger noch Zeilen oder Gruppenköpfe; dass
+    das Fragment je Laufzeit einen Gruppenkopf und alle Zeilen trägt, prüft
+    der statische Teil."""
+    _browser, basis = _basis
     with _oeffne(_basis, "?laufzeit=alle") as s:
         assert _gedrueckt(s) == ["alle"]
         assert _antwort(s) == ALLE_TEXT
         assert s.query_selector("#gr-zr-gruppe .gr-leit-zahl") is None
-        zeilen = _zeilen(s)
-        folge = [int(z["lz"]) for z in zeilen]
-        assert folge == sorted(folge) and set(folge) == {12, 24, 36}, folge
-        assert len(folge) == sum(len(v) for v in SOLL.values()), zeilen
-        assert {z["deltaSichtbar"] for z in zeilen} == {"hidden"}
-        koepfe = s.evaluate("""() => [...document.querySelectorAll(
-            '#gr-bndliste .gr-bnd-lzkopf')].filter(k => !k.hidden).map(k => [
-              k.textContent.trim(),
-              k.nextElementSibling && k.nextElementSibling.dataset.lz])""")
-        assert koepfe == [
-            ["12 Raten", "12"],
-            ["24 Raten", "24"],
-            ["36 Raten", "36"],
-        ]
+        assert _zeilen(s) == []
+        assert {z["lz"] for z in _fehlend_lz(s)} <= {"alle"}
         assert "ab" not in _kachelpreis(s), "unter „alle“ kein ab-Preis"
-        _waehle(s, "24")
-        assert {z["deltaSichtbar"] for z in _zeilen(s)} == {"visible"}
         assert s.evaluate(
             "() => [...document.querySelectorAll('.gr-bnd-lzkopf')]"
             ".every(k => k.hidden)"
         )
+        _waehle(s, "24")
+        assert {z["lz"] for z in _fehlend_lz(s)} == {"24"}
+    zeilen = _lager_zeilen(basis)
+    assert len(zeilen) == sum(len(v) for v in SOLL.values()), zeilen
+    for lz, soll in SOLL.items():
+        assert sorted(z["anbieter"] for z in zeilen if z["lz"] == str(lz)) == sorted(
+            soll
+        ), (lz, zeilen)
+    koepfe = [
+        (k.get_text(strip=True), k["data-lz-kopf"], k.has_attr("hidden"))
+        for k in _lager(basis).select("#gr-bndliste .gr-bnd-lzkopf")
+    ]
+    assert koepfe == [
+        ("12 Raten", "12", True),
+        ("24 Raten", "24", True),
+        ("36 Raten", "36", True),
+    ], koepfe
 
 
 _DELTA_SICHTBAR = """() => [...document.querySelectorAll(
@@ -292,22 +360,30 @@ _DELTA_SICHTBAR = """() => [...document.querySelectorAll(
 def test_unter_alle_steht_kein_delta_auch_nicht_aufgeklappt(_basis):
     """Prüfrunde DK23: „alle“ zeigt kein Δ - auch nicht der Satz in der
     aufgeklappten Zeile (o2 mit 24 Raten, 238,80 € unter Vodafone). Gegenprobe:
-    unter 24 steht derselbe Satz in derselben offenen Zeile."""
+    unter 24 steht derselbe Satz in derselben offenen Zeile.
+
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite: weder
+    unter „alle“ noch unter 24 steht ein Δ-Satz auf der Seite; den Satz trägt
+    nur der Rechenweg der o2-Zeile im Fragment."""
+    _browser, basis = _basis
     with _oeffne(_basis, "?laufzeit=alle") as s:
-        zeile = s.locator(
-            "#gr-bnd-gruppe details.gr-bnd[data-anbieter='o2'][data-lz='24']"
-        ).first
-        assert zeile.get_attribute("data-delta") == "-238.8"
-        zeile.locator("summary").click()
-        s.wait_for_timeout(400)
-        assert zeile.get_attribute("open") is not None
         assert s.evaluate(_DELTA_SICHTBAR) == []
         _waehle(s, "24")
-        sichtbar = s.evaluate(_DELTA_SICHTBAR)
-        assert len(sichtbar) == 1 and _euro(238.8) in sichtbar[0], sichtbar
+        assert s.evaluate(_DELTA_SICHTBAR) == []
+    zeile = _lager(basis).select_one("details.gr-bnd[data-anbieter='o2'][data-lz='24']")
+    assert zeile is not None and zeile["data-delta"] == "-238.8"
+    assert not zeile.has_attr("open")
+    vorlage = zeile.select_one("template.gr-bnd-rw-vorlage")
+    saetze = [
+        " ".join("".join(e.find_all(string=True)).split())
+        for e in vorlage.select(".gr-kk-delta, .gr-kk-luecke--delta")
+    ]
+    assert len(saetze) == 1 and _euro(238.8) in saetze[0], saetze
 
 
 def test_der_link_haelt_die_wahl_und_verwirft_fremde_werte(_basis):
+    """Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; der
+    Wahl folgt die Zeile der fehlenden Anbieter."""
     with _oeffne(_basis) as s:
         _waehle(s, "12")
         assert "laufzeit=12" in s.evaluate("location.search")
@@ -315,7 +391,8 @@ def test_der_link_haelt_die_wahl_und_verwirft_fremde_werte(_basis):
         s.click(".gr-reiter button[data-tafel='tafel-tco']")
         s.wait_for_timeout(600)
         assert _gedrueckt(s) == ["12"]
-        assert {z["lz"] for z in _zeilen(s)} == {"12"}
+        fehlend = _fehlend_lz(s)
+        assert fehlend and {z["lz"] for z in fehlend} == {"12"}, fehlend
     with _oeffne(_basis, "?laufzeit=30") as s:
         assert _gedrueckt(s) == ["24"]
         assert "laufzeit=24" in s.evaluate("location.search")
@@ -408,10 +485,14 @@ def test_der_export_folgt_dem_umschalter(_basis):
 
 def test_kriterium_11_haelt_an_der_gerenderten_seite(_basis):
     """Die Portal-Abnahme (Kriterium 11) an der echten Vorlage: jede Zeile mit
-    Zahl nennt „über H Monate“. Gegenprobe: ohne Etikett wird sie rot."""
+    Zahl nennt „über H Monate“. Gegenprobe: ohne Etikett wird sie rot.
+
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; geprüft
+    wird das Fragment."""
     _browser, basis = _basis
     seite = BeautifulSoup(_laden(basis, "geraete.html"), "html.parser")
-    tafel = seite.select_one("#tafel-tco")
+    assert not seite.select("#tafel-tco .gr-bnd"), "Bündelzeilen auf der Seite"
+    tafel = _lager(basis)
     mit_zahl = tafel.select(".gr-bnd[data-gesamt]:not([data-gesamt=''])")
     assert len(mit_zahl) == sum(len(v) for v in SOLL.values()), len(mit_zahl)
     assert portal.zeitraum_maengel(tafel) == []
@@ -425,11 +506,13 @@ def test_kriterium_11_haelt_an_der_gerenderten_seite(_basis):
 def test_die_36er_zeile_sagt_ab_wann_nur_die_rate_zaehlt(_basis):
     """Antonio 10.10.2026: der Rechenweg einer 36-Raten-Zeile nennt 24 Monate
     Tarif und „Monat 25–36 nur die Rate“, nicht 36 Monate Tarif. Gegenprobe:
-    die 24er-Zeilen tragen den Satz nicht, 1&1 (ein Betrag) auch nicht."""
+    die 24er-Zeilen tragen den Satz nicht, 1&1 (ein Betrag) auch nicht.
+
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; geprüft
+    wird das Fragment."""
     _browser, basis = _basis
-    seite = BeautifulSoup(_laden(basis, "geraete.html"), "html.parser")
     gesehen = set()
-    for zeile in seite.select("#tafel-tco .gr-bnd[data-gesamt]"):
+    for zeile in _lager(basis).select(".gr-bnd[data-gesamt]"):
         text = " ".join(
             "".join(t.decode_contents() for t in zeile.select("template")).split()
         )

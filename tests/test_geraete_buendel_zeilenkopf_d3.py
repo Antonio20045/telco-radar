@@ -23,8 +23,11 @@ Drei weitere Punkte desselben Auftrags, an derselben Fixture:
     vorher fiel `.gr-bnd-name`/`.gr-bnd` auf den grauen Rückfall
     `#57534a` zurück, weil keine `gr-anb--<slug>`-Klasse an der Zeile
     stand (die Regel in `style.css` existierte, ihre Klasse fehlte).
-  - Punkt 4: der Zerlegungsbalken - seine Segmentbeträge summieren exakt
+    - Punkt 4: der Zerlegungsbalken - seine Segmentbeträge summieren exakt
     zur Leitzahl, ohne offenes Segment.
+
+Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; geprüft
+wird das Fragment `data/geraete-buendel.html` (`_buendel_html`).
 """
 
 from __future__ import annotations
@@ -186,6 +189,12 @@ def site(tmp_path_factory):
     return _baue(tmp_path_factory.mktemp("d3zeilenkopf"), _bestand())
 
 
+def _buendel_html(site: pathlib.Path) -> str:
+    """Das Bündel-Fragment, das `render_site` neben die Seite schreibt - dort
+    stehen seit 10.10.2026 die Bündelzeilen."""
+    return (site / "data" / "geraete-buendel.html").read_text(encoding="utf-8")
+
+
 _ZEILE_RE = re.compile(
     r'(<details class="gr-bnd[^"]*"[^>]*data-anbieter="congstar"[^>]*>)'
     r"(.*?)</details>",
@@ -215,13 +224,14 @@ def test_gr_bnd_subjekt_kommt_nicht_mehr_vor(site):
     ein wieder eingeschlichenes CSS-Selektor-Fossil auffaellt."""
     html = (site / "geraete.html").read_text(encoding="utf-8")
     assert "gr-bnd-subjekt" not in html
+    assert "gr-bnd-subjekt" not in _buendel_html(site)
 
 
 def test_lookup_greift(site):
     """Gegenprobe: der Lookup findet wirklich beide Zahlweisen - sonst
     wären alle folgenden Tests grün, ohne etwas zu prüfen (CLAUDE.md
     Regel 10)."""
-    html = (site / "geraete.html").read_text(encoding="utf-8")
+    html = _buendel_html(site)
     zeilen = _congstar_zeilen(html)
     assert set(zeilen) == {24, 36}, (
         f"gefunden: {sorted(zeilen)} - erwartet beide Zahlweisen 24 und 36"
@@ -233,7 +243,7 @@ def test_punkt1_zeilen_sind_zugeklappt_unterscheidbar(site):
     <summary>-Text) verschieden, tragen ihre Ratenzahl, die Tarifbindung
     und ihre eigene Zahl über ihren eigenen Zeitraum - eine Restschuld
     nennt keine (Datenkonzept Geräte 5.3)."""
-    html = (site / "geraete.html").read_text(encoding="utf-8")
+    html = _buendel_html(site)
     zeilen = _congstar_zeilen(html)
     _klassen24, text24, _b24 = zeilen[24]
     _klassen36, text36, _b36 = zeilen[36]
@@ -275,18 +285,27 @@ def _congstar_xs_summarys(html: str) -> list:
     return texte
 
 
-def test_punkt1_ohne_ratenzahl_waeren_die_zeilen_wortgleich(site, chromium):
+def test_punkt1_ohne_ratenzahl_waeren_die_zeilen_wortgleich(site):
     """Der Befund vor D3: ohne den Ratenteil (`.gr-bnd-raten`) waren 24er-
     und 36er-Zeile wortgleich. Seit Datenkonzept Geräte Schritt 2 trägt jede
     ihre eigene Zahl über ihren eigenen Zeitraum, die Zeilen unterscheiden
     sich auch ohne Ratenteil; der Ratenteil bleibt zugeklappt im Browser
-    sichtbar, am Schreibtisch und am Telefon."""
-    html = (site / "geraete.html").read_text(encoding="utf-8")
+    sichtbar, am Schreibtisch und am Telefon.
+
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; statt im
+    Browser zu messen, prüft der Test am Fragment, dass der Ratenteil nicht
+    versteckt im Zeilenkopf steht, und am ausgelieferten `style.css`, dass
+    keine Regel ihn ausblendet."""
+    html = _buendel_html(site)
+    gesehen = []
     ohne_raten = []
     for _opentag, _text, block in _congstar_zeilen(html).values():
         summary = BeautifulSoup(block, "html.parser").select_one("summary")
         raten = summary.select(".gr-bnd-raten")
         assert len(raten) == 1, f"kein Ratenteil im Zeilenkopf: {summary}"
+        assert not raten[0].has_attr("hidden"), raten[0]
+        assert "display" not in raten[0].get("style", ""), raten[0]
+        gesehen.append(raten[0].get_text(strip=True).split(" ")[0])
         raten[0].decompose()
         ohne_raten.append(" ".join(summary.get_text(" ").split()))
     assert len(ohne_raten) == 2 and ohne_raten[0] != ohne_raten[1], ohne_raten
@@ -294,26 +313,15 @@ def test_punkt1_ohne_ratenzahl_waeren_die_zeilen_wortgleich(site, chromium):
         re.search(r"Kosten über \d+ Monate", t).group(0) for t in ohne_raten
     }
 
-    for breite in (1440, 390):
-        seite = chromium.new_page(viewport={"width": breite, "height": 900})
-        try:
-            seite.goto((site / "geraete.html").as_uri())
-            seite.click(".gx-bnd-auf")
-            gemessen = seite.eval_on_selector_all(
-                'details.gr-bnd[data-anbieter="congstar"]:not([open]) '
-                "summary .gr-bnd-raten",
-                """els => els.map(e => ({text: e.textContent.trim(),
-                    hoehe: e.getBoundingClientRect().height,
-                    display: getComputedStyle(e).display,
-                    sicht: getComputedStyle(e).visibility}))""",
-            )
-        finally:
-            seite.close()
-        texte = sorted(g["text"].split(" ")[0] for g in gemessen)
-        assert texte == ["24", "36"], (breite, gemessen)
-        for g in gemessen:
-            assert g["display"] != "none" and g["sicht"] == "visible", (breite, g)
-            assert g["hoehe"] > 0, (breite, g)
+    assert sorted(gesehen) == ["24", "36"], gesehen
+    css = (site / "style.css").read_text(encoding="utf-8")
+    regeln = re.findall(r"([^{}]*\.gr-bnd-raten[^{}]*)\{([^}]*)\}", css)
+    assert regeln, "style.css kennt den Ratenteil nicht"
+    for wahl, rumpf in regeln:
+        assert not re.search(r"display\s*:\s*none|visibility\s*:\s*hidden", rumpf), (
+            wahl.strip(),
+            rumpf,
+        )
 
 
 def test_punkt2_delta_spalte_traegt_die_feste_zahl(site):
@@ -328,7 +336,7 @@ def test_punkt2_delta_spalte_traegt_die_feste_zahl(site):
     Nur die 24er: die 36er hat keine Vodafone-Karte derselben Laufzeit
     neben sich, ihre Δ-Spalte trägt keinen Betrag (Datenkonzept Geräte 4,
     Regel 5)."""
-    html = (site / "geraete.html").read_text(encoding="utf-8")
+    html = _buendel_html(site)
     zeilen = _congstar_zeilen(html)
     delta = round(SOLL_GESAMT[24] - (1 + 24 * 26.0 + 24 * 54.0), 2)
     assert delta < 0
@@ -366,7 +374,7 @@ def test_punkt3_anbieterfarbe_steht_an_der_zeile(site):
     `class="gr-bnd"` ohne Zusatz - siehe die Gegenprobe unten."""
     from telco_radar.report import anbieter_farben
 
-    html = (site / "geraete.html").read_text(encoding="utf-8")
+    html = _buendel_html(site)
     zeilen = _congstar_zeilen(html)
     erwartet = anbieter_farben.farbe_fuer("congstar")
     for n, (opentag, _text, _block) in zeilen.items():
@@ -407,7 +415,7 @@ def test_punkt4_zerlegungsbalken_summiert_exakt_zur_leitzahl(site):
     gelesen) summieren GENAU zur Leitzahl - keine zweite Rechnung, nur
     eine zweite, groessere Darstellung derselben `kosten_ueber()`-Posten.
     """
-    html = (site / "geraete.html").read_text(encoding="utf-8")
+    html = _buendel_html(site)
     zeilen = _congstar_zeilen(html)
     for n, (_klassen, _text, block) in zeilen.items():
         seg = _zerlegung(block)
@@ -427,7 +435,7 @@ def test_punkt4_kein_offenes_segment_alle_raten_im_zeitraum(site):
     alle Raten im Zeitraum der Zahl: kein Segment ist offen, und die 36er
     trägt ihre Raten (36 × 30,50 = 1.098,00 EUR) und 24 Tarifmonate
     (24 × 15,00 = 360,00 EUR) als eigene Segmente."""
-    html = (site / "geraete.html").read_text(encoding="utf-8")
+    html = _buendel_html(site)
     zeilen = _congstar_zeilen(html)
     for n, (_klassen, _text, block) in zeilen.items():
         seg = _zerlegung(block)
@@ -558,7 +566,7 @@ def test_review_fix_s2_delta_spalte_behauptet_keine_fuehrerschaft(site_ungefaehr
     mehr behaupten ("8,00 €" ohne "≈"), sondern zeigt "≈ 8,00 €" - und
     dabei NICHT die `gr-bnd-delta--wert`-Klasse (das Δ-Praefix ist nur
     fuer feste Werte gedacht, siehe die Vorlage)."""
-    html = (site_ungefaehr / "geraete.html").read_text(encoding="utf-8")
+    html = _buendel_html(site_ungefaehr)
     treffer = _ZEILE_RE.findall(html)
     assert len(treffer) == 1, (
         f"erwartet genau eine congstar-Zeile, gefunden {len(treffer)}"

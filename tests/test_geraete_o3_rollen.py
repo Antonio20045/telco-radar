@@ -246,7 +246,9 @@ def test_das_buendel_fragment_existiert_fuer_alle_anderen_modelle(site, geraete)
     Seite von 3,9 MB auf ~1,1 MB gebracht; 423 Zeilen à 2,7 KB im HTML
     wären der Weg zurück (gemessen: +1,17 MB). Das Fragment wird beim
     ersten Modellwechsel geladen (lazy), der Netzwerk-Test des
-    Rechenweg-Aufklappers bleibt dadurch grün."""
+    Rechenweg-Aufklappers bleibt dadurch grün. Seit 10.10.2026 steht die
+    Bündelliste nicht mehr auf der Seite; geprüft wird das Fragment, das
+    nun auch das Vorgabemodell genau einmal (`#gr-bnd-vorgabe`) trägt."""
     fragment = site / "data" / "geraete-buendel.html"
     assert fragment.exists(), "site/data/geraete-buendel.html fehlt"
     lager = BeautifulSoup(fragment.read_text(encoding="utf-8"), "html.parser")
@@ -255,8 +257,12 @@ def test_das_buendel_fragment_existiert_fuer_alle_anderen_modelle(site, geraete)
         f"nur {len(container)} Modell-Container im Fragment (88 Modelle)"
     )
     vorgabe = json.loads(geraete.select_one("#gr-zeitreihe-daten").text)["vorgabe"]
-    ids = {c.get("data-modell") for c in container}
-    assert vorgabe not in ids, "das Vorgabemodell steht doppelt"
+    ids = [c.get("data-modell") for c in container]
+    assert ids.count(vorgabe) == 1, "das Vorgabemodell steht nicht genau einmal"
+    assert len(ids) == len(set(ids)), "ein Modell steht doppelt im Fragment"
+    vorgabe_lager = lager.select_one("#gr-bnd-vorgabe")
+    assert vorgabe_lager is not None and vorgabe_lager.get("data-modell") == vorgabe
+    assert geraete.select(".gr-bnd") == [], "die Seite trägt wieder Bündelzeilen"
     zeilen = lager.select(".gr-bnd")
     assert len(zeilen) >= 380, (
         f"nur {len(zeilen)} Zeilen im Fragment (423 am Bestand, 19 Vorgabe)"
@@ -290,26 +296,45 @@ def test_jede_belastbare_fragment_zeile_traegt_die_pflichtzeile(site):
         )
 
 
-def test_die_sortierkoepfe_stehen_ueber_der_bandliste(geraete):
-    """C: Die Spaltenköpfe der Bündeltabelle (Leitzahl, Δ und Anbieter)
-    sind Knöpfe — sortierbar ohne Reload; die Server-Vorsortierung nach
-    der Leitzahl (O2) bleibt der Ausgangszustand.
+def test_die_sortierkoepfe_stehen_ueber_der_bandliste(site, geraete):
+    """C: Die Server-Vorsortierung nach der Leitzahl (O2) ist der
+    Ausgangszustand, und jede Zeile trägt die Sortierschlüssel (Leitzahl,
+    Δ, Anbieter) als Daten.
 
-    P0-B-z2: der Kopf nennt die SPALTE, nicht den Zeitraum. Bis hierhin
-    stand dort fest "Kosten über 24 Monate" — über der einen Tafel, in der
-    beide Zeiträume der Leitzahl gemischt stehen (1&1 trägt 36). Der
-    Zeitraum steht seither am Etikett JEDER Zeile
-    (`geraete_tco_karten.label_der_leitzahl`, die eine Beschriftungsregel);
-    `tests/test_geraete_buendel_kopf_zeitraum.py` hält beides zusammen.
+    P0-B-z2: der Kopf nennt die SPALTE, nicht den Zeitraum. Der Zeitraum
+    steht am Etikett JEDER Zeile (`geraete_tco_karten.label_der_leitzahl`).
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; geprüft
+    wird das Fragment: die Seite trägt keine Sortierköpfe mehr, der einzige
+    verbliebene Spaltenkopf (Gruppe „Ohne Tarifband“) nennt die Spalte ohne
+    Monatszahl, und die Vorgabezeilen stehen je Zeitraum nach der Leitzahl
+    aufsteigend.
     """
-    kopf = geraete.select_one("#gr-buendel .gr-bnd-kopf")
-    assert kopf is not None
-    beschriftungen = " ".join(kopf.get_text(" ", strip=True).split())
-    knoepfe = kopf.select("button[data-bsort]")
-    arten = {b.get("data-bsort") for b in knoepfe}
-    assert arten == {"tco", "delta", "anbieter"}, arten
-    assert "Kosten mit Tarif" in beschriftungen and "Anbieter" in beschriftungen
-    assert "Monate" not in beschriftungen, beschriftungen
+    assert geraete.select_one("#gr-buendel .gr-bnd-kopf") is None
+    assert geraete.select(".gr-bsort") == []
+    lager = BeautifulSoup(
+        (site / "data" / "geraete-buendel.html").read_text(encoding="utf-8"),
+        "html.parser",
+    )
+    koepfe = lager.select(".gr-bnd-kopf")
+    assert koepfe, "kein Spaltenkopf im Fragment - der Test prüft nichts"
+    for kopf in koepfe:
+        beschriftungen = " ".join(kopf.get_text(" ", strip=True).split())
+        assert "Kosten mit Tarif" in beschriftungen and "Anbieter" in beschriftungen
+        assert "Monate" not in beschriftungen, beschriftungen
+    zeilen = lager.select("#gr-bnd-vorgabe #gr-bndliste > .gr-bnd")
+    assert zeilen, "keine Vorgabezeile im Fragment - der Test prüft nichts"
+    for z in zeilen:
+        assert z.get("data-anbieter"), "Zeile ohne data-anbieter"
+        assert z.has_attr("data-delta"), "Zeile ohne data-delta"
+    for band in {z.get("data-band") for z in zeilen}:
+        je_zeitraum: dict[str, list[float]] = {}
+        for z in zeilen:
+            if z.get("data-band") == band and z.get("data-gesamt"):
+                je_zeitraum.setdefault(z.get("data-leitzahl-monate", ""), []).append(
+                    float(z["data-gesamt"])
+                )
+        for werte in je_zeitraum.values():
+            assert werte == sorted(werte), (band, werte)
 
 
 def test_der_karten_hinweis_ist_weg(geraete):

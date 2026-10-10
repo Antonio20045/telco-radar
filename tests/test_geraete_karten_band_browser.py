@@ -40,6 +40,7 @@ import socket
 import threading
 
 import pytest
+from bs4 import BeautifulSoup
 
 from tarifleiter_testbestand import mit_leiter
 import yaml
@@ -276,10 +277,32 @@ def _server(site: pathlib.Path):
 
 
 @pytest.fixture(scope="module")
-def _seite(tmp_path_factory, chromium):
+def _site(tmp_path_factory):
+    return _baue(tmp_path_factory.mktemp("p1karten"))
 
-    tmp_path = tmp_path_factory.mktemp("p1karten")
-    site = _baue(tmp_path)
+
+@pytest.fixture(scope="module")
+def fragment(_site):
+    """Die Bündelzeilen des Startmodells aus `data/geraete-buendel.html`.
+
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; geprüft
+    wird das Fragment."""
+    suppe = BeautifulSoup(
+        (_site / "data" / "geraete-buendel.html").read_text(encoding="utf-8"),
+        "html.parser",
+    )
+    lager = suppe.select_one("#gr-bnd-vorgabe")
+    assert lager is not None, "das Fragment trägt kein Startmodell"
+    return lager
+
+
+def _text(element) -> str:
+    return " ".join(element.get_text(" ").split()) if element is not None else ""
+
+
+@pytest.fixture(scope="module")
+def _seite(_site, chromium):
+    site = _site
 
     with _server(site) as basis:
         seite = chromium.new_page(viewport={"width": 1440, "height": 900})
@@ -292,37 +315,56 @@ def _seite(tmp_path_factory, chromium):
 
 
 def _sichtbare_anbieter(seite):
-    """Anbieter der Bündel-ZEILEN, die der Leser wirklich sieht - nicht
-    die, die nur kein `hidden`-Attribut tragen (dieselbe Messregel wie
-    `_sichtbare_zeilen` in test_geraete_reiter_browser.py). Seit O2 stehen
-    die Zeilen offen unter dem Graphen - keine Kartenklappe mehr."""
+    """Anbieter der Zeilen fehlender Anbieter, die der Leser wirklich sieht -
+    nicht die, die nur kein `hidden`-Attribut tragen (dieselbe Messregel wie
+    `_sichtbare_zeilen` in test_geraete_reiter_browser.py). Seit 10.10.2026
+    steht die Bündelliste nicht mehr auf der Seite; unter dem Graphen steht
+    nur noch die Zeile der fehlenden Anbieter."""
     return seite.eval_on_selector_all(
-        "#gr-bndliste .gr-bnd",
+        "#gr-bnd-gruppe .gr-anb-fehlt",
         "e => e.filter(z => getComputedStyle(z).display !== 'none')"
         "      .map(z => z.dataset.anbieter)",
     )
 
 
-def test_die_zeilenliste_aendert_sich_bei_bandwechsel(_seite):
+def _bandzeilen(fragment, band):
+    return [
+        z for z in fragment.select("#gr-bndliste .gr-bnd") if z.get("data-band") == band
+    ]
+
+
+def test_die_zeilenliste_aendert_sich_bei_bandwechsel(_seite, fragment):
     """UX-1: bis P1 zeigte die Klappe bei jedem Band dieselben Karten aller
     Bänder gemischt. Seit O2 zeigt die Zeilenliste die Bündel des
     gewählten Bands - und die Liste ist nach dem Wechsel eine ANDERE.
     Unter „alle“ (Datenkonzept Geräte 5.4), weil congstar im Band M nur mit
-    36 Raten steht und die 24er-Ansicht diese Zeile nicht zeigt."""
+    36 Raten steht und die 24er-Ansicht diese Zeile nicht zeigt.
+
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; geprüft
+    wird das Fragment. Auf der Seite folgt die Zeile der fehlenden Anbieter
+    der Bandwahl: wer im Band ein Bündel hat, fehlt dort nicht."""
+    klein_b = {z["data-anbieter"] for z in _bandzeilen(fragment, "xs")}
+    mittel_b = {z["data-anbieter"] for z in _bandzeilen(fragment, "m")}
+    assert "o2" in klein_b, f"Band XS trägt keine o2-Zeile: {klein_b}"
+    assert "congstar" not in klein_b, klein_b
+    assert "congstar" in mittel_b and "Vodafone" in mittel_b, mittel_b
+    assert klein_b != mittel_b, f"die Zeilen folgen dem Band nicht: {klein_b}"
+
     waehle_laufzeit(_seite, "alle")
     try:
         waehle_band(_seite, "xs")
         _seite.wait_for_timeout(120)
         klein = _sichtbare_anbieter(_seite)
-        assert "o2" in klein, f"Band XS zeigt keine o2-Karte: {klein}"
-        assert "congstar" not in klein, klein
+        assert "o2" not in klein, f"Band XS nennt o2 als fehlend: {klein}"
+        assert "congstar" in klein, klein
 
         waehle_band(_seite, "m")
         _seite.wait_for_timeout(120)
         mittel = _sichtbare_anbieter(_seite)
-        assert "congstar" in mittel and "Vodafone" in mittel, mittel
+        assert "congstar" not in mittel and "Vodafone" not in mittel, mittel
+        assert "o2" in mittel, mittel
         assert klein != mittel, (
-            f"die Kartenliste folgt der Bandwahl nicht: {klein} == {mittel}"
+            f"die Fehlliste folgt der Bandwahl nicht: {klein} == {mittel}"
         )
     finally:
         waehle_laufzeit(_seite, "24")
@@ -330,29 +372,31 @@ def test_die_zeilenliste_aendert_sich_bei_bandwechsel(_seite):
 
 def test_zeilen_anderer_baender_bleiben_im_dokument_und_verstecken_sich(_seite):
     """Versteckt, nicht entfernt: die Zeilen sind statisch im Dokument, und
-    ein Bandwechsel darf kein Nachladen auslösen (OPTIK-6/E1)."""
+    ein Bandwechsel darf kein Nachladen auslösen (OPTIK-6/E1).
+
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; geprüft
+    wird die Zeile der fehlenden Anbieter, die dieselbe Regel trägt."""
     waehle_band(_seite, "m")
     _seite.wait_for_timeout(120)
     verdeckt = _seite.eval_on_selector(
-        '#gr-bndliste .gr-bnd[data-band="xs"]',
+        '#gr-bnd-gruppe .gr-anb-fehlt[data-band="xs"]',
         "e => ({versteckt: e.hidden,"
         "       sichtbar: getComputedStyle(e).display !== 'none'})",
     )
-    assert verdeckt["versteckt"] is True, "die Klein-Zeile trägt kein hidden"
-    assert verdeckt["sichtbar"] is False, "die Klein-Zeile steht noch da"
+    assert verdeckt["versteckt"] is True, "die XS-Zeile trägt kein hidden"
+    assert verdeckt["sichtbar"] is False, "die XS-Zeile steht noch da"
 
 
-def test_jede_bandzeile_traegt_ihre_gb_angabe(_seite):
+def test_jede_bandzeile_traegt_ihre_gb_angabe(fragment):
     """Ohne GB-Angabe ist eine Bandauswahl nicht nachprüfbar: der Leser
-    muss sehen, WARUM diese Zeile im Band XS steht."""
-    waehle_band(_seite, "m")
-    _seite.wait_for_timeout(120)
-    gb = _seite.eval_on_selector_all(
-        "#gr-bndliste .gr-bnd[data-band]",
-        "e => e.map(z => ({anbieter: z.dataset.anbieter,"
-        "                  gb: (z.querySelector('.gr-bnd-tarif') || {})"
-        "                       .textContent || ''}))",
-    )
+    muss sehen, WARUM diese Zeile im Band XS steht.
+
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; geprüft
+    wird das Fragment."""
+    gb = [
+        {"anbieter": z.get("data-anbieter"), "gb": _text(z.select_one(".gr-bnd-tarif"))}
+        for z in fragment.select("#gr-bndliste .gr-bnd[data-band]")
+    ]
     assert gb, "keine Zeile mit Band im Dokument"
     for eintrag in gb:
         assert "GB" in eintrag["gb"] or "unbegrenzt" in eintrag["gb"], (
@@ -360,44 +404,32 @@ def test_jede_bandzeile_traegt_ihre_gb_angabe(_seite):
         )
 
 
-def test_zeilen_ohne_tarifband_bilden_eine_markierte_gruppe(_seite):
+def test_zeilen_ohne_tarifband_bilden_eine_markierte_gruppe(fragment):
     """§7: Unbegrenzte Tarife und Tarife ohne erhobenes Volumen fallen aus
     dem Bandraster - seit O2 stehen sie in der eigenen Gruppe 'Ohne
     Tarifband' UNTER der Bandliste (#gr-ohneband), nicht heimlich in einem
-    Band (o2-Unlimited-Zeile, UX-1)."""
-    _seite.evaluate(
-        "() => {const b = document.querySelector('.gx-bnd-auf');"
-        " if (b && b.getAttribute('aria-expanded') !== 'true') b.click();}"
+    Band (o2-Unlimited-Zeile, UX-1).
+
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; geprüft
+    wird das Fragment."""
+    gruppe = fragment.select_one("#gr-ohneband")
+    assert gruppe is not None, "es gibt keine markierte Gruppe ohne Tarifband"
+    assert not gruppe.has_attr("hidden"), "die Gruppe ist versteckt"
+    assert "Ohne Tarifband" in _text(gruppe), _text(gruppe)
+    zeilen = gruppe.select(".gr-bnd")
+    assert [z for z in zeilen if not z.has_attr("data-band")], (
+        "keine Zeile ohne Band in der Gruppe"
     )
-    waehle_band(_seite, "m")
-    _seite.wait_for_timeout(120)
-    lage = _seite.evaluate("""() => {
-      const tafel = document.querySelector('#tafel-tco');
-      const gruppe = tafel.querySelector('#gr-ohneband');
-      const zeilen = gruppe ? [...gruppe.querySelectorAll('.gr-bnd')] : [];
-      return {
-        gruppeDa: !!gruppe,
-        gruppeSichtbar: !!gruppe
-            && getComputedStyle(gruppe).display !== 'none',
-        gruppeText: gruppe ? gruppe.textContent.trim() : '',
-        zeilenOhneBand: zeilen.filter(z => !z.hasAttribute('data-band')).length,
-        unlimitedOhneBand: zeilen.some(z => z.dataset.anbieter === 'o2'
-            && z.textContent.includes('O2 Unlimited')
-            && !z.hasAttribute('data-band')),
-        nachDerBandliste: !!gruppe && !!tafel.querySelector('#gr-bndliste')
-            && tafel.querySelector('#gr-bndliste')
-                 .compareDocumentPosition(gruppe)
-               & Node.DOCUMENT_POSITION_FOLLOWING,
-      };
-    }""")
-    assert lage["gruppeDa"], "es gibt keine markierte Gruppe ohne Tarifband"
-    assert lage["gruppeSichtbar"], "die Gruppe ist versteckt"
-    assert "Ohne Tarifband" in lage["gruppeText"], lage["gruppeText"]
-    assert lage["zeilenOhneBand"] > 0, "keine Zeile ohne Band in der Gruppe"
-    assert lage["unlimitedOhneBand"], (
-        "die o2-Unlimited-Zeile ist in ein Band einsortiert statt markiert"
-    )
-    assert lage["nachDerBandliste"], "die Gruppe steht nicht hinter der Bandliste"
+    assert any(
+        z.get("data-anbieter") == "o2"
+        and "O2 Unlimited" in _text(z)
+        and not z.has_attr("data-band")
+        for z in zeilen
+    ), "die o2-Unlimited-Zeile ist in ein Band einsortiert statt markiert"
+    bandliste = fragment.select_one("#gr-bndliste")
+    assert bandliste is not None
+    reihe = [e for e in fragment.descendants if e is bandliste or e is gruppe]
+    assert reihe == [bandliste, gruppe], "die Gruppe steht nicht hinter der Bandliste"
 
 
 def test_die_tco_werte_des_bands_stehen_ohne_hover_im_dom(_seite):
@@ -431,30 +463,27 @@ def test_die_tco_werte_des_bands_stehen_ohne_hover_im_dom(_seite):
         waehle_laufzeit(_seite, "24")
 
 
-def test_der_antwort_satz_nennt_die_zahl_der_guenstigsten_zeile(_seite):
+def test_der_antwort_satz_nennt_die_zahl_der_guenstigsten_zeile(_seite, fragment):
     """Keine zweite Rechnung (E2-Fassung der Wertelisten-Regel): der
     Betrag des Antwort-Satzes ist der KLEINSTE data-gesamt der im Band
-    sichtbaren Bündel-Zeilen - zwei Stellen, eine Zahl."""
+    sichtbaren Bündel-Zeilen - zwei Stellen, eine Zahl.
+
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; geprüft
+    wird das Fragment: die Zeilen des Bands unter der 24er-Ansicht."""
     waehle_band(_seite, "m")
     _seite.wait_for_timeout(250)
-    lage = _seite.evaluate("""() => {
-      const antwort = document.querySelector('#tafel-tco .gr-zr-antwort')
-        .innerText;
-      const bnd = [...document.querySelectorAll('#gr-bndliste .gr-bnd')]
-          .filter(z => !z.hidden && z.getAttribute('data-band') === 'm');
-      return {antwort,
-              min: Math.min(...bnd.map(z => parseFloat(z.dataset.gesamt))),
-              anbieter: bnd.map(z => z.dataset.anbieter)};
-    }""")
-    assert lage["anbieter"], "keine sichtbaren Bündel-Zeilen im Band"
+    antwort = _seite.eval_on_selector("#tafel-tco .gr-zr-antwort", "e => e.innerText")
+    bnd = [z for z in _bandzeilen(fragment, "m") if z.get("data-lz") in (None, "24")]
+    assert bnd, "keine Bündel-Zeilen im Band"
+    kleinste = min(float(z["data-gesamt"]) for z in bnd)
     from re import search
 
-    nach_doppelpunkt = lage["antwort"].split(":", 1)[1]
+    nach_doppelpunkt = antwort.split(":", 1)[1]
     treffer = search(r"([\d.]+,\d\d)", nach_doppelpunkt)
-    assert treffer, f"kein Betrag im Antwort-Satz: {lage['antwort']!r}"
+    assert treffer, f"kein Betrag im Antwort-Satz: {antwort!r}"
     beste = float(treffer.group(1).replace(".", "").replace(",", "."))
-    assert abs(beste - lage["min"]) < 0.005, (
-        f"Antwort-Satz nennt {beste}, die günstigste Zeile {lage['min']}"
+    assert abs(beste - kleinste) < 0.005, (
+        f"Antwort-Satz nennt {beste}, die günstigste Zeile {kleinste}"
     )
 
 
@@ -477,67 +506,50 @@ def test_mobil_bleibt_ohne_querscroll_und_mit_werteliste_lesbar(_seite):
         seite.close()
 
 
-def test_die_finanzierungssumme_heisst_so_und_nicht_geraetepreis(_seite):
+def test_die_finanzierungssumme_heisst_so_und_nicht_geraetepreis(fragment):
     """TCO-1: auf der congstar-Karte stand die tarifabhängige Summe aus
     Zuzahlung und allen Raten unter „Gerätepreis“. §3 verlangt zwei Zahlen,
     nie vermischt: die Finanzierung heißt Finanzierung, und der reine
     Gerätepreis ohne Vertrag wird als eigene Aussage benannt - hier als
     benannte Lücke, weil congstar dazu nichts gemessen hat. Die Kernzahl
     der 36-Raten-Zeile läuft über 36 Monate, der Tarif zählt davon 24
-    (1.477,00, nicht 1.765,00), und steht in der 36er-Ansicht."""
-    _seite.evaluate(
-        "() => {const b = document.querySelector('.gx-bnd-auf');"
-        " if (b && b.getAttribute('aria-expanded') !== 'true') b.click();}"
+    (1.477,00, nicht 1.765,00), und steht in der 36er-Ansicht.
+
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; geprüft
+    wird das Fragment samt Rechenweg-Vorlage."""
+    zeile = fragment.select_one(
+        "#gr-bndliste .gr-bnd[data-anbieter='congstar'][data-band='m']"
     )
-    waehle_band(_seite, "m")
-    waehle_laufzeit(_seite, "36")
-    _seite.wait_for_timeout(120)
-    congstar = _seite.eval_on_selector(
-        "#gr-bndliste .gr-bnd[data-anbieter='congstar'][data-band='m']",
-        """e => {
-          // P4-Fix (Sicht-Pruefung 18.09.): der Rechenweg wird erst beim
-          // OEFFNEN aus dem <template> montiert - der SUMMARY-KLICK ist
-          // der Nutzerweg (programmatisches open=true traefe die Montage
-          // nur ueber das asynchrone toggle-Event).
-          e.querySelector('summary').click();
-          const rw = e.querySelector('.gr-bnd-rw');
-          return {
-            bar: e.querySelector('.gr-bnd-bar').textContent,
-            summary: e.querySelector('summary').innerText,
-            rw: rw ? rw.innerText : '',
-            gesamt: e.getAttribute('data-gesamt') };
-        }""",
-    )
-    _seite.evaluate(
-        "() => document.querySelectorAll('.gr-bnd').forEach(z => { z.open = false; })"
-    )
-    waehle_laufzeit(_seite, "24")
-    assert "Finanzierung" in congstar["bar"], congstar["bar"]
-    assert "901,00" in congstar["bar"], congstar["bar"]
-    assert "Gerätepreis" not in congstar["bar"], congstar["bar"]
-    assert "nicht erhoben" in congstar["rw"], (
+    assert zeile is not None, "die congstar-Zeile im Band M fehlt"
+    assert zeile.get("data-lz") == "36", zeile.get("data-lz")
+    bar = _text(zeile.select_one(".gr-bnd-bar"))
+    summary = _text(zeile.select_one("summary"))
+    rw = _text(zeile.select_one("template.gr-bnd-rw-vorlage"))
+    assert "Finanzierung" in bar, bar
+    assert "901,00" in bar, bar
+    assert "Gerätepreis" not in bar, bar
+    assert "nicht erhoben" in rw, (
         "der Rechenweg nennt die Lücke beim Gerätepreis ohne Vertrag nicht"
     )
-    assert (
-        "Kosten über 36 Monate" in congstar["summary"]
-        and "1.477,00" in congstar["summary"]
-    )
+    assert "Kosten über 36 Monate" in summary and "1.477,00" in summary
+    assert "1.765,00" not in summary, "36 Tarifmonate gezählt"
 
 
-def test_ein_gemessener_barpreis_fuehrt_weiter_als_geraetepreis(_seite):
+def test_ein_gemessener_barpreis_fuehrt_weiter_als_geraetepreis(fragment):
     """Gegenprobe: Karten mit gemessenem eigenen Barpreis (o2, Vodafone)
     führen unverändert mit „Gerätepreis“ - das neue Etikett gilt nur der
-    Finanzierungssumme, nicht dem Barpreis."""
-    waehle_band(_seite, "xs")
-    _seite.wait_for_timeout(120)
-    o2 = _seite.eval_on_selector(
-        "#gr-bndliste .gr-bnd[data-anbieter='o2'][data-band='xs']",
-        "e => ({bar: e.querySelector('.gr-bnd-bar').textContent,"
-        "          text: e.innerText})",
+    Finanzierungssumme, nicht dem Barpreis.
+
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; geprüft
+    wird das Fragment."""
+    zeile = fragment.select_one(
+        "#gr-bndliste .gr-bnd[data-anbieter='o2'][data-band='xs']"
     )
-    assert "Finanzierung" not in o2["bar"], o2["bar"]
-    assert "999,00" in o2["bar"], o2["bar"]
-    assert "999,00" in o2["text"], o2["text"]
+    assert zeile is not None, "die o2-Zeile im Band XS fehlt"
+    bar = _text(zeile.select_one(".gr-bnd-bar"))
+    assert "Finanzierung" not in bar, bar
+    assert "999,00" in bar, bar
+    assert "999,00" in _text(zeile.select_one("summary")), _text(zeile)
 
 
 def test_der_antwort_satz_nennt_keine_finanzierungssumme_als_geraetepreis(_seite):

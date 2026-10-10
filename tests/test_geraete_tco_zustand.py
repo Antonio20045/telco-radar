@@ -622,19 +622,46 @@ def _baue(
     )
 
 
+def fragment(tmp_path: pathlib.Path, erneuert: bool = True) -> BeautifulSoup:
+    """Das Bündel-Fragment, das `_baue` neben die Seite schreibt.
+
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; ihre
+    Zeilen stehen nur noch im Fragment `data/geraete-buendel.html`."""
+    pfad = (
+        tmp_path
+        / ("mit" if erneuert else "ohne")
+        / "site"
+        / "data"
+        / "geraete-buendel.html"
+    )
+    return BeautifulSoup(pfad.read_text(encoding="utf-8"), "html.parser")
+
+
+def lager(tmp_path: pathlib.Path, erneuert: bool = True):
+    """Die Bündelzeilen des Startmodells im Fragment (`#gr-bnd-vorgabe`)."""
+    vorgabe = fragment(tmp_path, erneuert).select_one("#gr-bnd-vorgabe")
+    assert vorgabe is not None, "das Fragment trägt kein Startmodell"
+    return vorgabe
+
+
 def test_die_gerenderte_seite_traegt_das_etikett_auf_zeile_und_rechenweg(tmp_path):
     """BRIEF_FADEN (05.09.2026): G1 (der Balken) ist aus DIESER Ansicht
     entfernt - seit O2 (11.09.2026) sind die Karten Tabellenzeilen, und
     der Test prueft das Etikett an den ZEILEN. Dass `geraete_tco_grafik.
     balken()` das Etikett weiterhin rechnet (Code bleibt, nur der Aufruf
     im Template ist geloescht), haelt die Gegenprobe unten UND
-    `test_das_etikett_steht_am_g1_balken` oben."""
+    `test_das_etikett_steht_am_g1_balken` oben.
+
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; geprüft
+    wird das Fragment."""
     s = _baue(tmp_path)
     tafel = s.select_one("#tafel-tco")
-    zeilen_o2 = tafel.select('.gr-bnd[data-anbieter="o2"]')
+    assert not tafel.select(".gr-bnd"), "Bündelzeilen stehen noch auf der Seite"
+    zeilen = lager(tmp_path)
+    zeilen_o2 = zeilen.select('.gr-bnd[data-anbieter="o2"]')
     assert len(zeilen_o2) == 2
 
-    erneuert = tafel.select_one('.gr-bnd[data-zustand="refurbished"]')
+    erneuert = zeilen.select_one('.gr-bnd[data-zustand="refurbished"]')
     assert erneuert is not None
     assert (
         erneuert.select_one(".gr-kk-marke--zustand").get_text(strip=True) == "erneuert"
@@ -642,7 +669,7 @@ def test_die_gerenderte_seite_traegt_das_etikett_auf_zeile_und_rechenweg(tmp_pat
     assert erneuert.select_one(".gr-kk-delta") is None, (
         "das erneuerte Geraet ist kein Konkurrent des Neugeraets"
     )
-    neu = tafel.select_one('.gr-bnd[data-anbieter="o2"][data-zustand="neu"]')
+    neu = zeilen.select_one('.gr-bnd[data-anbieter="o2"][data-zustand="neu"]')
     assert neu.select_one(".gr-kk-marke--zustand") is None
     assert neu.select_one(".gr-bnd-delta").get_text(strip=True) == (
         "Vodafone nicht erfasst"
@@ -658,18 +685,23 @@ def test_die_gerenderte_seite_traegt_das_etikett_auf_zeile_und_rechenweg(tmp_pat
     assert "erneuert" in " ".join(erneuert.get_text(" ", strip=True).split())
 
     assert tafel.select_one(".gr-mband") is None
-    marken = [m.get_text(strip=True) for m in tafel.select(".gr-kk-marke")]
+    marken = [m.get_text(strip=True) for m in zeilen.select(".gr-kk-marke")]
     assert "unser Angebot" not in marken
 
 
 def test_ohne_erneuertes_buendel_kein_etikett(tmp_path):
-    """Die Gegenprobe: dieselbe Seite ohne das zweite Buendel."""
+    """Die Gegenprobe: dieselbe Seite ohne das zweite Buendel.
+
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; geprüft
+    wird das Fragment."""
     s = _baue(tmp_path, erneuert=False)
     tafel = s.select_one("#tafel-tco")
-    assert len(tafel.select('.gr-bnd[data-anbieter="o2"]')) == 1
-    assert not tafel.select(".gr-kk-marke--zustand")
+    zeilen = lager(tmp_path, erneuert=False)
+    assert len(zeilen.select('.gr-bnd[data-anbieter="o2"]')) == 1
+    assert not zeilen.select(".gr-kk-marke--zustand")
     assert not tafel.select(".gr-g1-zustand")
     assert "erneuert" not in tafel.get_text(" ")
+    assert "erneuert" not in vorlage_text(zeilen)
 
 
 def test_jede_karte_mit_zahl_nennt_den_preis_nach_der_laufzeit_oder_die_luecke(
@@ -678,9 +710,12 @@ def test_jede_karte_mit_zahl_nennt_den_preis_nach_der_laufzeit_oder_die_luecke(
     """F5: "ab Monat 25" steht auf JEDER Zeile mit Zahl - als Betrag, wo das
     Pflichtdokument eine Preisphase nennt (Vodafone Mobil XS: 29,95 EUR),
     sonst als benannte Luecke (o2: `preisphasen: []`). Eine stumme
-    Auslassung liest sich als "es aendert sich nichts"."""
-    s = _baue(tmp_path)
-    tafel = s.select_one("#tafel-tco")
+    Auslassung liest sich als "es aendert sich nichts".
+
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; geprüft
+    wird das Fragment."""
+    _baue(tmp_path)
+    tafel = lager(tmp_path)
     mit_zahl = [k for k in tafel.select(".gr-bnd") if k.get("data-gesamt")]
     assert len(mit_zahl) == 3
     for k in mit_zahl:
@@ -904,9 +939,12 @@ def test_die_gerenderte_zeile_zeigt_kleine_abstaende_mit_ungefaehr(tmp_path):
     Delta-Satz im Rechenweg "≈ 11,00 € über der Vodafone-Referenz" ohne
     Prozent. Gegenproben am selben Blatt: das wesentliche o2-Delta
     (−679,05 € · −37,7 %) behält Prozent UND Präfix-Klasse, und das
-    erneuerte Geraet zeigt weiterhin den Strich - "kein Angebot"."""
-    s = _baue(tmp_path, ungefaehr_delta=True)
-    tafel = s.select_one("#tafel-tco")
+    erneuerte Geraet zeigt weiterhin den Strich - "kein Angebot".
+
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; geprüft
+    wird das Fragment."""
+    _baue(tmp_path, ungefaehr_delta=True)
+    tafel = lager(tmp_path)
     o2_zeilen = tafel.select('.gr-bnd[data-anbieter="o2"]')
     assert len(o2_zeilen) == 3, "o2 neu, o2 knapp daneben, o2 erneuert"
 

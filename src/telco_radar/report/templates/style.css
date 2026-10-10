@@ -5910,16 +5910,7 @@ html:not([data-art="geraet"]) .gx-held .gx-art--tarif,html[data-art="geraet"] .g
 .gx-mehr[open] summary{display:none}
 .gx-leer{color:var(--ink-3);font-size:18px;margin:18px 0}
 #gr-buendel{margin:14px 0 0;padding:0;border:0;background:none}
-#gr-buendel{display:flex;flex-direction:column}
-#gr-buendel:not(.gx-offen) > .gr-bnd-titel,#gr-buendel:not(.gx-offen) > .gr-bnd-versand,#gr-buendel:not(.gx-offen) > .gr-bnd-kopf,#gr-buendel:not(.gx-offen) #gr-bnd-gruppe > :not(.gr-anb-fehlliste){display:none}
-#gr-bnd-gruppe{order:-1;display:flex;flex-direction:column}
-#gr-bnd-gruppe .gr-anb-fehlliste{order:-1}
-#gr-buendel.gx-offen #gr-bnd-gruppe{order:0}
-#gr-buendel.gx-offen #gr-bnd-gruppe .gr-anb-fehlliste{order:0;margin-top:14px}
-.gx-bnd-auf{align-self:flex-start;margin:14px 0 0;padding:0;border:0;background:none;font:inherit;font-size:14px;color:var(--ink-3);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
-.gx-bnd-auf::after{content:" ▾";color:var(--red)}
-#gr-buendel.gx-offen .gx-bnd-auf{margin-bottom:14px}
-#gr-buendel.gx-offen .gx-bnd-auf::after{content:" ▴"}
+#gr-bnd-gruppe > :not(.gr-anb-fehlliste){display:none}
 #gr-bnd-gruppe .gr-anb-fehlliste{display:flex;flex-wrap:wrap;gap:8px 22px;margin:0;padding:0;border:0}
 #gr-bnd-gruppe .gr-anb-fehlt{display:inline-flex;align-items:center;gap:8px;margin:0;padding:0;border:0;background:none;font-size:14px;color:var(--ink-3)}
 #gr-bnd-gruppe .gr-anb-fehlt .gr-bnd-name{display:inline-flex;align-items:center;gap:7px;font-weight:500;color:var(--ink-2)}

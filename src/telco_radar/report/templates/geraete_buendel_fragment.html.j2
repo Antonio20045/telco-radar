@@ -28,5 +28,5 @@
    Kommentar am Verlaufs-Reiter in `geraete.html.j2`) - das Fragment trägt
    wieder NUR die Bündel-Zeilen. #}
 {% from "_geraete_buendel.html.j2" import buendelgruppe %}
-{% for m in modelle %}{% if m.id != vorgabe %}<div class="gr-bnd-lager" data-modell="{{ m.id }}">{{ buendelgruppe(m) }}</div>
-{% endif %}{% endfor %}
+{% for m in modelle %}<div class="gr-bnd-lager" data-modell="{{ m.id }}"{% if m.id == vorgabe %} id="gr-bnd-vorgabe"{% endif %}>{{ buendelgruppe(m, ids=(m.id == vorgabe)) }}</div>
+{% endfor %}

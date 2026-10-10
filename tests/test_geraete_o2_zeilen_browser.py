@@ -16,6 +16,11 @@ Die EIGENE Fixture erweitert die O1-Lage um eine Zeile OHNE Band am
 Vorgabemodell (unbegrenzter Tarif, §7): die Gruppe unter der Bandliste
 braucht ihren eigenen Fall, und die O1-Fixture durfte nicht geändert
 werden - ihre Zahlen stehen in O1-Tests.
+
+Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite (Antonio):
+unter dem Graphen steht nur die Zeile der fehlenden Anbieter. Was der
+Browser an den Bündelzeilen maß, prüfen die Tests statisch am Fragment
+`data/geraete-buendel.html`; was auf der Seite bleibt, misst weiter Chromium.
 """
 
 from __future__ import annotations
@@ -25,6 +30,7 @@ import json
 import math
 
 import pytest
+from bs4 import BeautifulSoup
 
 from tarifleiter_testbestand import mit_leiter
 import yaml
@@ -40,6 +46,7 @@ from test_geraete_browser_fixture import (
     _server,
     _sku,
 )
+from test_geraete_tco_zustand import vorlage_text
 from test_geraete_zeitreihe_browser import waehle_band, waehle_modell
 
 _BAENDER_BUENDEL = [
@@ -153,16 +160,45 @@ def _baue(tmp_path):
 
 
 @contextlib.contextmanager
-def _browser_ctx(tmp_path_factory, chromium):
-    site = _baue(tmp_path_factory.mktemp("o2zeilen"))
+def _browser_ctx(site, chromium):
     with _server(site) as basis:
         yield chromium, basis
 
 
 @pytest.fixture(scope="module")
-def _browser_seite(tmp_path_factory, chromium):
-    with _browser_ctx(tmp_path_factory, chromium) as paar:
+def _site(tmp_path_factory):
+    return _baue(tmp_path_factory.mktemp("o2zeilen"))
+
+
+@pytest.fixture(scope="module")
+def _browser_seite(_site, chromium):
+    with _browser_ctx(_site, chromium) as paar:
         yield paar
+
+
+@pytest.fixture(scope="module")
+def fragment(_site):
+    """Das Bündel-Fragment mit den Zeilen aller Modelle."""
+    pfad = _site / "data" / "geraete-buendel.html"
+    return BeautifulSoup(pfad.read_text(encoding="utf-8"), "html.parser")
+
+
+@pytest.fixture(scope="module")
+def vorgabe(fragment):
+    """Die Bündelzeilen des Startmodells im Fragment (`#gr-bnd-vorgabe`)."""
+    lager = fragment.select_one("#gr-bnd-vorgabe")
+    assert lager is not None, "das Fragment trägt kein Startmodell"
+    return lager
+
+
+def _sichtbare_fehlende(s) -> list:
+    """Die sichtbaren Zeilen der fehlenden Anbieter unter dem Graphen."""
+    return s.evaluate("""() => Array.from(
+      document.querySelectorAll('#gr-bnd-gruppe .gr-anb-fehlt'))
+      .filter(z => z.getClientRects().length > 0
+                   && getComputedStyle(z).display !== 'none')
+      .map(z => ({anbieter: z.dataset.anbieter, band: z.dataset.band,
+                  lz: z.dataset.fehltLz}))""")
 
 
 @pytest.fixture
@@ -217,86 +253,119 @@ def test_die_erste_buendelzeile_ist_ohne_scroll_erreichbar(fixture_name, request
     """Der Entwurf will die Tabelle UNTER dem Graphen - aber die ERSTE
     Zeile gehört noch ins erste Bild, sonst ist der Weg zur Tabelle eine
     Blindheit. (1440: die erste Zeile endet im ersten Bildschirm;
-    390: sie endet im zweiten - der Graph hat Vorrang an der Falz.)"""
+    390: sie endet im zweiten - der Graph hat Vorrang an der Falz.)
+
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; gemessen
+    wird die erste sichtbare Zeile der fehlenden Anbieter unter dem Graphen."""
     s = request.getfixturevalue(fixture_name)
     grenze = 2 * s.viewport_size["height"]
-    box = s.eval_on_selector(
-        "#gr-bndliste .gr-bnd",
-        "e => { const r = e.getBoundingClientRect();"
-        "      return {top: Math.round(r.top), endet: Math.round(r.bottom)}; }",
+    assert s.evaluate("() => !document.querySelector('#tafel-tco .gr-bnd')"), (
+        "Bündelzeilen stehen noch auf der Seite"
     )
-    assert box is not None, "keine Bündelzeile im Dokument"
+    box = s.evaluate("""() => {
+      for (const e of document.querySelectorAll('#gr-bnd-gruppe .gr-anb-fehlt')) {
+        const r = e.getBoundingClientRect();
+        if (r.height > 0)
+          return {top: Math.round(r.top), endet: Math.round(r.bottom)};
+      }
+      return null;
+    }""")
+    assert box is not None, "keine sichtbare Zeile fehlender Anbieter"
     assert box["endet"] <= grenze, (
         f"die erste Zeile endet bei {box['endet']} px - tiefer als zwei "
         f"Bildschirme ({grenze} px)"
     )
 
 
-def test_deutlich_unter_hundert_aufklapper(seite):
+def test_deutlich_unter_hundert_aufklapper(seite, vorgabe):
     """A2 am Vorgabemodell: eine Zeile je Bündel, je Zeile EIN Rechenweg-
     Aufklapper - zusammen mit 'Wie gerechnet?', Maßstab und Datenlage
-    deutlich unter 100."""
+    deutlich unter 100.
+
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; geprüft
+    wird das Fragment."""
     anzahl = seite.eval_on_selector_all("#tafel-tco details", "e => e.length")
-    zeilen = seite.eval_on_selector_all("#tafel-tco .gr-bnd", "e => e.length")
-    assert zeilen >= 3, f"die Fixture trägt nur {zeilen} Zeilen"
+    auf_der_seite = seite.eval_on_selector_all("#tafel-tco .gr-bnd", "e => e.length")
+    assert auf_der_seite == 0, f"{auf_der_seite} Bündelzeilen auf der Seite"
     assert anzahl < 100, f"{anzahl} <details> in der Vergleichsansicht"
-    rw = seite.eval_on_selector_all(
-        "#tafel-tco .gr-bnd-rw ~ details, #tafel-tco details details", "e => e.length"
-    )
-    assert rw == 0, f"{rw} verschachtelte Aufklapper in den Zeilen"
+    zeilen = vorgabe.select(".gr-bnd")
+    assert len(zeilen) >= 3, f"die Fixture trägt nur {len(zeilen)} Zeilen"
+    assert all(z.name == "details" for z in zeilen)
+    assert len(vorgabe.select("details")) == len(zeilen) < 100
+    rw = vorgabe.select(".gr-bnd-rw ~ details, details details")
+    assert not rw, f"{len(rw)} verschachtelte Aufklapper in den Zeilen"
 
 
-def test_der_bandwechsel_versteckt_zeilen_anderer_baender(seite):
+def test_der_bandwechsel_versteckt_zeilen_anderer_baender(seite, vorgabe):
     """Dieselbe Auswahl, dieselbe Tabelle: der Wechsel auf ein anderes
     Band versteckt die Zeilen des alten - die Liste ist danach eine
-    ANDERE (P1/UX-1 für die Zeilenform)."""
-    klein = seite.eval_on_selector_all(
-        "#gr-bndliste .gr-bnd[data-band='xs']:not([hidden])",
-        "e => e.map(z => z.dataset.anbieter)",
-    )
+    ANDERE (P1/UX-1 für die Zeilenform).
+
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite: im
+    Browser folgt die Zeile der fehlenden Anbieter der Bandwahl, und das
+    Band nennt der gedrückte Band-Knopf; dass die Bündelzeilen je Band
+    verschieden sind, prüft das Fragment."""
+    vorher = _sichtbare_fehlende(seite)
     waehle_band(seite, "m")
     seite.wait_for_timeout(120)
-    verdeckt = seite.eval_on_selector(
-        "#gr-bndliste .gr-bnd[data-band='xs']",
-        "e => ({versteckt: e.hidden,"
-        "       sichtbar: getComputedStyle(e).display !== 'none'})",
+    nachher = _sichtbare_fehlende(seite)
+    assert vorher and {z["band"] for z in vorher} == {"xs"}, vorher
+    assert nachher and {z["band"] for z in nachher} == {"m"}, nachher
+    verdeckt = seite.evaluate("""() => Array.from(document.querySelectorAll(
+      "#gr-bnd-gruppe .gr-anb-fehlt[data-band='xs']"))
+      .map(e => getComputedStyle(e).display !== 'none'
+                && e.getClientRects().length > 0)""")
+    assert verdeckt and not any(verdeckt), "eine Klein-Zeile bleibt sichtbar"
+    gedrueckt = seite.evaluate(
+        "() => Array.from(document.querySelectorAll("
+        "'#gr-zr-baender button[aria-pressed=\"true\"]'))"
+        ".map(k => k.getAttribute('data-band'))"
     )
-    mittel = seite.eval_on_selector_all(
-        "#gr-bndliste .gr-bnd[data-band='m']:not([hidden])",
-        "e => e.map(z => z.dataset.anbieter)",
-    )
+    assert gedrueckt == ["m"], gedrueckt
+    klein = [
+        z["data-anbieter"]
+        for z in vorgabe.select("#gr-bndliste .gr-bnd[data-band='xs']")
+    ]
+    mittel = [
+        z["data-anbieter"]
+        for z in vorgabe.select("#gr-bndliste .gr-bnd[data-band='m']")
+    ]
     assert "o2" in klein, klein
-    assert verdeckt["versteckt"] is True, "Klein-Zeile trägt kein hidden"
-    assert verdeckt["sichtbar"] is False
     assert mittel and mittel != klein, (
         f"die Zeilenliste folgt der Bandwahl nicht: {klein} == {mittel}"
     )
-    titel = seite.eval_on_selector("#gr-bnd-titel", "e => e.textContent")
-    assert "M" in titel, titel
 
 
-def test_die_ohne_tarifband_zeilen_bleiben_stehen(seite):
+def test_die_ohne_tarifband_zeilen_bleiben_stehen(vorgabe):
     """§7: die Zeilen ohne Band gehören zu KEINEM Band - sie bleiben bei
-    jedem Bandwechsel stehen (sie hängen nicht an der Auswahl an)."""
-    ohne = seite.eval_on_selector_all(
-        "#gr-ohneband .gr-bnd", "e => e.map(z => z.dataset.anbieter)"
-    )
+    jedem Bandwechsel stehen (sie hängen nicht an der Auswahl an).
+
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; geprüft
+    wird das Fragment: die Zeilen ohne Band tragen kein `data-band`, an dem
+    ein Bandfilter sie verstecken könnte, und stehen nicht versteckt da."""
+    ohne = vorgabe.select("#gr-ohneband .gr-bnd")
     assert ohne, "die Fixture trägt keine Zeile ohne Band"
-    waehle_band(seite, "m")
-    seite.wait_for_timeout(120)
-    danach = seite.eval_on_selector_all(
-        "#gr-ohneband .gr-bnd:not([hidden])", "e => e.map(z => z.dataset.anbieter)"
-    )
-    assert danach == ohne, danach
+    assert [z["data-anbieter"] for z in ohne] == ["o2"], ohne
+    for z in ohne:
+        assert z.get("data-band") is None, z.get("data-band")
+        assert not z.has_attr("hidden")
+    assert vorgabe.select_one("#gr-bndliste #gr-ohneband") is None
+    mit_band = vorgabe.select("#gr-bndliste .gr-bnd")
+    assert mit_band and all(z.get("data-band") for z in mit_band)
 
 
-def test_der_modellwechsel_setzt_die_eigenen_zeilen_ein(seite):
+def test_der_modellwechsel_setzt_die_eigenen_zeilen_ein(seite, fragment):
     """O3 (S3): die Tabelle mit Rechenwegen gehört zum GEWÄHLTEN Modell -
     der Wechsel setzt die Zeilen des anderen Geräts ein (aus dem Fragment,
     `data/geraete-buendel.html`), statt sich zu verstecken. Bis O3 tat sie
-    genau das; die O2-Fassung dieses Tests nagelte das Verstecken fest."""
+    genau das; die O2-Fassung dieses Tests nagelte das Verstecken fest.
+
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite: der
+    Wechsel setzt die Zeile der fehlenden Anbieter des anderen Geräts ein,
+    die Bündelzeilen je Modell prüft das Fragment."""
     sichtbar = seite.eval_on_selector("#gr-buendel", "e => !e.hidden")
     assert sichtbar, "beim Vorgabemodell steht die Tabelle offen da"
+    vorher = {z["anbieter"] for z in _sichtbare_fehlende(seite)}
     auswahl = seite.eval_on_selector(
         "#gr-zeitreihe-daten", "k => Object.keys(JSON.parse(k.textContent).erlaubt)"
     )
@@ -308,58 +377,45 @@ def test_der_modellwechsel_setzt_die_eigenen_zeilen_ein(seite):
     waehle_modell(seite, fremd[0])
     seite.wait_for_timeout(300)
     assert seite.eval_on_selector("#gr-buendel", "e => !e.hidden")
-    anbieter = seite.eval_on_selector_all(
-        "#gr-buendel .gr-bnd", "e => e.map(z => z.dataset.anbieter)"
-    )
+    assert seite.evaluate("() => !document.querySelector('#gr-buendel .gr-bnd')")
+    nachher = {z["anbieter"] for z in _sichtbare_fehlende(seite)}
+    assert "1&1" in vorher and "1&1" not in nachher, (vorher, nachher)
+    assert nachher and nachher != vorher, (vorher, nachher)
+    lager = fragment.select_one(f'.gr-bnd-lager[data-modell="{fremd[0]}"]')
+    assert lager is not None, f"das Fragment trägt {fremd[0]} nicht"
+    anbieter = [z["data-anbieter"] for z in lager.select(".gr-bnd")]
     assert set(anbieter) == {"1&1"}, anbieter
     assert seite.evaluate("() => !document.getElementById('gr-karten-hinweis')"), (
         "der Vorgabegerät-Hinweis ist mit S3 entfallen"
     )
 
 
-def test_der_zeilen_aufklapper_oeffnet_ohne_netzwerk(seite):
+def test_der_zeilen_aufklapper_oeffnet_ohne_netzwerk(vorgabe):
     """E1: alles bleibt im Dokument erreichbar - das Öffnen einer Zeile ist
     reines UI (derselbe Maßstab wie der OPTIK-6-Klapptest, nur an der
-    Zeile)."""
-    seite.evaluate(
-        "() => {const b = document.querySelector('.gx-bnd-auf');"
-        " if (b && b.getAttribute('aria-expanded') !== 'true') b.click();}"
-    )
-    ursprung = seite.url.rsplit("/", 1)[0]
-    anfragen: list[str] = []
+    Zeile).
 
-    def _zaehle(anfrage) -> None:
-        if anfrage.url.startswith(ursprung):
-            anfragen.append(anfrage.url)
-
-    seite.on("request", _zaehle)
-    try:
-        ergebnis = seite.evaluate("""() => {
-          const z = document.querySelector('#gr-bndliste .gr-bnd');
-          if (!z) return null;
-          // P4-Fix (Sicht-Pruefung 18.09.): Rechenweg-Montage beim
-          // OEFFNEN - summary.click() ist der Nutzerweg (die Montage
-          // laeuft im click-Delegaten, das Oeffnen ist die Default-
-          // Action desselben Klicks).
-          z.querySelector('summary').click();
-          const rw = z.querySelector('.gr-bnd-rw');
-          return {sichtbar: !!rw.offsetParent,
-                  hoehe: Math.round(rw.getBoundingClientRect().height)};
-        }""")
-        seite.wait_for_timeout(200)
-    finally:
-        seite.remove_listener("request", _zaehle)
-        seite.evaluate(
-            "() => document.querySelectorAll('.gr-bnd')"
-            ".forEach(z => { z.open = false; })"
-        )
-    assert ergebnis is not None, "keine Zeile im Dokument"
-    assert ergebnis["sichtbar"], "der Rechenweg bleibt unsichtbar"
-    assert ergebnis["hoehe"] > 60, f"der Rechenweg hat nur {ergebnis['hoehe']} px Höhe"
-    assert anfragen == [], f"das Öffnen hat Netzwerkanfragen ausgelöst: {anfragen}"
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; geprüft
+    wird das Fragment: jede Zeile trägt ihren ganzen Rechenweg als Vorlage
+    bei sich und verweist auf keine nachzuladende Adresse."""
+    zeilen = vorgabe.select(".gr-bnd")
+    assert zeilen, "keine Zeile im Fragment"
+    for z in zeilen:
+        assert z.name == "details" and z.select_one("summary") is not None
+        assert z.select_one(".gr-bnd-rw") is not None, "Zeile ohne Montageziel"
+        vorlage = z.select_one("template.gr-bnd-rw-vorlage")
+        assert vorlage is not None, f"{z['data-anbieter']}: kein Rechenweg"
+        assert vorlage.select(".gr-tposten li"), "Rechenweg ohne Postenliste"
+        assert len(vorlage_text(vorlage)) > 200, vorlage_text(vorlage)
+        nachlade = [
+            el
+            for el in [z, *z.find_all(True)]
+            if any(a in el.attrs for a in ("src", "data-src", "data-url"))
+        ]
+        assert not nachlade, f"{z['data-anbieter']}: lädt nach: {nachlade}"
 
 
-def test_der_rechenweg_wird_erst_beim_oeffnen_montiert(seite):
+def test_der_rechenweg_wird_erst_beim_oeffnen_montiert(vorgabe):
     """P4-Fix (Sicht-Pruefung 18.09., Kriterium 13 / FM 4): der Aufklapp-
     Inhalt der Bündel-Zeilen steht im <template> und wird ERST BEIM
     ÖFFNEN montiert. Bis hierher zählte der Rechenweg-Text mit zum
@@ -367,92 +423,61 @@ def test_der_rechenweg_wird_erst_beim_oeffnen_montiert(seite):
     Zeichen - der Deckel war das einzige rote Kriterium der Abnahme).
     Drei Zusicherungen: (1) das Montageziel ist im Server-HTML LEER,
     (2) die Vorlage trägt den Inhalt, (3) der summary-Klick füllt das
-    Ziel - reine Montage, keine Zahl entsteht im Client."""
-    vor = seite.evaluate("""() => {
-      // Eine Zeile mit NOCH LEEREM Montageziel suchen - die modulweite
-      // Fixture kann aus frueheren Tests schon montierte Zeilen tragen.
-      for (const k of document.querySelectorAll('#gr-bndliste .gr-bnd')) {
-        const rw = k.querySelector('.gr-bnd-rw');
-        if (rw && rw.textContent.trim() === '') {
-          const tpl = k.querySelector('template.gr-bnd-rw-vorlage');
-          return {idx: k.dataset.anbieter,
-                  vorlageZeichen: tpl
-                    ? tpl.content.textContent.trim().length : 0,
-                  offen: k.open};
-        }
-      }
-      return null;
-    }""")
-    if vor is None:
-        seite.reload(wait_until="load")
-        vor = seite.evaluate("""() => {
-          const k = document.querySelector('#gr-bndliste .gr-bnd');
-          if (!k) return null;
-          const rw = k.querySelector('.gr-bnd-rw');
-          const tpl = k.querySelector('template.gr-bnd-rw-vorlage');
-          return {idx: k.dataset.anbieter,
-                  vorlageZeichen: tpl
-                    ? tpl.content.textContent.trim().length : 0,
-                  offen: k.open};
-        }""")
-    assert vor is not None, "keine Bündelzeile - der Test prüft nichts"
-    assert not vor["offen"], "die gemessene Zeile steht schon offen"
-    assert vor["vorlageZeichen"] > 200, (
-        f"die Vorlage ist zu duenn ({vor['vorlageZeichen']} Z) - "
-        "der Test misst einen leeren Rechenweg"
-    )
+    Ziel - reine Montage, keine Zahl entsteht im Client.
 
-    nach = seite.evaluate("""() => {
-      // Dieselbe Auswahl wie im vor-Schritt: erste Zeile mit leerem Ziel.
-      for (const k of document.querySelectorAll('#gr-bndliste .gr-bnd')) {
-        const rw = k.querySelector('.gr-bnd-rw');
-        if (rw && rw.textContent.trim() === '') {
-          k.querySelector('summary').click();
-          return {zeichen: rw.textContent.trim().length,
-                  offen: k.open,
-                  posten: rw.querySelectorAll('.gr-tposten li').length};
-        }
-      }
-      return null;
-    }""")
-    seite.evaluate(
-        "() => document.querySelectorAll('.gr-bnd').forEach(z => { z.open = false; })"
-    )
-    assert nach is not None, "keine unmontierte Zeile für den Klick"
-    assert nach["offen"], "der Klick hat die Zeile nicht geöffnet"
-    assert nach["zeichen"] > 200, (
-        f"nach dem Öffnen nur {nach['zeichen']} Z im Ziel - nicht montiert"
-    )
-    assert nach["posten"], "montierter Rechenweg ohne Postenliste"
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; geprüft
+    wird das Fragment: (1) und (2) an jeder Zeile, für (3) dass das Ziel und
+    die Vorlage in derselben, zugeklappten Zeile stehen."""
+    zeilen = vorgabe.select(".gr-bnd")
+    assert zeilen, "keine Bündelzeile - der Test prüft nichts"
+    for z in zeilen:
+        assert not z.has_attr("open"), f"{z['data-anbieter']}: steht schon offen"
+        rw = z.select_one(".gr-bnd-rw")
+        assert rw is not None and rw.get_text(strip=True) == "", (
+            f"{z['data-anbieter']}: das Montageziel ist nicht leer"
+        )
+        assert not rw.find(True), "das Montageziel trägt schon Knoten"
+        vorlage = z.select_one("template.gr-bnd-rw-vorlage")
+        assert vorlage is not None and vorlage.find_parent("details") is z
+        zeichen = len(vorlage_text(vorlage))
+        assert zeichen > 200, (
+            f"die Vorlage ist zu duenn ({zeichen} Z) - "
+            "der Test misst einen leeren Rechenweg"
+        )
+        assert vorlage.select(".gr-tposten li"), "Vorlage ohne Postenliste"
 
 
-def test_zeilen_stapeln_sich_auf_dem_telefon_ohne_querscroll(telefon):
+def test_zeilen_stapeln_sich_auf_dem_telefon_ohne_querscroll(telefon, vorgabe):
     """Auftrag 1: 'Mobile 390: Tabelle darf quer laufen IN einem
     Scroll-Container NUR wenn unvermeidbar - bevorzugt Zeilen-Stapel wie
     im Entwurf.' Gemessen: keine Zeile läuft aus dem 390-px-Rahmen, und
-    die Seite rollt nicht waagerecht."""
-    telefon.evaluate(
-        "() => {const b = document.querySelector('.gx-bnd-auf');"
-        " if (b && b.getAttribute('aria-expanded') !== 'true') b.click();}"
-    )
+    die Seite rollt nicht waagerecht.
+
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite: im
+    Browser läuft keine Zeile der fehlenden Anbieter aus dem Rahmen; dass die
+    Bündelzeile Anbieter, Tarif und Kosten als eigene Zellen trägt, die das
+    Telefon stapeln kann, prüft das Fragment."""
     quer = telefon.evaluate(
         "() => Math.max(document.documentElement.scrollWidth,"
         "               document.body.scrollWidth)"
     )
     assert quer <= 391, f"die Seite ist {quer} px breit"
-    zu_breit = telefon.evaluate("""() => Array.from(
-        document.querySelectorAll('#gr-bndliste .gr-bnd summary'))
-        .filter(s => s.scrollWidth > s.clientWidth + 1).length""")
-    assert zu_breit == 0, f"{zu_breit} summary-Elemente laufen quer aus"
-    lage = telefon.evaluate("""() => {
-      const s = document.querySelector('#gr-bndliste .gr-bnd summary');
-      const an = s.querySelector('.gr-bnd-an').getBoundingClientRect();
-      const tar = s.querySelector('.gr-bnd-tarif').getBoundingClientRect();
-      const tco = s.querySelector('.gr-bnd-tco').getBoundingClientRect();
-      return {tarifUnterAnbieter: tar.top >= an.bottom - 2,
-              tcoRechtsOderUeber: tco.left > an.left};
-    }""")
-    assert lage["tarifUnterAnbieter"] is True, (
-        "die Zellen stehen nebeneinander statt gestapelt"
-    )
-    assert lage["tcoRechtsOderUeber"] is True
+    rahmen = telefon.evaluate("""() => Array.from(
+        document.querySelectorAll('#gr-bnd-gruppe .gr-anb-fehlt'))
+        .filter(z => z.getClientRects().length > 0)
+        .map(z => ({rechts: Math.round(z.getBoundingClientRect().right),
+                    quer: z.scrollWidth > z.clientWidth + 1}))""")
+    assert rahmen, "keine sichtbare Zeile fehlender Anbieter"
+    zu_breit = [z for z in rahmen if z["quer"] or z["rechts"] > 391]
+    assert not zu_breit, f"{len(zu_breit)} Zeilen laufen quer aus: {zu_breit}"
+    for z in vorgabe.select("#gr-bndliste .gr-bnd"):
+        summary = z.select_one("summary")
+        assert summary is not None
+        zellen = [
+            summary.select_one(k)
+            for k in (".gr-bnd-an", ".gr-bnd-tarif", ".gr-bnd-tco")
+        ]
+        assert all(zellen), f"{z['data-anbieter']}: eine Zelle fehlt"
+        for zelle in zellen:
+            assert zelle.parent is summary or zelle.find_parent("summary") is summary
+        assert summary.select_one("table") is None, "eine Tabelle läuft quer"

@@ -787,7 +787,7 @@ def main() -> int:
                 maengel.append(f"Reste der geloeschten Preisgrafik: {tot}")
 
         reiter = [k.get("data-tafel") for k in gr.select(".gr-reiter [data-tafel]")]
-        erwartet = ["tafel-tco", "tafel-verlauf", "tafel-radar", "tafel-katalog"]
+        erwartet = ["tafel-tco", "tafel-verlauf", "tafel-radar"]
         if reiter != erwartet:
             maengel.append(f"Reiter {reiter} statt {erwartet}")
         if gr.select_one(".gr-reiter a") is not None:
@@ -835,26 +835,18 @@ def main() -> int:
                 "die Gerätedaten des Preisverlaufs "
                 "(#gr-verlaufdaten) fehlen im Verlaufs-Reiter"
             )
-        if (
-            verlaufflaeche is not None
-            and verlaufflaeche.select_one("svg.gr-g2") is not None
-        ):
-            maengel.append(
-                "der G2-Block ist im Verlaufs-Reiter "
-                "zurückgekehrt - der Reiter trägt den Modell-"
-                "Wähler als alleinige Grafik (F4)"
-            )
-        if (
-            verlaufflaeche is not None
-            and verlaufflaeche.select_one("#gr-g0-lager, svg.gr-g0") is not None
-        ):
-            maengel.append(
-                "der G0-Block ist im Verlaufs-Reiter "
-                "zurückgekehrt - der Reiter trägt seine eigene "
-                "Barpreis-Auswahl (Doppel-Darstellung, §4.6/4.8)"
-            )
+        alt = "svg.gr-g2, #gr-g0-lager, svg.gr-g0"
+        if verlaufflaeche is not None and verlaufflaeche.select_one(alt):
+            maengel.append("G0/G2-Block im Verlaufs-Reiter zurück (F4, §4.6/4.8)")
 
-        maengel += zeitraum_maengel(start) if start is not None else []
+        lager = site / "data" / "geraete-buendel.html"
+        maengel += (
+            zeitraum_maengel(
+                BeautifulSoup(lager.read_text(encoding="utf-8"), "html.parser")
+            )
+            if lager.exists()
+            else ["data/geraete-buendel.html fehlt"]
+        )
         verlauf = gr.select_one("#tafel-verlauf")
         verlauf_leer = (
             verlauf is not None and verlauf.select_one("#gr-verlaufdaten") is None

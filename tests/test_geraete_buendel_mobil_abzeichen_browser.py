@@ -12,7 +12,13 @@
 
 Fixture: vier Anbieter desselben Bündels - Vodafone (eigen, "unser
 Angebot"), Telekom (Abruf 9 Tage alt, "kein aktueller Stand seit …",
-ueber `geraete_tco_karten.ALT_AB_TAGEN`), o2 und 1&1 ohne Abzeichen."""
+ueber `geraete_tco_karten.ALT_AB_TAGEN`), o2 und 1&1 ohne Abzeichen.
+
+Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; geprüft wird
+das Fragment: der Bauplan jeder Zeile aus `data/geraete-buendel.html`, die
+Regeln von style.css, die bei 390 px gelten, und im Browser, was dort noch
+steht (Breite der Gruppe, Textbreite des Abzeichens, kein waagerechtes
+Rollen)."""
 
 from __future__ import annotations
 
@@ -20,10 +26,12 @@ import contextlib
 import functools
 import http.server
 import json
+import re
 import socket
 import threading
 
 import pytest
+from bs4 import BeautifulSoup
 
 from tarifleiter_testbestand import mit_leiter
 import yaml
@@ -243,51 +251,111 @@ def _server(site):
         httpd.shutdown()
 
 
+BREITE = 390
+
+
+def _css_fuer(site, breite) -> str:
+    """Die Regeln von style.css, die bei dieser Breite gelten: alles außerhalb
+    von @media plus die Blöcke `max-width` >= breite und `min-width` <= breite.
+    Leerraum ist zu einem Zeichen gefaltet."""
+    css = re.sub(r"\s+", " ", (site / "style.css").read_text(encoding="utf-8"))
+    css = re.sub(r"/\*.*?\*/", "", css)
+    teile, rest, pos = [], [], 0
+    for treffer in re.finditer(r"@media([^{]*)\{", css):
+        if treffer.start() < pos:
+            continue
+        tiefe, ende = 1, treffer.end()
+        while tiefe:
+            tiefe += {"{": 1, "}": -1}.get(css[ende], 0)
+            ende += 1
+        rest.append(css[pos : treffer.start()])
+        bedingung = treffer.group(1)
+        maxi = re.search(r"max-width:\s*(\d+)px", bedingung)
+        mini = re.search(r"min-width:\s*(\d+)px", bedingung)
+        passt = (not maxi or int(maxi.group(1)) >= breite) and (
+            not mini or int(mini.group(1)) <= breite
+        )
+        if passt and "print" not in bedingung and "hover" not in bedingung:
+            teile.append(css[treffer.end() : ende - 1])
+        pos = ende
+    rest.append(css[pos:])
+    return " ".join(rest + teile)
+
+
+def _zeile(d) -> dict:
+    """Bauplan einer Bündelzeile des Fragments: die Zellen des Zeilenkopfs
+    in ihrer Reihenfolge, Name und Abzeichen der Anbieterzelle."""
+    kopf = d.find("summary", recursive=False)
+    assert kopf is not None, d.attrs
+    an = kopf.select(":scope > .gr-bnd-an")
+    assert len(an) == 1, d.attrs
+    marke = an[0].select_one(".gr-kk-marke")
+    return {
+        "name": an[0].select_one(".gr-bnd-name").get_text(strip=True),
+        "marke": marke.get_text(" ", strip=True) if marke else None,
+        "markeKlassen": marke.get("class", []) if marke else [],
+        "zellen": [k.get("class", [""])[0] for k in kopf.find_all(recursive=False)],
+    }
+
+
+_MESSEN = """(texte) => {
+  const g = document.getElementById('gr-bnd-gruppe').getBoundingClientRect();
+  const wurzel = getComputedStyle(document.documentElement);
+  const ctx = document.createElement('canvas').getContext('2d');
+  ctx.font = '12px ' + wurzel.getPropertyValue('--sans').trim();
+  return {
+    gruppeBreite: g.width, gruppeRechts: g.right, innen: innerWidth,
+    quer: document.documentElement.scrollWidth,
+    zeilenAufSeite: document.querySelectorAll('.gr-bnd, .gx-bnd-auf').length,
+    textBreiten: texte.map(t => ctx.measureText(t).width),
+  };
+}"""
+
+
 @pytest.fixture(scope="module")
 def zeilen(tmp_path_factory, chromium):
     site = _baue(tmp_path_factory.mktemp("bnd390"))
+    lager = BeautifulSoup(
+        (site / "data" / "geraete-buendel.html").read_text(encoding="utf-8"),
+        "html.parser",
+    )
+    daten = [_zeile(d) for d in lager.select("#gr-bnd-vorgabe details.gr-bnd")]
     with _server(site) as wurzel:
-        ctx = chromium.new_context(viewport={"width": 390, "height": 1400})
+        ctx = chromium.new_context(viewport={"width": BREITE, "height": 1400})
         try:
             s = ctx.new_page()
             s.goto(f"{wurzel}/geraete.html", wait_until="networkidle")
-            s.click(".gx-bnd-auf")
+            s.click(".gr-reiter button[data-tafel='tafel-tco']")
             s.wait_for_timeout(300)
-            daten = s.evaluate("""() => {
-              const rows = [...document.querySelectorAll('#gr-buendel .gr-bnd')];
-              return rows.map(row => {
-                const name = row.querySelector('.gr-bnd-name');
-                const tco = row.querySelector('.gr-bnd-tco');
-                const an = row.querySelector('.gr-bnd-an');
-                const marke = row.querySelector('.gr-kk-marke');
-                if (!name || !tco || !name.getBoundingClientRect().width) {
-                  return null;
-                }
-                const nr = name.getBoundingClientRect();
-                const tr = tco.getBoundingClientRect();
-                const ar = an.getBoundingClientRect();
-                const mr = marke ? marke.getBoundingClientRect() : null;
-                const cs = mr ? getComputedStyle(marke) : null;
-                return {
-                  name: name.textContent, marke: marke ? marke.textContent : null,
-                  nameTop: nr.top, tcoTop: tr.top, tcoRight: tr.right,
-                  anWidth: ar.width, markeWidth: mr ? mr.width : null,
-                  markeHoehe: mr ? mr.height : null,
-                  zeilenhoehe: cs ? parseFloat(cs.fontSize) * 1.6 : null,
-                };
-              }).filter(Boolean);
-            }""")
-            yield daten
+            browser = s.evaluate(_MESSEN, [z["marke"] for z in daten if z["marke"]])
         finally:
             ctx.close()
+    return {"zeilen": daten, "css": _css_fuer(site, BREITE), "browser": browser}
 
 
 def test_alle_preise_haben_dieselbe_rechte_kante(zeilen):
-    assert len(zeilen) == 4, zeilen
-    kanten = [round(z["tcoRight"]) for z in zeilen]
-    assert max(kanten) - min(kanten) <= 1, (
-        f"die Preiszellen haben unterschiedliche rechte Kanten: {zeilen}"
+    """Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite;
+    geprüft wird das Fragment: jede Zeile trägt genau eine Preiszelle im
+    Zeilenkopf, und am Telefon steht sie auf einer eigenen vollen Grid-Zeile,
+    rechts ausgerichtet (`justify-self:end`) - dieselbe rechte Kante in
+    jeder Zeile, unabhängig vom Inhalt. Im Browser rollt nichts waagerecht."""
+    daten, css, browser = zeilen["zeilen"], zeilen["css"], zeilen["browser"]
+    assert len(daten) == 4, daten
+    for z in daten:
+        assert z["zellen"].count("gr-bnd-tco") == 1, z
+    assert (
+        ".gr-bnd summary{ grid-template-columns:minmax(0,1fr) auto;row-gap:3px; "
+        'grid-template-areas:"an an" "tco tco" ' in css
     )
+    assert (
+        ".gr-bnd-tco{grid-area:tco;text-align:right;align-self:start; "
+        "justify-self:end;width:max-content;max-width:100%}" in css
+    )
+    assert ".gr-bnd-an,.gr-bnd-tco,.gr-bnd-delta,.gr-bnd-bar{grid-row" not in css
+    assert browser["zeilenAufSeite"] == 0, browser
+    assert browser["gruppeBreite"] > 0, browser
+    assert browser["gruppeRechts"] <= browser["innen"] + 0.5, browser
+    assert browser["quer"] <= browser["innen"], browser
 
 
 def test_der_preis_liegt_in_jeder_zeile_gleich_zum_namen(zeilen):
@@ -299,17 +367,25 @@ def test_der_preis_liegt_in_jeder_zeile_gleich_zum_namen(zeilen):
     je Zeile, und zwei Zeilen mit identischem Bauplan sahen verschieden
     aus (Preis neben dem Namen vs. eine Zeile tiefer). Ein Abzeichen
     fuegt selbst legitim eine Zeile Hoehe hinzu - verglichen wird darum
-    je Gruppe (mit/ohne Abzeichen), nicht ueber beide hinweg."""
-    assert len(zeilen) == 4, zeilen
+    je Gruppe (mit/ohne Abzeichen), nicht ueber beide hinweg. Seit
+    10.10.2026 steht die Bündelliste nicht mehr auf der Seite; geprüft wird
+    das Fragment: je Gruppe derselbe Bauplan des Zeilenkopfs, und style.css
+    legt bei 390 px die Preiszeile direkt unter die Namenszeile, je über
+    die volle Breite, ohne Spalte, die der Inhalt bestimmt."""
+    daten, css = zeilen["zeilen"], zeilen["css"]
+    assert len(daten) == 4, daten
     for hat_marke in (True, False):
-        gruppe = [z for z in zeilen if bool(z["marke"]) == hat_marke]
+        gruppe = [z for z in daten if bool(z["marke"]) == hat_marke]
         if len(gruppe) < 2:
             continue
-        abstaende = [round(z["tcoTop"] - z["nameTop"]) for z in gruppe]
-        assert max(abstaende) - min(abstaende) <= 2, (
-            f"Abstand Name->Preis unterscheidet sich innerhalb derselben "
+        bauplaene = {tuple(z["zellen"]) for z in gruppe}
+        assert len(bauplaene) == 1, (
+            f"der Bauplan unterscheidet sich innerhalb derselben "
             f"Bauform (Abzeichen={hat_marke}): {gruppe}"
         )
+    assert 'grid-template-areas:"an an" "tco tco" "tar bar"' in css
+    assert ".gr-bnd-an{grid-area:an;min-width:0}" in css
+    assert "grid-template-columns:minmax(0,1fr) auto;row-gap:3px;" in css
 
 
 def test_das_abzeichen_steht_auf_einer_zeile(zeilen):
@@ -318,24 +394,39 @@ def test_das_abzeichen_steht_auf_einer_zeile(zeilen):
     sobald das Abzeichen `width:100%` dieser Zelle traegt, auch wenn die
     Zelle selbst nur ~75 px breit ist. Die eigentliche Regel: der Text
     passt auf EINE Zeile (Rechteckhoehe ~ eine Zeilenhoehe), nicht auf
-    zwei bis vier enge Zeilen gestapelt."""
-    mit_marke = [z for z in zeilen if z["marke"]]
-    assert len(mit_marke) == 1, zeilen
+    zwei bis vier enge Zeilen gestapelt. Seit 10.10.2026 steht die
+    Bündelliste nicht mehr auf der Seite; geprüft wird das Fragment (das
+    Abzeichen steht in der Anbieterzelle), style.css bei 390 px (Block über
+    die volle Zeile, 12 px) und im Browser die Breite des Abzeichentextes
+    in dieser Schrift gegen die Breite der Gruppe."""
+    daten, css, browser = zeilen["zeilen"], zeilen["css"], zeilen["browser"]
+    mit_marke = [z for z in daten if z["marke"]]
+    assert len(mit_marke) == 1, daten
     for z in mit_marke:
-        assert z["markeHoehe"] <= z["zeilenhoehe"] * 1.5, (
-            f"das Abzeichen steht nicht auf einer Zeile: {z}"
+        assert "gr-kk-marke--notbremse" not in z["markeKlassen"], z
+    assert (
+        ".gr-bnd-an .gr-kk-marke{display:block;width:100%;box-sizing:border-box;" in css
+    )
+    assert re.search(r"\.gr-bnd-an \.gr-kk-marke\{[^}]*font-size:12px", css)
+    breiten = browser["textBreiten"]
+    assert len(breiten) == len(mit_marke), browser
+    for z, breite in zip(mit_marke, breiten, strict=True):
+        assert 0 < breite < browser["gruppeBreite"] - 24, (
+            f"das Abzeichen steht nicht auf einer Zeile: {z} {browser}"
         )
 
 
 def test_die_alte_telekom_zeile_traegt_wirklich_die_alte_marke(zeilen):
     """Gegenprobe: die Fixture trifft wirklich `ALT_AB_TAGEN` - sonst
     testet `test_das_abzeichen_hat_die_volle_breite_der_an_zelle` an
-    einer Zeile ohne Marke vorbei."""
-    telekom = [z for z in zeilen if z["name"] == "Telekom"]
+    einer Zeile ohne Marke vorbei. Seit 10.10.2026 steht die Bündelliste
+    nicht mehr auf der Seite; geprüft wird das Fragment."""
+    telekom = [z for z in zeilen["zeilen"] if z["name"] == "Telekom"]
     assert telekom, zeilen
     assert telekom[0]["marke"] == geraete_tco_karten.alt_marke_fuer(ALT_ABGERUFEN), (
         telekom
     )
+    assert "gr-kk-marke--alt" in telekom[0]["markeKlassen"], telekom
     assert (
         geraete_tco_karten.alter_in_tagen(ALT_ABGERUFEN, HEUTE)
         > geraete_tco_karten.ALT_AB_TAGEN

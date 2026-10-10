@@ -32,6 +32,12 @@ VERBOTSMARKER = (
 HAENDLER = ("Amazon", "Expert", "Saturn")
 
 
+def _fragment(tmp_path) -> BeautifulSoup:
+    """Das Bündel-Fragment, das `_baue` neben die Seite schreibt."""
+    pfad = tmp_path / "mit" / "site" / "data" / "geraete-buendel.html"
+    return BeautifulSoup(pfad.read_text(encoding="utf-8"), "html.parser")
+
+
 def _ohne_details(suppe: BeautifulSoup) -> str:
     """Der Lesefluss: derselbe Baum, aber jeder `<details>`-Block samt
     Inhalt entfernt. Eine neue Kopie, damit der Aufrufer die Original-Suppe
@@ -61,9 +67,12 @@ def test_der_waechter_prueft_wirklich_etwas(tmp_path):
     (sie stand doppelt - siehe `test_wie_gerechnet_steht_hoechstens_einmal_
     je_modellblock`). Der Marker zaehlt seitdem 0-mal, auch hinter einer
     Aufklappung, und ist deshalb kein Beleg mehr fuer diesen Waechter.
+
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; geprüft
+    wird das Fragment.
     """
     s = _baue(tmp_path)
-    ganze_seite = str(s)
+    ganze_seite = str(s) + str(_fragment(tmp_path))
     gefunden = {m: ganze_seite.count(m) for m in VERBOTSMARKER}
     assert gefunden["Referenzrechnung, kein Angebot"] >= 1, gefunden
 
@@ -117,7 +126,11 @@ def test_die_buendel_stehen_als_zeilen_unter_dem_graphen(tmp_path):
     """O2 ersetzt die OPTIK-6-Klappe: jede Karte ist EINE Zeile mit EINEM
     eigenen Aufklapper - keine geschlossene Sammelklappe mehr, kein
     Steuerpult. Die Anfangshöhe hält stattdessen die Zeilenform selbst
-    (eine zusammengeklappte Zeile ist eine Zeile hoch)."""
+    (eine zusammengeklappte Zeile ist eine Zeile hoch).
+
+    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; geprüft
+    wird das Fragment. Unter dem Graphen steht nur die Zeile der fehlenden
+    Anbieter, ohne Titel und ohne Bündelzeile."""
     s = _baue(tmp_path, graphloses_modell=True)
     tafel = s.select_one("#tafel-tco")
     assert tafel is not None
@@ -127,16 +140,23 @@ def test_die_buendel_stehen_als_zeilen_unter_dem_graphen(tmp_path):
         "die Kartenklappe steht noch"
     )
     assert not block.select(".gr-kkarte"), "Karten stehen noch"
-    zeilen = block.select("#gr-bndliste .gr-bnd")
+    assert not block.select(".gr-bnd"), "Bündelzeilen stehen noch auf der Seite"
+    assert block.select_one("#gr-bnd-titel") is None, "der Listentitel steht noch"
+    assert block.select("#gr-bnd-gruppe .gr-anb-fehlliste p.gr-anb-fehlt"), (
+        "die Zeile der fehlenden Anbieter fehlt"
+    )
+    etikett = block.get("aria-label", "")
+    assert "Karten" not in block.get_text() + etikett, etikett
+    assert not re.search(r"\(\d+", etikett), etikett
+    lager = _fragment(tmp_path).select_one("#gr-bnd-vorgabe")
+    assert lager is not None, "das Fragment trägt kein Startmodell"
+    zeilen = lager.select("#gr-bndliste .gr-bnd")
     assert zeilen, "die Zeilenliste ist leer"
     for zeile in zeilen:
+        assert zeile.name == "details", zeile.name
         assert not zeile.has_attr("open"), (
             f"{zeile.get('data-anbieter')}: Zeile steht offen im HTML"
         )
-    titel = block.select_one("#gr-bnd-titel")
-    assert titel is not None
-    assert "Karten" not in titel.get_text(), titel.get_text()
-    assert not re.search(r"\(\d+", titel.get_text()), titel.get_text()
 
 
 def test_haendler_ohne_preis_stehen_nicht_einzeln(tmp_path):
