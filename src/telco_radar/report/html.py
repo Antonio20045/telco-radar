@@ -1720,8 +1720,9 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
         ),
         encoding="utf-8",
     )
-    for pfad, inhalt in geraete_fragmente.vorbereiten(site_dir, env, geraete).items():
-        pfad.write_text(inhalt, encoding="utf-8")
+    fragmente = geraete_fragmente.vorbereiten(site_dir, env, geraete)
+    for fragment_pfad, fragment_text in fragmente.items():
+        fragment_pfad.write_text(fragment_text, encoding="utf-8")
     (site_dir / "geraete-quellen.html").write_text(
         env.get_template("geraete_quellen.html.j2").render(prefix="", geraete=geraete),
         encoding="utf-8",
