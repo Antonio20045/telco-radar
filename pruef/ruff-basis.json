@@ -776,7 +776,6 @@
  "tests/test_geraete_o2_zeilen.py": {
   "F401": 1,
   "F811": 1,
-  "F841": 1,
   "I001": 1
  },
  "tests/test_geraete_o2_zeilen_browser.py": {
