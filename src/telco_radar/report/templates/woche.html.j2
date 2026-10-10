@@ -30,7 +30,7 @@
   <div class="buehne-bild" aria-hidden="true"{% if 'campus-tag' in bilder %} style="background:url({{ bilder['campus-tag'] }}) center/cover"{% endif %}>
     {% for z in ('morgen', 'tag', 'abend', 'nacht') %}
     {% if ('campus-' ~ z) in bilder %}
-    <img class="buehne-ebene" data-zeit-bild="{{ z }}" data-src="{{ prefix }}static/bilder/campus-{{ z }}.jpg" alt="" width="2400" height="1357" decoding="async">
+    <img class="buehne-ebene" data-zeit-bild="{{ z }}" data-src="{{ prefix }}static/bilder/campus-{{ z }}.jpg"{% set klein = (bilder_klein or {}).get('campus-' ~ z) %}{% if klein %} data-srcset="{{ prefix }}static/bilder/{{ klein }} 1200w, {{ prefix }}static/bilder/campus-{{ z }}.jpg 2400w" sizes="100vw"{% endif %} alt="" width="2400" height="1357" decoding="async">
     {% endif %}
     {% endfor %}
     {% if 'campus-tag' in bilder %}<noscript><img class="buehne-ebene geladen" src="{{ prefix }}static/bilder/campus-tag.jpg" alt=""></noscript>{% endif %}

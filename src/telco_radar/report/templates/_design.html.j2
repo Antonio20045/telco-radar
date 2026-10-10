@@ -7,7 +7,9 @@
 
 {% macro motiv(slug, prefix, klasse='', eager=false, breite=2400, hoehe=1357) -%}
 {%- if slug and slug in bilder -%}
-<img class="motiv {{ klasse }}" src="{{ prefix }}static/bilder/{{ slug }}.jpg" alt=""
+{%- set klein = (bilder_klein or {}).get(slug) -%}
+<img class="motiv {{ klasse }}" src="{{ prefix }}static/bilder/{{ slug }}.jpg" alt=""{% if klein %}
+     srcset="{{ prefix }}static/bilder/{{ klein }} 1200w, {{ prefix }}static/bilder/{{ slug }}.jpg {{ breite }}w" sizes="100vw"{% endif %}
      width="{{ breite }}" height="{{ hoehe }}" decoding="async" loading="{{ 'eager' if eager else 'lazy' }}"{% if eager %} fetchpriority="high"{% endif %}
      style="background:url({{ bilder[slug] }}) center/cover">
 {%- else -%}

@@ -45,6 +45,7 @@
       bild.classList.add('aktiv');
       bild.setAttribute('fetchpriority', 'high');
       bild.addEventListener('load', function () { bild.classList.add('geladen'); });
+      if (bild.getAttribute('data-srcset')) bild.srcset = bild.getAttribute('data-srcset');
       bild.src = bild.getAttribute('data-src');
       if (bild.complete && bild.naturalWidth) bild.classList.add('geladen');
     }

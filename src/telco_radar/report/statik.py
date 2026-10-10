@@ -16,7 +16,7 @@ from __future__ import annotations
 import shutil
 from pathlib import Path
 
-from ..bild_vorschau import vorschau
+from ..bild_vorschau import kleine_fassungen, vorschau
 
 ORDNER = "static"
 BILDER = "bilder"
@@ -48,3 +48,8 @@ def kopiere(vorlagen: Path, site_dir: Path) -> dict[str, str]:
         for b in sorted(bilder.iterdir())
         if b.is_file() and b.suffix == ".jpg"
     }
+
+
+def kleine(vorlagen: Path) -> dict[str, str]:
+    """Je Motiv der Pfad seiner 1200-px-Fassung unter ``static/bilder/``."""
+    return kleine_fassungen(vorlagen / ORDNER / BILDER)

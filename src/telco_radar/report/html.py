@@ -1158,6 +1158,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
     folien_dir.mkdir(exist_ok=True)
     (site_dir / ".nojekyll").write_text("")
     env.globals["bilder"] = schreibe_statische_dateien(site_dir)
+    env.globals["bilder_klein"] = statik.kleine(_TEMPLATES)
     bild_quelle = report_bilder.bildordner(reports_dir.parent.parent)
     diff_bild_quelle = diff_bilder.bildordner(reports_dir.parent.parent)
     bild_quellen = [q for q in (bild_quelle, diff_bild_quelle) if q.exists()]
