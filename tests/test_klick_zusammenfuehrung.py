@@ -60,6 +60,7 @@ HEUTE = "2026-09-29"
 MORGEN = "2026-09-30"
 M_PLUS = "O2 Mobile Unlimited M Plus"
 M_PLUS_ADAPTER = "O2 Mobile Unlimited M Plus mit 100 MBit/s (24 Mon.)"
+TARIF_UNBEKANNT_IM_BESTAND = "O2 Mobile Probe Plus"
 _KATALOG_URL = (
     "https://www.o2online.de/e-shop/rest/catalog/o2shop/"
     "privatkunden/ratenzahlung/default/__not-specified__/"
@@ -342,13 +343,18 @@ def test_gestoerter_oder_alter_anbieter_ersetzt_nichts(adapter, katalog, datei, 
 def test_vorrang_hat_nur_eine_lesung_die_buendel_wurde(
     adapter, katalog, bestand, tmp_path, tag1, vorrang
 ):
-    """Tag 1 liest der Klick 256 GB/M Plus/36. Ohne Adaptersatz fehlt ihm der Slug: er
-    wird kein Bündel (``ohne_tarif``). Tag 2 liefert der Adapter wieder, der Klick
-    liest nur 512 GB/24: der Adaptersatz zu 256 GB/36 kommt in den Bestand. Gegenprobe:
-    wurde die Lesung von Tag 1 ein Bündel, behält der Bestand sie mit ihrem Datum."""
+    """Tag 1 liest der Klick 256 GB/M Plus/36. Ohne Adaptersatz und mit einem Tarif,
+    den der Bestand nicht kennt, wird er kein Bündel (``ohne_tarif``; einen bekannten
+    löst ``klick_tarifslug`` seit Pitch 3 selbst auf). Tag 2 liefert der Adapter
+    wieder, der Klick liest nur 512 GB/24: der Adaptersatz zu 256 GB/36 kommt in den
+    Bestand. Gegenprobe: wurde die Lesung von Tag 1 ein Bündel, behält der Bestand sie
+    mit ihrem Datum."""
     pfad = tmp_path / "geraete_tco.json"
     erster = adapter if tag1 is None else tag1
     lesung = _o2(erfasst(o2_lesung("256 GB", M_PLUS, 36)))
+    if tag1 is not None:
+        (kombination,) = lesung["seiten"][0]["kombinationen"]
+        kombination["variante"]["tarif"] = TARIF_UNBEKANNT_IM_BESTAND
     _, b1 = _tag(pfad, erster, [lesung], HEUTE, katalog, bestand)
     zweite = _o2(erfasst(o2_lesung("512 GB", M_PLUS, 24)), datum=MORGEN)
 
