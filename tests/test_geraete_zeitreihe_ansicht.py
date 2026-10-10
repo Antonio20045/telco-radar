@@ -477,11 +477,23 @@ def test_ohne_katalog_hersteller_bleibt_der_kurzname_geraten_wird_nichts():
     assert "Beim  17" not in _text(html)
 
 
+def test_der_antwort_satz_nennt_den_gewaehlten_speicher():
+    modell = {
+        "id": "apple-iphone-18-pro-512",
+        "titel": "Apple iPhone 18 Pro 512 GB",
+        "hersteller": "Apple",
+        "speicher": 512,
+    }
+    html = geraete_zeitreihe._antwort_html(modell, "m", [dict(_ZEILE)], {"label": "M"})
+    assert "Beim Apple iPhone 18 Pro 512 GB im Band M" in _text(html), _text(html)
+    assert "512 GB 512 GB" not in _text(html)
+
+
 def test_der_antwort_satz_mit_hersteller_die_kachel_ohne(ansicht):
     paar = _paar(ansicht, ("apple-iphone-17-pro-256", "xs"))
-    assert "Beim Apple iPhone 17 Pro im Band XS" in _text(paar["antwort_html"]), _text(
+    assert "Beim Apple iPhone 17 Pro 256 GB im Band XS" in _text(
         paar["antwort_html"]
-    )
+    ), _text(paar["antwort_html"])
     assert ansicht["daten"]["kurz"]["apple-iphone-17-pro-256"] == "iPhone 17 Pro"
 
 

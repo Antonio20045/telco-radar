@@ -114,14 +114,16 @@ def _antwort_html(
     ueber ihm (`_leitzahl_html`). Der Satz nennt Anbieter, Kosten über H und
     Ø je Monat; seit Datenkonzept Geräte Schritt 2 auch die Ratenlaufzeit der
     Ansicht (`laufzeit`, „mit 36 Raten“) - eine Zahl ohne ihre Laufzeit ist
-    über 24 und 36 Raten nicht lesbar.
+    über 24 und 36 Raten nicht lesbar. Der Name traegt den gewaehlten
+    Speicher (Antonio, 10.10.2026: „im Band M“ ohne 512 GB war missverstaendlich).
 
     A3: steht KEIN frisches Angebot da, aber ein altes, sagt der Satz den
     letzten Stand MIT DATUM (harte Regel 9). P0-B-h3: dieselbe Regel fuer
     einen fremden Zeitraum. Führt in dieser Laufzeit niemand ein Bündel,
     heißt es „nicht erfasst“ - der Sammler kennt kein „nicht angeboten“.
     """
-    name = _esc(_satz_name(modell))
+    speicher = modell.get("speicher")
+    name = _esc(_satz_name(modell) + (f" {speicher} GB" if speicher else ""))
     label = band_katalog.get("label", band)
     bereich = band_katalog.get("bereich") or ""
     klammer = f" ({bereich})" if bereich else ""
