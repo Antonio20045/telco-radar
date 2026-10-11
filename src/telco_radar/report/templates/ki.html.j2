@@ -3,7 +3,8 @@
    Kopf wie die Meldungen-Seite: Vollbild, das beim Scrollen zum Fenster
    wird (Kinostrecke in app.js). Darunter drei Spalten mit dem Aufmacher in
    der Mitte, ohne fremde Fotos; jede Meldung traegt ihren Quellenlink.
-   Die Auswahl rechnet `ki_seite.ausgabe()`. #}
+   Die Auswahl rechnet `ki_seite.ausgabe()`, Ressort und Archiv
+   `analyze.ki_blatt` (Zeitungsprinzip, Schnitt 2). #}
 {% extends "base.html.j2" %}
 {% import "_design.html.j2" as d %}
 {% set active = 'ki' %}
@@ -12,7 +13,7 @@
 
 {% macro meldung(h, art, dek=false) %}
 <article class="ki-meldung ki-meldung--{{ art }}">
-  <p class="ki-kicker">{{ h.ressort_label }}</p>
+  <p class="ki-kicker">{{ h.ki_ressort }}</p>
   <h3 class="ki-schlag"><a href="{{ h.url }}" target="_blank" rel="noopener">{{ h.schlagzeile }}</a></h3>
   {% if dek and h.summary %}<p class="ki-dek">{{ h.summary }}</p>{% endif %}
   <p class="ki-wer"><a class="ki-quelle" href="{{ h.url }}" target="_blank" rel="noopener">{{ h.source_label }}</a>{% if h.operator %} · {{ h.operator }}{% endif %} · {{ h.ki_datum | date_de }}</p>
@@ -49,6 +50,17 @@
   </div>
   {% if ausgabe.liste %}
   <div class="ki-liste">{% for h in ausgabe.liste %}{{ meldung(h, 'liste') }}{% endfor %}</div>
+  {% endif %}
+  <p class="ki-mehr">Meldungen bleiben stehen wie in einer Zeitung: höchstens {{ ausgabe.je_ressort }} je Ressort, die älteste wandert ins Archiv.</p>
+  {% if ausgabe.archiv %}
+  <details id="ki-archiv" class="ki-archiv">
+    <summary>Archiv · {{ ausgabe.archiv | length }} ältere {{ 'Meldung' if ausgabe.archiv | length == 1 else 'Meldungen' }}</summary>
+    <ol class="ki-archiv-liste">
+      {% for h in ausgabe.archiv %}
+      <li><a href="{{ h.url }}" target="_blank" rel="noopener">{{ h.schlagzeile or h.title }}</a><span class="ki-archiv-wer">{{ h.source_label }} · {{ h.ki_datum | date_de }}</span></li>
+      {% endfor %}
+    </ol>
+  </details>
   {% endif %}
   {% else %}
   <p class="empty-note">In den Berichten steht noch keine KI-Meldung.</p>

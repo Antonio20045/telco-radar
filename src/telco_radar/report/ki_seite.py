@@ -5,7 +5,8 @@ KI-Meldung ist, was in der Themenregion der KI-Anbieter steht
 „KI / AI“ trägt. Gelesen werden alle Berichte, jede URL einmal, die neueste
 Meldung zuerst; innerhalb eines Tages entscheidet die Priorität. Die Seite
 zeigt die Meldungen wie die Meldungen-Seite in drei Spalten, aber ohne
-fremde Fotos.
+fremde Fotos. Ressort und Archiv rechnet ``analyze.ki_blatt``: je Ressort
+höchstens zwölf Meldungen im Blatt, die älteren im zugeklappten Archiv.
 
 Das Modul importiert ``html`` nicht: die Themenerkennung kommt als
 Parameter herein.
@@ -15,13 +16,13 @@ from __future__ import annotations
 
 from collections.abc import Callable, Iterable
 
+from ..analyze import ki_blatt
 from . import meldungen_seite
 
 KI_THEMA = "thema:ki"
 KI_TAG = "KI / AI"
 LINKS = 2
 RECHTS = 5
-LISTE = 36
 VORLAGE = "ki.html.j2"
 
 
@@ -56,8 +57,10 @@ def ki_meldungen(
     return out
 
 
-def ausgabe(meldungen: list[dict], stand: str) -> dict:
-    """Verteilt die KI-Meldungen auf Aufmacher, links, „Auch wichtig“ und Liste."""
+def ausgabe(
+    meldungen: list[dict], stand: str, archiv: list[dict] | None = None
+) -> dict:
+    """Verteilt das Blatt auf Aufmacher, links, „Auch wichtig“ und Liste."""
     aufmacher = meldungen[0] if meldungen else None
     links = meldungen[1 : 1 + LINKS]
     rechts = meldungen[1 + LINKS : 1 + LINKS + RECHTS]
@@ -66,7 +69,9 @@ def ausgabe(meldungen: list[dict], stand: str) -> dict:
         "aufmacher": aufmacher,
         "links": links,
         "rechts": rechts,
-        "liste": meldungen[1 + LINKS + RECHTS :][:LISTE],
+        "liste": meldungen[1 + LINKS + RECHTS :],
+        "je_ressort": ki_blatt.HOECHSTENS_JE_RESSORT,
+        "archiv": archiv or [],
     }
 
 
@@ -74,6 +79,7 @@ def seite(env, wochen: list[dict], cfg, tag_tech, date_de: str) -> str:
     """Das HTML von ``ki.html``; Stand ist der neueste Bericht."""
     stand = max((w["date"] for w in wochen), default="")
     meldungen = ki_meldungen(wochen, ki_region(cfg), tag_tech)
+    blatt, archiv = ki_blatt.blatt(meldungen, ki_blatt.netzbetreiber(cfg))
     return env.get_template(VORLAGE).render(
-        prefix="", date_de=date_de, ausgabe=ausgabe(meldungen, stand)
+        prefix="", date_de=date_de, ausgabe=ausgabe(blatt, stand, archiv)
     )
