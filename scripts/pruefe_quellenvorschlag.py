@@ -764,7 +764,7 @@ def main(argv: list[str] | None = None) -> int:
     with ThreadPoolExecutor(max_workers=max(1, args.workers)) as pool:
         futs = {
             pool.submit(
-                _pruefe_einen,
+                partial(_pruefe_einen, jetzt=datetime.now(UTC)),
                 k,
                 bestand,
                 lookback,
