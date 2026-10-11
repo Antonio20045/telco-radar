@@ -4576,3 +4576,121 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
     untersuche();
   });
 })();
+
+/* KI-SEITE, SCHNITTE 7 UND 8 (Pitch 9, Entwurf 10). Die Leiter der Modelle:
+   aus #ki-modelle-daten eine senkrechte Linie mit den Pillen abwechselnd
+   links und rechts (unter 700 px alle rechts); ein roter Punkt faellt mit
+   dem Scrollen, jede erreichte Stufe erscheint. Ohne JS bleibt die Liste.
+   Die Rubrikleiste erscheint, sobald der Kopf vorbei ist. */
+(function () {
+  var still = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  var NS = 'http://www.w3.org/2000/svg';
+  function mk(eltern, n, a, t) {
+    var e = document.createElementNS(NS, n);
+    for (var k in a) e.setAttribute(k, a[k]);
+    if (t != null) e.textContent = t;
+    eltern.appendChild(e);
+    return e;
+  }
+  var ansage = document.querySelector('.ki-ansage');
+  if (ansage && 'IntersectionObserver' in window) {
+    new IntersectionObserver(function (e, o) {
+      if (e[0].isIntersecting) { ansage.classList.add('da'); o.disconnect(); }
+    }, { threshold: 0.4 }).observe(ansage);
+  } else if (ansage) ansage.classList.add('da');
+
+  var daten = document.getElementById('ki-modelle-daten');
+  var M = daten ? JSON.parse(daten.textContent) : [];
+  var band = document.getElementById('modelle');
+  if (M.length && band) {
+    var liste = band.querySelector('.ki-rang');
+    var svg = document.createElementNS(NS, 'svg');
+    svg.id = 'ki-leiter';
+    svg.setAttribute('role', 'img');
+    svg.setAttribute('aria-label', 'Die ' + M.length + ' stärksten KI-Modelle, von Platz 1 abwärts');
+    liste.parentNode.insertBefore(svg, liste);
+    band.classList.add('ki-modelle--leiter');
+    var cs = getComputedStyle(band);
+    var c = function (v) { return cs.getPropertyValue(v).trim(); };
+    var WEISS = c('--bildtext'), LINIE = c('--sp-linie'), T2 = c('--sp-text-2'), GRUND = c('--sp-netz'), ROT = c('--red');
+    var punkt, spur, stufen = [], H = 1, Y0 = 0, Y1 = 0, akt = 0, ziel = 0, laeuft = false;
+    var schritt = function () {
+      var d = ziel - akt;
+      akt += still ? d : d * 0.14;
+      if (Math.abs(d) < 0.5) akt = ziel;
+      punkt.setAttribute('cy', akt);
+      spur.setAttribute('y2', akt);
+      stufen.forEach(function (st) {
+        var an = akt >= st.y - 2;
+        if (an === st.da) return;
+        st.da = an;
+        st.g.classList.toggle('da', an);
+        if (!still) st.l.style.strokeDashoffset = an ? 0 : st.len;
+      });
+      if (akt !== ziel) requestAnimationFrame(schritt); else laeuft = false;
+    };
+    var rechne = function () {
+      var r = svg.getBoundingClientRect(), s = r.height / H;
+      ziel = still ? Y1 : Math.max(Y0, Math.min(Y1, (innerHeight * 0.8 - r.top) / s));
+      if (still) schritt();
+      else if (!laeuft) { laeuft = true; requestAnimationFrame(schritt); }
+    };
+    var baue = function () {
+      while (svg.firstChild) svg.removeChild(svg.firstChild);
+      stufen = [];
+      var W = svg.parentNode.clientWidth, eng = W < 700;
+      var F = eng ? 15 : 19, PH = eng ? 36 : 44, AX = eng ? 34 : W / 2, AB = eng ? 52 : 56, Y = eng ? 40 : 50;
+      H = Y + M.length * AB + 10; Y0 = 10; Y1 = H - 10;
+      svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+      svg.setAttribute('height', H);
+      mk(svg, 'line', { x1: AX, x2: AX, y1: Y0, y2: Y1, stroke: LINIE, 'stroke-width': 1.3 });
+      spur = mk(svg, 'line', { x1: AX, x2: AX, y1: Y0, y2: Y0, stroke: WEISS, 'stroke-width': 1.6 });
+      M.forEach(function (m, i) {
+        var y = Y + i * AB, s = eng || i % 2 ? 1 : -1, eins = i === 0;
+        var g = mk(svg, 'g', { class: 'ki-stufe' });
+        var t = mk(g, 'text', { class: 'ki-stufe-name', 'font-size': eins ? F * 1.25 : F, fill: eins ? GRUND : WEISS, 'font-weight': eins ? 600 : 500 }, m.name);
+        var ph = eins ? PH * 1.2 : PH, mark = ph * 0.42, w = t.getComputedTextLength() + ph + mark * 0.5 + 10;
+        var x0 = s > 0 ? AX + (eng ? 26 : 90) : AX - 90 - w;
+        g.insertBefore(mk(g, 'rect', { x: x0, y: y - ph / 2, width: w, height: ph, rx: ph / 2, fill: eins ? WEISS : GRUND, stroke: WEISS, 'stroke-width': 1.3 }), t);
+        var p = mk(g, 'circle', { class: 'ki-stufe-punkt', cx: x0 + ph * 0.55, cy: y, r: mark * 0.42, stroke: eins ? 'none' : WEISS, 'stroke-width': 0.8 });
+        p.style.fill = 'var(' + m.farbe + ')';
+        t.setAttribute('x', x0 + ph * 0.55 + mark * 0.5 + 10);
+        t.setAttribute('y', y + F * 0.36 * (eins ? 1.25 : 1));
+        mk(svg, 'text', { x: eng ? AX - 12 : AX - s * 14, y: y + 5, 'text-anchor': eng || s > 0 ? 'end' : 'start', 'font-size': 13, fill: T2, 'font-variant-numeric': 'tabular-nums' }, m.platz);
+        var ende = s > 0 ? x0 : x0 + w, mitte = AX + (ende - AX) * 0.5;
+        var l = mk(svg, 'path', { d: 'M' + AX + ' ' + y + ' C ' + mitte + ' ' + y + ' ' + mitte + ' ' + y + ' ' + ende + ' ' + y, fill: 'none', stroke: WEISS, 'stroke-width': 1.2 });
+        var len = l.getTotalLength();
+        l.style.strokeDasharray = len;
+        l.style.strokeDashoffset = still ? 0 : len;
+        if (!still) l.style.transition = 'stroke-dashoffset .7s cubic-bezier(.6,.1,.2,1)';
+        mk(svg, 'circle', { cx: AX, cy: y, r: 4, fill: WEISS });
+        stufen.push({ y: y, g: g, l: l, len: len, da: false });
+      });
+      punkt = mk(svg, 'circle', { class: 'ki-leiter-punkt', cx: AX, cy: Y0, r: 7, fill: ROT });
+      akt = still ? Y1 : Y0;
+      rechne();
+    };
+    addEventListener('scroll', rechne, { passive: true });
+    var zg;
+    addEventListener('resize', function () { clearTimeout(zg); zg = setTimeout(baue, 150); });
+    baue();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(baue);
+  }
+
+  var rub = document.getElementById('ki-rubriken'), kopf = document.querySelector('.ki-auftakt');
+  if (!rub || !kopf) return;
+  var links = rub.querySelectorAll('a');
+  var ziele = [].map.call(links, function (a) { return document.querySelector(a.getAttribute('href')); });
+  var geplant = false;
+  function lage() {
+    geplant = false;
+    rub.classList.toggle('da', kopf.getBoundingClientRect().bottom < innerHeight * 0.75);
+    var i = -1;
+    ziele.forEach(function (z, j) { if (z && z.getBoundingClientRect().top < innerHeight * 0.45) i = j; });
+    [].forEach.call(links, function (a, j) { a.classList.toggle('an', i === j); });
+  }
+  addEventListener('scroll', function () {
+    if (!geplant) { geplant = true; requestAnimationFrame(lage); }
+  }, { passive: true });
+  lage();
+})();

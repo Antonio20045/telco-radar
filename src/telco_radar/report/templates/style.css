@@ -5992,6 +5992,31 @@ html:not([data-art="geraet"]) .gx-held .gx-art--tarif,html[data-art="geraet"] .g
 .ki-modelle-leer{margin:0;font-size:18px;color:var(--bildtext)}
 .ki-modelle-quelle{margin:clamp(24px,3vw,36px) 0 0;font-size:13px;color:var(--sp-text-2);text-align:center}
 .ki-modelle-quelle a{color:inherit;text-decoration:underline;text-underline-offset:3px}
+/* Schnitt 7: Leiter der Modelle (app.js baut sie aus #ki-modelle-daten) */
+.ki-ansage span>i{display:block;font-style:normal}
+.bewegt .ki-ansage span{overflow:hidden;padding:.08em 0 .02em}
+.bewegt .ki-ansage span>i{transform:translateY(105%);transition:transform 1s cubic-bezier(.2,.8,.2,1)}
+.bewegt .ki-ansage.da span>i{transform:none}
+.bewegt .ki-ansage span:nth-child(2)>i{transition-delay:.08s}
+.bewegt .ki-ansage span:nth-child(3)>i{transition-delay:.16s}
+.ki-modelle--leiter .ki-rang{display:none}
+#ki-leiter{display:block;width:100%;overflow:visible}
+.bewegt .ki-stufe{opacity:0;transform:translateY(14px);transition:opacity .5s,transform .7s cubic-bezier(.2,1.3,.4,1);transform-box:fill-box}
+.bewegt .ki-stufe.da{opacity:1;transform:none}
+/* Schnitt 8: Rubrikleiste unter der Hauptnavigation */
+.ki-blatt,.ki-modelle{scroll-margin-top:140px}
+.ki-rubriken{position:fixed;left:50%;top:76px;z-index:55;display:flex;gap:2px;padding:4px;max-width:calc(100% - 32px);
+  overflow-x:auto;scrollbar-width:none;background:var(--paper-2);border-radius:999px;box-shadow:0 6px 24px rgba(19,20,23,.12);
+  transform:translate(-50%,-14px);opacity:0;pointer-events:none;transition:opacity .35s,transform .35s}
+.ki-rubriken.da{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.ki-rubriken a{display:flex;align-items:baseline;gap:7px;padding:6px 14px;border-radius:999px;font-size:14.5px;color:var(--ink-2);white-space:nowrap}
+.ki-rubriken a b{font-weight:500;font-size:12px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.ki-rubriken a.an{background:var(--ink);color:var(--paper-2)}
+.ki-rubriken a.an b{color:var(--ink-4)}
+@media (max-width:900px){
+  .ki-rubriken{top:calc(12px + env(safe-area-inset-top,0px))}
+  .ki-blatt,.ki-modelle{scroll-margin-top:72px}
+}
 @media (max-width:980px){
   .ki-oben{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"m m" "l r";row-gap:36px}
   .ki-meldung--aufmacher{padding:0;border:0}

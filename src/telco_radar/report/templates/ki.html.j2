@@ -4,7 +4,9 @@
    wird (Kinostrecke in app.js). Darunter drei Spalten mit dem Aufmacher in
    der Mitte, ohne fremde Fotos; jede Meldung traegt ihren Quellenlink.
    Die Auswahl rechnet `ki_seite.ausgabe()`, Ressort und Archiv
-   `analyze.ki_blatt` (Zeitungsprinzip, Schnitt 2). #}
+   `analyze.ki_blatt` (Zeitungsprinzip, Schnitt 2). Die Leiter der Modelle
+   (Schnitt 7) baut app.js aus #ki-modelle-daten; ohne JS bleibt die Liste.
+   Die Rubrikleiste (Schnitt 8) zeigt app.js, sobald der Kopf vorbei ist. #}
 {% extends "base.html.j2" %}
 {% import "_design.html.j2" as d %}
 {% set active = 'ki' %}
@@ -38,6 +40,9 @@
 {% endblock %}
 
 {% block content %}
+{% if rubriken %}
+<nav class="ki-rubriken" id="ki-rubriken" aria-label="Teile der KI-Seite">{% for r in rubriken %}<a href="#{{ r.ziel }}">{{ r.name }} <b>{{ r.zahl }}</b></a>{% endfor %}</nav>
+{% endif %}
 <section class="ki-blatt" id="meldungen" aria-label="KI-Meldungen">
   {% if ausgabe.aufmacher %}
   <div class="ki-oben">
@@ -70,7 +75,8 @@
 <section class="ki-modelle" id="modelle" aria-label="KI-Modelle">
   <div class="ki-modelle-innen">
     {% if modelle.top %}
-    <h2 class="ki-ansage"><span>{{ modelle.top[0].kurz }}</span><span>ist gerade</span><span>die stärkste KI<em>.</em></span></h2>
+    <h2 class="ki-ansage"><span><i>{{ modelle.top[0].kurz }}</i></span><span><i>ist gerade</i></span><span><i>die stärkste KI<em>.</em></i></span></h2>
+    <script type="application/json" id="ki-modelle-daten">{{ modelle.leiter | tojson }}</script>
     <ol class="ki-rang">
       {% for m in modelle.top %}
       <li class="ki-rang-eintrag"><span class="ki-rang-platz">{{ m.platz }}</span><span class="ki-rang-punkt" style="--firma:var({{ m.farbe }})" aria-hidden="true"></span><span class="ki-rang-name">{{ m.name }}</span></li>

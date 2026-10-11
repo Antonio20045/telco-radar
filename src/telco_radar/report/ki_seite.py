@@ -7,7 +7,9 @@ Meldung zuerst; innerhalb eines Tages entscheidet die Priorität. Die Seite
 zeigt die Meldungen wie die Meldungen-Seite in drei Spalten, aber ohne
 fremde Fotos. Ressort und Archiv rechnet ``analyze.ki_blatt``: je Ressort
 höchstens zwölf Meldungen im Blatt, die älteren im zugeklappten Archiv.
-Das Band „Modelle“ zeigt den Store aus ``analyze.ki_modelle`` (Schnitt 6).
+Das Band „Modelle“ zeigt den Store aus ``analyze.ki_modelle`` (Schnitt 6),
+``app.js`` zeichnet daraus die Leiter (Schnitt 7). Die Rubrikleiste
+(Schnitt 8) zählt je Abschnitt dasselbe Feld, das der Abschnitt zeigt.
 
 Das Modul importiert ``html`` nicht: die Themenerkennung kommt als
 Parameter herein.
@@ -72,6 +74,7 @@ def ausgabe(
         "links": links,
         "rechts": rechts,
         "liste": meldungen[1 + LINKS + RECHTS :],
+        "anzahl": len(meldungen),
         "je_ressort": ki_blatt.HOECHSTENS_JE_RESSORT,
         "archiv": archiv or [],
     }
@@ -89,8 +92,10 @@ def modelle_band(store: dict) -> dict:
         for k, q in quellen.items()
         if q.get("error")
     ]
+    top = store.get("top") or []
     return {
-        "top": store.get("top") or [],
+        "top": top,
+        "leiter": [{k: m[k] for k in ("platz", "name", "farbe")} for m in top],
         "stand": _tag(store.get("stand")),
         "urls": {k: q.get("url") for k, q in quellen.items()},
         "ausfall": ausfall,
@@ -98,14 +103,26 @@ def modelle_band(store: dict) -> dict:
     }
 
 
+def rubriken(ausgabe: dict, modelle: dict) -> list[dict]:
+    """Die Teile der Seite mit ihrer Zahl; ein leerer Teil fehlt in der Leiste."""
+    teile = [
+        ("meldungen", "Meldungen", ausgabe["anzahl"]),
+        ("modelle", "Modelle", len(modelle["top"])),
+    ]
+    return [{"ziel": z, "name": n, "zahl": k} for z, n, k in teile if k]
+
+
 def seite(env, wochen: list[dict], cfg, tag_tech, date_de: str, ki_store: dict) -> str:
     """Das HTML von ``ki.html``; Stand ist der neueste Bericht."""
     stand = max((w["date"] for w in wochen), default="")
     meldungen = ki_meldungen(wochen, ki_region(cfg), tag_tech)
     blatt, archiv = ki_blatt.blatt(meldungen, ki_blatt.netzbetreiber(cfg))
+    blatt_ausgabe = ausgabe(blatt, stand, archiv)
+    band = modelle_band(ki_store)
     return env.get_template(VORLAGE).render(
         prefix="",
         date_de=date_de,
-        ausgabe=ausgabe(blatt, stand, archiv),
-        modelle=modelle_band(ki_store),
+        ausgabe=blatt_ausgabe,
+        modelle=band,
+        rubriken=rubriken(blatt_ausgabe, band),
     )
