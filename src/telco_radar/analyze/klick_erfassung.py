@@ -149,7 +149,7 @@ def speicher_gelesen(eintrag: dict, angebot: Angebot | None = None) -> dict[str,
     saetze = {}
     for geraet, speicher in je_geraet.items():
         gelistet = liste.get(geraet)
-        belegt = bool(gelistet) and gelistet <= set(speicher)
+        belegt = gelistet is not None and bool(gelistet) and gelistet <= set(speicher)
         satz = SATZ_SPEICHER_ANGEBOT if belegt else SATZ_SPEICHER
         saetze[f"{anbieter}{TRENNER}{geraet}"] = satz.format(
             anbieter=anbieter, speicher=_gb(speicher), datum=datum
