@@ -128,7 +128,14 @@ def _fahre(o2, karte, crawler, uhr, ende=10**6, gelesen=None):
 
 
 def test_tagesdatei_hat_alle_anbieter_mit_karte_und_keine_seitengrenze(ziele):
-    assert list(ziele) == ["o2", "vodafone", "1und1", "telekom", "congstar"]
+    assert list(ziele) == [
+        "o2",
+        "o2-tarife",
+        "vodafone",
+        "1und1",
+        "telekom",
+        "congstar",
+    ]
     for schluessel in ziele:
         assert (WURZEL / "config" / "klickkarten" / f"{schluessel}.yaml").is_file()
     assert O2_SEITE.adresse in {s.adresse for s in ziele["o2"].seiten}
@@ -145,6 +152,7 @@ def test_plan_nennt_jeden_anbieter_mit_karte(capsys):
     assert skript.main(["--plan", "--root", str(lese_wurzel())]) == 0
     assert json.loads(capsys.readouterr().out) == [
         "o2",
+        "o2-tarife",
         "vodafone",
         "1und1",
         "telekom",
