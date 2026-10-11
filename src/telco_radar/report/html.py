@@ -31,7 +31,7 @@ from .promo import prepare_promo_view
 from .thema import build_thema_view
 from .wettbewerb import anker as _wb_anker, build_wettbewerb_view
 from ..analyze import ctm, geraete_pruefkennzahlen
-from ..analyze import themen_store
+from ..analyze import ki_modelle, themen_store
 from ..analyze.diff_curator import DiffStore
 from ..analyze.begriffe import (
     DIGEST_MARKER,
@@ -1823,7 +1823,12 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
         )
 
     ki_html = ki_seite.seite(
-        env, wochen, cfg, _tag_tech, (latest_ctx or {}).get("date_de", "")
+        env,
+        wochen,
+        cfg,
+        _tag_tech,
+        (latest_ctx or {}).get("date_de", ""),
+        ki_modelle.lade(state_dir),
     )
     for alt, inhalt in (
         ("bericht.html", _redirect_html("index.html")),

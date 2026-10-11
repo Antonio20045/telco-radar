@@ -1,4 +1,5 @@
-"""Die Stufen nach der Bewertung: Kategorie-Sweep, Promo, Geräte, Differenzierung."""
+"""Die Stufen nach der Bewertung: Kategorie-Sweep, Promo, Geräte, Differenzierung,
+KI-Ranglisten."""
 
 from __future__ import annotations
 
@@ -9,7 +10,7 @@ from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
 
-from .analyze import category_sweep, differentiation_editor
+from .analyze import category_sweep, differentiation_editor, ki_modelle
 from .analyze.begriffe import THEME_LABEL
 from .analyze.diff_curator import DiffStore
 from .analyze.diff_db import DiffDB
@@ -54,7 +55,27 @@ def ausfuehren(
     promo = _promo(cfg, root, heute, sprache, use_llm, takt)
     geraete = _geraete(cfg, root, heute, geraete_frist(), takt)
     _differenzierung(root, heute, (editor_model, language), use_llm, takt)
+    _ki_ranglisten(cfg, root, heute, takt)
     return Zusatz(promo, geraete)
+
+
+def _ki_ranglisten(cfg: Config, root: Path, heute: date, takt: Takt) -> None:
+    """Artificial Analysis und Arena; ein Ausfall steht im Store, nie leer."""
+    if not cfg.settings.get("ki_ranglisten_aktiv", False):
+        return
+
+    def _lauf() -> None:
+        from .collect import ki_ranglisten
+
+        abruf = ki_ranglisten.abrufen(cfg.settings.get("http", {}))
+        store = ki_modelle.aktualisiere(
+            root / "data" / "state", ki_modelle.katalog(root), abruf, heute
+        )
+        log.info(
+            "KI-Ranglisten: Stand %s, %d Modelle", store["stand"], len(store["top"])
+        )
+
+    takt.abgesichert(_lauf, protokoll("KI-Ranglisten uebersprungen: %s", None))
 
 
 def _promo(

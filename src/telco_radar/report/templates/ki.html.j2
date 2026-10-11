@@ -66,4 +66,22 @@
   <p class="empty-note">In den Berichten steht noch keine KI-Meldung.</p>
   {% endif %}
 </section>
+
+<section class="ki-modelle" id="modelle" aria-label="KI-Modelle">
+  <div class="ki-modelle-innen">
+    {% if modelle.top %}
+    <h2 class="ki-ansage"><span>{{ modelle.top[0].kurz }}</span><span>ist gerade</span><span>die stärkste KI<em>.</em></span></h2>
+    <ol class="ki-rang">
+      {% for m in modelle.top %}
+      <li class="ki-rang-eintrag"><span class="ki-rang-platz">{{ m.platz }}</span><span class="ki-rang-punkt" style="--firma:var({{ m.farbe }})" aria-hidden="true"></span><span class="ki-rang-name">{{ m.name }}</span></li>
+      {% endfor %}
+    </ol>
+    {% elif not modelle.ausfall %}
+    <p class="ki-modelle-leer">Die Ranglisten der KI-Modelle sind noch nicht abgerufen.</p>
+    {% endif %}
+    {% if modelle.urls %}
+    <p class="ki-modelle-quelle">Platz aus zwei Ranglisten gemittelt: <a href="{{ modelle.urls.aa }}" target="_blank" rel="noopener">Artificial Analysis</a> (Tests) und <a href="{{ modelle.urls.arena }}" target="_blank" rel="noopener">Arena</a> (Stimmen der Nutzer){% if modelle.stand %} · {% if modelle.ausfall %}Stand {% endif %}{{ modelle.stand }}{% endif %}{% for name, tag in modelle.ausfall %} · {{ name }} am {{ tag }} nicht abrufbar{% endfor %}{% if modelle.fehler %} · {{ modelle.fehler }}{% endif %}</p>
+    {% endif %}
+  </div>
+</section>
 {% endblock %}

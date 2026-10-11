@@ -1,0 +1,31 @@
+{
+  "zweck": "Echte Abrufe der zwei KI-Ranglisten fuer tests/test_ki_ranglisten.py (Pitch 9, Schnitt 6). sha256_roh gilt fuer den entpackten Inhalt.",
+  "eintraege": [
+    {
+      "datei": "aa_tabelle.html.gz",
+      "abgerufen_am": "2026-10-11T13:05:36+00:00",
+      "url": "https://artificialanalysis.ai/leaderboards/models",
+      "quelle": "Artificial Analysis, Leaderboard Models",
+      "kennung": "TelcoRadar/1.0 (+https://github.com/Antonio20045/telco-radar), telco_radar.collect.http.fetch, HTTP 200, 2445460 Bytes",
+      "robots": "https://artificialanalysis.ai/robots.txt: User-Agent * Allow /",
+      "filter": "gekuerzt: nur das einzige <table>...</table>-Element der Seite, Zeichen fuer Zeichen unveraendert, gzip -9",
+      "sha256_ganze_seite": "ab6e446288a6b47cf79f20e85db65cc069d73b29c2c50b860982a94e7e91ccfc",
+      "gzip": true,
+      "bytes_roh": 1083090,
+      "sha256_roh": "fa935d807ddfd8008c1997ea2f4f5e187c0ba53aedb9722f6aebba3d52e81c71"
+    },
+    {
+      "datei": "arena_ldjson.html",
+      "abgerufen_am": "2026-10-11T13:05:38+00:00",
+      "url": "https://arena.ai/leaderboard/text",
+      "quelle": "Arena, Text-Rangliste (leitet weiter auf https://arena.ai/leaderboard/chat/text)",
+      "kennung": "TelcoRadar/1.0 (+https://github.com/Antonio20045/telco-radar), telco_radar.collect.http.fetch, HTTP 200, 2742057 Bytes",
+      "robots": "https://arena.ai/robots.txt: Allow /leaderboard und /leaderboard/chat/text, Disallow nur /api/, /nextjs-api/, /_next/, /images/, /c/, /agent/, /history/search",
+      "filter": "gekuerzt: nur das erste <script type=\"application/ld+json\"> (ItemList, 414 Eintraege), Zeichen fuer Zeichen unveraendert",
+      "sha256_ganze_seite": "7eb176ef3492cbb1283ff0f277acca55954244427b6fca64c2b9f134aa1754cb",
+      "gzip": false,
+      "bytes_roh": 26850,
+      "sha256_roh": "68c0a694fd6ea5ab20e30fe77656b5f4b52ba8675c2a1dd764e8d283c69ce70d"
+    }
+  ]
+}

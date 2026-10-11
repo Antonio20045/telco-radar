@@ -517,6 +517,13 @@ editor_model_fallback: true
 # ohne den Hauptlauf/die Hauptseite zu beruehren.
 promo_enabled: true
 
+# KI-Ranglisten fuer das Band „Modelle“ auf ki.html (zusatzstufen.py,
+# collect/ki_ranglisten.py): Artificial Analysis und Arena, je Lauf zwei
+# Seiten plus robots.txt. Fehlt der Schalter (goldener Lauf), bleibt sie aus.
+# Noch aus: tests/test_redaktion_kontinuitaet.py (leeres_projekt) kopiert diese
+# Datei und schaltet die Stufe nicht ab; erst dort false ergänzen, dann hier true.
+ki_ranglisten_aktiv: false
+
 # Geraete- und Preisradar: im WOCHENLAUF AUS. Nicht, weil die Stufe etwas
 # taugt oder nicht - sie hat einen eigenen taeglichen Job
 # (.github/workflows/geraete.yml, 02:17 UTC), und der ist der bessere Ort:

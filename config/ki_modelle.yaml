@@ -1,0 +1,102 @@
+# KI-Modelle für das Band „Modelle“ auf ki.html (Pitch 9, Schnitt 6).
+#
+# Namensabgleich von Hand zwischen Artificial Analysis (aa) und Arena (arena).
+# aa: Grundname ohne die Klammer der Einstellung, „Claude Opus 5.5 (max with
+#     fallback)“ zählt als „Claude Opus 5.5“; die beste Einstellung zählt.
+# arena: Namen genau wie in der Arena-Rangliste; der beste Platz zählt.
+# Es zählen nur Modelle, die in beiden Listen stehen. Ein neues Modell
+# erscheint erst, wenn es hier eingetragen ist. firma bestimmt die Farbe
+# (analyze/ki_modelle.py FIRMENFARBE, CSS --ki-*).
+# Stand der Namen: Abruf 11.10.2026 (tests/fixtures/ki/).
+
+modelle:
+  - name: Claude Opus 5.5
+    kurz: Opus 5.5
+    firma: Anthropic
+    aa: [Claude Opus 5.5]
+    arena: [claude-opus-5.5-high]
+  - name: Claude Sonnet 5.5
+    kurz: Sonnet 5.5
+    firma: Anthropic
+    aa: [Claude Sonnet 5.5]
+    arena: [claude-sonnet-5.5-xhigh]
+  - name: Claude Fable 5.1
+    kurz: Fable 5.1
+    firma: Anthropic
+    aa: [Claude Fable 5.1]
+    arena: [claude-fable-5.1-max]
+  - name: Claude Haiku 5.5
+    kurz: Haiku 5.5
+    firma: Anthropic
+    aa: [Claude Haiku 5.5]
+    arena: []
+  - name: GPT-6 Astra
+    kurz: GPT-6 Astra
+    firma: OpenAI
+    aa: [GPT-6 Astra]
+    arena: [gpt-6-astra-max]
+  - name: GPT-6.1 Sol
+    kurz: GPT-6.1 Sol
+    firma: OpenAI
+    aa: [GPT-6.1 Sol]
+    arena: [gpt-6.1-sol-max]
+  - name: GPT-5.6 Terra
+    kurz: GPT-5.6 Terra
+    firma: OpenAI
+    aa: [GPT-5.6 Terra]
+    arena: [gpt-5.6-terra-xhigh]
+  - name: GPT-6 Luna
+    kurz: GPT-6 Luna
+    firma: OpenAI
+    aa: [GPT-6 Luna]
+    arena: [gpt-6-luna-max]
+  - name: Gemini 4 Argon
+    kurz: Gemini 4 Argon
+    firma: Google
+    aa: [Gemini 4 Argon]
+    arena: [gemini-4-argon-high]
+  - name: Gemini 3.8 Flash
+    kurz: Gemini 3.8 Flash
+    firma: Google
+    aa: [Gemini 3.8 Flash]
+    arena: [gemini-3.8-flash-high]
+  - name: Muse Spark 1.3
+    kurz: Muse Spark 1.3
+    firma: Meta
+    aa: [Muse Spark 1.3]
+    arena: [muse-spark-1.3-max]
+  - name: Grok 4.7
+    kurz: Grok 4.7
+    firma: xAI
+    aa: [Grok 4.7]
+    arena: [grok-4.7-xhigh]
+  - name: Qwen3.8 Max
+    kurz: Qwen3.8 Max
+    firma: Alibaba
+    aa: [Qwen3.8 Max]
+    arena: [qwen3.8-max]
+  - name: Qwen3.8 Flash-Next
+    kurz: Qwen3.8 Flash-Next
+    firma: Alibaba
+    aa: [Qwen3.8-Flash-Next]
+    arena: []
+  - name: Qwen3.8 27B
+    kurz: Qwen3.8 27B
+    firma: Alibaba
+    aa: [Qwen3.8 27B]
+    arena: [qwen3.8-27b]
+  - name: DeepSeek V4.1 Flash
+    kurz: DeepSeek V4.1 Flash
+    firma: DeepSeek
+    aa: [DeepSeek V4.1 Flash]
+    arena: [deepseek-v4.1-flash-max]
+  - name: DeepSeek V4 Pro
+    kurz: DeepSeek V4 Pro
+    firma: DeepSeek
+    aa: [DeepSeek V4 Pro 0813]
+    arena: [deepseek-v4-pro-high-20260813, deepseek-v4-pro]
+  - name: Mistral Large 4
+    kurz: Mistral Large 4
+    firma: Mistral
+    aa: [Mistral Large 4 Preview]
+    arena: [mistral-large-4]

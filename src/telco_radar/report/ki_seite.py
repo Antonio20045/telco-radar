@@ -7,6 +7,7 @@ Meldung zuerst; innerhalb eines Tages entscheidet die Priorität. Die Seite
 zeigt die Meldungen wie die Meldungen-Seite in drei Spalten, aber ohne
 fremde Fotos. Ressort und Archiv rechnet ``analyze.ki_blatt``: je Ressort
 höchstens zwölf Meldungen im Blatt, die älteren im zugeklappten Archiv.
+Das Band „Modelle“ zeigt den Store aus ``analyze.ki_modelle`` (Schnitt 6).
 
 Das Modul importiert ``html`` nicht: die Themenerkennung kommt als
 Parameter herein.
@@ -15,8 +16,9 @@ Parameter herein.
 from __future__ import annotations
 
 from collections.abc import Callable, Iterable
+from datetime import date
 
-from ..analyze import ki_blatt
+from ..analyze import ki_blatt, ki_modelle
 from . import meldungen_seite
 
 KI_THEMA = "thema:ki"
@@ -75,11 +77,35 @@ def ausgabe(
     }
 
 
-def seite(env, wochen: list[dict], cfg, tag_tech, date_de: str) -> str:
+def _tag(iso: str | None) -> str | None:
+    return date.fromisoformat(iso).strftime("%d.%m.%Y") if iso else None
+
+
+def modelle_band(store: dict) -> dict:
+    """Rangliste, Stand und je ausgefallener Quelle Name und Tag des Versuchs."""
+    quellen = store.get("quellen") or {}
+    ausfall = [
+        (ki_modelle.QUELLEN_NAMEN.get(k, k), _tag(q.get("versucht")))
+        for k, q in quellen.items()
+        if q.get("error")
+    ]
+    return {
+        "top": store.get("top") or [],
+        "stand": _tag(store.get("stand")),
+        "urls": {k: q.get("url") for k, q in quellen.items()},
+        "ausfall": ausfall,
+        "fehler": store.get("error"),
+    }
+
+
+def seite(env, wochen: list[dict], cfg, tag_tech, date_de: str, ki_store: dict) -> str:
     """Das HTML von ``ki.html``; Stand ist der neueste Bericht."""
     stand = max((w["date"] for w in wochen), default="")
     meldungen = ki_meldungen(wochen, ki_region(cfg), tag_tech)
     blatt, archiv = ki_blatt.blatt(meldungen, ki_blatt.netzbetreiber(cfg))
     return env.get_template(VORLAGE).render(
-        prefix="", date_de=date_de, ausgabe=ausgabe(blatt, stand, archiv)
+        prefix="",
+        date_de=date_de,
+        ausgabe=ausgabe(blatt, stand, archiv),
+        modelle=modelle_band(ki_store),
     )
