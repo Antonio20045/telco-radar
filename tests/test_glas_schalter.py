@@ -276,3 +276,63 @@ def test_ueber_der_flaeche_bleibt_die_schrift_dunkel(chromium, buehne):
         assert s.get_attribute(".glas-schalter", "data-unter") == "bild"
     finally:
         context.close()
+
+
+_KNOEPFE = """<!doctype html><html><head><meta charset="utf-8">
+<link rel="stylesheet" href="style.css"></head><body><main>
+<nav class="glas-schalter" data-glas><span class="glas-pille"></span>
+<a href="#" aria-current="page">Mit Tarif</a><a href="#">Einzelgerät</a></nav>
+<div style="height:1200px"></div>
+<div id="baender" style="display:flex;justify-content:center;gap:8px">
+<button>15 GB</button><button>30 GB</button><button>60 GB</button>
+<button>120 GB</button></div><div style="height:3000px"></div>
+</main><script src="app.js"></script></body></html>"""
+
+
+@pytest.fixture(scope="module")
+def knoepfe(tmp_path_factory):
+    ordner = tmp_path_factory.mktemp("knoepfe")
+    schreibe_statische_dateien(ordner)
+    (ordner / "knoepfe.html").write_text(_KNOEPFE, encoding="utf-8")
+    with server(ordner) as adresse:
+        yield adresse
+
+
+_UNTER_DEM_SCHALTER = """() => {
+  const r = document.querySelector('.glas-schalter').getBoundingClientRect();
+  const b = document.querySelector('#baender').getBoundingClientRect();
+  window.scrollBy(0, b.top - r.top - 4);
+}"""
+
+_GREIFBAR = """() => {
+  const b = document.querySelector('#baender button').getBoundingClientRect();
+  return document.elementFromPoint(b.left + b.width / 2, b.top + b.height / 2)
+    .textContent.trim();
+}"""
+
+
+def test_der_schwebende_umschalter_verdeckt_keine_knoepfe(chromium, knoepfe):
+    """Crawler-Fund 11.10.2026: bei 1440 px lag "Mit Tarif / Einzelgeraet"
+    ueber den Band-Knoepfen (15 GB bis 120 GB). Rollt ein Knopf unter den
+    Umschalter, weicht er; Gegenprobe: ueber freier Flaeche bleibt er."""
+    context = chromium.new_context(viewport={"width": 1440, "height": 900})
+    s = context.new_page()
+    try:
+        s.goto(f"{knoepfe}/knoepfe.html", wait_until="load")
+        s.evaluate("window.scrollTo(0, 400)")
+        s.wait_for_timeout(300)
+        assert (
+            s.evaluate(
+                "getComputedStyle(document.querySelector('.glas-schalter')).opacity"
+            )
+            == "1"
+        )
+        s.evaluate(_UNTER_DEM_SCHALTER)
+        s.wait_for_timeout(500)
+        assert "weicht" in s.get_attribute(".glas-schalter", "class")
+        assert s.evaluate(_GREIFBAR) == "15 GB"
+        s.evaluate("window.scrollBy(0, 800)")
+        s.wait_for_timeout(500)
+        assert "weicht" not in s.get_attribute(".glas-schalter", "class")
+    finally:
+        context.close()

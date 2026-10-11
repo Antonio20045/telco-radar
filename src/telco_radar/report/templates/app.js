@@ -4572,6 +4572,22 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
       }
       s.setAttribute('data-unter', bild ? 'bild' : 'flaeche');
     };
+    var bedienbar = 'button,a[href],input,select,textarea,label,summary,[role="tab"],[role="button"]';
+    var kopf = document.getElementById('kopf');
+    var weiche = function () {
+      if (getComputedStyle(s).position !== 'sticky') { s.classList.remove('weicht'); return; }
+      var r = s.getBoundingClientRect();
+      var faellig = false;
+      for (var k = 0; k < 15 && !faellig; k++) {
+        var unter = document.elementsFromPoint ? document.elementsFromPoint(r.left + r.width * (k % 5 + 0.5) / 5, r.top + r.height * (Math.floor(k / 5) + 1) / 4) : [];
+        for (var m = 0; m < unter.length; m++) {
+          var el = unter[m];
+          if (s.contains(el) || (kopf && kopf.contains(el))) continue;
+          if (el.closest && el.closest(bedienbar)) { faellig = true; break; }
+        }
+      }
+      s.classList.toggle('weicht', faellig);
+    };
     var still = null, angefragt = false;
     window.addEventListener('scroll', function () {
       s.classList.add('rollt');
@@ -4579,9 +4595,10 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
       still = setTimeout(function () { s.classList.remove('rollt'); }, 180);
       if (angefragt) return;
       angefragt = true;
-      requestAnimationFrame(function () { angefragt = false; untersuche(); });
+      requestAnimationFrame(function () { angefragt = false; untersuche(); weiche(); });
     }, { passive: true });
     untersuche();
+    weiche();
   });
 })();
 
