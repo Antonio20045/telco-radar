@@ -90,13 +90,14 @@ def _blatt(html: str) -> str:
     return re.search(r'<section class="ki-blatt".*?</section>', html, re.S).group(0)
 
 
-def test_leiste_fuehrt_ki_zwischen_promo_und_quellen(tmp_path):
+def test_leiste_fuehrt_ki_nach_promo_und_quellen_nur_im_fuss(tmp_path):
     ki, meldungen = _seiten(tmp_path)
     for html in (ki, meldungen):
         leiste = _leiste(html)
-        promo = leiste.index("promo/index.html")
-        quellen = leiste.index("transparenz.html")
-        assert promo < leiste.index('href="ki.html"') < quellen
+        assert leiste.index("promo/index.html") < leiste.index('href="ki.html"')
+        assert "transparenz.html" not in leiste
+        fuss = html[html.index('class="foot-recht"') :]
+        assert 'href="transparenz.html"' in fuss[: fuss.index("</span>")]
     assert 'href="ki.html" class="on" aria-current="page"' in _leiste(ki)
 
 

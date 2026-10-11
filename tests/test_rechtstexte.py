@@ -175,6 +175,7 @@ def test_eine_unterseite_zeigt_eine_ebene_hoeher(wurzel):
         ".foot-recht"
     )
     assert {a["href"] for a in fuss.select("a")} == {
+        "../transparenz.html",
         "../impressum.html",
         "../datenschutz.html",
     }
@@ -237,7 +238,7 @@ def test_ohne_content_verzeichnis_kippt_keine_seite(tmp_path):
     fuss = BeautifulSoup(
         (site / "index.html").read_text(encoding="utf-8"), "html.parser"
     ).select_one(".foot-inner")
-    assert fuss.select_one(".foot-recht") is None
+    assert [a["href"] for a in fuss.select(".foot-recht a")] == ["transparenz.html"]
 
 
 def test_das_echte_repo_hat_beide_pflichtseiten():

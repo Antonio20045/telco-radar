@@ -128,7 +128,13 @@ def test_navigation_hat_fuenf_eintraege(tmp_path):
 
     Seit dem Redesign vom 09.10.2026 ist "Welt" (differenzierung.html) die
     zweite Ansicht von "Wettbewerb" - ein Umschalter auf der Seite, kein
-    eigener Eintrag -, und Promo steht als Eintrag wie jeder andere da."""
+    eigener Eintrag -, und Promo steht als Eintrag wie jeder andere da.
+
+    Am 11.10.2026 kam "KI" (ki.html) dazu: eine eigene Frage - was in der
+    KI passiert und wie sie funktioniert -, die keine andere Seite
+    beantwortet. Im selben Zug wanderte "Quellen" auf Antonios Wunsch
+    ("zu viele Unterseiten") aus der Leiste in die Fusszeile neben
+    Impressum und Datenschutz; es bleiben fuenf Eintraege."""
     reports_dir = tmp_path / "data" / "reports"
     reports_dir.mkdir(parents=True)
     site_dir = tmp_path / "site"
@@ -142,11 +148,13 @@ def test_navigation_hat_fuenf_eintraege(tmp_path):
         "meldungen.html",
         "wettbewerb.html",
         "promo/index.html",
-        "transparenz.html",
+        "ki.html",
     ):
         assert f'href="{ziel}"' in nav
     assert 'href="differenzierung.html"' not in nav
-    assert ">Quellen</a>" in nav
+    assert ">Quellen</a>" not in nav
+    fuss = html.split('class="foot-recht"')[1].split("</span>")[0]
+    assert 'href="transparenz.html"' in fuss
     assert ">Transparenz</a>" not in nav
     assert nav.count("<a ") == 5
     for weg in (

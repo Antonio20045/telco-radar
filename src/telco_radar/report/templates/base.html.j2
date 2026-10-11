@@ -36,7 +36,6 @@
         {% endif %}
         <a href="{{ prefix }}promo/index.html" {% if uc=='promo' %}class="on" aria-current="page"{% endif %}>Promo</a>
         <a href="{{ prefix }}ki.html" {% if active=='ki' %}class="on" aria-current="page"{% endif %}>KI</a>
-        <a href="{{ prefix }}transparenz.html" {% if active=='transparenz' %}class="on" aria-current="page"{% endif %}>Quellen</a>
       </nav>
       <div class="topbar-right kopf-rechts">
         {# Auf der Suchseite selbst faellt das Feld weg: dort steht das grosse
@@ -76,12 +75,11 @@
       {# Impressum und Datenschutz auf JEDER Seite (Art. 13 DSGVO); verlinkt
          wird nur, was auch gerendert wurde (`rechtstexte_verlinkt`). #}
       {% set rv = rechtstexte_verlinkt | default([]) %}
-      {% if rv %}
       <span class="foot-recht">
+        <a href="{{ prefix }}transparenz.html" {% if active=='transparenz' %}aria-current="page"{% endif %}>Quellen</a>
         {% if 'impressum' in rv %}<a href="{{ prefix }}impressum.html">Impressum</a>{% endif %}
         {% if 'datenschutz' in rv %}<a href="{{ prefix }}datenschutz.html">Datenschutz</a>{% endif %}
       </span>
-      {% endif %}
     </div>
     <p class="foot-bildnachweis">Bilder: generiert für dieses Portal. Campus-Motiv nach einer Vorlage von
       <a href="https://commons.wikimedia.org/wiki/File:Vodafone-Campus_D%C3%BCsseldorf.jpg" target="_blank" rel="noopener">Wikimedia Commons</a>.
