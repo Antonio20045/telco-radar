@@ -48,6 +48,7 @@ from bestand_pfad import lese_wurzel
 
 from telco_radar.geraete_config import lade_katalog
 from telco_radar.report import (
+    geraete_preisstand,
     geraete_tco_band,
     geraete_tco_view,
     geraete_view,
@@ -225,6 +226,17 @@ def test_grenzfall_am_modell_drei_tage_bleibt_drin():
     assert o2["frisch"] is True
     assert modell["antwort"]["tarif_anbieter"] == "o2"
     assert modell["antwort"]["tarif_gesamt"] == 1200.76
+
+
+def test_frischer_preis_von_vorgestern_traegt_sein_datum():
+    """Preisprüfung 11.10.2026: ein Telekom-Preis vom 10.10. sah aus wie einer von
+    heute. Frisch genug für den Vergleich, aber mit Datum an der Zeile; Gegenprobe:
+    ein Preis von heute trägt keinen Chip, ohne Datum der Tests auch keiner."""
+    o2 = _karte(_modell(_standard(o2_tag=TAG_3)), "o2")
+    assert o2["frisch"] is True
+    assert o2["alt_marke"] == f"Preis vom {karten.kurz_datum(TAG_3)}"
+    assert geraete_preisstand.marke(HEUTE, HEUTE, True) == ""
+    assert geraete_preisstand.marke(TAG_3, "", True) == ""
 
 
 def test_unbekanntes_datum_faellt_aus_dem_ranking():

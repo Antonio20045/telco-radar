@@ -17,8 +17,11 @@ from __future__ import annotations
 import pytest
 from bestand_pfad import lese_wurzel
 
+from telco_radar.analyze.klick_angebot import angebot_aus
 from telco_radar.analyze.klick_erfassung import (
     SATZ_SPEICHER,
+    SATZ_SPEICHER_ANGEBOT,
+    angebotene_speicher,
     erfassungsgruende,
     fuer_modell,
 )
@@ -123,3 +126,63 @@ def test_auf_jobs_verteilter_anbieter_nennt_alle_gelesenen_speicher():
     assert gruende["Telekom|apple-iphone-air"] == SATZ_SPEICHER.format(
         anbieter="Telekom", speicher="256 GB, 512 GB und 1 TB", datum="11.10.2026"
     )
+
+
+def _listung(anbieter, speicher, **anders):
+    return {
+        "anbieter": anbieter,
+        "device_id": "apple-iphone-17-pro",
+        "speicher_gb": speicher,
+        "status": "aktiv",
+        "zustand": "neu",
+        "last_verified": "2026-10-11",
+        **anders,
+    }
+
+
+def test_nicht_gelistete_speicher_heissen_nicht_im_angebot():
+    """Preisprüfung 11.10.2026: o2 führt das iPhone 17 Pro in seiner ganzen
+    Geräteliste nur mit 256 GB; 512 GB und 1 TB sind keine Erfassungslücke.
+    Gegenprobe: listet o2 auch 512 GB, bleibt es „nur mit 256 GB gelesen“; ohne heute
+    gelesene Liste ebenso; ausgelistete und gebrauchte Listungen zählen nicht."""
+    eintrag = {
+        "anbieter": "o2",
+        "datum": "2026-10-11",
+        "alter_tage": 0,
+        "laufstatus": LAUF_GELESEN,
+        "speicher_gelesen": {"apple-iphone-17-pro": [256]},
+    }
+    nur_256 = [
+        _listung("o2", 256),
+        _listung("o2", 512, status="ausgelistet"),
+        _listung("o2", 1024, zustand="gebraucht"),
+    ]
+    mit_512 = [*nur_256, _listung("o2", 512)]
+    schluessel = "o2|apple-iphone-17-pro"
+
+    def satz(listungen, gelesen):
+        angebot = angebotene_speicher(listungen, gelesen, "2026-10-11")
+        return erfassungsgruende({"dateien": [eintrag]}, angebot)[schluessel]
+
+    angebot = SATZ_SPEICHER_ANGEBOT.format(
+        anbieter="o2", speicher="256 GB", datum="11.10.2026"
+    )
+    gelesen = SATZ_SPEICHER.format(anbieter="o2", speicher="256 GB", datum="11.10.2026")
+    assert satz(nur_256, {"o2"}) == angebot
+    assert satz(mit_512, {"o2"}) == gelesen
+    assert satz(nur_256, set()) == gelesen
+
+
+class _Liste:
+    """Bestand mit zwei Anbietern; nur o2 hat seine Liste heute ganz gelesen."""
+
+    def eintraege(self):
+        return [_listung("o2", 256), _listung("congstar", 512)]
+
+    def lesezustand(self, anbieter, tag):
+        return {"o2": "gelesen", "congstar": "lesefehler"}[anbieter]
+
+
+def test_angebot_nur_aus_heute_ganz_gelesenen_listen():
+    angebot = angebot_aus(_Liste(), "2026-10-11")
+    assert angebot == {"o2": {"apple-iphone-17-pro": {256}}}

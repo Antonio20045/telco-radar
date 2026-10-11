@@ -451,7 +451,8 @@ def test_telekom_ist_in_der_24er_ansicht_nicht_erfasst(g):
     assert "1&1" not in vier, vier
     assert not any("andere Laufzeit" in k for k in vier.values()), vier
     zwoelf = zustand(12)
-    assert zwoelf["o2"].startswith("Mit 12 Raten nicht erfasst"), zwoelf
+    assert zwoelf["o2"] == "Mit 12 Raten nicht im Angebot", zwoelf
+    assert zwoelf["Telekom"].startswith("Mit 12 Raten nicht erfasst"), zwoelf
     sechsunddreissig = zustand(36)
     assert "Telekom" not in sechsunddreissig, sechsunddreissig
     assert sechsunddreissig["1&1"] == "Nur über 24 Monate verglichen"

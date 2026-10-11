@@ -75,7 +75,7 @@ from ..tco_model import (
     phasensumme,
     zeitraum_vergleichbar,
 )
-from . import anbieter_farben, geraete_rechnung, geraete_vergleich
+from . import anbieter_farben, geraete_preisstand, geraete_rechnung, geraete_vergleich
 from . import geraete_notbremse as notbremse
 from .geraete_tco_grafik import anbieter_slug
 
@@ -707,7 +707,7 @@ def _karte(
         "zustand_etikett": ZUSTAND_ETIKETT.get(zustand, zustand),
         "vergleichbar": zustand in _ZUSTAND,
         "frisch": frisch,
-        "alt_marke": ("" if frisch else alt_marke_fuer(b.abgerufen_am)),
+        "alt_marke": geraete_preisstand.marke(b.abgerufen_am, heute, frisch),
         "slug": anbieter_slug(b.anbieter),
         "anb_farbe": anbieter_farben.farbe_fuer(b.anbieter),
         "geraet": _name(katalog, device_id, speicher, rueckfall=b.sku_id),

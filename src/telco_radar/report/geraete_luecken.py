@@ -10,7 +10,11 @@ from __future__ import annotations
 
 import re
 
-from ..analyze.klick_erfassung import SATZ_NICHT_IM_ANGEBOT, SATZ_SPEICHER
+from ..analyze.klick_erfassung import (
+    SATZ_NICHT_IM_ANGEBOT,
+    SATZ_SPEICHER,
+    SATZ_SPEICHER_ANGEBOT,
+)
 from ..tco_model import TCO_HORIZONT, zeitraum_vergleichbar
 from . import geraete_notbremse as notbremse
 from .anbieter_farben import farbe_fuer
@@ -216,17 +220,24 @@ def _stufe(band_labels: dict, band: str) -> str:
 
 NICHT_IM_ANGEBOT = "Bietet das Gerät nicht an"
 NOCH_NICHT_ERFASST = "Noch nicht erfasst"
+RATEN_IM_ANGEBOT = {"o2": (24, 36), "congstar": (24, 36)}
+"""Laufzeitknöpfe der Klick-Karten; andere Raten sind „nicht im Angebot“."""
 KEIN_ANGEBOT_GELESEN = "Von {anbieter} ist zu diesem Gerät noch kein Angebot gelesen."
 _NICHT_IM_ANGEBOT_MUSTER = re.compile(
     re.escape(SATZ_NICHT_IM_ANGEBOT)
     .replace(re.escape("{anbieter}"), ".+")
     .replace(re.escape("{datum}"), ".+")
 )
-_SPEICHER_MUSTER = re.compile(
-    re.escape(SATZ_SPEICHER)
-    .replace(re.escape("{anbieter}"), ".+")
-    .replace(re.escape("{speicher}"), "(?P<speicher>.+)")
-    .replace(re.escape("{datum}"), ".+")
+
+
+_SPEICHER_MUSTER, _SPEICHER_ANGEBOT_MUSTER = (
+    re.compile(
+        re.escape(satz)
+        .replace(re.escape("{anbieter}"), ".+")
+        .replace(re.escape("{speicher}"), "(?P<speicher>.+)")
+        .replace(re.escape("{datum}"), ".+")
+    )
+    for satz in (SATZ_SPEICHER, SATZ_SPEICHER_ANGEBOT)
 )
 _KURZ = {
     "anderes-band": "Nur in anderen Bändern",
@@ -249,11 +260,17 @@ def _fehlzeile(lu: dict, band_labels: dict, h: int, erfassung: dict) -> dict:
         satz = erfassung.get(anbieter)
         if satz and _NICHT_IM_ANGEBOT_MUSTER.fullmatch(satz):
             return _zeile(lu, NICHT_IM_ANGEBOT, satz)
+        if satz and (treffer := _SPEICHER_ANGEBOT_MUSTER.fullmatch(satz)):
+            return _zeile(lu, f"Nur mit {treffer['speicher']} im Angebot", satz)
         if satz and (treffer := _SPEICHER_MUSTER.fullmatch(satz)):
             return _zeile(lu, f"Nur mit {treffer['speicher']} gelesen", satz)
         satz = satz or KEIN_ANGEBOT_GELESEN.format(anbieter=anbieter)
         return _zeile(lu, NOCH_NICHT_ERFASST, satz)
     if grund == "nicht-erfasst":
+        angebot = RATEN_IM_ANGEBOT.get(anbieter)
+        if angebot is not None and lu.get("laufzeit") not in angebot:
+            kurz = f"Mit {lu.get('laufzeit')} Raten nicht im Angebot"
+            return _zeile(lu, kurz, kurz + ".")
         kurz = f"Mit {lu.get('laufzeit')} Raten {NICHT_ERFASST}"
         if lu.get("andere_laufzeiten"):
             raten = " und ".join(str(a) for a in lu["andere_laufzeiten"])

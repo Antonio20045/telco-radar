@@ -45,7 +45,7 @@ from .analyze.geraete_store import (
     Preishistorie,
     TEILGELESEN,
 )
-from .analyze.klick_zusammenfuehrung import zusammenfuehren
+from .analyze.klick_angebot import zusammenfuehren
 from .analyze.tarif_referenzen import aus_bestand
 from .analyze.geraete_pruefstelle import Seite, vermerke as pruefe_buendel
 from .analyze.tco_store import TcoDB

@@ -39,7 +39,10 @@ SATZ_NICHT_IM_ANGEBOT = (
     "Bei {anbieter} nicht im Angebot (Übersicht vom {datum} ganz gelesen)"
 )
 SATZ_SPEICHER = "Bei {anbieter} nur mit {speicher} gelesen ({datum})"
+SATZ_SPEICHER_ANGEBOT = "Bei {anbieter} nur mit {speicher} im Angebot ({datum})"
 TRENNER = "|"
+Angebot = dict[str, dict[str, set[int]]]
+"""Je Anbieter und Gerät die angebotenen Speicher (``angebotene_speicher``)."""
 
 
 def erfassungsgrund(eintrag: dict) -> str | None:
@@ -64,8 +67,12 @@ def erfassungsgrund(eintrag: dict) -> str | None:
     )
 
 
-def erfassungsgruende(bilanz: dict | None) -> dict[str, str]:
-    """Je Anbieter mit frisch gestörtem Klick-Lauf sein Erfassungsgrund."""
+def erfassungsgruende(
+    bilanz: dict | None, angebot: Angebot | None = None
+) -> dict[str, str]:
+    """Je Anbieter mit frisch gestörtem Klick-Lauf sein Erfassungsgrund. ``angebot``
+    (``angebotene_speicher``) belegt, dass ein nicht gelesener Speicher nicht im
+    Angebot ist."""
     gruende = {}
     dateien = (bilanz or {}).get("dateien", [])
     for eintrag in dateien:
@@ -73,8 +80,29 @@ def erfassungsgruende(bilanz: dict | None) -> dict[str, str]:
             gruende[str(eintrag.get("anbieter"))] = satz
         gruende.update(nicht_im_angebot(eintrag))
     for eintrag in je_anbieter_vereint(dateien):
-        gruende.update(speicher_gelesen(eintrag))
+        gruende.update(speicher_gelesen(eintrag, angebot or {}))
     return gruende
+
+
+def angebotene_speicher(
+    listungen: list[dict], gelesen: set[str], heute: str
+) -> Angebot:
+    """Je Anbieter, dessen Geräteliste heute ganz gelesen wurde (``gelesen``), und
+    Gerät die Speicher seiner heute gesehenen, aktiven Neugeräte."""
+    angebot: Angebot = {}
+    for x in listungen:
+        anbieter, speicher = str(x.get("anbieter")), x.get("speicher_gb")
+        if (
+            anbieter not in gelesen
+            or x.get("status") != "aktiv"
+            or x.get("zustand", "neu") != "neu"
+            or x.get("last_verified") != heute
+            or not isinstance(speicher, int)
+        ):
+            continue
+        geraete = angebot.setdefault(anbieter, {})
+        geraete.setdefault(str(x.get("device_id")), set()).add(speicher)
+    return angebot
 
 
 def je_anbieter_vereint(dateien: list[dict]) -> list[dict]:
@@ -107,20 +135,26 @@ def nicht_im_angebot(eintrag: dict) -> dict[str, str]:
     return {f"{anbieter}{TRENNER}{g}": satz for g in geraete}
 
 
-def speicher_gelesen(eintrag: dict) -> dict[str, str]:
+def speicher_gelesen(eintrag: dict, angebot: Angebot | None = None) -> dict[str, str]:
     """Je Gerät, das ein Lauf von heute gelesen hat, die gelesenen Speicher; ein
-    Modell mit anderem Speicher zeigt sie statt des Anbietergrundes oder der Lücke."""
+    Modell mit anderem Speicher zeigt sie statt des Anbietergrundes oder der Lücke.
+    Führt die heute gelesene Geräteliste des Anbieters das Gerät mit keinem anderen
+    Speicher, heißt es „nur mit … im Angebot“."""
     je_geraet = eintrag.get("speicher_gelesen")
     if eintrag.get("alter_tage") != 0 or not isinstance(je_geraet, dict):
         return {}
     anbieter = str(eintrag.get("anbieter"))
+    liste = (angebot or {}).get(anbieter, {})
     datum = date.fromisoformat(str(eintrag.get("datum"))).strftime("%d.%m.%Y")
-    return {
-        f"{anbieter}{TRENNER}{geraet}": SATZ_SPEICHER.format(
+    saetze = {}
+    for geraet, speicher in je_geraet.items():
+        gelistet = liste.get(geraet)
+        belegt = bool(gelistet) and gelistet <= set(speicher)
+        satz = SATZ_SPEICHER_ANGEBOT if belegt else SATZ_SPEICHER
+        saetze[f"{anbieter}{TRENNER}{geraet}"] = satz.format(
             anbieter=anbieter, speicher=_gb(speicher), datum=datum
         )
-        for geraet, speicher in je_geraet.items()
-    }
+    return saetze
 
 
 def _gb(speicher: list[int]) -> str:
