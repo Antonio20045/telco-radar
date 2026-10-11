@@ -236,7 +236,7 @@ def test_transparenzseite_behauptet_keine_bewertung_die_nicht_stattfand(tmp_path
     assert "<b>1</b><span>davon relevant</span>" not in transparenz
 
     index = (site / "index.html").read_text(encoding="utf-8")
-    assert "relevante Meldungen</b>" in index
+    assert "ausfall-hinweis" in index
     assert "aus 12 neuen" not in index
 
 
