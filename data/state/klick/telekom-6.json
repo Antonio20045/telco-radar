@@ -1,0 +1,5708 @@
+{
+ "anbieter": "telekom-6",
+ "datum": "2026-10-11",
+ "dauer_sekunden": 4630.3,
+ "format": 1,
+ "frischegrenze_tage": 3,
+ "grund": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-a36-5g/awesome-black-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones: Strukturbruch: nur 40 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+ "karte": "telekom.yaml",
+ "laufstatus": "gestoert",
+ "lesefrist_tage": 1,
+ "name": "Telekom",
+ "seiten": [
+  {
+   "adresse": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25-fe/jetblack-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
+   "geraet": "samsung-galaxy-s25-fe",
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25-fe/jetblack-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=17.1&instalmentId=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "128 GB",
+      "tarif": "MagentaMobil M"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "a123982121a57550e9fe4529d18a4eff3d987a040676db128457a46e064001f2",
+      "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25-fe/jetblack-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=17.1&instalmentId=36",
+      "zeitpunkt": "2026-10-11T17:52:00Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "128 GB",
+      "tarif": "MagentaMobil M"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 17.1,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        49.95
+       ]
+      ],
+      "volumen_gb": 50.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25-fe/jetblack-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=25.7&instalmentId=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "128 GB",
+      "tarif": "MagentaMobil M"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "e678fc27cc768872bbb25c08f6d72a6212ffe8628e228ef52326bb95c043d37a",
+      "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25-fe/jetblack-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=25.7&instalmentId=24",
+      "zeitpunkt": "2026-10-11T17:52:00Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "128 GB",
+      "tarif": "MagentaMobil M"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 25.7,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        49.95
+       ]
+      ],
+      "volumen_gb": 50.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25-fe/jetblack-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=51.5&instalmentId=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "128 GB",
+      "tarif": "MagentaMobil M"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "d6dc59295b442fe74b258ff40283a9558ca6402eaf04772735d3db9c292f7f75",
+      "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25-fe/jetblack-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=51.5&instalmentId=12",
+      "zeitpunkt": "2026-10-11T17:52:01Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "128 GB",
+      "tarif": "MagentaMobil M"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 51.5,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        49.95
+       ]
+      ],
+      "volumen_gb": 50.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil M"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "b82388c298fac78a1b81c208bf65c48a38b314cbf7f59931bc275c55793c4ac3",
+      "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25-fe/jetblack-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=51.5&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D256_GB",
+      "zeitpunkt": "2026-10-11T17:52:04Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil M"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 19.1,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        49.95
+       ]
+      ],
+      "volumen_gb": 50.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil M"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "633f2daf37bf645d095ce80e7a15a647986076b4d73f87900da2e988a551b7a5",
+      "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25-fe/jetblack-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=28.6&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D256_GB",
+      "zeitpunkt": "2026-10-11T17:52:05Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil M"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 28.6,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        49.95
+       ]
+      ],
+      "volumen_gb": 50.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil M"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "ddcae59c1c775fad0ba95c69ea500065af72d4bc86f789de6acad6a8633c2f4d",
+      "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25-fe/jetblack-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=57.3&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D256_GB",
+      "zeitpunkt": "2026-10-11T17:52:06Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil M"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 57.3,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        49.95
+       ]
+      ],
+      "volumen_gb": 50.0
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 10.0,
+    "anfragen": 102,
+    "beendet": 96,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "bf72977jfz.bf.dynatrace.com": 1,
+     "onebot-webfrontend.oneai.yo-digital.com": 1,
+     "www.telekom.de": 4
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 139.6,
+    "takte_ms": 1100,
+    "wartet_auf": "load"
+   },
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 0.8571428571428571,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 36,
+    "felder_gesucht": 42,
+    "knoepfe_gefunden": 36,
+    "knoepfe_gesucht": 36
+   },
+   "verworfen": 36
+  },
+  {
+   "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17/lavendel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
+   "geraet": "apple-iphone-17",
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17/lavendel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=26.6&instalmentId=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "e7c246d8a7597591b7855838661aa4a1dd647ff976f10d8cee1011989c40f40b",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17/lavendel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=26.6&instalmentId=36",
+      "zeitpunkt": "2026-10-11T17:55:26Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 99.0,
+      "rate": 26.6,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        29.95
+       ]
+      ],
+      "volumen_gb": 20.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17/lavendel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=40&instalmentId=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "90764395c0f885a3671e3f96dae22eae123503834cf25c59cd36e4a182dc7861",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17/lavendel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=40&instalmentId=24",
+      "zeitpunkt": "2026-10-11T17:55:28Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 99.0,
+      "rate": 40.0,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        29.95
+       ]
+      ],
+      "volumen_gb": 20.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17/lavendel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=80&instalmentId=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "2ceac0399c3e7a0490bc825443b186dbaaceb0dc9f51951910bfbd687eb12c1f",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17/lavendel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=80&instalmentId=12",
+      "zeitpunkt": "2026-10-11T17:55:30Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 99.0,
+      "rate": 80.0,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        29.95
+       ]
+      ],
+      "volumen_gb": 20.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "ddf995695c984e77ec52bcccec5fe91bea959e4b2c26183d339a4239130614df",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17/lavendel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=80&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D512_GB",
+      "zeitpunkt": "2026-10-11T17:55:33Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 199.0,
+      "rate": 30.8,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        29.95
+       ]
+      ],
+      "volumen_gb": 20.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "8bf629e0fac468d87cd36d3cd8b8503e7f6cddf48e4216b11191a306a0dfeb1d",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17/lavendel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=46.2&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
+      "zeitpunkt": "2026-10-11T17:55:34Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 199.0,
+      "rate": 46.2,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        29.95
+       ]
+      ],
+      "volumen_gb": 20.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "5d2d79359ffb3851ed2a192b469d4c331fa8aec57f7fdf8daff88a1fb32644b7",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17/lavendel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=92.5&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
+      "zeitpunkt": "2026-10-11T17:55:36Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 199.0,
+      "rate": 92.5,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        29.95
+       ]
+      ],
+      "volumen_gb": 20.0
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 10.0,
+    "anfragen": 149,
+    "beendet": 145,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "bf72977jfz.bf.dynatrace.com": 2,
+     "onebot-webfrontend.oneai.yo-digital.com": 1,
+     "www.telekom.de": 1
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 134.5,
+    "takte_ms": 1650,
+    "wartet_auf": "load"
+   },
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 0.8571428571428571,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 36,
+    "felder_gesucht": 42,
+    "knoepfe_gefunden": 36,
+    "knoepfe_gesucht": 36
+   },
+   "verworfen": 52
+  },
+  {
+   "adresse": "https://www.telekom.de/shop/geraet/google/google-pixel-10a/lavender-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
+   "geraet": "google-pixel-10a",
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/google/google-pixel-10a/lavender-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=14.6&instalmentId=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "128 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "2578a4b57ecbfce8bcedd8f98503d4549a2d427a05807150bff1b65c4a806c25",
+      "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-10a/lavender-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=14.6&instalmentId=36",
+      "zeitpunkt": "2026-10-11T17:58:55Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "128 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 14.6,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        29.95
+       ]
+      ],
+      "volumen_gb": 20.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/google/google-pixel-10a/lavender-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=22&instalmentId=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "128 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "8006a5e9455dd061d7598fa0999ecf0a00e7aea6fecf3e7bd66823d753ea511b",
+      "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-10a/lavender-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=22&instalmentId=24",
+      "zeitpunkt": "2026-10-11T17:58:57Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "128 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 22.0,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        29.95
+       ]
+      ],
+      "volumen_gb": 20.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/google/google-pixel-10a/lavender-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=44&instalmentId=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "128 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "e8f87cc4eaae10457e1e1b47062082a6896123525e9b19ed27de3de31fde0656",
+      "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-10a/lavender-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=44&instalmentId=12",
+      "zeitpunkt": "2026-10-11T17:58:58Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "128 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 44.0,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        29.95
+       ]
+      ],
+      "volumen_gb": 20.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "c5ae6afa30e4e12c04019fe73999a20bee7718e686d695e979ffc3bca26bfeb1",
+      "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-10a/lavender-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=44&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D256_GB",
+      "zeitpunkt": "2026-10-11T17:59:01Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 17.4,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        29.95
+       ]
+      ],
+      "volumen_gb": 20.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "16b05bf9ab6c05235925d4ad5e23f181a15dfaca5d46779997389c325f8daba8",
+      "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-10a/lavender-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=26.1&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D256_GB",
+      "zeitpunkt": "2026-10-11T17:59:02Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 26.1,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        29.95
+       ]
+      ],
+      "volumen_gb": 20.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "c1aa2614dfcbb511cf97436e5c9d96e460e9fce47f833bb37e654de98747643e",
+      "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-10a/lavender-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=52.3&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D256_GB",
+      "zeitpunkt": "2026-10-11T17:59:04Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 52.3,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        29.95
+       ]
+      ],
+      "volumen_gb": 20.0
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 10.0,
+    "anfragen": 95,
+    "beendet": 91,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "bf72977jfz.bf.dynatrace.com": 1,
+     "onebot-webfrontend.oneai.yo-digital.com": 1,
+     "www.telekom.de": 2
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 133.7,
+    "takte_ms": 1500,
+    "wartet_auf": "load"
+   },
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 0.8571428571428571,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 36,
+    "felder_gesucht": 42,
+    "knoepfe_gefunden": 36,
+    "knoepfe_gesucht": 36
+   },
+   "verworfen": 50
+  },
+  {
+   "adresse": "https://www.telekom.de/shop/geraet/motorola/motorola-razr-fold-fifa-edition/pantone-blackened-blue-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
+   "geraet": "motorola-razr-fold-fifa-edition",
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/motorola/motorola-razr-fold-fifa-edition/pantone-blackened-blue-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=50.2&instalmentId=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "45cde6459d34ebcd21474e6af2065475d00ef27c870ca23433b76e70697eee46",
+      "seite": "https://www.telekom.de/shop/geraet/motorola/motorola-razr-fold-fifa-edition/pantone-blackened-blue-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=50.2&instalmentId=36",
+      "zeitpunkt": "2026-10-11T18:02:23Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 399.0,
+      "rate": 50.2,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        29.95
+       ]
+      ],
+      "volumen_gb": 20.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/motorola/motorola-razr-fold-fifa-edition/pantone-blackened-blue-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=75.4&instalmentId=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "c4e1c1b7ffe72716bb000a0e02089b077422d4ebb56c136579520ce8739d4cbc",
+      "seite": "https://www.telekom.de/shop/geraet/motorola/motorola-razr-fold-fifa-edition/pantone-blackened-blue-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=75.4&instalmentId=24",
+      "zeitpunkt": "2026-10-11T18:02:25Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 399.0,
+      "rate": 75.4,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        29.95
+       ]
+      ],
+      "volumen_gb": 20.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/motorola/motorola-razr-fold-fifa-edition/pantone-blackened-blue-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=150.8&instalmentId=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "065b4786d0ece0a0c30a2b7b371509fc88980c8f855029ba0e63f998ff379e4d",
+      "seite": "https://www.telekom.de/shop/geraet/motorola/motorola-razr-fold-fifa-edition/pantone-blackened-blue-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=150.8&instalmentId=12",
+      "zeitpunkt": "2026-10-11T18:02:27Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 399.0,
+      "rate": 150.8,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        29.95
+       ]
+      ],
+      "volumen_gb": 20.0
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 10.0,
+    "anfragen": 96,
+    "beendet": 92,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "bf72977jfz.bf.dynatrace.com": 1,
+     "onebot-webfrontend.oneai.yo-digital.com": 1,
+     "www.telekom.de": 2
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 133.7,
+    "takte_ms": 1600,
+    "wartet_auf": "load"
+   },
+   "speicher_gb": 512,
+   "sperre": null,
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 0.8571428571428571,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 18,
+    "felder_gesucht": 21,
+    "knoepfe_gefunden": 18,
+    "knoepfe_gesucht": 18
+   },
+   "verworfen": 35
+  },
+  {
+   "adresse": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25-fe/jetblack-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
+   "geraet": "samsung-galaxy-s25-fe",
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25-fe/jetblack-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=19.9&instalmentId=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "128 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "73bacdc392e51b44f151b529bf74746086ff57cfaec2b30a71ec21381958cdc9",
+      "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25-fe/jetblack-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=19.9&instalmentId=36",
+      "zeitpunkt": "2026-10-11T18:05:46Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "128 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 19.9,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        29.95
+       ]
+      ],
+      "volumen_gb": 20.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25-fe/jetblack-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=29.9&instalmentId=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "128 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "6b46156301ddd6cd088c22a538f884f4327ebc64935c91fdcb639377000076c6",
+      "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25-fe/jetblack-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=29.9&instalmentId=24",
+      "zeitpunkt": "2026-10-11T18:05:48Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "128 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 29.9,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        29.95
+       ]
+      ],
+      "volumen_gb": 20.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25-fe/jetblack-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=59.8&instalmentId=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "128 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "ec3954b1737784379d075dcd1e3f3fdb3da3c2f45f15af62330f7ebbf273810b",
+      "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25-fe/jetblack-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=59.8&instalmentId=12",
+      "zeitpunkt": "2026-10-11T18:05:49Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "128 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 59.8,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        29.95
+       ]
+      ],
+      "volumen_gb": 20.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "77a36c15960ea3c9050d02d4c19f3c74bcc144c3506c2618ebb322c68c54101f",
+      "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25-fe/jetblack-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=59.8&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D256_GB",
+      "zeitpunkt": "2026-10-11T18:05:52Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 21.8,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        29.95
+       ]
+      ],
+      "volumen_gb": 20.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "7d2d775c76674d65fa0598ca802cffb382828d8e9991e2c8efe60c7a07c8deea",
+      "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25-fe/jetblack-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=32.8&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D256_GB",
+      "zeitpunkt": "2026-10-11T18:05:54Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 32.8,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        29.95
+       ]
+      ],
+      "volumen_gb": 20.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "f4502f7332e96eb346fc9d2adc6f17ba0bb5301b6e2056991656ac680c4ff2f7",
+      "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25-fe/jetblack-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=65.6&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D256_GB",
+      "zeitpunkt": "2026-10-11T18:05:55Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 65.6,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        29.95
+       ]
+      ],
+      "volumen_gb": 20.0
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 10.0,
+    "anfragen": 99,
+    "beendet": 92,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "bf72977jfz.bf.dynatrace.com": 1,
+     "gallery-content.binkies3d.com": 3,
+     "www.telekom.de": 5
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 133.8,
+    "takte_ms": 1150,
+    "wartet_auf": "load"
+   },
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 0.8571428571428571,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 36,
+    "felder_gesucht": 42,
+    "knoepfe_gefunden": 36,
+    "knoepfe_gesucht": 36
+   },
+   "verworfen": 49
+  },
+  {
+   "adresse": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-z-fold8/cream-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
+   "geraet": "samsung-galaxy-z-fold8",
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "83e94c53f767beb180bd98130bd9ec06536185f4478d5460399e3b7ec41e7b64",
+      "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-z-fold8/cream-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&installmentValue=43.8&instalmentId=36&tariffCategoryId=smartphone-tarife",
+      "zeitpunkt": "2026-10-11T18:09:14Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 299.0,
+      "rate": 43.8,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        29.95
+       ]
+      ],
+      "volumen_gb": 20.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "747b26edb586ae7aa5105663fd7ce1788df4a903c0e41c14bb98acc6f9288004",
+      "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-z-fold8/cream-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&installmentValue=65.8&instalmentId=24&tariffCategoryId=smartphone-tarife",
+      "zeitpunkt": "2026-10-11T18:09:16Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 299.0,
+      "rate": 65.8,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        29.95
+       ]
+      ],
+      "volumen_gb": 20.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "4b737395c47f948b7d451d9954ef6176f422cf3e9eff23199dfae7cab1aa1b3f",
+      "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-z-fold8/cream-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&installmentValue=131.6&instalmentId=12&tariffCategoryId=smartphone-tarife",
+      "zeitpunkt": "2026-10-11T18:09:19Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 299.0,
+      "rate": 131.6,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        29.95
+       ]
+      ],
+      "volumen_gb": 20.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "d5121526ee7d6d850e2e3ee2f1076a3a0ac0485b6ff0945e3f33590151773eae",
+      "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-z-fold8/cream-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&installmentValue=131.6&instalmentId=12&tariffCategoryId=smartphone-tarife&changedAttr%255B%255D=changedAttr.storage%253D512_GB",
+      "zeitpunkt": "2026-10-11T18:09:21Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 399.0,
+      "rate": 46.1,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        29.95
+       ]
+      ],
+      "volumen_gb": 20.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "d0efbb66b16ac2d240b5276efccefa0c357f62b656e127437d8c3fe75f42941a",
+      "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-z-fold8/cream-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&installmentValue=69.1&instalmentId=24&tariffCategoryId=smartphone-tarife&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
+      "zeitpunkt": "2026-10-11T18:09:24Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 399.0,
+      "rate": 69.1,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        29.95
+       ]
+      ],
+      "volumen_gb": 20.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "3c48ef65c543ae248aa42527172b52f14fe9c41dcc5729da5a7fc6d4579b9d79",
+      "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-z-fold8/cream-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&installmentValue=138.3&instalmentId=12&tariffCategoryId=smartphone-tarife&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
+      "zeitpunkt": "2026-10-11T18:09:25Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 399.0,
+      "rate": 138.3,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        29.95
+       ]
+      ],
+      "volumen_gb": 20.0
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 10.0,
+    "anfragen": 96,
+    "beendet": 92,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "bf72977jfz.bf.dynatrace.com": 1,
+     "onebot-webfrontend.oneai.yo-digital.com": 1,
+     "www.telekom.de": 1
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 133.8,
+    "takte_ms": 1650,
+    "wartet_auf": "load"
+   },
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 0.8571428571428571,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 36,
+    "felder_gesucht": 42,
+    "knoepfe_gefunden": 36,
+    "knoepfe_gesucht": 36
+   },
+   "verworfen": 52
+  },
+  {
+   "adresse": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-15-pro-5g/titanium-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
+   "geraet": "xiaomi-redmi-note-15-pro",
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-15-pro-5g/titanium-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=8.2&instalmentId=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "bb7c589f15367d891a618e8e22bb4ff3643685b362080afa9ee6f81909ad8dc4",
+      "seite": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-15-pro-5g/titanium-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=8.2&instalmentId=36",
+      "zeitpunkt": "2026-10-11T18:12:44Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 8.2,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        29.95
+       ]
+      ],
+      "volumen_gb": 20.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-15-pro-5g/titanium-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=12.4&instalmentId=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "f695e5895ad04b8223b7156bfc64598f0d0083fe6c393db232e50926bac526b0",
+      "seite": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-15-pro-5g/titanium-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=12.4&instalmentId=24",
+      "zeitpunkt": "2026-10-11T18:12:46Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 12.4,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        29.95
+       ]
+      ],
+      "volumen_gb": 20.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-15-pro-5g/titanium-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=24.8&instalmentId=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "ca1de3b0d3673ab6e9b8859ad1708eb963412c4a89ddc346864e0318fc1b5357",
+      "seite": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-15-pro-5g/titanium-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=24.8&instalmentId=12",
+      "zeitpunkt": "2026-10-11T18:12:48Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XS"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 24.8,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        29.95
+       ]
+      ],
+      "volumen_gb": 20.0
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 10.0,
+    "anfragen": 93,
+    "beendet": 91,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "onebot-webfrontend.oneai.yo-digital.com": 1,
+     "www.telekom.de": 2
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 133.6,
+    "takte_ms": 1450,
+    "wartet_auf": "load"
+   },
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 0.8571428571428571,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 18,
+    "felder_gesucht": 21,
+    "knoepfe_gefunden": 18,
+    "knoepfe_gesucht": 18
+   },
+   "verworfen": 37
+  },
+  {
+   "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro-max/cosmic-orange-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
+   "geraet": "apple-iphone-17-pro-max",
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro-max/cosmic-orange-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=31.1&instalmentId=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "4b96da56c1659c2012537a35d9fe4f1a0a0ef535d22634a1b1a510275e9402b0",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro-max/cosmic-orange-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=31.1&instalmentId=36",
+      "zeitpunkt": "2026-10-11T18:16:08Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 199.0,
+      "rate": 31.1,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        39.95
+       ]
+      ],
+      "volumen_gb": 30.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro-max/cosmic-orange-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=46.6&instalmentId=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "3dbd2e556b3b6190d38abd52c5c5daa6018b5d90f2179fea509dc9b7acbe80b2",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro-max/cosmic-orange-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=46.6&instalmentId=24",
+      "zeitpunkt": "2026-10-11T18:16:10Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 199.0,
+      "rate": 46.6,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        39.95
+       ]
+      ],
+      "volumen_gb": 30.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro-max/cosmic-orange-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=93.3&instalmentId=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "85d5bc28d57fbf0c5cf73e683d5ee09c56af9064219bbe83dc8aa0548ca4c990",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro-max/cosmic-orange-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=93.3&instalmentId=12",
+      "zeitpunkt": "2026-10-11T18:16:12Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 199.0,
+      "rate": 93.3,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        39.95
+       ]
+      ],
+      "volumen_gb": 30.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "cc63dfcae602ce0785c49a94a04b5ac38b8f4071b2fe3fc0792165e3a1c6d2d3",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro-max/cosmic-orange-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=93.3&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D512_GB",
+      "zeitpunkt": "2026-10-11T18:16:15Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 299.0,
+      "rate": 35.0,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        39.95
+       ]
+      ],
+      "volumen_gb": 30.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "e728b383b1c59d0d4548b4bd6e73a182736935bfa1ba7ffec9b847ba3d3fe6b9",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro-max/cosmic-orange-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=52.5&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
+      "zeitpunkt": "2026-10-11T18:16:16Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 299.0,
+      "rate": 52.5,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        39.95
+       ]
+      ],
+      "volumen_gb": 30.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "d251f88a409d1d18ddf3ed76ac5604b6897a3337e8a7304daaa46909cd4066b8",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro-max/cosmic-orange-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=105&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
+      "zeitpunkt": "2026-10-11T18:16:18Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 299.0,
+      "rate": 105.0,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        39.95
+       ]
+      ],
+      "volumen_gb": 30.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "ec443b83d506b5023b02a68d14f7fe459e932608f918b572f6faba0b19ad182f",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro-max/cosmic-orange-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=105&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D1_TB",
+      "zeitpunkt": "2026-10-11T18:16:20Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil S"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 299.0,
+      "rate": 41.6,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        39.95
+       ]
+      ],
+      "volumen_gb": 30.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "8071d68c597811364c3cbc6fa22f107104f3c3d3ce8dae7b9fb1c471cdf82f29",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro-max/cosmic-orange-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=62.5&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
+      "zeitpunkt": "2026-10-11T18:16:23Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil S"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 299.0,
+      "rate": 62.5,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        39.95
+       ]
+      ],
+      "volumen_gb": 30.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "e04fa22d9184af42c9d28426f95703ea27b6475cbaeb84e98ce5a997c220c66e",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro-max/cosmic-orange-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=125&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
+      "zeitpunkt": "2026-10-11T18:16:25Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil S"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 299.0,
+      "rate": 125.0,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        39.95
+       ]
+      ],
+      "volumen_gb": 30.0
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "2 TB",
+      "tarif": "MagentaMobil S"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Seite bietet speicher 2 TB nicht an",
+     "luecken": [],
+     "status": "nicht_angeboten",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "2 TB",
+      "tarif": "MagentaMobil S"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "2 TB",
+      "tarif": "MagentaMobil S"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Seite bietet speicher 2 TB nicht an",
+     "luecken": [],
+     "status": "nicht_angeboten",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "2 TB",
+      "tarif": "MagentaMobil S"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "2 TB",
+      "tarif": "MagentaMobil S"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Seite bietet speicher 2 TB nicht an",
+     "luecken": [],
+     "status": "nicht_angeboten",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "2 TB",
+      "tarif": "MagentaMobil S"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 10.0,
+    "anfragen": 147,
+    "beendet": 145,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "bf72977jfz.bf.dynatrace.com": 1,
+     "binkiesproductionweu.servicebus.windows.net": 1,
+     "onebot-webfrontend.oneai.yo-digital.com": 1
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 134.6,
+    "takte_ms": 1650,
+    "wartet_auf": "load"
+   },
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 0.8571428571428571,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 54,
+    "felder_gesucht": 63,
+    "knoepfe_gefunden": 57,
+    "knoepfe_gesucht": 57
+   },
+   "verworfen": 68
+  },
+  {
+   "adresse": "https://www.telekom.de/shop/geraet/google/google-pixel-10a/lavender-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
+   "geraet": "google-pixel-10a",
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/google/google-pixel-10a/lavender-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=14.6&instalmentId=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "128 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "00c9645694b755be565c75b7aa37371270371c173140464141c2f6157ca915a9",
+      "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-10a/lavender-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=14.6&instalmentId=36",
+      "zeitpunkt": "2026-10-11T18:19:46Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "128 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 14.6,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        39.95
+       ]
+      ],
+      "volumen_gb": 30.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/google/google-pixel-10a/lavender-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=22&instalmentId=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "128 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "ac9a2b267ccc58c770c93d7dd2fd272edd1244cf728057d2bdab74ef313cc241",
+      "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-10a/lavender-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=22&instalmentId=24",
+      "zeitpunkt": "2026-10-11T18:19:48Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "128 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 22.0,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        39.95
+       ]
+      ],
+      "volumen_gb": 30.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/google/google-pixel-10a/lavender-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=44&instalmentId=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "128 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "35c5ab18436321f413ac40f76b3570faac7f9f61c88cd52cf80e2b9f7e974dc4",
+      "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-10a/lavender-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=44&instalmentId=12",
+      "zeitpunkt": "2026-10-11T18:19:50Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "128 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 44.0,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        39.95
+       ]
+      ],
+      "volumen_gb": 30.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "c00ace4df3c6379c152b5474bb05c9ab13c03b7a4f6c2743faf119b44ba71edf",
+      "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-10a/lavender-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=44&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D256_GB",
+      "zeitpunkt": "2026-10-11T18:19:53Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 17.4,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        39.95
+       ]
+      ],
+      "volumen_gb": 30.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "b91b9379f4f5d02460238f99974ab358f2bb71d8a468f0f7ff115b42462f10bc",
+      "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-10a/lavender-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=26.1&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D256_GB",
+      "zeitpunkt": "2026-10-11T18:19:55Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 26.1,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        39.95
+       ]
+      ],
+      "volumen_gb": 30.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "244eb066a54de65a77056b4ead1a59c2334781928d799cf39854e3edb41fef96",
+      "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-10a/lavender-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=52.3&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D256_GB",
+      "zeitpunkt": "2026-10-11T18:19:57Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 52.3,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        39.95
+       ]
+      ],
+      "volumen_gb": 30.0
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 10.0,
+    "anfragen": 95,
+    "beendet": 94,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "bf72977jfz.bf.dynatrace.com": 1,
+     "binkiesproductionweu.servicebus.windows.net": 1,
+     "www.telekom.de": 1
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 133.9,
+    "takte_ms": 1550,
+    "wartet_auf": "load"
+   },
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 0.8571428571428571,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 36,
+    "felder_gesucht": 42,
+    "knoepfe_gefunden": 36,
+    "knoepfe_gesucht": 36
+   },
+   "verworfen": 49
+  },
+  {
+   "adresse": "https://www.telekom.de/shop/geraet/motorola/motorola-razr-fold/pantone-blackened-blue-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
+   "geraet": "motorola-razr-fold",
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/motorola/motorola-razr-fold/pantone-blackened-blue-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=41.9&instalmentId=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "ba75fc42d8fbcc0644217ebc7c056a717f726fa0ea83a4289adc0703ea0e8503",
+      "seite": "https://www.telekom.de/shop/geraet/motorola/motorola-razr-fold/pantone-blackened-blue-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=41.9&instalmentId=36",
+      "zeitpunkt": "2026-10-11T18:23:15Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 299.0,
+      "rate": 41.9,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        39.95
+       ]
+      ],
+      "volumen_gb": 30.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/motorola/motorola-razr-fold/pantone-blackened-blue-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=62.9&instalmentId=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "01f172aabfd90eaa75f1f7124b3da4fda4c76e883cac8606427a3f777f83cc49",
+      "seite": "https://www.telekom.de/shop/geraet/motorola/motorola-razr-fold/pantone-blackened-blue-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=62.9&instalmentId=24",
+      "zeitpunkt": "2026-10-11T18:23:17Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 299.0,
+      "rate": 62.9,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        39.95
+       ]
+      ],
+      "volumen_gb": 30.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/motorola/motorola-razr-fold/pantone-blackened-blue-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=125.8&instalmentId=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "20256138046087d5ce8ee5054af9fdee3e83af8248a1b6b0e9607be4db7918dc",
+      "seite": "https://www.telekom.de/shop/geraet/motorola/motorola-razr-fold/pantone-blackened-blue-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=125.8&instalmentId=12",
+      "zeitpunkt": "2026-10-11T18:23:19Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 299.0,
+      "rate": 125.8,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        39.95
+       ]
+      ],
+      "volumen_gb": 30.0
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 10.0,
+    "anfragen": 95,
+    "beendet": 92,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "onebot-webfrontend.oneai.yo-digital.com": 1,
+     "www.telekom.de": 2
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 133.7,
+    "takte_ms": 1650,
+    "wartet_auf": "load"
+   },
+   "speicher_gb": 512,
+   "sperre": null,
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 0.8571428571428571,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 18,
+    "felder_gesucht": 21,
+    "knoepfe_gefunden": 18,
+    "knoepfe_gesucht": 18
+   },
+   "verworfen": 35
+  },
+  {
+   "adresse": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25/silver-shadow-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
+   "geraet": "samsung-galaxy-s25",
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25/silver-shadow-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=23.5&instalmentId=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "128 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "a21d3e29a522c2980379b3ef9dc70f4f53d806ef330a7f370dc3f457373792c0",
+      "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25/silver-shadow-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=23.5&instalmentId=36",
+      "zeitpunkt": "2026-10-11T18:26:39Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "128 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 23.5,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        39.95
+       ]
+      ],
+      "volumen_gb": 30.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25/silver-shadow-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=35.3&instalmentId=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "128 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "13c1da75aeb98bc08503d518d9a17f596b4f058db4e979b0b93400c469c113b1",
+      "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25/silver-shadow-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=35.3&instalmentId=24",
+      "zeitpunkt": "2026-10-11T18:26:41Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "128 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 35.3,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        39.95
+       ]
+      ],
+      "volumen_gb": 30.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25/silver-shadow-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=70.6&instalmentId=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "128 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "95720c09e42e0dcbb299661468a4cb50e0aba03b947956e4bd4095f08c0c34ba",
+      "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25/silver-shadow-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=70.6&instalmentId=12",
+      "zeitpunkt": "2026-10-11T18:26:42Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "128 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 70.6,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        39.95
+       ]
+      ],
+      "volumen_gb": 30.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "b8eba7a80dc94745a1b9a7232d71b28497f8c083212e6a4017b2be5962709cca",
+      "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25/silver-shadow-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=70.6&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D256_GB",
+      "zeitpunkt": "2026-10-11T18:26:45Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 99.0,
+      "rate": 23.6,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        39.95
+       ]
+      ],
+      "volumen_gb": 30.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "6650e4926dca4e50f74d60265565afa471f75844c97c13fce97f285ba38de92d",
+      "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25/silver-shadow-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=35.4&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D256_GB",
+      "zeitpunkt": "2026-10-11T18:26:47Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 99.0,
+      "rate": 35.4,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        39.95
+       ]
+      ],
+      "volumen_gb": 30.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "77dcff7c9f8ef6fa1c853478380221f050130dda243529f16d69191485320a7f",
+      "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25/silver-shadow-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=70.8&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D256_GB",
+      "zeitpunkt": "2026-10-11T18:26:48Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 99.0,
+      "rate": 70.8,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        39.95
+       ]
+      ],
+      "volumen_gb": 30.0
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 10.0,
+    "anfragen": 90,
+    "beendet": 85,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "bf72977jfz.bf.dynatrace.com": 1,
+     "onebot-webfrontend.oneai.yo-digital.com": 1,
+     "www.telekom.de": 3
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 134.6,
+    "takte_ms": 1650,
+    "wartet_auf": "load"
+   },
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 0.8571428571428571,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 36,
+    "felder_gesucht": 42,
+    "knoepfe_gefunden": 36,
+    "knoepfe_gesucht": 36
+   },
+   "verworfen": 48
+  },
+  {
+   "adresse": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-z-fold7/silver-shadow-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
+   "geraet": "samsung-galaxy-z-fold-7",
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-z-fold7/silver-shadow-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=44.4&instalmentId=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "8b14a680603223bb6889d52f0fca286dd171e26dc16f15f3accdd86fc80ee79f",
+      "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-z-fold7/silver-shadow-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=44.4&instalmentId=36",
+      "zeitpunkt": "2026-10-11T18:30:07Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 299.0,
+      "rate": 44.4,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        39.95
+       ]
+      ],
+      "volumen_gb": 30.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-z-fold7/silver-shadow-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=66.6&instalmentId=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "3dbf65b6eb05f0d0a83fe4f653beafdddc625895f6d5ae595cbd691b60482689",
+      "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-z-fold7/silver-shadow-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=66.6&instalmentId=24",
+      "zeitpunkt": "2026-10-11T18:30:09Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 299.0,
+      "rate": 66.6,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        39.95
+       ]
+      ],
+      "volumen_gb": 30.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-z-fold7/silver-shadow-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=133.3&instalmentId=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "1e9fdb9b5a1391a0d90c4cc39d45bba3c39777b2c88ab52d0406c307f6862be9",
+      "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-z-fold7/silver-shadow-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=133.3&instalmentId=12",
+      "zeitpunkt": "2026-10-11T18:30:11Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 299.0,
+      "rate": 133.3,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        39.95
+       ]
+      ],
+      "volumen_gb": 30.0
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Seite bietet speicher 512 GB nicht an",
+     "luecken": [],
+     "status": "nicht_angeboten",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Seite bietet speicher 512 GB nicht an",
+     "luecken": [],
+     "status": "nicht_angeboten",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Seite bietet speicher 512 GB nicht an",
+     "luecken": [],
+     "status": "nicht_angeboten",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 10.0,
+    "anfragen": 96,
+    "beendet": 93,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "onebot-webfrontend.oneai.yo-digital.com": 1,
+     "www.telekom.de": 2
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 133.7,
+    "takte_ms": 1600,
+    "wartet_auf": "load"
+   },
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 0.8571428571428571,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 18,
+    "felder_gesucht": 21,
+    "knoepfe_gefunden": 21,
+    "knoepfe_gesucht": 21
+   },
+   "verworfen": 36
+  },
+  {
+   "adresse": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-15-5g/black-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
+   "geraet": "xiaomi-redmi-note-15",
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-15-5g/black-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=7.4&instalmentId=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "a5b7e50a63ca8bdcdcde68e248c0d29b08f43eb74f5081124839eca9e6c16ee0",
+      "seite": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-15-5g/black-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=7.4&instalmentId=36",
+      "zeitpunkt": "2026-10-11T18:34:03Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 7.4,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        39.95
+       ]
+      ],
+      "volumen_gb": 30.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-15-5g/black-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=11.1&instalmentId=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "c05581e0ceb19e64bf007027de5bc77d47e0acb7a489b3e877ebb8a8694b7fa3",
+      "seite": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-15-5g/black-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=11.1&instalmentId=24",
+      "zeitpunkt": "2026-10-11T18:34:21Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 11.1,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        39.95
+       ]
+      ],
+      "volumen_gb": 30.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-15-5g/black-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=22.3&instalmentId=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "32ac2e91c88afd332dca99d83998d3e31419225af506be6a4305e7b3cc427911",
+      "seite": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-15-5g/black-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=22.3&instalmentId=12",
+      "zeitpunkt": "2026-10-11T18:34:38Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil S"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 22.3,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        39.95
+       ]
+      ],
+      "volumen_gb": 30.0
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 10.0,
+    "anfragen": 93,
+    "beendet": 90,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "bf72977jfz.bf.dynatrace.com": 1,
+     "onebot-webfrontend.oneai.yo-digital.com": 1
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 134.3,
+    "takte_ms": 2300,
+    "wartet_auf": "load"
+   },
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 0.8571428571428571,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 18,
+    "felder_gesucht": 21,
+    "knoepfe_gefunden": 18,
+    "knoepfe_gesucht": 18
+   },
+   "verworfen": 58
+  },
+  {
+   "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17/lavendel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
+   "geraet": "apple-iphone-17",
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17/lavendel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=23.8&instalmentId=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "3630ce0a6e73deffaf4bc9a19498ba4b4f0f76bd58273bd26bd3a6db81f170f0",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17/lavendel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=23.8&instalmentId=36",
+      "zeitpunkt": "2026-10-11T18:37:58Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 23.8,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        59.95
+       ]
+      ],
+      "volumen_gb": 100.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17/lavendel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=35.7&instalmentId=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "4bb24e0f38c972afd758171e98235b33245ec5e2f05a03636adf40cf1f2bb649",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17/lavendel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=35.7&instalmentId=24",
+      "zeitpunkt": "2026-10-11T18:38:00Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 35.7,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        59.95
+       ]
+      ],
+      "volumen_gb": 100.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17/lavendel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=71.5&instalmentId=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "d1fbdcbcb6e1bce06167d1750f11f12f2aafefe9acf2a9cb9d81fe4dc1a2e781",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17/lavendel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=71.5&instalmentId=12",
+      "zeitpunkt": "2026-10-11T18:38:02Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 71.5,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        59.95
+       ]
+      ],
+      "volumen_gb": 100.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "ef4a9e8453a15bcec7ed9480d6716e5f1c2cada38875cd433ea4c3911508b911",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17/lavendel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=71.5&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D512_GB",
+      "zeitpunkt": "2026-10-11T18:38:05Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 99.0,
+      "rate": 28.0,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        59.95
+       ]
+      ],
+      "volumen_gb": 100.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "e24a770cac4cf6053123931fc666adc32c4b51b32c0d6ad6cb787c9e13a596d0",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17/lavendel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=42&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
+      "zeitpunkt": "2026-10-11T18:38:06Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 99.0,
+      "rate": 42.0,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        59.95
+       ]
+      ],
+      "volumen_gb": 100.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "97c2eb25f7da418c2d4e14ab2255f3734662b439ec8c16c17136b0e33ed28fae",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17/lavendel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=84.1&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
+      "zeitpunkt": "2026-10-11T18:38:08Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 99.0,
+      "rate": 84.1,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        59.95
+       ]
+      ],
+      "volumen_gb": 100.0
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 10.0,
+    "anfragen": 166,
+    "beendet": 163,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "bf72977jfz.bf.dynatrace.com": 2,
+     "onebot-webfrontend.oneai.yo-digital.com": 1
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 134.9,
+    "takte_ms": 1650,
+    "wartet_auf": "load"
+   },
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 0.8571428571428571,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 36,
+    "felder_gesucht": 42,
+    "knoepfe_gefunden": 36,
+    "knoepfe_gesucht": 36
+   },
+   "verworfen": 49
+  },
+  {
+   "adresse": "https://www.telekom.de/shop/geraet/google/google-pixel-10a/lavender-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
+   "geraet": "google-pixel-10a",
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/google/google-pixel-10a/lavender-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=9.1&instalmentId=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "128 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "e5a767381f67c6cb892c43f64827f5ee9eb27ac521b15e0ef9b245eab744b1da",
+      "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-10a/lavender-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=9.1&instalmentId=36",
+      "zeitpunkt": "2026-10-11T18:41:27Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "128 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 9.1,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        59.95
+       ]
+      ],
+      "volumen_gb": 100.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/google/google-pixel-10a/lavender-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=13.6&instalmentId=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "128 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "d0da35da533d2519cb813b36366f5613905c5e73b5f82e55ef8b5dd66763a82a",
+      "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-10a/lavender-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=13.6&instalmentId=24",
+      "zeitpunkt": "2026-10-11T18:41:29Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "128 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 13.6,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        59.95
+       ]
+      ],
+      "volumen_gb": 100.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/google/google-pixel-10a/lavender-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=27.3&instalmentId=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "128 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "2a79bf72922497f27b34927bd8a813fe289d04d939c9443b7eb54e6e964a32de",
+      "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-10a/lavender-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=27.3&instalmentId=12",
+      "zeitpunkt": "2026-10-11T18:41:31Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "128 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 27.3,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        59.95
+       ]
+      ],
+      "volumen_gb": 100.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "5a3f53e50910c6e2b97ee1a120a82ec2dd72e2d423a62faa6b2a9e850a9289ef",
+      "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-10a/lavender-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=27.3&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D256_GB",
+      "zeitpunkt": "2026-10-11T18:41:34Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 11.8,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        59.95
+       ]
+      ],
+      "volumen_gb": 100.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "3fc0c8adb8e73789d19a2f3e100249500f6650faf5e36d484a1d10a1bb1778ae",
+      "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-10a/lavender-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=17.8&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D256_GB",
+      "zeitpunkt": "2026-10-11T18:41:36Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 17.8,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        59.95
+       ]
+      ],
+      "volumen_gb": 100.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "383cda7ecbfc969e8e95045434b4c70b747639193fd9b64e92255a91b7db5e00",
+      "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-10a/lavender-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=35.6&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D256_GB",
+      "zeitpunkt": "2026-10-11T18:41:38Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 35.6,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        59.95
+       ]
+      ],
+      "volumen_gb": 100.0
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 10.0,
+    "anfragen": 98,
+    "beendet": 94,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "bf72977jfz.bf.dynatrace.com": 2,
+     "onebot-webfrontend.oneai.yo-digital.com": 1,
+     "www.telekom.de": 1
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 134.0,
+    "takte_ms": 1650,
+    "wartet_auf": "load"
+   },
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 0.8571428571428571,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 36,
+    "felder_gesucht": 42,
+    "knoepfe_gefunden": 36,
+    "knoepfe_gesucht": 36
+   },
+   "verworfen": 49
+  },
+  {
+   "adresse": "https://www.telekom.de/shop/geraet/motorola/motorola-razr-fold-fifa-edition/pantone-blackened-blue-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
+   "geraet": "motorola-razr-fold-fifa-edition",
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/motorola/motorola-razr-fold-fifa-edition/pantone-blackened-blue-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=44.7&instalmentId=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "e0d7201009c18db864dba42e20e41b6c06b64ea9488c4054131992652dfd127e",
+      "seite": "https://www.telekom.de/shop/geraet/motorola/motorola-razr-fold-fifa-edition/pantone-blackened-blue-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=44.7&instalmentId=36",
+      "zeitpunkt": "2026-10-11T18:44:57Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 399.0,
+      "rate": 44.7,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        59.95
+       ]
+      ],
+      "volumen_gb": 100.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/motorola/motorola-razr-fold-fifa-edition/pantone-blackened-blue-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=67&instalmentId=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "01fb4ff4816f0ab722ff03d6164ac958776e5eb6688fd2a0003aa547b6dc3de1",
+      "seite": "https://www.telekom.de/shop/geraet/motorola/motorola-razr-fold-fifa-edition/pantone-blackened-blue-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=67&instalmentId=24",
+      "zeitpunkt": "2026-10-11T18:44:59Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 399.0,
+      "rate": 67.0,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        59.95
+       ]
+      ],
+      "volumen_gb": 100.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/motorola/motorola-razr-fold-fifa-edition/pantone-blackened-blue-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=134.1&instalmentId=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "337dd425d9f086d2682d42b951667d7e75a4fbdad3e2240c3c328c913b0ae711",
+      "seite": "https://www.telekom.de/shop/geraet/motorola/motorola-razr-fold-fifa-edition/pantone-blackened-blue-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=134.1&instalmentId=12",
+      "zeitpunkt": "2026-10-11T18:45:01Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 399.0,
+      "rate": 134.1,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        59.95
+       ]
+      ],
+      "volumen_gb": 100.0
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 10.0,
+    "anfragen": 96,
+    "beendet": 93,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "binkiesproductionweu.servicebus.windows.net": 1,
+     "onebot-webfrontend.oneai.yo-digital.com": 1,
+     "www.telekom.de": 1
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 134.2,
+    "takte_ms": 1750,
+    "wartet_auf": "load"
+   },
+   "speicher_gb": 512,
+   "sperre": null,
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 0.8571428571428571,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 18,
+    "felder_gesucht": 21,
+    "knoepfe_gefunden": 18,
+    "knoepfe_gesucht": 18
+   },
+   "verworfen": 34
+  },
+  {
+   "adresse": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25/silver-shadow-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
+   "geraet": "samsung-galaxy-s25",
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25/silver-shadow-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=18&instalmentId=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "128 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "68e293d7fd5f66bf15409d75b3acbee1136afe7e19941b641410c5c08bb7ba89",
+      "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25/silver-shadow-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=18&instalmentId=36",
+      "zeitpunkt": "2026-10-11T18:48:20Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "128 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 18.0,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        59.95
+       ]
+      ],
+      "volumen_gb": 100.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25/silver-shadow-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=27&instalmentId=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "128 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "958a00273455f5c550820bee7ee89b0441812c9f352f58cc630b0700c8274d99",
+      "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25/silver-shadow-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=27&instalmentId=24",
+      "zeitpunkt": "2026-10-11T18:48:23Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "128 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 27.0,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        59.95
+       ]
+      ],
+      "volumen_gb": 100.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25/silver-shadow-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=54&instalmentId=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "128 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "de90c5b6961d75a72de3640db21844da2227f904c031b3d76c3d2aa9d6cda8fa",
+      "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25/silver-shadow-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=54&instalmentId=12",
+      "zeitpunkt": "2026-10-11T18:48:24Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "128 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 54.0,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        59.95
+       ]
+      ],
+      "volumen_gb": 100.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "0a60c4d4ba49853fd8b71600bdc2e457c0a945a2c6dd099dd940731794621dad",
+      "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25/silver-shadow-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=54&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D256_GB",
+      "zeitpunkt": "2026-10-11T18:48:27Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 20.7,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        59.95
+       ]
+      ],
+      "volumen_gb": 100.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "0a353f6e28f4f06514cb77e43447ac278577a8fae4d6e657b597a02962965747",
+      "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25/silver-shadow-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=31.1&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D256_GB",
+      "zeitpunkt": "2026-10-11T18:48:28Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 31.1,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        59.95
+       ]
+      ],
+      "volumen_gb": 100.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "a9fbaa6ba2acc934731167b8839adac6a5f8de20e04655e6e17092add66335a7",
+      "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25/silver-shadow-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=62.3&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D256_GB",
+      "zeitpunkt": "2026-10-11T18:48:30Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 62.3,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        59.95
+       ]
+      ],
+      "volumen_gb": 100.0
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 10.0,
+    "anfragen": 99,
+    "beendet": 93,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "bf72977jfz.bf.dynatrace.com": 1,
+     "onebot-webfrontend.oneai.yo-digital.com": 1,
+     "www.telekom.de": 5
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 133.9,
+    "takte_ms": 1100,
+    "wartet_auf": "load"
+   },
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 0.8571428571428571,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 36,
+    "felder_gesucht": 42,
+    "knoepfe_gefunden": 36,
+    "knoepfe_gesucht": 36
+   },
+   "verworfen": 48
+  },
+  {
+   "adresse": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-z-fold8/cream-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
+   "geraet": "samsung-galaxy-z-fold8",
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-z-fold8/cream-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=38.3&instalmentId=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "9fd199312fb312b6c86e90b0acc69e5370d6d883b8fcd40ede3e910ee1afa2e2",
+      "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-z-fold8/cream-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=38.3&instalmentId=36",
+      "zeitpunkt": "2026-10-11T18:51:48Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 299.0,
+      "rate": 38.3,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        59.95
+       ]
+      ],
+      "volumen_gb": 100.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-z-fold8/cream-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=57.5&instalmentId=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "5e3f8995ee82565b4473baa311cef10d99c0dbfc4e4b5c6d10f4066420ead4d1",
+      "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-z-fold8/cream-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=57.5&instalmentId=24",
+      "zeitpunkt": "2026-10-11T18:51:49Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 299.0,
+      "rate": 57.5,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        59.95
+       ]
+      ],
+      "volumen_gb": 100.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-z-fold8/cream-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=115&instalmentId=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "f1f038030bed1c7e2127fe7a66e5227547fc8f4df33bac02f3a9c2cab14e84ca",
+      "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-z-fold8/cream-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=115&instalmentId=12",
+      "zeitpunkt": "2026-10-11T18:51:51Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 299.0,
+      "rate": 115.0,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        59.95
+       ]
+      ],
+      "volumen_gb": 100.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "e6826962ad56b8a58d6b203e6591551d0fdf822086cf151338035887ef877a0d",
+      "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-z-fold8/cream-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=115&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D512_GB",
+      "zeitpunkt": "2026-10-11T18:51:54Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 299.0,
+      "rate": 43.3,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        59.95
+       ]
+      ],
+      "volumen_gb": 100.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "3726335c39ce97b450fa3a3ab6601d2d1bc90519ac5d86404fcff27469e9a9f2",
+      "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-z-fold8/cream-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=65&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
+      "zeitpunkt": "2026-10-11T18:51:55Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 299.0,
+      "rate": 65.0,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        59.95
+       ]
+      ],
+      "volumen_gb": 100.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "ce62d6883b066629d2c7b426b6a73442d3d34c0b423f562ab5325d8a0b94b5f8",
+      "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-z-fold8/cream-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=130&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
+      "zeitpunkt": "2026-10-11T18:51:57Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 299.0,
+      "rate": 130.0,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        59.95
+       ]
+      ],
+      "volumen_gb": 100.0
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 10.0,
+    "anfragen": 101,
+    "beendet": 92,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "bf72977jfz.bf.dynatrace.com": 1,
+     "gallery-content.binkies3d.com": 3,
+     "www.telekom.de": 5
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 134.1,
+    "takte_ms": 1550,
+    "wartet_auf": "load"
+   },
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 0.8571428571428571,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 36,
+    "felder_gesucht": 42,
+    "knoepfe_gefunden": 36,
+    "knoepfe_gesucht": 36
+   },
+   "verworfen": 47
+  },
+  {
+   "adresse": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-17-pro-5g/black-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
+   "geraet": "xiaomi-redmi-note-17-pro",
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-17-pro-5g/black-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=5.5&instalmentId=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "9e0a520a990c4fa6fc590a0a8f6b0df013bca46a742441e110b08c4834d1d51e",
+      "seite": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-17-pro-5g/black-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=5.5&instalmentId=36",
+      "zeitpunkt": "2026-10-11T18:55:16Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 5.5,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        59.95
+       ]
+      ],
+      "volumen_gb": 100.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-17-pro-5g/black-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=8.2&instalmentId=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "488c55b71a23cee7d650de2528b6a5f7c79ef98b30e49d0eda12172b5c48a13c",
+      "seite": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-17-pro-5g/black-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=8.2&instalmentId=24",
+      "zeitpunkt": "2026-10-11T18:55:19Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 8.2,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        59.95
+       ]
+      ],
+      "volumen_gb": 100.0
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-17-pro-5g/black-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=16.5&instalmentId=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "4e2cf5e0aa55490506db19fe1032a5217fffff5f068dbfb431b4f0a015d455d1",
+      "seite": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-17-pro-5g/black-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=16.5&instalmentId=12",
+      "zeitpunkt": "2026-10-11T18:55:21Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil L"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 1.0,
+      "rate": 16.5,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        59.95
+       ]
+      ],
+      "volumen_gb": 100.0
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 10.0,
+    "anfragen": 94,
+    "beendet": 92,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "bf72977jfz.bf.dynatrace.com": 1,
+     "binkiesproductionweu.servicebus.windows.net": 1,
+     "onebot-webfrontend.oneai.yo-digital.com": 1
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 134.1,
+    "takte_ms": 1600,
+    "wartet_auf": "load"
+   },
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 0.8571428571428571,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 18,
+    "felder_gesucht": 21,
+    "knoepfe_gefunden": 18,
+    "knoepfe_gesucht": 18
+   },
+   "verworfen": 32
+  },
+  {
+   "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
+   "geraet": "apple-iphone-18-pro-max",
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=29.7&instalmentId=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XL"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "4e0b2601438a51770446973f7d3a2d4b774028e1e890bb715a6d03e9fe6171f9",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=29.7&instalmentId=36",
+      "zeitpunkt": "2026-10-11T18:58:40Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XL"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 199.0,
+      "rate": 29.7,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        84.95
+       ]
+      ],
+      "volumen_gb": "unbegrenzt"
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=44.5&instalmentId=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XL"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "0b2eea3898b3653ff79626a1012fba0c8ea17d4e4c3dbf4d8735a264e6711114",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=44.5&instalmentId=24",
+      "zeitpunkt": "2026-10-11T18:58:42Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XL"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 199.0,
+      "rate": 44.5,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        84.95
+       ]
+      ],
+      "volumen_gb": "unbegrenzt"
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=89.1&instalmentId=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XL"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "77c7808cc61953a00d04c200b8ca237d61e65d8fd496af4618f696e550b4fabd",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=89.1&instalmentId=12",
+      "zeitpunkt": "2026-10-11T18:58:44Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XL"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 199.0,
+      "rate": 89.1,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        84.95
+       ]
+      ],
+      "volumen_gb": "unbegrenzt"
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil XL"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "19abf526809a9269ab67f5e530b4d250c3d7e54ab6834df404f45ed84727c16b",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=89.1&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D512_GB",
+      "zeitpunkt": "2026-10-11T18:58:46Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil XL"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 299.0,
+      "rate": 34.1,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        84.95
+       ]
+      ],
+      "volumen_gb": "unbegrenzt"
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil XL"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "9b9e9e12a2dda7d067882b72a7cd30c6342eeacf2c0d463df918cbec69b218a5",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=51.2&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
+      "zeitpunkt": "2026-10-11T18:58:47Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil XL"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 299.0,
+      "rate": 51.2,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        84.95
+       ]
+      ],
+      "volumen_gb": "unbegrenzt"
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil XL"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "d4e34918ba7a7b1857167f8f7b02ad4d467bb1a72f5cc4b9f2a300c5ec5d97a5",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=102.5&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
+      "zeitpunkt": "2026-10-11T18:58:49Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "512 GB",
+      "tarif": "MagentaMobil XL"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 299.0,
+      "rate": 102.5,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        84.95
+       ]
+      ],
+      "volumen_gb": "unbegrenzt"
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil XL"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "e6becb01a1fb8884485215a76e3e150df5fca1b961b4e01247eafca7b59b2477",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=102.5&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D1_TB",
+      "zeitpunkt": "2026-10-11T18:58:52Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil XL"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 299.0,
+      "rate": 46.6,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        84.95
+       ]
+      ],
+      "volumen_gb": "unbegrenzt"
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil XL"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "ec2fed9dfcf1bb71a0e7353a10c1a19ea132150f11af02337a0332e180aff111",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=70&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
+      "zeitpunkt": "2026-10-11T18:58:54Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil XL"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 299.0,
+      "rate": 70.0,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        84.95
+       ]
+      ],
+      "volumen_gb": "unbegrenzt"
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil XL"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "a9b484b1c2bf94ff31f5de83dbf2892c8db7073bf9b522e7c0968e90f1f2e616",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=140&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
+      "zeitpunkt": "2026-10-11T18:58:55Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "1 TB",
+      "tarif": "MagentaMobil XL"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 299.0,
+      "rate": 140.0,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        84.95
+       ]
+      ],
+      "volumen_gb": "unbegrenzt"
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "2 TB",
+      "tarif": "MagentaMobil XL"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "3c14fa84a2232ce36cb822b0455be700da057ffdf69f9a679d27fbc7045f334f",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=140&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D2_TB",
+      "zeitpunkt": "2026-10-11T18:58:58Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "2 TB",
+      "tarif": "MagentaMobil XL"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 399.0,
+      "rate": 63.3,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        84.95
+       ]
+      ],
+      "volumen_gb": "unbegrenzt"
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "2 TB",
+      "tarif": "MagentaMobil XL"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "7d4abe7a1993aae54e1a0366911554f3d726603fe8931bee252f95ee81683d30",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=95&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D2_TB",
+      "zeitpunkt": "2026-10-11T18:59:00Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "2 TB",
+      "tarif": "MagentaMobil XL"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 399.0,
+      "rate": 95.0,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        84.95
+       ]
+      ],
+      "volumen_gb": "unbegrenzt"
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "2 TB",
+      "tarif": "MagentaMobil XL"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "3afaa1fec23d45ed36157e0a619cf0567814af0a13f7407bbebb472d1881abd5",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=190&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D2_TB",
+      "zeitpunkt": "2026-10-11T18:59:01Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "2 TB",
+      "tarif": "MagentaMobil XL"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 399.0,
+      "rate": 190.0,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        84.95
+       ]
+      ],
+      "volumen_gb": "unbegrenzt"
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 10.0,
+    "anfragen": 98,
+    "beendet": 94,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "bf72977jfz.bf.dynatrace.com": 1,
+     "onebot-webfrontend.oneai.yo-digital.com": 1,
+     "www.telekom.de": 1
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 134.0,
+    "takte_ms": 1600,
+    "wartet_auf": "load"
+   },
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 0.8571428571428571,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 72,
+    "felder_gesucht": 84,
+    "knoepfe_gefunden": 72,
+    "knoepfe_gesucht": 72
+   },
+   "verworfen": 79
+  },
+  {
+   "adresse": "https://www.telekom.de/shop/geraet/google/google-pixel-11-pro-fold/obsidian-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
+   "geraet": "google-pixel-11-pro-fold",
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/google/google-pixel-11-pro-fold/obsidian-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=33.8&instalmentId=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XL"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "58109b9085891f07f05a2e49d8297e4b89d6d0a82b7707abcf2cce3f1cf18047",
+      "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-11-pro-fold/obsidian-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=33.8&instalmentId=36",
+      "zeitpunkt": "2026-10-11T19:02:52Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XL"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 299.0,
+      "rate": 33.8,
+      "ratenzahl": 36,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        84.95
+       ]
+      ],
+      "volumen_gb": "unbegrenzt"
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/google/google-pixel-11-pro-fold/obsidian-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=50.8&instalmentId=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XL"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "d317f14edd5a93b4cdc302bb948b3e913a58be484557c7d81d2455ce1fb6fd3d",
+      "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-11-pro-fold/obsidian-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=50.8&instalmentId=24",
+      "zeitpunkt": "2026-10-11T19:03:09Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XL"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 299.0,
+      "rate": 50.8,
+      "ratenzahl": 24,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        84.95
+       ]
+      ],
+      "volumen_gb": "unbegrenzt"
+     }
+    },
+    {
+     "antwort_url": "https://www.telekom.de/shop/geraet/google/google-pixel-11-pro-fold/obsidian-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=101.6&instalmentId=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XL"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "0c26ffcc51ccd23ed510aa31af520dc107c2ece31eeff8ad5bb7ac8064717b06",
+      "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-11-pro-fold/obsidian-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=101.6&instalmentId=12",
+      "zeitpunkt": "2026-10-11T19:03:26Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XL"
+     },
+     "werte": {
+      "anschluss": 39.95,
+      "anzahlung": 299.0,
+      "rate": 101.6,
+      "ratenzahl": 12,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        84.95
+       ]
+      ],
+      "volumen_gb": "unbegrenzt"
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 10.0,
+    "anfragen": 91,
+    "beendet": 87,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "bf72977jfz.bf.dynatrace.com": 1,
+     "onebot-webfrontend.oneai.yo-digital.com": 1,
+     "www.telekom.de": 2
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 133.9,
+    "takte_ms": 1650,
+    "wartet_auf": "load"
+   },
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 0.8571428571428571,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 18,
+    "felder_gesucht": 21,
+    "knoepfe_gefunden": 18,
+    "knoepfe_gesucht": 18
+   },
+   "verworfen": 62
+  },
+  {
+   "adresse": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-a36-5g/awesome-black-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
+   "geraet": "samsung-galaxy-a36",
+   "gescheitert": 0,
+   "grund": "Strukturbruch: nur 40 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": null,
+      "speicher": "128 GB",
+      "tarif": "MagentaMobil XL"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Knöpfe für laufzeit nicht gefunden (#dyt_productViewDesktop button.dt_filterChips[role=\"radio\"][aria-label*=\" Monate\"])",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "128 GB",
+      "tarif": "MagentaMobil XL"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": null,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XL"
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Knöpfe für laufzeit nicht gefunden (#dyt_productViewDesktop button.dt_filterChips[role=\"radio\"][aria-label*=\" Monate\"])",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": null,
+      "speicher": "256 GB",
+      "tarif": "MagentaMobil XL"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 10.0,
+    "anfragen": 104,
+    "beendet": 101,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "bf72977jfz.bf.dynatrace.com": 1,
+     "onebot-webfrontend.oneai.yo-digital.com": 1,
+     "www.telekom.de": 1
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 133.6,
+    "takte_ms": 1600,
+    "wartet_auf": "load"
+   },
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "gestoert",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": 0.4,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 2,
+    "knoepfe_gesucht": 5
+   },
+   "verworfen": 22
+  },
+  {
+   "adresse": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-xcover7-pro-enterprise-edition/black-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
+   "geraet": "samsung-galaxy-xcover7-pro-ee",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 40 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-15-proplus-5g/glacier-blue-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
+   "geraet": "xiaomi-redmi-note-15-pro-plus",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 40 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false",
+   "geraet": "apple-iphone-18-pro-max",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 40 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-16e/weiss-128-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false",
+   "geraet": "apple-iphone-16e",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 40 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-15-proplus-5g/glacier-blue-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false",
+   "geraet": "xiaomi-redmi-note-15-pro-plus",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 40 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25/silver-shadow-128-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false",
+   "geraet": "samsung-galaxy-s25",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 40 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-a26-5g/black-128-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false",
+   "geraet": "samsung-galaxy-a26",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 40 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  }
+ ],
+ "ueberfaellig": [
+  "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false",
+  "https://www.telekom.de/shop/geraet/apple/apple-iphone-16e/weiss-128-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false",
+  "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-a36-5g/awesome-black-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
+  "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-xcover7-pro-enterprise-edition/black-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
+  "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-15-proplus-5g/glacier-blue-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones"
+ ],
+ "uebersichten": [],
+ "vertragsform": "tarif_plus_ratenkauf",
+ "zeitbudget_sekunden": 10280
+}

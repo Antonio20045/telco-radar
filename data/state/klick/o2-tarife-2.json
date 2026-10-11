@@ -1,0 +1,3961 @@
+{
+ "anbieter": "o2-tarife-2",
+ "datum": "2026-10-11",
+ "dauer_sekunden": 336.1,
+ "format": 1,
+ "frischegrenze_tage": 3,
+ "grund": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-256gb-burgunder-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special: Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+ "karte": "o2-tarife.yaml",
+ "laufstatus": "gestoert",
+ "lesefrist_tage": 1,
+ "name": "o2",
+ "seiten": [
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-plus-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "apple-iphone-15-plus",
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://www.o2online.de/e-shop/apple/apple-iphone-15-plus-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "128 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "befunde": [
+      {
+       "feld": "volumen_gb",
+       "grund": "fehlt im Text, Antwort 30,00"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "f9a2c91e17b1edc08125d8731f45904cd71bc7f7be0d46b0a394c8c04df8da06",
+      "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-15-plus-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+      "zeitpunkt": "2026-10-11T17:50:15Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 30,00",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "128 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "werte": {
+      "anschluss": 0.0,
+      "anzahlung": 1.0,
+      "rate": 26.0,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        14.99
+       ],
+       [
+        25,
+        null,
+        29.99
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtMTUtcGx1cy0xMjhnYi1zY2h3YXJ6LTI0eGhpZ2g7dGFyaWZmPW8yc2hvcDo6cHJpdmF0a3VuZGVuLW8yLW1vYmlsZS1zcGVjaWFsLW9ubGluZTtwYWNrcz11bXRzLW9wdGlvbg==",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "128 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "befunde": [
+      {
+       "feld": "volumen_gb",
+       "grund": "fehlt im Text, Antwort 30,00"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "256966561bf4d90943a291ee1058ebf50731e3bb2a2d751d49d6f30170bbd609",
+      "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-15-plus-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+      "zeitpunkt": "2026-10-11T17:50:18Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 30,00",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "128 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "werte": {
+      "anschluss": 0.0,
+      "anzahlung": 1.0,
+      "rate": 39.0,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        14.99
+       ]
+      ],
+      "volumen_gb": null
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 2.0,
+    "anfragen": 137,
+    "beendet": 137,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {},
+    "ohne_antwort_ms": 0,
+    "sekunden": 15.5,
+    "takte_ms": 8000,
+    "wartet_auf": "load"
+   },
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 0.8571428571428571,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 12,
+    "felder_gesucht": 14,
+    "knoepfe_gefunden": 12,
+    "knoepfe_gesucht": 12
+   },
+   "verworfen": 4
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-128gb-titan-natur-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "apple-iphone-15-pro",
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-128gb-titan-natur-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "128 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "befunde": [
+      {
+       "feld": "volumen_gb",
+       "grund": "fehlt im Text, Antwort 30,00"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "286531cf8f9f380786f0a8214c6d91993c38cb6870d942f54b6abc7bdd1bf874",
+      "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-128gb-titan-natur-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+      "zeitpunkt": "2026-10-11T17:50:46Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 30,00",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "128 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "werte": {
+      "anschluss": 0.0,
+      "anzahlung": 1.0,
+      "rate": 34.0,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        14.99
+       ],
+       [
+        25,
+        null,
+        29.99
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtMTUtcHJvLTEyOGdiLXRpdGFuLW5hdHVyLTI0eGhpZ2g7dGFyaWZmPW8yc2hvcDo6cHJpdmF0a3VuZGVuLW8yLW1vYmlsZS1zcGVjaWFsLW9ubGluZTtwYWNrcz11bXRzLW9wdGlvbg==",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "128 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "befunde": [
+      {
+       "feld": "volumen_gb",
+       "grund": "fehlt im Text, Antwort 30,00"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "4d16e9f58b16a99dd82a9565f3b1d56161134a98694910af7e2d5ec716e10818",
+      "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-128gb-titan-natur-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+      "zeitpunkt": "2026-10-11T17:50:49Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 30,00",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "128 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "werte": {
+      "anschluss": 0.0,
+      "anzahlung": 1.0,
+      "rate": 51.0,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        14.99
+       ]
+      ],
+      "volumen_gb": null
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 2.0,
+    "anfragen": 137,
+    "beendet": 136,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "api-v4.trbo.com": 1
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 11.5,
+    "takte_ms": 7000,
+    "wartet_auf": "load"
+   },
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 0.8571428571428571,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 12,
+    "felder_gesucht": 14,
+    "knoepfe_gefunden": 12,
+    "knoepfe_gesucht": 12
+   },
+   "verworfen": 4
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-max-256gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "apple-iphone-15-pro-max",
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-max-256gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "befunde": [
+      {
+       "feld": "volumen_gb",
+       "grund": "fehlt im Text, Antwort 30,00"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "eecd09d41619c9a833c5fad430e322d67eb69a0411601a0ed5f61fccc1408cc6",
+      "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-max-256gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+      "zeitpunkt": "2026-10-11T17:51:17Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 30,00",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "werte": {
+      "anschluss": 0.0,
+      "anzahlung": 37.0,
+      "rate": 40.0,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        14.99
+       ],
+       [
+        25,
+        null,
+        29.99
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtMTUtcHJvLW1heC0yNTZnYi10aXRhbi1zY2h3YXJ6LTI0eGhpZ2g7dGFyaWZmPW8yc2hvcDo6cHJpdmF0a3VuZGVuLW8yLW1vYmlsZS1zcGVjaWFsLW9ubGluZTtwYWNrcz11bXRzLW9wdGlvbg==",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "befunde": [
+      {
+       "feld": "volumen_gb",
+       "grund": "fehlt im Text, Antwort 30,00"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "e2f3402ecf2393b850c7725d13070be137ed9334fd4b2d93cc6cf5db55f938f7",
+      "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-max-256gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+      "zeitpunkt": "2026-10-11T17:51:20Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 30,00",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "werte": {
+      "anschluss": 0.0,
+      "anzahlung": 49.0,
+      "rate": 59.5,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        14.99
+       ]
+      ],
+      "volumen_gb": null
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 2.0,
+    "anfragen": 134,
+    "beendet": 127,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "library.telefonica.de": 6,
+     "www.o2online.de": 1
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 10.2,
+    "takte_ms": 6000,
+    "wartet_auf": "load"
+   },
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 0.8571428571428571,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 12,
+    "felder_gesucht": 14,
+    "knoepfe_gefunden": 12,
+    "knoepfe_gesucht": 12
+   },
+   "verworfen": 4
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "apple-iphone-16",
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://www.o2online.de/e-shop/apple/apple-iphone-16-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "128 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "befunde": [
+      {
+       "feld": "volumen_gb",
+       "grund": "fehlt im Text, Antwort 30,00"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "58aa3ba7a13b753f080097f37cabc8a44380cd1fc417e1b2804344c25f7e6459",
+      "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-16-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+      "zeitpunkt": "2026-10-11T17:51:49Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 30,00",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "128 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "werte": {
+      "anschluss": 0.0,
+      "anzahlung": 1.0,
+      "rate": 29.0,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        14.99
+       ],
+       [
+        25,
+        null,
+        29.99
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtMTYtMTI4Z2ItcGluay0yNHhoaWdoO3RhcmlmZj1vMnNob3A6OnByaXZhdGt1bmRlbi1vMi1tb2JpbGUtc3BlY2lhbC1vbmxpbmU7cGFja3M9dW10cy1vcHRpb24=",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "128 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "befunde": [
+      {
+       "feld": "volumen_gb",
+       "grund": "fehlt im Text, Antwort 30,00"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "ccb5a54f8003358f3b6eee2bed3d932e8578cc6c60975fca7dc74231b49f538d",
+      "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-16-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+      "zeitpunkt": "2026-10-11T17:51:52Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 30,00",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "128 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "werte": {
+      "anschluss": 0.0,
+      "anzahlung": 1.0,
+      "rate": 43.5,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        14.99
+       ]
+      ],
+      "volumen_gb": null
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 2.0,
+    "anfragen": 140,
+    "beendet": 138,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "library.telefonica.de": 2
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 11.2,
+    "takte_ms": 6900,
+    "wartet_auf": "load"
+   },
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 0.8571428571428571,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 12,
+    "felder_gesucht": 14,
+    "knoepfe_gefunden": 12,
+    "knoepfe_gesucht": 12
+   },
+   "verworfen": 4
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-plus-128gb-ultramarin-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "apple-iphone-16-plus",
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://www.o2online.de/e-shop/apple/apple-iphone-16-plus-128gb-ultramarin-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "128 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "befunde": [
+      {
+       "feld": "volumen_gb",
+       "grund": "fehlt im Text, Antwort 30,00"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "29a5215a21f9274cf9f47310936743a964262a784c546d6d5ede3d7e807485ef",
+      "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-16-plus-128gb-ultramarin-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+      "zeitpunkt": "2026-10-11T17:52:21Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 30,00",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "128 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "werte": {
+      "anschluss": 0.0,
+      "anzahlung": 1.0,
+      "rate": 27.5,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        14.99
+       ],
+       [
+        25,
+        null,
+        29.99
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtMTYtcGx1cy0xMjhnYi11bHRyYW1hcmluLTI0eGhpZ2g7dGFyaWZmPW8yc2hvcDo6cHJpdmF0a3VuZGVuLW8yLW1vYmlsZS1zcGVjaWFsLW9ubGluZTtwYWNrcz11bXRzLW9wdGlvbg==",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "128 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "befunde": [
+      {
+       "feld": "volumen_gb",
+       "grund": "fehlt im Text, Antwort 30,00"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "aca357286d947d496feffe8523bfaec1e30750802f4968cc4d8bb2ac2c7d57f4",
+      "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-16-plus-128gb-ultramarin-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+      "zeitpunkt": "2026-10-11T17:52:24Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 30,00",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "128 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "werte": {
+      "anschluss": 0.0,
+      "anzahlung": 7.0,
+      "rate": 41.0,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        14.99
+       ]
+      ],
+      "volumen_gb": null
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 2.0,
+    "anfragen": 137,
+    "beendet": 137,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {},
+    "ohne_antwort_ms": 0,
+    "sekunden": 11.1,
+    "takte_ms": 6750,
+    "wartet_auf": "load"
+   },
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 0.8571428571428571,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 12,
+    "felder_gesucht": 14,
+    "knoepfe_gefunden": 12,
+    "knoepfe_gesucht": 12
+   },
+   "verworfen": 4
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-128gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "apple-iphone-16-pro",
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-128gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "128 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "befunde": [
+      {
+       "feld": "volumen_gb",
+       "grund": "fehlt im Text, Antwort 30,00"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "9a4693c6440d7219bda22ea7e0a6eed19376e41bfb8130662884b2021f1ed67b",
+      "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-128gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+      "zeitpunkt": "2026-10-11T17:52:53Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 30,00",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "128 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "werte": {
+      "anschluss": 0.0,
+      "anzahlung": 1.0,
+      "rate": 35.0,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        14.99
+       ],
+       [
+        25,
+        null,
+        29.99
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtMTYtcHJvLTEyOGdiLXRpdGFuLXNjaHdhcnotMjR4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLXNwZWNpYWwtb25saW5lO3BhY2tzPXVtdHMtb3B0aW9u",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "128 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "befunde": [
+      {
+       "feld": "volumen_gb",
+       "grund": "fehlt im Text, Antwort 30,00"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "c49246bae91e316929c26a6a0bf68b802debdbfde145067afd3dd6d2bdf4a63f",
+      "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-128gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+      "zeitpunkt": "2026-10-11T17:52:55Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 30,00",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "128 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "werte": {
+      "anschluss": 0.0,
+      "anzahlung": 25.0,
+      "rate": 51.5,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        14.99
+       ]
+      ],
+      "volumen_gb": null
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 2.0,
+    "anfragen": 138,
+    "beendet": 138,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {},
+    "ohne_antwort_ms": 0,
+    "sekunden": 11.3,
+    "takte_ms": 7850,
+    "wartet_auf": "load"
+   },
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 0.8571428571428571,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 12,
+    "felder_gesucht": 14,
+    "knoepfe_gefunden": 12,
+    "knoepfe_gesucht": 12
+   },
+   "verworfen": 4
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-max-256gb-titan-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "apple-iphone-16-pro-max",
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-max-256gb-titan-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "befunde": [
+      {
+       "feld": "volumen_gb",
+       "grund": "fehlt im Text, Antwort 30,00"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "26359e349a7d9f22ea6f0c98d2824e72c6df93969f12d4d22ed9146ba05256ea",
+      "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-max-256gb-titan-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+      "zeitpunkt": "2026-10-11T17:53:24Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 30,00",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "werte": {
+      "anschluss": 0.0,
+      "anzahlung": 1.0,
+      "rate": 42.0,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        14.99
+       ],
+       [
+        25,
+        null,
+        29.99
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtMTYtcHJvLW1heC0yNTZnYi10aXRhbi13ZWlzcy0yNHhoaWdoO3RhcmlmZj1vMnNob3A6OnByaXZhdGt1bmRlbi1vMi1tb2JpbGUtc3BlY2lhbC1vbmxpbmU7cGFja3M9dW10cy1vcHRpb24=",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "befunde": [
+      {
+       "feld": "volumen_gb",
+       "grund": "fehlt im Text, Antwort 30,00"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "110ff9f5065871a319be68049e64994e39833f69389179d27861f943ee0a1744",
+      "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-max-256gb-titan-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+      "zeitpunkt": "2026-10-11T17:53:28Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 30,00",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "werte": {
+      "anschluss": 0.0,
+      "anzahlung": 1.0,
+      "rate": 63.0,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        14.99
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtMTYtcHJvLW1heC01MTJnYi10aXRhbi13ZWlzcy0zNnhoaWdoO3RhcmlmZj1vMnNob3A6OnByaXZhdGt1bmRlbi1vMi1tb2JpbGUtc3BlY2lhbC1vbmxpbmU7cGFja3M9dW10cy1vcHRpb24=",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "befunde": [
+      {
+       "feld": "volumen_gb",
+       "grund": "fehlt im Text, Antwort 30,00"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "8699f587e793fb9e2b7201892d448c7a239776a952c408b18b1dba382beb2261",
+      "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-max-256gb-titan-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+      "zeitpunkt": "2026-10-11T17:53:34Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 30,00",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "werte": {
+      "anschluss": 0.0,
+      "anzahlung": 1.0,
+      "rate": 49.0,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        14.99
+       ],
+       [
+        25,
+        null,
+        29.99
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtMTYtcHJvLW1heC01MTJnYi10aXRhbi13ZWlzcy0yNHhoaWdoO3RhcmlmZj1vMnNob3A6OnByaXZhdGt1bmRlbi1vMi1tb2JpbGUtc3BlY2lhbC1vbmxpbmU7cGFja3M9dW10cy1vcHRpb24=",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "befunde": [
+      {
+       "feld": "volumen_gb",
+       "grund": "fehlt im Text, Antwort 30,00"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "5f2c6de226fc2c22727c692be61aea3ec2f6633fed0352c64bfd311c8bc81f56",
+      "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-max-256gb-titan-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+      "zeitpunkt": "2026-10-11T17:53:38Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 30,00",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "werte": {
+      "anschluss": 0.0,
+      "anzahlung": 1.0,
+      "rate": 73.5,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        14.99
+       ]
+      ],
+      "volumen_gb": null
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 2.0,
+    "anfragen": 135,
+    "beendet": 129,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "library.telefonica.de": 5,
+     "www.o2online.de": 1
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 11.3,
+    "takte_ms": 6450,
+    "wartet_auf": "load"
+   },
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 0.8571428571428571,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 24,
+    "felder_gesucht": 28,
+    "knoepfe_gefunden": 24,
+    "knoepfe_gesucht": 24
+   },
+   "verworfen": 4
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16e-128gb-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "apple-iphone-16e",
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://www.o2online.de/e-shop/apple/apple-iphone-16e-128gb-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "128 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "befunde": [
+      {
+       "feld": "volumen_gb",
+       "grund": "fehlt im Text, Antwort 30,00"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "28ae15223f07b6b1eb9499b79b925c67c23a4791a521e264d9d1ff8ef28db132",
+      "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-16e-128gb-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+      "zeitpunkt": "2026-10-11T17:54:06Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 30,00",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "128 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "werte": {
+      "anschluss": 0.0,
+      "anzahlung": 1.0,
+      "rate": 19.5,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        14.99
+       ],
+       [
+        25,
+        null,
+        29.99
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtMTZlLTEyOGdiLXNjaHdhcnotMjR4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLXNwZWNpYWwtb25saW5lO3BhY2tzPXVtdHMtb3B0aW9u",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "128 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "befunde": [
+      {
+       "feld": "volumen_gb",
+       "grund": "fehlt im Text, Antwort 30,00"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "ba1660ade08cfe2e77f26142da5f1491e3d43fab60e5005b7c76ad0fb3c63156",
+      "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-16e-128gb-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+      "zeitpunkt": "2026-10-11T17:54:09Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 30,00",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "128 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "werte": {
+      "anschluss": 0.0,
+      "anzahlung": 7.0,
+      "rate": 29.0,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        14.99
+       ]
+      ],
+      "volumen_gb": null
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 2.0,
+    "anfragen": 138,
+    "beendet": 136,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "library.telefonica.de": 2
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 10.8,
+    "takte_ms": 7550,
+    "wartet_auf": "load"
+   },
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 0.8571428571428571,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 12,
+    "felder_gesucht": 14,
+    "knoepfe_gefunden": 12,
+    "knoepfe_gesucht": 12
+   },
+   "verworfen": 4
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17e-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "apple-iphone-17e",
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://www.o2online.de/e-shop/apple/apple-iphone-17e-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "befunde": [
+      {
+       "feld": "volumen_gb",
+       "grund": "fehlt im Text, Antwort 30,00"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "071cfc6216ab4939d990c50d51827eedbf8b79899503c9dbcaa99f8b29c21a6a",
+      "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-17e-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+      "zeitpunkt": "2026-10-11T17:54:36Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 30,00",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "werte": {
+      "anschluss": 0.0,
+      "anzahlung": 1.0,
+      "rate": 23.5,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        14.99
+       ],
+       [
+        25,
+        null,
+        29.99
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtMTdlLTI1NmdiLXNjaHdhcnotMjR4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLXNwZWNpYWwtb25saW5lO3BhY2tzPXVtdHMtb3B0aW9u",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "befunde": [
+      {
+       "feld": "volumen_gb",
+       "grund": "fehlt im Text, Antwort 30,00"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "b63fd87bb241140fd35e07e3ca2551196109e6f0ae584cf70ad090100e6a3ea2",
+      "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-17e-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+      "zeitpunkt": "2026-10-11T17:54:40Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 30,00",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "werte": {
+      "anschluss": 0.0,
+      "anzahlung": 7.0,
+      "rate": 35.0,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        14.99
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtMTdlLTUxMmdiLXNjaHdhcnotMzZ4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLXNwZWNpYWwtb25saW5lO3BhY2tzPXVtdHMtb3B0aW9u",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "befunde": [
+      {
+       "feld": "volumen_gb",
+       "grund": "fehlt im Text, Antwort 30,00"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "2d3015c08903257cb473bbd6ca8007acd3ee994c282aec264f3f3ca949df2666",
+      "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-17e-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+      "zeitpunkt": "2026-10-11T17:54:46Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 30,00",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "werte": {
+      "anschluss": 0.0,
+      "anzahlung": 13.0,
+      "rate": 30.0,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        14.99
+       ],
+       [
+        25,
+        null,
+        29.99
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtMTdlLTUxMmdiLXNjaHdhcnotMjR4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLXNwZWNpYWwtb25saW5lO3BhY2tzPXVtdHMtb3B0aW9u",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "befunde": [
+      {
+       "feld": "volumen_gb",
+       "grund": "fehlt im Text, Antwort 30,00"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "64aabf9d9c17343b44a245f45be3ceb2f4878f0bf7b40db3ec165fd1d482c116",
+      "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-17e-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+      "zeitpunkt": "2026-10-11T17:54:48Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 30,00",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "werte": {
+      "anschluss": 0.0,
+      "anzahlung": 1.0,
+      "rate": 45.5,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        14.99
+       ]
+      ],
+      "volumen_gb": null
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 2.0,
+    "anfragen": 140,
+    "beendet": 134,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "library.telefonica.de": 5,
+     "www.o2online.de": 1
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 10.1,
+    "takte_ms": 6600,
+    "wartet_auf": "load"
+   },
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 0.8571428571428571,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 24,
+    "felder_gesucht": 28,
+    "knoepfe_gefunden": 24,
+    "knoepfe_gesucht": 24
+   },
+   "verworfen": 4
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-256gb-burgunder-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "apple-iphone-18-pro",
+   "gescheitert": 0,
+   "grund": "Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": null
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": null
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": null
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": null
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": null
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": null
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": null
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": null
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "1 TB",
+      "tarif": null
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "1 TB",
+      "tarif": null
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "1 TB",
+      "tarif": null
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "1 TB",
+      "tarif": null
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "2 TB",
+      "tarif": null
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "2 TB",
+      "tarif": null
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": null,
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "2 TB",
+      "tarif": null
+     },
+     "befunde": [],
+     "beleg": null,
+     "beleg_status": "ohne_wert",
+     "buendel": null,
+     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
+     "luecken": [],
+     "status": "nicht_erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "2 TB",
+      "tarif": null
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 2.0,
+    "anfragen": 143,
+    "beendet": 143,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {},
+    "ohne_antwort_ms": 0,
+    "sekunden": 11.4,
+    "takte_ms": 7700,
+    "wartet_auf": "load"
+   },
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "gestoert",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": 0.18181818181818182,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 2,
+    "knoepfe_gesucht": 11
+   },
+   "verworfen": 4
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-max-256gb-polar-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "apple-iphone-18-pro-max",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-air-256gb-himmelblau-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "apple-iphone-air",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/fairphone/fairphone-6-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "fairphone-6",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "google-pixel-10",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10-pro-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "google-pixel-10-pro",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10a-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "google-pixel-10a",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-256gb-canyon-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "google-pixel-11-pro",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-fold-256gb-olive-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "google-pixel-11-pro-fold",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-xl-256gb-canyon-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "google-pixel-11-pro-xl",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-3-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "nothing-phone-3",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-4a-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "nothing-phone-4a",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-4a-pro-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "nothing-phone-4a-pro",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a17-128gb-5g-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "samsung-galaxy-a17",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a27-5g-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "samsung-galaxy-a27",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a37-128gb-awesome-charcoal-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "samsung-galaxy-a37",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a56-128gb-awesome-graphite-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "samsung-galaxy-a56",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a57-128gb-awesome-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "samsung-galaxy-a57",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s23-128gb-pink-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "samsung-galaxy-s23",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s24-128gb-onyx-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "samsung-galaxy-s24",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s24-ultra-256gb-titanium-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "samsung-galaxy-s24-ultra",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-128gb-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "samsung-galaxy-s25",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-fe-128gb-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "samsung-galaxy-s25-fe",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "samsung-galaxy-s25-ultra",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-fe-128gb-pistachio-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "samsung-galaxy-s26-fe",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-plus-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "samsung-galaxy-s26-plus",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-flip8-256gb-pink-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "samsung-galaxy-z-flip8",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-fold8-256gb-lavender-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "samsung-galaxy-z-fold8",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-fold8-ultra-256gb-violet-shadow-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "samsung-galaxy-z-fold8-ultra",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17-512gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "xiaomi-17",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 512,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17-ultra-512gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "xiaomi-17-ultra",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 512,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17t-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "xiaomi-17t",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17t-pro-512gb-violett-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "xiaomi-17t-pro",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 512,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-17-128gb-blue-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "xiaomi-redmi-17",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-15-pro-256gb-schwarz-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "xiaomi-redmi-note-15-pro",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-128gb-purple-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "xiaomi-redmi-note-17",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-pro-256gb-blue-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "xiaomi-redmi-note-17-pro",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-pro-max-256gb-cloud-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "xiaomi-redmi-note-17-pro-max",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "apple-iphone-17-pro",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "samsung-galaxy-s26",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "apple-iphone-17",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-max-256gb-cosmic-orange-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "apple-iphone-17-pro-max",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ultra-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "samsung-galaxy-s26-ultra",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-256gb-frost-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "google-pixel-11",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-128gb-mitternacht-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "apple-iphone-14",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-pro-128gb-dunkellila-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "apple-iphone-14-pro",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-pro-max-512gb-gold-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "apple-iphone-14-pro-max",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 512,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "apple-iphone-15",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-plus-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "apple-iphone-15-plus",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-128gb-titan-natur-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "apple-iphone-15-pro",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-max-256gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "apple-iphone-15-pro-max",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "apple-iphone-16",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-plus-128gb-ultramarin-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "apple-iphone-16-plus",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-128gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "apple-iphone-16-pro",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-max-256gb-titan-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "apple-iphone-16-pro-max",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16e-128gb-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "apple-iphone-16e",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17e-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "apple-iphone-17e",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-256gb-burgunder-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "apple-iphone-18-pro",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-max-256gb-polar-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "apple-iphone-18-pro-max",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-air-256gb-himmelblau-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "apple-iphone-air",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/fairphone/fairphone-6-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "fairphone-6",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "google-pixel-10",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10-pro-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "google-pixel-10-pro",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10a-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "google-pixel-10a",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-256gb-canyon-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "google-pixel-11-pro",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-fold-256gb-olive-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "google-pixel-11-pro-fold",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-xl-256gb-canyon-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "google-pixel-11-pro-xl",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-3-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "nothing-phone-3",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-4a-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "nothing-phone-4a",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-4a-pro-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "nothing-phone-4a-pro",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a17-128gb-5g-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "samsung-galaxy-a17",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a27-5g-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "samsung-galaxy-a27",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a37-128gb-awesome-charcoal-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "samsung-galaxy-a37",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a56-128gb-awesome-graphite-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "samsung-galaxy-a56",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a57-128gb-awesome-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "samsung-galaxy-a57",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s23-128gb-pink-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "samsung-galaxy-s23",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s24-128gb-onyx-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "samsung-galaxy-s24",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s24-ultra-256gb-titanium-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "samsung-galaxy-s24-ultra",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-128gb-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "samsung-galaxy-s25",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-fe-128gb-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "samsung-galaxy-s25-fe",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "samsung-galaxy-s25-ultra",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-fe-128gb-pistachio-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "samsung-galaxy-s26-fe",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-plus-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "samsung-galaxy-s26-plus",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-flip8-256gb-pink-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "samsung-galaxy-z-flip8",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-fold8-256gb-lavender-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "samsung-galaxy-z-fold8",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-fold8-ultra-256gb-violet-shadow-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "samsung-galaxy-z-fold8-ultra",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17-512gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "xiaomi-17",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 512,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17-ultra-512gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "xiaomi-17-ultra",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 512,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17t-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "xiaomi-17t",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17t-pro-512gb-violett-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "xiaomi-17t-pro",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 512,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-17-128gb-blue-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "xiaomi-redmi-17",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-15-pro-256gb-schwarz-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "xiaomi-redmi-note-15-pro",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-128gb-purple-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "xiaomi-redmi-note-17",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-pro-256gb-blue-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "xiaomi-redmi-note-17-pro",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-pro-max-256gb-cloud-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "xiaomi-redmi-note-17-pro-max",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "apple-iphone-17-pro",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "samsung-galaxy-s26",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "apple-iphone-17",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-max-256gb-cosmic-orange-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "apple-iphone-17-pro-max",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ultra-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "samsung-galaxy-s26-ultra",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-256gb-frost-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "google-pixel-11",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-128gb-mitternacht-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "apple-iphone-14",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-pro-128gb-dunkellila-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "apple-iphone-14-pro",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-pro-max-512gb-gold-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "apple-iphone-14-pro-max",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 512,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "apple-iphone-15",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-plus-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "apple-iphone-15-plus",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-128gb-titan-natur-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "apple-iphone-15-pro",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-max-256gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "apple-iphone-15-pro-max",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "apple-iphone-16",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-plus-128gb-ultramarin-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "apple-iphone-16-plus",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-128gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "apple-iphone-16-pro",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-max-256gb-titan-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "apple-iphone-16-pro-max",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16e-128gb-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "apple-iphone-16e",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17e-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "apple-iphone-17e",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-256gb-burgunder-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "apple-iphone-18-pro",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-max-256gb-polar-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "apple-iphone-18-pro-max",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-air-256gb-himmelblau-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "apple-iphone-air",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/fairphone/fairphone-6-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "fairphone-6",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "google-pixel-10",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10-pro-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "google-pixel-10-pro",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10a-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "google-pixel-10a",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-256gb-canyon-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "google-pixel-11-pro",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-fold-256gb-olive-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "google-pixel-11-pro-fold",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-xl-256gb-canyon-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "google-pixel-11-pro-xl",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-3-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "nothing-phone-3",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-4a-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "nothing-phone-4a",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-4a-pro-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "nothing-phone-4a-pro",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a17-128gb-5g-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "samsung-galaxy-a17",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a27-5g-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "samsung-galaxy-a27",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a37-128gb-awesome-charcoal-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "samsung-galaxy-a37",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a56-128gb-awesome-graphite-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "samsung-galaxy-a56",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a57-128gb-awesome-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "samsung-galaxy-a57",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s23-128gb-pink-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "samsung-galaxy-s23",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s24-128gb-onyx-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "samsung-galaxy-s24",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s24-ultra-256gb-titanium-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "samsung-galaxy-s24-ultra",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-128gb-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "samsung-galaxy-s25",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-fe-128gb-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "samsung-galaxy-s25-fe",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "samsung-galaxy-s25-ultra",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-fe-128gb-pistachio-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "samsung-galaxy-s26-fe",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-plus-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "samsung-galaxy-s26-plus",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-flip8-256gb-pink-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "samsung-galaxy-z-flip8",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-fold8-256gb-lavender-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "samsung-galaxy-z-fold8",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-fold8-ultra-256gb-violet-shadow-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "samsung-galaxy-z-fold8-ultra",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17-512gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "xiaomi-17",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 512,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17-ultra-512gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "xiaomi-17-ultra",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 512,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17t-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "xiaomi-17t",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17t-pro-512gb-violett-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "xiaomi-17t-pro",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 512,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-17-128gb-blue-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "xiaomi-redmi-17",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-15-pro-256gb-schwarz-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "xiaomi-redmi-note-15-pro",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-128gb-purple-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "xiaomi-redmi-note-17",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-pro-256gb-blue-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "xiaomi-redmi-note-17-pro",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-pro-max-256gb-cloud-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "xiaomi-redmi-note-17-pro-max",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "apple-iphone-17-pro",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "samsung-galaxy-s26",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "apple-iphone-17",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-max-256gb-cosmic-orange-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "apple-iphone-17-pro-max",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ultra-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "samsung-galaxy-s26-ultra",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-256gb-frost-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "google-pixel-11",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-128gb-mitternacht-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "apple-iphone-14",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-pro-128gb-dunkellila-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "apple-iphone-14-pro",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-pro-max-512gb-gold-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "apple-iphone-14-pro-max",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 512,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "apple-iphone-15",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-plus-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "apple-iphone-15-plus",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-128gb-titan-natur-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "apple-iphone-15-pro",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-max-256gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "apple-iphone-15-pro-max",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "apple-iphone-16",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-plus-128gb-ultramarin-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "apple-iphone-16-plus",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-128gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "apple-iphone-16-pro",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-max-256gb-titan-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "apple-iphone-16-pro-max",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16e-128gb-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "apple-iphone-16e",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17e-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "apple-iphone-17e",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-256gb-burgunder-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "apple-iphone-18-pro",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-max-256gb-polar-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "apple-iphone-18-pro-max",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-air-256gb-himmelblau-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "apple-iphone-air",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/fairphone/fairphone-6-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "fairphone-6",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "google-pixel-10",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10-pro-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "google-pixel-10-pro",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10a-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "google-pixel-10a",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-256gb-canyon-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "google-pixel-11-pro",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-fold-256gb-olive-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "google-pixel-11-pro-fold",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-xl-256gb-canyon-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "google-pixel-11-pro-xl",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-3-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "nothing-phone-3",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-4a-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "nothing-phone-4a",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-4a-pro-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "nothing-phone-4a-pro",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a17-128gb-5g-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "samsung-galaxy-a17",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a27-5g-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "samsung-galaxy-a27",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a37-128gb-awesome-charcoal-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "samsung-galaxy-a37",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a56-128gb-awesome-graphite-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "samsung-galaxy-a56",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a57-128gb-awesome-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "samsung-galaxy-a57",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s23-128gb-pink-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "samsung-galaxy-s23",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s24-128gb-onyx-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "samsung-galaxy-s24",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s24-ultra-256gb-titanium-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "samsung-galaxy-s24-ultra",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-128gb-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "samsung-galaxy-s25",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-fe-128gb-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "samsung-galaxy-s25-fe",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "samsung-galaxy-s25-ultra",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-fe-128gb-pistachio-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "samsung-galaxy-s26-fe",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-plus-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "samsung-galaxy-s26-plus",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-flip8-256gb-pink-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "samsung-galaxy-z-flip8",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-fold8-256gb-lavender-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "samsung-galaxy-z-fold8",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-fold8-ultra-256gb-violet-shadow-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "samsung-galaxy-z-fold8-ultra",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17-512gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "xiaomi-17",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 512,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17-ultra-512gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "xiaomi-17-ultra",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 512,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17t-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "xiaomi-17t",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17t-pro-512gb-violett-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "xiaomi-17t-pro",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 512,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-17-128gb-blue-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "xiaomi-redmi-17",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-15-pro-256gb-schwarz-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "xiaomi-redmi-note-15-pro",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-128gb-purple-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "xiaomi-redmi-note-17",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-pro-256gb-blue-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "xiaomi-redmi-note-17-pro",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-pro-max-256gb-cloud-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "xiaomi-redmi-note-17-pro-max",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "apple-iphone-17-pro",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "samsung-galaxy-s26",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "apple-iphone-17",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-max-256gb-cosmic-orange-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "apple-iphone-17-pro-max",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ultra-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "samsung-galaxy-s26-ultra",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-256gb-frost-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "google-pixel-11",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-128gb-mitternacht-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "apple-iphone-14",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-pro-128gb-dunkellila-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "apple-iphone-14-pro",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-pro-max-512gb-gold-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "apple-iphone-14-pro-max",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 512,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "apple-iphone-15",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  }
+ ],
+ "ueberfaellig": [
+  "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-256gb-burgunder-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+  "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-max-256gb-polar-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+  "https://www.o2online.de/e-shop/apple/apple-iphone-air-256gb-himmelblau-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+  "https://www.o2online.de/e-shop/fairphone/fairphone-6-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+  "https://www.o2online.de/e-shop/google/google-pixel-10-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+  "https://www.o2online.de/e-shop/google/google-pixel-10-pro-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+  "https://www.o2online.de/e-shop/google/google-pixel-10a-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+  "https://www.o2online.de/e-shop/google/google-pixel-11-pro-256gb-canyon-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+  "https://www.o2online.de/e-shop/google/google-pixel-11-pro-fold-256gb-olive-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+  "https://www.o2online.de/e-shop/google/google-pixel-11-pro-xl-256gb-canyon-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+  "https://www.o2online.de/e-shop/nothing/nothing-phone-3-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+  "https://www.o2online.de/e-shop/nothing/nothing-phone-4a-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+  "https://www.o2online.de/e-shop/nothing/nothing-phone-4a-pro-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a17-128gb-5g-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a27-5g-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a37-128gb-awesome-charcoal-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a56-128gb-awesome-graphite-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a57-128gb-awesome-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s23-128gb-pink-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s24-128gb-onyx-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s24-ultra-256gb-titanium-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-128gb-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-fe-128gb-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-fe-128gb-pistachio-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-plus-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-flip8-256gb-pink-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-fold8-256gb-lavender-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-fold8-ultra-256gb-violet-shadow-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+  "https://www.o2online.de/e-shop/xiaomi/xiaomi-17-512gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+  "https://www.o2online.de/e-shop/xiaomi/xiaomi-17-ultra-512gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+  "https://www.o2online.de/e-shop/xiaomi/xiaomi-17t-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+  "https://www.o2online.de/e-shop/xiaomi/xiaomi-17t-pro-512gb-violett-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+  "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-17-128gb-blue-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+  "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-15-pro-256gb-schwarz-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+  "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-128gb-purple-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+  "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-pro-256gb-blue-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+  "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-pro-max-256gb-cloud-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+  "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/apple/apple-iphone-17-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-max-256gb-cosmic-orange-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ultra-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/google/google-pixel-11-256gb-frost-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/apple/apple-iphone-14-128gb-mitternacht-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/apple/apple-iphone-14-pro-128gb-dunkellila-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/apple/apple-iphone-14-pro-max-512gb-gold-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/apple/apple-iphone-15-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/apple/apple-iphone-15-plus-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-128gb-titan-natur-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-max-256gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/apple/apple-iphone-16-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/apple/apple-iphone-16-plus-128gb-ultramarin-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-128gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-max-256gb-titan-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/apple/apple-iphone-16e-128gb-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/apple/apple-iphone-17e-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-256gb-burgunder-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-max-256gb-polar-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/apple/apple-iphone-air-256gb-himmelblau-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/fairphone/fairphone-6-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/google/google-pixel-10-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/google/google-pixel-10-pro-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/google/google-pixel-10a-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/google/google-pixel-11-pro-256gb-canyon-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/google/google-pixel-11-pro-fold-256gb-olive-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/google/google-pixel-11-pro-xl-256gb-canyon-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/nothing/nothing-phone-3-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/nothing/nothing-phone-4a-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/nothing/nothing-phone-4a-pro-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a17-128gb-5g-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a27-5g-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a37-128gb-awesome-charcoal-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a56-128gb-awesome-graphite-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a57-128gb-awesome-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s23-128gb-pink-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s24-128gb-onyx-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s24-ultra-256gb-titanium-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-128gb-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-fe-128gb-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-fe-128gb-pistachio-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-plus-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-flip8-256gb-pink-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-fold8-256gb-lavender-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-fold8-ultra-256gb-violet-shadow-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/xiaomi/xiaomi-17-512gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/xiaomi/xiaomi-17-ultra-512gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/xiaomi/xiaomi-17t-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/xiaomi/xiaomi-17t-pro-512gb-violett-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-17-128gb-blue-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-15-pro-256gb-schwarz-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-128gb-purple-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-pro-256gb-blue-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-pro-max-256gb-cloud-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+  "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/apple/apple-iphone-17-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-max-256gb-cosmic-orange-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ultra-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/google/google-pixel-11-256gb-frost-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/apple/apple-iphone-14-128gb-mitternacht-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/apple/apple-iphone-14-pro-128gb-dunkellila-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/apple/apple-iphone-14-pro-max-512gb-gold-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/apple/apple-iphone-15-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/apple/apple-iphone-15-plus-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-128gb-titan-natur-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-max-256gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/apple/apple-iphone-16-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/apple/apple-iphone-16-plus-128gb-ultramarin-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-128gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-max-256gb-titan-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/apple/apple-iphone-16e-128gb-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/apple/apple-iphone-17e-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-256gb-burgunder-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-max-256gb-polar-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/apple/apple-iphone-air-256gb-himmelblau-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/fairphone/fairphone-6-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/google/google-pixel-10-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/google/google-pixel-10-pro-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/google/google-pixel-10a-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/google/google-pixel-11-pro-256gb-canyon-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/google/google-pixel-11-pro-fold-256gb-olive-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/google/google-pixel-11-pro-xl-256gb-canyon-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/nothing/nothing-phone-3-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/nothing/nothing-phone-4a-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/nothing/nothing-phone-4a-pro-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a17-128gb-5g-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a27-5g-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a37-128gb-awesome-charcoal-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a56-128gb-awesome-graphite-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a57-128gb-awesome-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s23-128gb-pink-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s24-128gb-onyx-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s24-ultra-256gb-titanium-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-128gb-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-fe-128gb-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-fe-128gb-pistachio-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-plus-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-flip8-256gb-pink-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-fold8-256gb-lavender-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-fold8-ultra-256gb-violet-shadow-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/xiaomi/xiaomi-17-512gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/xiaomi/xiaomi-17-ultra-512gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/xiaomi/xiaomi-17t-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/xiaomi/xiaomi-17t-pro-512gb-violett-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-17-128gb-blue-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-15-pro-256gb-schwarz-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-128gb-purple-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-pro-256gb-blue-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+  "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-pro-max-256gb-cloud-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus"
+ ],
+ "uebersichten": [],
+ "vertragsform": "tarif_plus_ratenkauf",
+ "zeitbudget_sekunden": 10274
+}
