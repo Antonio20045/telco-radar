@@ -94,9 +94,17 @@ def aus_bericht(bericht: dict, *, bericht_url: str = "") -> list[Eintrag]:
 
 
 def aus_promo(
-    entries, *, marken_anker: dict | None = None, nur_aktiv: bool = True
+    entries,
+    *,
+    marken_anker: dict | None = None,
+    nur_aktiv: bool = True,
+    neu_nach: str = "",
 ) -> list[Eintrag]:
     """Die laufenden Aktionen aus `data/state/promo_db.json`.
+
+    `neu_nach` (ISO-Datum der vorigen Ausgabe) laesst nur Aktionen durch, die
+    danach zum ersten Mal gesehen wurden: die Mail kommt bei jedem Lauf und
+    darf nicht jedes Mal dieselben laufenden Aktionen wiederholen.
 
     `nur_aktiv` haelt ausgelaufene Aktionen heraus - eine Mail, die auf ein
     abgelaufenes Angebot zeigt, ist schlechter als eine ohne diesen Eintrag.
@@ -105,6 +113,8 @@ def aus_promo(
     aus: list[Eintrag] = []
     for e in entries or []:
         if nur_aktiv and (e.get("status") or "") != "aktiv":
+            continue
+        if neu_nach and (e.get("first_seen") or "")[:10] <= neu_nach:
             continue
         url = e.get("url") or ""
         marke = (e.get("brand") or "").strip()

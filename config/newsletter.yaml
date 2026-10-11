@@ -56,11 +56,14 @@ grenzen:
 # fuer das, was ohnehin entsteht, und kein eigener Apparat.
 bereiche:
   - key: marktrecherche
-    label: Marktrecherche
-    beschreibung: Meldungen aus dem Wochenbericht - Netzbetreiber, Fachpresse, Themenfelder.
+    label: Meldungen
+    beschreibung: Neue Meldungen - Netzbetreiber, Fachpresse, Themenfelder.
   - key: promo
-    label: Promo Übersicht
-    beschreibung: Laufende Endkunden-Aktionen der deutschen Anbieter.
+    label: Promo
+    beschreibung: Neue Endkunden-Aktionen der deutschen Anbieter.
+  - key: geraete
+    label: Geräte
+    beschreibung: Wöchentlich, wo sich der Abstand eines Anbieters zu Vodafone bei einem Gerät spürbar bewegt hat.
 
 # ------------------------------------------------------------- Dimension 2 -
 # Die sechs Regionen der Watchlist plus "Global". Die Schluessel sind die

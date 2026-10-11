@@ -50,6 +50,12 @@ def _fmt_date_de(iso: str) -> str:
     return f"{d.day}. {MONTHS_DE[d.month - 1]} {d.year}"
 
 
+def vorige_ausgabe(datum: str, berichte: Path = WURZEL / "data" / "reports") -> str:
+    """Das Datum des Berichts vor `datum` (Grenze fuer neue Aktionen), sonst ''."""
+    tage = [p.stem for p in berichte.glob("*.json") if p.stem < datum]
+    return max((t for t in tage if len(t) == 10 and t[4] == "-"), default="")
+
+
 def _zahl(name: str, wert) -> None:
     print(f"{name}: {wert}", flush=True)
 
@@ -69,7 +75,7 @@ def _transport(trocken: bool):
     )
 
 
-def _ausgabe(treffer, bericht: dict, datum: str, basis: str, *, seit: str, filt):
+def _ausgabe(treffer, bewegung, datum: str, basis: str, *, seit: str, filt):
     return render.baue(
         treffer,
         datum_de=_fmt_date_de(datum),
@@ -78,7 +84,7 @@ def _ausgabe(treffer, bericht: dict, datum: str, basis: str, *, seit: str, filt)
         seit_datum=_fmt_date_de(seit[:10] or datum),
         basis_url=basis,
         mit_filter=filt,
-        bewegung=bericht.get("geraete_bewegung"),
+        bewegung=bewegung,
     )
 
 
@@ -113,10 +119,9 @@ def testausgabe(bericht, datum, eintraege, katalog, basis, *, trocken) -> int:
         block = geraete_bewegung.fuer_bericht(
             WURZEL, date.fromisoformat(datum), WURZEL / "data" / "reports"
         )
-    bericht = dict(bericht, geraete_bewegung=dict(block, im_newsletter=True))
     nachricht = _ausgabe(
         waehle(eintraege, Filtersatz(), katalog),
-        bericht,
+        dict(block, im_newsletter=True),
         datum,
         basis,
         seit=datum,
@@ -150,7 +155,9 @@ def main(argv=None, umgebung=None) -> int:
     eintraege = aus_bericht(bericht, bericht_url=f"{basis}/reports/{datum}.html")
     if Path(args.promo).exists():
         promo = json.loads(Path(args.promo).read_text(encoding="utf-8"))
-        eintraege += aus_promo(promo.get("entries") or [])
+        eintraege += aus_promo(
+            promo.get("entries") or [], neu_nach=vorige_ausgabe(datum)
+        )
     _zahl("Eintraege zur Auswahl", len(eintraege))
 
     if args.nur_test:
@@ -185,7 +192,7 @@ def main(argv=None, umgebung=None) -> int:
     _zahl("Diese Ausgabe schon erhalten", len(erledigt))
 
     abos = [k.abo for k in offen]
-    segmente = bilde_segmente(abos, eintraege, katalog)
+    segmente = bilde_segmente(abos, eintraege, katalog, bericht.get("geraete_bewegung"))
     plan = v.baue_sendeplan(datum, segmente)
     je_id = {a.id: a for a in abos}
     platzhalter = f"{basis}/newsletter-abgemeldet.html"
@@ -195,7 +202,7 @@ def main(argv=None, umgebung=None) -> int:
     vorlagen = {
         s.hash: _ausgabe(
             s.treffer,
-            bericht,
+            s.geraete,
             datum,
             basis,
             seit=je_id[s.abo_ids[0]].confirmed_at,

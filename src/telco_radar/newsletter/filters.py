@@ -42,7 +42,7 @@ from datetime import date, timedelta
 from pathlib import Path
 
 from ..textwerkzeug import begriffs_muster
-from .config import DIMENSIONEN, NewsletterKatalog
+from .config import DIMENSIONEN, NUR_MELDUNGEN, NewsletterKatalog
 
 
 @dataclass
@@ -217,7 +217,7 @@ def _dimension_trifft(
     eintrag: Eintrag,
     katalog: NewsletterKatalog,
 ) -> bool:
-    if not gewaehlt:
+    if not gewaehlt or (eintrag.bereich == "promo" and dimension in NUR_MELDUNGEN):
         return True
     if dimension == "bereiche":
         return eintrag.bereich in gewaehlt

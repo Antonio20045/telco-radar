@@ -24,7 +24,7 @@ import hashlib
 import json
 from dataclasses import dataclass, field
 
-from .config import DIMENSIONEN, NewsletterKatalog
+from .config import DIMENSIONEN, GERAETE, NewsletterKatalog
 from .filters import Filtersatz, Treffer, waehle
 
 
@@ -57,17 +57,44 @@ class Segment:
     filter: Filtersatz
     abo_ids: list[str] = field(default_factory=list)
     treffer: list[Treffer] = field(default_factory=list)
+    geraete: dict | None = None
 
     @property
     def leer(self) -> bool:
-        """Ein Segment ohne Treffer wird NICHT verschickt.
+        """Ein Segment ohne Treffer und ohne Geraetebewegung wird NICHT verschickt.
 
-        Zweimal pro Woche eine Mail, in der nichts steht, erzieht zum
-        Ignorieren - und zwar nicht nur fuer die leeren Ausgaben."""
-        return not self.treffer
+        Eine Mail, in der nichts steht, erzieht zum Ignorieren - und zwar
+        nicht nur fuer die leeren Ausgaben."""
+        g = self.geraete or {}
+        return not self.treffer and not (g.get("im_newsletter") and g.get("zeilen"))
 
 
-def bilde_segmente(abos, eintraege, katalog: NewsletterKatalog) -> list[Segment]:
+def geraete_fuer(satz: Filtersatz, block: dict | None, katalog: NewsletterKatalog):
+    """Der Geraeteblock fuer diesen Filtersatz, oder None.
+
+    Er gehoert dazu, wenn kein Bereich oder `GERAETE` gewaehlt ist. Gewaehlte
+    Wettbewerber schraenken seine Zeilen ein, wie sie Meldungen einschraenken.
+    """
+    if not block or (satz.bereiche and GERAETE not in satz.bereiche):
+        return None
+    if not satz.wettbewerber or block.get("error"):
+        return block
+    muster = [
+        a.muster
+        for a in (katalog.finde("wettbewerber", k) for k in satz.wettbewerber)
+        if a and a.muster
+    ]
+    zeilen = [
+        z
+        for z in block.get("zeilen") or []
+        if any(m.search(str(z.get("anbieter") or "")) for m in muster)
+    ]
+    return dict(block, zeilen=zeilen)
+
+
+def bilde_segmente(
+    abos, eintraege, katalog: NewsletterKatalog, bewegung: dict | None = None
+) -> list[Segment]:
     """Aus Abos und Eintraegen die Segmente dieser Ausgabe.
 
     Erwartet je Abo ein Objekt mit `.id` und `.filter` (ein `Abo` aus
@@ -81,6 +108,7 @@ def bilde_segmente(abos, eintraege, katalog: NewsletterKatalog) -> list[Segment]
         if segment is None:
             segment = Segment(hash=h, filter=abo.filter)
             segment.treffer = waehle(eintraege, abo.filter, katalog)
+            segment.geraete = geraete_fuer(abo.filter, bewegung, katalog)
             nach_hash[h] = segment
         segment.abo_ids.append(abo.id)
     return sorted(nach_hash.values(), key=lambda s: s.hash)

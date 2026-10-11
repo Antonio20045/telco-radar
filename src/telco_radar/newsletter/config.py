@@ -27,6 +27,13 @@ log = logging.getLogger(__name__)
 
 DIMENSIONEN = ("bereiche", "regionen", "wettbewerber", "kategorien")
 
+NUR_MELDUNGEN = ("regionen", "kategorien")
+"""Dimensionen, die nur Meldungen einschraenken. Aktionen haben keine Region
+und kein Ressort; eine Wahl dort darf Promo nicht still herausfiltern."""
+
+GERAETE = "geraete"
+"""Der Bereich fuer den Geraeteblock (Preisabstaende zu Vodafone)."""
+
 FELD_JE_DIMENSION = {
     "bereiche": "branches",
     "regionen": "regions",
