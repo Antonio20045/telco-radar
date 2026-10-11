@@ -429,8 +429,8 @@ def test_der_dienst_schreibt_nichts_auf_die_platte(dienst, tmp_path, monkeypatch
 
 
 def test_der_dienst_kennt_keinen_versandweg():
-    """Kein SMTP, kein Brevo-Aufruf, kein API-Key: der Dienst laedt ohne
-    ``smtplib``, und seine Einstellungen kennen keinen Brevo-Schluessel."""
+    """Kein SMTP: der Dienst laedt ohne ``smtplib``. Seit 11.10.2026 kennt er
+    den Brevo-Schluessel (Bestaetigungsmail direkt), aber keinen SMTP-Weg."""
     lauf = subprocess.run(
         [
             sys.executable,
@@ -448,7 +448,7 @@ def test_der_dienst_kennt_keinen_versandweg():
     assert lauf.returncode == 0, lauf.stderr
     felder = lauf.stdout.lower()
     assert "dispatch_repo" in felder
-    assert "brevo" not in felder and "smtp" not in felder, felder
+    assert "brevo_key" in felder and "smtp" not in felder, felder
 
 
 def test_das_dispatch_ziel_ist_das_leere_inbox_repo(monkeypatch):

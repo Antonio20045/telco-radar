@@ -1,39 +1,19 @@
-"""Der Signup-Dienst: nimmt entgegen, prueft, reicht weiter.
+"""Der Signup-Dienst: nimmt Anmeldungen entgegen, prueft sie, bestaetigt per Mail.
 
-**Dieser Dienst speichert nichts und verschickt nichts.** Das ist keine
-Sparsamkeit, sondern die tragende Konstruktion des ganzen Newsletters, und
-sie folgt aus den Grenzen von Render Free:
+Seit 11.10.2026 (Antonio: ein Repo, Verteiler bei Brevo) laeuft mit
+`BREVO_API_KEY` alles direkt ueber Brevo (`telco_radar.newsletter.anmeldung`):
+Bestaetigungsmail, Kontakt anlegen, Kontakt loeschen. Ohne den Schluessel
+gilt bis zum Abbau der alte Weg ueber das leere Inbox-Repo (`_dispatch`).
+Der Schluessel liegt damit auf einer oeffentlich erreichbaren Instanz; er
+ist ein eigener, einzeln widerrufbarer Brevo-Schluessel.
 
-  * ausgehend gesperrt auf 25/465/587 -> er KANN keine Mail senden,
-  * ephemeres Dateisystem, Spin-down nach 15 Minuten -> er KANN nichts
-    behalten,
-  * Free-Postgres verfaellt nach 30 Tagen -> auch keine Datenbank.
+Die Regeln, die bleiben:
 
-Daraus folgt der Zuschnitt: **Versand und Speicherung passieren in GitHub
-Actions, dieser Dienst reicht signierte Ereignisse weiter.** Ueber die
-Brevo-HTTP-API *koennte* er technisch senden - HTTPS ist offen. Er tut es
-trotzdem nicht, aus zwei Gruenden, die unabhaengig von der Portfrage gelten:
-der API-Key soll nicht auf einer oeffentlich erreichbaren Instanz liegen,
-und die 24-Stunden-Sperre je Adresse braucht ohnehin den Zustand, den nur
-Actions sieht.
-
-ZWEI SICHERHEITSENTSCHEIDUNGEN, DIE MAN SPAETER NICHT MEHR NACHZIEHT:
-
-1. **Das GitHub-Token zeigt nur auf ein LEERES Dispatch-Repo**
-   (`telco-radar-inbox`), nicht auf den Store. Ein Token mit
-   `contents: write` auf `telco-radar-mail` koennte `scripts/send_digest.py`
-   ueberschreiben - genau die Datei, die der Workflow danach MIT DEM
-   ENTSCHLUESSELUNGSSCHLUESSEL ausfuehrt. Wer den Render-Dienst uebernimmt,
-   haette damit Codeausfuehrung im Runner und den entschluesselten
-   Verteiler.
-2. **Token stehen im PFADSEGMENT, nicht in der Query.** Eine Query-
-   Zeichenkette landet in Render-Zugriffslogs, in der Browser-Historie und
-   potenziell im `Referer` der naechsten Anfrage. Dazu
-   `Referrer-Policy: no-referrer`.
-
-Die Antwort auf `/subscribe` ist IMMER dieselbe neutrale Meldung. Wer daraus
-ablesen koennte, ob eine Adresse bekannt ist, haette einen Abfragedienst fuer
-fremde Postfaecher.
+1. **Token stehen im PFADSEGMENT, nicht in der Query** (Render-Zugriffslogs,
+   Browser-Historie, `Referer`). Dazu `Referrer-Policy: no-referrer`.
+2. Die Antwort auf `/subscribe` ist IMMER dieselbe neutrale Meldung. Wer daraus
+   ablesen koennte, ob eine Adresse bekannt ist, haette einen Abfragedienst
+   fuer fremde Postfaecher.
 """
 
 from __future__ import annotations
@@ -44,6 +24,7 @@ import os
 import sys
 import urllib.error
 import urllib.request
+from datetime import UTC, datetime
 from pathlib import Path
 
 from fastapi import FastAPI, Request, Response
@@ -53,7 +34,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 
 from telco_radar.newsletter.config import lade_katalog  # noqa: E402
-from telco_radar.newsletter import subscription as sub  # noqa: E402
+from telco_radar.newsletter import anmeldung, subscription as sub  # noqa: E402
 from telco_radar.report import rechtstexte  # noqa: E402
 
 from . import tokens  # noqa: E402
@@ -65,6 +46,11 @@ WURZEL = Path(__file__).resolve().parents[2]
 
 NEUTRAL = (
     "Gleich kommt eine E-Mail. Klick den Link darin — erst dann bist du angemeldet."
+)
+
+NOCHMAL = (
+    "Der Dienst hat gerade nicht geantwortet. Bitte den Link in ein paar "
+    "Minuten noch einmal anklicken."
 )
 
 
@@ -79,6 +65,8 @@ class Einstellungen:
         self.token_key = _env("SIGNUP_TOKEN_KEY")
         self.pepper = _env("SIGNUP_PEPPER")
         self.github_token = _env("GITHUB_DISPATCH_TOKEN")
+        self.brevo_key = _env("BREVO_API_KEY")
+        self.absender = _env("MAIL_FROM", "antonio.fotiadis.francisco@gmail.com")
         self.dispatch_repo = _env(
             "GITHUB_DISPATCH_REPO", "Antonio20045/telco-radar-inbox"
         )
@@ -94,7 +82,9 @@ class Einstellungen:
 
     @property
     def einsatzbereit(self) -> bool:
-        return bool(self.token_key and self.pepper and self.github_token)
+        return bool(
+            self.token_key and self.pepper and (self.brevo_key or self.github_token)
+        )
 
 
 app = FastAPI(title="Telco Radar - Anmeldung", docs_url=None, redoc_url=None)
@@ -293,7 +283,7 @@ async def subscribe(anfrage: Request) -> JSONResponse:
         tokens.ZWECK_BESTAETIGUNG,
         {
             "email": adresse,
-            "filters": _sauberer_filter(filter_roh),
+            "filters": anmeldung.sauberer_filter(filter_roh, katalog),
             "consent_version": fassung.version,
             "consent_hash": fassung.hash,
             "ip_hmac": sub.kennwert(einstellungen.pepper, _absender(anfrage)),
@@ -304,14 +294,24 @@ async def subscribe(anfrage: Request) -> JSONResponse:
         },
     )
 
-    ok = _dispatch(
-        "send_doi",
-        {
-            "token": bestaetigung,
-            "token_id": tokens.token_id(bestaetigung),
-            "addr_hmac": sub.adress_kennwert(einstellungen.pepper, adresse),
-            "confirm_url": f"{einstellungen.dienst_url}/confirm/{bestaetigung}",
-        },
+    ok = (
+        anmeldung.doi(
+            einstellungen.brevo_key,
+            adresse,
+            absender=einstellungen.absender,
+            bestaetigen=f"{einstellungen.dienst_url}/confirm/{bestaetigung}",
+            basis=einstellungen.basis_url,
+        )
+        if einstellungen.brevo_key
+        else _dispatch(
+            "send_doi",
+            {
+                "token": bestaetigung,
+                "token_id": tokens.token_id(bestaetigung),
+                "addr_hmac": sub.adress_kennwert(einstellungen.pepper, adresse),
+                "confirm_url": f"{einstellungen.dienst_url}/confirm/{bestaetigung}",
+            },
+        )
     )
     if not ok:
         return _sicherheitskopfzeilen(
@@ -349,19 +349,30 @@ def confirm(token: str) -> HTMLResponse:
             )
         )
 
-    _dispatch(
-        "confirm",
-        {
-            "token": token,
-            "token_id": tokens.token_id(token),
-            "addr_hmac": daten.get("addr_hmac", ""),
-        },
-    )
+    if einstellungen.brevo_key:
+        if not anmeldung.bestaetigen(
+            einstellungen.brevo_key,
+            daten,
+            katalog,
+            token_id=tokens.token_id(token),
+            pepper=einstellungen.pepper,
+            jetzt=datetime.now(UTC),
+        ):
+            return _sicherheitskopfzeilen(_seite("Das hat nicht geklappt", NOCHMAL))
+    else:
+        _dispatch(
+            "confirm",
+            {
+                "token": token,
+                "token_id": tokens.token_id(token),
+                "addr_hmac": daten.get("addr_hmac", ""),
+            },
+        )
     return _sicherheitskopfzeilen(
         _seite(
             "Angemeldet",
-            "Ihre Anmeldung ist bestätigt. Die nächste Ausgabe erhalten Sie "
-            "dienstags oder freitags — aber nur dann, wenn es zu Ihren Themen "
+            "Ihre Anmeldung ist bestätigt. Die nächste Ausgabe kommt mit dem "
+            "nächsten Radar-Lauf — aber nur dann, wenn es zu Ihren Themen "
             "wirklich etwas Neues gibt.",
             ziel=f"{einstellungen.basis_url}/index.html",
         )
@@ -398,14 +409,22 @@ def unsubscribe(token: str) -> HTMLResponse:
             )
         )
 
-    _dispatch(
-        "unsubscribe",
-        {
-            "token": token,
-            "sub_id": daten.get("sub_id", ""),
-            "addr_hmac": daten.get("addr_hmac", ""),
-        },
-    )
+    if einstellungen.brevo_key:
+        if not anmeldung.abmelden_ueber_brevo(
+            einstellungen.brevo_key,
+            str(daten.get("sub_id") or ""),
+            str(daten.get("addr_hmac") or ""),
+        ):
+            return _sicherheitskopfzeilen(_seite("Das hat nicht geklappt", NOCHMAL))
+    else:
+        _dispatch(
+            "unsubscribe",
+            {
+                "token": token,
+                "sub_id": daten.get("sub_id", ""),
+                "addr_hmac": daten.get("addr_hmac", ""),
+            },
+        )
     return _sicherheitskopfzeilen(
         _seite(
             "Abgemeldet",
@@ -413,30 +432,3 @@ def unsubscribe(token: str) -> HTMLResponse:
             ziel=f"{einstellungen.basis_url}/index.html",
         )
     )
-
-
-def _sauberer_filter(roh: dict) -> dict:
-    """Nur die bekannten Felder, nur die bekannten Formen.
-
-    Ohne das reist alles mit, was jemand ins Formular-JSON schreibt - und
-    landet signiert im Token und von dort im Store."""
-    aus: dict = {}
-    for feld in ("branches", "regions", "competitors", "categories"):
-        aus[feld] = sorted(
-            {str(w).strip() for w in (roh.get(feld) or []) if str(w).strip()}
-        )[:50]
-    stichwoerter = []
-    for eintrag in (roh.get("keywords") or [])[: katalog.grenzen.max_stichwoerter]:
-        if isinstance(eintrag, str):
-            term, mode = eintrag, ""
-        elif isinstance(eintrag, dict):
-            term, mode = str(eintrag.get("term") or ""), str(eintrag.get("mode") or "")
-        else:
-            continue
-        term = term.strip()[:60]
-        if term:
-            stichwoerter.append(
-                {"term": term, "mode": mode if mode in ("word", "phrase") else ""}
-            )
-    aus["keywords"] = stichwoerter
-    return aus

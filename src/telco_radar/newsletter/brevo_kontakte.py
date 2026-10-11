@@ -122,26 +122,40 @@ class BrevoKontakte:
         ziel = "/" + urllib.parse.quote(normalisiere_adresse(adresse), safe="")
         self._anfrage("PUT", ziel, {"attributes": {ATTR_LETZTE: datum}})
 
-    def alle(self, liste: int, katalog: NewsletterKatalog) -> list[Kontakt]:
-        """Alle Kontakte der Liste. Ein unlesbarer Datensatz bricht ab."""
-        aus: list[Kontakt] = []
+    def _seiten(self, liste: int):
         versatz = 0
         while True:
             seite = self._anfrage(
                 "GET", f"/lists/{liste}/contacts?limit={SEITE}&offset={versatz}"
             )
             kontakte = seite.get("contacts") or []
-            for k in kontakte:
-                attribute = k.get("attributes") or {}
-                roh = json.loads(str(attribute.get(ATTR_ABO) or "{}"))
-                roh["email"] = k.get("email") or ""
-                aus.append(
-                    Kontakt(
-                        abo=aus_dict(roh, katalog),
-                        letzte_ausgabe=str(attribute.get(ATTR_LETZTE) or ""),
-                        gesperrt=bool(k.get("emailBlacklisted")),
-                    )
-                )
+            yield from kontakte
             versatz += len(kontakte)
             if not kontakte or versatz >= int(seite.get("count") or 0):
-                return aus
+                return
+
+    def adresse_zu_id(self, liste: int, abo_id: str, kennwert: str = "") -> str:
+        """Die Adresse zum Abo mit dieser ID oder diesem Kennwert, sonst ''."""
+        for k in self._seiten(liste):
+            roh = json.loads(str((k.get("attributes") or {}).get(ATTR_ABO) or "{}"))
+            if (abo_id and roh.get("id") == abo_id) or (
+                kennwert and roh.get("email_hmac") == kennwert
+            ):
+                return str(k.get("email") or "")
+        return ""
+
+    def alle(self, liste: int, katalog: NewsletterKatalog) -> list[Kontakt]:
+        """Alle Kontakte der Liste. Ein unlesbarer Datensatz bricht ab."""
+        aus: list[Kontakt] = []
+        for k in self._seiten(liste):
+            attribute = k.get("attributes") or {}
+            roh = json.loads(str(attribute.get(ATTR_ABO) or "{}"))
+            roh["email"] = k.get("email") or ""
+            aus.append(
+                Kontakt(
+                    abo=aus_dict(roh, katalog),
+                    letzte_ausgabe=str(attribute.get(ATTR_LETZTE) or ""),
+                    gesperrt=bool(k.get("emailBlacklisted")),
+                )
+            )
+        return aus

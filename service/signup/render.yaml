@@ -29,6 +29,10 @@ services:
       - key: SIGNUP_PEPPER         # Pepper der Kennwerte - MUSS derselbe
         sync: false                # sein wie im privaten Repo, sonst passt
                                    # kein einziger Adress-Kennwert zusammen
+      - key: BREVO_API_KEY         # eigener Brevo-Schluessel "Anmeldedienst"
+        sync: false
+      - key: MAIL_FROM
+        sync: false
       - key: GITHUB_DISPATCH_TOKEN # fein granular, NUR auf telco-radar-inbox
         sync: false
       - key: GITHUB_DISPATCH_REPO
