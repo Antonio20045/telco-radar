@@ -113,6 +113,7 @@ def test_zusatzstufe_schreibt_den_store_nur_mit_schalter(tmp_path, monkeypatch):
     verlinke_neben_data(tmp_path)
     takt = Takt(lambda: 0.0, lambda *_: None, lambda f, ausfall: f())
     cfg = load_config(tmp_path)
+    cfg.settings["ki_ranglisten_aktiv"] = False
     zusatzstufen._ki_ranglisten(cfg, tmp_path, GESTERN, takt)
     assert ki_modelle.lade(tmp_path / "data" / "state")["stand"] is None
     cfg.settings["ki_ranglisten_aktiv"] = True

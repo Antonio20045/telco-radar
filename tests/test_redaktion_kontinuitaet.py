@@ -309,6 +309,7 @@ def leeres_projekt(tmp_path, monkeypatch):
         "geraete_enabled: false\ncrawl_newsrooms: false\n"
         "lieferzeit_radar_aktiv: false\naenderungsradar_aktiv: false\n"
         "tarif_radar_aktiv: false\nct_radar_aktiv: false\n"
+        "ki_ranglisten_aktiv: false\n"
     )
     (tmp_path / "config" / "settings.yaml").write_text(settings, encoding="utf-8")
     (tmp_path / "config" / "watchlist.yaml").write_text(

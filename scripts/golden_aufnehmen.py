@@ -48,6 +48,7 @@ EINSTELLUNGEN = {
     "lieferzeit_radar_aktiv": False,
     "ct_radar_aktiv": False,
     "tarif_radar_aktiv": False,
+    "ki_ranglisten_aktiv": False,
     "promo_enabled": False,
     "geraete_enabled": False,
     "lookback_days": 3,
