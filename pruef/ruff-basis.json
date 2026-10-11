@@ -715,9 +715,6 @@
   "F401": 1,
   "I001": 1
  },
- "tests/test_geraete_buendel_kopf_zeitraum.py": {
-  "I001": 1
- },
  "tests/test_geraete_buendel_mobil_abzeichen_browser.py": {
   "I001": 1
  },
@@ -784,7 +781,7 @@
  },
  "tests/test_geraete_o3_rollen_browser.py": {
   "B007": 1,
-  "E501": 2,
+  "E501": 1,
   "F401": 1,
   "I001": 1
  },

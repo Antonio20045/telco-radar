@@ -187,7 +187,7 @@
     'precision highp float;',
     'varying vec2 vUv;',
     'uniform sampler2D uBasis;uniform sampler2D uMaske;',
-    'uniform vec2 uAufl;uniform vec2 uBildAufl;uniform float uZeit;',
+    'uniform vec2 uAufl;uniform vec2 uBildAufl;uniform vec4 uRahmen;uniform float uZeit;',
     'uniform float uSonne;uniform float uSonneX;uniform float uWolken;uniform float uRegen;',
     'uniform float uSchnee;uniform float uDecke;uniform float uNebel;uniform float uWind;uniform float uBlitz;',
     'uniform float uHerbst;uniform float uWinter;uniform float uFrueh;uniform float uNass;',
@@ -212,12 +212,15 @@
     ' vec3 f=mix(vec3(li),t,0.45)*vec3(0.80,0.84,0.92)*0.62+sky*0.10;',
     ' float b=smoothstep(0.872,0.895,u.y);if(b<=0.0)return f;',
     ' return mix(f,tagLicht(pflaster(u)),b);}',
-    // Bildkoordinate fuer den Ausschnitt "cover" plus langsamer Kameraflug
+    // Ausschnitt wie "cover". Start wie das Standbild (Mitte), dann faehrt die Kamera dorthin, wo uRahmen.xy den Turm will (Zoom uRahmen.z, Anteil uRahmen.w)
     'vec2 bildUv(vec2 s){float ab=uAufl.x/uAufl.y;float ai=uBildAufl.x/uBildAufl.y;vec2 k=vec2(1.0);',
     ' if(ab>ai){k.y=ai/ab;}else{k.x=ab/ai;}',
-    ' float z=1.0/(1.035+0.025*sin(uZeit*0.035));',
-    ' vec2 m=vec2(0.5+0.012*sin(uZeit*0.021),0.5);',
-    ' return m+(s-0.5)*k*z;}',
+    ' k/=1.035+0.025*sin(uZeit*0.035);',
+    ' vec2 kz=k/uRahmen.z;',
+    ' vec2 mz=clamp(vec2(0.5025,0.42)-(uRahmen.xy-0.5)*kz,kz*0.5,1.0-kz*0.5);',
+    ' vec2 kk=mix(k,kz,uRahmen.w);vec2 m=mix(vec2(0.5),mz,uRahmen.w);',
+    ' m.x=clamp(m.x+0.012*kk.x*sin(uZeit*0.021),kk.x*0.5,1.0-kk.x*0.5);',
+    ' return m+(s-0.5)*kk;}',
     // Tageslicht-Gewichte aus der Sonnenhoehe in Grad
     'void licht(out float tag,out float daemm,out float nacht,out float gold){',
     ' tag=smoothstep(-3.0,7.0,uSonne);nacht=1.0-smoothstep(-15.0,-6.0,uSonne);',
@@ -363,7 +366,7 @@
     gl.vertexAttribPointer(ecke, 2, gl.FLOAT, false, 0, 0);
     var U = {};
     ['uBasis', 'uMaske', 'uAufl', 'uBildAufl', 'uZeit', 'uSonne', 'uSonneX', 'uWolken', 'uRegen', 'uSchnee', 'uDecke',
-      'uNebel', 'uWind', 'uBlitz', 'uHerbst', 'uWinter', 'uFrueh', 'uNass'].forEach(function (n) {
+      'uNebel', 'uWind', 'uBlitz', 'uHerbst', 'uWinter', 'uFrueh', 'uNass', 'uRahmen'].forEach(function (n) {
       U[n] = gl.getUniformLocation(programm, n);
     });
     /* Ausgangslage = das Foto selbst: blaue Stunde, Abendrot rechts. */
@@ -411,6 +414,11 @@
       gl.uniform1i(U.uMaske, 1);
       gl.uniform2f(U.uAufl, w, h);
       gl.uniform2f(U.uBildAufl, bildW, bildH);
+      /* Breit: Turm links im Drittel, Datum rechts vor freiem Himmel. Hoch: Turm mittig. */
+      var fahrt = still ? 1 : Math.min(1, (zeit - t0) / 3500);
+      fahrt = fahrt * fahrt * (3 - 2 * fahrt);
+      if (w / h > 1.2) gl.uniform4f(U.uRahmen, 0.30, 0.45, 1.22, fahrt);
+      else gl.uniform4f(U.uRahmen, 0.5, 0.5, 1.0, fahrt);
       gl.uniform1f(U.uZeit, sek);
       gl.uniform1f(U.uBlitz, blitz * (0.6 + 0.4 * Math.sin(sek * 60)));
       gl.uniform1f(U.uSonne, jetzt.sonne);
