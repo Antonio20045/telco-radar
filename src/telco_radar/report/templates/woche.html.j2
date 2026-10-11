@@ -27,16 +27,16 @@
 {# Nach dem Startbild folgt direkt das Bild des ersten Kapitels, ohne
    Zwischentitel und ohne Kino-Animation (Antonio, 11.10.2026). #}
 <section class="buehne" aria-label="Ausgabe vom {{ date_de }}">
-  {# Vier Stimmungen desselben Bildes. app.js waehlt nach der Uhrzeit des
-     Lesers EINE davon und laedt nur diese; ohne JavaScript steht der Tag. #}
-  <div class="buehne-bild" aria-hidden="true"{% if 'campus-tag' in bilder %} style="background:url({{ bilder['campus-tag'] }}) center/cover"{% endif %}>
-    {% for z in ('morgen', 'tag', 'abend', 'nacht') %}
-    {% if ('campus-' ~ z) in bilder %}
-    <img class="buehne-ebene" data-zeit-bild="{{ z }}" data-src="{{ prefix }}static/bilder/campus-{{ z }}.jpg"{% set klein = (bilder_klein or {}).get('campus-' ~ z) %}{% if klein %} data-srcset="{{ prefix }}static/bilder/{{ klein }} 1200w, {{ prefix }}static/bilder/campus-{{ z }}.jpg 2400w" sizes="100vw"{% endif %} alt="" width="2400" height="1357" decoding="async">
+  {# EIN Foto des Turms in der blauen Stunde. Darueber rechnet app.js im
+     Canvas Himmel, Tageszeit, Wetter und Jahreszeit am Campus; ohne
+     JavaScript oder WebGL steht das Foto. #}
+  {% set klein = (bilder_klein or {}).get('campus-turm') %}
+  <div class="buehne-bild" aria-hidden="true"{% if 'campus-turm' in bilder %} style="background:url({{ bilder['campus-turm'] }}) center/cover"{% endif %}>
+    {% if 'campus-turm' in bilder %}
+    <img class="buehne-ebene" data-zeit-bild="tag" data-src="{{ prefix }}static/bilder/campus-turm.jpg"{% if klein %} data-srcset="{{ prefix }}static/bilder/{{ klein }} 1200w, {{ prefix }}static/bilder/campus-turm.jpg 2400w" sizes="100vw"{% endif %} alt="" width="2400" height="1340" decoding="async">
+    <canvas class="buehne-himmel" data-bild="{{ prefix }}static/bilder/campus-turm.jpg" data-bild-klein="{{ prefix }}static/bilder/{{ klein or 'campus-turm.jpg' }}" data-maske="{{ prefix }}static/campus/campus-maske.png" data-maske-klein="{{ prefix }}static/campus/campus-maske-1200.png" aria-hidden="true"></canvas>
+    <noscript><img class="buehne-ebene geladen" src="{{ prefix }}static/bilder/campus-turm.jpg" alt=""></noscript>
     {% endif %}
-    {% endfor %}
-    <video class="buehne-film" data-basis="{{ prefix }}static/campus/" muted loop playsinline preload="none" aria-hidden="true"></video>
-    {% if 'campus-tag' in bilder %}<noscript><img class="buehne-ebene geladen" src="{{ prefix }}static/bilder/campus-tag.jpg" alt=""></noscript>{% endif %}
   </div>
   <div class="buehne-inhalt">
     <div class="buehne-kopf">
