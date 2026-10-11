@@ -273,7 +273,7 @@
     'void main(){',
     ' vec2 u=bildUv(vUv);',
     ' vec3 c0=texture2D(uBasis,u).rgb;vec3 m=texture2D(uMaske,u).rgb;',
-    ' float himmel=m.r;float lichter=m.g;float laub=m.b;',
+    ' float himmel=smoothstep(0.06,0.62,m.r);float lichter=m.g;float laub=m.b;',
     ' float tag,daemm,nacht,gold;licht(tag,daemm,nacht,gold);',
     ' float hor=0.80;',
     // --- Himmel ---
