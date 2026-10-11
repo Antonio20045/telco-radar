@@ -1,6 +1,6 @@
 """o2 und congstar bieten nur 24 und 36 Raten an (Preisprüfung 11.10.2026), 1&1 nur
-„24 Monate + Ablöse“ (Abgleich der Live-Seite 11.10.2026: 77 Modelle mit „1&1 Mit 12
-Raten nicht erfasst“)."""
+HW24 und HW24+12 (Kacheln im Bestellweg, Klick-Lauf 11.10.2026: je Gerät nur 24 und
+24+12 = 36; Live-Seite: 77 Modelle mit „1&1 Mit 12 Raten nicht erfasst“)."""
 
 from __future__ import annotations
 
@@ -27,7 +27,9 @@ def test_zwoelf_raten_bei_o2_und_congstar_sind_nicht_im_angebot(anbieter):
     assert zeile["kurz"] == "Mit 12 Raten nicht im Angebot"
 
 
-@pytest.mark.parametrize(("anbieter", "laufzeit"), [("Telekom", 12), ("o2", 24)])
+@pytest.mark.parametrize(
+    ("anbieter", "laufzeit"), [("Telekom", 12), ("o2", 24), ("1&1", 36)]
+)
 def test_gegenprobe_angebotene_laufzeit_bleibt_nicht_erfasst(anbieter, laufzeit):
     (zeile,) = fehlzeilen([_luecke(anbieter, laufzeit)], {})
     assert (
