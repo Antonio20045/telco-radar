@@ -2,8 +2,8 @@
  "updated": "2026-10-11",
  "anbieter": {
   "ALDI TALK": {
-   "laeufe": 68,
-   "funde_gesamt": 339,
+   "laeufe": 69,
+   "funde_gesamt": 350,
    "letzter_lauf": "2026-10-11",
    "letzte_funde": 11,
    "letzter_fund": "2026-10-11",
@@ -225,8 +225,8 @@
    "tote_adressen": 0
   },
   "Vodafone": {
-   "laeufe": 66,
-   "funde_gesamt": 11396,
+   "laeufe": 67,
+   "funde_gesamt": 11579,
    "letzter_lauf": "2026-10-11",
    "letzte_funde": 183,
    "termine": [
@@ -448,8 +448,8 @@
    "tote_adressen": 0
   },
   "o2": {
-   "laeufe": 66,
-   "funde_gesamt": 4460,
+   "laeufe": 67,
+   "funde_gesamt": 4529,
    "letzter_lauf": "2026-10-11",
    "letzte_funde": 69,
    "termine": [
@@ -671,8 +671,8 @@
    "tote_adressen": null
   },
   "mobilcom-debitel": {
-   "laeufe": 19,
-   "funde_gesamt": 7980,
+   "laeufe": 20,
+   "funde_gesamt": 8135,
    "letzte_funde": 155,
    "termine": [
     "2026-08-29",
@@ -1257,8 +1257,8 @@
    "tote_adressen": 0
   },
   "congstar": {
-   "laeufe": 42,
-   "funde_gesamt": 8303,
+   "laeufe": 43,
+   "funde_gesamt": 8458,
    "letzter_lauf": "2026-10-11",
    "letzte_funde": 155,
    "termine": [
@@ -1474,8 +1474,8 @@
    "tote_adressen": 0
   },
   "1&1": {
-   "laeufe": 58,
-   "funde_gesamt": 2113,
+   "laeufe": 59,
+   "funde_gesamt": 2155,
    "letzter_lauf": "2026-10-11",
    "letzte_funde": 42,
    "termine": [
@@ -1860,10 +1860,10 @@
    "tote_adressen": null
   },
   "Saturn": {
-   "laeufe": 54,
-   "funde_gesamt": 1046,
+   "laeufe": 55,
+   "funde_gesamt": 1065,
    "letzter_lauf": "2026-10-11",
-   "letzte_funde": 18,
+   "letzte_funde": 19,
    "termine": [
     "2026-09-05",
     "2026-09-06",
@@ -2066,7 +2066,7 @@
     ],
     [
      "2026-10-11",
-     18,
+     19,
      "gelesen",
      0,
      0,
@@ -7009,15 +7009,15 @@
    "ean": "",
    "zustand": "neu",
    "first_seen": "2026-09-14",
-   "status": "ausgelistet",
-   "missed_checks": 2,
+   "status": "aktiv",
+   "missed_checks": 0,
    "erstpreis": 1779.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-14",
-   "last_verified": "2026-10-09",
+   "last_verified": "2026-10-11",
    "letzter_check": "2026-10-11",
    "quelle_url": "https://www.saturn.de/de/product/_apple-iphone-17-pro-max-5g-1-tb-tiefblau-dual-sim-3013602.html",
-   "abgerufen_am": "2026-10-09",
+   "abgerufen_am": "2026-10-11",
    "verfuegbarkeit": "unbekannt",
    "confidence": "hoch",
    "einstiege": [
@@ -7025,8 +7025,7 @@
    ],
    "titel_roh": "APPLE iPhone 17 Pro Max 5G 1 TB Tiefblau Dual SIM",
    "preis_ohne_vertrag": 1819.0,
-   "ended_since": "2026-10-11",
-   "stale_since": "2026-10-10"
+   "ended_since": "2026-10-11"
   },
   {
    "id": "saturn--apple-iphone-17-pro-max-256gb-silber",
