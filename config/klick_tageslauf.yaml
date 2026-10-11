@@ -962,6 +962,13 @@ anbieter:
       - geraet: xiaomi-redmi-note-17-pro-max
         speicher_gb: 256
         url: https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-pro-max-256gb-cloud-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m
+
+  # o2-tarife liest rund 35 s je Seite; 450 Seiten passen nicht in einen 180-min-Job
+  # (11.10.2026: 289 von 450). Zweiter Job ab dem Tarif o2-mobile-s.
+  - schluessel: o2-tarife-2
+    name: o2
+    karte: o2-tarife
+    seiten:
       - geraet: apple-iphone-17-pro
         speicher_gb: 256
         url: https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s

@@ -138,6 +138,7 @@ def test_tagesdatei_hat_alle_anbieter_mit_karte_und_keine_seitengrenze(ziele):
     assert list(ziele) == [
         "o2",
         "o2-tarife",
+        "o2-tarife-2",
         "vodafone",
         "vodafone-2",
         "vodafone-3",
@@ -186,6 +187,7 @@ def test_plan_nennt_jeden_anbieter_mit_karte(capsys):
     assert json.loads(capsys.readouterr().out) == [
         "o2",
         "o2-tarife",
+        "o2-tarife-2",
         "vodafone",
         "vodafone-2",
         "vodafone-3",

@@ -99,12 +99,12 @@ def test_jeder_tarif_ohne_kachel_je_geraet_einmal():
         (s.geraet, TARIF_IN_ADRESSE.search(s.adresse)[1]) for s in ziele["o2"].seiten
     }
     geraete = {s.geraet for s in ziele["o2"].seiten}
-    paare = [
-        (s.geraet, TARIF_IN_ADRESSE.search(s.adresse)[1])
-        for s in ziele["o2-tarife"].seiten
-    ]
+    seiten = ziele["o2-tarife"].seiten + ziele["o2-tarife-2"].seiten
+    paare = [(s.geraet, TARIF_IN_ADRESSE.search(s.adresse)[1]) for s in seiten]
 
     assert len(ohne_kachel) == 8
     assert len(paare) == len(set(paare))
     assert set(paare) == {(g, t) for g in geraete for t in ohne_kachel} - schon
     assert ziele["o2-tarife"].name == ziele["o2"].name
+    assert ziele["o2-tarife-2"].name == ziele["o2"].name
+    assert ziele["o2-tarife-2"].kartenschluessel == "o2-tarife"
