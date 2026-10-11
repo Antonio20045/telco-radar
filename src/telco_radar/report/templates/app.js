@@ -68,8 +68,9 @@
      und Wetter am Campus, nicht beim Leser. Das Wetter kommt ohne Schluessel
      und ohne Kosten von Open-Meteo (Daten u. a. des Deutschen
      Wetterdienstes). Antwortet der Dienst nicht, bestimmt die Uhr die
-     Tageszeit und der Himmel bleibt bewoelkt. Unter Automatisierung bleibt
-     die Buehne ruhig. */
+     Tageszeit und der Himmel bleibt bewoelkt. Geladen wird genau EINE
+     Schleife, und erst wenn das Startbild steht. Unter Automatisierung
+     bleibt die Buehne ruhig. */
   var film = buehne && buehne.querySelector('.buehne-film');
   if (film && !ruhig && !navigator.webdriver) {
     var CAMPUS = 'https://api.open-meteo.com/v1/forecast?latitude=51.2437&longitude=6.7383'
@@ -96,7 +97,12 @@
       if (jetzt >= unter - 90) return 'abend';
       return 'mittag';
     };
-    var zeige = function (szene, wetter) {
+    var nachBild = function (los) {
+      if (document.readyState === 'complete') los();
+      else window.addEventListener('load', los, { once: true });
+    };
+    var zeige = function (szene, wetter) { nachBild(function () { zeigeJetzt(szene, wetter); }); };
+    var zeigeJetzt = function (szene, wetter) {
       var basis = film.getAttribute('data-basis');
       var klein = window.matchMedia && matchMedia('(max-width: 900px)').matches;
       film.setAttribute('data-szene', szene);

@@ -12,6 +12,7 @@ import functools
 import http.server
 import json
 import threading
+import time
 from pathlib import Path
 
 import pytest
@@ -24,11 +25,22 @@ HIMMEL = ("sonne", "wolken", "regen", "schnee")
 
 _SEITE = """<!doctype html><html class="ohne-js"><head><meta charset="utf-8"></head>
 <body><section class="buehne"><div class="buehne-bild">
-<img class="buehne-ebene" data-zeit-bild="tag" data-src="data:,">
+<img class="buehne-ebene" data-zeit-bild="tag" data-src="static/bilder/campus-tag.jpg">
 <video class="buehne-film" data-basis="static/campus/" muted loop playsinline></video>
 </div><div class="buehne-kopf"><h1>Datum</h1>
 <p class="buehne-wetter" data-campus-wetter hidden></p></div>
 </section><script src="app.js"></script></body></html>"""
+
+
+class _LangsamesStartbild(http.server.SimpleHTTPRequestHandler):
+    def do_GET(self):
+        if self.path.endswith("/campus-tag.jpg"):
+            time.sleep(1.5)
+        super().do_GET()
+
+    def log_message(self, *_):
+        pass
+
 
 _ECHT = "Object.defineProperty(navigator,'webdriver',{get:()=>false});"
 
@@ -38,9 +50,7 @@ def site(tmp_path_factory):
     ordner = tmp_path_factory.mktemp("campus")
     schreibe_statische_dateien(ordner)
     (ordner / "seite.html").write_text(_SEITE, encoding="utf-8")
-    handler = functools.partial(
-        http.server.SimpleHTTPRequestHandler, directory=str(ordner)
-    )
+    handler = functools.partial(_LangsamesStartbild, directory=str(ordner))
     httpd = http.server.ThreadingHTTPServer(("127.0.0.1", 0), handler)
     threading.Thread(target=httpd.serve_forever, daemon=True).start()
     try:
@@ -76,8 +86,16 @@ def _oeffne(chromium, adresse, antwort):
             route.fulfill(status=200, content_type="application/json", body=antwort)
 
     seite.route("https://api.open-meteo.com/**", beantworte)
+    seite.ablauf = []
+    seite.on(
+        "requestfinished",
+        lambda a: a.url.endswith(".jpg") and seite.ablauf.append(a.url),
+    )
+    seite.on("request", lambda a: a.url.endswith(".mp4") and seite.ablauf.append(a.url))
     seite.goto(f"{adresse}/seite.html")
     seite.wait_for_selector(".buehne-film[data-szene]", state="attached")
+    seite.wait_for_function("() => document.readyState === 'complete'")
+    seite.wait_for_timeout(300)
     return seite
 
 
@@ -142,3 +160,16 @@ def test_die_schleifen_liegen_nicht_doppelt_auf_der_platte(site):
             assert kopie.samefile(datei), datei.name
         else:
             assert filecmp.cmp(kopie, datei, shallow=False), datei.name
+
+
+def test_nur_eine_schleife_und_erst_nach_dem_startbild(chromium, site):
+    _, adresse = site
+    seite = _oeffne(chromium, adresse, _antwort("13:05", 3, 12.6))
+    try:
+        filme = [u for u in seite.ablauf if u.endswith(".mp4")]
+        assert len(filme) == 1, seite.ablauf
+        startbild = [u for u in seite.ablauf if u.endswith("/campus-tag.jpg")]
+        assert startbild, seite.ablauf
+        assert seite.ablauf.index(startbild[0]) < seite.ablauf.index(filme[0])
+    finally:
+        seite.close()
