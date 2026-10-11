@@ -56,15 +56,6 @@
     requestAnimationFrame(function () {
       requestAnimationFrame(function () { buehne.classList.add('buehne--da'); });
     });
-    var pause = buehne.querySelector('.buehne-pause');
-    if (pause && !ruhig && bild) {
-      pause.hidden = false;
-      pause.addEventListener('click', function () {
-        var an = buehne.classList.toggle('angehalten');
-        pause.setAttribute('aria-pressed', an ? 'true' : 'false');
-        pause.setAttribute('aria-label', an ? 'Bildbewegung fortsetzen' : 'Bildbewegung anhalten');
-      });
-    }
     if ('IntersectionObserver' in window) {
       new IntersectionObserver(function (e) {
         buehne.classList.toggle('verdeckt', !e[0].isIntersecting);
@@ -357,45 +348,85 @@
 
 /* WETTBEWERB WELT und PROMO (Redesign 09.10.2026): Hebel oeffnen, Marken filtern. */
 (function () {
-  var ansichten = document.querySelector('.hebel-ansichten');
-  var kacheln = document.querySelectorAll('.hebel-kachel[data-hebel]');
-  if (ansichten && kacheln.length) {
-    var zeige = function (key, rollen) {
-      var ziel = key && document.getElementById('dz-theme-' + key);
-      var abschnitte = ansichten.querySelectorAll('.dz-hebel');
-      for (var i = 0; i < abschnitte.length; i++) abschnitte[i].classList.toggle('on', abschnitte[i] === ziel);
-      for (var k = 0; k < kacheln.length; k++) kacheln[k].classList.toggle('on', kacheln[k].getAttribute('data-hebel') === key);
-      ansichten.classList.toggle('gewaehlt', !!ziel);
-      if (ziel && rollen) ziel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  var welt = document.querySelector('[data-welt]');
+  if (welt) {
+    var zeilen = welt.querySelectorAll('.wl-zeile');
+    var bilder = welt.querySelectorAll('.wl-bild');
+    var stapel = welt.querySelectorAll('.wl-stapel');
+    var bild = function (key) {
+      for (var i = 0; i < bilder.length; i++) bilder[i].classList.toggle('an', bilder[i].getAttribute('data-hebel') === key);
     };
-    var ausAdresse = function (rollen) {
-      var m = /^#dz-theme-(.+)$/.exec(location.hash || '');
-      zeige(m ? m[1] : '', rollen);
+    var stand = function (s) {
+      var k = s.querySelector('.wl-karten'), anz = s.querySelector('[data-stand]');
+      var karten = k ? k.querySelectorAll('.dzk') : [];
+      if (!k || !anz || !karten.length) return;
+      var breite = karten[0].getBoundingClientRect().width + 14;
+      var n = Math.min(karten.length, Math.round(k.scrollLeft / breite) + 1);
+      anz.textContent = n + ' / ' + karten.length;
     };
-    for (var i = 0; i < kacheln.length; i++) (function (a) {
+    var oeffne = function (key) {
+      var ziel = key ? document.getElementById('dz-theme-' + key) : null;
+      for (var i = 0; i < stapel.length; i++) stapel[i].classList.toggle('aktiv', stapel[i] === ziel);
+      for (var z = 0; z < zeilen.length; z++) zeilen[z].classList.toggle('on', !!ziel && zeilen[z].getAttribute('data-hebel') === key);
+      welt.classList.toggle('offen', !!ziel);
+      document.documentElement.classList.toggle('wl-blatt-offen', !!ziel && innerWidth <= 900);
+      if (!ziel) return;
+      bild(key);
+      var karten = ziel.querySelectorAll('.wl-karten .dzk');
+      for (var c = 0; c < karten.length; c++) karten[c].style.setProperty('--n', Math.min(c, 5));
+      var reihe = ziel.querySelector('.wl-karten');
+      if (reihe) reihe.scrollLeft = 0;
+      stand(ziel);
+      var fenster = welt.querySelector('.wl-fenster');
+      var oben = fenster ? fenster.getBoundingClientRect().top : 0;
+      if (innerWidth > 900 && oben > 110) window.scrollBy({ top: oben - 96, behavior: 'smooth' });
+    };
+    var offenerKey = function () {
+      for (var i = 0; i < stapel.length; i++) if (stapel[i].classList.contains('aktiv')) return stapel[i].id.slice(9);
+      return '';
+    };
+    for (var i = 0; i < zeilen.length; i++) (function (a) {
+      var key = a.getAttribute('data-hebel');
+      a.addEventListener('mouseenter', function () { if (!offenerKey()) bild(key); });
+      a.addEventListener('focus', function () { if (!offenerKey()) bild(key); });
       a.addEventListener('click', function (ev) {
         ev.preventDefault();
-        var key = a.getAttribute('data-hebel');
-        if (history.pushState) history.pushState(null, '', '#dz-theme-' + key);
-        var lauf = function () { zeige(key, true); };
-        if (document.startViewTransition && !matchMedia('(prefers-reduced-motion: reduce)').matches) document.startViewTransition(lauf);
-        else lauf();
+        if (history.replaceState) history.replaceState(null, '', '#dz-theme-' + key);
+        oeffne(key);
       });
-    })(kacheln[i]);
-    var zurueck = document.querySelectorAll('.hebel-zurueck');
-    for (var z = 0; z < zurueck.length; z++) zurueck[z].addEventListener('click', function (ev) {
-      ev.preventDefault();
-      if (history.pushState) history.pushState(null, '', location.pathname);
-      zeige('', false);
-      var wand = document.getElementById('hebel-wand');
-      if (wand) wand.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    })(zeilen[i]);
+    for (var s = 0; s < stapel.length; s++) (function (st) {
+      var reihe = st.querySelector('.wl-karten');
+      var leiste = st.querySelector('.wl-blaettern');
+      if (leiste) leiste.hidden = false;
+      var zu = st.querySelector('.hebel-zurueck');
+      if (zu) zu.addEventListener('click', function (ev) {
+        ev.preventDefault();
+        if (history.replaceState) history.replaceState(null, '', location.pathname + location.search);
+        oeffne('');
+      });
+      if (reihe) reihe.addEventListener('scroll', function () { stand(st); }, { passive: true });
+      var knoepfe = st.querySelectorAll('[data-schritt]');
+      for (var b = 0; b < knoepfe.length; b++) (function (kn) {
+        kn.addEventListener('click', function () {
+          var karte = reihe && reihe.querySelector('.dzk');
+          if (karte) reihe.scrollBy({ left: (karte.getBoundingClientRect().width + 14) * parseInt(kn.getAttribute('data-schritt'), 10), behavior: 'smooth' });
+        });
+      })(knoepfe[b]);
+    })(stapel[s]);
+    document.addEventListener('keydown', function (ev) {
+      var key = offenerKey();
+      if (!key) return;
+      if (ev.key === 'Escape') { oeffne(''); return; }
+      if (ev.key === 'ArrowRight' || ev.key === 'ArrowLeft') {
+        var b = document.querySelector('#dz-theme-' + key + ' [data-schritt="' + (ev.key === 'ArrowRight' ? 1 : -1) + '"]');
+        if (b) { ev.preventDefault(); b.click(); }
+      }
     });
-    window.addEventListener('popstate', function () { ausAdresse(false); });
-    window.addEventListener('hashchange', function () { ausAdresse(true); });
-    ausAdresse(false);
-    if (location.hash) {
-      var anfang = document.getElementById(location.hash.slice(1));
-      if (anfang) setTimeout(function () { anfang.scrollIntoView({ block: 'start' }); }, 0);
+    var m = /^#dz-theme-(.+)$/.exec(location.hash || '');
+    if (m && document.getElementById('dz-theme-' + m[1])) {
+      oeffne(m[1]);
+      setTimeout(function () { welt.scrollIntoView({ block: 'start' }); }, 0);
     }
   }
 
@@ -524,9 +555,9 @@
     pause.setAttribute('aria-pressed', an ? 'true' : 'false');
     pause.textContent = an ? 'Weiterlaufen' : 'Anhalten';
   });
-  var beobachtet = document.querySelectorAll('[data-puls],[data-zaehler]');
+  var beobachtet = document.querySelectorAll('[data-puls],[data-zaehler],[data-buchstaben]');
   if (!('IntersectionObserver' in window)) {
-    for (var j = 0; j < puls.length; j++) puls[j].classList.add('sichtbar');
+    for (var j = 0; j < beobachtet.length; j++) beobachtet[j].classList.add('sichtbar');
     return;
   }
   var io = new IntersectionObserver(function (es) {

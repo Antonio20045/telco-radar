@@ -36,32 +36,17 @@
 {% endmacro %}
 
 {% block buehne %}
-<section class="wa-auftakt" data-buehne>
+<section class="wa-auftakt mg-auftakt" data-buehne>
   <div class="wa-auftakt-buehne">
     <div class="wa-rahmen">
       <div class="wa-bild" aria-hidden="true">{{ d.motiv('band-wettbewerb', prefix, 'wa-motiv', eager=true) }}</div>
       <div class="wa-schleier" aria-hidden="true"></div>
-      <div class="wa-text">
-        <div class="wa-dach"><span>Wettbewerb</span>
-          {{ d.umschalter([{'key': 'de', 'href': 'wettbewerb.html', 'label': 'Deutschland'},
-                           {'key': 'welt', 'href': 'differenzierung.html', 'label': 'Welt'}], 'de', prefix, 'Ansicht') }}
-          {% if wettbewerb.stand %}<span class="wa-stand">Stand {{ wettbewerb.stand | date_de }}</span>{% endif %}</div>
-        <h1 class="wa-titel">{% for c in wettbewerb.wettbewerber %}<span><em class="gr-anb--{{ ANBIETER_KLASSE.get(c.anker, 'ohne-farbe') }}" style="--i:{{ loop.index0 }}">{{ KURZ.get(c.anker, c.name) }}</em></span>{% else %}<span><em>Wettbewerb</em></span>{% endfor %}</h1>
-      </div>
-      {% if puls.reihen %}
-      <ol class="wa-anzeige">
-        {% for r in puls.reihen %}
-        <li class="gr-anb--{{ r.klasse }}" style="--i:{{ loop.index0 }}">
-          <span class="wa-anz-name">{{ r.name }}</span>
-          {% if r.diese_woche is none %}<span class="wa-anz-zahl">–</span><span class="wa-anz-text">diese Woche nicht bewertet</span>
-          {% else %}<span class="wa-anz-zahl" data-zaehler="{{ r.diese_woche }}">{{ r.diese_woche }}</span><span class="wa-anz-text">Meldungen diese Woche (KW {{ puls.wochen[-1].kw }})</span>{% endif %}
-        </li>
-        {% endfor %}
-      </ol>
-      {% endif %}
+      <header class="mg-kopf wa-text wa-kopf-schlicht">
+        <h1 class="mg-titel" aria-label="Wettbewerb">{% for c in 'Wettbewerb' %}<span style="--i:{{ loop.index0 }}" aria-hidden="true">{{ c }}</span>{% endfor %}</h1>
+        <p class="mg-datum">Deutschland</p>
+      </header>
       <div class="wa-hinweis" aria-hidden="true"></div>
     </div>
-    <p class="wa-satz">Was Telekom, O2 und 1&amp;1 gerade tun und wie es zu den Wochen davor passt.</p>
   </div>
 </section>
 {% endblock %}
@@ -156,4 +141,5 @@
 {% else %}
 <p class="empty-note wa-leer-seite">Für diese Seite liegt noch kein Bericht im Archiv.</p>
 {% endfor %}
+{{ d.weiter('differenzierung.html', 'Welt', prefix, 'kapitel-global') }}
 {% endblock %}

@@ -24,6 +24,10 @@
 {% block buehne %}
 {% if report %}
 {% set teile = (date_de or '').rsplit(' ', 1) %}
+{# Die Buehne steht in einer Strecke: beim Scrollen wird das Bild zum
+   Fenster, dann baut sich der Titel des Wochenberichts auf (Antonio,
+   11.10.2026: wenige Elemente, Strich statt Knopf). --p setzt app.js. #}
+<div class="buehne-strecke" data-buehne>
 <section class="buehne" aria-label="Ausgabe vom {{ date_de }}">
   {# Vier Stimmungen desselben Bildes. app.js waehlt nach der Uhrzeit des
      Lesers EINE davon und laedt nur diese; ohne JavaScript steht der Tag. #}
@@ -37,14 +41,8 @@
   </div>
   <div class="buehne-inhalt">
     <div class="buehne-kopf">
-      <p class="buehne-gruss" data-gruss>{% if is_latest %}Ausgabe{% else %}Archiv{% endif %}</p>
-      <h1 class="buehne-datum">{{ teile[0] }}<span class="buehne-jahr"> {{ teile[1] if teile|length > 1 else '' }}</span></h1>
-      {# Ein Halbsatz mit zwei Zahlen: relevant behalten und neu gelesen. Bei
-         einer uebernommenen Ausgabe faellt "aus N neuen" weg - das waere die
-         Zahl der HEUTIGEN Runde neben Meldungen einer frueheren. #}
-      <p class="buehne-unter">{% if report and report.stats %}<b>{{ highlights|length }} relevante Meldungen</b>
-        {% if not redaktion_ausfall %}aus {{ report.stats.get('new', '–') }} neuen{% endif -%}
-        {% else %}{{ highlights|length }} Meldungen{% endif %}{% if lesezeit %} · Lesezeit ca. {{ lesezeit }} Minuten{% endif %}</p>
+      {% if not is_latest %}<p class="buehne-gruss">Archiv</p>{% endif %}
+      <h1 class="buehne-datum">{{ teile[0] }}</h1>
       {% if redaktion_ausfall %}
       <p class="ausfall-hinweis buehne-hinweis">Stand: {{ redaktion_ausfall.stand_de }} –
         die Runde vom {{ date_de }} blieb ohne Bewertung:
@@ -74,51 +72,42 @@
       {% if m %}
       {% set h = m.h %}
       <a class="fenster fenster--meldung" href="{{ prefix }}meldungen.html">
-        <span class="fenster-kopf"><span class="fenster-art">Meldung der Woche</span>
-          <span class="fenster-zahl">{{ m.anzahl }} Meldungen</span></span>
+        <span class="fenster-kopf"><span class="fenster-art">Meldung der Woche</span></span>
         <span class="fenster-koerper">
           {% if h.image %}<span class="fenster-bild"><img src="{{ prefix }}images/{{ h.image }}" alt=""
             {% if h.image_w %}width="{{ h.image_w }}" height="{{ h.image_h }}"{% endif %} loading="eager" decoding="async"></span>{% endif %}
           <span class="fenster-titel szl">{{ h.schlagzeile }}</span>
         </span>
         {% if h.ctm_satz %}<span class="ctm-satz fenster-ctm"><span class="ctm-marke">Was das für uns heißt</span>{{ h.ctm_satz }}</span>{% endif %}
-        <span class="fenster-fuss"><span class="punkt punkt--r{{ h.relevance }}" aria-hidden="true"></span>{{ h.operator or h.source_label }} · Priorität {{ h.relevance }}/5</span>
       </a>
       {% endif %}
       {% set g = fenster.geraete %}
       {% if g %}
       <a class="fenster fenster--geraete" href="{{ prefix }}geraete.html">
-        <span class="fenster-kopf"><span class="fenster-art">Wo steht Vodafone?</span>
-          <span class="fenster-zahl">{{ g.modell }}</span></span>
+        <span class="fenster-kopf"><span class="fenster-art">{{ g.modell }}</span></span>
         <span class="fenster-koerper">
           {% if g.leitzahl_html %}<span class="fenster-leit">{{ g.leitzahl_html | safe }}</span>
           {% else %}<span class="fenster-satz">{{ g.antwort_html | safe }}</span>{% endif %}
         </span>
-        <span class="fenster-fuss">Band {{ g.band }} · {{ g.laufzeit }} Raten{% if g.stand %} · Preise vom {{ g.stand | date_de }}{% endif %}</span>
       </a>
       {% endif %}
       {% set p = fenster.promo %}
       {% if p %}
       {% set k = p.karte %}
       <a class="fenster fenster--promo" href="{{ prefix }}promo/index.html">
-        <span class="fenster-kopf"><span class="fenster-art">Promo</span>
-          <span class="fenster-zahl">{% if p.neu %}{{ p.neu }} neu{% elif p.aktiv %}{{ p.aktiv }} Aktionen aktiv{% endif %}{% if p.endet_bald %} · {{ p.endet_bald }} enden bald{% endif %}</span></span>
+        <span class="fenster-kopf"><span class="fenster-art">Promo</span></span>
         <span class="fenster-koerper">
           <span class="fenster-gross">{{ k.kachel }}</span>
           <span class="fenster-titel fenster-titel--klein"><b>{{ k.brand.name }}</b> {{ k.offer.headline }}</span>
         </span>
-        <span class="fenster-fuss">Stand {{ p.stand | date_de }}</span>
       </a>
       {% endif %}
     </div>
     {% endif %}
-    <a class="buehne-weiter" href="#der-wochenbericht">Der Wochenbericht<span aria-hidden="true">↓</span></a>
   </div>
-  {# Die langsame Bildbewegung laesst sich anhalten (WCAG 2.2.2). #}
-  <button type="button" class="buehne-pause" aria-pressed="false" aria-label="Bildbewegung anhalten" hidden>
-    <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><rect x="3" y="2" width="3.4" height="12" rx="1" fill="currentColor"/><rect x="9.6" y="2" width="3.4" height="12" rx="1" fill="currentColor"/></svg>
-  </button>
+  <div class="buehne-strich" aria-hidden="true"></div>
 </section>
+</div>
 {% endif %}
 {% endblock %}
 
@@ -134,6 +123,9 @@
      zwei_minuten=(zwei_minuten|length > 0)) %}
 
 <div class="bericht" id="der-wochenbericht" style="scroll-margin-top:0">
+  {% if folge %}
+  <h2 class="bericht-titel" aria-label="Der Wochenbericht" data-buchstaben>{% for c in 'Der Wochenbericht' %}<span style="--i:{{ loop.index0 }}" aria-hidden="true">{{ c if c != ' ' else '&nbsp;'|safe }}</span>{% endfor %}</h2>
+  {% endif %}
   {% if folge %}
   {# Am Rand steht nur das aktuelle Kapitel; die Liste klappt erst beim
      Ueberfahren auf. Keine Fortschrittsleiste. #}

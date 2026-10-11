@@ -62,10 +62,7 @@
 {% import "_design.html.j2" as d %}
 {% set buehne = true %}
 {% block buehne %}
-{% call d.band('band-geraete', 'Geräte', 'Quellen & Methodik', prefix) %}
-{{ d.umschalter([{'key': 'preise', 'href': 'geraete.html', 'label': 'Preise'},
-                 {'key': 'quellen', 'href': 'geraete-quellen.html', 'label': 'Quellen & Methodik'}], 'quellen', prefix, 'Ansicht') }}
-{% endcall %}
+{{ d.band('band-geraete', 'Geräte', 'Quellen & Methodik', prefix) }}
 {% endblock %}
 
 {% block content %}

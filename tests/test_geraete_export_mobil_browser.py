@@ -238,32 +238,24 @@ def test_am_telefon_bleibt_die_falz_von_11c_erfuellt(telefon):
     )
 
 
-def test_der_kicker_bricht_auf_dem_telefon_nicht_um(telefon):
-    """Die Regel, die den Kopf trägt: auf dem Telefon ist der Kopf eine
-    SPALTE (Kicker, Schlagzeile, Datum - die Export-Zeile steht seit
-    P4/D4 in der Fußzeile), und der Kicker bleibt EINZEILIG. Ein
-    Nebeneinander von Kicker und Datum ist bei 390 px ausgeschlossen
-    (Kicker 163 px + Datum 214 px gegen 334 px Zeilenbreite) - die erste
-    Fassung dieser Änderung brach den Kicker mitten im Wort um, gefunden
-    am Screenshot, nicht am Messwert."""
+def test_der_kopf_traegt_keine_zeile_ueber_der_zahl(telefon):
+    """Bis 11.10.2026 stand ueber der Leitzahl eine Zeile aus Kicker,
+    Umschalter (Preise | Quellen & Methodik) und Datum. Antonio: "Ich
+    moechte keine Switches da haben." Gemessen im Browser: im Kopf steht
+    weder die Zeile noch ein Umschalter, und die Leitzahl ragt nicht ueber
+    den Rand."""
     box = telefon.evaluate("""() => {
-      const k = document.querySelector('.gx-auftakt .wa-dach > span');
-      const d = document.querySelector('.gx-auftakt .wa-stand');
-      if (!k || !d) return null;
-      return {kh: Math.round(k.getBoundingClientRect().height),
-              lh: Math.round(parseFloat(getComputedStyle(k).lineHeight)),
-              drechts: Math.round(
-                d.getBoundingClientRect().right),
-              breite: Math.round(
-                document.documentElement.clientWidth)};
+      const kopf = document.querySelector('.gx-auftakt');
+      const held = document.querySelector('.gx-auftakt .gx-held');
+      if (!kopf || !held) return null;
+      return {zeile: !!kopf.querySelector('.wa-dach, .umschalter, .wa-stand'),
+              rechts: Math.round(held.getBoundingClientRect().right),
+              breite: Math.round(document.documentElement.clientWidth)};
     }""")
-    assert box is not None, "Kopf ohne Kicker oder Datum - Messung ins Leere"
-    assert box["kh"] <= box["lh"] + 2, (
-        f"der Kicker ist {box['kh']} px hoch bei {box['lh']} px Zeilenhöhe "
-        "- er bricht um"
-    )
-    assert box["drechts"] <= box["breite"], (
-        f"Datumszeile ragt {box['drechts'] - box['breite']} px über den Rand"
+    assert box is not None, "Kopf ohne Leitzahl - Messung ins Leere"
+    assert not box["zeile"], "die Zeile ueber der Zahl steht wieder da"
+    assert box["rechts"] <= box["breite"], (
+        f"Leitzahl ragt {box['rechts'] - box['breite']} px ueber den Rand"
     )
 
 

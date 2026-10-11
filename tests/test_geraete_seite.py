@@ -2345,8 +2345,10 @@ def test_die_portfolio_zeile_nennt_generationen_und_modelle_getrennt(tmp_path):
     )
 
 
-def test_das_kopfdatum_ist_das_abrufdatum(tmp_path):
-    """Der Kopf sagte „Stand 28. August 2026", jede Tabellenzeile darunter
+def test_das_datum_der_tafel_ist_das_abrufdatum(tmp_path):
+    """Seit 11.10.2026 steht kein Datum mehr im Kopf (Antonio: Zeile
+    loeschen); das Datum der Zeilen bleibt das Abrufdatum. Der Kopf sagte
+    „Stand 28. August 2026", jede Tabellenzeile darunter
     „30. August 2026". Beide stimmten - der Geraetezweig laeuft naechtlich,
     der Bericht zweimal die Woche -, aber wer zwei Zahlen im selben Blick
     vergleicht, haelt die Seite fuer veraltet.
@@ -2371,18 +2373,13 @@ def test_das_kopfdatum_ist_das_abrufdatum(tmp_path):
         "darueber, welchen der beiden der Kopf traegt"
     )
 
-    kopf = (
-        _suppe(site, "geraete.html")
-        .select_one(".gx-auftakt .wa-stand")
-        .get_text(" ", strip=True)
+    seite = _suppe(site, "geraete.html")
+    assert seite.select_one(".gx-auftakt .wa-stand") is None, (
+        "seit 11.10.2026 traegt der erste Bildschirm keine Datumszeile"
     )
-    assert "Preise vom" in kopf, kopf
-    assert str(int(abruf.split("-")[2])) in kopf, (
-        f"{kopf!r} nennt nicht den Abruftag {abruf}"
-    )
-    assert str(int(geraete["stand"].split("-")[2])) not in kopf, (
-        f"{kopf!r} nennt weiterhin den Berichtstag {geraete['stand']}"
-    )
+    tag = str(int(abruf.split("-")[2]))
+    daten = [d.get_text(" ", strip=True) for d in seite.select(".gr-a-datum")]
+    assert daten and all(d.startswith(tag + ".") for d in daten), daten
 
 
 def test_der_alarmreiter_traegt_keine_verfuegbarkeitsspalte(tmp_path):

@@ -48,3 +48,13 @@
   {% endfor %}
 </nav>
 {%- endmacro %}
+
+{# Der Weg zur zweiten Ansicht eines Tabs steht am Seitenende, nie im
+   ersten Bildschirm (Antonio, 11.10.2026: "Die Switches gehören nicht auf
+   die Startseite. Auf keiner."). Ein grosses Bild, ein Wort, ein Pfeil. #}
+{% macro weiter(href, titel, prefix, slug='') -%}
+<a class="weiter-blatt{% if slug %} weiter-blatt--bild{% endif %}" href="{{ prefix }}{{ href }}">
+  {% if slug %}<span class="weiter-bild" aria-hidden="true">{{ motiv(slug, prefix, 'weiter-motiv', breite=2400, hoehe=1029) }}</span>{% endif %}
+  <span class="weiter-titel">{{ titel }}<span class="weiter-pfeil" aria-hidden="true">→</span></span>
+</a>
+{%- endmacro %}

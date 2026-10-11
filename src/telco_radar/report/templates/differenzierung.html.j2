@@ -1,4 +1,12 @@
-{# Wettbewerb · Welt (Redesign 09.10.2026): die zwoelf Hebel als Bildkacheln.
+{# Wettbewerb · Welt (Neubau 11.10.2026, Antonio: "dass man einfach drauf
+   drueckt und dann muss man runterscrollen, die ganzen Artikel runterscrollen,
+   das ist extrem schlecht gemacht"). Eine Buehne statt einer Liste: links
+   die Hebel als grosse Zeilen, rechts ein Fenster mit dem Bild des Hebels.
+   Ein Klick blaettert die Beispiele IM Fenster durch, die Seite bleibt
+   stehen (ohne JavaScript per :target). Am Telefon kommt der Stapel als
+   Blatt von unten.
+
+   Vorgaenger (Redesign 09.10.2026): die zwoelf Hebel als Bildkacheln.
    Ein Klick oeffnet den Hebel und zeigt, wer was macht. Marktbild,
    "Was waechst, was kippt", Monatstabelle und die Vergleichstabelle sind
    mit dem Redesign gefallen (Antonio: "diese Statistiken finde ich blöd");
@@ -47,10 +55,10 @@
    traegt `dzk`: daran haengt der Wahrheitstest, der die Rubrikzahl gegen die
    wirklich gerenderten Beispiele haelt. #}
 {% extends "base.html.j2" %}
-{% from "_seit.html.j2" import seit_block %}
 {% import "_design.html.j2" as d %}
 {% set active = 'differenzierung' %}
 {% set buehne = true %}
+{% set wrap_class = 'voll' %}
 {% block title %}Marktrecherche · Differenzierung{% endblock %}
 
 {% macro motiv(e) %}
@@ -88,93 +96,76 @@
 {% endmacro %}
 
 {% block buehne %}
-{% call d.band('band-wettbewerb', 'Wettbewerb', 'Welt', prefix) %}
-{{ d.umschalter([{'key': 'de', 'href': 'wettbewerb.html', 'label': 'Deutschland'},
-                 {'key': 'welt', 'href': 'differenzierung.html', 'label': 'Welt'}], 'welt', prefix, 'Ansicht') }}
-{% endcall %}
+<section class="wa-auftakt mg-auftakt" data-buehne>
+  <div class="wa-auftakt-buehne">
+    <div class="wa-rahmen">
+      <div class="wa-bild" aria-hidden="true">{{ d.motiv('band-welt' if 'band-welt' in bilder else 'kapitel-global', prefix, 'wa-motiv', eager=true) }}</div>
+      <div class="wa-schleier" aria-hidden="true"></div>
+      <header class="mg-kopf wa-text wa-kopf-schlicht">
+        <h1 class="mg-titel" aria-label="Welt">{% for c in 'Welt' %}<span style="--i:{{ loop.index0 }}" aria-hidden="true">{{ c }}</span>{% endfor %}</h1>
+        <p class="mg-datum">Wettbewerb</p>
+      </header>
+      <div class="wa-hinweis" aria-hidden="true"></div>
+    </div>
+  </div>
+</section>
 {% endblock %}
 
 {% block content %}
-<div class="wb-einstieg" data-auftritt>
-  <p class="wb-lead">Womit sich Telkos weltweit abheben – jenseits von Preis und Datenvolumen. Jedes Beispiel mit Originalquelle.</p>
-  {{ seit_block(seit, date_de) }}
-</div>
-{% if diff_lage_html %}
-<section class="dz-lage" data-auftritt>
-  <article class="prose">{{ diff_lage_html | safe }}</article>
-</section>
-{% endif %}
-
 {% if diff.hebel %}
-<nav class="hebel-wand dz-nav" id="hebel-wand" aria-label="Die Differenzierungs-Hebel" style="scroll-margin-top:96px">
-  {% for h in diff.hebel %}
-  {% set beispiele = ([h.lead] if h.lead else []) + (h.karten or []) + (h.zeilen_offen or []) + (h.zeilen_rest or []) %}
-  {% set anbieter = beispiele | map(attribute='operator') | reject('none') | unique | list | length %}
-  <a class="hebel-kachel" href="#dz-theme-{{ h.key }}" data-hebel="{{ h.key }}" data-auftritt>
-    <span class="hebel-bild">{{ d.motiv('hebel-' ~ h.key, prefix, 'hebel-motiv', breite=900, hoehe=1125) }}</span>
-    <span class="hebel-text">
+<section class="wl" data-welt>
+  <nav class="wl-liste dz-nav" id="hebel-wand" aria-label="Die Hebel" style="scroll-margin-top:96px">
+    {% for h in diff.hebel %}
+    {% set beispiele = ([h.lead] if h.lead else []) + (h.karten or []) + (h.zeilen_offen or []) + (h.zeilen_rest or []) %}
+    {% set anbieter = beispiele | map(attribute='operator') | reject('none') | unique | list | length %}
+    {% set neu = beispiele | selectattr('neu') | list | length %}
+    <a class="hebel-kachel wl-zeile" href="#dz-theme-{{ h.key }}" data-hebel="{{ h.key }}" data-auftritt>
       <span class="hebel-name">{{ h.label }}</span>
-      <span class="hebel-zahl">{{ anbieter }} Anbieter</span>
-    </span>
-  </a>
-  {% endfor %}
-</nav>
-{% endif %}
+      <span class="hebel-zahl"><b data-zaehler="{{ anbieter }}">{{ anbieter }}</b> Anbieter</span>
+      {% if neu %}<span class="wl-neu">{{ neu }} neu</span>{% endif %}
+    </a>
+    {% endfor %}
+  </nav>
 
-<div class="hebel-ansichten">
-{% for h in diff.hebel %}
-<section class="dz-hebel" id="dz-theme-{{ h.key }}"{% if h.farbe %} style="--c:{{ h.farbe }}"{% endif %}>
-  <div class="hebel-kopf">
-    <h2>{{ h.label }}</h2>
-    <span class="rubrik-zahl">{{ h.n }} Beispiel{{ 'e' if h.n != 1 else '' }}</span>
-    <a class="hebel-zurueck" href="#hebel-wand">Alle Hebel</a>
-  </div>
-  {% if h.erklaerung %}<p class="dz-hebel-was">{{ h.erklaerung }}</p>{% endif %}
-  {% if h.einordnung %}<p class="dz-hebel-einordnung">{{ h.einordnung }}</p>{% endif %}
-  {% if h.lead %}
-  <div class="dz-hebel-oben">{{ karte(h.lead, 'lead') }}</div>
-  {% endif %}
-  {% if h.karten %}
-  <div class="dz-raster">
-    {% for e in h.karten %}{{ karte(e) }}{% endfor %}
-  </div>
-  {% endif %}
-  {% if h.zeilen_offen %}
-  <div class="dz-zeilen">
-    {% for e in h.zeilen_offen %}{{ karte(e, 'zeile') }}{% endfor %}
-  </div>
-  {% endif %}
-  {% if h.zeilen_rest %}
-  <details class="dz-mehr">
-    <summary>{{ h.zeilen_rest | length }} weitere</summary>
-    <div class="dz-zeilen">
-      {% for e in h.zeilen_rest %}{{ karte(e, 'zeile') }}{% endfor %}
+  <div class="wl-fenster">
+    <div class="wl-bilder" aria-hidden="true">
+      {% for h in diff.hebel %}
+      <span class="wl-bild{% if loop.first %} an{% endif %}" data-hebel="{{ h.key }}">{{ d.motiv('hebel-' ~ h.key, prefix, 'wl-motiv', breite=900, hoehe=1125) }}
+        <span class="wl-bild-name">{{ h.label }}</span></span>
+      {% endfor %}
     </div>
-  </details>
-  {% endif %}
+    {% for h in diff.hebel %}
+    {% set beispiele = ([h.lead] if h.lead else []) + (h.karten or []) + (h.zeilen_offen or []) + (h.zeilen_rest or []) %}
+    <section class="dz-hebel wl-stapel" id="dz-theme-{{ h.key }}" aria-label="{{ h.label }}">
+      <div class="hebel-kopf">
+        <h2>{{ h.label }}</h2>
+        <span class="rubrik-zahl wl-anzahl">{{ beispiele | length }} Beispiel{{ 'e' if beispiele | length != 1 else '' }}</span>
+        <a class="hebel-zurueck" href="#hebel-wand" aria-label="Schließen">×</a>
+      </div>
+      {% if h.erklaerung %}<p class="dz-hebel-was">{{ h.erklaerung }}</p>{% endif %}
+      <div class="wl-karten">
+        {% for e in beispiele %}{{ karte(e) }}{% endfor %}
+      </div>
+      <div class="wl-blaettern" hidden>
+        <button type="button" data-schritt="-1" aria-label="Zurück">←</button>
+        <span class="wl-stand" data-stand>1 / {{ beispiele | length }}</span>
+        <button type="button" data-schritt="1" aria-label="Weiter">→</button>
+      </div>
+    </section>
+    {% endfor %}
+  </div>
 </section>
 {% else %}
 <p class="empty-note">Für dieses Ressort liegt noch kein belegtes Beispiel vor.</p>
-{% endfor %}
-</div>
-
-{# Was neu dazukam - oder, in einer ruhigen Woche, was zuletzt geprueft
-   wurde. Eine Reihe Karten, keine Statistik. #}
-{% if diff.neu %}
-<section class="dz-radar" id="neu" style="scroll-margin-top:96px" data-auftritt>
-  <div class="rubrik">
-    <h2>{% if diff.neu_ist_rueckfall %}Zuletzt nachgeprüft{% else %}Neu auf dem Radar{% endif %}</h2>
-  </div>
-  <div class="dz-raster dz-raster--gross">
-    {% for e in diff.neu %}{{ karte(e, 'gross') }}{% endfor %}
-  </div>
-</section>
 {% endif %}
 
-{# Die Muster aus dem Bericht: Prosa, keine Zahlenreihe. #}
+{% if diff_lage_html %}
+<section class="dz-lage wl-lage" data-auftritt>
+  <article class="prose">{{ diff_lage_html | safe }}</article>
+</section>
+{% endif %}
 {% if diff_muster %}
-<section class="dz-muster-band" data-auftritt>
-  <h2 class="abschnitt-titel">Was sich wiederholt</h2>
+<section class="dz-muster-band wl-muster" data-auftritt>
   <ul class="dz-muster">
     {% for m in diff_muster %}
     <li>{% if m.titel %}<b>{{ m.titel }}</b> {% endif %}{{ m.text_html | safe }}</li>
@@ -190,7 +181,5 @@
   </div>
 </details>
 {% endif %}
-<p class="dz-foot">Zwei Quellen speisen diese Seite: der wöchentliche Presse-Crawl der beobachteten Netzbetreiber
-und ein rotierender Web-Sweep (Brave Search + KI-Prüfung), der gezielt nach Differenzierung jenseits des Preises
-sucht. Jedes Beispiel trägt eine Originalquelle und ein Prüfdatum; nicht belegte Beispiele werden nicht aufgenommen.</p>
+{{ d.weiter('wettbewerb.html', 'Deutschland', prefix, 'band-wettbewerb') }}
 {% endblock %}

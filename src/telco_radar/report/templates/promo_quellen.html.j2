@@ -22,10 +22,7 @@
     </div>
 {% endmacro %}
 {% block buehne %}
-{% call d.band('band-promo', 'Promo · Transparenz', 'Beobachtete Anbieter', prefix) %}
-{{ d.umschalter([{'key': 'aktionen', 'href': 'promo/index.html', 'label': 'Aktionen'},
-                 {'key': 'quellen', 'href': 'promo/quellen.html', 'label': 'Quellen'}], 'quellen', prefix, 'Ansicht') }}
-{% endcall %}
+{{ d.band('band-promo', 'Promo · Transparenz', 'Beobachtete Anbieter', prefix) }}
 {% endblock %}
 
 {% block content %}

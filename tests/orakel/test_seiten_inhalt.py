@@ -416,16 +416,13 @@ def test_bericht_verlinkt_die_vollstaendige_liste(tmp_path):
     assert "meldungen.html" in html
 
 
-def test_kopfzeile_nennt_gelesen_und_relevant_getrennt(tmp_path):
-    """Ein Halbsatz mit zwei Zahlen - beide muessen stimmen.
-
-    Bis zum 08.08.2026 waren es drei Saetze mit vier Zahlen ("... Davon 13
-    zum sofortigen Ansehen (5/5). Lesezeit etwa 16 Minuten."); die dritte
-    Zahl stand an jeder betroffenen Meldung noch einmal als Prioritaet."""
+def test_kopfzeile_nennt_gelesen_und_relevant_nicht_mehr(tmp_path):
+    """Bis zum 11.10.2026 stand unter dem Datum ein Halbsatz mit zwei Zahlen
+    ("5 relevante Meldungen aus 15 neuen"). Antonio: bitte entfernen - die
+    Zahlen stehen auf der Quellenseite. Gegenprobe gegen das alte Muster."""
     html = lies_seite(render(tmp_path), "index.html")
-    assert re.search(
-        rf"<b>{len(HIGHLIGHTS)} relevante Meldungen</b>\s*"
-        rf"aus {NEU_GESAMMELT} neuen",
+    assert not re.search(
+        rf"{len(HIGHLIGHTS)} relevante Meldungen\D*aus {NEU_GESAMMELT} neuen",
         html,
     )
 
@@ -590,9 +587,18 @@ def test_bericht_bekommt_ein_inhaltsverzeichnis_mit_ankern(tmp_path):
         assert szene.select_one("h2").get_text(strip=True) == titel
 
 
-def test_lesezeit_wird_genannt(tmp_path):
+def test_erster_bildschirm_ohne_beiwerk(tmp_path):
     html = lies_seite(render(tmp_path), "index.html")
-    assert "Lesezeit ca." in html
+    soup = BeautifulSoup(html, "html.parser")
+    buehne = soup.select_one(".buehne")
+    assert buehne is not None
+    text = buehne.get_text(" ", strip=True)
+    assert "Lesezeit" not in text and "relevante Meldungen" not in text
+    beiwerk = ".buehne-pause, .buehne-weiter, .buehne-jahr, .fenster-fuss"
+    assert buehne.select_one(beiwerk) is None
+    assert buehne.select_one(".buehne-strich") is not None
+    titel = soup.select_one("#der-wochenbericht .bericht-titel")
+    assert titel["aria-label"] == "Der Wochenbericht"
 
 
 QUELLEN = [
@@ -1177,30 +1183,30 @@ def test_die_statuszeile_der_differenzierung_ist_weg(tmp_path, undefiniert):
         _gegenprobe_aufzeichnung(undefiniert, tot)
 
 
-def test_neu_auf_dem_radar_zeigt_nur_junge_funde(tmp_path):
+def test_neue_funde_tragen_im_stapel_ihr_neu(tmp_path):
+    """Seit dem Neubau vom 11.10.2026 gibt es keine eigene Rubrik "Neu auf
+    dem Radar" mehr: das Neue steht in der Zeile seines Hebels und auf
+    seiner Karte im Stapel."""
     site = _mit_differenzierung(tmp_path)
     soup = BeautifulSoup(lies_seite(site, "differenzierung.html"), "html.parser")
-    radar = soup.select(".dz-radar .dzk")
-    assert len(radar) == len(DIFF_STORE)
-    assert (
-        soup.select_one(".dz-radar .rubrik h2").get_text(strip=True)
-        == "Neu auf dem Radar"
+    assert soup.select_one(".dz-radar") is None
+    neu = [k for k in soup.select(".wl-stapel .dzk") if k.select_one(".dz-new")]
+    assert len(neu) == len(DIFF_STORE)
+    gezaehlt = sum(
+        int(z.get_text(strip=True).split()[0]) for z in soup.select(".wl-zeile .wl-neu")
     )
-    assert all(k.select_one(".dz-new") for k in radar)
+    assert gezaehlt == len(DIFF_STORE)
 
 
-def test_ohne_junge_funde_steht_oben_das_zuletzt_gepruefte(tmp_path):
-    """Gegenprobe: eine ruhige Woche darf die Seite nicht enthaupten."""
+def test_ohne_junge_funde_steht_nirgends_neu(tmp_path):
+    """Gegenprobe: eine ruhige Woche zeigt keine Neu-Marke."""
     soup = BeautifulSoup(
         lies_seite(_mit_differenzierung(tmp_path, store=[]), "differenzierung.html"),
         "html.parser",
     )
-    assert (
-        soup.select_one(".dz-radar .rubrik h2").get_text(strip=True)
-        == "Zuletzt nachgeprüft"
-    )
-    assert soup.select(".dz-radar .dzk")
-    assert not soup.select(".dz-radar .dz-new")
+    assert soup.select(".wl-stapel .dzk")
+    assert not soup.select(".dz-new")
+    assert not soup.select(".wl-neu")
 
 
 def test_der_suchindex_kennt_auch_die_presse_eintraege(tmp_path):
@@ -1344,8 +1350,8 @@ def test_der_bericht_steht_verteilt_statt_als_block(tmp_path):
     assert "Zwei Anbieter tun dasselbe." in soup.select_one(".dz-muster-band").get_text(
         " ", strip=True
     )
-    ki = soup.select_one("#dz-theme-ki .dz-hebel-einordnung").get_text(" ", strip=True)
-    assert ki == "Indien treibt das Feld."
+    assert soup.select_one("#dz-theme-ki .dz-hebel-einordnung") is None
+    assert "Indien treibt das Feld." not in soup.get_text(" ", strip=True)
     assert soup.select_one("details.dz-essay") is None
 
 

@@ -68,8 +68,15 @@
    naechste Reihe steht versetzt darunter. Antonio: "die ganzen Artikel sind
    kreuz und quer, das sieht total bescheuert aus." Eine Zeitungsseite
    entsteht aus einem Raster - und ein Raster hat gleiche Zellen. #}
+{# 11.10.2026 (Antonio: "In jeder Kachel sollte ein cooles Bild sein"):
+   fehlt das Kampagnenbild oder ist es nur ein Streifen, steht das Foto der
+   Mechanik in der Flaeche - zwei Fassungen je Mechanik, damit nebeneinander
+   nicht zweimal dasselbe Bild steht. #}
 {% macro motiv(k, gross) %}
-{%- if k.bild %}
+{%- set ersatz = 'promo-' ~ (k.offer.mechanic or 'sonstiges') ~ '-' ~ (k.offer.headline | length % 2 + 1) -%}
+{%- if (not k.bild or k.bild_panorama) and ersatz in bilder %}
+<span class="pk-bild pk-bild--foto">{{ d.motiv(ersatz, prefix, 'pk-foto', breite=1600, hoehe=900) }}</span>
+{%- elif k.bild %}
 {# Kein `max-width` mehr: die Flaeche ist gesetzt, und in sie darf nur, was
    sie fuellen kann. Der Aufmacher (579 px) verlangt dafuer
    promo.LEAD_MIND_BREITE, jede kleine Karte (277 px) die Mindestbreite des
@@ -102,7 +109,7 @@
 <article class="pkarte{% if gross %} pkarte--gross{% if hoch %} pkarte--hoch{% endif %}{% endif %}{% if k.neu %} pkarte--neu{% endif %}{% if k.endet_bald %} pkarte--endet{% endif %}">
   <a class="pk-flaeche" href="{{ k.offer.url }}" target="_blank" rel="noopener">
     {{ motiv(k, gross) }}
-    {% if k.bild %}<span class="pk-zahl">{{ k.kachel }}</span>{% endif %}
+    {% if k.bild or ('promo-' ~ (k.offer.mechanic or 'sonstiges') ~ '-' ~ (k.offer.headline | length % 2 + 1)) in bilder %}<span class="pk-zahl">{{ k.kachel }}</span>{% endif %}
     <span class="pk-titel szl">{{ k.offer.headline }}</span>
     {% if gross and k.offer.description %}<span class="pk-text">{{ k.offer.description }}</span>{% endif %}
   </a>
@@ -160,10 +167,6 @@
       {% endif %}
       <div class="pw-schleier" aria-hidden="true"></div>
       <div class="pw-text">
-        <div class="wa-dach"><span>Promo</span>
-          {{ d.umschalter([{'key': 'aktionen', 'href': 'promo/index.html', 'label': 'Aktionen'},
-                           {'key': 'quellen', 'href': 'promo/quellen.html', 'label': 'Quellen'}], 'aktionen', prefix, 'Ansicht') }}
-          <span class="wa-stand">Stand {{ date_de }}</span></div>
         <p class="pw-zahl"><b data-zaehler>{{ promo_view.active_total }}</b></p>
         <p class="pw-zahl-text">Aktionen bei {{ promo_view.brands_active }} Marken</p>
         <ul class="pw-neben">
@@ -171,7 +174,7 @@
           <li><b>{{ aktiv_karten | selectattr('endet_bald') | list | length }}</b>enden in 7 Tagen</li>
         </ul>
       </div>
-      {% if motive %}<button type="button" class="pw-pause" data-wand-pause aria-pressed="false">Anhalten</button>{% endif %}
+      <div class="wa-hinweis" aria-hidden="true"></div>
     </div>
   </div>
 </section>
@@ -215,4 +218,5 @@
   </details>
 </div>
 {% endif %}
+{{ d.weiter('promo/quellen.html', 'Quellen', prefix) }}
 {% endblock %}

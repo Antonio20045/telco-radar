@@ -31,9 +31,9 @@
     <div class="qf-rahmen">
       <div class="qf-bild" aria-hidden="true">{{ d.motiv('band-quellen', prefix, 'wa-motiv', eager=true) }}</div>
       <div class="qf-schleier" aria-hidden="true"></div>
+      <div class="wa-hinweis" aria-hidden="true"></div>
       <div class="qf-stufe">
         <div>
-          <div class="wa-dach"><span>Quellen</span>{% if date_de %}<span class="wa-stand">Lauf vom {{ date_de }}</span>{% endif %}</div>
           <div class="qf-wechsel" data-filter-anzeige>
             <p class="qf-zahl" data-filter-zahl>{{ tsd(stufen[0].zahl) }}</p>
             <p class="qf-titel" data-filter-titel>{{ stufen[0].titel }}</p>

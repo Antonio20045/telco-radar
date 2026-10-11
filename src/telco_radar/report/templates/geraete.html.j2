@@ -87,10 +87,6 @@
       <div class="wa-bild" aria-hidden="true">{{ d.motiv('band-geraete', prefix, 'wa-motiv', eager=true) }}</div>
       <div class="wa-schleier" aria-hidden="true"></div>
       <div class="wa-text">
-        <div class="wa-dach"><span>Geräte</span>
-          {{ d.umschalter([{'key': 'preise', 'href': 'geraete.html', 'label': 'Preise'},
-                           {'key': 'quellen', 'href': 'geraete-quellen.html', 'label': 'Quellen & Methodik'}], 'preise', prefix, 'Ansicht') }}
-          {% if geraete.abgerufen_bis %}<span class="wa-stand">Preise vom {{ geraete.abgerufen_bis | date_de }}</span>{% endif %}</div>
         <h1 class="gx-held">
           <span class="gx-art gx-art--tarif"><b data-zaehler="{{ teurer.tarif | length }}">{{ teurer.tarif | length }}</b>
             <span>Geräte sind mit Tarif bei Vodafone über {{ teurer.schwelle | int }}&nbsp;% teurer.</span></span>
@@ -1281,4 +1277,5 @@
 </section>
 {% endif %}
 
+{{ d.weiter('geraete-quellen.html', 'Quellen & Methodik', prefix) }}
 {% endblock %}
