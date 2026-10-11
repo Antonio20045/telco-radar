@@ -9,12 +9,17 @@ einer Startseite (``Gang.waehle``) und liest danach: die zweite Lesung neu
 geklickten Option, Text der Zusammenfassung. Das Tor lässt nach dem Weiter-Klick nur
 GET und HEAD durch (``klicktor.GRUND_NUR_LESEN``); ein solcher Klick kann also nichts
 schreiben. Zeigt die Seite danach Anmeldung, Checkout oder Zahlung, endet der Lauf.
+Vor jedem Klick bekommt die Wache den Text der Zusammenfassung als ``anzeige``: ihr
+Wechsel beendet das Warten nach dem Klick (``klickwache.Wache.warte_ruhe``).
 """
 
 from __future__ import annotations
 
 from dataclasses import replace
+from functools import partial
 from typing import TYPE_CHECKING, Protocol
+
+from playwright.sync_api import Error as PlaywrightFehler
 
 from .klickecho import LAUFZEIT, Variante, variante_aus
 from .klickkarte import DIMENSIONEN
@@ -33,6 +38,7 @@ if TYPE_CHECKING:
     from .klickwache import Wache
 
 GRUND_NICHT_BESUCHT = "nicht besucht"
+ERSTER_TEXT_JS = "(e) => e.length ? e[0].innerText : ''"
 
 
 class Gang(Protocol):
@@ -110,6 +116,8 @@ def _klicke_und_lies(
     vorab: Vorlesung,
 ) -> Kombiergebnis:
     """Ein Klick auf der Folgeseite (nur GET und HEAD gehen hinaus), dann die Lesung."""
+    if gang.karte.textlesung.oeffnen is None:
+        gang.wache.anzeige = partial(anzeige, gang.seite, gang.karte)
     ergebnis = gang.waehle(dimension, str(kombi[dimension]), variante)
     if ergebnis is not None:
         return ergebnis
@@ -137,6 +145,16 @@ def zu_viele(gang: Gang, variante: Variante) -> Kombiergebnis:
     """Die Kombination jenseits der Höchstzahl als „nicht besucht“."""
     grund = f"{GRUND_NICHT_BESUCHT}: mehr als {gang.hoechste} Kombinationen"
     return Kombiergebnis(variante, NICHT_ERFASST, grund)
+
+
+def anzeige(seite: Page, karte: Klickkarte) -> str:
+    """Text des ersten Bereichs der Zusammenfassung ohne Warten; leer ohne Treffer."""
+    try:
+        bereich = seite.locator(karte.textlesung.selektoren[0])
+        text = bereich.evaluate_all(ERSTER_TEXT_JS)
+    except PlaywrightFehler:
+        return ""
+    return str(text or "")
 
 
 def pruefe_strecke(seite: Page) -> None:

@@ -365,13 +365,13 @@ class Abrufschleuse:
         self._letzter_abruf = 0.0
         self.ausserhalb_besuchszeit = False
 
-    def passiere(self, url: str) -> None:
+    def passiere(self, url: str, eigener_abstand: bool = True) -> None:
         """Laesst den Abruf durch - oder wirft `GeraeteAbrufFehler`.
 
         Kehrt erst zurueck, wenn der Crawl-delay abgewartet ist; der
-        Aufrufer darf danach sofort abrufen.
+        Aufrufer darf danach sofort abrufen; ohne `eigener_abstand` nur Crawl-delay.
         """
-        abstand = self._waechter.abstand(url, self._rate_limit)
+        abstand = self._waechter.abstand(url, self._rate_limit * eigener_abstand)
         noch_kein_abruf = self._letzter_abruf == 0.0
         warte = (
             0.0

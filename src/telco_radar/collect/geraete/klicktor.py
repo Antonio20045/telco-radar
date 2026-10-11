@@ -5,7 +5,10 @@ Anfrage der Seite geht durch das ``Tor``, bevor sie hinausgeht. Bilder, Medien,
 Schriften und Datenkanäle ohne Nutzen für die Lesung (EventSource, Beacon, Prefetch,
 Manifest) bricht das Tor ab. Jede andere Adresse prüft ``RobotsWaechter.darf`` und
 passiert die Schleuse ihres Hosts, die den Crawl-delay abwartet: je Host ist höchstens
-eine Anfrage unterwegs, und der Abstand zählt ab dem Ende der letzten Antwort.
+eine Anfrage unterwegs, und der Abstand zählt ab dem Ende der letzten Antwort. Das
+eigene Rate-Limit gilt nur für Seitenaufrufe (``SEITENAUFRUF``); Skripte, Stylesheets
+und XHR einer Seite warten nur den Crawl-delay aus robots.txt ab, wie ein Browser
+(Entscheidung Antonio 11.10.2026).
 Skripte und Stylesheets eines Hosts, dessen robots.txt mit 401 oder 403 antwortet,
 passieren die Schleuse ohne Regeln, mit dem eigenen Abstand (``klickhilfe``,
 Entscheidung Antonio 07.10.2026); in den Browser kommen davon nur JavaScript und CSS,
@@ -34,18 +37,18 @@ from __future__ import annotations
 
 import logging
 import re
-import time
 from collections.abc import Callable
 from datetime import datetime
-from typing import TYPE_CHECKING, Protocol
+from typing import TYPE_CHECKING
 from urllib.parse import urljoin
 
 from playwright.sync_api import Error as PlaywrightFehler
 
-from . import Abrufschleuse
 from .basis import GeraeteAbrufFehler
 from .klickhilfe import Ausnahmeweg
 from .klicklauf import Gescheitert, Klicklauf, Verworfen, antworttext, bot_schutz
+from .klickschleuse import Hostschleuse as Hostschleuse
+from .klickschleuse import Schleuse
 from .klicksperre import Pruefung
 from .robots import RobotsWaechter, host_von
 
@@ -85,6 +88,7 @@ ABRUF_FRIST_MS = SEITEN_FRIST_MS
 WARTE_TAKT_MS = 50
 GRUND_ZU_VIELE = f"mehr als {HOECHSTE_UMLEITUNGEN} Umleitungen"
 LESENDE_METHODEN = frozenset({"GET", "HEAD"})
+SEITENAUFRUF = "document"
 GRUND_NUR_LESEN = "nach dem Weiter-Klick nur GET und HEAD"
 LEERE_SEITE = 200
 SPEKULATIONSKOPF = "speculation-rules"
@@ -99,78 +103,6 @@ _VORABLADEN = re.compile(
     re.I | re.S,
 )
 _VORAB_REL = re.compile(r"\brel\s*=\s*\"?[^\";,]*?\b(?:prerender|prefetch)\b", re.I)
-
-
-class Schleuse(Protocol):
-    """Das robots-Tor vor einem Abruf; hält den Abstand je Host über Läufe hinweg."""
-
-    def passiere(self, url: str) -> None:
-        """Wartet den Abstand ab oder wirft ``GeraeteAbrufFehler``."""
-
-    def passiere_ohne_regeln(self, url: str) -> None:
-        """Wie ``passiere``, ohne robots.txt zu fragen: nur für eine Hilfsdatei."""
-
-    def erledigt(self, url: str) -> None:
-        """Merkt das Ende der Antwort; ab hier zählt der Abstand."""
-
-    def abstand(self, url: str) -> float:
-        """Der Abstand in Sekunden, den ``passiere`` für ``url`` höchstens wartet."""
-
-
-class _Hostabruf(Abrufschleuse):
-    """Eine ``Abrufschleuse``, deren Abstand ab dem Ende der letzten Antwort zählt."""
-
-    def passiere_ohne_regeln(self, url: str) -> None:
-        """Wartet den Abstand ab (``RobotsWaechter.abstand``), ohne ``darf``."""
-        abstand = self._waechter.abstand(url, self._rate_limit)
-        if self._letzter_abruf:
-            time.sleep(max(0.0, abstand + self._letzter_abruf - time.monotonic()))
-        self._letzter_abruf = time.monotonic()
-
-    def erledigt(self) -> None:
-        """Setzt den letzten Abruf auf jetzt, nach dem Ende der Antwort."""
-        self._letzter_abruf = time.monotonic()
-
-
-class Hostschleuse:
-    """Je Host eine Abrufschleuse: Crawl-delay und Besuchszeit des Zielhosts.
-
-    Eine Hostschleuse gilt für einen ganzen Anbieterlauf, damit der Abstand auch
-    zwischen zwei Produktseiten desselben Hosts gilt; Hosts warten nicht aufeinander.
-    """
-
-    def __init__(
-        self,
-        waechter: RobotsWaechter,
-        uhr: Callable[[], datetime],
-        rate_limit_sekunden: float = 0.0,
-    ) -> None:
-        self._waechter, self._uhr = waechter, uhr
-        self._rate_limit = rate_limit_sekunden
-        self._je_host: dict[str, _Hostabruf] = {}
-
-    def passiere(self, url: str) -> None:
-        """Wartet den Abstand des Hosts von ``url`` ab; eine Sperre wirft."""
-        self._fuer(url).passiere(url)
-
-    def passiere_ohne_regeln(self, url: str) -> None:
-        """Wartet den Abstand des Hosts von ``url`` ab, ohne robots.txt zu fragen."""
-        self._fuer(url).passiere_ohne_regeln(url)
-
-    def erledigt(self, url: str) -> None:
-        """Die Antwort von ``url`` ist da; der nächste Abruf wartet ab jetzt."""
-        self._fuer(url).erledigt()
-
-    def abstand(self, url: str) -> float:
-        """Crawl-delay des Hosts oder eigenes Rate-Limit, der größere Wert."""
-        return self._waechter.abstand(url, self._rate_limit)
-
-    def _fuer(self, url: str) -> _Hostabruf:
-        host = host_von(url)
-        if host not in self._je_host:
-            schleuse = _Hostabruf(self._waechter, self._uhr, self._rate_limit)
-            self._je_host[host] = schleuse
-        return self._je_host[host]
 
 
 class Tor:
@@ -279,8 +211,7 @@ class Tor:
                 self._scheitere(route, ziel, belegt)
                 return False
             self._unterwegs.add(host)
-            schleuse = self.schleuse
-            passiere = schleuse.passiere_ohne_regeln if hilfe else schleuse.passiere
+            passiere = self._schleusengang(route.request, hilfe)
             try:
                 passiere(ziel)
             except GeraeteAbrufFehler as fehler:
@@ -294,6 +225,16 @@ class Tor:
                 return False
         self._verwirf(route, ziel, grund, anfrage)
         return False
+
+    def _schleusengang(self, anfrage: Request, hilfe: bool) -> Callable[[str], None]:
+        """Hilfsdatei ohne Regeln, Seitenaufruf mit eigenem Abstand, Unterressource
+        nur mit Crawl-delay (wie ein Browser, Entscheidung Antonio 11.10.2026)."""
+        schleuse = self.schleuse
+        if hilfe:
+            return schleuse.passiere_ohne_regeln
+        if anfrage.resource_type == SEITENAUFRUF:
+            return schleuse.passiere
+        return getattr(schleuse, "passiere_unterressource", schleuse.passiere)
 
     def _frei(self, host: str) -> bool:
         for _ in range(SEITEN_FRIST_MS // WARTE_TAKT_MS):

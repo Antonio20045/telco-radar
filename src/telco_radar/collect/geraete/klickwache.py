@@ -23,6 +23,10 @@ passt; erwartet keine Quelle eine Antwort je Klick (congstar, Vodafone, 1&1), wa
 die Wache nach einem Klick nur auf Ruhe. Mit ``bereit`` (Übersicht, ``klickuebersicht``)
 wartet ``lade`` nicht auf ``load``: nach der Prüfung und einem Hauptdokument ohne
 Störung (``abruf_gestoert``) nur, bis der JavaScript-Ausdruck ``bereit`` wahr ist.
+Trägt die Wache eine ``anzeige`` (Folgeseite, ``klickfolgeklick``), endet das Warten
+auf Ruhe auch, sobald deren Text anders ist als bei der letzten ``marke`` und zwei
+Lesungen im Abstand ``RUHE_MS`` gleich sind: Vodafone stellt nach einem Tarifklick
+keine Anfrage, Nebenabrufe der Seite laufen aber weiter, sodass Ruhe nie eintritt.
 """
 
 from __future__ import annotations
@@ -98,6 +102,8 @@ class Wache:
         self.antwort: Response | None = None
         self.ausstehend: str | None = None
         self.geoeffnet = False
+        self.anzeige: Callable[[], str] | None = None
+        self.anzeige_vorher: str | None = None
 
     def pruefe_tor(self) -> None:
         """Bricht ab, wenn die Hauptseite Bot-Schutz zeigte oder im Lauf umleitet."""
@@ -195,7 +201,12 @@ class Wache:
         return bedingung()
 
     def marke(self) -> Marke:
-        """Stand von Mitschnitt, ``verworfen`` und ``gescheitert`` vor einem Schritt."""
+        """Stand von Mitschnitt, ``verworfen`` und ``gescheitert`` vor einem Schritt.
+
+        Mit ``anzeige`` merkt sie sich auch deren Text (``warte_ruhe``).
+        """
+        if self.anzeige is not None:
+            self.anzeige_vorher = self.anzeige()
         return (
             self.mitschnitt.stand(),
             len(self.lauf.verworfen),
@@ -223,8 +234,26 @@ class Wache:
             self.nimm_antwort(marke)
 
     def warte_ruhe(self) -> None:
-        """Wartet, bis keine Anfrage läuft und keine neue kommt, höchstens die Frist."""
-        self.in_ruhe(lambda: [])
+        """Wartet, bis keine Anfrage läuft und keine neue kommt, höchstens die Frist.
+
+        Mit ``anzeige`` auch nur, bis deren Text sich seit ``marke`` geändert hat und
+        zwei Lesungen gleich sind.
+        """
+        anzeige, vorher = self.anzeige, self.anzeige_vorher
+        if anzeige is None or vorher is None:
+            self.in_ruhe(lambda: [])
+            return
+        ruhe: int | None = None
+        zuletzt: str | None = None
+        for _ in range(max(MINDESTE_RUHELESUNGEN, self.frist_ms // RUHE_MS)):
+            self.pruefe_tor()
+            gestartet, jetzt = self.mitschnitt.ruhe(), anzeige()
+            if gestartet is not None and gestartet == ruhe:
+                return
+            if jetzt and jetzt != vorher and jetzt == zuletzt:
+                return
+            ruhe, zuletzt = gestartet, jetzt
+            self.seite.wait_for_timeout(RUHE_MS)
 
     def warte_offen(self) -> None:
         """Wartet offene Preisanfragen ab; bleibt eine offen, ist der Lauf gestört."""

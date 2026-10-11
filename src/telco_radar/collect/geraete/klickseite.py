@@ -36,11 +36,12 @@ from typing import TYPE_CHECKING
 
 from playwright.sync_api import Error as PlaywrightFehler
 
-from .basis import GeraeteAbrufFehler
 from .klickinventar import Inventar, lies_inventar
 from .klickkontext import Sitzung, oeffne_sitzung, schliesse
 from .klicklauf import LAUF_GELESEN, LAUF_GESPERRT, LAUF_GESTOERT, Klicklauf
 from .klickproben import lehne_einwilligung_ab, probiere
+from .klickschleuse import GRUND_FRIST as GRUND_FRIST
+from .klickschleuse import Fristschleuse as Fristschleuse
 from .klickspur import (
     Eintrag,
     Spur,
@@ -54,7 +55,6 @@ from .klicktor import (
     HOECHSTE_UMLEITUNGEN,
     SEITEN_FRIST_MS,
     WARTE_TAKT_MS,
-    Hostschleuse,
     Tor,
     kurz,
 )
@@ -70,53 +70,10 @@ log = logging.getLogger(__name__)
 RUHE_FRIST_MS = 20_000
 FENSTER: ViewportSize = {"width": 1280, "height": 900}
 ABGELAUFEN = "zeitgrenze"
-GRUND_FRIST = "Zeitgrenze erreicht"
 TOTE_STATUS = frozenset({404, 410})
 LAUF_LEER = "leer"
 SET_COOKIE = "set-cookie"
 _GELADEN_JS = "() => document.readyState === 'complete'"
-
-
-class Fristschleuse:
-    """Eine Hostschleuse mit Zeitgrenze: nach ``ende`` geht keine Anfrage hinaus."""
-
-    def __init__(self, innen: Hostschleuse, ende: float) -> None:
-        self.innen, self.ende = innen, ende
-        self.abgelaufen = False
-
-    def setze(self, ende: float) -> None:
-        """Neue Grenze für die nächste Seite."""
-        self.ende, self.abgelaufen = ende, False
-
-    def offen(self, url: str) -> bool:
-        """Wahr, solange ein Abruf von ``url`` samt Abstand vor der Grenze hinausgeht.
-
-        Dieselbe Grenze gilt für ``passiere`` und für den Klick-Crawler (``frist``).
-        """
-        return time.monotonic() + self.innen.abstand(url) < self.ende
-
-    def passiere(self, url: str) -> None:
-        """Wirft ``GeraeteAbrufFehler``, wenn der Abstand über die Grenze reicht."""
-        self._pruefe_frist(url)
-        self.innen.passiere(url)
-
-    def passiere_ohne_regeln(self, url: str) -> None:
-        """Wie ``passiere``, ohne robots.txt zu fragen: nur für eine Hilfsdatei."""
-        self._pruefe_frist(url)
-        self.innen.passiere_ohne_regeln(url)
-
-    def erledigt(self, url: str) -> None:
-        """Die Antwort ist da; der Abstand zählt ab jetzt."""
-        self.innen.erledigt(url)
-
-    def abstand(self, url: str) -> float:
-        """Crawl-delay oder eigener Abstand des Hosts."""
-        return self.innen.abstand(url)
-
-    def _pruefe_frist(self, url: str) -> None:
-        if not self.offen(url):
-            self.abgelaufen = True
-            raise GeraeteAbrufFehler(f"{GRUND_FRIST}, nicht abgerufen")
 
 
 @dataclass
