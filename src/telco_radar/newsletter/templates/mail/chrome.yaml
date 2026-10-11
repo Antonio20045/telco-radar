@@ -24,7 +24,7 @@
 # Absicht: ein neuer Rahmensatz soll eine bewusste Entscheidung sein.
 # -----------------------------------------------------------------------------
 
-version: "2026-09-28"
+version: "2026-10-11"
 
 # Der Absender. Anzeigename bewusst neutral: ein Markenname vor einer nicht
 # zur Marke gehoerenden Adresse ist genau das Muster, auf das
@@ -33,47 +33,39 @@ absender_name: "Telco Radar"
 
 kopf:
   titel: "Telco Radar"
-  untertitel: "Marktbeobachtung Telekommunikation"
+  untertitel: "Vodafone Product and Services Insights"
   # {datum} wird ersetzt. Kein anderer Platzhalter.
   ausgabe: "Ausgabe vom {datum}"
 
-anrede: "Hallo,"
+# Der eine Satz, der die Auswahl erklaert; er steht vor dem ersten Abschnitt.
+einleitung_filter: "Neu seit der letzten Ausgabe, passend zu Ihrer Auswahl."
+einleitung_alles: "Neu seit der letzten Ausgabe."
 
-# Der eine Satz, der die Auswahl erklaert. Er steht bewusst VOR den
-# Meldungen: wer nicht weiss, warum diese acht Zeilen und keine anderen,
-# liest die erste als Zufall.
-einleitung_filter: "diese Meldungen passen zu deinen Themen:"
-einleitung_alles: "das ist neu in der Marktbeobachtung:"
+# Die Abschnitte heissen wie die Bereiche der Anmeldeseite und die Reiter des
+# Portals (config/newsletter.yaml); die Reihenfolge ist die dortige.
+abschnitte:
+  marktrecherche: "Meldungen"
+  promo: "Promo"
+  geraete: "Geräte"
 
 # Die Markierung eines additiven Stichworttreffers. Ohne sie versteht
 # niemand, warum ein Eintrag in der Mail steht, den die uebrigen Filter
 # ausgeschlossen haetten.
-stichwort_marker: "Dein Stichwort: {stichwort}"
+stichwort_marker: "Ihr Stichwort: {stichwort}"
 
-# Die zwei Links je Eintrag. "Quelle" fuehrt zum Original, "im Bericht" auf
-# die Website - der Klick auf die Seite ist das Ziel jeder Ausgabe.
+# Die zwei Links je Eintrag. "Quelle" fuehrt zum Original, "im Portal" auf
+# die Website.
 link_quelle: "Zur Quelle"
-link_bericht: "Im Wochenbericht"
+link_bericht: "Im Portal"
 
 # Der Abschluss.
-schluss: "Den vollständigen Wochenbericht mit allen Meldungen findest du hier:"
-schluss_link: "Wochenbericht öffnen"
-
-# Die Ausgabe, die es nicht gibt. Sie wird NICHT verschickt (ein leerer
-# Newsletter erzieht zum Ignorieren) - dieser Text steht in der einen
-# monatlichen Nachricht an jemanden, bei dem seit Wochen nichts passt.
-leer_titel: "Zu deinen Themen gab es nichts Neues"
-leer_text: >-
-  seit {seit} ist zu deinen Themen keine Meldung aufgelaufen. Das ist ein
-  Befund und keine Panne — du bekommst keine Ausgabe, in der nichts steht.
-  Falls deine Auswahl zu eng ist, kannst du sie hier ändern:
-leer_link: "Themen anpassen"
+schluss_link: "Zum Portal"
 
 # Der Fuss. Jede Zeile hier ist rechtlich noetig oder eine Zusicherung.
 fuss:
-  warum: "Du bekommst diese E-Mail, weil du dich am {seit_datum} für den Telco Radar angemeldet und die Anmeldung per Klick bestätigt hast."
+  warum: "Sie bekommen diese E-Mail, weil Sie sich am {seit_datum} für den Telco Radar angemeldet und die Anmeldung per Klick bestätigt haben."
   abmelden: "Abmelden"
-  abmelden_satz: "Du kannst dich jederzeit mit einem Klick abmelden:"
+  abmelden_satz: "Abmelden geht jederzeit mit einem Klick:"
   datenschutz: "Datenschutzerklärung"
   impressum: "Impressum"
   automatisch: "Automatisch erstellt aus öffentlichen Quellen. Jede Aussage ist mit ihrer Originalquelle verlinkt."
@@ -83,7 +75,7 @@ fuss:
 # drumherum. {euro}/{prozent} sind die Schwellen aus
 # `report/geraete_bewegung.py`, nie hier eingetragen.
 bewegung:
-  titel: "Geräte: Abstand zu Vodafone"
+  titel: "Abstand zu Vodafone"
   zeitraum: "{von} bis {bis}"
   # Die groesste Zahl ist die AENDERUNG des Abstands, kein Preisniveau:
   # „240 € zugunsten von o2" heisst, o2 steht gegen Vodafone 240 € besser

@@ -81,3 +81,55 @@ def test_ein_segment_mit_geraetebewegung_ist_nicht_leer():
     assert Segment(hash="h", filter=Filtersatz(), geraete=ohne_woche).leer
     ohne_zeilen = dict(BLOCK, zeilen=[])
     assert Segment(hash="h", filter=Filtersatz(), geraete=ohne_zeilen).leer
+
+
+def test_die_mail_gliedert_nach_bereichen_wie_die_tabs():
+    from telco_radar.newsletter.render import abschnitte, lade_chrome
+
+    items = [
+        {"titel": "A", "bereich": "promo"},
+        {"titel": "B", "bereich": "marktrecherche"},
+        {"titel": "C", "bereich": "unbekannt"},
+    ]
+    aus = abschnitte(items, lade_chrome())
+    assert [a["titel"] for a in aus] == ["Meldungen", "Promo"]
+    assert [i["titel"] for i in aus[0]["items"]] == ["B", "C"]
+    assert sum(len(a["items"]) for a in aus) == len(items)
+
+
+def test_viele_aktionen_verdraengen_keine_meldung(katalog):
+    from telco_radar.newsletter.filters import Eintrag
+
+    def eintrag(nr, bereich, gewicht):
+        return Eintrag(
+            id=f"{bereich}-{nr}",
+            bereich=bereich,
+            titel=f"{bereich} {nr}",
+            text="",
+            url=f"https://beispiel.test/{bereich}/{nr}",
+            gewicht=gewicht,
+        )
+
+    aktionen = [eintrag(n, "promo", 30) for n in range(20)]
+    meldungen = [eintrag(n, "marktrecherche", 2) for n in range(3)]
+    deckel = katalog.grenzen.max_eintraege
+    gewaehlt = [
+        t.eintrag.bereich for t in waehle(aktionen + meldungen, Filtersatz(), katalog)
+    ]
+    assert gewaehlt.count("marktrecherche") == 3
+    assert gewaehlt.count("promo") == deckel
+
+
+def test_der_betreff_nennt_die_erste_meldung_vor_aktionen(katalog):
+    from telco_radar.newsletter.filters import Eintrag
+    from telco_radar.newsletter.render import betreff, lade_chrome
+
+    aktion = Eintrag(
+        id="a", bereich="promo", titel="Aktion", text="", url="u", gewicht=30
+    )
+    meldung = Eintrag(
+        id="m", bereich="marktrecherche", titel="Meldung", text="", url="v"
+    )
+    treffer = waehle([aktion, meldung], Filtersatz(), katalog)
+    assert treffer[0].eintrag.titel == "Aktion"
+    assert "Meldung (+1 weitere)" in betreff("10. Oktober 2026", treffer, lade_chrome())

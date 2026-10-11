@@ -127,9 +127,7 @@ def test_jeder_inhaltstragende_block_steht_so_im_bericht():
     nachricht = _nachricht()
     quelle = _quelltext()
     rahmen = _erlaubte_rahmen()
-    unbedenklich = re.compile(
-        r"^(?:[\W\d\s]|https?://|&\w+;|Zur Quelle|Im Wochenbericht)+$"
-    )
+    unbedenklich = re.compile(r"^(?:[\W\d\s]|https?://|&\w+;|Zur Quelle|Im Portal)+$")
     erfunden = []
     gepruefte = 0
     for block in _bloecke(nachricht.html):

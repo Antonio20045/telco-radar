@@ -258,8 +258,8 @@ def test_jede_zeile_verlinkt_geraeteseite_und_beide_angebote():
 def test_html_und_text_tragen_dieselben_zahlen():
     n = _nachricht()
     html = BeautifulSoup(n.html, "html.parser").get_text(" ")
-    block_html = html[html.index("Geräte:") : html.rindex("Telekom senkt")]
-    block_text = n.text[n.text.index("GERÄTE") : n.text.index("Telekom senkt")]
+    block_html = html[html.index("Abstand zu Vodafone") : html.rindex("Zum Portal")]
+    block_text = n.text[n.text.index("GERÄTE") : n.text.rindex("Zum Portal")]
     assert _zahlen(block_html) == _zahlen(block_text)
     assert _zahlen(block_text)
 
@@ -390,7 +390,7 @@ def test_der_testversand_rechnet_den_block_fuer_alte_berichte(tmp_path):
     )
     assert lauf.returncode == 0, lauf.stderr[-2000:]
     text = (tmp_path / "aus" / "test.txt").read_text(encoding="utf-8")
-    assert "GERÄTE: ABSTAND ZU VODAFONE" in text
+    assert "GERÄTE\n" in text and "Abstand zu Vodafone" in text
 
 
 def test_in_actions_steht_die_adresse_nur_in_der_maskenzeile(tmp_path):

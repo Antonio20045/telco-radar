@@ -44,26 +44,28 @@ def bestaetigungsmail(bestaetigen: str, basis: str) -> tuple[str, str]:
 <table role=presentation width="100%" cellpadding=0 cellspacing=0 border=0><tr>
 <td align=center style="padding:28px 12px"><table role=presentation width=600
  cellpadding=0 cellspacing=0 border=0
- style="width:100%;max-width:600px;background:{flaeche};padding:26px 24px">
-<tr><td style="font:700 24px/1.15 Georgia,serif;padding-bottom:14px;
-border-bottom:3px solid {tinte}">Telco Radar</td></tr>
-<tr><td style="font:400 15px/1.6 Georgia,serif;color:{tinte};padding-top:20px">
-<p>Guten Tag,</p>
-<p>bitte bestätigen Sie mit einem Klick, dass Sie den Telco Radar per E-Mail
-bekommen möchten:</p>
-<p><a href="{b}" style="color:{rot};font:700 15px Arial,sans-serif">Anmeldung
-bestätigen &rsaquo;</a></p>
-<p style="font-size:13px;color:{grau}">Der Link gilt 72 Stunden. <strong>Wenn
-Sie das nicht waren, ignorieren Sie diese E-Mail — es passiert dann
-nichts.</strong> Ohne Ihren Klick wird nichts gespeichert und es kommt keine
-weitere Nachricht.</p>
-<p style="font-size:13px;color:{grau}">Angefordert über das Anmeldeformular auf
-{s}.</p>
-</td></tr>
-<tr><td style="padding-top:24px;border-top:3px solid {tinte};
-font:400 11px/1.6 Arial,sans-serif;color:{grau}">
+ style="width:100%;max-width:600px;background:{flaeche}">
+<tr><td align=center style="padding:36px 28px 22px;border-bottom:3px double {tinte}">
+<div style="font:700 11px/1.4 Arial,sans-serif;letter-spacing:.22em;
+text-transform:uppercase;color:{rot}">Bitte bestätigen</div>
+<div style="font:400 46px/1.05 Georgia,serif;color:{tinte};padding-top:10px">
+Telco Radar</div></td></tr>
+<tr><td align=center style="padding:26px 28px 0;font:400 16px/1.6 Georgia,serif;
+color:{tinte}">Ein Klick, und Sie bekommen den Telco Radar per E-Mail.</td></tr>
+<tr><td align=center style="padding:26px 28px">
+<table role=presentation cellpadding=0 cellspacing=0 border=0><tr>
+<td style="background:{tinte};border-radius:999px;padding:14px 30px">
+<a href="{b}" style="font:400 16px/1 Arial,sans-serif;color:{flaeche};
+text-decoration:none">Anmeldung bestätigen &rsaquo;</a></td></tr></table></td></tr>
+<tr><td style="padding:0 28px 22px;font:400 13px/1.6 Georgia,serif;color:{grau}">
+Der Link gilt 72 Stunden. <strong>Wenn Sie das nicht waren, ignorieren Sie
+diese E-Mail — es passiert dann nichts.</strong> Ohne Ihren Klick wird nichts
+gespeichert und es kommt keine weitere Nachricht. Angefordert über das
+Anmeldeformular auf {s}.</td></tr>
+<tr><td style="padding:14px 28px 28px;font:400 11px/1.6 Arial,sans-serif;color:{grau}">
+<div style="border-top:3px double {tinte};padding-top:14px">
 <a href="{s}/impressum.html" style="color:{grau}">Impressum</a> &middot;
-<a href="{s}/datenschutz.html" style="color:{grau}">Datenschutzerklärung</a>
+<a href="{s}/datenschutz.html" style="color:{grau}">Datenschutzerklärung</a></div>
 </td></tr></table></td></tr></table></body></html>"""
     text = (
         "TELCO RADAR\n===========\n\nGuten Tag,\n\n"

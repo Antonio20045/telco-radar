@@ -247,7 +247,7 @@ def waehle(
     *,
     max_eintraege: int | None = None,
 ) -> list[Treffer]:
-    """Die Ausgabe fuer EINEN Filtersatz. Sortiert, gedeckelt, begruendet.
+    """Die Ausgabe fuer EINEN Filtersatz. Sortiert, je Bereich gedeckelt.
 
     Die Reihenfolge ist: erst alles, was die Filter treffen, dann die
     Stichworttreffer - beide fuer sich nach Gewicht. Ein Stichworttreffer
@@ -258,7 +258,6 @@ def waehle(
     ueber_filter: list[Treffer] = []
     ueber_stichwort: list[Treffer] = []
     gesehen: set[str] = set()
-
     for eintrag in eintraege:
         if eintrag.id in gesehen:
             continue
@@ -282,9 +281,9 @@ def waehle(
     def _rang(t: Treffer):
         return (-t.eintrag.gewicht, t.eintrag.datum or "", t.eintrag.titel)
 
-    ueber_filter.sort(key=_rang)
-    ueber_stichwort.sort(key=_rang)
-    return (ueber_filter + ueber_stichwort)[:deckel]
+    alle = sorted(ueber_filter, key=_rang) + sorted(ueber_stichwort, key=_rang)
+    bereich = [t.eintrag.bereich for t in alle]
+    return [t for i, t in enumerate(alle) if bereich[:i].count(bereich[i]) < deckel]
 
 
 def _bericht_dateien(reports_dir: Path, tage: int, heute: date | None):

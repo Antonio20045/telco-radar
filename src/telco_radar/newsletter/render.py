@@ -25,6 +25,7 @@ abgemeldet, die naechste Ausgabe kommt trotzdem.
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from decimal import ROUND_HALF_UP, Decimal
 from pathlib import Path
@@ -32,7 +33,7 @@ from pathlib import Path
 import yaml
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from ..report.anbieter_farben import MAIL, farbe_fuer
+from ..report.anbieter_farben import MAIL, farbe_fuer, ist_bekannt
 from ..textwerkzeug import saetze as _saetze
 from .filters import Treffer
 
@@ -238,7 +239,14 @@ def betreff(datum_de: str, treffer: list[Treffer], chrome: dict) -> str:
     marke = (chrome.get("kopf") or {}).get("titel") or "Telco Radar"
     if not treffer:
         return f"{marke}, {datum_de}"
-    erste = treffer[0].eintrag.titel.strip()
+    reihe = list(chrome.get("abschnitte") or {})
+    vorne = min(
+        treffer,
+        key=lambda t: (
+            reihe.index(t.eintrag.bereich) if t.eintrag.bereich in reihe else 0
+        ),
+    )
+    erste = vorne.eintrag.titel.strip()
     rest = len(treffer) - 1
     zusatz = f" (+{rest} weitere)" if rest > 0 else ""
     kopf = f"{marke}, {datum_de}: "
@@ -246,6 +254,29 @@ def betreff(datum_de: str, treffer: list[Treffer], chrome: dict) -> str:
     if len(erste) > platz > 20:
         erste = erste[:platz].rsplit(" ", 1)[0]
     return f"{kopf}{erste}{zusatz}"
+
+
+def _markenfarbe(absender: str) -> str:
+    """Die Anbieterfarbe fuer den Punkt vor dem Absender, sonst ''.
+
+    "Telekom Deutschland" und "O2 / Telefónica" tragen die Marke als ein
+    Wort im Namen; gesucht wird erst der ganze Name, dann jedes Wort."""
+    kandidaten = [absender, *re.split(r"[^\w&-]+", absender or "")]
+    marke = next((k for k in kandidaten if k and ist_bekannt(k)), "")
+    return farbe_fuer(marke) if marke else ""
+
+
+def abschnitte(items: list[dict], chrome: dict) -> list[dict]:
+    """Die Eintraege je Bereich, in der Reihenfolge von `chrome.abschnitte`.
+
+    Ein Bereich ohne eigene Ueberschrift landet unter der ersten, damit nie
+    ein Eintrag still verschwindet."""
+    titel = chrome.get("abschnitte") or {}
+    reihe = list(titel)
+    aus = {k: [] for k in reihe}
+    for it in items:
+        aus[it["bereich"] if it["bereich"] in aus else reihe[0]].append(it)
+    return [{"titel": titel[k], "items": aus[k]} for k in reihe if aus[k]]
 
 
 def _items(treffer: list[Treffer]) -> list[dict]:
@@ -278,6 +309,8 @@ def _items(treffer: list[Treffer]) -> list[dict]:
                 "url": t.eintrag.url,
                 "anker": t.eintrag.anker,
                 "stichwort": zeigen,
+                "bereich": t.eintrag.bereich,
+                "farbe": _markenfarbe(t.eintrag.absender),
             }
         )
     return aus
@@ -304,6 +337,7 @@ def baue(
         "chrome": chrome,
         "bewegung": bewegung_kontext(bewegung, basis, chrome),
         "items": _items(treffer),
+        "geraete_titel": (chrome.get("abschnitte") or {}).get("geraete", ""),
         "betreff": betreff(datum_de, treffer, chrome),
         "datum_de": datum_de,
         "seit_datum": seit_datum or datum_de,
@@ -317,6 +351,7 @@ def baue(
         "breite": BREITE,
         "mailfarbe": MAIL,
     }
+    ctx["abschnitte"] = abschnitte(ctx["items"], chrome)
     env = _env()
     return Nachricht(
         betreff=ctx["betreff"],
