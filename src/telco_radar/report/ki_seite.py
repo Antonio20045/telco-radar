@@ -10,6 +10,9 @@ höchstens zwölf Meldungen im Blatt, die älteren im zugeklappten Archiv.
 Das Band „Modelle“ zeigt den Store aus ``analyze.ki_modelle`` (Schnitt 6),
 ``app.js`` zeichnet daraus die Leiter (Schnitt 7). Die Rubrikleiste
 (Schnitt 8) zählt je Abschnitt dasselbe Feld, das der Abschnitt zeigt.
+„Verstehen“ (Schnitt 9) zeigt die Kapitel aus ``KAPITEL``; verlinkt sind
+nur die fertigen (``FERTIG``), Linie und Pillen der Fahrt stehen in
+``FAHRT_WEG`` und ``STATIONEN``, ``app.js`` zeichnet sie beim Scrollen.
 
 Das Modul importiert ``html`` nicht: die Themenerkennung kommt als
 Parameter herein.
@@ -28,6 +31,28 @@ KI_TAG = "KI / AI"
 LINKS = 2
 RECHTS = 5
 VORLAGE = "ki.html.j2"
+KAPITEL = (
+    "Wie eine KI antwortet",
+    "Was ist eigentlich KI?",
+    "Wie eine KI lernt",
+    "Warum sie würfelt",
+    "Der Schreibtisch",
+    "Überzeugend falsch",
+    "Erst denken, dann antworten",
+    "Sehen und Hören",
+    "Nachschlagen lassen",
+    "Agenten",
+    "Strom, Chips, Rechnung",
+    "Sicher arbeiten",
+)
+FERTIG = frozenset({1})
+FAHRT_WEG = "M 20 190 C 140 190 170 70 300 70 S 470 200 600 180 S 760 60 980 80"
+STATIONEN = (
+    ("Frage", 0.0, "start", 20.0, 190.0),
+    ("Wörter", 0.3, "middle", 300.3, 70.0),
+    ("Bedeutung", 0.6, "middle", 584.3, 181.7),
+    ("Antwort", 0.97, "end", 948.9, 77.9),
+)
 
 
 def ki_region(cfg) -> str | None:
@@ -108,8 +133,41 @@ def rubriken(ausgabe: dict, modelle: dict) -> list[dict]:
     teile = [
         ("meldungen", "Meldungen", ausgabe["anzahl"]),
         ("modelle", "Modelle", len(modelle["top"])),
+        ("verstehen", "Verstehen", len(KAPITEL)),
     ]
     return [{"ziel": z, "name": n, "zahl": k} for z, n, k in teile if k]
+
+
+def kapitel() -> list[dict]:
+    """Die Knoten der Schiene: Nummer, Titel, Ziel nur für fertige Kapitel."""
+    return [
+        {"nr": nr, "titel": t, "ziel": f"#kapitel-{nr}" if nr in FERTIG else None}
+        for nr, t in enumerate(KAPITEL, start=1)
+    ]
+
+
+def fahrt(schrift: int = 24) -> dict:
+    """Linie und Pillen der Fahrt für die Seite ohne JavaScript."""
+    pillen = []
+    for wort, an, anker, x, y in STATIONEN:
+        breite = len(wort) * schrift * 0.56 + schrift * 1.2
+        links = {"start": x - schrift * 0.6, "end": x - breite + schrift * 0.6}
+        pillen.append(
+            {
+                "wort": wort,
+                "an": an,
+                "anker": anker,
+                "x": x,
+                "y": y,
+                "rx": round(links.get(anker, x - breite / 2), 1),
+                "ry": y - schrift * 2.5,
+                "ty": y - schrift * 1.25,
+                "breite": round(breite, 1),
+                "hoehe": schrift * 1.8,
+                "schrift": schrift,
+            }
+        )
+    return {"weg": FAHRT_WEG, "pillen": pillen}
 
 
 def seite(env, wochen: list[dict], cfg, tag_tech, date_de: str, ki_store: dict) -> str:
@@ -125,4 +183,6 @@ def seite(env, wochen: list[dict], cfg, tag_tech, date_de: str, ki_store: dict) 
         ausgabe=blatt_ausgabe,
         modelle=band,
         rubriken=rubriken(blatt_ausgabe, band),
+        kapitel=kapitel(),
+        fahrt=fahrt(),
     )

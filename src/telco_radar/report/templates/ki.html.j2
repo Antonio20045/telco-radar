@@ -6,7 +6,9 @@
    Die Auswahl rechnet `ki_seite.ausgabe()`, Ressort und Archiv
    `analyze.ki_blatt` (Zeitungsprinzip, Schnitt 2). Die Leiter der Modelle
    (Schnitt 7) baut app.js aus #ki-modelle-daten; ohne JS bleibt die Liste.
-   Die Rubrikleiste (Schnitt 8) zeigt app.js, sobald der Kopf vorbei ist. #}
+   Die Rubrikleiste (Schnitt 8) zeigt app.js, sobald der Kopf vorbei ist.
+   Verstehen (Schnitt 9): Linie und Pillen stehen fertig im HTML, app.js
+   zeichnet sie mit dem Scrollen; die Schiene kommt aus ki_seite.KAPITEL. #}
 {% extends "base.html.j2" %}
 {% import "_design.html.j2" as d %}
 {% set active = 'ki' %}
@@ -89,5 +91,26 @@
     <p class="ki-modelle-quelle">Platz aus zwei Ranglisten gemittelt: <a href="{{ modelle.urls.aa }}" target="_blank" rel="noopener">Artificial Analysis</a> (Tests) und <a href="{{ modelle.urls.arena }}" target="_blank" rel="noopener">Arena</a> (Stimmen der Nutzer){% if modelle.stand %} · {% if modelle.ausfall %}Stand {% endif %}{{ modelle.stand }}{% endif %}{% for name, tag in modelle.ausfall %} · {{ name }} am {{ tag }} nicht abrufbar{% endfor %}{% if modelle.fehler %} · {{ modelle.fehler }}{% endif %}</p>
     {% endif %}
   </div>
+</section>
+
+<section class="ki-verstehen" id="verstehen" aria-label="KI verstehen">
+  <h2 class="ki-ansage ki-lern-ansage"><span><i>Wie antwortet</i></span><span><i>eigentlich</i></span><span><i>eine KI<em>?</em></i></span></h2>
+  <a class="ki-fahrt" href="{{ kapitel[0].ziel }}" aria-label="Kapitel 1 ansehen: {{ kapitel[0].titel }}">
+    <svg viewBox="0 0 1000 260" aria-hidden="true">
+      <path class="ki-fahrt-weg" d="{{ fahrt.weg }}"/>
+      {% for p in fahrt.pillen %}
+      <g class="ki-zug" data-an="{{ p.an }}" data-anker="{{ p.anker }}"><rect x="{{ p.rx }}" y="{{ p.ry }}" width="{{ p.breite }}" height="{{ p.hoehe }}" rx="{{ p.hoehe / 2 }}"/><text x="{{ p.x }}" y="{{ p.ty }}" text-anchor="{{ p.anker }}" font-size="{{ p.schrift }}">{{ p.wort }}</text><circle cx="{{ p.x }}" cy="{{ p.y }}" r="6"/></g>
+      {% endfor %}
+      {% set ende = fahrt.pillen | last %}
+      <circle class="ki-fahrt-punkt" cx="{{ ende.x }}" cy="{{ ende.y }}" r="9"/>
+    </svg>
+    <span class="ki-los">Kapitel 1 ansehen <span aria-hidden="true">→</span></span>
+  </a>
+  <ol class="ki-schiene" style="--kapitel:{{ kapitel | length }}" aria-label="Alle {{ kapitel | length }} Kapitel">
+    {% for k in kapitel %}
+    {% if k.ziel %}<li class="ki-kapitel ki-kapitel--fertig"><a href="{{ k.ziel }}"><b>{{ k.nr }}</b>{{ k.titel }}</a></li>
+    {% else %}<li class="ki-kapitel"><b>{{ k.nr }}</b>{{ k.titel }}</li>{% endif %}
+    {% endfor %}
+  </ol>
 </section>
 {% endblock %}

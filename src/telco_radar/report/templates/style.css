@@ -6013,9 +6013,36 @@ html:not([data-art="geraet"]) .gx-held .gx-art--tarif,html[data-art="geraet"] .g
 .ki-rubriken a b{font-weight:500;font-size:12px;color:var(--ink-3);font-variant-numeric:tabular-nums}
 .ki-rubriken a.an{background:var(--ink);color:var(--paper-2)}
 .ki-rubriken a.an b{color:var(--ink-4)}
+/* Schnitt 9: Verstehen - Ansage, Fahrt durch die Linie, Kapitel-Schiene */
+.ki-verstehen{padding:0 0 clamp(56px,7vw,96px);scroll-margin-top:140px}
+.ki-lern-ansage{font-size:clamp(46px,8vw,120px);line-height:1.02;letter-spacing:-.015em;color:var(--ink);margin-bottom:clamp(8px,2vw,24px)}
+.ki-fahrt{display:block;color:var(--ink);text-decoration:none}
+.ki-fahrt svg{display:block;width:100%;height:auto;overflow:visible}
+.ki-fahrt-weg{fill:none;stroke:var(--ink);stroke-width:1.5;stroke-linecap:round}
+.ki-zug rect,.ki-zug circle{fill:var(--paper-2);stroke:var(--ink);stroke-width:1.3}
+.ki-zug text{fill:var(--ink);font-family:var(--schrift)}
+.ki-fahrt-punkt{fill:var(--red)}
+.bewegt .ki-zug{transition:opacity .5s,transform .7s cubic-bezier(.2,1.4,.4,1);transform-box:fill-box;transform-origin:center}
+.bewegt .ki-zug.weg{opacity:0;transform:scale(.55)}
+.ki-los{display:inline-flex;align-items:center;gap:12px;margin-top:8px;padding:12px 24px;border:1px solid var(--ink);border-radius:999px;
+  font-size:clamp(17px,1.8vw,22px);font-weight:500;text-transform:uppercase;transition:background .3s,color .3s}
+.ki-fahrt:hover .ki-los{background:var(--ink);color:var(--paper-2)}
+.ki-schiene{position:relative;display:grid;grid-template-columns:repeat(var(--kapitel),minmax(0,1fr));margin:clamp(40px,5vw,64px) 0 0;padding:0;list-style:none}
+.ki-schiene::before{content:"";position:absolute;left:0;right:0;top:7px;height:1px;background:var(--ink)}
+.ki-kapitel{position:relative;padding:28px 10px 0 0;font-size:14px;line-height:1.25;color:var(--ink-3)}
+.ki-kapitel::before{content:"";position:absolute;left:0;top:2px;width:11px;height:11px;border-radius:50%;background:var(--paper);border:1px solid var(--ink)}
+.ki-kapitel b{display:block;margin-bottom:4px;font-family:var(--zeitung);font-weight:400;font-size:14px;color:var(--ink-4)}
+.ki-kapitel--fertig,.ki-kapitel--fertig a{color:var(--ink)}
+.ki-kapitel--fertig::before{left:-2px;top:0;width:15px;height:15px;background:var(--red);border-color:var(--red)}
+.ki-kapitel--fertig b{color:var(--red-text)}
+@media (max-width:860px){
+  .ki-schiene{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding-left:2px}
+  .ki-schiene::before{right:auto;width:calc(130px * var(--kapitel))}
+  .ki-kapitel{flex:0 0 130px;scroll-snap-align:start}
+}
 @media (max-width:900px){
   .ki-rubriken{top:calc(12px + env(safe-area-inset-top,0px))}
-  .ki-blatt,.ki-modelle{scroll-margin-top:72px}
+  .ki-blatt,.ki-modelle,.ki-verstehen{scroll-margin-top:72px}
 }
 @media (max-width:980px){
   .ki-oben{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"m m" "l r";row-gap:36px}
@@ -6029,6 +6056,7 @@ html:not([data-art="geraet"]) .gx-held .gx-art--tarif,html[data-art="geraet"] .g
   .ki-links,.ki-rechts{padding:0}
   .ki-titel{font-size:clamp(110px,34vw,160px)}
   .ki-ansage{font-size:min(8.4vw,40px)}
+  .ki-lern-ansage{font-size:min(11.8vw,46px)}
   .ki-liste{grid-template-columns:minmax(0,1fr)}
 }
 

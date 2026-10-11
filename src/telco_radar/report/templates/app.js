@@ -4577,7 +4577,7 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
   });
 })();
 
-/* KI-SEITE, SCHNITTE 7 UND 8 (Pitch 9, Entwurf 10). Die Leiter der Modelle:
+/* KI-SEITE, SCHNITTE 7 BIS 9 (Pitch 9, Entwurf 10). Die Leiter der Modelle:
    aus #ki-modelle-daten eine senkrechte Linie mit den Pillen abwechselnd
    links und rechts (unter 700 px alle rechts); ein roter Punkt faellt mit
    dem Scrollen, jede erreichte Stufe erscheint. Ohne JS bleibt die Liste.
@@ -4592,12 +4592,12 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
     eltern.appendChild(e);
     return e;
   }
-  var ansage = document.querySelector('.ki-ansage');
-  if (ansage && 'IntersectionObserver' in window) {
+  [].forEach.call(document.querySelectorAll('.ki-ansage'), function (ansage) {
+    if (!('IntersectionObserver' in window)) return ansage.classList.add('da');
     new IntersectionObserver(function (e, o) {
       if (e[0].isIntersecting) { ansage.classList.add('da'); o.disconnect(); }
     }, { threshold: 0.4 }).observe(ansage);
-  } else if (ansage) ansage.classList.add('da');
+  });
 
   var daten = document.getElementById('ki-modelle-daten');
   var M = daten ? JSON.parse(daten.textContent) : [];
@@ -4675,6 +4675,60 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
     addEventListener('resize', function () { clearTimeout(zg); zg = setTimeout(baue, 150); });
     baue();
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(baue);
+  }
+
+  /* Schnitt 9: die Linie der Fahrt zeichnet sich mit dem Scrollen, der
+     rote Punkt laeuft mit, jede erreichte Station poppt auf. Ohne JS steht
+     alles fertig im HTML. Unter 700 px groessere Schrift, hoehere viewBox. */
+  var weg = document.querySelector('#verstehen .ki-fahrt-weg');
+  if (weg) {
+    var bild = weg.ownerSVGElement, L = weg.getTotalLength();
+    var zuege = [].map.call(bild.querySelectorAll('.ki-zug'), function (g) {
+      return { g: g, an: +g.getAttribute('data-an'), anker: g.getAttribute('data-anker') };
+    });
+    var fpunkt = bild.querySelector('.ki-fahrt-punkt');
+    var lege = function () {
+      var FS = bild.parentNode.clientWidth < 700 ? 46 : 24;
+      bild.setAttribute('viewBox', FS > 30 ? '0 -60 1000 340' : '0 0 1000 260');
+      zuege.forEach(function (z) {
+        var p = weg.getPointAtLength(L * z.an), t = z.g.querySelector('text'), r = z.g.querySelector('rect'), k = z.g.querySelector('circle');
+        t.setAttribute('font-size', FS);
+        t.setAttribute('x', p.x);
+        t.setAttribute('y', p.y - FS * 1.25);
+        var tw = t.getComputedTextLength() + FS * 1.2;
+        var x = z.anker === 'start' ? p.x - FS * 0.6 : z.anker === 'end' ? p.x - tw + FS * 0.6 : p.x - tw / 2;
+        [['x', x], ['y', p.y - FS * 2.5], ['width', tw], ['height', FS * 1.8], ['rx', FS * 0.9]].forEach(function (a) { r.setAttribute(a[0], a[1]); });
+        k.setAttribute('cx', p.x);
+        k.setAttribute('cy', p.y);
+      });
+    };
+    var setze = function (u) {
+      weg.style.strokeDashoffset = L * (1 - u);
+      var p = weg.getPointAtLength(L * u);
+      fpunkt.setAttribute('cx', p.x);
+      fpunkt.setAttribute('cy', p.y);
+      zuege.forEach(function (z) { z.g.classList.toggle('weg', u < z.an - 0.01); });
+    };
+    var fakt = still ? 1 : 0, fziel = fakt, flaeuft = false;
+    var fschritt = function () {
+      var d = fziel - fakt;
+      fakt += d * 0.12;
+      if (Math.abs(d) < 0.001) fakt = fziel;
+      setze(fakt);
+      if (fakt !== fziel) requestAnimationFrame(fschritt); else flaeuft = false;
+    };
+    var frechne = function () {
+      var r = bild.getBoundingClientRect();
+      fziel = still ? 1 : Math.max(0, Math.min(1, (innerHeight * 0.9 - r.top) / (innerHeight * 0.55)));
+      if (!flaeuft) { flaeuft = true; requestAnimationFrame(fschritt); }
+    };
+    weg.style.strokeDasharray = L;
+    lege();
+    setze(fakt);
+    addEventListener('scroll', frechne, { passive: true });
+    addEventListener('resize', lege);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(lege);
+    frechne();
   }
 
   var rub = document.getElementById('ki-rubriken'), kopf = document.querySelector('.ki-auftakt');
