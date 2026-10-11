@@ -478,6 +478,7 @@ def _browser_messungen(site: Path, b: Bilanz) -> None:
         for name in (
             "index.html",
             "meldungen.html",
+            "ki.html",
             "promo/index.html",
             "differenzierung.html",
             *([f"suche.html?q={begriff}"] if begriff else []),

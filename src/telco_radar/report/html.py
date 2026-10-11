@@ -25,7 +25,7 @@ from . import fruehwarnung as fruehwarnung_mod, lieferzeit_view as lieferzeit_vi
 from . import glas as glas_mod, luecken as luecken_mod
 from . import newsletter_protokoll, rechtstexte as rechtstexte_mod
 from . import seit as seit_mod, verlauf as verlauf_mod
-from . import meldungen_seite, startseite as startseite_mod, statik, suchindex
+from . import ki_seite, meldungen_seite, startseite as startseite_mod, statik, suchindex
 from .differentiation import DIFF_THEMES
 from .promo import prepare_promo_view
 from .thema import build_thema_view
@@ -1822,15 +1822,19 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
             encoding="utf-8",
         )
 
-    for alt, ziel in (
-        ("bericht.html", "index.html"),
-        ("archive.html", "meldungen.html#archiv"),
-        ("protokoll.html", "transparenz.html"),
-        ("sources.html", "transparenz.html#bestand"),
-        ("wettbewerber.html", "wettbewerb.html"),
-        ("wettbewerbsradar.html", "geraete.html#tafel-radar"),
+    ki_html = ki_seite.seite(
+        env, wochen, cfg, _tag_tech, (latest_ctx or {}).get("date_de", "")
+    )
+    for alt, inhalt in (
+        ("bericht.html", _redirect_html("index.html")),
+        ("archive.html", _redirect_html("meldungen.html#archiv")),
+        ("protokoll.html", _redirect_html("transparenz.html")),
+        ("sources.html", _redirect_html("transparenz.html#bestand")),
+        ("wettbewerber.html", _redirect_html("wettbewerb.html")),
+        ("wettbewerbsradar.html", _redirect_html("geraete.html#tafel-radar")),
+        ("ki.html", ki_html),
     ):
-        (site_dir / alt).write_text(_redirect_html(ziel), encoding="utf-8")
+        (site_dir / alt).write_text(inhalt, encoding="utf-8")
 
     log.info("Site rendered: %d report(s) -> %s", len(reports), site_dir)
     for ausfall in ausfaelle:

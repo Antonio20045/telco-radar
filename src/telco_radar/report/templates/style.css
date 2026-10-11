@@ -5935,6 +5935,49 @@ html:not([data-art="geraet"]) .gx-held .gx-art--tarif,html[data-art="geraet"] .g
 .mg-auftakt .mg-woche,.mg-auftakt .mg-titel,.mg-auftakt .mg-datum{color:var(--bildtext)}
 @media (max-width:820px){.mg-auftakt{height:160vh}}
 
+/* KI (Pitch 9, Entwurf 10): Kopf wie die Meldungen-Seite, darunter die
+   KI-Meldungen in drei Spalten, Aufmacher in der Mitte, keine Fotos. */
+.ki-auftakt{--wa-rand:clamp(16px,4vw,64px)}
+.ki-titel{margin-top:.14em;font-size:clamp(130px,20vw,260px)}
+.ki-blatt{padding:clamp(56px,7vw,96px) 0 clamp(48px,6vw,80px)}
+.ki-oben{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr) minmax(0,1fr);
+  grid-template-areas:"l m r";padding-bottom:48px;border-bottom:1px solid var(--rule)}
+.ki-oben>*{min-width:0}
+.ki-meldung{margin:0}
+.ki-meldung--aufmacher{grid-area:m;padding:0 36px;border-inline:1px solid var(--rule);text-align:center}
+.ki-links{grid-area:l;padding-right:36px}
+.ki-rechts{grid-area:r;padding-left:36px}
+.ki-meldung--links,.ki-meldung--rechts{padding:18px 0;border-top:1px solid var(--rule)}
+.ki-links>.ki-meldung:first-child,.ki-spaltenkopf+.ki-meldung{padding-top:0;border-top:0}
+.ki-kicker{margin:0 0 8px;font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--red-text)}
+.ki-schlag{margin:0;font-family:var(--zeitung);font-weight:500;font-size:20px;line-height:1.2;letter-spacing:-.005em;text-wrap:balance}
+.ki-schlag a{color:var(--ink)}
+.ki-schlag a:hover{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:4px}
+.ki-meldung--aufmacher .ki-schlag{font-size:clamp(34px,3.8vw,52px);line-height:1.06;letter-spacing:-.02em}
+.ki-dek{margin:10px 0 0;font-family:var(--zeitung);font-style:italic;font-size:16px;line-height:1.4;color:var(--ink-2);
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.ki-meldung--aufmacher .ki-dek{font-size:19px;max-width:46ch;margin:16px auto 0;-webkit-line-clamp:5}
+.ki-wer{margin:10px 0 0;font-size:13px;color:var(--ink-3)}
+.ki-quelle{color:var(--ink-3);text-decoration:underline;text-underline-offset:3px}
+.ki-spaltenkopf{margin:0 0 16px;padding:0 0 10px;border-bottom:2px solid var(--rule-ink);
+  font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--ink)}
+.ki-liste{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:40px;padding-top:12px}
+.ki-meldung--liste{padding:20px 0;border-bottom:1px solid var(--rule)}
+.ki-meldung--liste .ki-schlag{font-size:19px}
+@media (max-width:980px){
+  .ki-oben{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"m m" "l r";row-gap:36px}
+  .ki-meldung--aufmacher{padding:0;border:0}
+  .ki-links{padding-right:18px}
+  .ki-rechts{padding-left:18px}
+  .ki-liste{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:620px){
+  .ki-oben{grid-template-columns:minmax(0,1fr);grid-template-areas:"m" "l" "r"}
+  .ki-links,.ki-rechts{padding:0}
+  .ki-titel{font-size:clamp(110px,34vw,160px)}
+  .ki-liste{grid-template-columns:minmax(0,1fr)}
+}
+
 /* STARTSEITE (Antonio, 11.10.2026): kein Gruss, kein Jahr, keine
    Unterzeile, kein Knopf - unten mittig nur der Strich. Danach direkt das
    erste Kapitelbild, keine Strecke wie auf den anderen Reitern. */

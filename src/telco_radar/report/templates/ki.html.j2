@@ -1,0 +1,57 @@
+{# KI - die KI-Meldungen aller Berichte (Pitch 9, Entwurf 10, Schnitt 1).
+
+   Kopf wie die Meldungen-Seite: Vollbild, das beim Scrollen zum Fenster
+   wird (Kinostrecke in app.js). Darunter drei Spalten mit dem Aufmacher in
+   der Mitte, ohne fremde Fotos; jede Meldung traegt ihren Quellenlink.
+   Die Auswahl rechnet `ki_seite.ausgabe()`. #}
+{% extends "base.html.j2" %}
+{% import "_design.html.j2" as d %}
+{% set active = 'ki' %}
+{% set buehne = true %}
+{% block title %}Vodafone Product and Services Insights · KI{% endblock %}
+
+{% macro meldung(h, art, dek=false) %}
+<article class="ki-meldung ki-meldung--{{ art }}">
+  <p class="ki-kicker">{{ h.ressort_label }}</p>
+  <h3 class="ki-schlag"><a href="{{ h.url }}" target="_blank" rel="noopener">{{ h.schlagzeile }}</a></h3>
+  {% if dek and h.summary %}<p class="ki-dek">{{ h.summary }}</p>{% endif %}
+  <p class="ki-wer"><a class="ki-quelle" href="{{ h.url }}" target="_blank" rel="noopener">{{ h.source_label }}</a>{% if h.operator %} · {{ h.operator }}{% endif %} · {{ h.ki_datum | date_de }}</p>
+</article>
+{% endmacro %}
+
+{% block buehne %}
+<section class="wa-auftakt mg-auftakt ki-auftakt" data-buehne>
+  <div class="wa-auftakt-buehne">
+    <div class="wa-rahmen">
+      <div class="wa-bild" aria-hidden="true">{{ d.motiv('band-ki', prefix, 'wa-motiv', eager=true) }}</div>
+      <div class="wa-schleier" aria-hidden="true"></div>
+      <header class="mg-kopf wa-text">
+        {% if ausgabe.kw %}<p class="mg-woche">Kalenderwoche {{ ausgabe.kw }}</p>{% endif %}
+        <h1 class="mg-titel ki-titel" aria-label="KI">{% for c in 'KI' %}<span style="--i:{{ loop.index0 }}" aria-hidden="true">{{ c }}</span>{% endfor %}</h1>
+        {% if date_de %}<p class="mg-datum">Ausgabe vom {{ date_de }}</p>{% endif %}
+      </header>
+      <div class="wa-hinweis" aria-hidden="true"></div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<section class="ki-blatt" id="meldungen" aria-label="KI-Meldungen">
+  {% if ausgabe.aufmacher %}
+  <div class="ki-oben">
+    {{ meldung(ausgabe.aufmacher, 'aufmacher', dek=true) }}
+    <div class="ki-links">{% for h in ausgabe.links %}{{ meldung(h, 'links', dek=true) }}{% endfor %}</div>
+    <div class="ki-rechts">
+      {% if ausgabe.rechts %}<h2 class="ki-spaltenkopf">Auch wichtig</h2>{% endif %}
+      {% for h in ausgabe.rechts %}{{ meldung(h, 'rechts') }}{% endfor %}
+    </div>
+  </div>
+  {% if ausgabe.liste %}
+  <div class="ki-liste">{% for h in ausgabe.liste %}{{ meldung(h, 'liste') }}{% endfor %}</div>
+  {% endif %}
+  {% else %}
+  <p class="empty-note">In den Berichten steht noch keine KI-Meldung.</p>
+  {% endif %}
+</section>
+{% endblock %}
