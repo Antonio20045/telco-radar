@@ -3,6 +3,8 @@
 Klick-Lauf 10.10.2026 21:12 UTC: Die Produktseite des Galaxy S26 Plus brach ab mit
 „Kanarienwert fehlt: … ohne ‚Galaxy S26 Plus‘“; Telekom nennt das Gerät „Samsung Galaxy
 S26+“ (Übersichtstitel desselben Laufs). Die Störung hielt die übrigen 40 Seiten an.
+Klick-Lauf 11.10.2026 19:31 UTC: das Energielabel nennt „Motorola edge 70“ nicht so
+wie der Übersichtstitel; „edge 70“ steht in beiden Schreibweisen.
 Jede Telekom-Seite nennt darum einen Namen, der im Telekom-Titel steht.
 """
 
@@ -18,6 +20,7 @@ TITEL = {
     "samsung-galaxy-z-fold-7": "Samsung Galaxy Z Fold7",
     "samsung-galaxy-z-flip-7": "Samsung Galaxy Z Flip7",
     "motorola-moto-g77": "motorola moto g77",
+    "motorola-edge-70": "Motorola edge 70",
     "xiaomi-redmi-note-15-pro-plus": "Xiaomi Redmi Note 15 Pro+ 5G",
 }
 
