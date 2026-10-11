@@ -80,11 +80,17 @@ class Bedienung:
         """Stellt jeden Zustand der Karte her; wahr, wenn dafür geklickt wurde."""
         geklickt = False
         for schritt in self.karte.vorbereitung:
-            if self._erfuellt(schritt):
+            if self._fehlt_erlaubt(schritt) or self._erfuellt(schritt):
                 continue
             self._klicke(schritt)
             geklickt = True
         return geklickt
+
+    def _fehlt_erlaubt(self, schritt: Vorbereitung) -> bool:
+        selektor = schritt.klick if schritt.pruefe is None else schritt.pruefe
+        if not schritt.darf_fehlen:
+            return False
+        return not self.wache.warte(lambda: self.seite.locator(selektor).count() > 0)
 
     def _erfuellt(self, schritt: Vorbereitung) -> bool:
         selektor = schritt.klick if schritt.pruefe is None else schritt.pruefe

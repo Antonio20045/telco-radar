@@ -138,12 +138,15 @@ class Vorbereitung:
 
     Passt das erste Element zu ``pruefe`` (ohne: zu ``klick``) nicht auf den
     CSS-Selektor ``bis``, klickt der Crawler das erste Element zu ``klick`` und wartet
-    darauf.
+    darauf. ``darf_fehlen``: gibt es kein Element (Telekom zeigt den
+    Rückgabedeal-Schalter nicht bei jedem Gerät, Galaxy A17 am 11.10.2026), ist der
+    Schritt erfüllt statt gestört.
     """
 
     klick: str
     bis: str
     pruefe: str | None = None
+    darf_fehlen: bool = False
 
 
 @dataclass(frozen=True)

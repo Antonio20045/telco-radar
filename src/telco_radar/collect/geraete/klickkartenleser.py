@@ -59,7 +59,7 @@ KNOPFTEILE = (
 )
 ADRESSTEILE = ("selektor", "attribut", "parameter")
 MARKENTEILE = ("attribut", "wert", "passt")
-VORBEREITUNGSTEILE = ("klick", "bis", "pruefe")
+VORBEREITUNGSTEILE = ("klick", "bis", "pruefe", "darf_fehlen")
 LESUNGSTEILE = ("selektor", "oeffnen", "schliessen", "ohne", "muster")
 KANARIENTEILE = ("selektor", "enthaelt", "attribut")
 KACHELN = "kacheln"
@@ -102,6 +102,13 @@ class Kartenleser:
         if daten.get(schluessel) is None:
             return None
         return self.text(daten, schluessel, feld)
+
+    def schalter(self, daten: Mapping, schluessel: str, feld: str) -> bool:
+        """Ein wahlweiser Wahrheitswert, ohne Angabe falsch."""
+        wert = daten.get(schluessel, False)
+        if not isinstance(wert, bool):
+            raise self.fehler(stelle(feld, schluessel), "erwartet true oder false")
+        return wert
 
     def text(self, daten: Mapping, schluessel: str, feld: str) -> str:
         """Nicht leerer Text an ``schluessel``; Zahl und Wahrheitswert als Text."""
@@ -213,6 +220,7 @@ class Kartenleser:
                     klick=self.text(daten, "klick", feld),
                     bis=self.text(daten, "bis", feld),
                     pruefe=self.wahlweise_text(daten, "pruefe", feld),
+                    darf_fehlen=self.schalter(daten, "darf_fehlen", feld),
                 )
             )
         return tuple(schritte)

@@ -335,6 +335,18 @@ def test_fehlendes_element_der_vorbereitung_stoert_den_lauf(chromium):
     assert lauf.grund == "Vorbereitung: #gibt-es-nicht nicht gefunden"
 
 
+def test_fehlendes_element_darf_fehlen_liest_die_seite(chromium):
+    """Telekom Galaxy A17, 11.10.2026: kein Rückgabedeal-Schalter auf der Seite."""
+    html = seite(CONGSTAR_KOERPER, CONGSTAR_SKRIPT.replace("@FEST@", "false"))
+    fehlt = [{"klick": "#gibt-es-nicht", "bis": ":checked", "darf_fehlen": True}]
+    k = karte(knoepfe=CONGSTAR_KNOEPFE, vorbereitung=fehlt)
+
+    lauf, _ = laufe(chromium, html, _congstar, k, frist_ms=1000)
+
+    assert lauf.status != "gestoert"
+    assert nach_auswahl(lauf)[("128 GB", "Allnet S", 36)].werte.rate == 23.5
+
+
 def test_einsundeins_feste_laufzeit_zubehoer_ab_und_kanarie_je_geraet(chromium):
     ohne = {"klick": "#zubehoer label:has(#ohne)", "pruefe": "#ohne", "bis": ":checked"}
     vorbereitung = [ohne]

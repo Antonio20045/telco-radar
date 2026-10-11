@@ -55,8 +55,8 @@ knoepfe:
 
 vorbereitung:
   # be 40: Rückgabedeal-Schalter, aria-checked="false" (Startadresse
-  # forwardTradeInApplied=false).
-  - {klick: "span.dt_switch.forwardTradeInSwitch", bis: '[aria-checked="false"]'}
+  # forwardTradeInApplied=false). Galaxy A17 (11.10.2026) zeigt keinen Schalter.
+  - {klick: "span.dt_switch.forwardTradeInSwitch", bis: '[aria-checked="false"]', darf_fehlen: true}
 
 seite:
   # Anzahlung des gewählten Laufzeitknopfs (be 42 aria-label „… zuzüglich 99 €
