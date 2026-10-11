@@ -26,7 +26,6 @@ from telco_radar.report import glas
 from telco_radar.report.html import render_site
 
 OBEN = 84
-OBEN_TELEFON = 128
 
 
 def _png(url: str) -> Image.Image:
@@ -156,11 +155,13 @@ _LAGE = """() => {
 
 
 @pytest.mark.parametrize(
-    ("breite", "hoehe", "oben"), [(1440, 900, OBEN), (390, 844, OBEN_TELEFON)]
+    ("breite", "hoehe", "oben"), [(1440, 900, OBEN), (390, 844, None)]
 )
 def test_der_umschalter_schwebt_beim_scrollen_und_ist_glas(
     chromium, basis, breite, hoehe, oben
 ):
+    """Am Rechner schwebt er; am Telefon bleibt er an seinem Platz wie die
+    Leiste der Geraeteseite (10.10.2026: nichts schwebt dort ueber Text)."""
     context, s = _seite(chromium, basis, "wettbewerb.html", breite, hoehe)
     try:
         start = s.evaluate(_LAGE)
@@ -168,7 +169,10 @@ def test_der_umschalter_schwebt_beim_scrollen_und_ist_glas(
         s.evaluate("window.scrollTo(0, 3000)")
         s.wait_for_timeout(300)
         lage = s.evaluate(_LAGE)
-        assert lage["oben"] == oben
+        if oben is None:
+            assert lage["unten"] < 0
+        else:
+            assert lage["oben"] == oben
         assert lage["pille"] == lage["wahl"]
         assert "blur" in lage["glas"]
     finally:

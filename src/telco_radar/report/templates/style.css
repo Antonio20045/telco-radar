@@ -6074,7 +6074,8 @@ html:not([data-art="geraet"]) .gx-held .gx-art--tarif,html[data-art="geraet"] .g
 .ohne-js .glas-pille{display:none}
 .ohne-js .glas-schalter > [aria-current="page"],.ohne-js .gr-reiter.glas-schalter > button[aria-selected="true"]{background:rgba(255,255,255,.66)}
 @media (max-width:900px){
-  .glas-schalter,.gr-reiter.gx-modus.glas-schalter{position:sticky;top:128px;scroll-margin-top:128px;width:max-content;margin:0 auto 32px}
+  .glas-schalter{position:relative;top:auto;scroll-margin-top:128px;margin:0 auto 32px}
+  .gr-reiter.gx-modus.glas-schalter{width:max-content}
   .glas-schalter > a,.gr-reiter.glas-schalter > button{height:44px;padding:0 20px;font-size:16px;flex:none}
 }
 @media (prefers-reduced-transparency:reduce){
