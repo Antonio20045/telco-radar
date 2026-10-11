@@ -63,6 +63,72 @@
     }
   }
 
+  /* DER CAMPUS LEBT (Antonio, 11.10.2026): hinter der Buehne laeuft eine
+     nahtlose Schleife des Campus Duesseldorf, wie er gerade ist - Tageszeit
+     und Wetter am Campus, nicht beim Leser. Das Wetter kommt ohne Schluessel
+     und ohne Kosten von Open-Meteo (Daten u. a. des Deutschen
+     Wetterdienstes). Antwortet der Dienst nicht, bestimmt die Uhr die
+     Tageszeit und der Himmel bleibt bewoelkt. Unter Automatisierung bleibt
+     die Buehne ruhig. */
+  var film = buehne && buehne.querySelector('.buehne-film');
+  if (film && !ruhig && !navigator.webdriver) {
+    var CAMPUS = 'https://api.open-meteo.com/v1/forecast?latitude=51.2437&longitude=6.7383'
+      + '&current=weather_code,temperature_2m&daily=sunrise,sunset&timezone=Europe%2FBerlin&forecast_days=1';
+    var minuten = function (t) {
+      var m = /T(\d\d):(\d\d)/.exec(t || '');
+      return m ? (+m[1]) * 60 + (+m[2]) : null;
+    };
+    var himmel = function (code) {
+      if (code == null) return 'wolken';
+      if (code <= 1) return 'sonne';
+      if ((code >= 71 && code <= 77) || code === 85 || code === 86) return 'schnee';
+      if (code >= 51) return 'regen';
+      return 'wolken';
+    };
+    var phase = function (jetzt, auf, unter) {
+      if (jetzt == null) {
+        var h = new Date().getHours();
+        jetzt = h * 60; auf = auf == null ? 7 * 60 : auf; unter = unter == null ? 19 * 60 : unter;
+      }
+      if (auf == null || unter == null) return 'mittag';
+      if (jetzt < auf - 30 || jetzt >= unter + 60) return 'nacht';
+      if (jetzt < auf + 180) return 'morgen';
+      if (jetzt >= unter - 90) return 'abend';
+      return 'mittag';
+    };
+    var zeige = function (szene, wetter) {
+      var basis = film.getAttribute('data-basis');
+      var klein = window.matchMedia && matchMedia('(max-width: 900px)').matches;
+      film.setAttribute('data-szene', szene);
+      buehne.classList.toggle('film-dunkel', /^(abend|nacht)/.test(szene));
+      film.poster = basis + szene + '.jpg';
+      film.src = basis + szene + (klein ? '-klein' : '') + '.mp4';
+      film.addEventListener('playing', function () { film.classList.add('laeuft'); }, { once: true });
+      var spiel = film.play();
+      if (spiel && spiel.catch) spiel.catch(function () {});
+      var zeile = document.querySelector('[data-campus-wetter]');
+      if (zeile && wetter) {
+        zeile.textContent = 'Campus Düsseldorf · ' + wetter;
+        zeile.hidden = false;
+      }
+    };
+    var WORT = { sonne: 'klar', wolken: 'bewölkt', regen: 'Regen', schnee: 'Schnee' };
+    var spaeter = window.fetch ? fetch(CAMPUS).then(function (a) {
+      if (!a.ok) throw new Error('Wetter ' + a.status);
+      return a.json();
+    }) : Promise.reject(new Error('kein fetch'));
+    spaeter.then(function (d) {
+      var c = d.current || {};
+      var t = d.daily || {};
+      var h = himmel(c.weather_code);
+      var p = phase(minuten(c.time), minuten((t.sunrise || [])[0]), minuten((t.sunset || [])[0]));
+      var grad = typeof c.temperature_2m === 'number' ? Math.round(c.temperature_2m) + ' °C, ' : '';
+      zeige(p + '-' + h, grad + WORT[h]);
+    }).catch(function () {
+      zeige(phase(null) + '-wolken', null);
+    });
+  }
+
   /* DER KOPF wird beim Scrollen etwas deckender. */
   var kopf = document.getElementById('kopf');
   if (kopf) {

@@ -37,12 +37,14 @@
     <img class="buehne-ebene" data-zeit-bild="{{ z }}" data-src="{{ prefix }}static/bilder/campus-{{ z }}.jpg"{% set klein = (bilder_klein or {}).get('campus-' ~ z) %}{% if klein %} data-srcset="{{ prefix }}static/bilder/{{ klein }} 1200w, {{ prefix }}static/bilder/campus-{{ z }}.jpg 2400w" sizes="100vw"{% endif %} alt="" width="2400" height="1357" decoding="async">
     {% endif %}
     {% endfor %}
+    <video class="buehne-film" data-basis="{{ prefix }}static/campus/" muted loop playsinline preload="none" aria-hidden="true"></video>
     {% if 'campus-tag' in bilder %}<noscript><img class="buehne-ebene geladen" src="{{ prefix }}static/bilder/campus-tag.jpg" alt=""></noscript>{% endif %}
   </div>
   <div class="buehne-inhalt">
     <div class="buehne-kopf">
       {% if not is_latest %}<p class="buehne-gruss">Archiv</p>{% endif %}
       <h1 class="buehne-datum">{{ teile[0] }}</h1>
+      <p class="buehne-wetter" data-campus-wetter hidden></p>
       {% if redaktion_ausfall %}
       <p class="ausfall-hinweis buehne-hinweis">Stand: {{ redaktion_ausfall.stand_de }} –
         die Runde vom {{ date_de }} blieb ohne Bewertung:

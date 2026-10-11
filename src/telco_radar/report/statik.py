@@ -13,6 +13,7 @@ sofort dessen Farben stehen und keine fremde Fläche aufblitzt (Antonio,
 
 from __future__ import annotations
 
+import os
 import shutil
 from pathlib import Path
 
@@ -21,6 +22,19 @@ from ..bild_vorschau import kleine_fassungen, vorschau
 ORDNER = "static"
 BILDER = "bilder"
 BINAER = ("logo.png", "favicon.ico")
+
+
+def _verknuepfe(quelle: str, ziel: str) -> str:
+    """Legt die Datei als harten Link an, sonst als Kopie.
+
+    Die Campus-Schleifen sind zusammen rund 48 MB; jede gerenderte Website,
+    auch jede in den Tests, bekäme sonst eine eigene Abschrift davon.
+    """
+    try:
+        os.link(quelle, ziel)
+    except OSError:
+        return shutil.copy2(quelle, ziel)
+    return ziel
 
 
 def kopiere(vorlagen: Path, site_dir: Path) -> dict[str, str]:
@@ -39,7 +53,7 @@ def kopiere(vorlagen: Path, site_dir: Path) -> dict[str, str]:
     statik = vorlagen / ORDNER
     if not statik.is_dir():
         return {}
-    shutil.copytree(statik, ziel)
+    shutil.copytree(statik, ziel, copy_function=_verknuepfe)
     bilder = statik / BILDER
     if not bilder.is_dir():
         return {}
