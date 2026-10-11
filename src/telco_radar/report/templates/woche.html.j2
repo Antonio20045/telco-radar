@@ -24,10 +24,8 @@
 {% block buehne %}
 {% if report %}
 {% set teile = (date_de or '').rsplit(' ', 1) %}
-{# Die Buehne steht in einer Strecke: beim Scrollen wird das Bild zum
-   Fenster, dann baut sich der Titel des Wochenberichts auf (Antonio,
-   11.10.2026: wenige Elemente, Strich statt Knopf). --p setzt app.js. #}
-<div class="buehne-strecke" data-buehne>
+{# Nach dem Startbild folgt direkt das Bild des ersten Kapitels, ohne
+   Zwischentitel und ohne Kino-Animation (Antonio, 11.10.2026). #}
 <section class="buehne" aria-label="Ausgabe vom {{ date_de }}">
   {# Vier Stimmungen desselben Bildes. app.js waehlt nach der Uhrzeit des
      Lesers EINE davon und laedt nur diese; ohne JavaScript steht der Tag. #}
@@ -109,7 +107,6 @@
   </div>
   <div class="buehne-strich" aria-hidden="true"></div>
 </section>
-</div>
 {% endif %}
 {% endblock %}
 
@@ -125,9 +122,6 @@
      zwei_minuten=(zwei_minuten|length > 0)) %}
 
 <div class="bericht" id="der-wochenbericht" style="scroll-margin-top:0">
-  {% if folge %}
-  <h2 class="bericht-titel" aria-label="Der Wochenbericht" data-buchstaben>{% for c in 'Der Wochenbericht' %}<span style="--i:{{ loop.index0 }}" aria-hidden="true">{{ c if c != ' ' else '&nbsp;'|safe }}</span>{% endfor %}</h2>
-  {% endif %}
   {% if folge %}
   {# Am Rand steht nur das aktuelle Kapitel; die Liste klappt erst beim
      Ueberfahren auf. Keine Fortschrittsleiste. #}

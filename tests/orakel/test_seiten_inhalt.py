@@ -597,8 +597,11 @@ def test_erster_bildschirm_ohne_beiwerk(tmp_path):
     beiwerk = ".buehne-pause, .buehne-weiter, .buehne-jahr, .fenster-fuss"
     assert buehne.select_one(beiwerk) is None
     assert buehne.select_one(".buehne-strich") is not None
-    titel = soup.select_one("#der-wochenbericht .bericht-titel")
-    assert titel["aria-label"] == "Der Wochenbericht"
+    assert buehne.find_parent(attrs={"data-buehne": True}) is None
+    assert not buehne.has_attr("data-buehne")
+    bericht = soup.select_one("#der-wochenbericht")
+    assert bericht.find(["h2"], recursive=False) is None
+    assert "Der Wochenbericht" not in bericht.get_text(" ", strip=True)[:200]
 
 
 QUELLEN = [
