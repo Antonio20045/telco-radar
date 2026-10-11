@@ -46,7 +46,7 @@
 {% set buehne = true %}
 {% set wrap_class = 'voll' %}
 {% set active = 'promo_uebersicht' %}
-{% block title %}Promo Übersicht · Wer wirbt gerade womit{% endblock %}
+{% block title %}Vodafone Product and Services Insights · Promo{% endblock %}
 
 {# Das Motiv einer Karte. JEDE Karte hat eins - entweder das Kampagnenbild
    oder die Kernzahl des Angebots als Schriftkachel ("20 GB · 6,99 €").
@@ -69,13 +69,24 @@
    kreuz und quer, das sieht total bescheuert aus." Eine Zeitungsseite
    entsteht aus einem Raster - und ein Raster hat gleiche Zellen. #}
 {# 11.10.2026 (Antonio: "In jeder Kachel sollte ein cooles Bild sein"):
-   fehlt das Kampagnenbild oder ist es nur ein Streifen, steht das Foto der
-   Mechanik in der Flaeche - zwei Fassungen je Mechanik, damit nebeneinander
-   nicht zweimal dasselbe Bild steht. #}
-{% macro motiv(k, gross) %}
-{%- set ersatz = 'promo-' ~ (k.offer.mechanic or 'sonstiges') ~ '-' ~ (k.offer.headline | length % 2 + 1) -%}
-{%- if (not k.bild or k.bild_panorama) and ersatz in bilder %}
-<span class="pk-bild pk-bild--foto">{{ d.motiv(ersatz, prefix, 'pk-foto', breite=1600, hoehe=900) }}</span>
+   fehlt das Kampagnenbild oder ist es nur ein Streifen, steht ein Foto zur
+   Mechanik in der Flaeche. Jedes Foto steht hoechstens einmal auf der Seite:
+   erst ein freies der eigenen Mechanik, dann irgendein freies Promo-Foto,
+   sonst die Schriftkachel. #}
+{% set fotos_vergeben = [] %}
+{% macro foto_waehlen(k) -%}
+{%- set ns = namespace(wahl='') -%}
+{%- if not k.bild or k.bild_panorama -%}
+{%- for s in bilder | sort if s.startswith('promo-' ~ (k.offer.mechanic or 'sonstiges') ~ '-') and s not in fotos_vergeben and not ns.wahl %}{% set ns.wahl = s %}{% endfor -%}
+{%- for s in bilder | sort if s.startswith('promo-') and s not in fotos_vergeben and not ns.wahl %}{% set ns.wahl = s %}{% endfor -%}
+{%- if ns.wahl %}{% set _ = fotos_vergeben.append(ns.wahl) %}{% endif -%}
+{%- endif -%}
+{{ ns.wahl }}
+{%- endmacro %}
+{% macro motiv(k, gross, foto='') %}
+{%- if foto %}
+{%- set klein = (bilder_klein or {}).get(foto) %}
+<span class="pk-bild pk-bild--foto"><img class="motiv pk-foto" src="{{ prefix }}static/bilder/{{ foto }}.jpg" alt=""{% if klein %} srcset="{{ prefix }}static/bilder/{{ klein }} 1200w, {{ prefix }}static/bilder/{{ foto }}.jpg 1600w" sizes="(max-width: 900px) 100vw, 600px"{% endif %} width="1600" height="900" decoding="async" loading="lazy"></span>
 {%- elif k.bild %}
 {# Kein `max-width` mehr: die Flaeche ist gesetzt, und in sie darf nur, was
    sie fuellen kann. Der Aufmacher (579 px) verlangt dafuer
@@ -108,8 +119,9 @@
 {% macro karte(k, gross=false, hoch=false) %}
 <article class="pkarte{% if gross %} pkarte--gross{% if hoch %} pkarte--hoch{% endif %}{% endif %}{% if k.neu %} pkarte--neu{% endif %}{% if k.endet_bald %} pkarte--endet{% endif %}">
   <a class="pk-flaeche" href="{{ k.offer.url }}" target="_blank" rel="noopener">
-    {{ motiv(k, gross) }}
-    {% if k.bild or ('promo-' ~ (k.offer.mechanic or 'sonstiges') ~ '-' ~ (k.offer.headline | length % 2 + 1)) in bilder %}<span class="pk-zahl">{{ k.kachel }}</span>{% endif %}
+    {%- set foto = foto_waehlen(k) | trim %}
+    {{ motiv(k, gross, foto) }}
+    {% if k.bild or foto %}<span class="pk-zahl">{{ k.kachel }}</span>{% endif %}
     <span class="pk-titel szl">{{ k.offer.headline }}</span>
     {% if gross and k.offer.description %}<span class="pk-text">{{ k.offer.description }}</span>{% endif %}
   </a>

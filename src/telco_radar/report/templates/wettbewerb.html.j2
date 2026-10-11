@@ -13,7 +13,7 @@
 {% set active = 'wettbewerb' %}
 {% set buehne = true %}
 {% set wrap_class = 'voll' %}
-{% block title %}Marktrecherche · Wettbewerb{% endblock %}
+{% block title %}Vodafone Product and Services Insights · Wettbewerb{% endblock %}
 {% set ANBIETER_KLASSE = {'deutsche-telekom': 'telekom', 'telefonica-o2': 'o2', '1-1': '1-1'} %}
 {% set KURZ = {'deutsche-telekom': 'Telekom', 'telefonica-o2': 'O2', '1-1': '1&1'} %}
 {% set KAPITELBILD = {'deutsche-telekom': 'kapitel-das-wichtigste', 'telefonica-o2': 'kapitel-deutschland', '1-1': 'kapitel-auf-einen-blick'} %}
@@ -141,5 +141,5 @@
 {% else %}
 <p class="empty-note wa-leer-seite">Für diese Seite liegt noch kein Bericht im Archiv.</p>
 {% endfor %}
-{{ d.weiter('differenzierung.html', 'Welt', prefix, 'kapitel-global') }}
+{{ d.weiter('differenzierung.html', 'Welt', prefix, 'band-welt') }}
 {% endblock %}

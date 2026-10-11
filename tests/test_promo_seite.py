@@ -427,7 +427,9 @@ def test_die_seite_zeigt_kein_motiv_zweimal(promo_site):
     )
     quellen = [img["src"] for img in soup.select(".pk-bild img[src]")]
     assert len(quellen) == len(set(quellen)), "Ein Motiv steht mehrfach auf der Seite"
-    assert soup.select(".pmarke .pk-bild--typo"), "keine Schriftkachel, nichts geprueft"
+    assert soup.select(".pmarke .pk-bild--typo") or soup.select(".pk-bild--foto"), (
+        "weder Schriftkachel noch Ersatzfoto, nichts geprueft"
+    )
     for block in soup.select(".pmarke"):
         kacheln = [
             k.get_text(" ", strip=True)

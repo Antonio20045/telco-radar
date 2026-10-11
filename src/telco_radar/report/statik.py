@@ -20,7 +20,7 @@ from ..bild_vorschau import kleine_fassungen, vorschau
 
 ORDNER = "static"
 BILDER = "bilder"
-BINAER = ("logo.png",)
+BINAER = ("logo.png", "favicon.ico")
 
 
 def kopiere(vorlagen: Path, site_dir: Path) -> dict[str, str]:
