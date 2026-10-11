@@ -1,0 +1,46 @@
+{# KI, Kapitel 1 - "Wie eine KI antwortet" (Pitch 9, Schnitte 10-12).
+
+   Eine lange Linienzeichnung, durch die man scrollt; ein roter Punkt
+   fuehrt. Jede Koordinate rechnet `ki_kapitel.zeichnung()`, hier wird sie
+   nur geschrieben. Ansagen und Saetze liegen als HTML ueber der Zeichnung
+   (top in Prozent ihrer Hoehe). app.js zeichnet Linien, laesst Pillen
+   aufpoppen, Zaehler hochlaufen und den Punkt der Route folgen; ohne JS und
+   bei reduzierter Bewegung steht alles fertig da. Nichts klebt, nichts
+   schwebt ueber Text: der Punkt laeuft unter den Pillen durch. #}
+{% extends "base.html.j2" %}
+{% set active = 'ki' %}
+{% set wrap_class = 'voll' %}
+{% block title %}Vodafone Product and Services Insights · KI · Kapitel {{ nummer }}{% endblock %}
+
+{% macro el(e) -%}
+<{{ e.tag }}{% for k, v in e.attrs %} {{ k }}="{{ v }}"{% endfor %}>{% if e.text is not none %}{{ e.text }}{% endif %}{% for k in e.kinder %}{{ el(k) }}{% endfor %}</{{ e.tag }}>
+{%- endmacro %}
+
+{% block content %}
+<article class="ki-k1" id="kapitel-{{ nummer }}">
+  <header class="ki-k1-kopf">
+    <a class="ki-k1-pille" href="ki.html#verstehen"><span aria-hidden="true">←</span> KI</a>
+    <h1 class="ki-k1-pille ki-k1-titel">Kapitel {{ nummer }} · {{ titel }}</h1>
+  </header>
+  <div class="ki-k1-reise">
+    <svg class="ki-k1-welt" id="ki-k1-welt" viewBox="0 0 {{ bild.breite }} {{ bild.hoehe }}" role="img" aria-label="Zeichnung: wie eine KI aus einer Frage eine Antwort macht">
+      {% for e in bild.ringe %}{{ el(e) }}{% endfor %}
+      <path class="ki-k1-route" d="{{ bild.route }}"/>
+      {% for e in bild.hinten %}{{ el(e) }}{% endfor %}
+      <circle class="ki-k1-halo" cx="{{ bild.punkt[0] }}" cy="{{ bild.punkt[1] }}" r="15"/>
+      <circle class="ki-k1-punkt" cx="{{ bild.punkt[0] }}" cy="{{ bild.punkt[1] }}" r="7"/>
+      {% for e in bild.vorn %}{{ el(e) }}{% endfor %}
+    </svg>
+    {% for t in bild.texte %}
+    <div class="ki-k1-ueber" style="top:{{ t.top }}%" data-station="{{ t.station }}">
+      {% if t.art == 'ansage' %}<h2 class="ki-ansage ki-k1-ansage" data-y="{{ t.y }}">{% for z in t.zeilen %}<span><i>{{ z }}{% if loop.last %}<em>.</em>{% endif %}</i></span>{% endfor %}</h2>
+      {% else %}<p class="ki-k1-satz" data-y="{{ t.y }}">{{ t.text }}</p>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  <nav class="ki-k1-weiter" aria-label="Weiter">
+    {% if weiter %}<a href="{{ weiter.ziel }}">Kapitel {{ weiter.nr }} · {{ weiter.titel }} <span aria-hidden="true">→</span></a>
+    {% else %}<a href="ki.html#verstehen">Alle Kapitel <span aria-hidden="true">→</span></a>{% endif %}
+  </nav>
+</article>
+{% endblock %}

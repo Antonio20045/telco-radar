@@ -83,7 +83,7 @@ def test_schiene_zeigt_alle_kapitel_der_konstante_und_verlinkt_nur_kapitel_1(
     assert len(ki_seite.KAPITEL) == 12
     assert [k[1] for k in knoten] == list(ki_seite.KAPITEL)
     assert [k[0] for k in knoten] == [str(i) for i in range(1, 13)]
-    assert [k[2] for k in knoten] == ["#kapitel-1"] + [None] * 11
+    assert [k[2] for k in knoten] == ["ki-kapitel-1.html"] + [None] * 11
     assert knoten[0][3] == "rgb(204, 0, 0)"
     assert {k[3] for k in knoten[1:]} == {knoten[1][3]} != {knoten[0][3]}
     assert spalten == 12

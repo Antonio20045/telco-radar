@@ -13,6 +13,7 @@ Das Band „Modelle“ zeigt den Store aus ``analyze.ki_modelle`` (Schnitt 6),
 „Verstehen“ (Schnitt 9) zeigt die Kapitel aus ``KAPITEL``; verlinkt sind
 nur die fertigen (``FERTIG``), Linie und Pillen der Fahrt stehen in
 ``FAHRT_WEG`` und ``STATIONEN``, ``app.js`` zeichnet sie beim Scrollen.
+Kapitel 1 (Schnitte 10–12) ist eine eigene Seite aus ``ki_kapitel``.
 Die Muster-Prompts (Schnitt 13) lädt ``analyze.ki_inhalte``; Kopfzeile,
 Themenzeile und Rubrikleiste lesen dasselbe ``anzahl``. Die Videos
 (Schnitte 14 und 15) liest ``analyze.ki_videos.lange``; ``videos()`` ordnet
@@ -28,7 +29,7 @@ from collections.abc import Callable, Iterable
 from datetime import date
 
 from ..analyze import ki_blatt, ki_modelle, ki_videos
-from . import meldungen_seite
+from . import ki_kapitel, meldungen_seite
 
 KI_THEMA = "thema:ki"
 KI_TAG = "KI / AI"
@@ -174,9 +175,18 @@ def rubriken(ausgabe: dict, modelle: dict, prompts: dict) -> list[dict]:
 def kapitel() -> list[dict]:
     """Die Knoten der Schiene: Nummer, Titel, Ziel nur für fertige Kapitel."""
     return [
-        {"nr": nr, "titel": t, "ziel": f"#kapitel-{nr}" if nr in FERTIG else None}
+        {
+            "nr": nr,
+            "titel": t,
+            "ziel": f"ki-kapitel-{nr}.html" if nr in FERTIG else None,
+        }
         for nr, t in enumerate(KAPITEL, start=1)
     ]
+
+
+def kapitel_seite(env) -> str:
+    """Das HTML von ``ki-kapitel-1.html`` (Schnitte 10–12, ``ki_kapitel``)."""
+    return ki_kapitel.seite(env, kapitel())
 
 
 def fahrt(schrift: int = 24) -> dict:

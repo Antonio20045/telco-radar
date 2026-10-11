@@ -6065,6 +6065,62 @@ iframe.ki-player{display:block;cursor:auto}
 .ki-kapitel--fertig,.ki-kapitel--fertig a{color:var(--ink)}
 .ki-kapitel--fertig::before{left:-2px;top:0;width:15px;height:15px;background:var(--red);border-color:var(--red)}
 .ki-kapitel--fertig b{color:var(--red-text)}
+/* Schnitte 10-12: Kapitel 1 als eigene Seite. Eine lange Linienzeichnung,
+   durch die man scrollt, der rote Punkt fuehrt; Ansagen und Saetze liegen
+   in den Luecken der Zeichnung. Nichts klebt, nichts schwebt ueber Text.
+   Ohne .bewegt (kein JS, reduzierte Bewegung) steht alles fertig da. */
+.ki-k1{padding:0 0 clamp(40px,6vw,80px);overflow-x:clip}
+.ki-k1-kopf{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;padding:0 16px}
+.ki-k1-pille{display:inline-flex;align-items:center;gap:6px;margin:0;padding:9px 18px;border:1px solid var(--rule);
+  border-radius:var(--radius-pille);background:var(--paper-2);font:500 15px/1.2 var(--schrift);color:var(--ink);text-decoration:none}
+a.ki-k1-pille:hover{border-color:var(--ink)}
+.ki-k1-reise{position:relative;width:min(100%,880px);margin:clamp(24px,4vw,48px) auto 0}
+.ki-k1-welt{display:block;width:100%;height:auto;overflow:visible}
+.ki-k1-welt text{font-family:var(--schrift)}
+.ki-k1-route{fill:none;stroke:var(--ink);stroke-width:1.6}
+.ki-k1-zieh,.ki-k1-sehne{fill:none;stroke:var(--ink);stroke-linecap:round}
+.ki-k1-zieh.ki-k1-grau{stroke:var(--ink-4)}
+.ki-k1-zieh.ki-k1-rot,.ki-k1-sehne.ki-k1-rot{stroke:var(--red)}
+.ki-k1-flaeche,.ki-k1-form{fill:var(--paper);stroke:var(--ink);stroke-width:1.2}
+.ki-k1-form{fill:none}
+.ki-k1-nabe{fill:var(--ink)}
+.ki-k1-ring circle{fill:none;stroke:var(--rule);stroke-width:1}
+.ki-k1-strich{stroke:var(--ink-4);stroke-dasharray:3 4}
+.ki-k1-zug rect{fill:var(--paper-2);stroke:var(--ink);stroke-width:1.3;transition:fill .4s,stroke .4s}
+.ki-k1-zug text{fill:var(--ink);transition:fill .4s}
+.ki-k1-zug--rot rect,.ki-k1-wahl rect{fill:var(--red);stroke:var(--red)}
+.ki-k1-zug--rot text,.ki-k1-wahl text,.ki-k1-fokus text{fill:var(--paper-2)}
+.ki-k1-fokus rect{fill:var(--ink)}
+.ki-k1-nachbar circle{fill:var(--ink-4)}
+.ki-k1-wort,.ki-k1-anteil,.ki-k1-wert{fill:var(--ink-3);paint-order:stroke;stroke:var(--paper);stroke-width:5px;stroke-linejoin:round}
+.ki-k1-anteil.ki-k1-rot,.ki-k1-wert.ki-k1-rot{fill:var(--red-text)}
+.ki-k1-zaehler rect{fill:var(--paper-2);stroke:var(--ink);stroke-width:1.2}
+.ki-k1-zaehler line{stroke:var(--rule)}
+.ki-k1-welt .ki-k1-zahl{fill:var(--ink);font-family:var(--mono);font-variant-numeric:tabular-nums}
+.ki-k1-halo{fill:none;stroke:var(--red);stroke-width:1.2;opacity:.35}
+.ki-k1-punkt{fill:var(--red)}
+.ki-k1-ueber{position:absolute;left:0;right:0;padding:0 16px;text-align:center;pointer-events:none}
+.ki-k1-ansage{margin:0;color:var(--ink);font-size:clamp(36px,8.4vw,104px);line-height:.98;letter-spacing:-.01em}
+.ki-k1-satz{display:inline-block;max-width:min(26ch,100%);margin:0;padding:10px 14px;background:var(--paper);
+  font:400 clamp(19px,2.3vw,30px)/1.22 var(--zeitung);color:var(--ink);text-wrap:balance}
+.ki-k1-weiter{display:flex;justify-content:center;padding:40px 16px 0}
+.ki-k1-weiter a{padding:12px 26px;border:1px solid var(--ink);border-radius:var(--radius-pille);font-size:clamp(15px,2.4vw,30px);
+  font-weight:500;text-align:center;text-transform:uppercase;text-decoration:none;color:var(--ink);transition:background .3s,color .3s}
+.ki-k1-weiter a:hover{background:var(--ink);color:var(--paper-2)}
+.bewegt .ki-k1-zug{transition:opacity .5s,transform .7s cubic-bezier(.2,1.4,.4,1);transform-box:fill-box;transform-origin:center}
+.bewegt .ki-k1-zug.weg{opacity:0;transform:scale(.55)}
+.bewegt .ki-k1-satz{opacity:0;transform:translateY(24px);transition:opacity .8s,transform .8s cubic-bezier(.2,.8,.2,1)}
+.bewegt .ki-k1-satz.da{opacity:1;transform:none}
+.bewegt .ki-k1-anteil{opacity:0;transition:opacity .5s 1s}
+.bewegt .ki-k1-anteil.da{opacity:1}
+.bewegt .ki-k1-sehne{transition:stroke-dashoffset 1.2s cubic-bezier(.6,.1,.2,1) calc(var(--n,0) * 80ms)}
+.bewegt .ki-k1-fokus:not(.da) rect,.bewegt .ki-k1-wahl:not(.da) rect{fill:var(--paper-2);stroke:var(--ink)}
+.bewegt .ki-k1-fokus:not(.da) text,.bewegt .ki-k1-wahl:not(.da) text{fill:var(--ink)}
+@media (max-width:620px){
+  .ki-k1-ansage>span{width:fit-content;max-width:100%;margin-inline:auto;background:var(--paper)}
+  .ki-k1-welt .ki-k1-wort,.ki-k1-welt .ki-k1-anteil,.ki-k1-welt .ki-k1-wert{font-size:19px}
+  .ki-k1-welt .ki-k1-zahl{font-size:16px}
+}
 /* KI-Seite, Muster-Prompts (Schnitt 13): ohne JS alle Themen untereinander,
    app.js zeigt ein Thema mit Titeln links und dem Panel rechts. */
 .ki-prompts{padding:0 0 clamp(56px,7vw,96px);scroll-margin-top:140px}

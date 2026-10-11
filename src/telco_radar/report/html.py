@@ -1840,6 +1840,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
         ("wettbewerber.html", _redirect_html("wettbewerb.html")),
         ("wettbewerbsradar.html", _redirect_html("geraete.html#tafel-radar")),
         ("ki.html", ki_html),
+        ("ki-kapitel-1.html", ki_seite.kapitel_seite(env)),
     ):
         (site_dir / alt).write_text(inhalt, encoding="utf-8")
 
