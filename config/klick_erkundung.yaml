@@ -107,15 +107,16 @@ anbieter:
       # Pflichtfeld (Katalog). Gesucht wird u. a. das iPhone 18 Pro, das am 09.10.
       # bei Telekom ganz fehlte. Nach der Probe gehört die Übersicht in
       # klick_tageslauf.yaml.
+      # Stichprobe der Endkontrolle (11.10.2026): zwei Produktseiten, beide
+      # wörtlich als quelle_url in data/state/geraete_tco.json. iPhone 17 Pro 256 GB:
+      # stimmen die Preise der Geräteseite mit der Telekom-Seite? iPhone Air: welche
+      # Speicher und Ratenlaufzeiten bietet die Telekom?
       - geraet: apple-iphone-17-pro
         speicher_gb: 256
-        url: https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17791
-      # Zweite Übersicht (MagentaMobil XL, ebenfalls wörtlich aus
-      # geraete_quellen.yaml): zeigt, ob eine zweite Seite durchkommt und ob die
-      # Gerätezahl je Tarif gleich ist.
-      - geraet: apple-iphone-17-pro
+        url: https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+      - geraet: apple-iphone-air
         speicher_gb: 256
-        url: https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17803
+        url: https://www.telekom.de/shop/geraet/apple/apple-iphone-air/himmelblau-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones
 
   - schluessel: congstar
     name: congstar
