@@ -102,8 +102,9 @@ zusammenfassung:
     tarifphasen:
       selektor: "#step1 > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1)"
       muster: '([\d.]+,\d{2})\s*€'
-    # Gruppe 43: „50 GB MagentaMobil M“ in der Tarifkachel.
-    volumen_gb: '(\d+)\s*GB\s+MagentaMobil'
+    # Gruppe 43: „50 GB MagentaMobil M“ in der Tarifkachel. XL nennt keine GB-Zahl
+    # (Antwort dataBenefits „unlimited“, Tageslauf 11.10.2026): „unbegrenzt“ ist inf.
+    volumen_gb: '(?i)(\d+\s*GB|unbegrenzt\w*|unlimit\w*)(?:\s+Datenvolumen)?\s+MagentaMobil'
 
 antwort:
   # Je Wertfeld gilt die erste Quelle mit Wert: /v2/details vor den Ladequellen.

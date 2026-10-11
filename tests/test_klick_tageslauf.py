@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import re
 from dataclasses import replace
 
 import pytest
@@ -147,6 +148,13 @@ def test_tagesdatei_hat_alle_anbieter_mit_karte_und_keine_seitengrenze(ziele):
         "telekom-2",
         "telekom-3",
         "telekom-4",
+        "telekom-5",
+        "telekom-6",
+        "telekom-7",
+        "telekom-8",
+        "telekom-9",
+        "telekom-10",
+        "telekom-11",
         "congstar",
     ]
     for ziel in ziele.values():
@@ -154,7 +162,7 @@ def test_tagesdatei_hat_alle_anbieter_mit_karte_und_keine_seitengrenze(ziele):
         assert karte.is_file()
     assert O2_SEITE.adresse in {s.adresse for s in ziele["o2"].seiten}
     telekom = _seiten_von(ziele, "Telekom")
-    assert len(telekom) == len(set(telekom)) == 55
+    assert len(telekom) == len(set(telekom)) == 316
     vodafone = _seiten_von(ziele, "Vodafone")
     assert len(vodafone) == len(set(vodafone)) == 42
     with pytest.raises(ErkundungszielFehler, match="höchstens 2"):
@@ -166,13 +174,18 @@ def _seiten_von(ziele, name):
 
 
 def test_telekom_und_vodafone_verteilt_auf_jobs_mit_einer_karte(ziele):
-    """Antonio 11.10.2026: alle Geräte jeden Tag. Ein 180-min-Job liest rund 20
-    Telekom- oder Vodafone-Seiten; jeder Job hat eigene Seiten, alle eine Karte."""
-    for name, karte, jobs in (("Telekom", "telekom", 4), ("Vodafone", "vodafone", 3)):
+    """Antonio 11.10.2026: alle Geräte jeden Tag; jeder Job hat eigene Seiten, alle
+    eine Karte. Vodafone 5–9 min je Seite: höchstens 15. Telekom 200–250 s je Seite
+    samt Minute Abstand (Tageslauf 11.10.2026, 41 Seiten), dazu im ersten Job rund
+    20 min Übersichten: höchstens 30 Seiten in 10 270 s."""
+    for name, karte, jobs, hoechstens in (
+        ("Telekom", "telekom", 11, 30),
+        ("Vodafone", "vodafone", 3, 15),
+    ):
         teile = [z for z in ziele.values() if z.name == name]
         assert len(teile) == jobs
         assert {z.kartenschluessel for z in teile} == {karte}
-        assert max(len(z.seiten) for z in teile) <= 15
+        assert max(len(z.seiten) for z in teile) <= hoechstens
     assert [
         z.schluessel for z in ziele.values() if z.uebersichten and z.name == "Telekom"
     ] == ["telekom"]
@@ -196,6 +209,13 @@ def test_plan_nennt_jeden_anbieter_mit_karte(capsys):
         "telekom-2",
         "telekom-3",
         "telekom-4",
+        "telekom-5",
+        "telekom-6",
+        "telekom-7",
+        "telekom-8",
+        "telekom-9",
+        "telekom-10",
+        "telekom-11",
         "congstar",
     ]
     assert skript.main(["--root", str(lese_wurzel()), "--anbieter", "o2,telekom"]) == 2
@@ -491,3 +511,25 @@ def test_tageslauf_weicht_geraetelauf_erkundung_und_radar_aus():
     assert aus_umgebung({}, TAGESLAUF_WORKFLOWS)() == (
         "GitHub-API nicht lesbar (GITHUB_REPOSITORY, GITHUB_TOKEN fehlt)"
     )
+
+
+TARIFE = {"MF_17779", "MF_17785", "MF_17791", "MF_17797", "MF_17803"}
+
+
+def test_telekom_jedes_geraet_je_tarif_eine_seite(ziele):
+    """Preisprüfung 11.10.2026: iPhone Air nur in M mit 12 und 24 Raten, weil die
+    Telekom-Seite nur den Tarif ihrer Adresse zeigt und nur das 17 Pro alle fünf
+    Tarifseiten hatte. Jetzt je Gerät und Tarif genau eine Seite."""
+    paare = [
+        (s.geraet, re.search(r"tariffId=(MF_\d+)", s.adresse)[1])
+        for z in ziele.values()
+        if z.name == "Telekom"
+        for s in z.seiten
+    ]
+    assert len(paare) == len(set(paare))
+    je_geraet: dict[str, set[str]] = {}
+    for geraet, tarif in paare:
+        je_geraet.setdefault(geraet, set()).add(tarif)
+    for geraet in ("apple-iphone-air", "apple-iphone-17-pro", "samsung-galaxy-s26"):
+        assert je_geraet[geraet] == TARIFE
+    assert sum(len(t) == 5 for t in je_geraet.values()) >= 50

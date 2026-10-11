@@ -242,3 +242,25 @@ def test_strukturselektoren_stehen_im_inventar(karte, inventar):
     assert gruppen["45"]["pfad"].startswith(f"{erster} > ")
     assert gruppen["42"]["pfad"].startswith(f"{tarifblock} > ")
     assert karte.textlesung.muster["tarifphasen"].selektor == preise["19"]["pfad"]
+
+
+@pytest.mark.parametrize(
+    ("volumen", "erwartet"),
+    [
+        ("50 GB", 50.0),
+        ("Unbegrenzt", float("inf")),
+        ("Unbegrenztes Datenvolumen", float("inf")),
+        ("Unlimited", float("inf")),
+        ("", None),
+    ],
+)
+def test_volumen_auch_unbegrenzt(karte, inventar, volumen, erwartet):
+    """Tageslauf 11.10.2026: jede MagentaMobil-XL-Kombination blieb ein Befund
+    „volumen_gb fehlt im Text, Antwort unbegrenzt“ (dataBenefits „unlimited“); das
+    Muster las nur eine GB-Zahl vor „MagentaMobil“. Gegenprobe: ohne Volumen nichts."""
+    kachel = inventar["gruppen"]["43"]["name"]
+    assert "50 GB MagentaMobil" in kachel
+    text = " ".join(kachel.replace("50 GB", volumen).split())
+    treffer = karte.textlesung.muster["volumen_gb"].muster.search(text)
+    gelesen = None if treffer is None else feldwert("volumen_gb", treffer[1])
+    assert gelesen == erwartet
