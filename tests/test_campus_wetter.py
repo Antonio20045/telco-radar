@@ -31,7 +31,8 @@ _SEITE = """<!doctype html><html class="ohne-js"><head><meta charset="utf-8">
 <body><section class="buehne"><div class="buehne-bild">
 <img class="buehne-ebene" data-zeit-bild="tag" data-src="static/bilder/campus-turm.jpg">
 <canvas class="buehne-himmel" data-bild="static/bilder/campus-turm.jpg"
- data-bild-klein="static/bilder/campus-turm.jpg" data-maske="static/campus/campus-maske.png"
+ data-bild-klein="static/bilder/campus-turm.jpg"
+ data-maske="static/campus/campus-maske.png"
  data-maske-klein="static/campus/campus-maske-1200.png"></canvas>
 </div><div class="buehne-kopf"><h1>Datum</h1>
 <p class="buehne-wetter" data-campus-wetter hidden></p></div>
@@ -114,7 +115,14 @@ def _oeffne(chromium, adresse, antwort, ruhig=False):
         ("18:20", 3, 12.6, "abend-wolken", "Campus Düsseldorf · 13 °C, bewölkt", True),
         ("23:10", 0, 7.0, "nacht-sonne", "Campus Düsseldorf · 7 °C, klar", False),
         ("07:10", 45, 4.0, "nacht-nebel", "Campus Düsseldorf · 4 °C, Nebel", False),
-        ("16:00", 95, 18.0, "mittag-gewitter", "Campus Düsseldorf · 18 °C, Gewitter", True),
+        (
+            "16:00",
+            95,
+            18.0,
+            "mittag-gewitter",
+            "Campus Düsseldorf · 18 °C, Gewitter",
+            True,
+        ),
     ],
 )
 def test_die_szene_folgt_uhrzeit_und_wetter_am_campus(
@@ -191,7 +199,8 @@ def test_ein_foto_und_eine_maske_kein_film_und_die_maske_erst_nach_dem_startbild
     seite = _oeffne(chromium, adresse, _antwort("13:05", 3, 12.6))
     try:
         seite.wait_for_selector(".buehne-himmel.laeuft", timeout=20_000)
-        assert not [u for u in seite.ablauf if u.endswith((".mp4", ".webm"))], seite.ablauf
+        filme = [u for u in seite.ablauf if u.endswith((".mp4", ".webm"))]
+        assert not filme, seite.ablauf
         masken = [u for u in seite.ablauf if u.endswith("/campus-maske.png")]
         startbild = [u for u in seite.ablauf if u.endswith("/campus-turm.jpg")]
         assert len(masken) == 1 and startbild, seite.ablauf
