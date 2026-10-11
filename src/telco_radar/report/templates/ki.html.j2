@@ -8,7 +8,9 @@
    (Schnitt 7) baut app.js aus #ki-modelle-daten; ohne JS bleibt die Liste.
    Die Rubrikleiste (Schnitt 8) zeigt app.js, sobald der Kopf vorbei ist.
    Verstehen (Schnitt 9): Linie und Pillen stehen fertig im HTML, app.js
-   zeichnet sie mit dem Scrollen; die Schiene kommt aus ki_seite.KAPITEL. #}
+   zeichnet sie mit dem Scrollen; die Schiene kommt aus ki_seite.KAPITEL.
+   Muster-Prompts (Schnitt 13): ohne JS alle Themen untereinander, jeder
+   Text in <details>; app.js schaltet auf ein Thema mit Panel um. #}
 {% extends "base.html.j2" %}
 {% import "_design.html.j2" as d %}
 {% set active = 'ki' %}
@@ -112,5 +114,25 @@
     {% else %}<li class="ki-kapitel"><b>{{ k.nr }}</b>{{ k.titel }}</li>{% endif %}
     {% endfor %}
   </ol>
+</section>
+
+<section class="ki-prompts" id="prompts" aria-label="Muster-Prompts">
+  <div class="ki-p-kopfzeile"><h2>Muster-Prompts</h2>{% if prompts.anzahl %}<span>{{ prompts.anzahl }} zum Kopieren</span>{% endif %}</div>
+  {% if prompts.error %}
+  <p class="ki-p-ausfall">Muster-Prompts nicht geladen: {{ prompts.error }}</p>
+  {% else %}
+  <nav class="ki-p-themen" aria-label="Themen">{% for t in prompts.themen %}<a href="#prompts-{{ loop.index }}">{{ t.name }} ({{ t.prompts | length }})</a>{% endfor %}</nav>
+  <div class="ki-p-raster">
+    <div class="ki-p-liste">
+      {% for t in prompts.themen %}
+      <div class="ki-p-gruppe" id="prompts-{{ loop.index }}">
+        <h3>{{ t.name }}</h3>
+        {% for p in t.prompts %}<details class="ki-p-eintrag"><summary>{{ p.titel }}</summary><pre class="ki-p-text">{{ p.text }}</pre></details>
+        {% endfor %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
 </section>
 {% endblock %}

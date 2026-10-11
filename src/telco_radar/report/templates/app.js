@@ -4748,3 +4748,78 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
   }, { passive: true });
   lage();
 })();
+
+/* KI-SEITE, SCHNITT 13 (Pitch 9, Entwurf 10). Muster-Prompts: ein Thema auf
+   einmal. Die Daten liest das Skript aus den <details> des HTML (ohne JS
+   stehen alle Themen untereinander); links die Titel des Themas, rechts das
+   Panel mit „Kopieren“, unter 860 px steht das Panel unter dem Titel. */
+(function () {
+  var abschnitt = document.getElementById('prompts');
+  var raster = abschnitt && abschnitt.querySelector('.ki-p-raster');
+  if (!raster) return;
+  var reiter = abschnitt.querySelectorAll('.ki-p-themen a');
+  var P = [].map.call(raster.querySelectorAll('.ki-p-gruppe'), function (g) {
+    return [].map.call(g.querySelectorAll('details'), function (d) {
+      return [d.querySelector('summary').textContent, d.querySelector('pre').textContent];
+    });
+  });
+  raster.innerHTML = '';
+  raster.classList.add('ki-p-raster--an');
+  var liste = document.createElement('div');
+  liste.className = 'ki-p-liste';
+  var panel = document.createElement('div');
+  panel.className = 'ki-p-panel';
+  panel.innerHTML = '<div class="ki-p-kopf"><b class="ki-p-name"></b>' +
+    '<button type="button" class="ki-p-kopieren">Kopieren</button></div><pre class="ki-p-text"></pre>';
+  raster.appendChild(liste);
+  raster.appendChild(panel);
+  var schmal = window.matchMedia('(max-width:860px)'), akt = null, aktKnopf = null;
+  function lege() { if (schmal.matches && aktKnopf) aktKnopf.after(panel); else raster.appendChild(panel); }
+  function zeige(b, p) {
+    akt = p; aktKnopf = b;
+    panel.querySelector('.ki-p-name').textContent = p[0];
+    panel.querySelector('.ki-p-text').textContent = p[1];
+    [].forEach.call(liste.querySelectorAll('.ki-p-titel'), function (e) { e.classList.toggle('an', e === b); });
+    lege();
+  }
+  function thema(gi) {
+    [].forEach.call(reiter, function (t, i) {
+      t.classList.toggle('an', i === gi);
+      if (i === gi) t.setAttribute('aria-current', 'true'); else t.removeAttribute('aria-current');
+    });
+    raster.appendChild(panel);
+    liste.innerHTML = '';
+    var erst = null;
+    P[gi].forEach(function (p) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'ki-p-titel'; b.textContent = p[0];
+      b.addEventListener('click', function () { zeige(b, p); });
+      liste.appendChild(b);
+      if (!erst) erst = [b, p];
+    });
+    zeige(erst[0], erst[1]);
+  }
+  [].forEach.call(reiter, function (a, i) {
+    a.addEventListener('click', function (e) { e.preventDefault(); thema(i); });
+  });
+  if (schmal.addEventListener) schmal.addEventListener('change', lege);
+  thema(0);
+  var k = panel.querySelector('.ki-p-kopieren');
+  function ok() {
+    k.textContent = 'Kopiert'; k.classList.add('ok');
+    setTimeout(function () { k.textContent = 'Kopieren'; k.classList.remove('ok'); }, 1600);
+  }
+  function ersatz() {
+    var f = document.createElement('textarea');
+    f.value = akt[1]; f.setAttribute('readonly', ''); f.style.position = 'fixed'; f.style.opacity = '0';
+    document.body.appendChild(f); f.select();
+    var gut = false;
+    try { gut = document.execCommand('copy'); } catch (e) { gut = false; }
+    f.remove();
+    if (gut) ok();
+  }
+  k.addEventListener('click', function () {
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(akt[1]).then(ok, ersatz);
+    else ersatz();
+  });
+})();

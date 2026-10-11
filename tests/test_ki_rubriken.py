@@ -84,7 +84,12 @@ def _im_blatt(html: str) -> int:
 
 def test_leiste_zaehlt_meldungen_im_blatt_und_modelle_der_top_liste(tmp_path):
     html = _ki(tmp_path, 9, _store(10))
-    assert _leiste(html) == {"meldungen": "9", "modelle": "10", "verstehen": "12"}
+    assert _leiste(html) == {
+        "meldungen": "9",
+        "modelle": "10",
+        "verstehen": "12",
+        "prompts": "28",
+    }
     assert _im_blatt(html) == 9
     assert html.count('class="ki-rang-eintrag"') == 10
     assert 'id="meldungen"' in html and 'id="modelle"' in html
@@ -92,7 +97,7 @@ def test_leiste_zaehlt_meldungen_im_blatt_und_modelle_der_top_liste(tmp_path):
 
 def test_gegenprobe_elf_meldungen_und_ohne_store_keine_modelle(tmp_path):
     html = _ki(tmp_path, 11, None)
-    assert _leiste(html) == {"meldungen": "11", "verstehen": "12"}
+    assert _leiste(html) == {"meldungen": "11", "verstehen": "12", "prompts": "28"}
     assert _im_blatt(html) == 11
 
 

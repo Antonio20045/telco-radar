@@ -13,6 +13,8 @@ Das Band „Modelle“ zeigt den Store aus ``analyze.ki_modelle`` (Schnitt 6),
 „Verstehen“ (Schnitt 9) zeigt die Kapitel aus ``KAPITEL``; verlinkt sind
 nur die fertigen (``FERTIG``), Linie und Pillen der Fahrt stehen in
 ``FAHRT_WEG`` und ``STATIONEN``, ``app.js`` zeichnet sie beim Scrollen.
+Die Muster-Prompts (Schnitt 13) lädt ``analyze.ki_inhalte``; Kopfzeile,
+Themenzeile und Rubrikleiste lesen dasselbe ``anzahl``.
 
 Das Modul importiert ``html`` nicht: die Themenerkennung kommt als
 Parameter herein.
@@ -128,12 +130,13 @@ def modelle_band(store: dict) -> dict:
     }
 
 
-def rubriken(ausgabe: dict, modelle: dict) -> list[dict]:
+def rubriken(ausgabe: dict, modelle: dict, prompts: dict) -> list[dict]:
     """Die Teile der Seite mit ihrer Zahl; ein leerer Teil fehlt in der Leiste."""
     teile = [
         ("meldungen", "Meldungen", ausgabe["anzahl"]),
         ("modelle", "Modelle", len(modelle["top"])),
         ("verstehen", "Verstehen", len(KAPITEL)),
+        ("prompts", "Prompts", prompts["anzahl"]),
     ]
     return [{"ziel": z, "name": n, "zahl": k} for z, n, k in teile if k]
 
@@ -170,7 +173,15 @@ def fahrt(schrift: int = 24) -> dict:
     return {"weg": FAHRT_WEG, "pillen": pillen}
 
 
-def seite(env, wochen: list[dict], cfg, tag_tech, date_de: str, ki_store: dict) -> str:
+def seite(
+    env,
+    wochen: list[dict],
+    cfg,
+    tag_tech,
+    date_de: str,
+    ki_store: dict,
+    prompts: dict,
+) -> str:
     """Das HTML von ``ki.html``; Stand ist der neueste Bericht."""
     stand = max((w["date"] for w in wochen), default="")
     meldungen = ki_meldungen(wochen, ki_region(cfg), tag_tech)
@@ -182,7 +193,8 @@ def seite(env, wochen: list[dict], cfg, tag_tech, date_de: str, ki_store: dict) 
         date_de=date_de,
         ausgabe=blatt_ausgabe,
         modelle=band,
-        rubriken=rubriken(blatt_ausgabe, band),
+        rubriken=rubriken(blatt_ausgabe, band, prompts),
         kapitel=kapitel(),
         fahrt=fahrt(),
+        prompts=prompts,
     )
