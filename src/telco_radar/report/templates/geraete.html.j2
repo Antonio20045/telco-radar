@@ -168,7 +168,8 @@
 <p class="gx-leer">Kein Gerät</p>
 {% endif %}
 {% endmacro %}
-<nav class="gr-reiter gx-modus" role="tablist" aria-label="Preisart für die ganze Seite">
+<nav class="gr-reiter gx-modus glas-schalter" role="tablist" aria-label="Preisart für die ganze Seite" data-glas>
+  <span class="glas-pille" aria-hidden="true"></span>
   <button type="button" role="tab" aria-selected="true"
           aria-controls="tafel-tco" data-tafel="tafel-tco">Mit Tarif</button>
   <button type="button" role="tab" aria-selected="false"
@@ -176,6 +177,7 @@
   <button type="button" role="tab" aria-selected="false" hidden
           aria-controls="tafel-radar" data-tafel="tafel-radar">Übersicht</button>
 </nav>
+{{ d.glas_filter() }}
 
 <section class="gx-teuer" id="teuer" data-puls>
   <div class="gx-kopf"><h2>Über {{ teurer.schwelle | int }}&nbsp;% teurer</h2>

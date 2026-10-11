@@ -52,6 +52,8 @@
 {% endblock %}
 
 {% block content %}
+{{ d.glas_schalter([{'key': 'de', 'href': 'wettbewerb.html', 'label': 'Deutschland'},
+                    {'key': 'welt', 'href': 'differenzierung.html', 'label': 'Global'}], 'de', prefix, 'Ansicht') }}
 {% if puls.wochen %}
 <section class="wa-puls" id="puls" data-puls>
   <div class="wa-puls-kopf">
@@ -141,5 +143,4 @@
 {% else %}
 <p class="empty-note wa-leer-seite">Für diese Seite liegt noch kein Bericht im Archiv.</p>
 {% endfor %}
-{{ d.weiter('differenzierung.html', 'Welt', prefix, 'band-welt') }}
 {% endblock %}

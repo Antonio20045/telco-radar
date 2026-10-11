@@ -22,7 +22,7 @@ from . import diff_bilder, differenzierung_bericht, geraete_fragmente
 from . import differenzierung_view, geraete_teurer, wettbewerb_puls
 from . import geraete_tco_grafik as _geraete_tco_grafik
 from . import fruehwarnung as fruehwarnung_mod, lieferzeit_view as lieferzeit_view_mod
-from . import luecken as luecken_mod
+from . import glas as glas_mod, luecken as luecken_mod
 from . import newsletter_protokoll, rechtstexte as rechtstexte_mod
 from . import seit as seit_mod, verlauf as verlauf_mod
 from . import meldungen_seite, startseite as startseite_mod, statik, suchindex
@@ -1152,6 +1152,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
     ausfaelle: list[Ausfall] = ohne_konfiguration(_wurzel)
     env.globals["ausfaelle"] = ausfaelle
     env.globals["hausfarbe"] = _anbieter_farben.TRANSPARENZ
+    env.globals["glas"] = glas_mod.karte()
     site_dir.mkdir(parents=True, exist_ok=True)
     (site_dir / "reports").mkdir(exist_ok=True)
     folien_dir = site_dir / "folien"

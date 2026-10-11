@@ -4497,3 +4497,82 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
     if (ziel) ziel.scrollIntoView({behavior: 'smooth', block: 'start'});
   });
 })();
+
+/* LIQUID GLASS (Antonio, 11.10.2026): die Pille liegt unter der Wahl und
+   gleitet mit, wenn sie wechselt. Ueber Bildern und waehrend der Inhalt
+   rollt wird das Glas klarer. Die Brechung (Karte vom Server, Rechenweg
+   github.com/shuding/liquid-glass, MIT, (c) 2025 Shu Ding) bekommt nur
+   Chromium; der Filter folgt der echten Groesse des Umschalters. */
+(function () {
+  var schalter = document.querySelectorAll('[data-glas]');
+  if (!schalter.length) return;
+  var marken = (navigator.userAgentData && navigator.userAgentData.brands) || [];
+  for (var m = 0; m < marken.length; m++) {
+    if (marken[m].brand === 'Chromium') document.documentElement.classList.add('glas-chromium');
+  }
+  var ruhig = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  var filter = document.getElementById('glas-linse');
+  var bildartig = 'img,video,picture,canvas,[data-buehne],.wa-rahmen,.wa-bild,.szene-bild,[class*="motiv"]';
+
+  Array.prototype.forEach.call(schalter, function (s) {
+    var pille = s.querySelector('.glas-pille');
+    var lege = function (gleiten) {
+      var an = s.querySelector('[aria-current="page"],[aria-selected="true"]');
+      if (!pille || !an) return;
+      s.style.setProperty('--x', an.offsetLeft + 'px');
+      s.style.setProperty('--w', an.offsetWidth + 'px');
+      if (gleiten && !ruhig) {
+        s.classList.remove('gleitet');
+        void s.offsetWidth;
+        s.classList.add('gleitet');
+      }
+      if (filter) {
+        var r = s.getBoundingClientRect();
+        var w = Math.round(r.width), h = Math.round(r.height);
+        filter.setAttribute('width', w);
+        filter.setAttribute('height', h);
+        var bild = filter.querySelector('feImage');
+        if (bild) { bild.setAttribute('width', w); bild.setAttribute('height', h); }
+      }
+    };
+    lege(false);
+    requestAnimationFrame(function () { s.classList.add('bereit'); });
+    new MutationObserver(function () { lege(true); }).observe(s, {
+      attributes: true, subtree: true, attributeFilter: ['aria-selected', 'aria-current']
+    });
+    window.addEventListener('resize', function () { lege(false); });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { lege(false); });
+
+    var links = s.querySelectorAll('a[href]');
+    for (var i = 0; i < links.length; i++) {
+      links[i].addEventListener('click', function (e) {
+        if (e.metaKey || e.ctrlKey || e.shiftKey || this.getAttribute('aria-current')) return;
+        var alt = s.querySelector('[aria-current]');
+        if (alt) alt.removeAttribute('aria-current');
+        this.setAttribute('aria-current', 'page');
+      });
+    }
+
+    var untersuche = function () {
+      var r = s.getBoundingClientRect();
+      var unter = document.elementsFromPoint ? document.elementsFromPoint(r.left + r.width / 2, r.top + r.height / 2) : [];
+      var bild = false;
+      for (var j = 0; j < unter.length; j++) {
+        if (s.contains(unter[j])) continue;
+        bild = !!(unter[j].closest && unter[j].closest(bildartig));
+        break;
+      }
+      s.setAttribute('data-unter', bild ? 'bild' : 'flaeche');
+    };
+    var still = null, angefragt = false;
+    window.addEventListener('scroll', function () {
+      s.classList.add('rollt');
+      clearTimeout(still);
+      still = setTimeout(function () { s.classList.remove('rollt'); }, 180);
+      if (angefragt) return;
+      angefragt = true;
+      requestAnimationFrame(function () { angefragt = false; untersuche(); });
+    }, { passive: true });
+    untersuche();
+  });
+})();

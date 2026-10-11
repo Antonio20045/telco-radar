@@ -112,6 +112,8 @@
 {% endblock %}
 
 {% block content %}
+{{ d.glas_schalter([{'key': 'de', 'href': 'wettbewerb.html', 'label': 'Deutschland'},
+                    {'key': 'welt', 'href': 'differenzierung.html', 'label': 'Global'}], 'welt', prefix, 'Ansicht') }}
 {% if diff.hebel %}
 <section class="wl" data-welt>
   <nav class="wl-liste dz-nav" id="hebel-wand" aria-label="Die Hebel" style="scroll-margin-top:96px">
@@ -181,5 +183,4 @@
   </div>
 </details>
 {% endif %}
-{{ d.weiter('wettbewerb.html', 'Deutschland', prefix, 'band-wettbewerb') }}
 {% endblock %}

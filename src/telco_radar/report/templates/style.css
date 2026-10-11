@@ -6036,3 +6036,51 @@ html:not([data-art="geraet"]) .gx-held .gx-art--tarif,html[data-art="geraet"] .g
   .wl-blaettern button{color:var(--ink);border-color:var(--rule);background:var(--paper-2)}
   .wl-blatt-offen,.wl-blatt-offen body{overflow:hidden}
 }
+
+/* LIQUID GLASS (Antonio, 11.10.2026): der Umschalter schwebt beim Scrollen
+   ueber dem Inhalt und laesst ihn durchscheinen - ueber Bildern und waehrend
+   der Inhalt darunter rollt klarer, sonst matt (Apple: Regular und Clear).
+   Die Pille gleitet zur Wahl, dehnt sich dabei und federt nach. Brechung an
+   den Kanten nur in Chromium (backdrop-filter mit SVG-Filter); Rechenweg
+   der Karte: github.com/shuding/liquid-glass, MIT License, (c) 2025 Shu
+   Ding, Text unter static/lizenzen/liquid-glass.txt. */
+.glas-filter{position:absolute;width:0;height:0;overflow:hidden}
+.glas-schalter{position:sticky;top:84px;scroll-margin-top:84px;z-index:40;display:flex;width:max-content;max-width:calc(100% - 8px);
+  margin:0 auto 48px;padding:6px;gap:0;border:0;border-radius:var(--radius-pille);isolation:isolate;overflow:visible;
+  background:rgba(255,255,255,.26);-webkit-backdrop-filter:blur(12px) saturate(1.8);backdrop-filter:blur(12px) saturate(1.8);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.8),inset 0 -1px 0 rgba(8,10,14,.06),inset 0 0 0 1px rgba(255,255,255,.32),
+    0 12px 32px rgba(8,10,14,.14),0 1px 2px rgba(8,10,14,.06);
+  transition:background-color .45s var(--ease-standard),box-shadow .45s var(--ease-standard)}
+.glas-chromium .glas-schalter{backdrop-filter:url(#glas-linse) blur(3px) contrast(1.12) brightness(1.05) saturate(1.7)}
+.glas-schalter[data-unter="bild"],.glas-schalter.rollt{background:rgba(255,255,255,.1)}
+.glas-schalter[data-unter="bild"].rollt{background:rgba(255,255,255,.04)}
+.glas-schalter > a,.gr-reiter.glas-schalter > button{position:relative;z-index:1;display:inline-flex;align-items:center;
+  height:48px;padding:0 28px;border:0;border-radius:var(--radius-pille);background:transparent;box-shadow:none;
+  font:500 17px/1 var(--schrift);color:var(--ink-2);text-decoration:none;white-space:nowrap;cursor:pointer;
+  text-shadow:0 0 12px rgba(255,255,255,.7);transition:color var(--t-hover) var(--ease-standard)}
+.glas-schalter > a:hover,.gr-reiter.glas-schalter > button:hover{color:var(--ink)}
+.glas-schalter[data-unter="bild"] > a:not([aria-current]),.gr-reiter.glas-schalter[data-unter="bild"] > button[aria-selected="false"]{
+  color:var(--bildtext);text-shadow:0 1px 10px var(--schleier)}
+.glas-schalter > [aria-current="page"],.gr-reiter.glas-schalter > button[aria-selected="true"]{color:var(--ink);background:transparent;box-shadow:none}
+.glas-schalter > [aria-current="page"]::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;
+  background:var(--red);margin-right:10px}
+.gr-reiter.glas-schalter > button[hidden]{display:none}
+.glas-pille{position:absolute;z-index:0;top:6px;bottom:6px;left:0;width:var(--w,0);transform:translateX(var(--x,0));
+  border-radius:var(--radius-pille);background:rgba(255,255,255,.66);pointer-events:none;view-transition-name:glas-pille;
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.95),inset 0 -1px 2px rgba(8,10,14,.08),0 2px 10px rgba(8,10,14,.14)}
+.glas-schalter.bereit .glas-pille{transition:transform .55s cubic-bezier(.3,1.35,.5,1),width .55s cubic-bezier(.3,1.35,.5,1)}
+.glas-schalter.gleitet .glas-pille{animation:glas-dehnen .55s ease}
+@keyframes glas-dehnen{40%{scale:1.12 .88}}
+.ohne-js .glas-pille{display:none}
+.ohne-js .glas-schalter > [aria-current="page"],.ohne-js .gr-reiter.glas-schalter > button[aria-selected="true"]{background:rgba(255,255,255,.66)}
+@media (max-width:900px){
+  .glas-schalter,.gr-reiter.gx-modus.glas-schalter{position:sticky;top:128px;scroll-margin-top:128px;width:max-content;margin:0 auto 32px}
+  .glas-schalter > a,.gr-reiter.glas-schalter > button{height:44px;padding:0 20px;font-size:16px;flex:none}
+}
+@media (prefers-reduced-transparency:reduce){
+  .glas-schalter,.glas-chromium .glas-schalter{background:var(--paper-3);-webkit-backdrop-filter:none;backdrop-filter:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .glas-schalter.bereit .glas-pille{transition:none}
+  .glas-schalter.gleitet .glas-pille{animation:none}
+}

@@ -58,3 +58,22 @@
   <span class="weiter-titel">{{ titel }}<span class="weiter-pfeil" aria-hidden="true">→</span></span>
 </a>
 {%- endmacro %}
+
+{# LIQUID GLASS (Antonio, 11.10.2026): ein Umschalter, der beim Scrollen
+   ueber dem Inhalt schwebt und ihn durchscheinen laesst. Die Pille gleitet
+   zur gewaehlten Ansicht; app.js setzt ihre Lage. Die Brechung an den
+   Kanten (Karte vom Server, Rechenweg shuding/liquid-glass, MIT) zeigt nur
+   Chromium, alle anderen sehen mattes Glas. #}
+{% macro glas_filter() -%}
+<svg class="glas-filter" width="0" height="0" aria-hidden="true" focusable="false"><filter id="glas-linse" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB" x="0" y="0" width="{{ glas.breite }}" height="{{ glas.hoehe }}"><feImage href="{{ glas.url }}" x="0" y="0" width="{{ glas.breite }}" height="{{ glas.hoehe }}" preserveAspectRatio="none" result="karte"/><feDisplacementMap in="SourceGraphic" in2="karte" scale="{{ glas.staerke }}" xChannelSelector="R" yChannelSelector="G"/></filter></svg>
+{%- endmacro %}
+
+{# Zwei Seiten als eine: jeder Eintrag ist ein echter Link, der beim
+   Umschalter der anderen Seite landet (#ansicht), nicht wieder oben. #}
+{% macro glas_schalter(eintraege, aktiv, prefix, label) -%}
+<nav class="glas-schalter" id="ansicht" aria-label="{{ label }}" data-glas>
+  <span class="glas-pille" aria-hidden="true"></span>
+  {% for e in eintraege %}<a href="{{ prefix }}{{ e.href }}#ansicht"{% if e.key == aktiv %} aria-current="page"{% endif %}>{{ e.label }}</a>{% endfor %}
+</nav>
+{{ glas_filter() }}
+{%- endmacro %}
