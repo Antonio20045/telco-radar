@@ -6,13 +6,14 @@ Ein Job je Anbieter (Matrix im eigenen Workflow ``klick.yml``) arbeitet die Klic
 läuft durch den Klick-Crawler (``klickcrawler.klicke_durch``) mit demselben Tor wie die
 Erkundung: robots.txt samt Crawl-delay und Visit-time je Anfrage, eigener Abstand des
 Anbieters, User-Agent aus ``geraete_quellen.yaml``, keine Tarnung. Endet eine Seite
-gestört (Bot-Schutz, Challenge, Kanarienwert, Strukturbruch), geht für den Anbieter
+gestört durch Bot-Schutz oder Challenge, geht für den Anbieter
 keine Anfrage mehr hinaus (CLAUDE.md Regel 4); die übrigen Seiten heißen
 ``nicht_besucht`` mit Grund. Lud eine Seite nur nicht (``klicklauf.STOERUNG_ZEIT``,
 kein Bot-Schutz, CLAUDE.md Regel 10), folgt die nächste Seite unter derselben
 Hostschleuse samt Crawl-delay; nach ``HOECHSTE_ZEITUEBERSCHREITUNGEN`` solchen Seiten
 endet er. Hat eine Seite nach bestandener Bot-Prüfung nur eine andere Form
-(``klicklauf.STOERUNG_SEITE``: Kanarienwert, Vorbereitung), folgt ebenso die nächste;
+(``klicklauf.STOERUNG_SEITE``: Kanarienwert, Vorbereitung, Strukturbruch, keine
+angebotene Kombination; o2 11.10.2026), folgt ebenso die nächste;
 erst ``HOECHSTE_SEITENFORMEN_IN_FOLGE`` solche Seiten hintereinander beenden ihn
 (Telekom 10. und 11.10.2026: je eine Seite hielt alle übrigen an). Ebenso endet der
 Lauf, sobald die Parallellauf-Prüfung (``klickparallel``, vor jeder Seite) einen

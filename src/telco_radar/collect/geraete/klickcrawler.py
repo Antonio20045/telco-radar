@@ -21,9 +21,8 @@ Datenkonzept Geräteradar, Abschnitt 8. Je Produktseite und Klick-Karte (``klick
    nach dem ihre Anfrage hinausging, sonst ``nicht_erfasst``. Dann liest ``klicklesung``
    Antwort, Text, Markierung und Echo und macht einen Screenshot. Eine Kombination ohne
    Antwort besucht er am Ende einmal neu (``klicknachholen``).
-4. Je Kombination: erfasst, nicht_angeboten, nicht_erfasst oder befund; dazu der
-   Strukturwächter je Lauf (beides in ``klicklauf``). Ist keine Kombination angeboten,
-   ist der Lauf gestört.
+4. Je Kombination erfasst, nicht_angeboten, nicht_erfasst oder befund (``klicklauf``);
+   keine angeboten oder Strukturbruch: Seite anderer Form (``STOERUNG_SEITE``).
 5. Jede gelesene Kombination trägt ihren Beleg (``klickbeleg``): Screenshot, HAR der
    Preisantwort, Zeitpunkt aus ``uhr``, Fundstellen. Ohne Beleg ist ein Wert nicht
    gültig (``klicklauf.mit_beleg``), mit Beleg heißt er ``offen``, bis ``belegarchiv``
@@ -58,6 +57,7 @@ from .klicklauf import (
     LAUF_GESTOERT,
     LAUF_ZEITGRENZE,
     NICHT_ERFASST,
+    STOERUNG_SEITE,
     Klicklauf,
     Kombiergebnis,
     ergebnisgrund,
@@ -122,12 +122,12 @@ def klicke_durch(
     Crawl-delay je Host über Läufe hinweg (``klicktor.Hostschleuse``). ``vorlauf`` ist
     der letzte Lauf derselben Seite (``klicklauf.pruefe_struktur``). Ein Abbruch steht
     als Status und Grund im Lauf, eine Störung im Tor geht jedem anderen vor;
-    Kombinationen davor bleiben. ``kennung`` ist der User-Agent aus
-    ``geraete_quellen.yaml``. Nach ``hoechste`` Kombinationen oder wenn
-    ``frist`` vor einem Klick falsch ist, heißt die Kombination ``nicht_erfasst`` mit
-    Grund ``nicht besucht``; schneidet die Frist welche ab oder verwirft sie eine
-    Anfrage, ist der Lauf ``zeitgrenze``. ``beobachter`` sieht jede Antwort, ``cookies``
-    die Cookie-Werte jedes Kontexts, ``modell`` füllt ``{modell}`` im Kanarienwert.
+    Kombinationen davor bleiben. ``kennung`` ist der User-Agent aus ``geraete_quellen``.
+    Nach ``hoechste`` Kombinationen oder wenn ``frist`` vor einem Klick falsch ist,
+    heißt die Kombination ``nicht_erfasst`` mit Grund ``nicht besucht``; schneidet die
+    Frist welche ab oder verwirft sie eine Anfrage, ist der Lauf ``zeitgrenze``.
+    ``beobachter`` sieht jede Antwort, ``cookies`` die Cookie-Werte jedes Kontexts,
+    ``modell`` füllt ``{modell}`` im Kanarienwert.
     """
     lauf = Klicklauf(anbieter=karte.anbieter, adresse=adresse)
     tor = Tor(waechter, uhr, schleuse, lauf)
@@ -147,9 +147,9 @@ def klicke_durch(
         lauf.status, lauf.grund, lauf.stoerung = LAUF_GESTOERT, tor.stoerung, None
     bruch = pruefe_struktur(lauf, vorlauf)
     leer = ergebnisgrund(lauf.ergebnisse)
-    for grund in (bruch, leer):
-        if lauf.status == LAUF_GELESEN and grund is not None:
-            lauf.status, lauf.grund = LAUF_GESTOERT, grund
+    anlass = bruch or leer
+    if lauf.status == LAUF_GELESEN and anlass is not None:
+        lauf.status, lauf.grund, lauf.stoerung = LAUF_GESTOERT, anlass, STOERUNG_SEITE
     if lauf.status != LAUF_GELESEN:
         log.warning("Klick-Crawler %s %s: %s", karte.anbieter, adresse, lauf.grund)
     return lauf

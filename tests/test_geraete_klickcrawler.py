@@ -19,6 +19,7 @@ import pytest
 import yaml
 from klickserver import Antwort, html, klickserver
 
+from telco_radar.collect.geraete.klicklauf import STOERUNG_SEITE
 from telco_radar.collect.geraete.robots import RobotsWaechter
 
 FIXTURES = Path(__file__).parent / "fixtures" / "klickcrawler"
@@ -249,6 +250,7 @@ def test_fehlende_knoepfe_heissen_nicht_erfasst_und_brechen_die_struktur(
     assert lauf.struktur.anteil_knoepfe < 0.5
     assert lauf.status == "gestoert"
     assert "Strukturbruch" in lauf.grund
+    assert lauf.stoerung == STOERUNG_SEITE
     assert len(server.mit("/api/preis")) == 1
 
 
