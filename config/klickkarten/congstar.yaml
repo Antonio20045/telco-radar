@@ -86,7 +86,9 @@ zusammenfassung:
     # „Gerät 24,00 €“ (P1 Nr. 40), „Tarif 25,00 €“ (P1 Nr. 41), „Summe 1. bis 36. Monat“ (P1 Nr. 39)
     rate: '\bGerät\s*([\d.,]+)\s*€'
     ratenzahl: 'Summe\s*1\.\s*bis\s*(\d+)\.\s*Monat'
-    tarifphasen: '\bTarif\s*([\d.,]+)\s*€'
+    # Flex (planId 548): „Tarif (mtl. kündbar) 15,00 €“ (Erkundung 10.10.2026, Zweig
+    # klick-erkundung 0e0d2207, congstar/2026-10-10/karte-2.json)
+    tarifphasen: '\bTarif(?:\s*\(mtl\.\s*kündbar\))?\s*([\d.,]+)\s*€'
     # Anzahlung nur in der gewählten Ratenkachel: „Monatliche Kosten 24,00 € Anzahlung
     # 179,00 €“ (P1 Nr. 0–2) im div neben dem Label (Label B1 El. 93 „… > div:2 > label:1“,
     # Preise P1 Nr. 1/2 „… > div:2 > div:1 > …“; in den Produktseiten div#510-content, auf
@@ -103,10 +105,13 @@ zusammenfassung:
     anschluss:
       selektor: 'label[data-selected="true"]:has(input[aria-label^="Mindestlaufzeit von"]) ~ div'
       muster: 'Einmalige\s*Kosten\s*([\d.,]+)\s*€'
-    # „24 Monate Laufzeit“ (B1 El. 108, B2 El. 111)
+    # Am Input im gewählten Label: „Mindestlaufzeit von 24 Monaten“, Flex „Mindestlaufzeit
+    # von 0 Monaten“; das Flex-Label „Ohne Laufzeit (mtl. kündbar)“ nennt keine Zahl
+    # (Erkundung 10.10.2026, congstar/2026-10-10/bedienelemente-2.json El. 108–111).
     tarifbindung:
-      selektor: 'label[data-selected="true"]:has(input[aria-label^="Mindestlaufzeit von"])'
-      muster: '(\d+)\s*Monate\s*Laufzeit'
+      selektor: 'label[data-selected="true"] input[aria-label^="Mindestlaufzeit von"]'
+      attribut: aria-label
+      muster: 'Mindestlaufzeit\s*von\s*(\d+)\s*Monaten'
     # „125 GB 25,00 € mtl.“ (B1 El. 103, B2 El. 106)
     volumen_gb:
       selektor: 'label[data-selected="true"]:has(input[aria-label^="Tarifoption "])'

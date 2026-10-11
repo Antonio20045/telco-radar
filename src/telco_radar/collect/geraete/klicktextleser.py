@@ -99,7 +99,7 @@ class Textleser:
             if muster.selektor is not None:
                 ort, quelle = (
                     muster.selektor,
-                    self._text(self.seite.locator(muster.selektor)),
+                    self._text(self.seite.locator(muster.selektor), muster.attribut),
                 )
             treffer = muster.muster.search(zahlen_ohne_leerraum(quelle))
             roh = None

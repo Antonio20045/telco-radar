@@ -41,6 +41,7 @@ GRUND_UNBEKANNT = "unbekanntes Feld"
 GRUND_MUSTER = "kein gültiger regulärer Ausdruck"
 GRUND_YAML = "kein lesbares YAML"
 GRUND_OHNE_VARIANTE = "Antwort nennt keine Variante (variante oder parameter)"
+GRUND_ATTRIBUT_OHNE_SELEKTOR = "attribut nur mit selektor"
 GRUND_ENTWEDER = "entweder attribut mit wert oder passt"
 GRUND_ADRESSEN_UND_KNOPF = "adressen schließt alle anderen Teile des Knopfs aus"
 GRUND_EINE_ADRESSDIMENSION = "adressen nur bei einer Dimension"
@@ -149,11 +150,14 @@ class Vorbereitung:
 class Textmuster:
     """Wo ein Wertfeld im Text steht: erste Gruppe von ``muster``.
 
-    Ohne ``selektor`` im Text der Zusammenfassung, sonst im Text des ersten Treffers.
+    Ohne ``selektor`` im Text der Zusammenfassung, sonst im Text des ersten Treffers,
+    mit ``attribut`` in dessen Attribut (congstar „Mindestlaufzeit von 0 Monaten“ am
+    Input, das Label „Ohne Laufzeit“ nennt keine Zahl).
     """
 
     muster: re.Pattern[str]
     selektor: str | None = None
+    attribut: str | None = None
 
 
 @dataclass(frozen=True)

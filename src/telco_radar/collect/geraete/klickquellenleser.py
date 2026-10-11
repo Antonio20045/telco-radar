@@ -22,6 +22,7 @@ from .klickkartentypen import (
     DIMENSIONEN,
     EINHEITEN,
     ENTFALLEN_IM_BUENDEL,
+    GRUND_ATTRIBUT_OHNE_SELEKTOR,
     GRUND_EINE_QUELLE,
     GRUND_EINHEIT,
     GRUND_ENTFAELLT,
@@ -66,7 +67,7 @@ QUELLENTEILE = (
 WERTPFADTEILE = ("pfad", "muster", "einheit")
 PARAMETERTEILE = ("name", "muster")
 SEITENTEILE = ("selektor", "attribut", "parameter", "muster")
-MUSTERTEILE = ("muster", "selektor")
+MUSTERTEILE = ("muster", "selektor", "attribut")
 GRUND_PFAD = "kein gültiger Pfad"
 GRUND_GLOBAL = "kein Bezeichner einer globalen Variable"
 GRUND_KEIN_SEITENWERT = "kein Seitenwert dieses Namens"
@@ -151,9 +152,12 @@ def lies_textmuster(leser: Kartenleser, roh: object) -> dict[str, Textmuster]:
             muster[feld] = Textmuster(leser.muster(daten, feld, ort))
             continue
         teile = leser.zuordnung(daten[feld], f"{ort}.{feld}", MUSTERTEILE)
+        selektor = leser.wahlweise_text(teile, "selektor", f"{ort}.{feld}")
+        attribut = leser.wahlweise_text(teile, "attribut", f"{ort}.{feld}")
+        if attribut is not None and selektor is None:
+            raise leser.fehler(f"{ort}.{feld}", GRUND_ATTRIBUT_OHNE_SELEKTOR)
         muster[feld] = Textmuster(
-            leser.muster(teile, "muster", f"{ort}.{feld}"),
-            leser.wahlweise_text(teile, "selektor", f"{ort}.{feld}"),
+            leser.muster(teile, "muster", f"{ort}.{feld}"), selektor, attribut
         )
     return muster
 
