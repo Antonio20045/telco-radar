@@ -173,6 +173,7 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
           # Push statt Pull (src/telco_radar/versand.py). Fehlen diese
           # Secrets, verschickt der Lauf nichts und schreibt den Grund ins
           # Laufprotokoll - er scheitert deswegen nicht. Genau deshalb stehen
