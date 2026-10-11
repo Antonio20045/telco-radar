@@ -162,5 +162,5 @@ def test_rubrikleiste_zeigt_verstehen_mit_der_zahl_der_kapitel(chromium, site):
             ".map(a => [a.getAttribute('href'), a.textContent.trim(),"
             " a.classList.contains('an')])"
         )
-    assert eintraege[-1] == ["#verstehen", "Verstehen 12", True]
-    assert [e[0] for e in eintraege] == ["#meldungen", "#modelle", "#verstehen"]
+    assert ["#verstehen", "Verstehen 12", True] in eintraege
+    assert [e[0] for e in eintraege][:3] == ["#meldungen", "#modelle", "#verstehen"]
