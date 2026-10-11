@@ -48,7 +48,7 @@ from ..textwerkzeug import (
     slug as _tw_slug,
     wortmenge as _wortmenge,
 )
-from .. import promo_bilder
+from .. import promo_bilder, stil_seiten
 
 _DIFF_COLOR = {t["key"]: t["color"] for t in DIFF_THEMES}
 
@@ -1834,4 +1834,5 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
     log.info("Site rendered: %d report(s) -> %s", len(reports), site_dir)
     for ausfall in ausfaelle:
         log.error("Nicht neu gebaut: %s (%s)", ausfall.teil, ausfall.grund)
+    stil_seiten.teile_blaetter(site_dir)
     return ausfaelle
