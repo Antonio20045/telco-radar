@@ -1650,6 +1650,129 @@ anbieter:
       - geraet: samsung-galaxy-s26
         speicher_gb: 256
         url: https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html
+      # Alle übrigen Vodafone-Geräte (11.10.2026, nach „wie ein Browser laden“: 9 min für
+      # 45 Kombinationen), Adresse wörtlich `quelle_url` in data/state/geraete_tco.json,
+      # kleinster Speicher; die Karte klickt die übrigen Speicher selbst.
+      - geraet: apple-iphone-15
+        speicher_gb: 128
+        url: https://www.vodafone.de/privat/handys/iphone-15.html
+      - geraet: apple-iphone-16
+        speicher_gb: 128
+        url: https://www.vodafone.de/privat/handys/iphone-16.html
+      - geraet: apple-iphone-16-plus
+        speicher_gb: 128
+        url: https://www.vodafone.de/privat/handys/iphone-16-plus.html
+      - geraet: apple-iphone-16e
+        speicher_gb: 128
+        url: https://www.vodafone.de/privat/handys/iphone-16e.html
+      - geraet: apple-iphone-17
+        speicher_gb: 256
+        url: https://www.vodafone.de/privat/handys/iphone-17.html
+      - geraet: apple-iphone-17-pro-max
+        speicher_gb: 256
+        url: https://www.vodafone.de/privat/handys/iphone-17-pro-max.html
+      - geraet: apple-iphone-17e
+        speicher_gb: 256
+        url: https://www.vodafone.de/privat/handys/iphone-17e.html
+      - geraet: apple-iphone-18-pro
+        speicher_gb: 256
+        url: https://www.vodafone.de/privat/handys/iphone-18-pro.html
+      - geraet: apple-iphone-18-pro-max
+        speicher_gb: 256
+        url: https://www.vodafone.de/privat/handys/iphone-18-pro-max.html
+      - geraet: samsung-galaxy-s25
+        speicher_gb: 128
+        url: https://www.vodafone.de/privat/handys/samsung-galaxy-s25.html
+      - geraet: samsung-galaxy-s25-fe
+        speicher_gb: 128
+        url: https://www.vodafone.de/privat/handys/samsung-galaxy-s25-fe.html
+      - geraet: samsung-galaxy-s26-fe
+        speicher_gb: 128
+        url: https://www.vodafone.de/privat/handys/samsung-galaxy-s26-fe.html
+      - geraet: samsung-galaxy-s26-plus
+        speicher_gb: 256
+        url: https://www.vodafone.de/privat/handys/samsung-galaxy-s26-plus.html
+      - geraet: samsung-galaxy-s26-ultra
+        speicher_gb: 256
+        url: https://www.vodafone.de/privat/handys/samsung-galaxy-s26-ultra.html
+      - geraet: google-pixel-10
+        speicher_gb: 128
+        url: https://www.vodafone.de/privat/handys/google-pixel-10.html
+      - geraet: google-pixel-10-pro
+        speicher_gb: 128
+        url: https://www.vodafone.de/privat/handys/google-pixel-10-pro.html
+      - geraet: google-pixel-10-pro-xl
+        speicher_gb: 256
+        url: https://www.vodafone.de/privat/handys/google-pixel-10-pro-xl.html
+      - geraet: google-pixel-10a
+        speicher_gb: 128
+        url: https://www.vodafone.de/privat/handys/google-pixel-10a.html
+      - geraet: google-pixel-11
+        speicher_gb: 256
+        url: https://www.vodafone.de/privat/handys/google-pixel-11.html
+      - geraet: google-pixel-11-pro
+        speicher_gb: 256
+        url: https://www.vodafone.de/privat/handys/google-pixel-11-pro.html
+      - geraet: google-pixel-11-pro-fold
+        speicher_gb: 256
+        url: https://www.vodafone.de/privat/handys/google-pixel-11-pro-fold.html
+      - geraet: google-pixel-11-pro-xl
+        speicher_gb: 256
+        url: https://www.vodafone.de/privat/handys/google-pixel-11-pro-xl.html
+      - geraet: samsung-galaxy-z-flip-7
+        speicher_gb: 256
+        url: https://www.vodafone.de/privat/handys/samsung-galaxy-z-flip7.html
+      - geraet: samsung-galaxy-z-flip8
+        speicher_gb: 256
+        url: https://www.vodafone.de/privat/handys/samsung-galaxy-z-flip8.html
+      - geraet: samsung-galaxy-z-fold-7
+        speicher_gb: 256
+        url: https://www.vodafone.de/privat/handys/samsung-galaxy-z-fold7.html
+      - geraet: samsung-galaxy-z-fold8
+        speicher_gb: 256
+        url: https://www.vodafone.de/privat/handys/samsung-galaxy-z-fold8.html
+      - geraet: samsung-galaxy-z-fold8-ultra
+        speicher_gb: 256
+        url: https://www.vodafone.de/privat/handys/samsung-galaxy-z-fold8-ultra.html
+      - geraet: apple-iphone-air
+        speicher_gb: 256
+        url: https://www.vodafone.de/privat/handys/iphone-air.html
+      - geraet: samsung-galaxy-a17
+        speicher_gb: 128
+        url: https://www.vodafone.de/privat/handys/samsung-galaxy-a17-5g.html
+      - geraet: samsung-galaxy-a37
+        speicher_gb: 128
+        url: https://www.vodafone.de/privat/handys/samsung-galaxy-a37-5g.html
+      - geraet: samsung-galaxy-a57
+        speicher_gb: 256
+        url: https://www.vodafone.de/privat/handys/samsung-galaxy-a57-5g.html
+      - geraet: xiaomi-17
+        speicher_gb: 512
+        url: https://www.vodafone.de/privat/handys/xiaomi-17.html
+      - geraet: xiaomi-17-ultra
+        speicher_gb: 512
+        url: https://www.vodafone.de/privat/handys/xiaomi-17-ultra.html
+      - geraet: xiaomi-17t
+        speicher_gb: 256
+        url: https://www.vodafone.de/privat/handys/xiaomi-17t.html
+      - geraet: xiaomi-17t-pro
+        speicher_gb: 512
+        url: https://www.vodafone.de/privat/handys/xiaomi-17t-pro.html
+      - geraet: xiaomi-redmi-17
+        speicher_gb: 128
+        url: https://www.vodafone.de/privat/handys/xiaomi-redmi-17-5g.html
+      - geraet: xiaomi-redmi-note-15
+        speicher_gb: 256
+        url: https://www.vodafone.de/privat/handys/xiaomi-redmi-note-15-5g.html
+      - geraet: xiaomi-redmi-note-17
+        speicher_gb: 128
+        url: https://www.vodafone.de/privat/handys/xiaomi-redmi-note-17-5g.html
+      - geraet: xiaomi-redmi-note-17-pro
+        speicher_gb: 256
+        url: https://www.vodafone.de/privat/handys/xiaomi-redmi-note-17-pro-5g.html
+      - geraet: fairphone-6
+        speicher_gb: 256
+        url: https://www.vodafone.de/privat/handys/fairphone-6.html
 
   - schluessel: 1und1
     name: 1&1
