@@ -13,7 +13,7 @@
   <link rel="icon" type="image/png" href="{{ prefix }}logo.png">
 </head>
 {% set uc = usecase | default('markt') %}
-<body class="uc-{{ uc }} seite-{{ active | default('seite') }}{% if buehne %} mit-buehne{% endif %}{% if hintergrund %} mit-hintergrund{% endif %}">
+<body class="uc-{{ uc }} seite-{{ active | default('seite') }}{% if buehne %} mit-buehne{% endif %}">
   <a class="sprungmarke" href="#inhalt">Zum Inhalt</a>
   {# Der Kopf schwebt ueber dem Bild jeder Seite: Marke links, EINE
      Navigation in der Mitte, Suche und Newsletter rechts. Die Trennung

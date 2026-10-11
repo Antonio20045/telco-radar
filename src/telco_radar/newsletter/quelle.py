@@ -17,6 +17,7 @@ import re
 from urllib.parse import urlsplit
 
 from ..textwerkzeug import slug
+from .config import MELDUNGEN
 from .filters import Eintrag
 
 _IST_PLATZHALTER = re.compile(
@@ -76,7 +77,7 @@ def aus_bericht(bericht: dict, *, bericht_url: str = "") -> list[Eintrag]:
             aus.append(
                 Eintrag(
                     id=f"markt:{_id_aus_url(url)}",
-                    bereich="marktrecherche",
+                    bereich=MELDUNGEN,
                     titel=_schlagzeile(h),
                     text=h.get("summary") or "",
                     url=url,

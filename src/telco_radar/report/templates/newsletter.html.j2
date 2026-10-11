@@ -1,35 +1,33 @@
 {% extends "base.html.j2" %}
 {% import "_design.html.j2" as d %}
-{% set hintergrund = true %}
+{% set buehne = true %}
 {% block title %}Newsletter – Vodafone Product and Services Insights{% endblock %}
-{% block buehne %}{{ d.hintergrund('band-newsletter', prefix) }}{% endblock %}
+{# Die Anmeldeseite (Antonio, 11.10.2026): derselbe Bildkopf wie Meldungen,
+   darunter ein ruhiges Formular ohne Karte. Sie ist die einzige Seite, die
+   etwas entgegennimmt; deshalb stehen Impressum und Datenschutz hier (Art. 13
+   DSGVO), und die Regel "nichts angekreuzt heisst alles" steht einmal ueber
+   der Auswahl - sie ist keine Bedienhilfe, sondern die Regel selbst.
+   Regionen und Themen schraenken nur Meldungen ein (`NUR_MELDUNGEN`);
+   app.js blendet sie aus, sobald Bereiche ohne Meldungen gewaehlt sind. #}
+{% block buehne %}
+<section class="wa-auftakt mg-auftakt nl-auftakt" data-buehne>
+  <div class="wa-auftakt-buehne">
+    <div class="wa-rahmen">
+      <div class="wa-bild" aria-hidden="true">{{ d.motiv('band-newsletter', prefix, 'wa-motiv', eager=true) }}</div>
+      <div class="wa-schleier" aria-hidden="true"></div>
+      <header class="mg-kopf wa-text">
+        <p class="mg-woche">Per E-Mail</p>
+        <h1 class="mg-titel" aria-label="Newsletter">{% for c in 'Newsletter' %}<span style="--i:{{ loop.index0 }}" aria-hidden="true">{{ c }}</span>{% endfor %}</h1>
+        <p class="mg-datum">Nach jedem Radar-Lauf, nur mit Neuem</p>
+      </header>
+      <div class="wa-hinweis" aria-hidden="true"></div>
+    </div>
+  </div>
+</section>
+{% endblock %}
 {% block content %}
-{# Die Anmeldeseite. Drei Dinge sind hier anders als auf jeder anderen Seite
-   des Portals, und alle drei aus einem Grund:
-
-   1. Sie ist die EINZIGE Seite, die etwas entgegennimmt. Deshalb muessen
-      Impressum und Datenschutz von hier aus erreichbar sein - Art. 13 DSGVO
-      verlangt die Information zum ZEITPUNKT der Erhebung, nicht irgendwo.
-   2. Sie braucht JavaScript. Ohne es ist sichtbar, DASS es den Newsletter
-      gibt, und warum die Anmeldung gerade nicht geht.
-   3. Sie erklaert ihre eigene Bedienung an genau einer Stelle - bei der
-      leeren Auswahl. Die Hausregel "kein Satz erklaert die Bedienung"
-      (CLAUDE.md §5) gilt fuer Seiten, die etwas ZEIGEN. Hier trifft jemand
-      eine Entscheidung, und "leer heisst alles" ist keine Bedienhilfe,
-      sondern die Regel selbst - wer sie nicht kennt, waehlt falsch. #}
 <div class="nl">
-  <p class="page-kicker">Per E-Mail</p>
-  <h1>Der Radar in deinem Postfach</h1>
-  <p class="nl-lead">
-    Zweimal pro Woche, zu deinen Themen — und <strong>nur, wenn es dazu
-    wirklich etwas Neues gibt.</strong>
-  </p>
-
   {% if not newsletter_verlinkt %}
-  {# Die Veroeffentlichungsschwelle, sichtbar gemacht. Solange Impressum oder
-     Datenschutzerklaerung eine offene Stelle haben, nimmt diese Seite nichts
-     entgegen - und sagt, warum. Das Formular steht darunter trotzdem, aber
-     abgeschaltet: eine Seite, die ihre Luecke beziffert, luegt nicht. #}
   <div class="nl-gesperrt">
     <strong>Die Anmeldung ist noch nicht freigeschaltet.</strong>
     Impressum und Datenschutzerklärung sind noch nicht vollständig, und ohne
@@ -37,30 +35,26 @@
     steht auf der <a href="{{ prefix }}impressum.html">Impressumsseite</a>.
   </div>
   {% elif not dienst_da %}
-  {# Die zweite Sperre, und sie hat einen ANDEREN Grund: die Rechtstexte
-     stehen, aber der Anmeldedienst ist nicht eingerichtet. app.js sagt das
-     ohnehin - nur unten am Absendeknopf, also erst nach dem ausgefuellten
-     Formular. Hier oben kostet es den Leser nichts. #}
   <div class="nl-gesperrt">
     <strong>Die Anmeldung ist noch nicht möglich.</strong>
     Der Dienst, der die Anmeldungen entgegennimmt, ist noch nicht
-    eingerichtet. Das Formular unten zeigt, was einstellbar sein wird, nimmt
+    eingerichtet. Das Formular zeigt, was einstellbar sein wird, nimmt
     aber noch keine Adresse entgegen.
   </div>
   {% endif %}
 
   <form id="nl-form" class="nl-form" novalidate
         {% if not newsletter_verlinkt %}data-gesperrt="1"{% endif %}>
+    <p class="nl-regel">Nichts angekreuzt heißt: alles.</p>
 
-    {# ------------------------------------------------- die vier Achsen -#}
     {% for dim in dimensionen %}
-    <fieldset class="nl-block">
-      <legend class="rubrik">{{ dim.label }}</legend>
-      <p class="nl-hinweis">{{ dim.hinweis }}</p>
+    <fieldset class="nl-block" data-dim="{{ dim.key }}"{% if dim.nur_meldungen %} data-nur-meldungen{% endif %}>
+      <legend class="nl-titel">{{ dim.label }}</legend>
       <div class="nl-optionen">
         {% for opt in dim.optionen %}
         <label class="nl-opt">
           <input type="checkbox" name="{{ dim.feld }}" value="{{ opt.key }}">
+          {% if opt.marke %}<i class="nl-marke gr-anb--{{ opt.marke }}" aria-hidden="true"></i>{% endif %}
           <span>{{ opt.label }}</span>
         </label>
         {% endfor %}
@@ -68,14 +62,11 @@
     </fieldset>
     {% endfor %}
 
-    {# ------------------------------------------------------ Stichwoerter -#}
     <fieldset class="nl-block">
-      <legend class="rubrik">Eigene Stichwörter</legend>
+      <legend class="nl-titel">Stichwörter</legend>
       <p class="nl-hinweis">
-        Ein Treffer auf ein eigenes Stichwort kommt in die Ausgabe, auch wenn
-        er durch die Auswahl oben herausgefallen wäre — er ist dann als solcher
-        markiert. Höchstens {{ grenzen.max_stichwoerter }} Stichwörter, jedes
-        mit mindestens {{ grenzen.min_stichwort_laenge }} Zeichen.
+        Kommen immer mit, auch außerhalb der Auswahl. Höchstens
+        {{ grenzen.max_stichwoerter }}, je ab {{ grenzen.min_stichwort_laenge }} Zeichen.
       </p>
       <div class="nl-stichwort-zeile">
         <input type="text" id="nl-stichwort" class="nl-feld"
@@ -87,31 +78,28 @@
       <ul id="nl-stichwort-liste" class="nl-chips"></ul>
     </fieldset>
 
-    {# ----------------------------------------------- Adresse und Zustimmung -#}
     <fieldset class="nl-block nl-abschluss">
-      <legend class="rubrik">Deine E-Mail-Adresse</legend>
+      <legend class="nl-titel">E-Mail-Adresse</legend>
       <input type="email" id="nl-email" name="email" class="nl-feld nl-feld--breit"
              autocomplete="email" required placeholder="name@firma.de"
              aria-label="E-Mail-Adresse">
 
-      {# Der Honeypot. Kein `type=hidden` - Skripte fuellen versteckte Felder
-         gezielt NICHT aus. Ein sichtbares Feld, das aus dem Bild geschoben
-         ist, wird von ihnen ausgefuellt und von Menschen nie gesehen. #}
+      {# Honeypot: sichtbar, aber aus dem Bild geschoben - Skripte fuellen
+         `type=hidden` gezielt nicht aus. #}
       <div class="nl-hp" aria-hidden="true">
         <label>Website<input type="text" name="website" tabindex="-1" autocomplete="off"></label>
       </div>
 
       <label class="nl-consent">
-        {# NICHT vorausgewaehlt. Eine vorangekreuzte Einwilligung ist keine. #}
         <input type="checkbox" id="nl-consent" required>
         <span class="nl-consent-text">
           {% for absatz in einwilligung_absaetze %}<span class="nl-consent-p">{{ absatz }}</span>{% endfor %}
         </span>
       </label>
       <p class="nl-fein">
-        Fassung {{ einwilligung_version }}. Einzelheiten in der
-        <a href="{{ prefix }}datenschutz.html">Datenschutzerklärung</a>,
-        Anbieterangaben im <a href="{{ prefix }}impressum.html">Impressum</a>.
+        Fassung {{ einwilligung_version }} ·
+        <a href="{{ prefix }}datenschutz.html">Datenschutz</a> ·
+        <a href="{{ prefix }}impressum.html">Impressum</a>
       </p>
 
       <button type="submit" id="nl-submit" class="nl-btn"
@@ -124,9 +112,9 @@
 
   <noscript>
     <p class="nl-gesperrt">
-      Für die Anmeldung braucht diese Seite JavaScript — sie holt vorher eine
-      signierte Kennung beim Anmeldedienst ab. Ohne JavaScript schreib bitte
-      an die Adresse im <a href="{{ prefix }}impressum.html">Impressum</a>.
+      Für die Anmeldung braucht diese Seite JavaScript. Ohne JavaScript
+      schreiben Sie bitte an die Adresse im
+      <a href="{{ prefix }}impressum.html">Impressum</a>.
     </p>
   </noscript>
 </div>

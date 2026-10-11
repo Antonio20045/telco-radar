@@ -33,12 +33,6 @@
 </section>
 {%- endmacro %}
 
-{# Ein Motiv, das als ruhender Hintergrund hinter der ganzen Seite steht
-   (Newsletter): das Formular liegt als Glasflaeche darueber. #}
-{% macro hintergrund(slug, prefix) -%}
-<div class="hintergrund" aria-hidden="true">{{ motiv(slug, prefix, 'hintergrund-motiv', eager=true, breite=2400, hoehe=1357) }}</div>
-{%- endmacro %}
-
 {# Ein schlichter Umschalter zwischen zwei Ansichten einer Seite, z. B.
    Wettbewerb Deutschland | Welt. Jeder Eintrag ist ein echter Link. #}
 {% macro umschalter(eintraege, aktiv, prefix, label) -%}

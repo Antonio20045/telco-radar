@@ -249,3 +249,33 @@ def sauberer_filter(roh: dict, katalog: NewsletterKatalog) -> dict:
             )
     aus["keywords"] = stichwoerter
     return aus
+
+
+def antwortseite(titel: str, text: str, *, ziel: str = "") -> str:
+    """Die Antwortseite des Dienstes im Look des Portals, ohne Stylesheet und
+    ohne Skript: sie steht auch, wenn die Static Site nicht erreichbar ist."""
+    m = MAIL
+    weiter = (
+        f'<p style="margin:32px 0 0"><a href="{html.escape(ziel, True)}" '
+        f'style="color:{m["tinte"]};font-weight:500">Zum Portal &rsaquo;</a></p>'
+        if ziel
+        else ""
+    )
+    return (
+        "<!DOCTYPE html><html lang=de><head><meta charset=utf-8>"
+        "<meta name=viewport content='width=device-width,initial-scale=1'>"
+        f"<title>{html.escape(titel)}</title></head>"
+        f"<body style='margin:0;background:{m['papier']};color:{m['text']};"
+        "font:17px/1.6 system-ui,-apple-system,Segoe UI,Helvetica,Arial,sans-serif'>"
+        "<main style='max-width:36em;margin:0 auto;padding:16vh 24px 12vh;"
+        "text-align:center'>"
+        f"<p style='margin:0;font-size:13px;font-weight:600;letter-spacing:.22em;"
+        f"text-transform:uppercase;color:{m['rot']}'>Newsletter</p>"
+        "<h1 style='margin:12px 0 0;padding:0 0 26px;"
+        f"border-bottom:3px double {m['tinte']};"
+        f"font:500 clamp(44px,9vw,84px)/1 Georgia,serif;"
+        f"letter-spacing:-.02em;color:{m['tinte']}'>{html.escape(titel)}</h1>"
+        "<p style='margin:24px 0 0;font:italic 22px/1.4 Georgia,serif'>"
+        f"{html.escape(text)}</p>"
+        f"{weiter}</main></body></html>"
+    )

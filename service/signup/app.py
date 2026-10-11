@@ -45,7 +45,8 @@ log = logging.getLogger("signup")
 WURZEL = Path(__file__).resolve().parents[2]
 
 NEUTRAL = (
-    "Gleich kommt eine E-Mail. Klick den Link darin — erst dann bist du angemeldet."
+    "Gleich kommt eine E-Mail. Erst mit dem Klick auf den Link darin sind Sie "
+    "angemeldet."
 )
 
 NOCHMAL = (
@@ -158,24 +159,7 @@ def _dispatch(ereignis: str, nutzlast: dict) -> bool:
 
 
 def _seite(titel: str, text: str, *, ziel: str = "") -> HTMLResponse:
-    """Eine schlichte Antwortseite.
-
-    Bewusst ohne Stylesheet und ohne Skript: sie muss auch dann stehen, wenn
-    die Static Site gerade nicht erreichbar ist - sonst haette der Nutzer
-    nach dem Bestaetigen eine leere Seite vor sich."""
-    import html as h
-
-    weiter = (
-        f'<p><a href="{h.escape(ziel, True)}">Weiter zum Portal</a></p>' if ziel else ""
-    )
-    return HTMLResponse(
-        "<!DOCTYPE html><html lang=de><head><meta charset=utf-8>"
-        "<meta name=viewport content='width=device-width,initial-scale=1'>"
-        f"<title>{h.escape(titel)}</title></head>"
-        "<body style='font:16px/1.6 Georgia,serif;max-width:38em;margin:8vh auto;padding:0 1.2em'>"
-        f"<h1 style='font-size:1.6em'>{h.escape(titel)}</h1>"
-        f"<p>{h.escape(text)}</p>{weiter}</body></html>"
-    )
+    return HTMLResponse(anmeldung.antwortseite(titel, text, ziel=ziel))
 
 
 @app.get("/gesund")
@@ -371,9 +355,8 @@ def confirm(token: str) -> HTMLResponse:
     return _sicherheitskopfzeilen(
         _seite(
             "Angemeldet",
-            "Ihre Anmeldung ist bestätigt. Die nächste Ausgabe kommt mit dem "
-            "nächsten Radar-Lauf — aber nur dann, wenn es zu Ihren Themen "
-            "wirklich etwas Neues gibt.",
+            "Die nächste Ausgabe kommt nach dem nächsten Radar-Lauf, "
+            "wenn es zu Ihren Themen etwas Neues gibt.",
             ziel=f"{einstellungen.basis_url}/index.html",
         )
     )

@@ -237,21 +237,67 @@ def test_alle_vier_dimensionen_stehen_auf_der_seite(tmp_path_factory, katalog):
         assert gezeigt == katalog.schluessel(dimension), dimension
 
 
-def test_neben_jeder_dimension_steht_dass_leer_alles_heisst(tmp_path_factory):
+def test_die_regel_leer_heisst_alles_steht_einmal_ueber_der_auswahl(tmp_path_factory):
     """Die Erwartung fast aller Nutzer - und es ist NICHT die Erwartung der
-    anderen. Deshalb steht es da: das ist keine Bedienhilfe, sondern die
-    Regel selbst."""
+    anderen. Deshalb steht sie da, einmal und vor der ersten Auswahl: das ist
+    keine Bedienhilfe, sondern die Regel selbst."""
     site = _projekt(tmp_path_factory, vollstaendig=True)
     soup = BeautifulSoup(
         (site / "newsletter.html").read_text(encoding="utf-8"), "html.parser"
     )
-    hinweise = [
-        h.get_text(" ", strip=True)
-        for h in soup.select('.nl-block:has(input[type="checkbox"]) .nl-hinweis')
-    ]
-    assert len(hinweise) == 4, [h[:40] for h in hinweise]
-    for text in hinweise:
-        assert "alles" in text.lower(), text
+    regeln = soup.select("form#nl-form .nl-regel")
+    assert len(regeln) == 1 and "alles" in regeln[0].get_text().lower()
+    erste_auswahl = soup.select_one("form#nl-form fieldset")
+    assert regeln[0] in erste_auswahl.find_all_previous("p")
+
+
+def test_regionen_und_themen_gelten_nur_fuer_meldungen(tmp_path_factory, chromium):
+    """Aktionen und Geraete haben keine Region und kein Ressort
+    (`NUR_MELDUNGEN`). Wer nur Promo waehlt, sieht die zwei Achsen nicht und
+    schickt keine Wahl darin mit; mit Meldungen oder ohne Bereich stehen sie."""
+    site = _projekt(tmp_path_factory, vollstaendig=True, dienst="https://x.invalid")
+    seite = chromium.new_page()
+    try:
+        seite.goto("file://" + str((site / "newsletter.html").resolve()))
+
+        def sichtbar():
+            return seite.evaluate(
+                """() => [...document.querySelectorAll('fieldset[data-dim]')]
+                     .filter(f => getComputedStyle(f).display !== 'none')
+                     .map(f => f.dataset.dim)"""
+            )
+
+        alle = ["bereiche", "wettbewerber", "regionen", "kategorien"]
+        assert sichtbar() == alle
+        seite.check('input[name="regions"][value="asien"]', force=True)
+        seite.check('input[name="branches"][value="promo"]', force=True)
+        assert sichtbar() == ["bereiche", "wettbewerber"]
+        assert not seite.is_checked('input[name="regions"][value="asien"]')
+        seite.check('input[name="branches"][value="marktrecherche"]', force=True)
+        assert sichtbar() == alle
+        seite.uncheck('input[name="branches"][value="promo"]', force=True)
+        seite.uncheck('input[name="branches"][value="marktrecherche"]', force=True)
+        assert sichtbar() == alle
+    finally:
+        seite.close()
+
+
+def test_anbieter_tragen_ihre_markenfarbe(tmp_path_factory):
+    """Anbieterfarben nur als Punkt, aus derselben Quelle wie die Geraeteseite
+    (`gr-anb--<slug>`); 1&1 heisst dort `1-1`."""
+    site = _projekt(tmp_path_factory, vollstaendig=True)
+    soup = BeautifulSoup(
+        (site / "newsletter.html").read_text(encoding="utf-8"), "html.parser"
+    )
+    marken = {
+        o.select_one("input")["value"]: o.select_one(".nl-marke")["class"][1]
+        for o in soup.select('fieldset[data-dim="wettbewerber"] .nl-opt')
+    }
+    assert marken["telekom"] == "gr-anb--telekom"
+    assert marken["1und1"] == "gr-anb--1-1"
+    css = (site / "style.css").read_text(encoding="utf-8")
+    assert ".gr-anb--1-1{" in css and ".gr-anb--telekom{" in css
+    assert not soup.select('fieldset[data-dim="regionen"] .nl-marke')
 
 
 def test_die_einwilligung_ist_nicht_vorausgewaehlt(tmp_path_factory):

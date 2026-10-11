@@ -31,6 +31,9 @@ NUR_MELDUNGEN = ("regionen", "kategorien")
 """Dimensionen, die nur Meldungen einschraenken. Aktionen haben keine Region
 und kein Ressort; eine Wahl dort darf Promo nicht still herausfiltern."""
 
+MELDUNGEN = "marktrecherche"
+"""Der Bereich fuer Meldungen; nur fuer ihn gelten `NUR_MELDUNGEN`."""
+
 GERAETE = "geraete"
 """Der Bereich fuer den Geraeteblock (Preisabstaende zu Vodafone)."""
 

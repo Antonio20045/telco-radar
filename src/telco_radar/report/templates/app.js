@@ -3181,6 +3181,20 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
     sagen('Der Anmeldedienst ist noch nicht eingerichtet.', 'warn');
   }
 
+  /* ---- Regionen und Themen gelten nur fuer Meldungen: ausgeblendet und
+     geleert, sobald Bereiche ohne Meldungen gewaehlt sind. ------------- */
+  function nurMeldungenZeigen() {
+    var bereiche = gewaehlt('branches');
+    var an = !bereiche.length || bereiche.indexOf(K.meldungen) >= 0;
+    form.querySelectorAll('[data-nur-meldungen]').forEach(function (block) {
+      block.hidden = !an;
+      if (!an) block.querySelectorAll('input').forEach(function (el) { el.checked = false; });
+    });
+  }
+  form.querySelectorAll('input[name="branches"]').forEach(function (el) {
+    el.addEventListener('change', nurMeldungenZeigen);
+  });
+
   /* ---- 2. Stichwoerter: Vorschau gegen den Index ---------------------- */
   function indexLaden() {
     if (index) return Promise.resolve(index);
@@ -3298,7 +3312,7 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
       return;
     }
     if (!document.getElementById('nl-consent').checked) {
-      sagen('Ohne dein Häkchen bei der Einwilligung geht es nicht.', 'warn');
+      sagen('Ohne Ihr Häkchen bei der Einwilligung geht es nicht.', 'warn');
       return;
     }
 
@@ -3335,7 +3349,7 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
       clearTimeout(uhr);
       submit.disabled = false;
       if (a.ok) {
-        sagen(a.daten.message || 'Sieh bitte in dein Postfach.', 'ok');
+        sagen(a.daten.message || 'Bitte sehen Sie in Ihr Postfach.', 'ok');
         form.querySelector('#nl-email').value = '';
         document.getElementById('nl-consent').checked = false;
       } else {

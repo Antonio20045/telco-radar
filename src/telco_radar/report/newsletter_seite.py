@@ -22,39 +22,49 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from ..newsletter.config import FELD_JE_DIMENSION, NewsletterKatalog
+from ..newsletter.config import (
+    FELD_JE_DIMENSION,
+    MELDUNGEN,
+    NUR_MELDUNGEN,
+    NewsletterKatalog,
+)
 from . import rechtstexte
 
-_LEER = "Nichts angekreuzt = alles."
+LEER_HEISST_ALLES = "Nichts angekreuzt heißt: alles."
 
-HINWEISE = {
-    "bereiche": f"Welche Rubrik des Portals. {_LEER}",
-    "regionen": f"Welche Weltregionen. {_LEER}",
-    "wettbewerber": (
-        "Nur Meldungen, in denen einer dieser Anbieter vorkommt. " + _LEER
-    ),
-    "kategorien": f"Worum es gehen soll. {_LEER}",
+REIHENFOLGE = ("bereiche", "wettbewerber", "regionen", "kategorien")
+"""Wettbewerber gilt fuer alle Bereiche und steht deshalb vor den zwei
+Achsen, die nur Meldungen einschraenken (`NUR_MELDUNGEN`)."""
+
+LABEL = {
+    "bereiche": "Bereiche",
+    "regionen": "Regionen",
+    "wettbewerber": "Anbieter",
+    "kategorien": "Themen",
 }
+
+MARKE = {"1und1": "1-1"}
+"""Wettbewerber-Schluessel, deren Farbklasse `gr-anb--<slug>` anders heisst."""
 
 
 def dimensionen(katalog: NewsletterKatalog) -> list[dict]:
-    """Die vier Achsen fuer die Vorlage - Reihenfolge wie im Katalog."""
-    label = {
-        "bereiche": "Bereich",
-        "regionen": "Regionen",
-        "wettbewerber": "Wettbewerber",
-        "kategorien": "Themen",
-    }
+    """Die vier Achsen fuer die Vorlage, in der Reihenfolge `REIHENFOLGE`."""
     aus = []
-    for dimension, feld in FELD_JE_DIMENSION.items():
+    for dimension in REIHENFOLGE:
         aus.append(
             {
                 "key": dimension,
-                "feld": feld,
-                "label": label[dimension],
-                "hinweis": HINWEISE[dimension],
+                "feld": FELD_JE_DIMENSION[dimension],
+                "label": LABEL[dimension],
+                "nur_meldungen": dimension in NUR_MELDUNGEN,
                 "optionen": [
-                    {"key": a.key, "label": a.label}
+                    {
+                        "key": a.key,
+                        "label": a.label,
+                        "marke": MARKE.get(a.key, a.key)
+                        if dimension == "wettbewerber"
+                        else "",
+                    }
                     for a in katalog.eintraege(dimension)
                 ],
             }
@@ -73,6 +83,7 @@ def konfiguration(katalog: NewsletterKatalog, *, dienst_url: str, frei: bool) ->
     return json.dumps(
         {
             "dienst": dienst_url.rstrip("/"),
+            "meldungen": MELDUNGEN,
             "frei": bool(frei),
             "max_stichwoerter": katalog.grenzen.max_stichwoerter,
             "min_laenge": katalog.grenzen.min_stichwort_laenge,
@@ -85,17 +96,15 @@ def konfiguration(katalog: NewsletterKatalog, *, dienst_url: str, frei: bool) ->
 
 _ABSCHLUSS = {
     "bestaetigt": (
-        "Anmeldung bestätigt",
-        "Du bekommst den Telco Radar ab der nächsten Ausgabe — dienstags "
-        "oder freitags, und nur dann, wenn es zu deinen Themen wirklich "
-        "etwas Neues gibt.",
-        "Zur aktuellen Ausgabe",
+        "Angemeldet",
+        "Die nächste Ausgabe kommt nach dem nächsten Radar-Lauf, "
+        "wenn es zu Ihren Themen etwas Neues gibt.",
+        "Zum Portal",
     ),
     "abgemeldet": (
         "Abgemeldet",
-        "Du bekommst keine weiteren Ausgaben, deine E-Mail-Adresse wird "
-        "gelöscht. Du kannst dich jederzeit wieder anmelden.",
-        "Zur aktuellen Ausgabe",
+        "Sie bekommen keine weiteren Ausgaben. Ihre E-Mail-Adresse wird gelöscht.",
+        "Zum Portal",
     ),
 }
 
