@@ -1,0 +1,88 @@
+{
+  "kind": "youtube#playlistItemListResponse",
+  "etag": "fixtureEtagPlaylistItems0001",
+  "nextPageToken": "EAAaBlBUOkNBVQ",
+  "items": [
+    {
+      "kind": "youtube#playlistItem",
+      "etag": "fixtureEtagItem0001",
+      "id": "VVUxdDlWRmotTzZZVURQUXhhVmctTmtRLlRFU1QwMDAwMDAx",
+      "snippet": {
+        "publishedAt": "2026-10-09T15:00:12Z",
+        "channelId": "UC1t9VFj-O6YUDPQxaVg-NkQ",
+        "title": "🔥 Eigenen KI-Agenten bauen – so geht's 🤖",
+        "description": "Beschreibung (Fixture).",
+        "thumbnails": {
+          "default": {"url": "https://i.ytimg.com/vi/TEST0000001/default.jpg", "width": 120, "height": 90},
+          "medium": {"url": "https://i.ytimg.com/vi/TEST0000001/mqdefault.jpg", "width": 320, "height": 180},
+          "high": {"url": "https://i.ytimg.com/vi/TEST0000001/hqdefault.jpg", "width": 480, "height": 360}
+        },
+        "channelTitle": "c't 3003",
+        "playlistId": "UU1t9VFj-O6YUDPQxaVg-NkQ",
+        "position": 0,
+        "resourceId": {"kind": "youtube#video", "videoId": "TEST0000001"},
+        "videoOwnerChannelTitle": "c't 3003",
+        "videoOwnerChannelId": "UC1t9VFj-O6YUDPQxaVg-NkQ"
+      },
+      "contentDetails": {"videoId": "TEST0000001", "videoPublishedAt": "2026-10-09T15:00:12Z"}
+    },
+    {
+      "kind": "youtube#playlistItem",
+      "etag": "fixtureEtagItem0002",
+      "id": "VVUxdDlWRmotTzZZVURQUXhhVmctTmtRLlRFU1QwMDAwMDAy",
+      "snippet": {
+        "publishedAt": "2026-10-02T15:30:00Z",
+        "channelId": "UC1t9VFj-O6YUDPQxaVg-NkQ",
+        "title": "Copilot im Büro: Was wirklich hilft",
+        "description": "Beschreibung (Fixture).",
+        "thumbnails": {
+          "default": {"url": "https://i.ytimg.com/vi/TEST0000002/default.jpg", "width": 120, "height": 90}
+        },
+        "channelTitle": "c't 3003",
+        "playlistId": "UU1t9VFj-O6YUDPQxaVg-NkQ",
+        "position": 1,
+        "resourceId": {"kind": "youtube#video", "videoId": "TEST0000002"},
+        "videoOwnerChannelTitle": "c't 3003",
+        "videoOwnerChannelId": "UC1t9VFj-O6YUDPQxaVg-NkQ"
+      },
+      "contentDetails": {"videoId": "TEST0000002", "videoPublishedAt": "2026-10-02T15:00:00Z"}
+    },
+    {
+      "kind": "youtube#playlistItem",
+      "etag": "fixtureEtagItem0003",
+      "id": "VVUxdDlWRmotTzZZVURQUXhhVmctTmtRLlRFU1QwMDAwMDAz",
+      "snippet": {
+        "publishedAt": "2026-07-20T09:00:00Z",
+        "channelId": "UC1t9VFj-O6YUDPQxaVg-NkQ",
+        "title": "Private video",
+        "description": "This video is private.",
+        "thumbnails": {},
+        "channelTitle": "c't 3003",
+        "playlistId": "UU1t9VFj-O6YUDPQxaVg-NkQ",
+        "position": 2,
+        "resourceId": {"kind": "youtube#video", "videoId": "TEST0000003"}
+      },
+      "contentDetails": {"videoId": "TEST0000003"}
+    },
+    {
+      "kind": "youtube#playlistItem",
+      "etag": "fixtureEtagItem0004",
+      "id": "VVUxdDlWRmotTzZZVURQUXhhVmctTmtRLlRFU1QwMDAwMDA0",
+      "snippet": {
+        "publishedAt": "2026-07-01T15:00:00Z",
+        "channelId": "UC1t9VFj-O6YUDPQxaVg-NkQ",
+        "title": "Alte Folge vom Juli",
+        "description": "Beschreibung (Fixture).",
+        "thumbnails": {},
+        "channelTitle": "c't 3003",
+        "playlistId": "UU1t9VFj-O6YUDPQxaVg-NkQ",
+        "position": 3,
+        "resourceId": {"kind": "youtube#video", "videoId": "TEST0000004"},
+        "videoOwnerChannelTitle": "c't 3003",
+        "videoOwnerChannelId": "UC1t9VFj-O6YUDPQxaVg-NkQ"
+      },
+      "contentDetails": {"videoId": "TEST0000004", "videoPublishedAt": "2026-07-01T15:00:00Z"}
+    }
+  ],
+  "pageInfo": {"totalResults": 812, "resultsPerPage": 5}
+}

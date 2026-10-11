@@ -1,5 +1,5 @@
 {
-  "zweck": "Echte Abrufe der zwei KI-Ranglisten fuer tests/test_ki_ranglisten.py (Pitch 9, Schnitt 6). sha256_roh gilt fuer den entpackten Inhalt.",
+  "zweck": "Echte Abrufe der zwei KI-Ranglisten fuer tests/test_ki_ranglisten.py (Pitch 9, Schnitt 6), dazu nach Dokumentation gebaute YouTube-API-Antworten fuer tests/test_youtube_api.py (Schnitt 14). sha256_roh gilt fuer den entpackten Inhalt.",
   "eintraege": [
     {
       "datei": "aa_tabelle.html.gz",
@@ -26,6 +26,38 @@
       "gzip": false,
       "bytes_roh": 26850,
       "sha256_roh": "68c0a694fd6ea5ab20e30fe77656b5f4b52ba8675c2a1dd764e8d283c69ce70d"
+    },
+    {
+      "datei": "youtube-playlistitems.json",
+      "sha256_roh": "faac719214115b0b9cc48394c0340ee9e6f49318f18d37c88da5c1ebd24f7c7f",
+      "quelle": "YouTube Data API v3 playlistItems#list (part=snippet,contentDetails), Uploads-Playlist von c't 3003; Referenz https://developers.google.com/youtube/v3/docs/playlistItems/list",
+      "herkunft": "nach API-Dokumentation, nicht live abgerufen (kein Schluessel in der Cloud-Sitzung); Video-IDs TEST000000x und Titel ausgedacht, Kanal-ID und Uploads-Playlist echt",
+      "offen": "beim ersten Actions-Lauf gegen echte Antwort pruefen",
+      "erstellt_am": "2026-10-11"
+    },
+    {
+      "datei": "youtube-videos.json",
+      "sha256_roh": "7b7c3e2803b86a58beda192234f8a8e8fd72c6318c62cdf5afde82658b7f5833",
+      "quelle": "YouTube Data API v3 videos#list (part=contentDetails,snippet); Referenz https://developers.google.com/youtube/v3/docs/videos/list",
+      "herkunft": "nach API-Dokumentation, nicht live abgerufen (kein Schluessel in der Cloud-Sitzung); Video-IDs, Titel und Dauern ausgedacht",
+      "offen": "beim ersten Actions-Lauf gegen echte Antwort pruefen",
+      "erstellt_am": "2026-10-11"
+    },
+    {
+      "datei": "youtube-fehler-kontingent.json",
+      "sha256_roh": "eca89ec5679f65f2adbcc0ef1956c7dae62fbfdc315299e6559adc21a29b8912",
+      "quelle": "YouTube Data API v3 Fehlerantwort HTTP 403, reason quotaExceeded (domain youtube.quota); Referenz https://developers.google.com/youtube/v3/docs/errors",
+      "herkunft": "nach API-Dokumentation, nicht live abgerufen",
+      "offen": "beim ersten Actions-Lauf gegen echte Antwort pruefen",
+      "erstellt_am": "2026-10-11"
+    },
+    {
+      "datei": "youtube-fehler-schluessel.json",
+      "sha256_roh": "16bfc15e78d9ebac73456ef84e727c7fdada0635665cfefa4816c3d687c3649f",
+      "quelle": "Google-API-Fehlerantwort HTTP 400 fuer einen ungueltigen API-Schluessel (reason badRequest, details ErrorInfo API_KEY_INVALID); Referenz https://developers.google.com/youtube/v3/docs/errors",
+      "herkunft": "nach API-Dokumentation, nicht live abgerufen",
+      "offen": "beim ersten Actions-Lauf gegen echte Antwort pruefen",
+      "erstellt_am": "2026-10-11"
     }
   ]
 }

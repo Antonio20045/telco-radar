@@ -1,0 +1,118 @@
+# YouTube-Kanäle für die Videos auf ki.html (Pitch 9, Schnitt 14).
+#
+# Abruf nur über die offizielle YouTube Data API v3 (collect/youtube_api.py,
+# Schlüssel im Secret YOUTUBE_API_KEY). Der Video-Feed /feeds/videos.xml ist
+# in der robots.txt gesperrt und bleibt draußen.
+# kanal_id: belegt am 11.10.2026 über die öffentliche Kanalseite
+#   https://www.youtube.com/@<handle> (robots.txt erlaubt sie), Feld
+#   <link rel="canonical" href=".../channel/UC…">, Kennung TelcoRadar/1.0.
+# uploads: die Uploads-Playlist des Kanals, UU statt UC vor derselben Kennung.
+# stufe: Einstieg oder Fortgeschritten. Reihenfolge: deutschsprachige zuerst.
+# Ohne belegte kanal_id kommt ein Kanal nicht hierher, sondern als Lücke in
+# den Kommentar unten.
+
+kanaele:
+  - name: c't 3003
+    handle: ct3003
+    kanal_id: UC1t9VFj-O6YUDPQxaVg-NkQ
+    uploads: UU1t9VFj-O6YUDPQxaVg-NkQ
+    sprache: de
+    stufe: Einstieg
+  - name: KI Update (heise)
+    handle: KIUpdate
+    kanal_id: UC8qfFt_pBX3CZm1bpxyNwGw
+    uploads: UU8qfFt_pBX3CZm1bpxyNwGw
+    sprache: de
+    stufe: Einstieg
+  - name: Everlast AI
+    handle: EverlastAI
+    kanal_id: UC8T5gQ4U4GbI2h8kYCkEcvg
+    uploads: UU8T5gQ4U4GbI2h8kYCkEcvg
+    sprache: de
+    stufe: Einstieg
+  - name: The Morpheus Tutorials
+    handle: TheMorpheusTutorials
+    kanal_id: UCLGY6_j7kZfA1dmmjR1J_7w
+    uploads: UULGY6_j7kZfA1dmmjR1J_7w
+    sprache: de
+    stufe: Fortgeschritten
+  - name: Kevin Stratvert
+    handle: KevinStratvert
+    kanal_id: UCfJT_eYDTmDE-ovKaxVE1ig
+    uploads: UUfJT_eYDTmDE-ovKaxVE1ig
+    sprache: en
+    stufe: Einstieg
+  - name: Microsoft Mechanics
+    handle: MSFTMechanics
+    kanal_id: UCJ9905MRHxwLZ2jeNQGIWxA
+    uploads: UUJ9905MRHxwLZ2jeNQGIWxA
+    sprache: en
+    stufe: Einstieg
+  - name: Leila Gharani
+    handle: LeilaGharani
+    kanal_id: UCJtUOos_MwJa_Ewii-R3cJA
+    uploads: UUJtUOos_MwJa_Ewii-R3cJA
+    sprache: en
+    stufe: Einstieg
+  - name: Jeff Su
+    handle: JeffSu
+    kanal_id: UCwAnu01qlnVg1Ai2AbtTMaA
+    uploads: UUwAnu01qlnVg1Ai2AbtTMaA
+    sprache: en
+    stufe: Einstieg
+  - name: Matt Wolfe
+    handle: mreflow
+    kanal_id: UChpleBmo18P08aKCIgti38g
+    uploads: UUhpleBmo18P08aKCIgti38g
+    sprache: en
+    stufe: Einstieg
+  - name: IBM Technology
+    handle: IBMTechnology
+    kanal_id: UCKWaEZ-_VweaEx1j62do_vQ
+    uploads: UUKWaEZ-_VweaEx1j62do_vQ
+    sprache: en
+    stufe: Einstieg
+  - name: OpenAI
+    handle: OpenAI
+    kanal_id: UCXZCJLdBC09xxGZ6gcdrc6A
+    uploads: UUXZCJLdBC09xxGZ6gcdrc6A
+    sprache: en
+    stufe: Einstieg
+  - name: Anthropic
+    handle: anthropic-ai
+    kanal_id: UCrDwWp7EBBv4NwvScIpBDOA
+    uploads: UUrDwWp7EBBv4NwvScIpBDOA
+    sprache: en
+    stufe: Einstieg
+  - name: Google DeepMind
+    handle: googledeepmind
+    kanal_id: UCP7jMXSY2xbc3KCAE0MHQ-A
+    uploads: UUP7jMXSY2xbc3KCAE0MHQ-A
+    sprache: en
+    stufe: Einstieg
+  - name: AI Explained
+    handle: aiexplained-official
+    kanal_id: UCNJ1Ymd5yFuUPtn21xtRbbw
+    uploads: UUNJ1Ymd5yFuUPtn21xtRbbw
+    sprache: en
+    stufe: Fortgeschritten
+  - name: Two Minute Papers
+    handle: TwoMinutePapers
+    kanal_id: UCbfYPyITQ-7l4upoX8nvctg
+    uploads: UUbfYPyITQ-7l4upoX8nvctg
+    sprache: en
+    stufe: Fortgeschritten
+  - name: 3Blue1Brown
+    handle: 3blue1brown
+    kanal_id: UCYO_jab_esuFRV4b17AJtAw
+    uploads: UUYO_jab_esuFRV4b17AJtAw
+    sprache: en
+    stufe: Fortgeschritten
+  - name: David Ondrej
+    handle: DavidOndrej
+    kanal_id: UCPGrgwfbkjTIgPoOh2q1BAg
+    uploads: UUPGrgwfbkjTIgPoOh2q1BAg
+    sprache: en
+    stufe: Fortgeschritten
+
+# Offene Lücken: keine; alle 17 Kanäle des Anhangs sind belegt.

@@ -522,6 +522,11 @@ promo_enabled: true
 # Seiten plus robots.txt. Fehlt der Schalter (goldener Lauf), bleibt sie aus.
 ki_ranglisten_aktiv: true
 
+# KI-Videos auf ki.html (zusatzstufen.py, collect/youtube_api.py): offizielle
+# YouTube Data API v3, Schluessel nur im Secret YOUTUBE_API_KEY, Kanaele in
+# config/ki_videos.yaml. Fehlt der Schalter (goldener Lauf), bleibt sie aus.
+ki_videos_aktiv: true
+
 # Geraete- und Preisradar: im WOCHENLAUF AUS. Nicht, weil die Stufe etwas
 # taugt oder nicht - sie hat einen eigenen taeglichen Job
 # (.github/workflows/geraete.yml, 02:17 UTC), und der ist der bessere Ort:

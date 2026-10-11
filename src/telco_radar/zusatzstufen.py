@@ -1,5 +1,5 @@
 """Die Stufen nach der Bewertung: Kategorie-Sweep, Promo, Geräte, Differenzierung,
-KI-Ranglisten."""
+KI-Ranglisten, KI-Videos."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
 
-from .analyze import category_sweep, differentiation_editor, ki_modelle
+from .analyze import category_sweep, differentiation_editor, ki_modelle, ki_videos
 from .analyze.begriffe import THEME_LABEL
 from .analyze.diff_curator import DiffStore
 from .analyze.diff_db import DiffDB
@@ -56,6 +56,7 @@ def ausfuehren(
     geraete = _geraete(cfg, root, heute, geraete_frist(), takt)
     _differenzierung(root, heute, (editor_model, language), use_llm, takt)
     _ki_ranglisten(cfg, root, heute, takt)
+    _ki_videos(cfg, root, heute, takt)
     return Zusatz(promo, geraete)
 
 
@@ -76,6 +77,29 @@ def _ki_ranglisten(cfg: Config, root: Path, heute: date, takt: Takt) -> None:
         )
 
     takt.abgesichert(_lauf, protokoll("KI-Ranglisten uebersprungen: %s", None))
+
+
+def _ki_videos(cfg: Config, root: Path, heute: date, takt: Takt) -> None:
+    """YouTube-API; ohne Schlüssel oder bei Ablehnung steht der Ausfall im Store."""
+    if not cfg.settings.get("ki_videos_aktiv", False):
+        return
+
+    def _lauf() -> None:
+        from .collect import youtube_api
+
+        kanaele = ki_videos.kanaele(root)
+        abruf = youtube_api.abrufen(
+            kanaele, cfg.settings.get("http", {}), youtube_api.schluessel()
+        )
+        store = ki_videos.aktualisiere(root / "data" / "state", kanaele, abruf, heute)
+        log.info(
+            "KI-Videos: Stand %s, %d Videos, Ausfall %s",
+            store["stand"],
+            len(store["videos"]),
+            store["error"],
+        )
+
+    takt.abgesichert(_lauf, protokoll("KI-Videos uebersprungen: %s", None))
 
 
 def _promo(

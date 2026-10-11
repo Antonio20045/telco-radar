@@ -1,0 +1,56 @@
+{
+  "kind": "youtube#videoListResponse",
+  "etag": "fixtureEtagVideos0001",
+  "items": [
+    {
+      "kind": "youtube#video",
+      "etag": "fixtureEtagVideo0001",
+      "id": "TEST0000001",
+      "snippet": {
+        "publishedAt": "2026-10-09T15:00:12Z",
+        "channelId": "UC1t9VFj-O6YUDPQxaVg-NkQ",
+        "title": "🔥 Eigenen KI-Agenten bauen – so geht's 🤖",
+        "description": "Beschreibung (Fixture).",
+        "thumbnails": {"default": {"url": "https://i.ytimg.com/vi/TEST0000001/default.jpg", "width": 120, "height": 90}},
+        "channelTitle": "c't 3003",
+        "categoryId": "28",
+        "liveBroadcastContent": "none",
+        "defaultAudioLanguage": "de"
+      },
+      "contentDetails": {"duration": "PT14M7S", "dimension": "2d", "definition": "hd", "caption": "false", "licensedContent": true, "contentRating": {}, "projection": "rectangular"}
+    },
+    {
+      "kind": "youtube#video",
+      "etag": "fixtureEtagVideo0002",
+      "id": "TEST0000002",
+      "snippet": {
+        "publishedAt": "2026-10-02T15:00:00Z",
+        "channelId": "UC1t9VFj-O6YUDPQxaVg-NkQ",
+        "title": "Copilot im Büro: Was wirklich hilft",
+        "description": "Beschreibung (Fixture).",
+        "thumbnails": {},
+        "channelTitle": "c't 3003",
+        "categoryId": "28",
+        "liveBroadcastContent": "none"
+      },
+      "contentDetails": {"duration": "PT1H2M", "dimension": "2d", "definition": "hd", "caption": "true", "licensedContent": true, "contentRating": {}, "projection": "rectangular"}
+    },
+    {
+      "kind": "youtube#video",
+      "etag": "fixtureEtagVideo0004",
+      "id": "TEST0000004",
+      "snippet": {
+        "publishedAt": "2026-07-01T15:00:00Z",
+        "channelId": "UC1t9VFj-O6YUDPQxaVg-NkQ",
+        "title": "Alte Folge vom Juli",
+        "description": "Beschreibung (Fixture).",
+        "thumbnails": {},
+        "channelTitle": "c't 3003",
+        "categoryId": "28",
+        "liveBroadcastContent": "none"
+      },
+      "contentDetails": {"duration": "PT45S", "dimension": "2d", "definition": "hd", "caption": "false", "licensedContent": true, "contentRating": {}, "projection": "rectangular"}
+    }
+  ],
+  "pageInfo": {"totalResults": 3, "resultsPerPage": 3}
+}
