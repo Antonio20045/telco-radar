@@ -72,6 +72,49 @@ themen:
       # Publiziert unregelmaessig, im Abruf lag die neueste Meldung genau auf
       # der Grenze des Frischefensters.
       - {name: "Microsoft Azure", type: rss, url: "https://azure.microsoft.com/en-us/blog/feed/"}
+      #
+      # -- Fachpresse und Hintergrund (KI-Seite, Schnitt 3, 11.10.2026)
+      # Bis hierher sprachen nur die Hersteller selbst. Die KI-Seite richtet
+      # sich an Leser ohne Technik-Hintergrund: deutsche Fachpresse ordnet
+      # ein, die englische Rubrikpresse meldet Start-ups, Geld und Streit.
+      # Alle Feeds sind reine KI-Rubriken, keine Gesamtfeeds.
+      #
+      # heise-Themenfeed KI: breit, taeglich, mit c't-Hintergrund. Im Abruf
+      # 60 Meldungen, alle datiert und im Frischefenster.
+      - {name: "heise KI", type: rss, url: "https://www.heise.de/thema/Kuenstliche-Intelligenz.xml", herkunft: "KI-Seite Schnitt 3", abgenommen: "2026-10-11"}
+      # t3n-Tag KI: Praxis und Business ("So skaliert Compliance ..."), naeher
+      # am Arbeitsalltag als heise.
+      - {name: "t3n KI", type: rss, url: "https://t3n.de/tag/kuenstliche-intelligenz/rss.xml", herkunft: "KI-Seite Schnitt 3", abgenommen: "2026-10-11"}
+      # Golem-Themenfeed KI (ms=ki), NICHT der Gesamtfeed rss.php, der in
+      # news_sources.yaml und unter Regulierung als zu allgemein abgelehnt
+      # steht. Im Abruf 40 Meldungen, jede mit KI-Bezug.
+      - {name: "Golem KI", type: rss, url: "https://rss.golem.de/rss.php?ms=ki&feed=RSS2.0", herkunft: "KI-Seite Schnitt 3", abgenommen: "2026-10-11"}
+      # TechCrunch-Rubrik KI: Start-ups, Finanzierungsrunden, Uebernahmen -
+      # das Geld hinter den Modellen, das kein Herstellerfeed meldet.
+      - {name: "TechCrunch AI", type: rss, url: "https://techcrunch.com/category/artificial-intelligence/feed/", herkunft: "KI-Seite Schnitt 3", abgenommen: "2026-10-11"}
+      # The Verge, Rubrik KI: Produkte und Firmen aus Endkundensicht.
+      - {name: "The Verge AI", type: rss, url: "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml", herkunft: "KI-Seite Schnitt 3", abgenommen: "2026-10-11"}
+      # Ars Technica, Rubrik KI: technischer Hintergrund und Kritik.
+      - {name: "Ars Technica AI", type: rss, url: "https://arstechnica.com/ai/feed/", herkunft: "KI-Seite Schnitt 3", abgenommen: "2026-10-11"}
+      # MIT Technology Review, Thema KI: Einordnung und Forschung, wenige
+      # Meldungen je Woche.
+      - {name: "MIT Technology Review AI", type: rss, url: "https://www.technologyreview.com/topic/artificial-intelligence/feed/", herkunft: "KI-Seite Schnitt 3", abgenommen: "2026-10-11"}
+      # Datacenter Dynamics: Rechenzentren, Strom und Investitionen - die
+      # Infrastruktur, auf der jedes Modell laeuft. Einschraenkung, ehrlich
+      # benannt: auch Bitcoin-Mining und Sponsored-Beitraege laufen mit.
+      - {name: "Datacenter Dynamics", type: rss, url: "https://www.datacenterdynamics.com/en/rss/", herkunft: "KI-Seite Schnitt 3", abgenommen: "2026-10-11"}
+      # Hugging Face Blog: offene Modelle und Werkzeuge. 60 Meldungen im
+      # Feed, davon nur 6 im Frischefenster - der Feed reicht weit zurueck.
+      - {name: "Hugging Face Blog", type: rss, url: "https://huggingface.co/blog/feed.xml", herkunft: "KI-Seite Schnitt 3", abgenommen: "2026-10-11"}
+      #
+      # NICHT AUFGENOMMEN (11.10.2026):
+      #   the-decoder.de          robots.txt sperrt den Feed; nur mit
+      #                           Erlaubnis des Verlags.
+      #   youtube.com/feeds       robots.txt sperrt; Videos kommen ueber die
+      #                           YouTube-API (Schnitt 14).
+      #   digital-strategy.ec.europa.eu/en/rss.xml
+      #                           steht schon unter Regulierung (DG CNECT);
+      #                           ein zweiter Eintrag waere eine Dublette.
 
   geraete:
     name: "Geräte"
