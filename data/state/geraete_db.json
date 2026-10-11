@@ -2,8 +2,8 @@
  "updated": "2026-10-11",
  "anbieter": {
   "ALDI TALK": {
-   "laeufe": 66,
-   "funde_gesamt": 318,
+   "laeufe": 67,
+   "funde_gesamt": 328,
    "letzter_lauf": "2026-10-11",
    "letzte_funde": 10,
    "letzter_fund": "2026-10-11",
@@ -225,8 +225,8 @@
    "tote_adressen": 0
   },
   "Vodafone": {
-   "laeufe": 64,
-   "funde_gesamt": 11030,
+   "laeufe": 65,
+   "funde_gesamt": 11213,
    "letzter_lauf": "2026-10-11",
    "letzte_funde": 183,
    "termine": [
@@ -448,8 +448,8 @@
    "tote_adressen": 0
   },
   "o2": {
-   "laeufe": 64,
-   "funde_gesamt": 4322,
+   "laeufe": 65,
+   "funde_gesamt": 4391,
    "letzter_lauf": "2026-10-11",
    "letzte_funde": 69,
    "termine": [
@@ -663,7 +663,7 @@
      "2026-10-11",
      69,
      "gelesen",
-     1297,
+     1999,
      0,
      null
     ]
@@ -671,8 +671,8 @@
    "tote_adressen": null
   },
   "mobilcom-debitel": {
-   "laeufe": 17,
-   "funde_gesamt": 7670,
+   "laeufe": 18,
+   "funde_gesamt": 7825,
    "letzte_funde": 155,
    "termine": [
     "2026-08-29",
@@ -1066,11 +1066,11 @@
     ],
     [
      "2026-10-11",
-     20,
-     "lesefehler",
      0,
-     20,
-     0
+     "nicht gelesen",
+     0,
+     0,
+     null
     ]
    ],
    "tote_adressen": 0
@@ -1247,20 +1247,20 @@
     ],
     [
      "2026-10-11",
-     18,
-     "lesefehler",
      0,
-     20,
-     0
+     "nicht gelesen",
+     0,
+     0,
+     null
     ]
    ],
    "tote_adressen": 0
   },
   "congstar": {
-   "laeufe": 40,
-   "funde_gesamt": 7993,
-   "letzter_lauf": "2026-10-10",
-   "letzte_funde": 149,
+   "laeufe": 41,
+   "funde_gesamt": 8148,
+   "letzter_lauf": "2026-10-11",
+   "letzte_funde": 155,
    "termine": [
     "2026-09-03",
     "2026-09-04",
@@ -1464,18 +1464,18 @@
     ],
     [
      "2026-10-11",
-     149,
-     "lesefehler",
-     944,
-     39,
+     155,
+     "gelesen",
+     1008,
+     43,
      0
     ]
    ],
    "tote_adressen": 0
   },
   "1&1": {
-   "laeufe": 56,
-   "funde_gesamt": 2029,
+   "laeufe": 57,
+   "funde_gesamt": 2071,
    "letzter_lauf": "2026-10-11",
    "letzte_funde": 42,
    "termine": [
@@ -1860,10 +1860,10 @@
    "tote_adressen": null
   },
   "Saturn": {
-   "laeufe": 52,
-   "funde_gesamt": 1010,
+   "laeufe": 53,
+   "funde_gesamt": 1028,
    "letzter_lauf": "2026-10-11",
-   "letzte_funde": 17,
+   "letzte_funde": 18,
    "termine": [
     "2026-09-05",
     "2026-09-06",
@@ -2066,7 +2066,7 @@
     ],
     [
      "2026-10-11",
-     17,
+     18,
      "gelesen",
      0,
      0,
@@ -5742,7 +5742,7 @@
    "erstpreis_am": "2026-09-01",
    "last_verified": "2026-10-11",
    "letzter_check": "2026-10-11",
-   "quelle_url": "https://www.alditalk.de/p/fairphone-fairphone-gen-6-256-gb-forest-green-model-fp6-30042279A1?FF_QUERY=*%3Acategory_id%3BG5DE0Z0SIKUBHRGTNF411A7XPLN9RV3D&FF_POS=27&FF_PAGE=1&FF_PAGESIZE=30&FF_SCORE=100.0&FF_CAMPAIGN=&FF_CAMPAIGN_PAGE_ID=",
+   "quelle_url": "https://www.alditalk.de/p/fairphone-fairphone-gen-6-256-gb-forest-green-model-fp6-30042279A1?FF_QUERY=*%3Acategory_id%3BG5DE0Z0SIKUBHRGTNF411A7XPLN9RV3D&FF_POS=28&FF_PAGE=1&FF_PAGESIZE=30&FF_SCORE=100.0&FF_CAMPAIGN=&FF_CAMPAIGN_PAGE_ID=",
    "abgerufen_am": "2026-10-11",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
@@ -5894,7 +5894,7 @@
    "erstpreis_am": "2026-10-10",
    "last_verified": "2026-10-11",
    "letzter_check": "2026-10-11",
-   "quelle_url": "https://www.alditalk.de/p/motorola-motorola-moto-g77-256-gb-black-olive-xt2621-4--inkl-moto-buds-glacier-blue-30043149A1?FF_QUERY=*%3Acategory_id%3BG5DE0Z0SIKUBHRGTNF411A7XPLN9RV3D&FF_POS=11&FF_PAGE=1&FF_PAGESIZE=30&FF_SCORE=100.0&FF_CAMPAIGN=&FF_CAMPAIGN_PAGE_ID=",
+   "quelle_url": "https://www.alditalk.de/p/motorola-motorola-moto-g77-256-gb-black-olive-xt2621-4--inkl-moto-buds-glacier-blue-30043149A1?FF_QUERY=*%3Acategory_id%3BG5DE0Z0SIKUBHRGTNF411A7XPLN9RV3D&FF_POS=12&FF_PAGE=1&FF_PAGESIZE=30&FF_SCORE=100.0&FF_CAMPAIGN=&FF_CAMPAIGN_PAGE_ID=",
    "abgerufen_am": "2026-10-11",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
@@ -5954,7 +5954,7 @@
    "erstpreis_am": "2026-08-29",
    "last_verified": "2026-10-11",
    "letzter_check": "2026-10-11",
-   "quelle_url": "https://www.alditalk.de/p/samsung-samsung-galaxy-a17-lte-128-gb-black-sm-a175f-dsb-30042091A1?FF_QUERY=*%3Acategory_id%3BG5DE0Z0SIKUBHRGTNF411A7XPLN9RV3D&FF_POS=3&FF_PAGE=1&FF_PAGESIZE=30&FF_SCORE=100.0&FF_CAMPAIGN=&FF_CAMPAIGN_PAGE_ID=",
+   "quelle_url": "https://www.alditalk.de/p/samsung-samsung-galaxy-a17-lte-128-gb-black-sm-a175f-dsb-30042091A1?FF_QUERY=*%3Acategory_id%3BG5DE0Z0SIKUBHRGTNF411A7XPLN9RV3D&FF_POS=2&FF_PAGE=1&FF_PAGESIZE=30&FF_SCORE=100.0&FF_CAMPAIGN=&FF_CAMPAIGN_PAGE_ID=",
    "abgerufen_am": "2026-10-11",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
@@ -6886,15 +6886,15 @@
    "ean": "",
    "zustand": "neu",
    "first_seen": "2026-09-05",
-   "status": "vermutlich ausgelistet",
-   "missed_checks": 1,
+   "status": "aktiv",
+   "missed_checks": 0,
    "erstpreis": 1419.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-05",
-   "last_verified": "2026-10-10",
+   "last_verified": "2026-10-11",
    "letzter_check": "2026-10-11",
    "quelle_url": "https://www.saturn.de/de/product/_apple-iphone-17-pro-5g-512-gb-silber-dual-sim-3013588.html",
-   "abgerufen_am": "2026-10-10",
+   "abgerufen_am": "2026-10-11",
    "verfuegbarkeit": "unbekannt",
    "confidence": "hoch",
    "einstiege": [
@@ -6902,8 +6902,7 @@
    ],
    "titel_roh": "APPLE iPhone 17 Pro 5G 512 GB Silber Dual SIM",
    "preis_ohne_vertrag": 1419.0,
-   "ended_since": "2026-09-27",
-   "stale_since": "2026-10-11"
+   "ended_since": "2026-09-27"
   },
   {
    "id": "saturn--apple-iphone-17-pro-512gb-tiefblau",
@@ -17633,13 +17632,13 @@
    "ean": "4021114387883",
    "zustand": "refurbished",
    "first_seen": "2026-10-01",
-   "status": "vermutlich ausgelistet",
-   "missed_checks": 1,
+   "status": "ausgelistet",
+   "missed_checks": 2,
    "erstpreis": 829.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-10-01",
    "last_verified": "2026-10-09",
-   "letzter_check": "2026-10-10",
+   "letzter_check": "2026-10-11",
    "quelle_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26-zustand-wie-neu/",
    "abgerufen_am": "2026-10-09",
    "verfuegbarkeit": "lieferbar",
@@ -17649,7 +17648,8 @@
    ],
    "titel_roh": "Samsung Galaxy S26 512 GB sky blue NEUWERTIG",
    "preis_ohne_vertrag": 829.0,
-   "stale_since": "2026-10-10"
+   "stale_since": "2026-10-10",
+   "ended_since": "2026-10-11"
   },
   {
    "id": "congstar--samsung-galaxy-s26-512gb-weiss",
@@ -18486,13 +18486,13 @@
    "ean": "4021114388156",
    "zustand": "refurbished",
    "first_seen": "2026-10-01",
-   "status": "vermutlich ausgelistet",
-   "missed_checks": 1,
+   "status": "ausgelistet",
+   "missed_checks": 2,
    "erstpreis": 913.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-10-01",
    "last_verified": "2026-10-09",
-   "letzter_check": "2026-10-10",
+   "letzter_check": "2026-10-11",
    "quelle_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26-ultra-zustand-wie-neu/",
    "abgerufen_am": "2026-10-09",
    "verfuegbarkeit": "lieferbar",
@@ -18502,7 +18502,8 @@
    ],
    "titel_roh": "Samsung Galaxy S26 Ultra 256 GB white NEUWERTIG",
    "preis_ohne_vertrag": 913.0,
-   "stale_since": "2026-10-10"
+   "stale_since": "2026-10-10",
+   "ended_since": "2026-10-11"
   },
   {
    "id": "congstar--samsung-galaxy-s26-ultra-512gb-cobalt-violet",
@@ -18607,13 +18608,13 @@
    "ean": "4021114388262",
    "zustand": "refurbished",
    "first_seen": "2026-10-01",
-   "status": "vermutlich ausgelistet",
-   "missed_checks": 1,
+   "status": "ausgelistet",
+   "missed_checks": 2,
    "erstpreis": 1097.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-10-01",
    "last_verified": "2026-10-09",
-   "letzter_check": "2026-10-10",
+   "letzter_check": "2026-10-11",
    "quelle_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26-ultra-zustand-wie-neu/",
    "abgerufen_am": "2026-10-09",
    "verfuegbarkeit": "lieferbar",
@@ -18623,7 +18624,8 @@
    ],
    "titel_roh": "Samsung Galaxy S26 Ultra 512 GB black NEUWERTIG",
    "preis_ohne_vertrag": 1097.0,
-   "stale_since": "2026-10-10"
+   "stale_since": "2026-10-10",
+   "ended_since": "2026-10-11"
   },
   {
    "id": "congstar--samsung-galaxy-s26-ultra-512gb-sky-blue",
@@ -19735,10 +19737,10 @@
    "erstpreis": 353.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-10-10",
-   "last_verified": "2026-10-10",
-   "letzter_check": "2026-10-10",
+   "last_verified": "2026-10-11",
+   "letzter_check": "2026-10-11",
    "quelle_url": "https://www.congstar.de/geraete/xiaomi/xiaomi-redmi-note-15-pro-5g/",
-   "abgerufen_am": "2026-10-10",
+   "abgerufen_am": "2026-10-11",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -19765,10 +19767,10 @@
    "erstpreis": 353.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-10-10",
-   "last_verified": "2026-10-10",
-   "letzter_check": "2026-10-10",
+   "last_verified": "2026-10-11",
+   "letzter_check": "2026-10-11",
    "quelle_url": "https://www.congstar.de/geraete/xiaomi/xiaomi-redmi-note-15-pro-5g/",
-   "abgerufen_am": "2026-10-10",
+   "abgerufen_am": "2026-10-11",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -19795,10 +19797,10 @@
    "erstpreis": 343.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-03",
-   "last_verified": "2026-10-10",
-   "letzter_check": "2026-10-10",
+   "last_verified": "2026-10-11",
+   "letzter_check": "2026-10-11",
    "quelle_url": "https://www.congstar.de/geraete/xiaomi/xiaomi-redmi-note-17-5g/",
-   "abgerufen_am": "2026-10-10",
+   "abgerufen_am": "2026-10-11",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -19825,10 +19827,10 @@
    "erstpreis": 477.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-03",
-   "last_verified": "2026-10-10",
-   "letzter_check": "2026-10-10",
+   "last_verified": "2026-10-11",
+   "letzter_check": "2026-10-11",
    "quelle_url": "https://www.congstar.de/geraete/xiaomi/xiaomi-redmi-note-17-pro-5g/",
-   "abgerufen_am": "2026-10-10",
+   "abgerufen_am": "2026-10-11",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -19855,10 +19857,10 @@
    "erstpreis": 477.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-03",
-   "last_verified": "2026-10-10",
-   "letzter_check": "2026-10-10",
+   "last_verified": "2026-10-11",
+   "letzter_check": "2026-10-11",
    "quelle_url": "https://www.congstar.de/geraete/xiaomi/xiaomi-redmi-note-17-pro-5g/",
-   "abgerufen_am": "2026-10-10",
+   "abgerufen_am": "2026-10-11",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -19885,10 +19887,10 @@
    "erstpreis": 595.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-03",
-   "last_verified": "2026-10-10",
-   "letzter_check": "2026-10-10",
+   "last_verified": "2026-10-11",
+   "letzter_check": "2026-10-11",
    "quelle_url": "https://www.congstar.de/geraete/xiaomi/xiaomi-redmi-note-17-pro-max-5g/",
-   "abgerufen_am": "2026-10-10",
+   "abgerufen_am": "2026-10-11",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
