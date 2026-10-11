@@ -23,7 +23,7 @@ from PIL import Image
 from test_laufzeit_vergleich import baue
 
 from telco_radar.report import glas
-from telco_radar.report.html import render_site
+from telco_radar.report.html import render_site, schreibe_statische_dateien
 
 OBEN = 84
 
@@ -232,5 +232,47 @@ def test_ueber_bildern_wird_das_glas_klarer(chromium, basis):
         assert s.get_attribute(".glas-schalter", "data-unter") == "bild"
         klar = s.evaluate(_HINTERGRUND)
         assert klar != matt
+    finally:
+        context.close()
+
+
+_BUEHNE = """<!doctype html><html class="ohne-js"><head><meta charset="utf-8">
+<link rel="stylesheet" href="style.css"></head><body><main>
+<section data-buehne style="height:1400px"><div style="height:600px"></div></section>
+<nav class="glas-schalter" data-glas style="margin-top:-700px">
+<span class="glas-pille"></span><a href="#" aria-current="page">Mit Tarif</a>
+<a href="#">Einzelgerät</a></nav><div style="height:3000px"></div>
+</main><script src="app.js"></script></body></html>"""
+
+
+@pytest.fixture(scope="module")
+def buehne(tmp_path_factory):
+    ordner = tmp_path_factory.mktemp("buehne")
+    schreibe_statische_dateien(ordner)
+    (ordner / "buehne.html").write_text(_BUEHNE, encoding="utf-8")
+    with server(ordner) as adresse:
+        yield adresse
+
+
+def test_ueber_der_flaeche_bleibt_die_schrift_dunkel(chromium, buehne):
+    """Live 11.10.2026: unter der Leiste der Geraeteseite lag der leere Teil
+    des Startbild-Abschnitts; das Glas hielt ihn fuer ein Bild und schrieb
+    "Einzelgeraet" weiss auf Weiss. Gegenprobe: ein echtes Bild darunter
+    macht das Glas klar."""
+    context = chromium.new_context(viewport={"width": 1440, "height": 900})
+    s = context.new_page()
+    try:
+        s.goto(f"{buehne}/buehne.html", wait_until="load")
+        s.evaluate("window.scrollTo(0, 5)")
+        s.wait_for_timeout(300)
+        assert s.get_attribute(".glas-schalter", "data-unter") == "flaeche"
+        s.evaluate(
+            "() => { const b = document.createElement('img'); b.alt = '';"
+            " b.style.cssText = 'display:block;width:100%;height:1400px';"
+            " document.querySelector('[data-buehne]').prepend(b);"
+            " window.scrollTo(0, 10); }"
+        )
+        s.wait_for_timeout(300)
+        assert s.get_attribute(".glas-schalter", "data-unter") == "bild"
     finally:
         context.close()
