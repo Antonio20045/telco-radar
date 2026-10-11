@@ -103,7 +103,7 @@ def main(argumente: list[str] | None = None) -> int:
         level=logging.INFO, format="%(levelname)s %(name)s: %(message)s"
     )
     heute = _uhr().date().isoformat()
-    lage = lade_karte(args.root / KARTEN, ziel.schluessel)
+    lage = lade_karte(args.root / KARTEN, ziel.kartenschluessel)
     ziel_datei = args.ausgabe / f"{ziel.schluessel}.json"
     if lage.karte is None:
         schreibe(ziel_datei, _ohne_karte(ziel.schluessel, ziel.name, heute, lage))
@@ -146,7 +146,7 @@ def main(argumente: list[str] | None = None) -> int:
 
 
 def _hat_karte(root: Path, ziel: Erkundungsziel) -> bool:
-    return (root / KARTEN / f"{ziel.schluessel}.yaml").is_file()
+    return (root / KARTEN / f"{ziel.kartenschluessel}.yaml").is_file()
 
 
 def _ohne_karte(schluessel: str, name: str, heute: str, lage: Kartenlage) -> dict:

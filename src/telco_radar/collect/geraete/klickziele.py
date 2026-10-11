@@ -14,7 +14,10 @@ Gerät führt, wenn er vom Katalog abweicht (Kanarienwert). Jeder Verstoß wirft
 ``ErkundungszielFehler`` mit der Stelle; ein Ziel wird nie still übergangen.
 User-Agent und Abrufabstand kommen aus den Quellen;
 ``seitenabstand_sekunden`` (Zahl ab 0, Vorgabe 0) ist die Pause zwischen zwei Seiten;
-``uebersichten`` nennt Übersichtsseiten, jede wörtlich ein Einstieg aus den Quellen.
+``uebersichten`` nennt Übersichtsseiten, jede wörtlich ein Einstieg aus den Quellen;
+``karte`` (Vorgabe: der Schlüssel) nennt die Klick-Karte unter ``KARTEN``, damit ein
+großer Anbieter auf mehrere Einträge (je ein Matrix-Job) mit einer Karte aufgeteilt
+werden kann.
 Der Klick-Tageslauf liest dasselbe Format aus ``TAGESDATEI``, ohne Seitengrenze
 (``klicktageslauf``); ``geplante_anbieter`` nennt, wer darin eine Karte unter
 ``KARTEN`` hat und darum jeden Tag ein Ergebnis liefern soll.
@@ -82,6 +85,12 @@ class Erkundungsziel:
     rate_limit_sekunden: float
     seitenabstand_sekunden: float = 0.0
     uebersichten: tuple[str, ...] = ()
+    karte: str | None = None
+
+    @property
+    def kartenschluessel(self) -> str:
+        """Name der Klick-Karte unter ``KARTEN``, ohne Endung."""
+        return self.schluessel if self.karte is None else self.karte
 
 
 def lade_ziele(
@@ -131,6 +140,7 @@ def lade_ziele(
                 uebersichten=_uebersichten(
                     eintrag, ort, [*anbieter.einstiege, *anbieter.klick_einstiege]
                 ),
+                karte=_text(eintrag, "karte", ort) if "karte" in eintrag else None,
             )
         )
     schluessel_alle = [z.schluessel for z in ziele]
@@ -234,6 +244,6 @@ def geplante_anbieter(root: Path) -> list[str] | None:
         str(e["name"])
         for e in eintraege or []
         if isinstance(e, dict)
-        and (root / KARTEN / f"{e.get('schluessel')}.yaml").is_file()
+        and (root / KARTEN / f"{e.get('karte', e.get('schluessel'))}.yaml").is_file()
         and e.get("name")
     ]

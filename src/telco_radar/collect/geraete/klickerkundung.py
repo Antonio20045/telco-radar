@@ -178,7 +178,7 @@ def erkunde_anbieter(
     schleuse = Fristschleuse(
         Hostschleuse(waechter, uhr, ziel.rate_limit_sekunden), anbieter_ende
     )
-    lage = lade_karte(karten, ziel.schluessel)
+    lage = lade_karte(karten, ziel.kartenschluessel)
     mittel = Probenmittel(waechter, uhr, schleuse)
     seiten: list[dict] = []
     ausgang: dict[int, Seitenergebnis] = {}

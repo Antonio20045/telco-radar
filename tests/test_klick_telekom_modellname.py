@@ -25,8 +25,8 @@ TITEL = {
 @pytest.fixture(scope="module")
 def seiten():
     alle = lade_ziele(lese_wurzel(), TAGESDATEI, hoechste=None)
-    [telekom] = [z for z in alle if z.schluessel == "telekom"]
-    return {s.geraet: s for s in telekom.seiten}
+    telekom = [z for z in alle if z.name == "Telekom"]
+    return {s.geraet: s for z in telekom for s in z.seiten}
 
 
 @pytest.mark.parametrize("geraet", sorted(TITEL))

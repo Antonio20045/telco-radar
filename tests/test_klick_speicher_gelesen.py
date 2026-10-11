@@ -17,7 +17,11 @@ from __future__ import annotations
 import pytest
 from bestand_pfad import lese_wurzel
 
-from telco_radar.analyze.klick_erfassung import fuer_modell
+from telco_radar.analyze.klick_erfassung import (
+    SATZ_SPEICHER,
+    erfassungsgruende,
+    fuer_modell,
+)
 from telco_radar.analyze.klick_zusammenfuehrung import fuehre_zusammen
 from telco_radar.collect.geraete.klicklauf import LAUF_GELESEN, LAUF_GESTOERT
 from telco_radar.geraete_config import lade_katalog
@@ -95,3 +99,27 @@ def test_ungestoerter_lauf_nennt_die_speicher(katalog):
     datei = _datei(laufstatus=LAUF_GELESEN)
     zug = fuehre_zusammen([], [datei], katalog, TAG, lambda sku: ("", None))
     assert _modell(zug.erfassung, PIXEL) == {"Telekom": SATZ}
+
+
+def test_auf_jobs_verteilter_anbieter_nennt_alle_gelesenen_speicher():
+    """Telekom auf vier Jobs (11.10.2026): die Übersicht in ``telekom`` liest das iPhone
+    Air nur mit 256 GB, die Produktseite in ``telekom-3`` alle drei Speicher. Der Satz
+    nennt alle; Gegenprobe: eine Datei von gestern zählt nicht mit."""
+    kopf = {"anbieter": "Telekom", "datum": "2026-10-11", "laufstatus": LAUF_GELESEN}
+    bilanz = {
+        "dateien": [
+            {
+                **kopf,
+                "alter_tage": 0,
+                "speicher_gelesen": {"apple-iphone-air": [256, 512, 1024]},
+            },
+            {**kopf, "alter_tage": 1, "speicher_gelesen": {"apple-iphone-air": [128]}},
+            {**kopf, "alter_tage": 0, "speicher_gelesen": {"apple-iphone-air": [256]}},
+        ]
+    }
+
+    gruende = erfassungsgruende(bilanz)
+
+    assert gruende["Telekom|apple-iphone-air"] == SATZ_SPEICHER.format(
+        anbieter="Telekom", speicher="256 GB, 512 GB und 1 TB", datum="11.10.2026"
+    )

@@ -20,6 +20,12 @@
 # eines Tages, liest der nächste Tag die übrigen; jede Seite soll jeden Tag
 # gelesen sein (`ueberfaellig` nach einem Tag ohne Lesung, in der Ergebnisdatei).
 #
+# Aufteilen (Antonio 11.10.2026: alle Geräte jeden Tag): ein 180-min-Job liest rund
+# 20 Telekom- oder Vodafone-Seiten (Telekom ~500 s je Seite, Vodafone 5–9 min). Ein
+# großer Anbieter steht darum in mehreren Einträgen mit eigenen Seiten, gleichem
+# `name` und `karte: <schluessel>` des ersten Eintrags; jeder Eintrag ist ein
+# eigener Matrix-Job, der Lesestand gilt je `name`. Übersichten nur im ersten.
+#
 # `seitenabstand_sekunden` (Vorgabe 0): Pause zwischen zwei Seiten eines Anbieters,
 # ruhiges Tempo als Normalfall, keine Anpassung an eine Sperre (Pitch 1, 08.10.2026).
 #
@@ -1689,6 +1695,11 @@ anbieter:
       - geraet: samsung-galaxy-s26-fe
         speicher_gb: 128
         url: https://www.vodafone.de/privat/handys/samsung-galaxy-s26-fe.html
+
+  - schluessel: vodafone-2
+    name: Vodafone
+    karte: vodafone
+    seiten:
       - geraet: samsung-galaxy-s26-plus
         speicher_gb: 256
         url: https://www.vodafone.de/privat/handys/samsung-galaxy-s26-plus.html
@@ -1731,6 +1742,11 @@ anbieter:
       - geraet: samsung-galaxy-z-fold8
         speicher_gb: 256
         url: https://www.vodafone.de/privat/handys/samsung-galaxy-z-fold8.html
+
+  - schluessel: vodafone-3
+    name: Vodafone
+    karte: vodafone
+    seiten:
       - geraet: samsung-galaxy-z-fold8-ultra
         speicher_gb: 256
         url: https://www.vodafone.de/privat/handys/samsung-galaxy-z-fold8-ultra.html
@@ -1950,6 +1966,12 @@ anbieter:
       - geraet: apple-iphone-18-pro-max
         speicher_gb: 256
         url: https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+
+  - schluessel: telekom-2
+    name: Telekom
+    karte: telekom
+    seitenabstand_sekunden: 60
+    seiten:
       - geraet: samsung-galaxy-s26-ultra
         speicher_gb: 256
         url: https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26-ultra/sky-blue-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
@@ -1996,6 +2018,12 @@ anbieter:
       - geraet: xiaomi-redmi-note-17-pro-max
         speicher_gb: 256
         url: https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-17-pro-max-5g/black-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+
+  - schluessel: telekom-3
+    name: Telekom
+    karte: telekom
+    seitenabstand_sekunden: 60
+    seiten:
       - geraet: samsung-galaxy-s26-fe
         speicher_gb: 128
         url: https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26-fe/enterprise-edition-graphite-128-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
@@ -2043,6 +2071,12 @@ anbieter:
       - geraet: google-pixel-10
         speicher_gb: 256
         url: https://www.telekom.de/shop/geraet/google/google-pixel-10/obsidian-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false
+
+  - schluessel: telekom-4
+    name: Telekom
+    karte: telekom
+    seitenabstand_sekunden: 60
+    seiten:
       - geraet: apple-iphone-16
         speicher_gb: 128
         url: https://www.telekom.de/shop/geraet/apple/apple-iphone-16/ultramarin-128-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false

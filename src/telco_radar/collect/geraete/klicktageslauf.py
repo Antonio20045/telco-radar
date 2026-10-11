@@ -11,8 +11,12 @@ keine Anfrage mehr hinaus (CLAUDE.md Regel 4); die übrigen Seiten heißen
 ``nicht_besucht`` mit Grund. Lud eine Seite nur nicht (``klicklauf.STOERUNG_ZEIT``,
 kein Bot-Schutz, CLAUDE.md Regel 10), folgt die nächste Seite unter derselben
 Hostschleuse samt Crawl-delay; nach ``HOECHSTE_ZEITUEBERSCHREITUNGEN`` solchen Seiten
-endet er. Ebenso endet der Lauf, sobald die Parallellauf-Prüfung (``klickparallel``,
-vor jeder Seite) einen anderen Lauf auf denselben Hosts meldet.
+endet er. Hat eine Seite nach bestandener Bot-Prüfung nur eine andere Form
+(``klicklauf.STOERUNG_SEITE``: Kanarienwert, Vorbereitung), folgt ebenso die nächste;
+erst ``HOECHSTE_SEITENFORMEN_IN_FOLGE`` solche Seiten hintereinander beenden ihn
+(Telekom 10. und 11.10.2026: je eine Seite hielt alle übrigen an). Ebenso endet der
+Lauf, sobald die Parallellauf-Prüfung (``klickparallel``, vor jeder Seite) einen
+anderen Lauf auf denselben Hosts meldet.
 
 Zeitbudget (CLAUDE.md Regel 8): ``budget_ende`` rechnet gegen die Restzeit des Jobs,
 ``job_frist_s`` (Vorgabe ``JOB_FRIST_S``, gleich ``timeout-minutes`` des Matrix-Jobs)
@@ -61,7 +65,14 @@ from .klickergebnis import (
     seite_als_daten,
 )
 from .klickkontext import Browserzustand
-from .klicklauf import ERFASST, LAUF_GESTOERT, STOERUNG_ZEIT, Klicklauf
+from .klicklauf import (
+    ERFASST,
+    LAUF_GELESEN,
+    LAUF_GESTOERT,
+    STOERUNG_SEITE,
+    STOERUNG_ZEIT,
+    Klicklauf,
+)
 from .klickparallel import Laufpruefung
 from .klickseite import GRUND_FRIST, Fristschleuse, beobachte
 from .klickspur import ohne_geheimnisse
@@ -86,6 +97,8 @@ GRUND_NACH_STOERUNG = "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4)"
 GRUND_PARALLEL = "verschoben"
 HOECHSTE_ZEITUEBERSCHREITUNGEN = 2
 GRUND_ZEITUEBERSCHREITUNGEN = "Seiten luden nicht"
+HOECHSTE_SEITENFORMEN_IN_FOLGE = 3
+GRUND_SEITENFORMEN = "Seiten in Folge mit anderer Form"
 
 Crawler = Callable[["Seitenziel", float], Klicklauf]
 """Liest eine Seite bis zur monotonen Grenze ``ende``; wirft nie."""
@@ -108,6 +121,7 @@ class _Gang:
         self.uhr, self.schlafe = uhr, schlafe
         self.stopp: str | None = None
         self.zeit = 0
+        self.form_in_folge = 0
         self.besucht = False
 
     def vor(self) -> str | None:
@@ -129,8 +143,16 @@ class _Gang:
         return min(self.ende, self.uhr() + ZEIT_JE_SEITE_S)
 
     def nach(self, status: str, stoerung: str | None, grund: str | None) -> None:
-        """Nach Bot-Schutz oder zu vielen Zeitüberschreitungen geht nichts mehr."""
-        if status == LAUF_GESTOERT and stoerung == STOERUNG_ZEIT:
+        """Nach Bot-Schutz, zu vielen Zeitüberschreitungen oder Seiten anderer Form
+        in Folge geht nichts mehr."""
+        if status == LAUF_GELESEN:
+            self.form_in_folge = 0
+        if status == LAUF_GESTOERT and stoerung == STOERUNG_SEITE:
+            self.form_in_folge += 1
+            if self.form_in_folge >= HOECHSTE_SEITENFORMEN_IN_FOLGE:
+                zahl = self.form_in_folge
+                self.stopp = f"{zahl} {GRUND_SEITENFORMEN}: {grund}"
+        elif status == LAUF_GESTOERT and stoerung == STOERUNG_ZEIT:
             self.zeit += 1
             if self.zeit >= HOECHSTE_ZEITUEBERSCHREITUNGEN:
                 self.stopp = f"{self.zeit} {GRUND_ZEITUEBERSCHREITUNGEN}: {grund}"

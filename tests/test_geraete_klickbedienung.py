@@ -13,6 +13,8 @@ from __future__ import annotations
 import pytest
 from klickbeispiel import karte, laufe, nach_auswahl, preis, seite
 
+from telco_radar.collect.geraete.klicklauf import STOERUNG_SEITE
+
 pytestmark = pytest.mark.browser
 
 O2_KOERPER = """
@@ -333,6 +335,7 @@ def test_fehlendes_element_der_vorbereitung_stoert_den_lauf(chromium):
 
     assert lauf.status == "gestoert"
     assert lauf.grund == "Vorbereitung: #gibt-es-nicht nicht gefunden"
+    assert lauf.stoerung == STOERUNG_SEITE
 
 
 def test_fehlendes_element_darf_fehlen_liest_die_seite(chromium):
@@ -369,18 +372,19 @@ def test_einsundeins_feste_laufzeit_zubehoer_ab_und_kanarie_je_geraet(chromium):
 
 
 @pytest.mark.parametrize(
-    ("modell", "grund"),
+    ("modell", "grund", "stoerung"),
     [
-        (None, "Kanarienwert braucht den Modellnamen des Geräts ({modell})"),
+        (None, "Kanarienwert braucht den Modellnamen des Geräts ({modell})", None),
         (
             "Anderes Handy",
             "Kanarienwert fehlt: #konfig label.kachel [aria-label] ohne"
             " „Speicherauswahl Anderes Handy“",
+            STOERUNG_SEITE,
         ),
     ],
 )
 def test_kanarie_je_geraet_ohne_passenden_modellnamen_ist_gestoert(
-    chromium, modell, grund
+    chromium, modell, grund, stoerung
 ):
     k = karte(knoepfe=EINSUNDEINS_KNOEPFE, kanarie=EINSUNDEINS_KANARIE)
     html = seite(EINSUNDEINS_KOERPER, EINSUNDEINS_SKRIPT)
@@ -389,6 +393,7 @@ def test_kanarie_je_geraet_ohne_passenden_modellnamen_ist_gestoert(
 
     assert lauf.status == "gestoert"
     assert lauf.grund == grund
+    assert lauf.stoerung == stoerung
     assert lauf.ergebnisse == []
 
 

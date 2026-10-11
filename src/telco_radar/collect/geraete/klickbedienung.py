@@ -10,7 +10,9 @@ Ablehnen-Knopf nicht klicken, ist der Lauf gestört. Vor jeder Lesung stellt
 ``bereite_vor`` die Zustände der Karte her (``klickkarte.Vorbereitung``): passt das
 geprüfte Element nicht auf ``bis``, klickt sie ``klick`` und wartet in Takten der Wache
 darauf; fehlt das Element, lässt es sich nicht klicken oder kommt der Zustand nicht, ist
-der Lauf gestört (kein Wert aus einem falschen Zustand). Lädt der Klick eine
+der Lauf gestört (kein Wert aus einem falschen Zustand). Beides nach bestandener
+Bot-Prüfung heißt ``STOERUNG_SEITE``: diese eine Seite hat eine andere Form, der
+Tageslauf liest die nächste (``klicktageslauf``). Lädt der Klick eine
 Preisantwort, gehört sie zu ihm wie zu einem Knopf.
 """
 
@@ -21,7 +23,7 @@ from typing import TYPE_CHECKING
 from playwright.sync_api import Error as PlaywrightFehler
 
 from .klickkarte import PLATZHALTER_MODELL, Kanarie, Klickkarte, Vorbereitung
-from .klicklauf import LAUF_GESTOERT
+from .klicklauf import LAUF_GESTOERT, STOERUNG_SEITE
 from .klickproben import einwilligungsknopf
 from .klicktor import kurz
 from .klickwache import Abbruch, Wache
@@ -70,7 +72,7 @@ class Bedienung:
             if kanarie.attribut is not None:
                 stelle = f"{stelle} [{kanarie.attribut}]"
             grund = f"Kanarienwert fehlt: {stelle} ohne „{erwartet}“"
-            raise Abbruch(LAUF_GESTOERT, grund)
+            raise self._seitenform(grund)
 
     def lehne_einwilligung_ab(self) -> None:
         """Lehnt eine sichtbare Einwilligungsabfrage ab (``lehne_einwilligung_ab``)."""
@@ -96,7 +98,7 @@ class Bedienung:
         selektor = schritt.klick if schritt.pruefe is None else schritt.pruefe
         ort = self.seite.locator(selektor)
         if not self.wache.warte(lambda: ort.count() > 0):
-            raise Abbruch(LAUF_GESTOERT, f"Vorbereitung: {selektor} nicht gefunden")
+            raise self._seitenform(f"Vorbereitung: {selektor} nicht gefunden")
         return _passt(ort.first, schritt.bis)
 
     def _klicke(self, schritt: Vorbereitung) -> None:
@@ -106,11 +108,17 @@ class Bedienung:
             self.seite.locator(schritt.klick).first.click(timeout=self.wache.frist_ms)
         except PlaywrightFehler as fehler:
             grund = f"Vorbereitung: {schritt.klick} nicht klickbar: {kurz(fehler)}"
-            raise Abbruch(LAUF_GESTOERT, grund) from fehler
+            raise self._seitenform(grund) from fehler
         if not self.wache.warte(lambda: self._erfuellt(schritt)):
             grund = f"Vorbereitung: {schritt.klick} erreicht „{schritt.bis}“ nicht"
-            raise Abbruch(LAUF_GESTOERT, grund)
+            raise self._seitenform(grund)
         self.wache.nimm_angefragte(marke)
+
+    def _seitenform(self, grund: str) -> Abbruch:
+        """Abbruch einer Seite anderer Form; Bot-Schutz im Tor geht vor."""
+        self.wache.pruefe_tor()
+        self.wache.lauf.stoerung = STOERUNG_SEITE
+        return Abbruch(LAUF_GESTOERT, grund)
 
 
 def lehne_einwilligung_ab(seite: Page, wache: Wache) -> str | None:

@@ -67,12 +67,33 @@ def erfassungsgrund(eintrag: dict) -> str | None:
 def erfassungsgruende(bilanz: dict | None) -> dict[str, str]:
     """Je Anbieter mit frisch gestörtem Klick-Lauf sein Erfassungsgrund."""
     gruende = {}
-    for eintrag in (bilanz or {}).get("dateien", []):
+    dateien = (bilanz or {}).get("dateien", [])
+    for eintrag in dateien:
         if (satz := erfassungsgrund(eintrag)) is not None:
             gruende[str(eintrag.get("anbieter"))] = satz
         gruende.update(nicht_im_angebot(eintrag))
+    for eintrag in je_anbieter_vereint(dateien):
         gruende.update(speicher_gelesen(eintrag))
     return gruende
+
+
+def je_anbieter_vereint(dateien: list[dict]) -> list[dict]:
+    """Heutige Dateien eines Anbieters (ein Anbieter auf mehrere Jobs verteilt) mit
+    vereinten ``speicher_gelesen``; ältere Dateien unverändert."""
+    vereint: dict[str, dict] = {}
+    rest = []
+    for eintrag in dateien:
+        je_geraet = eintrag.get("speicher_gelesen")
+        if eintrag.get("alter_tage") != 0 or not isinstance(je_geraet, dict):
+            rest.append(eintrag)
+            continue
+        ziel = vereint.setdefault(
+            str(eintrag.get("anbieter")), {**eintrag, "speicher_gelesen": {}}
+        )
+        for geraet, speicher in je_geraet.items():
+            bisher = ziel["speicher_gelesen"].get(geraet, [])
+            ziel["speicher_gelesen"][geraet] = sorted({*bisher, *speicher})
+    return [*rest, *vereint.values()]
 
 
 def nicht_im_angebot(eintrag: dict) -> dict[str, str]:

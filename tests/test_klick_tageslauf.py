@@ -29,6 +29,7 @@ from telco_radar.collect.geraete.klicklauf import (
     LAUF_GESPERRT,
     LAUF_GESTOERT,
     LAUF_ZEITGRENZE,
+    STOERUNG_SEITE,
     STOERUNG_ZEIT,
     Klicklauf,
     abruf_gestoert,
@@ -39,7 +40,9 @@ from telco_radar.collect.geraete.klicktageslauf import (
     GRUND_BUDGET,
     GRUND_NACH_STOERUNG,
     GRUND_PARALLEL,
+    GRUND_SEITENFORMEN,
     GRUND_ZEITUEBERSCHREITUNGEN,
+    HOECHSTE_SEITENFORMEN_IN_FOLGE,
     HOECHSTE_ZEITUEBERSCHREITUNGEN,
     MINDESTZEIT_SEITE_S,
     RESERVE_S,
@@ -56,6 +59,7 @@ from telco_radar.geraete_config import lade_katalog
 
 HEUTE = "2026-09-29"
 NICHT_GELADEN = "Seite nach 30000 ms nicht geladen (30000 ms ohne neue Antwort)"
+OHNE_SCHALTER = "Vorbereitung: span.dt_switch.forwardTradeInSwitch nicht gefunden"
 MINUTE = 60.0
 _SKRIPT = WURZEL / "scripts" / "klick_tageslauf.py"
 
@@ -113,6 +117,9 @@ class Crawler:
         if status == STOERUNG_ZEIT:
             lauf = Klicklauf("o2", seite.adresse, LAUF_GESTOERT, NICHT_GELADEN, 200)
             return replace(lauf, stoerung=STOERUNG_ZEIT)
+        if status == STOERUNG_SEITE:
+            lauf = Klicklauf("o2", seite.adresse, LAUF_GESTOERT, OHNE_SCHALTER, 200)
+            return replace(lauf, stoerung=STOERUNG_SEITE)
         if status == LAUF_GESPERRT:
             return Klicklauf("o2", seite.adresse, status, "robots.txt verbietet", None)
         if status == LAUF_ZEITGRENZE:
@@ -132,18 +139,42 @@ def test_tagesdatei_hat_alle_anbieter_mit_karte_und_keine_seitengrenze(ziele):
         "o2",
         "o2-tarife",
         "vodafone",
+        "vodafone-2",
+        "vodafone-3",
         "1und1",
         "telekom",
+        "telekom-2",
+        "telekom-3",
+        "telekom-4",
         "congstar",
     ]
-    for schluessel in ziele:
-        assert (WURZEL / "config" / "klickkarten" / f"{schluessel}.yaml").is_file()
+    for ziel in ziele.values():
+        karte = WURZEL / "config" / "klickkarten" / f"{ziel.kartenschluessel}.yaml"
+        assert karte.is_file()
     assert O2_SEITE.adresse in {s.adresse for s in ziele["o2"].seiten}
-    assert len(ziele["telekom"].seiten) == 55
-    vodafone = [s.geraet for s in ziele["vodafone"].seiten]
+    telekom = _seiten_von(ziele, "Telekom")
+    assert len(telekom) == len(set(telekom)) == 55
+    vodafone = _seiten_von(ziele, "Vodafone")
     assert len(vodafone) == len(set(vodafone)) == 42
     with pytest.raises(ErkundungszielFehler, match="höchstens 2"):
         lade_ziele(lese_wurzel(), TAGESDATEI)
+
+
+def _seiten_von(ziele, name):
+    return [s.adresse for z in ziele.values() if z.name == name for s in z.seiten]
+
+
+def test_telekom_und_vodafone_verteilt_auf_jobs_mit_einer_karte(ziele):
+    """Antonio 11.10.2026: alle Geräte jeden Tag. Ein 180-min-Job liest rund 20
+    Telekom- oder Vodafone-Seiten; jeder Job hat eigene Seiten, alle eine Karte."""
+    for name, karte, jobs in (("Telekom", "telekom", 4), ("Vodafone", "vodafone", 3)):
+        teile = [z for z in ziele.values() if z.name == name]
+        assert len(teile) == jobs
+        assert {z.kartenschluessel for z in teile} == {karte}
+        assert max(len(z.seiten) for z in teile) <= 15
+    assert [
+        z.schluessel for z in ziele.values() if z.uebersichten and z.name == "Telekom"
+    ] == ["telekom"]
 
 
 def test_plan_nennt_jeden_anbieter_mit_karte(capsys):
@@ -156,8 +187,13 @@ def test_plan_nennt_jeden_anbieter_mit_karte(capsys):
         "o2",
         "o2-tarife",
         "vodafone",
+        "vodafone-2",
+        "vodafone-3",
         "1und1",
         "telekom",
+        "telekom-2",
+        "telekom-3",
+        "telekom-4",
         "congstar",
     ]
     assert skript.main(["--root", str(lese_wurzel()), "--anbieter", "o2,telekom"]) == 2
@@ -275,6 +311,60 @@ def test_nach_zwei_zeitueberschreitungen_oder_bot_schutz_ist_schluss(
     else:
         zahl = HOECHSTE_ZEITUEBERSCHREITUNGEN
         assert rest == {f"{zahl} {GRUND_ZEITUEBERSCHREITUNGEN}: {NICHT_GELADEN}"}
+
+
+def test_seite_anderer_form_haelt_die_uebrigen_nicht_an(o2, karte, gelesen_o2):
+    """Telekom 11.10.2026: Galaxy A17 ohne Rückgabe-Schalter hielt 53 Seiten an.
+    Eine Seite anderer Form ist kein Bot-Schutz: die übrigen werden gelesen, der
+    Anbieter gilt als gelesen, die Seite bleibt überfällig."""
+    zweite = o2.seiten[1].adresse
+    uhr = Uhr()
+    crawler = Crawler(uhr, gelesen_o2, status={zweite: STOERUNG_SEITE})
+
+    daten = _fahre(o2, karte, crawler, uhr)
+
+    assert len(crawler.aufrufe) == len(o2.seiten)
+    seite = daten["seiten"][1]
+    assert (seite["status"], seite["stoerung"], seite["grund"]) == (
+        LAUF_GESTOERT,
+        STOERUNG_SEITE,
+        OHNE_SCHALTER,
+    )
+    assert daten["laufstatus"] == LAUF_GELESEN
+    assert daten["ueberfaellig"] == [zweite]
+
+
+@pytest.mark.parametrize(
+    ("folge", "aufrufe"),
+    [
+        (
+            (STOERUNG_SEITE,) * HOECHSTE_SEITENFORMEN_IN_FOLGE,
+            HOECHSTE_SEITENFORMEN_IN_FOLGE,
+        ),
+        ((STOERUNG_SEITE, STOERUNG_SEITE, LAUF_GELESEN, STOERUNG_SEITE), 6),
+    ],
+)
+def test_seiten_anderer_form_in_folge_beenden_den_anbieter(
+    o2, karte, gelesen_o2, folge, aufrufe
+):
+    """Ändert sich die Form jeder Seite (etwa eine unerkannte Sperrseite), endet der
+    Anbieter nach HOECHSTE_SEITENFORMEN_IN_FOLGE Seiten hintereinander; Gegenprobe:
+    eine gelesene Seite dazwischen setzt die Folge zurück."""
+    adressen = [s.adresse for s in o2.seiten]
+    uhr = Uhr()
+    status = dict(zip(adressen, folge, strict=False))
+    crawler = Crawler(uhr, gelesen_o2, status=status)
+
+    daten = _fahre(o2, karte, crawler, uhr)
+
+    assert len(crawler.aufrufe) == aufrufe
+    rest = {s["grund"] for s in daten["seiten"][aufrufe:]}
+    if aufrufe < len(adressen):
+        zahl = HOECHSTE_SEITENFORMEN_IN_FOLGE
+        assert rest == {f"{zahl} {GRUND_SEITENFORMEN}: {OHNE_SCHALTER}"}
+        assert daten["laufstatus"] == LAUF_GESTOERT
+    else:
+        assert daten["laufstatus"] == LAUF_GELESEN
 
 
 def test_gesperrte_seite_beendet_den_anbieter_nicht(o2, karte, gelesen_o2):

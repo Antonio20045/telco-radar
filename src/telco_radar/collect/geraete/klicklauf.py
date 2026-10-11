@@ -14,7 +14,9 @@ gescheiterte Preisantwort, Strukturbruch, keine einzige angebotene Kombination),
 ``gesperrt`` (robots.txt sperrt Seite, Preisantwort oder Besuchszeit) oder
 ``zeitgrenze`` (die Zeitgrenze des Aufrufers schnitt ihn ab; was er nicht besuchte,
 heißt so). Lud die Hauptseite nicht, ist er gestört mit ``stoerung`` gleich
-``STOERUNG_ZEIT``, ohne Bot-Schutz (CLAUDE.md Regel 10). Bot-Schutz heißt
+``STOERUNG_ZEIT``, ohne Bot-Schutz (CLAUDE.md Regel 10). Fehlt nach bestandener
+Bot-Prüfung der Kanarienwert oder ein Element der Vorbereitung, ist er gestört mit
+``STOERUNG_SEITE``: die Seite hat eine andere Form, kein Bot-Schutz. Bot-Schutz heißt
 ``bot_schutz``: HTTP 202, 4xx oder 5xx, ein bekanntes Challenge-Muster
 (``CHALLENGE_MUSTER``) oder eine HTML-Seite, wo die Preisschnittstelle JSON liefern
 soll. Gescheiterte Anfragen hält der Lauf mit Grund fest, ebenso jede Hilfsdatei, die
@@ -63,6 +65,7 @@ BEFUND = "befund"
 LAUF_GESPERRT = "gesperrt"
 LAUF_ZEITGRENZE = "zeitgrenze"
 STOERUNG_ZEIT = "zeitueberschreitung"
+STOERUNG_SEITE = "seitenform"
 GRUND_ANDERE_FARBE = "in der vorgewählten Farbe nicht vorhanden"
 BELEG_OFFEN = "offen"
 BELEGT = "belegt"
