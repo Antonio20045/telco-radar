@@ -220,7 +220,7 @@ def _stufe(band_labels: dict, band: str) -> str:
 
 NICHT_IM_ANGEBOT = "Bietet das Gerät nicht an"
 NOCH_NICHT_ERFASST = "Noch nicht erfasst"
-RATEN_IM_ANGEBOT = {"o2": (24, 36), "congstar": (24, 36)}
+RATEN_IM_ANGEBOT = {"o2": (24, 36), "congstar": (24, 36), "1&1": (24,)}
 """Laufzeitknöpfe der Klick-Karten; andere Raten sind „nicht im Angebot“."""
 KEIN_ANGEBOT_GELESEN = "Von {anbieter} ist zu diesem Gerät noch kein Angebot gelesen."
 _NICHT_IM_ANGEBOT_MUSTER = re.compile(

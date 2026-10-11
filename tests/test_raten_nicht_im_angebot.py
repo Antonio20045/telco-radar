@@ -1,4 +1,6 @@
-"""o2 und congstar bieten nur 24 und 36 Raten an (Preisprüfung 11.10.2026)."""
+"""o2 und congstar bieten nur 24 und 36 Raten an (Preisprüfung 11.10.2026), 1&1 nur
+„24 Monate + Ablöse“ (Abgleich der Live-Seite 11.10.2026: 77 Modelle mit „1&1 Mit 12
+Raten nicht erfasst“)."""
 
 from __future__ import annotations
 
@@ -19,7 +21,7 @@ def _luecke(anbieter: str, laufzeit: int) -> dict:
     }
 
 
-@pytest.mark.parametrize("anbieter", ["o2", "congstar"])
+@pytest.mark.parametrize("anbieter", ["o2", "congstar", "1&1"])
 def test_zwoelf_raten_bei_o2_und_congstar_sind_nicht_im_angebot(anbieter):
     (zeile,) = fehlzeilen([_luecke(anbieter, 12)], {})
     assert zeile["kurz"] == "Mit 12 Raten nicht im Angebot"
