@@ -24,6 +24,7 @@ STORE_NAME = "ki_videos.json"
 KATALOG = Path("config") / "ki_videos.yaml"
 HOECHSTENS = 30
 TAGE = 60
+KURZ_UNTER_SEKUNDEN = 120
 _UNSICHTBAR = {"️", "‍", "⃣"}
 
 
@@ -57,6 +58,16 @@ def lade(state_dir: Path) -> dict:
     except (OSError, json.JSONDecodeError) as exc:
         log.error("%s unlesbar: %s", pfad, exc)
         return dict(leer, error=f"{STORE_NAME} unlesbar")
+
+
+def lange(store: dict) -> list[dict]:
+    """Die Videos des Stores ohne Shorts; ohne bekannte Dauer fällt eins weg."""
+    return [
+        v
+        for v in store.get("videos") or []
+        if v.get("dauer_sekunden") is not None
+        and v["dauer_sekunden"] >= KURZ_UNTER_SEKUNDEN
+    ]
 
 
 def aktualisiere(

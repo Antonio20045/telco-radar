@@ -14,7 +14,9 @@ Das Band „Modelle“ zeigt den Store aus ``analyze.ki_modelle`` (Schnitt 6),
 nur die fertigen (``FERTIG``), Linie und Pillen der Fahrt stehen in
 ``FAHRT_WEG`` und ``STATIONEN``, ``app.js`` zeichnet sie beim Scrollen.
 Die Muster-Prompts (Schnitt 13) lädt ``analyze.ki_inhalte``; Kopfzeile,
-Themenzeile und Rubrikleiste lesen dasselbe ``anzahl``.
+Themenzeile und Rubrikleiste lesen dasselbe ``anzahl``. Die Videos
+(Schnitte 14 und 15) liest ``analyze.ki_videos.lange``; ``videos()`` ordnet
+sie nur an: eins groß links, eins klein rechts, höchstens ``REIHE`` darunter.
 
 Das Modul importiert ``html`` nicht: die Themenerkennung kommt als
 Parameter herein.
@@ -25,7 +27,7 @@ from __future__ import annotations
 from collections.abc import Callable, Iterable
 from datetime import date
 
-from ..analyze import ki_blatt, ki_modelle
+from ..analyze import ki_blatt, ki_modelle, ki_videos
 from . import meldungen_seite
 
 KI_THEMA = "thema:ki"
@@ -33,6 +35,8 @@ KI_TAG = "KI / AI"
 LINKS = 2
 RECHTS = 5
 VORLAGE = "ki.html.j2"
+REIHE = 6
+OHNE_ABRUF = "noch kein Abruf"
 KAPITEL = (
     "Wie eine KI antwortet",
     "Was ist eigentlich KI?",
@@ -130,6 +134,32 @@ def modelle_band(store: dict) -> dict:
     }
 
 
+def _video(v: dict) -> dict:
+    sekunden = v["dauer_sekunden"]
+    return dict(
+        v,
+        zeit=f"{sekunden // 60}:{sekunden % 60:02d}",
+        minuten=(sekunden + 30) // 60,
+    )
+
+
+def videos(store: dict, mit_spalten: bool) -> dict:
+    """Eins links, eins rechts, die nächsten in der Reihe; ohne Spalten alle dort."""
+    liste = [_video(v) for v in ki_videos.lange(store)]
+    spalten = 2 if mit_spalten else 0
+    oben = liste[:spalten]
+    ausfall = store.get("error")
+    if ausfall is None and store.get("stand") is None:
+        ausfall = OHNE_ABRUF
+    return {
+        "links": oben[0] if oben else None,
+        "rechts": oben[1] if len(oben) > 1 else None,
+        "reihe": liste[spalten : spalten + REIHE],
+        "ausfall": ausfall,
+        "stand": _tag(store.get("stand")),
+    }
+
+
 def rubriken(ausgabe: dict, modelle: dict, prompts: dict) -> list[dict]:
     """Die Teile der Seite mit ihrer Zahl; ein leerer Teil fehlt in der Leiste."""
     teile = [
@@ -181,6 +211,7 @@ def seite(
     date_de: str,
     ki_store: dict,
     prompts: dict,
+    video_store: dict,
 ) -> str:
     """Das HTML von ``ki.html``; Stand ist der neueste Bericht."""
     stand = max((w["date"] for w in wochen), default="")
@@ -197,4 +228,5 @@ def seite(
         kapitel=kapitel(),
         fahrt=fahrt(),
         prompts=prompts,
+        videos=videos(video_store, blatt_ausgabe["aufmacher"] is not None),
     )

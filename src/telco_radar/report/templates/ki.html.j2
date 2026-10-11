@@ -10,7 +10,9 @@
    Verstehen (Schnitt 9): Linie und Pillen stehen fertig im HTML, app.js
    zeichnet sie mit dem Scrollen; die Schiene kommt aus ki_seite.KAPITEL.
    Muster-Prompts (Schnitt 13): ohne JS alle Themen untereinander, jeder
-   Text in <details>; app.js schaltet auf ein Thema mit Panel um. #}
+   Text in <details>; app.js schaltet auf ein Thema mit Panel um.
+   Videos (Schnitte 14, 15): eigenes Standbild, erst der Klick setzt in
+   app.js das iframe von youtube-nocookie; ohne JS bleibt der Link. #}
 {% extends "base.html.j2" %}
 {% import "_design.html.j2" as d %}
 {% set active = 'ki' %}
@@ -24,6 +26,27 @@
   {% if dek and h.summary %}<p class="ki-dek">{{ h.summary }}</p>{% endif %}
   <p class="ki-wer"><a class="ki-quelle" href="{{ h.url }}" target="_blank" rel="noopener">{{ h.source_label }}</a>{% if h.operator %} · {{ h.operator }}{% endif %} · {{ h.ki_datum | date_de }}</p>
 </article>
+{% endmacro %}
+
+{% macro video(v, art, n=0) %}
+<article class="ki-video ki-video--{{ art }}">
+  <button type="button" class="ki-player" data-ki-video="{{ v.id }}" aria-label="Video abspielen: {{ v.titel }}"><svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><g><circle cx="{{ 90 + n * 50 }}" cy="90" r="60"/><circle cx="{{ 90 + n * 50 }}" cy="90" r="34"/><path d="M0 {{ 120 - n * 8 }} C 80 {{ 60 + n * 14 }}, 200 {{ 150 - n * 16 }}, 320 {{ 70 + n * 12 }}"/></g></svg><span class="ki-knopf"></span><span class="ki-zeit">{{ v.zeit }}</span></button>
+  <div class="ki-video-text">
+    <p class="ki-kicker">Video{% if v.stufe %} · {{ v.stufe }}{% endif %}</p>
+    <h3 class="ki-video-titel">{{ v.titel }}</h3>
+    <p class="ki-wer">{{ v.kanal }} · {{ v.minuten }} Minuten · <a class="ki-quelle" href="https://www.youtube.com/watch?v={{ v.id }}" target="_blank" rel="noopener">auf YouTube öffnen</a></p>
+  </div>
+</article>
+{% endmacro %}
+
+{% macro video_reihe() %}
+{% if videos.reihe or videos.ausfall %}
+<div class="ki-video-reihe" id="ki-videos">
+  <h2 class="ki-spaltenkopf">Videos · was man mit KI bauen kann</h2>
+  {% if videos.reihe %}<div class="ki-videos">{% for v in videos.reihe %}{{ video(v, 'reihe', loop.index0 % 4) }}{% endfor %}</div>{% endif %}
+  {% if videos.ausfall %}<p class="ki-video-ausfall">Videos nicht abgerufen: {{ videos.ausfall }}{% if videos.stand %} · Stand {{ videos.stand }}{% endif %}</p>{% endif %}
+</div>
+{% endif %}
 {% endmacro %}
 
 {% block buehne %}
@@ -51,15 +74,17 @@
   {% if ausgabe.aufmacher %}
   <div class="ki-oben">
     {{ meldung(ausgabe.aufmacher, 'aufmacher', dek=true) }}
-    <div class="ki-links">{% for h in ausgabe.links %}{{ meldung(h, 'links', dek=true) }}{% endfor %}</div>
+    <div class="ki-links">{% if videos.links %}{{ video(videos.links, 'gross') }}{% endif %}{% for h in ausgabe.links %}{{ meldung(h, 'links', dek=true) }}{% endfor %}</div>
     <div class="ki-rechts">
-      {% if ausgabe.rechts %}<h2 class="ki-spaltenkopf">Auch wichtig</h2>{% endif %}
-      {% for h in ausgabe.rechts %}{{ meldung(h, 'rechts') }}{% endfor %}
+      {% if ausgabe.rechts or videos.rechts %}<h2 class="ki-spaltenkopf">Auch wichtig</h2>{% endif %}
+      {% for h in ausgabe.rechts %}{{ meldung(h, 'rechts') }}{% if loop.first and videos.rechts %}{{ video(videos.rechts, 'mini', 1) }}{% endif %}{% endfor %}
+      {% if videos.rechts and not ausgabe.rechts %}{{ video(videos.rechts, 'mini', 1) }}{% endif %}
     </div>
   </div>
   {% if ausgabe.liste %}
   <div class="ki-liste">{% for h in ausgabe.liste %}{{ meldung(h, 'liste') }}{% endfor %}</div>
   {% endif %}
+  {{ video_reihe() }}
   <p class="ki-mehr">Meldungen bleiben stehen wie in einer Zeitung: höchstens {{ ausgabe.je_ressort }} je Ressort, die älteste wandert ins Archiv.</p>
   {% if ausgabe.archiv %}
   <details id="ki-archiv" class="ki-archiv">
@@ -73,6 +98,7 @@
   {% endif %}
   {% else %}
   <p class="empty-note">In den Berichten steht noch keine KI-Meldung.</p>
+  {{ video_reihe() }}
   {% endif %}
 </section>
 

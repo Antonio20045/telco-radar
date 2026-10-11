@@ -4823,3 +4823,24 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
     else ersatz();
   });
 })();
+
+/* KI-SEITE, SCHNITTE 14 UND 15 (Pitch 9, Entwurf 10). Videos: das HTML
+   traegt nur das eigene Standbild und den Link zu YouTube. Erst ein Klick
+   ersetzt das Standbild durch das iframe von youtube-nocookie, vorher geht
+   beim Aufruf nichts an Google. */
+(function () {
+  [].forEach.call(document.querySelectorAll('.ki-player[data-ki-video]'), function (b) {
+    b.addEventListener('click', function () {
+      var f = document.createElement('iframe');
+      f.className = 'ki-player';
+      f.src = 'https://www.youtube-nocookie.com/embed/' +
+        encodeURIComponent(b.getAttribute('data-ki-video')) + '?autoplay=1&rel=0';
+      f.title = b.getAttribute('aria-label');
+      f.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture');
+      f.setAttribute('allowfullscreen', '');
+      var video = b.closest('.ki-video');
+      if (video) video.classList.add('ki-video--offen');
+      b.replaceWith(f);
+    });
+  });
+})();
