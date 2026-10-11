@@ -45,6 +45,7 @@
       bild.classList.add('aktiv');
       bild.setAttribute('fetchpriority', 'high');
       bild.addEventListener('load', function () { bild.classList.add('geladen'); });
+      if (bild.getAttribute('data-srcset')) bild.srcset = bild.getAttribute('data-srcset');
       bild.src = bild.getAttribute('data-src');
       if (bild.complete && bild.naturalWidth) bild.classList.add('geladen');
     }
@@ -326,7 +327,7 @@
   /* Scrollfortschritt: der Titel wird kleiner, Bilder ziehen leicht mit,
      der Schwerpunkt waechst auf volle Breite, Deutschland faerbt sich ein. */
   if (ruhig) return;
-  var kopf = document.querySelector('.mg-kopf');
+  var kopf = document.querySelector('.mg-kopf:not(.wa-text)');
   var aufmacher = document.querySelector('.mg--aufmacher');
   var deutschland = document.querySelector('.mg-deutschland');
   var bewegt = [kopf, aufmacher, schwerpunkt, deutschland].filter(Boolean);
