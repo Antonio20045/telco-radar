@@ -26,8 +26,8 @@ DIE ZWEI DINGE, DIE HIER RICHTIG SEIN MUESSEN:
 from __future__ import annotations
 
 import json
-import re
 import logging
+import re
 import time
 import urllib.error
 import urllib.request
@@ -192,3 +192,44 @@ def hole_ereignisse(
         log.error("Events-API nicht erreichbar: %s", type(fehler).__name__)
         return []
     return list(daten.get("events") or [])
+
+
+class BrevoFehler(RuntimeError):
+    """Brevo hat eine Anfrage abgelehnt (status > 0) oder war nicht erreichbar (0)."""
+
+    def __init__(self, status: int, grund: str):
+        super().__init__(f"Brevo HTTP {status}: {grund}")
+        self.status = status
+
+
+def brevo_anfrage(
+    api_key: str,
+    methode: str,
+    ziel: str,
+    koerper: dict | None = None,
+    *,
+    oeffner=None,
+    timeout: int = 30,
+) -> dict:
+    """Eine Anfrage an die Brevo-API. Fehlertexte ohne Adressen."""
+    anfrage = urllib.request.Request(
+        ziel,
+        data=None if koerper is None else json.dumps(koerper).encode("utf-8"),
+        headers={
+            "api-key": api_key,
+            "content-type": "application/json",
+            "accept": "application/json",
+        },
+        method=methode,
+    )
+    oeffnen = oeffner or urllib.request.urlopen
+    try:
+        with oeffnen(anfrage, timeout=timeout) as antwort:
+            roh = antwort.read().decode("utf-8")
+            return json.loads(roh) if roh.strip() else {}
+    except urllib.error.HTTPError as fehler:
+        text = fehler.read().decode("utf-8", "replace")
+        grund = re.sub(r"[\w.+-]+@[\w.-]+", "<adresse>", text)[:200]
+        raise BrevoFehler(fehler.code, grund) from None
+    except (OSError, json.JSONDecodeError) as fehler:
+        raise BrevoFehler(0, type(fehler).__name__) from None
