@@ -2,7 +2,11 @@
 
 import io
 import json
+import os
+import subprocess
+import sys
 import urllib.error
+from pathlib import Path
 from types import SimpleNamespace
 from urllib.parse import parse_qs, urlsplit
 
@@ -153,3 +157,23 @@ def test_brevo_faellt_aus_und_der_dienst_sagt_es(dienst):
     assert "nicht geklappt" in dienst.get(f"/confirm/{token}").text
     abmeldung = tokens.schreibe(KEY, tokens.ZWECK_ABMELDUNG, {"sub_id": "x"})
     assert "nicht geklappt" in dienst.get(f"/unsubscribe/{abmeldung}").text
+
+
+def test_der_dienst_startet_mit_seinen_eigenen_abhaengigkeiten():
+    """Render installiert nur service/signup/requirements.txt - kein jinja2."""
+    wurzel = Path(__file__).resolve().parents[1]
+    lauf = subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            "import sys\nsys.modules['jinja2'] = None\n"
+            "from service.signup import app\nprint(app.anmeldung.DOI_SCHLAGWORT)",
+        ],
+        capture_output=True,
+        text=True,
+        cwd=wurzel,
+        env={**os.environ, "PYTHONPATH": str(wurzel)},
+        timeout=60,
+    )
+    assert lauf.returncode == 0, lauf.stderr
+    assert "telco-radar-doi" in lauf.stdout
