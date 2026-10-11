@@ -63,6 +63,78 @@
     }
   }
 
+  /* DER CAMPUS LEBT (Antonio, 11.10.2026): hinter der Buehne laeuft eine
+     nahtlose Schleife des Campus Duesseldorf, wie er gerade ist - Tageszeit
+     und Wetter am Campus, nicht beim Leser. Das Wetter kommt ohne Schluessel
+     und ohne Kosten von Open-Meteo (Daten u. a. des Deutschen
+     Wetterdienstes). Antwortet der Dienst nicht, bestimmt die Uhr die
+     Tageszeit und der Himmel bleibt bewoelkt. Geladen wird genau EINE
+     Schleife, und erst wenn das Startbild steht. Unter Automatisierung
+     bleibt die Buehne ruhig. */
+  var film = buehne && buehne.querySelector('.buehne-film');
+  if (film && !ruhig && !navigator.webdriver) {
+    var CAMPUS = 'https://api.open-meteo.com/v1/forecast?latitude=51.2437&longitude=6.7383'
+      + '&current=weather_code,temperature_2m&daily=sunrise,sunset&timezone=Europe%2FBerlin&forecast_days=1';
+    var minuten = function (t) {
+      var m = /T(\d\d):(\d\d)/.exec(t || '');
+      return m ? (+m[1]) * 60 + (+m[2]) : null;
+    };
+    var himmel = function (code) {
+      if (code == null) return 'wolken';
+      if (code <= 1) return 'sonne';
+      if ((code >= 71 && code <= 77) || code === 85 || code === 86) return 'schnee';
+      if (code >= 51) return 'regen';
+      return 'wolken';
+    };
+    var phase = function (jetzt, auf, unter) {
+      if (jetzt == null) {
+        var h = new Date().getHours();
+        jetzt = h * 60; auf = auf == null ? 7 * 60 : auf; unter = unter == null ? 19 * 60 : unter;
+      }
+      if (auf == null || unter == null) return 'mittag';
+      if (jetzt < auf - 30 || jetzt >= unter + 60) return 'nacht';
+      if (jetzt < auf + 180) return 'morgen';
+      if (jetzt >= unter - 90) return 'abend';
+      return 'mittag';
+    };
+    var nachBild = function (los) {
+      if (document.readyState === 'complete') los();
+      else window.addEventListener('load', los, { once: true });
+    };
+    var zeige = function (szene, wetter) { nachBild(function () { zeigeJetzt(szene, wetter); }); };
+    var zeigeJetzt = function (szene, wetter) {
+      var basis = film.getAttribute('data-basis');
+      var klein = window.matchMedia && matchMedia('(max-width: 900px)').matches;
+      film.setAttribute('data-szene', szene);
+      buehne.classList.toggle('film-dunkel', /^(abend|nacht)/.test(szene));
+      film.poster = basis + szene + '.jpg';
+      film.src = basis + szene + (klein ? '-klein' : '') + '.mp4';
+      film.addEventListener('playing', function () { film.classList.add('laeuft'); }, { once: true });
+      var spiel = film.play();
+      if (spiel && spiel.catch) spiel.catch(function () {});
+      var zeile = document.querySelector('[data-campus-wetter]');
+      if (zeile && wetter) {
+        zeile.textContent = 'Campus Düsseldorf · ' + wetter;
+        zeile.hidden = false;
+      }
+    };
+    var WORT = { sonne: 'klar', wolken: 'bewölkt', regen: 'Regen', schnee: 'Schnee' };
+    var spaeter = window.fetch ? fetch(CAMPUS).then(function (a) {
+      if (!a.ok) throw new Error('Wetter ' + a.status);
+      return a.json();
+    }) : Promise.reject(new Error('kein fetch'));
+    spaeter.then(function (d) {
+      var c = d.current || {};
+      var t = d.daily || {};
+      var h = himmel(c.weather_code);
+      var p = phase(minuten(c.time), minuten((t.sunrise || [])[0]), minuten((t.sunset || [])[0]));
+      var grad = typeof c.temperature_2m === 'number' ? Math.round(c.temperature_2m) + ' °C, ' : '';
+      zeige(p + '-' + h, grad + WORT[h]);
+    }).catch(function () {
+      zeige(phase(null) + '-wolken', null);
+    });
+  }
+
   /* DER KOPF wird beim Scrollen etwas deckender. */
   var kopf = document.getElementById('kopf');
   if (kopf) {
@@ -4423,5 +4495,331 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
     waehle(g, true);
     var ziel = document.getElementById('verlauf');
     if (ziel) ziel.scrollIntoView({behavior: 'smooth', block: 'start'});
+  });
+})();
+
+/* LIQUID GLASS (Antonio, 11.10.2026): die Pille liegt unter der Wahl und
+   gleitet mit, wenn sie wechselt. Ueber Bildern und waehrend der Inhalt
+   rollt wird das Glas klarer. Die Brechung (Karte vom Server, Rechenweg
+   github.com/shuding/liquid-glass, MIT, (c) 2025 Shu Ding) bekommt nur
+   Chromium; der Filter folgt der echten Groesse des Umschalters. */
+(function () {
+  var schalter = document.querySelectorAll('[data-glas]');
+  if (!schalter.length) return;
+  var marken = (navigator.userAgentData && navigator.userAgentData.brands) || [];
+  for (var m = 0; m < marken.length; m++) {
+    if (marken[m].brand === 'Chromium') document.documentElement.classList.add('glas-chromium');
+  }
+  var ruhig = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  var filter = document.getElementById('glas-linse');
+  var bildartig = 'img,video,picture,canvas,[data-buehne],.wa-rahmen,.wa-bild,.szene-bild,[class*="motiv"]';
+
+  Array.prototype.forEach.call(schalter, function (s) {
+    var pille = s.querySelector('.glas-pille');
+    var lege = function (gleiten) {
+      var an = s.querySelector('[aria-current="page"],[aria-selected="true"]');
+      if (!pille || !an) return;
+      s.style.setProperty('--x', an.offsetLeft + 'px');
+      s.style.setProperty('--w', an.offsetWidth + 'px');
+      if (gleiten && !ruhig) {
+        s.classList.remove('gleitet');
+        void s.offsetWidth;
+        s.classList.add('gleitet');
+      }
+      if (filter) {
+        var r = s.getBoundingClientRect();
+        var w = Math.round(r.width), h = Math.round(r.height);
+        filter.setAttribute('width', w);
+        filter.setAttribute('height', h);
+        var bild = filter.querySelector('feImage');
+        if (bild) { bild.setAttribute('width', w); bild.setAttribute('height', h); }
+      }
+    };
+    lege(false);
+    requestAnimationFrame(function () { s.classList.add('bereit'); });
+    new MutationObserver(function () { lege(true); }).observe(s, {
+      attributes: true, subtree: true, attributeFilter: ['aria-selected', 'aria-current']
+    });
+    window.addEventListener('resize', function () { lege(false); });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { lege(false); });
+
+    var links = s.querySelectorAll('a[href]');
+    for (var i = 0; i < links.length; i++) {
+      links[i].addEventListener('click', function (e) {
+        if (e.metaKey || e.ctrlKey || e.shiftKey || this.getAttribute('aria-current')) return;
+        var alt = s.querySelector('[aria-current]');
+        if (alt) alt.removeAttribute('aria-current');
+        this.setAttribute('aria-current', 'page');
+      });
+    }
+
+    var untersuche = function () {
+      var r = s.getBoundingClientRect();
+      var unter = document.elementsFromPoint ? document.elementsFromPoint(r.left + r.width / 2, r.top + r.height / 2) : [];
+      var bild = false;
+      for (var j = 0; j < unter.length; j++) {
+        if (s.contains(unter[j])) continue;
+        bild = !!(unter[j].closest && unter[j].closest(bildartig));
+        break;
+      }
+      s.setAttribute('data-unter', bild ? 'bild' : 'flaeche');
+    };
+    var still = null, angefragt = false;
+    window.addEventListener('scroll', function () {
+      s.classList.add('rollt');
+      clearTimeout(still);
+      still = setTimeout(function () { s.classList.remove('rollt'); }, 180);
+      if (angefragt) return;
+      angefragt = true;
+      requestAnimationFrame(function () { angefragt = false; untersuche(); });
+    }, { passive: true });
+    untersuche();
+  });
+})();
+
+/* KI-SEITE, SCHNITTE 7 BIS 9 (Pitch 9, Entwurf 10). Die Leiter der Modelle:
+   aus #ki-modelle-daten eine senkrechte Linie mit den Pillen abwechselnd
+   links und rechts (unter 700 px alle rechts); ein roter Punkt faellt mit
+   dem Scrollen, jede erreichte Stufe erscheint. Ohne JS bleibt die Liste.
+   Die Rubrikleiste erscheint, sobald der Kopf vorbei ist. */
+(function () {
+  var still = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  var NS = 'http://www.w3.org/2000/svg';
+  function mk(eltern, n, a, t) {
+    var e = document.createElementNS(NS, n);
+    for (var k in a) e.setAttribute(k, a[k]);
+    if (t != null) e.textContent = t;
+    eltern.appendChild(e);
+    return e;
+  }
+  [].forEach.call(document.querySelectorAll('.ki-ansage'), function (ansage) {
+    if (!('IntersectionObserver' in window)) return ansage.classList.add('da');
+    new IntersectionObserver(function (e, o) {
+      if (e[0].isIntersecting) { ansage.classList.add('da'); o.disconnect(); }
+    }, { threshold: 0.4 }).observe(ansage);
+  });
+
+  var daten = document.getElementById('ki-modelle-daten');
+  var M = daten ? JSON.parse(daten.textContent) : [];
+  var band = document.getElementById('modelle');
+  if (M.length && band) {
+    var liste = band.querySelector('.ki-rang');
+    var svg = document.createElementNS(NS, 'svg');
+    svg.id = 'ki-leiter';
+    svg.setAttribute('role', 'img');
+    svg.setAttribute('aria-label', 'Die ' + M.length + ' stärksten KI-Modelle, von Platz 1 abwärts');
+    liste.parentNode.insertBefore(svg, liste);
+    band.classList.add('ki-modelle--leiter');
+    var cs = getComputedStyle(band);
+    var c = function (v) { return cs.getPropertyValue(v).trim(); };
+    var WEISS = c('--bildtext'), LINIE = c('--sp-linie'), T2 = c('--sp-text-2'), GRUND = c('--sp-netz'), ROT = c('--red');
+    var punkt, spur, stufen = [], H = 1, Y0 = 0, Y1 = 0, akt = 0, ziel = 0, laeuft = false;
+    var schritt = function () {
+      var d = ziel - akt;
+      akt += still ? d : d * 0.14;
+      if (Math.abs(d) < 0.5) akt = ziel;
+      punkt.setAttribute('cy', akt);
+      spur.setAttribute('y2', akt);
+      stufen.forEach(function (st) {
+        var an = akt >= st.y - 2;
+        if (an === st.da) return;
+        st.da = an;
+        st.g.classList.toggle('da', an);
+        if (!still) st.l.style.strokeDashoffset = an ? 0 : st.len;
+      });
+      if (akt !== ziel) requestAnimationFrame(schritt); else laeuft = false;
+    };
+    var rechne = function () {
+      var r = svg.getBoundingClientRect(), s = r.height / H;
+      ziel = still ? Y1 : Math.max(Y0, Math.min(Y1, (innerHeight * 0.8 - r.top) / s));
+      if (still) schritt();
+      else if (!laeuft) { laeuft = true; requestAnimationFrame(schritt); }
+    };
+    var baue = function () {
+      while (svg.firstChild) svg.removeChild(svg.firstChild);
+      stufen = [];
+      var W = svg.parentNode.clientWidth, eng = W < 700;
+      var F = eng ? 15 : 19, PH = eng ? 36 : 44, AX = eng ? 34 : W / 2, AB = eng ? 52 : 56, Y = eng ? 40 : 50;
+      H = Y + M.length * AB + 10; Y0 = 10; Y1 = H - 10;
+      svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+      svg.setAttribute('height', H);
+      mk(svg, 'line', { x1: AX, x2: AX, y1: Y0, y2: Y1, stroke: LINIE, 'stroke-width': 1.3 });
+      spur = mk(svg, 'line', { x1: AX, x2: AX, y1: Y0, y2: Y0, stroke: WEISS, 'stroke-width': 1.6 });
+      M.forEach(function (m, i) {
+        var y = Y + i * AB, s = eng || i % 2 ? 1 : -1, eins = i === 0;
+        var g = mk(svg, 'g', { class: 'ki-stufe' });
+        var t = mk(g, 'text', { class: 'ki-stufe-name', 'font-size': eins ? F * 1.25 : F, fill: eins ? GRUND : WEISS, 'font-weight': eins ? 600 : 500 }, m.name);
+        var ph = eins ? PH * 1.2 : PH, mark = ph * 0.42, w = t.getComputedTextLength() + ph + mark * 0.5 + 10;
+        var x0 = s > 0 ? AX + (eng ? 26 : 90) : AX - 90 - w;
+        g.insertBefore(mk(g, 'rect', { x: x0, y: y - ph / 2, width: w, height: ph, rx: ph / 2, fill: eins ? WEISS : GRUND, stroke: WEISS, 'stroke-width': 1.3 }), t);
+        var p = mk(g, 'circle', { class: 'ki-stufe-punkt', cx: x0 + ph * 0.55, cy: y, r: mark * 0.42, stroke: eins ? 'none' : WEISS, 'stroke-width': 0.8 });
+        p.style.fill = 'var(' + m.farbe + ')';
+        t.setAttribute('x', x0 + ph * 0.55 + mark * 0.5 + 10);
+        t.setAttribute('y', y + F * 0.36 * (eins ? 1.25 : 1));
+        mk(svg, 'text', { x: eng ? AX - 12 : AX - s * 14, y: y + 5, 'text-anchor': eng || s > 0 ? 'end' : 'start', 'font-size': 13, fill: T2, 'font-variant-numeric': 'tabular-nums' }, m.platz);
+        var ende = s > 0 ? x0 : x0 + w, mitte = AX + (ende - AX) * 0.5;
+        var l = mk(svg, 'path', { d: 'M' + AX + ' ' + y + ' C ' + mitte + ' ' + y + ' ' + mitte + ' ' + y + ' ' + ende + ' ' + y, fill: 'none', stroke: WEISS, 'stroke-width': 1.2 });
+        var len = l.getTotalLength();
+        l.style.strokeDasharray = len;
+        l.style.strokeDashoffset = still ? 0 : len;
+        if (!still) l.style.transition = 'stroke-dashoffset .7s cubic-bezier(.6,.1,.2,1)';
+        mk(svg, 'circle', { cx: AX, cy: y, r: 4, fill: WEISS });
+        stufen.push({ y: y, g: g, l: l, len: len, da: false });
+      });
+      punkt = mk(svg, 'circle', { class: 'ki-leiter-punkt', cx: AX, cy: Y0, r: 7, fill: ROT });
+      akt = still ? Y1 : Y0;
+      rechne();
+    };
+    addEventListener('scroll', rechne, { passive: true });
+    var zg;
+    addEventListener('resize', function () { clearTimeout(zg); zg = setTimeout(baue, 150); });
+    baue();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(baue);
+  }
+
+  /* Schnitt 9: die Linie der Fahrt zeichnet sich mit dem Scrollen, der
+     rote Punkt laeuft mit, jede erreichte Station poppt auf. Ohne JS steht
+     alles fertig im HTML. Unter 700 px groessere Schrift, hoehere viewBox. */
+  var weg = document.querySelector('#verstehen .ki-fahrt-weg');
+  if (weg) {
+    var bild = weg.ownerSVGElement, L = weg.getTotalLength();
+    var zuege = [].map.call(bild.querySelectorAll('.ki-zug'), function (g) {
+      return { g: g, an: +g.getAttribute('data-an'), anker: g.getAttribute('data-anker') };
+    });
+    var fpunkt = bild.querySelector('.ki-fahrt-punkt');
+    var lege = function () {
+      var FS = bild.parentNode.clientWidth < 700 ? 46 : 24;
+      bild.setAttribute('viewBox', FS > 30 ? '0 -60 1000 340' : '0 0 1000 260');
+      zuege.forEach(function (z) {
+        var p = weg.getPointAtLength(L * z.an), t = z.g.querySelector('text'), r = z.g.querySelector('rect'), k = z.g.querySelector('circle');
+        t.setAttribute('font-size', FS);
+        t.setAttribute('x', p.x);
+        t.setAttribute('y', p.y - FS * 1.25);
+        var tw = t.getComputedTextLength() + FS * 1.2;
+        var x = z.anker === 'start' ? p.x - FS * 0.6 : z.anker === 'end' ? p.x - tw + FS * 0.6 : p.x - tw / 2;
+        [['x', x], ['y', p.y - FS * 2.5], ['width', tw], ['height', FS * 1.8], ['rx', FS * 0.9]].forEach(function (a) { r.setAttribute(a[0], a[1]); });
+        k.setAttribute('cx', p.x);
+        k.setAttribute('cy', p.y);
+      });
+    };
+    var setze = function (u) {
+      weg.style.strokeDashoffset = L * (1 - u);
+      var p = weg.getPointAtLength(L * u);
+      fpunkt.setAttribute('cx', p.x);
+      fpunkt.setAttribute('cy', p.y);
+      zuege.forEach(function (z) { z.g.classList.toggle('weg', u < z.an - 0.01); });
+    };
+    var fakt = still ? 1 : 0, fziel = fakt, flaeuft = false;
+    var fschritt = function () {
+      var d = fziel - fakt;
+      fakt += d * 0.12;
+      if (Math.abs(d) < 0.001) fakt = fziel;
+      setze(fakt);
+      if (fakt !== fziel) requestAnimationFrame(fschritt); else flaeuft = false;
+    };
+    var frechne = function () {
+      var r = bild.getBoundingClientRect();
+      fziel = still ? 1 : Math.max(0, Math.min(1, (innerHeight * 0.9 - r.top) / (innerHeight * 0.55)));
+      if (!flaeuft) { flaeuft = true; requestAnimationFrame(fschritt); }
+    };
+    weg.style.strokeDasharray = L;
+    lege();
+    setze(fakt);
+    addEventListener('scroll', frechne, { passive: true });
+    addEventListener('resize', lege);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(lege);
+    frechne();
+  }
+
+  var rub = document.getElementById('ki-rubriken'), kopf = document.querySelector('.ki-auftakt');
+  if (!rub || !kopf) return;
+  var links = rub.querySelectorAll('a');
+  var ziele = [].map.call(links, function (a) { return document.querySelector(a.getAttribute('href')); });
+  var geplant = false;
+  function lage() {
+    geplant = false;
+    rub.classList.toggle('da', kopf.getBoundingClientRect().bottom < innerHeight * 0.75);
+    var i = -1;
+    ziele.forEach(function (z, j) { if (z && z.getBoundingClientRect().top < innerHeight * 0.45) i = j; });
+    [].forEach.call(links, function (a, j) { a.classList.toggle('an', i === j); });
+  }
+  addEventListener('scroll', function () {
+    if (!geplant) { geplant = true; requestAnimationFrame(lage); }
+  }, { passive: true });
+  lage();
+})();
+
+/* KI-SEITE, SCHNITT 13 (Pitch 9, Entwurf 10). Muster-Prompts: ein Thema auf
+   einmal. Die Daten liest das Skript aus den <details> des HTML (ohne JS
+   stehen alle Themen untereinander); links die Titel des Themas, rechts das
+   Panel mit „Kopieren“, unter 860 px steht das Panel unter dem Titel. */
+(function () {
+  var abschnitt = document.getElementById('prompts');
+  var raster = abschnitt && abschnitt.querySelector('.ki-p-raster');
+  if (!raster) return;
+  var reiter = abschnitt.querySelectorAll('.ki-p-themen a');
+  var P = [].map.call(raster.querySelectorAll('.ki-p-gruppe'), function (g) {
+    return [].map.call(g.querySelectorAll('details'), function (d) {
+      return [d.querySelector('summary').textContent, d.querySelector('pre').textContent];
+    });
+  });
+  raster.innerHTML = '';
+  raster.classList.add('ki-p-raster--an');
+  var liste = document.createElement('div');
+  liste.className = 'ki-p-liste';
+  var panel = document.createElement('div');
+  panel.className = 'ki-p-panel';
+  panel.innerHTML = '<div class="ki-p-kopf"><b class="ki-p-name"></b>' +
+    '<button type="button" class="ki-p-kopieren">Kopieren</button></div><pre class="ki-p-text"></pre>';
+  raster.appendChild(liste);
+  raster.appendChild(panel);
+  var schmal = window.matchMedia('(max-width:860px)'), akt = null, aktKnopf = null;
+  function lege() { if (schmal.matches && aktKnopf) aktKnopf.after(panel); else raster.appendChild(panel); }
+  function zeige(b, p) {
+    akt = p; aktKnopf = b;
+    panel.querySelector('.ki-p-name').textContent = p[0];
+    panel.querySelector('.ki-p-text').textContent = p[1];
+    [].forEach.call(liste.querySelectorAll('.ki-p-titel'), function (e) { e.classList.toggle('an', e === b); });
+    lege();
+  }
+  function thema(gi) {
+    [].forEach.call(reiter, function (t, i) {
+      t.classList.toggle('an', i === gi);
+      if (i === gi) t.setAttribute('aria-current', 'true'); else t.removeAttribute('aria-current');
+    });
+    raster.appendChild(panel);
+    liste.innerHTML = '';
+    var erst = null;
+    P[gi].forEach(function (p) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'ki-p-titel'; b.textContent = p[0];
+      b.addEventListener('click', function () { zeige(b, p); });
+      liste.appendChild(b);
+      if (!erst) erst = [b, p];
+    });
+    zeige(erst[0], erst[1]);
+  }
+  [].forEach.call(reiter, function (a, i) {
+    a.addEventListener('click', function (e) { e.preventDefault(); thema(i); });
+  });
+  if (schmal.addEventListener) schmal.addEventListener('change', lege);
+  thema(0);
+  var k = panel.querySelector('.ki-p-kopieren');
+  function ok() {
+    k.textContent = 'Kopiert'; k.classList.add('ok');
+    setTimeout(function () { k.textContent = 'Kopieren'; k.classList.remove('ok'); }, 1600);
+  }
+  function ersatz() {
+    var f = document.createElement('textarea');
+    f.value = akt[1]; f.setAttribute('readonly', ''); f.style.position = 'fixed'; f.style.opacity = '0';
+    document.body.appendChild(f); f.select();
+    var gut = false;
+    try { gut = document.execCommand('copy'); } catch (e) { gut = false; }
+    f.remove();
+    if (gut) ok();
+  }
+  k.addEventListener('click', function () {
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(akt[1]).then(ok, ersatz);
+    else ersatz();
   });
 })();
