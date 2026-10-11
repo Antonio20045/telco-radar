@@ -65,7 +65,7 @@ def rangliste(modelle: list[dict], aa: list[dict], arena: list[dict]) -> list[di
     for zeile in aa:
         name = grundname(zeile["name"])
         index[name] = max(index.get(name, zeile["index"]), zeile["index"])
-    platz_arena = {}
+    platz_arena: dict[str, int] = {}
     for zeile in arena:
         platz_arena.setdefault(zeile["name"], zeile["platz"])
     gemeinsam = []
@@ -96,7 +96,7 @@ def rangliste(modelle: list[dict], aa: list[dict], arena: list[dict]) -> list[di
 def lade(state_dir: Path) -> dict:
     """Der Store; fehlt er, ist nichts abgerufen. Einziger Einstieg für report/."""
     pfad = Path(state_dir) / STORE_NAME
-    leer = {"stand": None, "top": [], "quellen": {}}
+    leer: dict = {"stand": None, "top": [], "quellen": {}}
     if not pfad.exists():
         return leer
     try:

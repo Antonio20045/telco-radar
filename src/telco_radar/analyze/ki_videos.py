@@ -49,7 +49,7 @@ def saeubere(titel: str) -> str:
 def lade(state_dir: Path) -> dict:
     """Der Store; fehlt er, ist nichts abgerufen. Einziger Einstieg für report/."""
     pfad = Path(state_dir) / STORE_NAME
-    leer = {"stand": None, "videos": [], "kanaele": {}, "error": None}
+    leer: dict = {"stand": None, "videos": [], "kanaele": {}, "error": None}
     if not pfad.exists():
         return leer
     try:
