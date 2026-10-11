@@ -273,7 +273,7 @@ def abschnitte(items: list[dict], chrome: dict) -> list[dict]:
     ein Eintrag still verschwindet."""
     titel = chrome.get("abschnitte") or {}
     reihe = list(titel)
-    aus = {k: [] for k in reihe}
+    aus: dict[str, list[dict]] = {k: [] for k in reihe}
     for it in items:
         aus[it["bereich"] if it["bereich"] in aus else reihe[0]].append(it)
     return [{"titel": titel[k], "items": aus[k]} for k in reihe if aus[k]]
