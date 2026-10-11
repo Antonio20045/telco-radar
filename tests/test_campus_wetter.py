@@ -134,6 +134,8 @@ def test_die_szene_folgt_uhrzeit_und_wetter_am_campus(
 
 
 def test_die_sonne_steht_mittags_im_sommer_hoeher_als_im_winter(chromium, site):
+    """Düsseldorf liegt auf 51,2 Grad Nord: mittags rund 62 Grad zur Sommer- und
+    15 Grad zur Wintersonnenwende."""
     _, adresse = site
     hoehen = {}
     for datum in ("2026-06-21", "2026-12-21"):
@@ -145,7 +147,6 @@ def test_die_sonne_steht_mittags_im_sommer_hoeher_als_im_winter(chromium, site):
             assert himmel.get_attribute("data-jahreszeit") == erwartet
         finally:
             seite.context.close()
-    # Duesseldorf, 51,2 Grad Nord: rund 62 Grad zur Sommer-, 15 zur Wintersonnenwende
     assert 58 <= hoehen["2026-06-21"] <= 66
     assert 11 <= hoehen["2026-12-21"] <= 19
 

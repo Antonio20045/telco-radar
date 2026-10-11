@@ -14,6 +14,12 @@ liest nur die fertigen Dateien. Es braucht ``opencv-python`` und ``numpy``,
 die nicht zu den Laufzeitabhängigkeiten gehören.
 
     python scripts/campus_szene_bauen.py <foto.png>
+
+Feste Stellen im Foto (Pixel bei 2400 px Breite): ``LOGO`` bleibt immer wie im
+Foto; das ``LINKES_GEBAEUDE`` hat glatte Glasflächen, die wie Himmel aussehen;
+Laub gibt es nur in den ``LAUB_RECHTECKE``n, außerhalb ist Grünstich Glas oder
+Fassade; im ``HORIZONT_STREIFEN`` über den Bäumen rechts (x0, y0, x1, y1) ist
+alles Helle Himmel, denn Laub ist dort dunkel.
 """
 
 from __future__ import annotations
@@ -30,15 +36,11 @@ FOTO = VORLAGEN / "bilder" / "campus-turm.jpg"
 MASKE = VORLAGEN / "campus" / "campus-maske.png"
 MASKE_KLEIN = VORLAGEN / "campus" / "campus-maske-1200.png"
 
-# Das Logo (Mitte und Radius in Pixeln bei 2400 px Breite) bleibt immer wie im Foto.
 LOGO = (1206, 252, 54)
-# Linkes Bürogebäude: seine glatten Glasflächen sehen aus wie Himmel.
 LINKES_GEBAEUDE = [(0, 0), (15, 0), (350, 400), (460, 500), (556, 650), (528, 780),
                    (508, 840), (472, 905), (472, 1340), (0, 1340)]
-# Wo Laub steht; außerhalb davon ist Grünstich Glas oder Fassade.
 LAUB_RECHTECKE = [((1760, 600), (2400, 1340)), ((0, 1120), (2400, 1340)), ((430, 980), (780, 1180))]
 FOYER = ((770, 1020), (1690, 1185))
-# Streifen über den Bäumen rechts (x0, y0, x1, y1), in dem Wolkenreste hängen bleiben.
 HORIZONT_STREIFEN = (1772, 690, 2400, 1012)
 
 
@@ -102,7 +104,6 @@ def himmel(bild: np.ndarray) -> np.ndarray:
     xx = np.mgrid[0:h, 0:w][1]
     horizont = (lb > 50) & (kante < 12) & (y * h < 1010) & (xx > 1650)
     maske = _wachse(maske, horizont, 200)
-    # Helle Wolkenstreifen über den Bäumen rechts: alles Helle dort ist Himmel, Laub ist dunkel.
     hell_rgb = 0.2126 * rot + 0.7152 * gruen + 0.0722 * blau
     streifen = (xx >= HORIZONT_STREIFEN[0]) & (xx < HORIZONT_STREIFEN[2])
     streifen &= (y * h >= HORIZONT_STREIFEN[1]) & (y * h < HORIZONT_STREIFEN[3])
