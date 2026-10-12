@@ -1,0 +1,23 @@
+{
+ "preise_gesamt": 3,
+ "preise": [
+  {
+   "pfad": "#tariff-cards-container > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2)",
+   "text": "99 €/Mon.",
+   "kontext": "59 , 99 €/Mon.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#tariff-cards-container > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2)",
+   "text": "99 €/Mon.",
+   "kontext": "44 , 99 €/Mon.",
+   "sichtbar": true
+  },
+  {
+   "pfad": "#tariff-cards-container > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > ul:nth-of-type(1) > li:nth-of-type(1) > span:nth-of-type(1)",
+   "text": "Flexibel nach 24 Monaten: Jederzeit neues Handy wählen und Altgerät zurückschicken. Oder Vertrag kündigen und Altgerät gegen einmalig 360,– € behalten.",
+   "kontext": "Flexibel nach 24 Monaten: Jederzeit neues Handy wählen und Altgerät zurückschicken. Oder Vertrag kündigen und Altgerät gegen einmalig 360,– € behalten.",
+   "sichtbar": true
+  }
+ ]
+}

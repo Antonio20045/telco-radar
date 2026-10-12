@@ -1,0 +1,152 @@
+{
+ "einwilligung": {
+  "geklickt": "Nur erforderliche",
+  "ruhe": true,
+  "anfragen": [
+   {
+    "nummer": 173,
+    "methode": "GET",
+    "url": "https://tags-eu.tiqcdn.com/utag/telekom/oneshop-eu/prod/utag.123.js?utv=ut4.54.202610091229",
+    "art": "script",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 174,
+    "methode": "POST",
+    "url": "https://www2.telekom.de/lib-custom/es",
+    "art": "xhr",
+    "status": null,
+    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+   },
+   {
+    "nummer": 175,
+    "methode": "GET",
+    "url": "https://www.telekom.de/opt-in/set.php?consent=[Cookie entfernt]",
+    "art": "xhr",
+    "status": 200,
+    "abbruch": null
+   },
+   {
+    "nummer": 176,
+    "methode": "GET",
+    "url": "https://ext.telekom.de/js/exactag.js",
+    "art": "script",
+    "status": null,
+    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+   },
+   {
+    "nummer": 177,
+    "methode": "POST",
+    "url": "https://www2.telekom.de/lib-custom/es",
+    "art": "xhr",
+    "status": null,
+    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+   },
+   {
+    "nummer": 178,
+    "methode": "POST",
+    "url": "https://bf72977jfz.bf.dynatrace.com/bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&cy=event&bc=3570939799&co=snappy&si=[Cookie entfernt]&st=1791808634515&ss=0&qc=3071432206&end=1",
+    "art": "fetch",
+    "status": null,
+    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+   },
+   {
+    "nummer": 179,
+    "methode": "GET",
+    "url": "https://bf72977jfz.bf.dynatrace.com/bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=3841586883&end=1",
+    "art": "fetch",
+    "status": null,
+    "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+   }
+  ]
+ },
+ "vermerk": null,
+ "proben": [
+  {
+   "gruppe": 29,
+   "art": "speicher",
+   "pfad": "#dyt_productViewDesktop > div:nth-of-type(1) > section:nth-of-type(2) > article:nth-of-type(1) > section:nth-of-type(2) > div:nth-of-type(1) > section:nth-of-type(2) > section:nth-of-type(1) > div:nth-of-type(2) > button:nth-of-type(1)",
+   "text": "512 GB + 250 €",
+   "wert": null,
+   "fehler": null,
+   "navigiert": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-512-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=26.9&instalmentId=36&changedAttr%255B%255D=changedAttr.storage%253D512_GB",
+   "umleitung": null,
+   "ruhe": true,
+   "anfragen": [
+    {
+     "nummer": 180,
+     "methode": "POST",
+     "url": "https://www2.telekom.de/lib-custom/es",
+     "art": "xhr",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 181,
+     "methode": "POST",
+     "url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+     "art": "xhr",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 182,
+     "methode": "POST",
+     "url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/selected/snippet",
+     "art": "xhr",
+     "status": 200,
+     "abbruch": null
+    },
+    {
+     "nummer": 183,
+     "methode": "GET",
+     "url": "https://s3.eu-central-1.amazonaws.com/dtdl-eshop-sales-catalog-sylius-prod/de/cvS8fwMLaiQQvYPvqv7hKo1dXF3FnT.png",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 184,
+     "methode": "POST",
+     "url": "https://bf72977jfz.bf.dynatrace.com/bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&cy=event&bc=1010398570&co=snappy&si=[Cookie entfernt]&st=1791808636933&ss=0&qc=3841039418&end=1",
+     "art": "fetch",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 185,
+     "methode": "GET",
+     "url": "https://pix.telekom.de/196380495960676/wt?p=453%2Cwww.telekom.de.privatkunden.oneshop.mobilfunk.eg-detail.apple-iphone-17-pro-256gb-tiefblau.magentamobil-m%2C1%2C1280x900%2C24%2C1%2C1791808626855%2C0%2C1280x900%2C0&nc=1&ba=apple+iphone+17+pro+256gb+tiefblau%3Bmagentamobil+m&qn=1%3B1&st=view&la=en&cg1=www.telekom.de&cg2=oneshop&cg3=mobilfunk&cg4=eg-detail&cg5=apple-iphone-17-pro-256gb-tiefblau&cg6=magentamobil-m&cg8=privatkunden&cg9=magentamobil-m&cg10=product.individual&cg14=sales&cg15=mobilfunk&cp11=oneshop-eu&cp30=false%7CAnalytics%3D0%7CMarketing%3D0%7CSocial%3D0%7CUtiq%3D0&cp44=pk-mf-sales&cp54=not-logged-in&cp125=nein&cb1=OS000&cb2=mf_99936839%3Bmf_17791&cb3=mf_99936839%3Bmf_17791&cb25=endgeraet%3Bcontract-voice-data-standard&cb31=apple+iphone+17+pro%3Bmagentamobil+m&cb38=magentamobil+m%3Bapple+iphone+17+pro+256gb+tiefblau&cb39=hardware%3Bvertrag-anschluss&cb41=A123&cb49=mf&cb70=tiefblau%3B&cb71=256+gb%3B&cb72=apple%3Btelekom&cb73=%3B&cb81=apple+iphone+17+pro+256gb+tiefblau%3Bmagentamobil+m&cb82=view&cb131=neugeschaeft&cs1=nicht-bestandskunde&cs3=pk&cs27=false%7CAnalytics%3D0%7CMarketing%3D0%7CSocial%3D0%7CUtiq%3D0&np=&pu=https%3A%2F%2Fwww.telekom.de%2Fshop%2Fgeraet%2Fapple%2Fapple-iphone-17-pro%2Ftiefblau-256-gb%3FtariffId%3DMF_17791%26categoryId%3Dsmartphones%26forwardTradeInApplied%3Dfalse%26tariffCategoryId%3Dsmartphone-tarife%26installmentValue%3D26.9%26instalmentId%3D36",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 186,
+     "methode": "GET",
+     "url": "https://pix.telekom.de/316202539684123/wt?p=453%2Cwww.telekom.de.privatkunden.oneshop.mobilfunk.eg-detail.apple-iphone-17-pro-256gb-tiefblau.magentamobil-m%2C1%2C1280x900%2C24%2C1%2C1791808626859%2C0%2C1280x900%2C0&nc=1&ba=apple+iphone+17+pro+256gb+tiefblau%3Bmagentamobil+m&qn=1%3B1&st=view&la=en&cg1=www.telekom.de&cg2=oneshop&cg3=mobilfunk&cg4=eg-detail&cg5=apple-iphone-17-pro-256gb-tiefblau&cg6=magentamobil-m&cg8=privatkunden&cg9=magentamobil-m&cg10=product.individual&cg14=sales&cg15=mobilfunk&cp11=oneshop-eu&cp54=not-logged-in&cp125=nein&cb1=OS000&cb2=mf_99936839%3Bmf_17791&cb3=mf_99936839%3Bmf_17791&cb25=endgeraet%3Bcontract-voice-data-standard&cb31=apple+iphone+17+pro%3Bmagentamobil+m&cb38=magentamobil+m%3Bapple+iphone+17+pro+256gb+tiefblau&cb39=hardware%3Bvertrag-anschluss&cb41=A123&cb49=mf&cb70=tiefblau%3B&cb71=256+gb%3B&cb72=apple%3Btelekom&cb73=%3B&cb81=apple+iphone+17+pro+256gb+tiefblau%3Bmagentamobil+m&cb82=view&cb131=neugeschaeft&cs1=nicht-bestandskunde&cs3=pk&np=&pu=https%3A%2F%2Fwww.telekom.de%2Fshop%2Fgeraet%2Fapple%2Fapple-iphone-17-pro%2Ftiefblau-256-gb%3FtariffId%3DMF_17791%26categoryId%3Dsmartphones%26forwardTradeInApplied%3Dfalse%26tariffCategoryId%3Dsmartphone-tarife%26installmentValue%3D26.9%26instalmentId%3D36",
+     "art": "image",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 187,
+     "methode": "GET",
+     "url": "https://bf72977jfz.bf.dynatrace.com/bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=3841586883&end=1",
+     "art": "fetch",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+     "nummer": 188,
+     "methode": "POST",
+     "url": "https://www2.telekom.de/lib-custom/es",
+     "art": "xhr",
+     "status": null,
+     "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    }
+   ]
+  }
+ ]
+}

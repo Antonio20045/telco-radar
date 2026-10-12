@@ -1,0 +1,437 @@
+{
+ "karte": "1und1.yaml",
+ "anbieter": "1&1",
+ "adresse": "https://mobile.1und1.de[Cookie entfernt]",
+ "status": "gelesen",
+ "grund": null,
+ "bot_schutz": false,
+ "http_status": 200,
+ "hoechste_kombinationen": 12,
+ "belege": "nicht archiviert (kein Konto)",
+ "zaehlung": {
+  "kombinationen": 4,
+  "erfasst": 4,
+  "nicht_angeboten": 0,
+  "nicht_erfasst": 0,
+  "befund": 0,
+  "nicht_besucht": 0,
+  "verworfen": 11,
+  "gescheitert": 0
+ },
+ "struktur": {
+  "knoepfe_gesucht": 5,
+  "knoepfe_gefunden": 5,
+  "felder_gesucht": 28,
+  "felder_gefunden": 6,
+  "anteil_knoepfe": 1.0,
+  "anteil_felder": 0.21428571428571427
+ },
+ "gefunden": {
+  "knoepfe": {
+   "speicher": {
+    "selektor": "#hwd-configuration-section label.variant-chooser__tile:has(input[name$=\".storage\"])",
+    "werte": [
+     "256",
+     "512"
+    ]
+   },
+   "tarif": {
+    "selektor": null,
+    "werte": [
+     "tariff-anf-s-mvl"
+    ]
+   },
+   "laufzeit": {
+    "selektor": "#tariff-cards-container > div > div:has(add-to-cart-button)",
+    "werte": [
+     "24",
+     "24+12"
+    ]
+   }
+  },
+  "zusammenfassung": "#tariff-cards-container > div > div:has(add-to-cart-button)",
+  "felder": {
+   "anzahlung": {
+    "text": 0,
+    "antwort": 0
+   },
+   "rate": {
+    "text": 0,
+    "antwort": 0
+   },
+   "ratenzahl": {
+    "text": 0,
+    "antwort": 0
+   },
+   "tarifphasen": {
+    "text": 0,
+    "antwort": 0
+   },
+   "tarifbindung": {
+    "text": 0,
+    "antwort": 0
+   },
+   "anschluss": {
+    "text": 0,
+    "antwort": 0
+   },
+   "volumen_gb": {
+    "text": 0,
+    "antwort": 0
+   },
+   "buendelbetrag": {
+    "text": 4,
+    "antwort": 4
+   },
+   "einmalzahlung": {
+    "text": 2,
+    "antwort": 4
+   }
+  }
+ },
+ "kombinationen": [
+  {
+   "auswahl": {
+    "speicher": "256",
+    "tarif": "tariff-anf-s-mvl",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "256",
+    "tarif": "tariff-anf-s-mvl",
+    "laufzeit": 24
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": null,
+    "rate": null,
+    "ratenzahl": null,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_text": {
+    "anzahlung": null,
+    "rate": null,
+    "ratenzahl": null,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_antwort": {
+    "anzahlung": null,
+    "rate": null,
+    "ratenzahl": null,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "buendel": {
+    "buendelbetrag": 59.99,
+    "einmalzahlung": null
+   },
+   "echo": {
+    "befunde": [],
+    "luecken": [
+     "anzahlung",
+     "tarifphasen",
+     "tarifbindung",
+     "anschluss",
+     "volumen_gb",
+     "einmalzahlung"
+    ]
+   },
+   "text": "24 Monate\n59,99\n€/Mon.\nDAUERHAFT\nInkl. 1&1 All-Net-Flat S, iPhone 17 Pro\nWeiter",
+   "antwort_url": "https://mobile.1und1.de[Cookie entfernt]",
+   "beleg_status": "offen"
+  },
+  {
+   "auswahl": {
+    "speicher": "256",
+    "tarif": "tariff-anf-s-mvl",
+    "laufzeit": "24+12"
+   },
+   "variante": {
+    "speicher": "256",
+    "tarif": "tariff-anf-s-mvl",
+    "laufzeit": 36
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": null,
+    "rate": null,
+    "ratenzahl": null,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_text": {
+    "anzahlung": null,
+    "rate": null,
+    "ratenzahl": null,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_antwort": {
+    "anzahlung": null,
+    "rate": null,
+    "ratenzahl": null,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "buendel": {
+    "buendelbetrag": 44.99,
+    "einmalzahlung": 360.0
+   },
+   "echo": {
+    "befunde": [],
+    "luecken": [
+     "anzahlung",
+     "tarifphasen",
+     "tarifbindung",
+     "anschluss",
+     "volumen_gb"
+    ]
+   },
+   "text": "EMPFEHLUNG: GÜNSTIG & FLEXIBEL\n24 + 12 Monate  \n44,99\n€/Mon.\nDAUERHAFT\nInkl. 1&1 All-Net-Flat S, iPhone 17 Pro\nFlexibel nach 24 Monaten: Jederzeit neues Handy wählen und Altgerät zurückschicken. Oder Vertrag kündigen und Altgerät gegen einmalig 360,– € behalten.\nAlternativ nach 36 Monaten: Vertrag ab jetzt ohne Einmalzahlung und ohne Rückgabe des Altgeräts kündbar.\nWeiter",
+   "antwort_url": "https://mobile.1und1.de[Cookie entfernt]",
+   "beleg_status": "offen"
+  },
+  {
+   "auswahl": {
+    "speicher": "512",
+    "tarif": "tariff-anf-s-mvl",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "512",
+    "tarif": "tariff-anf-s-mvl",
+    "laufzeit": 24
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": null,
+    "rate": null,
+    "ratenzahl": null,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_text": {
+    "anzahlung": null,
+    "rate": null,
+    "ratenzahl": null,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_antwort": {
+    "anzahlung": null,
+    "rate": null,
+    "ratenzahl": null,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "buendel": {
+    "buendelbetrag": 69.99,
+    "einmalzahlung": null
+   },
+   "echo": {
+    "befunde": [],
+    "luecken": [
+     "anzahlung",
+     "tarifphasen",
+     "tarifbindung",
+     "anschluss",
+     "volumen_gb",
+     "einmalzahlung"
+    ]
+   },
+   "text": "24 Monate\n69,99\n€/Mon.\nDAUERHAFT\nInkl. 1&1 All-Net-Flat S, iPhone 17 Pro\nWeiter",
+   "antwort_url": "https://mobile.1und1.de[Cookie entfernt]?color=COSMIC_ORANGE&size=512",
+   "beleg_status": "offen"
+  },
+  {
+   "auswahl": {
+    "speicher": "512",
+    "tarif": "tariff-anf-s-mvl",
+    "laufzeit": "24+12"
+   },
+   "variante": {
+    "speicher": "512",
+    "tarif": "tariff-anf-s-mvl",
+    "laufzeit": 36
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": null,
+    "rate": null,
+    "ratenzahl": null,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_text": {
+    "anzahlung": null,
+    "rate": null,
+    "ratenzahl": null,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "werte_antwort": {
+    "anzahlung": null,
+    "rate": null,
+    "ratenzahl": null,
+    "tarifphasen": null,
+    "tarifbindung": null,
+    "anschluss": null,
+    "volumen_gb": null
+   },
+   "buendel": {
+    "buendelbetrag": 51.99,
+    "einmalzahlung": 450.0
+   },
+   "echo": {
+    "befunde": [],
+    "luecken": [
+     "anzahlung",
+     "tarifphasen",
+     "tarifbindung",
+     "anschluss",
+     "volumen_gb"
+    ]
+   },
+   "text": "EMPFEHLUNG: GÜNSTIG & FLEXIBEL\n24 + 12 Monate  \n51,99\n€/Mon.\nDAUERHAFT\nInkl. 1&1 All-Net-Flat S, iPhone 17 Pro\nFlexibel nach 24 Monaten: Jederzeit neues Handy wählen und Altgerät zurückschicken. Oder Vertrag kündigen und Altgerät gegen einmalig 450,– € behalten.\nAlternativ nach 36 Monaten: Vertrag ab jetzt ohne Einmalzahlung und ohne Rückgabe des Altgeräts kündbar.\nWeiter",
+   "antwort_url": "https://mobile.1und1.de[Cookie entfernt]?color=COSMIC_ORANGE&size=512",
+   "beleg_status": "offen"
+  }
+ ],
+ "verworfen": [
+  {
+   "url": "https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920",
+   "grund": "ReadTimeout: The read operation timed out"
+  },
+  {
+   "url": "https://cdn.appdynamics.com/adrum-xd.b5670ee02cea89158a710705f2152002.html",
+   "grund": "robots.txt nicht lesbar (HTTP 403)"
+  },
+  {
+   "url": "https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920",
+   "grund": "ReadTimeout: The read operation timed out"
+  },
+  {
+   "url": "https://api.1und1.de/genesys/channelroutingservice/request/productline",
+   "grund": "nach dem Weiter-Klick nur GET und HEAD"
+  },
+  {
+   "url": "https://cdn.appdynamics.com/adrum-xd.b5670ee02cea89158a710705f2152002.html",
+   "grund": "robots.txt nicht lesbar (HTTP 403)"
+  },
+  {
+   "url": "https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920",
+   "grund": "ReadTimeout: The read operation timed out"
+  },
+  {
+   "url": "https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920",
+   "grund": "ReadTimeout: The read operation timed out"
+  },
+  {
+   "url": "https://cdn.appdynamics.com/adrum-xd.b5670ee02cea89158a710705f2152002.html",
+   "grund": "robots.txt nicht lesbar (HTTP 403)"
+  },
+  {
+   "url": "https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920",
+   "grund": "ReadTimeout: The read operation timed out"
+  },
+  {
+   "url": "https://api.1und1.de/genesys/channelroutingservice/request/productline",
+   "grund": "nach dem Weiter-Klick nur GET und HEAD"
+  },
+  {
+   "url": "https://cdn.appdynamics.com/adrum-xd.b5670ee02cea89158a710705f2152002.html",
+   "grund": "robots.txt nicht lesbar (HTTP 403)"
+  }
+ ],
+ "gescheitert": [],
+ "hilfsdateien": [
+  {
+   "url": "https://content.1und1.de/ctx/dh/libt.min.js?bust=2026101212",
+   "art": "script",
+   "grund": "robots.txt nicht lesbar (HTTP 403)"
+  },
+  {
+   "url": "https://cdn.appdynamics.com/adrum/adrum-latest.js",
+   "art": "script",
+   "grund": "robots.txt nicht lesbar (HTTP 403)"
+  },
+  {
+   "url": "https://cdn.appdynamics.com/adrum-ext.b5670ee02cea89158a710705f2152002.js",
+   "art": "script",
+   "grund": "robots.txt nicht lesbar (HTTP 403)"
+  },
+  {
+   "url": "https://content.1und1.de/ctx/dh/libt.min.js?bust=2026101212",
+   "art": "script",
+   "grund": "robots.txt nicht lesbar (HTTP 403)"
+  },
+  {
+   "url": "https://cdn.appdynamics.com/adrum/adrum-latest.js",
+   "art": "script",
+   "grund": "robots.txt nicht lesbar (HTTP 403)"
+  },
+  {
+   "url": "https://cdn.appdynamics.com/adrum-ext.b5670ee02cea89158a710705f2152002.js",
+   "art": "script",
+   "grund": "robots.txt nicht lesbar (HTTP 403)"
+  },
+  {
+   "url": "https://content.1und1.de/ctx/dh/libt.min.js?bust=2026101212",
+   "art": "script",
+   "grund": "robots.txt nicht lesbar (HTTP 403)"
+  },
+  {
+   "url": "https://cdn.appdynamics.com/adrum/adrum-latest.js",
+   "art": "script",
+   "grund": "robots.txt nicht lesbar (HTTP 403)"
+  },
+  {
+   "url": "https://cdn.appdynamics.com/adrum-ext.b5670ee02cea89158a710705f2152002.js",
+   "art": "script",
+   "grund": "robots.txt nicht lesbar (HTTP 403)"
+  },
+  {
+   "url": "https://content.1und1.de/ctx/dh/libt.min.js?bust=2026101212",
+   "art": "script",
+   "grund": "robots.txt nicht lesbar (HTTP 403)"
+  },
+  {
+   "url": "https://cdn.appdynamics.com/adrum/adrum-latest.js",
+   "art": "script",
+   "grund": "robots.txt nicht lesbar (HTTP 403)"
+  },
+  {
+   "url": "https://cdn.appdynamics.com/adrum-ext.b5670ee02cea89158a710705f2152002.js",
+   "art": "script",
+   "grund": "robots.txt nicht lesbar (HTTP 403)"
+  }
+ ]
+}

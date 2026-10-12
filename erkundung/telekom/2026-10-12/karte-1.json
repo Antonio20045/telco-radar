@@ -1,0 +1,999 @@
+{
+ "karte": "telekom.yaml",
+ "anbieter": "Telekom",
+ "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false",
+ "status": "gelesen",
+ "grund": null,
+ "bot_schutz": false,
+ "http_status": 200,
+ "hoechste_kombinationen": 12,
+ "belege": "nicht archiviert (kein Konto)",
+ "zaehlung": {
+  "kombinationen": 9,
+  "erfasst": 9,
+  "nicht_angeboten": 0,
+  "nicht_erfasst": 0,
+  "befund": 0,
+  "nicht_besucht": 0,
+  "verworfen": 50,
+  "gescheitert": 0
+ },
+ "struktur": {
+  "knoepfe_gesucht": 54,
+  "knoepfe_gefunden": 54,
+  "felder_gesucht": 63,
+  "felder_gefunden": 54,
+  "anteil_knoepfe": 1.0,
+  "anteil_felder": 0.8571428571428571
+ },
+ "gefunden": {
+  "knoepfe": {
+   "speicher": {
+    "selektor": "#dyt_productViewDesktop button.dt_filterChips[role=\"radio\"][aria-label$=\" GB\"], #dyt_productViewDesktop button.dt_filterChips[role=\"radio\"][aria-label$=\" TB\"]",
+    "werte": [
+     "256 GB",
+     "512 GB",
+     "1 TB"
+    ]
+   },
+   "tarif": {
+    "selektor": "#step1 button.accordion-header",
+    "werte": [
+     "MagentaMobil M"
+    ]
+   },
+   "laufzeit": {
+    "selektor": "#dyt_productViewDesktop button.dt_filterChips[role=\"radio\"][aria-label*=\" Monate\"]",
+    "werte": [
+     "36",
+     "24",
+     "12"
+    ]
+   }
+  },
+  "zusammenfassung": "#main-content > section:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1) > aside:nth-of-type(1) > div:nth-of-type(2), #step1",
+  "felder": {
+   "anzahlung": {
+    "text": 9,
+    "antwort": 9
+   },
+   "rate": {
+    "text": 9,
+    "antwort": 9
+   },
+   "ratenzahl": {
+    "text": 9,
+    "antwort": 9
+   },
+   "tarifphasen": {
+    "text": 9,
+    "antwort": 9
+   },
+   "tarifbindung": {
+    "text": 0,
+    "antwort": 0
+   },
+   "anschluss": {
+    "text": 9,
+    "antwort": 9
+   },
+   "volumen_gb": {
+    "text": 9,
+    "antwort": 9
+   }
+  }
+ },
+ "kombinationen": [
+  {
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "MagentaMobil M",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "MagentaMobil M",
+    "laufzeit": 36
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 99.0,
+    "rate": 26.9,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      49.95
+     ]
+    ],
+    "tarifbindung": null,
+    "anschluss": 39.95,
+    "volumen_gb": 50.0
+   },
+   "werte_text": {
+    "anzahlung": 99.0,
+    "rate": 26.9,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      49.95
+     ]
+    ],
+    "tarifbindung": null,
+    "anschluss": 39.95,
+    "volumen_gb": 50.0
+   },
+   "werte_antwort": {
+    "anzahlung": 99.0,
+    "rate": 26.9,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      49.95
+     ]
+    ],
+    "tarifbindung": null,
+    "anschluss": 39.95,
+    "volumen_gb": 50.0
+   },
+   "buendel": null,
+   "echo": {
+    "befunde": [],
+    "luecken": [
+     "tarifbindung"
+    ]
+   },
+   "text": "EINMALIGE ZAHLUNG\n138,95 €\ninkl. Bereitstellung 39,95 €\nGESAMTPREIS MONATLICH\n76,85 €\nMonatlich\nIn den Warenkorb\n\nPreisübersicht anzeigen\nUNSERE EMPFEHLUNG\n50 GB\nMagentaMobil M\n49,95 €\nzzgl. 39,95 € ⌀ pro Karte einmalig\nTarif ändern\nTarif entfernen",
+   "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=26.9&instalmentId=36",
+   "beleg_status": "offen"
+  },
+  {
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "MagentaMobil M",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "MagentaMobil M",
+    "laufzeit": 24
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 99.0,
+    "rate": 40.4,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      49.95
+     ]
+    ],
+    "tarifbindung": null,
+    "anschluss": 39.95,
+    "volumen_gb": 50.0
+   },
+   "werte_text": {
+    "anzahlung": 99.0,
+    "rate": 40.4,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      49.95
+     ]
+    ],
+    "tarifbindung": null,
+    "anschluss": 39.95,
+    "volumen_gb": 50.0
+   },
+   "werte_antwort": {
+    "anzahlung": 99.0,
+    "rate": 40.4,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      49.95
+     ]
+    ],
+    "tarifbindung": null,
+    "anschluss": 39.95,
+    "volumen_gb": 50.0
+   },
+   "buendel": null,
+   "echo": {
+    "befunde": [],
+    "luecken": [
+     "tarifbindung"
+    ]
+   },
+   "text": "EINMALIGE ZAHLUNG\n138,95 €\ninkl. Bereitstellung 39,95 €\nGESAMTPREIS MONATLICH\n90,35 €\nMonatlich\nIn den Warenkorb\n\nPreisübersicht anzeigen\nUNSERE EMPFEHLUNG\n50 GB\nMagentaMobil M\n49,95 €\nzzgl. 39,95 € ⌀ pro Karte einmalig\nTarif ändern\nTarif entfernen",
+   "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=40.4&instalmentId=24",
+   "beleg_status": "offen"
+  },
+  {
+   "auswahl": {
+    "speicher": "256 GB",
+    "tarif": "MagentaMobil M",
+    "laufzeit": "12"
+   },
+   "variante": {
+    "speicher": "256 GB",
+    "tarif": "MagentaMobil M",
+    "laufzeit": 12
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 99.0,
+    "rate": 80.8,
+    "ratenzahl": 12,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      49.95
+     ]
+    ],
+    "tarifbindung": null,
+    "anschluss": 39.95,
+    "volumen_gb": 50.0
+   },
+   "werte_text": {
+    "anzahlung": 99.0,
+    "rate": 80.8,
+    "ratenzahl": 12,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      49.95
+     ]
+    ],
+    "tarifbindung": null,
+    "anschluss": 39.95,
+    "volumen_gb": 50.0
+   },
+   "werte_antwort": {
+    "anzahlung": 99.0,
+    "rate": 80.8,
+    "ratenzahl": 12,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      49.95
+     ]
+    ],
+    "tarifbindung": null,
+    "anschluss": 39.95,
+    "volumen_gb": 50.0
+   },
+   "buendel": null,
+   "echo": {
+    "befunde": [],
+    "luecken": [
+     "tarifbindung"
+    ]
+   },
+   "text": "EINMALIGE ZAHLUNG\n138,95 €\ninkl. Bereitstellung 39,95 €\nGESAMTPREIS MONATLICH\n130,75 €\nMonatlich\nIn den Warenkorb\n\nPreisübersicht anzeigen\nUNSERE EMPFEHLUNG\n50 GB\nMagentaMobil M\n49,95 €\nzzgl. 39,95 € ⌀ pro Karte einmalig\nTarif ändern\nTarif entfernen",
+   "antwort_url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=80.8&instalmentId=12",
+   "beleg_status": "offen"
+  },
+  {
+   "auswahl": {
+    "speicher": "512 GB",
+    "tarif": "MagentaMobil M",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "512 GB",
+    "tarif": "MagentaMobil M",
+    "laufzeit": 36
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 199.0,
+    "rate": 30.8,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      49.95
+     ]
+    ],
+    "tarifbindung": null,
+    "anschluss": 39.95,
+    "volumen_gb": 50.0
+   },
+   "werte_text": {
+    "anzahlung": 199.0,
+    "rate": 30.8,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      49.95
+     ]
+    ],
+    "tarifbindung": null,
+    "anschluss": 39.95,
+    "volumen_gb": 50.0
+   },
+   "werte_antwort": {
+    "anzahlung": 199.0,
+    "rate": 30.8,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      49.95
+     ]
+    ],
+    "tarifbindung": null,
+    "anschluss": 39.95,
+    "volumen_gb": 50.0
+   },
+   "buendel": null,
+   "echo": {
+    "befunde": [],
+    "luecken": [
+     "tarifbindung"
+    ]
+   },
+   "text": "EINMALIGE ZAHLUNG\n238,95 €\ninkl. Bereitstellung 39,95 €\nGESAMTPREIS MONATLICH\n80,75 €\nMonatlich\nIn den Warenkorb\n\nPreisübersicht anzeigen\nUNSERE EMPFEHLUNG\n50 GB\nMagentaMobil M\n49,95 €\nzzgl. 39,95 € ⌀ pro Karte einmalig\nTarif ändern\nTarif entfernen",
+   "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+   "beleg_status": "offen"
+  },
+  {
+   "auswahl": {
+    "speicher": "512 GB",
+    "tarif": "MagentaMobil M",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "512 GB",
+    "tarif": "MagentaMobil M",
+    "laufzeit": 24
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 199.0,
+    "rate": 46.2,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      49.95
+     ]
+    ],
+    "tarifbindung": null,
+    "anschluss": 39.95,
+    "volumen_gb": 50.0
+   },
+   "werte_text": {
+    "anzahlung": 199.0,
+    "rate": 46.2,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      49.95
+     ]
+    ],
+    "tarifbindung": null,
+    "anschluss": 39.95,
+    "volumen_gb": 50.0
+   },
+   "werte_antwort": {
+    "anzahlung": 199.0,
+    "rate": 46.2,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      49.95
+     ]
+    ],
+    "tarifbindung": null,
+    "anschluss": 39.95,
+    "volumen_gb": 50.0
+   },
+   "buendel": null,
+   "echo": {
+    "befunde": [],
+    "luecken": [
+     "tarifbindung"
+    ]
+   },
+   "text": "EINMALIGE ZAHLUNG\n238,95 €\ninkl. Bereitstellung 39,95 €\nGESAMTPREIS MONATLICH\n96,15 €\nMonatlich\nIn den Warenkorb\n\nPreisübersicht anzeigen\nUNSERE EMPFEHLUNG\n50 GB\nMagentaMobil M\n49,95 €\nzzgl. 39,95 € ⌀ pro Karte einmalig\nTarif ändern\nTarif entfernen",
+   "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+   "beleg_status": "offen"
+  },
+  {
+   "auswahl": {
+    "speicher": "512 GB",
+    "tarif": "MagentaMobil M",
+    "laufzeit": "12"
+   },
+   "variante": {
+    "speicher": "512 GB",
+    "tarif": "MagentaMobil M",
+    "laufzeit": 12
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 199.0,
+    "rate": 92.5,
+    "ratenzahl": 12,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      49.95
+     ]
+    ],
+    "tarifbindung": null,
+    "anschluss": 39.95,
+    "volumen_gb": 50.0
+   },
+   "werte_text": {
+    "anzahlung": 199.0,
+    "rate": 92.5,
+    "ratenzahl": 12,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      49.95
+     ]
+    ],
+    "tarifbindung": null,
+    "anschluss": 39.95,
+    "volumen_gb": 50.0
+   },
+   "werte_antwort": {
+    "anzahlung": 199.0,
+    "rate": 92.5,
+    "ratenzahl": 12,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      49.95
+     ]
+    ],
+    "tarifbindung": null,
+    "anschluss": 39.95,
+    "volumen_gb": 50.0
+   },
+   "buendel": null,
+   "echo": {
+    "befunde": [],
+    "luecken": [
+     "tarifbindung"
+    ]
+   },
+   "text": "EINMALIGE ZAHLUNG\n238,95 €\ninkl. Bereitstellung 39,95 €\nGESAMTPREIS MONATLICH\n142,45 €\nMonatlich\nIn den Warenkorb\n\nPreisübersicht anzeigen\nUNSERE EMPFEHLUNG\n50 GB\nMagentaMobil M\n49,95 €\nzzgl. 39,95 € ⌀ pro Karte einmalig\nTarif ändern\nTarif entfernen",
+   "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+   "beleg_status": "offen"
+  },
+  {
+   "auswahl": {
+    "speicher": "1 TB",
+    "tarif": "MagentaMobil M",
+    "laufzeit": "36"
+   },
+   "variante": {
+    "speicher": "1 TB",
+    "tarif": "MagentaMobil M",
+    "laufzeit": 36
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 299.0,
+    "rate": 34.7,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      49.95
+     ]
+    ],
+    "tarifbindung": null,
+    "anschluss": 39.95,
+    "volumen_gb": 50.0
+   },
+   "werte_text": {
+    "anzahlung": 299.0,
+    "rate": 34.7,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      49.95
+     ]
+    ],
+    "tarifbindung": null,
+    "anschluss": 39.95,
+    "volumen_gb": 50.0
+   },
+   "werte_antwort": {
+    "anzahlung": 299.0,
+    "rate": 34.7,
+    "ratenzahl": 36,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      49.95
+     ]
+    ],
+    "tarifbindung": null,
+    "anschluss": 39.95,
+    "volumen_gb": 50.0
+   },
+   "buendel": null,
+   "echo": {
+    "befunde": [],
+    "luecken": [
+     "tarifbindung"
+    ]
+   },
+   "text": "EINMALIGE ZAHLUNG\n338,95 €\ninkl. Bereitstellung 39,95 €\nGESAMTPREIS MONATLICH\n84,65 €\nMonatlich\nIn den Warenkorb\n\nPreisübersicht anzeigen\nUNSERE EMPFEHLUNG\n50 GB\nMagentaMobil M\n49,95 €\nzzgl. 39,95 € ⌀ pro Karte einmalig\nTarif ändern\nTarif entfernen",
+   "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+   "beleg_status": "offen"
+  },
+  {
+   "auswahl": {
+    "speicher": "1 TB",
+    "tarif": "MagentaMobil M",
+    "laufzeit": "24"
+   },
+   "variante": {
+    "speicher": "1 TB",
+    "tarif": "MagentaMobil M",
+    "laufzeit": 24
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 299.0,
+    "rate": 52.0,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      49.95
+     ]
+    ],
+    "tarifbindung": null,
+    "anschluss": 39.95,
+    "volumen_gb": 50.0
+   },
+   "werte_text": {
+    "anzahlung": 299.0,
+    "rate": 52.0,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      49.95
+     ]
+    ],
+    "tarifbindung": null,
+    "anschluss": 39.95,
+    "volumen_gb": 50.0
+   },
+   "werte_antwort": {
+    "anzahlung": 299.0,
+    "rate": 52.0,
+    "ratenzahl": 24,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      49.95
+     ]
+    ],
+    "tarifbindung": null,
+    "anschluss": 39.95,
+    "volumen_gb": 50.0
+   },
+   "buendel": null,
+   "echo": {
+    "befunde": [],
+    "luecken": [
+     "tarifbindung"
+    ]
+   },
+   "text": "EINMALIGE ZAHLUNG\n338,95 €\ninkl. Bereitstellung 39,95 €\nGESAMTPREIS MONATLICH\n101,95 €\nMonatlich\nIn den Warenkorb\n\nPreisübersicht anzeigen\nUNSERE EMPFEHLUNG\n50 GB\nMagentaMobil M\n49,95 €\nzzgl. 39,95 € ⌀ pro Karte einmalig\nTarif ändern\nTarif entfernen",
+   "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+   "beleg_status": "offen"
+  },
+  {
+   "auswahl": {
+    "speicher": "1 TB",
+    "tarif": "MagentaMobil M",
+    "laufzeit": "12"
+   },
+   "variante": {
+    "speicher": "1 TB",
+    "tarif": "MagentaMobil M",
+    "laufzeit": 12
+   },
+   "status": "erfasst",
+   "grund": null,
+   "werte": {
+    "anzahlung": 299.0,
+    "rate": 104.1,
+    "ratenzahl": 12,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      49.95
+     ]
+    ],
+    "tarifbindung": null,
+    "anschluss": 39.95,
+    "volumen_gb": 50.0
+   },
+   "werte_text": {
+    "anzahlung": 299.0,
+    "rate": 104.1,
+    "ratenzahl": 12,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      49.95
+     ]
+    ],
+    "tarifbindung": null,
+    "anschluss": 39.95,
+    "volumen_gb": 50.0
+   },
+   "werte_antwort": {
+    "anzahlung": 299.0,
+    "rate": 104.1,
+    "ratenzahl": 12,
+    "tarifphasen": [
+     [
+      1,
+      null,
+      49.95
+     ]
+    ],
+    "tarifbindung": null,
+    "anschluss": 39.95,
+    "volumen_gb": 50.0
+   },
+   "buendel": null,
+   "echo": {
+    "befunde": [],
+    "luecken": [
+     "tarifbindung"
+    ]
+   },
+   "text": "EINMALIGE ZAHLUNG\n338,95 €\ninkl. Bereitstellung 39,95 €\nGESAMTPREIS MONATLICH\n154,05 €\nMonatlich\nIn den Warenkorb\n\nPreisübersicht anzeigen\nUNSERE EMPFEHLUNG\n50 GB\nMagentaMobil M\n49,95 €\nzzgl. 39,95 € ⌀ pro Karte einmalig\nTarif ändern\nTarif entfernen",
+   "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
+   "beleg_status": "offen"
+  }
+ ],
+ "verworfen": [
+  {
+   "url": "https://www2.telekom.de/forward/ablyft-cdn/s/55651514.js",
+   "grund": "per robots.txt gesperrt: /forward/ablyft-cdn/s/55651514.js"
+  },
+  {
+   "url": "https://bf72977jfz.bf.dynatrace.com/bf?type=js3&sn=v_4_srv_-2D12123_sn_SGNP9JCQEOTBE6553V84VJKK8E66JHVP&svrid=-12123&flavor=cors&vi=BRUUQMOROURRTJCNEUPLEUPARKRAVRPK-0&modifiedSince=1791528588609&bp=3&app=b05c2f3edf669fad&crc=2402595165&en=p9vvb6ny&end=1",
+   "grund": "per robots.txt gesperrt: /bf?type=js3&sn=v_4_srv_-2D12123_sn_SGNP9JCQEOTBE6553V84VJKK8E66JHVP&svrid=-12123&flavor=cors&vi=BRUUQMOROURRTJCNEUPLEUPARKRAVRPK-0&modifiedSince=1791528588609&bp=3&app=b05c2f3edf669fad&crc=2402595165&en=p9vvb6ny&end=1"
+  },
+  {
+   "url": "https://bf72977jfz.bf.dynatrace.com/bf?type=js3&sn=v_4_srv_-2D12123_sn_SGNP9JCQEOTBE6553V84VJKK8E66JHVP&svrid=-12123&flavor=cors&vi=BRUUQMOROURRTJCNEUPLEUPARKRAVRPK-0&modifiedSince=1791528588609&bp=3&app=b05c2f3edf669fad&crc=2034485438&en=p9vvb6ny&end=1",
+   "grund": "per robots.txt gesperrt: /bf?type=js3&sn=v_4_srv_-2D12123_sn_SGNP9JCQEOTBE6553V84VJKK8E66JHVP&svrid=-12123&flavor=cors&vi=BRUUQMOROURRTJCNEUPLEUPARKRAVRPK-0&modifiedSince=1791528588609&bp=3&app=b05c2f3edf669fad&crc=2034485438&en=p9vvb6ny&end=1"
+  },
+  {
+   "url": "https://cms-cdn.yo-digital.com/cdn/ONmYZUYiGdfBtYy4l1ejqUHZg2VwIpwN/en/web-strings.json",
+   "grund": "per robots.txt gesperrt: /cdn/ONmYZUYiGdfBtYy4l1ejqUHZg2VwIpwN/en/web-strings.json"
+  },
+  {
+   "url": "https://bf72977jfz.bf.dynatrace.com/bf?type=js3&sn=v_4_srv_-2D12123_sn_SGNP9JCQEOTBE6553V84VJKK8E66JHVP&svrid=-12123&flavor=cors&vi=BRUUQMOROURRTJCNEUPLEUPARKRAVRPK-0&modifiedSince=1791528588609&bp=3&app=b05c2f3edf669fad&crc=2961069867&en=p9vvb6ny&end=1",
+   "grund": "per robots.txt gesperrt: /bf?type=js3&sn=v_4_srv_-2D12123_sn_SGNP9JCQEOTBE6553V84VJKK8E66JHVP&svrid=-12123&flavor=cors&vi=BRUUQMOROURRTJCNEUPLEUPARKRAVRPK-0&modifiedSince=1791528588609&bp=3&app=b05c2f3edf669fad&crc=2961069867&en=p9vvb6ny&end=1"
+  },
+  {
+   "url": "https://bf72977jfz.bf.dynatrace.com/bf?type=js3&sn=v_4_srv_-2D12123_sn_SGNP9JCQEOTBE6553V84VJKK8E66JHVP&svrid=-12123&flavor=cors&vi=BRUUQMOROURRTJCNEUPLEUPARKRAVRPK-0&modifiedSince=1791528588609&bp=3&app=b05c2f3edf669fad&crc=3615929347&en=p9vvb6ny&end=1",
+   "grund": "per robots.txt gesperrt: /bf?type=js3&sn=v_4_srv_-2D12123_sn_SGNP9JCQEOTBE6553V84VJKK8E66JHVP&svrid=-12123&flavor=cors&vi=BRUUQMOROURRTJCNEUPLEUPARKRAVRPK-0&modifiedSince=1791528588609&bp=3&app=b05c2f3edf669fad&crc=3615929347&en=p9vvb6ny&end=1"
+  },
+  {
+   "url": "https://www2.telekom.de/lib-custom/es",
+   "grund": "per robots.txt gesperrt: /lib-custom/es"
+  },
+  {
+   "url": "https://www2.telekom.de/lib-custom/es",
+   "grund": "per robots.txt gesperrt: /lib-custom/es"
+  },
+  {
+   "url": "https://gallery-content.binkies3d.com/maps/kxRQOYWn/r0eq8631/content-map.json",
+   "grund": "robots.txt nicht lesbar (HTTP 400)"
+  },
+  {
+   "url": "https://gallery-content.binkies3d.com/maps/kxRQOYWn/r0eq8631/content-map.json",
+   "grund": "robots.txt nicht lesbar (HTTP 400)"
+  },
+  {
+   "url": "https://gallery-content.binkies3d.com/maps/kxRQOYWn/r0eq8631/content-map.json",
+   "grund": "robots.txt nicht lesbar (HTTP 400)"
+  },
+  {
+   "url": "https://pix.telekom.de/196380495960676/cc?a=c&c=wteid_196380495960676&rn_wteid_196380495960676=wt3_eid&v=&cp=%2F&cd=180&ccl=180&w=3",
+   "grund": "per robots.txt gesperrt: /196380495960676/cc?a=c&c=wteid_196380495960676&rn_wteid_196380495960676=wt3_eid&v=&cp=/&cd=180&ccl=180&w=3"
+  },
+  {
+   "url": "https://binkiesproductionweu.servicebus.windows.net/binkiesproductionp2weu/messages",
+   "grund": "robots.txt nicht lesbar (HTTP 401)"
+  },
+  {
+   "url": "https://binkiesproductionweu.servicebus.windows.net/binkiesproductionp2weu/messages",
+   "grund": "robots.txt nicht lesbar (HTTP 401)"
+  },
+  {
+   "url": "https://bf72977jfz.bf.dynatrace.com/bf?sc=0&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&cy=event&bc=4266908925&co=snappy&si=[Cookie entfernt]&st=1791808801645&ss=0&qc=3280767005&end=1",
+   "grund": "per robots.txt gesperrt: /bf?sc=0&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&cy=event&bc=4266908925&co=snappy&si=[Cookie entfernt]&st=1791808801645&ss=0&qc=3280767005&end=1"
+  },
+  {
+   "url": "https://binkiesproductionweu.servicebus.windows.net/binkiesproductionp2weu/messages",
+   "grund": "robots.txt nicht lesbar (HTTP 401)"
+  },
+  {
+   "url": "https://bf72977jfz.bf.dynatrace.com/bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=1937247226&end=1",
+   "grund": "per robots.txt gesperrt: /bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=1937247226&end=1"
+  },
+  {
+   "url": "https://pix.telekom.de/196380495960676/cc?a=c&c=wteid_196380495960676&rn_wteid_196380495960676=wt3_eid&v=&cp=%2F&cd=180&ccl=180&w=3",
+   "grund": "per robots.txt gesperrt: /196380495960676/cc?a=c&c=wteid_196380495960676&rn_wteid_196380495960676=wt3_eid&v=&cp=/&cd=180&ccl=180&w=3"
+  },
+  {
+   "url": "https://cms-cdn.yo-digital.com/campaign/api/v2/de/fetchCampaigns",
+   "grund": "per robots.txt gesperrt: /campaign/api/v2/de/fetchCampaigns"
+  },
+  {
+   "url": "https://bf72977jfz.bf.dynatrace.com/bf?sc=3&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&cy=event&bc=1392822222&co=snappy&si=[Cookie entfernt]&st=1791808802441&ss=0&qc=1472555857&end=1",
+   "grund": "per robots.txt gesperrt: /bf?sc=3&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&cy=event&bc=1392822222&co=snappy&si=[Cookie entfernt]&st=1791808802441&ss=0&qc=1472555857&end=1"
+  },
+  {
+   "url": "https://bf72977jfz.bf.dynatrace.com/bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=2761591714&end=1",
+   "grund": "per robots.txt gesperrt: /bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=2761591714&end=1"
+  },
+  {
+   "url": "https://bf72977jfz.bf.dynatrace.com/bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&cy=event&bc=4150005114&co=snappy&si=[Cookie entfernt]&st=1791808803683&ss=0&qc=2006585054&end=1",
+   "grund": "per robots.txt gesperrt: /bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&cy=event&bc=4150005114&co=snappy&si=[Cookie entfernt]&st=1791808803683&ss=0&qc=2006585054&end=1"
+  },
+  {
+   "url": "https://bf72977jfz.bf.dynatrace.com/bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=2761591714&end=1",
+   "grund": "per robots.txt gesperrt: /bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=2761591714&end=1"
+  },
+  {
+   "url": "https://www2.telekom.de/lib-custom/es",
+   "grund": "per robots.txt gesperrt: /lib-custom/es"
+  },
+  {
+   "url": "https://ext.telekom.de/js/exactag.js",
+   "grund": "per robots.txt gesperrt: /js/exactag.js"
+  },
+  {
+   "url": "https://www2.telekom.de/lib-custom/es",
+   "grund": "per robots.txt gesperrt: /lib-custom/es"
+  },
+  {
+   "url": "https://bf72977jfz.bf.dynatrace.com/bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&cy=event&bc=2697921412&co=snappy&si=[Cookie entfernt]&st=1791808806226&ss=0&qc=3039832945&end=1",
+   "grund": "per robots.txt gesperrt: /bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&cy=event&bc=2697921412&co=snappy&si=[Cookie entfernt]&st=1791808806226&ss=0&qc=3039832945&end=1"
+  },
+  {
+   "url": "https://bf72977jfz.bf.dynatrace.com/bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=2761591714&end=1",
+   "grund": "per robots.txt gesperrt: /bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=2761591714&end=1"
+  },
+  {
+   "url": "https://www2.telekom.de/lib-custom/es",
+   "grund": "per robots.txt gesperrt: /lib-custom/es"
+  },
+  {
+   "url": "https://www2.telekom.de/lib-custom/es",
+   "grund": "per robots.txt gesperrt: /lib-custom/es"
+  },
+  {
+   "url": "https://bf72977jfz.bf.dynatrace.com/bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&cy=event&bc=363749941&co=snappy&si=[Cookie entfernt]&st=1791808808984&ss=0&qc=2128633623&end=1",
+   "grund": "per robots.txt gesperrt: /bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&cy=event&bc=363749941&co=snappy&si=[Cookie entfernt]&st=1791808808984&ss=0&qc=2128633623&end=1"
+  },
+  {
+   "url": "https://bf72977jfz.bf.dynatrace.com/bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=2761591714&end=1",
+   "grund": "per robots.txt gesperrt: /bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=2761591714&end=1"
+  },
+  {
+   "url": "https://www2.telekom.de/lib-custom/es",
+   "grund": "per robots.txt gesperrt: /lib-custom/es"
+  },
+  {
+   "url": "https://bf72977jfz.bf.dynatrace.com/bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&cy=event&bc=723705976&co=snappy&si=[Cookie entfernt]&st=1791808810985&ss=0&qc=4208595634&end=1",
+   "grund": "per robots.txt gesperrt: /bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&cy=event&bc=723705976&co=snappy&si=[Cookie entfernt]&st=1791808810985&ss=0&qc=4208595634&end=1"
+  },
+  {
+   "url": "https://bf72977jfz.bf.dynatrace.com/bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=2761591714&end=1",
+   "grund": "per robots.txt gesperrt: /bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=2761591714&end=1"
+  },
+  {
+   "url": "https://www2.telekom.de/lib-custom/es",
+   "grund": "per robots.txt gesperrt: /lib-custom/es"
+  },
+  {
+   "url": "https://www2.telekom.de/lib-custom/es",
+   "grund": "per robots.txt gesperrt: /lib-custom/es"
+  },
+  {
+   "url": "https://bf72977jfz.bf.dynatrace.com/bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&cy=event&bc=1292433829&co=snappy&si=[Cookie entfernt]&st=1791808813394&ss=0&qc=4206072748&end=1",
+   "grund": "per robots.txt gesperrt: /bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&cy=event&bc=1292433829&co=snappy&si=[Cookie entfernt]&st=1791808813394&ss=0&qc=4206072748&end=1"
+  },
+  {
+   "url": "https://bf72977jfz.bf.dynatrace.com/bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=2761591714&end=1",
+   "grund": "per robots.txt gesperrt: /bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=2761591714&end=1"
+  },
+  {
+   "url": "https://www2.telekom.de/lib-custom/es",
+   "grund": "per robots.txt gesperrt: /lib-custom/es"
+  },
+  {
+   "url": "https://bf72977jfz.bf.dynatrace.com/bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&cy=event&bc=454452884&co=snappy&si=[Cookie entfernt]&st=1791808815413&ss=0&qc=2310498552&end=1",
+   "grund": "per robots.txt gesperrt: /bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&cy=event&bc=454452884&co=snappy&si=[Cookie entfernt]&st=1791808815413&ss=0&qc=2310498552&end=1"
+  },
+  {
+   "url": "https://bf72977jfz.bf.dynatrace.com/bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=2761591714&end=1",
+   "grund": "per robots.txt gesperrt: /bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=2761591714&end=1"
+  },
+  {
+   "url": "https://www2.telekom.de/lib-custom/es",
+   "grund": "per robots.txt gesperrt: /lib-custom/es"
+  },
+  {
+   "url": "https://www2.telekom.de/lib-custom/es",
+   "grund": "per robots.txt gesperrt: /lib-custom/es"
+  },
+  {
+   "url": "https://bf72977jfz.bf.dynatrace.com/bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&cy=event&bc=1201155554&co=snappy&si=[Cookie entfernt]&st=1791808817514&ss=0&qc=150322742&end=1",
+   "grund": "per robots.txt gesperrt: /bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&cy=event&bc=1201155554&co=snappy&si=[Cookie entfernt]&st=1791808817514&ss=0&qc=150322742&end=1"
+  },
+  {
+   "url": "https://bf72977jfz.bf.dynatrace.com/bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=2761591714&end=1",
+   "grund": "per robots.txt gesperrt: /bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=2761591714&end=1"
+  },
+  {
+   "url": "https://www2.telekom.de/lib-custom/es",
+   "grund": "per robots.txt gesperrt: /lib-custom/es"
+  },
+  {
+   "url": "https://www2.telekom.de/lib-custom/es",
+   "grund": "per robots.txt gesperrt: /lib-custom/es"
+  },
+  {
+   "url": "https://bf72977jfz.bf.dynatrace.com/bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&cy=event&bc=3257731859&co=snappy&si=[Cookie entfernt]&st=1791808820376&ss=0&qc=840681811&end=1",
+   "grund": "per robots.txt gesperrt: /bf?sc=5&ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&cy=event&bc=3257731859&co=snappy&si=[Cookie entfernt]&st=1791808820376&ss=0&qc=840681811&end=1"
+  },
+  {
+   "url": "https://bf72977jfz.bf.dynatrace.com/bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=2761591714&end=1",
+   "grund": "per robots.txt gesperrt: /bf?ty=js&pv=4&ai=b05c2f3edf669fad&en=p9vvb6ny&cr=1791528588609&av=1.347.4&si=[Cookie entfernt]&rc=1&rr=cors&ss=0&qc=2761591714&end=1"
+  }
+ ],
+ "gescheitert": [],
+ "hilfsdateien": [
+  {
+   "url": "https://static.eshop.telekom.de/de/prod/dtdl/new/shop/assets/vendors.ee942fcf.css",
+   "art": "stylesheet",
+   "grund": "robots.txt nicht lesbar (HTTP 403)"
+  },
+  {
+   "url": "https://dtdl-static-natco.eshop.yo-digital.com/assets/de/1159223908086107_css-reset-oneshop-custom-html.css",
+   "art": "stylesheet",
+   "grund": "robots.txt nicht lesbar (HTTP 403)"
+  },
+  {
+   "url": "https://static.eshop.telekom.de/de/prod/dtdl/new/shop/assets/runtime.c816e3ae.js",
+   "art": "script",
+   "grund": "robots.txt nicht lesbar (HTTP 403)"
+  },
+  {
+   "url": "https://dtdl-static-natco.eshop.yo-digital.com/assets/de/1863333833276062_apple-iphone-17-pro-marketing-page-oneshop.css",
+   "art": "stylesheet",
+   "grund": "robots.txt nicht lesbar (HTTP 403)"
+  },
+  {
+   "url": "https://static.eshop.telekom.de/de/prod/dtdl/new/shop/assets/dt-components.72d42471.js",
+   "art": "script",
+   "grund": "robots.txt nicht lesbar (HTTP 403)"
+  },
+  {
+   "url": "https://dtdl-static-natco.eshop.yo-digital.com/assets/de/621327981966859_pdp-marketing-content.css",
+   "art": "stylesheet",
+   "grund": "robots.txt nicht lesbar (HTTP 403)"
+  },
+  {
+   "url": "https://static.eshop.telekom.de/de/prod/dtdl/new/shop/assets/one-ui-library.8dac447e.js",
+   "art": "script",
+   "grund": "robots.txt nicht lesbar (HTTP 403)"
+  },
+  {
+   "url": "https://static.eshop.telekom.de/de/prod/dtdl/new/shop/assets/vendors.ee942fcf.js",
+   "art": "script",
+   "grund": "robots.txt nicht lesbar (HTTP 403)"
+  },
+  {
+   "url": "https://static.eshop.telekom.de/de/prod/dtdl/new/shop/assets/client.e1d8cf85.js",
+   "art": "script",
+   "grund": "robots.txt nicht lesbar (HTTP 403)"
+  },
+  {
+   "url": "https://static.eshop.telekom.de/de/prod/dtdl/new/shop/assets/default-FixedConfiguratorV2-FixedQuickProlongationOrderReview-StreamingOptionConfigurator-fixed-plan-67c35897.76e54fbe.js",
+   "art": "script",
+   "grund": "robots.txt nicht lesbar (HTTP 403)"
+  },
+  {
+   "url": "https://static.eshop.telekom.de/de/prod/dtdl/new/shop/assets/default-ClaimRewardNonLoggedInFlow-RegistrationPage-basket-home-productdetail-productlist.0f9fbc25.js",
+   "art": "script",
+   "grund": "robots.txt nicht lesbar (HTTP 403)"
+  },
+  {
+   "url": "https://static.eshop.telekom.de/de/prod/dtdl/new/shop/assets/default-FixedConfiguratorV2-FixedQuickProlongationOrderReview-fixed-plan-landing-page-v2-productdeta-92520a5a.fb600c00.js",
+   "art": "script",
+   "grund": "robots.txt nicht lesbar (HTTP 403)"
+  },
+  {
+   "url": "https://static.eshop.telekom.de/de/prod/dtdl/new/shop/assets/default-FixedConfigurator-FixedConfiguratorPaymentDetails-FixedTariffPaymentDetails-productdetail-productlist.09d59ae2.js",
+   "art": "script",
+   "grund": "robots.txt nicht lesbar (HTTP 403)"
+  },
+  {
+   "url": "https://static.eshop.telekom.de/de/prod/dtdl/new/shop/assets/productdetail.d6717575.js",
+   "art": "script",
+   "grund": "robots.txt nicht lesbar (HTTP 403)"
+  },
+  {
+   "url": "https://static.eshop.telekom.de/de/prod/dtdl/new/shop/assets/newHeader.f2c966fd.js",
+   "art": "script",
+   "grund": "robots.txt nicht lesbar (HTTP 403)"
+  },
+  {
+   "url": "https://static.eshop.telekom.de/de/prod/dtdl/new/shop/assets/de.d2a3c5f1.js",
+   "art": "script",
+   "grund": "robots.txt nicht lesbar (HTTP 403)"
+  },
+  {
+   "url": "https://static.eshop.telekom.de/de/prod/dtdl/new/shop/assets/vendors-newHeader.ecb31fd1.js",
+   "art": "script",
+   "grund": "robots.txt nicht lesbar (HTTP 403)"
+  }
+ ]
+}

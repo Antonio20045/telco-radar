@@ -1,0 +1,2164 @@
+{
+ "elemente_gesamt": 71,
+ "elemente_gelesen": 71,
+ "gruppen": [
+  {
+   "nummer": 0,
+   "pfad": "body > header:nth-of-type(1) > nav:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1)",
+   "name": null,
+   "art": "tarif",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.5,
+    "farbe": 0.0
+   },
+   "elemente": [
+    0,
+    28
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 1,
+   "pfad": "#tariff-cards-container > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.33,
+    "farbe": 0.0
+   },
+   "elemente": [
+    1,
+    2,
+    3
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 2,
+   "pfad": "#tariff-cards-container > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1)",
+   "name": null,
+   "art": "tarif",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 1.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    4,
+    5
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 3,
+   "pfad": "#tariff-cards-container > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3)",
+   "name": "34 , 99 €/Mon. DAUERHAFT Inkl. 1&1 All-Net-Flat S, Samsung Galaxy S26 und Samsung Galaxy Buds 4",
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    6,
+    7
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 4,
+   "pfad": "body > aside:nth-of-type(2)",
+   "name": "2026-10-12T14:37:34.835",
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    8,
+    39,
+    47
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 5,
+   "pfad": "body > aside:nth-of-type(2) > div:nth-of-type(3)",
+   "name": "Herzlich willkommen bei 1&1!Gerne beraten wir Sie persönlich",
+   "art": "laufzeit",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.5,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    9,
+    10,
+    11,
+    12
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 6,
+   "pfad": "body > aside:nth-of-type(2) > div:nth-of-type(5) > div:nth-of-type(2)",
+   "name": "Kunden-HotlinePersönlicher Kundenservice 0721 / 9600",
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    13,
+    44
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 7,
+   "pfad": "#footer > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    14,
+    48
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 8,
+   "pfad": "#footer > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(2)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    15,
+    49
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 9,
+   "pfad": "#footer > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    16,
+    64
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 10,
+   "pfad": "#footer > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(2)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    17,
+    65
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 11,
+   "pfad": "#footer > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(3)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    18,
+    66
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 12,
+   "pfad": "#footer > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(4)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    19,
+    67
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 13,
+   "pfad": "#footer > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(5)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    20,
+    68
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 14,
+   "pfad": "#footer > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(6)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    21,
+    69
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 15,
+   "pfad": "#rogatorPopupIframe > div:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    22,
+    23,
+    70
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 16,
+   "pfad": "body > ul:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    24,
+    25,
+    26,
+    27
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 17,
+   "pfad": "body > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > ol:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.11,
+    "farbe": 0.0
+   },
+   "elemente": [
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 18,
+   "pfad": "body > aside:nth-of-type(2) > div:nth-of-type(4)",
+   "name": "Beratung & VerkaufKunden-Hotline1ChatChat",
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    40,
+    41
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 19,
+   "pfad": "body > aside:nth-of-type(2) > div:nth-of-type(5)",
+   "name": "Beratung & Verkauf 0721 / 960 6000Anrufen",
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    42,
+    43
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 20,
+   "pfad": "body > aside:nth-of-type(2) > div:nth-of-type(6)",
+   "name": "Beratung & Verkauf 0721 / 960 6000Anrufen",
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    45,
+    46
+   ],
+   "select": false,
+   "mit_marke": false
+  },
+  {
+   "nummer": 21,
+   "pfad": "#footer > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ul:nth-of-type(1)",
+   "name": null,
+   "art": "unbekannt",
+   "anteile": {
+    "speicher": 0.0,
+    "laufzeit": 0.0,
+    "tarif": 0.0,
+    "farbe": 0.0
+   },
+   "elemente": [
+    50,
+    51,
+    52,
+    53,
+    54,
+    55,
+    56,
+    57,
+    58,
+    59,
+    60,
+    61,
+    62,
+    63
+   ],
+   "select": false,
+   "mit_marke": false
+  }
+ ],
+ "elemente": [
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "",
+   "aria": {},
+   "daten": {
+    "data-toggle": "modal-lite",
+    "data-iframe": "https://mobile.1und1.de/DetailsKontakt?area=mobile-ssc-private&lightbox=true",
+    "data-target": "#iframeLightbox"
+   },
+   "id": null,
+   "klassen": [
+    "btn",
+    "btn--tunnel"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "body > header:nth-of-type(1) > nav:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > button:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 0
+  },
+  {
+   "tag": "span",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-label": "Tarifdetails"
+   },
+   "daten": {
+    "data-toggle": "modal-lite",
+    "data-target": "#iframeLightbox",
+    "data-iframe": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-s-mvl&chosenNet=1u1&lightbox=true&bk=false"
+   },
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#tariff-cards-container > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(2) > span:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 1
+  },
+  {
+   "tag": "add-to-cart-button",
+   "rolle": "link",
+   "text": "Weiter",
+   "aria": {},
+   "daten": {
+    "data-linkid": "content_tile :: button :: Weiter mit HW24"
+   },
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#tariff-cards-container > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > add-to-cart-button:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 1
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "Weiter",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "btn",
+    "btn--small"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#tariff-cards-container > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > add-to-cart-button:nth-of-type(1) > button:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 1
+  },
+  {
+   "tag": "span",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-label": "DetailsLaufzeitmodellHandys"
+   },
+   "daten": {
+    "data-bs-placement": "right",
+    "data-toggle": "modal-lite",
+    "data-target": "#iframeLightbox",
+    "data-asterisk-type": "lightbox",
+    "data-icon": "info-round-outline",
+    "data-icon-size": "",
+    "data-icon-color": "",
+    "data-linkid": "",
+    "data-iframe": "https://mobile.1und1.de/DetailsLaufzeitmodellHandys?lightbox=true"
+   },
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#tariff-cards-container > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 2
+  },
+  {
+   "tag": "span",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-label": "Tarifdetails"
+   },
+   "daten": {
+    "data-toggle": "modal-lite",
+    "data-target": "#iframeLightbox",
+    "data-iframe": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-s-mvl&chosenNet=1u1&lightbox=true&bk=false"
+   },
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#tariff-cards-container > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(2) > span:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 2
+  },
+  {
+   "tag": "add-to-cart-button",
+   "rolle": "link",
+   "text": "Weiter",
+   "aria": {},
+   "daten": {
+    "data-linkid": "content_tile :: button :: Weiter mit HW24+12"
+   },
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#tariff-cards-container > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > add-to-cart-button:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 3
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "Weiter",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "btn",
+    "btn--small",
+    "d-block",
+    "ms-auto"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#tariff-cards-container > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > add-to-cart-button:nth-of-type(1) > button:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 3
+  },
+  {
+   "tag": "div",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-label": "Flyout öffnen"
+   },
+   "daten": {
+    "data-linkid": "sticky_right_bottom_nksales-contact :: img :: open_Beratung & Verkauf",
+    "data-linktarget": "samepage",
+    "data-group": "open"
+   },
+   "id": null,
+   "klassen": [
+    "contact-bubble__trigger"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "body > aside:nth-of-type(2) > div:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 4
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "Beratung & Verkauf",
+   "aria": {},
+   "daten": {
+    "data-group": "phone",
+    "data-linkid": "sticky_right_bottom_nksales-contact :: icon :: Beratung & Verkauf",
+    "data-linktarget": "samepage"
+   },
+   "id": null,
+   "klassen": [
+    "contact-bubble__icon-text",
+    "contact-bubble__button--transparent"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "body > aside:nth-of-type(2) > div:nth-of-type(3) > button:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 5
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "Kunden-Hotline",
+   "aria": {},
+   "daten": {
+    "data-group": "user",
+    "data-linkid": "sticky_right_bottom_nksales-contact :: icon :: Kunden-Hotline",
+    "data-linktarget": "samepage"
+   },
+   "id": null,
+   "klassen": [
+    "contact-bubble__icon-text",
+    "contact-bubble__button--transparent"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "body > aside:nth-of-type(2) > div:nth-of-type(3) > button:nth-of-type(2)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 5
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "1Chat",
+   "aria": {},
+   "daten": {
+    "data-group": "chat",
+    "data-linkid": "sticky_right_bottom_nksales-contact :: icon :: Chat",
+    "data-linktarget": "samepage"
+   },
+   "id": null,
+   "klassen": [
+    "contact-bubble__icon-text",
+    "bg-secondary-100",
+    "d-none",
+    "contact-bubble__button--transparent"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "body > aside:nth-of-type(2) > div:nth-of-type(3) > button:nth-of-type(3)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 5
+  },
+  {
+   "tag": "button",
+   "rolle": "button",
+   "text": "Chat",
+   "aria": {},
+   "daten": {
+    "data-group": "chat"
+   },
+   "id": null,
+   "klassen": [
+    "contact-bubble__icon-text",
+    "disabled",
+    "contact-bubble__button--transparent"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "body > aside:nth-of-type(2) > div:nth-of-type(3) > button:nth-of-type(4)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 5
+  },
+  {
+   "tag": "span",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-label": "Mehr Infos"
+   },
+   "daten": {
+    "data-bs-placement": "right",
+    "data-bs-toggle": "popover",
+    "data-asterisk-type": "popover",
+    "data-icon": "info-round-outline",
+    "data-icon-size": "undefined",
+    "data-icon-color": "undefined",
+    "data-bs-title": "<span class=\"popover__close\" role=\"button\" aria-label=\"Fußnote schließen\"><svg class=\"icon\" viewbox=\"0 0 100 100\"><use href=\"#cross\"></use></svg></span>",
+    "data-bs-content": "<div><div>Bei beiden Rufnummern sprechen Sie mit unserem persönlichen Kundenservice.</div></div><div><br></div><div><b>Sie haben die Wahl:</b></div><div>Unter <b><span class='has-placeholder'><%PHONE_"
+   },
+   "id": "no-ai-support-info",
+   "klassen": [
+    "icon-centered"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#no-ai-support-info",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 6
+  },
+  {
+   "tag": "img",
+   "rolle": "img",
+   "text": "",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "img-fluid"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#footer > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(1) > a:nth-of-type(1) > div:nth-of-type(1) > img:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 7
+  },
+  {
+   "tag": "img",
+   "rolle": "img",
+   "text": "",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "img-fluid"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#footer > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(2) > a:nth-of-type(1) > div:nth-of-type(1) > img:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 8
+  },
+  {
+   "tag": "img",
+   "rolle": "img",
+   "text": "",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "img-fluid"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#footer > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(1) > a:nth-of-type(1) > div:nth-of-type(1) > img:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 9
+  },
+  {
+   "tag": "img",
+   "rolle": "img",
+   "text": "",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "img-fluid"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#footer > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(2) > a:nth-of-type(1) > div:nth-of-type(1) > img:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 10
+  },
+  {
+   "tag": "img",
+   "rolle": "img",
+   "text": "",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "img-fluid"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#footer > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(3) > a:nth-of-type(1) > div:nth-of-type(1) > img:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 11
+  },
+  {
+   "tag": "img",
+   "rolle": "img",
+   "text": "",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "img-fluid"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#footer > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(4) > a:nth-of-type(1) > div:nth-of-type(1) > img:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 12
+  },
+  {
+   "tag": "img",
+   "rolle": "img",
+   "text": "",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "img-fluid"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#footer > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(5) > a:nth-of-type(1) > div:nth-of-type(1) > img:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 13
+  },
+  {
+   "tag": "img",
+   "rolle": "img",
+   "text": "",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "img-fluid"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#footer > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(6) > a:nth-of-type(1) > div:nth-of-type(1) > img:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 14
+  },
+  {
+   "tag": "span",
+   "rolle": "span",
+   "text": "",
+   "aria": {
+    "aria-hidden": "true",
+    "aria-label": "Close"
+   },
+   "daten": {
+    "data-bs-dismiss": "modal-lite"
+   },
+   "id": null,
+   "klassen": [
+    "modal-lite__close"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#rogatorPopupIframe > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 15
+  },
+  {
+   "tag": "div",
+   "rolle": "div",
+   "text": "",
+   "aria": {},
+   "daten": {},
+   "id": "iframe-trap",
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": null,
+   "ziel": null,
+   "pfad": "#iframe-trap",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 15
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Suchfeld",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "skip-menu-content"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=6c64f092-5cb2-49e0-9a16-d995331edfdb",
+   "ziel": null,
+   "pfad": "body > ul:nth-of-type(1) > li:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 16
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Hauptinhalt",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "skip-menu-content"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=6c64f092-5cb2-49e0-9a16-d995331edfdb",
+   "ziel": null,
+   "pfad": "body > ul:nth-of-type(1) > li:nth-of-type(2) > a:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 16
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Navigationsmenü",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "skip-menu-content"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=6c64f092-5cb2-49e0-9a16-d995331edfdb",
+   "ziel": null,
+   "pfad": "body > ul:nth-of-type(1) > li:nth-of-type(3) > a:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 16
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Fußzeile",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "skip-menu-content"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=6c64f092-5cb2-49e0-9a16-d995331edfdb",
+   "ziel": null,
+   "pfad": "body > ul:nth-of-type(1) > li:nth-of-type(4) > a:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 16
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "navigation__home"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.1und1.de/",
+   "ziel": null,
+   "pfad": "body > header:nth-of-type(1) > nav:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 0
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Samsung Galaxy S26",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [
+    "core_button_normal"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://mobile.1und1.de/samsung-galaxy-s26",
+   "ziel": null,
+   "pfad": "body > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > ol:nth-of-type(1) > li:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 17
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Laufzeit",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=6c64f092-5cb2-49e0-9a16-d995331edfdb",
+   "ziel": null,
+   "pfad": "#current-flow-step > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 17
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Tarifauswahl",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=6c64f092-5cb2-49e0-9a16-d995331edfdb",
+   "ziel": null,
+   "pfad": "body > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > ol:nth-of-type(1) > li:nth-of-type(3) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 17
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Watch",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=6c64f092-5cb2-49e0-9a16-d995331edfdb",
+   "ziel": null,
+   "pfad": "body > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > ol:nth-of-type(1) > li:nth-of-type(4) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 17
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Tauschprämie",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=6c64f092-5cb2-49e0-9a16-d995331edfdb",
+   "ziel": null,
+   "pfad": "body > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > ol:nth-of-type(1) > li:nth-of-type(5) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 17
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Optionen",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=6c64f092-5cb2-49e0-9a16-d995331edfdb",
+   "ziel": null,
+   "pfad": "body > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > ol:nth-of-type(1) > li:nth-of-type(6) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 17
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Warenkorb",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=6c64f092-5cb2-49e0-9a16-d995331edfdb",
+   "ziel": null,
+   "pfad": "body > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > ol:nth-of-type(1) > li:nth-of-type(7) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 17
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Kundendaten",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=6c64f092-5cb2-49e0-9a16-d995331edfdb",
+   "ziel": null,
+   "pfad": "body > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > ol:nth-of-type(1) > li:nth-of-type(8) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 17
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Bestellübersicht",
+   "aria": {},
+   "daten": {},
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=6c64f092-5cb2-49e0-9a16-d995331edfdb",
+   "ziel": null,
+   "pfad": "body > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > ol:nth-of-type(1) > li:nth-of-type(9) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 17
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "0721 / 960 6000",
+   "aria": {},
+   "daten": {
+    "data-linkid": "sticky_right_bottom_order-hotline :: phone_number :: Telefonische Bestellung"
+   },
+   "id": null,
+   "klassen": [
+    "sticky-hotline__number",
+    "has-placeholder",
+    "DeSoAndMoSoPhoneNumber"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "tel:",
+   "ziel": null,
+   "pfad": "body > aside:nth-of-type(1) > span:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": null
+  },
+  {
+   "tag": "a",
+   "rolle": "button",
+   "text": "",
+   "aria": {
+    "aria-label": "Flyout schliessen"
+   },
+   "daten": {
+    "data-linkid": "sticky_right_bottom_nksales-contact :: icon :: close",
+    "data-linktarget": "samepage",
+    "data-group": "close"
+   },
+   "id": null,
+   "klassen": [
+    "contact-bubble__trigger-close",
+    "d-none"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "",
+   "ziel": null,
+   "pfad": "body > aside:nth-of-type(2) > div:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 4
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "0721 / 960 6000",
+   "aria": {},
+   "daten": {
+    "data-linkid": "sticky_right_bottom_nksales-contact :: phone_number :: Beratung & Verkauf"
+   },
+   "id": null,
+   "klassen": [
+    "contact-bubble__content-phone",
+    "phoneSale",
+    "has-placeholder",
+    "DeSoAndMoSoPhoneNumber"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "tel:",
+   "ziel": null,
+   "pfad": "body > aside:nth-of-type(2) > div:nth-of-type(4) > div:nth-of-type(1) > span:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 18
+  },
+  {
+   "tag": "a",
+   "rolle": "button",
+   "text": "Anrufen",
+   "aria": {},
+   "daten": {
+    "data-linkid": "sticky_right_bottom_nksales-contact :: button :: Anrufen Beratung & Verkauf",
+    "data-linktarget": "samepage"
+   },
+   "id": null,
+   "klassen": [
+    "btn",
+    "btn-secondary"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=6c64f092-5cb2-49e0-9a16-d995331edfdb",
+   "ziel": null,
+   "pfad": "body > aside:nth-of-type(2) > div:nth-of-type(4) > a:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 18
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "0721 / 9600",
+   "aria": {},
+   "daten": {
+    "data-linkid": "sticky_right_bottom_nksales-contact :: phone_number :: Kunden-Hotline"
+   },
+   "id": null,
+   "klassen": [
+    "contact-bubble__content-phone",
+    "phoneHotline",
+    "has-placeholder",
+    "DeSoAndMoSoPhoneNumber"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "tel:",
+   "ziel": null,
+   "pfad": "body > aside:nth-of-type(2) > div:nth-of-type(5) > div:nth-of-type(1) > span:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 19
+  },
+  {
+   "tag": "a",
+   "rolle": "button",
+   "text": "Anrufen",
+   "aria": {},
+   "daten": {
+    "data-linkid": "sticky_right_bottom_nksales-contact :: button :: Anrufen Kunden-Hotline",
+    "data-linktarget": "samepage"
+   },
+   "id": null,
+   "klassen": [
+    "btn",
+    "btn-secondary"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=6c64f092-5cb2-49e0-9a16-d995331edfdb",
+   "ziel": null,
+   "pfad": "body > aside:nth-of-type(2) > div:nth-of-type(5) > a:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 19
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "0721 / 960 9900",
+   "aria": {},
+   "daten": {
+    "data-linkid": "sticky_right_bottom_nksales-contact :: phone_number :: Kunden-Hotline-No-AI"
+   },
+   "id": null,
+   "klassen": [
+    "d-inline",
+    "contact-bubble__alt-phone",
+    "has-placeholder",
+    "DeSoAndMoSoPhoneNumber"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "tel:",
+   "ziel": null,
+   "pfad": "body > aside:nth-of-type(2) > div:nth-of-type(5) > div:nth-of-type(2) > span:nth-of-type(2) > a:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 6
+  },
+  {
+   "tag": "a",
+   "rolle": "button",
+   "text": "Chat starten",
+   "aria": {},
+   "daten": {
+    "data-linkid": "sticky_right_bottom_nksales-contact :: button :: Chat starten",
+    "data-linktarget": "samepage"
+   },
+   "id": null,
+   "klassen": [
+    "btn",
+    "btn-secondary",
+    "btn-one",
+    "nkChat"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=6c64f092-5cb2-49e0-9a16-d995331edfdb",
+   "ziel": null,
+   "pfad": "body > aside:nth-of-type(2) > div:nth-of-type(6) > a:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 20
+  },
+  {
+   "tag": "a",
+   "rolle": "button",
+   "text": "Chat starten",
+   "aria": {},
+   "daten": {
+    "data-linkid": "sticky_right_bottom_customer-chat :: link :: Kunden-Service",
+    "data-linktarget": "samepage"
+   },
+   "id": null,
+   "klassen": [
+    "btn",
+    "btn-secondary",
+    "bkChat",
+    "d-none"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fsamsung-galaxy-s26&addFlowStates=tradeInAvailable%2CbrandSamsung%2CsamsungS26Series%2CwatchAvailable%2CstrapsAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=6c64f092-5cb2-49e0-9a16-d995331edfdb",
+   "ziel": null,
+   "pfad": "body > aside:nth-of-type(2) > div:nth-of-type(6) > a:nth-of-type(2)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 20
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "0721 / 960 6000",
+   "aria": {},
+   "daten": {
+    "data-linkid": "sticky_right_bottom_nksales-contact :: phone_number :: unavailablechat_Beratung & Verkauf"
+   },
+   "id": null,
+   "klassen": [
+    "has-placeholder",
+    "DeSoAndMoSoPhoneNumber"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "tel:",
+   "ziel": null,
+   "pfad": "body > aside:nth-of-type(2) > div:nth-of-type(7) > div:nth-of-type(1) > span:nth-of-type(3) > a:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 4
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "",
+   "aria": {},
+   "daten": {
+    "data-linkid": "imageLink87a081a0"
+   },
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.united-internet.de/unternehmen.html",
+   "ziel": "_blank",
+   "pfad": "#footer > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 7
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "",
+   "aria": {},
+   "daten": {
+    "data-linkid": "imageLink6f7fd9a4"
+   },
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://unternehmen.1und1.de/unternehmen/nachhaltigkeit/",
+   "ziel": "_blank",
+   "pfad": "#footer > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(2) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 8
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Nachhaltigkeit",
+   "aria": {},
+   "daten": {
+    "data-linkid": "textLinkb70ab75f",
+    "data-linktarget": "newpage"
+   },
+   "id": null,
+   "klassen": [
+    "textlink",
+    "textlink--white",
+    "textlink--switch-underline"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://unternehmen.1und1.de/unternehmen/nachhaltigkeit/",
+   "ziel": "_self",
+   "pfad": "#footer > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 21
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Engagement",
+   "aria": {},
+   "daten": {
+    "data-linkid": "textLink577ae068",
+    "data-linktarget": "newpage"
+   },
+   "id": null,
+   "klassen": [
+    "textlink",
+    "textlink--white",
+    "textlink--switch-underline"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://unternehmen.1und1.de/unternehmen/soziales-engagement/",
+   "ziel": "_self",
+   "pfad": "#footer > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(2) > div:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 21
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Jobs",
+   "aria": {},
+   "daten": {
+    "data-linkid": "textLinkf49f5d2c",
+    "data-linktarget": "newpage"
+   },
+   "id": null,
+   "klassen": [
+    "textlink",
+    "textlink--white",
+    "textlink--switch-underline"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://karriere.1und1.de/",
+   "ziel": "_self",
+   "pfad": "#footer > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(3) > div:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 21
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Newsroom",
+   "aria": {},
+   "daten": {
+    "data-linkid": "textLinkf944c45d",
+    "data-linktarget": "newpage"
+   },
+   "id": null,
+   "klassen": [
+    "textlink",
+    "textlink--white",
+    "textlink--switch-underline"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://newsroom.1und1.de/?linkId=ft.nav.presse",
+   "ziel": "_self",
+   "pfad": "#footer > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(4) > div:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 21
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Partnerprogramm",
+   "aria": {},
+   "daten": {
+    "data-linkid": "textLink20932167",
+    "data-linktarget": "newpage"
+   },
+   "id": null,
+   "klassen": [
+    "textlink",
+    "textlink--white",
+    "textlink--switch-underline"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.1und1.de/partnerprogramme",
+   "ziel": "_self",
+   "pfad": "#footer > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(5) > div:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 21
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Hilfe-Center",
+   "aria": {},
+   "daten": {
+    "data-linkid": "textLinkab1e1b67",
+    "data-linktarget": "newpage"
+   },
+   "id": null,
+   "klassen": [
+    "textlink",
+    "textlink--white",
+    "textlink--switch-underline"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://hilfe-center.1und1.de/",
+   "ziel": "_self",
+   "pfad": "#footer > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(6) > div:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 21
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Barrierefreiheit",
+   "aria": {},
+   "daten": {
+    "data-linkid": "textLinkbc5ffca2",
+    "data-linktarget": "newpage"
+   },
+   "id": null,
+   "klassen": [
+    "textlink",
+    "textlink--white",
+    "textlink--switch-underline"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.1und1.de/barrierefreiheit",
+   "ziel": "_self",
+   "pfad": "#footer > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(7) > div:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 21
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "AGB",
+   "aria": {},
+   "daten": {
+    "data-linkid": "textLink869376ed",
+    "data-linktarget": "newpage"
+   },
+   "id": null,
+   "klassen": [
+    "textlink",
+    "textlink--white",
+    "textlink--switch-underline"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "http://unternehmen.1und1.de/agb/",
+   "ziel": "_self",
+   "pfad": "#footer > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(8) > div:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 21
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Entsorgung",
+   "aria": {},
+   "daten": {
+    "data-linkid": "textLink5b838a9b",
+    "data-linktarget": "newpage"
+   },
+   "id": null,
+   "klassen": [
+    "textlink",
+    "textlink--white",
+    "textlink--switch-underline"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.1und1.de/entsorgung/",
+   "ziel": "_self",
+   "pfad": "#footer > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(9) > div:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 21
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Datenschutz",
+   "aria": {},
+   "daten": {
+    "data-linkid": "textLink4d2a50b7",
+    "data-linktarget": "newpage"
+   },
+   "id": null,
+   "klassen": [
+    "textlink",
+    "textlink--white",
+    "textlink--switch-underline"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.1und1.de/Datenschutz",
+   "ziel": "_self",
+   "pfad": "#footer > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(10) > div:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 21
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Impressum",
+   "aria": {},
+   "daten": {
+    "data-linkid": "textLinkb558d4cb",
+    "data-linktarget": "newpage"
+   },
+   "id": null,
+   "klassen": [
+    "textlink",
+    "textlink--white",
+    "textlink--switch-underline"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "http://unternehmen.1und1.de/impressum/",
+   "ziel": "_self",
+   "pfad": "#footer > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(11) > div:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 21
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Vertrag kündigen",
+   "aria": {},
+   "daten": {
+    "data-linkid": "textLinka90ec9df",
+    "data-linktarget": "newpage"
+   },
+   "id": null,
+   "klassen": [
+    "textlink",
+    "textlink--white",
+    "textlink--switch-underline"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://control-center.1und1.de/kuendigung",
+   "ziel": "_self",
+   "pfad": "#footer > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(12) > div:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 21
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Vertrag widerrufen",
+   "aria": {},
+   "daten": {
+    "data-linkid": "textLinkfd4342da",
+    "data-linktarget": "newpage"
+   },
+   "id": null,
+   "klassen": [
+    "textlink",
+    "textlink--white",
+    "textlink--switch-underline"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://control-center.1und1.de/widerruf",
+   "ziel": "_self",
+   "pfad": "#footer > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(13) > div:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 21
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Gewährleistungsrechte",
+   "aria": {},
+   "daten": {
+    "data-linkid": "textLink6c3f6f88",
+    "data-linktarget": "newpage"
+   },
+   "id": null,
+   "klassen": [
+    "textlink",
+    "textlink--white",
+    "textlink--switch-underline"
+   ],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://content.1und1.de/pdfs/Gesetzliche_Gew%C3%A4hrleistung.pdf",
+   "ziel": "_blank",
+   "pfad": "#footer > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > ul:nth-of-type(1) > li:nth-of-type(14) > div:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": true,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 21
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "",
+   "aria": {},
+   "daten": {
+    "data-linkid": "imageLink2b7ad735"
+   },
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.facebook.com/1und1",
+   "ziel": "_blank",
+   "pfad": "#footer > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 9
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "",
+   "aria": {},
+   "daten": {
+    "data-linkid": "imageLink257f3847"
+   },
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.instagram.com/1und1/",
+   "ziel": "_blank",
+   "pfad": "#footer > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(2) > a:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 10
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "",
+   "aria": {},
+   "daten": {
+    "data-linkid": "imageLink4bf09630"
+   },
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://x.com/1und1",
+   "ziel": "_blank",
+   "pfad": "#footer > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(3) > a:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 11
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "",
+   "aria": {},
+   "daten": {
+    "data-linkid": "imageLink363bcf8f"
+   },
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.youtube.com/user/1und1",
+   "ziel": "_blank",
+   "pfad": "#footer > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(4) > a:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 12
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "",
+   "aria": {},
+   "daten": {
+    "data-linkid": "imageLink22907286"
+   },
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.linkedin.com/company/1und1de/",
+   "ziel": "_blank",
+   "pfad": "#footer > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(5) > a:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 13
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "",
+   "aria": {},
+   "daten": {
+    "data-linkid": "imageLinkff4517ae"
+   },
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.xing.com/pages/1-1",
+   "ziel": "_blank",
+   "pfad": "#footer > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(6) > a:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 14
+  },
+  {
+   "tag": "a",
+   "rolle": "link",
+   "text": "Datenschutzhinweise",
+   "aria": {},
+   "daten": {
+    "data-linkid": "overlay :: link :: Datenschutzhinweis Rogator Umfrage",
+    "data-linktarget": "newpage"
+   },
+   "id": null,
+   "klassen": [],
+   "name": null,
+   "wert": null,
+   "typ": null,
+   "href": "https://www.1und1.de/Datenschutz",
+   "ziel": null,
+   "pfad": "#rogatorPopupIframe > div:nth-of-type(1) > div:nth-of-type(3) > p:nth-of-type(1) > a:nth-of-type(1)",
+   "sichtbar": false,
+   "deaktiviert": false,
+   "gewaehlt": null,
+   "optionen": null,
+   "behaelter": 15
+  }
+ ]
+}

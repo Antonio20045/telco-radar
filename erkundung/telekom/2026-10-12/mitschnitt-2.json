@@ -1,0 +1,21 @@
+{
+ "anfragen": [
+  {
+   "nummer": 1,
+   "methode": "GET",
+   "url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-air/himmelblau-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
+   "art": "document",
+   "status": 202,
+   "abbruch": null
+  },
+  {
+   "nummer": 2,
+   "methode": "GET",
+   "url": "https://20994a22678a.2b40921b.eu-west-1.token.awswaf.com/20994a22678a/bcc9fc2f82bd/ddb9f1b10381/challenge.js",
+   "art": "script",
+   "status": null,
+   "abbruch": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+  }
+ ],
+ "antworten": []
+}
