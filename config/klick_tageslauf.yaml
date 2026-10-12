@@ -1710,6 +1710,7 @@ anbieter:
       - geraet: samsung-galaxy-s26-plus
         speicher_gb: 256
         url: https://www.vodafone.de/privat/handys/samsung-galaxy-s26-plus.html
+        modell: "Galaxy S26+"
       - geraet: samsung-galaxy-s26-ultra
         speicher_gb: 256
         url: https://www.vodafone.de/privat/handys/samsung-galaxy-s26-ultra.html
@@ -1740,12 +1741,14 @@ anbieter:
       - geraet: samsung-galaxy-z-flip-7
         speicher_gb: 256
         url: https://www.vodafone.de/privat/handys/samsung-galaxy-z-flip7.html
+        modell: "Galaxy Z Flip7"
       - geraet: samsung-galaxy-z-flip8
         speicher_gb: 256
         url: https://www.vodafone.de/privat/handys/samsung-galaxy-z-flip8.html
       - geraet: samsung-galaxy-z-fold-7
         speicher_gb: 256
         url: https://www.vodafone.de/privat/handys/samsung-galaxy-z-fold7.html
+        modell: "Galaxy Z Fold7"
       - geraet: samsung-galaxy-z-fold8
         speicher_gb: 256
         url: https://www.vodafone.de/privat/handys/samsung-galaxy-z-fold8.html
@@ -1784,15 +1787,18 @@ anbieter:
       - geraet: xiaomi-redmi-17
         speicher_gb: 128
         url: https://www.vodafone.de/privat/handys/xiaomi-redmi-17-5g.html
+        modell: "REDMI 17"
       - geraet: xiaomi-redmi-note-15
         speicher_gb: 256
         url: https://www.vodafone.de/privat/handys/xiaomi-redmi-note-15-5g.html
       - geraet: xiaomi-redmi-note-17
         speicher_gb: 128
         url: https://www.vodafone.de/privat/handys/xiaomi-redmi-note-17-5g.html
+        modell: "REDMI Note 17"
       - geraet: xiaomi-redmi-note-17-pro
         speicher_gb: 256
         url: https://www.vodafone.de/privat/handys/xiaomi-redmi-note-17-pro-5g.html
+        modell: "REDMI Note 17 Pro"
       - geraet: fairphone-6
         speicher_gb: 256
         url: https://www.vodafone.de/privat/handys/fairphone-6.html

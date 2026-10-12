@@ -389,6 +389,30 @@ def test_seiten_anderer_form_in_folge_beenden_den_anbieter(
         assert daten["laufstatus"] == LAUF_GELESEN
 
 
+@pytest.mark.parametrize(("nie_gelesen", "aufrufe"), [(True, None), (False, 3)])
+def test_nie_gelesene_seiten_anderer_form_beenden_den_anbieter_nicht(
+    o2, karte, gelesen_o2, nie_gelesen, aufrufe
+):
+    """Vodafone 12.10.2026: drei nie gelesene Seiten mit fremdem Kanarienwert standen
+    in der Rotation vorn und hielten die übrigen 11 an. Hat der Anbieter einen
+    Lesestand, zählen nie gelesene Seiten nicht zur Folge; Gegenprobe: dieselben
+    Seiten mit Lesestand beenden ihn."""
+    adressen = [s.adresse for s in o2.seiten]
+    folge = (STOERUNG_SEITE,) * HOECHSTE_SEITENFORMEN_IN_FOLGE
+    uhr = Uhr()
+    crawler = Crawler(uhr, gelesen_o2, status=dict(zip(adressen, folge, strict=False)))
+    zahl = HOECHSTE_SEITENFORMEN_IN_FOLGE
+    stand = adressen[zahl:] if nie_gelesen else adressen
+    gelesen = {a: "2026-10-0" + str(1 + i % 9) for i, a in enumerate(stand)}
+
+    daten = _fahre(o2, karte, crawler, uhr, gelesen=gelesen)
+
+    assert len(crawler.aufrufe) == (aufrufe or len(adressen))
+    assert len(adressen) > zahl
+    erwartet = LAUF_GESTOERT if aufrufe else LAUF_GELESEN
+    assert daten["laufstatus"] == erwartet
+
+
 def test_gesperrte_seite_beendet_den_anbieter_nicht(o2, karte, gelesen_o2):
     uhr = Uhr()
     crawler = Crawler(uhr, gelesen_o2, status={o2.seiten[1].adresse: LAUF_GESPERRT})

@@ -15,9 +15,11 @@ endet er. Hat eine Seite nach bestandener Bot-Prüfung nur eine andere Form
 (``klicklauf.STOERUNG_SEITE``: Kanarienwert, Vorbereitung, Strukturbruch, keine
 angebotene Kombination; o2 11.10.2026), folgt ebenso die nächste;
 erst ``HOECHSTE_SEITENFORMEN_IN_FOLGE`` solche Seiten hintereinander beenden ihn
-(Telekom 10. und 11.10.2026: je eine Seite hielt alle übrigen an). Ebenso endet der
-Lauf, sobald die Parallellauf-Prüfung (``klickparallel``, vor jeder Seite) einen
-anderen Lauf auf denselben Hosts meldet.
+(Telekom 10. und 11.10.2026: je eine Seite hielt alle übrigen an). Eine nie gelesene
+Seite zählt dabei nicht, sobald der Anbieter einen Lesestand hat (Vodafone 12.10.2026:
+drei nie gelesene Seiten standen in der Rotation vorn und hielten 22 an). Ebenso
+endet der Lauf, sobald die Parallellauf-Prüfung (``klickparallel``, vor jeder Seite)
+einen anderen Lauf auf denselben Hosts meldet.
 
 Zeitbudget (CLAUDE.md Regel 8): ``budget_ende`` rechnet gegen die Restzeit des Jobs,
 ``job_frist_s`` (Vorgabe ``JOB_FRIST_S``, gleich ``timeout-minutes`` des Matrix-Jobs)
@@ -143,11 +145,16 @@ class _Gang:
         self.besucht = True
         return min(self.ende, self.uhr() + ZEIT_JE_SEITE_S)
 
-    def nach(self, status: str, stoerung: str | None, grund: str | None) -> None:
+    def nach(
+        self, status: str, stoerung: str | None, grund: str | None, nie: bool = False
+    ) -> None:
         """Nach Bot-Schutz, zu vielen Zeitüberschreitungen oder Seiten anderer Form
-        in Folge geht nichts mehr."""
+        in Folge geht nichts mehr. Eine nie gelesene Seite (``nie``) anderer Form zählt
+        nicht zur Folge: sie zeigt keine neue Form der Website."""
         if status == LAUF_GELESEN:
             self.form_in_folge = 0
+        if status == LAUF_GESTOERT and stoerung == STOERUNG_SEITE and nie:
+            return
         if status == LAUF_GESTOERT and stoerung == STOERUNG_SEITE:
             self.form_in_folge += 1
             if self.form_in_folge >= HOECHSTE_SEITENFORMEN_IN_FOLGE:
@@ -258,7 +265,8 @@ def fahre(
             continue
         lauf = crawle(seite, gang.grenze())
         seiten.append(seite_als_daten(seite, lauf))
-        gang.nach(lauf.status, lauf.stoerung, lauf.grund)
+        nie = bool(gelesen) and ohne_geheimnisse(seite.adresse) not in gelesen
+        gang.nach(lauf.status, lauf.stoerung, lauf.grund, nie)
     status, grund = laufstatus(
         seiten + [s for u in uebersichten for s in _als_seiten(u)]
     )
