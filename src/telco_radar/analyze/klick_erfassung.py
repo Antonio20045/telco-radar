@@ -71,12 +71,8 @@ def erfassungsgrund(eintrag: dict) -> str | None:
     )
 
 
-def erfassungsgruende(
-    bilanz: dict | None, angebot: Angebot | None = None
-) -> dict[str, str]:
-    """Je Anbieter mit frisch gestörtem Klick-Lauf sein Erfassungsgrund. ``angebot``
-    (``angebotene_speicher``) belegt, dass ein nicht gelesener Speicher nicht im
-    Angebot ist."""
+def erfassungsgruende(bilanz: dict | None) -> dict[str, str]:
+    """Je Anbieter mit frisch gestörtem Klick-Lauf sein Erfassungsgrund."""
     gruende = {}
     dateien = (bilanz or {}).get("dateien", [])
     for eintrag in dateien:
@@ -84,7 +80,7 @@ def erfassungsgruende(
             gruende[str(eintrag.get("anbieter"))] = satz
         gruende.update(nicht_im_angebot(eintrag))
     for eintrag in je_anbieter_vereint(dateien):
-        gruende.update(speicher_gelesen(eintrag, angebot or {}))
+        gruende.update(speicher_gelesen(eintrag))
     return gruende
 
 
@@ -144,23 +140,20 @@ def nicht_im_angebot(eintrag: dict) -> dict[str, str]:
     return {f"{anbieter}{TRENNER}{g}": satz for g in geraete}
 
 
-def speicher_gelesen(eintrag: dict, angebot: Angebot | None = None) -> dict[str, str]:
+def speicher_gelesen(eintrag: dict) -> dict[str, str]:
     """Je Gerät, das ein Lauf von heute gelesen hat, die gelesenen Speicher; ein
     Modell mit anderem Speicher zeigt sie statt des Anbietergrundes oder der Lücke.
-    Führt die heute gelesene Geräteliste des Anbieters das Gerät mit keinem anderen
-    Speicher oder zeigt die Seite selbst jeden übrigen Speicher gesperrt
-    (``seite_belegt``), heißt es „nur mit … im Angebot“."""
+    Nur wenn die Seite selbst jeden übrigen Speicher gesperrt zeigt (``seite_belegt``),
+    heißt es „nur mit … im Angebot“. Die Geräteliste belegt das nicht: o2 führte das
+    iPhone 17 Pro am 12.10.2026 nur mit 256 GB, die Klick-Seite las 512 GB."""
     je_geraet = eintrag.get("speicher_gelesen")
     if eintrag.get("alter_tage") != 0 or not isinstance(je_geraet, dict):
         return {}
     anbieter = str(eintrag.get("anbieter"))
-    liste = (angebot or {}).get(anbieter, {})
     datum = date.fromisoformat(str(eintrag.get("datum"))).strftime("%d.%m.%Y")
     saetze = {}
     for geraet, speicher in je_geraet.items():
-        gelistet = liste.get(geraet)
-        belegt = gelistet is not None and bool(gelistet) and gelistet <= set(speicher)
-        belegt = belegt or seite_belegt(eintrag, geraet, speicher)
+        belegt = seite_belegt(eintrag, geraet, speicher)
         satz = SATZ_SPEICHER_ANGEBOT if belegt else SATZ_SPEICHER
         saetze[f"{anbieter}{TRENNER}{geraet}"] = satz.format(
             anbieter=anbieter, speicher=_gb(speicher), datum=datum

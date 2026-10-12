@@ -140,11 +140,11 @@ def _listung(anbieter, speicher, **anders):
     }
 
 
-def test_nicht_gelistete_speicher_heissen_nicht_im_angebot():
-    """Preisprüfung 11.10.2026: o2 führt das iPhone 17 Pro in seiner ganzen
-    Geräteliste nur mit 256 GB; 512 GB und 1 TB sind keine Erfassungslücke.
-    Gegenprobe: listet o2 auch 512 GB, bleibt es „nur mit 256 GB gelesen“; ohne heute
-    gelesene Liste ebenso; ausgelistete und gebrauchte Listungen zählen nicht."""
+def test_geraeteliste_allein_belegt_kein_angebot():
+    """Preisprüfung 11.10.2026, Punkt f: o2 führt das iPhone 17 Pro in seiner
+    Geräteliste nur mit 256 GB, die Klick-Seite las am 12.10.2026 aber 512 GB. Die
+    Liste belegt darum nicht, dass ein nicht gelesener Speicher fehlt: der Satz bleibt
+    „nur mit 256 GB gelesen“. Gegenprobe: eine gesperrt gezeigte Seite belegt es."""
     eintrag = {
         "anbieter": "o2",
         "datum": "2026-10-11",
@@ -157,20 +157,18 @@ def test_nicht_gelistete_speicher_heissen_nicht_im_angebot():
         _listung("o2", 512, status="ausgelistet"),
         _listung("o2", 1024, zustand="gebraucht"),
     ]
-    mit_512 = [*nur_256, _listung("o2", 512)]
     schluessel = "o2|apple-iphone-17-pro"
-
-    def satz(listungen, gelesen):
-        angebot = angebotene_speicher(listungen, gelesen, "2026-10-11")
-        return erfassungsgruende({"dateien": [eintrag]}, angebot)[schluessel]
-
+    assert angebotene_speicher(nur_256, {"o2"}, "2026-10-11") == {
+        "o2": {"apple-iphone-17-pro": {256}}
+    }
     angebot = SATZ_SPEICHER_ANGEBOT.format(
         anbieter="o2", speicher="256 GB", datum="11.10.2026"
     )
     gelesen = SATZ_SPEICHER.format(anbieter="o2", speicher="256 GB", datum="11.10.2026")
-    assert satz(nur_256, {"o2"}) == angebot
-    assert satz(mit_512, {"o2"}) == gelesen
-    assert satz(nur_256, set()) == gelesen
+    assert erfassungsgruende({"dateien": [eintrag]})[schluessel] == gelesen
+    gesperrt = {"apple-iphone-17-pro": {"gesperrt": [512, 1024]}}
+    mit_beleg = {**eintrag, "speicher_seite": gesperrt}
+    assert erfassungsgruende({"dateien": [mit_beleg]})[schluessel] == angebot
 
 
 class _Liste:

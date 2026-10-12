@@ -129,7 +129,7 @@ class Zusammenfuehrung:
     @property
     def erfassung(self) -> dict[str, str]:
         """Je Anbieter der Grund eines gestörten Klick-Laufs (``klick_erfassung``)."""
-        return erfassungsgruende(self.bilanz, self.angebot)
+        return erfassungsgruende(self.bilanz)
 
     def buendel(
         self,
