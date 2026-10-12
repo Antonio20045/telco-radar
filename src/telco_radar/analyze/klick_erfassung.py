@@ -22,14 +22,12 @@ from __future__ import annotations
 import re
 from datetime import date
 
-from ..collect.geraete.klicklauf import NICHT_ANGEBOTEN
 from ..klick_vertrag import (
     CHALLENGE_STATUS,
     FEHLER_AB_STATUS,
     FRISCHEGRENZE_TAGE,
     LAUF_GESTOERT,
 )
-from .klick_teillauf import OFFEN
 
 SATZ = "{anbieter} nicht erfasst: {art} ({angaben})"
 ART_SPERRE = "Seite sperrt automatisches Lesen"
@@ -43,6 +41,10 @@ SATZ_NICHT_IM_ANGEBOT = (
 SATZ_SPEICHER = "Bei {anbieter} nur mit {speicher} gelesen ({datum})"
 SATZ_SPEICHER_ANGEBOT = "Bei {anbieter} nur mit {speicher} im Angebot ({datum})"
 TRENNER = "|"
+GESPERRT = "gesperrt"
+OFFEN = "offen"
+"""Schlüssel von ``speicher_seite`` (``klick_teillauf``): gesperrt gezeigte Speicher
+und solche, die eine gelesene Seite weder gesperrt zeigte noch erfasste."""
 Angebot = dict[str, dict[str, set[int]]]
 """Je Anbieter und Gerät die angebotenen Speicher (``angebotene_speicher``)."""
 
@@ -171,7 +173,7 @@ def seite_belegt(eintrag: dict, geraet: str, gelesen: list[int]) -> bool:
     gelesenen entweder gesperrt oder gar nicht (``klick_teillauf.speicher_seite``)."""
     arten = (eintrag.get("speicher_seite") or {}).get(geraet) or {}
     offen = set(arten.get(OFFEN) or []) - set(gelesen)
-    return bool(arten.get(NICHT_ANGEBOTEN)) and not offen
+    return bool(arten.get(GESPERRT)) and not offen
 
 
 def _gb(speicher: list[int]) -> str:

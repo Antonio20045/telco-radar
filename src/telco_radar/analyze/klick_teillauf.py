@@ -14,8 +14,7 @@ from ..collect.geraete.klickergebnis import GELESENE_SEITEN
 from ..collect.geraete.klicklauf import ERFASST, LAUF_GELESEN, NICHT_ANGEBOTEN
 from ..collect.geraete.klickrohsatz import Klickausbeute, ausbeute, speicher_gb
 from ..geraete_model import Katalog
-
-OFFEN = "offen"
+from .klick_erfassung import GESPERRT, OFFEN
 
 
 def ausbeute_der_seiten(
@@ -38,18 +37,19 @@ def ausbeute_der_seiten(
 
 def speicher_seite(seiten: list[dict]) -> dict[str, dict[str, list[int]]]:
     """Je Gerät die Speicher, die eine gelesene Seite gesperrt zeigt
-    (``nicht_angeboten``), und die, die sie weder so zeigte noch erfasste (``offen``).
+    (``nicht_angeboten``, Schlüssel ``GESPERRT``), und die, die sie weder so zeigte
+    noch erfasste (``OFFEN``).
     Ohne offene Speicher belegt die Seite, dass sie nur die gelesenen anbietet."""
     je_geraet: dict[str, dict[str, set[int]]] = {}
     for seite in seiten:
         if seite.get("status") != LAUF_GELESEN or not seite.get("geraet"):
             continue
-        ziel = je_geraet.setdefault(str(seite["geraet"]), {NICHT_ANGEBOTEN: set()})
+        ziel = je_geraet.setdefault(str(seite["geraet"]), {GESPERRT: set()})
         for k in seite.get("kombinationen") or []:
             gb = speicher_gb((k.get("variante") or {}).get("speicher"))
             if gb is None:
                 continue
-            art = NICHT_ANGEBOTEN if k.get("status") == NICHT_ANGEBOTEN else OFFEN
+            art = GESPERRT if k.get("status") == NICHT_ANGEBOTEN else OFFEN
             if k.get("status") != ERFASST:
                 ziel.setdefault(art, set()).add(gb)
     return {
