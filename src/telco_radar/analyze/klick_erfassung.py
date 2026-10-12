@@ -22,12 +22,14 @@ from __future__ import annotations
 import re
 from datetime import date
 
+from ..collect.geraete.klicklauf import NICHT_ANGEBOTEN
 from ..klick_vertrag import (
     CHALLENGE_STATUS,
     FEHLER_AB_STATUS,
     FRISCHEGRENZE_TAGE,
     LAUF_GESTOERT,
 )
+from .klick_teillauf import OFFEN
 
 SATZ = "{anbieter} nicht erfasst: {art} ({angaben})"
 ART_SPERRE = "Seite sperrt automatisches Lesen"
@@ -116,11 +118,16 @@ def je_anbieter_vereint(dateien: list[dict]) -> list[dict]:
             rest.append(eintrag)
             continue
         ziel = vereint.setdefault(
-            str(eintrag.get("anbieter")), {**eintrag, "speicher_gelesen": {}}
+            str(eintrag.get("anbieter")),
+            {**eintrag, "speicher_gelesen": {}, "speicher_seite": {}},
         )
         for geraet, speicher in je_geraet.items():
             bisher = ziel["speicher_gelesen"].get(geraet, [])
             ziel["speicher_gelesen"][geraet] = sorted({*bisher, *speicher})
+        for geraet, arten in (eintrag.get("speicher_seite") or {}).items():
+            bisher = ziel["speicher_seite"].setdefault(geraet, {})
+            for art, speicher in arten.items():
+                bisher[art] = sorted({*bisher.get(art, []), *speicher})
     return [*rest, *vereint.values()]
 
 
@@ -139,7 +146,8 @@ def speicher_gelesen(eintrag: dict, angebot: Angebot | None = None) -> dict[str,
     """Je Gerät, das ein Lauf von heute gelesen hat, die gelesenen Speicher; ein
     Modell mit anderem Speicher zeigt sie statt des Anbietergrundes oder der Lücke.
     Führt die heute gelesene Geräteliste des Anbieters das Gerät mit keinem anderen
-    Speicher, heißt es „nur mit … im Angebot“."""
+    Speicher oder zeigt die Seite selbst jeden übrigen Speicher gesperrt
+    (``seite_belegt``), heißt es „nur mit … im Angebot“."""
     je_geraet = eintrag.get("speicher_gelesen")
     if eintrag.get("alter_tage") != 0 or not isinstance(je_geraet, dict):
         return {}
@@ -150,11 +158,20 @@ def speicher_gelesen(eintrag: dict, angebot: Angebot | None = None) -> dict[str,
     for geraet, speicher in je_geraet.items():
         gelistet = liste.get(geraet)
         belegt = gelistet is not None and bool(gelistet) and gelistet <= set(speicher)
+        belegt = belegt or seite_belegt(eintrag, geraet, speicher)
         satz = SATZ_SPEICHER_ANGEBOT if belegt else SATZ_SPEICHER
         saetze[f"{anbieter}{TRENNER}{geraet}"] = satz.format(
             anbieter=anbieter, speicher=_gb(speicher), datum=datum
         )
     return saetze
+
+
+def seite_belegt(eintrag: dict, geraet: str, gelesen: list[int]) -> bool:
+    """Die Seiten von heute zeigen mindestens einen Speicher gesperrt und jeden nicht
+    gelesenen entweder gesperrt oder gar nicht (``klick_teillauf.speicher_seite``)."""
+    arten = (eintrag.get("speicher_seite") or {}).get(geraet) or {}
+    offen = set(arten.get(OFFEN) or []) - set(gelesen)
+    return bool(arten.get(NICHT_ANGEBOTEN)) and not offen
 
 
 def _gb(speicher: list[int]) -> str:
