@@ -4823,3 +4823,118 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
     else ersatz();
   });
 })();
+
+/* KI-SEITE, SCHNITTE 14 UND 15 (Pitch 9, Entwurf 10). Videos: das HTML
+   traegt nur das eigene Standbild und den Link zu YouTube. Erst ein Klick
+   ersetzt das Standbild durch das iframe von youtube-nocookie, vorher geht
+   beim Aufruf nichts an Google. */
+(function () {
+  [].forEach.call(document.querySelectorAll('.ki-player[data-ki-video]'), function (b) {
+    b.addEventListener('click', function () {
+      var f = document.createElement('iframe');
+      f.className = 'ki-player';
+      f.src = 'https://www.youtube-nocookie.com/embed/' +
+        encodeURIComponent(b.getAttribute('data-ki-video')) + '?autoplay=1&rel=0';
+      f.title = b.getAttribute('aria-label');
+      f.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture');
+      f.setAttribute('allowfullscreen', '');
+      var video = b.closest('.ki-video');
+      if (video) video.classList.add('ki-video--offen');
+      b.replaceWith(f);
+    });
+  });
+})();
+
+/* KI-SEITE, SCHNITTE 10 BIS 12 (Pitch 9, Entwurf 10). Kapitel 1: die
+   Fahrt durch die Linienzeichnung. Alle Koordinaten stehen fertig im HTML
+   (ki_kapitel_bild.py); hier wird nur bewegt. Der rote Punkt folgt der
+   Route bis zur Hoehe der Bildschirmmitte, Linien zeichnen sich, sobald sie
+   ins Bild kommen, Pillen poppen auf (data-y), Zaehler laufen hoch und
+   Markierungen schalten, wenn der Punkt sie erreicht (data-an). Ohne JS
+   und bei reduzierter Bewegung steht alles fertig da; der Punkt springt
+   dann ohne Nachlauf. */
+(function () {
+  var welt = document.getElementById('ki-k1-welt');
+  if (!welt) return;
+  var still = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  var reise = welt.parentNode;
+  var W = welt.viewBox.baseVal.width;
+  var route = welt.querySelector('.ki-k1-route');
+  var punkt = welt.querySelector('.ki-k1-punkt'), halo = welt.querySelector('.ki-k1-halo');
+  var L = route.getTotalLength();
+  function alle(sel) { return [].slice.call(reise.querySelectorAll(sel)); }
+  function cl(x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
+  function ez(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+  var tabelle = [], maxY = -1;
+  for (var s = 0; s <= L; s += 3) {
+    maxY = Math.max(maxY, route.getPointAtLength(s).y);
+    tabelle.push([s, maxY]);
+  }
+  function laengeBis(y) {
+    var lo = 0, hi = tabelle.length - 1;
+    if (y <= tabelle[0][1]) return 0;
+    while (lo < hi) { var m = (lo + hi + 1) >> 1; if (tabelle[m][1] <= y) lo = m; else hi = m - 1; }
+    return tabelle[lo][0];
+  }
+  var ziehen = alle('.ki-k1-zieh, .ki-k1-sehne').map(function (p) {
+    var len = p.getTotalLength();
+    if (!still) { p.style.strokeDasharray = len; p.style.strokeDashoffset = len; }
+    return { p: p, len: len, y: +p.getAttribute('data-y'), h: +p.getAttribute('data-h'), sehne: p.classList.contains('ki-k1-sehne') };
+  });
+  var zuege = alle('.ki-k1-zug[data-y]').map(function (g) { return { g: g, y: +g.getAttribute('data-y') }; });
+  var saetze = alle('.ki-k1-satz').map(function (e) { return { e: e, y: +e.getAttribute('data-y') }; });
+  var marken = alle('[data-an]').map(function (e) { return { e: e, y: +e.getAttribute('data-an') }; });
+  var zaehler = alle('.ki-k1-zahl').map(function (e) { return { e: e, y: +e.getAttribute('data-y'), ziel: +e.textContent, fertig: still }; });
+  var raeder = alle('.ki-k1-rad').map(function (g) {
+    return { g: g, cx: g.getAttribute('data-cx'), cy: g.getAttribute('data-cy'), f: +g.getAttribute('data-f') };
+  });
+  var ringe = alle('.ki-k1-ring').map(function (g) { return { g: g, f: +g.getAttribute('data-f') }; });
+  if (!still) {
+    route.style.strokeDasharray = L;
+    zaehler.forEach(function (z) { z.e.textContent = '00000'; });
+  }
+  var akt = 0, ziel = 0, laeuft = false;
+  function zaehle(z) {
+    z.fertig = true;
+    var t0 = performance.now();
+    (function lauf(t) {
+      var k = cl((t - t0) / 900);
+      z.e.textContent = String(Math.round(z.ziel * ez(k))).padStart(5, '0');
+      if (k < 1) requestAnimationFrame(lauf);
+    })(t0);
+  }
+  function schritt() {
+    var d = ziel - akt;
+    akt += still ? d : d * 0.12;
+    if (Math.abs(d) < 0.4) akt = ziel;
+    var p = route.getPointAtLength(akt);
+    [punkt, halo].forEach(function (k) { k.setAttribute('cx', p.x); k.setAttribute('cy', p.y); });
+    if (!still) route.style.strokeDashoffset = L - akt;
+    zaehler.forEach(function (z) { if (!z.fertig && p.y >= z.y - 30) zaehle(z); });
+    marken.forEach(function (m) {
+      if (m.e.classList.contains('da') || p.y < m.y) return;
+      m.e.classList.add('da');
+      if (!still && m.e.classList.contains('ki-k1-sehne')) m.e.style.strokeDashoffset = 0;
+    });
+    if (akt !== ziel) requestAnimationFrame(schritt); else laeuft = false;
+  }
+  function bild() {
+    var r = welt.getBoundingClientRect(), skala = r.width / W;
+    var unten = (innerHeight - r.top) / skala, mitte = (innerHeight * 0.5 - r.top) / skala;
+    if (!still) {
+      ziehen.forEach(function (z) {
+        if (!z.sehne) z.p.style.strokeDashoffset = z.len * (1 - ez(cl((unten - z.y - 40) / (z.h * 0.8 + 260))));
+      });
+      zuege.forEach(function (z) { z.g.classList.toggle('weg', z.y > unten - 60); });
+      saetze.forEach(function (z) { z.e.classList.toggle('da', z.y < unten - 80); });
+      raeder.forEach(function (z) { z.g.setAttribute('transform', 'rotate(' + (scrollY * 0.25 * z.f) + ' ' + z.cx + ' ' + z.cy + ')'); });
+      ringe.forEach(function (z) { z.g.setAttribute('transform', 'translate(0,' + (-(scrollY / skala) * z.f) + ')'); });
+    }
+    ziel = laengeBis(mitte);
+    if (!laeuft) { laeuft = true; requestAnimationFrame(schritt); }
+  }
+  if (still) marken.forEach(function (m) { m.e.classList.add('da'); });
+  addEventListener('scroll', bild, { passive: true });
+  addEventListener('resize', bild);
+  bild();
+})();
