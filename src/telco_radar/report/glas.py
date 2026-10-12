@@ -5,6 +5,11 @@ runden Kanten wie eine Linse. Die Karte dafür rechnet der Server einmal:
 Rot verschiebt waagerecht, Grün senkrecht, 128 heißt keine Verschiebung.
 Der Browser legt sie über ``feDisplacementMap`` auf den Hintergrund.
 
+Die Karte liegt als fertige Datei unter ``templates/static/glas-linse.png``,
+nicht als PNG-Bytes im HTML: die Bytes hängen von der zlib-Fassung ab, die
+Pixel nicht (Golden-Seiten auf Antonios Mac, 12.10.2026). Neu schreiben mit
+``python -m telco_radar.report.glas``; ein Test vergleicht Datei und Rechnung.
+
 Rechenweg übernommen aus https://github.com/shuding/liquid-glass
 (MIT License, Copyright (c) 2025 Shu Ding; Lizenztext in
 ``templates/static/lizenzen/liquid-glass.txt``).
@@ -12,22 +17,23 @@ Rechenweg übernommen aus https://github.com/shuding/liquid-glass
 
 from __future__ import annotations
 
-import base64
-import io
 import math
 from dataclasses import dataclass
+from pathlib import Path
 
 from PIL import Image
 
 BREITE = 240
 HOEHE = 60
+DATEI = "static/glas-linse.png"
+PFAD = Path(__file__).parent / "templates" / DATEI
 
 
 @dataclass(frozen=True)
 class Karte:
-    """Die Karte als data-URL, die größte Verschiebung und die Rechengröße in Pixeln."""
+    """Pfad der Karte unter der Seite, größte Verschiebung, Größe in Pixeln."""
 
-    url: str
+    datei: str
     staerke: float
     breite: int
     hoehe: int
@@ -65,19 +71,30 @@ def verschiebungen(
     return werte
 
 
-def karte(breite: int = BREITE, hoehe: int = HOEHE) -> Karte:
-    """Rechnet die Brechungskarte als PNG-data-URL."""
+def _staerke(werte: list[tuple[float, float]]) -> float:
+    return max(max(abs(dx), abs(dy)) for dx, dy in werte) * 0.5
+
+
+def bild(breite: int = BREITE, hoehe: int = HOEHE) -> Image.Image:
+    """Rechnet die Brechungskarte als Bild."""
     werte = verschiebungen(breite, hoehe)
-    groesste = max(max(abs(dx), abs(dy)) for dx, dy in werte) * 0.5
-    bild = Image.new("RGB", (breite, hoehe))
-    bild.putdata(
+    groesste = _staerke(werte)
+    ergebnis = Image.new("RGB", (breite, hoehe))
+    ergebnis.putdata(
         [(_kanal(dx / groesste), _kanal(dy / groesste), 0) for dx, dy in werte]
     )
-    puffer = io.BytesIO()
-    bild.save(puffer, "PNG", optimize=True)
-    url = "data:image/png;base64," + base64.b64encode(puffer.getvalue()).decode("ascii")
-    return Karte(url=url, staerke=round(groesste, 2), breite=breite, hoehe=hoehe)
+    return ergebnis
+
+
+def karte() -> Karte:
+    """Die Angaben, mit denen die Seite die fertige Karte einbindet."""
+    staerke = round(_staerke(verschiebungen()), 2)
+    return Karte(datei=DATEI, staerke=staerke, breite=BREITE, hoehe=HOEHE)
 
 
 def _kanal(wert: float) -> int:
     return max(0, min(255, int((wert + 0.5) * 255)))
+
+
+if __name__ == "__main__":
+    bild().save(PFAD, "PNG", optimize=True)

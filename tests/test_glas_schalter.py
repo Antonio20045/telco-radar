@@ -8,11 +8,9 @@ shuding/liquid-glass, MIT).
 
 from __future__ import annotations
 
-import base64
 import contextlib
 import functools
 import http.server
-import io
 import json
 import pathlib
 import threading
@@ -28,15 +26,9 @@ from telco_radar.report.html import render_site, schreibe_statische_dateien
 OBEN = 84
 
 
-def _png(url: str) -> Image.Image:
-    kopf, _, daten = url.partition(",")
-    assert kopf == "data:image/png;base64"
-    return Image.open(io.BytesIO(base64.b64decode(daten))).convert("RGB")
-
-
 def test_die_karte_laesst_die_mitte_ruhig_und_holt_die_raender_nach_innen():
     k = glas.karte()
-    bild = _png(k.url)
+    bild = Image.open(glas.PFAD).convert("RGB")
     assert bild.size == (k.breite, k.hoehe) == (glas.BREITE, glas.HOEHE)
     assert k.staerke > 0
     mitte = bild.getpixel((k.breite // 2, k.hoehe // 2))
@@ -48,6 +40,12 @@ def test_die_karte_laesst_die_mitte_ruhig_und_holt_die_raender_nach_innen():
     assert links[0] > 135 and rechts[0] < 119
     assert oben[1] > 135 and unten[1] < 119
     assert abs((links[0] - 127) + (rechts[0] - 127)) <= 3
+
+
+def test_die_eingecheckte_karte_ist_die_gerechnete():
+    """Die Datei ist gerechnet, nicht gezeichnet: gleiche Pixel wie glas.bild()."""
+    datei = Image.open(glas.PFAD).convert("RGB")
+    assert list(datei.getdata()) == list(glas.bild().getdata())
 
 
 def baue_site(ordner: pathlib.Path) -> pathlib.Path:
@@ -108,7 +106,15 @@ def test_wettbewerb_hat_einen_umschalter_ausserhalb_des_startbilds(site, datei, 
     assert soup.select(".wa-auftakt .glas-schalter, .wa-auftakt .umschalter") == []
     assert soup.select(".weiter-blatt") == []
     bild = soup.select_one("#glas-linse feImage")
-    assert bild is not None and bild["href"].startswith("data:image/png;base64,")
+    assert bild is not None and bild["href"] == glas.DATEI
+    assert (site / glas.DATEI).is_file()
+
+
+def test_keine_seite_traegt_pngbytes_im_html(site):
+    """Antonios Mac, 12.10.2026: die PNG-Bytes der Karte hingen von der
+    zlib-Fassung ab und die Golden-Seiten wichen ab; Pixel sind ueberall gleich."""
+    for seite in ("wettbewerb.html", "differenzierung.html", "geraete.html"):
+        assert "data:image/png" not in (site / seite).read_text(encoding="utf-8")
 
 
 def test_die_geraeteseite_traegt_dasselbe_glas(site):

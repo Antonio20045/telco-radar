@@ -64,8 +64,8 @@
    zur gewaehlten Ansicht; app.js setzt ihre Lage. Die Brechung an den
    Kanten (Karte vom Server, Rechenweg shuding/liquid-glass, MIT) zeigt nur
    Chromium, alle anderen sehen mattes Glas. #}
-{% macro glas_filter() -%}
-<svg class="glas-filter" width="0" height="0" aria-hidden="true" focusable="false"><filter id="glas-linse" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB" x="0" y="0" width="{{ glas.breite }}" height="{{ glas.hoehe }}"><feImage href="{{ glas.url }}" x="0" y="0" width="{{ glas.breite }}" height="{{ glas.hoehe }}" preserveAspectRatio="none" result="karte"/><feDisplacementMap in="SourceGraphic" in2="karte" scale="{{ glas.staerke }}" xChannelSelector="R" yChannelSelector="G"/></filter></svg>
+{% macro glas_filter(prefix) -%}
+<svg class="glas-filter" width="0" height="0" aria-hidden="true" focusable="false"><filter id="glas-linse" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB" x="0" y="0" width="{{ glas.breite }}" height="{{ glas.hoehe }}"><feImage href="{{ prefix }}{{ glas.datei }}" x="0" y="0" width="{{ glas.breite }}" height="{{ glas.hoehe }}" preserveAspectRatio="none" result="karte"/><feDisplacementMap in="SourceGraphic" in2="karte" scale="{{ glas.staerke }}" xChannelSelector="R" yChannelSelector="G"/></filter></svg>
 {%- endmacro %}
 
 {# Zwei Seiten als eine: jeder Eintrag ist ein echter Link, der beim
@@ -75,5 +75,5 @@
   <span class="glas-pille" aria-hidden="true"></span>
   {% for e in eintraege %}<a href="{{ prefix }}{{ e.href }}#ansicht"{% if e.key == aktiv %} aria-current="page"{% endif %}>{{ e.label }}</a>{% endfor %}
 </nav>
-{{ glas_filter() }}
+{{ glas_filter(prefix) }}
 {%- endmacro %}
