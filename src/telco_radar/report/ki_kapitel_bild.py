@@ -28,7 +28,13 @@ TOKENS = (
 )
 FOKUS = 4
 BEZUG = 3
-ORTE = ((0.13, 0.12), (0.3, 0.42), (0.45, 0.1), (0.62, 0.5), (0.86, 0.28))
+ORTE: tuple[tuple[float, float], ...] = (
+    (0.13, 0.12),
+    (0.3, 0.42),
+    (0.45, 0.1),
+    (0.62, 0.5),
+    (0.86, 0.28),
+)
 ORTE += ((0.9, 0.62), (0.08, 0.86))
 NACHBARN = (
     ("Tarif", 0.5, 0.72, 3),
@@ -42,7 +48,11 @@ NACHBARN = (
 WINKEL = (200, 235, 270, 320, 90, 40, 145)
 GEWICHTE = (0.05, 0.08, 0.22, 0.62, 0.0, 0.38, 0.03)
 ANTEIL_AB = 0.2
-KANDIDATEN = (("Ja", 0.62, 100), ("Das", 0.17, 240), ("Grundsätzlich", 0.11, 385))
+KANDIDATEN: tuple[tuple[str, float, int], ...] = (
+    ("Ja", 0.62, 100),
+    ("Das", 0.17, 240),
+    ("Grundsätzlich", 0.11, 385),
+)
 KANDIDATEN += (("Nein", 0.06, 525),)
 ANTWORT = (("Ja,", "das", "geht", "zum"), ("Ende", "der", "Laufzeit."))
 RINGE = ((60, 700, 150), (560, 1500, 220), (40, 2560, 180), (580, 3460, 160))
