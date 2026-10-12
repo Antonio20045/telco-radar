@@ -1,0 +1,129 @@
+{
+ "stand": "2026-10-12",
+ "top": [
+  {
+   "name": "Claude Opus 5.5",
+   "kurz": "Opus 5.5",
+   "firma": "Anthropic",
+   "farbe": "--ki-anthropic",
+   "aa_index": 58.0,
+   "aa_platz": 1.0,
+   "arena_platz": 2,
+   "mittel": 1.5,
+   "platz": 1
+  },
+  {
+   "name": "Gemini 4 Argon",
+   "kurz": "Gemini 4 Argon",
+   "firma": "Google",
+   "farbe": "--ki-google",
+   "aa_index": 53.0,
+   "aa_platz": 4.0,
+   "arena_platz": 1,
+   "mittel": 2.5,
+   "platz": 2
+  },
+  {
+   "name": "Claude Fable 5.1",
+   "kurz": "Fable 5.1",
+   "firma": "Anthropic",
+   "farbe": "--ki-anthropic",
+   "aa_index": 53.0,
+   "aa_platz": 4.0,
+   "arena_platz": 3,
+   "mittel": 3.5,
+   "platz": 3
+  },
+  {
+   "name": "Claude Sonnet 5.5",
+   "kurz": "Sonnet 5.5",
+   "firma": "Anthropic",
+   "farbe": "--ki-anthropic",
+   "aa_index": 56.0,
+   "aa_platz": 2.0,
+   "arena_platz": 8,
+   "mittel": 5.0,
+   "platz": 4
+  },
+  {
+   "name": "GPT-6.1 Sol",
+   "kurz": "GPT-6.1 Sol",
+   "firma": "OpenAI",
+   "farbe": "--ki-openai",
+   "aa_index": 52.0,
+   "aa_platz": 6.0,
+   "arena_platz": 6,
+   "mittel": 6.0,
+   "platz": 5
+  },
+  {
+   "name": "Muse Spark 1.3",
+   "kurz": "Muse Spark 1.3",
+   "firma": "Meta",
+   "farbe": "--ki-meta",
+   "aa_index": 48.0,
+   "aa_platz": 7.0,
+   "arena_platz": 5,
+   "mittel": 6.0,
+   "platz": 6
+  },
+  {
+   "name": "GPT-6 Astra",
+   "kurz": "GPT-6 Astra",
+   "firma": "OpenAI",
+   "farbe": "--ki-openai",
+   "aa_index": 53.0,
+   "aa_platz": 4.0,
+   "arena_platz": 9,
+   "mittel": 6.5,
+   "platz": 7
+  },
+  {
+   "name": "Gemini 3.8 Flash",
+   "kurz": "Gemini 3.8 Flash",
+   "firma": "Google",
+   "farbe": "--ki-google",
+   "aa_index": 41.0,
+   "aa_platz": 11.0,
+   "arena_platz": 4,
+   "mittel": 7.5,
+   "platz": 8
+  },
+  {
+   "name": "Qwen3.8 Max",
+   "kurz": "Qwen3.8 Max",
+   "firma": "Alibaba",
+   "farbe": "--ki-alibaba",
+   "aa_index": 45.0,
+   "aa_platz": 9.0,
+   "arena_platz": 7,
+   "mittel": 8.0,
+   "platz": 9
+  },
+  {
+   "name": "Grok 4.7",
+   "kurz": "Grok 4.7",
+   "firma": "xAI",
+   "farbe": "--ki-xai",
+   "aa_index": 46.0,
+   "aa_platz": 8.0,
+   "arena_platz": 13,
+   "mittel": 10.5,
+   "platz": 10
+  }
+ ],
+ "quellen": {
+  "aa": {
+   "url": "https://artificialanalysis.ai/leaderboards/models",
+   "error": null,
+   "versucht": "2026-10-12",
+   "abgerufen": "2026-10-12"
+  },
+  "arena": {
+   "url": "https://arena.ai/leaderboard/text",
+   "error": null,
+   "versucht": "2026-10-12",
+   "abgerufen": "2026-10-12"
+  }
+ }
+}
