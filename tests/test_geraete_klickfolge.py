@@ -20,8 +20,11 @@ from telco_radar.collect.geraete.robots import RobotsWaechter
 JETZT = datetime(2026, 10, 3, 5, 0, tzinfo=UTC)
 OFFEN = "User-agent: *\nDisallow:\n"
 RATE = {"S": 20, "M": 30, "L": 40}
-VERZUG = {"S": 0.0, "M": 1.4, "L": 3.0}
-SPAETE_FRIST_MS = 1000
+SPAETE_FRIST_MS = 3000
+VERZUG = {"S": 0.0, "M": 4.5, "L": 9.0}
+"""M kommt 1,5 s nach seiner Frist und 1,5 s vor dem Ende der Klickfrist für L, L drei
+Fristen nach dem Klick: Antonios Mac (12.10.2026) zählte M bei 1,0 s Frist und 1,4 s
+Verzug noch als erfasst; 0,4 s Marge hing an Rechnertempo und Timer-Auflösung."""
 TARIFE = """<!doctype html><html><body>
 <h1 id="kanarie">Beispielhandy X</h1>
 <div id="speicher"><button data-wert="128" aria-pressed="true">128 GB</button></div>

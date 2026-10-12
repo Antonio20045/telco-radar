@@ -19,6 +19,7 @@ from __future__ import annotations
 import dataclasses
 import gzip
 from datetime import UTC, datetime
+from urllib.parse import urlsplit
 
 import pytest
 from bestand_pfad import lese_wurzel
@@ -91,6 +92,15 @@ def _robots_nur_lokal(url: str) -> tuple[int, str]:
     return 200, OFFEN if "127.0.0.1" in url else ZU
 
 
+def _robots_beide_lokal(url: str) -> tuple[int, str]:
+    """Offen für 127.0.0.1 und localhost, zu für alles andere: sonst holte der Browser
+    Telekoms Skripte aus dem Netz, und deren Rechtshinweis-Ersetzer schrieb je nach
+    Netzlaufzeit ``<text-replacer>`` in den Zustand, bevor er gelesen war (12.10.2026).
+    """
+    host = urlsplit(url).hostname
+    return 200, OFFEN if host in ("127.0.0.1", "localhost") else ZU
+
+
 def _lies(chromium, karte, adresse: str, robots=_robots_nur_lokal) -> dict:
     waechter = RobotsWaechter(hole=robots)
     schleuse = Hostschleuse(waechter, lambda: JETZT)
@@ -130,7 +140,7 @@ def test_folgelink_auf_fremden_host_wird_nicht_gefolgt(chromium, karte, roh):
 
     with klickserver(antworte) as server:
         seite1 = _mit_folgelink(roh, server.adresse(NAECHSTE, host="localhost"))
-        ergebnis = _lies(chromium, karte, server.adresse(PFAD), lambda u: (200, OFFEN))
+        ergebnis = _lies(chromium, karte, server.adresse(PFAD), _robots_beide_lokal)
     assert ergebnis["status"] == LAUF_GELESEN, ergebnis["grund"]
     assert ergebnis["vollstaendig"] is False
     assert ergebnis["unvollstaendig"].startswith(GRUND_FREMDER_HOST)
