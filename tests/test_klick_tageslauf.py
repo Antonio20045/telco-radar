@@ -162,7 +162,7 @@ def test_tagesdatei_hat_alle_anbieter_mit_karte_und_keine_seitengrenze(ziele):
         assert karte.is_file()
     assert O2_SEITE.adresse in {s.adresse for s in ziele["o2"].seiten}
     telekom = _seiten_von(ziele, "Telekom")
-    assert len(telekom) == len(set(telekom)) == 316
+    assert len(telekom) == len(set(telekom)) == 324
     vodafone = _seiten_von(ziele, "Vodafone")
     assert len(vodafone) == len(set(vodafone)) == 42
     with pytest.raises(ErkundungszielFehler, match="höchstens 2"):
