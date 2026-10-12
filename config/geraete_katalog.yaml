@@ -472,7 +472,9 @@ geraete:
     modell: iPhone 17e
     generation: 17
     vorgaenger: iPhone 16e
-    speicher: [128, 256, 512]
+    # ohne 128 GB: keine Klick-Seite (12.10.2026) und keine Geräteliste seit 29.08.2026
+    # (alle Netzbetreiber, Saturn, mobilcom-debitel) führte diesen Speicher je
+    speicher: [256, 512]
     segment: mid
 
   - hersteller: Apple
@@ -549,7 +551,9 @@ geraete:
     generation: 11
     vorgaenger: Pixel 10 Pro
     marktstart: 2026-08-20   # siehe Block oben (Vodafone UK / Three UK, 20.08.2026)
-    speicher: [256, 512, 1024]
+    # ohne 1 TB: keine Klick-Seite (12.10.2026) und keine Geräteliste seit 29.08.2026
+    # (alle Netzbetreiber, Saturn, mobilcom-debitel) führte diesen Speicher je
+    speicher: [256, 512]
     segment: flagship
 
   - hersteller: Google
@@ -557,7 +561,9 @@ geraete:
     generation: 11
     vorgaenger: Pixel 10 Pro XL
     marktstart: 2026-08-20   # siehe Block oben (Vodafone UK / Three UK, 20.08.2026)
-    speicher: [256, 512, 1024]
+    # ohne 1 TB: keine Klick-Seite (12.10.2026) und keine Geräteliste seit 29.08.2026
+    # (alle Netzbetreiber, Saturn, mobilcom-debitel) führte diesen Speicher je
+    speicher: [256, 512]
     segment: flagship
 
   # "Pro Fold" ist ein EIGENER Eintrag und kein Alias von "Pro": beide stehen
@@ -637,7 +643,9 @@ geraete:
     vorgaenger: Galaxy Z Fold 7
     marktstart: 2026-08-07   # siehe Block oben (Samsung Newsroom, "ab dem 7. August")
     aliase: ["Galaxy Z Fold 8"]
-    speicher: [256, 512, 1024]
+    # ohne 1 TB: keine Klick-Seite (12.10.2026) und keine Geräteliste seit 29.08.2026
+    # (alle Netzbetreiber, Saturn, mobilcom-debitel) führte diesen Speicher je
+    speicher: [256, 512]
     segment: flagship
 
   - hersteller: Samsung
