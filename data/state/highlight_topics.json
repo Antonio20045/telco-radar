@@ -261,8 +261,8 @@
    ],
    "first_seen": "2026-10-09",
    "last_active": "2026-10-09",
-   "runs_ohne_zuwachs": 3,
-   "status": "aktiv",
+   "runs_ohne_zuwachs": 4,
+   "status": "beendet",
    "items": [
     {
      "url": "https://news.virginmediao2.co.uk/virgin-media-o2-creates-new-dedicated-customer-hub-in-newcastle-to-handle-repeat-calls-and-boost-first-time-resolution-for-all-customers/",
@@ -356,7 +356,8 @@
      "image_w": 800,
      "image_h": 450
     }
-   ]
+   ],
+   "ended": "2026-10-12"
   },
   {
    "slug": "bt-uebernimmt-talktalk",
@@ -371,8 +372,8 @@
    ],
    "first_seen": "2026-10-09",
    "last_active": "2026-10-09",
-   "runs_ohne_zuwachs": 3,
-   "status": "aktiv",
+   "runs_ohne_zuwachs": 4,
+   "status": "beendet",
    "items": [
     {
      "url": "https://www.mobileworldlive.com/ai-cloud/the-friday-file-starlink-talktalk-dt/",
@@ -508,7 +509,8 @@
      "image_w": 1200,
      "image_h": 800
     }
-   ]
+   ],
+   "ended": "2026-10-12"
   }
  ]
 }
