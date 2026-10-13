@@ -4,6 +4,11 @@ Vorbild ist die Weltseite von The Atlantic: oben drei Spalten mit dem
 Aufmacher in der Mitte, darunter eine Bildreihe, ein farbiger Schwerpunkt
 je Thema, die uebrigen Meldungen als ruhige Liste und am Ende Deutschland.
 
+Die Seite fuehrt wie eine Zeitung (Antonio, 13.10.2026): sie sammelt die
+Meldungen aller Laeufe, je Rubrik bis `HOECHSTZAHL`; erst was darueber
+hinausgeht oder aelter als `HOECHSTALTER_TAGE` ist, geht ins Archiv.
+Neue Meldungen des letzten Laufs bleiben immer sichtbar und fuehren oben.
+
 Jede Meldung steht genau einmal im Lauf der Seite. Der Schwerpunkt
 verweist nur auf Meldungen, die weiter oben oder unten vollstaendig
 stehen; er zeigt keine eigene. Die Reihenfolge innerhalb jeder Position
@@ -13,8 +18,9 @@ neu bewertet, nur verteilt.
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, timedelta
 
+from ..models import normalize_url
 from .bilder import MIND_BREITE_GROSS
 
 LINKS = 2
@@ -26,6 +32,16 @@ SCHWERPUNKT_MIND = 3
 STROM_SICHTBAR = 18
 MIND_BREITE_SPALTE = 400
 DEUTSCHLAND = "DE"
+HOECHSTZAHL = {
+    "tarife": 40,
+    "netz": 30,
+    "satellit": 15,
+    "regulierung": 15,
+    "geld": 15,
+    "partner": 15,
+    "vermischt": 10,
+}
+HOECHSTALTER_TAGE = 60
 
 
 def _breite(h: dict) -> int:
@@ -87,10 +103,69 @@ def _schwerpunkte(meldungen: list[dict], aufmacher: dict | None) -> list[dict]:
     return out
 
 
-def ausgabe(kontext: dict | None, cfg) -> dict:
-    """Verteilt die Meldungen der Ausgabe auf die Positionen der Seite."""
+def _tag(h: dict, ersatz: str | None) -> date | None:
+    for wert in (h.get("date"), ersatz):
+        try:
+            return date.fromisoformat(str(wert or "")[:10])
+        except ValueError:
+            continue
+    return None
+
+
+def zeitung(wochen: list[dict]) -> tuple[list[dict], list[dict]]:
+    """Sichtbare Meldungen und Archiv aus allen Ausgaben, neueste zuerst.
+
+    `wochen` ist `[{"date", "highlights"}]` mit der neuesten Ausgabe vorn.
+    Steht eine Adresse in mehreren Ausgaben, gilt die neueste. Sichtbar
+    sind zuerst die Meldungen des letzten Laufs in ihrer Rangfolge, dann
+    die aelteren nach Datum.
+    """
+    if not wochen:
+        return [], []
+    stichtag = _tag({}, wochen[0].get("date"))
+    grenze = stichtag - timedelta(days=HOECHSTALTER_TAGE) if stichtag else None
+    gesehen: set[str] = set()
+    neu: list[dict] = []
+    alt: list[dict] = []
+    for i, woche in enumerate(wochen):
+        for h in woche.get("highlights") or []:
+            schluessel = normalize_url(h.get("url") or "") or str(id(h))
+            if schluessel in gesehen:
+                continue
+            gesehen.add(schluessel)
+            (neu if i == 0 else alt).append(dict(h, lauf=woche.get("date")))
+    alt.sort(key=lambda h: str(_tag(h, h["lauf"]) or ""), reverse=True)
+    sichtbar = list(neu)
+    archiv: list[dict] = []
+    belegt: dict[str, int] = {}
+    for h in neu:
+        belegt[h.get("ressort") or "vermischt"] = (
+            belegt.get(h.get("ressort") or "vermischt", 0) + 1
+        )
+    for h in alt:
+        ressort = h.get("ressort") or "vermischt"
+        tag = _tag(h, h["lauf"])
+        zu_alt = grenze is not None and (tag is None or tag < grenze)
+        if zu_alt or belegt.get(ressort, 0) >= HOECHSTZAHL.get(ressort, 10):
+            archiv.append(h)
+            continue
+        belegt[ressort] = belegt.get(ressort, 0) + 1
+        sichtbar.append(h)
+    return sichtbar, archiv
+
+
+def ausgabe(kontext: dict | None, cfg, wochen: list[dict] | None = None) -> dict:
+    """Verteilt die Meldungen auf die Positionen der Seite.
+
+    Mit `wochen` sammelt die Seite ueber alle Laeufe (`zeitung()`), nicht
+    nur aus der letzten Ausgabe.
+    """
     kontext = kontext or {}
-    alle = list(kontext.get("highlights") or [])
+    archiv: list[dict] = []
+    if wochen is None:
+        alle = list(kontext.get("highlights") or [])
+    else:
+        alle, archiv = zeitung(wochen)
     de = deutsche_anbieter(cfg)
     deutschland = [h for h in alle if h.get("operator") in de]
     frei = [h for h in alle if h.get("operator") not in de]
@@ -119,4 +194,5 @@ def ausgabe(kontext: dict | None, cfg) -> dict:
         "strom": strom,
         "strom_sichtbar": STROM_SICHTBAR,
         "deutschland": deutschland,
+        "archiv": archiv,
     }

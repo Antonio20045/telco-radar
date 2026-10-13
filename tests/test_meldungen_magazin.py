@@ -111,3 +111,116 @@ def test_meldungsseite_nennt_keine_zahl_der_meldungen(tmp_path):
     assert f"{len(PORTAL)} Meldungen" not in soup.get_text(" ")
     assert not soup.select(".rubrik-zahl, .chip[data-filter]")
     assert soup.select_one(".mg-kopf .mg-datum")
+
+
+def _w(datum: str, hs: list[dict]) -> dict:
+    for h in hs:
+        h.setdefault("date", datum)
+    return {"date": datum, "highlights": hs}
+
+
+def test_zeitung_kappt_je_rubrik_die_aeltesten():
+    """Antonio, 13.10.2026: Hoechstzahl je Rubrik, Aeltestes ins Archiv."""
+    grenze = meldungen_seite.HOECHSTZAHL["netz"]
+    alt = [_h(i, 3) for i in range(grenze + 5)]
+    for i, h in enumerate(alt):
+        h["date"] = f"2026-10-{1 + i % 9:02d}"
+    neu = [_h(100, 2), _h(101, 2)]
+    sichtbar, archiv = meldungen_seite.zeitung(
+        [_w("2026-10-12", neu), _w("2026-10-09", alt)]
+    )
+    assert len(sichtbar) == grenze
+    assert sichtbar[:2] == [dict(h, lauf="2026-10-12") for h in neu]
+    assert len(archiv) == 7
+    juengstes_archiv = max(h["date"] for h in archiv)
+    aeltestes_sichtbar = min(h["date"] for h in sichtbar[2:])
+    assert juengstes_archiv <= aeltestes_sichtbar
+
+
+def test_neue_meldungen_des_letzten_laufs_bleiben_alle():
+    """Bringt ein Lauf mehr Neues als die Hoechstzahl, geht nichts verloren."""
+    grenze = meldungen_seite.HOECHSTZAHL["tarife"]
+    neu = [_h(i, 3, "tarife") for i in range(grenze + 12)]
+    alt = [_h(500, 5, "tarife"), _h(501, 5, "geld")]
+    sichtbar, archiv = meldungen_seite.zeitung(
+        [_w("2026-10-12", neu), _w("2026-10-09", alt)]
+    )
+    assert len(sichtbar) == grenze + 13
+    assert [h["url"] for h in archiv] == ["https://example.com/500"]
+
+
+def test_seltene_rubrik_behaelt_alte_meldungen_bis_zur_altersgrenze():
+    tage = meldungen_seite.HOECHSTALTER_TAGE
+    from datetime import date, timedelta
+
+    stichtag = date(2026, 10, 12)
+    knapp = (stichtag - timedelta(days=tage)).isoformat()
+    zu_alt = (stichtag - timedelta(days=tage + 1)).isoformat()
+    sichtbar, archiv = meldungen_seite.zeitung(
+        [
+            _w(stichtag.isoformat(), [_h(1, 3)]),
+            _w(knapp, [_h(2, 3, "regulierung")]),
+            _w(zu_alt, [_h(3, 3, "regulierung")]),
+        ]
+    )
+    assert [h["url"] for h in sichtbar] == [
+        "https://example.com/1",
+        "https://example.com/2",
+    ]
+    assert [h["url"] for h in archiv] == ["https://example.com/3"]
+
+
+def test_dieselbe_adresse_steht_einmal_und_die_neueste_gilt():
+    neu = _h(1, 4)
+    neu["url"] = "https://www.example.com/1/?utm_source=x"
+    alt = _h(1, 2)
+    sichtbar, archiv = meldungen_seite.zeitung(
+        [_w("2026-10-12", [neu]), _w("2026-10-09", [alt])]
+    )
+    assert len(sichtbar) == 1 and archiv == []
+    assert sichtbar[0]["relevance"] == 4 and sichtbar[0]["lauf"] == "2026-10-12"
+
+
+def test_kopf_kommt_aus_dem_letzten_lauf():
+    alt = [_h(i, 5, image_w=MIND_BREITE_GROSS) for i in range(5)]
+    neu = [_h(9, 2, image_w=MIND_BREITE_GROSS)]
+    a = meldungen_seite.ausgabe(
+        {"highlights": neu}, None, [_w("2026-10-12", neu), _w("2026-10-09", alt)]
+    )
+    assert a["aufmacher"]["url"] == "https://example.com/9"
+    assert len(_alle(a)) == 6
+
+
+def test_meldungsseite_zeigt_meldungen_frueherer_laeufe(tmp_path):
+    """Gegenprobe zum alten Stand: dort stand nur die letzte Ausgabe."""
+    import json
+
+    from orakel.test_seiten_inhalt import PORTAL, lies_seite, render
+
+    from telco_radar.report.html import render_site
+
+    render(tmp_path, highlights=PORTAL[:6])
+    reports = tmp_path / "data" / "reports"
+    frueher = json.loads((reports / "2026-08-05.json").read_text(encoding="utf-8"))
+    frueher["date"] = "2026-08-01"
+    frueher["regions"]["Europa"]["highlights"] = [
+        dict(h, url=f"https://example.com/frueher/{i}", title=f"Früher {i}")
+        for i, h in enumerate(PORTAL[6:10])
+    ]
+    (reports / "2026-08-01.json").write_text(json.dumps(frueher), encoding="utf-8")
+    site = tmp_path / "site2"
+    render_site(site, reports)
+    soup = BeautifulSoup(lies_seite(site, "meldungen.html"), "html.parser")
+    links = {a["href"] for a in soup.select("article.meldung a.mg-link")}
+    assert "https://example.com/frueher/0" in links
+    assert len(soup.select("article.meldung")) == 10
+
+
+def test_jede_meldung_nennt_ihr_datum(tmp_path):
+    """Aeltere Meldungen bleiben stehen, also muss man ihr Alter sehen."""
+    from orakel.test_seiten_inhalt import PORTAL, lies_seite, render
+
+    html = lies_seite(render(tmp_path, highlights=PORTAL[:6]), "meldungen.html")
+    soup = BeautifulSoup(html, "html.parser")
+    wer = soup.select("article.meldung .mg-wer")
+    assert wer and all("5. August 2026" in w.get_text() for w in wer)

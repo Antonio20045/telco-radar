@@ -38,7 +38,7 @@
 {% endmacro %}
 
 {% macro wer(h) -%}
-<span class="mg-wer">{{ h.operator or h.source_label }}{% if h.region %} · {{ h.region }}{% endif %}</span>
+<span class="mg-wer">{{ h.operator or h.source_label }}{% if h.region %} · {{ h.region }}{% endif %}{% if h.date %} · {{ h.date[:10] | date_de }}{% endif %}</span>
 {%- endmacro %}
 
 {# Eine Meldung im Lauf der Seite. `art` waehlt die Groesse, `bild` und
@@ -89,7 +89,7 @@
   zuletzt vollständig redigierte Ausgabe.</p>
 {% endif %}
 
-{% if highlights %}
+{% if ausgabe.aufmacher %}
 <section class="mg-oben" aria-label="Die wichtigsten Meldungen">
   {% if ausgabe.aufmacher %}{{ meldung(ausgabe.aufmacher, 'aufmacher', dek=true) }}{% endif %}
   <div class="mg-links">
@@ -147,7 +147,7 @@
 {% endif %}
 
 <div class="wrap">
-{% if highlights %}
+{% if ausgabe.aufmacher %}
 {% if ausgabe.strom %}
 <section class="mg-weiter" aria-labelledby="mg-weiter-titel">
   <div class="mg-abschnitt" data-auftritt><h2 id="mg-weiter-titel">Weitere Meldungen</h2></div>
