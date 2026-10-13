@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-12",
+ "updated": "2026-10-13",
  "entries": [
   {
    "id": "https://thefastmode.com/technology-solutions/49163-o2-expands-cloud-storage-service-with-10-tb-free-space-for-mobile-fiber-customers",
@@ -110,7 +110,7 @@
    "date": null,
    "why": "Vodafone könnte ein vergleichbares Entertainment-Paket mit starken Partnern wie Disney schnüren, das nicht kostenlos, aber deutlich vergünstigt ist und so einen Mehrwert jenseits des reinen Preises schafft.",
    "first_seen": "2026-07-21",
-   "last_verified": "2026-10-12",
+   "last_verified": "2026-10-13",
    "status": "aktiv"
   },
   {
@@ -166,7 +166,7 @@
    "date": null,
    "why": "Der Move ist interessant, weil er mit steigender Leitungszahl zusätzliche Gratis-Dienste freischaltet und so Multi-Line-Haushalte gezielt anspricht.",
    "first_seen": "2026-07-25",
-   "last_verified": "2026-10-12",
+   "last_verified": "2026-10-13",
    "status": "aktiv"
   },
   {
@@ -180,7 +180,7 @@
    "date": null,
    "why": "Der Move zeigt, wie ein Mobilfunkanbieter durch die gleichzeitige Bündelung mehrerer Streaming- und Audio-Dienste den Unterhaltungswert seiner Tarife erhöht.",
    "first_seen": "2026-08-14",
-   "last_verified": "2026-10-12",
+   "last_verified": "2026-10-13",
    "status": "aktiv"
   },
   {
@@ -194,7 +194,7 @@
    "date": null,
    "why": "Der Move zeigt, wie ein Anbieter über Festnetz- und Mobilfunkanschlüsse hinweg ein vergünstigtes Streaming-Bündel als Kundenbindungsinstrument einsetzt.",
    "first_seen": "2026-08-14",
-   "last_verified": "2026-10-12",
+   "last_verified": "2026-10-13",
    "status": "aktiv"
   },
   {
@@ -334,7 +334,7 @@
    "date": null,
    "why": "Eine mehrjährige Preisgarantie ist ein klares Serviceversprechen, das Kunden Planungssicherheit gibt und sich von kurzfristigen Lockangeboten abhebt.",
    "first_seen": "2026-07-25",
-   "last_verified": "2026-10-12",
+   "last_verified": "2026-10-13",
    "status": "aktiv"
   },
   {
@@ -376,7 +376,7 @@
    "date": null,
    "why": "Das Versprechen adressiert direkt Kundensorgen hinsichtlich der Verbindungsqualität und bietet einen formalen Nachbesserungsanspruch bei Serviceproblemen.",
    "first_seen": "2026-10-12",
-   "last_verified": "2026-10-12",
+   "last_verified": "2026-10-13",
    "status": "aktiv"
   },
   {
@@ -405,6 +405,20 @@
    "why": "Die Integration von Versicherung (AppleCare+) in ein Upgrade-Programm zeigt Vodafone eine Möglichkeit, eigene Geräte-Programme mit Vodafone Care oder ähnlichen Services zu bündeln, um ein exklusives Ökosystem zu schaffen.",
    "first_seen": "2026-07-21",
    "last_verified": "2026-07-21",
+   "status": "aktiv"
+  },
+  {
+   "id": "https://xfinity.com/support/articles/upgrade-anytime-faqs",
+   "theme": "geraete",
+   "operator": "Xfinity Mobile",
+   "region": "Nordamerika",
+   "what": "Xfinity Mobile ermöglicht Kunden mit dem 'Mobile Plus' oder 'Premium Unlimited' Service ein jederzeitiges Upgrade auf ein neues Smartphone.",
+   "url": "https://www.xfinity.com/support/articles/upgrade-anytime-faqs",
+   "source": "xfinity.com",
+   "date": null,
+   "why": "Dieser Move differenziert durch die Flexibilität, unabhängig von starren Vertragslaufzeiten oder festen Upgrade-Zyklen jederzeit modernste Hardware nutzen zu können.",
+   "first_seen": "2026-10-13",
+   "last_verified": "2026-10-13",
    "status": "aktiv"
   },
   {
@@ -502,7 +516,7 @@
    "date": null,
    "why": "Dies zeigt, wie ein direkter Konkurrent KI-Assistenten als Massenmarkt-Benefit einsetzt. Vodafone sollte bewerten, ob ein ähnliches 'KI-Flatrate'-Modell ohne Aufpreis einen Wettbewerbsvorteil bringen oder nur Kosten verursachen würde.",
    "first_seen": "2026-07-21",
-   "last_verified": "2026-07-25",
+   "last_verified": "2026-10-13",
    "status": "aktiv"
   },
   {
@@ -558,7 +572,7 @@
    "date": null,
    "why": "Der Move zeigt, wie ein Mobilfunker ein KI-Abo als konkreten Zusatznutzen in Prepaid-Datentarife integriert und sich damit abseits reiner Netztarife positioniert.",
    "first_seen": "2026-08-14",
-   "last_verified": "2026-10-12",
+   "last_verified": "2026-10-13",
    "status": "aktiv"
   },
   {
@@ -573,6 +587,20 @@
    "why": "Der Schritt illustriert, wie ein Netzbetreiber einen generativen KI-Assistenten als Tarifbestandteil einsetzt, um sich im Endkundengeschäft über den Preis hinaus zu differenzieren.",
    "first_seen": "2026-08-14",
    "last_verified": "2026-08-14",
+   "status": "aktiv"
+  },
+  {
+   "id": "https://timesofindia.indiatimes.com/technology/tech-news/how-to-get-access-to-googles-gemini-pro-openais-chatgpt-go-and-perplexity-for-free-all-offers-and-more/articleshow/126266849.cms",
+   "theme": "ki",
+   "operator": "Airtel",
+   "region": "Asien",
+   "what": "Airtel bietet allen seinen 360 Millionen Kunden ein kostenloses 12-monatiges Abonnement für Perplexity Pro an.",
+   "url": "https://timesofindia.indiatimes.com/technology/tech-news/how-to-get-access-to-googles-gemini-pro-openais-chatgpt-go-and-perplexity-for-free-all-offers-and-more/articleshow/126266849.cms",
+   "source": "timesofindia.indiatimes.com",
+   "date": null,
+   "why": "Dieser Move zielt darauf ab, die Kundenbindung durch die Integration eines Premium-KI-Suchwerkzeugs in das Standard-Mobilfunkangebot zu stärken.",
+   "first_seen": "2026-10-13",
+   "last_verified": "2026-10-13",
    "status": "aktiv"
   },
   {

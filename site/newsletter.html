@@ -12,7 +12,7 @@
   <link rel="icon" type="image/png" href="logo.png">
 </head>
 
-<body class="uc-markt seite-newsletter mit-hintergrund">
+<body class="uc-markt seite-newsletter mit-buehne">
   <a class="sprungmarke" href="#inhalt">Zum Inhalt</a>
   
   <header class="topbar kopf" id="kopf">
@@ -55,159 +55,190 @@
     </div>
   </header>
   <main id="inhalt">
-    <div class="hintergrund" aria-hidden="true"><img class="motiv hintergrund-motiv" src="static/bilder/band-newsletter.jpg" alt=""
+    
+<section class="wa-auftakt mg-auftakt nl-auftakt" data-buehne>
+  <div class="wa-auftakt-buehne">
+    <div class="wa-rahmen">
+      <div class="wa-bild" aria-hidden="true"><img class="motiv wa-motiv" src="static/bilder/band-newsletter.jpg" alt=""
      srcset="static/bilder/1200/band-newsletter-e5a3d7c5a0.jpg 1200w, static/bilder/band-newsletter.jpg 2400w" sizes="100vw"
      width="2400" height="1357" decoding="async" loading="eager" fetchpriority="high"
      style="background:url(data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAASACADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwCfwlIzupIYAKOT35rsYXCnB6c159oM9zDdFI1bBGckHA6cZrq0u7rjLRjvzmoTKsbbTJn5RmsjXL+CGyuA527gp5/3cUC7um3YMQAGSx4Cj3Jrm/EV2/lFpp4HRgMBJFP6ZouFjz4XNwp+WeUfRzUn2u6z/wAfM3/fZooqUUH2u5fMb3EzIw5UuSD+FNYADgYoooA//9k=) center/cover"></div>
+      <div class="wa-schleier" aria-hidden="true"></div>
+      <header class="mg-kopf wa-text">
+        <p class="mg-woche">Per E-Mail</p>
+        <h1 class="mg-titel" aria-label="Newsletter"><span style="--i:0" aria-hidden="true">N</span><span style="--i:1" aria-hidden="true">e</span><span style="--i:2" aria-hidden="true">w</span><span style="--i:3" aria-hidden="true">s</span><span style="--i:4" aria-hidden="true">l</span><span style="--i:5" aria-hidden="true">e</span><span style="--i:6" aria-hidden="true">t</span><span style="--i:7" aria-hidden="true">t</span><span style="--i:8" aria-hidden="true">e</span><span style="--i:9" aria-hidden="true">r</span></h1>
+        <p class="mg-datum">Nach jedem Radar-Lauf, nur mit Neuem</p>
+      </header>
+      <div class="wa-hinweis" aria-hidden="true"></div>
+    </div>
+  </div>
+</section>
+
     <div class="wrap">
       
       
-
 <div class="nl">
-  <p class="page-kicker">Per E-Mail</p>
-  <h1>Der Radar in deinem Postfach</h1>
-  <p class="nl-lead">
-    Zweimal pro Woche, zu deinen Themen — und <strong>nur, wenn es dazu
-    wirklich etwas Neues gibt.</strong>
-  </p>
-
   
 
   <form id="nl-form" class="nl-form" novalidate
         >
+    <p class="nl-regel">Nichts angekreuzt heißt: alles.</p>
 
     
-    <fieldset class="nl-block">
-      <legend class="rubrik">Bereich</legend>
-      <p class="nl-hinweis">Welche Rubrik des Portals. Nichts angekreuzt = alles.</p>
+    <fieldset class="nl-block" data-dim="bereiche">
+      <legend class="nl-titel">Bereiche</legend>
       <div class="nl-optionen">
         
         <label class="nl-opt">
           <input type="checkbox" name="branches" value="marktrecherche">
-          <span>Marktrecherche</span>
+          
+          <span>Meldungen</span>
         </label>
         
         <label class="nl-opt">
           <input type="checkbox" name="branches" value="promo">
-          <span>Promo Übersicht</span>
+          
+          <span>Promo</span>
+        </label>
+        
+        <label class="nl-opt">
+          <input type="checkbox" name="branches" value="geraete">
+          
+          <span>Geräte</span>
         </label>
         
       </div>
     </fieldset>
     
-    <fieldset class="nl-block">
-      <legend class="rubrik">Regionen</legend>
-      <p class="nl-hinweis">Welche Weltregionen. Nichts angekreuzt = alles.</p>
-      <div class="nl-optionen">
-        
-        <label class="nl-opt">
-          <input type="checkbox" name="regions" value="europa">
-          <span>Europa</span>
-        </label>
-        
-        <label class="nl-opt">
-          <input type="checkbox" name="regions" value="nordamerika">
-          <span>Nordamerika</span>
-        </label>
-        
-        <label class="nl-opt">
-          <input type="checkbox" name="regions" value="lateinamerika">
-          <span>Lateinamerika</span>
-        </label>
-        
-        <label class="nl-opt">
-          <input type="checkbox" name="regions" value="afrika-naher-osten">
-          <span>Afrika &amp; Naher Osten</span>
-        </label>
-        
-        <label class="nl-opt">
-          <input type="checkbox" name="regions" value="asien">
-          <span>Asien</span>
-        </label>
-        
-        <label class="nl-opt">
-          <input type="checkbox" name="regions" value="ozeanien">
-          <span>Ozeanien</span>
-        </label>
-        
-        <label class="nl-opt">
-          <input type="checkbox" name="regions" value="global">
-          <span>Global und Themenfelder</span>
-        </label>
-        
-      </div>
-    </fieldset>
-    
-    <fieldset class="nl-block">
-      <legend class="rubrik">Wettbewerber</legend>
-      <p class="nl-hinweis">Nur Meldungen, in denen einer dieser Anbieter vorkommt. Nichts angekreuzt = alles.</p>
+    <fieldset class="nl-block" data-dim="wettbewerber">
+      <legend class="nl-titel">Anbieter</legend>
       <div class="nl-optionen">
         
         <label class="nl-opt">
           <input type="checkbox" name="competitors" value="telekom">
+          <i class="nl-marke gr-anb--telekom" aria-hidden="true"></i>
           <span>Deutsche Telekom</span>
         </label>
         
         <label class="nl-opt">
           <input type="checkbox" name="competitors" value="o2">
+          <i class="nl-marke gr-anb--o2" aria-hidden="true"></i>
           <span>O2 Telefónica</span>
         </label>
         
         <label class="nl-opt">
           <input type="checkbox" name="competitors" value="1und1">
+          <i class="nl-marke gr-anb--1-1" aria-hidden="true"></i>
           <span>1&amp;1</span>
         </label>
         
         <label class="nl-opt">
           <input type="checkbox" name="competitors" value="vodafone">
+          <i class="nl-marke gr-anb--vodafone" aria-hidden="true"></i>
           <span>Vodafone</span>
         </label>
         
         <label class="nl-opt">
           <input type="checkbox" name="competitors" value="freenet">
+          <i class="nl-marke gr-anb--freenet" aria-hidden="true"></i>
           <span>freenet / mobilcom-debitel</span>
         </label>
         
         <label class="nl-opt">
           <input type="checkbox" name="competitors" value="discounter">
+          <i class="nl-marke gr-anb--discounter" aria-hidden="true"></i>
           <span>Discountmarken</span>
         </label>
         
       </div>
     </fieldset>
     
-    <fieldset class="nl-block">
-      <legend class="rubrik">Themen</legend>
-      <p class="nl-hinweis">Worum es gehen soll. Nichts angekreuzt = alles.</p>
+    <fieldset class="nl-block" data-dim="regionen" data-nur-meldungen>
+      <legend class="nl-titel">Regionen</legend>
+      <div class="nl-optionen">
+        
+        <label class="nl-opt">
+          <input type="checkbox" name="regions" value="europa">
+          
+          <span>Europa</span>
+        </label>
+        
+        <label class="nl-opt">
+          <input type="checkbox" name="regions" value="nordamerika">
+          
+          <span>Nordamerika</span>
+        </label>
+        
+        <label class="nl-opt">
+          <input type="checkbox" name="regions" value="lateinamerika">
+          
+          <span>Lateinamerika</span>
+        </label>
+        
+        <label class="nl-opt">
+          <input type="checkbox" name="regions" value="afrika-naher-osten">
+          
+          <span>Afrika &amp; Naher Osten</span>
+        </label>
+        
+        <label class="nl-opt">
+          <input type="checkbox" name="regions" value="asien">
+          
+          <span>Asien</span>
+        </label>
+        
+        <label class="nl-opt">
+          <input type="checkbox" name="regions" value="ozeanien">
+          
+          <span>Ozeanien</span>
+        </label>
+        
+        <label class="nl-opt">
+          <input type="checkbox" name="regions" value="global">
+          
+          <span>Global und Themenfelder</span>
+        </label>
+        
+      </div>
+    </fieldset>
+    
+    <fieldset class="nl-block" data-dim="kategorien" data-nur-meldungen>
+      <legend class="nl-titel">Themen</legend>
       <div class="nl-optionen">
         
         <label class="nl-opt">
           <input type="checkbox" name="categories" value="tarife">
+          
           <span>Tarife &amp; Angebote</span>
         </label>
         
         <label class="nl-opt">
           <input type="checkbox" name="categories" value="netz">
+          
           <span>Netz &amp; Technik</span>
         </label>
         
         <label class="nl-opt">
           <input type="checkbox" name="categories" value="satellit">
+          
           <span>Satellit &amp; Direct-to-Cell</span>
         </label>
         
         <label class="nl-opt">
           <input type="checkbox" name="categories" value="regulierung">
+          
           <span>Regulierung &amp; Politik</span>
         </label>
         
         <label class="nl-opt">
           <input type="checkbox" name="categories" value="geld">
+          
           <span>Geld &amp; Übernahmen</span>
         </label>
         
         <label class="nl-opt">
           <input type="checkbox" name="categories" value="partner">
+          
           <span>Partnerschaften</span>
         </label>
         
@@ -216,12 +247,10 @@
     
 
     <fieldset class="nl-block">
-      <legend class="rubrik">Eigene Stichwörter</legend>
+      <legend class="nl-titel">Stichwörter</legend>
       <p class="nl-hinweis">
-        Ein Treffer auf ein eigenes Stichwort kommt in die Ausgabe, auch wenn
-        er durch die Auswahl oben herausgefallen wäre — er ist dann als solcher
-        markiert. Höchstens 10 Stichwörter, jedes
-        mit mindestens 4 Zeichen.
+        Kommen immer mit, auch außerhalb der Auswahl. Höchstens
+        10, je ab 4 Zeichen.
       </p>
       <div class="nl-stichwort-zeile">
         <input type="text" id="nl-stichwort" class="nl-feld"
@@ -234,7 +263,7 @@
     </fieldset>
 
     <fieldset class="nl-block nl-abschluss">
-      <legend class="rubrik">Deine E-Mail-Adresse</legend>
+      <legend class="nl-titel">E-Mail-Adresse</legend>
       <input type="email" id="nl-email" name="email" class="nl-feld nl-feld--breit"
              autocomplete="email" required placeholder="name@firma.de"
              aria-label="E-Mail-Adresse">
@@ -245,16 +274,15 @@
       </div>
 
       <label class="nl-consent">
-        
         <input type="checkbox" id="nl-consent" required>
         <span class="nl-consent-text">
           <span class="nl-consent-p">Ich möchte den Telco Radar per E-Mail bekommen, zu den Themen, die ich hier ausgewählt habe.</span><span class="nl-consent-p">Versendet wird von Antonio Fotiadis Francisco über den Dienstleister Brevo (Frankreich). Gespeichert werden meine E-Mail-Adresse, meine Themenauswahl und der Nachweis dieser Einwilligung.</span><span class="nl-consent-p">Ich kann jederzeit widerrufen — über den Abmeldelink in jeder E-Mail. Danach wird meine Adresse gelöscht. Einzelheiten in der Datenschutzerklärung.</span>
         </span>
       </label>
       <p class="nl-fein">
-        Fassung 2026-08-13. Einzelheiten in der
-        <a href="datenschutz.html">Datenschutzerklärung</a>,
-        Anbieterangaben im <a href="impressum.html">Impressum</a>.
+        Fassung 2026-08-13 ·
+        <a href="datenschutz.html">Datenschutz</a> ·
+        <a href="impressum.html">Impressum</a>
       </p>
 
       <button type="submit" id="nl-submit" class="nl-btn"
@@ -267,14 +295,14 @@
 
   <noscript>
     <p class="nl-gesperrt">
-      Für die Anmeldung braucht diese Seite JavaScript — sie holt vorher eine
-      signierte Kennung beim Anmeldedienst ab. Ohne JavaScript schreib bitte
-      an die Adresse im <a href="impressum.html">Impressum</a>.
+      Für die Anmeldung braucht diese Seite JavaScript. Ohne JavaScript
+      schreiben Sie bitte an die Adresse im
+      <a href="impressum.html">Impressum</a>.
     </p>
   </noscript>
 </div>
 
-<script id="nl-config" type="application/json">{"dienst": "https://telco-radar-signup.onrender.com", "frei": true, "max_stichwoerter": 10, "min_laenge": 4, "warnung_ab": 25, "vorschau_tage": 30}</script>
+<script id="nl-config" type="application/json">{"dienst": "https://telco-radar-signup.onrender.com", "meldungen": "marktrecherche", "frei": true, "max_stichwoerter": 10, "min_laenge": 4, "warnung_ab": 25, "vorschau_tage": 30}</script>
 
     </div>
   </main>

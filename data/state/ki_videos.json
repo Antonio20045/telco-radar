@@ -1,6 +1,156 @@
 {
- "stand": "2026-10-12",
+ "stand": "2026-10-13",
  "videos": [
+  {
+   "id": "z_sXLlLVUls",
+   "titel": "OpenAI’s New AI Is Doing Things We Barely Understand",
+   "kanal": "Two Minute Papers",
+   "datum": "2026-10-13",
+   "dauer_sekunden": 529,
+   "stufe": "Fortgeschritten",
+   "sprache": "en",
+   "bild": "z_sXLlLVUls.jpg"
+  },
+  {
+   "id": "wSuWuPUTC10",
+   "titel": "Every Generation Thinks This Time Is Different: The AI Job Myth",
+   "kanal": "IBM Technology",
+   "datum": "2026-10-13",
+   "dauer_sekunden": 766,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "wSuWuPUTC10.jpg"
+  },
+  {
+   "id": "quj0s7oVs-g",
+   "titel": "Ask AI Agents If You’re Protected From a Threat Actor",
+   "kanal": "Microsoft Mechanics",
+   "datum": "2026-10-13",
+   "dauer_sekunden": 41,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "quj0s7oVs-g.jpg"
+  },
+  {
+   "id": "ftkic7Tdpcg",
+   "titel": "Using Gemini 4 Argon to protect against Cyber attackers",
+   "kanal": "Google DeepMind",
+   "datum": "2026-10-13",
+   "dauer_sekunden": 128,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "ftkic7Tdpcg.jpg"
+  },
+  {
+   "id": "eBszYxzE2dk",
+   "titel": "Google Just Caught Up (Gemini-4 Argon)",
+   "kanal": "Matt Wolfe",
+   "datum": "2026-10-13",
+   "dauer_sekunden": 1240,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "eBszYxzE2dk.jpg"
+  },
+  {
+   "id": "b0jA6fkGsk8",
+   "titel": "How To Stop Being An \"AI Meat Proxy\"",
+   "kanal": "Matt Wolfe",
+   "datum": "2026-10-13",
+   "dauer_sekunden": 61,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "b0jA6fkGsk8.jpg"
+  },
+  {
+   "id": "U7OUacSjohw",
+   "titel": "„Die Intelligenz-Explosion hat begonnen\", OpenAI schockt Mathematik & China baut das Weltgehirn",
+   "kanal": "Everlast AI",
+   "datum": "2026-10-13",
+   "dauer_sekunden": 8390,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "U7OUacSjohw.jpg"
+  },
+  {
+   "id": "TD0bImyg_IM",
+   "titel": "Ride out this sticker storm in style",
+   "kanal": "OpenAI",
+   "datum": "2026-10-13",
+   "dauer_sekunden": 65,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "TD0bImyg_IM.jpg"
+  },
+  {
+   "id": "N6K_pxaAh0w",
+   "titel": "Block on Finding and Fixing Security Risks with OpenAI",
+   "kanal": "OpenAI",
+   "datum": "2026-10-13",
+   "dauer_sekunden": 45,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "N6K_pxaAh0w.jpg"
+  },
+  {
+   "id": "LVEfFyijQ2c",
+   "titel": "Applying Gemini 4 for large-scale codebase maintenance in Chromium",
+   "kanal": "Google DeepMind",
+   "datum": "2026-10-13",
+   "dauer_sekunden": 155,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "LVEfFyijQ2c.jpg"
+  },
+  {
+   "id": "HdI_aYzgJIg",
+   "titel": "Personal Agents, Clearly Explained",
+   "kanal": "Jeff Su",
+   "datum": "2026-10-13",
+   "dauer_sekunden": 921,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "HdI_aYzgJIg.jpg"
+  },
+  {
+   "id": "9jQA7IgPhBE",
+   "titel": "Untangling 500-page chemistry patents with Gemini 4",
+   "kanal": "Google DeepMind",
+   "datum": "2026-10-13",
+   "dauer_sekunden": 150,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "9jQA7IgPhBE.jpg"
+  },
+  {
+   "id": "9aDuSpVoB-Y",
+   "titel": "Block on Finding and Fixing Security Risks with OpenAI",
+   "kanal": "OpenAI",
+   "datum": "2026-10-13",
+   "dauer_sekunden": 24,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "9aDuSpVoB-Y.jpg"
+  },
+  {
+   "id": "9PICEmtfpWU",
+   "titel": "Teaching a humanoid robot to play cornhole with Gemini 4 Argon",
+   "kanal": "Google DeepMind",
+   "datum": "2026-10-13",
+   "dauer_sekunden": 104,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "9PICEmtfpWU.jpg"
+  },
+  {
+   "id": "2xJbP3eJqiY",
+   "titel": "How AI-Powered Cyberattacks Adapt Mid-Breach",
+   "kanal": "Microsoft Mechanics",
+   "datum": "2026-10-13",
+   "dauer_sekunden": 37,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "2xJbP3eJqiY.jpg"
+  },
   {
    "id": "xBSLmwVTsRc",
    "titel": "How to Use Meta Muse",
@@ -8,7 +158,8 @@
    "datum": "2026-10-12",
    "dauer_sekunden": 479,
    "stufe": "Einstieg",
-   "sprache": "en"
+   "sprache": "en",
+   "bild": "xBSLmwVTsRc.jpg"
   },
   {
    "id": "k5IUKr4TQFo",
@@ -17,7 +168,8 @@
    "datum": "2026-10-12",
    "dauer_sekunden": 1407,
    "stufe": "Einstieg",
-   "sprache": "de"
+   "sprache": "de",
+   "bild": "k5IUKr4TQFo.jpg"
   },
   {
    "id": "hTAWHgQI4xg",
@@ -26,7 +178,8 @@
    "datum": "2026-10-12",
    "dauer_sekunden": 603,
    "stufe": "Einstieg",
-   "sprache": "en"
+   "sprache": "en",
+   "bild": "hTAWHgQI4xg.jpg"
   },
   {
    "id": "g_cUMfhZ0k8",
@@ -35,7 +188,8 @@
    "datum": "2026-10-12",
    "dauer_sekunden": 1464,
    "stufe": "Einstieg",
-   "sprache": "de"
+   "sprache": "de",
+   "bild": "g_cUMfhZ0k8.jpg"
   },
   {
    "id": "afXHGzGNAtM",
@@ -44,16 +198,28 @@
    "datum": "2026-10-12",
    "dauer_sekunden": 743,
    "stufe": "Einstieg",
-   "sprache": "en"
+   "sprache": "en",
+   "bild": "afXHGzGNAtM.jpg"
   },
   {
    "id": "IZXv6a78NDw",
-   "titel": "Code review shouldn't be the bottleneck",
+   "titel": "Code review is no longer the bottleneck",
    "kanal": "OpenAI",
    "datum": "2026-10-12",
    "dauer_sekunden": 142,
    "stufe": "Einstieg",
-   "sprache": "en"
+   "sprache": "en",
+   "bild": "IZXv6a78NDw.jpg"
+  },
+  {
+   "id": "C4Sq3Rot8FU",
+   "titel": "AI Labs Warn Race Makes Breach ‘Inevitable’",
+   "kanal": "AI Explained",
+   "datum": "2026-10-12",
+   "dauer_sekunden": 1861,
+   "stufe": "Fortgeschritten",
+   "sprache": "en",
+   "bild": "C4Sq3Rot8FU.jpg"
   },
   {
    "id": "zRMAvMSSSII",
@@ -62,7 +228,8 @@
    "datum": "2026-10-11",
    "dauer_sekunden": 243,
    "stufe": "Einstieg",
-   "sprache": "en"
+   "sprache": "en",
+   "bild": "zRMAvMSSSII.jpg"
   },
   {
    "id": "ZHOmBeMNbnc",
@@ -71,7 +238,8 @@
    "datum": "2026-10-11",
    "dauer_sekunden": 3657,
    "stufe": "Fortgeschritten",
-   "sprache": "en"
+   "sprache": "en",
+   "bild": "ZHOmBeMNbnc.jpg"
   },
   {
    "id": "83LZqTqz7QA",
@@ -80,7 +248,8 @@
    "datum": "2026-10-11",
    "dauer_sekunden": 4588,
    "stufe": "Fortgeschritten",
-   "sprache": "de"
+   "sprache": "de",
+   "bild": "83LZqTqz7QA.jpg"
   },
   {
    "id": "4fLVq6HJsKc",
@@ -89,7 +258,8 @@
    "datum": "2026-10-11",
    "dauer_sekunden": 338,
    "stufe": "Fortgeschritten",
-   "sprache": "en"
+   "sprache": "en",
+   "bild": "4fLVq6HJsKc.jpg"
   },
   {
    "id": "0tbDxmVy1m8",
@@ -98,7 +268,8 @@
    "datum": "2026-10-11",
    "dauer_sekunden": 1626,
    "stufe": "Einstieg",
-   "sprache": "de"
+   "sprache": "de",
+   "bild": "0tbDxmVy1m8.jpg"
   },
   {
    "id": "Ju-JyxDgV7g",
@@ -107,7 +278,8 @@
    "datum": "2026-10-10",
    "dauer_sekunden": 70,
    "stufe": "Einstieg",
-   "sprache": "en"
+   "sprache": "en",
+   "bild": "Ju-JyxDgV7g.jpg"
   },
   {
    "id": "wE-EwF50hyA",
@@ -116,7 +288,8 @@
    "datum": "2026-10-09",
    "dauer_sekunden": 1273,
    "stufe": "Einstieg",
-   "sprache": "de"
+   "sprache": "de",
+   "bild": "wE-EwF50hyA.jpg"
   },
   {
    "id": "pHeL9Qeb0kk",
@@ -125,238 +298,95 @@
    "datum": "2026-10-09",
    "dauer_sekunden": 776,
    "stufe": "Einstieg",
-   "sprache": "en"
-  },
-  {
-   "id": "p5KxBTUncoE",
-   "titel": "Set up your dot in the ChatGPT mobile app",
-   "kanal": "OpenAI",
-   "datum": "2026-10-09",
-   "dauer_sekunden": 167,
-   "stufe": "Einstieg",
-   "sprache": "en"
-  },
-  {
-   "id": "enPbh_A5F7E",
-   "titel": "Building the Codex community",
-   "kanal": "OpenAI",
-   "datum": "2026-10-09",
-   "dauer_sekunden": 339,
-   "stufe": "Einstieg",
-   "sprache": "en"
-  },
-  {
-   "id": "YLn9nsihymY",
-   "titel": "KI-Update Deep-Dive: Jede Menge Gigawatt für die KI - KI-Update – ein heise-Podcast",
-   "kanal": "KI Update (heise)",
-   "datum": "2026-10-09",
-   "dauer_sekunden": 3882,
-   "stufe": "Einstieg",
-   "sprache": "de"
-  },
-  {
-   "id": "Wx56hLmnPwE",
-   "titel": "KI-Update Deep-Dive: Jede Menge Gigawatt für die KI",
-   "kanal": "KI Update (heise)",
-   "datum": "2026-10-09",
-   "dauer_sekunden": 3965,
-   "stufe": "Einstieg",
-   "sprache": "de"
-  },
-  {
-   "id": "NUizyuGj-kE",
-   "titel": "AI News: Haiku-5.5, Visual ChatGPT, Grok's New Trick, and more!",
-   "kanal": "Matt Wolfe",
-   "datum": "2026-10-09",
-   "dauer_sekunden": 2128,
-   "stufe": "Einstieg",
-   "sprache": "en"
-  },
-  {
-   "id": "MUHjyljBPHI",
-   "titel": "How Sophos cuts threat response time by 96% with OpenAI Daybreak",
-   "kanal": "OpenAI",
-   "datum": "2026-10-09",
-   "dauer_sekunden": 143,
-   "stufe": "Einstieg",
-   "sprache": "en"
-  },
-  {
-   "id": "IO6Bhs2iNfk",
-   "titel": "OpenAI's always-on agents, 700+ math manuscripts & HackerRank's AI interviewer",
-   "kanal": "IBM Technology",
-   "datum": "2026-10-09",
-   "dauer_sekunden": 2083,
-   "stufe": "Einstieg",
-   "sprache": "en"
-  },
-  {
-   "id": "3Tk0sFoFYvM",
-   "titel": "Human Bias is Harder to Fix than AI Bias",
-   "kanal": "IBM Technology",
-   "datum": "2026-10-09",
-   "dauer_sekunden": 18,
-   "stufe": "Einstieg",
-   "sprache": "en"
-  },
-  {
-   "id": "tZfE4h2JDFI",
-   "titel": "KI-Blase wird PLATZEN! Aber ANDERS als die meisten denken - Dr. Andreas Beck & Gregor Broschinski",
-   "kanal": "Everlast AI",
-   "datum": "2026-10-08",
-   "dauer_sekunden": 4084,
-   "stufe": "Einstieg",
-   "sprache": "de"
-  },
-  {
-   "id": "grOilk8aCS0",
-   "titel": "AI Design Hack Saves HOURS",
-   "kanal": "Matt Wolfe",
-   "datum": "2026-10-08",
-   "dauer_sekunden": 58,
-   "stufe": "Einstieg",
-   "sprache": "en"
-  },
-  {
-   "id": "gebskF8HP7g",
-   "titel": "Even Tech Experts Hate CAPTCHAs",
-   "kanal": "IBM Technology",
-   "datum": "2026-10-08",
-   "dauer_sekunden": 20,
-   "stufe": "Einstieg",
-   "sprache": "en"
-  },
-  {
-   "id": "Pq1QiymJuUc",
-   "titel": "Windows-11-Update: Die Taskleiste darf wieder wandern | c't 4004 #42",
-   "kanal": "c't 3003",
-   "datum": "2026-10-08",
-   "dauer_sekunden": 6828,
-   "stufe": "Einstieg",
-   "sprache": "de"
-  },
-  {
-   "id": "7XzjQa8z0uc",
-   "titel": "How to Use OpenAI Codex (Step-by-Step Tutorial)",
-   "kanal": "Kevin Stratvert",
-   "datum": "2026-10-08",
-   "dauer_sekunden": 1031,
-   "stufe": "Einstieg",
-   "sprache": "en"
-  },
-  {
-   "id": "hvVTbyzLsoQ",
-   "titel": "KI-Update kompakt: Datennutzung der Chatbots, Kolibri, JEPA-Anything, arXiv",
-   "kanal": "KI Update (heise)",
-   "datum": "2026-10-07",
-   "dauer_sekunden": 1289,
-   "stufe": "Einstieg",
-   "sprache": "de"
-  },
-  {
-   "id": "cR0TaYikrz8",
-   "titel": "How to Edit Videos with ChatGPT",
-   "kanal": "Kevin Stratvert",
-   "datum": "2026-10-07",
-   "dauer_sekunden": 513,
-   "stufe": "Einstieg",
-   "sprache": "en"
-  },
-  {
-   "id": "Wkaw03p3BrM",
-   "titel": "DeepMind's New AI Just Cracked The Code Of Life",
-   "kanal": "Two Minute Papers",
-   "datum": "2026-10-07",
-   "dauer_sekunden": 1997,
-   "stufe": "Fortgeschritten",
-   "sprache": "en"
+   "sprache": "en",
+   "bild": "pHeL9Qeb0kk.jpg"
   }
  ],
  "kanaele": {
   "c't 3003": {
    "error": null,
-   "versucht": "2026-10-12",
-   "abgerufen": "2026-10-12"
+   "versucht": "2026-10-13",
+   "abgerufen": "2026-10-13"
   },
   "KI Update (heise)": {
    "error": null,
-   "versucht": "2026-10-12",
-   "abgerufen": "2026-10-12"
+   "versucht": "2026-10-13",
+   "abgerufen": "2026-10-13"
   },
   "Everlast AI": {
    "error": null,
-   "versucht": "2026-10-12",
-   "abgerufen": "2026-10-12"
+   "versucht": "2026-10-13",
+   "abgerufen": "2026-10-13"
   },
   "The Morpheus Tutorials": {
    "error": null,
-   "versucht": "2026-10-12",
-   "abgerufen": "2026-10-12"
+   "versucht": "2026-10-13",
+   "abgerufen": "2026-10-13"
   },
   "Kevin Stratvert": {
    "error": null,
-   "versucht": "2026-10-12",
-   "abgerufen": "2026-10-12"
+   "versucht": "2026-10-13",
+   "abgerufen": "2026-10-13"
   },
   "Microsoft Mechanics": {
    "error": null,
-   "versucht": "2026-10-12",
-   "abgerufen": "2026-10-12"
+   "versucht": "2026-10-13",
+   "abgerufen": "2026-10-13"
   },
   "Leila Gharani": {
    "error": null,
-   "versucht": "2026-10-12",
-   "abgerufen": "2026-10-12"
+   "versucht": "2026-10-13",
+   "abgerufen": "2026-10-13"
   },
   "Jeff Su": {
    "error": null,
-   "versucht": "2026-10-12",
-   "abgerufen": "2026-10-12"
+   "versucht": "2026-10-13",
+   "abgerufen": "2026-10-13"
   },
   "Matt Wolfe": {
    "error": null,
-   "versucht": "2026-10-12",
-   "abgerufen": "2026-10-12"
+   "versucht": "2026-10-13",
+   "abgerufen": "2026-10-13"
   },
   "IBM Technology": {
    "error": null,
-   "versucht": "2026-10-12",
-   "abgerufen": "2026-10-12"
+   "versucht": "2026-10-13",
+   "abgerufen": "2026-10-13"
   },
   "OpenAI": {
    "error": null,
-   "versucht": "2026-10-12",
-   "abgerufen": "2026-10-12"
+   "versucht": "2026-10-13",
+   "abgerufen": "2026-10-13"
   },
   "Anthropic": {
    "error": null,
-   "versucht": "2026-10-12",
-   "abgerufen": "2026-10-12"
+   "versucht": "2026-10-13",
+   "abgerufen": "2026-10-13"
   },
   "Google DeepMind": {
    "error": null,
-   "versucht": "2026-10-12",
-   "abgerufen": "2026-10-12"
+   "versucht": "2026-10-13",
+   "abgerufen": "2026-10-13"
   },
   "AI Explained": {
    "error": null,
-   "versucht": "2026-10-12",
-   "abgerufen": "2026-10-12"
+   "versucht": "2026-10-13",
+   "abgerufen": "2026-10-13"
   },
   "Two Minute Papers": {
    "error": null,
-   "versucht": "2026-10-12",
-   "abgerufen": "2026-10-12"
+   "versucht": "2026-10-13",
+   "abgerufen": "2026-10-13"
   },
   "3Blue1Brown": {
    "error": null,
-   "versucht": "2026-10-12",
-   "abgerufen": "2026-10-12"
+   "versucht": "2026-10-13",
+   "abgerufen": "2026-10-13"
   },
   "David Ondrej": {
    "error": null,
-   "versucht": "2026-10-12",
-   "abgerufen": "2026-10-12"
+   "versucht": "2026-10-13",
+   "abgerufen": "2026-10-13"
   }
  },
  "error": null
