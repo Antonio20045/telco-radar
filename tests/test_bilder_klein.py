@@ -69,7 +69,7 @@ def test_kopfbilder_bieten_dem_handy_die_kleine_fassung(site):
     assert gross.strip() == "static/bilder/band-meldungen.jpg 2400w"
     assert bild["sizes"] == "100vw"
     ebenen = _seite(site, "index.html").select(".buehne-ebene[data-zeit-bild]")
-    assert len(ebenen) == 4
+    assert len(ebenen) == 1
     for ebene in ebenen:
         klein = ebene["data-srcset"].split(",")[0]
         assert _klein_pfad(site, klein).is_file(), ebene["data-zeit-bild"]

@@ -63,76 +63,524 @@
     }
   }
 
-  /* DER CAMPUS LEBT (Antonio, 11.10.2026): hinter der Buehne laeuft eine
-     nahtlose Schleife des Campus Duesseldorf, wie er gerade ist - Tageszeit
-     und Wetter am Campus, nicht beim Leser. Das Wetter kommt ohne Schluessel
-     und ohne Kosten von Open-Meteo (Daten u. a. des Deutschen
-     Wetterdienstes). Antwortet der Dienst nicht, bestimmt die Uhr die
-     Tageszeit und der Himmel bleibt bewoelkt. Geladen wird genau EINE
-     Schleife, und erst wenn das Startbild steht. Unter Automatisierung
-     bleibt die Buehne ruhig. */
-  var film = buehne && buehne.querySelector('.buehne-film');
-  if (film && !ruhig && !navigator.webdriver) {
+  /* Die Lage am Campus aus Zeitpunkt und Wetter: Sonnenhoehe, welche Platte
+     wie stark, Laub der Jahreszeit und wie viele Bueros Licht haben. */
+  var CAMPUS_LEBEN = (function () {
+    var BREITE = 51.2437 * Math.PI / 180, LAENGE = 6.7383;
+    var BUERO = [[0, 0.04], [5, 0.04], [6, 0.3], [7, 0.75], [8, 0.95], [17, 0.95], [18, 0.75], [19, 0.5],
+      [20, 0.3], [21, 0.12], [22, 0.06], [24, 0.04]];
+    /* Monat -> Laub [Fruehling, Herbst, Winter]; der Rest ist Sommer. */
+    var LAUB = [[0, 0, 1], [0, 0, 1], [0.4, 0, 0.5], [1, 0, 0], [0.6, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0],
+      [0, 0.35, 0], [0, 1, 0], [0, 0.7, 0.4], [0, 0, 1]];
+    var JAHRESZEIT = ['winter', 'winter', 'fruehling', 'fruehling', 'fruehling', 'sommer', 'sommer', 'sommer',
+      'herbst', 'herbst', 'herbst', 'winter'];
+    var ORT = window.Intl ? new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Berlin', year: 'numeric', month: 'numeric',
+      day: 'numeric', hour: 'numeric', minute: 'numeric', weekday: 'short', hourCycle: 'h23' }) : null;
+    var kurve = function (punkte, x) {
+      for (var i = 1; i < punkte.length; i++) {
+        if (x <= punkte[i][0]) { var a = punkte[i - 1], b = punkte[i]; return a[1] + (b[1] - a[1]) * (x - a[0]) / (b[0] - a[0]); }
+      }
+      return punkte[punkte.length - 1][1];
+    };
+    var glatt = function (a, b, x) { var t = Math.max(0, Math.min(1, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+    var buero = function (minute, werktag) {
+      var v = kurve(BUERO, (((minute % 1440) + 1440) % 1440) / 60);
+      return werktag ? v : Math.min(v, 0.07);
+    };
+    /* Uhrzeit, Datum und Wochentag in Duesseldorf */
+    var ortszeit = function (d) {
+      var t = {};
+      if (ORT) ORT.formatToParts(d).forEach(function (p) { t[p.type] = p.value; });
+      else t = { year: d.getFullYear(), month: d.getMonth() + 1, day: d.getDate(), hour: d.getHours(), minute: d.getMinutes(),
+        weekday: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d.getDay()] };
+      var tagNr = Math.round((Date.UTC(+t.year, +t.month - 1, +t.day) - Date.UTC(+t.year, 0, 1)) / 864e5) + 1;
+      return { monat: +t.month - 1, tagNr: tagNr, minute: +t.hour * 60 + +t.minute, werktag: !/Sat|Sun/.test(t.weekday) };
+    };
+    /* Sonnenhoehe in Grad: Deklination aus dem Tag des Jahres, Stundenwinkel
+       aus der wahren Ortszeit (Weltzeit, Laenge, Zeitgleichung). */
+    var sonne = function (d, tagNr) {
+      var dekl = 23.44 * Math.sin(2 * Math.PI / 365 * (tagNr - 81)) * Math.PI / 180;
+      var b = 2 * Math.PI * (tagNr - 81) / 364;
+      var gleichung = 9.87 * Math.sin(2 * b) - 7.53 * Math.cos(b) - 1.5 * Math.sin(b);
+      var wahr = d.getUTCHours() * 60 + d.getUTCMinutes() + d.getUTCSeconds() / 60 + LAENGE * 4 + gleichung;
+      var winkel = (wahr - 720) / 4 * Math.PI / 180;
+      var s = Math.sin(BREITE) * Math.sin(dekl) + Math.cos(BREITE) * Math.cos(dekl) * Math.cos(winkel);
+      return Math.asin(s) * 180 / Math.PI;
+    };
+    /* Welche Fotoplatte wie stark: ueber 14 Grad Tag, bis -3,5 Grad goldene
+       Stunde, bis -12 Grad blaue Stunde, darunter Nacht. */
+    var platten = function (h) {
+      var tag = glatt(3, 14, h), g1 = glatt(-3.5, 1.5, h), b1 = glatt(-12, -5.5, h);
+      return [tag, (1 - tag) * g1, (1 - tag) * (1 - g1) * b1, (1 - tag) * (1 - g1) * (1 - b1)];
+    };
+    var lage = function (datum, wetter) {
+      var o = ortszeit(datum), h = sonne(datum, o.tagNr), p = platten(h), laub = LAUB[o.monat];
+      var w = wetter || { wolken: 0.5, regen: 0, schnee: 0, nebel: 0, wind: 0.2, gewitter: 0 };
+      var wolken = Math.max(w.wolken, w.regen > 0.05 || w.schnee > 0.05 || w.nebel > 0.3 ? 0.92 : 0);
+      var ziel = {
+        tag: p[0], gold: p[1], blau: p[2], nacht: p[3], wolken: wolken, bedeckt: glatt(0.62, 0.95, wolken),
+        regenPlatte: glatt(0.04, 0.25, w.regen), regenHell: (0.38 + 0.62 * glatt(-4, 12, h)) * (w.gewitter ? 0.7 : 1),
+        regen: w.regen, schnee: w.schnee, nebel: w.nebel, wind: w.wind, gewitter: w.gewitter,
+        decke: w.schnee > 0.05 ? 1 : 0, nass: w.regen > 0.05 ? 1 : 0,
+        frueh: laub[0], herbst: laub[1], winter: laub[2], buero: buero(o.minute, o.werktag)
+      };
+      var NAMEN = ['tag', 'gold', 'blau', 'nacht'], staerkste = 0;
+      for (var i = 1; i < 4; i++) if (p[i] > p[staerkste]) staerkste = i;
+      return {
+        ziel: ziel, sonne: h, jahreszeit: JAHRESZEIT[o.monat],
+        szene: NAMEN[staerkste] + '-' + (wetter ? w.wort.toLowerCase() : 'unbekannt'),
+        hell: h > 6 && wolken < 0.85 && w.regen < 0.05 && w.nebel < 0.5
+      };
+    };
+    return { lage: lage, buero: buero };
+  })();
+
+  /* DER CAMPUS LEBT (Antonio, 13.10.2026): hinter der Buehne stehen sieben
+     echte Fotoplatten des Turms im selben Blickwinkel - Tag, goldene Stunde,
+     blaue Stunde, Abend mit Licht, spaete Nacht, Regen, Schnee. Ein
+     WebGL-2-Canvas blendet zwischen ihnen nach der Sonnenhoehe am Campus,
+     legt Wolken, Regen, Schnee, Nebel und Wind darueber und schaltet nachts
+     die Bueros Fenster fuer Fenster nach der Belegung (CAMPUS_LEBEN). Es zaehlt
+     die echte Zeit in Duesseldorf, nicht die des Lesers. Das Wetter kommt
+     ohne Schluessel und ohne Kosten von Open-Meteo (Daten u. a. des Deutschen
+     Wetterdienstes); antwortet der Dienst nicht, bleibt der Himmel bewoelkt
+     und es steht keine Wetterzeile da. Das Startfoto ist die blaue Stunde
+     (static/bilder/campus-turm.jpg, zugleich die 2K-Platte); geladen wird
+     erst nach dem Startbild und nur, was die Lage braucht. Ohne WebGL 2 bleibt
+     das Foto stehen; unter Automatisierung bleibt die Buehne ruhig. */
+  var himmelBild = buehne && buehne.querySelector('.buehne-himmel');
+  if (himmelBild && !navigator.webdriver) {
     var CAMPUS = 'https://api.open-meteo.com/v1/forecast?latitude=51.2437&longitude=6.7383'
-      + '&current=weather_code,temperature_2m&daily=sunrise,sunset&timezone=Europe%2FBerlin&forecast_days=1';
-    var minuten = function (t) {
-      var m = /T(\d\d):(\d\d)/.exec(t || '');
-      return m ? (+m[1]) * 60 + (+m[2]) : null;
+      + '&current=weather_code,temperature_2m,cloud_cover,wind_speed_10m&timezone=Europe%2FBerlin&forecast_days=1';
+    var REGEN = { 51: 0.3, 53: 0.4, 55: 0.5, 56: 0.4, 57: 0.5, 61: 0.45, 63: 0.6, 65: 0.85, 66: 0.5, 67: 0.75,
+      80: 0.45, 81: 0.65, 82: 0.9, 95: 1, 96: 1, 99: 1 };
+    var SCHNEE = { 71: 0.45, 73: 0.65, 75: 0.9, 77: 0.3, 85: 0.55, 86: 0.9 };
+    var wetterAus = function (c) {
+      var code = c.weather_code;
+      var w = {
+        wolken: typeof c.cloud_cover === 'number' ? c.cloud_cover / 100 : (code >= 3 ? 0.95 : code >= 2 ? 0.5 : 0.15),
+        regen: REGEN[code] || 0, schnee: SCHNEE[code] || 0, nebel: code === 45 || code === 48 ? 0.8 : 0,
+        wind: Math.min(1, (typeof c.wind_speed_10m === 'number' ? c.wind_speed_10m : 10) / 50), gewitter: code >= 95 ? 1 : 0
+      };
+      w.wort = w.gewitter ? 'Gewitter' : w.schnee ? 'Schnee' : w.regen ? 'Regen' : w.nebel ? 'Nebel'
+        : w.wolken > 0.7 ? 'bedeckt' : w.wolken > 0.4 ? 'bewölkt' : 'klar';
+      w.grad = typeof c.temperature_2m === 'number' ? Math.round(c.temperature_2m) : null;
+      return w;
     };
-    var himmel = function (code) {
-      if (code == null) return 'wolken';
-      if (code <= 1) return 'sonne';
-      if ((code >= 71 && code <= 77) || code === 85 || code === 86) return 'schnee';
-      if (code >= 51) return 'regen';
-      return 'wolken';
+    var zeigeLage = function (wetter) {
+      var l = CAMPUS_LEBEN.lage(new Date(), wetter);
+      himmelBild.setAttribute('data-szene', l.szene);
+      himmelBild.setAttribute('data-jahreszeit', l.jahreszeit);
+      himmelBild.setAttribute('data-sonne', String(Math.round(l.sonne)));
+      himmelBild.setAttribute('data-buero', String(Math.round(l.ziel.buero * 100)));
+      buehne.classList.toggle('film-dunkel', !l.hell);
+      return l;
     };
-    var phase = function (jetzt, auf, unter) {
-      if (jetzt == null) {
-        var h = new Date().getHours();
-        jetzt = h * 60; auf = auf == null ? 7 * 60 : auf; unter = unter == null ? 19 * 60 : unter;
-      }
-      if (auf == null || unter == null) return 'mittag';
-      if (jetzt < auf - 30 || jetzt >= unter + 60) return 'nacht';
-      if (jetzt < auf + 180) return 'morgen';
-      if (jetzt >= unter - 90) return 'abend';
-      return 'mittag';
-    };
-    var nachBild = function (los) {
-      if (document.readyState === 'complete') los();
-      else window.addEventListener('load', los, { once: true });
-    };
-    var zeige = function (szene, wetter) { nachBild(function () { zeigeJetzt(szene, wetter); }); };
-    var zeigeJetzt = function (szene, wetter) {
-      var basis = film.getAttribute('data-basis');
-      var klein = window.matchMedia && matchMedia('(max-width: 900px)').matches;
-      film.setAttribute('data-szene', szene);
-      buehne.classList.toggle('film-dunkel', /^(abend|nacht)/.test(szene));
-      film.poster = basis + szene + '.jpg';
-      film.src = basis + szene + (klein ? '-klein' : '') + '.mp4';
-      film.addEventListener('playing', function () { film.classList.add('laeuft'); }, { once: true });
-      var spiel = film.play();
-      if (spiel && spiel.catch) spiel.catch(function () {});
-      var zeile = document.querySelector('[data-campus-wetter]');
-      if (zeile && wetter) {
-        zeile.textContent = 'Campus Düsseldorf · ' + wetter;
-        zeile.hidden = false;
-      }
-    };
-    var WORT = { sonne: 'klar', wolken: 'bewölkt', regen: 'Regen', schnee: 'Schnee' };
     var spaeter = window.fetch ? fetch(CAMPUS).then(function (a) {
       if (!a.ok) throw new Error('Wetter ' + a.status);
       return a.json();
     }) : Promise.reject(new Error('kein fetch'));
-    spaeter.then(function (d) {
-      var c = d.current || {};
-      var t = d.daily || {};
-      var h = himmel(c.weather_code);
-      var p = phase(minuten(c.time), minuten((t.sunrise || [])[0]), minuten((t.sunset || [])[0]));
-      var grad = typeof c.temperature_2m === 'number' ? Math.round(c.temperature_2m) + ' °C, ' : '';
-      zeige(p + '-' + h, grad + WORT[h]);
-    }).catch(function () {
-      zeige(phase(null) + '-wolken', null);
+    spaeter.then(function (d) { return wetterAus(d.current || {}); }, function () { return null; }).then(function (wetter) {
+      var l = zeigeLage(wetter);
+      var zeile = document.querySelector('[data-campus-wetter]');
+      if (zeile && wetter) {
+        zeile.textContent = 'Campus Düsseldorf · ' + (wetter.grad == null ? '' : wetter.grad + ' °C, ') + wetter.wort;
+        zeile.hidden = false;
+      }
+      var los = function () {
+        var gross = Math.max(screen.width, window.innerWidth) * (window.devicePixelRatio || 1) > 2700;
+        var szene = campusSzene(himmelBild, gross, l.ziel, ruhig);
+        if (szene) setInterval(function () { szene.neu(zeigeLage(wetter).ziel); }, 5 * 60 * 1000);
+      };
+      if (document.readyState === 'complete') los();
+      else window.addEventListener('load', los, { once: true });
     });
+  }
+
+  /* Der Shader: Platten nach Gewicht, Laub, Wolken ueber dem echten Himmel,
+     nasser Platz, Schneedecke, Leuchthof, Flugwarnlichter, Nebel, Niederschlag. */
+  var CAMPUS_SHADER = `#version 300 es
+precision highp float;
+in vec2 vUv;
+out vec4 farbe;
+uniform sampler2D uTag, uGold, uBlau, uNacht, uSpaet, uRegen, uSchneeP, uMA, uMB, uGlanz, uHim;
+uniform vec4 uW;            // Tag, Gold, Blau, Nacht (Summe 1)
+uniform float uRegenPlatte; // Anteil der Regenplatte an Tag und Gold
+uniform float uBedeckt;     // geschlossene Wolkendecke 0..1
+uniform float uRegenHell;   // Helligkeit der Regenplatte nach Sonnenstand
+uniform vec2 uAufl, uBild, uAnker;
+uniform float uZeit, uWolken, uRegenI, uSchnee, uDecke, uNebel, uWind, uBlitz, uHerbst, uWinter, uFrueh, uNass, uBuero;
+
+float hash(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract(p.x*p.y);}
+float noise(vec2 p){vec2 i=floor(p);vec2 f=fract(p);f=f*f*(3.0-2.0*f);
+  return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x),f.y);}
+float fbm(vec2 p){float v=0.0;float a=0.5;for(int i=0;i<5;i++){v+=a*noise(p);p=p*2.03+vec2(1.7,9.2);a*=0.5;}return v;}
+float lum(vec3 c){return dot(c,vec3(0.2126,0.7152,0.0722));}
+
+// Bildausschnitt wie object-fit:cover mit object-position uAnker, genau wie das Startfoto darunter
+vec2 cover(vec2 s){
+  float ab=uAufl.x/uAufl.y, ai=uBild.x/uBild.y; vec2 k=vec2(1.0), m=vec2(0.5);
+  if(ab>ai){k.y=ai/ab;m.y=k.y*0.5+uAnker.y*(1.0-k.y);}else{k.x=ab/ai;m.x=k.x*0.5+uAnker.x*(1.0-k.x);}
+  return m+(s-0.5)*k;
+}
+vec3 kachel(sampler2D t,vec2 u,float i,float n,float h){float y=clamp(u.y,1.5/h,1.0-1.5/h);return texture(t,vec2(u.x,(i+y)/n)).rgb;}
+
+void main(){
+  vec2 u0=cover(vUv);
+  float wT=uW.x,wG=uW.y,wB=uW.z,wN=uW.w;
+  float dunkel=clamp(wN+wB*0.75+wG*0.25,0.0,1.0);
+
+  // Wind in den Kronen: weich ausgeblendete Verschiebung, Boeen kommen und gehen, die Blaetter zittern
+  vec2 u=u0;
+  float weich=textureLod(uMA,u0,3.0).g;
+  if(weich>0.002){
+    float t=uZeit;float boe=0.5+0.5*sin(t*0.29+2.0*sin(t*0.11));
+    float ph=noise(u0*vec2(14.0,9.0))*6.283;
+    float sw=sin(t*(0.8+0.9*uWind)+ph)+0.4*sin(t*(2.1+1.6*uWind)+ph*1.7);
+    float zit=noise(u0*vec2(300.0,210.0)+vec2(t*(1.4+3.5*uWind),t*0.8))-0.5;
+    vec2 d=vec2(sw*(0.5+4.5*uWind)*(0.4+0.6*boe)+zit*(0.6+2.2*uWind),0.22*sw*(0.3+uWind)+zit*0.4);
+    u=u0+d*weich/uBild;
+  }
+  vec3 ma=texture(uMA,u).rgb;   // r Himmel, g Baum, b Boden
+  float himmel=ma.r, baum=ma.g, boden=ma.b;
+
+  // Bedeckt ohne Regen: Gebaeude im weichen Licht der Regenplatte, der trockene Platz bleibt aus der Tagplatte
+  float r=max(uRegenPlatte,uBedeckt*(1.0-boden));
+  float wR=(wT+wG)*r; wT*=1.0-r; wG*=1.0-r;
+  // Schneedecke bei Tag: echte Winterplatte
+  float wS=(wT+wG+wR)*uDecke; wT*=1.0-uDecke; wG*=1.0-uDecke; wR*=1.0-uDecke;
+  float deckeRest=uDecke*(1.0-(uW.x+uW.y));
+
+  vec3 I=vec3(0.0), S=vec3(0.0), G=vec3(0.0);
+  float an=uBuero;
+  if(wT>0.001){I+=wT*texture(uTag,u).rgb;S+=wT*kachel(uHim,u,0.0,7.0,266.0);}
+  if(wG>0.001){I+=wG*texture(uGold,u).rgb;S+=wG*kachel(uHim,u,1.0,7.0,266.0);}
+  if(wB>0.001){I+=wB*texture(uBlau,u).rgb;S+=wB*kachel(uHim,u,2.0,7.0,266.0);G+=wB*0.55*kachel(uGlanz,u,2.0,3.0,531.0);}
+  if(wN>0.001){
+    // Buerolichter: jedes Fenster hat eine eigene Schwelle; liegt der Anteil besetzter Bueros darueber, brennt es
+    vec3 mb=texture(uMB,u).rgb;
+    an=mix(clamp(uBuero*1.15,0.0,1.0),smoothstep(mb.g-0.025,mb.g+0.025,uBuero*1.15),mb.b);
+    vec3 n=texture(uNacht,u).rgb, s=texture(uSpaet,u).rgb;
+    I+=wN*mix(s,n,an);S+=wN*kachel(uHim,u,4.0,7.0,266.0);
+    G+=wN*mix(kachel(uGlanz,u,1.0,3.0,531.0),kachel(uGlanz,u,0.0,3.0,531.0),clamp(uBuero*1.6,0.0,1.0));
+  }
+  if(wR>0.001){I+=wR*texture(uRegen,u).rgb*uRegenHell;S+=wR*kachel(uHim,u,5.0,7.0,266.0)*uRegenHell;}
+  if(wS>0.001){I+=wS*texture(uSchneeP,u).rgb*uRegenHell;S+=wS*kachel(uHim,u,6.0,7.0,266.0)*uRegenHell;}
+
+  // Jahreszeit im Laub (das Foto zeigt Herbst)
+  if(baum>0.01){
+    float l=lum(I);float v=noise(u*vec2(20.0,14.0));
+    vec3 frueh=mix(vec3(0.42,0.60,0.18),vec3(0.55,0.68,0.26),v);
+    vec3 sommer=mix(vec3(0.17,0.30,0.09),vec3(0.24,0.36,0.11),v);
+    float som=clamp(1.0-uFrueh-uHerbst-uWinter,0.0,1.0);
+    vec3 ziel=frueh*uFrueh+sommer*som;
+    float st=uFrueh+som;
+    vec3 neu=ziel/max(lum(ziel),0.02)*l*mix(1.0,1.12,uFrueh);
+    I=mix(I,mix(neu,vec3(l),0.06),baum*st*0.9);
+    // Winter: kahl, braungrau, gegen den Himmel licht
+    vec3 kahl=vec3(l)*vec3(0.86,0.79,0.72)*0.8;
+    float nah=smoothstep(0.1,0.5,textureLod(uMA,u,5.5).r);
+    kahl=mix(kahl,S,0.28*nah);
+    I=mix(I,kahl,baum*uWinter*(1.0-wS));
+  }
+
+  vec3 col=I;
+
+  // Wolken ueber dem echten Himmel; an Kanten mit der Himmelsschaetzung entmischt, damit kein Saum entsteht
+  float opaz=1.0-(uW.x+uW.y)*max(uRegenPlatte,uBedeckt);
+  if(himmel>0.002&&uWolken>0.02&&opaz>0.01){
+    float hor=0.74;float e=max(hor-u0.y,0.0);float t=1.0/(e+0.11);
+    float wind=uZeit*(0.005+0.024*uWind);
+    vec2 p=vec2((u0.x-0.5)*1.6*t+wind*t*0.28,t*1.3+wind*0.12);
+    vec2 q=vec2(fbm(p*0.6),fbm(p*0.6+vec2(5.2,1.3)));
+    float d=fbm(p*0.85+q*0.7);
+    float c=min(clamp(uWolken,0.0,1.0),0.72);
+    float dichte=smoothstep(0.80-c*0.64,0.97-c*0.50,d)*smoothstep(0.0,0.07,e);
+    float d2=fbm(p*0.85+q*0.7+vec2(0.07,-0.11));
+    float hell=clamp(0.55+1.8*(d-d2),0.0,1.0);
+    vec3 lichtC=uW.x*vec3(0.97,0.97,0.98)+uW.y*vec3(1.0,0.76,0.60)+uW.z*vec3(0.58,0.52,0.64)+uW.w*vec3(0.15,0.115,0.105);
+    vec3 schattenC=uW.x*vec3(0.60,0.63,0.69)+uW.y*vec3(0.46,0.38,0.46)+uW.z*vec3(0.25,0.24,0.33)+uW.w*vec3(0.045,0.04,0.045);
+    vec3 grau=(uW.x+uW.y*0.7+uW.z*0.3+uW.w*0.07)*vec3(0.66,0.68,0.71)*(1.0-0.35*uRegenI);
+    lichtC=mix(lichtC,grau*1.08,uBedeckt*0.85);schattenC=mix(schattenC,grau*0.72,uBedeckt*0.85);
+    vec3 wc=mix(schattenC,lichtC,hell);
+    wc=mix(S,wc,smoothstep(0.0,0.45,dichte));
+    vec3 neuHimmel=mix(S,wc,clamp(dichte*1.15,0.0,1.0)*opaz);
+    // geschlossene Decke: weich, unten von der Stadt angeleuchtet
+    float decke=smoothstep(0.62,0.95,uWolken);
+    if(decke>0.0){
+      float hh=pow(clamp((hor+0.08-u0.y)/(hor+0.08),0.0,1.0),0.7);
+      vec3 strH=uW.x*vec3(0.74,0.76,0.79)+uW.y*vec3(0.66,0.58,0.56)+uW.z*vec3(0.36,0.35,0.43)+uW.w*vec3(0.14,0.115,0.105);
+      vec3 strO=uW.x*vec3(0.60,0.62,0.66)+uW.y*vec3(0.44,0.42,0.47)+uW.z*vec3(0.21,0.21,0.28)+uW.w*vec3(0.05,0.047,0.055);
+      vec3 str=mix(strH,strO,hh)*(1.0-0.3*uRegenI);
+      float tex=fbm(vec2(u0.x*2.4+wind*0.6,u0.y*4.5))*0.6+fbm(vec2(u0.x*7.0+wind*1.2,u0.y*12.0))*0.4;
+      str*=0.86+0.26*tex;
+      neuHimmel=mix(neuHimmel,str,decke*opaz);
+    }
+    col=col+himmel*(neuHimmel-S);
+  }
+
+  // Nasser Platz ohne Regenplatte (Abend, Nacht): Spiegelung der Gebaeudesockel, gekraeuselt
+  float nassOhne=uNass*(1.0-uRegenPlatte*(uW.x+uW.y));
+  if(nassOhne>0.01&&boden>0.01){
+    float yb=0.866;
+    float rip=(noise(vec2(u0.x*90.0,u0.y*260.0+uZeit*0.8))-0.5)*0.0018*(0.4+uRegenI);
+    vec2 rr=vec2(u0.x+rip,2.0*yb-u0.y);
+    vec3 sp=vec3(0.0);
+    for(int k=0;k<3;k++){
+      vec2 rk=rr+vec2(0.0,float(k)*0.006*(u0.y-yb)*4.0);
+      if(uW.z>0.001)sp+=uW.z*textureLod(uBlau,rk,2.2).rgb;
+      if(uW.w>0.001)sp+=uW.w*mix(textureLod(uSpaet,rk,2.2).rgb,textureLod(uNacht,rk,2.2).rgb,an);
+      if(uW.x+uW.y>0.001)sp+=(uW.x+uW.y)*textureLod(uTag,rk,2.2).rgb;
+    }
+    sp/=3.0;
+    float fres=1.0-smoothstep(yb,1.0,u0.y)*0.45;
+    float hellig=smoothstep(0.12,0.7,lum(sp));
+    col=col*mix(1.0,0.74,nassOhne*boden)+sp*boden*nassOhne*fres*(0.10+0.75*hellig);
+  }
+
+  // Schneedecke auf Platz, Hecken und Kronen
+  if(deckeRest>0.01){
+    float licht=uW.z*0.40+uW.w*0.10;
+    vec3 sc=vec3(0.80,0.84,0.95)*licht+vec3(0.05,0.055,0.08);
+    sc+=I*0.9;
+    float wellig=0.92+0.10*noise(u0*vec2(30.0,80.0));
+    float auf=boden*0.92+baum*0.35;
+    col=mix(col,sc*wellig,clamp(auf,0.0,1.0)*deckeRest);
+  }
+
+  // Leuchten in der Daemmerung und Nacht: Hof um Logo, Fenster und Laternen; rote Flugwarnlichter blinken
+  col+=G*(0.30+0.9*uNebel)*dunkel;
+  {
+    float zyk=mod(uZeit,3.0);float blink=step(zyk,1.0)+step(1.5,zyk)*step(zyk,2.0);
+    vec2 P=u0*uBild;float fw=0.0;
+    fw+=exp(-pow(length(P-vec2(0.3880,0.0432)*uBild)/5.0,2.0))+exp(-length(P-vec2(0.3880,0.0432)*uBild)/16.0)*0.25;
+    fw+=exp(-pow(length(P-vec2(0.3982,0.0786)*uBild)/5.0,2.0))+exp(-length(P-vec2(0.3982,0.0786)*uBild)/16.0)*0.25;
+    fw+=(exp(-pow(length(P-vec2(0.3976,0.1710)*uBild)/4.0,2.0))+exp(-pow(length(P-vec2(0.3880,0.1806)*uBild)/4.0,2.0)))*0.6;
+    col+=vec3(1.0,0.12,0.06)*fw*blink*smoothstep(0.3,0.8,dunkel)*0.9;
+  }
+
+  // Nebel: Ferne dichter, Lichter leuchten hindurch
+  if(uNebel>0.01){
+    float tiefe=max(mix(0.12,1.0,smoothstep(0.98,0.40,u0.y)),himmel);
+    float n=fbm(vec2(u0.x*2.2+uZeit*0.012,u0.y*3.5-uZeit*0.003))*0.65+fbm(vec2(u0.x*7.0-uZeit*0.02,u0.y*9.0))*0.35;
+    vec3 nf=uW.x*vec3(0.78,0.80,0.83)+uW.y*vec3(0.80,0.72,0.66)+uW.z*vec3(0.40,0.42,0.50)+uW.w*vec3(0.10,0.095,0.10);
+    nf=mix(nf,vec3(lum(nf)),0.25);
+    col=mix(col,nf,clamp(uNebel*tiefe*(0.55+0.6*n),0.0,0.92));
+    col+=G*uNebel*dunkel*0.7;
+  }
+
+  // Niederschlag
+  vec2 q=vUv*vec2(uAufl.x/uAufl.y,1.0);
+  if(uRegenI>0.01){
+    col=mix(col,vec3(lum(col))*vec3(0.95,0.97,1.0),0.18*uRegenI);
+    float a=0.0;
+    for(int l=0;l<3;l++){
+      float fl=float(l);float sk=34.0+fl*26.0;
+      vec2 g=q*vec2(sk,sk*0.11);g.x+=g.y*(0.03+0.20*uWind);g.y+=uZeit*(8.0+fl*3.5);
+      vec2 i=floor(g);vec2 f=fract(g);float h=hash(i+fl*17.0);
+      float x=abs(f.x-0.15-0.7*h);
+      float st=smoothstep(0.045-fl*0.01,0.0,x)*smoothstep(0.0,0.35,f.y)*smoothstep(1.0,0.55,f.y);
+      a+=st*step(1.0-uRegenI*0.6,h)*(0.55-fl*0.13);
+    }
+    vec3 rc=vec3(0.78,0.81,0.86)*(0.35+0.65*(1.0-dunkel))+G*1.2+vec3(0.08)*dunkel;
+    col=mix(col,rc,clamp(a,0.0,1.0)*0.34);
+  }
+  if(uSchnee>0.01){
+    float a=0.0;
+    for(int l=0;l<4;l++){
+      float fl=float(l);float sk=26.0-fl*5.0;
+      vec2 g=q*sk;g.y-=uZeit*(0.06+0.045*fl)*sk*0.4;g.x+=sin(uZeit*0.55+g.y*0.6+fl*2.0)*0.32+uZeit*uWind*0.06*sk;
+      vec2 i=floor(g);vec2 f=fract(g)-0.5;float h=hash(i+fl*31.0);
+      vec2 o=vec2(h-0.5,hash(i+7.0)-0.5)*0.6;float d=length(f-o);
+      float gr=mix(0.028,0.06,fl/3.0);float rand=mix(0.012,0.06,fl/3.0);
+      a+=smoothstep(gr+rand,gr-rand*0.6,d)*step(1.0-uSchnee*(0.55-fl*0.08),h)*mix(0.8,0.35,fl/3.0);
+    }
+    vec3 fc=vec3(0.95,0.96,1.0)*(0.42+0.58*(1.0-dunkel))+G*0.8;
+    col=mix(col,fc,clamp(a,0.0,1.0));
+  }
+  col+=vec3(0.62,0.66,0.82)*uBlitz*(0.22+0.78*himmel);
+
+  // Film: sanfte Kurve, Vignette, feines Korn
+  col=max(col,0.0);
+  col=mix(col,col*col*(3.0-2.0*col),0.10);
+  vec2 v=vUv-0.5;col*=1.0-0.20*dot(v,v)*1.6;
+  col+=(hash(floor(gl_FragCoord.xy)+fract(uZeit*24.0)*vec2(113.0,71.0))-0.5)*0.012;
+  farbe=vec4(clamp(col,0.0,1.0),1.0);
+}`;
+
+
+  /* Die Szene selbst. Jede Platte bekommt ihre feste Texture-Einheit; was die
+     Lage nicht braucht, wird nicht geladen und vom Shader nicht gelesen.
+     Beim Start steht die blaue Stunde wie das Startfoto und laeuft in wenigen
+     Sekunden in die Lage am Campus. Gibt { neu(ziel) } zurueck oder null. */
+  function campusSzene(canvas, gross, ziel, still) {
+    var gl = canvas.getContext('webgl2', { alpha: false, antialias: false, depth: false, powerPreference: 'high-performance' });
+    if (!gl) return null;
+    var VS = '#version 300 es\nin vec2 p;out vec2 vUv;void main(){vUv=p*0.5+0.5;vUv.y=1.0-vUv.y;gl_Position=vec4(p,0.0,1.0);}';
+    var prog = gl.createProgram();
+    var teil = function (typ, quelle) {
+      var s = gl.createShader(typ);
+      gl.shaderSource(s, quelle);
+      gl.compileShader(s);
+      gl.attachShader(prog, s);
+      return gl.getShaderParameter(s, gl.COMPILE_STATUS);
+    };
+    if (!teil(gl.VERTEX_SHADER, VS) || !teil(gl.FRAGMENT_SHADER, CAMPUS_SHADER)) return null;
+    gl.bindAttribLocation(prog, 0, 'p');
+    gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return null;
+    gl.useProgram(prog);
+    gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+    gl.enableVertexAttribArray(0);
+    gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+    var U = {};
+    ['uTag', 'uGold', 'uBlau', 'uNacht', 'uSpaet', 'uRegen', 'uSchneeP', 'uMA', 'uMB', 'uGlanz', 'uHim', 'uW', 'uRegenPlatte',
+      'uBedeckt', 'uRegenHell', 'uAufl', 'uBild', 'uAnker', 'uZeit', 'uWolken', 'uRegenI', 'uSchnee', 'uDecke', 'uNebel', 'uWind',
+      'uBlitz', 'uHerbst', 'uWinter', 'uFrueh', 'uNass', 'uBuero'].forEach(function (n) { U[n] = gl.getUniformLocation(prog, n); });
+    /* Grosse Bildschirme (ab 2700 physischen Pixeln) bekommen die 4K-Platten,
+       alle anderen die 2,5K-Platten; die blaue 2K-Platte ist das Startfoto. */
+    var basis = canvas.getAttribute('data-basis'), satz = basis + (gross ? '4k/' : '2k/');
+    var PLATTEN = {
+      uTag: [satz + 'platte-tag.jpg', 1], uGold: [satz + 'platte-gold.jpg', 1],
+      uBlau: [gross ? satz + 'platte-blau.jpg' : canvas.getAttribute('data-blau'), 1],
+      uNacht: [satz + 'platte-nacht.jpg', 1], uSpaet: [satz + 'platte-spaet.jpg', 1], uRegen: [satz + 'platte-regen.jpg', 1],
+      uSchneeP: [satz + 'platte-schnee.jpg', 1], uMA: [satz + 'maske-a.png', 1], uMB: [basis + 'maske-b.png', 0],
+      uGlanz: [basis + 'glanz.png', 0], uHim: [basis + 'himmel-atlas.png', 0]
+    };
+    var einheiten = Object.keys(PLATTEN), geladen = {};
+    var leer = gl.createTexture();
+    einheiten.forEach(function (n, i) {
+      gl.activeTexture(gl.TEXTURE0 + i);
+      gl.bindTexture(gl.TEXTURE_2D, leer);
+      gl.uniform1i(U[n], i);
+    });
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB8, 1, 1, 0, gl.RGB, gl.UNSIGNED_BYTE, new Uint8Array(3));
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    var aniso = gl.getExtension('EXT_texture_filter_anisotropic');
+    var bildW = 3840, bildH = 2124;
+    var lade = function (n) {
+      if (!geladen[n]) geladen[n] = new Promise(function (ok, fehler) {
+        var b = new Image();
+        b.decoding = 'async';
+        b.onload = function () {
+          gl.activeTexture(gl.TEXTURE0 + einheiten.indexOf(n));
+          gl.bindTexture(gl.TEXTURE_2D, gl.createTexture());
+          gl.pixelStorei(gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.NONE);
+          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB8, gl.RGB, gl.UNSIGNED_BYTE, b);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+          if (PLATTEN[n][1]) {
+            gl.generateMipmap(gl.TEXTURE_2D);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+            if (aniso) gl.texParameterf(gl.TEXTURE_2D, aniso.TEXTURE_MAX_ANISOTROPY_EXT, Math.min(8, gl.getParameter(aniso.MAX_TEXTURE_MAX_ANISOTROPY_EXT)));
+          } else gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+          if (n === 'uBlau') { bildW = b.naturalWidth; bildH = b.naturalHeight; }
+          ok();
+        };
+        b.onerror = function () { fehler(new Error(PLATTEN[n][0])); };
+        b.src = PLATTEN[n][0];
+      });
+      return geladen[n];
+    };
+    /* Was eine Lage liest; die blaue Stunde steht immer am Anfang. */
+    var bedarf = function (z) {
+      var n = ['uBlau', 'uMA', 'uHim', 'uGlanz'], hell = z.tag + z.gold > 0.001;
+      if (hell) n.push('uTag');
+      if (z.gold > 0.001) n.push('uGold');
+      if (z.nacht > 0.001) n.push('uNacht', 'uSpaet', 'uMB');
+      if (hell && Math.max(z.regenPlatte, z.bedeckt) > 0.001) n.push('uRegen');
+      if (hell && z.decke > 0.001) n.push('uSchneeP');
+      return Promise.all(n.map(lade));
+    };
+    var jetzt = {}, soll = {}, k;
+    for (k in ziel) { jetzt[k] = ziel[k]; soll[k] = ziel[k]; }
+    if (!still) {
+      jetzt.tag = jetzt.gold = jetzt.nacht = jetzt.regenPlatte = jetzt.bedeckt = jetzt.decke = 0;
+      jetzt.blau = 1;
+      jetzt.regenHell = 1;
+    }
+    var t0 = 0, letzte = 0, gemalt = 0, blitz = 0, naechster = 3, skala = 1, langsam = 0;
+    var laeuft = false, sichtbar = true, raf = 0;
+    var male = function (zeit) {
+      var echt = Math.max(0, (zeit - letzte) / 1000), dt = Math.min(0.1, echt);
+      letzte = zeit;
+      var sek = (zeit - t0) / 1000 + 20;
+      var tempo = Math.min(1, echt * 0.9);
+      for (var j in soll) jetzt[j] += (soll[j] - jetzt[j]) * tempo;
+      if (soll.gewitter && !still) {
+        naechster -= dt;
+        if (naechster <= 0) { blitz = 1; naechster = 3 + Math.random() * 7; }
+      }
+      blitz *= Math.pow(0.015, dt);
+      var dpr = (window.devicePixelRatio || 1) * skala;
+      var w = Math.max(1, Math.round(canvas.clientWidth * dpr)), h = Math.max(1, Math.round(canvas.clientHeight * dpr));
+      var deckel = Math.min(1, bildW / w, bildH * 1.15 / h);
+      w = Math.round(w * deckel);
+      h = Math.round(h * deckel);
+      if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
+      gl.viewport(0, 0, w, h);
+      var summe = jetzt.tag + jetzt.gold + jetzt.blau + jetzt.nacht || 1;
+      gl.uniform4f(U.uW, jetzt.tag / summe, jetzt.gold / summe, jetzt.blau / summe, jetzt.nacht / summe);
+      gl.uniform1f(U.uRegenPlatte, jetzt.regenPlatte);
+      gl.uniform1f(U.uBedeckt, jetzt.bedeckt);
+      gl.uniform1f(U.uRegenHell, jetzt.regenHell);
+      gl.uniform2f(U.uAufl, w, h);
+      gl.uniform2f(U.uBild, bildW, bildH);
+      /* Wie object-position des Startfotos in style.css: breit Turm links und
+         Datum vor freiem Himmel, hoch Turm in der Mitte. */
+      if (w / h > 1.2) gl.uniform2f(U.uAnker, 0.5, 0.25);
+      else gl.uniform2f(U.uAnker, 0.24, 0.25);
+      gl.uniform1f(U.uZeit, still ? 20 : sek);
+      gl.uniform1f(U.uBlitz, Math.max(0, blitz * (0.55 + 0.45 * Math.sin(sek * 47) * Math.sin(sek * 13))));
+      gl.uniform1f(U.uWolken, jetzt.wolken);
+      gl.uniform1f(U.uRegenI, jetzt.regen);
+      gl.uniform1f(U.uSchnee, jetzt.schnee);
+      gl.uniform1f(U.uDecke, jetzt.decke);
+      gl.uniform1f(U.uNebel, jetzt.nebel);
+      gl.uniform1f(U.uWind, jetzt.wind);
+      gl.uniform1f(U.uHerbst, jetzt.herbst);
+      gl.uniform1f(U.uWinter, jetzt.winter);
+      gl.uniform1f(U.uFrueh, jetzt.frueh);
+      gl.uniform1f(U.uNass, jetzt.nass);
+      gl.uniform1f(U.uBuero, jetzt.buero);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    };
+    /* Hoechstens 30 Bilder je Sekunde; ruckelt es lange, rechnet die Szene kleiner. */
+    var schleife = function (zeit) {
+      if (!laeuft) return;
+      raf = requestAnimationFrame(schleife);
+      if (zeit - gemalt < 32) return;
+      langsam = zeit - gemalt > 70 ? langsam + 1 : 0;
+      if (langsam > 30 && skala > 0.6) { skala *= 0.85; langsam = 0; }
+      gemalt = zeit;
+      male(zeit);
+    };
+    var steuere = function () {
+      var an = !still && !document.hidden && sichtbar;
+      if (an && !laeuft) { laeuft = true; letzte = gemalt = performance.now(); raf = requestAnimationFrame(schleife); }
+      if (!an && laeuft) { laeuft = false; cancelAnimationFrame(raf); }
+    };
+    bedarf(ziel).then(function () {
+      t0 = letzte = performance.now();
+      male(t0);
+      canvas.classList.add('laeuft');
+      steuere();
+      document.addEventListener('visibilitychange', steuere);
+      if ('IntersectionObserver' in window) {
+        new IntersectionObserver(function (e) { sichtbar = e[0].isIntersecting; steuere(); }).observe(canvas);
+      }
+      window.addEventListener('resize', function () { if (still) male(performance.now()); });
+    }).catch(function () {});
+    return {
+      neu: function (z) {
+        bedarf(z).then(function () {
+          for (var j in z) soll[j] = z[j];
+          if (still) { for (var i in z) jetzt[i] = z[i]; male(performance.now()); }
+        }).catch(function () {});
+      }
+    };
   }
 
   /* DER KOPF wird beim Scrollen etwas deckender. */
