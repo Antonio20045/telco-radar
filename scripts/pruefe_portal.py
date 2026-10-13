@@ -283,6 +283,13 @@ def max_absatz_nach_svg(tafel) -> tuple[int, str]:
     return best, best_text
 
 
+def waehle_tafel(seite, knopf, tid: str) -> None:
+    """Versteckte Reiter (Uebersicht) schaltet der Anker, wie in app.js."""
+    knopf.click() if knopf.is_visible() else seite.evaluate(f"location.hash='{tid}'")
+    seite.wait_for_selector(f"#{tid}:not(.gr-tafel--aus)", state="attached")
+    seite.wait_for_timeout(80)
+
+
 def _reiterhoehen(seite, wurzel: str, b: Bilanz) -> None:
     """Jeder Reiter unter drei Bildschirmen - an der ECHTEN Seite gemessen.
 
@@ -301,8 +308,7 @@ def _reiterhoehen(seite, wurzel: str, b: Bilanz) -> None:
     zu_hoch, gemessen = [], []
     for knopf in seite.query_selector_all(".gr-reiter [data-tafel]"):
         tid = knopf.get_attribute("data-tafel")
-        knopf.click()
-        seite.wait_for_timeout(80)
+        waehle_tafel(seite, knopf, tid)
         hoehe = seite.evaluate("document.documentElement.scrollHeight")
         gemessen.append(f"{tid.replace('tafel-', '')} {hoehe}")
         if hoehe >= _MAX_REITERHOEHE:
@@ -371,8 +377,7 @@ def _summary_zeiger(seite, b: Bilanz) -> None:
     gesamt = 0
     for knopf in seite.query_selector_all(".gr-reiter [data-tafel]"):
         tid = knopf.get_attribute("data-tafel")
-        knopf.click()
-        seite.wait_for_timeout(80)
+        waehle_tafel(seite, knopf, tid)
         daten = seite.evaluate(
             """(tid) => {
               const t = document.getElementById(tid);
