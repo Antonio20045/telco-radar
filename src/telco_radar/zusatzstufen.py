@@ -85,17 +85,27 @@ def _ki_videos(cfg: Config, root: Path, heute: date, takt: Takt) -> None:
         return
 
     def _lauf() -> None:
-        from .collect import youtube_api
+        from .collect import youtube_api, youtube_vorschau
 
+        state = root / "data" / "state"
+        http_cfg = cfg.settings.get("http", {})
         kanaele = ki_videos.kanaele(root)
-        abruf = youtube_api.abrufen(
-            kanaele, cfg.settings.get("http", {}), youtube_api.schluessel()
-        )
-        store = ki_videos.aktualisiere(root / "data" / "state", kanaele, abruf, heute)
+        abruf = youtube_api.abrufen(kanaele, http_cfg, youtube_api.schluessel())
+        store = ki_videos.aktualisiere(state, kanaele, abruf, heute)
+        adressen = {
+            v["id"]: v.get("vorschau")
+            for kanal in (abruf.get("kanaele") or {}).values()
+            for v in kanal.get("videos") or []
+        }
+        ordner = ki_videos.bildordner(state)
+        bilder = youtube_vorschau.hole(store["videos"], adressen, ordner, http_cfg)
+        store = ki_videos.setze_bilder(state, bilder)
+        youtube_vorschau.raeume_auf(ordner, {b for b in bilder.values() if b})
         log.info(
-            "KI-Videos: Stand %s, %d Videos, Ausfall %s",
+            "KI-Videos: Stand %s, %d Videos, %d mit Bild, Ausfall %s",
             store["stand"],
             len(store["videos"]),
+            sum(1 for b in bilder.values() if b),
             store["error"],
         )
 

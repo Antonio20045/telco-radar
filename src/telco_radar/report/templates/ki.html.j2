@@ -30,7 +30,7 @@
 
 {% macro video(v, art, n=0) %}
 <article class="ki-video ki-video--{{ art }}">
-  <button type="button" class="ki-player" data-ki-video="{{ v.id }}" aria-label="Video abspielen: {{ v.titel }}"><svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><g><circle cx="{{ 90 + n * 50 }}" cy="90" r="60"/><circle cx="{{ 90 + n * 50 }}" cy="90" r="34"/><path d="M0 {{ 120 - n * 8 }} C 80 {{ 60 + n * 14 }}, 200 {{ 150 - n * 16 }}, 320 {{ 70 + n * 12 }}"/></g></svg><span class="ki-knopf"></span><span class="ki-zeit">{{ v.zeit }}</span></button>
+  <button type="button" class="ki-player" data-ki-video="{{ v.id }}" aria-label="Video abspielen: {{ v.titel }}">{% if v.bild_src %}<img class="ki-standbild" src="{{ v.bild_src }}" alt="" loading="lazy" decoding="async">{% else %}<svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><g><circle cx="{{ 90 + n * 50 }}" cy="90" r="60"/><circle cx="{{ 90 + n * 50 }}" cy="90" r="34"/><path d="M0 {{ 120 - n * 8 }} C 80 {{ 60 + n * 14 }}, 200 {{ 150 - n * 16 }}, 320 {{ 70 + n * 12 }}"/></g></svg>{% endif %}<span class="ki-knopf"></span><span class="ki-zeit">{{ v.zeit }}</span></button>
   <div class="ki-video-text">
     <p class="ki-kicker">Video{% if v.stufe %} · {{ v.stufe }}{% endif %}</p>
     <h3 class="ki-video-titel">{{ v.titel }}</h3>

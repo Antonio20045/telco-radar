@@ -4,7 +4,8 @@ Je Kanal ein ``playlistItems.list`` auf die Uploads-Playlist, danach ein
 ``videos.list`` für die Dauer aller gefundenen Videos: zusammen etwa eine
 Einheit je Kanal vom Tageskontingent (10.000). Der Schlüssel kommt nur aus der
 Umgebung und geht nur im Kopf ``X-Goog-Api-Key`` mit, nie in Adresse,
-Protokoll oder Fehlertext. Vorschaubilder werden nicht gelesen.
+Protokoll oder Fehlertext. Je Video kommt die Adresse des besten
+Vorschaubilds mit (``vorschau``); geholt wird es in ``youtube_vorschau``.
 """
 
 from __future__ import annotations
@@ -22,6 +23,7 @@ UMGEBUNG = "YOUTUBE_API_KEY"
 JE_KANAL = 5
 OHNE_SCHLUESSEL = "YouTube-Schlüssel fehlt"
 _GESAMT = {"quotaExceeded", "dailyLimitExceeded", "keyInvalid", "accessNotConfigured"}
+_BILDGROESSEN = ("maxres", "standard", "high", "medium")
 _DAUER = re.compile(r"P(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?)?")
 
 
@@ -48,15 +50,32 @@ def dauer_sekunden(iso: str) -> int | None:
     return summe if summe > 0 else None
 
 
+def vorschau(snippet: dict) -> str | None:
+    """Die Adresse des größten Vorschaubilds (maxres > standard > high > medium)."""
+    bilder = snippet.get("thumbnails") or {}
+    for groesse in _BILDGROESSEN:
+        url = (bilder.get(groesse) or {}).get("url")
+        if url:
+            return url
+    return None
+
+
 def uploads(antwort: dict) -> list[dict]:
-    """ID, Titel und Tag je Video; private und gelöschte (ohne Datum) fallen weg."""
+    """ID, Titel, Tag und Vorschaubild je Video; ohne Datum (privat) fällt es weg."""
     out = []
     for eintrag in antwort.get("items") or []:
         details = eintrag.get("contentDetails") or {}
         datum = details.get("videoPublishedAt")
         if details.get("videoId") and datum:
-            titel = (eintrag.get("snippet") or {}).get("title") or ""
-            out.append({"id": details["videoId"], "titel": titel, "datum": datum[:10]})
+            snippet = eintrag.get("snippet") or {}
+            out.append(
+                {
+                    "id": details["videoId"],
+                    "titel": snippet.get("title") or "",
+                    "datum": datum[:10],
+                    "vorschau": vorschau(snippet),
+                }
+            )
     return out
 
 

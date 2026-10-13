@@ -68,7 +68,11 @@ def _abruf(videos: list[dict], kanal: str = "c't 3003") -> dict:
     return {"kanaele": {kanal: {"videos": videos}}}
 
 
-def _render(tmp_path: Path, abrufe: list[tuple[dict, date]] | None) -> BeautifulSoup:
+def _render(
+    tmp_path: Path,
+    abrufe: list[tuple[dict, date]] | None,
+    bilder: dict[str, bool] | None = None,
+) -> BeautifulSoup:
     root = tmp_path / "repo"
     berichte = root / "data" / "reports"
     berichte.mkdir(parents=True)
@@ -93,6 +97,8 @@ def _render(tmp_path: Path, abrufe: list[tuple[dict, date]] | None) -> Beautiful
     if abrufe is not None:
         _store(root / "data" / "state", abrufe)
     site = tmp_path / "site"
+    if bilder is not None:
+        _lege_bilder_ab(root / "data" / "state", bilder, site)
     render_site(site, berichte, load_config(root))
     return BeautifulSoup((site / "ki.html").read_text(encoding="utf-8"), "html.parser")
 
@@ -317,3 +323,79 @@ def test_am_handy_kein_ueberlauf_und_die_reihe_einspaltig(chromium, site):
             " v.length]; })()"
         )
     assert lage == [True, 1, 6]
+
+
+def _lege_bilder_ab(state: Path, mit_datei: dict[str, bool], site: Path) -> None:
+    """``bild`` je Video im Store; die Datei nur, wo ``True``; dazu eine Altlast."""
+    from PIL import Image
+
+    ordner = ki_videos.bildordner(state)
+    ordner.mkdir(parents=True, exist_ok=True)
+    for vid, datei in mit_datei.items():
+        if datei:
+            Image.new("RGB", (960, 540), (30, 90, 160)).save(ordner / f"{vid}.jpg")
+    ki_videos.setze_bilder(state, {vid: f"{vid}.jpg" for vid in mit_datei})
+    altlast = site / "images" / "ki-videos" / "WEG00000001.jpg"
+    altlast.parent.mkdir(parents=True)
+    altlast.write_bytes(b"alt")
+
+
+def test_vorschaubild_kommt_aus_der_eigenen_site_nie_von_youtube(tmp_path):
+    bilder = {"VID00000001": True, "VID00000002": True, "VID00000003": False}
+    seite = _render(tmp_path, [(_abruf(_lange_und_kurze()), HEUTE)], bilder)
+    site = tmp_path / "site"
+    standbilder = {
+        b["data-ki-video"]: b.select_one("img.ki-standbild")
+        for b in seite.select(".ki-player[data-ki-video]")
+    }
+    mit_bild = {vid for vid, img in standbilder.items() if img is not None}
+    assert mit_bild == {"VID00000001", "VID00000002"}
+    for vid in mit_bild:
+        img = standbilder[vid]
+        assert img["src"] == f"images/ki-videos/{vid}.jpg"
+        assert img["alt"] == "" and img["loading"] == "lazy"
+        assert (site / img["src"]).is_file()
+        knopf = img.find_parent("button")
+        assert knopf.select_one(".ki-knopf") and knopf.select_one(".ki-zeit")
+        assert knopf.select("svg") == []
+    for img in seite.select("img"):
+        assert "ytimg" not in img["src"] and "youtu" not in img["src"]
+    assert "ytimg" not in str(seite)
+    ohne = standbilder.keys() - mit_bild
+    assert "VID00000003" in ohne
+    for vid in ohne:
+        assert seite.select_one(f'[data-ki-video="{vid}"] svg') is not None
+    ausgeliefert = sorted(p.name for p in (site / "images" / "ki-videos").iterdir())
+    assert ausgeliefert == ["VID00000001.jpg", "VID00000002.jpg"]
+
+
+def test_ohne_bilder_bleibt_das_gezeichnete_standbild(tmp_path):
+    seite = _render(tmp_path, [(_abruf(_lange_und_kurze()), HEUTE)], {})
+    assert seite.select(".ki-player img") == []
+    knoepfe = seite.select(".ki-player[data-ki-video]")
+    assert len(knoepfe) == 8 and all(b.select_one("svg") for b in knoepfe)
+    assert list((tmp_path / "site" / "images" / "ki-videos").iterdir()) == []
+
+
+BILDLAGE = (
+    "(() => { const i = document.querySelector('.ki-links img.ki-standbild');"
+    " const b = i.closest('button').getBoundingClientRect();"
+    " const r = i.getBoundingClientRect();"
+    " const k = document.querySelector('.ki-links .ki-knopf');"
+    " k.scrollIntoView({block: 'center'}); const m = k.getBoundingClientRect();"
+    " const oben = document.elementFromPoint(m.x + m.width / 2, m.y + m.height / 2);"
+    " return [i.naturalWidth, Math.round(r.width) === Math.round(b.width),"
+    " Math.round(r.height) === Math.round(b.height), k === oben]; })()"
+)
+
+
+def test_vorschaubild_laedt_im_chromium_ohne_fremde_anfrage(chromium, tmp_path):
+    abrufe = [(_abruf(_lange_und_kurze()), HEUTE)]
+    _render(tmp_path, abrufe, {"VID00000010": True})
+    with _seite(chromium, tmp_path / "site") as (page, fremd):
+        page.wait_for_function(
+            "document.querySelector('.ki-links img.ki-standbild').complete"
+        )
+        lage = page.evaluate(BILDLAGE)
+    assert fremd == []
+    assert lage == [960, True, True, True]

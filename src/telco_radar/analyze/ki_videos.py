@@ -4,6 +4,8 @@ Der Store ``data/state/ki_videos.json`` hält ``stand``, höchstens ``HOECHSTENS
 Videos der letzten ``TAGE`` Tage (neueste zuerst), je Kanal ``error`` und
 ``error`` für den ganzen Abruf. Fällt der Abruf aus, bleibt der alte Stand;
 fällt ein Kanal aus, bleiben seine Videos. Titel verlieren nur Werbe-Emoji.
+``bild`` nennt das selbst abgelegte Vorschaubild im Ordner ``BILDORDNER``
+neben dem Store, ``None`` heißt: keins, die Seite zeichnet ihr Standbild.
 Lesen ohne Netz, damit ``report/`` den Store laden darf.
 """
 
@@ -22,6 +24,7 @@ log = logging.getLogger(__name__)
 
 STORE_NAME = "ki_videos.json"
 KATALOG = Path("config") / "ki_videos.yaml"
+BILDORDNER = "ki_videos"
 HOECHSTENS = 30
 TAGE = 60
 KURZ_UNTER_SEKUNDEN = 120
@@ -45,6 +48,11 @@ def saeubere(titel: str) -> str:
         and not (ord(z) >= 0x2190 and unicodedata.category(z) in ("So", "Sk"))
     )
     return re.sub(r"\s+", " ", "".join(zeichen)).strip()
+
+
+def bildordner(state_dir: Path) -> Path:
+    """Wo die Vorschaubilder liegen: ``data/state/ki_videos/``."""
+    return Path(state_dir) / BILDORDNER
 
 
 def lade(state_dir: Path) -> dict:
@@ -80,6 +88,7 @@ def aktualisiere(
     if "kanaele" in abruf:
         je_name = {k["name"]: k for k in katalog}
         videos = {v["id"]: v for v in alt.get("videos") or []}
+        bild_alt = {i: v.get("bild") for i, v in videos.items()}
         kanal_stand = {}
         for name, ergebnis in abruf["kanaele"].items():
             vorher = (alt.get("kanaele") or {}).get(name) or {}
@@ -99,12 +108,27 @@ def aktualisiere(
                     "dauer_sekunden": v["dauer_sekunden"],
                     "stufe": kanal.get("stufe"),
                     "sprache": kanal.get("sprache"),
+                    "bild": bild_alt.get(v["id"]),
                 }
         grenze = (heute - timedelta(days=TAGE)).isoformat()
         frisch = [v for v in videos.values() if v["datum"] >= grenze]
         frisch.sort(key=lambda v: (v["datum"], v["id"]), reverse=True)
         store.update(stand=tag, videos=frisch[:HOECHSTENS], kanaele=kanal_stand)
+    _schreibe(state_dir, store)
+    return store
+
+
+def setze_bilder(state_dir: Path, bilder: dict[str, str | None]) -> dict:
+    """``bild`` je Video aus dem Abruf der Vorschaubilder; Fehlende heißen ``None``."""
+    store = lade(state_dir)
+    store["videos"] = [
+        dict(v, bild=bilder.get(v["id"])) for v in store.get("videos") or []
+    ]
+    _schreibe(state_dir, store)
+    return store
+
+
+def _schreibe(state_dir: Path, store: dict) -> None:
     pfad = Path(state_dir) / STORE_NAME
     pfad.parent.mkdir(parents=True, exist_ok=True)
     pfad.write_text(json.dumps(store, ensure_ascii=False, indent=1), encoding="utf-8")
-    return store

@@ -22,7 +22,7 @@ from . import diff_bilder, differenzierung_bericht, geraete_fragmente
 from . import differenzierung_view, geraete_teurer, wettbewerb_puls
 from . import geraete_tco_grafik as _geraete_tco_grafik
 from . import fruehwarnung as fruehwarnung_mod, lieferzeit_view as lieferzeit_view_mod
-from . import glas as glas_mod, luecken as luecken_mod
+from . import glas as glas_mod, ki_vorschau, luecken as luecken_mod
 from . import newsletter_protokoll, rechtstexte as rechtstexte_mod
 from . import seit as seit_mod, verlauf as verlauf_mod
 from . import ki_seite, meldungen_seite, startseite as startseite_mod, statik, suchindex
@@ -31,7 +31,7 @@ from .promo import prepare_promo_view
 from .thema import build_thema_view
 from .wettbewerb import anker as _wb_anker, build_wettbewerb_view
 from ..analyze import ctm, geraete_pruefkennzahlen
-from ..analyze import ki_inhalte, ki_modelle, ki_videos, themen_store
+from ..analyze import ki_inhalte, ki_modelle, themen_store
 from ..analyze.diff_curator import DiffStore
 from ..analyze.begriffe import (
     DIGEST_MARKER,
@@ -1830,7 +1830,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
         (latest_ctx or {}).get("date_de", ""),
         ki_modelle.lade(state_dir),
         ki_inhalte.lade_prompts(_wurzel),
-        ki_videos.lade(state_dir),
+        ki_vorschau.liefere_aus(state_dir, site_dir),
     )
     for alt, inhalt in (
         ("bericht.html", _redirect_html("index.html")),

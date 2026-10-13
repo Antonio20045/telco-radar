@@ -47,6 +47,8 @@ def _json(name: str) -> dict:
 def _api(gefragt: list[httpx.Request], fehler: str | None = None, status=403):
     def antworte(anfrage: httpx.Request) -> httpx.Response:
         gefragt.append(anfrage)
+        if anfrage.url.host == "i.ytimg.com":
+            return httpx.Response(404)
         if fehler is not None:
             return httpx.Response(status, json=_json(fehler))
         if anfrage.url.path.endswith("/playlistItems"):
@@ -66,13 +68,20 @@ def test_parser_lesen_id_titel_datum_aus_playlistitems():
             "id": "TEST0000001",
             "titel": "🔥 Eigenen KI-Agenten bauen – so geht's 🤖",
             "datum": "2026-10-09",
+            "vorschau": "https://i.ytimg.com/vi/TEST0000001/hqdefault.jpg",
         },
         {
             "id": "TEST0000002",
             "titel": "Copilot im Büro: Was wirklich hilft",
             "datum": "2026-10-02",
+            "vorschau": None,
         },
-        {"id": "TEST0000004", "titel": "Alte Folge vom Juli", "datum": "2026-07-01"},
+        {
+            "id": "TEST0000004",
+            "titel": "Alte Folge vom Juli",
+            "datum": "2026-07-01",
+            "vorschau": None,
+        },
     ]
 
 
@@ -116,6 +125,7 @@ def test_abruf_traegt_den_schluessel_nur_im_kopf(monkeypatch, caplog):
         "id": "TEST0000001",
         "titel": "🔥 Eigenen KI-Agenten bauen – so geht's 🤖",
         "datum": "2026-10-09",
+        "vorschau": "https://i.ytimg.com/vi/TEST0000001/hqdefault.jpg",
         "dauer_sekunden": 847,
     }
 
@@ -190,6 +200,7 @@ def test_store_haelt_hoechstens_30_videos_der_letzten_60_tage(tmp_path):
         "dauer_sekunden": 600,
         "stufe": "Einstieg",
         "sprache": "de",
+        "bild": None,
     }
 
 
@@ -263,6 +274,8 @@ def test_zusatzstufe_ruft_nur_mit_schalter_ab(tmp_path, monkeypatch):
     store = ki_videos.lade(tmp_path / "data" / "state")
     assert store["stand"] == HEUTE.isoformat()
     assert len(store["videos"]) == 2
+    assert [v["bild"] for v in store["videos"]] == [None, None]
+    assert "ytimg" not in json.dumps(store)
     monkeypatch.delenv(youtube_api.UMGEBUNG)
     zusatzstufen._ki_videos(cfg, tmp_path, HEUTE, takt)
     store = ki_videos.lade(tmp_path / "data" / "state")

@@ -5974,8 +5974,8 @@ html:not([data-art="geraet"]) .gx-held .gx-art--tarif,html[data-art="geraet"] .g
 .ki-archiv-liste li{padding:12px 0;border-top:1px solid var(--rule)}
 .ki-archiv-liste a{font-family:var(--zeitung);font-size:17px;line-height:1.3;color:var(--ink)}
 .ki-archiv-wer{display:block;margin-top:4px;font-size:13px;color:var(--ink-3)}
-/* KI-Videos (Schnitte 14, 15): eigenes Standbild mit Linienzeichnung, erst
-   ein Klick laedt das iframe von youtube-nocookie (app.js). */
+/* KI-Videos (Schnitte 14, 15): selbst ausgeliefertes Vorschaubild, ohne Bild
+   die Linienzeichnung; erst ein Klick laedt das iframe von youtube-nocookie (app.js). */
 .ki-video{margin:0}
 .ki-video--gross{padding-bottom:18px}
 .ki-player{position:relative;display:grid;place-items:center;width:100%;aspect-ratio:16/9;margin:0 0 12px;padding:0;border:0;
@@ -5983,6 +5983,7 @@ html:not([data-art="geraet"]) .gx-held .gx-art--tarif,html[data-art="geraet"] .g
 iframe.ki-player{display:block;cursor:auto}
 .ki-player svg{position:absolute;inset:0;width:100%;height:100%}
 .ki-player g{fill:none;stroke:rgba(255,255,255,.28);stroke-width:.8}
+.ki-standbild{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .ki-knopf{position:relative;z-index:1;display:grid;place-items:center;width:72px;height:72px;border-radius:50%;background:var(--red);transition:transform .3s}
 .ki-player:hover .ki-knopf{transform:scale(1.08)}
 .ki-knopf::after{content:"";margin-left:6px;border-left:20px solid var(--bildtext);border-top:12px solid transparent;border-bottom:12px solid transparent}
