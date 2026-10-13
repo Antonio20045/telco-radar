@@ -4510,9 +4510,12 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
   for (var m = 0; m < marken.length; m++) {
     if (marken[m].brand === 'Chromium') document.documentElement.classList.add('glas-chromium');
   }
+  /* Ueber einem Bild heisst: das oberste, was unter der Mitte des Glases
+     zu sehen ist, ist ein Bild - nicht ein Abschnitt, der ein Bild nur
+     enthaelt. Eine deckende Flaeche davor beendet die Suche. */
   var ruhig = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
   var filter = document.getElementById('glas-linse');
-  var bildartig = 'img,video,picture,canvas,[data-buehne],.wa-rahmen,.wa-bild,.szene-bild,[class*="motiv"]';
+  var bildartig = 'img,video,picture,canvas';
 
   Array.prototype.forEach.call(schalter, function (s) {
     var pille = s.querySelector('.glas-pille');
@@ -4558,11 +4561,32 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
       var unter = document.elementsFromPoint ? document.elementsFromPoint(r.left + r.width / 2, r.top + r.height / 2) : [];
       var bild = false;
       for (var j = 0; j < unter.length; j++) {
-        if (s.contains(unter[j])) continue;
-        bild = !!(unter[j].closest && unter[j].closest(bildartig));
-        break;
+        var el = unter[j];
+        if (s.contains(el)) continue;
+        if (el.matches && el.matches(bildartig)) { bild = true; break; }
+        var st = getComputedStyle(el);
+        if (st.backgroundImage.indexOf('url(') >= 0) { bild = true; break; }
+        var farbe = /rgba?\(([^)]+)\)/.exec(st.backgroundColor);
+        var deckung = farbe ? farbe[1].split(',') : [];
+        if (deckung.length === 3 || (deckung.length === 4 && parseFloat(deckung[3]) > 0.5)) break;
       }
       s.setAttribute('data-unter', bild ? 'bild' : 'flaeche');
+    };
+    var bedienbar = 'button,a[href],input,select,textarea,label,summary,[role="tab"],[role="button"]';
+    var kopf = document.getElementById('kopf');
+    var weiche = function () {
+      if (getComputedStyle(s).position !== 'sticky') { s.classList.remove('weicht'); return; }
+      var r = s.getBoundingClientRect();
+      var faellig = false;
+      for (var k = 0; k < 15 && !faellig; k++) {
+        var unter = document.elementsFromPoint ? document.elementsFromPoint(r.left + r.width * (k % 5 + 0.5) / 5, r.top + r.height * (Math.floor(k / 5) + 1) / 4) : [];
+        for (var m = 0; m < unter.length; m++) {
+          var el = unter[m];
+          if (s.contains(el) || (kopf && kopf.contains(el))) continue;
+          if (el.closest && el.closest(bedienbar)) { faellig = true; break; }
+        }
+      }
+      s.classList.toggle('weicht', faellig);
     };
     var still = null, angefragt = false;
     window.addEventListener('scroll', function () {
@@ -4571,9 +4595,10 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
       still = setTimeout(function () { s.classList.remove('rollt'); }, 180);
       if (angefragt) return;
       angefragt = true;
-      requestAnimationFrame(function () { angefragt = false; untersuche(); });
+      requestAnimationFrame(function () { angefragt = false; untersuche(); weiche(); });
     }, { passive: true });
     untersuche();
+    weiche();
   });
 })();
 
