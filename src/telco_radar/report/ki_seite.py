@@ -4,9 +4,11 @@ KI-Meldung ist, was in der Themenregion der KI-Anbieter steht
 (``cfg.theme_names["thema:ki"]``) oder in Titel und Kurztext das Technikthema
 „KI / AI“ trägt. Gelesen werden alle Berichte, jede URL einmal, die neueste
 Meldung zuerst; innerhalb eines Tages entscheidet die Priorität. Die Seite
-zeigt die Meldungen wie die Meldungen-Seite in drei Spalten, aber ohne
-fremde Fotos. Ressort und Archiv rechnet ``analyze.ki_blatt``: je Ressort
-höchstens zwölf Meldungen im Blatt, die älteren im zugeklappten Archiv.
+zeigt die neuesten Meldungen wie die Meldungen-Seite in drei Spalten, aber
+ohne fremde Fotos, darunter das übrige Blatt in Ressort-Kapiteln mit eigenen
+Bildern. Ressort, Kapitel und Archiv rechnet ``analyze.ki_blatt``: je
+Ressort höchstens zwölf Meldungen im Blatt, die älteren im zugeklappten
+Archiv. Die Videoreihe steht nach ``VIDEOS_NACH_KAPITEL`` Kapiteln.
 Das Band „Modelle“ zeigt den Store aus ``analyze.ki_modelle`` (Schnitt 6),
 ``app.js`` zeichnet daraus die Leiter (Schnitt 7). Die Rubrikleiste
 (Schnitt 8) zählt je Abschnitt dasselbe Feld, das der Abschnitt zeigt.
@@ -37,6 +39,7 @@ LINKS = 2
 RECHTS = 5
 VORLAGE = "ki.html.j2"
 REIHE = 6
+VIDEOS_NACH_KAPITEL = 2
 OHNE_ABRUF = "noch kein Abruf"
 KAPITEL = (
     "Wie eine KI antwortet",
@@ -96,18 +99,19 @@ def ki_meldungen(
 def ausgabe(
     meldungen: list[dict], stand: str, archiv: list[dict] | None = None
 ) -> dict:
-    """Verteilt das Blatt auf Aufmacher, links, „Auch wichtig“ und Liste."""
+    """Verteilt das Blatt auf Aufmacher, links, „Auch wichtig“ und Kapitel."""
     aufmacher = meldungen[0] if meldungen else None
     links = meldungen[1 : 1 + LINKS]
     rechts = meldungen[1 + LINKS : 1 + LINKS + RECHTS]
+    ressorts = ki_blatt.kapitel(meldungen[1 + LINKS + RECHTS :])
     return {
         "kw": meldungen_seite.kalenderwoche(stand),
         "aufmacher": aufmacher,
         "links": links,
         "rechts": rechts,
-        "liste": meldungen[1 + LINKS + RECHTS :],
+        "ressorts": ressorts,
+        "videos_nach": min(VIDEOS_NACH_KAPITEL, len(ressorts)),
         "anzahl": len(meldungen),
-        "je_ressort": ki_blatt.HOECHSTENS_JE_RESSORT,
         "archiv": archiv or [],
     }
 

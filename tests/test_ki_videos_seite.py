@@ -4,7 +4,7 @@ Die Videos kommen aus dem Store ``ki_videos.json`` (``analyze.ki_videos``).
 Videos unter ``KURZ_UNTER_SEKUNDEN`` (Shorts) und ohne Dauer fallen weg. Das
 erste lange Video steht groß oben in der linken Spalte, das zweite klein unter
 der ersten Meldung von „Auch wichtig“, die nächsten sechs in der Reihe
-``#ki-videos`` unter den Meldungen; jedes genau einmal. Ohne Store oder mit
+``#ki-videos`` zwischen den Ressort-Kapiteln; jedes genau einmal. Ohne Store oder mit
 ``error`` nennt die Reihe Grund und Stand, ohne Videos bleiben die Spalten reine
 Meldungsspalten. Im HTML steht kein iframe und keine Adresse von YouTube außer
 dem Link „auf YouTube öffnen“; erst ein Klick im Chromium setzt das iframe
@@ -131,11 +131,12 @@ def test_verteilung_eins_links_eins_rechts_sechs_in_der_reihe(tmp_path):
     assert len(links) == 3
 
 
-def test_reihe_steht_unter_den_meldungen_vor_der_zeitungszeile(tmp_path):
+def test_reihe_steht_nach_dem_ressort_kapitel_unter_dem_kopf(tmp_path):
     seite = _render(tmp_path, [(_abruf(_lange_und_kurze()), HEUTE)])
     blatt = str(seite.select_one("#meldungen"))
-    assert blatt.index('class="ki-oben"') < blatt.index('id="ki-videos"')
-    assert blatt.index('id="ki-videos"') < blatt.index('class="ki-mehr"')
+    assert blatt.index('class="ki-oben"') < blatt.index('id="ressort-modelle"')
+    assert blatt.index('id="ressort-modelle"') < blatt.index('id="ki-videos"')
+    assert len(seite.select("#meldungen .ki-ressort")) == 1
     titel = seite.select_one("#ki-videos h2")
     assert _text(titel) == "Videos · was man mit KI bauen kann"
 

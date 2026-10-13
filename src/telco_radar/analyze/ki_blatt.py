@@ -9,6 +9,13 @@ Meldungen bleiben stehen wie in einer Zeitung: je Ressort stehen die
 neuesten ``HOECHSTENS_JE_RESSORT`` im Blatt, die älteren im Archiv. Das
 Blatt wird aus allen gespeicherten Berichten abgeleitet, es gibt keinen
 eigenen Store.
+
+Unter dem Kopf der Seite steht das Blatt in Kapiteln (``kapitel()``), je
+Ressort eins mit eigenem Bild ``ki-<schluessel>``: der neueste Aufmacher,
+daneben höchstens ``NEBEN_JE_KAPITEL`` weitere, der Rest zugeklappt. Die
+Kapitel folgen fest ``KAPITEL_FOLGE`` wie die Ressorts einer Zeitung: der
+Leser findet ein Ressort in jeder Ausgabe an derselben Stelle, und „KI im
+Mobilfunk“, das Geschäft der Leser, steht vorn statt zuletzt.
 """
 
 from __future__ import annotations
@@ -17,6 +24,7 @@ import re
 from collections.abc import Iterable
 
 HOECHSTENS_JE_RESSORT = 12
+NEBEN_JE_KAPITEL = 3
 MOBILFUNK = "KI im Mobilfunk"
 FALLBACK = "Produkte"
 RESSORTS = (
@@ -28,6 +36,24 @@ RESSORTS = (
     "Forschung",
     MOBILFUNK,
 )
+KAPITEL_FOLGE = (
+    MOBILFUNK,
+    "Modelle",
+    "Chips & Rechenzentren",
+    "Start-ups & Geld",
+    "Produkte",
+    "Regeln & Recht",
+    "Forschung",
+)
+SCHLUESSEL = {
+    MOBILFUNK: "mobilfunk",
+    "Modelle": "modelle",
+    "Chips & Rechenzentren": "chips",
+    "Start-ups & Geld": "startups",
+    "Produkte": "produkte",
+    "Regeln & Recht": "regeln",
+    "Forschung": "forschung",
+}
 TELCO_STICHWORTE = (
     r"telco|telekom|telecom|mobilfunk|netzbetreiber|operator|carrier|[56]g\b|ai-ran|o-ran"
     r"|open ran|ran\b|spectrum|spektrum|glasfaser|fib(?:re|er)|broadband|breitband"
@@ -112,3 +138,26 @@ def blatt(
         ziel = stehen if je_ressort[name] <= HOECHSTENS_JE_RESSORT else archiv
         ziel.append(dict(h, ki_ressort=name))
     return stehen, archiv
+
+
+def kapitel(meldungen: Iterable[dict]) -> list[dict]:
+    """Je Ressort mit Meldung ein Kapitel in ``KAPITEL_FOLGE``.
+
+    ``meldungen`` sind Blattmeldungen mit ``ki_ressort``, neueste zuerst; die
+    Reihenfolge bleibt in jedem Kapitel erhalten. Ein Ressort ohne Meldung
+    entfällt.
+    """
+    je_ressort: dict[str, list[dict]] = {name: [] for name in KAPITEL_FOLGE}
+    for h in meldungen:
+        je_ressort[h["ki_ressort"]].append(h)
+    return [
+        {
+            "name": name,
+            "schluessel": SCHLUESSEL[name],
+            "aufmacher": eigene[0],
+            "neben": eigene[1 : 1 + NEBEN_JE_KAPITEL],
+            "weitere": eigene[1 + NEBEN_JE_KAPITEL :],
+        }
+        for name, eigene in je_ressort.items()
+        if eigene
+    ]

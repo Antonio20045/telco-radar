@@ -3,7 +3,9 @@
    Kopf wie die Meldungen-Seite: Vollbild, das beim Scrollen zum Fenster
    wird (Kinostrecke in app.js). Darunter drei Spalten mit dem Aufmacher in
    der Mitte, ohne fremde Fotos; jede Meldung traegt ihren Quellenlink.
-   Die Auswahl rechnet `ki_seite.ausgabe()`, Ressort und Archiv
+   Darunter je Ressort ein Kapitel mit eigenem Bild: Aufmacher gross,
+   daneben wenige kleinere, der Rest zugeklappt (Antonio, 13.10.2026).
+   Die Auswahl rechnet `ki_seite.ausgabe()`, Ressort, Kapitel und Archiv
    `analyze.ki_blatt` (Zeitungsprinzip, Schnitt 2). Die Leiter der Modelle
    (Schnitt 7) baut app.js aus #ki-modelle-daten; ohne JS bleibt die Liste.
    Die Rubrikleiste (Schnitt 8) zeigt app.js, sobald der Kopf vorbei ist.
@@ -19,9 +21,9 @@
 {% set buehne = true %}
 {% block title %}Vodafone Product and Services Insights · KI{% endblock %}
 
-{% macro meldung(h, art, dek=false) %}
+{% macro meldung(h, art, dek=false, kicker=true) %}
 <article class="ki-meldung ki-meldung--{{ art }}">
-  <p class="ki-kicker">{{ h.ki_ressort }}</p>
+  {% if kicker %}<p class="ki-kicker">{{ h.ki_ressort }}</p>{% endif %}
   <h3 class="ki-schlag"><a href="{{ h.url }}" target="_blank" rel="noopener">{{ h.schlagzeile }}</a></h3>
   {% if dek and h.summary %}<p class="ki-dek">{{ h.summary }}</p>{% endif %}
   <p class="ki-wer"><a class="ki-quelle" href="{{ h.url }}" target="_blank" rel="noopener">{{ h.source_label }}</a>{% if h.operator %} · {{ h.operator }}{% endif %} · {{ h.ki_datum | date_de }}</p>
@@ -47,6 +49,24 @@
   {% if videos.ausfall %}<p class="ki-video-ausfall">Videos nicht abgerufen: {{ videos.ausfall }}{% if videos.stand %} · Stand {{ videos.stand }}{% endif %}</p>{% endif %}
 </div>
 {% endif %}
+{% endmacro %}
+
+{% macro ressort(r) %}
+<div class="ki-ressort" id="ressort-{{ r.schluessel }}">
+  <div class="ki-ressort-bild">{{ d.motiv('ki-' ~ r.schluessel, prefix, 'ki-ressort-motiv', breite=2400, hoehe=1339) }}
+    <h2 class="ki-ressort-titel" id="ressort-{{ r.schluessel }}-titel">{{ r.name }}</h2>
+  </div>
+  <div class="ki-ressort-blatt{% if not r.neben %} ki-ressort-blatt--allein{% endif %}">
+    {{ meldung(r.aufmacher, 'kopf', dek=true, kicker=false) }}
+    {% if r.neben %}<div class="ki-ressort-neben">{% for h in r.neben %}{{ meldung(h, 'neben', dek=loop.first, kicker=false) }}{% endfor %}</div>{% endif %}
+  </div>
+  {% if r.weitere %}
+  <details class="ki-ressort-weitere">
+    <summary>Weitere {{ r.weitere | length }} aus {{ r.name }}</summary>
+    <div class="ki-weitere-liste">{% for h in r.weitere %}{{ meldung(h, 'weitere', kicker=false) }}{% endfor %}</div>
+  </details>
+  {% endif %}
+</div>
 {% endmacro %}
 
 {% block buehne %}
@@ -81,11 +101,8 @@
       {% if videos.rechts and not ausgabe.rechts %}{{ video(videos.rechts, 'mini', 1) }}{% endif %}
     </div>
   </div>
-  {% if ausgabe.liste %}
-  <div class="ki-liste">{% for h in ausgabe.liste %}{{ meldung(h, 'liste') }}{% endfor %}</div>
-  {% endif %}
-  {{ video_reihe() }}
-  <p class="ki-mehr">Meldungen bleiben stehen wie in einer Zeitung: höchstens {{ ausgabe.je_ressort }} je Ressort, die älteste wandert ins Archiv.</p>
+  {% for r in ausgabe.ressorts %}{{ ressort(r) }}{% if loop.index == ausgabe.videos_nach %}{{ video_reihe() }}{% endif %}{% endfor %}
+  {% if not ausgabe.ressorts %}{{ video_reihe() }}{% endif %}
   {% if ausgabe.archiv %}
   <details id="ki-archiv" class="ki-archiv">
     <summary>Archiv · {{ ausgabe.archiv | length }} ältere {{ 'Meldung' if ausgabe.archiv | length == 1 else 'Meldungen' }}</summary>

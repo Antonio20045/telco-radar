@@ -3,8 +3,11 @@
 Jede KI-Meldung trägt genau ein KI-Ressort. Je Ressort stehen höchstens
 zwölf Meldungen im Blatt, die neuesten; die älteren wandern ins Archiv.
 Gegenprobe: elf Meldungen lassen das Archiv leer. Auf ``ki.html`` nennt der
-Archivtitel genau so viele Meldungen, wie die Liste darunter führt. Feste
-Tage, kein heute.
+Archivtitel genau so viele Meldungen, wie die Liste darunter führt; die vier
+nach dem Kopf stehen im Kapitel ihres Ressorts, ein Erklärsatz zum
+Zeitungsprinzip steht nicht auf der Seite. Die Kapitel (``kapitel()``)
+folgen fest ``KAPITEL_FOLGE``, leere Ressorts entfallen. Feste Tage, kein
+heute.
 """
 
 from __future__ import annotations
@@ -110,6 +113,38 @@ def test_jede_meldung_genau_einmal_mit_genau_einem_ressort():
     assert len(archiv) == 3
 
 
+def test_kapitel_in_fester_folge_ohne_leere_ressorts():
+    blatt, _ = ki_blatt.blatt(
+        [_meldung(i, "Forscher zeigen neue Studie") for i in range(2)]
+        + [_meldung(10 + i, "Neues Sprachmodell vorgestellt") for i in range(6)]
+        + [_meldung(20, "Operators test AI in the RAN")],
+        NETZBETREIBER,
+    )
+    kapitel = ki_blatt.kapitel(blatt)
+    assert [k["name"] for k in kapitel] == ["KI im Mobilfunk", "Modelle", "Forschung"]
+    assert [k["schluessel"] for k in kapitel] == ["mobilfunk", "modelle", "forschung"]
+    modelle = kapitel[1]
+    assert modelle["aufmacher"]["url"] == "https://example.org/ki/15"
+    assert [h["url"] for h in modelle["neben"]] == [
+        f"https://example.org/ki/{i}" for i in (14, 13, 12)
+    ]
+    assert [h["url"] for h in modelle["weitere"]] == [
+        f"https://example.org/ki/{i}" for i in (11, 10)
+    ]
+    assert kapitel[0]["neben"] == kapitel[0]["weitere"] == []
+
+
+def test_gegenprobe_jede_meldung_genau_einmal_in_den_kapiteln():
+    blatt, _ = ki_blatt.blatt(_modelle(12), NETZBETREIBER)
+    (kapitel,) = ki_blatt.kapitel(blatt)
+    alle = [kapitel["aufmacher"], *kapitel["neben"], *kapitel["weitere"]]
+    assert [h["url"] for h in alle] == [h["url"] for h in blatt]
+    assert len(kapitel["neben"]) == ki_blatt.NEBEN_JE_KAPITEL
+    assert set(ki_blatt.KAPITEL_FOLGE) == set(ki_blatt.RESSORTS)
+    assert sorted(ki_blatt.SCHLUESSEL) == sorted(ki_blatt.RESSORTS)
+    assert len(set(ki_blatt.SCHLUESSEL.values())) == len(ki_blatt.RESSORTS)
+
+
 def _ki_seite(tmp_path, anzahl: int) -> str:
     root = tmp_path / "repo"
     berichte = root / "data" / "reports"
@@ -141,8 +176,17 @@ def test_ki_seite_fuehrt_zwoelf_im_blatt_und_das_archiv_zugeklappt(tmp_path):
     ki = _ki_seite(tmp_path, 15)
     blatt = re.search(r'<section class="ki-blatt".*?</section>', ki, re.S).group(0)
     assert len(re.findall(r'<article class="ki-meldung', blatt)) == 12
-    assert re.findall(r'<p class="ki-kicker">([^<]+)</p>', blatt) == ["Modelle"] * 12
-    assert "höchstens 12 je Ressort, die älteste wandert ins Archiv." in blatt
+    oben = re.search(r'<div class="ki-oben">.*?<div class="ki-ressort"', blatt, re.S)
+    kicker = re.findall(r'<p class="ki-kicker">([^<]+)</p>', oben.group(0))
+    assert kicker == ["Modelle"] * 8
+    kapitel = re.findall(r'<div class="ki-ressort" id="ressort-([a-z]+)">', blatt)
+    assert kapitel == ["modelle"]
+    assert len(re.findall(r'<article class="ki-meldung ki-meldung--kopf">', blatt)) == 1
+    assert (
+        len(re.findall(r'<article class="ki-meldung ki-meldung--neben">', blatt)) == 3
+    )
+    assert "wie in einer Zeitung" not in ki
+    assert "ki-mehr" not in ki
     archiv = re.search(r'<details id="ki-archiv".*?</details>', blatt, re.S).group(0)
     assert '<details id="ki-archiv" open' not in archiv
     assert "Archiv · 3 ältere Meldungen" in archiv
