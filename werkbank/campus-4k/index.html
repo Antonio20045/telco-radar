@@ -2,10 +2,8 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Campus-Szene Vorschau</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&display=swap">
 <style>
 /* Ein Bildschirm: die Szene fuellt alles, die Steuerung liegt als Glasleiste unten und laesst sich ganz wegschieben. Bewusst nur dunkel, wie ein Kinosaal. */
 :root {
@@ -20,15 +18,13 @@
   --schrift: "Instrument Sans", "Helvetica Neue", Arial, system-ui, sans-serif;
   color-scheme: dark;
 }
-:root:not([data-theme="light"]) { color-scheme: dark; }
-:root[data-theme="dark"] { color-scheme: dark; }
 html, body { height: 100%; }
 body { margin: 0; background: var(--grund); color: var(--text); font-family: var(--schrift); overflow: hidden; }
 #buehne { position: fixed; inset: 0; }
 #szene { position: absolute; inset: 0; width: 100%; height: 100%; display: block; opacity: 0; transition: opacity 1.4s ease; }
 #szene.da { opacity: 1; }
 .laden { position: absolute; inset: 0; display: grid; place-items: center; font-size: 15px; color: var(--text-2); font-variant-numeric: tabular-nums; }
-.marke { position: absolute; top: 16px; left: 16px; display: flex; align-items: center; gap: 10px;
+.marke { position: absolute; top: calc(16px + env(safe-area-inset-top, 0px)); left: 16px; display: flex; align-items: center; gap: 10px;
   padding: 8px 14px; border-radius: 999px; background: var(--glas); border: 1px solid var(--glas-rand);
   -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); font-size: 14px; font-weight: 500; }
 .marke i { width: 9px; height: 9px; border-radius: 50%; background: var(--rot); display: block; }
@@ -44,12 +40,12 @@ body { margin: 0; background: var(--grund); color: var(--text); font-family: var
 .kopf.hell p { background: rgba(255,255,255,.45); border-color: rgba(255,255,255,.6); }
 .kopf[hidden] { display: none; }
 
-.leiste { position: absolute; left: 16px; right: 16px; max-width: 1180px; margin-inline: auto; bottom: 16px;
+.leiste { position: absolute; left: 16px; right: 16px; max-width: 1180px; margin-inline: auto; bottom: calc(16px + env(safe-area-inset-bottom, 0px));
   display: grid; gap: 10px; padding: 12px 14px; border-radius: 20px; background: var(--glas); border: 1px solid var(--glas-rand);
   -webkit-backdrop-filter: blur(18px) saturate(1.2); backdrop-filter: blur(18px) saturate(1.2); max-height: 46vh; overflow-y: auto;
   transition: transform .45s cubic-bezier(.2,.7,.2,1), opacity .45s ease; }
 .leiste.weg { transform: translateY(calc(100% + 40px)); opacity: 0; pointer-events: none; }
-.griff { position: absolute; right: 16px; bottom: 16px; display: flex; align-items: center; gap: 8px;
+.griff { position: absolute; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); display: flex; align-items: center; gap: 8px;
   -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); background: var(--glas); }
 .griff[hidden] { display: none; }
 .griff svg, .weg-knopf svg { width: 14px; height: 14px; display: block; }
