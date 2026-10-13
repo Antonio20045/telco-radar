@@ -54,7 +54,7 @@ def verkleinere(daten: bytes) -> bytes:
     if bild.width > BREITE:
         bild = bild.resize(
             (BREITE, max(1, round(bild.height * BREITE / bild.width))),
-            Image.LANCZOS,
+            Image.Resampling.LANCZOS,
         )
     aus = io.BytesIO()
     bild.save(aus, "JPEG", quality=QUALITAET, optimize=True, progressive=True)
