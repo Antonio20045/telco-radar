@@ -1,0 +1,612 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Campus-Szene Vorschau</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&display=swap">
+<style>
+/* Ein Bildschirm: die Szene fuellt alles, die Steuerung liegt als Glasleiste unten und laesst sich ganz wegschieben. Bewusst nur dunkel, wie ein Kinosaal. */
+:root {
+  --grund: #07090c;
+  --glas: rgba(16, 19, 24, 0.62);
+  --glas-hell: rgba(255, 255, 255, 0.08);
+  --glas-rand: rgba(255, 255, 255, 0.14);
+  --text: #f2f4f7;
+  --text-2: rgba(242, 244, 247, 0.62);
+  --rot: #e60000;
+  --dunkel-text: #101317;
+  --schrift: "Instrument Sans", "Helvetica Neue", Arial, system-ui, sans-serif;
+  color-scheme: dark;
+}
+:root:not([data-theme="light"]) { color-scheme: dark; }
+:root[data-theme="dark"] { color-scheme: dark; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--grund); color: var(--text); font-family: var(--schrift); overflow: hidden; }
+#buehne { position: fixed; inset: 0; }
+#szene { position: absolute; inset: 0; width: 100%; height: 100%; display: block; opacity: 0; transition: opacity 1.4s ease; }
+#szene.da { opacity: 1; }
+.laden { position: absolute; inset: 0; display: grid; place-items: center; font-size: 15px; color: var(--text-2); font-variant-numeric: tabular-nums; }
+.marke { position: absolute; top: 16px; left: 16px; display: flex; align-items: center; gap: 10px;
+  padding: 8px 14px; border-radius: 999px; background: var(--glas); border: 1px solid var(--glas-rand);
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); font-size: 14px; font-weight: 500; }
+.marke i { width: 9px; height: 9px; border-radius: 50%; background: var(--rot); display: block; }
+.marke span { color: var(--text-2); font-weight: 400; font-variant-numeric: tabular-nums; }
+
+/* Startseiten-Text: rechts im freien Himmel neben dem Turm */
+.kopf { position: absolute; left: 55%; top: 15vh; max-width: 42vw; color: var(--text); transition: color 1.2s ease, opacity .6s ease; text-shadow: 0 1px 30px rgba(0,0,0,.18); }
+.kopf h1 { margin: 0; font-size: clamp(56px, 8.2vw, 150px); font-weight: 500; line-height: .92; letter-spacing: -.05em; text-wrap: balance; }
+.kopf p { display: inline-block; margin: 16px 0 0; padding: 7px 14px; border-radius: 999px; font-size: 15px; font-weight: 500;
+  background: rgba(12,14,18,.34); color: inherit; border: 1px solid rgba(255,255,255,.22);
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
+.kopf.hell { color: var(--dunkel-text); text-shadow: 0 1px 24px rgba(255,255,255,.25); }
+.kopf.hell p { background: rgba(255,255,255,.45); border-color: rgba(255,255,255,.6); }
+.kopf[hidden] { display: none; }
+
+.leiste { position: absolute; left: 16px; right: 16px; max-width: 1180px; margin-inline: auto; bottom: 16px;
+  display: grid; gap: 10px; padding: 12px 14px; border-radius: 20px; background: var(--glas); border: 1px solid var(--glas-rand);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2); backdrop-filter: blur(18px) saturate(1.2); max-height: 46vh; overflow-y: auto;
+  transition: transform .45s cubic-bezier(.2,.7,.2,1), opacity .45s ease; }
+.leiste.weg { transform: translateY(calc(100% + 40px)); opacity: 0; pointer-events: none; }
+.griff { position: absolute; right: 16px; bottom: 16px; display: flex; align-items: center; gap: 8px;
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); background: var(--glas); }
+.griff[hidden] { display: none; }
+.griff svg, .weg-knopf svg { width: 14px; height: 14px; display: block; }
+.zeile { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; min-width: 0; }
+.titel { font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--text-2); margin-right: 4px; }
+.szenen { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: thin; }
+button { font: inherit; color: var(--text); background: var(--glas-hell); border: 1px solid var(--glas-rand); border-radius: 999px;
+  padding: 7px 13px; font-size: 14px; cursor: pointer; white-space: nowrap; transition: background .2s ease, color .2s ease; }
+button:hover { background: rgba(255,255,255,.16); }
+button:focus-visible, input:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+button[aria-pressed="true"] { background: var(--text); color: var(--dunkel-text); border-color: var(--text); }
+.weg-knopf { display: inline-flex; align-items: center; gap: 6px; }
+.schalter { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+.regler { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px 16px; }
+.breit { grid-column: span 2; }
+.regler label, .regler .feld { display: grid; gap: 4px; font-size: 13px; color: var(--text-2); min-width: 0; }
+.regler b { color: var(--text); font-weight: 500; font-variant-numeric: tabular-nums; }
+.kopfzeile { display: flex; justify-content: space-between; gap: 8px; }
+input[type=range] { width: 100%; accent-color: #ffffff; }
+.knoepfe { display: flex; gap: 6px; flex-wrap: wrap; }
+.knoepfe button { padding: 5px 11px; font-size: 13px; }
+.stand { font-size: 13px; color: var(--text-2); font-variant-numeric: tabular-nums; }
+@media (max-width: 700px) {
+  .kopf { left: 16px; right: 16px; max-width: none; top: 74px; }
+  .breit { grid-column: auto; }
+  .schalter { margin-left: 0; }
+}
+@media (prefers-reduced-motion: reduce) { #szene, .kopf, .leiste { transition: none; } }
+</style>
+</head>
+<body>
+<div id="buehne">
+  <div class="laden" id="laden">Campus wird geladen …</div>
+  <canvas id="szene" aria-label="Vodafone-Turm am Campus Düsseldorf, Licht und Wetter live gerechnet"></canvas>
+  <div class="marke"><i></i>Campus Düsseldorf <span id="kurz">Vorschau</span></div>
+  <div class="kopf" id="kopf">
+    <h1 id="datum">13. Oktober</h1>
+    <p id="pille">Campus Düsseldorf · klar</p>
+  </div>
+
+  <section class="leiste" id="leiste" aria-label="Steuerung">
+    <div class="zeile">
+      <span class="titel">Szenen</span>
+      <div class="schalter">
+        <button id="rundgang" aria-pressed="true">Rundgang</button>
+        <button id="raffer" aria-pressed="false">Zeitraffer</button>
+        <button id="text" aria-pressed="true">Startseiten-Text</button>
+        <button id="weg" class="weg-knopf" aria-controls="leiste"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 6l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Wegschieben</button>
+      </div>
+    </div>
+    <div class="szenen" id="szenen"></div>
+    <div class="regler">
+      <label class="breit"><span class="kopfzeile">Uhrzeit <b id="w-zeit">13:00</b></span>
+        <input id="r-zeit" type="range" min="0" max="1439" step="1" value="780"></label>
+      <div class="feld breit"><span class="kopfzeile">Jahreszeit</span>
+        <span class="knoepfe" id="jahr"></span></div>
+      <div class="feld"><span class="kopfzeile">Tag</span>
+        <span class="knoepfe" id="woche"></span></div>
+      <label><span class="kopfzeile">Wolken <b id="w-wolken">30 %</b></span><input id="r-wolken" type="range" min="0" max="100" value="30"></label>
+      <label><span class="kopfzeile">Regen <b id="w-regen">0 %</b></span><input id="r-regen" type="range" min="0" max="100" value="0"></label>
+      <label><span class="kopfzeile">Schnee <b id="w-schnee">0 %</b></span><input id="r-schnee" type="range" min="0" max="100" value="0"></label>
+      <label><span class="kopfzeile">Nebel <b id="w-nebel">0 %</b></span><input id="r-nebel" type="range" min="0" max="100" value="0"></label>
+      <label><span class="kopfzeile">Wind <b id="w-wind">20 %</b></span><input id="r-wind" type="range" min="0" max="100" value="20"></label>
+      <label><span class="kopfzeile">Gewitter <b id="w-gewitter">aus</b></span><input id="r-gewitter" type="range" min="0" max="1" step="1" value="0"></label>
+    </div>
+    <div class="stand" id="stand"></div>
+  </section>
+  <button class="griff" id="griff" hidden aria-controls="leiste"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 10l5-5 5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Steuerung</button>
+</div>
+
+<script>
+/* Wie viele Bueros Licht haben, nach Uhrzeit (Werktag) */
+var CAMPUS_LEBEN = (function () {
+  var BUERO = [[0, 0.04], [5, 0.04], [6, 0.3], [7, 0.75], [8, 0.95], [17, 0.95], [18, 0.75], [19, 0.5],
+    [20, 0.3], [21, 0.12], [22, 0.06], [24, 0.04]];
+  var kurve = function (punkte, x) {
+    for (var i = 1; i < punkte.length; i++) {
+      if (x <= punkte[i][0]) { var a = punkte[i - 1], b = punkte[i]; return a[1] + (b[1] - a[1]) * (x - a[0]) / (b[0] - a[0]); }
+    }
+    return punkte[punkte.length - 1][1];
+  };
+  return {
+    buero: function (minute, werktag) {
+      var v = kurve(BUERO, ((((minute % 1440) + 1440) % 1440) / 60));
+      return werktag ? v : Math.min(v, 0.07);
+    }
+  };
+})();
+
+/* Sechs echte Fotoplatten im selben Blickwinkel (Tag, goldene Stunde, blaue Stunde, Abend mit Licht, Nacht, Regen).
+   Die Szene blendet zwischen ihnen statt ein Foto umzufaerben; Wolken, Regen, Schnee, Nebel, Wind und Licht liegen darueber. */
+var CAMPUS_SHADER = `#version 300 es
+precision highp float;
+in vec2 vUv;
+out vec4 farbe;
+uniform sampler2D uTag, uGold, uBlau, uNacht, uSpaet, uRegen, uSchneeP, uMA, uMB, uGlanz, uHim;
+uniform vec4 uW;            // Tag, Gold, Blau, Nacht (Summe 1)
+uniform float uRegenPlatte; // Anteil der Regenplatte an Tag und Gold
+uniform float uBedeckt;     // geschlossene Wolkendecke 0..1
+uniform float uRegenHell;   // Helligkeit der Regenplatte nach Sonnenstand
+uniform vec2 uAufl, uBild, uAnker;
+uniform float uZeit, uWolken, uRegenI, uSchnee, uDecke, uNebel, uWind, uBlitz, uHerbst, uWinter, uFrueh, uNass, uBuero;
+
+float hash(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract(p.x*p.y);}
+float noise(vec2 p){vec2 i=floor(p);vec2 f=fract(p);f=f*f*(3.0-2.0*f);
+  return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x),f.y);}
+float fbm(vec2 p){float v=0.0;float a=0.5;for(int i=0;i<5;i++){v+=a*noise(p);p=p*2.03+vec2(1.7,9.2);a*=0.5;}return v;}
+float lum(vec3 c){return dot(c,vec3(0.2126,0.7152,0.0722));}
+
+// Bildausschnitt wie "cover"; der Turm bleibt im Bild
+vec2 cover(vec2 s){
+  float ab=uAufl.x/uAufl.y, ai=uBild.x/uBild.y; vec2 k=vec2(1.0), m=vec2(0.5);
+  if(ab>ai){k.y=ai/ab;m.y=clamp(uAnker.y,k.y*0.5,1.0-k.y*0.5);}else{k.x=ab/ai;m.x=clamp(uAnker.x,k.x*0.5,1.0-k.x*0.5);}
+  return m+(s-0.5)*k;
+}
+vec3 kachel(sampler2D t,vec2 u,float i,float n,float h){float y=clamp(u.y,1.5/h,1.0-1.5/h);return texture(t,vec2(u.x,(i+y)/n)).rgb;}
+
+void main(){
+  vec2 u0=cover(vUv);
+  float wT=uW.x,wG=uW.y,wB=uW.z,wN=uW.w;
+  float dunkel=clamp(wN+wB*0.75+wG*0.25,0.0,1.0);
+
+  // Wind in den Kronen: weich ausgeblendete Verschiebung, Boeen kommen und gehen, die Blaetter zittern
+  vec2 u=u0;
+  float weich=textureLod(uMA,u0,3.0).g;
+  if(weich>0.002){
+    float t=uZeit;float boe=0.5+0.5*sin(t*0.29+2.0*sin(t*0.11));
+    float ph=noise(u0*vec2(14.0,9.0))*6.283;
+    float sw=sin(t*(0.8+0.9*uWind)+ph)+0.4*sin(t*(2.1+1.6*uWind)+ph*1.7);
+    float zit=noise(u0*vec2(300.0,210.0)+vec2(t*(1.4+3.5*uWind),t*0.8))-0.5;
+    vec2 d=vec2(sw*(0.5+4.5*uWind)*(0.4+0.6*boe)+zit*(0.6+2.2*uWind),0.22*sw*(0.3+uWind)+zit*0.4);
+    u=u0+d*weich/uBild;
+  }
+  vec3 ma=texture(uMA,u).rgb;   // r Himmel, g Baum, b Boden
+  float himmel=ma.r, baum=ma.g, boden=ma.b;
+
+  // Bedeckt ohne Regen: Gebaeude im weichen Licht der Regenplatte, der trockene Platz bleibt aus der Tagplatte
+  float r=max(uRegenPlatte,uBedeckt*(1.0-boden));
+  float wR=(wT+wG)*r; wT*=1.0-r; wG*=1.0-r;
+  // Schneedecke bei Tag: echte Winterplatte
+  float wS=(wT+wG+wR)*uDecke; wT*=1.0-uDecke; wG*=1.0-uDecke; wR*=1.0-uDecke;
+  float deckeRest=uDecke*(1.0-(uW.x+uW.y));
+
+  vec3 I=vec3(0.0), S=vec3(0.0), G=vec3(0.0);
+  float an=uBuero;
+  if(wT>0.001){I+=wT*texture(uTag,u).rgb;S+=wT*kachel(uHim,u,0.0,7.0,266.0);}
+  if(wG>0.001){I+=wG*texture(uGold,u).rgb;S+=wG*kachel(uHim,u,1.0,7.0,266.0);}
+  if(wB>0.001){I+=wB*texture(uBlau,u).rgb;S+=wB*kachel(uHim,u,2.0,7.0,266.0);G+=wB*0.55*kachel(uGlanz,u,2.0,3.0,531.0);}
+  if(wN>0.001){
+    // Buerolichter: jedes Fenster hat eine eigene Schwelle; liegt der Anteil besetzter Bueros darueber, brennt es
+    vec3 mb=texture(uMB,u).rgb;
+    an=mix(clamp(uBuero*1.15,0.0,1.0),smoothstep(mb.g-0.025,mb.g+0.025,uBuero*1.15),mb.b);
+    vec3 n=texture(uNacht,u).rgb, s=texture(uSpaet,u).rgb;
+    I+=wN*mix(s,n,an);S+=wN*kachel(uHim,u,4.0,7.0,266.0);
+    G+=wN*mix(kachel(uGlanz,u,1.0,3.0,531.0),kachel(uGlanz,u,0.0,3.0,531.0),clamp(uBuero*1.6,0.0,1.0));
+  }
+  if(wR>0.001){I+=wR*texture(uRegen,u).rgb*uRegenHell;S+=wR*kachel(uHim,u,5.0,7.0,266.0)*uRegenHell;}
+  if(wS>0.001){I+=wS*texture(uSchneeP,u).rgb*uRegenHell;S+=wS*kachel(uHim,u,6.0,7.0,266.0)*uRegenHell;}
+
+  // Jahreszeit im Laub (das Foto zeigt Herbst)
+  if(baum>0.01){
+    float l=lum(I);float v=noise(u*vec2(20.0,14.0));
+    vec3 frueh=mix(vec3(0.42,0.60,0.18),vec3(0.55,0.68,0.26),v);
+    vec3 sommer=mix(vec3(0.17,0.30,0.09),vec3(0.24,0.36,0.11),v);
+    float som=clamp(1.0-uFrueh-uHerbst-uWinter,0.0,1.0);
+    vec3 ziel=frueh*uFrueh+sommer*som;
+    float st=uFrueh+som;
+    vec3 neu=ziel/max(lum(ziel),0.02)*l*mix(1.0,1.12,uFrueh);
+    I=mix(I,mix(neu,vec3(l),0.06),baum*st*0.9);
+    // Winter: kahl, braungrau, gegen den Himmel licht
+    vec3 kahl=vec3(l)*vec3(0.86,0.79,0.72)*0.8;
+    float nah=smoothstep(0.1,0.5,textureLod(uMA,u,5.5).r);
+    kahl=mix(kahl,S,0.28*nah);
+    I=mix(I,kahl,baum*uWinter*(1.0-wS));
+  }
+
+  vec3 col=I;
+
+  // Wolken ueber dem echten Himmel; an Kanten mit der Himmelsschaetzung entmischt, damit kein Saum entsteht
+  float opaz=1.0-(uW.x+uW.y)*max(uRegenPlatte,uBedeckt);
+  if(himmel>0.002&&uWolken>0.02&&opaz>0.01){
+    float hor=0.74;float e=max(hor-u0.y,0.0);float t=1.0/(e+0.11);
+    float wind=uZeit*(0.005+0.024*uWind);
+    vec2 p=vec2((u0.x-0.5)*1.6*t+wind*t*0.28,t*1.3+wind*0.12);
+    vec2 q=vec2(fbm(p*0.6),fbm(p*0.6+vec2(5.2,1.3)));
+    float d=fbm(p*0.85+q*0.7);
+    float c=min(clamp(uWolken,0.0,1.0),0.72);
+    float dichte=smoothstep(0.80-c*0.64,0.97-c*0.50,d)*smoothstep(0.0,0.07,e);
+    float d2=fbm(p*0.85+q*0.7+vec2(0.07,-0.11));
+    float hell=clamp(0.55+1.8*(d-d2),0.0,1.0);
+    vec3 lichtC=uW.x*vec3(0.97,0.97,0.98)+uW.y*vec3(1.0,0.76,0.60)+uW.z*vec3(0.58,0.52,0.64)+uW.w*vec3(0.15,0.115,0.105);
+    vec3 schattenC=uW.x*vec3(0.60,0.63,0.69)+uW.y*vec3(0.46,0.38,0.46)+uW.z*vec3(0.25,0.24,0.33)+uW.w*vec3(0.045,0.04,0.045);
+    vec3 grau=(uW.x+uW.y*0.7+uW.z*0.3+uW.w*0.07)*vec3(0.66,0.68,0.71)*(1.0-0.35*uRegenI);
+    lichtC=mix(lichtC,grau*1.08,uBedeckt*0.85);schattenC=mix(schattenC,grau*0.72,uBedeckt*0.85);
+    vec3 wc=mix(schattenC,lichtC,hell);
+    wc=mix(S,wc,smoothstep(0.0,0.45,dichte));
+    vec3 neuHimmel=mix(S,wc,clamp(dichte*1.15,0.0,1.0)*opaz);
+    // geschlossene Decke: weich, unten von der Stadt angeleuchtet
+    float decke=smoothstep(0.62,0.95,uWolken);
+    if(decke>0.0){
+      float hh=pow(clamp((hor+0.08-u0.y)/(hor+0.08),0.0,1.0),0.7);
+      vec3 strH=uW.x*vec3(0.74,0.76,0.79)+uW.y*vec3(0.66,0.58,0.56)+uW.z*vec3(0.36,0.35,0.43)+uW.w*vec3(0.14,0.115,0.105);
+      vec3 strO=uW.x*vec3(0.60,0.62,0.66)+uW.y*vec3(0.44,0.42,0.47)+uW.z*vec3(0.21,0.21,0.28)+uW.w*vec3(0.05,0.047,0.055);
+      vec3 str=mix(strH,strO,hh)*(1.0-0.3*uRegenI);
+      float tex=fbm(vec2(u0.x*2.4+wind*0.6,u0.y*4.5))*0.6+fbm(vec2(u0.x*7.0+wind*1.2,u0.y*12.0))*0.4;
+      str*=0.86+0.26*tex;
+      neuHimmel=mix(neuHimmel,str,decke*opaz);
+    }
+    col=col+himmel*(neuHimmel-S);
+  }
+
+  // Nasser Platz ohne Regenplatte (Abend, Nacht): Spiegelung der Gebaeudesockel, gekraeuselt
+  float nassOhne=uNass*(1.0-uRegenPlatte*(uW.x+uW.y));
+  if(nassOhne>0.01&&boden>0.01){
+    float yb=0.866;
+    float rip=(noise(vec2(u0.x*90.0,u0.y*260.0+uZeit*0.8))-0.5)*0.0018*(0.4+uRegenI);
+    vec2 rr=vec2(u0.x+rip,2.0*yb-u0.y);
+    vec3 sp=vec3(0.0);
+    for(int k=0;k<3;k++){
+      vec2 rk=rr+vec2(0.0,float(k)*0.006*(u0.y-yb)*4.0);
+      if(uW.z>0.001)sp+=uW.z*textureLod(uBlau,rk,2.2).rgb;
+      if(uW.w>0.001)sp+=uW.w*mix(textureLod(uSpaet,rk,2.2).rgb,textureLod(uNacht,rk,2.2).rgb,an);
+      if(uW.x+uW.y>0.001)sp+=(uW.x+uW.y)*textureLod(uTag,rk,2.2).rgb;
+    }
+    sp/=3.0;
+    float fres=1.0-smoothstep(yb,1.0,u0.y)*0.45;
+    float hellig=smoothstep(0.12,0.7,lum(sp));
+    col=col*mix(1.0,0.74,nassOhne*boden)+sp*boden*nassOhne*fres*(0.10+0.75*hellig);
+  }
+
+  // Schneedecke auf Platz, Hecken und Kronen
+  if(deckeRest>0.01){
+    float licht=uW.z*0.40+uW.w*0.10;
+    vec3 sc=vec3(0.80,0.84,0.95)*licht+vec3(0.05,0.055,0.08);
+    sc+=I*0.9;
+    float wellig=0.92+0.10*noise(u0*vec2(30.0,80.0));
+    float auf=boden*0.92+baum*0.35;
+    col=mix(col,sc*wellig,clamp(auf,0.0,1.0)*deckeRest);
+  }
+
+  // Leuchten in der Daemmerung und Nacht: Hof um Logo, Fenster und Laternen; rote Flugwarnlichter blinken
+  col+=G*(0.30+0.9*uNebel)*dunkel;
+  {
+    float zyk=mod(uZeit,3.0);float blink=step(zyk,1.0)+step(1.5,zyk)*step(zyk,2.0);
+    vec2 P=u0*uBild;float fw=0.0;
+    fw+=exp(-pow(length(P-vec2(0.3880,0.0432)*uBild)/5.0,2.0))+exp(-length(P-vec2(0.3880,0.0432)*uBild)/16.0)*0.25;
+    fw+=exp(-pow(length(P-vec2(0.3982,0.0786)*uBild)/5.0,2.0))+exp(-length(P-vec2(0.3982,0.0786)*uBild)/16.0)*0.25;
+    fw+=(exp(-pow(length(P-vec2(0.3976,0.1710)*uBild)/4.0,2.0))+exp(-pow(length(P-vec2(0.3880,0.1806)*uBild)/4.0,2.0)))*0.6;
+    col+=vec3(1.0,0.12,0.06)*fw*blink*smoothstep(0.3,0.8,dunkel)*0.9;
+  }
+
+  // Nebel: Ferne dichter, Lichter leuchten hindurch
+  if(uNebel>0.01){
+    float tiefe=max(mix(0.12,1.0,smoothstep(0.98,0.40,u0.y)),himmel);
+    float n=fbm(vec2(u0.x*2.2+uZeit*0.012,u0.y*3.5-uZeit*0.003))*0.65+fbm(vec2(u0.x*7.0-uZeit*0.02,u0.y*9.0))*0.35;
+    vec3 nf=uW.x*vec3(0.78,0.80,0.83)+uW.y*vec3(0.80,0.72,0.66)+uW.z*vec3(0.40,0.42,0.50)+uW.w*vec3(0.10,0.095,0.10);
+    nf=mix(nf,vec3(lum(nf)),0.25);
+    col=mix(col,nf,clamp(uNebel*tiefe*(0.55+0.6*n),0.0,0.92));
+    col+=G*uNebel*dunkel*0.7;
+  }
+
+  // Niederschlag
+  vec2 q=vUv*vec2(uAufl.x/uAufl.y,1.0);
+  if(uRegenI>0.01){
+    col=mix(col,vec3(lum(col))*vec3(0.95,0.97,1.0),0.18*uRegenI);
+    float a=0.0;
+    for(int l=0;l<3;l++){
+      float fl=float(l);float sk=34.0+fl*26.0;
+      vec2 g=q*vec2(sk,sk*0.11);g.x+=g.y*(0.03+0.20*uWind);g.y+=uZeit*(8.0+fl*3.5);
+      vec2 i=floor(g);vec2 f=fract(g);float h=hash(i+fl*17.0);
+      float x=abs(f.x-0.15-0.7*h);
+      float st=smoothstep(0.045-fl*0.01,0.0,x)*smoothstep(0.0,0.35,f.y)*smoothstep(1.0,0.55,f.y);
+      a+=st*step(1.0-uRegenI*0.6,h)*(0.55-fl*0.13);
+    }
+    vec3 rc=vec3(0.78,0.81,0.86)*(0.35+0.65*(1.0-dunkel))+G*1.2+vec3(0.08)*dunkel;
+    col=mix(col,rc,clamp(a,0.0,1.0)*0.34);
+  }
+  if(uSchnee>0.01){
+    float a=0.0;
+    for(int l=0;l<4;l++){
+      float fl=float(l);float sk=26.0-fl*5.0;
+      vec2 g=q*sk;g.y-=uZeit*(0.06+0.045*fl)*sk*0.4;g.x+=sin(uZeit*0.55+g.y*0.6+fl*2.0)*0.32+uZeit*uWind*0.06*sk;
+      vec2 i=floor(g);vec2 f=fract(g)-0.5;float h=hash(i+fl*31.0);
+      vec2 o=vec2(h-0.5,hash(i+7.0)-0.5)*0.6;float d=length(f-o);
+      float gr=mix(0.028,0.06,fl/3.0);float rand=mix(0.012,0.06,fl/3.0);
+      a+=smoothstep(gr+rand,gr-rand*0.6,d)*step(1.0-uSchnee*(0.55-fl*0.08),h)*mix(0.8,0.35,fl/3.0);
+    }
+    vec3 fc=vec3(0.95,0.96,1.0)*(0.42+0.58*(1.0-dunkel))+G*0.8;
+    col=mix(col,fc,clamp(a,0.0,1.0));
+  }
+  col+=vec3(0.62,0.66,0.82)*uBlitz*(0.22+0.78*himmel);
+
+  // Film: sanfte Kurve, Vignette, feines Korn
+  col=max(col,0.0);
+  col=mix(col,col*col*(3.0-2.0*col),0.10);
+  vec2 v=vUv-0.5;col*=1.0-0.20*dot(v,v)*1.6;
+  col+=(hash(floor(gl_FragCoord.xy)+fract(uZeit*24.0)*vec2(113.0,71.0))-0.5)*0.012;
+  farbe=vec4(clamp(col,0.0,1.0),1.0);
+}`;
+
+(function () {
+  var VS = '#version 300 es\nin vec2 p;out vec2 vUv;void main(){vUv=p*0.5+0.5;vUv.y=1.0-vUv.y;gl_Position=vec4(p,0.0,1.0);}';
+  var BREITE = 51.2437 * Math.PI / 180, LAENGE = 6.7383;
+  var JAHR = {
+    fruehling: { name: 'Frühling', datum: '2026-04-20', laub: [1, 0, 0], sommerzeit: true },
+    sommer: { name: 'Sommer', datum: '2026-07-15', laub: [0, 0, 0], sommerzeit: true },
+    herbst: { name: 'Herbst', datum: '2026-10-13', laub: [0, 1, 0], sommerzeit: true },
+    winter: { name: 'Winter', datum: '2026-01-15', laub: [0, 0, 1], sommerzeit: false }
+  };
+  var SZENEN = [
+    ['Morgenrot', { zeit: 470, jahr: 'herbst', wolken: 25, regen: 0, schnee: 0, nebel: 0, wind: 15, gewitter: 0, werktag: 1 }],
+    ['Frühling', { zeit: 690, jahr: 'fruehling', wolken: 30, regen: 0, schnee: 0, nebel: 0, wind: 25, gewitter: 0, werktag: 1 }],
+    ['Sommermittag', { zeit: 790, jahr: 'sommer', wolken: 10, regen: 0, schnee: 0, nebel: 0, wind: 15, gewitter: 0, werktag: 1 }],
+    ['Herbststurm', { zeit: 840, jahr: 'herbst', wolken: 70, regen: 0, schnee: 0, nebel: 0, wind: 95, gewitter: 0, werktag: 1 }],
+    ['Regentag', { zeit: 900, jahr: 'herbst', wolken: 100, regen: 55, schnee: 0, nebel: 0, wind: 35, gewitter: 0, werktag: 1 }],
+    ['Goldene Stunde', { zeit: 1080, jahr: 'herbst', wolken: 20, regen: 0, schnee: 0, nebel: 0, wind: 20, gewitter: 0, werktag: 1 }],
+    ['Blaue Stunde', { zeit: 1150, jahr: 'herbst', wolken: 15, regen: 0, schnee: 0, nebel: 0, wind: 15, gewitter: 0, werktag: 1 }],
+    ['Regenabend', { zeit: 1200, jahr: 'herbst', wolken: 100, regen: 55, schnee: 0, nebel: 0, wind: 40, gewitter: 0, werktag: 1 }],
+    ['Spätabend', { zeit: 1350, jahr: 'herbst', wolken: 10, regen: 0, schnee: 0, nebel: 0, wind: 10, gewitter: 0, werktag: 1 }],
+    ['Gewitter', { zeit: 1070, jahr: 'sommer', wolken: 100, regen: 100, schnee: 0, nebel: 0, wind: 90, gewitter: 1, werktag: 1 }],
+    ['Nebelmorgen', { zeit: 500, jahr: 'herbst', wolken: 90, regen: 0, schnee: 0, nebel: 80, wind: 5, gewitter: 0, werktag: 1 }],
+    ['Schneetag', { zeit: 780, jahr: 'winter', wolken: 95, regen: 0, schnee: 70, nebel: 0, wind: 25, gewitter: 0, werktag: 1 }],
+    ['Winterabend', { zeit: 1050, jahr: 'winter', wolken: 60, regen: 0, schnee: 45, nebel: 0, wind: 15, gewitter: 0, werktag: 1 }],
+    ['Sonntag', { zeit: 900, jahr: 'sommer', wolken: 25, regen: 0, schnee: 0, nebel: 0, wind: 30, gewitter: 0, werktag: 0 }]
+  ];
+  var MONATE = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+  var $ = function (id) { return document.getElementById(id); };
+  var ruhig = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  var wahl = { zeit: 780, jahr: 'herbst', wolken: 30, regen: 0, schnee: 0, nebel: 0, wind: 20, gewitter: 0, werktag: 1 };
+
+  function uhr(m) { m = ((Math.round(m) % 1440) + 1440) % 1440; return ('0' + Math.floor(m / 60)).slice(-2) + ':' + ('0' + (m % 60)).slice(-2); }
+  function tagNr(datum) { var d = /(\d{4})-(\d\d)-(\d\d)/.exec(datum); return Math.round((Date.UTC(+d[1], +d[2] - 1, +d[3]) - Date.UTC(+d[1], 0, 1)) / 864e5) + 1; }
+  function dekl(datum) { return 23.44 * Math.sin(2 * Math.PI / 365 * (tagNr(datum) - 81)) * Math.PI / 180; }
+  /* Sonnenauf- und -untergang am Campus, Ortszeit (MEZ/MESZ). */
+  function sonnenlauf(j) {
+    var d = dekl(j.datum);
+    var mittag = (12 * 60 - LAENGE * 4) + (j.sommerzeit ? 120 : 60);
+    var c = (Math.sin(-0.83 * Math.PI / 180) - Math.sin(BREITE) * Math.sin(d)) / (Math.cos(BREITE) * Math.cos(d));
+    var h = Math.acos(Math.max(-1, Math.min(1, c))) * 180 / Math.PI;
+    return { auf: mittag - h * 4, unter: mittag + h * 4, mittag: mittag };
+  }
+  function sonne(j, jetzt) {
+    var l = sonnenlauf(j), d = dekl(j.datum);
+    var winkel = (jetzt - l.mittag) * 0.25;
+    var s = Math.sin(BREITE) * Math.sin(d) + Math.cos(BREITE) * Math.cos(d) * Math.cos(winkel * Math.PI / 180);
+    return { hoehe: Math.asin(s) * 180 / Math.PI, auf: l.auf, unter: l.unter };
+  }
+  function glatt(a, b, x) { var t = Math.max(0, Math.min(1, (x - a) / (b - a))); return t * t * (3 - 2 * t); }
+  /* Welche Fotoplatte wie stark: nach Sonnenhoehe in Grad */
+  function platten(h) {
+    var tag = glatt(3, 14, h), g1 = glatt(-3.5, 1.5, h), b1 = glatt(-12, -5.5, h);
+    return [tag, (1 - tag) * g1, (1 - tag) * (1 - g1) * b1, (1 - tag) * (1 - g1) * (1 - b1)];
+  }
+  function wetterWort() {
+    if (wahl.gewitter) return 'Gewitter';
+    if (wahl.schnee > 5) return 'Schnee';
+    if (wahl.regen > 5) return 'Regen';
+    if (wahl.nebel > 30) return 'Nebel';
+    return wahl.wolken > 70 ? 'bedeckt' : wahl.wolken > 40 ? 'bewölkt' : 'klar';
+  }
+
+  /* ---------- Steuerung ---------- */
+  var knoepfeSzene = [];
+  SZENEN.forEach(function (s, i) {
+    var b = document.createElement('button');
+    b.textContent = s[0]; b.setAttribute('aria-pressed', 'false');
+    b.addEventListener('click', function () { rundgang(false); raffer(false); waehle(i); });
+    $('szenen').appendChild(b); knoepfeSzene.push(b);
+  });
+  var knoepfeJahr = {};
+  Object.keys(JAHR).forEach(function (k) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.textContent = JAHR[k].name;
+    b.addEventListener('click', function () { rundgang(false); wahl.jahr = k; zeigeWahl(true); });
+    $('jahr').appendChild(b); knoepfeJahr[k] = b;
+  });
+  var knoepfeWoche = [];
+  ['Wochenende', 'Werktag'].forEach(function (name, wert) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.textContent = name;
+    b.addEventListener('click', function () { rundgang(false); wahl.werktag = wert; zeigeWahl(true); });
+    $('woche').appendChild(b); knoepfeWoche[wert] = b;
+  });
+  ['wolken', 'regen', 'schnee', 'nebel', 'wind', 'gewitter', 'zeit'].forEach(function (k) {
+    $('r-' + k).addEventListener('input', function (e) {
+      rundgang(false); if (k === 'zeit') raffer(false);
+      wahl[k] = +e.target.value; zeigeWahl(true);
+    });
+  });
+  var aktiv = -1;
+  function waehle(i) {
+    aktiv = i;
+    var s = SZENEN[i][1];
+    for (var k in s) wahl[k] = s[k];
+    zeigeWahl();
+  }
+  function zeigeWahl(vomRegler) {
+    knoepfeSzene.forEach(function (b, i) { b.setAttribute('aria-pressed', String(i === aktiv && !vomRegler)); });
+    if (vomRegler) aktiv = -1;
+    Object.keys(knoepfeJahr).forEach(function (k) { knoepfeJahr[k].setAttribute('aria-pressed', String(k === wahl.jahr)); });
+    knoepfeWoche.forEach(function (b, i) { b.setAttribute('aria-pressed', String(i === (wahl.werktag ? 1 : 0))); });
+    ['wolken', 'regen', 'schnee', 'nebel', 'wind'].forEach(function (k) { $('r-' + k).value = wahl[k]; $('w-' + k).textContent = Math.round(wahl[k]) + ' %'; });
+    $('r-gewitter').value = wahl.gewitter; $('w-gewitter').textContent = wahl.gewitter ? 'an' : 'aus';
+    $('r-zeit').value = Math.round(wahl.zeit) % 1440; $('w-zeit').textContent = uhr(wahl.zeit);
+    var s = sonne(JAHR[wahl.jahr], wahl.zeit);
+    var d = /(\d{4})-(\d\d)-(\d\d)/.exec(JAHR[wahl.jahr].datum);
+    $('datum').textContent = (+d[3]) + '. ' + MONATE[+d[2] - 1];
+    $('kurz').textContent = uhr(wahl.zeit) + ' · ' + wetterWort();
+    $('pille').textContent = 'Campus Düsseldorf · ' + wetterWort();
+    $('kopf').classList.toggle('hell', s.hoehe > 6 && wahl.wolken < 85 && wahl.regen < 5 && wahl.nebel < 50);
+    setzeZiel(s);
+    schreibeStand(s);
+  }
+  function schreibeStand(s) {
+    s = s || sonne(JAHR[wahl.jahr], wahl.zeit);
+    $('stand').textContent = JAHR[wahl.jahr].name + ' · Sonne ' + Math.round(s.hoehe) + '° · Aufgang ' + uhr(s.auf) + ' · Untergang ' + uhr(s.unter)
+      + ' · Büros mit Licht ' + Math.round(CAMPUS_LEBEN.buero(wahl.zeit, !!wahl.werktag) * 100) + ' %';
+  }
+  var tourZeit = null, tourIndex = 0;
+  function rundgang(an) {
+    $('rundgang').setAttribute('aria-pressed', String(an));
+    clearInterval(tourZeit); tourZeit = null;
+    if (an) {
+      raffer(false);
+      waehle(tourIndex % SZENEN.length);
+      tourZeit = setInterval(function () { tourIndex++; waehle(tourIndex % SZENEN.length); }, 10000);
+    }
+  }
+  var rafferAn = false;
+  function raffer(an) { rafferAn = an; $('raffer').setAttribute('aria-pressed', String(an)); if (an) rundgang(false); }
+  $('rundgang').addEventListener('click', function () { rundgang(!tourZeit); });
+  $('raffer').addEventListener('click', function () { raffer(!rafferAn); });
+  $('text').addEventListener('click', function () {
+    var an = $('text').getAttribute('aria-pressed') !== 'true';
+    $('text').setAttribute('aria-pressed', String(an)); $('kopf').hidden = !an;
+  });
+  function wegschieben(weg) {
+    $('leiste').classList.toggle('weg', weg);
+    $('leiste').setAttribute('aria-hidden', String(weg));
+    $('griff').hidden = !weg;
+    try { localStorage.setItem('campus-leiste-weg', weg ? '1' : '0'); } catch (e) { /* ohne Speicher bleibt sie sichtbar */ }
+    (weg ? $('griff') : $('weg')).focus({ preventScroll: true });
+  }
+  $('weg').addEventListener('click', function () { wegschieben(true); });
+  $('griff').addEventListener('click', function () { wegschieben(false); });
+  try { if (localStorage.getItem('campus-leiste-weg') === '1') { $('leiste').classList.add('weg'); $('griff').hidden = false; } } catch (e) { /* egal */ }
+
+  /* ---------- Szene ---------- */
+  var ziel = { tag: 1, gold: 0, blau: 0, nacht: 0, regenPlatte: 0, bedeckt: 0, regenHell: 1, wolken: 0.3, regen: 0, schnee: 0, decke: 0, nebel: 0, wind: 0.2, herbst: 1, winter: 0, frueh: 0, nass: 0, buero: 0.5 };
+  var jetzt = {}; for (var k0 in ziel) jetzt[k0] = ziel[k0];
+  function setzeZiel(s) {
+    var p = platten(s.hoehe), laub = JAHR[wahl.jahr].laub;
+    ziel.tag = p[0]; ziel.gold = p[1]; ziel.blau = p[2]; ziel.nacht = p[3];
+    ziel.regen = wahl.regen / 100; ziel.schnee = wahl.schnee / 100; ziel.nebel = wahl.nebel / 100; ziel.wind = wahl.wind / 100;
+    ziel.wolken = Math.max(wahl.wolken / 100, (wahl.regen > 5 || wahl.schnee > 5 || wahl.nebel > 30) ? 0.92 : 0);
+    ziel.bedeckt = glatt(0.62, 0.95, ziel.wolken);
+    ziel.regenPlatte = glatt(0.04, 0.25, ziel.regen);
+    ziel.regenHell = (0.38 + 0.62 * glatt(-4, 12, s.hoehe)) * (wahl.gewitter ? 0.7 : 1);
+    ziel.decke = wahl.schnee > 5 ? 1 : 0;
+    ziel.nass = wahl.regen > 5 ? 1 : 0;
+    ziel.frueh = laub[0]; ziel.herbst = laub[1]; ziel.winter = laub[2];
+    ziel.buero = CAMPUS_LEBEN.buero(wahl.zeit, !!wahl.werktag);
+  }
+
+  var canvas = $('szene');
+  var gl = canvas.getContext('webgl2', { alpha: false, antialias: false, depth: false, powerPreference: 'high-performance' });
+  if (!gl) { $('laden').textContent = 'Dieser Browser kann kein WebGL 2 – die Szene braucht es.'; return; }
+  var prog = gl.createProgram();
+  function teil(typ, q) { var s = gl.createShader(typ); gl.shaderSource(s, q); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s)); gl.attachShader(prog, s); }
+  teil(gl.VERTEX_SHADER, VS); teil(gl.FRAGMENT_SHADER, CAMPUS_SHADER);
+  gl.bindAttribLocation(prog, 0, 'p');
+  gl.linkProgram(prog);
+  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(prog));
+  gl.useProgram(prog);
+  gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+  gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+  var U = {};
+  ['uTag', 'uGold', 'uBlau', 'uNacht', 'uSpaet', 'uRegen', 'uSchneeP', 'uMA', 'uMB', 'uGlanz', 'uHim', 'uW', 'uRegenPlatte', 'uBedeckt', 'uRegenHell',
+    'uAufl', 'uBild', 'uAnker', 'uZeit', 'uWolken', 'uRegenI', 'uSchnee', 'uDecke', 'uNebel', 'uWind', 'uBlitz', 'uHerbst', 'uWinter', 'uFrueh', 'uNass', 'uBuero']
+    .forEach(function (n) { U[n] = gl.getUniformLocation(prog, n); });
+  var aniso = gl.getExtension('EXT_texture_filter_anisotropic');
+  var BILDER = [['uTag', 'platte-tag.jpg', 1], ['uGold', 'platte-gold.jpg', 1], ['uBlau', 'platte-blau.jpg', 1], ['uNacht', 'platte-nacht.jpg', 1],
+    ['uSpaet', 'platte-spaet.jpg', 1], ['uRegen', 'platte-regen.jpg', 1], ['uSchneeP', 'platte-schnee.jpg', 1], ['uMA', 'maske-a.png', 1], ['uMB', 'maske-b.png', 0],
+    ['uGlanz', 'glanz.png', 0], ['uHim', 'himmel-atlas.png', 0]];
+  var bildW = 3840, bildH = 2124, fertig = 0;
+  /* Grosse Bildschirme bekommen die 4K-Platten, alle anderen die 2,5K-Platten (halbe Datenmenge, gleiche Schaerfe am Schirm) */
+  var satz = Math.max(screen.width, window.innerWidth) * (window.devicePixelRatio || 1) > 2700 ? '4k/' : '2k/';
+  function lade(eintrag, einheit) {
+    return new Promise(function (ok, fehler) {
+      var b = new Image();
+      b.decoding = 'async';
+      b.onload = function () {
+        gl.activeTexture(gl.TEXTURE0 + einheit); gl.bindTexture(gl.TEXTURE_2D, gl.createTexture());
+        gl.pixelStorei(gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.NONE);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB8, gl.RGB, gl.UNSIGNED_BYTE, b);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        if (eintrag[2]) {
+          gl.generateMipmap(gl.TEXTURE_2D);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+          if (aniso) gl.texParameterf(gl.TEXTURE_2D, aniso.TEXTURE_MAX_ANISOTROPY_EXT, Math.min(8, gl.getParameter(aniso.MAX_TEXTURE_MAX_ANISOTROPY_EXT)));
+        } else gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.uniform1i(U[eintrag[0]], einheit);
+        if (einheit === 0) { bildW = b.naturalWidth; bildH = b.naturalHeight; }
+        fertig++; $('laden').textContent = 'Campus wird geladen … ' + Math.round(fertig / BILDER.length * 100) + ' %';
+        ok();
+      };
+      b.onerror = function () { fehler(new Error(eintrag[1])); };
+      b.src = satz + eintrag[1];
+    });
+  }
+
+  var t0 = 0, letzte = 0, blitz = 0, naechster = 3, standUhr = 0;
+  function male(zeit) {
+    var echt = Math.max(0, (zeit - letzte) / 1000), dt = Math.min(0.1, echt); letzte = zeit;
+    var sek = (zeit - t0) / 1000 + 20;
+    if (rafferAn) { wahl.zeit = (wahl.zeit + dt * 30) % 1440; zeigeWahl(true); }
+    var tempo = Math.min(1, echt * (rafferAn ? 5 : 0.9));
+    for (var k in ziel) jetzt[k] += (ziel[k] - jetzt[k]) * tempo;
+    if (wahl.gewitter) { naechster -= dt; if (naechster <= 0) { blitz = 1; naechster = 3 + Math.random() * 7; } }
+    blitz *= Math.pow(0.015, dt);
+    if (zeit - standUhr > 1000) { standUhr = zeit; schreibeStand(); }
+    var dpr = (window.devicePixelRatio || 1) * skala;
+    var w = Math.max(1, Math.round(canvas.clientWidth * dpr)), h = Math.max(1, Math.round(canvas.clientHeight * dpr));
+    var deckel = Math.min(1, bildW / w, bildH * 1.15 / h); w = Math.round(w * deckel); h = Math.round(h * deckel);
+    if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
+    gl.viewport(0, 0, w, h);
+    var summe = jetzt.tag + jetzt.gold + jetzt.blau + jetzt.nacht || 1;
+    gl.uniform4f(U.uW, jetzt.tag / summe, jetzt.gold / summe, jetzt.blau / summe, jetzt.nacht / summe);
+    gl.uniform1f(U.uRegenPlatte, jetzt.regenPlatte); gl.uniform1f(U.uBedeckt, jetzt.bedeckt); gl.uniform1f(U.uRegenHell, jetzt.regenHell);
+    gl.uniform2f(U.uAufl, w, h); gl.uniform2f(U.uBild, bildW, bildH); gl.uniform2f(U.uAnker, 0.5, 0.40);
+    gl.uniform1f(U.uZeit, ruhig ? 20 : sek);
+    var b = blitz * (0.55 + 0.45 * Math.sin(sek * 47) * Math.sin(sek * 13));
+    gl.uniform1f(U.uBlitz, Math.max(0, b));
+    gl.uniform1f(U.uWolken, jetzt.wolken); gl.uniform1f(U.uRegenI, jetzt.regen); gl.uniform1f(U.uSchnee, jetzt.schnee); gl.uniform1f(U.uDecke, jetzt.decke);
+    gl.uniform1f(U.uNebel, jetzt.nebel); gl.uniform1f(U.uWind, jetzt.wind); gl.uniform1f(U.uHerbst, jetzt.herbst);
+    gl.uniform1f(U.uWinter, jetzt.winter); gl.uniform1f(U.uFrueh, jetzt.frueh); gl.uniform1f(U.uNass, jetzt.nass); gl.uniform1f(U.uBuero, jetzt.buero);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  }
+  var gemalt = 0, skala = 1, langsam = 0;
+  function schleife(zeit) {
+    requestAnimationFrame(schleife);
+    if (document.hidden || zeit - gemalt < 32) return;
+    langsam = zeit - gemalt > 70 ? langsam + 1 : 0;
+    if (langsam > 30 && skala > 0.6) { skala *= 0.85; langsam = 0; }
+    gemalt = zeit; male(zeit);
+  }
+  window.campusSzene = { waehle: function (i) { rundgang(false); waehle(i); for (var k in ziel) jetzt[k] = ziel[k]; }, wahl: wahl, setze: function (o) { rundgang(false); for (var k in o) wahl[k] = o[k]; zeigeWahl(true); for (var k2 in ziel) jetzt[k2] = ziel[k2]; } };
+  Promise.all(BILDER.map(lade)).then(function () {
+    t0 = letzte = performance.now();
+    if (ruhig) waehle(2); else rundgang(true);
+    for (var k in ziel) jetzt[k] = ziel[k];
+    male(t0); canvas.classList.add('da'); $('laden').hidden = true;
+    requestAnimationFrame(schleife);
+  }).catch(function (e) { $('laden').textContent = 'Das Foto des Campus konnte nicht geladen werden (' + e.message + ').'; });
+})();
+</script>
+</body>
+</html>
