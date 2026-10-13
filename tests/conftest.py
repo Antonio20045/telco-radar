@@ -277,9 +277,11 @@ def _frische_llm_sitzung():
     """Jeder Test beginnt ohne Ketten, Verbrauch und tote Modelle anderer Tests."""
     if importlib.util.find_spec("telco_radar") is None:
         return
+    from telco_radar.analyze import llm_frei
     from telco_radar.analyze.llm_sitzung import LlmSitzung
 
     LlmSitzung().aktivieren()
+    llm_frei.registrieren(None, None)
 
 
 @pytest.fixture(autouse=True)
