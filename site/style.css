@@ -3493,7 +3493,7 @@ b,strong{font-weight:700}
 .gr-g1-zustand{font-family:var(--sans);font-size:12px;font-weight:700;
   letter-spacing:.06em;text-transform:uppercase;fill:var(--red)}
 .gr-t-zustand{color:var(--red);font-weight:700}
-.gr-kk-bau,.gr-kk-24,.gr-kk-eff,.gr-kk-nach,.gr-kk-bonus,.gr-kk-hinweis,
+.gr-kk-bau,.gr-kk-24,.gr-kk-nach,.gr-kk-bonus,.gr-kk-hinweis,
 .gr-kk-luecke{margin:0 0 5px;font-size:13px;line-height:1.45}
 /* Der Satz unter der Zweitzahl sagt, WORAUS das Ø besteht. Er gehoert zur
    Zahl und nicht zu den Bausteinen - Grotesk, klein, aber nicht unter
@@ -3505,7 +3505,6 @@ b,strong{font-weight:700}
 .gr-kk-basis{margin:-4px 0 8px;font-family:var(--sans);
   font-size:12px;line-height:1.4;color:var(--ink-4)}
 .gr-kk-24 b{font-weight:600}
-.gr-kk-eff .gr-a-klein{display:block}
 .gr-kk-hinweis,.gr-kk-luecke{color:var(--ink-3);font-style:italic}
 /* Die benannte Nach-Laufzeit-Luecke (F5) steht in derselben Stimme wie die
    uebrigen Luecken der Karte - kursiv, zurueckgenommen, aber da. */

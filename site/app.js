@@ -3527,6 +3527,12 @@ function grFilterleiste(tafelId, mehrId) {
         if (x !== yy) return (x - yy) * vz;
         return 0;
       }
+      /* Ein leerer Text (etwa kein Abrufdatum) faellt wie eine fehlende Zahl
+         in BEIDEN Richtungen ans Ende (F9, 14.10.2026). */
+      if (!a.wert || !b.wert) {
+        if (!a.wert && !b.wert) return 0;
+        return a.wert ? -1 : 1;
+      }
       return a.wert.localeCompare(b.wert, 'de') * vz;
     });
     paare.forEach(function (p) {
@@ -3960,9 +3966,21 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
   /* Tage seit einem festen Nullpunkt - ohne `new Date()`, damit die Rechnung
      nicht an der Zeitzone des Lesers haengt. */
   function tagNr(iso) {
+    /* Exakte Tage seit dem 1.1.1970 (Donnerstag), gregorianisch gerechnet;
+       die alte Naeherung ueber 365,2425 Tage je Jahr verschob Monatsgrenzen
+       und damit das Wochenraster (F7, 14.10.2026). */
     var t = iso.split('-').map(Number);
-    var a = (t[0] * 12 + (t[1] - 1)) / 12;
-    return Math.floor(a * 365.2425) + t[2];
+    var j = t[1] <= 2 ? t[0] - 1 : t[0];
+    var era = Math.floor(j / 400);
+    var jdE = j - era * 400;
+    var tdJ = Math.floor((153 * (t[1] + (t[1] > 2 ? -3 : 9)) + 2) / 5) + t[2] - 1;
+    var tdE = jdE * 365 + Math.floor(jdE / 4) - Math.floor(jdE / 100) + tdJ;
+    return era * 146097 + tdE - 719468;
+  }
+  /* Die Kalenderwoche (Montag bis Sonntag) eines Tages als Zahl: der
+     1.1.1970 war ein Donnerstag, also beginnt Woche 0 am Montag davor. */
+  function wocheNr(iso) {
+    return Math.floor((tagNr(iso) + 3) / 7);
   }
 
   /* Welche Tage eine Beschriftung bekommen.
@@ -3993,9 +4011,9 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
       } else {
         // Woechentlich hiess bis zum 30.08.2026 "gar nicht" - der Knopf gab
         // die Punkte unveraendert zurueck und zeigte damit Rohtage. Jetzt
-        // fasst er wirklich je Kalenderwoche zusammen (Montag als Anker,
+        // fasst er wirklich je Kalenderwoche zusammen (Montag bis Sonntag,
         // ohne `new Date()`).
-        k = String(Math.floor(tagNr(p.datum) / 7));
+        k = 'W' + wocheNr(p.datum);
       }
       if (!je[k] || p.datum > je[k].datum) je[k] = p;
     });
@@ -4127,7 +4145,7 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
        auf den zusammengefassten Punkten. */
     var gefiltert = g.reihen.map(function (r) {
       return { anbieter: r.anbieter, farbe: r.farbe, eigen: r.eigen,
-               slug: r.slug,
+               slug: r.slug, frisch: r.frisch !== false,
                roh: r.punkte.filter(function (p) {
                  return (!vonT || p.datum >= vonT) && (!bisT || p.datum <= bisT);
                }) };
@@ -4140,7 +4158,8 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
 
     var reihen = gefiltert.map(function (r) {
       return { anbieter: r.anbieter, farbe: r.farbe, eigen: r.eigen,
-               slug: r.slug, punkte: fassen(r.roh, raster) };
+               slug: r.slug, frisch: r.frisch, roh: r.roh,
+               punkte: fassen(r.roh, raster) };
     }).filter(function (r) { return r.punkte.length; });
 
     bild.innerHTML = '';
@@ -4167,6 +4186,15 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
     });
     var tageSort = Object.keys(tage).sort();
     var lo = Math.min.apply(null, alle), hi = Math.max.apply(null, alle);
+    /* Niedrigster und hoechster Preis aus ALLEN Rohpunkten des Zeitfensters,
+       nicht aus den gefassten: das Raster behaelt je Woche nur den letzten
+       Punkt und uebersah so Tiefst- und Hoechstwerte (F7, 14.10.2026). */
+    var rohPreise = [];
+    gefiltert.forEach(function (r) {
+      r.roh.forEach(function (p) { rohPreise.push(p.preis); });
+    });
+    var rohLo = Math.min.apply(null, rohPreise);
+    var rohHi = Math.max.apply(null, rohPreise);
 
     /* DIE KACHELN UND DER SATZ GEHOEREN NICHT ZUM DIAGRAMM.
 
@@ -4174,8 +4202,8 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
        zwei Messterminen hat einen niedrigsten und einen hoechsten Preis,
        und die Zahl seiner Termine ist gerade dann die wichtigste Auskunft
        der Seite. */
-    document.getElementById('gr-vmin').textContent = euro(lo);
-    document.getElementById('gr-vmax').textContent = euro(hi);
+    document.getElementById('gr-vmin').textContent = euro(rohLo);
+    document.getElementById('gr-vmax').textContent = euro(rohHi);
     document.getElementById('gr-vanb').textContent = reihen.length;
     /* MESSTERMINE, nicht Preispunkte - dieselbe Menge, die das Gatter zaehlt
        und die der Satz darunter nennt. Vorher stand hier `alle.length`
@@ -4196,7 +4224,10 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
     if (leit) {
       var aktuell = null;
       gefiltert.forEach(function (r) {
-        if (!r.roh.length) return;
+        /* Ein Anbieter ohne frischen Preis stellt kein "aktuell" - dieselbe
+           Frische wie Katalog und "Über 10 % teurer" (F2, `frisch` aus
+           geraete_verlauf). */
+        if (!r.roh.length || !r.frisch) return;
         /* der SPAETESTE Punkt der Reihe (reduce statt [length-1]: die
            Sortierung der Rohpunkte ist eine Annahme des Lieferanten,
            keine dieser Stelle). */
@@ -4741,7 +4772,9 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
     // nicht vorkam, mit einem Datum ausserhalb des gewaehlten Fensters.
     // Zwei Zahlen fuer dieselbe Sache auf einem Bildschirm.
     var zeilen = reihen.map(function (r) {
-      var ps = r.punkte;
+      // Rohpunkte, nicht das Raster: die Veraenderung haengt sonst davon ab,
+      // welcher Tag einer Woche stehen blieb (F7).
+      var ps = r.roh || r.punkte;
       var letzt = ps[ps.length - 1];
       var aend = null;
       if (ps.length > 1 && ps[0].preis !== letzt.preis) {
@@ -4765,7 +4798,7 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
       return z.veraenderung !== null;
     });
     t.innerHTML = '<thead><tr><th scope="col">Anbieter</th>' +
-      '<th scope="col" class="num">aktueller Preis</th>' +
+      '<th scope="col" class="num">letzter Preis</th>' +
       (mitAenderung ? '<th scope="col" class="num">Veränderung</th>' : '') +
       '<th scope="col">zuletzt aktualisiert</th></tr></thead>';
 
