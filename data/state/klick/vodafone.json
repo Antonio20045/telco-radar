@@ -1,7 +1,7 @@
 {
  "anbieter": "vodafone",
- "datum": "2026-10-13",
- "dauer_sekunden": 4282.7,
+ "datum": "2026-10-14",
+ "dauer_sekunden": 4755.3,
  "format": 1,
  "frischegrenze_tage": 3,
  "grund": null,
@@ -20,13 +20,15 @@
    "ladung": {
     "abstand_s": 2.0,
     "anfragen": 118,
-    "beendet": 119,
+    "beendet": 117,
     "dokument": "complete",
     "geladen": true,
-    "offen": {},
+    "offen": {
+     "tags.vodafone.de": 1
+    },
     "ohne_antwort_ms": 0,
-    "sekunden": 15.5,
-    "takte_ms": 8500,
+    "sekunden": 18.4,
+    "takte_ms": 9800,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -52,14 +54,16 @@
    "kombinationen": [],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 108,
-    "beendet": 108,
+    "anfragen": 115,
+    "beendet": 111,
     "dokument": "complete",
     "geladen": true,
-    "offen": {},
+    "offen": {
+     "www.vodafone.de": 6
+    },
     "ohne_antwort_ms": 0,
-    "sekunden": 10.2,
-    "takte_ms": 7400,
+    "sekunden": 12.7,
+    "takte_ms": 9350,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -92,9 +96,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "4319079cba3657bfe281203534809c7e54bd6c4b0acc4ef22483df9bacafe4eb",
+      "beleg_id": "0b562ab462a6c339f106029d8dfc2c926342f4fb5c68f3044d791db64f5a3410",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:42:31Z"
+      "zeitpunkt": "2026-10-14T04:44:36Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -140,9 +144,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "c6ce28a1e1f2f8b133ed412c5c7d535d8d0e9842322ed17abeb4e41552850812",
+      "beleg_id": "9e1902d6e91d9891e377eb0fbc49df33d57e9b450310c189f0e870e549bc7f3b",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:42:32Z"
+      "zeitpunkt": "2026-10-14T04:44:37Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -188,9 +192,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "986768e1d0caaa983debe06b893b4d554905a678d38d4019b3b912316b6e8a16",
+      "beleg_id": "930a96c88a2f82bc0d59457be8303eb5a73dca7265ea2713e322f4737fe8f0e2",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:42:32Z"
+      "zeitpunkt": "2026-10-14T04:44:37Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -236,9 +240,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "671c76d71029c1b1f7264dca91f73908816f8abdee9b12f236176ba678e6d825",
+      "beleg_id": "6ed8d2aa6e940ad5f110eff59953372df69f3e047ad6607f6c3adc87143e3f17",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:42:33Z"
+      "zeitpunkt": "2026-10-14T04:44:38Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -284,9 +288,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "00bd64e5cf360f7f8eed65603e0df86dccaf0cab5a238ff9190b8d980f22905e",
+      "beleg_id": "01bd6c71e047f77932e12565ffd9d141b1a251bc072ad80e23a9b96e94c77e0b",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:42:34Z"
+      "zeitpunkt": "2026-10-14T04:44:39Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -332,9 +336,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "c8ca6cf3da8d3b0b90f48cf6335365758e5e805761248f9cc4b13bc80256e58c",
+      "beleg_id": "9b3cf0dae664b5de6580c5132dd4e52fd8772cf78b5c4595db61d950823014fd",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:43:34Z"
+      "zeitpunkt": "2026-10-14T04:45:35Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -380,9 +384,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "b1ef4a07e9faa00f49d022d135bfc7133a6234cd3ccfa2a940e8e1abb0726ad1",
+      "beleg_id": "f8911c71633dc315f1419e8499448db16552194febdcfac33654cdf2ac5dbfdb",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:43:35Z"
+      "zeitpunkt": "2026-10-14T04:45:36Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -428,9 +432,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "baed084af12cdcde58bc6811927752ee1b16d5cfbb420f45288c8ecb0d388d29",
+      "beleg_id": "e5e7d6f15a9ffb5be2ffdc7a44461ab79b3da85e574bc86db4a0ea09a2874037",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:43:35Z"
+      "zeitpunkt": "2026-10-14T04:45:37Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -476,9 +480,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "de1f5cb06ee4a4bef88121f644c8286ba08541b6cbd023e77d3f37742e727a90",
+      "beleg_id": "5a06661f705acb3f9797594e24ad7d8b0ce00f95b644c9fad8168802bac44e76",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:43:36Z"
+      "zeitpunkt": "2026-10-14T04:45:38Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -524,9 +528,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "40d857c7919d4e8f0389301ddd40a4c1950849d72116edb0f05d35b86b2e0f4a",
+      "beleg_id": "4ddb1e2f553be5e6297d65ec0923ff5ee510d45ab4ae34d0f72839900df1aca7",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:43:37Z"
+      "zeitpunkt": "2026-10-14T04:45:38Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -572,9 +576,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "9a96a9bc76399f6f37dd02a1fcfe253b8129b0907c1ece639b323d911d9f55a5",
+      "beleg_id": "adce9d8cbe8cf3b45d456deb9adb10788ad6d6efb939879e8fff12dd43c87932",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:44:36Z"
+      "zeitpunkt": "2026-10-14T04:46:36Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -620,9 +624,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "cb0d3acf15347b79eff37c19a92cd786b5b9c6de527c4f9958a3bd122caf801e",
+      "beleg_id": "85e290debdf51566bcbdfcbe66361ece53f0481eaad1dd9f61a66f52d67df6d1",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:44:37Z"
+      "zeitpunkt": "2026-10-14T04:46:37Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -677,9 +681,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "23f43b78e945dc8b5c5000106ec25f9f64bbd1b45ec5d627ab42669c5baeb03b",
+      "beleg_id": "6b3b3ec9ac42810dcb4b4f3ae916a6b5b38a04f645853b65657a959798e825ab",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:44:37Z"
+      "zeitpunkt": "2026-10-14T04:46:38Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -725,9 +729,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "cd1970ee45c47f33d52559550d21d24190951ddaab34f556847d28ed51891d58",
+      "beleg_id": "3da1e7f4a5b2bf2b044a59b3ff776d67b6c4c9b45c334041b3bc79fa890817a1",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:44:38Z"
+      "zeitpunkt": "2026-10-14T04:46:38Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -773,9 +777,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "a7d6dfaa173a3ac01fcaaf08bba37531203b5974ed05e0ce4f4e5ff5bf2069cc",
+      "beleg_id": "8a6b5ecdf657f29c1ebef19dcf701041cd23fc79dba13f95cf315d84651cf0e1",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:44:39Z"
+      "zeitpunkt": "2026-10-14T04:46:39Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -812,9 +816,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "bd1594f980696b51345c8f8b5ec3f42bdd1f57b94cf3562241e2ed7aae8d9fc5",
+      "beleg_id": "a5d3daed0085225196f5f5603c36dc4755c9cc2442e4e0efab9089d8f03864a1",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:45:27Z"
+      "zeitpunkt": "2026-10-14T04:47:32Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -860,9 +864,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "93da15b2fb7d3410336076ddd52bda1c0f816ed20daf051f20c29289b1e59817",
+      "beleg_id": "294a90f91c2f1c2ae78a237e4029162e242daa90fe41024f0d8fa637263c024c",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:45:28Z"
+      "zeitpunkt": "2026-10-14T04:47:33Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -908,9 +912,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "451ff4dfd3630464c7c498f2db5ba9eeb9ad3aa7ce6e32a2b9d6b42d464a411f",
+      "beleg_id": "692fa371665cf614d87fa766d6a20b9dad2a3a3cb8f6c51e456c63c07941563d",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:45:29Z"
+      "zeitpunkt": "2026-10-14T04:47:34Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -956,9 +960,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "30f346ac6c56dcbe3efe564f68125b56f974d25c3581eca69dc50bfb27ddf176",
+      "beleg_id": "985f2eeb684f177ef891923498e02d78662db68b9d2c93bd645875f5f8c04fb3",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:45:29Z"
+      "zeitpunkt": "2026-10-14T04:47:35Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1004,9 +1008,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "524b0de3e8a32b51cf92b9d3ed95b987efafe2d4130ceacc768ce11ab1fc9b53",
+      "beleg_id": "caab441c5ce94487dd84a12eacfc4b8fe7c5714880f7228265cd2f89afeb5c88",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:45:30Z"
+      "zeitpunkt": "2026-10-14T04:47:36Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1052,9 +1056,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "75e4c3245f8025e118749f1b1b211c95668f43c57c106d03a7af21ece1a8fc54",
+      "beleg_id": "d91357819f28fb37bd53974c0b5ac5f4af1052cb7c7ff172deb2bf2b097feec0",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:46:35Z"
+      "zeitpunkt": "2026-10-14T04:48:35Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1100,9 +1104,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "39bcbb1d309850059bf6ef236804873823211a7b449afa0bbab8c1c631c1a95d",
+      "beleg_id": "b3d12c6b7cdd43b661e7b00bb8b2e290f8a310579adda9a98c6108055e5111c6",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:46:35Z"
+      "zeitpunkt": "2026-10-14T04:48:36Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1148,9 +1152,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a1c9db1ddd7e636f976ffdc4fe6277a2cc7f28159d18953aefb5ba610fe90896",
+      "beleg_id": "98fed02084035a410ca1f0be08d0c1a681def6868395eb046d48de139bd35de9",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:46:36Z"
+      "zeitpunkt": "2026-10-14T04:48:37Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1196,9 +1200,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "7723c722fd638c614531ddee85e8a1a80d1c47b614ac58b2a10646b8e09cea4c",
+      "beleg_id": "c4d4cfa82c6e45b4a1e9afc0e575e131ac4c5363b491e428f5bf0105a30e5971",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:46:37Z"
+      "zeitpunkt": "2026-10-14T04:48:37Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1244,9 +1248,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "29888fb33da657969241c4b2a53052b875c74f410b68fc60829fb73116add9e9",
+      "beleg_id": "562ed914922431c24a8289a6b9b0416892d0b792702abe0d5c254974a9b7eed7",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:46:37Z"
+      "zeitpunkt": "2026-10-14T04:48:38Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1292,9 +1296,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "7ed03d446d34b7530c60d5c0b3fe999f83793d4b7a90ef823cc80b561b7ef5ce",
+      "beleg_id": "9fefb726fc1810cd987601e66dd727c8a349f710155b6c6671a24da787ef89cb",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:47:42Z"
+      "zeitpunkt": "2026-10-14T04:49:39Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1340,9 +1344,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "f2c6973f40b631486e29353e166132f0d90432f7d0409f7dfddd1d31ccdb2c70",
+      "beleg_id": "46edb835a839b66a7062a293d12372db246b053fe49b8c72bacc88844f8e9e68",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:47:43Z"
+      "zeitpunkt": "2026-10-14T04:49:40Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1397,9 +1401,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "c59a001e324ec15bb63246bfa953e21ae9f7186bd571150138b85a3d7fa8337e",
+      "beleg_id": "a6a3d662ac203ba75fc449d92887323811d20429f5cb282852db77decb7e07a0",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:47:44Z"
+      "zeitpunkt": "2026-10-14T04:49:41Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1445,9 +1449,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "f41b7aec9dbdd4228bb1c0d741ccd41f71db243632b6c6b6950b2e48472d13be",
+      "beleg_id": "2f34b5af6962f8ea4428d1f33654fb6732f1eba2a8124879d7bff79f4512f1cc",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:47:44Z"
+      "zeitpunkt": "2026-10-14T04:49:42Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1493,9 +1497,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "da6e220cfe0f891eb3868f89534e422822db70c9f3b96b31e2ee84c4d3358afb",
+      "beleg_id": "70d9c5f4ffeb9b3a3ac7c291ce7c7577a574d4bddfcefe5bf87465b0e3b87831",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:47:45Z"
+      "zeitpunkt": "2026-10-14T04:49:42Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1532,9 +1536,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "d27a64e3dc5470a63919e25b24bfcf88307e2453bcb57ed34ada23e09e1c3dc1",
+      "beleg_id": "a6ab10ed698d873848b9b40f6406b7824887e3a9290c33920131357fb19e2957",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:48:36Z"
+      "zeitpunkt": "2026-10-14T04:50:39Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1580,9 +1584,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "34eda3f102fa115609bd4759f482761bfd08b7e27a58c2dd3b1122ce9a33029c",
+      "beleg_id": "ec495c4b4bd476e4e1c7feef3f2bb27e6b565bd4096b9a7b37955c61f1fa8bd7",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:48:37Z"
+      "zeitpunkt": "2026-10-14T04:50:39Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1628,9 +1632,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "f8c71b02f0f8808009553b0684d499c0937900b62c1924fa81fb12be76ef16b6",
+      "beleg_id": "fe93189967a0d05ece2a0cb65896d68ba7142ecc10d9af5d69d7343ed21dea93",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:48:37Z"
+      "zeitpunkt": "2026-10-14T04:50:40Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1676,9 +1680,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a6277c52290df11fa99fbfb2db65e59f48838a6c4f8dd3656a581bbd8ae49335",
+      "beleg_id": "fa44a1293f13534093b39c7c5692ddb43ed83e720ef01ea66412cadc4ab7cbd9",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:48:38Z"
+      "zeitpunkt": "2026-10-14T04:50:41Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1724,9 +1728,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "ed0f4395a66d737dcc255d00d006a29a3f3ac143459e4593984685908a42f627",
+      "beleg_id": "9a6d0e3e536f8b930f8170a60c122f6c4788499e3bb0ed280bd3b4085dd73160",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:48:39Z"
+      "zeitpunkt": "2026-10-14T04:50:42Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1772,9 +1776,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "6430dd7f4745f1005959f7cea6813fdfa65765de2f7f24d90630a9447780db6a",
+      "beleg_id": "387f9ec3f95da048c90c10a8db228e45b5862c9f0ce28b2a792fc528d0fca4ca",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:49:43Z"
+      "zeitpunkt": "2026-10-14T04:51:39Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1820,9 +1824,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "992bba54fc3b5a9ae193ff061971c962012602145525f383fd838e633dc50a94",
+      "beleg_id": "983c5dbd584f42bcd7331d2718775e1ec2170ba211eb479f2f7cb6a51346778e",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:49:43Z"
+      "zeitpunkt": "2026-10-14T04:51:40Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1868,9 +1872,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "2c818a8dac87309545d0706dccabab4170620f72fcfb2aef780544eb62eb1a13",
+      "beleg_id": "76e1dd77fcc0eb061703e8c320dbd0c000dd6281504fb33f7899f4ec5fee2dad",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:49:44Z"
+      "zeitpunkt": "2026-10-14T04:51:41Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1916,9 +1920,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "304293da6b1de975c973db56f811a63b5aac2f9f1f60383eb64cc4f32a5739f0",
+      "beleg_id": "0647f7fc2ae91db6a6ccb19128ef075d590476f102b5e477b00644cf4b2dc208",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:49:45Z"
+      "zeitpunkt": "2026-10-14T04:51:42Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1964,9 +1968,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "8006e56fd96c04fd6c01209f442cdd5864e80c5254eee5ad78d05423eb2e6d93",
+      "beleg_id": "e56362ca218ad00f89995289387d5afcb6626dd3607aa55d0832bd15f51c7588",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:49:45Z"
+      "zeitpunkt": "2026-10-14T04:51:42Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2012,9 +2016,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "8e960ba4d310cf94cd826a79f5d046c3b3cf4bedf6e62c0f01a94ed8514ddf58",
+      "beleg_id": "a9b6fc10bd9e8f7d309cec6f889fd2a9cf6fd28065861a6717eb348493c4786a",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:50:50Z"
+      "zeitpunkt": "2026-10-14T04:52:40Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2060,9 +2064,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "de07ae353906c025233ac2f9c6d33138651202ad0ca2d036a449ae1f927ca991",
+      "beleg_id": "aef687cb487be980d9ec70945f04e4b50166173573deac68370adcee67bb584d",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:50:51Z"
+      "zeitpunkt": "2026-10-14T04:52:41Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2117,9 +2121,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "a91c48fc08f520c8a92085a07f76f990a438e8c7f5fdea8e4aab638c875ca207",
+      "beleg_id": "cec056271e34a70d1ed9f03b385a5faac05f268f42612556f3c141cc1c60c6c1",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:50:51Z"
+      "zeitpunkt": "2026-10-14T04:52:42Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2165,9 +2169,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "c047a5e876666f9552a5a6715d4dbdd3a76fa9dc1a42501a322eed71f7d58c50",
+      "beleg_id": "937129cb190c48409c3ad61428fdec443aa310821a1e76607737b7889959dbb5",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:50:52Z"
+      "zeitpunkt": "2026-10-14T04:52:43Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2213,9 +2217,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "326ab4b3a23d651a1992c2f6666624173d62d65ce78a67e01106266dea4ea762",
+      "beleg_id": "7ce3f87c04827a025f0c0a7cbb5721460d20bc496aea3fcc9f95f4c443fe6a86",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:50:53Z"
+      "zeitpunkt": "2026-10-14T04:52:43Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2246,18 +2250,17 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 226,
-    "beendet": 224,
+    "anfragen": 234,
+    "beendet": 233,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "collect.vodafone.de": 1,
-     "tags.vodafone.de": 1,
-     "www.vodafone.de": 1
+     "cdn.dimml.io": 1,
+     "tags.vodafone.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 14.5,
-    "takte_ms": 10900,
+    "sekunden": 18.5,
+    "takte_ms": 13650,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -2290,9 +2293,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "1abbd2df1dbb2adf61b85e7dfa64aa8cd2e76d4ea7f5ae12e477a8fa3f733cba",
+      "beleg_id": "45d266304757efa0ba4fa5b83bc6bf0ccd7fda5764d1b69339daeb9e6cdbe166",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:51:40Z"
+      "zeitpunkt": "2026-10-14T04:53:37Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2338,9 +2341,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "3c0545252760e79a3b123659d420bf0cc64e854b12d8b69c150f92e61d7ef9ac",
+      "beleg_id": "72c89155ceb12d67cdd69e639913a2fa2a6d8b4397446e7e0d3bbacafcfe8857",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:51:40Z"
+      "zeitpunkt": "2026-10-14T04:53:38Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2386,9 +2389,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "9a0b222420a3e57f7d3c919bdb19766f08a1a6b4116345ec2b946e734952416e",
+      "beleg_id": "da13eafe6ead164cf5aa8b25e2b1c82b0c069693f986d36c4fa950ab69c505a7",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:51:41Z"
+      "zeitpunkt": "2026-10-14T04:53:38Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2434,9 +2437,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "ecc930e80e60a9393d3c0accb0ab81969a5836f3810092b5d4b289311da4eceb",
+      "beleg_id": "73bee845be9013b9d94a2141ca8895a543dda2e60519e9c44748a55b07891721",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:51:42Z"
+      "zeitpunkt": "2026-10-14T04:53:39Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2482,9 +2485,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "50f22bc5f925c14c36a34c2ba170a624a5adb5fdfc04dce2d87ed2447b2639d1",
+      "beleg_id": "a4782ca94d9e7347b84d82dee8e0b0a312f02e879733099c7ccd695c2bbc3216",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:51:42Z"
+      "zeitpunkt": "2026-10-14T04:53:40Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2530,9 +2533,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "d606d1fc8a44768b2db1dcb32d24a67f3e58b8ac7e4dcf7dde577bad331139fc",
+      "beleg_id": "5a7bbeeb83e6c7490ae320ff4ae4b01a33b3d408ad1fd3bc5352e9a6943a49b3",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:52:32Z"
+      "zeitpunkt": "2026-10-14T04:54:48Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2578,9 +2581,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "6d97050b23b3cc98073242fd850ca799fb6ee676d6a9b74235d9c939abf87d62",
+      "beleg_id": "792bb4fb7b5341b6146476f105aa48b6b50299d54a8402bc5c0f53b7f37a0f56",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:52:32Z"
+      "zeitpunkt": "2026-10-14T04:54:49Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2626,9 +2629,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "f628b20676f14a09574a1aab459f4f3e49454c0b7501eaaa8df83631b524696a",
+      "beleg_id": "48cfa04b9768b19c0899c781cfc6b68cc56b4665aa6df4869d1cba040e675d28",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:52:33Z"
+      "zeitpunkt": "2026-10-14T04:54:49Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2674,9 +2677,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a618eda4f21f8e916da319a04b863f0a2a97e7274c78f9fd89f4f54d5cfef005",
+      "beleg_id": "a843f6ce8f18ffa775dd1d13a86ece9e0279eb030332b7d25cb20bc627a85f3e",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:52:34Z"
+      "zeitpunkt": "2026-10-14T04:54:50Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2722,9 +2725,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "f555bc700a682ae0e0eea17c289f5044f864a01b83d2d54de55e00e496cdc5a5",
+      "beleg_id": "5a91966c9a3648bad8163aab70cf066104a629c0211ec5c91b696f9d145dd971",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:52:34Z"
+      "zeitpunkt": "2026-10-14T04:54:51Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2770,9 +2773,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "0560ebec9dd1053d1370dc8333a9397e818fe11212c193f9dc3de3909f2ed5c2",
+      "beleg_id": "dcf723ff7f39e3bb2121c059cbf1b7692d291c218e89df3fb396bb4447cbbcd5",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:53:23Z"
+      "zeitpunkt": "2026-10-14T04:55:58Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2818,9 +2821,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "80d2d8facd2b62521988b6b2809ce54c4e95eeae73f6dfeeec971ee54c3dc208",
+      "beleg_id": "faf81b49d8ec662693d7692112591ad9dcb4bfa248276e0f77c740439e71441c",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:53:24Z"
+      "zeitpunkt": "2026-10-14T04:55:59Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2875,9 +2878,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "0253817fc30fad06cf3ac687e9216cd878fbb4a01229c7d55ac4ffed0185bbaf",
+      "beleg_id": "0c658e00b2dcabebf72f7e8e1ac6065f423a0674b919ef7886898bff9f3d1fd7",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:53:25Z"
+      "zeitpunkt": "2026-10-14T04:55:59Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2923,9 +2926,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "76366ea379f24500542e73de2251eecac80f110ee1d5162636b1d26b7d1a7d7b",
+      "beleg_id": "952d1c8e0d36091b9a252ef5fcd34b103bf205b3e4b4cdecb5e6b03b64311bee",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:53:25Z"
+      "zeitpunkt": "2026-10-14T04:56:00Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2971,9 +2974,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "babfc78d20027c2b961ee329473be01bc22ec772982caa0f8415384ab68ec5cc",
+      "beleg_id": "21f7f217eb7c6e013ee1443d456aa2874ce5cf45b5ea7a28a8d2e324e5765028",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:53:26Z"
+      "zeitpunkt": "2026-10-14T04:56:01Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3010,9 +3013,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "2d07cae3cbf1b7d63b67b58724f5d9f16a1b0c703eb2057092700145dad14848",
+      "beleg_id": "d28cab33bcd9d9b851cfca2e2bd352fc4064d247ef253e5616ea01d1a8956c0c",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:54:17Z"
+      "zeitpunkt": "2026-10-14T04:56:58Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3058,9 +3061,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a31b4c351a8c32f3411cedf87d5e17d85f8f0ec37642b6099e66aade48169e3e",
+      "beleg_id": "056f2407fd25e41d620fb3957b684dcd9dd3e9a3418384276fc8e5794d730539",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:54:17Z"
+      "zeitpunkt": "2026-10-14T04:56:59Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3106,9 +3109,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "b3adf7ab900a58de0c91831728ee64fcf62fad1b59a71244d20fcb5eb0864b1f",
+      "beleg_id": "44a8df1404ebbc06a867db0b661f5ad2e341a52e11987503ba99d4138a50b7ee",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:54:18Z"
+      "zeitpunkt": "2026-10-14T04:57:00Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3154,9 +3157,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "39f3245ff3a8ff47e8e46f786dbf829097b6bde1dca3df08474db4d79f7c8024",
+      "beleg_id": "6b0dd5050c31c3bbd9b8988dd3c0ffc5f4a03051d73561f9ef92dd49a8f0d598",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:54:19Z"
+      "zeitpunkt": "2026-10-14T04:57:00Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3202,9 +3205,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "99133050728c860af1dc91517f4859785496475cb9bd695c5d9f3d4c8a6447c7",
+      "beleg_id": "00e3c468f7a9d7c721c46c0cc3572a0a856dcf15633b3426153e10a77c39ed4b",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:54:20Z"
+      "zeitpunkt": "2026-10-14T04:57:01Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3250,9 +3253,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "7444dab5e3917ea3d659a264275a0f041055845e2f89c169869a72617d7d04a1",
+      "beleg_id": "ed64e770e139312cc58c033c5a68c772b7c4c8cf4a895d7a0203a9047343eb8c",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:55:10Z"
+      "zeitpunkt": "2026-10-14T04:58:12Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3298,9 +3301,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "283cfe2a77bacc170a6e5f1fde04324103de3f606749585c75f1ad998215f1cd",
+      "beleg_id": "9630472e9809281a911033f1180b4722152e38afaf8f85c980fdba07c992468e",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:55:11Z"
+      "zeitpunkt": "2026-10-14T04:58:13Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3346,9 +3349,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "3ae1eaa193181417babfd3b55ada1fb2ed087575293e9216c84f2b96bc1873a0",
+      "beleg_id": "a6e8b55a292a60068edd505e7ef74fc4e8d25cde555296c83c388d8148edaf04",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:55:12Z"
+      "zeitpunkt": "2026-10-14T04:58:14Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3394,9 +3397,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "830c584c0986dd8208544240a6b908c7a5810d7021de201f21be93102cc7f789",
+      "beleg_id": "8825fd149b539dc8071fcf24e38dde6cc801b8685c50d434995f257f78a560f2",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:55:12Z"
+      "zeitpunkt": "2026-10-14T04:58:15Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3442,9 +3445,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "5a9f5c2de0e128b0baa2e5c1a4a88c5328cee923bb717ccc3213d90e961ce77f",
+      "beleg_id": "6e90a3f7072a956fd0bef9aff325d0d2fc466bf1bcc929cfae1781f9d4b7d9f2",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:55:13Z"
+      "zeitpunkt": "2026-10-14T04:58:15Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3490,9 +3493,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "c597e8d3c129bf3bd8ed7cff7751431bab98b66e7a65b7503bb4ab1893dd3e4f",
+      "beleg_id": "56fc3b118f1515bca3c4dea019952affa759796cc3e330312b770274cbb43213",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:56:04Z"
+      "zeitpunkt": "2026-10-14T04:59:26Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3538,9 +3541,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a5df954501602a14dc74fa360c833f918bd2021d22b85eaf06c99c89cf07e668",
+      "beleg_id": "d52f5d15474dbd218b5833e2c268a7547f3801bcc24c3c0d1ac80dc4c99bceae",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:56:05Z"
+      "zeitpunkt": "2026-10-14T04:59:26Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3595,9 +3598,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "3f5cceb12d18ff8d1a5522574ff6831280bd6ac6a571c2ac667a05c32d895bf2",
+      "beleg_id": "e21ea6e2574ff7b0a1bd03f73681c0b7d59c0d433eb462a441ca6578ca09439c",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:56:06Z"
+      "zeitpunkt": "2026-10-14T04:59:27Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3643,9 +3646,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "c2e75c0d3491cd65637e1035a999748cd251d642ce7bfc8245d4003a6bec6ce3",
+      "beleg_id": "44865feb49ade6d2af41289c9973d486b7add956ca0240161c02c47d4a0d8add",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:56:06Z"
+      "zeitpunkt": "2026-10-14T04:59:28Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3691,9 +3694,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "5c1adf002d7d6575a011570a56856444165a17eb73b36a1c41b652c81633c237",
+      "beleg_id": "1bb5ee87ea2919f510d7f1269cf944075a7b01232be47d775818102f3f7f76ac",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:56:07Z"
+      "zeitpunkt": "2026-10-14T04:59:29Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3724,18 +3727,18 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 206,
-    "beendet": 204,
+    "anfragen": 210,
+    "beendet": 205,
     "dokument": "complete",
     "geladen": true,
     "offen": {
      "collect.vodafone.de": 1,
      "tags.vodafone.de": 1,
-     "www.vodafone.de": 1
+     "www.vodafone.de": 4
     },
-    "ohne_antwort_ms": 450,
-    "sekunden": 14.0,
-    "takte_ms": 11050,
+    "ohne_antwort_ms": 0,
+    "sekunden": 18.2,
+    "takte_ms": 13500,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -3768,9 +3771,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "13f666771ecd0ce81c6235f76487280abb1dd03aaa9b0c45615b6719d31bb3bd",
+      "beleg_id": "5c0c7c3e65f1ea7f53cd646726e5d8aa7aa7ee859f9f32ca40efce5a12981ffe",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:56:54Z"
+      "zeitpunkt": "2026-10-14T05:00:22Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3816,9 +3819,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "c9b3073169e152e829981e9aa3e9ad4822ef1343d49bd383ec87ab55537c8048",
+      "beleg_id": "745f95a4e61e53924c1213aa9ab255598cdff5aec4272f14aed2d2bda0519559",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:56:54Z"
+      "zeitpunkt": "2026-10-14T05:00:22Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3864,9 +3867,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "1615299e9c45d205b2b21e7f6d88ec5d0cdaf3a6dde4a9d0307ad493b6f5bec4",
+      "beleg_id": "b5166120d64c38d7867823295aba2ffdb907acd00fbeb4ea16d36d002967d7fc",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:56:55Z"
+      "zeitpunkt": "2026-10-14T05:00:23Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3912,9 +3915,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "3904f617e84abe13726086437ae123bf585f71fee0115d47057fda0182c89dc3",
+      "beleg_id": "ef65aa2faea4c01f0f10f706deea432d4eadca54e6fa5e79b37fd7da5a0a779b",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:56:56Z"
+      "zeitpunkt": "2026-10-14T05:00:24Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3960,9 +3963,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "7f8fbfd6ce21949febb5f08efac87d4d2a14321b786e8622b714cf6577d6a569",
+      "beleg_id": "63bd13289202edb5d02c9c831974ae5241cec9402a5e05968271d1f8873ed519",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:56:56Z"
+      "zeitpunkt": "2026-10-14T05:00:25Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4008,9 +4011,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "072cf3ab296fcd21805596f91b0513771e199619f8fcf04b964f6e8e5bdfc568",
+      "beleg_id": "2e38245f11d49c652cc0752aa60c5d287529a34d42ba74a4fb05a24e286aaa84",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:57:45Z"
+      "zeitpunkt": "2026-10-14T05:01:19Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4056,9 +4059,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "3a6328e647544619acaf77a5a89cd3d42920f292996bf0e3e5fa033f4dbc5dd3",
+      "beleg_id": "b99e5c9da5aecdf2cc83938d67e6de77e447ffccda2f9afa390a5f5f28279926",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:57:46Z"
+      "zeitpunkt": "2026-10-14T05:01:20Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4104,9 +4107,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "343ccce8da1885f5a9bd35e380f512ee340b369dbb9013908cf3fcdb0112b2d3",
+      "beleg_id": "82a32e4f7b407e62db4eabc86fa48b5b53e6b6b8e4591a18bf71859e92132463",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:57:47Z"
+      "zeitpunkt": "2026-10-14T05:01:21Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4152,9 +4155,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "95825314d9b364837d64f24cca07f27f98aeed31d8bd98180b273422c50677d2",
+      "beleg_id": "a7c79ab8500f11b523097551e6846fbcca3d32bc86dc0d6539cb0370a121b025",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:57:47Z"
+      "zeitpunkt": "2026-10-14T05:01:21Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4200,9 +4203,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "22b4c2be5d1f91b4e52dfc739aeb584aab68c7315b6406bd535804d3eab64384",
+      "beleg_id": "de7a00a989feabd71bd0af4dc2748a09191d7a9a8f54c8e6195611dd0f5b2264",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:57:48Z"
+      "zeitpunkt": "2026-10-14T05:01:22Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4248,9 +4251,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "031e5ac34cf8210054a4d27cb82a039b60ce47b8f7e9d94e36a26a422e0f1b7f",
+      "beleg_id": "9630b256b06f27a28a4e62acd0af7a66a5861396301c648d04e0a337c7eca783",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:58:38Z"
+      "zeitpunkt": "2026-10-14T05:02:18Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4296,9 +4299,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "e0b0143c9371344d90111d1adb407ca6d6375386a8240260215157a96e1fee7a",
+      "beleg_id": "fd5132c132ae03ad83916a8bfa3955f5f4c4636145e9faf0316853c9a381c3f0",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:58:38Z"
+      "zeitpunkt": "2026-10-14T05:02:19Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4353,9 +4356,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "34dcac87ca851ff4338ce33627f184023568f26dc76fb69c9b8872e2211af755",
+      "beleg_id": "45c63221ef550d66b56094f18f1ace9fb196554d4e789a0e14abc690a47b16b6",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:58:39Z"
+      "zeitpunkt": "2026-10-14T05:02:20Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4401,9 +4404,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "d497528f77380f145875df30cca09693f65c210cff72b0afa64de41dc28f146e",
+      "beleg_id": "e68fccf65c2e84fd4f5e54633cffedd36d603e7d7e57c64bcfda8856ae54129f",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:58:40Z"
+      "zeitpunkt": "2026-10-14T05:02:20Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4449,9 +4452,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "fb563ae16fb4dc5c75d4310f604e9e9b0289c6ba64bad82a81b6d946adbb7507",
+      "beleg_id": "7ecc0c984c7f1152bd4d077c6d75da19b57fe64f606af3aa2d54dcfaaa7df85d",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:58:40Z"
+      "zeitpunkt": "2026-10-14T05:02:21Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4482,18 +4485,18 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 209,
-    "beendet": 208,
+    "anfragen": 206,
+    "beendet": 204,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "cdn.dimml.io": 1,
      "collect.vodafone.de": 1,
-     "tags.vodafone.de": 1
+     "tags.vodafone.de": 1,
+     "www.vodafone.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 14.8,
-    "takte_ms": 11600,
+    "sekunden": 17.9,
+    "takte_ms": 13200,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -4526,9 +4529,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "8eddb9e56b0983be6cf0f567351c216b4502af5001d0884bd633bfb08f065f67",
+      "beleg_id": "c97fc309822531ad66f67e2c67ed422e2633f16964460649156b50743070fc50",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:59:29Z"
+      "zeitpunkt": "2026-10-14T05:03:14Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4574,9 +4577,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "9c236c72d7373186fbabe475fc4d06fcd9c1744066dd802f1cbd180e820c972c",
+      "beleg_id": "b941373072089d99509e7f4eb2dd1cd00d7ad4e1ee381a8f6c58f9e719f46b68",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:59:30Z"
+      "zeitpunkt": "2026-10-14T05:03:15Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4622,9 +4625,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "dadc50fc3532b0448175e8ea8eaee215c6bc922707db76f794b771f4c6303ba6",
+      "beleg_id": "fcdf096c344452ff511469b8d1012b1ad1f39e4bedd63a82598170dafcafceaa",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:59:31Z"
+      "zeitpunkt": "2026-10-14T05:03:16Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4670,9 +4673,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "1564eff17c30e63a84be16c1ad32a9057ff86dcbd140f45e5cbd556a19aaed38",
+      "beleg_id": "a2b44ea1a9973853ab836b61ee04fce231a7f3fb4a26477c40ab4bce490609bb",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:59:31Z"
+      "zeitpunkt": "2026-10-14T05:03:16Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4718,9 +4721,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "e158489644732e0c5eb5755f2cfaa2c222d904ba2da3a8076c56dbbe46f5f106",
+      "beleg_id": "913a08c8f0269e28cbdd798363db0b0f98e2a0b3d4d86d7043190bd01c0e8493",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T06:59:32Z"
+      "zeitpunkt": "2026-10-14T05:03:17Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4766,9 +4769,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "4f6ee9d6e834cb3d75cd3609e210075b688e16157b9eeb0c08b4edfad0562a73",
+      "beleg_id": "5b493c3b677d41b5493500de4028340be7f45e2f3aaadeea65edc5c72e492563",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:00:27Z"
+      "zeitpunkt": "2026-10-14T05:04:12Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4814,9 +4817,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "34484042a62c08772b3152066f1d2ead237c781c484b6bc41f100fefadfe928d",
+      "beleg_id": "3f18b51c3a7b54d88ccd1fda6453a3340d655f00888edb75be943d3c30140902",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:00:28Z"
+      "zeitpunkt": "2026-10-14T05:04:13Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4862,9 +4865,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "195847935904d8100433428e2724ca7ba23c07a5430a3e85001a1d0e2260a04e",
+      "beleg_id": "6e382b6ecef1aac8d50e7222471e30d10a00c78f3cfcd34c66baa759e13f41f7",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:00:29Z"
+      "zeitpunkt": "2026-10-14T05:04:14Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4910,9 +4913,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "97d99f9f009dfa3994cfc989bbb823541ca6de096847374292e01e41eb3d16e7",
+      "beleg_id": "905b2f807de97285294181954cef8ae3b226391047b7265ce07fd630cb98de50",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:00:29Z"
+      "zeitpunkt": "2026-10-14T05:04:14Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4958,9 +4961,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "0b3da45634df084ec4a5c902eb691b2c86fb7cf9b1465abcdb256c4c980771ba",
+      "beleg_id": "36d3bf55860201939d5412aa2c6fccc31aaab8f6a14245f0692dc20642fb1b64",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:00:30Z"
+      "zeitpunkt": "2026-10-14T05:04:15Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5006,9 +5009,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "16ecc71bbc653c140b8485a8b3de4c2480f2a7e221ef7d47dbdc0a27dbc41f84",
+      "beleg_id": "a2e54bacaf6861c6ef4d95cacbb53eafc04c0148d96d9ca508020af95e326b75",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:01:20Z"
+      "zeitpunkt": "2026-10-14T05:05:12Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5054,9 +5057,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "1be15bb3f4775cd4dc7cf8f5d1833fde674a978875f9b20af063ad81f39b0cbe",
+      "beleg_id": "30300c25f16b473ebb521269ca7a256dd5f14ae69b6138e2d620301a09e4b2ec",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:01:21Z"
+      "zeitpunkt": "2026-10-14T05:05:13Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5111,9 +5114,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "425d0768e78c3bc301f6e0e19ebc5c50b4dba24fcb2db74b6228bb2f8df15a0f",
+      "beleg_id": "1291d68c7946993f69401b584b751bd656d079fac661ce44b2a6b3a4c349040d",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:01:21Z"
+      "zeitpunkt": "2026-10-14T05:05:13Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5159,9 +5162,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "a2afd05487dfd443e5fd6089304f0340607c16fe54df4b0ce8d63bad4dfcbc09",
+      "beleg_id": "ea8d1b7d5d044d264ece9f034d59a9d491ec0979240428d99ca5bcdb2646366d",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:01:22Z"
+      "zeitpunkt": "2026-10-14T05:05:14Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5207,9 +5210,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "db11e6bfc2329a5cbc51af9a08ed00a2705e31b53d1d4240cb65ebb339ba999d",
+      "beleg_id": "e69f31bc0379ce2e4201e52079eab7a28f99251c115ab1204d8a192da2e7ac16",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:01:23Z"
+      "zeitpunkt": "2026-10-14T05:05:15Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5240,16 +5243,18 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 239,
-    "beendet": 238,
+    "anfragen": 240,
+    "beendet": 239,
     "dokument": "complete",
     "geladen": true,
     "offen": {
+     "cdn.dimml.io": 1,
+     "collect.vodafone.de": 1,
      "tags.vodafone.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 15.3,
-    "takte_ms": 12000,
+    "sekunden": 19.2,
+    "takte_ms": 14400,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -5282,9 +5287,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a323a4c1765e48a8129b5f1016cb4378636787d2d27ff50ff798f239aef2759c",
+      "beleg_id": "ddb588d4747bdaa38f001ca432bf4313b797c09a4a3ef95dd784372d93466b41",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:02:07Z"
+      "zeitpunkt": "2026-10-14T05:06:06Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5330,9 +5335,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "704f3b26c810728bf66b96e2866f48d5468d6633adbdf47f1bf6adac0d243ba3",
+      "beleg_id": "b5c853e84aabaf8feb240893f1fa979908c10a670cef8739cde7566c5825045d",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:02:08Z"
+      "zeitpunkt": "2026-10-14T05:06:07Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5378,9 +5383,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "2797d88d573eab0e11c39d58f497ed37af284ddf0a57b14cb2097975edcb7ac2",
+      "beleg_id": "d70d4d7b139af71fb078f97b9f5607ea10c5aedbd0a17b1f04fd92ce35deeeaf",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:02:08Z"
+      "zeitpunkt": "2026-10-14T05:06:07Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5426,9 +5431,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "e2b3eec7723e781016d7f7d23d77a9da0ec500dcc68e682cf56407761d0b492f",
+      "beleg_id": "dc8318ead2a6832550011e7fe5bc8ed8aa03dd9744501e5fd7462a8c083b10f8",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:02:09Z"
+      "zeitpunkt": "2026-10-14T05:06:08Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5474,9 +5479,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "6a5ecfd2f4a6e9a6cd3130da58c5d0e3298cf739ffea803ae617429ad4f8e5b3",
+      "beleg_id": "7e35f0749301189cdc00c30f425e7efd1afe74598e4822ed057e9cd8bc61c04f",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:02:10Z"
+      "zeitpunkt": "2026-10-14T05:06:09Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5522,9 +5527,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "7fdee7c2d199a32beb53dd32a3c6c1ebf53fe09488d08578b8b1e235bfac4b43",
+      "beleg_id": "1b4231b0785861df8a3c8f5779d6b4a02353e7bf19b542a845abcaced8684cfa",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:03:10Z"
+      "zeitpunkt": "2026-10-14T05:07:16Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5570,9 +5575,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "e93f474e390e99ce951c0a8c3bf9ecbb72524dd0472f7523441acd41b10eff47",
+      "beleg_id": "d32d9243d1a144e110688bdf61119674dd6ba162fff95114e0375eed4272d1f3",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:03:10Z"
+      "zeitpunkt": "2026-10-14T05:07:17Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5618,9 +5623,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "73c967d338de81278f159556315963eb5a437a08f6ccf56fe34eaa6a70d6fda7",
+      "beleg_id": "ee6dad4923406828e534cfcab6341f8ca6b7100f481fbedf5b5037c87eedea82",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:03:11Z"
+      "zeitpunkt": "2026-10-14T05:07:17Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5666,9 +5671,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "92e1e54830b8d9c96a495a856c70bb823246c1e08be14cae0bc676ae6f9eef0e",
+      "beleg_id": "3ab89ac80f2841618364214719f2d33ebd2253b41ff5dd4cac66e04316970ed9",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:03:12Z"
+      "zeitpunkt": "2026-10-14T05:07:18Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5714,9 +5719,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "3eaeffe6f032894a7d9e40b6164396b703071fe1c10aacade7b1dad7112b3f4d",
+      "beleg_id": "7c4748a00e0ae288fc03103df98058837a4d05a333b8cc27e885306cf01f2464",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:03:12Z"
+      "zeitpunkt": "2026-10-14T05:07:19Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5762,9 +5767,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a04af6f8702b3d80e7dddf67a2aa9baf5af26d9059fe6d5b7be4e2ee4976271c",
+      "beleg_id": "ad332e3a7477bf8d59d4eca360904898060f22ce31a1707f13b67d2f9bc839b0",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:04:12Z"
+      "zeitpunkt": "2026-10-14T05:08:12Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5810,9 +5815,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "b92ce1ac57e739552fa389202ee4be670828b1c48096cb577be46f06660abec0",
+      "beleg_id": "f1b73bb7be6cc6e2114964ade31f12be39cd24c44c3bd2bcf8542883e2dc9d1a",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:04:12Z"
+      "zeitpunkt": "2026-10-14T05:08:13Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5867,9 +5872,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "368a3712abc463bff50a3ad73642fe63602cd9eb3f8a5da9bd5577c99a81bd7a",
+      "beleg_id": "4eb04c672caf6299e56fe36b9010486ce1bd1969d3ba5e7604ca792ca452bd6f",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:04:13Z"
+      "zeitpunkt": "2026-10-14T05:08:14Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5915,9 +5920,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "39e6428a2ed822f4623a59620c505e5168ccb0c617ab759ac138bb65b642974f",
+      "beleg_id": "a1d3ddd9a14ce7f517460a0cd24e73432ad192356d727f0a0dcf3cded6d995fc",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:04:14Z"
+      "zeitpunkt": "2026-10-14T05:08:15Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5963,9 +5968,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "dbc852eebef774695c4ef7c9b0a6a2e062080763c2175bf29103f818b3e5560b",
+      "beleg_id": "4be14deda71b4979252ad644829416ac6316f5470ec5b560092dd985179d868c",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:04:14Z"
+      "zeitpunkt": "2026-10-14T05:08:15Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6002,9 +6007,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "12f89d26efe7ff947359883d3e3bb4ebc7dbcb244ad04fd86b3baa9bfed9e01c",
+      "beleg_id": "bc3b3b5b2aa978f7fe1559ef6ee9c0e1f2e9d9c98a53aa1576ddc45c0877a1ea",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:05:03Z"
+      "zeitpunkt": "2026-10-14T05:09:10Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6050,9 +6055,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a7f8c7850a25059e86f11acce1c61c04bb2c536870fc85dc8171aa551e002346",
+      "beleg_id": "2417031b080bf313095e5d5575cf1fd6b73484fba762fafcd463dfc35511f8fd",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:05:04Z"
+      "zeitpunkt": "2026-10-14T05:09:11Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6098,9 +6103,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "3316a302fb110ed412017d51279f9aed13eb83bcc480c51cc06f2316bac0788e",
+      "beleg_id": "692d48ab691185ab60e77e1a9b55cd5b321333ce00fc56adcbf7980ea2c15c80",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:05:05Z"
+      "zeitpunkt": "2026-10-14T05:09:12Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6146,9 +6151,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "050f137f98efe49f4ab11d7522d28620fec5cda1e4e5da11a727b9beaf0795e9",
+      "beleg_id": "fed2897e3f3802659035128d1c1316e2ec70ed1e39ebd64ae1f8dac755783d49",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:05:06Z"
+      "zeitpunkt": "2026-10-14T05:09:13Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6194,9 +6199,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "94b034bc7b864e3ea2b166e428fe4ba86751971bd082b52dcb6acafc776b2122",
+      "beleg_id": "75190dc5c9184844c3f95800c3ef0d8552158346e3867c50008206beb33db707",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:05:06Z"
+      "zeitpunkt": "2026-10-14T05:09:13Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6242,9 +6247,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "9d5b93794798aadb01844d1540da5aac7dee130545cdd0042cc295056dc174b6",
+      "beleg_id": "cde7e98df9f96bf20bb0d26f63b0f2e83f67ad03e1f1b928a7c96dbc94f8eb5c",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:06:10Z"
+      "zeitpunkt": "2026-10-14T05:10:21Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6290,9 +6295,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "38ca9e2a77e231824febae438a6084f083718c9f3e52f37236914a0a4b122e53",
+      "beleg_id": "7af5d744f7547e8dd3ca7c0923ad69935e0392ee08aa96e5a7d72de39e0abcda",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:06:11Z"
+      "zeitpunkt": "2026-10-14T05:10:22Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6338,9 +6343,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "2358b1dd4c8a3fa12a2cb03e782018e0b2edb862a4655e0281a871cae629e072",
+      "beleg_id": "1ab76cbb002b053cc81738cf0e856dde4c5de7d7d0183f1ef7a37fec70708ff1",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:06:12Z"
+      "zeitpunkt": "2026-10-14T05:10:23Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6386,9 +6391,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "6cce36ab4b2b19a4be57a0b9c9ab2a19d2ceb8f6e940c503a00213a51adc4e07",
+      "beleg_id": "cba7d5c6d266d9ebb3f5db253c4d52f6a24f9c7415ac6f822f911f869972e531",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:06:12Z"
+      "zeitpunkt": "2026-10-14T05:10:23Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6434,9 +6439,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "104937cf0405039f62414b58324f41c454c8f0670e3fc6b8fe52e28911712f09",
+      "beleg_id": "136a26f5cccdd95b9ebc26fb02d8812bf8f5aa62c7356292d6a3d9cf89bd0cdb",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:06:13Z"
+      "zeitpunkt": "2026-10-14T05:10:24Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6482,9 +6487,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "03178abca07cadef1af71538669a4283eaa5a70817a59f481b057ff7031c9fa5",
+      "beleg_id": "0dce0338d4e41897b2e7edb09973ba8973aa59ded016ab1faa45d56b00ddbb48",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:07:14Z"
+      "zeitpunkt": "2026-10-14T05:11:22Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6530,9 +6535,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "b5147ea10982450129bd45e9b76c5a5d90b632e20b5d2582b1e8ef8c83b93152",
+      "beleg_id": "4b5ce2abf1aad9ecacedbe77d0a1f7966bd89991798bb2cb841a06aae8e64400",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:07:15Z"
+      "zeitpunkt": "2026-10-14T05:11:23Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6587,9 +6592,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "3377bfc07c6012330c8aefe9d02c3591d5f950ccf76e71155089d680b43e8dd9",
+      "beleg_id": "ce7c4f2024dcf8c1d6ed315740e8b53d00fecaad48b490f85be6b2815493df21",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:07:16Z"
+      "zeitpunkt": "2026-10-14T05:11:23Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6635,9 +6640,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "1ea8c93816a556762c178df82e713487eb964767d14166bf7f99b05811e398c3",
+      "beleg_id": "b2f5d5ea36ab188b022c13a5a58d2d6aba5ba303e5747a4c0e2f09768baaad36",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:07:16Z"
+      "zeitpunkt": "2026-10-14T05:11:24Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6683,9 +6688,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "6f99bfe86ca2ea45a5ad3eea28c04677ddf711c24f90cd3f118ddf84fe1eed68",
+      "beleg_id": "c323c0dbdf32ffc1bfe360384dc05d822115d4be31a3d04132e5a611837292e8",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:07:17Z"
+      "zeitpunkt": "2026-10-14T05:11:25Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6716,17 +6721,16 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 226,
-    "beendet": 224,
+    "anfragen": 235,
+    "beendet": 234,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "tags.vodafone.de": 1,
      "www.vodafone.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 13.4,
-    "takte_ms": 9550,
+    "sekunden": 17.1,
+    "takte_ms": 11450,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -6759,9 +6763,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "5bfcc485c2896c4a31428aa7459d91fa272ad023dafcd6ca8dcedea87fcbb2e5",
+      "beleg_id": "1464c9edc41e4bc4648d1a4bb629e3e8a17dcae2b81d14804aab39f261c76259",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:08:03Z"
+      "zeitpunkt": "2026-10-14T05:12:16Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6807,9 +6811,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "677aa8307175b58f1dacbe2c80081acaf2b938674cddc7bd7089a14ff9bb2b56",
+      "beleg_id": "4967bb0b5bdadca052d566280b7a03231077ddf35c6526ba7f90a949dd4d34f7",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:08:03Z"
+      "zeitpunkt": "2026-10-14T05:12:16Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6855,9 +6859,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "b7dd36ae85e7943c556b818927a3c56d3e0aba5fffd4cb0543fb94bb63f6a2e1",
+      "beleg_id": "52a9b83120512942bb382fdf49df17f39537466fdf6875bad0dd004286af1f23",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:08:04Z"
+      "zeitpunkt": "2026-10-14T05:12:17Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6903,9 +6907,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "692557690f797fdf8c7ca45b986d06186203fbb7c8883e6b0a6937e710546d42",
+      "beleg_id": "b2b77ecbd33fb7802d2ed4d766c632d1cf7e68d86ffcbf8db31f8725622bdc97",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:08:05Z"
+      "zeitpunkt": "2026-10-14T05:12:18Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6951,9 +6955,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "839f68a673a9d850b3b0544145eb5cc73257d8d3d20232e7cd2cf39461109fb6",
+      "beleg_id": "6a5209140c0502a7ea199b604472f4097da7e656777cf57e347734c03b5fca38",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:08:05Z"
+      "zeitpunkt": "2026-10-14T05:12:19Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6999,9 +7003,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "f5c96b8a1ad196b747b61e8b27321a99a7c9f397b75509556533811b6fd01043",
+      "beleg_id": "d269a483fc326e99be9c6e542b6cf9c8fd489fa011f72af99e7793bc13e7f420",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:09:04Z"
+      "zeitpunkt": "2026-10-14T05:13:14Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -7047,9 +7051,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "9ed6293a60168fbcde0a2f4a98ff4117818f3b45403656c85f926ec4d030bff9",
+      "beleg_id": "24d9eb72145b99b0715949e9e0e6e79c7bc88b88aa05dc13d94d6b44de01ab4f",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:09:05Z"
+      "zeitpunkt": "2026-10-14T05:13:15Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -7095,9 +7099,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "586fb9bfaca6a4a1552661cf33752932b8abe1720707502b51cd13f3ad7fd7bf",
+      "beleg_id": "a8c984cdc45f8934521932febf141b74a3eb685d7047d4a74fd7e92b943aeb1f",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:09:06Z"
+      "zeitpunkt": "2026-10-14T05:13:16Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -7143,9 +7147,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "738a2a2b8cfe28a3d60e94550d632d2f769e8e46fa3ab05481e2e5e84684be93",
+      "beleg_id": "15248dc83f287b0be824221eecbd5aa8cc3376e71d9f432ba0958c9f495f1fac",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:09:06Z"
+      "zeitpunkt": "2026-10-14T05:13:17Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -7191,9 +7195,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "4e2dac0105d0b933f632875b08847998beea3fb6f2943a14108d36b41eb047a4",
+      "beleg_id": "6bfeb10d07040e82a41873fd36d9a727501067e1748e47ef5cdb7af180e6e1b2",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:09:07Z"
+      "zeitpunkt": "2026-10-14T05:13:17Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -7239,9 +7243,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "afa82b9e2e654d99b8090987bff2f2ecafbaff0d6819db93c2e70d1be2ba7950",
+      "beleg_id": "296e25110003fc42b9dd9bea9ea06a5a960476a18c979afd6231de66fb3461a0",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:10:07Z"
+      "zeitpunkt": "2026-10-14T05:14:13Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -7287,9 +7291,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "1fc40ea7a49502667d41205bbb53602f7f56da3b22ac13306ada534a8572372c",
+      "beleg_id": "433979e1cc964955c832087043080b749249c7e27d527c2f7ab14af9d6f5f9e4",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:10:07Z"
+      "zeitpunkt": "2026-10-14T05:14:14Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -7344,9 +7348,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "cd3e4e8f21466b9068d09b6a41cd38f86b65f25f8cd976f0c7f0b520f3ea33bc",
+      "beleg_id": "d5b442e41c78c3d106e61ac552a968fc60299966147c82015fc91d359e4ac3fe",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:10:08Z"
+      "zeitpunkt": "2026-10-14T05:14:15Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -7392,9 +7396,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "8c0a8d1396d5ef28fd675cfe7ad19d9d9aacfa80f83f67e008e766aebd9841d0",
+      "beleg_id": "d2e73c33a0417e38a18f4f103ab833df6d2ff27b6320675cf645608439556401",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:10:09Z"
+      "zeitpunkt": "2026-10-14T05:14:16Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -7440,9 +7444,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "cb86e34d38504639651e7d7df09b5730ae94054672e105abdd6c799e7aaae976",
+      "beleg_id": "980b6a02311577495eb6ee9cb220d5b4fe6e37863d901d174271dca2355345c5",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:10:09Z"
+      "zeitpunkt": "2026-10-14T05:14:16Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -7479,9 +7483,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "23d8514e32ee95b7ee7a23d05170f4fc9b1f55e92eb68aae2353c59f99766acc",
+      "beleg_id": "7ee207341f3ed4a55d0da17026c2e94fb520b0b7a8736dbeae0ca005bf8db778",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:10:59Z"
+      "zeitpunkt": "2026-10-14T05:15:16Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -7527,9 +7531,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a028338c5fcc45ac36180654707dd5ae5ed0043b1476ecc8a26730f70f3be30a",
+      "beleg_id": "b3b67b8b64b9b8fe7189a40d43b83cc604e1352db1874ff38843e5b7c9829cdc",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:11:00Z"
+      "zeitpunkt": "2026-10-14T05:15:17Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -7575,9 +7579,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "3ccda151e292ac4fd9577104da98e0034121661595273a1003371ce94a006061",
+      "beleg_id": "cecad47fd24461f19cee47fd41ec529ef71eb80e7d9510994903671c253462d8",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:11:01Z"
+      "zeitpunkt": "2026-10-14T05:15:18Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -7623,9 +7627,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "b4e5817ea8af86255032ccb7a68a88fb0ebed375bcc133171ffbab94e822e4c6",
+      "beleg_id": "06788199448f9076382285118132e15eddde4eae62061f7bb455a900bb5a2818",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:11:01Z"
+      "zeitpunkt": "2026-10-14T05:15:19Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -7671,9 +7675,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "623299509a8bee06e26dea97b06d7faa2291b39f7dd2091e0f40f61f68d81279",
+      "beleg_id": "a1c94bade55fb17cb5fda70f677c9390d29069684aca8a7ab858da36721fd55d",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:11:02Z"
+      "zeitpunkt": "2026-10-14T05:15:19Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -7719,9 +7723,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "d7c731f4da8d6c9a41e68d67351f215977b1766b68a45b407a6aa1a01a811631",
+      "beleg_id": "0b3e157c0fbda235657e97be104dd033cee1cc0cfd2485b6f3e772ecba230d03",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:12:06Z"
+      "zeitpunkt": "2026-10-14T05:16:17Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -7767,9 +7771,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "dc0ac71dac5a67816407a779820b1ef9af4c6cfee9c8303a448628b9fe2d13ef",
+      "beleg_id": "eb2f7c32e0c8460341de2eaf2c8fa37ca33173bb5cf6f19efffd2cd0cfc780b3",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:12:07Z"
+      "zeitpunkt": "2026-10-14T05:16:18Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -7815,9 +7819,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "83da586c187b41965e7f9b9355f5c446d2ef1335e809e5aadb441f2d998886eb",
+      "beleg_id": "3705bb0aa8ebefaaa7bdadfe4f21f38f788d0efbaf22bdf3799a8c65b054101f",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:12:07Z"
+      "zeitpunkt": "2026-10-14T05:16:19Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -7863,9 +7867,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "ad9187498bd697ea538864f8421ffbf45c1d3ec4b9dd6ba9d3aaea4774529465",
+      "beleg_id": "cda7644a29026cf7c5517bec6ad9f7683820cd0796e6216314bbb923342702d5",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:12:08Z"
+      "zeitpunkt": "2026-10-14T05:16:20Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -7911,9 +7915,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "44126871404bb183b6447cbf6b98e556ed71977ce15f345a381dd053e209dc0e",
+      "beleg_id": "ad8c898b899393c47747e2de95198718344f50ff5827a6fbeb1d39a3edbb8d02",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:12:09Z"
+      "zeitpunkt": "2026-10-14T05:16:20Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -7959,9 +7963,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "c23872295f97feb2d6f5b575eac4842caf2d80f3a429761fdd0169c1d87c049d",
+      "beleg_id": "901a07381ed2bc6c1cfdd356613e003d77235cb6acaccc646fecc307da5e5b1f",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:12:59Z"
+      "zeitpunkt": "2026-10-14T05:17:18Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -8007,9 +8011,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "83764150a4a5cb6c41e645019254c6d3abbb6c21f12409d8233e87dad265be6d",
+      "beleg_id": "16f653b96b2e65a0bf69acc1cc8fadb54f5eba693d4b2bd5a32bb2486c2b712a",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:13:00Z"
+      "zeitpunkt": "2026-10-14T05:17:19Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -8064,9 +8068,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "788211ec18168ee3501fbe0ceb09f95175a7daa872982dab7bec01269552491c",
+      "beleg_id": "36d8d5f389a0805de1ab80224fc1532e864f42641c9d894d3c41335cacaf57f9",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:13:01Z"
+      "zeitpunkt": "2026-10-14T05:17:20Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -8112,9 +8116,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "5ef376e7b823265b139008588877e93764474177915b709eeac6bdbb5aa8b959",
+      "beleg_id": "b0368610444ce512adcac5e9cc673b26d5f1d264bb31cb0247852ed8d412a7b3",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:13:01Z"
+      "zeitpunkt": "2026-10-14T05:17:21Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -8160,9 +8164,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "c1af0963b1a9d6d056f52b23950802f58c9fbb7f5df2af81e3c4ec94c3f7259e",
+      "beleg_id": "30eea9392cf0ce9501c07fb9e4dc8bed9a9d9f89bc2f148a985b4787b21cc917",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:13:02Z"
+      "zeitpunkt": "2026-10-14T05:17:21Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -8193,18 +8197,17 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 226,
-    "beendet": 212,
+    "anfragen": 233,
+    "beendet": 232,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "collect.vodafone.de": 1,
-     "tags.vodafone.de": 1,
-     "www.vodafone.de": 51
+     "cdn.dimml.io": 1,
+     "tags.vodafone.de": 1
     },
-    "ohne_antwort_ms": 0,
-    "sekunden": 13.4,
-    "takte_ms": 10050,
+    "ohne_antwort_ms": 200,
+    "sekunden": 18.1,
+    "takte_ms": 13300,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -8237,9 +8240,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "743f488ed0ac69c1e0f1860b102a9cdf3b4168f7a5cc1cd79dbd6525d4c7817d",
+      "beleg_id": "db9005145eb32c712501a217e1a09c917a6dbdd28779c1d4b86db05fc66125d3",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:13:51Z"
+      "zeitpunkt": "2026-10-14T05:18:15Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -8285,9 +8288,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "cc4bd6425a05dcea082c03b5018b00b93ba784bc10b0a07ab291afb993b98211",
+      "beleg_id": "bc1f250593bdf8387cc0a0b9af61e92d18d2afef0abe7bd3d575714be5bfb9e6",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:13:51Z"
+      "zeitpunkt": "2026-10-14T05:18:16Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -8333,9 +8336,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "06023e930cd29854a1c4e80b722fb4c62bab6ffafc5c76377c4f8a4ee45a945c",
+      "beleg_id": "72a41799050d89bbde32e209e9801e42a43b591a85176c48662ec13d820477f5",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:13:52Z"
+      "zeitpunkt": "2026-10-14T05:18:17Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -8381,9 +8384,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "8b7c4111b28415dcf9b0b96b3907198c882ce4f06a0cd91834a160b85b5cd3b5",
+      "beleg_id": "dca342e5692fd3fd88ac7d72c6247d664aab600e04e8874b86f7fabd56ba0b3a",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:13:53Z"
+      "zeitpunkt": "2026-10-14T05:18:17Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -8429,9 +8432,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "f101104e82839c909706b0818c0993403a7d88ef8801d2b2080659f9b790b491",
+      "beleg_id": "6ae6fbd0b360342295ed5f3fd5afbbfbb4d9944a7970b87da11d2575891159de",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:13:53Z"
+      "zeitpunkt": "2026-10-14T05:18:18Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -8477,9 +8480,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "ded1409070635afc1353117c41a031e73c53baf9951c17a9389141d20477505b",
+      "beleg_id": "8396d5fe2553b227a33a3f1d707ecea00fb8e55bfa40ce5a0fd4618ac79f13af",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:14:42Z"
+      "zeitpunkt": "2026-10-14T05:19:14Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -8525,9 +8528,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "68ed0862d3bcd10245cf67ee6b90b3d2a1188df02d3815c7bbd92b7aa817bc12",
+      "beleg_id": "15fde5f81d6f8816362160a0f12960e0d41ce0d2dd51069838a1572581ef8e01",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:14:43Z"
+      "zeitpunkt": "2026-10-14T05:19:14Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -8573,9 +8576,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "27fb3bfc1812e1c9cc4f201f3a62d1c8c8cadcff1cab7c2c185083038fceb9f6",
+      "beleg_id": "9c8d1a95eed2f979fb1765988f62527e9a2384ef5e96451eefd89c17ce4f3cb7",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:14:43Z"
+      "zeitpunkt": "2026-10-14T05:19:15Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -8621,9 +8624,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "4385539ced53dc8f6a34d077819bdc9f05489708045d3dc1800aec9e901294ee",
+      "beleg_id": "3175ed2a475b934eb1fa994bc5cdaf37944088dbd6beefdd4707d419f5861f42",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:14:44Z"
+      "zeitpunkt": "2026-10-14T05:19:16Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -8669,9 +8672,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "8a9153e3ac55f800e8445ed01d8c6eb6e69e3cdde81afc5cf563e5e48c81bb71",
+      "beleg_id": "adfd151b3d340c69e293d062f1ac6af5f26935e790dfb0300db839ef98b5af5f",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:14:45Z"
+      "zeitpunkt": "2026-10-14T05:19:17Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -8717,9 +8720,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "542273d3de3c4b713a7ac34423d55f7f6db5c72e49fb09d6821350252bbce1d2",
+      "beleg_id": "46b68574b1b5a4fc95c8a010c232bf8e500998b28c8e9ee62df64ec9ebe500a0",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:15:34Z"
+      "zeitpunkt": "2026-10-14T05:20:13Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -8765,9 +8768,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "0b69379392aab6d944d875531a2c0e82660bf2ae792893cc538f32f5b3b9c6aa",
+      "beleg_id": "3ab4a74dc27124ae236c213534b906e82c97b48d60e3c70833386ca4d462abbb",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:15:34Z"
+      "zeitpunkt": "2026-10-14T05:20:14Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -8822,9 +8825,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "7ad84c92d75a4987b7c9b9c02f8756705b42a7cac9135941a888037e9323795a",
+      "beleg_id": "06eb6d653b8a16da467336451d53cb06550d46d0608c93642e01630b3bb69bf1",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:15:35Z"
+      "zeitpunkt": "2026-10-14T05:20:14Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -8870,9 +8873,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "b0068f23951eb4b2c8aec9d2c088c41499b9725c7bb844935ecb7641ab94bfce",
+      "beleg_id": "f1555eb865331b50a75bc5247d9419760fee0a3fa45bc97e52bd7428cccc826f",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:15:36Z"
+      "zeitpunkt": "2026-10-14T05:20:15Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -8918,9 +8921,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "e8203a914fc8172a3e23bb4da03ada1850d1e2d04c6b39e3b3845b24461527e4",
+      "beleg_id": "8d8affba24de7a079f185d0473273b9c04b6d54d9aee7aa9eb903c13fd1bd457",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:15:36Z"
+      "zeitpunkt": "2026-10-14T05:20:16Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -8957,9 +8960,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "259ea09b1d4ff203bd343a00a6c1ad1de804299a9ed4581eb2fb3fbfeb03bf3a",
+      "beleg_id": "4c532ac398f6579860a90939696274e3540ce6bce4c71d4bbc0ea20d55f5f602",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:16:25Z"
+      "zeitpunkt": "2026-10-14T05:21:12Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -9005,9 +9008,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "9ba4cd66d3ee5cb0fd6d0bd0d2702643f6af5153757d95c5e669edbeedf53532",
+      "beleg_id": "b1f425f2c0c1de53f8bac6873c307040fac99d49cec2abd1c121592c9f82cf05",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:16:26Z"
+      "zeitpunkt": "2026-10-14T05:21:13Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -9053,9 +9056,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "2dd9063030f111233fb08ea1cf493924390a7a0ab0dbb53e33aca76376211142",
+      "beleg_id": "3d1f2d0084dd3861a3ef6ddd5ec56d67ef664b48b7efcc44fc6259d74df6e964",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:16:27Z"
+      "zeitpunkt": "2026-10-14T05:21:14Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -9101,9 +9104,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "8683c32fbc5bbbc82f7812d05f5a8b8cbe0687b4a28e80da222eed3fa9723703",
+      "beleg_id": "d7cadc3c3d99e8eb75f96692f2fff8456e7aa2eec47075e3bcb3d4682d198c0e",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:16:27Z"
+      "zeitpunkt": "2026-10-14T05:21:15Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -9149,9 +9152,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "31e86bb3709aa24d7077fc934fef2739c745a0aa1a15e5614986378adc709aa2",
+      "beleg_id": "3e1c4273d73f2b74ab0d8e4a497dd031d22a6b51172944c492b369f3686627d0",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:16:28Z"
+      "zeitpunkt": "2026-10-14T05:21:15Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -9197,9 +9200,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "1da6420ee89ed752e4086186702c1d3c7a705cbc2c3cd0d2ce86ef2db0bb0b74",
+      "beleg_id": "08172951bf284b2f382dd3633b9aeb7c0359bdf45f7c94ad7fd05d7cdbc82cc0",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:17:20Z"
+      "zeitpunkt": "2026-10-14T05:22:13Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -9245,9 +9248,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "2e7fb87c81817c86e80df0e887abc735c399a1264932d3202d696fca531f5c0a",
+      "beleg_id": "62ac94a537e92605dca01a78bf1cb771ef988a0595206ab5c46a2c425c56c482",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:17:20Z"
+      "zeitpunkt": "2026-10-14T05:22:14Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -9293,9 +9296,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "bd18aa4cb24e393071f5c69bc0915bf8ba5a42a1868ff38bf5c681032cd7a9a6",
+      "beleg_id": "43d63f7f3d028029269125574576c2530f9127f2e119f29ebdaf6cced52d1de9",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:17:21Z"
+      "zeitpunkt": "2026-10-14T05:22:15Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -9341,9 +9344,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "0ebd49e66d51a0214f3889f79fd234ee5d26f84b70fafd93127a0820052626f8",
+      "beleg_id": "3bf5258c6e2a36bd18a8b7bf2303a409b2352e292672d0b17e49522e16002063",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:17:22Z"
+      "zeitpunkt": "2026-10-14T05:22:16Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -9389,9 +9392,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "24812d6aa29d6c966be4a4208d7c4b5d6d17b037e499bad99f364e801e025aed",
+      "beleg_id": "47bce3a268fd776ecb642ad668b9dd5072945c408c334f074e0e910b1c843560",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:17:22Z"
+      "zeitpunkt": "2026-10-14T05:22:16Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -9437,9 +9440,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "5fad99bcf87cfd3b0644a350788341648e835907932f69aba58bd8a9aa095ed9",
+      "beleg_id": "e17faf6dd41a3a04be1de994f0143151b84e12fc96ca36234dc1d1aef1bd90ae",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:18:14Z"
+      "zeitpunkt": "2026-10-14T05:23:12Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -9485,9 +9488,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "027187df56236a9e563ffd2b6606ce272cd3a6ff10dd61650e4cdd776cde36f4",
+      "beleg_id": "5a38848e8b11fc2f138c281cde9a63b872b25c7e29054504bb801cb34a72a728",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:18:15Z"
+      "zeitpunkt": "2026-10-14T05:23:13Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -9542,9 +9545,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "d624405ec76d84cbeac1ce463f0923434e94c29bc8b76144293c32beb560152f",
+      "beleg_id": "36a370a254b9f24d6f551259d08366d14d4cbcd61002edf147ac792fceca4658",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:18:15Z"
+      "zeitpunkt": "2026-10-14T05:23:14Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -9590,9 +9593,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "31d86e6393dc0b0268dbec8e2c814b8d6e843c4586b0ed9734311ff1bcf09eec",
+      "beleg_id": "b88288a9ed608310c13c3b662f489e614b99008996d276579b2fec736d43f8f2",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:18:16Z"
+      "zeitpunkt": "2026-10-14T05:23:14Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -9638,9 +9641,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "66888222146c3acb40a4a203832459544a16634341401452e2287dcca355f9a5",
+      "beleg_id": "323f133c0df5d924bc595cdcf501d30336176287dc9d07d1f8a301eb418f83ad",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:18:17Z"
+      "zeitpunkt": "2026-10-14T05:23:15Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -9671,18 +9674,18 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 149,
-    "beendet": 144,
+    "anfragen": 145,
+    "beendet": 143,
     "dokument": "complete",
     "geladen": true,
     "offen": {
      "collect.vodafone.de": 1,
      "tags.vodafone.de": 1,
-     "www.vodafone.de": 4
+     "www.vodafone.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 14.0,
-    "takte_ms": 10650,
+    "sekunden": 16.4,
+    "takte_ms": 11750,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -9715,9 +9718,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "d1e5bd00bf0e9fa0236cd6fb212fe5def49a1036331ea7f99a73362fc4b43091",
+      "beleg_id": "54ee4741e51d6d8d5122f5b7f4f0cc311b77b2f8c16caba9600585d5ccb9122f",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:19:03Z"
+      "zeitpunkt": "2026-10-14T05:24:08Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -9763,9 +9766,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "d1292489ce3971164ad1db8618a6df8468336abcf7a7bb89d77e56bed90f4389",
+      "beleg_id": "10c7d60e8da1f680e55b5d3a91611f8944a5edba472c5fbfdc63294c3cbffc2e",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:19:04Z"
+      "zeitpunkt": "2026-10-14T05:24:09Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -9811,9 +9814,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "46a88a483e495dfb9d2b9a79ba4385d32f93f8b2b4163551e7987a0da7042803",
+      "beleg_id": "0368d5d4a1f2118bc9591ad2f3c12180f460d5b3ee4bdc225c945dfb160cbf11",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:19:04Z"
+      "zeitpunkt": "2026-10-14T05:24:10Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -9859,9 +9862,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "6145efc7ee27e0d7fa8a1d600a0deaacaee57da02740424ec7114bad0d2acb70",
+      "beleg_id": "07b27f4838dbffb361b3d08ccc07791650ad1f27556c8464d44b11b6d7d1f6c2",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:19:05Z"
+      "zeitpunkt": "2026-10-14T05:24:11Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -9907,9 +9910,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "9fe3d7d69242c6713363740d5e1f787e9554d732e2b58ff3bead09039cbfa452",
+      "beleg_id": "63e84cfcf3e71e2fc535ce71a29e33829b84117e2d3ea4bc918ec864e86c8bc3",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:19:06Z"
+      "zeitpunkt": "2026-10-14T05:24:12Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -9955,9 +9958,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "0226bf8da8d44eaf762421107bb5762d6377a246491305a2126e2b80ffd179b4",
+      "beleg_id": "33ce2f86bcd57760a50fb09aa5cf2ddf4cd0bf560dc37ebdab8de1651bf206dd",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:20:07Z"
+      "zeitpunkt": "2026-10-14T05:25:07Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -10003,9 +10006,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "77775a20ddf55166f9e1e2f664a9b802bfa4baaac07d0c0a05edef2948b8934a",
+      "beleg_id": "0a666d2eae7b3dd5743c064881ffd369eeda8d1b89e72cd72fa5a7ff4cb329bb",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:20:08Z"
+      "zeitpunkt": "2026-10-14T05:25:07Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -10051,9 +10054,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "eae2d3d81c001b277835d32a0f15daadeb7aafc9787318de5120438f570e550f",
+      "beleg_id": "dfdc2e5032b09e4f96ff96c545efac8eaf5574dbca84dada141af10ab365b0f8",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:20:09Z"
+      "zeitpunkt": "2026-10-14T05:25:08Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -10099,9 +10102,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "2c33b1727f0633b575735009a4901f9c81206cd23ffb816434c49ccd4b00d4b9",
+      "beleg_id": "d9d373266b72805aef0dc40ca208159a53a9868e56a98b64209d309b2b60f729",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:20:09Z"
+      "zeitpunkt": "2026-10-14T05:25:09Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -10147,9 +10150,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "b9eabf5dbc39f7fe6d57082a4f3dde5b600883c9814cac55386f25a1ca0f94f2",
+      "beleg_id": "03fef2d4ce7f6334869da309c06bfb508cfd04aa32a5301923a84cc7604aad10",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:20:10Z"
+      "zeitpunkt": "2026-10-14T05:25:10Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -10195,9 +10198,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "424b58f1e0c386ebd57f1ea181f3544c9af0830eb0b20c4e30a03e809d3c86fe",
+      "beleg_id": "1f93716a89de9d2185930221ca3f6b171ddddeb723040fba09ea66773e188d09",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:21:11Z"
+      "zeitpunkt": "2026-10-14T05:26:18Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -10243,9 +10246,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "7a5c27e2766c8966d5d4f890002a6c38e091136bfbe4a8ad70333d7380b7e2ee",
+      "beleg_id": "67da0a2bae9211b10199a366aac8c88e142f83c0e5b84678fcc3d5cf56a35ea8",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:21:12Z"
+      "zeitpunkt": "2026-10-14T05:26:19Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -10300,9 +10303,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "e3eee294dbc7f4f14c80c3b456e1d3e7dd0800a68f55a6f25b643ba730b5dcab",
+      "beleg_id": "5ca4108139f0f9d9d0859720f34043fe75b9dcd9f36a6efc257d44115b755cec",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:21:13Z"
+      "zeitpunkt": "2026-10-14T05:26:20Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -10348,9 +10351,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "f5a3d48a62ba5aca9df66ad393f72b70ed8b8d44725ab860118bc454c2cd7cc1",
+      "beleg_id": "e928b4fe919bb54d0fc3727904ec598478b502a83ae21cb4a55406a7dde4df28",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:21:13Z"
+      "zeitpunkt": "2026-10-14T05:26:21Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -10396,9 +10399,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "ec0c9989a8021cac17817ff768b3f4ae378c1850da386ccbe0bce303548ca623",
+      "beleg_id": "7477585f88aa8155e0ca1aa91fcf0c40f1ebd074ca754fb4950c1415c26cfbb6",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:21:14Z"
+      "zeitpunkt": "2026-10-14T05:26:21Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -10435,9 +10438,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "4271a1d1770a65b6341b61474250fac917bb62a17aff63166dd0fb7948739544",
+      "beleg_id": "d0f338b31644c90bb664f2cb708d0a075accbbffd328851338e8095321129ede",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:22:05Z"
+      "zeitpunkt": "2026-10-14T05:27:18Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -10483,9 +10486,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "dbb27816b255d10ee71d1acfe7e7647c4c3182b214c69fbd80ed2d4ad5284d81",
+      "beleg_id": "ba2fd6aa69cb4fcf606f1e42d7ff5f9b198bc8a2dd985449083c94231c422e87",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:22:06Z"
+      "zeitpunkt": "2026-10-14T05:27:19Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -10531,9 +10534,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "d1450872868f4c2d8c914489fc906e61dbd794d60f7dfd7e27f648fc8370e3dc",
+      "beleg_id": "86a78710bd847f0864024ad641963f820f973447108af9decd0e30b0c3ceba1a",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:22:07Z"
+      "zeitpunkt": "2026-10-14T05:27:20Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -10579,9 +10582,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "2ecedb11f89916eb8becf276199d8c3c28430477ead2335a30450955236bcccf",
+      "beleg_id": "2014b9f7ed015c7b6823c42eaf54793dcc4612342f93e54f75ccd62451b504e4",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:22:07Z"
+      "zeitpunkt": "2026-10-14T05:27:21Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -10627,9 +10630,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a5fc581bf867f009f9b209c360073175e9111acd3f22eff83fcfc8a56611210b",
+      "beleg_id": "09b328f4692fe81aa3207684a5dba925ad33a118f3c27f4fe43d241c15fe291d",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:22:08Z"
+      "zeitpunkt": "2026-10-14T05:27:21Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -10675,9 +10678,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "97541dc539c80a1ae0b2a9e5edd9fecb4b30429cecab364006ce334be782dbb1",
+      "beleg_id": "e219979c6d2514305a7cefb46a7f62762bef924cc154a50c506d2f7214163d32",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:23:13Z"
+      "zeitpunkt": "2026-10-14T05:28:19Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -10723,9 +10726,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "5133ff28329273b424c436a3959f80fa2388307efdf3736bb80ad670be956409",
+      "beleg_id": "504d73b2c90658c11e53fa287ab2c163ee8f13d83b0d45428ae934746041eec3",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:23:13Z"
+      "zeitpunkt": "2026-10-14T05:28:20Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -10771,9 +10774,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "2130040c1ba5476116f9265e9089a4bc96a40400e12cd541852d409e69d7acc8",
+      "beleg_id": "7c33a04c35261e4476185357c91f598200d4748de649c24ee3ef4a0e12014541",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:23:14Z"
+      "zeitpunkt": "2026-10-14T05:28:21Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -10819,9 +10822,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "21c90316da086cb0c5bc8fec318f2b582c932cc1eca64addcf48cbb347c56b6e",
+      "beleg_id": "b8fb4d218ebea5534aa3f1c93cb322c1bb4c090ade102812eebb2a228853640f",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:23:15Z"
+      "zeitpunkt": "2026-10-14T05:28:21Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -10867,9 +10870,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "d63da383be080fc918896dfd074041824758bcd7deb10e24f9b1c45842a30ee2",
+      "beleg_id": "ae4a1211513a552b79519f337b2888d4e317efc9c2d31817872c91614e0f12d5",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:23:16Z"
+      "zeitpunkt": "2026-10-14T05:28:22Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -10915,9 +10918,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "e6717c890c4e113b8b708c775b607dcc23d5bab93767722b8f77ae1a62173383",
+      "beleg_id": "aa4fcb1142a8d4849a183e8b1b57b0ccc6f00ab0c2558fbf770ec58addd52ee7",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:24:08Z"
+      "zeitpunkt": "2026-10-14T05:29:33Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -10963,9 +10966,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "7767425a04538253cdca4e9ac189eb3c9ebe101649439baafc4fc4bb3d3fcdb1",
+      "beleg_id": "e3588d1380d3a13e919e38ad8eb0667ea1707e97360ea7ac931bc3b0848fbe8c",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:24:09Z"
+      "zeitpunkt": "2026-10-14T05:29:34Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -11020,9 +11023,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "83988088d770fa327359bd8bb71b855586a2d67beec65832be6072d9e541e39d",
+      "beleg_id": "11bf66785f7241b00603d37f10a254cfdfe895e8a0d037f45a5e4693a9a274c0",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:24:10Z"
+      "zeitpunkt": "2026-10-14T05:29:35Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -11068,9 +11071,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "da4f4a45749bd2a578b25b5c2adf538144c6cfab00de1b39ab56e614da76cf00",
+      "beleg_id": "ef9339340bf7243df98aaee0e888d5812b27b9ab1c28867af8598b9370f1f4ba",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:24:11Z"
+      "zeitpunkt": "2026-10-14T05:29:35Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -11116,9 +11119,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "6af1c241753fb665949364ee36f04b1c97382073dc116e3ac6805f185b4b5899",
+      "beleg_id": "0bee4f48b2ac22d2419a1299170e59ac1b980d94f47216fb7bda0a3120479c42",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:24:11Z"
+      "zeitpunkt": "2026-10-14T05:29:36Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -11155,9 +11158,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "7649156651317f88654d0a81bd526113e726600c1b2a029896867e02cc174e69",
+      "beleg_id": "3ee00c216b7b38dbd5ed7838fa689bd21d427b5bcf7ca6681f5587fb6f675475",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:25:01Z"
+      "zeitpunkt": "2026-10-14T05:30:30Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -11203,9 +11206,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "1d81ce3e9ae34c9efcb135983c1d2bf3c729387c08c78b2e0ee555db20a59942",
+      "beleg_id": "4544b92065b311eb99fcb732f8e71741ebe6e17a729157ed2089c95227c4a605",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:25:01Z"
+      "zeitpunkt": "2026-10-14T05:30:31Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -11251,9 +11254,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "c5b3bab90cb93a5fd9434ab41cbc817183788b2c37da748198fcd483ed78144f",
+      "beleg_id": "211746cbe25c78e9fa8c2e50ee78454515b0f344b84d0da3842a8cc794882f12",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:25:02Z"
+      "zeitpunkt": "2026-10-14T05:30:32Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -11299,9 +11302,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "1ac755bd39e66a4a80cf8ba9df5f482f643ef38693d8f936bd8d6e94f26ccf32",
+      "beleg_id": "fe0f06236c79f2bc77d9fe87fa45096fb6e5b561f48b8941b829f309327a0192",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:25:03Z"
+      "zeitpunkt": "2026-10-14T05:30:33Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -11347,9 +11350,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "817cebed7a9449dfac361a429f20b4522d289e76c925d09669226df3e23b6ea5",
+      "beleg_id": "11331b4933e45a8793331c7286cf1df1721a04d43fa4414152ada42861b7c72b",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:25:03Z"
+      "zeitpunkt": "2026-10-14T05:30:33Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -11395,9 +11398,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "500d98df920db13a768d5f4f47cd02735c9070260608cb668c47b78488a44329",
+      "beleg_id": "202ec2ec576c3d71c14d02ce83d93bb24ac133f0e546cd666d2e167dca158644",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:26:09Z"
+      "zeitpunkt": "2026-10-14T05:31:35Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -11443,9 +11446,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "b19e85500a6af1f6efe73f168a8c66c1b07fae22f85966ec1a8e795319c4493a",
+      "beleg_id": "45634a66ca795ab5c7c2e6a6d5446f58d31727275da2b02be80a7113d8acd890",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:26:10Z"
+      "zeitpunkt": "2026-10-14T05:31:35Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -11491,9 +11494,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "19ae3fb9656cbc577262621ce8676065af21cac61194de57e7fa3e847136d78e",
+      "beleg_id": "adeab61d96e8c71820d96742c2bd2b0ff3614bf16b10af72b54b934e34b69838",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:26:10Z"
+      "zeitpunkt": "2026-10-14T05:31:36Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -11539,9 +11542,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "bd05cb6266085b33c703f281f49dc2073f16ea122ee4d5beb44ea57473f02070",
+      "beleg_id": "a18c8f472b9f785e30d50d193d697c67bd05d0f2f7011863406384664a839707",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:26:11Z"
+      "zeitpunkt": "2026-10-14T05:31:37Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -11587,9 +11590,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "4fa9a24719bbd5e8a21904998d9ee6ceba1024d3f18919924c3d8b1b2c4bdeaf",
+      "beleg_id": "840d821278b12b4d2a0c9636715907afbf5f476c87b228793d94f4b2fba955b2",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:26:12Z"
+      "zeitpunkt": "2026-10-14T05:31:38Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -11635,9 +11638,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "568ffbf0b77b2af7efd93d09bce5fdc1e0735e13b75cf4d552afcbf3df75d0dd",
+      "beleg_id": "d1a850194e4e77a8ee89e8b2ac9a46cfb17998b1a464343a5267c8b6bc12c697",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:27:17Z"
+      "zeitpunkt": "2026-10-14T05:32:35Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -11683,9 +11686,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "f9327bc7c616999abdee67887e0c55ae174af526f422b37bbfa69de9627fdacd",
+      "beleg_id": "36847eee8795e08c845f9b940747f003c3a408568344759af2e4fc9c06551158",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:27:18Z"
+      "zeitpunkt": "2026-10-14T05:32:36Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -11740,9 +11743,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "71fac3c9c4dcb326bc8b09a8f5c410e9fa73e76e2595a2cccea595037ac03075",
+      "beleg_id": "0c362bdb8569c6836d9a4d8dbade4e711c4f26fe4f189df5f8b631f9d76af694",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:27:18Z"
+      "zeitpunkt": "2026-10-14T05:32:37Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -11788,9 +11791,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "0821964428ef1be0760ecf66f267546f809cc72723340c0c21b1d0b56dfa001c",
+      "beleg_id": "36182b07ed7f37b4df13a7ba2cfa40b8e8b077f529a5ca979edb1d9045b7ce51",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:27:19Z"
+      "zeitpunkt": "2026-10-14T05:32:38Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -11836,9 +11839,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "ef2449be4b88dbd0bc4535e0b997b06b1d004c4d4cc5ce728de10a74ceb3f445",
+      "beleg_id": "ec8d1006a3081530583d9481f2cc30906af7c102a7a31d6a91c0af9a3e50d6d1",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:27:20Z"
+      "zeitpunkt": "2026-10-14T05:32:38Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -11875,9 +11878,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "0d2476ca20fdbe2f2c99b19863a3c0e79c1703b2f03ef5d6bfa0fe10f87e5069",
+      "beleg_id": "9dc204dbc91c390cf8d118b196bb9d003ea0fb9fbb6d269f8ca2f8fbf0b40a86",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:28:10Z"
+      "zeitpunkt": "2026-10-14T05:33:36Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -11923,9 +11926,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "c221fd5794ff05068f338701e03a950eeae36b7218900ea0cba8b5094f327ddb",
+      "beleg_id": "35a0d98fb69babd72bd1e47250d78cbc4f0d31fb7cc7689d09ae86c471de461c",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:28:10Z"
+      "zeitpunkt": "2026-10-14T05:33:37Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -11971,9 +11974,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a7aa4b1ec52ae0eb1d212b18b4eb071e82ebd856741ef5409971fca05867172c",
+      "beleg_id": "46678b39f238adce41a2f92f7cd73901d166053f758b36945ff3b0cc42495ad7",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:28:11Z"
+      "zeitpunkt": "2026-10-14T05:33:37Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -12019,9 +12022,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "5a93ccf3d3de431090dc5ee1a0bd6f35d4dccbd00fc13325d42d11628b9b46e9",
+      "beleg_id": "be77fe532a542aafbe938aba44d76d42c7fe78f4fc0e5f1b58f60a394169898c",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:28:12Z"
+      "zeitpunkt": "2026-10-14T05:33:38Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -12067,9 +12070,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "12d49d30fcc5768f15b412790ba93edf6def082218bae930c4b066d16ad78895",
+      "beleg_id": "d70b41b39d37c6b0d6bc181d8481163a1cde0d3893645f4d6c6024818baa56cf",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:28:12Z"
+      "zeitpunkt": "2026-10-14T05:33:39Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -12115,9 +12118,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "0e0c169c461d26983a2407ee6b52de03289a245a25518c0ecaca7fee2fed5415",
+      "beleg_id": "6ff51fad229d5c6f220a14fdf4f7c5f40d502e31187e78aa0e8d8d88c01194ad",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:29:18Z"
+      "zeitpunkt": "2026-10-14T05:34:37Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -12163,9 +12166,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a1541e9e4100249ef16104d62dfcc1420d213e780ba454803474cd01d524970c",
+      "beleg_id": "9ad0aa588a417e97ced9869d07ec13a34a1ead810f2073d4377234600b0b1a08",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:29:18Z"
+      "zeitpunkt": "2026-10-14T05:34:38Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -12211,9 +12214,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "6628772928944b7b6a2d25312dbfca9803f73b6a37af59289a329ed7e76e2657",
+      "beleg_id": "44bac6cb9eec03930c5c7a8fcd71777c1f3523952bf3fe5d1bb13c8adefa4169",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:29:19Z"
+      "zeitpunkt": "2026-10-14T05:34:38Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -12259,9 +12262,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "d360bd4d6102577a13b6c9d04318e58037da618fd1967295a40d0cf595259d92",
+      "beleg_id": "3bff458198cff3ce7afa03c119c8982051d61b31830445c61480c8ff9770ed98",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:29:20Z"
+      "zeitpunkt": "2026-10-14T05:34:39Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -12307,9 +12310,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "21e2c423e1c822853ad753b2743f242714b2d6a1acf15763b8c063dc2b9ddc5e",
+      "beleg_id": "83cf985e3308340b1ec537412d9a51406da3882e5b449b4a2f4763a1dda5ac5d",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:29:20Z"
+      "zeitpunkt": "2026-10-14T05:34:40Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -12355,9 +12358,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "daa06ef897d810a528f56455b57355c68e54f02c3058a62f1c4ec39bb3158039",
+      "beleg_id": "3648d412496410ef285228d11739f26a982afc852008c2d5f0dcb806a987d342",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:30:26Z"
+      "zeitpunkt": "2026-10-14T05:35:51Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -12403,9 +12406,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "c7e403ef8e7ba0a741503a8f69ea8d726c0bec88c236b00cb7b1f2b36bcef769",
+      "beleg_id": "556ce151637b6096b3a220379093a53b4b97181261f860a5876cd34923acee93",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:30:27Z"
+      "zeitpunkt": "2026-10-14T05:35:51Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -12460,9 +12463,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "584e5915db70c0f7d4e215f594f150a635b4be7e411524d185e0d44fb6bbe665",
+      "beleg_id": "9e307ad52064cb1fee5566ac68f3e42cee815a68bcebed6e876bb6f20cdd34a8",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:30:28Z"
+      "zeitpunkt": "2026-10-14T05:35:52Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -12508,9 +12511,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "963c45489d6886d79c8c0c52b657190c5667370320d1a931b13d17e8b0689035",
+      "beleg_id": "aa4d7d46ddfeb076b8aced5c1f760dee3a1e71a677ab5ef1dee1510a374ed51c",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:30:28Z"
+      "zeitpunkt": "2026-10-14T05:35:53Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -12556,9 +12559,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "15d8bc834b9c2db8751088c909d9c69d9d0c10f386b6c575d507172c8e37035e",
+      "beleg_id": "5db1a9daccebf619b99618bf0d060e425efbc971300633dad70faca7497acc1b",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:30:29Z"
+      "zeitpunkt": "2026-10-14T05:35:54Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -12594,11 +12597,13 @@
     "dokument": "complete",
     "geladen": true,
     "offen": {
+     "cdn.dimml.io": 1,
+     "collect.vodafone.de": 1,
      "tags.vodafone.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 16.0,
-    "takte_ms": 12300,
+    "sekunden": 18.6,
+    "takte_ms": 14400,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -12631,9 +12636,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "0812457bc794f1162ef70794bf82e6e0ce8b435d428e965de1f9ffe7d482918a",
+      "beleg_id": "afea73f2996afbcd6038cb1ac332020c3bf12b232a736e9050c1aa05f7daf171",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:31:16Z"
+      "zeitpunkt": "2026-10-14T05:36:46Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -12679,9 +12684,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "bd0bb71a62f349a6b019a1afdb68b5d0392cdfd445cca46c1598352126279b1e",
+      "beleg_id": "855f22a18efdc0456ab5d12bff1e7f0efb66508c8b11137955d003ea26b9d97f",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:31:17Z"
+      "zeitpunkt": "2026-10-14T05:36:47Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -12727,9 +12732,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "02a7f960b77b340b703c11d2c11359c164d38d2a45e64eb24c33d92cf6fb98cd",
+      "beleg_id": "1d7c6d5837ffcb9d19dcd4573ba67458c90fd26f5c2414b2ee5ab562ecd6dced",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:31:17Z"
+      "zeitpunkt": "2026-10-14T05:36:48Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -12775,9 +12780,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "67e0b69d00502daf6fca7c0c61bbf33921ab2f2030324605c9cfb018794d1062",
+      "beleg_id": "bc5484d2083e0f3d5745aa8678b358c2df70b2d0380614dbaf03ec886f0d024f",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:31:18Z"
+      "zeitpunkt": "2026-10-14T05:36:49Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -12823,9 +12828,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "35bcf987f4f4ebc04a93771a42c6f27ed5343cccd34324f0603afe1ad290ce46",
+      "beleg_id": "1ccec38c70e03fe92b46d124741d5f93a5b7367c14aaf01c04571299546bb135",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:31:19Z"
+      "zeitpunkt": "2026-10-14T05:36:49Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -12871,9 +12876,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "4dce9cb12be01c7567adee2e11c2d1332fe07eb5f33e294b30ed1438dc107fc2",
+      "beleg_id": "cfc5b7c2027921d1a7c9260c3e14bab53ad298ed882a26c506c48ef34ab8b506",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:32:08Z"
+      "zeitpunkt": "2026-10-14T05:37:45Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -12919,9 +12924,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "9f3d9ddff2a712bbfeb4a6c8e8ff7996929860055daca09412c525089fa7db14",
+      "beleg_id": "75944a53c5a884cc031957f7da9d1a62570a3cbd1d5a707b440019d781ed07d8",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:32:08Z"
+      "zeitpunkt": "2026-10-14T05:37:46Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -12967,9 +12972,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "325d1c6069f4cb41f5dfd36da2c8544d3161bb8ba5cc7ca58c4a59a6b10bc2f8",
+      "beleg_id": "50187f80f33b6ba2bf9aad98692015fe89274f0d10d8a8cad6c281f13fa33504",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:32:09Z"
+      "zeitpunkt": "2026-10-14T05:37:47Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -13015,9 +13020,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "caefd37457905a47896f544404b5749a28e1f7adddae9883b3336d777f408859",
+      "beleg_id": "b8bb6f369560f73212f7cbd453dbe455869d7c0fb96932665f7d0e79f18d4ee0",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:32:10Z"
+      "zeitpunkt": "2026-10-14T05:37:47Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -13063,9 +13068,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "7d709bdfe98e122da21b9a6da3b7adc8929b1b8f2ec38bbad7d60243e320ab7f",
+      "beleg_id": "1e1e697a537f458fd4397401840d836800a62934a15f79b1fc220dec7251ec0a",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:32:10Z"
+      "zeitpunkt": "2026-10-14T05:37:48Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -13111,9 +13116,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "bb4abbf2738b890ee9d40fc41f5f276423240cbeeededf3d9bd83dc444ae7485",
+      "beleg_id": "3f02bf3567124fae00fcf575fc873084b69ddfd7a01d06b8e8b96329856772a7",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:33:12Z"
+      "zeitpunkt": "2026-10-14T05:38:55Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -13159,9 +13164,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "48fd059a9103b3044e12de5944b315fd04d783b48ef686533ec46e9dd05d0aba",
+      "beleg_id": "82dd7f0e726828b676ae3584481e5c20ea3a6820269013c71019f880c4eba82f",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:33:13Z"
+      "zeitpunkt": "2026-10-14T05:38:55Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -13216,9 +13221,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "6dc848c33ddc789c7a75fbffe789b98be324858a7d8679bb6ed9f6f6d6c89c12",
+      "beleg_id": "6f857fef8bc19446ee6866648d618a14866bbfdf21b68889deea99967eb445d8",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:33:14Z"
+      "zeitpunkt": "2026-10-14T05:38:56Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -13264,9 +13269,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "d22fa32c4495e2497928a867cc86c2f33edab5e9fa72d0af23b6fa5dcc013967",
+      "beleg_id": "97747d74af1aa0eb31af39b7ca6b6c922329f7b061b677627eaaea082e6684c5",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:33:14Z"
+      "zeitpunkt": "2026-10-14T05:38:57Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -13312,9 +13317,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "a6c70fd16347df4efdb875f728cf4b179b27777ef02ef1007eb53c91978ef038",
+      "beleg_id": "7de138d23a9768ace7de9af17f1b8ade5ba907c03a3f7503fe8d661fd5bb1850",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:33:15Z"
+      "zeitpunkt": "2026-10-14T05:38:58Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -13351,9 +13356,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "4ae21ac29b71b128fd59fadd61c1858b150837f51910af492fd8ee06e6a7ad97",
+      "beleg_id": "d48d2680a2e91526864669dc8afeb2433d1fcd32671bbfbfc7a6eef0921b9386",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:34:05Z"
+      "zeitpunkt": "2026-10-14T05:39:54Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -13399,9 +13404,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "10bbb5a84ca103a85f51ec8cbc0e09c6aa20ae8c707c816dbce44ce63b3a0430",
+      "beleg_id": "2a8d06803cc8d8f1e4c50f3e2ad9550e866020cc6d550f6ee5ba7fa70b007c27",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:34:06Z"
+      "zeitpunkt": "2026-10-14T05:39:55Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -13447,9 +13452,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "1ffeb25da39b1bead09a0085c72c39b3d7994ca51321cd2d27ad1c6421dab488",
+      "beleg_id": "d36166a1a42fc6f02e123434cc68b64906df614a0680240f2fac78cb8310ee6a",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:34:06Z"
+      "zeitpunkt": "2026-10-14T05:39:56Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -13495,9 +13500,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "03f70670ec388268864c8a552056a4915154d99e6b4514ea357c306d32e9cd65",
+      "beleg_id": "bccfa3853abafb6f108a7fc197db2b1e104161bb8bb3b6bc533fd764cd8ffc82",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:34:07Z"
+      "zeitpunkt": "2026-10-14T05:39:57Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -13543,9 +13548,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "aa799eb6b97c892bcfcfb0e19e52aafa0c38cfacf8ce400600b4b670180c221d",
+      "beleg_id": "9ba60aadc28e926c7ef2905ccc29f8fae008979d8a16a9f094fd18c22c313e0a",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:34:08Z"
+      "zeitpunkt": "2026-10-14T05:39:57Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -13591,9 +13596,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "78cf139b602f2ffe3b840d03510efab0333c5c9e531ee15fea93f272f5cb9798",
+      "beleg_id": "b6f661c497572fec3564a327efd0ee6ad53e099c85c76b0115acd80e756e0488",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:34:59Z"
+      "zeitpunkt": "2026-10-14T05:41:07Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -13639,9 +13644,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a7f2a5dea7c9dd1436b4a43d531f95fab7d21544522628beadd49f5ce472bbf4",
+      "beleg_id": "2f24c992c19a7bd62478e2a1b49633eb100b12979d7ac7d5701f4f08ef719da2",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:35:00Z"
+      "zeitpunkt": "2026-10-14T05:41:08Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -13687,9 +13692,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "8ce6ea1b859bb9e4dd9c22df8ea5e960a54cbc6c8caa617a69553f7fdae8ac30",
+      "beleg_id": "8b8db378feb0440bc40c4ff3c25c04a993ed2f8535a8100c7bf72c7cb503f950",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:35:00Z"
+      "zeitpunkt": "2026-10-14T05:41:09Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -13735,9 +13740,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "8f2eaa19cc738c4ad9178b3c78273e2b6d73cf21c5544ae76ab20e250ee0d4f3",
+      "beleg_id": "88c9363fb32ce93573461d8cb0793b8080bff2f467dc0925d8d0075c945dffdf",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:35:01Z"
+      "zeitpunkt": "2026-10-14T05:41:09Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -13783,9 +13788,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "0e2afc0742c25b075e190e6066ab0f352c11c41cc69c21df30408f21591861e9",
+      "beleg_id": "2813057d10b49f12c73170256fccd22ca7ecb3d6402c1f7311e28c05dcb9e776",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:35:02Z"
+      "zeitpunkt": "2026-10-14T05:41:10Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -13831,9 +13836,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "dd1386ff0514f3c8ffb04e712a52b08c413ab7a2a6e757019368b9aef949c9b3",
+      "beleg_id": "6d5f97547c4f5d0c73578136eff73da09403d4fb884e088be0743f6eafb11bd0",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:35:52Z"
+      "zeitpunkt": "2026-10-14T05:42:06Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -13879,9 +13884,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "2e0ac4825a174cd04add703584df17962223fa3326710404986161439e31d14d",
+      "beleg_id": "528e5c694120d047eeb36c520fe892e0569e13e29294816910f80941eecf8300",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:35:53Z"
+      "zeitpunkt": "2026-10-14T05:42:07Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -13936,9 +13941,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "74efbac6b0002f77f6ea2b5bf50ac5cb0f5c371e2d01a740ee65d7d126069197",
+      "beleg_id": "c977556b9172dfd651081ea7f4929235d659b8c5fd9ad3e3a886d42fee2b807e",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:35:54Z"
+      "zeitpunkt": "2026-10-14T05:42:07Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -13984,9 +13989,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "e2dbcfed048a0160a5a123fd4e404c1335acfd08c161849f22c850e4f44bd9d8",
+      "beleg_id": "5a2bf11cb81b4fdbf5e56f8a3c02fbcd34167061b1fbdb244037710f2e723589",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:35:54Z"
+      "zeitpunkt": "2026-10-14T05:42:08Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -14032,9 +14037,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "a4431b9fdfc98c12d14ea62e492e24c6c8cd2c8aa1a30fb91923df954dc31bba",
+      "beleg_id": "ffca21d0ed945da9fd0720082a517a040edaa0cf8529390221dd8914472b094d",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:35:55Z"
+      "zeitpunkt": "2026-10-14T05:42:09Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -14071,9 +14076,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "d9a04037f758eb644a2b408c7e93685fd135eefab42bcbe4c1f7fa5510f43f74",
+      "beleg_id": "c1e244f693c16df68eab513dc6b0264e1459ed72a446cec8b702c2a0a0065b60",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:36:46Z"
+      "zeitpunkt": "2026-10-14T05:43:06Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -14119,9 +14124,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "c8556d94c354e15044172f94792a9b7ce185ec216da372fa1bfebe9568bd2951",
+      "beleg_id": "f3022448774caaaace4ab6a53d71b777c81abd9b90c6202c9fbb504d81c83d1a",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:36:47Z"
+      "zeitpunkt": "2026-10-14T05:43:07Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -14167,9 +14172,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "cb3625782330d5c78832df8c4796d74105261b083ef64858f19c01c227fb203e",
+      "beleg_id": "5b39d41902f4c64e5cc12fed36b80075db138394c764c816c81380f21f7f5c3d",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:36:48Z"
+      "zeitpunkt": "2026-10-14T05:43:08Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -14215,9 +14220,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "651f42610b8bd30e4c8262c74c35a5e451ce9d0fbed40f777d87cb921892701c",
+      "beleg_id": "eeaa3ed3804e8dbfc656767ea3ddee86b9a691f22fb7d175e2a12afa080a177c",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:36:48Z"
+      "zeitpunkt": "2026-10-14T05:43:08Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -14263,9 +14268,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "d92966c107968e3d6478f26bdcd03326e0bfe3abb3112db5ef2838611d41a568",
+      "beleg_id": "5e34339cbf8e0a601574c6638c07bcaac816d95045e9b6d3667a11c3cb8b88d8",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:36:49Z"
+      "zeitpunkt": "2026-10-14T05:43:09Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -14311,9 +14316,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "3cb87ceeb5092fca66145befe25bdf8ba17bf08bed41e8c7cb3bd16b8b1390d4",
+      "beleg_id": "6601c5755da3406ef2101ee0cf5c19bee3713c3d60693b27377c863ae6e4daf1",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:37:41Z"
+      "zeitpunkt": "2026-10-14T05:44:22Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -14359,9 +14364,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "ef5b4c39b672eb78ba426f7b1f64dc7acc4b8ec5d467e68da8e243472b423be7",
+      "beleg_id": "e3cfc019cb056c1bafab03daf0b1760110eb90e2641d2841bd6dc1e1eb6464fb",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:37:42Z"
+      "zeitpunkt": "2026-10-14T05:44:22Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -14407,9 +14412,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "42f89a7304db4ecdabea57912556065eca43b974b3aeb3e14c779e2044815073",
+      "beleg_id": "d42c82cc9b0fa99ffa2e28ef13f91527be3abe9b34be2af4415a9b31b5d41e93",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:37:42Z"
+      "zeitpunkt": "2026-10-14T05:44:23Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -14455,9 +14460,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "45f1d6b067bb504bd169eb663f52df3a93753f0b8f6c1fce31c0d5b9a3fee9b3",
+      "beleg_id": "9b458be238422a93121bf818789ce1a06f83858fe471ed5cb84eae7eb8dcfec9",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:37:43Z"
+      "zeitpunkt": "2026-10-14T05:44:24Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -14503,9 +14508,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "7a9cf5750c94c5fbeb1eff1254cb80197070f6718e4b348042ddd445797a5571",
+      "beleg_id": "5ed44ddfbc65d5daaf2b4f83bfbf280c45c80c68047ffa54f3b38478c7835fd6",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:37:44Z"
+      "zeitpunkt": "2026-10-14T05:44:25Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -14551,9 +14556,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "84c321b73f56a7fab2f974fbc90ecd162caacc07cd9bfee844ef464a1b97d802",
+      "beleg_id": "48b13f9c171c6ce169d0e9e8836d59aa1a4b86ee36572c91ed39a7c8c2787cb1",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:38:34Z"
+      "zeitpunkt": "2026-10-14T05:45:22Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -14599,9 +14604,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "2acd8ed546f86e583eaf16cc3d71807fb124c21b79abe6171e1933076d8c9a3a",
+      "beleg_id": "34bdbee0b6ea297aadab8dbe87a984b97e0b5060d9769823b100368f85dc9dd8",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:38:34Z"
+      "zeitpunkt": "2026-10-14T05:45:23Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -14656,9 +14661,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "1bf76fccef3602fb0cca5eaa3acdd9780d3623120eb6c14030811c751e925dd3",
+      "beleg_id": "554eec2f3a6184c9eb86f23e536152fdf1bf839c98a588dfd6fda514f9588f73",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:38:35Z"
+      "zeitpunkt": "2026-10-14T05:45:24Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -14704,9 +14709,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "1e56d6bba98157a45d9bdb363f6e93a1a6fdffde7ad75cd4a271b4ef9bff0e33",
+      "beleg_id": "cb716ce35d0d6b0bd744f81dab8af30d0614f994e04ec68d96bf1b881a93477d",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:38:36Z"
+      "zeitpunkt": "2026-10-14T05:45:24Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -14752,9 +14757,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "edc34b8aa7d9de2b5a7cf25fb73e447c054ff335de1f29491dbca596f576452e",
+      "beleg_id": "577eba879f4bd6fa0d3cb0ab3f6fe05112d868daa3f4a6ed002144396192e09f",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:38:36Z"
+      "zeitpunkt": "2026-10-14T05:45:25Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -14791,9 +14796,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "1498218f7284ee1f224ba6b1b4e2c4157e2f3fb3023b9574f0b4f8bfcf806f5b",
+      "beleg_id": "fb2379f1761abbca90c59acc8612443853a80b36704c7109cc7ed59de789100f",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:39:25Z"
+      "zeitpunkt": "2026-10-14T05:46:21Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -14839,9 +14844,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "b6659264852ad5a057ad6ff2ccf4be61305d8a2de1706cad2fb77e4eadb383ff",
+      "beleg_id": "f6dfa16eb0b12e90598d83642d031f33b5a82ec1b9845db65c0778d408da90fa",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:39:26Z"
+      "zeitpunkt": "2026-10-14T05:46:22Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -14887,9 +14892,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "0a996875a88bf56f3285b29e377861e1a1bb7a85249bae8dd8cfad7f18064c3c",
+      "beleg_id": "170dacf430ae616fade69a5b9bac5c844e6a91a15f7ef607b134cecdaf704812",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:39:26Z"
+      "zeitpunkt": "2026-10-14T05:46:23Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -14935,9 +14940,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a3e58ccad011854a5801e2f8f1ad48894a8c558760ebd74db4212d043f1c2228",
+      "beleg_id": "2ba8972bb40f9a9d99e76e7bcd558fb0617e8d045b1fd183c515421a13ecb08c",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:39:27Z"
+      "zeitpunkt": "2026-10-14T05:46:24Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -14983,9 +14988,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "71c6dd74cc497c28f226238bd31f7028859f902fae386db82530a631d48595d5",
+      "beleg_id": "b5264bdc6a6291dd155fc4b24562590bb9385a5621a3497c514a7c0fea47a735",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:39:28Z"
+      "zeitpunkt": "2026-10-14T05:46:24Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -15031,9 +15036,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "2c58a919e933a33d02ea8b385dc1e648eb8a6e0d1987852a282acff4ff0a01ac",
+      "beleg_id": "93dfaef032ab5b74fc0632bb9ab6a72210697d25c7a221f44026953e15a3b0db",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:40:32Z"
+      "zeitpunkt": "2026-10-14T05:47:24Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -15079,9 +15084,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "b9502b6e8575f3fd1ccacaf3c508b6e5dca7038380705488fe693068f22865fe",
+      "beleg_id": "a5d87b91434d9cff569aae04ea9468df5c742a09b287da7e2a21183881468514",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:40:32Z"
+      "zeitpunkt": "2026-10-14T05:47:25Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -15127,9 +15132,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "d2a6beaf5c183dc7b0eb024c312c6d8d6e2efe81ba2a403587e733e12d030132",
+      "beleg_id": "61bb5f26e4de8b76c60282ba367cf8c659e5efd972c8bedfe4e3be1c8e288cbd",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:40:33Z"
+      "zeitpunkt": "2026-10-14T05:47:26Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -15175,9 +15180,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "8fb46b2326d21821f53e1615c6670c589af5a775b887a3068b1da86aa3bc0064",
+      "beleg_id": "7df48f853bf659424b9a00df4d4b43d87875e5077e106d0216be93bc0408df4b",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:40:34Z"
+      "zeitpunkt": "2026-10-14T05:47:27Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -15223,9 +15228,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "b2295607332e8558d8f0edda8470ec7fba556ba3316d8932488337c2c85ae7d3",
+      "beleg_id": "bc3923647b6af29d410991e53fd8f27a0acd33afb6199c011dd29e1db8327e6d",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:40:34Z"
+      "zeitpunkt": "2026-10-14T05:47:28Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -15271,9 +15276,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "70393179d108431853235bd459686b4b880cd0c4a0650929e5ef3d3c64603a49",
+      "beleg_id": "91cbb54c26ef28786ccfc10e91e4d42572fa0cb43ab027e7628bedde2228d709",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:41:27Z"
+      "zeitpunkt": "2026-10-14T05:48:27Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -15319,9 +15324,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "32546cb3c134dfa22693eb4adb3e35dd655fa73c95ec4a9498e1346a35da8cfc",
+      "beleg_id": "2ae8ddfd930353e08ddb4dfa2aa3ed2e8fad86c5f5a4d27f7979633f20bee841",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:41:27Z"
+      "zeitpunkt": "2026-10-14T05:48:28Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -15376,9 +15381,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "2465a4743e1ec5fafb556d561ed39c6f073b205031943b88cb60ed452b809568",
+      "beleg_id": "4634bda20016b3a3612f2ed80197323f5a22a489ef768aa9755d6239b56cfee3",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:41:28Z"
+      "zeitpunkt": "2026-10-14T05:48:29Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -15424,9 +15429,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "b6924d9ee36b3e0120ca4cda53fe5c60ab808ddaba7702a6f96f309efa73ccca",
+      "beleg_id": "cb69735390a041d469f710f60a71de0d35fe4e456a94908fdbf001b3aebf3813",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:41:29Z"
+      "zeitpunkt": "2026-10-14T05:48:30Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -15472,9 +15477,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "e4b3866a349877d30ba99cf49e2c966a39d69cae35570c9e9a726df4e1b95178",
+      "beleg_id": "29761e2d35d658b7963bc6d0b6a2735fc0f8c75360d7975943126743ed8b8670",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:41:30Z"
+      "zeitpunkt": "2026-10-14T05:48:30Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -15505,8 +15510,8 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 147,
-    "beendet": 146,
+    "anfragen": 150,
+    "beendet": 149,
     "dokument": "complete",
     "geladen": true,
     "offen": {
@@ -15515,8 +15520,8 @@
      "tags.vodafone.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 15.2,
-    "takte_ms": 11900,
+    "sekunden": 19.0,
+    "takte_ms": 14600,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -15549,9 +15554,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "e1525c64ae7fe1c30afbbf017e05ed44d0bca5dbbef6a8b1fcdca7baf1104e2e",
+      "beleg_id": "fe115c0fd7a1f451338fe5e016c98a9f2eaa7bb87db1d60129c45ffac93d0a0b",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:42:16Z"
+      "zeitpunkt": "2026-10-14T05:49:23Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -15597,9 +15602,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "6bbba522b7d9dab225350695e68154b2878dd7fed76cabe9e71b88e12fccff5f",
+      "beleg_id": "504ecaafdc3eed7b7b6a6fad24745f35651f93c032253978e3c75fe0485440b1",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:42:17Z"
+      "zeitpunkt": "2026-10-14T05:49:24Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -15645,9 +15650,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "c1b273d68891ed909e3524fd22e53b315dabdb2ca54047886dc982c3773df731",
+      "beleg_id": "bdcf204eecdea4225ccc4a6a9d522192d02f33173793a34499d7d913ea43650f",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:42:17Z"
+      "zeitpunkt": "2026-10-14T05:49:25Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -15693,9 +15698,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "e002fa5ddc0d4116b5e499839be899ba3873497a4db4b820f3911a9c4a8223e8",
+      "beleg_id": "626dbe247b2013b744c89455e5cecfe212a1cec1eca606f26b659498eee98d05",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:42:18Z"
+      "zeitpunkt": "2026-10-14T05:49:26Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -15741,9 +15746,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "6df34b4b8a2f9a070dd347fbc8899b94fd4ac5e8ebfb39ce3f7969f215338e30",
+      "beleg_id": "88730e6a84f0b075ed754d2c3a6ea8e764ae0e6de5a11b1a44c50967f2cdd290",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:42:19Z"
+      "zeitpunkt": "2026-10-14T05:49:26Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -15789,9 +15794,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "2ac573a367f7a8ebdec388107622b906c8b50fc1a7a3ba8a09cb086906f8b5aa",
+      "beleg_id": "a375b94ac40c31b5b35b0cda5dc2661481b9115ea2d9e47bded6addc9af6ca11",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:43:08Z"
+      "zeitpunkt": "2026-10-14T05:50:34Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -15837,9 +15842,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "cc60c028e4eda97b6418c6151450f4ca8783044745ae1469f94ede4ebd290fef",
+      "beleg_id": "d4e7ff8396363e1e1180b9095b437c911ac8ff54656dfcc3f43a378e51823546",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:43:08Z"
+      "zeitpunkt": "2026-10-14T05:50:35Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -15885,9 +15890,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "18c1ad33696999072eb0a3e9d267236fe37b1ad9d072e9c4ddbce32034501cf7",
+      "beleg_id": "0867c4062b043a50b06b0ddad8a976c456eba55be2d15dddb6f3c7bd2b737a5f",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:43:09Z"
+      "zeitpunkt": "2026-10-14T05:50:36Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -15933,9 +15938,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "193694f68fd69a57db14173859c4272486add41a0c10e47a6c03b86dfcf9ac08",
+      "beleg_id": "804a4c3164d2696a1502b659be7509f174adefc6456b9cfd95b5b3021633aca0",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:43:10Z"
+      "zeitpunkt": "2026-10-14T05:50:36Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -15981,9 +15986,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "86c900f01fc46814f680a980a76b7d2935856de023242a50726413886f5a5827",
+      "beleg_id": "403780c6173f432c4a13c74e6316428182e4d399328cd73472db2cc9a2cc2aa7",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:43:10Z"
+      "zeitpunkt": "2026-10-14T05:50:37Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -16029,9 +16034,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "858d83a8c3558dfeaaf0a71bdb2ddaadd9f200bd14cb3b054f81224933843fe0",
+      "beleg_id": "0020c48650379c74f601f3da4b810402dc3c9f1115a20025d74a8427f3691712",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:44:00Z"
+      "zeitpunkt": "2026-10-14T05:51:43Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -16077,9 +16082,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "e133702287c5703762376bd7b0cef8ef3b4455c5d6c054930f84321a18cf4c39",
+      "beleg_id": "a75e7879e8a4cb09a280fbda2ee3d1ae2834b50523615e4c60d5d23544eab898",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:44:00Z"
+      "zeitpunkt": "2026-10-14T05:51:43Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -16134,9 +16139,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "f288299edda8b770f34c2afab88f296fe5c88567caa55070b3a52f9bf27d80b8",
+      "beleg_id": "dbce40adb2ad58cf45beb32c460486da73d245f114392a5c288775e1a9e8960b",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:44:01Z"
+      "zeitpunkt": "2026-10-14T05:51:44Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -16182,9 +16187,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "1110a9ae0209235f579b961361ebb39367ce94b86d99fe6acb1f3580b5b4c428",
+      "beleg_id": "ca6b861a7753e201eb6dc722edc2e81a0748f23d304640db5ebcaedae48792a3",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:44:02Z"
+      "zeitpunkt": "2026-10-14T05:51:45Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -16230,9 +16235,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "e95443c0922db4896c489b5b7bdd083c7b18318e8db93dc6a6c6ce1476abf2a2",
+      "beleg_id": "cd5167011491f1fbfe7b48c50f3287b977fcbb368c9c621e58ad7c73775f3b5a",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:44:02Z"
+      "zeitpunkt": "2026-10-14T05:51:46Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -16264,16 +16269,17 @@
    "ladung": {
     "abstand_s": 2.0,
     "anfragen": 201,
-    "beendet": 196,
+    "beendet": 199,
     "dokument": "complete",
     "geladen": true,
     "offen": {
+     "collect.vodafone.de": 1,
      "tags.vodafone.de": 1,
-     "www.vodafone.de": 4
+     "www.vodafone.de": 3
     },
-    "ohne_antwort_ms": 0,
-    "sekunden": 15.8,
-    "takte_ms": 12650,
+    "ohne_antwort_ms": 550,
+    "sekunden": 18.0,
+    "takte_ms": 13850,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -16306,9 +16312,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "be7484e7e1118c3f12a9e424afd00794cf1ac24c4a408266040378c3a4dae8ac",
+      "beleg_id": "098f221473acefacf4926c835b2b8aa98980afee69b4733257a070e835668d74",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:44:49Z"
+      "zeitpunkt": "2026-10-14T05:52:39Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -16354,9 +16360,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "41e1808a3fd625c0a041f9cb7dd22f80663b1347302a61a8ef98d1f4774c3c30",
+      "beleg_id": "25188ed41f6b86fd4839c72a75df584211a1b5496c8e9ea044c495df34c6e8e6",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:44:49Z"
+      "zeitpunkt": "2026-10-14T05:52:40Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -16402,9 +16408,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "d830cafe599e11def8b2a9387ce84c8568e571baa3baf938be639864ebe57724",
+      "beleg_id": "d6569c00ebe9e62a7b05bac80ed066a90a3ea5925e873815771bc485e8f4384e",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:44:50Z"
+      "zeitpunkt": "2026-10-14T05:52:40Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -16450,9 +16456,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "756369eb8f48aca7c5099b6401760ef5ef34617351ea6d8e998bd5793351ca58",
+      "beleg_id": "336c20a3772421f13cf20782ecafcb57d89bc9201dbf72124e82dc4288c34077",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:44:51Z"
+      "zeitpunkt": "2026-10-14T05:52:41Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -16498,9 +16504,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "cb7138ba7cfdbe40e929c4a85c5ea0d2b56bfe22d31a761cd73fe8709151d22f",
+      "beleg_id": "a1296fc14edfc1756f37187c584004fc6329f38cdd6c80b6cd2a41877aabf4aa",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:44:51Z"
+      "zeitpunkt": "2026-10-14T05:52:42Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -16546,9 +16552,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "ea65694325cec2692bc741b01e0806445c1e645156181e3ecbc3b02581dbec04",
+      "beleg_id": "2984ec11f1c42a3cfa828f106e7a4fc52d16f45b2543a3719da8915e88fcead8",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:45:42Z"
+      "zeitpunkt": "2026-10-14T05:53:50Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -16594,9 +16600,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a7a07d091a00ce37645f08c4cda49bc2a90efccfc972355a0c498ec67c9993b6",
+      "beleg_id": "8f8ba3d558fc77f960f432b515dfa2a3d60948b0040600405e3ae6ad6e5d016d",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:45:43Z"
+      "zeitpunkt": "2026-10-14T05:53:50Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -16642,9 +16648,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "78717b1fa9a3c9e4796bd837f6b361d61db376da6332af06731bfdd81f0bae1a",
+      "beleg_id": "d2b9a8f35fc364f75c7d41d81c4dcc0dc75cf5774ffd0d694b8e302ca7bfdcbe",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:45:43Z"
+      "zeitpunkt": "2026-10-14T05:53:51Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -16690,9 +16696,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "e31af0fa5c0d9d67990fa167381f9b7fd61319ddaa2fa3bf0cc74ff80f1842da",
+      "beleg_id": "8875ea0808c5c59600a4a2d545c2e247e5dd7ffb4921111238137202ada1bc1d",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:45:44Z"
+      "zeitpunkt": "2026-10-14T05:53:52Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -16738,9 +16744,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "071d8b738e69d2f919761667b12d138437bc83877ec5a0129dab6a45e00fcd7b",
+      "beleg_id": "47b3cca8f65a4bbe81667126d4475e49f4b052be4ebce501ba9a9620e7ff10af",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:45:45Z"
+      "zeitpunkt": "2026-10-14T05:53:53Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -16786,9 +16792,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "c9c5a76203da69dec35edf4c232e997e3a963e5ced2b376ae72241e3d2a85af5",
+      "beleg_id": "de74a7c9711001ccfc03313f65454d9d09e78c6e124b43075d58748aa7cce52b",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:46:36Z"
+      "zeitpunkt": "2026-10-14T05:54:59Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -16843,9 +16849,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "adfa7eacfea7503f4fa5c9a60a60711d0dd3c83f238ac0f84e68ca448e4549b6",
+      "beleg_id": "ad81742dd6e2907ef61d803a7f534aaa4945a8c6069c4cd7401d0dd65d923459",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:46:36Z"
+      "zeitpunkt": "2026-10-14T05:54:59Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -16891,9 +16897,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "8434eed80cea28d8886078967912b4354fb0eea06e5e2ee79d5b919ea47bb044",
+      "beleg_id": "806909a1de2c5996a6826ecf2786291a1ff86beb104e37faa152e2f070810a26",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:46:37Z"
+      "zeitpunkt": "2026-10-14T05:55:00Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -16939,9 +16945,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "3bc392a4ad6b807b091317b8b13f06353443bf44ba0663898d58c1aaea233e73",
+      "beleg_id": "830d9942570b94e5db3fde97115d11491d7fca3b0d9e9284718d5c7c5f0713fc",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:46:38Z"
+      "zeitpunkt": "2026-10-14T05:55:01Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -16987,9 +16993,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "287317b8c0c5320b59610f78316a79dc93d41cb7e67f8d26f49a09d0bfb5c619",
+      "beleg_id": "86c5f7b68aa3f7bf854d080ebca827fdfe764ea3a1b623b7a4b82effd3bc3018",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:46:38Z"
+      "zeitpunkt": "2026-10-14T05:55:02Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -17028,8 +17034,8 @@
      "tags.vodafone.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 15.7,
-    "takte_ms": 12300,
+    "sekunden": 18.0,
+    "takte_ms": 13900,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -17062,9 +17068,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "da4c3271f995de4e48f08851c19315acdf27e7ac9ee40105e867369367df25df",
+      "beleg_id": "cbfb4fe469e3d70c18adffcadfd3ded9b95ffe745e85a75b97db12096d9cde86",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:47:25Z"
+      "zeitpunkt": "2026-10-14T05:55:53Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -17110,9 +17116,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "9bd97bea214f60e72c724893df42c1f35fb6af794128b437f2e2cd31f6c2df25",
+      "beleg_id": "b9cf4557c7c272e1935616a54dd9e5a67ba4161b2d615f5d7996390729643476",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:47:26Z"
+      "zeitpunkt": "2026-10-14T05:55:54Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -17158,9 +17164,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "18c9c82f95eac89188880bc0e137e196491b5af35e95b6b6e7bd82ddefe43f56",
+      "beleg_id": "98a2ea3cfb89e2945c389ebd0705015ccc3f6a9e8a211265e440b73e58b2efdd",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:47:27Z"
+      "zeitpunkt": "2026-10-14T05:55:55Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -17206,9 +17212,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "d0eb9f3f2613c9661c5fbd9c92e61f35ab60797ac9489a592140c06448d8d34b",
+      "beleg_id": "3aae4789672bfcd741ebed90a08dcf696d2f36547edd36a3280e2dc1a34a30f3",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:47:27Z"
+      "zeitpunkt": "2026-10-14T05:55:55Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -17254,9 +17260,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "7b67fe886fb5e232ba08dda2249cc4aef5e491e5da4fbb4765a270f13f56b4b6",
+      "beleg_id": "6909927c19a4b587285389f4167c9ab18ec67df4e56f5832f1931e2e9292c59e",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:47:28Z"
+      "zeitpunkt": "2026-10-14T05:55:56Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -17302,9 +17308,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "d434808e0290dcc4f2e027c649e75151911f94cd345e951449e405162df2f86b",
+      "beleg_id": "3af8def3ff5f10d4699c0a0f14ddd07a0f7e9a8685688b79309f5693c1b0a2ad",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:48:17Z"
+      "zeitpunkt": "2026-10-14T05:57:02Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -17350,9 +17356,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "b100b7e583ee7bd6be67fbdfcc90b4591d5e72de3116444e383a2593d27f274c",
+      "beleg_id": "a2c3fc8e70de7af2231b472d8c726c789bbfd2e5df7e266f67e7b57348b31021",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:48:17Z"
+      "zeitpunkt": "2026-10-14T05:57:03Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -17398,9 +17404,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a74427d1383fb335ebda45e58bc461ab6ec105c5aed17106fe05f85ba58abfb5",
+      "beleg_id": "f8469ad9915e435fd48cc060a238e25d07e5ca5ed2a1a12d3b75687250b2f6d2",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:48:18Z"
+      "zeitpunkt": "2026-10-14T05:57:04Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -17446,9 +17452,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "d0d8e46da16d0206a1899e0a0d480e374b1778fd1eba0e1df833d83c4df6f26b",
+      "beleg_id": "ad386daaefae2fe4663ecb1f7b1baaf5c18d96dcc4970e537782c8d7d8998e2a",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:48:19Z"
+      "zeitpunkt": "2026-10-14T05:57:05Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -17494,9 +17500,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "9fcfda7089224348939548534f9339ddcb81b07f5caa466a6498df2105e28342",
+      "beleg_id": "fb46517a1882f1cff1f75cb13ba6697455536f760f4afb177ca542ff86ebade2",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:48:20Z"
+      "zeitpunkt": "2026-10-14T05:57:05Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -17542,9 +17548,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "ff32e6437b54f876488c96c4d4cb282f01c1f1e35da27701c6f1b0e41b7631c6",
+      "beleg_id": "4093545491d6e973b494484ac9c6ae7078f84ca25280236a36363191b5ca86a6",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:49:21Z"
+      "zeitpunkt": "2026-10-14T05:58:14Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -17599,9 +17605,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "d5458367760040c8c39aa32ff1a55d7f85371b3e0290d5802d2d3aa22c050915",
+      "beleg_id": "4e5967668d319994705ae3ce884ef50b3c62e47991deedf3441ca08908514788",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:49:21Z"
+      "zeitpunkt": "2026-10-14T05:58:14Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -17647,9 +17653,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "bffab253fb5d713faacc09c255779c68b0c921a6ec74c71695dce8e157cc7dd4",
+      "beleg_id": "36c91161b4735ec2708b31eba72bcf53a1ad5b548d765a409dc4bb2bb022a92a",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:49:22Z"
+      "zeitpunkt": "2026-10-14T05:58:15Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -17695,9 +17701,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "eb77db36fc8d3cafe3ea39d558da27a57bc92b67422c8d58cc91cf0bed6ba8d1",
+      "beleg_id": "10aa4c2f5ab359c48ba174f21ddc391b4646bdd4a39c75e02b9784b4850a110f",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:49:23Z"
+      "zeitpunkt": "2026-10-14T05:58:16Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -17743,9 +17749,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "3d96b4112a58f0a22642efb4658fe5ea7e9d67eeb90d783f9c56ca00bb60b26d",
+      "beleg_id": "6dd929c64038a5306fa434c14522b970aeb178a5689f64d52cff1c90e457e114",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:49:23Z"
+      "zeitpunkt": "2026-10-14T05:58:17Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -17782,9 +17788,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "81328dbce1c9041b521a927b02112b973171b5eb4beeabbeed127879b67f8457",
+      "beleg_id": "8546e0556e42259faf24b331a7e92f48334b112e9e4e2cfe5c7d371edc50e445",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:50:11Z"
+      "zeitpunkt": "2026-10-14T05:59:12Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -17830,9 +17836,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "38bc1864a48e63fa2f19b9cc92d1acb097d35c2ba108ec78893eceab85592a89",
+      "beleg_id": "997f00531c76c56fb17acfa8620cc4378b0ab00b2644e5c2edba4d8f95701c1e",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:50:12Z"
+      "zeitpunkt": "2026-10-14T05:59:13Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -17878,9 +17884,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "b0c45f8df9fa6ca004e420e063a097217adc615a757a703d759d5c5fb46b7cb8",
+      "beleg_id": "57709831946bf3d5451554fee4dc214707746bc60884f0f01bf963679f6e75c4",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:50:13Z"
+      "zeitpunkt": "2026-10-14T05:59:14Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -17926,9 +17932,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "97436f77f369bf57129212e9321f2575f985bfee5724047eda9a1631d80e0eec",
+      "beleg_id": "d6027495e81dc4da3cc5866804c4acc50ee97d60cf66d61bfc9b78c026a04d59",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:50:13Z"
+      "zeitpunkt": "2026-10-14T05:59:14Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -17974,9 +17980,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "52683db5fc7b59f41f206cb42d9571787a170f31a46d7ff367a3eb471e480139",
+      "beleg_id": "1d059414f750e604e913e282b449daa1e075cbd8c137168e4016ff761099d0eb",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:50:14Z"
+      "zeitpunkt": "2026-10-14T05:59:15Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -18022,9 +18028,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "14cc16548b821d4f4482790b3161ef4e8fe0c87b9562757ef660200250fc90c4",
+      "beleg_id": "738d590070ed50eb61aabf83331f47ac60886c86871e01eaa2435f99e40fbd6c",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:51:06Z"
+      "zeitpunkt": "2026-10-14T06:00:25Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -18070,9 +18076,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "4f3a1c9eb5780876d904640707079d1c2e771a3b169bdee6a04b0760d916c499",
+      "beleg_id": "40279cfd86cedc536ce0761454538ef28cfda2ae79d13bbda071015d521bc152",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:51:06Z"
+      "zeitpunkt": "2026-10-14T06:00:26Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -18118,9 +18124,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "b2ac3145460d02881e70e29a19b4376fa01ebb51a8ea8f93552cd0af8ba040b7",
+      "beleg_id": "889f22b1bd2bb0426c2d719164eae221c5700cafcb3beaaf6f470d8c4e19878d",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:51:07Z"
+      "zeitpunkt": "2026-10-14T06:00:27Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -18166,9 +18172,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "84a9d310fc1c882269b768b587a5e2aaeb96496b24691ceebb6828a2dbf4789e",
+      "beleg_id": "4f1a742d9ccd3dff9646b66104bc9632157b773addf745ef9fa75fe7249b55bc",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:51:08Z"
+      "zeitpunkt": "2026-10-14T06:00:27Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -18214,9 +18220,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "c6407aa25d7a8d0239a8a9a7de139bce85d2afa454e332864f0dd58bf55bef03",
+      "beleg_id": "bf8e78efc24a3f3e11d7096f26ba76b6ad6605103fd13bad66a03a8402313903",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:51:08Z"
+      "zeitpunkt": "2026-10-14T06:00:28Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -18262,9 +18268,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "0257c037a0f54d24ffad761eddc7d5837c4ea796f4a236234e14fb6db4dcff3b",
+      "beleg_id": "f3e7c40091827f52babd3f91c6d367f5ac12a2215bc396af94a93c2060e95185",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:52:00Z"
+      "zeitpunkt": "2026-10-14T06:01:42Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -18319,9 +18325,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "fed89c2051ec394de7d25eae89b47d78024fc449911b733dbc6a4b33ba0dc58a",
+      "beleg_id": "4ba24339e667da6f414bbeadae433b9c4173394fe330f2d65b8199654922fbeb",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:52:01Z"
+      "zeitpunkt": "2026-10-14T06:01:43Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -18367,9 +18373,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "17a5b1e1ea3f985e12363b372e6d4f4d9dacc417b27a604353714fa4ce785dfb",
+      "beleg_id": "c9c62af1601307ce2859f57466e87fafb81e9870e136cdec261974e390690ab2",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:52:01Z"
+      "zeitpunkt": "2026-10-14T06:01:43Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -18415,9 +18421,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "79778342157d859e75c55611f9188bbd4c28c282b53620ff3edf1bced3601efb",
+      "beleg_id": "15ed56ef2d8228dd30bcb0dc8a8cea8a9fd651574f8eea04c89f8388f98deb30",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:52:02Z"
+      "zeitpunkt": "2026-10-14T06:01:44Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -18463,9 +18469,9 @@
       }
      ],
      "beleg": {
-      "beleg_id": "b79b17811248e1460592f35dddcd5b2101dde874952769285577a28e46436d02",
+      "beleg_id": "859b7a51941e3f43ec323cedd7923f281a16f04dce15ca4141c4e94fadb0c42b",
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-10-13T07:52:03Z"
+      "zeitpunkt": "2026-10-14T06:01:45Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -18496,16 +18502,16 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 210,
-    "beendet": 209,
+    "anfragen": 209,
+    "beendet": 208,
     "dokument": "complete",
     "geladen": true,
     "offen": {
      "tags.vodafone.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 15.1,
-    "takte_ms": 11850,
+    "sekunden": 19.4,
+    "takte_ms": 15300,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -18529,5 +18535,5 @@
  ],
  "uebersichten": [],
  "vertragsform": "tarif_plus_ratenkauf",
- "zeitbudget_sekunden": 10280
+ "zeitbudget_sekunden": 10274
 }
