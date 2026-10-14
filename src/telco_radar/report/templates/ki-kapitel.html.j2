@@ -1,4 +1,4 @@
-{# KI, Kapitel 1 - "Wie eine KI antwortet" (Pitch 9, Schnitte 10-12).
+{# KI, Kapitelseite (Pitch 9): Kapitel 1 "Wie eine KI antwortet" und jedes weitere.
 
    Eine lange Linienzeichnung, durch die man scrollt; ein roter Punkt
    fuehrt. Jede Koordinate rechnet `ki_kapitel.zeichnung()`, hier wird sie
@@ -23,7 +23,7 @@
     <h1 class="ki-k1-pille ki-k1-titel">Kapitel {{ nummer }} · {{ titel }}</h1>
   </header>
   <div class="ki-k1-reise">
-    <svg class="ki-k1-welt" id="ki-k1-welt" viewBox="0 0 {{ bild.breite }} {{ bild.hoehe }}" role="img" aria-label="Zeichnung: wie eine KI aus einer Frage eine Antwort macht">
+    <svg class="ki-k1-welt" id="ki-k1-welt" viewBox="0 0 {{ bild.breite }} {{ bild.hoehe }}" role="img" aria-label="{{ beschreibung }}">
       {% for e in bild.ringe %}{{ el(e) }}{% endfor %}
       <path class="ki-k1-route" d="{{ bild.route }}"/>
       {% for e in bild.hinten %}{{ el(e) }}{% endfor %}
@@ -42,5 +42,6 @@
     {% if weiter %}<a href="{{ weiter.ziel }}">Kapitel {{ weiter.nr }} · {{ weiter.titel }} <span aria-hidden="true">→</span></a>
     {% else %}<a href="ki.html#verstehen">Alle Kapitel <span aria-hidden="true">→</span></a>{% endif %}
   </nav>
+  {% if quellen %}<p class="ki-k1-quellen">Quellen: {% for name, url in quellen %}<a href="{{ url }}" rel="noopener">{{ name }}</a>{% if not loop.last %} · {% endif %}{% endfor %}</p>{% endif %}
 </article>
 {% endblock %}

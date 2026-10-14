@@ -6135,6 +6135,11 @@ a.ki-k1-pille:hover{border-color:var(--ink)}
 .ki-k1-weiter a{padding:12px 26px;border:1px solid var(--ink);border-radius:var(--radius-pille);font-size:clamp(15px,2.4vw,30px);
   font-weight:500;text-align:center;text-transform:uppercase;text-decoration:none;color:var(--ink);transition:background .3s,color .3s}
 .ki-k1-weiter a:hover{background:var(--ink);color:var(--paper-2)}
+.ki-k1-quellen{max-width:880px;margin:28px auto 0;padding:0 16px;text-align:center;font-size:13px;color:var(--ink-3)}
+.ki-k1-quellen a{color:inherit}
+.ki-k2-spam{fill:var(--ink)}
+.ki-k2-post{fill:var(--paper-2);stroke:var(--ink);stroke-width:1.5}
+.ki-k2-neu{fill:var(--red)}
 .bewegt .ki-k1-zug{transition:opacity .5s,transform .7s cubic-bezier(.2,1.4,.4,1);transform-box:fill-box;transform-origin:center}
 .bewegt .ki-k1-zug.weg{opacity:0;transform:scale(.55)}
 .bewegt .ki-k1-satz{opacity:0;transform:translateY(24px);transition:opacity .8s,transform .8s cubic-bezier(.2,.8,.2,1)}

@@ -15,7 +15,7 @@ Das Band „Modelle“ zeigt den Store aus ``analyze.ki_modelle`` (Schnitt 6),
 „Verstehen“ (Schnitt 9) zeigt die Kapitel aus ``KAPITEL``; verlinkt sind
 nur die fertigen (``FERTIG``), Linie und Pillen der Fahrt stehen in
 ``FAHRT_WEG`` und ``STATIONEN``, ``app.js`` zeichnet sie beim Scrollen.
-Kapitel 1 (Schnitte 10–12) ist eine eigene Seite aus ``ki_kapitel``.
+Jedes fertige Kapitel ist eine eigene Seite aus seinem Modul in ``SEITEN``.
 Die Muster-Prompts (Schnitt 13) lädt ``analyze.ki_inhalte``; Kopfzeile,
 Themenzeile und Rubrikleiste lesen dasselbe ``anzahl``. Die Videos
 (Schnitte 14 und 15) liest ``analyze.ki_videos.lange``; ``videos()`` ordnet
@@ -31,7 +31,7 @@ from collections.abc import Callable, Iterable
 from datetime import date
 
 from ..analyze import ki_blatt, ki_modelle, ki_videos
-from . import ki_kapitel, meldungen_seite
+from . import ki_kapitel, ki_kapitel2, meldungen_seite
 
 KI_THEMA = "thema:ki"
 KI_TAG = "KI / AI"
@@ -55,7 +55,8 @@ KAPITEL = (
     "Strom, Chips, Rechnung",
     "Sicher arbeiten",
 )
-FERTIG = frozenset({1})
+SEITEN = {1: ki_kapitel, 2: ki_kapitel2}
+FERTIG = frozenset(SEITEN)
 FAHRT_WEG = "M 20 190 C 140 190 170 70 300 70 S 470 200 600 180 S 760 60 980 80"
 STATIONEN = (
     ("Frage", 0.0, "start", 20.0, 190.0),
@@ -188,9 +189,10 @@ def kapitel() -> list[dict]:
     ]
 
 
-def kapitel_seite(env) -> str:
-    """Das HTML von ``ki-kapitel-1.html`` (Schnitte 10–12, ``ki_kapitel``)."""
-    return ki_kapitel.seite(env, kapitel())
+def kapitel_seiten(env) -> list[tuple[str, str]]:
+    """Datei und HTML jedes fertigen Kapitels (Modul je Kapitel in ``SEITEN``)."""
+    schiene = kapitel()
+    return [(m.DATEI, m.seite(env, schiene)) for _, m in sorted(SEITEN.items())]
 
 
 def fahrt(schrift: int = 24) -> dict:

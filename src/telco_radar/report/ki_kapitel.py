@@ -18,6 +18,7 @@ DATEI = "ki-kapitel-1.html"
 NUMMER = 1
 TITEL = "Wie eine KI antwortet"
 STATIONEN = ("Frage", "Wörter", "Bedeutung", "Aufmerksamkeit", "Antwort")
+BESCHREIBUNG = "Zeichnung: wie eine KI aus einer Frage eine Antwort macht"
 TEXTE = (
     ("Frage", "ansage", 30, ("Eine KI", "liest keine", "Wörter")),
     (
@@ -63,24 +64,37 @@ TEXTE = (
 )
 
 
-def texte() -> list[dict]:
+def texte(eintraege=TEXTE, hoehe: float = bild.HOEHE) -> list[dict]:
     """Ansagen und Sätze mit ihrer Höhe in der Zeichnung und als Prozentwert."""
     out = []
-    for station, art, y, inhalt in TEXTE:
+    for station, art, y, inhalt in eintraege:
         eintrag = {"station": station, "art": art, "y": y}
-        eintrag["top"] = round(y / bild.HOEHE * 100, 3)
+        eintrag["top"] = round(y / hoehe * 100, 3)
         eintrag["zeilen" if art == "ansage" else "text"] = inhalt
         out.append(eintrag)
     return out
 
 
+def rendere(env, kapitel: list[dict], nummer: int, titel: str, **teile) -> str:
+    """Eine Kapitelseite: ``teile`` sind ``bild``, ``beschreibung``, ``quellen``.
+
+    ``kapitel`` ist die Schiene der KI-Seite; „Weiter“ führt zum nächsten
+    fertigen Kapitel, sonst zurück zu allen.
+    """
+    weiter = next((k for k in kapitel if k["nr"] == nummer + 1 and k["ziel"]), None)
+    return env.get_template(VORLAGE).render(
+        prefix="", nummer=nummer, titel=titel, weiter=weiter, **teile
+    )
+
+
 def seite(env, kapitel: list[dict]) -> str:
     """Das HTML von ``ki-kapitel-1.html``; ``kapitel`` ist die Schiene der KI-Seite."""
-    weiter = next((k for k in kapitel if k["nr"] == NUMMER + 1 and k["ziel"]), None)
-    return env.get_template(VORLAGE).render(
-        prefix="",
-        nummer=NUMMER,
-        titel=TITEL,
+    return rendere(
+        env,
+        kapitel,
+        NUMMER,
+        TITEL,
         bild=dict(bild.zeichnung(STATIONEN), texte=texte()),
-        weiter=weiter,
+        beschreibung=BESCHREIBUNG,
+        quellen=(),
     )

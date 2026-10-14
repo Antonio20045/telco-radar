@@ -98,10 +98,10 @@ def test_knopf_und_schiene_fuehren_auf_die_seite_des_kapitels(site):
         r'<li class="ki-kapitel ki-kapitel--fertig"><a href="([^"]+)"', html
     )
     assert knopf and knopf.group(1) == SEITE
-    assert schiene == [SEITE]
+    assert schiene[0] == SEITE
     assert (site / SEITE).is_file()
     assert ki_seite.kapitel()[0]["ziel"] == SEITE == ki_kapitel.DATEI
-    assert [k["ziel"] for k in ki_seite.kapitel()[1:]] == [None] * 11
+    assert [k["ziel"] for k in ki_seite.kapitel()[2:]] == [None] * 10
 
 
 def test_stationen_in_ihrer_reihenfolge_und_zahlen_aus_den_konstanten(site):
