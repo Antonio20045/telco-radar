@@ -2,8 +2,8 @@
  "updated": "2026-10-14",
  "anbieter": {
   "ALDI TALK": {
-   "laeufe": 72,
-   "funde_gesamt": 383,
+   "laeufe": 73,
+   "funde_gesamt": 394,
    "letzter_lauf": "2026-10-14",
    "letzte_funde": 11,
    "letzter_fund": "2026-10-14",
@@ -252,8 +252,8 @@
    "tote_adressen": 0
   },
   "Vodafone": {
-   "laeufe": 70,
-   "funde_gesamt": 12122,
+   "laeufe": 71,
+   "funde_gesamt": 12299,
    "letzter_lauf": "2026-10-14",
    "letzte_funde": 177,
    "termine": [
@@ -502,8 +502,8 @@
    "tote_adressen": 0
   },
   "o2": {
-   "laeufe": 70,
-   "funde_gesamt": 4736,
+   "laeufe": 71,
+   "funde_gesamt": 4805,
    "letzter_lauf": "2026-10-14",
    "letzte_funde": 69,
    "termine": [
@@ -744,7 +744,7 @@
      "2026-10-14",
      69,
      "gelesen",
-     1264,
+     1961,
      0,
      null
     ]
@@ -752,8 +752,8 @@
    "tote_adressen": null
   },
   "mobilcom-debitel": {
-   "laeufe": 23,
-   "funde_gesamt": 8600,
+   "laeufe": 24,
+   "funde_gesamt": 8755,
    "letzte_funde": 155,
    "termine": [
     "2026-08-29",
@@ -1199,11 +1199,11 @@
     ],
     [
      "2026-10-14",
-     20,
-     "lesefehler",
      0,
-     20,
-     0
+     "nicht gelesen",
+     0,
+     0,
+     null
     ]
    ],
    "tote_adressen": 0
@@ -1405,18 +1405,18 @@
     ],
     [
      "2026-10-14",
-     18,
-     "lesefehler",
      0,
-     20,
-     0
+     "nicht gelesen",
+     0,
+     0,
+     null
     ]
    ],
    "tote_adressen": 0
   },
   "congstar": {
    "laeufe": 45,
-   "funde_gesamt": 8903,
+   "funde_gesamt": 9046,
    "letzter_lauf": "2026-10-13",
    "letzte_funde": 143,
    "termine": [
@@ -1659,8 +1659,8 @@
    "tote_adressen": 0
   },
   "1&1": {
-   "laeufe": 62,
-   "funde_gesamt": 2280,
+   "laeufe": 63,
+   "funde_gesamt": 2321,
    "letzter_lauf": "2026-10-14",
    "letzte_funde": 41,
    "termine": [
@@ -2096,10 +2096,10 @@
    "tote_adressen": null
   },
   "Saturn": {
-   "laeufe": 58,
-   "funde_gesamt": 1125,
+   "laeufe": 59,
+   "funde_gesamt": 1144,
    "letzter_lauf": "2026-10-14",
-   "letzte_funde": 20,
+   "letzte_funde": 19,
    "termine": [
     "2026-09-05",
     "2026-09-06",
@@ -2329,7 +2329,7 @@
     ],
     [
      "2026-10-14",
-     20,
+     19,
      "gelesen",
      0,
      0,
@@ -6502,7 +6502,7 @@
    "erstpreis_am": "2026-10-10",
    "last_verified": "2026-10-14",
    "letzter_check": "2026-10-14",
-   "quelle_url": "https://www.alditalk.de/p/motorola-motorola-moto-g77-256-gb-black-olive-xt2621-4--inkl-moto-buds-glacier-blue-30043149A1?FF_QUERY=*%3Acategory_id%3BG5DE0Z0SIKUBHRGTNF411A7XPLN9RV3D&FF_POS=12&FF_PAGE=1&FF_PAGESIZE=30&FF_SCORE=100.0&FF_CAMPAIGN=&FF_CAMPAIGN_PAGE_ID=",
+   "quelle_url": "https://www.alditalk.de/p/motorola-motorola-moto-g77-256-gb-black-olive-xt2621-4--inkl-moto-buds-glacier-blue-30043149A1?FF_QUERY=*%3Acategory_id%3BG5DE0Z0SIKUBHRGTNF411A7XPLN9RV3D&FF_POS=11&FF_PAGE=1&FF_PAGESIZE=30&FF_SCORE=100.0&FF_CAMPAIGN=&FF_CAMPAIGN_PAGE_ID=",
    "abgerufen_am": "2026-10-14",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
@@ -6532,7 +6532,7 @@
    "erstpreis_am": "2026-10-10",
    "last_verified": "2026-10-14",
    "letzter_check": "2026-10-14",
-   "quelle_url": "https://www.alditalk.de/p/motorola-motorola-razr-70-256-gb-swarovski-edition-black-xt2657-1-30043385A1?FF_QUERY=*%3Acategory_id%3BG5DE0Z0SIKUBHRGTNF411A7XPLN9RV3D&FF_POS=11&FF_PAGE=1&FF_PAGESIZE=30&FF_SCORE=100.0&FF_CAMPAIGN=&FF_CAMPAIGN_PAGE_ID=",
+   "quelle_url": "https://www.alditalk.de/p/motorola-motorola-razr-70-256-gb-swarovski-edition-black-xt2657-1-30043385A1?FF_QUERY=*%3Acategory_id%3BG5DE0Z0SIKUBHRGTNF411A7XPLN9RV3D&FF_POS=12&FF_PAGE=1&FF_PAGESIZE=30&FF_SCORE=100.0&FF_CAMPAIGN=&FF_CAMPAIGN_PAGE_ID=",
    "abgerufen_am": "2026-10-14",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
@@ -28055,6 +28055,40 @@
    "preis_ohne_vertrag": 889.0,
    "anzahlung": 1.0,
    "monatsrate": 37.0,
+   "laufzeit_monate": 24,
+   "zins_effektiv": 0.0
+  },
+  {
+   "id": "o2--samsung-galaxy-s25-ultra-256gb-titan-grau",
+   "sku_id": "samsung-galaxy-s25-ultra-256gb-titan-grau",
+   "device_id": "samsung-galaxy-s25-ultra",
+   "anbieter": "o2",
+   "anbieter_typ": "netzbetreiber",
+   "netz": "",
+   "speicher_gb": 256,
+   "farbe_roh": "titanium gray",
+   "farbe_normalisiert": "titan-grau",
+   "ean": "",
+   "zustand": "neu",
+   "first_seen": "2026-10-14",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "erstpreis": 1081.0,
+   "erstpreis_art": "ohne_vertrag",
+   "erstpreis_am": "2026-10-14",
+   "last_verified": "2026-10-14",
+   "letzter_check": "2026-10-14",
+   "quelle_url": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-gray-details?ohne-tarif=ja&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung",
+   "abgerufen_am": "2026-10-14",
+   "verfuegbarkeit": "unbekannt",
+   "confidence": "hoch",
+   "einstiege": [
+    "https://www.o2online.de/e-shop/rest/catalog/o2shop/privatkunden/ratenzahlung/default/__not-specified__/__not-specified__/__not-specified__?hwOnly=true"
+   ],
+   "titel_roh": "Samsung Galaxy S25 Ultra 256 GB titanium gray",
+   "preis_ohne_vertrag": 1081.0,
+   "anzahlung": 1.0,
+   "monatsrate": 45.0,
    "laufzeit_monate": 24,
    "zins_effektiv": 0.0
   },
