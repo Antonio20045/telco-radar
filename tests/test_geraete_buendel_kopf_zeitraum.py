@@ -520,8 +520,6 @@ def _finanzierungskarte(raten_laufzeit) -> dict:
         "gezahlt_nach_24": 1500.0,
         "offen_nach_24": None,
         "offene_raten": 0,
-        "eff_ohne_geraet": None,
-        "eff_basis": None,
         "bestandteile": [],
         "luecken": [],
         "boni": [],

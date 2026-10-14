@@ -678,14 +678,14 @@ class SimOnlyReferenz:
     def id(self) -> str:
         return sim_only_id(self.anbieter, self.tarif_name)
 
-    def als_buendel(self) -> Buendel:
+    def als_buendel(self, mit_anschluss: bool = True) -> Buendel:
         """Dieselbe Rechnung, ein Rechenweg.
 
         Eine SIM-only-Zeile ist ein Buendel ohne Geraet. Sie so zu fuehren
         heisst, dass `tco_24` fuer beide Seiten der Differenz DIESELBE
         Funktion ist - zwei Rechenwege waeren zwei Rechnungen, und ihre
         Differenz waere keine Aussage ueber den Geraetepreis, sondern ueber
-        den Unterschied der Wege.
+        den Unterschied der Wege. Ohne Anschluss: der Tarif allein (F5).
         """
         return Buendel(
             sku_id="",
@@ -694,7 +694,7 @@ class SimOnlyReferenz:
             tarif_id=self.tarif_id,
             tarif_id_guete=self.tarif_id_guete,
             tarif_monatlich=self.tarif_sim_only_monatlich,
-            anschlusspreis=self.anschlusspreis,
+            anschlusspreis=self.anschlusspreis if mit_anschluss else 0.0,
             rabatte=list(self.rabatte),
             quelle_url=self.quelle_url,
             abgerufen_am=self.abgerufen_am,

@@ -151,7 +151,7 @@
 <li class="gr-anb--{{ t.klasse }}">{% if tarif %}<a class="gr-sprung gx-t" href="?modell={{ t.id }}{% if t.band %}&amp;band={{ t.band }}{% endif %}#tafel-tco"
   data-modell="{{ t.id }}"{% if t.band %} data-band="{{ t.band }}"{% endif %}>{% else %}<a class="gx-vsprung gx-t" href="?modell={{ t.id }}#tafel-verlauf"
   data-geraet="{{ t.id }}">{% endif %}<span class="gx-t-name">{{ t.titel }}</span>
-  <span class="gx-t-wer"><span class="gx-nw"><i aria-hidden="true"></i>{{ t.anbieter }} {{ t.preis | euro }}</span>
+  <span class="gx-t-wer"><span class="gx-nw"><i aria-hidden="true"></i>{{ t.anbieter }}{% if tarif and t.band_label %} {{ t.band_label }}{% endif %} {{ t.preis | euro }}</span>
   <span class="gx-nw">Vodafone {{ t.vodafone | euro }}</span></span>
   <span class="gx-t-plus">+{{ t.abstand | round | int }}&nbsp;€</span></a></li>
 {% endmacro %}
@@ -215,7 +215,7 @@
   <thead><tr>
     <th scope="col">Anbieter und Tarif</th>
     <th scope="col">je Monat</th>
-    <th scope="col">über {{ geraete.tco.horizont }} Monate</th>
+    <th scope="col">über {{ geraete.tco.horizont }} Monate ohne Anschlusspreis</th>
     <th scope="col">Beleg</th>
   </tr></thead>
   <tbody>
@@ -224,7 +224,7 @@
     <td><span class="gr-t-anbieter">{{ r.anbieter }}</span>
         <span class="gr-a-klein">{{ r.tarif }}</span></td>
     <td>{{ r.monatlich | euro }}</td>
-    <td>{{ r.ueber_horizont | euro }}</td>
+    <td>{{ r.tarif_ueber_horizont | euro }}</td>
     <td>{% if r.quelle_url %}<a href="{{ r.quelle_url }}"
           rel="nofollow noopener" target="_blank">{% if r.quelle_ist_dokument %}Produktinformationsblatt{% else %}Shop-Seite{% endif %}<span
           class="gr-a-pfeil" aria-hidden="true">↗</span></a>{%
@@ -241,7 +241,8 @@
 {# EINE Karte je Anbieter und Tarif. Die Pflichtzeilen stehen in der
    Reihenfolge des Terminologie-Katalogs D, und ihre Beschriftungen sind
    woertlich von dort: `TCO-<Laufzeit>`, `Ø X €/Monat`, `monatlich X €`,
-   `Gerät einmalig X €`, `eff. X €/M. ohne Gerät`, `ab Monat 25: X €`.
+   `Gerät einmalig X €`, `ab Monat 25: X €`. „eff. €/Monat ohne Gerät“ ist
+   entfallen (Antonio, 14.10.2026: braucht er nicht).
    Ein Synonym waere ein zweites Mass. #}
 
 <div class="gr-tafel" id="tafel-tco" role="tabpanel">
@@ -568,13 +569,12 @@
      die Balken darunter (negativ = Wettbewerber günstiger). Ohne
      vergleichbare Zeile (leerer Bestand) gibt es keine
      Leitzahl-Zeile - dann steht der Satz allein. #}
-  {% set spitze = radar.modelliste.zeilen[0] if radar.modelliste.zeilen
-    else none %}
-  {% if spitze and spitze.prozent is not none %}
+  {% set spitze = radar.modelliste.spitze %}
+  {% if spitze %}
   <div class="gr-leit gr-leit--radar"><b class="gr-leit-zahl">{{
     spitze.euro_text }} €</b><span class="gr-leit-label">{{ spitze.anbieter }} {{
     spitze.richtung }} Vodafone: {{ spitze.titel }} mit Tarif, Kosten
-    über 24 Monate</span></div>
+    über {{ spitze.monate }} Monate</span></div>
   {% endif %}
   {# E3-Fix (QA 17.09.2026, B2) / P4-Fix (Sicht-Pruefung 18.09.): Der Kopf
      behauptete die vorzeichenbehaftete Leitzahl für ALLE drei Sektionen -

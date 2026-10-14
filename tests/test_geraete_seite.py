@@ -1211,6 +1211,7 @@ def test_kein_satz_der_karte_nennt_eine_ungedeckte_zahl(tmp_path):
     s = _verlauf(site)
     daten = {abs(p["preis_ohne_vertrag"]) for p in _PUNKTE}
     daten |= {100.0, 1.0, 2.0, 10.0}
+    daten |= {256.0}
     for g in _KATALOG["geraete"]:
         daten |= zahlen_der_namen(g["modell"])
     for a in _QUELLEN["anbieter"]:

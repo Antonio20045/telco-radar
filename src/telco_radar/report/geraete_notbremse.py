@@ -163,6 +163,17 @@ def gruende(karten: list) -> str:
     return ", ".join(dict.fromkeys(kurz))
 
 
+def leersatz(slot: dict, kopf: str) -> str | None:
+    """Der Satz für ein Paar der Zeitreihe, das nur Messungen hat, die nicht
+    zählen (F3, 14.10.2026); `None`, wenn es gar keine Messungen hat."""
+    if grund := gruende([m for tage in slot.values() for m in tage.values()]):
+        return (
+            f"{kopf} liegen nur Preise vor, die nicht im Vergleich zählen "
+            f"({grund}). Sie stehen in den Bündel-Zeilen darunter."
+        )
+    return None
+
+
 def nur_zaehlende(messungen: dict) -> dict:
     """Die Messungen der Zeitreihe (``{(modell, band): {anbieter: {tag: m}}}``) ohne
     die, deren Bündel nicht zählt; ein Anbieter ohne solche fällt heraus."""

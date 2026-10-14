@@ -23,7 +23,7 @@ geprüft worden und zählt wie vor der Prüfstelle.
 from __future__ import annotations
 
 from collections.abc import Callable, Iterable, Mapping
-from dataclasses import dataclass, field, fields
+from dataclasses import dataclass, field, fields, replace
 
 from ..tarif_model import buendelphasen_aus
 from ..tco_model import Aktion, Buendel, aktionen_aus, kosten_ueber
@@ -205,11 +205,15 @@ def satz_zaehlt(satz: Mapping, heute: str) -> bool:
 
 def geraetepreis(b: Buendel) -> float | None:
     """Was das Gerät im Bündel kostet: Anzahlung plus alle Raten; ein Vertrag ohne
-    eigene Rate (1&1) über seine Laufzeit. None, wenn ein Posten fehlt."""
+    eigene Rate (1&1) über seine Laufzeit. None, wenn ein Posten fehlt.
+
+    Bei 1&1 ist die gemessene Zuzahlung die Ablöse bei Kündigung nach Monat 24;
+    wer alle Monate zahlt, zahlt sie nicht (F9, 14.10.2026: sie stand zusätzlich
+    zu Monat 25–36 in der Summe)."""
     if b.geraeteraten is not None:
         return b.geraeteraten.gesamt
     if b.buendel_monatlich is not None and b.laufzeit_monate:
-        return kosten_ueber(b, b.laufzeit_monate).gesamt
+        return kosten_ueber(replace(b, geraet_zuzahlung=0.0), b.laufzeit_monate).gesamt
     return None
 
 

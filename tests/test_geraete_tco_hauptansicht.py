@@ -701,19 +701,12 @@ def test_kein_delta_an_der_referenz_selbst(bestand):
                 )
 
 
-def test_der_effektivpreis_nennt_seinen_barpreis(bestand):
-    mit_eff = [
-        k
-        for m in bestand["modelle"]
-        for k in m["karten"]
-        if k["eff_ohne_geraet"] is not None
-    ]
-    assert mit_eff
-    for k in mit_eff:
-        assert k["eff_basis"]["betrag"] > 0
-        assert k["eff_basis"]["quelle_url"], "ein Barpreis ohne Beleg"
-        if k["eff_basis"]["fremd"]:
-            assert k["eff_basis"]["anbieter"]
+def test_d2_es_gibt_keinen_effektivpreis_ohne_geraet_mehr(bestand):
+    """D2 (Antonio, 14.10.2026): „eff. €/Monat ohne Gerät“ braucht er nicht;
+    die Zahl teilte bei 36 Raten durch 36, obwohl der Tarif 24 Monate läuft."""
+    karten = [k for m in bestand["modelle"] for k in m["karten"]]
+    assert karten
+    assert not [k for k in karten if "eff_ohne_geraet" in k or "eff_basis" in k]
 
 
 def test_g1_entsteht_erst_ab_zwei_zahlen(bestand):

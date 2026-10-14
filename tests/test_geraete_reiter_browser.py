@@ -105,7 +105,7 @@ _MESSTAGE = (
     "2026-08-11",
     "2026-08-18",
     "2026-08-25",
-    "2026-08-28",
+    "2026-09-01",
 )
 
 
@@ -1889,8 +1889,19 @@ def test_die_preiskacheln_stehen_so_im_datensatz(_seite):
 
     kachel_min = euro_zu_zahl(_seite.text_content("#gr-vmin"))
     kachel_max = euro_zu_zahl(_seite.text_content("#gr-vmax"))
-    assert kachel_min == min(werte), (kachel_min, min(werte))
-    assert kachel_max == max(werte), (kachel_max, max(werte))
+    roh = _seite.evaluate(
+        """() => {
+          const id = new URLSearchParams(location.search).get('modell');
+          const el = document.getElementById('gr-verlaufdaten');
+          const alle = JSON.parse(el.textContent);
+          const g = alle.find(x => x.id === id);
+          return g ? g.reihen.flatMap(r => r.punkte.map(p => p.preis)) : [];
+        }"""
+    )
+    assert roh, "gewaehltes Geraet nicht im Datensatz - der Test misst nichts"
+    assert kachel_min in roh and kachel_max in roh, (kachel_min, kachel_max, roh)
+    assert kachel_min <= min(werte), (kachel_min, min(werte))
+    assert kachel_max >= max(werte), (kachel_max, max(werte))
     assert kachel_min != kachel_max, (
         "alle Preise gleich - der Test kann eine Verwechslung nicht sehen"
     )

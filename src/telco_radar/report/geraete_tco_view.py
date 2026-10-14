@@ -433,11 +433,9 @@ def _referenztabelle(referenzen: list) -> list[dict]:
     """
     zeilen = []
     for r in referenzen:
-        if not isinstance(r, SimOnlyReferenz):
+        if not isinstance(r, SimOnlyReferenz) or r.tarif_sim_only_monatlich is None:
             continue
-        if r.tarif_sim_only_monatlich is None:
-            continue
-        kennzahl = tco_24(r.als_buendel())
+        kennzahl, allein = tco_24(r.als_buendel()), tco_24(r.als_buendel(False))
         zeilen.append(
             {
                 "anbieter": r.anbieter,
@@ -446,6 +444,7 @@ def _referenztabelle(referenzen: list) -> list[dict]:
                 "tarif_id": r.tarif_id,
                 "monatlich": r.tarif_sim_only_monatlich,
                 "ueber_horizont": (kennzahl.gesamt if kennzahl.belastbar else None),
+                "tarif_ueber_horizont": allein.gesamt if allein.belastbar else None,
                 "leitzahl_monate": kennzahl.leitzahl_monate,
                 "anschlusspreis": r.anschlusspreis,
                 "quelle_url": r.quelle_url,
