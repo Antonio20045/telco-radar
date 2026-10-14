@@ -41,14 +41,22 @@
       if (ebenen[i].getAttribute('data-zeit-bild') === zeit) bild = ebenen[i];
     }
     if (!bild && ebenen.length) bild = ebenen[0];
-    if (bild) {
+    /* Rechnet die Campus-Szene, steht bis zu ihrem ersten Bild kein Foto da:
+       das Startfoto zeigt nur eine Lage und waere fast immer die falsche
+       (Antonio, 14.10.2026). Es kommt nur, wenn die Szene nicht kann. */
+    var szeneKommt = !!buehne.querySelector('.buehne-himmel') && !navigator.webdriver;
+    if (szeneKommt) buehne.classList.add('campus-wartet', 'film-dunkel');
+    var zeigeStartbild = function (src) {
+      if (!bild) return;
       bild.classList.add('aktiv');
       bild.setAttribute('fetchpriority', 'high');
       bild.addEventListener('load', function () { bild.classList.add('geladen'); });
-      if (bild.getAttribute('data-srcset')) bild.srcset = bild.getAttribute('data-srcset');
-      bild.src = bild.getAttribute('data-src');
+      if (src) bild.removeAttribute('srcset');
+      else if (bild.getAttribute('data-srcset')) bild.srcset = bild.getAttribute('data-srcset');
+      bild.src = src || bild.getAttribute('data-src');
       if (bild.complete && bild.naturalWidth) bild.classList.add('geladen');
-    }
+    };
+    if (!szeneKommt) zeigeStartbild(null);
     var stufen = buehne.querySelectorAll('.buehne-kopf > *, .fenster, .buehne-weiter');
     for (var s = 0; s < stufen.length; s++) {
       stufen[s].style.setProperty('--verzug', Math.min(s, 6) * 70 + 'ms');
@@ -134,68 +142,6 @@
     };
     return { lage: lage, buero: buero };
   })();
-
-  /* DER CAMPUS LEBT (Antonio, 13.10.2026): hinter der Buehne stehen sieben
-     echte Fotoplatten des Turms im selben Blickwinkel - Tag, goldene Stunde,
-     blaue Stunde, Abend mit Licht, spaete Nacht, Regen, Schnee. Ein
-     WebGL-2-Canvas blendet zwischen ihnen nach der Sonnenhoehe am Campus,
-     legt Wolken, Regen, Schnee, Nebel und Wind darueber und schaltet nachts
-     die Bueros Fenster fuer Fenster nach der Belegung (CAMPUS_LEBEN). Es zaehlt
-     die echte Zeit in Duesseldorf, nicht die des Lesers. Das Wetter kommt
-     ohne Schluessel und ohne Kosten von Open-Meteo (Daten u. a. des Deutschen
-     Wetterdienstes); antwortet der Dienst nicht, bleibt der Himmel bewoelkt
-     und es steht keine Wetterzeile da. Das Startfoto ist die blaue Stunde
-     (static/bilder/campus-turm.jpg, zugleich die 2K-Platte); geladen wird
-     erst nach dem Startbild und nur, was die Lage braucht. Ohne WebGL 2 bleibt
-     das Foto stehen; unter Automatisierung bleibt die Buehne ruhig. */
-  var himmelBild = buehne && buehne.querySelector('.buehne-himmel');
-  if (himmelBild && !navigator.webdriver) {
-    var CAMPUS = 'https://api.open-meteo.com/v1/forecast?latitude=51.2437&longitude=6.7383'
-      + '&current=weather_code,temperature_2m,cloud_cover,wind_speed_10m&timezone=Europe%2FBerlin&forecast_days=1';
-    var REGEN = { 51: 0.3, 53: 0.4, 55: 0.5, 56: 0.4, 57: 0.5, 61: 0.45, 63: 0.6, 65: 0.85, 66: 0.5, 67: 0.75,
-      80: 0.45, 81: 0.65, 82: 0.9, 95: 1, 96: 1, 99: 1 };
-    var SCHNEE = { 71: 0.45, 73: 0.65, 75: 0.9, 77: 0.3, 85: 0.55, 86: 0.9 };
-    var wetterAus = function (c) {
-      var code = c.weather_code;
-      var w = {
-        wolken: typeof c.cloud_cover === 'number' ? c.cloud_cover / 100 : (code >= 3 ? 0.95 : code >= 2 ? 0.5 : 0.15),
-        regen: REGEN[code] || 0, schnee: SCHNEE[code] || 0, nebel: code === 45 || code === 48 ? 0.8 : 0,
-        wind: Math.min(1, (typeof c.wind_speed_10m === 'number' ? c.wind_speed_10m : 10) / 50), gewitter: code >= 95 ? 1 : 0
-      };
-      w.wort = w.gewitter ? 'Gewitter' : w.schnee ? 'Schnee' : w.regen ? 'Regen' : w.nebel ? 'Nebel'
-        : w.wolken > 0.7 ? 'bedeckt' : w.wolken > 0.4 ? 'bewölkt' : 'klar';
-      w.grad = typeof c.temperature_2m === 'number' ? Math.round(c.temperature_2m) : null;
-      return w;
-    };
-    var zeigeLage = function (wetter) {
-      var l = CAMPUS_LEBEN.lage(new Date(), wetter);
-      himmelBild.setAttribute('data-szene', l.szene);
-      himmelBild.setAttribute('data-jahreszeit', l.jahreszeit);
-      himmelBild.setAttribute('data-sonne', String(Math.round(l.sonne)));
-      himmelBild.setAttribute('data-buero', String(Math.round(l.ziel.buero * 100)));
-      buehne.classList.toggle('film-dunkel', !l.hell);
-      return l;
-    };
-    var spaeter = window.fetch ? fetch(CAMPUS).then(function (a) {
-      if (!a.ok) throw new Error('Wetter ' + a.status);
-      return a.json();
-    }) : Promise.reject(new Error('kein fetch'));
-    spaeter.then(function (d) { return wetterAus(d.current || {}); }, function () { return null; }).then(function (wetter) {
-      var l = zeigeLage(wetter);
-      var zeile = document.querySelector('[data-campus-wetter]');
-      if (zeile && wetter) {
-        zeile.textContent = 'Campus Düsseldorf · ' + (wetter.grad == null ? '' : wetter.grad + ' °C, ') + wetter.wort;
-        zeile.hidden = false;
-      }
-      var los = function () {
-        var gross = Math.max(screen.width, window.innerWidth) * (window.devicePixelRatio || 1) > 2700;
-        var szene = campusSzene(himmelBild, gross, l.ziel, ruhig);
-        if (szene) setInterval(function () { szene.neu(zeigeLage(wetter).ziel); }, 5 * 60 * 1000);
-      };
-      if (document.readyState === 'complete') los();
-      else window.addEventListener('load', los, { once: true });
-    });
-  }
 
   /* Der Shader: Platten nach Gewicht, Laub, Wolken ueber dem echten Himmel,
      nasser Platz, Schneedecke, Leuchthof, Flugwarnlichter, Nebel, Niederschlag. */
@@ -409,11 +355,88 @@ void main(){
 }`;
 
 
+  /* DER CAMPUS LEBT (Antonio, 13.10.2026): hinter der Buehne stehen sieben
+     echte Fotoplatten des Turms im selben Blickwinkel - Tag, goldene Stunde,
+     blaue Stunde, Abend mit Licht, spaete Nacht, Regen, Schnee. Ein
+     WebGL-2-Canvas blendet zwischen ihnen nach der Sonnenhoehe am Campus,
+     legt Wolken, Regen, Schnee, Nebel und Wind darueber und schaltet nachts
+     die Bueros Fenster fuer Fenster nach der Belegung (CAMPUS_LEBEN). Es zaehlt
+     die echte Zeit in Duesseldorf, nicht die des Lesers. Das Wetter kommt
+     ohne Schluessel und ohne Kosten von Open-Meteo (Daten u. a. des Deutschen
+     Wetterdienstes); antwortet der Dienst nicht, bleibt der Himmel bewoelkt
+     und es steht keine Wetterzeile da. Die Szene erscheint erst mit ihrem
+     ersten Bild in der echten Lage, ohne Startfoto davor und ohne
+     Ueberblenden aus einer anderen Lage (Antonio, 14.10.2026); geladen wird
+     nur, was die Lage braucht. Ohne WebGL 2 steht das Foto der Platte, die
+     zur Uhrzeit passt; unter Automatisierung bleibt die Buehne ruhig. */
+  var himmelBild = buehne && buehne.querySelector('.buehne-himmel');
+  if (himmelBild && !navigator.webdriver) {
+    var CAMPUS = 'https://api.open-meteo.com/v1/forecast?latitude=51.2437&longitude=6.7383'
+      + '&current=weather_code,temperature_2m,cloud_cover,wind_speed_10m&timezone=Europe%2FBerlin&forecast_days=1';
+    var REGEN = { 51: 0.3, 53: 0.4, 55: 0.5, 56: 0.4, 57: 0.5, 61: 0.45, 63: 0.6, 65: 0.85, 66: 0.5, 67: 0.75,
+      80: 0.45, 81: 0.65, 82: 0.9, 95: 1, 96: 1, 99: 1 };
+    var SCHNEE = { 71: 0.45, 73: 0.65, 75: 0.9, 77: 0.3, 85: 0.55, 86: 0.9 };
+    var wetterAus = function (c) {
+      var code = c.weather_code;
+      var w = {
+        wolken: typeof c.cloud_cover === 'number' ? c.cloud_cover / 100 : (code >= 3 ? 0.95 : code >= 2 ? 0.5 : 0.15),
+        regen: REGEN[code] || 0, schnee: SCHNEE[code] || 0, nebel: code === 45 || code === 48 ? 0.8 : 0,
+        wind: Math.min(1, (typeof c.wind_speed_10m === 'number' ? c.wind_speed_10m : 10) / 50), gewitter: code >= 95 ? 1 : 0
+      };
+      w.wort = w.gewitter ? 'Gewitter' : w.schnee ? 'Schnee' : w.regen ? 'Regen' : w.nebel ? 'Nebel'
+        : w.wolken > 0.7 ? 'bedeckt' : w.wolken > 0.4 ? 'bewölkt' : 'klar';
+      w.grad = typeof c.temperature_2m === 'number' ? Math.round(c.temperature_2m) : null;
+      return w;
+    };
+    var zeigeLage = function (wetter) {
+      var l = CAMPUS_LEBEN.lage(new Date(), wetter);
+      himmelBild.setAttribute('data-szene', l.szene);
+      himmelBild.setAttribute('data-jahreszeit', l.jahreszeit);
+      himmelBild.setAttribute('data-sonne', String(Math.round(l.sonne)));
+      himmelBild.setAttribute('data-buero', String(Math.round(l.ziel.buero * 100)));
+      buehne.classList.toggle('film-dunkel', !l.hell);
+      return l;
+    };
+    /* Das Wetter bekommt hoechstens WETTER_FRIST ms; danach zeichnet die
+       Szene die Lage ohne Wetter, statt den Leser warten zu lassen. */
+    var WETTER_FRIST = 1500;
+    var spaeter = window.fetch ? Promise.race([
+      fetch(CAMPUS).then(function (a) {
+        if (!a.ok) throw new Error('Wetter ' + a.status);
+        return a.json();
+      }),
+      new Promise(function (_, nein) { setTimeout(function () { nein(new Error('Wetter zu langsam')); }, WETTER_FRIST); })
+    ]) : Promise.reject(new Error('kein fetch'));
+    var gross = Math.max(screen.width, window.innerWidth) * (window.devicePixelRatio || 1) > 2700;
+    var ohneWetter = CAMPUS_LEBEN.lage(new Date(), null);
+    /* Kann die Szene nicht, steht das Foto der Platte, die der Uhrzeit am
+       naechsten kommt; die blaue 2K-Platte ist das Startfoto. */
+    var ersatz = function () {
+      buehne.classList.remove('campus-wartet');
+      var platte = ohneWetter.szene.split('-')[0];
+      zeigeStartbild(platte === 'blau' ? null : himmelBild.getAttribute('data-basis') + '2k/platte-' + platte + '.jpg');
+    };
+    var szene = campusSzene(himmelBild, gross, ohneWetter.ziel, ruhig, ersatz);
+    if (!szene) ersatz();
+    spaeter.then(function (d) { return wetterAus(d.current || {}); }, function () { return null; }).then(function (wetter) {
+      var l = zeigeLage(wetter);
+      var zeile = document.querySelector('[data-campus-wetter]');
+      if (zeile && wetter) {
+        zeile.textContent = 'Campus Düsseldorf · ' + (wetter.grad == null ? '' : wetter.grad + ' °C, ') + wetter.wort;
+        zeile.hidden = false;
+      }
+      if (!szene) return;
+      szene.start(l.ziel, function () { buehne.classList.remove('campus-wartet'); });
+      setInterval(function () { szene.neu(zeigeLage(wetter).ziel); }, 5 * 60 * 1000);
+    });
+  }
+
   /* Die Szene selbst. Jede Platte bekommt ihre feste Texture-Einheit; was die
-     Lage nicht braucht, wird nicht geladen und vom Shader nicht gelesen.
-     Beim Start steht die blaue Stunde wie das Startfoto und laeuft in wenigen
-     Sekunden in die Lage am Campus. Gibt { neu(ziel) } zurueck oder null. */
-  function campusSzene(canvas, gross, ziel, still) {
+     Lage nicht braucht, wird nicht geladen und vom Shader nicht gelesen. Die
+     Platten der Lage ohne Wetter (vorab) laden sofort; start(ziel, fertig)
+     malt das erste Bild gleich in der echten Lage. Scheitert das Laden, ruft
+     die Szene fehlt(). Gibt { start, neu } zurueck oder null. */
+  function campusSzene(canvas, gross, vorab, still, fehlt) {
     var gl = canvas.getContext('webgl2', { alpha: false, antialias: false, depth: false, powerPreference: 'high-performance' });
     if (!gl) return null;
     var VS = '#version 300 es\nin vec2 p;out vec2 vUv;void main(){vUv=p*0.5+0.5;vUv.y=1.0-vUv.y;gl_Position=vec4(p,0.0,1.0);}';
@@ -476,7 +499,7 @@ void main(){
             if (aniso) gl.texParameterf(gl.TEXTURE_2D, aniso.TEXTURE_MAX_ANISOTROPY_EXT, Math.min(8, gl.getParameter(aniso.MAX_TEXTURE_MAX_ANISOTROPY_EXT)));
           } else gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
           gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-          if (n === 'uBlau') { bildW = b.naturalWidth; bildH = b.naturalHeight; }
+          if (/^u(Tag|Gold|Blau|Nacht|Spaet|Regen|SchneeP)$/.test(n)) { bildW = b.naturalWidth; bildH = b.naturalHeight; }
           ok();
         };
         b.onerror = function () { fehler(new Error(PLATTEN[n][0])); };
@@ -484,23 +507,19 @@ void main(){
       });
       return geladen[n];
     };
-    /* Was eine Lage liest; die blaue Stunde steht immer am Anfang. */
+    /* Was eine Lage liest. */
     var bedarf = function (z) {
-      var n = ['uBlau', 'uMA', 'uHim', 'uGlanz'], hell = z.tag + z.gold > 0.001;
+      var n = ['uMA', 'uHim', 'uGlanz'], hell = z.tag + z.gold > 0.001;
       if (hell) n.push('uTag');
+      if (z.blau > 0.001) n.push('uBlau');
       if (z.gold > 0.001) n.push('uGold');
       if (z.nacht > 0.001) n.push('uNacht', 'uSpaet', 'uMB');
       if (hell && Math.max(z.regenPlatte, z.bedeckt) > 0.001) n.push('uRegen');
       if (hell && z.decke > 0.001) n.push('uSchneeP');
       return Promise.all(n.map(lade));
     };
-    var jetzt = {}, soll = {}, k;
-    for (k in ziel) { jetzt[k] = ziel[k]; soll[k] = ziel[k]; }
-    if (!still) {
-      jetzt.tag = jetzt.gold = jetzt.nacht = jetzt.regenPlatte = jetzt.bedeckt = jetzt.decke = 0;
-      jetzt.blau = 1;
-      jetzt.regenHell = 1;
-    }
+    var jetzt = {}, soll = {};
+    bedarf(vorab).catch(function () {});
     var t0 = 0, letzte = 0, gemalt = 0, blitz = 0, naechster = 3, skala = 1, langsam = 0;
     var laeuft = false, sichtbar = true, raf = 0;
     var male = function (zeit) {
@@ -562,18 +581,25 @@ void main(){
       if (an && !laeuft) { laeuft = true; letzte = gemalt = performance.now(); raf = requestAnimationFrame(schleife); }
       if (!an && laeuft) { laeuft = false; cancelAnimationFrame(raf); }
     };
-    bedarf(ziel).then(function () {
-      t0 = letzte = performance.now();
-      male(t0);
-      canvas.classList.add('laeuft');
-      steuere();
-      document.addEventListener('visibilitychange', steuere);
-      if ('IntersectionObserver' in window) {
-        new IntersectionObserver(function (e) { sichtbar = e[0].isIntersecting; steuere(); }).observe(canvas);
-      }
-      window.addEventListener('resize', function () { if (still) male(performance.now()); });
-    }).catch(function () {});
     return {
+      start: function (ziel, fertig) {
+        for (var k in ziel) { jetzt[k] = ziel[k]; soll[k] = ziel[k]; }
+        bedarf(ziel).then(function () {
+          t0 = letzte = performance.now();
+          male(t0);
+          var w = [jetzt.tag, jetzt.gold, jetzt.blau, jetzt.nacht], st = 0;
+          for (var i = 1; i < 4; i++) if (w[i] > w[st]) st = i;
+          canvas.setAttribute('data-erstes-bild', ['tag', 'gold', 'blau', 'nacht'][st]);
+          canvas.classList.add('laeuft');
+          fertig();
+          steuere();
+          document.addEventListener('visibilitychange', steuere);
+          if ('IntersectionObserver' in window) {
+            new IntersectionObserver(function (e) { sichtbar = e[0].isIntersecting; steuere(); }).observe(canvas);
+          }
+          window.addEventListener('resize', function () { if (still) male(performance.now()); });
+        }).catch(fehlt);
+      },
       neu: function (z) {
         bedarf(z).then(function () {
           for (var j in z) soll[j] = z[j];
@@ -631,13 +657,10 @@ void main(){
   /* LESEFLUSS: Absaetze und Aufzaehlungen erscheinen, wenn der Leser sie
      erreicht - einmal, dann bleiben sie. Was beim Laden schon im Bild ist,
      wird nie versteckt. */
-  var LESESTUECKE = [
-    '.szene-text > p', '.szene-text > ul > li', '.szene-text > ol > li',
-    '.szene-text > h3', '.szene-text > blockquote', '.szene-text > .rubrik',
-    '.szene-text .wichtig-zeile', '.szene-text > .ex-count', '.szene-text .wb-kurz-zeile',
-    '.szene-text .fwb-frage', '.szene-text .fwb-stand', '.themen-zeile',
-    '.szene-text .kurzpfad-zeile', '.szene-weiter', '[data-auftritt]'
-  ].join(',');
+  /* Der Wochenbericht steht seit 14.10.2026 sofort da (Antonio: "der
+     Bericht ... zu viel Bewegung"); eingeblendet wird nur noch, was eine
+     Seite ausdruecklich mit data-auftritt markiert. */
+  var LESESTUECKE = '[data-auftritt]';
   var lesen = null;
   function aufdecken(el, sofort) {
     if (!el.classList.contains('vorher') || el.classList.contains('sichtbar')) return;
@@ -686,23 +709,9 @@ void main(){
   sprungZiel();
   window.addEventListener('hashchange', sprungZiel);
 
-  /* DIE SZENEN: wo der Browser scrollgebundene Animationen nicht kennt,
-     schneidet eine Klasse das Bild auf die linke Haelfte. */
+  /* DIE SZENEN: am Rand steht das Kapitel, in dem der Leser gerade ist. */
   var szenen = document.querySelectorAll('.szene');
-  var nativ = !!(window.CSS && CSS.supports && CSS.supports('animation-timeline: view()'));
   if (szenen.length && 'IntersectionObserver' in window) {
-    if (!nativ && !ruhig) {
-      var schnitt = new IntersectionObserver(function (eintraege) {
-        eintraege.forEach(function (e) {
-          var szene = e.target.parentNode;
-          szene.classList.toggle('szene--geschnitten', e.isIntersecting || e.boundingClientRect.top < 0);
-        });
-      }, { rootMargin: '0px 0px -30% 0px' });
-      for (var n = 0; n < szenen.length; n++) {
-        var text = szenen[n].querySelector(':scope > .szene-text');
-        if (text && szenen[n].querySelector(':scope > .szene-bild')) schnitt.observe(text);
-      }
-    }
     var marke = document.querySelector('.kapitel-marke');
     if (marke) {
       var name = marke.querySelector('[data-kapitel-name]');
@@ -5064,105 +5073,18 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
   });
 })();
 
-/* KI-SEITE, SCHNITTE 7 BIS 9 (Pitch 9, Entwurf 10). Die Leiter der Modelle:
-   aus #ki-modelle-daten eine senkrechte Linie mit den Pillen abwechselnd
-   links und rechts (unter 700 px alle rechts); ein roter Punkt faellt mit
-   dem Scrollen, jede erreichte Stufe erscheint. Ohne JS bleibt die Liste.
-   Die Rubrikleiste erscheint, sobald der Kopf vorbei ist. */
+/* KI-SEITE, SCHNITTE 8 UND 9 (Pitch 9, Entwurf 10). Die Rubrikleiste
+   erscheint, sobald der Kopf vorbei ist; hervorgehoben ist der innerste
+   Teil, der die Lesezeile kreuzt (das Fenster der Modelle liegt in den
+   Meldungen, Antonio 14.10.2026). */
 (function () {
   var still = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
-  var NS = 'http://www.w3.org/2000/svg';
-  function mk(eltern, n, a, t) {
-    var e = document.createElementNS(NS, n);
-    for (var k in a) e.setAttribute(k, a[k]);
-    if (t != null) e.textContent = t;
-    eltern.appendChild(e);
-    return e;
-  }
   [].forEach.call(document.querySelectorAll('.ki-ansage'), function (ansage) {
     if (!('IntersectionObserver' in window)) return ansage.classList.add('da');
     new IntersectionObserver(function (e, o) {
       if (e[0].isIntersecting) { ansage.classList.add('da'); o.disconnect(); }
     }, { threshold: 0.4 }).observe(ansage);
   });
-
-  var daten = document.getElementById('ki-modelle-daten');
-  var M = daten ? JSON.parse(daten.textContent) : [];
-  var band = document.getElementById('modelle');
-  if (M.length && band) {
-    var liste = band.querySelector('.ki-rang');
-    var svg = document.createElementNS(NS, 'svg');
-    svg.id = 'ki-leiter';
-    svg.setAttribute('role', 'img');
-    svg.setAttribute('aria-label', 'Die ' + M.length + ' stärksten KI-Modelle, von Platz 1 abwärts');
-    liste.parentNode.insertBefore(svg, liste);
-    band.classList.add('ki-modelle--leiter');
-    var cs = getComputedStyle(band);
-    var c = function (v) { return cs.getPropertyValue(v).trim(); };
-    var WEISS = c('--bildtext'), LINIE = c('--sp-linie'), T2 = c('--sp-text-2'), GRUND = c('--sp-netz'), ROT = c('--red');
-    var punkt, spur, stufen = [], H = 1, Y0 = 0, Y1 = 0, akt = 0, ziel = 0, laeuft = false;
-    var schritt = function () {
-      var d = ziel - akt;
-      akt += still ? d : d * 0.14;
-      if (Math.abs(d) < 0.5) akt = ziel;
-      punkt.setAttribute('cy', akt);
-      spur.setAttribute('y2', akt);
-      stufen.forEach(function (st) {
-        var an = akt >= st.y - 2;
-        if (an === st.da) return;
-        st.da = an;
-        st.g.classList.toggle('da', an);
-        if (!still) st.l.style.strokeDashoffset = an ? 0 : st.len;
-      });
-      if (akt !== ziel) requestAnimationFrame(schritt); else laeuft = false;
-    };
-    var rechne = function () {
-      var r = svg.getBoundingClientRect(), s = r.height / H;
-      ziel = still ? Y1 : Math.max(Y0, Math.min(Y1, (innerHeight * 0.8 - r.top) / s));
-      if (still) schritt();
-      else if (!laeuft) { laeuft = true; requestAnimationFrame(schritt); }
-    };
-    var baue = function () {
-      while (svg.firstChild) svg.removeChild(svg.firstChild);
-      stufen = [];
-      var W = svg.parentNode.clientWidth, eng = W < 700;
-      var F = eng ? 15 : 19, PH = eng ? 36 : 44, AX = eng ? 34 : W / 2, AB = eng ? 52 : 56, Y = eng ? 40 : 50;
-      H = Y + M.length * AB + 10; Y0 = 10; Y1 = H - 10;
-      svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
-      svg.setAttribute('height', H);
-      mk(svg, 'line', { x1: AX, x2: AX, y1: Y0, y2: Y1, stroke: LINIE, 'stroke-width': 1.3 });
-      spur = mk(svg, 'line', { x1: AX, x2: AX, y1: Y0, y2: Y0, stroke: WEISS, 'stroke-width': 1.6 });
-      M.forEach(function (m, i) {
-        var y = Y + i * AB, s = eng || i % 2 ? 1 : -1, eins = i === 0;
-        var g = mk(svg, 'g', { class: 'ki-stufe' });
-        var t = mk(g, 'text', { class: 'ki-stufe-name', 'font-size': eins ? F * 1.25 : F, fill: eins ? GRUND : WEISS, 'font-weight': eins ? 600 : 500 }, m.name);
-        var ph = eins ? PH * 1.2 : PH, mark = ph * 0.42, w = t.getComputedTextLength() + ph + mark * 0.5 + 10;
-        var x0 = s > 0 ? AX + (eng ? 26 : 90) : AX - 90 - w;
-        g.insertBefore(mk(g, 'rect', { x: x0, y: y - ph / 2, width: w, height: ph, rx: ph / 2, fill: eins ? WEISS : GRUND, stroke: WEISS, 'stroke-width': 1.3 }), t);
-        var p = mk(g, 'circle', { class: 'ki-stufe-punkt', cx: x0 + ph * 0.55, cy: y, r: mark * 0.42, stroke: eins ? 'none' : WEISS, 'stroke-width': 0.8 });
-        p.style.fill = 'var(' + m.farbe + ')';
-        t.setAttribute('x', x0 + ph * 0.55 + mark * 0.5 + 10);
-        t.setAttribute('y', y + F * 0.36 * (eins ? 1.25 : 1));
-        mk(svg, 'text', { x: eng ? AX - 12 : AX - s * 14, y: y + 5, 'text-anchor': eng || s > 0 ? 'end' : 'start', 'font-size': 13, fill: T2, 'font-variant-numeric': 'tabular-nums' }, m.platz);
-        var ende = s > 0 ? x0 : x0 + w, mitte = AX + (ende - AX) * 0.5;
-        var l = mk(svg, 'path', { d: 'M' + AX + ' ' + y + ' C ' + mitte + ' ' + y + ' ' + mitte + ' ' + y + ' ' + ende + ' ' + y, fill: 'none', stroke: WEISS, 'stroke-width': 1.2 });
-        var len = l.getTotalLength();
-        l.style.strokeDasharray = len;
-        l.style.strokeDashoffset = still ? 0 : len;
-        if (!still) l.style.transition = 'stroke-dashoffset .7s cubic-bezier(.6,.1,.2,1)';
-        mk(svg, 'circle', { cx: AX, cy: y, r: 4, fill: WEISS });
-        stufen.push({ y: y, g: g, l: l, len: len, da: false });
-      });
-      punkt = mk(svg, 'circle', { class: 'ki-leiter-punkt', cx: AX, cy: Y0, r: 7, fill: ROT });
-      akt = still ? Y1 : Y0;
-      rechne();
-    };
-    addEventListener('scroll', rechne, { passive: true });
-    var zg;
-    addEventListener('resize', function () { clearTimeout(zg); zg = setTimeout(baue, 150); });
-    baue();
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(baue);
-  }
 
   /* Schnitt 9: die Linie der Fahrt zeichnet sich mit dem Scrollen, der
      rote Punkt laeuft mit, jede erreichte Station poppt auf. Ohne JS steht
@@ -5225,9 +5147,15 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
   var geplant = false;
   function lage() {
     geplant = false;
-    rub.classList.toggle('da', kopf.getBoundingClientRect().bottom < innerHeight * 0.75);
+    rub.classList.toggle('da', kopf.getBoundingClientRect().bottom < 0);
     var i = -1;
-    ziele.forEach(function (z, j) { if (z && z.getBoundingClientRect().top < innerHeight * 0.45) i = j; });
+    var zeile = innerHeight * 0.45, tiefe = -1;
+    ziele.forEach(function (z, j) {
+      if (!z) return;
+      var r = z.getBoundingClientRect(), t = 0;
+      for (var e = z; e; e = e.parentElement) t++;
+      if (r.top < zeile && r.bottom > zeile && t > tiefe) { i = j; tiefe = t; }
+    });
     [].forEach.call(links, function (a, j) { a.classList.toggle('an', i === j); });
   }
   addEventListener('scroll', function () {
