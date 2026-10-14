@@ -378,11 +378,9 @@ def _auffaellig(
                 "url": e.get("quelle_url", ""),
             }
         )
+    bewegungen.sort(key=lambda b: abs(b["delta"]))
+    bewegungen = list({b.pop("schluessel"): b for b in bewegungen}.values())
     bewegungen.sort(key=lambda b: -abs(b["delta"]))
-    erste: dict[tuple, dict] = {}
-    for b in bewegungen:
-        erste.setdefault(b.pop("schluessel"), b)
-    bewegungen = list(erste.values())
 
     neu_gelistet = [e for e in eintraege if _im_fenster(e.get("first_seen", ""), heute)]
     verschwunden = [
@@ -1627,7 +1625,8 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         ),
         default=0,
     )
-    auffaellig = _auffaellig(alle, historie, katalog, heute, laeufe=laeufe)
+    je_laden = [{**e, "anbieter": geraete_vergleich._laden(e, laden)} for e in alle]
+    auffaellig = _auffaellig(je_laden, historie, katalog, heute, laeufe=laeufe)
     lifecycle = geraete_lifecycle.auswertung(
         alle,
         punkte_alle,

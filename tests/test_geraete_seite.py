@@ -372,7 +372,7 @@ _PUNKTE_DUENN = [
 ]
 
 
-def _baue(tmp_path: Path, db=None, punkte=None):
+def _baue(tmp_path: Path, db=None, punkte=None, quellen=None):
     """Eine vollstaendige Site rendern - mit echtem Bericht, echtem Zustand.
 
     `db` ersetzt den Bestand, wenn ein Fall mehr Listungen braucht als die
@@ -385,7 +385,7 @@ def _baue(tmp_path: Path, db=None, punkte=None):
     for name, daten in (
         ("geraete_katalog.yaml", _KATALOG),
         ("farben.yaml", _FARBEN),
-        ("geraete_quellen.yaml", _QUELLEN),
+        ("geraete_quellen.yaml", quellen or _QUELLEN),
     ):
         (root / "config" / name).write_text(
             yaml.safe_dump(daten, allow_unicode=True, sort_keys=False), encoding="utf-8"
@@ -3220,3 +3220,13 @@ def test_die_seite_behauptet_keinen_reinen_barpreisvergleich_mehr(tmp_path):
     assert absatz is not None, "der Datensatz-Absatz der Alarm-Sektion fehlt"
     titel = absatz.get("title") or ""
     assert "kein Barpreis" in titel, f"Absatz ohne Ratenzahl-Hinweis: {titel!r}"
+
+
+def test_die_wochenkarte_nennt_den_laden_nicht_die_marke(tmp_path):
+    """mobilcom-debitel und freenet sind ein Laden: die Wochenkarte nennt ihn
+    wie Händlertabelle und Grafik (`shop` in geraete_quellen.yaml)."""
+    quellen = json.loads(json.dumps(_QUELLEN))
+    quellen["anbieter"][0]["shop"] = "Medimax Markt"
+    site = _baue(tmp_path, quellen=quellen)
+    saetze = [li.get_text(strip=True) for li in _verlauf(site).select(".gr-saetze li")]
+    assert any("bei Medimax Markt:" in s for s in saetze), saetze
