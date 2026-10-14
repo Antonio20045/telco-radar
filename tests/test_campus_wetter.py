@@ -235,23 +235,76 @@ def _geladen(seite, endung: str) -> list[str]:
     return [u for u in seite.ablauf if u.endswith(endung)]
 
 
-def test_am_klaren_tag_laden_nur_die_noetigen_platten_und_erst_nach_dem_startbild(
+def test_am_klaren_tag_laden_nur_die_noetigen_platten_und_kein_startfoto(
     chromium, site
 ):
+    """Das Startfoto (blaue Stunde) stand vor der Szene und zeigte erst eine
+    falsche Lage (Antonio, 14.10.2026): rechnet die Szene, kommt es nie."""
     _, adresse = site
     seite = _oeffne(chromium, adresse, "2026-10-13T11:05:00Z", _antwort(0, 16.0, 10))
     try:
         seite.wait_for_selector(".buehne-himmel.laeuft", timeout=30_000)
         assert not _geladen(seite, ".mp4"), seite.ablauf
-        startbild = _geladen(seite, "/campus-turm.jpg")
-        tag = _geladen(seite, "/2k/platte-tag.jpg")
-        assert startbild and tag and _geladen(seite, "/2k/maske-a.png"), seite.ablauf
-        assert seite.ablauf.index(startbild[0]) < seite.ablauf.index(tag[0])
-        for unnoetig in ("nacht", "spaet", "regen", "schnee", "gold"):
+        assert not _geladen(seite, "/campus-turm.jpg"), seite.ablauf
+        assert seite.locator(".buehne-ebene.geladen").count() == 0
+        assert _geladen(seite, "/2k/platte-tag.jpg"), seite.ablauf
+        assert _geladen(seite, "/2k/maske-a.png"), seite.ablauf
+        for unnoetig in ("nacht", "spaet", "regen", "schnee", "gold", "blau"):
             assert not _geladen(seite, f"/platte-{unnoetig}.jpg"), unnoetig
         assert not _geladen(seite, "/maske-b.png")
     finally:
         seite.context.close()
+
+
+@pytest.mark.parametrize(
+    ("zeitpunkt", "code", "erstes"),
+    [
+        ("2026-10-13T11:05:00Z", 45, "tag"),
+        ("2026-10-13T21:30:00Z", 0, "nacht"),
+        ("2026-10-13T16:35:00Z", 1, "gold"),
+    ],
+)
+def test_das_erste_bild_zeigt_schon_die_echte_lage(
+    chromium, site, zeitpunkt, code, erstes
+):
+    """Kein Ueberblenden aus der blauen Stunde: schon das erste gemalte Bild
+    steht in der Lage am Campus, und bis dahin bleibt die Buehne dunkel."""
+    _, adresse = site
+    seite = _oeffne(chromium, adresse, zeitpunkt, _antwort(code, 10.0))
+    try:
+        assert "campus-wartet" in seite.get_attribute(".buehne", "class") or (
+            seite.locator(".buehne-himmel.laeuft").count() == 1
+        )
+        seite.wait_for_selector(".buehne-himmel.laeuft", timeout=30_000)
+        himmel = seite.locator(".buehne-himmel")
+        assert himmel.get_attribute("data-erstes-bild") == erstes
+        assert "campus-wartet" not in seite.get_attribute(".buehne", "class")
+    finally:
+        seite.context.close()
+
+
+def test_ohne_webgl_steht_das_foto_der_uhrzeit(chromium, site):
+    """Kann der Browser kein WebGL 2, steht das Foto der Platte, die zur
+    Uhrzeit am Campus passt, nicht die blaue Stunde."""
+    _, adresse = site
+    kontext = chromium.new_context(viewport={"width": 960, "height": 540})
+    seite = kontext.new_page()
+    seite.add_init_script(_ECHT)
+    seite.add_init_script(_UHR % "2026-10-13T11:05:00Z")
+    seite.add_init_script(
+        "const g=HTMLCanvasElement.prototype.getContext;"
+        "HTMLCanvasElement.prototype.getContext=function(t,...a){"
+        "return t==='webgl2'?null:g.call(this,t,...a)};"
+    )
+    seite.route("https://api.open-meteo.com/**", lambda r: r.abort())
+    try:
+        seite.goto(f"{adresse}/seite.html")
+        seite.wait_for_selector(".buehne-ebene.geladen", timeout=30_000)
+        quelle = seite.get_attribute(".buehne-ebene", "src")
+        assert quelle.endswith("static/campus/2k/platte-tag.jpg"), quelle
+        assert "campus-wartet" not in seite.get_attribute(".buehne", "class")
+    finally:
+        kontext.close()
 
 
 def test_nachts_kommen_abend_und_nachtplatte_mit_der_fenstermaske(chromium, site):

@@ -27,11 +27,13 @@
 {# Nach dem Startbild folgt direkt das Bild des ersten Kapitels, ohne
    Zwischentitel und ohne Kino-Animation (Antonio, 11.10.2026). #}
 <section class="buehne" aria-label="Ausgabe vom {{ date_de }}">
-  {# Das Startfoto ist die blaue Stunde. Darueber blendet app.js im Canvas
-     zwischen sieben Fotoplatten (static/campus/) nach Uhrzeit, Wetter und
-     Jahreszeit am Campus; ohne JavaScript oder WebGL 2 steht das Foto. #}
+  {# app.js malt im Canvas den Campus aus sieben Fotoplatten (static/campus/)
+     nach Uhrzeit, Wetter und Jahreszeit; das Foto der blauen Stunde steht nur
+     ohne JavaScript oder WebGL 2. #}
   {% set klein = (bilder_klein or {}).get('campus-turm') %}
-  <div class="buehne-bild" aria-hidden="true"{% if 'campus-turm' in bilder %} style="background:url({{ bilder['campus-turm'] }}) center/cover"{% endif %}>
+  {# Kein Vorschaubild als Hintergrund: es zeigte die blaue Stunde, bevor die
+     Szene die echte Lage malt (Antonio, 14.10.2026). #}
+  <div class="buehne-bild" aria-hidden="true">
     {% if 'campus-turm' in bilder %}
     <img class="buehne-ebene" data-zeit-bild="tag" data-src="{{ prefix }}static/bilder/campus-turm.jpg"{% if klein %} data-srcset="{{ prefix }}static/bilder/{{ klein }} 1200w, {{ prefix }}static/bilder/campus-turm.jpg 2560w" sizes="100vw"{% endif %} alt="" width="2560" height="1416" decoding="async">
     <canvas class="buehne-himmel" data-basis="{{ prefix }}static/campus/" data-blau="{{ prefix }}static/bilder/campus-turm.jpg" aria-hidden="true"></canvas>

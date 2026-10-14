@@ -4419,7 +4419,8 @@ body:not(.mit-buehne) main{padding-top:112px}
   opacity:0;transition:opacity 1.2s var(--ease-blende)}
 .buehne-ebene.geladen{opacity:1}
 .buehne-himmel{position:absolute;inset:0;width:100%;height:100%;display:block;
-  opacity:0;transition:opacity 1.2s var(--ease-blende)}
+  opacity:0;transition:opacity .6s var(--ease-blende)}
+.buehne.campus-wartet,.buehne.campus-wartet .buehne-bild{background:var(--n-paper)}
 .buehne-himmel.laeuft{opacity:1}
 .buehne-wetter{display:inline-block;margin:14px 0 0;padding:7px 14px;border-radius:999px;
   font-size:15px;font-weight:500;color:var(--glas-text);background:var(--glas);
