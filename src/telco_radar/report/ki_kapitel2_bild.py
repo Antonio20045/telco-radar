@@ -116,7 +116,7 @@ def _regel() -> tuple[list, list]:
         vorn.append(
             _t(x + (40 if x < MITTE else -40), REGEL_Y + 65, ja, "ki-k1-wort", 14)
         )
-    fach = {True: [], False: []}
+    fach: dict[bool, list[tuple[str, bool]]] = {True: [], False: []}
     for wort, _, _, spam in MAILS:
         fach["klick" in wort.lower()].append((wort, spam))
     for (_, x), sortiert in zip(FAECHER, (True, False), strict=True):
@@ -161,9 +161,9 @@ def _ebene() -> tuple[list, list]:
     grenzen = [n for _, _, n in LINIEN]
     for i, (u, v, spam) in enumerate(BEISPIELE):
         stufe = next(k for k, n in enumerate(grenzen) if i < n)
-        x, y = _punkt(EBENE, u, v)
+        px, py = _punkt(EBENE, u, v)
         kreis = _e(
-            "circle", klasse="ki-k2-spam" if spam else "ki-k2-post", cx=x, cy=y, r=7
+            "circle", klasse="ki-k2-spam" if spam else "ki-k2-post", cx=px, cy=py, r=7
         )
         vorn.append(
             _e("g", kinder=[kreis], klasse="ki-k1-zug", data_y=y0 + 40 + stufe * 200)
