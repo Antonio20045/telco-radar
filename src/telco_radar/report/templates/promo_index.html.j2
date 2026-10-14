@@ -163,7 +163,7 @@
 {% block buehne %}
 {% set aktiv_karten = promo_view.karten | rejectattr('offer.fading') | list %}
 {% set motive = aktiv_karten | selectattr('bild') | map(attribute='bild') | unique | list %}
-<section class="pw-auftakt" data-buehne>
+<section class="pw-auftakt kopfband">
   <div class="pw-buehne">
     <div class="pw-rahmen">
       {% if motive %}
@@ -179,14 +179,13 @@
       {% endif %}
       <div class="pw-schleier" aria-hidden="true"></div>
       <div class="pw-text">
-        <p class="pw-zahl"><b data-zaehler>{{ promo_view.active_total }}</b></p>
+        <p class="pw-zahl"><b>{{ promo_view.active_total }}</b></p>
         <p class="pw-zahl-text">Aktionen bei {{ promo_view.brands_active }} Marken</p>
         <ul class="pw-neben">
           <li><b>{{ aktiv_karten | selectattr('neu') | list | length }}</b>neu diese Woche</li>
           <li><b>{{ aktiv_karten | selectattr('endet_bald') | list | length }}</b>enden in 7 Tagen</li>
         </ul>
       </div>
-      <div class="wa-hinweis" aria-hidden="true"></div>
     </div>
   </div>
 </section>

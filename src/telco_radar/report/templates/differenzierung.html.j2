@@ -96,16 +96,15 @@
 {% endmacro %}
 
 {% block buehne %}
-<section class="wa-auftakt mg-auftakt" data-buehne>
+<section class="wa-auftakt mg-auftakt kopfband">
   <div class="wa-auftakt-buehne">
     <div class="wa-rahmen">
       <div class="wa-bild" aria-hidden="true">{{ d.motiv('band-welt' if 'band-welt' in bilder else 'kapitel-global', prefix, 'wa-motiv', eager=true) }}</div>
       <div class="wa-schleier" aria-hidden="true"></div>
       <header class="mg-kopf wa-text wa-kopf-schlicht">
-        <h1 class="mg-titel" aria-label="Welt">{% for c in 'Welt' %}<span style="--i:{{ loop.index0 }}" aria-hidden="true">{{ c }}</span>{% endfor %}</h1>
+        <h1 class="mg-titel">Welt</h1>
         <p class="mg-datum">Wettbewerb</p>
       </header>
-      <div class="wa-hinweis" aria-hidden="true"></div>
     </div>
   </div>
 </section>

@@ -195,7 +195,11 @@ def test_global_landet_beim_umschalter_der_anderen_seite(chromium, basis):
         assert lage["pille"] == lage["wahl"]
         wahl = s.inner_text(".glas-schalter [aria-current=page]")
         assert wahl.strip() == "Global"
-        assert s.evaluate("window.scrollY") > 0
+        box = s.evaluate(
+            "(() => { const r = document.querySelector('.glas-schalter')"
+            ".getBoundingClientRect(); return [r.top, r.bottom]; })()"
+        )
+        assert box[0] >= 0 and box[1] <= 900, box
     finally:
         context.close()
 

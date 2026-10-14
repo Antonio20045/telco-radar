@@ -36,16 +36,15 @@
 {% endmacro %}
 
 {% block buehne %}
-<section class="wa-auftakt mg-auftakt" data-buehne>
+<section class="wa-auftakt mg-auftakt kopfband">
   <div class="wa-auftakt-buehne">
     <div class="wa-rahmen">
       <div class="wa-bild" aria-hidden="true">{{ d.motiv('band-wettbewerb', prefix, 'wa-motiv', eager=true) }}</div>
       <div class="wa-schleier" aria-hidden="true"></div>
       <header class="mg-kopf wa-text wa-kopf-schlicht">
-        <h1 class="mg-titel" aria-label="Wettbewerb">{% for c in 'Wettbewerb' %}<span style="--i:{{ loop.index0 }}" aria-hidden="true">{{ c }}</span>{% endfor %}</h1>
+        <h1 class="mg-titel">Wettbewerb</h1>
         <p class="mg-datum">Deutschland</p>
       </header>
-      <div class="wa-hinweis" aria-hidden="true"></div>
     </div>
   </div>
 </section>
@@ -75,13 +74,13 @@
 {% set erste = (c.monate[0].offen if c.monate else []) %}
 {% set themen = (puls.themen or {}).get(c.anker, []) %}
 <section class="wb wa-kapitel gr-anb--{{ ANBIETER_KLASSE.get(c.anker, 'ohne-farbe') }}" id="{{ c.anker }}">
-  <div class="wa-kapitel-buehne" data-buehne>
+  <div class="wa-kapitel-buehne">
     <div class="wa-kapitel-bild" aria-hidden="true">{{ d.motiv(KAPITELBILD.get(c.anker), prefix, 'wa-motiv') }}</div>
     <div class="wa-schleier" aria-hidden="true"></div>
     <div class="wa-kapitel-titel">
       <p class="wa-nr">{{ loop.index }} / {{ loop.length }}</p>
       <h2 class="wb-name">{{ c.name }}</h2>
-      {% if c.n_chronik %}<p class="wa-kapitel-zahl"><span class="rubrik-zahl"><b data-zaehler="{{ c.n_chronik }}">{{ c.n_chronik }}</b>
+      {% if c.n_chronik %}<p class="wa-kapitel-zahl"><span class="rubrik-zahl"><b>{{ c.n_chronik }}</b>
         Meldung{{ 'en' if c.n_chronik != 1 else '' }} seit {{ c.seit | date_de }}</span></p>{% endif %}
     </div>
   </div>

@@ -61,21 +61,20 @@
 </article>
 {% endmacro %}
 
-{# Das grosse Bild wie auf den anderen Seiten (Antonio, 10.10.2026): nur
-   der Zeitungskopf liegt darauf, keine Schlagworte; beim Scrollen wird es
-   zum Fenster, darunter steht die Ausgabe unveraendert. #}
+{# Kopfband statt Startbildschirm (Antonio, 14.10.2026): ein flaches Bild
+   mit dem Zeitungskopf, ohne Scrollstrecke und ohne Bewegung; die
+   Artikel stehen direkt darunter im ersten Bildschirm. #}
 {% block buehne %}
-<section class="wa-auftakt mg-auftakt" data-buehne>
+<section class="wa-auftakt mg-auftakt kopfband">
   <div class="wa-auftakt-buehne">
     <div class="wa-rahmen">
       <div class="wa-bild" aria-hidden="true">{{ d.motiv('band-meldungen', prefix, 'wa-motiv', eager=true) }}</div>
       <div class="wa-schleier" aria-hidden="true"></div>
       <header class="mg-kopf wa-text">
         {% if ausgabe.kw %}<p class="mg-woche">Kalenderwoche {{ ausgabe.kw }}</p>{% endif %}
-        <h1 class="mg-titel" aria-label="Meldungen">{% for c in 'Meldungen' %}<span style="--i:{{ loop.index0 }}" aria-hidden="true">{{ c }}</span>{% endfor %}</h1>
+        <h1 class="mg-titel">Meldungen</h1>
         {% if date_de %}<p class="mg-datum">Ausgabe vom {{ date_de }}</p>{% endif %}
       </header>
-      <div class="wa-hinweis" aria-hidden="true"></div>
     </div>
   </div>
 </section>

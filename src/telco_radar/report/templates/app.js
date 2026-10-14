@@ -657,13 +657,10 @@ void main(){
   /* LESEFLUSS: Absaetze und Aufzaehlungen erscheinen, wenn der Leser sie
      erreicht - einmal, dann bleiben sie. Was beim Laden schon im Bild ist,
      wird nie versteckt. */
-  var LESESTUECKE = [
-    '.szene-text > p', '.szene-text > ul > li', '.szene-text > ol > li',
-    '.szene-text > h3', '.szene-text > blockquote', '.szene-text > .rubrik',
-    '.szene-text .wichtig-zeile', '.szene-text > .ex-count', '.szene-text .wb-kurz-zeile',
-    '.szene-text .fwb-frage', '.szene-text .fwb-stand', '.themen-zeile',
-    '.szene-text .kurzpfad-zeile', '.szene-weiter', '[data-auftritt]'
-  ].join(',');
+  /* Der Wochenbericht steht seit 14.10.2026 sofort da (Antonio: "der
+     Bericht ... zu viel Bewegung"); eingeblendet wird nur noch, was eine
+     Seite ausdruecklich mit data-auftritt markiert. */
+  var LESESTUECKE = '[data-auftritt]';
   var lesen = null;
   function aufdecken(el, sofort) {
     if (!el.classList.contains('vorher') || el.classList.contains('sichtbar')) return;
@@ -712,23 +709,9 @@ void main(){
   sprungZiel();
   window.addEventListener('hashchange', sprungZiel);
 
-  /* DIE SZENEN: wo der Browser scrollgebundene Animationen nicht kennt,
-     schneidet eine Klasse das Bild auf die linke Haelfte. */
+  /* DIE SZENEN: am Rand steht das Kapitel, in dem der Leser gerade ist. */
   var szenen = document.querySelectorAll('.szene');
-  var nativ = !!(window.CSS && CSS.supports && CSS.supports('animation-timeline: view()'));
   if (szenen.length && 'IntersectionObserver' in window) {
-    if (!nativ && !ruhig) {
-      var schnitt = new IntersectionObserver(function (eintraege) {
-        eintraege.forEach(function (e) {
-          var szene = e.target.parentNode;
-          szene.classList.toggle('szene--geschnitten', e.isIntersecting || e.boundingClientRect.top < 0);
-        });
-      }, { rootMargin: '0px 0px -30% 0px' });
-      for (var n = 0; n < szenen.length; n++) {
-        var text = szenen[n].querySelector(':scope > .szene-text');
-        if (text && szenen[n].querySelector(':scope > .szene-bild')) schnitt.observe(text);
-      }
-    }
     var marke = document.querySelector('.kapitel-marke');
     if (marke) {
       var name = marke.querySelector('[data-kapitel-name]');

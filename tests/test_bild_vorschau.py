@@ -103,9 +103,12 @@ def test_die_wichtigsten_meldungen_haben_ein_bild(tmp_path):
     assert "kapitel-meldungen" in bilder
 
 
-def test_meldungen_haben_ein_grosses_bild_ohne_schlagworte(seiten):
+def test_meldungen_haben_ein_kopfband_ohne_schlagworte(seiten):
+    """Seit 14.10.2026 ein flaches Kopfband statt Scrollstrecke (Antonio:
+    "man sieht direkt die Artikel"): kein data-buehne, also kein --p."""
     seite = seiten["meldungen.html"]
-    auftakt = seite.select_one("section.wa-auftakt.mg-auftakt[data-buehne]")
+    assert seite.select_one("[data-buehne]") is None
+    auftakt = seite.select_one("section.wa-auftakt.mg-auftakt.kopfband")
     assert auftakt is not None
     assert "band-meldungen.jpg" in auftakt.select_one(".wa-bild img")["src"]
     assert auftakt.select_one(".mg-kopf .mg-titel")

@@ -6371,3 +6371,81 @@ a.ki-k1-pille:hover{border-color:var(--ink)}
   .glas-schalter.bereit .glas-pille{transition:none}
   .glas-schalter.gleitet .glas-pille{animation:none}
 }
+
+/* KOPFBAND (Antonio, 14.10.2026): "Der Leser muss direkt zum Punkt kommen."
+   Meldungen, Wettbewerb, Geraete und Promo tragen statt der Scrollstrecke
+   ein flaches Bild mit Titel oder Leitzahl; der Inhalt beginnt im ersten
+   Bildschirm. Keine Bewegung: kein --p, kein Atmen, kein Hochzaehlen. */
+.wa-auftakt.kopfband,.pw-auftakt.kopfband{--kb-h:clamp(290px,38vh,360px);height:var(--kb-h);--p:0;margin:0 0 clamp(28px,4vh,44px)}
+.kopfband .wa-auftakt-buehne,.kopfband .pw-buehne{position:relative;height:100%;overflow:hidden}
+.kopfband .wa-rahmen,.kopfband .pw-rahmen{clip-path:none}
+.kopfband .wa-bild .wa-motiv{inset:0;width:100%;height:100%;transform:none;animation:none;object-position:center 55%}
+.kopfband .wa-schleier{background:linear-gradient(180deg,rgba(8,10,14,.38) 0%,rgba(8,10,14,.22) 38%,rgba(8,10,14,.66) 100%)}
+.kopfband .wa-text,.kopfband .pw-text{transform:none;opacity:1}
+.kopfband .mg-kopf{top:auto;bottom:clamp(22px,4vh,36px);translate:none;padding:0 0 18px;left:var(--wa-rand,32px);right:var(--wa-rand,32px)}
+.kopfband .mg-kopf::after,.kopfband .mg-woche,.kopfband .mg-datum{animation:none}
+.kopfband .mg-titel{font-size:clamp(52px,6.4vw,96px);transform:none}
+.kopfband .mg-woche{font-size:12px}
+.kopfband .mg-datum{margin-top:10px;font-size:clamp(19px,1.8vw,24px)}
+.kopfband.gx-auftakt .wa-text{top:auto;bottom:clamp(40px,6vh,60px)}
+.kopfband .gx-held b{font-size:clamp(84px,10vw,150px);animation:none}
+.kopfband .gx-held b + span{font-size:clamp(22px,2.3vw,34px);max-width:18ch;animation:none}
+.kopfband .pw-wand{inset:-30% -10%;transform:rotate(-7deg)}
+.kopfband .pw-band{animation:none}
+.kopfband .pw-text{bottom:clamp(24px,4vh,40px);display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px clamp(20px,3vw,44px)}
+.kopfband .pw-zahl{font-size:clamp(84px,10vw,150px)}
+.kopfband .pw-zahl-text{margin:0 0 .35em;font-size:clamp(22px,2.3vw,34px)}
+.kopfband .pw-neben{margin:0 0 .6em}
+.kopfband .pw-neben b{font-size:clamp(26px,2.4vw,36px)}
+.kopfband.gx-auftakt + .wrap,.kopfband.gx-auftakt ~ .wrap{margin-top:0}
+/* Die Kapitel der Wettbewerber: ein Band statt Vollbild, das Blatt liegt
+   direkt darunter statt beim Scrollen darueber zu fahren. */
+.wa-kapitel .wa-kapitel-buehne{position:relative;height:clamp(200px,28vh,260px);border-radius:28px;margin:0 var(--wa-rand)}
+.wa-kapitel .wa-kapitel-bild .wa-motiv{transform:none;filter:none}
+.wa-kapitel .wa-kapitel-titel{bottom:clamp(20px,4vh,32px);left:clamp(20px,3vw,40px);right:clamp(20px,3vw,40px);opacity:1}
+.wa-kapitel .wb-name{font-size:clamp(44px,5.6vw,84px)}
+.wa-kapitel .wa-kapitel-zahl{margin-top:10px}
+.wa-kapitel .wa-blatt{margin-top:0;border-radius:0;box-shadow:none}
+.wa-kapitel .wa-blatt::before{content:none}
+.wa-kapitel .wa-blatt-innen{padding-top:clamp(32px,5vh,56px)}
+@media (max-width:820px){
+  .wa-auftakt.kopfband,.pw-auftakt.kopfband{--kb-h:320px}
+  .kopfband .mg-titel{font-size:52px}
+  .kopfband .gx-held .gx-art{grid-template-columns:auto minmax(0,1fr);column-gap:14px}
+  .kopfband .gx-held b{font-size:84px}
+  .kopfband .gx-held b + span{font-size:20px}
+  .kopfband .pw-wand{inset:-30% -60%}
+  .kopfband .pw-zahl{font-size:84px}
+  .kopfband .pw-zahl-text{font-size:20px;margin:0}
+  .kopfband .pw-neben{gap:8px 24px}
+  .kopfband .pw-neben b{font-size:24px}
+  .wa-kapitel .wa-kapitel-buehne{height:200px;border-radius:20px}
+  .wa-kapitel .wb-name{font-size:44px}
+}
+.seite-wettbewerb .wa-puls{padding-top:clamp(12px,2vh,24px)}
+.seite-promo_uebersicht .pw-markt{padding-top:clamp(8px,2vh,24px)}
+
+/* WOCHENBERICHT OHNE KINO (Antonio, 14.10.2026): "dass man den Bericht
+   direkt sieht, sehr schoen formatiert, mit den Bildern, aber kleiner
+   daneben". Jedes Kapitel ist ein Blatt: Titel und Text links, das Bild
+   klein rechts und steht still. Kein Vollbild, kein Schnitt, kein
+   Einblenden der Absaetze. */
+.bericht .szene{display:grid;grid-template-columns:minmax(0,1fr) minmax(220px,340px);column-gap:clamp(32px,5vw,72px);
+  align-items:start;max-width:var(--wrap);margin:0 auto;padding:clamp(48px,8vh,88px) 32px;border-top:1px solid var(--rule-2);background:transparent}
+.bericht .szene:first-of-type,.bericht .kapitel-marke + .szene{border-top:0}
+.bericht .szene-bild{grid-column:2;grid-row:1/span 2;position:sticky;top:104px;height:auto;aspect-ratio:4/3;border-radius:20px;
+  clip-path:none!important;animation:none!important;transition:none;background:var(--paper-3)}
+.bericht .szene-motiv{animation:none!important;transform:none!important}
+.bericht .szene-marke{display:none}
+.bericht .szene-titel,.bericht .szene--blatt .szene-titel--blatt{grid-column:1;grid-row:1;height:auto;display:block;margin:0 0 clamp(18px,3vh,28px);padding:0;
+  max-width:none;color:var(--ink);text-shadow:none;pointer-events:auto;font-size:clamp(40px,4.4vw,64px);line-height:1;letter-spacing:-.035em}
+.bericht .szene-text,.bericht .szene--blatt .szene-text{grid-column:1;grid-row:2;min-height:0;max-width:none;margin:0;padding:0;background:transparent}
+.bericht .szene--blatt{display:grid}
+.bericht .szene--blatt .szene-titel--blatt,.bericht .szene--blatt .szene-text{grid-column:1/-1}
+.bericht .folienlink{padding-top:clamp(24px,4vh,48px)}
+@media (max-width:900px){
+  .bericht .szene{display:block;padding:40px 16px}
+  .bericht .szene-bild{position:relative;top:auto;aspect-ratio:12/5;height:auto;margin:0 0 20px;border-radius:16px}
+  .bericht .szene-titel,.bericht .szene--blatt .szene-titel--blatt{font-size:40px;margin-bottom:16px}
+}
+@media (max-width:900px){.bericht .szene .kurzpfad-satz{font-size:20px}}

@@ -81,20 +81,19 @@
 {% set buehne = true %}
 {% set teurer = teurer or {'tarif': [], 'geraet': [], 'schwelle': 10} %}
 {% block buehne %}
-<section class="wa-auftakt gx-auftakt" data-buehne>
+<section class="wa-auftakt gx-auftakt kopfband">
   <div class="wa-auftakt-buehne">
     <div class="wa-rahmen">
       <div class="wa-bild" aria-hidden="true">{{ d.motiv('band-geraete', prefix, 'wa-motiv', eager=true) }}</div>
       <div class="wa-schleier" aria-hidden="true"></div>
       <div class="wa-text">
         <h1 class="gx-held">
-          <span class="gx-art gx-art--tarif"><b data-zaehler="{{ teurer.tarif | length }}">{{ teurer.tarif | length }}</b>
+          <span class="gx-art gx-art--tarif"><b>{{ teurer.tarif | length }}</b>
             <span>Geräte sind mit Tarif bei Vodafone über {{ teurer.schwelle | int }}&nbsp;% teurer.</span></span>
-          <span class="gx-art gx-art--geraet"><b data-zaehler="{{ teurer.geraet | length }}">{{ teurer.geraet | length }}</b>
+          <span class="gx-art gx-art--geraet"><b>{{ teurer.geraet | length }}</b>
             <span>Geräte sind ohne Vertrag bei Vodafone über {{ teurer.schwelle | int }}&nbsp;% teurer.</span></span>
         </h1>
       </div>
-      <div class="wa-hinweis" aria-hidden="true"></div>
     </div>
   </div>
 </section>
