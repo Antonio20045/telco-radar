@@ -96,6 +96,8 @@ def test_die_buehne_der_woche_zeigt_keine_vorschau_einer_anderen_lage(seiten):
     assert buehne is not None
     assert "url(" not in (buehne.get("style") or "")
     assert buehne.select_one("canvas.buehne-himmel[data-basis]") is not None
+    klassen = seiten["index.html"].select_one("section.buehne")["class"]
+    assert "campus-wartet" in klassen, klassen
 
 
 def test_die_wichtigsten_meldungen_haben_ein_bild(tmp_path):

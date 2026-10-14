@@ -26,7 +26,9 @@
 {% set teile = (date_de or '').rsplit(' ', 1) %}
 {# Nach dem Startbild folgt direkt das Bild des ersten Kapitels, ohne
    Zwischentitel und ohne Kino-Animation (Antonio, 11.10.2026). #}
-<section class="buehne" aria-label="Ausgabe vom {{ date_de }}">
+{# campus-wartet steht schon im HTML: bis app.js laeuft, ist die Buehne dunkel
+   statt hellblau (Antonio, 14.10.2026). #}
+<section class="buehne{% if 'campus-turm' in bilder %} campus-wartet film-dunkel{% endif %}" aria-label="Ausgabe vom {{ date_de }}">
   {# app.js malt im Canvas den Campus aus sieben Fotoplatten (static/campus/)
      nach Uhrzeit, Wetter und Jahreszeit; das Foto der blauen Stunde steht nur
      ohne JavaScript oder WebGL 2. #}
