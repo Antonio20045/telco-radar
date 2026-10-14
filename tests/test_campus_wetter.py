@@ -27,6 +27,7 @@ _VORLAGEN = Path(statik.__file__).parent / "templates" / "static"
 _PLATTEN = ("tag", "gold", "blau", "nacht", "spaet", "regen", "schnee")
 
 _SEITE = """<!doctype html><html class="ohne-js"><head><meta charset="utf-8">
+<link rel="stylesheet" href="style.css">
 <style>.buehne{position:relative;width:960px;height:540px}.buehne-bild{position:absolute;inset:0}
 .buehne-himmel{position:absolute;inset:0;width:100%;height:100%}</style></head>
 <body><section class="buehne"><div class="buehne-bild">
@@ -278,6 +279,10 @@ def test_das_erste_bild_zeigt_schon_die_echte_lage(
         seite.wait_for_selector(".buehne-himmel.laeuft", timeout=30_000)
         himmel = seite.locator(".buehne-himmel")
         assert himmel.get_attribute("data-erstes-bild") == erstes
+        sofort = himmel.evaluate(
+            "c => [getComputedStyle(c).opacity, getComputedStyle(c).transitionDuration]"
+        )
+        assert sofort == ["1", "0s"], sofort
         assert "campus-wartet" not in seite.get_attribute(".buehne", "class")
     finally:
         seite.context.close()
