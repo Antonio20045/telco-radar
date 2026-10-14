@@ -9,7 +9,7 @@
    "gruppe": 40,
    "art": "speicher",
    "pfad": "#device-details > div:nth-of-type(1) > fieldset:nth-of-type(2) > div:nth-of-type(1)",
-   "text": "Storage: 512 GB 512 GB",
+   "text": "Speicher: 512 GB 512 GB",
    "wert": null,
    "fehler": null,
    "navigiert": null,
@@ -23,7 +23,7 @@
   {
    "gruppe": 53,
    "art": "tarif",
-   "pfad": "#react-aria7735698549-_r_1h_ > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > label:nth-of-type(1) > span:nth-of-type(1) > input:nth-of-type(1)",
+   "pfad": "#react-aria5426664925-_r_1h_ > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > label:nth-of-type(1) > span:nth-of-type(1) > input:nth-of-type(1)",
    "text": "543",
    "wert": null,
    "fehler": "Locator.click: Timeout 5000ms exceeded.",
@@ -38,7 +38,7 @@
   {
    "gruppe": 54,
    "art": "tarif",
-   "pfad": "#react-aria7735698549-_r_1h_ > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > label:nth-of-type(1) > span:nth-of-type(1) > input:nth-of-type(1)",
+   "pfad": "#react-aria5426664925-_r_1h_ > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > label:nth-of-type(1) > span:nth-of-type(1) > input:nth-of-type(1)",
    "text": "560",
    "wert": null,
    "fehler": "Locator.click: Timeout 5000ms exceeded.",

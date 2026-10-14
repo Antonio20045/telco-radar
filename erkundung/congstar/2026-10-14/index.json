@@ -2,14 +2,14 @@
  "anbieter": "congstar",
  "name": "congstar",
  "datum": "2026-10-14",
- "status": "gestoert",
- "grund": "Seite 2: nach Bot-Schutz keine weitere Anfrage (CLAUDE.md Regel 4)",
+ "status": "gelesen",
+ "grund": null,
  "kennung": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)",
  "parallelpruefung": "vor jeder Seite",
  "robots_gelesen": true,
  "abstand_sekunden": 2.0,
  "besuchszeit": null,
- "dauer_sekunden": 42.9,
+ "dauer_sekunden": 70.2,
  "zeitgrenze_sekunden": 3000,
  "seiten": [
   {
@@ -33,17 +33,18 @@
     "html": "seite-1.html.gz"
    },
    "zaehlung": {
-    "anfragen": 83,
+    "anfragen": 76,
     "verworfen": 2,
     "gescheitert": 0,
     "hilfsdateien": 0,
     "mitschnitt": 3,
-    "elemente": 537,
+    "elemente": 536,
     "gruppen_je_art": {
-     "tarif": 22,
-     "unbekannt": 143,
+     "tarif": 28,
+     "unbekannt": 134,
      "farbe": 1,
-     "speicher": 1
+     "speicher": 1,
+     "laufzeit": 3
     },
     "preis_kandidaten": 48,
     "klicks": 3
@@ -63,13 +64,13 @@
    "karte": {
     "status": "gelaufen",
     "karte": "congstar.yaml",
-    "grund": "Kanarienwert fehlt: [data-testid=\"memory-size-selection\"] ohne „Speicher:“",
+    "grund": null,
     "datei": "karte-1.json",
-    "laufstatus": "gestoert",
-    "bot_schutz": true,
+    "laufstatus": "gelesen",
+    "bot_schutz": false,
     "zaehlung": {
-     "kombinationen": 0,
-     "erfasst": 0,
+     "kombinationen": 8,
+     "erfasst": 8,
      "nicht_angeboten": 0,
      "nicht_erfasst": 0,
      "befund": 0,
@@ -84,17 +85,71 @@
    "geraet": "apple-iphone-17-pro",
    "speicher_gb": 256,
    "adresse": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/?planId=548",
-   "status": "nicht_besucht",
-   "grund": "nach Bot-Schutz keine weitere Anfrage (CLAUDE.md Regel 4)",
-   "dateien": {},
+   "endadresse": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/?planId=548",
+   "status": "gelesen",
+   "grund": null,
+   "bot_schutz": false,
+   "http_status": 200,
+   "ruhe": true,
+   "dateien": {
+    "bedienelemente": "bedienelemente-2.json",
+    "preise": "preise-2.json",
+    "klicks": "klicks-2.json",
+    "karte": "karte-2.json",
+    "mitschnitt": "mitschnitt-2.json",
+    "screenshot": "seite-2.png",
+    "html": "seite-2.html.gz"
+   },
+   "zaehlung": {
+    "anfragen": 77,
+    "verworfen": 2,
+    "gescheitert": 0,
+    "hilfsdateien": 0,
+    "mitschnitt": 4,
+    "elemente": 536,
+    "gruppen_je_art": {
+     "tarif": 28,
+     "unbekannt": 134,
+     "farbe": 1,
+     "speicher": 1,
+     "laufzeit": 3
+    },
+    "preis_kandidaten": 40,
+    "klicks": 2
+   },
+   "verworfen": [
+    {
+     "url": "https://api.usercentrics.eu/settings/3DQmSnVkN/latest/languages.json",
+     "grund": "robots.txt nicht lesbar (HTTP 403)"
+    },
+    {
+     "url": "https://www.congstar.de/checkout/api/cart-state",
+     "grund": "per robots.txt gesperrt: /checkout/api/cart-state"
+    }
+   ],
+   "gescheitert": [],
+   "hilfsdateien": [],
    "karte": {
-    "status": "nicht_besucht",
+    "status": "gelaufen",
     "karte": "congstar.yaml",
-    "grund": "nach Bot-Schutz keine weitere Anfrage (CLAUDE.md Regel 4)"
+    "grund": null,
+    "datei": "karte-2.json",
+    "laufstatus": "gelesen",
+    "bot_schutz": false,
+    "zaehlung": {
+     "kombinationen": 8,
+     "erfasst": 8,
+     "nicht_angeboten": 0,
+     "nicht_erfasst": 0,
+     "befund": 0,
+     "nicht_besucht": 0,
+     "verworfen": 2,
+     "gescheitert": 0
+    }
    }
   }
  ],
- "groesse_bytes": 814891,
+ "groesse_bytes": 1662911,
  "groessengrenze_bytes": 8000000,
  "gekuerzt": []
 }
