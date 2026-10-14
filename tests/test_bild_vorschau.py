@@ -89,10 +89,13 @@ def test_das_grosse_bild_liegt_auf_seiner_vorschau(seiten):
         assert _vorschau_von(bild).width == bild_vorschau.VORSCHAU_BREITE, name
 
 
-def test_die_buehne_der_woche_steht_sofort_auf_ihrer_vorschau(seiten):
+def test_die_buehne_der_woche_zeigt_keine_vorschau_einer_anderen_lage(seiten):
+    """Die Vorschau zeigte die blaue Stunde, bevor die Campus-Szene die echte
+    Lage malt (Antonio, 14.10.2026); die Buehne bleibt bis dahin dunkel."""
     buehne = seiten["index.html"].select_one(".buehne-bild")
     assert buehne is not None
-    assert _vorschau_von(buehne).width == bild_vorschau.VORSCHAU_BREITE
+    assert "url(" not in (buehne.get("style") or "")
+    assert buehne.select_one("canvas.buehne-himmel[data-basis]") is not None
 
 
 def test_die_wichtigsten_meldungen_haben_ein_bild(tmp_path):
