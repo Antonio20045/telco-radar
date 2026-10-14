@@ -5140,7 +5140,7 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
     frechne();
   }
 
-  var rub = document.getElementById('ki-rubriken'), kopf = document.querySelector('.ki-kopf');
+  var rub = document.getElementById('ki-rubriken'), kopf = document.querySelector('.ki-auftakt');
   if (!rub || !kopf) return;
   var links = rub.querySelectorAll('a');
   var ziele = [].map.call(links, function (a) { return document.querySelector(a.getAttribute('href')); });

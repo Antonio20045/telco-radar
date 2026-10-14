@@ -5939,33 +5939,18 @@ html:not([data-art="geraet"]) .gx-held .gx-art--tarif,html[data-art="geraet"] .g
 .mg-auftakt .mg-woche,.mg-auftakt .mg-titel,.mg-auftakt .mg-datum{color:var(--bildtext)}
 @media (max-width:820px){.mg-auftakt{height:160vh}}
 
-/* KI (Pitch 9, Entwurf 10; Kopf Antonio 14.10.2026): kein Vollbild. Ein
-   schmales Bildband, links der Titel, rechts die Wegweiser zu Verstehen,
-   Prompts und Modellen; die Meldungen stehen im ersten Bildschirm.
-   Bewegt wird nur beim Laden, nichts wartet aufs Scrollen. */
-.ki-kopf{position:relative;isolation:isolate;display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,360px);align-items:end;
-  gap:20px clamp(24px,4vw,64px);margin-top:clamp(12px,1.6vw,20px);padding:clamp(24px,3vw,44px);min-height:clamp(230px,21vw,300px);
-  overflow:hidden;border-radius:20px;background:var(--sp-netz)}
-.ki-kopf-bild{position:absolute;inset:0;z-index:-1}
-.ki-kopf-motiv{display:block;width:100%;height:100%;object-fit:cover;animation:ki-kopf-bild 1.6s var(--ease-aus) both}
-@keyframes ki-kopf-bild{from{opacity:0;transform:scale(1.06)}}
-.ki-kopf-bild::after{content:"";position:absolute;inset:0;
-  background:linear-gradient(90deg,var(--schleier),transparent 75%),linear-gradient(to top,var(--schleier),transparent 65%)}
-.ki-kopf .mg-woche,.ki-kopf .mg-titel,.ki-kopf .mg-datum{color:var(--bildtext)}
-.ki-titel{margin-top:.16em;font-size:clamp(84px,9.4vw,140px);transform:none}
-.ki-kopf .mg-datum{margin-top:8px;font-size:clamp(19px,1.7vw,25px)}
-.ki-tueren{display:grid;gap:10px}
-.ki-tuer{display:grid;gap:2px;min-width:0;padding:13px 18px;border:1px solid var(--glas-rand);border-radius:14px;background:var(--glas);
-  -webkit-backdrop-filter:blur(14px) saturate(1.4);backdrop-filter:blur(14px) saturate(1.4);color:var(--glas-text);
-  box-shadow:var(--glas-schatten);transition:background .25s,transform .25s;animation:mg-hoch .8s var(--ease-aus) .25s both}
-.ki-tuer:nth-child(2){animation-delay:.33s}
-.ki-tuer:nth-child(3){animation-delay:.41s}
-.ki-tuer:hover{background:var(--glas-aktiv);transform:translateX(-3px)}
-@media (prefers-reduced-motion:reduce){.ki-kopf-motiv,.ki-tuer{animation:none}}
-.ki-tuer b{font-size:15.5px;font-weight:600}
+/* KI (Pitch 9, Entwurf 10; Antonio 14.10.2026): Kopfband wie alle Reiter,
+   direkt darunter die Wegweiser zu Verstehen, Prompts und Modellen; die
+   Meldungen stehen im ersten Bildschirm. */
+.ki-auftakt{--wa-rand:clamp(16px,4vw,64px)}
+.ki-tueren{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.ki-tuer{display:grid;gap:2px;min-width:0;padding:14px 20px;border:1px solid var(--rule);border-radius:14px;background:var(--paper-2);
+  color:var(--ink);transition:border-color .25s,transform .25s}
+.ki-tuer:hover{border-color:var(--ink);transform:translateY(-2px)}
+.ki-tuer b{font-size:16px;font-weight:600}
 .ki-tuer b::after{content:" \2192";color:var(--red)}
-.ki-tuer span{overflow:hidden;font-size:13.5px;color:var(--glas-text-2);white-space:nowrap;text-overflow:ellipsis}
-.ki-blatt{padding:clamp(32px,3.6vw,52px) 0 clamp(48px,6vw,80px)}
+.ki-tuer span{overflow:hidden;font-size:14px;color:var(--ink-2);white-space:nowrap;text-overflow:ellipsis}
+.ki-blatt{padding:clamp(28px,3.2vw,44px) 0 clamp(48px,6vw,80px)}
 .ki-oben{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr) minmax(0,1fr);
   grid-template-areas:"l m r";padding-bottom:48px;border-bottom:1px solid var(--rule)}
 .ki-oben>*{min-width:0}
@@ -6234,10 +6219,7 @@ a.ki-k1-pille:hover{border-color:var(--ink)}
   .ki-ressort-blatt>.ki-ressort-neben .ki-meldung--neben:first-child{padding-top:18px;border-top:1px solid var(--rule)}
 }
 @media (max-width:760px){
-  .ki-kopf{grid-template-columns:minmax(0,1fr);min-height:0;padding:18px 16px 16px;border-radius:16px}
-  .ki-titel{font-size:76px}
-  .ki-kopf .mg-datum{font-size:18px}
-  .ki-tueren{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+  .ki-tueren{gap:6px}
   .ki-tuer{padding:9px 10px;border-radius:12px}
   .ki-tuer b{font-size:13.5px}
   .ki-tuer b::after{content:none}

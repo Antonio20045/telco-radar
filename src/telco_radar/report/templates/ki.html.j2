@@ -1,8 +1,8 @@
 {# KI - die KI-Meldungen aller Berichte (Pitch 9, Entwurf 10, Schnitt 1).
 
-   Kopf (Antonio, 14.10.2026): schmales Bildband statt Vollbild, rechts
-   die Wegweiser zu Verstehen, Prompts und Modellen; die Meldungen stehen
-   im ersten Bildschirm. Darunter drei Spalten mit dem Aufmacher in der
+   Kopf (Antonio, 14.10.2026): das Kopfband aller Reiter statt Vollbild,
+   darunter die Wegweiser zu Verstehen, Prompts und Modellen; die
+   Meldungen stehen im ersten Bildschirm. Darunter drei Spalten mit dem Aufmacher in der
    Mitte, ohne fremde Fotos; jede Meldung traegt ihren Quellenlink.
    Darunter je Ressort eine Zeile: Bild mit Namen, Aufmacher, wenige
    kleinere, der Rest zugeklappt. Im ersten Ressort steht statt der
@@ -20,6 +20,7 @@
 {% extends "base.html.j2" %}
 {% import "_design.html.j2" as d %}
 {% set active = 'ki' %}
+{% set buehne = true %}
 {% block title %}Vodafone Product and Services Insights · KI{% endblock %}
 
 {% macro meldung(h, art, dek=false, kicker=true) %}
@@ -92,20 +93,28 @@
 </div>
 {% endmacro %}
 
-{% block content %}
-<header class="ki-kopf">
-  <div class="ki-kopf-bild" aria-hidden="true">{{ d.motiv('band-ki', prefix, 'ki-kopf-motiv', eager=true) }}</div>
-  <div class="ki-kopf-text">
-    {% if ausgabe.kw %}<p class="mg-woche">Kalenderwoche {{ ausgabe.kw }}</p>{% endif %}
-    <h1 class="mg-titel ki-titel" aria-label="KI">{% for c in 'KI' %}<span style="--i:{{ loop.index0 }}" aria-hidden="true">{{ c }}</span>{% endfor %}</h1>
-    {% if date_de %}<p class="mg-datum">Ausgabe vom {{ date_de }}</p>{% endif %}
+{% block buehne %}
+<section class="wa-auftakt mg-auftakt ki-auftakt kopfband">
+  <div class="wa-auftakt-buehne">
+    <div class="wa-rahmen">
+      <div class="wa-bild" aria-hidden="true">{{ d.motiv('band-ki', prefix, 'wa-motiv', eager=true) }}</div>
+      <div class="wa-schleier" aria-hidden="true"></div>
+      <header class="mg-kopf wa-text">
+        {% if ausgabe.kw %}<p class="mg-woche">Kalenderwoche {{ ausgabe.kw }}</p>{% endif %}
+        <h1 class="mg-titel ki-titel" aria-label="KI">{% for c in 'KI' %}<span style="--i:{{ loop.index0 }}" aria-hidden="true">{{ c }}</span>{% endfor %}</h1>
+        {% if date_de %}<p class="mg-datum">Ausgabe vom {{ date_de }}</p>{% endif %}
+      </header>
+    </div>
   </div>
-  <nav class="ki-tueren" aria-label="Mehr auf dieser Seite">
-    <a class="ki-tuer" href="#verstehen"><b>Verstehen</b><span>Kapitel 1: {{ kapitel[0].titel }}</span></a>
-    {% if prompts.anzahl %}<a class="ki-tuer" href="#prompts"><b>Prompts</b><span>{{ prompts.anzahl }} zum Kopieren</span></a>{% endif %}
-    {% if modelle.top %}<a class="ki-tuer" href="#modelle"><b>Modelle</b><span>Platz 1: {{ modelle.top[0].kurz }}</span></a>{% endif %}
-  </nav>
-</header>
+</section>
+{% endblock %}
+
+{% block content %}
+<nav class="ki-tueren" aria-label="Mehr auf dieser Seite">
+  <a class="ki-tuer" href="#verstehen"><b>Verstehen</b><span>Kapitel 1: {{ kapitel[0].titel }}</span></a>
+  {% if prompts.anzahl %}<a class="ki-tuer" href="#prompts"><b>Prompts</b><span>{{ prompts.anzahl }} zum Kopieren</span></a>{% endif %}
+  {% if modelle.top %}<a class="ki-tuer" href="#modelle"><b>Modelle</b><span>Platz 1: {{ modelle.top[0].kurz }}</span></a>{% endif %}
+</nav>
 {% if rubriken %}
 <nav class="ki-rubriken" id="ki-rubriken" aria-label="Teile der KI-Seite">{% for r in rubriken %}<a href="#{{ r.ziel }}">{{ r.name }} <b>{{ r.zahl }}</b></a>{% endfor %}</nav>
 {% endif %}

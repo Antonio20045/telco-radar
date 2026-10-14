@@ -4,7 +4,7 @@ Antonio, 14.10.2026: kein Startbild, durch das man erst scrollen muss; die
 Meldungen und die Wegweiser zu Verstehen, Prompts und Modellen stehen im
 ersten Bildschirm. Die Rangliste ist ein kleines Fenster im ersten Ressort
 neben den Artikeln, je Modell ein Punkt in der Farbe seiner Firma.
-Gegenprobe: bei reduzierter Bewegung steht der Kopf sofort. Der Store kommt
+Der Kopf ist das Kopfband aller Reiter, ohne Kinostrecke. Der Store kommt
 aus den echten Abrufen unter ``tests/fixtures/ki/``, Stand fest am 11.10.2026.
 """
 
@@ -188,14 +188,14 @@ def test_meldungen_und_wegweiser_stehen_im_ersten_bildschirm(chromium, site, bre
             f" [a.getAttribute('href'), ...({BOX})(a)])"
         )
         buehne = page.evaluate(
-            "[document.body.classList.contains('mit-buehne'),"
+            "[!!document.querySelector('.ki-auftakt.kopfband'),"
             " !!document.querySelector('[data-buehne]')]"
         )
     assert aufmacher[1] < hoehe - 60
     assert [t[0] for t in tueren] == ["#verstehen", "#prompts", "#modelle"]
     for _, links, oben, rechts, unten in tueren:
         assert links >= 0 and rechts <= breite and oben > 0 and unten <= hoehe
-    assert buehne == [False, False]
+    assert buehne == [True, False]
 
 
 def test_wegweiser_fuehren_zu_ihrem_teil(chromium, site):
@@ -212,18 +212,22 @@ def test_wegweiser_fuehren_zu_ihrem_teil(chromium, site):
         assert 0 <= oben < 200, (ziel, oben)
 
 
-def test_gegenprobe_reduzierte_bewegung_zeigt_den_kopf_sofort(chromium, site):
-    with _seite(chromium, site, reduced_motion="reduce") as page:
+def test_kopf_steht_sofort_und_faehrt_beim_scrollen_nicht_mit(chromium, site):
+    with _seite(chromium, site) as page:
         namen = page.evaluate(
-            "[...document.querySelectorAll('.ki-kopf-motiv, .ki-tuer')]"
+            "[...document.querySelectorAll('.ki-auftakt .wa-motiv, .ki-tuer')]"
             ".map(e => getComputedStyle(e).animationName)"
         )
-        deckkraft = page.evaluate(
-            "[...document.querySelectorAll('.ki-tuer')]"
-            ".map(e => getComputedStyle(e).opacity)"
+        vorher = page.evaluate(
+            "document.querySelector('.ki-auftakt').getBoundingClientRect().height"
         )
-    assert namen and set(namen) == {"none"}
-    assert deckkraft == ["1"] * 3
+        page.evaluate("scrollTo(0, 300)")
+        page.wait_for_timeout(400)
+        nachher = page.evaluate(
+            "document.querySelector('.ki-auftakt').getBoundingClientRect().height"
+        )
+    assert len(namen) == 4 and set(namen) == {"none"}
+    assert vorher == nachher <= 400
 
 
 @pytest.mark.parametrize("breite", [1440, 390])
