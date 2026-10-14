@@ -6140,6 +6140,8 @@ a.ki-k1-pille:hover{border-color:var(--ink)}
 .ki-k2-spam{fill:var(--ink)}
 .ki-k2-post{fill:var(--paper-2);stroke:var(--ink);stroke-width:1.5}
 .ki-k2-neu{fill:var(--red)}
+.ki-k1-welt .ki-k3-probe{fill:var(--ink);font-family:var(--mono)}
+.ki-k3-chips rect{fill:var(--paper-2);stroke:var(--ink);stroke-width:1.2}
 .bewegt .ki-k1-zug{transition:opacity .5s,transform .7s cubic-bezier(.2,1.4,.4,1);transform-box:fill-box;transform-origin:center}
 .bewegt .ki-k1-zug.weg{opacity:0;transform:scale(.55)}
 .bewegt .ki-k1-satz{opacity:0;transform:translateY(24px);transition:opacity .8s,transform .8s cubic-bezier(.2,.8,.2,1)}

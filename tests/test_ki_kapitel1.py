@@ -101,7 +101,7 @@ def test_knopf_und_schiene_fuehren_auf_die_seite_des_kapitels(site):
     assert schiene[0] == SEITE
     assert (site / SEITE).is_file()
     assert ki_seite.kapitel()[0]["ziel"] == SEITE == ki_kapitel.DATEI
-    assert [k["ziel"] for k in ki_seite.kapitel()[2:]] == [None] * 10
+    assert [k["ziel"] for k in ki_seite.kapitel()[3:]] == [None] * 9
 
 
 def test_stationen_in_ihrer_reihenfolge_und_zahlen_aus_den_konstanten(site):

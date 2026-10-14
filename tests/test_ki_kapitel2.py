@@ -35,11 +35,8 @@ def test_schiene_und_kapitel_1_fuehren_auf_kapitel_2(site):
         r'<li class="ki-kapitel ki-kapitel--fertig"><a href="([^"]+)"', html
     )
     eins = (site / ki_kapitel.DATEI).read_text(encoding="utf-8")
-    assert (
-        schiene
-        == [ki_kapitel.DATEI, SEITE]
-        == [k["ziel"] for k in ki_seite.kapitel()[:2]]
-    )
+    assert schiene[:2] == [ki_kapitel.DATEI, SEITE]
+    assert schiene[:2] == [k["ziel"] for k in ki_seite.kapitel()[:2]]
     assert ki_kapitel2.DATEI == SEITE and (site / SEITE).is_file()
     assert f'<a href="{SEITE}">Kapitel 2 · {ki_seite.KAPITEL[1]}' in eins
     assert ki_seite.KAPITEL[1] == ki_kapitel2.TITEL
