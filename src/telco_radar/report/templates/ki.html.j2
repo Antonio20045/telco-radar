@@ -111,7 +111,7 @@
 
 {% block content %}
 <nav class="ki-tueren" aria-label="Mehr auf dieser Seite">
-  <a class="ki-tuer" href="#verstehen"><b>Verstehen</b><span>Kapitel 1: {{ kapitel[0].titel }}</span></a>
+  <a class="ki-tuer" href="#verstehen"><b>Verstehen</b>{% set fertig = kapitel | selectattr('ziel') | list %}<span>{% if fertig | length > 1 %}Kapitel 1 bis {{ fertig | length }}{% else %}Kapitel 1: {{ kapitel[0].titel }}{% endif %}</span></a>
   {% if prompts.anzahl %}<a class="ki-tuer" href="#prompts"><b>Prompts</b><span>{{ prompts.anzahl }} zum Kopieren</span></a>{% endif %}
   {% if modelle.top %}<a class="ki-tuer" href="#modelle"><b>Modelle</b><span>Platz 1: {{ modelle.top[0].kurz }}</span></a>{% endif %}
 </nav>
