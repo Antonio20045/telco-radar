@@ -315,15 +315,17 @@ def test_mini_video_spielt_in_voller_spaltenbreite(chromium, site):
     assert breite > 200
 
 
-def test_am_handy_kein_ueberlauf_und_die_reihe_einspaltig(chromium, site):
+def test_am_handy_kein_ueberlauf_und_die_reihe_zum_wischen(chromium, site):
     with _seite(chromium, site, breite=390) as (page, _):
         lage = page.evaluate(
-            "(() => { const v = [...document.querySelectorAll('#ki-videos .ki-video')];"
+            "(() => { const r = document.querySelector('#ki-videos .ki-videos');"
+            " const v = [...r.querySelectorAll('.ki-video')];"
             " return [document.documentElement.scrollWidth <= innerWidth,"
-            " new Set(v.map(e => Math.round(e.getBoundingClientRect().left))).size,"
-            " v.length]; })()"
+            " new Set(v.map(e => Math.round(e.getBoundingClientRect().top))).size,"
+            " v.length, r.scrollWidth > r.clientWidth,"
+            " v.every(e => e.getBoundingClientRect().width >= 250)]; })()"
         )
-    assert lage == [True, 1, 6]
+    assert lage == [True, 1, 6, True, True]
 
 
 def _lege_bilder_ab(state: Path, mit_datei: dict[str, bool], site: Path) -> None:

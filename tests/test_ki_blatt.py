@@ -176,11 +176,12 @@ def test_ki_seite_fuehrt_zwoelf_im_blatt_und_das_archiv_zugeklappt(tmp_path):
     ki = _ki_seite(tmp_path, 15)
     blatt = re.search(r'<section class="ki-blatt".*?</section>', ki, re.S).group(0)
     assert len(re.findall(r'<article class="ki-meldung', blatt)) == 12
-    oben = re.search(r'<div class="ki-oben">.*?<div class="ki-ressort"', blatt, re.S)
+    oben = re.search(r'<div class="ki-oben">.*?<div class="ki-ressort[ "]', blatt, re.S)
     kicker = re.findall(r'<p class="ki-kicker">([^<]+)</p>', oben.group(0))
     assert kicker == ["Modelle"] * 8
-    kapitel = re.findall(r'<div class="ki-ressort" id="ressort-([a-z]+)">', blatt)
+    kapitel = re.findall(r'<div class="ki-ressort[^"]*" id="ressort-([a-z]+)">', blatt)
     assert kapitel == ["modelle"]
+    assert '<div class="ki-ressort ki-ressort--fenster" id="ressort-modelle">' in blatt
     assert len(re.findall(r'<article class="ki-meldung ki-meldung--kopf">', blatt)) == 1
     assert (
         len(re.findall(r'<article class="ki-meldung ki-meldung--neben">', blatt)) == 3

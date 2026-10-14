@@ -132,7 +132,6 @@ def modelle_band(store: dict) -> dict:
     top = store.get("top") or []
     return {
         "top": top,
-        "leiter": [{k: m[k] for k in ("platz", "name", "farbe")} for m in top],
         "stand": _tag(store.get("stand")),
         "urls": {k: q.get("url") for k, q in quellen.items()},
         "ausfall": ausfall,

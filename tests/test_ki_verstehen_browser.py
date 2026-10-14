@@ -89,7 +89,7 @@ def test_schiene_zeigt_alle_kapitel_der_konstante_und_verlinkt_nur_kapitel_1(
     assert {k[3] for k in knoten[3:]} == {knoten[3][3]} != {knoten[0][3]}
     assert spalten == 12
     assert ansage == "Wie antworteteigentlicheine KI?"
-    assert folge.index("verstehen") == folge.index("modelle") + 1
+    assert folge.index("verstehen") == folge.index("meldungen") + 1
 
 
 def test_linie_zeichnet_sich_beim_scrollen_und_pillen_poppen_auf(chromium, site):

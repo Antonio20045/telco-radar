@@ -240,6 +240,7 @@ MESSUNG = """() => {
       geladen: k.querySelector('.ki-ressort-bild img').naturalWidth,
       sichtbar: [...k.querySelectorAll('article.ki-meldung')].filter(sichtbar).length,
       kopf: schrift(k.querySelector('.ki-meldung--kopf .ki-schlag')),
+      kopf_box: box(k.querySelector('.ki-meldung--kopf')),
       andere: [...k.querySelectorAll('.ki-ressort-neben .ki-schlag')].map(schrift),
       texte,
     };
@@ -276,7 +277,13 @@ def test_kapitel_im_chromium_ohne_ueberlauf_und_ohne_ueberdeckung(
             and b["o"] <= t["o"]
             and t["u"] <= b["u"]
         )
-        assert b["r"] - b["l"] >= breite * 0.75, k["id"]
+        if breite < 760:
+            assert b["r"] - b["l"] >= breite * 0.75, k["id"]
+            assert b["u"] - b["o"] <= 844 * 0.4, k["id"]
+        else:
+            assert b["r"] - b["l"] <= breite * 0.34, k["id"]
+            assert abs(b["o"] - k["kopf_box"]["o"]) < 40, k["id"]
+            assert k["kopf_box"]["l"] >= b["r"], k["id"]
         texte = k["texte"]
         for i, a in enumerate(texte):
             for c in texte[i + 1 :]:

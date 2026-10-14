@@ -1,13 +1,15 @@
 {# KI - die KI-Meldungen aller Berichte (Pitch 9, Entwurf 10, Schnitt 1).
 
-   Kopf wie die Meldungen-Seite: Vollbild, das beim Scrollen zum Fenster
-   wird (Kinostrecke in app.js). Darunter drei Spalten mit dem Aufmacher in
-   der Mitte, ohne fremde Fotos; jede Meldung traegt ihren Quellenlink.
-   Darunter je Ressort ein Kapitel mit eigenem Bild: Aufmacher gross,
-   daneben wenige kleinere, der Rest zugeklappt (Antonio, 13.10.2026).
+   Kopf (Antonio, 14.10.2026): schmales Bildband statt Vollbild, rechts
+   die Wegweiser zu Verstehen, Prompts und Modellen; die Meldungen stehen
+   im ersten Bildschirm. Darunter drei Spalten mit dem Aufmacher in der
+   Mitte, ohne fremde Fotos; jede Meldung traegt ihren Quellenlink.
+   Darunter je Ressort eine Zeile: Bild mit Namen, Aufmacher, wenige
+   kleinere, der Rest zugeklappt. Im ersten Ressort steht statt der
+   kleineren das Fenster mit den Modellen, die kleineren unter dem
+   Aufmacher.
    Die Auswahl rechnet `ki_seite.ausgabe()`, Ressort, Kapitel und Archiv
-   `analyze.ki_blatt` (Zeitungsprinzip, Schnitt 2). Die Leiter der Modelle
-   (Schnitt 7) baut app.js aus #ki-modelle-daten; ohne JS bleibt die Liste.
+   `analyze.ki_blatt` (Zeitungsprinzip, Schnitt 2).
    Die Rubrikleiste (Schnitt 8) zeigt app.js, sobald der Kopf vorbei ist.
    Verstehen (Schnitt 9): Linie und Pillen stehen fertig im HTML, app.js
    zeichnet sie mit dem Scrollen; die Schiene kommt aus ki_seite.KAPITEL.
@@ -18,7 +20,6 @@
 {% extends "base.html.j2" %}
 {% import "_design.html.j2" as d %}
 {% set active = 'ki' %}
-{% set buehne = true %}
 {% block title %}Vodafone Product and Services Insights · KI{% endblock %}
 
 {% macro meldung(h, art, dek=false, kicker=true) %}
@@ -51,14 +52,36 @@
 {% endif %}
 {% endmacro %}
 
-{% macro ressort(r) %}
-<div class="ki-ressort" id="ressort-{{ r.schluessel }}">
-  <div class="ki-ressort-bild">{{ d.motiv('ki-' ~ r.schluessel, prefix, 'ki-ressort-motiv', breite=2400, hoehe=1339) }}
-    <h2 class="ki-ressort-titel" id="ressort-{{ r.schluessel }}-titel">{{ r.name }}</h2>
-  </div>
-  <div class="ki-ressort-blatt{% if not r.neben %} ki-ressort-blatt--allein{% endif %}">
-    {{ meldung(r.aufmacher, 'kopf', dek=true, kicker=false) }}
-    {% if r.neben %}<div class="ki-ressort-neben">{% for h in r.neben %}{{ meldung(h, 'neben', dek=loop.first, kicker=false) }}{% endfor %}</div>{% endif %}
+{% macro modelle_fenster() %}
+<aside class="ki-fenster" id="modelle" aria-labelledby="modelle-titel">
+  <h2 class="ki-fenster-titel" id="modelle-titel">Stärkste KI-Modelle</h2>
+  {% if modelle.top %}
+  <ol class="ki-rang">
+    {% for m in modelle.top %}
+    <li class="ki-rang-eintrag"><span class="ki-rang-platz">{{ m.platz }}</span><span class="ki-rang-punkt" style="--firma:var({{ m.farbe }})" aria-hidden="true"></span><span class="ki-rang-name">{{ m.name }}</span></li>
+    {% endfor %}
+  </ol>
+  {% elif not modelle.ausfall %}
+  <p class="ki-modelle-leer">Die Ranglisten der KI-Modelle sind noch nicht abgerufen.</p>
+  {% endif %}
+  {% if modelle.urls %}
+  <p class="ki-modelle-quelle">Platz aus <a href="{{ modelle.urls.aa }}" target="_blank" rel="noopener">Artificial Analysis</a> und <a href="{{ modelle.urls.arena }}" target="_blank" rel="noopener">Arena</a>{% if modelle.stand %} · {% if modelle.ausfall %}Stand {% endif %}{{ modelle.stand }}{% endif %}{% for name, tag in modelle.ausfall %} · {{ name }} am {{ tag }} nicht abrufbar{% endfor %}{% if modelle.fehler %} · {{ modelle.fehler }}{% endif %}</p>
+  {% endif %}
+</aside>
+{% endmacro %}
+
+{% macro ressort(r, fenster=false) %}
+<div class="ki-ressort{% if fenster %} ki-ressort--fenster{% endif %}" id="ressort-{{ r.schluessel }}">
+  <div class="ki-ressort-blatt{% if not r.neben and not fenster %} ki-ressort-blatt--allein{% endif %}">
+    <div class="ki-ressort-bild">{{ d.motiv('ki-' ~ r.schluessel, prefix, 'ki-ressort-motiv', breite=2400, hoehe=1339) }}
+      <h2 class="ki-ressort-titel" id="ressort-{{ r.schluessel }}-titel">{{ r.name }}</h2>
+    </div>
+    <div class="ki-ressort-mitte">
+      {{ meldung(r.aufmacher, 'kopf', dek=true, kicker=false) }}
+      {% if fenster and r.neben %}<div class="ki-ressort-neben">{% for h in r.neben %}{{ meldung(h, 'neben', kicker=false) }}{% endfor %}</div>{% endif %}
+    </div>
+    {% if fenster %}{{ modelle_fenster() }}
+    {% elif r.neben %}<div class="ki-ressort-neben">{% for h in r.neben %}{{ meldung(h, 'neben', dek=loop.first, kicker=false) }}{% endfor %}</div>{% endif %}
   </div>
   {% if r.weitere %}
   <details class="ki-ressort-weitere">
@@ -69,24 +92,20 @@
 </div>
 {% endmacro %}
 
-{% block buehne %}
-<section class="wa-auftakt mg-auftakt ki-auftakt" data-buehne>
-  <div class="wa-auftakt-buehne">
-    <div class="wa-rahmen">
-      <div class="wa-bild" aria-hidden="true">{{ d.motiv('band-ki', prefix, 'wa-motiv', eager=true) }}</div>
-      <div class="wa-schleier" aria-hidden="true"></div>
-      <header class="mg-kopf wa-text">
-        {% if ausgabe.kw %}<p class="mg-woche">Kalenderwoche {{ ausgabe.kw }}</p>{% endif %}
-        <h1 class="mg-titel ki-titel" aria-label="KI">{% for c in 'KI' %}<span style="--i:{{ loop.index0 }}" aria-hidden="true">{{ c }}</span>{% endfor %}</h1>
-        {% if date_de %}<p class="mg-datum">Ausgabe vom {{ date_de }}</p>{% endif %}
-      </header>
-      <div class="wa-hinweis" aria-hidden="true"></div>
-    </div>
-  </div>
-</section>
-{% endblock %}
-
 {% block content %}
+<header class="ki-kopf">
+  <div class="ki-kopf-bild" aria-hidden="true">{{ d.motiv('band-ki', prefix, 'ki-kopf-motiv', eager=true) }}</div>
+  <div class="ki-kopf-text">
+    {% if ausgabe.kw %}<p class="mg-woche">Kalenderwoche {{ ausgabe.kw }}</p>{% endif %}
+    <h1 class="mg-titel ki-titel" aria-label="KI">{% for c in 'KI' %}<span style="--i:{{ loop.index0 }}" aria-hidden="true">{{ c }}</span>{% endfor %}</h1>
+    {% if date_de %}<p class="mg-datum">Ausgabe vom {{ date_de }}</p>{% endif %}
+  </div>
+  <nav class="ki-tueren" aria-label="Mehr auf dieser Seite">
+    <a class="ki-tuer" href="#verstehen"><b>Verstehen</b><span>Kapitel 1: {{ kapitel[0].titel }}</span></a>
+    {% if prompts.anzahl %}<a class="ki-tuer" href="#prompts"><b>Prompts</b><span>{{ prompts.anzahl }} zum Kopieren</span></a>{% endif %}
+    {% if modelle.top %}<a class="ki-tuer" href="#modelle"><b>Modelle</b><span>Platz 1: {{ modelle.top[0].kurz }}</span></a>{% endif %}
+  </nav>
+</header>
 {% if rubriken %}
 <nav class="ki-rubriken" id="ki-rubriken" aria-label="Teile der KI-Seite">{% for r in rubriken %}<a href="#{{ r.ziel }}">{{ r.name }} <b>{{ r.zahl }}</b></a>{% endfor %}</nav>
 {% endif %}
@@ -101,8 +120,8 @@
       {% if videos.rechts and not ausgabe.rechts %}{{ video(videos.rechts, 'mini', 1) }}{% endif %}
     </div>
   </div>
-  {% for r in ausgabe.ressorts %}{{ ressort(r) }}{% if loop.index == ausgabe.videos_nach %}{{ video_reihe() }}{% endif %}{% endfor %}
-  {% if not ausgabe.ressorts %}{{ video_reihe() }}{% endif %}
+  {% for r in ausgabe.ressorts %}{{ ressort(r, fenster=loop.first) }}{% if loop.index == ausgabe.videos_nach %}{{ video_reihe() }}{% endif %}{% endfor %}
+  {% if not ausgabe.ressorts %}{{ modelle_fenster() }}{{ video_reihe() }}{% endif %}
   {% if ausgabe.archiv %}
   <details id="ki-archiv" class="ki-archiv">
     <summary>Archiv · {{ ausgabe.archiv | length }} ältere {{ 'Meldung' if ausgabe.archiv | length == 1 else 'Meldungen' }}</summary>
@@ -115,27 +134,9 @@
   {% endif %}
   {% else %}
   <p class="empty-note">In den Berichten steht noch keine KI-Meldung.</p>
+  {{ modelle_fenster() }}
   {{ video_reihe() }}
   {% endif %}
-</section>
-
-<section class="ki-modelle" id="modelle" aria-label="KI-Modelle">
-  <div class="ki-modelle-innen">
-    {% if modelle.top %}
-    <h2 class="ki-ansage"><span><i>{{ modelle.top[0].kurz }}</i></span><span><i>ist gerade</i></span><span><i>die stärkste KI<em>.</em></i></span></h2>
-    <script type="application/json" id="ki-modelle-daten">{{ modelle.leiter | tojson }}</script>
-    <ol class="ki-rang">
-      {% for m in modelle.top %}
-      <li class="ki-rang-eintrag"><span class="ki-rang-platz">{{ m.platz }}</span><span class="ki-rang-punkt" style="--firma:var({{ m.farbe }})" aria-hidden="true"></span><span class="ki-rang-name">{{ m.name }}</span></li>
-      {% endfor %}
-    </ol>
-    {% elif not modelle.ausfall %}
-    <p class="ki-modelle-leer">Die Ranglisten der KI-Modelle sind noch nicht abgerufen.</p>
-    {% endif %}
-    {% if modelle.urls %}
-    <p class="ki-modelle-quelle">Platz aus zwei Ranglisten gemittelt: <a href="{{ modelle.urls.aa }}" target="_blank" rel="noopener">Artificial Analysis</a> (Tests) und <a href="{{ modelle.urls.arena }}" target="_blank" rel="noopener">Arena</a> (Stimmen der Nutzer){% if modelle.stand %} · {% if modelle.ausfall %}Stand {% endif %}{{ modelle.stand }}{% endif %}{% for name, tag in modelle.ausfall %} · {{ name }} am {{ tag }} nicht abrufbar{% endfor %}{% if modelle.fehler %} · {{ modelle.fehler }}{% endif %}</p>
-    {% endif %}
-  </div>
 </section>
 
 <section class="ki-verstehen" id="verstehen" aria-label="KI verstehen">

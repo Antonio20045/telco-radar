@@ -1,11 +1,11 @@
-"""Modelle-Leiter und Rubrikleiste der KI-Seite im Chromium (Pitch 9, Schnitte 7, 8).
+"""Kopf, Fenster der Modelle und Rubrikleiste der KI-Seite im Chromium.
 
-``app.js`` baut aus den eingebetteten Daten des Bands eine Linienzeichnung:
-zehn Stufen in der Reihenfolge der Liste, je Modell ein Punkt in der Farbe
-seiner Firma, ein roter Punkt fällt mit dem Scrollen. Gegenproben: bei
-reduzierter Bewegung ist alles sofort sichtbar, ohne JavaScript bleibt die
-Liste stehen. Der Store kommt aus den echten Abrufen unter
-``tests/fixtures/ki/``, Stand fest am 11.10.2026.
+Antonio, 14.10.2026: kein Startbild, durch das man erst scrollen muss; die
+Meldungen und die Wegweiser zu Verstehen, Prompts und Modellen stehen im
+ersten Bildschirm. Die Rangliste ist ein kleines Fenster im ersten Ressort
+neben den Artikeln, je Modell ein Punkt in der Farbe seiner Firma.
+Gegenprobe: bei reduzierter Bewegung steht der Kopf sofort. Der Store kommt
+aus den echten Abrufen unter ``tests/fixtures/ki/``, Stand fest am 11.10.2026.
 """
 
 from __future__ import annotations
@@ -112,110 +112,129 @@ def _seite(chromium, site: Path, breite: int = 1440, **optionen):
         httpd.shutdown()
 
 
-STUFEN = "[...document.querySelectorAll('#ki-leiter .ki-stufe')]"
-PUNKT = "document.querySelector('#ki-leiter .ki-leiter-punkt')"
-PUNKT_Y = f"+{PUNKT}.getAttribute('cy')"
-ZEILEN = "[...document.querySelectorAll('.ki-ansage i')]"
-TRANSFORM = f"{ZEILEN}.map(e => getComputedStyle(e).transform)"
+FENSTER = "document.getElementById('modelle')"
+BOX = (
+    "e => { const r = e.getBoundingClientRect();"
+    " return [r.left, r.top, r.right, r.bottom]; }"
+)
 FARBEN = (
-    "(() => { const d = JSON.parse("
-    "document.getElementById('ki-modelle-daten').textContent);"
-    " const probe = document.createElement('span');"
+    "(() => { const probe = document.createElement('span');"
     " document.body.appendChild(probe);"
-    f" return {STUFEN}.map((g, i) => {{"
-    " probe.style.color = 'var(' + d[i].farbe + ')';"
-    " return [getComputedStyle(g.querySelector('.ki-stufe-punkt')).fill,"
-    " getComputedStyle(probe).color, d[i].farbe]; }); })()"
+    " return [...document.querySelectorAll('#modelle .ki-rang-punkt')].map(p => {"
+    " const farbe = p.style.getPropertyValue('--firma').slice(4, -1);"
+    " probe.style.color = 'var(' + farbe + ')';"
+    " return [getComputedStyle(p).backgroundColor,"
+    " getComputedStyle(probe).color, farbe]; }); })()"
 )
 
 
-def _scrolle_durch_band(page) -> None:
-    ende = page.evaluate(
-        "(() => { const b = document.getElementById('modelle').getBoundingClientRect();"
-        " return b.bottom + scrollY - innerHeight; })()"
+def _scrolle_zu(page, auswahl: str, rand: int = 100) -> None:
+    page.evaluate(
+        f"scrollTo(0, document.querySelector('{auswahl}')"
+        f".getBoundingClientRect().top + scrollY - {rand})"
     )
-    page.evaluate(f"scrollTo(0, {ende})")
-    page.wait_for_timeout(1500)
+    page.wait_for_timeout(600)
 
 
-def test_leiter_hat_zehn_stufen_in_der_reihenfolge_der_liste(chromium, site):
+def test_fenster_listet_die_zehn_modelle_in_der_reihenfolge_der_liste(chromium, site):
     with _seite(chromium, site) as page:
         namen = page.evaluate(
-            f"{STUFEN}.map(g => g.querySelector('.ki-stufe-name').textContent)"
+            f"[...{FENSTER}.querySelectorAll('.ki-rang-name')].map(e => e.textContent)"
         )
-        liste = page.evaluate(
-            "[...document.querySelectorAll('.ki-rang-name')].map(e => e.textContent)"
+        schrift = page.evaluate(
+            f"[...{FENSTER}.querySelectorAll('.ki-rang-name')]"
+            ".map(e => parseFloat(getComputedStyle(e).fontSize))"
         )
-        ol = page.evaluate(
-            "getComputedStyle(document.querySelector('.ki-rang')).display"
-        )
-    assert namen == NAMEN == liste
-    assert ol == "none"
+    assert namen == NAMEN
+    assert all(schrift[0] > s for s in schrift[1:])
 
 
 def test_firmenpunkt_hat_die_farbe_seiner_firma(chromium, site):
     with _seite(chromium, site) as page:
         paare = page.evaluate(FARBEN)
     assert len(paare) == 10
-    for fill, erwartet, _ in paare:
-        assert fill == erwartet
+    for farbe, erwartet, _ in paare:
+        assert farbe == erwartet
     assert paare[0][2] == "--ki-anthropic" and paare[1][2] == "--ki-google"
     assert paare[0][0] != paare[1][0]
 
 
-def test_roter_punkt_faellt_beim_scrollen_und_stufen_erscheinen(chromium, site):
+def test_fenster_steht_klein_im_ersten_ressort_neben_dem_aufmacher(chromium, site):
     with _seite(chromium, site) as page:
-        vorher = page.evaluate(PUNKT_Y)
-        sichtbar_vorher = page.evaluate(
-            f"{STUFEN}.filter(g => g.classList.contains('da')).length"
+        ressort = page.evaluate(
+            f"{FENSTER}.closest('.ki-ressort') === "
+            "document.querySelector('#meldungen .ki-ressort')"
         )
-        letzte = page.evaluate(f"getComputedStyle({STUFEN}[9]).opacity")
-        _scrolle_durch_band(page)
-        nachher = page.evaluate(PUNKT_Y)
-        sichtbar = page.evaluate(
-            f"{STUFEN}.filter(g => getComputedStyle(g).opacity === '1').length"
+        fenster = page.evaluate(f"({BOX})({FENSTER})")
+        kopf = page.evaluate(
+            f"({BOX})(document.querySelector('.ki-ressort--fenster .ki-meldung--kopf'))"
         )
-        rot = page.evaluate(f"getComputedStyle({PUNKT}).fill")
-    assert sichtbar_vorher == 0 and letzte == "0"
-    assert nachher > vorher + 300
-    assert sichtbar == 10
-    assert rot == "rgb(230, 0, 0)"
-
-
-def test_gegenprobe_reduzierte_bewegung_zeigt_alles_sofort(chromium, site):
-    with _seite(chromium, site, reduced_motion="reduce") as page:
-        deckkraft = page.evaluate(f"{STUFEN}.map(g => getComputedStyle(g).opacity)")
-        zeilen = page.evaluate(TRANSFORM)
-        punkt = page.evaluate(PUNKT_Y)
-        unten = page.evaluate(
-            "+document.getElementById('ki-leiter').viewBox.baseVal.height"
-        )
-    assert deckkraft == ["1"] * 10
-    assert zeilen and set(zeilen) == {"none"}
-    assert punkt == unten - 10
-
-
-def test_gegenprobe_ohne_javascript_bleibt_die_liste(chromium, site):
-    with _seite(chromium, site, java_script_enabled=False) as page:
-        hoehe = page.evaluate(
-            "document.querySelector('.ki-rang').getBoundingClientRect().height"
-        )
-        svg = page.evaluate("document.getElementById('ki-leiter')")
-        zeilen = page.evaluate(TRANSFORM)
-    assert hoehe > 200
-    assert svg is None
-    assert set(zeilen) == {"none"}
+    assert ressort is True
+    assert fenster[0] >= kopf[2]
+    assert abs(fenster[1] - kopf[1]) < 40
+    assert fenster[3] - fenster[1] < 520
+    assert fenster[2] - fenster[0] < 1440 * 0.34
 
 
 @pytest.mark.parametrize("breite", [1440, 390])
-def test_rubrikleiste_erscheint_nach_dem_kopf_und_passt_auf_den_schirm(
+def test_meldungen_und_wegweiser_stehen_im_ersten_bildschirm(chromium, site, breite):
+    with _seite(chromium, site, breite=breite) as page:
+        hoehe = page.evaluate("innerHeight")
+        aufmacher = page.evaluate(
+            f"({BOX})(document.querySelector('.ki-meldung--aufmacher .ki-schlag'))"
+        )
+        tueren = page.evaluate(
+            f"[...document.querySelectorAll('.ki-tuer')].map(a =>"
+            f" [a.getAttribute('href'), ...({BOX})(a)])"
+        )
+        buehne = page.evaluate(
+            "[document.body.classList.contains('mit-buehne'),"
+            " !!document.querySelector('[data-buehne]')]"
+        )
+    assert aufmacher[1] < hoehe - 60
+    assert [t[0] for t in tueren] == ["#verstehen", "#prompts", "#modelle"]
+    for _, links, oben, rechts, unten in tueren:
+        assert links >= 0 and rechts <= breite and oben > 0 and unten <= hoehe
+    assert buehne == [False, False]
+
+
+def test_wegweiser_fuehren_zu_ihrem_teil(chromium, site):
+    with _seite(chromium, site) as page:
+        lagen = {}
+        for ziel in ("#verstehen", "#prompts", "#modelle"):
+            page.evaluate("scrollTo(0, 0)")
+            page.click(f".ki-tuer[href='{ziel}']")
+            page.wait_for_timeout(1200)
+            lagen[ziel] = page.evaluate(
+                f"document.querySelector('{ziel}').getBoundingClientRect().top"
+            )
+    for ziel, oben in lagen.items():
+        assert 0 <= oben < 200, (ziel, oben)
+
+
+def test_gegenprobe_reduzierte_bewegung_zeigt_den_kopf_sofort(chromium, site):
+    with _seite(chromium, site, reduced_motion="reduce") as page:
+        namen = page.evaluate(
+            "[...document.querySelectorAll('.ki-kopf-motiv, .ki-tuer')]"
+            ".map(e => getComputedStyle(e).animationName)"
+        )
+        deckkraft = page.evaluate(
+            "[...document.querySelectorAll('.ki-tuer')]"
+            ".map(e => getComputedStyle(e).opacity)"
+        )
+    assert namen and set(namen) == {"none"}
+    assert deckkraft == ["1"] * 3
+
+
+@pytest.mark.parametrize("breite", [1440, 390])
+def test_rubrikleiste_erscheint_nach_dem_kopf_und_folgt_dem_lesen(
     chromium, site, breite
 ):
     with _seite(chromium, site, breite=breite) as page:
         vorher = page.evaluate(
             "getComputedStyle(document.getElementById('ki-rubriken')).opacity"
         )
-        _scrolle_durch_band(page)
+        _scrolle_zu(page, "#modelle", 200)
         box = page.evaluate(
             "document.getElementById('ki-rubriken').getBoundingClientRect().toJSON()"
         )
@@ -223,6 +242,11 @@ def test_rubrikleiste_erscheint_nach_dem_kopf_und_passt_auf_den_schirm(
             "getComputedStyle(document.getElementById('ki-rubriken')).opacity"
         )
         aktiv = page.evaluate(
+            "[...document.querySelectorAll('#ki-rubriken a.an')]"
+            ".map(a => a.getAttribute('href'))"
+        )
+        _scrolle_zu(page, ".ki-oben", 0)
+        danach = page.evaluate(
             "[...document.querySelectorAll('#ki-rubriken a.an')]"
             ".map(a => a.getAttribute('href'))"
         )
@@ -237,4 +261,5 @@ def test_rubrikleiste_erscheint_nach_dem_kopf_und_passt_auf_den_schirm(
     assert vorher == "0" and deck == "1"
     assert box["left"] >= 0 and box["right"] <= breite
     assert aktiv == ["#modelle"]
+    assert danach == ["#meldungen"]
     assert unter_leiste <= oben < 200

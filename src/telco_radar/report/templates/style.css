@@ -5939,11 +5939,33 @@ html:not([data-art="geraet"]) .gx-held .gx-art--tarif,html[data-art="geraet"] .g
 .mg-auftakt .mg-woche,.mg-auftakt .mg-titel,.mg-auftakt .mg-datum{color:var(--bildtext)}
 @media (max-width:820px){.mg-auftakt{height:160vh}}
 
-/* KI (Pitch 9, Entwurf 10): Kopf wie die Meldungen-Seite, darunter die
-   KI-Meldungen in drei Spalten, Aufmacher in der Mitte, keine Fotos. */
-.ki-auftakt{--wa-rand:clamp(16px,4vw,64px)}
-.ki-titel{margin-top:.14em;font-size:clamp(130px,20vw,260px)}
-.ki-blatt{padding:clamp(56px,7vw,96px) 0 clamp(48px,6vw,80px)}
+/* KI (Pitch 9, Entwurf 10; Kopf Antonio 14.10.2026): kein Vollbild. Ein
+   schmales Bildband, links der Titel, rechts die Wegweiser zu Verstehen,
+   Prompts und Modellen; die Meldungen stehen im ersten Bildschirm.
+   Bewegt wird nur beim Laden, nichts wartet aufs Scrollen. */
+.ki-kopf{position:relative;isolation:isolate;display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,360px);align-items:end;
+  gap:20px clamp(24px,4vw,64px);margin-top:clamp(12px,1.6vw,20px);padding:clamp(24px,3vw,44px);min-height:clamp(230px,21vw,300px);
+  overflow:hidden;border-radius:20px;background:var(--sp-netz)}
+.ki-kopf-bild{position:absolute;inset:0;z-index:-1}
+.ki-kopf-motiv{display:block;width:100%;height:100%;object-fit:cover;animation:ki-kopf-bild 1.6s var(--ease-aus) both}
+@keyframes ki-kopf-bild{from{opacity:0;transform:scale(1.06)}}
+.ki-kopf-bild::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(90deg,var(--schleier),transparent 75%),linear-gradient(to top,var(--schleier),transparent 65%)}
+.ki-kopf .mg-woche,.ki-kopf .mg-titel,.ki-kopf .mg-datum{color:var(--bildtext)}
+.ki-titel{margin-top:.16em;font-size:clamp(84px,9.4vw,140px);transform:none}
+.ki-kopf .mg-datum{margin-top:8px;font-size:clamp(19px,1.7vw,25px)}
+.ki-tueren{display:grid;gap:10px}
+.ki-tuer{display:grid;gap:2px;min-width:0;padding:13px 18px;border:1px solid var(--glas-rand);border-radius:14px;background:var(--glas);
+  -webkit-backdrop-filter:blur(14px) saturate(1.4);backdrop-filter:blur(14px) saturate(1.4);color:var(--glas-text);
+  box-shadow:var(--glas-schatten);transition:background .25s,transform .25s;animation:mg-hoch .8s var(--ease-aus) .25s both}
+.ki-tuer:nth-child(2){animation-delay:.33s}
+.ki-tuer:nth-child(3){animation-delay:.41s}
+.ki-tuer:hover{background:var(--glas-aktiv);transform:translateX(-3px)}
+@media (prefers-reduced-motion:reduce){.ki-kopf-motiv,.ki-tuer{animation:none}}
+.ki-tuer b{font-size:15.5px;font-weight:600}
+.ki-tuer b::after{content:" \2192";color:var(--red)}
+.ki-tuer span{overflow:hidden;font-size:13.5px;color:var(--glas-text-2);white-space:nowrap;text-overflow:ellipsis}
+.ki-blatt{padding:clamp(32px,3.6vw,52px) 0 clamp(48px,6vw,80px)}
 .ki-oben{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr) minmax(0,1fr);
   grid-template-areas:"l m r";padding-bottom:48px;border-bottom:1px solid var(--rule)}
 .ki-oben>*{min-width:0}
@@ -5965,33 +5987,31 @@ html:not([data-art="geraet"]) .gx-held .gx-art--tarif,html[data-art="geraet"] .g
 .ki-quelle{color:var(--ink-3);text-decoration:underline;text-underline-offset:3px}
 .ki-spaltenkopf{margin:0 0 16px;padding:0 0 10px;border-bottom:2px solid var(--rule-ink);
   font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--ink)}
-/* KI-Blatt in Ressort-Kapiteln (Antonio, 13.10.2026): je Ressort ein
-   eigenes Bild mit dem Namen gross darauf, darunter der Aufmacher gross und
-   daneben wenige kleinere; jedes zweite Kapitel gespiegelt. */
-.ki-ressort{padding-top:clamp(72px,9vw,136px)}
-.ki-ressort-bild{position:relative;overflow:hidden;aspect-ratio:21/9;background:var(--sp-netz)}
+/* KI-Blatt in Ressort-Zeilen (Antonio, 13. und 14.10.2026): je Ressort
+   eine Zeile, links das eigene Bild mit dem Namen, daneben der Aufmacher
+   und wenige kleinere; im ersten Ressort rechts das Fenster der Modelle. */
+.ki-ressort{padding-top:clamp(40px,4.4vw,64px)}
+.ki-ressort-blatt{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,5fr) minmax(0,4fr);column-gap:clamp(24px,3vw,44px);align-items:start}
+.ki-ressort-blatt--allein{grid-template-columns:minmax(0,4fr) minmax(0,9fr)}
+.ki-ressort-bild{position:relative;overflow:hidden;aspect-ratio:1/1;border-radius:4px;background:var(--sp-netz)}
 .ki-ressort-bild::after{content:"";position:absolute;inset:0;pointer-events:none;
   background:linear-gradient(to top,var(--schleier),transparent 62%),linear-gradient(to top,var(--schleier),transparent 34%)}
 .ki-ressort-motiv{display:block;width:100%;height:100%;object-fit:cover}
-.ki-ressort-titel{position:absolute;left:clamp(20px,3.4vw,48px);right:clamp(20px,3.4vw,48px);bottom:clamp(18px,3vw,40px);z-index:1;margin:0;
-  font-family:var(--zeitung);font-weight:500;font-size:clamp(40px,6.6vw,100px);line-height:.95;letter-spacing:-.03em;
+.ki-ressort-titel{position:absolute;left:clamp(16px,1.6vw,24px);right:clamp(16px,1.6vw,24px);bottom:clamp(14px,1.5vw,22px);z-index:1;margin:0;
+  font-family:var(--zeitung);font-weight:500;font-size:clamp(30px,3.1vw,46px);line-height:.98;letter-spacing:-.025em;
   color:var(--bildtext);text-shadow:0 2px 32px var(--schleier);text-wrap:balance}
-.ki-ressort-blatt{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);column-gap:clamp(32px,4.4vw,64px);
-  padding-top:clamp(32px,4vw,52px)}
-.ki-ressort-blatt--allein{grid-template-columns:minmax(0,1fr)}
 .ki-ressort-neben{padding-left:clamp(24px,3vw,40px);border-left:1px solid var(--rule)}
-.ki-ressort:nth-child(even of .ki-ressort) .ki-ressort-blatt:not(.ki-ressort-blatt--allein){grid-template-columns:minmax(0,5fr) minmax(0,7fr)}
-.ki-ressort:nth-child(even of .ki-ressort) .ki-meldung--kopf{grid-column:2;grid-row:1}
-.ki-ressort:nth-child(even of .ki-ressort) .ki-ressort-neben{grid-column:1;grid-row:1;padding:0 clamp(24px,3vw,40px) 0 0;border:0;border-right:1px solid var(--rule)}
-.ki-meldung--kopf .ki-schlag{font-size:clamp(30px,3.3vw,46px);line-height:1.07;letter-spacing:-.02em}
-.ki-meldung--kopf .ki-dek{max-width:52ch;margin-top:16px;font-size:clamp(17px,1.5vw,20px);-webkit-line-clamp:4}
+.ki-ressort-mitte .ki-ressort-neben{margin-top:24px;padding:0;border:0}
+.ki-ressort-mitte .ki-meldung--neben:first-child{padding-top:18px;border-top:1px solid var(--rule)}
+.ki-meldung--kopf .ki-schlag{font-size:clamp(26px,2.5vw,38px);line-height:1.08;letter-spacing:-.02em}
+.ki-meldung--kopf .ki-dek{max-width:52ch;margin-top:14px;font-size:clamp(16px,1.3vw,19px);-webkit-line-clamp:4}
 .ki-meldung--kopf .ki-wer{margin-top:16px}
 .ki-ressort-blatt--allein .ki-meldung--kopf{max-width:860px}
 .ki-meldung--neben{padding:20px 0;border-top:1px solid var(--rule)}
 .ki-meldung--neben:first-child{padding-top:0;border-top:0}
 .ki-meldung--neben:first-child .ki-schlag{font-size:clamp(21px,1.9vw,25px);line-height:1.15}
 .ki-meldung--neben .ki-schlag{font-size:18px}
-.ki-ressort-weitere{margin-top:clamp(28px,3vw,40px);border-top:1px solid var(--rule)}
+.ki-ressort-weitere{margin-top:clamp(20px,2.4vw,32px);border-top:1px solid var(--rule)}
 .ki-ressort-weitere>summary{padding:14px 0;cursor:pointer;font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--ink)}
 .ki-weitere-liste{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:32px;padding-bottom:8px}
 .ki-meldung--weitere{padding:14px 0;border-top:1px solid var(--rule)}
@@ -6034,35 +6054,33 @@ iframe.ki-player{display:block;cursor:auto}
 .ki-video-ausfall{margin:0;font-size:15px;color:var(--ink-2)}
 .ki-videos+.ki-video-ausfall{margin-top:24px}
 /* Modelle: abgesetztes Band wie der Schwerpunkt der Meldungen-Seite. */
-.ki-modelle{margin:0 0 clamp(48px,6vw,80px);background:var(--sp-netz);color:var(--bildtext);border-radius:28px}
-.ki-modelle-innen{padding:clamp(40px,6vw,88px) clamp(20px,5vw,72px)}
+/* Fenster der Modelle (Antonio, 14.10.2026): klein im ersten Ressort,
+   Platz 1 in der groessten Schrift, darunter die Quellen. */
+.ki-fenster{padding:20px 22px 18px;border-radius:16px;background:var(--sp-netz);color:var(--bildtext)}
+.ki-fenster-titel{margin:0 0 10px;font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--bildtext)}
 .ki-ansage{margin:0 0 clamp(28px,4vw,52px);font-weight:500;text-transform:uppercase;font-size:clamp(40px,7vw,96px);
   line-height:1.04;letter-spacing:-.01em;color:var(--bildtext);overflow-wrap:anywhere}
 .ki-ansage span{display:block}
 .ki-ansage em{font-style:normal;color:var(--red)}
-.ki-rang{margin:0 auto;padding:0;list-style:none;max-width:560px;border-top:1px solid var(--sp-linie)}
-.ki-rang-eintrag{display:grid;grid-template-columns:2.2em 14px minmax(0,1fr);align-items:center;column-gap:14px;
-  padding:13px 0;border-bottom:1px solid var(--sp-linie)}
-.ki-rang-platz{font-size:14px;color:var(--sp-text-2);text-align:right;font-variant-numeric:tabular-nums}
-.ki-rang-punkt{width:14px;height:14px;border-radius:50%;background:var(--firma);box-shadow:0 0 0 2px var(--bildtext)}
-.ki-rang-name{font-size:clamp(18px,2vw,22px);font-weight:500;color:var(--bildtext)}
-.ki-rang-eintrag:first-child .ki-rang-name{font-size:clamp(22px,2.6vw,28px)}
-.ki-modelle-leer{margin:0;font-size:18px;color:var(--bildtext)}
-.ki-modelle-quelle{margin:clamp(24px,3vw,36px) 0 0;font-size:13px;color:var(--sp-text-2);text-align:center}
+.ki-rang{margin:0;padding:0;list-style:none;border-top:1px solid var(--sp-linie)}
+.ki-rang-eintrag{display:grid;grid-template-columns:1.6em 10px minmax(0,1fr);align-items:center;column-gap:10px;
+  padding:6px 0;border-bottom:1px solid var(--sp-linie)}
+.ki-rang-platz{font-size:12px;color:var(--sp-text-2);text-align:right;font-variant-numeric:tabular-nums}
+.ki-rang-punkt{width:10px;height:10px;border-radius:50%;background:var(--firma);box-shadow:0 0 0 1.5px var(--bildtext)}
+.ki-rang-name{font-size:15px;font-weight:500;line-height:1.25;color:var(--bildtext);overflow-wrap:anywhere}
+.ki-rang-eintrag:first-child{padding:10px 0}
+.ki-rang-eintrag:first-child .ki-rang-name{font-size:21px;font-weight:600}
+.ki-modelle-leer{margin:0;font-size:15px;color:var(--bildtext)}
+.ki-modelle-quelle{margin:12px 0 0;font-size:12px;line-height:1.45;color:var(--sp-text-2)}
 .ki-modelle-quelle a{color:inherit;text-decoration:underline;text-underline-offset:3px}
-/* Schnitt 7: Leiter der Modelle (app.js baut sie aus #ki-modelle-daten) */
 .ki-ansage span>i{display:block;font-style:normal}
 .bewegt .ki-ansage span{overflow:hidden;padding:.08em 0 .02em}
 .bewegt .ki-ansage span>i{transform:translateY(105%);transition:transform 1s cubic-bezier(.2,.8,.2,1)}
 .bewegt .ki-ansage.da span>i{transform:none}
 .bewegt .ki-ansage span:nth-child(2)>i{transition-delay:.08s}
 .bewegt .ki-ansage span:nth-child(3)>i{transition-delay:.16s}
-.ki-modelle--leiter .ki-rang{display:none}
-#ki-leiter{display:block;width:100%;overflow:visible}
-.bewegt .ki-stufe{opacity:0;transform:translateY(14px);transition:opacity .5s,transform .7s cubic-bezier(.2,1.3,.4,1);transform-box:fill-box}
-.bewegt .ki-stufe.da{opacity:1;transform:none}
 /* Schnitt 8: Rubrikleiste unter der Hauptnavigation */
-.ki-blatt,.ki-modelle{scroll-margin-top:140px}
+.ki-blatt,.ki-fenster{scroll-margin-top:140px}
 .ki-rubriken{position:fixed;left:50%;top:76px;z-index:55;display:flex;gap:2px;padding:4px;max-width:calc(100% - 32px);
   overflow-x:auto;scrollbar-width:none;background:var(--paper-2);border-radius:999px;box-shadow:0 6px 24px rgba(19,20,23,.12);
   transform:translate(-50%,-14px);opacity:0;pointer-events:none;transition:opacity .35s,transform .35s}
@@ -6199,7 +6217,7 @@ a.ki-k1-pille:hover{border-color:var(--ink)}
 }
 @media (max-width:900px){
   .ki-rubriken{top:calc(12px + env(safe-area-inset-top,0px))}
-  .ki-blatt,.ki-modelle,.ki-verstehen,.ki-prompts,.ki-p-gruppe{scroll-margin-top:72px}
+  .ki-blatt,.ki-fenster,.ki-verstehen,.ki-prompts,.ki-p-gruppe{scroll-margin-top:72px}
 }
 @media (max-width:980px){
   .ki-oben{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"m m" "l r";row-gap:36px}
@@ -6208,20 +6226,36 @@ a.ki-k1-pille:hover{border-color:var(--ink)}
   .ki-rechts{padding-left:18px}
   .ki-weitere-liste{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+@media (max-width:1100px){
+  .ki-ressort-blatt,.ki-ressort-blatt--allein{grid-template-columns:minmax(0,2fr) minmax(0,3fr);row-gap:28px}
+  .ki-ressort-bild{grid-row:span 2}
+  .ki-ressort-blatt>.ki-ressort-neben,.ki-ressort-blatt>.ki-fenster{grid-column:2}
+  .ki-ressort-blatt>.ki-ressort-neben{padding:0;border:0}
+  .ki-ressort-blatt>.ki-ressort-neben .ki-meldung--neben:first-child{padding-top:18px;border-top:1px solid var(--rule)}
+}
 @media (max-width:760px){
-  .ki-ressort-bild{aspect-ratio:4/3;margin-inline:-16px}
-  .ki-ressort-blatt,.ki-ressort:nth-child(even of .ki-ressort) .ki-ressort-blatt:not(.ki-ressort-blatt--allein){grid-template-columns:minmax(0,1fr)}
-  .ki-ressort:nth-child(even of .ki-ressort) .ki-meldung--kopf,.ki-ressort:nth-child(even of .ki-ressort) .ki-ressort-neben{grid-column:auto;grid-row:auto}
-  .ki-ressort-neben,.ki-ressort:nth-child(even of .ki-ressort) .ki-ressort-neben{margin-top:24px;padding:0;border:0}
-  .ki-meldung--neben:first-child{padding-top:20px;border-top:1px solid var(--rule)}
+  .ki-kopf{grid-template-columns:minmax(0,1fr);min-height:0;padding:18px 16px 16px;border-radius:16px}
+  .ki-titel{font-size:76px}
+  .ki-kopf .mg-datum{font-size:18px}
+  .ki-tueren{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+  .ki-tuer{padding:9px 10px;border-radius:12px}
+  .ki-tuer b{font-size:13.5px}
+  .ki-tuer b::after{content:none}
+  .ki-tuer span{font-size:11.5px;line-height:1.3;white-space:normal}
+  .ki-ressort-blatt,.ki-ressort-blatt--allein{grid-template-columns:minmax(0,1fr);row-gap:20px}
+  .ki-ressort-bild{grid-row:auto;aspect-ratio:16/9}
+  .ki-ressort-blatt>.ki-ressort-neben,.ki-ressort-blatt>.ki-fenster{grid-column:auto}
+  .ki-ressort-blatt>.ki-ressort-neben{margin-top:0}
   .ki-meldung--neben .ki-dek{display:none}
   .ki-weitere-liste{grid-template-columns:minmax(0,1fr)}
 }
-@media (max-width:860px){.ki-videos{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:860px){
+  .ki-videos{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding-bottom:4px}
+  .ki-video--reihe{flex:0 0 min(78%,340px);scroll-snap-align:start}
+}
 @media (max-width:620px){
   .ki-oben{grid-template-columns:minmax(0,1fr);grid-template-areas:"m" "l" "r"}
   .ki-links,.ki-rechts{padding:0}
-  .ki-titel{font-size:clamp(110px,34vw,160px)}
   .ki-ansage{font-size:min(8.4vw,40px)}
   .ki-lern-ansage{font-size:min(11.8vw,46px)}
 }

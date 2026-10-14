@@ -192,7 +192,9 @@ def _ki_seite(tmp_path, store: dict | None) -> str:
     site = tmp_path / "site"
     render_site(site, berichte, load_config(root))
     html = (site / "ki.html").read_text(encoding="utf-8")
-    return re.search(r'<section[^>]*id="modelle".*?</section>', html, re.S).group(0)
+    fenster = re.search(r'<aside[^>]*id="modelle".*?</aside>', html, re.S).group(0)
+    tueren = re.search(r'<nav class="ki-tueren".*?</nav>', html, re.S).group(0)
+    return fenster + tueren
 
 
 def _store(tmp_path, abrufe: list[tuple[dict, date]]) -> dict:
@@ -204,14 +206,14 @@ def _store(tmp_path, abrufe: list[tuple[dict, date]]) -> dict:
 
 
 def _ansage(band: str) -> str:
-    h2 = re.search(r"<h2[^>]*>(.*?)</h2>", band, re.S).group(1)
-    return " ".join(re.sub(r"<[^>]+>", " ", h2).split())
+    tuer = re.search(r'<a class="ki-tuer" href="#modelle">(.*?)</a>', band, re.S)
+    return " ".join(re.sub(r"<[^>]+>", " ", tuer.group(1)).split())
 
 
 def test_band_zeigt_zehn_modelle_und_platz_eins_aus_dem_store(tmp_path):
     store = _store(tmp_path, [(_abruf(_aa(), _arena()), HEUTE)])
     band = _ki_seite(tmp_path, store)
-    assert _ansage(band) == "Opus 5.5 ist gerade die stärkste KI ."
+    assert _ansage(band) == "Modelle Platz 1: Opus 5.5"
     namen = re.findall(r'class="ki-rang-name">([^<]+)<', band)
     assert namen == [name for name, _, _ in ERWARTET]
     assert band.count('class="ki-rang-eintrag"') == 10
@@ -248,7 +250,7 @@ def test_gegenprobe_anderer_store_andere_seite(tmp_path):
         },
     }
     band = _ki_seite(tmp_path, anderer)
-    assert _ansage(band) == "Modell X ist gerade die stärkste KI ."
+    assert _ansage(band) == "Modelle Platz 1: Modell X"
     assert band.count('class="ki-rang-eintrag"') == 2
     assert "10.10.2026" in band
     assert "Opus" not in band
