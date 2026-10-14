@@ -1,0 +1,89 @@
+{
+ "karte": "congstar.yaml",
+ "anbieter": "congstar",
+ "adresse": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/",
+ "status": "gestoert",
+ "grund": "Kanarienwert fehlt: [data-testid=\"memory-size-selection\"] ohne „Speicher:“",
+ "bot_schutz": true,
+ "http_status": 200,
+ "hoechste_kombinationen": 12,
+ "belege": "nicht archiviert (kein Konto)",
+ "zaehlung": {
+  "kombinationen": 0,
+  "erfasst": 0,
+  "nicht_angeboten": 0,
+  "nicht_erfasst": 0,
+  "befund": 0,
+  "nicht_besucht": 0,
+  "verworfen": 2,
+  "gescheitert": 0
+ },
+ "struktur": {
+  "knoepfe_gesucht": 0,
+  "knoepfe_gefunden": 0,
+  "felder_gesucht": 0,
+  "felder_gefunden": 0,
+  "anteil_knoepfe": null,
+  "anteil_felder": null
+ },
+ "gefunden": {
+  "knoepfe": {
+   "speicher": {
+    "selektor": "[data-testid=\"memory-size\"]",
+    "werte": []
+   },
+   "tarif": {
+    "selektor": "label:has(input[aria-label^=\"Tarifoption \"])",
+    "werte": []
+   },
+   "laufzeit": {
+    "selektor": "label:has(input[aria-label$=\"mtl. Zahlungen\"])",
+    "werte": []
+   }
+  },
+  "zusammenfassung": "[data-testid=\"sticky-box-side-postpaid\"], #layout > main > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(3)",
+  "felder": {
+   "anzahlung": {
+    "text": 0,
+    "antwort": 0
+   },
+   "rate": {
+    "text": 0,
+    "antwort": 0
+   },
+   "ratenzahl": {
+    "text": 0,
+    "antwort": 0
+   },
+   "tarifphasen": {
+    "text": 0,
+    "antwort": 0
+   },
+   "tarifbindung": {
+    "text": 0,
+    "antwort": 0
+   },
+   "anschluss": {
+    "text": 0,
+    "antwort": 0
+   },
+   "volumen_gb": {
+    "text": 0,
+    "antwort": 0
+   }
+  }
+ },
+ "kombinationen": [],
+ "verworfen": [
+  {
+   "url": "https://www.congstar.de/checkout/api/cart-state",
+   "grund": "per robots.txt gesperrt: /checkout/api/cart-state"
+  },
+  {
+   "url": "https://api.usercentrics.eu/settings/3DQmSnVkN/latest/languages.json",
+   "grund": "robots.txt nicht lesbar (HTTP 403)"
+  }
+ ],
+ "gescheitert": [],
+ "hilfsdateien": []
+}
