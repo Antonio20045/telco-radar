@@ -31,7 +31,7 @@ from collections.abc import Callable, Iterable
 from datetime import date
 
 from ..analyze import ki_blatt, ki_modelle, ki_videos
-from . import ki_kapitel, ki_kapitel2, ki_kapitel3, meldungen_seite
+from . import ki_kapitel, ki_kapitel2, ki_kapitel3, ki_kapitel4, meldungen_seite
 
 KI_THEMA = "thema:ki"
 KI_TAG = "KI / AI"
@@ -55,7 +55,7 @@ KAPITEL = (
     "Strom, Chips, Rechnung",
     "Sicher arbeiten",
 )
-SEITEN = {1: ki_kapitel, 2: ki_kapitel2, 3: ki_kapitel3}
+SEITEN = {1: ki_kapitel, 2: ki_kapitel2, 3: ki_kapitel3, 4: ki_kapitel4}
 FERTIG = frozenset(SEITEN)
 FAHRT_WEG = "M 20 190 C 140 190 170 70 300 70 S 470 200 600 180 S 760 60 980 80"
 STATIONEN = (
