@@ -2,8 +2,8 @@
  "updated": "2026-10-14",
  "anbieter": {
   "ALDI TALK": {
-   "laeufe": 73,
-   "funde_gesamt": 394,
+   "laeufe": 74,
+   "funde_gesamt": 405,
    "letzter_lauf": "2026-10-14",
    "letzte_funde": 11,
    "letzter_fund": "2026-10-14",
@@ -252,8 +252,8 @@
    "tote_adressen": 0
   },
   "Vodafone": {
-   "laeufe": 71,
-   "funde_gesamt": 12299,
+   "laeufe": 72,
+   "funde_gesamt": 12476,
    "letzter_lauf": "2026-10-14",
    "letzte_funde": 177,
    "termine": [
@@ -502,8 +502,8 @@
    "tote_adressen": 0
   },
   "o2": {
-   "laeufe": 71,
-   "funde_gesamt": 4805,
+   "laeufe": 72,
+   "funde_gesamt": 4874,
    "letzter_lauf": "2026-10-14",
    "letzte_funde": 69,
    "termine": [
@@ -744,7 +744,7 @@
      "2026-10-14",
      69,
      "gelesen",
-     1961,
+     1973,
      0,
      null
     ]
@@ -752,8 +752,8 @@
    "tote_adressen": null
   },
   "mobilcom-debitel": {
-   "laeufe": 24,
-   "funde_gesamt": 8755,
+   "laeufe": 25,
+   "funde_gesamt": 8910,
    "letzte_funde": 155,
    "termine": [
     "2026-08-29",
@@ -1416,9 +1416,9 @@
   },
   "congstar": {
    "laeufe": 45,
-   "funde_gesamt": 9046,
+   "funde_gesamt": 9188,
    "letzter_lauf": "2026-10-13",
-   "letzte_funde": 143,
+   "letzte_funde": 142,
    "termine": [
     "2026-09-03",
     "2026-09-04",
@@ -1649,7 +1649,7 @@
     ],
     [
      "2026-10-14",
-     143,
+     142,
      "lesefehler",
      912,
      43,
@@ -1659,8 +1659,8 @@
    "tote_adressen": 0
   },
   "1&1": {
-   "laeufe": 63,
-   "funde_gesamt": 2321,
+   "laeufe": 64,
+   "funde_gesamt": 2362,
    "letzter_lauf": "2026-10-14",
    "letzte_funde": 41,
    "termine": [
@@ -2096,10 +2096,10 @@
    "tote_adressen": null
   },
   "Saturn": {
-   "laeufe": 59,
-   "funde_gesamt": 1144,
+   "laeufe": 60,
+   "funde_gesamt": 1164,
    "letzter_lauf": "2026-10-14",
-   "letzte_funde": 19,
+   "letzte_funde": 20,
    "termine": [
     "2026-09-05",
     "2026-09-06",
@@ -2329,7 +2329,7 @@
     ],
     [
      "2026-10-14",
-     19,
+     20,
      "gelesen",
      0,
      0,
@@ -7726,6 +7726,36 @@
    "preis_ohne_vertrag": 1329.0,
    "stale_since": "2026-10-10",
    "ended_since": "2026-10-11"
+  },
+  {
+   "id": "saturn--apple-iphone-17-pro-max-512gb-cosmic-orange",
+   "sku_id": "apple-iphone-17-pro-max-512gb-cosmic-orange",
+   "device_id": "apple-iphone-17-pro-max",
+   "anbieter": "Saturn",
+   "anbieter_typ": "handel",
+   "netz": "",
+   "speicher_gb": 512,
+   "farbe_roh": "Cosmic Orange",
+   "farbe_normalisiert": null,
+   "ean": "",
+   "zustand": "neu",
+   "first_seen": "2026-10-14",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "erstpreis": 1569.0,
+   "erstpreis_art": "ohne_vertrag",
+   "erstpreis_am": "2026-10-14",
+   "last_verified": "2026-10-14",
+   "letzter_check": "2026-10-14",
+   "quelle_url": "https://www.saturn.de/de/product/_apple-iphone-17-pro-max-5g-512-gb-cosmic-orange-dual-sim-3013598.html",
+   "abgerufen_am": "2026-10-14",
+   "verfuegbarkeit": "unbekannt",
+   "confidence": "hoch",
+   "einstiege": [
+    "https://www.saturn.de/de/brand/apple/iphone/iphone-17-pro"
+   ],
+   "titel_roh": "APPLE iPhone 17 Pro Max 5G 512 GB Cosmic Orange Dual SIM",
+   "preis_ohne_vertrag": 1569.0
   },
   {
    "id": "saturn--apple-iphone-17-pro-max-512gb-silber",

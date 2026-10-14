@@ -196798,6 +196798,550 @@
    "beleg_status": "offen"
   },
   {
+   "id": "buendel--congstar--xiaomi-redmi-note-15-pro-plus-256gb-mocha-brown--allnet-flat-l--24m",
+   "sku_id": "xiaomi-redmi-note-15-pro-plus-256gb-mocha-brown",
+   "anbieter": "congstar",
+   "tarif_name": "Allnet Flat L",
+   "first_seen": "2026-10-14",
+   "tarif_id": "congstar:allnet-flat-l",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 30.0,
+   "tarif_listenpreis": null,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 29.0,
+   "geraet_monatsrate": 7.5,
+   "laufzeit_monate": 24,
+   "anschlusspreis": 15.0,
+   "quelle_url": "https://www.congstar.de/geraete/xiaomi/xiaomi-redmi-note-15-pro-5g/",
+   "abgerufen_am": "2026-10-14",
+   "zustand": "neu",
+   "herleitung": "",
+   "tarif_phasen": [
+    {
+     "von_monat": 1,
+     "bis_monat": 24,
+     "betrag": 30.0,
+     "beleg": "prices.recurring: listed 30,00 € = discounted 30,00 €, discounts [] (keine Rabattphase)"
+    }
+   ],
+   "rechenweise": 1,
+   "rabatte": [],
+   "aktionen": [],
+   "last_verified": "2026-10-14",
+   "pruefung": "gueltig"
+  },
+  {
+   "id": "buendel--congstar--xiaomi-redmi-note-15-pro-plus-256gb-mocha-brown--allnet-flat-l--36m",
+   "sku_id": "xiaomi-redmi-note-15-pro-plus-256gb-mocha-brown",
+   "anbieter": "congstar",
+   "tarif_name": "Allnet Flat L",
+   "first_seen": "2026-10-14",
+   "tarif_id": "congstar:allnet-flat-l",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 30.0,
+   "tarif_listenpreis": null,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 29.0,
+   "geraet_monatsrate": 5.0,
+   "laufzeit_monate": 36,
+   "anschlusspreis": 15.0,
+   "quelle_url": "https://www.congstar.de/geraete/xiaomi/xiaomi-redmi-note-15-pro-5g/",
+   "abgerufen_am": "2026-10-14",
+   "zustand": "neu",
+   "herleitung": "",
+   "tarif_phasen": [
+    {
+     "von_monat": 1,
+     "bis_monat": 36,
+     "betrag": 30.0,
+     "beleg": "prices.recurring: listed 30,00 € = discounted 30,00 €, discounts [] (keine Rabattphase)"
+    }
+   ],
+   "rechenweise": 1,
+   "rabatte": [],
+   "aktionen": [],
+   "last_verified": "2026-10-14",
+   "pruefung": "gueltig"
+  },
+  {
+   "id": "buendel--congstar--xiaomi-redmi-note-15-pro-plus-256gb-mocha-brown--allnet-flat-l-flex--24m",
+   "sku_id": "xiaomi-redmi-note-15-pro-plus-256gb-mocha-brown",
+   "anbieter": "congstar",
+   "tarif_name": "Allnet Flat L Flex",
+   "first_seen": "2026-10-14",
+   "tarif_id": "congstar:allnet-flat-l-flex",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 30.0,
+   "tarif_listenpreis": null,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 29.0,
+   "geraet_monatsrate": 13.5,
+   "laufzeit_monate": 24,
+   "anschlusspreis": 35.0,
+   "quelle_url": "https://www.congstar.de/geraete/xiaomi/xiaomi-redmi-note-15-pro-5g/",
+   "abgerufen_am": "2026-10-14",
+   "zustand": "neu",
+   "herleitung": "",
+   "tarif_phasen": [
+    {
+     "von_monat": 1,
+     "bis_monat": 24,
+     "betrag": 30.0,
+     "beleg": "prices.recurring: listed 30,00 € = discounted 30,00 €, discounts [] (keine Rabattphase)"
+    }
+   ],
+   "rechenweise": 1,
+   "rabatte": [],
+   "aktionen": [],
+   "last_verified": "2026-10-14",
+   "pruefung": "gueltig"
+  },
+  {
+   "id": "buendel--congstar--xiaomi-redmi-note-15-pro-plus-256gb-mocha-brown--allnet-flat-l-flex--36m",
+   "sku_id": "xiaomi-redmi-note-15-pro-plus-256gb-mocha-brown",
+   "anbieter": "congstar",
+   "tarif_name": "Allnet Flat L Flex",
+   "first_seen": "2026-10-14",
+   "tarif_id": "congstar:allnet-flat-l-flex",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 30.0,
+   "tarif_listenpreis": null,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 29.0,
+   "geraet_monatsrate": 9.0,
+   "laufzeit_monate": 36,
+   "anschlusspreis": 35.0,
+   "quelle_url": "https://www.congstar.de/geraete/xiaomi/xiaomi-redmi-note-15-pro-5g/",
+   "abgerufen_am": "2026-10-14",
+   "zustand": "neu",
+   "herleitung": "",
+   "tarif_phasen": [
+    {
+     "von_monat": 1,
+     "bis_monat": 36,
+     "betrag": 30.0,
+     "beleg": "prices.recurring: listed 30,00 € = discounted 30,00 €, discounts [] (keine Rabattphase)"
+    }
+   ],
+   "rechenweise": 1,
+   "rabatte": [],
+   "aktionen": [],
+   "last_verified": "2026-10-14",
+   "pruefung": "gueltig"
+  },
+  {
+   "id": "buendel--congstar--xiaomi-redmi-note-15-pro-plus-256gb-mocha-brown--allnet-flat-m--24m",
+   "sku_id": "xiaomi-redmi-note-15-pro-plus-256gb-mocha-brown",
+   "anbieter": "congstar",
+   "tarif_name": "Allnet Flat M",
+   "first_seen": "2026-10-14",
+   "tarif_id": "congstar:allnet-flat-m",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 25.0,
+   "tarif_listenpreis": null,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 29.0,
+   "geraet_monatsrate": 9.0,
+   "laufzeit_monate": 24,
+   "anschlusspreis": 15.0,
+   "quelle_url": "https://www.congstar.de/geraete/xiaomi/xiaomi-redmi-note-15-pro-5g/",
+   "abgerufen_am": "2026-10-14",
+   "zustand": "neu",
+   "herleitung": "",
+   "tarif_phasen": [
+    {
+     "von_monat": 1,
+     "bis_monat": 24,
+     "betrag": 25.0,
+     "beleg": "prices.recurring: listed 25,00 € = discounted 25,00 €, discounts [] (keine Rabattphase)"
+    }
+   ],
+   "rechenweise": 1,
+   "rabatte": [],
+   "aktionen": [],
+   "last_verified": "2026-10-14",
+   "pruefung": "gueltig"
+  },
+  {
+   "id": "buendel--congstar--xiaomi-redmi-note-15-pro-plus-256gb-mocha-brown--allnet-flat-m--36m",
+   "sku_id": "xiaomi-redmi-note-15-pro-plus-256gb-mocha-brown",
+   "anbieter": "congstar",
+   "tarif_name": "Allnet Flat M",
+   "first_seen": "2026-10-14",
+   "tarif_id": "congstar:allnet-flat-m",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 25.0,
+   "tarif_listenpreis": null,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 29.0,
+   "geraet_monatsrate": 6.0,
+   "laufzeit_monate": 36,
+   "anschlusspreis": 15.0,
+   "quelle_url": "https://www.congstar.de/geraete/xiaomi/xiaomi-redmi-note-15-pro-5g/",
+   "abgerufen_am": "2026-10-14",
+   "zustand": "neu",
+   "herleitung": "",
+   "tarif_phasen": [
+    {
+     "von_monat": 1,
+     "bis_monat": 36,
+     "betrag": 25.0,
+     "beleg": "prices.recurring: listed 25,00 € = discounted 25,00 €, discounts [] (keine Rabattphase)"
+    }
+   ],
+   "rechenweise": 1,
+   "rabatte": [],
+   "aktionen": [],
+   "last_verified": "2026-10-14",
+   "pruefung": "gueltig"
+  },
+  {
+   "id": "buendel--congstar--xiaomi-redmi-note-15-pro-plus-256gb-mocha-brown--allnet-flat-m-flex--24m",
+   "sku_id": "xiaomi-redmi-note-15-pro-plus-256gb-mocha-brown",
+   "anbieter": "congstar",
+   "tarif_name": "Allnet Flat M Flex",
+   "first_seen": "2026-10-14",
+   "tarif_id": "congstar:allnet-flat-m-flex",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 25.0,
+   "tarif_listenpreis": null,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 29.0,
+   "geraet_monatsrate": 13.5,
+   "laufzeit_monate": 24,
+   "anschlusspreis": 35.0,
+   "quelle_url": "https://www.congstar.de/geraete/xiaomi/xiaomi-redmi-note-15-pro-5g/",
+   "abgerufen_am": "2026-10-14",
+   "zustand": "neu",
+   "herleitung": "",
+   "tarif_phasen": [
+    {
+     "von_monat": 1,
+     "bis_monat": 24,
+     "betrag": 25.0,
+     "beleg": "prices.recurring: listed 25,00 € = discounted 25,00 €, discounts [] (keine Rabattphase)"
+    }
+   ],
+   "rechenweise": 1,
+   "rabatte": [],
+   "aktionen": [],
+   "last_verified": "2026-10-14",
+   "pruefung": "gueltig"
+  },
+  {
+   "id": "buendel--congstar--xiaomi-redmi-note-15-pro-plus-256gb-mocha-brown--allnet-flat-m-flex--36m",
+   "sku_id": "xiaomi-redmi-note-15-pro-plus-256gb-mocha-brown",
+   "anbieter": "congstar",
+   "tarif_name": "Allnet Flat M Flex",
+   "first_seen": "2026-10-14",
+   "tarif_id": "congstar:allnet-flat-m-flex",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 25.0,
+   "tarif_listenpreis": null,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 29.0,
+   "geraet_monatsrate": 9.0,
+   "laufzeit_monate": 36,
+   "anschlusspreis": 35.0,
+   "quelle_url": "https://www.congstar.de/geraete/xiaomi/xiaomi-redmi-note-15-pro-5g/",
+   "abgerufen_am": "2026-10-14",
+   "zustand": "neu",
+   "herleitung": "",
+   "tarif_phasen": [
+    {
+     "von_monat": 1,
+     "bis_monat": 36,
+     "betrag": 25.0,
+     "beleg": "prices.recurring: listed 25,00 € = discounted 25,00 €, discounts [] (keine Rabattphase)"
+    }
+   ],
+   "rechenweise": 1,
+   "rabatte": [],
+   "aktionen": [],
+   "last_verified": "2026-10-14",
+   "pruefung": "gueltig"
+  },
+  {
+   "id": "buendel--congstar--xiaomi-redmi-note-15-pro-plus-256gb-mocha-brown--allnet-flat-s--24m",
+   "sku_id": "xiaomi-redmi-note-15-pro-plus-256gb-mocha-brown",
+   "anbieter": "congstar",
+   "tarif_name": "Allnet Flat S",
+   "first_seen": "2026-10-14",
+   "tarif_id": "congstar:allnet-flat-s-mit-gb",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 20.0,
+   "tarif_listenpreis": null,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 29.0,
+   "geraet_monatsrate": 10.5,
+   "laufzeit_monate": 24,
+   "anschlusspreis": 15.0,
+   "quelle_url": "https://www.congstar.de/geraete/xiaomi/xiaomi-redmi-note-15-pro-5g/",
+   "abgerufen_am": "2026-10-14",
+   "zustand": "neu",
+   "herleitung": "",
+   "tarif_phasen": [
+    {
+     "von_monat": 1,
+     "bis_monat": 24,
+     "betrag": 20.0,
+     "beleg": "prices.recurring: listed 20,00 € = discounted 20,00 €, discounts [] (keine Rabattphase)"
+    }
+   ],
+   "rechenweise": 1,
+   "rabatte": [],
+   "aktionen": [],
+   "last_verified": "2026-10-14",
+   "pruefung": "gueltig"
+  },
+  {
+   "id": "buendel--congstar--xiaomi-redmi-note-15-pro-plus-256gb-mocha-brown--allnet-flat-s--36m",
+   "sku_id": "xiaomi-redmi-note-15-pro-plus-256gb-mocha-brown",
+   "anbieter": "congstar",
+   "tarif_name": "Allnet Flat S",
+   "first_seen": "2026-10-14",
+   "tarif_id": "congstar:allnet-flat-s-mit-gb",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 20.0,
+   "tarif_listenpreis": null,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 29.0,
+   "geraet_monatsrate": 7.0,
+   "laufzeit_monate": 36,
+   "anschlusspreis": 15.0,
+   "quelle_url": "https://www.congstar.de/geraete/xiaomi/xiaomi-redmi-note-15-pro-5g/",
+   "abgerufen_am": "2026-10-14",
+   "zustand": "neu",
+   "herleitung": "",
+   "tarif_phasen": [
+    {
+     "von_monat": 1,
+     "bis_monat": 36,
+     "betrag": 20.0,
+     "beleg": "prices.recurring: listed 20,00 € = discounted 20,00 €, discounts [] (keine Rabattphase)"
+    }
+   ],
+   "rechenweise": 1,
+   "rabatte": [],
+   "aktionen": [],
+   "last_verified": "2026-10-14",
+   "pruefung": "gueltig"
+  },
+  {
+   "id": "buendel--congstar--xiaomi-redmi-note-15-pro-plus-256gb-mocha-brown--allnet-flat-s-flex--24m",
+   "sku_id": "xiaomi-redmi-note-15-pro-plus-256gb-mocha-brown",
+   "anbieter": "congstar",
+   "tarif_name": "Allnet Flat S Flex",
+   "first_seen": "2026-10-14",
+   "tarif_id": "congstar:allnet-flat-s-flex-mit-gb",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 20.0,
+   "tarif_listenpreis": null,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 29.0,
+   "geraet_monatsrate": 13.5,
+   "laufzeit_monate": 24,
+   "anschlusspreis": 35.0,
+   "quelle_url": "https://www.congstar.de/geraete/xiaomi/xiaomi-redmi-note-15-pro-5g/",
+   "abgerufen_am": "2026-10-14",
+   "zustand": "neu",
+   "herleitung": "",
+   "tarif_phasen": [
+    {
+     "von_monat": 1,
+     "bis_monat": 24,
+     "betrag": 20.0,
+     "beleg": "prices.recurring: listed 20,00 € = discounted 20,00 €, discounts [] (keine Rabattphase)"
+    }
+   ],
+   "rechenweise": 1,
+   "rabatte": [],
+   "aktionen": [],
+   "last_verified": "2026-10-14",
+   "pruefung": "gueltig"
+  },
+  {
+   "id": "buendel--congstar--xiaomi-redmi-note-15-pro-plus-256gb-mocha-brown--allnet-flat-s-flex--36m",
+   "sku_id": "xiaomi-redmi-note-15-pro-plus-256gb-mocha-brown",
+   "anbieter": "congstar",
+   "tarif_name": "Allnet Flat S Flex",
+   "first_seen": "2026-10-14",
+   "tarif_id": "congstar:allnet-flat-s-flex-mit-gb",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 20.0,
+   "tarif_listenpreis": null,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 29.0,
+   "geraet_monatsrate": 9.0,
+   "laufzeit_monate": 36,
+   "anschlusspreis": 35.0,
+   "quelle_url": "https://www.congstar.de/geraete/xiaomi/xiaomi-redmi-note-15-pro-5g/",
+   "abgerufen_am": "2026-10-14",
+   "zustand": "neu",
+   "herleitung": "",
+   "tarif_phasen": [
+    {
+     "von_monat": 1,
+     "bis_monat": 36,
+     "betrag": 20.0,
+     "beleg": "prices.recurring: listed 20,00 € = discounted 20,00 €, discounts [] (keine Rabattphase)"
+    }
+   ],
+   "rechenweise": 1,
+   "rabatte": [],
+   "aktionen": [],
+   "last_verified": "2026-10-14",
+   "pruefung": "gueltig"
+  },
+  {
+   "id": "buendel--congstar--xiaomi-redmi-note-15-pro-plus-256gb-mocha-brown--allnet-flat-xs--24m",
+   "sku_id": "xiaomi-redmi-note-15-pro-plus-256gb-mocha-brown",
+   "anbieter": "congstar",
+   "tarif_name": "Allnet Flat XS",
+   "first_seen": "2026-10-14",
+   "tarif_id": "congstar:allnet-flat-xs-mit-gb",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 15.0,
+   "tarif_listenpreis": null,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 29.0,
+   "geraet_monatsrate": 12.0,
+   "laufzeit_monate": 24,
+   "anschlusspreis": 15.0,
+   "quelle_url": "https://www.congstar.de/geraete/xiaomi/xiaomi-redmi-note-15-pro-5g/",
+   "abgerufen_am": "2026-10-14",
+   "zustand": "neu",
+   "herleitung": "",
+   "tarif_phasen": [
+    {
+     "von_monat": 1,
+     "bis_monat": 24,
+     "betrag": 15.0,
+     "beleg": "prices.recurring: listed 15,00 € = discounted 15,00 €, discounts [] (keine Rabattphase)"
+    }
+   ],
+   "rechenweise": 1,
+   "rabatte": [],
+   "aktionen": [],
+   "last_verified": "2026-10-14",
+   "pruefung": "gueltig"
+  },
+  {
+   "id": "buendel--congstar--xiaomi-redmi-note-15-pro-plus-256gb-mocha-brown--allnet-flat-xs--36m",
+   "sku_id": "xiaomi-redmi-note-15-pro-plus-256gb-mocha-brown",
+   "anbieter": "congstar",
+   "tarif_name": "Allnet Flat XS",
+   "first_seen": "2026-10-14",
+   "tarif_id": "congstar:allnet-flat-xs-mit-gb",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 15.0,
+   "tarif_listenpreis": null,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 29.0,
+   "geraet_monatsrate": 8.0,
+   "laufzeit_monate": 36,
+   "anschlusspreis": 15.0,
+   "quelle_url": "https://www.congstar.de/geraete/xiaomi/xiaomi-redmi-note-15-pro-5g/",
+   "abgerufen_am": "2026-10-14",
+   "zustand": "neu",
+   "herleitung": "",
+   "tarif_phasen": [
+    {
+     "von_monat": 1,
+     "bis_monat": 36,
+     "betrag": 15.0,
+     "beleg": "prices.recurring: listed 15,00 € = discounted 15,00 €, discounts [] (keine Rabattphase)"
+    }
+   ],
+   "rechenweise": 1,
+   "rabatte": [],
+   "aktionen": [],
+   "last_verified": "2026-10-14",
+   "pruefung": "gueltig"
+  },
+  {
+   "id": "buendel--congstar--xiaomi-redmi-note-15-pro-plus-256gb-mocha-brown--allnet-flat-xs-flex--24m",
+   "sku_id": "xiaomi-redmi-note-15-pro-plus-256gb-mocha-brown",
+   "anbieter": "congstar",
+   "tarif_name": "Allnet Flat XS Flex",
+   "first_seen": "2026-10-14",
+   "tarif_id": "congstar:allnet-flat-xs-flex-mit-gb",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 15.0,
+   "tarif_listenpreis": null,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 29.0,
+   "geraet_monatsrate": 13.5,
+   "laufzeit_monate": 24,
+   "anschlusspreis": 35.0,
+   "quelle_url": "https://www.congstar.de/geraete/xiaomi/xiaomi-redmi-note-15-pro-5g/",
+   "abgerufen_am": "2026-10-14",
+   "zustand": "neu",
+   "herleitung": "",
+   "tarif_phasen": [
+    {
+     "von_monat": 1,
+     "bis_monat": 24,
+     "betrag": 15.0,
+     "beleg": "prices.recurring: listed 15,00 € = discounted 15,00 €, discounts [] (keine Rabattphase)"
+    }
+   ],
+   "rechenweise": 1,
+   "rabatte": [],
+   "aktionen": [],
+   "last_verified": "2026-10-14",
+   "pruefung": "gueltig"
+  },
+  {
+   "id": "buendel--congstar--xiaomi-redmi-note-15-pro-plus-256gb-mocha-brown--allnet-flat-xs-flex--36m",
+   "sku_id": "xiaomi-redmi-note-15-pro-plus-256gb-mocha-brown",
+   "anbieter": "congstar",
+   "tarif_name": "Allnet Flat XS Flex",
+   "first_seen": "2026-10-14",
+   "tarif_id": "congstar:allnet-flat-xs-flex-mit-gb",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 15.0,
+   "tarif_listenpreis": null,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 29.0,
+   "geraet_monatsrate": 9.0,
+   "laufzeit_monate": 36,
+   "anschlusspreis": 35.0,
+   "quelle_url": "https://www.congstar.de/geraete/xiaomi/xiaomi-redmi-note-15-pro-5g/",
+   "abgerufen_am": "2026-10-14",
+   "zustand": "neu",
+   "herleitung": "",
+   "tarif_phasen": [
+    {
+     "von_monat": 1,
+     "bis_monat": 36,
+     "betrag": 15.0,
+     "beleg": "prices.recurring: listed 15,00 € = discounted 15,00 €, discounts [] (keine Rabattphase)"
+    }
+   ],
+   "rechenweise": 1,
+   "rabatte": [],
+   "aktionen": [],
+   "last_verified": "2026-10-14",
+   "pruefung": "gueltig"
+  },
+  {
    "id": "buendel--congstar--xiaomi-redmi-note-15-pro-plus-256gb-schwarz--allnet-flat-l--24m",
    "sku_id": "xiaomi-redmi-note-15-pro-plus-256gb-schwarz",
    "anbieter": "congstar",
@@ -216620,13 +217164,13 @@
     }
    ],
    "rechenweise": 1,
-   "quelle_art": "klick",
-   "beleg_id": "c246382c6f1593343eae2ef816357951207d7ff6304bffeb57308612ddc16d8d",
-   "beleg_status": "offen",
    "rabatte": [],
    "aktionen": [],
    "last_verified": "2026-10-14",
-   "pruefung": "gueltig"
+   "pruefung": "gueltig",
+   "quelle_art": "klick",
+   "beleg_id": "c246382c6f1593343eae2ef816357951207d7ff6304bffeb57308612ddc16d8d",
+   "beleg_status": "offen"
   },
   {
    "id": "buendel--o2--apple-iphone-16e-128gb-weiss--o2-mobile-unlimited-l-plus-mit-300-mbit-s-24-mon--36m",
@@ -216657,13 +217201,13 @@
     }
    ],
    "rechenweise": 1,
-   "quelle_art": "klick",
-   "beleg_id": "f3ffda2f993ff9173ec39bdeff98cb389305c43f53e939511b49705c5d3ea11d",
-   "beleg_status": "offen",
    "rabatte": [],
    "aktionen": [],
    "last_verified": "2026-10-14",
-   "pruefung": "gueltig"
+   "pruefung": "gueltig",
+   "quelle_art": "klick",
+   "beleg_id": "f3ffda2f993ff9173ec39bdeff98cb389305c43f53e939511b49705c5d3ea11d",
+   "beleg_status": "offen"
   },
   {
    "id": "buendel--o2--apple-iphone-16e-128gb-weiss--o2-mobile-unlimited-m-mit-100-mbit-s-24-mon--24m",
@@ -246054,13 +246598,13 @@
    "zustand": "neu",
    "herleitung": "",
    "rechenweise": 1,
-   "quelle_art": "klick",
-   "beleg_id": "66b6899555a3244fb03948ca667ef932631f882d2e173fcdd6832df8f52f0ede",
-   "beleg_status": "offen",
    "rabatte": [],
    "aktionen": [],
    "last_verified": "2026-10-14",
-   "pruefung": "gueltig"
+   "pruefung": "gueltig",
+   "quelle_art": "klick",
+   "beleg_id": "66b6899555a3244fb03948ca667ef932631f882d2e173fcdd6832df8f52f0ede",
+   "beleg_status": "offen"
   },
   {
    "id": "buendel--o2--samsung-galaxy-a37-256gb-ohne-farbe--o2-mobile-l-mit-150-gb--36m",
@@ -246083,13 +246627,13 @@
    "zustand": "neu",
    "herleitung": "",
    "rechenweise": 1,
-   "quelle_art": "klick",
-   "beleg_id": "10e97c3e7631628c892e042e6f7a35459b239f7642240b50f5c54f19ef001053",
-   "beleg_status": "offen",
    "rabatte": [],
    "aktionen": [],
    "last_verified": "2026-10-14",
-   "pruefung": "gueltig"
+   "pruefung": "gueltig",
+   "quelle_art": "klick",
+   "beleg_id": "10e97c3e7631628c892e042e6f7a35459b239f7642240b50f5c54f19ef001053",
+   "beleg_status": "offen"
   },
   {
    "id": "buendel--o2--samsung-galaxy-a37-256gb-ohne-farbe--o2-mobile-l-plus-mit-150-gb--24m",
@@ -246112,13 +246656,13 @@
    "zustand": "neu",
    "herleitung": "",
    "rechenweise": 1,
-   "quelle_art": "klick",
-   "beleg_id": "cb3f10875713a82d6506b1d044e9495bdb1c33e15e170721901df8f15c9f149c",
-   "beleg_status": "offen",
    "rabatte": [],
    "aktionen": [],
    "last_verified": "2026-10-14",
-   "pruefung": "gueltig"
+   "pruefung": "gueltig",
+   "quelle_art": "klick",
+   "beleg_id": "cb3f10875713a82d6506b1d044e9495bdb1c33e15e170721901df8f15c9f149c",
+   "beleg_status": "offen"
   },
   {
    "id": "buendel--o2--samsung-galaxy-a37-256gb-ohne-farbe--o2-mobile-l-plus-mit-150-gb--36m",
@@ -246141,13 +246685,13 @@
    "zustand": "neu",
    "herleitung": "",
    "rechenweise": 1,
-   "quelle_art": "klick",
-   "beleg_id": "98a6101bc60addab4d45e08f7e8bd86cc88d2bcb59281da0fb450198e05dd8dd",
-   "beleg_status": "offen",
    "rabatte": [],
    "aktionen": [],
    "last_verified": "2026-10-14",
-   "pruefung": "gueltig"
+   "pruefung": "gueltig",
+   "quelle_art": "klick",
+   "beleg_id": "98a6101bc60addab4d45e08f7e8bd86cc88d2bcb59281da0fb450198e05dd8dd",
+   "beleg_status": "offen"
   },
   {
    "id": "buendel--o2--samsung-galaxy-a37-256gb-ohne-farbe--o2-mobile-on-demand-m-mit-50-gb--24m",
@@ -246170,13 +246714,13 @@
    "zustand": "neu",
    "herleitung": "",
    "rechenweise": 1,
-   "quelle_art": "klick",
-   "beleg_id": "cf2fc73257050634af12102d56e3ed4915295b7de89e1500fecafce2a7901f33",
-   "beleg_status": "offen",
    "rabatte": [],
    "aktionen": [],
    "last_verified": "2026-10-14",
-   "pruefung": "gueltig"
+   "pruefung": "gueltig",
+   "quelle_art": "klick",
+   "beleg_id": "cf2fc73257050634af12102d56e3ed4915295b7de89e1500fecafce2a7901f33",
+   "beleg_status": "offen"
   },
   {
    "id": "buendel--o2--samsung-galaxy-a37-256gb-ohne-farbe--o2-mobile-on-demand-m-mit-50-gb--36m",
@@ -246199,13 +246743,13 @@
    "zustand": "neu",
    "herleitung": "",
    "rechenweise": 1,
-   "quelle_art": "klick",
-   "beleg_id": "e8957c3de115f5862259833541d9eed128cb1bfebffae18a877bb902d9ae7428",
-   "beleg_status": "offen",
    "rabatte": [],
    "aktionen": [],
    "last_verified": "2026-10-14",
-   "pruefung": "gueltig"
+   "pruefung": "gueltig",
+   "quelle_art": "klick",
+   "beleg_id": "e8957c3de115f5862259833541d9eed128cb1bfebffae18a877bb902d9ae7428",
+   "beleg_status": "offen"
   },
   {
    "id": "buendel--o2--samsung-galaxy-a37-256gb-ohne-farbe--o2-mobile-on-demand-m-plus-mit-50-gb--24m",
@@ -246228,13 +246772,13 @@
    "zustand": "neu",
    "herleitung": "",
    "rechenweise": 1,
-   "quelle_art": "klick",
-   "beleg_id": "488707b0a106f24b9ce248efef73078cb1f911083c5d51b9da33e46acabbce11",
-   "beleg_status": "offen",
    "rabatte": [],
    "aktionen": [],
    "last_verified": "2026-10-14",
-   "pruefung": "gueltig"
+   "pruefung": "gueltig",
+   "quelle_art": "klick",
+   "beleg_id": "488707b0a106f24b9ce248efef73078cb1f911083c5d51b9da33e46acabbce11",
+   "beleg_status": "offen"
   },
   {
    "id": "buendel--o2--samsung-galaxy-a37-256gb-ohne-farbe--o2-mobile-on-demand-m-plus-mit-50-gb--36m",
@@ -246257,13 +246801,13 @@
    "zustand": "neu",
    "herleitung": "",
    "rechenweise": 1,
-   "quelle_art": "klick",
-   "beleg_id": "f2d4a1e1bba0d363006d7008d86672e0fee2d4dfb8f6e0b33b8ba475e49e36ac",
-   "beleg_status": "offen",
    "rabatte": [],
    "aktionen": [],
    "last_verified": "2026-10-14",
-   "pruefung": "gueltig"
+   "pruefung": "gueltig",
+   "quelle_art": "klick",
+   "beleg_id": "f2d4a1e1bba0d363006d7008d86672e0fee2d4dfb8f6e0b33b8ba475e49e36ac",
+   "beleg_status": "offen"
   },
   {
    "id": "buendel--o2--samsung-galaxy-a37-256gb-ohne-farbe--o2-mobile-s-mit-15-gb--24m",
@@ -246294,13 +246838,13 @@
     }
    ],
    "rechenweise": 1,
-   "quelle_art": "klick",
-   "beleg_id": "10c30b86b23d4d0b0a372926bb56c1060236e13679e9805c5ac1c3663436960a",
-   "beleg_status": "offen",
    "rabatte": [],
    "aktionen": [],
    "last_verified": "2026-10-14",
-   "pruefung": "gueltig"
+   "pruefung": "gueltig",
+   "quelle_art": "klick",
+   "beleg_id": "10c30b86b23d4d0b0a372926bb56c1060236e13679e9805c5ac1c3663436960a",
+   "beleg_status": "offen"
   },
   {
    "id": "buendel--o2--samsung-galaxy-a37-256gb-ohne-farbe--o2-mobile-s-mit-15-gb--36m",
@@ -246331,13 +246875,13 @@
     }
    ],
    "rechenweise": 1,
-   "quelle_art": "klick",
-   "beleg_id": "9d5090875feedaf0696c8bd87a68b74e1b45f136d0fccfa407aac758e6f2248f",
-   "beleg_status": "offen",
    "rabatte": [],
    "aktionen": [],
    "last_verified": "2026-10-14",
-   "pruefung": "gueltig"
+   "pruefung": "gueltig",
+   "quelle_art": "klick",
+   "beleg_id": "9d5090875feedaf0696c8bd87a68b74e1b45f136d0fccfa407aac758e6f2248f",
+   "beleg_status": "offen"
   },
   {
    "id": "buendel--o2--samsung-galaxy-a37-256gb-ohne-farbe--o2-mobile-unlimited-l-mit-300-mbit-s--24m",
@@ -246360,13 +246904,13 @@
    "zustand": "neu",
    "herleitung": "",
    "rechenweise": 1,
-   "quelle_art": "klick",
-   "beleg_id": "7fbf8d79cffae6706374daed03408cfd1e9c1e87b4de2a9bc99ae06e17bc68a6",
-   "beleg_status": "offen",
    "rabatte": [],
    "aktionen": [],
    "last_verified": "2026-10-14",
-   "pruefung": "gueltig"
+   "pruefung": "gueltig",
+   "quelle_art": "klick",
+   "beleg_id": "7fbf8d79cffae6706374daed03408cfd1e9c1e87b4de2a9bc99ae06e17bc68a6",
+   "beleg_status": "offen"
   },
   {
    "id": "buendel--o2--samsung-galaxy-a37-256gb-ohne-farbe--o2-mobile-unlimited-l-mit-300-mbit-s--36m",
@@ -246389,13 +246933,13 @@
    "zustand": "neu",
    "herleitung": "",
    "rechenweise": 1,
-   "quelle_art": "klick",
-   "beleg_id": "e8e0aadeb30057792763b2092de8c59011eb02a491f98b07f5cff72550133d64",
-   "beleg_status": "offen",
    "rabatte": [],
    "aktionen": [],
    "last_verified": "2026-10-14",
-   "pruefung": "gueltig"
+   "pruefung": "gueltig",
+   "quelle_art": "klick",
+   "beleg_id": "e8e0aadeb30057792763b2092de8c59011eb02a491f98b07f5cff72550133d64",
+   "beleg_status": "offen"
   },
   {
    "id": "buendel--o2--samsung-galaxy-a37-256gb-ohne-farbe--o2-mobile-unlimited-l-plus-mit-300-mbit-s--24m",
@@ -246418,13 +246962,13 @@
    "zustand": "neu",
    "herleitung": "",
    "rechenweise": 1,
-   "quelle_art": "klick",
-   "beleg_id": "2d5b0f42e5091262c977e0c8fdd20ff3655bdd68f6cefe42999d06d971013bdc",
-   "beleg_status": "offen",
    "rabatte": [],
    "aktionen": [],
    "last_verified": "2026-10-14",
-   "pruefung": "gueltig"
+   "pruefung": "gueltig",
+   "quelle_art": "klick",
+   "beleg_id": "2d5b0f42e5091262c977e0c8fdd20ff3655bdd68f6cefe42999d06d971013bdc",
+   "beleg_status": "offen"
   },
   {
    "id": "buendel--o2--samsung-galaxy-a37-256gb-ohne-farbe--o2-mobile-unlimited-l-plus-mit-300-mbit-s--36m",
@@ -246447,13 +246991,13 @@
    "zustand": "neu",
    "herleitung": "",
    "rechenweise": 1,
-   "quelle_art": "klick",
-   "beleg_id": "f956a338dfc147b8c500c14d38b052dfd5744538bbd7acef6e60a28e35dc1981",
-   "beleg_status": "offen",
    "rabatte": [],
    "aktionen": [],
    "last_verified": "2026-10-14",
-   "pruefung": "gueltig"
+   "pruefung": "gueltig",
+   "quelle_art": "klick",
+   "beleg_id": "f956a338dfc147b8c500c14d38b052dfd5744538bbd7acef6e60a28e35dc1981",
+   "beleg_status": "offen"
   },
   {
    "id": "buendel--o2--samsung-galaxy-a37-256gb-ohne-farbe--o2-mobile-unlimited-m-mit-100-mbit-s--24m",
@@ -246476,13 +247020,13 @@
    "zustand": "neu",
    "herleitung": "",
    "rechenweise": 1,
-   "quelle_art": "klick",
-   "beleg_id": "d9ca4b2269981a9b4385604caf2e21ecc5807eae32fc4749ccd2eff8cef9e073",
-   "beleg_status": "offen",
    "rabatte": [],
    "aktionen": [],
    "last_verified": "2026-10-14",
-   "pruefung": "gueltig"
+   "pruefung": "gueltig",
+   "quelle_art": "klick",
+   "beleg_id": "d9ca4b2269981a9b4385604caf2e21ecc5807eae32fc4749ccd2eff8cef9e073",
+   "beleg_status": "offen"
   },
   {
    "id": "buendel--o2--samsung-galaxy-a37-256gb-ohne-farbe--o2-mobile-unlimited-m-mit-100-mbit-s--36m",
@@ -246505,13 +247049,13 @@
    "zustand": "neu",
    "herleitung": "",
    "rechenweise": 1,
-   "quelle_art": "klick",
-   "beleg_id": "54923a616ffeb176de7fa0acf114108a21d5de125803235490ebae7509be66cc",
-   "beleg_status": "offen",
    "rabatte": [],
    "aktionen": [],
    "last_verified": "2026-10-14",
-   "pruefung": "gueltig"
+   "pruefung": "gueltig",
+   "quelle_art": "klick",
+   "beleg_id": "54923a616ffeb176de7fa0acf114108a21d5de125803235490ebae7509be66cc",
+   "beleg_status": "offen"
   },
   {
    "id": "buendel--o2--samsung-galaxy-a37-256gb-ohne-farbe--o2-mobile-unlimited-m-plus-mit-100-mbit-s--24m",
@@ -246534,13 +247078,13 @@
    "zustand": "neu",
    "herleitung": "",
    "rechenweise": 1,
-   "quelle_art": "klick",
-   "beleg_id": "93ff298225166ab43d09cb1ae0d4d0788679cc4c8d2e26683cf6ebdafbe4ee7a",
-   "beleg_status": "offen",
    "rabatte": [],
    "aktionen": [],
    "last_verified": "2026-10-14",
-   "pruefung": "gueltig"
+   "pruefung": "gueltig",
+   "quelle_art": "klick",
+   "beleg_id": "93ff298225166ab43d09cb1ae0d4d0788679cc4c8d2e26683cf6ebdafbe4ee7a",
+   "beleg_status": "offen"
   },
   {
    "id": "buendel--o2--samsung-galaxy-a37-256gb-ohne-farbe--o2-mobile-unlimited-m-plus-mit-100-mbit-s--36m",
@@ -246563,13 +247107,13 @@
    "zustand": "neu",
    "herleitung": "",
    "rechenweise": 1,
-   "quelle_art": "klick",
-   "beleg_id": "1bd8427971834dd9c592314631ba988395a6ff317b066c6eb13b2aa870e6491f",
-   "beleg_status": "offen",
    "rabatte": [],
    "aktionen": [],
    "last_verified": "2026-10-14",
-   "pruefung": "gueltig"
+   "pruefung": "gueltig",
+   "quelle_art": "klick",
+   "beleg_id": "1bd8427971834dd9c592314631ba988395a6ff317b066c6eb13b2aa870e6491f",
+   "beleg_status": "offen"
   },
   {
    "id": "buendel--o2--samsung-galaxy-a56-128gb-awesome-graphite-5g--o2-mobile-l-mit-150-gb-24-mon--24m",
@@ -281030,7 +281574,7 @@
    "tarif_sim_only_monatlich": 59.95,
    "anschlusspreis": null,
    "quelle_url": "https://www.vodafone.de/media/downloads/pdf/VF-Mobil-L-Juli-2026.pdf",
-   "abgerufen_am": "2026-10-13",
+   "abgerufen_am": "2026-10-14",
    "rabatte": [],
    "last_verified": "2026-10-14",
    "quelle_art": "dokument",
@@ -281047,7 +281591,7 @@
    "tarif_sim_only_monatlich": 49.95,
    "anschlusspreis": null,
    "quelle_url": "https://www.vodafone.de/media/downloads/pdf/VF-Mobil-M-Juli-2026.pdf",
-   "abgerufen_am": "2026-10-13",
+   "abgerufen_am": "2026-10-14",
    "rabatte": [],
    "last_verified": "2026-10-14",
    "quelle_art": "dokument",
@@ -281064,7 +281608,7 @@
    "tarif_sim_only_monatlich": 39.95,
    "anschlusspreis": null,
    "quelle_url": "https://www.vodafone.de/media/downloads/pdf/VF-Mobil-S-Juli-2026.pdf",
-   "abgerufen_am": "2026-10-13",
+   "abgerufen_am": "2026-10-14",
    "rabatte": [],
    "last_verified": "2026-10-14",
    "quelle_art": "dokument",
@@ -281081,7 +281625,7 @@
    "tarif_sim_only_monatlich": 79.95,
    "anschlusspreis": null,
    "quelle_url": "https://www.vodafone.de/media/downloads/pdf/VF-Mobil-XL-Juli-2026.pdf",
-   "abgerufen_am": "2026-10-13",
+   "abgerufen_am": "2026-10-14",
    "rabatte": [],
    "last_verified": "2026-10-14",
    "quelle_art": "dokument",
@@ -281098,7 +281642,7 @@
    "tarif_sim_only_monatlich": 29.95,
    "anschlusspreis": null,
    "quelle_url": "https://www.vodafone.de/media/downloads/pdf/VF-Mobil-XS-Juli-2026.pdf",
-   "abgerufen_am": "2026-10-13",
+   "abgerufen_am": "2026-10-14",
    "rabatte": [],
    "last_verified": "2026-10-14",
    "quelle_art": "dokument",
@@ -281115,7 +281659,7 @@
    "tarif_sim_only_monatlich": 29.0,
    "anschlusspreis": null,
    "quelle_url": "https://www.congstar.de/fileadmin/produktinformationsblatt/Produktinformationsblatt_545.pdf",
-   "abgerufen_am": "2026-10-13",
+   "abgerufen_am": "2026-10-14",
    "rabatte": [],
    "last_verified": "2026-10-14",
    "quelle_art": "dokument",
@@ -281132,7 +281676,7 @@
    "tarif_sim_only_monatlich": 29.0,
    "anschlusspreis": null,
    "quelle_url": "https://www.congstar.de/fileadmin/files_congstar/documents/PIBs/2026/congstar/Produktinformationsblatt_549.pdf",
-   "abgerufen_am": "2026-10-13",
+   "abgerufen_am": "2026-10-14",
    "rabatte": [],
    "last_verified": "2026-10-14",
    "quelle_art": "dokument",
@@ -281149,7 +281693,7 @@
    "tarif_sim_only_monatlich": 25.0,
    "anschlusspreis": null,
    "quelle_url": "https://www.congstar.de/fileadmin/produktinformationsblatt/Produktinformationsblatt_540.pdf",
-   "abgerufen_am": "2026-10-13",
+   "abgerufen_am": "2026-10-14",
    "rabatte": [],
    "last_verified": "2026-10-14",
    "quelle_art": "dokument",
@@ -281166,7 +281710,7 @@
    "tarif_sim_only_monatlich": 25.0,
    "anschlusspreis": null,
    "quelle_url": "https://www.congstar.de/fileadmin/produktinformationsblatt/Produktinformationsblatt_548.pdf",
-   "abgerufen_am": "2026-10-13",
+   "abgerufen_am": "2026-10-14",
    "rabatte": [],
    "last_verified": "2026-10-14",
    "quelle_art": "dokument",
@@ -281183,7 +281727,7 @@
    "tarif_sim_only_monatlich": 20.0,
    "anschlusspreis": null,
    "quelle_url": "https://www.congstar.de/fileadmin/produktinformationsblatt/Produktinformationsblatt_559.pdf",
-   "abgerufen_am": "2026-10-13",
+   "abgerufen_am": "2026-10-14",
    "rabatte": [],
    "last_verified": "2026-10-14",
    "quelle_art": "dokument",
@@ -281200,7 +281744,7 @@
    "tarif_sim_only_monatlich": 20.0,
    "anschlusspreis": null,
    "quelle_url": "https://www.congstar.de/fileadmin/files_congstar/documents/PIBs/2026/congstar/Produktinformationsblatt_560.pdf",
-   "abgerufen_am": "2026-10-13",
+   "abgerufen_am": "2026-10-14",
    "rabatte": [],
    "last_verified": "2026-10-14",
    "quelle_art": "dokument",
@@ -281217,7 +281761,7 @@
    "tarif_sim_only_monatlich": 15.0,
    "anschlusspreis": null,
    "quelle_url": "https://www.congstar.de/fileadmin/files_congstar/documents/PIBs/2026/congstar/Produktinformationsblatt_544.pdf",
-   "abgerufen_am": "2026-10-13",
+   "abgerufen_am": "2026-10-14",
    "rabatte": [],
    "last_verified": "2026-10-14",
    "quelle_art": "dokument",
@@ -281234,7 +281778,7 @@
    "tarif_sim_only_monatlich": 15.0,
    "anschlusspreis": null,
    "quelle_url": "https://www.congstar.de/fileadmin/produktinformationsblatt/Produktinformationsblatt_543.pdf",
-   "abgerufen_am": "2026-10-13",
+   "abgerufen_am": "2026-10-14",
    "rabatte": [],
    "last_verified": "2026-10-14",
    "quelle_art": "dokument",
@@ -281251,7 +281795,7 @@
    "tarif_sim_only_monatlich": 24.99,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.o2online.de/tarife/handyvertrag-ohne-handy/",
-   "abgerufen_am": "2026-10-13",
+   "abgerufen_am": "2026-10-14",
    "rabatte": [],
    "last_verified": "2026-10-14",
    "quelle_art": "live_shop",
@@ -281268,7 +281812,7 @@
    "tarif_sim_only_monatlich": 34.99,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/tarife/handyvertrag-ohne-handy/",
-   "abgerufen_am": "2026-10-13",
+   "abgerufen_am": "2026-10-14",
    "rabatte": [],
    "last_verified": "2026-10-14",
    "quelle_art": "live_shop",
@@ -281285,7 +281829,7 @@
    "tarif_sim_only_monatlich": 19.99,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/tarife/handyvertrag-ohne-handy/",
-   "abgerufen_am": "2026-10-13",
+   "abgerufen_am": "2026-10-14",
    "rabatte": [],
    "last_verified": "2026-10-14",
    "quelle_art": "live_shop",
@@ -281302,7 +281846,7 @@
    "tarif_sim_only_monatlich": 29.99,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/tarife/handyvertrag-ohne-handy/",
-   "abgerufen_am": "2026-10-13",
+   "abgerufen_am": "2026-10-14",
    "rabatte": [],
    "last_verified": "2026-10-14",
    "quelle_art": "live_shop",
@@ -281319,7 +281863,7 @@
    "tarif_sim_only_monatlich": 19.99,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/tarife/handyvertrag-ohne-handy/",
-   "abgerufen_am": "2026-10-13",
+   "abgerufen_am": "2026-10-14",
    "rabatte": [],
    "last_verified": "2026-10-14",
    "quelle_art": "live_shop",
@@ -281336,7 +281880,7 @@
    "tarif_sim_only_monatlich": 19.99,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/tarife/handyvertrag-ohne-handy/",
-   "abgerufen_am": "2026-10-13",
+   "abgerufen_am": "2026-10-14",
    "rabatte": [],
    "last_verified": "2026-10-14",
    "quelle_art": "live_shop",
@@ -281353,7 +281897,7 @@
    "tarif_sim_only_monatlich": 39.99,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.o2online.de/tarife/handyvertrag-ohne-handy/",
-   "abgerufen_am": "2026-10-13",
+   "abgerufen_am": "2026-10-14",
    "rabatte": [],
    "last_verified": "2026-10-14",
    "quelle_art": "live_shop",
@@ -281370,7 +281914,7 @@
    "tarif_sim_only_monatlich": 59.99,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/tarife/handyvertrag-ohne-handy/",
-   "abgerufen_am": "2026-10-13",
+   "abgerufen_am": "2026-10-14",
    "rabatte": [],
    "last_verified": "2026-10-14",
    "quelle_art": "live_shop",
@@ -281387,7 +281931,7 @@
    "tarif_sim_only_monatlich": 29.99,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.o2online.de/tarife/handyvertrag-ohne-handy/",
-   "abgerufen_am": "2026-10-13",
+   "abgerufen_am": "2026-10-14",
    "rabatte": [],
    "last_verified": "2026-10-14",
    "quelle_art": "live_shop",
@@ -281404,7 +281948,7 @@
    "tarif_sim_only_monatlich": 39.99,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/tarife/handyvertrag-ohne-handy/",
-   "abgerufen_am": "2026-10-13",
+   "abgerufen_am": "2026-10-14",
    "rabatte": [],
    "last_verified": "2026-10-14",
    "quelle_art": "live_shop",
@@ -281421,7 +281965,7 @@
    "tarif_sim_only_monatlich": 39.99,
    "anschlusspreis": null,
    "quelle_url": "https://static2.o9.de/resource/blob/2241742/f853005b6defea74a5b4b10da9240e49/o2-mobile-unlimited-m-flex-2026-download-data.pdf",
-   "abgerufen_am": "2026-10-13",
+   "abgerufen_am": "2026-10-14",
    "rabatte": [],
    "last_verified": "2026-10-14",
    "quelle_art": "dokument",
@@ -281438,7 +281982,7 @@
    "tarif_sim_only_monatlich": 24.99,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/tarife/handyvertrag-ohne-handy/",
-   "abgerufen_am": "2026-10-13",
+   "abgerufen_am": "2026-10-14",
    "rabatte": [],
    "last_verified": "2026-10-14",
    "quelle_art": "live_shop",
@@ -281455,7 +281999,7 @@
    "tarif_sim_only_monatlich": 34.99,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/tarife/handyvertrag-ohne-handy/",
-   "abgerufen_am": "2026-10-13",
+   "abgerufen_am": "2026-10-14",
    "rabatte": [],
    "last_verified": "2026-10-14",
    "quelle_art": "live_shop",
@@ -281681,12 +282225,12 @@
    },
    {
     "name": "congstar",
-    "buendel": 1264,
-    "geprueft": 1264,
+    "buendel": 1280,
+    "geprueft": 1280,
     "nie_geprueft": 0,
     "gescheitert": 0,
     "fehler": "",
-    "gueltig": 1040,
+    "gueltig": 1056,
     "quarantaene": 60,
     "veraltet": 164,
     "abdeckung": [
@@ -281702,24 +282246,24 @@
      },
      {
       "monate": 24,
-      "gueltig": 520,
+      "gueltig": 528,
       "erfasst": true
      },
      {
       "monate": 36,
-      "gueltig": 520,
+      "gueltig": 528,
       "erfasst": true
      }
     ],
     "frische": {
-     "zahl": 1056,
-     "von": 1264,
+     "zahl": 1072,
+     "von": 1280,
      "prozent": 84,
      "nicht_pruefbar": 0
     },
     "quarantaenequote": {
      "zahl": 60,
-     "von": 1264,
+     "von": 1280,
      "prozent": 5,
      "nicht_pruefbar": 0
     },
@@ -281727,13 +282271,13 @@
      "zahl": 0,
      "von": 0,
      "prozent": null,
-     "nicht_pruefbar": 1264
+     "nicht_pruefbar": 1280
     },
     "belegquote": {
      "zahl": 0,
      "von": 0,
      "prozent": null,
-     "nicht_pruefbar": 1264
+     "nicht_pruefbar": 1280
     },
     "ohne_daten": [
      1,
@@ -281821,12 +282365,12 @@
   ],
   "summe": {
    "name": "Alle",
-   "buendel": 8611,
-   "geprueft": 8611,
+   "buendel": 8627,
+   "geprueft": 8627,
    "nie_geprueft": 0,
    "gescheitert": 0,
    "fehler": "",
-   "gueltig": 8086,
+   "gueltig": 8102,
    "quarantaene": 61,
    "veraltet": 464,
    "abdeckung": [
@@ -281842,24 +282386,24 @@
     },
     {
      "monate": 24,
-     "gueltig": 3190,
+     "gueltig": 3198,
      "erfasst": true
     },
     {
      "monate": 36,
-     "gueltig": 3558,
+     "gueltig": 3566,
      "erfasst": true
     }
    ],
    "frische": {
-    "zahl": 8103,
-    "von": 8611,
+    "zahl": 8119,
+    "von": 8627,
     "prozent": 94,
     "nicht_pruefbar": 0
    },
    "quarantaenequote": {
     "zahl": 61,
-    "von": 8611,
+    "von": 8627,
     "prozent": 1,
     "nicht_pruefbar": 0
    },
@@ -281867,13 +282411,13 @@
     "zahl": 0,
     "von": 0,
     "prozent": null,
-    "nicht_pruefbar": 8611
+    "nicht_pruefbar": 8627
    },
    "belegquote": {
     "zahl": 0,
     "von": 0,
     "prozent": null,
-    "nicht_pruefbar": 8611
+    "nicht_pruefbar": 8627
    },
    "ohne_daten": [
     1,
@@ -281900,14 +282444,14 @@
     "name": "Rechenprobe",
     "verletzt": 0,
     "luecke": 0,
-    "nicht_pruefbar": 8611
+    "nicht_pruefbar": 8627
    },
    {
     "nr": 2,
     "name": "Gerätesumme zur UVP",
     "verletzt": 0,
     "luecke": 0,
-    "nicht_pruefbar": 8611
+    "nicht_pruefbar": 8627
    },
    {
     "nr": 3,
@@ -281921,42 +282465,42 @@
     "name": "Volumen im Tarifnamen",
     "verletzt": 0,
     "luecke": 0,
-    "nicht_pruefbar": 6262
+    "nicht_pruefbar": 6278
    },
    {
     "nr": 5,
     "name": "Preis je Speicher",
     "verletzt": 32,
     "luecke": 0,
-    "nicht_pruefbar": 138
+    "nicht_pruefbar": 42
    },
    {
     "nr": 6,
     "name": "Ratenlaufzeit",
     "verletzt": 0,
     "luecke": 0,
-    "nicht_pruefbar": 8611
+    "nicht_pruefbar": 8627
    },
    {
     "nr": 7,
     "name": "Tarifbindung",
     "verletzt": 0,
     "luecke": 0,
-    "nicht_pruefbar": 8611
+    "nicht_pruefbar": 8627
    },
    {
     "nr": 8,
     "name": "Preisphasen",
     "verletzt": 0,
     "luecke": 0,
-    "nicht_pruefbar": 8611
+    "nicht_pruefbar": 8627
    },
    {
     "nr": 9,
     "name": "Text und Antwort",
     "verletzt": 0,
     "luecke": 0,
-    "nicht_pruefbar": 8611
+    "nicht_pruefbar": 8627
    },
    {
     "nr": 10,
@@ -281970,7 +282514,7 @@
     "name": "Sprung zum Vortag",
     "verletzt": 0,
     "luecke": 0,
-    "nicht_pruefbar": 688
+    "nicht_pruefbar": 704
    },
    {
     "nr": 12,
@@ -281984,7 +282528,7 @@
     "name": "Beleglink",
     "verletzt": 0,
     "luecke": 0,
-    "nicht_pruefbar": 8611
+    "nicht_pruefbar": 8627
    },
    {
     "nr": 14,
