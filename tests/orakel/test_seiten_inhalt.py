@@ -1539,7 +1539,7 @@ def test_zwei_minuten_steht_nach_der_buehne_und_vor_was_wichtig_ist(tmp_path):
     assert szenen[0] == "in-zwei-minuten", szenen
     assert soup.select_one("#in-zwei-minuten .kurzpfad") is not None
     assert soup.select_one(".buehne .kurzpfad") is None
-    assert html.index('class="buehne"') < html.index("kurzpfad")
+    assert html.index('class="buehne') < html.index("kurzpfad")
     assert html.index("kurzpfad") < html.index("wichtig-liste")
 
 
