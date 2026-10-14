@@ -52,7 +52,7 @@ def test_prozente_und_quellen_auf_der_seite(site):
     for t, _ in bild.TEMPERATUREN:
         soll += [bild.prozent(p) for _, p in bild.verteilung(t)]
     assert werte == soll
-    assert "Bei Temperatur 0,5 gewinnt „Ja“ 89 %, bei 2 nur noch 40 %." in seite
+    assert "Kalt gewinnt „Ja“ 89 %, heiß nur 40 %" in seite
     gezogen = re.findall(r">([^<>]+) …</text>", seite)
     assert gezogen == bild.ziehungen()
     quellen = re.search(r'<p class="ki-k1-quellen">(.*?)</p>', seite, re.S).group(1)

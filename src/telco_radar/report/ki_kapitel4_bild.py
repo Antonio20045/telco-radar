@@ -20,10 +20,10 @@ FRAGE_Y = 480
 WUERFEL_Y = 640
 BALKEN_Y = 830
 BALKEN_X, BALKEN_L = 280, 260
-ROHR = (30, 1600, 2500)
-GRUPPEN_Y = (1640, 1940, 2240)
-ZUG_Y = 2900
-ENDE = 3870
+ROHR = (30, 1750, 2650)
+GRUPPEN_Y = (1790, 2090, 2390)
+ZUG_Y = 3050
+ENDE = 4270
 HOEHE = ENDE + 60
 
 
@@ -144,8 +144,8 @@ def route() -> str:
     m, (x, oben, unten) = MITTE, ROHR
     return " ".join(
         [
-            f"M {m} {LINSE} L {m} {BALKEN_Y - 40} L {m} 1500",
-            f"C {m} 1560 {x} 1540 {x} {oben} L {x} {unten + 26}",
+            f"M {m} {LINSE} L {m} {BALKEN_Y - 40} L {m} {oben - 100}",
+            f"C {m} {oben - 40} {x} {oben - 60} {x} {oben} L {x} {unten + 26}",
             f"C {x} {unten + 200} {m} {unten + 120} {m} {unten + 300} L {m} {ENDE}",
         ]
     )

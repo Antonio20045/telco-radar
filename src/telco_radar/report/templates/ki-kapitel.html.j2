@@ -33,7 +33,7 @@
     </svg>
     {% for t in bild.texte %}
     <div class="ki-k1-ueber" style="top:{{ t.top }}%" data-station="{{ t.station }}">
-      {% if t.art == 'ansage' %}<h2 class="ki-ansage ki-k1-ansage" data-y="{{ t.y }}">{% for z in t.zeilen %}<span><i>{{ z }}{% if loop.last %}<em>.</em>{% endif %}</i></span>{% endfor %}</h2>
+      {% if t.art == 'ansage' %}<h2 class="ki-ansage ki-k1-ansage" data-y="{{ t.y }}">{% for z in t.zeilen %}<span><i>{% if loop.last and z.endswith('?') %}{{ z[:-1] }}<em>?</em>{% else %}{{ z }}{% if loop.last %}<em>.</em>{% endif %}{% endif %}</i></span>{% endfor %}</h2>
       {% else %}<p class="ki-k1-satz" data-y="{{ t.y }}">{{ t.text }}</p>{% endif %}
     </div>
     {% endfor %}

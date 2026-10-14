@@ -48,7 +48,7 @@ def test_zahlen_aus_den_konstanten_und_jede_quelle_verlinkt(site):
     texte = re.findall(r'class="ki-k1-ueber"[^>]*data-station="([^"]+)"', html)
     assert vorn == list(ki_kapitel2.STATIONEN)
     assert texte == sorted(texte, key=ki_kapitel2.STATIONEN.index)
-    for zahl in (ki_kapitel2.KLICK_FANG, ki_kapitel2.KLICK_FALSCH, ki_kapitel2.GMAIL):
+    for zahl in (ki_kapitel2.KLICK_FANG, ki_kapitel2.GMAIL):
         assert f"{zahl} %" in html
     assert all(s in html for s in ki_kapitel2.SAMUEL)
     quellen = re.search(r'<p class="ki-k1-quellen">(.*?)</p>', html, re.S).group(1)
@@ -56,6 +56,7 @@ def test_zahlen_aus_den_konstanten_und_jede_quelle_verlinkt(site):
     assert links == [u for _, u in ki_kapitel2.QUELLEN]
     assert all(u.startswith("https://") for u in links)
     assert ">Kapitel 2 · Was ist eigentlich KI?</h1>" in html
+    assert "<i>KI<em>?</em></i>" in html and "?<em>.</em>" not in html
     assert "ki-k1-quellen" not in (site / ki_kapitel.DATEI).read_text("utf-8")
 
 

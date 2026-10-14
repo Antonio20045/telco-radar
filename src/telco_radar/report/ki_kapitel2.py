@@ -17,7 +17,7 @@ NUMMER = 2
 TITEL = "Was ist eigentlich KI?"
 STATIONEN = ("Regel", "Beispiele", "Neue Mail", "Gelernt")
 BESCHREIBUNG = "Zeichnung: eine starre Regel gegen eine gelernte Trennlinie"
-KLICK_FANG, KLICK_FALSCH = "79,7", "1,2"
+KLICK_FANG = "79,7"
 GMAIL = "99,9"
 SAMUEL = ("1959", "8 bis 10")
 QUELLEN = (
@@ -37,41 +37,49 @@ QUELLEN = (
     ),
 )
 TEXTE = (
-    ("Regel", "ansage", 30, ("Früher", "schrieb man", "Regeln")),
+    ("Regel", "ansage", 30, ("Was ist", "eigentlich", "KI?")),
     (
         "Regel",
         "satz",
         1130,
-        f"Die Regel „klick“ fängt {KLICK_FANG} % des Spams. Aber sie sperrt "
-        f"{KLICK_FALSCH} % echte Mails und lässt neuen Spam durch.",
+        "Ein normales Programm folgt Regeln, die ein Mensch schreibt. "
+        "Etwa: Steht „klick“ in der Mail, ist sie Spam.",
     ),
-    ("Beispiele", "ansage", 1380, ("Eine KI", "lernt aus", "Beispielen")),
+    (
+        "Regel",
+        "satz",
+        1380,
+        f"So fängt man {KLICK_FANG} % des Spams. Aber die Regel sperrt auch "
+        "echte Mails und übersieht Spam ohne „klick“.",
+    ),
+    ("Beispiele", "ansage", 1630, ("KI lernt", "aus", "Beispielen")),
     (
         "Beispiele",
         "satz",
-        2270,
-        "Mit jedem Beispiel dreht sich ihre Trennlinie. "
-        "Niemand schreibt sie als Regel hin.",
+        2520,
+        "Eine KI bekommt keine Regel, sondern sortierte Mails. "
+        "Mit jedem Beispiel rückt sie ihre Trennlinie zurecht.",
     ),
     (
         "Neue Mail",
         "satz",
         bild.KLEIN[3] + 50,
-        "Die Mail, die der Regel entwischt ist, landet im Spam. "
-        f"Gmail sortierte 2017 so über {GMAIL} % richtig.",
+        "Neue Mails ordnet sie nach dieser Linie ein, auch die, an der die "
+        f"Regel scheiterte. Gmail traf so 2017 über {GMAIL} %.",
     ),
     (
         "Gelernt",
         "satz",
-        3460,
-        f"{SAMUEL[0]} lernte ein Dame-Programm von Arthur Samuel in {SAMUEL[1]} "
-        "Stunden, besser zu spielen als er selbst.",
+        3710,
+        f"Das Prinzip ist alt: {SAMUEL[0]} brachte sich ein Dame-Programm in "
+        f"{SAMUEL[1]} Stunden bei, besser zu spielen als sein Erfinder.",
     ),
     (
         "Gelernt",
         "satz",
-        3700,
-        "Genau das meint die EU: Ein KI-System leitet aus Eingaben ab, was es ausgibt.",
+        3960,
+        "Das ist KI: Ein Programm leitet aus Beispielen selbst ab, was es "
+        "tun soll, statt nur Regeln zu befolgen.",
     ),
     ("Gelernt", "ansage", bild.ENDE - 410, ("Nicht", "befohlen,", "gelernt")),
 )

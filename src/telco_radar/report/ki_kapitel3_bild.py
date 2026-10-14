@@ -22,13 +22,13 @@ PROBEN = (
     (700, "Aftair fall unsuch that the hall"),
     (2000, "“Why do what that day,” replied Natasha"),
 )
-KARTE_Y = (1560, 1790, 2020, 2250)
-CHIPS = (120, 2620, 10, 5, 36)
-FRAGE_Y = 3200
-FEST_Y = 3360
+KARTE_Y = (1810, 2040, 2270, 2500)
+CHIPS = (120, 2870, 10, 5, 36)
+FRAGE_Y = 3450
+FEST_Y = 3610
 ANTWORT = "Ja, zum Ende der Laufzeit."
-ANTWORT_Y = 3520
-ENDE = 4270
+ANTWORT_Y = 3770
+ENDE = 4500
 HOEHE = ENDE + 60
 
 

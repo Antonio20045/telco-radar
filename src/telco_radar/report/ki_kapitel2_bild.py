@@ -36,7 +36,7 @@ MAILS = (
 REGEL_Y = 760
 FACH_Y = 910
 FAECHER = (("Spam", 150), ("Posteingang", 450))
-EBENE = (90, 510, 1690, 2190)
+EBENE = (90, 510, 1940, 2440)
 LINIEN = (
     ((0.55, 1.0), (0.45, 0.0), 2),
     ((0.25, 1.0), (0.85, 0.0), 6),
@@ -57,10 +57,10 @@ BEISPIELE = (
     (0.92, 0.85, True),
 )
 NEU = ("Gratis-Handy wartet", 0.7, 0.82)
-NEU_Y = 2540
-KLEIN = (180, 420, 2640, 2880)
-BRETT = (180, 3180, 240)
-ENDE = 4340
+NEU_Y = 2790
+KLEIN = (180, 420, 2890, 3130)
+BRETT = (180, 3430, 240)
+ENDE = 4640
 HOEHE = ENDE + 60
 
 
@@ -137,9 +137,13 @@ def _ebene() -> tuple[list, list]:
     ]
     for i, (a, b, _) in enumerate(LINIEN):
         (ax, ay), (bx, by) = _punkt(EBENE, *a), _punkt(EBENE, *b)
-        art, dicke = ("ki-k1-rot", 3) if i == len(LINIEN) - 1 else ("ki-k1-grau", 1.5)
         d = f"M {_r(ax)} {_r(ay)} L {_r(bx)} {_r(by)}"
-        hinten.append(_linie(d, y0 + 60 + i * 200, y0 + 160 + i * 200, art, dicke))
+        if i < len(LINIEN) - 1:
+            y = y0 + 60 + i * 200
+            hinten.append(_linie(d, y, y + 100, "ki-k1-grau", 1.5))
+        else:
+            rot = "ki-k1-sehne ki-k1-rot"
+            hinten.append(_e("path", klasse=rot, d=d, stroke_width=3, data_an=y0 + 60))
     vorn = [
         _t(MITTE, y1 + 34, "mehr Werbung →", "ki-k1-wort", 15),
         _t(

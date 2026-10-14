@@ -38,9 +38,9 @@ def test_kapitel_2_fuehrt_weiter_und_die_schiene_kennt_kapitel_3(site):
 def test_zahlen_proben_und_quellen_aus_den_konstanten(site):
     seite = h.unescape((site / SEITE).read_text(encoding="utf-8"))
     assert ki_kapitel3.chip_jahre() == 3520
-    assert "30,84 Mio. Chip-Stunden" in seite and "über 3.520 Jahre" in seite
+    assert "30,84 Mio. Chip-Stunden, ein Chip allein über 3.520 Jahre" in seite
     assert "Llama 3.1 " in seite
-    assert "nach 100, 300, 700 und 2000 Runden" in seite
+    assert "nach 100 Runden Salat, nach 2000 fast Englisch" in seite
     runden = re.findall(r">Runde (\d+)<", seite)
     assert [int(r) for r in runden] == [r for r, _ in bild.PROBEN]
     assert runden == sorted(runden, key=int)

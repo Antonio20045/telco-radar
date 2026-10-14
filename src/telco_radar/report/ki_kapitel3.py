@@ -46,41 +46,44 @@ def _komma(x: float) -> str:
     return f"{x:.2f}".replace(".", ",")
 
 
-def _runden() -> str:
-    werte = [str(r) for r, _ in bild.PROBEN]
-    return ", ".join(werte[:-1]) + " und " + werte[-1]
-
-
 TEXTE = (
-    ("Raten", "ansage", 30, ("Lernen", "heißt", "raten")),
+    ("Raten", "ansage", 30, ("Wie lernt", "eine", "KI?")),
     (
         "Raten",
         "satz",
         1000,
-        "Sie rät das nächste Zeichen eines echten Textes. "
-        "Liegt sie falsch, dreht sie ihre Stellschrauben ein wenig.",
+        "Sie liest echten Text und rät immer das nächste Zeichen. "
+        "Nach „Vertra“ tippt sie „k“, richtig wäre „g“.",
     ),
-    ("Runden", "ansage", 1250, ("Runde", "für", "Runde")),
+    (
+        "Raten",
+        "satz",
+        1250,
+        "Liegt sie falsch, stellt sie ihre Stellschrauben ein Stück nach, "
+        "damit es beim nächsten Mal eher passt.",
+    ),
+    ("Runden", "ansage", 1500, ("Runde", "für", "Runde")),
     (
         "Runden",
         "satz",
-        2340,
-        f"So schrieb ein kleines Modell nach {_runden()} Runden, "
-        "gelernt aus „Krieg und Frieden“.",
+        bild.KARTE_Y[-1] + 90,
+        "Ein kleines Modell, das „Krieg und Frieden“ las, schrieb nach "
+        f"{bild.PROBEN[0][0]} Runden Salat, nach {bild.PROBEN[-1][0]} fast Englisch.",
     ),
     (
         "Rechenzeit",
         "satz",
-        2900,
-        f"Llama 3.1 brauchte {_komma(CHIP_STUNDEN_MIO)} Mio. Chip-Stunden. "
-        f"Ein einzelner Chip säße über {_zahl(chip_jahre())} Jahre daran.",
+        3150,
+        f"Große Modelle üben an Billionen Textstücken. Llama 3.1 brauchte "
+        f"{_komma(CHIP_STUNDEN_MIO)} Mio. Chip-Stunden, ein Chip allein über "
+        f"{_zahl(chip_jahre())} Jahre.",
     ),
     (
         "Benutzen",
         "satz",
-        3600,
-        "Beim Benutzen bleiben die Stellschrauben fest. "
-        "Was du ihr sagst, lernt sie dabei nicht dazu.",
+        3850,
+        "Danach ist das Lernen vorbei. Wenn du sie fragst, bleiben die "
+        "Stellschrauben fest: Sie wendet nur an.",
     ),
     ("Benutzen", "ansage", bild.ENDE - 410, ("Erst lernen", "dann", "arbeiten")),
 )

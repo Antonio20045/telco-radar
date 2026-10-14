@@ -28,29 +28,36 @@ QUELLEN = (
 )
 KALT, HEISS = bild.TEMPERATUREN[-1][0], bild.TEMPERATUREN[0][0]
 TEXTE = (
-    ("Würfel", "ansage", 30, ("Sie", "würfelt", "mit")),
+    ("Würfel", "ansage", 30, ("Warum", "würfelt", "sie?")),
     (
         "Würfel",
         "satz",
         1060,
-        "Sie kennt die wahrscheinlichsten Wörter. "
-        "Welches sie nimmt, entscheidet ein gezinkter Würfel.",
+        "Für das nächste Wort kennt sie nur Wahrscheinlichkeiten. "
+        "Daraus zieht sie wie mit einem gezinkten Würfel.",
     ),
-    ("Temperatur", "ansage", 1290, ("Ein Regler", "für den", "Zufall")),
+    ("Temperatur", "ansage", 1440, ("Ein Regler", "für den", "Zufall")),
     (
         "Temperatur",
         "satz",
-        2620,
-        f"Bei Temperatur {bild.zahl(KALT)} gewinnt „Ja“ "
-        f"{bild.prozent(bild.verteilung(KALT)[0][1])}, bei {bild.zahl(HEISS)} "
-        f"nur noch {bild.prozent(bild.verteilung(HEISS)[0][1])}.",
+        bild.ROHR[2] + 120,
+        f"Der Regler heißt Temperatur. Kalt gewinnt „Ja“ "
+        f"{bild.prozent(bild.verteilung(KALT)[0][1])}, heiß nur "
+        f"{bild.prozent(bild.verteilung(HEISS)[0][1])}: Dann kommt Seltenes dran.",
     ),
     (
         "Ziehen",
         "satz",
-        3230,
-        "Darum klingt dieselbe Frage nie ganz gleich. "
-        "Selbst bei Temperatur 0 ist das laut Anthropic nicht sicher.",
+        bild.ZUG_Y + 340,
+        "Fünfmal gefragt, fünfmal gewürfelt: meist „Ja“, manchmal etwas "
+        "anderes. Darum klingt sie nie ganz gleich.",
+    ),
+    (
+        "Ziehen",
+        "satz",
+        bild.ZUG_Y + 580,
+        "Für Fakten stellt man sie kalt, für Ideen warm. "
+        "Ganz ohne Zufall ist sie laut Anthropic nie.",
     ),
     ("Ziehen", "ansage", bild.ENDE - 410, ("Fakten kalt", "Ideen", "warm")),
 )
