@@ -41,6 +41,8 @@ Woche bei fuenf, sagt die Seite fuenf, ohne dass jemand eine Zeile aendert.
 from __future__ import annotations
 
 from .anbieter_farben import stil_fuer
+from .geraete_tco_karten import ist_frisch
+from .geraete_vergleich import beide_preisarten
 from .geraete_zeitreihe import LUECKE_TAGE_SCHWELLE
 from ..geraete_model import VERGLEICHBARE_ZUSTAENDE
 
@@ -128,7 +130,7 @@ def mehrdeutige_tage(listungen: list, historie) -> list[dict]:
     return out
 
 
-def _punkte(listungen: list, historie) -> list[dict]:
+def _punkte(listungen: list, historie, laeden: dict | None = None) -> list[dict]:
     """Alle Messpunkte einer Listungsmenge, aelteste zuerst.
 
     Die Historie traegt nur AENDERUNGSpunkte - ein unveraenderter Preis
@@ -137,15 +139,21 @@ def _punkte(listungen: list, historie) -> list[dict]:
     Tag, an dem der Preis zuletzt BESTAETIGT wurde. Ohne diesen Zusatz endet
     jede Linie am Tag ihrer letzten Aenderung und behauptet damit, das
     Geraet sei seitdem nicht mehr gesehen worden.
+
+    `laeden` (Anbieter -> Laden aus `geraete_quellen.yaml`) fuehrt einen
+    Laden unter EINEM Namen, wie Alarm- und Haendlertabelle: mobilcom-debitel
+    heisst dort "freenet" (F9, 14.10.2026).
     """
+    laeden = laeden or {}
     punkte = []
     for e in listungen:
+        name = laeden.get(e.get("anbieter"), e.get("anbieter"))
         eindeutig, mehrdeutig = messtage(historie.reihe(e.get("id") or ""))
         for datum, preis in sorted(eindeutig.items()):
             punkte.append(
                 {
                     "datum": datum,
-                    "anbieter": e.get("anbieter"),
+                    "anbieter": name,
                     "preis": preis,
                     "art": "gemessen",
                 }
@@ -156,7 +164,7 @@ def _punkte(listungen: list, historie) -> list[dict]:
             punkte.append(
                 {
                     "datum": letzt,
-                    "anbieter": e.get("anbieter"),
+                    "anbieter": name,
                     "preis": float(preis),
                     "art": "bestaetigt",
                 }
@@ -232,7 +240,9 @@ def reihen_fuer_listungen(listungen: list, historie) -> list[dict]:
     return _reihen(_punkte(passende, historie))
 
 
-def geraete_mit_verlauf(eintraege: list, historie, katalog) -> list[dict]:
+def geraete_mit_verlauf(
+    eintraege: list, historie, katalog, heute: str = "", laeden: dict | None = None
+) -> list[dict]:
     """Je (Modell, Speicher) ein waehlbares Geraet mit seinen Reihen.
 
     Nur Neugeraete ohne Vertrag: ein Gebrauchtpreis und ein Neupreis in
@@ -250,9 +260,11 @@ def geraete_mit_verlauf(eintraege: list, historie, katalog) -> list[dict]:
     geraete = []
     for (gid, speicher), listungen in gruppen.items():
         g = katalog.nach_id(gid) if katalog else None
-        reihen = _reihen(_punkte(listungen, historie))
+        reihen = _reihen(_punkte(listungen, historie, laeden))
         if not reihen:
             continue
+        for r in reihen:
+            r["frisch"] = ist_frisch(max(p["datum"] for p in r["punkte"]), heute)
         alle = [p["preis"] for r in reihen for p in r["punkte"]]
         tage = sorted({p["datum"] for r in reihen for p in r["punkte"]})
         geraete.append(
@@ -298,6 +310,10 @@ def geraete_mit_verlauf(eintraege: list, historie, katalog) -> list[dict]:
 def _aktuell(reihen: list) -> list[dict]:
     """Die Tabelle unter dem Diagramm: aktueller Preis je Anbieter.
 
+    Nur Anbieter mit frischem Preis (`ist_frisch`, dieselbe Definition wie
+    Katalog und Tafel): ein 15 Tage alter Preis ist kein "aktuell" (F2,
+    14.10.2026).
+
     `veraenderung` bleibt None, solange ein Anbieter nur EINEN Messpunkt
     hat. "0 Tage" und "-0,00 EUR" sind keine Auskunft, und der Auftrag
     verbietet sie ausdruecklich - eine Zeile, die nichts sagt, kommt nicht
@@ -306,7 +322,7 @@ def _aktuell(reihen: list) -> list[dict]:
     zeilen = []
     for r in reihen:
         ps = sorted(r["punkte"], key=lambda p: p["datum"])
-        if not ps:
+        if not ps or not r.get("frisch", True):
             continue
         letzt = ps[-1]
         veraenderung = None
@@ -323,12 +339,14 @@ def _aktuell(reihen: list) -> list[dict]:
                 "messpunkte": len(ps),
             }
         )
-    return sorted(zeilen, key=lambda z: z["preis"])
+    return sorted(zeilen, key=lambda z: (z["preis"], z["anbieter"] or ""))
 
 
-def aufbereiten(eintraege: list, historie, katalog) -> dict:
+def aufbereiten(
+    eintraege: list, historie, katalog, heute: str = "", laeden: dict | None = None
+) -> dict:
     """Alles, was Reiter 3 braucht - Daten, kein SVG."""
-    geraete = geraete_mit_verlauf(eintraege, historie, katalog)
+    geraete = geraete_mit_verlauf(eintraege, historie, katalog, heute, laeden)
     tage = sorted({t for g in geraete for t in g["tage"]})
     return {
         "hat_daten": bool(geraete),
@@ -359,3 +377,14 @@ def leer() -> dict:
         "max_datumsmarken": MAX_DATUMSMARKEN,
         "verlauf_satz_max_termine": VERLAUF_SATZ_MAX_TERMINE,
     }
+
+
+def vergleich_frisch(eintraege: list, katalog, laeden: dict, heute: str) -> dict:
+    """Der Ohne-/Mit-Vertrag-Vergleich über die FRISCHEN Listungen.
+
+    Ohne-Vertrag-Grafik, Alarme und Händlertabelle sehen dieselben Preise
+    wie Katalog und Verlauf (`ist_frisch`, F2,
+    14.10.2026): ein 15 Tage alter Medimax-Preis ist kein „aktuell“.
+    """
+    frisch = [e for e in eintraege if ist_frisch(e.get("abgerufen_am", ""), heute)]
+    return beide_preisarten(frisch, katalog, laeden=laeden)

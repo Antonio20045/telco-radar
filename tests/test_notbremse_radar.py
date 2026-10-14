@@ -82,7 +82,8 @@ def _herkunft_falsch(karten: list, zeile: dict) -> bool:
 
 def test_kernzahl_der_seite_ohne_schaetzung(bestand, seite):
     sicht, karten = bestand
-    spitze = sicht["modelliste"]["zeilen"][0]
+    spitze = sicht["modelliste"]["spitze"]
+    assert spitze is not None, "Kernzahl: der Radar hat keine Spitze"
     leit = LEITZAHL.search(seite)
     assert leit is not None, "Kernzahl: die Seite zeigt keine Leitzahl des Radars"
     label = html.unescape(leit["label"])

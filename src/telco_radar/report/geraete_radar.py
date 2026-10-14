@@ -451,10 +451,8 @@ def netzbetreiber_gruppen(
                     "speicher": modell["speicher"],
                     "vodafone": None,
                     "vodafone_grund": (
-                        "Keine Vodafone-Kosten über 24 Monate "
-                        "für dieses Gerät "
-                        "erhoben – kein Bündel und kein eigener "
-                        "Barpreis."
+                        "Keine Vodafone-Kosten für dieses Gerät erhoben – "
+                        "kein Bündel und kein eigener Barpreis."
                     ),
                     "zeilen": zeilen,
                     "rang": float("inf"),
@@ -553,7 +551,7 @@ def modellliste(gruppen: list[dict]) -> dict:
         sprung_band = ""
         if paar is None:
             if g["vodafone"] is None:
-                luecke = "keine Vodafone-Kosten über 24 Monate erhoben"
+                luecke = "keine Vodafone-Kosten erhoben"
             else:
                 luecke = "kein Vergleich"
                 for status in (
@@ -591,6 +589,7 @@ def modellliste(gruppen: list[dict]) -> dict:
                 "band_label": (paar or {}).get("band_label", ""),
                 "gesamt": (paar or {}).get("gesamt"),
                 "vf_gesamt": (paar or {}).get("vf_gesamt"),
+                "monate": (paar or {}).get("monate"),
                 "quelle_url": (paar or {}).get("quelle_url", ""),
                 "abgerufen_am": (paar or {}).get("abgerufen_am", ""),
                 "luecke": luecke,
@@ -600,8 +599,11 @@ def modellliste(gruppen: list[dict]) -> dict:
                 "gruppe_zeilen": g["zeilen"],
             }
         )
+    negativ = [z for z in zeilen if z["euro"] is not None and z["euro"] < 0]
+    spitze = min(negativ, key=lambda z: (z["euro"], z["titel"] or ""), default=None)
     return {
         "zeilen": zeilen,
+        "spitze": spitze,
         "sichtbar": zeilen[:MODELLISTE_SICHTBAR],
         "rest": zeilen[MODELLISTE_SICHTBAR:],
         "gesamt": len(zeilen),
@@ -713,14 +715,14 @@ def _grafik_svg(
         w, name_breite, wert_raum, neg_raum = 350, 0, 78, 78
         reihen_hoehe, balken_hoehe, kopf, fuss = 40, 12, 26, 8
     h = kopf + n * reihen_hoehe + fuss
-    max_abs = max((abs(z["delta"]) for z in zeilen), default=1.0) or 1.0
     neg_arm = max((abs(z["delta"]) for z in zeilen if z["delta"] < 0), default=0.0)
+    pos_arm = max((z["delta"] for z in zeilen if z["delta"] > 0), default=0.0)
     start = (2 if breit else 10) + neg_raum * (neg_arm > 0)
     verfuegbar = w - 6 - wert_raum - start
     if breit:
         verfuegbar -= name_breite + 10
         start += name_breite + 10
-    skala = verfuegbar / max_abs
+    skala = verfuegbar / ((neg_arm + pos_arm) or 1.0)
     x0 = start + neg_arm * skala
 
     spitze = None
@@ -839,7 +841,8 @@ def grafik(vergleich_ohne_vertrag: dict, n: int = GRAFIK_MAX) -> dict:
     Top N schaffte, sonst markierte Rot in der Tabelle ein Modell, das im
     Bild fehlt (und die Alarm-Pille haette keinen Balken)."""
     alle = grafik_zeilen(vergleich_ohne_vertrag)
-    if not alle:
+    teurer = [z for z in alle if z["delta"] > 0]
+    if not teurer:
         return {
             "svg_breit": "",
             "svg_schmal": "",
@@ -850,12 +853,12 @@ def grafik(vergleich_ohne_vertrag: dict, n: int = GRAFIK_MAX) -> dict:
             "leer_grund": (
                 "Noch keine vergleichbaren Barpreise erhoben "
                 "– die Grafik entsteht mit dem nächsten Lauf."
+                if not alle
+                else "Bei keinem verglichenen Modell ist Vodafone teurer."
             ),
         }
-    spitze_kandidat = max(
-        (z for z in alle if z["delta"] > 0), key=lambda z: z["delta"], default=None
-    )
-    gewaehlt = sorted(alle, key=lambda z: -abs(z["delta"]))[:n]
+    spitze_kandidat = max(teurer, key=lambda z: z["delta"], default=None)
+    gewaehlt = sorted(teurer, key=lambda z: -z["delta"])[:n]
     if spitze_kandidat is not None:
         schluessel = (spitze_kandidat["device_id"], spitze_kandidat["speicher"])
         if not any((z["device_id"], z["speicher"]) == schluessel for z in gewaehlt):
@@ -1032,7 +1035,7 @@ def leer() -> dict:
         "gruppen": [],
         "gruppen_sichtbar": [],
         "gruppen_rest": [],
-        "modelliste": {"zeilen": [], "sichtbar": [], "rest": [], "gesamt": 0},
+        "modelliste": modellliste([]),
         "grafik": grafik({}),
         "haendler": [],
         "haendler_sichtbar": [],

@@ -271,15 +271,6 @@
       if k.anschlusspreis is not none %} · Anschlusspreis {{
       k.anschlusspreis | euro }}{% endif %}{% endif %}</p>
 
-    {% if k.eff_ohne_geraet is not none %}
-    <p class="gr-kk-eff">eff. {{ k.eff_ohne_geraet | euro }}/M. ohne Gerät
-      <span class="gr-a-klein">Ø/Monat minus Gerätebarpreis {{
-      k.eff_basis.betrag | euro }} geteilt durch {{ k.laufzeit }} Monate{%
-      if k.eff_basis.fremd %}; der Barpreis ist der von {{ k.eff_basis.anbieter
-      }}, {{ k.anbieter }} verkauft dieses Gerät nicht ohne Vertrag{% endif
-      %}</span></p>
-    {% endif %}
-
     {# F5, PFLICHTZEILE "ab Monat 25" (Katalog D, B.2): eine Zahl, wo das
        Pflichtdokument eine Preisphase nach der Mindestlaufzeit nennt - sonst
        die BENANNTE Luecke. #}

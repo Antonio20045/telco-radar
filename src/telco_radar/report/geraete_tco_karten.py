@@ -684,9 +684,6 @@ def _karte(
     aktionen, aktion_ueberhang = aktionen_der_karte(b, heute)
     monate = kosten.monate
     device_id, speicher = geraet_je_sku.get(b.sku_id, ("", None))
-    eff = None
-    if barpreis is not None and belastbar and kosten.monatlich is not None and monate:
-        eff = round(kosten.monatlich - barpreis["betrag"] / monate, 2)
     raten_summe = (
         round(b.geraet_monatsrate * b.laufzeit_monate, 2)
         if (b.geraet_monatsrate is not None and b.laufzeit_monate is not None)
@@ -734,8 +731,6 @@ def _karte(
         "raten_summe": raten_summe,
         "anschlusspreis": b.anschlusspreis,
         "nach_bindung": tarifpreis_im_monat(b, AB_MONAT),
-        "eff_ohne_geraet": eff,
-        "eff_basis": barpreis,
         "bestandteile": bestandteile,
         "zerlegung": zerlegung_balken(bestandteile, None, kosten.gesamt),
         **geraete_rechnung.felder(kosten),
@@ -819,8 +814,6 @@ def _leere_karte(anbieter: str, grund: str = "") -> dict:
         "raten_summe": None,
         "anschlusspreis": None,
         "nach_bindung": None,
-        "eff_ohne_geraet": None,
-        "eff_basis": None,
         "bestandteile": [],
         "zerlegung": [],
         "luecken": [],

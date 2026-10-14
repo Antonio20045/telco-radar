@@ -143,7 +143,7 @@ def _guenstigstes_je_laden(eintraege: list, laeden: Optional[dict]) -> list:
         vorher = beste.get(schluessel)
         if vorher is None or preis < vorher["preis"]:
             beste[schluessel] = _angebot(e, laeden)
-    return sorted(beste.values(), key=lambda a: a["preis"])
+    return sorted(beste.values(), key=lambda a: (a["preis"], a["laden"]))
 
 
 def vergleich(

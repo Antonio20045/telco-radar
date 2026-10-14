@@ -15,7 +15,7 @@ from datetime import date
 
 from .. import rechenweise
 from ..tarif_model import buendelphasen_aus
-from ..tco_kosten import POSTEN_EINMALZAHLUNG, tarifmonate
+from ..tco_kosten import POSTEN_EINMALZAHLUNG, tarifmonate, tarifpreis_im_monat
 from ..tco_model import (
     POSTEN_ANSCHLUSS,
     POSTEN_BUENDEL,
@@ -191,7 +191,7 @@ def _rechung(messung: dict, tarife: dict | None = None) -> dict | None:
 
     posten: list[dict] = []
 
-    def _posten(label: str, betrag, anzahl=None, einzeln=None, klammer=""):
+    def _posten(label: str, betrag, anzahl=None, einzeln=None, klammer="", teile=()):
         if betrag is None:
             return
         posten.append(
@@ -201,6 +201,7 @@ def _rechung(messung: dict, tarife: dict | None = None) -> dict | None:
                 "einzeln": einzeln,
                 "betrag": betrag,
                 "klammer": klammer,
+                "teile": list(teile),
             }
         )
 
@@ -216,12 +217,14 @@ def _rechung(messung: dict, tarife: dict | None = None) -> dict | None:
         _posten(f"Ablöse nach Monat {h}", kosten.posten.get(POSTEN_EINMALZAHLUNG))
     else:
         t = tarifmonate(b) if h is None else min(h, tarifmonate(b))
+        phasen = _phasen_der_monate(b, t) if b.tarif_phasen else []
         _posten(
             "Tarif",
             kosten.posten.get(f"Tarif über {t} Monate"),
             anzahl=t,
             einzeln=b.tarif_monatlich,
-            klammer="phasengewichtet" if b.tarif_phasen else "",
+            klammer="phasengewichtet" if b.tarif_phasen and not phasen else "",
+            teile=phasen if len(phasen) > 1 else (),
         )
         _posten(
             POSTEN_RATE,
@@ -248,6 +251,19 @@ def _rechung(messung: dict, tarife: dict | None = None) -> dict | None:
         "quelle_url": satz.get("quelle_url") or "",
         "abgerufen_am": satz.get("abgerufen_am") or "",
     }
+
+
+def _phasen_der_monate(b, monate: int) -> list[tuple[int, float]]:
+    """Die Preisphasen als (Anzahl, Preis) aus `tarifpreis_im_monat`, derselben
+    Lesung wie `kosten_ueber` (F4); ein Monat ohne eindeutigen Preis: []."""
+    folge: list[tuple[int, float]] = []
+    for monat in range(1, monate + 1):
+        preis = tarifpreis_im_monat(b, monat)
+        if preis is None:
+            return []
+        n = folge.pop()[0] if folge and folge[-1][1] == preis else 0
+        folge.append((n + 1, preis))
+    return folge
 
 
 def _rechung_html(anbieter: str, messung: dict, tarife: dict | None = None) -> str:
@@ -283,7 +299,12 @@ def _rechung_html(anbieter: str, messung: dict, tarife: dict | None = None) -> s
         "<ul class='gr-zr-posten'>",
     ]
     for p in r["posten"]:
-        if p["anzahl"] is not None and p["einzeln"] is not None:
+        if p.get("teile"):
+            ausdruck = (
+                " + ".join(f"{n} × {_euro(preis)}" for n, preis in p["teile"])
+                + f" <span class='gr-zr-pg'>= {_euro(p['betrag'])}</span>"
+            )
+        elif p["anzahl"] is not None and p["einzeln"] is not None:
             ausdruck = (
                 f"{p['anzahl']} × {_euro(p['einzeln'])} "
                 f"<span class='gr-zr-pg'>= {_euro(p['betrag'])}"

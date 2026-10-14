@@ -52,6 +52,7 @@ from . import (
     geraete_alarme,
     geraete_bereinigung,
     geraete_pruefung,
+    geraete_teurer,
     geraete_tco_karten,
     geraete_tco_view,
     geraete_vergleich,
@@ -62,6 +63,7 @@ from . import geraete_notbremse as notbremse, klick_ueberholt
 
 from .geraete_laufzeit import LAUFZEIT_STANDARD, ansicht, rang_der_monatsangabe
 from .geraete_tco_band import _MONATE, band_label
+from .geraete_tco_grafik import euro
 from ..analyze import geraete_lifecycle, klick_erfassung as erfassung
 from ..analyze.tco_store import TcoDB
 from ..analyze.klick_lesestand import mit_klick
@@ -169,21 +171,6 @@ def zahlen_der_namen(*namen) -> set:
     for name in namen:
         gefunden |= zahlen_im_text(str(name or ""))
     return gefunden
-
-
-def euro(betrag: float) -> str:
-    """Ein Euro-Betrag in deutscher Schreibweise.
-
-    Die Saetze der Wochenkarte schrieben ihre Preise bis zum 30.08.2026 mit
-    `f"{wert:.2f} €"` - also "129.00 €" mit Dezimalpunkt, waehrend jede
-    Tabelle derselben Seite "129,00 €" zeigt. Solange die Saetze neben einer
-    Tabelle standen, ging das unter; seit die Karte unter kurzem Vorlauf NUR
-    aus einem Satz besteht, ist es die erste Zahl, die jemand dort liest.
-
-    Der Waechter `pruefe_zahlen` liest beide Schreibweisen ueber
-    `lies_preis` - die Umstellung aendert nichts an dem, was er durchlaesst.
-    """
-    return f"{betrag:.2f}".replace(".", ",") + " €"
 
 
 def pruefe_zahlen(text: str, erlaubt: set) -> bool:
@@ -376,9 +363,12 @@ def _auffaellig(
         if alt is None or neu is None or alt == 0 or alt == neu:
             continue
         g = katalog.nach_id(e.get("device_id"))
+        speicher = e.get("speicher_gb")
+        modell = g.modell if g else e.get("device_id")
         bewegungen.append(
             {
-                "modell": g.modell if g else e.get("device_id"),
+                "schluessel": (e.get("device_id"), speicher, e.get("anbieter")),
+                "modell": f"{modell} {speicher} GB" if speicher else modell,
                 "anbieter": e.get("anbieter"),
                 "von": alt,
                 "auf": neu,
@@ -388,6 +378,8 @@ def _auffaellig(
                 "url": e.get("quelle_url", ""),
             }
         )
+    bewegungen.sort(key=lambda b: abs(b["delta"]))
+    bewegungen = list({b.pop("schluessel"): b for b in bewegungen}.values())
     bewegungen.sort(key=lambda b: -abs(b["delta"]))
 
     neu_gelistet = [e for e in eintraege if _im_fenster(e.get("first_seen", ""), heute)]
@@ -788,6 +780,7 @@ def _tco_leer(grund: str) -> dict:
         "tco_delta_anbieter": None,
         "tco_delta_leer": None,
         "tco_delta_leer_grund": None,
+        "tco_vodafone_teurer": [],
     }
 
 
@@ -905,6 +898,7 @@ def _tco_spalte(modell_tco: dict | None, heute: str = "") -> dict:
             "abgerufen_am": bester.get("abgerufen_am", ""),
         },
         "tco_leer": None,
+        "tco_vodafone_teurer": geraete_teurer.je_band(zaehlende),
     }
 
 
@@ -1631,7 +1625,8 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         ),
         default=0,
     )
-    auffaellig = _auffaellig(alle, historie, katalog, heute, laeufe=laeufe)
+    je_laden = [{**e, "anbieter": geraete_vergleich._laden(e, laden)} for e in alle]
+    auffaellig = _auffaellig(je_laden, historie, katalog, heute, laeufe=laeufe)
     lifecycle = geraete_lifecycle.auswertung(
         alle,
         punkte_alle,
@@ -1669,13 +1664,15 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
     laeden_mit_daten = _laeden(bestand)
     hersteller_mit_daten = _hersteller(bestand)
 
-    vergleich = geraete_vergleich.beide_preisarten(belastbar, katalog, laeden=laden)
+    tco_heute = _spaeterer_tag(heute, tco_db.updated) if heute else ""
+    bestand_heute = _spaeterer_tag(heute, db.updated) if heute else ""
+
+    vergleich = geraete_verlauf.vergleich_frisch(
+        belastbar, katalog, laden, bestand_heute
+    )
     alarme = geraete_alarme.zeilen(
         vergleich["ohne_vertrag"], pruefung.get("auffaellig")
     )
-
-    tco_heute = _spaeterer_tag(heute, tco_db.updated) if heute else ""
-    bestand_heute = _spaeterer_tag(heute, db.updated) if heute else ""
     tco = geraete_tco_view.aufbereiten(
         (sichtbar := klick_ueberholt.ohne_ueberholte(tco_db.buendel())),
         tco_db.referenzen(),
@@ -1741,7 +1738,9 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         "tco": tco,
         "zeitreihe": zeitreihe,
         "ausfaelle": ausfaelle,
-        "verlauf": geraete_verlauf.aufbereiten(belastbar, historie, katalog),
+        "verlauf": geraete_verlauf.aufbereiten(
+            belastbar, historie, katalog, bestand_heute, laden
+        ),
         "katalog_modelle": katalog_modelle,
         "katalog_ab_preis": katalog_ab_preis,
         "katalog_sichtbar": KATALOG_SICHTBAR,

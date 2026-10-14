@@ -252,9 +252,8 @@ def _messungen(
     <Buendel-Eintrag aus geraete_tco.json>, "wert": <Leitzahl von HEUTE>}`
     samt der Notbremse ihres Bündels (`felder_aus_satz` am Stand, `zaehlt`).
     Je (Modell, Band, Anbieter, Tag) zaehlt das GUENSTIGSTE Buendel (Farben
-    sind Preisdimensionen) - seit A1 nach der HEUTIGEN Rechnung (`wert`,
-    nicht dem eingefrorenen `gesamt` der Historie). Ein fehlender Tag
-    bleibt fehlend.
+    sind Preisdimensionen; zaehlende vor nicht zaehlenden, F3; ohne B-Ware, F1),
+    seit A1 nach der HEUTIGEN Rechnung (`wert`). Ein fehlender Tag bleibt fehlend.
 
     P1 (17.09.2026): die Zeile wird GANZ behalten, nicht nur ihr `gesamt` -
     aus ihren Messfeldern baut `_rechung` die Postenliste. Bei gleichem
@@ -263,7 +262,7 @@ def _messungen(
     sku_modell: dict[str, str] = {}
     for modell in tco.get("modelle") or []:
         for karte in modell.get("karten") or []:
-            if karte.get("sku_id"):
+            if karte.get("sku_id") and karte.get("vergleichbar", True):
                 sku_modell[karte["sku_id"]] = modell["id"]
 
     band_je_tarif = tco.get("band_je_tarif") or {}
@@ -337,8 +336,9 @@ def _messungen(
             b.get("anbieter") or "?", {}
         )
         alt = slot.get(datum)
-        if alt is None:
-            besser = True
+        felder = notbremse.felder_aus_satz(b, heute)
+        if alt is None or notbremse.zaehlt(felder) != notbremse.zaehlt(alt):
+            besser = alt is None or notbremse.zaehlt(felder)
         elif zeitraum_vergleichbar(monate, alt["monate"]):
             besser = wert < alt["wert"]
         else:
@@ -350,7 +350,7 @@ def _messungen(
                 "wert": wert,
                 "monate": monate,
                 "laufzeit": laufzeit,
-                **notbremse.felder_aus_satz(b, heute),
+                **felder,
             }
     if (
         ohne_id
@@ -983,7 +983,7 @@ def _bewegung(serien: dict, zeitraeume: dict | None = None) -> dict | None:
 
 def _legende_html(anbieter_serien: dict, zeitraeume: dict | None = None) -> str:
     """EINE Zeile ueber dem Graphen: Name mit Farb-Punkt, Vodafone rot und
-    benannt. Der „ab"-Wert (erster Messbetrag) steht im eigenen Span, der
+    benannt. Der „anfangs"-Wert (erster Messbetrag, F9) steht im eigenen Span, der
     auf dem breiten Bild ausgeblendet ist - dort traegt ihn das kleine
     Erst-Label im SVG, und eine Zahl steht je Ort genau EINMAL.
 
@@ -1006,7 +1006,7 @@ def _legende_html(anbieter_serien: dict, zeitraeume: dict | None = None) -> str:
         if not serie:
             continue
         zusatz = (
-            f" <span class='gr-zr-leg-wert'>ab {_euro0(serie[0][1])}"
+            f" <span class='gr-zr-leg-wert'>anfangs {_euro0(serie[0][1])}"
             f" · zuletzt {_euro0(serie[-1][1])}</span>"
         )
         mon_text = (
@@ -1132,17 +1132,14 @@ def _paar(
         for z in zeilen
     }
     leer = None
+    kopf = f"Für {_satz_name(modell)} im Band {band_info.get('label', band)}"
+    seit = historie_lage.get("seit")
     if not serien:
-        seit_text = (
-            f"seit dem {_datum_de(historie_lage['seit'])}"
-            if historie_lage.get("seit")
-            else ""
-        )
-        leer = (
-            f"Für {_satz_name(modell)} im Band {band_info.get('label', band)} "
-            f"mit {laufzeit} Raten liegt noch keine Messreihe vor - die "
-            f"Zeitreihe beginnt {seit_text} und wächst mit jedem Messtag. Der "
-            f"Stand heute steht in den Bündel-Zeilen darunter."
+        leer = notbremse.leersatz(mess, f"{kopf} mit {laufzeit} Raten") or (
+            f"{kopf} mit {laufzeit} Raten liegt noch keine Messreihe vor - die "
+            f"Zeitreihe beginnt {'seit dem ' + _datum_de(seit) if seit else ''} "
+            "und wächst mit jedem Messtag. Der Stand heute steht in den Bündel-"
+            "Zeilen darunter."
         )
     return {
         "modell": modell["id"],
@@ -1249,11 +1246,10 @@ def aufbereiten(
         for band, lz in ((b, lz) for b in bands for lz in _REIHE):
             satz = je_laufzeit[lz].get(band) or _ohne_satz()
             schluessel = (modell["id"], band, lz)
-            serien = serien_alle.get(schluessel, {})
             zaehlend = zaehlend_alle.get(schluessel, {})
             zeitraeume = zeitraeume_alle.get(schluessel, {})
             karten_baender.setdefault(modell["id"], {}).setdefault(band, {})[lz] = (
-                _kachel_eintrag(satz, serien, zaehlend, zeitraeume)
+                _kachel_eintrag(satz, zaehlend, zaehlend, zeitraeume)
             )
             paare.append(
                 _paar(
@@ -1263,7 +1259,7 @@ def aufbereiten(
                     satz,
                     band_katalog,
                     messungen_alle.get(schluessel, {}),
-                    serien,
+                    zaehlend,
                     zaehlend,
                     zeitraeume,
                     tarife,

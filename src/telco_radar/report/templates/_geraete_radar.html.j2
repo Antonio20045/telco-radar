@@ -125,7 +125,7 @@
       {% if z.tarif %}<span class="gr-a-klein">{{ z.tarif }}</span>{% endif %}
       {% if z.band_label %}<span class="gr-a-klein">Band {{ z.band_label }}</span>{% endif %}
       {% else %}–{% endif %}</td>
-    <td class="num">{% if z.gesamt is not none %}{{ z.gesamt | euro }}{% else %}–{% endif %}</td>
+    <td class="num">{% if z.gesamt is not none %}{{ z.gesamt | euro }}{% if z.monate %} <span class="gr-a-klein">{{ z.monate }} Mon.</span>{% endif %}{% else %}–{% endif %}</td>
     <td class="num">{% if z.vf_gesamt is not none %}{{ z.vf_gesamt | euro }}{% else %}–{% endif %}</td>
     <td>{% if z.quelle_url %}<a class="gr-a-quelle" href="{{ z.quelle_url }}"
         rel="noopener">{{ z.quelle_url | domain }}<span class="gr-a-pfeil"
@@ -169,15 +169,14 @@
        lebt im Vergleichs-Reiter (E2-Zeitreihe, „Barkauf + Tarif"). #}
     <div class="gr-scroll">
     <table class="src-table wr-tabelle">
-      <thead><tr><th>Anbieter</th><th>Tarif</th><th class="num">Kosten über
-        24 Monate</th>
+      <thead><tr><th>Anbieter</th><th>Tarif</th><th class="num">Kosten</th>
         <th>Band</th><th class="num">Abweichung</th><th>Beleg</th></tr></thead>
       <tbody>
         {% for s in z.gruppe_zeilen %}
         <tr class="wr-status--{{ s.status }}">
           <td>{{ s.anbieter }}</td>
           <td class="wr-tarif">{% if s.tarif %}{{ s.tarif }}{% else %}–{% endif %}</td>
-          <td class="num">{% if s.gesamt is not none %}{{ s.gesamt | euro }}{% else %}–{% endif %}</td>
+          <td class="num">{% if s.gesamt is not none %}{{ s.gesamt | euro }}{% if s.monate %} <span class="gr-a-klein">{{ s.monate }} Mon.</span>{% endif %}{% else %}–{% endif %}</td>
           <td>{{ s.band_label or '–' }}{% if s.status == 'vergleichbar' and s.vf_gesamt is not none %} · VF {{ s.vf_gesamt | euro }}{% endif %}</td>
           <td class="num wr-prozent{% if s.prozent is not none %}{{ ' wr-prozent--negativ' if s.prozent < 0 else ' wr-prozent--positiv' }}{% endif %}">
             {%- if s.prozent is not none -%}{{ '%+.1f'|format(s.prozent)|replace('.', ',') }} %
@@ -266,7 +265,7 @@
           <td class="num">{{ b.von | euro }}</td>
           <td class="num">{{ b.auf | euro }}</td>
           <td class="num gr-delta{{ ' gr-delta--runter' if b.delta < 0 else ' gr-delta--rauf' }}">
-            {{ '%+.2f'|format(b.delta) }} €</td>
+            {{ '+' if b.delta > 0 else '−' }}{{ b.delta | abs | euro }}</td>
           <td>{{ b.datum | date_de }}</td>
           <td>{% if b.url %}<a href="{{ b.url }}" rel="noopener">{{ b.url | domain }}</a>{% endif %}</td>
         </tr>
@@ -323,8 +322,7 @@
   {# ROT-DECKEL (design.md Regel 4): die Spitzen-Markierung traegt die
      ERSTE vergleichbare Zeile - die Liste steht nach Abweichung
      sortiert da, ihre erste Zahl IST der schärfste TCO-Befund. #}
-  {% set spitze_id = ml.sichtbar[0].id
-     if (ml.sichtbar and ml.sichtbar[0].prozent is not none) else '' %}
+  {% set spitze_id = ml.spitze.id if ml.spitze else '' %}
   <details class="gr-auf">
     <summary>Alle {{ ml.gesamt }} Modelle</summary>
     {# D4a (24.09.2026): der Erklärsatz vor der Tabelle ist GEFALLEN
@@ -351,7 +349,7 @@
       <th scope="col"><button type="button" class="gr-sort"
         data-sort="anbieter" data-art="text">Wettbewerber</button></th>
       <th scope="col" class="num"><button type="button" class="gr-sort"
-        data-sort="gesamt" data-art="zahl">Kosten über 24 Monate</button></th>
+        data-sort="gesamt" data-art="zahl" title="Kosten über die Laufzeit der Zeile (Mon.)">Kosten</button></th>
       <th scope="col" class="num"><button type="button" class="gr-sort"
         data-sort="vf" data-art="zahl">Vodafone</button></th>
       <th scope="col"><button type="button" class="gr-sort"
@@ -397,7 +395,7 @@
      aus geraete_radar.grafik(), len(alle)) war beim Kürzen des Achslabels
      NIRGENDS mehr sichtbar - weder als Text noch als title. Sie kommt
      zurück als knappe Zahl, ohne Lesehilfe-Satz. #}
-  <p class="gr-v-meta">{{ wr.grafik.basis }} Modelle</p>
+  <p class="gr-v-meta">{{ wr.grafik.n }} von {{ wr.grafik.basis }} Modellen</p>
   <div class="wr-grafik-bild" title="Balkenlänge = Abstand in Euro zum Vodafone-Preis (Neugeräte, ohne Vertrag); negativ heißt, der Wettbewerber ist günstiger. Die Preis-Alarme zeigen denselben Abstand als Betrag.">{{ wr.grafik.svg_breit | safe
     }}{{ wr.grafik.svg_schmal | safe }}</div>
   {% else %}
