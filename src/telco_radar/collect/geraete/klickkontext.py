@@ -51,6 +51,10 @@ log = logging.getLogger(__name__)
 BEIWEG_ARTEN = ("Other",)
 BEIWEG_GRUND = "BlockedByClient"
 LEER = "about:blank"
+SPRACHE = "de-DE"
+"""Sprache des Browsers (``navigator.language``, ``Accept-Language``): congstar
+übersetzt seit dem 14.10.2026 im Browser, der englische Actions-Browser las „Storage:“
+statt „Speicher:“."""
 VORAB_ZWECK = re.compile(r"prefetch|prerender", re.I)
 OHNE_VORAB_JS = """(() => {
   const vorab = /\\b(?:prerender|prefetch)\\b/i;
@@ -122,9 +126,9 @@ def oeffne_sitzung(
     """Eigener Kontext ohne Service Worker und ohne Vorabladen, alles am Tor.
 
     ``kennung`` ist der User-Agent aus ``geraete_quellen.yaml``, sonst der des Browsers;
-    eine andere Kopfzeile setzt der Kontext nicht. Die HAR-Dateien in ``wiedergabe``
-    stehen vor dem Tor. ``zustand`` bringt Cookies und Speicher des vorigen Kontexts
-    mit.
+    außer der Sprache ``SPRACHE`` setzt der Kontext keine andere Kopfzeile. Die
+    HAR-Dateien in ``wiedergabe`` stehen vor dem Tor. ``zustand`` bringt Cookies und
+    Speicher des vorigen Kontexts mit.
     """
     wache = sperre_vorabladen(browser)
     kontext: BrowserContext | None = None
@@ -134,6 +138,7 @@ def oeffne_sitzung(
             service_workers="block",
             viewport=fenster,
             user_agent=kennung,
+            locale=SPRACHE,
             storage_state=stand,
         )
         kontext.add_init_script(script=OHNE_VORAB_JS)
