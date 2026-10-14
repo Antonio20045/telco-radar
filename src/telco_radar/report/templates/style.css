@@ -6397,7 +6397,8 @@ a.ki-k1-pille:hover{border-color:var(--ink)}
 .kopfband .pw-zahl-text{margin:0 0 .35em;font-size:clamp(22px,2.3vw,34px)}
 .kopfband .pw-neben{margin:0 0 .6em}
 .kopfband .pw-neben b{font-size:clamp(26px,2.4vw,36px)}
-.kopfband.gx-auftakt + .wrap,.kopfband.gx-auftakt ~ .wrap{margin-top:0}
+.wa-auftakt.kopfband.gx-auftakt{margin-bottom:0}
+@media (min-width:721px){.kopfband.gx-auftakt ~ .wrap .gr-reiter.gx-modus{margin:12px auto 24px}}
 /* Die Kapitel der Wettbewerber: ein Band statt Vollbild, das Blatt liegt
    direkt darunter statt beim Scrollen darueber zu fahren. */
 .wa-kapitel .wa-kapitel-buehne{position:relative;height:clamp(200px,28vh,260px);border-radius:28px;margin:0 var(--wa-rand)}
