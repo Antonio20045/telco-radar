@@ -379,7 +379,7 @@ def _auffaellig(
             }
         )
     bewegungen.sort(key=lambda b: -abs(b["delta"]))
-    erste = {}
+    erste: dict[tuple, dict] = {}
     for b in bewegungen:
         erste.setdefault(b.pop("schluessel"), b)
     bewegungen = list(erste.values())
