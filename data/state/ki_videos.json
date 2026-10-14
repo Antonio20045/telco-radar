@@ -1,6 +1,126 @@
 {
- "stand": "2026-10-13",
+ "stand": "2026-10-14",
  "videos": [
+  {
+   "id": "zKvaoG5Jlh0",
+   "titel": "Is AI Replacing Entry-Level Jobs?",
+   "kanal": "IBM Technology",
+   "datum": "2026-10-14",
+   "dauer_sekunden": 37,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "zKvaoG5Jlh0.jpg"
+  },
+  {
+   "id": "aHatrPLNqEM",
+   "titel": "What Each AI Agent Team Does in Project Perception",
+   "kanal": "Microsoft Mechanics",
+   "datum": "2026-10-14",
+   "dauer_sekunden": 32,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "aHatrPLNqEM.jpg"
+  },
+  {
+   "id": "ZA7h91R9qdE",
+   "titel": "Vergesst Alexa und Co",
+   "kanal": "c't 3003",
+   "datum": "2026-10-14",
+   "dauer_sekunden": 78,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "ZA7h91R9qdE.jpg"
+  },
+  {
+   "id": "XMhU-9e9ylY",
+   "titel": "ChatGPT Can Now Transcribe Audio to Text!",
+   "kanal": "Kevin Stratvert",
+   "datum": "2026-10-14",
+   "dauer_sekunden": 25,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "XMhU-9e9ylY.jpg"
+  },
+  {
+   "id": "XEl4ZQKKxig",
+   "titel": "This Robot Is Unlike Any Other On The Market",
+   "kanal": "Matt Wolfe",
+   "datum": "2026-10-14",
+   "dauer_sekunden": 73,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "XEl4ZQKKxig.jpg"
+  },
+  {
+   "id": "W6F4QZlknkc",
+   "titel": "AI slop stalls bug bounties, malware hides in IoT and agents hit Wikipedia",
+   "kanal": "IBM Technology",
+   "datum": "2026-10-14",
+   "dauer_sekunden": 1860,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "W6F4QZlknkc.jpg"
+  },
+  {
+   "id": "W-ia2MNcmNk",
+   "titel": "KI-Update kompakt: OpenAI-Spionage, Zerstörung, Zulassung, KI-Replikation, Muse Wonder",
+   "kanal": "KI Update (heise)",
+   "datum": "2026-10-14",
+   "dauer_sekunden": 1296,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "W-ia2MNcmNk.jpg"
+  },
+  {
+   "id": "Veot9JRCONg",
+   "titel": "Human in the Loop for AI Pen Testing Agents",
+   "kanal": "Microsoft Mechanics",
+   "datum": "2026-10-14",
+   "dauer_sekunden": 40,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "Veot9JRCONg.jpg"
+  },
+  {
+   "id": "FbKXvab-0yQ",
+   "titel": "Cloudroom just destroyed all AI coding apps (fully open-source)",
+   "kanal": "David Ondrej",
+   "datum": "2026-10-14",
+   "dauer_sekunden": 3623,
+   "stufe": "Fortgeschritten",
+   "sprache": "en",
+   "bild": "FbKXvab-0yQ.jpg"
+  },
+  {
+   "id": "DTcK95TAZ-k",
+   "titel": "How Oracle Uses Codex to Help Business Users Get Answers",
+   "kanal": "OpenAI",
+   "datum": "2026-10-14",
+   "dauer_sekunden": 22,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "DTcK95TAZ-k.jpg"
+  },
+  {
+   "id": "8SV_Dj9Kebo",
+   "titel": "How to Transcribe Audio to Text with ChatGPT",
+   "kanal": "Kevin Stratvert",
+   "datum": "2026-10-14",
+   "dauer_sekunden": 112,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "8SV_Dj9Kebo.jpg"
+  },
+  {
+   "id": "43XVqjxECVU",
+   "titel": "KI-Update kompakt: OpenAI-Spionage, Zerstörung, Zulassung, KI-Replikation, Muse Wonder",
+   "kanal": "KI Update (heise)",
+   "datum": "2026-10-14",
+   "dauer_sekunden": 1364,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "43XVqjxECVU.jpg"
+  },
   {
    "id": "z_sXLlLVUls",
    "titel": "OpenAI’s New AI Is Doing Things We Barely Understand",
@@ -112,6 +232,16 @@
    "bild": "HdI_aYzgJIg.jpg"
   },
   {
+   "id": "G-9Y2xNiDKQ",
+   "titel": "Work with your team in ChatGPT Space",
+   "kanal": "OpenAI",
+   "datum": "2026-10-13",
+   "dauer_sekunden": 204,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "G-9Y2xNiDKQ.jpg"
+  },
+  {
    "id": "9jQA7IgPhBE",
    "titel": "Untangling 500-page chemistry patents with Gemini 4",
    "kanal": "Google DeepMind",
@@ -170,223 +300,93 @@
    "stufe": "Einstieg",
    "sprache": "de",
    "bild": "k5IUKr4TQFo.jpg"
-  },
-  {
-   "id": "hTAWHgQI4xg",
-   "titel": "5 Concepts to Know for Coding with AI Agents",
-   "kanal": "IBM Technology",
-   "datum": "2026-10-12",
-   "dauer_sekunden": 603,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "hTAWHgQI4xg.jpg"
-  },
-  {
-   "id": "g_cUMfhZ0k8",
-   "titel": "KI-Update kompakt: SI statt AI, Wer zahlt?, Apples Privacy, SynthID, Closed Source-Ende",
-   "kanal": "KI Update (heise)",
-   "datum": "2026-10-12",
-   "dauer_sekunden": 1464,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "g_cUMfhZ0k8.jpg"
-  },
-  {
-   "id": "afXHGzGNAtM",
-   "titel": "Fight AI with AI | Multi-Agent Security Defense",
-   "kanal": "Microsoft Mechanics",
-   "datum": "2026-10-12",
-   "dauer_sekunden": 743,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "afXHGzGNAtM.jpg"
-  },
-  {
-   "id": "IZXv6a78NDw",
-   "titel": "Code review is no longer the bottleneck",
-   "kanal": "OpenAI",
-   "datum": "2026-10-12",
-   "dauer_sekunden": 142,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "IZXv6a78NDw.jpg"
-  },
-  {
-   "id": "C4Sq3Rot8FU",
-   "titel": "AI Labs Warn Race Makes Breach ‘Inevitable’",
-   "kanal": "AI Explained",
-   "datum": "2026-10-12",
-   "dauer_sekunden": 1861,
-   "stufe": "Fortgeschritten",
-   "sprache": "en",
-   "bild": "C4Sq3Rot8FU.jpg"
-  },
-  {
-   "id": "zRMAvMSSSII",
-   "titel": "Human in the Loop Is Not a Governance Strategy for Agentic AI",
-   "kanal": "IBM Technology",
-   "datum": "2026-10-11",
-   "dauer_sekunden": 243,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "zRMAvMSSSII.jpg"
-  },
-  {
-   "id": "ZHOmBeMNbnc",
-   "titel": "Stop coding, build Software Factories instead",
-   "kanal": "David Ondrej",
-   "datum": "2026-10-11",
-   "dauer_sekunden": 3657,
-   "stufe": "Fortgeschritten",
-   "sprache": "en",
-   "bild": "ZHOmBeMNbnc.jpg"
-  },
-  {
-   "id": "83LZqTqz7QA",
-   "titel": "Europas KI-Hoffnung hat bei meinem Test abgeschrieben",
-   "kanal": "The Morpheus Tutorials",
-   "datum": "2026-10-11",
-   "dauer_sekunden": 4588,
-   "stufe": "Fortgeschritten",
-   "sprache": "de",
-   "bild": "83LZqTqz7QA.jpg"
-  },
-  {
-   "id": "4fLVq6HJsKc",
-   "titel": "DeepSeek Solved AI’s Memory Problem",
-   "kanal": "Two Minute Papers",
-   "datum": "2026-10-11",
-   "dauer_sekunden": 338,
-   "stufe": "Fortgeschritten",
-   "sprache": "en",
-   "bild": "4fLVq6HJsKc.jpg"
-  },
-  {
-   "id": "0tbDxmVy1m8",
-   "titel": "Der erste Roboter “Death Fight” der Welt! + ChatGPT Wasserzeichen & Claude Haiku 5.5 | KI-NEWS",
-   "kanal": "Everlast AI",
-   "datum": "2026-10-11",
-   "dauer_sekunden": 1626,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "0tbDxmVy1m8.jpg"
-  },
-  {
-   "id": "Ju-JyxDgV7g",
-   "titel": "How Oracle Uses Codex to Help Business Users Get Answers",
-   "kanal": "OpenAI",
-   "datum": "2026-10-10",
-   "dauer_sekunden": 70,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "Ju-JyxDgV7g.jpg"
-  },
-  {
-   "id": "wE-EwF50hyA",
-   "titel": "Besser als Siri und lokal",
-   "kanal": "c't 3003",
-   "datum": "2026-10-09",
-   "dauer_sekunden": 1273,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "wE-EwF50hyA.jpg"
-  },
-  {
-   "id": "pHeL9Qeb0kk",
-   "titel": "How to Categorize Transactions in QuickBooks Online (2026)",
-   "kanal": "Kevin Stratvert",
-   "datum": "2026-10-09",
-   "dauer_sekunden": 776,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "pHeL9Qeb0kk.jpg"
   }
  ],
  "kanaele": {
   "c't 3003": {
    "error": null,
-   "versucht": "2026-10-13",
-   "abgerufen": "2026-10-13"
+   "versucht": "2026-10-14",
+   "abgerufen": "2026-10-14"
   },
   "KI Update (heise)": {
    "error": null,
-   "versucht": "2026-10-13",
-   "abgerufen": "2026-10-13"
+   "versucht": "2026-10-14",
+   "abgerufen": "2026-10-14"
   },
   "Everlast AI": {
    "error": null,
-   "versucht": "2026-10-13",
-   "abgerufen": "2026-10-13"
+   "versucht": "2026-10-14",
+   "abgerufen": "2026-10-14"
   },
   "The Morpheus Tutorials": {
    "error": null,
-   "versucht": "2026-10-13",
-   "abgerufen": "2026-10-13"
+   "versucht": "2026-10-14",
+   "abgerufen": "2026-10-14"
   },
   "Kevin Stratvert": {
    "error": null,
-   "versucht": "2026-10-13",
-   "abgerufen": "2026-10-13"
+   "versucht": "2026-10-14",
+   "abgerufen": "2026-10-14"
   },
   "Microsoft Mechanics": {
    "error": null,
-   "versucht": "2026-10-13",
-   "abgerufen": "2026-10-13"
+   "versucht": "2026-10-14",
+   "abgerufen": "2026-10-14"
   },
   "Leila Gharani": {
    "error": null,
-   "versucht": "2026-10-13",
-   "abgerufen": "2026-10-13"
+   "versucht": "2026-10-14",
+   "abgerufen": "2026-10-14"
   },
   "Jeff Su": {
    "error": null,
-   "versucht": "2026-10-13",
-   "abgerufen": "2026-10-13"
+   "versucht": "2026-10-14",
+   "abgerufen": "2026-10-14"
   },
   "Matt Wolfe": {
    "error": null,
-   "versucht": "2026-10-13",
-   "abgerufen": "2026-10-13"
+   "versucht": "2026-10-14",
+   "abgerufen": "2026-10-14"
   },
   "IBM Technology": {
    "error": null,
-   "versucht": "2026-10-13",
-   "abgerufen": "2026-10-13"
+   "versucht": "2026-10-14",
+   "abgerufen": "2026-10-14"
   },
   "OpenAI": {
    "error": null,
-   "versucht": "2026-10-13",
-   "abgerufen": "2026-10-13"
+   "versucht": "2026-10-14",
+   "abgerufen": "2026-10-14"
   },
   "Anthropic": {
    "error": null,
-   "versucht": "2026-10-13",
-   "abgerufen": "2026-10-13"
+   "versucht": "2026-10-14",
+   "abgerufen": "2026-10-14"
   },
   "Google DeepMind": {
    "error": null,
-   "versucht": "2026-10-13",
-   "abgerufen": "2026-10-13"
+   "versucht": "2026-10-14",
+   "abgerufen": "2026-10-14"
   },
   "AI Explained": {
    "error": null,
-   "versucht": "2026-10-13",
-   "abgerufen": "2026-10-13"
+   "versucht": "2026-10-14",
+   "abgerufen": "2026-10-14"
   },
   "Two Minute Papers": {
    "error": null,
-   "versucht": "2026-10-13",
-   "abgerufen": "2026-10-13"
+   "versucht": "2026-10-14",
+   "abgerufen": "2026-10-14"
   },
   "3Blue1Brown": {
    "error": null,
-   "versucht": "2026-10-13",
-   "abgerufen": "2026-10-13"
+   "versucht": "2026-10-14",
+   "abgerufen": "2026-10-14"
   },
   "David Ondrej": {
    "error": null,
-   "versucht": "2026-10-13",
-   "abgerufen": "2026-10-13"
+   "versucht": "2026-10-14",
+   "abgerufen": "2026-10-14"
   }
  },
  "error": null
