@@ -45,7 +45,7 @@
        das Startfoto zeigt nur eine Lage und waere fast immer die falsche
        (Antonio, 14.10.2026). Es kommt nur, wenn die Szene nicht kann. */
     var szeneKommt = !!buehne.querySelector('.buehne-himmel') && !navigator.webdriver;
-    if (szeneKommt) buehne.classList.add('campus-wartet', 'film-dunkel');
+    if (!szeneKommt) buehne.classList.remove('campus-wartet');
     var zeigeStartbild = function (src) {
       if (!bild) return;
       bild.classList.add('aktiv');
@@ -399,7 +399,7 @@ void main(){
     };
     /* Das Wetter bekommt hoechstens WETTER_FRIST ms; danach zeichnet die
        Szene die Lage ohne Wetter, statt den Leser warten zu lassen. */
-    var WETTER_FRIST = 1500;
+    var WETTER_FRIST = 3000;
     var spaeter = window.fetch ? Promise.race([
       fetch(CAMPUS).then(function (a) {
         if (!a.ok) throw new Error('Wetter ' + a.status);
