@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-14",
+ "updated": "2026-10-15",
  "topics": [
   {
    "slug": "apples-iphone-event-am-9-september",
@@ -511,6 +511,80 @@
     }
    ],
    "ended": "2026-10-12"
+  },
+  {
+   "slug": "globaler-einbruch-der-smartphone-lieferungen",
+   "title": "Globaler Einbruch der Smartphone-Lieferungen",
+   "description": "Weltweit brechen die Verkaufszahlen von Smartphones stark ein, da steigende Preise für Speicherchips die Geräte verteuern und Käufer abschrecken.",
+   "keywords": [
+    "Omdia",
+    "Counterpoint Research",
+    "Smartphone-Lieferungen",
+    "Speicherkrise",
+    "Speicherknappheit"
+   ],
+   "first_seen": "2026-10-15",
+   "last_active": "2026-10-15",
+   "runs_ohne_zuwachs": 0,
+   "status": "aktiv",
+   "items": [
+    {
+     "url": "https://www.lightreading.com/smartphones-devices/memory-crisis-fueling-smartphone-shipment-shrinkage-omdia",
+     "title": "Memory crisis fueling smartphone shipment shrinkage – Omdia",
+     "headline": "Speicherkrise lässt globale Smartphone-Lieferungen um 20 Prozent einbrechen",
+     "summary": "Omdia schätzt, dass die weltweiten Smartphone-Lieferungen im dritten Quartal 2026 infolge von Kostendruck durch eine anhaltende Speicherkrise um 20% gefallen sind.",
+     "operator": "Omdia",
+     "source": "Light Reading",
+     "date": "2026-10-15",
+     "week": "2026-10-15",
+     "relevance": 4,
+     "image": "17c6d0e04416a6ba-1280.jpg",
+     "image_w": 1200,
+     "image_h": 630
+    },
+    {
+     "url": "https://www.mobiletime.com.br/noticias/28/08/2026/mercado-de-smartphones-na-america-latina-cai-10-em-2026/",
+     "title": "Mercado de smartphones na América Latina cai 10% em 2026",
+     "headline": "Lateinamerika: Smartphone-Markt fällt 2026 um zehn Prozent",
+     "summary": "Laut Counterpoint Research sanken die Smartphone-Lieferungen in Lateinamerika im zweiten Quartal 2026 im Jahresvergleich um 10 Prozent – der stärkste Rückgang seit dem dritten Quartal 2023. Speicherknappheit, hohe Lagerbestände und Kaufzurückhaltung in Kolumbien, Mexiko und Brasilien trafen vor allem Einsteiger- und Mittelklassegeräte; Samsung wuchs um 6 Prozent auf 38 Prozent Marktanteil, Apple um 5 Prozent bei den Lieferungen.",
+     "operator": "Samsung / Apple / Counterpoint Research",
+     "source": "Mobile Time (Brasilien)",
+     "date": "2026-08-28",
+     "week": "2026-10-07",
+     "relevance": 3,
+     "image": "f2c75349ac5aca82-1280.jpg",
+     "image_w": 567,
+     "image_h": 319
+    },
+    {
+     "url": "https://www.lightreading.com/smartphones-devices/mainland-china-smartphone-shipments-drop-to-lowest-q3-level-since-2013-omdia",
+     "title": "Mainland China smartphone shipments drop to lowest Q3 level since 2013 – Omdia",
+     "headline": "Chinesische Smartphone-Auslieferungen sinken im dritten Quartal stark",
+     "summary": "Laut Omdia-Daten sind die Smartphone-Lieferungen in Festlandchina im dritten Quartal 2026 im Jahresvergleich um 12 Prozent auf 59,3 Millionen Einheiten zurückgegangen, dem niedrigsten Wert für ein drittes Quartal seit 2013.",
+     "operator": "Omdia",
+     "source": "Light Reading",
+     "date": "2026-10-14",
+     "week": "2026-10-15",
+     "relevance": 2,
+     "image": "17c6d0e04416a6ba-800.jpg",
+     "image_w": 800,
+     "image_h": 420
+    },
+    {
+     "url": "https://developingtelecoms.com/telecom-technology/telecom-devices-platforms/20954-global-smartphone-shipments-fall-20-as-memory-costs-push-up-prices.html",
+     "title": "Global smartphone shipments fall 20% as memory costs push up prices",
+     "headline": "Weltweite Smartphone-Lieferungen sinken um 20 Prozent",
+     "summary": "Im dritten Quartal 2026 sind die globalen Smartphone-Lieferungen im Jahresvergleich um 20 Prozent gefallen, da steigende Kosten für Speicherchips zu höheren Gerätepreisen und einer schwächeren Verbrauchernachfrage führten.",
+     "operator": "",
+     "source": "Developing Telecoms",
+     "date": "2026-10-12",
+     "week": "2026-10-12",
+     "relevance": 2,
+     "image": "68a538c8121060a1-1280.jpg",
+     "image_w": 1200,
+     "image_h": 900
+    }
+   ]
   }
  ]
 }

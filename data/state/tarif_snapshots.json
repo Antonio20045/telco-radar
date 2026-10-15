@@ -59,7 +59,7 @@
    "|59.99€",
    "|5gb"
   ],
-  "stand": "2026-10-14"
+  "stand": "2026-10-15"
  },
  "https://www.o2online.de/mobilfunk/prepaid/": {
   "werte": [
@@ -88,7 +88,7 @@
    "|80gb",
    "|999gb"
   ],
-  "stand": "2026-10-14"
+  "stand": "2026-10-15"
  },
  "https://www.blau.de/tarife/": {
   "werte": [
@@ -119,7 +119,7 @@
    "|8.99€",
    "|9.99€"
   ],
-  "stand": "2026-10-14"
+  "stand": "2026-10-15"
  },
  "https://www.1und1.de/handytarife": {
   "werte": [
@@ -150,7 +150,7 @@
    "|50gb",
    "|9.99€"
   ],
-  "stand": "2026-10-14"
+  "stand": "2026-10-15"
  },
  "https://www.winsim.de/5g-tarife": {
   "werte": [
@@ -159,7 +159,6 @@
    "|10gb",
    "|11.99€",
    "|12.99€",
-   "|14.99€",
    "|15gb",
    "|19.99€",
    "|192€",
@@ -177,11 +176,12 @@
    "|8.99€",
    "|9.99€"
   ],
-  "stand": "2026-10-14"
+  "stand": "2026-10-15"
  },
  "https://www.premiumsim.de/": {
   "werte": [
    "ab|19.99€",
+   "ab|66.99€",
    "dsl ab|19.99€",
    "|0€",
    "|10.99€",
@@ -203,7 +203,7 @@
    "|9.99€",
    "|96€"
   ],
-  "stand": "2026-10-14"
+  "stand": "2026-10-15"
  },
  "https://www.mobilcom-debitel.de/handytarife/": {
   "werte": [
@@ -239,7 +239,7 @@
    "|59.99€",
    "|99€"
   ],
-  "stand": "2026-10-14"
+  "stand": "2026-10-15"
  },
  "https://www.klarmobil.de/handytarife": {
   "werte": [
@@ -260,7 +260,7 @@
    "|60%",
    "|99€"
   ],
-  "stand": "2026-10-14"
+  "stand": "2026-10-15"
  },
  "https://www.pennymobil.de/tarife": {
   "werte": [
@@ -277,21 +277,20 @@
    "|899€",
    "|9999€"
   ],
-  "stand": "2026-10-14"
+  "stand": "2026-10-15"
  },
  "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html": {
   "werte": [
-   "als monatliche gutschrift von|8.34€",
+   "als monatliche gutschrift von|5€",
    "als option dazubuchen für|3.99€",
-   "auf deinen tarifpreis.|24monate",
    "auf deinen vodafone mobil-tarif.|24monate",
    "außerhalb der eu. mit|2gb",
    "bei uns nur einmal|1€",
    "beim tarifpreis.|24monate",
    "bekommst du monate lang|10%",
-   "bestellst zahlst du einmal|1€",
+   "bis xl gibt s|30%",
    "bis zu|12monate",
-   "bis zu|400€",
+   "bis zu|30%",
    "buchst bekommst du zusätzlich|50%",
    "da ist hast du|15tage",
    "das geht bis zu|6monate",
@@ -303,38 +302,23 @@
    "den einmalpreis und oder|36monat",
    "den tarifpreis du zahlst|24.99€",
    "der einmalige anschlusspreis von|39.99€",
-   "der mobilfunk-vertrag besteht tarifpreis|10.50€",
-   "der mobilfunk-vertrag besteht tarifpreis|21€",
-   "der mobilfunk-vertrag besteht tarifpreis|30.50€",
    "der rabatt endet nach|24monate",
    "der rabatt entfällt nach|24monate",
    "die komplette mindestlaufzeit von|24monate",
    "download und bis zu|100mb",
    "du ein smartphone dazubuchst.|24monate",
    "du im eu-ausland mit|85gb",
-   "du im monat statt|64.45€",
-   "du im monat statt|77.95€",
-   "du im monat statt|86.95€",
-   "du sparst pro monat.|24monate",
-   "du sparst|25%",
    "du sparst|39.99€",
+   "du weitere pro monat.|24monate",
    "eine laufzeit von oder|36monate",
    "eine ratenzahlung über oder|36monate",
    "einer monatlichen geräte-zuzahlung von|10€",
-   "einmalpreis um bis zu|110€",
-   "einmalpreis um bis zu|200€",
-   "einmalpreis um bis zu|238.90€",
    "entfallen mit laufzeitende nach|24monate",
    "euro tarifpreis und mindestens|10€",
    "familycard s und m|20%",
    "freischalten jeweils mb für|3€",
-   "galaxy a57 g mit|256gb",
-   "galaxy galaxy z flip8|256gb",
-   "galaxy z flip8 mit|256gb",
-   "gb im mobil s|5gb",
-   "gb im mobil xs|5gb",
    "gerät muss innerhalb von|15tage",
-   "geschenkt in ausgewählten tarifen|10gb",
+   "gibt s rabatt jeweils|24monate",
    "gigamobil s handyvertrag für|12monate",
    "gigamobil s mit nur|12monate",
    "gigamobil young l|280gb",
@@ -344,25 +328,22 @@
    "google ai pro|6monate",
    "google one mit|200gb",
    "haben. das angebot umfasst|6monate",
-   "hardware-bonus|200€",
+   "hardware-bonus|120€",
    "im gigamobil l mit|280gb",
    "im gigamobil l mit|77gb",
    "im gigamobil m mit|52gb",
    "im gigamobil xl mit|104gb",
    "im mobil m mit|120gb",
-   "im mobil s und|40gb",
    "im red l mit|72gb",
    "im red m mit|52gb",
    "im tarif familycard xl|15€",
    "im wert von insgesamt|131.94€",
    "innerhalb von|14tage",
    "kostenpflichtig. du zahlst dafür|5.99€",
-   "lang. das sind insgesamt|200€",
-   "m gb zusätzlich insgesamt|100gb",
+   "l und xl sogar|24monate",
+   "l und xl sogar|30%",
+   "lang. das sind insgesamt|120€",
    "m gb zusätzlich insgesamt|200gb",
-   "m zahlst du z.b.|1€",
-   "m zahlst du z.b.|59.90€",
-   "m zahlst du z.b.|79.90€",
    "mit dem angebot bekommst|2monate",
    "mit dem tauschbonus von|240€",
    "mit einem datenvolumen von|107gb",
@@ -370,41 +351,34 @@
    "mit einem mindestwert von|1€",
    "mit einer frist von|1monat",
    "mobil l und mit|135gb",
-   "mobil m|40gb",
    "mobil s mit|25gb",
-   "mobil s|5gb",
-   "mobil xs bis xl|25%",
-   "mobil xs gibt s|10gb",
-   "mobil xs|10gb",
+   "mobil xs und s|25%",
    "monat auf den tarifpreis|24monate",
    "monat. dein tarif hat|24monate",
    "monate lang jeden monat|10€",
+   "monate lang jeden monat|2.50€",
    "monate lang jeden monat|20€",
    "monate lang jeden monat|5€",
    "monatliche abogebühr von derzeit|21.99€",
    "nach ablauf der kostenlosen|2monate",
    "nach ablauf der kostenlosen|3monate",
-   "neu abschließt bekommst du|200€",
+   "neu abschließt bekommst du|120€",
+   "neu abschließt bekommst du|24monate",
    "one mit gb-abo für|6monate",
    "rabatt entfällt automatisch nach|24monate",
    "rabatte entfallen automatisch nach|24monate",
-   "recommerce. dann bekommst du|12monate",
    "reisen dafür bekommst du|2gb",
    "s gb zusätzlich insgesamt|100gb",
    "s gb zusätzlich insgesamt|110gb",
-   "s gb zusätzlich insgesamt|35gb",
-   "s gb zusätzlich insgesamt|40gb",
    "s oder m mit|24monate",
-   "samsung galaxy a57 g|256gb",
-   "samsung galaxy s26 mit|256gb",
-   "samsung galaxy s26|256gb",
    "selbständig dann bekommst du|24monate",
    "sich dein tarifpreis um|2€",
    "sich der tarifpreis um|15€",
-   "smartphone dazubuchen und|200€",
+   "smartphone dazubuchen und|120€",
    "smartphone-akkus ist weniger als|80%",
-   "solange der mobilfunk-vertrag besteht|50.95€",
-   "sparst du|200€",
+   "sogar rabatt jeden monat.|24monate",
+   "sparst du jeden monat|25%",
+   "sparst du|120€",
    "sparst weitere|25%",
    "spotify premium für|3monate",
    "standardpreis|39.99€",
@@ -414,11 +388,11 @@
    "statt|60gb",
    "surfst langsamer sobald du|100%",
    "tarif gigamobil young xs|25%",
+   "tarif mobil xs mit|24monate",
    "tarifpreis du zahlst statt|39.99€",
    "tauschbonus von sind das|300€",
    "tauschbonus von sind das|400€",
-   "und einer ratenzahlungsvereinbarung von|36monate",
-   "und im mobil m|40gb",
+   "und s sparst du|25%",
    "und zwar nachdem du|4monate",
    "uns zahlst du einmalig|39.99€",
    "unser mobilfunknetz funkt zu|100%",
@@ -427,20 +401,14 @@
    "von uns bis zu|12monate",
    "wenn du|80%",
    "werden. nach ablauf der|6monate",
+   "xl gibt s sogar|30%",
    "xs bis m mit|24monate",
    "xs gb zusätzlich insgesamt|20gb",
-   "xs gb zusätzlich insgesamt|25gb",
    "xs gb zusätzlich insgesamt|26gb",
-   "xs gb zusätzlich insgesamt|28gb",
+   "xs sparst du weitere|2.50€",
    "x|15€",
    "youtube premium für|2monate",
    "z flip8 bis zu|400€",
-   "zahlst du im monat|61.45€",
-   "zahlst du im monat|71.95€",
-   "zahlst du im monat|81.45€",
-   "zahlst du z.b. statt|169.90€",
-   "zahlst du z.b. statt|239.90€",
-   "zahlst du z.b. statt|279.90€",
    "zusätzliches datenvolumen freischalten jeweils|250mb",
    "zusätzlich|70gb",
    "|0€",
@@ -451,9 +419,7 @@
    "|10gb",
    "|10€",
    "|12.49€",
-   "|12.66€",
    "|120gb",
-   "|120€",
    "|12monate",
    "|12€",
    "|135gb",
@@ -476,6 +442,7 @@
    "|24monate",
    "|25%",
    "|25gb",
+   "|30%",
    "|300mb",
    "|30gb",
    "|35gb",
@@ -488,11 +455,10 @@
    "|5€",
    "|60gb",
    "|60€",
-   "|8.34€",
    "|9.98€",
    "|999.99€"
   ],
-  "stand": "2026-10-14"
+  "stand": "2026-10-15"
  },
  "https://www.otelo.de/allnet-flat": {
   "werte": [
@@ -511,6 +477,6 @@
    "|30€",
    "|5€"
   ],
-  "stand": "2026-10-14"
+  "stand": "2026-10-15"
  }
 }

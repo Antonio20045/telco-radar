@@ -1,6 +1,76 @@
 {
- "stand": "2026-10-14",
+ "stand": "2026-10-15",
  "videos": [
+  {
+   "id": "eUr9ZgrYhts",
+   "titel": "Ex-Generalkonsul packt aus: „Wir haben ALLES verschlafen!“ Die Wahrheit über China (Wolfgang Röhr)",
+   "kanal": "Everlast AI",
+   "datum": "2026-10-15",
+   "dauer_sekunden": 4698,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "eUr9ZgrYhts.jpg"
+  },
+  {
+   "id": "BwXremQ-i6I",
+   "titel": "Context Engineering for AI Agents: 4 Failure Modes to Avoid",
+   "kanal": "IBM Technology",
+   "datum": "2026-10-15",
+   "dauer_sekunden": 621,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "BwXremQ-i6I.jpg"
+  },
+  {
+   "id": "BOTAeAU5ExQ",
+   "titel": "Weeks to Hours: SentinelOne on Cybersecurity Research with OpenAI",
+   "kanal": "OpenAI",
+   "datum": "2026-10-15",
+   "dauer_sekunden": 53,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "BOTAeAU5ExQ.jpg"
+  },
+  {
+   "id": "9RaCke7Wl3c",
+   "titel": "Nehmt uns nicht die Mathematik! | c't 4004 #43",
+   "kanal": "c't 3003",
+   "datum": "2026-10-15",
+   "dauer_sekunden": 6596,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "9RaCke7Wl3c.jpg"
+  },
+  {
+   "id": "8nds44yMR0g",
+   "titel": "UiPath Maestro Flow: A No-Code AI Orchestration Tool",
+   "kanal": "Kevin Stratvert",
+   "datum": "2026-10-15",
+   "dauer_sekunden": 1128,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "8nds44yMR0g.jpg"
+  },
+  {
+   "id": "3IVo-MNwk2I",
+   "titel": "Weeks to Hours: SentinelOne on Cybersecurity Research with OpenAI",
+   "kanal": "OpenAI",
+   "datum": "2026-10-15",
+   "dauer_sekunden": 27,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "3IVo-MNwk2I.jpg"
+  },
+  {
+   "id": "0S0f8kekMsI",
+   "titel": "What Is MAI Cyber Flash?",
+   "kanal": "Microsoft Mechanics",
+   "datum": "2026-10-15",
+   "dauer_sekunden": 47,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "0S0f8kekMsI.jpg"
+  },
   {
    "id": "zKvaoG5Jlh0",
    "titel": "Is AI Replacing Entry-Level Jobs?",
@@ -43,7 +113,7 @@
   },
   {
    "id": "XEl4ZQKKxig",
-   "titel": "This Robot Is Unlike Any Other On The Market",
+   "titel": "The Cheapest Robot On The Market?!",
    "kanal": "Matt Wolfe",
    "datum": "2026-10-14",
    "dauer_sekunden": 73,
@@ -80,6 +150,16 @@
    "stufe": "Einstieg",
    "sprache": "en",
    "bild": "Veot9JRCONg.jpg"
+  },
+  {
+   "id": "PZxbaIp8PzE",
+   "titel": "Cooking up a catering business with ChatGPT",
+   "kanal": "OpenAI",
+   "datum": "2026-10-14",
+   "dauer_sekunden": 108,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "PZxbaIp8PzE.jpg"
   },
   {
    "id": "FbKXvab-0yQ",
@@ -120,6 +200,16 @@
    "stufe": "Einstieg",
    "sprache": "de",
    "bild": "43XVqjxECVU.jpg"
+  },
+  {
+   "id": "-RRw9UNOuBQ",
+   "titel": "Automated SQL Injection Remediation With AI Agents",
+   "kanal": "Microsoft Mechanics",
+   "datum": "2026-10-14",
+   "dauer_sekunden": 40,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "-RRw9UNOuBQ.jpg"
   },
   {
    "id": "z_sXLlLVUls",
@@ -210,183 +300,93 @@
    "stufe": "Einstieg",
    "sprache": "en",
    "bild": "N6K_pxaAh0w.jpg"
-  },
-  {
-   "id": "LVEfFyijQ2c",
-   "titel": "Applying Gemini 4 for large-scale codebase maintenance in Chromium",
-   "kanal": "Google DeepMind",
-   "datum": "2026-10-13",
-   "dauer_sekunden": 155,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "LVEfFyijQ2c.jpg"
-  },
-  {
-   "id": "HdI_aYzgJIg",
-   "titel": "Personal Agents, Clearly Explained",
-   "kanal": "Jeff Su",
-   "datum": "2026-10-13",
-   "dauer_sekunden": 921,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "HdI_aYzgJIg.jpg"
-  },
-  {
-   "id": "G-9Y2xNiDKQ",
-   "titel": "Work with your team in ChatGPT Space",
-   "kanal": "OpenAI",
-   "datum": "2026-10-13",
-   "dauer_sekunden": 204,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "G-9Y2xNiDKQ.jpg"
-  },
-  {
-   "id": "9jQA7IgPhBE",
-   "titel": "Untangling 500-page chemistry patents with Gemini 4",
-   "kanal": "Google DeepMind",
-   "datum": "2026-10-13",
-   "dauer_sekunden": 150,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "9jQA7IgPhBE.jpg"
-  },
-  {
-   "id": "9aDuSpVoB-Y",
-   "titel": "Block on Finding and Fixing Security Risks with OpenAI",
-   "kanal": "OpenAI",
-   "datum": "2026-10-13",
-   "dauer_sekunden": 24,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "9aDuSpVoB-Y.jpg"
-  },
-  {
-   "id": "9PICEmtfpWU",
-   "titel": "Teaching a humanoid robot to play cornhole with Gemini 4 Argon",
-   "kanal": "Google DeepMind",
-   "datum": "2026-10-13",
-   "dauer_sekunden": 104,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "9PICEmtfpWU.jpg"
-  },
-  {
-   "id": "2xJbP3eJqiY",
-   "titel": "How AI-Powered Cyberattacks Adapt Mid-Breach",
-   "kanal": "Microsoft Mechanics",
-   "datum": "2026-10-13",
-   "dauer_sekunden": 37,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "2xJbP3eJqiY.jpg"
-  },
-  {
-   "id": "xBSLmwVTsRc",
-   "titel": "How to Use Meta Muse",
-   "kanal": "Kevin Stratvert",
-   "datum": "2026-10-12",
-   "dauer_sekunden": 479,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "xBSLmwVTsRc.jpg"
-  },
-  {
-   "id": "k5IUKr4TQFo",
-   "titel": "KI-Update kompakt: SI statt AI, Wer zahlt?, Apples Privacy, SynthID, Closed Source-Ende",
-   "kanal": "KI Update (heise)",
-   "datum": "2026-10-12",
-   "dauer_sekunden": 1407,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "k5IUKr4TQFo.jpg"
   }
  ],
  "kanaele": {
   "c't 3003": {
    "error": null,
-   "versucht": "2026-10-14",
-   "abgerufen": "2026-10-14"
+   "versucht": "2026-10-15",
+   "abgerufen": "2026-10-15"
   },
   "KI Update (heise)": {
    "error": null,
-   "versucht": "2026-10-14",
-   "abgerufen": "2026-10-14"
+   "versucht": "2026-10-15",
+   "abgerufen": "2026-10-15"
   },
   "Everlast AI": {
    "error": null,
-   "versucht": "2026-10-14",
-   "abgerufen": "2026-10-14"
+   "versucht": "2026-10-15",
+   "abgerufen": "2026-10-15"
   },
   "The Morpheus Tutorials": {
    "error": null,
-   "versucht": "2026-10-14",
-   "abgerufen": "2026-10-14"
+   "versucht": "2026-10-15",
+   "abgerufen": "2026-10-15"
   },
   "Kevin Stratvert": {
    "error": null,
-   "versucht": "2026-10-14",
-   "abgerufen": "2026-10-14"
+   "versucht": "2026-10-15",
+   "abgerufen": "2026-10-15"
   },
   "Microsoft Mechanics": {
    "error": null,
-   "versucht": "2026-10-14",
-   "abgerufen": "2026-10-14"
+   "versucht": "2026-10-15",
+   "abgerufen": "2026-10-15"
   },
   "Leila Gharani": {
    "error": null,
-   "versucht": "2026-10-14",
-   "abgerufen": "2026-10-14"
+   "versucht": "2026-10-15",
+   "abgerufen": "2026-10-15"
   },
   "Jeff Su": {
    "error": null,
-   "versucht": "2026-10-14",
-   "abgerufen": "2026-10-14"
+   "versucht": "2026-10-15",
+   "abgerufen": "2026-10-15"
   },
   "Matt Wolfe": {
    "error": null,
-   "versucht": "2026-10-14",
-   "abgerufen": "2026-10-14"
+   "versucht": "2026-10-15",
+   "abgerufen": "2026-10-15"
   },
   "IBM Technology": {
    "error": null,
-   "versucht": "2026-10-14",
-   "abgerufen": "2026-10-14"
+   "versucht": "2026-10-15",
+   "abgerufen": "2026-10-15"
   },
   "OpenAI": {
    "error": null,
-   "versucht": "2026-10-14",
-   "abgerufen": "2026-10-14"
+   "versucht": "2026-10-15",
+   "abgerufen": "2026-10-15"
   },
   "Anthropic": {
    "error": null,
-   "versucht": "2026-10-14",
-   "abgerufen": "2026-10-14"
+   "versucht": "2026-10-15",
+   "abgerufen": "2026-10-15"
   },
   "Google DeepMind": {
    "error": null,
-   "versucht": "2026-10-14",
-   "abgerufen": "2026-10-14"
+   "versucht": "2026-10-15",
+   "abgerufen": "2026-10-15"
   },
   "AI Explained": {
    "error": null,
-   "versucht": "2026-10-14",
-   "abgerufen": "2026-10-14"
+   "versucht": "2026-10-15",
+   "abgerufen": "2026-10-15"
   },
   "Two Minute Papers": {
    "error": null,
-   "versucht": "2026-10-14",
-   "abgerufen": "2026-10-14"
+   "versucht": "2026-10-15",
+   "abgerufen": "2026-10-15"
   },
   "3Blue1Brown": {
    "error": null,
-   "versucht": "2026-10-14",
-   "abgerufen": "2026-10-14"
+   "versucht": "2026-10-15",
+   "abgerufen": "2026-10-15"
   },
   "David Ondrej": {
    "error": null,
-   "versucht": "2026-10-14",
-   "abgerufen": "2026-10-14"
+   "versucht": "2026-10-15",
+   "abgerufen": "2026-10-15"
   }
  },
  "error": null

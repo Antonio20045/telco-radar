@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-14",
+ "updated": "2026-10-15",
  "entries": [
   {
    "id": "https://thefastmode.com/technology-solutions/49163-o2-expands-cloud-storage-service-with-10-tb-free-space-for-mobile-fiber-customers",
@@ -110,7 +110,7 @@
    "date": null,
    "why": "Vodafone könnte ein vergleichbares Entertainment-Paket mit starken Partnern wie Disney schnüren, das nicht kostenlos, aber deutlich vergünstigt ist und so einen Mehrwert jenseits des reinen Preises schafft.",
    "first_seen": "2026-07-21",
-   "last_verified": "2026-10-14",
+   "last_verified": "2026-10-15",
    "status": "aktiv"
   },
   {
@@ -152,7 +152,7 @@
    "date": null,
    "why": "Vodafone könnte ein ähnliches 'Perk'-Modell für Familien- oder Mehrfachverträge einführen, bei dem Kunden sich ihren Wunsch-Streaming-Dienst flexibel aussuchen können, was die Attraktivität für Haushalte steigert.",
    "first_seen": "2026-07-21",
-   "last_verified": "2026-10-14",
+   "last_verified": "2026-10-15",
    "status": "aktiv"
   },
   {
@@ -166,7 +166,7 @@
    "date": null,
    "why": "Der Move ist interessant, weil er mit steigender Leitungszahl zusätzliche Gratis-Dienste freischaltet und so Multi-Line-Haushalte gezielt anspricht.",
    "first_seen": "2026-07-25",
-   "last_verified": "2026-10-13",
+   "last_verified": "2026-10-15",
    "status": "aktiv"
   },
   {
@@ -180,7 +180,7 @@
    "date": null,
    "why": "Der Move zeigt, wie ein Mobilfunkanbieter durch die gleichzeitige Bündelung mehrerer Streaming- und Audio-Dienste den Unterhaltungswert seiner Tarife erhöht.",
    "first_seen": "2026-08-14",
-   "last_verified": "2026-10-14",
+   "last_verified": "2026-10-15",
    "status": "aktiv"
   },
   {
@@ -208,7 +208,21 @@
    "date": null,
    "why": "Dieses zeitlich begrenzte Zugangsmodell für mehrere Premium-Streamingdienste dient als starker Anreiz zur Kundengewinnung im Festnetz- und TV-Segment.",
    "first_seen": "2026-10-12",
-   "last_verified": "2026-10-12",
+   "last_verified": "2026-10-15",
+   "status": "aktiv"
+  },
+  {
+   "id": "https://t-mobile.com/tv-streaming/netflix-on-us",
+   "theme": "entertainment",
+   "operator": "T-Mobile",
+   "region": "Nordamerika",
+   "what": "Der Anbieter integriert im Rahmen des Programms „Netflix on Us“ ein Netflix-Abonnement ohne Zusatzkosten in ausgewählte Mobilfunktarife.",
+   "url": "https://www.t-mobile.com/tv-streaming/netflix-on-us",
+   "source": "t-mobile.com",
+   "date": null,
+   "why": "Dauerhaft inkludierte Premium-Streamingdienste dienen als starker Kundengewinnungs- und Bindungsfaktor im hart umkämpften Mobilfunkmarkt.",
+   "first_seen": "2026-10-15",
+   "last_verified": "2026-10-15",
    "status": "aktiv"
   },
   {
@@ -334,7 +348,7 @@
    "date": null,
    "why": "Eine mehrjährige Preisgarantie ist ein klares Serviceversprechen, das Kunden Planungssicherheit gibt und sich von kurzfristigen Lockangeboten abhebt.",
    "first_seen": "2026-07-25",
-   "last_verified": "2026-10-14",
+   "last_verified": "2026-10-15",
    "status": "aktiv"
   },
   {
@@ -376,7 +390,7 @@
    "date": null,
    "why": "Das Versprechen adressiert direkt Kundensorgen hinsichtlich der Verbindungsqualität und bietet einen formalen Nachbesserungsanspruch bei Serviceproblemen.",
    "first_seen": "2026-10-12",
-   "last_verified": "2026-10-14",
+   "last_verified": "2026-10-15",
    "status": "aktiv"
   },
   {
@@ -558,7 +572,7 @@
    "date": null,
    "why": "Dieser Move ist interessant, weil er einen Premium-KI-Dienst als Massen-Benefit für die gesamte Kundenbasis einführt, ohne eine Preiserhöhung vorzunehmen.",
    "first_seen": "2026-07-25",
-   "last_verified": "2026-10-14",
+   "last_verified": "2026-10-15",
    "status": "aktiv"
   },
   {
@@ -572,7 +586,7 @@
    "date": null,
    "why": "Der Move zeigt, wie ein Mobilfunker ein KI-Abo als konkreten Zusatznutzen in Prepaid-Datentarife integriert und sich damit abseits reiner Netztarife positioniert.",
    "first_seen": "2026-08-14",
-   "last_verified": "2026-10-13",
+   "last_verified": "2026-10-15",
    "status": "aktiv"
   },
   {
@@ -601,6 +615,20 @@
    "why": "Dieser Move zielt darauf ab, die Kundenbindung durch die Integration eines Premium-KI-Suchwerkzeugs in das Standard-Mobilfunkangebot zu stärken.",
    "first_seen": "2026-10-13",
    "last_verified": "2026-10-13",
+   "status": "aktiv"
+  },
+  {
+   "id": "https://airtel.in/blog/airtel-app/unlock-the-power-of-ai-airtel-offers-perplexity-pro-worth-%E2%82%B917000-at-no-extra-cost",
+   "theme": "ki",
+   "operator": "Airtel",
+   "region": "Asien",
+   "what": "Airtel bietet allen seinen Kunden eine kostenlose 12-monatige Perplexity Pro-Abonnement im Wert von rund ₹17.000 an.",
+   "url": "https://www.airtel.in/blog/airtel-app/unlock-the-power-of-ai-airtel-offers-perplexity-pro-worth-%E2%82%B917000-at-no-extra-cost/",
+   "source": "airtel.in",
+   "date": null,
+   "why": "Dieser Move zeigt, wie Betreiber etablierte KI-Suchdienste als langfristigen Mehrwert in ihre bestehenden Tarife integrieren, um sich im Wettbewerb zu differenzieren.",
+   "first_seen": "2026-10-15",
+   "last_verified": "2026-10-15",
    "status": "aktiv"
   },
   {
