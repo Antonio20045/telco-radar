@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-15",
+ "updated": "2026-10-16",
  "topics": [
   {
    "slug": "apples-iphone-event-am-9-september",
@@ -525,7 +525,7 @@
    ],
    "first_seen": "2026-10-15",
    "last_active": "2026-10-15",
-   "runs_ohne_zuwachs": 0,
+   "runs_ohne_zuwachs": 1,
    "status": "aktiv",
    "items": [
     {
@@ -585,6 +585,94 @@
      "image_h": 900
     }
    ]
+  },
+  {
+   "slug": "spanien-fuehrt-neue-pflichtvorwahl-fuer-werbeanrufe-ein",
+   "title": "Spanien führt neue Pflichtvorwahl für Werbeanrufe ein",
+   "description": "Ab Oktober müssen Unternehmen in Spanien für kommerzielle Anrufe zwingend eine neue Vorwahl nutzen, um unerwünschte Anrufe für Verbraucher besser erkennbar zu machen.",
+   "keywords": [
+    "CNMC",
+    "Vorwahl 400",
+    "Werbeanrufe",
+    "Movistar",
+    "Digi",
+    "Vodafone Spanien",
+    "Adigital"
+   ],
+   "first_seen": "2026-10-16",
+   "last_active": "2026-10-16",
+   "runs_ohne_zuwachs": 0,
+   "status": "aktiv",
+   "items": [
+    {
+     "url": "https://www.adslzone.net/noticias/operadores/resultados-operadores-segundo-trimestre-2026/",
+     "title": "Movistar se lleva el 36% de los ingresos del sector, mientras Digi crece a doble dígito en el segundo trimestre",
+     "headline": "Movistar führt mit 36 Prozent Umsatzanteil in Spanien",
+     "summary": "Im zweiten Quartal 2026 betrug der Telekommunikationsumsatz in Spanien laut CNMC 5.648 Millionen Euro. Movistar führt mit 36,3 Prozent vor MasOrange mit 28,4 Prozent, Vodafone mit 13,7 Prozent und dem stark wachsenden Anbieter Digi mit 4,4 Prozent.",
+     "operator": "Telefónica",
+     "source": "ADSLZone",
+     "date": "2026-10-14",
+     "week": "2026-10-14",
+     "relevance": 5,
+     "image": "256f76caf8301654-1280.jpg",
+     "image_w": 1280,
+     "image_h": 720
+    },
+    {
+     "url": "https://www.adslzone.net/noticias/operadores/diferencia-velocidad-fibra-1gbps-movistar-orange-digi/",
+     "title": "Pagas 1 Gbps de fibra, pero no todas las operadoras te dan lo mismo: hay casi 190 Mbps de diferencia entre Movistar, Orange, Digi y Vodafone",
+     "headline": "Vodafone Spanien bei 1-Gbps-Glasfaser deutlich hinter Movistar",
+     "summary": "Ein Vergleich der CNMC-Qualitätsberichte für das erste Quartal 2026 zeigt bei 1 Gbps im Download: Movistar 931 Mbit/s, Orange 922,9 Mbit/s, Digi 897,1 Mbit/s, Vodafone 741,1 Mbit/s – fast 190 Mbit/s Rückstand auf Movistar.",
+     "operator": "Vodafone España",
+     "source": "ADSLZone",
+     "date": "2026-08-28",
+     "week": "2026-10-07",
+     "relevance": 5,
+     "image": "4ff7e2502a8ec8db-1280.jpg",
+     "image_w": 1280,
+     "image_h": 720
+    },
+    {
+     "url": "https://www.xatakamovil.com/movistar/sabras-que-somos-nosotros-movistar-aclara-que-numero-utilizara-para-llamadas-comerciales-llegada-prefijo-400",
+     "title": "Movistar y Digi aclaran qué números utilizarán para las llamadas comerciales tras la llegada del prefijo 400",
+     "headline": "Spanien führt ab 17. Oktober Pflichtvorwahl 400 für Werbeanrufe ein",
+     "summary": "Ab dem 17. Oktober müssen Telekommunikationsanbieter in Spanien für Werbeanrufe zwingend Nummern mit dem neuen Vorwahl-Präfix 400 nutzen, während Kundendienstnummern unverändert bleiben. Movistar nutzt dafür die Nummer 400 00 1004 und Digi setzt unter anderem auf 400 120 120.",
+     "operator": "Telefónica",
+     "source": "Xataka Móvil",
+     "date": "2026-10-16",
+     "week": "2026-10-16",
+     "relevance": 4,
+     "image": "396d5191259b012c-1280.jpg",
+     "image_w": 1024,
+     "image_h": 729
+    },
+    {
+     "url": "https://www.adslzone.net/noticias/operadores/numeros-400-movistar-orange-vodafone-digi-llamadas/",
+     "title": "Estos son los números 400 de Movistar, Orange, Vodafone y DIGI que te harán llamadas comerciales desde mañana sábado",
+     "headline": "Spanische Telekommunikationsanbieter nutzen neue 400er Vorwahlen für Werbeanrufe",
+     "summary": "Auf Anordnung der iberischen Regulierungsbehörde CNMC müssen kommerzielle Anrufe ab dem 17. Oktober 2026 spezielle Rufnummern nutzen, die mit 400 beginnen, wovon Vodafone 15 Nummernblöcke zugeteilt wurden.",
+     "operator": "Vodafone Group",
+     "source": "ADSLZone",
+     "date": "2026-10-16",
+     "week": "2026-10-16",
+     "relevance": 3,
+     "image": "ed839ff9e73550ae-1280.jpg",
+     "image_w": 1280,
+     "image_h": 720
+    },
+    {
+     "url": "https://www.mobileworldlive.com/spanish/adigital-lanza-un-buscador-inverso-de-llamadas-comerciales-con-prefijo-400/",
+     "title": "Adigital lanza un buscador inverso de llamadas comerciales con prefijo 400",
+     "headline": "Spanien startet Rückwärtssuche für kommerzielle Anrufe",
+     "summary": "Der spanische Verband Adigital hat die Plattform Soy Yo gestartet, die als Rückwärts-Suchmaschine für kommerzielle Anrufe mit dem neuen Pflichtpräfix 400 dient. Über 30 Unternehmen, die rund 90 Prozent der Werbeanrufe abwickeln, machen dort ihre Nummern transparent.",
+     "operator": "Adigital",
+     "source": "Mobile World Live",
+     "date": "2026-10-15",
+     "week": "2026-10-16",
+     "relevance": 3
+    }
+   ],
+   "event_datum": "2026-10-17"
   }
  ]
 }

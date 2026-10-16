@@ -1,15 +1,125 @@
 {
- "stand": "2026-10-15",
+ "stand": "2026-10-16",
  "videos": [
   {
+   "id": "vMykpEYmsv8",
+   "titel": "RTX Spark im Test: Der MacBook-Killer?",
+   "kanal": "c't 3003",
+   "datum": "2026-10-16",
+   "dauer_sekunden": 1191,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "vMykpEYmsv8.jpg"
+  },
+  {
+   "id": "qu7TzZ2jaKk",
+   "titel": "KI-Update kompakt: Schwarzer Donnerstag, Neue Open-Weight-Modelle, Klagen gegen OpenAI",
+   "kanal": "KI Update (heise)",
+   "datum": "2026-10-16",
+   "dauer_sekunden": 968,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "qu7TzZ2jaKk.jpg"
+  },
+  {
+   "id": "WXWFmwfo1JA",
+   "titel": "This Tesla Actually Flies (NOT AI)",
+   "kanal": "Matt Wolfe",
+   "datum": "2026-10-16",
+   "dauer_sekunden": 46,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "WXWFmwfo1JA.jpg"
+  },
+  {
+   "id": "Q93sIJIFrSQ",
+   "titel": "KI-Update kompakt: Schwarzer Donnerstag, Neue Open-Weight-Modelle, Klagen gegen OpenAI",
+   "kanal": "KI Update (heise)",
+   "datum": "2026-10-16",
+   "dauer_sekunden": 1058,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "Q93sIJIFrSQ.jpg"
+  },
+  {
+   "id": "LKrwhjOI8Nc",
+   "titel": "There's never been a better time to go into math",
+   "kanal": "3Blue1Brown",
+   "datum": "2026-10-16",
+   "dauer_sekunden": 2444,
+   "stufe": "Fortgeschritten",
+   "sprache": "en",
+   "bild": "LKrwhjOI8Nc.jpg"
+  },
+  {
+   "id": "KGcuuhqmPhI",
+   "titel": "AI News: 6 New Models & A Nano Banana Killer",
+   "kanal": "Matt Wolfe",
+   "datum": "2026-10-16",
+   "dauer_sekunden": 1868,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "KGcuuhqmPhI.jpg"
+  },
+  {
+   "id": "ExOodQdeBo4",
+   "titel": "Surface Laptop Ultra: Who Is This Actually For?",
+   "kanal": "Kevin Stratvert",
+   "datum": "2026-10-16",
+   "dauer_sekunden": 487,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "ExOodQdeBo4.jpg"
+  },
+  {
+   "id": "2DmP5etgh4U",
+   "titel": "How to build a $10B AI company (Supabase Co-Founder)",
+   "kanal": "David Ondrej",
+   "datum": "2026-10-16",
+   "dauer_sekunden": 3026,
+   "stufe": "Fortgeschritten",
+   "sprache": "en",
+   "bild": "2DmP5etgh4U.jpg"
+  },
+  {
+   "id": "0FBdWvkgNQE",
+   "titel": "Decision models take off & Anthropic bans cruelty to Claude",
+   "kanal": "IBM Technology",
+   "datum": "2026-10-16",
+   "dauer_sekunden": 1924,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "0FBdWvkgNQE.jpg"
+  },
+  {
    "id": "eUr9ZgrYhts",
-   "titel": "Ex-Generalkonsul packt aus: „Wir haben ALLES verschlafen!“ Die Wahrheit über China (Wolfgang Röhr)",
+   "titel": "Ex-China-Diplomat packt aus: Es ist LÄNGST vorbei! Das verschweigen sie dir (Dr. Wolfgang Röhr)",
    "kanal": "Everlast AI",
    "datum": "2026-10-15",
    "dauer_sekunden": 4698,
    "stufe": "Einstieg",
    "sprache": "de",
    "bild": "eUr9ZgrYhts.jpg"
+  },
+  {
+   "id": "KJ_7KPKlO_Q",
+   "titel": "Build more personal sites with Codex",
+   "kanal": "OpenAI",
+   "datum": "2026-10-15",
+   "dauer_sekunden": 81,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "KJ_7KPKlO_Q.jpg"
+  },
+  {
+   "id": "GyO8Ao7yKJc",
+   "titel": "GPT-Live-1.1 has new voices and better accents.",
+   "kanal": "OpenAI",
+   "datum": "2026-10-15",
+   "dauer_sekunden": 41,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "GyO8Ao7yKJc.jpg"
   },
   {
    "id": "BwXremQ-i6I",
@@ -33,7 +143,7 @@
   },
   {
    "id": "9RaCke7Wl3c",
-   "titel": "Nehmt uns nicht die Mathematik! | c't 4004 #43",
+   "titel": "Chris ist jetzt Reverse-Engineer | c't 4004 #43",
    "kanal": "c't 3003",
    "datum": "2026-10-15",
    "dauer_sekunden": 6596,
@@ -190,203 +300,93 @@
    "stufe": "Einstieg",
    "sprache": "en",
    "bild": "8SV_Dj9Kebo.jpg"
-  },
-  {
-   "id": "43XVqjxECVU",
-   "titel": "KI-Update kompakt: OpenAI-Spionage, Zerstörung, Zulassung, KI-Replikation, Muse Wonder",
-   "kanal": "KI Update (heise)",
-   "datum": "2026-10-14",
-   "dauer_sekunden": 1364,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "43XVqjxECVU.jpg"
-  },
-  {
-   "id": "-RRw9UNOuBQ",
-   "titel": "Automated SQL Injection Remediation With AI Agents",
-   "kanal": "Microsoft Mechanics",
-   "datum": "2026-10-14",
-   "dauer_sekunden": 40,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "-RRw9UNOuBQ.jpg"
-  },
-  {
-   "id": "z_sXLlLVUls",
-   "titel": "OpenAI’s New AI Is Doing Things We Barely Understand",
-   "kanal": "Two Minute Papers",
-   "datum": "2026-10-13",
-   "dauer_sekunden": 529,
-   "stufe": "Fortgeschritten",
-   "sprache": "en",
-   "bild": "z_sXLlLVUls.jpg"
-  },
-  {
-   "id": "wSuWuPUTC10",
-   "titel": "Every Generation Thinks This Time Is Different: The AI Job Myth",
-   "kanal": "IBM Technology",
-   "datum": "2026-10-13",
-   "dauer_sekunden": 766,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "wSuWuPUTC10.jpg"
-  },
-  {
-   "id": "quj0s7oVs-g",
-   "titel": "Ask AI Agents If You’re Protected From a Threat Actor",
-   "kanal": "Microsoft Mechanics",
-   "datum": "2026-10-13",
-   "dauer_sekunden": 41,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "quj0s7oVs-g.jpg"
-  },
-  {
-   "id": "ftkic7Tdpcg",
-   "titel": "Using Gemini 4 Argon to protect against Cyber attackers",
-   "kanal": "Google DeepMind",
-   "datum": "2026-10-13",
-   "dauer_sekunden": 128,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "ftkic7Tdpcg.jpg"
-  },
-  {
-   "id": "eBszYxzE2dk",
-   "titel": "Google Just Caught Up (Gemini-4 Argon)",
-   "kanal": "Matt Wolfe",
-   "datum": "2026-10-13",
-   "dauer_sekunden": 1240,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "eBszYxzE2dk.jpg"
-  },
-  {
-   "id": "b0jA6fkGsk8",
-   "titel": "How To Stop Being An \"AI Meat Proxy\"",
-   "kanal": "Matt Wolfe",
-   "datum": "2026-10-13",
-   "dauer_sekunden": 61,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "b0jA6fkGsk8.jpg"
-  },
-  {
-   "id": "U7OUacSjohw",
-   "titel": "„Die Intelligenz-Explosion hat begonnen\", OpenAI schockt Mathematik & China baut das Weltgehirn",
-   "kanal": "Everlast AI",
-   "datum": "2026-10-13",
-   "dauer_sekunden": 8390,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "U7OUacSjohw.jpg"
-  },
-  {
-   "id": "TD0bImyg_IM",
-   "titel": "Ride out this sticker storm in style",
-   "kanal": "OpenAI",
-   "datum": "2026-10-13",
-   "dauer_sekunden": 65,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "TD0bImyg_IM.jpg"
-  },
-  {
-   "id": "N6K_pxaAh0w",
-   "titel": "Block on Finding and Fixing Security Risks with OpenAI",
-   "kanal": "OpenAI",
-   "datum": "2026-10-13",
-   "dauer_sekunden": 45,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "N6K_pxaAh0w.jpg"
   }
  ],
  "kanaele": {
   "c't 3003": {
    "error": null,
-   "versucht": "2026-10-15",
-   "abgerufen": "2026-10-15"
+   "versucht": "2026-10-16",
+   "abgerufen": "2026-10-16"
   },
   "KI Update (heise)": {
    "error": null,
-   "versucht": "2026-10-15",
-   "abgerufen": "2026-10-15"
+   "versucht": "2026-10-16",
+   "abgerufen": "2026-10-16"
   },
   "Everlast AI": {
    "error": null,
-   "versucht": "2026-10-15",
-   "abgerufen": "2026-10-15"
+   "versucht": "2026-10-16",
+   "abgerufen": "2026-10-16"
   },
   "The Morpheus Tutorials": {
    "error": null,
-   "versucht": "2026-10-15",
-   "abgerufen": "2026-10-15"
+   "versucht": "2026-10-16",
+   "abgerufen": "2026-10-16"
   },
   "Kevin Stratvert": {
    "error": null,
-   "versucht": "2026-10-15",
-   "abgerufen": "2026-10-15"
+   "versucht": "2026-10-16",
+   "abgerufen": "2026-10-16"
   },
   "Microsoft Mechanics": {
    "error": null,
-   "versucht": "2026-10-15",
-   "abgerufen": "2026-10-15"
+   "versucht": "2026-10-16",
+   "abgerufen": "2026-10-16"
   },
   "Leila Gharani": {
    "error": null,
-   "versucht": "2026-10-15",
-   "abgerufen": "2026-10-15"
+   "versucht": "2026-10-16",
+   "abgerufen": "2026-10-16"
   },
   "Jeff Su": {
    "error": null,
-   "versucht": "2026-10-15",
-   "abgerufen": "2026-10-15"
+   "versucht": "2026-10-16",
+   "abgerufen": "2026-10-16"
   },
   "Matt Wolfe": {
    "error": null,
-   "versucht": "2026-10-15",
-   "abgerufen": "2026-10-15"
+   "versucht": "2026-10-16",
+   "abgerufen": "2026-10-16"
   },
   "IBM Technology": {
    "error": null,
-   "versucht": "2026-10-15",
-   "abgerufen": "2026-10-15"
+   "versucht": "2026-10-16",
+   "abgerufen": "2026-10-16"
   },
   "OpenAI": {
    "error": null,
-   "versucht": "2026-10-15",
-   "abgerufen": "2026-10-15"
+   "versucht": "2026-10-16",
+   "abgerufen": "2026-10-16"
   },
   "Anthropic": {
    "error": null,
-   "versucht": "2026-10-15",
-   "abgerufen": "2026-10-15"
+   "versucht": "2026-10-16",
+   "abgerufen": "2026-10-16"
   },
   "Google DeepMind": {
    "error": null,
-   "versucht": "2026-10-15",
-   "abgerufen": "2026-10-15"
+   "versucht": "2026-10-16",
+   "abgerufen": "2026-10-16"
   },
   "AI Explained": {
    "error": null,
-   "versucht": "2026-10-15",
-   "abgerufen": "2026-10-15"
+   "versucht": "2026-10-16",
+   "abgerufen": "2026-10-16"
   },
   "Two Minute Papers": {
    "error": null,
-   "versucht": "2026-10-15",
-   "abgerufen": "2026-10-15"
+   "versucht": "2026-10-16",
+   "abgerufen": "2026-10-16"
   },
   "3Blue1Brown": {
    "error": null,
-   "versucht": "2026-10-15",
-   "abgerufen": "2026-10-15"
+   "versucht": "2026-10-16",
+   "abgerufen": "2026-10-16"
   },
   "David Ondrej": {
    "error": null,
-   "versucht": "2026-10-15",
-   "abgerufen": "2026-10-15"
+   "versucht": "2026-10-16",
+   "abgerufen": "2026-10-16"
   }
  },
  "error": null
