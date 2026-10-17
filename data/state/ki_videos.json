@@ -1,6 +1,26 @@
 {
- "stand": "2026-10-16",
+ "stand": "2026-10-17",
  "videos": [
+  {
+   "id": "HpaFZjRjBhQ",
+   "titel": "Google ist wieder vorne dabei - auch in meinen Tests?",
+   "kanal": "The Morpheus Tutorials",
+   "datum": "2026-10-17",
+   "dauer_sekunden": 2707,
+   "stufe": "Fortgeschritten",
+   "sprache": "de",
+   "bild": "HpaFZjRjBhQ.jpg"
+  },
+  {
+   "id": "yZUzeYLaIME",
+   "titel": "Been Rude to a Chatbot?",
+   "kanal": "IBM Technology",
+   "datum": "2026-10-16",
+   "dauer_sekunden": 30,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "yZUzeYLaIME.jpg"
+  },
   {
    "id": "vMykpEYmsv8",
    "titel": "RTX Spark im Test: Der MacBook-Killer?",
@@ -42,6 +62,16 @@
    "bild": "Q93sIJIFrSQ.jpg"
   },
   {
+   "id": "OMxEUdIgsQc",
+   "titel": "Put ChatGPT to work on shared team tasks",
+   "kanal": "OpenAI",
+   "datum": "2026-10-16",
+   "dauer_sekunden": 154,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "OMxEUdIgsQc.jpg"
+  },
+  {
    "id": "LKrwhjOI8Nc",
    "titel": "There's never been a better time to go into math",
    "kanal": "3Blue1Brown",
@@ -60,6 +90,16 @@
    "stufe": "Einstieg",
    "sprache": "en",
    "bild": "KGcuuhqmPhI.jpg"
+  },
+  {
+   "id": "GBOZIRK1ujw",
+   "titel": "Put your dot on call",
+   "kanal": "OpenAI",
+   "datum": "2026-10-16",
+   "dauer_sekunden": 158,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "GBOZIRK1ujw.jpg"
   },
   {
    "id": "ExOodQdeBo4",
@@ -260,133 +300,93 @@
    "stufe": "Einstieg",
    "sprache": "en",
    "bild": "Veot9JRCONg.jpg"
-  },
-  {
-   "id": "PZxbaIp8PzE",
-   "titel": "Cooking up a catering business with ChatGPT",
-   "kanal": "OpenAI",
-   "datum": "2026-10-14",
-   "dauer_sekunden": 108,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "PZxbaIp8PzE.jpg"
-  },
-  {
-   "id": "FbKXvab-0yQ",
-   "titel": "Cloudroom just destroyed all AI coding apps (fully open-source)",
-   "kanal": "David Ondrej",
-   "datum": "2026-10-14",
-   "dauer_sekunden": 3623,
-   "stufe": "Fortgeschritten",
-   "sprache": "en",
-   "bild": "FbKXvab-0yQ.jpg"
-  },
-  {
-   "id": "DTcK95TAZ-k",
-   "titel": "How Oracle Uses Codex to Help Business Users Get Answers",
-   "kanal": "OpenAI",
-   "datum": "2026-10-14",
-   "dauer_sekunden": 22,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "DTcK95TAZ-k.jpg"
-  },
-  {
-   "id": "8SV_Dj9Kebo",
-   "titel": "How to Transcribe Audio to Text with ChatGPT",
-   "kanal": "Kevin Stratvert",
-   "datum": "2026-10-14",
-   "dauer_sekunden": 112,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "8SV_Dj9Kebo.jpg"
   }
  ],
  "kanaele": {
   "c't 3003": {
    "error": null,
-   "versucht": "2026-10-16",
-   "abgerufen": "2026-10-16"
+   "versucht": "2026-10-17",
+   "abgerufen": "2026-10-17"
   },
   "KI Update (heise)": {
    "error": null,
-   "versucht": "2026-10-16",
-   "abgerufen": "2026-10-16"
+   "versucht": "2026-10-17",
+   "abgerufen": "2026-10-17"
   },
   "Everlast AI": {
    "error": null,
-   "versucht": "2026-10-16",
-   "abgerufen": "2026-10-16"
+   "versucht": "2026-10-17",
+   "abgerufen": "2026-10-17"
   },
   "The Morpheus Tutorials": {
    "error": null,
-   "versucht": "2026-10-16",
-   "abgerufen": "2026-10-16"
+   "versucht": "2026-10-17",
+   "abgerufen": "2026-10-17"
   },
   "Kevin Stratvert": {
    "error": null,
-   "versucht": "2026-10-16",
-   "abgerufen": "2026-10-16"
+   "versucht": "2026-10-17",
+   "abgerufen": "2026-10-17"
   },
   "Microsoft Mechanics": {
    "error": null,
-   "versucht": "2026-10-16",
-   "abgerufen": "2026-10-16"
+   "versucht": "2026-10-17",
+   "abgerufen": "2026-10-17"
   },
   "Leila Gharani": {
    "error": null,
-   "versucht": "2026-10-16",
-   "abgerufen": "2026-10-16"
+   "versucht": "2026-10-17",
+   "abgerufen": "2026-10-17"
   },
   "Jeff Su": {
    "error": null,
-   "versucht": "2026-10-16",
-   "abgerufen": "2026-10-16"
+   "versucht": "2026-10-17",
+   "abgerufen": "2026-10-17"
   },
   "Matt Wolfe": {
    "error": null,
-   "versucht": "2026-10-16",
-   "abgerufen": "2026-10-16"
+   "versucht": "2026-10-17",
+   "abgerufen": "2026-10-17"
   },
   "IBM Technology": {
    "error": null,
-   "versucht": "2026-10-16",
-   "abgerufen": "2026-10-16"
+   "versucht": "2026-10-17",
+   "abgerufen": "2026-10-17"
   },
   "OpenAI": {
    "error": null,
-   "versucht": "2026-10-16",
-   "abgerufen": "2026-10-16"
+   "versucht": "2026-10-17",
+   "abgerufen": "2026-10-17"
   },
   "Anthropic": {
    "error": null,
-   "versucht": "2026-10-16",
-   "abgerufen": "2026-10-16"
+   "versucht": "2026-10-17",
+   "abgerufen": "2026-10-17"
   },
   "Google DeepMind": {
    "error": null,
-   "versucht": "2026-10-16",
-   "abgerufen": "2026-10-16"
+   "versucht": "2026-10-17",
+   "abgerufen": "2026-10-17"
   },
   "AI Explained": {
    "error": null,
-   "versucht": "2026-10-16",
-   "abgerufen": "2026-10-16"
+   "versucht": "2026-10-17",
+   "abgerufen": "2026-10-17"
   },
   "Two Minute Papers": {
    "error": null,
-   "versucht": "2026-10-16",
-   "abgerufen": "2026-10-16"
+   "versucht": "2026-10-17",
+   "abgerufen": "2026-10-17"
   },
   "3Blue1Brown": {
    "error": null,
-   "versucht": "2026-10-16",
-   "abgerufen": "2026-10-16"
+   "versucht": "2026-10-17",
+   "abgerufen": "2026-10-17"
   },
   "David Ondrej": {
    "error": null,
-   "versucht": "2026-10-16",
-   "abgerufen": "2026-10-16"
+   "versucht": "2026-10-17",
+   "abgerufen": "2026-10-17"
   }
  },
  "error": null
