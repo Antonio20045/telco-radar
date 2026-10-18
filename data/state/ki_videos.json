@@ -1,6 +1,36 @@
 {
- "stand": "2026-10-17",
+ "stand": "2026-10-18",
  "videos": [
+  {
+   "id": "iVxubkOM4gA",
+   "titel": "Krass: KI kopiert jetzt JEDE Software! Gemini 4 Argon & Meta Wonder im Praxistest | KI-NEWS",
+   "kanal": "Everlast AI",
+   "datum": "2026-10-18",
+   "dauer_sekunden": 1793,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "iVxubkOM4gA.jpg"
+  },
+  {
+   "id": "YaK6cnET2IE",
+   "titel": "OpenCode hack is INSANE.",
+   "kanal": "David Ondrej",
+   "datum": "2026-10-18",
+   "dauer_sekunden": 1895,
+   "stufe": "Fortgeschritten",
+   "sprache": "en",
+   "bild": "YaK6cnET2IE.jpg"
+  },
+  {
+   "id": "4b6KpFN7Rio",
+   "titel": "The AI Memory Wall: Why LLMs & AI Accelerators Hit a Bottleneck",
+   "kanal": "IBM Technology",
+   "datum": "2026-10-18",
+   "dauer_sekunden": 741,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "4b6KpFN7Rio.jpg"
+  },
   {
    "id": "HpaFZjRjBhQ",
    "titel": "Google ist wieder vorne dabei - auch in meinen Tests?",
@@ -270,123 +300,93 @@
    "stufe": "Einstieg",
    "sprache": "en",
    "bild": "XEl4ZQKKxig.jpg"
-  },
-  {
-   "id": "W6F4QZlknkc",
-   "titel": "AI slop stalls bug bounties, malware hides in IoT and agents hit Wikipedia",
-   "kanal": "IBM Technology",
-   "datum": "2026-10-14",
-   "dauer_sekunden": 1860,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "W6F4QZlknkc.jpg"
-  },
-  {
-   "id": "W-ia2MNcmNk",
-   "titel": "KI-Update kompakt: OpenAI-Spionage, Zerstörung, Zulassung, KI-Replikation, Muse Wonder",
-   "kanal": "KI Update (heise)",
-   "datum": "2026-10-14",
-   "dauer_sekunden": 1296,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "W-ia2MNcmNk.jpg"
-  },
-  {
-   "id": "Veot9JRCONg",
-   "titel": "Human in the Loop for AI Pen Testing Agents",
-   "kanal": "Microsoft Mechanics",
-   "datum": "2026-10-14",
-   "dauer_sekunden": 40,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "Veot9JRCONg.jpg"
   }
  ],
  "kanaele": {
   "c't 3003": {
    "error": null,
-   "versucht": "2026-10-17",
-   "abgerufen": "2026-10-17"
+   "versucht": "2026-10-18",
+   "abgerufen": "2026-10-18"
   },
   "KI Update (heise)": {
    "error": null,
-   "versucht": "2026-10-17",
-   "abgerufen": "2026-10-17"
+   "versucht": "2026-10-18",
+   "abgerufen": "2026-10-18"
   },
   "Everlast AI": {
    "error": null,
-   "versucht": "2026-10-17",
-   "abgerufen": "2026-10-17"
+   "versucht": "2026-10-18",
+   "abgerufen": "2026-10-18"
   },
   "The Morpheus Tutorials": {
    "error": null,
-   "versucht": "2026-10-17",
-   "abgerufen": "2026-10-17"
+   "versucht": "2026-10-18",
+   "abgerufen": "2026-10-18"
   },
   "Kevin Stratvert": {
    "error": null,
-   "versucht": "2026-10-17",
-   "abgerufen": "2026-10-17"
+   "versucht": "2026-10-18",
+   "abgerufen": "2026-10-18"
   },
   "Microsoft Mechanics": {
    "error": null,
-   "versucht": "2026-10-17",
-   "abgerufen": "2026-10-17"
+   "versucht": "2026-10-18",
+   "abgerufen": "2026-10-18"
   },
   "Leila Gharani": {
    "error": null,
-   "versucht": "2026-10-17",
-   "abgerufen": "2026-10-17"
+   "versucht": "2026-10-18",
+   "abgerufen": "2026-10-18"
   },
   "Jeff Su": {
    "error": null,
-   "versucht": "2026-10-17",
-   "abgerufen": "2026-10-17"
+   "versucht": "2026-10-18",
+   "abgerufen": "2026-10-18"
   },
   "Matt Wolfe": {
    "error": null,
-   "versucht": "2026-10-17",
-   "abgerufen": "2026-10-17"
+   "versucht": "2026-10-18",
+   "abgerufen": "2026-10-18"
   },
   "IBM Technology": {
    "error": null,
-   "versucht": "2026-10-17",
-   "abgerufen": "2026-10-17"
+   "versucht": "2026-10-18",
+   "abgerufen": "2026-10-18"
   },
   "OpenAI": {
    "error": null,
-   "versucht": "2026-10-17",
-   "abgerufen": "2026-10-17"
+   "versucht": "2026-10-18",
+   "abgerufen": "2026-10-18"
   },
   "Anthropic": {
    "error": null,
-   "versucht": "2026-10-17",
-   "abgerufen": "2026-10-17"
+   "versucht": "2026-10-18",
+   "abgerufen": "2026-10-18"
   },
   "Google DeepMind": {
    "error": null,
-   "versucht": "2026-10-17",
-   "abgerufen": "2026-10-17"
+   "versucht": "2026-10-18",
+   "abgerufen": "2026-10-18"
   },
   "AI Explained": {
    "error": null,
-   "versucht": "2026-10-17",
-   "abgerufen": "2026-10-17"
+   "versucht": "2026-10-18",
+   "abgerufen": "2026-10-18"
   },
   "Two Minute Papers": {
    "error": null,
-   "versucht": "2026-10-17",
-   "abgerufen": "2026-10-17"
+   "versucht": "2026-10-18",
+   "abgerufen": "2026-10-18"
   },
   "3Blue1Brown": {
    "error": null,
-   "versucht": "2026-10-17",
-   "abgerufen": "2026-10-17"
+   "versucht": "2026-10-18",
+   "abgerufen": "2026-10-18"
   },
   "David Ondrej": {
    "error": null,
-   "versucht": "2026-10-17",
-   "abgerufen": "2026-10-17"
+   "versucht": "2026-10-18",
+   "abgerufen": "2026-10-18"
   }
  },
  "error": null
