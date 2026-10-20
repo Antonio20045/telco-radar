@@ -1,7 +1,7 @@
 {
  "anbieter": "o2-tarife-2",
- "datum": "2026-10-19",
- "dauer_sekunden": 357.7,
+ "datum": "2026-10-20",
+ "dauer_sekunden": 448.0,
  "format": 1,
  "frischegrenze_tage": 3,
  "grund": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s: Abruf gestört (HTTP 404)",
@@ -14,507 +14,378 @@
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-256gb-burgunder-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "apple-iphone-18-pro",
    "gescheitert": 0,
-   "grund": "Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "grund": null,
    "http_status": 200,
    "kombinationen": [
     {
-     "antwort_url": null,
+     "antwort_url": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-256gb-burgunder-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
      "auswahl": {
       "laufzeit": "36",
       "speicher": "256 GB",
-      "tarif": null
+      "tarif": "O2 Mobile Special"
      },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
+     "befunde": [
+      {
+       "feld": "volumen_gb",
+       "grund": "fehlt im Text, Antwort 30,00"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "4ea36983595888548601a18de5d813bda9acb3df8dfdcb852852cbdf0a22bc12",
+      "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-256gb-burgunder-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+      "zeitpunkt": "2026-10-20T04:38:38Z"
+     },
+     "beleg_status": "offen",
      "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
+     "grund": "fehlt im Text, Antwort 30,00",
      "luecken": [],
-     "status": "nicht_erfasst",
+     "status": "befund",
      "variante": {
       "laufzeit": 36,
       "speicher": "256 GB",
-      "tarif": null
+      "tarif": "O2 Mobile Special"
      },
      "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
+      "anschluss": 0.0,
+      "anzahlung": 1.0,
+      "rate": 43.5,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        14.99
+       ],
+       [
+        25,
+        null,
+        29.99
+       ]
+      ],
       "volumen_gb": null
      }
     },
     {
-     "antwort_url": null,
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtMTgtcHJvLTI1NmdiLWJ1cmd1bmRlci0yNHhoaWdoO3RhcmlmZj1vMnNob3A6OnByaXZhdGt1bmRlbi1vMi1tb2JpbGUtc3BlY2lhbC1vbmxpbmU7cGFja3M9dW10cy1vcHRpb24=",
      "auswahl": {
       "laufzeit": "24",
       "speicher": "256 GB",
-      "tarif": null
+      "tarif": "O2 Mobile Special"
      },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
+     "befunde": [
+      {
+       "feld": "volumen_gb",
+       "grund": "fehlt im Text, Antwort 30,00"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "3455f5915e76cc11cbcde9692040c311d8291cc665fe94e38dd5eca495b53bb4",
+      "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-256gb-burgunder-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+      "zeitpunkt": "2026-10-20T04:38:43Z"
+     },
+     "beleg_status": "offen",
      "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
+     "grund": "fehlt im Text, Antwort 30,00",
      "luecken": [],
-     "status": "nicht_erfasst",
+     "status": "befund",
      "variante": {
       "laufzeit": 24,
       "speicher": "256 GB",
-      "tarif": null
+      "tarif": "O2 Mobile Special"
      },
      "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
+      "anschluss": 0.0,
+      "anzahlung": 7.0,
+      "rate": 65.0,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        14.99
+       ]
+      ],
       "volumen_gb": null
      }
     },
     {
-     "antwort_url": null,
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtMTgtcHJvLTUxMmdiLWJ1cmd1bmRlci0zNnhoaWdoO3RhcmlmZj1vMnNob3A6OnByaXZhdGt1bmRlbi1vMi1tb2JpbGUtc3BlY2lhbC1vbmxpbmU7cGFja3M9dW10cy1vcHRpb24=",
      "auswahl": {
       "laufzeit": "36",
       "speicher": "512 GB",
-      "tarif": null
+      "tarif": "O2 Mobile Special"
      },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
+     "befunde": [
+      {
+       "feld": "volumen_gb",
+       "grund": "fehlt im Text, Antwort 30,00"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "c288afffb8a04dc8160d40c1bf4c43c40ccb76c28fd67c6d133c78ec36382353",
+      "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-256gb-burgunder-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+      "zeitpunkt": "2026-10-20T04:38:47Z"
+     },
+     "beleg_status": "offen",
      "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
+     "grund": "fehlt im Text, Antwort 30,00",
      "luecken": [],
-     "status": "nicht_erfasst",
+     "status": "befund",
      "variante": {
       "laufzeit": 36,
       "speicher": "512 GB",
-      "tarif": null
+      "tarif": "O2 Mobile Special"
      },
      "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
+      "anschluss": 0.0,
+      "anzahlung": 1.0,
+      "rate": 51.0,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        14.99
+       ],
+       [
+        25,
+        null,
+        29.99
+       ]
+      ],
       "volumen_gb": null
      }
     },
     {
-     "antwort_url": null,
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtMTgtcHJvLTUxMmdiLWJ1cmd1bmRlci0yNHhoaWdoO3RhcmlmZj1vMnNob3A6OnByaXZhdGt1bmRlbi1vMi1tb2JpbGUtc3BlY2lhbC1vbmxpbmU7cGFja3M9dW10cy1vcHRpb24=",
      "auswahl": {
       "laufzeit": "24",
       "speicher": "512 GB",
-      "tarif": null
+      "tarif": "O2 Mobile Special"
      },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
+     "befunde": [
+      {
+       "feld": "volumen_gb",
+       "grund": "fehlt im Text, Antwort 30,00"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "fae69a1d006a5f1d874439b896598a646c9eceb6d9aeef48eb29b32be1fb1d21",
+      "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-256gb-burgunder-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+      "zeitpunkt": "2026-10-20T04:38:49Z"
+     },
+     "beleg_status": "offen",
      "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
+     "grund": "fehlt im Text, Antwort 30,00",
      "luecken": [],
-     "status": "nicht_erfasst",
+     "status": "befund",
      "variante": {
       "laufzeit": 24,
       "speicher": "512 GB",
-      "tarif": null
+      "tarif": "O2 Mobile Special"
      },
      "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
+      "anschluss": 0.0,
+      "anzahlung": 1.0,
+      "rate": 76.5,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        14.99
+       ]
+      ],
       "volumen_gb": null
      }
     },
     {
-     "antwort_url": null,
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtMTgtcHJvLTF0Yi1idXJndW5kZXItMzZ4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLXNwZWNpYWwtb25saW5lO3BhY2tzPXVtdHMtb3B0aW9u",
      "auswahl": {
       "laufzeit": "36",
       "speicher": "1 TB",
-      "tarif": null
+      "tarif": "O2 Mobile Special"
      },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
+     "befunde": [
+      {
+       "feld": "volumen_gb",
+       "grund": "fehlt im Text, Antwort 30,00"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "e10b152bc3ad2f89eb3a1a58f5901e50ca9a1863cc670c118845538b3fe48174",
+      "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-256gb-burgunder-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+      "zeitpunkt": "2026-10-20T04:38:56Z"
+     },
+     "beleg_status": "offen",
      "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
+     "grund": "fehlt im Text, Antwort 30,00",
      "luecken": [],
-     "status": "nicht_erfasst",
+     "status": "befund",
      "variante": {
       "laufzeit": 36,
       "speicher": "1 TB",
-      "tarif": null
+      "tarif": "O2 Mobile Special"
      },
      "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
+      "anschluss": 0.0,
+      "anzahlung": 13.0,
+      "rate": 66.0,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        14.99
+       ],
+       [
+        25,
+        null,
+        29.99
+       ]
+      ],
       "volumen_gb": null
      }
     },
     {
-     "antwort_url": null,
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtMTgtcHJvLTF0Yi1idXJndW5kZXItMjR4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLXNwZWNpYWwtb25saW5lO3BhY2tzPXVtdHMtb3B0aW9u",
      "auswahl": {
       "laufzeit": "24",
       "speicher": "1 TB",
-      "tarif": null
+      "tarif": "O2 Mobile Special"
      },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
+     "befunde": [
+      {
+       "feld": "volumen_gb",
+       "grund": "fehlt im Text, Antwort 30,00"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "223e459d0a2ab0505ed5a9cc86428d61eefa0ddbe054a4f2128f40c4a0c5be9e",
+      "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-256gb-burgunder-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+      "zeitpunkt": "2026-10-20T04:39:00Z"
+     },
+     "beleg_status": "offen",
      "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
+     "grund": "fehlt im Text, Antwort 30,00",
      "luecken": [],
-     "status": "nicht_erfasst",
+     "status": "befund",
      "variante": {
       "laufzeit": 24,
       "speicher": "1 TB",
-      "tarif": null
+      "tarif": "O2 Mobile Special"
      },
      "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
+      "anschluss": 0.0,
+      "anzahlung": 1.0,
+      "rate": 99.5,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        14.99
+       ]
+      ],
       "volumen_gb": null
      }
     },
     {
-     "antwort_url": null,
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtMTgtcHJvLTJ0Yi1idXJndW5kZXItMzZ4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLXNwZWNpYWwtb25saW5lO3BhY2tzPXVtdHMtb3B0aW9u",
      "auswahl": {
       "laufzeit": "36",
       "speicher": "2 TB",
-      "tarif": null
+      "tarif": "O2 Mobile Special"
      },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
+     "befunde": [
+      {
+       "feld": "volumen_gb",
+       "grund": "fehlt im Text, Antwort 30,00"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "e639fb06c062556b04c8df4b01d87db765cae50f6730612d5e387630921f4d99",
+      "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-256gb-burgunder-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+      "zeitpunkt": "2026-10-20T04:39:06Z"
+     },
+     "beleg_status": "offen",
      "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
+     "grund": "fehlt im Text, Antwort 30,00",
      "luecken": [],
-     "status": "nicht_erfasst",
+     "status": "befund",
      "variante": {
       "laufzeit": 36,
       "speicher": "2 TB",
-      "tarif": null
+      "tarif": "O2 Mobile Special"
      },
      "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
+      "anschluss": 0.0,
+      "anzahlung": 1.0,
+      "rate": 89.0,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        14.99
+       ],
+       [
+        25,
+        null,
+        29.99
+       ]
+      ],
       "volumen_gb": null
      }
     },
     {
-     "antwort_url": null,
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtMTgtcHJvLTJ0Yi1idXJndW5kZXItMjR4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLXNwZWNpYWwtb25saW5lO3BhY2tzPXVtdHMtb3B0aW9u",
      "auswahl": {
       "laufzeit": "24",
       "speicher": "2 TB",
-      "tarif": null
+      "tarif": "O2 Mobile Special"
      },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
+     "befunde": [
+      {
+       "feld": "volumen_gb",
+       "grund": "fehlt im Text, Antwort 30,00"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "5c250090991691252aabd0d1cd990f7792bf7fd7c3ef5df367750012c2f8e7e3",
+      "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-256gb-burgunder-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+      "zeitpunkt": "2026-10-20T04:39:08Z"
+     },
+     "beleg_status": "offen",
      "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
+     "grund": "fehlt im Text, Antwort 30,00",
      "luecken": [],
-     "status": "nicht_erfasst",
+     "status": "befund",
      "variante": {
       "laufzeit": 24,
       "speicher": "2 TB",
-      "tarif": null
+      "tarif": "O2 Mobile Special"
      },
      "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    }
-   ],
-   "ladung": {
-    "abstand_s": 2.0,
-    "anfragen": 144,
-    "beendet": 139,
-    "dokument": "complete",
-    "geladen": true,
-    "offen": {
-     "library.telefonica.de": 5,
-     "www.o2online.de": 1
-    },
-    "ohne_antwort_ms": 0,
-    "sekunden": 16.2,
-    "takte_ms": 5800,
-    "wartet_auf": "load"
-   },
-   "speicher_gb": 256,
-   "sperre": null,
-   "status": "gestoert",
-   "stoerung": "seitenform",
-   "struktur": {
-    "anteil_felder": null,
-    "anteil_knoepfe": 0.18181818181818182,
-    "felder_gefunden": 0,
-    "felder_gesucht": 0,
-    "knoepfe_gefunden": 2,
-    "knoepfe_gesucht": 11
-   },
-   "verworfen": 4
-  },
-  {
-   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-max-256gb-polar-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
-   "geraet": "apple-iphone-18-pro-max",
-   "gescheitert": 0,
-   "grund": "Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
-   "http_status": 200,
-   "kombinationen": [
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "36",
-      "speicher": "256 GB",
-      "tarif": null
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": 36,
-      "speicher": "256 GB",
-      "tarif": null
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "24",
-      "speicher": "256 GB",
-      "tarif": null
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": 24,
-      "speicher": "256 GB",
-      "tarif": null
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "36",
-      "speicher": "512 GB",
-      "tarif": null
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": 36,
-      "speicher": "512 GB",
-      "tarif": null
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "24",
-      "speicher": "512 GB",
-      "tarif": null
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": 24,
-      "speicher": "512 GB",
-      "tarif": null
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "36",
-      "speicher": "1 TB",
-      "tarif": null
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": 36,
-      "speicher": "1 TB",
-      "tarif": null
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "24",
-      "speicher": "1 TB",
-      "tarif": null
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": 24,
-      "speicher": "1 TB",
-      "tarif": null
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "36",
-      "speicher": "2 TB",
-      "tarif": null
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": 36,
-      "speicher": "2 TB",
-      "tarif": null
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "24",
-      "speicher": "2 TB",
-      "tarif": null
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": 24,
-      "speicher": "2 TB",
-      "tarif": null
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
+      "anschluss": 0.0,
+      "anzahlung": 1.0,
+      "rate": 133.5,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        14.99
+       ]
+      ],
       "volumen_gb": null
      }
     }
@@ -527,21 +398,430 @@
     "geladen": true,
     "offen": {},
     "ohne_antwort_ms": 0,
-    "sekunden": 11.6,
-    "takte_ms": 7050,
+    "sekunden": 17.2,
+    "takte_ms": 8550,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
    "sperre": null,
-   "status": "gestoert",
-   "stoerung": "seitenform",
+   "status": "gelesen",
+   "stoerung": null,
    "struktur": {
-    "anteil_felder": null,
-    "anteil_knoepfe": 0.18181818181818182,
-    "felder_gefunden": 0,
-    "felder_gesucht": 0,
-    "knoepfe_gefunden": 2,
-    "knoepfe_gesucht": 11
+    "anteil_felder": 0.8571428571428571,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 48,
+    "felder_gesucht": 56,
+    "knoepfe_gefunden": 48,
+    "knoepfe_gesucht": 48
+   },
+   "verworfen": 4
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-max-256gb-polar-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "apple-iphone-18-pro-max",
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-max-256gb-polar-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "befunde": [
+      {
+       "feld": "volumen_gb",
+       "grund": "fehlt im Text, Antwort 30,00"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "9d0bf7659ec8b8f51626d56c4507b228784f9d38224eece3ba6edc5c86a59619",
+      "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-max-256gb-polar-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+      "zeitpunkt": "2026-10-20T04:39:40Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 30,00",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "werte": {
+      "anschluss": 0.0,
+      "anzahlung": 1.0,
+      "rate": 48.0,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        14.99
+       ],
+       [
+        25,
+        null,
+        29.99
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtMTgtcHJvLW1heC0yNTZnYi1wb2xhci0yNHhoaWdoO3RhcmlmZj1vMnNob3A6OnByaXZhdGt1bmRlbi1vMi1tb2JpbGUtc3BlY2lhbC1vbmxpbmU7cGFja3M9dW10cy1vcHRpb24=",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "befunde": [
+      {
+       "feld": "volumen_gb",
+       "grund": "fehlt im Text, Antwort 30,00"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "ea4d9f04e5c94ce1b2a01916a482f7a4a1c7b87207950b75d9e9773a5a3a014f",
+      "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-max-256gb-polar-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+      "zeitpunkt": "2026-10-20T04:39:45Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 30,00",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "werte": {
+      "anschluss": 0.0,
+      "anzahlung": 1.0,
+      "rate": 72.0,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        14.99
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtMTgtcHJvLW1heC01MTJnYi1wb2xhci0zNnhoaWdoO3RhcmlmZj1vMnNob3A6OnByaXZhdGt1bmRlbi1vMi1tb2JpbGUtc3BlY2lhbC1vbmxpbmU7cGFja3M9dW10cy1vcHRpb24=",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "befunde": [
+      {
+       "feld": "volumen_gb",
+       "grund": "fehlt im Text, Antwort 30,00"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "7a271f10122e24308eec62ce770db55112a6ada40779ec23e581edf25d7acfe4",
+      "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-max-256gb-polar-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+      "zeitpunkt": "2026-10-20T04:39:51Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 30,00",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "werte": {
+      "anschluss": 0.0,
+      "anzahlung": 1.0,
+      "rate": 55.5,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        14.99
+       ],
+       [
+        25,
+        null,
+        29.99
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtMTgtcHJvLW1heC01MTJnYi1wb2xhci0yNHhoaWdoO3RhcmlmZj1vMnNob3A6OnByaXZhdGt1bmRlbi1vMi1tb2JpbGUtc3BlY2lhbC1vbmxpbmU7cGFja3M9dW10cy1vcHRpb24=",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "befunde": [
+      {
+       "feld": "volumen_gb",
+       "grund": "fehlt im Text, Antwort 30,00"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "e615ca9c681ecf924253f34a0facace695198637b918bc58b3397dc2729d2448",
+      "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-max-256gb-polar-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+      "zeitpunkt": "2026-10-20T04:39:56Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 30,00",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "O2 Mobile Special"
+     },
+     "werte": {
+      "anschluss": 0.0,
+      "anzahlung": 7.0,
+      "rate": 83.0,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        14.99
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtMTgtcHJvLW1heC0xdGItcG9sYXItMzZ4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLXNwZWNpYWwtb25saW5lO3BhY2tzPXVtdHMtb3B0aW9u",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "1 TB",
+      "tarif": "O2 Mobile Special"
+     },
+     "befunde": [
+      {
+       "feld": "volumen_gb",
+       "grund": "fehlt im Text, Antwort 30,00"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "3bd36e48177695b13a943f88398930d819c7761fa27f0032eac4c7800eb4d82b",
+      "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-max-256gb-polar-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+      "zeitpunkt": "2026-10-20T04:40:00Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 30,00",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "1 TB",
+      "tarif": "O2 Mobile Special"
+     },
+     "werte": {
+      "anschluss": 0.0,
+      "anzahlung": 1.0,
+      "rate": 71.0,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        14.99
+       ],
+       [
+        25,
+        null,
+        29.99
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtMTgtcHJvLW1heC0xdGItcG9sYXItMjR4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLXNwZWNpYWwtb25saW5lO3BhY2tzPXVtdHMtb3B0aW9u",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "1 TB",
+      "tarif": "O2 Mobile Special"
+     },
+     "befunde": [
+      {
+       "feld": "volumen_gb",
+       "grund": "fehlt im Text, Antwort 30,00"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "5fb7cd4726325349853d3580660c0613cf5630696193f68b01c344b88b3726ad",
+      "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-max-256gb-polar-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+      "zeitpunkt": "2026-10-20T04:40:05Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 30,00",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "1 TB",
+      "tarif": "O2 Mobile Special"
+     },
+     "werte": {
+      "anschluss": 0.0,
+      "anzahlung": 1.0,
+      "rate": 106.5,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        14.99
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtMTgtcHJvLW1heC0ydGItcG9sYXItMzZ4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLXNwZWNpYWwtb25saW5lO3BhY2tzPXVtdHMtb3B0aW9u",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "2 TB",
+      "tarif": "O2 Mobile Special"
+     },
+     "befunde": [
+      {
+       "feld": "volumen_gb",
+       "grund": "fehlt im Text, Antwort 30,00"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "b7f183e672d5d30c580c04610d5febab4a1eb7381149c518b4e0db61a0c0d688",
+      "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-max-256gb-polar-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+      "zeitpunkt": "2026-10-20T04:40:11Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 30,00",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "2 TB",
+      "tarif": "O2 Mobile Special"
+     },
+     "werte": {
+      "anschluss": 0.0,
+      "anzahlung": 7.0,
+      "rate": 93.5,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        14.99
+       ],
+       [
+        25,
+        null,
+        29.99
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1hcHBsZS1pcGhvbmUtMTgtcHJvLW1heC0ydGItcG9sYXItMjR4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLXNwZWNpYWwtb25saW5lO3BhY2tzPXVtdHMtb3B0aW9u",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "2 TB",
+      "tarif": "O2 Mobile Special"
+     },
+     "befunde": [
+      {
+       "feld": "volumen_gb",
+       "grund": "fehlt im Text, Antwort 30,00"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "be34dce8422875fdb5052e3da2499226d36dc3893110f60ee427e39109fe8d27",
+      "seite": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-max-256gb-polar-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+      "zeitpunkt": "2026-10-20T04:40:13Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 30,00",
+     "luecken": [],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "2 TB",
+      "tarif": "O2 Mobile Special"
+     },
+     "werte": {
+      "anschluss": 0.0,
+      "anzahlung": 1.0,
+      "rate": 140.5,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        14.99
+       ]
+      ],
+      "volumen_gb": null
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 2.0,
+    "anfragen": 144,
+    "beendet": 138,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "library.telefonica.de": 5,
+     "www.o2online.de": 1
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 13.3,
+    "takte_ms": 8000,
+    "wartet_auf": "load"
+   },
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 0.8571428571428571,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 48,
+    "felder_gesucht": 56,
+    "knoepfe_gefunden": 48,
+    "knoepfe_gesucht": 48
    },
    "verworfen": 4
   },
@@ -613,14 +893,17 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 136,
-    "beendet": 136,
+    "anfragen": 137,
+    "beendet": 135,
     "dokument": "complete",
     "geladen": true,
-    "offen": {},
+    "offen": {
+     "api-v4.trbo.com": 1,
+     "library.telefonica.de": 1
+    },
     "ohne_antwort_ms": 0,
-    "sekunden": 11.8,
-    "takte_ms": 6950,
+    "sekunden": 14.3,
+    "takte_ms": 9900,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -705,16 +988,17 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 136,
-    "beendet": 135,
+    "anfragen": 135,
+    "beendet": 129,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "library.telefonica.de": 1
+     "library.telefonica.de": 5,
+     "www.o2online.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 11.3,
-    "takte_ms": 6650,
+    "sekunden": 12.4,
+    "takte_ms": 7800,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -799,16 +1083,14 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 138,
-    "beendet": 137,
+    "anfragen": 140,
+    "beendet": 140,
     "dokument": "complete",
     "geladen": true,
-    "offen": {
-     "library.telefonica.de": 1
-    },
+    "offen": {},
     "ohne_antwort_ms": 0,
-    "sekunden": 11.2,
-    "takte_ms": 6600,
+    "sekunden": 12.7,
+    "takte_ms": 8300,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -893,7 +1175,7 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 138,
+    "anfragen": 140,
     "beendet": 134,
     "dokument": "complete",
     "geladen": true,
@@ -902,8 +1184,8 @@
      "www.o2online.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 10.1,
-    "takte_ms": 5800,
+    "sekunden": 12.0,
+    "takte_ms": 7650,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -1163,13 +1445,16 @@
    "ladung": {
     "abstand_s": 2.0,
     "anfragen": 144,
-    "beendet": 144,
+    "beendet": 138,
     "dokument": "complete",
     "geladen": true,
-    "offen": {},
+    "offen": {
+     "library.telefonica.de": 5,
+     "www.o2online.de": 1
+    },
     "ohne_antwort_ms": 0,
-    "sekunden": 13.2,
-    "takte_ms": 7050,
+    "sekunden": 13.0,
+    "takte_ms": 7600,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -1428,8 +1713,8 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 144,
-    "beendet": 140,
+    "anfragen": 142,
+    "beendet": 137,
     "dokument": "complete",
     "geladen": true,
     "offen": {
@@ -1437,8 +1722,8 @@
      "www.o2online.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 12.6,
-    "takte_ms": 6550,
+    "sekunden": 13.7,
+    "takte_ms": 8150,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -1529,8 +1814,8 @@
     "geladen": true,
     "offen": {},
     "ohne_antwort_ms": 0,
-    "sekunden": 11.4,
-    "takte_ms": 6850,
+    "sekunden": 14.7,
+    "takte_ms": 9350,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -1624,8 +1909,8 @@
      "www.o2online.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 10.4,
-    "takte_ms": 5850,
+    "sekunden": 11.6,
+    "takte_ms": 7850,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -1710,8 +1995,8 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 139,
-    "beendet": 133,
+    "anfragen": 140,
+    "beendet": 134,
     "dokument": "complete",
     "geladen": true,
     "offen": {
@@ -1719,8 +2004,8 @@
      "www.o2online.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 10.7,
-    "takte_ms": 6600,
+    "sekunden": 12.6,
+    "takte_ms": 8300,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -1805,16 +2090,16 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 138,
-    "beendet": 134,
+    "anfragen": 139,
+    "beendet": 138,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "library.telefonica.de": 4
+     "library.telefonica.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 12.1,
-    "takte_ms": 6950,
+    "sekunden": 14.8,
+    "takte_ms": 10250,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -4081,8 +4366,6 @@
   "https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-max-256gb-titan-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
   "https://www.o2online.de/e-shop/apple/apple-iphone-16e-128gb-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
   "https://www.o2online.de/e-shop/apple/apple-iphone-17e-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
-  "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-256gb-burgunder-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
-  "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-max-256gb-polar-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
   "https://www.o2online.de/e-shop/apple/apple-iphone-air-256gb-himmelblau-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
   "https://www.o2online.de/e-shop/fairphone/fairphone-6-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
   "https://www.o2online.de/e-shop/google/google-pixel-10-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
@@ -4236,5 +4519,5 @@
  ],
  "uebersichten": [],
  "vertragsform": "tarif_plus_ratenkauf",
- "zeitbudget_sekunden": 10273
+ "zeitbudget_sekunden": 10272
 }
