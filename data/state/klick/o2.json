@@ -1,7 +1,7 @@
 {
  "anbieter": "o2",
- "datum": "2026-10-20",
- "dauer_sekunden": 5.1,
+ "datum": "2026-10-21",
+ "dauer_sekunden": 5.4,
  "format": 1,
  "frischegrenze_tage": 3,
  "grund": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus: Abruf gestört (HTTP 404)",
@@ -896,5 +896,5 @@
  ],
  "uebersichten": [],
  "vertragsform": "tarif_plus_ratenkauf",
- "zeitbudget_sekunden": 10257
+ "zeitbudget_sekunden": 10263
 }
