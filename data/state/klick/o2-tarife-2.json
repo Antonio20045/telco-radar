@@ -1,7 +1,7 @@
 {
  "anbieter": "o2-tarife-2",
- "datum": "2026-10-21",
- "dauer_sekunden": 303.0,
+ "datum": "2026-10-22",
+ "dauer_sekunden": 294.5,
  "format": 1,
  "frischegrenze_tage": 3,
  "grund": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s: Abruf gestört (HTTP 404)",
@@ -78,8 +78,8 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 125,
-    "beendet": 119,
+    "anfragen": 136,
+    "beendet": 131,
     "dokument": "complete",
     "geladen": true,
     "offen": {
@@ -87,7 +87,7 @@
      "www.o2online.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 16.6,
+    "sekunden": 12.8,
     "takte_ms": 5800,
     "wartet_auf": "load"
    },
@@ -174,16 +174,13 @@
    "ladung": {
     "abstand_s": 2.0,
     "anfragen": 136,
-    "beendet": 130,
+    "beendet": 136,
     "dokument": "complete",
     "geladen": true,
-    "offen": {
-     "library.telefonica.de": 5,
-     "www.o2online.de": 1
-    },
+    "offen": {},
     "ohne_antwort_ms": 0,
-    "sekunden": 10.7,
-    "takte_ms": 6500,
+    "sekunden": 12.3,
+    "takte_ms": 7950,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -268,16 +265,14 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 137,
-    "beendet": 135,
+    "anfragen": 138,
+    "beendet": 138,
     "dokument": "complete",
     "geladen": true,
-    "offen": {
-     "library.telefonica.de": 2
-    },
+    "offen": {},
     "ohne_antwort_ms": 0,
-    "sekunden": 12.0,
-    "takte_ms": 7550,
+    "sekunden": 11.1,
+    "takte_ms": 6750,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -362,17 +357,14 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 140,
-    "beendet": 134,
+    "anfragen": 139,
+    "beendet": 139,
     "dokument": "complete",
     "geladen": true,
-    "offen": {
-     "library.telefonica.de": 5,
-     "www.o2online.de": 1
-    },
+    "offen": {},
     "ohne_antwort_ms": 0,
-    "sekunden": 10.6,
-    "takte_ms": 6100,
+    "sekunden": 12.7,
+    "takte_ms": 7950,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -632,13 +624,16 @@
    "ladung": {
     "abstand_s": 2.0,
     "anfragen": 144,
-    "beendet": 144,
+    "beendet": 138,
     "dokument": "complete",
     "geladen": true,
-    "offen": {},
+    "offen": {
+     "library.telefonica.de": 5,
+     "www.o2online.de": 1
+    },
     "ohne_antwort_ms": 0,
-    "sekunden": 13.0,
-    "takte_ms": 6950,
+    "sekunden": 10.2,
+    "takte_ms": 6400,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -898,13 +893,16 @@
    "ladung": {
     "abstand_s": 2.0,
     "anfragen": 144,
-    "beendet": 144,
+    "beendet": 139,
     "dokument": "complete",
     "geladen": true,
-    "offen": {},
+    "offen": {
+     "library.telefonica.de": 5,
+     "www.o2online.de": 1
+    },
     "ohne_antwort_ms": 0,
-    "sekunden": 12.7,
-    "takte_ms": 7000,
+    "sekunden": 11.3,
+    "takte_ms": 6150,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -995,8 +993,8 @@
     "geladen": true,
     "offen": {},
     "ohne_antwort_ms": 0,
-    "sekunden": 11.1,
-    "takte_ms": 7250,
+    "sekunden": 11.5,
+    "takte_ms": 7350,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -1087,8 +1085,8 @@
     "geladen": true,
     "offen": {},
     "ohne_antwort_ms": 0,
-    "sekunden": 12.4,
-    "takte_ms": 7750,
+    "sekunden": 11.4,
+    "takte_ms": 7100,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -1173,17 +1171,16 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 137,
-    "beendet": 131,
+    "anfragen": 138,
+    "beendet": 137,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "library.telefonica.de": 5,
-     "www.o2online.de": 1
+     "library.telefonica.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 10.5,
-    "takte_ms": 6550,
+    "sekunden": 11.7,
+    "takte_ms": 7750,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -1276,8 +1273,8 @@
      "library.telefonica.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 12.3,
-    "takte_ms": 7800,
+    "sekunden": 12.2,
+    "takte_ms": 7350,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -3719,5 +3716,5 @@
  ],
  "uebersichten": [],
  "vertragsform": "tarif_plus_ratenkauf",
- "zeitbudget_sekunden": 10268
+ "zeitbudget_sekunden": 10277
 }
