@@ -1,7 +1,7 @@
 {
  "anbieter": "o2-tarife-2",
- "datum": "2026-10-24",
- "dauer_sekunden": 273.8,
+ "datum": "2026-10-25",
+ "dauer_sekunden": 324.1,
  "format": 1,
  "frischegrenze_tage": 3,
  "grund": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s: Abruf gestört (HTTP 404)",
@@ -78,17 +78,16 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 136,
-    "beendet": 131,
+    "anfragen": 134,
+    "beendet": 133,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "library.telefonica.de": 5,
-     "www.o2online.de": 1
+     "library.telefonica.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 13.2,
-    "takte_ms": 5600,
+    "sekunden": 17.5,
+    "takte_ms": 8900,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -173,17 +172,14 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 135,
-    "beendet": 129,
+    "anfragen": 134,
+    "beendet": 134,
     "dokument": "complete",
     "geladen": true,
-    "offen": {
-     "library.telefonica.de": 5,
-     "www.o2online.de": 1
-    },
+    "offen": {},
     "ohne_antwort_ms": 0,
-    "sekunden": 9.7,
-    "takte_ms": 5850,
+    "sekunden": 14.8,
+    "takte_ms": 10350,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -268,8 +264,8 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 139,
-    "beendet": 133,
+    "anfragen": 140,
+    "beendet": 134,
     "dokument": "complete",
     "geladen": true,
     "offen": {
@@ -277,8 +273,8 @@
      "www.o2online.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 8.2,
-    "takte_ms": 4200,
+    "sekunden": 13.6,
+    "takte_ms": 8050,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -363,16 +359,17 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 138,
-    "beendet": 137,
+    "anfragen": 140,
+    "beendet": 134,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "library.telefonica.de": 1
+     "library.telefonica.de": 5,
+     "www.o2online.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 9.1,
-    "takte_ms": 4450,
+    "sekunden": 14.0,
+    "takte_ms": 8900,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -632,7 +629,7 @@
    "ladung": {
     "abstand_s": 2.0,
     "anfragen": 144,
-    "beendet": 139,
+    "beendet": 138,
     "dokument": "complete",
     "geladen": true,
     "offen": {
@@ -640,8 +637,8 @@
      "www.o2online.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 10.4,
-    "takte_ms": 5050,
+    "sekunden": 13.7,
+    "takte_ms": 8200,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -900,7 +897,7 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 143,
+    "anfragen": 144,
     "beendet": 138,
     "dokument": "complete",
     "geladen": true,
@@ -909,8 +906,8 @@
      "www.o2online.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 11.0,
-    "takte_ms": 5750,
+    "sekunden": 14.3,
+    "takte_ms": 8650,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -995,17 +992,14 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 135,
-    "beendet": 130,
+    "anfragen": 136,
+    "beendet": 136,
     "dokument": "complete",
     "geladen": true,
-    "offen": {
-     "library.telefonica.de": 5,
-     "www.o2online.de": 1
-    },
+    "offen": {},
     "ohne_antwort_ms": 0,
-    "sekunden": 8.4,
-    "takte_ms": 4250,
+    "sekunden": 13.0,
+    "takte_ms": 9000,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -1090,17 +1084,16 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 135,
-    "beendet": 129,
+    "anfragen": 134,
+    "beendet": 133,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "library.telefonica.de": 5,
-     "www.o2online.de": 1
+     "api-v4.trbo.com": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 10.2,
-    "takte_ms": 5900,
+    "sekunden": 13.2,
+    "takte_ms": 9100,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -1186,15 +1179,16 @@
    "ladung": {
     "abstand_s": 2.0,
     "anfragen": 139,
-    "beendet": 138,
+    "beendet": 133,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "api-v4.trbo.com": 1
+     "library.telefonica.de": 5,
+     "www.o2online.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 11.5,
-    "takte_ms": 7400,
+    "sekunden": 12.8,
+    "takte_ms": 7950,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -1280,16 +1274,13 @@
    "ladung": {
     "abstand_s": 2.0,
     "anfragen": 139,
-    "beendet": 134,
+    "beendet": 139,
     "dokument": "complete",
     "geladen": true,
-    "offen": {
-     "library.telefonica.de": 5,
-     "www.o2online.de": 1
-    },
+    "offen": {},
     "ohne_antwort_ms": 0,
-    "sekunden": 8.4,
-    "takte_ms": 4400,
+    "sekunden": 13.8,
+    "takte_ms": 9250,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -3731,5 +3722,5 @@
  ],
  "uebersichten": [],
  "vertragsform": "tarif_plus_ratenkauf",
- "zeitbudget_sekunden": 10270
+ "zeitbudget_sekunden": 10269
 }
