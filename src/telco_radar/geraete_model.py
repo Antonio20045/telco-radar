@@ -101,7 +101,7 @@ ersatzakku ersatzdisplay folie aufkleber skin simkarte
 
 _MODELLZUSATZ = frozenset(
     """
-pro max plus ultra mini air fold flip lite neo note fe edge se xl active
+pro max plus ultra mini air fold flip lite neo note fe edge se xl active enterprise ee
 """.split()
 )
 

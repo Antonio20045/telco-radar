@@ -587,6 +587,8 @@ _KATALOG_REVIEW = Katalog(
         "Google Pixel 10 Pro Fold 256 GB Moonstone",
         "Samsung Galaxy S25 FE 128 GB Icyblue",
         "Samsung Galaxy S25 Edge 256GB",
+        "Samsung Galaxy S25 Enterprise Edition 256 GB",
+        "Samsung Galaxy S25 EE 256GB Black",
     ],
 )
 def test_ein_modellzusatz_hinter_dem_treffer_verwirft_die_zuordnung(titel):
