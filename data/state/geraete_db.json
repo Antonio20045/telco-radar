@@ -2,8 +2,8 @@
  "updated": "2026-10-26",
  "anbieter": {
   "ALDI TALK": {
-   "laeufe": 86,
-   "funde_gesamt": 507,
+   "laeufe": 87,
+   "funde_gesamt": 513,
    "letzter_lauf": "2026-10-26",
    "letzte_funde": 6,
    "letzter_fund": "2026-10-26",
@@ -308,8 +308,8 @@
    "tote_adressen": 0
   },
   "Vodafone": {
-   "laeufe": 84,
-   "funde_gesamt": 14497,
+   "laeufe": 85,
+   "funde_gesamt": 14664,
    "letzter_lauf": "2026-10-26",
    "letzte_funde": 167,
    "termine": [
@@ -614,8 +614,8 @@
    "tote_adressen": 0
   },
   "o2": {
-   "laeufe": 84,
-   "funde_gesamt": 5673,
+   "laeufe": 85,
+   "funde_gesamt": 5739,
    "letzter_lauf": "2026-10-26",
    "letzte_funde": 66,
    "termine": [
@@ -920,8 +920,8 @@
    "tote_adressen": null
   },
   "mobilcom-debitel": {
-   "laeufe": 37,
-   "funde_gesamt": 10770,
+   "laeufe": 38,
+   "funde_gesamt": 10925,
    "letzte_funde": 155,
    "termine": [
     "2026-08-29",
@@ -1773,8 +1773,8 @@
    "tote_adressen": 0
   },
   "congstar": {
-   "laeufe": 54,
-   "funde_gesamt": 10870,
+   "laeufe": 55,
+   "funde_gesamt": 11007,
    "letzter_lauf": "2026-10-26",
    "letzte_funde": 137,
    "termine": [
@@ -2073,8 +2073,8 @@
    "tote_adressen": 0
   },
   "1&1": {
-   "laeufe": 76,
-   "funde_gesamt": 2864,
+   "laeufe": 77,
+   "funde_gesamt": 2906,
    "letzter_lauf": "2026-10-26",
    "letzte_funde": 42,
    "termine": [
@@ -2630,8 +2630,8 @@
    "tote_adressen": null
   },
   "Saturn": {
-   "laeufe": 72,
-   "funde_gesamt": 1338,
+   "laeufe": 73,
+   "funde_gesamt": 1346,
    "letzter_lauf": "2026-10-26",
    "letzte_funde": 8,
    "termine": [
@@ -6495,7 +6495,7 @@
     "https://mobile.1und1.de/smartphones"
    ],
    "titel_roh": "Apple iPhone 18 Pro 256 GB silber",
-   "preis_mit_vertrag_ab": 52.99,
+   "preis_mit_vertrag_ab": 49.99,
    "laufzeit_monate": 36,
    "tarif_referenz": "1&1 All-Net-Flat S"
   },
