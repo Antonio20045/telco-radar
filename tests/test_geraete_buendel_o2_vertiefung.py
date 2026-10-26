@@ -448,3 +448,13 @@ def test_die_enterprise_edition_im_katalog_heisst_auch_so():
     normal = {**ee, "offerName": "privatkunden-samsung-galaxy-s26-256gb-black-36xhigh"}
     assert modellname(ee) == "Samsung Galaxy S26 Enterprise Edition"
     assert modellname(normal) == "Samsung Galaxy S26"
+
+
+def test_eine_beschreibung_mit_ee_bekommt_den_zusatz_nicht_doppelt():
+    """Preisprüfung Runde 3, 26.10.2026: „Galaxy XCover7 Pro EE“ wurde zu
+    „… EE Enterprise Edition“ und stand als zweites Modell im Katalog."""
+    pro = {
+        "description": "Samsung Galaxy XCover7 Pro EE",
+        "offerName": "privatkunden-samsung-galaxy-xcover7-pro-ee-128gb-black-36xhigh",
+    }
+    assert modellname(pro) == "Samsung Galaxy XCover7 Pro EE"

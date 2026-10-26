@@ -75,7 +75,6 @@ from __future__ import annotations
 
 import json
 import logging
-import re
 from dataclasses import asdict
 from pathlib import Path
 
@@ -89,6 +88,7 @@ from ..tco_model import (
     sim_only_id,
     tco_24,
 )
+from .tco_beleg import beleg_widerspricht
 from .tco_buendel import KLICKFELDER
 
 log = logging.getLogger(__name__)
@@ -123,15 +123,6 @@ _REFERENZ_MESSFELDER = (
 )
 
 _HISTORIE_NAME = "geraete_tco_historie.jsonl"
-_EE_BELEG = re.compile(r"-ee-\d+(?:gb|tb)-|enterprise-edition")
-
-
-def beleg_widerspricht(eintrag: dict) -> bool:
-    """Der Beleg ist eine Enterprise Edition, die SKU das normale Modell
-    (Preisprüfung 26.10.2026: o2 S26 und Telekom S26 FE, bis 102 € daneben)."""
-    sku = str(eintrag.get("sku_id") or "")
-    ee_sku = "enterprise" in sku or "-ee-" in sku
-    return bool(_EE_BELEG.search(str(eintrag.get("quelle_url") or ""))) and not ee_sku
 
 
 def id_aus_satz(satz: dict) -> str | None:

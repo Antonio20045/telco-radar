@@ -188,6 +188,7 @@ class Referenzstand:
 
 
 _EE_RE = re.compile(r"-ee-\d+(?:gb|tb)-")
+_EE_NAME = re.compile(r"\b(?:ee|enterprise)\b", re.IGNORECASE)
 
 
 def modellname(h: dict) -> str:
@@ -197,6 +198,6 @@ def modellname(h: dict) -> str:
     Preise als normales S26 (Preisprüfung 26.10.2026, 102 € zu hoch)."""
     modell = str(h.get("description") or "").strip()
     ee = _EE_RE.search(str(h.get("offerName") or ""))
-    if modell and ee and "enterprise" not in modell.lower():
+    if modell and ee and not _EE_NAME.search(modell):
         return f"{modell} Enterprise Edition"
     return modell

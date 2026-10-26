@@ -297,3 +297,21 @@ def test_ein_buendel_mit_dem_beleg_einer_enterprise_edition_faellt_weg(tmp_path)
     db.upsert_buendel([ee, _vodafone(TAG1)], TAG1)
     db.save(TAG1)
     assert [b["id"] for b in TcoDB(pfad).buendel()] == [_vodafone(TAG1).id]
+
+
+def test_ein_o2_rest_beleg_verraet_die_enterprise_edition_base64_kodiert(tmp_path):
+    """Preisprüfung Runde 3, 26.10.2026: die letzte EE-Zeile des S26 256 trug
+    einen REST-Beleg, in dem das Modell nur Base64-kodiert steht."""
+    import base64
+
+    konfig = "hardware=o2shop::privatkunden-samsung-galaxy-s26-ee-256gb-black-24xhigh"
+    normal = "hardware=o2shop::privatkunden-samsung-galaxy-s26-256gb-black-24xhigh"
+    rest = "https://www.o2online.de/e-shop/rest/configuration/"
+    pfad = tmp_path / "geraete_tco.json"
+    ee, gegenprobe = _o2(TAG1), _vodafone(TAG1)
+    ee.quelle_url = rest + base64.b64encode(konfig.encode()).decode().rstrip("=")
+    gegenprobe.quelle_url = rest + base64.b64encode(normal.encode()).decode()
+    db = TcoDB(pfad)
+    db.upsert_buendel([ee, gegenprobe], TAG1)
+    db.save(TAG1)
+    assert [b["id"] for b in TcoDB(pfad).buendel()] == [gegenprobe.id]
