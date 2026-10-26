@@ -30,6 +30,7 @@ import json
 import pathlib
 
 import pytest
+import zeitreihe_fragment
 from bestand_pfad import abbild
 from bs4 import BeautifulSoup
 
@@ -349,10 +350,10 @@ def test_fehlende_anbieter_stehen_als_zeilen_statt_im_sammelsatz(site, geraete):
     fehlende Anbieter steht als eigene Zeile in der Bündelliste. „Führt das
     Gerät gar nicht“ behauptete der Satz auch, wo nur nicht gelesen wurde."""
     quellen = [geraete.get_text(" ", strip=True)]
-    for name in ("geraete-zeitreihe.html", "geraete-buendel.html"):
-        fragment = site / "data" / name
-        assert fragment.exists(), f"{name} fehlt"
-        quellen.append(fragment.read_text(encoding="utf-8"))
+    quellen.append(zeitreihe_fragment.lies(site / "data"))
+    fragment = site / "data" / "geraete-buendel.html"
+    assert fragment.exists(), "geraete-buendel.html fehlt"
+    quellen.append(fragment.read_text(encoding="utf-8"))
     gesamt = " ".join(quellen)
     for alt in ("führt kein Bündel", "gar nicht im Bündel", "gr-lueckenzeile"):
         assert alt not in gesamt, f"alter Wortlaut ist zurück: {alt}"

@@ -26,21 +26,21 @@ import math
 import pathlib
 
 import yaml
+import zeitreihe_fragment
 from bs4 import BeautifulSoup
-
 from tarifleiter_testbestand import mit_leiter
+from test_geraete_tco_zustand import HEUTE, _baue, lager, vorlage_text
+
 from telco_radar.geraete_config import lade_katalog, lade_quellen
 from telco_radar.report import geraete_view
 from telco_radar.report.html import render_site
-from test_geraete_tco_zustand import HEUTE, _baue, lager, vorlage_text
 
 
 def _zr_fragment(tmp_path: pathlib.Path) -> list:
     """Die Zeitreihen-Lager des gerenderten Fragments - _baue_ohne_band
     rendert nach <tmp>/ohne_band/site, das Fragment liegt daneben."""
-    fragment = tmp_path / "ohne_band" / "site" / "data" / "geraete-zeitreihe.html"
-    assert fragment.exists(), "Zeitreihen-Fragment fehlt"
-    return BeautifulSoup(fragment.read_text(encoding="utf-8"), "html.parser").select(
+    daten = tmp_path / "ohne_band" / "site" / "data"
+    return BeautifulSoup(zeitreihe_fragment.lies(daten), "html.parser").select(
         ".gr-zr-lager"
     )
 
@@ -188,7 +188,6 @@ def _baue_ohne_band(tmp_path: pathlib.Path) -> BeautifulSoup:
     """Ein Modell in drei Lagern: Band XS (o2 + Vodafone), unbegrenzt
     (o2, ohne Band), kein Tarifbestand (1&1, ohne Band) - dazu Saturn mit
     und Amazon/Expert ohne Händlerpreis."""
-    import math
 
     root = tmp_path / "ohne_band"
     (root / "config").mkdir(parents=True)
