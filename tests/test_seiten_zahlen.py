@@ -26,6 +26,7 @@ from decimal import Decimal
 from pathlib import Path
 
 import pytest
+import zeitreihe_fragment
 from bestand_pfad import ARCHIV
 from bs4 import BeautifulSoup
 from orakel.test_geraete_bestand import (
@@ -761,7 +762,7 @@ def test_die_panel_posten_kommen_aus_der_aufbereitung(tmp_path):
     first_paint = soup.select("#gr-zr-gruppe .gr-zr-rechnungen template[data-anb]")
     assert first_paint, "die Rechenweg-Vorlagen fehlen im First Paint"
     fragment = BeautifulSoup(
-        (site / "data" / "geraete-zeitreihe.html").read_text("utf-8"), "html.parser"
+        zeitreihe_fragment.lies(site / "data"), "html.parser"
     ).select("template[data-anb]")
     assert fragment, "das Zeitreihen-Fragment traegt keine Vorlagen"
     start = aufbereitung["start_block"]

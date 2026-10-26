@@ -27,6 +27,7 @@ import json
 import pathlib
 
 import pytest
+import zeitreihe_fragment
 from bs4 import BeautifulSoup
 from test_geraete_zeitreihe_ansicht import HEUTE, _baue
 
@@ -531,9 +532,7 @@ def test_der_leerzustands_text_steht_woertlich_in_der_buendel_vorlage(tmp_path):
     )
     assert hinweis is not None, "die Fixture trägt keine Referenzkarte"
     fragment = BeautifulSoup(
-        (tmp_path / "mit" / "site" / "data" / "geraete-zeitreihe.html").read_text(
-            encoding="utf-8"
-        ),
+        zeitreihe_fragment.lies(tmp_path / "mit" / "site" / "data"),
         "html.parser",
     )
     leer = [vorlage_text(e) for e in fragment.select(".gr-zr-rleer")]
@@ -723,7 +722,7 @@ def test_im_first_paint_findet_jeder_kreis_sein_template(gerendert):
 
 
 def test_im_fragment_findet_jeder_kreis_sein_template(gerendert):
-    inhalt = (gerendert / "data" / "geraete-zeitreihe.html").read_text(encoding="utf-8")
+    inhalt = zeitreihe_fragment.lies(gerendert / "data")
     suppe = BeautifulSoup(inhalt, "html.parser")
     lager = suppe.select(".gr-zr-lager")
     assert lager, "das Fragment braucht Blöcke"

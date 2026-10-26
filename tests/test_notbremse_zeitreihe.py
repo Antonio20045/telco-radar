@@ -16,6 +16,7 @@ import re
 import shutil
 
 import pytest
+import zeitreihe_fragment
 from bestand_pfad import ZUSTAND, abbild, lese_wurzel
 from bs4 import BeautifulSoup
 
@@ -55,9 +56,7 @@ def gerendert(tmp_path_factory):
     finally:
         locale.setlocale(locale.LC_TIME, vorher)
     seite = (wurzel / "site" / "geraete.html").read_text(encoding="utf-8")
-    fragment = (wurzel / "site" / "data" / "geraete-zeitreihe.html").read_text(
-        encoding="utf-8"
-    )
+    fragment = zeitreihe_fragment.lies(wurzel / "site" / "data")
     return seite, BeautifulSoup(fragment, "html.parser")
 
 

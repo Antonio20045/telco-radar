@@ -10,6 +10,7 @@ Bestand vom 2026-10-03; der Bezugstag kommt aus dem Bestand, nie vom heutigen Da
 from __future__ import annotations
 
 import pytest
+import zeitreihe_fragment
 from bestand_pfad import abbild
 from bs4 import BeautifulSoup
 
@@ -24,9 +25,7 @@ def seite(tmp_path_factory):
     wurzel = tmp_path_factory.mktemp("notbremse-kachel")
     render_site(wurzel / "site", abbild(wurzel), load_config(wurzel))
     html = (wurzel / "site" / "geraete.html").read_text(encoding="utf-8")
-    fragment = (wurzel / "site" / "data" / "geraete-zeitreihe.html").read_text(
-        encoding="utf-8"
-    )
+    fragment = zeitreihe_fragment.lies(wurzel / "site" / "data")
     return BeautifulSoup(html, "html.parser"), BeautifulSoup(fragment, "html.parser")
 
 
