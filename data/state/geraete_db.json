@@ -2,8 +2,8 @@
  "updated": "2026-10-26",
  "anbieter": {
   "ALDI TALK": {
-   "laeufe": 85,
-   "funde_gesamt": 501,
+   "laeufe": 86,
+   "funde_gesamt": 507,
    "letzter_lauf": "2026-10-26",
    "letzte_funde": 6,
    "letzter_fund": "2026-10-26",
@@ -308,8 +308,8 @@
    "tote_adressen": 0
   },
   "Vodafone": {
-   "laeufe": 83,
-   "funde_gesamt": 14330,
+   "laeufe": 84,
+   "funde_gesamt": 14497,
    "letzter_lauf": "2026-10-26",
    "letzte_funde": 167,
    "termine": [
@@ -614,8 +614,8 @@
    "tote_adressen": 0
   },
   "o2": {
-   "laeufe": 83,
-   "funde_gesamt": 5607,
+   "laeufe": 84,
+   "funde_gesamt": 5673,
    "letzter_lauf": "2026-10-26",
    "letzte_funde": 66,
    "termine": [
@@ -920,8 +920,8 @@
    "tote_adressen": null
   },
   "mobilcom-debitel": {
-   "laeufe": 36,
-   "funde_gesamt": 10615,
+   "laeufe": 37,
+   "funde_gesamt": 10770,
    "letzte_funde": 155,
    "termine": [
     "2026-08-29",
@@ -1773,10 +1773,10 @@
    "tote_adressen": 0
   },
   "congstar": {
-   "laeufe": 53,
-   "funde_gesamt": 10733,
+   "laeufe": 54,
+   "funde_gesamt": 10870,
    "letzter_lauf": "2026-10-26",
-   "letzte_funde": 138,
+   "letzte_funde": 137,
    "termine": [
     "2026-09-03",
     "2026-09-04",
@@ -2063,9 +2063,9 @@
     ],
     [
      "2026-10-26",
-     138,
+     137,
      "gelesen",
-     912,
+     896,
      39,
      0
     ]
@@ -2073,8 +2073,8 @@
    "tote_adressen": 0
   },
   "1&1": {
-   "laeufe": 75,
-   "funde_gesamt": 2822,
+   "laeufe": 76,
+   "funde_gesamt": 2864,
    "letzter_lauf": "2026-10-26",
    "letzte_funde": 42,
    "termine": [
@@ -2630,8 +2630,8 @@
    "tote_adressen": null
   },
   "Saturn": {
-   "laeufe": 71,
-   "funde_gesamt": 1330,
+   "laeufe": 72,
+   "funde_gesamt": 1338,
    "letzter_lauf": "2026-10-26",
    "letzte_funde": 8,
    "termine": [
@@ -6495,7 +6495,7 @@
     "https://mobile.1und1.de/smartphones"
    ],
    "titel_roh": "Apple iPhone 18 Pro 256 GB silber",
-   "preis_mit_vertrag_ab": 49.99,
+   "preis_mit_vertrag_ab": 52.99,
    "laufzeit_monate": 36,
    "tarif_referenz": "1&1 All-Net-Flat S"
   },
@@ -7365,7 +7365,7 @@
     "https://mobile.1und1.de/smartphones"
    ],
    "titel_roh": "Samsung Samsung Galaxy S26 Ultra 256 GB cobalt violet",
-   "preis_mit_vertrag_ab": 42.99,
+   "preis_mit_vertrag_ab": 44.99,
    "laufzeit_monate": 36,
    "tarif_referenz": "1&1 All-Net-Flat S"
   },
