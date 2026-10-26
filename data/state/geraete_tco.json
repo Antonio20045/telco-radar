@@ -3673,8 +3673,8 @@
    "tarif_id_guete": "hoch",
    "tarif_monatlich": null,
    "tarif_bindung_monate": null,
-   "buendel_monatlich": 88.99,
-   "geraet_zuzahlung": 710.0,
+   "buendel_monatlich": 85.99,
+   "geraet_zuzahlung": 680.0,
    "geraet_monatsrate": null,
    "laufzeit_monate": 36,
    "anschlusspreis": 39.9,
@@ -3861,8 +3861,8 @@
    "tarif_id_guete": "hoch",
    "tarif_monatlich": null,
    "tarif_bindung_monate": null,
-   "buendel_monatlich": 109.99,
-   "geraet_zuzahlung": 960.0,
+   "buendel_monatlich": 106.99,
+   "geraet_zuzahlung": 930.0,
    "geraet_monatsrate": null,
    "laufzeit_monate": 36,
    "anschlusspreis": 39.9,
@@ -4443,8 +4443,8 @@
    "tarif_id_guete": "hoch",
    "tarif_monatlich": null,
    "tarif_bindung_monate": null,
-   "buendel_monatlich": 74.99,
-   "geraet_zuzahlung": 540.0,
+   "buendel_monatlich": 71.99,
+   "geraet_zuzahlung": 510.0,
    "geraet_monatsrate": null,
    "laufzeit_monate": 36,
    "anschlusspreis": 39.9,
@@ -12851,8 +12851,8 @@
    "tarif_id_guete": "hoch",
    "tarif_monatlich": null,
    "tarif_bindung_monate": null,
-   "buendel_monatlich": 73.99,
-   "geraet_zuzahlung": 530.0,
+   "buendel_monatlich": 71.99,
+   "geraet_zuzahlung": 510.0,
    "geraet_monatsrate": null,
    "laufzeit_monate": 36,
    "anschlusspreis": 39.9,
@@ -12930,7 +12930,7 @@
    "tarif_monatlich": null,
    "tarif_bindung_monate": null,
    "buendel_monatlich": 52.99,
-   "geraet_zuzahlung": 360.0,
+   "geraet_zuzahlung": 340.0,
    "geraet_monatsrate": null,
    "laufzeit_monate": 36,
    "anschlusspreis": 39.9,
@@ -12955,8 +12955,8 @@
    "tarif_id_guete": "hoch",
    "tarif_monatlich": null,
    "tarif_bindung_monate": null,
-   "buendel_monatlich": 47.99,
-   "geraet_zuzahlung": 360.0,
+   "buendel_monatlich": 49.99,
+   "geraet_zuzahlung": 340.0,
    "geraet_monatsrate": null,
    "laufzeit_monate": 36,
    "anschlusspreis": 39.9,
@@ -13039,8 +13039,8 @@
    "tarif_id_guete": "hoch",
    "tarif_monatlich": null,
    "tarif_bindung_monate": null,
-   "buendel_monatlich": 59.99,
-   "geraet_zuzahlung": 360.0,
+   "buendel_monatlich": 57.99,
+   "geraet_zuzahlung": 340.0,
    "geraet_monatsrate": null,
    "laufzeit_monate": 36,
    "anschlusspreis": 39.9,
@@ -13066,7 +13066,7 @@
    "tarif_monatlich": null,
    "tarif_bindung_monate": null,
    "buendel_monatlich": 54.99,
-   "geraet_zuzahlung": 360.0,
+   "geraet_zuzahlung": 340.0,
    "geraet_monatsrate": null,
    "laufzeit_monate": 36,
    "anschlusspreis": 39.9,
@@ -13092,7 +13092,7 @@
    "tarif_monatlich": null,
    "tarif_bindung_monate": null,
    "buendel_monatlich": 49.99,
-   "geraet_zuzahlung": 360.0,
+   "geraet_zuzahlung": 340.0,
    "geraet_monatsrate": null,
    "laufzeit_monate": 36,
    "anschlusspreis": 39.9,
@@ -13117,8 +13117,8 @@
    "tarif_id_guete": "hoch",
    "tarif_monatlich": null,
    "tarif_bindung_monate": null,
-   "buendel_monatlich": 74.99,
-   "geraet_zuzahlung": 360.0,
+   "buendel_monatlich": 72.99,
+   "geraet_zuzahlung": 340.0,
    "geraet_monatsrate": null,
    "laufzeit_monate": 36,
    "anschlusspreis": 39.9,
@@ -13253,8 +13253,8 @@
    "tarif_id_guete": "hoch",
    "tarif_monatlich": null,
    "tarif_bindung_monate": null,
-   "buendel_monatlich": 65.99,
-   "geraet_zuzahlung": 440.0,
+   "buendel_monatlich": 63.99,
+   "geraet_zuzahlung": 410.0,
    "geraet_monatsrate": null,
    "laufzeit_monate": 36,
    "anschlusspreis": 39.9,
@@ -194652,13 +194652,22 @@
    "geraet_zuzahlung": 1.0,
    "geraet_monatsrate": 22.5,
    "laufzeit_monate": 24,
-   "anschlusspreis": 15.0,
+   "anschlusspreis": 0.0,
    "quelle_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
-   "abgerufen_am": "2026-10-01",
+   "abgerufen_am": "2026-10-26",
    "zustand": "neu",
    "herleitung": "",
    "rabatte": [],
    "aktionen": [
+    {
+     "art": "anschluss_erlassen",
+     "bedingung": "Bei Abschluss bis zum 02.11.2026 schenken wir dir den einmaligen Bereitstellungspreis / die einmaligen Kosten.",
+     "quelle_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
+     "betrag": 15.0,
+     "betrag_monatlich": null,
+     "eingerechnet": true,
+     "gueltig_bis": "2026-11-02"
+    },
     {
      "art": "trade_in",
      "bedingung": "nur mit Eintausch eines Altgeräts",
@@ -194669,8 +194678,18 @@
      "gueltig_bis": ""
     }
    ],
-   "last_verified": "2026-10-01",
-   "pruefung": "veraltet 16"
+   "last_verified": "2026-10-26",
+   "pruefung": "gueltig",
+   "tarif_listenpreis": null,
+   "tarif_phasen": [
+    {
+     "von_monat": 1,
+     "bis_monat": 24,
+     "betrag": 30.0,
+     "beleg": "prices.recurring: listed 30,00 € = discounted 30,00 €, discounts [] (keine Rabattphase)"
+    }
+   ],
+   "rechenweise": 1
   },
   {
    "id": "buendel--congstar--samsung-galaxy-s26-256gb-weiss--allnet-flat-l--36m",
@@ -194686,13 +194705,22 @@
    "geraet_zuzahlung": 1.0,
    "geraet_monatsrate": 15.0,
    "laufzeit_monate": 36,
-   "anschlusspreis": 15.0,
+   "anschlusspreis": 0.0,
    "quelle_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
-   "abgerufen_am": "2026-10-01",
+   "abgerufen_am": "2026-10-26",
    "zustand": "neu",
    "herleitung": "",
    "rabatte": [],
    "aktionen": [
+    {
+     "art": "anschluss_erlassen",
+     "bedingung": "Bei Abschluss bis zum 02.11.2026 schenken wir dir den einmaligen Bereitstellungspreis / die einmaligen Kosten.",
+     "quelle_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
+     "betrag": 15.0,
+     "betrag_monatlich": null,
+     "eingerechnet": true,
+     "gueltig_bis": "2026-11-02"
+    },
     {
      "art": "trade_in",
      "bedingung": "nur mit Eintausch eines Altgeräts",
@@ -194703,8 +194731,18 @@
      "gueltig_bis": ""
     }
    ],
-   "last_verified": "2026-10-01",
-   "pruefung": "veraltet 16"
+   "last_verified": "2026-10-26",
+   "pruefung": "gueltig",
+   "tarif_listenpreis": null,
+   "tarif_phasen": [
+    {
+     "von_monat": 1,
+     "bis_monat": 36,
+     "betrag": 30.0,
+     "beleg": "prices.recurring: listed 30,00 € = discounted 30,00 €, discounts [] (keine Rabattphase)"
+    }
+   ],
+   "rechenweise": 1
   },
   {
    "id": "buendel--congstar--samsung-galaxy-s26-256gb-weiss--allnet-flat-l-flex--24m",
@@ -194720,13 +194758,22 @@
    "geraet_zuzahlung": 1.0,
    "geraet_monatsrate": 33.0,
    "laufzeit_monate": 24,
-   "anschlusspreis": 35.0,
+   "anschlusspreis": 0.0,
    "quelle_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
-   "abgerufen_am": "2026-10-01",
+   "abgerufen_am": "2026-10-26",
    "zustand": "neu",
    "herleitung": "",
    "rabatte": [],
    "aktionen": [
+    {
+     "art": "anschluss_erlassen",
+     "bedingung": "Bei Abschluss bis zum 02.11.2026 schenken wir dir den einmaligen Bereitstellungspreis / die einmaligen Kosten.",
+     "quelle_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
+     "betrag": 35.0,
+     "betrag_monatlich": null,
+     "eingerechnet": true,
+     "gueltig_bis": "2026-11-02"
+    },
     {
      "art": "trade_in",
      "bedingung": "nur mit Eintausch eines Altgeräts",
@@ -194737,8 +194784,18 @@
      "gueltig_bis": ""
     }
    ],
-   "last_verified": "2026-10-01",
-   "pruefung": "veraltet 16"
+   "last_verified": "2026-10-26",
+   "pruefung": "gueltig",
+   "tarif_listenpreis": null,
+   "tarif_phasen": [
+    {
+     "von_monat": 1,
+     "bis_monat": 24,
+     "betrag": 30.0,
+     "beleg": "prices.recurring: listed 30,00 € = discounted 30,00 €, discounts [] (keine Rabattphase)"
+    }
+   ],
+   "rechenweise": 1
   },
   {
    "id": "buendel--congstar--samsung-galaxy-s26-256gb-weiss--allnet-flat-l-flex--36m",
@@ -194754,13 +194811,22 @@
    "geraet_zuzahlung": 1.0,
    "geraet_monatsrate": 22.0,
    "laufzeit_monate": 36,
-   "anschlusspreis": 35.0,
+   "anschlusspreis": 0.0,
    "quelle_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
-   "abgerufen_am": "2026-10-01",
+   "abgerufen_am": "2026-10-26",
    "zustand": "neu",
    "herleitung": "",
    "rabatte": [],
    "aktionen": [
+    {
+     "art": "anschluss_erlassen",
+     "bedingung": "Bei Abschluss bis zum 02.11.2026 schenken wir dir den einmaligen Bereitstellungspreis / die einmaligen Kosten.",
+     "quelle_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
+     "betrag": 35.0,
+     "betrag_monatlich": null,
+     "eingerechnet": true,
+     "gueltig_bis": "2026-11-02"
+    },
     {
      "art": "trade_in",
      "bedingung": "nur mit Eintausch eines Altgeräts",
@@ -194771,8 +194837,18 @@
      "gueltig_bis": ""
     }
    ],
-   "last_verified": "2026-10-01",
-   "pruefung": "veraltet 16"
+   "last_verified": "2026-10-26",
+   "pruefung": "gueltig",
+   "tarif_listenpreis": null,
+   "tarif_phasen": [
+    {
+     "von_monat": 1,
+     "bis_monat": 36,
+     "betrag": 30.0,
+     "beleg": "prices.recurring: listed 30,00 € = discounted 30,00 €, discounts [] (keine Rabattphase)"
+    }
+   ],
+   "rechenweise": 1
   },
   {
    "id": "buendel--congstar--samsung-galaxy-s26-256gb-weiss--allnet-flat-m--24m",
@@ -194788,13 +194864,22 @@
    "geraet_zuzahlung": 1.0,
    "geraet_monatsrate": 25.5,
    "laufzeit_monate": 24,
-   "anschlusspreis": 15.0,
+   "anschlusspreis": 0.0,
    "quelle_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
-   "abgerufen_am": "2026-10-01",
+   "abgerufen_am": "2026-10-26",
    "zustand": "neu",
    "herleitung": "",
    "rabatte": [],
    "aktionen": [
+    {
+     "art": "anschluss_erlassen",
+     "bedingung": "Bei Abschluss bis zum 02.11.2026 schenken wir dir den einmaligen Bereitstellungspreis / die einmaligen Kosten.",
+     "quelle_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
+     "betrag": 15.0,
+     "betrag_monatlich": null,
+     "eingerechnet": true,
+     "gueltig_bis": "2026-11-02"
+    },
     {
      "art": "trade_in",
      "bedingung": "nur mit Eintausch eines Altgeräts",
@@ -194805,8 +194890,18 @@
      "gueltig_bis": ""
     }
    ],
-   "last_verified": "2026-10-01",
-   "pruefung": "veraltet 16"
+   "last_verified": "2026-10-26",
+   "pruefung": "gueltig",
+   "tarif_listenpreis": null,
+   "tarif_phasen": [
+    {
+     "von_monat": 1,
+     "bis_monat": 24,
+     "betrag": 25.0,
+     "beleg": "prices.recurring: listed 25,00 € = discounted 25,00 €, discounts [] (keine Rabattphase)"
+    }
+   ],
+   "rechenweise": 1
   },
   {
    "id": "buendel--congstar--samsung-galaxy-s26-256gb-weiss--allnet-flat-m--36m",
@@ -194822,13 +194917,22 @@
    "geraet_zuzahlung": 1.0,
    "geraet_monatsrate": 17.0,
    "laufzeit_monate": 36,
-   "anschlusspreis": 15.0,
+   "anschlusspreis": 0.0,
    "quelle_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
-   "abgerufen_am": "2026-10-01",
+   "abgerufen_am": "2026-10-26",
    "zustand": "neu",
    "herleitung": "",
    "rabatte": [],
    "aktionen": [
+    {
+     "art": "anschluss_erlassen",
+     "bedingung": "Bei Abschluss bis zum 02.11.2026 schenken wir dir den einmaligen Bereitstellungspreis / die einmaligen Kosten.",
+     "quelle_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
+     "betrag": 15.0,
+     "betrag_monatlich": null,
+     "eingerechnet": true,
+     "gueltig_bis": "2026-11-02"
+    },
     {
      "art": "trade_in",
      "bedingung": "nur mit Eintausch eines Altgeräts",
@@ -194839,8 +194943,18 @@
      "gueltig_bis": ""
     }
    ],
-   "last_verified": "2026-10-01",
-   "pruefung": "veraltet 16"
+   "last_verified": "2026-10-26",
+   "pruefung": "gueltig",
+   "tarif_listenpreis": null,
+   "tarif_phasen": [
+    {
+     "von_monat": 1,
+     "bis_monat": 36,
+     "betrag": 25.0,
+     "beleg": "prices.recurring: listed 25,00 € = discounted 25,00 €, discounts [] (keine Rabattphase)"
+    }
+   ],
+   "rechenweise": 1
   },
   {
    "id": "buendel--congstar--samsung-galaxy-s26-256gb-weiss--allnet-flat-m-flex--24m",
@@ -194856,13 +194970,22 @@
    "geraet_zuzahlung": 1.0,
    "geraet_monatsrate": 33.0,
    "laufzeit_monate": 24,
-   "anschlusspreis": 35.0,
+   "anschlusspreis": 0.0,
    "quelle_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
-   "abgerufen_am": "2026-10-01",
+   "abgerufen_am": "2026-10-26",
    "zustand": "neu",
    "herleitung": "",
    "rabatte": [],
    "aktionen": [
+    {
+     "art": "anschluss_erlassen",
+     "bedingung": "Bei Abschluss bis zum 02.11.2026 schenken wir dir den einmaligen Bereitstellungspreis / die einmaligen Kosten.",
+     "quelle_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
+     "betrag": 35.0,
+     "betrag_monatlich": null,
+     "eingerechnet": true,
+     "gueltig_bis": "2026-11-02"
+    },
     {
      "art": "trade_in",
      "bedingung": "nur mit Eintausch eines Altgeräts",
@@ -194873,8 +194996,18 @@
      "gueltig_bis": ""
     }
    ],
-   "last_verified": "2026-10-01",
-   "pruefung": "veraltet 16"
+   "last_verified": "2026-10-26",
+   "pruefung": "gueltig",
+   "tarif_listenpreis": null,
+   "tarif_phasen": [
+    {
+     "von_monat": 1,
+     "bis_monat": 24,
+     "betrag": 25.0,
+     "beleg": "prices.recurring: listed 25,00 € = discounted 25,00 €, discounts [] (keine Rabattphase)"
+    }
+   ],
+   "rechenweise": 1
   },
   {
    "id": "buendel--congstar--samsung-galaxy-s26-256gb-weiss--allnet-flat-m-flex--36m",
@@ -194890,13 +195023,22 @@
    "geraet_zuzahlung": 1.0,
    "geraet_monatsrate": 22.0,
    "laufzeit_monate": 36,
-   "anschlusspreis": 35.0,
+   "anschlusspreis": 0.0,
    "quelle_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
-   "abgerufen_am": "2026-10-01",
+   "abgerufen_am": "2026-10-26",
    "zustand": "neu",
    "herleitung": "",
    "rabatte": [],
    "aktionen": [
+    {
+     "art": "anschluss_erlassen",
+     "bedingung": "Bei Abschluss bis zum 02.11.2026 schenken wir dir den einmaligen Bereitstellungspreis / die einmaligen Kosten.",
+     "quelle_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
+     "betrag": 35.0,
+     "betrag_monatlich": null,
+     "eingerechnet": true,
+     "gueltig_bis": "2026-11-02"
+    },
     {
      "art": "trade_in",
      "bedingung": "nur mit Eintausch eines Altgeräts",
@@ -194907,8 +195049,18 @@
      "gueltig_bis": ""
     }
    ],
-   "last_verified": "2026-10-01",
-   "pruefung": "veraltet 16"
+   "last_verified": "2026-10-26",
+   "pruefung": "gueltig",
+   "tarif_listenpreis": null,
+   "tarif_phasen": [
+    {
+     "von_monat": 1,
+     "bis_monat": 36,
+     "betrag": 25.0,
+     "beleg": "prices.recurring: listed 25,00 € = discounted 25,00 €, discounts [] (keine Rabattphase)"
+    }
+   ],
+   "rechenweise": 1
   },
   {
    "id": "buendel--congstar--samsung-galaxy-s26-256gb-weiss--allnet-flat-s--24m",
@@ -194924,13 +195076,22 @@
    "geraet_zuzahlung": 1.0,
    "geraet_monatsrate": 28.5,
    "laufzeit_monate": 24,
-   "anschlusspreis": 15.0,
+   "anschlusspreis": 0.0,
    "quelle_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
-   "abgerufen_am": "2026-10-01",
+   "abgerufen_am": "2026-10-26",
    "zustand": "neu",
    "herleitung": "",
    "rabatte": [],
    "aktionen": [
+    {
+     "art": "anschluss_erlassen",
+     "bedingung": "Bei Abschluss bis zum 02.11.2026 schenken wir dir den einmaligen Bereitstellungspreis / die einmaligen Kosten.",
+     "quelle_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
+     "betrag": 15.0,
+     "betrag_monatlich": null,
+     "eingerechnet": true,
+     "gueltig_bis": "2026-11-02"
+    },
     {
      "art": "trade_in",
      "bedingung": "nur mit Eintausch eines Altgeräts",
@@ -194941,8 +195102,18 @@
      "gueltig_bis": ""
     }
    ],
-   "last_verified": "2026-10-01",
-   "pruefung": "veraltet 16"
+   "last_verified": "2026-10-26",
+   "pruefung": "gueltig",
+   "tarif_listenpreis": null,
+   "tarif_phasen": [
+    {
+     "von_monat": 1,
+     "bis_monat": 24,
+     "betrag": 20.0,
+     "beleg": "prices.recurring: listed 20,00 € = discounted 20,00 €, discounts [] (keine Rabattphase)"
+    }
+   ],
+   "rechenweise": 1
   },
   {
    "id": "buendel--congstar--samsung-galaxy-s26-256gb-weiss--allnet-flat-s--36m",
@@ -194958,13 +195129,22 @@
    "geraet_zuzahlung": 1.0,
    "geraet_monatsrate": 19.0,
    "laufzeit_monate": 36,
-   "anschlusspreis": 15.0,
+   "anschlusspreis": 0.0,
    "quelle_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
-   "abgerufen_am": "2026-10-01",
+   "abgerufen_am": "2026-10-26",
    "zustand": "neu",
    "herleitung": "",
    "rabatte": [],
    "aktionen": [
+    {
+     "art": "anschluss_erlassen",
+     "bedingung": "Bei Abschluss bis zum 02.11.2026 schenken wir dir den einmaligen Bereitstellungspreis / die einmaligen Kosten.",
+     "quelle_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
+     "betrag": 15.0,
+     "betrag_monatlich": null,
+     "eingerechnet": true,
+     "gueltig_bis": "2026-11-02"
+    },
     {
      "art": "trade_in",
      "bedingung": "nur mit Eintausch eines Altgeräts",
@@ -194975,8 +195155,18 @@
      "gueltig_bis": ""
     }
    ],
-   "last_verified": "2026-10-01",
-   "pruefung": "veraltet 16"
+   "last_verified": "2026-10-26",
+   "pruefung": "gueltig",
+   "tarif_listenpreis": null,
+   "tarif_phasen": [
+    {
+     "von_monat": 1,
+     "bis_monat": 36,
+     "betrag": 20.0,
+     "beleg": "prices.recurring: listed 20,00 € = discounted 20,00 €, discounts [] (keine Rabattphase)"
+    }
+   ],
+   "rechenweise": 1
   },
   {
    "id": "buendel--congstar--samsung-galaxy-s26-256gb-weiss--allnet-flat-s-flex--24m",
@@ -194992,13 +195182,22 @@
    "geraet_zuzahlung": 1.0,
    "geraet_monatsrate": 33.0,
    "laufzeit_monate": 24,
-   "anschlusspreis": 35.0,
+   "anschlusspreis": 0.0,
    "quelle_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
-   "abgerufen_am": "2026-10-01",
+   "abgerufen_am": "2026-10-26",
    "zustand": "neu",
    "herleitung": "",
    "rabatte": [],
    "aktionen": [
+    {
+     "art": "anschluss_erlassen",
+     "bedingung": "Bei Abschluss bis zum 02.11.2026 schenken wir dir den einmaligen Bereitstellungspreis / die einmaligen Kosten.",
+     "quelle_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
+     "betrag": 35.0,
+     "betrag_monatlich": null,
+     "eingerechnet": true,
+     "gueltig_bis": "2026-11-02"
+    },
     {
      "art": "trade_in",
      "bedingung": "nur mit Eintausch eines Altgeräts",
@@ -195009,8 +195208,18 @@
      "gueltig_bis": ""
     }
    ],
-   "last_verified": "2026-10-01",
-   "pruefung": "veraltet 16"
+   "last_verified": "2026-10-26",
+   "pruefung": "gueltig",
+   "tarif_listenpreis": null,
+   "tarif_phasen": [
+    {
+     "von_monat": 1,
+     "bis_monat": 24,
+     "betrag": 20.0,
+     "beleg": "prices.recurring: listed 20,00 € = discounted 20,00 €, discounts [] (keine Rabattphase)"
+    }
+   ],
+   "rechenweise": 1
   },
   {
    "id": "buendel--congstar--samsung-galaxy-s26-256gb-weiss--allnet-flat-s-flex--36m",
@@ -195026,13 +195235,22 @@
    "geraet_zuzahlung": 1.0,
    "geraet_monatsrate": 22.0,
    "laufzeit_monate": 36,
-   "anschlusspreis": 35.0,
+   "anschlusspreis": 0.0,
    "quelle_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
-   "abgerufen_am": "2026-10-01",
+   "abgerufen_am": "2026-10-26",
    "zustand": "neu",
    "herleitung": "",
    "rabatte": [],
    "aktionen": [
+    {
+     "art": "anschluss_erlassen",
+     "bedingung": "Bei Abschluss bis zum 02.11.2026 schenken wir dir den einmaligen Bereitstellungspreis / die einmaligen Kosten.",
+     "quelle_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
+     "betrag": 35.0,
+     "betrag_monatlich": null,
+     "eingerechnet": true,
+     "gueltig_bis": "2026-11-02"
+    },
     {
      "art": "trade_in",
      "bedingung": "nur mit Eintausch eines Altgeräts",
@@ -195043,8 +195261,18 @@
      "gueltig_bis": ""
     }
    ],
-   "last_verified": "2026-10-01",
-   "pruefung": "veraltet 16"
+   "last_verified": "2026-10-26",
+   "pruefung": "gueltig",
+   "tarif_listenpreis": null,
+   "tarif_phasen": [
+    {
+     "von_monat": 1,
+     "bis_monat": 36,
+     "betrag": 20.0,
+     "beleg": "prices.recurring: listed 20,00 € = discounted 20,00 €, discounts [] (keine Rabattphase)"
+    }
+   ],
+   "rechenweise": 1
   },
   {
    "id": "buendel--congstar--samsung-galaxy-s26-256gb-weiss--allnet-flat-xs--24m",
@@ -195060,13 +195288,22 @@
    "geraet_zuzahlung": 1.0,
    "geraet_monatsrate": 31.5,
    "laufzeit_monate": 24,
-   "anschlusspreis": 15.0,
+   "anschlusspreis": 0.0,
    "quelle_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
-   "abgerufen_am": "2026-10-01",
+   "abgerufen_am": "2026-10-26",
    "zustand": "neu",
    "herleitung": "",
    "rabatte": [],
    "aktionen": [
+    {
+     "art": "anschluss_erlassen",
+     "bedingung": "Bei Abschluss bis zum 02.11.2026 schenken wir dir den einmaligen Bereitstellungspreis / die einmaligen Kosten.",
+     "quelle_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
+     "betrag": 15.0,
+     "betrag_monatlich": null,
+     "eingerechnet": true,
+     "gueltig_bis": "2026-11-02"
+    },
     {
      "art": "trade_in",
      "bedingung": "nur mit Eintausch eines Altgeräts",
@@ -195077,8 +195314,18 @@
      "gueltig_bis": ""
     }
    ],
-   "last_verified": "2026-10-01",
-   "pruefung": "veraltet 16"
+   "last_verified": "2026-10-26",
+   "pruefung": "gueltig",
+   "tarif_listenpreis": null,
+   "tarif_phasen": [
+    {
+     "von_monat": 1,
+     "bis_monat": 24,
+     "betrag": 15.0,
+     "beleg": "prices.recurring: listed 15,00 € = discounted 15,00 €, discounts [] (keine Rabattphase)"
+    }
+   ],
+   "rechenweise": 1
   },
   {
    "id": "buendel--congstar--samsung-galaxy-s26-256gb-weiss--allnet-flat-xs--36m",
@@ -195094,13 +195341,22 @@
    "geraet_zuzahlung": 1.0,
    "geraet_monatsrate": 21.0,
    "laufzeit_monate": 36,
-   "anschlusspreis": 15.0,
+   "anschlusspreis": 0.0,
    "quelle_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
-   "abgerufen_am": "2026-10-01",
+   "abgerufen_am": "2026-10-26",
    "zustand": "neu",
    "herleitung": "",
    "rabatte": [],
    "aktionen": [
+    {
+     "art": "anschluss_erlassen",
+     "bedingung": "Bei Abschluss bis zum 02.11.2026 schenken wir dir den einmaligen Bereitstellungspreis / die einmaligen Kosten.",
+     "quelle_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
+     "betrag": 15.0,
+     "betrag_monatlich": null,
+     "eingerechnet": true,
+     "gueltig_bis": "2026-11-02"
+    },
     {
      "art": "trade_in",
      "bedingung": "nur mit Eintausch eines Altgeräts",
@@ -195111,8 +195367,18 @@
      "gueltig_bis": ""
     }
    ],
-   "last_verified": "2026-10-01",
-   "pruefung": "veraltet 16"
+   "last_verified": "2026-10-26",
+   "pruefung": "gueltig",
+   "tarif_listenpreis": null,
+   "tarif_phasen": [
+    {
+     "von_monat": 1,
+     "bis_monat": 36,
+     "betrag": 15.0,
+     "beleg": "prices.recurring: listed 15,00 € = discounted 15,00 €, discounts [] (keine Rabattphase)"
+    }
+   ],
+   "rechenweise": 1
   },
   {
    "id": "buendel--congstar--samsung-galaxy-s26-256gb-weiss--allnet-flat-xs-flex--24m",
@@ -195128,13 +195394,22 @@
    "geraet_zuzahlung": 1.0,
    "geraet_monatsrate": 33.0,
    "laufzeit_monate": 24,
-   "anschlusspreis": 35.0,
+   "anschlusspreis": 0.0,
    "quelle_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
-   "abgerufen_am": "2026-10-01",
+   "abgerufen_am": "2026-10-26",
    "zustand": "neu",
    "herleitung": "",
    "rabatte": [],
    "aktionen": [
+    {
+     "art": "anschluss_erlassen",
+     "bedingung": "Bei Abschluss bis zum 02.11.2026 schenken wir dir den einmaligen Bereitstellungspreis / die einmaligen Kosten.",
+     "quelle_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
+     "betrag": 35.0,
+     "betrag_monatlich": null,
+     "eingerechnet": true,
+     "gueltig_bis": "2026-11-02"
+    },
     {
      "art": "trade_in",
      "bedingung": "nur mit Eintausch eines Altgeräts",
@@ -195145,8 +195420,18 @@
      "gueltig_bis": ""
     }
    ],
-   "last_verified": "2026-10-01",
-   "pruefung": "veraltet 16"
+   "last_verified": "2026-10-26",
+   "pruefung": "gueltig",
+   "tarif_listenpreis": null,
+   "tarif_phasen": [
+    {
+     "von_monat": 1,
+     "bis_monat": 24,
+     "betrag": 15.0,
+     "beleg": "prices.recurring: listed 15,00 € = discounted 15,00 €, discounts [] (keine Rabattphase)"
+    }
+   ],
+   "rechenweise": 1
   },
   {
    "id": "buendel--congstar--samsung-galaxy-s26-256gb-weiss--allnet-flat-xs-flex--36m",
@@ -195162,13 +195447,22 @@
    "geraet_zuzahlung": 1.0,
    "geraet_monatsrate": 22.0,
    "laufzeit_monate": 36,
-   "anschlusspreis": 35.0,
+   "anschlusspreis": 0.0,
    "quelle_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
-   "abgerufen_am": "2026-10-01",
+   "abgerufen_am": "2026-10-26",
    "zustand": "neu",
    "herleitung": "",
    "rabatte": [],
    "aktionen": [
+    {
+     "art": "anschluss_erlassen",
+     "bedingung": "Bei Abschluss bis zum 02.11.2026 schenken wir dir den einmaligen Bereitstellungspreis / die einmaligen Kosten.",
+     "quelle_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
+     "betrag": 35.0,
+     "betrag_monatlich": null,
+     "eingerechnet": true,
+     "gueltig_bis": "2026-11-02"
+    },
     {
      "art": "trade_in",
      "bedingung": "nur mit Eintausch eines Altgeräts",
@@ -195179,8 +195473,18 @@
      "gueltig_bis": ""
     }
    ],
-   "last_verified": "2026-10-01",
-   "pruefung": "veraltet 16"
+   "last_verified": "2026-10-26",
+   "pruefung": "gueltig",
+   "tarif_listenpreis": null,
+   "tarif_phasen": [
+    {
+     "von_monat": 1,
+     "bis_monat": 36,
+     "betrag": 15.0,
+     "beleg": "prices.recurring: listed 15,00 € = discounted 15,00 €, discounts [] (keine Rabattphase)"
+    }
+   ],
+   "rechenweise": 1
   },
   {
    "id": "buendel--congstar--samsung-galaxy-s26-512gb-cobalt-violet--allnet-flat-l--24m",
@@ -291777,326 +292081,6 @@
    "pruefung": "veraltet 16"
   },
   {
-   "id": "buendel--o2--samsung-galaxy-s26-256gb-schwarz--o2-mobile-l-mit-150-gb-24-mon--24m",
-   "sku_id": "samsung-galaxy-s26-256gb-schwarz",
-   "anbieter": "o2",
-   "tarif_name": "O2 Mobile L mit 150 GB+ (24 Mon.)",
-   "first_seen": "2026-09-30",
-   "tarif_id": "o2:o2-mobile-l",
-   "tarif_id_guete": "hoch",
-   "tarif_monatlich": 24.99,
-   "tarif_bindung_monate": null,
-   "buendel_monatlich": null,
-   "geraet_zuzahlung": 1.0,
-   "geraet_monatsrate": 42.0,
-   "laufzeit_monate": 24,
-   "anschlusspreis": 0.0,
-   "quelle_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1zYW1zdW5nLWdhbGF4eS1zMjYtZWUtMjU2Z2ItYmxhY2stMjR4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLWwtcGx1cy1vbmxpbmUtaHd2O3BhY2tzPXVtdHMtb3B0aW9u",
-   "abgerufen_am": "2026-10-26",
-   "zustand": "neu",
-   "herleitung": "tarifsumme_minus_geraeterate",
-   "rabatte": [],
-   "aktionen": [],
-   "last_verified": "2026-10-26",
-   "pruefung": "gueltig",
-   "tarif_listenpreis": null,
-   "rechenweise": 1
-  },
-  {
-   "id": "buendel--o2--samsung-galaxy-s26-256gb-schwarz--o2-mobile-l-plus-mit-150-gb-24-mon--24m",
-   "sku_id": "samsung-galaxy-s26-256gb-schwarz",
-   "anbieter": "o2",
-   "tarif_name": "O2 Mobile L Plus mit 150 GB+ (24 Mon.)",
-   "first_seen": "2026-09-30",
-   "tarif_id": "o2:o2-mobile-l",
-   "tarif_id_guete": "hoch",
-   "tarif_monatlich": 19.99,
-   "tarif_bindung_monate": null,
-   "buendel_monatlich": null,
-   "geraet_zuzahlung": 1.0,
-   "geraet_monatsrate": 42.0,
-   "laufzeit_monate": 24,
-   "anschlusspreis": 0.0,
-   "quelle_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1zYW1zdW5nLWdhbGF4eS1zMjYtZWUtMjU2Z2ItYmxhY2stMjR4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLWwtcGx1cy1vbmxpbmUtaHd2O3BhY2tzPXVtdHMtb3B0aW9u",
-   "abgerufen_am": "2026-10-26",
-   "zustand": "neu",
-   "herleitung": "",
-   "rabatte": [],
-   "aktionen": [],
-   "last_verified": "2026-10-26",
-   "pruefung": "gueltig",
-   "tarif_listenpreis": null,
-   "rechenweise": 1
-  },
-  {
-   "id": "buendel--o2--samsung-galaxy-s26-256gb-schwarz--o2-mobile-on-demand-m-mit-50-gb-24-mon--24m",
-   "sku_id": "samsung-galaxy-s26-256gb-schwarz",
-   "anbieter": "o2",
-   "tarif_name": "O2 Mobile on Demand M mit 50 GB+ (24 Mon.)",
-   "first_seen": "2026-09-30",
-   "tarif_id": "o2:o2-mobile-on-demand-m",
-   "tarif_id_guete": "hoch",
-   "tarif_monatlich": 19.99,
-   "tarif_bindung_monate": null,
-   "buendel_monatlich": null,
-   "geraet_zuzahlung": 1.0,
-   "geraet_monatsrate": 42.0,
-   "laufzeit_monate": 24,
-   "anschlusspreis": 39.99,
-   "quelle_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1zYW1zdW5nLWdhbGF4eS1zMjYtZWUtMjU2Z2ItYmxhY2stMjR4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLWwtcGx1cy1vbmxpbmUtaHd2O3BhY2tzPXVtdHMtb3B0aW9u",
-   "abgerufen_am": "2026-10-26",
-   "zustand": "neu",
-   "herleitung": "tarifsumme_minus_geraeterate",
-   "rabatte": [],
-   "aktionen": [],
-   "last_verified": "2026-10-26",
-   "pruefung": "gueltig",
-   "tarif_listenpreis": null,
-   "rechenweise": 1
-  },
-  {
-   "id": "buendel--o2--samsung-galaxy-s26-256gb-schwarz--o2-mobile-on-demand-m-plus-mit-50-gb-24-mon--24m",
-   "sku_id": "samsung-galaxy-s26-256gb-schwarz",
-   "anbieter": "o2",
-   "tarif_name": "O2 Mobile on Demand M Plus mit 50 GB+ (24 Mon.)",
-   "first_seen": "2026-09-30",
-   "tarif_id": "o2:o2-mobile-on-demand-m",
-   "tarif_id_guete": "hoch",
-   "tarif_monatlich": 14.99,
-   "tarif_bindung_monate": null,
-   "buendel_monatlich": null,
-   "geraet_zuzahlung": 1.0,
-   "geraet_monatsrate": 42.0,
-   "laufzeit_monate": 24,
-   "anschlusspreis": 39.99,
-   "quelle_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1zYW1zdW5nLWdhbGF4eS1zMjYtZWUtMjU2Z2ItYmxhY2stMjR4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLWwtcGx1cy1vbmxpbmUtaHd2O3BhY2tzPXVtdHMtb3B0aW9u",
-   "abgerufen_am": "2026-10-26",
-   "zustand": "neu",
-   "herleitung": "tarifsumme_minus_geraeterate",
-   "rabatte": [],
-   "aktionen": [],
-   "last_verified": "2026-10-26",
-   "pruefung": "gueltig",
-   "tarif_listenpreis": null,
-   "rechenweise": 1
-  },
-  {
-   "id": "buendel--o2--samsung-galaxy-s26-256gb-schwarz--o2-mobile-s-mit-15-gb-24-mon--24m",
-   "sku_id": "samsung-galaxy-s26-256gb-schwarz",
-   "anbieter": "o2",
-   "tarif_name": "O2 Mobile S mit 15 GB+ (24 Mon.)",
-   "first_seen": "2026-09-30",
-   "tarif_id": "o2:o2-mobile-s",
-   "tarif_id_guete": "hoch",
-   "tarif_monatlich": 14.99,
-   "tarif_bindung_monate": null,
-   "buendel_monatlich": null,
-   "geraet_zuzahlung": 1.0,
-   "geraet_monatsrate": 42.0,
-   "laufzeit_monate": 24,
-   "anschlusspreis": 39.99,
-   "quelle_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1zYW1zdW5nLWdhbGF4eS1zMjYtZWUtMjU2Z2ItYmxhY2stMjR4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLWwtcGx1cy1vbmxpbmUtaHd2O3BhY2tzPXVtdHMtb3B0aW9u",
-   "abgerufen_am": "2026-10-26",
-   "zustand": "neu",
-   "herleitung": "tarifsumme_minus_geraeterate",
-   "rabatte": [],
-   "aktionen": [],
-   "last_verified": "2026-10-26",
-   "pruefung": "gueltig",
-   "tarif_phasen": [
-    {
-     "von_monat": 1,
-     "bis_monat": 24,
-     "betrag": 14.99,
-     "beleg": "selectedHardwareRateDurationModal: Entscheidest du dich zudem für einen passenden Mobilfunktarif, so erhältst du über die gesamte Laufzeit deines Geräte-Ratenplans (24 oder 36) einen attraktiven monatlichen Rabatt auf deinen Tarif. Tarif privatkunden-o2-mobile-s-online-hwv-24m-05-00"
-    }
-   ],
-   "tarif_listenpreis": null,
-   "rechenweise": 1
-  },
-  {
-   "id": "buendel--o2--samsung-galaxy-s26-256gb-schwarz--o2-mobile-special-24-mon--24m",
-   "sku_id": "samsung-galaxy-s26-256gb-schwarz",
-   "anbieter": "o2",
-   "tarif_name": "O2 Mobile Special (24 Mon.)",
-   "first_seen": "2026-10-07",
-   "tarif_id": "o2:o2-mobile-special",
-   "tarif_id_guete": "nur_mit_geraet",
-   "tarif_monatlich": 14.99,
-   "tarif_bindung_monate": null,
-   "buendel_monatlich": null,
-   "geraet_zuzahlung": 1.0,
-   "geraet_monatsrate": 42.0,
-   "laufzeit_monate": 24,
-   "anschlusspreis": 0.0,
-   "quelle_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1zYW1zdW5nLWdhbGF4eS1zMjYtZWUtMjU2Z2ItYmxhY2stMjR4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLWwtcGx1cy1vbmxpbmUtaHd2O3BhY2tzPXVtdHMtb3B0aW9u",
-   "abgerufen_am": "2026-10-26",
-   "zustand": "neu",
-   "herleitung": "tarifsumme_minus_geraeterate",
-   "rabatte": [],
-   "aktionen": [],
-   "last_verified": "2026-10-26",
-   "pruefung": "gueltig",
-   "tarif_listenpreis": null,
-   "rechenweise": 1
-  },
-  {
-   "id": "buendel--o2--samsung-galaxy-s26-256gb-schwarz--o2-mobile-unlimited-l-mit-300-mbit-s-24-mon--24m",
-   "sku_id": "samsung-galaxy-s26-256gb-schwarz",
-   "anbieter": "o2",
-   "tarif_name": "O2 Mobile Unlimited L mit 300 MBit/s (24 Mon.)",
-   "first_seen": "2026-09-30",
-   "tarif_id": "o2:o2-mobile-unlimited-l",
-   "tarif_id_guete": "hoch",
-   "tarif_monatlich": 39.99,
-   "tarif_bindung_monate": null,
-   "buendel_monatlich": null,
-   "geraet_zuzahlung": 1.0,
-   "geraet_monatsrate": 42.0,
-   "laufzeit_monate": 24,
-   "anschlusspreis": 0.0,
-   "quelle_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1zYW1zdW5nLWdhbGF4eS1zMjYtZWUtMjU2Z2ItYmxhY2stMjR4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLWwtcGx1cy1vbmxpbmUtaHd2O3BhY2tzPXVtdHMtb3B0aW9u",
-   "abgerufen_am": "2026-10-26",
-   "zustand": "neu",
-   "herleitung": "tarifsumme_minus_geraeterate",
-   "rabatte": [],
-   "aktionen": [],
-   "last_verified": "2026-10-26",
-   "pruefung": "gueltig",
-   "tarif_listenpreis": null,
-   "rechenweise": 1
-  },
-  {
-   "id": "buendel--o2--samsung-galaxy-s26-256gb-schwarz--o2-mobile-unlimited-l-plus-mit-300-mbit-s-24-mon--24m",
-   "sku_id": "samsung-galaxy-s26-256gb-schwarz",
-   "anbieter": "o2",
-   "tarif_name": "O2 Mobile Unlimited L Plus mit 300 MBit/s (24 Mon.)",
-   "first_seen": "2026-10-07",
-   "tarif_id": "o2:o2-mobile-unlimited-l-plus",
-   "tarif_id_guete": "nur_mit_geraet",
-   "tarif_monatlich": 34.99,
-   "tarif_bindung_monate": null,
-   "buendel_monatlich": null,
-   "geraet_zuzahlung": 1.0,
-   "geraet_monatsrate": 42.0,
-   "laufzeit_monate": 24,
-   "anschlusspreis": 0.0,
-   "quelle_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1zYW1zdW5nLWdhbGF4eS1zMjYtZWUtMjU2Z2ItYmxhY2stMjR4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLWwtcGx1cy1vbmxpbmUtaHd2O3BhY2tzPXVtdHMtb3B0aW9u",
-   "abgerufen_am": "2026-10-26",
-   "zustand": "neu",
-   "herleitung": "tarifsumme_minus_geraeterate",
-   "rabatte": [],
-   "aktionen": [],
-   "last_verified": "2026-10-26",
-   "pruefung": "gueltig",
-   "tarif_listenpreis": null,
-   "rechenweise": 1
-  },
-  {
-   "id": "buendel--o2--samsung-galaxy-s26-256gb-schwarz--o2-mobile-unlimited-m-mit-100-mbit-s-24-mon--24m",
-   "sku_id": "samsung-galaxy-s26-256gb-schwarz",
-   "anbieter": "o2",
-   "tarif_name": "O2 Mobile Unlimited M mit 100 MBit/s (24 Mon.)",
-   "first_seen": "2026-09-30",
-   "tarif_id": "o2:o2-mobile-unlimited-m",
-   "tarif_id_guete": "hoch",
-   "tarif_monatlich": 29.99,
-   "tarif_bindung_monate": null,
-   "buendel_monatlich": null,
-   "geraet_zuzahlung": 1.0,
-   "geraet_monatsrate": 42.0,
-   "laufzeit_monate": 24,
-   "anschlusspreis": 0.0,
-   "quelle_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1zYW1zdW5nLWdhbGF4eS1zMjYtZWUtMjU2Z2ItYmxhY2stMjR4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLWwtcGx1cy1vbmxpbmUtaHd2O3BhY2tzPXVtdHMtb3B0aW9u",
-   "abgerufen_am": "2026-10-26",
-   "zustand": "neu",
-   "herleitung": "tarifsumme_minus_geraeterate",
-   "rabatte": [],
-   "aktionen": [],
-   "last_verified": "2026-10-26",
-   "pruefung": "gueltig",
-   "tarif_listenpreis": null,
-   "rechenweise": 1
-  },
-  {
-   "id": "buendel--o2--samsung-galaxy-s26-256gb-schwarz--o2-mobile-unlimited-m-plus-mit-100-mbit-s-24-mon--24m",
-   "sku_id": "samsung-galaxy-s26-256gb-schwarz",
-   "anbieter": "o2",
-   "tarif_name": "O2 Mobile Unlimited M Plus mit 100 MBit/s (24 Mon.)",
-   "first_seen": "2026-09-30",
-   "tarif_id": "o2:o2-mobile-unlimited-m",
-   "tarif_id_guete": "hoch",
-   "tarif_monatlich": 24.99,
-   "tarif_bindung_monate": null,
-   "buendel_monatlich": null,
-   "geraet_zuzahlung": 1.0,
-   "geraet_monatsrate": 42.0,
-   "laufzeit_monate": 24,
-   "anschlusspreis": 0.0,
-   "quelle_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1zYW1zdW5nLWdhbGF4eS1zMjYtZWUtMjU2Z2ItYmxhY2stMjR4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLWwtcGx1cy1vbmxpbmUtaHd2O3BhY2tzPXVtdHMtb3B0aW9u",
-   "abgerufen_am": "2026-10-26",
-   "zustand": "neu",
-   "herleitung": "tarifsumme_minus_geraeterate",
-   "rabatte": [],
-   "aktionen": [],
-   "last_verified": "2026-10-26",
-   "pruefung": "gueltig",
-   "tarif_listenpreis": null,
-   "rechenweise": 1
-  },
-  {
-   "id": "buendel--o2--samsung-galaxy-s26-256gb-schwarz--o2-mobile-unlimited-s-special-mit-15-mbit-s-24-mon--24m",
-   "sku_id": "samsung-galaxy-s26-256gb-schwarz",
-   "anbieter": "o2",
-   "tarif_name": "O2 Mobile Unlimited S Special mit 15 MBit/s (24 Mon.)",
-   "first_seen": "2026-09-30",
-   "tarif_id": "o2:o2-mobile-unlimited-s-special",
-   "tarif_id_guete": "hoch",
-   "tarif_monatlich": 24.99,
-   "tarif_bindung_monate": null,
-   "buendel_monatlich": null,
-   "geraet_zuzahlung": 1.0,
-   "geraet_monatsrate": 42.0,
-   "laufzeit_monate": 24,
-   "anschlusspreis": 39.99,
-   "quelle_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1zYW1zdW5nLWdhbGF4eS1zMjYtZWUtMjU2Z2ItYmxhY2stMjR4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLWwtcGx1cy1vbmxpbmUtaHd2O3BhY2tzPXVtdHMtb3B0aW9u",
-   "abgerufen_am": "2026-10-26",
-   "zustand": "neu",
-   "herleitung": "tarifsumme_minus_geraeterate",
-   "rabatte": [],
-   "aktionen": [],
-   "last_verified": "2026-10-26",
-   "pruefung": "gueltig",
-   "tarif_listenpreis": null,
-   "rechenweise": 1
-  },
-  {
-   "id": "buendel--o2--samsung-galaxy-s26-256gb-schwarz--o2-mobile-unlimited-s-special-plus-mit-15-mbit-s-24-mon--24m",
-   "sku_id": "samsung-galaxy-s26-256gb-schwarz",
-   "anbieter": "o2",
-   "tarif_name": "O2 Mobile Unlimited S Special Plus mit 15 MBit/s (24 Mon.)",
-   "first_seen": "2026-09-30",
-   "tarif_id": "o2:o2-mobile-unlimited-s-special",
-   "tarif_id_guete": "hoch",
-   "tarif_monatlich": 19.99,
-   "tarif_bindung_monate": null,
-   "buendel_monatlich": null,
-   "geraet_zuzahlung": 1.0,
-   "geraet_monatsrate": 42.0,
-   "laufzeit_monate": 24,
-   "anschlusspreis": 39.99,
-   "quelle_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1zYW1zdW5nLWdhbGF4eS1zMjYtZWUtMjU2Z2ItYmxhY2stMjR4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLWwtcGx1cy1vbmxpbmUtaHd2O3BhY2tzPXVtdHMtb3B0aW9u",
-   "abgerufen_am": "2026-10-26",
-   "zustand": "neu",
-   "herleitung": "tarifsumme_minus_geraeterate",
-   "rabatte": [],
-   "aktionen": [],
-   "last_verified": "2026-10-26",
-   "pruefung": "gueltig",
-   "tarif_listenpreis": null,
-   "rechenweise": 1
-  },
-  {
    "id": "buendel--o2--samsung-galaxy-s26-512gb-cobalt-violet--o2-mobile-l-mit-150-gb-24-mon--24m",
    "sku_id": "samsung-galaxy-s26-512gb-cobalt-violet",
    "anbieter": "o2",
@@ -313972,9 +313956,9 @@
     "nie_geprueft": 0,
     "gescheitert": 0,
     "fehler": "",
-    "gueltig": 912,
+    "gueltig": 928,
     "quarantaene": 56,
-    "veraltet": 600,
+    "veraltet": 584,
     "abdeckung": [
      {
       "monate": 6,
@@ -313988,19 +313972,19 @@
      },
      {
       "monate": 24,
-      "gueltig": 456,
+      "gueltig": 464,
       "erfasst": true
      },
      {
       "monate": 36,
-      "gueltig": 456,
+      "gueltig": 464,
       "erfasst": true
      }
     ],
     "frische": {
-     "zahl": 928,
+     "zahl": 944,
      "von": 1568,
-     "prozent": 59,
+     "prozent": 60,
      "nicht_pruefbar": 0
     },
     "quarantaenequote": {
@@ -314037,12 +314021,12 @@
    },
    {
     "name": "o2",
-    "buendel": 3156,
-    "geprueft": 3156,
+    "buendel": 3144,
+    "geprueft": 3144,
     "nie_geprueft": 0,
     "gescheitert": 0,
     "fehler": "",
-    "gueltig": 2099,
+    "gueltig": 2087,
     "quarantaene": 1,
     "veraltet": 1056,
     "abdeckung": [
@@ -314058,7 +314042,7 @@
      },
      {
       "monate": 24,
-      "gueltig": 1055,
+      "gueltig": 1043,
       "erfasst": true
      },
      {
@@ -314068,14 +314052,14 @@
      }
     ],
     "frische": {
-     "zahl": 2099,
-     "von": 3156,
-     "prozent": 67,
+     "zahl": 2087,
+     "von": 3144,
+     "prozent": 66,
      "nicht_pruefbar": 0
     },
     "quarantaenequote": {
      "zahl": 1,
-     "von": 3156,
+     "von": 3144,
      "prozent": 0,
      "nicht_pruefbar": 0
     },
@@ -314083,13 +314067,13 @@
      "zahl": 0,
      "von": 0,
      "prozent": null,
-     "nicht_pruefbar": 3156
+     "nicht_pruefbar": 3144
     },
     "belegquote": {
      "zahl": 0,
      "von": 0,
      "prozent": null,
-     "nicht_pruefbar": 3156
+     "nicht_pruefbar": 3144
     },
     "ohne_daten": [
      1,
@@ -314107,14 +314091,14 @@
   ],
   "summe": {
    "name": "Alle",
-   "buendel": 9470,
-   "geprueft": 9470,
+   "buendel": 9458,
+   "geprueft": 9458,
    "nie_geprueft": 0,
    "gescheitert": 0,
    "fehler": "",
-   "gueltig": 6408,
+   "gueltig": 6412,
    "quarantaene": 57,
-   "veraltet": 3005,
+   "veraltet": 2989,
    "abdeckung": [
     {
      "monate": 6,
@@ -314128,24 +314112,24 @@
     },
     {
      "monate": 24,
-     "gueltig": 2438,
+     "gueltig": 2434,
      "erfasst": true
     },
     {
      "monate": 36,
-     "gueltig": 3106,
+     "gueltig": 3114,
      "erfasst": true
     }
    ],
    "frische": {
-    "zahl": 6424,
-    "von": 9470,
+    "zahl": 6428,
+    "von": 9458,
     "prozent": 68,
     "nicht_pruefbar": 0
    },
    "quarantaenequote": {
     "zahl": 57,
-    "von": 9470,
+    "von": 9458,
     "prozent": 1,
     "nicht_pruefbar": 0
    },
@@ -314153,13 +314137,13 @@
     "zahl": 0,
     "von": 0,
     "prozent": null,
-    "nicht_pruefbar": 9470
+    "nicht_pruefbar": 9458
    },
    "belegquote": {
     "zahl": 0,
     "von": 0,
     "prozent": null,
-    "nicht_pruefbar": 9470
+    "nicht_pruefbar": 9458
    },
    "ohne_daten": [
     1,
@@ -314186,28 +314170,28 @@
     "name": "Rechenprobe",
     "verletzt": 0,
     "luecke": 0,
-    "nicht_pruefbar": 9470
+    "nicht_pruefbar": 9458
    },
    {
     "nr": 2,
     "name": "Gerätesumme zur UVP",
     "verletzt": 0,
     "luecke": 0,
-    "nicht_pruefbar": 9470
+    "nicht_pruefbar": 9458
    },
    {
     "nr": 3,
     "name": "Tarif zum SIM-only-Preis",
     "verletzt": 25,
     "luecke": 0,
-    "nicht_pruefbar": 1998
+    "nicht_pruefbar": 1992
    },
    {
     "nr": 4,
     "name": "Volumen im Tarifnamen",
     "verletzt": 0,
     "luecke": 0,
-    "nicht_pruefbar": 6786
+    "nicht_pruefbar": 6784
    },
    {
     "nr": 5,
@@ -314221,28 +314205,28 @@
     "name": "Ratenlaufzeit",
     "verletzt": 0,
     "luecke": 0,
-    "nicht_pruefbar": 9470
+    "nicht_pruefbar": 9458
    },
    {
     "nr": 7,
     "name": "Tarifbindung",
     "verletzt": 0,
     "luecke": 0,
-    "nicht_pruefbar": 9470
+    "nicht_pruefbar": 9458
    },
    {
     "nr": 8,
     "name": "Preisphasen",
     "verletzt": 0,
     "luecke": 0,
-    "nicht_pruefbar": 9470
+    "nicht_pruefbar": 9458
    },
    {
     "nr": 9,
     "name": "Text und Antwort",
     "verletzt": 0,
     "luecke": 0,
-    "nicht_pruefbar": 9470
+    "nicht_pruefbar": 9458
    },
    {
     "nr": 10,
@@ -314270,7 +314254,7 @@
     "name": "Beleglink",
     "verletzt": 0,
     "luecke": 0,
-    "nicht_pruefbar": 9470
+    "nicht_pruefbar": 9458
    },
    {
     "nr": 14,
@@ -314289,7 +314273,7 @@
    {
     "nr": 16,
     "name": "Frische",
-    "verletzt": 3046,
+    "verletzt": 3030,
     "luecke": 0,
     "nicht_pruefbar": 0
    }
