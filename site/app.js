@@ -5026,8 +5026,9 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
     var lege = function (gleiten) {
       var an = s.querySelector('[aria-current="page"],[aria-selected="true"]');
       if (!pille || !an) return;
-      s.style.setProperty('--x', an.offsetLeft + 'px');
-      s.style.setProperty('--w', an.offsetWidth + 'px');
+      var ra = an.getBoundingClientRect(), rs = s.getBoundingClientRect();
+      s.style.setProperty('--x', (ra.left - rs.left - s.clientLeft) + 'px');
+      s.style.setProperty('--w', ra.width + 'px');
       if (gleiten && !ruhig) {
         s.classList.remove('gleitet');
         void s.offsetWidth;
