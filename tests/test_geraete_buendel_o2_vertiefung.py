@@ -412,18 +412,26 @@ def test_der_slugweg_gilt_nur_im_eigenen_anbieter():
     assert _bestand().loese("Telekom", "x", slug="o2-mobile-unlimited-m") is None
 
 
-def test_der_beleglink_zeigt_speicher_und_laufzeit_der_konfiguration(mitschnitt):
-    """Preisprüfung 26.10.2026: jede Konfiguration verlinkte die Startseite,
-    der Beleg zeigte also oft einen anderen Speicher und eine andere Laufzeit."""
+def test_der_beleglink_ist_eine_seite_fuer_menschen(mitschnitt):
+    """Preisprüfung 26.10.2026: Konfigurationen verlinkten die Startseite,
+    der Beleg zeigte oft einen anderen Speicher; die REST-Antworten der
+    Konfiguration sind dagegen keine Seite für Leser (robots.txt sperrt sie)."""
     saetze = _vertieft(mitschnitt)
-    je_speicher_laufzeit: dict[tuple, set] = {}
-    for s in saetze:
-        je_speicher_laufzeit.setdefault(
-            (s["speicher_gb"], s["laufzeit_monate"]), set()
-        ).add(s["url"])
-    assert len(je_speicher_laufzeit) == 4
-    assert all(len(urls) == 1 for urls in je_speicher_laufzeit.values())
-    assert len(set.union(*je_speicher_laufzeit.values())) == 4
-    assert all(
-        u in mitschnitt["antworten"] for u in set.union(*je_speicher_laufzeit.values())
+    urls = {s["url"] for s in saetze}
+    assert not any("/e-shop/rest/" in u for u in urls)
+
+
+def test_eine_farbe_eines_anderen_modells_faellt_weg(mitschnitt):
+    """o2 führt beim Galaxy S26 die Farbe Schwarz als Enterprise Edition
+    (`galaxy-s26-ee`); ihre Preise liefen als normales S26, 102 € zu hoch."""
+    antworten = dict(mitschnitt["antworten"])
+    for url, text in antworten.items():
+        if "iphone-17-pro-512gb" in text:
+            antworten[url] = text.replace(
+                "iphone-17-pro-512gb", "iphone-17-pro-ee-512gb"
+            )
+    saetze = o2.vertiefe_buendel(
+        _hole_aus({**mitschnitt, "antworten": antworten}), _katalogsaetze(mitschnitt)
     )
+    assert saetze
+    assert {s["speicher_gb"] for s in saetze} == {256}

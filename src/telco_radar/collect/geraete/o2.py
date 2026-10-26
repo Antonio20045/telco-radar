@@ -77,6 +77,7 @@ from __future__ import annotations
 import json
 import logging
 import re
+from functools import partial
 from typing import Optional
 
 from .basis import GeraeteAbrufFehler, _gleich, _preis
@@ -609,6 +610,14 @@ def _hole_seite(hole, url: str, z: dict) -> Optional[dict]:
     return None
 
 
+def _folgeseiten(hole, weiter, z: dict, seite: dict, art: str) -> list:
+    """(Antwort, Adresse) je nicht gewählter Option ``art`` der Seite."""
+    optionen = (seite.get("hardware") or {}).get(art) or []
+    links = [_link(o) for o in optionen if not o.get("selected") and _link(o)]
+    paare = ((_hole_seite(hole, u, z), u) for u in links if weiter())
+    return [(pv, u) for pv, u in paare if pv is not None]
+
+
 def vertiefe_buendel(
     hole, rohsaetze: list, weiter=None, zaehler: Optional[dict] = None
 ) -> list[dict]:
@@ -626,6 +635,7 @@ def vertiefe_buendel(
     stand = Referenzstand(
         lambda u: _hole_seite(hole, u, z), _gemessen, _link, _ohne_markup, weiter, z
     )
+    folge = partial(_folgeseiten, hole, weiter, z)
     gesehen: set = set()
     out: list[dict] = []
     for basis in rohsaetze or []:
@@ -639,30 +649,20 @@ def vertiefe_buendel(
         if start is None:
             continue
         _zaehle(z, "geraete")
-        speicherseiten = [(start, url)]
-        for option in (start.get("hardware") or {}).get("storageOptions") or []:
-            if option.get("selected") or not _link(option) or not weiter():
-                continue
-            pv = _hole_seite(hole, _link(option), z)
-            if pv is not None:
-                speicherseiten.append((pv, _link(option)))
-        antworten = []
-        for seite, seite_url in speicherseiten:
-            antworten.append((seite, seite_url))
-            for option in (seite.get("hardware") or {}).get("paymentOptions") or []:
-                if option.get("selected") or not _link(option) or not weiter():
-                    continue
-                pv = _hole_seite(hole, _link(option), z)
-                if pv is not None:
-                    antworten.append((pv, _link(option)))
+        speicher = [(start, url), *folge(start, "storageOptions")]
+        raten = [folge(seite, "paymentOptions") for seite, _ in speicher]
+        antworten = [p for s, r in zip(speicher, raten, strict=True) for p in (s, *r)]
         stand.erster_durchlauf(start)
+        modell = _OFFER_RE.match(str(start["hardware"].get("offerName") or ""))
         for pv, pv_url in antworten:
             angebot = str((pv.get("hardware") or {}).get("offerName") or "")
-            if angebot in gesehen:
+            m = _OFFER_RE.match(angebot)
+            if angebot in gesehen or (m and modell and m["slug"] != modell["slug"]):
                 continue
             gesehen.add(angebot)
             stand.ergaenze(pv, url)
-            out.extend(saetze_aus_konfiguration(pv, basis, stand.tarife, pv_url, z))
+            beleg = url if "/e-shop/rest/" in pv_url else pv_url
+            out.extend(saetze_aus_konfiguration(pv, basis, stand.tarife, beleg, z))
     return out
 
 
