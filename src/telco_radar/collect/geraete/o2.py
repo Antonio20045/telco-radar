@@ -639,30 +639,30 @@ def vertiefe_buendel(
         if start is None:
             continue
         _zaehle(z, "geraete")
-        speicherseiten = [start]
+        speicherseiten = [(start, url)]
         for option in (start.get("hardware") or {}).get("storageOptions") or []:
             if option.get("selected") or not _link(option) or not weiter():
                 continue
             pv = _hole_seite(hole, _link(option), z)
             if pv is not None:
-                speicherseiten.append(pv)
+                speicherseiten.append((pv, _link(option)))
         antworten = []
-        for seite in speicherseiten:
-            antworten.append(seite)
+        for seite, seite_url in speicherseiten:
+            antworten.append((seite, seite_url))
             for option in (seite.get("hardware") or {}).get("paymentOptions") or []:
                 if option.get("selected") or not _link(option) or not weiter():
                     continue
                 pv = _hole_seite(hole, _link(option), z)
                 if pv is not None:
-                    antworten.append(pv)
+                    antworten.append((pv, _link(option)))
         stand.erster_durchlauf(start)
-        for pv in antworten:
+        for pv, pv_url in antworten:
             angebot = str((pv.get("hardware") or {}).get("offerName") or "")
             if angebot in gesehen:
                 continue
             gesehen.add(angebot)
             stand.ergaenze(pv, url)
-            out.extend(saetze_aus_konfiguration(pv, basis, stand.tarife, url, z))
+            out.extend(saetze_aus_konfiguration(pv, basis, stand.tarife, pv_url, z))
     return out
 
 

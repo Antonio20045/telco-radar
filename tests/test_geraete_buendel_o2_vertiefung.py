@@ -410,3 +410,20 @@ def test_plus_wird_nie_auf_den_tarif_ohne_plus_geraten():
 
 def test_der_slugweg_gilt_nur_im_eigenen_anbieter():
     assert _bestand().loese("Telekom", "x", slug="o2-mobile-unlimited-m") is None
+
+
+def test_der_beleglink_zeigt_speicher_und_laufzeit_der_konfiguration(mitschnitt):
+    """Preisprüfung 26.10.2026: jede Konfiguration verlinkte die Startseite,
+    der Beleg zeigte also oft einen anderen Speicher und eine andere Laufzeit."""
+    saetze = _vertieft(mitschnitt)
+    je_speicher_laufzeit: dict[tuple, set] = {}
+    for s in saetze:
+        je_speicher_laufzeit.setdefault(
+            (s["speicher_gb"], s["laufzeit_monate"]), set()
+        ).add(s["url"])
+    assert len(je_speicher_laufzeit) == 4
+    assert all(len(urls) == 1 for urls in je_speicher_laufzeit.values())
+    assert len(set.union(*je_speicher_laufzeit.values())) == 4
+    assert all(
+        u in mitschnitt["antworten"] for u in set.union(*je_speicher_laufzeit.values())
+    )
