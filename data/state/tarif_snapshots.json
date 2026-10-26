@@ -25,9 +25,12 @@
    "max.|100mb",
    "max.|15mb",
    "max.|300mb",
+   "monatlich kündbar. jetzt inkl.|10€",
    "oder hotspot-nutzung empfehlen sich|100gb",
+   "ohne grundgebühr|4.99€",
    "plus bundle sparst du|5€",
    "plus bundles spare|5€",
+   "rabatt jeden monat und|0€",
    "surfen reichen häufig bis|20gb",
    "surfgeschwindigkeit bis zu oder|300mb",
    "uns schon für unter|20€",
@@ -57,9 +60,10 @@
    "|50gb",
    "|59.98€",
    "|59.99€",
-   "|5gb"
+   "|5gb",
+   "|5€"
   ],
-  "stand": "2026-10-18"
+  "stand": "2026-10-26"
  },
  "https://www.o2online.de/mobilfunk/prepaid/": {
   "werte": [
@@ -88,7 +92,7 @@
    "|80gb",
    "|999gb"
   ],
-  "stand": "2026-10-18"
+  "stand": "2026-10-26"
  },
  "https://www.blau.de/tarife/": {
   "werte": [
@@ -119,7 +123,7 @@
    "|8.99€",
    "|9.99€"
   ],
-  "stand": "2026-10-18"
+  "stand": "2026-10-26"
  },
  "https://www.1und1.de/handytarife": {
   "werte": [
@@ -150,7 +154,7 @@
    "|50gb",
    "|9.99€"
   ],
-  "stand": "2026-10-18"
+  "stand": "2026-10-26"
  },
  "https://www.winsim.de/5g-tarife": {
   "werte": [
@@ -166,16 +170,16 @@
    "|264€",
    "|30gb",
    "|312€",
-   "|336€",
    "|360€",
-   "|40gb",
+   "|408€",
+   "|50gb",
    "|50mb",
    "|6.99€",
    "|60gb",
    "|8.99€",
    "|9.99€"
   ],
-  "stand": "2026-10-18"
+  "stand": "2026-10-26"
  },
  "https://www.premiumsim.de/": {
   "werte": [
@@ -202,7 +206,7 @@
    "|9.99€",
    "|96€"
   ],
-  "stand": "2026-10-18"
+  "stand": "2026-10-26"
  },
  "https://www.mobilcom-debitel.de/handytarife/": {
   "werte": [
@@ -223,7 +227,6 @@
    "nutzung erfordert nur bis|2gb",
    "vielnutzer|50gb",
    "wenignutzer|15gb",
-   "|0€",
    "|14.99€",
    "|24monate",
    "|25%",
@@ -233,33 +236,31 @@
    "|46%",
    "|47%",
    "|50%",
-   "|54%",
-   "|54.99€",
    "|59.99€",
    "|99€"
   ],
-  "stand": "2026-10-18"
+  "stand": "2026-10-26"
  },
  "https://www.klarmobil.de/handytarife": {
   "werte": [
+   "ab monat|12.99€",
+   "ab monat|19.99€",
+   "ab monat|9.99€",
    "du innerhalb der ersten|19monate",
-   "max.|100mb",
    "max.|50mb",
-   "monat laufzeit anschlusspreis|19.99€",
+   "monat laufzeit anschlusspreis|29.99€",
    "monate laufzeit anschlusspreis|0€",
    "normal surfer|40gb",
    "viel surfer|280gb",
    "wenig surfer|10gb",
    "|1monat",
-   "|24.99€",
    "|24monate",
-   "|29.99€",
-   "|39.99€",
-   "|50%",
-   "|60%",
+   "|33%",
+   "|52%",
+   "|55%",
    "|99€"
   ],
-  "stand": "2026-10-18"
+  "stand": "2026-10-26"
  },
  "https://www.pennymobil.de/tarife": {
   "werte": [
@@ -276,7 +277,7 @@
    "|899€",
    "|9999€"
   ],
-  "stand": "2026-10-18"
+  "stand": "2026-10-26"
  },
  "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html": {
   "werte": [
@@ -458,7 +459,7 @@
    "|9.98€",
    "|999.99€"
   ],
-  "stand": "2026-10-18"
+  "stand": "2026-10-26"
  },
  "https://www.otelo.de/allnet-flat": {
   "werte": [
@@ -477,6 +478,6 @@
    "|30€",
    "|5€"
   ],
-  "stand": "2026-10-18"
+  "stand": "2026-10-26"
  }
 }

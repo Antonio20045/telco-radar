@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-18",
+ "updated": "2026-10-26",
  "topics": [
   {
    "slug": "apples-iphone-event-am-9-september",
@@ -525,8 +525,8 @@
    ],
    "first_seen": "2026-10-15",
    "last_active": "2026-10-15",
-   "runs_ohne_zuwachs": 3,
-   "status": "aktiv",
+   "runs_ohne_zuwachs": 4,
+   "status": "beendet",
    "items": [
     {
      "url": "https://www.lightreading.com/smartphones-devices/memory-crisis-fueling-smartphone-shipment-shrinkage-omdia",
@@ -584,7 +584,8 @@
      "image_w": 1200,
      "image_h": 900
     }
-   ]
+   ],
+   "ended": "2026-10-26"
   },
   {
    "slug": "spanien-fuehrt-neue-pflichtvorwahl-fuer-werbeanrufe-ein",
@@ -601,7 +602,7 @@
    ],
    "first_seen": "2026-10-16",
    "last_active": "2026-10-16",
-   "runs_ohne_zuwachs": 0,
+   "runs_ohne_zuwachs": 1,
    "status": "aktiv",
    "items": [
     {
@@ -647,6 +648,17 @@
      "image_h": 729
     },
     {
+     "url": "https://www.xatakamovil.com/movil-y-sociedad/puedes-denunciar-llamadas-comerciales-que-nos-usen-prefijo-400",
+     "title": "¿Has recibido una llamada comercial desde un número que no empieza por el prefijo 400? Ya puedes denunciarlo",
+     "headline": "Spanien führt verpflichtende Vorwahl 400 für Telemarketing ein",
+     "summary": "Seit dem 17. Oktober 2026 müssen alle kommerziellen Werbeanrufe in Spanien zwingend die neue Vorwahl 400 verwenden. Die Regulierungsbehörde CNMC sanktioniert Anbieter, die weiterhin Standardnummern nutzen, während Verbraucher Verstosse digital melden können.",
+     "operator": "CNMC / O2",
+     "source": "",
+     "date": "",
+     "week": "2026-10-26",
+     "relevance": 4
+    },
+    {
      "url": "https://www.adslzone.net/noticias/operadores/numeros-400-movistar-orange-vodafone-digi-llamadas/",
      "title": "Estos son los números 400 de Movistar, Orange, Vodafone y DIGI que te harán llamadas comerciales desde mañana sábado",
      "headline": "Spanische Telekommunikationsanbieter nutzen neue 400er Vorwahlen für Werbeanrufe",
@@ -673,6 +685,86 @@
     }
    ],
    "event_datum": "2026-10-17"
+  },
+  {
+   "slug": "europaeische-netzbetreiber-planen-gemeinsames-satellitenspektrum",
+   "title": "Europäische Netzbetreiber planen gemeinsames Satellitenspektrum",
+   "description": "Vier große europäische Telekommunikationskonzerne bündeln ihre Kräfte, um gemeinsam Frequenzen für die direkte Satellitenkommunikation mit Mobiltelefonen zu erwerben.",
+   "keywords": [
+    "Deutsche Telekom",
+    "Orange",
+    "Telefónica",
+    "Vodafone",
+    "Satellitenspektrum",
+    "Direkt-zum-Gerät"
+   ],
+   "first_seen": "2026-10-26",
+   "last_active": "2026-10-26",
+   "runs_ohne_zuwachs": 0,
+   "status": "aktiv",
+   "items": [
+    {
+     "url": "https://www.mobileworldlive.com/microsoft/the-friday-file-microsoft-european-satellite-spacex/",
+     "title": "The Friday File: Microsoft; European satellite; SpaceX",
+     "headline": "Europäische Telco-Schwergewichte planen gemeinsames Satellitenspektrum-Gebot",
+     "summary": "Deutsche Telekom, Orange, Telefonica und die Vodafone Group haben eine Absichtserklärung unterzeichnet, um gemeinsam ein Gebot für Frequenzen im Bereich der mobilen Satellitendienste zu prüfen und die Direkt-zum-Gerät-Konnektivität auszubauen.",
+     "operator": "Vodafone Group",
+     "source": "Mobile World Live",
+     "date": "2026-10-23",
+     "week": "2026-10-26",
+     "relevance": 5
+    },
+    {
+     "url": "https://totaltele.com/european-telcos-to-club-together-to-bid-for-satellite-spectrum/",
+     "title": "European telcos consider joint bid for satellite spectrum",
+     "headline": "Europäische Telekommunikationskonzerne planen gemeinsames Satellitenspektrum",
+     "summary": "Deutsche Telekom, Orange, Telefónica und Vodafone haben eine Absichtserklärung unterzeichnet, um ein gemeinsames Gebot für zukünftige Frequenzen im mobilen Satellitenfunk im 2-GHz-Band zu prüfen und die europäische Netzsicherheit zu stärken.",
+     "operator": "Charter Communications",
+     "source": "Total Telecom",
+     "date": "2026-10-20",
+     "week": "2026-10-26",
+     "relevance": 5
+    },
+    {
+     "url": "https://telesintese.com.br/operadoras-europeias-estudam-oferta-conjunta-por-espectro-de-satelite/",
+     "title": "Operadoras europeias estudam oferta conjunta por espectro de satélite",
+     "headline": "Vier europäische Netzbetreiber prüfen gemeinsame Satellitenspektrum-Gebote",
+     "summary": "Deutsche Telekom, Orange, Telefónica und Vodafone haben eine Absichtserklärung unterzeichnet, um ein gemeinsames Angebot für künftiges Satellitenspektrum für Direktverbindungen zu Mobilgeräten in Europa zu prüfen.",
+     "operator": "Deutsche Telekom, Orange, Telefónica, Vodafone",
+     "source": "TeleSíntese (BR)",
+     "date": "2026-10-19",
+     "week": "2026-10-26",
+     "relevance": 4,
+     "image": "9045d52fd73b3870-800.jpg",
+     "image_w": 800,
+     "image_h": 513
+    },
+    {
+     "url": "https://www.telefonica.de/fixed/news/10969/europaeische-satellitendienste-vier-europaeische-netzbetreiber-wollen-sich-gemeinsam-um-spektrum-fuer-mobile-satellitendienste-bewerben.html",
+     "title": "Europäische Satellitendienste | Vier europäische Netzbetreiber wollen sich gemeinsam um Spektrum für mobile Satellitendienste bewerben",
+     "headline": "Vier europäische Netzbetreiber prüfen gemeinsames Gebot für Satellitenfrequenzen",
+     "summary": "Deutsche Telekom, Orange, Telefónica und Vodafone haben eine Absichtserklärung unterzeichnet, um ein gemeinsames Gebot für die Zuteilung von Frequenzen für mobile Satellitendienste in Europa zu prüfen.",
+     "operator": "O2 Telefónica Deutschland",
+     "source": "O2 Telefónica Deutschland",
+     "date": "2026-10-19",
+     "week": "2026-10-26",
+     "relevance": 4
+    },
+    {
+     "url": "https://www.mobileeurope.co.uk/nokia-iceye-satellite-ukraine/",
+     "title": "Nokia, ICEYE partner to strengthen Ukraine’s military connectivity",
+     "headline": "Nokia und ICEYE unterstützen ukrainisches Verteidigungsministerium",
+     "summary": "Nokia und das finnische Satellitenunternehmen ICEYE haben eine Absichtserklärung mit dem ukrainischen Verteidigungsministerium unterzeichnet, um unabhängige und sichere Satellitenkommunikationssysteme auf Basis von erdnahen Umlaufbahnen aufzubauen.",
+     "operator": "Nokia",
+     "source": "Mobile Europe",
+     "date": "2026-10-26",
+     "week": "2026-10-26",
+     "relevance": 3,
+     "image": "3fb9f4ce75bc3191-800.jpg",
+     "image_w": 800,
+     "image_h": 533
+    }
+   ]
   }
  ]
 }
