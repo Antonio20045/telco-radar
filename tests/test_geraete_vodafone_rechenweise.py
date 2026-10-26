@@ -22,6 +22,7 @@ from telco_radar.analyze.tco_store import TcoDB
 from telco_radar.collect.geraete.vodafone import loese_tarifnamen
 from telco_radar.geraete_config import lade_katalog
 from telco_radar.report import geraete_bewegung, geraete_tco_karten, geraete_view
+from telco_radar.report.geraete_rechnung import WORT_TARIF_NACH_RABATT
 from telco_radar.tarif_model import buendelphasen_aus
 from telco_radar.tco_kosten import kosten_ueber, tarifpreis_im_monat
 from telco_radar.tco_model import Buendel, sim_only_id, tco_24
@@ -113,18 +114,21 @@ def _karte(satz: dict) -> dict:
     return karte
 
 
+_TARIFWORTE = ("Tarif", WORT_TARIF_NACH_RABATT)
+
+
 def _tarifzeilen(karte: dict) -> list[dict]:
     """Die Tarif-Summanden der Zeile: eigene Zeile oder Teil des Monatspreises
     (Gerät und Tarif gleich lang, Antonio 07.10.2026)."""
     return [
         {"anzahl": s["anzahl"], "betrag": s["betrag"]}
         for s in karte["rechnung"]
-        if s["wort"] == "Tarif"
+        if s["wort"] in _TARIFWORTE
     ] + [
         {"anzahl": s["anzahl"], "betrag": t["betrag"]}
         for s in karte["rechnung"]
         for t in s["teile"]
-        if t["wort"] == "Tarif"
+        if t["wort"] in _TARIFWORTE
     ]
 
 
