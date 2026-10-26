@@ -2,8 +2,8 @@
  "updated": "2026-10-26",
  "anbieter": {
   "ALDI TALK": {
-   "laeufe": 82,
-   "funde_gesamt": 482,
+   "laeufe": 83,
+   "funde_gesamt": 488,
    "letzter_lauf": "2026-10-26",
    "letzte_funde": 6,
    "letzter_fund": "2026-10-26",
@@ -308,8 +308,8 @@
    "tote_adressen": 0
   },
   "Vodafone": {
-   "laeufe": 80,
-   "funde_gesamt": 13829,
+   "laeufe": 81,
+   "funde_gesamt": 13996,
    "letzter_lauf": "2026-10-26",
    "letzte_funde": 167,
    "termine": [
@@ -614,8 +614,8 @@
    "tote_adressen": 0
   },
   "o2": {
-   "laeufe": 80,
-   "funde_gesamt": 5409,
+   "laeufe": 81,
+   "funde_gesamt": 5475,
    "letzter_lauf": "2026-10-26",
    "letzte_funde": 66,
    "termine": [
@@ -920,8 +920,8 @@
    "tote_adressen": null
   },
   "mobilcom-debitel": {
-   "laeufe": 33,
-   "funde_gesamt": 10150,
+   "laeufe": 34,
+   "funde_gesamt": 10305,
    "letzte_funde": 155,
    "termine": [
     "2026-08-29",
@@ -1773,8 +1773,8 @@
    "tote_adressen": 0
   },
   "congstar": {
-   "laeufe": 50,
-   "funde_gesamt": 10319,
+   "laeufe": 51,
+   "funde_gesamt": 10457,
    "letzter_lauf": "2026-10-26",
    "letzte_funde": 138,
    "termine": [
@@ -2073,8 +2073,8 @@
    "tote_adressen": 0
   },
   "1&1": {
-   "laeufe": 72,
-   "funde_gesamt": 2696,
+   "laeufe": 73,
+   "funde_gesamt": 2738,
    "letzter_lauf": "2026-10-26",
    "letzte_funde": 42,
    "termine": [
@@ -2630,10 +2630,10 @@
    "tote_adressen": null
   },
   "Saturn": {
-   "laeufe": 68,
-   "funde_gesamt": 1305,
+   "laeufe": 69,
+   "funde_gesamt": 1314,
    "letzter_lauf": "2026-10-26",
-   "letzte_funde": 11,
+   "letzte_funde": 9,
    "termine": [
     "2026-09-05",
     "2026-09-06",
@@ -2919,7 +2919,7 @@
     ],
     [
      "2026-10-26",
-     11,
+     9,
      "gelesen",
      0,
      0,
@@ -6495,7 +6495,7 @@
     "https://mobile.1und1.de/smartphones"
    ],
    "titel_roh": "Apple iPhone 18 Pro 256 GB silber",
-   "preis_mit_vertrag_ab": 49.99,
+   "preis_mit_vertrag_ab": 52.99,
    "laufzeit_monate": 36,
    "tarif_referenz": "1&1 All-Net-Flat S"
   },
@@ -9242,15 +9242,15 @@
    "ean": "",
    "zustand": "neu",
    "first_seen": "2026-09-27",
-   "status": "ausgelistet",
-   "missed_checks": 2,
+   "status": "aktiv",
+   "missed_checks": 0,
    "erstpreis": 1329.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-27",
-   "last_verified": "2026-10-20",
+   "last_verified": "2026-10-26",
    "letzter_check": "2026-10-26",
    "quelle_url": "https://www.saturn.de/de/product/_apple-iphone-17-pro-max-5g-256-gb-silber-dual-sim-3013594.html",
-   "abgerufen_am": "2026-10-20",
+   "abgerufen_am": "2026-10-26",
    "verfuegbarkeit": "unbekannt",
    "confidence": "hoch",
    "einstiege": [
@@ -9258,7 +9258,6 @@
    ],
    "titel_roh": "APPLE iPhone 17 Pro Max 5G 256 GB Silber Dual SIM",
    "preis_ohne_vertrag": 1329.0,
-   "stale_since": "2026-10-25",
    "ended_since": "2026-10-26"
   },
   {
@@ -9712,24 +9711,23 @@
    "ean": "",
    "zustand": "neu",
    "first_seen": "2026-09-12",
-   "status": "ausgelistet",
-   "missed_checks": 2,
+   "status": "aktiv",
+   "missed_checks": 0,
    "erstpreis": 909.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-12",
-   "last_verified": "2026-10-20",
+   "last_verified": "2026-10-26",
    "letzter_check": "2026-10-26",
    "quelle_url": "https://www.saturn.de/de/product/_apple-iphone-air-5g-256-gb-space-schwarz-dual-sim-3013606.html",
-   "abgerufen_am": "2026-10-20",
+   "abgerufen_am": "2026-10-26",
    "verfuegbarkeit": "unbekannt",
    "confidence": "hoch",
    "einstiege": [
     "https://www.saturn.de/de/brand/apple/iphone/iphone-air"
    ],
    "titel_roh": "APPLE iPhone Air 5G 256 GB Space Schwarz",
-   "preis_ohne_vertrag": 929.0,
-   "ended_since": "2026-10-26",
-   "stale_since": "2026-10-25"
+   "preis_ohne_vertrag": 899.0,
+   "ended_since": "2026-10-26"
   },
   {
    "id": "saturn--apple-iphone-air-256gb-wolkenweiss",
@@ -30364,6 +30362,40 @@
    "erstpreis": 1009.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-08-29",
+   "last_verified": "2026-10-26",
+   "letzter_check": "2026-10-26",
+   "quelle_url": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ee-256gb-black-details?ohne-tarif=ja&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung",
+   "abgerufen_am": "2026-10-26",
+   "verfuegbarkeit": "unbekannt",
+   "confidence": "hoch",
+   "einstiege": [
+    "https://www.o2online.de/e-shop/rest/catalog/o2shop/privatkunden/ratenzahlung/default/__not-specified__/__not-specified__/__not-specified__?hwOnly=true"
+   ],
+   "titel_roh": "Samsung Galaxy S26 Enterprise Edition 256 GB black",
+   "preis_ohne_vertrag": 1009.0,
+   "anzahlung": 1.0,
+   "monatsrate": 42.0,
+   "laufzeit_monate": 24,
+   "zins_effektiv": 0.0
+  },
+  {
+   "id": "o2--samsung-galaxy-s26-enterprise-edition-256gb-schwarz",
+   "sku_id": "samsung-galaxy-s26-enterprise-edition-256gb-schwarz",
+   "device_id": "samsung-galaxy-s26-enterprise-edition",
+   "anbieter": "o2",
+   "anbieter_typ": "netzbetreiber",
+   "netz": "",
+   "speicher_gb": 256,
+   "farbe_roh": "black",
+   "farbe_normalisiert": "schwarz",
+   "ean": "",
+   "zustand": "neu",
+   "first_seen": "2026-10-26",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "erstpreis": 1009.0,
+   "erstpreis_art": "ohne_vertrag",
+   "erstpreis_am": "2026-10-26",
    "last_verified": "2026-10-26",
    "letzter_check": "2026-10-26",
    "quelle_url": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ee-256gb-black-details?ohne-tarif=ja&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung",
