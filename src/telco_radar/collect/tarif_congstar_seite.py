@@ -51,7 +51,7 @@ def tarife_aus_html(
     volumen = _VOLUMEN_RE.search(titel)
     out: list[tuple[Tarif, str]] = []
     for knopf in suppe.find_all("input", attrs={"type": "radio"}):
-        laufzeit = _LAUFZEIT_RE.search(knopf.get("aria-label") or "")
+        laufzeit = _LAUFZEIT_RE.search(str(knopf.get("aria-label") or ""))
         inhalt = suppe.find(id=f"{knopf.get('value')}-content")
         preis = _PREIS_RE.search(_text(inhalt))
         if not (laufzeit and preis):
