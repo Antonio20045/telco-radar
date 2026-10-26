@@ -81,7 +81,7 @@ from functools import partial
 from typing import Optional
 
 from .basis import GeraeteAbrufFehler, _gleich, _preis
-from .o2_referenz import Referenzstand, passt, tarife_aus
+from .o2_referenz import Referenzstand, modellname, passt, tarife_aus
 from .ratenlaufzeit import katalog_mit_phasen, o2_phasen
 from ...geraete_model import probe_geht_auf
 
@@ -147,7 +147,7 @@ def lies(text: str, url: str = "") -> list[dict]:
     for h in daten.get("hardware") or []:
         if not isinstance(h, dict):
             continue
-        modell = str(h.get("description") or "").strip()
+        modell = modellname(h)
         angebot = str(h.get("offerName") or "").strip()
         if not modell:
             continue
@@ -219,7 +219,7 @@ def _buendelsatz(h: dict, proben: Optional[dict] = None) -> Optional[dict]:
     Zeile". Die drei Proben selbst sind unveraendert Bedingung, nicht
     Protokoll.
     """
-    modell = str(h.get("description") or "").strip()
+    modell = modellname(h)
     angebot = str(h.get("offerName") or "").strip()
     if not modell:
         return None

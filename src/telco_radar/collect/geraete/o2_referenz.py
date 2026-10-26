@@ -29,6 +29,7 @@ Geraet wiederholt werden, bis `PROBEN_JE_ANZEIGE` Proben ungelesen blieben.
 from __future__ import annotations
 
 import logging
+import re
 from collections import defaultdict
 from collections.abc import Callable
 
@@ -184,3 +185,18 @@ class Referenzstand:
             return
         self.tarife[anzeige] = neu[anzeige]
         _zaehle(self._z, PROBE_ERGAENZT)
+
+
+_EE_RE = re.compile(r"-ee-\d+(?:gb|tb)-")
+
+
+def modellname(h: dict) -> str:
+    """Die Gerätebeschreibung eines Katalogeintrags. o2 nennt die Enterprise
+    Edition nur im Angebotsnamen (`…-galaxy-s26-ee-256gb-black-…`), die
+    Beschreibung heißt wie das normale Modell; ohne den Zusatz liefen ihre
+    Preise als normales S26 (Preisprüfung 26.10.2026, 102 € zu hoch)."""
+    modell = str(h.get("description") or "").strip()
+    ee = _EE_RE.search(str(h.get("offerName") or ""))
+    if modell and ee and "enterprise" not in modell.lower():
+        return f"{modell} Enterprise Edition"
+    return modell

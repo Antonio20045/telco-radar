@@ -31,6 +31,7 @@ import pytest
 from bestand_pfad import lese_wurzel
 
 from telco_radar.collect.geraete import GeraeteAbrufFehler, o2
+from telco_radar.collect.geraete.o2_referenz import modellname
 from telco_radar.tarif_bezug import Tarifbestand
 from telco_radar.tarif_model import HOCH
 
@@ -435,3 +436,15 @@ def test_eine_farbe_eines_anderen_modells_faellt_weg(mitschnitt):
     )
     assert saetze
     assert {s["speicher_gb"] for s in saetze} == {256}
+
+
+def test_die_enterprise_edition_im_katalog_heisst_auch_so():
+    """o2 nennt die EE nur im Angebotsnamen; die Beschreibung ist die des
+    normalen S26 (Preisprüfung 26.10.2026, Summe 102 € zu hoch)."""
+    ee = {
+        "description": "Samsung Galaxy S26",
+        "offerName": "privatkunden-samsung-galaxy-s26-ee-256gb-black-36xhigh",
+    }
+    normal = {**ee, "offerName": "privatkunden-samsung-galaxy-s26-256gb-black-36xhigh"}
+    assert modellname(ee) == "Samsung Galaxy S26 Enterprise Edition"
+    assert modellname(normal) == "Samsung Galaxy S26"
