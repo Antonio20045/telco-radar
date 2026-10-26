@@ -32,7 +32,9 @@ def gw_seite(bestand: Path, tmp_path_factory: pytest.TempPathFactory) -> dict:
     return {
         "bestand": bestand,
         "geraete": (site / "geraete.html").read_text(encoding="utf-8"),
-        "fragment": (site / "data" / "geraete-zeitreihe.html").read_text("utf-8"),
+        "fragment": "".join(
+            p.read_text("utf-8") for p in sorted((site / "data" / "zr").glob("*.html"))
+        ),
         "buendel": (site / "data" / "geraete-buendel.html").read_text("utf-8"),
         "csv": site / "exporte" / "geraete-tco.csv",
         "stand": tco["updated"],

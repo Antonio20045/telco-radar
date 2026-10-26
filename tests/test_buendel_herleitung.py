@@ -7,6 +7,7 @@ Bündelbetrag nicht wörtlich auf der Seite steht. Ohne dieses Feld wären sie
 im Bestand von gemessenen nicht zu unterscheiden.
 """
 
+from telco_radar import tco_historie
 from telco_radar.analyze.tco_buendel import aus_rohsaetzen
 from telco_radar.analyze.tco_store import TcoDB
 from telco_radar.tarif_bezug import Tarifbestand
@@ -66,5 +67,5 @@ def test_herleitung_reist_vom_rohsatz_bis_in_bestand_und_historie(tmp_path):
         == "tarifsumme_minus_geraeterate"
     )
     assert je_sku["apple-iphone-17-512gb-schwarz"]["herleitung"] == ""
-    historie = (tmp_path / "historie.jsonl").read_text(encoding="utf-8")
+    historie = "\n".join(tco_historie.zeilen(tmp_path / "historie.jsonl"))
     assert '"herleitung": "tarifsumme_minus_geraeterate"' in historie

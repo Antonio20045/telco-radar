@@ -14,7 +14,7 @@ from pathlib import Path
 
 from bestand_pfad import lese_wurzel
 
-from telco_radar import rechenweise
+from telco_radar import rechenweise, tco_historie
 from telco_radar.analyze.buendel_abdeckung import pruefe
 from telco_radar.analyze.geraete_pruefstatus import Kontext
 from telco_radar.analyze.geraete_regeln import pruefe_bestand
@@ -298,7 +298,7 @@ def test_stand_und_historie_tragen_rechenweise_und_listenpreis(tmp_path):
     assert stand["Vodafone"][rechenweise.FELD] == 2
     assert stand["Vodafone"]["tarif_listenpreis"] == 31.95
     assert stand["o2"][rechenweise.FELD] == rechenweise.ERSTE
-    zeilen = [json.loads(z) for z in db.historie_path.read_text().splitlines()]
+    zeilen = [json.loads(z) for z in tco_historie.zeilen(db.historie_path)]
     assert sorted(rechenweise.der_zeile(z) for z in zeilen) == [1, 2]
 
 
