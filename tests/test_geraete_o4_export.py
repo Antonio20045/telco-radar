@@ -28,6 +28,7 @@ import pytest
 from bestand_pfad import ZUSTAND, abbild
 from bs4 import BeautifulSoup
 
+from telco_radar.analyze.tco_store import beleg_widerspricht
 from telco_radar.report.geraete_export import SPALTE_UEBER_24, SPALTE_UEBER_LAUFZEIT
 from telco_radar.report.html import render_site
 from telco_radar.tco_model import TCO_HORIZONT as _O4_HORIZONT
@@ -120,7 +121,11 @@ def radar(site) -> BeautifulSoup:
 
 @pytest.fixture(scope="module")
 def store() -> dict:
-    return json.loads((ZUSTAND / "geraete_tco.json").read_text())
+    """Der Bestand, wie der Store ihn lädt: Zeilen mit widersprechendem Beleg
+    (Enterprise Edition unter normaler SKU) fallen beim Laden weg."""
+    roh = json.loads((ZUSTAND / "geraete_tco.json").read_text())
+    roh["buendel"] = [b for b in roh["buendel"] if not beleg_widerspricht(b)]
+    return roh
 
 
 def test_die_spalten_stehen_wie_im_auftrag(tco_csv):
