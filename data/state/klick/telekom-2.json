@@ -1,7 +1,7 @@
 {
  "anbieter": "telekom-2",
- "datum": "2026-10-25",
- "dauer_sekunden": 471.6,
+ "datum": "2026-10-26",
+ "dauer_sekunden": 475.4,
  "format": 1,
  "frischegrenze_tage": 3,
  "grund": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-a36-5g/awesome-black-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones: Abruf gestört (HTTP 404)",
@@ -19,7 +19,7 @@
    "kombinationen": [],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 92,
+    "anfragen": 91,
     "beendet": 88,
     "dokument": "complete",
     "geladen": true,
@@ -29,8 +29,8 @@
      "www2.telekom.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 155.7,
-    "takte_ms": 1850,
+    "sekunden": 156.3,
+    "takte_ms": 1600,
     "wartet_auf": "load"
    },
    "speicher_gb": 512,
@@ -45,7 +45,7 @@
     "knoepfe_gefunden": 0,
     "knoepfe_gesucht": 0
    },
-   "verworfen": 24
+   "verworfen": 25
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/motorola/motorola-razr-fold-fifa-edition/pantone-blackened-blue-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
@@ -56,18 +56,18 @@
    "kombinationen": [],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 92,
-    "beendet": 90,
+    "anfragen": 91,
+    "beendet": 89,
     "dokument": "complete",
     "geladen": true,
     "offen": {
      "pix.telekom.de": 2,
-     "tags-eu.tiqcdn.com": 1,
-     "www.telekom.de": 1
+     "www.telekom.de": 1,
+     "www2.telekom.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 153.3,
-    "takte_ms": 1850,
+    "sekunden": 153.5,
+    "takte_ms": 2000,
     "wartet_auf": "load"
    },
    "speicher_gb": 512,
@@ -411,5 +411,5 @@
  ],
  "uebersichten": [],
  "vertragsform": "tarif_plus_ratenkauf",
- "zeitbudget_sekunden": 10276
+ "zeitbudget_sekunden": 10267
 }

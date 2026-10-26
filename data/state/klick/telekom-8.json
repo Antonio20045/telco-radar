@@ -1,7 +1,7 @@
 {
  "anbieter": "telekom-8",
- "datum": "2026-10-25",
- "dauer_sekunden": 239.8,
+ "datum": "2026-10-26",
+ "dauer_sekunden": 242.2,
  "format": 1,
  "frischegrenze_tage": 3,
  "grund": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25-ultra/titanium-black-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false: Abruf gestört (HTTP 404)",
@@ -20,17 +20,17 @@
    "ladung": {
     "abstand_s": 10.0,
     "anfragen": 99,
-    "beendet": 95,
+    "beendet": 96,
     "dokument": "complete",
     "geladen": true,
     "offen": {
      "pix.telekom.de": 2,
-     "www.telekom.de": 2,
+     "www.telekom.de": 1,
      "www2.telekom.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 156.1,
-    "takte_ms": 1700,
+    "sekunden": 156.8,
+    "takte_ms": 2300,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -45,7 +45,7 @@
     "knoepfe_gefunden": 0,
     "knoepfe_gesucht": 0
    },
-   "verworfen": 24
+   "verworfen": 23
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25-ultra/titanium-black-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false",
@@ -373,5 +373,5 @@
  ],
  "uebersichten": [],
  "vertragsform": "tarif_plus_ratenkauf",
- "zeitbudget_sekunden": 10271
+ "zeitbudget_sekunden": 10266
 }

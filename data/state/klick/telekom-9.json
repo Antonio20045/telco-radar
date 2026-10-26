@@ -1,7 +1,7 @@
 {
  "anbieter": "telekom-9",
- "datum": "2026-10-25",
- "dauer_sekunden": 4.4,
+ "datum": "2026-10-26",
+ "dauer_sekunden": 4.3,
  "format": 1,
  "frischegrenze_tage": 3,
  "grund": "https://www.telekom.de/shop/geraet/google/google-pixel-10-pro-fold/moonstone-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false: Abruf gestört (HTTP 404)",
@@ -346,5 +346,5 @@
  ],
  "uebersichten": [],
  "vertragsform": "tarif_plus_ratenkauf",
- "zeitbudget_sekunden": 10268
+ "zeitbudget_sekunden": 10263
 }

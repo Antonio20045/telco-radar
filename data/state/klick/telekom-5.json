@@ -1,7 +1,7 @@
 {
  "anbieter": "telekom-5",
- "datum": "2026-10-25",
- "dauer_sekunden": 470.5,
+ "datum": "2026-10-26",
+ "dauer_sekunden": 476.4,
  "format": 1,
  "frischegrenze_tage": 3,
  "grund": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-z-flip7/jetblack-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones: Abruf gestört (HTTP 404)",
@@ -19,18 +19,18 @@
    "kombinationen": [],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 92,
-    "beendet": 84,
+    "anfragen": 91,
+    "beendet": 87,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "tags-eu.tiqcdn.com": 1,
-     "www.telekom.de": 6,
+     "pix.telekom.de": 2,
+     "www.telekom.de": 2,
      "www2.telekom.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 154.7,
-    "takte_ms": 900,
+    "sekunden": 158.1,
+    "takte_ms": 3200,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -45,7 +45,7 @@
     "knoepfe_gefunden": 0,
     "knoepfe_gesucht": 0
    },
-   "verworfen": 28
+   "verworfen": 24
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/motorola/motorola-razr-fold-fifa-edition/pantone-blackened-blue-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
@@ -56,18 +56,17 @@
    "kombinationen": [],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 76,
-    "beendet": 70,
+    "anfragen": 83,
+    "beendet": 81,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "pix.telekom.de": 2,
-     "www.telekom.de": 5,
-     "www2.telekom.de": 1
+     "tags-eu.tiqcdn.com": 1,
+     "www.telekom.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 152.6,
-    "takte_ms": 1200,
+    "sekunden": 153.9,
+    "takte_ms": 2250,
     "wartet_auf": "load"
    },
    "speicher_gb": 512,
@@ -411,5 +410,5 @@
  ],
  "uebersichten": [],
  "vertragsform": "tarif_plus_ratenkauf",
- "zeitbudget_sekunden": 10270
+ "zeitbudget_sekunden": 10265
 }

@@ -1,7 +1,7 @@
 {
  "anbieter": "telekom-10",
- "datum": "2026-10-25",
- "dauer_sekunden": 3.7,
+ "datum": "2026-10-26",
+ "dauer_sekunden": 4.0,
  "format": 1,
  "frischegrenze_tage": 3,
  "grund": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-a36-5g/awesome-black-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones: Abruf gestört (HTTP 404)",
@@ -346,5 +346,5 @@
  ],
  "uebersichten": [],
  "vertragsform": "tarif_plus_ratenkauf",
- "zeitbudget_sekunden": 10269
+ "zeitbudget_sekunden": 10274
 }
