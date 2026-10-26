@@ -75,6 +75,7 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 from dataclasses import asdict
 from pathlib import Path
 
@@ -122,6 +123,15 @@ _REFERENZ_MESSFELDER = (
 )
 
 _HISTORIE_NAME = "geraete_tco_historie.jsonl"
+_EE_BELEG = re.compile(r"-ee-\d+(?:gb|tb)-|enterprise-edition")
+
+
+def beleg_widerspricht(eintrag: dict) -> bool:
+    """Der Beleg ist eine Enterprise Edition, die SKU das normale Modell
+    (Preisprüfung 26.10.2026: o2 S26 und Telekom S26 FE, bis 102 € daneben)."""
+    sku = str(eintrag.get("sku_id") or "")
+    ee_sku = "enterprise" in sku or "-ee-" in sku
+    return bool(_EE_BELEG.search(str(eintrag.get("quelle_url") or ""))) and not ee_sku
 
 
 def id_aus_satz(satz: dict) -> str | None:
@@ -204,6 +214,11 @@ class TcoDB:
         self.erfassung = erfassung if isinstance(erfassung, dict) else {}
         migriert = 0
         for eintrag in roh.get("buendel") or []:
+            if beleg_widerspricht(eintrag):
+                log.warning(
+                    "verworfen, Beleg ist ein anderes Modell: %s", eintrag.get("id")
+                )
+                continue
             bid = id_aus_satz(eintrag)
             if bid is None:
                 if eintrag.get("id"):
@@ -310,6 +325,11 @@ class TcoDB:
                 )
 
         for satz in buendel:
+            if beleg_widerspricht(
+                {"sku_id": satz.sku_id, "quelle_url": satz.quelle_url}
+            ):
+                log.warning("verworfen, Beleg ist ein anderes Modell: %s", satz.id)
+                continue
             bid = satz.id
             eintrag = self._buendel.get(bid)
             if eintrag is None:

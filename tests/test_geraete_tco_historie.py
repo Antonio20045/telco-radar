@@ -285,3 +285,15 @@ def test_die_altdatei_bleibt_stehen_und_neue_tage_kommen_in_tagesdateien(tmp_pat
         f"{TAG2}.jsonl",
     ]
     assert [z["datum"] for z in _historie(pfad)] == [TAG0, TAG1, TAG2]
+
+
+def test_ein_buendel_mit_dem_beleg_einer_enterprise_edition_faellt_weg(tmp_path):
+    """Preisprüfung 26.10.2026: die o2-EE des Galaxy S26 stand als normales
+    S26 auf der Seite, 102 € zu hoch; ihr Beleg verriet sie (`-ee-256gb-`)."""
+    pfad = tmp_path / "geraete_tco.json"
+    ee = _o2(TAG1)
+    ee.quelle_url = "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ee-256gb-black-details"
+    db = TcoDB(pfad)
+    db.upsert_buendel([ee, _vodafone(TAG1)], TAG1)
+    db.save(TAG1)
+    assert [b["id"] for b in TcoDB(pfad).buendel()] == [_vodafone(TAG1).id]
