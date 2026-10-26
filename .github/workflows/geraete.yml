@@ -198,6 +198,11 @@ jobs:
             # scheitern lassen und die drei oben mitziehen.
             git add data/state/geraete_tco_historie.jsonl
           fi
+          if [ -d data/state/geraete_tco_historie ]; then
+            # Ab 26.10.2026 je Messtag eine Datei (src/telco_radar/tco_historie.py):
+            # die Altdatei lag an GitHubs 100-MB-Grenze, jeder Push scheiterte.
+            git add data/state/geraete_tco_historie
+          fi
           if [ -f data/state/geraete_katalog_auto.json ]; then
             # E4-Auto-Erkennung (17.09.2026): der Auto-Katalog und die
             # Zaehlung unbekannter Titel/Farben sind STATE. Ohne diese
