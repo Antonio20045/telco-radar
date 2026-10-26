@@ -52,8 +52,9 @@ from bs4 import BeautifulSoup
 
 from ..models import Item
 from ..tarif_model import PREISTYP_DOKUMENT, PREISTYP_LIVE_SHOP, Tarif
+from . import tarif_congstar_seite, tarif_kacheln, tarif_ldjson, tarif_telekom_kacheln
+from .browserseite import hole_im_browser
 from .http import fetch
-from . import tarif_kacheln, tarif_ldjson, tarif_telekom_kacheln
 from .tarif_pdf import dokument_hash, ist_tarifdokument, lies_text, text_aus_pdf
 
 log = logging.getLogger(__name__)
@@ -121,6 +122,7 @@ _SEITEN_LESARTEN = {
     METHODE_LDJSON: tarif_ldjson.tarife_aus_html,
     METHODE_KACHELN: tarif_kacheln.tarife_aus_html,
     METHODE_TELEKOM_KACHELN: tarif_telekom_kacheln.tarife_aus_html,
+    tarif_congstar_seite.METHODE: tarif_congstar_seite.tarife_aus_html,
 }
 
 METHODEN = (METHODE_DOKUMENTE, *sorted(_SEITEN_LESARTEN))
@@ -136,6 +138,7 @@ class Quelle:
     max_dokumente: int = 5
     methode: str = METHODE_DOKUMENTE
     user_agent: str | None = None
+    browser: bool = False
 
 
 @dataclass
@@ -185,6 +188,7 @@ def lade_quellen(root: Path) -> list[Quelle]:
                 max_dokumente=int(q.get("max_dokumente") or 5),
                 methode=str(q.get("methode") or METHODE_DOKUMENTE).strip(),
                 user_agent=(str(q["user_agent"]) if q.get("user_agent") else None),
+                browser=bool(q.get("browser")),
             )
         )
     return quellen
@@ -650,25 +654,21 @@ def _sammle_seite(
     waeren zwei Delta-Schichten, und die zweite meldete irgendwann anders
     als die erste.
 
-    Es wird KEIN Link geerntet und keine zweite Adresse geholt: die Seite
-    ist die Nutzlast. Damit ist die Regel "nur abrufen, was verlinkt ist"
-    hier trivial erfuellt - abgerufen wird ausschliesslich die Adresse, die
-    in der Konfiguration steht.
-
-    `geholt` zaehlt die Seite mit, `verlinkt` nicht: es wurde nichts
-    verlinkt. Eine Null in einer Spalte, die hier gar nichts messen kann,
-    waere eine Falschmeldung im Protokoll.
+    Es wird KEIN Link geerntet: abgerufen wird nur die Adresse aus der
+    Konfiguration (`browser: true` im echten Browser, `browserseite`).
+    `geholt` zaehlt die Seite mit, `verlinkt` nicht (es wurde nichts
+    verlinkt; eine Null dort waere eine Falschmeldung im Protokoll).
     """
     for einstieg in quelle.einstieg:
         erlaubt.add(einstieg)
         bilanz["einstiege"] += 1
         try:
             besucht.append(einstieg)
-            antwort = hole(einstieg, http_cfg)
+            antwort = (hole_im_browser if quelle.browser else hole)(einstieg, http_cfg)
             html = antwort.text
         except Exception as exc:  # noqa: BLE001
             bilanz["fehler"] += 1
-            log.info("Tarifquelle %s nicht lesbar: %s", einstieg, str(exc)[:120])
+            log.warning("Tarifquelle %s nicht lesbar: %s", einstieg, str(exc)[:120])
             continue
         bilanz["geholt"] += 1
         gefunden = extrahiere(

@@ -91,6 +91,7 @@ log = logging.getLogger(__name__)
 _TILE_RE = re.compile(r"^TariffTileModified_TariffTileModified__[A-Za-z0-9]+$")
 _NAME_WRAPPER_RE = re.compile(r"TariffTile__name-wrapper")
 _STRIKE_RE = re.compile(r"strike-price-value")
+_PREISWERT_RE = re.compile(r"__price-value")
 _HERO_VALUE_RE = re.compile(r"hero-value")
 _HERO_UNLIMITED_RE = re.compile(r"hero-unlimited-top")
 
@@ -116,6 +117,13 @@ def _auswahl_link(kachel) -> str:
     return ""
 
 
+def _listenpreis(kachel):
+    """Seit Oktober 2026 (gemessen 26.10.) zeigt die Kachel keinen durchgestrichenen
+    Preis mehr: der Monatspreis steht als `…__price-value` („84,95 € Monatlich“), der
+    Ø-Kombipreis getrennt davon als `…__average-price` mit „inkl. 240 € Cashback“."""
+    return kachel.find(class_=_PREISWERT_RE)
+
+
 def tarif_aus_kachel(
     kachel, *, anbieter: str, seiten_url: str, abgerufen_am: str
 ) -> Optional[tuple[Tarif, str]]:
@@ -129,7 +137,7 @@ def tarif_aus_kachel(
     if not name:
         return None
 
-    strike_text = _text(kachel.find(class_=_STRIKE_RE))
+    strike_text = _text(kachel.find(class_=_STRIKE_RE) or _listenpreis(kachel))
     grundgebuehr = zahl(strike_text)
     if grundgebuehr is None:
         log.info(

@@ -270,6 +270,11 @@ quellen:
 
   - anbieter: Telekom
     methode: telekom_kacheln
+    # Seit 15.09.2026 blieb dieser Stand stehen: aus GitHub Actions kommt die
+    # 202-JavaScript-Pruefung (siehe PIB-Eintrag oben). Der echte Browser
+    # darf sie mit ehrlicher Kennung durchlaufen (CLAUDE.md, Harte Regel 4;
+    # `collect/browserseite.py`). Gemessen 26.10.2026: HTTP 200, fuenf Kacheln.
+    browser: true
     # Derselbe Per-Anbieter-Override wie beim PIB-Eintrag oben
     # (BRIEF_TELEKOM_TAEGLICH_R3_E4): auch diese Quelle ist mit dem
     # ehrlichen Absender gemessen, nicht mit der globalen Chrome-Kennung.
@@ -373,6 +378,21 @@ quellen:
     einstieg:
       - https://www.o2online.de/tarife/handyvertrag-ohne-handy/
     max_dokumente: 15
+
+  - anbieter: congstar
+    methode: congstar_seite
+    # Gemessen 26.10.2026 mit dem Absender TelcoRadar/1.0: HTTP 200,
+    # serverseitig gerendert, je Seite zwei Laufzeitknoepfe (24 Monate und
+    # ohne Laufzeit) mit "Monatliche Kosten". Das Blatt 545 nennt fuer die
+    # Allnet Flat L noch 29,00 EUR (Stand 30.07.2026), diese Seite und jede
+    # Buendelzeile 30,00 EUR. Lesart in `collect/tarif_congstar_seite.py`.
+    # robots.txt (26.10.2026) sperrt /handytarife/ nicht.
+    einstieg:
+      - https://www.congstar.de/handytarife/allnet-flat-tarife/allnet-flat-xs/
+      - https://www.congstar.de/handytarife/allnet-flat-tarife/allnet-flat-s/
+      - https://www.congstar.de/handytarife/allnet-flat-tarife/allnet-flat-m/
+      - https://www.congstar.de/handytarife/allnet-flat-tarife/allnet-flat-l/
+    max_dokumente: 8
 
 # --- Warum die PIB-Blaetter von 1&1 weiterhin fehlen
 # hilfe-center.1und1.de/produktinformationsblaetter ist eine Next.js-Seite

@@ -82,6 +82,32 @@
       "bytes_roh": 3368,
       "sha256_roh": "20091f3b73c2673a01dc063ee3efd1d9d8a0c220969addca0e3d92824ab4bf05",
       "nachgetragen": "Paket 11: Laufzeitbeleg als Fixture, damit kein Test outputs/ liest"
+    },
+    {
+      "datei": "congstar_allnet_flat_l_2026-10-26.html",
+      "url": "https://www.congstar.de/handytarife/allnet-flat-tarife/allnet-flat-l/",
+      "abgerufen_am": "2026-10-26",
+      "http_status": 200,
+      "content_type": "text/html",
+      "bytes_roh": 4011,
+      "sha256_roh": "1b1c0fd61f008476cac333bf02eb6ab2ca7bd1734602e9dc02365abe46194ffa",
+      "gzip": false,
+      "absender": "TelcoRadar/1.0",
+      "bytes_abgelegt": 4011,
+      "notiz": "Ausschnitt: title, h1, h2 und die Laufzeitauswahl (kleinster Knoten mit beiden Knoepfen) der rohen Antwort"
+    },
+    {
+      "datei": "telekom_kacheln_2026-10-26.html",
+      "url": "https://www.telekom.de/shop/tarife/handyvertrag",
+      "abgerufen_am": "2026-10-26",
+      "http_status": 200,
+      "content_type": "text/html",
+      "bytes_roh": 16345,
+      "sha256_roh": "eeb5187bd09c15eb7f1c9c4fbf96f000945a4a9701a75716f76e6d6401968aad",
+      "gzip": false,
+      "absender": "TelcoRadar/1.0",
+      "bytes_abgelegt": 16345,
+      "notiz": "Ausschnitt: die fuenf Tarifkacheln aus dem im Browser gerenderten DOM"
     }
   ]
 }
