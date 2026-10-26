@@ -43,7 +43,7 @@ import math
 from datetime import date
 from pathlib import Path
 
-from .. import rechenweise
+from .. import rechenweise, tco_historie
 from ..analyze.tco_store import basis_aus_satz, id_aus_satz
 from ..tco_model import TCO_HORIZONT, zeitraum_vergleichbar
 from . import geraete_bewegung
@@ -287,11 +287,11 @@ def _messungen(
 
     messungen: dict[tuple, dict] = {}
     historie = state_dir / "geraete_tco_historie.jsonl"
-    if not historie.exists():
+    if not tco_historie.vorhanden(historie):
         return {}
     ohne_id = ohne_stand = ueber_basis = ohne_wert = 0
     fremder_zeitraum = fremde_laufzeit = 0
-    for zeile in historie.read_text(encoding="utf-8").splitlines():
+    for zeile in tco_historie.zeilen(historie):
         if not zeile.strip():
             continue
         try:

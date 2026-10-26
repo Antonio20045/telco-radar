@@ -26,7 +26,9 @@ from __future__ import annotations
 
 import json
 import pathlib
+import shutil
 
+from telco_radar import tco_historie
 from telco_radar.analyze.tco_store import TcoDB
 from telco_radar.tco_model import Buendel, tco_24
 
@@ -110,11 +112,9 @@ def _lauf(pfad: pathlib.Path, buendel: list[Buendel], datum: str) -> None:
 
 def _historie(pfad: pathlib.Path) -> list[dict]:
     historie = TcoDB(pfad).historie_path
-    assert historie.exists(), f"{historie} fehlt"
+    assert tco_historie.vorhanden(historie), f"{historie} fehlt"
     return [
-        json.loads(zeile)
-        for zeile in historie.read_text(encoding="utf-8").splitlines()
-        if zeile.strip()
+        json.loads(zeile) for zeile in tco_historie.zeilen(historie) if zeile.strip()
     ]
 
 
@@ -148,7 +148,7 @@ def test_erster_lauf_schreibt_je_buendel_eine_zeile(tmp_path):
 def test_zweiter_lauf_am_selben_tag_ersetzt_statt_zu_duplizieren(tmp_path):
     pfad = tmp_path / "geraete_tco.json"
     _lauf(pfad, [_o2(TAG1), _vodafone(TAG1)], TAG1)
-    historie = TcoDB(pfad).historie_path
+    historie = tco_historie.tagesdatei(TcoDB(pfad).historie_path, TAG1)
 
     identisch = historie.read_text(encoding="utf-8")
     _lauf(pfad, [_o2(TAG1), _vodafone(TAG1)], TAG1)
@@ -242,7 +242,7 @@ def test_die_historie_beginnt_mit_dem_ersten_lauf_nicht_in_der_vergangenheit(tmp
     db = TcoDB(pfad)
     db.upsert_buendel([_o2(TAG0)], TAG0)
     db.save(TAG0)
-    TcoDB(pfad).historie_path.unlink(missing_ok=True)
+    shutil.rmtree(tco_historie.ordner(TcoDB(pfad).historie_path))
 
     _lauf(pfad, [_o2(TAG1)], TAG1)
     assert [z["datum"] for z in _historie(pfad)] == [TAG1]
@@ -256,7 +256,7 @@ def test_eine_unlesbare_historie_wird_nicht_angefasst(tmp_path):
     ist. Der Lauf wirft nicht; der Stand wird trotzdem gesichert."""
     pfad = tmp_path / "geraete_tco.json"
     _lauf(pfad, [_o2(TAG1)], TAG1)
-    historie = TcoDB(pfad).historie_path
+    historie = tco_historie.tagesdatei(TcoDB(pfad).historie_path, TAG2)
     muell = "{kein json\n"
     historie.write_text(muell, encoding="utf-8")
 
@@ -265,3 +265,23 @@ def test_eine_unlesbare_historie_wird_nicht_angefasst(tmp_path):
         "eine unlesbare Historie wird still ersatzlos ueberschrieben"
     )
     assert json.loads(pfad.read_text(encoding="utf-8"))["updated"] == TAG2
+
+
+def test_die_altdatei_bleibt_stehen_und_neue_tage_kommen_in_tagesdateien(tmp_path):
+    """26.10.2026: die Altdatei wuchs über GitHubs 100-MB-Grenze, jeder Push
+    scheiterte. Ein Lauf hängt deshalb nie mehr an sie an; gelesen wird sie
+    weiter, vor den Tagesdateien."""
+    pfad = tmp_path / "geraete_tco.json"
+    alt = TcoDB(pfad).historie_path
+    altzeile = json.dumps({"id": _o2(TAG0).id, "datum": TAG0, "gesamt": 1.0})
+    alt.write_text(altzeile + "\n", encoding="utf-8")
+
+    _lauf(pfad, [_o2(TAG1)], TAG1)
+    _lauf(pfad, [_o2(TAG2)], TAG2)
+
+    assert alt.read_text(encoding="utf-8") == altzeile + "\n"
+    assert sorted(p.name for p in tco_historie.ordner(alt).iterdir()) == [
+        f"{TAG1}.jsonl",
+        f"{TAG2}.jsonl",
+    ]
+    assert [z["datum"] for z in _historie(pfad)] == [TAG0, TAG1, TAG2]

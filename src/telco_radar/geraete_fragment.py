@@ -42,6 +42,9 @@ from dataclasses import dataclass
 from datetime import date, timedelta
 from pathlib import Path
 
+from . import tco_historie
+from .report.geraete_fragmente import ZR_ORDNER
+
 log = logging.getLogger(__name__)
 
 GRENZE_BYTES = 5_000_000
@@ -103,12 +106,12 @@ def lies_historie(pfad: Path) -> Bestand:
     den Lauf kosten, sie ist Protokoll, nicht Guete.
     """
     pfad = Path(pfad)
-    if not pfad.exists():
+    if not tco_historie.vorhanden(pfad):
         return Bestand(tage=(), paare=0)
     je_tag: dict[date, dict[str, None]] = {}
     paare: set[tuple[str, str]] = set()
     try:
-        zeilen = pfad.read_text(encoding="utf-8").splitlines()
+        zeilen = tco_historie.zeilen(pfad)
     except OSError as exc:
         log.warning("%s unlesbar (%s) - Fragmentmessung ohne Historie", pfad.name, exc)
         return Bestand(tage=(), paare=0)
@@ -160,11 +163,17 @@ def fragment_groessen(site_dir: Path) -> list[Fragment]:
     geaendert hat).
     """
     out: list[Fragment] = []
+    daten = Path(site_dir) / "data"
     for name in (ZEITREIHE_NAME, BUNDEL_NAME):
-        pfad = Path(site_dir) / "data" / name
-        if not pfad.exists():
+        pfad = daten / name
+        if pfad.exists():
+            roh = pfad.read_bytes()
+        elif name == ZEITREIHE_NAME and (daten / ZR_ORDNER).is_dir():
+            roh = b"".join(
+                p.read_bytes() for p in sorted((daten / ZR_ORDNER).iterdir())
+            )
+        else:
             continue
-        roh = pfad.read_bytes()
         out.append(
             Fragment(
                 name=name, bytes=len(roh), gzip_bytes=len(gzip.compress(roh, mtime=0))

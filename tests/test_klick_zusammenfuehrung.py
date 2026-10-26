@@ -36,6 +36,7 @@ from klickergebnisse import (
     telekom_lesung,
 )
 
+from telco_radar import tco_historie
 from telco_radar.analyze.klick_zusammenfuehrung import (
     UMGEBUNG,
     fuehre_zusammen,
@@ -402,8 +403,8 @@ def test_gestoerter_tag_laesst_die_frische_klickmessung_stehen(
         (30.8, "2026-09-29", 1),
         (23.63, "2026-10-02", 0),
     ]
-    historie = (tmp_path / "geraete_tco_historie.jsonl").read_text("utf-8")
-    zeilen = [json.loads(z) for z in historie.splitlines()]
+    historie = tco_historie.zeilen(tmp_path / "geraete_tco_historie.jsonl")
+    zeilen = [json.loads(z) for z in historie]
     assert [(z["datum"], z["geraet_monatsrate"]) for z in zeilen] == [
         ("2026-09-29", 30.8),
         ("2026-10-02", 23.63),

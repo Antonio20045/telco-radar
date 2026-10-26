@@ -4,8 +4,9 @@ Bis 10.10.2026 holte app.js bei jedem Wechsel von Modell, Band oder
 Laufzeit die Gesamtfragmente `geraete-zeitreihe.html` (47 MB) und
 `geraete-buendel.html` (24 MB) und zerlegte sie im Browser: 7 s am
 Rechner, 35 s mit Handy-CPU. Jetzt lädt der Client nur die Datei des
-gewählten Modells aus `data/zr/` bzw. `data/bnd/`. Die Gesamtfragmente
-bleiben für Wachstumsmessung und Prüfungen stehen.
+gewählten Modells aus `data/zr/` bzw. `data/bnd/`. `geraete-buendel.html`
+bleibt für Prüfungen stehen. Die Gesamt-Zeitreihe entfällt seit 26.10.2026:
+sie wuchs über 100 MB, und GitHub lehnte jeden Push der Seite ab.
 """
 
 from __future__ import annotations
@@ -48,7 +49,7 @@ def vorbereiten(site_dir: Path, env, geraete: dict) -> dict[Path, str]:
     if not paare:
         return dateien
     zr_vorlage = env.get_template("geraete_zeitreihe_fragment.html.j2")
-    dateien[daten / "geraete-zeitreihe.html"] = zr_vorlage.render(paare=paare)
+    (daten / "geraete-zeitreihe.html").unlink(missing_ok=True)
     je_modell: dict[str, list] = {}
     for p in paare:
         je_modell.setdefault(p["modell"], []).append(p)

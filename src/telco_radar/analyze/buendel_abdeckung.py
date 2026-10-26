@@ -32,11 +32,10 @@ import re
 from collections import defaultdict
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Optional
 
 import yaml
 
-from .. import rechenweise
+from .. import rechenweise, tco_historie
 from ..geraete_model import normalisiere
 
 KOMBI_VERLUST_ANTEIL = 0.10
@@ -56,8 +55,8 @@ class Befund:
 
 @dataclass
 class Abdeckung:
-    messtag: Optional[str]
-    vortag: Optional[str]
+    messtag: str | None
+    vortag: str | None
     matrix: dict = field(default_factory=dict)
     anbieter_zahl: dict = field(default_factory=dict)
     luecken: dict = field(default_factory=dict)
@@ -68,7 +67,7 @@ class Abdeckung:
         return bool(self.befunde)
 
 
-def modell_und_speicher(sku_id: str) -> tuple[Optional[str], Optional[str]]:
+def modell_und_speicher(sku_id: str) -> tuple[str | None, str | None]:
     """Katalogmodell und Speicherstufe aus der SKU-ID
     (`geraete_model.sku_id`: Gerät-Speicher-Farbe[-Zustand])."""
     treffer = _SKU_MUSTER.match(sku_id or "")
@@ -94,7 +93,7 @@ def lade_pflicht(pfad: Path) -> dict:
     }
 
 
-def _anbieter_aus_id(buendel_id: str, namen: dict) -> Optional[str]:
+def _anbieter_aus_id(buendel_id: str, namen: dict) -> str | None:
     teile = (buendel_id or "").split("--")
     return namen.get(teile[1]) if len(teile) > 1 else None
 
@@ -226,14 +225,13 @@ def lade_und_pruefe(root: Path) -> Abdeckung:
     tco = json.loads((zustand / "geraete_tco.json").read_text("utf-8"))
     historie = []
     pfad = zustand / "geraete_tco_historie.jsonl"
-    if pfad.exists():
-        with pfad.open(encoding="utf-8") as f:
-            historie = [json.loads(z) for z in f if z.strip()]
+    if tco_historie.vorhanden(pfad):
+        historie = [json.loads(z) for z in tco_historie.zeilen(pfad) if z.strip()]
     pflicht = lade_pflicht(root / "config" / "geraete_abdeckung.yaml")
     return pruefe(tco, historie, pflicht)
 
 
-def _zelle_text(zelle: Optional[dict]) -> str:
+def _zelle_text(zelle: dict | None) -> str:
     if not zelle:
         return ""
     laufzeiten = "/".join(

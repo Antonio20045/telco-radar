@@ -77,9 +77,8 @@ import json
 import logging
 from dataclasses import asdict
 from pathlib import Path
-from typing import Optional
 
-from .. import rechenweise
+from .. import rechenweise, tco_historie
 from ..tarif_model import schreibe_buendelphasen
 from ..tco_model import (
     Buendel,
@@ -125,7 +124,7 @@ _REFERENZ_MESSFELDER = (
 _HISTORIE_NAME = "geraete_tco_historie.jsonl"
 
 
-def id_aus_satz(satz: dict) -> Optional[str]:
+def id_aus_satz(satz: dict) -> str | None:
     """Die heutige Buendel-ID eines GESPEICHERTEN Satzes - die Lesemigration.
 
     Nimmt einen Stand-Eintrag aus `geraete_tco.json` ODER eine Zeile aus
@@ -156,7 +155,7 @@ def id_aus_satz(satz: dict) -> Optional[str]:
     return neu_
 
 
-def basis_aus_satz(satz: dict) -> Optional[str]:
+def basis_aus_satz(satz: dict) -> str | None:
     """Der laufzeitfreie Teil der ID eines gespeicherten Satzes.
 
     Der Notweg der Zeitreihe: eine gemessene Laufzeit, die im heutigen
@@ -180,7 +179,7 @@ class TcoDB:
     `historie_path`): eine Zeile je (buendel_id, datum), siehe Modulkopf.
     """
 
-    def __init__(self, path: Path, historie_path: Optional[Path] = None):
+    def __init__(self, path: Path, historie_path: Path | None = None):
         self.path = Path(path)
         self.historie_path = Path(historie_path or self.path.parent / _HISTORIE_NAME)
         self._buendel: dict[str, dict] = {}
@@ -239,10 +238,10 @@ class TcoDB:
             key=lambda e: (e.get("anbieter", ""), e.get("id", "")),
         )
 
-    def nach_id(self, buendel_id: str) -> Optional[dict]:
+    def nach_id(self, buendel_id: str) -> dict | None:
         return self._buendel.get(buendel_id)
 
-    def referenz(self, anbieter: str, tarif_name: str) -> Optional[dict]:
+    def referenz(self, anbieter: str, tarif_name: str) -> dict | None:
         """Der Massstab fuer ein Buendel dieses Anbieters und Tarifs."""
         return self._referenzen.get(sim_only_id(anbieter, tarif_name))
 
@@ -261,12 +260,12 @@ class TcoDB:
         """
         tage: set[str] = set()
         ids: set[str] = set()
-        if self.historie_path.exists():
+        if tco_historie.vorhanden(self.historie_path):
             try:
-                text = self.historie_path.read_text(encoding="utf-8")
+                text = tco_historie.zeilen(self.historie_path)
             except OSError:
-                text = ""
-            for zeile in text.splitlines():
+                text = []
+            for zeile in text:
                 zeile = zeile.strip()
                 if not zeile:
                     continue
@@ -335,7 +334,7 @@ class TcoDB:
         return neu, gesehen
 
     def setze_referenzen(
-        self, referenzen, today: str, anbieter: Optional[set] = None
+        self, referenzen, today: str, anbieter: set | None = None
     ) -> int:
         """SIM-only-Referenzen aufnehmen oder auffrischen. Gibt die Zahl der
         neu aufgenommenen zurueck.
@@ -369,7 +368,7 @@ class TcoDB:
         return neu
 
     def ersetze_referenzen(
-        self, referenzen, today: str, anbieter: Optional[set] = None
+        self, referenzen, today: str, anbieter: set | None = None
     ) -> tuple[int, int]:
         """Den Referenzbestand VOLLSTAENDIG neu setzen. Gibt (neu, entfernt).
 
@@ -466,7 +465,8 @@ class TcoDB:
         return True
 
     def _schreibe_historie(self) -> bool:
-        """Fuegt die Messungen dieses Laufs in die Historie ein.
+        """Fuegt die Messungen dieses Laufs in die Historie ein, je Messtag
+        in die Tagesdatei (`tco_historie`); die Altdatei bleibt unberuehrt.
 
         True heisst geschrieben, False heisst "nichts zu schreiben" ODER
         "nicht angefasst" - eine unlesbare Historie wird uebersprungen und
@@ -479,41 +479,11 @@ class TcoDB:
         """
         if not self._historie_pendente:
             return False
-        zusammen: dict[tuple[str, str], dict] = {}
-        if self.historie_path.exists():
-            try:
-                text = self.historie_path.read_text(encoding="utf-8")
-                saetze = [
-                    json.loads(zeile) for zeile in text.splitlines() if zeile.strip()
-                ]
-            except (json.JSONDecodeError, OSError) as exc:
-                log.warning(
-                    "%s unlesbar (%s) - Historie NICHT angefasst, "
-                    "nur der Stand geschrieben",
-                    self.historie_path.name,
-                    exc,
-                )
-                return False
-            if any(
-                not isinstance(satz, dict)
-                or not (satz.get("id") or "").strip()
-                or not (satz.get("datum") or "").strip()
-                for satz in saetze
-            ):
-                log.warning(
-                    "%s enthaelt Zeilen ohne (id, datum) - Historie NICHT angefasst",
-                    self.historie_path.name,
-                )
-                return False
-            for satz in saetze:
-                zusammen[(satz["id"], satz["datum"])] = satz
-        zusammen.update(self._historie_pendente)
-        self.historie_path.parent.mkdir(parents=True, exist_ok=True)
-        self.historie_path.write_text(
-            "".join(
-                json.dumps(satz, ensure_ascii=False) + "\n"
-                for satz in zusammen.values()
-            ),
-            encoding="utf-8",
-        )
-        return True
+        je_tag: dict[str, list[dict]] = {}
+        for (_, datum), satz in self._historie_pendente.items():
+            je_tag.setdefault(datum, []).append(satz)
+        geschrieben = [
+            tco_historie.schreibe_tag(self.historie_path, datum, saetze)
+            for datum, saetze in sorted(je_tag.items())
+        ]
+        return any(geschrieben)

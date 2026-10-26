@@ -17,12 +17,11 @@ from __future__ import annotations
 import json
 
 import pytest
+import zeitreihe_fragment
 from bs4 import BeautifulSoup
-
-from telco_radar.geraete_config import lade_katalog, lade_quellen
-from telco_radar.report.html import render_site
-
 from test_geraete_zeitreihe_ansicht import HEUTE, _baue
+
+from telco_radar.report.html import render_site
 
 
 @pytest.fixture(scope="module")
@@ -231,7 +230,6 @@ def test_der_grafik_daten_knoten_ist_weg(suppe):
 
 
 def test_das_fragment_traegt_alle_pare_und_den_startzustand(tmp_path_factory):
-    import pathlib
 
     root, state = _baue(tmp_path_factory.mktemp("zrfrag"))
     reports = root / "data" / "reports"
@@ -251,9 +249,8 @@ def test_das_fragment_traegt_alle_pare_und_den_startzustand(tmp_path_factory):
     (reports / f"{HEUTE}.md").write_text("# B\n", encoding="utf-8")
     site = root / "site"
     render_site(site, reports)
-    fragment = site / "data" / "geraete-zeitreihe.html"
-    assert fragment.exists(), "das Zeitreihen-Fragment fehlt"
-    inhalt = fragment.read_text(encoding="utf-8")
+    assert not (site / "data" / "geraete-zeitreihe.html").exists()
+    inhalt = zeitreihe_fragment.lies(site / "data")
     frag = BeautifulSoup(inhalt, "html.parser")
     lager = frag.select(".gr-zr-lager")
     paare = {(l.get("data-modell"), l.get("data-band")) for l in lager}

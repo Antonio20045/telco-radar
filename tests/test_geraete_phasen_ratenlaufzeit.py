@@ -23,6 +23,7 @@ from pathlib import Path
 import pytest
 from bestand_pfad import ZUSTAND
 
+from telco_radar import tco_historie
 from telco_radar.analyze.geraete_pruefstatus import buendel_aus_satz
 from telco_radar.analyze.tco_buendel import aus_rohsaetzen
 from telco_radar.analyze.tco_store import TcoDB
@@ -265,9 +266,7 @@ def test_die_phase_geht_durch_speicher_historie_und_ansicht(tmp_path):
     [satz] = TcoDB(tmp_path / "geraete_tco.json").buendel()
     assert _spannen(satz.get("tarif_phasen", [])) == [(1, 36, 15.0)]
     assert satz["tarif_phasen"] == roh["tarif_phasen"]
-    zeile = json.loads(
-        (tmp_path / "geraete_tco_historie.jsonl").read_text().splitlines()[0]
-    )
+    zeile = json.loads(tco_historie.zeilen(tmp_path / "geraete_tco_historie.jsonl")[0])
     assert zeile.get("tarif_phasen") == roh["tarif_phasen"]
 
     [karte] = geraete_tco_view._aus_speicher(

@@ -24,6 +24,7 @@ from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
 
+from .. import tco_historie
 from ..collect.geraete.klicktext import volumen_aus_zeile
 from ..geraete_model import Katalog
 from ..tarif_bezug import Tarifbestand
@@ -61,11 +62,11 @@ def vortageswerte(historie: Path, stand: Mapping[str, str]) -> dict[str, dict]:
     Eine fehlende Historie heißt: kein Vortag. Unlesbare Zeilen werden gezählt und
     protokolliert, die übrigen gelten.
     """
-    if not historie.exists():
+    if not tco_historie.vorhanden(historie):
         return {}
     vortag: dict[str, dict] = {}
     unlesbar = 0
-    for zeile in historie.read_text(encoding="utf-8").splitlines():
+    for zeile in tco_historie.zeilen(historie):
         if not zeile.strip():
             continue
         try:
