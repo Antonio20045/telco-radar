@@ -23,7 +23,7 @@ def lauf_ordner(tmp_path, monkeypatch):
 
 def test_vor_push_bricht_vor_den_stufen_ab(lauf_ordner, monkeypatch, capsys):
     gestartet = []
-    monkeypatch.setattr(pruefleiter, "STUFEN_VOLL", [gestartet.append])
+    monkeypatch.setattr(pruefleiter, "STUFEN_PUSH", [gestartet.append])
     monkeypatch.setattr(
         pruefleiter.pruefstempel,
         "vor_push",
@@ -35,20 +35,46 @@ def test_vor_push_bricht_vor_den_stufen_ab(lauf_ordner, monkeypatch, capsys):
     assert capsys.readouterr().out.startswith("pre-push: origin/main ist neuer")
 
 
-def test_vor_push_laeuft_voll_und_stempelt_bei_gruen(lauf_ordner, monkeypatch):
-    monkeypatch.setattr(pruefleiter, "STUFEN_VOLL", [_gruen])
+def test_vor_push_laeuft_push_stufen_und_stempelt_nicht(lauf_ordner, monkeypatch):
+    monkeypatch.setattr(pruefleiter, "STUFEN_PUSH", [_gruen])
+    monkeypatch.setattr(pruefleiter, "STUFEN_VOLL", [lambda log: pytest.fail("voll")])
     monkeypatch.setattr(pruefleiter.pruefstempel, "vor_push", lambda w, z: None)
-    monkeypatch.setattr(pruefleiter.pruefstempel, "baum_oder_nichts", lambda w: "b")
-    gestempelt = []
     monkeypatch.setattr(
-        pruefleiter.pruefstempel,
-        "stemple_lauf",
-        lambda w, baum, geschrieben: gestempelt.append(baum) or "gestempelt b",
+        pruefleiter.pruefstempel, "stemple_lauf", lambda *a: pytest.fail("Stempel")
     )
     monkeypatch.setattr(sys, "stdin", io.StringIO(""))
     assert pruefleiter.main(["--vor-push"]) == 0
-    assert gestempelt == ["b"]
-    assert "--voll" in (lauf_ordner / "zeiten.csv").read_text("utf-8")
+    assert "--vor-push" in (lauf_ordner / "zeiten.csv").read_text("utf-8")
+
+
+def test_push_stufe_faehrt_nur_die_betroffenen_tests(monkeypatch):
+    leiter_push = importlib.import_module("leiter_push")
+    monkeypatch.setattr(leiter_push, "geaendert", lambda w: ["src/a.py"])
+    auswahl = leiter_push.leiter_schnell.Auswahl(dateien=["tests/test_a.py"])
+    monkeypatch.setattr(leiter_push.leiter_schnell, "betroffene", lambda w, d: auswahl)
+    befehle = []
+
+    def lauf(log, befehl, zusatz):
+        befehle.append(befehl)
+        return pruefleiter.subprocess.CompletedProcess(befehl, 0, "", "")
+
+    def voll(log):
+        pytest.fail("Volllauf trotz betroffener Einzeldateien")
+
+    ergebnis = leiter_push.stufe(io.StringIO(), Path("."), lauf, voll, 300)
+    assert ergebnis.gruen
+    assert befehle[0][-1] == "tests/test_a.py"
+    assert "tests" not in befehle[0]
+
+
+def test_push_stufe_faehrt_alles_wenn_alle_betroffen(monkeypatch):
+    leiter_push = importlib.import_module("leiter_push")
+    monkeypatch.setattr(leiter_push, "geaendert", lambda w: ["config/a.yaml"])
+    auswahl = leiter_push.leiter_schnell.Auswahl(alle=["config/a.yaml"])
+    monkeypatch.setattr(leiter_push.leiter_schnell, "betroffene", lambda w, d: auswahl)
+    voll = []
+    leiter_push.stufe(io.StringIO(), Path("."), None, voll.append, 300)
+    assert len(voll) == 1
 
 
 def test_roter_volllauf_stempelt_nicht(lauf_ordner, monkeypatch):
@@ -140,9 +166,9 @@ def test_ausgehebelter_hook_ist_rot(tmp_path):
 
 def test_vor_push_mit_roter_stufe_ist_rot(lauf_ordner, monkeypatch):
     def rot(log):
-        return pruefleiter.Ergebnis("5 Voll", False, ["FAILED t.py::t"])
+        return pruefleiter.Ergebnis("5 Push", False, ["FAILED t.py::t"])
 
-    monkeypatch.setattr(pruefleiter, "STUFEN_VOLL", [rot])
+    monkeypatch.setattr(pruefleiter, "STUFEN_PUSH", [rot])
     monkeypatch.setattr(pruefleiter.pruefstempel, "vor_push", lambda w, z: None)
     monkeypatch.setattr(sys, "stdin", io.StringIO(""))
     assert pruefleiter.main(["--vor-push"]) == 1

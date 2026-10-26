@@ -23,6 +23,7 @@ from collections.abc import Callable, Mapping
 from pathlib import Path
 from typing import TextIO
 
+import leiter_push
 import leiter_pytest
 import leiter_schnell
 import leiter_vertraege
@@ -167,21 +168,9 @@ def stufe_schichten(log: TextIO) -> Ergebnis:
 def stufe_tests(log: TextIO) -> Ergebnis:
     """Volle Suite; rot ist jeder unbekannt rote, fehlende und abgewählte Test."""
     python_files = f"test_*.py *_test.py {Path(KANARIE).name}"
-    befehl = [
-        sys.executable,
-        "-m",
-        "pytest",
-        "-n",
-        "auto",
-        "--dist",
-        "worksteal",
-        "-rfEp",
-        f"--timeout={TEST_FRIST_SEKUNDEN}",
-        "-o",
-        f"python_files={python_files}",
-        "-p",
-        leiter_pytest.PLUGIN,
-    ]
+    befehl = [sys.executable, "-m", "pytest", "-n", "auto", "--dist", "worksteal"]
+    befehl += ["-rfEp", f"--timeout={TEST_FRIST_SEKUNDEN}", "-o"]
+    befehl += [f"python_files={python_files}", "-p", leiter_pytest.PLUGIN]
     with tempfile.TemporaryDirectory() as ordner:
         pfade = os.pathsep.join(map(str, (leiter_pytest.PLUGIN_ORDNER, WURZEL / "src")))
         zusatz = {
@@ -260,6 +249,14 @@ STUFEN_STATISCH: list[Callable[[TextIO], Ergebnis]] = [
 STUFEN_VOLL = [*STUFEN_STATISCH, stufe_tests]
 
 
+def stufe_push(log: TextIO) -> Ergebnis:
+    """Stufe 5 im pre-push: nur die betroffenen Testdateien (``leiter_push``)."""
+    return leiter_push.stufe(log, WURZEL, _lauf, stufe_tests, TEST_FRIST_SEKUNDEN)
+
+
+STUFEN_PUSH = [*STUFEN_STATISCH, stufe_push]
+
+
 def fuehre_aus(
     stufen: list[Callable[[TextIO], Ergebnis]], log: TextIO
 ) -> list[Ergebnis]:
@@ -319,7 +316,7 @@ def main(argv: list[str] | None = None) -> int:
     art.add_argument("--voll", action="store_true", help="Stufen 0 bis 3 und 5")
     art.add_argument("--statisch", action="store_true", help="Stufen 0 bis 3")
     art.add_argument("--schnell", action="store_true", help="Stufen 0, 1 und 4")
-    art.add_argument("--vor-push", action="store_true", help="pre-push, dann --voll")
+    art.add_argument("--vor-push", action="store_true", help="pre-push, Stufe 5 Push")
     parser.add_argument("--nur-vorgemerkt", action="store_true")
     parser.add_argument("hook", nargs="*", help="Argumente des pre-push-Hooks")
     args = parser.parse_args(argv)
@@ -328,7 +325,10 @@ def main(argv: list[str] | None = None) -> int:
         return abbruch[0]
     art_name = "schnell" if args.schnell else "statisch" if args.statisch else "voll"
     art_name = "pre-commit" if args.schnell and args.nur_vorgemerkt else art_name
-    stufen = STUFEN_VOLL if art_name == "voll" else STUFEN_STATISCH
+    art_name = "vor-push" if args.vor_push else art_name
+    stufen = {"voll": STUFEN_VOLL, "vor-push": STUFEN_PUSH}.get(
+        art_name, STUFEN_STATISCH
+    )
     if args.schnell:
         stufen = stufen_schnell(args.nur_vorgemerkt)
     baum = pruefstempel.baum_oder_nichts(WURZEL) if art_name == "voll" else None
