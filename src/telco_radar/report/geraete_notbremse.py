@@ -1,11 +1,13 @@
 """Notbremse der Geräteseite: welche Karte in Sieger, Δ und Kernzahl zählt.
 
 Datenkonzept Geräteradar, Schritt 1 (docs/datenkonzept-geraete.md): Nur gemessene
-Bündel zählen. Ein Bündel mit ``herleitung`` (1&1 aus dem Tarifraster, o2 aus
-Tarifsumme minus Geräterate) stand so nie auf der Anbieterseite und ist eine
-Schätzung. Ein Bündel, in dessen Preis eine abgelaufene Aktion steckt, ist veraltet.
-Beide bleiben als Zeile sichtbar, stellen aber weder Δ noch Referenz noch Sieger,
-keine Bewegung und keinen Günstigst-Wert; der Export nennt denselben Zustand.
+Bündel zählen. Ein Bündel mit ``herleitung`` (o2 aus Tarifsumme minus Geräterate)
+stand so nie auf der Anbieterseite und ist eine Schätzung. Ausgenommen sind Rechenwege,
+die eine Preisliste exakt nachrechnen (``HERLEITUNG_PREISLISTE``, 1&1-Tarifaufschlag):
+sie zählen wie gemessene. Ein Bündel, in dessen Preis eine
+abgelaufene Aktion steckt, ist veraltet. Beide bleiben als Zeile sichtbar, stellen
+aber weder Δ noch Referenz noch Sieger, keine Bewegung und keinen Günstigst-Wert;
+der Export nennt denselben Zustand.
 
 Schritt 7: Ebenso ein Bündel, dem die Prüfstelle (``analyze/geraete_regeln``) den Status
 Quarantäne oder veraltet gegeben hat oder an dem sie gescheitert ist (``unbekannt``);
@@ -26,6 +28,7 @@ from ..analyze.geraete_pruefstatus import (
     VERALTET,
     abgelaufene_aktionen,
     buendel_zaehlt,
+    ist_schaetzung,
     lies_vermerk,
 )
 from ..tco_model import Aktion, Buendel, aktionen_aus
@@ -86,8 +89,8 @@ def felder(b: Buendel, heute: str) -> dict:
 
 def herleitung_satz(anbieter: str, herleitung: str) -> str:
     """Der Satz an der Zeile, wie ein nicht direkt genannter Preis berechnet ist;
-    leer für einen gemessenen Preis."""
-    if not herleitung.strip():
+    leer für einen gemessenen oder aus der Preisliste exakt nachgerechneten Preis."""
+    if not ist_schaetzung(herleitung):
         return ""
     vorlage = HERLEITUNG_SATZ.get(herleitung.strip(), HERLEITUNG_SATZ_SONST)
     return vorlage.format(anbieter=anbieter)
@@ -105,7 +108,7 @@ def _felder(
     herleitung: str, aktionen: Iterable[Aktion], heute: str, pruefung: object
 ) -> dict:
     aktionen = list(aktionen)
-    schaetzung = bool(herleitung.strip())
+    schaetzung = ist_schaetzung(herleitung)
     veraltet = bool(abgelaufene_aktionen(aktionen, heute))
     vermerk = lies_vermerk(pruefung)
     status = vermerk.status

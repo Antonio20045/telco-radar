@@ -177,17 +177,36 @@ def abgelaufene_aktionen(aktionen: Iterable[Aktion], heute: str) -> list[Aktion]
     return [a for a in aktionen if a.eingerechnet and not a.gilt_am(heute)]
 
 
+HERLEITUNG_PREISLISTE = frozenset(
+    {"tarifaufschlag_aus_tarifraster", "schlusszahlung_aus_grundtarif"}
+)
+
+
+def ist_schaetzung(herleitung: str) -> bool:
+    """Ist ein Preis mit dieser ``herleitung`` eine Schätzung, die nicht zählt?
+
+    Nicht für Rechenwege, die eine Preisliste exakt nachrechnen
+    (``HERLEITUNG_PREISLISTE``): 1&1 bepreist jede Tarifstufe als Grundangebot plus
+    festen Tarifaufschlag (Gegenprobe in ``einsundeins.ergaenze_tarifstufen``), die
+    Ablöse hängt nur an der Gerätevariante. Die Preisprüfung vom 26.10.2026 fand diese
+    Preise beim Anbieter wieder (A17, All-Net-Flat M, 22,99 €).
+    """
+    weg = herleitung.strip()
+    return bool(weg) and weg not in HERLEITUNG_PREISLISTE
+
+
 def buendel_zaehlt(
     herleitung: str, aktionen: Iterable[Aktion], heute: str, pruefung: object
 ) -> bool:
     """Darf das Bündel Δ, Referenz oder Sieger stellen (Notbremse, Schritte 1 und 7)?
 
-    Nur gemessen (ohne ``herleitung``), ohne abgelaufene eingerechnete Aktion und mit
-    Status gültig oder nie geprüft. Seite und Abnahme teilen diese eine Definition.
+    Nur gemessen oder aus der Preisliste exakt nachgerechnet (``ist_schaetzung``), ohne
+    abgelaufene eingerechnete Aktion und mit Status gültig oder nie geprüft. Seite und
+    Abnahme teilen diese eine Definition.
     """
     status = lies_vermerk(pruefung).status
     return (
-        not herleitung.strip()
+        not ist_schaetzung(herleitung)
         and not abgelaufene_aktionen(aktionen, heute)
         and status in (None, GUELTIG)
     )

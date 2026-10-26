@@ -733,7 +733,10 @@ def _karte(
         "nach_bindung": tarifpreis_im_monat(b, AB_MONAT),
         "bestandteile": bestandteile,
         "zerlegung": zerlegung_balken(bestandteile, None, kosten.gesamt),
-        **geraete_rechnung.felder(kosten),
+        **geraete_rechnung.felder(
+            kosten,
+            geraete_rechnung.tarif_rabattiert(b.tarif_monatlich, b.tarif_listenpreis),
+        ),
         "luecken": luecken,
         "boni": [],
         "aktionen": aktionen,

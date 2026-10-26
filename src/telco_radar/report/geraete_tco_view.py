@@ -312,6 +312,7 @@ _BUENDEL_FELDER = (
     "tarif_id",
     "tarif_id_guete",
     "tarif_monatlich",
+    "tarif_listenpreis",
     "tarif_bindung_monate",
     "buendel_monatlich",
     "geraet_zuzahlung",

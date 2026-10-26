@@ -47,20 +47,36 @@ WORT_JE_LUECKE = {
 }
 
 
-def zum_lesen(schritte: list[Rechenschritt]) -> list[dict]:
+WORT_TARIF_NACH_RABATT = "Tarifanteil nach Rabatten"
+
+
+def zum_lesen(
+    schritte: list[Rechenschritt], tarif_rabattiert: bool = False
+) -> list[dict]:
     """Die Summanden mit ihrem Wort für die Zeile; ein Monatspreis mit Gerät und
-    Tarif als `teile`."""
+    Tarif als `teile`. Ein rabattierter Tarif heißt `WORT_TARIF_NACH_RABATT`."""
+    worte = dict(WORT_JE_SCHRITT)
+    if tarif_rabattiert:
+        worte[SCHRITT_TARIF] = WORT_TARIF_NACH_RABATT
     return [
         {
             "anzahl": s.anzahl,
             "betrag": s.betrag,
-            "wort": WORT_JE_SCHRITT[s.art],
-            "teile": [
-                {"betrag": t.betrag, "wort": WORT_JE_SCHRITT[t.art]} for t in s.teile
-            ],
+            "wort": worte[s.art],
+            "teile": [{"betrag": t.betrag, "wort": worte[t.art]} for t in s.teile],
         }
         for s in schritte
     ]
+
+
+def tarif_rabattiert(monatlich: float | None, listenpreis: float | None) -> bool:
+    """Liegt der eingerechnete Tarifpreis unter dem Listenpreis des Anbieters?
+
+    Vodafone nennt den Tarif mit Gerät nur rabattiert (`tariff.month.withDiscounts`,
+    Hardware-Bonus eingerechnet); einen Tarif zu diesem Preis gibt es nicht, also
+    heißt der Teil dann nicht „Tarif“ (Preisprüfung 26.10.2026).
+    """
+    return monatlich is not None and listenpreis is not None and monatlich < listenpreis
 
 
 def luecken_zum_lesen(luecken: list[str]) -> list[str]:
@@ -75,12 +91,12 @@ def luecken_zum_lesen(luecken: list[str]) -> list[str]:
     return fertig
 
 
-def felder(kosten: Kosten) -> dict:
+def felder(kosten: Kosten, rabattiert: bool = False) -> dict:
     """Die Felder der Bündelkarte: Summanden und, ohne Kernzahl, was fehlt. Gerät
     und Tarif über gleich viele Monate stehen als Monatspreis wie beim Anbieter
     (Antonio, 07.10.2026)."""
     return {
-        "rechnung": zum_lesen(monatsschritte(kosten.rechnung)),
+        "rechnung": zum_lesen(monatsschritte(kosten.rechnung), rabattiert),
         "rechnung_luecken": luecken_zum_lesen(kosten.luecken),
     }
 

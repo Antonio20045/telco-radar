@@ -18,6 +18,7 @@ import json
 import pytest
 from bestand_pfad import abbild
 
+from telco_radar.analyze.geraete_pruefstatus import ist_schaetzung
 from telco_radar.config import load_config
 from telco_radar.report.html import render_site
 
@@ -42,7 +43,7 @@ def export(tmp_path_factory):
 
 
 def _grund(roh: dict, heute: str) -> str:
-    if str(roh.get("herleitung") or "").strip():
+    if ist_schaetzung(str(roh.get("herleitung") or "")):
         return "nicht direkt genannt"
     for a in roh.get("aktionen") or []:
         ende = str(a.get("gueltig_bis") or "").strip()

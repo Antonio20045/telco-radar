@@ -1,6 +1,6 @@
 """Notbremse an der Bündelzeile: die Zeile sagt selbst, dass ihr Preis nicht zählt.
 
-Eine Schätzung (Bündel mit ``herleitung``: 1&1 aus dem Tarifraster, o2 aus
+Eine Schätzung (Bündel mit ``herleitung`` außerhalb der Preisliste, o2 aus
 Tarifsumme minus Geräterate) trägt an ihrer Zeile die Marke „nicht direkt genannt“
 oder, mit Rechnung, den Satz, wie der Preis berechnet ist (Antonio 07.10.2026), ein Satz
 mit abgelaufener eingerechneter Aktion (congstar) die Marke „Aktion abgelaufen“.
@@ -97,8 +97,8 @@ def _beschreibung(karte: dict) -> str:
 
 def test_schaetzung_traegt_marke_an_der_zeile(paare):
     geschaetzt = [(k, m) for k, m in paare if k.get("schaetzung")]
-    assert {k["anbieter"] for k, _ in geschaetzt} >= {"o2", "1&1"}, (
-        "Bestand ohne Schätzungen von o2 und 1&1 – der Test prüft nichts"
+    assert {k["anbieter"] for k, _ in geschaetzt} == {"o2"}, (
+        "Schätzungen erwartet nur bei o2; 1&1 rechnet seine Preisliste exakt nach"
     )
     ohne = [_beschreibung(k) for k, m in geschaetzt if SCHAETZUNG not in m]
     assert not ohne, (
