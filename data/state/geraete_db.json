@@ -2,10 +2,10 @@
  "updated": "2026-10-26",
  "anbieter": {
   "ALDI TALK": {
-   "laeufe": 84,
-   "funde_gesamt": 495,
+   "laeufe": 85,
+   "funde_gesamt": 501,
    "letzter_lauf": "2026-10-26",
-   "letzte_funde": 7,
+   "letzte_funde": 6,
    "letzter_fund": "2026-10-26",
    "termine": [
     "2026-08-29",
@@ -298,18 +298,18 @@
     ],
     [
      "2026-10-26",
-     7,
+     6,
      "gelesen",
      0,
-     21,
+     20,
      0
     ]
    ],
    "tote_adressen": 0
   },
   "Vodafone": {
-   "laeufe": 82,
-   "funde_gesamt": 14163,
+   "laeufe": 83,
+   "funde_gesamt": 14330,
    "letzter_lauf": "2026-10-26",
    "letzte_funde": 167,
    "termine": [
@@ -614,8 +614,8 @@
    "tote_adressen": 0
   },
   "o2": {
-   "laeufe": 82,
-   "funde_gesamt": 5541,
+   "laeufe": 83,
+   "funde_gesamt": 5607,
    "letzter_lauf": "2026-10-26",
    "letzte_funde": 66,
    "termine": [
@@ -920,8 +920,8 @@
    "tote_adressen": null
   },
   "mobilcom-debitel": {
-   "laeufe": 35,
-   "funde_gesamt": 10460,
+   "laeufe": 36,
+   "funde_gesamt": 10615,
    "letzte_funde": 155,
    "termine": [
     "2026-08-29",
@@ -1773,8 +1773,8 @@
    "tote_adressen": 0
   },
   "congstar": {
-   "laeufe": 52,
-   "funde_gesamt": 10595,
+   "laeufe": 53,
+   "funde_gesamt": 10733,
    "letzter_lauf": "2026-10-26",
    "letzte_funde": 138,
    "termine": [
@@ -2073,8 +2073,8 @@
    "tote_adressen": 0
   },
   "1&1": {
-   "laeufe": 74,
-   "funde_gesamt": 2780,
+   "laeufe": 75,
+   "funde_gesamt": 2822,
    "letzter_lauf": "2026-10-26",
    "letzte_funde": 42,
    "termine": [
@@ -2630,8 +2630,8 @@
    "tote_adressen": null
   },
   "Saturn": {
-   "laeufe": 70,
-   "funde_gesamt": 1322,
+   "laeufe": 71,
+   "funde_gesamt": 1330,
    "letzter_lauf": "2026-10-26",
    "letzte_funde": 8,
    "termine": [
@@ -6495,7 +6495,7 @@
     "https://mobile.1und1.de/smartphones"
    ],
    "titel_roh": "Apple iPhone 18 Pro 256 GB silber",
-   "preis_mit_vertrag_ab": 52.99,
+   "preis_mit_vertrag_ab": 49.99,
    "laufzeit_monate": 36,
    "tarif_referenz": "1&1 All-Net-Flat S"
   },
@@ -30644,6 +30644,40 @@
     "https://www.o2online.de/e-shop/rest/catalog/o2shop/privatkunden/ratenzahlung/default/__not-specified__/__not-specified__/__not-specified__?hwOnly=true"
    ],
    "titel_roh": "Samsung Galaxy XCover7 Pro EE 128 GB schwarz",
+   "preis_ohne_vertrag": 541.0,
+   "anzahlung": 1.0,
+   "monatsrate": 22.5,
+   "laufzeit_monate": 24,
+   "zins_effektiv": 0.0
+  },
+  {
+   "id": "o2--samsung-galaxy-xcover7-pro-ee-enterprise-edition-128gb-schwarz",
+   "sku_id": "samsung-galaxy-xcover7-pro-ee-enterprise-edition-128gb-schwarz",
+   "device_id": "samsung-galaxy-xcover7-pro-ee-enterprise-edition",
+   "anbieter": "o2",
+   "anbieter_typ": "netzbetreiber",
+   "netz": "",
+   "speicher_gb": 128,
+   "farbe_roh": "schwarz",
+   "farbe_normalisiert": "schwarz",
+   "ean": "",
+   "zustand": "neu",
+   "first_seen": "2026-10-26",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "erstpreis": 541.0,
+   "erstpreis_art": "ohne_vertrag",
+   "erstpreis_am": "2026-10-26",
+   "last_verified": "2026-10-26",
+   "letzter_check": "2026-10-26",
+   "quelle_url": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-xcover-7-pro-5g-ee-128gb-schwarz-details?ohne-tarif=ja&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung",
+   "abgerufen_am": "2026-10-26",
+   "verfuegbarkeit": "unbekannt",
+   "confidence": "hoch",
+   "einstiege": [
+    "https://www.o2online.de/e-shop/rest/catalog/o2shop/privatkunden/ratenzahlung/default/__not-specified__/__not-specified__/__not-specified__?hwOnly=true"
+   ],
+   "titel_roh": "Samsung Galaxy XCover7 Pro EE Enterprise Edition 128 GB schwarz",
    "preis_ohne_vertrag": 541.0,
    "anzahlung": 1.0,
    "monatsrate": 22.5,
