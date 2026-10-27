@@ -1,7 +1,7 @@
 {
  "anbieter": "congstar",
- "datum": "2026-10-26",
- "dauer_sekunden": 67.8,
+ "datum": "2026-10-27",
+ "dauer_sekunden": 77.2,
  "format": 1,
  "frischegrenze_tage": 3,
  "grund": "https://www.congstar.de/geraete/xiaomi/xiaomi-redmi-note-15-pro-5g/: Kanarienwert fehlt: [data-testid=\"memory-size-selection\"] ohne „Speicher:“",
@@ -19,14 +19,14 @@
    "kombinationen": [],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 37,
-    "beendet": 37,
+    "anfragen": 61,
+    "beendet": 62,
     "dokument": "complete",
     "geladen": true,
     "offen": {},
     "ohne_antwort_ms": 0,
-    "sekunden": 5.0,
-    "takte_ms": 2800,
+    "sekunden": 8.3,
+    "takte_ms": 3350,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -48,18 +48,18 @@
    "geraet": "xiaomi-redmi-note-15-pro-plus",
    "gescheitert": 0,
    "grund": "Kanarienwert fehlt: [data-testid=\"memory-size-selection\"] ohne „Speicher:“",
-   "http_status": 307,
+   "http_status": 200,
    "kombinationen": [],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 37,
-    "beendet": 37,
+    "anfragen": 69,
+    "beendet": 62,
     "dokument": "complete",
     "geladen": true,
     "offen": {},
     "ohne_antwort_ms": 0,
-    "sekunden": 3.5,
-    "takte_ms": 2750,
+    "sekunden": 6.4,
+    "takte_ms": 3300,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -85,14 +85,14 @@
    "kombinationen": [],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 68,
-    "beendet": 69,
+    "anfragen": 34,
+    "beendet": 34,
     "dokument": "complete",
     "geladen": true,
     "offen": {},
     "ohne_antwort_ms": 0,
-    "sekunden": 5.5,
-    "takte_ms": 2350,
+    "sekunden": 5.1,
+    "takte_ms": 3850,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -920,5 +920,5 @@
  ],
  "uebersichten": [],
  "vertragsform": "tarif_plus_ratenkauf",
- "zeitbudget_sekunden": 10265
+ "zeitbudget_sekunden": 10270
 }

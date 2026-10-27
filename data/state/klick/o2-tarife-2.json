@@ -1,7 +1,7 @@
 {
  "anbieter": "o2-tarife-2",
- "datum": "2026-10-26",
- "dauer_sekunden": 327.1,
+ "datum": "2026-10-27",
+ "dauer_sekunden": 245.7,
  "format": 1,
  "frischegrenze_tage": 3,
  "grund": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s: Abruf gestört (HTTP 404)",
@@ -14,27 +14,32 @@
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a17-128gb-5g-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "samsung-galaxy-a17",
    "gescheitert": 0,
-   "grund": "Strukturbruch: nur 40 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "grund": null,
    "http_status": 200,
    "kombinationen": [
     {
-     "antwort_url": null,
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1zYW1zdW5nLWdhbGF4eS1hMTctMTI4Z2ItNWctc2Nod2Fyei0zNnhoaWdoO3RhcmlmZj1vMnNob3A6OnByaXZhdGt1bmRlbi1vMi1tb2JpbGUtb24tZGVtYW5kLW0tb25saW5lLXByb21vO3BhY2tzPXVtdHMtb3B0aW9u",
      "auswahl": {
       "laufzeit": "36",
       "speicher": "128 GB",
-      "tarif": null
+      "tarif": "O2 Mobile on Demand M mit 50 GB+"
      },
-     "befunde": [],
+     "befunde": [
+      {
+       "feld": "antwort.tarif",
+       "grund": "Antwort nennt mehrdeutig: O2 Mobile on Demand M mit 50 GB+ | O2 Mobile Unlimited S Special mit 15 MBit/s statt O2 Mobile on Demand M mit 50 GB+"
+      }
+     ],
      "beleg": null,
      "beleg_status": "ohne_wert",
      "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
+     "grund": "Antwort nennt mehrdeutig: O2 Mobile on Demand M mit 50 GB+ | O2 Mobile Unlimited S Special mit 15 MBit/s statt O2 Mobile on Demand M mit 50 GB+",
      "luecken": [],
-     "status": "nicht_erfasst",
+     "status": "befund",
      "variante": {
       "laufzeit": 36,
       "speicher": "128 GB",
-      "tarif": null
+      "tarif": "O2 Mobile on Demand M mit 50 GB+"
      },
      "werte": {
       "anschluss": null,
@@ -47,60 +52,74 @@
      }
     },
     {
-     "antwort_url": null,
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1zYW1zdW5nLWdhbGF4eS1hMTctMTI4Z2ItNWctc2Nod2Fyei0yNHhoaWdoO3RhcmlmZj1vMnNob3A6OnByaXZhdGt1bmRlbi1vMi1tb2JpbGUtb24tZGVtYW5kLW0tb25saW5lLXByb21vO3BhY2tzPXVtdHMtb3B0aW9u",
      "auswahl": {
       "laufzeit": "24",
       "speicher": "128 GB",
-      "tarif": null
+      "tarif": "O2 Mobile on Demand M mit 50 GB+"
      },
      "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
+     "beleg": {
+      "beleg_id": "8d36371e086c40508e3524551051e15575232f4943783485d904b01164640ffd",
+      "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a17-128gb-5g-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+      "zeitpunkt": "2026-10-27T04:50:42Z"
+     },
+     "beleg_status": "offen",
      "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
+     "grund": null,
      "luecken": [],
-     "status": "nicht_erfasst",
+     "nachweise": {
+      "ratenplan": "Entscheidest du dich zudem für einen passenden Mobilfunktarif, so erhältst du über die gesamte Laufzeit deines Geräte-Ratenplans (24 oder 36) einen attraktiven monatlichen Rabatt auf deinen Tarif."
+     },
+     "status": "erfasst",
      "variante": {
       "laufzeit": 24,
       "speicher": "128 GB",
-      "tarif": null
+      "tarif": "O2 Mobile on Demand M mit 50 GB+"
      },
      "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
+      "anschluss": 39.99,
+      "anzahlung": 7.0,
+      "rate": 11.0,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        19.99
+       ]
+      ],
+      "volumen_gb": 50.0
      }
     }
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 134,
-    "beendet": 133,
+    "anfragen": 136,
+    "beendet": 131,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "library.telefonica.de": 1
+     "library.telefonica.de": 4,
+     "www.o2online.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 18.3,
-    "takte_ms": 9300,
+    "sekunden": 13.0,
+    "takte_ms": 4100,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
    "sperre": null,
-   "status": "gestoert",
-   "stoerung": "seitenform",
+   "status": "gelesen",
+   "stoerung": null,
    "struktur": {
-    "anteil_felder": null,
-    "anteil_knoepfe": 0.4,
-    "felder_gefunden": 0,
-    "felder_gesucht": 0,
-    "knoepfe_gefunden": 2,
-    "knoepfe_gesucht": 5
+    "anteil_felder": 1.0,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 14,
+    "felder_gesucht": 14,
+    "knoepfe_gefunden": 12,
+    "knoepfe_gesucht": 12
    },
    "verworfen": 4
   },
@@ -108,27 +127,32 @@
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a27-5g-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "samsung-galaxy-a27",
    "gescheitert": 0,
-   "grund": "Strukturbruch: nur 40 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "grund": null,
    "http_status": 200,
    "kombinationen": [
     {
-     "antwort_url": null,
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1zYW1zdW5nLWdhbGF4eS1hMjctNWctMTI4Z2Itc2Nod2Fyei0zNnhoaWdoO3RhcmlmZj1vMnNob3A6OnByaXZhdGt1bmRlbi1vMi1tb2JpbGUtb24tZGVtYW5kLW0tb25saW5lLXByb21vO3BhY2tzPXVtdHMtb3B0aW9u",
      "auswahl": {
       "laufzeit": "36",
       "speicher": "128 GB",
-      "tarif": null
+      "tarif": "O2 Mobile on Demand M mit 50 GB+"
      },
-     "befunde": [],
+     "befunde": [
+      {
+       "feld": "antwort.tarif",
+       "grund": "Antwort nennt mehrdeutig: O2 Mobile on Demand M mit 50 GB+ | O2 Mobile Unlimited S Special mit 15 MBit/s statt O2 Mobile on Demand M mit 50 GB+"
+      }
+     ],
      "beleg": null,
      "beleg_status": "ohne_wert",
      "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
+     "grund": "Antwort nennt mehrdeutig: O2 Mobile on Demand M mit 50 GB+ | O2 Mobile Unlimited S Special mit 15 MBit/s statt O2 Mobile on Demand M mit 50 GB+",
      "luecken": [],
-     "status": "nicht_erfasst",
+     "status": "befund",
      "variante": {
       "laufzeit": 36,
       "speicher": "128 GB",
-      "tarif": null
+      "tarif": "O2 Mobile on Demand M mit 50 GB+"
      },
      "werte": {
       "anschluss": null,
@@ -141,61 +165,74 @@
      }
     },
     {
-     "antwort_url": null,
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi1zYW1zdW5nLWdhbGF4eS1hMjctNWctMTI4Z2Itc2Nod2Fyei0yNHhoaWdoO3RhcmlmZj1vMnNob3A6OnByaXZhdGt1bmRlbi1vMi1tb2JpbGUtb24tZGVtYW5kLW0tb25saW5lLXByb21vO3BhY2tzPXVtdHMtb3B0aW9u",
      "auswahl": {
       "laufzeit": "24",
       "speicher": "128 GB",
-      "tarif": null
+      "tarif": "O2 Mobile on Demand M mit 50 GB+"
      },
      "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
+     "beleg": {
+      "beleg_id": "a2e8e36d1e8f3493c7045fa3fb03390605695c0ec9fe01d6b09f6388a9f354ce",
+      "seite": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a27-5g-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+      "zeitpunkt": "2026-10-27T04:51:00Z"
+     },
+     "beleg_status": "offen",
      "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
+     "grund": null,
      "luecken": [],
-     "status": "nicht_erfasst",
+     "nachweise": {
+      "ratenplan": "Entscheidest du dich zudem für einen passenden Mobilfunktarif, so erhältst du über die gesamte Laufzeit deines Geräte-Ratenplans (24 oder 36) einen attraktiven monatlichen Rabatt auf deinen Tarif."
+     },
+     "status": "erfasst",
      "variante": {
       "laufzeit": 24,
       "speicher": "128 GB",
-      "tarif": null
+      "tarif": "O2 Mobile on Demand M mit 50 GB+"
      },
      "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
+      "anschluss": 39.99,
+      "anzahlung": 7.0,
+      "rate": 14.0,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        19.99
+       ]
+      ],
+      "volumen_gb": 50.0
      }
     }
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 133,
+    "anfragen": 136,
     "beendet": 131,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "api-v4.trbo.com": 1,
-     "library.telefonica.de": 1
+     "library.telefonica.de": 5,
+     "www.o2online.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 14.8,
-    "takte_ms": 9950,
+    "sekunden": 10.5,
+    "takte_ms": 5500,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
    "sperre": null,
-   "status": "gestoert",
-   "stoerung": "seitenform",
+   "status": "gelesen",
+   "stoerung": null,
    "struktur": {
-    "anteil_felder": null,
-    "anteil_knoepfe": 0.4,
-    "felder_gefunden": 0,
-    "felder_gesucht": 0,
-    "knoepfe_gefunden": 2,
-    "knoepfe_gesucht": 5
+    "anteil_felder": 1.0,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 14,
+    "felder_gesucht": 14,
+    "knoepfe_gefunden": 12,
+    "knoepfe_gesucht": 12
    },
    "verworfen": 4
   },
@@ -203,27 +240,32 @@
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-17-128gb-blue-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "xiaomi-redmi-17",
    "gescheitert": 0,
-   "grund": "Strukturbruch: nur 40 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "grund": null,
    "http_status": 200,
    "kombinationen": [
     {
-     "antwort_url": null,
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi14aWFvbWktcmVkbWktMTctMTI4Z2ItYmx1ZS01Zy0zNnhoaWdoO3RhcmlmZj1vMnNob3A6OnByaXZhdGt1bmRlbi1vMi1tb2JpbGUtb24tZGVtYW5kLW0tb25saW5lLXByb21vO3BhY2tzPXVtdHMtb3B0aW9u",
      "auswahl": {
       "laufzeit": "36",
       "speicher": "128 GB",
-      "tarif": null
+      "tarif": "O2 Mobile on Demand M mit 50 GB+"
      },
-     "befunde": [],
+     "befunde": [
+      {
+       "feld": "antwort.tarif",
+       "grund": "Antwort nennt mehrdeutig: O2 Mobile on Demand M mit 50 GB+ | O2 Mobile Unlimited S Special mit 15 MBit/s statt O2 Mobile on Demand M mit 50 GB+"
+      }
+     ],
      "beleg": null,
      "beleg_status": "ohne_wert",
      "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
+     "grund": "Antwort nennt mehrdeutig: O2 Mobile on Demand M mit 50 GB+ | O2 Mobile Unlimited S Special mit 15 MBit/s statt O2 Mobile on Demand M mit 50 GB+",
      "luecken": [],
-     "status": "nicht_erfasst",
+     "status": "befund",
      "variante": {
       "laufzeit": 36,
       "speicher": "128 GB",
-      "tarif": null
+      "tarif": "O2 Mobile on Demand M mit 50 GB+"
      },
      "werte": {
       "anschluss": null,
@@ -236,61 +278,74 @@
      }
     },
     {
-     "antwort_url": null,
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi14aWFvbWktcmVkbWktMTctMTI4Z2ItYmx1ZS01Zy0yNHhoaWdoO3RhcmlmZj1vMnNob3A6OnByaXZhdGt1bmRlbi1vMi1tb2JpbGUtb24tZGVtYW5kLW0tb25saW5lLXByb21vO3BhY2tzPXVtdHMtb3B0aW9u",
      "auswahl": {
       "laufzeit": "24",
       "speicher": "128 GB",
-      "tarif": null
+      "tarif": "O2 Mobile on Demand M mit 50 GB+"
      },
      "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
+     "beleg": {
+      "beleg_id": "1ffe0feb597515500e644213a6cd6459f2ab4d073a41958179f209ae0e483ed9",
+      "seite": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-17-128gb-blue-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+      "zeitpunkt": "2026-10-27T04:51:17Z"
+     },
+     "beleg_status": "offen",
      "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
+     "grund": null,
      "luecken": [],
-     "status": "nicht_erfasst",
+     "nachweise": {
+      "ratenplan": "Entscheidest du dich zudem für einen passenden Mobilfunktarif, so erhältst du über die gesamte Laufzeit deines Geräte-Ratenplans (24 oder 36) einen attraktiven monatlichen Rabatt auf deinen Tarif."
+     },
+     "status": "erfasst",
      "variante": {
       "laufzeit": 24,
       "speicher": "128 GB",
-      "tarif": null
+      "tarif": "O2 Mobile on Demand M mit 50 GB+"
      },
      "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
+      "anschluss": 39.99,
+      "anzahlung": 1.0,
+      "rate": 10.5,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        19.99
+       ]
+      ],
+      "volumen_gb": 50.0
      }
     }
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 140,
+    "anfragen": 139,
     "beendet": 134,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "library.telefonica.de": 5,
+     "library.telefonica.de": 4,
      "www.o2online.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 12.6,
-    "takte_ms": 7950,
+    "sekunden": 9.6,
+    "takte_ms": 4300,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
    "sperre": null,
-   "status": "gestoert",
-   "stoerung": "seitenform",
+   "status": "gelesen",
+   "stoerung": null,
    "struktur": {
-    "anteil_felder": null,
-    "anteil_knoepfe": 0.4,
-    "felder_gefunden": 0,
-    "felder_gesucht": 0,
-    "knoepfe_gefunden": 2,
-    "knoepfe_gesucht": 5
+    "anteil_felder": 1.0,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 14,
+    "felder_gesucht": 14,
+    "knoepfe_gefunden": 12,
+    "knoepfe_gesucht": 12
    },
    "verworfen": 4
   },
@@ -298,27 +353,32 @@
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-128gb-purple-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "xiaomi-redmi-note-17",
    "gescheitert": 0,
-   "grund": "Strukturbruch: nur 40 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+   "grund": null,
    "http_status": 200,
    "kombinationen": [
     {
-     "antwort_url": null,
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi14aWFvbWktcmVkbWktbm90ZS0xNy0xMjhnYi1wdXJwbGUtNWctMzZ4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLW9uLWRlbWFuZC1tLW9ubGluZS1wcm9tbztwYWNrcz11bXRzLW9wdGlvbg==",
      "auswahl": {
       "laufzeit": "36",
       "speicher": "128 GB",
-      "tarif": null
+      "tarif": "O2 Mobile on Demand M mit 50 GB+"
      },
-     "befunde": [],
+     "befunde": [
+      {
+       "feld": "antwort.tarif",
+       "grund": "Antwort nennt mehrdeutig: O2 Mobile on Demand M mit 50 GB+ | O2 Mobile Unlimited S Special mit 15 MBit/s statt O2 Mobile on Demand M mit 50 GB+"
+      }
+     ],
      "beleg": null,
      "beleg_status": "ohne_wert",
      "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
+     "grund": "Antwort nennt mehrdeutig: O2 Mobile on Demand M mit 50 GB+ | O2 Mobile Unlimited S Special mit 15 MBit/s statt O2 Mobile on Demand M mit 50 GB+",
      "luecken": [],
-     "status": "nicht_erfasst",
+     "status": "befund",
      "variante": {
       "laufzeit": 36,
       "speicher": "128 GB",
-      "tarif": null
+      "tarif": "O2 Mobile on Demand M mit 50 GB+"
      },
      "werte": {
       "anschluss": null,
@@ -331,61 +391,73 @@
      }
     },
     {
-     "antwort_url": null,
+     "antwort_url": "https://www.o2online.de/e-shop/rest/configuration/dHlwZT1NT0JJTEVfSEFSRFdBUkVfVEFSSUZGX0JVTkRMRTtoYXJkd2FyZT1vMnNob3A6OnByaXZhdGt1bmRlbi14aWFvbWktcmVkbWktbm90ZS0xNy0xMjhnYi1wdXJwbGUtNWctMjR4aGlnaDt0YXJpZmY9bzJzaG9wOjpwcml2YXRrdW5kZW4tbzItbW9iaWxlLW9uLWRlbWFuZC1tLW9ubGluZS1wcm9tbztwYWNrcz11bXRzLW9wdGlvbg==",
      "auswahl": {
       "laufzeit": "24",
       "speicher": "128 GB",
-      "tarif": null
+      "tarif": "O2 Mobile on Demand M mit 50 GB+"
      },
      "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
+     "beleg": {
+      "beleg_id": "920ae199e0bbed6bc9e981c4c4b788fe9c5055d3852e2a37346b3cf446d6d8f9",
+      "seite": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-128gb-purple-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+      "zeitpunkt": "2026-10-27T04:51:33Z"
+     },
+     "beleg_status": "offen",
      "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
+     "grund": null,
      "luecken": [],
-     "status": "nicht_erfasst",
+     "nachweise": {
+      "ratenplan": "Entscheidest du dich zudem für einen passenden Mobilfunktarif, so erhältst du über die gesamte Laufzeit deines Geräte-Ratenplans (24 oder 36) einen attraktiven monatlichen Rabatt auf deinen Tarif."
+     },
+     "status": "erfasst",
      "variante": {
       "laufzeit": 24,
       "speicher": "128 GB",
-      "tarif": null
+      "tarif": "O2 Mobile on Demand M mit 50 GB+"
      },
      "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
+      "anschluss": 39.99,
+      "anzahlung": 1.0,
+      "rate": 14.5,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        19.99
+       ]
+      ],
+      "volumen_gb": 50.0
      }
     }
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 140,
-    "beendet": 134,
+    "anfragen": 139,
+    "beendet": 137,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "library.telefonica.de": 5,
-     "www.o2online.de": 1
+     "library.telefonica.de": 2
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 12.1,
-    "takte_ms": 7700,
+    "sekunden": 10.6,
+    "takte_ms": 5950,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
    "sperre": null,
-   "status": "gestoert",
-   "stoerung": "seitenform",
+   "status": "gelesen",
+   "stoerung": null,
    "struktur": {
-    "anteil_felder": null,
-    "anteil_knoepfe": 0.4,
-    "felder_gefunden": 0,
-    "felder_gesucht": 0,
-    "knoepfe_gefunden": 2,
-    "knoepfe_gesucht": 5
+    "anteil_felder": 1.0,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 14,
+    "felder_gesucht": 14,
+    "knoepfe_gefunden": 12,
+    "knoepfe_gesucht": 12
    },
    "verworfen": 4
   },
@@ -631,17 +703,16 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 144,
-    "beendet": 138,
+    "anfragen": 143,
+    "beendet": 142,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "library.telefonica.de": 5,
-     "www.o2online.de": 1
+     "library.telefonica.de": 2
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 13.8,
-    "takte_ms": 8000,
+    "sekunden": 12.9,
+    "takte_ms": 6500,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -900,17 +971,17 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 144,
-    "beendet": 138,
+    "anfragen": 145,
+    "beendet": 142,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "library.telefonica.de": 5,
-     "www.o2online.de": 1
+     "api-v4.trbo.com": 1,
+     "library.telefonica.de": 2
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 14.9,
-    "takte_ms": 8650,
+    "sekunden": 13.4,
+    "takte_ms": 6900,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -996,15 +1067,15 @@
    "ladung": {
     "abstand_s": 2.0,
     "anfragen": 135,
-    "beendet": 134,
+    "beendet": 135,
     "dokument": "complete",
     "geladen": true,
     "offen": {
      "api-v4.trbo.com": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 13.9,
-    "takte_ms": 8850,
+    "sekunden": 10.8,
+    "takte_ms": 6950,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -1089,17 +1160,17 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 135,
-    "beendet": 129,
+    "anfragen": 136,
+    "beendet": 133,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "library.telefonica.de": 5,
+     "library.telefonica.de": 4,
      "www.o2online.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 12.6,
-    "takte_ms": 7700,
+    "sekunden": 9.3,
+    "takte_ms": 4650,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -1185,16 +1256,16 @@
    "ladung": {
     "abstand_s": 2.0,
     "anfragen": 140,
-    "beendet": 134,
+    "beendet": 135,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "library.telefonica.de": 5,
+     "library.telefonica.de": 4,
      "www.o2online.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 13.6,
-    "takte_ms": 8100,
+    "sekunden": 9.8,
+    "takte_ms": 5300,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -1279,17 +1350,16 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 139,
-    "beendet": 133,
+    "anfragen": 138,
+    "beendet": 137,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "library.telefonica.de": 5,
-     "www.o2online.de": 1
+     "library.telefonica.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 13.7,
-    "takte_ms": 8400,
+    "sekunden": 10.6,
+    "takte_ms": 5950,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -3646,8 +3716,6 @@
   "https://www.o2online.de/e-shop/nothing/nothing-phone-3-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
   "https://www.o2online.de/e-shop/nothing/nothing-phone-4a-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
   "https://www.o2online.de/e-shop/nothing/nothing-phone-4a-pro-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
-  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a17-128gb-5g-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
-  "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a27-5g-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
   "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a37-128gb-awesome-charcoal-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
   "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a56-128gb-awesome-graphite-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
   "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a57-128gb-awesome-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
@@ -3666,9 +3734,7 @@
   "https://www.o2online.de/e-shop/xiaomi/xiaomi-17-ultra-512gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
   "https://www.o2online.de/e-shop/xiaomi/xiaomi-17t-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
   "https://www.o2online.de/e-shop/xiaomi/xiaomi-17t-pro-512gb-violett-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
-  "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-17-128gb-blue-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
   "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-15-pro-256gb-schwarz-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
-  "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-128gb-purple-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
   "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-pro-256gb-blue-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
   "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-pro-max-256gb-cloud-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
   "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
@@ -3731,5 +3797,5 @@
  ],
  "uebersichten": [],
  "vertragsform": "tarif_plus_ratenkauf",
- "zeitbudget_sekunden": 10038
+ "zeitbudget_sekunden": 10273
 }

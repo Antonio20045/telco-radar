@@ -1,10 +1,10 @@
 {
  "anbieter": "telekom-6",
- "datum": "2026-10-26",
- "dauer_sekunden": 478.2,
+ "datum": "2026-10-27",
+ "dauer_sekunden": 646.1,
  "format": 1,
  "frischegrenze_tage": 3,
- "grund": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-15t/black-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones: Abruf gestört (HTTP 404)",
+ "grund": "https://www.telekom.de/shop/geraet/motorola/motorola-edge-70-fusio-fifa-edition/pantone-silhouette-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones: Kanarienwert fehlt: button[aria-label^=\"View energy label for\"] [aria-label] ohne „motorola edge 70 fusion FIFA Edition“",
  "karte": "telekom.yaml",
  "laufstatus": "gestoert",
  "lesefrist_tage": 1,
@@ -19,18 +19,18 @@
    "kombinationen": [],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 92,
-    "beendet": 88,
+    "anfragen": 93,
+    "beendet": 90,
     "dokument": "complete",
     "geladen": true,
     "offen": {
      "pix.telekom.de": 2,
-     "www.telekom.de": 2,
+     "www.telekom.de": 1,
      "www2.telekom.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 158.0,
-    "takte_ms": 1750,
+    "sekunden": 156.9,
+    "takte_ms": 1650,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -56,18 +56,18 @@
    "kombinationen": [],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 87,
-    "beendet": 84,
+    "anfragen": 97,
+    "beendet": 94,
     "dokument": "complete",
     "geladen": true,
     "offen": {
      "pix.telekom.de": 2,
-     "www.telekom.de": 2,
+     "www.telekom.de": 1,
      "www2.telekom.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 155.2,
-    "takte_ms": 2950,
+    "sekunden": 155.3,
+    "takte_ms": 2800,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -82,20 +82,35 @@
     "knoepfe_gefunden": 0,
     "knoepfe_gesucht": 0
    },
-   "verworfen": 10
+   "verworfen": 29
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-15t/black-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
    "geraet": "xiaomi-15t",
    "gescheitert": 0,
-   "grund": "Abruf gestört (HTTP 404)",
-   "http_status": 404,
+   "grund": "Kanarienwert fehlt: button[aria-label^=\"View energy label for\"] [aria-label] ohne „Xiaomi 15T“",
+   "http_status": 200,
    "kombinationen": [],
-   "ladung": null,
+   "ladung": {
+    "abstand_s": 10.0,
+    "anfragen": 108,
+    "beendet": 106,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "tags-eu.tiqcdn.com": 1,
+     "www.telekom.de": 1,
+     "www2.telekom.de": 1
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 154.5,
+    "takte_ms": 2450,
+    "wartet_auf": "load"
+   },
    "speicher_gb": 256,
-   "sperre": "captcha",
+   "sperre": null,
    "status": "gestoert",
-   "stoerung": null,
+   "stoerung": "seitenform",
    "struktur": {
     "anteil_felder": null,
     "anteil_knoepfe": null,
@@ -104,12 +119,12 @@
     "knoepfe_gefunden": 0,
     "knoepfe_gesucht": 0
    },
-   "verworfen": 0
+   "verworfen": 29
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/fairphone/fairphone-gen-6plus/forest-gruen-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
    "geraet": "fairphone-6-plus",
-   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 404)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: button[aria-label^=\"View energy label for\"] [aria-label] ohne „Xiaomi 15T“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -119,7 +134,7 @@
   {
    "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-16-plus/weiss-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
    "geraet": "apple-iphone-16-plus",
-   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 404)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: button[aria-label^=\"View energy label for\"] [aria-label] ohne „Xiaomi 15T“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -129,7 +144,7 @@
   {
    "adresse": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-17t-pro/black-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
    "geraet": "xiaomi-17t-pro",
-   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 404)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: button[aria-label^=\"View energy label for\"] [aria-label] ohne „Xiaomi 15T“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 512,
@@ -139,7 +154,7 @@
   {
    "adresse": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-z-fold7/silver-shadow-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
    "geraet": "samsung-galaxy-z-fold-7",
-   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 404)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: button[aria-label^=\"View energy label for\"] [aria-label] ohne „Xiaomi 15T“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -149,7 +164,7 @@
   {
    "adresse": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25-ultra/titanium-black-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
    "geraet": "samsung-galaxy-s25-ultra",
-   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 404)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: button[aria-label^=\"View energy label for\"] [aria-label] ohne „Xiaomi 15T“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -159,7 +174,7 @@
   {
    "adresse": "https://www.telekom.de/shop/geraet/nothing/nothing-phone-4a-pro/silber-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
    "geraet": "nothing-phone-4a-pro",
-   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 404)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: button[aria-label^=\"View energy label for\"] [aria-label] ohne „Xiaomi 15T“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -169,7 +184,7 @@
   {
    "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17797&categoryId=smartphones&forwardTradeInApplied=false",
    "geraet": "apple-iphone-17-pro",
-   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 404)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: button[aria-label^=\"View energy label for\"] [aria-label] ohne „Xiaomi 15T“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -179,7 +194,7 @@
   {
    "adresse": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-15-5g/black-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
    "geraet": "xiaomi-redmi-note-15",
-   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 404)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: button[aria-label^=\"View energy label for\"] [aria-label] ohne „Xiaomi 15T“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -189,7 +204,7 @@
   {
    "adresse": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-z-flip8/pink-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
    "geraet": "samsung-galaxy-z-flip8",
-   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 404)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: button[aria-label^=\"View energy label for\"] [aria-label] ohne „Xiaomi 15T“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -199,7 +214,7 @@
   {
    "adresse": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25/silver-shadow-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
    "geraet": "samsung-galaxy-s25",
-   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 404)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: button[aria-label^=\"View energy label for\"] [aria-label] ohne „Xiaomi 15T“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -209,7 +224,7 @@
   {
    "adresse": "https://www.telekom.de/shop/geraet/nothing/nothing-phone-3/schwarz-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
    "geraet": "nothing-phone-3",
-   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 404)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: button[aria-label^=\"View energy label for\"] [aria-label] ohne „Xiaomi 15T“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -219,7 +234,7 @@
   {
    "adresse": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26plus/white-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
    "geraet": "samsung-galaxy-s26-plus",
-   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 404)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: button[aria-label^=\"View energy label for\"] [aria-label] ohne „Xiaomi 15T“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -229,7 +244,7 @@
   {
    "adresse": "https://www.telekom.de/shop/geraet/google/google-pixel-10-pro-fold/moonstone-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
    "geraet": "google-pixel-10-pro-fold",
-   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 404)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: button[aria-label^=\"View energy label for\"] [aria-label] ohne „Xiaomi 15T“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -239,7 +254,7 @@
   {
    "adresse": "https://www.telekom.de/shop/geraet/motorola/motorola-signature/pantone-martini-olive-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
    "geraet": "motorola-signature",
-   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 404)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: button[aria-label^=\"View energy label for\"] [aria-label] ohne „Xiaomi 15T“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 512,
@@ -249,7 +264,7 @@
   {
    "adresse": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26-ultra/sky-blue-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
    "geraet": "samsung-galaxy-s26-ultra",
-   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 404)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: button[aria-label^=\"View energy label for\"] [aria-label] ohne „Xiaomi 15T“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -259,7 +274,7 @@
   {
    "adresse": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-17-pro-5g/black-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
    "geraet": "xiaomi-redmi-note-17-pro",
-   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 404)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: button[aria-label^=\"View energy label for\"] [aria-label] ohne „Xiaomi 15T“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -269,7 +284,7 @@
   {
    "adresse": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-z-fold7/silver-shadow-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
    "geraet": "samsung-galaxy-z-fold-7",
-   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 404)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: button[aria-label^=\"View energy label for\"] [aria-label] ohne „Xiaomi 15T“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -279,7 +294,7 @@
   {
    "adresse": "https://www.telekom.de/shop/geraet/google/google-pixel-10a/lavender-128-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false",
    "geraet": "google-pixel-10a",
-   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 404)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: button[aria-label^=\"View energy label for\"] [aria-label] ohne „Xiaomi 15T“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -289,7 +304,7 @@
   {
    "adresse": "https://www.telekom.de/shop/geraet/google/google-pixel-10-pro-xl/obsidian-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false",
    "geraet": "google-pixel-10-pro-xl",
-   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 404)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: button[aria-label^=\"View energy label for\"] [aria-label] ohne „Xiaomi 15T“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -299,7 +314,7 @@
   {
    "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17e/weiss-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false",
    "geraet": "apple-iphone-17e",
-   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 404)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: button[aria-label^=\"View energy label for\"] [aria-label] ohne „Xiaomi 15T“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -309,7 +324,7 @@
   {
    "adresse": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-z-fold8-ultra/violet-shadow-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false",
    "geraet": "samsung-galaxy-z-fold8-ultra",
-   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 404)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: button[aria-label^=\"View energy label for\"] [aria-label] ohne „Xiaomi 15T“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -319,7 +334,7 @@
   {
    "adresse": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-a27-5g/black-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
    "geraet": "samsung-galaxy-a27",
-   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 404)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: button[aria-label^=\"View energy label for\"] [aria-label] ohne „Xiaomi 15T“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -329,7 +344,7 @@
   {
    "adresse": "https://www.telekom.de/shop/geraet/motorola/motorola-moto-g37/pantone-impenetrable-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
    "geraet": "motorola-moto-g37",
-   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 404)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: button[aria-label^=\"View energy label for\"] [aria-label] ohne „Xiaomi 15T“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -339,7 +354,7 @@
   {
    "adresse": "https://www.telekom.de/shop/geraet/google/google-pixel-10-pro-xl/obsidian-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
    "geraet": "google-pixel-10-pro-xl",
-   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 404)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: button[aria-label^=\"View energy label for\"] [aria-label] ohne „Xiaomi 15T“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -349,7 +364,7 @@
   {
    "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro-max/cosmic-orange-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
    "geraet": "apple-iphone-17-pro-max",
-   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 404)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: button[aria-label^=\"View energy label for\"] [aria-label] ohne „Xiaomi 15T“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -359,7 +374,7 @@
   {
    "adresse": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-17-5g/black-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
    "geraet": "xiaomi-redmi-note-17",
-   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (HTTP 404)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: button[aria-label^=\"View energy label for\"] [aria-label] ohne „Xiaomi 15T“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -400,5 +415,5 @@
  ],
  "uebersichten": [],
  "vertragsform": "tarif_plus_ratenkauf",
- "zeitbudget_sekunden": 10270
+ "zeitbudget_sekunden": 10272
 }
