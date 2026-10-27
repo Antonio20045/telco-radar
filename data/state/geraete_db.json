@@ -2,8 +2,8 @@
  "updated": "2026-10-27",
  "anbieter": {
   "ALDI TALK": {
-   "laeufe": 90,
-   "funde_gesamt": 531,
+   "laeufe": 91,
+   "funde_gesamt": 537,
    "letzter_lauf": "2026-10-27",
    "letzte_funde": 6,
    "letzter_fund": "2026-10-27",
@@ -309,8 +309,8 @@
    "tote_adressen": 0
   },
   "Vodafone": {
-   "laeufe": 88,
-   "funde_gesamt": 15165,
+   "laeufe": 89,
+   "funde_gesamt": 15332,
    "letzter_lauf": "2026-10-27",
    "letzte_funde": 167,
    "termine": [
@@ -616,8 +616,8 @@
    "tote_adressen": 0
   },
   "o2": {
-   "laeufe": 88,
-   "funde_gesamt": 5937,
+   "laeufe": 89,
+   "funde_gesamt": 6003,
    "letzter_lauf": "2026-10-27",
    "letzte_funde": 66,
    "termine": [
@@ -923,8 +923,8 @@
    "tote_adressen": null
   },
   "mobilcom-debitel": {
-   "laeufe": 41,
-   "funde_gesamt": 11390,
+   "laeufe": 42,
+   "funde_gesamt": 11545,
    "letzte_funde": 155,
    "termine": [
     "2026-08-29",
@@ -1778,8 +1778,8 @@
    "tote_adressen": 0
   },
   "congstar": {
-   "laeufe": 58,
-   "funde_gesamt": 11412,
+   "laeufe": 59,
+   "funde_gesamt": 11547,
    "letzter_lauf": "2026-10-27",
    "letzte_funde": 135,
    "termine": [
@@ -2079,8 +2079,8 @@
    "tote_adressen": 0
   },
   "1&1": {
-   "laeufe": 80,
-   "funde_gesamt": 3032,
+   "laeufe": 81,
+   "funde_gesamt": 3074,
    "letzter_lauf": "2026-10-27",
    "letzte_funde": 42,
    "termine": [
@@ -2637,10 +2637,10 @@
    "tote_adressen": null
   },
   "Saturn": {
-   "laeufe": 76,
-   "funde_gesamt": 1374,
+   "laeufe": 77,
+   "funde_gesamt": 1388,
    "letzter_lauf": "2026-10-27",
-   "letzte_funde": 11,
+   "letzte_funde": 14,
    "termine": [
     "2026-09-05",
     "2026-09-06",
@@ -2927,7 +2927,7 @@
     ],
     [
      "2026-10-27",
-     11,
+     14,
      "gelesen",
      0,
      0,
@@ -6503,7 +6503,7 @@
     "https://mobile.1und1.de/smartphones"
    ],
    "titel_roh": "Apple iPhone 18 Pro 256 GB silber",
-   "preis_mit_vertrag_ab": 49.99,
+   "preis_mit_vertrag_ab": 52.99,
    "laufzeit_monate": 36,
    "tarif_referenz": "1&1 All-Net-Flat S"
   },
@@ -8740,24 +8740,23 @@
    "ean": "",
    "zustand": "neu",
    "first_seen": "2026-09-05",
-   "status": "ausgelistet",
-   "missed_checks": 2,
+   "status": "aktiv",
+   "missed_checks": 0,
    "erstpreis": 939.99,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-05",
-   "last_verified": "2026-10-07",
-   "letzter_check": "2026-10-09",
+   "last_verified": "2026-10-27",
+   "letzter_check": "2026-10-27",
    "quelle_url": "https://www.saturn.de/de/product/_apple-iphone-17-5g-256-gb-schwarz-dual-sim-3013575.html",
-   "abgerufen_am": "2026-10-07",
+   "abgerufen_am": "2026-10-27",
    "verfuegbarkeit": "unbekannt",
    "confidence": "hoch",
    "einstiege": [
     "https://www.saturn.de/de/brand/apple/iphone/iphone-17"
    ],
    "titel_roh": "APPLE iPhone 17 5G 256 GB Schwarz Dual SIM",
-   "preis_ohne_vertrag": 1029.0,
-   "ended_since": "2026-10-09",
-   "stale_since": "2026-10-08"
+   "preis_ohne_vertrag": 1019.0,
+   "ended_since": "2026-10-09"
   },
   {
    "id": "saturn--apple-iphone-17-256gb-violett",
@@ -8772,24 +8771,23 @@
    "ean": "",
    "zustand": "neu",
    "first_seen": "2026-09-05",
-   "status": "ausgelistet",
-   "missed_checks": 2,
+   "status": "aktiv",
+   "missed_checks": 0,
    "erstpreis": 939.99,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-05",
-   "last_verified": "2026-10-07",
-   "letzter_check": "2026-10-09",
+   "last_verified": "2026-10-27",
+   "letzter_check": "2026-10-27",
    "quelle_url": "https://www.saturn.de/de/product/_apple-iphone-17-5g-256-gb-lavendel-dual-sim-3013578.html",
-   "abgerufen_am": "2026-10-07",
+   "abgerufen_am": "2026-10-27",
    "verfuegbarkeit": "unbekannt",
    "confidence": "hoch",
    "einstiege": [
     "https://www.saturn.de/de/brand/apple/iphone/iphone-17"
    ],
    "titel_roh": "APPLE iPhone 17 5G 256 GB Lavendel Dual SIM",
-   "preis_ohne_vertrag": 1029.0,
-   "ended_since": "2026-10-09",
-   "stale_since": "2026-10-08"
+   "preis_ohne_vertrag": 1019.0,
+   "ended_since": "2026-10-09"
   },
   {
    "id": "saturn--apple-iphone-17-256gb-weiss",
@@ -8804,24 +8802,23 @@
    "ean": "",
    "zustand": "neu",
    "first_seen": "2026-09-05",
-   "status": "vermutlich ausgelistet",
-   "missed_checks": 1,
+   "status": "aktiv",
+   "missed_checks": 0,
    "erstpreis": 939.99,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-05",
-   "last_verified": "2026-10-26",
+   "last_verified": "2026-10-27",
    "letzter_check": "2026-10-27",
    "quelle_url": "https://www.saturn.de/de/product/_apple-iphone-17-5g-256-gb-weiss-dual-sim-3013576.html",
-   "abgerufen_am": "2026-10-26",
+   "abgerufen_am": "2026-10-27",
    "verfuegbarkeit": "unbekannt",
    "confidence": "hoch",
    "einstiege": [
     "https://www.saturn.de/de/brand/apple/iphone/iphone-17"
    ],
    "titel_roh": "APPLE iPhone 17 5G 256 GB Weiß Dual SIM",
-   "preis_ohne_vertrag": 1089.0,
-   "ended_since": "2026-10-15",
-   "stale_since": "2026-10-27"
+   "preis_ohne_vertrag": 1019.0,
+   "ended_since": "2026-10-15"
   },
   {
    "id": "saturn--apple-iphone-17-512gb-schwarz",
