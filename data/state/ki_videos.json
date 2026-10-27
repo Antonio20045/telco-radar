@@ -1,6 +1,126 @@
 {
- "stand": "2026-10-26",
+ "stand": "2026-10-27",
  "videos": [
+  {
+   "id": "vKMDQJpRSvA",
+   "titel": "AI for Detection and Response | Cloudflare’s Mark Anderson",
+   "kanal": "OpenAI",
+   "datum": "2026-10-27",
+   "dauer_sekunden": 29,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "vKMDQJpRSvA.jpg"
+  },
+  {
+   "id": "uQWyn-jkah4",
+   "titel": "Massiver Durchbruch: Automatisiere ALLES mit KI-Telefonagenten in 2027! MEGA-KURS",
+   "kanal": "Everlast AI",
+   "datum": "2026-10-27",
+   "dauer_sekunden": 7060,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "uQWyn-jkah4.jpg"
+  },
+  {
+   "id": "sFfPkUJd_Jk",
+   "titel": "Genie 4: A new generation of world simulation",
+   "kanal": "Google DeepMind",
+   "datum": "2026-10-27",
+   "dauer_sekunden": 148,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "sFfPkUJd_Jk.jpg"
+  },
+  {
+   "id": "ofzHbyxkpVg",
+   "titel": "I knew AI + Notion would be good, but this... wow.",
+   "kanal": "Jeff Su",
+   "datum": "2026-10-27",
+   "dauer_sekunden": 861,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "ofzHbyxkpVg.jpg"
+  },
+  {
+   "id": "lPZQrVFcz3c",
+   "titel": "Getting a Head Start with Codex | Mitchell Hashimoto",
+   "kanal": "OpenAI",
+   "datum": "2026-10-27",
+   "dauer_sekunden": 46,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "lPZQrVFcz3c.jpg"
+  },
+  {
+   "id": "cflbzHRvGvg",
+   "titel": "From Ideas to Prototypes with Codex | Shopify’s Mikhail Parakhin",
+   "kanal": "OpenAI",
+   "datum": "2026-10-27",
+   "dauer_sekunden": 66,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "cflbzHRvGvg.jpg"
+  },
+  {
+   "id": "Yim7JrVzSkk",
+   "titel": "Lawyers Stay in Control | AT&T + OpenAI",
+   "kanal": "OpenAI",
+   "datum": "2026-10-27",
+   "dauer_sekunden": 26,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "Yim7JrVzSkk.jpg"
+  },
+  {
+   "id": "LgkC-txLMTA",
+   "titel": "Deine eBooks ÜBERALL",
+   "kanal": "c't 3003",
+   "datum": "2026-10-27",
+   "dauer_sekunden": 65,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "LgkC-txLMTA.jpg"
+  },
+  {
+   "id": "G6AwOYT-Gbw",
+   "titel": "Grok Bot Tutorial for Beginners",
+   "kanal": "Kevin Stratvert",
+   "datum": "2026-10-27",
+   "dauer_sekunden": 540,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "G6AwOYT-Gbw.jpg"
+  },
+  {
+   "id": "EUjd_UBApoA",
+   "titel": "Crazy Spy Tech You Can Use For Free!",
+   "kanal": "Matt Wolfe",
+   "datum": "2026-10-27",
+   "dauer_sekunden": 68,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "EUjd_UBApoA.jpg"
+  },
+  {
+   "id": "C2vdw5GSTQo",
+   "titel": "How Sotira Gives Unsold Inventory a Second Life with Codex",
+   "kanal": "OpenAI",
+   "datum": "2026-10-27",
+   "dauer_sekunden": 43,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "C2vdw5GSTQo.jpg"
+  },
+  {
+   "id": "5WlmyncEcNM",
+   "titel": "Open Source Security in the Age of AI",
+   "kanal": "IBM Technology",
+   "datum": "2026-10-27",
+   "dauer_sekunden": 617,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "5WlmyncEcNM.jpg"
+  },
   {
    "id": "jkkLYlGLScM",
    "titel": "KI-Update kompakt: Nvidia GTC, KI-Agenten, Kimi K3.1 Pro, Perplexity Computer",
@@ -10,6 +130,16 @@
    "stufe": "Einstieg",
    "sprache": "de",
    "bild": "jkkLYlGLScM.jpg"
+  },
+  {
+   "id": "gC18kqOcCEI",
+   "titel": "ANOTHER Flying Car? (Not Tesla / Not AI)",
+   "kanal": "Matt Wolfe",
+   "datum": "2026-10-26",
+   "dauer_sekunden": 63,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "gC18kqOcCEI.jpg"
   },
   {
    "id": "SIZsFGvtClM",
@@ -73,7 +203,7 @@
   },
   {
    "id": "V_uq3v6xK-4",
-   "titel": "Sphere Intersection Puzzle Corrected",
+   "titel": "The Sphere Intersection Puzzle",
    "kanal": "3Blue1Brown",
    "datum": "2026-10-25",
    "dauer_sekunden": 46,
@@ -143,7 +273,7 @@
   },
   {
    "id": "wETSpF4ef6E",
-   "titel": "How to Use Hermes AI Agent",
+   "titel": "Hermes AI Agent Tutorial for Beginners",
    "kanal": "Kevin Stratvert",
    "datum": "2026-10-23",
    "dauer_sekunden": 614,
@@ -170,223 +300,93 @@
    "stufe": "Einstieg",
    "sprache": "en",
    "bild": "m6MlxaFMmPI.jpg"
-  },
-  {
-   "id": "hgX1hgyWD4g",
-   "titel": "How Realpage. builds AI training with ChatGPT Work",
-   "kanal": "OpenAI",
-   "datum": "2026-10-23",
-   "dauer_sekunden": 54,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "hgX1hgyWD4g.jpg"
-  },
-  {
-   "id": "WSHEBdmahHY",
-   "titel": "These ChatGPT Prompts Are Game-Changers!",
-   "kanal": "Matt Wolfe",
-   "datum": "2026-10-23",
-   "dauer_sekunden": 51,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "WSHEBdmahHY.jpg"
-  },
-  {
-   "id": "WLhh5FeLpy0",
-   "titel": "Self-replicating AI, your doctor’s chatbot & agents at dinner",
-   "kanal": "IBM Technology",
-   "datum": "2026-10-23",
-   "dauer_sekunden": 2170,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "WLhh5FeLpy0.jpg"
-  },
-  {
-   "id": "TVRCcMlvR10",
-   "titel": "AI News: 24 Things You Need To Know This Week",
-   "kanal": "Matt Wolfe",
-   "datum": "2026-10-23",
-   "dauer_sekunden": 1618,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "TVRCcMlvR10.jpg"
-  },
-  {
-   "id": "P0kZQHdYnZs",
-   "titel": "Gleiches Modell und völlig unbrauchbar?!",
-   "kanal": "The Morpheus Tutorials",
-   "datum": "2026-10-23",
-   "dauer_sekunden": 2881,
-   "stufe": "Fortgeschritten",
-   "sprache": "de",
-   "bild": "P0kZQHdYnZs.jpg"
-  },
-  {
-   "id": "GijbJyuR9DM",
-   "titel": "Ja, es ist wirklich so schlimm",
-   "kanal": "The Morpheus Tutorials",
-   "datum": "2026-10-23",
-   "dauer_sekunden": 423,
-   "stufe": "Fortgeschritten",
-   "sprache": "de",
-   "bild": "GijbJyuR9DM.jpg"
-  },
-  {
-   "id": "CZ0X9EVuUfI",
-   "titel": "KI-Update Deep-Dive: Warum ControlAI ein Verbot von Superintelligenz fordert",
-   "kanal": "KI Update (heise)",
-   "datum": "2026-10-23",
-   "dauer_sekunden": 3019,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "CZ0X9EVuUfI.jpg"
-  },
-  {
-   "id": "7Cs5qyBlYQk",
-   "titel": "From notes to AI training with ChatGPT Work | Realpage.",
-   "kanal": "OpenAI",
-   "datum": "2026-10-23",
-   "dauer_sekunden": 50,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "7Cs5qyBlYQk.jpg"
-  },
-  {
-   "id": "6f7ojkd4_Wc",
-   "titel": "Hunt bugs with your dot",
-   "kanal": "OpenAI",
-   "datum": "2026-10-23",
-   "dauer_sekunden": 312,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "6f7ojkd4_Wc.jpg"
-  },
-  {
-   "id": "4ivd3zRiuys",
-   "titel": "AI Home Security Threat",
-   "kanal": "IBM Technology",
-   "datum": "2026-10-23",
-   "dauer_sekunden": 31,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "4ivd3zRiuys.jpg"
-  },
-  {
-   "id": "2lNUGkCg_qc",
-   "titel": "AI agents for everyday IT fixes | Shield and OpenAI",
-   "kanal": "OpenAI",
-   "datum": "2026-10-23",
-   "dauer_sekunden": 31,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "2lNUGkCg_qc.jpg"
-  },
-  {
-   "id": "UhFBCIOcCJY",
-   "titel": "KI ist NICHTS zu dem, was bald kommt! Quantengehirne, Licht-Chips & Superintelligenz - Klaus Mainzer",
-   "kanal": "Everlast AI",
-   "datum": "2026-10-22",
-   "dauer_sekunden": 9200,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "UhFBCIOcCJY.jpg"
-  },
-  {
-   "id": "615-yWyS1n0",
-   "titel": "What Is LLM Inference? How AI Models Generate Responses",
-   "kanal": "IBM Technology",
-   "datum": "2026-10-22",
-   "dauer_sekunden": 466,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "615-yWyS1n0.jpg"
   }
  ],
  "kanaele": {
   "c't 3003": {
    "error": null,
-   "versucht": "2026-10-26",
-   "abgerufen": "2026-10-26"
+   "versucht": "2026-10-27",
+   "abgerufen": "2026-10-27"
   },
   "KI Update (heise)": {
    "error": null,
-   "versucht": "2026-10-26",
-   "abgerufen": "2026-10-26"
+   "versucht": "2026-10-27",
+   "abgerufen": "2026-10-27"
   },
   "Everlast AI": {
    "error": null,
-   "versucht": "2026-10-26",
-   "abgerufen": "2026-10-26"
+   "versucht": "2026-10-27",
+   "abgerufen": "2026-10-27"
   },
   "The Morpheus Tutorials": {
    "error": null,
-   "versucht": "2026-10-26",
-   "abgerufen": "2026-10-26"
+   "versucht": "2026-10-27",
+   "abgerufen": "2026-10-27"
   },
   "Kevin Stratvert": {
    "error": null,
-   "versucht": "2026-10-26",
-   "abgerufen": "2026-10-26"
+   "versucht": "2026-10-27",
+   "abgerufen": "2026-10-27"
   },
   "Microsoft Mechanics": {
    "error": null,
-   "versucht": "2026-10-26",
-   "abgerufen": "2026-10-26"
+   "versucht": "2026-10-27",
+   "abgerufen": "2026-10-27"
   },
   "Leila Gharani": {
    "error": null,
-   "versucht": "2026-10-26",
-   "abgerufen": "2026-10-26"
+   "versucht": "2026-10-27",
+   "abgerufen": "2026-10-27"
   },
   "Jeff Su": {
    "error": null,
-   "versucht": "2026-10-26",
-   "abgerufen": "2026-10-26"
+   "versucht": "2026-10-27",
+   "abgerufen": "2026-10-27"
   },
   "Matt Wolfe": {
    "error": null,
-   "versucht": "2026-10-26",
-   "abgerufen": "2026-10-26"
+   "versucht": "2026-10-27",
+   "abgerufen": "2026-10-27"
   },
   "IBM Technology": {
    "error": null,
-   "versucht": "2026-10-26",
-   "abgerufen": "2026-10-26"
+   "versucht": "2026-10-27",
+   "abgerufen": "2026-10-27"
   },
   "OpenAI": {
    "error": null,
-   "versucht": "2026-10-26",
-   "abgerufen": "2026-10-26"
+   "versucht": "2026-10-27",
+   "abgerufen": "2026-10-27"
   },
   "Anthropic": {
    "error": null,
-   "versucht": "2026-10-26",
-   "abgerufen": "2026-10-26"
+   "versucht": "2026-10-27",
+   "abgerufen": "2026-10-27"
   },
   "Google DeepMind": {
    "error": null,
-   "versucht": "2026-10-26",
-   "abgerufen": "2026-10-26"
+   "versucht": "2026-10-27",
+   "abgerufen": "2026-10-27"
   },
   "AI Explained": {
    "error": null,
-   "versucht": "2026-10-26",
-   "abgerufen": "2026-10-26"
+   "versucht": "2026-10-27",
+   "abgerufen": "2026-10-27"
   },
   "Two Minute Papers": {
    "error": null,
-   "versucht": "2026-10-26",
-   "abgerufen": "2026-10-26"
+   "versucht": "2026-10-27",
+   "abgerufen": "2026-10-27"
   },
   "3Blue1Brown": {
    "error": null,
-   "versucht": "2026-10-26",
-   "abgerufen": "2026-10-26"
+   "versucht": "2026-10-27",
+   "abgerufen": "2026-10-27"
   },
   "David Ondrej": {
    "error": null,
-   "versucht": "2026-10-26",
-   "abgerufen": "2026-10-26"
+   "versucht": "2026-10-27",
+   "abgerufen": "2026-10-27"
   }
  },
  "error": null
