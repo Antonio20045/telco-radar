@@ -315,3 +315,15 @@ def test_ein_o2_rest_beleg_verraet_die_enterprise_edition_base64_kodiert(tmp_pat
     db.upsert_buendel([ee, gegenprobe], TAG1)
     db.save(TAG1)
     assert [b["id"] for b in TcoDB(pfad).buendel()] == [gegenprobe.id]
+
+
+def test_eine_sku_mit_doppeltem_ee_zusatz_faellt_weg(tmp_path):
+    """Preisprüfung Runde 3, 26.10.2026: das XCover7 Pro EE stand ein zweites Mal
+    als „… EE Enterprise Edition“ auf der Seite, mit denselben o2-Zeilen."""
+    pfad = tmp_path / "geraete_tco.json"
+    doppelt = _o2(TAG1)
+    doppelt.sku_id = "samsung-galaxy-xcover7-pro-ee-enterprise-edition-128gb-schwarz"
+    db = TcoDB(pfad)
+    db.upsert_buendel([doppelt, _vodafone(TAG1)], TAG1)
+    db.save(TAG1)
+    assert [b["id"] for b in TcoDB(pfad).buendel()] == [_vodafone(TAG1).id]

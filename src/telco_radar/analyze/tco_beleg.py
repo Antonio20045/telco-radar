@@ -7,12 +7,17 @@ import binascii
 import re
 
 _EE_BELEG = re.compile(r"-ee-\d+(?:gb|tb)-|enterprise-edition")
+_EE_DOPPELT = "-ee-enterprise-edition-"
+"""o2 26.10.2026 (21:30-Lauf): „XCover7 Pro EE“ bekam den EE-Zusatz ein zweites Mal
+und stand mit denselben Zeilen als zweites Modell auf der Seite."""
 
 
 def beleg_widerspricht(eintrag: dict) -> bool:
     """Der Beleg ist eine Enterprise Edition, die SKU das normale Modell
     (Preisprüfung 26.10.2026: o2 S26 und Telekom S26 FE, bis 102 € daneben)."""
     sku = str(eintrag.get("sku_id") or "")
+    if _EE_DOPPELT in sku:
+        return True
     ee_sku = "enterprise" in sku or "-ee-" in sku
     return bool(_EE_BELEG.search(_beleg_klartext(eintrag))) and not ee_sku
 
