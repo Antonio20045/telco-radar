@@ -2,11 +2,13 @@ name: CI
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "30 21 * * *"
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -14,7 +16,7 @@ jobs:
           python-version-file: .python-version
           cache: pip
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: pip install -r requirements.txt -r requirements-dev.txt
       # Ohne diesen Schritt ueberspringt sich tests/test_falz_browser.py, und
       # zwar lautlos - ein Skip sieht im Protokoll aus wie ein Erfolg. Genau
       # dieser Test misst, ob die Schlagzeile der Ausgabe ohne Scrollen
@@ -26,4 +28,4 @@ jobs:
       - name: Run tests
         env:
           PYTHONPATH: src
-        run: pytest -q
+        run: pytest -q -n auto
