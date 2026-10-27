@@ -524,7 +524,7 @@ def _rohsatz(
         "geraet_monatsrate": g["rate"],
         "anschlusspreis": anschluss,
         "laufzeit_monate": g["laufzeit"],
-        "url": belegadresse(url, slug, g["laufzeit"]),
+        "url": belegadresse(url, slug, g["laufzeit"], g["angebot"]),
         "quelle": _TIEF_QUELLE,
     }
 

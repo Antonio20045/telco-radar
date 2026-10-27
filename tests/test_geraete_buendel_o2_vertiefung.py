@@ -473,4 +473,5 @@ def test_der_beleglink_nennt_tarif_und_ratenzahl_der_zeile(mitschnitt):
         frage = parse_qs(urlsplit(s["url"]).query)
         assert frage["tarif"] == [s["tarif_slug"]]
         assert frage["ratenzahlung"] == [str(s["laufzeit_monate"])]
+        assert f"-{s['speicher_gb']}gb-" in urlsplit(s["url"]).path
     assert len({s["url"] for s in saetze}) > 1

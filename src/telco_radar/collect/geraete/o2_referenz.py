@@ -189,6 +189,7 @@ class Referenzstand:
 
 
 _EE_RE = re.compile(r"-ee-\d+(?:gb|tb)-")
+_ANGEBOT_RE = re.compile(r"^[a-z]+-(?P<geraet>.+?-\d+(?:gb|tb)-.+?)-\d+x\w+$")
 _EE_NAME = re.compile(r"\b(?:ee|enterprise)\b", re.IGNORECASE)
 
 
@@ -204,15 +205,23 @@ def modellname(h: dict) -> str:
     return modell
 
 
-def belegadresse(url: str, tarif_slug: str, raten: int | None) -> str:
-    """Die Produktseite mit Tarif und Ratenzahl der Zeile. Alle Zeilen eines Geräts
-    trugen sonst die Adresse der Startseite (Preisprüfung 26.10.2026: bei 1.875 von
-    2.062 o2-Zeilen nannte der Link einen anderen Tarif)."""
+def belegadresse(
+    url: str, tarif_slug: str, raten: int | None, angebot: str = ""
+) -> str:
+    """Die Produktseite mit Speicher, Farbe, Tarif und Ratenzahl der Zeile. Alle
+    Zeilen eines Geräts trugen sonst die Adresse der Startseite (Preisprüfung
+    26.10.2026: bei 1.875 von 2.062 o2-Zeilen ein anderer Tarif, 27.10.: bei 462
+    eine kleinere Speichergröße). Den Pfad nennt der Angebotsname:
+    ``x-<gerät>-512gb-<farbe>-24xhigh`` zu ``<gerät>-512gb-<farbe>-details``.
+    """
     teile = urlsplit(url)
     if not tarif_slug or not teile.path.endswith("-details"):
         return url
+    pfad = teile.path
+    if m := _ANGEBOT_RE.match(angebot):
+        pfad = pfad.rsplit("/", 1)[0] + f"/{m['geraet']}-details"
     frage = dict(parse_qsl(teile.query, keep_blank_values=True))
     frage["tarif"] = tarif_slug
     if raten:
         frage["ratenzahlung"] = str(raten)
-    return urlunsplit(teile._replace(query=urlencode(frage)))
+    return urlunsplit(teile._replace(path=pfad, query=urlencode(frage)))
