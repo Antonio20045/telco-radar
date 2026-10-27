@@ -2,8 +2,8 @@
  "updated": "2026-10-27",
  "anbieter": {
   "ALDI TALK": {
-   "laeufe": 89,
-   "funde_gesamt": 525,
+   "laeufe": 90,
+   "funde_gesamt": 531,
    "letzter_lauf": "2026-10-27",
    "letzte_funde": 6,
    "letzter_fund": "2026-10-27",
@@ -309,8 +309,8 @@
    "tote_adressen": 0
   },
   "Vodafone": {
-   "laeufe": 87,
-   "funde_gesamt": 14998,
+   "laeufe": 88,
+   "funde_gesamt": 15165,
    "letzter_lauf": "2026-10-27",
    "letzte_funde": 167,
    "termine": [
@@ -616,8 +616,8 @@
    "tote_adressen": 0
   },
   "o2": {
-   "laeufe": 87,
-   "funde_gesamt": 5871,
+   "laeufe": 88,
+   "funde_gesamt": 5937,
    "letzter_lauf": "2026-10-27",
    "letzte_funde": 66,
    "termine": [
@@ -923,8 +923,8 @@
    "tote_adressen": null
   },
   "mobilcom-debitel": {
-   "laeufe": 40,
-   "funde_gesamt": 11235,
+   "laeufe": 41,
+   "funde_gesamt": 11390,
    "letzte_funde": 155,
    "termine": [
     "2026-08-29",
@@ -1495,11 +1495,11 @@
     ],
     [
      "2026-10-27",
-     18,
-     "teilweise gelesen",
      0,
-     18,
-     0
+     "nicht gelesen",
+     0,
+     0,
+     null
     ]
    ],
    "tote_adressen": 0
@@ -1778,8 +1778,8 @@
    "tote_adressen": 0
   },
   "congstar": {
-   "laeufe": 57,
-   "funde_gesamt": 11277,
+   "laeufe": 58,
+   "funde_gesamt": 11412,
    "letzter_lauf": "2026-10-27",
    "letzte_funde": 135,
    "termine": [
@@ -2079,8 +2079,8 @@
    "tote_adressen": 0
   },
   "1&1": {
-   "laeufe": 79,
-   "funde_gesamt": 2990,
+   "laeufe": 80,
+   "funde_gesamt": 3032,
    "letzter_lauf": "2026-10-27",
    "letzte_funde": 42,
    "termine": [
@@ -2637,10 +2637,10 @@
    "tote_adressen": null
   },
   "Saturn": {
-   "laeufe": 75,
-   "funde_gesamt": 1363,
+   "laeufe": 76,
+   "funde_gesamt": 1374,
    "letzter_lauf": "2026-10-27",
-   "letzte_funde": 9,
+   "letzte_funde": 11,
    "termine": [
     "2026-09-05",
     "2026-09-06",
@@ -2927,7 +2927,7 @@
     ],
     [
      "2026-10-27",
-     9,
+     11,
      "gelesen",
      0,
      0,
@@ -6503,7 +6503,7 @@
     "https://mobile.1und1.de/smartphones"
    ],
    "titel_roh": "Apple iPhone 18 Pro 256 GB silber",
-   "preis_mit_vertrag_ab": 52.99,
+   "preis_mit_vertrag_ab": 49.99,
    "laufzeit_monate": 36,
    "tarif_referenz": "1&1 All-Net-Flat S"
   },
@@ -8724,7 +8724,7 @@
     "https://www.saturn.de/de/brand/apple/iphone/iphone-17"
    ],
    "titel_roh": "APPLE iPhone 17 5G 256 GB Nebelblau Dual SIM",
-   "preis_ohne_vertrag": 1089.0,
+   "preis_ohne_vertrag": 1019.0,
    "ended_since": "2026-10-26"
   },
   {
@@ -9283,15 +9283,15 @@
    "ean": "",
    "zustand": "neu",
    "first_seen": "2026-10-07",
-   "status": "vermutlich ausgelistet",
-   "missed_checks": 1,
+   "status": "aktiv",
+   "missed_checks": 0,
    "erstpreis": 1329.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-10-07",
-   "last_verified": "2026-10-26",
+   "last_verified": "2026-10-27",
    "letzter_check": "2026-10-27",
    "quelle_url": "https://www.saturn.de/de/product/_apple-iphone-17-pro-max-5g-256-gb-tiefblau-dual-sim-3013596.html",
-   "abgerufen_am": "2026-10-26",
+   "abgerufen_am": "2026-10-27",
    "verfuegbarkeit": "unbekannt",
    "confidence": "hoch",
    "einstiege": [
@@ -9299,8 +9299,7 @@
    ],
    "titel_roh": "APPLE iPhone 17 Pro Max 5G 256 GB Tiefblau Dual SIM",
    "preis_ohne_vertrag": 1329.0,
-   "ended_since": "2026-10-11",
-   "stale_since": "2026-10-27"
+   "ended_since": "2026-10-11"
   },
   {
    "id": "saturn--apple-iphone-17-pro-max-512gb-cosmic-orange",
@@ -9692,15 +9691,15 @@
    "ean": "",
    "zustand": "neu",
    "first_seen": "2026-09-05",
-   "status": "vermutlich ausgelistet",
-   "missed_checks": 1,
+   "status": "aktiv",
+   "missed_checks": 0,
    "erstpreis": 909.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-05",
-   "last_verified": "2026-10-26",
+   "last_verified": "2026-10-27",
    "letzter_check": "2026-10-27",
    "quelle_url": "https://www.saturn.de/de/product/_apple-iphone-air-5g-256-gb-lichtgold-dual-sim-3013608.html",
-   "abgerufen_am": "2026-10-26",
+   "abgerufen_am": "2026-10-27",
    "verfuegbarkeit": "unbekannt",
    "confidence": "hoch",
    "einstiege": [
@@ -9708,8 +9707,7 @@
    ],
    "titel_roh": "APPLE iPhone Air 5G 256 GB Lichtgold",
    "preis_ohne_vertrag": 899.0,
-   "ended_since": "2026-09-29",
-   "stale_since": "2026-10-27"
+   "ended_since": "2026-09-29"
   },
   {
    "id": "saturn--apple-iphone-air-256gb-space-schwarz",
