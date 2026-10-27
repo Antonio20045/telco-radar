@@ -458,3 +458,19 @@ def test_eine_beschreibung_mit_ee_bekommt_den_zusatz_nicht_doppelt():
         "offerName": "privatkunden-samsung-galaxy-xcover7-pro-ee-128gb-black-36xhigh",
     }
     assert modellname(pro) == "Samsung Galaxy XCover7 Pro EE"
+
+
+def test_der_beleglink_nennt_tarif_und_ratenzahl_der_zeile(mitschnitt):
+    """Preisprüfung Runde 3, 26.10.2026: bei 1.875 von 2.062 o2-Zeilen nannte
+    der Link einen anderen Tarif als die Zeile, bei 1.030 eine andere Ratenzahl."""
+    from urllib.parse import parse_qs, urlsplit
+
+    saetze = [
+        s for s in _vertieft(mitschnitt) if s["url"].split("?")[0].endswith("-details")
+    ]
+    assert saetze
+    for s in saetze:
+        frage = parse_qs(urlsplit(s["url"]).query)
+        assert frage["tarif"] == [s["tarif_slug"]]
+        assert frage["ratenzahlung"] == [str(s["laufzeit_monate"])]
+    assert len({s["url"] for s in saetze}) > 1

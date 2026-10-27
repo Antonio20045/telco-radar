@@ -32,6 +32,7 @@ import logging
 import re
 from collections import defaultdict
 from collections.abc import Callable
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 from .basis import _gleich
 
@@ -201,3 +202,17 @@ def modellname(h: dict) -> str:
     if modell and ee and not _EE_NAME.search(modell):
         return f"{modell} Enterprise Edition"
     return modell
+
+
+def belegadresse(url: str, tarif_slug: str, raten: int | None) -> str:
+    """Die Produktseite mit Tarif und Ratenzahl der Zeile. Alle Zeilen eines Geräts
+    trugen sonst die Adresse der Startseite (Preisprüfung 26.10.2026: bei 1.875 von
+    2.062 o2-Zeilen nannte der Link einen anderen Tarif)."""
+    teile = urlsplit(url)
+    if not tarif_slug or not teile.path.endswith("-details"):
+        return url
+    frage = dict(parse_qsl(teile.query, keep_blank_values=True))
+    frage["tarif"] = tarif_slug
+    if raten:
+        frage["ratenzahlung"] = str(raten)
+    return urlunsplit(teile._replace(query=urlencode(frage)))

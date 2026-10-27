@@ -81,7 +81,7 @@ from functools import partial
 from typing import Optional
 
 from .basis import GeraeteAbrufFehler, _gleich, _preis
-from .o2_referenz import Referenzstand, modellname, passt, tarife_aus
+from .o2_referenz import Referenzstand, belegadresse, modellname, passt, tarife_aus
 from .ratenlaufzeit import katalog_mit_phasen, o2_phasen
 from ...geraete_model import probe_geht_auf
 
@@ -524,7 +524,7 @@ def _rohsatz(
         "geraet_monatsrate": g["rate"],
         "anschlusspreis": anschluss,
         "laufzeit_monate": g["laufzeit"],
-        "url": url,
+        "url": belegadresse(url, slug, g["laufzeit"]),
         "quelle": _TIEF_QUELLE,
     }
 
