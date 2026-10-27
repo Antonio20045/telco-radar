@@ -418,3 +418,21 @@ def test_telekom_ohne_oeffnen_findet_keine_zusammenfassung(chromium):
     assert lauf.ergebnisse
     assert {e.status for e in lauf.ergebnisse} == {"nicht_erfasst"}
     assert lauf.ergebnisse[0].grund == "Preiszusammenfassung nicht gefunden (#preis)"
+
+
+def test_umleitung_auf_die_uebersicht_heisst_nicht_mehr_angeboten(chromium):
+    """congstar 27.10.2026: ausgelistete Geräte leiten auf die Markenübersicht um
+    (``redirectFrom=device-details``); drei davon in Folge hielten als „andere Form“
+    den ganzen Tageslauf an. Gegenprobe: ohne Umleitung bleibt es gestört."""
+    from telco_radar.collect.geraete.klickbedienung import GRUND_AUSGELISTET
+
+    umleitung = "history.replaceState(null, '', '/handy/?redirectFrom=device-details');"
+    kanarie = {"selektor": "#speicher", "enthaelt": "Speicher:"}
+    k = karte(knoepfe=CONGSTAR_KNOEPFE, kanarie=kanarie)
+    weg, _ = laufe(chromium, seite("<p>Übersicht</p>", umleitung), _fest_36, k, 1000)
+    da, _ = laufe(chromium, seite("<p>Übersicht</p>", ""), _fest_36, k, 1000)
+
+    assert weg.status == "leer"
+    assert weg.grund.startswith(GRUND_AUSGELISTET)
+    assert weg.ergebnisse == []
+    assert da.status == "gestoert"

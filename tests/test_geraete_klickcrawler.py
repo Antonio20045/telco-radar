@@ -266,6 +266,18 @@ def test_challenge_oder_sperre_heisst_abruf_gestoert(chromium, status):
     assert schleuse.adressen == [server.adresse(PRODUKTPFAD)]
 
 
+@pytest.mark.parametrize("status", [404, 410])
+def test_fehlende_hauptseite_ist_eine_seite_anderer_form(chromium, status):
+    """o2 ab 25.10.2026: ein ausgelistetes Gerät (404) hielt als Sperre jeden
+    Tageslauf an. Es ist eine Seite anderer Form; 403 bleibt Sperre (Test oben)."""
+    lauf, server, _ = _laufe(chromium, status_seite=status)
+
+    assert lauf.status == "gestoert"
+    assert lauf.stoerung == STOERUNG_SEITE
+    assert lauf.ergebnisse == []
+    assert server.abrufe == [PRODUKTPFAD]
+
+
 def test_fehlender_kanarienwert_heisst_abruf_gestoert(chromium):
     karte = _karte(kanarie__enthaelt="Anderes Handy")
 

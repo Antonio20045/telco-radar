@@ -13,7 +13,10 @@ darauf; fehlt das Element, lässt es sich nicht klicken oder kommt der Zustand n
 der Lauf gestört (kein Wert aus einem falschen Zustand). Beides nach bestandener
 Bot-Prüfung heißt ``STOERUNG_SEITE``: diese eine Seite hat eine andere Form, der
 Tageslauf liest die nächste (``klicktageslauf``). Lädt der Klick eine
-Preisantwort, gehört sie zu ihm wie zu einem Knopf.
+Preisantwort, gehört sie zu ihm wie zu einem Knopf. Leitet der Anbieter die
+Produktseite auf eine Übersicht um (``AUSGELISTET``), bietet er das Gerät nicht mehr
+an: die Seite ist ``leer``, keine andere Form (congstar 27.10.2026, drei ausgelistete
+Geräte in Folge hielten den ganzen Tageslauf an).
 """
 
 from __future__ import annotations
@@ -22,6 +25,7 @@ from typing import TYPE_CHECKING
 
 from playwright.sync_api import Error as PlaywrightFehler
 
+from .klickergebnis import LAUF_LEER
 from .klickkarte import PLATZHALTER_MODELL, Kanarie, Klickkarte, Vorbereitung
 from .klicklauf import LAUF_GESTOERT, STOERUNG_SEITE
 from .klickproben import einwilligungsknopf
@@ -35,6 +39,8 @@ if TYPE_CHECKING:
 
 PLATZHALTER = "{" + PLATZHALTER_MODELL + "}"
 _PASST_JS = "(element, css) => element.matches(css)"
+AUSGELISTET = "redirectFrom=device-details"
+GRUND_AUSGELISTET = "Gerät nicht mehr angeboten, Umleitung auf"
 
 
 def kanarientext(kanarie: Kanarie, modell: str | None) -> str:
@@ -68,6 +74,8 @@ class Bedienung:
         ort = self.seite.locator(kanarie.selektor)
         if erwartet not in self.leser.text(ort, erwartet, kanarie.attribut):
             self.wache.pruefe_tor()
+            if AUSGELISTET in self.seite.url:
+                raise Abbruch(LAUF_LEER, f"{GRUND_AUSGELISTET} {self.seite.url}")
             stelle = kanarie.selektor
             if kanarie.attribut is not None:
                 stelle = f"{stelle} [{kanarie.attribut}]"

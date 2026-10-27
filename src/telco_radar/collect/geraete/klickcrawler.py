@@ -22,7 +22,7 @@ Datenkonzept Geräteradar, Abschnitt 8. Je Produktseite und Klick-Karte (``klick
    Antwort, Text, Markierung und Echo und macht einen Screenshot. Eine Kombination ohne
    Antwort besucht er am Ende einmal neu (``klicknachholen``).
 4. Je Kombination erfasst, nicht_angeboten, nicht_erfasst oder befund (``klicklauf``);
-   keine angeboten oder Strukturbruch: Seite anderer Form (``STOERUNG_SEITE``).
+   keine angeboten, Strukturbruch oder HTTP 404/410: Seite anderer Form.
 5. Jede gelesene Kombination trägt ihren Beleg (``klickbeleg``): Screenshot, HAR der
    Preisantwort, Zeitpunkt aus ``uhr``, Fundstellen. Ohne Beleg ist ein Wert nicht
    gültig (``klicklauf.mit_beleg``), mit Beleg heißt er ``offen``, bis ``belegarchiv``
@@ -74,7 +74,7 @@ from .klicktor import (
     Tor,
     kurz,
 )
-from .klickwache import Abbruch, Wache
+from .klickwache import Abbruch, Wache, form
 from .klickweiter import GRUND_NICHT_BESUCHT, Kontexte, fehlen, je_weiter
 from .robots import RobotsWaechter
 
@@ -144,7 +144,7 @@ def klicke_durch(
     finally:
         kontexte.schliesse()
     if lauf.status != LAUF_GELESEN and tor.stoerung is not None:
-        lauf.status, lauf.grund, lauf.stoerung = LAUF_GESTOERT, tor.stoerung, None
+        lauf.status, lauf.grund, lauf.stoerung = LAUF_GESTOERT, tor.stoerung, form(tor)
     bruch = pruefe_struktur(lauf, vorlauf)
     leer = ergebnisgrund(lauf.ergebnisse)
     anlass = bruch or leer

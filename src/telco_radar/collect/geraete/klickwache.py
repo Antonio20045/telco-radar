@@ -43,6 +43,7 @@ from .klicklauf import (
     CHALLENGE_STATUS,
     LAUF_GESPERRT,
     LAUF_GESTOERT,
+    STOERUNG_SEITE,
     STOERUNG_ZEIT,
     Klicklauf,
     antworttext,
@@ -51,6 +52,16 @@ from .klicklauf import (
 from .klickmitschnitt import Mitschnitt
 from .klickspur import ohne_geheimnisse, status_verdacht
 from .klicktor import SEITEN_FRIST_MS, WARTE_TAKT_MS, Tor, kurz
+
+SEITE_FEHLT = frozenset({404, 410})
+"""Hauptseite gibt es nicht (mehr): eine Seite anderer Form, keine Sperre (o2 ab
+25.10.2026: ein ausgelistetes Galaxy S25 Ultra hielt mit 404 jeden Tageslauf an)."""
+
+
+def form(tor: Tor) -> str | None:
+    """``STOERUNG_SEITE``, wenn die Hauptseite fehlt (``SEITE_FEHLT``)."""
+    return STOERUNG_SEITE if tor.haupt_status in SEITE_FEHLT else None
+
 
 if TYPE_CHECKING:
     from playwright.sync_api import Frame, Page, Response
