@@ -1,6 +1,146 @@
 {
- "stand": "2026-10-27",
+ "stand": "2026-10-28",
  "videos": [
+  {
+   "id": "z-WZMjNsg-k",
+   "titel": "Faster contract review. Broader legal analysis. | Legora’s Alex Fortescue-Webb",
+   "kanal": "OpenAI",
+   "datum": "2026-10-28",
+   "dauer_sekunden": 247,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "z-WZMjNsg-k.jpg"
+  },
+  {
+   "id": "pryCaGv8wuo",
+   "titel": "Deepseek's New AI Has A Secret",
+   "kanal": "Two Minute Papers",
+   "datum": "2026-10-28",
+   "dauer_sekunden": 341,
+   "stufe": "Fortgeschritten",
+   "sprache": "en",
+   "bild": "pryCaGv8wuo.jpg"
+  },
+  {
+   "id": "lGSQV0lIGus",
+   "titel": "How to Use Grok – Complete Beginner's Tutorial (2026)",
+   "kanal": "Kevin Stratvert",
+   "datum": "2026-10-28",
+   "dauer_sekunden": 695,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "lGSQV0lIGus.jpg"
+  },
+  {
+   "id": "kP26OlW5PBk",
+   "titel": "Merge CEO Shensi Ding: AI fluency starts at the top",
+   "kanal": "OpenAI",
+   "datum": "2026-10-28",
+   "dauer_sekunden": 31,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "kP26OlW5PBk.jpg"
+  },
+  {
+   "id": "a4-NQn1XVpY",
+   "titel": "Kimi K3.1 Pro ist jetzt also auf Opus-Niveau?",
+   "kanal": "The Morpheus Tutorials",
+   "datum": "2026-10-28",
+   "dauer_sekunden": 3941,
+   "stufe": "Fortgeschritten",
+   "sprache": "de",
+   "bild": "a4-NQn1XVpY.jpg"
+  },
+  {
+   "id": "XqzzjL4MAdI",
+   "titel": "KI-Update kompakt: Anthropics Börsengang, Wahlhilfe, Deepmind Genie, Magnetband",
+   "kanal": "KI Update (heise)",
+   "datum": "2026-10-28",
+   "dauer_sekunden": 1015,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "XqzzjL4MAdI.jpg"
+  },
+  {
+   "id": "XHvQElsBedI",
+   "titel": "Cuck Coding: das neue Wort aus dem US-Dev-Slang #shorts",
+   "kanal": "c't 3003",
+   "datum": "2026-10-28",
+   "dauer_sekunden": 61,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "XHvQElsBedI.jpg"
+  },
+  {
+   "id": "VoSQZBguB1A",
+   "titel": "The PHP bug threatening the web. Plus, who's auditing AI?",
+   "kanal": "IBM Technology",
+   "datum": "2026-10-28",
+   "dauer_sekunden": 1222,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "VoSQZBguB1A.jpg"
+  },
+  {
+   "id": "UOfmD1fY-i8",
+   "titel": "Building the future of legal work with AI | Legora CEO Max Junestrand",
+   "kanal": "OpenAI",
+   "datum": "2026-10-28",
+   "dauer_sekunden": 222,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "UOfmD1fY-i8.jpg"
+  },
+  {
+   "id": "RHMsAm4ODDU",
+   "titel": "kimi k3.1 changes everything...",
+   "kanal": "David Ondrej",
+   "datum": "2026-10-28",
+   "dauer_sekunden": 2205,
+   "stufe": "Fortgeschritten",
+   "sprache": "en",
+   "bild": "RHMsAm4ODDU.jpg"
+  },
+  {
+   "id": "Qa0RO6Lh2Yk",
+   "titel": "KI-Update kompakt: Anthropics Börsengang, Wahlhilfe, Deepmind Genie, Magnetband",
+   "kanal": "KI Update (heise)",
+   "datum": "2026-10-28",
+   "dauer_sekunden": 1102,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "Qa0RO6Lh2Yk.jpg"
+  },
+  {
+   "id": "M2Oa42hF67E",
+   "titel": "From legal bottleneck to business partner | Legora’s Emma Kadri Bergström",
+   "kanal": "OpenAI",
+   "datum": "2026-10-28",
+   "dauer_sekunden": 242,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "M2Oa42hF67E.jpg"
+  },
+  {
+   "id": "BUI5LZPoHAs",
+   "titel": "New Conditional Access policy plans in Microsoft Entra",
+   "kanal": "Microsoft Mechanics",
+   "datum": "2026-10-28",
+   "dauer_sekunden": 533,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "BUI5LZPoHAs.jpg"
+  },
+  {
+   "id": "6ep8Vvm4Bdw",
+   "titel": "Why Merge CEO Shensi Ding stays hands-on with Codex",
+   "kanal": "OpenAI",
+   "datum": "2026-10-28",
+   "dauer_sekunden": 63,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "6ep8Vvm4Bdw.jpg"
+  },
   {
    "id": "vKMDQJpRSvA",
    "titel": "AI for Detection and Response | Cloudflare’s Mark Anderson",
@@ -16,7 +156,7 @@
    "titel": "Massiver Durchbruch: Automatisiere ALLES mit KI-Telefonagenten in 2027! MEGA-KURS",
    "kanal": "Everlast AI",
    "datum": "2026-10-27",
-   "dauer_sekunden": 7060,
+   "dauer_sekunden": 7059,
    "stufe": "Einstieg",
    "sprache": "de",
    "bild": "uQWyn-jkah4.jpg"
@@ -83,7 +223,7 @@
   },
   {
    "id": "G6AwOYT-Gbw",
-   "titel": "Grok Bot Tutorial for Beginners",
+   "titel": "How to Use Grok Bot for Beginners",
    "kanal": "Kevin Stratvert",
    "datum": "2026-10-27",
    "dauer_sekunden": 540,
@@ -160,233 +300,93 @@
    "stufe": "Einstieg",
    "sprache": "en",
    "bild": "QmE1YuNPbiM.jpg"
-  },
-  {
-   "id": "NuLoosgEavE",
-   "titel": "KI-Update kompakt: Nvidia GTC, KI-Agenten, Kimi K3.1 Pro, Perplexity Computer",
-   "kanal": "KI Update (heise)",
-   "datum": "2026-10-26",
-   "dauer_sekunden": 1230,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "NuLoosgEavE.jpg"
-  },
-  {
-   "id": "B8YFkYY20OY",
-   "titel": "The Robot Butler Will Clean Up After You",
-   "kanal": "Matt Wolfe",
-   "datum": "2026-10-26",
-   "dauer_sekunden": 80,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "B8YFkYY20OY.jpg"
-  },
-  {
-   "id": "2Ly7Q6H4bWg",
-   "titel": "This AI Lets You Edit Presentations by Drawing!",
-   "kanal": "Kevin Stratvert",
-   "datum": "2026-10-26",
-   "dauer_sekunden": 57,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "2Ly7Q6H4bWg.jpg"
-  },
-  {
-   "id": "e_4YEmG9KyU",
-   "titel": "Gleiches Modell, fast 4x so lange",
-   "kanal": "The Morpheus Tutorials",
-   "datum": "2026-10-25",
-   "dauer_sekunden": 3104,
-   "stufe": "Fortgeschritten",
-   "sprache": "de",
-   "bild": "e_4YEmG9KyU.jpg"
-  },
-  {
-   "id": "V_uq3v6xK-4",
-   "titel": "The Sphere Intersection Puzzle",
-   "kanal": "3Blue1Brown",
-   "datum": "2026-10-25",
-   "dauer_sekunden": 46,
-   "stufe": "Fortgeschritten",
-   "sprache": "en",
-   "bild": "V_uq3v6xK-4.jpg"
-  },
-  {
-   "id": "UgEA5ictENM",
-   "titel": "The One-Line Slowdown: Why AI Models Get Slower",
-   "kanal": "IBM Technology",
-   "datum": "2026-10-25",
-   "dauer_sekunden": 259,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "UgEA5ictENM.jpg"
-  },
-  {
-   "id": "ByySHWCtDRg",
-   "titel": "Es ist übel: Der “Schwarze Oktober” hat begonnen! DAS muss jetzt jeder wissen | KI-NEWS",
-   "kanal": "Everlast AI",
-   "datum": "2026-10-25",
-   "dauer_sekunden": 1790,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "ByySHWCtDRg.jpg"
-  },
-  {
-   "id": "u3WV4nf8Jdo",
-   "titel": "Open-Source AI Models Caught Up! (Kimi K3.1 Pro)",
-   "kanal": "Matt Wolfe",
-   "datum": "2026-10-24",
-   "dauer_sekunden": 81,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "u3WV4nf8Jdo.jpg"
-  },
-  {
-   "id": "FiyUagHO37Y",
-   "titel": "Old Phones Are Becoming Robots?!?",
-   "kanal": "Matt Wolfe",
-   "datum": "2026-10-24",
-   "dauer_sekunden": 64,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "FiyUagHO37Y.jpg"
-  },
-  {
-   "id": "zljqMj_pRjY",
-   "titel": "Meine E-Books überall (mit lokaler Cloud)",
-   "kanal": "c't 3003",
-   "datum": "2026-10-23",
-   "dauer_sekunden": 1089,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "zljqMj_pRjY.jpg"
-  },
-  {
-   "id": "wuv61uEq7uY",
-   "titel": "Everything Is Getting Hacked (it’s over)",
-   "kanal": "David Ondrej",
-   "datum": "2026-10-23",
-   "dauer_sekunden": 1717,
-   "stufe": "Fortgeschritten",
-   "sprache": "en",
-   "bild": "wuv61uEq7uY.jpg"
-  },
-  {
-   "id": "wETSpF4ef6E",
-   "titel": "Hermes AI Agent Tutorial for Beginners",
-   "kanal": "Kevin Stratvert",
-   "datum": "2026-10-23",
-   "dauer_sekunden": 614,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "wETSpF4ef6E.jpg"
-  },
-  {
-   "id": "obuWu5nkodk",
-   "titel": "KI-Update Deep-Dive: Warum ControlAI ein Verbot von Superintelligenz fordert",
-   "kanal": "KI Update (heise)",
-   "datum": "2026-10-23",
-   "dauer_sekunden": 2928,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "obuWu5nkodk.jpg"
-  },
-  {
-   "id": "m6MlxaFMmPI",
-   "titel": "How Shield uses OpenAI’s Astra to support IT teams",
-   "kanal": "OpenAI",
-   "datum": "2026-10-23",
-   "dauer_sekunden": 72,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "m6MlxaFMmPI.jpg"
   }
  ],
  "kanaele": {
   "c't 3003": {
    "error": null,
-   "versucht": "2026-10-27",
-   "abgerufen": "2026-10-27"
+   "versucht": "2026-10-28",
+   "abgerufen": "2026-10-28"
   },
   "KI Update (heise)": {
    "error": null,
-   "versucht": "2026-10-27",
-   "abgerufen": "2026-10-27"
+   "versucht": "2026-10-28",
+   "abgerufen": "2026-10-28"
   },
   "Everlast AI": {
    "error": null,
-   "versucht": "2026-10-27",
-   "abgerufen": "2026-10-27"
+   "versucht": "2026-10-28",
+   "abgerufen": "2026-10-28"
   },
   "The Morpheus Tutorials": {
    "error": null,
-   "versucht": "2026-10-27",
-   "abgerufen": "2026-10-27"
+   "versucht": "2026-10-28",
+   "abgerufen": "2026-10-28"
   },
   "Kevin Stratvert": {
    "error": null,
-   "versucht": "2026-10-27",
-   "abgerufen": "2026-10-27"
+   "versucht": "2026-10-28",
+   "abgerufen": "2026-10-28"
   },
   "Microsoft Mechanics": {
    "error": null,
-   "versucht": "2026-10-27",
-   "abgerufen": "2026-10-27"
+   "versucht": "2026-10-28",
+   "abgerufen": "2026-10-28"
   },
   "Leila Gharani": {
    "error": null,
-   "versucht": "2026-10-27",
-   "abgerufen": "2026-10-27"
+   "versucht": "2026-10-28",
+   "abgerufen": "2026-10-28"
   },
   "Jeff Su": {
    "error": null,
-   "versucht": "2026-10-27",
-   "abgerufen": "2026-10-27"
+   "versucht": "2026-10-28",
+   "abgerufen": "2026-10-28"
   },
   "Matt Wolfe": {
    "error": null,
-   "versucht": "2026-10-27",
-   "abgerufen": "2026-10-27"
+   "versucht": "2026-10-28",
+   "abgerufen": "2026-10-28"
   },
   "IBM Technology": {
    "error": null,
-   "versucht": "2026-10-27",
-   "abgerufen": "2026-10-27"
+   "versucht": "2026-10-28",
+   "abgerufen": "2026-10-28"
   },
   "OpenAI": {
    "error": null,
-   "versucht": "2026-10-27",
-   "abgerufen": "2026-10-27"
+   "versucht": "2026-10-28",
+   "abgerufen": "2026-10-28"
   },
   "Anthropic": {
    "error": null,
-   "versucht": "2026-10-27",
-   "abgerufen": "2026-10-27"
+   "versucht": "2026-10-28",
+   "abgerufen": "2026-10-28"
   },
   "Google DeepMind": {
    "error": null,
-   "versucht": "2026-10-27",
-   "abgerufen": "2026-10-27"
+   "versucht": "2026-10-28",
+   "abgerufen": "2026-10-28"
   },
   "AI Explained": {
    "error": null,
-   "versucht": "2026-10-27",
-   "abgerufen": "2026-10-27"
+   "versucht": "2026-10-28",
+   "abgerufen": "2026-10-28"
   },
   "Two Minute Papers": {
    "error": null,
-   "versucht": "2026-10-27",
-   "abgerufen": "2026-10-27"
+   "versucht": "2026-10-28",
+   "abgerufen": "2026-10-28"
   },
   "3Blue1Brown": {
    "error": null,
-   "versucht": "2026-10-27",
-   "abgerufen": "2026-10-27"
+   "versucht": "2026-10-28",
+   "abgerufen": "2026-10-28"
   },
   "David Ondrej": {
    "error": null,
-   "versucht": "2026-10-27",
-   "abgerufen": "2026-10-27"
+   "versucht": "2026-10-28",
+   "abgerufen": "2026-10-28"
   }
  },
  "error": null

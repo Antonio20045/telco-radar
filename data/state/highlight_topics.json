@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-27",
+ "updated": "2026-10-28",
  "topics": [
   {
    "slug": "apples-iphone-event-am-9-september",
@@ -602,7 +602,7 @@
    ],
    "first_seen": "2026-10-16",
    "last_active": "2026-10-16",
-   "runs_ohne_zuwachs": 2,
+   "runs_ohne_zuwachs": 3,
    "status": "aktiv",
    "items": [
     {
@@ -699,8 +699,8 @@
     "Direkt-zum-Gerät"
    ],
    "first_seen": "2026-10-26",
-   "last_active": "2026-10-26",
-   "runs_ohne_zuwachs": 1,
+   "last_active": "2026-10-28",
+   "runs_ohne_zuwachs": 0,
    "status": "aktiv",
    "items": [
     {
@@ -724,6 +724,17 @@
      "date": "2026-10-20",
      "week": "2026-10-26",
      "relevance": 5
+    },
+    {
+     "url": "https://www.telecom-handel.de/themen/business-solutions/netzbetreiber-pruefen-gemeinsames-gebot-fuer-satellitenfrequenzen",
+     "title": "Netzbetreiber prüfen gemeinsames Gebot für Satellitenfrequenzen",
+     "headline": "Vier Netzbetreiber prüfen gemeinsamen Satellitenfrequenz-Kauf",
+     "summary": "Deutsche Telekom, Vodafone, Telefónica und Orange prüfen gemeinsam, ob sie auf künftige Frequenzen für mobile Satellitendienste in Europa bieten wollen. Ein eigenes Satellitennetz ist durch die beteiligten Unternehmen jedoch nicht geplant.",
+     "operator": "Deutsche Telekom, Vodafone, Telefónica und Orange",
+     "source": "Telecom Handel",
+     "date": "2026-10-28",
+     "week": "2026-10-28",
+     "relevance": 4
     },
     {
      "url": "https://telesintese.com.br/operadoras-europeias-estudam-oferta-conjunta-por-espectro-de-satelite/",
@@ -777,6 +788,17 @@
      "image": "3fb9f4ce75bc3191-800.jpg",
      "image_w": 800,
      "image_h": 533
+    },
+    {
+     "url": "https://www.xatakamovil.com/movistar/movistar-avisa-que-debes-chequere-router-affected-vulnerabilidad-chip-wifi-broadcom",
+     "title": "Movistar avisa sobre lo que debes hacer si tu router está afectado por la vulnerabilidad del chip WiFi de Broadcom",
+     "headline": "Movistar warnt vor Sicherheitslücke in Broadcom-WLAN-Chips",
+     "summary": "Movistar, Orange und weitere Anbieter haben eine Sicherheitslücke in WiFi-Chips des Herstellers Broadcom bestätigt, die bestimmte ältere Router betrifft. Movistar betonte, dass die notwendigen Schutzmaßnahmen präventiv und automatisch durchgeführt werden.",
+     "operator": "Telefónica",
+     "source": "",
+     "date": "",
+     "week": "2026-10-28",
+     "relevance": 3
     }
    ]
   }
