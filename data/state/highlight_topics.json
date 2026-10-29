@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-28",
+ "updated": "2026-10-29",
  "topics": [
   {
    "slug": "apples-iphone-event-am-9-september",
@@ -602,8 +602,8 @@
    ],
    "first_seen": "2026-10-16",
    "last_active": "2026-10-16",
-   "runs_ohne_zuwachs": 3,
-   "status": "aktiv",
+   "runs_ohne_zuwachs": 4,
+   "status": "beendet",
    "items": [
     {
      "url": "https://www.adslzone.net/noticias/operadores/resultados-operadores-segundo-trimestre-2026/",
@@ -684,7 +684,8 @@
      "relevance": 3
     }
    ],
-   "event_datum": "2026-10-17"
+   "event_datum": "2026-10-17",
+   "ended": "2026-10-29"
   },
   {
    "slug": "europaeische-netzbetreiber-planen-gemeinsames-satellitenspektrum",
@@ -700,7 +701,7 @@
    ],
    "first_seen": "2026-10-26",
    "last_active": "2026-10-28",
-   "runs_ohne_zuwachs": 0,
+   "runs_ohne_zuwachs": 1,
    "status": "aktiv",
    "items": [
     {

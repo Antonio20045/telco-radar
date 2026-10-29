@@ -116,13 +116,13 @@
   "aa": {
    "url": "https://artificialanalysis.ai/leaderboards/models",
    "error": null,
-   "versucht": "2026-10-28",
-   "abgerufen": "2026-10-28"
+   "versucht": "2026-10-29",
+   "abgerufen": "2026-10-29"
   },
   "arena": {
    "url": "https://arena.ai/leaderboard/text",
    "error": "HTTPStatusError: 403 with UA 'TelcoRadar/1.0 (+https:/...'",
-   "versucht": "2026-10-28",
+   "versucht": "2026-10-29",
    "abgerufen": "2026-10-12"
   }
  }
