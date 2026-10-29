@@ -1,7 +1,7 @@
 {
  "anbieter": "telekom-4",
- "datum": "2026-10-28",
- "dauer_sekunden": 650.8,
+ "datum": "2026-10-29",
+ "dauer_sekunden": 657.2,
  "format": 1,
  "frischegrenze_tage": 3,
  "grund": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-a56-5g/awesome-lightgray-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones: Kanarienwert fehlt: button[aria-label^=\"View energy label for\"] [aria-label] ohne „Galaxy A56“",
@@ -20,17 +20,17 @@
    "ladung": {
     "abstand_s": 10.0,
     "anfragen": 107,
-    "beendet": 104,
+    "beendet": 106,
     "dokument": "complete",
     "geladen": true,
     "offen": {
      "pix.telekom.de": 2,
-     "www.telekom.de": 1,
+     "tags-eu.tiqcdn.com": 1,
      "www2.telekom.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 158.2,
-    "takte_ms": 2850,
+    "sekunden": 160.9,
+    "takte_ms": 3000,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -56,18 +56,17 @@
    "kombinationen": [],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 85,
-    "beendet": 82,
+    "anfragen": 83,
+    "beendet": 81,
     "dokument": "complete",
     "geladen": true,
     "offen": {
      "tags-eu.tiqcdn.com": 1,
-     "www.telekom.de": 2,
-     "www2.telekom.de": 1
+     "www.telekom.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 153.7,
-    "takte_ms": 1650,
+    "sekunden": 155.0,
+    "takte_ms": 2500,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -98,13 +97,13 @@
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "tags-eu.tiqcdn.com": 1,
+     "pix.telekom.de": 2,
      "www.telekom.de": 1,
      "www2.telekom.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 155.1,
-    "takte_ms": 2100,
+    "sekunden": 156.9,
+    "takte_ms": 3600,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -426,5 +425,5 @@
  ],
  "uebersichten": [],
  "vertragsform": "tarif_plus_ratenkauf",
- "zeitbudget_sekunden": 10270
+ "zeitbudget_sekunden": 10261
 }
