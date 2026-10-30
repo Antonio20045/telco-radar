@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-29",
+ "updated": "2026-10-30",
  "topics": [
   {
    "slug": "apples-iphone-event-am-9-september",
@@ -701,7 +701,7 @@
    ],
    "first_seen": "2026-10-26",
    "last_active": "2026-10-28",
-   "runs_ohne_zuwachs": 1,
+   "runs_ohne_zuwachs": 2,
    "status": "aktiv",
    "items": [
     {
@@ -799,6 +799,98 @@
      "source": "",
      "date": "",
      "week": "2026-10-28",
+     "relevance": 3
+    }
+   ]
+  },
+  {
+   "slug": "indien-plant-regeln-fuer-kuenstliche-intelligenz",
+   "title": "Indien plant Regeln für künstliche Intelligenz",
+   "description": "Die indische Telekommunikationsbehörde hat einen Entwurf für Richtlinien vorgelegt, um den Einsatz von künstlicher Intelligenz in Netzen und Diensten sicherer und verbindlicher zu regeln.",
+   "keywords": [
+    "TRAI",
+    "Indien",
+    "KI-Richtlinien",
+    "Telekommunikation"
+   ],
+   "first_seen": "2026-10-30",
+   "last_active": "2026-10-30",
+   "runs_ohne_zuwachs": 0,
+   "status": "aktiv",
+   "items": [
+    {
+     "url": "https://www.mobiletime.com.br/noticias/26/10/2026/ia-renov-trade-in-avalia/",
+     "title": "IA da Renov reduz tempo de avaliação de celulares para 3 minutos",
+     "headline": "KI-System verkürzt Smartphone-Bewertung im Handel auf drei Minuten",
+     "summary": "Das Unternehmen Renov hat eine auf künstlicher Intelligenz basierende Lösung für Inzahlungnahmen vorgestellt, die die Zustandsprüfung von gebrauchten Smartphones von 15 auf drei Minuten verkürzt. Die Technologie analysiert vier Fotos per Algorithmus und ist in über 2.500 Verkaufsstellen im Einsatz.",
+     "operator": "Renov",
+     "source": "Mobile Time (Brasilien)",
+     "date": "2026-10-26",
+     "week": "2026-10-27",
+     "relevance": 4,
+     "image": "d3e807597d67c027-1280.jpg",
+     "image_w": 567,
+     "image_h": 319
+    },
+    {
+     "url": "https://www.mobileworldlive.com/operators/vmo2-lauds-ai-impact-on-ran/",
+     "title": "VMO2 lauds AI impact on RAN",
+     "headline": "Virgin Media O2 steigert Netzressourcen durch KI-Test",
+     "summary": "Virgin Media O2 hat in einem Live-Test mit Nokia an einem stark frequentierten Bahnhof in London durch den Einsatz von künstlicher Intelligenz im Funknetz eine etwa 20-prozentige Verbesserung der spektralen Effizienz erzielt.",
+     "operator": "Virgin Media O2",
+     "source": "Mobile World Live",
+     "date": "2026-10-26",
+     "week": "2026-10-26",
+     "relevance": 4
+    },
+    {
+     "url": "https://www.thefastmode.com/technology-solutions/51163-deutsche-telekom-and-nokia-report-10-15-ai-ran-throughput-gains",
+     "title": "Deutsche Telekom and Nokia Report 10–15% AI-RAN Throughput Gains",
+     "headline": "Deutsche Telekom und Nokia melden 10-15 Prozent AI-RAN-Zuwachs",
+     "summary": "Deutsche Telekom, Nokia und Nvidia haben in Labormessungen zur uplink-Kanalschätzung Durchsatzgewinne von 10 bis 15 Prozent durch den Einsatz von Künstlicher Intelligenz in der Funkzugangsznetzinfrastruktur nachgewiesen.",
+     "operator": "Deutsche Telekom",
+     "source": "The Fast Mode",
+     "date": "2026-10-22",
+     "week": "2026-10-26",
+     "relevance": 4,
+     "image": "895d1b3ccb94a7d1-800.jpg",
+     "image_w": 752,
+     "image_h": 408
+    },
+    {
+     "url": "https://www.fierce-network.com/cloud/servicenow-cuts-network-incidents-90-hpe-mist-ai",
+     "title": "ServiceNow cuts network incidents 90% with HPE Mist AI",
+     "headline": "KI-Netzwerkmanagement senkt Vorfälle bei ServiceNow um 90 Prozent",
+     "summary": "ServiceNow hat durch den Einsatz von HPE Juniper Mist Künstlicher Intelligenz das Volumen von Netzwerkvorfällen um 90 Prozent reduziert und strebt bis 2028 eine vollständige Automatisierung an.",
+     "operator": "ServiceNow / HPE",
+     "source": "Fierce Network",
+     "date": "2026-10-21",
+     "week": "2026-10-26",
+     "relevance": 4,
+     "image": "9e697b24efc42bb8-1280.jpg",
+     "image_w": 1280,
+     "image_h": 731
+    },
+    {
+     "url": "https://www.mobileworldlive.com/asia-pacific/india-issues-draft-guidelines-for-ai-use-in-telecoms/",
+     "title": "India issues draft guidelines for AI use in telecoms",
+     "headline": "Indien legt Entwurf fuer KI-Regeln in Telekommunikation vor",
+     "summary": "Die indische Regulierungsbehörde TRAI hat einen Konsultationsprozess zu verbindlichen Richtlinien für den verantwortungsvollen Einsatz von Künstlicher Intelligenz in der Telekommunikation gestartet. Betreiber müssen bis zum 27. November Feedback einreichen und unter anderem Risikobewertungen sowie Vorfallmeldungen implementieren.",
+     "operator": "TRAI",
+     "source": "Mobile World Live",
+     "date": "2026-10-30",
+     "week": "2026-10-30",
+     "relevance": 3
+    },
+    {
+     "url": "http://www.trai.gov.in/draft-guidelines-responsible-use-artificial-intelligence-ai-telecommunication-networks-and",
+     "title": "Draft Guidelines on Responsible Use of Artificial Intelligence (AI) in Telecommunication Networks and Provision of Telecommunication Services",
+     "headline": "Indische Regulierungsbehörde veröffentlicht Entwurf für KI-Richtlinien",
+     "summary": "Die Regulierungsbehörde Trai hat am 30. Oktober 2026 Entwurfsrichtlinien zum verantwortungsvollen Einsatz von künstlicher Intelligenz in Telekommunikationsnetzen und bei Diensten veröffentlicht, für die Stellungnahmen bis zum 27. November 2026 möglich sind.",
+     "operator": "TRAI (Indien)",
+     "source": "TRAI (Indien)",
+     "date": "2026-10-30",
+     "week": "2026-10-30",
      "relevance": 3
     }
    ]
