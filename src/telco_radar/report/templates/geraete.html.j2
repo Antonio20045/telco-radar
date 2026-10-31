@@ -412,6 +412,11 @@
          andere Zustand kommt als fertiges Markup aus dem Fragment
          `data/geraete-zeitreihe.html` (app.js montiert nur). #}
   {% if zr.start_block %}
+  <div class="gr-zr-zeitwahl" id="gr-zr-zeitwahl" role="group" aria-label="Zeitraum des Preisverlaufs">
+    {% for wert, titel in [('7t','7 Tage'), ('30t','30 Tage'), ('90t','90 Tage'), ('1j','1 Jahr'), ('alle','Alles')] %}
+    <button type="button" data-zeitfenster="{{ wert }}" aria-pressed="{{ 'true' if wert == '30t' else 'false' }}">{{ titel }}</button>
+    {% endfor %}
+  </div>
   <div class="gr-zr-gruppe" id="gr-zr-gruppe">{{ paarblock(zr.start_block) }}</div>
   {# P1/A2 (17.09.2026): EIN Klick-Panel unter dem Graph. app.js setzt hier
      bei Klick auf einen Kurvenpunkt (unsichtbare Fläche .gr-zr-hit) oder die
