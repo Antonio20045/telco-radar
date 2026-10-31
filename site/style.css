@@ -6485,3 +6485,14 @@ a.ki-k1-pille:hover{border-color:var(--ink)}
   .bericht .szene-titel,.bericht .szene--blatt .szene-titel--blatt{font-size:40px;margin-bottom:16px}
 }
 @media (max-width:900px){.bericht .szene .kurzpfad-satz{font-size:20px}}
+
+/* Geräte: kompakte, eigenständige Wahl des Messzeitraums. */
+.gr-zr-zeitwahl{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 10px}
+.gr-zr-zeitwahl button{font:600 12px var(--sans);border:1px solid var(--rule);
+  border-radius:var(--radius-klein);color:var(--ink);background:transparent;
+  padding:7px 12px;cursor:pointer}
+.gr-zr-zeitwahl button[aria-pressed="true"]{color:var(--paper);
+  background:var(--ink);border-color:var(--ink)}
+.gr-zr-zeitwahl button:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+@media(max-width:600px){.gr-zr-zeitwahl{gap:4px}
+.gr-zr-zeitwahl button{flex:1 1 0;padding:8px 4px;font-size:11px}}

@@ -2296,6 +2296,82 @@ var TelcoFrage = (function () {
     });
   }
 
+  /* Zeitfenster: nie TCO-Betraege im Browser berechnen. Wir tauschen
+     ausschliesslich die bereits serverseitig gezeichnete Grafik. */
+  var zrZeitfenster = '30t';
+  var zfCache = {};
+  var zfFolge = 0;
+  function zfLager(modell) {
+    var url = 'data/zf/' + encodeURIComponent(modell) + '.html';
+    if (!zfCache[url]) {
+      zfCache[url] = fetch(url).then(function (r) {
+        if (!r.ok) throw new Error(r.status);
+        return r.text();
+      }).then(function (txt) {
+        var doc = new DOMParser().parseFromString(txt, 'text/html');
+        var lager = {};
+        Array.prototype.forEach.call(doc.querySelectorAll('template.gr-zf-lager'),
+          function (el) {
+            lager[el.getAttribute('data-band') + '::' +
+                  el.getAttribute('data-laufzeit') + '::' +
+                  el.getAttribute('data-zeitfenster')] = el;
+          });
+        return lager;
+      });
+      zfCache[url].catch(function () { delete zfCache[url]; });
+    }
+    return zfCache[url];
+  }
+  function markiereZeitfenster() {
+    Array.prototype.forEach.call(
+      document.querySelectorAll('#gr-zr-zeitwahl button[data-zeitfenster]'),
+      function (b) {
+        b.setAttribute('aria-pressed',
+          b.getAttribute('data-zeitfenster') === zrZeitfenster ? 'true' : 'false');
+      });
+  }
+  function setzeZeitfenster() {
+    var folge = ++zfFolge;
+    var ziel = zrGruppe.querySelector('.gr-zr-fenster-inhalt');
+    if (!ziel || zustand.laufzeit === 'alle') return;
+    var graf = zrGruppe.querySelector('.gr-zr-graph');
+    var standard = graf && graf.querySelector('.gr-zr-fenster-standard');
+    if (zrZeitfenster === '30t') {
+      if (standard) {
+        ziel.innerHTML = standard.innerHTML;
+        zrEingaengeRuesten();
+      }
+      return;
+    }
+    var modell = zustand.modell;
+    var band = zustand.band;
+    var laufzeit = zustand.laufzeit;
+    zfLager(modell).then(function (lager) {
+      if (folge !== zfFolge || zustand.modell !== modell ||
+          zustand.band !== band || zustand.laufzeit !== laufzeit) return;
+      var slot = band + '::' + laufzeit + '::' + zrZeitfenster;
+      var tpl = lager[slot];
+      if (tpl && tpl.getAttribute('data-alias')) {
+        tpl = lager[band + '::' + laufzeit + '::' +
+                    tpl.getAttribute('data-alias')];
+      }
+      if (!tpl) throw new Error('Zeitfenster fehlt');
+      ziel.replaceChildren(tpl.content.cloneNode(true));
+      zrEingaengeRuesten();
+    }).catch(function () {
+      if (folge !== zfFolge) return;
+      ziel.textContent = 'Der Preisverlauf für diesen Zeitraum konnte nicht geladen werden.';
+    });
+  }
+  Array.prototype.forEach.call(
+    document.querySelectorAll('#gr-zr-zeitwahl button[data-zeitfenster]'),
+    function (b) {
+      b.addEventListener('click', function () {
+        zrZeitfenster = b.getAttribute('data-zeitfenster');
+        markiereZeitfenster();
+        setzeZeitfenster();
+      });
+    });
   var zrFolge = 0;
   /* P1-Fix (Sicht-A1, 17.09.2026): der Karten-Preis oeffnet den Rechenweg
      DESSES Anbieters. Fuer eine NICHT aktive Karte muss erst das Paar
