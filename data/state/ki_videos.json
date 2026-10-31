@@ -1,6 +1,26 @@
 {
- "stand": "2026-10-30",
+ "stand": "2026-10-31",
  "videos": [
+  {
+   "id": "mfgSBLGePuA",
+   "titel": "When Security Patches Leak",
+   "kanal": "IBM Technology",
+   "datum": "2026-10-31",
+   "dauer_sekunden": 58,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "mfgSBLGePuA.jpg"
+  },
+  {
+   "id": "8Hr0ymVjb2A",
+   "titel": "Wie aus einem FALSE eine 9.8 RCE in Node wird",
+   "kanal": "The Morpheus Tutorials",
+   "datum": "2026-10-31",
+   "dauer_sekunden": 482,
+   "stufe": "Fortgeschritten",
+   "sprache": "de",
+   "bild": "8Hr0ymVjb2A.jpg"
+  },
   {
    "id": "uht3zfBEym4",
    "titel": "Apples Falt-iPhone: Ein Sandkorn zu viel?",
@@ -22,6 +42,26 @@
    "bild": "suJXDPEfe3U.jpg"
   },
   {
+   "id": "sJOqt3wIyvg",
+   "titel": "Conditional Access for AI Agents in Microsoft Entra",
+   "kanal": "Microsoft Mechanics",
+   "datum": "2026-10-30",
+   "dauer_sekunden": 33,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "sJOqt3wIyvg.jpg"
+  },
+  {
+   "id": "o4D1J1YWjhg",
+   "titel": "There are many futures. Which do you want to build?",
+   "kanal": "OpenAI",
+   "datum": "2026-10-30",
+   "dauer_sekunden": 77,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "o4D1J1YWjhg.jpg"
+  },
+  {
    "id": "hOVaubDnu5A",
    "titel": "AI Exposes Legacy Code",
    "kanal": "IBM Technology",
@@ -40,6 +80,16 @@
    "stufe": "Einstieg",
    "sprache": "en",
    "bild": "fv9_CnoF-1M.jpg"
+  },
+  {
+   "id": "eDiQNFa-zYg",
+   "titel": "6 AI Updates Worth Knowing & A Bubble-Bursting IPO",
+   "kanal": "Matt Wolfe",
+   "datum": "2026-10-30",
+   "dauer_sekunden": 1761,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "eDiQNFa-zYg.jpg"
   },
   {
    "id": "_MjIPI1MgTQ",
@@ -92,6 +142,26 @@
    "bild": "K8NgeOuZmWU.jpg"
   },
   {
+   "id": "F8rc-ULd4_4",
+   "titel": "My Agentic Engineering Workflow (after 15,700 sessions)",
+   "kanal": "David Ondrej",
+   "datum": "2026-10-30",
+   "dauer_sekunden": 5141,
+   "stufe": "Fortgeschritten",
+   "sprache": "en",
+   "bild": "F8rc-ULd4_4.jpg"
+  },
+  {
+   "id": "Df_FbS8PxTE",
+   "titel": "Video Editor with Customizable Templates: Build a Full Video Fast",
+   "kanal": "Kevin Stratvert",
+   "datum": "2026-10-30",
+   "dauer_sekunden": 1708,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "Df_FbS8PxTE.jpg"
+  },
+  {
    "id": "CWdTBLsbaQs",
    "titel": "OpenAI Claims It Just Did The Impossible",
    "kanal": "Two Minute Papers",
@@ -122,8 +192,18 @@
    "bild": "7TtGMileCus.jpg"
   },
   {
+   "id": "4sGplZdBy6A",
+   "titel": "When a humanoid and a drone become besties",
+   "kanal": "Matt Wolfe",
+   "datum": "2026-10-30",
+   "dauer_sekunden": 58,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "4sGplZdBy6A.jpg"
+  },
+  {
    "id": "3zqh0gpyZDI",
-   "titel": "Wir haben ein 3003-Video mit ArtCraft geschnitten!",
+   "titel": "ArtCraft hat mich in eine Krise gestürzt",
    "kanal": "c't 3003",
    "datum": "2026-10-30",
    "dauer_sekunden": 1286,
@@ -220,173 +300,93 @@
    "stufe": "Einstieg",
    "sprache": "en",
    "bild": "GNYHDltnwZQ.jpg"
-  },
-  {
-   "id": "D294CcGtUKU",
-   "titel": "Was können diese Exoten-Agents?",
-   "kanal": "The Morpheus Tutorials",
-   "datum": "2026-10-29",
-   "dauer_sekunden": 3287,
-   "stufe": "Fortgeschritten",
-   "sprache": "de",
-   "bild": "D294CcGtUKU.jpg"
-  },
-  {
-   "id": "AEZsSnBk320",
-   "titel": "Was Lieferandos KI \"angerichtet\" hat | c't 4004 #45",
-   "kanal": "c't 3003",
-   "datum": "2026-10-29",
-   "dauer_sekunden": 6666,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "AEZsSnBk320.jpg"
-  },
-  {
-   "id": "6hQY3Sx-BDM",
-   "titel": "Inherited a Huge Excel File? Start With These 8 Tools",
-   "kanal": "Leila Gharani",
-   "datum": "2026-10-29",
-   "dauer_sekunden": 683,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "6hQY3Sx-BDM.jpg"
-  },
-  {
-   "id": "z-WZMjNsg-k",
-   "titel": "Faster contract review. Broader legal analysis. | Legora’s Alex Fortescue-Webb",
-   "kanal": "OpenAI",
-   "datum": "2026-10-28",
-   "dauer_sekunden": 247,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "z-WZMjNsg-k.jpg"
-  },
-  {
-   "id": "ujmyzWSj8IU",
-   "titel": "API credits, now in ChatGPT Pro and Business plans",
-   "kanal": "OpenAI",
-   "datum": "2026-10-28",
-   "dauer_sekunden": 146,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "ujmyzWSj8IU.jpg"
-  },
-  {
-   "id": "pryCaGv8wuo",
-   "titel": "DeepSeek's New AI Is An Absolute Monster",
-   "kanal": "Two Minute Papers",
-   "datum": "2026-10-28",
-   "dauer_sekunden": 341,
-   "stufe": "Fortgeschritten",
-   "sprache": "en",
-   "bild": "pryCaGv8wuo.jpg"
-  },
-  {
-   "id": "lGSQV0lIGus",
-   "titel": "How to Use Grok – Complete Beginner's Tutorial (2026)",
-   "kanal": "Kevin Stratvert",
-   "datum": "2026-10-28",
-   "dauer_sekunden": 695,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "lGSQV0lIGus.jpg"
-  },
-  {
-   "id": "kP26OlW5PBk",
-   "titel": "Merge CEO Shensi Ding: AI fluency starts at the top",
-   "kanal": "OpenAI",
-   "datum": "2026-10-28",
-   "dauer_sekunden": 31,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "kP26OlW5PBk.jpg"
   }
  ],
  "kanaele": {
   "c't 3003": {
    "error": null,
-   "versucht": "2026-10-30",
-   "abgerufen": "2026-10-30"
+   "versucht": "2026-10-31",
+   "abgerufen": "2026-10-31"
   },
   "KI Update (heise)": {
    "error": null,
-   "versucht": "2026-10-30",
-   "abgerufen": "2026-10-30"
+   "versucht": "2026-10-31",
+   "abgerufen": "2026-10-31"
   },
   "Everlast AI": {
    "error": null,
-   "versucht": "2026-10-30",
-   "abgerufen": "2026-10-30"
+   "versucht": "2026-10-31",
+   "abgerufen": "2026-10-31"
   },
   "The Morpheus Tutorials": {
    "error": null,
-   "versucht": "2026-10-30",
-   "abgerufen": "2026-10-30"
+   "versucht": "2026-10-31",
+   "abgerufen": "2026-10-31"
   },
   "Kevin Stratvert": {
    "error": null,
-   "versucht": "2026-10-30",
-   "abgerufen": "2026-10-30"
+   "versucht": "2026-10-31",
+   "abgerufen": "2026-10-31"
   },
   "Microsoft Mechanics": {
    "error": null,
-   "versucht": "2026-10-30",
-   "abgerufen": "2026-10-30"
+   "versucht": "2026-10-31",
+   "abgerufen": "2026-10-31"
   },
   "Leila Gharani": {
    "error": null,
-   "versucht": "2026-10-30",
-   "abgerufen": "2026-10-30"
+   "versucht": "2026-10-31",
+   "abgerufen": "2026-10-31"
   },
   "Jeff Su": {
    "error": null,
-   "versucht": "2026-10-30",
-   "abgerufen": "2026-10-30"
+   "versucht": "2026-10-31",
+   "abgerufen": "2026-10-31"
   },
   "Matt Wolfe": {
    "error": null,
-   "versucht": "2026-10-30",
-   "abgerufen": "2026-10-30"
+   "versucht": "2026-10-31",
+   "abgerufen": "2026-10-31"
   },
   "IBM Technology": {
    "error": null,
-   "versucht": "2026-10-30",
-   "abgerufen": "2026-10-30"
+   "versucht": "2026-10-31",
+   "abgerufen": "2026-10-31"
   },
   "OpenAI": {
    "error": null,
-   "versucht": "2026-10-30",
-   "abgerufen": "2026-10-30"
+   "versucht": "2026-10-31",
+   "abgerufen": "2026-10-31"
   },
   "Anthropic": {
    "error": null,
-   "versucht": "2026-10-30",
-   "abgerufen": "2026-10-30"
+   "versucht": "2026-10-31",
+   "abgerufen": "2026-10-31"
   },
   "Google DeepMind": {
    "error": null,
-   "versucht": "2026-10-30",
-   "abgerufen": "2026-10-30"
+   "versucht": "2026-10-31",
+   "abgerufen": "2026-10-31"
   },
   "AI Explained": {
    "error": null,
-   "versucht": "2026-10-30",
-   "abgerufen": "2026-10-30"
+   "versucht": "2026-10-31",
+   "abgerufen": "2026-10-31"
   },
   "Two Minute Papers": {
    "error": null,
-   "versucht": "2026-10-30",
-   "abgerufen": "2026-10-30"
+   "versucht": "2026-10-31",
+   "abgerufen": "2026-10-31"
   },
   "3Blue1Brown": {
    "error": null,
-   "versucht": "2026-10-30",
-   "abgerufen": "2026-10-30"
+   "versucht": "2026-10-31",
+   "abgerufen": "2026-10-31"
   },
   "David Ondrej": {
    "error": null,
-   "versucht": "2026-10-30",
-   "abgerufen": "2026-10-30"
+   "versucht": "2026-10-31",
+   "abgerufen": "2026-10-31"
   }
  },
  "error": null
