@@ -1,7 +1,7 @@
 {
  "anbieter": "o2-tarife-2",
- "datum": "2026-10-30",
- "dauer_sekunden": 213.4,
+ "datum": "2026-10-31",
+ "dauer_sekunden": 176.3,
  "format": 1,
  "frischegrenze_tage": 3,
  "grund": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-256gb-burgunder-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus: Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
@@ -261,8 +261,8 @@
      "www.o2online.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 18.4,
-    "takte_ms": 8400,
+    "sekunden": 14.3,
+    "takte_ms": 5750,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -522,15 +522,13 @@
    "ladung": {
     "abstand_s": 2.0,
     "anfragen": 143,
-    "beendet": 141,
+    "beendet": 143,
     "dokument": "complete",
     "geladen": true,
-    "offen": {
-     "library.telefonica.de": 3
-    },
+    "offen": {},
     "ohne_antwort_ms": 0,
-    "sekunden": 14.7,
-    "takte_ms": 8550,
+    "sekunden": 10.5,
+    "takte_ms": 5050,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -615,17 +613,16 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 135,
-    "beendet": 133,
+    "anfragen": 134,
+    "beendet": 134,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "api-v4.trbo.com": 1,
      "library.telefonica.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 14.5,
-    "takte_ms": 9550,
+    "sekunden": 9.7,
+    "takte_ms": 5200,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -710,14 +707,16 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 135,
-    "beendet": 135,
+    "anfragen": 134,
+    "beendet": 134,
     "dokument": "complete",
     "geladen": true,
-    "offen": {},
+    "offen": {
+     "library.telefonica.de": 1
+    },
     "ohne_antwort_ms": 0,
-    "sekunden": 14.0,
-    "takte_ms": 9250,
+    "sekunden": 8.8,
+    "takte_ms": 5050,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -803,15 +802,16 @@
    "ladung": {
     "abstand_s": 2.0,
     "anfragen": 139,
-    "beendet": 138,
+    "beendet": 134,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "api-v4.trbo.com": 1
+     "library.telefonica.de": 4,
+     "www.o2online.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 14.7,
-    "takte_ms": 9550,
+    "sekunden": 8.1,
+    "takte_ms": 4150,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -897,15 +897,13 @@
    "ladung": {
     "abstand_s": 2.0,
     "anfragen": 138,
-    "beendet": 136,
+    "beendet": 138,
     "dokument": "complete",
     "geladen": true,
-    "offen": {
-     "library.telefonica.de": 2
-    },
+    "offen": {},
     "ohne_antwort_ms": 0,
-    "sekunden": 12.8,
-    "takte_ms": 8100,
+    "sekunden": 9.2,
+    "takte_ms": 5350,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -3411,5 +3409,5 @@
  ],
  "uebersichten": [],
  "vertragsform": "tarif_plus_ratenkauf",
- "zeitbudget_sekunden": 10269
+ "zeitbudget_sekunden": 10267
 }
