@@ -1127,7 +1127,7 @@ def _fenster_serien(serien: dict, fenster: str, heute: str = "") -> dict:
     """Wahre Messtage auf ein rollierendes Fenster begrenzen und ausduennen.
 
     Bei 90 Tagen: letzter Messwert jedes dritten Kalendertags,
-    beim Jahr: letzter Messwert je Kalenderwochen-Intervall (7 Tage).
+    beim Jahr: letzter Messwert je Siebentagesabschnitt.
     Keine Interpolation oder Mittelwertbildung. Die letzte Messung je
     Zeitabschnitt bleibt mit ihrem ECHTEN Datum erhalten.
     """
@@ -1146,7 +1146,7 @@ def _fenster_serien(serien: dict, fenster: str, heute: str = "") -> dict:
         # Hoechstens ungefaehr 52 echte Messtage bei langen Verlaeufen.
         schritt = max(1, math.ceil(((ende - start).days + 1) / 52))
     else:
-        start = ende.fromordinal(ende.toordinal() - tage_anzahl + 1)
+        start = date.fromordinal(ende.toordinal() - tage_anzahl + 1)
     ergebnis: dict = {}
     for anbieter, serie in serien.items():
         buckets: dict[int, tuple[str, float]] = {}
@@ -1243,8 +1243,12 @@ def _paar(
         "modell": modell["id"],
         "band": band,
         "laufzeit": laufzeit,
-        "fenster_html": _fenster_html(
-            standard_serien, beleg_je, zeitraeume, laufzeit
+        "fenster_html": (
+            f"<p class='gr-zr-keine'>{_esc(leer)}</p>"
+            if not serien and leer
+            else _fenster_html(
+                standard_serien, beleg_je, zeitraeume, laufzeit
+            )
         ),
         "fenster_weitere": weitere,
         "antwort_html": _antwort_html(
