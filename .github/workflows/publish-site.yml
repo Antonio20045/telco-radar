@@ -1,0 +1,72 @@
+name: Publish website changes
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/telco_radar/report/**'
+      - 'tests/test_geraete_zeitfenster.py'
+      - '.github/workflows/publish-site.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# Never cancel a data collector; site publishing runs independently.
+concurrency:
+  group: telco-site-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version-file: .python-version
+          cache: pip
+      - name: Install requirements
+        run: pip install -r requirements.txt -r requirements-dev.txt
+      - name: Check time-window calculations
+        env:
+          PYTHONPATH: src
+        run: python -m pytest -q tests/test_geraete_zeitfenster.py
+      - name: Render website from existing data (no crawl)
+        env:
+          PYTHONPATH: src
+        run: python -m telco_radar.report.bauen --root .
+      - name: Commit generated website
+        env:
+          PYTHONPATH: src
+        run: |
+          git config user.name "telco-radar-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add site
+          python scripts/waechter_leck.py
+          if git diff --cached --quiet; then
+            echo "No site changes."
+            exit 0
+          fi
+          git commit -m "site: rebuild from updated presentation code"
+          for retry in 1 2 3; do
+            if git pull --rebase origin main && git push origin HEAD:main; then
+              exit 0
+            fi
+            git rebase --abort || true
+            git fetch origin main
+            git reset --hard origin/main
+            PYTHONPATH=src python -m telco_radar.report.bauen --root .
+            git add site
+            python scripts/waechter_leck.py
+            if git diff --cached --quiet; then exit 0; fi
+            git commit -m "site: rebuild from updated presentation code"
+          done
+          exit 1
+      - name: Deploy and confirm live HTML
+        env:
+          HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: scripts/render_deploy.sh geraete.html
