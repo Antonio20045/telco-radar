@@ -1110,6 +1110,83 @@ def _kachel_eintrag(satz: dict, serien: dict, zaehlend: dict, zeitraeume: dict) 
     return eintrag
 
 
+
+# Die Auswahl betrifft ausschliesslich die Darstellung, niemals die TCO-Rechnung.
+# Ein Bucket zeigt den LETZTEN tatsaechlich gemessenen Tag, keinen Mittelwert.
+ZEITFENSTER = {
+    "7t": (7, 1),
+    "30t": (30, 1),
+    "90t": (90, 3),
+    "1j": (365, 7),
+    "alle": (None, None),
+}
+ZEITFENSTER_STANDARD = "30t"
+
+
+def _fenster_serien(serien: dict, fenster: str, heute: str = "") -> dict:
+    """Wahre Messtage auf ein rollierendes Fenster begrenzen und ausduennen.
+
+    Bei 90 Tagen: letzter Messwert jedes dritten Kalendertags,
+    beim Jahr: letzter Messwert je Kalenderwochen-Intervall (7 Tage).
+    Keine Interpolation oder Mittelwertbildung. Die letzte Messung je
+    Zeitabschnitt bleibt mit ihrem ECHTEN Datum erhalten.
+    """
+    if fenster not in ZEITFENSTER:
+        raise ValueError(f"Unbekanntes Zeitfenster: {fenster}")
+    tage = _messtage(serien)
+    if not tage:
+        return {}
+    try:
+        ende = date.fromisoformat(heute) if heute else date.fromisoformat(tage[-1])
+    except ValueError:
+        ende = date.fromisoformat(tage[-1])
+    tage_anzahl, schritt = ZEITFENSTER[fenster]
+    if tage_anzahl is None:
+        start = date.fromisoformat(tage[0])
+        # Hoechstens ungefaehr 52 echte Messtage bei langen Verlaeufen.
+        schritt = max(1, math.ceil(((ende - start).days + 1) / 52))
+    else:
+        start = ende.fromordinal(ende.toordinal() - tage_anzahl + 1)
+    ergebnis: dict = {}
+    for anbieter, serie in serien.items():
+        buckets: dict[int, tuple[str, float]] = {}
+        for datum, wert in sorted(serie, key=lambda punkt: punkt[0]):
+            try:
+                tag = date.fromisoformat(datum)
+            except ValueError:
+                continue
+            if not start <= tag <= ende:
+                continue
+            bucket = (tag - start).days // schritt
+            # Bei mehreren Messungen im Bucket gilt die letzte echte
+            # Beobachtung. Ein Zwischentag wird niemals erfunden.
+            buckets[bucket] = (datum, wert)
+        if buckets:
+            ergebnis[anbieter] = [buckets[k] for k in sorted(buckets)]
+    return ergebnis
+
+
+def _fenster_html(
+    serien: dict, beleg_je: dict, zeitraeume: dict, laufzeit: int
+) -> str:
+    """Fertige Grafik, die app.js unveraendert einhaengt."""
+    if not _messtage(serien):
+        return (
+            "<p class='gr-zr-keine'>Für diesen Zeitraum liegen "
+            "keine Messungen vor.</p>"
+        )
+    breit = _svg(serien, True, beleg_je, zeitraeume, laufzeit=laufzeit)
+    schmal = _svg(serien, False, beleg_je, zeitraeume, laufzeit=laufzeit)
+    legende = _legende_html(serien, zeitraeume)
+    return (
+        legende
+        + '<div class="gr-zr-bild" id="gr-zr-bild" '
+        + 'title="Ein fehlender Punkt bedeutet: keine Messung an diesem Tag. '
+        + 'Lange Zeiträume zeigen ausgewählte echte Messtage, keine Mittelwerte.">'
+        + breit + schmal + "</div>"
+    )
+
+
 def _paar(
     modell: dict,
     band: str,
@@ -1122,6 +1199,7 @@ def _paar(
     zeitraeume: dict,
     tarife: dict | None,
     historie_lage: dict,
+    heute: str = "",
 ) -> dict:
     """Der vorgerenderte Block eines Paares (Modell, Band, Ratenlaufzeit)."""
     zeilen, fremde = satz["zeilen"], satz.get("fremd") or []
@@ -1141,10 +1219,34 @@ def _paar(
             "und wächst mit jedem Messtag. Der Stand heute steht in den Bündel-"
             "Zeilen darunter."
         )
+    # Das 30-Tage-Bild ist der schnelle serverseitige First Paint.
+    # Andere Bilder liegen als kleine separate Lazy-Fragmente vor.
+    standard_serien = _fenster_serien(serien, ZEITFENSTER_STANDARD, heute)
+    weitere: list[dict] = []
+    schon: dict[tuple, str] = {}
+    for fenster in ("7t", "90t", "1j", "alle"):
+        ausschnitt = _fenster_serien(serien, fenster, heute)
+        signatur = tuple(
+            (anbieter, tuple(punkte)) for anbieter, punkte in sorted(ausschnitt.items())
+        )
+        alias = schon.get(signatur)
+        if alias:
+            weitere.append({"key": fenster, "alias": alias, "html": ""})
+        else:
+            schon[signatur] = fenster
+            weitere.append({
+                "key": fenster,
+                "alias": "",
+                "html": _fenster_html(ausschnitt, beleg_je, zeitraeume, laufzeit),
+            })
     return {
         "modell": modell["id"],
         "band": band,
         "laufzeit": laufzeit,
+        "fenster_html": _fenster_html(
+            standard_serien, beleg_je, zeitraeume, laufzeit
+        ),
+        "fenster_weitere": weitere,
         "antwort_html": _antwort_html(
             modell,
             band,
@@ -1161,8 +1263,12 @@ def _paar(
         "legende_html": _legende_html(serien, zeitraeume),
         "graph_beschriftung": f"Kosten über {h} Monate mit {laufzeit} Raten "
         f"je Messtag und Anbieter",
-        "svg_breit": _svg(serien, True, beleg_je, zeitraeume, laufzeit=laufzeit),
-        "svg_schmal": _svg(serien, False, beleg_je, zeitraeume, laufzeit=laufzeit),
+        "svg_breit": _svg(
+            standard_serien, True, beleg_je, zeitraeume, laufzeit=laufzeit
+        ),
+        "svg_schmal": _svg(
+            standard_serien, False, beleg_je, zeitraeume, laufzeit=laufzeit
+        ),
         "rechenweg_html": _rechenwege_html(mess, zeilen, tarife),
         "fehlen": fehlen_im_paar(modell, satz, band, laufzeit, band_katalog, h),
         "leer_text": leer,
@@ -1264,6 +1370,7 @@ def aufbereiten(
                     zeitraeume,
                     tarife,
                     tco.get("historie_lage") or {},
+                    heute,
                 )
             )
 
