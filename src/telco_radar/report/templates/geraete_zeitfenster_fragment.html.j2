@@ -1,0 +1,2 @@
+{# Nur alternative Grafiken, ohne Rechenweg und Angebotstexte. #}
+{% for p in paare %}{% for fenster in p.fenster_weitere %}<template class="gr-zf-lager" data-modell="{{ p.modell }}" data-band="{{ p.band }}" data-laufzeit="{{ p.laufzeit }}" data-zeitfenster="{{ fenster.key }}" {% if fenster.alias %}data-alias="{{ fenster.alias }}"{% endif %}>{{ fenster.html | safe }}</template>{% endfor %}{% endfor %}
