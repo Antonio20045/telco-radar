@@ -54,6 +54,11 @@ def vorbereiten(site_dir: Path, env, geraete: dict) -> dict[Path, str]:
     for p in paare:
         je_modell.setdefault(p["modell"], []).append(p)
     ziel = _neu(daten / ZR_ORDNER)
+    fenster_vorlage = env.get_template("geraete_zeitfenster_fragment.html.j2")
+    fenster_root = _neu(daten / "zf")
     for modell, eigene in je_modell.items():
         dateien[ziel / f"{modell}.html"] = zr_vorlage.render(paare=eigene)
+        # Nur Grafiken, keine mehrfachen Rechenweg-Vorlagen und keine
+        # wiederholten Buendel-Informationen. Ein Abruf je ausgewaehltem Modell.
+        dateien[fenster_root / f"{modell}.html"] = fenster_vorlage.render(paare=eigene)
     return dateien

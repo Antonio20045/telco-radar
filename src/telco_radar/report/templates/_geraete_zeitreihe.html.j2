@@ -48,20 +48,8 @@
      eine 36-Monats-Kurve liegt. #}
   <section class="gr-zr-graph" aria-label="{{ p.graph_beschriftung
       or 'Kosten je Messtag und Anbieter' }}">
-    {% if p.svg_breit %}
-    {{ p.legende_html | safe }}
-    {# D4a (24.09.2026): der Lesehilfe-Satz „Ein fehlender Punkt heißt …"
-       ist GEFALLEN (Antonios Regel: keine Erklär-Unterzeile unter einer
-       Grafik). Dieselbe Auskunft steht jetzt als `title` am Graphen selbst
-       (Tooltip) und auf der Methodik-Seite (geraete-quellen.html#methodik)
-       - nichts verloren, nur umgezogen. #}
-    <div class="gr-zr-bild" id="gr-zr-bild" title="Ein fehlender Punkt heißt: dieser Anbieter hatte an dem Tag kein Bündel in diesem Band — Linien verbinden nur echte Messungen.">{{ p.svg_breit | safe }}{{
-      p.svg_schmal | safe }}</div>
-    {% else %}
-    {# Der ehrliche Leer-Satz: Historie und Karten sind zwei Zeitreihen,
-       und eine Kurve aus einem Stand wäre erfunden. #}
-    <p class="gr-zr-keine">{{ p.leer_text }}</p>
-    {% endif %}
+    <div class="gr-zr-fenster-inhalt">{{ p.fenster_html | safe }}</div>
+    <template class="gr-zr-fenster-standard">{{ p.fenster_html | safe }}</template>
     {# P1 (17.09.2026): der Rechenweg JE MESSUNG als <template>-Blöcke,
        serverseitig fertig - unter dem SVG, im Fragment genauso wie im
        Server-First-Paint (DEMSELBEN Makro). Der Container ist hidden;
