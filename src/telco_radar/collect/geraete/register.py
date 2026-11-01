@@ -7,7 +7,7 @@ Paket nur `basis`, so bleiben sie voneinander unabhaengig (Vertrag
 
 from __future__ import annotations
 
-from . import congstar, einsundeins, o2, saturn, telekom, vodafone
+from . import congstar, coolblue, einsundeins, o2, saturn, telekom, vodafone
 from .basis import Adapter, registriere
 
 
@@ -60,6 +60,10 @@ def registriere_anbieter_adapter() -> None:
             lies_buendel=einsundeins.lies_buendel,
             ergaenze_buendel=einsundeins.ergaenze_buendel,
         ),
+    )
+    registriere(
+        "coolblue_produkt",
+        Adapter(name="coolblue_produkt", lies=coolblue.lies),
     )
     registriere(
         "saturn_brand",
