@@ -92,3 +92,24 @@ def test_coolblue_konfiguriert_und_saturn_18_pro_erfasst():
         "iphone-18-pro" in e.url
         for e in quellen.nach_name("Saturn").einstiege
     )
+
+def test_coolblue_verwirft_unbelegte_produktidentitaet():
+    produkt = _produkt(url="")
+    produkt.pop("sku")
+    with pytest.raises(GeraeteAbrufFehler):
+        coolblue.lies(_html(produkt), _URL)
+
+
+def test_coolblue_verwirft_falsche_sku_auch_ohne_quelllink():
+    produkt = _produkt(url="")
+    produkt["sku"] = "123456"
+    with pytest.raises(GeraeteAbrufFehler):
+        coolblue.lies(_html(produkt), _URL)
+
+
+def test_coolblue_kategorieseiten_umfassen_16_varianten():
+    from pathlib import Path
+
+    q = lade_quellen(Path(__file__).resolve().parents[1]).nach_name("Coolblue")
+    assert q is not None
+    assert q.max_produkte >= 16
