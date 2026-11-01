@@ -1,6 +1,36 @@
 {
- "stand": "2026-10-31",
+ "stand": "2026-11-01",
  "videos": [
+  {
+   "id": "xeLRAFPeh2E",
+   "titel": "Snapintosh: macOS auf dem Windows-Laptop?",
+   "kanal": "c't 3003",
+   "datum": "2026-11-01",
+   "dauer_sekunden": 85,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "xeLRAFPeh2E.jpg"
+  },
+  {
+   "id": "VOYccAKu7Zg",
+   "titel": "Platzt jetzt die KI-Blase? DAS wird ALLE überraschen! Anthropics Börsengang | KI-NEWS",
+   "kanal": "Everlast AI",
+   "datum": "2026-11-01",
+   "dauer_sekunden": 1620,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "VOYccAKu7Zg.jpg"
+  },
+  {
+   "id": "QUZ4KEDxhCM",
+   "titel": "What Is torch.compile? Dynamo, PyTorch & Faster AI Models Explained",
+   "kanal": "IBM Technology",
+   "datum": "2026-11-01",
+   "dauer_sekunden": 413,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "QUZ4KEDxhCM.jpg"
+  },
   {
    "id": "mfgSBLGePuA",
    "titel": "When Security Patches Leak",
@@ -10,6 +40,36 @@
    "stufe": "Einstieg",
    "sprache": "en",
    "bild": "mfgSBLGePuA.jpg"
+  },
+  {
+   "id": "g5bl6G4lTTo",
+   "titel": "Migrate Conditional Access Policies to Policy Plans",
+   "kanal": "Microsoft Mechanics",
+   "datum": "2026-10-31",
+   "dauer_sekunden": 43,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "g5bl6G4lTTo.jpg"
+  },
+  {
+   "id": "_9R7QOhJh-o",
+   "titel": "Glasses That Make You Telepathic",
+   "kanal": "Matt Wolfe",
+   "datum": "2026-10-31",
+   "dauer_sekunden": 76,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "_9R7QOhJh-o.jpg"
+  },
+  {
+   "id": "KotNngsvj_g",
+   "titel": "GPU Unlock: Steckt in deiner RTX noch mehr KI-Leistung?",
+   "kanal": "c't 3003",
+   "datum": "2026-10-31",
+   "dauer_sekunden": 86,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "KotNngsvj_g.jpg"
   },
   {
    "id": "8Hr0ymVjb2A",
@@ -83,7 +143,7 @@
   },
   {
    "id": "eDiQNFa-zYg",
-   "titel": "6 AI Updates Worth Knowing & A Bubble-Bursting IPO",
+   "titel": "AI News: The Only 6 Stories Worth Knowing This Week",
    "kanal": "Matt Wolfe",
    "datum": "2026-10-30",
    "dauer_sekunden": 1761,
@@ -240,153 +300,93 @@
    "stufe": "Einstieg",
    "sprache": "en",
    "bild": "mmns33BsBcY.jpg"
-  },
-  {
-   "id": "evXFML_Rnc0",
-   "titel": "3 Critical Tasks AI Can Automate For You",
-   "kanal": "Matt Wolfe",
-   "datum": "2026-10-29",
-   "dauer_sekunden": 62,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "evXFML_Rnc0.jpg"
-  },
-  {
-   "id": "eJrjYA-GG3c",
-   "titel": "What Are Conditional Access Policy Plans?",
-   "kanal": "Microsoft Mechanics",
-   "datum": "2026-10-29",
-   "dauer_sekunden": 38,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "eJrjYA-GG3c.jpg"
-  },
-  {
-   "id": "YgcEesCDIkw",
-   "titel": "How to Create an Excel Dashboard with Copilot",
-   "kanal": "Kevin Stratvert",
-   "datum": "2026-10-29",
-   "dauer_sekunden": 386,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "YgcEesCDIkw.jpg"
-  },
-  {
-   "id": "L6pzlo1QvoM",
-   "titel": "ChatGPT Enterprise at Zendesk: Putting Company Data to Work",
-   "kanal": "OpenAI",
-   "datum": "2026-10-29",
-   "dauer_sekunden": 56,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "L6pzlo1QvoM.jpg"
-  },
-  {
-   "id": "Jg9wbQTWfq8",
-   "titel": "Sogar KI-Kritiker Ed Zitron nutzt dafür LLMs #shorts",
-   "kanal": "c't 3003",
-   "datum": "2026-10-29",
-   "dauer_sekunden": 62,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "Jg9wbQTWfq8.jpg"
-  },
-  {
-   "id": "GNYHDltnwZQ",
-   "titel": "ChatGPT Enterprise at Zendesk: Putting Company Data to Work",
-   "kanal": "OpenAI",
-   "datum": "2026-10-29",
-   "dauer_sekunden": 33,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "GNYHDltnwZQ.jpg"
   }
  ],
  "kanaele": {
   "c't 3003": {
    "error": null,
-   "versucht": "2026-10-31",
-   "abgerufen": "2026-10-31"
+   "versucht": "2026-11-01",
+   "abgerufen": "2026-11-01"
   },
   "KI Update (heise)": {
    "error": null,
-   "versucht": "2026-10-31",
-   "abgerufen": "2026-10-31"
+   "versucht": "2026-11-01",
+   "abgerufen": "2026-11-01"
   },
   "Everlast AI": {
    "error": null,
-   "versucht": "2026-10-31",
-   "abgerufen": "2026-10-31"
+   "versucht": "2026-11-01",
+   "abgerufen": "2026-11-01"
   },
   "The Morpheus Tutorials": {
    "error": null,
-   "versucht": "2026-10-31",
-   "abgerufen": "2026-10-31"
+   "versucht": "2026-11-01",
+   "abgerufen": "2026-11-01"
   },
   "Kevin Stratvert": {
    "error": null,
-   "versucht": "2026-10-31",
-   "abgerufen": "2026-10-31"
+   "versucht": "2026-11-01",
+   "abgerufen": "2026-11-01"
   },
   "Microsoft Mechanics": {
    "error": null,
-   "versucht": "2026-10-31",
-   "abgerufen": "2026-10-31"
+   "versucht": "2026-11-01",
+   "abgerufen": "2026-11-01"
   },
   "Leila Gharani": {
    "error": null,
-   "versucht": "2026-10-31",
-   "abgerufen": "2026-10-31"
+   "versucht": "2026-11-01",
+   "abgerufen": "2026-11-01"
   },
   "Jeff Su": {
    "error": null,
-   "versucht": "2026-10-31",
-   "abgerufen": "2026-10-31"
+   "versucht": "2026-11-01",
+   "abgerufen": "2026-11-01"
   },
   "Matt Wolfe": {
    "error": null,
-   "versucht": "2026-10-31",
-   "abgerufen": "2026-10-31"
+   "versucht": "2026-11-01",
+   "abgerufen": "2026-11-01"
   },
   "IBM Technology": {
    "error": null,
-   "versucht": "2026-10-31",
-   "abgerufen": "2026-10-31"
+   "versucht": "2026-11-01",
+   "abgerufen": "2026-11-01"
   },
   "OpenAI": {
    "error": null,
-   "versucht": "2026-10-31",
-   "abgerufen": "2026-10-31"
+   "versucht": "2026-11-01",
+   "abgerufen": "2026-11-01"
   },
   "Anthropic": {
    "error": null,
-   "versucht": "2026-10-31",
-   "abgerufen": "2026-10-31"
+   "versucht": "2026-11-01",
+   "abgerufen": "2026-11-01"
   },
   "Google DeepMind": {
    "error": null,
-   "versucht": "2026-10-31",
-   "abgerufen": "2026-10-31"
+   "versucht": "2026-11-01",
+   "abgerufen": "2026-11-01"
   },
   "AI Explained": {
    "error": null,
-   "versucht": "2026-10-31",
-   "abgerufen": "2026-10-31"
+   "versucht": "2026-11-01",
+   "abgerufen": "2026-11-01"
   },
   "Two Minute Papers": {
    "error": null,
-   "versucht": "2026-10-31",
-   "abgerufen": "2026-10-31"
+   "versucht": "2026-11-01",
+   "abgerufen": "2026-11-01"
   },
   "3Blue1Brown": {
    "error": null,
-   "versucht": "2026-10-31",
-   "abgerufen": "2026-10-31"
+   "versucht": "2026-11-01",
+   "abgerufen": "2026-11-01"
   },
   "David Ondrej": {
    "error": null,
-   "versucht": "2026-10-31",
-   "abgerufen": "2026-10-31"
+   "versucht": "2026-11-01",
+   "abgerufen": "2026-11-01"
   }
  },
  "error": null

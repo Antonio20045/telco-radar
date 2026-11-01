@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-31",
+ "updated": "2026-11-01",
  "topics": [
   {
    "slug": "apples-iphone-event-am-9-september",
@@ -701,8 +701,8 @@
    ],
    "first_seen": "2026-10-26",
    "last_active": "2026-10-28",
-   "runs_ohne_zuwachs": 3,
-   "status": "aktiv",
+   "runs_ohne_zuwachs": 4,
+   "status": "beendet",
    "items": [
     {
      "url": "https://www.mobileworldlive.com/microsoft/the-friday-file-microsoft-european-satellite-spacex/",
@@ -801,7 +801,8 @@
      "week": "2026-10-28",
      "relevance": 3
     }
-   ]
+   ],
+   "ended": "2026-11-01"
   },
   {
    "slug": "indien-plant-regeln-fuer-kuenstliche-intelligenz",
@@ -815,9 +816,20 @@
    ],
    "first_seen": "2026-10-30",
    "last_active": "2026-10-30",
-   "runs_ohne_zuwachs": 1,
+   "runs_ohne_zuwachs": 2,
    "status": "aktiv",
    "items": [
+    {
+     "url": "https://telecomlead.com/4g-lte/trai-proposes-ai-guidelines-for-telecom-operators-jio-airtel-vodafone-idea-and-bsnl-face-new-governance-requirements-128471",
+     "title": "TRAI Proposes AI Guidelines for Telecom Operators: Jio, Airtel, Vodafone Idea and BSNL Face New Governance Requirements",
+     "headline": "Indische Behoerde plant strenge KI-Vorgaben fuer Telekommunikation",
+     "summary": "Die indische Regulierungsbehoerde TRAI hat am 30. Oktober 2026 Entwürfe für neue KI-Richtlinien vorgelegt, die Betreiber wie Reliance Jio, Bharti Airtel, Vodafone Idea und BSNL zu umfassendem Risikomanagement und Vorstandskontrolle verpflichten. Stellungnahmen dazu koennen bis zum 27. November 2026 eingereicht werden.",
+     "operator": "Vodafone Idea",
+     "source": "TelecomLead (Indien)",
+     "date": "2026-11-01",
+     "week": "2026-11-01",
+     "relevance": 4
+    },
     {
      "url": "https://www.mobiletime.com.br/noticias/26/10/2026/ia-renov-trade-in-avalia/",
      "title": "IA da Renov reduz tempo de avaliação de celulares para 3 minutos",
