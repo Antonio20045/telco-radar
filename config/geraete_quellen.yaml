@@ -264,7 +264,7 @@ anbieter:
     basis_url: https://www.coolblue.de
     user_agent: "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
     rate_limit_sekunden: 10
-    max_produkte: 12
+    max_produkte: 20
     hinweis: >-
       Deutschland: Smartphones ohne Mobilfunktarif. Ratenzahlung ueber
       PayPal ist moeglich, aber die individuellen Ratenkosten sind nicht
