@@ -39,6 +39,7 @@ METHODEN = (
     "telekom_kategorie",
     "einsundeins_buendel",
     "saturn_brand",
+    "coolblue_produkt",
     "kein_hardware",
     "deaktiviert",
 )
