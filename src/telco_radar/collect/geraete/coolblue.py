@@ -38,14 +38,24 @@ def lies(text: str, url: str = "") -> list[dict]:
             continue
         if satz.get("waehrung") != "EUR":
             continue
-        quelllink = str(satz.get("url") or "")
-        if quelllink:
-            identitaet = _PRODUKT.search(urlparse(quelllink).path)
-            if identitaet is not None and identitaet.group(1) != treffer.group(1):
-                continue
-            host = urlparse(quelllink).hostname
-            if host and host not in ("coolblue.de", "www.coolblue.de"):
-                continue
+        quelllink = str(satz.get("url") or "").strip()
+        produkt_sku = str(satz.get("sku") or "").strip()
+        quelle = urlparse(quelllink)
+        identitaet = _PRODUKT.search(quelle.path)
+        if quelle.hostname and quelle.hostname not in (
+            "coolblue.de",
+            "www.coolblue.de",
+        ):
+            continue
+        # Eine Preisangabe aus Empfehlungen / Cross-Selling darf niemals
+        # dem angefragten Produkt zugeschrieben werden. Mindestens EINE
+        # strukturierte Identität muss die URL-ID exakt belegen.
+        if identitaet is not None and identitaet.group(1) != treffer.group(1):
+            continue
+        if produkt_sku and produkt_sku.isdecimal() and produkt_sku != treffer.group(1):
+            continue
+        if identitaet is None and produkt_sku != treffer.group(1):
+            continue
         passend.append(
             {
                 **satz,
