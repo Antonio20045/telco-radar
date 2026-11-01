@@ -272,12 +272,12 @@ anbieter:
       eindeutigen EUR-Preis strukturiert ausweisen, sonst gilt die
       Messung als unlesbar. Keine Tarife oder Raten erfinden.
     einstiege:
-      - url: https://www.coolblue.de/handys/smartphones/apple
-        label: Apple Smartphones
+      - url: https://www.coolblue.de/handys/smartphones/apple/apple-iphone-18-pro
+        label: iPhone 18 Pro
         kind: static
         pfadmuster: /produkt/
-      - url: https://www.coolblue.de/handys/smartphones/samsung
-        label: Samsung Smartphones
+      - url: https://www.coolblue.de/handys/smartphones/apple/apple-iphone-18-pro-max
+        label: iPhone 18 Pro Max
         kind: static
         pfadmuster: /produkt/
 
