@@ -248,6 +248,39 @@ anbieter:
         label: iPhone 17e
         kind: static
 
+      - url: https://www.saturn.de/de/brand/apple/iphone/iphone-18-pro
+        label: iPhone 18 Pro
+        kind: static
+      - url: https://www.saturn.de/de/brand/apple/iphone/iphone-18-pro-max
+        label: iPhone 18 Pro Max
+        kind: static
+
+  - name: Coolblue
+    typ: handel
+    gruppe: Coolblue
+    rang: 3
+    methode: coolblue_produkt
+    aktiv: true
+    basis_url: https://www.coolblue.de
+    user_agent: "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    rate_limit_sekunden: 10
+    max_produkte: 12
+    hinweis: >-
+      Deutschland: Smartphones ohne Mobilfunktarif. Ratenzahlung ueber
+      PayPal ist moeglich, aber die individuellen Ratenkosten sind nicht
+      aus dem Geraetepreis ableitbar. Produktseiten muessen einen
+      eindeutigen EUR-Preis strukturiert ausweisen, sonst gilt die
+      Messung als unlesbar. Keine Tarife oder Raten erfinden.
+    einstiege:
+      - url: https://www.coolblue.de/handys/smartphones/apple
+        label: Apple Smartphones
+        kind: static
+        pfadmuster: /produkt/
+      - url: https://www.coolblue.de/handys/smartphones/samsung
+        label: Samsung Smartphones
+        kind: static
+        pfadmuster: /produkt/
+
   - name: expert
     typ: handel
     gruppe: expert
