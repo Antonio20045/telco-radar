@@ -211,7 +211,9 @@ def test_ohne_parameter_gilt_24_und_der_link_traegt_die_laufzeit(_basis):
         fehlend = _fehlend_lz(s)
         assert fehlend and {z["lz"] for z in fehlend} == {"24"}, fehlend
     zeilen = _lager_zeilen(basis, "24")
-    assert sorted(z["anbieter"] for z in zeilen) == sorted(SOLL[24]), zeilen
+    mit_zahl = [z for z in zeilen if z["gesamt"]]
+    assert sorted(z["anbieter"] for z in mit_zahl) == sorted(SOLL[24]), zeilen
+    assert [z["anbieter"] for z in zeilen if not z["gesamt"]] == ["1&1"], zeilen
     assert {z["lz"] for z in _lager_zeilen(basis)} == {"12", "24", "36"}
 
 
@@ -232,7 +234,7 @@ def test_der_sieger_jeder_ansicht_hat_ihre_raten(_basis, laufzeit):
             antwort
         )
         assert f"ab{_euro(soll[sieger])}€" in _kachelpreis(s).replace(" ", "")
-    zeilen = _lager_zeilen(basis, str(laufzeit))
+    zeilen = [z for z in _lager_zeilen(basis, str(laufzeit)) if z["gesamt"]]
     guenstigste = min(zeilen, key=lambda z: float(z["gesamt"]))
     assert guenstigste["anbieter"] == sieger, zeilen
     assert guenstigste["raten"].startswith(f"{laufzeit} "), guenstigste
@@ -254,25 +256,20 @@ def test_ein_36_raten_buendel_erscheint_nicht_in_der_24er_ansicht(_basis):
         assert _euro(SOLL[36]["congstar"]) in s.inner_text("#tafel-tco")
 
 
-def test_1und1_steht_unter_24_monaten_mit_delta(_basis):
-    """Ein Betrag für Tarif und Gerät über 36 Monate wird nur über 24 Monate
-    verglichen (Antonio 10.10.2026): 24 Beträge plus Ablöse stehen unter 24 mit
-    Δ gegen Vodafone 24, die 36er-Ansicht nennt den Grund.
-
-    Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; die
-    1&1-Zeile prüft das Fragment."""
+def test_1und1_24_plus_12_steht_ohne_zahl_und_ohne_delta(_basis):
+    """„24 + 12“ von 1&1 ist keine 24-Monats-Finanzierung (Preisprüfung
+    02.11.2026): unter 36 steht die benannte Lücke, unter 24 die Zeile des
+    Fragments ohne Gesamtkosten und Δ."""
     _browser, basis = _basis
     with _oeffne(_basis, "?laufzeit=36") as s:
         assert _gedrueckt(s) == ["36"]
-        assert _fehlend(s).get("1&1", "").startswith("Nur über 24 Monate verglichen")
-        _waehle(s, "24")
-        assert "1&1" not in _fehlend(s)
+        assert _fehlend(s).get("1&1") == "Nur als 24 + 12 erfasst", _fehlend(s)
     assert not [z for z in _lager_zeilen(basis, "36") if z["anbieter"] == "1&1"]
     eins = [z for z in _lager_zeilen(basis, "24") if z["anbieter"] == "1&1"]
-    assert [float(z["gesamt"]) for z in eins] == [SOLL[24]["1&1"]], eins
+    assert len(eins) == 1, eins
+    assert eins[0]["gesamt"] == "", eins
     assert eins[0]["raten"].startswith("24 Monate + Ablöse"), eins
-    delta = " ".join(eins[0]["delta"].split())
-    assert delta.startswith(f"−{_euro(SOLL[24]['Vodafone'] - SOLL[24]['1&1'])} €")
+    assert not eins[0]["delta"].strip().startswith(("−", "+")), eins
 
 
 @pytest.mark.parametrize("laufzeit", [12, 24, 36])
@@ -332,7 +329,7 @@ def test_alle_gruppiert_die_zeilen_ohne_sieger_und_ohne_delta(_basis):
         )
         _waehle(s, "24")
         assert {z["lz"] for z in _fehlend_lz(s)} == {"24"}
-    zeilen = _lager_zeilen(basis)
+    zeilen = [z for z in _lager_zeilen(basis) if z["gesamt"]]
     assert len(zeilen) == sum(len(v) for v in SOLL.values()), zeilen
     for lz, soll in SOLL.items():
         assert sorted(z["anbieter"] for z in zeilen if z["lz"] == str(lz)) == sorted(

@@ -234,15 +234,25 @@ def test_ein_zeitraum_unter_der_bindung_laesst_keine_tarifmonate_weg(
     assert kosten_ueber(b, 24).gesamt == tco_24(b).gesamt == 1961.80
 
 
-def test_ein_vertrag_ueber_36_monate_zaehlt_24_betraege_und_die_abloese():
-    """Antonio 10.10.2026, 1&1 nur über 24 Monate: 24 × 42,99 + Ablöse 0,00 +
-    39,90 = 1.071,66 €. Die Zuzahlung ist die Ablöse nach Monat 24."""
-    from telco_radar.tco_kosten import POSTEN_EINMALZAHLUNG
-    from telco_radar.tco_model import kosten_ueber, zeitraum
+def test_ein_vertrag_ueber_36_monate_hat_im_standardzeitraum_keine_zahl():
+    """Preisprüfung 02.11.2026: „24 + 12“ (1&1) ist keine 24-Monats-Finanzierung.
+    Ohne ausdrücklichen Zeitraum steht die benannte Lücke, kein Betrag."""
+    from telco_radar.tco_kosten import POSTEN_NUR_24_PLUS_12
+    from telco_radar.tco_model import kosten_ueber
 
-    b = _einsundeins()
-    assert zeitraum(b) == 24
-    k = kosten_ueber(b)
+    k = kosten_ueber(_einsundeins())
+    assert (k.gesamt, k.monatlich, k.posten) == (None, None, {})
+    assert k.luecken == [POSTEN_NUR_24_PLUS_12]
+    assert (k.monate, k.ratenlaufzeit) == (24, 36)
+
+
+def test_ein_ausdruecklicher_zeitraum_rechnet_den_vertrag_weiter_mit_abloese():
+    """Nur wer 24 Monate ausdrücklich anfragt, bekommt 24 × 42,99 + Ablöse 0,00 +
+    39,90 = 1.071,66 €; die Zuzahlung ist dann die Ablöse nach Monat 24."""
+    from telco_radar.tco_kosten import POSTEN_EINMALZAHLUNG
+    from telco_radar.tco_model import kosten_ueber
+
+    k = kosten_ueber(_einsundeins(), 24)
     assert k.posten == {
         f"{POSTEN_BUENDEL} über 24 Monate": 1031.76,
         POSTEN_EINMALZAHLUNG: 0.00,
@@ -250,7 +260,7 @@ def test_ein_vertrag_ueber_36_monate_zaehlt_24_betraege_und_die_abloese():
     }
     assert (k.gesamt, k.monate, k.ratenlaufzeit) == (1071.66, 24, 36)
     assert k.monatlich == 44.65
-    abloese = kosten_ueber(_einsundeins(geraet_zuzahlung=360.0))
+    abloese = kosten_ueber(_einsundeins(geraet_zuzahlung=360.0), 24)
     assert abloese.gesamt == round(24 * 42.99 + 360.0 + 39.90, 2) == 1431.66
     assert POSTEN_ZUZAHLUNG not in abloese.posten
 
@@ -512,16 +522,19 @@ def test_eine_phase_ohne_ende_ist_der_grundpreis_der_bindung():
     assert kosten_ueber(_o2(tarif_phasen=_blatt(19.99)), 36).gesamt == 1794.76
 
 
-def test_am_bestand_rechnet_ein_vertrag_seine_laufzeit_wie_tco_24():
-    """1&1 über 24 Monate (Antonio 10.10.2026): 24 × Bündelbetrag + Ablöse +
-    Anschluss; ohne gemessene Ablöse eine Lücke."""
-    from telco_radar.tco_kosten import POSTEN_EINMALZAHLUNG
+def test_am_bestand_hat_ein_vertrag_im_standardzeitraum_nur_die_luecke():
+    """1&1 „24 + 12“: im Standardzeitraum immer die benannte Lücke, nie eine Zahl.
+    Der ausdrückliche 24er-Zeitraum rechnet 24 × Bündelbetrag + Ablöse + Anschluss;
+    ohne gemessene Ablöse eine Lücke."""
+    from telco_radar.tco_kosten import POSTEN_EINMALZAHLUNG, POSTEN_NUR_24_PLUS_12
     from telco_radar.tco_model import kosten_ueber
 
     vertraege = [b for b in _bestand() if b.buendel_monatlich is not None]
     vollstaendig = 0
     for b in vertraege:
-        k = kosten_ueber(b)
+        standard = kosten_ueber(b)
+        assert (standard.gesamt, standard.luecken) == (None, [POSTEN_NUR_24_PLUS_12])
+        k = kosten_ueber(b, 24)
         assert (k.monate, k.ratenlaufzeit) == (24, 36), b.id
         if b.geraet_zuzahlung is None:
             assert (k.gesamt, k.luecken) == (None, [POSTEN_EINMALZAHLUNG]), b.id

@@ -151,13 +151,11 @@ def test_die_buendelkarte_nennt_die_wahre_dauer_und_die_richtigen_raten(tmp_path
     s = lager(tmp_path)
     eins = s.select_one('.gr-bnd[data-anbieter="1&1"]')
     assert eins is not None, "die Fixture muss die 1&1-Karte liefern"
-    bau = vorlage_text(eins.select_one(".gr-kk-bau"))
-    assert bau.startswith("monatlich 44,99 € für Tarif und Gerät zusammen · 36 Monate")
+    assert "gr-bnd--leer" in eins["class"] and not eins.get("data-gesamt")
     eins_text = vorlage_text(eins)
-    assert "gerechnet 24 Monate, dann Ablöse 360,00 €" in bau
-    assert "Gerechnet über 24 Monate" in eins_text
-    assert "auch die Ablöse nach Monat 24" in eins_text
-    assert "auch alle Monatsraten der eigenen Laufzeit" not in eins_text
+    assert "24 Monate + Ablöse" in eins_text
+    assert "Nur als „24 + 12“ erfasst" in eins_text
+    assert "Kosten über 24 Monate" not in eins_text
     assert "danach noch offen" not in eins_text
     assert "Geräteraten" not in eins_text
     assert "davon in der" not in eins_text, "die Kappungsklammer ist tot"
@@ -170,9 +168,7 @@ def test_die_buendelkarte_nennt_die_wahre_dauer_und_die_richtigen_raten(tmp_path
     ohne = lager(tmp_path / "ohne-einmal")
     luecke = ohne.select_one('.gr-bnd[data-anbieter="1&1"]')
     assert "gr-bnd--leer" in luecke["class"] and not luecke.get("data-gesamt")
-    assert "Einmalzahlung bei Kündigung" in vorlage_text(
-        luecke.select_one(".gr-kk-luecke")
-    )
+    assert "24 + 12" in vorlage_text(luecke.select_one(".gr-kk-luecke"))
 
 
 def test_die_buendelkarte_nennt_einmalzahlung_und_bereitstellung(tmp_path):
@@ -193,15 +189,11 @@ def test_die_buendelkarte_nennt_einmalzahlung_und_bereitstellung(tmp_path):
     _baue(tmp_path, eins_und_eins=True, einmalzahlung=360.0, anschlusspreis=39.9)
     eins = lager(tmp_path).select_one('.gr-bnd[data-anbieter="1&1"]')
     assert eins is not None, "die Fixture muss die 1&1-Karte liefern"
-    bau = vorlage_text(eins.select_one(".gr-kk-bau"))
-    assert bau == (
-        "monatlich 44,99 € für Tarif und Gerät zusammen · "
-        "36 Monate · "
-        "gerechnet 24 Monate, dann Ablöse 360,00 € · Anschlusspreis 39,90 €"
-    )
+    assert eins.select_one(".gr-kk-bau") is None, "keine Rechnung ohne Zahl"
     text = vorlage_text(eins)
-    assert "1.479,66 € Kosten über 24 Monate" in text
+    assert "Kosten über 24 Monate" not in text
     assert "Kosten über 36 Monate" not in text
+    assert "1.479,66" not in text
 
 
 def test_nur_der_barpreis_traegt_das_ohne_vertrag_etikett(tmp_path):

@@ -58,10 +58,10 @@ def rang_der_monatsangabe(laufzeit: int | None) -> tuple:
 def nur_ueber_24(karte: dict) -> bool:
     """Ein Betrag für Tarif und Gerät (1&1) über mehr als 24 Monate.
 
-    Antonio, 10.10.2026: die anderen rechnen ab Monat 25 nur die Rate, weil der
-    Tarif dann kündbar ist; 1&1 trägt den Tarif bis zur letzten Rate. Also wird
-    1&1 nur über 24 Monate verglichen: 24 Bündelbeträge plus Ablöse, in der
-    24er-Ansicht (`tco_kosten.zeitraum`).
+    Das Modell „24 + 12“ ist keine 24-Monats-Finanzierung. Die Karte trägt in
+    der 24er-Ansicht keine Zahl, nur die benannte Lücke (`tco_kosten`,
+    `POSTEN_NUR_24_PLUS_12`); sie steht dort als Zeile ohne Preis und fließt in
+    keinen Vergleich.
     """
     return (
         karte.get("buendel_monatlich") is not None
@@ -69,15 +69,15 @@ def nur_ueber_24(karte: dict) -> bool:
     )
 
 
+def nur_24(karten: list, anbieter: str) -> bool:
+    """Führt der Anbieter unter diesen Karten ein „24 + 12“-Angebot?"""
+    return any(k["anbieter"] == anbieter and nur_ueber_24(k) for k in karten)
+
+
 def fehlt_satz(anbieter: str, karten: list, laufzeit: int) -> str:
     """Warum ein Anbieter mit Bündeln in dieser Laufzeit keine Zeile trägt."""
-    if any(
-        k["anbieter"] == anbieter
-        and nur_ueber_24(k)
-        and k.get("raten_laufzeit") == laufzeit
-        for k in karten
-    ):
-        return f"{anbieter} wird nur über 24 Monate verglichen."
+    if laufzeit >= LAUFZEIT_STANDARD and nur_24(karten, anbieter):
+        return f"{anbieter} ist nur als 24 + 12 (36 Monate) erfasst."
     return f"{anbieter} ist mit {laufzeit} Raten {NICHT_ERFASST}."
 
 

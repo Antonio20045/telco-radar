@@ -146,15 +146,15 @@ def _luecken(
         )
         if not alle:
             grund = "gar-kein-buendel"
-        elif not eigene and any(
-            nur_ueber_24(k) and k.get("raten_laufzeit") == laufzeit for k in alle
-        ):
+        elif not eigene and any(nur_ueber_24(k) for k in alle):
             grund = "nur-24"
         elif not eigene:
             grund = "nicht-erfasst"
         elif not any(k.get("band") == band for k in eigene):
             im_band = [k for k in alle if k.get("band") == band]
             grund = "nicht-erfasst" if im_band else "anderes-band"
+        elif all(nur_ueber_24(k) for k in eigene if k.get("band") == band):
+            grund = "nur-24"
         elif not any(k.get("frisch", True) for k in eigene if k.get("band") == band):
             grund = "nur-alte"
         elif namen:
@@ -245,7 +245,7 @@ _KURZ = {
     "zaehlt-nicht": "Nicht im Vergleich",
     "kein-belastbares": "Kein vollständiger Preis",
     "nur-alte": "Kein aktueller Stand",
-    "nur-24": "Nur über 24 Monate verglichen",
+    "nur-24": "Nur als 24 + 12 erfasst",
 }
 
 

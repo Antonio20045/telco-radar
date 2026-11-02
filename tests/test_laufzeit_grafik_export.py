@@ -73,7 +73,7 @@ def test_die_standardansicht_des_bandgraphen_hat_24_raten(g):
     xs = next(b for b in modell["baender"] if b["key"] == "xs")
     werte = {w["anbieter"]: w["gesamt"] for w in xs["werte"]}
     assert werte["congstar"] == SOLL[24]["congstar"] != SOLL[12]["congstar"]
-    assert "Telekom" not in werte and werte["1&1"] == SOLL[24]["1&1"]
+    assert "Telekom" not in werte and "1&1" not in werte
 
 
 def test_das_delta_des_bandgraphen_gilt_nur_gegen_vodafone_derselben_laufzeit(g):
@@ -94,6 +94,7 @@ def test_ein_anbieter_ohne_buendel_dieser_laufzeit_heisst_nicht_erfasst(g):
     fehlend = {f["anbieter"]: f["grund"] for f in _band(g, 24)["fehlend"]}
     assert fehlend == {
         "Telekom": "Telekom ist mit 24 Raten nicht erfasst.",
+        "1&1": "1&1 ist nur als 24 + 12 (36 Monate) erfasst.",
     }
     zwoelf = {f["anbieter"]: f["grund"] for f in _band(g, 12)["fehlend"]}
     assert zwoelf == {
@@ -102,7 +103,7 @@ def test_ein_anbieter_ohne_buendel_dieser_laufzeit_heisst_nicht_erfasst(g):
     sechsunddreissig = {f["anbieter"]: f["grund"] for f in _band(g, 36)["fehlend"]}
     assert sechsunddreissig == {
         "o2": "o2 ist mit 36 Raten nicht erfasst.",
-        "1&1": "1&1 wird nur über 24 Monate verglichen.",
+        "1&1": "1&1 ist nur als 24 + 12 (36 Monate) erfasst.",
     }
 
 
@@ -127,7 +128,12 @@ def test_der_export_je_laufzeit_traegt_genau_ihre_buendel(g, tmp_path):
     tco = g["tco"]["export"]
     info = geraete_export.schreibe_exporte(tmp_path, [], [], None, tco=tco)
     alle = _buendelzeilen(tmp_path / info["tco"]["datei"])
-    assert len(alle) == sum(len(s) for s in SOLL.values())
+    assert len(alle) == sum(len(s) for s in SOLL.values()) + 1
+    assert not [
+        z
+        for z in alle
+        if z["Anbieter"] == "1&1" and geraete_export.leitzahl_aus_zeile(z)
+    ]
     assert set(info["tco_je_laufzeit"]) == set(SOLL)
     for laufzeit, soll in SOLL.items():
         eintrag = info["tco_je_laufzeit"][laufzeit]
@@ -138,7 +144,9 @@ def test_der_export_je_laufzeit_traegt_genau_ihre_buendel(g, tmp_path):
             str(laufzeit)
         }
         assert {
-            z["Anbieter"]: geraete_export.leitzahl_aus_zeile(z) for z in zeilen
+            z["Anbieter"]: geraete_export.leitzahl_aus_zeile(z)
+            for z in zeilen
+            if z["Anbieter"] != "1&1"
         } == {anbieter: _komma(betrag) for anbieter, betrag in soll.items()}
 
 

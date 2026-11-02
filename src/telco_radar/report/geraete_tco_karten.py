@@ -754,14 +754,13 @@ def _karte(
 _GRUND_JE_LUECKE = {
     POSTEN_TARIF: (
         "Der Tarifgrundpreis dieses Bündels ist nicht erhoben – "
-        "ohne ihn ist es kein Gesamtpreis, sondern ein "
-        "Gerätebetrag."
+        "ohne ihn ist es kein Gesamtpreis, sondern ein Gerätebetrag."
     ),
     POSTEN_LAUFZEIT: (
         "Die Ratenlaufzeit dieses Bündels ist nicht erhoben – "
-        "ohne die Zahl der Monate ergibt der Monatsbetrag "
-        "keine Gesamtsumme."
+        "ohne die Zahl der Monate ergibt der Monatsbetrag keine Gesamtsumme."
     ),
+    _kosten.POSTEN_NUR_24_PLUS_12: "Nur als „24 + 12“ erfasst, kein 24-Monats-Preis.",
 }
 
 
@@ -771,15 +770,15 @@ def _grund(kosten) -> str:
         return _GRUND_JE_LUECKE[POSTEN_TARIF]
     if POSTEN_LAUFZEIT in kosten.luecken or POSTEN_ZEITRAUM in kosten.luecken:
         return _GRUND_JE_LUECKE[POSTEN_LAUFZEIT]
+    if _kosten.POSTEN_NUR_24_PLUS_12 in kosten.luecken:
+        return _GRUND_JE_LUECKE[_kosten.POSTEN_NUR_24_PLUS_12]
     if not kosten.posten:
         return (
             "Zu diesem Bündel ist kein einziger Posten erhoben – es "
             "steht als Angebot da, nicht als Preis."
         )
     return (
-        "Die Rechnung ist unvollständig: "
-        + ", ".join(kosten.luecken)
-        + " nicht gemessen."
+        f"Die Rechnung ist unvollständig: {', '.join(kosten.luecken)} nicht gemessen."
     )
 
 

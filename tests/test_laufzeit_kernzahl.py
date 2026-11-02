@@ -120,8 +120,9 @@ def test_12_und_24_raten_tragen_weiter_24_monate():
     assert {_karte(b)["leitzahl_monate"] for b in (zwoelf, vierundzwanzig)} == {24}
 
 
-def test_ein_vertrag_ueber_36_monate_rechnet_24_betraege_und_die_abloese():
-    """Antonio 10.10.2026: 1&1 nur über 24 Monate, die 360 € sind die Ablöse."""
+def test_ein_vertrag_ueber_36_monate_traegt_keine_24_monats_zahl():
+    """Preisprüfung 02.11.2026: „24 + 12“ ist keine 24-Monats-Finanzierung; die
+    Karte trägt keine Zahl, sondern die benannte Lücke."""
     b = Buendel(
         sku_id="apple-iphone-17-pro-256gb-silber",
         anbieter="1&1",
@@ -134,8 +135,8 @@ def test_ein_vertrag_ueber_36_monate_rechnet_24_betraege_und_die_abloese():
         abgerufen_am=HEUTE,
     )
     k = _karte(b)
-    assert k["gesamt"] == round(360.0 + 39.9 + 24 * 44.99, 2) == 1479.66
-    assert k["leitzahl_monate"] == 24
+    assert k["gesamt"] is None and not k["belastbar"]
+    assert "24 + 12" in k["leer_grund"]
 
 
 def test_ein_fehlender_anschlusspreis_ist_keine_null():
