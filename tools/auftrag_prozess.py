@@ -10,6 +10,8 @@ import subprocess
 import tempfile
 from pathlib import Path
 
+GRUPPE_SCHON_LEER = (ProcessLookupError, PermissionError)
+
 
 def ohne_git(extra: dict[str, str] | None = None) -> dict[str, str]:
     """Umgebung ohne ``GIT_*``-Variablen, ergänzt um ``extra``."""
@@ -25,6 +27,9 @@ def starten(
     frist: float | None = None,
 ) -> subprocess.CompletedProcess[str]:
     """Führt ``befehl`` aus; danach endet jeder Prozess seiner Gruppe.
+
+    Besteht die Gruppe nur noch aus Zombies, meldet macOS EPERM statt ESRCH; das
+    heißt „nichts mehr zu beenden“ und bricht den Lauf nicht ab.
 
     Ein Hintergrundprozess, der in der Gruppe bleibt, kann so nach dem Ende nichts
     mehr ändern. Python schreibt keinen Bytecode und liest ihn nur aus einem leeren
@@ -62,7 +67,7 @@ def _ausfuehren(
         try:
             aus, fehler = lauf.communicate(eingabe, timeout=frist)
         finally:
-            with contextlib.suppress(ProcessLookupError):
+            with contextlib.suppress(*GRUPPE_SCHON_LEER):
                 os.killpg(lauf.pid, signal.SIGKILL)
     return subprocess.CompletedProcess(befehl, lauf.returncode, aus, fehler)
 

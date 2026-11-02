@@ -376,7 +376,7 @@ def _lauf(
         try:
             stdout, stderr = prozess.communicate(timeout=frist or STUFE_FRIST_SEKUNDEN)
         except subprocess.TimeoutExpired:
-            with contextlib.suppress(ProcessLookupError):
+            with contextlib.suppress(ProcessLookupError, PermissionError):
                 os.killpg(prozess.pid, signal.SIGKILL)
             try:
                 stdout, stderr = prozess.communicate(timeout=NACHLAUF_SEKUNDEN)

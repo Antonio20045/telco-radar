@@ -54,6 +54,20 @@ def test_gegenprobe_ohne_eigenen_ordner_liest_python_den_bytecode(tmp_path):
     assert lauf.stdout.strip() == "2"
 
 
+def test_gruppe_aus_zombies_macht_den_lauf_nicht_zum_abbruch(tmp_path, monkeypatch):
+    """macOS meldet EPERM statt ESRCH, wenn die Gruppe nur noch aus Zombies besteht."""
+
+    def killpg(pid, signal_nummer):
+        raise PermissionError(1, "Operation not permitted")
+
+    monkeypatch.setattr(os, "killpg", killpg)
+
+    lauf = prozess.starten([sys.executable, "-c", "print(7)"], tmp_path)
+
+    assert lauf.returncode == 0
+    assert lauf.stdout.strip() == "7"
+
+
 def _repo(ort: Path) -> Path:
     ort.mkdir()
     _git(ort, "init", "-q")
