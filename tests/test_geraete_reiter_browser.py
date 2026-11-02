@@ -583,15 +583,20 @@ def test_jeder_reiter_bleibt_unter_drei_bildschirmen(_seite, tid):
     18.412 px hoch.
 
     E3: die Radar-Tafel steht mit auf dieser Seite; ihr Platzhalter-
-    Gerüst ist bewusst klein (der Inhalt montiert E3 Schritt 2)."""
+    Gerüst ist bewusst klein (der Inhalt montiert E3 Schritt 2).
+
+    Die Preispositionierung steht als eigenes Bild vor den Reitern (Auftrag
+    02.11.2026) und gehört zu keinem Reiter; wie das Aufmacherbild zählt sie
+    nicht mit. Die Reiter selbst bleiben unter der Grenze."""
     _frisch(_seite)
     _zeige_tafel(_seite, tid)
     _seite.wait_for_timeout(60)
     hoehe = _seite.evaluate(
         "document.documentElement.scrollHeight"
         " - document.querySelector('.gx-auftakt').offsetHeight"
+        " - document.querySelector('#preisposition').offsetHeight"
     )
-    assert hoehe < MAX_HOEHE, f"{tid}: {hoehe} px ohne das Aufmacherbild"
+    assert hoehe < MAX_HOEHE, f"{tid}: {hoehe} px ohne Aufmacher und Preisbild"
 
 
 def _radar_url(seite):

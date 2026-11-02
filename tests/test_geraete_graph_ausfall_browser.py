@@ -82,7 +82,7 @@ def _wechsle_band(_seite, abrufe_sperren: bool):
     s.click("#gr-zr-baender button[data-band='m']")
     s.wait_for_timeout(400)
     text = s.eval_on_selector("#gr-zr-gruppe", "e => e.textContent")
-    graphen = s.locator("#gr-zr-gruppe svg.gr-zr").count()
+    graphen = s.locator("#gr-zr-gruppe svg.gr-zr:visible").count()
     context.close()
     return text, graphen
 

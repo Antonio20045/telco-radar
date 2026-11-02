@@ -256,9 +256,16 @@ def test_die_erste_buendelzeile_ist_ohne_scroll_erreichbar(fixture_name, request
     390: sie endet im zweiten - der Graph hat Vorrang an der Falz.)
 
     Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite; gemessen
-    wird die erste sichtbare Zeile der fehlenden Anbieter unter dem Graphen."""
+    wird die erste sichtbare Zeile der fehlenden Anbieter unter dem Graphen.
+
+    Das Preisbild (`#preisposition`) steht seit 02.11.2026 auf Auftrag
+    ganz oben, vor den Reitern; seine Höhe zählt zur Falz nicht mit, sonst
+    wäre jede Änderung an ihm ein Fehlschlag dieser Messung."""
     s = request.getfixturevalue(fixture_name)
-    grenze = 2 * s.viewport_size["height"]
+    preisbild = s.evaluate(
+        "() => document.querySelector('#preisposition').offsetHeight"
+    )
+    grenze = 2 * s.viewport_size["height"] + preisbild
     assert s.evaluate("() => !document.querySelector('#tafel-tco .gr-bnd')"), (
         "Bündelzeilen stehen noch auf der Seite"
     )
