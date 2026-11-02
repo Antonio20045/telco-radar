@@ -287,7 +287,10 @@ def test_die_ausgelieferte_konfiguration_haelt_was_der_hinweis_verspricht():
         anbieter.user_agent
         == "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
     )
-    assert len(anbieter.einstiege) == 17
+    # 17 historische Modellseiten plus die zwei neuen iPhone-18-Pro-Seiten.
+    assert len(anbieter.einstiege) == 19
+    assert any(e.url.endswith("/iphone-18-pro") for e in anbieter.einstiege)
+    assert any(e.url.endswith("/iphone-18-pro-max") for e in anbieter.einstiege)
     assert all("/de/brand/apple/iphone/" in e.url for e in anbieter.einstiege)
 
 
