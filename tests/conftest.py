@@ -13,11 +13,17 @@ import glob
 import importlib.util
 import json
 import os
+import socketserver
 import sys
 import sysconfig
 from pathlib import Path
 
 import pytest
+
+RUECKSTAU_TESTSERVER = 128
+"""Lokale Testserver hätten sonst Rückstau 5; unter Last setzt der Kernel Verbindungen
+zurück (net::ERR_CONNECTION_RESET) und Browser-Tests flackern. Eine Stelle für alle."""
+socketserver.TCPServer.request_queue_size = RUECKSTAU_TESTSERVER
 
 WURZEL = Path(__file__).resolve().parents[1]
 TESTS = f"{WURZEL / 'tests'}{os.sep}"
