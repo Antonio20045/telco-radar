@@ -13,8 +13,19 @@ from pathlib import Path
 from bs4 import BeautifulSoup
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from telco_radar.beleg_manifest import MANIFEST_NAME, baue_manifest, schreibe
-from telco_radar.beleg_regeln import dateiname
+from telco_radar.beleg_manifest import (
+    MANIFEST_NAME,
+    Beleg,
+    baue_manifest,
+    markiere_ausfall,
+    schreibe,
+)
+from telco_radar.beleg_regeln import (
+    ANZEIGE_GROSS_ANZAHL,
+    ANZEIGE_TAGE,
+    AUFBEWAHRUNG_TAGE,
+    dateiname,
+)
 from telco_radar.report import geraete_belege
 from telco_radar.report.geraete_tco_grafik import euro
 
@@ -137,3 +148,58 @@ def test_anbietername_mit_sonderzeichen_trifft_den_dateinamen(tmp_path):
     env = umgebung()
     geraete_belege.installiere(env, ordner, BERICHTE)
     assert zeige(env, ("iphone-17-256", "1&1")).select_one("details") is not None
+
+
+def test_anzeige_sieben_tage_und_hoechstens_drei_aeltere_grosse(tmp_path):
+    """Heute 10.11.: Bild vom 5.11. und die drei jüngsten älteren großen."""
+    tage = ("2026-10-01", "2026-10-08", "2026-10-15", "2026-10-22")
+    ordner = manifest(
+        tmp_path,
+        {
+            "belege-gross-2026-10": [
+                datei("iphone-17-256", "vodafone", t) for t in tage
+            ],
+            "belege-2026-11-05": [datei("iphone-17-256", "vodafone", "2026-11-05")],
+        },
+    )
+    env = umgebung()
+    geraete_belege.installiere(env, ordner, BERICHTE)
+    seite = zeige(env)
+    gezeigt = [t.get_text()[:16].strip() for t in seite.select(".gr-belege-tag")]
+    assert gezeigt == [
+        "5. November 2026",
+        "22. Oktober 2026",
+        "15. Oktober 2026",
+        "8. Oktober 2026",
+    ]
+    assert seite.select_one("summary").get_text(strip=True) == "Belege (4)"
+
+
+def test_anzeige_grenzen_sind_benannte_konstanten():
+    assert (ANZEIGE_TAGE, ANZEIGE_GROSS_ANZAHL) == (7, 3)
+    assert ANZEIGE_TAGE == AUFBEWAHRUNG_TAGE
+
+
+def test_anzeige_aeltere_kleine_aenderung_bleibt_weg_gegenprobe():
+    """Ohne Manifest-Filter: älter als sieben Tage und nicht groß, nicht angezeigt."""
+    heute = date(2026, 11, 10)
+    url = "https://example.invalid/b.webp"
+    klein = Beleg("g", "a", date(2026, 11, 2), False, url)
+    gross = Beleg("g", "a", date(2026, 11, 2), True, url)
+    grenze = Beleg("g", "a", date(2026, 11, 3), False, url)
+    assert geraete_belege.sortiert_je_preis([klein], heute) == {}
+    assert len(geraete_belege.sortiert_je_preis([gross], heute)[("g", "a")]) == 1
+    assert len(geraete_belege.sortiert_je_preis([grenze], heute)[("g", "a")]) == 1
+
+
+def test_stoerungsvermerk_im_manifest_wird_ein_benannter_ausfall(tmp_path):
+    name = datei("iphone-17-256", "vodafone", "2026-11-10")
+    ordner = manifest(tmp_path, {"belege-2026-11-10": [name]})
+    gut = geraete_belege.installiere(umgebung(), ordner, BERICHTE)
+    assert gut == []
+    markiere_ausfall(ordner / MANIFEST_NAME, "Lauf endete mit Exit 124", HEUTE)
+    env = umgebung()
+    ausfaelle = geraete_belege.installiere(env, ordner, BERICHTE)
+    assert [a.teil for a in ausfaelle] == [geraete_belege.TEIL]
+    assert "Exit 124" in ausfaelle[0].grund
+    assert zeige(env).select_one("details") is not None

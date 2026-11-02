@@ -9,8 +9,9 @@ from telco_radar.analyze.beleg_schluessel import (
     GRUND_OHNE_BELEG,
     GRUND_OHNE_GERAET,
     ordne_zu,
-    vorher_je_geraet,
+    vorher_je_konfiguration,
 )
+from telco_radar.beleg_regeln import ist_grosse_aenderung
 
 
 def satz(tarif=30.0, zuzahlung=100.0, rate=20.0, **extra) -> dict:
@@ -25,6 +26,9 @@ def satz(tarif=30.0, zuzahlung=100.0, rate=20.0, **extra) -> dict:
         "laufzeit_monate": 24,
         "anschlusspreis": 0.0,
         "pruefung": "gueltig",
+        "quelle_art": "klick",
+        "zustand": "neu",
+        "abgerufen_am": "2026-11-01",
     }
     daten.update(extra)
     return daten
@@ -40,19 +44,64 @@ def geraet(sku: str):
     return ("iphone-17", 256) if sku == "sku-1" else ("", None)
 
 
+SCHLUESSEL = ("Telekom", "iphone-17", 256, "m", 24)
+
+
 def test_gesamtkosten_wie_von_hand_gerechnet():
-    vorher = vorher_je_geraet([satz()], geraet)
-    assert vorher == {("iphone-17", 256, "Telekom"): 1300.0}
+    vorher = vorher_je_konfiguration([satz()], geraet)
+    assert vorher == {SCHLUESSEL: 1300.0}
 
 
-def test_vorher_ist_der_niedrigste_gueltige_wert():
-    bestand = [satz(), satz(tarif=25.0), satz(tarif=10.0, pruefung="abweichend")]
-    assert vorher_je_geraet(bestand, geraet) == {("iphone-17", 256, "Telekom"): 1180.0}
+def test_vorher_ist_der_jüngste_stand_derselben_konfiguration():
+    bestand = [
+        satz(abgerufen_am="2026-10-20", tarif=10.0),
+        satz(abgerufen_am="2026-11-01"),
+        satz(abgerufen_am="2026-10-25", tarif=25.0),
+    ]
+    assert vorher_je_konfiguration(bestand, geraet) == {SCHLUESSEL: 1300.0}
 
 
-def test_vorher_ignoriert_unbekannte_geraete_und_ungueltiges():
-    bestand = [satz(sku_id="fremd"), satz(pruefung="abweichend")]
-    assert vorher_je_geraet(bestand, geraet) == {}
+def test_gleicher_tag_nimmt_den_niedrigeren_wert():
+    bestand = [satz(), satz(tarif=25.0)]
+    assert vorher_je_konfiguration(bestand, geraet) == {SCHLUESSEL: 1180.0}
+
+
+def test_vorher_ignoriert_unbekannte_geraete_fremde_quellen_und_quarantaene():
+    bestand = [
+        satz(sku_id="fremd"),
+        satz(pruefung="quarantaene"),
+        satz(quelle_art=None),
+    ]
+    assert vorher_je_konfiguration(bestand, geraet) == {}
+
+
+def test_veraltet_zaehlt_als_letzter_stand():
+    bestand = [satz(pruefung="veraltet 16")]
+    assert vorher_je_konfiguration(bestand, geraet) == {SCHLUESSEL: 1300.0}
+
+
+def test_billigerer_fremder_tarif_macht_unveraenderten_preis_nicht_gross():
+    """Vorher: Minimum über alle Tarife, M (1300 €) gegen L (1000 €) war +30 %."""
+    bestand = [satz(), satz(tarif_name="L", tarif=12.0)]
+    heute = [roh("m"), roh("l", tarif_name="L", tarif=12.0)]
+    zuordnung = ordne_zu(heute, bestand, geraet)
+    assert zuordnung.messungen[0].beleg_id == "l"
+    messung = zuordnung.messungen[0]
+    assert messung.vorher_24 == messung.gesamt_24
+    assert not ist_grosse_aenderung(messung.vorher_24, messung.gesamt_24)
+
+
+def test_echte_preisaenderung_derselben_konfiguration_ist_gross():
+    """Gegenprobe: 30 € statt 25 € Tarif über 24 Monate sind 120 € (mehr als 5 %)."""
+    messung = ordne_zu([roh(tarif=25.0)], [satz(tarif=30.0)], geraet).messungen[0]
+    assert (messung.vorher_24, messung.gesamt_24) == (1300.0, 1180.0)
+    assert ist_grosse_aenderung(messung.vorher_24, messung.gesamt_24)
+
+
+def test_neue_konfiguration_ohne_vorgaenger_hat_kein_vorher():
+    messung = ordne_zu([roh(tarif_name="XL")], [satz()], geraet).messungen[0]
+    assert messung.vorher_24 is None
+    assert not ist_grosse_aenderung(messung.vorher_24, messung.gesamt_24)
 
 
 def test_billigster_rohsatz_je_geraet_und_anbieter_gewinnt():

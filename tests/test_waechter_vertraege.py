@@ -39,6 +39,14 @@ jobs:
       - name: Run geraete stage
         if: steps.heute.outputs.fertig != 'true'
         run: python -m x --frist "${{ github.event.inputs.frist || 1500 }}"
+      - name: Belege-Manifest
+        if: steps.heute.outputs.fertig != 'true'
+        timeout-minutes: 5
+        run: |
+          rc=0
+          timeout 240 python scripts/belege_manifest.py --root . || rc=$?
+          [ "$rc" -eq 0 ] || python scripts/belege_manifest.py --melde-ausfall "$rc"
+          exit 0
       - name: Commit state
         if: steps.heute.outputs.fertig != 'true'
         run: |
@@ -72,6 +80,18 @@ for versuch in 1 2 3; do
 done
 exit 1
 """
+KLICK = """\
+jobs:
+  belege:
+    timeout-minutes: 40
+    steps:
+      - name: Veroeffentlichen
+        run: |
+          python scripts/belege_veroeffentlichen.py --root . \\
+            --job-start "$JOB_START" --job-frist-sekunden 1800
+"""
+BELEG_ABLAGE = "ZEIT_JE_AUFRUF_S = 300\n"
+BELEG_SKRIPT = "JOB_MINUTEN = 40\nPUFFER_S = 300\n"
 PIPELINE = "FRIST_STANDARD = 900.0\nFRIST_TAGESLAUF = 1500.0\n"
 
 
@@ -108,6 +128,9 @@ def projekt(tmp_path: Path) -> Path:
     _schreibe(tmp_path, wv.SETTINGS, "job_frist_sekunden: 3600\n")
     _schreibe(tmp_path, wv.DEPLOY, DEPLOY)
     _schreibe(tmp_path, wv.GERAETE_PIPELINE, PIPELINE)
+    _schreibe(tmp_path, wv.KLICK, KLICK)
+    _schreibe(tmp_path, wv.BELEG_ABLAGE, BELEG_ABLAGE)
+    _schreibe(tmp_path, wv.BELEG_SKRIPT, BELEG_SKRIPT)
     _schreibe(tmp_path, "tests/test_a.py", "def test_a():\n    assert True\n")
     roh = b"<html>echt</html>"
     _schreibe(tmp_path, "tests/fixtures/x/seite.html.gz", gzip.compress(roh))
@@ -273,6 +296,59 @@ def test_seitenbau_mit_continue_on_error_ist_rot(projekt, schritt):
     assert wv.pruefe(projekt) == [
         f".github/workflows/geraete.yml: Schritt {schritt!r} schluckt Fehler"
         " (continue-on-error)"
+    ]
+
+
+@pytest.mark.parametrize(
+    ("alt", "neu", "meldung"),
+    [
+        ("          exit 0\n", "", "nicht immer mit exit 0"),
+        (" || rc=$?\n", "\n", "nicht immer mit exit 0"),
+        ("        timeout-minutes: 5\n", "", "kein timeout-minutes"),
+        ("timeout 240 ", "", "nicht vor dem Schritt-Timeout selbst ab"),
+        ("timeout 240 ", "timeout 300 ", "nicht vor dem Schritt-Timeout selbst ab"),
+        ("--melde-ausfall", "--ohne", "nicht als Ausfall an die Seite"),
+    ],
+)
+def test_belege_manifest_schritt_darf_den_commit_nicht_sperren(
+    projekt, alt, neu, meldung
+):
+    """Gegenprobe zum Beispielprojekt: jede Lockerung ist rot."""
+    _ersetze(projekt, wv.GERAETE, alt, neu)
+    meldungen = wv.pruefe(projekt)
+    assert any(meldung in m for m in meldungen), meldungen
+    assert all("Belege-Manifest" in m for m in meldungen), meldungen
+
+
+def test_belege_manifest_nach_dem_commit_ist_rot(projekt):
+    _ersetze(projekt, wv.GERAETE, "- name: Belege-Manifest", "- name: Belege-Manifest2")
+    _ersetze(projekt, wv.GERAETE, "- name: Render site", "- name: Belege-Manifest")
+    meldungen = wv.pruefe(projekt)
+    assert any("steht nicht vor dem Commit" in m for m in meldungen), meldungen
+
+
+def test_belegjob_frist_ohne_puffer_ist_rot(projekt):
+    """2100 s + ein Aufruf von 300 s = 2400 s: der Job-Timeout selbst."""
+    _ersetze(
+        projekt, wv.KLICK, "--job-frist-sekunden 1800", "--job-frist-sekunden 2100"
+    )
+    assert wv.pruefe(projekt) == [
+        ".github/workflows/klick.yml: Job belege lässt nach --job-frist-sekunden 2100"
+        " nur 300 s, nötig sind 600 (ein letzter Aufruf plus Puffer)"
+    ]
+
+
+def test_belegjob_frist_mit_genau_dem_puffer_ist_gruen(projekt):
+    _ersetze(
+        projekt, wv.KLICK, "--job-frist-sekunden 1800", "--job-frist-sekunden 1800"
+    )
+    assert wv.pruefe(projekt) == []
+
+
+def test_belegjob_timeout_weicht_vom_skript_ab_ist_rot(projekt):
+    _ersetze(projekt, wv.KLICK, "timeout-minutes: 40", "timeout-minutes: 45")
+    assert wv.pruefe(projekt) == [
+        ".github/workflows/klick.yml: Job belege 2700 s ≠ JOB_MINUTEN 40.0 min"
     ]
 
 

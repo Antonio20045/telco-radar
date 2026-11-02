@@ -9,10 +9,14 @@ den die Seite als Leitzahl zeigt. Die Gesamtkosten rechnet ``tco_kosten`` an der
 Stelle wie die Seite (CLAUDE.md Clean Code 1); eine Lücke heißt ``None`` und verliert
 gegen jede Zahl.
 
-Der Vergleichswert ist der niedrigste Wert derselben (Gerät, Anbieter) im Bestand
-``geraete_tco.json`` mit Status ``gueltig``. Der Klick-Lauf läuft vor dem Geräte-Lauf;
-der Bestand ist darum der Stand der letzten Messung. Ohne gültigen Bestandssatz ist
-``vorher_24`` ``None`` und die Änderung nie groß (``beleg_regeln``).
+Der Vergleichswert ist der letzte Stand DERSELBEN Konfiguration im Bestand
+``geraete_tco.json``: gleiches Gerät, gleicher Speicher, Anbieter, Tarif, Laufzeit und
+Zustand, gleiche Quelle (Klick), Status ``gueltig`` oder ``veraltet`` (``quarantaene``
+zählt nicht). Es ist ausdrücklich nicht das Minimum über alle Tarife: ein unveränderter
+Preis darf nicht „groß“ werden, nur weil ein anderer Tarif billiger ist. Der Klick-Lauf
+läuft vor dem Geräte-Lauf; der Bestand ist darum der Stand der letzten Messung.
+Gibt es den Satz dort nicht (neue Konfiguration), ist ``vorher_24`` ``None`` und die
+Änderung nie groß (``beleg_regeln``).
 """
 
 from __future__ import annotations
@@ -21,9 +25,11 @@ from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from typing import Any
 
+from ..collect.geraete.klickrohsatz import QUELLE
 from ..tco_kosten import kosten_ueber
 from ..tco_model import TCO_HORIZONT
-from .geraete_pruefstatus import GUELTIG, buendel_aus_satz
+from .geraete_pruefstatus import GUELTIG, VERALTET, buendel_aus_satz
+from .klick_zusammenfuehrung import Schluessel, klickschluessel
 
 GeraetAusSku = Callable[[str], tuple[str, int | None]]
 
@@ -66,13 +72,21 @@ def _gesamt(satz: dict[str, Any]) -> float | None:
     return kosten_ueber(buendel_aus_satz(satz), TCO_HORIZONT).gesamt
 
 
-def vorher_je_geraet(
+def vorher_je_konfiguration(
     bestand: Iterable[dict[str, Any]], geraet: GeraetAusSku
-) -> dict[tuple[str, int | None, str], float | None]:
-    """Niedrigste Gesamtkosten je (device_id, speicher, anbieter) im Bestand."""
-    ergebnis: dict[tuple[str, int | None, str], float | None] = {}
+) -> dict[Schluessel, float | None]:
+    """Letzter Stand der Gesamtkosten je Klick-Konfiguration im Bestand.
+
+    Schlüssel ist ``klickschluessel`` (Anbieter, Gerät, Speicher, Tarif, Laufzeit,
+    Zustand). Gibt es mehrere Sätze, gewinnt der jüngste ``abgerufen_am``, bei
+    Gleichstand der niedrigere Wert.
+    """
+    stand: dict[Schluessel, tuple[str, float | None]] = {}
     for satz in bestand:
-        if not str(satz.get("pruefung") or "").startswith(GUELTIG):
+        if satz.get("quelle_art") != QUELLE:
+            continue
+        pruefung = str(satz.get("pruefung") or "")
+        if not pruefung.startswith((GUELTIG, VERALTET)):
             continue
         device_id, speicher = geraet(str(satz.get("sku_id") or ""))
         if not device_id:
@@ -81,9 +95,16 @@ def vorher_je_geraet(
             gesamt = _gesamt(satz)
         except (TypeError, ValueError, KeyError):
             continue
-        schluessel = (device_id, speicher, str(satz.get("anbieter")))
-        ergebnis[schluessel] = _niedriger(ergebnis.get(schluessel), gesamt)
-    return ergebnis
+        schluessel = klickschluessel(
+            {**satz, "device_id": device_id, "speicher_gb": speicher}, mit_zustand=True
+        )
+        abgerufen = str(satz.get("abgerufen_am") or "")
+        alt = stand.get(schluessel)
+        if alt is None or abgerufen > alt[0]:
+            stand[schluessel] = (abgerufen, gesamt)
+        elif abgerufen == alt[0]:
+            stand[schluessel] = (abgerufen, _niedriger(alt[1], gesamt))
+    return {schluessel: gesamt for schluessel, (_, gesamt) in stand.items()}
 
 
 def _besser(neu: tuple, alt: tuple) -> bool:
@@ -101,7 +122,7 @@ def ordne_zu(
     geraet: GeraetAusSku,
 ) -> Zuordnung:
     """Eine ``Messung`` je (Gerät, Anbieter) mit Beleg; Rest zählt ``mehrdeutig``."""
-    vorher = vorher_je_geraet(bestand, geraet)
+    vorher = vorher_je_konfiguration(bestand, geraet)
     ergebnis = Zuordnung([], {})
     beste: dict[tuple[str, int | None, str], Messung] = {}
 
@@ -131,7 +152,7 @@ def ordne_zu(
             schluessel[2],
             str(beleg_id),
             gesamt,
-            vorher.get(schluessel),
+            vorher.get(klickschluessel(satz, mit_zustand=True)),
         )
         alt = beste.get(schluessel)
         if alt is not None:

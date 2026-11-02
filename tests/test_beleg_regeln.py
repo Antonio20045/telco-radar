@@ -14,6 +14,7 @@ from telco_radar.beleg_regeln import (
     AUFBEWAHRUNG_TAGE,
     GROSS_EURO,
     GROSS_PROZENT,
+    anbieter_schluessel,
     dateiname,
     gross_tag,
     ist_abgelaufen,
@@ -163,3 +164,28 @@ def test_fremdes_ist_nie_sichtbar():
     heute = date(2026, 11, 10)
     assert not ist_sichtbar("belege-2026-11-10", "foto.webp", heute)
     assert not ist_sichtbar("v1.0", dateiname("g", "o2", heute), heute)
+
+
+@pytest.mark.parametrize(
+    ("name", "erwartet"),
+    [
+        ("Telekom", "telekom"),
+        ("1&1", "1-1"),
+        ("o2", "o2"),
+        ("Café Müller", "cafe-muller"),
+    ],
+)
+def test_anbieter_schluessel_ist_ascii_und_stabil(name, erwartet):
+    assert anbieter_schluessel(name) == erwartet
+
+
+@pytest.mark.parametrize("name", ["Телеком", "電信", "", "!!!"])
+def test_anbieter_schluessel_ohne_ascii_hat_stabilen_ersatz(name):
+    schluessel = anbieter_schluessel(name)
+    assert schluessel == anbieter_schluessel(name)
+    assert schluessel.startswith("anbieter-")
+    assert zerlege_dateiname(dateiname("g", schluessel, TAG)) is not None
+
+
+def test_anbieter_schluessel_unterscheidet_verschiedene_unicode_namen():
+    assert anbieter_schluessel("Телеком") != anbieter_schluessel("電信")

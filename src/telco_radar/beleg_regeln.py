@@ -10,9 +10,9 @@ Der Dateiname trägt die stabilen Schlüssel:
 ``<geraet_id>__<anbieter_id>__<JJJJ-MM-TT>.webp``.
 ``geraet_id`` ist Gerät und Speicher des Katalogs
 (``geraete_tco_karten.modell_schluessel``),
-``anbieter_id`` der Anbieter-Slug (``geraete_tco_grafik.anbieter_slug``), nie ein
-Titeltext. Wer ein Bild von Hand hochlädt, benennt es genauso; die Seite liest die
-Anhänge der Releases (``beleg_manifest``) und kennt keinen zweiten Weg.
+``anbieter_id`` der ASCII-Schlüssel des Anbieternamens (``anbieter_schluessel``),
+nie ein Titeltext. Wer ein Bild von Hand hochlädt, benennt es genauso; die Seite
+liest die Anhänge der Releases (``beleg_manifest``) und kennt keinen zweiten Weg.
 
 Große Änderung: die Gesamtkosten über 24 Monate weichen von der letzten Messung
 derselben Konfiguration um mindestens ``GROSS_PROZENT`` Prozent ODER ``GROSS_EURO`` Euro
@@ -25,13 +25,19 @@ Reines Stdlib-Modul ohne Netz: Workflow-Skripte und Seite lesen dieselben Zahlen
 
 from __future__ import annotations
 
+import hashlib
 import re
+import unicodedata
 from dataclasses import dataclass
 from datetime import date, timedelta
 
 REPO = "Antonio20045/telco-radar"
 AUFBEWAHRUNG_TAGE = 7
 AUFBEWAHRUNG_GROSS_TAGE = 90
+ANZEIGE_TAGE = AUFBEWAHRUNG_TAGE
+"""Die Seite zeigt alle Belege dieser letzten Tage (wie ``ist_abgelaufen``)."""
+ANZEIGE_GROSS_ANZAHL = 3
+"""Dazu höchstens so viele ältere große Änderungen (die jüngsten der 90 Tage)."""
 GROSS_PROZENT = 5
 GROSS_EURO = 50
 MAX_ANHAENGE_JE_RELEASE = 900
@@ -62,6 +68,23 @@ class Dateiname:
     def schluessel(self) -> str:
         """Gerät und Anbieter ohne Datum."""
         return f"{self.geraet_id}{TRENNER}{self.anbieter_id}"
+
+
+def anbieter_schluessel(anbieter: str) -> str:
+    """Stabiler ASCII-Schlüssel eines Anbieternamens, immer im Schema von ``dateiname``.
+
+    ``1&1`` wird ``1-1``, ``ALDI TALK`` wird ``aldi-talk``, ``Telefónica`` wird
+    ``telefonica``. Bleibt nach dem Falten nichts übrig (nur Zeichen außerhalb von
+    ASCII), ist der Schlüssel ``anbieter-<8 Zeichen Prüfsumme des Namens>``: stabil, nie
+    leer, nie ein Fehler, der das Hochladen aller anderen Bilder stoppt. Seite und
+    Hochladen rufen dieselbe Funktion (CLAUDE.md Clean Code 1).
+    """
+    gefaltet = unicodedata.normalize("NFKD", anbieter or "").encode("ascii", "ignore")
+    schluessel = re.sub(r"[^a-z0-9]+", "-", gefaltet.decode("ascii").lower()).strip("-")
+    if schluessel:
+        return schluessel
+    pruefsumme = hashlib.sha1((anbieter or "").encode("utf-8")).hexdigest()[:8]
+    return f"anbieter-{pruefsumme}"
 
 
 def dateiname(geraet_id: str, anbieter_id: str, datum: date) -> str:
@@ -123,6 +146,11 @@ def ist_grosse_aenderung(vorher: float | None, jetzt: float | None) -> bool:
     if unterschied >= GROSS_EURO * 100:
         return True
     return unterschied * 100 >= GROSS_PROZENT * abs(_cent(vorher))
+
+
+def ist_anzeige_neu(datum: date, heute: date) -> bool:
+    """Gehört der Beleg zu den letzten ``ANZEIGE_TAGE`` Tagen? (Alter 7 ja, 8 nein.)"""
+    return (heute - datum).days <= ANZEIGE_TAGE
 
 
 def release_ende(tag: str) -> date | None:

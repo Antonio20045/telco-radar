@@ -10,6 +10,11 @@ Ein Bild kann in beiden Releases liegen (Tag und Monat, große Änderung). Die S
 es einmal, mit Kennzeichen ``gross``; liegt es nur im Monats-Release, ist es ebenfalls
 groß. Die Adresse zeigt dann auf das Monats-Release, das länger lebt. Was
 ``ist_sichtbar`` verneint, kommt nicht hinein.
+Kann der Geräte-Lauf das Manifest nicht erneuern (``gh`` hängt, scheitert), bleibt
+der letzte Stand stehen und ``markiere_ausfall`` trägt Grund und Tag ein (Feld
+``ausfall``); die Seite nennt ihn als Ausfall „Belegbilder“, statt einen alten
+Stand als aktuell zu zeigen. Das
+nächste erfolgreiche ``baue_manifest`` löscht den Vermerk.
 Fremde Dateien in einem Release (falscher Name) bleiben still außen vor: das ist kein
 Fehler der Seite, die Zählung steht in ``fremd``.
 """
@@ -38,6 +43,14 @@ DOWNLOAD_BASIS = f"https://github.com/{REPO}/releases/download"
 
 class BelegManifestFehler(ValueError):
     """Das Manifest ist unlesbar oder hat ein fremdes Format."""
+
+
+@dataclass(frozen=True)
+class Manifest:
+    """Gelesenes Manifest: die Bilder und, falls vermerkt, der Grund der Störung."""
+
+    belege: list[Beleg]
+    ausfall: str | None = None
 
 
 @dataclass(frozen=True)
@@ -101,20 +114,39 @@ def schreibe(pfad: Path, manifest: dict) -> None:
     )
 
 
-def lies(pfad: Path) -> list[Beleg]:
-    """Die Einträge; fehlt die Datei, ist die Liste leer; kaputt:
+def markiere_ausfall(pfad: Path, grund: str, heute: date) -> None:
+    """Vermerkt im bestehenden Manifest, dass es nicht erneuert wurde (Bilder bleiben).
+
+    Fehlt das Manifest, entsteht ein leeres mit dem Vermerk: „keine Bilder“ ist dann
+    nicht still, sondern benannt. Ein unlesbares Manifest wird nicht angefasst.
+    """
+    manifest = baue_manifest({}, heute)
+    if pfad.is_file():
+        try:
+            alt = json.loads(pfad.read_text(encoding="utf-8"))
+            if alt["format"] != FORMAT:
+                raise ValueError(f"Format {alt['format']!r}")
+            manifest = alt
+        except (OSError, ValueError, KeyError, TypeError):
+            return
+    manifest["ausfall"] = f"{heute.isoformat()}: {grund}"
+    schreibe(pfad, manifest)
+
+
+def lies_manifest(pfad: Path) -> Manifest:
+    """Bilder und Störungsvermerk; fehlt die Datei, ist sie leer; kaputt:
     ``BelegManifestFehler``.
 
     Eine fehlende Datei ist der Zustand vor dem ersten Lauf, keine Störung. Eine kaputte
     ist nie leer: sie wirft, und der Aufrufer benennt es.
     """
     if not pfad.is_file():
-        return []
+        return Manifest([])
     try:
         daten = json.loads(pfad.read_text(encoding="utf-8"))
         if daten["format"] != FORMAT:
             raise BelegManifestFehler(f"Format {daten['format']!r}, erwartet {FORMAT}")
-        return [
+        belege = [
             Beleg(
                 str(b["geraet_id"]),
                 str(b["anbieter_id"]),
@@ -124,5 +156,12 @@ def lies(pfad: Path) -> list[Beleg]:
             )
             for b in daten["belege"]
         ]
+        ausfall = daten.get("ausfall")
+        return Manifest(belege, str(ausfall) if ausfall else None)
     except (OSError, ValueError, KeyError, TypeError) as fehler:
         raise BelegManifestFehler(f"{pfad}: {fehler}") from fehler
+
+
+def lies(pfad: Path) -> list[Beleg]:
+    """Nur die Bilder (``lies_manifest``)."""
+    return lies_manifest(pfad).belege

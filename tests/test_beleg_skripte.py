@@ -15,7 +15,7 @@ from types import ModuleType, SimpleNamespace
 import pytest
 from beleg_attrappe import AttrappeReleases
 
-from telco_radar.beleg_manifest import MANIFEST_DATEI, lies
+from telco_radar.beleg_manifest import MANIFEST_DATEI, lies, lies_manifest
 from telco_radar.beleg_regeln import dateiname
 from telco_radar.klick_vertrag import FORMAT
 
@@ -105,6 +105,9 @@ def satz(tarif: float, beleg_id: str, anbieter: str = "Telekom") -> dict:
         "laufzeit_monate": 24,
         "anschlusspreis": 0.0,
         "beleg_id": beleg_id,
+        "quelle_art": "klick",
+        "zustand": "neu",
+        "abgerufen_am": "2026-11-09",
     }
 
 
@@ -160,6 +163,55 @@ def test_grosse_aenderung_zusaetzlich_im_monatsrelease(aufbau):
     assert veroeffentliche(aufbau, wurzel, gh) == 0
     name = "apple-iphone-17-256__telekom__2026-11-10.webp"
     assert gh.stand == {"belege-2026-11-10": [name], "belege-gross-2026-11": [name]}
+
+
+def test_billigerer_fremder_tarif_im_bestand_macht_nichts_gross(aufbau):
+    """Vorher: Minimum aller Tarife, 30 € gegen 20 € galt als groß."""
+    bestand = [
+        {**satz(30.0, "alt"), "pruefung": "gueltig"},
+        {**satz(20.0, "alt2"), "tarif_name": "L", "pruefung": "gueltig"},
+    ]
+    wurzel = aufbau.lege(bestand, [satz(30.0, "b1")])
+    gh = AttrappeReleases()
+    assert veroeffentliche(aufbau, wurzel, gh) == 0
+    assert sorted(gh.stand) == ["belege-2026-11-10"]
+
+
+def test_unbrauchbarer_anbietername_stoppt_die_anderen_bilder_nicht(aufbau):
+    """Ein Name ohne ASCII-Zeichen ergab einen ValueError und brach ab."""
+    wurzel = aufbau.lege([], [satz(30.0, "b1", anbieter="Телеком")])
+    (aufbau.quelle / "telekom" / "ergebnis2.json").write_text(
+        json.dumps(
+            {"format": FORMAT, "anbieter": "o2", "roh": [satz(20.0, "b2", "o2")]}
+        ),
+        encoding="utf-8",
+    )
+    (aufbau.quelle / "telekom" / "b2.webp").write_bytes(b"RIFFxxxxWEBP")
+    gh = AttrappeReleases()
+    assert veroeffentliche(aufbau, wurzel, gh) == 0
+    namen = [n for _, liste in gh.hochgeladen for n in liste]
+    assert any("__o2__" in n for n in namen)
+    assert any("__anbieter-" in n for n in namen)
+
+
+def test_ausfall_wird_im_manifest_vermerkt_und_haengt_nicht_an_der_seite(tmp_path):
+    """Scheitert der Schritt, kennt die Seite den Grund (CLAUDE.md Regel 6)."""
+    alt = dateiname("g", "o2", date(2026, 11, 9))
+    assert manifest_lauf(tmp_path, AttrappeReleases({"belege-2026-11-09": [alt]})) == 0
+    assert manifest_lauf(tmp_path, AttrappeReleases(lesefehler=True)) == 1
+    manifest = lies_manifest(tmp_path / MANIFEST_DATEI)
+    assert [b.anbieter_id for b in manifest.belege] == ["o2"]
+    assert manifest.ausfall is not None and "Releases nicht lesbar" in manifest.ausfall
+    assert manifest_lauf(tmp_path, AttrappeReleases({"belege-2026-11-09": [alt]})) == 0
+    assert lies_manifest(tmp_path / MANIFEST_DATEI).ausfall is None
+
+
+def test_melde_ausfall_ohne_netz_vermerkt_den_grund(tmp_path):
+    modul = lade_skript("belege_manifest")
+    argv = ["--root", str(tmp_path), "--heute", HEUTE.isoformat()]
+    assert modul.main([*argv, "--melde-ausfall", "Exit 124"], gh=None) == 1
+    ausfall = lies_manifest(tmp_path / MANIFEST_DATEI).ausfall
+    assert ausfall == "2026-11-10: Exit 124"
 
 
 def test_ohne_bestandssatz_ist_nichts_gross(aufbau):

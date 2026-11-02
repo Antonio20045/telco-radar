@@ -4,16 +4,17 @@
 AUFRUF
 ------
     PYTHONPATH=src python scripts/belege_veroeffentlichen.py --quelle klick-artefakte
-        [--root .] [--job-frist-sekunden 2100] [--job-start EPOCHE] [--heute JJJJ-MM-TT]
+        [--root .] [--job-frist-sekunden 1800] [--job-start EPOCHE] [--heute JJJJ-MM-TT]
 
 ``--quelle`` enthält je Anbieter die Ergebnisdatei und die WebP-Bilder (``belegbild``),
 in beliebig tiefen Unterordnern. Je (Gerät, Anbieter) wählt ``beleg_schluessel`` den
 Preis mit den niedrigsten Gesamtkosten; das Bild heißt dann
 ``<geraet_id>__<anbieter_id>__<JJJJ-MM-TT>.webp`` (``beleg_regeln.dateiname``, Gerät aus
-dem Katalog, Anbieter als Slug). ``beleg_ablage.veroeffentliche`` lädt es ins Release
-``belege-JJJJ-MM-TT``, eine große Änderung zusätzlich in ``belege-gross-JJJJ-MM``. Es
-gibt keine Indexdatei und keinen Commit: die Seite liest die Anhänge der Releases
-(``scripts/belege_manifest.py``). Das Token liegt nur in ``GH_TOKEN``.
+dem Katalog, Anbieter als ASCII-Schlüssel). ``beleg_ablage.veroeffentliche`` lädt es ins
+Release ``belege-JJJJ-MM-TT``, eine große Änderung zusätzlich in
+``belege-gross-JJJJ-MM``. Es gibt keine Indexdatei und keinen Commit: die Seite liest
+die Anhänge der Releases (``scripts/belege_manifest.py``). Das Token liegt nur in
+``GH_TOKEN``.
 
 Exit-Code 0: alles getan oder nichts zu tun (auch ohne Artefakt); 1: ein Teil ist
 gescheitert; 2: Eingabe oder Konfiguration falsch.
@@ -31,20 +32,34 @@ from datetime import UTC, date, datetime
 from pathlib import Path
 
 from telco_radar.analyze.beleg_schluessel import ordne_zu
-from telco_radar.beleg_ablage import Bild, Gh, Releases, veroeffentliche
-from telco_radar.beleg_regeln import dateiname, ist_grosse_aenderung
+from telco_radar.beleg_ablage import (
+    ZEIT_JE_AUFRUF_S,
+    Bild,
+    Gh,
+    Releases,
+    veroeffentliche,
+)
+from telco_radar.beleg_regeln import (
+    anbieter_schluessel,
+    dateiname,
+    ist_grosse_aenderung,
+)
 from telco_radar.collect.geraete.belegbild import zwischenname
 from telco_radar.collect.geraete.klickrohsatz import ausbeute
 from telco_radar.geraete_config import lade_katalog
 from telco_radar.klick_vertrag import lies_ergebnisse
-from telco_radar.report.geraete_tco_grafik import anbieter_slug
 from telco_radar.report.geraete_tco_karten import geraet_aus_sku, modell_schluessel
 
 FEHLER_TEIL = 1
 FEHLER_EINGABE = 2
 TCO_DATEI = Path("data") / "state" / "geraete_tco.json"
-JOB_FRIST_S = 35 * 60
-"""Zeit des Jobs ``belege`` (``timeout-minutes: 40``) ohne fünf Minuten Reserve."""
+JOB_MINUTEN = 40
+"""``timeout-minutes`` des Jobs ``belege`` in ``klick.yml`` (ein Test prüft es)."""
+PUFFER_S = 300
+"""Reserve nach dem letzten Aufruf: Skriptende, Aufräumen des Läufers."""
+JOB_FRIST_S = JOB_MINUTEN * 60 - ZEIT_JE_AUFRUF_S - PUFFER_S
+"""Bis hierhin darf ein neues Paket beginnen. Ein Aufruf, der kurz davor beginnt, darf
+``ZEIT_JE_AUFRUF_S`` laufen; danach bleibt ``PUFFER_S`` bis zum Zeitlimit des Jobs."""
 
 
 def sammle_bilder(
@@ -64,17 +79,22 @@ def sammle_bilder(
         zuordnung = ordne_zu(
             rohsaetze, bestand, lambda sku: geraet_aus_sku(sku, katalog)
         )
-        ohne_datei = 0
+        ohne_datei = unbrauchbar = 0
         for messung in zuordnung.messungen:
             roh = dateien.get(zwischenname(messung.beleg_id))
             if roh is None:
                 ohne_datei += 1
                 continue
-            name = dateiname(
-                modell_schluessel(messung.device_id, messung.speicher_gb),
-                anbieter_slug(messung.anbieter),
-                heute,
-            )
+            try:
+                name = dateiname(
+                    modell_schluessel(messung.device_id, messung.speicher_gb),
+                    anbieter_schluessel(messung.anbieter),
+                    heute,
+                )
+            except ValueError as fehler:
+                unbrauchbar += 1
+                zeilen.append(f"{daten.get('anbieter')}: kein Dateiname: {fehler}")
+                continue
             datei = ziel / name
             shutil.copyfile(roh, datei)
             bilder.append(
@@ -82,7 +102,8 @@ def sammle_bilder(
             )
         zeilen.append(
             f"{daten.get('anbieter')}: {len(zuordnung.messungen)} Preise, "
-            f"{ohne_datei} ohne Bild, {zuordnung.mehrdeutig} weitere Tarife, "
+            f"{ohne_datei} ohne Bild, {unbrauchbar} ohne Dateiname, "
+            f"{zuordnung.mehrdeutig} weitere Tarife, "
             f"{sum(zuordnung.uebersprungen.values())} übersprungen"
         )
     return bilder, zeilen

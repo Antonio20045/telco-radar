@@ -17,6 +17,7 @@ import re
 from collections.abc import Callable, Iterator
 from pathlib import Path
 
+import waechter_belegvertraege
 import waechter_claude
 import waechter_erkundung
 import waechter_speicher
@@ -41,10 +42,13 @@ HERKUNFT = "_herkunft.json"
 BELEGFELDER = ("url", "quelle", "abgeleitet_aus")
 QUELLTEXT_LESER = frozenset({"getsource", "getsourcelines", "findsource", "linecache"})
 RADAR = ".github/workflows/radar.yml"
-GERAETE = ".github/workflows/geraete.yml"
+GERAETE = waechter_belegvertraege.GERAETE
 SETTINGS = "config/settings.yaml"
 DEPLOY = "scripts/render_deploy.sh"
 GERAETE_PIPELINE = "src/telco_radar/geraete_pipeline.py"
+KLICK = waechter_belegvertraege.KLICK
+BELEG_ABLAGE = waechter_belegvertraege.BELEG_ABLAGE
+BELEG_SKRIPT = waechter_belegvertraege.BELEG_SKRIPT
 FRIST_NAME = "FRIST_TAGESLAUF"
 ZUSTANDSDATEIEN = (
     "geraete_db.json",
@@ -312,7 +316,7 @@ def frist_ist_eine(wurzel: Path) -> list[str]:
     text = (wurzel / GERAETE).read_text(encoding="utf-8")
     cron = _CRON_FRIST.search(text)
     vorgabe = _yaml(wurzel, GERAETE)[True]["workflow_dispatch"]["inputs"]["frist"]
-    soll = _konstante(wurzel / GERAETE_PIPELINE, FRIST_NAME)
+    soll = waechter_belegvertraege.konstante(wurzel / GERAETE_PIPELINE, FRIST_NAME)
     werte = {
         "Cron-Rückfall": float(cron.group(1)) if cron else None,
         "workflow_dispatch-Vorgabe": float(vorgabe["default"]),
@@ -322,17 +326,6 @@ def frist_ist_eine(wurzel: Path) -> list[str]:
         for art, wert in werte.items()
         if wert != soll
     ]
-
-
-def _konstante(pfad: Path, name: str) -> float | None:
-    for knoten in ast.parse(pfad.read_text(encoding="utf-8")).body:
-        if (
-            isinstance(knoten, ast.Assign)
-            and [getattr(z, "id", None) for z in knoten.targets] == [name]
-            and isinstance(knoten.value, ast.Constant)
-        ):
-            return float(knoten.value.value)
-    return None
 
 
 def buendelwaechter_zuletzt(wurzel: Path) -> list[str]:
@@ -388,4 +381,5 @@ REGELN: tuple[Callable[[Path], list[str]], ...] = (
     frist_ist_eine,
     buendelwaechter_zuletzt,
     ein_crawl_je_tag,
+    waechter_belegvertraege.belegbilder_halten_commit_und_zeit_frei,
 )
