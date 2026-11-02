@@ -16,7 +16,9 @@ Tageslauf liest die nächste (``klicktageslauf``). Lädt der Klick eine
 Preisantwort, gehört sie zu ihm wie zu einem Knopf. Leitet der Anbieter die
 Produktseite auf eine Übersicht um (``AUSGELISTET``), bietet er das Gerät nicht mehr
 an: die Seite ist ``leer``, keine andere Form (congstar 27.10.2026, drei ausgelistete
-Geräte in Folge hielten den ganzen Tageslauf an).
+Geräte in Folge hielten den ganzen Tageslauf an; Telekom 02.11.2026 ebenso: Umleitung
+auf ``/shop/geraete/smartphones/<marke>``, alle zwölf Detailläufe gestört). Die
+Umleitung wird nur gewertet, wenn der Kanarienwert fehlt.
 """
 
 from __future__ import annotations
@@ -39,7 +41,7 @@ if TYPE_CHECKING:
 
 PLATZHALTER = "{" + PLATZHALTER_MODELL + "}"
 _PASST_JS = "(element, css) => element.matches(css)"
-AUSGELISTET = "redirectFrom=device-details"
+AUSGELISTET = ("redirectFrom=device-details", "/shop/geraete/smartphones/")
 GRUND_AUSGELISTET = "Gerät nicht mehr angeboten, Umleitung auf"
 
 
@@ -74,7 +76,7 @@ class Bedienung:
         ort = self.seite.locator(kanarie.selektor)
         if erwartet not in self.leser.text(ort, erwartet, kanarie.attribut):
             self.wache.pruefe_tor()
-            if AUSGELISTET in self.seite.url:
+            if any(m in self.seite.url for m in AUSGELISTET):
                 raise Abbruch(LAUF_LEER, f"{GRUND_AUSGELISTET} {self.seite.url}")
             stelle = kanarie.selektor
             if kanarie.attribut is not None:

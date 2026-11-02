@@ -10,6 +10,8 @@ Antworten; keine Anfrage verlässt den Rechner.
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 from klickbeispiel import karte, laufe, nach_auswahl, preis, seite
 
@@ -436,3 +438,52 @@ def test_umleitung_auf_die_uebersicht_heisst_nicht_mehr_angeboten(chromium):
     assert weg.grund.startswith(GRUND_AUSGELISTET)
     assert weg.ergebnisse == []
     assert da.status == "gestoert"
+
+
+TELEKOM_FIXTURES = Path(__file__).parent / "fixtures" / "klickcrawler"
+TELEKOM_KANARIE = {
+    "selektor": 'button[aria-label^="View energy label for"]',
+    "attribut": "aria-label",
+    "enthaelt": "{modell}",
+}
+TELEKOM_MODELL = "Apple iPhone 17 Pro"
+
+
+def test_telekom_umleitung_auf_die_markenuebersicht_heisst_nicht_mehr_angeboten(
+    chromium,
+):
+    """Telekom 02.11.2026: ausgelistete Geräte leiten auf die Markenübersicht
+    (``/shop/geraete/smartphones/<marke>``) um, deren Energielabel-Knöpfe andere Modelle
+    nennen; drei davon in Folge hielten als „andere Form“ alle zwölf Detailläufe an.
+    Gegenprobe: dieselbe Übersicht ohne Umleitung bleibt gestört, und die echte
+    Produktseite mit dem Modellnamen im Knopf besteht den Kanarienwert."""
+    from telco_radar.collect.geraete.klickbedienung import GRUND_AUSGELISTET
+
+    uebersicht = (TELEKOM_FIXTURES / "telekom_uebersicht_ausschnitt.html").read_text(
+        encoding="utf-8"
+    )
+    produkt = (TELEKOM_FIXTURES / "telekom_produktseite_ausschnitt.html").read_text(
+        encoding="utf-8"
+    )
+    umleitung = (
+        "history.replaceState(null, '', '/shop/geraete/smartphones/samsung"
+        "?tariffId=MF_17785');"
+    )
+    k = karte(knoepfe=CONGSTAR_KNOEPFE, kanarie=TELEKOM_KANARIE)
+
+    weg, _ = laufe(
+        chromium, seite(uebersicht, umleitung), _fest_36, k, 1000, modell=TELEKOM_MODELL
+    )
+    da, _ = laufe(
+        chromium, seite(uebersicht, ""), _fest_36, k, 1000, modell=TELEKOM_MODELL
+    )
+    ok, _ = laufe(
+        chromium, seite(produkt, ""), _fest_36, k, 1000, modell=TELEKOM_MODELL
+    )
+
+    assert weg.status == "leer"
+    assert weg.grund.startswith(GRUND_AUSGELISTET)
+    assert da.status == "gestoert"
+    assert da.grund.startswith("Kanarienwert fehlt")
+    assert "Kanarienwert" not in (ok.grund or "")
+    assert ok.status != "leer"

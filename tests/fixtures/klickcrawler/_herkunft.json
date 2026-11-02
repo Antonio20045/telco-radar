@@ -21,6 +21,20 @@
       "abgerufen_am": null,
       "bytes_roh": 2931,
       "sha256_roh": "1be46c4e9f92e849c52efb2e911cc1833b740a379ff2c2ab97fce86eff8ec052"
+    },
+    {
+      "datei": "telekom_produktseite_ausschnitt.html",
+      "quelle": "Ausschnitt (nur Energielabel-Knöpfe) von https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/, kein personenbezogener Inhalt",
+      "abgerufen_am": "2026-11-02",
+      "bytes_roh": 436,
+      "sha256_roh": "3347c33b9130c708675e5e9195c870d1773290350b176e4d3697618ad7c7b94a"
+    },
+    {
+      "datei": "telekom_uebersicht_ausschnitt.html",
+      "quelle": "Ausschnitt (nur Energielabel-Knöpfe) von https://www.telekom.de/shop/geraete/smartphones/samsung, kein personenbezogener Inhalt",
+      "abgerufen_am": "2026-11-02",
+      "bytes_roh": 644,
+      "sha256_roh": "2647a0a617f4dc064179b04a8422bd1a9a80a3cd707ec360c9658d4e9063f38b"
     }
   ]
 }
