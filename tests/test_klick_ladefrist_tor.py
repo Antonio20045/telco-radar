@@ -40,7 +40,7 @@ WURZEL = Path(__file__).parent.parent
 KARTE = lade_klickkarte(WURZEL / "config" / "klickkarten" / "telekom.yaml")
 HOST = "https://www.telekom.de"
 ERSTE = f"{HOST}/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_1"
-ZWEITE = f"{HOST}/shop/geraet/google/google-pixel-11/frost-256-gb?tariffId=MF_17791"
+ZWEITE = f"{HOST}/shop/geraet/google/google-pixel-11/frost-256-gb?tariffId=MF_2"
 HAENGT = f"{HOST}/shop/api/eshop/bff-de/session/check"
 
 

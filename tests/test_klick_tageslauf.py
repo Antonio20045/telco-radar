@@ -48,6 +48,7 @@ from telco_radar.collect.geraete.klicktageslauf import (
     HOECHSTE_ZEITUEBERSCHREITUNGEN,
     MINDESTZEIT_SEITE_S,
     RESERVE_S,
+    VORRANG_GERAETE,
     ZEIT_JE_SEITE_S,
     budget_ende,
     fahre,
@@ -318,7 +319,7 @@ def test_grosse_modelle_im_mittleren_telekom_tarif_stehen_vor_scheiternden_seite
 
 
 def test_vorrang_gilt_nur_fuer_grosse_modelle_im_mittleren_tarif(ziele):
-    """Gegenprobe: dasselbe Modell in einem anderen Tarif und ein kleines Modell im
+    """Gegenprobe: dasselbe Modell in einem anderen Tarif und ein Nicht-Topmodell im
     mittleren Tarif haben keinen Vorrang; bei o2 gibt es keinen."""
     seiten = [s for job in _telekom_jobs(ziele) for s in job.seiten]
     andere_tarife = [
@@ -330,11 +331,36 @@ def test_vorrang_gilt_nur_fuer_grosse_modelle_im_mittleren_tarif(ziele):
     kleine = [
         s
         for s in seiten
-        if s.geraet == "apple-iphone-17" and "tariffId=MF_17791" in s.adresse
+        if s.geraet == "apple-iphone-16e" and "tariffId=MF_17791" in s.adresse
     ]
     assert andere_tarife and kleine
     assert not any(hat_vorrang(s) for s in andere_tarife + kleine)
     assert not any(hat_vorrang(s) for s in ziele["o2"].seiten)
+
+
+def _vorrang_im_tarif_m(ziele):
+    seiten = [s for job in _telekom_jobs(ziele) for s in job.seiten]
+    return {s.geraet for s in seiten if hat_vorrang(s)}, {
+        s.geraet for s in seiten if "tariffId=MF_17791" in s.adresse
+    }
+
+
+def test_vorrang_trifft_genau_die_topmodelle_nach_katalog_id(ziele):
+    """November 2026: Präfixe ließen das iPhone 17 Pro im Tarif M aus und trafen das
+    Pixel 11 Pro Fold und das Galaxy S26 FE, die keine Topmodelle sind."""
+    mit_vorrang, im_tarif_m = _vorrang_im_tarif_m(ziele)
+    assert {"apple-iphone-17-pro", "apple-iphone-17-pro-max", "apple-iphone-air"} <= (
+        mit_vorrang
+    )
+    assert "google-pixel-11-pro-fold" in im_tarif_m
+    assert "samsung-galaxy-s26-fe" in im_tarif_m
+    assert not mit_vorrang & {"google-pixel-11-pro-fold", "samsung-galaxy-s26-fe"}
+    assert mit_vorrang == VORRANG_GERAETE & im_tarif_m
+
+
+def test_vorrang_geraete_stehen_alle_im_katalog():
+    katalog = lade_katalog(lese_wurzel())
+    assert [g for g in VORRANG_GERAETE if katalog.nach_id(g) is None] == []
 
 
 def test_zeitbudget_rechnet_gegen_die_restzeit_des_jobs(o2, karte, gelesen_o2):

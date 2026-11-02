@@ -56,6 +56,7 @@ from datetime import date, datetime
 from typing import TYPE_CHECKING
 
 from .basis import GeraeteAbrufFehler
+from .klick_vorrang import VORRANG_GERAETE
 from .klickcrawler import klicke_durch
 from .klickergebnis import (
     FORMAT,
@@ -101,7 +102,6 @@ GRUND_PARALLEL = "verschoben"
 HOECHSTE_ZEITUEBERSCHREITUNGEN = 2
 GRUND_ZEITUEBERSCHREITUNGEN = "Seiten luden nicht"
 HOECHSTE_SEITENFORMEN_IN_FOLGE = 3
-VORRANG_GERAETE = ("apple-iphone-18", "samsung-galaxy-s26", "google-pixel-11")
 VORRANG_TARIF = "tariffId=MF_17791"
 GRUND_SEITENFORMEN = "Seiten in Folge mit anderer Form"
 
@@ -220,14 +220,14 @@ def reihenfolge(
 
 
 def hat_vorrang(seite: Seitenziel) -> bool:
-    """Großes Modell (``VORRANG_GERAETE``) im Telekom-Tarif M (``VORRANG_TARIF``).
+    """Topmodell (``VORRANG_GERAETE``) im Telekom-Tarif M (``VORRANG_TARIF``).
 
     Die Geräteseite vergleicht Gerät im mittleren Tarif (MagentaMobil M) über 24
     Monate. Diese Seiten stehen vor jeder, die an ihrer Form scheitern kann, und
     bekommen im Zeitbudget immer ihren Platz (Telekom, November 2026: nur 5 Bündel
     je Modell).
     """
-    return seite.geraet.startswith(VORRANG_GERAETE) and VORRANG_TARIF in seite.adresse
+    return seite.geraet in VORRANG_GERAETE and VORRANG_TARIF in seite.adresse
 
 
 def ueberfaellig(
