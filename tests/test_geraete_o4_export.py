@@ -30,6 +30,7 @@ from bs4 import BeautifulSoup
 
 from telco_radar.analyze.tco_store import beleg_widerspricht
 from telco_radar.report.geraete_export import SPALTE_UEBER_24, SPALTE_UEBER_LAUFZEIT
+from telco_radar.report.geraete_preisstand import KURZ_VERALTET
 from telco_radar.report.html import render_site
 from telco_radar.tco_model import TCO_HORIZONT as _O4_HORIZONT
 
@@ -186,7 +187,13 @@ def test_die_leitzahl_zeitraum_spalte_ist_die_von_tco_24(tco_csv):
         assert not _o4_leitzahl(z, idx), z
         assert "24 + 12" in z[idx["Lücke"]], z
 
-    aufgeteilt = [z for z in buendel if not z[idx["Bündel/Monat EUR"]]]
+    def _veraltet(z):
+        """Ohne Betrag, auch ohne Bündelpreis: sagt nichts über die Preisform."""
+        return z[idx["Lücke"]].startswith(KURZ_VERALTET)
+
+    aufgeteilt = [
+        z for z in buendel if not z[idx["Bündel/Monat EUR"]] and not _veraltet(z)
+    ]
     assert aufgeteilt, "keine aufgeteilte Zeile im Bestand"
     for z in aufgeteilt:
         soll = max(int(z[idx["Laufzeit Monate"]]), TCO_HORIZONT)
@@ -196,6 +203,7 @@ def test_die_leitzahl_zeitraum_spalte_ist_die_von_tco_24(tco_csv):
         for z in zeilen
         if z[0] == "Bündel"
         and not z[idx["Bündel/Monat EUR"]]
+        and not _veraltet(z)
         and z[idx["Laufzeit Monate"]] not in ("", str(TCO_HORIZONT))
     ]
     for z in laenger:

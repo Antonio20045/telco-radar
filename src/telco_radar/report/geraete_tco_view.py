@@ -38,7 +38,7 @@ from __future__ import annotations
 import logging
 
 from . import geraete_tco_band, geraete_tco_grafik, geraete_tco_karten
-from . import geraete_laufzeit, geraete_notbremse, geraete_vergleich
+from . import geraete_laufzeit, geraete_notbremse, geraete_preisstand, geraete_vergleich
 from ..analyze.geraete_pruefstatus import listen_aus_satz
 from ..geraete_model import VERGLEICHBARE_ZUSTAENDE, Ratenzahlung, normalisiere
 from ..tarif_model import NUR_MIT_GERAET, PREISTYP_LIVE_SHOP, vertrag_basis
@@ -482,10 +482,9 @@ def _export_zeilen(
     Aufgelöst wird wie in der Modelltafel (`geraet_je_sku` plus Katalog), die
     Kostenspalte ist `tco_model.kosten_ueber()` wie auf der Karte; Dezimalkomma
     und Semikolon macht `geraete_export.tco_csv`. Eigene Felder: `sku_id` (A4),
-    der Zeitraum H (`leitzahl_monate`, P0-B-h4), `status` (Notbremse, dasselbe
-    Wort wie an der Bündelzeile), `luecke` (Posten ohne Zahl) und
-    `raten_laufzeit` (die Ansicht des Umschalters, `geraete_laufzeit`). Die
-    Bündelzeilen stehen nach Ratenlaufzeit gruppiert, sonst in Bestandsfolge.
+    Zeitraum H (`leitzahl_monate`), `status` (Notbremse), `luecke` (Posten ohne
+    Zahl) und `raten_laufzeit` (Umschalter); nach Ratenlaufzeit gruppiert. Ein
+    veralteter Preis (`geraete_preisstand.buendel_luecke`) trägt keinen Betrag.
 
     Die SIM-only-Zeilen sind DERSELBE Massstab wie auf der Tafel
     (`_referenztabelle`), `ueber_horizont` als ihre TCO-24 (`tco_24` über
@@ -508,6 +507,7 @@ def _export_zeilen(
         device_id, speicher = geraet_je_sku.get(b.sku_id) or ("", None)
         g = katalog.nach_id(device_id) if (katalog and device_id) else None
         kosten = kosten_ueber(b)
+        veraltet = geraete_preisstand.buendel_luecke(b, heute)
         zeilen.append(
             {
                 "modell": (getattr(g, "modell", "") or device_id or b.sku_id),
@@ -518,20 +518,20 @@ def _export_zeilen(
                 "tarif": b.tarif_name,
                 "band": band_von(band_je_tarif.get(b.tarif_id or "")),
                 "zustand": b.zustand or "",
-                "zuzahlung": b.geraet_zuzahlung,
-                "tarif_monatlich": b.tarif_monatlich,
-                "geraet_monatsrate": b.geraet_monatsrate,
-                "buendel_monatlich": b.buendel_monatlich,
+                "zuzahlung": None if veraltet else b.geraet_zuzahlung,
+                "tarif_monatlich": None if veraltet else b.tarif_monatlich,
+                "geraet_monatsrate": None if veraltet else b.geraet_monatsrate,
+                "buendel_monatlich": None if veraltet else b.buendel_monatlich,
                 "laufzeit": b.laufzeit_monate,
                 "raten_laufzeit": geraete_laufzeit.raten_laufzeit(b),
-                "anschlusspreis": b.anschlusspreis,
-                "tco24": kosten.gesamt,
+                "anschlusspreis": None if veraltet else b.anschlusspreis,
+                "tco24": None if veraltet else kosten.gesamt,
                 "leitzahl_monate": kosten.monate,
                 "abgerufen_am": b.abgerufen_am,
                 "quelle_url": b.quelle_url,
                 "sku_id": b.sku_id or "",
                 "status": geraete_notbremse.kurz(b, heute),
-                "luecke": ", ".join(kosten.luecken),
+                "luecke": veraltet or ", ".join(kosten.luecken),
             }
         )
     zeilen.sort(key=_nach_ratenlaufzeit)

@@ -48,12 +48,41 @@ KURZ_VERALTET = "Preis veraltet"
 SATZ_VERALTET_OHNE_DATUM = "Preis veraltet – nicht mehr bestätigt."
 
 
+def veraltet(frisch: bool | None, veraltet_pruefung: bool) -> bool:
+    """DIE Definition von „Preis veraltet“ (Clean Code 7): älter als die Frischegrenze
+    oder von der Prüfstelle als veraltet gestempelt (Regel 16) - die zwei Wege, auf
+    denen ein alter Preis in die Daten kommt. Zeile, Karte und Export lesen sie hier."""
+    return frisch is False or bool(veraltet_pruefung)
+
+
 def preis_veraltet(karte: dict) -> bool:
-    """Ist der Preis der Karte nicht mehr bestätigt? Entweder älter als die
-    Frischegrenze (``frisch``) oder von der Prüfstelle als veraltet gestempelt
-    (``veraltet_pruefung``, Regel 16) - die zwei Wege, auf denen ein alter Preis
-    in die Daten kommt."""
-    return karte.get("frisch") is False or bool(karte.get("veraltet_pruefung"))
+    """Ist der Preis der Karte nicht mehr bestätigt? (``veraltet`` an ihren Feldern.)"""
+    return veraltet(karte.get("frisch"), karte.get("veraltet_pruefung", False))
+
+
+def grund(stand: str, abgerufen_am: str = "") -> str:
+    """Der Satz der Lücke: „Preis veraltet: <Stand>.“, ohne Stand der Hinweis ohne
+    Datum. Fehlt die Marke, wird sie aus dem Abrufdatum gebildet."""
+    if not stand and abgerufen_am:
+        from .geraete_tco_karten import alt_marke_fuer
+
+        stand = alt_marke_fuer(abgerufen_am)
+    return f"Preis veraltet: {stand}." if stand else SATZ_VERALTET_OHNE_DATUM
+
+
+def buendel_luecke(b, heute: str) -> str:
+    """Der Lückensatz eines Bündels mit veraltetem Preis, sonst ``""``.
+
+    Dieselbe Entscheidung wie ``anzeige`` an der Karte (``frisch`` aus ``ist_frisch``,
+    ``veraltet_pruefung`` aus der Notbremse), für Leser, die keine Karte haben (Export).
+    """
+    from . import geraete_notbremse
+    from .geraete_tco_karten import ist_frisch
+
+    frisch = ist_frisch(b.abgerufen_am, heute)
+    if not veraltet(frisch, geraete_notbremse.felder(b, heute)["veraltet_pruefung"]):
+        return ""
+    return grund(marke(b.abgerufen_am, heute, frisch), b.abgerufen_am)
 
 
 def anzeige(karte: dict) -> dict:
@@ -65,11 +94,6 @@ def anzeige(karte: dict) -> dict:
     """
     if not karte.get("sku_id") or not preis_veraltet(karte):
         return karte
-    stand = karte.get("alt_marke") or ""
-    if not stand and karte.get("abgerufen_am"):
-        from .geraete_tco_karten import alt_marke_fuer
-
-        stand = alt_marke_fuer(karte["abgerufen_am"])
     kopie = dict(karte)
     for feld in _PREISFELDER_LEER:
         kopie[feld] = None if feld != "delta_kurz" else ""
@@ -77,7 +101,7 @@ def anzeige(karte: dict) -> dict:
         kopie[feld] = []
     kopie["belastbar"] = False
     kopie["luecke_kurz"] = KURZ_VERALTET
-    kopie["leer_grund"] = (
-        f"Preis veraltet: {stand}." if stand else SATZ_VERALTET_OHNE_DATUM
+    kopie["leer_grund"] = grund(
+        karte.get("alt_marke") or "", karte.get("abgerufen_am") or ""
     )
     return kopie
