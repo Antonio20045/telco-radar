@@ -521,6 +521,17 @@ def test_beide_seiten_werden_gerendert(tmp_path):
     assert (site / "geraete-quellen.html").exists()
 
 
+def test_mit_tarif_tafel_verlinkt_den_tarifshop_ohne_ranking_text(tmp_path):
+    seite = _suppe(_baue(tmp_path), "geraete.html")
+    links = [
+        a["href"]
+        for a in seite.find_all("a", href=True)
+        if a["href"].startswith("https://tarife.mediamarkt.de/smartphones/")
+    ]
+    assert len(links) == 1
+    assert "TCO-Ranking" not in seite.get_text()
+
+
 def _katalog_objekt(tmp_path) -> object:
     """Der Katalog der Fixture als Objekt, ohne eine Site zu rendern."""
     (tmp_path / "config").mkdir(parents=True, exist_ok=True)

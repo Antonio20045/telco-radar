@@ -1,11 +1,10 @@
 """Loader fuer die drei Konfigurationsdateien des Geraete- und Preisradars.
 
 Bewusst NICHT in `config.py`: die trennt Betreiber-Presse von allem anderen,
-und jede weitere Quellenart in diesem Projekt bringt ihren eigenen Loader
-neben dem nutzenden Modul mit (promo_config.py, ct_log.lade_domains,
-ctm.lade_fokus, tarif_crawler, lieferzeit, aenderungen). Dieselbe Konvention
-hier - und dieselbe Failsafe-Regel: eine fehlende Datei ist kein Fehler,
-sondern eine leere Konfiguration. Die Geraetestufe tut dann nichts.
+und jede weitere Quellenart bringt ihren eigenen Loader neben dem nutzenden
+Modul mit (promo_config.py, ct_log.lade_domains, ctm.lade_fokus, tarif_crawler,
+lieferzeit, aenderungen). Dieselbe Konvention hier - und dieselbe Failsafe-Regel:
+eine fehlende Datei ist eine leere Konfiguration, die Stufe tut dann nichts.
 
     config/geraete_katalog.yaml   die VERFOLGTEN Modelle (nicht der Markt)
     config/farben.yaml            Schreibweise -> kanonische Farbe
@@ -39,6 +38,7 @@ METHODEN = (
     "telekom_kategorie",
     "einsundeins_buendel",
     "saturn_brand",
+    "coolblue_produkt",
     "kein_hardware",
     "deaktiviert",
 )

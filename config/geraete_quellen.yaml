@@ -248,6 +248,43 @@ anbieter:
         label: iPhone 17e
         kind: static
 
+      - url: https://www.saturn.de/de/brand/apple/iphone/iphone-18-pro
+        label: iPhone 18 Pro
+        kind: static
+
+  - name: Coolblue
+    typ: handel
+    gruppe: Coolblue
+    rang: 3
+    methode: coolblue_produkt
+    aktiv: false
+    grund: >-
+      Gelesen 02.11.2026: coolblue.de antwortet auf jeden Abruf, auch auf
+      robots.txt, mit HTTP 403 der AWS-WAF (Kopfzeile coolblue-waf-custom-
+      response: blocked-by-aws-waf) und auf die ehrliche Kennung nicht
+      anders. Bot-Schutz wird nicht umgangen; ohne lesbare robots.txt gilt
+      der Host als nicht abrufbar. Wieder aktivieren, sobald die Seite die
+      ehrliche Kennung durchlässt.
+    basis_url: https://www.coolblue.de
+    user_agent: "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    rate_limit_sekunden: 10
+    max_produkte: 20
+    hinweis: >-
+      Deutschland: Smartphones ohne Mobilfunktarif. Ratenzahlung ueber
+      PayPal ist moeglich, aber die individuellen Ratenkosten sind nicht
+      aus dem Geraetepreis ableitbar. Produktseiten muessen einen
+      eindeutigen EUR-Preis strukturiert ausweisen, sonst gilt die
+      Messung als unlesbar. Keine Tarife oder Raten erfinden.
+    einstiege:
+      - url: https://www.coolblue.de/handys/smartphones/apple/apple-iphone-18-pro
+        label: iPhone 18 Pro
+        kind: static
+        pfadmuster: /produkt/
+      - url: https://www.coolblue.de/handys/smartphones/apple/apple-iphone-18-pro-max
+        label: iPhone 18 Pro Max
+        kind: static
+        pfadmuster: /produkt/
+
   - name: expert
     typ: handel
     gruppe: expert

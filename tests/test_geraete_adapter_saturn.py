@@ -287,7 +287,8 @@ def test_die_ausgelieferte_konfiguration_haelt_was_der_hinweis_verspricht():
         anbieter.user_agent
         == "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
     )
-    assert len(anbieter.einstiege) == 17
+    assert len(anbieter.einstiege) == 18
+    assert any(e.url.endswith("/iphone-18-pro") for e in anbieter.einstiege)
     assert all("/de/brand/apple/iphone/" in e.url for e in anbieter.einstiege)
 
 

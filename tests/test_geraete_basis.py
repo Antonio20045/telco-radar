@@ -21,6 +21,7 @@ import telco_radar.collect.geraete as geraete
 
 METHODEN_HEUTE = (
     "congstar_next",
+    "coolblue_produkt",
     "einsundeins_buendel",
     "ldjson",
     "o2_katalog",
