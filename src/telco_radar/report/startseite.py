@@ -15,6 +15,7 @@ import re
 from datetime import date, timedelta
 
 from .bilder import MIND_BREITE_GROSS
+from .geraete_preisstand import anzeige as preis_anzeige
 
 ENDET_BALD_TAGE = 7
 ERSATZBILD = "kapitel-global"
@@ -339,4 +340,5 @@ VORLAGEN_HELFER = {
     "szenen": szenen,
     "meldung_id": meldung_id,
     "MIND_BREITE_GROSS": MIND_BREITE_GROSS,
+    "preis_anzeige": preis_anzeige,
 }

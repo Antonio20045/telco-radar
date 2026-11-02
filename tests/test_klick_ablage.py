@@ -27,6 +27,8 @@ from telco_radar.collect.geraete.klicklauf import (
     LAUF_GELESEN,
     LAUF_GESTOERT,
     LAUF_ZEITGRENZE,
+    STOERUNG_SEITE,
+    STOERUNG_ZEIT,
 )
 
 HEUTE = "2026-09-29"
@@ -133,3 +135,38 @@ def test_skript_ohne_artefakte_laesst_alles_stehen(tmp_path):
     rueckgabe = _skript().main(["--root", str(root), "--quelle", str(tmp_path / "x")])
 
     assert rueckgabe == 0 and list(root.iterdir()) == []
+
+
+def _datei_mit(**felder):
+    seite = lauf(O2_SEITE, [], status=LAUF_GESTOERT, grund="gestört", **felder)
+    return ergebnisdatei("o2", "o2", [(O2_SEITE, seite)], HEUTE)
+
+
+def test_seite_mit_falscher_form_kommt_in_den_versuchsstand_nicht_in_den_lesestand(
+    tmp_path,
+):
+    """Sie bleibt ungelesen (überfällig), rückt aber in der Rotation nach hinten."""
+    ziel = tmp_path / "klick"
+
+    lege_ab([_datei_mit(stoerung=STOERUNG_SEITE)], ziel)
+
+    stand = lies_stand(ziel / STAND_DATEI)
+    assert stand["versucht"] == {"o2": {O2_SEITE.adresse: HEUTE}}
+    assert stand["seiten"] == {}
+
+
+def test_bot_schutz_und_zeitueberschreitung_gelten_nicht_als_versuch(tmp_path):
+    """Gegenprobe: das ist Lage des Anbieters, kein Merkmal der Seite."""
+    ziel = tmp_path / "klick"
+
+    lege_ab([_datei_mit(stoerung=STOERUNG_ZEIT), _datei_mit()], ziel)
+
+    assert lies_stand(ziel / STAND_DATEI)["versucht"] == {}
+
+
+def test_versuchsstand_fehlt_in_alter_standdatei_ohne_fehler(tmp_path):
+    """Ein Stand vor dieser Änderung hat keinen Schlüssel ``versucht``."""
+    datei = tmp_path / STAND_DATEI
+    datei.write_text('{"format": 1, "seiten": {"o2": {"a": "2026-09-01"}}}')
+
+    assert lies_stand(datei)["versucht"] == {}

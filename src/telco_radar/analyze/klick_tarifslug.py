@@ -17,19 +17,26 @@ Die Brücke ist dieselbe, die der alte Leser nutzt, nur von der Seite gelesen:
   (``ergaenze_pib_slug``), genau wie beim alten Leser.
 
 Ein Satz, der schon einen Slug trägt, behält ihn; andere Anbieter bekommen keinen.
+
+Dieselbe Brücke gibt dem Beleglink die Konfiguration der Zeile (``klick_beleglink``):
+der Klick wählt Tarif und Ratenzahl im Browser, die Adresse der Seite bleibt die der
+Konfiguration (Preisprüfung 02.11.2026: Link ``ratenzahlung=36`` und
+``tarif=o2-mobile-unlimited-m`` zu Zeilen mit 24 Raten und ``O2 Mobile L``).
 """
 
 from __future__ import annotations
 
 import re
-from urllib.parse import parse_qs, urlsplit
+from urllib.parse import parse_qs, parse_qsl, urlencode, urlsplit, urlunsplit
 
 from ..collect.geraete.klickrohsatz import QUELLE
+from ..collect.geraete.o2_referenz import belegadresse
 from ..collect.tarif_crawler import tarif_id
 
 SLUG_AUS_NAMEN = "o2"
 SLUG_AUS_PLAN = "congstar"
 PLAN_PARAMETER = "planId"
+RATEN_PARAMETER = "ratenzahlung"
 _LEISTUNGSZUSATZ = re.compile(r"\s+mit\s+.*$", re.IGNORECASE)
 _KLAMMER = re.compile(r"\s*\([^)]*\)\s*$")
 _NUMMER = re.compile(r"^\d+$")
@@ -45,6 +52,28 @@ def klick_slug(satz: dict) -> str:
     if anbieter == SLUG_AUS_PLAN:
         return plan_nummer(str(satz.get("quelle_url") or ""))
     return ""
+
+
+def klick_beleglink(satz: dict) -> str:
+    """Die Quelladresse des Satzes; bei o2-Klick-Sätzen mit Tarif und Ratenzahl der
+    Zeile (``o2_referenz.belegadresse``, wie beim Adapter). Ohne Slug bleibt die
+    Adresse der Seite; ohne Ratenzahl entfällt deren Angabe, statt die der Seite
+    (36) für eine andere Zeile stehen zu lassen."""
+    adresse = str(satz.get("quelle_url") or "")
+    if satz.get("quelle_art") != QUELLE or satz.get("anbieter") != SLUG_AUS_NAMEN:
+        return adresse
+    raten = satz.get("laufzeit_monate")
+    raten = raten if isinstance(raten, int) and not isinstance(raten, bool) else None
+    link = belegadresse(adresse, klick_slug(satz), raten)
+    if raten is None:
+        teile = urlsplit(link)
+        frage = [(k, v) for k, v in parse_qsl(teile.query, keep_blank_values=True)]
+        link = urlunsplit(
+            teile._replace(
+                query=urlencode([(k, v) for k, v in frage if k != RATEN_PARAMETER])
+            )
+        )
+    return link
 
 
 def o2_slug(name: str) -> str:

@@ -8,10 +8,17 @@ Schnappschuss vom 03.10.2026. Ohne Slug blieben o2 alle und congstar XS ohne Tar
 
 from __future__ import annotations
 
+from urllib.parse import parse_qsl, urlsplit
+
 import pytest
 from bestand_pfad import ZUSTAND
 
-from telco_radar.analyze.klick_tarifslug import klick_slug, o2_slug, plan_nummer
+from telco_radar.analyze.klick_tarifslug import (
+    klick_beleglink,
+    klick_slug,
+    o2_slug,
+    plan_nummer,
+)
 from telco_radar.analyze.tco_buendel import aus_rohsaetzen
 from telco_radar.collect.geraete.congstar import ergaenze_pib_slug
 from telco_radar.tarif_bezug import Tarifbestand
@@ -125,3 +132,50 @@ def test_gegenprobe_ohne_klick_kennung_bleibt_ohne_tarif(bestand, saetze):
 
     assert bilanz.ohne_tarif == 5
     assert [b.tarif_name for b in bilanz.buendel] == ["Allnet Flat M"]
+
+
+def _query(adresse: str) -> dict[str, str]:
+    return dict(parse_qsl(urlsplit(adresse).query))
+
+
+def test_o2_beleglink_traegt_tarif_und_ratenzahl_der_zeile(saetze):
+    """Preisprüfung 02.11.2026: die Seite blieb auf ``ratenzahlung=36`` und ihrem
+    Konfigurationstarif, die Zeile war 24 Raten ``O2 Mobile L``."""
+    satz = {**saetze[0], "tarif_name": "O2 Mobile L mit 150 GB+ (24 Mon.)"}
+    satz["laufzeit_monate"] = 24
+
+    link = klick_beleglink(satz)
+
+    frage = _query(link)
+    assert (frage["tarif"], frage["ratenzahlung"]) == ("o2-mobile-l", "24")
+    assert urlsplit(link).path == urlsplit(O2_SEITE).path
+    ohne = {k: v for k, v in frage.items() if k not in ("tarif", "ratenzahlung")}
+    rest = {
+        k: v for k, v in _query(O2_SEITE).items() if k not in ("tarif", "ratenzahlung")
+    }
+    assert ohne == rest
+
+
+def test_beleglink_ohne_ratenzahl_behaelt_nicht_die_der_seite(saetze):
+    satz = {**saetze[0], "laufzeit_monate": None}
+
+    frage = _query(klick_beleglink(satz))
+
+    assert "ratenzahlung" not in frage and frage["tarif"] == "o2-mobile-l-plus"
+
+
+def test_beleglink_nur_fuer_o2_klick_saetze(saetze):
+    o2, congstar = saetze[0], saetze[-1]
+    assert klick_beleglink(congstar) == congstar["quelle_url"]
+    assert klick_beleglink({**o2, "quelle_art": ""}) == O2_SEITE
+    assert klick_beleglink({**o2, "quelle_url": ""}) == ""
+
+
+def test_buendel_aus_o2_klick_satz_traegt_den_beleglink_der_zeile(bestand, saetze):
+    satz = {**saetze[0], "laufzeit_monate": 24}
+
+    bilanz = aus_rohsaetzen([satz], bestand, HEUTE)
+
+    (buendel,) = bilanz.buendel
+    assert _query(buendel.quelle_url)["ratenzahlung"] == "24"
+    assert _query(buendel.quelle_url)["tarif"] == "o2-mobile-l-plus"

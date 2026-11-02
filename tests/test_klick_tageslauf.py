@@ -19,6 +19,7 @@ import pytest
 from bestand_pfad import lese_wurzel
 from klickergebnisse import O2_SEITE, WURZEL, erfasst, o2_lesung
 
+from telco_radar.analyze.klick_ablage import lege_ab
 from telco_radar.collect.geraete.klickergebnis import (
     SEITE_NICHT_BESUCHT,
     lies_ergebnisse,
@@ -50,6 +51,8 @@ from telco_radar.collect.geraete.klicktageslauf import (
     ZEIT_JE_SEITE_S,
     budget_ende,
     fahre,
+    hat_vorrang,
+    reihenfolge,
 )
 from telco_radar.collect.geraete.klickziele import (
     TAGESDATEI,
@@ -231,6 +234,107 @@ def test_rotation_nie_gelesen_zuerst_dann_die_aelteste(o2, karte, gelesen_o2):
 
     assert [adresse for adresse, _ in crawler.aufrufe] == [d, f, e, b, c, a]
     assert daten["laufstatus"] == LAUF_GELESEN and daten["ueberfaellig"] == []
+
+
+def test_dauernd_scheiternde_seiten_mit_altem_lesedatum_blockieren_die_folgenden_nicht(
+    o2, karte, gelesen_o2, tmp_path
+):
+    """Telekom, Oktober 2026: drei Seiten mit dem ältesten Lesedatum scheitern jeden
+    Tag an ihrer Form, der Lauf endet nach der dritten, die übrigen bleiben ``nicht
+    besucht``. Mit dem Fehlversuch im Stand kommen sie am Folgetag an die Reihe."""
+    a, b, c, d, e, f = (s.adresse for s in o2.seiten)
+    gelesen = {a: "2026-09-20", b: "2026-09-21", c: "2026-09-22"}
+    gelesen |= {d: "2026-09-25", e: "2026-09-26", f: "2026-09-27"}
+    kaputt = {adresse: STOERUNG_SEITE for adresse in (a, b, c)}
+    uhr = Uhr()
+    erster = Crawler(uhr, gelesen_o2, status=kaputt)
+
+    tag1 = _fahre(o2, karte, erster, uhr, gelesen=gelesen)
+
+    assert [x for x, _ in erster.aufrufe] == [a, b, c]
+    assert [s["status"] for s in tag1["seiten"]][3:] == [SEITE_NICHT_BESUCHT] * 3
+    stand = lege_ab([tag1], tmp_path).stand
+    assert stand["versucht"] == {"o2": {a: HEUTE, b: HEUTE, c: HEUTE}}
+    uhr2 = Uhr()
+    zweiter = Crawler(uhr2, gelesen_o2, status=kaputt)
+
+    tag2 = fahre(
+        o2,
+        karte,
+        "o2.yaml",
+        zweiter,
+        "2026-09-30",
+        10**6,
+        gelesen=gelesen,
+        versucht=stand["versucht"]["o2"],
+        uhr=uhr2,
+    )
+
+    assert [x for x, _ in zweiter.aufrufe][:3] == [d, e, f]
+    assert [s["status"] for s in tag2["seiten"]][:3] == [LAUF_GELESEN] * 3
+
+
+def test_reihenfolge_nimmt_das_juengere_von_lesung_und_fehlversuch(o2):
+    a, b, c = (s.adresse for s in o2.seiten[:3])
+    gelesen = {a: "2026-09-01", b: "2026-09-02", c: "2026-09-03"}
+
+    assert [s.adresse for s in reihenfolge(o2.seiten[:3], gelesen)] == [a, b, c]
+    versucht = {a: "2026-09-10"}
+    assert [s.adresse for s in reihenfolge(o2.seiten[:3], gelesen, versucht)] == [
+        b,
+        c,
+        a,
+    ]
+    alt = {a: "2026-08-01"}
+    assert [s.adresse for s in reihenfolge(o2.seiten[:3], gelesen, alt)] == [a, b, c]
+
+
+def _telekom_jobs(ziele):
+    return [z for k, z in ziele.items() if k == "telekom" or k.startswith("telekom-")]
+
+
+def test_grosse_modelle_im_mittleren_telekom_tarif_stehen_vor_scheiternden_seiten(
+    ziele,
+):
+    """Telekom, November 2026: drei Seiten mit alter Lesung beendeten jeden Job, die
+    Seite des iPhone 18 Pro im Tarif M blieb ``nicht besucht``."""
+    gefunden = []
+    for job in _telekom_jobs(ziele):
+        seiten = job.seiten
+        vorrang = [s for s in seiten if hat_vorrang(s)]
+        uebrige = [s for s in seiten if not hat_vorrang(s)]
+        gefunden += [s for s in vorrang if s.geraet == "apple-iphone-18-pro"]
+        gelesen = {s.adresse: "2026-10-20" for s in uebrige}
+        gelesen.update({s.adresse: "2026-11-01" for s in vorrang})
+
+        geordnet = reihenfolge(seiten, gelesen)
+
+        spitze = {s.adresse for s in geordnet[: len(vorrang)]}
+        assert spitze == {s.adresse for s in vorrang}
+        ohne = [s for s in geordnet if not hat_vorrang(s)]
+        assert [s.adresse for s in ohne] == [s.adresse for s in uebrige]
+    assert len(gefunden) == 1
+    assert "tariffId=MF_17791" in gefunden[0].adresse
+
+
+def test_vorrang_gilt_nur_fuer_grosse_modelle_im_mittleren_tarif(ziele):
+    """Gegenprobe: dasselbe Modell in einem anderen Tarif und ein kleines Modell im
+    mittleren Tarif haben keinen Vorrang; bei o2 gibt es keinen."""
+    seiten = [s for job in _telekom_jobs(ziele) for s in job.seiten]
+    andere_tarife = [
+        s
+        for s in seiten
+        if s.geraet.startswith("apple-iphone-18")
+        and "tariffId=MF_17791" not in s.adresse
+    ]
+    kleine = [
+        s
+        for s in seiten
+        if s.geraet == "apple-iphone-17" and "tariffId=MF_17791" in s.adresse
+    ]
+    assert andere_tarife and kleine
+    assert not any(hat_vorrang(s) for s in andere_tarife + kleine)
+    assert not any(hat_vorrang(s) for s in ziele["o2"].seiten)
 
 
 def test_zeitbudget_rechnet_gegen_die_restzeit_des_jobs(o2, karte, gelesen_o2):

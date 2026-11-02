@@ -99,7 +99,7 @@ from ..geraete_model import normalisiere
 from ..tarif_bezug import SLUG_ALS_ID_ANBIETER, Bezug, Tarifbestand
 from ..tarif_model import NUR_MIT_GERAET, buendelphasen_aus
 from ..tco_model import Buendel, aktionen_aus
-from .klick_tarifslug import klick_slug
+from .klick_tarifslug import klick_beleglink, klick_slug
 
 log = logging.getLogger(__name__)
 
@@ -187,7 +187,7 @@ def aus_rohsaetzen(rohsaetze, bestand: Tarifbestand, heute: str) -> Buendelbilan
                     anschlusspreis=satz.get("anschlusspreis"),
                     aktionen=aktionen_aus(satz.get("aktionen")),
                     zustand=str(satz.get("zustand") or ""),
-                    quelle_url=str(satz.get("quelle_url") or ""),
+                    quelle_url=klick_beleglink(satz),
                     abgerufen_am=heute,
                     herleitung=str(satz.get("herleitung") or ""),
                     tarif_phasen=buendelphasen_aus(satz.get("tarif_phasen")),

@@ -27,6 +27,13 @@ ganze Lesung ist sie überfällig. Getrennt davon ist ``FRISCHEGRENZE_TAGE`` die
 in der eine Klick-Messung im Bestand nutzbar bleibt und Vorrang vor dem Adapter
 behält, damit ein ausgefallener Tag die Seite nicht leert. ``ganz_gelesen`` ist die
 eine Definition einer heute gelesenen Seite, für Rotation und Quellenseite.
+
+Zusätzlich führt der Stand unter ``STAND_VERSUCHT`` je Anbieter das Datum, an dem eine
+Seite zuletzt an ihrer eigenen Form scheiterte (``STOERUNG_SEITE``). Ohne diesen
+Vermerk blieb eine dauernd scheiternde Seite mit altem Lesedatum für immer vorn und
+beendete den Lauf nach drei Seiten, bevor die übrigen an die Reihe kamen (Telekom,
+Oktober 2026: 27 Seiten täglich ``nicht besucht``). Die Rotation ordnet nach dem
+jüngeren der beiden Daten; ``ueberfaellig`` liest weiter nur den Lesestand.
 """
 
 from __future__ import annotations
@@ -73,6 +80,7 @@ OHNE_SPERRE = frozenset({STOERUNG_ZEIT, STOERUNG_SEITE})
 GRUND_NICHTS_ERFASST = "keine Kombination erfasst"
 GRUND_KEINE_SEITE = "keine Seite gelesen"
 STAND_FORMAT = 1
+STAND_VERSUCHT = "versucht"
 
 
 def kombination_als_daten(ergebnis: Kombiergebnis) -> dict:
@@ -173,7 +181,7 @@ def schreibe(pfad: Path, daten: dict) -> None:
 
 def lies_stand(pfad: Path) -> dict:
     """Der Lesestand; fehlt er oder ist er unlesbar, ein leerer Stand mit Vermerk."""
-    leer = {"format": STAND_FORMAT, "seiten": {}}
+    leer = {"format": STAND_FORMAT, "seiten": {}, STAND_VERSUCHT: {}}
     try:
         stand = json.loads(pfad.read_text(encoding="utf-8"))
     except FileNotFoundError:
@@ -185,4 +193,5 @@ def lies_stand(pfad: Path) -> dict:
         log.warning("Klick-Stand %s: Format nicht %s", pfad, STAND_FORMAT)
         return leer
     stand.setdefault("seiten", {})
+    stand.setdefault(STAND_VERSUCHT, {})
     return stand

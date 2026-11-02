@@ -39,11 +39,11 @@ die übrigen bleiben ``nicht besucht`` und kommen in der Rotation am nächsten T
 
 Rotation: Einheit ist die Produktseite, denn der Crawler klickt alle Varianten einer
 Seite in einem Gang. Zuerst kommen nie gelesene Seiten, dann die am längsten nicht
-gelesenen (Lesestand, ``klickergebnis.lies_stand``); bei Gleichstand gilt die
-Reihenfolge der Konfiguration. Seiten, die heute nicht ganz gelesen wurden (eine an der
-Zeitgrenze abgeschnittene zählt nicht, ``klickergebnis.ganz_gelesen``) und deren
-letzte Lesung ``LESEFRIST_TAGE`` oder älter ist, stehen unter ``ueberfaellig``: jede
-Seite soll jeden Tag gelesen sein.
+gelesenen oder an ihrer Form gescheiterten (Lesestand, ``klickergebnis.lies_stand``);
+bei Gleichstand gilt die Reihenfolge der Konfiguration. Seiten, die heute nicht ganz
+gelesen wurden (eine an der Zeitgrenze abgeschnittene zählt nicht,
+``klickergebnis.ganz_gelesen``) und deren letzte Lesung ``LESEFRIST_TAGE`` oder
+älter ist, stehen unter ``ueberfaellig``: jede Seite soll jeden Tag gelesen sein.
 Kein LLM.
 """
 
@@ -101,6 +101,8 @@ GRUND_PARALLEL = "verschoben"
 HOECHSTE_ZEITUEBERSCHREITUNGEN = 2
 GRUND_ZEITUEBERSCHREITUNGEN = "Seiten luden nicht"
 HOECHSTE_SEITENFORMEN_IN_FOLGE = 3
+VORRANG_GERAETE = ("apple-iphone-18", "samsung-galaxy-s26", "google-pixel-11")
+VORRANG_TARIF = "tariffId=MF_17791"
 GRUND_SEITENFORMEN = "Seiten in Folge mit anderer Form"
 
 Crawler = Callable[["Seitenziel", float], Klicklauf]
@@ -194,13 +196,38 @@ def budget_ende(job_frist_s: float, verstrichen_s: float, jetzt: float) -> float
 
 
 def reihenfolge(
-    seiten: tuple[Seitenziel, ...], gelesen: Mapping[str, str]
+    seiten: tuple[Seitenziel, ...],
+    gelesen: Mapping[str, str],
+    versucht: Mapping[str, str] | None = None,
 ) -> list[Seitenziel]:
-    """Nie gelesene zuerst, dann nach dem ältesten Lesedatum; sonst Konfiguration.
+    """Nie angefasste zuerst, dann nach dem ältesten Datum; sonst Konfiguration.
 
-    Der Lesestand kennt Adressen nur ohne Geheimnisse, wie die Ergebnisdatei.
+    Das Datum einer Seite ist das jüngere von Lesung (``gelesen``) und Fehlversuch an
+    ihrer Form (``versucht``, ``klickergebnis.STAND_VERSUCHT``): eine Seite, die jeden
+    Tag scheitert, steht sonst mit ihrem alten Lesedatum ewig vorn und beendet den Lauf
+    nach ``HOECHSTE_SEITENFORMEN_IN_FOLGE`` Seiten (Telekom, Oktober 2026).
+    Vor allen stehen die Seiten mit ``hat_vorrang``. Der Lesestand kennt Adressen nur
+    ohne Geheimnisse, wie die Ergebnisdatei.
     """
-    return sorted(seiten, key=lambda s: gelesen.get(ohne_geheimnisse(s.adresse), ""))
+    versucht = versucht or {}
+
+    def rang(seite: Seitenziel) -> tuple[bool, str]:
+        adresse = ohne_geheimnisse(seite.adresse)
+        datum = max(gelesen.get(adresse, ""), versucht.get(adresse, ""))
+        return (not hat_vorrang(seite), datum)
+
+    return sorted(seiten, key=rang)
+
+
+def hat_vorrang(seite: Seitenziel) -> bool:
+    """Großes Modell (``VORRANG_GERAETE``) im Telekom-Tarif M (``VORRANG_TARIF``).
+
+    Die Geräteseite vergleicht Gerät im mittleren Tarif (MagentaMobil M) über 24
+    Monate. Diese Seiten stehen vor jeder, die an ihrer Form scheitern kann, und
+    bekommen im Zeitbudget immer ihren Platz (Telekom, November 2026: nur 5 Bündel
+    je Modell).
+    """
+    return seite.geraet.startswith(VORRANG_GERAETE) and VORRANG_TARIF in seite.adresse
 
 
 def ueberfaellig(
@@ -232,6 +259,7 @@ def fahre(
     ende: float,
     *,
     gelesen: Mapping[str, str],
+    versucht: Mapping[str, str] | None = None,
     laeufe: Laufpruefung | None = None,
     uhr: Callable[[], float] = time.monotonic,
     schlafe: Callable[[float], None] = time.sleep,
@@ -258,7 +286,7 @@ def fahre(
         uebersichten.append(ergebnis)
         for teil in ergebnis.get("seiten") or [ergebnis]:
             gang.nach(teil["status"], teil.get("stoerung"), teil["grund"])
-    for seite in reihenfolge(ziel.seiten, gelesen):
+    for seite in reihenfolge(ziel.seiten, gelesen, versucht):
         stopp = gang.vor()
         if stopp is not None:
             seiten.append(nicht_besucht(seite, stopp))

@@ -46,6 +46,7 @@ from telco_radar.collect.geraete.klickergebnis import (
     LAUF_NICHT_GELESEN,
     ORDNER,
     STAND_DATEI,
+    STAND_VERSUCHT,
     lies_stand,
     schreibe,
 )
@@ -132,6 +133,7 @@ def main(argumente: list[str] | None = None) -> int:
                 heute,
                 ende,
                 gelesen=stand["seiten"].get(ziel.name, {}),
+                versucht=stand[STAND_VERSUCHT].get(ziel.name, {}),
                 laeufe=laeufe,
                 lies_uebersicht=lies,
             )

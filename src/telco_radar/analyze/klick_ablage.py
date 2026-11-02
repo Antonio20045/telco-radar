@@ -9,8 +9,11 @@ Datei liegen; der Gerätelauf nimmt nur eine Datei von heute als Messung.
 Den Lesestand ``STAND_DATEI`` führt die Ablage für jede Datei fort, gleich welcher
 Laufstatus: jede ganz gelesene Seite (``ROTATION_GELESEN``) bekommt das Datum der Datei.
 Auch ein Lauf, der nichts erfasst hat, schiebt so die Rotation weiter; eine an der
-Zeitgrenze abgeschnittene Seite bleibt vorn. Welche Klick-Messung Vorrang vor dem
-Adapter hat, steht nicht hier, sondern im Bestand (``klick_zusammenfuehrung``).
+Zeitgrenze abgeschnittene Seite bleibt vorn. Eine Seite, die an ihrer eigenen Form
+scheiterte, bekommt das Datum unter ``STAND_VERSUCHT``: sie ist nicht gelesen (also
+überfällig), steht aber in der Rotation hinten und hält die übrigen nicht mehr auf.
+Welche Klick-Messung Vorrang vor dem Adapter hat, steht nicht hier, sondern im
+Bestand (``klick_zusammenfuehrung``).
 """
 
 from __future__ import annotations
@@ -23,9 +26,11 @@ from ..collect.geraete.klickergebnis import (
     ROTATION_GELESEN,
     STAND_DATEI,
     STAND_FORMAT,
+    STAND_VERSUCHT,
     lies_stand,
     schreibe,
 )
+from ..collect.geraete.klicklauf import LAUF_GESTOERT, STOERUNG_SEITE
 
 SCHLUESSEL = re.compile(r"^[a-z0-9][a-z0-9_-]*$")
 """Anbieterschlüssel wie in ``config/klick_tageslauf.yaml``; zugleich der Dateiname."""
@@ -38,6 +43,15 @@ class Ablage:
     abgelegt: list[str] = field(default_factory=list)
     abgelehnt: list[str] = field(default_factory=list)
     stand: dict = field(default_factory=dict)
+
+
+def _scheiterte_an_ihrer_form(seite: dict) -> bool:
+    """Hat die Seite nach bestandener Bot-Prüfung nur eine andere Form (Kanarienwert,
+    Vorbereitung, Strukturbruch)? Nur sie rückt in der Rotation trotzdem nach hinten:
+    Bot-Schutz und Ladefehler sind Lage des Anbieters, nicht Merkmal der Seite."""
+    return (
+        seite.get("status") == LAUF_GESTOERT and seite.get("stoerung") == STOERUNG_SEITE
+    )
 
 
 def lege_ab(ergebnisse: list[dict], ziel: Path) -> Ablage:
@@ -56,5 +70,8 @@ def lege_ab(ergebnisse: list[dict], ziel: Path) -> Ablage:
             if seite.get("status") in ROTATION_GELESEN:
                 seiten = stand["seiten"].setdefault(str(daten.get("name")), {})
                 seiten[str(seite.get("adresse"))] = str(daten.get("datum"))
+            elif _scheiterte_an_ihrer_form(seite):
+                versucht = stand[STAND_VERSUCHT].setdefault(str(daten.get("name")), {})
+                versucht[str(seite.get("adresse"))] = str(daten.get("datum"))
     schreibe(ziel / STAND_DATEI, stand)
     return ablage

@@ -17,6 +17,9 @@
    nie in der Vorlage, Clean Code 8). `frisch` fehlt keiner Karte, die
    `modelle()` baut; `is defined` haelt den Rueckfall auf frisch. #}
 {% macro buendelzeile(k) %}
+{# Ein veralteter Preis wird zur benannten Lücke (`geraete_preisstand.anzeige`):
+   keine Zahl, keine Rechnung, `data-gesamt` leer. #}
+{% set k = preis_anzeige(k) %}
 {# D3: das Ratenwort der kompakten Laufzeit-Angabe (siehe .gr-bnd-tarif
    unten) - "Monatsraten" bei einem zusammengelegten Bündelmonatspreis
    (1&1), sonst "Raten". Dieselbe Unterscheidung wie `raten_wort` im
@@ -102,7 +105,7 @@
       class="gr-bnd-label">{{ k.label }}</em>{% if k.aktion_ueberhang %} <span
       class="gr-bnd-aktion">bis −{{ k.aktion_ueberhang.betrag | euro }} {{
       k.aktion_ueberhang.kurz }}</span>{% endif %}{% else %}<span class="gr-t-luecke"
-      >keine belastbare Zahl</span>{% endif %}</span>
+      >{{ k.luecke_kurz or 'keine belastbare Zahl' }}</span>{% endif %}</span>
     {# `gr-bnd-delta--wert` nur für ZAHLEN-Werte: mobil ist der Spaltenkopf
        versteckt, und eine nackter zweiter Euro-Betrag neben „Gerät ohne
        Vertrag" wäre mehrdeutig - das Δ-Präfix (CSS, mobil) erklärt die
