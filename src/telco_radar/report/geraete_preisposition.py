@@ -12,9 +12,9 @@ Satz und Zeitreihe (vergleichbar, belastbar, frisch, Notbremse). Was die
 Seite als alt oder ungeprüft behandelt, bekommt hier keinen Punkt. Die
 Vodafone-Näherung ist kein Angebot und ebenfalls keiner. Ein Anbieter ohne
 geprüften Preis ist eine benannte Lücke in der Zeile, nie ein Punkt bei 0.
-Ein aus der Preisliste abgeleiteter Preis (1&1), dessen Geräte-Zuzahlung der
-gelesenen Zeile desselben Geräts widerspricht, ist nachweislich falsch und
-bekommt keinen Punkt (`widerspricht_gelesenem`): lieber ein Punkt weniger.
+Ein aus der Preisliste abgeleiteter Preis (1&1), den die gelesene Zeile desselben
+Geräts widerlegt, ist schon aus den Bündeln der Seite entfernt
+(`analyze.geraete_widerspruch`): Bild, Tabelle, Teurer-Liste und Export teilen das.
 Jeder Punkt ist ein Link auf die Originalquelle der Karte (`quelle_url`, wie
 die Spalte „Beleg“ der Tabelle).
 

@@ -2,8 +2,7 @@
 
 Gerechnet wird ausschliesslich in `tco_model`. Dieses Modul ruft
 `kosten_ueber()` auf und formt das Ergebnis; es addiert selbst keinen Euro.
-Zwei Rechnungen fuer dieselbe Zahl sind zwei Zahlen (CLAUDE.md § 6) - und die
-eine davon stuende in einer Vorlage, wo sie niemand testet.
+Zwei Rechnungen derselben Zahl sind zwei Zahlen. Widerlegte Bündel: `ohne_widerlegte`.
 
 Fehlt ein Posten, steht die benannte Luecke statt einer Zahl: "Wenn kein
 Anschlusspreis bekannt ist, heisst das nicht kostenlos"
@@ -17,6 +16,7 @@ from __future__ import annotations
 import logging
 
 from ..analyze.geraete_pruefstatus import listen_aus_satz
+from ..analyze.geraete_widerspruch import ohne_widerlegte
 from ..tarif_model import PREISTYP_LIVE_SHOP
 from ..tco_model import (
     TCO_HORIZONT,
@@ -192,7 +192,7 @@ def _export_zeilen(
 ) -> dict:
     """Die Zeilen des TCO-Gesamtexports (O4) - WERTE, keine Form.
 
-    Hier steht JEDES Bündel des Bestands, auch eines ohne Tarifband und ohne
+    Hier steht jedes zählende Bündel, auch eines ohne Tarifband und ohne
     auflösbare Gerätezuordnung (Modellspalte dann die SKU, wie `aktuell_csv`).
     Aufgelöst wird wie in der Modelltafel (`geraet_je_sku` plus Katalog), die
     Kostenspalte ist `tco_model.kosten_ueber()` wie auf der Karte; Dezimalkomma
@@ -324,7 +324,7 @@ def aufbereiten(
     `heute` (A3, "YYYY-MM-DD") schaltet die Alterung ein - ohne das
     Datum (Default) altert nichts (`geraete_tco_karten.ist_frisch`).
     """
-    buendel = _aus_speicher(buendel, Buendel, _BUENDEL_FELDER)
+    buendel = ohne_widerlegte(_aus_speicher(buendel, Buendel, _BUENDEL_FELDER))
     referenzen = _aus_speicher(referenzen, SimOnlyReferenz, _REFERENZ_FELDER)
 
     geraet_je_sku: dict[str, tuple] = {}
