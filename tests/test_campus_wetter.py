@@ -30,13 +30,23 @@ _SEITE = """<!doctype html><html class="ohne-js"><head><meta charset="utf-8">
 <link rel="stylesheet" href="style.css">
 <style>.buehne{position:relative;width:960px;height:540px}.buehne-bild{position:absolute;inset:0}
 .buehne-himmel{position:absolute;inset:0;width:100%;height:100%}</style></head>
-<body><section class="buehne"><div class="buehne-bild">
+<body><section class="buehne campus-wartet film-dunkel"><div class="buehne-bild">
 <img class="buehne-ebene" data-zeit-bild="tag" data-src="static/bilder/campus-turm.jpg">
 <canvas class="buehne-himmel" data-basis="static/campus/"
  data-blau="static/bilder/campus-turm.jpg"></canvas>
 </div><div class="buehne-kopf"><h1>Datum</h1>
 <p class="buehne-wetter" data-campus-wetter hidden></p></div>
 </section><script src="app.js"></script></body></html>"""
+
+
+class _Server(http.server.ThreadingHTTPServer):
+    """Der Browser holt mehrere Platten gleichzeitig (mehrere Browser laufen
+    parallel). Mit dem Standard-Rueckstau von 5 setzt der Kernel unter Last
+    Verbindungen zurueck (ERR_CONNECTION_RESET); das Laden einer Platte
+    scheitert dann, die Szene faellt auf das Foto zurueck und malt nie."""
+
+    request_queue_size = 128
+    daemon_threads = True
 
 
 class _LangsamesStartbild(http.server.SimpleHTTPRequestHandler):
@@ -64,7 +74,7 @@ def site(tmp_path_factory):
     schreibe_statische_dateien(ordner)
     (ordner / "seite.html").write_text(_SEITE, encoding="utf-8")
     handler = functools.partial(_LangsamesStartbild, directory=str(ordner))
-    httpd = http.server.ThreadingHTTPServer(("127.0.0.1", 0), handler)
+    httpd = _Server(("127.0.0.1", 0), handler)
     threading.Thread(target=httpd.serve_forever, daemon=True).start()
     try:
         yield ordner, f"http://127.0.0.1:{httpd.server_address[1]}"
@@ -273,8 +283,9 @@ def test_das_erste_bild_zeigt_schon_die_echte_lage(
     _, adresse = site
     seite = _oeffne(chromium, adresse, zeitpunkt, _antwort(code, 10.0))
     try:
-        assert "campus-wartet" in seite.get_attribute(".buehne", "class") or (
-            seite.locator(".buehne-himmel.laeuft").count() == 1
+        assert seite.evaluate(
+            "() => document.querySelector('.buehne.campus-wartet')"
+            " || document.querySelector('.buehne-himmel.laeuft')"
         )
         seite.wait_for_selector(".buehne-himmel.laeuft", timeout=30_000)
         himmel = seite.locator(".buehne-himmel")
