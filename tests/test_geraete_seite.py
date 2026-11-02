@@ -3241,3 +3241,61 @@ def test_die_wochenkarte_nennt_den_laden_nicht_die_marke(tmp_path):
     site = _baue(tmp_path, quellen=quellen)
     saetze = [li.get_text(strip=True) for li in _verlauf(site).select(".gr-saetze li")]
     assert any("bei Medimax Markt:" in s for s in saetze), saetze
+
+
+def test_geraeteseite_traegt_keine_modellkacheln_und_keine_tarifliste(tmp_path):
+    """Antonio 02.11.2026: die Modell-Kacheln über dem Graphen und der Fuß
+    „Maßstab & Datenlage“ mit der Tarifliste sind weg. Rot gegen den alten
+    Stand: dort standen `#gr-zr-kacheln`, `details#gr-massstab-datenlage`,
+    Tarifzeilen mit Produktinformationsblatt-Links und die Bereitschaftstabelle.
+    Gegenprobe: ohne Gerät zuordenbare Tarife nennt die Seite die Anbieter in
+    einem Satz, mit Zuordnung steht dieser Satz nicht da."""
+    from test_geraete_glossar import baue_mit_referenzen
+
+    soup = baue_mit_referenzen(tmp_path, weitere=4)
+    assert soup.select_one("#gr-zr-kacheln") is None
+    assert not soup.select("[class*='gr-zr-k-']")
+    assert soup.select_one("#gr-zr-baender") is not None, "Band-Wahl gehört bleiben"
+    assert soup.select_one("#gr-zr-suche") is not None
+    assert soup.select_one("#gr-massstab-datenlage") is None
+    assert not soup.select("table.gr-ttab, [class*='gr-ttab']")
+    text = " ".join(soup.get_text(" ", strip=True).split())
+    for weg in (
+        "Tarife ohne Gerät",
+        "Tarife aus den Produktinformationsblättern",
+        "Was der Rechnung noch fehlt",
+        "Was je Anbieter schon gemessen ist",
+        "weitere Tarife anzeigen",
+        "sku_id",
+    ):
+        assert weg not in text, f"{weg!r} steht noch auf der Seite"
+    for a in soup.select("a[href]"):
+        assert "Produktinformationsblatt" not in a.get_text(), a
+    assert "Nicht auf der Tafel, weil kein Gerät zuzuordnen ist" not in text
+
+
+def test_der_satz_zu_buendeln_ohne_geraet_erscheint_nur_mit_solchen(
+    tmp_path, monkeypatch
+):
+    """Gegenprobe zur entfernten Tarifliste: bleibt ein Bündel ohne Gerät
+    außerhalb der Tafel, nennt die Seite den Anbieter einmal in einem Satz."""
+    from test_geraete_glossar import baue_mit_referenzen
+
+    from telco_radar.report import geraete_tco_karten as karten
+
+    echt = karten.ergaenze_geraete_aus_katalog
+
+    def mit_luecke(*args, **kwargs):
+        echt(*args, **kwargs)
+        return [
+            {"sku_id": "x", "anbieter": "o2", "grund": "kein Katalogtreffer"},
+            {"sku_id": "y", "anbieter": "o2", "grund": "kein Katalogtreffer"},
+        ]
+
+    monkeypatch.setattr(karten, "ergaenze_geraete_aus_katalog", mit_luecke)
+    soup = baue_mit_referenzen(tmp_path, weitere=4)
+    satz = soup.select_one(".gr-tco-ohne-zuordnung")
+    assert satz is not None
+    assert " ".join(satz.get_text().split()) == (
+        "Nicht auf der Tafel, weil kein Gerät zuzuordnen ist: o2."
+    )

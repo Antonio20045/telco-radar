@@ -21,10 +21,8 @@ Balkenzeile liegt an der Telefon-Falz schon knapp, `pruefe_portal.py`
 unter die Auswahl). Die INTENTION der drei Kriterien traegt; die Orte
 sind die der neuen Struktur:
 
-  K1 -> die Aufklapper, die eine MENGE verbergen: der Massstab
-        ("N Tarife anzeigen") und die innere "N weitere Tarife"-Klappe.
-        app.js setzt KEIN Klapplabel mehr nach (der Karten-Sortierer ist
-        mit der Klappe gefallen) - der Wortlaut lebt nur im Template.
+  K1 -> entfallen: der Tarifmassstab samt "N weitere Tarife"-Klappe steht
+        seit 02.11.2026 nicht mehr auf der Seite.
   K2 -> der Rechenweg-Aufklapper jeder Buendel-ZEILE (die fuenf
         Kernangaben stehen offen, ALLES weitere im EINEN Rechenweg, A6);
         die Begriffe selber erklaert die Antwortzeile ueber dem Graph
@@ -74,7 +72,7 @@ def _server(site):
         httpd.shutdown()
 
 
-def _baue_mit_referenzen(tmp_path, weitere: int):
+def baue_mit_referenzen(tmp_path, weitere: int):
     """`_baue` mit mehr SIM-only-Referenzen: erst ab fuenf (SICHTBAR ist
     vier) entsteht die innere "N weitere Tarife"-Klappe - ohne diesen
     Schritt pruefte der K1-Test sie an einer Fixture, die den Fall nie
@@ -106,92 +104,6 @@ def _baue_mit_referenzen(tmp_path, weitere: int):
     return BeautifulSoup(
         (root / "site" / "geraete.html").read_text(encoding="utf-8"), "html.parser"
     )
-
-
-def test_das_klapplabel_nennt_handlung_und_zahl(tmp_path):
-    """Jede Klappe, die eine MENGE verbergen, traegt "<N> <Ding> anzeigen"
-    - die Zahl als nackter Text direkt vor dem Wort (das Abnahmekriterium
-    greift die Zeile per grep am Quelltext) und ein Aktionswort. In der
-    O3-Struktur sind das der Tarifmassstab und seine innere Klappe; die
-    Kartenklappe, fuer die SQ67 die Regel erfand, ist mit O2 gefallen."""
-    s = _baue_mit_referenzen(tmp_path, weitere=4)
-    klappe = s.select_one("details#gr-massstab-datenlage")
-    assert klappe is not None, (
-        "die Fixture traegt keine Massstabs-Klappe (keine Referenzen)"
-    )
-    summary = klappe.select_one("summary")
-    text = re.sub(r"\s+", " ", summary.get_text(" ", strip=True))
-    assert text == "Maßstab & Datenlage", f"falscher Klapname: {text!r}"
-    inhalt = " ".join(klappe.get_text(" ", strip=True).split())
-    treffer = re.search(r"(\d+)\s+Tarife\s+aus\s+den", inhalt)
-    assert treffer, f"keine Tarifzahl im Inhalt: {inhalt[:120]!r}"
-    zeilen = klappe.select("table.gr-ttab--simonly tbody tr")
-    assert zeilen, "Klappe ohne Tabellenzeilen - der Test prueft nichts"
-    assert int(treffer.group(1)) == len(zeilen), (
-        f"der Satz zaehlt {treffer.group(1)}, die Klappe traegt "
-        f"{len(zeilen)} Tarifzeilen"
-    )
-
-
-def test_die_innere_klappe_nennt_handlung_und_zahl(tmp_path):
-    """Die innere Klappe ("N weitere Tarife") folgt derselben Regel wie
-    die aeussere - bis zur Portierung hiess sie "Die uebrigen N Tarife",
-    ein Etikett ohne Handlung. Die Zahl muss die Zeilen der EIGENEN
-    Tabelle zaehlen, nicht die Gesamtmenge der aeusseren Klappe."""
-    s = _baue_mit_referenzen(tmp_path, weitere=4)
-    klappe = s.select_one("details#gr-massstab-datenlage")
-    innere = klappe.select("details.gr-auf summary")
-    texte = [re.sub(r"\s+", " ", t.get_text(" ", strip=True)) for t in innere]
-    treffer = [t for t in texte if re.search(r"\d+\s+weitere\s+Tarife\s+anzeigen", t)]
-    assert treffer, (
-        f"keine innere Klappe mit Handlung und Zahl: {texte!r} - die "
-        "Fixture stellt mehr als vier Referenzen, der Fall MUSS eintreten"
-    )
-    innere_klappe = klappe.select("details.gr-auf")[0]
-    zeilen = innere_klappe.select("table.gr-ttab--simonly tbody tr")
-    assert zeilen, "innere Klappe ohne eigene Tabellenzeilen"
-    assert re.search(rf"{len(zeilen)}\s+weitere\s+Tarife\s+anzeigen", treffer[0]), (
-        f"{treffer[0]!r} zaehlt nicht die {len(zeilen)} Zeilen ihrer eigenen Tabelle"
-    )
-
-
-def _summary_texte(seite) -> list[str]:
-    return seite.eval_on_selector_all(
-        "#gr-massstab-datenlage summary",
-        "els => els.map(e => e.textContent.replace(/\\s+/g, ' ').trim())",
-    )
-
-
-def test_app_js_setzt_keine_klapplabels_mehr_nach(tmp_path, chromium):
-    """Nachfolger des SQ67-Tests 'app.js baut dasselbe Klapplabel nach': Der
-    Wortlaut der Klapplabels lebt nur in der Vorlage. Im Browser stehen nach
-    dem Laden und nach jedem Auf- und Zuklappen dieselben Labels wie im
-    ausgelieferten HTML, und das alte Karten-Klapplabel taucht nirgends auf."""
-    s = _baue_mit_referenzen(tmp_path, weitere=4)
-    vom_server = [
-        " ".join(t.get_text(" ").split())
-        for t in s.select("#gr-massstab-datenlage summary")
-    ]
-    assert len(vom_server) >= 2, vom_server
-    assert any(re.search(r"\d+ weitere Tarife anzeigen", t) for t in vom_server)
-
-    site = tmp_path / "mit" / "site"
-    with _server(site) as basis:
-        seite = chromium.new_page()
-        try:
-            seite.goto(f"{basis}/geraete.html", wait_until="load")
-            assert _summary_texte(seite) == vom_server
-            klappen = seite.locator("#gr-massstab-datenlage summary")
-            for i in range(klappen.count()):
-                klappen.nth(i).click()
-                assert _summary_texte(seite) == vom_server, f"nach Klick {i}"
-            for i in reversed(range(klappen.count())):
-                klappen.nth(i).click()
-                assert _summary_texte(seite) == vom_server, f"nach Zuklappen {i}"
-            koerper = seite.inner_text("body")
-        finally:
-            seite.close()
-    assert "Anbieterangebote anzeigen" not in koerper
 
 
 def _zeilen_mit_zwei_preisen(soup):

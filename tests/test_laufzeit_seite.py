@@ -192,13 +192,6 @@ def _gedrueckt(s) -> list[str]:
     )
 
 
-def _kachelpreis(s) -> str:
-    return s.eval_on_selector_all(
-        "#gr-zr-kacheln button[aria-pressed='true'] .gr-zr-k-band",
-        "e => e.filter(x => !x.hidden).map(x => x.textContent).join(' ')",
-    )
-
-
 def test_ohne_parameter_gilt_24_und_der_link_traegt_die_laufzeit(_basis):
     """Seit 10.10.2026 steht die Bündelliste nicht mehr auf der Seite: die
     Zeile der fehlenden Anbieter zeigt die 24er-Ansicht, die Bündelzeilen
@@ -233,7 +226,6 @@ def test_der_sieger_jeder_ansicht_hat_ihre_raten(_basis, laufzeit):
         assert f"{_euro(soll[sieger])} € Kosten über {max(laufzeit, 24)} Monate" in (
             antwort
         )
-        assert f"ab{_euro(soll[sieger])}€" in _kachelpreis(s).replace(" ", "")
     zeilen = [z for z in _lager_zeilen(basis, str(laufzeit)) if z["gesamt"]]
     guenstigste = min(zeilen, key=lambda z: float(z["gesamt"]))
     assert guenstigste["anbieter"] == sieger, zeilen
@@ -322,7 +314,6 @@ def test_alle_gruppiert_die_zeilen_ohne_sieger_und_ohne_delta(_basis):
         assert s.query_selector("#gr-zr-gruppe .gr-leit-zahl") is None
         assert _zeilen(s) == []
         assert {z["lz"] for z in _fehlend_lz(s)} <= {"alle"}
-        assert "ab" not in _kachelpreis(s), "unter „alle“ kein ab-Preis"
         assert s.evaluate(
             "() => [...document.querySelectorAll('.gr-bnd-lzkopf')]"
             ".every(k => k.hidden)"

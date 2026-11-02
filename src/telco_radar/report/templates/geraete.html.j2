@@ -193,51 +193,6 @@
      § 8). Heute traegt sie ihre Luecke - null Buendel, weil kein Adapter
      Tarifpreise sammelt. Sie zeigt deshalb, WAS schon gemessen ist und was
      fehlt, statt aus einem Geraetepreis eine Gesamtsumme zu runden. #}
-{# Die Referenztabelle steht an ZWEI Orten (offen und im Aufklapper).
-   Als Makro, nicht als zwei Kopien: zwei Kopien einer Tabelle sind zwei
-   Tabellen, und die zweite wird beim naechsten Umbau vergessen. #}
-{% macro referenztabelle(zeilen) %}
-{# `gr-scroll`: eine breite Tabelle rollt IN SICH, nie die ganze Seite.
-   Vier Spalten, deren letzte "Produktinformationsblatt" plus Datum traegt;
-   auf 390 px einzeln gemessen wird sie 403 px breit und reicht bis 446.
-   Die 480 px, auf die der Reiter im Vorzustand lief, gehen NICHT auf ihr
-   Konto, sondern auf das der Bereitschaftstabelle weiter unten (437 breit)
-   - eine Zahl gehoert an die Tabelle, an der sie gemessen wurde. Eine
-   Seite, die waagerecht rollt, ist auf dem Telefon unbenutzbar; dieselbe
-   Regel und derselbe Behaelter wie bei der SKU-Matrix (dort
-   `gr-matrix-scroll`) und der Bewegungstabelle.
-
-   Das Makro wird ZWEIMAL aufgerufen - offen und im Aufklapper "Die
-   uebrigen N Tarife" -, zwei Behaelter im Template ergeben also drei auf
-   der Seite. #}
-<div class="gr-scroll">
-<table class="gr-ttab gr-ttab--simonly">
-  <thead><tr>
-    <th scope="col">Anbieter und Tarif</th>
-    <th scope="col">je Monat</th>
-    <th scope="col">über {{ geraete.tco.horizont }} Monate ohne Anschlusspreis</th>
-    <th scope="col">Beleg</th>
-  </tr></thead>
-  <tbody>
-  {% for r in zeilen %}
-  <tr{% if r.eigen %} class="gr-tzeile--eigen"{% endif %}>
-    <td><span class="gr-t-anbieter">{{ r.anbieter }}</span>
-        <span class="gr-a-klein">{{ r.tarif }}</span></td>
-    <td>{{ r.monatlich | euro }}</td>
-    <td>{{ r.tarif_ueber_horizont | euro }}</td>
-    <td>{% if r.quelle_url %}<a href="{{ r.quelle_url }}"
-          rel="nofollow noopener" target="_blank">{% if r.quelle_ist_dokument %}Produktinformationsblatt{% else %}Shop-Seite{% endif %}<span
-          class="gr-a-pfeil" aria-hidden="true">↗</span></a>{%
-        else %}<span class="gr-t-luecke">kein Beleg</span>{% endif %}
-        {% if r.abgerufen_am %}<span class="gr-a-klein gr-a-datum">{{
-          r.abgerufen_am | date_de }}</span>{% endif %}</td>
-  </tr>
-  {% endfor %}
-  </tbody>
-</table>
-</div>
-{% endmacro %}
-
 {# EINE Karte je Anbieter und Tarif. Die Pflichtzeilen stehen in der
    Reihenfolge des Terminologie-Katalogs D, und ihre Beschriftungen sind
    woertlich von dort: `TCO-<Laufzeit>`, `Ø X €/Monat`, `monatlich X €`,
@@ -312,7 +267,7 @@
       </div>
     </div>
     {# Datenkonzept Geräte 5.4: der Umschalter der Ratenlaufzeit steuert die
-       ganze Tafel (Kacheln, Antwort, Graph, Zeilen, Δ); Standard 24, im Link
+       ganze Tafel (Antwort, Graph, Zeilen, Δ); Standard 24, im Link
        als ?laufzeit=. „alle“ zeigt die Zeilen gruppiert, ohne Sieger und Δ. #}
     <div class="gr-zr-feld gr-zr-feld--lz">
       <label id="gr-zr-lz-label">Ratenlaufzeit</label>
@@ -327,88 +282,6 @@
       </div>
     </div>
   </div>
-
-  {# --- 1b. Die MODELL-KARTEN (§3.2 + P1/F3): die häufigsten Geräte als
-         prominenter Schnelleingang - jede Karte trägt JE BAND (P1-Fix
-         Sicht-B2: die Karte reagiert auf den Band-Umschalter) ihren
-         ab-Preis (bestes echtes Angebot DES BANDES, groß), die Bewegung
-         seit dem ersten Messtag und die Anbieter der Zeitreihe als Punkte
-         in Hausfarben. Alle Zahlen kommen fertig aus geraete_zeitreihe
-         (Regel 1); die Reihung (Anbieter, dann Punkte) ist unverändert.
-         Zwei Klickwege: der Karten-Körper wählt das Modell
-         (waehle(modell, null)), die PREISZAHL öffnet zusätzlich den
-         Rechenweg dieses Preises (P1-Fix Sicht-A1 - app.js liest nur
-         fertige data-Attribute, kein Rechnen). Ein Band ohne echtes
-         Angebot zeigt „—" statt eines geratenen Preises. #}
-  {% if zr.kacheln %}
-  {% set aktives_band = zr.start.band if zr.start else '' %}
-  {% set aktive_lz = zr.daten.start_laufzeit %}
-  <div class="gr-zr-kacheln" id="gr-zr-kacheln" aria-label="Häufige Geräte">
-    {% for k in zr.kacheln %}
-    <button type="button" data-modell="{{ k.id }}"{% if k.id ==
-      start_modell %} aria-pressed="true"{% endif %}>
-      <span class="gr-zr-k-kopf"><span class="gr-zr-k-name">{{ k.kurz
-        }}</span>{% for b, je in k.baender.items() %}{% for lz, s in je.items()
-        %}<span class="gr-zr-k-punkte gr-zr-k-band" data-band="{{ b }}"
-        data-lz="{{ lz }}"{% if b != aktives_band or lz != aktive_lz %}
-        hidden{% endif %}{% if s.anbieter_text %} role="img"
-        aria-label="Anbieter mit Messung: {{ s.anbieter_text }}"{% endif
-        %}>{{ s.punkte_html|safe }}</span>{% endfor %}{% endfor %}</span>
-      {% for b, je in k.baender.items() %}{% for lz, s in je.items() %}
-      <span class="gr-zr-k-band" data-band="{{ b }}" data-lz="{{ lz }}"{% if
-        b != aktives_band or lz != aktive_lz %} hidden{% endif %}{% if s.anb
-        %} data-anb="{{ s.anb }}"{% endif %}>
-        {%- if s.ab %}<span class="gr-zr-k-preis"><small>ab</small><b>{{
-          s.ab }}</b>{% if s.ab_monat %}<span class="gr-zr-k-monat">{{
-          s.ab_monat }}</span>{% endif %}</span>
-        {# A3: ein Band mit nur alten Angeboten zeigt den benannten alten
-           Stand (`alt_text`, in Python gebaut, MIT Abrufdatum) statt
-           „—" - harte Regel 9; der Titel nennt denselben Sachverhalt
-           für Maus und Touch. #}
-        {%- elif s.alt_text %}<span class="gr-zr-k-preis"><small
-          class="gr-zr-k-leer gr-zr-k-alt"
-          title="kein aktueller Bündel-Stand">{{
-          s.alt_text }}</small></span>
-        {# P0-B-z1: der fremde Zeitraum ist sein EIGENER Zustand
-           (`fremd_text`) - das Angebot ist von heute, nur seine Laufzeit
-           ist eine andere. Der Titel des alten Stands wäre hier falsch. #}
-        {%- elif s.fremd_text %}<span class="gr-zr-k-preis"><small
-          class="gr-zr-k-leer gr-zr-k-alt gr-zr-k-fremd"
-          title="Bündel-Angebot nur über eine andere Laufzeit">{{
-          s.fremd_text }}</small></span>
-        {# Notbremse: das Band führt nur Bündel, die nicht zählen (Schätzung,
-           abgelaufene Aktion) - derselbe Zustand wie der Antwortsatz, kein
-           „kein Angebot". #}
-        {%- elif s.gesperrt_text %}<span class="gr-zr-k-preis"><small
-          class="gr-zr-k-leer gr-zr-k-alt gr-zr-k-gesperrt"
-          title="Bündel-Angebot nicht im Vergleich">{{
-          s.gesperrt_text }}</small></span>
-        {%- else %}<span class="gr-zr-k-preis"><small class="gr-zr-k-leer"
-          title="kein Bündel-Angebot in diesem Band">—</small></span>{%- endif %}
-        {#- 28.09.2026: die Bewegung steht nur, wenn sich wirklich etwas
-            bewegt hat - „±0 € in 16 Tagen" auf jeder Karte war Rauschen,
-            ein echter Preissprung faellt so auf. #}
-        {%- if s.delta_text and s.delta_richtung != 'gleich' %}<span
-          class="gr-zr-k-delta gr-zr-k-delta--{{ s.delta_richtung }}">{{
-          s.delta_text }}</span>{%- endif %}
-      </span>
-      {% endfor %}{% endfor %}
-      {# Ein Band, das DIESE Karte nicht führt, lässt sie nicht leer
-         sterben: der Ersatz-Span steht auf und sagt „—" (dasselbe
-         Zeichen wie ein Band ohne echtes Angebot - ein benannter
-         Zustand, kein geratener Preis). #}
-      <span class="gr-zr-k-band gr-zr-k-band--kein" data-band="__ohne" hidden>
-        <span class="gr-zr-k-preis"><small class="gr-zr-k-leer"
-          title="dieses Gerät wird in diesem Band nicht geführt">—</small>
-      </span></span>
-      {# Unter „alle“ gibt es keinen Sieger und damit keinen ab-Preis. #}
-      <span class="gr-zr-k-band gr-zr-k-band--alle" hidden>
-        <span class="gr-zr-k-preis"><small class="gr-zr-k-leer"
-          title="{{ zr.daten.alle_text }}">—</small></span></span>
-    </button>
-    {% endfor %}
-  </div>
-  {% endif %}
 
   {# --- 2. Der Montagepunkt: der STARTZUSTAND steht serverseitig da
          (First Paint ohne JavaScript, lesbar ohne jede Anfrage); jeder
@@ -455,66 +328,17 @@
      Mini-Satz zwischen Kopf und Steuerung (Falz-Regel: höchstens EIN Satz
      vor dem ersten Datenelement - das ist der Antwort-Satz der Zeitreihe). #}
 
-  {# --- 4. Der EINE Fuß-Aufklapper (c): „Maßstab & Datenlage" - bis E2
-         waren es zwei eigene Aufklapper (der Tarifmaßstab und die
-         Datenlage). §3.1: genau DREI Rest-Aufklapper auf der ganzen
-         Tafel, das ist der dritte; die Referenztabelle samt ihrer
-         „N weitere Tarife"-Klappe ist Inhalt, kein vierter. #}
-  <details class="gr-auf" id="gr-massstab-datenlage">
-  <summary>Maßstab & Datenlage</summary>
+  {# --- 4. Der Fuß der Tafel: keine Tarifliste mehr (Entscheidung 02.11.2026:
+         die Endpreise kommen aus dem täglichen Lauf beim Anbieter, nicht aus
+         den Produktinformationsblättern). Übrig bleibt EIN Satz, und nur
+         dann, wenn ein Bündel ohne Gerät-Zuordnung nicht auf der Tafel
+         steht - die Lücke wird genannt, nicht verschwiegen. #}
   {% if geraete.tco.ohne_zuordnung %}
   <p class="gr-erklaer gr-basis--duenn gr-tco-ohne-zuordnung">Nicht auf der
-  Tafel, weil kein Gerät zuzuordnen ist: {% for u in geraete.tco.ohne_zuordnung
-  %}{{ u.anbieter }}, <code>{{ u.sku_id }}</code> – {{ u.grund }}{% if not
-  loop.last %}; {% endif %}{% endfor %}.</p>
+  Tafel, weil kein Gerät zuzuordnen ist: {{
+  geraete.tco.ohne_zuordnung | map(attribute="anbieter") | unique | join(", ")
+  }}.</p>
   {% endif %}
-  {% if geraete.tco.referenzen %}
-  <p class="gr-erklaer">{{ geraete.tco.referenzen_gesamt }} Tarife aus den
-  Produktinformationsblättern – dem gesetzlich vorgeschriebenen Dokument,
-  nicht der Werbeseite. Der Betrag gilt <b>ohne Gerät</b>; er ist der
-  Maßstab, gegen den ein Gerätepreis im Bündel überhaupt bestimmbar wird
-  (<a href="{{ prefix }}tarife.html">Tarifübersicht</a>).</p>
-  {{ referenztabelle(geraete.tco.referenzen) }}
-  {% if geraete.tco.referenzen_rest %}
-  <details class="gr-auf">
-    <summary>{{ geraete.tco.referenzen_rest | length }} weitere Tarife anzeigen</summary>
-    {{ referenztabelle(geraete.tco.referenzen_rest) }}
-  </details>
-  {% endif %}
-  {% else %}
-  <p class="gr-erklaer">Der Tarifmaßstab steht noch nicht: ohne
-  Produktinformationsblatt ist kein Gesamtpreis berechenbar.</p>
-  {% endif %}
-  <h3 class="gr-tueber">Was der Rechnung noch fehlt</h3>
-  <ul class="gr-tposten gr-tposten--offen">
-    {% for o in geraete.tco.offene_posten %}
-    <li><span>{{ o.name }}</span><em>{{ o.phase }}</em></li>
-    {% endfor %}
-  </ul>
-  {% if geraete.tco.bereitschaft %}
-  <h3 class="gr-tueber">Was je Anbieter schon gemessen ist</h3>
-  <div class="gr-scroll">
-  <table class="gr-ttab gr-ttab--bereit">
-    <thead><tr>
-      <th scope="col">Anbieter</th><th scope="col">Neugeräte</th>
-      <th scope="col">Preisform</th>
-      <th scope="col">Geräteseite vollständig</th>
-    </tr></thead>
-    <tbody>
-    {% for b in geraete.tco.bereitschaft %}
-    <tr{% if b.eigen %} class="gr-tzeile--eigen"{% endif %}>
-      <td>{{ b.anbieter }}</td>
-      <td>{{ b.listungen }}</td>
-      <td>{{ b.preisform }}</td>
-      <td>{% if b.mit_raten %}{{ b.raten_probe_ok }} von {{ b.mit_raten }}
-        mit geprüfter Ratenrechnung{% else %}–{% endif %}</td>
-    </tr>
-    {% endfor %}
-    </tbody>
-  </table>
-  </div>
-  {% endif %}
-  </details>
 
   {# Der Client-Knoten: Titel, Zählungen, Erlaubnis - KEINE Beträge. Der
      Zustands-Graph selbst (Antwort-Satz, SVG) kommt nie als Daten, sondern
@@ -523,15 +347,12 @@
     zr.daten | tojson }}</script>
   {% else %}
   <p class="gr-erklaer gr-basis--duenn">Es gibt heute kein einziges Bündel
-  aus Gerät und Tarif im Bestand – ohne diese Verbindung gibt es nichts zu
-  rechnen. Was schon gemessen ist, steht unten.</p>
+  aus Gerät und Tarif im Bestand.</p>
   {% endif %}
 
   {% if not geraete.tco.lesbar %}
-  <p class="gr-erklaer gr-basis--duenn">Der Bündelbestand
-  (<code>geraete_tco.json</code>) war nicht lesbar. Was hier steht, ist
-  deshalb unvollständig – das ist ein Lesefehler und keine Auskunft über den
-  Markt.</p>
+  <p class="gr-erklaer gr-basis--duenn">Die Bündeldaten ließen sich nicht lesen;
+  die Tafel ist unvollständig.</p>
   {% endif %}
 </section>
 </div>
@@ -768,8 +589,7 @@
      auf das GEWAEHLTE Geraet um („… liegen 11 Messtermine vor, vom 10.8.
      bis zum 16.9.“) und benennt hier die Messluecken. Vor P2 trug er
      zusaetzlich den globalen Stand („wird seit dem … erfasst“) samt
-     Nachsatz - beide stehen jetzt im Aufklapper „Datenlage“ am
-     Reiterende, und der Satz hier spricht NUR noch über das eine
+     Nachsatz; der Satz hier spricht NUR noch über das eine
      gezeichnete Geraet. Initial `hidden`: die Auto-Vorauswahl fuellt ihn
      beim Laden. Die data-Attribute sind die zwei Schwellen aus
      `geraete_verlauf.py`, die `app.js` am Knoten liest (AB_TERMINEN,
@@ -805,7 +625,7 @@
          _geraete_radar.html.j2, denselben Datenkontext `radar.portfolio`
          wie vorher - keine zweite Berechnung).
 
-         Sie steht UNTER der Tabelle und dem Datenlage-Aufklapper, am
+         Sie steht UNTER der Tabelle, am
          Reiterende: ihr Gatter ist das EIGENE (`auffaellig.hat_daten`),
          unabhaengig vom hat_daten-Gatter des Verlaufs darueber - haenge
          sie in dessen else-Zweig, wuerde sie im Verlaufs-Leerzustand

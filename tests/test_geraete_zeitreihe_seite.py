@@ -106,13 +106,10 @@ def test_der_glossar_und_wie_gerechnet_sind_weg(suppe, tafel):
 
 def test_zwischen_wahl_leiste_und_graph_steht_nur_der_antwort_satz(tafel):
     wahl = tafel.select_one(".gr-zr-wahl")
-    kacheln = tafel.select_one(".gr-zr-kacheln")
     antwort = tafel.select_one(".gr-zr-antwort")
     graph = tafel.select_one(".gr-zr-graph")
     assert all(e is not None for e in (wahl, antwort, graph))
-    positionen = [
-        e.sourceline for e in (wahl, kacheln, antwort, graph) if e is not None
-    ]
+    positionen = [e.sourceline for e in (wahl, antwort, graph) if e is not None]
     assert positionen == sorted(positionen)
     zwischen = [
         e
@@ -129,44 +126,11 @@ def test_zwischen_wahl_leiste_und_graph_steht_nur_der_antwort_satz(tafel):
     )
 
 
-def test_die_wahl_leiste_traegt_suchfeld_band_und_kacheln(tafel):
+def test_die_wahl_leiste_traegt_suchfeld_und_band_aber_keine_kacheln(tafel):
     assert tafel.select_one("#gr-zr-suche") is not None
     knoepfe = tafel.select("#gr-zr-baender button[data-band]")
     assert [k.get("data-band") for k in knoepfe] == ["xs", "m", "l"]
-    kacheln = tafel.select("#gr-zr-kacheln button[data-modell]")
-    assert 1 <= len(kacheln) <= 6
-
-
-def test_jede_karte_traegt_preis_und_anbieter_punkte(tafel):
-    """P1/F3 (A3) + P1-Fix (Sicht-B2): die Karte ist die erste Preis-
-    antwort der Tafel - JE BAND ein eigener Satz Spans (Preis, Delta,
-    Punkte), genau eine Bandlage sichtbar. Ein Band ohne echtes Angebot
-    zeigt den benannten Leerzustand „—" statt eines geratenen Preises.
-    get_text OHNE Trenner (Hausregel aus dem 2454-Modelle-Befund)."""
-    karten = tafel.select("#gr-zr-kacheln button[data-modell]")
-    assert karten, "die Modell-Karten fehlen"
-    for k in karten:
-        bande = k.select(".gr-zr-k-band[data-band]")
-        assert bande, "Karte ohne Band-Spans"
-        sichtbar = [s for s in bande if not s.has_attr("hidden")]
-        assert sichtbar, "kein Band-Span sichtbar"
-        preise = k.select(".gr-zr-k-preis")
-        assert preise, "Karte ohne Preis-Gruppe"
-        if not k.select_one(".gr-zr-k-leer"):
-            preis = k.select_one(".gr-zr-k-preis b")
-            assert preis is not None, "Karte ohne ab-Preis"
-            assert "€" in preis.get_text()
-            assert k.select_one(".gr-zr-k-preis small").get_text() == "ab"
-            monat = k.select_one(".gr-zr-k-monat")
-            assert monat is not None and "€/Monat" in monat.get_text()
-        assert k.select(".gr-zr-k-punkte i"), "Karte ohne Anbieter-Punkte"
-        delta = k.select_one(".gr-zr-k-delta")
-        assert delta is None or (
-            "€" in delta.get_text()
-            and "Tag" in delta.get_text()
-            and "±0" not in delta.get_text()
-        )
-        assert "€" in k.get_text()
+    assert tafel.select_one("#gr-zr-kacheln") is None
 
 
 def test_kein_weiterer_aufklapper_ueber_dem_graphen(tafel):
@@ -185,10 +149,8 @@ def test_kein_weiterer_aufklapper_ueber_dem_graphen(tafel):
             )
 
 
-def test_der_fuss_aufklapper_heisst_massstab_und_datenlage(tafel):
-    fuss = tafel.select_one("details#gr-massstab-datenlage")
-    assert fuss is not None
-    assert "Maßstab & Datenlage" in fuss.select_one("summary").get_text(" ", strip=True)
+def test_der_fuss_aufklapper_tarife_ohne_geraet_ist_weg(tafel):
+    assert tafel.select_one("details#gr-massstab-datenlage") is None
 
 
 def test_zwei_separate_fuss_aufklapper_gibt_es_nicht_mehr(tafel):

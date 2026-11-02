@@ -652,69 +652,6 @@ def _geraete_kartenzahl_site(tmp_path):
     return site, aufbereitung
 
 
-def test_die_kartenzahlen_stehen_wortlich_auf_der_seite(tmp_path):
-    site, aufbereitung = _geraete_kartenzahl_site(tmp_path)
-    soup = BeautifulSoup(
-        (site / "geraete.html").read_text(encoding="utf-8"), "html.parser"
-    )
-    karten = soup.select("#gr-zr-kacheln button[data-modell]")
-    assert karten, "die Modell-Karten fehlen auf der Geräteseite"
-    assert len(karten) == len(aufbereitung["kacheln"]), (
-        f"{len(karten)} Karten auf der Seite, "
-        f"{len(aufbereitung['kacheln'])} in der Aufbereitung"
-    )
-    text_je_id = {k.get("data-modell"): k.get_text() for k in karten}
-    assert len(text_je_id) == len(aufbereitung["kacheln"]), (
-        "dieselbe Karte zweimal auf der Seite"
-    )
-    for k in aufbereitung["kacheln"]:
-        text = text_je_id[k["id"]]
-        assert k["kurz"] in text, f"Name fehlt auf der Karte {k['id']}"
-        assert set(k["baender"]), f"Karte {k['id']} ohne Band-Werte"
-        for band, s in ((b, s) for b, je in k["baender"].items() for s in je.values()):
-            if s["ab"]:
-                assert s["ab"] in text, (
-                    f"ab-Preis {s['ab']} ({band}) fehlt auf {k['id']}"
-                )
-                if s["ab_monat"]:
-                    assert s["ab_monat"] in text, (
-                        f"Ø/Monat {s['ab_monat']} ({band}) fehlt auf {k['id']}"
-                    )
-            if s["delta_text"] and s["delta_richtung"] != "gleich":
-                assert s["delta_text"] in text, (
-                    f"Bewegung {s['delta_text']} ({band}) fehlt auf {k['id']}"
-                )
-            elif s["delta_text"]:
-                assert s["delta_text"] not in text, (
-                    f"Stillstand {s['delta_text']} ({band}) steht auf {k['id']}"
-                )
-
-
-def test_keine_karte_zeigt_zahlen_die_die_aufbereitung_nicht_hat(tmp_path):
-    """Gegenprobe: der Karten-Text der Seite besteht NUR aus Feldern der
-    Aufbereitung - kein Zahlfragment, das dort nicht herkommt (waere die
-    Vorlage auf eigene Rechnung gerechnet)."""
-    import re
-
-    site, aufbereitung = _geraete_kartenzahl_site(tmp_path)
-    soup = BeautifulSoup(
-        (site / "geraete.html").read_text(encoding="utf-8"), "html.parser"
-    )
-    erlaubt = set()
-    for k in aufbereitung["kacheln"]:
-        erlaubt |= {k["kurz"], "ab"}
-        for je in k["baender"].values():
-            for s in je.values():
-                erlaubt |= {s["ab"], s["ab_monat"], s["delta_text"], s["anbieter_text"]}
-    erlaubt |= {t for k in aufbereitung["kacheln"] for t in k["kurz"].split()}
-    erlaubt.discard(None)
-    for karte in soup.select("#gr-zr-kacheln button[data-modell]"):
-        for wort in re.findall(r"[\d.,]+ ?(?:€|€/Monat|Tag(?:en)?)", karte.get_text()):
-            assert wort in erlaubt or any(wort in (f or "") for f in erlaubt if f), (
-                f"Zahl {wort!r} steht auf der Karte, aber nicht in der Aufbereitung"
-            )
-
-
 def test_die_katalog_leitzahl_ist_der_guenstigste_zeilenpreis(tmp_path):
     """P4-Fix (Sicht-Pruefung 18.09., Falz 1): die Katalog-Leitzahl ist der
     guenstigste Einzelgeraetepreis des Regals - gehalten gegen DIESELBEN

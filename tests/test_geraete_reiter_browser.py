@@ -2854,29 +2854,11 @@ def test_kein_reiter_rollt_auf_dem_telefon_waagerecht(_umgebung, tid):
 
 
 def test_jede_breite_tabelle_liegt_in_ihrem_rollbehaelter(_seite):
-    """Jede `.gr-ttab` sitzt in einem `.gr-scroll`.
+    """Jede Verlaufstabelle sitzt in ihrem Rollbehaelter.
 
-    Der Breitentest darueber misst die WIRKUNG und ist damit an die
-    Datenlage gebunden: eine Tabelle, die heute keine Zeilen hat, rendert
-    nicht und kann nicht ueberlaufen. Genau daran ist die erste Fassung
-    dieses Reiters vorbeigelaufen - die Leitzahl-Tabelle steht hinter
-    `{% if geraete.tco.zeilen %}` und bekommt ihre Zeilen erst, wenn ein
-    Adapter Buendel liefert (Phase 4).
-
-    Dieser Test misst deshalb die REGEL statt ihrer Wirkung: er faellt auch
-    dann, wenn jemand eine vierte Tabelle ohne Behaelter ergaenzt, und er
-    faellt, bevor sie Daten hat.
+    Die Tarifliste (`.gr-ttab`) steht seit 02.11.2026 nicht mehr auf der
+    Seite; die Regel gilt weiter fuer die Verlaufstabelle.
     """
-    tabellen = _seite.evaluate(
-        """() => Array.from(document.querySelectorAll('table.gr-ttab'))
-                     .map(t => ({klassen: t.className,
-                                 drin: !!t.closest('.gr-scroll')}))"""
-    )
-    assert len(tabellen) >= 3, (
-        f"die Fixture muss alle Tabellen des TCO-Reiters zeigen: {tabellen}"
-    )
-    ohne = [t["klassen"] for t in tabellen if not t["drin"]]
-    assert not ohne, f"Tabellen ohne Rollbehaelter: {ohne}"
     verlauf = _seite.evaluate(
         """() => Array.from(document.querySelectorAll('#gr-vtabelle table'))
                      .map(t => ({klassen: t.className,

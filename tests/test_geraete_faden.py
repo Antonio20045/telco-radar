@@ -105,21 +105,6 @@ def test_die_vergleichsansicht_traegt_keine_alarmtafel_mehr(tmp_path):
     )
 
 
-def test_der_tarifmassstab_steht_in_einer_aufklappung(tmp_path):
-    """Der Maßstab (was der Tarif allein kostet) bleibt Analyse und steht
-    hinter einer eigenen, geschlossenen Aufklappung."""
-    s = _baue(tmp_path)
-    tafel = s.select_one("#tafel-tco")
-    massstab = tafel.select_one("#gr-massstab-datenlage")
-    if massstab is None or massstab.select_one(".gr-ttab--simonly") is None:
-        pytest.skip("keine Referenzen im Bestand der Fixture")
-    assert massstab.name == "details"
-    assert massstab.get("open") is None, "die Aufklappung ist offen"
-    assert tafel.select_one("#gr-massstab") is None, (
-        "der Massstab steht doppelt (alter Aufklapper zurueckgekehrt)"
-    )
-
-
 def test_die_buendel_zeilen_stehen_ausserhalb_jeder_aufklappung(tmp_path):
     """Die Bündel-Zeilen (seit O2 die Kartenform) stehen OFFEN unter dem
     Graphen - nicht in einer Analyse-Aufklappung verschachtelt. Zwei
