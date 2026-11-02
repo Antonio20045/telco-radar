@@ -168,6 +168,23 @@ jobs:
       # gehuellt. Ein Messtag einer Zeitreihe ist nicht nachholbar; eine
       # nicht neu gebaute Seite ist es sehr wohl (der naechste Lauf holt sie
       # nach). Also wird der Bestand zuerst gesichert.
+      # BELEGE (Screenshots als Beleg): liest die Anhaenge der Releases
+      # belege-* (Quelle der Wahrheit), loescht Abgelaufenes (Tages-Releases
+      # nach 7 Tagen, grosse Aenderungen nach 90) und schreibt
+      # data/state/belege_manifest.json, das einzige, was render_site liest.
+      # Weich: scheitert gh, bleibt das alte Manifest stehen (die Seite
+      # zeigt den letzten Stand), der Lauf meldet eine Fehlermeldung und
+      # kostet weder Messtag noch Seite. Zeit: hoechstens 5 min von 40.
+      - name: Belege-Manifest
+        if: steps.heute.outputs.fertig != 'true'
+        timeout-minutes: 5
+        env:
+          PYTHONPATH: src
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python scripts/belege_manifest.py --root . \
+            || echo "::error::Belege-Manifest nicht erneuert, die Seite zeigt den letzten Stand"
+
       - name: Commit state
         if: steps.heute.outputs.fertig != 'true'
         run: |
@@ -213,6 +230,10 @@ jobs:
           fi
           if [ -f data/state/geraete_unbekannt.jsonl ]; then
             git add data/state/geraete_unbekannt.jsonl
+          fi
+          if [ -f data/state/belege_manifest.json ]; then
+            # Liste der Belegbilder aus den Releases (scripts/belege_manifest.py).
+            git add data/state/belege_manifest.json
           fi
           python scripts/waechter_leck.py
           if git diff --cached --quiet; then

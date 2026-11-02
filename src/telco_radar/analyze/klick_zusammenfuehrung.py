@@ -198,7 +198,7 @@ def fuehre_zusammen(
     eindeutig, mehrdeutig = _eindeutig(saetze)
     index: dict[Schluessel, list[int]] = {}
     for stelle, satz in enumerate(adapter):
-        for schluessel in _adapterschluessel(satz, geraet):
+        for schluessel in adapterschluessel(satz, geraet):
             index.setdefault(schluessel, []).append(stelle)
     probe = Gegenprobe()
     andere_laufzeit = geschwister(index)
@@ -336,7 +336,7 @@ def _vorrang(buendel: Buendel, eintrag: dict | None, heute: str) -> bool:
     return alter is not None and 0 <= alter < FRISCHEGRENZE_TAGE
 
 
-def _adapterschluessel(satz: dict, geraet: Geraet) -> list[Schluessel]:
+def adapterschluessel(satz: dict, geraet: Geraet) -> list[Schluessel]:
     """Je Tarifschreibweise (Name, Slug) ein Schlüssel; nur Geräte im Zustand neu."""
     if str(satz.get("zustand") or ZUSTAND_NEU) != ZUSTAND_NEU:
         return []

@@ -2619,6 +2619,20 @@ b,strong{font-weight:700}
 .gr-tiefe .gr-eigen .dz-balken-fuell{background:var(--red)}
 .gr-basis--duenn{color:var(--r4)}
 
+/* Belege: leiser Aufklapper unter dem Beleg-Link; die Bilder laedt app.js
+   erst beim Oeffnen. */
+.gr-belege{margin:4px 0 0;font-family:var(--sans);font-size:12px}
+.gr-belege>summary{cursor:pointer;color:var(--ink-3);list-style:none}
+.gr-belege>summary::-webkit-details-marker{display:none}
+.gr-belege>summary:hover{color:var(--ink)}
+.gr-belege-liste{display:flex;flex-wrap:wrap;gap:12px;list-style:none;
+  margin:8px 0 0;padding:0}
+.gr-belege-liste li{display:flex;flex-direction:column;gap:3px;
+  max-width:100%}
+.gr-belege-liste img{display:block;width:320px;max-width:100%;height:auto;
+  min-height:60px;background:var(--rule);border:1px solid var(--rule)}
+.gr-belege-tag{color:var(--ink-4);font-size:11px}
+
 /* --- Wer ist guenstiger als Vodafone? (G2, 28.08.2026) ------------------
    ZUR FARBE, nachgesehen am gerenderten Bild statt behauptet: in diesem
    Portal sind LINKS rot (Designsprache "Zeitungsausgabe": Rot markiert

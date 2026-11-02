@@ -3176,6 +3176,20 @@ var TelcoFrage = (function () {
     }
   }, true);
 
+  /* Belege: die Screenshots der Anbieterseite stehen mit data-src im
+     Aufklapper und werden ERST BEIM OEFFNEN geladen (src setzen, sonst
+     nichts; Adresse und Zahl kommen fertig vom Server). toggle bubbelt
+     nicht - deshalb Capture, wie beim Rechenweg. */
+  document.addEventListener('toggle', function (ev) {
+    var d = ev.target;
+    if (!d || d.tagName !== 'DETAILS' || !d.open ||
+        !d.classList.contains('gr-belege')) return;
+    d.querySelectorAll('img[data-src]').forEach(function (bild) {
+      bild.setAttribute('src', bild.getAttribute('data-src'));
+      bild.removeAttribute('data-src');
+    });
+  }, true);
+
   /* Die Live-Vorschau: ab 2 Zeichen, hoechstens 8 Treffer, Praefix-Treffer
      auf Titel-Woertern - die Reihenfolge kommt fertig aus Python. */
   function trefferListe(eingabe) {

@@ -19,7 +19,7 @@ from . import anbieter_farben as _anbieter_farben
 from .ausfall import NEWSLETTER_TEIL, Ausfall, ohne_konfiguration
 from . import bilder as report_bilder
 from . import diff_bilder, differenzierung_bericht, geraete_fragmente
-from . import differenzierung_view, geraete_teurer, wettbewerb_puls
+from . import differenzierung_view, geraete_belege, geraete_teurer, wettbewerb_puls
 from . import geraete_tco_grafik as _geraete_tco_grafik
 from . import fruehwarnung as fruehwarnung_mod, lieferzeit_view as lieferzeit_view_mod
 from . import glas as glas_mod, ki_vorschau, luecken as luecken_mod
@@ -1151,8 +1151,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
     _wurzel = getattr(cfg, "root", None) or reports_dir.parent.parent
     ausfaelle: list[Ausfall] = ohne_konfiguration(_wurzel)
     env.globals["ausfaelle"] = ausfaelle
-    env.globals["hausfarbe"] = _anbieter_farben.TRANSPARENZ
-    env.globals["glas"] = glas_mod.karte()
+    env.globals.update(hausfarbe=_anbieter_farben.TRANSPARENZ, glas=glas_mod.karte())
     site_dir.mkdir(parents=True, exist_ok=True)
     (site_dir / "reports").mkdir(exist_ok=True)
     folien_dir = site_dir / "folien"
@@ -1188,6 +1187,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
                     for feld in ("image", "image_w", "image_h"):
                         h.pop(feld, None)
     state_dir = reports_dir.parent / "state"
+    ausfaelle.extend(geraete_belege.installiere(env, state_dir, reports))
     themen = themen_store.lade_themen(state_dir)
     for thema in themen:
         for item in thema.get("items") or []:

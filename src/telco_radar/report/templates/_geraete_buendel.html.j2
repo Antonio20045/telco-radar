@@ -16,6 +16,20 @@
    (`gr-kk-marke--alt`, Text aus `alt_marke` - die Zahl steht in Python,
    nie in der Vorlage, Clean Code 8). `frisch` fehlt keiner Karte, die
    `modelle()` baut; `is defined` haelt den Rueckfall auf frisch. #}
+{# „Belege“: die Screenshots der Anbieterseite zu DIESEM Preis (Manifest
+   `belege_manifest.json`, `report/geraete_belege.py`). Schluessel ist
+   (Modell, Anbieter) der Preiszeile. Ohne Bild: nichts. Die Bilder laedt
+   app.js erst beim Aufklappen (`data-src`). #}
+{% macro belegeintrag(modell_id, anbieter) %}{% if belege_fuer is defined %}{% set bel = belege_fuer(modell_id, anbieter) %}{% if bel %}
+    <details class="gr-belege">
+      <summary>Belege ({{ bel | length }})</summary>
+      <ul class="gr-belege-liste">{% for b in bel %}
+        <li><a href="{{ b.url }}" rel="nofollow noopener" target="_blank"><img
+          data-src="{{ b.url }}" alt="Screenshot {{ anbieter }} vom {{ b.datum | date_de }}"
+          width="320" height="200"></a><span class="gr-belege-tag">{{ b.datum | date_de }}{% if b.gross %} · große Änderung{% endif %}</span></li>{% endfor %}
+      </ul>
+    </details>{% endif %}{% endif %}{% endmacro %}
+
 {% macro buendelzeile(k) %}
 {# Ein veralteter Preis wird zur benannten Lücke (`geraete_preisstand.anzeige`):
    keine Zahl, keine Rechnung, `data-gesamt` leer. #}

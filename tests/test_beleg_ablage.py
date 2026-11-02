@@ -1,0 +1,232 @@
+"""Ablage der Belegbilder in Releases: Hochladen, Aufräumen, Fehler, Zeit.
+
+Eine Attrappe ersetzt GitHub; feste Daten, nie das heutige Datum.
+"""
+
+from __future__ import annotations
+
+import subprocess
+from datetime import date
+from pathlib import Path
+
+import pytest
+from beleg_attrappe import AttrappeReleases
+
+from telco_radar import beleg_ablage
+from telco_radar.beleg_ablage import (
+    Bild,
+    Gh,
+    GhFehler,
+    raeume_auf,
+    veroeffentliche,
+)
+from telco_radar.beleg_regeln import dateiname
+
+HEUTE = date(2026, 11, 10)
+
+
+def bild(tmp_path: Path, geraet: str, anbieter: str, gross: bool = False) -> Bild:
+    datei = tmp_path / dateiname(geraet, anbieter, HEUTE)
+    datei.write_bytes(b"RIFF")
+    return Bild(datei, gross)
+
+
+def test_bild_geht_ins_tagesrelease_und_legt_es_an(tmp_path):
+    gh = AttrappeReleases()
+    bilanz = veroeffentliche([bild(tmp_path, "g", "o2")], HEUTE, gh)
+    assert gh.angelegt == ["belege-2026-11-10"]
+    assert gh.hochgeladen == [("belege-2026-11-10", ["g__o2__2026-11-10.webp"])]
+    assert (bilanz.hochgeladen, bilanz.gross, bilanz.fehler) == (1, 0, [])
+
+
+def test_grosse_aenderung_geht_zusaetzlich_ins_monatsrelease(tmp_path):
+    gh = AttrappeReleases()
+    bilder = [bild(tmp_path, "g", "o2", gross=True), bild(tmp_path, "g", "telekom")]
+    bilanz = veroeffentliche(bilder, HEUTE, gh)
+    assert sorted(gh.stand) == ["belege-2026-11-10", "belege-gross-2026-11"]
+    assert gh.stand["belege-gross-2026-11"] == ["g__o2__2026-11-10.webp"]
+    assert len(gh.stand["belege-2026-11-10"]) == 2
+    assert (bilanz.hochgeladen, bilanz.gross) == (2, 1)
+
+
+def test_vorhandenes_release_wird_nicht_neu_angelegt(tmp_path):
+    gh = AttrappeReleases({"belege-2026-11-10": ["x__y__2026-11-10.webp"]})
+    veroeffentliche([bild(tmp_path, "g", "o2")], HEUTE, gh)
+    assert gh.angelegt == []
+
+
+def test_ohne_bilder_kein_zugriff_auf_github():
+    gh = AttrappeReleases(lesefehler=True)
+    bilanz = veroeffentliche([], HEUTE, gh)
+    assert bilanz.fehler == [] and gh.angelegt == [] and gh.hochgeladen == []
+
+
+def test_pakete_und_volles_release_bekommt_zaehler(tmp_path, monkeypatch):
+    monkeypatch.setattr(beleg_ablage, "PAKET", 2)
+    monkeypatch.setattr(beleg_ablage, "MAX_ANHAENGE_JE_RELEASE", 3)
+    gh = AttrappeReleases()
+    bilder = [bild(tmp_path, f"g{i}", "o2") for i in range(5)]
+    veroeffentliche(bilder, HEUTE, gh)
+    assert sorted(gh.stand) == ["belege-2026-11-10", "belege-2026-11-10-2"]
+    assert [len(gh.stand[t]) for t in sorted(gh.stand)] == [3, 2]
+    assert [len(d) for _, d in gh.hochgeladen] == [2, 1, 2]
+
+
+def test_lesefehler_laedt_nichts_hoch_und_steht_in_der_bilanz(tmp_path):
+    gh = AttrappeReleases(lesefehler=True)
+    bilanz = veroeffentliche([bild(tmp_path, "g", "o2")], HEUTE, gh)
+    assert gh.hochgeladen == []
+    assert bilanz.ausgelassen == 1
+    assert "nicht lesbar" in bilanz.fehler[0]
+
+
+def test_fehler_im_tagesrelease_stoppt_das_monatsrelease_nicht(tmp_path):
+    gh = AttrappeReleases(scheitern_bei=("belege-2026-11-10",))
+    bilanz = veroeffentliche([bild(tmp_path, "g", "o2", gross=True)], HEUTE, gh)
+    assert gh.stand.get("belege-gross-2026-11") == ["g__o2__2026-11-10.webp"]
+    assert len(bilanz.fehler) == 1
+    assert bilanz.ausgelassen == 1
+    assert bilanz.gross == 1
+
+
+def test_frist_vorbei_laesst_aus_und_zaehlt(tmp_path):
+    gh = AttrappeReleases()
+    bilder = [bild(tmp_path, "g", "o2"), bild(tmp_path, "g", "telekom")]
+    bilanz = veroeffentliche(bilder, HEUTE, gh, frist_ende=100.0, uhr=lambda: 100.0)
+    assert gh.angelegt == [] and gh.hochgeladen == []
+    assert (bilanz.hochgeladen, bilanz.ausgelassen) == (0, 2)
+
+
+def test_frist_laeuft_zwischen_den_paketen_ab(tmp_path, monkeypatch):
+    monkeypatch.setattr(beleg_ablage, "PAKET", 1)
+    gh = AttrappeReleases()
+    zeiten = iter([0.0, 0.0, 200.0, 300.0])
+    bilder = [bild(tmp_path, f"g{i}", "o2") for i in range(3)]
+    bilanz = veroeffentliche(
+        bilder, HEUTE, gh, frist_ende=100.0, uhr=lambda: next(zeiten)
+    )
+    assert bilanz.hochgeladen == 1
+    assert bilanz.ausgelassen == 2
+
+
+def test_aufraeumen_loescht_abgelaufene_releases_nur_im_schema():
+    gh = AttrappeReleases()
+    anhaenge = {
+        "belege-2026-11-02": ["a__b__2026-11-02.webp"],
+        "belege-2026-11-03": ["a__b__2026-11-03.webp"],
+        "belege-gross-2026-07": ["a__b__2026-07-10.webp"],
+        "belege-gross-2026-09": ["a__b__2026-09-10.webp"],
+    }
+    bilanz, rest = raeume_auf(anhaenge, HEUTE, gh)
+    assert gh.releases_geloescht == ["belege-2026-11-02", "belege-gross-2026-07"]
+    assert sorted(rest) == ["belege-2026-11-03", "belege-gross-2026-09"]
+    assert bilanz.releases_geloescht == gh.releases_geloescht
+
+
+def test_aufraeumen_loescht_alte_bilder_im_jungen_monatsrelease():
+    gh = AttrappeReleases({"belege-gross-2026-11": ["a__b__2026-11-02.webp"]})
+    anhaenge = {
+        "belege-gross-2026-11": [
+            "a__b__2026-11-02.webp",
+            "a__o2__2026-11-09.webp",
+            "foto.webp",
+        ]
+    }
+    bilanz, rest = raeume_auf(anhaenge, HEUTE, gh)
+    assert gh.assets_geloescht == []
+    assert len(rest["belege-gross-2026-11"]) == 3
+    assert bilanz.assets_geloescht == 0
+
+
+def test_aufraeumen_loescht_einzelne_alte_bilder_ueber_neunzig_tage():
+    heute = date(2027, 2, 15)
+    gh = AttrappeReleases(
+        {"belege-gross-2026-11": ["a__b__2026-11-02.webp", "a__b__2026-11-20.webp"]}
+    )
+    anhaenge = gh.anhaenge()
+    bilanz, rest = raeume_auf(anhaenge, heute, gh)
+    assert gh.assets_geloescht == [("belege-gross-2026-11", "a__b__2026-11-02.webp")]
+    assert rest == {"belege-gross-2026-11": ["a__b__2026-11-20.webp"]}
+    assert bilanz.assets_geloescht == 1
+
+
+def test_aufraeumen_fasst_fremde_dateien_nie_an():
+    gh = AttrappeReleases({"belege-2026-11-10": ["foto.webp"]})
+    bilanz, rest = raeume_auf(gh.anhaenge(), HEUTE, gh)
+    assert gh.assets_geloescht == [] and gh.releases_geloescht == []
+    assert rest == {"belege-2026-11-10": ["foto.webp"]}
+    assert bilanz.fehler == []
+
+
+def test_loeschfehler_steht_in_der_bilanz_und_der_rest_laeuft_weiter():
+    gh = AttrappeReleases(scheitern_bei=("belege-2026-11-01",))
+    anhaenge = {
+        "belege-2026-11-01": ["a__b__2026-11-01.webp"],
+        "belege-2026-10-30": ["a__b__2026-10-30.webp"],
+    }
+    bilanz, rest = raeume_auf(anhaenge, HEUTE, gh)
+    assert gh.releases_geloescht == ["belege-2026-10-30"]
+    assert len(bilanz.fehler) == 1
+    assert "belege-2026-11-01" in rest
+
+
+class Lauf:
+    """Fängt die gh-Aufrufe ab."""
+
+    def __init__(self, antwort: str = "", code: int = 0, stderr: str = "") -> None:
+        self.aufrufe: list[list[str]] = []
+        self.antwort = subprocess.CompletedProcess([], code, antwort, stderr)
+
+    def __call__(self, argv):
+        self.aufrufe.append(list(argv))
+        return self.antwort
+
+
+def test_gh_liest_nur_belege_releases_aus_jsonzeilen():
+    zeilen = "\n".join(
+        [
+            '{"tag":"belege-2026-11-10","dateien":["b.webp","a.webp"]}',
+            '{"tag":"v1.0","dateien":["programm.zip"]}',
+            "",
+            '{"tag":"belege-gross-2026-11","dateien":[]}',
+        ]
+    )
+    gh = Gh(runner=Lauf(zeilen))
+    assert gh.anhaenge() == {
+        "belege-2026-11-10": ["a.webp", "b.webp"],
+        "belege-gross-2026-11": [],
+    }
+
+
+def test_gh_fehler_wird_zur_benannten_ausnahme_ohne_token():
+    gh = Gh(runner=Lauf(code=1, stderr="x\nHTTP 403: Resource not accessible"))
+    with pytest.raises(GhFehler) as fehler:
+        gh.anhaenge()
+    assert "403" in str(fehler.value)
+
+
+def test_gh_unlesbare_antwort_ist_kein_leeres_ergebnis():
+    with pytest.raises(GhFehler):
+        Gh(runner=Lauf("kein json")).anhaenge()
+
+
+def test_gh_timeout_wird_zur_ausnahme():
+    def runner(argv):
+        raise subprocess.TimeoutExpired(argv, 1)
+
+    with pytest.raises(GhFehler):
+        Gh(runner=runner).anhaenge()
+
+
+def test_gh_aufrufe_pre_release_clobber_und_cleanup():
+    lauf = Lauf()
+    gh = Gh(runner=lauf, repo="o/r")
+    gh.release_anlegen("belege-2026-11-10", "Belege 2026-11-10")
+    gh.hochladen("belege-2026-11-10", [Path("a.webp")])
+    gh.release_loeschen("belege-2026-11-10")
+    gh.asset_loeschen("belege-gross-2026-11", "a.webp")
+    anlegen, hoch, weg, asset = lauf.aufrufe
+    assert "--prerelease" in anlegen and "--latest=false" in anlegen
+    assert "--clobber" in hoch and hoch[hoch.index("--repo") + 1] == "o/r"
+    assert "--cleanup-tag" in weg and "--yes" in weg
+    assert asset[:3] == ["gh", "release", "delete-asset"]

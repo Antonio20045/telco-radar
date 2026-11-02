@@ -1,0 +1,312 @@
+"""Belegbilder in GitHub-Releases legen und Abgelaufenes löschen (``gh``, Regeln in
+``beleg_regeln``).
+
+Quelle der Wahrheit für die Seite sind allein die Anhänge der Releases. Es gibt keinen
+Index im Repo: wer ein Bild ins richtige Release lädt, hat es veröffentlicht, wer eines
+löscht, hat es zurückgenommen. ``beleg_manifest`` liest die Anhänge und schreibt, was
+die Seite braucht.
+
+``veroeffentliche`` (Klick-Job): Jedes Bild geht ins Tages-Release; eine große Änderung
+geht zusätzlich ins Monats-Release (``beleg_regeln.gross_tag``). Fehlende Releases
+entstehen als Pre-Release ohne „latest“. Dateien gehen in Paketen hoch (``PAKET``), mit
+``--clobber``, damit ein zweiter Lauf am selben Tag nicht scheitert. Ein gescheitertes
+Paket steht in der Bilanz, die übrigen laufen weiter (CLAUDE.md Clean Code 5).
+
+``raeume_auf`` (Geräte-Job): Tages-Releases nach ``AUFBEWAHRUNG_TAGE``, Monats-Releases
+nach ``AUFBEWAHRUNG_GROSS_TAGE`` löschen; in jüngeren Monats-Releases einzelne Bilder,
+die älter sind. Was nicht im Schema liegt, rührt nichts an.
+
+``frist_ende`` ist die monotone Zeit, bis zu der ein neues Paket beginnen darf
+(CLAUDE.md Regel 8); der Rest heißt ``ausgelassen``. Außer ``gh`` gibt es kein Netz; das
+Token liegt nur in der Umgebung (``GH_TOKEN``), nie in Argumenten oder Ausgaben.
+"""
+
+from __future__ import annotations
+
+import json
+import subprocess
+import time
+from collections.abc import Callable, Mapping, Sequence
+from dataclasses import dataclass, field
+from datetime import date
+from pathlib import Path
+from typing import Protocol
+
+from .beleg_regeln import (
+    MAX_ANHAENGE_JE_RELEASE,
+    REPO,
+    gross_tag,
+    ist_abgelaufen,
+    ist_beleg_tag,
+    ist_gross_tag,
+    release_abgelaufen,
+    tages_tag,
+    zerlege_dateiname,
+)
+
+PAKET = 40
+"""Dateien je ``gh release upload``: klein genug, dass ein Fehler wenig kostet."""
+ZEIT_JE_AUFRUF_S = 300
+Runner = Callable[[Sequence[str]], "subprocess.CompletedProcess[str]"]
+Anhaenge = Mapping[str, Sequence[str]]
+"""Tag eines Releases -> Dateinamen seiner Anhänge."""
+
+
+class GhFehler(RuntimeError):
+    """Ein ``gh``-Aufruf ist gescheitert; die Meldung nennt nur den Befehl."""
+
+
+class Releases(Protocol):
+    """Was die Ablage von GitHub braucht (im Test durch eine Attrappe ersetzt)."""
+
+    def anhaenge(self) -> dict[str, list[str]]:
+        """Release-Tag -> Dateinamen."""
+        ...
+
+    def release_anlegen(self, tag: str, titel: str) -> None:
+        """Legt ein Pre-Release an."""
+        ...
+
+    def hochladen(self, tag: str, dateien: Sequence[Path]) -> None:
+        """Lädt Dateien hoch (überschreibt gleiche Namen)."""
+        ...
+
+    def release_loeschen(self, tag: str) -> None:
+        """Löscht Release samt Tag."""
+        ...
+
+    def asset_loeschen(self, tag: str, datei: str) -> None:
+        """Löscht eine Datei eines Releases."""
+        ...
+
+
+def _lauf(argv: Sequence[str]) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        argv, capture_output=True, text=True, timeout=ZEIT_JE_AUFRUF_S, check=False
+    )
+
+
+class Gh:
+    """Die Release-Aufrufe der GitHub-CLI; ``runner`` ist im Test austauschbar."""
+
+    def __init__(self, runner: Runner = _lauf, repo: str = REPO) -> None:
+        self._runner, self._repo = runner, repo
+
+    def _gh(self, *argumente: str) -> str:
+        argv = ["gh", *argumente]
+        try:
+            fertig = self._runner(argv)
+        except (OSError, subprocess.TimeoutExpired) as fehler:
+            raise GhFehler(f"gh {argumente[0]} {argumente[1]}: {fehler}") from fehler
+        if fertig.returncode != 0:
+            letzte = (fertig.stderr or "").strip().splitlines()[-1:] or ["ohne Meldung"]
+            raise GhFehler(
+                f"gh {argumente[0]} {argumente[1]}: "
+                f"Exit {fertig.returncode}: {letzte[0]}"
+            )
+        return fertig.stdout or ""
+
+    def anhaenge(self) -> dict[str, list[str]]:
+        """Alle Releases im Schema mit ihren Anhängen; wirft ``GhFehler`` bei
+        Lesefehlern.
+
+        Eine Zeile JSON je Release (``--paginate`` mit ``--jq``), damit seitenweises
+        Lesen kein Listenende zerreißt.
+        """
+        ausgabe = self._gh(
+            "api",
+            "--paginate",
+            f"repos/{self._repo}/releases?per_page=100",
+            "--jq",
+            ".[] | {tag: .tag_name, dateien: [.assets[].name]}",
+        )
+        ergebnis: dict[str, list[str]] = {}
+        for zeile in ausgabe.splitlines():
+            if not zeile.strip():
+                continue
+            try:
+                eintrag = json.loads(zeile)
+                tag, dateien = str(eintrag["tag"]), list(eintrag["dateien"])
+            except (ValueError, KeyError, TypeError) as fehler:
+                raise GhFehler(f"gh api: Antwort unlesbar: {fehler}") from fehler
+            if ist_beleg_tag(tag):
+                ergebnis[tag] = sorted(str(d) for d in dateien)
+        return ergebnis
+
+    def release_anlegen(self, tag: str, titel: str) -> None:
+        """Legt ein Pre-Release ohne „latest“ an."""
+        self._gh(
+            "release",
+            "create",
+            tag,
+            "--repo",
+            self._repo,
+            "--title",
+            titel,
+            "--notes",
+            titel,
+            "--prerelease",
+            "--latest=false",
+        )
+
+    def hochladen(self, tag: str, dateien: Sequence[Path]) -> None:
+        """Lädt Dateien hoch; gleiche Namen werden überschrieben."""
+        self._gh(
+            "release",
+            "upload",
+            tag,
+            *map(str, dateien),
+            "--repo",
+            self._repo,
+            "--clobber",
+        )
+
+    def release_loeschen(self, tag: str) -> None:
+        """Löscht Release und Tag."""
+        self._gh(
+            "release", "delete", tag, "--repo", self._repo, "--yes", "--cleanup-tag"
+        )
+
+    def asset_loeschen(self, tag: str, datei: str) -> None:
+        """Löscht eine Datei eines Releases."""
+        self._gh("release", "delete-asset", tag, datei, "--repo", self._repo, "--yes")
+
+
+@dataclass(frozen=True)
+class Bild:
+    """Ein Bild mit endgültigem Dateinamen; ``gross`` = große Änderung."""
+
+    datei: Path
+    gross: bool
+
+
+@dataclass
+class Bilanz:
+    """Zähler und Fehler eines Laufs."""
+
+    hochgeladen: int = 0
+    gross: int = 0
+    ausgelassen: int = 0
+    fehler: list[str] = field(default_factory=list)
+    releases_geloescht: list[str] = field(default_factory=list)
+    assets_geloescht: int = 0
+
+    def zeilen(self) -> list[str]:
+        """Protokollzeilen."""
+        return [
+            f"Belege: {self.hochgeladen} Bilder in Tages-Releases, {self.gross} in "
+            f"Monats-Releases (große Änderungen), {self.ausgelassen} ausgelassen "
+            f"(Zeit), {len(self.fehler)} Fehler",
+            f"Belege: {len(self.releases_geloescht)} Releases und "
+            f"{self.assets_geloescht} Dateien gelöscht",
+        ]
+
+
+def _freier_tag(
+    belegt: dict[str, int], bauen: Callable[[date, int], str], tag: date
+) -> str:
+    teil = 1
+    while belegt.get(bauen(tag, teil), 0) >= MAX_ANHAENGE_JE_RELEASE:
+        teil += 1
+    return bauen(tag, teil)
+
+
+def _lade_tag(
+    tag: str,
+    eintraege: list[Bild],
+    vorhanden: dict[str, list[str]],
+    gh: Releases,
+    bilanz: Bilanz,
+    frist_ende: float | None,
+    uhr: Callable[[], float],
+) -> None:
+    """Legt das Release an, falls nötig, und lädt die Bilder paketweise hoch."""
+    if frist_ende is not None and uhr() >= frist_ende:
+        bilanz.ausgelassen += len(eintraege)
+        return
+    if tag not in vorhanden:
+        try:
+            gh.release_anlegen(tag, f"Belege {tag.removeprefix('belege-')}")
+        except GhFehler as fehler:
+            bilanz.fehler.append(f"{tag}: {fehler}")
+            bilanz.ausgelassen += len(eintraege)
+            return
+        vorhanden[tag] = []
+    for start in range(0, len(eintraege), PAKET):
+        paket = eintraege[start : start + PAKET]
+        if frist_ende is not None and uhr() >= frist_ende:
+            bilanz.ausgelassen += len(paket)
+            continue
+        try:
+            gh.hochladen(tag, [bild.datei for bild in paket])
+        except GhFehler as fehler:
+            bilanz.fehler.append(f"{tag}: {fehler}")
+            bilanz.ausgelassen += len(paket)
+            continue
+        if ist_gross_tag(tag):
+            bilanz.gross += len(paket)
+        else:
+            bilanz.hochgeladen += len(paket)
+
+
+def veroeffentliche(
+    bilder: Sequence[Bild],
+    heute: date,
+    gh: Releases,
+    frist_ende: float | None = None,
+    uhr: Callable[[], float] = time.monotonic,
+) -> Bilanz:
+    """Lädt hoch (Modulkopf). Kein Zugriff auf ``gh`` ohne Bilder."""
+    bilanz = Bilanz()
+    if not bilder:
+        return bilanz
+    try:
+        vorhanden = {tag: list(dateien) for tag, dateien in gh.anhaenge().items()}
+    except GhFehler as fehler:
+        bilanz.fehler.append(f"Releases nicht lesbar: {fehler}")
+        bilanz.ausgelassen = len(bilder)
+        return bilanz
+    belegt = {tag: len(dateien) for tag, dateien in vorhanden.items()}
+    je_tag: dict[str, list[Bild]] = {}
+    for bild in sorted(bilder, key=lambda b: b.datei.name):
+        ziele = [_freier_tag(belegt, tages_tag, heute)]
+        if bild.gross:
+            ziele.append(_freier_tag(belegt, gross_tag, heute))
+        for tag in ziele:
+            belegt[tag] = belegt.get(tag, 0) + 1
+            je_tag.setdefault(tag, []).append(bild)
+    for tag in sorted(je_tag):
+        _lade_tag(tag, je_tag[tag], vorhanden, gh, bilanz, frist_ende, uhr)
+    return bilanz
+
+
+def raeume_auf(
+    anhaenge: Anhaenge, heute: date, gh: Releases
+) -> tuple[Bilanz, dict[str, list[str]]]:
+    """Löscht Abgelaufenes (Modulkopf); gibt Bilanz und verbleibende Anhänge zurück."""
+    bilanz = Bilanz()
+    rest: dict[str, list[str]] = {}
+    for tag in sorted(anhaenge):
+        if release_abgelaufen(tag, heute):
+            try:
+                gh.release_loeschen(tag)
+                bilanz.releases_geloescht.append(tag)
+            except GhFehler as fehler:
+                bilanz.fehler.append(f"{tag} nicht gelöscht: {fehler}")
+                rest[tag] = list(anhaenge[tag])
+            continue
+        rest[tag] = []
+        for datei in anhaenge[tag]:
+            name = zerlege_dateiname(datei)
+            if name is None or not ist_abgelaufen(
+                name.datum, heute, ist_gross_tag(tag)
+            ):
+                rest[tag].append(datei)
+                continue
+            try:
+                gh.asset_loeschen(tag, datei)
+                bilanz.assets_geloescht += 1
+            except GhFehler as fehler:
+                bilanz.fehler.append(f"{tag}/{datei} nicht gelöscht: {fehler}")
+                rest[tag].append(datei)
+    return bilanz, rest

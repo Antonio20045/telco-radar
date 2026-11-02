@@ -24,7 +24,9 @@ name: Klick-Tageslauf
 #              ihr hoechstens 25 min. Was nicht passt, heisst
 #              `nicht_besucht` und kommt am naechsten Tag zuerst.
 #   ablegen    timeout 10 min
-#   Summe hoechstens 200 min: 00:05 + 200 min = 03:25.
+#   belege     timeout 40 min, laeuft neben `ablegen` (beide warten nur auf
+#              `klick`); --job-frist-sekunden 2100 = 35 min, 5 min Reserve
+#   Summe hoechstens 230 min: 00:05 + 230 min = 03:55.
 # GitHub startet geplante Laeufe oft Stunden spaeter (geraete.yml: 4 h 41
 # bis 5 h 40 gemessen). Dann kann dieser Lauf auf geraete.yml treffen; der
 # Tageslauf fragt darum vor JEDER Seite, ob geraete.yml, klick-erkundung.yml
@@ -33,6 +35,14 @@ name: Klick-Tageslauf
 # Seite, die schon laeuft, laeuft zu Ende: hoechstens 25 min Ueberlappung.
 # Kam der Klick-Lauf nach dem Geraetelauf, liest der naechste Geraetelauf
 # die Datei als "gestern" (nur Ersetzung, keine Werte mit falschem Datum).
+#
+# BELEGE (Screenshots als Beleg): der Lauf legt zu jedem erfassten Preis ein
+# WebP nach klick/belege/ (collect/geraete/belegbild.py); der Job `belege`
+# laedt sie mit scripts/belege_veroeffentlichen.py in GitHub-Releases
+# (belege-JJJJ-MM-TT, grosse Aenderungen zusaetzlich belege-gross-JJJJ-MM).
+# Nichts davon liegt im Repo. Die Seite liest die Anhaenge erst im
+# Geraetelauf (geraete.yml, scripts/belege_manifest.py), der Abgelaufenes
+# loescht. Ein Fehler dort macht den Job rot, nie den Klick-Lauf.
 #
 # PARALLELLAUF: eigene concurrency-Gruppe `klick` ohne Abbruch (Regel 9).
 # Die Klick-Erkundung weicht diesem Lauf aus (klickparallel.WORKFLOWS).
@@ -125,6 +135,17 @@ jobs:
           retention-days: 7
           if-no-files-found: warn
 
+      # Die Belegbilder: eigener Name, damit `ablegen` (Muster klick-*) sie
+      # nie als Ergebnis liest.
+      - name: Belegbilder hochladen
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: belegbilder-${{ matrix.anbieter }}
+          path: klick/belege
+          retention-days: 2
+          if-no-files-found: ignore
+
   ablegen:
     # Auch wenn ein Matrix-Job scheitert: die anderen Anbieter werden abgelegt.
     needs: [plan, klick]
@@ -178,3 +199,43 @@ jobs:
             sleep $((2 ** i))
           done
           exit 1
+
+  belege:
+    # Auch wenn ein Matrix-Job scheitert: die anderen Anbieter werden abgelegt.
+    needs: [plan, klick]
+    if: ${{ always() && needs.plan.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    permissions:
+      contents: write
+    steps:
+      # Erster Schritt: ab hier zaehlt die Restzeit des Jobs.
+      - name: Jobstart merken
+        run: echo "JOB_START=$(date +%s)" >> "$GITHUB_ENV"
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version-file: .python-version
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # Ergebnisse (Preise) und Bilder, je Anbieter ein Unterordner.
+      - name: Ergebnisse und Bilder holen
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "{klick,belegbilder}-*"
+          path: belege-artefakte
+
+      # Exit 1, wenn ein Teil nicht hochgeladen wurde; die Seite liest nur,
+      # was wirklich in den Releases liegt.
+      - name: Belegbilder in Releases legen
+        env:
+          PYTHONPATH: src
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python scripts/belege_veroeffentlichen.py --root . \
+            --quelle belege-artefakte \
+            --job-start "$JOB_START" --job-frist-sekunden 2100

@@ -20,6 +20,11 @@ Schritt); mit ``--job-frist-sekunden`` ergibt er die Restzeit (CLAUDE.md Regel 8
 ohne Netz. Ein gestörter Anbieter ist ein Ergebnis, kein Fehler: Exit-Code 0; 2 heißt,
 die Auswahl oder die Konfiguration ist falsch.
 
+Zu jedem erfassten Preis liegt danach ein verkleinertes WebP in ``<ausgabe>/belege/``
+(``belegbild``); ``klick.yml`` lädt den Ordner als Artefakt und
+``belege_veroeffentlichen.py`` legt die Bilder in Releases. Schlägt ein Bild fehl,
+läuft der Lauf weiter.
+
 Vor jeder Seite fragt der Lauf mit ``GITHUB_TOKEN`` (``actions: read``), ob der
 Gerätelauf, die Klick-Erkundung oder der Radarlauf ansteht oder läuft
 (``klickparallel.TAGESLAUF_WORKFLOWS``); dann und
@@ -41,6 +46,8 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 
 from telco_radar.collect import http
+from telco_radar.collect.geraete.belegbild import ORDNER as BILDER_ORDNER
+from telco_radar.collect.geraete.belegbild import speichere_bilder
 from telco_radar.collect.geraete.klickergebnis import (
     FORMAT,
     LAUF_NICHT_GELESEN,
@@ -125,6 +132,7 @@ def main(argumente: list[str] | None = None) -> int:
         try:
             holer = robots_holer(ziel.kennung or http.BOT_UA)
             crawle, lies = leser_im_browser(browser, ziel, lage.karte, _uhr, holer)
+            crawle = _mit_bildern(crawle, args.ausgabe / BILDER_ORDNER)
             daten = fahre(
                 ziel,
                 lage.karte,
@@ -145,6 +153,22 @@ def main(argumente: list[str] | None = None) -> int:
         f"{ziel.schluessel}: {daten['laufstatus']}{grund}, {daten['dauer_sekunden']} s"
     )
     return 0
+
+
+def _mit_bildern(crawle, ordner: Path):
+    """Der Crawler, der nach jeder Seite die Bilder ihrer Preise schreibt."""
+
+    def mit_bildern(seite, ende):
+        lauf = crawle(seite, ende)
+        bilanz = speichere_bilder(lauf, ordner)
+        if bilanz.fehler or bilanz.ohne_bild:
+            print(
+                f"Belegbilder {seite.adresse}: {bilanz.geschrieben} geschrieben, "
+                f"{bilanz.ohne_bild} ohne Bild, {bilanz.fehler} Fehler"
+            )
+        return lauf
+
+    return mit_bildern
 
 
 def _hat_karte(root: Path, ziel: Erkundungsziel) -> bool:
