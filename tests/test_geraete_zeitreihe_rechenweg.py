@@ -186,7 +186,7 @@ def test_die_zusammenform_behaelt_ihre_kurve_und_nennt_ihren_zeitraum():
     Die Kurve steht also - und der Zeitraum, den sie trägt, wird GELESEN
     (`Tco.leitzahl_monate`) und ans Kurvenende geschrieben (`_svg`). Das
     Tor wirkt weiter am Vorzeichen und an der Rangfolge (`_bewegung`,
-    `_band_zeilen`), nicht an der Sichtbarkeit. Seit 10.10.2026 trägt 1&1
+    `band_zeilen`), nicht an der Sichtbarkeit. Seit 10.10.2026 trägt 1&1
     24 Monate plus Ablöse (Antonio: nur über 24 Monate vergleichen).
     """
     m = _messung(EINS_EINS_MESSUNG, anbieter="1&1", tarif="1&1 All-Net-Flat S")

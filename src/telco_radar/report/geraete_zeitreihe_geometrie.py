@@ -155,7 +155,7 @@ def _linien_laeufe(
     return laeufe
 
 
-def _form_pfad(marker: str, x: float, y: float, r: float) -> str | None:
+def form_pfad(marker: str, x: float, y: float, r: float) -> str | None:
     """Die Zusatzform eines Markers - ODER `None` fuer den Kreis (der
     Punkt TRAEGT die Form schon: `<circle class='gr-zr-punkt'>`) und fuer
     unbekannte Formen. Gezeichnet als OFFENER Umriss (fill='none') UM den

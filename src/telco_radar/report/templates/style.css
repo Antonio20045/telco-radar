@@ -3910,7 +3910,7 @@ td .gr-sprung,td .gr-ksprung{display:inline-block;margin-top:3px}
 .gr-zr-punkt{stroke:var(--paper-2);stroke-width:1.6}
 .gr-zr-ende{stroke-width:2.6}
 /* P2/D2: die Markerform - ein offener Umriss UM den bestehenden Kreis
-   (`_form_pfad` in geraete_zeitreihe.py), Farbe kommt inline vom Anbieter.
+   (`form_pfad` in geraete_zeitreihe.py), Farbe kommt inline vom Anbieter.
    `pointer-events:none`: die Trefferflaeche (.gr-zr-hit) bleibt allein
    fuer Klicks zustaendig, die Form darf ihr nie im Weg stehen. */
 .gr-zr-form{pointer-events:none}
@@ -6365,6 +6365,10 @@ a.ki-k1-pille:hover{border-color:var(--ink)}
 .gr-pp-gb{font-size:12px;font-weight:400;fill:var(--ink-3)}
 .gr-pp-spanne{stroke:var(--ink-4);stroke-width:1.5;stroke-linecap:round}
 .gr-pp-punkt{fill:var(--anb-marker,var(--anb-ersatz));stroke:var(--anb-marker-rand,none);stroke-width:1.5}
+.gr-pp-link{cursor:pointer}
+.gr-pp-treffer{fill:transparent;stroke:none}
+.gr-pp-link:hover .gr-pp-punkt,.gr-pp-link:focus-visible .gr-pp-punkt{stroke:var(--ink);stroke-width:2.5}
+.gr-pp-link:focus-visible{outline:none}
 .gr-pp-summe{font-size:12px;fill:var(--ink-3);font-variant-numeric:tabular-nums}
 .gr-pp-summe--eigen{font-size:15px;font-weight:700;fill:var(--ink)}
 .gr-pp-fehlt{font-size:12px;fill:var(--ink-4)}

@@ -11,7 +11,7 @@ from __future__ import annotations
 from ..tco_model import TCO_HORIZONT
 from . import geraete_notbremse as notbremse
 from .geraete_laufzeit import NICHT_ERFASST, ansicht, zeitraum
-from .geraete_rechenweg import EIGEN, _datum_de, _esc, _euro
+from .geraete_rechenweg import EIGEN, _datum_de, _esc, euro
 from .geraete_tco_karten import kurz_datum
 
 
@@ -83,7 +83,7 @@ def _ohne_zeilen(
         )
         return (
             f"{beginn} führt nur {_esc(beste_fremd['anbieter'])} – und nur über "
-            f"{zeit}: <b class='gr-zr-zahl'>{_euro(beste_fremd['gesamt'])}</b> "
+            f"{zeit}: <b class='gr-zr-zahl'>{euro(beste_fremd['gesamt'])}</b> "
             f"({_esc(beste_fremd.get('tarif') or '')}{_gb_teil(beste_fremd)}). "
             f"Über zwei Laufzeiten gibt es keinen Vergleich mit {h} Monaten."
         )
@@ -141,7 +141,7 @@ def _antwort_html(
         return f"{beginn} führt kein Anbieter ein Bündel."
     beste = zeilen[0]
     kern = (
-        f"<b class='gr-zr-zahl'>{_euro(beste['gesamt'])}</b> Kosten über "
+        f"<b class='gr-zr-zahl'>{euro(beste['gesamt'])}</b> Kosten über "
         f"{h} Monate, Ø <b class='gr-zr-zahl'>{_schnitt(beste)}</b> "
         f"({_esc(beste.get('tarif') or '')}{_gb_teil(beste)})"
     )
@@ -161,7 +161,7 @@ def _antwort_html(
         if zweit is not None:
             satz += (
                 f" Nächster Anbieter: {_esc(zweit['anbieter'])} "
-                f"({_euro(zweit['gesamt'])})."
+                f"({euro(zweit['gesamt'])})."
             )
     elif eigen is None and laufzeit is not None:
         satz += _vodafone_fehlt(modell, band, laufzeit)
@@ -214,10 +214,10 @@ def _leitzahl_html(zeilen: list) -> str | None:
         return None
     delta = round(eigen["gesamt"] - beste["gesamt"], 2)
     return (
-        f"<b class='gr-leit-zahl'>{_euro(delta)}</b>"
+        f"<b class='gr-leit-zahl'>{euro(delta)}</b>"
         f"<span class='gr-leit-label'>{_esc(beste['anbieter'])} "
         f"unter Vodafone "
-        f"({_euro(eigen['gesamt'])}"
+        f"({euro(eigen['gesamt'])}"
         f"{', Näherung' if eigen.get('naeherung') else ''})</span>"
     )
 

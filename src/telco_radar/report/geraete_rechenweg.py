@@ -5,7 +5,7 @@ Baustelle, an der eine Historien-Zeile zum Bündel wird (`_buendel_aus_messung`)
 ihre Kernzahl über H Monate (`_messwert`, gerechnet nur in `tco_kosten.kosten_ueber`)
 und die gesetzte Postenliste je Messung (`_rechung`, `_rechung_html`,
 `_rechenwege_html`). Dazu die kleinen Schreibweisen, die Zeitreihe und Rechenweg
-teilen (`_euro`, `_esc`, Datumsformen, `_zeitraum_wort`).
+teilen (`euro`, `_esc`, Datumsformen, `_zeitraum_wort`).
 """
 
 from __future__ import annotations
@@ -54,7 +54,7 @@ def _zr_marker_farbe(anbieter: str) -> str:
     return stil_fuer(anbieter).marker_farbe
 
 
-def _euro(betrag) -> str:
+def euro(betrag) -> str:
     """1.234,56 € - dieselbe Schreibweise wie ueberall auf der Seite."""
     if betrag is None:
         return ""
@@ -152,7 +152,7 @@ def _messwert(
     Gerechnet wird nur in `kosten_ueber` (Datenkonzept Geräte 5.3); H wird
     gelesen, nie angenommen: 12 und 24 Raten 24 Monate, 36 Raten 36, ein Vertrag
     (1&1) seine Laufzeit. Ein fremder Zeitraum sperrt die Kurve nicht (P0-B-z1);
-    das Tor wirkt an Rangfolge und Vorzeichen (`_band_zeilen`, Wochenbewegung).
+    das Tor wirkt an Rangfolge und Vorzeichen (`band_zeilen`, Wochenbewegung).
     `(None, None)`: keine vollständige Zahl (Clean Code 3/5).
     """
     b = _buendel_aus_messung(messung, tarife)
@@ -301,17 +301,17 @@ def _rechung_html(anbieter: str, messung: dict, tarife: dict | None = None) -> s
     for p in r["posten"]:
         if p.get("teile"):
             ausdruck = (
-                " + ".join(f"{n} × {_euro(preis)}" for n, preis in p["teile"])
-                + f" <span class='gr-zr-pg'>= {_euro(p['betrag'])}</span>"
+                " + ".join(f"{n} × {euro(preis)}" for n, preis in p["teile"])
+                + f" <span class='gr-zr-pg'>= {euro(p['betrag'])}</span>"
             )
         elif p["anzahl"] is not None and p["einzeln"] is not None:
             ausdruck = (
-                f"{p['anzahl']} × {_euro(p['einzeln'])} "
-                f"<span class='gr-zr-pg'>= {_euro(p['betrag'])}"
+                f"{p['anzahl']} × {euro(p['einzeln'])} "
+                f"<span class='gr-zr-pg'>= {euro(p['betrag'])}"
                 f"</span>"
             )
         else:
-            ausdruck = _euro(p["betrag"])
+            ausdruck = euro(p["betrag"])
         klammer = (
             f" <span class='gr-zr-pk'>{_esc(p['klammer'])}</span>"
             if p["klammer"]
@@ -328,7 +328,7 @@ def _rechung_html(anbieter: str, messung: dict, tarife: dict | None = None) -> s
         )
     teile.append("</ul>")
     teile.append(
-        f"<p class='gr-zr-rsumme'>= <b>{_euro(r['gesamt'])}</b> "
+        f"<p class='gr-zr-rsumme'>= <b>{euro(r['gesamt'])}</b> "
         f"<span class='gr-zr-plabel'>{label_der_leitzahl(r['monate'])}</span></p>"
     )
     url = r["quelle_url"]

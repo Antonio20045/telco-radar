@@ -1,7 +1,7 @@
 """Preispositionierung (Geräteseite, ganz oben): jeder Punkt ist die TCO-Zahl.
 
 Die Achse ist `gesamt` der Karte, die die Seite als Zeile des Bandes M bei 24
-Raten führt (`geraete_zeitreihe._band_zeilen`). Veraltete Preise, Schätzungen
+Raten führt (`geraete_zeitreihe.band_zeilen`). Veraltete Preise, Schätzungen
 und die Vodafone-Näherung bekommen keinen Punkt; ein Anbieter ohne Preis ist
 eine benannte Lücke, nie ein Punkt bei 0. Die Tests hängen nicht am Datum.
 """
@@ -40,6 +40,7 @@ def _karte(anbieter: str, gesamt, **mehr) -> dict:
         "naeherung": False,
         "raten_laufzeit": M24,
         "leitzahl_monate": M24,
+        "quelle_url": f"https://beispiel.test/{anbieter}?tarif=m&stand=1",
     }
     karte.update(mehr)
     return karte
@@ -81,7 +82,7 @@ def test_jeder_punkt_ist_die_tco_zahl_der_seite():
     daten = pp.aufbereiten(geraete)
     seite = {
         k["anbieter"]: k["gesamt"]
-        for k in geraete_zeitreihe._band_zeilen(geraete["tco"]["modelle"][0], M24)["m"][
+        for k in geraete_zeitreihe.band_zeilen(geraete["tco"]["modelle"][0], M24)["m"][
             "zeilen"
         ]
     }
@@ -158,6 +159,7 @@ def test_fehlt_ein_anbieter_in_jeder_zeile_steht_das_einmal_in_der_legende():
     fehlt = {e["name"]: e["fehlt"] for e in daten["legende"]}
     assert fehlt["Telekom"] == pp.FEHLT_TEXT
     assert fehlt["Vodafone"] == ""
+    assert "24" in pp.FEHLT_TEXT and "aktuell" not in pp.FEHLT_TEXT
     assert daten["zeilen"][0]["luecken"] == []
 
 
@@ -192,7 +194,8 @@ def test_die_vorlage_zeichnet_beide_ausfuehrungen_mit_denselben_zahlen():
         p["data-wert"] for p in schmal
     )
     assert len(seite.select(".gr-pp-legende li")) == len(pp.ANBIETER_FOLGE)
-    assert seite.select_one("script") is None and "http" not in str(seite)
+    assert seite.select_one("script") is None
+    assert not [a for a in seite.select("a") if not a.select_one(".gr-pp-punkt")]
 
 
 def test_die_geraeteseite_traegt_den_abschnitt(tmp_path):
@@ -203,3 +206,121 @@ def test_die_geraeteseite_traegt_den_abschnitt(tmp_path):
     assert "gx-art--tarif" in abschnitt["class"]
     punkte = abschnitt.select(".gr-pp-breit .gr-pp-punkt")
     assert punkte and all(float(p["data-wert"]) > 0 for p in punkte)
+
+
+def _links(daten: dict, breit: bool = True) -> dict[str, str]:
+    svg = BeautifulSoup(daten["svg_breit" if breit else "svg_schmal"], "html.parser")
+    return {
+        a.select_one(".gr-pp-punkt")["data-anbieter"]: a["href"]
+        for a in svg.select("a.gr-pp-link")
+    }
+
+
+def test_jeder_punkt_verlinkt_auf_die_quelle_der_tabelle():
+    """Der Link ist `quelle_url` der Karte - dieselbe wie die Spalte „Beleg“."""
+    geraete = _geraete(KARTEN)
+    daten = pp.aufbereiten(geraete)
+    tabelle = {
+        k["anbieter"]: k["quelle_url"]
+        for k in geraete_zeitreihe.band_zeilen(geraete["tco"]["modelle"][0], M24)["m"][
+            "zeilen"
+        ]
+    }
+    assert len(tabelle) == len(KARTEN)
+    for breit in (True, False):
+        assert _links(daten, breit) == tabelle
+        svg = BeautifulSoup(
+            daten["svg_breit" if breit else "svg_schmal"], "html.parser"
+        )
+        assert all(a["target"] == "_blank" for a in svg.select("a.gr-pp-link"))
+        assert all("noopener" in a["rel"] for a in svg.select("a.gr-pp-link"))
+        assert all(p.find_parent("a") for p in svg.select(".gr-pp-punkt"))
+
+
+def test_ein_punkt_ohne_quelle_ist_kein_link_und_sagt_das():
+    """Gegenprobe: fehlende oder fremde Quelle ergibt keinen Link, keinen `#`."""
+    karten = [
+        _karte("Vodafone", 2157.4, quelle_url=""),
+        _karte("o2", 2087.75, quelle_url=None),
+        _karte("congstar", 1867.0, quelle_url="javascript:alert(1)"),
+        _karte("1&1", 1890.66),
+    ]
+    daten = pp.aufbereiten(_geraete(karten))
+    assert set(_links(daten)) == {"1&1"}
+    assert set(_punkte(daten)) == {"Vodafone", "o2", "congstar", "1&1"}
+    svg = BeautifulSoup(daten["svg_breit"], "html.parser")
+    tips = {p["data-anbieter"]: p.title.get_text() for p in svg.select(".gr-pp-punkt")}
+    assert pp.KEIN_BELEG in tips["Vodafone"] and pp.KEIN_BELEG not in tips["1&1"]
+
+
+def test_der_tooltip_nennt_den_betrag_mit_cent_die_beschriftung_ganze_euro():
+    daten = pp.aufbereiten(_geraete(KARTEN))
+    svg = BeautifulSoup(daten["svg_breit"], "html.parser")
+    tips = {p["data-anbieter"]: p.title.get_text() for p in svg.select(".gr-pp-punkt")}
+    assert "2.087,75 €" in tips["o2"] and "1.890,66 €" in tips["1&1"]
+    zahlen = [t.get_text() for t in svg.select(".gr-pp-summe")]
+    assert "1.867 €" in zahlen and all("," not in z for z in zahlen)
+
+
+def _einsundeins(m_zuzahlung: float, **mehr) -> list[dict]:
+    """1&1 für ein Gerät: Tarif S gelesen (Zuzahlung 360), M abgeleitet."""
+    gelesen = _karte(
+        "1&1",
+        1479.66,
+        band="xs",
+        sku_id="s26-ultra-256",
+        zuzahlung=360.0,
+        vom_crawler=True,
+        aus_preisliste=False,
+    )
+    abgeleitet = _karte(
+        "1&1",
+        1531.66,
+        sku_id="s26-ultra-256",
+        zuzahlung=m_zuzahlung,
+        vom_crawler=False,
+        aus_preisliste=True,
+        **mehr,
+    )
+    return [gelesen, abgeleitet]
+
+
+def test_eine_abgeleitete_zahl_gegen_die_gelesene_zuzahlung_bekommt_keinen_punkt(
+    caplog,
+):
+    """Die Ablöse hängt nur am Gerät: 340 gegen gelesene 360 ist falsch."""
+    karten = [*KARTEN[:-1], *_einsundeins(340.0)]
+    with caplog.at_level("WARNING"):
+        daten = pp.aufbereiten(_geraete(karten))
+    assert "widerspricht der gelesenen Zeile" in caplog.text
+    assert "1&1" not in _punkte(daten)
+    assert (
+        "1&1" in daten["zeilen"][0]["luecken"]
+        or "1&1" not in daten["zeilen"][0]["punkte"]
+    )
+    assert 1531.66 not in _punkte(daten).values()
+
+
+def test_gleiche_summen_bleiben_wenn_die_zuzahlung_stimmt():
+    """Gegenprobe: gleiche Zuzahlung (360) - der Punkt steht; ebenso eine
+    abgeleitete Zahl ohne gelesene Gegenzeile, und Telekom mit je Tarif
+    verschiedener Zuzahlung (keine Preisliste)."""
+    mit = pp.aufbereiten(_geraete([*KARTEN[:-1], *_einsundeins(360.0)]))
+    assert _punkte(mit)["1&1"] == 1531.66
+    ohne_gegenzeile = [*KARTEN[:-1], _einsundeins(340.0)[1]]
+    assert _punkte(pp.aufbereiten(_geraete(ohne_gegenzeile)))["1&1"] == 1531.66
+    telekom = [
+        _karte(
+            "Telekom", 2000.0, band="xs", sku_id="x", zuzahlung=100.0, vom_crawler=True
+        ),
+        _karte("Telekom", 2100.0, sku_id="x", zuzahlung=150.0, vom_crawler=False),
+    ]
+    assert (
+        _punkte(pp.aufbereiten(_geraete([*KARTEN[:-1], *telekom])))["Telekom"] == 2100.0
+    )
+
+
+def test_ein_anderes_geraet_oder_eine_andere_laufzeit_widerlegt_nichts():
+    karten = _einsundeins(340.0)
+    karten[0]["sku_id"] = "anderes-geraet"
+    assert _punkte(pp.aufbereiten(_geraete([*KARTEN[:-1], *karten])))["1&1"] == 1531.66

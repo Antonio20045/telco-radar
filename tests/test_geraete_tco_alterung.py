@@ -440,13 +440,13 @@ def test_zeitreihe_gemischtes_band_ignoriert_das_alte_angebot(tmp_path):
 
 
 def test_band_zeilen_trennen_frisch_und_alt():
-    """Die EINE Auswahl der Zeitreihe am Modul: `_band_zeilen` hält
+    """Die EINE Auswahl der Zeitreihe am Modul: `band_zeilen` hält
     frische Zeilen und alte getrennt - alte verdrängen keine frischen,
     auch nicht beim selben Anbieter."""
     modell = _modell(_standard())
     for k in modell["karten"]:
         k["band"] = BAND_MITTEL.get((k.get("tarif_id") or "").strip())
-    saetze = geraete_zeitreihe._band_zeilen(modell)
+    saetze = geraete_zeitreihe.band_zeilen(modell)
     satz = saetze["m"]
     assert [k["anbieter"] for k in satz["zeilen"]] == ["Vodafone", "Telekom"]
     assert [k["anbieter"] for k in satz["alt"]] == ["o2"]

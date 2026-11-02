@@ -26,7 +26,7 @@ from .geraete_laufzeit import (
     ansicht,
     nur_ueber_24,
 )
-from .geraete_rechenweg import ANBIETER_FOLGE, _euro, _zeitraum_wort
+from .geraete_rechenweg import ANBIETER_FOLGE, _zeitraum_wort, euro
 from .geraete_tco_band import band_label
 
 
@@ -118,9 +118,9 @@ def _luecken(
     Bündel ist da und belastbar, seine Leitzahl trägt nur einen anderen
     Zeitraum als diese Tafel (1&1, 36 Monate). Er steht ZULETZT, weil er
     die Fälle mit vorhandenem Bündel aufteilt: erst seit P0-B-h3 fällt
-    eine solche Karte aus `_band_zeilen` heraus, und "Kein Bündel in
+    eine solche Karte aus `band_zeilen` heraus, und "Kein Bündel in
     diesem Band" wäre für sie falsch. `fremd` ist dabei genau der Eimer,
-    den das Tor in `_band_zeilen` gefüllt hat - dieselbe Menge, keine
+    den das Tor in `band_zeilen` gefüllt hat - dieselbe Menge, keine
     zweite Ableitung.
 
     Datenkonzept Geräte Schritt 2: in der Ansicht `laufzeit` zählen nur
@@ -285,7 +285,7 @@ def _fehlzeile(lu: dict, band_labels: dict, h: int, erfassung: dict) -> dict:
         satz = f"{kurz}."
     if lu.get("alternativ") and grund != "anderer-zeitraum":
         alt = " · ".join(
-            f"{_stufe(band_labels, a['band'])} {_euro(a['tco'])}"
+            f"{_stufe(band_labels, a['band'])} {euro(a['tco'])}"
             f"{_alt_zeitraum(a.get('monate'), h)}"
             for a in lu["alternativ"]
         )

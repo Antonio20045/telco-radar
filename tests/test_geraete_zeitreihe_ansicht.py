@@ -919,7 +919,7 @@ def test_auto_modell_mit_zwei_mestagen_steht_in_der_wahl(tmp_path):
 
 
 def _h3_karte(anbieter, gesamt, monate, band="xs", frisch=True):
-    """Eine Kartenzeile in der Form, die `_band_zeilen` liest; seit Teil A
+    """Eine Kartenzeile in der Form, die `band_zeilen` liest; seit Teil A
     trägt jede Karte ihre Ratenlaufzeit (hier gleich dem Zeitraum)."""
     return {
         "anbieter": anbieter,
@@ -955,10 +955,10 @@ def test_h3_eine_36_monats_karte_ist_keine_zeile_dieser_tafel():
         "speicher": 256,
         "karten": [_h3_karte("1&1", 1299.54, 36), _h3_karte("Vodafone", 1433.80, 24)],
     }
-    satz = geraete_zeitreihe._band_zeilen(modell)["xs"]
+    satz = geraete_zeitreihe.band_zeilen(modell)["xs"]
     assert [z["anbieter"] for z in satz["zeilen"]] == ["Vodafone"]
     assert satz["fremd"] == []
-    sechsunddreissig = geraete_zeitreihe._band_zeilen(modell, 36)["xs"]
+    sechsunddreissig = geraete_zeitreihe.band_zeilen(modell, 36)["xs"]
     assert [z["anbieter"] for z in sechsunddreissig["zeilen"]] == ["1&1"]
     assert geraete_zeitreihe._leitzahl_html(satz["zeilen"]) is None
     text = _text(
@@ -981,7 +981,7 @@ def test_h3_der_luecken_satz_nennt_anbieter_und_zeitraum():
         "speicher": 256,
         "karten": [_h3_karte("1&1", 1299.54, 36), _h3_karte("Vodafone", 1433.80, 24)],
     }
-    satz = geraete_zeitreihe._band_zeilen(modell)["xs"]
+    satz = geraete_zeitreihe.band_zeilen(modell)["xs"]
     luecken = geraete_zeitreihe._luecken(
         satz["zeilen"], modell["karten"], "xs", fremd=satz["fremd"], laufzeit=24
     )
@@ -1007,8 +1007,8 @@ def test_h3_ein_band_mit_nur_fremdem_zeitraum_verschwindet_nicht():
         "speicher": 256,
         "karten": [_h3_karte("1&1", 2019.54, 36)],
     }
-    assert "xs" not in geraete_zeitreihe._band_zeilen(modell)
-    satz = geraete_zeitreihe._band_zeilen(modell, 36)["xs"]
+    assert "xs" not in geraete_zeitreihe.band_zeilen(modell)
+    satz = geraete_zeitreihe.band_zeilen(modell, 36)["xs"]
     assert [z["anbieter"] for z in satz["zeilen"]] == ["1&1"]
     text = _text(
         geraete_zeitreihe._antwort_html(

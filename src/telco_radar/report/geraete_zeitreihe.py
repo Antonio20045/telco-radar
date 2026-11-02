@@ -77,14 +77,14 @@ from .geraete_rechenweg import _wert_aus_messung as _wert_aus_messung
 from .geraete_zeitreihe_geometrie import (
     LUECKE_TAGE_SCHWELLE as LUECKE_TAGE_SCHWELLE,
 )
+from .geraete_zeitreihe_geometrie import _linien_laeufe as _linien_laeufe
+from .geraete_zeitreihe_geometrie import _stufenpfad as _stufenpfad
 from .geraete_zeitreihe_geometrie import (
-    _form_pfad,
     _x_marken,
     _xtick_x,
     _y_schritt,
+    form_pfad,
 )
-from .geraete_zeitreihe_geometrie import _linien_laeufe as _linien_laeufe
-from .geraete_zeitreihe_geometrie import _stufenpfad as _stufenpfad
 
 log = logging.getLogger(__name__)
 
@@ -133,7 +133,7 @@ def _mon_kurz(monate: list) -> str:
     return "/".join(str(m) for m in monate) + " Mon."
 
 
-def _band_zeilen(modell: dict, laufzeit: int = LAUFZEIT_STANDARD) -> dict:
+def band_zeilen(modell: dict, laufzeit: int = LAUFZEIT_STANDARD) -> dict:
     """Je Band des Modells: die Zeilen (beste je Anbieter) und Luecken.
 
     Dieselbe Auswahl wie der Prototyp (`zahlen_sammeln.py`): vergleichbare,
@@ -608,7 +608,7 @@ def _svg(
                 f"cy='{y:.1f}' r='{r}' fill='{marker_farbe}'"
                 f"{daten}/>"
             )
-            form = _form_pfad(stil.marker, x, y, r)
+            form = form_pfad(stil.marker, x, y, r)
             if form:
                 teile.append(
                     f"<g class='gr-zr-form gr-zr-form--{stil.marker}' "
@@ -1001,7 +1001,7 @@ def aufbereiten(
     paare: list[dict] = []
     erlaubt: dict[str, list[str]] = {}
     for modell in wahl:
-        je_laufzeit = {lz: _band_zeilen(modell, lz) for lz in _REIHE}
+        je_laufzeit = {lz: band_zeilen(modell, lz) for lz in _REIHE}
         bands: list[str] = []
         for lz in _REIHE:
             bands += [

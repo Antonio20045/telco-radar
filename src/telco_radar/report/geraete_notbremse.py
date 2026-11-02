@@ -22,6 +22,7 @@ from collections.abc import Iterable
 
 from ..analyze.geraete_pruefstatus import (
     FELD_PRUEFUNG,
+    HERLEITUNG_PREISLISTE,
     QUARANTAENE,
     REGELN,
     UNBEKANNT,
@@ -84,6 +85,7 @@ def felder(b: Buendel, heute: str) -> dict:
     return {
         **_felder(b.herleitung, b.aktionen, heute, b.pruefung),
         "herleitung_satz": herleitung_satz(b.anbieter, b.herleitung),
+        "aus_preisliste": b.herleitung.strip() in HERLEITUNG_PREISLISTE,
     }
 
 

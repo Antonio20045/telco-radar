@@ -7,11 +7,16 @@ der Seite: TCO über 24 Monate im Band M (`LAUFZEIT_STANDARD`, `BAND`).
 
 Nichts wird hier gerechnet, was die Seite schon rechnet (Clean Code 1): der
 Wert eines Punktes ist `gesamt` der Karte, die `geraete_zeitreihe.
-_band_zeilen` als Zeile des Bandes führt - dieselbe Auswahl wie Antwort-
+band_zeilen` als Zeile des Bandes führt - dieselbe Auswahl wie Antwort-
 Satz und Zeitreihe (vergleichbar, belastbar, frisch, Notbremse). Was die
 Seite als alt oder ungeprüft behandelt, bekommt hier keinen Punkt. Die
 Vodafone-Näherung ist kein Angebot und ebenfalls keiner. Ein Anbieter ohne
 geprüften Preis ist eine benannte Lücke in der Zeile, nie ein Punkt bei 0.
+Ein aus der Preisliste abgeleiteter Preis (1&1), dessen Geräte-Zuzahlung der
+gelesenen Zeile desselben Geräts widerspricht, ist nachweislich falsch und
+bekommt keinen Punkt (`widerspricht_gelesenem`): lieber ein Punkt weniger.
+Jeder Punkt ist ein Link auf die Originalquelle der Karte (`quelle_url`, wie
+die Spalte „Beleg“ der Tabelle).
 
 Der Server zeichnet das SVG (zwei Ausführungen, breit und schmal, die das
 Stylesheet umschaltet); es gibt kein JavaScript und keine Bibliothek.
@@ -25,15 +30,19 @@ import math
 from html import escape
 
 from ..geraete_model import serie_aus_modell
-from . import geraete_notbremse as notbremse
-from . import geraete_rechenweg, geraete_zeitreihe, geraete_zeitreihe_geometrie
+from . import geraete_rechenweg, geraete_zeitreihe_geometrie
 from .anbieter_farben import legendenname, slug_fuer, stil_fuer
-from .geraete_laufzeit import LAUFZEIT_STANDARD
+from .geraete_preisposition_preise import (
+    BAND,
+    FEHLT_TEXT,
+    LAUFZEIT,
+    preise_je_anbieter,
+)
 
 log = logging.getLogger(__name__)
 
-BAND = "m"
-LAUFZEIT = LAUFZEIT_STANDARD
+KEIN_BELEG = "kein Beleg-Link"
+TREFFER_R = 14
 EIGEN = "Vodafone"
 ANBIETER_FOLGE = tuple(geraete_rechenweg.ANBIETER_FOLGE)
 
@@ -43,7 +52,6 @@ GENERATIONEN_ZURUECK = 1
 
 MAX_TICKS = 7
 TICK_SCHRITTE = (50, 100, 200, 250, 500, 1000, 2500, 5000)
-FEHLT_TEXT = "kein aktueller Preis"
 TICK_Y = 12
 
 BREIT = {
@@ -119,25 +127,6 @@ def modelle_waehlen(katalog) -> list[dict]:
     return gewaehlt
 
 
-def preise_je_anbieter(modell: dict | None) -> dict[str, dict]:
-    """Anbieter -> Karte (Zeile des Bandes M bei 24 Raten) mit geprüftem Preis.
-
-    Die Zeilen kommen aus `_band_zeilen`; hier fällt nur heraus, was kein
-    Angebot mit Preis ist (Näherung) oder nicht zählt. Ohne Modell: leer."""
-    if not modell:
-        return {}
-    satz = geraete_zeitreihe._band_zeilen(modell, LAUFZEIT).get(BAND) or {}
-    karten: dict[str, dict] = {}
-    for karte in satz.get("zeilen") or []:
-        wert = karte.get("gesamt")
-        if karte.get("naeherung") or wert is None:
-            continue
-        if not karte.get("frisch", True) or not notbremse.zaehlt(karte):
-            continue
-        karten.setdefault(karte["anbieter"], karte)
-    return karten
-
-
 def achse(werte: list[float]) -> dict | None:
     """Gemeinsame Achse: Anfang, Ende und runde Teilstriche; `None` ohne Werte."""
     if not werte:
@@ -161,19 +150,36 @@ def _anteil(wert: float, ach: dict) -> float:
 
 def _marke(anbieter: str, x: float, y: float, r: float) -> str:
     """Die Form des Punktes: Kreis, sonst die Zusatzform des Anbieters."""
-    form = geraete_zeitreihe_geometrie._form_pfad(stil_fuer(anbieter).marker, x, y, r)
+    form = geraete_zeitreihe_geometrie.form_pfad(stil_fuer(anbieter).marker, x, y, r)
     return form or f"<circle cx='{x:.1f}' cy='{y:.1f}' r='{r:.1f}'/>"
 
 
+def _beleg(p: dict) -> str:
+    """Die Quelle des Punktes, wenn sie ein Web-Link ist; sonst leer."""
+    url = str(p.get("beleg") or "")
+    return url if url.startswith(("https://", "http://")) else ""
+
+
 def _punkt(zeile: dict, p: dict, y: float) -> str:
+    """Ein Punkt; mit Quelle ein Link darauf (auch mit dem Finger zu treffen)."""
     eigen = p["anbieter"] == EIGEN
-    tip = f"{p['anbieter']}: {geraete_rechenweg._euro(p['wert'])}"
-    return (
+    beleg = _beleg(p)
+    tip = f"{p['anbieter']}: {geraete_rechenweg.euro(p['wert'])}"
+    tip += " · Quelle öffnen" if beleg else f" · {KEIN_BELEG}"
+    marke = (
         f"<g class='gr-pp-punkt gr-anb--{p['slug']}{' gr-pp-eigen' if eigen else ''}' "
         f"data-modell='{escape(zeile['id'])}' data-anbieter='{escape(p['anbieter'])}' "
         f"data-wert='{p['wert']}' data-x='{p['x']:.1f}'>"
         f"<title>{escape(tip)}</title>"
         f"{_marke(p['anbieter'], p['x'], y, R_EIGEN if eigen else R_PUNKT)}</g>"
+    )
+    if not beleg:
+        return marke
+    return (
+        f"<a class='gr-pp-link' href='{escape(beleg)}' target='_blank' "
+        f"rel='nofollow noopener' aria-label='{escape(tip)}'>"
+        f"<circle class='gr-pp-treffer' cx='{p['x']:.1f}' cy='{y:.1f}' "
+        f"r='{TREFFER_R}'/>{marke}</a>"
     )
 
 
