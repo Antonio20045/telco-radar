@@ -87,7 +87,7 @@ def main(argumente: list[str] | None = None) -> int:
     args = parser.parse_args(argumente)
     beginn = time.time()
     try:
-        ziele = lade_ziele(args.root, TAGESDATEI, hoechste=None)
+        ziele = lade_ziele(args.root, TAGESDATEI, hoechste=None, auto=True)
         if args.plan:
             mit_karte = [z.schluessel for z in ziele if _hat_karte(args.root, z)]
             print(json.dumps(mit_karte))

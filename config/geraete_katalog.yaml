@@ -181,6 +181,16 @@ geraete:
     speicher: [256, 512, 1024, 2048]
     segment: flagship
 
+  # iPhone Duo: bei Telekom, Vodafone, o2, 1&1 und congstar gelistet (02.11.2026);
+  # bisher nur Auto-Eintrag mit Speicher 256 (17.10.2026). Stufen wie im Bestand
+  # (data/state/geraete_tco.json: 256 bis 2048 GB). Ein iPhone 18 ohne Zusatz
+  # gibt es bei keinem Anbieter; es steht darum nicht im Katalog.
+  - hersteller: Apple
+    modell: iPhone Duo
+    generation: 18
+    speicher: [256, 512, 1024, 2048]
+    segment: flagship
+
   # ---------------------------------------------------------------- Samsung
   - hersteller: Samsung
     modell: Galaxy S24

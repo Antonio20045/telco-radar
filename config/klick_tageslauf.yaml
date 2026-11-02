@@ -15,6 +15,10 @@
 # (Karte: der Tarif kommt aus der Startadresse); jede Tarifstufe ist darum eine
 # eigene Seite.
 #
+# Neue Modelle: was hier fehlt, leitet `klickliste_auto` aus Katalog (auch den
+# Auto-Einträgen) und Bestand ab: je Anbieter ein Ziel `<Schlüssel>-auto` mit höchstens
+# 8 Seiten (Telefone von Apple, Samsung Galaxy S, Google Pixel). Hier nichts eintragen.
+#
 # Rotation: nie gelesene Seiten zuerst, dann die am längsten nicht gelesenen
 # (data/state/klick/klick_stand.json). Reicht das Zeitbudget nicht für alle Seiten
 # eines Tages, liest der nächste Tag die übrigen; jede Seite soll jeden Tag

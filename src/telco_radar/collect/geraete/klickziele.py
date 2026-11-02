@@ -25,6 +25,7 @@ Der Klick-Tageslauf liest dasselbe Format aus ``TAGESDATEI``, ohne Seitengrenze
 
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -33,6 +34,7 @@ import yaml
 
 from ...geraete_config import lade_katalog, lade_quellen
 from ...geraete_model import Katalog
+from .klickliste_auto import KlicklisteAutoFehler, leite_ab
 from .robots import host_von
 
 DATEI = Path("config") / "klick_erkundung.yaml"
@@ -40,6 +42,8 @@ TAGESDATEI = Path("config") / "klick_tageslauf.yaml"
 KARTEN = Path("config") / "klickkarten"
 HOECHSTE_SEITEN = 2
 ALLE = "alle"
+AUTO_ENDUNG = "-auto"
+log = logging.getLogger(__name__)
 SCHEMA = "https"
 LOKALE_HOSTS = frozenset({"127.0.0.1", "localhost"})
 WEITER_FELDER = frozenset({"selektor", "text", "proben"})
@@ -94,11 +98,16 @@ class Erkundungsziel:
 
 
 def lade_ziele(
-    root: Path, datei: Path = DATEI, hoechste: int | None = HOECHSTE_SEITEN
+    root: Path,
+    datei: Path = DATEI,
+    hoechste: int | None = HOECHSTE_SEITEN,
+    auto: bool = False,
 ) -> list[Erkundungsziel]:
     """Alle Ziele aus ``datei``, geprüft an Quellen und Katalog.
 
-    ``hoechste`` begrenzt die Seiten je Anbieter; ``None`` heißt ohne Grenze.
+    ``hoechste`` begrenzt die Seiten je Anbieter; ``None`` heißt ohne Grenze. Mit
+    ``auto`` kommt je Anbieter ein Ziel ``<Schlüssel>-auto`` mit den Seiten dazu, die
+    ``klickliste_auto`` aus Katalog und Bestand ableitet.
     """
     pfad = root / datei
     try:
@@ -143,11 +152,63 @@ def lade_ziele(
                 karte=_text(eintrag, "karte", ort) if "karte" in eintrag else None,
             )
         )
+    if auto:
+        ziele.extend(_auto_ziele(root, ziele, katalog, quellen))
     schluessel_alle = [z.schluessel for z in ziele]
     doppelt = {s for s in schluessel_alle if schluessel_alle.count(s) > 1}
     if doppelt:
         raise ErkundungszielFehler(f"{datei}: Schlüssel doppelt: {sorted(doppelt)}")
     return ziele
+
+
+def _auto_ziele(
+    root: Path, ziele: list[Erkundungsziel], katalog: Katalog, quellen
+) -> list[Erkundungsziel]:
+    """Je Anbieter ein Ziel mit den abgeleiteten Seiten, Karte und Tempo des ersten
+    Eintrags dieses Anbieters. Eine abgeleitete Seite, die die Prüfung von ``_seite``
+    nicht besteht, entfällt mit Protokoll; sie hält die Handliste nicht an."""
+    vorhanden = {(z.name, s.geraet) for z in ziele for s in z.seiten}
+    try:
+        abgeleitet = leite_ab(root, katalog, vorhanden)
+    except KlicklisteAutoFehler as fehler:
+        raise ErkundungszielFehler(f"Klickliste aus dem Katalog: {fehler}") from fehler
+    je_anbieter: dict[str, list[Seitenziel]] = {}
+    for seite in abgeleitet:
+        anbieter = quellen.nach_name(seite.anbieter)
+        if anbieter is None:
+            log.warning(
+                "Klickliste auto: Anbieter %r fehlt in den Quellen", seite.anbieter
+            )
+            continue
+        roh = {
+            "geraet": seite.geraet,
+            "speicher_gb": seite.speicher_gb,
+            "url": seite.url,
+        }
+        try:
+            ziel = _seite(roh, f"auto {anbieter.name}", katalog, anbieter.basis_url)
+        except ErkundungszielFehler as fehler:
+            log.warning("Klickliste auto: Seite entfällt: %s", fehler)
+            continue
+        je_anbieter.setdefault(anbieter.name, []).append(ziel)
+    neu: list[Erkundungsziel] = []
+    for name, seiten in je_anbieter.items():
+        basis = next((z for z in ziele if z.name == name), None)
+        if basis is None:
+            log.warning("Klickliste auto: %s hat keine Handliste, keine Karte", name)
+            continue
+        neu.append(
+            Erkundungsziel(
+                schluessel=f"{basis.schluessel}{AUTO_ENDUNG}",
+                name=name,
+                seiten=tuple(seiten),
+                kennung=basis.kennung,
+                rate_limit_sekunden=basis.rate_limit_sekunden,
+                seitenabstand_sekunden=basis.seitenabstand_sekunden,
+                karte=basis.kartenschluessel,
+            )
+        )
+    return neu
 
 
 def waehle(ziele: list[Erkundungsziel], auswahl: str) -> list[Erkundungsziel]:
