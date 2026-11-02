@@ -8,8 +8,8 @@ Karten, die zählen). Ihre Δ-Zelle nennt dann den Zustand der Notbremse, nicht
 Gerendert aus dem Bestand vom 2026-10-03; darin werden die Vodafone-Bündel zweier
 Modelle zur Schätzung bzw. zum Satz mit abgelaufener Aktion. Orakel ist diese
 Änderung selbst, die übrigen Vodafone-Zeilen bleiben „Referenz“ (Gegenprobe).
-Gelesen werden die Zeilen MIT Zahl. Seit der Tarif nur seine 24 Monate zählt
-(Antonio, 10.10.2026), hat im Bestand jede Vodafone-Zeile eine Zahl.
+Gelesen werden die Zeilen MIT Zahl. Zeilen ohne Zahl sind im Bestand nur die mit
+veraltetem Preis („Preis veraltet“, benannte Lücke).
 """
 
 from __future__ import annotations
@@ -60,12 +60,12 @@ def delta_zellen(tmp_path_factory) -> dict[str, list[str]]:
         for modell in lager.select(".gr-bnd-lager[data-modell]")
     }
     ohne_zahl = {
-        z.select_one(".gr-bnd-delta").get_text(" ", strip=True)
+        z.select_one(".gr-bnd-tco").get_text(" ", strip=True)
         for liste in zeilen.values()
         for z in liste
         if not z.get("data-gesamt")
     }
-    assert ohne_zahl == set(), ohne_zahl
+    assert ohne_zahl <= {"Preis veraltet"}, ohne_zahl
     return {
         modell: [
             z.select_one(".gr-bnd-delta").get_text(" ", strip=True)

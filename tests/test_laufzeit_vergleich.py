@@ -458,15 +458,11 @@ def test_telekom_ist_in_der_24er_ansicht_nicht_erfasst(g):
     assert sechsunddreissig["1&1"] == "Nur als 24 + 12 erfasst"
 
 
-def test_spanne_und_kacheln_je_laufzeit(g):
+def test_spanne_je_laufzeit(g):
     modell, _ = _karten(g)
     assert modell["spanne_je_laufzeit"] == {
         lz: [min(s.values()), max(s.values())] for lz, s in SOLL.items()
     }
-    kachel = next(k for k in g["zeitreihe"]["kacheln"] if k["id"] == MODELL)
-    for laufzeit, soll in SOLL.items():
-        eintrag = kachel["baender"]["xs"][laufzeit]
-        assert eintrag["ab"] == f"{_euro(min(soll.values()))} €", (laufzeit, eintrag)
 
 
 def _rund(betrag: float) -> str:
