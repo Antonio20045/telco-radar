@@ -8,6 +8,9 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import signal
+import subprocess
+import time
 from datetime import date
 from pathlib import Path
 from types import ModuleType, SimpleNamespace
@@ -15,6 +18,7 @@ from types import ModuleType, SimpleNamespace
 import pytest
 from beleg_attrappe import AttrappeReleases
 
+from telco_radar.beleg_ablage import ZEIT_JE_AUFRUF_S
 from telco_radar.beleg_manifest import MANIFEST_DATEI, lies, lies_manifest
 from telco_radar.beleg_regeln import dateiname
 from telco_radar.klick_vertrag import FORMAT
@@ -74,21 +78,25 @@ def test_nur_lesen_loescht_nichts(tmp_path):
     assert lies(tmp_path / MANIFEST_DATEI) == []
 
 
-def test_lesefehler_laesst_das_manifest_unveraendert_und_endet_mit_eins(tmp_path):
+def test_lesefehler_laesst_die_bilder_stehen_vermerkt_den_ausfall_und_endet_mit_null(
+    tmp_path,
+):
     pfad = tmp_path / MANIFEST_DATEI
     pfad.parent.mkdir(parents=True)
     pfad.write_text("STAND VON GESTERN", encoding="utf-8")
-    assert manifest_lauf(tmp_path, AttrappeReleases(lesefehler=True)) == 1
+    assert manifest_lauf(tmp_path, AttrappeReleases(lesefehler=True)) == 0
     assert pfad.read_text(encoding="utf-8") == "STAND VON GESTERN"
 
 
-def test_loeschfehler_endet_mit_eins_manifest_wird_trotzdem_geschrieben(tmp_path):
+def test_loeschfehler_endet_mit_null_manifest_wird_geschrieben_und_nennt_ihn(tmp_path):
     gh = AttrappeReleases(
         {"belege-2026-11-01": [dateiname("g", "o2", date(2026, 11, 1))]},
         scheitern_bei=("loeschen",),
     )
-    assert manifest_lauf(tmp_path, gh) == 1
+    assert manifest_lauf(tmp_path, gh) == 0
     assert lies(tmp_path / MANIFEST_DATEI) == []
+    ausfall = lies_manifest(tmp_path / MANIFEST_DATEI).ausfall
+    assert ausfall is not None and "Löschen gescheitert" in ausfall
 
 
 def satz(tarif: float, beleg_id: str, anbieter: str = "Telekom") -> dict:
@@ -198,7 +206,7 @@ def test_ausfall_wird_im_manifest_vermerkt_und_haengt_nicht_an_der_seite(tmp_pat
     """Scheitert der Schritt, kennt die Seite den Grund (CLAUDE.md Regel 6)."""
     alt = dateiname("g", "o2", date(2026, 11, 9))
     assert manifest_lauf(tmp_path, AttrappeReleases({"belege-2026-11-09": [alt]})) == 0
-    assert manifest_lauf(tmp_path, AttrappeReleases(lesefehler=True)) == 1
+    assert manifest_lauf(tmp_path, AttrappeReleases(lesefehler=True)) == 0
     manifest = lies_manifest(tmp_path / MANIFEST_DATEI)
     assert [b.anbieter_id for b in manifest.belege] == ["o2"]
     assert manifest.ausfall is not None and "Releases nicht lesbar" in manifest.ausfall
@@ -209,7 +217,7 @@ def test_ausfall_wird_im_manifest_vermerkt_und_haengt_nicht_an_der_seite(tmp_pat
 def test_melde_ausfall_ohne_netz_vermerkt_den_grund(tmp_path):
     modul = lade_skript("belege_manifest")
     argv = ["--root", str(tmp_path), "--heute", HEUTE.isoformat()]
-    assert modul.main([*argv, "--melde-ausfall", "Exit 124"], gh=None) == 1
+    assert modul.main([*argv, "--melde-ausfall", "Exit 124"], gh=None) == 0
     ausfall = lies_manifest(tmp_path / MANIFEST_DATEI).ausfall
     assert ausfall == "2026-11-10: Exit 124"
 
@@ -250,3 +258,109 @@ def test_fehlender_artefaktordner_ist_nichts_zu_tun(aufbau, tmp_path):
 def test_fehlender_bestand_ist_exit_zwei(aufbau, tmp_path):
     argv = ["--root", str(tmp_path / "leer"), "--quelle", str(aufbau.quelle)]
     assert aufbau.modul.main(argv, gh=AttrappeReleases()) == 2
+
+
+def haengendes_gh(argv, *, timeout, **_):
+    """Wie ``subprocess.run``, wenn ``gh`` hängt: schläft bis zum Timeout (höchstens
+    5 s, damit ein Fehler den Test nicht blockiert), dann ``TimeoutExpired``."""
+    time.sleep(min(timeout, 5.0))
+    raise subprocess.TimeoutExpired(argv, timeout)
+
+
+def kurze_frist(modul, monkeypatch, gesamt: float = 1.0, reserve: float = 0.5) -> None:
+    monkeypatch.setattr(modul, "GESAMT_FRIST_S", gesamt)
+    monkeypatch.setattr(modul, "SCHREIB_RESERVE_S", reserve)
+
+
+def test_haengendes_gh_endet_in_der_frist_mit_null_und_vermerkt_den_ausfall(
+    tmp_path, monkeypatch, capsys
+):
+    """Der Schritt in geraete.yml darf den Commit des Messtags nie sperren."""
+    modul = lade_skript("belege_manifest")
+    kurze_frist(modul, monkeypatch)
+    alt = dateiname("g", "o2", date(2026, 11, 9))
+    assert manifest_lauf(tmp_path, AttrappeReleases({"belege-2026-11-09": [alt]})) == 0
+    argv = ["--root", str(tmp_path), "--heute", HEUTE.isoformat()]
+    beginn = time.monotonic()
+    assert modul.main(argv, lauf=haengendes_gh) == 0
+    assert time.monotonic() - beginn < 3.0
+    manifest = lies_manifest(tmp_path / MANIFEST_DATEI)
+    assert [b.anbieter_id for b in manifest.belege] == ["o2"]
+    assert manifest.ausfall is not None and "Releases nicht lesbar" in manifest.ausfall
+    assert "Belege-Manifest nicht erneuert" in capsys.readouterr().err
+
+
+@pytest.mark.skipif(not hasattr(signal, "SIGALRM"), reason="Wachhund braucht SIGALRM")
+def test_gh_das_sein_timeout_ignoriert_trifft_den_wachhund(tmp_path, monkeypatch):
+    modul = lade_skript("belege_manifest")
+    kurze_frist(modul, monkeypatch)
+
+    def taub(argv, *, timeout, **_):
+        time.sleep(5.0)
+        raise AssertionError("der Wachhund hätte vorher zuschlagen müssen")
+
+    argv = ["--root", str(tmp_path), "--heute", HEUTE.isoformat()]
+    beginn = time.monotonic()
+    assert modul.main(argv, lauf=taub) == 0
+    assert time.monotonic() - beginn < 3.0
+    ausfall = lies_manifest(tmp_path / MANIFEST_DATEI).ausfall
+    assert ausfall is not None and "Gesamtfrist von 1 s überschritten" in ausfall
+    assert signal.getitimer(signal.ITIMER_REAL)[0] == 0.0
+
+
+def test_unerwarteter_dateifehler_endet_mit_null_und_steht_im_manifest(tmp_path):
+    class Kaputt(AttrappeReleases):
+        def anhaenge(self):
+            raise OSError("Platte voll")
+
+    assert manifest_lauf(tmp_path, Kaputt()) == 0
+    ausfall = lies_manifest(tmp_path / MANIFEST_DATEI).ausfall
+    assert ausfall is not None and "OSError: Platte voll" in ausfall
+
+
+def test_frist_des_skripts_liegt_deutlich_unter_dem_schritt_timeout():
+    modul = lade_skript("belege_manifest")
+    assert modul.GESAMT_FRIST_S + 60 <= modul.SCHRITT_FRIST_S
+    assert 0 < modul.SCHREIB_RESERVE_S < modul.GESAMT_FRIST_S
+
+
+def test_wirksame_frist_zieht_die_zeit_eines_aufrufs_ab():
+    """2100 ist die Frist in klick.yml; zu große und kleine Werte: Gegenprobe."""
+    modul = lade_skript("belege_veroeffentlichen")
+    assert modul.wirksame_frist(2100) == 1800
+    assert modul.wirksame_frist(1800) == 1500
+    assert modul.wirksame_frist(modul.JOB_ENDE_S) == modul.JOB_FRIST_S
+    assert modul.wirksame_frist(9999) == modul.JOB_FRIST_S
+    assert modul.wirksame_frist(100) == 0.0
+
+
+def test_ein_letzter_aufruf_endet_vor_dem_job_timeout():
+    modul = lade_skript("belege_veroeffentlichen")
+    job_s = modul.JOB_MINUTEN * 60
+    for uebergeben in (0, 600, 1800, 2100, 2399, 2400, 5000):
+        letzter_beginn = modul.wirksame_frist(uebergeben)
+        assert letzter_beginn + ZEIT_JE_AUFRUF_S + modul.PUFFER_S <= job_s
+
+
+def test_veroeffentlichen_rechnet_die_wirksame_frist_ab_jobstart(aufbau, monkeypatch):
+    """Zweiter Aufruf: der Job lief schon 600 s (Start 9400 statt 10000)."""
+    wurzel = aufbau.lege([], [])
+    modul = aufbau.modul
+    gesehen: list[float] = []
+
+    def merke(bilder, heute, gh, frist_ende=None, **_):
+        gesehen.append(frist_ende)
+        return SimpleNamespace(zeilen=lambda: [], fehler=[], ausgelassen=0)
+
+    monkeypatch.setattr(modul, "veroeffentliche", merke)
+    monkeypatch.setattr(
+        modul,
+        "time",
+        SimpleNamespace(time=lambda: 10_000.0, monotonic=lambda: 50.0),
+    )
+    argv = ["--root", str(wurzel), "--quelle", str(aufbau.quelle)]
+    argv += ["--job-frist-sekunden", "2100", "--job-start", "10000"]
+    assert modul.main(argv, gh=AttrappeReleases()) == 0
+    argv[-1] = "9400"
+    assert modul.main(argv, gh=AttrappeReleases()) == 0
+    assert gesehen == [50.0 + 1800, 50.0 + 1200]

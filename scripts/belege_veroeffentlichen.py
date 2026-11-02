@@ -4,7 +4,7 @@
 AUFRUF
 ------
     PYTHONPATH=src python scripts/belege_veroeffentlichen.py --quelle klick-artefakte
-        [--root .] [--job-frist-sekunden 1800] [--job-start EPOCHE] [--heute JJJJ-MM-TT]
+        [--root .] [--job-frist-sekunden 2100] [--job-start EPOCHE] [--heute JJJJ-MM-TT]
 
 ``--quelle`` enthält je Anbieter die Ergebnisdatei und die WebP-Bilder (``belegbild``),
 in beliebig tiefen Unterordnern. Je (Gerät, Anbieter) wählt ``beleg_schluessel`` den
@@ -57,9 +57,22 @@ JOB_MINUTEN = 40
 """``timeout-minutes`` des Jobs ``belege`` in ``klick.yml`` (ein Test prüft es)."""
 PUFFER_S = 300
 """Reserve nach dem letzten Aufruf: Skriptende, Aufräumen des Läufers."""
-JOB_FRIST_S = JOB_MINUTEN * 60 - ZEIT_JE_AUFRUF_S - PUFFER_S
+JOB_ENDE_S = JOB_MINUTEN * 60 - PUFFER_S
+"""Bis hierhin soll alles fertig sein (Standard von ``--job-frist-sekunden``)."""
+JOB_FRIST_S = JOB_ENDE_S - ZEIT_JE_AUFRUF_S
 """Bis hierhin darf ein neues Paket beginnen. Ein Aufruf, der kurz davor beginnt, darf
 ``ZEIT_JE_AUFRUF_S`` laufen; danach bleibt ``PUFFER_S`` bis zum Zeitlimit des Jobs."""
+
+
+def wirksame_frist(uebergeben_s: float) -> float:
+    """Bis wann (Sekunden seit Jobstart) ein neues Paket beginnen darf.
+
+    ``--job-frist-sekunden`` ist das Ende, bis zu dem alles fertig sein soll: ein
+    Aufruf, der kurz davor beginnt, darf noch ``ZEIT_JE_AUFRUF_S`` laufen, also zählt
+    die Frist abzüglich dieser Zeit. Nie mehr als ``JOB_FRIST_S``: auch bei einem
+    zu großen Argument bleibt der Puffer vor dem Job-Timeout (die Workflow-Datei muss
+    dafür nicht stimmen). Nie unter 0."""
+    return max(0.0, min(uebergeben_s - ZEIT_JE_AUFRUF_S, JOB_FRIST_S))
 
 
 def sammle_bilder(
@@ -113,14 +126,16 @@ def main(argumente: list[str] | None = None, gh: Releases | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--root", default=".", type=Path)
     parser.add_argument("--quelle", required=True, type=Path)
-    parser.add_argument("--job-frist-sekunden", type=float, default=JOB_FRIST_S)
+    parser.add_argument("--job-frist-sekunden", type=float, default=JOB_ENDE_S)
     parser.add_argument("--job-start", type=float)
     parser.add_argument("--heute", type=date.fromisoformat)
     args = parser.parse_args(argumente)
     beginn = time.time()
     heute = args.heute or datetime.now(UTC).date()
     verstrichen = beginn - (args.job_start if args.job_start is not None else beginn)
-    ende = time.monotonic() + max(0.0, args.job_frist_sekunden - verstrichen)
+    ende = time.monotonic() + max(
+        0.0, wirksame_frist(args.job_frist_sekunden) - verstrichen
+    )
     try:
         bestand = json.loads((args.root / TCO_DATEI).read_text(encoding="utf-8"))[
             "buendel"

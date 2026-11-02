@@ -39,14 +39,6 @@ jobs:
       - name: Run geraete stage
         if: steps.heute.outputs.fertig != 'true'
         run: python -m x --frist "${{ github.event.inputs.frist || 1500 }}"
-      - name: Belege-Manifest
-        if: steps.heute.outputs.fertig != 'true'
-        timeout-minutes: 5
-        run: |
-          rc=0
-          timeout 240 python scripts/belege_manifest.py --root . || rc=$?
-          [ "$rc" -eq 0 ] || python scripts/belege_manifest.py --melde-ausfall "$rc"
-          exit 0
       - name: Commit state
         if: steps.heute.outputs.fertig != 'true'
         run: |
@@ -80,18 +72,14 @@ for versuch in 1 2 3; do
 done
 exit 1
 """
-KLICK = """\
-jobs:
-  belege:
-    timeout-minutes: 40
-    steps:
-      - name: Veroeffentlichen
-        run: |
-          python scripts/belege_veroeffentlichen.py --root . \\
-            --job-start "$JOB_START" --job-frist-sekunden 1800
-"""
 BELEG_ABLAGE = "ZEIT_JE_AUFRUF_S = 300\n"
-BELEG_SKRIPT = "JOB_MINUTEN = 40\nPUFFER_S = 300\n"
+BELEG_SKRIPT = (
+    "JOB_MINUTEN = 40\nPUFFER_S = 300\n"
+    "JOB_ENDE_S = JOB_MINUTEN * 60 - PUFFER_S\n"
+    "JOB_FRIST_S = JOB_ENDE_S - ZEIT_JE_AUFRUF_S\n"
+    "def wirksame_frist(x):\n    return x\n"
+)
+BELEG_MANIFEST = "SCHRITT_FRIST_S = 300\nGESAMT_FRIST_S = 200\nSCHREIB_RESERVE_S = 20\n"
 PIPELINE = "FRIST_STANDARD = 900.0\nFRIST_TAGESLAUF = 1500.0\n"
 
 
@@ -128,9 +116,9 @@ def projekt(tmp_path: Path) -> Path:
     _schreibe(tmp_path, wv.SETTINGS, "job_frist_sekunden: 3600\n")
     _schreibe(tmp_path, wv.DEPLOY, DEPLOY)
     _schreibe(tmp_path, wv.GERAETE_PIPELINE, PIPELINE)
-    _schreibe(tmp_path, wv.KLICK, KLICK)
     _schreibe(tmp_path, wv.BELEG_ABLAGE, BELEG_ABLAGE)
     _schreibe(tmp_path, wv.BELEG_SKRIPT, BELEG_SKRIPT)
+    _schreibe(tmp_path, wv.BELEG_MANIFEST, BELEG_MANIFEST)
     _schreibe(tmp_path, "tests/test_a.py", "def test_a():\n    assert True\n")
     roh = b"<html>echt</html>"
     _schreibe(tmp_path, "tests/fixtures/x/seite.html.gz", gzip.compress(roh))
@@ -302,54 +290,50 @@ def test_seitenbau_mit_continue_on_error_ist_rot(projekt, schritt):
 @pytest.mark.parametrize(
     ("alt", "neu", "meldung"),
     [
-        ("          exit 0\n", "", "nicht immer mit exit 0"),
-        (" || rc=$?\n", "\n", "nicht immer mit exit 0"),
-        ("        timeout-minutes: 5\n", "", "kein timeout-minutes"),
-        ("timeout 240 ", "", "nicht vor dem Schritt-Timeout selbst ab"),
-        ("timeout 240 ", "timeout 300 ", "nicht vor dem Schritt-Timeout selbst ab"),
-        ("--melde-ausfall", "--ohne", "nicht als Ausfall an die Seite"),
+        ("GESAMT_FRIST_S = 200", "GESAMT_FRIST_S = 300", "liegt nicht 60 s unter"),
+        ("GESAMT_FRIST_S = 200", "GESAMT_FRIST_S = 250", "liegt nicht 60 s unter"),
+        ("SCHREIB_RESERVE_S = 20", "SCHREIB_RESERVE_S = 0", "muss zwischen 0"),
+        ("SCHREIB_RESERVE_S = 20", "SCHREIB_RESERVE_S = 200", "muss zwischen 0"),
+        ("GESAMT_FRIST_S = 200\n", "", "GESAMT_FRIST_S nicht lesbar"),
     ],
 )
-def test_belege_manifest_schritt_darf_den_commit_nicht_sperren(
+def test_belege_manifest_haelt_die_frist_unter_dem_schritt_timeout(
     projekt, alt, neu, meldung
 ):
-    """Gegenprobe zum Beispielprojekt: jede Lockerung ist rot."""
-    _ersetze(projekt, wv.GERAETE, alt, neu)
+    """Gegenprobe zum Beispielprojekt: jede Lockerung im Skript ist rot."""
+    _ersetze(projekt, wv.BELEG_MANIFEST, alt, neu)
     meldungen = wv.pruefe(projekt)
     assert any(meldung in m for m in meldungen), meldungen
-    assert all("Belege-Manifest" in m for m in meldungen), meldungen
+    assert all(m.startswith(wv.BELEG_MANIFEST) for m in meldungen), meldungen
 
 
-def test_belege_manifest_nach_dem_commit_ist_rot(projekt):
-    _ersetze(projekt, wv.GERAETE, "- name: Belege-Manifest", "- name: Belege-Manifest2")
-    _ersetze(projekt, wv.GERAETE, "- name: Render site", "- name: Belege-Manifest")
-    meldungen = wv.pruefe(projekt)
-    assert any("steht nicht vor dem Commit" in m for m in meldungen), meldungen
-
-
-def test_belegjob_frist_ohne_puffer_ist_rot(projekt):
-    """2100 s + ein Aufruf von 300 s = 2400 s: der Job-Timeout selbst."""
-    _ersetze(
-        projekt, wv.KLICK, "--job-frist-sekunden 1800", "--job-frist-sekunden 2100"
-    )
-    assert wv.pruefe(projekt) == [
-        ".github/workflows/klick.yml: Job belege lässt nach --job-frist-sekunden 2100"
-        " nur 300 s, nötig sind 600 (ein letzter Aufruf plus Puffer)"
-    ]
-
-
-def test_belegjob_frist_mit_genau_dem_puffer_ist_gruen(projekt):
-    _ersetze(
-        projekt, wv.KLICK, "--job-frist-sekunden 1800", "--job-frist-sekunden 1800"
-    )
+def test_manifest_frist_genau_60_s_unter_dem_schritt_ist_gruen(projekt):
+    _ersetze(projekt, wv.BELEG_MANIFEST, "GESAMT_FRIST_S = 200", "GESAMT_FRIST_S = 240")
     assert wv.pruefe(projekt) == []
 
 
-def test_belegjob_timeout_weicht_vom_skript_ab_ist_rot(projekt):
-    _ersetze(projekt, wv.KLICK, "timeout-minutes: 40", "timeout-minutes: 45")
-    assert wv.pruefe(projekt) == [
-        ".github/workflows/klick.yml: Job belege 2700 s ≠ JOB_MINUTEN 40.0 min"
-    ]
+def test_belegjob_ohne_puffer_ist_rot(projekt):
+    """Nach JOB_FRIST_S 1800 bleiben 600 s; 2100 liessen nur 300 (= ein Aufruf)."""
+    _ersetze(projekt, wv.BELEG_SKRIPT, "- ZEIT_JE_AUFRUF_S", "")
+    meldungen = wv.pruefe(projekt)
+    assert len(meldungen) == 1 and "nach JOB_FRIST_S bleiben nur 300 s" in meldungen[0]
+
+
+def test_belegjob_mit_genau_dem_puffer_ist_gruen(projekt):
+    _ersetze(projekt, wv.BELEG_SKRIPT, "PUFFER_S = 300", "PUFFER_S = 300")
+    assert wv.pruefe(projekt) == []
+
+
+def test_belegjob_ohne_fristkuerzung_ist_rot(projekt):
+    _ersetze(projekt, wv.BELEG_SKRIPT, "def wirksame_frist", "def andere_frist")
+    meldungen = wv.pruefe(projekt)
+    assert any("wirksame_frist fehlt" in m for m in meldungen), meldungen
+
+
+def test_belegvertrag_verlangt_nichts_von_den_workflows(projekt):
+    """Ohne geraete.yml-Schritt und ohne klick.yml bleibt die Belegregel grün."""
+    assert not (projekt / ".github/workflows/klick.yml").exists()
+    assert wv.pruefe(projekt) == []
 
 
 def test_doppelter_schrittname_ist_nicht_pruefbar_und_rot(projekt):
@@ -490,10 +474,11 @@ def test_schritt_ohne_heute_bedingung_ist_rot(projekt):
 
 
 def test_fehlender_workflow_ist_rot(projekt):
+    """Ohne geraete.yml bleiben Radar-Frist und Belegregel (nur Python) grün."""
     (projekt / wv.GERAETE).unlink()
     meldungen = wv.pruefe(projekt)
     assert meldungen and all("nicht prüfbar" in m for m in meldungen)
-    assert len(meldungen) == len(wv.REGELN) - 1
+    assert len(meldungen) == len(wv.REGELN) - 2
 
 
 def test_fehlende_ordner_claude_md_ist_rot(projekt):

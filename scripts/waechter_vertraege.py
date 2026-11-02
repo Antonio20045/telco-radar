@@ -42,13 +42,13 @@ HERKUNFT = "_herkunft.json"
 BELEGFELDER = ("url", "quelle", "abgeleitet_aus")
 QUELLTEXT_LESER = frozenset({"getsource", "getsourcelines", "findsource", "linecache"})
 RADAR = ".github/workflows/radar.yml"
-GERAETE = waechter_belegvertraege.GERAETE
+GERAETE = ".github/workflows/geraete.yml"
 SETTINGS = "config/settings.yaml"
 DEPLOY = "scripts/render_deploy.sh"
 GERAETE_PIPELINE = "src/telco_radar/geraete_pipeline.py"
-KLICK = waechter_belegvertraege.KLICK
 BELEG_ABLAGE = waechter_belegvertraege.BELEG_ABLAGE
 BELEG_SKRIPT = waechter_belegvertraege.BELEG_SKRIPT
+BELEG_MANIFEST = waechter_belegvertraege.BELEG_MANIFEST
 FRIST_NAME = "FRIST_TAGESLAUF"
 ZUSTANDSDATEIEN = (
     "geraete_db.json",

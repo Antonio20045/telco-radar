@@ -230,3 +230,28 @@ def test_gh_aufrufe_pre_release_clobber_und_cleanup():
     assert "--clobber" in hoch and hoch[hoch.index("--repo") + 1] == "o/r"
     assert "--cleanup-tag" in weg and "--yes" in weg
     assert asset[:3] == ["gh", "release", "delete-asset"]
+
+
+def test_runner_mit_frist_nimmt_die_restzeit_als_timeout():
+    gesehen: list[float] = []
+
+    def lauf(argv, *, timeout, **_):
+        gesehen.append(timeout)
+        return subprocess.CompletedProcess(argv, 0, "", "")
+
+    runner = beleg_ablage.runner_mit_frist(1000.0, uhr=lambda: 990.0, lauf=lauf)
+    runner(["gh", "api"])
+    fern = beleg_ablage.runner_mit_frist(1e9, uhr=lambda: 990.0, lauf=lauf)
+    fern(["gh", "api"])
+    assert gesehen == [10.0, beleg_ablage.ZEIT_JE_AUFRUF_S]
+
+
+def test_runner_mit_frist_startet_nach_ablauf_kein_gh_mehr():
+    def lauf(argv, **_):
+        raise AssertionError("gh darf nicht mehr starten")
+
+    runner = beleg_ablage.runner_mit_frist(1000.0, uhr=lambda: 1000.0, lauf=lauf)
+    with pytest.raises(subprocess.TimeoutExpired):
+        runner(["gh", "api"])
+    with pytest.raises(beleg_ablage.GhFehler, match="^gh "):
+        beleg_ablage.Gh(runner).release_loeschen("belege-2026-11-01")

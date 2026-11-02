@@ -86,6 +86,31 @@ def _lauf(argv: Sequence[str]) -> subprocess.CompletedProcess[str]:
     )
 
 
+def runner_mit_frist(
+    ende: float,
+    uhr: Callable[[], float] = time.monotonic,
+    lauf: Callable[..., subprocess.CompletedProcess[str]] = subprocess.run,
+) -> Runner:
+    """Ein ``gh``-Runner, dessen Timeout die Restzeit bis ``ende`` (monotone Zeit)
+    ist, höchstens ``ZEIT_JE_AUFRUF_S``; ist sie aufgebraucht, scheitert der Aufruf
+    sofort mit ``TimeoutExpired`` (``Gh`` macht daraus ``GhFehler``), ohne ``gh`` zu
+    starten."""
+
+    def runner(argv: Sequence[str]) -> subprocess.CompletedProcess[str]:
+        rest = ende - uhr()
+        if rest <= 0:
+            raise subprocess.TimeoutExpired(list(argv), 0)
+        return lauf(
+            argv,
+            capture_output=True,
+            text=True,
+            timeout=min(ZEIT_JE_AUFRUF_S, rest),
+            check=False,
+        )
+
+    return runner
+
+
 class Gh:
     """Die Release-Aufrufe der GitHub-CLI; ``runner`` ist im Test austauschbar."""
 
