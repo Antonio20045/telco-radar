@@ -26,9 +26,8 @@ import pathlib
 import re
 
 import pytest
-
-from tarifleiter_testbestand import mit_leiter
 import yaml
+from tarifleiter_testbestand import mit_leiter
 
 from telco_radar.geraete_config import lade_katalog, lade_quellen
 from telco_radar.report import geraete_view, geraete_zeitreihe
@@ -489,12 +488,11 @@ def test_der_antwort_satz_nennt_den_gewaehlten_speicher():
     assert "512 GB 512 GB" not in _text(html)
 
 
-def test_der_antwort_satz_mit_hersteller_die_kachel_ohne(ansicht):
+def test_der_antwort_satz_nennt_den_hersteller(ansicht):
     paar = _paar(ansicht, ("apple-iphone-17-pro-256", "xs"))
     assert "Beim Apple iPhone 17 Pro 256 GB im Band XS" in _text(
         paar["antwort_html"]
     ), _text(paar["antwort_html"])
-    assert ansicht["daten"]["kurz"]["apple-iphone-17-pro-256"] == "iPhone 17 Pro"
 
 
 def test_ein_lueckensatz_mit_alternativbaendern_statt_zeilen(ansicht):
@@ -758,173 +756,6 @@ def test_der_client_knoten_traegt_keine_preise(ansicht):
         }
 
 
-def test_die_kacheln_sind_die_haeufigsten_geraete_mit_kurznamen(ansicht):
-    kacheln = ansicht["kacheln"]
-    assert 1 <= len(kacheln) <= 6
-    assert kacheln[0]["id"] == ansicht["start"]["modell"]
-    assert kacheln[0]["kurz"] == "iPhone 17 Pro"
-
-
-def test_die_karte_traegt_preis_und_anbieter_punkte(ansicht):
-    """P1/F3 (A3) + P1-Fix (Sicht-B2/S3-4): aus dem Chip ist eine KARTE
-    geworden, und ihre Werte stehen JE BAND - nicht mehr der ab-Preis über
-    alle Bänder neben Bewegung und Punkten des Leit-Paares (zwei
-    Maßstäbe). Der Band-Eintrag traegt den ab-Preis des besten ECHTEN
-    Angebots DIESES Bandes (mit Ø/Monat und Anbieter) und die Anbieter
-    der Zeitreihe DES BANDES als Punkte in ihren HAUSFARBEN."""
-    k = ansicht["kacheln"][0]
-    assert k["id"] == "apple-iphone-17-pro-256"
-    assert set(k["baender"]) == {"xs", "m"}
-    klein = k["baender"]["xs"][24]
-    assert klein["ab"] == "841,00 €"
-    assert klein["ab_monat"] == "35,04 €/Monat"
-    assert klein["anb"] == "1&1"
-    assert klein["punkte_html"].count("<i") == 4
-    assert "#e60000" in klein["punkte_html"], "Vodafone-Punkt in Hausfarbe"
-    assert "#0019a5" in klein["punkte_html"], "o2-Punkt in Hausfarbe"
-    assert klein["anbieter_text"] == "Vodafone, o2, 1&1, congstar"
-    mittel = k["baender"]["m"][24]
-    assert mittel["anb"] == "congstar"
-    assert mittel["ab"] == "961,00 €"
-    assert mittel["punkte_html"].count("<i") == 1
-    assert mittel["anbieter_text"] == "congstar"
-    assert mittel["delta_text"] == "↓ −12 € in 1 Tag"
-
-
-def test_das_karten_delta_ist_die_bewegung_des_fuehrenden_anbieters(ansicht_state):
-    """Gegenrechnung aus der ROHEN Historie (nicht aus der Aufbereitung),
-    JE ANBIETER (A2, 20.09.2026): fuehrend am letzten Messtag des Bandes
-    klein ist congstar - die EINZIGE Messung am 15.9. (1.009 EUR) -, und
-    congstar stand auch am ersten Messtag (12.9.) bei 1.009 EUR. Die
-    Bewegung der Karte ist congstars EIGENE (±0 in 3 Tagen). Die bis A2
-    gerechnete Front haette 1&1s 841 EUR (12.9.) gegen congstars 1.009 EUR
-    (15.9.) gestellt und "+168 in 3 Tagen" gemeldet - zwei VERSCHIEDENE
-    Angebote gegeneinander, ohne dass ein Anbieter seinen Preis geaendert
-    hat."""
-    ansicht, state = ansicht_state
-    k = ansicht["kacheln"][0]
-    assert k["id"] == "apple-iphone-17-pro-256"
-    tco = json.loads(
-        (pathlib.Path(state) / "geraete_tco.json").read_text(encoding="utf-8")
-    )
-    anbieter_je_id = {b["id"]: b["anbieter"] for b in tco["buendel"]}
-    je_anbieter: dict[str, dict[str, float]] = {}
-    pfad = pathlib.Path(state) / "geraete_tco_historie.jsonl"
-    for zeile in pfad.read_text(encoding="utf-8").splitlines():
-        satz = json.loads(zeile)
-        if not satz["tarif_id"].endswith(":klein"):
-            continue
-        if satz["id"] not in anbieter_je_id:
-            continue
-        je = je_anbieter.setdefault(anbieter_je_id[satz["id"]], {})
-        if satz["datum"] not in je or satz["gesamt"] < je[satz["datum"]]:
-            je[satz["datum"]] = satz["gesamt"]
-    tage = sorted({d for je in je_anbieter.values() for d in je})
-    assert (tage[0], tage[-1]) == ("2026-09-12", "2026-09-15")
-    fuehrend = min(
-        (a for a in je_anbieter if tage[-1] in je_anbieter[a]),
-        key=lambda a: (je_anbieter[a][tage[-1]], a),
-    )
-    assert fuehrend == "congstar"
-    assert tage[0] in je_anbieter[fuehrend], (
-        "ohne Messung am ersten Tag gaebe es keine Bewegung (A2)"
-    )
-    delta = round(je_anbieter[fuehrend][tage[-1]] - je_anbieter[fuehrend][tage[0]], 2)
-    assert delta == 0.0
-    assert k["baender"]["xs"][24]["delta_text"] == "±0 € in 3 Tagen"
-    assert k["baender"]["xs"][24]["delta_richtung"] == "gleich"
-
-
-def test_ohne_zwei_messtage_gibt_es_kein_delta(ansicht):
-    """Galaxy S26 hat EINEN Messtag (12.9.) - eine Bewegung daraus waere
-    geraten. Die Karte zeigt keins (Feld None, kein Pfeil)."""
-    k = ansicht["kacheln"][1]
-    assert k["id"] == "samsung-galaxy-s26-256"
-    for je_laufzeit in k["baender"].values():
-        for band in je_laufzeit.values():
-            assert band["delta_text"] is None
-            assert band["delta_richtung"] is None
-
-
-def test_bewegung_traegt_alle_richtungen():
-    """Die Richtungs-Sprache der Karte: steigen rot, sinken gruen,
-    unverändert grau - und gemessen wird die Reihe DES ANBIETERS, der am
-    letzten Messtag fuehrt, nie der Wert des ersten Anbieters der
-    Schleife."""
-    steigt = geraete_zeitreihe._bewegung(
-        {"a": [["2026-09-12", 100.0], ["2026-09-14", 120.0]]}
-    )
-    assert steigt == {"text": "↑ +20 € in 2 Tagen", "richtung": "steigt"}
-    sinkt = geraete_zeitreihe._bewegung(
-        {"a": [["2026-09-12", 100.0], ["2026-09-13", 90.0]]}
-    )
-    assert sinkt == {"text": "↓ −10 € in 1 Tag", "richtung": "sinkt"}
-    gleich = geraete_zeitreihe._bewegung(
-        {"a": [["2026-09-12", 100.0], ["2026-09-13", 100.0]]}
-    )
-    assert gleich == {"text": "±0 € in 1 Tag", "richtung": "gleich"}
-    front = geraete_zeitreihe._bewegung(
-        {
-            "a": [["2026-09-12", 100.0], ["2026-09-13", 110.0]],
-            "b": [["2026-09-13", 90.0]],
-        }
-    )
-    assert front is None
-    assert geraete_zeitreihe._bewegung({"a": [["2026-09-12", 100.0]]}) is None
-
-
-def test_wechselt_der_guenstigste_anbieter_ohne_preisaenderung_gibt_es_keine_bewegung():
-    """A2 (20.09.2026), der Befund am iPhone 17 Pro, Band XS: congstar
-    am 12.9., 1&1 am 18.9. - KEIN Anbieter hat seinen Preis geaendert, und
-    die Karte meldete "+387 EUR in 6 Tagen". Bewegung ist anzeigepflichtig
-    nur je ANBIETER: der Fuehrende am letzten Messtag (1&1) fehlt am
-    ersten, also gibt es fuer ihn keine Bewegung - keinesfalls die
-    Differenz der zwei Angebote."""
-    assert (
-        geraete_zeitreihe._bewegung(
-            {"congstar": [["2026-09-12", 1009.0]], "1&1": [["2026-09-18", 1396.0]]}
-        )
-        is None
-    )
-    assert (
-        geraete_zeitreihe._bewegung(
-            {
-                "congstar": [["2026-09-12", 1009.0], ["2026-09-18", 1009.0]],
-                "1&1": [["2026-09-18", 900.0]],
-            }
-        )
-        is None
-    )
-
-
-def test_die_bewegung_misst_den_fuehrenden_anbieter_an_beiden_endtagen():
-    """Wer am letzten Messtag fuehrt, dessen EIGENE Reihe zwischen erstem
-    und letztem Messtag ist die Bewegung - inklusive Gleichstand und
-    Gleichstands-Tie-break ueber die Anbieterfolge (deterministisch, kein
-    Wuerfeln je Rendern)."""
-    steigt = geraete_zeitreihe._bewegung(
-        {
-            "a": [["2026-09-12", 100.0], ["2026-09-13", 95.0]],
-            "b": [["2026-09-12", 90.0], ["2026-09-13", 94.0]],
-        }
-    )
-    assert steigt == {"text": "↑ +4 € in 1 Tag", "richtung": "steigt"}
-    gleich = geraete_zeitreihe._bewegung(
-        {
-            "o2": [["2026-09-12", 100.0], ["2026-09-13", 100.0]],
-            "1&1": [["2026-09-12", 80.0]],
-        }
-    )
-    assert gleich == {"text": "±0 € in 1 Tag", "richtung": "gleich"}
-    tie = geraete_zeitreihe._bewegung(
-        {
-            "1&1": [["2026-09-12", 80.0], ["2026-09-13", 100.0]],
-            "o2": [["2026-09-12", 120.0], ["2026-09-13", 100.0]],
-        }
-    )
-    assert tie == {"text": "↓ −20 € in 1 Tag", "richtung": "sinkt"}
-
-
 def test_ohne_historie_gibt_es_den_ehrlichen_leersatz(tmp_path):
     root, state = _baue(tmp_path)
     (state / "geraete_tco_historie.jsonl").write_text("", encoding="utf-8")
@@ -1066,7 +897,6 @@ def test_auto_modell_mit_einem_mestag_steht_nicht_in_der_wahl(tmp_path):
     ids = {m["id"] for m in a["suchindex"]}
     assert "apple-iphone-18-pro-256" not in ids
     assert all(p["modell"] != "apple-iphone-18-pro-256" for p in a["paare"])
-    assert all(k["id"] != "apple-iphone-18-pro-256" for k in a["kacheln"])
     assert a["start"]["modell"] != "apple-iphone-18-pro-256"
 
     assert any(
@@ -1274,69 +1104,6 @@ def test_z1_die_alternative_vergleicht_nur_innerhalb_eines_zeitraums():
     assert geraete_zeitreihe._alternativen(karten, "xs", "1&1") == [
         {"band": "m", "tco": 1500.00, "monate": 24}
     ]
-
-
-def test_z1_die_bewegung_geht_nie_ueber_zwei_zeitraeume():
-    """Das Tor sitzt am VORZEICHEN, nicht an der Sichtbarkeit (P0-B-z1).
-
-    congstar rechnet ueber 24 Monate und sinkt um 50 €; 1&1s Summe ist
-    ZAHLENMAESSIG kleiner, traegt aber 36 Monate. ROT gegen den alten
-    Stand: dort waehlte `_bewegung` den Fuehrenden ueber beide Zeitraeume
-    (1&1) und meldete dessen ±0 als Bewegung des Bandes.
-    """
-    serien = {
-        "congstar": [("2026-09-12", 1459.0), ("2026-09-15", 1409.0)],
-        "1&1": [("2026-09-12", 1299.54), ("2026-09-15", 1299.54)],
-    }
-    zeitraeume = {"congstar": [24], "1&1": [36]}
-    assert geraete_zeitreihe._bewegung(serien, zeitraeume) == {
-        "text": "↓ −50 € in 3 Tagen",
-        "richtung": "sinkt",
-    }
-    assert geraete_zeitreihe._bewegung(serien) == {
-        "text": "±0 € in 3 Tagen",
-        "richtung": "gleich",
-    }
-    assert (
-        geraete_zeitreihe._bewegung(
-            {"1&1": [("2026-09-12", 1000.0), ("2026-09-15", 1500.0)]}, {"1&1": [24, 36]}
-        )
-        is None
-    )
-
-
-def test_z1_der_fremde_zeitraum_hat_sein_eigenes_kachel_feld(tmp_path):
-    """MITNEHMEN (:1521): der Zustand lag in `alt_text` - dem Feld des
-    ALTEN Stands - und bekam in der Vorlage dessen Beschriftung ("kein
-    aktueller Bündel-Stand") ueber einem heute gemessenen Angebot. ROT
-    gegen den alten Stand: dort war `alt_text` gesetzt und `fremd_text`
-    gab es nicht.
-
-    Seit Datenkonzept Geräte Schritt 2 steht eine 36-Raten-Karte in ihrer
-    eigenen Ansicht; fremd ist in der 24er-Ansicht nur noch eine Karte mit
-    24 Raten, deren Zahl über einen anderen Zeitraum läuft (Tarif 36 Monate).
-    """
-    fremd = _h3_karte("1&1", 2019.54, 36)
-    fremd["raten_laufzeit"] = 24
-    tco = {
-        "modelle": [
-            {
-                "id": "m",
-                "titel": "Testgerät 256 GB",
-                "hersteller": "Test",
-                "speicher": 256,
-                "karten": [fremd],
-            }
-        ],
-        "baender_katalog": [{"key": "xs", "label": "XS"}],
-        "band_je_tarif": {},
-        "historie_lage": {},
-    }
-    a = geraete_zeitreihe.aufbereiten(tmp_path, tco)
-    kachel = a["kacheln"][0]["baender"]["xs"][24]
-    assert kachel["fremd_text"] == "nur über 36 Monate"
-    assert kachel["alt_text"] is None, "der fremde Zeitraum ist kein alter Stand"
-    assert kachel["ab"] is None, "kein Betrag ohne vergleichbaren Zeitraum"
 
 
 def _p1_zeile(bid, datum, laufzeit, rate):

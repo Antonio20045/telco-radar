@@ -213,8 +213,8 @@ def test_speicher_und_pruefstelle_tragen_die_guete(gespeichert):
 
 
 def test_die_seite_zeigt_den_tarifnamen_ohne_geraeteanteil(gespeichert, bestand):
-    """Nichts stürzt ab, der Name steht da, ein Geräteanteil nie - auch nicht mit
-    einem Maßstab unter derselben Tarif-ID."""
+    """Nichts stürzt ab, der Name steht da, auch mit einem Maßstab unter derselben
+    Tarif-ID."""
     referenzen = gespeichert.referenzen() + [
         {
             "anbieter": "o2",
@@ -233,9 +233,6 @@ def test_die_seite_zeigt_den_tarifnamen_ohne_geraeteanteil(gespeichert, bestand)
         tarife=bestand.je_id_aktuell,
         heute=_HEUTE,
     )
-    zeilen = [z for z in modell["zeilen"] if z["tarif"] in (_SPECIAL, _L_PLUS)]
-    assert len(zeilen) == 8
-    assert all(z["geraeteanteil"] is None for z in zeilen)
     karten = [
         k
         for m in modell["modelle"]

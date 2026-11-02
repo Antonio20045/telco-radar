@@ -1,15 +1,14 @@
-"""Notbremse in der Bewegung: Mail, Kachel und Start nur aus Bündeln, die zählen.
+"""Notbremse in der Bewegung: Mail und Start nur aus Bündeln, die zählen.
 
 Der Bewegungsblock der Mail meldet den Abstand eines Wettbewerbers zu Vodafone; am
 Bestand vom 2026-10-06 standen 39 von 95 solchen Abständen auf Schätzungen (Fund des
 Prüfers). Eine Messung, deren Bündel nicht zählt (Schätzung, abgelaufene Aktion),
 wird nicht gemeldet, sondern als ``ohne_aussage["zaehlt_nicht"]`` gezählt. Ebenso
-wählt das Kachel-Delta seinen führenden Anbieter nur unter Bündeln, die zählen, und
-Startpaar und Kachelfolge zählen nur Anbieter, die zählen.
+zählt das Startpaar nur Anbieter, die zählen.
 
 Synthetischer Bestand aus ``test_geraete_zeitreihe_ansicht.baue`` über den
 öffentlichen Eingang ``geraete_view.aufbereiten``; fester Bezugstag. Orakel der
-Kachel- und Startwahl ist derselbe Bestand ohne die Historie der gesperrten Bündel.
+Startwahl ist derselbe Bestand ohne die Historie der gesperrten Bündel.
 """
 
 from __future__ import annotations
@@ -142,34 +141,6 @@ def test_mail_meldet_keinen_abstand_aus_buendeln_die_nicht_zaehlen(tmp_path, fel
     assert block["geprueft"] == 1, "congstar (gemessen) bleibt geprüft"
 
 
-def _kachel_delta(zeitreihe: dict) -> str | None:
-    kachel = next(k for k in zeitreihe["kacheln"] if k["id"] == IPHONE)
-    return kachel["baender"][BAND][24]["delta_text"]
-
-
-def _mit_billigem_o2_am_letzten_tag(tmp_path, name: str):
-    """o2 ist am 15.09. mit Rate 10 € das günstigste Bündel des Bandes."""
-    root, state = baue(tmp_path / name)
-    _historie_dazu(state, [(O2, "2026-09-15", 10.0)])
-    return root, state
-
-
-def test_kachel_delta_fuehrt_nur_ein_anbieter_der_zaehlt(tmp_path):
-    gemessen = _kachel_delta(
-        _zeitreihe(*_mit_billigem_o2_am_letzten_tag(tmp_path, "a"))
-    )
-    root, state = _mit_billigem_o2_am_letzten_tag(tmp_path, "b")
-    _sperre(state, [O2], SCHAETZUNG)
-    gesperrt = _kachel_delta(_zeitreihe(root, state))
-    root, state = _mit_billigem_o2_am_letzten_tag(tmp_path, "c")
-    _historie_ohne(state, _sperre(state, [O2], {}))
-    ohne_o2 = _kachel_delta(_zeitreihe(root, state))
-    assert gemessen != ohne_o2, f"Fall fehlt: o2 führt die Kachel nicht ({gemessen})"
-    assert gesperrt == ohne_o2, (
-        f"Kachel-Delta „{gesperrt}“ stammt aus der o2-Schätzung, erwartet „{ohne_o2}“"
-    )
-
-
 def _mit_telekom(tmp_path, name: str):
     """Galaxy S26 im Band XS mit zwei gemessenen Anbietern (1&1, Telekom)."""
     root, state = baue(tmp_path / name)
@@ -179,11 +150,11 @@ def _mit_telekom(tmp_path, name: str):
     return root, state
 
 
-def _wahl(zeitreihe: dict) -> tuple:
-    return zeitreihe["start"], [k["id"] for k in zeitreihe["kacheln"]]
+def _wahl(zeitreihe: dict) -> dict:
+    return zeitreihe["start"]
 
 
-def test_startpaar_und_kachelfolge_zaehlen_nur_anbieter_die_zaehlen(tmp_path):
+def test_startpaar_zaehlt_nur_anbieter_die_zaehlen(tmp_path):
     gesperrte = [O2, CONGSTAR, EINS_IPHONE]
     gemessen = _wahl(_zeitreihe(*_mit_telekom(tmp_path, "a")))
     root, state = _mit_telekom(tmp_path, "b")
@@ -192,10 +163,10 @@ def test_startpaar_und_kachelfolge_zaehlen_nur_anbieter_die_zaehlen(tmp_path):
     root, state = _mit_telekom(tmp_path, "c")
     _historie_ohne(state, _sperre(state, gesperrte, {}))
     ohne = _wahl(_zeitreihe(root, state))
-    assert gemessen[0] == {"modell": IPHONE, "band": BAND}, gemessen
+    assert gemessen == {"modell": IPHONE, "band": BAND}, gemessen
     assert ohne != gemessen, (
         f"Fall fehlt: die Wahl hängt nicht an den Schätzungen ({ohne})"
     )
     assert gesperrt == ohne, (
-        f"Startpaar/Kachelfolge {gesperrt} zählen Schätzungen mit, erwartet {ohne}"
+        f"Startpaar {gesperrt} zählt Schätzungen mit, erwartet {ohne}"
     )

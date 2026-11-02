@@ -1551,14 +1551,10 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
 
     pruefung, bestand, belastbar = bestand_und_belastbar(sichtbar, katalog)
 
-    laden = {a.name: (a.shop or a.name) for a in getattr(quellen, "anbieter", [])}
-    anzeige = {a.name: (a.anzeige or a.name) for a in getattr(quellen, "anbieter", [])}
-    anzeige.update(
-        {
-            (a.shop or a.name): (a.anzeige or a.name)
-            for a in getattr(quellen, "anbieter", [])
-        }
-    )
+    konfig = getattr(quellen, "anbieter", [])
+    laden = {a.name: (a.shop or a.name) for a in konfig}
+    anzeige = {a.name: (a.anzeige or a.name) for a in konfig}
+    anzeige.update({(a.shop or a.name): (a.anzeige or a.name) for a in konfig})
 
     punkte_ohne_vertrag = []
     for e in belastbar:
@@ -1683,6 +1679,7 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         anbieter_typen={a.name: a.typ for a in quellen.anbieter},
         tco_historie=tco_db.historie_lage(),
         heute=tco_heute,
+        anbieter_anzeige=anzeige,
     )
     for modell in tco["modelle"]:
         modell["erfassung"] = erfassung.fuer_modell(tco_db.erfassung, modell)

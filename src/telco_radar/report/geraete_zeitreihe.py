@@ -45,14 +45,14 @@ from pathlib import Path
 
 from .. import rechenweise, tco_historie
 from ..analyze.tco_store import basis_aus_satz, id_aus_satz
-from ..tco_model import TCO_HORIZONT, zeitraum_vergleichbar
+from ..tco_model import zeitraum_vergleichbar
 from . import geraete_bewegung
 from . import geraete_notbremse as notbremse
 from .anbieter_farben import STRICHMUSTER, stil_fuer
 from .geraete_antwort import _antwort_html as _antwort_html
-from .geraete_antwort import _kurz_name, _satz_name, _schnitt
 from .geraete_antwort import _leitzahl_html as _leitzahl_html
 from .geraete_antwort import _rechnung_html as _rechnung_html
+from .geraete_antwort import _satz_name
 from .geraete_laufzeit import ALLE_TEXT as ALLE_TEXT
 from .geraete_laufzeit import LAUFZEIT_STANDARD, LAUFZEITEN, ansicht, zeitraum
 from .geraete_luecken import _alternativen as _alternativen
@@ -65,7 +65,6 @@ from .geraete_rechenweg import (
     _datum_de,
     _datum_kurz,
     _esc,
-    _euro,
     _zeitraum_wort,
     _zr_marker_farbe,
 )
@@ -75,7 +74,6 @@ from .geraete_rechenweg import _rechenwege_html as _rechenwege_html
 from .geraete_rechenweg import _rechung as _rechung
 from .geraete_rechenweg import _rechung_html as _rechung_html
 from .geraete_rechenweg import _wert_aus_messung as _wert_aus_messung
-from .geraete_tco_karten import kurz_datum
 from .geraete_zeitreihe_geometrie import (
     LUECKE_TAGE_SCHWELLE as LUECKE_TAGE_SCHWELLE,
 )
@@ -92,7 +90,7 @@ log = logging.getLogger(__name__)
 
 
 def _zr_farbe(anbieter: str) -> str:
-    """Die Linienfarbe - fuer Pfad, Achsen-Name und `_anbieter_punkte`."""
+    """Die Linienfarbe - fuer Pfad, Achsen-Name und Legende."""
     return stil_fuer(anbieter).farbe
 
 
@@ -101,8 +99,6 @@ SCHMAL_W, SCHMAL_MIN_H = 358, 380
 KOPF_FREIRAUM_BREIT, KOPF_FREIRAUM_SCHMAL = 18, 10
 MASSSTAB_FREIRAUM_ANTEIL = 0.12
 TREFFERFLAECHE_RADIUS = 12
-
-KACHELN_MAX = 6
 
 ACHSENBRUCH_ANTEIL = 0.10
 
@@ -418,12 +414,12 @@ def _zeitraeume_aus(messungen: dict, tarife: dict | None = None) -> dict:
     P0-B-z1: der Zeitraum der Punkte, aus DERSELBEN Lesung der Historie wie die Punkte
     selbst (`_messungen` legt ihn je Messung ab, gelesen aus `Tco.leitzahl_monate`).
     Keine zweite Ableitung, keine Nachrechnung: `_svg` schreibt ihn ans Kurvenende,
-    `_bewegung` prueft an ihm, ob ein Vorzeichen ueberhaupt eine Aussage ist.
+    die Wochenbewegung prueft an ihm, ob ein Vorzeichen eine Aussage ist.
 
     Je Anbieter die VERSCHIEDENEN Zeitraeume seiner Reihe, aufsteigend -
     in der Regel genau einer. Zwei heissen: der Anbieter hat die
     Ratenlaufzeit zwischen zwei Messtagen gewechselt, und dann ist die
-    Stufe in der Kurve keine Preisaenderung (`_bewegung` schweigt dazu).
+    Stufe in der Kurve keine Preisaenderung (die Wochenbewegung schweigt dazu).
     Eine Messung ohne lesbaren Zeitraum steht nicht in der Liste; sie
     wird nie als Horizont ANGENOMMEN (Clean Code 4).
     """
@@ -706,86 +702,6 @@ def _svg(
     return "".join(teile)
 
 
-def _anbieter_punkte(anbieter: list) -> str:
-    """P1/F3 (A3): die Punkte-Reihe der Modell-Karte - je Anbieter der
-    Zeitreihe EIN Punkt in seiner Hausfarbe (`anbieter_farben.py`,
-    dieselbe Markerfarbe wie seine Punkte im Graphen). Die Punkte SIND
-    die Anbieterzahl der Karte; ein zusaetzlicher Text \"N Anbieter\"
-    waere dieselbe Zahl ein zweites Mal am selben Ort (Beruhigungsregel)."""
-    return "".join(
-        f"<i style='background:{_zr_marker_farbe(a)}' title='{_esc(a)}'></i>"
-        for a in anbieter
-    )
-
-
-def _bewegung(serien: dict, zeitraeume: dict | None = None) -> dict | None:
-    """A2 (20.09.2026): das Bewegungs-Delta der Karte - die EIGENE Reihe
-    des fuehrenden Anbieters zwischen erstem und letztem Messtag.
-
-    Bewegung ist anzeigepflichtig nur JE ANBIETER. Die bis A2 gerechnete
-    PREIS-FRONT (Minimum ueber alle Anbieter je Messtag) stellte am
-    letzten Messtag das Angebot des einen gegen das eines ANDEREN am
-    ersten: am iPhone 17 Pro, Band Klein, meldete die Karte "+387 EUR in
-    6 Tagen", ohne dass ein Anbieter seinen Preis geaendert hatte
-    (congstar am 12.9., 1&1 am 18.9.). Fuehrend ist, wer am LETZTEN
-    Messtag den kleinsten Wert hat - Gleichstand bricht die
-    ANBIETER_FOLGE, dann der Name (deterministisch, kein Wuerfeln je
-    Rendern). Fehlt dem Fuehrenden eine Messung am ERSTEN Messtag, gibt
-    es keine Bewegung: die Differenz zweier Angebote ist keine
-    Preisaenderung. Unter zwei Messtagen ebenso - das Feld ist None und
-    die Karte zeigt keins.
-
-    P0-B-z1: `zeitraeume` (`_zeitraeume_aus`) ist DAS TOR dieses Moduls.
-    Die Kurve eines fremden Zeitraums bleibt im Bild; Rangfolge und
-    Vorzeichen gehen nie ueber zwei Zeitraeume (siehe unten). Ohne
-    Angabe steht kein Zeitraum zur Debatte - `aufbereiten` gibt sie
-    IMMER mit, und nur mitgegebene Zeitraeume koennen sich
-    widersprechen."""
-    tage = _messtage(serien)
-    if len(tage) < 2:
-        return None
-    spanne = (date.fromisoformat(tage[-1]) - date.fromisoformat(tage[0])).days
-    if spanne < 1:
-        return None
-
-    def _wert(anbieter: str, tag: str) -> float:
-        return min(w for d, w in serien[anbieter] if d == tag)
-
-    letzte, erste = tage[-1], tage[0]
-    kandidaten = [
-        a for a, punkte in serien.items() if any(d == letzte for d, _ in punkte)
-    ]
-    zeitraeume = zeitraeume or {}
-    monate_je = {a: (zeitraeume.get(a) or []) for a in kandidaten}
-    if len({m for ms in monate_je.values() for m in ms}) > 1:
-        kandidaten = [
-            a
-            for a in kandidaten
-            if any(zeitraum_vergleichbar(m, TCO_HORIZONT) for m in monate_je[a])
-        ]
-    if not kandidaten:
-        return None
-    fuehrend = min(
-        kandidaten,
-        key=lambda a: (
-            _wert(a, letzte),
-            ANBIETER_FOLGE.index(a) if a in ANBIETER_FOLGE else len(ANBIETER_FOLGE),
-            a,
-        ),
-    )
-    if not any(d == erste for d, _ in serien[fuehrend]):
-        return None
-    if len(monate_je.get(fuehrend) or []) > 1:
-        return None
-    delta = round(_wert(fuehrend, letzte) - _wert(fuehrend, erste), 2)
-    zeit = f"in {spanne} Tag" if spanne == 1 else f"in {spanne} Tagen"
-    if delta > 0:
-        return {"text": f"↑ +{_euro0(delta)} {zeit}", "richtung": "steigt"}
-    if delta < 0:
-        return {"text": f"↓ −{_euro0(-delta)} {zeit}", "richtung": "sinkt"}
-    return {"text": f"±0 € {zeit}", "richtung": "gleich"}
-
-
 def _legende_html(anbieter_serien: dict, zeitraeume: dict | None = None) -> str:
     """EINE Zeile ueber dem Graphen: Name mit Farb-Punkt, Vodafone rot und
     benannt. Der „anfangs"-Wert (erster Messbetrag, F9) steht im eigenen Span, der
@@ -855,64 +771,6 @@ def _hat_inhalt(satz: dict) -> bool:
         or satz.get("gesperrt")
         or satz.get("unvollstaendig")
     )
-
-
-def _kachel_eintrag(satz: dict, serien: dict, zaehlend: dict, zeitraeume: dict) -> dict:
-    """Die Kachelzeile eines Bandes in EINER Ratenlaufzeit."""
-    zeilen, alte, fremde = satz["zeilen"], satz.get("alt") or [], satz.get("fremd")
-    eintrag: dict = {
-        "ab": None,
-        "ab_monat": None,
-        "anb": None,
-        "delta_text": None,
-        "delta_richtung": None,
-        "punkte_html": "",
-        "anbieter_text": "",
-        "alt_text": None,
-        "fremd_text": None,
-        "gesperrt_text": None,
-    }
-    echt = next(
-        (z for z in zeilen if not z.get("naeherung") and z.get("gesamt") is not None),
-        None,
-    )
-    if echt is not None:
-        eintrag["ab"] = _euro(echt["gesamt"])
-        eintrag["ab_monat"] = _schnitt(echt)
-        eintrag["anb"] = echt["anbieter"]
-    elif alte:
-        alt_seit = max(
-            (
-                k.get("abgerufen_am") or ""
-                for k in alte
-                if kurz_datum(k.get("abgerufen_am") or "")
-            ),
-            default="",
-        )
-        eintrag["alt_text"] = (
-            f"kein aktueller Stand seit {kurz_datum(alt_seit)}"
-            if alt_seit
-            else "kein aktueller Stand"
-        )
-    elif fremde:
-        monate_fremd = fremde[0].get("leitzahl_monate")
-        eintrag["fremd_text"] = (
-            f"nur über {monate_fremd} Monate"
-            if monate_fremd is not None
-            else "nur über eine andere Laufzeit"
-        )
-    elif satz.get("gesperrt"):
-        gruende = notbremse.gruende(satz["gesperrt"])
-        eintrag["gesperrt_text"] = f"nicht im Vergleich ({gruende})"
-    if serien:
-        band_anbieter = [a for a in ANBIETER_FOLGE if serien.get(a)]
-        eintrag["punkte_html"] = _anbieter_punkte(band_anbieter)
-        eintrag["anbieter_text"] = ", ".join(band_anbieter)
-        bew = _bewegung(zaehlend, zeitraeume)
-        if bew:
-            eintrag["delta_text"] = bew["text"]
-            eintrag["delta_richtung"] = bew["richtung"]
-    return eintrag
 
 
 ZEITFENSTER = {
@@ -1099,8 +957,8 @@ def aufbereiten(
     werden mit der HEUTIGEN Leitzahl gerechnet, und deren Tarifanteil ist
     phasengewichtet, wo der Stamm Phasen nennt - dieselben Phasen wie auf
     der Tafel (`phasen_fuer_buendel`, ohne Widerspruch zur Messung).
-    `heute` stellt die Uhr der Notbremse; Kachel-Delta, Startpaar und
-    Kachelfolge (`wahl`) zählen nur Messungen, deren Bündel zählt.
+    `heute` stellt die Uhr der Notbremse; das Startpaar (`wahl`) zählt nur
+    Messungen, deren Bündel zählt.
     """
     state_dir = Path(state_dir)
     modelle = tco.get("modelle") or []
@@ -1142,7 +1000,6 @@ def aufbereiten(
 
     paare: list[dict] = []
     erlaubt: dict[str, list[str]] = {}
-    karten_baender: dict[str, dict[str, dict]] = {}
     for modell in wahl:
         je_laufzeit = {lz: _band_zeilen(modell, lz) for lz in _REIHE}
         bands: list[str] = []
@@ -1158,9 +1015,6 @@ def aufbereiten(
             schluessel = (modell["id"], band, lz)
             zaehlend = zaehlend_alle.get(schluessel, {})
             zeitraeume = zeitraeume_alle.get(schluessel, {})
-            karten_baender.setdefault(modell["id"], {}).setdefault(band, {})[lz] = (
-                _kachel_eintrag(satz, zaehlend, zaehlend, zeitraeume)
-            )
             paare.append(
                 _paar(
                     modell,
@@ -1230,42 +1084,6 @@ def aufbereiten(
     index_modelle.sort(key=lambda m: (-m["band_zahl"], -m["anbieter_zahl"], m["titel"]))
     suchindex = index_modelle
 
-    kachel_werte: dict[str, tuple] = {}
-    for p in paare:
-        wert = p["wahl"]
-        bisher = kachel_werte.get(p["modell"])
-        if bisher is None or wert > bisher:
-            kachel_werte[p["modell"]] = wert
-    titel_je = {m["id"]: m for m in modelle}
-    kurze_namen = [_kurz_name(titel_je[mid]) for mid in kachel_werte]
-
-    def _kachel_name(mid: str) -> str:
-        kurz = _kurz_name(titel_je[mid])
-        if kurze_namen.count(kurz) > 1:
-            speicher = titel_je[mid].get("speicher")
-            if speicher:
-                return f"{kurz} · {speicher} GB"
-        return kurz
-
-    kacheln = []
-    for mid in sorted(
-        kachel_werte, key=lambda m: (-kachel_werte[m][0], -kachel_werte[m][1], m)
-    )[:KACHELN_MAX]:
-        if mid not in titel_je:
-            continue
-        kacheln.append(
-            {
-                "id": mid,
-                "kurz": _kachel_name(mid),
-                "titel": titel_je[mid].get("titel") or mid,
-                "baender": {
-                    b: karten_baender.get(mid, {}).get(b)
-                    for b in band_katalog
-                    if karten_baender.get(mid, {}).get(b)
-                },
-            }
-        )
-
     daten = {
         "vorgabe": (start or {}).get("modell", ""),
         "start_band": (start or {}).get("band", ""),
@@ -1277,7 +1095,6 @@ def aufbereiten(
         "suchindex": suchindex,
         "erlaubt": erlaubt,
         "titel": {m["id"]: m.get("titel") or m["id"] for m in modelle},
-        "kurz": {m["id"]: _kurz_name(m) for m in modelle},
         "bnd_titel": {
             m["id"]: {
                 band: f"Alle Bündel im Band "
@@ -1301,7 +1118,6 @@ def aufbereiten(
         "start": start,
         "start_block": start_block,
         "paare": paare,
-        "kacheln": kacheln,
         "baender": band_katalog,
         "band_folge": list(band_katalog),
         "suchindex": suchindex,
@@ -1322,7 +1138,6 @@ def leer() -> dict:
         "start": None,
         "start_block": None,
         "paare": [],
-        "kacheln": [],
         "baender": {},
         "band_folge": [],
         "bewegung_woche": geraete_bewegung.ausfall(
@@ -1339,7 +1154,6 @@ def leer() -> dict:
             "suchindex": [],
             "erlaubt": {},
             "titel": {},
-            "kurz": {},
             "bnd_titel": {},
             "bnd_titel_ohne": {},
         },

@@ -16,7 +16,7 @@ from .geraete_tco_karten import kurz_datum
 
 
 def _kurz_name(modell: dict) -> str:
-    """„Apple iPhone 17 Pro 256 GB" -> „iPhone 17 Pro" (Kachel/Vorschau)."""
+    """„Apple iPhone 17 Pro 256 GB" -> „iPhone 17 Pro" (Vorschau)."""
     titel = modell.get("titel") or modell.get("id", "")
     hersteller = modell.get("hersteller") or ""
     speicher = modell.get("speicher")
@@ -33,7 +33,7 @@ def _kurz_name(modell: dict) -> str:
 def _satz_name(modell: dict) -> str:
     """Der Name im Antwort-Satz: MIT Hersteller, wenn der Katalog ihn kennt.
 
-    `_kurz_name` schneidet den Hersteller fuer Kacheln und Vorschauen ab -
+    `_kurz_name` schneidet den Hersteller fuer Vorschauen ab -
     im Fliesstext liest sich „Beim 17 im Band Mittel" (Xiaomi 17) als Zahl
     ohne Bezug. Der Satz nennt deshalb den Hersteller aus dem Katalog-/Auto-
     Eintrag vor dem Kurznamen. Fehlt er im Eintrag, bleibt der Kurzname

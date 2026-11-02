@@ -300,7 +300,6 @@ def test_der_graph_knoten_traegt_alle_modelle():
     assert len(ids_knoten) == len(ids_seite)
     assert sorted(ids_knoten) == sorted(ids_seite)
     assert knoten["vorgabe"] == daten["modell_vorgabe"]
-    assert knoten["gesamt"] == daten["modelle_gesamt"]
 
 
 def test_der_graph_knoten_traegt_dieselben_zahlen_wie_die_balken():

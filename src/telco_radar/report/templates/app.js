@@ -2392,25 +2392,34 @@ var TelcoFrage = (function () {
                                  zustand.laufzeit];
       while (zrGruppe.firstChild) zrGruppe.removeChild(zrGruppe.firstChild);
       /* P1/A2: ein offenes Panel gehoert zum PAAR, nicht zur Seite - sein
-         Inhalt waere die Messung des eben entfernten Graphen. Im Fehlerfall
-         (Fragment unerreichbar) bleibt der alte Block UND das Panel stehen. */
+         Inhalt waere die Messung des eben entfernten Graphen. */
       zrPanelSchliessen();
       if (block) {
         var klon = document.importNode(block, true);
         while (klon.firstChild) zrGruppe.appendChild(klon.firstChild);
       } else if (lager) {
-        var p = document.createElement('p');
-        p.className = 'gr-zr-keine';
-        p.textContent = 'Der Graph dieses Geräts konnte nicht geladen ' +
-                        'werden – die Bündel-Zeilen darunter nennen die ' +
-                        'Werte aller Anbieter.';
-        zrGruppe.appendChild(p);
+        zrGraphFehlt();
       }
       zrEingaengeRuesten();
     }, function () {
-      /* Das Fragment ist unerreichbar: der SERVER-Startzustand bleibt
-         stehen, statt einer leeren Flaeche. */
+      /* Das Fragment ist unerreichbar: der Ausfall steht auf der Seite,
+         der alte Graph gehoert nicht zum gewaehlten Paar. */
+      if (folge !== zrFolge) return;
+      zrPanelSchliessen();
+      zrGraphFehlt();
+      zrEingaengeRuesten();
     });
+  }
+
+  function zrGraphFehlt() {
+    while (zrGruppe.firstChild) zrGruppe.removeChild(zrGruppe.firstChild);
+    var p = document.createElement('p');
+    p.className = 'gr-zr-keine';
+    p.setAttribute('role', 'status');
+    p.textContent = 'Der Graph dieses Geräts konnte nicht geladen werden – ' +
+                    'die Bündel-Zeilen darunter nennen die Werte aller ' +
+                    'Anbieter.';
+    zrGruppe.appendChild(p);
   }
 
   /* P1/A2 (17.09.2026, STRATEGIE_GERAETE_V3): das Klick-Panel fuer den

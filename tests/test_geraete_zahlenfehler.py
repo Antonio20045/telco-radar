@@ -133,7 +133,7 @@ def test_f1_refurbished_punkt_steht_nicht_in_der_zeitreihe(tmp_path):
     }
 
 
-def test_f1_refurbished_punkt_fehlt_in_kurve_legende_und_kachel(tmp_path):
+def test_f1_refurbished_punkt_fehlt_in_kurve_und_legende(tmp_path):
     state, tco = _f1(tmp_path)
     a = geraete_zeitreihe.aufbereiten(state, tco, heute=HEUTE)
     paar = _paar(a)
@@ -141,8 +141,6 @@ def test_f1_refurbished_punkt_fehlt_in_kurve_legende_und_kachel(tmp_path):
     assert "zuletzt 1.440" in paar["legende_html"]
     for svg in (paar["svg_breit"], paar["svg_schmal"]):
         assert "960" not in svg and "720" not in svg
-    kachel = a["kacheln"][0]["baender"]["xs"][24]
-    assert (kachel["delta_text"] or "").startswith("±0"), kachel["delta_text"]
 
 
 def _f3(tmp_path):
@@ -175,15 +173,13 @@ def test_f3_tag_bleibt_mit_dem_zaehlenden_wert(tmp_path):
     assert all(m["zaehlt"] for m in tage.values())
 
 
-def test_f3_kurve_zeigt_keine_schaetzung_und_kachel_nennt_die_bewegung(tmp_path):
+def test_f3_kurve_zeigt_keine_schaetzung(tmp_path):
     state, tco = _f3(tmp_path)
     a = geraete_zeitreihe.aufbereiten(state, tco, heute=HEUTE)
     paar = _paar(a)
     assert "1.200" not in paar["legende_html"], paar["legende_html"]
     for svg in (paar["svg_breit"], paar["svg_schmal"]):
         assert "1.200" not in svg
-    kachel = a["kacheln"][0]["baender"]["xs"][24]
-    assert kachel["delta_text"] and re.search(r"120", kachel["delta_text"]), kachel
 
 
 def test_f3_nur_schaetzungen_nennen_den_grund_statt_leerer_messreihe(tmp_path):

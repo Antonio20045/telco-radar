@@ -152,7 +152,7 @@ def _messwert(
     Gerechnet wird nur in `kosten_ueber` (Datenkonzept Geräte 5.3); H wird
     gelesen, nie angenommen: 12 und 24 Raten 24 Monate, 36 Raten 36, ein Vertrag
     (1&1) seine Laufzeit. Ein fremder Zeitraum sperrt die Kurve nicht (P0-B-z1);
-    das Tor wirkt an Rangfolge und Vorzeichen (`_band_zeilen`, `_bewegung`).
+    das Tor wirkt an Rangfolge und Vorzeichen (`_band_zeilen`, Wochenbewegung).
     `(None, None)`: keine vollständige Zahl (Clean Code 3/5).
     """
     b = _buendel_aus_messung(messung, tarife)

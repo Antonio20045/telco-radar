@@ -539,11 +539,6 @@
   "E741": 2,
   "UP045": 25
  },
- "src/telco_radar/report/geraete_tco_view.py": {
-  "C901": 1,
-  "E741": 1,
-  "I001": 1
- },
  "src/telco_radar/report/geraete_vergleich.py": {
   "UP045": 6
  },
@@ -561,7 +556,7 @@
  },
  "src/telco_radar/report/geraete_zeitreihe.py": {
   "B007": 1,
-  "C901": 3
+  "C901": 2
  },
  "src/telco_radar/report/html.py": {
   "B007": 1,
@@ -842,9 +837,6 @@
  "tests/test_geraete_tco_historie.py": {
   "F841": 1
  },
- "tests/test_geraete_tco_view.py": {
-  "I001": 1
- },
  "tests/test_geraete_tco_zustand.py": {
   "E741": 1,
   "F541": 1
@@ -872,8 +864,7 @@
  },
  "tests/test_geraete_zeitreihe_ansicht.py": {
   "B007": 5,
-  "E741": 1,
-  "I001": 1
+  "E741": 1
  },
  "tests/test_geraete_zeitreihe_browser.py": {
   "B905": 1,

@@ -3297,5 +3297,5 @@ def test_der_satz_zu_buendeln_ohne_geraet_erscheint_nur_mit_solchen(
     satz = soup.select_one(".gr-tco-ohne-zuordnung")
     assert satz is not None
     assert " ".join(satz.get_text().split()) == (
-        "Nicht auf der Tafel, weil kein Gerät zuzuordnen ist: o2."
+        "Nicht auf der Tafel, weil kein Gerät zuzuordnen ist: 2 Bündel von o2."
     )

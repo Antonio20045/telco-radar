@@ -5763,8 +5763,6 @@ html:not([data-art="geraet"]) .gx-held .gx-art--tarif,html[data-art="geraet"] .g
 .gx-mehr summary{list-style:none;cursor:pointer;display:inline-flex;margin:18px 0 0;padding:11px 20px;border-radius:999px;border:1px solid var(--rule);background:var(--paper-2);font-weight:500}
 .gx-mehr summary::-webkit-details-marker{display:none}
 .gx-mehr[open] summary{display:none}
-.gr-mehr{font:inherit;font-weight:500;cursor:pointer;margin:6px 0 0;padding:11px 20px;border-radius:999px;border:1px solid var(--rule);background:var(--paper-2);color:var(--ink)}
-.gr-mehr:hover{border-color:var(--ink-3)}
 .gx-leer{color:var(--ink-3);font-size:18px;margin:18px 0}
 #gr-buendel{margin:14px 0 0;padding:0;border:0;background:none}
 #gr-bnd-gruppe > :not(.gr-anb-fehlliste){display:none}

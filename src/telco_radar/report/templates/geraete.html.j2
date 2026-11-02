@@ -333,11 +333,9 @@
          den Produktinformationsblättern). Übrig bleibt EIN Satz, und nur
          dann, wenn ein Bündel ohne Gerät-Zuordnung nicht auf der Tafel
          steht - die Lücke wird genannt, nicht verschwiegen. #}
-  {% if geraete.tco.ohne_zuordnung %}
-  <p class="gr-erklaer gr-basis--duenn gr-tco-ohne-zuordnung">Nicht auf der
-  Tafel, weil kein Gerät zuzuordnen ist: {{
-  geraete.tco.ohne_zuordnung | map(attribute="anbieter") | unique | join(", ")
-  }}.</p>
+  {% if geraete.tco.ohne_zuordnung_satz %}
+  <p class="gr-erklaer gr-basis--duenn gr-tco-ohne-zuordnung">{{
+  geraete.tco.ohne_zuordnung_satz }}</p>
   {% endif %}
 
   {# Der Client-Knoten: Titel, Zählungen, Erlaubnis - KEINE Beträge. Der
@@ -983,7 +981,7 @@
     %} hidden{% endif %}>Zu dieser Auswahl steht keine Zeile im
   Bestand.</p>
   {% if geraete.katalog_modelle | selectattr('zeilen_rest') | list %}
-  <p class="gr-erklaer"><button type="button" class="gr-mehr" id="gr-kmehr">alle
+  <p class="gr-erklaer"><button type="button" class="gr-knopf" id="gr-kmehr">alle
     {{ geraete.katalog_modelle | length }} Zeilen zeigen</button></p>
   {% endif %}
 
