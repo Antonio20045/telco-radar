@@ -9,7 +9,9 @@ beautifulsoup4>=4.12
 PyYAML>=6.0
 Jinja2>=3.1
 Markdown>=3.6
-pytest>=8.0
+# <9.2 seit 02.11.2026: pytest 9.2 entfernt Item._nodeid, mutmut 3.8.0 scheitert
+# dann mit "failed to collect stats" (Stufe 5, test_mutation, test_auftrag).
+pytest>=8.0,<9.2
 playwright>=1.44
 # report/bilder.py misst jeden Bildkandidaten, bevor es einen auswaehlt, und
 # rechnet ihn auf Zeitungsmasse herunter. Ohne Pillow gaebe es weder das eine
