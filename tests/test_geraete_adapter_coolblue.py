@@ -61,7 +61,9 @@ def test_coolblue_unlesbarer_preis_ist_fehler_statt_nullbestand(html):
 
 
 def test_coolblue_verwirft_fremde_crossselling_produkte():
-    andere = _produkt(url="https://www.coolblue.de/produkt/33333/anderes.html")
+    andere = _produkt(url="https://www.coolblue.de/produkt/33333/anderes.html", preis="1199.00")
+    andere["name"] = "Anderes Smartphone"
+    andere["sku"] = "33333"
     result = coolblue.lies(_html(andere, _produkt()), _URL)
     assert len(result) == 1
     assert result[0]["url"] == _URL
@@ -72,9 +74,10 @@ def test_coolblue_ohne_originalquelle_keine_preiszuordnung():
         coolblue.lies(_html(_produkt()), "https://www.coolblue.de/handys/smartphones")
 
 
-def test_coolblue_mischung_ohne_eindeutige_zuordnung_ist_fehler():
-    with pytest.raises(GeraeteAbrufFehler):
-        coolblue.lies(_html(_produkt(), _produkt()), _URL)
+def test_coolblue_identische_strukturierte_produkte_werden_dedupliziert():
+    # Der gemeinsame JSON-LD-Extraktor entfernt exakt gleiche Produktknoten.
+    saetze = coolblue.lies(_html(_produkt(), _produkt()), _URL)
+    assert len(saetze) == 1
 
 
 def test_coolblue_konfiguriert_und_saturn_18_pro_erfasst():
