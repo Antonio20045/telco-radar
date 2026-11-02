@@ -32,14 +32,20 @@ def _variante(b: Buendel) -> tuple:
     return (b.anbieter, b.sku_id, b.laufzeit_monate)
 
 
-def _abgeleitet(b: Buendel) -> bool:
-    return (
-        b.herleitung.strip() in HERLEITUNG_PREISLISTE and b.geraet_zuzahlung is not None
-    )
+def _abgeleitet(b: Buendel) -> float | None:
+    """Die abgeleitete Zuzahlung, sonst None."""
+    if b.herleitung.strip() in HERLEITUNG_PREISLISTE:
+        return b.geraet_zuzahlung
+    return None
 
 
-def _gelesen(b: Buendel) -> bool:
-    return b.quelle_art == QUELLE_KLICK and b.geraet_zuzahlung is not None
+def _gelesen(b: Buendel) -> float | None:
+    """Die gelesene Zuzahlung, sonst None."""
+    return b.geraet_zuzahlung if b.quelle_art == QUELLE_KLICK else None
+
+
+def _widerlegt(abgeleitet: float, gelesen: Iterable[float]) -> bool:
+    return any(abs(z - abgeleitet) > ZUZAHLUNG_TOLERANZ for z in gelesen)
 
 
 def ohne_widerlegte(buendel: Iterable) -> list:
@@ -50,28 +56,22 @@ def ohne_widerlegte(buendel: Iterable) -> list:
     liste = list(buendel)
     gelesen: dict[tuple, list[float]] = {}
     for b in liste:
-        if isinstance(b, Buendel) and _gelesen(b):
-            gelesen.setdefault(_variante(b), []).append(b.geraet_zuzahlung)
+        if isinstance(b, Buendel) and (z := _gelesen(b)) is not None:
+            gelesen.setdefault(_variante(b), []).append(z)
     if not gelesen:
         return liste
     rest = []
     for b in liste:
-        if (
-            isinstance(b, Buendel)
-            and _abgeleitet(b)
-            and any(
-                abs(z - b.geraet_zuzahlung) > ZUZAHLUNG_TOLERANZ
-                for z in gelesen.get(_variante(b), ())
-            )
-        ):
-            log.warning(
-                "%s %s %s: abgeleitete Zuzahlung %s widerspricht der gelesenen Zeile, "
-                "Bündel zählt nicht",
-                b.anbieter,
-                b.sku_id,
-                b.tarif_name,
-                b.geraet_zuzahlung,
-            )
+        abg = _abgeleitet(b) if isinstance(b, Buendel) else None
+        if abg is None or not _widerlegt(abg, gelesen.get(_variante(b), ())):
+            rest.append(b)
             continue
-        rest.append(b)
+        log.warning(
+            "%s %s %s: abgeleitete Zuzahlung %s widerspricht der gelesenen "
+            "Zeile, Bündel zählt nicht",
+            b.anbieter,
+            b.sku_id,
+            b.tarif_name,
+            abg,
+        )
     return rest
