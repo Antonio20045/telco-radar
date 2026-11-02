@@ -177,6 +177,7 @@
           aria-controls="tafel-radar" data-tafel="tafel-radar">Übersicht</button>
 </nav>
 {{ d.glas_filter(prefix) }}
+{% include "_geraete_preisposition.html.j2" %}
 
 <section class="gx-teuer" id="teuer" data-puls>
   <div class="gx-kopf"><h2>Über {{ teurer.schwelle | int }}&nbsp;% teurer</h2>
