@@ -139,7 +139,6 @@
  },
  "service/signup/app.py": {
   "D102": 1,
-  "E501": 1,
   "I001": 1,
   "TID251": 3
  },
@@ -156,8 +155,7 @@
  "src/telco_radar/analyze/buendel_abdeckung.py": {
   "D101": 2,
   "D102": 1,
-  "D103": 3,
-  "UP045": 6
+  "D103": 3
  },
  "src/telco_radar/analyze/category_sweep.py": {
   "D103": 1,
@@ -233,8 +231,7 @@
   "UP037": 1
  },
  "src/telco_radar/analyze/tco_store.py": {
-  "D102": 3,
-  "UP045": 7
+  "D102": 3
  },
  "src/telco_radar/analyze/themen_store.py": {
   "D103": 2
@@ -280,7 +277,7 @@
   "UP045": 5
  },
  "src/telco_radar/collect/geraete/o2.py": {
-  "C901": 2,
+  "C901": 1,
   "I001": 1,
   "UP045": 16
  },
@@ -344,8 +341,7 @@
   "C901": 1,
   "D101": 2,
   "D102": 5,
-  "D103": 1,
-  "I001": 1
+  "D103": 1
  },
  "src/telco_radar/collect/tarif_einsundeins_simonly.py": {
   "UP035": 1,
@@ -440,8 +436,7 @@
   "UP037": 1
  },
  "src/telco_radar/newsletter/transport.py": {
-  "D102": 4,
-  "I001": 1
+  "D102": 4
  },
  "src/telco_radar/newsletter/versand.py": {
   "D101": 2,
@@ -715,9 +710,6 @@
   "F401": 1,
   "I001": 1
  },
- "tests/test_geraete_buendel_kopf_zeitraum.py": {
-  "I001": 1
- },
  "tests/test_geraete_buendel_mobil_abzeichen_browser.py": {
   "I001": 1
  },
@@ -773,18 +765,13 @@
   "E741": 6,
   "I001": 1
  },
- "tests/test_geraete_o2_zeilen.py": {
-  "F401": 1,
-  "F811": 1,
-  "I001": 1
- },
  "tests/test_geraete_o2_zeilen_browser.py": {
   "B007": 1,
   "I001": 1
  },
  "tests/test_geraete_o3_rollen_browser.py": {
   "B007": 1,
-  "E501": 2,
+  "E501": 1,
   "F401": 1,
   "I001": 1
  },
@@ -901,9 +888,7 @@
   "E501": 1
  },
  "tests/test_geraete_zeitreihe_seite.py": {
-  "E741": 1,
-  "F401": 3,
-  "I001": 1
+  "E741": 1
  },
  "tests/test_geraete_zeitreihe_xtick_browser.py": {
   "B905": 2,

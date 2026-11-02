@@ -26,7 +26,11 @@ def _neu(ordner: Path) -> Path:
 
 
 def vorbereiten(site_dir: Path, env, geraete: dict) -> dict[Path, str]:
-    """Leert `data/zr/` und `data/bnd/`, gibt jede Fragmentdatei mit Inhalt zurück."""
+    """Leert `data/zr/` und `data/bnd/`, gibt jede Fragmentdatei mit Inhalt zurück.
+
+    Die Zeitfenster-Fragmente enthalten nur Grafiken (keine Rechenweg-Vorlagen, keine
+    Bündel-Informationen); je ausgewähltem Modell genügt ein Abruf.
+    """
     tco = geraete.get("tco") or {}
     if not tco.get("modelle"):
         return {}
@@ -58,7 +62,5 @@ def vorbereiten(site_dir: Path, env, geraete: dict) -> dict[Path, str]:
     fenster_root = _neu(daten / "zf")
     for modell, eigene in je_modell.items():
         dateien[ziel / f"{modell}.html"] = zr_vorlage.render(paare=eigene)
-        # Nur Grafiken, keine mehrfachen Rechenweg-Vorlagen und keine
-        # wiederholten Buendel-Informationen. Ein Abruf je ausgewaehltem Modell.
         dateien[fenster_root / f"{modell}.html"] = fenster_vorlage.render(paare=eigene)
     return dateien

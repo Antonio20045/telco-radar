@@ -56,7 +56,9 @@ jobs:
             if git pull --rebase origin main && git push origin HEAD:main; then
               exit 0
             fi
-            git rebase --abort || true
+            if [ -d .git/rebase-merge ] || [ -d .git/rebase-apply ]; then
+              git rebase --abort
+            fi
             git fetch origin main
             git reset --hard origin/main
             PYTHONPATH=src python -m telco_radar.report.bauen --root .
