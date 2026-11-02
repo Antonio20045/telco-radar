@@ -1,6 +1,106 @@
 {
- "stand": "2026-11-01",
+ "stand": "2026-11-02",
  "videos": [
+  {
+   "id": "jL53DwYaK3c",
+   "titel": "KI-Update kompakt: Linux-Lücke, Audio Intelligence, KI-Operation, KI-Satellit",
+   "kanal": "KI Update (heise)",
+   "datum": "2026-11-02",
+   "dauer_sekunden": 828,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "jL53DwYaK3c.jpg"
+  },
+  {
+   "id": "j068jHeqABk",
+   "titel": "Adobe Photoshop, Premiere und After Effects für lau",
+   "kanal": "c't 3003",
+   "datum": "2026-11-02",
+   "dauer_sekunden": 56,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "j068jHeqABk.jpg"
+  },
+  {
+   "id": "h5SNFLIZl_U",
+   "titel": "Would you be excited to see this at Disneyland?",
+   "kanal": "Matt Wolfe",
+   "datum": "2026-11-02",
+   "dauer_sekunden": 74,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "h5SNFLIZl_U.jpg"
+  },
+  {
+   "id": "EvOYYbW2RZQ",
+   "titel": "KI-Update kompakt: Linux-Lücke, Audio Intelligence, KI-Operation, KI-Satellit",
+   "kanal": "KI Update (heise)",
+   "datum": "2026-11-02",
+   "dauer_sekunden": 861,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "EvOYYbW2RZQ.jpg"
+  },
+  {
+   "id": "EkdIZXDnRK8",
+   "titel": "Context-Aware Coding: Give AI Agents the Right Context",
+   "kanal": "IBM Technology",
+   "datum": "2026-11-02",
+   "dauer_sekunden": 394,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "EkdIZXDnRK8.jpg"
+  },
+  {
+   "id": "DSlDIC58fF0",
+   "titel": "Wie gut ist TTS heute?",
+   "kanal": "The Morpheus Tutorials",
+   "datum": "2026-11-02",
+   "dauer_sekunden": 6396,
+   "stufe": "Fortgeschritten",
+   "sprache": "de",
+   "bild": "DSlDIC58fF0.jpg"
+  },
+  {
+   "id": "DLXIMYfzM9g",
+   "titel": "KI-Abos: Erst dran gewöhnen, dann teuer bezahlen?",
+   "kanal": "c't 3003",
+   "datum": "2026-11-02",
+   "dauer_sekunden": 36,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "DLXIMYfzM9g.jpg"
+  },
+  {
+   "id": "Amm9ySSET4c",
+   "titel": "Coinbase on OpenAI Private Intelligence",
+   "kanal": "OpenAI",
+   "datum": "2026-11-02",
+   "dauer_sekunden": 65,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "Amm9ySSET4c.jpg"
+  },
+  {
+   "id": "9tOu4r-FiQI",
+   "titel": "This DeepSeek v4.1 is powerful and uncensored, let's run it",
+   "kanal": "David Ondrej",
+   "datum": "2026-11-02",
+   "dauer_sekunden": 2144,
+   "stufe": "Fortgeschritten",
+   "sprache": "en",
+   "bild": "9tOu4r-FiQI.jpg"
+  },
+  {
+   "id": "0Kw6_DTZPrY",
+   "titel": "‘We may release models we can’t control’: Amodei, Altman … and Gemini Carbon",
+   "kanal": "AI Explained",
+   "datum": "2026-11-02",
+   "dauer_sekunden": 1675,
+   "stufe": "Fortgeschritten",
+   "sprache": "en",
+   "bild": "0Kw6_DTZPrY.jpg"
+  },
   {
    "id": "xeLRAFPeh2E",
    "titel": "Snapintosh: macOS auf dem Windows-Laptop?",
@@ -200,193 +300,93 @@
    "stufe": "Einstieg",
    "sprache": "en",
    "bild": "K8NgeOuZmWU.jpg"
-  },
-  {
-   "id": "F8rc-ULd4_4",
-   "titel": "My Agentic Engineering Workflow (after 15,700 sessions)",
-   "kanal": "David Ondrej",
-   "datum": "2026-10-30",
-   "dauer_sekunden": 5141,
-   "stufe": "Fortgeschritten",
-   "sprache": "en",
-   "bild": "F8rc-ULd4_4.jpg"
-  },
-  {
-   "id": "Df_FbS8PxTE",
-   "titel": "Video Editor with Customizable Templates: Build a Full Video Fast",
-   "kanal": "Kevin Stratvert",
-   "datum": "2026-10-30",
-   "dauer_sekunden": 1708,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "Df_FbS8PxTE.jpg"
-  },
-  {
-   "id": "CWdTBLsbaQs",
-   "titel": "OpenAI Claims It Just Did The Impossible",
-   "kanal": "Two Minute Papers",
-   "datum": "2026-10-30",
-   "dauer_sekunden": 442,
-   "stufe": "Fortgeschritten",
-   "sprache": "en",
-   "bild": "CWdTBLsbaQs.jpg"
-  },
-  {
-   "id": "9PwpJpJJ3IY",
-   "titel": "How to Use Remotion with ChatGPT",
-   "kanal": "Kevin Stratvert",
-   "datum": "2026-10-30",
-   "dauer_sekunden": 481,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "9PwpJpJJ3IY.jpg"
-  },
-  {
-   "id": "7TtGMileCus",
-   "titel": "How Gen uses ChatGPT Work to turn data Into decisions | OpenAI",
-   "kanal": "OpenAI",
-   "datum": "2026-10-30",
-   "dauer_sekunden": 35,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "7TtGMileCus.jpg"
-  },
-  {
-   "id": "4sGplZdBy6A",
-   "titel": "When a humanoid and a drone become besties",
-   "kanal": "Matt Wolfe",
-   "datum": "2026-10-30",
-   "dauer_sekunden": 58,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "4sGplZdBy6A.jpg"
-  },
-  {
-   "id": "3zqh0gpyZDI",
-   "titel": "ArtCraft hat mich in eine Krise gestürzt",
-   "kanal": "c't 3003",
-   "datum": "2026-10-30",
-   "dauer_sekunden": 1286,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "3zqh0gpyZDI.jpg"
-  },
-  {
-   "id": "xLEd5eS_V5U",
-   "titel": "39 Jahre alter Synthesizer-Bug – von lokaler KI gefixt #shorts",
-   "kanal": "c't 3003",
-   "datum": "2026-10-29",
-   "dauer_sekunden": 56,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "xLEd5eS_V5U.jpg"
-  },
-  {
-   "id": "sR6-DFgA6Cc",
-   "titel": "IT-Unternehmer: “Die Uhr für SAP TICKT!” KI kopiert jetzt JEDE Software (Emanuel Böminghaus)",
-   "kanal": "Everlast AI",
-   "datum": "2026-10-29",
-   "dauer_sekunden": 5763,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "sR6-DFgA6Cc.jpg"
-  },
-  {
-   "id": "mmns33BsBcY",
-   "titel": "What Is Quantization? How AI Models Get Smaller & Faster",
-   "kanal": "IBM Technology",
-   "datum": "2026-10-29",
-   "dauer_sekunden": 481,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "mmns33BsBcY.jpg"
   }
  ],
  "kanaele": {
   "c't 3003": {
    "error": null,
-   "versucht": "2026-11-01",
-   "abgerufen": "2026-11-01"
+   "versucht": "2026-11-02",
+   "abgerufen": "2026-11-02"
   },
   "KI Update (heise)": {
    "error": null,
-   "versucht": "2026-11-01",
-   "abgerufen": "2026-11-01"
+   "versucht": "2026-11-02",
+   "abgerufen": "2026-11-02"
   },
   "Everlast AI": {
    "error": null,
-   "versucht": "2026-11-01",
-   "abgerufen": "2026-11-01"
+   "versucht": "2026-11-02",
+   "abgerufen": "2026-11-02"
   },
   "The Morpheus Tutorials": {
    "error": null,
-   "versucht": "2026-11-01",
-   "abgerufen": "2026-11-01"
+   "versucht": "2026-11-02",
+   "abgerufen": "2026-11-02"
   },
   "Kevin Stratvert": {
    "error": null,
-   "versucht": "2026-11-01",
-   "abgerufen": "2026-11-01"
+   "versucht": "2026-11-02",
+   "abgerufen": "2026-11-02"
   },
   "Microsoft Mechanics": {
    "error": null,
-   "versucht": "2026-11-01",
-   "abgerufen": "2026-11-01"
+   "versucht": "2026-11-02",
+   "abgerufen": "2026-11-02"
   },
   "Leila Gharani": {
    "error": null,
-   "versucht": "2026-11-01",
-   "abgerufen": "2026-11-01"
+   "versucht": "2026-11-02",
+   "abgerufen": "2026-11-02"
   },
   "Jeff Su": {
    "error": null,
-   "versucht": "2026-11-01",
-   "abgerufen": "2026-11-01"
+   "versucht": "2026-11-02",
+   "abgerufen": "2026-11-02"
   },
   "Matt Wolfe": {
    "error": null,
-   "versucht": "2026-11-01",
-   "abgerufen": "2026-11-01"
+   "versucht": "2026-11-02",
+   "abgerufen": "2026-11-02"
   },
   "IBM Technology": {
    "error": null,
-   "versucht": "2026-11-01",
-   "abgerufen": "2026-11-01"
+   "versucht": "2026-11-02",
+   "abgerufen": "2026-11-02"
   },
   "OpenAI": {
    "error": null,
-   "versucht": "2026-11-01",
-   "abgerufen": "2026-11-01"
+   "versucht": "2026-11-02",
+   "abgerufen": "2026-11-02"
   },
   "Anthropic": {
    "error": null,
-   "versucht": "2026-11-01",
-   "abgerufen": "2026-11-01"
+   "versucht": "2026-11-02",
+   "abgerufen": "2026-11-02"
   },
   "Google DeepMind": {
    "error": null,
-   "versucht": "2026-11-01",
-   "abgerufen": "2026-11-01"
+   "versucht": "2026-11-02",
+   "abgerufen": "2026-11-02"
   },
   "AI Explained": {
    "error": null,
-   "versucht": "2026-11-01",
-   "abgerufen": "2026-11-01"
+   "versucht": "2026-11-02",
+   "abgerufen": "2026-11-02"
   },
   "Two Minute Papers": {
    "error": null,
-   "versucht": "2026-11-01",
-   "abgerufen": "2026-11-01"
+   "versucht": "2026-11-02",
+   "abgerufen": "2026-11-02"
   },
   "3Blue1Brown": {
    "error": null,
-   "versucht": "2026-11-01",
-   "abgerufen": "2026-11-01"
+   "versucht": "2026-11-02",
+   "abgerufen": "2026-11-02"
   },
   "David Ondrej": {
    "error": null,
-   "versucht": "2026-11-01",
-   "abgerufen": "2026-11-01"
+   "versucht": "2026-11-02",
+   "abgerufen": "2026-11-02"
   }
  },
  "error": null
