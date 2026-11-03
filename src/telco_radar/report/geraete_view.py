@@ -1074,7 +1074,7 @@ def katalog_modellzeilen(
                     else je_anbieter
                 )
                 bisher = ziel.get(anbieter)
-                if bisher is None or beleg["betrag"] < bisher["betrag"]:
+                if bisher is None or geraete_vergleich.ersetzt_beleg(beleg, bisher):
                     ziel[anbieter] = beleg
         auswahl = je_anbieter or je_anbieter_alt
         ab_beleg = min(auswahl.values(), key=lambda b: b["betrag"]) if auswahl else None

@@ -266,3 +266,16 @@ def beide_preisarten(eintraege: list, katalog, laeden: Optional[dict] = None) ->
         "hat_daten": ohne["hat_daten"] or mit["hat_daten"],
         "standard": OHNE_VERTRAG if ohne["hat_daten"] else MIT_VERTRAG,
     }
+
+
+def ersetzt_beleg(neu: dict, bisher: dict) -> bool:
+    """Ein Anbieter hat EINEN aktuellen Preis: den der juengsten Messung.
+
+    Gleiches Abrufdatum (mehrere Farben am selben Tag) entscheidet der
+    tiefere Betrag. Katalog und Verlauf lesen so denselben Preis je Anbieter
+    (Clean Code 1); ein fehlendes Datum ist das aelteste.
+    """
+    return (neu.get("abgerufen_am", ""), -neu["betrag"]) > (
+        bisher.get("abgerufen_am", ""),
+        -bisher["betrag"],
+    )
