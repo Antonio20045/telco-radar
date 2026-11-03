@@ -59,21 +59,23 @@ BREIT = {
     "x0": 245,
     "x1": 925,
     "kopf": 26,
-    "zeile": 48,
-    "punkt_y": 17,
-    "fehlt_y": 40,
+    "zeile": 64,
+    "punkt_y": 36,
+    "fehlt_y": 58,
 }
 SCHMAL = {
     "w": 358,
     "x0": 22,
     "x1": 334,
     "kopf": 30,
-    "zeile": 62,
-    "punkt_y": 36,
-    "fehlt_y": 54,
+    "zeile": 66,
+    "punkt_y": 40,
+    "fehlt_y": 59,
 }
 R_PUNKT = 6.5
 R_EIGEN = 8.5
+EIGEN_ABSTAND = 14
+EIGEN_HALBBREITE = 58
 
 
 def _de(wert: float) -> str:
@@ -197,11 +199,15 @@ def _zahl(p: dict, x: float, y: float, anker: str = "start") -> str:
 
 
 def _beschriftung(pts: list[dict], y: float, oben: float, schmal: bool) -> list[str]:
-    """Die Beträge einer Zeile: günstigster und teuerster Punkt, Vodafone
-    dazu, wo er mittendrin liegt. Schmal steht alles in der Namenszeile."""
-    tief, hoch = pts[0], pts[-1]
+    """Die Beträge einer Zeile. Vodafones Betrag steht immer: breit über dem
+    eigenen Punkt (nie auf dem Nachbarn oder der Achse, weil die Zeile Platz
+    dafür hat), schmal rechts in der Namenszeile. Günstigster und teuerster
+    Punkt der anderen Anbieter stehen breit neben ihrem Punkt."""
+    eigen = next((p for p in pts if p["anbieter"] == EIGEN), None)
     if schmal:
-        zahlen = [tief] if tief is hoch else [tief, hoch]
+        if eigen is not None:
+            return [_zahl(eigen, SCHMAL["w"], oben + 22, "end")]
+        zahlen = [pts[0]] if pts[0] is pts[-1] else [pts[0], pts[-1]]
         teile = [
             f"<tspan class='{_klasse(p)}' dx='{8 if i else 0}'>"
             f"{_eur(p['wert'])}</tspan>"
@@ -211,13 +217,15 @@ def _beschriftung(pts: list[dict], y: float, oben: float, schmal: bool) -> list[
             f"<text x='{SCHMAL['w']}' y='{oben + 14}' text-anchor='end'>"
             f"{''.join(teile)}</text>"
         ]
+    tief, hoch = pts[0], pts[-1]
     aus = []
-    if tief is not hoch:
+    if tief is not hoch and tief is not eigen:
         aus.append(_zahl(tief, tief["x"] - 14, y + 4, "end"))
-    aus.append(_zahl(hoch, hoch["x"] + 14, y + 4))
-    mitte = next((p for p in pts[1:-1] if p["anbieter"] == EIGEN), None)
-    if mitte is not None:
-        aus.append(_zahl(mitte, mitte["x"], y - 14, "middle"))
+    if hoch is not eigen:
+        aus.append(_zahl(hoch, hoch["x"] + 14, y + 4))
+    if eigen is not None:
+        mitte = min(max(eigen["x"], EIGEN_HALBBREITE), BREIT["w"] - EIGEN_HALBBREITE)
+        aus.append(_zahl(eigen, mitte, y - EIGEN_ABSTAND, "middle"))
     return aus
 
 
@@ -254,8 +262,8 @@ def _svg(daten: dict, schmal: bool) -> str:
             )
         else:
             teile.append(
-                f"<text class='gr-pp-name' x='0' y='{oben + 17}'>{name}</text>"
-                f"<text class='gr-pp-gb' x='0' y='{oben + 34}'>{gb}</text>"
+                f"<text class='gr-pp-name' x='0' y='{oben + 31}'>{name}</text>"
+                f"<text class='gr-pp-gb' x='0' y='{oben + 48}'>{gb}</text>"
             )
         pts = zeile["punkte"]
         if pts:
