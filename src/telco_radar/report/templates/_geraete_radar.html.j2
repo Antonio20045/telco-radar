@@ -336,7 +336,7 @@
        steht je Anbieter-Zeile selbst („Band Klein · VF 1.949,80 €"). D4a:
        die Erklärung dieses Kürzels steht jetzt als `title` an der
        Legende, ihr sichtbarer Text bleibt so kurz wie die Formel selbst. #}
-    <p class="wr-basis-legende" title="Abweichung je Zeile = Wettbewerber-Kosten über 24 Monate gegen die Vodafone-Karte im selben Tarifband.">„VF" in den Detailzeilen = Vodafone-Kosten im selben Band ·
+    <p class="wr-basis-legende" title="Abweichung je Zeile = Wettbewerber-Kosten über 24 Monate gegen die Vodafone-Karte im selben Tarifband.">„VF“ = Vodafone im selben Tarifband ·
     <a href="{{ prefix }}tarife.html">Tarifübersicht</a></p>
   <div class="gr-alarm-scroll">
   <table class="gr-alarm wr-modelliste">
@@ -533,7 +533,7 @@
       <thead><tr><th>Anbieter</th><th>Warum</th></tr></thead>
       <tbody>
         {% for a in wr.nicht_erhebbar %}
-        <tr><td>{{ a.anbieter }}</td><td>{{ a.grund }}</td></tr>
+        <tr><td>{{ a.anbieter }}</td><td>{{ 'Die Seite gibt ihre Preise nicht heraus.' if a.aktiv else 'Noch nicht angebunden.' }}</td></tr>
         {% endfor %}
       </tbody>
     </table>

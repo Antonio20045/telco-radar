@@ -553,7 +553,7 @@ def _svg(
             f"<line class='gr-zr-raster' x1='{x:.1f}' y1='{oben}' "
             f"x2='{x:.1f}' y2='{oben + ph}'/>"
         )
-    beschriftet = _x_marken(tage, x_v)
+    beschriftet = _x_marken(tage, x_v, breit)
     for tag in tage:
         if tag not in beschriftet:
             continue
@@ -608,7 +608,7 @@ def _svg(
                 f"cy='{y:.1f}' r='{r}' fill='{marker_farbe}'"
                 f"{daten}/>"
             )
-            form = form_pfad(stil.marker, x, y, r)
+            form = form_pfad(stil.marker, x, y, r) if (breit or ende) else None
             if form:
                 teile.append(
                     f"<g class='gr-zr-form gr-zr-form--{stil.marker}' "

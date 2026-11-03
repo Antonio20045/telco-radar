@@ -82,11 +82,18 @@ def test_die_vorschau_zeigt_die_farben_des_bildes(tmp_path):
 
 
 def test_das_grosse_bild_liegt_auf_seiner_vorschau(seiten):
-    for name in ("meldungen.html", "geraete.html"):
+    for name in ("meldungen.html",):
         bild = seiten[name].select_one(".wa-bild img.wa-motiv")
         assert bild is not None, name
         assert bild.get("fetchpriority") == "high", name
         assert _vorschau_von(bild).width == bild_vorschau.VORSCHAU_BREITE, name
+
+
+def test_die_geraeteseite_hat_kein_kopfbild(seiten):
+    """P2 (03.11.2026): die Zahl steht auf schlichtem Grund, kein Foto."""
+    kopf = seiten["geraete.html"].select_one(".gx-auftakt")
+    assert kopf is not None
+    assert kopf.select_one(".wa-bild, .wa-schleier, img") is None
 
 
 def test_die_buehne_der_woche_zeigt_keine_vorschau_einer_anderen_lage(seiten):

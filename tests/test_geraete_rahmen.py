@@ -91,7 +91,7 @@ def test_wie_gerechnet_ist_weg_so_gerechnet_steht_genau_einmal(tmp_path):
         f"{len(rechnung)} Rechenschafts-Aufklapper statt genau einem"
     )
     assert rechnung[0].select_one("summary").get_text(strip=True) == "So gerechnet"
-    assert "Kosten über 24 Monate" in rechnung[0].get_text(" ")
+    assert "Alles über 24 Monate" in rechnung[0].get_text(" ")
     assert "TCO-24" not in rechnung[0].get_text(" ")
     assert tafel.select_one("#gr-tco-wie") is None
 

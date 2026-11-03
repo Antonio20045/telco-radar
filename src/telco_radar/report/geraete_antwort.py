@@ -213,12 +213,12 @@ def _leitzahl_html(zeilen: list) -> str | None:
     if eigen is None or eigen is beste:
         return None
     delta = round(eigen["gesamt"] - beste["gesamt"], 2)
+    naeherung = " (Näherung)" if eigen.get("naeherung") else ""
     return (
         f"<b class='gr-leit-zahl'>{euro(delta)}</b>"
-        f"<span class='gr-leit-label'>{_esc(beste['anbieter'])} "
-        f"unter Vodafone "
-        f"({euro(eigen['gesamt'])}"
-        f"{', Näherung' if eigen.get('naeherung') else ''})</span>"
+        f"<span class='gr-leit-label' "
+        f"title='Vodafone: {euro(eigen['gesamt'])}{naeherung}'>"
+        f"{_esc(beste['anbieter'])} günstiger als Vodafone{naeherung}</span>"
     )
 
 
@@ -258,8 +258,7 @@ def _rechnung_html(zeilen: list, h: int = TCO_HORIZONT) -> str:
     datum = beste.get("abgerufen_am") or ""
     datum_teil = f", abgerufen am {_datum_de(datum)}" if datum else ""
     return (
-        f"So gerechnet: <code>Kosten über {h} Monate = Anzahlung + "
-        f"Tarif über {h} Monate + alle Geräteraten + "
-        f"Anschlusspreis</code> — Boni bleiben außerhalb. Beleg des "
-        f"günstigsten Angebots: {link}{datum_teil}."
+        f"Alles über {h} Monate: Anzahlung, Tarif, alle Geräteraten und "
+        f"Anschlusspreis, ohne Boni. Beleg des günstigsten Angebots: "
+        f"{link}{datum_teil}."
     )

@@ -84,8 +84,6 @@
 <section class="wa-auftakt gx-auftakt kopfband">
   <div class="wa-auftakt-buehne">
     <div class="wa-rahmen">
-      <div class="wa-bild" aria-hidden="true">{{ d.motiv('band-geraete', prefix, 'wa-motiv', eager=true) }}</div>
-      <div class="wa-schleier" aria-hidden="true"></div>
       <div class="wa-text">
         <h1 class="gx-held">
           <span class="gx-art gx-art--tarif"><b>{{ teurer.tarif | length }}</b>
@@ -179,10 +177,8 @@
 {{ d.glas_filter(prefix) }}
 {% include "_geraete_preisposition.html.j2" %}
 
-<section class="gx-teuer" id="teuer" data-puls>
-  <div class="gx-kopf"><h2>Über {{ teurer.schwelle | int }}&nbsp;% teurer</h2>
-    <span class="gx-art gx-art--tarif">{{ teurer.tarif | length }} Geräte mit Tarif</span>
-    <span class="gx-art gx-art--geraet">{{ teurer.geraet | length }} Einzelgeräte</span></div>
+<section class="gx-teuer" id="teuer">
+  <div class="gx-kopf"><h2>Über {{ teurer.schwelle | int }}&nbsp;% teurer</h2></div>
   <div class="gx-art gx-art--tarif">{{ teuerliste(teurer.tarif, true) }}</div>
   <div class="gx-art gx-art--geraet">{{ teuerliste(teurer.geraet, false) }}</div>
 </section>
@@ -204,9 +200,6 @@
 <div class="gr-tafel" id="tafel-tco" role="tabpanel">
 
 <section class="gr-tco" id="tco">
-  <p class="gr-ruhe">Weitere Smartphone-Tarife im
-    <a href="https://tarife.mediamarkt.de/smartphones/?utm_source=saturn.de&amp;utm_medium=own-link&amp;utm_term=kvs_467_categorymodule"
-       rel="noopener noreferrer">externen Tarifshop</a>.</p>
   {# E2 (16.09.2026): DIESE TAFEL IST DIE ZEITREIHE. Bis E2 führte sie
      Modell-<select>, Antwort-Leitzeilen und den HTML/CSS-Balkengraphen
      (O1); Antonios Graph-Entscheidung (AUFTRAG_GERAETE_EINE_SEITE_V2 §1a)
@@ -1083,13 +1076,13 @@
          Ratenlaufzeit - app.js (`setzeExport`) tauscht Ziel und Text aus den
          data-Feldern, je Ansicht `geraete-tco-<N>.csv`. Ohne Skript blendet
          die Tafel keine Zeile aus, und der Link nennt den Gesamtexport. #}
-      {% set tco_text = 'Bündel-TCO (' ~ geraete.export.tco.zeilen ~ ')' %}
+      {% set tco_text = 'Kosten mit Tarif (' ~ geraete.export.tco.zeilen ~ ')' %}
       <a class="gr-knopf" id="gr-export-tco" href="{{ geraete.export.tco.datei }}"
         download data-datei-alle="{{ geraete.export.tco.datei }}"
         data-text-alle="{{ tco_text }}"{% for lz, e in
         (geraete.export.tco_je_laufzeit or {}).items() %}
         data-datei-{{ lz }}="{{ e.datei }}"
-        data-text-{{ lz }}="Bündel-TCO {{ lz }} Monate ({{ e.zeilen }})"{%
+        data-text-{{ lz }}="Kosten mit Tarif {{ lz }} Monate ({{ e.zeilen }})"{%
         endfor %}>{{ tco_text }}</a>
       <a class="gr-knopf" href="{{ geraete.export.radar.datei }}" download
         >Radar ({{ geraete.export.radar.zeilen }})</a>
@@ -1102,7 +1095,7 @@
         download>Katalog Barpreis ({{ geraete.export.modell_barpreis.zeilen
         }})</a>
       <a class="gr-knopf" href="{{ geraete.export.modell_tco.datei }}"
-        download>Katalog TCO ({{ geraete.export.modell_tco.zeilen }})</a>
+        download>Katalog Kosten ({{ geraete.export.modell_tco.zeilen }})</a>
       {% endif %}
     </span>
   </details>

@@ -445,8 +445,7 @@ _GW_ANTWORT_MUSTER = re.compile(
 
 _GW_LEIT_MUSTER = re.compile(
     r"<b class='gr-leit-zahl'>([\d.,]+) €</b>"
-    r"<span class='gr-leit-label'>[^()]*\(([\d.,]+) €(?:, Näherung)?\)"
-    r"</span>"
+    r"<span class='gr-leit-label' title='Vodafone: ([\d.,]+) €(?: \(Näherung\))?'>"
 )
 
 

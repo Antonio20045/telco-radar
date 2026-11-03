@@ -10,6 +10,7 @@ import math
 from datetime import date
 
 MIN_XTICK_ABSTAND = 34
+MIN_XTICK_ABSTAND_SCHMAL = 62
 
 LUECKE_TAGE_SCHWELLE = 10
 
@@ -74,20 +75,19 @@ def _xtick_x(
     return links + (tag - t0).days / max(1, (t1 - t0).days) * breite
 
 
-def _x_marken(
-    tage: list[str], x_v, mindestabstand: float = MIN_XTICK_ABSTAND
-) -> set[str]:
+def _x_marken(tage: list[str], x_v, breit: bool = True) -> set[str]:
     """Welche Messtage eine X-Achsen-BESCHRIFTUNG bekommen (`MIN_XTICK_ABSTAND`).
 
     Gierig von links: der erste Tag ist immer dabei, jeder weitere nur,
-    wenn er `mindestabstand` Einheiten vom zuletzt beschrifteten Tag
-    entfernt liegt; der letzte Tag ersetzt noetigenfalls den zuletzt
-    gewaehlten, statt zusaetzlich zu kollidieren - eine Achse ohne
-    Enddatum sagt nicht, bis wann sie reicht. Die RASTERLINIE bekommt
+    wenn er den Mindestabstand (schmal: `MIN_XTICK_ABSTAND_SCHMAL`) vom
+    zuletzt beschrifteten Tag entfernt liegt; der letzte Tag ersetzt
+    noetigenfalls den zuletzt gewaehlten, statt zusaetzlich zu kollidieren
+    - eine Achse ohne Enddatum sagt nicht, bis wann sie reicht. Die RASTERLINIE bekommt
     trotzdem JEDER Messtag (siehe `_svg`) - nur die Textmarke wird
     ausgeduennt."""
     if len(tage) <= 1:
         return set(tage)
+    mindestabstand = MIN_XTICK_ABSTAND if breit else MIN_XTICK_ABSTAND_SCHMAL
     behalten = [tage[0]]
     letzte_x = x_v(tage[0])
     for tag in tage[1:-1]:

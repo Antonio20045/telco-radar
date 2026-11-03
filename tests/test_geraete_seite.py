@@ -528,7 +528,8 @@ def test_mit_tarif_tafel_verlinkt_den_tarifshop_ohne_ranking_text(tmp_path):
         for a in seite.find_all("a", href=True)
         if a["href"].startswith("https://tarife.mediamarkt.de/smartphones/")
     ]
-    assert len(links) == 1
+    assert links == [], "P2: der Satz zum externen Tarifshop ist ersatzlos weg"
+    assert "externen Tarifshop" not in seite.get_text()
     assert "TCO-Ranking" not in seite.get_text()
 
 

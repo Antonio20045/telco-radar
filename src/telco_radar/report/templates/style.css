@@ -5731,7 +5731,7 @@ body{font-synthesis-style:none}
 /* ================================  GERAETE (ein Schalter, 10.10.2026) ==== */
 .gx-auftakt{height:175vh;--wa-rand:clamp(16px,4vw,64px)}
 .gx-auftakt .wa-text{top:auto;bottom:calc(9vh + var(--p)*6vh)}
-.gx-held{margin:0;color:var(--bildtext);font-weight:400}
+.gx-held{margin:0;color:var(--ink);font-weight:400}
 .gx-held .gx-art{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:end;column-gap:clamp(16px,3vw,40px)}
 .gx-held b{font:500 clamp(120px,19vw,280px)/.8 var(--sans);letter-spacing:-.06em;font-variant-numeric:tabular-nums;animation:wa-steigen 1.1s cubic-bezier(.2,.8,.2,1) both .15s}
 .gx-held b + span{font:400 clamp(26px,3.4vw,52px)/1.05 var(--zeitung);letter-spacing:-.01em;max-width:15ch;padding-bottom:.25em;text-wrap:balance;animation:wa-auftauchen .9s ease both .6s}
@@ -5745,7 +5745,7 @@ html:not([data-art="geraet"]) .gx-held .gx-art--tarif,html[data-art="geraet"] .g
 .gx-modus button[hidden]{display:none}
 .gx-teuer{margin:0 0 clamp(56px,10vh,110px)}
 .gx-kopf{display:flex;align-items:baseline;flex-wrap:wrap;gap:8px 20px;border-bottom:1px solid var(--rule);padding-bottom:14px;margin-bottom:6px}
-.gx-kopf h2{margin:0;font:400 clamp(36px,4.6vw,64px)/1 var(--zeitung);letter-spacing:-.02em}
+.gx-kopf h2{margin:0;font:400 clamp(18px,1.5vw,21px)/1.15 var(--zeitung);letter-spacing:-.01em}
 .gx-kopf > span{color:var(--ink-3);font-size:15px}
 .gx-teuer-liste{list-style:none;margin:0;padding:0;counter-reset:none}
 .gx-teuer-liste li{border-bottom:1px solid var(--rule)}
@@ -5756,9 +5756,7 @@ html:not([data-art="geraet"]) .gx-held .gx-art--tarif,html[data-art="geraet"] .g
 .gx-t-wer{grid-area:wer;display:flex;flex-wrap:wrap;gap:4px 14px;font-size:14px;color:var(--ink-3)}
 .gx-nw{white-space:nowrap}
 .gx-t-wer i{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--anb,var(--ink-4));margin-right:7px;vertical-align:0}
-.gx-t-plus{grid-area:plus;align-self:center;font:500 clamp(24px,2.6vw,36px)/1 var(--sans);letter-spacing:-.03em;color:var(--red-text);font-variant-numeric:tabular-nums;white-space:nowrap}
-.gx-teuer[data-puls] .gx-teuer-liste li{transition:opacity .6s ease,transform .6s ease}
-.gx-teuer[data-puls]:not(.sichtbar) .gx-teuer-liste li{opacity:0;transform:translateY(14px)}
+.gx-t-plus{grid-area:plus;align-self:center;font:500 clamp(32px,3.2vw,46px)/1 var(--sans);letter-spacing:-.03em;color:var(--red-text);font-variant-numeric:tabular-nums;white-space:nowrap}
 .gx-mehr{margin:0}
 .gx-mehr summary{list-style:none;cursor:pointer;display:inline-flex;margin:18px 0 0;padding:11px 20px;border-radius:999px;border:1px solid var(--rule);background:var(--paper-2);font-weight:500}
 .gx-mehr summary::-webkit-details-marker{display:none}
@@ -5773,7 +5771,7 @@ html:not([data-art="geraet"]) .gx-held .gx-art--tarif,html[data-art="geraet"] .g
 #gr-bnd-gruppe .gr-anb-fehlt-zustand{font:inherit;color:var(--ink-4)}
 .gx-alle{margin:clamp(56px,10vh,110px) 0 0}
 .gx-alle .gr-kansicht,.gx-alle .gr-leit--katalog{display:none}
-.gx-alle .rubrik{font:400 clamp(36px,4.6vw,64px)/1 var(--zeitung);letter-spacing:-.02em;text-transform:none;border-bottom:1px solid var(--rule);padding-bottom:14px}
+.gx-alle .rubrik{font:400 clamp(18px,1.5vw,21px)/1.15 var(--zeitung);letter-spacing:-.01em;text-transform:none;border-bottom:1px solid var(--rule);padding-bottom:14px}
 @media (max-width:720px){
   .gx-auftakt{height:150vh}
   .gx-held .gx-art{grid-template-columns:1fr;row-gap:10px}
@@ -5783,11 +5781,10 @@ html:not([data-art="geraet"]) .gx-held .gx-art--tarif,html[data-art="geraet"] .g
   .gx-modus button{height:44px;padding:0 18px;font-size:16px}
   .gx-t{column-gap:14px;padding:14px 2px}
   .gx-t-name{font-size:17px}
-  .gx-t-plus{font-size:22px}
+  .gx-t-plus{font-size:30px}
 }
 @media (prefers-reduced-motion:reduce){
   .gx-held b,.gx-held b + span{animation:none}
-  .gx-teuer[data-puls]:not(.sichtbar) .gx-teuer-liste li{opacity:1;transform:none}
 }
 
 /* MELDUNGEN: grosses Bild mit dem Zeitungskopf (Antonio, 10.10.2026) */
@@ -6370,9 +6367,20 @@ a.ki-k1-pille:hover{border-color:var(--ink)}
 .gr-pp-link:hover .gr-pp-punkt,.gr-pp-link:focus-visible .gr-pp-punkt{stroke:var(--ink);stroke-width:2.5}
 .gr-pp-link:focus-visible{outline:none}
 .gr-pp-summe{font-size:12px;fill:var(--ink-3);font-variant-numeric:tabular-nums}
-.gr-pp-summe--eigen{font-size:15px;font-weight:700;fill:var(--ink)}
+.gr-pp-summe--eigen{font-size:26px;font-weight:700;fill:var(--ink)}
 .gr-pp-fehlt{font-size:12px;fill:var(--ink-4)}
 @media (max-width:720px){
   .gr-pp-breit{display:none}
   .gr-pp-schmal{display:block}
 }
+
+/* P2 (03.11.2026): schlichter Kopf der Geräteseite - kein Foto, keine Fläche,
+   die Zahl bleibt die größte Schrift; die Überschriften darunter sind kleiner
+   als jede Kernzahl ihres Bereichs. */
+.wa-auftakt.gx-auftakt.kopfband{height:auto;margin:0}
+.kopfband.gx-auftakt .wa-auftakt-buehne{position:relative;height:auto;overflow:visible}
+.kopfband.gx-auftakt .wa-rahmen{position:relative;inset:auto}
+.kopfband.gx-auftakt .wa-text{position:relative;left:auto;right:auto;top:auto;bottom:auto;
+  padding:clamp(104px,14vh,132px) var(--wa-rand) clamp(8px,2vh,20px)}
+/* Handy: auf dem schmalen Verlauf tragen nur die Endpunkte eine Marke. */
+.gr-zr--schmal .gr-zr-punkt:not(.gr-zr-ende):not(.gr-zr-aktiv){opacity:0}

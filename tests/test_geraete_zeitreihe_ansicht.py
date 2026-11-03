@@ -402,7 +402,8 @@ def test_der_antwort_satz_nennt_die_vodafone_referenz(ansicht):
     paar = _paar(ansicht, ("apple-iphone-17-pro-256", "xs"))
     text = __import__("re").sub(r"<[^>]+>", "", paar["antwort_html"])
     leit = __import__("re").sub(r"<[^>]+>", "", paar["leitzahl_html"] or "")
-    assert "Vodafone" in leit and "1.105,00 €" in leit, (text, leit)
+    assert "Vodafone" in leit, (text, leit)
+    assert "title='Vodafone: 1.105,00 €" in paar["leitzahl_html"]
 
 
 def test_der_antwort_satz_polt_den_abstand_zur_referenz_richtig(ansicht):
@@ -419,7 +420,8 @@ def test_der_antwort_satz_polt_den_abstand_zur_referenz_richtig(ansicht):
     text = __import__("re").sub(r"<[^>]+>", "", paar["antwort_html"])
     leit = __import__("re").sub(r"<[^>]+>", "", paar["leitzahl_html"] or "")
     assert "264,00 €" in leit, (text, leit)
-    assert "1&amp;1 unter Vodafone (1.105,00 €)" in leit, (text, leit)
+    assert leit.endswith("1&amp;1 günstiger als Vodafone"), (text, leit)
+    assert "title='Vodafone: 1.105,00 €" in paar["leitzahl_html"]
     assert "über Vodafone" not in leit, leit
     assert "über der Vodafone-Referenz" not in text, text
 
@@ -1225,3 +1227,46 @@ def test_p1_bei_reihenfolgetausch_bleibt_dieselbe_zahlweise_gewinnen(tmp_path):
     for laufzeit in (12, 24):
         slot = messungen[("modell-x", "xs", laufzeit)]["congstar"]["2026-09-22"]
         assert slot["laufzeit"] == laufzeit
+
+
+def _langer_verlauf():
+    """Zwei Anbieter, 20 aufeinanderfolgende Messtage (Handy-Überlappung)."""
+    tage = [f"2026-10-{t:02d}" for t in range(1, 21)]
+    return {
+        "Vodafone": [(d, 900.0 + (5.0 if i > 9 else 0.0)) for i, d in enumerate(tage)],
+        "o2": [(d, 800.0) for d in tage],
+    }
+
+
+def _bs(html):
+    return __import__("bs4").BeautifulSoup(html, "html.parser")
+
+
+def test_p2_schmal_hat_weniger_datumsmarken_als_breit():
+    """P2 (03.11.2026): auf dem Handy liefen die Datumsmarken ineinander;
+    schmal wird die Achse ausgedünnt, die Rasterlinien bleiben je Tag."""
+    serien = _langer_verlauf()
+    breit = _bs(geraete_zeitreihe._svg(serien, True, {}))
+    schmal = _bs(geraete_zeitreihe._svg(serien, False, {}))
+    n_breit = len(breit.select("text.gr-zr-xtick"))
+    n_schmal = len(schmal.select("text.gr-zr-xtick"))
+    assert 2 <= n_schmal <= n_breit, (n_schmal, n_breit)
+    xs = sorted(float(e["x"]) for e in schmal.select("text.gr-zr-xtick"))
+    abstaende = [b - a for a, b in zip(xs, xs[1:], strict=False)]
+    assert min(abstaende) >= 60, abstaende
+    assert len(schmal.select("line.gr-zr-raster")) == len(
+        breit.select("line.gr-zr-raster")
+    )
+
+
+def test_p2_schmal_zeichnet_nur_am_ende_eine_markerform():
+    """Die Zwischenpunkte verdecken sich auf dem Handy: dort bleibt nur
+    der Endpunkt mit Form; die Punkte (Treffer-Flaeche) bleiben vollzaehlig."""
+    serien = _langer_verlauf()
+    breit = _bs(geraete_zeitreihe._svg(serien, True, {}))
+    schmal = _bs(geraete_zeitreihe._svg(serien, False, {}))
+    assert len(schmal.select("circle.gr-zr-punkt")) == len(
+        breit.select("circle.gr-zr-punkt")
+    )
+    assert len(breit.select("g.gr-zr-form")) > len(serien)
+    assert len(schmal.select("g.gr-zr-form")) <= len(serien)

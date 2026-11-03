@@ -877,8 +877,11 @@ def test_die_seite_nennt_die_nicht_erhebbaren_haendler(tmp_path):
     text = suppe.get_text(" ", strip=True)
     for name in ("Amazon", "MediaMarkt", "expert", "Euronics"):
         assert name in text, f"{name} fehlt auf der Tafel"
-    assert "403" in text, "der Grund (HTTP 403) muss genannt sein"
-    assert "PA-API" in text
+    assert (
+        "Die Seite gibt ihre Preise nicht heraus." in text
+        or "Noch nicht angebunden." in text
+    )
+    assert "403" not in text and "PA-API" not in text
 
 
 def test_auf_der_seite_fehlt_kein_netzbetreiber(tmp_path):
