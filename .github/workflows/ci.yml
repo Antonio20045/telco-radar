@@ -33,15 +33,29 @@ jobs:
       # headless gegen 127.0.0.1 und braucht weder Netz noch Systempakete.
       - name: Install Chromium for the browser tests
         run: playwright install chromium
+      - name: Kerne der Maschine
+        run: |
+          echo "nproc: $(nproc)"
+          cat /proc/cpuinfo | grep -c processor
       - name: Run tests
         env:
           PYTHONPATH: src
         run: |
           set +e
-          pytest -q -n auto -rs | tee pytest-ausgabe.txt
+          pytest -q -n auto -rs --durations=0 --store-durations --durations-path .test_durations --junitxml=junit-dauern.xml | tee pytest-ausgabe.txt
           status=${PIPESTATUS[0]}
           set -e
           echo '```' >> "$GITHUB_STEP_SUMMARY"
           tail -n 15 pytest-ausgabe.txt >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
           exit "$status"
+      - name: Testdauern als Artefakt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-durations-${{ github.run_id }}
+          path: |
+            .test_durations
+            junit-dauern.xml
+            pytest-ausgabe.txt
+          if-no-files-found: warn

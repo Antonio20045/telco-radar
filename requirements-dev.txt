@@ -1,5 +1,6 @@
 -r requirements.txt
 pytest-xdist>=3.5
+pytest-split==0.11.0
 pytest-timeout==2.4.0
 pytest-socket==0.8.1
 ruff==0.15.20
