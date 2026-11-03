@@ -1,1001 +1,19 @@
 {
  "anbieter": "o2-tarife-2",
  "datum": "2026-11-03",
- "dauer_sekunden": 209.0,
+ "dauer_sekunden": 0.9,
  "format": 1,
  "frischegrenze_tage": 3,
- "grund": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-256gb-burgunder-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus: Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
+ "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
  "karte": "o2-tarife.yaml",
- "laufstatus": "gestoert",
+ "laufstatus": "nicht_gelesen",
  "lesefrist_tage": 1,
  "name": "o2",
  "seiten": [
   {
-   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-256gb-burgunder-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
-   "geraet": "apple-iphone-18-pro",
-   "gescheitert": 0,
-   "grund": "Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
-   "http_status": 200,
-   "kombinationen": [
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "36",
-      "speicher": "256 GB",
-      "tarif": null
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": 36,
-      "speicher": "256 GB",
-      "tarif": null
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "24",
-      "speicher": "256 GB",
-      "tarif": null
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": 24,
-      "speicher": "256 GB",
-      "tarif": null
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "36",
-      "speicher": "512 GB",
-      "tarif": null
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": 36,
-      "speicher": "512 GB",
-      "tarif": null
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "24",
-      "speicher": "512 GB",
-      "tarif": null
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": 24,
-      "speicher": "512 GB",
-      "tarif": null
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "36",
-      "speicher": "1 TB",
-      "tarif": null
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": 36,
-      "speicher": "1 TB",
-      "tarif": null
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "24",
-      "speicher": "1 TB",
-      "tarif": null
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": 24,
-      "speicher": "1 TB",
-      "tarif": null
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "36",
-      "speicher": "2 TB",
-      "tarif": null
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": 36,
-      "speicher": "2 TB",
-      "tarif": null
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "24",
-      "speicher": "2 TB",
-      "tarif": null
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": 24,
-      "speicher": "2 TB",
-      "tarif": null
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    }
-   ],
-   "ladung": {
-    "abstand_s": 2.0,
-    "anfragen": 143,
-    "beendet": 142,
-    "dokument": "complete",
-    "geladen": true,
-    "offen": {
-     "library.telefonica.de": 1
-    },
-    "ohne_antwort_ms": 0,
-    "sekunden": 19.2,
-    "takte_ms": 10050,
-    "wartet_auf": "load"
-   },
-   "speicher_gb": 256,
-   "sperre": null,
-   "status": "gestoert",
-   "stoerung": "seitenform",
-   "struktur": {
-    "anteil_felder": null,
-    "anteil_knoepfe": 0.18181818181818182,
-    "felder_gefunden": 0,
-    "felder_gesucht": 0,
-    "knoepfe_gefunden": 2,
-    "knoepfe_gesucht": 11
-   },
-   "verworfen": 4
-  },
-  {
-   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-max-256gb-polar-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
-   "geraet": "apple-iphone-18-pro-max",
-   "gescheitert": 0,
-   "grund": "Strukturbruch: nur 18 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
-   "http_status": 200,
-   "kombinationen": [
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "36",
-      "speicher": "256 GB",
-      "tarif": null
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": 36,
-      "speicher": "256 GB",
-      "tarif": null
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "24",
-      "speicher": "256 GB",
-      "tarif": null
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": 24,
-      "speicher": "256 GB",
-      "tarif": null
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "36",
-      "speicher": "512 GB",
-      "tarif": null
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": 36,
-      "speicher": "512 GB",
-      "tarif": null
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "24",
-      "speicher": "512 GB",
-      "tarif": null
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": 24,
-      "speicher": "512 GB",
-      "tarif": null
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "36",
-      "speicher": "1 TB",
-      "tarif": null
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": 36,
-      "speicher": "1 TB",
-      "tarif": null
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "24",
-      "speicher": "1 TB",
-      "tarif": null
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": 24,
-      "speicher": "1 TB",
-      "tarif": null
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "36",
-      "speicher": "2 TB",
-      "tarif": null
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": 36,
-      "speicher": "2 TB",
-      "tarif": null
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "24",
-      "speicher": "2 TB",
-      "tarif": null
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": 24,
-      "speicher": "2 TB",
-      "tarif": null
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    }
-   ],
-   "ladung": {
-    "abstand_s": 2.0,
-    "anfragen": 143,
-    "beendet": 141,
-    "dokument": "complete",
-    "geladen": true,
-    "offen": {
-     "library.telefonica.de": 2
-    },
-    "ohne_antwort_ms": 0,
-    "sekunden": 13.8,
-    "takte_ms": 10150,
-    "wartet_auf": "load"
-   },
-   "speicher_gb": 256,
-   "sperre": null,
-   "status": "gestoert",
-   "stoerung": "seitenform",
-   "struktur": {
-    "anteil_felder": null,
-    "anteil_knoepfe": 0.18181818181818182,
-    "felder_gefunden": 0,
-    "felder_gesucht": 0,
-    "knoepfe_gefunden": 2,
-    "knoepfe_gesucht": 11
-   },
-   "verworfen": 4
-  },
-  {
-   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a17-128gb-5g-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
-   "geraet": "samsung-galaxy-a17",
-   "gescheitert": 0,
-   "grund": "Strukturbruch: nur 40 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
-   "http_status": 200,
-   "kombinationen": [
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "36",
-      "speicher": "128 GB",
-      "tarif": null
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": 36,
-      "speicher": "128 GB",
-      "tarif": null
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "24",
-      "speicher": "128 GB",
-      "tarif": null
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": 24,
-      "speicher": "128 GB",
-      "tarif": null
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    }
-   ],
-   "ladung": {
-    "abstand_s": 2.0,
-    "anfragen": 136,
-    "beendet": 130,
-    "dokument": "complete",
-    "geladen": true,
-    "offen": {
-     "library.telefonica.de": 5,
-     "www.o2online.de": 1
-    },
-    "ohne_antwort_ms": 0,
-    "sekunden": 12.0,
-    "takte_ms": 7850,
-    "wartet_auf": "load"
-   },
-   "speicher_gb": 128,
-   "sperre": null,
-   "status": "gestoert",
-   "stoerung": "seitenform",
-   "struktur": {
-    "anteil_felder": null,
-    "anteil_knoepfe": 0.4,
-    "felder_gefunden": 0,
-    "felder_gesucht": 0,
-    "knoepfe_gefunden": 2,
-    "knoepfe_gesucht": 5
-   },
-   "verworfen": 4
-  },
-  {
-   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a27-5g-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
-   "geraet": "samsung-galaxy-a27",
-   "gescheitert": 0,
-   "grund": "Strukturbruch: nur 40 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
-   "http_status": 200,
-   "kombinationen": [
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "36",
-      "speicher": "128 GB",
-      "tarif": null
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": 36,
-      "speicher": "128 GB",
-      "tarif": null
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "24",
-      "speicher": "128 GB",
-      "tarif": null
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": 24,
-      "speicher": "128 GB",
-      "tarif": null
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    }
-   ],
-   "ladung": {
-    "abstand_s": 2.0,
-    "anfragen": 135,
-    "beendet": 129,
-    "dokument": "complete",
-    "geladen": true,
-    "offen": {
-     "library.telefonica.de": 5,
-     "www.o2online.de": 1
-    },
-    "ohne_antwort_ms": 0,
-    "sekunden": 13.4,
-    "takte_ms": 8550,
-    "wartet_auf": "load"
-   },
-   "speicher_gb": 128,
-   "sperre": null,
-   "status": "gestoert",
-   "stoerung": "seitenform",
-   "struktur": {
-    "anteil_felder": null,
-    "anteil_knoepfe": 0.4,
-    "felder_gefunden": 0,
-    "felder_gesucht": 0,
-    "knoepfe_gefunden": 2,
-    "knoepfe_gesucht": 5
-   },
-   "verworfen": 4
-  },
-  {
-   "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-17-128gb-blue-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
-   "geraet": "xiaomi-redmi-17",
-   "gescheitert": 0,
-   "grund": "Strukturbruch: nur 40 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
-   "http_status": 200,
-   "kombinationen": [
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "36",
-      "speicher": "128 GB",
-      "tarif": null
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": 36,
-      "speicher": "128 GB",
-      "tarif": null
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "24",
-      "speicher": "128 GB",
-      "tarif": null
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": 24,
-      "speicher": "128 GB",
-      "tarif": null
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    }
-   ],
-   "ladung": {
-    "abstand_s": 2.0,
-    "anfragen": 139,
-    "beendet": 137,
-    "dokument": "complete",
-    "geladen": true,
-    "offen": {
-     "api-v4.trbo.com": 1,
-     "library.telefonica.de": 1
-    },
-    "ohne_antwort_ms": 0,
-    "sekunden": 14.6,
-    "takte_ms": 9500,
-    "wartet_auf": "load"
-   },
-   "speicher_gb": 128,
-   "sperre": null,
-   "status": "gestoert",
-   "stoerung": "seitenform",
-   "struktur": {
-    "anteil_felder": null,
-    "anteil_knoepfe": 0.4,
-    "felder_gefunden": 0,
-    "felder_gesucht": 0,
-    "knoepfe_gefunden": 2,
-    "knoepfe_gesucht": 5
-   },
-   "verworfen": 4
-  },
-  {
-   "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-128gb-purple-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
-   "geraet": "xiaomi-redmi-note-17",
-   "gescheitert": 0,
-   "grund": "Strukturbruch: nur 40 % der gesuchten Knöpfe gefunden (mindestens 50 %)",
-   "http_status": 200,
-   "kombinationen": [
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "36",
-      "speicher": "128 GB",
-      "tarif": null
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": 36,
-      "speicher": "128 GB",
-      "tarif": null
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    },
-    {
-     "antwort_url": null,
-     "auswahl": {
-      "laufzeit": "24",
-      "speicher": "128 GB",
-      "tarif": null
-     },
-     "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
-     "buendel": null,
-     "grund": "Knöpfe für tarif nicht gefunden (tef-choice-panel:has(input[name=\"select-tariff\"]:checked) > label)",
-     "luecken": [],
-     "status": "nicht_erfasst",
-     "variante": {
-      "laufzeit": 24,
-      "speicher": "128 GB",
-      "tarif": null
-     },
-     "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
-      "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
-     }
-    }
-   ],
-   "ladung": {
-    "abstand_s": 2.0,
-    "anfragen": 140,
-    "beendet": 134,
-    "dokument": "complete",
-    "geladen": true,
-    "offen": {
-     "library.telefonica.de": 5,
-     "www.o2online.de": 1
-    },
-    "ohne_antwort_ms": 0,
-    "sekunden": 13.2,
-    "takte_ms": 8050,
-    "wartet_auf": "load"
-   },
-   "speicher_gb": 128,
-   "sperre": null,
-   "status": "gestoert",
-   "stoerung": "seitenform",
-   "struktur": {
-    "anteil_felder": null,
-    "anteil_knoepfe": 0.4,
-    "felder_gefunden": 0,
-    "felder_gesucht": 0,
-    "knoepfe_gefunden": 2,
-    "knoepfe_gesucht": 5
-   },
-   "verworfen": 4
-  },
-  {
-   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
-   "geraet": "samsung-galaxy-s25-ultra",
-   "gescheitert": 0,
-   "grund": "Abruf gestört (HTTP 404)",
-   "http_status": 404,
-   "kombinationen": [],
-   "ladung": null,
-   "speicher_gb": 256,
-   "sperre": "unbekannt",
-   "status": "gestoert",
-   "stoerung": "seitenform",
-   "struktur": {
-    "anteil_felder": null,
-    "anteil_knoepfe": null,
-    "felder_gefunden": 0,
-    "felder_gesucht": 0,
-    "knoepfe_gefunden": 0,
-    "knoepfe_gesucht": 0
-   },
-   "verworfen": 0
-  },
-  {
-   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
-   "geraet": "samsung-galaxy-s25-ultra",
-   "gescheitert": 0,
-   "grund": "Abruf gestört (HTTP 404)",
-   "http_status": 404,
-   "kombinationen": [],
-   "ladung": null,
-   "speicher_gb": 256,
-   "sperre": "unbekannt",
-   "status": "gestoert",
-   "stoerung": "seitenform",
-   "struktur": {
-    "anteil_felder": null,
-    "anteil_knoepfe": null,
-    "felder_gefunden": 0,
-    "felder_gesucht": 0,
-    "knoepfe_gefunden": 0,
-    "knoepfe_gesucht": 0
-   },
-   "verworfen": 0
-  },
-  {
-   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
-   "geraet": "samsung-galaxy-s25-ultra",
-   "gescheitert": 0,
-   "grund": "Abruf gestört (HTTP 404)",
-   "http_status": 404,
-   "kombinationen": [],
-   "ladung": null,
-   "speicher_gb": 256,
-   "sperre": "unbekannt",
-   "status": "gestoert",
-   "stoerung": "seitenform",
-   "struktur": {
-    "anteil_felder": null,
-    "anteil_knoepfe": null,
-    "felder_gefunden": 0,
-    "felder_gesucht": 0,
-    "knoepfe_gefunden": 0,
-    "knoepfe_gesucht": 0
-   },
-   "verworfen": 0
-  },
-  {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "samsung-galaxy-s25-ultra",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1005,7 +23,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-256gb-burgunder-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "apple-iphone-18-pro",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1015,7 +33,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-max-256gb-polar-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "apple-iphone-18-pro-max",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1025,7 +43,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "apple-iphone-17-pro",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1035,7 +53,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "samsung-galaxy-s26",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1045,7 +63,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "apple-iphone-17",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1055,7 +73,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-max-256gb-cosmic-orange-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "apple-iphone-17-pro-max",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1065,7 +83,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ultra-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "samsung-galaxy-s26-ultra",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1075,7 +93,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-256gb-frost-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "google-pixel-11",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1085,7 +103,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-128gb-mitternacht-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "apple-iphone-14",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1095,7 +113,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-pro-128gb-dunkellila-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "apple-iphone-14-pro",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1105,7 +123,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-pro-max-512gb-gold-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "apple-iphone-14-pro-max",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 512,
@@ -1115,7 +133,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "apple-iphone-15",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1125,7 +143,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-plus-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "apple-iphone-15-plus",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1135,7 +153,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-128gb-titan-natur-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "apple-iphone-15-pro",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1145,7 +163,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-max-256gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "apple-iphone-15-pro-max",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1155,7 +173,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "apple-iphone-16",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1165,7 +183,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-plus-128gb-ultramarin-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "apple-iphone-16-plus",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1175,7 +193,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-128gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "apple-iphone-16-pro",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1185,7 +203,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-max-256gb-titan-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "apple-iphone-16-pro-max",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1195,7 +213,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16e-128gb-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "apple-iphone-16e",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1205,7 +223,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17e-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "apple-iphone-17e",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1215,7 +233,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-256gb-burgunder-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "apple-iphone-18-pro",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1225,7 +243,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-max-256gb-polar-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "apple-iphone-18-pro-max",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1235,7 +253,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-air-256gb-himmelblau-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "apple-iphone-air",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1245,7 +263,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/fairphone/fairphone-6-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "fairphone-6",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1255,7 +273,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "google-pixel-10",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1265,7 +283,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10-pro-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "google-pixel-10-pro",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1275,7 +293,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10a-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "google-pixel-10a",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1285,7 +303,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-256gb-canyon-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "google-pixel-11-pro",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1295,7 +313,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-fold-256gb-olive-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "google-pixel-11-pro-fold",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1305,7 +323,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-xl-256gb-canyon-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "google-pixel-11-pro-xl",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1315,7 +333,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-3-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "nothing-phone-3",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1325,7 +343,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-4a-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "nothing-phone-4a",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1335,7 +353,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-4a-pro-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "nothing-phone-4a-pro",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1345,7 +363,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a17-128gb-5g-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "samsung-galaxy-a17",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1355,7 +373,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a27-5g-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "samsung-galaxy-a27",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1365,7 +383,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a37-128gb-awesome-charcoal-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "samsung-galaxy-a37",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1375,7 +393,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a56-128gb-awesome-graphite-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "samsung-galaxy-a56",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1385,7 +403,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a57-128gb-awesome-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "samsung-galaxy-a57",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1395,7 +413,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s23-128gb-pink-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "samsung-galaxy-s23",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1405,7 +423,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s24-128gb-onyx-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "samsung-galaxy-s24",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1415,7 +433,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s24-ultra-256gb-titanium-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "samsung-galaxy-s24-ultra",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1425,7 +443,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-128gb-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "samsung-galaxy-s25",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1435,7 +453,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-fe-128gb-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "samsung-galaxy-s25-fe",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1445,7 +463,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-fe-128gb-pistachio-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "samsung-galaxy-s26-fe",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1455,7 +473,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-plus-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "samsung-galaxy-s26-plus",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1465,7 +483,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-flip8-256gb-pink-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "samsung-galaxy-z-flip8",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1475,7 +493,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-fold8-256gb-lavender-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "samsung-galaxy-z-fold8",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1485,7 +503,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-fold8-ultra-256gb-violet-shadow-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "samsung-galaxy-z-fold8-ultra",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1495,7 +513,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17-512gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "xiaomi-17",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 512,
@@ -1505,7 +523,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17-ultra-512gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "xiaomi-17-ultra",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 512,
@@ -1515,7 +533,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17t-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "xiaomi-17t",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1525,7 +543,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17t-pro-512gb-violett-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "xiaomi-17t-pro",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 512,
@@ -1535,7 +553,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-17-128gb-blue-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "xiaomi-redmi-17",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1545,7 +563,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-15-pro-256gb-schwarz-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "xiaomi-redmi-note-15-pro",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1555,7 +573,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-128gb-purple-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "xiaomi-redmi-note-17",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1565,7 +583,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-pro-256gb-blue-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "xiaomi-redmi-note-17-pro",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1575,7 +593,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-pro-max-256gb-cloud-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "xiaomi-redmi-note-17-pro-max",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1585,7 +603,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "apple-iphone-17-pro",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1595,7 +613,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "samsung-galaxy-s26",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1605,7 +623,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "apple-iphone-17",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1615,7 +633,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-max-256gb-cosmic-orange-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "apple-iphone-17-pro-max",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1625,7 +643,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ultra-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "samsung-galaxy-s26-ultra",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1635,7 +653,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-256gb-frost-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "google-pixel-11",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1645,7 +663,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-128gb-mitternacht-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "apple-iphone-14",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1655,7 +673,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-pro-128gb-dunkellila-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "apple-iphone-14-pro",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1665,7 +683,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-pro-max-512gb-gold-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "apple-iphone-14-pro-max",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 512,
@@ -1675,7 +693,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "apple-iphone-15",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1685,7 +703,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-plus-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "apple-iphone-15-plus",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1695,7 +713,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-128gb-titan-natur-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "apple-iphone-15-pro",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1705,7 +723,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-max-256gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "apple-iphone-15-pro-max",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1715,7 +733,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "apple-iphone-16",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1725,7 +743,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-plus-128gb-ultramarin-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "apple-iphone-16-plus",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1735,7 +753,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-128gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "apple-iphone-16-pro",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1745,7 +763,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-max-256gb-titan-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "apple-iphone-16-pro-max",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1755,7 +773,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16e-128gb-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "apple-iphone-16e",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1765,7 +783,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17e-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "apple-iphone-17e",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1775,7 +793,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-air-256gb-himmelblau-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "apple-iphone-air",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1785,7 +803,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/fairphone/fairphone-6-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "fairphone-6",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1795,7 +813,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "google-pixel-10",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1805,7 +823,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10-pro-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "google-pixel-10-pro",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1815,7 +833,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10a-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "google-pixel-10a",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1825,7 +843,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-256gb-canyon-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "google-pixel-11-pro",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1835,7 +853,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-fold-256gb-olive-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "google-pixel-11-pro-fold",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1845,7 +863,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-xl-256gb-canyon-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "google-pixel-11-pro-xl",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1855,7 +873,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-3-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "nothing-phone-3",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1865,7 +883,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-4a-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "nothing-phone-4a",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1875,7 +893,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-4a-pro-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "nothing-phone-4a-pro",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1885,7 +903,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a17-128gb-5g-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "samsung-galaxy-a17",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1895,7 +913,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a27-5g-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "samsung-galaxy-a27",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1905,7 +923,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a37-128gb-awesome-charcoal-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "samsung-galaxy-a37",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1915,7 +933,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a56-128gb-awesome-graphite-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "samsung-galaxy-a56",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1925,7 +943,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a57-128gb-awesome-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "samsung-galaxy-a57",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1935,7 +953,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s23-128gb-pink-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "samsung-galaxy-s23",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1945,7 +963,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s24-128gb-onyx-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "samsung-galaxy-s24",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1955,7 +973,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s24-ultra-256gb-titanium-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "samsung-galaxy-s24-ultra",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1965,7 +983,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-128gb-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "samsung-galaxy-s25",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1975,7 +993,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-fe-128gb-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "samsung-galaxy-s25-fe",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1985,7 +1003,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-fe-128gb-pistachio-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "samsung-galaxy-s26-fe",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1995,7 +1013,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-plus-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "samsung-galaxy-s26-plus",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2005,7 +1023,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-flip8-256gb-pink-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "samsung-galaxy-z-flip8",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2015,7 +1033,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-fold8-256gb-lavender-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "samsung-galaxy-z-fold8",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2025,7 +1043,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-fold8-ultra-256gb-violet-shadow-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "samsung-galaxy-z-fold8-ultra",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2035,7 +1053,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17-512gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "xiaomi-17",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 512,
@@ -2045,7 +1063,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17-ultra-512gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "xiaomi-17-ultra",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 512,
@@ -2055,7 +1073,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17t-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "xiaomi-17t",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2065,7 +1083,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17t-pro-512gb-violett-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "xiaomi-17t-pro",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 512,
@@ -2075,7 +1093,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-17-128gb-blue-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "xiaomi-redmi-17",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2085,7 +1103,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-15-pro-256gb-schwarz-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "xiaomi-redmi-note-15-pro",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2095,7 +1113,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-128gb-purple-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "xiaomi-redmi-note-17",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2105,7 +1123,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-pro-256gb-blue-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "xiaomi-redmi-note-17-pro",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2115,7 +1133,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-pro-max-256gb-cloud-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "xiaomi-redmi-note-17-pro-max",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2125,7 +1143,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "apple-iphone-17-pro",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2135,7 +1153,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "samsung-galaxy-s26",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2145,7 +1163,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "apple-iphone-17",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2155,7 +1173,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-max-256gb-cosmic-orange-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "apple-iphone-17-pro-max",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2165,7 +1183,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ultra-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "samsung-galaxy-s26-ultra",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2175,7 +1193,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-256gb-frost-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "google-pixel-11",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2185,7 +1203,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-128gb-mitternacht-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "apple-iphone-14",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2195,7 +1213,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-pro-128gb-dunkellila-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "apple-iphone-14-pro",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2205,7 +1223,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-pro-max-512gb-gold-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "apple-iphone-14-pro-max",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 512,
@@ -2215,7 +1233,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "apple-iphone-15",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2225,7 +1243,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-plus-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "apple-iphone-15-plus",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2235,7 +1253,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-128gb-titan-natur-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "apple-iphone-15-pro",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2245,7 +1263,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-max-256gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "apple-iphone-15-pro-max",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2255,7 +1273,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "apple-iphone-16",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2265,7 +1283,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-plus-128gb-ultramarin-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "apple-iphone-16-plus",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2275,7 +1293,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-128gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "apple-iphone-16-pro",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2285,7 +1303,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-max-256gb-titan-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "apple-iphone-16-pro-max",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2295,7 +1313,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16e-128gb-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "apple-iphone-16e",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2305,7 +1323,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17e-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "apple-iphone-17e",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2315,7 +1333,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-256gb-burgunder-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "apple-iphone-18-pro",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2325,7 +1343,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-max-256gb-polar-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "apple-iphone-18-pro-max",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2335,7 +1353,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-air-256gb-himmelblau-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "apple-iphone-air",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2345,7 +1363,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/fairphone/fairphone-6-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "fairphone-6",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2355,7 +1373,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "google-pixel-10",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2365,7 +1383,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10-pro-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "google-pixel-10-pro",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2375,7 +1393,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10a-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "google-pixel-10a",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2385,7 +1403,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-256gb-canyon-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "google-pixel-11-pro",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2395,7 +1413,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-fold-256gb-olive-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "google-pixel-11-pro-fold",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2405,7 +1423,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-xl-256gb-canyon-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "google-pixel-11-pro-xl",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2415,7 +1433,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-3-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "nothing-phone-3",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2425,7 +1443,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-4a-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "nothing-phone-4a",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2435,7 +1453,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-4a-pro-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "nothing-phone-4a-pro",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2445,7 +1463,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a17-128gb-5g-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "samsung-galaxy-a17",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2455,7 +1473,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a27-5g-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "samsung-galaxy-a27",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2465,7 +1483,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a37-128gb-awesome-charcoal-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "samsung-galaxy-a37",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2475,7 +1493,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a56-128gb-awesome-graphite-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "samsung-galaxy-a56",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2485,7 +1503,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a57-128gb-awesome-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "samsung-galaxy-a57",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2495,7 +1513,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s23-128gb-pink-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "samsung-galaxy-s23",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2505,7 +1523,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s24-128gb-onyx-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "samsung-galaxy-s24",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2515,7 +1533,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s24-ultra-256gb-titanium-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "samsung-galaxy-s24-ultra",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2525,7 +1543,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-128gb-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "samsung-galaxy-s25",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2535,7 +1553,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-fe-128gb-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "samsung-galaxy-s25-fe",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2545,7 +1563,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-fe-128gb-pistachio-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "samsung-galaxy-s26-fe",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2555,7 +1573,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-plus-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "samsung-galaxy-s26-plus",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2565,7 +1583,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-flip8-256gb-pink-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "samsung-galaxy-z-flip8",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2575,7 +1593,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-fold8-256gb-lavender-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "samsung-galaxy-z-fold8",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2585,7 +1603,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-fold8-ultra-256gb-violet-shadow-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "samsung-galaxy-z-fold8-ultra",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2595,7 +1613,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17-512gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "xiaomi-17",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 512,
@@ -2605,7 +1623,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17-ultra-512gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "xiaomi-17-ultra",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 512,
@@ -2615,7 +1633,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17t-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "xiaomi-17t",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2625,7 +1643,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17t-pro-512gb-violett-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "xiaomi-17t-pro",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 512,
@@ -2635,7 +1653,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-17-128gb-blue-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "xiaomi-redmi-17",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2645,7 +1663,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-15-pro-256gb-schwarz-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "xiaomi-redmi-note-15-pro",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2655,7 +1673,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-128gb-purple-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "xiaomi-redmi-note-17",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2665,7 +1683,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-pro-256gb-blue-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "xiaomi-redmi-note-17-pro",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2675,7 +1693,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-pro-max-256gb-cloud-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "xiaomi-redmi-note-17-pro-max",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2685,7 +1703,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "apple-iphone-17-pro",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2695,7 +1713,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "samsung-galaxy-s26",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2705,7 +1723,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "apple-iphone-17",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2715,7 +1733,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-max-256gb-cosmic-orange-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "apple-iphone-17-pro-max",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2725,7 +1743,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ultra-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "samsung-galaxy-s26-ultra",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2735,7 +1753,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-256gb-frost-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "google-pixel-11",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2745,7 +1763,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-128gb-mitternacht-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "apple-iphone-14",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2755,7 +1773,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-pro-128gb-dunkellila-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "apple-iphone-14-pro",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2765,7 +1783,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-pro-max-512gb-gold-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "apple-iphone-14-pro-max",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 512,
@@ -2775,7 +1793,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "apple-iphone-15",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2785,7 +1803,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-plus-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "apple-iphone-15-plus",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2795,7 +1813,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-128gb-titan-natur-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "apple-iphone-15-pro",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2805,7 +1823,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-max-256gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "apple-iphone-15-pro-max",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2815,7 +1833,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "apple-iphone-16",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2825,7 +1843,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-plus-128gb-ultramarin-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "apple-iphone-16-plus",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2835,7 +1853,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-128gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "apple-iphone-16-pro",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2845,7 +1863,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-max-256gb-titan-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "apple-iphone-16-pro-max",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2855,7 +1873,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16e-128gb-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "apple-iphone-16e",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2865,7 +1883,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17e-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "apple-iphone-17e",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2875,7 +1893,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-air-256gb-himmelblau-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "apple-iphone-air",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2885,7 +1903,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/fairphone/fairphone-6-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "fairphone-6",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2895,7 +1913,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "google-pixel-10",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2905,7 +1923,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10-pro-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "google-pixel-10-pro",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2915,7 +1933,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10a-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "google-pixel-10a",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2925,7 +1943,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-256gb-canyon-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "google-pixel-11-pro",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2935,7 +1953,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-fold-256gb-olive-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "google-pixel-11-pro-fold",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2945,7 +1963,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-xl-256gb-canyon-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "google-pixel-11-pro-xl",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2955,7 +1973,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-3-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "nothing-phone-3",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2965,7 +1983,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-4a-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "nothing-phone-4a",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2975,7 +1993,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-4a-pro-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "nothing-phone-4a-pro",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2985,7 +2003,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a37-128gb-awesome-charcoal-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "samsung-galaxy-a37",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2995,7 +2013,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a56-128gb-awesome-graphite-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "samsung-galaxy-a56",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -3005,7 +2023,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a57-128gb-awesome-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "samsung-galaxy-a57",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -3015,7 +2033,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s23-128gb-pink-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "samsung-galaxy-s23",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -3025,7 +2043,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s24-128gb-onyx-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "samsung-galaxy-s24",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -3035,7 +2053,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s24-ultra-256gb-titanium-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "samsung-galaxy-s24-ultra",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -3045,7 +2063,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-128gb-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "samsung-galaxy-s25",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -3055,7 +2073,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-fe-128gb-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "samsung-galaxy-s25-fe",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -3065,7 +2083,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-fe-128gb-pistachio-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "samsung-galaxy-s26-fe",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -3075,7 +2093,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-plus-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "samsung-galaxy-s26-plus",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -3085,7 +2103,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-flip8-256gb-pink-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "samsung-galaxy-z-flip8",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -3095,7 +2113,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-fold8-256gb-lavender-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "samsung-galaxy-z-fold8",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -3105,7 +2123,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-fold8-ultra-256gb-violet-shadow-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "samsung-galaxy-z-fold8-ultra",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -3115,7 +2133,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17-512gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "xiaomi-17",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 512,
@@ -3125,7 +2143,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17-ultra-512gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "xiaomi-17-ultra",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 512,
@@ -3135,7 +2153,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17t-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "xiaomi-17t",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -3145,7 +2163,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17t-pro-512gb-violett-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "xiaomi-17t-pro",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 512,
@@ -3155,7 +2173,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-15-pro-256gb-schwarz-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "xiaomi-redmi-note-15-pro",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -3165,7 +2183,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-pro-256gb-blue-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "xiaomi-redmi-note-17-pro",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -3175,10 +2193,100 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-pro-max-256gb-cloud-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "xiaomi-redmi-note-17-pro-max",
-   "grund": "3 Seiten in Folge mit anderer Form: Abruf gestört (HTTP 404)",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
+   "geraet": "samsung-galaxy-s25-ultra",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
+   "geraet": "samsung-galaxy-s25-ultra",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
+   "geraet": "samsung-galaxy-s25-ultra",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-256gb-burgunder-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "apple-iphone-18-pro",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-max-256gb-polar-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "apple-iphone-18-pro-max",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a17-128gb-5g-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "samsung-galaxy-a17",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a27-5g-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "samsung-galaxy-a27",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-17-128gb-blue-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "xiaomi-redmi-17",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "nicht_besucht"
+  },
+  {
+   "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-128gb-purple-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
+   "geraet": "xiaomi-redmi-note-17",
+   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "http_status": null,
+   "kombinationen": [],
+   "speicher_gb": 128,
    "sperre": null,
    "status": "nicht_besucht"
   }
@@ -3415,5 +2523,5 @@
  ],
  "uebersichten": [],
  "vertragsform": "tarif_plus_ratenkauf",
- "zeitbudget_sekunden": 10265
+ "zeitbudget_sekunden": 10184
 }
