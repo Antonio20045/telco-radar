@@ -2,8 +2,8 @@
  "updated": "2026-11-03",
  "anbieter": {
   "ALDI TALK": {
-   "laeufe": 99,
-   "funde_gesamt": 585,
+   "laeufe": 100,
+   "funde_gesamt": 591,
    "letzter_lauf": "2026-11-03",
    "letzte_funde": 6,
    "letzter_fund": "2026-11-03",
@@ -316,8 +316,8 @@
    "tote_adressen": 0
   },
   "Vodafone": {
-   "laeufe": 97,
-   "funde_gesamt": 16652,
+   "laeufe": 98,
+   "funde_gesamt": 16814,
    "letzter_lauf": "2026-11-03",
    "letzte_funde": 162,
    "termine": [
@@ -630,8 +630,8 @@
    "tote_adressen": 0
   },
   "o2": {
-   "laeufe": 97,
-   "funde_gesamt": 6531,
+   "laeufe": 98,
+   "funde_gesamt": 6597,
    "letzter_lauf": "2026-11-03",
    "letzte_funde": 66,
    "termine": [
@@ -936,7 +936,7 @@
      "2026-11-03",
      66,
      "gelesen",
-     1247,
+     1360,
      0,
      null
     ]
@@ -1258,7 +1258,7 @@
   },
   "ElectronicPartner": {
    "laeufe": 1,
-   "funde_gesamt": 464,
+   "funde_gesamt": 483,
    "letzte_funde": 19,
    "termine": [
     "2026-09-02",
@@ -1534,7 +1534,7 @@
   },
   "Medimax": {
    "laeufe": 1,
-   "funde_gesamt": 403,
+   "funde_gesamt": 423,
    "letzte_funde": 20,
    "termine": [
     "2026-09-02",
@@ -1808,9 +1808,9 @@
   },
   "congstar": {
    "laeufe": 65,
-   "funde_gesamt": 12633,
+   "funde_gesamt": 12710,
    "letzter_lauf": "2026-11-02",
-   "letzte_funde": 121,
+   "letzte_funde": 77,
    "termine": [
     "2026-09-03",
     "2026-09-04",
@@ -2105,18 +2105,18 @@
     ],
     [
      "2026-11-03",
-     121,
+     77,
      "lesefehler",
-     784,
-     36,
+     512,
+     26,
      0
     ]
    ],
    "tote_adressen": 0
   },
   "1&1": {
-   "laeufe": 89,
-   "funde_gesamt": 3404,
+   "laeufe": 90,
+   "funde_gesamt": 3445,
    "letzter_lauf": "2026-11-03",
    "letzte_funde": 41,
    "termine": [
@@ -2680,8 +2680,8 @@
    "tote_adressen": null
   },
   "Saturn": {
-   "laeufe": 85,
-   "funde_gesamt": 1475,
+   "laeufe": 86,
+   "funde_gesamt": 1495,
    "letzter_lauf": "2026-11-03",
    "letzte_funde": 20,
    "termine": [
@@ -6568,7 +6568,7 @@
     "https://mobile.1und1.de/smartphones"
    ],
    "titel_roh": "Apple iPhone 18 Pro 256 GB silber",
-   "preis_mit_vertrag_ab": 52.99,
+   "preis_mit_vertrag_ab": 49.99,
    "laufzeit_monate": 36,
    "tarif_referenz": "1&1 All-Net-Flat S"
   },
@@ -7474,7 +7474,7 @@
     "https://mobile.1und1.de/smartphones"
    ],
    "titel_roh": "Samsung Samsung Galaxy S26 Ultra 256 GB cobalt violet",
-   "preis_mit_vertrag_ab": 42.99,
+   "preis_mit_vertrag_ab": 44.99,
    "laufzeit_monate": 36,
    "tarif_referenz": "1&1 All-Net-Flat S"
   },
