@@ -13,6 +13,7 @@ eigenen Band der Maßstab, und nur, wo Vodafone kein Bündel hat (`modelle()`).
 
 from __future__ import annotations
 
+from ..tco_kosten import POSTEN_NUR_24_PLUS_12
 from ..tco_model import TCO_HORIZONT
 from . import geraete_notbremse as notbremse
 from . import geraete_tco_karten as karten_modul
@@ -72,6 +73,18 @@ def nur_ueber_24(karte: dict) -> bool:
 def nur_24(karten: list, anbieter: str) -> bool:
     """Führt der Anbieter unter diesen Karten ein „24 + 12“-Angebot?"""
     return any(k["anbieter"] == anbieter and nur_ueber_24(k) for k in karten)
+
+
+def nur_24_karte(karten: list, anbieter: str, *quellen: dict) -> dict | None:
+    """Die Karte des Anbieters im Radar; führt er nur „24 + 12“, trägt sie die
+    benannte Lücke des Exports (`tco_kosten.POSTEN_NUR_24_PLUS_12`) als Grund.
+
+    `quellen` sind die Kartenlisten (je Anbieter) in der Reihenfolge, in der die
+    erste mit einem Treffer gilt."""
+    karte = next((q[anbieter] for q in quellen if q.get(anbieter)), None)
+    if nur_24(karten, anbieter):
+        return {**(karte or {}), "leer_grund": POSTEN_NUR_24_PLUS_12}
+    return karte
 
 
 def fehlt_satz(anbieter: str, karten: list, laufzeit: int) -> str:

@@ -38,6 +38,7 @@ import yaml
 from bestand_pfad import lese_wurzel
 from tarifleiter_testbestand import mit_leiter
 
+from telco_radar import tco_kosten
 from telco_radar.geraete_config import lade_katalog, lade_quellen
 from telco_radar.report import (
     geraete_export,
@@ -579,3 +580,36 @@ def test_ohne_24er_nennt_der_katalog_die_raten_des_gezeigten_buendels(tmp_path):
         zeile["buendel_monat"],
         zeile["buendel_raten"],
     ) == ("o2", 75.0, 12)
+
+
+def test_der_radar_nennt_fuer_1und1_die_luecke_des_exports_statt_kein_buendel(g):
+    """1&1 führt nur „24 + 12“ (36 Monate): die Radarzeile nennt dieselbe
+    benannte Lücke wie die Lücken-Spalte des Bündel-Exports
+    (`tco_kosten.POSTEN_NUR_24_PLUS_12`), nicht „kein Bündel erhoben“ - ein
+    Bündel ist ja erhoben, nur ohne 24-Monats-Preis."""
+    gruppen = geraete_radar.netzbetreiber_gruppen(
+        g["tco"]["modelle"], g["tco"]["band_je_tarif"]
+    )
+    gruppe = next(x for x in gruppen if x["id"] == MODELL)
+    eins = [z for z in gruppe["zeilen"] if z["anbieter"] == "1&1"]
+    assert [z["grund"] for z in eins] == [tco_kosten.POSTEN_NUR_24_PLUS_12]
+    assert eins[0]["grund"].startswith("24-Monats-Preis (nur als 24 + 12")
+    text, _n = geraete_export.tco_csv(g["tco"]["export"])
+    luecken = {
+        z["Lücke"]
+        for z in csv.DictReader(io.StringIO(text.lstrip("﻿")), delimiter=";")
+        if z.get("Anbieter") == "1&1"
+    }
+    assert any(tco_kosten.POSTEN_NUR_24_PLUS_12 in x for x in luecken), luecken
+
+
+def test_gegenprobe_ein_anbieter_ohne_24_plus_12_behaelt_seinen_grund(g):
+    """Wer nicht „24 + 12“ führt, bekommt den Satz nicht: eine Zeile ohne
+    Karte nennt weiter „kein Bündel erhoben“."""
+    modell = next(m for m in g["tco"]["modelle"] if m["id"] == MODELL)
+    ohne = {**modell, "karten": [k for k in modell["karten"] if k["anbieter"] != "1&1"]}
+    gruppen = geraete_radar.netzbetreiber_gruppen([ohne], g["tco"]["band_je_tarif"])
+    eins = [z for z in gruppen[0]["zeilen"] if z["anbieter"] == "1&1"]
+    assert [z["grund"] for z in eins] == [
+        "Für dieses Modell ist bei 1&1 kein Bündel erhoben."
+    ]

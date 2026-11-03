@@ -8,17 +8,15 @@ from telco_radar.report import geraete_teurer as gt
 def _modell(schluessel, ab, delta, prozent=None, band="m"):
     """Eine Katalogzeile; `delta` ist Wettbewerber minus Vodafone im Band."""
     teurer = (
-        [
-            {
-                "anbieter": "congstar",
-                "preis": ab,
-                "vodafone": round(ab - delta, 2),
-                "band": band,
-                "band_label": band.upper(),
-            }
-        ]
+        {
+            "anbieter": "congstar",
+            "preis": ab,
+            "vodafone": round(ab - delta, 2),
+            "band": band,
+            "band_label": band.upper(),
+        }
         if delta is not None and delta < 0
-        else []
+        else None
     )
     return {
         "schluessel": schluessel,
@@ -64,42 +62,6 @@ def test_d1_basis_ist_der_wettbewerberpreis():
 
 def _geraete_d1():
     return [_geraet("s25", [("Vodafone", 799.9), ("o2", 725.9)])]
-
-
-def test_d3_ein_anderes_band_reicht():
-    """Pixel 11 Pro Fold 256: das günstigste Angebot liegt in XS knapp unter
-    Vodafone, in XL ist o2 deutlich günstiger - das Modell steht in der Liste,
-    mit dem Band, in dem Vodafone teurer ist."""
-    m = _modell("fold", 2500.0, -50.0, band="xs")
-    m["tco_vodafone_teurer"].append(
-        {
-            "anbieter": "o2",
-            "preis": 3120.0,
-            "vodafone": 3788.88,
-            "band": "xl",
-            "band_label": "XL",
-        }
-    )
-    (z,) = gt.mit_tarif([m])
-    assert (z["anbieter"], z["band"], z["abstand"]) == ("o2", "xl", 668.88)
-    assert z["prozent"] == 21.4
-
-
-def test_d3_das_band_des_guenstigsten_angebots_bleibt_vorn():
-    """Liegt schon das Band des günstigsten Angebots über der Schwelle, zeigt
-    die Liste dieses Band, auch wenn ein anderes Band höher liegt."""
-    m = _modell("air", 1192.0, -427.8, band="xs")
-    m["tco_vodafone_teurer"].append(
-        {
-            "anbieter": "o2",
-            "preis": 1470.76,
-            "vodafone": 2211.64,
-            "band": "xl",
-            "band_label": "XL",
-        }
-    )
-    (z,) = gt.mit_tarif([m])
-    assert (z["band"], z["preis"]) == ("xs", 1192.0)
 
 
 def _geraet(gid, preise):
@@ -194,3 +156,99 @@ def test_seite_zeigt_acht_zeilen_und_den_rest_hinter_einem_klick(tmp_path, monke
     assert len(teil.select("details.gx-mehr li")) == 3
     assert s.select_one(".gx-held .gx-art--tarif b").get_text() == "0"
     assert s.select_one("#teuer > div.gx-art--tarif .gx-leer") is not None
+
+
+def _karte_m(anbieter, band, gesamt):
+    """Eine Bündelkarte der Standardansicht (24 Raten) im Aufbau der Seite."""
+    return {
+        "anbieter": anbieter,
+        "eigen": anbieter == "Vodafone",
+        "band": band,
+        "gesamt": gesamt,
+        "vergleichbar": True,
+        "belastbar": True,
+        "frisch": True,
+        "zaehlt": True,
+        "naeherung": False,
+        "raten_laufzeit": 24,
+        "leitzahl_monate": 24,
+        "quelle_url": f"https://beispiel.test/{anbieter}?tarif={band}",
+    }
+
+
+def _modell_m(schluessel, karten):
+    """Das Modell wie die Seite es führt: Wettbewerber tragen `delta` gegen
+    Vodafone im selben Band (so rechnet die Tarifaufbereitung)."""
+    eigen = {k["band"]: k["gesamt"] for k in karten if k["eigen"]}
+    return {
+        "id": schluessel,
+        "karten": [
+            k
+            if k["eigen"]
+            else {**k, "delta": {"betrag": round(k["gesamt"] - eigen[k["band"]], 2)}}
+            for k in karten
+        ],
+    }
+
+
+IPHONE17 = _modell_m(
+    "apple-iphone-17-256",
+    [
+        _karte_m("Vodafone", "m", 1797.4),
+        _karte_m("Vodafone", "l", 1947.4),
+        _karte_m("congstar", "m", 1360.0),
+        _karte_m("congstar", "l", 1336.0),
+    ],
+)
+"""iPhone 17 256 GB (Livestand 03.11.2026): Vodafone M 1.797,40 (Diagramm),
+L 1.947,40; congstar M 1.360,00, L 1.336,00."""
+
+
+def _zeile_aus(modell):
+    from telco_radar.report import geraete_delta_wort, geraete_view
+
+    spalte = geraete_delta_wort.ergaenze(geraete_view._tco_spalte(modell), modell)
+    (z,) = gt.mit_tarif([{"schluessel": modell["id"], "titel": "X", **spalte}])
+    return z
+
+
+def test_block_und_diagramm_nennen_denselben_vodafone_betrag():
+    """Punkt 1: der Block „Über 10 % teurer“ rechnet auf Tarif M, 24 Monate wie
+    das Diagramm „Preispositionierung“ - Vodafone 1.797,40 statt 1.947,40 (L)."""
+    from telco_radar.report import geraete_preisposition_preise as pre
+
+    karten = pre.preise_je_anbieter(IPHONE17)
+    assert karten["Vodafone"]["gesamt"] == 1797.4
+    z = _zeile_aus(IPHONE17)
+    assert z["vodafone"] == karten["Vodafone"]["gesamt"] == 1797.4
+    assert z["preis"] == karten["congstar"]["gesamt"] == 1360.0
+    assert (z["abstand"], z["prozent"], z["band"]) == (437.4, 32.2, "m")
+
+
+def test_gegenprobe_liegt_nur_das_band_l_ueber_der_schwelle_fehlt_die_zeile():
+    """Gegenprobe: in L ist Vodafone 611,40 teurer, in M nur 3,3 % - dann steht
+    das Modell nicht im Block (früher stand es mit dem L-Betrag darin)."""
+    modell = _modell_m(
+        "apple-iphone-17-256",
+        [
+            _karte_m("Vodafone", "m", 1380.0),
+            _karte_m("Vodafone", "l", 1947.4),
+            _karte_m("congstar", "m", 1336.0),
+            _karte_m("congstar", "l", 1336.0),
+        ],
+    )
+    from telco_radar.report import geraete_view
+
+    spalte = geraete_view._tco_spalte(modell)
+    assert gt.mit_tarif([{"schluessel": "x", "titel": "X", **spalte}]) == []
+
+
+def test_ohne_geprueften_m_preis_steht_keine_zeile():
+    """Ein fehlender Vodafone-Preis in M ist eine Lücke, kein Vergleich."""
+    modell = _modell_m(
+        "x", [_karte_m("Vodafone", "l", 1947.4), _karte_m("congstar", "l", 1000.0)]
+    )
+    from telco_radar.report import geraete_view
+
+    spalte = geraete_view._tco_spalte(modell)
+    assert gt.mit_tarif([{"schluessel": "x", "titel": "X", **spalte}]) == []

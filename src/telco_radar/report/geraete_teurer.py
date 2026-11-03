@@ -5,9 +5,10 @@ Zwei Listen für die Geräteseite, je eine für den Umschalter "Mit Tarif" und
 `SCHWELLE_PROZENT` über dem günstigsten Wettbewerber liegt, gemessen am
 Wettbewerberpreis (D1, 14.10.2026).
 
-Mit Tarif liest je Band das günstigste fremde Bündel samt Vodafone-Referenz
-desselben Bands (`tco_vodafone_teurer` aus `geraete_view`), alle Bänder der
-Standardansicht (D3). Einzelgerät
+Mit Tarif liest das Bündel, das auch das Diagramm "Preispositionierung"
+zeigt: Tarif M, 24 Monate, nur geprüfte Preise (`tco_vodafone_teurer` aus
+`geraete_view`, Karten von `geraete_preisposition_preise`), das günstigste
+fremde Bündel gegen Vodafone. Einzelgerät
 liest den letzten gemessenen Preis je Anbieter aus dem Preisverlauf.
 """
 
@@ -31,28 +32,42 @@ def prozent(vodafone: float, preis: float) -> float | None:
     return round((vodafone - preis) / preis * 100, 1)
 
 
+def vergleich_m(karten: dict[str, dict]) -> dict | None:
+    """Vodafone gegen das günstigste fremde Bündel auf der Basis des Diagramms.
+
+    `karten` ist `geraete_preisposition_preise.preise_je_anbieter` (Anbieter ->
+    Karte, Tarif M, 24 Monate, geprüft): dieselben Zahlen wie die Punkte des
+    Diagramms. Fehlt Vodafone oder jeder Fremde, gibt es keinen Vergleich
+    (`None`, eine Lücke, nie eine 0)."""
+    eigen = next((k for k in karten.values() if k.get("eigen")), None)
+    fremde = [k for k in karten.values() if not k.get("eigen")]
+    if eigen is None or not fremde:
+        return None
+    bester = min(fremde, key=lambda k: (k["gesamt"], k["anbieter"] or ""))
+    return {
+        "anbieter": bester["anbieter"],
+        "preis": bester["gesamt"],
+        "vodafone": eigen["gesamt"],
+        "band": bester.get("band"),
+        "band_label": band_label(bester.get("band")),
+    }
+
+
 def mit_tarif(katalog_modelle: list[dict]) -> list[dict]:
     """Modelle, bei denen das Bündel bei Vodafone über der Schwelle teurer ist.
 
-    Geprüft werden alle Bänder der Standardansicht (D3, 14.10.2026,
-    `tco_vodafone_teurer` aus `geraete_view._tco_spalte`): je Band das
-    günstigste fremde Bündel gegen Vodafone im selben Band. Liegt das Band des
-    insgesamt günstigsten Angebots (`tco_band`) über der Schwelle, zeigt die
-    Liste dieses Band wie bisher; sonst das Band mit dem höchsten Prozentsatz.
+    Gerechnet wird auf der Basis des Diagramms (`vergleich_m`, Tarif M, 24
+    Monate, geprüfte Preise): Betrag, Abstand und Prozent sind dort dieselben
+    wie im Diagramm. Ein Modell ohne diesen Vergleich steht nicht in der Liste.
     """
     zeilen = []
     for m in katalog_modelle:
-        kandidaten = []
-        for b in m.get("tco_vodafone_teurer") or []:
-            p = prozent(b["vodafone"], b["preis"])
-            if p is not None and p >= SCHWELLE_PROZENT:
-                kandidaten.append((p, b))
-        if not kandidaten:
+        b = m.get("tco_vodafone_teurer")
+        if not b:
             continue
-        p, b = max(
-            kandidaten,
-            key=lambda pb: (pb[1]["band"] == m.get("tco_band"), pb[0], -pb[1]["preis"]),
-        )
+        p = prozent(b["vodafone"], b["preis"])
+        if p is None or p < SCHWELLE_PROZENT:
+            continue
         zeilen.append(
             {
                 "id": m.get("schluessel"),
@@ -112,28 +127,3 @@ def listen(geraete: dict) -> dict:
         "geraet": einzelgeraet(((geraete.get("verlauf") or {}).get("geraete")) or []),
         "schwelle": SCHWELLE_PROZENT,
     }
-
-
-def je_band(zaehlende: list) -> list[dict]:
-    """Je Band das günstigste fremde Bündel, das unter Vodafone liegt.
-
-    D3 (Antonio, 14.10.2026): "Mit Tarif über 10 % teurer" prüft ALLE
-    Bänder, nicht nur das Band des insgesamt günstigsten Angebots. Der
-    Vodafone-Betrag ist die Referenz derselben Karte (`delta`, gleiches
-    Band, gleiche Laufzeit): Kosten minus Abstand.
-    """
-    je_band: dict[str, dict] = {}
-    for k in zaehlende:
-        delta = k.get("delta") or {}
-        if k.get("eigen") or delta.get("betrag") is None or delta["betrag"] >= 0:
-            continue
-        bisher = je_band.get(k.get("band"))
-        if bisher is None or k["gesamt"] < bisher["preis"]:
-            je_band[k.get("band")] = {
-                "anbieter": k.get("anbieter"),
-                "preis": k["gesamt"],
-                "vodafone": round(k["gesamt"] - delta["betrag"], 2),
-                "band": k.get("band"),
-                "band_label": band_label(k.get("band")),
-            }
-    return list(je_band.values())

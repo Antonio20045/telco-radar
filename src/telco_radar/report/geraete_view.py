@@ -52,14 +52,13 @@ from . import (
     geraete_alarme,
     geraete_bereinigung,
     geraete_pruefung,
-    geraete_teurer,
     geraete_tco_karten,
     geraete_tco_view,
     geraete_vergleich,
     geraete_verlauf,
     geraete_zeitreihe,
 )
-from . import geraete_notbremse as notbremse, klick_ueberholt
+from . import geraete_delta_wort, geraete_notbremse as notbremse, klick_ueberholt
 
 from .geraete_laufzeit import LAUFZEIT_STANDARD, ansicht, rang_der_monatsangabe
 from .geraete_tco_band import _MONATE, band_label
@@ -780,7 +779,6 @@ def _tco_leer(grund: str) -> dict:
         "tco_delta_anbieter": None,
         "tco_delta_leer": None,
         "tco_delta_leer_grund": None,
-        "tco_vodafone_teurer": [],
     }
 
 
@@ -898,7 +896,6 @@ def _tco_spalte(modell_tco: dict | None, heute: str = "") -> dict:
             "abgerufen_am": bester.get("abgerufen_am", ""),
         },
         "tco_leer": None,
-        "tco_vodafone_teurer": geraete_teurer.je_band(zaehlende),
     }
 
 
@@ -1123,7 +1120,9 @@ def katalog_modellzeilen(
         name = gruppe["modell"]
         if gruppe["speicher"]:
             name = f"{name} {int(gruppe['speicher'])} GB"
-        tco_felder = _tco_spalte(tco_je_id.get(mid), heute)
+        tco_felder = geraete_delta_wort.ergaenze(
+            _tco_spalte(tco_je_id.get(mid), heute), tco_je_id.get(mid)
+        )
 
         listen_anbieter = sorted({z["anbieter"] for z in zeilen if z["anbieter"]})
         if not listen_anbieter:

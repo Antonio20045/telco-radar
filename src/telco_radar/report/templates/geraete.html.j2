@@ -685,7 +685,8 @@
    `gr-ksprung` in `_geraete_radar.html.j2`. #}
 <section class="gr-katalog" id="katalog">
   <h2 class="rubrik">Alle Geräte
-    <span class="rubrik-zahl">{{ geraete.katalog_modelle | length }}</span></h2>
+    <span class="rubrik-zahl">{{ geraete.katalog_modelle | length }}</span>
+    <span class="rubrik-zahl">Modelle</span></h2>
   {# P4-Fix (Sicht-Pruefung 18.09., Falz 1): DIE LEITZAHL DES KATALOGS -
      der guenstigste Einzelgeraetepreis des Regals als groesste Schrift
      der Tafel. Der Katalog war der einzige der vier Reiter ohne Falz-
@@ -887,6 +888,7 @@
             rel="noopener" title="Quelle bei {{ m.tco_anbieter }} öffnen">bei
             {{ m.tco_anbieter }}<span class="gr-a-pfeil" aria-hidden="true">↗</span></a>
           {% else %}<span class="gr-a-klein">bei {{ m.tco_anbieter }}</span>{% endif %}
+          {% if m.tco_band_label %}<span class="gr-a-klein gr-k-tarif">Tarif {{ m.tco_band_label }}</span>{% endif %}
           {% if m.tco_beleg and m.tco_beleg.abgerufen_am %} <span
             class="gr-a-klein gr-a-datum">{{ m.tco_beleg.abgerufen_am | date_de }}</span>{% endif %}
           {{ belegeintrag(m.schluessel, m.tco_anbieter) }}
@@ -896,7 +898,7 @@
         <td class="gr-sp--tco" data-k="{{ spalten.delta }}">{% if m.tco_delta_kurz %}<span
           class="gr-a-prozent wr-prozent{{ ' wr-prozent--negativ' if m.tco_delta is not none and m.tco_delta < 0 else ' wr-prozent--positiv' }}"{%
           if m.tco_delta_anbieter %} title="Vodafone ist am günstigsten – Δ ist der Abstand des günstigsten Wettbewerber-Angebots ({{ m.tco_delta_anbieter }}) zur Vodafone-Referenz"{% endif %}>{{
-          m.tco_delta_kurz }}</span>{% elif m.tco_delta_leer %}<span
+          m.tco_delta_wort }}</span>{% elif m.tco_delta_leer %}<span
             class="gr-a-klein" title="{{ m.tco_delta_leer_grund }}">{{ m.tco_delta_leer }}</span>{% else %}–{% endif %}</td>
         <td class="gr-sp--tco" data-k="{{ spalten.band }}"><span class="gr-k-band">{{
           m.tco_band_label or '–' }}</span></td>
