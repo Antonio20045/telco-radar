@@ -2238,18 +2238,7 @@ b,strong{font-weight:700}
   .gr-export-fuss .gr-knopf{white-space:nowrap;flex:none}
 }
 
-/* Die TCO-Tafel ("Was kostet es"). Sie borgt sich die Typografie der
-   Alarmtabelle - dieselbe Seite, dieselben Spaltenkoepfe -, hat aber eine
-   eigene Klassenfamilie: die zwei Tabellen beantworten verschiedene Fragen
-   und werden getrennt gedeckelt. */
-.gr-ttab{width:100%;border-collapse:collapse;margin:18px 0 0}
-.gr-ttab th{font-family:var(--sans);font-size:12px;letter-spacing:.08em;
-  text-transform:uppercase;color:var(--ink-4);text-align:left;font-weight:400;
-  padding:0 10px 7px 0;border-bottom:1px solid var(--rule)}
-.gr-ttab td{padding:11px 10px 11px 0;border-bottom:1px solid var(--rule-2);
-  vertical-align:top;font-size:14px}
-.gr-t-anbieter{font-family:var(--serif);font-size:15px;font-weight:600;
-  display:block}
+/* Die TCO-Tafel ("Was kostet es"). */
 /* Die Leitzahl (E2): TCO-24 gross, Ø/Monat daneben klein. */
 .gr-t-leit{font-family:var(--serif);font-size:19px;font-weight:700;
   white-space:nowrap}
@@ -2257,7 +2246,6 @@ b,strong{font-weight:700}
    Etiketten, nicht in der Serife der Betraege - wer die Spalte ueberfliegt,
    soll sie nicht fuer einen kleinen Preis halten. */
 .gr-t-luecke{font-family:var(--sans);font-size:12px;color:var(--ink-4)}
-.gr-tzeile--eigen .gr-t-anbieter{color:var(--red)}
 /* P4/D3 (18.09.2026): KLICKBARKEIT ZEIGT SICH - jedes <summary> der
    Geräteseite trägt Zeiger und Aufklappzeichen. design.md (17.09.):
    20 von 22 Aufklappern des Vergleichs-Reiters sahen aus wie Tabellen-
@@ -2282,12 +2270,8 @@ b,strong{font-weight:700}
   border-bottom:1px solid var(--rule-2)}
 .gr-tposten li:last-child{border-bottom:0}
 .gr-tposten em{font-style:normal;margin-left:auto;color:var(--ink-3)}
-.gr-tposten--luecke em,.gr-tposten--offen em{color:var(--ink-4);
+.gr-tposten--luecke em{color:var(--ink-4);
   font-family:var(--sans);font-size:12px}
-.gr-tposten--offen{margin-top:4px}
-.gr-tueber{font-family:var(--sans);font-size:12px;letter-spacing:.08em;
-  text-transform:uppercase;color:var(--ink-4);font-weight:400;
-  margin:26px 0 0;padding-bottom:6px;border-bottom:1px solid var(--rule)}
 /* Das Euro-Delta gegen uns. Rot heisst hier NICHT "schlecht", sondern
    "guenstiger als wir" - dieselbe Bedeutung wie in der Alarmtabelle. */
 .gr-tdelta{margin:18px 0 0;border-left:3px solid var(--rule);padding-left:13px}
@@ -2536,19 +2520,6 @@ b,strong{font-weight:700}
   .gr-tafel{padding:16px 14px 20px}
   .gr-alarm{min-width:700px}
   .gr-alarm-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
-  /* Die drei Tabellen des TCO-Reiters rollen IN ihrem `gr-scroll`-Behaelter
-     und bekommen dafuer ihre Mindestbreite. Gestaucht waere bei zweien die
-     BELEGSPALTE unlesbar, und der Beleg ist der Grund, warum die Zahl
-     dasteht; `--bereit` hat keine und braucht die Breite nur fuer ihre vier
-     Spalten.
-
-     Natuerliche Breite auf 390 px gemessen, jede einzeln: `--bereit` 437
-     (sie war es, die den Vorzustand auf 480 px Rechtskante schob),
-     `--simonly` 403, `--leit` 436. `--leit` rendert erst, wenn Phase 4
-     Buendel liefert - der Wert stammt aus einem gestellten Bestand. */
-  .gr-ttab--simonly{min-width:520px}
-  .gr-ttab--bereit{min-width:440px}
-  .gr-ttab--leit{min-width:560px}
 }
 
 /* Was auffaellt */
@@ -2618,6 +2589,20 @@ b,strong{font-weight:700}
 .gr-luecke{display:block;color:var(--ink-3);margin-top:2px}
 .gr-tiefe .gr-eigen .dz-balken-fuell{background:var(--red)}
 .gr-basis--duenn{color:var(--r4)}
+
+/* Belege: leiser Aufklapper unter dem Beleg-Link; die Bilder laedt app.js
+   erst beim Oeffnen. */
+.gr-belege{margin:4px 0 0;font-family:var(--sans);font-size:12px}
+.gr-belege>summary{cursor:pointer;color:var(--ink-3);list-style:none}
+.gr-belege>summary::-webkit-details-marker{display:none}
+.gr-belege>summary:hover{color:var(--ink)}
+.gr-belege-liste{display:flex;flex-wrap:wrap;gap:12px;list-style:none;
+  margin:8px 0 0;padding:0}
+.gr-belege-liste li{display:flex;flex-direction:column;gap:3px;
+  max-width:100%}
+.gr-belege-liste img{display:block;width:320px;max-width:100%;height:auto;
+  min-height:60px;background:var(--rule);border:1px solid var(--rule)}
+.gr-belege-tag{color:var(--ink-4);font-size:11px}
 
 /* --- Wer ist guenstiger als Vodafone? (G2, 28.08.2026) ------------------
    ZUR FARBE, nachgesehen am gerenderten Bild statt behauptet: in diesem
@@ -3388,7 +3373,6 @@ b,strong{font-weight:700}
     padding:5px 8px}
   .gr-msel-feld{flex-basis:100%;gap:6px}
   .gr-msel-feld select{flex-basis:170px}
-  .gr-tueber{margin-top:2px}
   .gr-antwort{padding:6px 0 2px;margin:0 0 6px}
   /* Der Spalt zwischen den zwei Zahlen ist auf dem Telefon kleiner als auf
      dem Schreibtisch: er gibt den Bloecken die Breite, die der Anbieter in
@@ -3857,101 +3841,6 @@ td .gr-sprung,td .gr-ksprung{display:inline-block;margin-top:3px}
 .gr-zr-baender button[aria-pressed="true"] small{color:var(--red-deep)}
 .gr-zr-baender button:disabled{opacity:.38;cursor:default}
 .gr-zr-baender button:focus-visible{outline:2px solid var(--red);outline-offset:-2px}
-/* --- P1/F3 (A3, 17.09.2026): MODELL-KARTEN statt einzeiliger Chips ----
-   Der Schnelleingang ist kein Knopf-Reihen-Nachschub mehr, sondern die
-   erste Preisantwort der Tafel: Modellname (Etikett), ab-Preis GROSS
-   (Serif wie jede Preiszahl der Seite, >= 20 px - Messlatte der Abnahme),
-   darunter Bewegungs-Delta und Anbieter-Punkte in den Hausfarben des
-   Graphen. Linien statt Kaesten bleibt: 1-px-Rahmen, kein Schatten, kein
-   Radius.
-   P1-Fix (Sicht-B1/B2/B3/B4, 17.09.2026): die Werte stehen JE BAND als
-   eigene Spans (.gr-zr-k-band) - der Bandwechsel blendet nur um. Die
-   aktive Karte traegt ROT (Akzent, kein Ink mehr) mit 3 px PLUS Flaeche;
-   inaktive Karten unterstreichen ihren Modellnamen im Hover. Die
-   Bewegung ist die Story der Karte und steht eine Stufe groesser und
-   farbig (steigt rot / sinkt gruen; ±0 bleibt grau und klein - keine
-   Bewegung ist keine Story). */
-.gr-zr-kacheln{display:grid;grid-template-columns:repeat(auto-fit,
-  minmax(158px,1fr));gap:10px;padding-bottom:16px}
-.gr-zr-kacheln button{display:flex;flex-direction:column;align-items:flex-start;
-  gap:2px;min-width:0;padding:9px 12px 8px;
-  border:1px solid var(--rule);background:var(--paper);color:var(--ink);
-  cursor:pointer;text-align:left;font-family:var(--serif)}
-.gr-zr-kacheln button .gr-zr-k-kopf{display:flex;align-items:center;
-  justify-content:space-between;gap:8px;width:100%;min-width:0}
-/* P4-Fix (Sicht-Pruefung 18.09., Kleineres 8): der Kachelname bricht UM,
-   er wird nicht abgeschnitten. text-overflow:ellipsis kuerzte drei der
-   sechs Karten auf dasselbe "GALAXY S26 UL…" - die GB-Stufe (der Teil,
-   der die Zwillinge unterscheidet) fiel weg, und Regel 2 dieser Vorlage
-   ("keine mit '…' abgeschnittene Beschriftung") galt fuer die Karten
-   nicht. Der Umbruch kostet Hoehe nur bei mehrzeiligen Namen; die
-   GB-Stufe steht im gleichen String ("· 512 GB") und wandert mit. */
-.gr-zr-kacheln button .gr-zr-k-name{font-family:var(--sans);font-size:12px;
-  font-weight:700;letter-spacing:.05em;text-transform:uppercase;
-  color:var(--ink-3);min-width:0;overflow-wrap:break-word}
-.gr-zr-kacheln button:hover .gr-zr-k-name,.gr-zr-kacheln button:focus-visible
-  .gr-zr-k-name{text-decoration:underline;text-underline-offset:2px}
-/* Die Band-Spans: EINE Sichtbarkeit-Regel mit eigener [hidden]-Zeile -
-   die Klasse allein (display:flex) wuerde das globale [hidden] schlagen
-   (gleiche Spezifitaet, spaetere Regel gewinnt) und der Umschalter
-   bliebe ohne Wirkung. Die [hidden]-Zeile ist absichtlich spezifischer
-   als jede Gestaltungsregel derselben Spans (die Punkte-Spans sind
-   Band-Span UND Reihe zugleich). */
-.gr-zr-k-band{display:flex;flex-direction:column;align-items:flex-start;
-  gap:1px;min-width:0}
-.gr-zr-kacheln .gr-zr-k-band[hidden]{display:none}
-.gr-zr-k-band .gr-zr-k-preis{display:flex;align-items:baseline;
-  flex-wrap:wrap;gap:4px;margin-top:2px}
-.gr-zr-k-band .gr-zr-k-preis small{font-family:var(--sans);
-  font-size:12px;color:var(--ink-4)}
-.gr-zr-k-band .gr-zr-k-preis small.gr-zr-k-leer{font-size:14px;
-  color:var(--ink-3);cursor:help}
-/* A3: der alte Stand der Kachel ist ein SATZ mit Datum, kein „—" - er
-   darf umbrechen (der ab-Preis bleibt nowrap, das Wort nicht). */
-.gr-zr-k-band .gr-zr-k-preis small.gr-zr-k-alt{white-space:normal;
-  line-height:1.35}
-.gr-zr-k-band .gr-zr-k-preis b{font-family:var(--serif);font-size:21px;
-  font-weight:700;font-variant-numeric:lining-nums;letter-spacing:-.01em;
-  line-height:1.15;white-space:nowrap}
-.gr-zr-k-band .gr-zr-k-monat{font-family:var(--sans);font-size:12px;
-  color:var(--ink-4);white-space:nowrap}
-.gr-zr-k-band .gr-zr-k-delta{font-family:var(--sans);
-  font-weight:600;white-space:nowrap;margin-top:1px}
-/* Die Richtungsklassen muessen die Specificitaet der Basisregel
-   (.gr-zr-k-band .gr-zr-k-delta, Gewicht 600) schlagen - ein bloesses
-   .gr-zr-k-delta--steigt verlöre font-weight dagegen (gemessen). */
-.gr-zr-k-band .gr-zr-k-delta--steigt,.gr-zr-k-band .gr-zr-k-delta--sinkt{
-  font-size:13.5px;font-weight:700}
-.gr-zr-k-delta--steigt{color:var(--red)}
-.gr-zr-k-delta--sinkt{color:var(--gruen-tief)}
-/* Die Punkte-Spalte ist selbst ein Band-Span (wechselt mit) - ihr
-   flex-direction MUSS hier ausdrücklich row stehen, sonst erbt sie die
-   column des Band-Koerpers und stapelt die Anbieterpunkte untereinander
-   (mobil mass das +36 px Kartenhoehe, 11c fiel auf 872 px). */
-.gr-zr-kacheln button .gr-zr-k-punkte{display:flex;flex-direction:row;
-  gap:4px;flex:none}
-.gr-zr-k-punkte i{width:10px;height:10px;border-radius:50%;display:block;
-  border:1px solid var(--paper)}
-.gr-zr-kacheln button:hover,.gr-zr-kacheln button:focus-visible{
-  border-color:var(--ink-3)}
-/* P4-Fix (Sicht-Pruefung 18.09., Rot-Deckel): die AKTIVE Karte traegt
-   INK statt Rot. Rot trug bis hierher vier Bedeutungen auf einer Tafel
-   (Marke, aktiv, Delta, Link) - aktiv ist keine Daten-, sondern eine
-   Auswahl-Bedeutung; ein schwarzer 3-px-Rand ist in der Zeitungssprache
-   derselben Seite die deutlichere Markierung und nimmt Rot die dritte
-   Bedeutung. P1-Messlatte unveraendert erfuellt: Rahmen 3 px >= 2 px
-   plus Flaechenaenderung (paper-2). */
-.gr-zr-kacheln button[aria-pressed="true"]{border-color:var(--ink);
-  border-width:3px;background:var(--paper-2)}
-/* P1-Fix (Sicht-A1): die Preiszahl der AKTIVEN Karte mit echtem Angebot
-   ist der dritte Eingang des Rechenweg-Panels - dieselbe gepunktete
-   rote Unterscheidung wie die Preiszahl des Antwort-Satzes. Das Styling
-   haengt am data-anb des Band-Koerpers (nur mit Anbieter, nie am
-   Leerzustand „-"). */
-.gr-zr-kacheln button[aria-pressed="true"] .gr-zr-k-band[data-anb]
-  .gr-zr-k-preis b{cursor:pointer;border-bottom:2px dotted var(--red)}
-.gr-zr-kacheln button[aria-pressed="true"] .gr-zr-k-band[data-anb]
-  .gr-zr-k-preis b:hover{color:var(--red);border-bottom-style:solid}
 /* --- Ende P1/F3 (A3): Modell-Karten --------------------------------- */
 /* P4/D4 (STRATEGIE_GERAETE_V3, 18.09.2026): DIE ANTWORT IST DIE
    GROESSTE ZAHL (design.md Regel 1). Vier Reiter, vier Leitzahlen -
@@ -4035,7 +3924,7 @@ td .gr-sprung,td .gr-ksprung{display:inline-block;margin-top:3px}
 .gr-zr-punkt{stroke:var(--paper-2);stroke-width:1.6}
 .gr-zr-ende{stroke-width:2.6}
 /* P2/D2: die Markerform - ein offener Umriss UM den bestehenden Kreis
-   (`_form_pfad` in geraete_zeitreihe.py), Farbe kommt inline vom Anbieter.
+   (`form_pfad` in geraete_zeitreihe.py), Farbe kommt inline vom Anbieter.
    `pointer-events:none`: die Trefferflaeche (.gr-zr-hit) bleibt allein
    fuer Klicks zustaendig, die Form darf ihr nie im Weg stehen. */
 .gr-zr-form{pointer-events:none}
@@ -4161,19 +4050,6 @@ circle.gr-zr-punkt.gr-zr-aktiv{stroke:var(--ink);stroke-width:2.8}
   .gr-zr-laufzeiten button{padding:6px 4px}
   .gr-zr-laufzeiten button .gr-zr-lang{display:none}
   .gr-zr-laufzeiten button .gr-zr-kurz{display:inline}
-  /* P1/F3 (A3): die Karten rollen QUER (kein 2x3-Berg - der wuerde die
-     Antwort um ueber 100 px unter die 844-er-Falz druecken, Kriterium
-     11c geht vor). Alle Karten bleiben ohne vertikalen Berg erreichbar;
-     der Preis bleibt auch hier >= 20 px (Messlatte). P1-Fix (Sicht-B4):
-     das Bewegungs-Delta ist eine Stufe gewachsen (13,5 px) - die beiden
-     Karten-Paddings sind dafuer um denselben Betrag schmaler, 11c mass
-     846 statt 844. */
-  .gr-zr-kacheln{display:flex;flex-wrap:nowrap;overflow-x:auto;
-    -webkit-overflow-scrolling:touch;padding-bottom:4px;gap:6px}
-  .gr-zr-kacheln button{flex:0 0 auto;width:156px;gap:1px;padding:6px 10px 4px}
-  .gr-zr-kacheln button .gr-zr-k-preis{margin-top:1px}
-  .gr-zr-kacheln button .gr-zr-k-preis b{font-size:20px;line-height:1.1}
-  .gr-zr-kacheln button .gr-zr-k-delta{margin-top:0}
   /* 11c geht vor (§3.2): am echten Bestand mass der Graphkopf mit den
      alten Abstaenden 854 von 844 px - die Kartenzeile kostet jetzt mehr
      Flaeche als die alten Chips, deshalb werden die gr-zr-eigenen
@@ -4186,11 +4062,6 @@ circle.gr-zr-punkt.gr-zr-aktiv{stroke:var(--ink);stroke-width:2.8}
      holt die Zeile zurueck (Karteninnenabstaende, Namendurchschuss,
      Wahl- und Kartenboden); gemessen: Kopfboden 841 von 844. */
   .gr-zr-wahl{padding-bottom:0}
-  .gr-zr-kacheln{padding-bottom:0}
-  .gr-zr-kacheln button{padding:4px 10px 2px}
-  .gr-zr-kacheln button .gr-zr-k-name{line-height:1.08}
-  .gr-zr-kacheln button .gr-zr-k-preis{margin-top:0}
-  .gr-zr-kacheln button .gr-zr-k-preis b{line-height:1.02}
   .gr-zr-rechnung{margin-bottom:0}
   .gr-zr-antwort{font-size:14.5px;line-height:1.32;padding-top:3px;
     margin-bottom:0}
@@ -4229,8 +4100,6 @@ circle.gr-zr-punkt.gr-zr-aktiv{stroke:var(--ink);stroke-width:2.8}
   .gr-leit-zahl{line-height:1}
   .gr-leit-label{line-height:1.25}
   .gr-zr-antwort{line-height:1.26;padding-top:2px}
-  .gr-zr-kacheln button{padding-bottom:0}
-  .gr-zr-kacheln button .gr-zr-k-name{line-height:1.05}
 }
 /* P2/D2: ENDLABELS STATT LEGENDE. Auf breit traegt jede Kurve ihr
    Endlabel im Bild (Name, Beleg-Link, Datum - `geraete_zeitreihe._svg`
@@ -5213,12 +5082,9 @@ html.panel-offen{overflow:hidden}
 .gr-reiter .gr-reiter-seite,
 .gr-reiter button,
 .gr-tdetail summary,
-.gr-ttab th,
-.gr-tueber,
 .gr-unter,
 .gr-vlabel,
 .gr-zr-feld>label,
-.gr-zr-kacheln button .gr-zr-k-name,
 .gr-zr-plabel,
 .gr-zr-rechnung>summary,
 .kbadge,
@@ -5361,8 +5227,6 @@ html.panel-offen{overflow:hidden}
 .gr-reiter button[aria-selected="true"]{background:var(--paper-2);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.08)}
 .gr-reiter button[aria-selected="true"]::after,.gr-reiter button::after{display:none}
 .gr-knopf,.gr-band-knopf,.gr-lz-knopf{border-radius:var(--radius-klein)}
-.gr-zr-kacheln button,.gr-zr-k{border-radius:var(--radius);border:1px solid var(--rule-2);background:var(--paper-2)}
-.gr-zr-kacheln button[aria-pressed="true"],.gr-zr-kacheln button.on{border:2px solid var(--ink)}
 .gr-leit-zahl{font-family:var(--schrift);font-weight:500;letter-spacing:-.04em}
 .gr-zr-leit,.gr-zr-antwort,.gr-antwort{border-top:1px solid var(--rule)}
 .gr-zr-antwort{font-size:19px;line-height:1.5}
@@ -5371,9 +5235,6 @@ input[type="search"],input[type="text"],input[type="email"],select{border-radius
   font-family:var(--schrift)}
 table{font-family:var(--schrift)}
 .gr-auf > summary,.gr-zr-rechnung > summary{border-radius:var(--radius-pille)}
-.gr-zr-kacheln button{border-radius:var(--radius);background:var(--paper-2);border:1px solid var(--rule-2);
-  padding:12px 14px 10px;font-family:var(--schrift)}
-.gr-zr-kacheln button[aria-pressed="true"]{border:2px solid var(--ink);box-shadow:none;background:var(--paper)}
 .gr-zr-baender,.gr-zr-laufzeiten{border-radius:var(--radius-klein);overflow:hidden}
 .gr-zr-baender button[aria-pressed="true"],.gr-zr-laufzeiten button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
 .gr-zr-baender button[aria-pressed="true"] small,.gr-zr-laufzeiten button[aria-pressed="true"] small{color:var(--paper);opacity:.75}
@@ -6496,3 +6357,36 @@ a.ki-k1-pille:hover{border-color:var(--ink)}
 .gr-zr-zeitwahl button:focus-visible{outline:2px solid var(--red);outline-offset:2px}
 @media(max-width:600px){.gr-zr-zeitwahl{gap:4px}
 .gr-zr-zeitwahl button{flex:1 1 0;padding:8px 4px;font-size:11px}}
+
+/* Preispositionierung (Geraeteseite, ganz oben): ein SVG je Breite, der
+   Server zeichnet. Punktfarbe aus `gr-anb--<slug>` (--anb-marker). */
+.gr-pp{margin:0 0 clamp(36px,6vh,64px)}
+.gr-pp-legende{list-style:none;margin:14px 0 10px;padding:0;display:flex;flex-wrap:wrap;gap:6px 20px;font:500 14px var(--sans);color:var(--ink-2)}
+.gr-pp-legende li{display:inline-flex;align-items:center;gap:7px}
+.gr-pp-legende svg{width:14px;height:14px;fill:var(--anb-marker,var(--anb-ersatz));stroke:var(--anb-marker-rand,none)}
+.gr-pp-ohne{color:var(--ink-4)}
+.gr-pp-ohne svg{opacity:.35}
+.gr-pp-ohne small{font-size:13px;font-weight:400}
+.gr-pp-ohne small::before{content:" · "}
+.gr-pp-einheit{margin:6px 0 10px;font:400 13px var(--sans);color:var(--ink-3)}
+.gr-pp-bild{width:100%}
+.gr-pp-schmal{display:none}
+.gr-pp-svg{display:block;width:100%;height:auto;overflow:visible;font-family:var(--sans)}
+.gr-pp-raster{stroke:var(--rule-2);stroke-width:1}
+.gr-pp-tick{font-size:12px;fill:var(--ink-3);font-variant-numeric:tabular-nums}
+.gr-pp-achse{font-size:12px;fill:var(--ink-3)}
+.gr-pp-name{font-size:15px;font-weight:600;fill:var(--ink)}
+.gr-pp-gb{font-size:12px;font-weight:400;fill:var(--ink-3)}
+.gr-pp-spanne{stroke:var(--ink-4);stroke-width:1.5;stroke-linecap:round}
+.gr-pp-punkt{fill:var(--anb-marker,var(--anb-ersatz));stroke:var(--anb-marker-rand,none);stroke-width:1.5}
+.gr-pp-link{cursor:pointer}
+.gr-pp-treffer{fill:transparent;stroke:none}
+.gr-pp-link:hover .gr-pp-punkt,.gr-pp-link:focus-visible .gr-pp-punkt{stroke:var(--ink);stroke-width:2.5}
+.gr-pp-link:focus-visible{outline:none}
+.gr-pp-summe{font-size:12px;fill:var(--ink-3);font-variant-numeric:tabular-nums}
+.gr-pp-summe--eigen{font-size:15px;font-weight:700;fill:var(--ink)}
+.gr-pp-fehlt{font-size:12px;fill:var(--ink-4)}
+@media (max-width:720px){
+  .gr-pp-breit{display:none}
+  .gr-pp-schmal{display:block}
+}

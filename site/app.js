@@ -2373,31 +2373,12 @@ var TelcoFrage = (function () {
       });
     });
   var zrFolge = 0;
-  /* P1-Fix (Sicht-A1, 17.09.2026): der Karten-Preis oeffnet den Rechenweg
-     DESSES Anbieters. Fuer eine NICHT aktive Karte muss erst das Paar
-     geladen werden - der Wunsch ueberlebt den asynchronen Ladevorgang und
-     wird nach dem Montieren des neuen Blocks bedient (oder still
-     verworfen, wenn der Anbieter dort keine Vorlage hat: der Klick hat
-     dann trotzdem Modell und Band gewechselt, nie ist er wirkungslos). */
-  var zrOeffneNach = null;
-  function zrWunschBedienen() {
-    if (!zrOeffneNach) return;
-    var wunsch = zrOeffneNach;
-    zrOeffneNach = null;
-    var serie = zrVorlagen(wunsch.anb);
-    if (serie.length) {
-      zrMessungOeffnen(wunsch.anb, serie[serie.length - 1]
-        .getAttribute('data-m'));
-    }
-  }
-
   function setzeGraph(modell, band) {
     var folge = ++zrFolge;
     if (zustand.laufzeit === 'alle') {
       /* Über Laufzeiten hinweg gibt es keinen Sieger - also weder Antwort
          noch Graph, sondern den benannten Satz aus dem Datenknoten. */
       zrPanelSchliessen();
-      zrOeffneNach = null;
       while (zrGruppe.firstChild) zrGruppe.removeChild(zrGruppe.firstChild);
       var satz = document.createElement('p');
       satz.className = 'gr-zr-keine gr-zr-alle';
@@ -2411,31 +2392,34 @@ var TelcoFrage = (function () {
                                  zustand.laufzeit];
       while (zrGruppe.firstChild) zrGruppe.removeChild(zrGruppe.firstChild);
       /* P1/A2: ein offenes Panel gehoert zum PAAR, nicht zur Seite - sein
-         Inhalt waere die Messung des eben entfernten Graphen. Im Fehlerfall
-         (Fragment unerreichbar) bleibt der alte Block UND das Panel stehen. */
+         Inhalt waere die Messung des eben entfernten Graphen. */
       zrPanelSchliessen();
       if (block) {
         var klon = document.importNode(block, true);
         while (klon.firstChild) zrGruppe.appendChild(klon.firstChild);
       } else if (lager) {
-        var p = document.createElement('p');
-        p.className = 'gr-zr-keine';
-        p.textContent = 'Der Graph dieses Geräts konnte nicht geladen ' +
-                        'werden – die Bündel-Zeilen darunter nennen die ' +
-                        'Werte aller Anbieter.';
-        zrGruppe.appendChild(p);
+        zrGraphFehlt();
       }
       zrEingaengeRuesten();
-      zrWunschBedienen();
     }, function () {
+      /* Das Fragment ist unerreichbar: der Ausfall steht auf der Seite,
+         der alte Graph gehoert nicht zum gewaehlten Paar. */
       if (folge !== zrFolge) return;
-      /* Das Fragment ist unerreichbar: der SERVER-Startzustand bleibt
-         stehen, statt einer leeren Flaeche. Ein bestellter Panel-Wunsch
-         (Karten-Preis) ist damit unbezahlbar - er darf nicht auf den
-         NAECHSTEN erfolgreichen Laden warten und dort ein fremdes Paar
-         oeffnen. */
-      zrOeffneNach = null;
+      zrPanelSchliessen();
+      zrGraphFehlt();
+      zrEingaengeRuesten();
     });
+  }
+
+  function zrGraphFehlt() {
+    while (zrGruppe.firstChild) zrGruppe.removeChild(zrGruppe.firstChild);
+    var p = document.createElement('p');
+    p.className = 'gr-zr-keine';
+    p.setAttribute('role', 'status');
+    p.textContent = 'Der Graph dieses Geräts konnte nicht geladen werden – ' +
+                    'die Bündel-Zeilen darunter nennen die Werte aller ' +
+                    'Anbieter.';
+    zrGruppe.appendChild(p);
   }
 
   /* P1/A2 (17.09.2026, STRATEGIE_GERAETE_V3): das Klick-Panel fuer den
@@ -2911,7 +2895,7 @@ var TelcoFrage = (function () {
       });
   }
 
-  /* --- Die Wahl: Band-Knoepfe, Kacheln, Suchfeld --------------------- */
+  /* --- Die Wahl: Band-Knoepfe, Suchfeld --------------------- */
   function markiereBaender() {
     var erlaubt = daten.erlaubt[zustand.modell] || [];
     Array.prototype.forEach.call(
@@ -2921,44 +2905,6 @@ var TelcoFrage = (function () {
         k.disabled = erlaubt.indexOf(band) === -1;
         k.setAttribute('aria-pressed', band === zustand.band ? 'true'
                                                              : 'false');
-      });
-  }
-
-  function markiereKacheln() {
-    Array.prototype.forEach.call(
-      document.querySelectorAll('#gr-zr-kacheln button[data-modell]'),
-      function (k) {
-        k.setAttribute('aria-pressed',
-                       k.getAttribute('data-modell') === zustand.modell
-                         ? 'true' : 'false');
-      });
-  }
-
-  /* P1-Fix (Sicht-B2, 17.09.2026): die Modell-Karten tragen ihre Werte JE
-     BAND als fertige Spans (serverseitig, Regel 1) - der Bandwechsel
-     blendet nur um (hidden, reine Attributmontage). Bis hierher zeigten
-     die Karten in jedem Band denselben bandunabhaengigen "ab"-Preis und
-     der Umschalter wirkte auf die prominenteste Ebene nicht. Eine Karte,
-     die das gewählte Band nicht führt, zeigt ihren Ersatz-Span („-"),
-     statt komplett leer zu stehen. */
-  function setzeKartenBand(band) {
-    Array.prototype.forEach.call(
-      document.querySelectorAll('#gr-zr-kacheln button[data-modell]'),
-      function (k) {
-        var traf = false;
-        Array.prototype.forEach.call(
-          k.querySelectorAll('.gr-zr-k-band[data-band]'),
-          function (s) {
-            var passt = s.getAttribute('data-band') === band &&
-              s.getAttribute('data-lz') === zustand.laufzeit;
-            s.hidden = !passt;
-            if (passt) traf = true;
-          });
-        var alle = zustand.laufzeit === 'alle';
-        var ersatz = k.querySelector('.gr-zr-k-band--kein');
-        if (ersatz) ersatz.hidden = traf || alle;
-        var ohneSieger = k.querySelector('.gr-zr-k-band--alle');
-        if (ohneSieger) ohneSieger.hidden = !alle;
       });
   }
 
@@ -2973,9 +2919,9 @@ var TelcoFrage = (function () {
     }
   }
 
-  /* EINE Wahl beendet die Suche - egal ob der Treffer per Klick, Enter,
-     Kachel oder Band gewaehlt wurde. Die offene Vorschau verdeckte auf
-     dem Telefon die Band-Knoepfe und die Kacheln komplett (E2-F3: der
+  /* EINE Wahl beendet die Suche - egal ob der Treffer per Klick, Enter
+     oder Band gewaehlt wurde. Die offene Vorschau verdeckte auf
+     dem Telefon die Band-Knoepfe komplett (E2-F3: der
      Band-Klick schlug 60-mal am Overlay fehl), und der alte blur-Timer
      feuerte nach der Auswahl oft nicht - der mousedown-Handler der
      Eintraege ruft preventDefault und haelt damit den Fokus. */
@@ -3021,9 +2967,7 @@ var TelcoFrage = (function () {
   function waehleLaufzeit(lz) {
     if (!laufzeitErlaubt(lz) || lz === zustand.laufzeit) return;
     zustand.laufzeit = lz;
-    zrOeffneNach = null;
     markiereLaufzeiten();
-    setzeKartenBand(zustand.band);
     setzeGraph(zustand.modell, zustand.band);
     stelleZeilen(zustand.band);
     setzeExport();
@@ -3032,9 +2976,6 @@ var TelcoFrage = (function () {
 
   function waehle(modell, band) {
     schliesseVorschau();
-    /* Ein Panel-Wunsch (Karten-Preis, Sicht-A1) ueberlebt keinen NEUEN
-       Wahlweg - nur den Ladevorgang des Paars, das er bestellt hat. */
-    zrOeffneNach = null;
     var erlaubt = daten.erlaubt[modell] || [];
     if (!erlaubt.length) return;
     zustand.modell = modell;
@@ -3045,8 +2986,6 @@ var TelcoFrage = (function () {
       zustand.band = erlaubt[0];
     }
     markiereBaender();
-    markiereKacheln();
-    setzeKartenBand(zustand.band);
     setzeSuchfeld();
     setzeGraph(zustand.modell, zustand.band);
     setzeBndTitel(zustand.modell, zustand.band);
@@ -3085,35 +3024,6 @@ var TelcoFrage = (function () {
     function (k) {
       k.addEventListener('click', function () {
         waehleLaufzeit(k.getAttribute('data-lz'));
-      });
-    });
-
-  Array.prototype.forEach.call(
-    document.querySelectorAll('#gr-zr-kacheln button[data-modell]'),
-    function (k) {
-      k.addEventListener('click', function (ev) {
-        var modell = k.getAttribute('data-modell');
-        /* P1-Fix (Sicht-A1, 17.09.2026): Klick auf die PREISZAHL der
-           Karte oeffnet zusaetzlich den Rechenweg dieses Preises -
-           Antonios Geste ist „wenn man auf den Preis drueckt". Der
-           Band-Koerper traegt serverseitig data-anb (Anbieter des
-           ab-Preises); die Vorlagen des Paars stehen erst nach dessen
-           Wechsel im DOM, deshalb bestellt der Klick Modell UND Band und
-           hinterlasst einen Wunsch (zrOeffneNach), den der geladene Block
-           bedient. Ohne Anbieter ("-", Band ohne echtes Angebot) bleibt
-           der gewoehnliche Wahl-Klick - kein Bedienelement ohne Antwort.
-           Kein Zahlbetrag geht durch diese Hand: nur Attribute. */
-        var ziel = ev.target && ev.target.closest
-          ? ev.target : null;
-        var koerper = ziel && ziel.closest('.gr-zr-k-band[data-anb]');
-        if (koerper && ziel.closest('.gr-zr-k-preis')) {
-          var band = koerper.getAttribute('data-band');
-          zrOeffneNach = null;
-          waehle(modell, band);
-          zrOeffneNach = {anb: koerper.getAttribute('data-anb')};
-          return;
-        }
-        waehle(modell, null);
       });
     });
 
@@ -3174,6 +3084,20 @@ var TelcoFrage = (function () {
         d.classList.contains('gr-bnd') && d.open) {
       montiereRechenweg(d);
     }
+  }, true);
+
+  /* Belege: die Screenshots der Anbieterseite stehen mit data-src im
+     Aufklapper und werden ERST BEIM OEFFNEN geladen (src setzen, sonst
+     nichts; Adresse und Zahl kommen fertig vom Server). toggle bubbelt
+     nicht - deshalb Capture, wie beim Rechenweg. */
+  document.addEventListener('toggle', function (ev) {
+    var d = ev.target;
+    if (!d || d.tagName !== 'DETAILS' || !d.open ||
+        !d.classList.contains('gr-belege')) return;
+    d.querySelectorAll('img[data-src]').forEach(function (bild) {
+      bild.setAttribute('src', bild.getAttribute('data-src'));
+      bild.removeAttribute('data-src');
+    });
   }, true);
 
   /* Die Live-Vorschau: ab 2 Zeichen, hoechstens 8 Treffer, Praefix-Treffer
@@ -3302,12 +3226,9 @@ var TelcoFrage = (function () {
 
   /* --- Start: der Server-Zustand steht da; dieser Aufruf setzt nur die
      Markierungen und blendet die Zeilen des gewaehlten Bands ein. Ein
-     Deep-Link-Band, das vom Server-Start abweicht, schaltet auch die
-     Karten-Spans um (Sicht-B2) - der Server rendert sein Startband. */
+     Deep-Link-Band, das vom Server-Start abweicht, wird hier markiert. */
   markiereBaender();
   markiereLaufzeiten();
-  markiereKacheln();
-  setzeKartenBand(zustand.band);
   setzeSuchfeld();
   stelleZeilen(zustand.band);
   setzeExport();
