@@ -1,5 +1,6 @@
-"""P2 (03.11.2026) im echten Chromium: Schriftgrößen-Rangfolge, schlichter
-Kopf, sichtbarer Abschnitt „teurer“ und ausgedünnte Datumsachse am Handy."""
+"""P2/P3 (03.11.2026) im echten Chromium: Schriftgrößen-Rangfolge, Kopf mit
+Bild wie auf den Schwesterseiten, sichtbarer Abschnitt „teurer" und
+ausgedünnte Datumsachse am Handy."""
 
 from __future__ import annotations
 
@@ -26,21 +27,22 @@ def telefon(seite_p2):
         yield paar
 
 
-def test_der_kopf_ist_schlicht_und_die_zahl_ist_die_groesste_schrift(schreibtisch):
+def test_der_kopf_hat_ein_bild_und_die_zahl_ist_die_groesste_schrift(schreibtisch):
     s, _ = schreibtisch
     m = s.evaluate("""() => {
       const k = document.querySelector('.gx-auftakt');
+      const bild = k.querySelector('.wa-bild img');
       const zahl = k.querySelector('.gx-held b');
       const h2 = document.querySelector('#teuer h2');
       return {
-        bild: getComputedStyle(k).backgroundImage,
+        bildBreite: bild ? bild.naturalWidth : 0,
         grund: getComputedStyle(k).backgroundColor,
         bilder: k.querySelectorAll('img').length,
         zahl: parseFloat(getComputedStyle(zahl).fontSize),
         h2: parseFloat(getComputedStyle(h2).fontSize),
       };
     }""")
-    assert m["bild"] == "none" and m["bilder"] == 0, m
+    assert m["bilder"] == 1 and m["bildBreite"] > 0, m
     assert m["grund"] != "rgb(230, 0, 0)", m
     assert m["zahl"] > 2 * m["h2"], m
     assert m["h2"] <= 22, m

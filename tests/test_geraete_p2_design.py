@@ -1,5 +1,7 @@
-"""P2 (03.11.2026): Geräteseite ohne Erklär-Unterzeilen, ohne Fachwörter,
-ohne Kopffoto und ohne Einblend-Animation im Abschnitt „teurer“."""
+"""P2 (03.11.2026): Geräteseite ohne Erklär-Unterzeilen, ohne Fachwörter und
+ohne Einblend-Animation im Abschnitt „teurer". Das Kopffoto (P3,
+03.11.2026) ist wieder da - dieselbe Kopfband-Komponente wie auf den
+Schwesterseiten."""
 
 from __future__ import annotations
 
@@ -46,11 +48,14 @@ def seite(tmp_path_factory):
     return BeautifulSoup(html, "html.parser")
 
 
-def test_der_kopf_hat_kein_foto_und_keinen_schleier(seite):
+def test_der_kopf_hat_dasselbe_kopfbild_wie_die_schwesterseiten(seite):
     kopf = seite.select_one(".gx-auftakt")
     assert kopf is not None
-    assert kopf.select_one(".wa-bild, .wa-schleier, img") is None
-    assert "band-geraete" not in str(kopf)
+    assert kopf.select_one(".wa-bild") is not None
+    assert kopf.select_one(".wa-schleier") is not None
+    bild = kopf.select_one(".wa-bild img")
+    assert bild is not None
+    assert "band-geraete" in bild["src"]
 
 
 def test_unter_der_ueberschrift_teurer_stehen_keine_zaehl_unterzeilen(seite):

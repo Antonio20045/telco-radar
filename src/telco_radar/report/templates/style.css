@@ -5732,7 +5732,7 @@ body{font-synthesis-style:none}
 /* ================================  GERAETE (ein Schalter, 10.10.2026) ==== */
 .gx-auftakt{height:175vh;--wa-rand:clamp(16px,4vw,64px)}
 .gx-auftakt .wa-text{top:auto;bottom:calc(9vh + var(--p)*6vh)}
-.gx-held{margin:0;color:var(--ink);font-weight:400}
+.gx-held{margin:0;color:var(--bildtext);font-weight:400}
 .gx-held .gx-art{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:end;column-gap:clamp(16px,3vw,40px)}
 .gx-held b{font:500 clamp(120px,19vw,280px)/.8 var(--sans);letter-spacing:-.06em;font-variant-numeric:tabular-nums;animation:wa-steigen 1.1s cubic-bezier(.2,.8,.2,1) both .15s}
 .gx-held b + span{font:400 clamp(26px,3.4vw,52px)/1.05 var(--zeitung);letter-spacing:-.01em;max-width:15ch;padding-bottom:.25em;text-wrap:balance;animation:wa-auftauchen .9s ease both .6s}
@@ -6375,13 +6375,5 @@ a.ki-k1-pille:hover{border-color:var(--ink)}
   .gr-pp-schmal{display:block}
 }
 
-/* P2 (03.11.2026): schlichter Kopf der Geräteseite - kein Foto, keine Fläche,
-   die Zahl bleibt die größte Schrift; die Überschriften darunter sind kleiner
-   als jede Kernzahl ihres Bereichs. */
-.wa-auftakt.gx-auftakt.kopfband{height:auto;margin:0}
-.kopfband.gx-auftakt .wa-auftakt-buehne{position:relative;height:auto;overflow:visible}
-.kopfband.gx-auftakt .wa-rahmen{position:relative;inset:auto}
-.kopfband.gx-auftakt .wa-text{position:relative;left:auto;right:auto;top:auto;bottom:auto;
-  padding:clamp(104px,14vh,132px) var(--wa-rand) clamp(8px,2vh,20px)}
 /* Handy: auf dem schmalen Verlauf tragen nur die Endpunkte eine Marke. */
 .gr-zr--schmal .gr-zr-punkt:not(.gr-zr-ende):not(.gr-zr-aktiv){opacity:0}
