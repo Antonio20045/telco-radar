@@ -12,9 +12,14 @@ permissions:
   contents: read
 
 jobs:
-  test:
+  test-shard:
+    name: test (Teil ${{ matrix.shard }})
     runs-on: ubuntu-latest
     timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -33,15 +38,29 @@ jobs:
       # headless gegen 127.0.0.1 und braucht weder Netz noch Systempakete.
       - name: Install Chromium for the browser tests
         run: playwright install chromium
-      - name: Run tests
+      - name: Run tests (Teil ${{ matrix.shard }}/4)
         env:
           PYTHONPATH: src
         run: |
           set +e
-          pytest -q -n auto -rs | tee pytest-ausgabe.txt
+          pytest -q -n auto -rs --splits 4 --group ${{ matrix.shard }} \
+            --splitting-algorithm least_duration --durations-path .test_durations \
+            | tee pytest-ausgabe.txt
           status=${PIPESTATUS[0]}
           set -e
           echo '```' >> "$GITHUB_STEP_SUMMARY"
           tail -n 15 pytest-ausgabe.txt >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
           exit "$status"
+
+  test:
+    name: test
+    needs: [test-shard]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Alle Teile grün?
+        if: needs.test-shard.result != 'success'
+        run: |
+          echo "Teil-Ergebnis: ${{ needs.test-shard.result }}"
+          exit 1
