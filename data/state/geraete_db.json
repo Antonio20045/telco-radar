@@ -2,8 +2,8 @@
  "updated": "2026-11-03",
  "anbieter": {
   "ALDI TALK": {
-   "laeufe": 98,
-   "funde_gesamt": 579,
+   "laeufe": 99,
+   "funde_gesamt": 585,
    "letzter_lauf": "2026-11-03",
    "letzte_funde": 6,
    "letzter_fund": "2026-11-03",
@@ -316,8 +316,8 @@
    "tote_adressen": 0
   },
   "Vodafone": {
-   "laeufe": 96,
-   "funde_gesamt": 16490,
+   "laeufe": 97,
+   "funde_gesamt": 16652,
    "letzter_lauf": "2026-11-03",
    "letzte_funde": 162,
    "termine": [
@@ -630,8 +630,8 @@
    "tote_adressen": 0
   },
   "o2": {
-   "laeufe": 96,
-   "funde_gesamt": 6465,
+   "laeufe": 97,
+   "funde_gesamt": 6531,
    "letzter_lauf": "2026-11-03",
    "letzte_funde": 66,
    "termine": [
@@ -936,7 +936,7 @@
      "2026-11-03",
      66,
      "gelesen",
-     1371,
+     1247,
      0,
      null
     ]
@@ -1258,7 +1258,7 @@
   },
   "ElectronicPartner": {
    "laeufe": 1,
-   "funde_gesamt": 445,
+   "funde_gesamt": 464,
    "letzte_funde": 19,
    "termine": [
     "2026-09-02",
@@ -1534,7 +1534,7 @@
   },
   "Medimax": {
    "laeufe": 1,
-   "funde_gesamt": 383,
+   "funde_gesamt": 403,
    "letzte_funde": 20,
    "termine": [
     "2026-09-02",
@@ -1808,9 +1808,9 @@
   },
   "congstar": {
    "laeufe": 65,
-   "funde_gesamt": 12512,
+   "funde_gesamt": 12633,
    "letzter_lauf": "2026-11-02",
-   "letzte_funde": 134,
+   "letzte_funde": 121,
    "termine": [
     "2026-09-03",
     "2026-09-04",
@@ -2105,18 +2105,18 @@
     ],
     [
      "2026-11-03",
-     134,
+     121,
      "lesefehler",
-     896,
-     43,
+     784,
+     36,
      0
     ]
    ],
    "tote_adressen": 0
   },
   "1&1": {
-   "laeufe": 88,
-   "funde_gesamt": 3363,
+   "laeufe": 89,
+   "funde_gesamt": 3404,
    "letzter_lauf": "2026-11-03",
    "letzte_funde": 41,
    "termine": [
@@ -2680,10 +2680,10 @@
    "tote_adressen": null
   },
   "Saturn": {
-   "laeufe": 84,
-   "funde_gesamt": 1455,
+   "laeufe": 85,
+   "funde_gesamt": 1475,
    "letzter_lauf": "2026-11-03",
-   "letzte_funde": 19,
+   "letzte_funde": 20,
    "termine": [
     "2026-09-05",
     "2026-09-06",
@@ -2977,7 +2977,7 @@
     ],
     [
      "2026-11-03",
-     19,
+     20,
      "gelesen",
      0,
      0,
@@ -7474,7 +7474,7 @@
     "https://mobile.1und1.de/smartphones"
    ],
    "titel_roh": "Samsung Samsung Galaxy S26 Ultra 256 GB cobalt violet",
-   "preis_mit_vertrag_ab": 44.99,
+   "preis_mit_vertrag_ab": 42.99,
    "laufzeit_monate": 36,
    "tarif_referenz": "1&1 All-Net-Flat S"
   },
@@ -8215,7 +8215,7 @@
    "speicher_gb": 128,
    "farbe_roh": "",
    "farbe_normalisiert": null,
-   "ean": "8806099035365",
+   "ean": "8806099035167",
    "zustand": "neu",
    "first_seen": "2026-09-02",
    "status": "aktiv",
@@ -8225,7 +8225,7 @@
    "erstpreis_am": "2026-09-02",
    "last_verified": "2026-11-03",
    "letzter_check": "2026-11-03",
-   "quelle_url": "https://www.ep.de/p/1518877/galaxy-a37-5g-a376b-128gb",
+   "quelle_url": "https://www.ep.de/p/1518879/galaxy-a37-5g-a376b-128gb",
    "abgerufen_am": "2026-11-03",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
@@ -8275,7 +8275,7 @@
    "speicher_gb": 256,
    "farbe_roh": "",
    "farbe_normalisiert": null,
-   "ean": "8806097827634",
+   "ean": "8806097827337",
    "zustand": "neu",
    "first_seen": "2026-11-03",
    "status": "aktiv",
@@ -8285,7 +8285,7 @@
    "erstpreis_am": "2026-11-03",
    "last_verified": "2026-11-03",
    "letzter_check": "2026-11-03",
-   "quelle_url": "https://www.ep.de/p/1514138/galaxy-s26-s942b-256gb",
+   "quelle_url": "https://www.ep.de/p/1514139/galaxy-s26-s942b-256gb",
    "abgerufen_am": "2026-11-03",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
@@ -8935,24 +8935,23 @@
    "ean": "",
    "zustand": "neu",
    "first_seen": "2026-09-05",
-   "status": "vermutlich ausgelistet",
-   "missed_checks": 1,
+   "status": "aktiv",
+   "missed_checks": 0,
    "erstpreis": 939.99,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-05",
-   "last_verified": "2026-11-02",
+   "last_verified": "2026-11-03",
    "letzter_check": "2026-11-03",
    "quelle_url": "https://www.saturn.de/de/product/_apple-iphone-17-5g-256-gb-weiss-dual-sim-3013576.html",
-   "abgerufen_am": "2026-11-02",
+   "abgerufen_am": "2026-11-03",
    "verfuegbarkeit": "unbekannt",
    "confidence": "hoch",
    "einstiege": [
     "https://www.saturn.de/de/brand/apple/iphone/iphone-17"
    ],
    "titel_roh": "APPLE iPhone 17 5G 256 GB Weiß Dual SIM",
-   "preis_ohne_vertrag": 1019.0,
-   "ended_since": "2026-10-15",
-   "stale_since": "2026-11-03"
+   "preis_ohne_vertrag": 1089.0,
+   "ended_since": "2026-10-15"
   },
   {
    "id": "saturn--apple-iphone-17-512gb-schwarz",
@@ -10124,15 +10123,15 @@
    "ean": "",
    "zustand": "neu",
    "first_seen": "2026-09-08",
-   "status": "ausgelistet",
-   "missed_checks": 2,
+   "status": "aktiv",
+   "missed_checks": 0,
    "erstpreis": 1349.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-08",
-   "last_verified": "2026-10-28",
-   "letzter_check": "2026-10-30",
+   "last_verified": "2026-11-03",
+   "letzter_check": "2026-11-03",
    "quelle_url": "https://www.saturn.de/de/product/_apple-iphone-air-5g-1-tb-space-schwarz-dual-sim-3013614.html",
-   "abgerufen_am": "2026-10-28",
+   "abgerufen_am": "2026-11-03",
    "verfuegbarkeit": "unbekannt",
    "confidence": "hoch",
    "einstiege": [
@@ -10140,7 +10139,6 @@
    ],
    "titel_roh": "APPLE iPhone Air 5G 1 TB Space Schwarz",
    "preis_ohne_vertrag": 1299.0,
-   "stale_since": "2026-10-29",
    "ended_since": "2026-10-30"
   },
   {

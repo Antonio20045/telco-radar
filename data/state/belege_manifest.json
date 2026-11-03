@@ -1,5 +1,335 @@
 {
- "belege": [],
+ "belege": [
+  {
+   "anbieter_id": "o2",
+   "datum": "2026-11-03",
+   "geraet_id": "apple-iphone-14-128",
+   "gross": false,
+   "url": "https://github.com/Antonio20045/telco-radar/releases/download/belege-2026-11-03/apple-iphone-14-128__o2__2026-11-03.webp"
+  },
+  {
+   "anbieter_id": "o2",
+   "datum": "2026-11-03",
+   "geraet_id": "apple-iphone-14-pro-128",
+   "gross": false,
+   "url": "https://github.com/Antonio20045/telco-radar/releases/download/belege-2026-11-03/apple-iphone-14-pro-128__o2__2026-11-03.webp"
+  },
+  {
+   "anbieter_id": "o2",
+   "datum": "2026-11-03",
+   "geraet_id": "apple-iphone-14-pro-max-512",
+   "gross": false,
+   "url": "https://github.com/Antonio20045/telco-radar/releases/download/belege-2026-11-03/apple-iphone-14-pro-max-512__o2__2026-11-03.webp"
+  },
+  {
+   "anbieter_id": "o2",
+   "datum": "2026-11-03",
+   "geraet_id": "apple-iphone-15-128",
+   "gross": false,
+   "url": "https://github.com/Antonio20045/telco-radar/releases/download/belege-2026-11-03/apple-iphone-15-128__o2__2026-11-03.webp"
+  },
+  {
+   "anbieter_id": "telekom",
+   "datum": "2026-11-03",
+   "geraet_id": "apple-iphone-15-128",
+   "gross": false,
+   "url": "https://github.com/Antonio20045/telco-radar/releases/download/belege-2026-11-03/apple-iphone-15-128__telekom__2026-11-03.webp"
+  },
+  {
+   "anbieter_id": "o2",
+   "datum": "2026-11-03",
+   "geraet_id": "apple-iphone-15-plus-128",
+   "gross": false,
+   "url": "https://github.com/Antonio20045/telco-radar/releases/download/belege-2026-11-03/apple-iphone-15-plus-128__o2__2026-11-03.webp"
+  },
+  {
+   "anbieter_id": "vodafone",
+   "datum": "2026-11-03",
+   "geraet_id": "apple-iphone-17-256",
+   "gross": false,
+   "url": "https://github.com/Antonio20045/telco-radar/releases/download/belege-2026-11-03/apple-iphone-17-256__vodafone__2026-11-03.webp"
+  },
+  {
+   "anbieter_id": "1-1",
+   "datum": "2026-11-03",
+   "geraet_id": "apple-iphone-17-512",
+   "gross": false,
+   "url": "https://github.com/Antonio20045/telco-radar/releases/download/belege-2026-11-03/apple-iphone-17-512__1-1__2026-11-03.webp"
+  },
+  {
+   "anbieter_id": "telekom",
+   "datum": "2026-11-03",
+   "geraet_id": "apple-iphone-17-512",
+   "gross": false,
+   "url": "https://github.com/Antonio20045/telco-radar/releases/download/belege-2026-11-03/apple-iphone-17-512__telekom__2026-11-03.webp"
+  },
+  {
+   "anbieter_id": "telekom",
+   "datum": "2026-11-03",
+   "geraet_id": "apple-iphone-17-pro-max-512",
+   "gross": false,
+   "url": "https://github.com/Antonio20045/telco-radar/releases/download/belege-2026-11-03/apple-iphone-17-pro-max-512__telekom__2026-11-03.webp"
+  },
+  {
+   "anbieter_id": "vodafone",
+   "datum": "2026-11-03",
+   "geraet_id": "apple-iphone-17-pro-max-512",
+   "gross": false,
+   "url": "https://github.com/Antonio20045/telco-radar/releases/download/belege-2026-11-03/apple-iphone-17-pro-max-512__vodafone__2026-11-03.webp"
+  },
+  {
+   "anbieter_id": "1-1",
+   "datum": "2026-11-03",
+   "geraet_id": "apple-iphone-17e-256",
+   "gross": false,
+   "url": "https://github.com/Antonio20045/telco-radar/releases/download/belege-2026-11-03/apple-iphone-17e-256__1-1__2026-11-03.webp"
+  },
+  {
+   "anbieter_id": "o2",
+   "datum": "2026-11-03",
+   "geraet_id": "apple-iphone-17e-256",
+   "gross": false,
+   "url": "https://github.com/Antonio20045/telco-radar/releases/download/belege-2026-11-03/apple-iphone-17e-256__o2__2026-11-03.webp"
+  },
+  {
+   "anbieter_id": "o2",
+   "datum": "2026-11-03",
+   "geraet_id": "apple-iphone-18-pro-512",
+   "gross": false,
+   "url": "https://github.com/Antonio20045/telco-radar/releases/download/belege-2026-11-03/apple-iphone-18-pro-512__o2__2026-11-03.webp"
+  },
+  {
+   "anbieter_id": "telekom",
+   "datum": "2026-11-03",
+   "geraet_id": "apple-iphone-18-pro-512",
+   "gross": false,
+   "url": "https://github.com/Antonio20045/telco-radar/releases/download/belege-2026-11-03/apple-iphone-18-pro-512__telekom__2026-11-03.webp"
+  },
+  {
+   "anbieter_id": "vodafone",
+   "datum": "2026-11-03",
+   "geraet_id": "apple-iphone-18-pro-512",
+   "gross": false,
+   "url": "https://github.com/Antonio20045/telco-radar/releases/download/belege-2026-11-03/apple-iphone-18-pro-512__vodafone__2026-11-03.webp"
+  },
+  {
+   "anbieter_id": "telekom",
+   "datum": "2026-11-03",
+   "geraet_id": "apple-iphone-air-256",
+   "gross": false,
+   "url": "https://github.com/Antonio20045/telco-radar/releases/download/belege-2026-11-03/apple-iphone-air-256__telekom__2026-11-03.webp"
+  },
+  {
+   "anbieter_id": "vodafone",
+   "datum": "2026-11-03",
+   "geraet_id": "apple-iphone-air-256",
+   "gross": false,
+   "url": "https://github.com/Antonio20045/telco-radar/releases/download/belege-2026-11-03/apple-iphone-air-256__vodafone__2026-11-03.webp"
+  },
+  {
+   "anbieter_id": "telekom",
+   "datum": "2026-11-03",
+   "geraet_id": "google-pixel-10-256",
+   "gross": false,
+   "url": "https://github.com/Antonio20045/telco-radar/releases/download/belege-2026-11-03/google-pixel-10-256__telekom__2026-11-03.webp"
+  },
+  {
+   "anbieter_id": "o2",
+   "datum": "2026-11-03",
+   "geraet_id": "google-pixel-10-pro-128",
+   "gross": false,
+   "url": "https://github.com/Antonio20045/telco-radar/releases/download/belege-2026-11-03/google-pixel-10-pro-128__o2__2026-11-03.webp"
+  },
+  {
+   "anbieter_id": "telekom",
+   "datum": "2026-11-03",
+   "geraet_id": "google-pixel-10-pro-128",
+   "gross": false,
+   "url": "https://github.com/Antonio20045/telco-radar/releases/download/belege-2026-11-03/google-pixel-10-pro-128__telekom__2026-11-03.webp"
+  },
+  {
+   "anbieter_id": "vodafone",
+   "datum": "2026-11-03",
+   "geraet_id": "google-pixel-11-pro-256",
+   "gross": false,
+   "url": "https://github.com/Antonio20045/telco-radar/releases/download/belege-2026-11-03/google-pixel-11-pro-256__vodafone__2026-11-03.webp"
+  },
+  {
+   "anbieter_id": "1-1",
+   "datum": "2026-11-03",
+   "geraet_id": "google-pixel-11-pro-512",
+   "gross": false,
+   "url": "https://github.com/Antonio20045/telco-radar/releases/download/belege-2026-11-03/google-pixel-11-pro-512__1-1__2026-11-03.webp"
+  },
+  {
+   "anbieter_id": "o2",
+   "datum": "2026-11-03",
+   "geraet_id": "google-pixel-11-pro-512",
+   "gross": false,
+   "url": "https://github.com/Antonio20045/telco-radar/releases/download/belege-2026-11-03/google-pixel-11-pro-512__o2__2026-11-03.webp"
+  },
+  {
+   "anbieter_id": "vodafone",
+   "datum": "2026-11-03",
+   "geraet_id": "google-pixel-11-pro-512",
+   "gross": false,
+   "url": "https://github.com/Antonio20045/telco-radar/releases/download/belege-2026-11-03/google-pixel-11-pro-512__vodafone__2026-11-03.webp"
+  },
+  {
+   "anbieter_id": "1-1",
+   "datum": "2026-11-03",
+   "geraet_id": "google-pixel-11-pro-fold-256",
+   "gross": false,
+   "url": "https://github.com/Antonio20045/telco-radar/releases/download/belege-2026-11-03/google-pixel-11-pro-fold-256__1-1__2026-11-03.webp"
+  },
+  {
+   "anbieter_id": "o2",
+   "datum": "2026-11-03",
+   "geraet_id": "google-pixel-11-pro-fold-256",
+   "gross": false,
+   "url": "https://github.com/Antonio20045/telco-radar/releases/download/belege-2026-11-03/google-pixel-11-pro-fold-256__o2__2026-11-03.webp"
+  },
+  {
+   "anbieter_id": "vodafone",
+   "datum": "2026-11-03",
+   "geraet_id": "google-pixel-11-pro-fold-256",
+   "gross": false,
+   "url": "https://github.com/Antonio20045/telco-radar/releases/download/belege-2026-11-03/google-pixel-11-pro-fold-256__vodafone__2026-11-03.webp"
+  },
+  {
+   "anbieter_id": "1-1",
+   "datum": "2026-11-03",
+   "geraet_id": "google-pixel-11-pro-fold-512",
+   "gross": false,
+   "url": "https://github.com/Antonio20045/telco-radar/releases/download/belege-2026-11-03/google-pixel-11-pro-fold-512__1-1__2026-11-03.webp"
+  },
+  {
+   "anbieter_id": "telekom",
+   "datum": "2026-11-03",
+   "geraet_id": "motorola-edge-70-512",
+   "gross": true,
+   "url": "https://github.com/Antonio20045/telco-radar/releases/download/belege-gross-2026-11/motorola-edge-70-512__telekom__2026-11-03.webp"
+  },
+  {
+   "anbieter_id": "telekom",
+   "datum": "2026-11-03",
+   "geraet_id": "motorola-signature-512",
+   "gross": false,
+   "url": "https://github.com/Antonio20045/telco-radar/releases/download/belege-2026-11-03/motorola-signature-512__telekom__2026-11-03.webp"
+  },
+  {
+   "anbieter_id": "o2",
+   "datum": "2026-11-03",
+   "geraet_id": "samsung-galaxy-a56-128",
+   "gross": false,
+   "url": "https://github.com/Antonio20045/telco-radar/releases/download/belege-2026-11-03/samsung-galaxy-a56-128__o2__2026-11-03.webp"
+  },
+  {
+   "anbieter_id": "telekom",
+   "datum": "2026-11-03",
+   "geraet_id": "samsung-galaxy-s25-fe-128",
+   "gross": false,
+   "url": "https://github.com/Antonio20045/telco-radar/releases/download/belege-2026-11-03/samsung-galaxy-s25-fe-128__telekom__2026-11-03.webp"
+  },
+  {
+   "anbieter_id": "vodafone",
+   "datum": "2026-11-03",
+   "geraet_id": "samsung-galaxy-s25-fe-128",
+   "gross": false,
+   "url": "https://github.com/Antonio20045/telco-radar/releases/download/belege-2026-11-03/samsung-galaxy-s25-fe-128__vodafone__2026-11-03.webp"
+  },
+  {
+   "anbieter_id": "telekom",
+   "datum": "2026-11-03",
+   "geraet_id": "samsung-galaxy-s25-fe-256",
+   "gross": false,
+   "url": "https://github.com/Antonio20045/telco-radar/releases/download/belege-2026-11-03/samsung-galaxy-s25-fe-256__telekom__2026-11-03.webp"
+  },
+  {
+   "anbieter_id": "telekom",
+   "datum": "2026-11-03",
+   "geraet_id": "samsung-galaxy-s26-plus-512",
+   "gross": false,
+   "url": "https://github.com/Antonio20045/telco-radar/releases/download/belege-2026-11-03/samsung-galaxy-s26-plus-512__telekom__2026-11-03.webp"
+  },
+  {
+   "anbieter_id": "1-1",
+   "datum": "2026-11-03",
+   "geraet_id": "samsung-galaxy-s26-ultra-1024",
+   "gross": false,
+   "url": "https://github.com/Antonio20045/telco-radar/releases/download/belege-2026-11-03/samsung-galaxy-s26-ultra-1024__1-1__2026-11-03.webp"
+  },
+  {
+   "anbieter_id": "telekom",
+   "datum": "2026-11-03",
+   "geraet_id": "samsung-galaxy-s26-ultra-1024",
+   "gross": false,
+   "url": "https://github.com/Antonio20045/telco-radar/releases/download/belege-2026-11-03/samsung-galaxy-s26-ultra-1024__telekom__2026-11-03.webp"
+  },
+  {
+   "anbieter_id": "o2",
+   "datum": "2026-11-03",
+   "geraet_id": "samsung-galaxy-z-flip8-512",
+   "gross": false,
+   "url": "https://github.com/Antonio20045/telco-radar/releases/download/belege-2026-11-03/samsung-galaxy-z-flip8-512__o2__2026-11-03.webp"
+  },
+  {
+   "anbieter_id": "telekom",
+   "datum": "2026-11-03",
+   "geraet_id": "samsung-galaxy-z-fold8-ultra-512",
+   "gross": false,
+   "url": "https://github.com/Antonio20045/telco-radar/releases/download/belege-2026-11-03/samsung-galaxy-z-fold8-ultra-512__telekom__2026-11-03.webp"
+  },
+  {
+   "anbieter_id": "vodafone",
+   "datum": "2026-11-03",
+   "geraet_id": "samsung-galaxy-z-fold8-ultra-512",
+   "gross": false,
+   "url": "https://github.com/Antonio20045/telco-radar/releases/download/belege-2026-11-03/samsung-galaxy-z-fold8-ultra-512__vodafone__2026-11-03.webp"
+  },
+  {
+   "anbieter_id": "telekom",
+   "datum": "2026-11-03",
+   "geraet_id": "telekom-t-phone-3-128",
+   "gross": false,
+   "url": "https://github.com/Antonio20045/telco-radar/releases/download/belege-2026-11-03/telekom-t-phone-3-128__telekom__2026-11-03.webp"
+  },
+  {
+   "anbieter_id": "telekom",
+   "datum": "2026-11-03",
+   "geraet_id": "telekom-t-phone-3-pro-256",
+   "gross": false,
+   "url": "https://github.com/Antonio20045/telco-radar/releases/download/belege-2026-11-03/telekom-t-phone-3-pro-256__telekom__2026-11-03.webp"
+  },
+  {
+   "anbieter_id": "telekom",
+   "datum": "2026-11-03",
+   "geraet_id": "xiaomi-17t-pro-512",
+   "gross": true,
+   "url": "https://github.com/Antonio20045/telco-radar/releases/download/belege-gross-2026-11/xiaomi-17t-pro-512__telekom__2026-11-03.webp"
+  },
+  {
+   "anbieter_id": "telekom",
+   "datum": "2026-11-03",
+   "geraet_id": "xiaomi-redmi-note-15-256",
+   "gross": false,
+   "url": "https://github.com/Antonio20045/telco-radar/releases/download/belege-2026-11-03/xiaomi-redmi-note-15-256__telekom__2026-11-03.webp"
+  },
+  {
+   "anbieter_id": "o2",
+   "datum": "2026-11-03",
+   "geraet_id": "xiaomi-redmi-note-15-pro-256",
+   "gross": false,
+   "url": "https://github.com/Antonio20045/telco-radar/releases/download/belege-2026-11-03/xiaomi-redmi-note-15-pro-256__o2__2026-11-03.webp"
+  },
+  {
+   "anbieter_id": "telekom",
+   "datum": "2026-11-03",
+   "geraet_id": "xiaomi-redmi-note-15-pro-256",
+   "gross": false,
+   "url": "https://github.com/Antonio20045/telco-radar/releases/download/belege-2026-11-03/xiaomi-redmi-note-15-pro-256__telekom__2026-11-03.webp"
+  }
+ ],
  "erstellt": "2026-11-03",
  "format": 1,
  "fremd": 0
