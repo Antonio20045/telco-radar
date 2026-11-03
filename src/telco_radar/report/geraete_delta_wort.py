@@ -1,7 +1,8 @@
 """Die Modellzeile der Tabelle „Alle Geräte“: Abstand in Worten, Vergleich je Tarif M.
 
 Zwei Felder, die `geraete_view._tco_spalte` nicht selbst rechnet:
-`tco_delta_wort` („193,79 € günstiger · 9,9 %“ statt „−193,79 € · −9,9 %“) und
+`tco_delta_wort` („congstar 193,79 € günstiger · 9,9 %“ statt „−193,79 € · −9,9 %“)
+und
 `tco_vodafone_teurer`, die Zeile des Blocks „Über 10 % teurer“ auf der Basis
 des Diagramms „Preispositionierung“ (Tarif M, 24 Monate, geprüft)."""
 
@@ -15,23 +16,31 @@ NAEHERUNG = "≈"
 
 
 def delta_wort(
-    betrag: float | None, prozent: float | None, ungefaehr: bool = False
+    betrag: float | None,
+    prozent: float | None,
+    ungefaehr: bool = False,
+    anbieter: str | None = None,
 ) -> str | None:
     """Der Abstand zur Vodafone-Referenz mit Wort statt Vorzeichen.
+
+    Das Subjekt ist immer der Wettbewerber, dessen Angebot den Abstand trägt
+    („o2 181,35 € teurer“ heißt: o2 liegt über Vodafone); ohne Namen bleibt
+    der Satz ohne Subjekt.
 
     Negativ heißt das Angebot ist günstiger, positiv teurer. Eine Näherung
     (`ungefaehr`) bleibt „rund“ und trägt keinen Prozentanteil; fehlt der
     Betrag, gibt es kein Wort (`None`, eine Lücke)."""
     if betrag is None:
         return None
+    subjekt = f"{anbieter} " if anbieter else ""
     if not betrag:
-        return "gleich teuer"
+        return f"{subjekt}gleich teuer"
     text = f"{euro(abs(betrag))} {'günstiger' if betrag < 0 else 'teurer'}"
     if ungefaehr:
-        return f"rund {text}"
+        return f"{subjekt}rund {text}"
     if prozent is not None:
         text += f" · {abs(prozent):,.1f}".replace(".", ",") + " %"
-    return text
+    return subjekt + text
 
 
 def ergaenze(felder: dict, modell_tco: dict | None) -> dict:
@@ -45,6 +54,7 @@ def ergaenze(felder: dict, modell_tco: dict | None) -> dict:
             felder.get("tco_delta"),
             felder.get("tco_delta_prozent"),
             kurz.startswith(NAEHERUNG),
+            felder.get("tco_delta_traeger"),
         )
         if kurz
         else None

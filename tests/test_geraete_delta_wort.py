@@ -44,6 +44,17 @@ def test_delta_wort_nennt_guenstiger_und_teurer_mit_dem_betrag():
     assert wort(None, 9.9) is None
 
 
+def test_delta_wort_nennt_den_wettbewerber_als_subjekt():
+    """„o2 181,35 € teurer“: wer teurer ist, steht in der Zelle, nicht im Hover."""
+    wort = geraete_delta_wort.delta_wort
+    assert wort(181.35, 5.1, anbieter="o2") == "o2 181,35 € teurer · 5,1 %"
+    assert wort(-193.79, 9.9, anbieter="congstar") == (
+        "congstar 193,79 € günstiger · 9,9 %"
+    )
+    assert wort(0.0, None, anbieter="o2") == "o2 gleich teuer"
+    assert wort(7.74, None, True, "o2") == "o2 rund 7,74 € teurer"
+
+
 def test_delta_wort_einer_naeherung_bleibt_ungefaehr():
     wort = geraete_delta_wort.delta_wort
     assert wort(7.74, None, ungefaehr=True) == "rund 7,74 € teurer"
@@ -56,10 +67,11 @@ def test_die_modellzeile_traegt_das_wort_zum_abstand():
         "tco_delta": -100.0,
         "tco_delta_prozent": 9.1,
         "tco_delta_kurz": "−100,00 € · −9,1 %",
+        "tco_delta_traeger": "congstar",
     }
     zeile = geraete_delta_wort.ergaenze(felder, None)
     assert zeile["tco_delta"] == -100.0
-    assert zeile["tco_delta_wort"] == "100,00 € günstiger · 9,1 %"
+    assert zeile["tco_delta_wort"] == "congstar 100,00 € günstiger · 9,1 %"
     naeherung = {
         **felder,
         "tco_delta": 7.74,
@@ -68,7 +80,7 @@ def test_die_modellzeile_traegt_das_wort_zum_abstand():
     }
     assert (
         geraete_delta_wort.ergaenze(naeherung, None)["tco_delta_wort"]
-        == "rund 7,74 € teurer"
+        == "congstar rund 7,74 € teurer"
     )
 
 
@@ -86,7 +98,7 @@ def test_die_seite_schreibt_das_wort_in_die_delta_zelle(tmp_path):
     suppe = BeautifulSoup(
         (site / "geraete.html").read_text(encoding="utf-8"), "html.parser"
     )
-    gesehen = 0
+    gesehen = vf_guenstigster = 0
     for z in suppe.select("#gr-katalogtabelle .gr-k-zeile"):
         wert = z.get("data-s-delta")
         zelle = z.select("td.gr-sp--tco")[2]
@@ -105,7 +117,20 @@ def test_die_seite_schreibt_das_wort_in_die_delta_zelle(tmp_path):
             in text
         ), text
         assert "−" not in text and "+" not in text, text
+        titel = zelle.select_one(".wr-prozent").get("title") or ""
+        if "Vodafone ist am günstigsten" in titel:
+            vf_guenstigster += 1
+            anbieter = titel.rsplit("(", 1)[-1].split(")")[0]
+            assert text.startswith(anbieter + " ") and " € teurer" in text, text
+        else:
+            kosten = " ".join(z.select("td.gr-sp--tco")[0].get_text().split())
+            anbieter = text.split(" ")[0]
+            assert f"bei {anbieter}" in kosten, (text, kosten)
+            assert " € günstiger" in text, text
     assert gesehen, "die Fixture hat keine Δ-Zelle mit Abstand"
+    assert vf_guenstigster < gesehen, (
+        "die Fixture hat keine Zeile mit günstigerem Wettbewerber"
+    )
 
 
 def test_die_katalogzahl_traegt_ihr_wort_und_die_kostenzelle_ihren_tarif(tmp_path):
@@ -124,3 +149,41 @@ def test_die_katalogzahl_traegt_ihr_wort_und_die_kostenzelle_ihren_tarif(tmp_pat
         kosten = z.select("td.gr-sp--tco")[0].get_text(" ", strip=True)
         band = z.select("td.gr-sp--tco")[3].get_text(strip=True)
         assert f"Tarif {band}" in kosten, kosten
+
+
+def _zeile_mit_vodafone_vorn(o2_betrag, o2_prozent):
+    """Vodafone 1.100 führt, o2 liegt `o2_betrag` darüber."""
+    import test_geraete_katalog_modelle as k
+
+    from telco_radar.report import geraete_view
+
+    mid = k.modell_schluessel(k.device_id("Apple", "Apple X"), 256)
+    tco = [
+        k._tco_modell(
+            mid,
+            karten=[
+                k._karte("Vodafone", 1100.0, eigen=True, delta=None, delta_kurz=None),
+                k._karte(
+                    "o2",
+                    1100.0 + o2_betrag,
+                    delta={"betrag": o2_betrag, "prozent": o2_prozent},
+                    delta_kurz=f"+{o2_betrag:.2f} € · +{o2_prozent} %",
+                ),
+            ],
+            referenz={"gesamt": 1100.0, "monate": 24},
+        )
+    ]
+    eintraege = [k._listung("A", "Apple", "Apple X", "256gb-a", 1000.0)]
+    (zeile,) = geraete_view.katalog_modellzeilen(
+        eintraege, k._katalog(), tco_modelle=tco
+    )
+    return zeile
+
+
+def test_fuehrt_vodafone_nennt_die_zelle_den_teureren_wettbewerber():
+    """Wenn Vodafone vorn liegt, liest „181,35 € teurer“ allein wie „Vodafone
+    ist teurer“: das Subjekt steht in der Zelle, nicht im Hover-Titel."""
+    zeile = _zeile_mit_vodafone_vorn(181.35, 5.1)
+    assert zeile["tco_anbieter"] == "Vodafone"
+    assert zeile["tco_delta_wort"] == "o2 181,35 € teurer · 5,1 %"
+    assert zeile["tco_delta_traeger"] == zeile["tco_delta_anbieter"] == "o2"

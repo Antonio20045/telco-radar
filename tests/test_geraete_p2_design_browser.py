@@ -74,3 +74,35 @@ def test_am_handy_ist_die_datumsachse_ausgeduennt(telefon):
     assert m["n"] >= 2, m
     assert m["luecke"] >= 0, m
     assert m["sichtbareZwischenpunkte"] == 0, m
+
+
+_UEBERLAPPUNG = """() => {
+  const r = s => document.querySelector(s).getBoundingClientRect();
+  const held = r('.gx-held'), zahl = r('.gx-held b'), modus = r('.gx-modus');
+  const rand = getComputedStyle(document.querySelector('.gx-modus')).marginTop;
+  return {held: [held.top, held.bottom], zahl: [zahl.top, zahl.bottom],
+          modus: [modus.top, modus.bottom],
+          rand: parseFloat(rand)};
+}"""
+
+
+def _ohne_ueberlappung(s):
+    s.evaluate("() => window.scrollTo(0, 0)")
+    s.wait_for_timeout(150)
+    m = s.evaluate(_UEBERLAPPUNG)
+    for teil in ("held", "zahl"):
+        assert m["modus"][0] >= m[teil][1], (teil, m)
+    assert m["rand"] >= 0, ("ein negativer Rand zieht den Schalter in die Zahl", m)
+    return m
+
+
+def test_am_schreibtisch_deckt_der_schalter_die_leitzahl_nicht_ab(schreibtisch):
+    s, _ = schreibtisch
+    m = _ohne_ueberlappung(s)
+    assert m["modus"][0] >= m["held"][1], m
+
+
+def test_am_handy_deckt_der_schalter_die_leitzahl_nicht_ab(telefon):
+    s, _ = telefon
+    m = _ohne_ueberlappung(s)
+    assert m["modus"][0] - m["held"][1] >= 8, m

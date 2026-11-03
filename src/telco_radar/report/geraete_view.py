@@ -875,6 +875,7 @@ def _tco_spalte(modell_tco: dict | None, heute: str = "") -> dict:
         delta_leer = zustand.get("kurz") or TCO_DELTA_LEER_UNBESTIMMT
         delta_leer_grund = zustand.get("satz") or TCO_DELTA_GRUND_UNBESTIMMT
     delta = (traeger or {}).get("delta") or {}
+    delta_traeger = (traeger or {}).get("anbieter")
     return {
         "tco_ab": bester["gesamt"],
         "tco_anbieter": bester.get("anbieter"),
@@ -882,11 +883,8 @@ def _tco_spalte(modell_tco: dict | None, heute: str = "") -> dict:
         "tco_delta": delta.get("betrag"),
         "tco_delta_prozent": delta.get("prozent"),
         "tco_delta_kurz": (traeger or {}).get("delta_kurz"),
-        "tco_delta_anbieter": (
-            traeger.get("anbieter")
-            if bester.get("eigen") and traeger is not None
-            else None
-        ),
+        "tco_delta_anbieter": delta_traeger if bester.get("eigen") else None,
+        "tco_delta_traeger": delta_traeger,
         "tco_delta_leer": delta_leer,
         "tco_delta_leer_grund": delta_leer_grund,
         "tco_band": bester.get("band"),

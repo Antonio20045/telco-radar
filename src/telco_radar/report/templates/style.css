@@ -744,6 +744,7 @@ b,strong{font-weight:700}
 /* In einer laufenden Metazeile steht der Wert MITTEN im Satz, nicht am
    rechten Rand - `margin-left:auto` schoebe dort alles Folgende weg. */
 .aufmacher-meta .rubrik-zahl{margin-left:0}
+.gr-katalog .rubrik-zahl + .rubrik-zahl{margin-left:-8px}
 
 /* ============================================  WER WAS HAT (Luecken) ==== */
 /* Die Gegenfrage der Differenzierungs-Seite. Eine Tabelle, kein Kartenraster:
@@ -6277,7 +6278,7 @@ a.ki-k1-pille:hover{border-color:var(--ink)}
 .kopfband .pw-neben{margin:0 0 .6em}
 .kopfband .pw-neben b{font-size:clamp(26px,2.4vw,36px)}
 .wa-auftakt.kopfband.gx-auftakt{margin-bottom:0}
-@media (min-width:721px){.kopfband.gx-auftakt ~ .wrap .gr-reiter.gx-modus{margin:12px auto 24px}}
+.kopfband.gx-auftakt ~ .wrap .gr-reiter.gx-modus{margin:12px auto 24px}
 /* Die Kapitel der Wettbewerber: ein Band statt Vollbild, das Blatt liegt
    direkt darunter statt beim Scrollen darueber zu fahren. */
 .wa-kapitel .wa-kapitel-buehne{position:relative;height:clamp(200px,28vh,260px);border-radius:28px;margin:0 var(--wa-rand)}

@@ -225,30 +225,49 @@ def test_block_und_diagramm_nennen_denselben_vodafone_betrag():
     assert (z["abstand"], z["prozent"], z["band"]) == (437.4, 32.2, "m")
 
 
+def _spalte_aus(modell):
+    """Der Produktionsweg: `_tco_spalte`, dann `ergaenze`."""
+    from telco_radar.report import geraete_delta_wort, geraete_view
+
+    return {
+        "schluessel": modell["id"],
+        "titel": "X",
+        **geraete_delta_wort.ergaenze(geraete_view._tco_spalte(modell), modell),
+    }
+
+
 def test_gegenprobe_liegt_nur_das_band_l_ueber_der_schwelle_fehlt_die_zeile():
     """Gegenprobe: in L ist Vodafone 611,40 teurer, in M nur 3,3 % - dann steht
     das Modell nicht im Block (früher stand es mit dem L-Betrag darin)."""
-    modell = _modell_m(
-        "apple-iphone-17-256",
-        [
-            _karte_m("Vodafone", "m", 1380.0),
-            _karte_m("Vodafone", "l", 1947.4),
-            _karte_m("congstar", "m", 1336.0),
-            _karte_m("congstar", "l", 1336.0),
-        ],
-    )
-    from telco_radar.report import geraete_view
-
-    spalte = geraete_view._tco_spalte(modell)
-    assert gt.mit_tarif([{"schluessel": "x", "titel": "X", **spalte}]) == []
+    karten = [
+        _karte_m("Vodafone", "l", 1947.4),
+        _karte_m("congstar", "m", 1336.0),
+        _karte_m("congstar", "l", 1336.0),
+    ]
+    ueber = _spalte_aus(_modell_m("a", [_karte_m("Vodafone", "m", 1500.0), *karten]))
+    knapp = _spalte_aus(_modell_m("a", [_karte_m("Vodafone", "m", 1380.0), *karten]))
+    assert ueber["tco_vodafone_teurer"] is not None
+    (z,) = gt.mit_tarif([ueber])
+    assert (z["band"], z["vodafone"], z["prozent"]) == ("m", 1500.0, 12.3)
+    assert knapp["tco_vodafone_teurer"]["vodafone"] == 1380.0
+    assert gt.mit_tarif([knapp]) == []
 
 
 def test_ohne_geprueften_m_preis_steht_keine_zeile():
     """Ein fehlender Vodafone-Preis in M ist eine Lücke, kein Vergleich."""
-    modell = _modell_m(
-        "x", [_karte_m("Vodafone", "l", 1947.4), _karte_m("congstar", "l", 1000.0)]
+    karten_l = [_karte_m("Vodafone", "l", 1947.4), _karte_m("congstar", "l", 1000.0)]
+    mit_m = _spalte_aus(
+        _modell_m(
+            "x",
+            [
+                _karte_m("Vodafone", "m", 1500.0),
+                _karte_m("congstar", "m", 1000.0),
+                *karten_l,
+            ],
+        )
     )
-    from telco_radar.report import geraete_view
-
-    spalte = geraete_view._tco_spalte(modell)
-    assert gt.mit_tarif([{"schluessel": "x", "titel": "X", **spalte}]) == []
+    ohne_m = _spalte_aus(_modell_m("x", karten_l))
+    assert mit_m["tco_vodafone_teurer"] is not None
+    assert len(gt.mit_tarif([mit_m])) == 1
+    assert ohne_m["tco_vodafone_teurer"] is None
+    assert gt.mit_tarif([ohne_m]) == []
