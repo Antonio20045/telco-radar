@@ -25,7 +25,7 @@
 - Ein Push mit `GITHUB_TOKEN` startet keinen Deploy; `deploy.yml` gibt es nicht mehr.
 
 ## CI
-- `ci.yml` läuft nur von Hand (`workflow_dispatch`, 30 min); lokal `make venv`, Python aus `.python-version`.
+- `ci.yml` läuft bei Pull Request gegen `main`, bei `merge_group`, von Hand (`workflow_dispatch`) und nachts (`schedule`, 90 min); Pflicht-Check ist der Job `test`, inklusive der Chromium-Browsertests. Zweig pushen, PR gegen `main` öffnen, `gh pr merge --auto --squash` — kein direkter Push auf `main` (Freigabe Antonio, 03.11.2026). Lokal prüft `pruefleiter --vor-push` nur noch die schnellen, statischen Stufen (Wächter, Lint, Typen, Schichten); die volle Testsuite läuft in der CI, lokal bei Bedarf einzelne Testdateien ohne Browser-Marker. Die nächtlichen Bot-Workflows (geraete, klick, golden, newsletter_stats, publish-site, radar) pushen weiter direkt auf `main`, per Ruleset-Ausnahme für GitHub Actions.
 
 ## Geräte-Nachtlauf (`geraete.yml`, täglich 02:17 UTC)
 - Läuft im Besuchsfenster zweier Händler (robots.txt `Visit-time` 0200–0800, medimax.de, ep.de); das Fenster gilt je Abruf mit der Uhr des Abrufs, auch für Nachbearbeitungs-Haken. Ein Anbieteranteil endet spätestens 10 s vor dem Fensterende.

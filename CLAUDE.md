@@ -9,7 +9,7 @@ Automatisches Competitive-Intelligence-System für Vodafone-Manager ohne Technik
 ## Betrieb
 
 - Website https://telco-radar.onrender.com (Render Static Site aus `site/`), Repo https://github.com/Antonio20045/telco-radar (öffentlich). GitHub Pages bleibt aus.
-- `radar.yml` Mi und Fr 11:00 UTC und manuell, `geraete.yml` täglich 02:17 UTC; beide committen `data/` und `site/` und rufen den Render-Hook über `scripts/render_deploy.sh` (Ablauf in `docs/betrieb.md`). `ci.yml` nur von Hand.
+- `radar.yml` Mi und Fr 11:00 UTC und manuell, `geraete.yml` täglich 02:17 UTC; beide committen `data/` und `site/` und rufen den Render-Hook über `scripts/render_deploy.sh` (Ablauf in `docs/betrieb.md`). `ci.yml` läuft bei Pull Request gegen `main`, bei `merge_group`, nachts und von Hand; Pflicht-Check ist der Job `test`.
 - Ein Push auf `main` ist kein Deploy. Den Live-Stand bestätigt nur das ausgelieferte HTML (`curl -L -sS …/index.html`).
 - Actions laufen mit Python 3.11 (`.python-version`): keine Syntax erst ab 3.12, etwa Zeilenumbrüche oder gleiche Anführungszeichen in f-String-Feldern.
 - Ein Workflow-Push mit `GITHUB_TOKEN` startet keine weiteren Workflows. Ein Job-Timeout heißt in GitHub „cancelled“. Laufzeit steht in `run.phases` im Berichts-JSON.
@@ -63,7 +63,7 @@ from telco_radar.report.html import render_site; render_site(Path('/tmp/site'), 
 
 1. `site/` und `data/` werden nie von Hand bearbeitet, nie gelöscht oder gekürzt (`seen.jsonl`!) und Daten aus lokalen Läufen nie committet. Produktionsdaten entstehen nur in Actions; nach einem lokalen Lauf `git restore site data`.
 2. Keine Secrets, Tokens oder Deploy-Hooks in Dateien, Logs, Commits oder Chat-Ausgaben; sie liegen nur als GitHub-Secrets vor.
-3. Gearbeitet und gepusht wird auf `main`, `git add` nur mit Dateinamen. Bei einem Bot-Commit `git pull --rebase origin main`, nie force-pushen.
+3. Zweig pushen, Pull Request gegen `main` öffnen, `gh pr merge --auto --squash`; kein direkter Push auf `main` (Freigabe Antonio, 03.11.2026). `git add` nur mit Dateinamen. Die nächtlichen Bot-Workflows (geraete, klick, golden, newsletter_stats, publish-site, radar) pushen weiter direkt auf `main`, per Ruleset-Ausnahme für GitHub Actions. Bei einem Bot-Commit `git pull --rebase origin main`, nie force-pushen.
 4. Bot-Schutz (403, Captcha, Radware) wird nicht umgangen. Eine JavaScript-Prüfung (202) darf der echte Browser mit ehrlicher Kennung durchlaufen, ohne Tarnung, Proxy oder Captcha-Löser (Antonio, 08.10.2026). robots.txt samt Crawl-delay und Visit-time gilt, IDs werden nie hochgezählt.
 5. Keine Bibliotheken oder Skripte von CDNs; JavaScript bleibt Vanilla in `app.js`, Grafiken rechnet der Server.
 6. Alles rendert ohne LLM. Fällt eine Stufe aus, nennt die Seite den Ausfall, statt „nichts gefunden“ vorzutäuschen.

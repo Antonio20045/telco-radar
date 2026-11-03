@@ -1,9 +1,15 @@
 name: CI
 
 on:
+  pull_request:
+    branches: [main]
+  merge_group:
   workflow_dispatch:
   schedule:
     - cron: "30 21 * * *"
+
+permissions:
+  contents: read
 
 jobs:
   test:
@@ -17,6 +23,8 @@ jobs:
           cache: pip
       - name: Install dependencies
         run: pip install -r requirements.txt -r requirements-dev.txt
+      - name: Install poppler-utils for the PDF tests
+        run: sudo apt-get update && sudo apt-get install -y poppler-utils
       # Ohne diesen Schritt ueberspringt sich tests/test_falz_browser.py, und
       # zwar lautlos - ein Skip sieht im Protokoll aus wie ein Erfolg. Genau
       # dieser Test misst, ob die Schlagzeile der Ausgabe ohne Scrollen
@@ -28,4 +36,12 @@ jobs:
       - name: Run tests
         env:
           PYTHONPATH: src
-        run: pytest -q -n auto
+        run: |
+          set +e
+          pytest -q -n auto -rs | tee pytest-ausgabe.txt
+          status=${PIPESTATUS[0]}
+          set -e
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          tail -n 15 pytest-ausgabe.txt >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          exit "$status"
