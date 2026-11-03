@@ -158,3 +158,9 @@ kanarie:
   selektor: 'button[aria-label^="View energy label for"]'
   attribut: aria-label
   enthaelt: "{modell}"
+  # Ausgelistete Geräte leitet die Telekom (301) auf die Markenübersicht um
+  # (Tageslauf 02.11.2026, z. B. Motorola Edge 60 Neo): dort fehlt der Kanarienwert zu
+  # Recht. Greift nur mit Umleitung, genauem Host und diesem Pfad (ohne Query).
+  ausgelistet_url:
+    host: www.telekom.de
+    pfad: '/shop/geraete/smartphones/[^/]+/?'

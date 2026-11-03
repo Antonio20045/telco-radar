@@ -445,6 +445,7 @@ TELEKOM_KANARIE = {
     "selektor": 'button[aria-label^="View energy label for"]',
     "attribut": "aria-label",
     "enthaelt": "{modell}",
+    "ausgelistet_url": {"host": "127.0.0.1", "pfad": "/shop/geraete/smartphones/[^/]+"},
 }
 TELEKOM_MODELL = "Apple iPhone 17 Pro"
 

@@ -269,16 +269,26 @@ class Seitenwert:
 
 
 @dataclass(frozen=True)
+class AusgelistetUrl:
+    """Übersicht für Ausgelistetes: genauer ``host``, ``pfad`` als ``fullmatch``."""
+
+    host: str
+    pfad: re.Pattern[str]
+
+
+@dataclass(frozen=True)
 class Kanarie:
     """Ein Text, der an fester Stelle stehen muss, solange die Karte zur Seite passt.
 
     ``enthaelt`` darf ``{modell}`` tragen: der Modellname des Geräts aus dem Katalog.
     Mit ``attribut`` gilt der Wert dieses Attributs statt des sichtbaren Texts.
+    ``ausgelistet_url`` (Telekom): nach Umleitung dorthin heißt ein fehlender Wert leer.
     """
 
     selektor: str
     enthaelt: str
     attribut: str | None = None
+    ausgelistet_url: AusgelistetUrl | None = None
 
 
 @dataclass(frozen=True)

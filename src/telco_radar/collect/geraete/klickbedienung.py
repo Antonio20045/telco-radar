@@ -14,16 +14,18 @@ der Lauf gestört (kein Wert aus einem falschen Zustand). Beides nach bestandene
 Bot-Prüfung heißt ``STOERUNG_SEITE``: diese eine Seite hat eine andere Form, der
 Tageslauf liest die nächste (``klicktageslauf``). Lädt der Klick eine
 Preisantwort, gehört sie zu ihm wie zu einem Knopf. Leitet der Anbieter die
-Produktseite auf eine Übersicht um (``AUSGELISTET``), bietet er das Gerät nicht mehr
-an: die Seite ist ``leer``, keine andere Form (congstar 27.10.2026, drei ausgelistete
-Geräte in Folge hielten den ganzen Tageslauf an; Telekom 02.11.2026 ebenso: Umleitung
-auf ``/shop/geraete/smartphones/<marke>``, alle zwölf Detailläufe gestört). Die
-Umleitung wird nur gewertet, wenn der Kanarienwert fehlt.
+Produktseite auf eine Übersicht um, bietet er das Gerät nicht mehr an: die Seite ist
+``leer``, keine andere Form (congstar 27.10.2026, drei ausgelistete Geräte in Folge
+hielten den ganzen Tageslauf an: ``AUSGELISTET``; Telekom 02.11.2026 ebenso, alle zwölf
+Detailläufe gestört). Die Telekom-Regel steht in der Karte (``kanarie.ausgelistet_url``,
+``ist_ausgelistet``): Endadresse anders als die angeforderte, Host genau der des Musters
+und Pfad (nicht Query) ganz im Muster. Beides gilt nur, wenn der Kanarienwert fehlt.
 """
 
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
+from urllib.parse import urlsplit
 
 from playwright.sync_api import Error as PlaywrightFehler
 
@@ -41,8 +43,27 @@ if TYPE_CHECKING:
 
 PLATZHALTER = "{" + PLATZHALTER_MODELL + "}"
 _PASST_JS = "(element, css) => element.matches(css)"
-AUSGELISTET = ("redirectFrom=device-details", "/shop/geraete/smartphones/")
+AUSGELISTET = ("redirectFrom=device-details",)
 GRUND_AUSGELISTET = "Gerät nicht mehr angeboten, Umleitung auf"
+
+
+def ist_ausgelistet(kanarie: Kanarie, angefordert: str, endadresse: str) -> bool:
+    """Wahr, wenn die Endadresse die Übersicht für ausgelistete Geräte der Karte ist.
+
+    Nur mit ``kanarie.ausgelistet_url``, nur nach einer Umleitung (anderer Host oder
+    Pfad als angefordert), beim genauen Host und mit dem Pfad ganz im Muster; die Query
+    zählt nicht (eine Login- oder Fehlerseite trägt den Rückweg oft darin).
+    """
+    regel = kanarie.ausgelistet_url
+    if regel is None:
+        return False
+    ende, anfang = urlsplit(endadresse), urlsplit(angefordert)
+    if (ende.hostname, ende.path.rstrip("/")) == (
+        anfang.hostname,
+        anfang.path.rstrip("/"),
+    ):
+        return False
+    return ende.hostname == regel.host and regel.pfad.fullmatch(ende.path) is not None
 
 
 def kanarientext(kanarie: Kanarie, modell: str | None) -> str:
@@ -76,8 +97,11 @@ class Bedienung:
         ort = self.seite.locator(kanarie.selektor)
         if erwartet not in self.leser.text(ort, erwartet, kanarie.attribut):
             self.wache.pruefe_tor()
-            if any(m in self.seite.url for m in AUSGELISTET):
-                raise Abbruch(LAUF_LEER, f"{GRUND_AUSGELISTET} {self.seite.url}")
+            ende = self.seite.url
+            if any(m in ende for m in AUSGELISTET) or ist_ausgelistet(
+                kanarie, self.wache.lauf.adresse, ende
+            ):
+                raise Abbruch(LAUF_LEER, f"{GRUND_AUSGELISTET} {ende}")
             stelle = kanarie.selektor
             if kanarie.attribut is not None:
                 stelle = f"{stelle} [{kanarie.attribut}]"

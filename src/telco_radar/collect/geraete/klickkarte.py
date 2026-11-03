@@ -66,6 +66,8 @@ Anbieter verlangt (Befunde je Anbieter):
   und danach geschlossen wird (Telekom „Preisübersicht anzeigen“).
 - ``kanarie.enthaelt`` mit ``{modell}`` (Modellname aus dem Katalog, o2 und 1&1) und
   ``kanarie.attribut``: der Wert dieses Attributs statt des Texts (1&1 ``aria-label``).
+- ``kanarie.ausgelistet_url`` ``{host, pfad}`` (Telekom): Übersicht, auf die der
+  Anbieter ausgelistete Geräte umleitet; Host genau, ``pfad`` ganzer Pfad.
 
 Zweite Lesung (Stufe 2 von Format 2):
 
@@ -168,6 +170,7 @@ from .klickkartentypen import (
     WERTFELDER,
     Adressen,
     Antwortmuster,
+    AusgelistetUrl,
     Auswahlmarke,
     Kanarie,
     Klickkarte,
@@ -203,6 +206,7 @@ __all__ = [
     "PLATZHALTER_MODELL",
     "WERTFELDER",
     "Antwortmuster",
+    "AusgelistetUrl",
     "Auswahlmarke",
     "Kanarie",
     "KlickkartenFehler",

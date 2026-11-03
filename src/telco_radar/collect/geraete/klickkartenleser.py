@@ -37,6 +37,7 @@ from .klickkartentypen import (
     GRUND_WEITER_KLICK,
     PLATZHALTER_MODELL,
     Adressen,
+    AusgelistetUrl,
     Auswahlmarke,
     Kanarie,
     KlickkartenFehler,
@@ -61,7 +62,8 @@ ADRESSTEILE = ("selektor", "attribut", "parameter")
 MARKENTEILE = ("attribut", "wert", "passt")
 VORBEREITUNGSTEILE = ("klick", "bis", "pruefe", "darf_fehlen")
 LESUNGSTEILE = ("selektor", "oeffnen", "schliessen", "ohne", "muster")
-KANARIENTEILE = ("selektor", "enthaelt", "attribut")
+KANARIENTEILE = ("selektor", "enthaelt", "attribut", "ausgelistet_url")
+AUSGELISTETTEILE = ("host", "pfad")
 KACHELN = "kacheln"
 KLICKEN = "klicken"
 WEITERTEILE = ("selektor", "text", KACHELN, KLICKEN)
@@ -298,6 +300,18 @@ class Kartenleser:
             selektor=self.text(daten, "selektor", feld),
             enthaelt=enthaelt,
             attribut=self.wahlweise_text(daten, "attribut", feld),
+            ausgelistet_url=self.ausgelistet_url(daten.get("ausgelistet_url")),
+        )
+
+    def ausgelistet_url(self, roh: object) -> AusgelistetUrl | None:
+        """Host und Pfadmuster der Übersicht für ausgelistete Geräte, sonst ``None``."""
+        if roh is None:
+            return None
+        feld = "kanarie.ausgelistet_url"
+        daten = self.zuordnung(roh, feld, AUSGELISTETTEILE)
+        return AusgelistetUrl(
+            host=self.text(daten, "host", feld).lower(),
+            pfad=self.muster(daten, "pfad", feld),
         )
 
 
