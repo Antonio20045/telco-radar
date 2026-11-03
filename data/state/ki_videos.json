@@ -1,6 +1,106 @@
 {
- "stand": "2026-11-02",
+ "stand": "2026-11-03",
  "videos": [
+  {
+   "id": "yC72iQx6rM0",
+   "titel": "Qodo brings company context into Codex code review",
+   "kanal": "OpenAI",
+   "datum": "2026-11-03",
+   "dauer_sekunden": 85,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "yC72iQx6rM0.jpg"
+  },
+  {
+   "id": "wgvEgLJX-e8",
+   "titel": "Codex baut Space Taxi nach – und nimmt eine Abkürzung",
+   "kanal": "c't 3003",
+   "datum": "2026-11-03",
+   "dauer_sekunden": 51,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "wgvEgLJX-e8.jpg"
+  },
+  {
+   "id": "jnP9AgtX0qo",
+   "titel": "Can Your AI Use Sensitive Data Safely? 5 Capabilities You Need",
+   "kanal": "IBM Technology",
+   "datum": "2026-11-03",
+   "dauer_sekunden": 695,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "jnP9AgtX0qo.jpg"
+  },
+  {
+   "id": "NCxD-qsQcN0",
+   "titel": "TamaGPT",
+   "kanal": "OpenAI",
+   "datum": "2026-11-03",
+   "dauer_sekunden": 82,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "NCxD-qsQcN0.jpg"
+  },
+  {
+   "id": "JR7xBi2kJjY",
+   "titel": "Glean on privacy and OpenAI Private Intelligence",
+   "kanal": "OpenAI",
+   "datum": "2026-11-03",
+   "dauer_sekunden": 28,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "JR7xBi2kJjY.jpg"
+  },
+  {
+   "id": "I_192sI3UPM",
+   "titel": "vidIQ Tutorial for Beginners (Step-by-Step)",
+   "kanal": "Kevin Stratvert",
+   "datum": "2026-11-03",
+   "dauer_sekunden": 805,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "I_192sI3UPM.jpg"
+  },
+  {
+   "id": "6Q0X-yk52w0",
+   "titel": "Es beginnt: KI hat jetzt eine eigene Sprache, die kein Mensch versteht",
+   "kanal": "Everlast AI",
+   "datum": "2026-11-03",
+   "dauer_sekunden": 1018,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "6Q0X-yk52w0.jpg"
+  },
+  {
+   "id": "63pcV4z0DwI",
+   "titel": "ChatGPT Voice is now in Finances",
+   "kanal": "OpenAI",
+   "datum": "2026-11-03",
+   "dauer_sekunden": 52,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "63pcV4z0DwI.jpg"
+  },
+  {
+   "id": "2h16j4K_NbA",
+   "titel": "Glean on privacy and OpenAI Private Intelligence",
+   "kanal": "OpenAI",
+   "datum": "2026-11-03",
+   "dauer_sekunden": 57,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "2h16j4K_NbA.jpg"
+  },
+  {
+   "id": "lZes3U_WIug",
+   "titel": "Generate Worlds in Real-Time (Free & Open Source)",
+   "kanal": "Matt Wolfe",
+   "datum": "2026-11-02",
+   "dauer_sekunden": 76,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "lZes3U_WIug.jpg"
+  },
   {
    "id": "jL53DwYaK3c",
    "titel": "KI-Update kompakt: Linux-Lücke, Audio Intelligence, KI-Operation, KI-Satellit",
@@ -200,193 +300,93 @@
    "stufe": "Einstieg",
    "sprache": "de",
    "bild": "suJXDPEfe3U.jpg"
-  },
-  {
-   "id": "sJOqt3wIyvg",
-   "titel": "Conditional Access for AI Agents in Microsoft Entra",
-   "kanal": "Microsoft Mechanics",
-   "datum": "2026-10-30",
-   "dauer_sekunden": 33,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "sJOqt3wIyvg.jpg"
-  },
-  {
-   "id": "o4D1J1YWjhg",
-   "titel": "There are many futures. Which do you want to build?",
-   "kanal": "OpenAI",
-   "datum": "2026-10-30",
-   "dauer_sekunden": 77,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "o4D1J1YWjhg.jpg"
-  },
-  {
-   "id": "hOVaubDnu5A",
-   "titel": "AI Exposes Legacy Code",
-   "kanal": "IBM Technology",
-   "datum": "2026-10-30",
-   "dauer_sekunden": 35,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "hOVaubDnu5A.jpg"
-  },
-  {
-   "id": "fv9_CnoF-1M",
-   "titel": "Phishing-Resistant MFA with Conditional Access Authentication Strength",
-   "kanal": "Microsoft Mechanics",
-   "datum": "2026-10-30",
-   "dauer_sekunden": 32,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "fv9_CnoF-1M.jpg"
-  },
-  {
-   "id": "eDiQNFa-zYg",
-   "titel": "AI News: The Only 6 Stories Worth Knowing This Week",
-   "kanal": "Matt Wolfe",
-   "datum": "2026-10-30",
-   "dauer_sekunden": 1761,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "eDiQNFa-zYg.jpg"
-  },
-  {
-   "id": "_MjIPI1MgTQ",
-   "titel": "How Conditional Access Plans and Rules Work",
-   "kanal": "Microsoft Mechanics",
-   "datum": "2026-10-30",
-   "dauer_sekunden": 45,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "_MjIPI1MgTQ.jpg"
-  },
-  {
-   "id": "Rh1QmdzMreI",
-   "titel": "Lieferandos KI serviert eine Kartoffeljacke",
-   "kanal": "c't 3003",
-   "datum": "2026-10-30",
-   "dauer_sekunden": 72,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "Rh1QmdzMreI.jpg"
-  },
-  {
-   "id": "Oi9DHk57KeQ",
-   "titel": "How Gen uses ChatGPT Work to turn data Into decisions | OpenAI",
-   "kanal": "OpenAI",
-   "datum": "2026-10-30",
-   "dauer_sekunden": 64,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "Oi9DHk57KeQ.jpg"
-  },
-  {
-   "id": "Leo0eo8CznU",
-   "titel": "KI-Update kompakt: Mistral ML4, Cohere, KI-Empfehlungen, KI klont Indie-Spiele",
-   "kanal": "KI Update (heise)",
-   "datum": "2026-10-30",
-   "dauer_sekunden": 1093,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "Leo0eo8CznU.jpg"
-  },
-  {
-   "id": "K8NgeOuZmWU",
-   "titel": "AI exposes a major web security flaw, plus a new kind of voice model",
-   "kanal": "IBM Technology",
-   "datum": "2026-10-30",
-   "dauer_sekunden": 2365,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "K8NgeOuZmWU.jpg"
   }
  ],
  "kanaele": {
   "c't 3003": {
    "error": null,
-   "versucht": "2026-11-02",
-   "abgerufen": "2026-11-02"
+   "versucht": "2026-11-03",
+   "abgerufen": "2026-11-03"
   },
   "KI Update (heise)": {
    "error": null,
-   "versucht": "2026-11-02",
-   "abgerufen": "2026-11-02"
+   "versucht": "2026-11-03",
+   "abgerufen": "2026-11-03"
   },
   "Everlast AI": {
    "error": null,
-   "versucht": "2026-11-02",
-   "abgerufen": "2026-11-02"
+   "versucht": "2026-11-03",
+   "abgerufen": "2026-11-03"
   },
   "The Morpheus Tutorials": {
    "error": null,
-   "versucht": "2026-11-02",
-   "abgerufen": "2026-11-02"
+   "versucht": "2026-11-03",
+   "abgerufen": "2026-11-03"
   },
   "Kevin Stratvert": {
    "error": null,
-   "versucht": "2026-11-02",
-   "abgerufen": "2026-11-02"
+   "versucht": "2026-11-03",
+   "abgerufen": "2026-11-03"
   },
   "Microsoft Mechanics": {
    "error": null,
-   "versucht": "2026-11-02",
-   "abgerufen": "2026-11-02"
+   "versucht": "2026-11-03",
+   "abgerufen": "2026-11-03"
   },
   "Leila Gharani": {
    "error": null,
-   "versucht": "2026-11-02",
-   "abgerufen": "2026-11-02"
+   "versucht": "2026-11-03",
+   "abgerufen": "2026-11-03"
   },
   "Jeff Su": {
    "error": null,
-   "versucht": "2026-11-02",
-   "abgerufen": "2026-11-02"
+   "versucht": "2026-11-03",
+   "abgerufen": "2026-11-03"
   },
   "Matt Wolfe": {
    "error": null,
-   "versucht": "2026-11-02",
-   "abgerufen": "2026-11-02"
+   "versucht": "2026-11-03",
+   "abgerufen": "2026-11-03"
   },
   "IBM Technology": {
    "error": null,
-   "versucht": "2026-11-02",
-   "abgerufen": "2026-11-02"
+   "versucht": "2026-11-03",
+   "abgerufen": "2026-11-03"
   },
   "OpenAI": {
    "error": null,
-   "versucht": "2026-11-02",
-   "abgerufen": "2026-11-02"
+   "versucht": "2026-11-03",
+   "abgerufen": "2026-11-03"
   },
   "Anthropic": {
    "error": null,
-   "versucht": "2026-11-02",
-   "abgerufen": "2026-11-02"
+   "versucht": "2026-11-03",
+   "abgerufen": "2026-11-03"
   },
   "Google DeepMind": {
    "error": null,
-   "versucht": "2026-11-02",
-   "abgerufen": "2026-11-02"
+   "versucht": "2026-11-03",
+   "abgerufen": "2026-11-03"
   },
   "AI Explained": {
    "error": null,
-   "versucht": "2026-11-02",
-   "abgerufen": "2026-11-02"
+   "versucht": "2026-11-03",
+   "abgerufen": "2026-11-03"
   },
   "Two Minute Papers": {
    "error": null,
-   "versucht": "2026-11-02",
-   "abgerufen": "2026-11-02"
+   "versucht": "2026-11-03",
+   "abgerufen": "2026-11-03"
   },
   "3Blue1Brown": {
    "error": null,
-   "versucht": "2026-11-02",
-   "abgerufen": "2026-11-02"
+   "versucht": "2026-11-03",
+   "abgerufen": "2026-11-03"
   },
   "David Ondrej": {
    "error": null,
-   "versucht": "2026-11-02",
-   "abgerufen": "2026-11-02"
+   "versucht": "2026-11-03",
+   "abgerufen": "2026-11-03"
   }
  },
  "error": null
