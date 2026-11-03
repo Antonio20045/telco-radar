@@ -1,0 +1,53 @@
+{
+ "anbieter": "congstar-auto",
+ "datum": "2026-11-03",
+ "dauer_sekunden": 25.6,
+ "format": 1,
+ "frischegrenze_tage": 3,
+ "grund": "Gerät nicht mehr angeboten, Umleitung auf https://www.congstar.de/geraete/samsung/?redirectFrom=device-details",
+ "karte": "congstar.yaml",
+ "laufstatus": "nicht_gelesen",
+ "lesefrist_tage": 1,
+ "name": "congstar",
+ "seiten": [
+  {
+   "adresse": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s25-fe/",
+   "geraet": "samsung-galaxy-s25-fe",
+   "gescheitert": 0,
+   "grund": "Gerät nicht mehr angeboten, Umleitung auf https://www.congstar.de/geraete/samsung/?redirectFrom=device-details",
+   "http_status": 200,
+   "kombinationen": [],
+   "ladung": {
+    "abstand_s": 2.0,
+    "anfragen": 35,
+    "beendet": 33,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {},
+    "ohne_antwort_ms": 0,
+    "sekunden": 6.1,
+    "takte_ms": 3500,
+    "wartet_auf": "load"
+   },
+   "speicher_gb": 128,
+   "sperre": null,
+   "status": "leer",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 2
+  }
+ ],
+ "ueberfaellig": [
+  "https://www.congstar.de/geraete/samsung/samsung-galaxy-s25-fe/"
+ ],
+ "uebersichten": [],
+ "vertragsform": "tarif_plus_ratenkauf",
+ "zeitbudget_sekunden": 10260
+}
