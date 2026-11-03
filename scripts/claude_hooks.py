@@ -147,14 +147,14 @@ def datei_lesen(ereignis: dict) -> str | None:
 def nach_edit(ereignis: dict, wurzel: Path = WURZEL) -> str | None:
     """PostToolUse Edit/Write: ruff format und ruff check auf die eine Datei.
 
-    Läuft der Hook nicht im ``.venv``, ruft er sich dort auf; ohne ``.venv`` prüft er
-    nichts, das meldet ``sitzung``.
+    Liegt neben dem laufenden Python kein ``ruff`` (z. B. Claude Code mit einem
+    fremden Interpreter), ruft er sich im Projekt-``.venv`` auf; ohne ``.venv``
+    prüft er nichts, das meldet ``sitzung``.
     """
     pfad = Path(str(ereignis.get("tool_input", {}).get("file_path", "")))
     if pfad.suffix != ".py" or not pfad.is_file() or not pfad.is_relative_to(wurzel):
         return None
-    eigenes_venv = sys.prefix != sys.base_prefix
-    if not (eigenes_venv and (Path(sys.executable).parent / "ruff").exists()):
+    if not (Path(sys.executable).parent / "ruff").exists():
         venv = wurzel / ".venv" / "bin"
         if not (venv / "python").exists() or not (venv / "ruff").exists():
             return None
