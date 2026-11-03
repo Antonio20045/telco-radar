@@ -364,3 +364,23 @@ def test_veroeffentlichen_rechnet_die_wirksame_frist_ab_jobstart(aufbau, monkeyp
     argv[-1] = "9400"
     assert modul.main(argv, gh=AttrappeReleases()) == 0
     assert gesehen == [50.0 + 1800, 50.0 + 1200]
+
+
+def test_jobstart_in_der_zukunft_verlaengert_die_frist_nicht(aufbau, monkeypatch):
+    """Uhrversatz zwischen Läufern: die Frist bleibt höchstens ``JOB_FRIST_S``."""
+    wurzel = aufbau.lege([], [])
+    modul = aufbau.modul
+    gesehen: list[float] = []
+
+    def merke(bilder, heute, gh, frist_ende=None, **_):
+        gesehen.append(frist_ende)
+        return SimpleNamespace(zeilen=lambda: [], fehler=[], ausgelassen=0)
+
+    monkeypatch.setattr(modul, "veroeffentliche", merke)
+    monkeypatch.setattr(
+        modul, "time", SimpleNamespace(time=lambda: 10_000.0, monotonic=lambda: 50.0)
+    )
+    argv = ["--root", str(wurzel), "--quelle", str(aufbau.quelle)]
+    argv += ["--job-frist-sekunden", "2100", "--job-start", "10100"]
+    assert modul.main(argv, gh=AttrappeReleases()) == 0
+    assert gesehen == [50.0 + modul.JOB_FRIST_S]

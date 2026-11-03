@@ -16,6 +16,13 @@ Paket steht in der Bilanz, die übrigen laufen weiter (CLAUDE.md Clean Code 5).
 nach ``AUFBEWAHRUNG_GROSS_TAGE`` löschen; in jüngeren Monats-Releases einzelne Bilder,
 die älter sind. Was nicht im Schema liegt, rührt nichts an.
 
+Ein Paket kann halb ankommen (``gh`` lädt die Dateien parallel und bricht beim ersten
+Fehler ab) und frisch angelegte Releases antworten kurz mit 404. Darum liest
+``veroeffentliche`` nach einem Fehler die Anhänge, zählt, was angekommen ist, und lädt
+bei vorübergehenden Fehlern (404, „already exists“, 429, 5xx) nur den Rest mit Pause
+erneut (``VERSUCHE``). Was am Ende fehlt, steht als ``fehlgeschlagen`` mit Fehlerzeile;
+``ausgelassen`` heißt nur: Zeit abgelaufen.
+
 ``frist_ende`` ist die monotone Zeit, bis zu der ein neues Paket beginnen darf
 (CLAUDE.md Regel 8); der Rest heißt ``ausgelassen``. Außer ``gh`` gibt es kein Netz; das
 Token liegt nur in der Umgebung (``GH_TOKEN``), nie in Argumenten oder Ausgaben.
@@ -47,6 +54,12 @@ from .beleg_regeln import (
 PAKET = 40
 """Dateien je ``gh release upload``: klein genug, dass ein Fehler wenig kostet."""
 ZEIT_JE_AUFRUF_S = 300
+VERSUCHE = 5
+"""Hochladeversuche je Paket bei vorübergehenden Fehlern."""
+PAUSE_S = 5.0
+"""Pause vor Versuch n+1: ``PAUSE_S * n`` Sekunden, nur solange die Frist es zulässt."""
+VORUEBERGEHEND = ("HTTP 404", "already exists", "HTTP 429", "HTTP 50")
+"""Teile einer ``GhFehler``-Meldung, die eine Wiederholung lohnen."""
 Runner = Callable[[Sequence[str]], "subprocess.CompletedProcess[str]"]
 Anhaenge = Mapping[str, Sequence[str]]
 """Tag eines Releases -> Dateinamen seiner Anhänge."""
@@ -212,6 +225,7 @@ class Bilanz:
     hochgeladen: int = 0
     gross: int = 0
     ausgelassen: int = 0
+    fehlgeschlagen: int = 0
     fehler: list[str] = field(default_factory=list)
     releases_geloescht: list[str] = field(default_factory=list)
     assets_geloescht: int = 0
@@ -221,7 +235,7 @@ class Bilanz:
         return [
             f"Belege: {self.hochgeladen} Bilder in Tages-Releases, {self.gross} in "
             f"Monats-Releases (große Änderungen), {self.ausgelassen} ausgelassen "
-            f"(Zeit), {len(self.fehler)} Fehler",
+            f"(Zeit), {self.fehlgeschlagen} fehlgeschlagen, {len(self.fehler)} Fehler",
             f"Belege: {len(self.releases_geloescht)} Releases und "
             f"{self.assets_geloescht} Dateien gelöscht",
         ]
@@ -236,6 +250,56 @@ def _freier_tag(
     return bauen(tag, teil)
 
 
+def ist_voruebergehend(fehler: GhFehler) -> bool:
+    """Lohnt eine Wiederholung (Release noch nicht sichtbar, Wettlauf, Last)?"""
+    return any(teil in str(fehler) for teil in VORUEBERGEHEND)
+
+
+def _lade_paket(
+    tag: str,
+    paket: list[Bild],
+    vorhanden: dict[str, list[str]],
+    gh: Releases,
+    bilanz: Bilanz,
+    frist_ende: float | None,
+    uhr: Callable[[], float],
+    schlaf: Callable[[float], None],
+) -> list[Bild]:
+    """Lädt ein Paket, wiederholt den Rest, gibt das Angekommene zurück."""
+    vorher = set(vorhanden.get(tag, []))
+    offen = list(paket)
+    fertig: list[Bild] = []
+    letzter: GhFehler | None = None
+    for versuch in range(1, VERSUCHE + 1):
+        try:
+            gh.hochladen(tag, [bild.datei for bild in offen])
+            fertig.extend(offen)
+            offen = []
+            break
+        except GhFehler as fehler:
+            letzter = fehler
+        try:
+            da = set(gh.anhaenge().get(tag, []))
+        except GhFehler:
+            da = set()
+        angekommen = [b for b in offen if b.datei.name in da - vorher]
+        fertig.extend(angekommen)
+        offen = [b for b in offen if b not in angekommen]
+        if not offen or versuch == VERSUCHE or not ist_voruebergehend(letzter):
+            break
+        pause = PAUSE_S * versuch
+        if frist_ende is not None and uhr() + pause >= frist_ende:
+            break
+        schlaf(pause)
+    if offen and letzter is not None:
+        bilanz.fehler.append(
+            f"{tag}: {len(offen)} von {len(paket)} Bildern fehlen: {letzter}"
+        )
+        bilanz.fehlgeschlagen += len(offen)
+    vorhanden.setdefault(tag, []).extend(b.datei.name for b in fertig)
+    return fertig
+
+
 def _lade_tag(
     tag: str,
     eintraege: list[Bild],
@@ -244,8 +308,9 @@ def _lade_tag(
     bilanz: Bilanz,
     frist_ende: float | None,
     uhr: Callable[[], float],
+    schlaf: Callable[[float], None] = time.sleep,
 ) -> None:
-    """Legt das Release an, falls nötig, und lädt die Bilder paketweise hoch."""
+    """Legt das Release an (falls nötig) und lädt die Bilder paketweise hoch."""
     if frist_ende is not None and uhr() >= frist_ende:
         bilanz.ausgelassen += len(eintraege)
         return
@@ -254,7 +319,7 @@ def _lade_tag(
             gh.release_anlegen(tag, f"Belege {tag.removeprefix('belege-')}")
         except GhFehler as fehler:
             bilanz.fehler.append(f"{tag}: {fehler}")
-            bilanz.ausgelassen += len(eintraege)
+            bilanz.fehlgeschlagen += len(eintraege)
             return
         vorhanden[tag] = []
     for start in range(0, len(eintraege), PAKET):
@@ -262,16 +327,13 @@ def _lade_tag(
         if frist_ende is not None and uhr() >= frist_ende:
             bilanz.ausgelassen += len(paket)
             continue
-        try:
-            gh.hochladen(tag, [bild.datei for bild in paket])
-        except GhFehler as fehler:
-            bilanz.fehler.append(f"{tag}: {fehler}")
-            bilanz.ausgelassen += len(paket)
-            continue
+        angekommen = len(
+            _lade_paket(tag, paket, vorhanden, gh, bilanz, frist_ende, uhr, schlaf)
+        )
         if ist_gross_tag(tag):
-            bilanz.gross += len(paket)
+            bilanz.gross += angekommen
         else:
-            bilanz.hochgeladen += len(paket)
+            bilanz.hochgeladen += angekommen
 
 
 def veroeffentliche(
@@ -280,6 +342,7 @@ def veroeffentliche(
     gh: Releases,
     frist_ende: float | None = None,
     uhr: Callable[[], float] = time.monotonic,
+    schlaf: Callable[[float], None] = time.sleep,
 ) -> Bilanz:
     """Lädt hoch (Modulkopf). Kein Zugriff auf ``gh`` ohne Bilder."""
     bilanz = Bilanz()
@@ -289,7 +352,7 @@ def veroeffentliche(
         vorhanden = {tag: list(dateien) for tag, dateien in gh.anhaenge().items()}
     except GhFehler as fehler:
         bilanz.fehler.append(f"Releases nicht lesbar: {fehler}")
-        bilanz.ausgelassen = len(bilder)
+        bilanz.fehlgeschlagen = len(bilder)
         return bilanz
     belegt = {tag: len(dateien) for tag, dateien in vorhanden.items()}
     je_tag: dict[str, list[Bild]] = {}
@@ -301,7 +364,7 @@ def veroeffentliche(
             belegt[tag] = belegt.get(tag, 0) + 1
             je_tag.setdefault(tag, []).append(bild)
     for tag in sorted(je_tag):
-        _lade_tag(tag, je_tag[tag], vorhanden, gh, bilanz, frist_ende, uhr)
+        _lade_tag(tag, je_tag[tag], vorhanden, gh, bilanz, frist_ende, uhr, schlaf)
     return bilanz
 
 

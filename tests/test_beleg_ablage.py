@@ -76,7 +76,7 @@ def test_lesefehler_laedt_nichts_hoch_und_steht_in_der_bilanz(tmp_path):
     gh = AttrappeReleases(lesefehler=True)
     bilanz = veroeffentliche([bild(tmp_path, "g", "o2")], HEUTE, gh)
     assert gh.hochgeladen == []
-    assert bilanz.ausgelassen == 1
+    assert (bilanz.fehlgeschlagen, bilanz.ausgelassen) == (1, 0)
     assert "nicht lesbar" in bilanz.fehler[0]
 
 
@@ -85,7 +85,7 @@ def test_fehler_im_tagesrelease_stoppt_das_monatsrelease_nicht(tmp_path):
     bilanz = veroeffentliche([bild(tmp_path, "g", "o2", gross=True)], HEUTE, gh)
     assert gh.stand.get("belege-gross-2026-11") == ["g__o2__2026-11-10.webp"]
     assert len(bilanz.fehler) == 1
-    assert bilanz.ausgelassen == 1
+    assert (bilanz.fehlgeschlagen, bilanz.ausgelassen) == (1, 0)
     assert bilanz.gross == 1
 
 
@@ -255,3 +255,95 @@ def test_runner_mit_frist_startet_nach_ablauf_kein_gh_mehr():
         runner(["gh", "api"])
     with pytest.raises(beleg_ablage.GhFehler, match="^gh "):
         beleg_ablage.Gh(runner).release_loeschen("belege-2026-11-01")
+
+
+class FlakyReleases(AttrappeReleases):
+    """Wie GitHub kurz nach dem Anlegen: die ersten Uploads scheitern, ein Teil der
+    Dateien kommt trotzdem an (``gh`` lädt parallel, bricht beim ersten Fehler ab)."""
+
+    def __init__(self, meldung: str, scheitert: int, teilweise: int = 0, **kw) -> None:
+        super().__init__(**kw)
+        self.meldung, self.scheitert, self.teilweise = meldung, scheitert, teilweise
+        self.versuche = 0
+
+    def hochladen(self, tag, dateien):
+        self.versuche += 1
+        if self.versuche <= self.scheitert:
+            namen = (
+                [d.name for d in dateien][: self.teilweise]
+                if self.versuche == 1
+                else []
+            )
+            self.stand.setdefault(tag, []).extend(namen)
+            raise GhFehler(f"gh release upload: Exit 1: {self.meldung}")
+        super().hochladen(tag, dateien)
+
+
+def viele(tmp_path: Path, anzahl: int) -> list[Bild]:
+    return [bild(tmp_path, f"g{i}", "o2") for i in range(anzahl)]
+
+
+def test_404_nach_dem_anlegen_wird_mit_pause_wiederholt(tmp_path):
+    gh = FlakyReleases("HTTP 404: Not Found (https://uploads.github.com/x)", 2)
+    pausen: list[float] = []
+    bilanz = veroeffentliche(viele(tmp_path, 3), HEUTE, gh, schlaf=pausen.append)
+    assert len(gh.stand["belege-2026-11-10"]) == 3
+    assert (bilanz.hochgeladen, bilanz.fehlgeschlagen, bilanz.fehler) == (3, 0, [])
+    assert pausen == [beleg_ablage.PAUSE_S, 2 * beleg_ablage.PAUSE_S]
+
+
+def test_halb_angekommenes_paket_zaehlt_und_laedt_nur_den_rest_nach(tmp_path):
+    gh = FlakyReleases("HTTP 404: Not Found", 1, teilweise=2)
+    bilanz = veroeffentliche(viele(tmp_path, 5), HEUTE, gh, schlaf=lambda s: None)
+    assert (bilanz.hochgeladen, bilanz.fehlgeschlagen) == (5, 0)
+    assert len(gh.stand["belege-2026-11-10"]) == 5
+    assert [len(d) for _, d in gh.hochgeladen] == [3]
+
+
+def test_already_exists_nach_teilerfolg_ist_erfolg_ohne_doppelzaehlung(tmp_path):
+    gh = FlakyReleases("ReleaseAsset.name already exists", 1, teilweise=4)
+    bilanz = veroeffentliche(viele(tmp_path, 4), HEUTE, gh, schlaf=lambda s: None)
+    assert gh.versuche == 1
+    assert (bilanz.hochgeladen, bilanz.fehlgeschlagen, bilanz.fehler) == (4, 0, [])
+
+
+def test_dauerhafter_404_bleibt_benannter_fehler_ohne_falsche_zeit(tmp_path):
+    gh = FlakyReleases("HTTP 404: Not Found", 99, teilweise=1)
+    bilanz = veroeffentliche(viele(tmp_path, 3), HEUTE, gh, schlaf=lambda s: None)
+    assert gh.versuche == beleg_ablage.VERSUCHE
+    assert (bilanz.hochgeladen, bilanz.fehlgeschlagen, bilanz.ausgelassen) == (1, 2, 0)
+    assert len(bilanz.fehler) == 1 and "2 von 3" in bilanz.fehler[0]
+    assert "2 fehlgeschlagen" in bilanz.zeilen()[0]
+    assert "0 ausgelassen (Zeit)" in bilanz.zeilen()[0]
+
+
+def test_dauerhafter_fehler_wird_nicht_wiederholt(tmp_path):
+    gh = FlakyReleases("HTTP 401: Bad credentials", 99)
+    bilanz = veroeffentliche(viele(tmp_path, 2), HEUTE, gh, schlaf=lambda s: None)
+    assert gh.versuche == 1
+    assert (bilanz.fehlgeschlagen, bilanz.ausgelassen) == (2, 0)
+
+
+def test_wiederholung_beachtet_die_frist(tmp_path):
+    gh = FlakyReleases("HTTP 404: Not Found", 99)
+    pausen: list[float] = []
+    bilanz = veroeffentliche(
+        viele(tmp_path, 2),
+        HEUTE,
+        gh,
+        frist_ende=100.0,
+        uhr=lambda: 99.0,
+        schlaf=pausen.append,
+    )
+    assert pausen == [] and gh.versuche == 1
+    assert (bilanz.fehlgeschlagen, bilanz.ausgelassen) == (2, 0)
+
+
+def test_vorhandene_datei_gilt_nicht_als_angekommen(tmp_path):
+    """Gegenprobe: ein Name von einem früheren Lauf beweist keinen neuen Upload."""
+    name = dateiname("g0", "o2", HEUTE)
+    gh = FlakyReleases(
+        "HTTP 404: Not Found", 99, anhaenge={"belege-2026-11-10": [name]}
+    )
+    bilanz = veroeffentliche(viele(tmp_path, 1), HEUTE, gh, schlaf=lambda s: None)
+    assert (bilanz.hochgeladen, bilanz.fehlgeschlagen) == (0, 1)

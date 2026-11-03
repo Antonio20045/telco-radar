@@ -132,7 +132,9 @@ def main(argumente: list[str] | None = None, gh: Releases | None = None) -> int:
     args = parser.parse_args(argumente)
     beginn = time.time()
     heute = args.heute or datetime.now(UTC).date()
-    verstrichen = beginn - (args.job_start if args.job_start is not None else beginn)
+    verstrichen = max(
+        0.0, beginn - (args.job_start if args.job_start is not None else beginn)
+    )
     ende = time.monotonic() + max(
         0.0, wirksame_frist(args.job_frist_sekunden) - verstrichen
     )
