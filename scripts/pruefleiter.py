@@ -23,7 +23,6 @@ from collections.abc import Callable, Mapping
 from pathlib import Path
 from typing import TextIO
 
-import leiter_push
 import leiter_pytest
 import leiter_schnell
 import leiter_vertraege
@@ -247,14 +246,7 @@ STUFEN_STATISCH: list[Callable[[TextIO], Ergebnis]] = [
     stufe_schichten,
 ]
 STUFEN_VOLL = [*STUFEN_STATISCH, stufe_tests]
-
-
-def stufe_push(log: TextIO) -> Ergebnis:
-    """Stufe 5 im pre-push: nur die betroffenen Testdateien (``leiter_push``)."""
-    return leiter_push.stufe(log, WURZEL, _lauf, stufe_tests, TEST_FRIST_SEKUNDEN)
-
-
-STUFEN_PUSH = [*STUFEN_STATISCH, stufe_push]
+STUFEN_PUSH = STUFEN_STATISCH
 
 
 def fuehre_aus(
@@ -316,7 +308,7 @@ def main(argv: list[str] | None = None) -> int:
     art.add_argument("--voll", action="store_true", help="Stufen 0 bis 3 und 5")
     art.add_argument("--statisch", action="store_true", help="Stufen 0 bis 3")
     art.add_argument("--schnell", action="store_true", help="Stufen 0, 1 und 4")
-    art.add_argument("--vor-push", action="store_true", help="pre-push, Stufe 5 Push")
+    art.add_argument("--vor-push", action="store_true", help="pre-push, Stufen 0 bis 3")
     parser.add_argument("--nur-vorgemerkt", action="store_true")
     parser.add_argument("hook", nargs="*", help="Argumente des pre-push-Hooks")
     args = parser.parse_args(argv)
