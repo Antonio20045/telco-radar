@@ -88,7 +88,7 @@ from ..tco_model import (
     sim_only_id,
     tco_24,
 )
-from .tco_beleg import beleg_widerspricht
+from .tco_beleg import beleg_widerspricht, beleglink_der_zeile
 from .tco_buendel import KLICKFELDER
 
 log = logging.getLogger(__name__)
@@ -204,7 +204,7 @@ class TcoDB:
         erfassung = roh.get("erfassung")
         self.erfassung = erfassung if isinstance(erfassung, dict) else {}
         migriert = 0
-        for eintrag in roh.get("buendel") or []:
+        for eintrag in map(beleglink_der_zeile, roh.get("buendel") or []):
             if beleg_widerspricht(eintrag):
                 log.warning(
                     "verworfen, Beleg ist ein anderes Modell: %s", eintrag.get("id")

@@ -25,6 +25,7 @@ from __future__ import annotations
 from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass, field, fields, replace
 
+from ..geraete_model import normalisiere
 from ..tarif_model import buendelphasen_aus
 from ..tco_model import Aktion, Buendel, aktionen_aus, kosten_ueber
 
@@ -58,7 +59,10 @@ GERAETETARIF_MERKMAL = {"o2": "Plus"}
 """Wort im Namen eines Tarifs, den der Anbieter nur mit Gerät führt (normalisierter Name
 → Wort). o2s „… Plus …“ trägt die Tarif-ID des Grundtarifs, ist aber ein eigener Tarif:
 zum iPhone 17 Pro kostet Unlimited M Plus 19,99 € statt 39,99 €, SIM-only Unlimited M
-29,99 € (o2-Seite am 07.10.2026). Für Regel 3 fehlt sein SIM-only-Preis."""
+29,99 € (o2-Seite am 07.10.2026). Für Regel 3 fehlt sein SIM-only-Preis. Sein Preis
+enthält den o2-Plus-Bundle-Rabatt, der laut o2-Fußnote nur gilt, wenn binnen 6 Wochen
+ein Zweitprodukt gebucht wird (Preisprüfung 03.11.2026); ein solcher Tarif zählt nicht
+im Vergleich (``ist_bedingter_tarif``, Notbremse)."""
 MIN_BUENDEL_GLEICHWERT = 3
 
 REGELN = {
@@ -195,18 +199,36 @@ def ist_schaetzung(herleitung: str) -> bool:
     return bool(weg) and weg not in HERLEITUNG_PREISLISTE
 
 
+def ist_bedingter_tarif(anbieter: str, tarif_name: str) -> bool:
+    """Setzt der Preis dieses Tarifs ein Zweitprodukt voraus (``GERAETETARIF_MERKMAL``)?
+
+    Der Neuvertragspreis der Seite gilt ohne Boni; ein Preis, der erst mit einem
+    zweiten Produkt entsteht, darf nicht in den Vergleich, lieber fehlt der Wert. Das
+    Merkmal ist das Wort im Tarifnamen, den die Anbieterseite selbst trägt; ein
+    unbekannter Anbieter oder ein leerer Name ist nicht bedingt."""
+    merkmal = GERAETETARIF_MERKMAL.get(normalisiere(anbieter))
+    return merkmal is not None and merkmal in (tarif_name or "").split()
+
+
 def buendel_zaehlt(
-    herleitung: str, aktionen: Iterable[Aktion], heute: str, pruefung: object
+    herleitung: str,
+    aktionen: Iterable[Aktion],
+    heute: str,
+    pruefung: object,
+    anbieter: str = "",
+    tarif_name: str = "",
 ) -> bool:
     """Darf das Bündel Δ, Referenz oder Sieger stellen (Notbremse, Schritte 1 und 7)?
 
     Nur gemessen oder aus der Preisliste exakt nachgerechnet (``ist_schaetzung``), ohne
-    abgelaufene eingerechnete Aktion und mit Status gültig oder nie geprüft. Seite und
+    abgelaufene eingerechnete Aktion, ohne Preis, der ein Zweitprodukt voraussetzt
+    (``ist_bedingter_tarif``), und mit Status gültig oder nie geprüft. Seite und
     Abnahme teilen diese eine Definition.
     """
     status = lies_vermerk(pruefung).status
     return (
         not ist_schaetzung(herleitung)
+        and not ist_bedingter_tarif(anbieter, tarif_name)
         and not abgelaufene_aktionen(aktionen, heute)
         and status in (None, GUELTIG)
     )
@@ -219,6 +241,8 @@ def satz_zaehlt(satz: Mapping, heute: str) -> bool:
         aktionen_aus(satz.get("aktionen")),
         heute,
         satz.get(FELD_PRUEFUNG),
+        str(satz.get("anbieter") or ""),
+        str(satz.get("tarif_name") or ""),
     )
 
 

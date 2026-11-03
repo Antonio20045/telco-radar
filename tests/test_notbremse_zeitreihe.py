@@ -153,6 +153,7 @@ def test_band_nur_mit_schaetzungen_bleibt_und_nennt_den_grund(gerendert, karten)
         if "steht kein Bündel im Vergleich: " not in antwort
         or (
             "(nicht direkt genannt)" not in antwort
+            and "(nur mit Zweitprodukt)" not in antwort
             and "(Aktion abgelaufen)" not in antwort
         )
     ]

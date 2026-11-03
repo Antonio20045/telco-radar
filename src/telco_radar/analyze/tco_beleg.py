@@ -6,6 +6,8 @@ import base64
 import binascii
 import re
 
+from .klick_tarifslug import klick_beleglink
+
 _EE_BELEG = re.compile(r"-ee-\d+(?:gb|tb)-|enterprise-edition")
 _EE_DOPPELT = "-ee-enterprise-edition-"
 """o2 26.10.2026 (21:30-Lauf): „XCover7 Pro EE“ bekam den EE-Zusatz ein zweites Mal
@@ -32,3 +34,12 @@ def _beleg_klartext(eintrag: dict) -> str:
         return url + " " + base64.b64decode(teil + "=" * (-len(teil) % 4)).decode()
     except (binascii.Error, UnicodeDecodeError):
         return url
+
+
+def beleglink_der_zeile(satz: dict) -> dict:
+    """Lesemigration: ein gespeicherter Klick-Link von vor dem 03.11.2026 trägt
+    Ratenzahl und Tarif der Seite, nicht der Zeile. Der Link folgt der Zeile beim
+    Lesen, ohne neuen Messlauf; die Datei ändert erst der nächste ``save()``."""
+    if satz.get("quelle_url"):
+        satz["quelle_url"] = klick_beleglink(satz)
+    return satz

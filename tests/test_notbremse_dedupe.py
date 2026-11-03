@@ -3,7 +3,7 @@ aus der Seite. Zwei Farben desselben Geräts beim selben Anbieter, gleicher Tari
 gleiche Ratenlaufzeit: die eine gemessen, die andere abgeleitet und billiger.
 Die gemessene muss als Karte bleiben und die Spanne/den günstigsten Tarif
 stellen (Datenkonzept Regel 1: nur gemessene Werte zählen - und die gemessenen
-zählen). Am Schnappschuss: Galaxy S26 256 GB, o2 „O2 Mobile L Plus“, gemessen
+zählen). Am Schnappschuss: Galaxy S26 256 GB, o2 „O2 Mobile L“, gemessen
 1.488,76 € wird von der Schätzung 1.434,76 € verdrängt.
 
 Synthetisch über den öffentlichen Eingang ``geraete_tco_karten.modelle``; fester
@@ -18,7 +18,7 @@ from telco_radar.report import geraete_tco_karten
 from telco_radar.tco_model import Aktion, Buendel
 
 HEUTE = "2026-10-03"
-TARIF = "O2 Mobile L Plus mit 150 GB+ (24 Mon.)"
+TARIF = "O2 Mobile L mit 150 GB+ (24 Mon.)"
 
 
 def _listung(sku: str, farbe: str) -> dict:

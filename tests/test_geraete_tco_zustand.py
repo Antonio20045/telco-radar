@@ -109,7 +109,7 @@ def _buendel(sku, rate, zustand=""):
     return Buendel(
         sku_id=sku,
         anbieter="o2",
-        tarif_name="O2 Mobile on Demand M Plus mit 50 GB+ (24 Mon.)",
+        tarif_name="O2 Mobile on Demand M mit 50 GB+ (24 Mon.)",
         tarif_id="o2:on-demand-m",
         tarif_id_guete="hoch",
         tarif_monatlich=14.99,
@@ -320,15 +320,15 @@ def test_der_buendelleser_reicht_den_zustand_durch():
                 "anbieter": "o2",
                 "name": "O2 Mobile on Demand M",
                 "grundgebuehr": 19.99,
-                "buendel_slug": "o2-mobile-on-demand-m-plus",
+                "buendel_slug": "o2-mobile-on-demand-m",
             }
         ]
     )
     roh = {
         "sku_id": SKU_ERNEUERT,
         "anbieter": "o2",
-        "tarif_name": "O2 Mobile on Demand M Plus mit 50 GB+ (24 Mon.)",
-        "tarif_slug": "o2-mobile-on-demand-m-plus",
+        "tarif_name": "O2 Mobile on Demand M mit 50 GB+ (24 Mon.)",
+        "tarif_slug": "o2-mobile-on-demand-m",
         "tarif_monatlich": 14.99,
         "geraet_zuzahlung": 1.0,
         "geraet_monatsrate": 17.0,

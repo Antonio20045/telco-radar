@@ -90,10 +90,10 @@ def _tarife() -> list[dict]:
         satz("Vodafone", "Vodafone Mobil L mit Smartphone", "vf:l-sp", 100, 49.95),
         satz("Vodafone", "Vodafone Mobil M", "vf:m", 60, 39.95),
         satz("o2", "O2 Mobile S", "o2:k", 10, 9.99),
-        satz("o2", "O2 Mobile S Plus", "o2:k2", 12, 12.99),
+        satz("o2", "O2 Mobile S Pro", "o2:k2", 12, 12.99),
         satz("o2", "O2 Mobile M", "o2:m", 40, 19.99),
         satz("o2", "O2 Mobile L", "o2:g", 100, 39.99),
-        satz("o2", "O2 Mobile L Plus", "o2:g2", 80, 44.99),
+        satz("o2", "O2 Mobile L Pro", "o2:g2", 80, 44.99),
     ]
 
 
@@ -172,11 +172,11 @@ def _bestand():
         ),
         _buendel(SKU_M1, "vf:m", "Vodafone Mobil M", 39.95, 40.0, anbieter="Vodafone"),
         _buendel(SKU_M1, "o2:k", "O2 Mobile S", 9.99, 1.0),
-        _buendel(SKU_M1, "o2:k2", "O2 Mobile S Plus", 12.99, 1.5),
+        _buendel(SKU_M1, "o2:k2", "O2 Mobile S Pro", 12.99, 1.5),
         _buendel(SKU_M1, "o2:m", "O2 Mobile M", 19.99, 2.0),
         _buendel(SKU_M2, "o2:k", "O2 Mobile S", 49.99, 120.0, laufzeit=24),
         _buendel(SKU_M3, "o2:g", "O2 Mobile L", 39.99, 5.0, zuzahlung=0.0),
-        _buendel(SKU_M3, "o2:g2", "O2 Mobile L Plus", 44.99, 5.0, zuzahlung=50.0),
+        _buendel(SKU_M3, "o2:g2", "O2 Mobile L Pro", 44.99, 5.0, zuzahlung=50.0),
         _buendel(SKU_M4, "o2:m", "O2 Mobile M", 19.99, 10.0),
     ]
     referenzen = [

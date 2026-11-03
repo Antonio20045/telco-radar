@@ -5,9 +5,11 @@ Bündel zählen. Ein Bündel mit ``herleitung`` (o2 aus Tarifsumme minus Geräte
 stand so nie auf der Anbieterseite und ist eine Schätzung. Ausgenommen sind Rechenwege,
 die eine Preisliste exakt nachrechnen (``HERLEITUNG_PREISLISTE``, 1&1-Tarifaufschlag):
 sie zählen wie gemessene. Ein Bündel, in dessen Preis eine
-abgelaufene Aktion steckt, ist veraltet. Beide bleiben als Zeile sichtbar, stellen
-aber weder Δ noch Referenz noch Sieger, keine Bewegung und keinen Günstigst-Wert;
-der Export nennt denselben Zustand.
+abgelaufene Aktion steckt, ist veraltet. Ebenso eines, dessen Tarifpreis ein
+Zweitprodukt voraussetzt (o2 „Plus“, ``ist_bedingter_tarif``): der Vergleich nennt
+Neuvertragspreise ohne Boni, lieber fehlt der o2-Wert als ein zu niedriger. Beide
+bleiben als Zeile sichtbar, stellen aber weder Δ noch Referenz noch Sieger, keine
+Bewegung und keinen Günstigst-Wert; der Export nennt denselben Zustand.
 
 Schritt 7: Ebenso ein Bündel, dem die Prüfstelle (``analyze/geraete_regeln``) den Status
 Quarantäne oder veraltet gegeben hat oder an dem sie gescheitert ist (``unbekannt``);
@@ -29,6 +31,7 @@ from ..analyze.geraete_pruefstatus import (
     VERALTET,
     abgelaufene_aktionen,
     buendel_zaehlt,
+    ist_bedingter_tarif,
     ist_schaetzung,
     lies_vermerk,
 )
@@ -54,6 +57,11 @@ HERLEITUNG_SATZ = {
 }
 HERLEITUNG_SATZ_SONST = (
     "{anbieter} nennt diesen Preis nicht direkt – berechnet aus seinen Angaben."
+)
+DELTA_BEDINGT = "nur mit Zweitprodukt"
+SATZ_BEDINGT = (
+    "Kein Abstand zur Vodafone-Referenz: der Tarifpreis gilt nur, wenn ein "
+    "zweites Produkt gebucht wird."
 )
 DELTA_AKTION_ABGELAUFEN = "Aktion abgelaufen"
 SATZ_AKTION_ABGELAUFEN = (
@@ -83,7 +91,9 @@ def felder(b: Buendel, heute: str) -> dict:
     befristet hat (``Aktion.gilt_am``); ein Platzhalter-Ende wie 2050 läuft weiter.
     """
     return {
-        **_felder(b.herleitung, b.aktionen, heute, b.pruefung),
+        **_felder(
+            b.herleitung, b.aktionen, heute, b.pruefung, b.anbieter, b.tarif_name
+        ),
         "herleitung_satz": herleitung_satz(b.anbieter, b.herleitung),
         "aus_preisliste": b.herleitung.strip() in HERLEITUNG_PREISLISTE,
     }
@@ -103,11 +113,23 @@ def felder_aus_satz(satz: dict, heute: str) -> dict:
     dessen Aktionen über ``aktionen_aus`` gelesen werden wie im Store."""
     herleitung = str(satz.get("herleitung") or "")
     aktionen = aktionen_aus(satz.get("aktionen"))
-    return _felder(herleitung, aktionen, heute, satz.get(FELD_PRUEFUNG))
+    return _felder(
+        herleitung,
+        aktionen,
+        heute,
+        satz.get(FELD_PRUEFUNG),
+        str(satz.get("anbieter") or ""),
+        str(satz.get("tarif_name") or ""),
+    )
 
 
 def _felder(
-    herleitung: str, aktionen: Iterable[Aktion], heute: str, pruefung: object
+    herleitung: str,
+    aktionen: Iterable[Aktion],
+    heute: str,
+    pruefung: object,
+    anbieter: str = "",
+    tarif_name: str = "",
 ) -> dict:
     aktionen = list(aktionen)
     schaetzung = ist_schaetzung(herleitung)
@@ -116,6 +138,7 @@ def _felder(
     status = vermerk.status
     flags = {
         "schaetzung": schaetzung,
+        "bedingter_tarif": ist_bedingter_tarif(anbieter, tarif_name),
         "veraltet_aktion": veraltet,
         "quarantaene": status == QUARANTAENE,
         "veraltet_pruefung": status == VERALTET,
@@ -124,7 +147,9 @@ def _felder(
     }
     return {
         **flags,
-        "zaehlt": buendel_zaehlt(herleitung, aktionen, heute, pruefung),
+        "zaehlt": buendel_zaehlt(
+            herleitung, aktionen, heute, pruefung, anbieter, tarif_name
+        ),
         "notbremse": zustand(flags),
     }
 
@@ -143,6 +168,8 @@ def zustand(karte: dict) -> dict | None:
     """
     if karte.get("schaetzung"):
         return {"kurz": DELTA_SCHAETZUNG, "satz": SATZ_SCHAETZUNG}
+    if karte.get("bedingter_tarif"):
+        return {"kurz": DELTA_BEDINGT, "satz": SATZ_BEDINGT}
     if karte.get("veraltet_aktion"):
         return {"kurz": DELTA_AKTION_ABGELAUFEN, "satz": SATZ_AKTION_ABGELAUFEN}
     gruende = [f"{g}." for g in karte.get("pruefgruende") or []]

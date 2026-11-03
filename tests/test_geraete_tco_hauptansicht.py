@@ -558,33 +558,25 @@ def test_die_beschriftung_der_referenz_aendert_kein_delta(bestand):
     Datenkonzept Geräte Teil B: Δ nur gegen die Vodafone-Karte mit gleichem
     Band und gleicher Ratenlaufzeit; die Referenz des Modells ist die
     günstigste Vodafone-Karte mit 24 Raten (iPhone 15: Mobil M, 1.949,80 EUR -
-    Mobil S mit 12 Raten steht in der 12er-Ansicht). o2 L Plus gegen Vodafone
-    Mobil L mit 24 Raten (2.675,80), o2 on Demand M Plus gegen Mobil M."""
+    Mobil S mit 12 Raten steht in der 12er-Ansicht). o2 „Plus“-Tarife setzen seit
+    der Preisprüfung 03.11.2026 ein Zweitprodukt voraus und tragen kein Δ."""
 
-    def delta(mid, tarif):
-        (betrag,) = {
-            k["delta"]["betrag"]
+    def plus_deltas(mid):
+        return [
+            k.get("delta")
             for k in _modell(bestand, mid)["karten"]
             if k["anbieter"] == "o2"
             and k["zustand"] == "neu"
-            and k["tarif"] == tarif
-            and k["belastbar"]
+            and "Plus" in k["tarif"].split()
             and k["raten_laufzeit"] == 24
-        }
-        return betrag
+        ]
 
     assert _modell(bestand, "apple-iphone-17-pro-256")["referenz"]["gesamt"] == 1955.80
     assert _modell(bestand, "apple-iphone-15-128")["referenz"]["gesamt"] == 1949.80
-    assert (
-        delta("apple-iphone-17-pro-256", "O2 Mobile L Plus mit 150 GB+ (24 Mon.)")
-        == round(1794.76 - 2675.80, 2)
-        == -881.04
-    )
-    assert (
-        delta("apple-iphone-15-128", "O2 Mobile on Demand M Plus mit 50 GB+ (24 Mon.)")
-        == round(1120.75 - 1949.80, 2)
-        == -829.05
-    )
+    for mid in ("apple-iphone-17-pro-256", "apple-iphone-15-128"):
+        plus = plus_deltas(mid)
+        assert plus, f"{mid}: keine o2-Plus-Karte im Bestand"
+        assert not any(plus), f"{mid}: o2 Plus setzt ein Zweitprodukt voraus, kein Δ"
     for modell in bestand["modelle"]:
         ref = modell["referenz"]
         if not ref or ref.get("aus_buendel"):

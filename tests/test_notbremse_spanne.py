@@ -80,6 +80,6 @@ def test_schaetzungen_bleiben_zeilen_ausserhalb_der_spanne(modelle):
             for k in m["karten"]
         )
     ]
-    assert len(mit_spanne) >= 90, f"nur {len(mit_spanne)} Modelle mit Spanne"
+    assert len(mit_spanne) >= 70, f"nur {len(mit_spanne)} Modelle mit Spanne"
     assert ausserhalb, "keine Schätzung außerhalb einer Spanne - Fall fehlt"
     assert "samsung-galaxy-s25-fe-128" in ausserhalb, ausserhalb

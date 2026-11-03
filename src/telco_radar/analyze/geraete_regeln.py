@@ -41,7 +41,6 @@ from .geraete_pruefstatus import (
     FELD_BELEG_VARIANTE,
     FELD_ECHO,
     FELD_GERAETESUMME,
-    GERAETETARIF_MERKMAL,
     LUECKE,
     MIN_BUENDEL_GLEICHWERT,
     NICHT_PRUEFBAR,
@@ -59,6 +58,7 @@ from .geraete_pruefstatus import (
     eur,
     gb,
     geraetepreis,
+    ist_bedingter_tarif,
     pflichtfelder,
 )
 
@@ -148,8 +148,7 @@ def sim_only_preis(b: Buendel, tabelle: Mapping[str, float]) -> float | None:
     if b.tarif_id_guete == NUR_MIT_GERAET:
         return None
     schluessel = [sim_only_id(b.anbieter, b.tarif_name)]
-    merkmal = GERAETETARIF_MERKMAL.get(normalisiere(b.anbieter))
-    nur_mit_geraet = merkmal is not None and merkmal in (b.tarif_name or "").split()
+    nur_mit_geraet = ist_bedingter_tarif(b.anbieter, b.tarif_name)
     if (tid := (b.tarif_id or "").strip()) and not nur_mit_geraet:
         schluessel.append(_tarif_schluessel(b.anbieter, tid))
         schluessel.append(_tarif_schluessel(b.anbieter, vertrag_basis(tid)))

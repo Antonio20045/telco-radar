@@ -136,6 +136,7 @@ def test_wettbewerber_ohne_zaehlende_karte_ist_benannte_luecke(bestand):
     saetze = {
         geraete_notbremse.SATZ_SCHAETZUNG,
         geraete_notbremse.SATZ_AKTION_ABGELAUFEN,
+        geraete_notbremse.SATZ_BEDINGT,
     }
     erwartet, ohne_luecke = [], []
     for g in sicht["gruppen"]:
