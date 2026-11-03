@@ -453,7 +453,7 @@ def test_der_export_folgt_dem_umschalter(_basis):
         link = s.evaluate(_EXPORT)
         assert link == {
             "href": "exporte/geraete-tco-36.csv",
-            "text": f"Bündel-TCO 36 Monate ({len(SOLL[36])})",
+            "text": f"Kosten mit Tarif 36 Monate ({len(SOLL[36])})",
         }, link
         text = _laden(basis, link["href"])
         zeilen = [
