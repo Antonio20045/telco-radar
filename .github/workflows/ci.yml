@@ -23,6 +23,8 @@ jobs:
           cache: pip
       - name: Install dependencies
         run: pip install -r requirements.txt -r requirements-dev.txt
+      - name: Install poppler-utils for the PDF tests
+        run: sudo apt-get update && sudo apt-get install -y poppler-utils
       # Ohne diesen Schritt ueberspringt sich tests/test_falz_browser.py, und
       # zwar lautlos - ein Skip sieht im Protokoll aus wie ein Erfolg. Genau
       # dieser Test misst, ob die Schlagzeile der Ausgabe ohne Scrollen
