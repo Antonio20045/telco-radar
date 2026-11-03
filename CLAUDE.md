@@ -18,7 +18,7 @@ Automatisches Competitive-Intelligence-System für Vodafone-Manager ohne Technik
 
 ```bash
 make einrichten                  # venv, Playwright-Chromium und Git-Hooks (core.hooksPath .githooks)
-make schnell                     # Leiter Stufen 0, 1, 4 auf den geänderten Dateien
+make schnell                     # Leiter Stufen 0–3, Lint nur auf den geänderten Dateien
 make pruefen                     # volle Leiter 0–3 und 5; grün stempelt den Stand
 make stand                       # zehn Umbauschritte: erfüllt oder offen, weil …
 .venv/bin/python scripts/pruefleiter.py --statisch      # Stufen 0–3
