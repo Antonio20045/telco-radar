@@ -15,6 +15,10 @@ def _gruen(log):
     return pruefleiter.Ergebnis("0 Wächter", True)
 
 
+def _gruen_stufe(stufe):
+    return lambda log: pruefleiter.Ergebnis(stufe, True)
+
+
 @pytest.fixture()
 def lauf_ordner(tmp_path, monkeypatch):
     monkeypatch.setattr(pruefleiter, "LAUF_ORDNER", tmp_path)
@@ -110,6 +114,8 @@ def test_schneller_lauf_nimmt_die_vorgemerkten_dateien(lauf_ordner, monkeypatch)
 
     monkeypatch.setattr(pruefleiter.leiter_schnell, "geaenderte_dateien", dateien)
     monkeypatch.setattr(pruefleiter, "stufe_waechter", _gruen)
+    monkeypatch.setattr(pruefleiter, "stufe_typen", _gruen_stufe("2 Typen"))
+    monkeypatch.setattr(pruefleiter, "stufe_schichten", _gruen_stufe("3 Schichten"))
     assert pruefleiter.main(["--schnell", "--nur-vorgemerkt"]) == 0
     assert gefragt == [True]
     zeilen = (lauf_ordner / "zeiten.csv").read_text("utf-8").splitlines()
@@ -117,7 +123,8 @@ def test_schneller_lauf_nimmt_die_vorgemerkten_dateien(lauf_ordner, monkeypatch)
         "--pre-commit",
         "0 Wächter",
         "1 Lint",
-        "4 Betroffen",
+        "2 Typen",
+        "3 Schichten",
     ]
 
 

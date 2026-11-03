@@ -291,13 +291,17 @@ def zusammenfassung(ergebnisse: list[Ergebnis]) -> list[str]:
 
 
 def stufen_schnell(nur_vorgemerkt: bool) -> list[Callable[[TextIO], Ergebnis]]:
-    """Stufen 0, 1 und 4 für pre-commit, 1 und 4 auf den geänderten Dateien."""
+    """Stufen 0, 1, 2 und 3 für den Commit; nur Stufe 1 auf den geänderten Dateien.
+
+    Pytest läuft lokal nicht mehr mit (Stufe 4 „Betroffen“), das prüft die CI.
+    """
     dateien = leiter_schnell.geaenderte_dateien(WURZEL, nur_vorgemerkt)
-    ruff, zeiten = str(BIN / "ruff"), WURZEL / leiter_schnell.ZEITEN
+    ruff = str(BIN / "ruff")
     return [
         leiter_schnell.mit_speicher(stufe_waechter, LAUF_ORDNER / "speicher.json"),
         lambda log: leiter_schnell.stufe_lint(log, _lauf, ruff, dateien, RUFF_BASIS),
-        lambda log: leiter_schnell.stufe_betroffen(log, _lauf, WURZEL, dateien, zeiten),
+        stufe_typen,
+        stufe_schichten,
     ]
 
 
@@ -307,7 +311,9 @@ def main(argv: list[str] | None = None) -> int:
     art = parser.add_mutually_exclusive_group(required=True)
     art.add_argument("--voll", action="store_true", help="Stufen 0 bis 3 und 5")
     art.add_argument("--statisch", action="store_true", help="Stufen 0 bis 3")
-    art.add_argument("--schnell", action="store_true", help="Stufen 0, 1 und 4")
+    art.add_argument(
+        "--schnell", action="store_true", help="Stufen 0 bis 3, ohne Tests"
+    )
     art.add_argument("--vor-push", action="store_true", help="pre-push, Stufen 0 bis 3")
     parser.add_argument("--nur-vorgemerkt", action="store_true")
     parser.add_argument("hook", nargs="*", help="Argumente des pre-push-Hooks")
