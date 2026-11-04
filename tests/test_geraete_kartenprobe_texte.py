@@ -101,6 +101,32 @@ def _karte(anbieter: str) -> Klickkarte:
     return lade_klickkarte(ort / f"{anbieter}.yaml")
 
 
+_O2_MUSTER_20261007 = {
+    "rate": Textmuster(re.compile(r"Gerät mtl\.\s*\(\d+\s*Raten\):?\s*([\d.,]+)\s*€")),
+    "ratenzahl": Textmuster(re.compile(r"\((\d+)\s*Raten\)")),
+    "tarifphasen": Textmuster(
+        re.compile(
+            r"Tarif mtl\.[^\n€]*:\s*(\d[\d.,]*\s*€(?:\s*ab\s+(?:dem\s+)?\d{1,2}\."
+            r"\s*Monat:?\s*\d[\d.,]*\s*€)*)"
+        )
+    ),
+}
+
+
+def _karte_o2_20261007() -> Klickkarte:
+    """Die o2-Karte, wie sie zur Probe vom 07.10.2026 passte: eigene Tabellenzeile je
+
+    Posten, Tarifbetrag mit Mindestlaufzeit im selben Posten (Lehre 3). Die Probe
+    archiviert echte Texte von damals; o2 stellte die Preiszusammenfassung am
+    04.11.2026 auf <tef-mini-basket> ohne table um (Ursache-Probe, arbeit/o2-klick-0411/
+    ursache.md), seither nennt die lebende Karte andere Muster. Diese Tests prüfen die
+    Lesung der Archivtexte, nicht die der heutigen Seite (dafür test_klickkarte_o2.py).
+    """
+    karte = _karte("o2")
+    muster = {**karte.textlesung.muster, **_O2_MUSTER_20261007}
+    return replace(karte, textlesung=replace(karte.textlesung, muster=muster))
+
+
 def _textwerte(karte: Klickkarte, text: str) -> tuple[Preiswerte, Buendelwerte]:
     werte, buendel, _ = Textleser(_Seite(), karte, 1000).textwerte(text)
     return werte, buendel
@@ -108,7 +134,7 @@ def _textwerte(karte: Klickkarte, text: str) -> tuple[Preiswerte, Buendelwerte]:
 
 def _echo_o2(text: str, kombination: dict):
     gewaehlt = variante_aus(**kombination["variante"])
-    im_text, _ = _textwerte(_karte("o2"), text)
+    im_text, _ = _textwerte(_karte_o2_20261007(), text)
     antwort = Antwortlesung(werte_aus_json(kombination["werte_antwort"]), {})
     return pruefe_echo(gewaehlt, gewaehlt, im_text, antwort)
 
@@ -329,7 +355,7 @@ def test_gegenprobe_zahlen_bleiben_getrennt(text):
 def test_texte_lesen_sich_wie_in_der_probe(anbieter):
     """Alle Felder ohne eigenen Fundort wie in ``werte_text`` der Probe; einzig o2
     ``tarifphasen`` ist neu gelesen und gleicht dann der Antwort (Lehre 3)."""
-    karte = _karte(anbieter)
+    karte = _karte_o2_20261007() if anbieter == "o2" else _karte(anbieter)
     eigener_ort = {f for f, m in karte.textlesung.muster.items() if m.selektor}
     for kombination in _von(anbieter):
         assert zahlen_ohne_leerraum(kombination["text"]) == kombination["text"]
@@ -379,7 +405,7 @@ def test_o2_folgezeile_ab_monat_25_bleibt_zweite_phase(folge):
     stelle = "Monate):\n19,99\xa0€"
     assert stelle in text
 
-    werte, _ = _textwerte(_karte("o2"), text.replace(stelle, stelle + folge))
+    werte, _ = _textwerte(_karte_o2_20261007(), text.replace(stelle, stelle + folge))
 
     assert werte.tarifphasen == (
         Preisphase(1, 24, 19.99),

@@ -6,6 +6,10 @@ erkundung/o2/2026-10-10/bedienelemente-2.json: Input select-tariff aria-checked 
 Label „O2 Mobile Unlimited M mit 100 MBit/s mtl. 66,49 €“). Die BEISPIEL-Seite bildet
 die vier Kacheln dieser Erkundung von Hand nach. Die Tarif-Slugs stammen aus o2s eigener
 Antwort (tests/fixtures/geraete/o2_vertiefung_iphone17pro.json.gz).
+
+Seit der Ursache-Probe 04.11.2026 (arbeit/o2-klick-0411/ursache.md) trägt das Label
+den vollen Tarifnamen ohne Preis im eigenen aria-label, der Knopf liest ihn ohne
+Muster; die BEISPIEL-Seite bildet das nach.
 """
 
 from __future__ import annotations
@@ -30,10 +34,10 @@ VERTIEFUNG = (
     WURZEL / "tests" / "fixtures" / "geraete" / "o2_vertiefung_iphone17pro.json.gz"
 )
 KACHELN = (
-    ("786", "O2 Mobile Unlimited M Plus mit 100 MBit/s mtl. 56,49 €", False),
-    ("432", "O2 Mobile L Plus mit 150 GB+ mtl. 56,49 €", False),
-    ("846", "O2 Mobile on Demand M Plus mit 50 GB+ mtl. 46,49 €", False),
-    ("510", "O2 Mobile Unlimited M mit 100 MBit/s mtl. 66,49 €", True),
+    ("786", "O2 Mobile Unlimited M Plus mit 100 MBit/s", False),
+    ("432", "O2 Mobile L Plus mit 150 GB+", False),
+    ("846", "O2 Mobile on Demand M Plus mit 50 GB+", False),
+    ("510", "O2 Mobile Unlimited M mit 100 MBit/s", True),
 )
 TARIF_IN_ADRESSE = re.compile(r"[?&]tarif=([^&]+)")
 SLUG = re.compile(r'(o2-mobile-[a-z]+(?:-[a-z]+)*)\\"')
@@ -41,9 +45,10 @@ SLUG = re.compile(r'(o2-mobile-[a-z]+(?:-[a-z]+)*)\\"')
 
 def _seite() -> str:
     kacheln = "".join(
-        f'<tef-choice-panel><input type="radio" name="select-tariff"'
+        f'<tef-choice-panel><input type="radio" name="pdp-tariff-plans-desktop"'
         f' id="choice-panel-input-{n}"{" checked" if an else ""}>'
-        f'<label for="choice-panel-input-{n}">{text}</label></tef-choice-panel>'
+        f'<label for="choice-panel-input-{n}" aria-label="{text}">{text}</label>'
+        "</tef-choice-panel>"
         for n, text, an in KACHELN
     )
     return (

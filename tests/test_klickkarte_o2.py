@@ -12,6 +12,13 @@
 (Gerät 36,50 €, Tarif 19,99 €, Anzahlung 1,00 €, Anschluss 0,00 €): Text vom 07.10. und
 pageValue vom 29.09. müssen darum übereinstimmen. Das Volumen fehlt im gekürzten
 pageValue (nur gelesene Felder); es steht im Auszug vom 07.10.
+
+``TABELLE`` ist seit der Ursache-Probe 04.11.2026 (arbeit/o2-klick-0411/ursache.md)
+kein table mehr: das Preiswidget ist <tef-mini-basket>, der Crawler liest
+``innerText`` des ersten Treffers im DOM (die mobile Variante vor der sichtbaren
+Desktop-Variante), ohne Zeilenumbrüche zwischen den Posten. Der Tarifknopf liest
+seinen Wert seither ohne Muster aus aria-label; der volle Tarifname steht dort schon
+ohne Preis (``test_tarifknopf_liest_ohne_muster_aus_aria_label``).
 """
 
 from __future__ import annotations
@@ -41,16 +48,13 @@ _FIX = Path(__file__).parent / "fixtures" / "geraete"
 KARTE = lade_klickkarte(WURZEL / "config" / "klickkarten" / "o2.yaml")
 KONFIGURATION, SEITE = KARTE.lesequellen
 
-TABELLE = "\n".join(
-    [
-        "Gerät mtl. (36 Raten):\t36,50 €",
-        "Tarif mtl. (Mindestlaufzeit 24 Monate):\t19,99 €",
-        "56,49 €\t56,49 €",
-        "Gerät Anzahlung:\t1,00 €",
-        "einmaliger Anschlusspreis\t0,00 €",
-        "Versandkosten:\t6,99 €",
-        "7,99 €\t7,99 €",
-    ]
+TABELLE = (
+    "Gerät monatlich:36,50\xa0€Ratenzahlung: 36 Monate"
+    "Gesamtpreis Gerät: 1.315,00\xa0€"
+    "Tarif monatlich:19,99\xa0€(Mindestlaufzeit 24 Monate):"
+    "monatlich gesamt:56,49\xa0€56,49\xa0€"
+    "Gerät Anzahlung:1,00\xa0€einmaliger Anschlusspreis0,00\xa0€39,99\xa0€"
+    "Versandkosten:6,99\xa0€einmalig gesamt:7,99\xa0€7,99\xa0€In den Warenkorb"
 )
 KACHEL_M_PLUS = "O2 Mobile Unlimited M Plus mit 100 MBit/s mtl. 56,49 €"
 KACHEL_L_PLUS = "O2 Mobile Unlimited L Plus mit 300 MBit/s mtl. 66,49 €"
@@ -127,12 +131,17 @@ def test_karte_laedt_mit_drei_geklickten_dimensionen_und_zwei_quellen():
     [
         ("256 GB", "speicher", "256 GB"),
         ("24 Monate", "laufzeit", "24"),
-        (KACHEL_L_PLUS, "tarif", "O2 Mobile Unlimited L Plus mit 300 MBit/s"),
-        (KACHEL_150, "tarif", "O2 Mobile L Plus mit 150 GB+"),
     ],
 )
 def test_knopftext_ergibt_den_wert_der_antwort(text, dimension, wert):
     assert wert_nach_muster(text, KARTE.knoepfe[dimension].muster) == wert
+
+
+def test_tarifknopf_liest_ohne_muster_aus_aria_label():
+    """Seit der Ursache-Probe 04.11.2026 trägt das Label den vollen Tarifnamen ohne
+    Preis im eigenen aria-label (arbeit/o2-klick-0411/ursache.md); kein Muster nötig."""
+    assert KARTE.knoepfe["tarif"].wert_attribut == "aria-label"
+    assert KARTE.knoepfe["tarif"].muster is None
 
 
 def test_ausgangszustand_aus_page_value():
@@ -205,8 +214,7 @@ def test_variante_und_volumen_nach_klicks_vom_7_oktober():
         ("256 GB", 24, "O2 Mobile Unlimited S Special Plus mit 15 MBit/s", math.inf),
         ("512 GB", 24, "O2 Mobile Unlimited L Plus mit 300 MBit/s", math.inf),
     ]
-    tarif = wert_nach_muster(KACHEL_L_PLUS, KARTE.knoepfe["tarif"].muster)
-    assert gleiche_option(gelesen[0][2], tarif)
+    assert gleiche_option(gelesen[0][2], "O2 Mobile Unlimited L Plus mit 300 MBit/s")
     assert _textwerte(TABELLE, KACHEL_L_PLUS)[0].volumen_gb == math.inf
 
 
@@ -221,11 +229,11 @@ def test_text_und_page_value_stimmen_ueberein():
     assert echo.luecken == ()
     assert echo.werte.rate == 36.5
     assert echo.werte.tarifphasen == (Preisphase(1, None, 19.99),)
-    assert fundorte["rate"][1] == "Gerät mtl. (36 Raten):\t36,50 €"
+    assert fundorte["rate"][1] == "Gerät monatlich:36,50\xa0€"
 
 
 def test_gegenprobe_andere_rate_im_text_ist_befund():
-    text, _ = _textwerte(TABELLE.replace("36,50 €", "43,50 €"), KACHEL_M_PLUS)
+    text, _ = _textwerte(TABELLE.replace("36,50\xa0€", "43,50\xa0€"), KACHEL_M_PLUS)
     antwort = lies_antwort(_page_value(), SEITE)
     gewaehlt = variante_aus("256 GB", "O2 Mobile Unlimited M Plus mit 100 MBit/s", "36")
 

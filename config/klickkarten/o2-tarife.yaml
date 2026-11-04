@@ -22,48 +22,49 @@ anbieter: o2
 
 knoepfe:
   speicher:
-    # Label neben einem Input ohne name im selben div (B1 El. 23/24 „256 GB“; B2 El. 25/26
-    # „256 GB“, El. 27/28 „512 GB“). Farb-Inputs tragen name (B1 El. 17–22), Tarife
-    # name="select-tariff". Klick aufs Label lädt die Konfiguration (K2 Probe 2 → M2 Nr. 131).
-    selektor: '#content div:has(> input[type="radio"]:not([name])) > label:not(:has-text("Monate"))'
+    # Ursache-Probe 04.11.2026 (arbeit/o2-klick-0411/ursache.md): alle Radios tragen
+    # jetzt einen name (vorher nameless), Speicher steckt in <tef-choice-item> mit
+    # Input name="storage" (meist nur eine Option, die Adresse legt den Speicher fest).
+    selektor: 'tef-choice-item:has(input[name="storage"]) > label'
     muster: '^(\d+\s*[GT]B)\b'
-    # Input im selben div ist checked (B1 El. 23, B2 El. 25)
-    gewaehlt: {passt: 'div:has(> input[type="radio"]:checked) > label'}
+    gewaehlt: {passt: 'tef-choice-item:has(input[name="storage"]:checked) > label'}
   tarif:
-    # Kachel-Label im tef-choice-panel mit Input name="select-tariff" (B1 El. 29–36, B2 El. 33–40;
-    # Gruppen 18–21). Der Input läuft in die Frist (K1 Probe 4/6), das Label lädt die
-    # Konfiguration (K1 Probe 5 → M1 Nr. 135, Probe 7 → M1 Nr. 138).
-    selektor: 'tef-choice-panel:has(input[name="select-tariff"]:checked) > label'
-    # „O2 Mobile Unlimited L Plus mit 300 MBit/s mtl. 66,49 €“ (B1 El. 30): Name ohne den Preis,
-    # der mit Speicher und Laufzeit wechselt (B2 El. 34 „… mtl. 56,49 €“)
-    muster: '^(.+?)\s+mtl\.'
-    # vorher B1 El. 32/B2 El. 36 label-checked, nach dem Klick K1 Probe 5/7, K2 Probe 6/8
+    # Tarif ohne Kachel: dieselbe Gruppe name="pdp-tariff-plans-desktop" zeigt ihn als
+    # fünfte/sechste gewählte Option (Probe 04.11.2026 gegen tarif=o2-mobile-unlimited-m),
+    # das Label trägt den vollen Tarifnamen im eigenen aria-label.
+    selektor: 'tef-choice-panel:has(input[name="pdp-tariff-plans-desktop"]:checked) > label'
+    wert: aria-label
     gewaehlt: {passt: "*"}
   laufzeit:
-    # B1 El. 25–28 „36 Monate“ (Input checked)/„24 Monate“, B2 El. 29–32; Klick aufs Label lädt
-    # die Konfiguration (K1 Probe 3 → M1 Nr. 133)
-    selektor: '#content div:has(> input[type="radio"]:not([name])) > label:has-text("Monate")'
+    # Kachel-Label im tef-choice-panel mit Input name="payment-plans" („36 Monate“,
+    # „24 Monate“, „Einmalzahlung Gerät“ als erste Zeile des Labeltexts).
+    selektor: 'tef-choice-panel:has(input[name="payment-plans"]) > label'
     muster: '^(\d+)\s*Monate'
-    gewaehlt: {passt: 'div:has(> input[type="radio"]:checked) > label'}
+    gewaehlt: {passt: 'tef-choice-panel:has(input[name="payment-plans"]:checked) > label'}
 
 zusammenfassung:
-  # Tabelle #content > section:1 > div:1 > div:2 > div:1 > div:1 > div:1 > div:2 > div:3 > table
-  # (P1 Nr. 42–50, P2 Nr. 44–50): „Gerät mtl. (36 Raten): 36,50 €“, „Tarif mtl. (Mindestlaufzeit
-  # 24 Monate): 19,99 €“, „Gerät Anzahlung: 1,00 €“, „einmaliger Anschlusspreis 0,00 €“. Daraus
-  # liest der Text ohne Muster Anzahlung, Ratenzahl, Bindung und Anschluss.
-  selektor: '#content table:has-text("Gerät Anzahlung")'
+  # Kein table mehr (Ursache-Probe 04.11.2026, arbeit/o2-klick-0411/ursache.md): das
+  # Preiswidget ist <tef-mini-basket> mit <ul class="list--reset"><li class="row">
+  # ... je Posten ein eigener <div>, kein <table>. „Gerät mtl. (36 Raten): 36,50 €“ heißt
+  # jetzt „Gerät monatlich: 36,50 €“ + eigene Zeile „Ratenzahlung: 36 Monate“; „Tarif mtl.
+  # (Mindestlaufzeit 24 Monate): 19,99 €“ heißt „Tarif monatlich: 19,99 €“ + eigene Zeile
+  # „(Mindestlaufzeit 24 Monate):“ danach. „Gerät Anzahlung: 1,00 €“ und „einmaliger
+  # Anschlusspreis 0,00 €“ unverändert. Daraus liest der Text ohne Muster Anzahlung,
+  # Bindung und Anschluss (Bindung über das weiterhin generische „Mindestlaufzeit …
+  # Monat“-Muster, unberührt von der Umstellung).
+  selektor: '#content tef-mini-basket:visible:has-text("Gerät Anzahlung")'
   muster:
-    # „Rate“ steht dort nur als „Raten“ (P1 Nr. 42, P2 Nr. 44)
-    rate: 'Gerät mtl\.\s*\(\d+\s*Raten\):?\s*([\d.,]+)\s*€'
-    # Im Browser steht der Betrag in eigener Zeile: „Tarif mtl. (Mindestlaufzeit 24 Monate):
-    # \n29,99 €“ (Kartenprobe 07.10.2026, Zweig klick-erkundung, Commit c8ce1f77,
-    # karte-1/-2.json, alle 20 gelesenen Kombinationen); ohne Muster fand der Text keine
-    # Tarifzeile mit Betrag. Die Gruppe hält Betrag samt € und direkt folgende Zeilen
-    # „ab dem 25. Monat: 29,99 €“ (O2 Mobile Special) und ergibt die Phasen wie die Antwort.
-    tarifphasen: 'Tarif mtl\.[^\n€]*:\s*(\d[\d.,]*\s*€(?:\s*ab\s+(?:dem\s+)?\d{1,2}\.\s*Monat:?\s*\d[\d.,]*\s*€)*)'
-    # Volumen nur an der gewählten Kachel: „Unlimited“ oder „150 GB+“ (B1 El. 30–36)
+    # „Gerät monatlich:“ ohne Ratenzahl im selben Posten (die steht in „Ratenzahlung:“)
+    rate: 'Gerät monatlich:\s*([\d.,]+)\s*€'
+    # Ratenzahl jetzt eigener Posten „Ratenzahlung: 36 Monate“, nicht mehr im Geräteposten
+    ratenzahl: 'Ratenzahlung:\s*(\d+)\s*Monate'
+    # Zwischen dem Tarifbetrag und einer Folgephase steht jetzt „(Mindestlaufzeit 24
+    # Monate):“ (eigene Zeile, kein Zeilenumbruch im gelesenen Text); die Lücke lässt das
+    # ohne € durch, bis „ab dem 25. Monat: 29,99 €“ (O2 Mobile Special) folgt oder nicht.
+    tarifphasen: 'Tarif monatlich:\s*(\d[\d.,]*\s*€(?:(?:(?!ab\s)[^€]){0,60}?ab\s+(?:dem\s+)?\d{1,2}\.\s*Monat:?\s*\d[\d.,]*\s*€)*)'
+    # Volumen nur an der gewählten Kachel: „Unlimited“ oder „50 GB+“
     volumen_gb:
-      selektor: 'tef-choice-panel:has(input[name="select-tariff"]:checked) > label'
+      selektor: 'tef-choice-panel:has(input[name="pdp-tariff-plans-desktop"]:checked) > label'
       muster: '(Unlimited|\d+\s*GB)'
 
 antwort:
@@ -103,6 +104,7 @@ antwort:
     variante: *variante
 
 kanarie:
-  # Tarifzeile der Tabelle (P1 Nr. 43, P2 Nr. 45)
-  selektor: '#content table:has-text("Gerät Anzahlung")'
-  enthaelt: 'Tarif mtl. (Mindestlaufzeit'
+  # Tarifzeile des Preiswidgets (Ursache-Probe 04.11.2026): kein table mehr, die
+  # Mindestlaufzeit steht als eigene Zeile hinter dem Tarifbetrag statt im selben Posten.
+  selektor: '#content tef-mini-basket:visible:has-text("Gerät Anzahlung")'
+  enthaelt: '(Mindestlaufzeit'
