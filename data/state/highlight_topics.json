@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-03",
+ "updated": "2026-11-04",
  "topics": [
   {
    "slug": "apples-iphone-event-am-9-september",
@@ -907,6 +907,123 @@
     }
    ],
    "ended": "2026-11-03"
+  },
+  {
+   "slug": "gesichtserkennung-fuer-handykunden-in-brasilien",
+   "title": "Gesichtserkennung für Handykunden in Brasilien",
+   "description": "Die brasilianische Telekommunikationsbehörde macht die biometrische Gesichtserkennung für den Kauf neuer SIM-Karten verpflichtend, um Betrug und den Missbrauch von Mobilfunkanschlüssen einzudämmen.",
+   "keywords": [
+    "Anatel",
+    "Brasilien",
+    "Gesichtserkennung",
+    "Mobilfunk",
+    "SIM-Karten",
+    "Biometrie"
+   ],
+   "first_seen": "2026-11-04",
+   "last_active": "2026-11-04",
+   "runs_ohne_zuwachs": 0,
+   "status": "aktiv",
+   "items": [
+    {
+     "url": "https://telesintese.com.br/anatel-aprova-roaming-obrigatorio-em-rodovias-e-pequenas-localidades/",
+     "title": "Anatel aprova roaming obrigatório em rodovias e pequenas localidades",
+     "headline": "Brasilien beschliesst automatisches Roaming auf Autobahnen",
+     "summary": "Die brasilianische Regulierungsbehörde Anatel hat ein verpflichtendes, automatisches Roaming für Mobilfunkkunden auf Bundes- und Staatsstrassen sowie in Gemeinden mit weniger als 30.000 Einwohnern beschlossen. Die Abrechnung erfolgt dabei zum Tarif des eigenen Anbieters.",
+     "operator": "Anatel",
+     "source": "TeleSíntese (BR)",
+     "date": "2026-11-04",
+     "week": "2026-11-04",
+     "relevance": 4,
+     "image": "d74831d58b29d09c-1280.jpg",
+     "image_w": 1200,
+     "image_h": 769
+    },
+    {
+     "url": "https://www.mobiletime.com.br/noticias/29/10/2026/biometria-facial-norma-d/",
+     "title": "Especialistas veem norma de biometria facial da Anatel como positiva, mas alertam para risco de exclusão",
+     "headline": "Anatel fordert Gesichtserkennung mit Lebendigkeitsnachweis vor Aktivierung",
+     "summary": "Die brasilianische Telekommunikationsbehörde Anatel hat die technische Norm GT-SEG.2026.11 erlassen, die Mobilfunkbetreiber zu einer Identitätsprüfung per Gesichtserkennung mit Lebendigkeitsnachweis vor der Freischaltung von SIM-Karten verpflichtet.",
+     "operator": "Anatel",
+     "source": "Mobile Time (Brasilien)",
+     "date": "2026-10-29",
+     "week": "2026-10-30",
+     "relevance": 4,
+     "image": "f0e96f9ced114a26-1280.jpg",
+     "image_w": 787,
+     "image_h": 443
+    },
+    {
+     "url": "https://www.mobiletime.com.br/noticias/28/10/2026/anatel-biometria-facial/",
+     "title": "Anatel determina uso de reconhecimento facial para cadastro de linhas móveis",
+     "headline": "Gesichtserkennung für neue Mobilfunkkarten in Brasilien vorgeschrieben",
+     "summary": "Die brasilianische Regulierungsbehörde Anatel verlangt künftig eine Gesichtsbiometrie mit Lebenderkennzeichnung für alle neuen Prepaid- und Postpaid-Verträge von Privatpersonen.",
+     "operator": "Anatel",
+     "source": "Mobile Time (Brasilien)",
+     "date": "2026-10-28",
+     "week": "2026-10-29",
+     "relevance": 4,
+     "image": "0c5b791c72ddaa1f-1280.jpg",
+     "image_w": 787,
+     "image_h": 443
+    },
+    {
+     "url": "https://telesintese.com.br/anatel-exige-biometria-facial-para-usuarios-de-telefonia-movel/",
+     "title": "Anatel exige biometria facial para usuários de telefonia móvel",
+     "headline": "Brasilianische Behörde macht Gesichtserkennung für Handynutzer zur Pflicht",
+     "summary": "Die Telekommunikationsbehörde Anatel schreibt die biometrische Validierung per Gesichtserkennung für neue Mobilfunkkunden und das Bestandsnetz vor. Die Umsetzung muss je nach Vertragsart bis September oder Dezember 2027 erfolgen, während der vollständige Abgleich aller Bestandsnutzer bis zum 31. Dezember 2028 abgeschlossen sein muss.",
+     "operator": "Anatel",
+     "source": "TeleSíntese (BR)",
+     "date": "2026-10-28",
+     "week": "2026-10-28",
+     "relevance": 4,
+     "image": "20bc780e8fff1b57-1280.jpg",
+     "image_w": 936,
+     "image_h": 600
+    },
+    {
+     "url": "https://telesintese.com.br/biometria-obrigatoria-alcanca-mvnos-credenciadas-e-meis/",
+     "title": "Biometria obrigatória alcança MVNOs credenciadas e MEIs",
+     "headline": "Biometrische Verifizierung für virtuelle Mobilfunkbetreiber wird verpflichtend",
+     "summary": "Die brasilianische Regulierungsbehörde Anatel hat festgelegt, dass die obligatorische biometrische Validierung mittels Gesichtserkennung und Betrugserkennung nun auch für virtuelle Mobilfunkbetreiber (MVNOs) und Kleinstunternehmer gilt.",
+     "operator": "Anatel",
+     "source": "TeleSíntese (BR)",
+     "date": "2026-10-28",
+     "week": "2026-10-28",
+     "relevance": 4,
+     "image": "ea23642f6e68130f-1280.jpg",
+     "image_w": 936,
+     "image_h": 600
+    },
+    {
+     "url": "https://telesintese.com.br/anatel-regulamenta-mp-e-detalha-bloqueio-por-chamadas-abusivas/",
+     "title": "Anatel regulamenta MP e detalha bloqueio por chamadas abusivas",
+     "headline": "Anatel regelt 15-tägige Sperre für missbräuchliche Telefonanrufe",
+     "summary": "Die brasilianische Telekommunikationsbehörde Anatel hat Richtlinien zur Umsetzung einer Medida Provisória erlassen, die bei Überschreitung von 1.000 Anrufen pro Anschluss oder 10.000 Gesamtanrufen mit einer Kurzgesamtlaufquote ab 85% eine 15-tägige Sperrung aller zugeordneten Nummern vorsieht.",
+     "operator": "Anatel",
+     "source": "TeleSíntese (BR)",
+     "date": "2026-10-19",
+     "week": "2026-10-26",
+     "relevance": 3,
+     "image": "113d2d142789ca41-800.jpg",
+     "image_w": 800,
+     "image_h": 513
+    },
+    {
+     "url": "https://teletime.com.br/03/11/2026/mercado-movel-setembro-2026/",
+     "title": "Mercado móvel ganha 1,26 milhão de acessos no Brasil em setembro",
+     "headline": "Brasilianischer Mobilfunkmarkt wächst im September um 1,26 Millionen Anschlüsse",
+     "summary": "Der brasilianische Mobilfunkmarkt verzeichnete im September 2026 ein Wachstum von 1,26 Millionen Anschlüssen, was leicht unter dem Vormonatswert von 1,29 Millionen lag.",
+     "operator": "Anatel",
+     "source": "TELETIME (Brasilien)",
+     "date": "2026-11-03",
+     "week": "2026-11-04",
+     "relevance": 2,
+     "image": "4be712d4b66bffd7-800.jpg",
+     "image_w": 800,
+     "image_h": 495
+    }
+   ]
   }
  ]
 }

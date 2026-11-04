@@ -1,6 +1,96 @@
 {
- "stand": "2026-11-03",
+ "stand": "2026-11-04",
  "videos": [
+  {
+   "id": "k8PKrLNqiRk",
+   "titel": "Keno sucht Natto-Fans",
+   "kanal": "c't 3003",
+   "datum": "2026-11-04",
+   "dauer_sekunden": 46,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "k8PKrLNqiRk.jpg"
+  },
+  {
+   "id": "jVxX-cNJeP4",
+   "titel": "Diese drei CLIs schlagen Claude Code!",
+   "kanal": "The Morpheus Tutorials",
+   "datum": "2026-11-04",
+   "dauer_sekunden": 3683,
+   "stufe": "Fortgeschritten",
+   "sprache": "de",
+   "bild": "jVxX-cNJeP4.jpg"
+  },
+  {
+   "id": "ep4psgAFOqc",
+   "titel": "How I Get Claude To Edit My Videos (No Code Needed)",
+   "kanal": "Matt Wolfe",
+   "datum": "2026-11-04",
+   "dauer_sekunden": 1965,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "ep4psgAFOqc.jpg"
+  },
+  {
+   "id": "cTuNmSJQWuI",
+   "titel": "KI-Update kompakt: Nein zu Rechenzentren, Anthropic warnt, Google-Zwang, KI-Mythen",
+   "kanal": "KI Update (heise)",
+   "datum": "2026-11-04",
+   "dauer_sekunden": 1154,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "cTuNmSJQWuI.jpg"
+  },
+  {
+   "id": "c5n94VqXZAw",
+   "titel": "Did the Knicks’ phishing test go too far? Plus, hackers pose as IT in Teams",
+   "kanal": "IBM Technology",
+   "datum": "2026-11-04",
+   "dauer_sekunden": 1822,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "c5n94VqXZAw.jpg"
+  },
+  {
+   "id": "ZfXt-4P2UjM",
+   "titel": "KI-Update kompakt: Nein zu Rechenzentren, Anthropic warnt, Google-Zwang, KI-Mythen",
+   "kanal": "KI Update (heise)",
+   "datum": "2026-11-04",
+   "dauer_sekunden": 1194,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "ZfXt-4P2UjM.jpg"
+  },
+  {
+   "id": "VSP5ofNCoHg",
+   "titel": "KI ersetzt Jobs? Cool – bis es der eigene ist",
+   "kanal": "c't 3003",
+   "datum": "2026-11-04",
+   "dauer_sekunden": 57,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "VSP5ofNCoHg.jpg"
+  },
+  {
+   "id": "44GBqQGc-v0",
+   "titel": "How Figma Is Building Self-Serve Analytics with OpenAI",
+   "kanal": "OpenAI",
+   "datum": "2026-11-04",
+   "dauer_sekunden": 66,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "44GBqQGc-v0.jpg"
+  },
+  {
+   "id": "0LDs5rvx1EI",
+   "titel": "How Figma Is Building Self-Serve Analytics with OpenAI",
+   "kanal": "OpenAI",
+   "datum": "2026-11-04",
+   "dauer_sekunden": 42,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "0LDs5rvx1EI.jpg"
+  },
   {
    "id": "yC72iQx6rM0",
    "titel": "Qodo brings company context into Codex code review",
@@ -30,6 +120,26 @@
    "stufe": "Einstieg",
    "sprache": "en",
    "bild": "jnP9AgtX0qo.jpg"
+  },
+  {
+   "id": "hlZ0nJwDGOE",
+   "titel": "The AI bubble is popping",
+   "kanal": "David Ondrej",
+   "datum": "2026-11-03",
+   "dauer_sekunden": 3200,
+   "stufe": "Fortgeschritten",
+   "sprache": "en",
+   "bild": "hlZ0nJwDGOE.jpg"
+  },
+  {
+   "id": "PRAY_SewRxI",
+   "titel": "A real-life speeder bike from Return of the Jedi (Not AI)",
+   "kanal": "Matt Wolfe",
+   "datum": "2026-11-03",
+   "dauer_sekunden": 64,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "PRAY_SewRxI.jpg"
   },
   {
    "id": "NCxD-qsQcN0",
@@ -190,203 +300,93 @@
    "stufe": "Fortgeschritten",
    "sprache": "en",
    "bild": "9tOu4r-FiQI.jpg"
-  },
-  {
-   "id": "0Kw6_DTZPrY",
-   "titel": "‘We may release models we can’t control’: Amodei, Altman … and Gemini Carbon",
-   "kanal": "AI Explained",
-   "datum": "2026-11-02",
-   "dauer_sekunden": 1675,
-   "stufe": "Fortgeschritten",
-   "sprache": "en",
-   "bild": "0Kw6_DTZPrY.jpg"
-  },
-  {
-   "id": "xeLRAFPeh2E",
-   "titel": "Snapintosh: macOS auf dem Windows-Laptop?",
-   "kanal": "c't 3003",
-   "datum": "2026-11-01",
-   "dauer_sekunden": 85,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "xeLRAFPeh2E.jpg"
-  },
-  {
-   "id": "VOYccAKu7Zg",
-   "titel": "Platzt jetzt die KI-Blase? DAS wird ALLE überraschen! Anthropics Börsengang | KI-NEWS",
-   "kanal": "Everlast AI",
-   "datum": "2026-11-01",
-   "dauer_sekunden": 1620,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "VOYccAKu7Zg.jpg"
-  },
-  {
-   "id": "QUZ4KEDxhCM",
-   "titel": "What Is torch.compile? Dynamo, PyTorch & Faster AI Models Explained",
-   "kanal": "IBM Technology",
-   "datum": "2026-11-01",
-   "dauer_sekunden": 413,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "QUZ4KEDxhCM.jpg"
-  },
-  {
-   "id": "mfgSBLGePuA",
-   "titel": "When Security Patches Leak",
-   "kanal": "IBM Technology",
-   "datum": "2026-10-31",
-   "dauer_sekunden": 58,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "mfgSBLGePuA.jpg"
-  },
-  {
-   "id": "g5bl6G4lTTo",
-   "titel": "Migrate Conditional Access Policies to Policy Plans",
-   "kanal": "Microsoft Mechanics",
-   "datum": "2026-10-31",
-   "dauer_sekunden": 43,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "g5bl6G4lTTo.jpg"
-  },
-  {
-   "id": "_9R7QOhJh-o",
-   "titel": "Glasses That Make You Telepathic",
-   "kanal": "Matt Wolfe",
-   "datum": "2026-10-31",
-   "dauer_sekunden": 76,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "_9R7QOhJh-o.jpg"
-  },
-  {
-   "id": "KotNngsvj_g",
-   "titel": "GPU Unlock: Steckt in deiner RTX noch mehr KI-Leistung?",
-   "kanal": "c't 3003",
-   "datum": "2026-10-31",
-   "dauer_sekunden": 86,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "KotNngsvj_g.jpg"
-  },
-  {
-   "id": "8Hr0ymVjb2A",
-   "titel": "Wie aus einem FALSE eine 9.8 RCE in Node wird",
-   "kanal": "The Morpheus Tutorials",
-   "datum": "2026-10-31",
-   "dauer_sekunden": 482,
-   "stufe": "Fortgeschritten",
-   "sprache": "de",
-   "bild": "8Hr0ymVjb2A.jpg"
-  },
-  {
-   "id": "uht3zfBEym4",
-   "titel": "Apples Falt-iPhone: Ein Sandkorn zu viel?",
-   "kanal": "c't 3003",
-   "datum": "2026-10-30",
-   "dauer_sekunden": 45,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "uht3zfBEym4.jpg"
-  },
-  {
-   "id": "suJXDPEfe3U",
-   "titel": "KI-Update kompakt: Mistral ML4, Cohere, KI-Empfehlungen, KI klont Indie-Spiele",
-   "kanal": "KI Update (heise)",
-   "datum": "2026-10-30",
-   "dauer_sekunden": 1003,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "suJXDPEfe3U.jpg"
   }
  ],
  "kanaele": {
   "c't 3003": {
    "error": null,
-   "versucht": "2026-11-03",
-   "abgerufen": "2026-11-03"
+   "versucht": "2026-11-04",
+   "abgerufen": "2026-11-04"
   },
   "KI Update (heise)": {
    "error": null,
-   "versucht": "2026-11-03",
-   "abgerufen": "2026-11-03"
+   "versucht": "2026-11-04",
+   "abgerufen": "2026-11-04"
   },
   "Everlast AI": {
    "error": null,
-   "versucht": "2026-11-03",
-   "abgerufen": "2026-11-03"
+   "versucht": "2026-11-04",
+   "abgerufen": "2026-11-04"
   },
   "The Morpheus Tutorials": {
    "error": null,
-   "versucht": "2026-11-03",
-   "abgerufen": "2026-11-03"
+   "versucht": "2026-11-04",
+   "abgerufen": "2026-11-04"
   },
   "Kevin Stratvert": {
    "error": null,
-   "versucht": "2026-11-03",
-   "abgerufen": "2026-11-03"
+   "versucht": "2026-11-04",
+   "abgerufen": "2026-11-04"
   },
   "Microsoft Mechanics": {
    "error": null,
-   "versucht": "2026-11-03",
-   "abgerufen": "2026-11-03"
+   "versucht": "2026-11-04",
+   "abgerufen": "2026-11-04"
   },
   "Leila Gharani": {
    "error": null,
-   "versucht": "2026-11-03",
-   "abgerufen": "2026-11-03"
+   "versucht": "2026-11-04",
+   "abgerufen": "2026-11-04"
   },
   "Jeff Su": {
    "error": null,
-   "versucht": "2026-11-03",
-   "abgerufen": "2026-11-03"
+   "versucht": "2026-11-04",
+   "abgerufen": "2026-11-04"
   },
   "Matt Wolfe": {
    "error": null,
-   "versucht": "2026-11-03",
-   "abgerufen": "2026-11-03"
+   "versucht": "2026-11-04",
+   "abgerufen": "2026-11-04"
   },
   "IBM Technology": {
    "error": null,
-   "versucht": "2026-11-03",
-   "abgerufen": "2026-11-03"
+   "versucht": "2026-11-04",
+   "abgerufen": "2026-11-04"
   },
   "OpenAI": {
    "error": null,
-   "versucht": "2026-11-03",
-   "abgerufen": "2026-11-03"
+   "versucht": "2026-11-04",
+   "abgerufen": "2026-11-04"
   },
   "Anthropic": {
    "error": null,
-   "versucht": "2026-11-03",
-   "abgerufen": "2026-11-03"
+   "versucht": "2026-11-04",
+   "abgerufen": "2026-11-04"
   },
   "Google DeepMind": {
    "error": null,
-   "versucht": "2026-11-03",
-   "abgerufen": "2026-11-03"
+   "versucht": "2026-11-04",
+   "abgerufen": "2026-11-04"
   },
   "AI Explained": {
    "error": null,
-   "versucht": "2026-11-03",
-   "abgerufen": "2026-11-03"
+   "versucht": "2026-11-04",
+   "abgerufen": "2026-11-04"
   },
   "Two Minute Papers": {
    "error": null,
-   "versucht": "2026-11-03",
-   "abgerufen": "2026-11-03"
+   "versucht": "2026-11-04",
+   "abgerufen": "2026-11-04"
   },
   "3Blue1Brown": {
    "error": null,
-   "versucht": "2026-11-03",
-   "abgerufen": "2026-11-03"
+   "versucht": "2026-11-04",
+   "abgerufen": "2026-11-04"
   },
   "David Ondrej": {
    "error": null,
-   "versucht": "2026-11-03",
-   "abgerufen": "2026-11-03"
+   "versucht": "2026-11-04",
+   "abgerufen": "2026-11-04"
   }
  },
  "error": null

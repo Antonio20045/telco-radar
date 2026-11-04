@@ -1,7 +1,6 @@
 {
  "https://www.o2online.de/tarife/": {
   "werte": [
-   "ab monat|44.98€",
    "ab|20gb",
    "beträgt dabei bis zu|300mb",
    "bonus|10gb",
@@ -17,53 +16,44 @@
    "g mit max.|15mb",
    "g mit max.|300mb",
    "gb einmalig und monatlich|500mb",
-   "gb mit bis zu|300mb",
    "gutes g-netz mit ca.|99%",
    "jedes jahr|10gb",
-   "jedes jahr|1gb",
    "jedes jahr|5gb",
+   "jetzt mit|0€",
    "max.|100mb",
    "max.|15mb",
    "max.|300mb",
-   "monatlich kündbar. jetzt inkl.|10€",
    "oder hotspot-nutzung empfehlen sich|100gb",
    "ohne grundgebühr|4.99€",
-   "plus bundle sparst du|5€",
-   "plus bundles spare|5€",
-   "rabatt jeden monat und|0€",
+   "special mit bis zu|15mb",
    "surfen reichen häufig bis|20gb",
    "surfgeschwindigkeit bis zu oder|300mb",
    "uns schon für unter|20€",
    "unsere testkarte und nutze|30tage",
-   "x|50gb",
    "zwischen monatlicher kündigung und|24monate",
    "|0.00€",
-   "|1.00€",
    "|100gb",
    "|10gb",
    "|150gb",
-   "|150mb",
    "|15gb",
    "|19.99€",
    "|1gb",
    "|24.99€",
    "|24monate",
-   "|29.98€",
    "|29.99€",
    "|300gb",
    "|30gb",
    "|30tage",
-   "|34.98€",
    "|34.99€",
    "|39.98€",
    "|39.99€",
+   "|49.98€",
    "|50gb",
-   "|59.98€",
    "|59.99€",
    "|5gb",
    "|5€"
   ],
-  "stand": "2026-11-03"
+  "stand": "2026-11-04"
  },
  "https://www.o2online.de/mobilfunk/prepaid/": {
   "werte": [
@@ -92,11 +82,13 @@
    "|80gb",
    "|999gb"
   ],
-  "stand": "2026-11-03"
+  "stand": "2026-11-04"
  },
  "https://www.blau.de/tarife/": {
   "werte": [
    "bis|50mb",
+   "deal mit bis zu|20gb",
+   "die tarife mit|24monate",
    "grundgebühr etwa zwischen und|10€",
    "hier meist zwischen und|15€",
    "l zum preis von|9.99€",
@@ -105,25 +97,25 @@
    "mobilfunknetz mit bis zu|50mb",
    "monate mindestvertragslaufzeit. einmaliger anschlusspreis|29.99€",
    "mtl.|24monate",
-   "passenden tarif schon ab|6.99€",
    "promo zum preis von|14.99€",
    "s im download durchschnitt|39.9mb",
    "s im upload durchschnitt|22.2mb",
    "s und bis zu|32mb",
    "s zum preis von|6.99€",
    "sichern und bis zu|90tage",
+   "tarif später zahlen innerhalb|90tage",
    "tarife mit|24monate",
    "zum preis von monat.|24monate",
    "|0€",
-   "|12.99€",
    "|14.99€",
    "|24monate",
-   "|3€",
    "|6.99€",
+   "|60gb",
    "|8.99€",
+   "|80gb",
    "|9.99€"
   ],
-  "stand": "2026-11-03"
+  "stand": "2026-11-04"
  },
  "https://www.1und1.de/handytarife": {
   "werte": [
@@ -154,7 +146,7 @@
    "|50gb",
    "|9.99€"
   ],
-  "stand": "2026-11-03"
+  "stand": "2026-11-04"
  },
  "https://www.winsim.de/5g-tarife": {
   "werte": [
@@ -180,7 +172,7 @@
    "|8.99€",
    "|9.99€"
   ],
-  "stand": "2026-11-03"
+  "stand": "2026-11-04"
  },
  "https://www.premiumsim.de/": {
   "werte": [
@@ -207,7 +199,7 @@
    "|9.99€",
    "|96€"
   ],
-  "stand": "2026-11-03"
+  "stand": "2026-11-04"
  },
  "https://www.mobilcom-debitel.de/handytarife/": {
   "werte": [
@@ -286,7 +278,7 @@
    "|899€",
    "|9999€"
   ],
-  "stand": "2026-11-03"
+  "stand": "2026-11-04"
  },
  "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html": {
   "werte": [
@@ -468,7 +460,7 @@
    "|9.98€",
    "|999.99€"
   ],
-  "stand": "2026-11-03"
+  "stand": "2026-11-04"
  },
  "https://www.otelo.de/allnet-flat": {
   "werte": [
@@ -487,6 +479,6 @@
    "|30€",
    "|5€"
   ],
-  "stand": "2026-11-03"
+  "stand": "2026-11-04"
  }
 }
