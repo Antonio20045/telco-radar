@@ -1,49 +1,126 @@
 {
  "anbieter": "o2-auto",
- "datum": "2026-11-03",
- "dauer_sekunden": 0.7,
+ "datum": "2026-11-04",
+ "dauer_sekunden": 107.9,
  "format": 1,
  "frischegrenze_tage": 3,
- "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+ "grund": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-256gb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
  "karte": "o2.yaml",
- "laufstatus": "nicht_gelesen",
+ "laufstatus": "gestoert",
  "lesefrist_tage": 1,
  "name": "o2",
  "seiten": [
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-256gb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
    "geraet": "apple-iphone-duo",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
-   "http_status": null,
+   "gescheitert": 0,
+   "grund": "Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
+   "http_status": 200,
    "kombinationen": [],
+   "ladung": {
+    "abstand_s": 2.0,
+    "anfragen": 147,
+    "beendet": 142,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "library.telefonica.de": 6,
+     "www.o2online.de": 1
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 18.0,
+    "takte_ms": 6200,
+    "wartet_auf": "load"
+   },
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gestoert",
+   "stoerung": "seitenform",
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 4
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-512gb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
    "geraet": "apple-iphone-duo",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
-   "http_status": null,
+   "gescheitert": 0,
+   "grund": "Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
+   "http_status": 200,
    "kombinationen": [],
+   "ladung": {
+    "abstand_s": 2.0,
+    "anfragen": 146,
+    "beendet": 145,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "library.telefonica.de": 2
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 16.3,
+    "takte_ms": 8150,
+    "wartet_auf": "load"
+   },
    "speicher_gb": 512,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gestoert",
+   "stoerung": "seitenform",
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 4
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-1tb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
    "geraet": "apple-iphone-duo",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
-   "http_status": null,
+   "gescheitert": 0,
+   "grund": "Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
+   "http_status": 200,
    "kombinationen": [],
+   "ladung": {
+    "abstand_s": 2.0,
+    "anfragen": 147,
+    "beendet": 142,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "library.telefonica.de": 6,
+     "www.o2online.de": 1
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 16.2,
+    "takte_ms": 6750,
+    "wartet_auf": "load"
+   },
    "speicher_gb": 1024,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gestoert",
+   "stoerung": "seitenform",
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 4
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-duo-2tb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
    "geraet": "apple-iphone-duo",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 2048,
@@ -51,8 +128,13 @@
    "status": "nicht_besucht"
   }
  ],
- "ueberfaellig": [],
+ "ueberfaellig": [
+  "https://www.o2online.de/e-shop/apple/apple-iphone-duo-256gb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
+  "https://www.o2online.de/e-shop/apple/apple-iphone-duo-512gb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
+  "https://www.o2online.de/e-shop/apple/apple-iphone-duo-1tb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l",
+  "https://www.o2online.de/e-shop/apple/apple-iphone-duo-2tb-nachthimmel-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-l"
+ ],
  "uebersichten": [],
  "vertragsform": "tarif_plus_ratenkauf",
- "zeitbudget_sekunden": 10262
+ "zeitbudget_sekunden": 10276
 }

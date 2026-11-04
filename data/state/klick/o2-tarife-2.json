@@ -1,49 +1,112 @@
 {
  "anbieter": "o2-tarife-2",
- "datum": "2026-11-03",
- "dauer_sekunden": 0.9,
+ "datum": "2026-11-04",
+ "dauer_sekunden": 63.5,
  "format": 1,
  "frischegrenze_tage": 3,
- "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+ "grund": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus: Abruf gestört (HTTP 404)",
  "karte": "o2-tarife.yaml",
- "laufstatus": "nicht_gelesen",
+ "laufstatus": "gestoert",
  "lesefrist_tage": 1,
  "name": "o2",
  "seiten": [
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "samsung-galaxy-s25-ultra",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
-   "http_status": null,
+   "gescheitert": 0,
+   "grund": "Abruf gestört (HTTP 404)",
+   "http_status": 404,
    "kombinationen": [],
+   "ladung": null,
    "speicher_gb": 256,
-   "sperre": null,
-   "status": "nicht_besucht"
+   "sperre": "unbekannt",
+   "status": "gestoert",
+   "stoerung": "seitenform",
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 0
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-256gb-burgunder-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "apple-iphone-18-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
-   "http_status": null,
+   "gescheitert": 0,
+   "grund": "Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
+   "http_status": 200,
    "kombinationen": [],
+   "ladung": {
+    "abstand_s": 2.0,
+    "anfragen": 150,
+    "beendet": 145,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "library.telefonica.de": 6,
+     "www.o2online.de": 1
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 12.5,
+    "takte_ms": 4550,
+    "wartet_auf": "load"
+   },
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gestoert",
+   "stoerung": "seitenform",
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 4
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-max-256gb-polar-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "apple-iphone-18-pro-max",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
-   "http_status": null,
+   "gescheitert": 0,
+   "grund": "Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
+   "http_status": 200,
    "kombinationen": [],
+   "ladung": {
+    "abstand_s": 2.0,
+    "anfragen": 149,
+    "beendet": 149,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "library.telefonica.de": 2
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 9.1,
+    "takte_ms": 4500,
+    "wartet_auf": "load"
+   },
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gestoert",
+   "stoerung": "seitenform",
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 4
   },
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "apple-iphone-17-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -53,7 +116,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "samsung-galaxy-s26",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -63,7 +126,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "apple-iphone-17",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -73,7 +136,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-max-256gb-cosmic-orange-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "apple-iphone-17-pro-max",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -83,7 +146,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ultra-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "samsung-galaxy-s26-ultra",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -93,7 +156,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-256gb-frost-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "google-pixel-11",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -103,7 +166,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-128gb-mitternacht-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "apple-iphone-14",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -113,7 +176,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-pro-128gb-dunkellila-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "apple-iphone-14-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -123,7 +186,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-pro-max-512gb-gold-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "apple-iphone-14-pro-max",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 512,
@@ -133,7 +196,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "apple-iphone-15",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -143,7 +206,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-plus-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "apple-iphone-15-plus",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -153,7 +216,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-128gb-titan-natur-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "apple-iphone-15-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -163,7 +226,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-max-256gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "apple-iphone-15-pro-max",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -173,7 +236,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "apple-iphone-16",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -183,7 +246,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-plus-128gb-ultramarin-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "apple-iphone-16-plus",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -193,7 +256,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-128gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "apple-iphone-16-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -203,7 +266,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-max-256gb-titan-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "apple-iphone-16-pro-max",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -213,7 +276,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16e-128gb-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "apple-iphone-16e",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -223,7 +286,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17e-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "apple-iphone-17e",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -233,7 +296,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-256gb-burgunder-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "apple-iphone-18-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -243,7 +306,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-max-256gb-polar-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "apple-iphone-18-pro-max",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -253,7 +316,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-air-256gb-himmelblau-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "apple-iphone-air",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -263,7 +326,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/fairphone/fairphone-6-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "fairphone-6",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -273,7 +336,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "google-pixel-10",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -283,7 +346,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10-pro-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "google-pixel-10-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -293,7 +356,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10a-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "google-pixel-10a",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -303,7 +366,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-256gb-canyon-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "google-pixel-11-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -313,7 +376,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-fold-256gb-olive-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "google-pixel-11-pro-fold",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -323,7 +386,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-xl-256gb-canyon-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "google-pixel-11-pro-xl",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -333,7 +396,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-3-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "nothing-phone-3",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -343,7 +406,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-4a-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "nothing-phone-4a",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -353,7 +416,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-4a-pro-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "nothing-phone-4a-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -363,7 +426,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a17-128gb-5g-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "samsung-galaxy-a17",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -373,7 +436,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a27-5g-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "samsung-galaxy-a27",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -383,7 +446,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a37-128gb-awesome-charcoal-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "samsung-galaxy-a37",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -393,7 +456,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a56-128gb-awesome-graphite-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "samsung-galaxy-a56",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -403,7 +466,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a57-128gb-awesome-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "samsung-galaxy-a57",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -413,7 +476,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s23-128gb-pink-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "samsung-galaxy-s23",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -423,7 +486,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s24-128gb-onyx-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "samsung-galaxy-s24",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -433,7 +496,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s24-ultra-256gb-titanium-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "samsung-galaxy-s24-ultra",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -443,7 +506,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-128gb-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "samsung-galaxy-s25",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -453,7 +516,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-fe-128gb-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "samsung-galaxy-s25-fe",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -463,7 +526,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-fe-128gb-pistachio-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "samsung-galaxy-s26-fe",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -473,7 +536,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-plus-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "samsung-galaxy-s26-plus",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -483,7 +546,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-flip8-256gb-pink-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "samsung-galaxy-z-flip8",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -493,7 +556,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-fold8-256gb-lavender-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "samsung-galaxy-z-fold8",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -503,7 +566,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-fold8-ultra-256gb-violet-shadow-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "samsung-galaxy-z-fold8-ultra",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -513,7 +576,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17-512gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "xiaomi-17",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 512,
@@ -523,7 +586,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17-ultra-512gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "xiaomi-17-ultra",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 512,
@@ -533,7 +596,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17t-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "xiaomi-17t",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -543,7 +606,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17t-pro-512gb-violett-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "xiaomi-17t-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 512,
@@ -553,7 +616,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-17-128gb-blue-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "xiaomi-redmi-17",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -563,7 +626,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-15-pro-256gb-schwarz-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "xiaomi-redmi-note-15-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -573,7 +636,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-128gb-purple-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "xiaomi-redmi-note-17",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -583,7 +646,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-pro-256gb-blue-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "xiaomi-redmi-note-17-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -593,7 +656,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-pro-max-256gb-cloud-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "xiaomi-redmi-note-17-pro-max",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -603,7 +666,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "apple-iphone-17-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -613,7 +676,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "samsung-galaxy-s26",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -623,7 +686,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "apple-iphone-17",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -633,7 +696,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-max-256gb-cosmic-orange-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "apple-iphone-17-pro-max",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -643,7 +706,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ultra-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "samsung-galaxy-s26-ultra",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -653,7 +716,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-256gb-frost-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "google-pixel-11",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -663,7 +726,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-128gb-mitternacht-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "apple-iphone-14",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -673,7 +736,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-pro-128gb-dunkellila-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "apple-iphone-14-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -683,7 +746,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-pro-max-512gb-gold-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "apple-iphone-14-pro-max",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 512,
@@ -693,7 +756,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "apple-iphone-15",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -703,7 +766,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-plus-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "apple-iphone-15-plus",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -713,7 +776,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-128gb-titan-natur-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "apple-iphone-15-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -723,7 +786,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-max-256gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "apple-iphone-15-pro-max",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -733,7 +796,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "apple-iphone-16",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -743,7 +806,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-plus-128gb-ultramarin-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "apple-iphone-16-plus",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -753,7 +816,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-128gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "apple-iphone-16-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -763,7 +826,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-max-256gb-titan-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "apple-iphone-16-pro-max",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -773,7 +836,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16e-128gb-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "apple-iphone-16e",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -783,7 +846,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17e-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "apple-iphone-17e",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -793,7 +856,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-air-256gb-himmelblau-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "apple-iphone-air",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -803,7 +866,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/fairphone/fairphone-6-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "fairphone-6",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -813,7 +876,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "google-pixel-10",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -823,7 +886,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10-pro-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "google-pixel-10-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -833,7 +896,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10a-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "google-pixel-10a",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -843,7 +906,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-256gb-canyon-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "google-pixel-11-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -853,7 +916,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-fold-256gb-olive-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "google-pixel-11-pro-fold",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -863,7 +926,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-xl-256gb-canyon-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "google-pixel-11-pro-xl",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -873,7 +936,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-3-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "nothing-phone-3",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -883,7 +946,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-4a-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "nothing-phone-4a",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -893,7 +956,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-4a-pro-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "nothing-phone-4a-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -903,7 +966,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a17-128gb-5g-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "samsung-galaxy-a17",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -913,7 +976,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a27-5g-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "samsung-galaxy-a27",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -923,7 +986,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a37-128gb-awesome-charcoal-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "samsung-galaxy-a37",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -933,7 +996,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a56-128gb-awesome-graphite-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "samsung-galaxy-a56",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -943,7 +1006,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a57-128gb-awesome-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "samsung-galaxy-a57",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -953,7 +1016,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s23-128gb-pink-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "samsung-galaxy-s23",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -963,7 +1026,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s24-128gb-onyx-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "samsung-galaxy-s24",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -973,7 +1036,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s24-ultra-256gb-titanium-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "samsung-galaxy-s24-ultra",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -983,7 +1046,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-128gb-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "samsung-galaxy-s25",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -993,7 +1056,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-fe-128gb-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "samsung-galaxy-s25-fe",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1003,7 +1066,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-fe-128gb-pistachio-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "samsung-galaxy-s26-fe",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1013,7 +1076,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-plus-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "samsung-galaxy-s26-plus",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1023,7 +1086,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-flip8-256gb-pink-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "samsung-galaxy-z-flip8",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1033,7 +1096,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-fold8-256gb-lavender-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "samsung-galaxy-z-fold8",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1043,7 +1106,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-fold8-ultra-256gb-violet-shadow-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "samsung-galaxy-z-fold8-ultra",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1053,7 +1116,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17-512gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "xiaomi-17",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 512,
@@ -1063,7 +1126,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17-ultra-512gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "xiaomi-17-ultra",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 512,
@@ -1073,7 +1136,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17t-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "xiaomi-17t",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1083,7 +1146,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17t-pro-512gb-violett-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "xiaomi-17t-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 512,
@@ -1093,7 +1156,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-17-128gb-blue-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "xiaomi-redmi-17",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1103,7 +1166,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-15-pro-256gb-schwarz-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "xiaomi-redmi-note-15-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1113,7 +1176,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-128gb-purple-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "xiaomi-redmi-note-17",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1123,7 +1186,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-pro-256gb-blue-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "xiaomi-redmi-note-17-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1133,7 +1196,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-pro-max-256gb-cloud-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "xiaomi-redmi-note-17-pro-max",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1143,7 +1206,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "apple-iphone-17-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1153,7 +1216,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "samsung-galaxy-s26",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1163,7 +1226,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "apple-iphone-17",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1173,7 +1236,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-max-256gb-cosmic-orange-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "apple-iphone-17-pro-max",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1183,7 +1246,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ultra-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "samsung-galaxy-s26-ultra",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1193,7 +1256,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-256gb-frost-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "google-pixel-11",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1203,7 +1266,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-128gb-mitternacht-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "apple-iphone-14",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1213,7 +1276,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-pro-128gb-dunkellila-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "apple-iphone-14-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1223,7 +1286,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-pro-max-512gb-gold-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "apple-iphone-14-pro-max",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 512,
@@ -1233,7 +1296,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "apple-iphone-15",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1243,7 +1306,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-plus-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "apple-iphone-15-plus",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1253,7 +1316,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-128gb-titan-natur-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "apple-iphone-15-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1263,7 +1326,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-max-256gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "apple-iphone-15-pro-max",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1273,7 +1336,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "apple-iphone-16",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1283,7 +1346,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-plus-128gb-ultramarin-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "apple-iphone-16-plus",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1293,7 +1356,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-128gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "apple-iphone-16-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1303,7 +1366,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-max-256gb-titan-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "apple-iphone-16-pro-max",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1313,7 +1376,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16e-128gb-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "apple-iphone-16e",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1323,7 +1386,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17e-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "apple-iphone-17e",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1333,7 +1396,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-256gb-burgunder-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "apple-iphone-18-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1343,7 +1406,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-max-256gb-polar-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "apple-iphone-18-pro-max",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1353,7 +1416,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-air-256gb-himmelblau-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "apple-iphone-air",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1363,7 +1426,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/fairphone/fairphone-6-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "fairphone-6",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1373,7 +1436,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "google-pixel-10",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1383,7 +1446,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10-pro-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "google-pixel-10-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1393,7 +1456,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10a-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "google-pixel-10a",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1403,7 +1466,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-256gb-canyon-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "google-pixel-11-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1413,7 +1476,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-fold-256gb-olive-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "google-pixel-11-pro-fold",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1423,7 +1486,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-xl-256gb-canyon-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "google-pixel-11-pro-xl",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1433,7 +1496,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-3-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "nothing-phone-3",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1443,7 +1506,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-4a-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "nothing-phone-4a",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1453,7 +1516,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-4a-pro-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "nothing-phone-4a-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1463,7 +1526,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a17-128gb-5g-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "samsung-galaxy-a17",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1473,7 +1536,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a27-5g-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "samsung-galaxy-a27",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1483,7 +1546,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a37-128gb-awesome-charcoal-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "samsung-galaxy-a37",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1493,7 +1556,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a56-128gb-awesome-graphite-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "samsung-galaxy-a56",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1503,7 +1566,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a57-128gb-awesome-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "samsung-galaxy-a57",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1513,7 +1576,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s23-128gb-pink-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "samsung-galaxy-s23",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1523,7 +1586,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s24-128gb-onyx-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "samsung-galaxy-s24",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1533,7 +1596,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s24-ultra-256gb-titanium-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "samsung-galaxy-s24-ultra",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1543,7 +1606,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-128gb-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "samsung-galaxy-s25",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1553,7 +1616,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-fe-128gb-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "samsung-galaxy-s25-fe",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1563,7 +1626,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-fe-128gb-pistachio-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "samsung-galaxy-s26-fe",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1573,7 +1636,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-plus-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "samsung-galaxy-s26-plus",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1583,7 +1646,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-flip8-256gb-pink-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "samsung-galaxy-z-flip8",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1593,7 +1656,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-fold8-256gb-lavender-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "samsung-galaxy-z-fold8",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1603,7 +1666,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-fold8-ultra-256gb-violet-shadow-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "samsung-galaxy-z-fold8-ultra",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1613,7 +1676,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17-512gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "xiaomi-17",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 512,
@@ -1623,7 +1686,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17-ultra-512gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "xiaomi-17-ultra",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 512,
@@ -1633,7 +1696,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17t-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "xiaomi-17t",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1643,7 +1706,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17t-pro-512gb-violett-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "xiaomi-17t-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 512,
@@ -1653,7 +1716,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-17-128gb-blue-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "xiaomi-redmi-17",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1663,7 +1726,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-15-pro-256gb-schwarz-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "xiaomi-redmi-note-15-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1673,7 +1736,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-128gb-purple-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "xiaomi-redmi-note-17",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1683,7 +1746,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-pro-256gb-blue-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "xiaomi-redmi-note-17-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1693,7 +1756,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-pro-max-256gb-cloud-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "xiaomi-redmi-note-17-pro-max",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1703,7 +1766,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "apple-iphone-17-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1713,7 +1776,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "samsung-galaxy-s26",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1723,7 +1786,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "apple-iphone-17",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1733,7 +1796,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-max-256gb-cosmic-orange-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "apple-iphone-17-pro-max",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1743,7 +1806,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ultra-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "samsung-galaxy-s26-ultra",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1753,7 +1816,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-256gb-frost-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "google-pixel-11",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1763,7 +1826,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-128gb-mitternacht-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "apple-iphone-14",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1773,7 +1836,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-pro-128gb-dunkellila-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "apple-iphone-14-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1783,7 +1846,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-14-pro-max-512gb-gold-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "apple-iphone-14-pro-max",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 512,
@@ -1793,7 +1856,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "apple-iphone-15",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1803,7 +1866,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-plus-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "apple-iphone-15-plus",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1813,7 +1876,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-128gb-titan-natur-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "apple-iphone-15-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1823,7 +1886,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-max-256gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "apple-iphone-15-pro-max",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1833,7 +1896,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "apple-iphone-16",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1843,7 +1906,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-plus-128gb-ultramarin-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "apple-iphone-16-plus",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1853,7 +1916,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-128gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "apple-iphone-16-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1863,7 +1926,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-max-256gb-titan-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "apple-iphone-16-pro-max",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1873,7 +1936,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-16e-128gb-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "apple-iphone-16e",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1883,7 +1946,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-17e-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "apple-iphone-17e",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1893,7 +1956,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-air-256gb-himmelblau-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "apple-iphone-air",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1903,7 +1966,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/fairphone/fairphone-6-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "fairphone-6",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1913,7 +1976,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "google-pixel-10",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1923,7 +1986,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10-pro-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "google-pixel-10-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1933,7 +1996,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-10a-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "google-pixel-10a",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1943,7 +2006,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-256gb-canyon-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "google-pixel-11-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1953,7 +2016,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-fold-256gb-olive-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "google-pixel-11-pro-fold",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1963,7 +2026,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-xl-256gb-canyon-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "google-pixel-11-pro-xl",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1973,7 +2036,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-3-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "nothing-phone-3",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -1983,7 +2046,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-4a-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "nothing-phone-4a",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -1993,7 +2056,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/nothing/nothing-phone-4a-pro-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "nothing-phone-4a-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2003,7 +2066,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a37-128gb-awesome-charcoal-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "samsung-galaxy-a37",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2013,7 +2076,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a56-128gb-awesome-graphite-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "samsung-galaxy-a56",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2023,7 +2086,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a57-128gb-awesome-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "samsung-galaxy-a57",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2033,7 +2096,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s23-128gb-pink-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "samsung-galaxy-s23",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2043,7 +2106,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s24-128gb-onyx-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "samsung-galaxy-s24",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2053,7 +2116,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s24-ultra-256gb-titanium-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "samsung-galaxy-s24-ultra",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2063,7 +2126,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-128gb-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "samsung-galaxy-s25",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2073,7 +2136,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-fe-128gb-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "samsung-galaxy-s25-fe",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2083,7 +2146,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-fe-128gb-pistachio-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "samsung-galaxy-s26-fe",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2093,7 +2156,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-plus-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "samsung-galaxy-s26-plus",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2103,7 +2166,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-flip8-256gb-pink-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "samsung-galaxy-z-flip8",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2113,7 +2176,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-fold8-256gb-lavender-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "samsung-galaxy-z-fold8",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2123,7 +2186,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-fold8-ultra-256gb-violet-shadow-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "samsung-galaxy-z-fold8-ultra",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2133,7 +2196,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17-512gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "xiaomi-17",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 512,
@@ -2143,7 +2206,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17-ultra-512gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "xiaomi-17-ultra",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 512,
@@ -2153,7 +2216,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17t-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "xiaomi-17t",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2163,7 +2226,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17t-pro-512gb-violett-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "xiaomi-17t-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 512,
@@ -2173,7 +2236,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-15-pro-256gb-schwarz-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "xiaomi-redmi-note-15-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2183,7 +2246,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-pro-256gb-blue-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "xiaomi-redmi-note-17-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2193,7 +2256,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-pro-max-256gb-cloud-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "xiaomi-redmi-note-17-pro-max",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2203,7 +2266,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-s",
    "geraet": "samsung-galaxy-s25-ultra",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2213,7 +2276,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-special",
    "geraet": "samsung-galaxy-s25-ultra",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2223,7 +2286,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special",
    "geraet": "samsung-galaxy-s25-ultra",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2233,7 +2296,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-256gb-burgunder-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "apple-iphone-18-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2243,7 +2306,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-max-256gb-polar-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "apple-iphone-18-pro-max",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -2253,7 +2316,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a17-128gb-5g-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "samsung-galaxy-a17",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2263,7 +2326,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a27-5g-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "samsung-galaxy-a27",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2273,7 +2336,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-17-128gb-blue-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "xiaomi-redmi-17",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2283,7 +2346,7 @@
   {
    "adresse": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-128gb-purple-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-s-special-plus",
    "geraet": "xiaomi-redmi-note-17",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "3 Seiten in Folge mit anderer Form: Kanarienwert fehlt: #content table:has-text(\"Gerät Anzahlung\") ohne „Tarif mtl. (Mindestlaufzeit“",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -2523,5 +2586,5 @@
  ],
  "uebersichten": [],
  "vertragsform": "tarif_plus_ratenkauf",
- "zeitbudget_sekunden": 10184
+ "zeitbudget_sekunden": 10262
 }

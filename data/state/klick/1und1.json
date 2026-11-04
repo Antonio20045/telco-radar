@@ -1,10 +1,10 @@
 {
  "anbieter": "1und1",
- "datum": "2026-11-03",
- "dauer_sekunden": 0.7,
+ "datum": "2026-11-04",
+ "dauer_sekunden": 115.8,
  "format": 1,
  "frischegrenze_tage": 3,
- "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+ "grund": "robots.txt nicht lesbar (HTTP 502)",
  "karte": "1und1.yaml",
  "laufstatus": "nicht_gelesen",
  "lesefrist_tage": 1,
@@ -13,528 +13,1366 @@
   {
    "adresse": "https://mobile.1und1.de/iphone-17-pro",
    "geraet": "apple-iphone-17-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "gescheitert": 0,
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
    "http_status": null,
    "kombinationen": [],
+   "ladung": null,
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gesperrt",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 0
   },
   {
    "adresse": "https://mobile.1und1.de/samsung-galaxy-s26",
    "geraet": "samsung-galaxy-s26",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "gescheitert": 0,
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
    "http_status": null,
    "kombinationen": [],
+   "ladung": null,
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gesperrt",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 0
   },
   {
    "adresse": "https://mobile.1und1.de/iphone-17",
    "geraet": "apple-iphone-17",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "gescheitert": 0,
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
    "http_status": null,
    "kombinationen": [],
+   "ladung": null,
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gesperrt",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 0
   },
   {
    "adresse": "https://mobile.1und1.de/iphone-17-pro-max",
    "geraet": "apple-iphone-17-pro-max",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "gescheitert": 0,
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
    "http_status": null,
    "kombinationen": [],
+   "ladung": null,
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gesperrt",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 0
   },
   {
    "adresse": "https://mobile.1und1.de/samsung-galaxy-s26-ultra",
    "geraet": "samsung-galaxy-s26-ultra",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "gescheitert": 0,
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
    "http_status": null,
    "kombinationen": [],
+   "ladung": null,
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gesperrt",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 0
   },
   {
    "adresse": "https://mobile.1und1.de/google-pixel-11",
    "geraet": "google-pixel-11",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "gescheitert": 0,
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
    "http_status": null,
    "kombinationen": [],
+   "ladung": null,
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gesperrt",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 0
   },
   {
    "adresse": "https://mobile.1und1.de/fairphone-6",
    "geraet": "fairphone-6",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "gescheitert": 0,
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
    "http_status": null,
    "kombinationen": [],
+   "ladung": null,
    "speicher_gb": null,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gesperrt",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 0
   },
   {
    "adresse": "https://mobile.1und1.de/google-pixel-10a",
    "geraet": "google-pixel-10a",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "gescheitert": 0,
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
    "http_status": null,
    "kombinationen": [],
+   "ladung": null,
    "speicher_gb": null,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gesperrt",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 0
   },
   {
    "adresse": "https://mobile.1und1.de/google-pixel-11-pro",
    "geraet": "google-pixel-11-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "gescheitert": 0,
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
    "http_status": null,
    "kombinationen": [],
+   "ladung": null,
    "speicher_gb": null,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gesperrt",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 0
   },
   {
    "adresse": "https://mobile.1und1.de/google-pixel-11-pro-fold",
    "geraet": "google-pixel-11-pro-fold",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "gescheitert": 0,
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
    "http_status": null,
    "kombinationen": [],
+   "ladung": null,
    "speicher_gb": null,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gesperrt",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 0
   },
   {
    "adresse": "https://mobile.1und1.de/google-pixel-11-pro-xl",
    "geraet": "google-pixel-11-pro-xl",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "gescheitert": 0,
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
    "http_status": null,
    "kombinationen": [],
+   "ladung": null,
    "speicher_gb": null,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gesperrt",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 0
   },
   {
    "adresse": "https://mobile.1und1.de/iphone-16",
    "geraet": "apple-iphone-16",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "gescheitert": 0,
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
    "http_status": null,
    "kombinationen": [],
+   "ladung": null,
    "speicher_gb": null,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gesperrt",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 0
   },
   {
    "adresse": "https://mobile.1und1.de/iphone-16-plus",
    "geraet": "apple-iphone-16-plus",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "gescheitert": 0,
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
    "http_status": null,
    "kombinationen": [],
+   "ladung": null,
    "speicher_gb": null,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gesperrt",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 0
   },
   {
    "adresse": "https://mobile.1und1.de/iphone-16e",
    "geraet": "apple-iphone-16e",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "gescheitert": 0,
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
    "http_status": null,
    "kombinationen": [],
+   "ladung": null,
    "speicher_gb": null,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gesperrt",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 0
   },
   {
    "adresse": "https://mobile.1und1.de/iphone-17e",
    "geraet": "apple-iphone-17e",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "gescheitert": 0,
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
    "http_status": null,
    "kombinationen": [],
+   "ladung": null,
    "speicher_gb": null,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gesperrt",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 0
   },
   {
    "adresse": "https://mobile.1und1.de/iphone-18-pro",
    "geraet": "apple-iphone-18-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "gescheitert": 0,
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
    "http_status": null,
    "kombinationen": [],
+   "ladung": null,
    "speicher_gb": null,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gesperrt",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 0
   },
   {
    "adresse": "https://mobile.1und1.de/iphone-18-pro-max",
    "geraet": "apple-iphone-18-pro-max",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "gescheitert": 0,
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
    "http_status": null,
    "kombinationen": [],
+   "ladung": null,
    "speicher_gb": null,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gesperrt",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 0
   },
   {
    "adresse": "https://mobile.1und1.de/iphone-air",
    "geraet": "apple-iphone-air",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "gescheitert": 0,
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
    "http_status": null,
    "kombinationen": [],
+   "ladung": null,
    "speicher_gb": null,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gesperrt",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 0
   },
   {
    "adresse": "https://mobile.1und1.de/nothing-phone-3",
    "geraet": "nothing-phone-3",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "gescheitert": 0,
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
    "http_status": null,
    "kombinationen": [],
+   "ladung": null,
    "speicher_gb": null,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gesperrt",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 0
   },
   {
    "adresse": "https://mobile.1und1.de/nothing-phone-4a-pro",
    "geraet": "nothing-phone-4a-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "gescheitert": 0,
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
    "http_status": null,
    "kombinationen": [],
+   "ladung": null,
    "speicher_gb": null,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gesperrt",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 0
   },
   {
    "adresse": "https://mobile.1und1.de/samsung-galaxy-a17-5g",
    "geraet": "samsung-galaxy-a17",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "gescheitert": 0,
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
    "http_status": null,
    "kombinationen": [],
+   "ladung": null,
    "speicher_gb": null,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gesperrt",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 0
   },
   {
    "adresse": "https://mobile.1und1.de/samsung-galaxy-a27-5g",
    "geraet": "samsung-galaxy-a27",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "gescheitert": 0,
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
    "http_status": null,
    "kombinationen": [],
+   "ladung": null,
    "speicher_gb": null,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gesperrt",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 0
   },
   {
    "adresse": "https://mobile.1und1.de/samsung-galaxy-a57",
    "geraet": "samsung-galaxy-a57",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "gescheitert": 0,
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
    "http_status": null,
    "kombinationen": [],
+   "ladung": null,
    "speicher_gb": null,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gesperrt",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 0
   },
   {
    "adresse": "https://mobile.1und1.de/samsung-galaxy-s26-fe",
    "geraet": "samsung-galaxy-s26-fe",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "gescheitert": 0,
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
    "http_status": null,
    "kombinationen": [],
+   "ladung": null,
    "speicher_gb": null,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gesperrt",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 0
   },
   {
    "adresse": "https://mobile.1und1.de/samsung-galaxy-s26-plus",
    "geraet": "samsung-galaxy-s26-plus",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "gescheitert": 0,
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
    "http_status": null,
    "kombinationen": [],
+   "ladung": null,
    "speicher_gb": null,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gesperrt",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 0
   },
   {
    "adresse": "https://mobile.1und1.de/samsung-galaxy-z-flip8",
    "geraet": "samsung-galaxy-z-flip8",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "gescheitert": 0,
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
    "http_status": null,
    "kombinationen": [],
+   "ladung": null,
    "speicher_gb": null,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gesperrt",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 0
   },
   {
    "adresse": "https://mobile.1und1.de/samsung-galaxy-z-fold8",
    "geraet": "samsung-galaxy-z-fold8",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "gescheitert": 0,
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
    "http_status": null,
    "kombinationen": [],
+   "ladung": null,
    "speicher_gb": null,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gesperrt",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 0
   },
   {
    "adresse": "https://mobile.1und1.de/samsung-galaxy-z-fold8-ultra",
    "geraet": "samsung-galaxy-z-fold8-ultra",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "gescheitert": 0,
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
    "http_status": null,
    "kombinationen": [],
+   "ladung": null,
    "speicher_gb": null,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gesperrt",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 0
   },
   {
    "adresse": "https://mobile.1und1.de/xiaomi-17",
    "geraet": "xiaomi-17",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "gescheitert": 0,
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
    "http_status": null,
    "kombinationen": [],
+   "ladung": null,
    "speicher_gb": null,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gesperrt",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 0
   },
   {
    "adresse": "https://mobile.1und1.de/xiaomi-17-ultra",
    "geraet": "xiaomi-17-ultra",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "gescheitert": 0,
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
    "http_status": null,
    "kombinationen": [],
+   "ladung": null,
    "speicher_gb": null,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gesperrt",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 0
   },
   {
    "adresse": "https://mobile.1und1.de/xiaomi-17t",
    "geraet": "xiaomi-17t",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "gescheitert": 0,
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
    "http_status": null,
    "kombinationen": [],
+   "ladung": null,
    "speicher_gb": null,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gesperrt",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 0
   },
   {
    "adresse": "https://mobile.1und1.de/xiaomi-17t-pro",
    "geraet": "xiaomi-17t-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "gescheitert": 0,
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
    "http_status": null,
    "kombinationen": [],
+   "ladung": null,
    "speicher_gb": null,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gesperrt",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 0
   },
   {
    "adresse": "https://mobile.1und1.de/xiaomi-redmi-note-17-5g",
    "geraet": "xiaomi-redmi-note-17",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "gescheitert": 0,
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
    "http_status": null,
    "kombinationen": [],
+   "ladung": null,
    "speicher_gb": null,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gesperrt",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 0
   },
   {
    "adresse": "https://mobile.1und1.de/xiaomi-redmi-note-17-pro-5g",
    "geraet": "xiaomi-redmi-note-17-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "gescheitert": 0,
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
    "http_status": null,
    "kombinationen": [],
+   "ladung": null,
    "speicher_gb": null,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gesperrt",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 0
   },
   {
    "adresse": "https://mobile.1und1.de/xiaomi-redmi-note-17-pro-max-5g",
    "geraet": "xiaomi-redmi-note-17-pro-max",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "gescheitert": 0,
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
    "http_status": null,
    "kombinationen": [],
+   "ladung": null,
    "speicher_gb": null,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gesperrt",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 0
   },
   {
    "adresse": "https://mobile.1und1.de/honor-600",
    "geraet": "honor-600",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "gescheitert": 0,
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
    "http_status": null,
    "kombinationen": [],
+   "ladung": null,
    "speicher_gb": null,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gesperrt",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 0
   },
   {
    "adresse": "https://mobile.1und1.de/honor-magic-v6",
    "geraet": "honor-magic-v6",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "gescheitert": 0,
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
    "http_status": null,
    "kombinationen": [],
+   "ladung": null,
    "speicher_gb": null,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gesperrt",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 0
   },
   {
    "adresse": "https://mobile.1und1.de/honor-magic8-lite",
    "geraet": "honor-magic8-lite",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "gescheitert": 0,
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
    "http_status": null,
    "kombinationen": [],
+   "ladung": null,
    "speicher_gb": null,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gesperrt",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 0
   },
   {
    "adresse": "https://mobile.1und1.de/motorola-moto-g77",
    "geraet": "motorola-moto-g77",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "gescheitert": 0,
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
    "http_status": null,
    "kombinationen": [],
+   "ladung": null,
    "speicher_gb": null,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gesperrt",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 0
   },
   {
    "adresse": "https://mobile.1und1.de/motorola-razr-70",
    "geraet": "motorola-razr-70",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "gescheitert": 0,
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
    "http_status": null,
    "kombinationen": [],
+   "ladung": null,
    "speicher_gb": null,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gesperrt",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 0
   },
   {
    "adresse": "https://mobile.1und1.de/samsung-galaxy-s25-edge",
    "geraet": "samsung-galaxy-s25-edge",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "gescheitert": 0,
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
    "http_status": null,
    "kombinationen": [],
+   "ladung": null,
    "speicher_gb": null,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gesperrt",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 0
   },
   {
    "adresse": "https://mobile.1und1.de/xiaomi-redmi-17c-5g",
    "geraet": "xiaomi-redmi-17c",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "gescheitert": 0,
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
    "http_status": null,
    "kombinationen": [],
+   "ladung": null,
    "speicher_gb": null,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gesperrt",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 0
   }
  ],
  "ueberfaellig": [
+  "https://mobile.1und1.de/iphone-17-pro",
+  "https://mobile.1und1.de/samsung-galaxy-s26",
+  "https://mobile.1und1.de/iphone-17",
+  "https://mobile.1und1.de/iphone-17-pro-max",
+  "https://mobile.1und1.de/samsung-galaxy-s26-ultra",
+  "https://mobile.1und1.de/google-pixel-11",
+  "https://mobile.1und1.de/fairphone-6",
+  "https://mobile.1und1.de/google-pixel-10a",
+  "https://mobile.1und1.de/google-pixel-11-pro",
+  "https://mobile.1und1.de/google-pixel-11-pro-fold",
+  "https://mobile.1und1.de/google-pixel-11-pro-xl",
+  "https://mobile.1und1.de/iphone-16",
+  "https://mobile.1und1.de/iphone-16-plus",
+  "https://mobile.1und1.de/iphone-16e",
+  "https://mobile.1und1.de/iphone-17e",
+  "https://mobile.1und1.de/iphone-18-pro",
+  "https://mobile.1und1.de/iphone-18-pro-max",
+  "https://mobile.1und1.de/iphone-air",
+  "https://mobile.1und1.de/nothing-phone-3",
+  "https://mobile.1und1.de/nothing-phone-4a-pro",
+  "https://mobile.1und1.de/samsung-galaxy-a17-5g",
+  "https://mobile.1und1.de/samsung-galaxy-a27-5g",
+  "https://mobile.1und1.de/samsung-galaxy-a57",
+  "https://mobile.1und1.de/samsung-galaxy-s26-fe",
+  "https://mobile.1und1.de/samsung-galaxy-s26-plus",
+  "https://mobile.1und1.de/samsung-galaxy-z-flip8",
+  "https://mobile.1und1.de/samsung-galaxy-z-fold8",
+  "https://mobile.1und1.de/samsung-galaxy-z-fold8-ultra",
   "https://mobile.1und1.de/xiaomi-17",
-  "https://mobile.1und1.de/motorola-moto-g77"
+  "https://mobile.1und1.de/xiaomi-17-ultra",
+  "https://mobile.1und1.de/xiaomi-17t",
+  "https://mobile.1und1.de/xiaomi-17t-pro",
+  "https://mobile.1und1.de/xiaomi-redmi-note-17-5g",
+  "https://mobile.1und1.de/xiaomi-redmi-note-17-pro-5g",
+  "https://mobile.1und1.de/xiaomi-redmi-note-17-pro-max-5g",
+  "https://mobile.1und1.de/honor-600",
+  "https://mobile.1und1.de/honor-magic-v6",
+  "https://mobile.1und1.de/honor-magic8-lite",
+  "https://mobile.1und1.de/motorola-moto-g77",
+  "https://mobile.1und1.de/motorola-razr-70",
+  "https://mobile.1und1.de/samsung-galaxy-s25-edge",
+  "https://mobile.1und1.de/xiaomi-redmi-17c-5g"
  ],
  "uebersichten": [
   {
    "adresse": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-s-mvl&chosenNet=1u1&lightbox=true&bk=false",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "beleg": {
+    "seite": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-s-mvl&chosenNet=1u1&lightbox=true&bk=false",
+    "zeitpunkt": "2026-11-04T06:01:53Z"
+   },
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
+   "http_status": null,
    "saetze": [],
-   "status": "nicht_besucht",
+   "seiten": [
+    {
+     "adresse": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-s-mvl&chosenNet=1u1&lightbox=true&bk=false",
+     "beleg": {
+      "seite": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-s-mvl&chosenNet=1u1&lightbox=true&bk=false",
+      "zeitpunkt": "2026-11-04T06:01:53Z"
+     },
+     "grund": "robots.txt nicht lesbar (HTTP 502)",
+     "http_status": null,
+     "saetze_neu": 0,
+     "status": "gesperrt",
+     "stoerung": null
+    }
+   ],
+   "status": "gesperrt",
+   "stoerung": null,
+   "unvollstaendig": "gesperrt: robots.txt nicht lesbar (HTTP 502)",
    "vollstaendig": false
   },
   {
    "adresse": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-m-mvl&chosenNet=1u1&lightbox=true&bk=false",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "beleg": {
+    "seite": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-m-mvl&chosenNet=1u1&lightbox=true&bk=false",
+    "zeitpunkt": "2026-11-04T06:01:55Z"
+   },
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
+   "http_status": null,
    "saetze": [],
-   "status": "nicht_besucht",
+   "seiten": [
+    {
+     "adresse": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-m-mvl&chosenNet=1u1&lightbox=true&bk=false",
+     "beleg": {
+      "seite": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-m-mvl&chosenNet=1u1&lightbox=true&bk=false",
+      "zeitpunkt": "2026-11-04T06:01:55Z"
+     },
+     "grund": "robots.txt nicht lesbar (HTTP 502)",
+     "http_status": null,
+     "saetze_neu": 0,
+     "status": "gesperrt",
+     "stoerung": null
+    }
+   ],
+   "status": "gesperrt",
+   "stoerung": null,
+   "unvollstaendig": "gesperrt: robots.txt nicht lesbar (HTTP 502)",
    "vollstaendig": false
   },
   {
    "adresse": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-l-mvl&chosenNet=1u1&lightbox=true&bk=false",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "beleg": {
+    "seite": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-l-mvl&chosenNet=1u1&lightbox=true&bk=false",
+    "zeitpunkt": "2026-11-04T06:01:57Z"
+   },
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
+   "http_status": null,
    "saetze": [],
-   "status": "nicht_besucht",
+   "seiten": [
+    {
+     "adresse": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-l-mvl&chosenNet=1u1&lightbox=true&bk=false",
+     "beleg": {
+      "seite": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-l-mvl&chosenNet=1u1&lightbox=true&bk=false",
+      "zeitpunkt": "2026-11-04T06:01:57Z"
+     },
+     "grund": "robots.txt nicht lesbar (HTTP 502)",
+     "http_status": null,
+     "saetze_neu": 0,
+     "status": "gesperrt",
+     "stoerung": null
+    }
+   ],
+   "status": "gesperrt",
+   "stoerung": null,
+   "unvollstaendig": "gesperrt: robots.txt nicht lesbar (HTTP 502)",
    "vollstaendig": false
   },
   {
    "adresse": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-s-mvl&chosenNet=1u1&lightbox=true&bk=false",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "beleg": {
+    "seite": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-s-mvl&chosenNet=1u1&lightbox=true&bk=false",
+    "zeitpunkt": "2026-11-04T06:01:59Z"
+   },
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
+   "http_status": null,
    "saetze": [],
-   "status": "nicht_besucht",
+   "seiten": [
+    {
+     "adresse": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-s-mvl&chosenNet=1u1&lightbox=true&bk=false",
+     "beleg": {
+      "seite": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-s-mvl&chosenNet=1u1&lightbox=true&bk=false",
+      "zeitpunkt": "2026-11-04T06:01:59Z"
+     },
+     "grund": "robots.txt nicht lesbar (HTTP 502)",
+     "http_status": null,
+     "saetze_neu": 0,
+     "status": "gesperrt",
+     "stoerung": null
+    }
+   ],
+   "status": "gesperrt",
+   "stoerung": null,
+   "unvollstaendig": "gesperrt: robots.txt nicht lesbar (HTTP 502)",
    "vollstaendig": false
   },
   {
    "adresse": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-m-mvl&chosenNet=1u1&lightbox=true&bk=false",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "beleg": {
+    "seite": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-m-mvl&chosenNet=1u1&lightbox=true&bk=false",
+    "zeitpunkt": "2026-11-04T06:02:01Z"
+   },
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
+   "http_status": null,
    "saetze": [],
-   "status": "nicht_besucht",
+   "seiten": [
+    {
+     "adresse": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-m-mvl&chosenNet=1u1&lightbox=true&bk=false",
+     "beleg": {
+      "seite": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-m-mvl&chosenNet=1u1&lightbox=true&bk=false",
+      "zeitpunkt": "2026-11-04T06:02:01Z"
+     },
+     "grund": "robots.txt nicht lesbar (HTTP 502)",
+     "http_status": null,
+     "saetze_neu": 0,
+     "status": "gesperrt",
+     "stoerung": null
+    }
+   ],
+   "status": "gesperrt",
+   "stoerung": null,
+   "unvollstaendig": "gesperrt: robots.txt nicht lesbar (HTTP 502)",
    "vollstaendig": false
   },
   {
    "adresse": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-l-mvl&chosenNet=1u1&lightbox=true&bk=false",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "beleg": {
+    "seite": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-l-mvl&chosenNet=1u1&lightbox=true&bk=false",
+    "zeitpunkt": "2026-11-04T06:02:03Z"
+   },
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
+   "http_status": null,
    "saetze": [],
-   "status": "nicht_besucht",
+   "seiten": [
+    {
+     "adresse": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-l-mvl&chosenNet=1u1&lightbox=true&bk=false",
+     "beleg": {
+      "seite": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-l-mvl&chosenNet=1u1&lightbox=true&bk=false",
+      "zeitpunkt": "2026-11-04T06:02:03Z"
+     },
+     "grund": "robots.txt nicht lesbar (HTTP 502)",
+     "http_status": null,
+     "saetze_neu": 0,
+     "status": "gesperrt",
+     "stoerung": null
+    }
+   ],
+   "status": "gesperrt",
+   "stoerung": null,
+   "unvollstaendig": "gesperrt: robots.txt nicht lesbar (HTTP 502)",
    "vollstaendig": false
   },
   {
    "adresse": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-xl-ovl&chosenNet=1u1&lightbox=true&bk=false",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "beleg": {
+    "seite": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-xl-ovl&chosenNet=1u1&lightbox=true&bk=false",
+    "zeitpunkt": "2026-11-04T06:02:05Z"
+   },
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
+   "http_status": null,
    "saetze": [],
-   "status": "nicht_besucht",
+   "seiten": [
+    {
+     "adresse": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-xl-ovl&chosenNet=1u1&lightbox=true&bk=false",
+     "beleg": {
+      "seite": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-xl-ovl&chosenNet=1u1&lightbox=true&bk=false",
+      "zeitpunkt": "2026-11-04T06:02:05Z"
+     },
+     "grund": "robots.txt nicht lesbar (HTTP 502)",
+     "http_status": null,
+     "saetze_neu": 0,
+     "status": "gesperrt",
+     "stoerung": null
+    }
+   ],
+   "status": "gesperrt",
+   "stoerung": null,
+   "unvollstaendig": "gesperrt: robots.txt nicht lesbar (HTTP 502)",
    "vollstaendig": false
   },
   {
    "adresse": "https://mobile.1und1.de/smartphones-all-net-flat-s",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "beleg": {
+    "seite": "https://mobile.1und1.de/smartphones-all-net-flat-s",
+    "zeitpunkt": "2026-11-04T06:02:07Z"
+   },
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
+   "http_status": null,
    "saetze": [],
-   "status": "nicht_besucht",
+   "seiten": [
+    {
+     "adresse": "https://mobile.1und1.de/smartphones-all-net-flat-s",
+     "beleg": {
+      "seite": "https://mobile.1und1.de/smartphones-all-net-flat-s",
+      "zeitpunkt": "2026-11-04T06:02:07Z"
+     },
+     "grund": "robots.txt nicht lesbar (HTTP 502)",
+     "http_status": null,
+     "saetze_neu": 0,
+     "status": "gesperrt",
+     "stoerung": null
+    }
+   ],
+   "status": "gesperrt",
+   "stoerung": null,
+   "unvollstaendig": "gesperrt: robots.txt nicht lesbar (HTTP 502)",
    "vollstaendig": false
   },
   {
    "adresse": "https://mobile.1und1.de/smartphones-all-net-flat-m",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "beleg": {
+    "seite": "https://mobile.1und1.de/smartphones-all-net-flat-m",
+    "zeitpunkt": "2026-11-04T06:02:09Z"
+   },
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
+   "http_status": null,
    "saetze": [],
-   "status": "nicht_besucht",
+   "seiten": [
+    {
+     "adresse": "https://mobile.1und1.de/smartphones-all-net-flat-m",
+     "beleg": {
+      "seite": "https://mobile.1und1.de/smartphones-all-net-flat-m",
+      "zeitpunkt": "2026-11-04T06:02:09Z"
+     },
+     "grund": "robots.txt nicht lesbar (HTTP 502)",
+     "http_status": null,
+     "saetze_neu": 0,
+     "status": "gesperrt",
+     "stoerung": null
+    }
+   ],
+   "status": "gesperrt",
+   "stoerung": null,
+   "unvollstaendig": "gesperrt: robots.txt nicht lesbar (HTTP 502)",
    "vollstaendig": false
   },
   {
    "adresse": "https://mobile.1und1.de/smartphones-all-net-flat-l",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "beleg": {
+    "seite": "https://mobile.1und1.de/smartphones-all-net-flat-l",
+    "zeitpunkt": "2026-11-04T06:02:11Z"
+   },
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
+   "http_status": null,
    "saetze": [],
-   "status": "nicht_besucht",
+   "seiten": [
+    {
+     "adresse": "https://mobile.1und1.de/smartphones-all-net-flat-l",
+     "beleg": {
+      "seite": "https://mobile.1und1.de/smartphones-all-net-flat-l",
+      "zeitpunkt": "2026-11-04T06:02:11Z"
+     },
+     "grund": "robots.txt nicht lesbar (HTTP 502)",
+     "http_status": null,
+     "saetze_neu": 0,
+     "status": "gesperrt",
+     "stoerung": null
+    }
+   ],
+   "status": "gesperrt",
+   "stoerung": null,
+   "unvollstaendig": "gesperrt: robots.txt nicht lesbar (HTTP 502)",
    "vollstaendig": false
   },
   {
    "adresse": "https://mobile.1und1.de/smartphones-unlimited-s",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "beleg": {
+    "seite": "https://mobile.1und1.de/smartphones-unlimited-s",
+    "zeitpunkt": "2026-11-04T06:02:13Z"
+   },
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
+   "http_status": null,
    "saetze": [],
-   "status": "nicht_besucht",
+   "seiten": [
+    {
+     "adresse": "https://mobile.1und1.de/smartphones-unlimited-s",
+     "beleg": {
+      "seite": "https://mobile.1und1.de/smartphones-unlimited-s",
+      "zeitpunkt": "2026-11-04T06:02:13Z"
+     },
+     "grund": "robots.txt nicht lesbar (HTTP 502)",
+     "http_status": null,
+     "saetze_neu": 0,
+     "status": "gesperrt",
+     "stoerung": null
+    }
+   ],
+   "status": "gesperrt",
+   "stoerung": null,
+   "unvollstaendig": "gesperrt: robots.txt nicht lesbar (HTTP 502)",
    "vollstaendig": false
   },
   {
    "adresse": "https://mobile.1und1.de/smartphones-unlimited-m",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "beleg": {
+    "seite": "https://mobile.1und1.de/smartphones-unlimited-m",
+    "zeitpunkt": "2026-11-04T06:02:15Z"
+   },
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
+   "http_status": null,
    "saetze": [],
-   "status": "nicht_besucht",
+   "seiten": [
+    {
+     "adresse": "https://mobile.1und1.de/smartphones-unlimited-m",
+     "beleg": {
+      "seite": "https://mobile.1und1.de/smartphones-unlimited-m",
+      "zeitpunkt": "2026-11-04T06:02:15Z"
+     },
+     "grund": "robots.txt nicht lesbar (HTTP 502)",
+     "http_status": null,
+     "saetze_neu": 0,
+     "status": "gesperrt",
+     "stoerung": null
+    }
+   ],
+   "status": "gesperrt",
+   "stoerung": null,
+   "unvollstaendig": "gesperrt: robots.txt nicht lesbar (HTTP 502)",
    "vollstaendig": false
   },
   {
    "adresse": "https://mobile.1und1.de/smartphones-unlimited-l",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "beleg": {
+    "seite": "https://mobile.1und1.de/smartphones-unlimited-l",
+    "zeitpunkt": "2026-11-04T06:02:17Z"
+   },
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
+   "http_status": null,
    "saetze": [],
-   "status": "nicht_besucht",
+   "seiten": [
+    {
+     "adresse": "https://mobile.1und1.de/smartphones-unlimited-l",
+     "beleg": {
+      "seite": "https://mobile.1und1.de/smartphones-unlimited-l",
+      "zeitpunkt": "2026-11-04T06:02:17Z"
+     },
+     "grund": "robots.txt nicht lesbar (HTTP 502)",
+     "http_status": null,
+     "saetze_neu": 0,
+     "status": "gesperrt",
+     "stoerung": null
+    }
+   ],
+   "status": "gesperrt",
+   "stoerung": null,
+   "unvollstaendig": "gesperrt: robots.txt nicht lesbar (HTTP 502)",
    "vollstaendig": false
   },
   {
    "adresse": "https://mobile.1und1.de/smartphones-unlimited-xl",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "beleg": {
+    "seite": "https://mobile.1und1.de/smartphones-unlimited-xl",
+    "zeitpunkt": "2026-11-04T06:02:20Z"
+   },
+   "grund": "robots.txt nicht lesbar (HTTP 502)",
+   "http_status": null,
    "saetze": [],
-   "status": "nicht_besucht",
+   "seiten": [
+    {
+     "adresse": "https://mobile.1und1.de/smartphones-unlimited-xl",
+     "beleg": {
+      "seite": "https://mobile.1und1.de/smartphones-unlimited-xl",
+      "zeitpunkt": "2026-11-04T06:02:20Z"
+     },
+     "grund": "robots.txt nicht lesbar (HTTP 502)",
+     "http_status": null,
+     "saetze_neu": 0,
+     "status": "gesperrt",
+     "stoerung": null
+    }
+   ],
+   "status": "gesperrt",
+   "stoerung": null,
+   "unvollstaendig": "gesperrt: robots.txt nicht lesbar (HTTP 502)",
    "vollstaendig": false
   }
  ],
  "vertragsform": "ein_vertrag",
- "zeitbudget_sekunden": 10252
+ "zeitbudget_sekunden": 10260
 }

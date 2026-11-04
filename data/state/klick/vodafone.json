@@ -1,89 +1,5071 @@
 {
  "anbieter": "vodafone",
- "datum": "2026-11-03",
- "dauer_sekunden": 0.8,
+ "datum": "2026-11-04",
+ "dauer_sekunden": 1315.6,
  "format": 1,
  "frischegrenze_tage": 3,
- "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+ "grund": "https://www.vodafone.de/privat/handys/iphone-17.html: Abruf gestört (Route.fetch: getaddrinfo EAI_AGAIN www.vodafone.de)",
  "karte": "vodafone.yaml",
- "laufstatus": "nicht_gelesen",
+ "laufstatus": "gestoert",
  "lesefrist_tage": 1,
  "name": "Vodafone",
  "seiten": [
   {
    "adresse": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
    "geraet": "apple-iphone-17-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
-   "http_status": null,
-   "kombinationen": [],
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57562&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "267"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "5989265e35009d373e372174aa128a9e959e04614d8493d78f04e09b477314c9",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:04:45Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil XS"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "267"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 33.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        21.45
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57562&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "268"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "524dd2bf341faef6168824897823fa6e4a2a634b4361e5c9df7c84f01665ed0b",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:04:46Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil S"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "268"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 33.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        31.45
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57562&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "269"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "afe081d7cea76bad1eb085b6c9f44060076c450ffc29fc0199d16d2da5faf4f6",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:04:46Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil M"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "269"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 33.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        30.35
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57562&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "270"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "8dd131d0d47f90f0b3d00f279f77ce2667f4b0b13f7cd8e740f35b7d48e5c6ed",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:04:47Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil L"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "270"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 33.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        36.85
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57562&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "271"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "aa0ed72062dbd94053b5251733a30213c8a0ab7c4060cd13e7062b99c40eaa97",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:04:48Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil XL"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "271"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 33.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        49.35
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57562&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "267"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "654e93227328779787939df008e819a178b05475dd0dca289a112ca825b40c2e",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:05:55Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil XS"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "267"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 49.5,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        21.45
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57562&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "268"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "46424da1e129089740eadf057163ed573a8b5197a181a8556b624b508d5d4ff3",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:05:55Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil S"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "268"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 49.5,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        31.45
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57562&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "269"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "57ad41f8a30784179a5686b71dafac45085eafb045654ebde60b1d28cddc67ac",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:05:56Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil M"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "269"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 49.5,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        29.85
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57562&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "270"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "ff2e32890eba12c2240b19c5a4806891440f926bd5b15594933230095dc370fb",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:05:57Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil L"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "270"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 49.5,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        36.1
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57562&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "271"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "74ddee222dae400e2b5c39b8d36ca561addcd1627f5593e6f9701bddda2f10eb",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:05:58Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil XL"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "271"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 49.5,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        47.85
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57562&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "256 GB",
+      "tarif": "267"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "705ffd4cdb317b5764352ca01e8b21a2581906725fee01987851fcc5a11a4966",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:07:03Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil XS"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "256 GB",
+      "tarif": "267"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 99.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        21.45
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57562&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "256 GB",
+      "tarif": "268"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "f94384a377af0b8c1d83268030be7ff6c12a11bae67d69f1c26780404ac3f74b",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:07:04Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil S"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "256 GB",
+      "tarif": "268"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 99.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        31.45
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57562&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "256 GB",
+      "tarif": "269"
+     },
+     "befunde": [
+      {
+       "feld": "rate",
+       "grund": "fehlt im Text, Antwort 99,00"
+      },
+      {
+       "feld": "tarifphasen",
+       "grund": "fehlt im Text, Antwort Monat 1–12: 28,35; Monat 13–24: 31,35"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "f85b1b4bb757c6639e831343ffb0e81e9dc2b6b6720d61d01d64117358c377fc",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:07:05Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 99,00",
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "256 GB",
+      "tarif": "269"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57562&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "256 GB",
+      "tarif": "270"
+     },
+     "befunde": [
+      {
+       "feld": "rate",
+       "grund": "fehlt im Text, Antwort 99,00"
+      },
+      {
+       "feld": "tarifphasen",
+       "grund": "fehlt im Text, Antwort Monat 1–12: 33,85; Monat 13–24: 38,35"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "28f999c92881f87eb7761d8df95e23856d5972f7678c05d4e8bd18cea8b69d7f",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:07:06Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 99,00",
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "256 GB",
+      "tarif": "270"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57562&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "256 GB",
+      "tarif": "271"
+     },
+     "befunde": [
+      {
+       "feld": "rate",
+       "grund": "fehlt im Text, Antwort 99,00"
+      },
+      {
+       "feld": "tarifphasen",
+       "grund": "fehlt im Text, Antwort Monat 1–12: 43,35; Monat 13–24: 52,35"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "602181961918cafe635b27e3982a772158ce616c003a3be80895b294a3e3488c",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:07:06Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 99,00",
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "256 GB",
+      "tarif": "271"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57563&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "267"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "31e99ce48751429bcc0c22f7dacf74a71ce23b6ce7a4c24fed9f4f56be6589b8",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:08:03Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil XS"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "267"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 0.99,
+      "rate": 40.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        21.45
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57563&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "268"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "1c102ee80ca17a0d59396c7de1d06e347bae55eb0362231082a642aca1e64c2d",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:08:04Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil S"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "268"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 0.99,
+      "rate": 40.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        31.45
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57563&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "269"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "471cf4fd902b4ef889f732217f44e055220bc89fb106d8ff2bde65d235935455",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:08:05Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil M"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "269"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 0.99,
+      "rate": 40.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        30.35
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57563&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "270"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "ccfd1a4ef39b2575d0eace8ae6ea638a0f98e136c6e70fb4eb68131319dc42af",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:08:05Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil L"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "270"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 0.99,
+      "rate": 40.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        36.85
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57563&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "271"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "8117e392788981679773f7827b120e26bbdb47cfa695383938457114976895ba",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:08:06Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil XL"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "271"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 0.99,
+      "rate": 40.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        49.35
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57563&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "267"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "844fef17bb344001ae02d42015538b95a369744f439e7204e205aed108fc6109",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:09:07Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil XS"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "267"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 0.99,
+      "rate": 60.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        21.45
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57563&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "268"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "77404a74200133bcea2051642ecc30bd212f2c0ee44d708bdf5bd6e1a5a7b4a1",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:09:08Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil S"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "268"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 0.99,
+      "rate": 60.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        31.45
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57563&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "269"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "f5eba220beb0a02a3e64c45b8216a031f1f791dc42437479c57460c6b0d1c641",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:09:09Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil M"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "269"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 0.99,
+      "rate": 60.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        29.85
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57563&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "270"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "679dd0da9b68542d546cf2b5d463858d0013d9e6b703d1ce616408707f697ddd",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:09:10Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil L"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "270"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 0.99,
+      "rate": 60.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        36.1
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57563&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "271"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "0e7c0bee8c9e317d1ff65df816ab71f31090202d39c31227029f9dd7dd765822",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:09:10Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil XL"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "271"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 0.99,
+      "rate": 60.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        47.85
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57563&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "512 GB",
+      "tarif": "267"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "ba5ba3ed4acf195130558a6256310f5100099a3f753319c37dd344bbcc44ff73",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:10:25Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil XS"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "512 GB",
+      "tarif": "267"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 0.99,
+      "rate": 120.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        21.45
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57563&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "512 GB",
+      "tarif": "268"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "6a5d69177c32b85c577f2ef367b848c3b93f129615acd86f4e4c7a16efeefffa",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:10:26Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil S"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "512 GB",
+      "tarif": "268"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 0.99,
+      "rate": 120.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        31.45
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57563&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "512 GB",
+      "tarif": "269"
+     },
+     "befunde": [
+      {
+       "feld": "rate",
+       "grund": "fehlt im Text, Antwort 120,00"
+      },
+      {
+       "feld": "tarifphasen",
+       "grund": "fehlt im Text, Antwort Monat 1–12: 28,35; Monat 13–24: 31,35"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "daa55327ded9a5d7e461c8fec7cf3fe3b0abf7523775c78a4f6f255fea9ce6e0",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:10:26Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 120,00",
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "512 GB",
+      "tarif": "269"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 0.99,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57563&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "512 GB",
+      "tarif": "270"
+     },
+     "befunde": [
+      {
+       "feld": "rate",
+       "grund": "fehlt im Text, Antwort 120,00"
+      },
+      {
+       "feld": "tarifphasen",
+       "grund": "fehlt im Text, Antwort Monat 1–12: 33,85; Monat 13–24: 38,35"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "1e286a7ecf7d4d9a2f0f0e40c423347b97585038949a66c2d329151070eca095",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:10:27Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 120,00",
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "512 GB",
+      "tarif": "270"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 0.99,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57563&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "512 GB",
+      "tarif": "271"
+     },
+     "befunde": [
+      {
+       "feld": "rate",
+       "grund": "fehlt im Text, Antwort 120,00"
+      },
+      {
+       "feld": "tarifphasen",
+       "grund": "fehlt im Text, Antwort Monat 1–12: 43,35; Monat 13–24: 52,35"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "dfcc01da92618bd76f0e18a62399354e14fc342449def39d7a255b1e88b4a6ca",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:10:28Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 120,00",
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "512 GB",
+      "tarif": "271"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 0.99,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 2.0,
+    "anfragen": 227,
+    "beendet": 226,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "tags.vodafone.de": 1
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 21.1,
+    "takte_ms": 16400,
+    "wartet_auf": "load"
+   },
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 0.14285714285714285,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 30,
+    "felder_gesucht": 210,
+    "knoepfe_gefunden": 50,
+    "knoepfe_gesucht": 50
+   },
+   "verworfen": 31
   },
   {
    "adresse": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html",
    "geraet": "samsung-galaxy-s26",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
-   "http_status": null,
-   "kombinationen": [],
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57767&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "267"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "88b15016580cff2d88aaba4b81422ea46d5ed137d1fb236102a7bd7d73271909",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:11:19Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil XS"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "267"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 28.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        21.45
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57767&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "268"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "5a4d149812d95b59c6e112bb66863c7ad1021599740589280784398679964164",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:11:19Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil S"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "268"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 28.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        31.45
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57767&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "269"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "b1dc14d12e88ffb39b74fc475eadecfe8f57d3a1ff18b123a9521b4c335d992b",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:11:20Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil M"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "269"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 28.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        30.35
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57767&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "270"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "60252cef22e8c11b70e2a21df4ff5a06c4805fa91968f764a635e831d96098a2",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:11:21Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil L"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "270"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 28.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        36.85
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57767&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "271"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "8a64a5f5ac5e37d0682b27a8e56ea713e1d1d32a983ae9b04c4616286d0ba887",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:11:22Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil XL"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "271"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 28.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        49.35
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57767&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "267"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "3570c50adaf8c04c16bd1a94581bf3bdbd4768d717a951232dc4a2f25aa07455",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:12:13Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil XS"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "267"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 42.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        21.45
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57767&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "268"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "796c111a780aa8f8f35d2b9ad098897742719d54def7cb3692d3e160503f4874",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:12:14Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil S"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "268"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 42.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        31.45
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57767&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "269"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "1a952210d11a9f00797eae4b02058ee8cae5a27d5b052ec67ff1d6d2d3fee298",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:12:14Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil M"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "269"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 42.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        29.85
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57767&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "270"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "590a03d79e839d8fc7e2843aafa8e838ca7c3493f2b07b367490d53b3f09dc24",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:12:15Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil L"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "270"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 42.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        36.1
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57767&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "271"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "9c416850f3c932766fadb1f1cfe0e460f463e9c1948baa8b66ed6f834f0ac1cf",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:12:16Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil XL"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "271"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 42.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        47.85
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57767&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "256 GB",
+      "tarif": "267"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "21793568908fe0a54fd5d26f08dadb52ee46ae8134c9fc281c144328a7339772",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:13:10Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil XS"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "256 GB",
+      "tarif": "267"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 84.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        21.45
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57767&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "256 GB",
+      "tarif": "268"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "7062c9153136bd876df026429f03953449635256d01d4a7806fda3b42fd039fa",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:13:11Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil S"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "256 GB",
+      "tarif": "268"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 84.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        31.45
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57767&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "256 GB",
+      "tarif": "269"
+     },
+     "befunde": [
+      {
+       "feld": "rate",
+       "grund": "fehlt im Text, Antwort 84,00"
+      },
+      {
+       "feld": "tarifphasen",
+       "grund": "fehlt im Text, Antwort Monat 1–12: 28,35; Monat 13–24: 31,35"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "917c77a873a10a28d2dcaac2163f4d66c19ce34e0fce690e0159f701a5ad9f09",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:13:12Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 84,00",
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "256 GB",
+      "tarif": "269"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57767&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "256 GB",
+      "tarif": "270"
+     },
+     "befunde": [
+      {
+       "feld": "rate",
+       "grund": "fehlt im Text, Antwort 84,00"
+      },
+      {
+       "feld": "tarifphasen",
+       "grund": "fehlt im Text, Antwort Monat 1–12: 33,85; Monat 13–24: 38,35"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "5fae4f757c84688a6ba8b6726d4a2f180954a913c7c07c6c15bf80961479f683",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:13:12Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 84,00",
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "256 GB",
+      "tarif": "270"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57767&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "256 GB",
+      "tarif": "271"
+     },
+     "befunde": [
+      {
+       "feld": "rate",
+       "grund": "fehlt im Text, Antwort 84,00"
+      },
+      {
+       "feld": "tarifphasen",
+       "grund": "fehlt im Text, Antwort Monat 1–12: 43,35; Monat 13–24: 52,35"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "7a80ebf19168189766f12e536254f95e928a7a03cd6979588e0b6f442661962e",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:13:13Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 84,00",
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "256 GB",
+      "tarif": "271"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57768&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "267"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "b2171f243f9a4b339a59cefe8489752decb94fdf424eb502a5e89f3bdd4f64f0",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:14:10Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil XS"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "267"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 33.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        21.45
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57768&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "268"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "3b5c10db0040d63af01b696a481607aa64668971a1ba81b61817e2830f5a6332",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:14:10Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil S"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "268"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 33.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        31.45
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57768&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "269"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "743bbc186f122959cb3ea1febf048e2c36437598411d1e61a25178f7342bb9d3",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:14:11Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil M"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "269"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 33.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        30.35
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57768&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "270"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "c4d900f83d5f8b96d6bbd8e476777a251af307e0ce344cc8813c292ce3232943",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:14:12Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil L"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "270"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 33.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        36.85
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57768&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "512 GB",
+      "tarif": "271"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "43b54d7589dda627cdf2b423ce6fb0b6f9d53261fe0f495bf5c08d76f531a7c1",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:14:12Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil XL"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512 GB",
+      "tarif": "271"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 33.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        49.35
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57768&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "267"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "e20bd84ac5c065885a3fa94a172005f74c529d32100f5e053229572cd9e8c5f0",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:15:21Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil XS"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "267"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 49.5,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        21.45
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57768&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "268"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "2386ca17fde8c4d0cc5029e253c830f711fe2756d222b4a2e9b4b6589f3e4b24",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:15:22Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil S"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "268"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 49.5,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        31.45
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57768&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "269"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "ce1d0a7f2229f435cd6183f26a28fcd54befc0498d701eaeed3858c48bef6463",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:15:23Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil M"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "269"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 49.5,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        29.85
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57768&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "270"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "4dc0e3e1e7ebae2d1c4dffc9b00c96944528ed15185f2ea886fcc02ad2d133c2",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:15:23Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil L"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "270"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 49.5,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        36.1
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57768&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512 GB",
+      "tarif": "271"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "9d7654a089a46c002957e3b55fd8b3e2a2cefebb6e4089c01278665dacd1849e",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:15:24Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil XL"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512 GB",
+      "tarif": "271"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 49.5,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        47.85
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57768&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "512 GB",
+      "tarif": "267"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "c82a914019014ac610a337a016c18e6a9c3aa256fa08f24daa1908522056f8a2",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:16:34Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil XS"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "512 GB",
+      "tarif": "267"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 99.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        21.45
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57768&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "512 GB",
+      "tarif": "268"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "7cf591d0f2ee04f9014f36032de322b5df64386ce4fa1a2e7179f6b20cc58a61",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:16:34Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil S"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "512 GB",
+      "tarif": "268"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 99.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        31.45
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57768&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "512 GB",
+      "tarif": "269"
+     },
+     "befunde": [
+      {
+       "feld": "rate",
+       "grund": "fehlt im Text, Antwort 99,00"
+      },
+      {
+       "feld": "tarifphasen",
+       "grund": "fehlt im Text, Antwort Monat 1–12: 28,35; Monat 13–24: 31,35"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "68337e128fcdc18c2199b8526b53c243e89bfb3aa1e328236eb82058b39a4cee",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:16:35Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 99,00",
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "512 GB",
+      "tarif": "269"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57768&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "512 GB",
+      "tarif": "270"
+     },
+     "befunde": [
+      {
+       "feld": "rate",
+       "grund": "fehlt im Text, Antwort 99,00"
+      },
+      {
+       "feld": "tarifphasen",
+       "grund": "fehlt im Text, Antwort Monat 1–12: 33,85; Monat 13–24: 38,35"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "892235b12658cb69ad28011d3d0294bf055dba204a85d289c40c5fe27e2ad577",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:16:36Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 99,00",
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "512 GB",
+      "tarif": "270"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57768&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "512 GB",
+      "tarif": "271"
+     },
+     "befunde": [
+      {
+       "feld": "rate",
+       "grund": "fehlt im Text, Antwort 99,00"
+      },
+      {
+       "feld": "tarifphasen",
+       "grund": "fehlt im Text, Antwort Monat 1–12: 43,35; Monat 13–24: 52,35"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "40f15321c2631a44e103097bf3db71996d967cc31436f7a67b7217a4fba4e3c4",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:16:36Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 99,00",
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "512 GB",
+      "tarif": "271"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 2.0,
+    "anfragen": 207,
+    "beendet": 206,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "cdn.dimml.io": 1,
+     "tags.vodafone.de": 1
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 18.6,
+    "takte_ms": 15050,
+    "wartet_auf": "load"
+   },
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 0.14285714285714285,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 30,
+    "felder_gesucht": 210,
+    "knoepfe_gefunden": 50,
+    "knoepfe_gesucht": 50
+   },
+   "verworfen": 30
   },
   {
    "adresse": "https://www.vodafone.de/privat/handys/iphone-15.html",
    "geraet": "apple-iphone-15",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
-   "http_status": null,
+   "gescheitert": 0,
+   "grund": "Kanarienwert fehlt: #device-details-offer-summary-card a[aria-label^=\"Zur Tarifauswahl\"] [aria-label] ohne „iPhone 15“",
+   "http_status": 200,
    "kombinationen": [],
+   "ladung": {
+    "abstand_s": 2.0,
+    "anfragen": 119,
+    "beendet": 120,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {},
+    "ohne_antwort_ms": 0,
+    "sekunden": 12.8,
+    "takte_ms": 9850,
+    "wartet_auf": "load"
+   },
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gestoert",
+   "stoerung": "seitenform",
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 2
   },
   {
    "adresse": "https://www.vodafone.de/privat/handys/iphone-16.html",
    "geraet": "apple-iphone-16",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
-   "http_status": null,
-   "kombinationen": [],
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=56762&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "128 GB",
+      "tarif": "267"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "b4c910f216181feef29221f748ad68f58e40d713380abc0beb8f4980217d3640",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:18:00Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil XS"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "128 GB",
+      "tarif": "267"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 27.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        21.45
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=56762&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "128 GB",
+      "tarif": "268"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "07686fda2a9a857e892e4eb4d48ac971e6f1e5ce2894311f3857751f55649ca0",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:18:01Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil S"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "128 GB",
+      "tarif": "268"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 27.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        31.45
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=56762&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "128 GB",
+      "tarif": "269"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "7c0305fb0aa733253804c6a96ee4048e07b2704521e2db12ce3834015e535bc7",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:18:01Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil M"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "128 GB",
+      "tarif": "269"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 27.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        30.35
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=56762&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "128 GB",
+      "tarif": "270"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "298a7490efae6a87c610875c7eb5dbd86c6e21148fa53df2df5160dbe7be8805",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:18:02Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil L"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "128 GB",
+      "tarif": "270"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 27.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        36.85
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=56762&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "128 GB",
+      "tarif": "271"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "9322215955c37a5e159fefbbc8e8ce687de3dc80fe5393698bec15041d601e47",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:18:03Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil XL"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "128 GB",
+      "tarif": "271"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 27.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        49.35
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=56762&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "128 GB",
+      "tarif": "267"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "c92d71be7028a6268f7dc785d6b0e99aa87c1eec336399720972ab933113195b",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:18:58Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil XS"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "128 GB",
+      "tarif": "267"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 40.5,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        21.45
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=56762&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "128 GB",
+      "tarif": "268"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "fceb21a7a845f233549e07f302c3f4a7ad397d5de9370ca634a343303772f7ee",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:18:58Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil S"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "128 GB",
+      "tarif": "268"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 40.5,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        31.45
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=56762&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "128 GB",
+      "tarif": "269"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "b0f800ca793458b4e34479e6f9c2438f6298e37d972360dad3839b0cf62c3f3b",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:18:59Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil M"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "128 GB",
+      "tarif": "269"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 40.5,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        29.85
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=56762&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "128 GB",
+      "tarif": "270"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "95a040285834bb34eaf0950b1ee6517757fdf008172a0f21f0e46cb298a936ed",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:19:00Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil L"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "128 GB",
+      "tarif": "270"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 40.5,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        36.1
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=56762&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "128 GB",
+      "tarif": "271"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "e59d46e53a05cf629dfbf3fca9b4c34bbdb94b2baa18fd2a081b004516e00568",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:19:00Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil XL"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "128 GB",
+      "tarif": "271"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 40.5,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        47.85
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=56762&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "128 GB",
+      "tarif": "267"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "c357d925f9df6ee7031676113a8fc5fb2ea987f688238a64fc4a708d22cd884a",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:19:54Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil XS"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "128 GB",
+      "tarif": "267"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 81.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        21.45
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=56762&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "128 GB",
+      "tarif": "268"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "5a1da49c277ce5e134b99f2a9fe12785d44adc33d9647b8ea19b73837bc043c8",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:19:55Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil S"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "128 GB",
+      "tarif": "268"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 81.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        31.45
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=56762&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "128 GB",
+      "tarif": "269"
+     },
+     "befunde": [
+      {
+       "feld": "rate",
+       "grund": "fehlt im Text, Antwort 81,00"
+      },
+      {
+       "feld": "tarifphasen",
+       "grund": "fehlt im Text, Antwort Monat 1–12: 28,35; Monat 13–24: 31,35"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "ecb5a5a17d0605a2dc45630bbaf6faca30e4360f5ce4fd558a25b43e7f016473",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:19:55Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 81,00",
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "128 GB",
+      "tarif": "269"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=56762&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "128 GB",
+      "tarif": "270"
+     },
+     "befunde": [
+      {
+       "feld": "rate",
+       "grund": "fehlt im Text, Antwort 81,00"
+      },
+      {
+       "feld": "tarifphasen",
+       "grund": "fehlt im Text, Antwort Monat 1–12: 33,85; Monat 13–24: 38,35"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "26c604df57672bfc905bbe797acd0ce4ddb48078f55ea1526fbf79c1010b25a3",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:19:56Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 81,00",
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "128 GB",
+      "tarif": "270"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=56762&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "128 GB",
+      "tarif": "271"
+     },
+     "befunde": [
+      {
+       "feld": "rate",
+       "grund": "fehlt im Text, Antwort 81,00"
+      },
+      {
+       "feld": "tarifphasen",
+       "grund": "fehlt im Text, Antwort Monat 1–12: 43,35; Monat 13–24: 52,35"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "b1b9908e1f28add08ad5cfd42b2ff132b55c840132f8cfa136a4d469b85f05be",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:19:57Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 81,00",
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "128 GB",
+      "tarif": "271"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 2.0,
+    "anfragen": 204,
+    "beendet": 203,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "cdn.dimml.io": 1,
+     "collect.vodafone.de": 1,
+     "tags.vodafone.de": 1
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 17.5,
+    "takte_ms": 13500,
+    "wartet_auf": "load"
+   },
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 0.14285714285714285,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 15,
+    "felder_gesucht": 105,
+    "knoepfe_gefunden": 26,
+    "knoepfe_gesucht": 26
+   },
+   "verworfen": 15
   },
   {
    "adresse": "https://www.vodafone.de/privat/handys/iphone-16-plus.html",
    "geraet": "apple-iphone-16-plus",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
-   "http_status": null,
+   "gescheitert": 0,
+   "grund": "Kanarienwert fehlt: #device-details-offer-summary-card a[aria-label^=\"Zur Tarifauswahl\"] [aria-label] ohne „iPhone 16 Plus“",
+   "http_status": 200,
    "kombinationen": [],
+   "ladung": {
+    "abstand_s": 2.0,
+    "anfragen": 115,
+    "beendet": 115,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "tags.vodafone.de": 1
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 12.7,
+    "takte_ms": 9550,
+    "wartet_auf": "load"
+   },
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gestoert",
+   "stoerung": "seitenform",
+   "struktur": {
+    "anteil_felder": null,
+    "anteil_knoepfe": null,
+    "felder_gefunden": 0,
+    "felder_gesucht": 0,
+    "knoepfe_gefunden": 0,
+    "knoepfe_gesucht": 0
+   },
+   "verworfen": 2
   },
   {
    "adresse": "https://www.vodafone.de/privat/handys/iphone-16e.html",
    "geraet": "apple-iphone-16e",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
-   "http_status": null,
-   "kombinationen": [],
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57064&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "128 GB",
+      "tarif": "267"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "81944674f592933fb26eca04c7db54ff3a0332cb3b2e00f06e2c898f840d09ac",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:21:20Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil XS"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "128 GB",
+      "tarif": "267"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 18.5,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        21.45
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57064&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "128 GB",
+      "tarif": "268"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "76c4d3d1bfe90b38c4f7bb986aca928f296a65fe572f978062a89e7693a56a20",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:21:20Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil S"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "128 GB",
+      "tarif": "268"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 18.5,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        31.45
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57064&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "128 GB",
+      "tarif": "269"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "9e5052fd30c0019505c14282b0057f6f9557235173df3caae2e01f2969cfe3ed",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:21:21Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil M"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "128 GB",
+      "tarif": "269"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 18.5,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        30.35
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57064&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "128 GB",
+      "tarif": "270"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "ab689ec8afbd6e9ad4cfac23ed6555431db07bb779544868b3bf3634dd100b8a",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:21:22Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil L"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "128 GB",
+      "tarif": "270"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 18.5,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        36.85
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57064&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "128 GB",
+      "tarif": "271"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "623c626c2ed437dc19b38c990d854abb8af800969f909782a1d25162d0884d3a",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:21:22Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil XL"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "128 GB",
+      "tarif": "271"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 18.5,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        49.35
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57064&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "128 GB",
+      "tarif": "267"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "f71485492a84ebf5c44423f3cdaea8c173df72b214c3fcdffc0e697cd0ebd7b7",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:22:19Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil XS"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "128 GB",
+      "tarif": "267"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 27.75,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        21.45
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57064&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "128 GB",
+      "tarif": "268"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "cf0f6d14dcffc82a2fbb642c3789ea12c0ab22b7bd10f608192a465551beaf6e",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:22:19Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil S"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "128 GB",
+      "tarif": "268"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 27.75,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        31.45
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57064&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "128 GB",
+      "tarif": "269"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "ba515966faf3cd8925616d8ba7e6d8cd97bc7c1d54e6f7c1139f21b2392c1fb3",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:22:20Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil M"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "128 GB",
+      "tarif": "269"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 27.75,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        29.85
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57064&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "128 GB",
+      "tarif": "270"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "a883ff5ed727927256d85e237d7b6eeb3d95afe9e5538728849a8ad99332529f",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:22:21Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil L"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "128 GB",
+      "tarif": "270"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 27.75,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        36.1
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57064&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "128 GB",
+      "tarif": "271"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "03b9f90e7450e29f582bbe6b88e7688d8930acff3463f8785b81694a3c6bc8bf",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:22:22Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil XL"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "128 GB",
+      "tarif": "271"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 27.75,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        47.85
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57064&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "128 GB",
+      "tarif": "267"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "4d26739b42abd474caf010464c224cce86624485f5463f50ea7c298ccf436496",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:23:17Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil XS"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "128 GB",
+      "tarif": "267"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 55.5,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        21.45
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57064&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "128 GB",
+      "tarif": "268"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "0430bcba4b7f6541d2f47632ba191753537196d5e4b68917c0dc0080d89e53c3",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:23:18Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil S"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "128 GB",
+      "tarif": "268"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 55.5,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        31.45
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57064&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "128 GB",
+      "tarif": "269"
+     },
+     "befunde": [
+      {
+       "feld": "rate",
+       "grund": "fehlt im Text, Antwort 55,50"
+      },
+      {
+       "feld": "tarifphasen",
+       "grund": "fehlt im Text, Antwort Monat 1–12: 28,35; Monat 13–24: 31,35"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "abf0cb2814c9da7fe13e7d00a0bf313b5ef50875a3b03381df10bac149a0a21d",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:23:18Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 55,50",
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "128 GB",
+      "tarif": "269"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57064&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "128 GB",
+      "tarif": "270"
+     },
+     "befunde": [
+      {
+       "feld": "rate",
+       "grund": "fehlt im Text, Antwort 55,50"
+      },
+      {
+       "feld": "tarifphasen",
+       "grund": "fehlt im Text, Antwort Monat 1–12: 33,85; Monat 13–24: 38,35"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "f24932a627997bb400c71d7e32ab4626f1dead24473140f6c341e8cccdedb63b",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:23:19Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 55,50",
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "128 GB",
+      "tarif": "270"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57064&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=12",
+     "auswahl": {
+      "laufzeit": "12",
+      "speicher": "128 GB",
+      "tarif": "271"
+     },
+     "befunde": [
+      {
+       "feld": "rate",
+       "grund": "fehlt im Text, Antwort 55,50"
+      },
+      {
+       "feld": "tarifphasen",
+       "grund": "fehlt im Text, Antwort Monat 1–12: 43,35; Monat 13–24: 52,35"
+      }
+     ],
+     "beleg": {
+      "beleg_id": "2de4da4b4f2f3e8c9850de654542135c5998c8efeb4a4195ee2151063c2529af",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:23:20Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": "fehlt im Text, Antwort 55,50",
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "status": "befund",
+     "variante": {
+      "laufzeit": 12,
+      "speicher": "128 GB",
+      "tarif": "271"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 2.0,
+    "anfragen": 234,
+    "beendet": 230,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "tags.vodafone.de": 1,
+     "www.vodafone.de": 3
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 17.9,
+    "takte_ms": 14050,
+    "wartet_auf": "load"
+   },
    "speicher_gb": 128,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 0.14285714285714285,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 15,
+    "felder_gesucht": 105,
+    "knoepfe_gefunden": 26,
+    "knoepfe_gesucht": 26
+   },
+   "verworfen": 15
   },
   {
    "adresse": "https://www.vodafone.de/privat/handys/iphone-17.html",
    "geraet": "apple-iphone-17",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
-   "http_status": null,
-   "kombinationen": [],
+   "gescheitert": 1,
+   "grund": "Abruf gestört (Route.fetch: getaddrinfo EAI_AGAIN www.vodafone.de)",
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57532&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "267"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "2fe4800116141d07759a568bfc070c78277d24d7ac61777d0d974e2512c50343",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:24:10Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil XS"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "267"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 30.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        21.45
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57532&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "268"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "c09adb0b50d5bf8f8abd9dbd4743a2fef9e4f2ed28abc9c16976016064ef1e35",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:24:11Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil S"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "268"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 30.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        31.45
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57532&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "269"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "395cc741b01cea37e8d8260629339439bf3a921749ae2410092070f9ce404d24",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:24:12Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil M"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "269"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 30.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        30.35
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57532&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "270"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "c0f67e8b0808edf17a86c54d9d17e78a7b0044b899a1cdd150b33468390a5ce9",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:24:12Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil L"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "270"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 30.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        36.85
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57532&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=36",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "271"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "51f02a29bb806cff9e0158055251dc3872718858b887e5d2d153322953703104",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:24:13Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil XL"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "271"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 30.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        49.35
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57532&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "267"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "102d61e86f9d3c0b4d43c0367fe006732cbf375199fb3c73fbda059016a94d26",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:25:22Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil XS"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "267"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 45.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        21.45
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57532&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "268"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "7d43ff08f267f9e48b60311ecb21948395975fc49616ef3a9a561f40c464ccb8",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:25:23Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil S"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "268"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 45.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        31.45
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57532&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "269"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "bab26eaa524f0c04a49297f4ff7f0b7814efb297875a66a7db712a370e1a3978",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:25:23Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil M"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "269"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 45.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        29.85
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57532&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "270"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "00ac2b0fe1d491058c131430effd7c42ec8f52c337ca17d1ed1984024416703a",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:25:24Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil L"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "270"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 45.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        36.1
+       ]
+      ],
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://api.vodafone.de/glados/v2/tariff/v2/hardware?businessTransaction=newContract&salesChannel=Online.Consumer&hardwareId=57532&virtualItemId=267&virtualItemId=268&virtualItemId=269&virtualItemId=270&virtualItemId=271&financingType=rate&financingDuration=24",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "271"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "bdacfd685c1c7fb86517dc91c1e7a3c635ebf71228b785fbf4941e2affda5e91",
+      "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+      "zeitpunkt": "2026-11-04T06:25:25Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [
+      "ratenzahl",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "nachweise": {
+      "tarifname": "Mobil XL"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "271"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": 1.0,
+      "rate": 45.0,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": [
+       [
+        1,
+        24,
+        47.85
+       ]
+      ],
+      "volumen_gb": null
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 2.0,
+    "anfragen": 233,
+    "beendet": 232,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "tags.vodafone.de": 1
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 19.8,
+    "takte_ms": 15950,
+    "wartet_auf": "load"
+   },
    "speicher_gb": 256,
    "sperre": null,
-   "status": "nicht_besucht"
+   "status": "gestoert",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 0.14285714285714285,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 10,
+    "felder_gesucht": 70,
+    "knoepfe_gefunden": 18,
+    "knoepfe_gesucht": 18
+   },
+   "verworfen": 10
   },
   {
    "adresse": "https://www.vodafone.de/privat/handys/iphone-17-pro-max.html",
    "geraet": "apple-iphone-17-pro-max",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (Route.fetch: getaddrinfo EAI_AGAIN www.vodafone.de)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -93,7 +5075,7 @@
   {
    "adresse": "https://www.vodafone.de/privat/handys/iphone-17e.html",
    "geraet": "apple-iphone-17e",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (Route.fetch: getaddrinfo EAI_AGAIN www.vodafone.de)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -103,7 +5085,7 @@
   {
    "adresse": "https://www.vodafone.de/privat/handys/iphone-18-pro.html",
    "geraet": "apple-iphone-18-pro",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (Route.fetch: getaddrinfo EAI_AGAIN www.vodafone.de)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -113,7 +5095,7 @@
   {
    "adresse": "https://www.vodafone.de/privat/handys/iphone-18-pro-max.html",
    "geraet": "apple-iphone-18-pro-max",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (Route.fetch: getaddrinfo EAI_AGAIN www.vodafone.de)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 256,
@@ -123,7 +5105,7 @@
   {
    "adresse": "https://www.vodafone.de/privat/handys/samsung-galaxy-s25.html",
    "geraet": "samsung-galaxy-s25",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (Route.fetch: getaddrinfo EAI_AGAIN www.vodafone.de)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -133,7 +5115,7 @@
   {
    "adresse": "https://www.vodafone.de/privat/handys/samsung-galaxy-s25-fe.html",
    "geraet": "samsung-galaxy-s25-fe",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (Route.fetch: getaddrinfo EAI_AGAIN www.vodafone.de)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -143,7 +5125,7 @@
   {
    "adresse": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26-fe.html",
    "geraet": "samsung-galaxy-s26-fe",
-   "grund": "verschoben: Gerätelauf läuft (geraete.yml, in_progress)",
+   "grund": "nach Störung keine weitere Anfrage (CLAUDE.md Regel 4): Abruf gestört (Route.fetch: getaddrinfo EAI_AGAIN www.vodafone.de)",
    "http_status": null,
    "kombinationen": [],
    "speicher_gb": 128,
@@ -153,9 +5135,17 @@
  ],
  "ueberfaellig": [
   "https://www.vodafone.de/privat/handys/iphone-15.html",
-  "https://www.vodafone.de/privat/handys/iphone-16-plus.html"
+  "https://www.vodafone.de/privat/handys/iphone-16-plus.html",
+  "https://www.vodafone.de/privat/handys/iphone-17.html",
+  "https://www.vodafone.de/privat/handys/iphone-17-pro-max.html",
+  "https://www.vodafone.de/privat/handys/iphone-17e.html",
+  "https://www.vodafone.de/privat/handys/iphone-18-pro.html",
+  "https://www.vodafone.de/privat/handys/iphone-18-pro-max.html",
+  "https://www.vodafone.de/privat/handys/samsung-galaxy-s25.html",
+  "https://www.vodafone.de/privat/handys/samsung-galaxy-s25-fe.html",
+  "https://www.vodafone.de/privat/handys/samsung-galaxy-s26-fe.html"
  ],
  "uebersichten": [],
  "vertragsform": "tarif_plus_ratenkauf",
- "zeitbudget_sekunden": 10262
+ "zeitbudget_sekunden": 10285
 }
