@@ -104,8 +104,203 @@
 <svg class="glas-filter" width="0" height="0" aria-hidden="true" focusable="false"><filter id="glas-linse" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB" x="0" y="0" width="240" height="60"><feImage href="static/glas-linse.png" x="0" y="0" width="240" height="60" preserveAspectRatio="none" result="karte"/><feDisplacementMap in="SourceGraphic" in2="karte" scale="38.96" xChannelSelector="R" yChannelSelector="G"/></filter></svg>
 
 
+<section class="gr-hm gx-art gx-art--tarif" id="hersteller" aria-labelledby="hm-titel" data-stand="2026-11-05">
+  <div class="gx-kopf"><h2 id="hm-titel">Preisposition je Hersteller</h2></div>
+  
+  <div class="gr-zr-zeitwahl gr-hm-zeit" id="hm-zeit" role="group" aria-label="Zeitraum" hidden>
+    <button type="button" data-zeit="aktuell" aria-pressed="true">Aktuell</button>
+    <button type="button" data-zeit="7" aria-pressed="false">7 Tage</button>
+    <button type="button" data-zeit="30" aria-pressed="false">30 Tage</button>
+    <button type="button" data-zeit="eigen" aria-pressed="false">Eigener Zeitraum</button>
+  </div>
+  <div class="gr-hm-eigen" id="hm-eigen" hidden>
+    <label>von <input type="date" id="hm-von" value="2026-09-22" min="2026-09-22" max="2026-11-05"></label>
+    <label>bis <input type="date" id="hm-bis" value="2026-11-05" min="2026-09-22" max="2026-11-05"></label>
+  </div>
+  <p class="gr-pp-einheit" id="hm-einheit" data-basis="Vodafone gegenüber dem Wettbewerber · Gesamtkosten 24 Monate" aria-live="polite">Vodafone gegenüber dem Wettbewerber · Gesamtkosten 24 Monate · Stand 05.11.2026</p>
+  <div class="gr-hm-tafel" style="--hm-n:3" role="group" aria-label="Abstand der Vodafone-Kosten zum Wettbewerber in Prozent je Hersteller">
+    <div class="gr-hm-achse">
+      <span></span>
+      
+      <span class="gr-hm-kopf gr-anb--telekom"><i class="gr-hm-punkt"></i>Telekom</span>
+      
+      <span class="gr-hm-kopf gr-anb--o2"><i class="gr-hm-punkt"></i>o2</span>
+      
+      <span class="gr-hm-kopf gr-anb--congstar"><i class="gr-hm-punkt"></i>congstar</span>
+      
+    </div>
+    <div class="gr-hm-richtung"><span>← Vodafone günstiger</span><span>Vodafone teurer →</span></div>
+    
+    <div class="gr-hm-zeile" data-hersteller="Apple">
+      <div class="gr-hm-name">Apple</div>
+      
+      <div class="gr-hm-zelle gr-anb--telekom gr-hm-duenn" data-anbieter="Telekom" data-wert="-15.04" data-n="2">
+        <span class="gr-hm-wb"><i class="gr-hm-punkt"></i>Telekom</span>
+        <span class="gr-hm-zahl">−15 %</span>
+        <span class="gr-hm-spur"><b class="gr-hm-balken" style="left:31.19%;width:18.81%"></b></span>
+        <span class="gr-hm-n"><span class="gr-hm-r">günstiger · </span><span class="gr-hm-m">nur 2 Modelle</span></span>
+      </div>
+      
+      <div class="gr-hm-zelle gr-anb--o2" data-anbieter="o2" data-wert="1.30" data-n="3">
+        <span class="gr-hm-wb"><i class="gr-hm-punkt"></i>o2</span>
+        <span class="gr-hm-zahl">+1 %</span>
+        <span class="gr-hm-spur"><b class="gr-hm-balken" style="left:50.00%;width:1.62%"></b></span>
+        <span class="gr-hm-n"><span class="gr-hm-r">gleichauf · </span><span class="gr-hm-m">3 Modelle</span></span>
+      </div>
+      
+      <div class="gr-hm-zelle gr-anb--congstar gr-hm-duenn" data-anbieter="congstar" data-wert="12.43" data-n="2">
+        <span class="gr-hm-wb"><i class="gr-hm-punkt"></i>congstar</span>
+        <span class="gr-hm-zahl">+12 %</span>
+        <span class="gr-hm-spur"><b class="gr-hm-balken" style="left:50.00%;width:15.53%"></b></span>
+        <span class="gr-hm-n"><span class="gr-hm-r">teurer · </span><span class="gr-hm-m">nur 2 Modelle</span></span>
+      </div>
+      
+    </div>
+    
+    <div class="gr-hm-zeile" data-hersteller="Samsung">
+      <div class="gr-hm-name">Samsung</div>
+      
+      <div class="gr-hm-zelle gr-anb--telekom" data-anbieter="Telekom" data-wert="-23.30" data-n="7">
+        <span class="gr-hm-wb"><i class="gr-hm-punkt"></i>Telekom</span>
+        <span class="gr-hm-zahl">−23 %</span>
+        <span class="gr-hm-spur"><b class="gr-hm-balken" style="left:20.88%;width:29.12%"></b></span>
+        <span class="gr-hm-n"><span class="gr-hm-r">günstiger · </span><span class="gr-hm-m">7 Modelle</span></span>
+      </div>
+      
+      <div class="gr-hm-zelle gr-anb--o2" data-anbieter="o2" data-wert="-2.45" data-n="5">
+        <span class="gr-hm-wb"><i class="gr-hm-punkt"></i>o2</span>
+        <span class="gr-hm-zahl">−2 %</span>
+        <span class="gr-hm-spur"><b class="gr-hm-balken" style="left:46.94%;width:3.06%"></b></span>
+        <span class="gr-hm-n"><span class="gr-hm-r">günstiger · </span><span class="gr-hm-m">5 Modelle</span></span>
+      </div>
+      
+      <div class="gr-hm-zelle gr-anb--congstar" data-anbieter="congstar" data-wert="17.89" data-n="8">
+        <span class="gr-hm-wb"><i class="gr-hm-punkt"></i>congstar</span>
+        <span class="gr-hm-zahl">+18 %</span>
+        <span class="gr-hm-spur"><b class="gr-hm-balken" style="left:50.00%;width:22.36%"></b></span>
+        <span class="gr-hm-n"><span class="gr-hm-r">teurer · </span><span class="gr-hm-m">8 Modelle</span></span>
+      </div>
+      
+    </div>
+    
+    <div class="gr-hm-zeile" data-hersteller="Google">
+      <div class="gr-hm-name">Google</div>
+      
+      <div class="gr-hm-zelle gr-anb--telekom" data-anbieter="Telekom" data-wert="-17.65" data-n="4">
+        <span class="gr-hm-wb"><i class="gr-hm-punkt"></i>Telekom</span>
+        <span class="gr-hm-zahl">−18 %</span>
+        <span class="gr-hm-spur"><b class="gr-hm-balken" style="left:27.94%;width:22.06%"></b></span>
+        <span class="gr-hm-n"><span class="gr-hm-r">günstiger · </span><span class="gr-hm-m">4 Modelle</span></span>
+      </div>
+      
+      <div class="gr-hm-zelle gr-anb--o2" data-anbieter="o2" data-wert="4.14" data-n="4">
+        <span class="gr-hm-wb"><i class="gr-hm-punkt"></i>o2</span>
+        <span class="gr-hm-zahl">+4 %</span>
+        <span class="gr-hm-spur"><b class="gr-hm-balken" style="left:50.00%;width:5.17%"></b></span>
+        <span class="gr-hm-n"><span class="gr-hm-r">teurer · </span><span class="gr-hm-m">4 Modelle</span></span>
+      </div>
+      
+      <div class="gr-hm-zelle gr-anb--congstar" data-anbieter="congstar" data-wert="22.60" data-n="3">
+        <span class="gr-hm-wb"><i class="gr-hm-punkt"></i>congstar</span>
+        <span class="gr-hm-zahl">+23 %</span>
+        <span class="gr-hm-spur"><b class="gr-hm-balken" style="left:50.00%;width:28.25%"></b></span>
+        <span class="gr-hm-n"><span class="gr-hm-r">teurer · </span><span class="gr-hm-m">3 Modelle</span></span>
+      </div>
+      
+    </div>
+    
+    <div class="gr-hm-zeile" data-hersteller="Xiaomi">
+      <div class="gr-hm-name">Xiaomi</div>
+      
+      <div class="gr-hm-zelle gr-anb--telekom" data-anbieter="Telekom" data-wert="-24.56" data-n="6">
+        <span class="gr-hm-wb"><i class="gr-hm-punkt"></i>Telekom</span>
+        <span class="gr-hm-zahl">−25 %</span>
+        <span class="gr-hm-spur"><b class="gr-hm-balken" style="left:19.30%;width:30.70%"></b></span>
+        <span class="gr-hm-n"><span class="gr-hm-r">günstiger · </span><span class="gr-hm-m">6 Modelle</span></span>
+      </div>
+      
+      <div class="gr-hm-zelle gr-anb--o2" data-anbieter="o2" data-wert="10.49" data-n="5">
+        <span class="gr-hm-wb"><i class="gr-hm-punkt"></i>o2</span>
+        <span class="gr-hm-zahl">+10 %</span>
+        <span class="gr-hm-spur"><b class="gr-hm-balken" style="left:50.00%;width:13.11%"></b></span>
+        <span class="gr-hm-n"><span class="gr-hm-r">teurer · </span><span class="gr-hm-m">5 Modelle</span></span>
+      </div>
+      
+      <div class="gr-hm-zelle gr-anb--congstar" data-anbieter="congstar" data-wert="36.76" data-n="6">
+        <span class="gr-hm-wb"><i class="gr-hm-punkt"></i>congstar</span>
+        <span class="gr-hm-zahl">+37 %</span>
+        <span class="gr-hm-spur"><b class="gr-hm-balken" style="left:50.00%;width:45.95%"></b></span>
+        <span class="gr-hm-n"><span class="gr-hm-r">teurer · </span><span class="gr-hm-m">6 Modelle</span></span>
+      </div>
+      
+    </div>
+    
+    <div class="gr-hm-zeile" data-hersteller="Fairphone">
+      <div class="gr-hm-name">Fairphone</div>
+      
+      <div class="gr-hm-zelle gr-anb--telekom gr-hm-duenn" data-anbieter="Telekom" data-wert="-27.19" data-n="1">
+        <span class="gr-hm-wb"><i class="gr-hm-punkt"></i>Telekom</span>
+        <span class="gr-hm-zahl">−27 %</span>
+        <span class="gr-hm-spur"><b class="gr-hm-balken" style="left:16.01%;width:33.99%"></b></span>
+        <span class="gr-hm-n"><span class="gr-hm-r">günstiger · </span><span class="gr-hm-m">nur 1 Modell</span></span>
+      </div>
+      
+      <div class="gr-hm-zelle gr-anb--o2 gr-hm-duenn" data-anbieter="o2" data-wert="16.56" data-n="1">
+        <span class="gr-hm-wb"><i class="gr-hm-punkt"></i>o2</span>
+        <span class="gr-hm-zahl">+17 %</span>
+        <span class="gr-hm-spur"><b class="gr-hm-balken" style="left:50.00%;width:20.70%"></b></span>
+        <span class="gr-hm-n"><span class="gr-hm-r">teurer · </span><span class="gr-hm-m">nur 1 Modell</span></span>
+      </div>
+      
+      <div class="gr-hm-zelle gr-anb--congstar gr-hm-duenn" data-anbieter="congstar" data-wert="30.44" data-n="1">
+        <span class="gr-hm-wb"><i class="gr-hm-punkt"></i>congstar</span>
+        <span class="gr-hm-zahl">+30 %</span>
+        <span class="gr-hm-spur"><b class="gr-hm-balken" style="left:50.00%;width:38.05%"></b></span>
+        <span class="gr-hm-n"><span class="gr-hm-r">teurer · </span><span class="gr-hm-m">nur 1 Modell</span></span>
+      </div>
+      
+    </div>
+    
+    <div class="gr-hm-zeile gr-hm-zeile--alle" data-hersteller="Alle">
+      <div class="gr-hm-name">Alle Hersteller</div>
+      
+      <div class="gr-hm-zelle gr-anb--telekom" data-anbieter="Telekom" data-wert="-21.91" data-n="20">
+        <span class="gr-hm-wb"><i class="gr-hm-punkt"></i>Telekom</span>
+        <span class="gr-hm-zahl">−22 %</span>
+        <span class="gr-hm-spur"><b class="gr-hm-balken" style="left:22.61%;width:27.39%"></b></span>
+        <span class="gr-hm-n"><span class="gr-hm-r">günstiger · </span><span class="gr-hm-m">20 Modelle</span></span>
+      </div>
+      
+      <div class="gr-hm-zelle gr-anb--o2" data-anbieter="o2" data-wert="4.29" data-n="18">
+        <span class="gr-hm-wb"><i class="gr-hm-punkt"></i>o2</span>
+        <span class="gr-hm-zahl">+4 %</span>
+        <span class="gr-hm-spur"><b class="gr-hm-balken" style="left:50.00%;width:5.36%"></b></span>
+        <span class="gr-hm-n"><span class="gr-hm-r">teurer · </span><span class="gr-hm-m">18 Modelle</span></span>
+      </div>
+      
+      <div class="gr-hm-zelle gr-anb--congstar" data-anbieter="congstar" data-wert="24.34" data-n="20">
+        <span class="gr-hm-wb"><i class="gr-hm-punkt"></i>congstar</span>
+        <span class="gr-hm-zahl">+24 %</span>
+        <span class="gr-hm-spur"><b class="gr-hm-balken" style="left:50.00%;width:30.42%"></b></span>
+        <span class="gr-hm-n"><span class="gr-hm-r">teurer · </span><span class="gr-hm-m">20 Modelle</span></span>
+      </div>
+      
+    </div>
+    
+  </div>
+  
+  <p class="gr-hm-ohne" data-anbieter="1&amp;1">1&amp;1: kein 24-Monats-Preis</p>
+  
+  <div class="gr-hm-erklaerung">
+    <p>Die Prozentzahl sagt, um wie viel die Gesamtkosten über 24 Monate (Gerät mit 24 Raten, neu, plus Tarif) bei Vodafone über (+) oder unter (−) dem Wettbewerber liegen; bis ±1 % gilt als gleichauf. Es zählen die aktuellen Modelle: je Reihe die neueste Generation, mit dem kleinsten Speicher, zu dem Vodafone einen Preis hat, und nur dort, wo auch der Wettbewerber einen frischen Preis führt.</p><p>Verglichene Tarife: Vodafone: Mobil M · Telekom: MagentaMobil M · o2: O2 Mobile on Demand M mit 50 GB+ / O2 Mobile on Demand M mit 50 GB+ (24 Mon.) · congstar: Allnet Flat S.</p><p>„Alle Hersteller“ ist das Mittel über alle Modelle, also nach Modellzahl gewichtet. Zellen mit weniger als 3 Modellen sind blasser und als kleine Stichprobe benannt; die Modellzahl steht in jeder Zelle, weil sie mit dem Zeitraum wechseln kann.</p><p>1&amp;1: kein geprüfter 24-Monats-Preis - Angebote mit anderer Laufzeit zählen nicht, deshalb bleibt die Spalte weg.</p><p>Ohne Vodafone-Preis: HONOR, Motorola, Nothing, OnePlus, realme.</p>
+  </div>
+  <script type="application/json" id="hm-daten">{"stand":"2026-11-05","w":["Telekom","o2","1&1","congstar"],"h":["Apple","Apple","Apple","Samsung","Samsung","Google","Google","Google","Google","Samsung","Samsung","Samsung","Samsung","Samsung","Samsung","Xiaomi","Xiaomi","Xiaomi","Xiaomi","Xiaomi","Xiaomi","Xiaomi","Fairphone"],"tage":["2026-09-22","2026-09-25","2026-09-27","2026-09-28","2026-09-29","2026-09-30","2026-10-01","2026-10-02","2026-10-03","2026-10-04","2026-10-05","2026-10-06","2026-10-07","2026-10-08","2026-10-09","2026-10-10","2026-10-11","2026-10-12","2026-10-13","2026-10-14","2026-10-15","2026-10-16","2026-10-17","2026-10-18","2026-10-19","2026-10-20","2026-10-25","2026-10-26","2026-10-27","2026-10-28","2026-10-29","2026-10-30","2026-10-31","2026-11-01","2026-11-02","2026-11-03","2026-11-04","2026-11-05"],"pct":[[[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null]],[[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null]],[[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null]],[[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null]],[[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null]],[[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null]],[[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null]],[[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null]],[[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null]],[[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null]],[[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null]],[[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,null,null,null]],[[null,null,null,13.69],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,-2.79,null,16.02],[null,2.31,null,27.11],[null,3.1,null,19.84],[null,0.88,null,17.11],[null,6.43,null,null],[null,5.04,null,14.02],[null,3.97,null,13.79],[null,-8.56,null,3.74],[null,null,null,5.16],[null,-1.05,null,15.38],[null,null,null,21.36],[null,13.35,null,null],[null,6.74,null,24.38],[null,5.71,null,36.06],[null,null,null,24.51],[null,13.69,null,46.1],[null,10.81,null,38.34],[null,18.49,null,43.07],[null,14.91,null,28.59]],[[null,null,null,13.69],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,-2.79,null,16.02],[null,2.31,null,27.11],[null,3.1,null,19.84],[null,0.88,null,17.11],[null,6.43,null,null],[null,5.04,null,14.02],[null,3.97,null,13.79],[null,-8.56,null,3.74],[null,null,null,5.16],[null,-1.05,null,15.38],[null,null,null,21.36],[null,13.35,null,null],[null,6.74,null,24.38],[null,5.71,null,36.06],[null,null,null,24.51],[null,13.69,null,46.1],[null,10.81,null,38.34],[null,18.49,null,43.07],[null,14.91,null,28.59]],[[null,null,null,13.69],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,-2.79,null,16.02],[-23.38,2.31,null,27.11],[null,3.1,null,19.84],[null,0.88,null,17.11],[null,6.43,null,null],[null,5.04,null,14.02],[null,3.97,null,13.79],[null,-8.56,null,3.74],[null,null,null,5.16],[null,-1.05,null,15.38],[null,null,null,21.36],[null,13.35,null,null],[null,6.74,null,24.38],[null,5.71,null,36.06],[null,null,null,24.51],[null,13.69,null,46.1],[null,10.81,null,38.34],[-33.02,18.49,null,43.07],[null,14.91,null,28.59]],[[-15.02,null,null,13.69],[-15.63,null,null,null],[null,null,null,null],[-33.45,null,null,null],[-25.65,-2.79,null,16.02],[-23.38,2.31,null,27.11],[-21.95,3.1,null,19.84],[-18.31,0.88,null,17.11],[null,6.43,null,null],[null,5.04,null,14.02],[null,3.97,null,13.79],[-23.09,-8.56,null,3.74],[-21.23,null,null,5.16],[-24.37,-1.05,null,15.38],[-34.98,null,null,21.36],[null,13.35,null,null],[null,6.74,null,24.38],[null,5.71,null,36.06],[-24.16,null,null,24.51],[null,13.69,null,46.1],[null,10.81,null,38.34],[-33.02,18.49,null,43.07],[null,14.91,null,28.59]],[[-15.02,null,null,13.69],[null,null,null,null],[null,null,null,null],[-33.45,null,null,null],[-25.65,-2.79,null,16.02],[-23.38,2.31,null,27.11],[-21.95,3.1,null,19.84],[-18.31,0.88,null,17.11],[-9.96,6.43,null,null],[-24.02,5.04,null,14.02],[null,3.97,null,13.79],[-23.09,-8.56,null,3.74],[-21.23,null,null,5.16],[-24.37,-1.05,null,15.38],[-34.98,null,null,21.36],[null,13.35,null,null],[-13.93,6.74,null,24.38],[-27.76,5.71,null,36.06],[-24.16,2.4,null,24.51],[-31.25,13.69,null,46.1],[-28.73,10.81,null,38.34],[-33.02,18.49,null,43.07],[-28.22,14.91,null,28.59]],[[-15.02,null,null,13.69],[-15.63,null,null,null],[null,null,null,null],[-33.45,null,null,null],[-25.65,-2.79,null,16.02],[-23.38,2.31,null,27.11],[-21.95,3.1,null,19.84],[-18.31,0.88,null,17.11],[-9.96,6.43,null,null],[-24.02,5.04,null,14.02],[null,3.97,null,13.79],[-23.09,-8.56,null,3.74],[-21.23,null,null,5.16],[-24.37,-1.05,null,15.38],[-34.98,null,null,21.36],[null,13.35,null,null],[-13.93,6.74,null,24.38],[-27.76,5.71,null,36.06],[-24.16,2.4,null,24.51],[-31.25,13.69,null,46.1],[-28.73,10.81,null,38.34],[-33.02,18.49,null,43.07],[-28.22,14.91,null,28.59]],[[null,null,null,13.69],[null,null,null,null],[null,null,null,null],[null,null,null,null],[null,-2.79,null,16.02],[null,2.31,null,27.11],[null,3.1,null,19.84],[null,0.88,null,17.11],[null,6.43,null,null],[null,5.04,null,14.02],[null,3.97,null,13.79],[null,-8.56,null,3.74],[null,null,null,5.16],[null,-1.05,null,15.38],[null,null,null,21.36],[null,13.35,null,null],[null,6.74,null,24.38],[null,5.71,null,36.06],[null,2.4,null,24.51],[null,13.69,null,46.1],[null,10.81,null,38.34],[null,18.49,null,43.07],[null,14.91,null,28.59]],[[-15.02,null,null,null],[-15.63,null,null,null],[null,null,null,null],[-33.45,null,null,null],[-25.65,-2.79,null,null],[-23.38,2.31,null,null],[-21.95,3.1,null,null],[-18.31,0.88,null,null],[-9.96,6.43,null,null],[-24.02,5.04,null,null],[null,3.97,null,null],[-23.09,-8.56,null,null],[-21.23,null,null,null],[-24.37,-1.05,null,null],[-37.25,null,null,null],[null,13.35,null,null],[-12.0,6.74,null,null],[-27.76,5.71,null,null],[-24.16,2.4,null,null],[-31.25,13.69,null,null],[-28.73,10.81,null,null],[-33.02,18.49,null,null],[-28.22,14.91,null,null]],[[-14.31,null,null,14.63],[-14.97,null,null,null],[null,null,null,null],[-21.12,null,null,null],[-24.97,null,null,17.09],[-22.5,null,null,28.57],[-21.16,null,null,21.05],[-17.57,null,null,18.18],[-9.36,null,null,null],[-23.29,null,null,15.11],[null,null,null,null],[-22.5,null,null,4.53],[-20.67,null,null,5.91],[-20.6,null,null,21.14],[-29.93,null,null,35.52],[null,null,null,null],[-11.21,null,null,25.5],[-26.79,null,null,37.9],[-23.26,null,null,25.99],[-30.01,null,null,48.73],[-27.58,null,null,40.58],[-31.72,null,null,45.84],[-27.19,null,null,30.44]],[[-14.31,null,null,14.63],[-14.97,null,null,null],[null,null,null,null],[-21.12,null,null,null],[-24.97,null,null,17.09],[-22.5,null,null,28.57],[-21.16,null,null,21.05],[-17.57,null,null,18.18],[-9.36,null,null,null],[-23.29,null,null,15.11],[null,null,null,24.46],[-22.5,null,null,4.53],[-20.67,null,null,5.91],[-20.6,null,null,21.14],[-29.93,null,null,29.68],[null,null,null,null],[-11.21,null,null,31.1],[-26.79,null,null,37.9],[-23.26,null,null,25.99],[-30.01,null,null,null],[-27.58,null,null,null],[-31.72,null,null,45.84],[-27.19,null,null,30.44]],[[-14.31,null,null,14.63],[-14.97,2.34,null,null],[null,null,null,null],[-21.12,null,null,null],[-24.97,null,null,17.09],[-22.5,null,null,28.57],[-21.16,null,null,21.05],[-17.57,null,null,18.18],[-9.36,null,null,null],[-23.29,null,null,15.11],[null,null,null,24.46],[-22.5,null,null,4.53],[-20.67,null,null,5.91],[-20.6,null,null,21.14],[-29.93,null,null,29.68],[null,null,null,null],[-11.21,null,null,null],[-26.79,null,null,null],[-23.26,null,null,null],[-30.01,15.73,null,null],[-27.58,null,null,null],[-31.72,20.79,null,null],[-27.19,null,null,30.44]],[[-14.31,null,null,null],[-14.97,2.34,null,null],[null,null,null,null],[-21.12,null,null,null],[-24.97,null,null,null],[-22.5,null,null,null],[-21.16,null,null,null],[-17.57,null,null,null],[-9.36,null,null,null],[-23.29,null,null,null],[null,null,null,null],[-22.5,null,null,null],[-20.67,null,null,null],[-20.6,null,null,null],[-29.93,null,null,null],[null,null,null,null],[-11.21,null,null,null],[-26.79,null,null,null],[-23.26,null,null,null],[-30.01,15.73,null,48.73],[-27.58,null,null,40.58],[-31.72,20.79,null,null],[-27.19,null,null,null]],[[-14.31,null,null,14.63],[-14.97,null,null,null],[null,null,null,null],[-21.12,null,null,null],[-24.97,-1.89,null,17.09],[-22.5,3.48,null,28.57],[-21.16,null,null,21.05],[-17.57,1.8,null,18.18],[-9.36,7.14,null,null],[-23.29,null,null,15.11],[null,5.31,null,24.46],[-22.5,null,null,4.53],[-20.67,null,null,5.91],[-20.6,3.89,null,21.14],[-29.93,null,null,29.68],[null,14.56,null,null],[-11.21,null,null,31.1],[-26.79,7.14,null,37.9],[-23.26,null,null,25.99],[-30.01,15.73,null,48.73],[-27.58,null,null,40.58],[-31.72,null,null,45.84],[-27.19,16.56,null,30.44]],[[-14.31,3.39,null,14.63],[-14.97,null,null,null],[null,null,null,null],[-21.12,null,null,null],[-24.97,null,null,17.09],[-22.5,3.48,null,28.57],[-21.16,4.13,null,21.05],[-17.57,null,null,18.18],[-9.36,null,null,null],[-23.29,6.05,null,15.11],[null,null,null,24.46],[-22.5,-7.86,null,4.53],[-20.67,null,null,5.91],[-20.6,null,null,21.14],[-29.93,null,null,29.68],[null,14.56,null,null],[-11.21,null,null,31.1],[-26.79,7.14,null,37.9],[-23.26,null,null,25.99],[-30.01,15.73,null,48.73],[-27.58,12.61,null,40.58],[-31.72,20.79,null,45.84],[-27.19,16.56,null,30.44]],[[null,null,null,15.55],[null,null,null,11.02],[null,-1.83,null,null],[null,null,null,null],[null,-1.89,null,18.16],[null,3.48,null,30.17],[null,4.13,null,22.3],[null,1.8,null,19.26],[null,7.14,null,null],[null,6.05,null,16.18],[null,null,null,26.14],[null,-7.86,null,5.24],[null,null,null,6.57],[null,3.89,null,22.32],[null,null,null,31.81],[null,14.56,null,null],[null,7.7,null,32.41],[null,null,null,40.08],[null,null,null,27.59],[null,null,null,52.1],[null,12.61,null,43.29],[-31.72,null,null,49.34],[null,null,null,32.5]],[[null,3.39,null,15.55],[null,2.34,null,11.02],[null,-1.83,null,null],[null,null,null,48.1],[null,-1.89,null,18.16],[null,3.48,null,30.17],[null,4.13,null,22.3],[null,1.8,null,19.26],[null,7.14,null,null],[null,6.05,null,16.18],[null,5.31,null,26.14],[null,-7.86,null,5.24],[null,null,null,6.57],[null,3.89,null,22.32],[null,null,null,31.81],[null,14.56,null,null],[null,7.7,null,32.41],[null,7.14,null,40.08],[null,null,null,27.59],[null,15.73,null,52.1],[null,12.61,null,43.29],[-31.72,20.79,null,49.34],[null,16.56,null,32.5]],[[-14.31,3.39,null,15.55],[-14.97,2.34,null,11.02],[null,-1.83,null,null],[null,null,null,48.1],[-24.97,-1.89,null,18.16],[-22.5,3.48,null,30.17],[-21.16,4.13,null,22.3],[null,1.8,null,19.26],[-9.36,7.14,null,null],[null,6.05,null,16.18],[null,5.31,null,26.14],[-22.5,-7.86,null,5.24],[null,null,null,6.57],[null,3.89,null,22.32],[-29.93,null,null,31.81],[null,14.56,null,null],[-11.21,7.7,null,32.41],[-26.79,7.14,null,40.08],[-23.26,null,null,27.59],[null,15.73,null,52.1],[-27.58,12.61,null,43.29],[-31.72,20.79,null,49.34],[null,16.56,null,32.5]],[[null,3.39,null,15.55],[null,2.34,null,11.02],[null,-1.83,null,null],[null,null,null,48.1],[null,-1.89,null,18.16],[null,3.48,null,30.17],[null,4.13,null,22.3],[null,1.8,null,19.26],[null,7.14,null,null],[null,6.05,null,16.18],[null,5.31,null,26.14],[null,-7.86,null,5.24],[null,null,null,6.57],[null,3.89,null,22.32],[null,null,null,31.81],[null,14.56,null,null],[null,7.7,null,32.41],[null,7.14,null,40.08],[null,3.61,null,27.59],[null,15.73,null,52.1],[null,12.61,null,43.29],[-31.72,20.79,null,49.34],[null,16.56,null,32.5]],[[null,3.39,null,15.55],[null,2.34,null,11.02],[null,-1.83,null,null],[null,null,null,48.1],[null,null,null,18.16],[null,null,null,30.17],[null,null,null,22.3],[null,null,null,19.26],[null,null,null,null],[null,null,null,16.18],[null,null,null,26.14],[null,null,null,5.24],[null,null,null,6.57],[null,null,null,22.32],[null,null,null,31.81],[null,null,null,null],[null,null,null,32.41],[null,null,null,40.08],[null,null,null,27.59],[null,15.73,null,52.1],[null,null,null,43.29],[-31.72,20.79,null,49.34],[null,null,null,32.5]],[[null,3.39,null,15.55],[null,2.34,null,11.02],[null,-1.83,null,null],[null,null,null,48.1],[null,null,null,18.16],[null,null,null,30.17],[null,null,null,22.3],[null,null,null,19.26],[null,null,null,null],[null,null,null,16.18],[null,null,null,26.14],[null,null,null,5.24],[null,null,null,6.57],[null,null,null,22.32],[null,null,null,31.81],[null,null,null,null],[null,null,null,32.41],[null,null,null,40.08],[null,null,null,27.59],[null,15.73,null,52.1],[null,null,null,43.29],[-31.72,20.79,null,49.34],[null,null,null,32.5]],[[null,3.39,null,15.55],[null,2.34,null,11.02],[null,-1.83,null,null],[null,null,null,48.1],[null,-1.89,null,18.16],[null,3.48,null,30.17],[null,4.13,null,22.3],[null,1.8,null,19.26],[null,7.14,null,null],[null,6.05,null,16.18],[null,5.31,null,26.14],[null,-7.86,null,5.24],[null,null,null,6.57],[null,3.89,null,22.32],[null,null,null,31.81],[null,14.56,null,null],[null,7.7,null,32.41],[null,7.14,null,40.08],[null,null,null,27.59],[null,15.73,null,52.1],[null,12.61,null,43.29],[-31.72,20.79,null,49.34],[null,16.56,null,32.5]],[[null,3.39,null,15.55],[null,2.34,null,11.02],[null,-1.83,null,null],[null,null,null,48.1],[null,-1.89,null,18.16],[null,3.48,null,30.17],[null,4.13,null,22.3],[null,1.8,null,19.26],[null,7.14,null,null],[null,6.05,null,16.18],[null,5.31,null,26.14],[null,-7.86,null,5.24],[null,null,null,6.57],[null,3.89,null,22.32],[null,null,null,31.81],[null,14.56,null,null],[null,7.7,null,32.41],[null,7.14,null,40.08],[null,null,null,27.59],[null,15.73,null,52.1],[null,12.61,null,43.29],[-31.72,20.79,null,49.34],[null,16.56,null,32.5]],[[null,3.39,null,15.55],[null,2.34,null,11.02],[null,-1.83,null,null],[null,null,null,48.1],[null,-1.89,null,18.16],[null,3.48,null,30.17],[null,4.13,null,22.3],[null,1.8,null,19.26],[null,7.14,null,null],[null,6.05,null,16.18],[null,5.31,null,26.14],[null,-7.86,null,5.24],[null,null,null,6.57],[null,3.89,null,22.32],[null,null,null,31.81],[null,14.56,null,null],[null,7.7,null,32.41],[null,7.14,null,40.08],[null,null,null,27.59],[null,15.73,null,52.1],[null,12.61,null,43.29],[-31.72,20.79,null,49.34],[null,16.56,null,32.5]],[[-15.12,3.39,null,14.63],[-14.97,2.34,null,10.22],[null,-1.83,null,null],[-21.12,null,null,44.02],[-24.97,-1.89,null,17.09],[-22.5,null,null,28.57],[-21.16,4.13,null,21.05],[-17.57,null,null,18.18],[-9.36,null,null,null],[-23.29,6.05,null,15.11],[null,5.31,null,24.46],[-22.5,null,null,4.53],[-20.67,null,null,5.91],[-20.6,3.89,null,21.14],[-29.93,null,null,29.68],[null,14.56,null,null],[-11.21,null,null,31.1],[-26.79,null,null,28.32],[-20.04,null,null,25.99],[-30.01,15.73,null,48.73],[-27.58,null,null,40.58],[-31.72,20.79,null,45.84],[-27.19,null,null,30.44]],[[-15.12,null,null,14.63],[-14.97,null,null,10.22],[null,-1.83,null,null],[-21.12,null,null,25.21],[-24.97,-10.07,null,17.09],[-22.5,3.48,null,28.57],[-21.16,4.13,null,21.05],[-17.57,1.8,null,18.18],[-9.36,7.14,null,null],[-23.29,null,null,15.11],[null,-0.1,null,24.46],[-22.5,-7.86,null,4.53],[-20.67,null,null,5.91],[-20.6,null,null,21.14],[-29.93,null,null,29.68],[null,14.56,null,null],[-11.21,7.7,null,31.1],[-26.79,7.14,null,28.32],[-20.04,null,null,25.99],[-30.01,null,null,48.73],[-27.58,12.61,null,40.58],[-31.72,null,null,45.84],[-27.19,null,null,30.44]],[[-15.12,3.39,null,14.63],[-14.97,2.34,null,10.22],[null,-1.83,null,null],[-21.12,null,null,25.21],[-24.97,-10.07,null,17.09],[-22.5,3.48,null,28.57],[-21.16,4.13,null,21.05],[-17.57,1.8,null,18.18],[-9.36,7.14,null,null],[-23.29,1.89,null,15.11],[null,-0.1,null,24.46],[-22.5,-7.86,null,4.53],[-20.67,null,null,5.91],[-20.6,3.89,null,21.14],[-29.93,null,null,29.68],[null,14.56,null,null],[-11.21,7.7,null,31.1],[-26.79,7.14,null,28.32],[-20.04,10.44,null,25.99],[-30.01,null,null,48.73],[-27.58,12.61,null,40.58],[-31.72,null,null,45.84],[-27.19,16.56,null,30.44]]],"aktuell":[[-15.12,3.39,null,14.63],[-14.97,2.34,null,10.22],[null,-1.83,null,null],[-21.12,null,null,25.21],[-24.97,-10.07,null,17.09],[-22.5,3.48,null,28.57],[-21.16,4.13,null,21.05],[-17.57,1.8,null,18.18],[-9.36,7.14,null,null],[-23.29,1.89,null,15.11],[null,-0.1,null,24.46],[-22.5,-7.86,null,4.53],[-20.67,null,null,5.91],[-20.6,3.89,null,21.14],[-29.93,null,null,29.68],[null,14.56,null,null],[-11.21,7.7,null,31.1],[-26.79,7.14,null,28.32],[-20.04,10.44,null,25.99],[-30.01,null,null,48.73],[-27.58,12.61,null,40.58],[-31.72,null,null,45.84],[-27.19,16.56,null,30.44]],"skala":40,"fenster":[7,30],"gleichauf":1,"klein":3}</script>
+  
+</section>
+
+
 <section class="gr-pp gx-art gx-art--tarif" id="preisposition" aria-labelledby="pp-titel">
-  <div class="gx-kopf"><h2 id="pp-titel">Preispositionierung</h2></div>
+  <div class="gx-kopf"><h2 id="pp-titel">Preispositionierung je Modell</h2></div>
   
   <ul class="gr-pp-legende">
     
