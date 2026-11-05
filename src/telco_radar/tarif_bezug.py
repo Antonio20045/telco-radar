@@ -67,12 +67,14 @@ from .collect.tarif_crawler import tarif_id
 from .tarif_model import (
     HOCH,
     MITTEL,
+    NUR_MIT_GERAET,
     PREISTYP_LIVE_SHOP,
     ist_geraeteblatt_von,
     ist_zurueckgezogen,
     vertrag_basis,
     zeitreihen_basis,
 )
+from .tarif_plus import plus_fassung
 
 log = logging.getLogger(__name__)
 
@@ -280,25 +282,18 @@ class Tarifbestand:
         """Der Weg mit Guete `hoch` - ueber den Slug des Anbieters selbst.
 
         Er ist noetig, weil ein Name manchmal auf keiner der zwei Seiten
-        derselbe ist. o2 (gemessen 04.09.2026) nennt denselben Tarif
+        derselbe ist. o2 (gemessen 04.09.2026) nennt denselben Tarif im
+        Geraetekatalog "O2 Mobile on Demand M Plus mit 50 GB+ (24 Mon.)", in
+        der SIM-only-Kachel "O2 Mobile on Demand M", 19,99 EUR. Kein
+        Namensvergleich bringt diese zwei zusammen, und genau das SOLL er nicht:
+        "M" und "M Plus" sind verschiedene Zeichenketten.
 
-            im Geraetekatalog   "O2 Mobile on Demand M Plus mit 50 GB+
-                                (24 Mon.)"
-            in der SIM-only-Kachel  "O2 Mobile on Demand M", 19,99 EUR
-
-        Kein Namensvergleich der Welt bringt diese zwei zusammen, und
-        genau das SOLL er nicht: "M" und "M Plus" sind verschiedene
-        Zeichenketten, und eine Heuristik, die "Plus" wegwirft, wuerfe
-        beim naechsten Tarif etwas Bedeutungstragendes weg.
-
-        Was die zwei verbindet, ist keine Aehnlichkeit, sondern eine
-        Angabe: die Kachel verlinkt unter "Handy hinzufügen" den Slug
-        `o2-mobile-on-demand-m-plus`, und derselbe Slug steht im Katalog
-        am Buendel. Der Anbieter stellt die Verbindung her, dieses Modul
-        liest sie nur nach - deshalb `hoch` und nicht `mittel`.
-
-        Wie bei `ueber_betrag` gilt: zwei Treffer sind keine schwache
-        Zuordnung, sondern gar keine.
+        Was die zwei verbindet, ist eine Angabe des Anbieters: die Kachel
+        verlinkt den Slug `o2-mobile-on-demand-m-plus`, derselbe Slug steht im
+        Katalog am Buendel. Das ist aber die Plus-Fassung, nicht der Tarif der
+        Kachel: `tarif_plus.plus_fassung` gibt ihr eine eigene ID, Guete
+        `nur_mit_geraet`. Wie bei `ueber_betrag` gilt: zwei Treffer sind keine
+        schwache Zuordnung, sondern gar keine.
         """
         gesucht = (slug or "").strip().lower()
         treffer = self.kacheln_zum_slug(anbieter, gesucht)
@@ -314,6 +309,9 @@ class Tarifbestand:
             )
             return None
         satz = treffer[0]
+        plus = plus_fassung(anbieter, gesucht, tarif_id(anbieter, gesucht), satz)
+        if plus:
+            return Bezug(plus[0], "", NUR_MIT_GERAET, plus[1])
         return Bezug(
             tarif_id=satz["tarif_id"],
             tarif_name=satz.get("name", ""),

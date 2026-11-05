@@ -705,7 +705,7 @@ def test_ein_buendel_einstieg_schreibt_die_tco_datei_und_keine_listung(tmp_path)
     assert len(tco["buendel"]) == 1
     satz = tco["buendel"][0]
     assert satz["sku_id"] == "apple-iphone-17-pro-max-256gb-titan-natur"
-    assert satz["tarif_id"] == "o2:o2-mobile-on-demand-m"
+    assert satz["tarif_id"] == "o2:o2-mobile-on-demand-m-plus"
     assert satz["geraet_zuzahlung"] == 1.0
     assert satz["geraet_monatsrate"] == 34.0
     assert satz["tarif_monatlich"] == 14.99
@@ -781,7 +781,7 @@ def test_ohne_tarif_im_bestand_wird_kein_buendel_geschrieben(tmp_path):
         tarife=[
             {
                 **_O2_TARIFE[0],
-                "buendel_slug": "ein-ganz-anderer-tarif",
+                "buendel_slug": "",
                 "name": "O2 Etwas Anderes",
                 "tarif_id": "o2:o2-etwas-anderes",
             }

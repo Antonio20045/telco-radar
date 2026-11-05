@@ -356,7 +356,12 @@ def test_vorrang_hat_nur_eine_lesung_die_buendel_wurde(
     if tag1 is not None:
         (kombination,) = lesung["seiten"][0]["kombinationen"]
         kombination["variante"]["tarif"] = TARIF_UNBEKANNT_IM_BESTAND
-    _, b1 = _tag(pfad, erster, [lesung], HEUTE, katalog, bestand)
+    tag1_bestand = bestand
+    if tag1 is not None:
+        tag1_bestand = Tarifbestand(
+            [{**t, "buendel_slug": ""} for t in bestand.saetze("o2")]
+        )
+    _, b1 = _tag(pfad, erster, [lesung], HEUTE, katalog, tag1_bestand)
     zweite = _o2(erfasst(o2_lesung("512 GB", M_PLUS, 24)), datum=MORGEN)
 
     zug, _ = _tag(pfad, adapter, [zweite], MORGEN, katalog, bestand)

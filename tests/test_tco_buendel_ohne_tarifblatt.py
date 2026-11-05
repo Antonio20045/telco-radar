@@ -131,7 +131,8 @@ def test_special_und_unlimited_l_plus_kommen_als_buendel_an(o2_bilanz, bestand):
         assert len(saetze) == 4, name
         assert {b.tarif_id for b in saetze} == {tid}
         assert {b.tarif_id_guete for b in saetze} == {NUR_MIT_GERAET}
-    assert o2_bilanz.nur_mit_geraet == 8
+    assert o2_bilanz.nur_mit_geraet == 24, o2_bilanz.tarife_nur_mit_geraet
+    assert {n for n in o2_bilanz.tarife_nur_mit_geraet if "Plus" not in n} == {_SPECIAL}
     for anbieter, slug in (
         ("o2", "o2-mobile-unlimited-m-plus"),
         ("o2", "o2-mobile-unlimited-l"),
@@ -162,8 +163,9 @@ def test_36_raten_ohne_tarifblatt_zaehlen_24_tarifmonate(o2_bilanz):
 
 
 def test_plus_wird_nie_auf_den_tarif_ohne_plus_abgebildet(o2_bilanz, bestand):
-    """Gegenprobe: Unlimited L Plus bleibt ein eigener Tarif. Unlimited M Plus
-    hängt weiter am Grundtarif, weil o2s Kachel genau diesen Slug verlinkt."""
+    """Gegenprobe: Unlimited L Plus und Unlimited M Plus bleiben eigene Tarife
+    (`o2:...-plus`, ohne SIM-only-Vergleich), auch wo o2s Kachel den Plus-Slug
+    verlinkt (M). Der Grundtarif behaelt seine ID und sein Tarifblatt."""
     assert (
         bestand.loese("o2", _L_PLUS, slug="o2-mobile-unlimited-l-plus", mit_geraet=True)
         is None
@@ -171,12 +173,15 @@ def test_plus_wird_nie_auf_den_tarif_ohne_plus_abgebildet(o2_bilanz, bestand):
     assert "o2:o2-mobile-unlimited-l" not in {
         b.tarif_id for b in _je_tarif(o2_bilanz, _L_PLUS)
     }
-    for name, tid in (
-        (_L, "o2:o2-mobile-unlimited-l"),
-        (_M_PLUS, "o2:o2-mobile-unlimited-m"),
+    assert "o2:o2-mobile-unlimited-m" not in {
+        b.tarif_id for b in _je_tarif(o2_bilanz, _M_PLUS)
+    }
+    for name, tid, guete in (
+        (_L, "o2:o2-mobile-unlimited-l", HOCH),
+        (_M_PLUS, "o2:o2-mobile-unlimited-m-plus", NUR_MIT_GERAET),
     ):
         saetze = _je_tarif(o2_bilanz, name)
-        assert {(b.tarif_id, b.tarif_id_guete) for b in saetze} == {(tid, HOCH)}
+        assert {(b.tarif_id, b.tarif_id_guete) for b in saetze} == {(tid, guete)}
 
 
 def test_ohne_tarifblatt_kein_sim_only_vergleich(o2_bilanz):
@@ -266,10 +271,12 @@ def ab_monat(o2_bilanz, tmp_path_factory) -> list[tuple[str, str]]:
 def test_ab_monat_25_ohne_tarifblatt_nennt_keine_tarifquelle(ab_monat):
     """Prüferbefund zu fb832ba4: die Lücke behauptete eine Tarifquelle, weil die
     Vorlage den Grund an der Tarif-ID festmachte. Gegenprobe: Unlimited L hat ein
-    Tarifblatt und behält den Quellengrund."""
-    ohne = [z for tarif, z in ab_monat if tarif in (_SPECIAL, _L_PLUS)]
+    Tarifblatt und behält den Quellengrund. Plus-Zeilen (Zweitprodukt) zeigen
+    seit PR #38 M1 keinen Preis und damit keine Zeile "ab Monat 25"."""
+    ohne = [z for tarif, z in ab_monat if tarif == _SPECIAL]
     mit = [z for tarif, z in ab_monat if tarif == _L]
-    assert len(ohne) == 8 and mit
+    assert not [z for tarif, z in ab_monat if tarif == _L_PLUS]
+    assert len(ohne) == 4 and mit
     assert not [z for z in ohne + mit if "ab Monat 37" in z]
     for zeile in ohne:
         assert "Tarifquelle" not in zeile and "nicht im Tarifbestand" in zeile, zeile
@@ -286,20 +293,20 @@ def _bestand_ohne(weg) -> Tarifbestand:
 def test_plus_ohne_gelesene_kachel_wechselt_nie_die_tarif_id(o2_roh):
     """Prüferbefund zu fb832ba4: ohne die Kachel "Unlimited M" (Tarifsammler Mi/Fr,
     Gerätelauf täglich) bekam M Plus `o2:...-m-plus`, mit ihr `o2:...-m`. Jetzt
-    bleibt der Satz bis zur Kachel ohne Tarif. Gegenprobe: L Plus, dessen
-    Grundtarif-Kachel gelesen ist, kommt im selben Bestand an."""
+    ist die ID in beiden Fällen `o2:...-m-plus` (`Tarifbestand.ueber_slug`)."""
     ohne_kachel = _bestand_ohne(
         lambda s: s.get("buendel_slug") == "o2-mobile-unlimited-m-plus"
     )
     roh = [dict(s) for s in o2_roh if s["tarif_name"] in (_M_PLUS, _L_PLUS)]
     vorher = aus_rohsaetzen(roh, ohne_kachel, _HEUTE)
-    assert vorher.offene_tarife == {_M_PLUS: 4}
+    assert vorher.offene_tarife == {}
     assert {(b.tarif_name, b.tarif_id) for b in vorher.buendel} == {
-        (_L_PLUS, "o2:o2-mobile-unlimited-l-plus")
+        (_L_PLUS, "o2:o2-mobile-unlimited-l-plus"),
+        (_M_PLUS, "o2:o2-mobile-unlimited-m-plus"),
     }
     nachher = aus_rohsaetzen(roh, _bestand_ohne(lambda s: False), _HEUTE)
     assert {b.tarif_id for b in nachher.buendel if b.tarif_name == _M_PLUS} == {
-        "o2:o2-mobile-unlimited-m"
+        "o2:o2-mobile-unlimited-m-plus"
     }
 
 
