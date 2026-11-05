@@ -133,6 +133,16 @@ def test_methodik_nennt_die_ratenregel_fuer_o2(tmp_path):
     assert "Vergleichsbasis sind 24 Monate" not in _sichtbarer_text(geraete)
 
 
+def test_methodik_erklaert_o2_m_ohne_zweitprodukt(tmp_path):
+    """05.11.2026: o2 zeigt M Plus, verglichen wird M ohne Zweitprodukt."""
+    geraete, quellen = _gebaut(tmp_path)
+    text = _sichtbarer_text(quellen.select_one("section#methodik"))
+    assert "o2 zeigt standardmäßig M Plus." in text
+    assert "innerhalb von 6 Wochen ein Zweitprodukt gebucht wird" in text
+    assert "Wir vergleichen deshalb o2 Mobile M ohne Zweitprodukt." in text
+    assert "ohne Zweitprodukt" not in _sichtbarer_text(geraete)
+
+
 def test_geraeteseite_verlinkt_genau_einmal_auf_die_methodik(tmp_path):
     """Die Geräteseite bekommt höchstens EINEN Fußzeilen-Link 'Methodik'
     (Auftrag D4a) - kein Wissen geht verloren, es zieht nur um."""

@@ -9,8 +9,7 @@ Die eine Frage, an der dieser Baustein gebaut ist
 AUFTRAG_GERAETESEITE.md §2a verlangt die Kopplung Geraet x Tarifniveau,
 eine Linie je Anbieter. Die Stufen sind seit P3-E1 (28.09.2026) die
 Vodafone-Tarifleiter (`tarifleiter`), abgeleitet aus den ERHOBENEN Saetzen
-von `tarife.jsonl` - nicht erfunden, nicht gerundet. Die frueheren festen
-Baender Klein/Mittel/Gross (bis 20 / 21-60 / ueber 60 GB) sind entfallen.
+von `tarife.jsonl` - nicht erfunden, nicht gerundet. Feste Baender gibt es nicht.
 
 Die Zeitreihe ueber alle Messtage baut `geraete_zeitreihe`; hier steht je
 Band der Stand eines Tages, gruppiert je Ratenlaufzeit (`laufzeit`).
@@ -38,6 +37,7 @@ import re
 from dataclasses import dataclass
 from typing import Optional
 
+from ..tarif_plus import mit_plus
 from . import geraete_tco_grafik
 from .anbieter_farben import farbe_fuer
 from .geraete_laufzeit import LAUFZEIT_STANDARD, ansicht, fehlt_satz, nur_24, zeitraum
@@ -182,7 +182,7 @@ def tarif_baender(tarife: dict, leiter: Optional[tuple[Stufe, ...]] = None) -> d
     21.09.2026 - nicht `je_id`, sonst traegt die Bandkarte bei Telekom das
     Datenvolumen des Pflichtdokuments statt der aktuellen Lesart) - keine
     zweite Datenquelle, nur eine zweite Lesart derselben Datei. Die Leiter
-    kommt aus demselben Bestand, wenn sie nicht mitgegeben wird.
+    kommt aus demselben Bestand, wenn sie fehlt; Plus (`tarif_plus`) erbt das Grundband.
     """
     if leiter is None:
         leiter = tarifleiter(tarife)
@@ -194,7 +194,7 @@ def tarif_baender(tarife: dict, leiter: Optional[tuple[Stufe, ...]] = None) -> d
         )
         if band:
             out[tarif_id] = band
-    return out
+    return mit_plus(out)
 
 
 def baender_katalog(leiter: tuple[Stufe, ...]) -> list[dict]:

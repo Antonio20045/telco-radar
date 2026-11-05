@@ -38,7 +38,7 @@ from telco_radar.analyze.tco_buendel import aus_rohsaetzen
 from telco_radar.collect.geraete import GeraeteAbrufFehler
 from telco_radar.collect.geraete.o2 import lies_buendel
 from telco_radar.tarif_bezug import Tarifbestand
-from telco_radar.tarif_model import HOCH
+from telco_radar.tarif_model import NUR_MIT_GERAET
 from telco_radar.tco_model import LAUFZEIT_LUECKE, POSTEN_LAUFZEIT, TCO_HORIZONT, tco_24
 
 _FIX = Path(__file__).parent / "fixtures" / "geraete"
@@ -294,8 +294,8 @@ def test_der_slug_traegt_die_zuordnung():
     bilanz = aus_rohsaetzen([_rohsatz()], _bestand(), "2026-09-04")
     assert len(bilanz.buendel) == 1
     buendel = bilanz.buendel[0]
-    assert buendel.tarif_id == "o2:o2-mobile-on-demand-m"
-    assert buendel.tarif_id_guete == HOCH
+    assert buendel.tarif_id == "o2:o2-mobile-on-demand-m-plus"
+    assert buendel.tarif_id_guete == NUR_MIT_GERAET
     assert buendel.tarif_name.startswith("O2 Mobile on Demand M Plus")
 
 
@@ -376,9 +376,9 @@ def test_kein_rabatt_wird_aus_der_simonly_kachel_gebaut():
     """
     bilanz = aus_rohsaetzen([_rohsatz()], _bestand(), "2026-09-04")
     buendel = bilanz.buendel[0]
-    assert buendel.tarif_id == "o2:o2-mobile-on-demand-m"
-    assert buendel.tarif_id_guete == HOCH
-    assert _bestand().je_id[buendel.tarif_id]["grundgebuehr"] == 19.99
+    assert buendel.tarif_id == "o2:o2-mobile-on-demand-m-plus"
+    assert buendel.tarif_id_guete == NUR_MIT_GERAET
+    assert _bestand().je_id["o2:o2-mobile-on-demand-m"]["grundgebuehr"] == 19.99
     assert buendel.tarif_monatlich == pytest.approx(14.99, abs=0.005)
     assert buendel.rabatte == []
     assert tco_24(buendel).rabatte_offen == 0.0

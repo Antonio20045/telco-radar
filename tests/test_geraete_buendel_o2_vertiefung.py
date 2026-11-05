@@ -33,7 +33,7 @@ from bestand_pfad import lese_wurzel
 from telco_radar.collect.geraete import GeraeteAbrufFehler, o2
 from telco_radar.collect.geraete.o2_referenz import modellname
 from telco_radar.tarif_bezug import Tarifbestand
-from telco_radar.tarif_model import HOCH
+from telco_radar.tarif_model import HOCH, NUR_MIT_GERAET
 
 _FIX = Path(__file__).parent / "fixtures" / "geraete"
 _WURZEL = Path(__file__).parent.parent
@@ -405,7 +405,8 @@ def test_plus_wird_nie_auf_den_tarif_ohne_plus_geraten():
     )
     assert b.loese("o2", "x", slug="o2-mobile-unlimited") is None
     bezug = b.loese("o2", "x", slug="o2-mobile-unlimited-m-plus")
-    assert bezug.tarif_id == "o2:o2-mobile-unlimited-m"
+    assert bezug.tarif_id == "o2:o2-mobile-unlimited-m-plus"
+    assert bezug.guete == NUR_MIT_GERAET
     assert "SIM-only-Kachel" in bezug.grund
 
 
