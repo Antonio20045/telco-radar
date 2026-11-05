@@ -155,7 +155,7 @@
  "src/telco_radar/analyze/buendel_abdeckung.py": {
   "D101": 2,
   "D102": 1,
-  "D103": 3
+  "D103": 2
  },
  "src/telco_radar/analyze/category_sweep.py": {
   "D103": 1,
@@ -609,7 +609,7 @@
   "C901": 2,
   "D102": 2,
   "E741": 2,
-  "UP045": 45
+  "UP045": 44
  },
  "src/telco_radar/uebersetzung/__init__.py": {
   "I001": 1
