@@ -40,4 +40,16 @@ pflicht_modelle:
 
 # anbieter + modelle (fehlt `modelle`, gilt der Grund für den ganzen
 # Anbieter) + grund + geprueft (Datum der Messung).
-belegte_luecken: []
+belegte_luecken:
+  # congstar führt das iPhone 17 Pro seit dem 03.11.2026 nicht mehr: die Seite
+  # /geraete/apple/apple-iphone-17-pro/ antwortet 307 auf die Apple-Übersicht
+  # (?redirectFrom=device-details), die Übersicht und sitemap/devices.xml führen
+  # nur 17, 17 Pro Max, 17e, 18 Pro, 18 Pro Max, Air und 16. Belege (Screenshots,
+  # Linkliste, Sitemap) vom 05.11.2026: Bereiche/vodafone/telcoradar/abnahme/
+  # congstar-17pro-0511/. Der Tageslauf liest die Seite weiter und meldet sie als
+  # „Gerät nicht mehr angeboten“; kommt sie zurück, entsteht wieder ein Bündel.
+  - anbieter: congstar
+    modelle:
+      - apple-iphone-17-pro
+    grund: Anbieter führt das Gerät nicht mehr (Seite leitet auf die Übersicht um, nicht in der Sitemap)
+    geprueft: "2026-11-05"

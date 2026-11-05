@@ -214,3 +214,67 @@ def test_config_laedt_und_verlangt_gruende(tmp_path):
     kaputt.write_text("belegte_luecken:\n  - anbieter: X\n", encoding="utf-8")
     with pytest.raises(ValueError):
         lade_pflicht(kaputt)
+
+
+ECHTE_CONFIG = Path(__file__).resolve().parents[1] / "config" / "geraete_abdeckung.yaml"
+
+
+def _buendel_aller_pflichtmodelle(anbieter, pflicht, ohne=()):
+    return [
+        _buendel(anbieter, f"{modell}-256gb-schwarz")
+        for modell in pflicht["modelle"]
+        if modell not in ohne
+    ]
+
+
+def test_echte_config_fuehrt_congstar_iphone_17_pro_als_belegte_luecke():
+    """05.11.2026: congstar leitet die 17-Pro-Seite auf die Übersicht um und führt
+    das Gerät nicht mehr. Die Lücke steht mit Grund in der echten Config, und nur
+    diese eine: kein ganzer Anbieter, kein anderes Modell."""
+    pflicht = lade_pflicht(ECHTE_CONFIG)
+    assert "apple-iphone-17-pro" in pflicht["modelle"]
+    assert "nicht mehr" in pflicht["luecken"][("congstar", "apple-iphone-17-pro")]
+    assert [k for k in pflicht["luecken"] if k[0] == "congstar"] == [
+        ("congstar", "apple-iphone-17-pro")
+    ]
+
+
+def test_congstar_ohne_iphone_17_pro_ist_mit_echter_config_gruen():
+    pflicht = lade_pflicht(ECHTE_CONFIG)
+    nur_congstar = {**pflicht, "anbieter": ["congstar"]}
+    buendel = _buendel_aller_pflichtmodelle(
+        "congstar", pflicht, ohne=("apple-iphone-17-pro",)
+    )
+    ergebnis = pruefe({"updated": TAG, "buendel": buendel}, [], nur_congstar)
+    assert ergebnis.befunde == []
+
+
+def test_ohne_die_belegte_luecke_waere_der_congstar_lauf_rot():
+    """Gegenprobe zum Fehler vom 05.11.: dieselben Bündel, Lücke nicht erfasst."""
+    pflicht = lade_pflicht(ECHTE_CONFIG)
+    ohne_luecke = {**pflicht, "anbieter": ["congstar"], "luecken": {}}
+    buendel = _buendel_aller_pflichtmodelle(
+        "congstar", pflicht, ohne=("apple-iphone-17-pro",)
+    )
+    ergebnis = pruefe({"updated": TAG, "buendel": buendel}, [], ohne_luecke)
+    assert [(b.art, b.anbieter) for b in ergebnis.befunde] == [
+        ("modell_fehlt", "congstar")
+    ]
+    assert ergebnis.befunde[0].text.endswith("apple-iphone-17-pro")
+
+
+def test_luecke_gilt_weder_fuer_andere_anbieter_noch_fuer_andere_modelle():
+    pflicht = lade_pflicht(ECHTE_CONFIG)
+    telekom = {**pflicht, "anbieter": ["Telekom"]}
+    buendel = _buendel_aller_pflichtmodelle(
+        "Telekom", pflicht, ohne=("apple-iphone-17-pro",)
+    )
+    rot = pruefe({"updated": TAG, "buendel": buendel}, [], telekom)
+    assert [b.art for b in rot.befunde] == ["modell_fehlt"]
+    congstar = {**pflicht, "anbieter": ["congstar"]}
+    buendel = _buendel_aller_pflichtmodelle(
+        "congstar", pflicht, ohne=("apple-iphone-17-pro", "apple-iphone-17-pro-max")
+    )
+    rot = pruefe({"updated": TAG, "buendel": buendel}, [], congstar)
+    assert [b.art for b in rot.befunde] == ["modell_fehlt"]
+    assert rot.befunde[0].text.endswith("apple-iphone-17-pro-max")

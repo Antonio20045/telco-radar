@@ -236,6 +236,34 @@ def test_nur_der_billigste_preis_je_geraet_und_anbieter_bekommt_ein_bild(aufbau)
     assert len(gh.hochgeladen) == 1
 
 
+def test_mehrere_jobs_desselben_anbieters_ergeben_ein_bild_mit_dem_niedrigsten_preis(
+    aufbau,
+):
+    """Regression 04./05.11.2026: telekom, telekom-2 … messen dasselbe Gerät; jeder
+    Name geht einmal hoch, mit dem billigsten Preis über alle Ergebnisse."""
+    wurzel = aufbau.lege([], [satz(30.0, "job1")])
+    zweiter = aufbau.quelle / "telekom-2"
+    zweiter.mkdir()
+    (zweiter / "ergebnis.json").write_text(
+        json.dumps(
+            {"format": FORMAT, "anbieter": "Telekom", "roh": [satz(25.0, "job2")]}
+        ),
+        encoding="utf-8",
+    )
+    (zweiter / "job2.webp").write_bytes(b"RIFFyyyyWEBP")
+    hochgeladen: list[bytes] = []
+
+    class Mitschnitt(AttrappeReleases):
+        def hochladen(self, tag, dateien):
+            hochgeladen.extend(d.read_bytes() for d in dateien)
+            super().hochladen(tag, dateien)
+
+    gh = Mitschnitt()
+    assert veroeffentliche(aufbau, wurzel, gh) == 0
+    assert [len(namen) for _, namen in gh.hochgeladen] == [1]
+    assert hochgeladen == [b"RIFFyyyyWEBP"]
+
+
 def test_fehlt_das_bild_wird_nichts_vorgetaeuscht(aufbau):
     wurzel = aufbau.lege([], [satz(30.0, "b1")])
     (aufbau.quelle / "telekom" / "b1.webp").unlink()
