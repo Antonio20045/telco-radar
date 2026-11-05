@@ -30,7 +30,7 @@
       </ul>
     </details>{% endif %}{% endif %}{% endmacro %}
 
-{% macro buendelzeile(k) %}
+{% macro buendelzeile(k, modell_id='') %}
 {# Ein Plus-Tarif („nur mit Zweitprodukt“), ein veralteter Preis und ein Preis in
    Quarantäne („Preis in Prüfung“) werden zur benannten Lücke
    (`geraete_preisstand.anzeige`): keine Zahl, keine Rechnung, `data-gesamt` leer. #}
@@ -98,7 +98,13 @@
       if k.alt_marke %} <span class="gr-kk-marke gr-kk-marke--alt">{{
       k.alt_marke }}</span>{% endif %}{%
       if k.naeherung %} <span class="gr-kk-marke">Referenzrechnung</span>{%
-      endif %}</span>
+      endif %}{#- Beleg je Zeile (Ziel 1d): Bild des Paares (Modell, Anbieter) als Link, sonst
+       „ohne Beleg“ mit Grund im title. `zeilenbeleg` rechnet in Python
+       (`report/geraete_belege.py`), dieselbe Funktion wie die Quote. -#}
+{%- if k.belastbar and modell_id and zeilenbeleg is defined %}{% set zb = zeilenbeleg(modell_id, k) %}{% if zb.beleg %} <a class="gr-kk-marke gr-kk-marke--beleg"
+      href="{{ zb.beleg.url }}" target="_blank" rel="nofollow noopener"
+      title="Screenshot der Anbieterseite vom {{ zb.beleg.datum | date_de }}. {{ zb.hinweis }}">Screenshot vom {{ zb.beleg.datum | date_de }}</a>{% else %} <span class="gr-kk-marke gr-kk-marke--ohnebeleg"
+      title="{{ zb.grund }}">ohne Beleg</span>{% endif %}{% endif -%}</span>
     {# D3, PUNKT 1 (gemessen): zwei Zahlweisen DESSELBEN Tarifs (congstar
        24 UND 36 Raten) trugen zugeklappt woertlich denselben Text. Die
        Ratenlaufzeit gehoert deshalb HIER auf die Zeile, knapp, mit der
@@ -468,7 +474,7 @@
          gruppiert: app.js ordnet sie und zeigt diese Köpfe. #}
       <div class="gr-bndliste"{% if ids %} id="gr-bndliste"{% endif %}>
         {{ laufzeitkoepfe(m.zeilen_band) }}
-        {% for k in m.zeilen_band %}{{ buendelzeile(k) }}{% endfor %}
+        {% for k in m.zeilen_band %}{{ buendelzeile(k, m.id) }}{% endfor %}
       </div>
       {% if m.fehlzeilen %}<div class="gr-anb-fehlliste">{% for f in m.fehlzeilen
         %}{{ fehlzeile(f) }}{% endfor %}</div>{% endif %}
@@ -501,7 +507,7 @@
         </div>
         <div class="gr-bndliste">
           {{ laufzeitkoepfe(m.zeilen_ohne_band) }}
-          {% for k in m.zeilen_ohne_band %}{{ buendelzeile(k) }}{% endfor %}
+          {% for k in m.zeilen_ohne_band %}{{ buendelzeile(k, m.id) }}{% endfor %}
         </div>
         {% for h, eintrag in haendler_mit_preis %}
         <p class="gr-haendlerzeile"><b>{{ h }}</b> {{ eintrag.preis | euro }}

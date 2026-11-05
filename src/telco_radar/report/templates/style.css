@@ -3179,6 +3179,10 @@ b,strong{font-weight:700}
   background:none;font-family:var(--sans);font-size:12px;font-weight:400;
   letter-spacing:0;text-transform:none;color:var(--ink-4);line-height:1.35}
 .gr-bnd-an .gr-kk-marke--zustand{color:var(--red)}
+/* Beleg je Zeile (Ziel 1d): Link zum Screenshot bzw. „ohne Beleg“, grau und klein. */
+.gr-bnd-an .gr-kk-marke--beleg{text-decoration:underline;color:var(--ink-3)}
+.gr-bnd-an .gr-kk-marke--ohnebeleg{font-style:italic;cursor:help}
+.gr-belegquote{margin:8px 0 0}
 /* EIN Aufklappzeichen je Bündelzeile (28.09.2026): bis hierhin trug die
    Zeile das „+" der Chevron-Zelle UND das rote „▾" der Tafel-Regel
    (`.gr-tafel summary::after`), das als eigenes Grid-Element in eine

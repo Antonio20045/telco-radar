@@ -320,6 +320,10 @@
     <div id="gr-bnd-gruppe">{% if m and m.fehlzeilen %}<div class="gr-anb-fehlliste">{% for f in m.fehlzeilen
       %}{{ fehlzeile(f) }}{% endfor %}</div>{% endif %}</div>
   </section>
+  {# Ziel 1d: die Belegquote als EIN Satz, gerechnet in `geraete_belege.quote`. #}
+  {% if belegquote is defined %}{% set bq = belegquote(geraete.tco.modelle) %}{% if bq.satz %}
+  <p class="gr-basis--duenn gr-belegquote" id="gr-belegquote">{{ bq.satz }}</p>
+  {% endif %}{% endif %}
 
   {# EIN BUENDEL OHNE GERAETEZUORDNUNG STEHT HIER BEIM NAMEN (F-R2-3) -
      seit P4/D4 HINTER der Bündel-Sektion: vor der Wahl-Leiste war er der
