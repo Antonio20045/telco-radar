@@ -34,6 +34,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Optional
 
+from .geraete_abruf import hole_fabrik as _hole_fabrik
 from .geraete_alarm import baue_alarm_mail as baue_alarm_mail
 from .geraete_alarm import melde_ausfall
 from .geraete_alarm import sende_alarm_mail as sende_alarm_mail
@@ -80,40 +81,6 @@ def abgesichert(aufgabe: Callable[[], Any], bei_fehler: Callable[[Exception], An
 def _ohne_simonly(exc: Exception) -> tuple[list, dict]:
     log.warning("1&1 SIM-only-Messung gescheitert (%s) - Bestandsableitung bleibt", exc)
     return [], {}
-
-
-def _hole_fabrik(http_cfg: dict) -> Callable:
-    """`(status, text)` statt Response oder Ausnahme.
-
-    Der Waechter muss 404 ("keine robots.txt, also keine Regeln") von 403 ("nicht
-    anfassen") unterscheiden koennen. Ein Verbindungsfehler bleibt dagegen eine
-    Ausnahme und wird oben als Fehler gewertet, nicht als Freibrief.
-
-    DIESE FUNKTION HAT DAS BIS ZUM 28.08.2026 NICHT GEHALTEN, und ihre eigene Docstring
-    behauptete das Gegenteil ("`fetch` wirft bei beidem nicht"). `collect.http.fetch`
-    ruft `raise_for_status()` - es wirft bei JEDEM 4xx. Der Waechter bekam damit statt
-    eines Status eine Ausnahme, und sein Ausnahmezweig sagt zu Recht "kein Ergebnis
-    heisst nicht erlaubt": der Anbieter wurde als nicht abrufbar gefuehrt.
-
-    Aufgefallen ist es nie, weil jeder bisher konfigurierte Host eine robots.txt mit
-    HTTP 200 ausliefert. `api.vodafone.de` ist der erste ohne - dort antwortet 404, also
-    "keine Regeln", und der ganze Anbieter fiel mit "404 Not Found" aus, obwohl die
-    Schnittstelle einwandfrei antwortet. Ein Host ohne robots.txt ist der Normalfall im
-    Web, nicht der Sonderfall.
-    """
-    from .collect.http import StatusFehler, fetch
-
-    def hole(
-        url: str, kopfzeilen: Optional[dict] = None, user_agent: Optional[str] = None
-    ):
-        cfg = http_cfg if not user_agent else {**http_cfg, "user_agent": user_agent}
-        try:
-            antwort = fetch(url, cfg, extra_headers=kopfzeilen or None)
-        except StatusFehler as exc:
-            return (exc.response.status_code, exc.response.text)
-        return (antwort.status_code, antwort.text)
-
-    return hole
 
 
 def _abdeckungszustand(bilanz) -> str:

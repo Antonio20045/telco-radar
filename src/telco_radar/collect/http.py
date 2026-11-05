@@ -175,6 +175,34 @@ def _hole(url: str, **art: Any) -> httpx.Response:
         return client.get(url, **art)
 
 
+_MAX_WEITERLEITUNGEN = 3
+
+
+def _hole_gepruefte_weiterleitung(
+    url: str, vor_weiterleitung: Any, **art: Any
+) -> httpx.Response:
+    """GET, der Weiterleitungen nicht blind folgt.
+
+    Vor JEDEM Sprung auf eine andere Adresse ruft er `vor_weiterleitung(ziel)`;
+    wirft die Pruefung (robots.txt, Abstand), endet der Abruf dort und der
+    Sprung wird nicht ausgefuehrt. Mehr als `_MAX_WEITERLEITUNGEN` Spruenge
+    sind ein Fehler. Der Aufruf laeuft schon im Slot von `fetch`.
+    """
+    antwort = _hole(url, follow_redirects=False, **art)
+    for _ in range(_MAX_WEITERLEITUNGEN):
+        ziel = antwort.headers.get("location")
+        if not antwort.is_redirect or not ziel:
+            return antwort
+        adresse = str(antwort.url.join(ziel))
+        vor_weiterleitung(adresse)
+        antwort = _hole(adresse, follow_redirects=False, **art)
+    if antwort.is_redirect:
+        raise httpx.TooManyRedirects(
+            "zu viele Weiterleitungen", request=antwort.request
+        )
+    return antwort
+
+
 Zeitueberschreitung = httpx.TimeoutException
 HttpFehler = httpx.HTTPError
 StatusFehler = httpx.HTTPStatusError
@@ -220,6 +248,7 @@ def fetch(
     timeout_override: float | None = None,
     extra_headers: dict | None = None,
     schnell: bool = False,
+    vor_weiterleitung: Any = None,
 ) -> httpx.Response:
     """GET with UA fallback + short backoff on rate limits; 404 und 410 sind endgültig.
 
@@ -231,6 +260,10 @@ def fetch(
     also ueber eine Minute - mal sechs Adressen je Firma mal hunderte Firmen.
     Fuer den LAUF selbst bleibt die Ausdauer richtig und Standard: dort ist
     jede Quelle ausgewaehlt, und ein verlorener Abruf kostet eine Woche.
+
+    `vor_weiterleitung(ziel)` schaltet das blinde Folgen von Weiterleitungen
+    ab: jede wird erst dem Aufrufer zur Pruefung vorgelegt (siehe
+    `_hole_gepruefte_weiterleitung`).
     """
     timeout = float(timeout_override or http_cfg.get("timeout_seconds", 20))
     primary = http_cfg.get("user_agent", BROWSER_UA)
@@ -263,9 +296,14 @@ def fetch(
                 break
             try:
                 with _gate.slot(url):
-                    resp = _hole(
-                        url, timeout=timeout, headers=headers, follow_redirects=True
-                    )
+                    if vor_weiterleitung is None:
+                        resp = _hole(
+                            url, timeout=timeout, headers=headers, follow_redirects=True
+                        )
+                    else:
+                        resp = _hole_gepruefte_weiterleitung(
+                            url, vor_weiterleitung, timeout=timeout, headers=headers
+                        )
                 if resp.status_code in _ENDGUELTIGE_STATUSES:
                     endgueltig = httpx.HTTPStatusError(
                         f"status {resp.status_code}",

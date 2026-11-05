@@ -187,3 +187,38 @@ def _einstieg_gelesen(versucht: int, tot: int) -> bool:
     if versucht <= 0:
         return True
     return (versucht - tot) >= _MINDESTANTEIL_GELESENER_PRODUKTSEITEN * versucht
+
+
+def abruf_zusaetze(adapter: Adapter, user_agent: str | None) -> dict:
+    """Zusatzargumente fuer `hole`: eigene Kennung, bei Schutz-Abbruch EIN Versuch.
+
+    `einmalig=True` heisst im echten Abrufweg: genau eine Anfrage mit der
+    festen Kennung, kein Wechsel auf eine Browser-Kennung, kein Backoff.
+    """
+    zusatz: dict = {"user_agent": user_agent} if user_agent else {}
+    if adapter.bricht_bei_schutzantwort_ab:
+        zusatz["einmalig"] = True
+    return zusatz
+
+
+def weiterleitungs_wache(schleuse, bilanz):
+    """Pruefung VOR jeder Weiterleitung: robots.txt und Abstand wie bei einem
+    eigenen Einstieg, und der Sprung steht in `bilanz.besucht`. Eine
+    verbotene Adresse wirft `GeraeteAbrufFehler`, der Sprung unterbleibt."""
+
+    def wache(ziel: str) -> None:
+        schleuse.passiere(ziel)
+        bilanz.besucht.append(ziel)
+
+    return wache
+
+
+def abruf_argumente(zusatz: dict, kopfzeilen: dict, schleuse, bilanz) -> dict:
+    """Argumente eines `hole`-Aufrufs: Zusaetze, Kopfzeilen und - bei
+    Einmal-Abrufen - die Weiterleitungswache."""
+    argumente = dict(zusatz)
+    if kopfzeilen:
+        argumente["kopfzeilen"] = kopfzeilen
+    if zusatz.get("einmalig"):
+        argumente["vor_weiterleitung"] = weiterleitungs_wache(schleuse, bilanz)
+    return argumente

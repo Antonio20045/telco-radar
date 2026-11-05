@@ -60,6 +60,8 @@ from .basis import (
     ADAPTER,
     Adapter,
     GeraeteAbrufFehler,
+    abruf_argumente,
+    abruf_zusaetze,
     registriere,
     schutz_abbruch,
 )
@@ -454,8 +456,9 @@ def sammle_anbieter(
     kopfzeilen = dict(getattr(anbieter, "kopfzeilen", None) or {})
     user_agent = (getattr(anbieter, "user_agent", "") or "").strip() or None
 
-    if user_agent:
-        waechter = RobotsWaechter(hole=lambda url: hole(url, user_agent=user_agent))
+    zusatz = abruf_zusaetze(adapter, user_agent)
+    if zusatz:
+        waechter = RobotsWaechter(hole=lambda url: hole(url, **zusatz))
 
     leitadresse = anbieter.basis_url or anbieter.einstiege[0].url
 
@@ -479,11 +482,7 @@ def sammle_anbieter(
                 bilanz.ausserhalb_besuchszeit = True
             raise
         bilanz.besucht.append(url)
-        kwargs = {}
-        if kopfzeilen:
-            kwargs["kopfzeilen"] = kopfzeilen
-        if user_agent:
-            kwargs["user_agent"] = user_agent
+        kwargs = abruf_argumente(zusatz, kopfzeilen, schleuse, bilanz)
         status, text = hole(url, **kwargs) if kwargs else hole(url)
         if not (200 <= int(status) < 300):
             raise GeraeteAbrufFehler(f"HTTP {status}", status=int(status))

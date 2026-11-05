@@ -200,7 +200,9 @@ def test_landet_als_listung_im_bestand(katalog, farben, angebote_html):
 
     gesehene_user_agents = []
 
-    def hole(url, kopfzeilen=None, user_agent=None):
+    def hole(
+        url, kopfzeilen=None, user_agent=None, einmalig=False, vor_weiterleitung=None
+    ):
         if url.endswith("/robots.txt"):
             return (200, "User-agent: *\nDisallow: /api/v1/msg\n")
         gesehene_user_agents.append(user_agent)
@@ -241,7 +243,9 @@ def test_schutzantwort_bricht_still_ab_ohne_wiederholung(katalog, farben):
 
     versuche = []
 
-    def hole(url, kopfzeilen=None, user_agent=None):
+    def hole(
+        url, kopfzeilen=None, user_agent=None, einmalig=False, vor_weiterleitung=None
+    ):
         if url.endswith("/robots.txt"):
             return (200, "User-agent: *\nDisallow: /api/v1/msg\n")
         versuche.append((url, user_agent))
@@ -278,7 +282,9 @@ def test_weitere_schutzantworten_brechen_ebenfalls_ab(katalog, farben, status, t
     anbieter.rate_limit_sekunden = 0
     versuche = []
 
-    def hole(url, kopfzeilen=None, user_agent=None):
+    def hole(
+        url, kopfzeilen=None, user_agent=None, einmalig=False, vor_weiterleitung=None
+    ):
         if url.endswith("/robots.txt"):
             return (200, "User-agent: *\nDisallow: /api/v1/msg\n")
         versuche.append(url)
@@ -305,7 +311,9 @@ def test_schutzantwort_mitten_im_lauf_stoppt_den_rest(katalog, farben, angebote_
     anbieter.rate_limit_sekunden = 0
     versuche = []
 
-    def hole(url, kopfzeilen=None, user_agent=None):
+    def hole(
+        url, kopfzeilen=None, user_agent=None, einmalig=False, vor_weiterleitung=None
+    ):
         if url.endswith("/robots.txt"):
             return (200, "User-agent: *\nDisallow: /api/v1/msg\n")
         versuche.append(url)
@@ -331,3 +339,38 @@ def test_andere_anbieter_brechen_bei_403_nicht_ab(katalog, farben):
     des Collectors: Saturn faellt bei einem 403 weiter auf die naechste Seite."""
     assert ADAPTER["mediamarkt_angebote"].bricht_bei_schutzantwort_ab is True
     assert ADAPTER["saturn_brand"].bricht_bei_schutzantwort_ab is False
+
+
+def _seite_mit_titeln(*titel_und_ids):
+    eintraege = []
+    for titel, pid in titel_und_ids:
+        eintraege.append(
+            f'"CofrPriceFeature:{{\\"id\\":\\"Media:de:{pid}\\"}}": '
+            f'{{"id": "Media:de:{pid}", "price": {{"amount": 500.0}}, '
+            f'"currency": "EUR", "isProductOfTypeMarketplace": false}}, '
+            f'"GraphqlProduct:Media:de-DE:{pid}": '
+            f'{{"title": "{titel}", "url": "/de/product/p{pid}.html"}}'
+        )
+    return (
+        '<script>window.__PRELOADED_STATE__ = {"apolloState": {'
+        + ", ".join(eintraege)
+        + "}};</script>"
+    )
+
+
+@pytest.mark.parametrize(
+    "titel",
+    [
+        "APPLE iPhone 17 256 GB Schwarz Dual SIM Refurbished",
+        "APPLE iPhone 17 256 GB Schwarz Dual SIM (Generalüberholt)",
+        "APPLE iPhone 17 256 GB Schwarz B-Ware",
+        "APPLE iPhone 17 256 GB Schwarz OUTLET",
+        "APPLE iPhone 17 256 GB Schwarz Gebraucht",
+    ],
+)
+def test_aufbereitete_geraete_werden_verworfen(titel):
+    html = _seite_mit_titeln(
+        (titel, "1"), ("APPLE iPhone 17 256 GB Schwarz Dual SIM", "2")
+    )
+    zeilen = mediamarkt.lies(html, _URL_ANGEBOTE)
+    assert [z["sku"] for z in zeilen] == ["2"]

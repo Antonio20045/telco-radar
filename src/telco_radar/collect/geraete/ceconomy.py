@@ -39,6 +39,20 @@ _FARBE_RE = re.compile(
 )
 
 
+_AUFBEREITET_RE = re.compile(
+    r"refurb|general[uü]berholt|aufbereitet|b[\s-]?ware|outlet|gebraucht|"
+    r"\brenewed\b|\bwie neu\b|\bretoure",
+    re.IGNORECASE,
+)
+
+
+def ist_aufbereitet(titel: str, adresse: str = "") -> bool:
+    """Refurbished, Outlet, B-Ware, gebraucht: kein Neugeraet, kein Preis fuer
+    den Neukauf. Ein solcher Titel ("iPhone 17 ... Refurbished") wuerde
+    sonst eine eigene Listung mit erfundener Farbe anlegen."""
+    return bool(_AUFBEREITET_RE.search(f"{titel or ''} {adresse or ''}"))
+
+
 def farbe_aus_titel(titel: str) -> str:
     """Farbe aus einer festen Titelposition (vor "Dual SIM" o.ae.), nicht
     ueber den ASCII-faltenden generischen Fallback - der findet "Weiss" nie
@@ -165,6 +179,8 @@ def lies(
     for f in eigen:
         titel = f["title"]
         if not titel or f["amount"] is None:
+            continue
+        if ist_aufbereitet(titel, f["product_url"] or ""):
             continue
         try:
             preis = float(f["amount"])
