@@ -27,6 +27,9 @@ Nennen zwei Klick-Sätze denselben Schlüssel (ein Zustand außer neu zählt mit
 einer, wenn ihre Werte gleich sind, sonst keiner (``mehrdeutig``). Jeder ersetzte
 Adaptersatz ist Gegenprobe, Gerätepreise ohne Tarif sind es über ``klick_geraetepreis``.
 
+Widerspricht ein 1&1-Klick-Satz dem Adaptersatz, ersetzt er ihn nicht
+(``klick_widerspruch``).
+
 Vorrang steht im Bestand, nicht im Lesestand: ``Zusammenfuehrung.buendel`` lässt jedes
 Adapterbündel weg, dessen Eintrag im Bestand eine Klick-Messung jünger als
 ``FRISCHEGRENZE_TAGE`` trägt (``klick_vorrang``), auch an einem Tag, an dem der
@@ -41,31 +44,27 @@ import os
 from collections import Counter
 from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass, field
-from datetime import date
 from pathlib import Path
 
 from ..collect.geraete.klickergebnis import FRISCHEGRENZE_TAGE, ORDNER, lies_ergebnisse
-from ..collect.geraete.klicklauf import LAUF_GELESEN, LAUF_GESTOERT
 from ..collect.geraete.klickrohsatz import QUELLE, ZUSTAND_NEU, tarifschluessel
 from ..collect.geraete.klickziele import geplante_anbieter
 from ..geraete_model import Katalog
 from ..tarif_bezug import Tarifbestand
 from ..tco_model import Buendel, laufzeit_in_monaten
+from .geraete_pruefstatus import HERLEITUNG_WIDERSPRUCH
 from .klick_erfassung import Angebot, erfassungsgruende
+from .klick_ergebnisdatei import alter_tage, kopf_der_datei
 from .klick_geraetepreis import gegenprobe_geraet
 from .klick_geschwister import Schluessel, geschwister, mit_namen
-from .klick_teillauf import ausbeute_der_seiten
 from .klick_vollstaendig import CENT, VERGLEICHSFELDER, begleitend, fehlend, nennt
+from .klick_widerspruch import widerspruch_luecke
 from .tco_buendel import Buendelbilanz, aus_rohsaetzen
 
 log = logging.getLogger(__name__)
 
 UMGEBUNG = "TELCO_KLICK_ERGEBNISSE"
 BEISPIELE = 8
-GRUND_NICHT_HEUTE = "Datei vom {datum}, nicht von heute"
-GRUND_VERALTET = "Datei vom {datum}, älter als {tage} Tage"
-GRUND_ZUKUNFT = "Datei vom {datum}, nach heute"
-GRUND_DATUM = "Datum der Datei unlesbar: {datum!r}"
 UEBERNOMMEN = ("sku_id", "tarif_name", "tarif_slug")
 
 Geraet = Callable[[str], tuple[str, int | None]]
@@ -90,8 +89,10 @@ class Gegenprobe:
         self.fehlend.update(felder)
         return bool(felder)
 
-    def vergleiche(self, klick: dict, adapter: dict) -> None:
-        """Zählt einen ersetzten Adaptersatz; Felder nur, wo beide einen Wert haben."""
+    def vergleiche(self, klick: dict, adapter: dict) -> list[str]:
+        """Zählt einen ersetzten Adaptersatz; Felder nur, wo beide einen Wert haben.
+
+        Gibt die Felder zurück, in denen beide Sätze verschiedene Werte nennen."""
         beide = [f for f in VERGLEICHSFELDER if nennt(klick, f) and nennt(adapter, f)]
         anders = [f for f in beide if abs(klick[f] - adapter[f]) > CENT]
         if not beide:
@@ -106,6 +107,7 @@ class Gegenprobe:
                 )
         else:
             self.gleich += 1
+        return anders
 
     def als_daten(self) -> dict:
         """Zahlen und Beispiele für Bilanz und Protokoll."""
@@ -191,7 +193,7 @@ def fuehre_zusammen(
     saetze: list[dict] = []
     ohne_tarif: list[dict] = []
     for daten in ergebnisse:
-        eintrag, aus_datei, geraetepreise = _datei(daten, katalog, heute)
+        eintrag, aus_datei, geraetepreise = kopf_der_datei(daten, katalog, heute)
         eintraege.append(eintrag)
         saetze.extend(aus_datei)
         ohne_tarif.extend(geraetepreise)
@@ -205,6 +207,7 @@ def fuehre_zusammen(
     ersetzt: set[int] = set()
     neu: list[dict] = []
     ohne_gegenstueck = 0
+    widersprueche = 0
     for satz in eindeutig:
         schluessel = klickschluessel(satz)
         treffer = sorted(set(index.get(schluessel, []) if _neu(satz) else []))
@@ -215,8 +218,12 @@ def fuehre_zusammen(
             alt = adapter[stelle]
             if probe.unvollstaendig_fuer(satz, alt):
                 continue
-            probe.vergleiche(satz, alt)
+            anders = probe.vergleiche(satz, alt)
             ersetzt.add(stelle)
+            if luecke := widerspruch_luecke(schluessel, satz, alt, anders):
+                widersprueche += 1
+                neu.append(luecke)
+                continue
             uebernommen = {f: alt.get(f) for f in UEBERNOMMEN}
             neu.append({**satz, **uebernommen, **begleitend(satz, alt)})
     vorhanden = {e["anbieter"] for e in eintraege}
@@ -234,6 +241,7 @@ def fuehre_zusammen(
         "mehrdeutig": mehrdeutig,
         "ohne_gegenstueck": ohne_gegenstueck,
         "klick_vorrang": 0,
+        "widerspruch_24_plus_12": widersprueche,
         "gegenprobe": probe.als_daten(),
         "gegenprobe_geraet": gegenprobe_geraet(ohne_tarif, adapter, geraet),
     }
@@ -261,51 +269,6 @@ def schluesseltext(schluessel: Schluessel) -> str:
     return "|".join("" if teil is None else str(teil) for teil in schluessel)
 
 
-def alter_tage(datum: object, heute: str) -> int | None:
-    """Tage von ``datum`` bis ``heute``; ``None``, wenn ``datum`` kein ISO-Datum ist."""
-    try:
-        return (date.fromisoformat(heute) - date.fromisoformat(str(datum))).days
-    except ValueError:
-        return None
-
-
-def _datei(
-    daten: dict, katalog: Katalog, heute: str
-) -> tuple[dict, list[dict], list[dict]]:
-    """Kopf einer Ergebnisdatei für die Bilanz und, wenn verwendet, ihre Rohsätze und
-    Gerätepreise ohne Tarif."""
-    status = daten.get("laufstatus")
-    datum = daten.get("datum")
-    alter = alter_tage(datum, heute)
-    eintrag = {
-        "anbieter": daten.get("name"),
-        "datum": datum,
-        "alter_tage": alter,
-        "laufstatus": status,
-        "grund": daten.get("grund"),
-        "ueberfaellig": list(daten.get("ueberfaellig") or []),
-        "verwendet": False,
-        "warum_nicht": None,
-    }
-    if alter is None:
-        eintrag["warum_nicht"] = GRUND_DATUM.format(datum=datum)
-    elif alter < 0:
-        eintrag["warum_nicht"] = GRUND_ZUKUNFT.format(datum=datum)
-    elif alter >= FRISCHEGRENZE_TAGE:
-        grund = GRUND_VERALTET.format(datum=datum, tage=FRISCHEGRENZE_TAGE)
-        eintrag["warum_nicht"] = grund
-    elif alter > 0:
-        eintrag["warum_nicht"] = GRUND_NICHT_HEUTE.format(datum=datum)
-    elif status != LAUF_GELESEN:
-        eintrag["warum_nicht"] = f"Lauf {status}: {daten.get('grund')}"
-    teil = status == LAUF_GESTOERT and alter == 0
-    if eintrag["warum_nicht"] is not None and not teil:
-        return eintrag, [], []
-    aus, felder = ausbeute_der_seiten(daten, katalog, teil)
-    eintrag.update(aus.als_daten(), **felder)
-    return eintrag, aus.rohsaetze, aus.ohne_tarif
-
-
 def _eindeutig(saetze: list[dict]) -> tuple[list[dict], list[str]]:
     """Je Schlüssel ein Satz; verschiedene Werte auf einem Schlüssel gelten nicht."""
     gruppen: dict[Schluessel, list[dict]] = {}
@@ -329,6 +292,8 @@ def _werte(satz: dict) -> tuple:
 def _vorrang(buendel: Buendel, eintrag: dict | None, heute: str) -> bool:
     """Ein Adapterbündel, dessen Bestandseintrag eine frische Klick-Messung ist."""
     if buendel.quelle_art == QUELLE or eintrag is None:
+        return False
+    if buendel.herleitung == HERLEITUNG_WIDERSPRUCH:
         return False
     if eintrag.get("quelle_art") != QUELLE:
         return False

@@ -547,30 +547,29 @@ def modell_barpreis_csv(modelle: list) -> tuple[str, int]:
 def modell_tco_csv(modelle: list) -> tuple[str, int]:
     """Die TCO-Ansicht des Modell-Katalogs als CSV - eine Zeile je Modell.
 
-    Gelesen wird genau das, was die TCO-Spalte der Modellzeile traegt
-    (`_tco_spalte` in `geraete_view`): die Leitzahl des besten
-    vergleichbaren Angebots, sein Anbieter, sein Ø je Monat, die
-    Abweichung des guenstigen Wettbewerber-Angebots zur
-    Vodafone-Referenz (wo Vodafone selbst fuehrt, der Abstand des
-    naechsten Wettbewerbers) und sein Tarifband. Eine Zeile ohne Zahl
-    oder ohne Abstand traegt den benannten Grund in der Statusspalte -
-    gerechnet wird hier nichts.
+    Gelesen wird `tco_export` der Modellzeile (`tco_spalte`, Band M wie das
+    Diagramm der Preisposition): das beste vergleichbare Angebot im Band M,
+    sein Anbieter, Ø je Monat, Abstand zur Vodafone-Referenz und Tarifband.
+    Ein Modell ohne Karte in diesem Band hat keine Zahl, sondern den Grund in
+    der Statusspalte - nie das Angebot eines anderen Bandes. Gerechnet wird
+    hier nichts.
     """
     ausgabe = []
     for m in modelle or []:
-        beleg = m.get("tco_beleg") or {}
+        t = m.get("tco_export") or {}
+        beleg = t.get("tco_beleg") or {}
         ausgabe.append(
             [
                 m.get("hersteller", ""),
                 m.get("modell", ""),
                 m.get("speicher") or "",
-                _zahl(m.get("tco_ab")),
-                m.get("tco_anbieter") or "",
-                _zahl(m.get("tco_monat")),
-                _zahl(m.get("tco_delta")),
-                _prozent(m.get("tco_delta_prozent")),
-                band_label(m.get("tco_band")),
-                m.get("tco_leer") or m.get("tco_delta_leer") or "",
+                _zahl(t.get("tco_ab")),
+                t.get("tco_anbieter") or "",
+                _zahl(t.get("tco_monat")),
+                _zahl(t.get("tco_delta")),
+                _prozent(t.get("tco_delta_prozent")),
+                band_label(t.get("tco_band")),
+                t.get("tco_leer") or t.get("tco_delta_leer") or "",
                 beleg.get("abgerufen_am", ""),
                 beleg.get("quelle_url", ""),
             ]

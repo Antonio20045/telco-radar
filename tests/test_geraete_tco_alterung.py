@@ -50,6 +50,7 @@ from telco_radar.geraete_config import lade_katalog
 from telco_radar.report import (
     geraete_preisstand,
     geraete_tco_band,
+    geraete_tco_spalte,
     geraete_tco_view,
     geraete_view,
     geraete_zeitreihe,
@@ -323,7 +324,7 @@ def test_katalog_spalte_nennt_den_zustand_wenn_alles_alt_ist():
     alt = _modell(_alles_alt())
     spalte = geraete_view._tco_spalte(alt)
     assert spalte["tco_ab"] is None
-    assert spalte["tco_leer"] == geraete_view.TCO_LEER_NUR_ALT
+    assert spalte["tco_leer"] == geraete_tco_spalte.TCO_LEER_NUR_ALT
     assert spalte["tco_leer"] == "kein aktueller Bündel-Stand"
     gemischt = _modell(_standard())
     assert geraete_view._tco_spalte(gemischt)["tco_ab"] == 1224.76

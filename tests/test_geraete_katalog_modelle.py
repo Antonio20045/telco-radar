@@ -402,12 +402,20 @@ def test_unser_angebot_fuehrt_der_delta_traegt_der_wettbewerber():
         _tco_modell(
             mid,
             karten=[
-                _karte("Vodafone", 1100.0, eigen=True, delta=None, delta_kurz=None),
+                _karte(
+                    "Vodafone",
+                    1100.0,
+                    eigen=True,
+                    delta=None,
+                    delta_kurz=None,
+                    band="m",
+                ),
                 _karte(
                     "1&1",
                     1107.74,
                     delta={"betrag": 7.74, "prozent": None, "ungefaehr": True},
                     delta_kurz="≈ +7,74 €",
+                    band="m",
                 ),
             ],
             referenz={"gesamt": 1100.0, "monate": 24},
@@ -436,7 +444,14 @@ def test_nur_unser_angebot_heisst_die_luecke_beim_wettbewerber():
         _tco_modell(
             mid,
             karten=[
-                _karte("Vodafone", 1100.0, eigen=True, delta=None, delta_kurz=None),
+                _karte(
+                    "Vodafone",
+                    1100.0,
+                    eigen=True,
+                    delta=None,
+                    delta_kurz=None,
+                    band="m",
+                ),
             ],
             referenz={"gesamt": 1100.0, "monate": 24},
         )
@@ -703,6 +718,7 @@ def _beispiel_zeilen():
                     1000.0,
                     delta={"betrag": -100.0, "prozent": 9.1},
                     delta_kurz="−100,00 € · −9,1 %",
+                    band="m",
                 )
             ],
         )
@@ -752,7 +768,7 @@ def test_modell_tco_csv_traegt_den_grund_statt_einer_luecke(tmp_path):
     pixel = next(z for z in zeilen[1:] if z[1] == "Pixel 11")
     assert apple[kopf.index("TCO ab EUR")] == "1000,00"
     assert apple[kopf.index("Abweichung zu Vodafone EUR")] == "-100,00"
-    assert apple[kopf.index("Tarifband")] == "XS"
+    assert apple[kopf.index("Tarifband")] == "M"
     assert apple[kopf.index("Status")] == ""
     assert pixel[kopf.index("TCO ab EUR")] == ""
     assert pixel[kopf.index("Status")] == "kein Bündel gemessen"
@@ -768,12 +784,20 @@ def test_modell_tco_csv_nennt_den_delta_leergrund(tmp_path):
         _tco_modell(
             mid,
             karten=[
-                _karte("Vodafone", 1100.0, eigen=True, delta=None, delta_kurz=None),
+                _karte(
+                    "Vodafone",
+                    1100.0,
+                    eigen=True,
+                    delta=None,
+                    delta_kurz=None,
+                    band="m",
+                ),
                 _karte(
                     "1&1",
                     1107.74,
                     delta={"betrag": 7.74, "prozent": None, "ungefaehr": True},
                     delta_kurz="≈ +7,74 €",
+                    band="m",
                 ),
             ],
             referenz={"gesamt": 1100.0, "monate": 24},
@@ -793,7 +817,14 @@ def test_modell_tco_csv_nennt_den_delta_leergrund(tmp_path):
         _tco_modell(
             mid,
             karten=[
-                _karte("Vodafone", 1100.0, eigen=True, delta=None, delta_kurz=None),
+                _karte(
+                    "Vodafone",
+                    1100.0,
+                    eigen=True,
+                    delta=None,
+                    delta_kurz=None,
+                    band="m",
+                ),
             ],
             referenz={"gesamt": 1100.0, "monate": 24},
         )
@@ -805,6 +836,40 @@ def test_modell_tco_csv_nennt_den_delta_leergrund(tmp_path):
     (daten,) = [z.split(";") for z in inhalt.split("\r\n") if z][1:]
     assert daten[kopf.index("Abweichung zu Vodafone EUR")] == ""
     assert daten[kopf.index("Status")] == "kein Wettbewerber-Angebot"
+
+
+def _export_zeile(karten):
+    mid = modell_schluessel(device_id("Apple", "Apple X"), 256)
+    tco = [_tco_modell(mid, karten=karten)]
+    eintraege = [_listung("A", "Apple", "Apple X", "256gb-a", 1000.0)]
+    (zeile,) = geraete_view.katalog_modellzeilen(eintraege, _katalog(), tco_modelle=tco)
+    inhalt, _ = ex.modell_tco_csv([zeile])
+    (daten,) = [z.split(";") for z in inhalt.split("\r\n") if z][1:]
+    return zeile, dict(zip(ex.SPALTEN_MODELL_TCO, daten, strict=True))
+
+
+def test_modell_tco_export_nimmt_band_m_nicht_das_billigste_band():
+    """iPhone 17 Pro 256 GB bei 1&1: Tarif S (XS) 1479,66 EUR, Tarif M
+    1599,66 EUR. Die Katalogkarte darf "ab" 1479,66 sagen, der Export und
+    das Diagramm der Preisposition nennen für JEDEN Anbieter Band M. Gegen
+    die Auswahl über alle Bänder ROT (Export zeigte 1479,66 / XS)."""
+    zeile, csv = _export_zeile(
+        [_karte("1&1", 1479.66, band="xs"), _karte("1&1", 1599.66, band="m")]
+    )
+    assert zeile["tco_ab"] == 1479.66 and zeile["tco_band"] == "xs"
+    assert csv["TCO ab EUR"] == "1599,66"
+    assert csv["Tarifband"] == "M"
+    assert csv["Status"] == "keine Referenz", "nur der Abstand fehlt, nicht der Preis"
+
+
+def test_modell_tco_export_ohne_band_m_ist_eine_benannte_luecke():
+    """Gegenprobe: gibt es nur den S-Preis, steht im Export KEINE Zahl aus
+    dem falschen Band, sondern die Lücke mit Namen."""
+    zeile, csv = _export_zeile([_karte("1&1", 1479.66, band="xs")])
+    assert zeile["tco_ab"] == 1479.66
+    assert csv["TCO ab EUR"] == ""
+    assert csv["Tarifband"] == ""
+    assert csv["Status"] == "kein vergleichbares Bündel im Tarif M"
 
 
 def test_schreibe_exporte_legt_beide_ansichten_an(tmp_path):
