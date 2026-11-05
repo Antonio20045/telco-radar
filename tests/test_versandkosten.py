@@ -182,3 +182,34 @@ def test_die_seite_sagt_in_einem_satz_wie_versand_zaehlt(quellenseite):
     assert "einmalig in die Kosten über 24 Monate" in text
     assert "bei jedem Anbieter, der sie ausweist" in text
     assert "nicht erfasst" in text, "die Lücke wird benannt"
+
+
+def test_gerenderte_zeile_nennt_den_unbelegten_versand(tmp_path, monkeypatch):
+    """Muss-Auflage 1 der Prüfung PR 41: nicht nur die Datenebene (`hinweise`),
+    die gerenderte Seite trägt den Satz an der Zeile des Anbieters. Gegenprobe:
+    ist der Versand belegt, steht der Satz nirgends."""
+    import test_geraete_tco_zustand as zustand
+
+    _baue, lager, vorlage_text = (
+        getattr(zustand, n) for n in ("_baue", "lager", "vorlage_text")
+    )
+
+    belegt = dict(versandkosten.tabelle())
+    assert "o2" in belegt and belegt["o2"].betrag == 6.99
+
+    monkeypatch.setattr(
+        versandkosten, "_TABELLE", {k: v for k, v in belegt.items() if k != "o2"}
+    )
+    _baue(tmp_path / "unbelegt")
+    zeilen = lager(tmp_path / "unbelegt").select('.gr-bnd[data-anbieter="o2"]')
+    assert zeilen, "keine o2-Zeile gerendert"
+    for zeile in zeilen:
+        satz = zeile.select_one(".gr-bnd-versand-luecke")
+        assert satz is not None, "der Hinweis fehlt auf der gerenderten Zeile"
+        assert vorlage_text(satz) == "Versand bei o2 nicht belegt – mit 0 € gerechnet"
+
+    monkeypatch.setattr(versandkosten, "_TABELLE", belegt)
+    _baue(tmp_path / "belegt")
+    seite = lager(tmp_path / "belegt")
+    assert not seite.select(".gr-bnd-versand-luecke")
+    assert "nicht belegt – mit 0 €" not in vorlage_text(seite)
