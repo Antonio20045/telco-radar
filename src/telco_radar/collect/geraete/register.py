@@ -71,5 +71,10 @@ def registriere_anbieter_adapter() -> None:
     )
     registriere(
         "mediamarkt_angebote",
-        Adapter(name="mediamarkt_angebote", lies=mediamarkt.lies, direkt=True),
+        Adapter(
+            name="mediamarkt_angebote",
+            lies=mediamarkt.lies,
+            direkt=True,
+            bricht_bei_schutzantwort_ab=True,
+        ),
     )

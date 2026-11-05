@@ -76,6 +76,12 @@ class Adapter:
     tragen. Adapter ohne Proben ignorieren ihn. Der Zaehler steht danach
     in `Anbieterbilanz.proben` und wird protokolliert - er loest nichts
     aus, er meldet.
+
+    `bricht_bei_schutzantwort_ab=True` (MediaMarkt, 05.11.2026): trifft der
+    Collector auf eine Schutzantwort (HTTP 403/429 oder eine Seite, die der
+    Adapter nicht lesen kann, etwa Captcha oder Challenge), ruft er fuer
+    diesen Anbieter NICHTS mehr ab - kein Wiederholen, keine weiteren
+    Einstiege, andere Anbieter laufen weiter.
     """
 
     name: str
@@ -89,6 +95,7 @@ class Adapter:
     vertiefe_buendel: Callable | None = None
     fuehre_zusammen: Callable | None = None
     confidence: str = "hoch"
+    bricht_bei_schutzantwort_ab: bool = False
 
 
 def registriere(methode: str, adapter: Adapter) -> None:
@@ -142,3 +149,41 @@ def _gleich(a: float | None, b: float | None) -> bool:
     if a is None or b is None:
         return False
     return abs(float(a) - float(b)) < HALBER_CENT
+
+
+_SCHUTZ_STATUS = (403, 429)
+_GRUND_SCHUTZ = "Schutzantwort, Anbieter fuer diesen Lauf abgebrochen"
+
+_MINDESTANTEIL_GELESENER_PRODUKTSEITEN = 0.75
+
+
+def schutz_abbruch(
+    adapter: Adapter, fehler: GeraeteAbrufFehler, gruende: list, unlesbar: bool = False
+) -> bool:
+    """Soll der Collector diesen Anbieter nach `fehler` sofort aufgeben?
+
+    Nur fuer Adapter mit `bricht_bei_schutzantwort_ab`. Schutzantwort heisst
+    HTTP 403/429; `unlesbar=True` steht fuer eine Antwort 2xx, die der
+    Adapter nicht lesen konnte (Captcha- oder Challenge-Seite nicht
+    auszuschliessen). Bei Abbruch steht der Grund in `gruende`.
+    """
+    if not adapter.bricht_bei_schutzantwort_ab:
+        return False
+    if not unlesbar and fehler.status not in _SCHUTZ_STATUS:
+        return False
+    gruende.append(_GRUND_SCHUTZ)
+    return True
+
+
+def _einstieg_gelesen(versucht: int, tot: int) -> bool:
+    """Reicht das Gelesene dieser Einstiegsseite fuer "gelesen"?
+
+    `versucht` sind die Produktadressen, an denen dieser Lauf wirklich war,
+    `tot` die davon, die der Anbieter selbst als nicht mehr vorhanden
+    beantwortet hat. Eine Einstiegsseite ganz ohne Produktadressen ist
+    gelesen - es gab nichts nachzuladen; das ist "gelesen, nichts
+    gefunden" und damit eine Aussage, kein Ausfall.
+    """
+    if versucht <= 0:
+        return True
+    return (versucht - tot) >= _MINDESTANTEIL_GELESENER_PRODUKTSEITEN * versucht

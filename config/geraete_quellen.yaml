@@ -140,6 +140,45 @@ anbieter:
       - url: https://www.mediamarkt.de/de/campaign/angebote-smartphones
         label: Angebote Smartphones
         kind: static
+      # Suchseiten der Top-/Pflichtmodelle (config/geraete_abdeckung.yaml),
+      # 05.11.2026: /de/search.html ist fuer "*" nicht gesperrt (geprueft
+      # gegen tests/fixtures/geraete/mediamarkt_robots.txt, Test
+      # test_konfigurierter_einstieg_ist_nach_robots_erlaubt), traegt
+      # dieselbe Apollo-Struktur wie die Kampagnenseite und liefert nur die
+      # erste Ergebnisseite (hoechstens 12 Preisfelder). Je Adresse ein
+      # echter Probeabruf mit HTTP 200 (arbeit/mediamarkt-0511/probe2.md).
+      # Nicht abgedeckt: iPhone 17 Pro Max in 256/512 GB (die Suche liefert
+      # nur die 2-TB-Fassung), Pixel 11 Pro Fold; Marktplatz bleibt verworfen.
+      - url: https://www.mediamarkt.de/de/search.html?query=iPhone%2018%20Pro
+        label: Suche iPhone 18 Pro
+        kind: static
+      - url: https://www.mediamarkt.de/de/search.html?query=iPhone%2017
+        label: Suche iPhone 17
+        kind: static
+      - url: https://www.mediamarkt.de/de/search.html?query=iPhone%20Air
+        label: Suche iPhone Air
+        kind: static
+      - url: https://www.mediamarkt.de/de/search.html?query=iPhone%2017e
+        label: Suche iPhone 17e
+        kind: static
+      - url: https://www.mediamarkt.de/de/search.html?query=Galaxy%20S26
+        label: Suche Galaxy S26
+        kind: static
+      - url: https://www.mediamarkt.de/de/search.html?query=Galaxy%20S26%20Ultra
+        label: Suche Galaxy S26 Ultra
+        kind: static
+      - url: https://www.mediamarkt.de/de/search.html?query=Galaxy%20Z%20Fold8
+        label: Suche Galaxy Z Fold8
+        kind: static
+      - url: https://www.mediamarkt.de/de/search.html?query=Galaxy%20Z%20Flip8
+        label: Suche Galaxy Z Flip8
+        kind: static
+      - url: https://www.mediamarkt.de/de/search.html?query=Pixel%2011
+        label: Suche Pixel 11
+        kind: static
+      - url: https://www.mediamarkt.de/de/search.html?query=Pixel%2010a
+        label: Suche Pixel 10a
+        kind: static
 
   - name: Saturn
     typ: handel

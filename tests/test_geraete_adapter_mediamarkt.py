@@ -43,6 +43,19 @@ _URL_PRODUKT = (
     "_samsung-galaxy-a57-256-gb-awesome-gray-dual-sim-3039261.html"
 )
 _URL_ANGEBOTE = "https://www.mediamarkt.de/de/campaign/angebote-smartphones"
+_SUCHE = "https://www.mediamarkt.de/de/search.html?query="
+_SUCHEN = (
+    "iPhone%2018%20Pro",
+    "iPhone%2017",
+    "iPhone%20Air",
+    "iPhone%2017e",
+    "Galaxy%20S26",
+    "Galaxy%20S26%20Ultra",
+    "Galaxy%20Z%20Fold8",
+    "Galaxy%20Z%20Flip8",
+    "Pixel%2011",
+    "Pixel%2010a",
+)
 _EHRLICHE_UA = "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
 
 
@@ -162,8 +175,11 @@ def test_die_ausgelieferte_konfiguration_haelt_was_der_hinweis_verspricht():
     assert "isProductOfTypeMarketplace" in anbieter.hinweis
     assert anbieter.user_agent == _EHRLICHE_UA
     assert anbieter.rate_limit_sekunden >= 10
-    assert len(anbieter.einstiege) == 1
-    assert anbieter.einstiege[0].url == _URL_ANGEBOTE
+    urls = [e.url for e in anbieter.einstiege]
+    assert urls[0] == _URL_ANGEBOTE
+    suchen = urls[1:]
+    assert len(suchen) == len(set(suchen)) == len(_SUCHEN)
+    assert suchen == [_SUCHE + q for q in _SUCHEN]
 
 
 def test_konfigurierter_einstieg_ist_nach_robots_erlaubt():
@@ -174,6 +190,7 @@ def test_konfigurierter_einstieg_ist_nach_robots_erlaubt():
     anbieter = lade_quellen(_WURZEL).nach_name("MediaMarkt")
     for einstieg in anbieter.einstiege:
         assert regeln.erlaubt(einstieg.url), einstieg.url
+    assert any("/de/search.html?query=" in e.url for e in anbieter.einstiege)
     assert regeln.erlaubt("https://www.mediamarkt.de/de/product/irgendein-handy.html")
 
 
@@ -199,7 +216,10 @@ def test_landet_als_listung_im_bestand(katalog, farben, angebote_html):
         datetime(2026, 11, 5, 12, tzinfo=UTC),
     )
     assert bilanz.status == "ok"
-    assert bilanz.gelesene_einstiege == {_URL_ANGEBOTE}
+    assert bilanz.gelesene_einstiege == {
+        _URL_ANGEBOTE,
+        *(_SUCHE + q for q in _SUCHEN),
+    }
     treffer = next(
         listung
         for listung in bilanz.listungen
@@ -208,7 +228,8 @@ def test_landet_als_listung_im_bestand(katalog, farben, angebote_html):
     assert treffer.preis_ohne_vertrag == 389.99
     assert treffer.anbieter == "MediaMarkt"
     assert treffer.abgerufen_am == "2026-11-05"
-    assert gesehene_user_agents == [_EHRLICHE_UA]
+    assert len(gesehene_user_agents) == 1 + len(_SUCHEN)
+    assert set(gesehene_user_agents) == {_EHRLICHE_UA}
 
 
 def test_schutzantwort_bricht_still_ab_ohne_wiederholung(katalog, farben):
@@ -241,3 +262,72 @@ def test_schutzantwort_bricht_still_ab_ohne_wiederholung(katalog, farben):
     assert versuche[0][1] == _EHRLICHE_UA, (
         "kein Wechsel des Absenders bei Schutzantwort"
     )
+
+
+@pytest.mark.parametrize(
+    ("status", "text"),
+    [
+        pytest.param(429, "zu viele Anfragen", id="429"),
+        pytest.param(
+            200, "<html><title>Just a moment...</title></html>", id="challenge"
+        ),
+    ],
+)
+def test_weitere_schutzantworten_brechen_ebenfalls_ab(katalog, farben, status, text):
+    anbieter = lade_quellen(_WURZEL).nach_name("MediaMarkt")
+    anbieter.rate_limit_sekunden = 0
+    versuche = []
+
+    def hole(url, kopfzeilen=None, user_agent=None):
+        if url.endswith("/robots.txt"):
+            return (200, "User-agent: *\nDisallow: /api/v1/msg\n")
+        versuche.append(url)
+        return (status, text)
+
+    bilanz = sammle_anbieter(
+        anbieter,
+        katalog,
+        farben,
+        hole,
+        "2026-11-05",
+        RobotsWaechter(hole=hole),
+        datetime(2026, 11, 5, 12, tzinfo=UTC),
+    )
+    assert bilanz.status == "fehler"
+    assert bilanz.listungen == []
+    assert versuche == [_URL_ANGEBOTE]
+
+
+def test_schutzantwort_mitten_im_lauf_stoppt_den_rest(katalog, farben, angebote_html):
+    """Erste Seite lesbar, zweite 403: die uebrigen neun werden nicht mehr
+    angefasst, das Gelesene bleibt erhalten."""
+    anbieter = lade_quellen(_WURZEL).nach_name("MediaMarkt")
+    anbieter.rate_limit_sekunden = 0
+    versuche = []
+
+    def hole(url, kopfzeilen=None, user_agent=None):
+        if url.endswith("/robots.txt"):
+            return (200, "User-agent: *\nDisallow: /api/v1/msg\n")
+        versuche.append(url)
+        return (200, angebote_html) if len(versuche) == 1 else (403, "Schutz")
+
+    bilanz = sammle_anbieter(
+        anbieter,
+        katalog,
+        farben,
+        hole,
+        "2026-11-05",
+        RobotsWaechter(hole=hole),
+        datetime(2026, 11, 5, 12, tzinfo=UTC),
+    )
+    assert len(versuche) == 2
+    assert bilanz.gelesene_einstiege == {_URL_ANGEBOTE}
+    assert bilanz.listungen
+    assert "Schutzantwort" in bilanz.grund
+
+
+def test_andere_anbieter_brechen_bei_403_nicht_ab(katalog, farben):
+    """Der Abbruch ist eine Eigenschaft des MediaMarkt-Adapters, nicht
+    des Collectors: Saturn faellt bei einem 403 weiter auf die naechste Seite."""
+    assert ADAPTER["mediamarkt_angebote"].bricht_bei_schutzantwort_ab is True
+    assert ADAPTER["saturn_brand"].bricht_bei_schutzantwort_ab is False
