@@ -404,3 +404,94 @@ def test_vorhandene_datei_gilt_nicht_als_angekommen(tmp_path):
     )
     bilanz = veroeffentliche(viele(tmp_path, 1), HEUTE, gh, schlaf=lambda s: None)
     assert (bilanz.hochgeladen, bilanz.fehlgeschlagen) == (0, 1)
+
+
+class RennenReleases(AttrappeReleases):
+    """Das Rennen vom 05.11.2026: ein anderer Lauf ersetzt das Release mitten im
+    Hochladen. Wie GitHub: Upload auf ein Release, das es nicht (mehr) gibt, ist
+    HTTP 404 mit der alten ID; ein neu angelegtes Release hat eine neue ID und ist
+    leer."""
+
+    def __init__(self, ersetze_nach: int, **kw) -> None:
+        super().__init__(**kw)
+        self.ersetze_nach, self.aufrufe = ersetze_nach, 0
+        self.weg: set[str] = set()
+
+    def hochladen(self, tag, dateien):
+        self.aufrufe += 1
+        if self.aufrufe == self.ersetze_nach + 1:
+            self.stand.pop(tag, None)
+            self.weg.add(tag)
+        if tag not in self.stand:
+            raise GhFehler(
+                "gh release upload: Exit 1: HTTP 404: Not Found "
+                f"(https://uploads.github.com/repos/o/r/releases/{self._id(tag)}/assets)"
+            )
+        super().hochladen(tag, dateien)
+
+    def release_anlegen(self, tag, titel):
+        super().release_anlegen(tag, titel)
+        self.ids[tag] = 5000 + len(self.angelegt)
+
+
+def test_release_mitten_im_hochladen_ersetzt_alle_bilder_landen(tmp_path, monkeypatch):
+    monkeypatch.setattr(beleg_ablage, "PAKET", 2)
+    bilder = viele(tmp_path, 7)
+    gh = RennenReleases(ersetze_nach=2)
+    bilanz = veroeffentliche(bilder, HEUTE, gh, schlaf=lambda s: None)
+    tag = "belege-2026-11-10"
+    assert sorted(gh.stand[tag]) == sorted(b.datei.name for b in bilder)
+    assert (bilanz.hochgeladen, bilanz.fehlgeschlagen, bilanz.fehler) == (7, 0, [])
+    assert gh.releases_geloescht == []
+    assert gh.angelegt == [tag, tag]
+    zeilen = "\n".join(bilanz.protokollzeilen())
+    assert "HTTP 404" in zeilen and "Release-ID gewechselt" in zeilen
+    assert "erneut hochgeladen" in zeilen
+
+
+def test_ohne_den_404_pfad_gingen_die_ersten_bilder_verloren(tmp_path, monkeypatch):
+    """Gegenprobe: ohne Abgleich nach dem Wechsel läge nur der Rest im neuen Release."""
+    monkeypatch.setattr(beleg_ablage, "PAKET", 2)
+    monkeypatch.setattr(beleg_ablage, "_hole_verlorene_nach", lambda *a, **k: None)
+    gh = RennenReleases(ersetze_nach=2)
+    veroeffentliche(viele(tmp_path, 7), HEUTE, gh, schlaf=lambda s: None)
+    assert len(gh.stand["belege-2026-11-10"]) < 7
+
+
+def test_release_anlegen_schon_da_ist_kein_fehler(tmp_path):
+    """Ein anderer Lauf legt das Release zwischen Suche und Anlegen an."""
+
+    class Schneller(AttrappeReleases):
+        def release_info(self, tag):
+            gefunden = super().release_info(tag)
+            if gefunden is None and not self.angelegt:
+                self.stand[tag] = []
+            return gefunden
+
+    gh = Schneller()
+    bilanz = veroeffentliche(viele(tmp_path, 2), HEUTE, gh, schlaf=lambda s: None)
+    assert (bilanz.hochgeladen, bilanz.fehlgeschlagen, bilanz.fehler) == (2, 0, [])
+    assert "schon angelegt" in "\n".join(bilanz.protokollzeilen())
+
+
+def test_anlegen_scheitert_dauerhaft_bleibt_benannter_fehler(tmp_path):
+    gh = AttrappeReleases(scheitern_bei=("anlegen",))
+    bilanz = veroeffentliche(viele(tmp_path, 2), HEUTE, gh, schlaf=lambda s: None)
+    assert bilanz.fehlgeschlagen == 2 and "kaputt" in bilanz.fehler[0]
+
+
+def test_entwurf_steht_im_protokoll(tmp_path):
+    gh = AttrappeReleases({"belege-2026-11-10": []})
+    gh.entwuerfe.add("belege-2026-11-10")
+    bilanz = veroeffentliche(viele(tmp_path, 1), HEUTE, gh, schlaf=lambda s: None)
+    assert "ist ein Entwurf" in "\n".join(bilanz.protokollzeilen())
+    assert bilanz.hochgeladen == 1
+
+
+def test_gh_release_info_liest_id_und_entwurf_und_kennt_fehlendes():
+    lauf = Lauf('{"id": 434989383, "draft": false}\n')
+    info = Gh(runner=lauf, repo="o/r").release_info("belege-2026-11-05")
+    assert (info.id, info.entwurf) == (434989383, False)
+    assert Gh(runner=Lauf("")).release_info("belege-2026-11-05") is None
+    with pytest.raises(GhFehler, match="unlesbar"):
+        Gh(runner=Lauf("kein json\n")).release_info("belege-2026-11-05")

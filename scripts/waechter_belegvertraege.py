@@ -15,7 +15,7 @@ import ast
 import operator
 from pathlib import Path
 
-BELEG_ABLAGE = "src/telco_radar/beleg_ablage.py"
+BELEG_ABLAGE = "src/telco_radar/beleg_gh.py"
 BELEG_SKRIPT = "scripts/belege_veroeffentlichen.py"
 BELEG_MANIFEST = "scripts/belege_manifest.py"
 FRIST_FUNKTION = "wirksame_frist"

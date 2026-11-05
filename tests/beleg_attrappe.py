@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 from pathlib import Path
 
-from telco_radar.beleg_ablage import GhFehler
+from telco_radar.beleg_ablage import GhFehler, ReleaseInfo
 
 
 class AttrappeReleases:
@@ -20,6 +20,8 @@ class AttrappeReleases:
         self.stand = {tag: list(d) for tag, d in (anhaenge or {}).items()}
         self.lesefehler = lesefehler
         self.scheitern_bei = scheitern_bei
+        self.ids: dict[str, int] = {}
+        self.entwuerfe: set[str] = set()
         self.angelegt: list[str] = []
         self.hochgeladen: list[tuple[str, list[str]]] = []
         self.releases_geloescht: list[str] = []
@@ -34,10 +36,24 @@ class AttrappeReleases:
             raise GhFehler("gh api: Exit 1: kein Zugriff")
         return {tag: list(d) for tag, d in self.stand.items()}
 
+    def _id(self, tag: str) -> int:
+        return self.ids.setdefault(tag, 1000 + len(self.ids))
+
+    def release_info(self, tag: str) -> ReleaseInfo | None:
+        if tag not in self.stand:
+            return None
+        return ReleaseInfo(self._id(tag), tag in self.entwuerfe)
+
     def release_anlegen(self, tag: str, titel: str) -> None:
+        """Wie ``gh release create``: ein bestehendes Release gibt HTTP 422."""
         self._pruefe("anlegen", tag)
+        if tag in self.stand:
+            raise GhFehler(
+                f"gh release create {tag}: Exit 1: HTTP 422: tag_name already exists"
+            )
         self.angelegt.append(tag)
-        self.stand.setdefault(tag, [])
+        self.stand[tag] = []
+        self.ids[tag] = 1000 + len(self.ids)
 
     def hochladen(self, tag: str, dateien: Sequence[Path]) -> None:
         """Wie GitHub: paralleles ``--clobber`` desselben Namens gibt HTTP 404."""
