@@ -42,7 +42,7 @@ scripts/pruefe_promo_seite.py noqa:E402 3
 scripts/pruefe_quellenvorschlag.py noqa:BLE001 7
 scripts/pruefe_quellenvorschlag.py noqa:E402 4
 scripts/quellen_zaehlen.py noqa:E402 1
-scripts/rescue_sources.py noqa:E402 5
+scripts/rescue_sources.py noqa:E402 4
 scripts/sniff_xhr.py noqa:BLE001 2
 scripts/sniff_xhr.py noqa:E402 2
 scripts/spike_saturn_geraetepreis.py noqa:BLE001 5
