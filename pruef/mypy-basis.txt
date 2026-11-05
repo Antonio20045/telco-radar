@@ -23,7 +23,6 @@ src/telco_radar/analyze/tco_store.py assignment 1
 src/telco_radar/analyze/vorsortierung.py arg-type 1
 src/telco_radar/collect/__init__.py assignment 2
 src/telco_radar/collect/__init__.py union-attr 1
-src/telco_radar/collect/geraete/__init__.py assignment 1
 src/telco_radar/collect/geraete/__init__.py union-attr 1
 src/telco_radar/collect/geraete/autoerkennung.py arg-type 1
 src/telco_radar/collect/geraete/congstar.py arg-type 7
