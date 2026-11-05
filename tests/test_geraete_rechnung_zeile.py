@@ -228,7 +228,11 @@ def _text(knoten) -> str:
 def test_jede_belastbare_zeile_zeigt_ihre_rechnung_im_kopf(bestand):
     _, karten, soup = bestand
     zeilen = soup.select("details.gr-bnd > summary")
-    belastbar = [k for k in karten if k["belastbar"] and not preis_veraltet(k)]
+    belastbar = [
+        k
+        for k in karten
+        if k["belastbar"] and not preis_veraltet(k) and not k.get("bedingter_tarif")
+    ]
     assert len(belastbar) > 20, "Bestand ohne belastbare Zeilen – der Test prüft nichts"
     rechnungen = [z.select_one(".gr-bnd-rechnung") for z in zeilen]
     mit = [_text(r) for r in rechnungen if r is not None and "=" in _text(r)]

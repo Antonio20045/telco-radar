@@ -31,9 +31,9 @@
     </details>{% endif %}{% endif %}{% endmacro %}
 
 {% macro buendelzeile(k) %}
-{# Ein veralteter Preis und ein Preis in Quarantäne („Preis in Prüfung“) werden zur
-   benannten Lücke (`geraete_preisstand.anzeige`): keine Zahl, keine Rechnung,
-   `data-gesamt` leer. #}
+{# Ein Plus-Tarif („nur mit Zweitprodukt“), ein veralteter Preis und ein Preis in
+   Quarantäne („Preis in Prüfung“) werden zur benannten Lücke
+   (`geraete_preisstand.anzeige`): keine Zahl, keine Rechnung, `data-gesamt` leer. #}
 {% set k = preis_anzeige(k) %}
 {# D3: das Ratenwort der kompakten Laufzeit-Angabe (siehe .gr-bnd-tarif
    unten) - "Monatsraten" bei einem zusammengelegten Bündelmonatspreis
@@ -93,7 +93,7 @@
       dieselben Wörter wie ihr Δ-Zustand (`notbremse`). Die Erklärung steht im `title`,
       nicht als Unterzeile. Ein berechneter Preis mit Rechnung trägt statt der
       Marke seinen Herleitungssatz unter der Rechnung. #}{%
-      if k.notbremse and not k.herleitung_satz and not k.quarantaene %} <span class="gr-kk-marke gr-kk-marke--notbremse"
+      if k.notbremse and not k.herleitung_satz and not k.quarantaene and not k.bedingter_tarif %} <span class="gr-kk-marke gr-kk-marke--notbremse"
       title="{{ k.notbremse.satz }}">{{ k.notbremse.kurz }}</span>{% endif %}{%
       if k.alt_marke %} <span class="gr-kk-marke gr-kk-marke--alt">{{
       k.alt_marke }}</span>{% endif %}{%

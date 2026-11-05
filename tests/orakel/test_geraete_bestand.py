@@ -1485,11 +1485,11 @@ _PF_FAELLE = (
     (
         "samsung-galaxy-s26-ultra-256",
         "o2",
-        "O2 Mobile Unlimited M Plus mit 100 MBit/s (24 Mon.)",
+        "O2 Mobile Unlimited M mit 100 MBit/s (24 Mon.)",
     ),
     ("google-pixel-11-256", "congstar", "Allnet Flat S"),
     ("google-pixel-11-256", "Vodafone", "Mobil XS"),
-    ("google-pixel-11-256", "o2", "O2 Mobile on Demand M Plus mit 50 GB+ (24 Mon.)"),
+    ("google-pixel-11-256", "o2", "O2 Mobile on Demand M mit 50 GB+ (24 Mon.)"),
 )
 _PF_MINDESTFAELLE = len(_PF_FAELLE)
 
@@ -2712,8 +2712,9 @@ def test_pruefer_der_csv_kopf_widerspricht_nicht_seiner_zeitraum_spalte(gw_seite
             b.get("tarif_name") or "",
             str(b.get("laufzeit_monate") or ""),
         )
+        plus = b["anbieter"] == "o2" and "Plus" in (b.get("tarif_name") or "").split()
         luecke_je_schluessel.setdefault(schluessel, set()).add(
-            _gw_leitzahl(b, blaetter)[0] is None or not _gw_frisch(b, heute)
+            plus or _gw_leitzahl(b, blaetter)[0] is None or not _gw_frisch(b, heute)
         )
     stumm, unbenannt = [], []
     for z in zeilen:
