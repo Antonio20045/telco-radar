@@ -438,7 +438,7 @@ def test_der_zustand_steht_auf_der_zeile(tmp_path):
     tafel = lager(tmp_path)
     erneuert = tafel.select_one('.gr-bnd[data-zustand="refurbished"]')
     assert erneuert is not None
-    assert _text(erneuert.select_one(".gr-bnd-an")).endswith("erneuert")
+    assert "erneuert" in _text(erneuert.select_one(".gr-bnd-an"))
     assert erneuert.select_one(".gr-kk-marke--zustand") is not None
     neu = tafel.select_one('.gr-bnd[data-anbieter="o2"][data-zustand="neu"]')
     assert neu is not None

@@ -289,7 +289,9 @@ def _zeile(d) -> dict:
     assert kopf is not None, d.attrs
     an = kopf.select(":scope > .gr-bnd-an")
     assert len(an) == 1, d.attrs
-    marke = an[0].select_one(".gr-kk-marke")
+    marke = an[0].select_one(
+        ".gr-kk-marke:not(.gr-kk-marke--beleg):not(.gr-kk-marke--ohnebeleg)"
+    )
     return {
         "name": an[0].select_one(".gr-bnd-name").get_text(strip=True),
         "marke": marke.get_text(" ", strip=True) if marke else None,
