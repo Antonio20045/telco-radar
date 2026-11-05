@@ -22,15 +22,15 @@ bei vorübergehenden Fehlern (404, „already exists“, 429, 5xx) nur den Rest 
 erneut (``VERSUCHE``). Was fehlt, steht als ``fehlgeschlagen`` mit Fehlerzeile;
 ``ausgelassen`` heißt nur: Zeit abgelaufen.
 
-``frist_ende`` ist die monotone Zeit, bis zu der ein neues Paket beginnen darf
-(CLAUDE.md Regel 8); der Rest heißt ``ausgelassen``. Außer ``gh`` gibt es kein Netz; das
-Token liegt nur in der Umgebung (``GH_TOKEN``), nie in Argumenten oder Ausgaben.
+Das Release wird je Tag einmal gesucht oder angelegt (``_sichere_release``; „existiert
+schon“ heißt: ein anderer Lauf war schneller). Bei HTTP 404 liest die Ablage die ID
+neu, legt ein fehlendes Release wieder an und lädt nach einem ID-Wechsel nach, was im
+alten Release lag. Alles steht im Protokoll der Bilanz; ein Release löscht hier nie
+etwas (nur ``raeume_auf``, nach Alter).
 """
 
 from __future__ import annotations
 
-import json
-import subprocess
 import time
 from collections import Counter
 from collections.abc import Callable, Mapping, Sequence
@@ -40,34 +40,50 @@ from pathlib import Path
 from typing import Protocol
 
 from .beleg_bilanz import Bilanz
+from .beleg_gh import (
+    ZEIT_JE_AUFRUF_S,
+    Gh,
+    GhFehler,
+    ReleaseInfo,
+    Runner,
+    runner_mit_frist,
+)
 from .beleg_regeln import (
     MAX_ANHAENGE_JE_RELEASE,
-    REPO,
     gross_tag,
     ist_abgelaufen,
-    ist_beleg_tag,
     ist_gross_tag,
     release_abgelaufen,
     tages_tag,
     zerlege_dateiname,
 )
 
+__all__ = [
+    "PAKET",
+    "ZEIT_JE_AUFRUF_S",
+    "Bild",
+    "Gh",
+    "GhFehler",
+    "ReleaseInfo",
+    "Releases",
+    "Runner",
+    "raeume_auf",
+    "runner_mit_frist",
+    "veroeffentliche",
+]
+
 PAKET = 40
 """Dateien je ``gh release upload``: klein genug, dass ein Fehler wenig kostet."""
-ZEIT_JE_AUFRUF_S = 300
 VERSUCHE = 5
 """Hochladeversuche je Paket bei vorübergehenden Fehlern."""
 PAUSE_S = 5.0
 """Pause vor Versuch n+1: ``PAUSE_S * n`` Sekunden, nur solange die Frist es zulässt."""
+SCHON_DA = ("already exists", "already_exists", "HTTP 422")
+"""Teile einer Meldung von ``gh release create``, wenn das Release schon besteht."""
 VORUEBERGEHEND = ("HTTP 404", "already exists", "HTTP 429", "HTTP 50")
 """Teile einer ``GhFehler``-Meldung, die eine Wiederholung lohnen."""
-Runner = Callable[[Sequence[str]], "subprocess.CompletedProcess[str]"]
 Anhaenge = Mapping[str, Sequence[str]]
 """Tag eines Releases -> Dateinamen seiner Anhänge."""
-
-
-class GhFehler(RuntimeError):
-    """Ein ``gh``-Aufruf ist gescheitert; die Meldung nennt nur den Befehl."""
 
 
 class Releases(Protocol):
@@ -75,6 +91,10 @@ class Releases(Protocol):
 
     def anhaenge(self) -> dict[str, list[str]]:
         """Release-Tag -> Dateinamen."""
+        ...
+
+    def release_info(self, tag: str) -> ReleaseInfo | None:
+        """ID des Releases zum Tag oder ``None``, wenn es keines gibt."""
         ...
 
     def release_anlegen(self, tag: str, titel: str) -> None:
@@ -92,123 +112,6 @@ class Releases(Protocol):
     def asset_loeschen(self, tag: str, datei: str) -> None:
         """Löscht eine Datei eines Releases."""
         ...
-
-
-def _lauf(argv: Sequence[str]) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(
-        argv, capture_output=True, text=True, timeout=ZEIT_JE_AUFRUF_S, check=False
-    )
-
-
-def runner_mit_frist(
-    ende: float,
-    uhr: Callable[[], float] = time.monotonic,
-    lauf: Callable[..., subprocess.CompletedProcess[str]] = subprocess.run,
-) -> Runner:
-    """Ein ``gh``-Runner, dessen Timeout die Restzeit bis ``ende`` (monotone Zeit)
-    ist, höchstens ``ZEIT_JE_AUFRUF_S``; ist sie aufgebraucht, scheitert der Aufruf
-    sofort mit ``TimeoutExpired`` (``Gh`` macht daraus ``GhFehler``), ohne ``gh`` zu
-    starten."""
-
-    def runner(argv: Sequence[str]) -> subprocess.CompletedProcess[str]:
-        rest = ende - uhr()
-        if rest <= 0:
-            raise subprocess.TimeoutExpired(list(argv), 0)
-        return lauf(
-            argv,
-            capture_output=True,
-            text=True,
-            timeout=min(ZEIT_JE_AUFRUF_S, rest),
-            check=False,
-        )
-
-    return runner
-
-
-class Gh:
-    """Die Release-Aufrufe der GitHub-CLI; ``runner`` ist im Test austauschbar."""
-
-    def __init__(self, runner: Runner = _lauf, repo: str = REPO) -> None:
-        self._runner, self._repo = runner, repo
-
-    def _gh(self, *argumente: str) -> str:
-        argv = ["gh", *argumente]
-        try:
-            fertig = self._runner(argv)
-        except (OSError, subprocess.TimeoutExpired) as fehler:
-            raise GhFehler(f"gh {argumente[0]} {argumente[1]}: {fehler}") from fehler
-        if fertig.returncode != 0:
-            letzte = (fertig.stderr or "").strip().splitlines()[-1:] or ["ohne Meldung"]
-            raise GhFehler(
-                f"gh {argumente[0]} {argumente[1]}: "
-                f"Exit {fertig.returncode}: {letzte[0]}"
-            )
-        return fertig.stdout or ""
-
-    def anhaenge(self) -> dict[str, list[str]]:
-        """Alle Releases im Schema mit ihren Anhängen; wirft ``GhFehler`` bei
-        Lesefehlern.
-
-        Eine Zeile JSON je Release (``--paginate`` mit ``--jq``), damit seitenweises
-        Lesen kein Listenende zerreißt.
-        """
-        ausgabe = self._gh(
-            "api",
-            "--paginate",
-            f"repos/{self._repo}/releases?per_page=100",
-            "--jq",
-            ".[] | {tag: .tag_name, dateien: [.assets[].name]}",
-        )
-        ergebnis: dict[str, list[str]] = {}
-        for zeile in ausgabe.splitlines():
-            if not zeile.strip():
-                continue
-            try:
-                eintrag = json.loads(zeile)
-                tag, dateien = str(eintrag["tag"]), list(eintrag["dateien"])
-            except (ValueError, KeyError, TypeError) as fehler:
-                raise GhFehler(f"gh api: Antwort unlesbar: {fehler}") from fehler
-            if ist_beleg_tag(tag):
-                ergebnis[tag] = sorted(str(d) for d in dateien)
-        return ergebnis
-
-    def release_anlegen(self, tag: str, titel: str) -> None:
-        """Legt ein Pre-Release ohne „latest“ an."""
-        self._gh(
-            "release",
-            "create",
-            tag,
-            "--repo",
-            self._repo,
-            "--title",
-            titel,
-            "--notes",
-            titel,
-            "--prerelease",
-            "--latest=false",
-        )
-
-    def hochladen(self, tag: str, dateien: Sequence[Path]) -> None:
-        """Lädt Dateien hoch; gleiche Namen werden überschrieben."""
-        self._gh(
-            "release",
-            "upload",
-            tag,
-            *map(str, dateien),
-            "--repo",
-            self._repo,
-            "--clobber",
-        )
-
-    def release_loeschen(self, tag: str) -> None:
-        """Löscht Release und Tag."""
-        self._gh(
-            "release", "delete", tag, "--repo", self._repo, "--yes", "--cleanup-tag"
-        )
-
-    def asset_loeschen(self, tag: str, datei: str) -> None:
-        """Löscht eine Datei eines Releases."""
-        self._gh("release", "delete-asset", tag, datei, "--repo", self._repo, "--yes")
 
 
 @dataclass(frozen=True)
@@ -231,6 +134,34 @@ def _freier_tag(
 def ist_voruebergehend(fehler: GhFehler) -> bool:
     """Lohnt eine Wiederholung (Release noch nicht sichtbar, Wettlauf, Last)?"""
     return any(teil in str(fehler) for teil in VORUEBERGEHEND)
+
+
+def _sichere_release(tag: str, gh: Releases, bilanz: Bilanz) -> bool:
+    """Findet das Release zum Tag oder legt es an; nie löschen. Wirft ``GhFehler``.
+
+    Gibt ``True`` zurück, wenn es nicht mehr das Release ist, das dieser Lauf zuvor
+    gesehen hat (neue ID oder neu angelegt): was dort lag, ist weg."""
+    alt = bilanz.release_ids.get(tag)
+    info = gh.release_info(tag)
+    if info is None:
+        try:
+            gh.release_anlegen(tag, f"Belege {tag.removeprefix('belege-')}")
+        except GhFehler as fehler:
+            if not any(teil in str(fehler) for teil in SCHON_DA):
+                raise
+            bilanz.protokoll.append(f"{tag}: Release schon angelegt (anderer Lauf)")
+        info = gh.release_info(tag)
+        if info is None:
+            raise GhFehler(f"gh release create {tag}: Release danach nicht auffindbar")
+        bilanz.protokoll.append(f"{tag}: Release angelegt, ID {info.id}")
+    if info.entwurf:
+        bilanz.protokoll.append(f"{tag}: Release {info.id} ist ein Entwurf")
+    gewechselt = alt is not None and alt != info.id
+    if gewechselt:
+        bilanz.protokoll.append(f"{tag}: Release-ID gewechselt von {alt} auf {info.id}")
+        bilanz.erneuert.add(tag)
+    bilanz.release_ids[tag] = info.id
+    return gewechselt
 
 
 def _lade_paket(
@@ -256,6 +187,17 @@ def _lade_paket(
             break
         except GhFehler as fehler:
             letzter = fehler
+        if "HTTP 404" in str(letzter):
+            bilanz.protokoll.append(
+                f"{tag}: HTTP 404 beim Hochladen (Versuch {versuch}), "
+                "Release-ID wird neu gelesen"
+            )
+            try:
+                if _sichere_release(tag, gh, bilanz):
+                    vorher, fertig, offen = set(), [], list(paket)
+                    vorhanden[tag] = []
+            except GhFehler as fehler:
+                bilanz.protokoll.append(f"{tag}: Release nicht prüfbar: {fehler}")
         try:
             da = set(gh.anhaenge().get(tag, []))
         except GhFehler:
@@ -278,6 +220,66 @@ def _lade_paket(
     return fertig
 
 
+def _lade_pakete(
+    tag: str,
+    eintraege: list[Bild],
+    vorhanden: dict[str, list[str]],
+    gh: Releases,
+    bilanz: Bilanz,
+    frist_ende: float | None,
+    uhr: Callable[[], float],
+    schlaf: Callable[[float], None],
+) -> list[Bild]:
+    """Lädt paketweise, zählt in der Bilanz und gibt das Angekommene zurück."""
+    angekommen: list[Bild] = []
+    for start in range(0, len(eintraege), PAKET):
+        paket = eintraege[start : start + PAKET]
+        if frist_ende is not None and uhr() >= frist_ende:
+            bilanz.ausgelassen += len(paket)
+            continue
+        fertig = _lade_paket(tag, paket, vorhanden, gh, bilanz, frist_ende, uhr, schlaf)
+        angekommen.extend(fertig)
+        if ist_gross_tag(tag):
+            bilanz.gross += len(fertig)
+        else:
+            bilanz.hochgeladen += len(fertig)
+    return angekommen
+
+
+def _hole_verlorene_nach(
+    tag: str,
+    angekommen: list[Bild],
+    vorhanden: dict[str, list[str]],
+    gh: Releases,
+    bilanz: Bilanz,
+    frist_ende: float | None,
+    uhr: Callable[[], float],
+    schlaf: Callable[[float], None],
+) -> None:
+    """Wurde das Release mitten im Lauf ersetzt, fehlen frühere Bilder: noch einmal
+    lesen, was wirklich liegt, und den Rest nachladen (ein Durchgang)."""
+    try:
+        da = set(gh.anhaenge().get(tag, []))
+    except GhFehler as fehler:
+        bilanz.protokoll.append(
+            f"{tag}: Abgleich nach Release-Wechsel unlesbar: {fehler}"
+        )
+        return
+    fehlend = [b for b in angekommen if b.datei.name not in da]
+    if not fehlend:
+        return
+    bilanz.protokoll.append(
+        f"{tag}: {len(fehlend)} Bilder lagen im ersetzten Release, werden erneut "
+        "hochgeladen"
+    )
+    if ist_gross_tag(tag):
+        bilanz.gross -= len(fehlend)
+    else:
+        bilanz.hochgeladen -= len(fehlend)
+    vorhanden[tag] = sorted(da)
+    _lade_pakete(tag, fehlend, vorhanden, gh, bilanz, frist_ende, uhr, schlaf)
+
+
 def _lade_tag(
     tag: str,
     eintraege: list[Bild],
@@ -288,30 +290,24 @@ def _lade_tag(
     uhr: Callable[[], float],
     schlaf: Callable[[float], None] = time.sleep,
 ) -> None:
-    """Legt das Release an (falls nötig) und lädt die Bilder paketweise hoch."""
+    """Sucht oder legt das Release an und lädt die Bilder paketweise hoch."""
     if frist_ende is not None and uhr() >= frist_ende:
         bilanz.ausgelassen += len(eintraege)
         return
-    if tag not in vorhanden:
-        try:
-            gh.release_anlegen(tag, f"Belege {tag.removeprefix('belege-')}")
-        except GhFehler as fehler:
-            bilanz.fehler.append(f"{tag}: {fehler}")
-            bilanz.fehlgeschlagen += len(eintraege)
-            return
-        vorhanden[tag] = []
-    for start in range(0, len(eintraege), PAKET):
-        paket = eintraege[start : start + PAKET]
-        if frist_ende is not None and uhr() >= frist_ende:
-            bilanz.ausgelassen += len(paket)
-            continue
-        angekommen = len(
-            _lade_paket(tag, paket, vorhanden, gh, bilanz, frist_ende, uhr, schlaf)
+    try:
+        _sichere_release(tag, gh, bilanz)
+    except GhFehler as fehler:
+        bilanz.fehler.append(f"{tag}: {fehler}")
+        bilanz.fehlgeschlagen += len(eintraege)
+        return
+    vorhanden.setdefault(tag, [])
+    angekommen = _lade_pakete(
+        tag, eintraege, vorhanden, gh, bilanz, frist_ende, uhr, schlaf
+    )
+    if tag in bilanz.erneuert:
+        _hole_verlorene_nach(
+            tag, angekommen, vorhanden, gh, bilanz, frist_ende, uhr, schlaf
         )
-        if ist_gross_tag(tag):
-            bilanz.gross += angekommen
-        else:
-            bilanz.hochgeladen += angekommen
 
 
 def veroeffentliche(

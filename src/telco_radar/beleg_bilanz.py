@@ -19,6 +19,12 @@ class Bilanz:
     releases_geloescht: list[str] = field(default_factory=list)
     assets_geloescht: int = 0
     doppelt: list[str] = field(default_factory=list)
+    release_ids: dict[str, int] = field(default_factory=dict)
+    """Zuletzt gesehene Release-ID je Tag (Wechsel mitten im Lauf fällt auf)."""
+    erneuert: set[str] = field(default_factory=set)
+    """Tags, deren Release während des Laufs ersetzt oder neu angelegt wurde."""
+    protokoll: list[str] = field(default_factory=list)
+    """Zeilen über Release-Funde, -Wechsel und Wiederholungen."""
 
     def zeilen(self) -> list[str]:
         """Protokollzeilen."""
@@ -41,3 +47,7 @@ class Bilanz:
             f"Belege: {len(self.doppelt)} Dateinamen mehrfach übergeben, je einmal "
             f"hochgeladen: {beispiele}{rest}"
         ]
+
+    def protokollzeilen(self) -> list[str]:
+        """Release-Funde, -Wechsel und Wiederholungen, eine Zeile je Ereignis."""
+        return [f"Belege: {z}" for z in self.protokoll]
