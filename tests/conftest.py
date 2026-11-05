@@ -299,15 +299,21 @@ class _VersandNull(dict):
         return Versandangabe(name, 0.0)
 
 
-_MIT_ECHTEM_VERSAND = ("/orakel/", "/golden/", "test_versandkosten")
+_MIT_ECHTEM_VERSAND = (
+    "/orakel/",
+    "/golden/",
+    "test_versandkosten",
+    "test_seiten_zahlen",
+)
 
 
 @pytest.fixture(autouse=True, scope="module")
 def _versand_nur_wo_er_gemeint_ist(request):
     """Die Rechenproben der Kernzahl bleiben vom Versand unberührt: sie rechnen mit
     0 € Versand, damit ihre Zahlen allein ihren Posten gehören. Mit den echten Beträgen
-    aus `config/versandkosten.yaml` rechnen die Orakel am Bestand, der goldene Lauf
-    und `tests/test_versandkosten.py`. Je Modul, damit auch seine Modul- und
+    aus `config/versandkosten.yaml` rechnen die Orakel am Bestand, der goldene Lauf,
+    `tests/test_versandkosten.py` und `tests/test_seiten_zahlen.py` (Seite gegen
+    Orakel). Je Modul, damit auch seine Modul- und
     Sitzungs-Fixtures denselben Stand sehen."""
     if importlib.util.find_spec("telco_radar") is None:
         yield
