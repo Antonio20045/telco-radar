@@ -167,6 +167,23 @@ def _gw_tarif_cent(buendel: dict, blaetter: dict, monate: int) -> int | None:
     return summe
 
 
+_GW_VERSAND_CENT = {
+    "vodafone": 998,
+    "telekom": 0,
+    "o2": 699,
+    "congstar": 499,
+    "1&1": 0,
+}
+"""Der Pflichtversand je Anbieter, am 05.11.2026 an den Originalen gemessen (Belege
+unter abnahme/versand-0511). Bewusst hier noch einmal und nicht aus
+`config/versandkosten.yaml` gelesen: weicht die Datei ab, schlägt das Orakel aus."""
+
+
+def _gw_versand(anbieter) -> _gw_Dez:
+    """Der Versand des Anbieters in Euro; ein Anbieter ohne Messung zählt 0 €."""
+    return _gw_Dez(_GW_VERSAND_CENT.get((anbieter or "").strip().casefold(), 0)) / 100
+
+
 def _gw_leitzahl(buendel: dict, blaetter: dict) -> tuple:
     """(gesamt_cent, H) der Soll-Definition; gesamt None = Lücke.
 
@@ -198,6 +215,7 @@ def _gw_leitzahl(buendel: dict, blaetter: dict) -> tuple:
     teile += [
         _gw_cent_oder_luecke(buendel.get("geraet_zuzahlung")),
         _gw_cent_oder_luecke(buendel.get("anschlusspreis")),
+        _GW_VERSAND_CENT.get((buendel.get("anbieter") or "").strip().casefold(), 0),
     ]
     if any(t is None for t in teile):
         return None, monate
@@ -520,10 +538,11 @@ _GW_PFLICHT_SPEICHER = "256"
 _GW_PFLICHT_ANBIETER = "congstar"
 _GW_PFLICHT_TARIF = "Allnet Flat S"
 _GW_PFLICHT_BAND = "m"
-_GW_PFLICHT_LEITZAHL = "1.216,00 €"
+_GW_PFLICHT_LEITZAHL = "1.220,99 €"
 _GW_PFLICHT_RATEN = {24: 3000, 36: 2000}
-_GW_PFLICHT_SOLL = {24: 121600, 36: 121600}
-"""Je Zahlweise die Kosten über H Monate: 1 + 24 × 20,00 + 24 × 30,00 + 15,00; mit
+_GW_PFLICHT_SOLL = {24: 122099, 36: 122099}
+"""Je Zahlweise die Kosten über H Monate: 1 + 24 × 20,00 + 24 × 30,00 + 15,00
++ 4,99 Pflichtversand congstar (Ziel 1b, 05.11.2026); mit
 36 Raten (H 36) eine Lücke, weil das Produktinformationsblatt keine Phasentabelle
 trägt und den Tarif ab Monat 25 nicht nennt (`_gw_nur_grundpreis`)."""
 _GW_LUECKE_AB_25 = "Tarifgrundpreis Monat 25–{} nicht gemessen"
@@ -647,9 +666,10 @@ def test_leitzahl_des_pflichtfalls_am_bestand(gw_seite):
     tco, blaetter, _db = _gw_rohdaten(gw_seite["bestand"])
     soll_cent, je_laufzeit, _tage = _gw_pflichtbuendel(tco, blaetter)
 
-    assert soll_cent == 121600, (
+    assert soll_cent == 122099, (
         f"Pflichtfall-Rechnung ergibt {soll_cent / 100} € - Verankerung "
-        "1.216,00 € (1 + 24 × 20,00 + 24 × 30,00 + 15,00) stimmt nicht mehr"
+        "1.220,99 € (1 + 24 × 20,00 + 24 × 30,00 + 15,00 + 4,99 Versand) "
+        "stimmt nicht mehr"
     )
     soll_je = _gw_pflicht_soll(je_laufzeit, blaetter)
     assert {n: c for n, (c, _h) in soll_je.items()} == _GW_PFLICHT_SOLL
@@ -796,7 +816,7 @@ def test_monatsschnitt_und_restschuld_des_pflichtfalls_am_bestand(gw_seite):
     soll_je = _gw_pflicht_soll(je_laufzeit, blaetter)
     assert {
         n: None if c is None else _gw_o_monat(c, h) for n, (c, h) in soll_je.items()
-    } == {24: {_gw_Dez("50.67")}, 36: {_gw_Dez("33.78")}}
+    } == {24: {_gw_Dez("50.87")}, 36: {_gw_Dez("33.92")}}
 
     block = _gw_paar_block(gw_seite["fragment"], _GW_PFLICHT_MODELL, _GW_PFLICHT_BAND)
     vorlagen = re.findall(
@@ -1209,10 +1229,21 @@ def test_geraete_tco_csv_gegen_die_eigene_rechnung(gw_seite):
         monate = max(int(lz), _GW_HORIZONT) if lz else None
         if buendel is not None and lz:
             monate = min(int(lz), _GW_HORIZONT)
-            soll = buendel * monate + (zu or 0) + (anschluss or 0)
+            soll = (
+                buendel * monate
+                + (zu or 0)
+                + (anschluss or 0)
+                + _gw_versand(r["Anbieter"])
+            )
         elif lz and tarif is not None and rate is not None:
             tarifmonate = min(monate, _GW_HORIZONT)
-            soll = (zu or 0) + tarif * tarifmonate + rate * int(lz) + (anschluss or 0)
+            soll = (
+                (zu or 0)
+                + tarif * tarifmonate
+                + rate * int(lz)
+                + (anschluss or 0)
+                + _gw_versand(r["Anbieter"])
+            )
         else:
             soll = None
         ist = _n(_gw_leitzahl_aus_zeile(r))
@@ -1380,7 +1411,11 @@ def test_geraete_tco_csv_simonly_mit_anschlusspreis(gw_seite):
         anschluss = _z(r["Anschlusspreis EUR"])
         if tarif is None or ist is None:
             continue
-        soll = tarif * 24 + (anschluss if anschluss is not None else _gw_Dez(0))
+        soll = (
+            tarif * 24
+            + (anschluss if anschluss is not None else _gw_Dez(0))
+            + _gw_versand(r["Anbieter"])
+        )
         if anschluss is not None:
             mit_anschluss += 1
         geprueft += 1
@@ -1458,7 +1493,7 @@ def test_ein_verfaelschter_schnappschuss_macht_den_pflichtfall_rot(gw_seite, tmp
             with pytest.raises(AssertionError, match="Pflichtfall"):
                 _gw_pflichtbuendel(tco_kopie, blaetter)
         else:
-            assert _gw_pflichtbuendel(tco_kopie, blaetter)[0] == 121600
+            assert _gw_pflichtbuendel(tco_kopie, blaetter)[0] == 122099
 
 
 _PF_MODELL_RE = re.compile(r"^(?P<basis>.+)-(?P<gb>\d+)gb(?:-.*)?$")
@@ -1598,7 +1633,29 @@ def pf_leitzahl_cent(satz: dict, blaetter: dict) -> int | None:
         assert tarif is not None and rate is not None, (
             f"{satz.get('id')} hat weder Buendelbetrag noch Tarif+Rate"
         )
-    return _gw_leitzahl(satz, blaetter)[0]
+    gesamt = _gw_leitzahl(satz, blaetter)[0]
+    if gesamt is None:
+        return None
+    return gesamt + _gw_versand_der_historie(satz)
+
+
+def _gw_versand_der_historie(satz: dict) -> int:
+    """Der Versand in Cent, den `_gw_leitzahl` noch nicht zählt.
+
+    Ein Satz mit `anbieter` ist dort schon bedient. Die Historie trägt keinen
+    Anbieternamen, nur die Kennung „anbieter:tarif“ (oder „buendel--anbieter--…“);
+    aus ihr kommt der Anbieter.
+    """
+    if (satz.get("anbieter") or "").strip():
+        return 0
+    kennung = str(satz.get("tarif_id") or satz.get("id") or "")
+    if ":" in kennung:
+        anbieter = kennung.split(":")[0]
+    elif "--" in kennung:
+        anbieter = kennung.split("--")[1]
+    else:
+        anbieter = ""
+    return _GW_VERSAND_CENT.get(anbieter.casefold(), 0)
 
 
 def pf_seitenzeilen(fragment: str, geraete_html: str = "") -> dict:
@@ -2109,34 +2166,34 @@ def test_pr_fuenf_leitzahlen_gegen_die_historie_nachgerechnet(gw_seite):
 
     Nachgerechnet am Schnappschuss, je juengste Messung der Laufzeit:
       congstar / iPhone 18 Pro 256 / Allnet Flat XS
-        24 Raten: 199,00 + 24 x 15,00 + 24 x 49,50 + 15,00  = 1.762,00 EUR
-        36 Raten: 199,00 + 24 x 15,00 + 36 x 33,00 + 15,00  = 1.762,00 EUR
+        24 Raten: 199,00 + 24 x 15,00 + 24 x 49,50 + 15,00 + 4,99  = 1.766,99 EUR
+        36 Raten: 199,00 + 24 x 15,00 + 36 x 33,00 + 15,00 + 4,99  = 1.766,99 EUR
       o2 / iPhone 18 Pro 256 / Unlimited M
-        24 Raten: 7,00 + 24 x 24,99 + 24 x 65,00 + 0,00     = 2.166,76 EUR
-        36 Raten: 1,00 + 24 x 24,99 + 36 x 43,50 + 0,00     = 2.166,76 EUR
+        24 Raten: 7,00 + 24 x 24,99 + 24 x 65,00 + 0,00 + 6,99  = 2.173,75 EUR
+        36 Raten: 1,00 + 24 x 24,99 + 36 x 43,50 + 0,00 + 6,99  = 2.173,75 EUR
       Vodafone / iPhone 18 Pro 256 / Mobil XS
-        12 Raten: 0,99 + 24 x 31,95 + 12 x 120,00 + 0,00    = 2.207,79 EUR
-        24 Raten: 0,99 + 24 x 31,95 + 24 x 60,00 + 0,00     = 2.207,79 EUR
-        36 Raten: 0,99 + 24 x 31,95 + 36 x 40,00 + 0,00     = 2.207,79 EUR
+        12 Raten: 0,99 + 24 x 31,95 + 12 x 120,00 + 0,00 + 9,98 = 2.217,77 EUR
+        24 Raten: 0,99 + 24 x 31,95 + 24 x 60,00 + 0,00 + 9,98 = 2.217,77 EUR
+        36 Raten: 0,99 + 24 x 31,95 + 36 x 40,00 + 0,00 + 9,98 = 2.217,77 EUR
       1&1 / iPhone 18 Pro 256 / All-Net-Flat S: 24 + 12, keine Zahl (02.11.2026)
       congstar / Galaxy S26 Ultra 256 / Allnet Flat S
-        24 Raten: 119,00 + 24 x 20,00 + 24 x 43,50 + 15,00  = 1.658,00 EUR
-        36 Raten: 119,00 + 24 x 20,00 + 36 x 29,00 + 15,00  = 1.658,00 EUR
+        24 Raten: 119,00 + 24 x 20,00 + 24 x 43,50 + 15,00 + 4,99  = 1.662,99 EUR
+        36 Raten: 119,00 + 24 x 20,00 + 36 x 29,00 + 15,00 + 4,99  = 1.662,99 EUR
     Verglichen wird nur mit der Zeile derselben Ratenlaufzeit.
     """
     historie = _pf_historie(gw_seite["bestand"])
     _tco, blaetter, _db = _gw_rohdaten(gw_seite["bestand"])
     o2_tarif = "o2-mobile-unlimited-m-mit-100-mbit-s-24-mon"
     faelle = (
-        ("apple-iphone-18-pro-256", "congstar", "allnet-flat-xs", 24, 176200),
-        ("apple-iphone-18-pro-256", "congstar", "allnet-flat-xs", 36, 176200),
-        ("apple-iphone-18-pro-256", "o2", o2_tarif, 24, 216676),
-        ("apple-iphone-18-pro-256", "o2", o2_tarif, 36, 216676),
-        ("apple-iphone-18-pro-256", "vodafone", "mobil-xs", 12, 220779),
-        ("apple-iphone-18-pro-256", "vodafone", "mobil-xs", 24, 220779),
-        ("apple-iphone-18-pro-256", "vodafone", "mobil-xs", 36, 220779),
-        ("samsung-galaxy-s26-ultra-256", "congstar", "allnet-flat-s", 24, 165800),
-        ("samsung-galaxy-s26-ultra-256", "congstar", "allnet-flat-s", 36, 165800),
+        ("apple-iphone-18-pro-256", "congstar", "allnet-flat-xs", 24, 176699),
+        ("apple-iphone-18-pro-256", "congstar", "allnet-flat-xs", 36, 176699),
+        ("apple-iphone-18-pro-256", "o2", o2_tarif, 24, 217375),
+        ("apple-iphone-18-pro-256", "o2", o2_tarif, 36, 217375),
+        ("apple-iphone-18-pro-256", "vodafone", "mobil-xs", 12, 221777),
+        ("apple-iphone-18-pro-256", "vodafone", "mobil-xs", 24, 221777),
+        ("apple-iphone-18-pro-256", "vodafone", "mobil-xs", 36, 221777),
+        ("samsung-galaxy-s26-ultra-256", "congstar", "allnet-flat-s", 24, 166299),
+        ("samsung-galaxy-s26-ultra-256", "congstar", "allnet-flat-s", 36, 166299),
     )
     zeilen = _pr_buendelzeilen(gw_seite)
     geprueft, luecken, fehler = 0, 0, []

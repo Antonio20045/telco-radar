@@ -98,9 +98,11 @@ from .tarif_model import (
     Preisphase,
     vertrag_basis,
 )
+from .tarif_phasensumme import phasensumme as phasensumme
 from .tco_kosten import Kosten as Kosten
 from .tco_kosten import kosten_ueber as kosten_ueber
 from .tco_kosten import zeitraum as zeitraum
+from .versandkosten import POSTEN_VERSAND, versand_fuer
 
 log = logging.getLogger(__name__)
 
@@ -741,36 +743,6 @@ def zeitraum_vergleichbar(monate: Optional[int], andere: Optional[int]) -> bool:
     return monate is not None and andere is not None and monate == andere
 
 
-def phasensumme(phasen: list[Preisphase], horizont: int) -> Optional[float]:
-    """Die Summe der Monatsentgelte ueber den Horizont - phasengewichtet.
-
-    Der Kern der Tarif-Rechnung, seit A1 (20.09.2026) Teil des Moduls der
-    Leitzahl: Leitzahl und Effektivpreis teilen EINE phasengewichtete Summe,
-    sonst rechneten zwei Stellen dasselbe Blatt verschieden
-    (`report/effektivpreis.py` re-exportiert sie). Eine Phase ohne Ende
-    laeuft bis zum Horizont; eine Phase, die darueber hinausreicht, wird
-    gekappt; Monate nach der letzten Phase laufen zum letzten bekannten
-    Preis weiter - die vorsichtige Annahme: der letzte Preis eines Tarifs
-    ist der Normalpreis, nicht der Rabattpreis.
-    """
-    if not phasen:
-        return None
-    summe = 0.0
-    abgedeckt = 0
-    for phase in sorted(phasen, key=lambda p: p.von_monat):
-        monate = phase.monate(horizont)
-        if monate <= 0:
-            continue
-        summe += monate * phase.betrag
-        abgedeckt += monate
-    if abgedeckt <= 0:
-        return None
-    if abgedeckt < horizont:
-        letzter = sorted(phasen, key=lambda p: p.von_monat)[-1]
-        summe += (horizont - abgedeckt) * letzter.betrag
-    return round(summe, 2)
-
-
 @dataclass
 class Tco:
     """Das Ergebnis einer TCO-Rechnung - mit allem, was ihr fehlt.
@@ -831,6 +803,13 @@ class Tco:
             and POSTEN_TARIF not in self.luecken
             and POSTEN_LAUFZEIT not in self.luecken
         )
+
+
+def _versandposten(buendel: Buendel) -> dict[str, float]:
+    """Der Pflichtversand als einmaliger Posten, dieselbe Regel wie in `kosten_ueber`
+    (`config/versandkosten.yaml`); ohne belegten oder bei 0 € Versand kein Posten."""
+    betrag = versand_fuer(buendel.anbieter).betrag
+    return {POSTEN_VERSAND: betrag} if betrag else {}
 
 
 def tco_24(buendel: Buendel) -> Tco:
@@ -920,6 +899,8 @@ def tco_24(buendel: Buendel) -> Tco:
         ergebnis.bestandteile[POSTEN_ANSCHLUSS] = buendel.anschlusspreis
     else:
         ergebnis.luecken.append(POSTEN_ANSCHLUSS)
+
+    ergebnis.bestandteile.update(_versandposten(buendel))
 
     if buendel.rabatte:
         ergebnis.rabatte_offen = round(
@@ -1215,6 +1196,10 @@ def tco_bindung(buendel: Buendel) -> TcoBindung:
         )
     else:
         e.luecken.append(POSTEN_ANSCHLUSS)
+    e.bestandteile.extend(
+        {"name": name, "betrag": betrag, "kategorie": KAT_EINMALIG}
+        for name, betrag in _versandposten(buendel).items()
+    )
 
     if buendel.rabatte and e.bindung:
         for r in buendel.rabatte:

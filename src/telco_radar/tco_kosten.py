@@ -34,6 +34,8 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
 from .tarif_model import Preisphase
+from .tco_monatsspannen import preise_im_monat, spanne, spannen
+from .versandkosten import POSTEN_VERSAND, hinweis_unbelegt, versand_fuer
 
 if TYPE_CHECKING:
     from .tco_model import Buendel
@@ -41,12 +43,14 @@ if TYPE_CHECKING:
 ZEITRAUM_OHNE_BINDUNG = 24
 POSTEN_ZEITRAUM = "Zeitraum"
 POSTEN_EINMALZAHLUNG = "Einmalzahlung bei Kündigung"
+EINMALPOSTEN = (POSTEN_VERSAND, POSTEN_EINMALZAHLUNG)
 POSTEN_NUR_24_PLUS_12 = "24-Monats-Preis (nur als 24 + 12 mit 36 Monaten erfasst)"
 SCHRITT_GERAET = "geraet"
 SCHRITT_TARIF = "tarif"
 SCHRITT_VERTRAG = "vertrag"
 SCHRITT_ANZAHLUNG = "anzahlung"
 SCHRITT_ANSCHLUSS = "anschluss"
+SCHRITT_VERSAND = "versand"
 SCHRITT_BARPREIS = "barpreis"
 SCHRITT_MONAT = "monat"
 SCHRITT_NUR_GERAET = "nur_geraet"
@@ -59,6 +63,7 @@ REIHENFOLGE_SCHRITTE = (
     SCHRITT_ANZAHLUNG,
     SCHRITT_ABLOESE,
     SCHRITT_ANSCHLUSS,
+    SCHRITT_VERSAND,
 )
 
 
@@ -88,7 +93,9 @@ class Kosten:
     `rechnung` sind dieselben Posten als Summanden (Gerät, Tarif, einmalig, ohne
     Nullbeträge); ihre Summe ist `gesamt`. Ohne `gesamt` stehen darin nur die
     gemessenen Posten, die fehlenden nennt `luecken`. `tarifmonate` sind die Monate
-    mit Tarif in der Zahl (`tarifmonate`; ein Bündelbetrag läuft über H).
+    mit Tarif in der Zahl (`tarifmonate`; ein Bündelbetrag läuft über H). `hinweise`
+    nennen, was die Zahl trägt, ohne sie zu entwerten: ein Versand ohne Beleg zählt
+    0 €, und der Hinweis sagt es (`config/versandkosten.yaml`).
     """
 
     gesamt: float | None = None
@@ -99,6 +106,7 @@ class Kosten:
     luecken: list[str] = field(default_factory=list)
     rechnung: list[Rechenschritt] = field(default_factory=list)
     tarifmonate: int | None = None
+    hinweise: list[str] = field(default_factory=list)
 
 
 def zeitraum(buendel: Buendel) -> int | None:
@@ -175,7 +183,7 @@ def _vertrag(k: Kosten, betrag: float, laufzeit: int | None, h: int) -> None:
     if laufzeit is None:
         k.luecken.append(POSTEN_LAUFZEIT)
     elif h > laufzeit:
-        k.luecken.append(f"{POSTEN_BUENDEL} Monat {_spanne(laufzeit + 1, h)}")
+        k.luecken.append(f"{POSTEN_BUENDEL} Monat {spanne(laufzeit + 1, h)}")
     else:
         k.posten[f"{POSTEN_BUENDEL} über {h} Monate"] = round(betrag * h, 2)
         k.rechnung.append(
@@ -198,8 +206,8 @@ def _tarif(k: Kosten, buendel: Buendel, h: int) -> None:
         k.luecken.append(POSTEN_TARIF)
         return
     t = k.tarifmonate = min(h, tarifmonate(buendel))
-    offen = [m for m in range(1, t + 1) if _preise_im_monat(phasen, m) != 1]
-    k.luecken += [f"{POSTEN_TARIF} Monat {s}" for s in _spannen(offen)]
+    offen = [m for m in range(1, t + 1) if preise_im_monat(phasen, m) != 1]
+    k.luecken += [f"{POSTEN_TARIF} Monat {s}" for s in spannen(offen)]
     summe = None if offen else phasensumme(phasen, t)
     if summe is not None:
         k.posten[f"Tarif über {t} Monate"] = summe
@@ -209,7 +217,7 @@ def _tarif(k: Kosten, buendel: Buendel, h: int) -> None:
     elif offen[0] > 1:
         k.rechnung += tarifschritte(phasen, offen[0] - 1)
     if h < pflicht:
-        k.luecken.append(f"{POSTEN_TARIF} Monat {_spanne(h + 1, pflicht)}")
+        k.luecken.append(f"{POSTEN_TARIF} Monat {spanne(h + 1, pflicht)}")
 
 
 def monatsschritte(schritte: list[Rechenschritt]) -> list[Rechenschritt]:
@@ -355,6 +363,21 @@ def _geraet_und_anschluss(k: Kosten, buendel: Buendel) -> None:
             k.posten[f"Geräteraten über {laufzeit} Monate"] = summe
             k.rechnung.append(Rechenschritt(SCHRITT_GERAET, laufzeit, rate, summe))
     _posten(k, POSTEN_ANSCHLUSS, buendel.anschlusspreis, SCHRITT_ANSCHLUSS)
+    _versand(k, buendel)
+
+
+def _versand(k: Kosten, buendel: Buendel) -> None:
+    """Der Pflichtversand als einmaliger Posten, für jeden Anbieter dieselbe Regel.
+
+    Der Betrag steht je Anbieter in `config/versandkosten.yaml` (Beleg, Datum,
+    Screenshot). Ohne belegten Betrag zählt der Versand 0 € und `hinweise` nennt
+    die Lücke; ein Betrag von 0 € bleibt ohne Posten (Antonio, 05.11.2026).
+    """
+    angabe = versand_fuer(buendel.anbieter)
+    if angabe.betrag is None:
+        k.hinweise.append(hinweis_unbelegt(buendel.anbieter))
+    if angabe.betrag:
+        _posten(k, POSTEN_VERSAND, angabe.betrag, SCHRITT_VERSAND)
 
 
 def _mit_abloese(buendel: Buendel, h: int | None) -> bool:
@@ -375,26 +398,3 @@ def _posten(k: Kosten, name: str, betrag: float | None, art: str) -> None:
     else:
         k.posten[name] = betrag
         k.rechnung.append(Rechenschritt(art, None, betrag, betrag))
-
-
-def _preise_im_monat(phasen: list[Preisphase], monat: int) -> int:
-    """Wie viele Phasen einen Preis für `monat` nennen."""
-    return sum(
-        p.von_monat <= monat and (p.bis_monat is None or monat <= p.bis_monat)
-        for p in phasen
-    )
-
-
-def _spannen(monate: list[int]) -> list[str]:
-    """Aufeinanderfolgende Monate als „25–36“, ein einzelner als „25“."""
-    spannen: list[list[int]] = []
-    for monat in monate:
-        if spannen and monat == spannen[-1][1] + 1:
-            spannen[-1][1] = monat
-        else:
-            spannen.append([monat, monat])
-    return [_spanne(von, bis) for von, bis in spannen]
-
-
-def _spanne(von: int, bis: int) -> str:
-    return f"{von}–{bis}" if bis > von else f"{von}"

@@ -19,6 +19,7 @@ from ..tco_kosten import (
     SCHRITT_MONAT,
     SCHRITT_NUR_GERAET,
     SCHRITT_TARIF,
+    SCHRITT_VERSAND,
     SCHRITT_VERTRAG,
     Kosten,
     Rechenschritt,
@@ -34,6 +35,7 @@ WORT_JE_SCHRITT = {
     SCHRITT_TARIF: "Tarif",
     SCHRITT_ANZAHLUNG: "Anzahlung",
     SCHRITT_ANSCHLUSS: "Anschluss",
+    SCHRITT_VERSAND: "Versand",
     SCHRITT_MONAT: "Monatspreis",
     SCHRITT_NUR_GERAET: "nur Gerät",
     SCHRITT_ABLOESE: "Ablöse nach Monat 24",
@@ -98,6 +100,7 @@ def felder(kosten: Kosten, rabattiert: bool = False) -> dict:
     return {
         "rechnung": zum_lesen(monatsschritte(kosten.rechnung), rabattiert),
         "rechnung_luecken": luecken_zum_lesen(kosten.luecken),
+        "versand_hinweise": list(kosten.hinweise),
     }
 
 

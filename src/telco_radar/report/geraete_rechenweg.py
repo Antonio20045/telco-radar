@@ -24,6 +24,7 @@ from ..tco_model import (
     Buendel,
     kosten_ueber,
 )
+from ..versandkosten import POSTEN_VERSAND
 from .anbieter_farben import stil_fuer
 from .geraete_tco_karten import label_der_leitzahl, tarif_anreichern
 from .verlauf import MONATE_DE
@@ -205,8 +206,8 @@ def _rechung(messung: dict, tarife: dict | None = None) -> dict | None:
             }
         )
 
-    _posten(POSTEN_ZUZAHLUNG, kosten.posten.get(POSTEN_ZUZAHLUNG))
-    _posten(POSTEN_ANSCHLUSS, kosten.posten.get(POSTEN_ANSCHLUSS))
+    for einmal in (POSTEN_ZUZAHLUNG, POSTEN_ANSCHLUSS, POSTEN_VERSAND):
+        _posten(einmal, kosten.posten.get(einmal))
     if b.buendel_monatlich is not None:
         _posten(
             POSTEN_BUENDEL,

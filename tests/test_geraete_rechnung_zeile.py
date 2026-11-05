@@ -350,11 +350,10 @@ def test_rechnung_ist_zugeklappt_sichtbar_ohne_querscroll(
     assert not mass["quer"]
 
 
-def test_tafel_sagt_einmal_ohne_versandkosten(bestand):
-    """Versand rechnet bei keinem Anbieter mit. Seit 10.10.2026 steht die
-    Bündelliste nicht mehr auf der Seite und mit ihr der Vermerk; geprüft
-    werden die Daten: kein Summand und kein Posten einer Karte ist Versand,
-    und die Summanden ergeben die Kernzahl ohne weiteren Betrag."""
+def test_summanden_der_karten_ergeben_die_kernzahl(bestand):
+    """Die Summanden jeder Karte ergeben die Kernzahl ohne weiteren Betrag. Der
+    Versand (Ziel 1b) ist ein Summand wie die anderen; mit echten Beträgen
+    prüft ihn `test_versandkosten.py`, hier rechnet die Fixture mit 0 €."""
     site, karten, soup = bestand
     seite = BeautifulSoup(
         (site / "geraete.html").read_text(encoding="utf-8"), "html.parser"
@@ -372,7 +371,6 @@ def test_tafel_sagt_einmal_ohne_versandkosten(bestand):
         ]
     ]
     assert worte, "keine Summanden gelesen - der Test prüft nichts"
-    assert not [w for w in worte if "versand" in w.lower()], worte
     for k in belastbar:
         summe = sum(s["betrag"] * (s["anzahl"] or 1) for s in k["rechnung"])
         assert round(summe, 2) == pytest.approx(k["gesamt"], abs=0.011), k["tarif"]
