@@ -33,7 +33,7 @@
 - Der Bestand wird vor Bündel- und Referenzstufe gespeichert; ein Fehler danach kostet keinen Messtag (ein Messtag ist nicht nachholbar, ein Maßstab schon).
 - Quellentod meldet der Lauf auf drei Wegen: Actions-Log, Quellenseite, Mail. Abdeckungsmail: kein Messtag im Bestand ist rot; Mailkanal ohne Secrets ist nur `::warning`; eingerichteter Kanal mit gescheiterter Zustellung ist rot.
 - Die Geräteseite rendert täglich, `render_site` bekommt als `heute` aber den Tag des jüngsten Radar-Berichts; Frische-Bezug ist der spätere von Berichtstag und `updated` des Bündel-Stores.
-- Abrufe gehen mit der Kennung `TelcoRadar/1.0`; ein Anbieter-Override gilt auch für robots.txt. Aus Actions antwortet die Telekom-Tarifseite mit einer 202-Challenge.
+- Abrufe gehen mit der Kennung `TelcoRadar/1.0`; ein Anbieter-Override gilt auch für robots.txt. Aus Actions antwortet die Telekom-Tarifseite mit einer 202-Challenge. Nach 403/406, 429 oder einer 503-Challenge wechselt `fetch` weder Kennung noch Kopfzeilen (eine Anfrage, danach Abbruch; 429 nur einmal bei `Retry-After` ≤ 60 s). Achtung: `http.user_agent` in `config/settings.yaml` ist derzeit eine Browser-Kennung, nicht `TelcoRadar/1.0`.
 
 ## Radar-Lauf (`radar.yml`)
 - Job-Timeout 50 min, Kernlauf rund 27 min. Geräte-Stufe im Wochenlauf aus (`geraete_enabled: false`). Stufen nach dem Kernlauf (Übersetzung) rechnen ihr Budget gegen die Restzeit des Jobs abzüglich der Reserve fürs Veröffentlichen; eine angebrochene Reserve heißt: nicht anfangen.

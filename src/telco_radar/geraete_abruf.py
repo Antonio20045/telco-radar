@@ -5,6 +5,21 @@ from __future__ import annotations
 from collections.abc import Callable
 
 
+class Abruf(tuple):
+    """`(status, text)` und, ob der Anbieter mit einer Schutzantwort geantwortet hat.
+
+    Ein Tupel aus genau zwei Werten, damit `status, text = hole(...)` bleibt;
+    `schutz` kommt als Attribut dazu (403, 406, 429, 503 mit Challenge)."""
+
+    schutz: bool
+
+    def __new__(cls, status: int, text: str, schutz: bool = False):
+        """Zweiertupel `(status, text)` mit dem Merkmal `schutz`."""
+        self = super().__new__(cls, (status, text))
+        self.schutz = schutz
+        return self
+
+
 def hole_fabrik(http_cfg: dict) -> Callable:
     """`(status, text)` statt Response oder Ausnahme.
 
@@ -24,7 +39,7 @@ def hole_fabrik(http_cfg: dict) -> Callable:
     Schnittstelle einwandfrei antwortet. Ein Host ohne robots.txt ist der Normalfall im
     Web, nicht der Sonderfall.
     """
-    from .collect.http import StatusFehler, fetch
+    from .collect.http import SchutzAntwort, StatusFehler, fetch
 
     def hole(
         url: str,
@@ -33,8 +48,9 @@ def hole_fabrik(http_cfg: dict) -> Callable:
         einmalig: bool = False,
         vor_weiterleitung: Callable | None = None,
     ):
-        """`einmalig=True`: ein Versuch mit der konfigurierten Kennung, kein
-        Wechsel auf die Browser-Kennung, kein Backoff (`fetch(schnell=True)`).
+        """`einmalig=True`: ein Versuch, kein Backoff, kein Warten auf
+        `Retry-After` (`fetch(schnell=True)`). Die Kennung wechselt `fetch`
+        nie mehr.
         `vor_weiterleitung(ziel)` prueft jede Weiterleitung vor dem Sprung."""
         cfg = http_cfg if not user_agent else {**http_cfg, "user_agent": user_agent}
         try:
@@ -46,7 +62,11 @@ def hole_fabrik(http_cfg: dict) -> Callable:
                 vor_weiterleitung=vor_weiterleitung,
             )
         except StatusFehler as exc:
-            return (exc.response.status_code, exc.response.text)
-        return (antwort.status_code, antwort.text)
+            return Abruf(
+                exc.response.status_code,
+                exc.response.text,
+                schutz=isinstance(exc, SchutzAntwort),
+            )
+        return Abruf(antwort.status_code, antwort.text)
 
     return hole

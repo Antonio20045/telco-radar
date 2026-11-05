@@ -11,7 +11,7 @@ from datetime import datetime
 
 from ..config import Config, Source, Operator
 from ..models import Item
-from .http import configure_throttle, deadline
+from .http import SchutzAntwort, configure_throttle, deadline
 from .rss import collect_rss
 from .json_api import collect_json
 from .newsroom import collect_newsroom
@@ -24,6 +24,34 @@ _QUELLEN_FRIST = 75.0
 
 
 _JS_GLEICHZEITIG = threading.BoundedSemaphore(4)
+
+_SPERR_STATUS = re.compile(r"Schutzantwort (\d{3})")
+
+
+def _sperrvermerk(exc: Exception | None, datum: str) -> dict:
+    """Welche Quelle den Abruf gesperrt hat: Status und Datum fuer die Quellenseite.
+
+    Nur `SchutzAntwort` zaehlt; jeder andere Fehler ist keine Sperre.
+    """
+    if not isinstance(exc, SchutzAntwort):
+        return {}
+    return {
+        "schutz": True,
+        "schutz_status": exc.response.status_code,
+        "schutz_datum": datum,
+    }
+
+
+def _sperrvermerk_aus_grund(grund: str, datum: str) -> dict:
+    """Dasselbe fuer eine stillgelegte Quelle, deren Grund noch die Sperre nennt."""
+    treffer = _SPERR_STATUS.search(grund) if "SchutzAntwort" in grund else None
+    if treffer is None:
+        return {}
+    return {
+        "schutz": True,
+        "schutz_status": int(treffer.group(1)),
+        "schutz_datum": datum,
+    }
 
 
 def _collect_source(
@@ -146,6 +174,10 @@ def collect_all(
                         "count": 0,
                         "seconds": 0.0,
                         "error": e.quarantaene_grund if e else "",
+                        **_sperrvermerk_aus_grund(
+                            e.quarantaene_grund if e else "",
+                            (e.letzter_lauf if e else "") or jetzt.date().isoformat(),
+                        ),
                     }
                 )
         if uebersprungen:
@@ -201,6 +233,7 @@ def collect_all(
                 rec["status"] = "fail"
                 rec["count"] = 0
                 rec["error"] = f"{type(exc).__name__}: {str(exc)[:140]}"
+                rec.update(_sperrvermerk(exc, jetzt.date().isoformat()))
                 log.warning(
                     "FAIL  %-22s %-45s -> %s (%.1fs)",
                     (operator or src.name)[:22],

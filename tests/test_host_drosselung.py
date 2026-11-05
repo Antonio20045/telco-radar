@@ -161,7 +161,8 @@ def test_frist_bricht_die_wiederholungen_ab(monkeypatch):
 
 def test_ohne_frist_bleibt_die_ausdauer_erhalten(monkeypatch):
     """Fuer eine ausgewaehlte Quelle im Lauf ist die Leiter richtig - ein
-    verlorener Abruf kostet dort eine Woche."""
+    verlorener Abruf kostet dort eine Woche. Seit 05.11.2026 ohne zweiten Absender:
+    drei Versuche (ein Abruf plus zwei Backoff-Stufen) mit derselben Kennung."""
     import httpx
 
     from telco_radar.collect import http as http_mod
@@ -176,7 +177,7 @@ def test_ohne_frist_bleibt_die_ausdauer_erhalten(monkeypatch):
     monkeypatch.setattr(http_mod, "_BACKOFF_WAITS", (0.0, 0.0))
     with pytest.raises(httpx.HTTPError):
         http_mod.fetch("https://tot.de/feed", {"timeout_seconds": 1})
-    assert len(versuche) == 6
+    assert len(versuche) == 3
 
 
 def test_frist_gilt_nur_im_eigenen_thread():

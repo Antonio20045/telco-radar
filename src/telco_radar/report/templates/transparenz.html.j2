@@ -236,6 +236,27 @@
   {% endif %}
 </div>
 
+{# Gesperrte Quellen: kommen aus run.sources (Feld schutz, gesetzt von
+   collect_all bei SchutzAntwort); nichts davon steht hier fest. #}
+{% set gesperrt = run.sources | selectattr('schutz') | list %}
+<div class="card" id="gesperrt">
+  <div class="card-head"><h2>Gesperrte Quellen</h2></div>
+  {% if gesperrt %}
+  <p class="card-sub">Diese Quellen haben beim letzten Lauf den Abruf gesperrt; wir umgehen Sperren nicht, deshalb fehlen ihre Daten.</p>
+  <div class="rowtable">
+    {% for s in gesperrt | sort(attribute='name') %}
+    <div class="rowtable-row">
+      <span class="col-src-name"><a href="{{ s.url }}" target="_blank" rel="noopener">{{ s.name }}</a></span>
+      <span class="col-src-type">Status {{ s.schutz_status }}</span>
+      <span class="col-src-count">{{ s.schutz_datum | date_de }}</span>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="card-sub">Beim letzten Lauf hat keine Quelle den Abruf gesperrt.</p>
+  {% endif %}
+</div>
+
 <details class="evidence" style="margin-top:24px">
   <summary><span>Alle {{ run.source_summary.total }} abgefragten Quellen</span><small>mit Status und Meldungszahl</small></summary>
   <div class="evidence-body">

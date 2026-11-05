@@ -47,7 +47,8 @@ def test_gegenprobe_serverfehler_wird_weiter_wiederholt(naht):
 
 
 def test_gegenprobe_anderer_client_fehler_bleibt_bei_der_ausdauer(naht):
+    """Seit 05.11.2026 ohne zweiten Absender: ein Abruf plus zwei Backoff-Stufen."""
     gesehen = naht(400)
     with pytest.raises(httpx.HTTPStatusError):
         http.fetch("https://www.saturn.de/de/brand/apple/iphone/iphone-17", {})
-    assert len(gesehen) == 6
+    assert len(gesehen) == 3

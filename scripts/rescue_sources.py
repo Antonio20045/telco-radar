@@ -19,6 +19,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import logging
 import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
@@ -27,11 +28,18 @@ from urllib.parse import urljoin, urlsplit
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 import feedparser  # noqa: E402
-import httpx  # noqa: E402
 from bs4 import BeautifulSoup  # noqa: E402
 
-from telco_radar.collect.http import BROWSER_UA, BOT_UA  # noqa: E402
+from telco_radar.collect.http import (  # noqa: E402
+    BOT_UA,
+    Antwort,
+    HttpFehler,
+    SchutzAntwort,
+    fetch,
+)
 from telco_radar.config import Config, Operator, Source, load_config  # noqa: E402
+
+log = logging.getLogger(__name__)
 
 COMMON_FEED_PATHS = [
     "feed",
@@ -59,26 +67,24 @@ COMMON_FEED_PATHS = [
     "rss/news",
 ]
 
-_HEADERS_UA = (BROWSER_UA, BOT_UA)
 
+def _get(url: str, timeout: float = 15.0) -> Antwort | None:
+    """Ein Abruf mit der ehrlichen Kennung ueber `collect.http.fetch`.
 
-def _get(url: str, timeout: float = 15.0) -> httpx.Response | None:
-    for ua in _HEADERS_UA:
-        try:
-            resp = httpx.get(
-                url,
-                timeout=timeout,
-                follow_redirects=True,
-                headers={
-                    "User-Agent": ua,
-                    "Accept": "text/html,application/xhtml+xml,application/xml,*/*",
-                    "Accept-Language": "en;q=0.9,de;q=0.8",
-                },
-            )
-            if resp.status_code < 400:
-                return resp
-        except httpx.HTTPError:
-            continue
+    Gleiche Regel wie in der Pipeline: eine Schutzantwort (403, 406, 429,
+    503 mit Challenge) wird protokolliert und beendet den Abruf - keine zweite
+    Kennung, keine anderen Kopfzeilen, keine Wiederholung (CLAUDE.md Regel 4).
+    """
+    try:
+        return fetch(
+            url, {"user_agent": BOT_UA}, timeout_override=timeout, schnell=True
+        )
+    except SchutzAntwort as exc:
+        log.warning(
+            "SchutzAntwort %s -> %s, nicht umgangen", url, exc.response.status_code
+        )
+    except HttpFehler:
+        pass
     return None
 
 

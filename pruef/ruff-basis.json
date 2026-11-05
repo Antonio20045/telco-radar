@@ -108,10 +108,6 @@
  "scripts/quellen_zaehlen.py": {
   "B904": 1
  },
- "scripts/rescue_sources.py": {
-  "I001": 1,
-  "TID251": 1
- },
  "scripts/schiess_screenshot.py": {
   "F401": 1
  },
@@ -155,7 +151,7 @@
  "src/telco_radar/analyze/buendel_abdeckung.py": {
   "D101": 2,
   "D102": 1,
-  "D103": 3
+  "D103": 2
  },
  "src/telco_radar/analyze/category_sweep.py": {
   "D103": 1,

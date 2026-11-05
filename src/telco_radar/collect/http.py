@@ -1,13 +1,15 @@
-"""Shared HTTP fetch with user-agent fallback and rate-limit backoff.
+"""Gemeinsamer HTTP-Abruf: ehrliche Kennung, keine Umgehung von Bot-Schutz.
 
-Some newsrooms block browser UAs from datacenter IPs, others block anything
-that does not look like a browser -> we try the configured UA first and retry
-once with the alternate style on 403/406.
+Eine Schutzantwort (403, 406, 429, eine 503 mit Challenge) beendet den Abruf
+nach GENAU EINER Anfrage: kein Wechsel von User-Agent oder Kopfzeilen, keine
+Wiederholung. Bis zum 05.11.2026 wechselte `fetch` nach 403/406 auf eine
+Chrome-Kennung mit Client-Hints (oder umgekehrt) und versuchte es erneut; das
+war ein Umweg um eine Sperre (CLAUDE.md Regel 4).
 
-News aggregators (notably Google News RSS) throttle bursts of requests from
-shared cloud IPs with 429/503. We retry those a couple of times with a short
-backoff, which clears the transient throttling that happens when many feeds
-fire at once. A UA swap cannot fix a 5xx, so we do not waste a second UA on it.
+Ausnahme 429: ein Header `Retry-After` von hoechstens 60 Sekunden wird EINMAL
+abgewartet; alles andere bricht ab. Serverfehler (500, 502, 503 ohne Challenge)
+sind keine Schutzantwort und werden mit kurzem Backoff wiederholt, mit
+derselben Kennung.
 """
 
 from __future__ import annotations
@@ -23,6 +25,8 @@ from typing import Any
 from urllib.parse import urlsplit
 
 import httpx
+
+from .schutz import RETRY_AFTER_MAX, SCHUTZ_STATUSES, ist_challenge, retry_after
 
 log = logging.getLogger(__name__)
 
@@ -53,9 +57,7 @@ def _ca_bundle():
         return True
 
 
-_UA_SWAP_STATUSES = {403, 406}
 _ENDGUELTIGE_STATUSES = {404, 410}
-_BACKOFF_STATUSES = {429, 500, 502, 503}
 _BACKOFF_WAITS = (4.0, 9.0)
 Transport = httpx.BaseTransport
 TRANSPORT: Transport | None = None
@@ -63,23 +65,10 @@ _WEG = {"content-encoding", "content-length", "transfer-encoding", "set-cookie"}
 
 
 def _ist_ehrliche_kennung(ua: str) -> bool:
-    """True, wenn `ua` sich selbst als das Programm ausgibt statt als Browser.
+    """True, wenn `ua` sich als das Programm ausgibt statt als Browser.
 
-    Bis zum 05.09.2026 gab es dafuer genau EINEN bekannten Wert (`BOT_UA`),
-    und die UA-Logik unten verglich stumpf auf Gleichheit damit. Der
-    per-Anbieter-UA-Override (BRIEF_SATURN_ADAPTER_R2) fuehrt eine ZWEITE
-    ehrliche Kennung ein - dieselbe Projekt-Identitaet
-    ("TelcoRadar/1.0"), aber mit einer anderen Kontaktadresse
-    (`+https://telco-radar.onrender.com/ueber` statt des Repo-Links). Ein
-    reiner Gleichheitsvergleich haette diese zweite Kennung wie eine
-    unbekannte, browserfremde UND unehrliche Zeichenkette behandelt: sie
-    haette Chrome-Client-Hints bekommen (Widerspruch in sich, siehe unten)
-    und als Fallback die ALTE `BOT_UA` gezogen statt des Browser-UA - beides
-    das Gegenteil dessen, was ein ehrlicher Absender verspricht. Der
-    Praefix-Vergleich erkennt JEDE TelcoRadar-Kennung als ehrlich, ohne die
-    bestehenden zwei Werte (`BOT_UA`, `BROWSER_UA`) oder ihre Rollen
-    zueinander zu aendern.
-    """
+    Jede `TelcoRadar/1.0`-Kennung zaehlt (`BOT_UA`, der Anbieter-Override mit
+    anderer Kontaktadresse); nur ein Browser-UA bekommt Client-Hints."""
     return (ua or "").startswith("TelcoRadar/1.0")
 
 
@@ -167,6 +156,11 @@ def _frist_abgelaufen() -> bool:
     return ende is not None and time.monotonic() >= ende
 
 
+def _frist_reicht_fuer(sekunden: float) -> bool:
+    ende = getattr(_frist, "ende", None)
+    return ende is None or time.monotonic() + sekunden < ende
+
+
 def _hole(url: str, **art: Any) -> httpx.Response:
     """GET ins echte Netz, über die Naht ``TRANSPORT``, wenn sie gesetzt ist."""
     if TRANSPORT is None:
@@ -206,7 +200,18 @@ def _hole_gepruefte_weiterleitung(
 Zeitueberschreitung = httpx.TimeoutException
 HttpFehler = httpx.HTTPError
 StatusFehler = httpx.HTTPStatusError
+
+
 Antwort = httpx.Response
+
+
+class SchutzAntwort(httpx.HTTPStatusError):
+    """Schutzantwort (403/406/429, 503 mit Challenge); ein StatusFehler."""
+
+
+def schutz(resp: httpx.Response, text: str) -> SchutzAntwort:
+    """Die Schutzantwort-Ausnahme zu `resp`."""
+    return SchutzAntwort(text, request=resp.request, response=resp)
 
 
 def get(url: str, **art: Any) -> httpx.Response:
@@ -250,96 +255,91 @@ def fetch(
     schnell: bool = False,
     vor_weiterleitung: Any = None,
 ) -> httpx.Response:
-    """GET with UA fallback + short backoff on rate limits; 404 und 410 sind endgültig.
+    """GET mit EINER Kennung; Schutzantwort endet nach einem Abruf.
 
-    `schnell=True` schaltet beides ab: ein User-Agent, ein Versuch, kein
-    Backoff. Gedacht fuer die BREITENSUCHE (scripts/finde_quellen.py), wo
-    neun von zehn geprobten Adressen erwartungsgemaess 404 sind. Dort ist die
-    Ausdauer oben nicht Robustheit, sondern der Engpass: eine tote Adresse
-    kostet sonst zwei User-Agents mal drei Versuche plus 4 s und 9 s Backoff,
-    also ueber eine Minute - mal sechs Adressen je Firma mal hunderte Firmen.
-    Fuer den LAUF selbst bleibt die Ausdauer richtig und Standard: dort ist
-    jede Quelle ausgewaehlt, und ein verlorener Abruf kostet eine Woche.
+    404/410 sind endgueltig. 403, 406, 503 mit Challenge und jede Antwort mit
+    `cf-mitigated`: `SchutzAntwort`, eine Anfrage, keine andere Kennung, keine
+    anderen Kopfzeilen. 429: keine Wiederholung, ausser `Retry-After` nennt
+    hoechstens `RETRY_AFTER_MAX` Sekunden (einmal warten, einmal wiederholen).
+    500/502/503 ohne Challenge und Netzfehler: Backoff `_BACKOFF_WAITS`.
 
-    `vor_weiterleitung(ziel)` schaltet das blinde Folgen von Weiterleitungen
-    ab: jede wird erst dem Aufrufer zur Pruefung vorgelegt (siehe
-    `_hole_gepruefte_weiterleitung`).
+    `schnell=True`: ein Versuch, kein Backoff, kein `Retry-After`-Warten
+    (Breitensuche, Adapter mit Abbruch bei Schutzantwort).
+    `vor_weiterleitung(ziel)` legt jede Weiterleitung vorab zur Pruefung vor
+    (siehe `_hole_gepruefte_weiterleitung`).
     """
     timeout = float(timeout_override or http_cfg.get("timeout_seconds", 20))
-    primary = http_cfg.get("user_agent", BROWSER_UA)
-    fallback = BROWSER_UA if _ist_ehrliche_kennung(primary) else BOT_UA
-    uas = (primary,) if schnell else (primary, fallback)
-    wartezeiten = (0.0,) if schnell else (0.0, *_BACKOFF_WAITS)
-
+    ua = http_cfg.get("user_agent", BOT_UA)
     site_root = f"{urlsplit(url).scheme}://{urlsplit(url).netloc}/"
+    headers = {
+        "User-Agent": ua,
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,"
+        "application/rss+xml;q=0.9,application/atom+xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "de-DE,de;q=0.9,en;q=0.8",
+        "Referer": site_root,
+    }
+    if not _ist_ehrliche_kennung(ua):
+        headers.update(_CLIENT_HINTS)
+    if extra_headers:
+        headers.update(extra_headers)
 
+    backoff = [] if schnell else list(_BACKOFF_WAITS)
+    retry_after_genutzt = False
     last_exc: Exception | None = None
-    endgueltig: httpx.HTTPStatusError | None = None
-    for ua in uas:
-        headers = {
-            "User-Agent": ua,
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,"
-            "application/rss+xml;q=0.9,application/atom+xml;q=0.9,*/*;q=0.8",
-            "Accept-Language": "de-DE,de;q=0.9,en;q=0.8",
-            "Referer": site_root,
-        }
-        if not _ist_ehrliche_kennung(ua):
-            headers.update(_CLIENT_HINTS)
-        if extra_headers:
-            headers.update(extra_headers)
-        for wait in wartezeiten:
-            if wait:
-                if _frist_abgelaufen():
-                    break
-                time.sleep(wait + random.uniform(0, 1.0))
+    wait = 0.0
+    while True:
+        if wait:
             if _frist_abgelaufen():
                 break
-            try:
-                with _gate.slot(url):
-                    if vor_weiterleitung is None:
-                        resp = _hole(
-                            url, timeout=timeout, headers=headers, follow_redirects=True
-                        )
-                    else:
-                        resp = _hole_gepruefte_weiterleitung(
-                            url, vor_weiterleitung, timeout=timeout, headers=headers
-                        )
-                if resp.status_code in _ENDGUELTIGE_STATUSES:
-                    endgueltig = httpx.HTTPStatusError(
-                        f"status {resp.status_code}",
-                        request=resp.request,
-                        response=resp,
-                    )
-                    break
-                if resp.status_code in _UA_SWAP_STATUSES:
-                    last_exc = httpx.HTTPStatusError(
-                        f"{resp.status_code} with UA '{ua[:24]}...'",
-                        request=resp.request,
-                        response=resp,
-                    )
-                    break
-                if resp.status_code in _BACKOFF_STATUSES:
-                    last_exc = httpx.HTTPStatusError(
-                        f"status {resp.status_code}",
-                        request=resp.request,
-                        response=resp,
-                    )
-                    continue
-                resp.raise_for_status()
-                return resp
-            except httpx.HTTPError as exc:
-                last_exc = exc
-                continue
-        if endgueltig is not None:
-            raise endgueltig
-        if (
-            isinstance(last_exc, httpx.HTTPStatusError)
-            and last_exc.response is not None
-            and last_exc.response.status_code in _BACKOFF_STATUSES
-        ):
-            break
+            time.sleep(wait)
         if _frist_abgelaufen():
             break
+        try:
+            with _gate.slot(url):
+                if vor_weiterleitung is None:
+                    resp = _hole(
+                        url, timeout=timeout, headers=headers, follow_redirects=True
+                    )
+                else:
+                    resp = _hole_gepruefte_weiterleitung(
+                        url, vor_weiterleitung, timeout=timeout, headers=headers
+                    )
+        except httpx.HTTPError as exc:
+            last_exc = exc
+            if not backoff:
+                break
+            wait = backoff.pop(0) + random.uniform(0, 1.0)
+            continue
+
+        status = resp.status_code
+        if status in _ENDGUELTIGE_STATUSES:
+            raise httpx.HTTPStatusError(
+                f"status {status}", request=resp.request, response=resp
+            )
+        if status in SCHUTZ_STATUSES or (status >= 400 and ist_challenge(resp)):
+            raise schutz(resp, f"Schutzantwort {status}, kein zweiter Versuch")
+        if status == 429:
+            pause = retry_after(resp)
+            if (
+                schnell
+                or retry_after_genutzt
+                or pause is None
+                or pause > RETRY_AFTER_MAX
+                or not _frist_reicht_fuer(pause)
+            ):
+                raise schutz(resp, "Schutzantwort 429, keine Wiederholung")
+            retry_after_genutzt = True
+            wait = pause
+            continue
+        try:
+            resp.raise_for_status()
+        except httpx.HTTPStatusError as exc:
+            last_exc = exc
+            if not backoff:
+                break
+            wait = backoff.pop(0) + random.uniform(0, 1.0)
+            continue
+        return resp
     raise last_exc if last_exc else RuntimeError(f"fetch failed: {url}")
 
 
