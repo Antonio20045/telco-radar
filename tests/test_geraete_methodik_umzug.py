@@ -122,6 +122,17 @@ def test_die_entfernten_lesehilfen_stehen_nicht_im_nichts(tmp_path):
     )
 
 
+def test_methodik_nennt_die_ratenregel_fuer_o2(tmp_path):
+    """Ziel 1b (05.11.2026): ein Satz sagt, wie o2 vergleichbar gemacht wird."""
+    geraete, quellen = _gebaut(tmp_path)
+    methodik = quellen.select_one("section#methodik")
+    assert methodik is not None
+    text = _sichtbarer_text(methodik)
+    assert "Vergleichsbasis sind 24 Monate Ratenzahlung" in text
+    assert "nie in der 24er-Ansicht" in text
+    assert "Vergleichsbasis sind 24 Monate" not in _sichtbarer_text(geraete)
+
+
 def test_geraeteseite_verlinkt_genau_einmal_auf_die_methodik(tmp_path):
     """Die Geräteseite bekommt höchstens EINEN Fußzeilen-Link 'Methodik'
     (Auftrag D4a) - kein Wissen geht verloren, es zieht nur um."""
