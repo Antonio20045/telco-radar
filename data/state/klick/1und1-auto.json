@@ -1,12 +1,12 @@
 {
  "anbieter": "1und1-auto",
- "datum": "2026-11-04",
- "dauer_sekunden": 2.5,
+ "datum": "2026-11-05",
+ "dauer_sekunden": 110.1,
  "format": 1,
  "frischegrenze_tage": 3,
- "grund": "robots.txt nicht lesbar (HTTP 502)",
+ "grund": null,
  "karte": "1und1.yaml",
- "laufstatus": "nicht_gelesen",
+ "laufstatus": "gelesen",
  "lesefrist_tage": 1,
  "name": "1&1",
  "seiten": [
@@ -14,29 +14,525 @@
    "adresse": "https://mobile.1und1.de/iphone-duo",
    "geraet": "apple-iphone-duo",
    "gescheitert": 0,
-   "grund": "robots.txt nicht lesbar (HTTP 502)",
-   "http_status": null,
-   "kombinationen": [],
-   "ladung": null,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://mobile.1und1.de/iphone-duo",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "96aec2b6e247451c8c63277a3e1a2998b6ce621f3ff524fdde5c964c9f579d90",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=37824923-fe71-431a-9776-982887d6b4d3",
+      "zeitpunkt": "2026-11-05T06:29:55Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 109.99,
+      "einmalzahlung": null
+     },
+     "diagnose": {
+      "antwort_betrag": true,
+      "antwort_einmalzahlung": true,
+      "antwort_laufzeit": 36,
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=37824923-fe71-431a-9776-982887d6b4d3",
+      "fundstellen": [],
+      "gleicher_betrag": false,
+      "kachel_betrag": true,
+      "kachel_einmalzahlung": false,
+      "ohne_suche": null
+     },
+     "echo_quelle": "Kachel der Folgeseite",
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/iphone-duo",
+     "auswahl": {
+      "laufzeit": "24+12",
+      "speicher": "256",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "3edbacf974975193294a973232624c4783cfd375c9c36f6cea1a8c86caea07e1",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=37824923-fe71-431a-9776-982887d6b4d3",
+      "zeitpunkt": "2026-11-05T06:29:55Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 77.99,
+      "einmalzahlung": 760.0
+     },
+     "diagnose": {
+      "antwort_betrag": true,
+      "antwort_einmalzahlung": true,
+      "antwort_laufzeit": 36,
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=37824923-fe71-431a-9776-982887d6b4d3",
+      "fundstellen": [
+       "window.oResult.data[\"product.tariff.monthlycostsgross.2.cost\"]",
+       "window.oResult.data[\"productlist.vendors.multi.tariff.monthlycostsgross.DE.3.cost\"][0]",
+       "window.oResult.data[\"productlist.vendors.multi.tariff.monthlycostsgross.DE.2.cost\"][0]",
+       "window.oResult.data[\"productlist.tariff.monthlycostsgross.3.cost\"][0]",
+       "window.oResult.data[\"productlist.tariff.monthlycostsgross.2.cost\"][0]",
+       "window.iTealiumInterface.history[2].final_dictionary[\"productlist.tariff.monthlycostsgross.1.3.cost\"]",
+       "window.iTealiumInterface.history[2].final_dictionary[\"productlist.tariff.monthlycostsgross.1.2.cost\"]",
+       "window.iTealiumInterface.history[2].input_dictionary[\"productlist.tariff.monthlycostsgross.1.3.cost\"]",
+       "window.iTealiumInterface.history[2].input_dictionary[\"productlist.tariff.monthlycostsgross.1.2.cost\"]",
+       "window.iTealiumInterface.history[2].input_object.productlist[\"tariff.monthlycostsgross\"][0][\"3\"].cost",
+       "window.iTealiumInterface.history[2].input_object.productlist[\"tariff.monthlycostsgross\"][0][\"2\"].cost",
+       "window.iTealiumInterface.history[1].final_dictionary[\"productlist.tariff.monthlycostsgross.1.3.cost\"]"
+      ],
+      "gleicher_betrag": true,
+      "kachel_betrag": true,
+      "kachel_einmalzahlung": true,
+      "ohne_suche": null
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/iphone-duo?color=STERNENWEISS&size=512",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "512",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "114f650b0bfe5ea5616c299eacfd7e7e75afb3bb18d42e739c47b29cc1c0b5c9",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=2a05cbe2-6b35-414f-a4d9-2bc3242a20c0",
+      "zeitpunkt": "2026-11-05T06:30:16Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 120.99,
+      "einmalzahlung": null
+     },
+     "diagnose": {
+      "antwort_betrag": true,
+      "antwort_einmalzahlung": true,
+      "antwort_laufzeit": 36,
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=2a05cbe2-6b35-414f-a4d9-2bc3242a20c0",
+      "fundstellen": [],
+      "gleicher_betrag": false,
+      "kachel_betrag": true,
+      "kachel_einmalzahlung": false,
+      "ohne_suche": null
+     },
+     "echo_quelle": "Kachel der Folgeseite",
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "512",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/iphone-duo?color=STERNENWEISS&size=512",
+     "auswahl": {
+      "laufzeit": "24+12",
+      "speicher": "512",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "adb4f8072e43a24ab4ef61640becc6e73a926710a523603d19a80289139c062d",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=2a05cbe2-6b35-414f-a4d9-2bc3242a20c0",
+      "zeitpunkt": "2026-11-05T06:30:17Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 84.99,
+      "einmalzahlung": 840.0
+     },
+     "diagnose": {
+      "antwort_betrag": true,
+      "antwort_einmalzahlung": true,
+      "antwort_laufzeit": 36,
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=2a05cbe2-6b35-414f-a4d9-2bc3242a20c0",
+      "fundstellen": [
+       "window.iTealiumInterface.history[0].final_dictionary[\"vendors.multi.tealium.inCart.product.tariff.monthlycostsgross.3.cost\"]",
+       "window.iTealiumInterface.history[0].final_dictionary[\"vendors.multi.tealium.inCart.product.tariff.monthlycostsgross.2.cost\"]",
+       "window.iTealiumInterface.history[0].final_dictionary[\"product.tariff.monthlycostsgross.2.cost\"]",
+       "window.iTealiumInterface.history[0].final_dictionary[\"productlist.vendors.multi.tariff.monthlycostsgross.DE.3.cost\"][0]",
+       "window.iTealiumInterface.history[0].final_dictionary[\"productlist.vendors.multi.tariff.monthlycostsgross.DE.2.cost\"][0]",
+       "window.iTealiumInterface.history[0].final_dictionary[\"productlist.tariff.monthlycostsgross.3.cost\"][0]",
+       "window.iTealiumInterface.history[0].final_dictionary[\"productlist.tariff.monthlycostsgross.2.cost\"][0]",
+       "window.iTealiumInterface.history[0].input_dictionary[\"productlist.tariff.monthlycostsgross.3.cost\"][0]",
+       "window.iTealiumInterface.history[0].input_dictionary[\"productlist.tariff.monthlycostsgross.2.cost\"][0]",
+       "window.iTealiumInterface.history[0].input_object.productlist[\"tariff.monthlycostsgross.3.cost\"][0]",
+       "window.iTealiumInterface.history[0].input_object.productlist[\"tariff.monthlycostsgross.2.cost\"][0]",
+       "window.iTealiumInterface.datalayers[1].data.productlist[\"tariff.monthlycostsgross.3.cost\"][0]"
+      ],
+      "gleicher_betrag": true,
+      "kachel_betrag": true,
+      "kachel_einmalzahlung": true,
+      "ohne_suche": null
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "512",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/iphone-duo?color=STERNENWEISS&size=1024",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "1024",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "9c440088f6bc63bb8d637f36e6d90daa4659cb02638935c21704d8f99f5c0f72",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=eae4d36a-8bb9-4095-b815-321373d6705e",
+      "zeitpunkt": "2026-11-05T06:30:38Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 140.99,
+      "einmalzahlung": null
+     },
+     "diagnose": {
+      "antwort_betrag": true,
+      "antwort_einmalzahlung": true,
+      "antwort_laufzeit": 36,
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=eae4d36a-8bb9-4095-b815-321373d6705e",
+      "fundstellen": [],
+      "gleicher_betrag": false,
+      "kachel_betrag": true,
+      "kachel_einmalzahlung": false,
+      "ohne_suche": null
+     },
+     "echo_quelle": "Kachel der Folgeseite",
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "1024",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/iphone-duo?color=STERNENWEISS&size=1024",
+     "auswahl": {
+      "laufzeit": "24+12",
+      "speicher": "1024",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "7cd61a0ee901221859806eaf94623dc8adb6d6aeceb7f9eba25d0aa86eb2fc4f",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=eae4d36a-8bb9-4095-b815-321373d6705e",
+      "zeitpunkt": "2026-11-05T06:30:38Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 98.99,
+      "einmalzahlung": 1010.0
+     },
+     "diagnose": {
+      "antwort_betrag": true,
+      "antwort_einmalzahlung": true,
+      "antwort_laufzeit": 36,
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=eae4d36a-8bb9-4095-b815-321373d6705e",
+      "fundstellen": [
+       "window.iTealiumInterface.history[0].final_dictionary[\"vendors.multi.tealium.inCart.product.tariff.monthlycostsgross.3.cost\"]",
+       "window.iTealiumInterface.history[0].final_dictionary[\"vendors.multi.tealium.inCart.product.tariff.monthlycostsgross.2.cost\"]",
+       "window.iTealiumInterface.history[0].final_dictionary[\"product.tariff.monthlycostsgross.2.cost\"]",
+       "window.iTealiumInterface.history[0].final_dictionary[\"productlist.vendors.multi.tariff.monthlycostsgross.DE.3.cost\"][0]",
+       "window.iTealiumInterface.history[0].final_dictionary[\"productlist.vendors.multi.tariff.monthlycostsgross.DE.2.cost\"][0]",
+       "window.iTealiumInterface.history[0].final_dictionary[\"productlist.tariff.monthlycostsgross.3.cost\"][0]",
+       "window.iTealiumInterface.history[0].final_dictionary[\"productlist.tariff.monthlycostsgross.2.cost\"][0]",
+       "window.iTealiumInterface.history[0].input_dictionary[\"productlist.tariff.monthlycostsgross.3.cost\"][0]",
+       "window.iTealiumInterface.history[0].input_dictionary[\"productlist.tariff.monthlycostsgross.2.cost\"][0]",
+       "window.iTealiumInterface.history[0].input_object.productlist[\"tariff.monthlycostsgross.3.cost\"][0]",
+       "window.iTealiumInterface.history[0].input_object.productlist[\"tariff.monthlycostsgross.2.cost\"][0]",
+       "window.iTealiumInterface.datalayers[1].data.productlist[\"tariff.monthlycostsgross.3.cost\"][0]"
+      ],
+      "gleicher_betrag": true,
+      "kachel_betrag": true,
+      "kachel_einmalzahlung": true,
+      "ohne_suche": null
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "1024",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/iphone-duo?color=STERNENWEISS&size=2048",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "2048",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "7edcd3eb8ba91b7fff938b997ab75be567b5bfa3f3755a37eed087d3da7a1a03",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=822c9516-62e7-4c7c-b3e1-0c8f4b4937a6",
+      "zeitpunkt": "2026-11-05T06:30:59Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 171.99,
+      "einmalzahlung": null
+     },
+     "diagnose": {
+      "antwort_betrag": true,
+      "antwort_einmalzahlung": true,
+      "antwort_laufzeit": 36,
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=822c9516-62e7-4c7c-b3e1-0c8f4b4937a6",
+      "fundstellen": [],
+      "gleicher_betrag": false,
+      "kachel_betrag": true,
+      "kachel_einmalzahlung": false,
+      "ohne_suche": null
+     },
+     "echo_quelle": "Kachel der Folgeseite",
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb",
+      "einmalzahlung"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "2048",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    },
+    {
+     "antwort_url": "https://mobile.1und1.de/iphone-duo?color=STERNENWEISS&size=2048",
+     "auswahl": {
+      "laufzeit": "24+12",
+      "speicher": "2048",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "aab210e46170c19755882b8707c38e28cf3144eabb00f818b28a6e6aef13777e",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=822c9516-62e7-4c7c-b3e1-0c8f4b4937a6",
+      "zeitpunkt": "2026-11-05T06:31:00Z"
+     },
+     "beleg_status": "offen",
+     "buendel": {
+      "buendelbetrag": 119.99,
+      "einmalzahlung": 1260.0
+     },
+     "diagnose": {
+      "antwort_betrag": true,
+      "antwort_einmalzahlung": true,
+      "antwort_laufzeit": 36,
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=822c9516-62e7-4c7c-b3e1-0c8f4b4937a6",
+      "fundstellen": [
+       "window.iTealiumInterface.history[0].final_dictionary[\"vendors.multi.tealium.inCart.product.tariff.monthlycostsgross.3.cost\"]",
+       "window.iTealiumInterface.history[0].final_dictionary[\"vendors.multi.tealium.inCart.product.tariff.monthlycostsgross.2.cost\"]",
+       "window.iTealiumInterface.history[0].final_dictionary[\"product.tariff.monthlycostsgross.2.cost\"]",
+       "window.iTealiumInterface.history[0].final_dictionary[\"productlist.vendors.multi.tariff.monthlycostsgross.DE.3.cost\"][0]",
+       "window.iTealiumInterface.history[0].final_dictionary[\"productlist.vendors.multi.tariff.monthlycostsgross.DE.2.cost\"][0]",
+       "window.iTealiumInterface.history[0].final_dictionary[\"productlist.tariff.monthlycostsgross.3.cost\"][0]",
+       "window.iTealiumInterface.history[0].final_dictionary[\"productlist.tariff.monthlycostsgross.2.cost\"][0]",
+       "window.iTealiumInterface.history[0].input_dictionary[\"productlist.tariff.monthlycostsgross.3.cost\"][0]",
+       "window.iTealiumInterface.history[0].input_dictionary[\"productlist.tariff.monthlycostsgross.2.cost\"][0]",
+       "window.iTealiumInterface.history[0].input_object.productlist[\"tariff.monthlycostsgross.3.cost\"][0]",
+       "window.iTealiumInterface.history[0].input_object.productlist[\"tariff.monthlycostsgross.2.cost\"][0]",
+       "window.iTealiumInterface.datalayers[1].data.productlist[\"tariff.monthlycostsgross.3.cost\"][0]"
+      ],
+      "gleicher_betrag": true,
+      "kachel_betrag": true,
+      "kachel_einmalzahlung": true,
+      "ohne_suche": null
+     },
+     "grund": null,
+     "luecken": [
+      "anzahlung",
+      "tarifphasen",
+      "tarifbindung",
+      "anschluss",
+      "volumen_gb"
+     ],
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "2048",
+      "tarif": "tariff-anf-s-mvl"
+     },
+     "werte": {
+      "anschluss": null,
+      "anzahlung": null,
+      "rate": null,
+      "ratenzahl": null,
+      "tarifbindung": null,
+      "tarifphasen": null,
+      "volumen_gb": null
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 2.0,
+    "anfragen": 28,
+    "beendet": 27,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {
+     "cdn.appdynamics.com": 1
+    },
+    "ohne_antwort_ms": 0,
+    "sekunden": 3.8,
+    "takte_ms": 1500,
+    "wartet_auf": "load"
+   },
    "speicher_gb": 256,
    "sperre": null,
-   "status": "gesperrt",
+   "status": "gelesen",
    "stoerung": null,
    "struktur": {
-    "anteil_felder": null,
-    "anteil_knoepfe": null,
-    "felder_gefunden": 0,
-    "felder_gesucht": 0,
-    "knoepfe_gefunden": 0,
-    "knoepfe_gesucht": 0
+    "anteil_felder": 0.21428571428571427,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 12,
+    "felder_gesucht": 56,
+    "knoepfe_gefunden": 9,
+    "knoepfe_gesucht": 9
    },
-   "verworfen": 0
+   "verworfen": 24
   }
  ],
- "ueberfaellig": [
-  "https://mobile.1und1.de/iphone-duo"
- ],
+ "ueberfaellig": [],
  "uebersichten": [],
  "vertragsform": "ein_vertrag",
- "zeitbudget_sekunden": 10263
+ "zeitbudget_sekunden": 10268
 }
