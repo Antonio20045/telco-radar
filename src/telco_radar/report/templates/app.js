@@ -5384,3 +5384,134 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
   addEventListener('resize', bild);
   bild();
 })();
+
+/* PREISPOSITION JE HERSTELLER (Antonio, 05.11.2026). Der Server zeichnet die
+   Ansicht „aktuell“; hier schaltet der Zeitraum (7 Tage, 30 Tage, eigener
+   Zeitraum) um. Gerechnet wird aus dem JSON im Dokument (#hm-daten), dieselbe
+   Rechnung wie geraete_hersteller.py (mittel_ueber_tage, zellen): je Modell das
+   Mittel der Messtage, je Hersteller das Mittel der Modelle, die einen Wert
+   haben. Fehlt ein Wert, bleibt die Zelle leer (nie 0). Rundung Math.round. */
+(function () {
+  var sec = document.getElementById('hersteller');
+  var roh = document.getElementById('hm-daten');
+  var zeit = document.getElementById('hm-zeit');
+  if (!sec || !roh || !zeit) return;
+  var D;
+  try { D = JSON.parse(roh.textContent); } catch (e) { return; }
+  var MINUS = '−', NB = ' ';
+  var eigen = document.getElementById('hm-eigen');
+  var von = document.getElementById('hm-von'), bis = document.getElementById('hm-bis');
+  var einheit = document.getElementById('hm-einheit');
+  var basis = einheit ? einheit.getAttribute('data-basis') : '';
+  zeit.hidden = false;
+
+  function tag(iso) { return iso.slice(8, 10) + '.' + iso.slice(5, 7) + '.'; }
+  function datum(iso) { return tag(iso) + iso.slice(0, 4); }
+  function plusTage(iso, n) {
+    var t = Date.UTC(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10)) + n * 864e5;
+    return new Date(t).toISOString().slice(0, 10);
+  }
+  function prozent(m) {
+    var r = Math.round(m);
+    return (r > 0 ? '+' : r < 0 ? MINUS : '') + Math.abs(r) + NB + '%';
+  }
+  function richtung(m) {
+    if (Math.abs(Math.round(m)) <= D.gleichauf) return 'gleichauf';
+    return m > 0 ? 'teurer' : 'günstiger';
+  }
+  function modelle(n) {
+    var w = n === 1 ? n + ' Modell' : n + ' Modelle';
+    return n < D.klein ? 'nur ' + w : w;
+  }
+  /* werte[modell][wettbewerber] fuer den gewaehlten Zeitraum */
+  function werteAktuell() { return { zeilen: D.aktuell, tage: 0 }; }
+  function werteVonBis(v, b) {
+    var idx = [];
+    D.tage.forEach(function (t, i) { if (t >= v && t <= b) idx.push(i); });
+    var zeilen = D.h.map(function (_, i) {
+      return D.w.map(function (_w, j) {
+        var s = 0, n = 0;
+        idx.forEach(function (k) {
+          var x = D.pct[k][i][j];
+          if (x !== null && x !== undefined) { s += x; n++; }
+        });
+        return n ? s / n : null;
+      });
+    });
+    return { zeilen: zeilen, tage: idx.length };
+  }
+  function mittel(zeilen, hersteller, j) {
+    var s = 0, n = 0;
+    zeilen.forEach(function (z, i) {
+      if (hersteller !== null && D.h[i] !== hersteller) return;
+      if (z[j] !== null && z[j] !== undefined) { s += z[j]; n++; }
+    });
+    return n ? { m: s / n, n: n } : null;
+  }
+  function zeichne(erg) {
+    [].forEach.call(sec.querySelectorAll('.gr-hm-zeile'), function (zeile) {
+      var h = zeile.getAttribute('data-hersteller');
+      var alle = zeile.classList.contains('gr-hm-zeile--alle');
+      [].forEach.call(zeile.querySelectorAll('.gr-hm-zelle'), function (zelle) {
+        var j = D.w.indexOf(zelle.getAttribute('data-anbieter'));
+        var e = j < 0 ? null : mittel(erg.zeilen, alle ? null : h, j);
+        var zahl = zelle.querySelector('.gr-hm-zahl');
+        var balken = zelle.querySelector('.gr-hm-balken');
+        var rr = zelle.querySelector('.gr-hm-r'), mm = zelle.querySelector('.gr-hm-m');
+        zelle.classList.toggle('gr-hm-leer', !e);
+        zelle.classList.toggle('gr-hm-duenn', !!e && e.n < D.klein);
+        if (!e) {
+          zelle.removeAttribute('data-wert'); zelle.removeAttribute('data-n');
+          zahl.textContent = '–'; balken.hidden = true;
+          rr.textContent = ''; mm.textContent = 'kein Preis';
+          return;
+        }
+        var b = Math.min(Math.abs(e.m), D.skala) / D.skala * 50;
+        zelle.setAttribute('data-wert', e.m.toFixed(2));
+        zelle.setAttribute('data-n', String(e.n));
+        zahl.textContent = prozent(e.m);
+        balken.hidden = false;
+        balken.style.left = (e.m >= 0 ? 50 : 50 - b).toFixed(2) + '%';
+        balken.style.width = b.toFixed(2) + '%';
+        rr.textContent = richtung(e.m) + ' · ';
+        mm.textContent = modelle(e.n);
+      });
+    });
+  }
+  function text(erg, v, b) {
+    if (!einheit) return;
+    var s = basis;
+    if (v === null) s += ' · Stand ' + datum(D.stand);
+    else if (!erg.tage) s += ' · Keine Messtage vom ' + datum(v) + ' bis ' + datum(b);
+    else s += ' · Mittel aus ' + erg.tage + (erg.tage === 1 ? ' Messtag' : ' Messtagen') +
+      ', ' + tag(v) + '–' + datum(b);
+    einheit.textContent = s;
+  }
+  function waehle(modus) {
+    var v = null, b = null, erg;
+    if (modus === 'aktuell') {
+      erg = werteAktuell();
+    } else {
+      if (modus === 'eigen') {
+        v = von.value || D.tage[0]; b = bis.value || D.stand;
+        if (v > b) { var t = v; v = b; b = t; }
+      } else {
+        b = D.stand; v = plusTage(b, -(+modus - 1));
+      }
+      erg = werteVonBis(v, b);
+    }
+    [].forEach.call(zeit.querySelectorAll('button[data-zeit]'), function (k) {
+      k.setAttribute('aria-pressed', String(k.getAttribute('data-zeit') === modus));
+    });
+    eigen.hidden = modus !== 'eigen';
+    zeichne(erg);
+    text(erg, v, b);
+  }
+  var modus = 'aktuell';
+  [].forEach.call(zeit.querySelectorAll('button[data-zeit]'), function (k) {
+    k.addEventListener('click', function () { modus = k.getAttribute('data-zeit'); waehle(modus); });
+  });
+  [von, bis].forEach(function (f) {
+    if (f) f.addEventListener('change', function () { if (modus === 'eigen') waehle(modus); });
+  });
+})();

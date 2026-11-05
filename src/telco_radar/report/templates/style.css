@@ -6375,5 +6375,52 @@ a.ki-k1-pille:hover{border-color:var(--ink)}
   .gr-pp-schmal{display:block}
 }
 
+/* Preisposition je Hersteller (Antonio, 05.11.2026): Matrix Hersteller x
+   Wettbewerber; Zahl = mittlerer Abstand Vodafone in %, Balken ab der roten
+   Vodafone-Linie (links günstiger, rechts teurer). Server zeichnet "aktuell",
+   app.js schaltet den Zeitraum. Farbe aus `gr-anb--<slug>`. */
+.gr-hm{margin:0 0 clamp(28px,5vh,48px)}
+.gr-hm-eigen{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:0 0 10px;font:400 14px var(--sans);color:var(--ink-3)}
+.gr-hm-eigen[hidden],.gr-hm-zeit[hidden]{display:none}
+.gr-hm-eigen label{display:inline-flex;align-items:center;gap:8px}
+.gr-hm-eigen input{font:400 15px var(--sans);color:var(--ink);background:var(--paper-2);border:1px solid var(--rule);border-radius:var(--radius-klein);padding:7px 10px}
+.gr-hm-tafel{display:grid;grid-template-columns:150px repeat(var(--hm-n,4),minmax(0,1fr));column-gap:22px;margin-top:6px}
+.gr-hm-achse{display:grid;grid-column:1/-1;grid-template-columns:subgrid;align-items:end;padding:0 0 10px;border-bottom:1px solid var(--rule-ink)}
+.gr-hm-kopf{display:flex;align-items:center;gap:8px;font:600 14px var(--sans);color:var(--ink)}
+.gr-hm-punkt{display:inline-block;flex:none;width:11px;height:11px;border-radius:50%;background:var(--anb-marker,var(--anb-ersatz));box-shadow:0 0 0 1.5px var(--anb-marker-rand,transparent)}
+.gr-hm-richtung{grid-column:2/-1;display:flex;justify-content:space-between;padding:6px 0 0;font:400 12px var(--sans);color:var(--ink-3)}
+.gr-hm-zeile{display:grid;grid-column:1/-1;grid-template-columns:subgrid;align-items:center;padding:16px 0;border-bottom:1px solid var(--rule)}
+.gr-hm-zeile--alle{border-bottom:0;border-top:1px solid var(--rule-ink);margin-top:-1px}
+.gr-hm-name{font:600 20px/1.2 var(--sans);letter-spacing:-.01em;color:var(--ink)}
+.gr-hm-zeile--alle .gr-hm-name,.gr-hm-zeile--alle .gr-hm-zahl{font-weight:500;color:var(--ink-2)}
+.gr-hm-zelle{display:grid;grid-template-columns:minmax(0,1fr);row-gap:5px;min-width:0}
+.gr-hm-wb{display:none}
+.gr-hm-zahl{font:600 30px/1 var(--sans);letter-spacing:-.03em;font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--ink)}
+.gr-hm-spur{position:relative;display:block;height:10px;border-radius:5px;background:var(--paper-3)}
+.gr-hm-spur::after{content:"";position:absolute;left:50%;top:-3px;bottom:-3px;width:2px;margin-left:-1px;background:var(--red)}
+.gr-hm-balken{position:absolute;top:0;bottom:0;border-radius:5px;background:var(--anb-marker,var(--anb-ersatz));box-shadow:inset 0 0 0 1.5px var(--anb-marker-rand,transparent)}
+.gr-hm-balken[hidden]{display:none}
+.gr-hm-n{font:400 13px var(--sans);color:var(--ink-3);white-space:nowrap}
+.gr-hm-leer .gr-hm-zahl{font:500 15px/30px var(--sans);letter-spacing:0;color:var(--ink-3)}
+.gr-hm-leer .gr-hm-spur{opacity:.45}
+.gr-hm-duenn .gr-hm-zahl,.gr-hm-duenn .gr-hm-spur{opacity:.55}
+.gr-hm-ohne{margin:12px 0 0;font:500 13px var(--sans);color:var(--ink-3)}
+.gr-hm-erklaerung{max-width:var(--wrap-text);margin:12px 0 0;font:400 14px/1.5 var(--sans);color:var(--ink-3)}
+.gr-hm-erklaerung p{margin:0 0 8px}
+@media (max-width:720px){
+  .gr-hm-tafel{grid-template-columns:68px repeat(var(--hm-n,4),minmax(0,1fr));column-gap:8px}
+  .gr-hm-kopf{gap:4px;font-size:11.5px}
+  .gr-hm-punkt{width:9px;height:9px}
+  .gr-hm-richtung{grid-column:2/-1;font-size:10.5px}
+  .gr-hm-zeile{padding:10px 0}
+  .gr-hm-name{font-size:14px;line-height:1.2;overflow-wrap:anywhere}
+  .gr-hm-zelle{row-gap:4px}
+  .gr-hm-zahl{font-size:17px;letter-spacing:-.02em}
+  .gr-hm-leer .gr-hm-zahl{font-size:15px;line-height:17px}
+  .gr-hm-spur{height:7px}
+  .gr-hm-n{font-size:10.5px;white-space:normal;line-height:1.2}
+  .gr-hm-r{display:none}
+}
+
 /* Handy: auf dem schmalen Verlauf tragen nur die Endpunkte eine Marke. */
 .gr-zr--schmal .gr-zr-punkt:not(.gr-zr-ende):not(.gr-zr-aktiv){opacity:0}

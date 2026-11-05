@@ -260,12 +260,19 @@ def test_die_erste_buendelzeile_ist_ohne_scroll_erreichbar(fixture_name, request
 
     Das Preisbild (`#preisposition`) steht seit 02.11.2026 auf Auftrag
     ganz oben, vor den Reitern; seine Höhe zählt zur Falz nicht mit, sonst
-    wäre jede Änderung an ihm ein Fehlschlag dieser Messung."""
+    wäre jede Änderung an ihm ein Fehlschlag dieser Messung. Dasselbe gilt
+    seit 05.11.2026 für die Herstellergrafik (`#hersteller`), die als erstes
+    Bild noch davor steht (Auftrag Antonio, Preisposition je Hersteller)."""
     s = request.getfixturevalue(fixture_name)
     preisbild = s.evaluate(
         "() => document.querySelector('#preisposition').offsetHeight"
     )
-    grenze = 2 * s.viewport_size["height"] + preisbild
+    herstellerbild = s.evaluate(
+        "() => { const e = document.querySelector('#hersteller');"
+        " return e ? e.offsetHeight + parseFloat("
+        "getComputedStyle(e).marginBottom) : 0 }"
+    )
+    grenze = 2 * s.viewport_size["height"] + preisbild + herstellerbild
     assert s.evaluate("() => !document.querySelector('#tafel-tco .gr-bnd')"), (
         "Bündelzeilen stehen noch auf der Seite"
     )

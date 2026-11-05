@@ -51,6 +51,7 @@ from ..geraete_model import (
 from . import (
     geraete_alarme,
     geraete_bereinigung,
+    geraete_hersteller,
     geraete_pruefung,
     geraete_tco_karten,
     geraete_tco_view,
@@ -1403,6 +1404,7 @@ def leer(fehler: str = "") -> dict:
         "verlauf": geraete_verlauf.leer(),
         "tco": geraete_tco_view.leer(),
         "zeitreihe": geraete_zeitreihe.leer(),
+        "hersteller": {"fehler": "", "leer": True},
         "ausfaelle": [],
         "katalog_modelle": [],
         "katalog_ab_preis": None,
@@ -1656,7 +1658,6 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
 
     laeden_mit_daten = _laeden(bestand)
     hersteller_mit_daten = _hersteller(bestand)
-
     tco_heute = _spaeterer_tag(heute, tco_db.updated) if heute else ""
     bestand_heute = _spaeterer_tag(heute, db.updated) if heute else ""
 
@@ -1691,7 +1692,7 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         )
         zeitreihe = geraete_zeitreihe.leer()
         ausfaelle.append(Ausfall.aus_ausnahme(ZEITREIHE_TEIL, exc))
-
+    hm = geraete_hersteller.ansicht(state_dir, tco, katalog, tarifbestand, tco_heute)
     zr_erlaubt = {
         k: b
         for k, b in ((zeitreihe.get("daten") or {}).get("erlaubt") or {}).items()
@@ -1707,7 +1708,6 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         heute=bestand_heute,
     )
     katalog_ab_preis = katalog_leitzahl(katalog_modelle)
-
     katalog_neu = []
     for m in katalog_modelle:
         if not m.get("hat_buendel") or m.get("zr"):
@@ -1727,10 +1727,10 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         )
     if isinstance((zeitreihe or {}).get("daten"), dict):
         zeitreihe["daten"]["katalog_neu"] = katalog_neu
-
     return {
         "tco": tco,
         "zeitreihe": zeitreihe,
+        "hersteller": hm,
         "ausfaelle": ausfaelle,
         "verlauf": geraete_verlauf.aufbereiten(
             belastbar, historie, katalog, bestand_heute, laden

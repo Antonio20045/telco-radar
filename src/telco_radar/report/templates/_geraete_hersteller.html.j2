@@ -1,0 +1,56 @@
+{# Preisposition je Hersteller (Antonio, 05.11.2026): die erste Übersichtsgrafik.
+   Daten und Text liefert geraete_hersteller.py; hier steht nur die Hülle. Der
+   Server zeichnet die Ansicht „aktuell“ (lesbar ohne JavaScript); die
+   Zeitraumwahl blendet app.js ein und rechnet aus dem JSON im Dokument. #}
+{% set hm = geraete.hersteller %}
+<section class="gr-hm gx-art gx-art--tarif" id="hersteller" aria-labelledby="hm-titel"{% if hm and hm.json %} data-stand="{{ hm.stand }}"{% endif %}>
+  <div class="gx-kopf"><h2 id="hm-titel">Preisposition je Hersteller</h2></div>
+  {% if not hm %}
+  <p class="gx-leer">Herstellergrafik nicht berechnet.</p>
+  {% elif hm.fehler %}
+  <p class="gx-leer">Herstellergrafik nicht verfügbar: {{ hm.fehler }}</p>
+  {% elif hm.leer %}
+  <p class="gx-leer">Kein geprüfter Preis in den aktuellen Modellen.</p>
+  {% else %}
+  <div class="gr-zr-zeitwahl gr-hm-zeit" id="hm-zeit" role="group" aria-label="Zeitraum" hidden>
+    <button type="button" data-zeit="aktuell" aria-pressed="true">Aktuell</button>
+    <button type="button" data-zeit="7" aria-pressed="false">7 Tage</button>
+    <button type="button" data-zeit="30" aria-pressed="false">30 Tage</button>
+    <button type="button" data-zeit="eigen" aria-pressed="false">Eigener Zeitraum</button>
+  </div>
+  <div class="gr-hm-eigen" id="hm-eigen" hidden>
+    <label>von <input type="date" id="hm-von" value="{{ hm.tage_von }}" min="{{ hm.tage_von }}" max="{{ hm.tage_bis }}"></label>
+    <label>bis <input type="date" id="hm-bis" value="{{ hm.tage_bis }}" min="{{ hm.tage_von }}" max="{{ hm.tage_bis }}"></label>
+  </div>
+  <p class="gr-pp-einheit" id="hm-einheit" data-basis="{{ hm.einheit }}" aria-live="polite">{{ hm.einheit }} · Stand {{ hm.stand[8:] }}.{{ hm.stand[5:7] }}.{{ hm.stand[:4] }}</p>
+  <div class="gr-hm-tafel" style="--hm-n:{{ hm.wettbewerber | length }}" role="group" aria-label="Abstand der Vodafone-Kosten zum Wettbewerber in Prozent je Hersteller">
+    <div class="gr-hm-achse">
+      <span></span>
+      {% for w in hm.wettbewerber %}
+      <span class="gr-hm-kopf gr-anb--{{ w.slug }}"><i class="gr-hm-punkt"></i>{{ w.legende }}</span>
+      {% endfor %}
+    </div>
+    <div class="gr-hm-richtung"><span>← Vodafone günstiger</span><span>Vodafone teurer →</span></div>
+    {% for z in hm.zeilen %}
+    <div class="gr-hm-zeile{{ ' gr-hm-zeile--alle' if z.gesamt }}" data-hersteller="{{ z.hersteller }}">
+      <div class="gr-hm-name">{{ z.name }}</div>
+      {% for c in z.zellen %}
+      <div class="gr-hm-zelle gr-anb--{{ c.slug }}{{ ' gr-hm-leer' if c.leer }}{{ ' gr-hm-duenn' if c.duenn }}" data-anbieter="{{ c.name }}"{% if not c.leer %} data-wert="{{ c.wert }}" data-n="{{ c.n }}"{% endif %}>
+        <span class="gr-hm-wb"><i class="gr-hm-punkt"></i>{{ c.name }}</span>
+        <span class="gr-hm-zahl">{{ c.text }}</span>
+        <span class="gr-hm-spur"><b class="gr-hm-balken"{% if c.leer %} hidden{% else %} style="left:{{ c.links }}%;width:{{ c.breite }}%"{% endif %}></b></span>
+        <span class="gr-hm-n"><span class="gr-hm-r">{{ c.richtung ~ ' · ' if not c.leer }}</span><span class="gr-hm-m">{{ c.n_text }}</span></span>
+      </div>
+      {% endfor %}
+    </div>
+    {% endfor %}
+  </div>
+  {% for o in hm.ohne_spalte %}
+  <p class="gr-hm-ohne" data-anbieter="{{ o.name }}">{{ o.text }}</p>
+  {% endfor %}
+  <div class="gr-hm-erklaerung">
+    {% for absatz in hm.erklaerung %}<p>{{ absatz }}</p>{% endfor %}
+  </div>
+  <script type="application/json" id="hm-daten">{{ hm.json | safe }}</script>
+  {% endif %}
+</section>
