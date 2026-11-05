@@ -3,9 +3,11 @@ mit Mock-Transport (`http.TRANSPORT`), Anfragen gezaehlt.
 
 Die Tests in `test_geraete_adapter_mediamarkt.py` ersetzen `hole` und sehen
 darum nicht, was `fetch` darunter tut: nach einem 403 eine zweite Anfrage mit
-Browser-Kennung und Client-Hints, bei 429 drei Versuche mit Wartezeit. Fuer
-einen Adapter mit `bricht_bei_schutzantwort_ab` ist beides verboten: genau
-EINE Anfrage mit der festen ehrlichen Kennung, danach Abbruch des Anbieters.
+Browser-Kennung und Client-Hints, bei 429 drei Versuche mit Wartezeit (beides
+gibt es seit 05.11.2026 fuer niemanden mehr, siehe `test_fetch_ehrlich.py`).
+Ein Adapter mit `bricht_bei_schutzantwort_ab` ruft zusaetzlich nach der ersten
+Schutzantwort (403, 406, 429, 503 mit Challenge) NICHTS mehr ab, auch keine
+weiteren Einstiege.
 """
 
 from __future__ import annotations
@@ -93,7 +95,7 @@ def _seitenabrufe(gesehen):
     return [a for a in gesehen if a.url.path != "/robots.txt"]
 
 
-@pytest.mark.parametrize("status", [403, 429])
+@pytest.mark.parametrize("status", [403, 406, 429])
 def test_schutzantwort_kostet_genau_eine_anfrage_mit_ehrlicher_kennung(
     netz, katalog, farben, status
 ):
@@ -110,14 +112,13 @@ def test_schutzantwort_kostet_genau_eine_anfrage_mit_ehrlicher_kennung(
     assert "Schutzantwort" in bilanz.grund
 
 
-def test_andere_anbieter_behalten_den_kennungswechsel(netz):
+def test_auch_der_allgemeine_abruf_wechselt_die_kennung_nicht_mehr(netz):
+    """Bis 05.11.2026 behielten andere Anbieter den Kennungswechsel nach 403
+    (zweite Anfrage mit Browser-Kennung); das ist ein Umweg um eine Sperre."""
     gesehen = netz(lambda anfrage: httpx.Response(403, text="gesperrt"))
     with pytest.raises(httpx.HTTPStatusError):
         http.fetch("https://www.example.de/seite", {"user_agent": _EHRLICHE_UA})
-    kennungen = [a.headers["user-agent"] for a in gesehen]
-    assert len(kennungen) == 2
-    assert kennungen[0] == _EHRLICHE_UA
-    assert kennungen[1] == http.BROWSER_UA
+    assert [a.headers["user-agent"] for a in gesehen] == [_EHRLICHE_UA]
 
 
 def test_erlaubte_weiterleitung_wird_nach_pruefung_gefolgt(netz, katalog, farben):
@@ -162,3 +163,41 @@ def test_weiterleitung_auf_fremden_host_wird_gegen_dessen_robots_geprueft(
 
     pfade = [(a.url.host, a.url.path) for a in gesehen]
     assert ("fremd.example", "/robots.txt") in pfade
+
+
+def test_503_mit_challenge_ist_schutzantwort_und_stoppt_alle_einstiege(
+    netz, katalog, farben
+):
+    """Ein 503 mit `cf-mitigated` ist keine Serverstoerung: Anbieter bricht ab,
+    die uebrigen Einstiege bleiben unbesucht, keine 5xx-Wiederholung."""
+    anbieter = _anbieter()
+    assert len(anbieter.crawled_einstiege) > 1
+    gesehen = netz(
+        lambda anfrage: httpx.Response(
+            503, headers={"cf-mitigated": "challenge"}, text="Just a moment..."
+        )
+    )
+    bilanz = _lauf(anbieter, katalog, farben)
+
+    assert len(_seitenabrufe(gesehen)) == 1
+    assert bilanz.listungen == []
+    assert "Schutzantwort" in bilanz.grund
+
+
+def test_503_mit_challenge_seite_ohne_kopf_stoppt_ebenfalls(netz, katalog, farben):
+    gesehen = netz(
+        lambda anfrage: httpx.Response(
+            503, text='<html><script src="/cdn-cgi/challenge-platform/x"></script>'
+        )
+    )
+    bilanz = _lauf(_anbieter(), katalog, farben)
+    assert len(_seitenabrufe(gesehen)) == 1
+    assert "Schutzantwort" in bilanz.grund
+
+
+def test_gegenprobe_503_ohne_challenge_stoppt_den_anbieter_nicht(netz, katalog, farben):
+    """Ein gewoehnlicher 503 ist kein Schutz: die uebrigen Einstiege laufen."""
+    anbieter = _anbieter()
+    gesehen = netz(lambda anfrage: httpx.Response(503, text="Wartungsarbeiten"))
+    _lauf(anbieter, katalog, farben)
+    assert len(_seitenabrufe(gesehen)) == len(anbieter.crawled_einstiege)

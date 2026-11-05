@@ -78,8 +78,9 @@ class Adapter:
     aus, er meldet.
 
     `bricht_bei_schutzantwort_ab=True` (MediaMarkt, 05.11.2026): trifft der
-    Collector auf eine Schutzantwort (HTTP 403/429 oder eine Seite, die der
-    Adapter nicht lesen kann, etwa Captcha oder Challenge), ruft er fuer
+    Collector auf eine Schutzantwort (HTTP 403/406/429, eine 503 mit
+    Challenge oder eine Seite, die der Adapter nicht lesen kann, etwa
+    Captcha oder Challenge), ruft er fuer
     diesen Anbieter NICHTS mehr ab - kein Wiederholen, keine weiteren
     Einstiege, andere Anbieter laufen weiter.
     """
@@ -123,9 +124,10 @@ class GeraeteAbrufFehler(RuntimeError):
     man an einem String erkennt, kippt bei der ersten Umformulierung.
     """
 
-    def __init__(self, *args, status: int | None = None):
+    def __init__(self, *args, status: int | None = None, schutz: bool = False):
         super().__init__(*args)
         self.status = status
+        self.schutz = schutz
 
 
 def _preis(wert) -> float | None:
@@ -151,7 +153,7 @@ def _gleich(a: float | None, b: float | None) -> bool:
     return abs(float(a) - float(b)) < HALBER_CENT
 
 
-_SCHUTZ_STATUS = (403, 429)
+_SCHUTZ_STATUS = (403, 406, 429)
 _GRUND_SCHUTZ = "Schutzantwort, Anbieter fuer diesen Lauf abgebrochen"
 
 _MINDESTANTEIL_GELESENER_PRODUKTSEITEN = 0.75
@@ -163,13 +165,14 @@ def schutz_abbruch(
     """Soll der Collector diesen Anbieter nach `fehler` sofort aufgeben?
 
     Nur fuer Adapter mit `bricht_bei_schutzantwort_ab`. Schutzantwort heisst
-    HTTP 403/429; `unlesbar=True` steht fuer eine Antwort 2xx, die der
-    Adapter nicht lesen konnte (Captcha- oder Challenge-Seite nicht
-    auszuschliessen). Bei Abbruch steht der Grund in `gruende`.
+    HTTP 403/406/429 oder eine Antwort, die der Abrufweg als Schutz erkannt
+    hat (`fehler.schutz`, etwa 503 mit Challenge); `unlesbar=True` steht fuer
+    eine Antwort 2xx, die der Adapter nicht lesen konnte (Captcha- oder
+    Challenge-Seite nicht auszuschliessen). Bei Abbruch steht der Grund in `gruende`.
     """
     if not adapter.bricht_bei_schutzantwort_ab:
         return False
-    if not unlesbar and fehler.status not in _SCHUTZ_STATUS:
+    if not unlesbar and not fehler.schutz and fehler.status not in _SCHUTZ_STATUS:
         return False
     gruende.append(_GRUND_SCHUTZ)
     return True
@@ -199,6 +202,20 @@ def abruf_zusaetze(adapter: Adapter, user_agent: str | None) -> dict:
     if adapter.bricht_bei_schutzantwort_ab:
         zusatz["einmalig"] = True
     return zusatz
+
+
+def antwort_text(antwort) -> str:
+    """Der Text einer `(status, text)`-Antwort von `hole`; ausserhalb 2xx ein
+    `GeraeteAbrufFehler` mit Status und - falls der Abrufweg es erkannt hat -
+    dem Merkmal `schutz` (siehe `geraete_abruf.Abruf`)."""
+    status, text = antwort
+    if not (200 <= int(status) < 300):
+        raise GeraeteAbrufFehler(
+            f"HTTP {status}",
+            status=int(status),
+            schutz=bool(getattr(antwort, "schutz", False)),
+        )
+    return text
 
 
 def weiterleitungs_wache(schleuse, bilanz):

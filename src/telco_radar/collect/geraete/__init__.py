@@ -62,6 +62,7 @@ from .basis import (
     GeraeteAbrufFehler,
     abruf_argumente,
     abruf_zusaetze,
+    antwort_text,
     registriere,
     schutz_abbruch,
 )
@@ -483,10 +484,7 @@ def sammle_anbieter(
             raise
         bilanz.besucht.append(url)
         kwargs = abruf_argumente(zusatz, kopfzeilen, schleuse, bilanz)
-        status, text = hole(url, **kwargs) if kwargs else hole(url)
-        if not (200 <= int(status) < 300):
-            raise GeraeteAbrufFehler(f"HTTP {status}", status=int(status))
-        return text
+        return antwort_text(hole(url, **kwargs) if kwargs else hole(url))
 
     for einstieg in anbieter.crawled_einstiege:
         if frist_erreicht:
