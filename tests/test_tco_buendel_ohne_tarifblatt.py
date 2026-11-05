@@ -271,10 +271,12 @@ def ab_monat(o2_bilanz, tmp_path_factory) -> list[tuple[str, str]]:
 def test_ab_monat_25_ohne_tarifblatt_nennt_keine_tarifquelle(ab_monat):
     """Prüferbefund zu fb832ba4: die Lücke behauptete eine Tarifquelle, weil die
     Vorlage den Grund an der Tarif-ID festmachte. Gegenprobe: Unlimited L hat ein
-    Tarifblatt und behält den Quellengrund."""
-    ohne = [z for tarif, z in ab_monat if tarif in (_SPECIAL, _L_PLUS)]
+    Tarifblatt und behält den Quellengrund. Plus-Zeilen (Zweitprodukt) zeigen
+    seit PR #38 M1 keinen Preis und damit keine Zeile "ab Monat 25"."""
+    ohne = [z for tarif, z in ab_monat if tarif == _SPECIAL]
     mit = [z for tarif, z in ab_monat if tarif == _L]
-    assert len(ohne) == 8 and mit
+    assert not [z for tarif, z in ab_monat if tarif == _L_PLUS]
+    assert len(ohne) == 4 and mit
     assert not [z for z in ohne + mit if "ab Monat 37" in z]
     for zeile in ohne:
         assert "Tarifquelle" not in zeile and "nicht im Tarifbestand" in zeile, zeile
