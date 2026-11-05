@@ -588,7 +588,8 @@ def test_jeder_reiter_bleibt_unter_drei_bildschirmen(_seite, tid):
     Die Preispositionierung steht als eigenes Bild vor den Reitern (Auftrag
     02.11.2026) und gehört zu keinem Reiter; wie das Aufmacherbild zählt sie
     nicht mit. Die Herstellergrafik (`#hersteller`, 05.11.2026) steht als
-    erstes Bild davor und zählt aus demselben Grund nicht mit. Die Reiter
+    erstes Bild davor und zählt aus demselben Grund nicht mit; ebenso der
+    Abschnitt „Portfolio gegen Vodafone“ (`#portfolio`) dahinter. Die Reiter
     selbst bleiben unter der Grenze."""
     _frisch(_seite)
     _zeige_tafel(_seite, tid)
@@ -598,6 +599,8 @@ def test_jeder_reiter_bleibt_unter_drei_bildschirmen(_seite, tid):
         " - document.querySelector('.gx-auftakt').offsetHeight"
         " - document.querySelector('#preisposition').offsetHeight"
         " - (document.querySelector('#hersteller') || {offsetHeight: 0})"
+        ".offsetHeight"
+        " - (document.querySelector('#portfolio') || {offsetHeight: 0})"
         ".offsetHeight"
     )
     assert hoehe < MAX_HOEHE, f"{tid}: {hoehe} px ohne Aufmacher und Preisbilder"
