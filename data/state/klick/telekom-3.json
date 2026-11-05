@@ -1,7 +1,7 @@
 {
  "anbieter": "telekom-3",
- "datum": "2026-11-04",
- "dauer_sekunden": 6352.9,
+ "datum": "2026-11-05",
+ "dauer_sekunden": 6305.6,
  "format": 1,
  "frischegrenze_tage": 3,
  "grund": null,
@@ -26,9 +26,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "4a3bc5a1c5730567548f542c9291b7d2d2cc20d261427aa403a49b143399ef46",
+      "beleg_id": "af87a4b00b29318be8346e52f268a5f3c01fb38cb44fe6da8ebc70b5861caf8a",
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26/cobalt-violet-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=23.6&instalmentId=36",
-      "zeitpunkt": "2026-11-04T06:04:18Z"
+      "zeitpunkt": "2026-11-05T06:31:40Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -67,9 +67,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "01a70cf9de00a1dd84088c84743a1ca4b9f7ea294446f78634d477cd5c3ad658",
+      "beleg_id": "c6bfc52587c5018e65551e84f6145003fa10a0c50a7361d7bdb60d72bcd4bdd8",
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26/cobalt-violet-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=35.4&instalmentId=24",
-      "zeitpunkt": "2026-11-04T06:04:19Z"
+      "zeitpunkt": "2026-11-05T06:31:41Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -108,9 +108,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "4d95829858b4252bad1b0d56615849c82a1b66abfd04cc8863c459f4e6588531",
+      "beleg_id": "956f8a784a76a1c5bbdcaec5865fe92b2ae4047d9ed00db24f656cadcb056371",
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26/cobalt-violet-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=70.8&instalmentId=12",
-      "zeitpunkt": "2026-11-04T06:04:20Z"
+      "zeitpunkt": "2026-11-05T06:31:42Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -149,9 +149,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "3e603c9c2472d542f1a916664cb67892d661d5f3c10d267e9a49f6cb07fd4b9d",
+      "beleg_id": "ea7d7d1e62ba4adbb209ff317f5ab806913de4024736905b8fe18207e204147d",
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26/cobalt-violet-512-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=70.8&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D512_GB",
-      "zeitpunkt": "2026-11-04T06:04:22Z"
+      "zeitpunkt": "2026-11-05T06:31:45Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -190,9 +190,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "308a553b0822d57d8ae5ff2e70c6af2ae7505e8e74ea19be617295c9e4b25d65",
+      "beleg_id": "eb52b73de6b5ad630b7a9638f1b9b06d6114062541aa72229d79a822c86cfe5f",
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26/cobalt-violet-512-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=39.5&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-04T06:04:23Z"
+      "zeitpunkt": "2026-11-05T06:31:46Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -231,9 +231,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "dbd65d32e503c71828da20fd641485e17f99d20c318a91bc6f6e6da8816f693c",
+      "beleg_id": "b107280c6a09500557e3d925037a465c6a85fc305bfdc89fddb255fb91538ba5",
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26/cobalt-violet-512-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=79.1&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-04T06:04:25Z"
+      "zeitpunkt": "2026-11-05T06:31:47Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -266,17 +266,17 @@
    ],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 134,
-    "beendet": 102,
+    "anfragen": 106,
+    "beendet": 100,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "20994a22678a.edge.sdk.awswaf.com": 1,
      "onebot-webfrontend.oneai.yo-digital.com": 1,
+     "render.binkies3d.com": 2,
      "www.telekom.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 139.0,
+    "sekunden": 138.0,
     "takte_ms": 1000,
     "wartet_auf": "load"
    },
@@ -292,7 +292,7 @@
     "knoepfe_gefunden": 36,
     "knoepfe_gesucht": 36
    },
-   "verworfen": 48
+   "verworfen": 43
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro-max/cosmic-orange-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false",
@@ -310,9 +310,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "445a12dccae876e95cb8b6aab9d94895cc03486ab4c1d7f3ae889811872f9df9",
+      "beleg_id": "7248647d7138d0243aad9414b8bbd31e7a7ea061d2dbfeccae5d40d6291fb484",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro-max/cosmic-orange-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=31.1&instalmentId=36",
-      "zeitpunkt": "2026-11-04T06:07:44Z"
+      "zeitpunkt": "2026-11-05T06:35:06Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -351,9 +351,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "3cbed81ce1f8621fef28c319cc1c10492a94d4a1c2a35fe48d0b985995e83fed",
+      "beleg_id": "686ca36649177246e4452f38e3c154436a635c05f28a532d6287bb641b3fe8f1",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro-max/cosmic-orange-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=46.6&instalmentId=24",
-      "zeitpunkt": "2026-11-04T06:07:45Z"
+      "zeitpunkt": "2026-11-05T06:35:07Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -392,9 +392,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "65fa938cd063260825b4473b7c7e45905045ba798c1a3fca603e5881b7e3d335",
+      "beleg_id": "4a4019344f29a2fe150691e96351baf8dec4ccd5e7605f1bb73f60e3188407cf",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro-max/cosmic-orange-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=93.3&instalmentId=12",
-      "zeitpunkt": "2026-11-04T06:07:47Z"
+      "zeitpunkt": "2026-11-05T06:35:08Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -433,9 +433,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "c6cb29c646caccb2707b429dbb1f1995415e2b73abed398efcb930496c17edda",
+      "beleg_id": "0b5710e2cb0d61f1fb36ad78528d0a2e199b2bd891deb5ae3119e4118e913da7",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro-max/cosmic-orange-512-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=93.3&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D512_GB",
-      "zeitpunkt": "2026-11-04T06:07:50Z"
+      "zeitpunkt": "2026-11-05T06:35:11Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -474,9 +474,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "835e35c8bf07368319d47f454469c321b27219b7c807bb4be679dab30b127c0b",
+      "beleg_id": "0832566993638cc6d562b54feaed3a018f93527ab5dce98600bb39e2fa479f34",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro-max/cosmic-orange-512-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=48.3&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-04T06:07:51Z"
+      "zeitpunkt": "2026-11-05T06:35:12Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -515,9 +515,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "fa76f906da3bfe5d685f8fecf1592c4d0aad353dbcd9dd9d440227d1555a3914",
+      "beleg_id": "016d09c4a522781589ae3c68ae82deb49675becb794e9efb1dfb04e06e60bb53",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro-max/cosmic-orange-512-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=96.6&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-04T06:07:52Z"
+      "zeitpunkt": "2026-11-05T06:35:13Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -556,9 +556,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "faaf683392e45b7fbbee4b4040cfda7f54c24bf6f75c9fdc1731dbf1a6454035",
+      "beleg_id": "3e61f0c5935c5e9d8ec1fbbcf9474753f5ce3d5dd25eeccb0e83704b7f3aa0af",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro-max/cosmic-orange-1-tb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=96.6&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D1_TB",
-      "zeitpunkt": "2026-11-04T06:07:55Z"
+      "zeitpunkt": "2026-11-05T06:35:16Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -597,9 +597,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "4a277a9481ec5c64722d6d166409bb416f0fa4d1b618d44a47639412923a289f",
+      "beleg_id": "c262267b1a511d4508ac3dacb2ee57246c955fd18b105747ff291bd76d786f16",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro-max/cosmic-orange-1-tb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=58.3&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
-      "zeitpunkt": "2026-11-04T06:07:56Z"
+      "zeitpunkt": "2026-11-05T06:35:17Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -638,9 +638,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "c60cb9839361c6d699a02059f4ad1d680255b71068f066b6cbf741baaab6addf",
+      "beleg_id": "9464639bbf297a4e2dc2978837b3e9eaf3d914e31f26a8041d3e56e82dc4b76d",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro-max/cosmic-orange-1-tb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=116.6&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
-      "zeitpunkt": "2026-11-04T06:07:57Z"
+      "zeitpunkt": "2026-11-05T06:35:18Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -760,17 +760,16 @@
    ],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 143,
+    "anfragen": 142,
     "beendet": 140,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "onebot-webfrontend.oneai.yo-digital.com": 1,
-     "www.telekom.de": 1
+     "onebot-webfrontend.oneai.yo-digital.com": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 135.3,
-    "takte_ms": 1550,
+    "sekunden": 135.0,
+    "takte_ms": 1500,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -785,7 +784,7 @@
     "knoepfe_gefunden": 57,
     "knoepfe_gesucht": 57
    },
-   "verworfen": 30
+   "verworfen": 29
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/motorola/motorola-edge-70-fusio-fifa-edition/pantone-silhouette-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
@@ -796,18 +795,18 @@
    "kombinationen": [],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 82,
-    "beendet": 80,
+    "anfragen": 84,
+    "beendet": 81,
     "dokument": "complete",
     "geladen": true,
     "offen": {
      "pix.telekom.de": 2,
-     "www.telekom.de": 1,
+     "www.telekom.de": 2,
      "www2.telekom.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 154.6,
-    "takte_ms": 2000,
+    "sekunden": 153.5,
+    "takte_ms": 1500,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -833,18 +832,18 @@
    "kombinationen": [],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 85,
-    "beendet": 84,
+    "anfragen": 84,
+    "beendet": 81,
     "dokument": "complete",
     "geladen": true,
     "offen": {
      "pix.telekom.de": 2,
-     "tags-eu.tiqcdn.com": 1,
+     "www.telekom.de": 2,
      "www2.telekom.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 154.2,
-    "takte_ms": 2050,
+    "sekunden": 153.0,
+    "takte_ms": 1450,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -871,7 +870,7 @@
    "ladung": {
     "abstand_s": 10.0,
     "anfragen": 79,
-    "beendet": 77,
+    "beendet": 76,
     "dokument": "complete",
     "geladen": true,
     "offen": {
@@ -880,8 +879,8 @@
      "www2.telekom.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 153.6,
-    "takte_ms": 1950,
+    "sekunden": 153.1,
+    "takte_ms": 1600,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -907,18 +906,18 @@
    "kombinationen": [],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 82,
-    "beendet": 80,
+    "anfragen": 80,
+    "beendet": 75,
     "dokument": "complete",
     "geladen": true,
     "offen": {
      "pix.telekom.de": 2,
-     "www.telekom.de": 1,
+     "www.telekom.de": 4,
      "www2.telekom.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 153.6,
-    "takte_ms": 1850,
+    "sekunden": 152.7,
+    "takte_ms": 1350,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -944,18 +943,18 @@
    "kombinationen": [],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 91,
-    "beendet": 91,
+    "anfragen": 81,
+    "beendet": 75,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "pix.telekom.de": 2,
      "tags-eu.tiqcdn.com": 1,
+     "www.telekom.de": 5,
      "www2.telekom.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 154.5,
-    "takte_ms": 2100,
+    "sekunden": 152.9,
+    "takte_ms": 850,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -988,9 +987,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "7b1e666c72752684e0b5d2d6df6776f413f2495bdf041ec9b53df6b0fccbaf8e",
+      "beleg_id": "bd39817f4ce84928447e67376fc8031328369545e2c0174618ccad0e414b8464",
       "seite": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-17-5g/black-128-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=5.5&instalmentId=36",
-      "zeitpunkt": "2026-11-04T06:30:44Z"
+      "zeitpunkt": "2026-11-05T06:57:58Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1029,9 +1028,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a6adf4a6c275c2810a4a60e11c0d72163cfb557e71e3688054dc24ea314dafcf",
+      "beleg_id": "a626fa8ef696aba82b47387df48d48f7c6441b884117050b08a51eb00c1a6569",
       "seite": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-17-5g/black-128-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=8.2&instalmentId=24",
-      "zeitpunkt": "2026-11-04T06:30:45Z"
+      "zeitpunkt": "2026-11-05T06:57:59Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1070,9 +1069,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "dda9d0b8126187511c46e746c41cac1bf0453b940bd17bf8c5162f16f4a3ef47",
+      "beleg_id": "f8b55a4905baa69061a7c95a0a4d37a1f13c7ec47c6ff5788d9c114e4d2cd9ca",
       "seite": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-17-5g/black-128-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=16.5&instalmentId=12",
-      "zeitpunkt": "2026-11-04T06:30:46Z"
+      "zeitpunkt": "2026-11-05T06:58:00Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1105,17 +1104,16 @@
    ],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 90,
-    "beendet": 86,
+    "anfragen": 85,
+    "beendet": 83,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "onebot-webfrontend.oneai.yo-digital.com": 1,
-     "www.telekom.de": 2
+     "onebot-webfrontend.oneai.yo-digital.com": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 133.7,
-    "takte_ms": 1350,
+    "sekunden": 133.9,
+    "takte_ms": 1500,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -1130,7 +1128,7 @@
     "knoepfe_gefunden": 18,
     "knoepfe_gesucht": 18
    },
-   "verworfen": 10
+   "verworfen": 11
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25-fe/jetblack-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
@@ -1148,9 +1146,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "b9aa39ddc28120cb37945f7c4f37eb9600f2e62f10637d97c51f2c79ba0e46d6",
+      "beleg_id": "91e9e11b744195b1217a5eba4e812c23650acd1a2ad3db3fe87c0d5cbbe35da6",
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25-fe/jetblack-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=17.1&instalmentId=36",
-      "zeitpunkt": "2026-11-04T06:34:05Z"
+      "zeitpunkt": "2026-11-05T07:01:18Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1189,9 +1187,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "c77ce9974642ecb15d3f149525294d7b50fe1ff5e3e98dcbb55b3a6a9434f0ab",
+      "beleg_id": "1a99925a5140934c45f5c0acd90b63313b0bed1f745b4dbeab2447b705e730fd",
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25-fe/jetblack-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=25.7&instalmentId=24",
-      "zeitpunkt": "2026-11-04T06:34:06Z"
+      "zeitpunkt": "2026-11-05T07:01:19Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1230,9 +1228,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "6ac5b3ae0d10404f4a0c42a93a34c42401ca56d301282555d458960b310ece3f",
+      "beleg_id": "e7f77fa00b5aad251aca25da031755fd9b95dac25faabd5b6cc2b953d4d6234e",
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25-fe/jetblack-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=51.5&instalmentId=12",
-      "zeitpunkt": "2026-11-04T06:34:07Z"
+      "zeitpunkt": "2026-11-05T07:01:20Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1271,9 +1269,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "0f4ac0f22ed61cc4d14e6a2a8f4b350f07b7909c7165d683c34c5ced6b43368e",
+      "beleg_id": "50dcd5c18b6c9317b8206bc777886956eac705f75392535ff66fea446fe34515",
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25-fe/jetblack-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=51.5&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D256_GB",
-      "zeitpunkt": "2026-11-04T06:34:09Z"
+      "zeitpunkt": "2026-11-05T07:01:22Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1312,9 +1310,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "cd7211472556609c762afa431f51dc040015f830e46a63986e1909c69b66746c",
+      "beleg_id": "8c8e3c123ca6b89b3cd313625dfe6f48a4baeeb4d7ec72fc2bab5eb432a5f35b",
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25-fe/jetblack-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=28.6&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D256_GB",
-      "zeitpunkt": "2026-11-04T06:34:10Z"
+      "zeitpunkt": "2026-11-05T07:01:23Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1353,9 +1351,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "954eb612943a1dd0fbed3d29033c55a34a0ae02b7ed9929a7165f2ad336a54cc",
+      "beleg_id": "2f776b2610bfca3e48a6dfe4a69e1cd74dbd9bf3324acd2f4f8323ef04e1e1ea",
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25-fe/jetblack-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=57.3&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D256_GB",
-      "zeitpunkt": "2026-11-04T06:34:11Z"
+      "zeitpunkt": "2026-11-05T07:01:24Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1389,15 +1387,15 @@
    "ladung": {
     "abstand_s": 10.0,
     "anfragen": 98,
-    "beendet": 95,
+    "beendet": 97,
     "dokument": "complete",
     "geladen": true,
     "offen": {
      "onebot-webfrontend.oneai.yo-digital.com": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 134.5,
-    "takte_ms": 1650,
+    "sekunden": 133.8,
+    "takte_ms": 1350,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -1412,7 +1410,7 @@
     "knoepfe_gefunden": 36,
     "knoepfe_gesucht": 36
    },
-   "verworfen": 23
+   "verworfen": 24
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/fairphone/fairphone-6/horizon-black-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
@@ -1430,9 +1428,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "7a1aa3f3e470a3e51cc85253dd6607f19969ec6ab33c7af1acb027026f569414",
+      "beleg_id": "60d184fdb8a902835e61cf1a7548c59d485327d72fd759effc040041e901c55c",
       "seite": "https://www.telekom.de/shop/geraet/fairphone/fairphone-6/horizon-black-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=13.5&instalmentId=36",
-      "zeitpunkt": "2026-11-04T06:37:30Z"
+      "zeitpunkt": "2026-11-05T07:04:42Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1471,9 +1469,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "3a3f6a8e9b8cf95a05ee22dbd54c53f0eed68e57adf22b70c007fede733a1206",
+      "beleg_id": "9616b7bfa5190798916602b749e571f0bc21f2055d059e79f77b279970f5fe89",
       "seite": "https://www.telekom.de/shop/geraet/fairphone/fairphone-6/horizon-black-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=20.3&instalmentId=24",
-      "zeitpunkt": "2026-11-04T06:37:31Z"
+      "zeitpunkt": "2026-11-05T07:04:43Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1512,9 +1510,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "c80fe36b5f19f72e35783818fd913ac0b91bbcc878e372c5ffab904eef9b9540",
+      "beleg_id": "ea6a6f26a67b766e024d86e03078c29312fb10ebc2ed6f4c82c5a00714245e44",
       "seite": "https://www.telekom.de/shop/geraet/fairphone/fairphone-6/horizon-black-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=40.6&instalmentId=12",
-      "zeitpunkt": "2026-11-04T06:37:32Z"
+      "zeitpunkt": "2026-11-05T07:04:44Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1555,8 +1553,8 @@
      "onebot-webfrontend.oneai.yo-digital.com": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 134.4,
-    "takte_ms": 1700,
+    "sekunden": 133.8,
+    "takte_ms": 1400,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -1571,7 +1569,7 @@
     "knoepfe_gefunden": 18,
     "knoepfe_gesucht": 18
    },
-   "verworfen": 15
+   "verworfen": 16
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17779&categoryId=smartphones&forwardTradeInApplied=false",
@@ -1589,9 +1587,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "046c73a21d844338784a6d21cbda6a7833922854e72142184b5197b4f3f52f27",
+      "beleg_id": "3e21659ba202ee79c1aa9e80bc155a283212f555d4dc694396172240478bd251",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17779&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=29.7&instalmentId=36",
-      "zeitpunkt": "2026-11-04T06:41:01Z"
+      "zeitpunkt": "2026-11-05T07:08:02Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1630,9 +1628,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "79d994da24bbcbfca5d261361b09332b59f2577e76988f80360ef27c747523f3",
+      "beleg_id": "f3d72a9a1695b144f17bbdde28c731a6400bfaa5a3626be25ad30b64bed472d4",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17779&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=44.5&instalmentId=24",
-      "zeitpunkt": "2026-11-04T06:41:02Z"
+      "zeitpunkt": "2026-11-05T07:08:03Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1671,9 +1669,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "fdf129cff2bf2d214b0293b028e29aeeb8450bf246ddf5fd0e26c49e130ec410",
+      "beleg_id": "0470883ab27d842e79c820c5c8721fb9c94bc27d9cafbc7b7abe915ea92c78c7",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-256-gb?tariffId=MF_17779&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=89.1&instalmentId=12",
-      "zeitpunkt": "2026-11-04T06:41:03Z"
+      "zeitpunkt": "2026-11-05T07:08:04Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1704,90 +1702,126 @@
      }
     },
     {
-     "antwort_url": null,
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
      "auswahl": {
       "laufzeit": "36",
       "speicher": "512 GB",
       "tarif": "MagentaMobil XS"
      },
      "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
+     "beleg": {
+      "beleg_id": "56b5456681874c69976d57df4bc8a0b66688bcfe75b82aa86fe2de792ee3e7a2",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-512-gb?tariffId=MF_17779&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=89.1&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D512_GB",
+      "zeitpunkt": "2026-11-05T07:08:07Z"
+     },
+     "beleg_status": "offen",
      "buendel": null,
-     "grund": "Seite bietet speicher 512 GB nicht an",
-     "luecken": [],
-     "status": "nicht_angeboten",
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
      "variante": {
       "laufzeit": 36,
       "speicher": "512 GB",
       "tarif": "MagentaMobil XS"
      },
      "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
+      "anschluss": 39.95,
+      "anzahlung": 199.0,
+      "rate": 33.6,
+      "ratenzahl": 36,
       "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
+      "tarifphasen": [
+       [
+        1,
+        null,
+        29.95
+       ]
+      ],
+      "volumen_gb": 20.0
      }
     },
     {
-     "antwort_url": null,
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
      "auswahl": {
       "laufzeit": "24",
       "speicher": "512 GB",
       "tarif": "MagentaMobil XS"
      },
      "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
+     "beleg": {
+      "beleg_id": "f6a3c9812d516cfa614ba3eb05769cde60c591dbb661ed90b791136f0af3d12a",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-512-gb?tariffId=MF_17779&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=50.4&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
+      "zeitpunkt": "2026-11-05T07:08:08Z"
+     },
+     "beleg_status": "offen",
      "buendel": null,
-     "grund": "Seite bietet speicher 512 GB nicht an",
-     "luecken": [],
-     "status": "nicht_angeboten",
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
      "variante": {
       "laufzeit": 24,
       "speicher": "512 GB",
       "tarif": "MagentaMobil XS"
      },
      "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
+      "anschluss": 39.95,
+      "anzahlung": 199.0,
+      "rate": 50.4,
+      "ratenzahl": 24,
       "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
+      "tarifphasen": [
+       [
+        1,
+        null,
+        29.95
+       ]
+      ],
+      "volumen_gb": 20.0
      }
     },
     {
-     "antwort_url": null,
+     "antwort_url": "https://www.telekom.de/shop/api/eshop/bff-de/productOfferings/v2/details",
      "auswahl": {
       "laufzeit": "12",
       "speicher": "512 GB",
       "tarif": "MagentaMobil XS"
      },
      "befunde": [],
-     "beleg": null,
-     "beleg_status": "ohne_wert",
+     "beleg": {
+      "beleg_id": "075c3926bcdf1e2bb33b0621eddc052be755f48f1526a8e57c3e69cecdc88b34",
+      "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/tiefblau-512-gb?tariffId=MF_17779&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=100.8&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
+      "zeitpunkt": "2026-11-05T07:08:09Z"
+     },
+     "beleg_status": "offen",
      "buendel": null,
-     "grund": "Seite bietet speicher 512 GB nicht an",
-     "luecken": [],
-     "status": "nicht_angeboten",
+     "grund": null,
+     "luecken": [
+      "tarifbindung"
+     ],
+     "status": "erfasst",
      "variante": {
       "laufzeit": 12,
       "speicher": "512 GB",
       "tarif": "MagentaMobil XS"
      },
      "werte": {
-      "anschluss": null,
-      "anzahlung": null,
-      "rate": null,
-      "ratenzahl": null,
+      "anschluss": 39.95,
+      "anzahlung": 199.0,
+      "rate": 100.8,
+      "ratenzahl": 12,
       "tarifbindung": null,
-      "tarifphasen": null,
-      "volumen_gb": null
+      "tarifphasen": [
+       [
+        1,
+        null,
+        29.95
+       ]
+      ],
+      "volumen_gb": 20.0
      }
     },
     {
@@ -1880,16 +1914,16 @@
    ],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 160,
-    "beendet": 159,
+    "anfragen": 143,
+    "beendet": 141,
     "dokument": "complete",
     "geladen": true,
     "offen": {
      "onebot-webfrontend.oneai.yo-digital.com": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 145.1,
-    "takte_ms": 1800,
+    "sekunden": 134.7,
+    "takte_ms": 1250,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -1899,12 +1933,12 @@
    "struktur": {
     "anteil_felder": 0.8571428571428571,
     "anteil_knoepfe": 1.0,
-    "felder_gefunden": 18,
-    "felder_gesucht": 21,
-    "knoepfe_gefunden": 24,
-    "knoepfe_gesucht": 24
+    "felder_gefunden": 36,
+    "felder_gesucht": 42,
+    "knoepfe_gefunden": 39,
+    "knoepfe_gesucht": 39
    },
-   "verworfen": 15
+   "verworfen": 23
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-17t/violet-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
@@ -1922,9 +1956,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "8e5d3d79c5976d0a5c488e6ea2fafae486a14ae10d6697f7c139db3d19db5890",
+      "beleg_id": "225afc51412a4347ea8243b2c96545b47b196bf2853e8e3445400b3a7ecf6ca4",
       "seite": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-17t/violet-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=18.8&instalmentId=36",
-      "zeitpunkt": "2026-11-04T06:44:27Z"
+      "zeitpunkt": "2026-11-05T07:11:28Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1963,9 +1997,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "8c9c03ca8d0dcaf2fa1b082d9d5716adf882ee09df69a370f8d8a5f28043b403",
+      "beleg_id": "ed3b1b07140b408ac9adf211d7f324094cc50df3093f82f73872f5c72e327d0f",
       "seite": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-17t/violet-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=28.2&instalmentId=24",
-      "zeitpunkt": "2026-11-04T06:44:29Z"
+      "zeitpunkt": "2026-11-05T07:11:29Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2004,9 +2038,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "78f8ae93ae925d618215512b357d1aa4755c11878b981e186c42336e624717c9",
+      "beleg_id": "7f00bef26b4606a0dc4b3429bddd9c9ab0aac39f0c4428a6a35cbb24711c32db",
       "seite": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-17t/violet-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=56.5&instalmentId=12",
-      "zeitpunkt": "2026-11-04T06:44:30Z"
+      "zeitpunkt": "2026-11-05T07:11:30Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2039,18 +2073,18 @@
    ],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 149,
-    "beendet": 135,
+    "anfragen": 98,
+    "beendet": 94,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "engage-content2.binkies3d.com": 12,
+     "binkiesproductionweu.servicebus.windows.net": 1,
      "onebot-webfrontend.oneai.yo-digital.com": 1,
-     "www.telekom.de": 1
+     "www.telekom.de": 2
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 134.3,
-    "takte_ms": 1500,
+    "sekunden": 133.4,
+    "takte_ms": 1250,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -2065,7 +2099,7 @@
     "knoepfe_gefunden": 18,
     "knoepfe_gesucht": 18
    },
-   "verworfen": 16
+   "verworfen": 15
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-z-flip8/pink-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
@@ -2083,9 +2117,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "d35ddf773bd68bdab0855a7f905659ad45ca4ed8176dcd8a48170af4ed6cd8f2",
+      "beleg_id": "36c82c8b4de3c511610ff65e63136751ccaf27c602ea62121c16fe3fdb8cbf2d",
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-z-flip8/pink-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=31.6&instalmentId=36",
-      "zeitpunkt": "2026-11-04T06:47:48Z"
+      "zeitpunkt": "2026-11-05T07:14:48Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2124,9 +2158,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "35c32ea2fe6915e634735ab1931ac1d0ea64426b283b9a9729c822bdbc29b25c",
+      "beleg_id": "8f1c6143f00158bc3c8c0758e472076cd0a0dbf407d028574f2f084fb1343d4a",
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-z-flip8/pink-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=47.5&instalmentId=24",
-      "zeitpunkt": "2026-11-04T06:47:50Z"
+      "zeitpunkt": "2026-11-05T07:14:49Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2165,9 +2199,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "b472b9655db302174818b5eb0ce536e3d09d0ab00e8f45587528da2e02804765",
+      "beleg_id": "c2ba20acdf7eb6d0a3db26642f35383e4ecec635497550c52c6bb481594b78af",
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-z-flip8/pink-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=95&instalmentId=12",
-      "zeitpunkt": "2026-11-04T06:47:51Z"
+      "zeitpunkt": "2026-11-05T07:14:50Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2206,9 +2240,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "734c28d61bee826bd1ac4786c10a5c78ca1a09a6e34285bc96e4296197c2a186",
+      "beleg_id": "263e94f78a07c4dabb8ba3f14515d19e528471fd63f4ea1a7d768d4939b7b148",
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-z-flip8/pink-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=95&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D512_GB",
-      "zeitpunkt": "2026-11-04T06:47:54Z"
+      "zeitpunkt": "2026-11-05T07:14:53Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2247,9 +2281,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "71c0d477a39937480b2cdbeb51f0c71bb6ba5ca3eac2e6f0de34fcbee50165e0",
+      "beleg_id": "c257872cb62b5db50ec2eaf51e0444546ca9ef86537edbae6d6155ff0e5be69a",
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-z-flip8/pink-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=50.8&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-04T06:47:55Z"
+      "zeitpunkt": "2026-11-05T07:14:54Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2288,9 +2322,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "eb616ea6e4835afaaf0f2b1d4aa8cd306170e0758477ab3b89eff864fc8af58d",
+      "beleg_id": "ef37afdb8bca50fef3c765244aacf6648cf611f53ca21a9d64ce8119b3789cd1",
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-z-flip8/pink-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=101.6&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-04T06:47:56Z"
+      "zeitpunkt": "2026-11-05T07:14:55Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2323,17 +2357,16 @@
    ],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 92,
-    "beendet": 89,
+    "anfragen": 96,
+    "beendet": 94,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "onebot-webfrontend.oneai.yo-digital.com": 1,
-     "www.telekom.de": 1
+     "onebot-webfrontend.oneai.yo-digital.com": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 134.6,
-    "takte_ms": 1500,
+    "sekunden": 133.8,
+    "takte_ms": 1350,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -2366,9 +2399,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "ea144acf8e4bdc4f359897c6cedae5ac7ea15805fe86dc05dd0216bb840d6f81",
+      "beleg_id": "883e7602ddecd06df75974a411966b874a1072a22986ca0d5c41f39fdc3b9714",
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25-fe/jetblack-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=19.9&instalmentId=36",
-      "zeitpunkt": "2026-11-04T06:51:14Z"
+      "zeitpunkt": "2026-11-05T07:18:12Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2407,9 +2440,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a893c7aacd87dd3d17b5268c9bef47a870d17e4073d14e562358a31fb282ba63",
+      "beleg_id": "2086186c17785f8153f5f59e49c928cc0e82b8ce66858cc162b906ef3464e168",
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25-fe/jetblack-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=29.9&instalmentId=24",
-      "zeitpunkt": "2026-11-04T06:51:15Z"
+      "zeitpunkt": "2026-11-05T07:18:13Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2448,9 +2481,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "007843d6bd313d57f22deca208a9eeb338dee48288f01cfee543f5670f52b65f",
+      "beleg_id": "aead96a251f9701f4d54e3a651fec38f463d9baec42798db8c6640d18e13ea72",
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25-fe/jetblack-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=59.8&instalmentId=12",
-      "zeitpunkt": "2026-11-04T06:51:16Z"
+      "zeitpunkt": "2026-11-05T07:18:14Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2489,9 +2522,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "d5c946365d5c7372c2b1fc5fb714b91e3f347f843f6e8f149ab056530ae9675b",
+      "beleg_id": "b436399a35499934e6f258ac9d15fa48655ae5e7567479bc120c0b3d901e1cea",
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25-fe/jetblack-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=59.8&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D256_GB",
-      "zeitpunkt": "2026-11-04T06:51:19Z"
+      "zeitpunkt": "2026-11-05T07:18:16Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2530,9 +2563,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "78d867fb1b48922faad8da06c2797e68461d63089870f4a308286e8716509c08",
+      "beleg_id": "ec6be77b03ca0a9ab1790c7e8777ececdf8a8524e634791975055c8ba9b935b9",
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25-fe/jetblack-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=32.8&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D256_GB",
-      "zeitpunkt": "2026-11-04T06:51:20Z"
+      "zeitpunkt": "2026-11-05T07:18:17Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2571,9 +2604,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "e58d65d9d7c4d21693161dd99572dd9b37aaddec6c2646a12b4db68996019193",
+      "beleg_id": "b301d9a2b17c234365fec79ac1f1cce92a049799b6946a2f0b4e538032ddb4fa",
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25-fe/jetblack-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=65.6&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D256_GB",
-      "zeitpunkt": "2026-11-04T06:51:21Z"
+      "zeitpunkt": "2026-11-05T07:18:18Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2607,15 +2640,15 @@
    "ladung": {
     "abstand_s": 10.0,
     "anfragen": 98,
-    "beendet": 97,
+    "beendet": 96,
     "dokument": "complete",
     "geladen": true,
     "offen": {
      "onebot-webfrontend.oneai.yo-digital.com": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 134.1,
-    "takte_ms": 1600,
+    "sekunden": 133.7,
+    "takte_ms": 1400,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -2648,9 +2681,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a8640b57634e6c2458653db7313877d194f106e8a4cc337a8147442db907e25d",
+      "beleg_id": "374447ea30de42e0386e07d3a4640109acad12bd8b7c4e7f2441efa49f5a11e5",
       "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-11-pro-xl/obsidian-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=31.6&instalmentId=36",
-      "zeitpunkt": "2026-11-04T06:54:39Z"
+      "zeitpunkt": "2026-11-05T07:21:36Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2689,9 +2722,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "17bc9f258bdcf0b66d8ebdd3ef605488997ab77333a5554867abafb50f9c8219",
+      "beleg_id": "5c80fb1daef2830201b9ea34570b7523327445b62c0128df24ab7b638fc793a6",
       "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-11-pro-xl/obsidian-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=47.5&instalmentId=24",
-      "zeitpunkt": "2026-11-04T06:54:40Z"
+      "zeitpunkt": "2026-11-05T07:21:38Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2730,9 +2763,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "51f30e2287bc427b54a530abc131970896a6e3cb0a8e302873bb7eada3b8921f",
+      "beleg_id": "5efb03d915a3965d5ec1257a709fd3a3fdd96ddb68ed8cf4b84df610147947c5",
       "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-11-pro-xl/obsidian-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=95&instalmentId=12",
-      "zeitpunkt": "2026-11-04T06:54:41Z"
+      "zeitpunkt": "2026-11-05T07:21:39Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2771,9 +2804,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "7b0aa77f445b5e45a41242e127d89ba9ddc6b3bcd7808f5e728f44979b3ed77b",
+      "beleg_id": "fcf5899a7fac404b820d1ab2181125ce146f5c687a35efa98d48157bc915ba24",
       "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-11-pro-xl/obsidian-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=95&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D512_GB",
-      "zeitpunkt": "2026-11-04T06:54:44Z"
+      "zeitpunkt": "2026-11-05T07:21:41Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2812,9 +2845,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "05c16eff729dbfdb0dc43ec00a58af94447f42061e48f2eb456a5d5e180605eb",
+      "beleg_id": "d85c1b598f103817799e7ecff374829ffae0be3586d5776034b7b1753888f870",
       "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-11-pro-xl/obsidian-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=48.7&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-04T06:54:45Z"
+      "zeitpunkt": "2026-11-05T07:21:42Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2853,9 +2886,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "8ea13c297139ba1be48451b8dec0d606431294453836917cdb68e628d17b1d83",
+      "beleg_id": "1e5805b2ebc81417f82e49f59429ca6f18d44f346e426184c55d70f2c1a9e5a7",
       "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-11-pro-xl/obsidian-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=97.5&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-04T06:54:46Z"
+      "zeitpunkt": "2026-11-05T07:21:43Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2888,18 +2921,16 @@
    ],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 96,
-    "beendet": 91,
+    "anfragen": 94,
+    "beendet": 93,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "binkiesproductionweu.servicebus.windows.net": 1,
-     "onebot-webfrontend.oneai.yo-digital.com": 1,
-     "www.telekom.de": 4
+     "onebot-webfrontend.oneai.yo-digital.com": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 133.7,
-    "takte_ms": 1150,
+    "sekunden": 134.2,
+    "takte_ms": 1450,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -2914,7 +2945,7 @@
     "knoepfe_gefunden": 36,
     "knoepfe_gesucht": 36
    },
-   "verworfen": 22
+   "verworfen": 24
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/motorola/motorola-edge-70-fusion/pantone-silhouette-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
@@ -2932,9 +2963,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "b6ce2d8449fff1284e2419eca7c8be023fa619772e29a662ced3790462e33aca",
+      "beleg_id": "c9e2c4ae4ed638c743f67889af64beecd92fb6d5354da0bd72fe6396441a619b",
       "seite": "https://www.telekom.de/shop/geraet/motorola/motorola-edge-70-fusion/pantone-silhouette-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=10.5&instalmentId=36",
-      "zeitpunkt": "2026-11-04T06:58:05Z"
+      "zeitpunkt": "2026-11-05T07:25:01Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2973,9 +3004,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "e637ca7f4f4403550b696b8bb7d77f4b03a574086b88534d184097d9e28f8018",
+      "beleg_id": "53bd59f520159c05d9f6c28960a203ef65262a013f4731e92ea684da6258d8e9",
       "seite": "https://www.telekom.de/shop/geraet/motorola/motorola-edge-70-fusion/pantone-silhouette-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=15.7&instalmentId=24",
-      "zeitpunkt": "2026-11-04T06:58:06Z"
+      "zeitpunkt": "2026-11-05T07:25:02Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3014,9 +3045,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "fb06e8e066e32ca2c22400024defe6adc4a4c5495505d4ecd3ee6563898b0f3d",
+      "beleg_id": "bf71d31f24afa035daea9a69d4855afe0866223e366dffd87c3040a98a57abdd",
       "seite": "https://www.telekom.de/shop/geraet/motorola/motorola-edge-70-fusion/pantone-silhouette-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=31.5&instalmentId=12",
-      "zeitpunkt": "2026-11-04T06:58:07Z"
+      "zeitpunkt": "2026-11-05T07:25:04Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3059,7 +3090,7 @@
     },
     "ohne_antwort_ms": 0,
     "sekunden": 134.5,
-    "takte_ms": 1750,
+    "takte_ms": 1600,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -3092,9 +3123,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "e5dac2f06da3dcb22ecc3e72aab8f1de301cbb3e95d889a6c6f8f49719ddd717",
+      "beleg_id": "c196005115ab1ddd7557c6471332f0d2ddb7d208eeef522408c2aa24b2dcf035",
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-a27-5g/black-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=9.6&instalmentId=36",
-      "zeitpunkt": "2026-11-04T07:01:24Z"
+      "zeitpunkt": "2026-11-05T07:28:21Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3133,9 +3164,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "ba75bef77e72040e5dfed0e80881cb5e4f01a0d61b228cf1f671e9a0b804ea84",
+      "beleg_id": "77ec817e8ce3db9f69fa57eff1e343b9c251f4708a404afbfc6f277992ce6634",
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-a27-5g/black-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=14.5&instalmentId=24",
-      "zeitpunkt": "2026-11-04T07:01:25Z"
+      "zeitpunkt": "2026-11-05T07:28:22Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3174,9 +3205,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "5eb084df882705580b2a58169a32c594e37592e4638b7bb1750a78bcae5340b7",
+      "beleg_id": "2d170a43d4846ff9d5b6ea87213faae5052e9034f43d66e6e6cf17ce5fb07d55",
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-a27-5g/black-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=29&instalmentId=12",
-      "zeitpunkt": "2026-11-04T07:01:26Z"
+      "zeitpunkt": "2026-11-05T07:28:23Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3209,17 +3240,18 @@
    ],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 98,
-    "beendet": 96,
+    "anfragen": 93,
+    "beendet": 92,
     "dokument": "complete",
     "geladen": true,
     "offen": {
+     "binkiesproductionweu.servicebus.windows.net": 1,
      "onebot-webfrontend.oneai.yo-digital.com": 1,
      "www.telekom.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 133.9,
-    "takte_ms": 1350,
+    "sekunden": 133.6,
+    "takte_ms": 1400,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -3234,7 +3266,7 @@
     "knoepfe_gefunden": 18,
     "knoepfe_gesucht": 18
    },
-   "verworfen": 14
+   "verworfen": 16
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/motorola/motorola-moto-g37/pantone-impenetrable-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
@@ -3252,9 +3284,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "9bc385105678af3d3782655c60d759e9c0d7313688e3648765676c2341f6479e",
+      "beleg_id": "3fd485ac4be64dfc0875e93c23f035fae79281c6f2b18aba68e2c4d421e3d571",
       "seite": "https://www.telekom.de/shop/geraet/motorola/motorola-moto-g37/pantone-impenetrable-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=8&instalmentId=36",
-      "zeitpunkt": "2026-11-04T07:05:20Z"
+      "zeitpunkt": "2026-11-05T07:32:12Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3293,9 +3325,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "e49a74ae3878f18aab51f47fa7c1fec5ba47cb4b9b2ed6e669baf027ff172185",
+      "beleg_id": "17f98c1464dc8d6ed90b9c49a3d2d9d51945a7ae6f51248309f8ec461efa6f70",
       "seite": "https://www.telekom.de/shop/geraet/motorola/motorola-moto-g37/pantone-impenetrable-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=12&instalmentId=24",
-      "zeitpunkt": "2026-11-04T07:05:37Z"
+      "zeitpunkt": "2026-11-05T07:32:28Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3334,9 +3366,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "88f8bab971bd9a3d05dcd8e36a5f674f419b1155786523187503742bde2df98b",
+      "beleg_id": "703b831077ced916de42060e59eeaf7e15c2b87aeda30bd7b095f2533f6c8f4d",
       "seite": "https://www.telekom.de/shop/geraet/motorola/motorola-moto-g37/pantone-impenetrable-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=24&instalmentId=12",
-      "zeitpunkt": "2026-11-04T07:05:54Z"
+      "zeitpunkt": "2026-11-05T07:32:45Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3369,18 +3401,17 @@
    ],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 151,
-    "beendet": 137,
+    "anfragen": 94,
+    "beendet": 92,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "binkiesproductionweu.servicebus.windows.net": 1,
-     "engage-content2.binkies3d.com": 12,
+     "onebot-webfrontend.oneai.yo-digital.com": 1,
      "www.telekom.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 134.4,
-    "takte_ms": 1600,
+    "sekunden": 133.5,
+    "takte_ms": 1450,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -3395,7 +3426,7 @@
     "knoepfe_gefunden": 18,
     "knoepfe_gesucht": 18
    },
-   "verworfen": 15
+   "verworfen": 16
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/google/google-pixel-10a/lavender-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
@@ -3413,9 +3444,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "f18189fc8b33896fbf97636d7173392f5eaf17726d79262d0cf87285f1829e5a",
+      "beleg_id": "bf25cde4b7b491840d665ea3f9f94a92effdc741bbaeeb1ed450dc4e4d6c09d6",
       "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-10a/lavender-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=14.6&instalmentId=36",
-      "zeitpunkt": "2026-11-04T07:09:13Z"
+      "zeitpunkt": "2026-11-05T07:36:03Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3454,9 +3485,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "8c69bfc024a2313f3ffa1818fde88ed59cc7153791c998a82ec0c922201542aa",
+      "beleg_id": "9e6253c253ffb87f12453feee2351398844813c42069badf6078a73668fcaa2f",
       "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-10a/lavender-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=22&instalmentId=24",
-      "zeitpunkt": "2026-11-04T07:09:14Z"
+      "zeitpunkt": "2026-11-05T07:36:04Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3495,9 +3526,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "36badd45637b9e7da0bd3d07259854bb0f1943605d2fd8cf75fda4d94b2ad7fa",
+      "beleg_id": "77b8179266bb27b0a9309811f76b32388053067b40d36f34cf80be32fb37d19e",
       "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-10a/lavender-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=44&instalmentId=12",
-      "zeitpunkt": "2026-11-04T07:09:15Z"
+      "zeitpunkt": "2026-11-05T07:36:05Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3536,9 +3567,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "849712f842da6b42142d636932919466256a7c8257c9a84f7e1a19ecbff0d59f",
+      "beleg_id": "486d166207fc404c0e4e3f4872c9b47f8248904c1944aa54b2afea16e97377ca",
       "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-10a/lavender-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=44&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D256_GB",
-      "zeitpunkt": "2026-11-04T07:09:18Z"
+      "zeitpunkt": "2026-11-05T07:36:08Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3577,9 +3608,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "00e0d274fe8d75093bb5166a3bfd53d567de1e644776b202175fb61116dee7e8",
+      "beleg_id": "a053334327f488c3bd61cfd62283723ad934edb6d48ed5522eb95e158fcf4ed3",
       "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-10a/lavender-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=26.1&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D256_GB",
-      "zeitpunkt": "2026-11-04T07:09:19Z"
+      "zeitpunkt": "2026-11-05T07:36:09Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3618,9 +3649,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "ebf1d0c453e43f7f0c189ddf5690acd70b9b77f88a1ad4ff0dd5350cc98dd1c4",
+      "beleg_id": "ea8074252b9bb43cd407e8198e9541a2fc6a5c440c440075c3c94ba2c0c2e771",
       "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-10a/lavender-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=52.3&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D256_GB",
-      "zeitpunkt": "2026-11-04T07:09:20Z"
+      "zeitpunkt": "2026-11-05T07:36:10Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3653,16 +3684,18 @@
    ],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 93,
-    "beendet": 91,
+    "anfragen": 150,
+    "beendet": 138,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "onebot-webfrontend.oneai.yo-digital.com": 1
+     "engage-content2.binkies3d.com": 9,
+     "onebot-webfrontend.oneai.yo-digital.com": 1,
+     "www.telekom.de": 2
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 134.5,
-    "takte_ms": 1650,
+    "sekunden": 134.4,
+    "takte_ms": 1250,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -3677,7 +3710,7 @@
     "knoepfe_gefunden": 36,
     "knoepfe_gesucht": 36
    },
-   "verworfen": 22
+   "verworfen": 23
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro/polar-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
@@ -3695,9 +3728,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "abe585787b721108d484701ba14a7a835f2553182a6288b3d81a33c406735691",
+      "beleg_id": "f4afe0e6d003ac4a650b7a5e9b6c8ab97fcf8c034ec536b3358bfe3cbcd06400",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro/polar-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=34.1&instalmentId=36",
-      "zeitpunkt": "2026-11-04T07:12:38Z"
+      "zeitpunkt": "2026-11-05T07:39:29Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3736,9 +3769,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "9008c9576fd49ed98cdd5d93cd13a4ada195c74a0d25ea263d5499dcda6976e9",
+      "beleg_id": "4f6ef99e2eaab56f997ceb6da37e6afd97d5d8a63a38a8b247a9b7d06153bc44",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro/polar-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=51.2&instalmentId=24",
-      "zeitpunkt": "2026-11-04T07:12:39Z"
+      "zeitpunkt": "2026-11-05T07:39:30Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3777,9 +3810,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "e6112c9a60fb9ac7a15fbe88efd671f36b38f2ab6eace7eec833e341a8182b86",
+      "beleg_id": "eb077045c4cebb002cdeb629aa3e982149c389cc8d16c0cc413a81f6a2d32383",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro/polar-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=102.5&instalmentId=12",
-      "zeitpunkt": "2026-11-04T07:12:40Z"
+      "zeitpunkt": "2026-11-05T07:39:31Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3818,9 +3851,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "d5a076c5ff614283651e5f72c2159b33e81654441c6a0921251ad9a2f8395d06",
+      "beleg_id": "7c99e397e0e9b83c3d5b39fda641cb7c0c05638af2b56efbfbd4e218f4cbfe49",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro/polar-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=102.5&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D512_GB",
-      "zeitpunkt": "2026-11-04T07:12:43Z"
+      "zeitpunkt": "2026-11-05T07:39:33Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3859,9 +3892,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "b0a5a34bf7885e41c785b8805eb69182c092b5628a94e853734af2668df58a64",
+      "beleg_id": "17b5ed9e51ec6bbdb65d3c320dea6e9a141948e214faac0872ab71df0037912f",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro/polar-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=57.5&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-04T07:12:44Z"
+      "zeitpunkt": "2026-11-05T07:39:34Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3900,9 +3933,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "2f4850431e591497ee8fa56c969b926af0feeac0f7bf170ff6033c1743497a68",
+      "beleg_id": "b2cc71040faa0444fbe47434ed7c3b2fab2c8343728743f8e9b573af1a009e80",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro/polar-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=115&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-04T07:12:45Z"
+      "zeitpunkt": "2026-11-05T07:39:35Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3941,9 +3974,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "1d73605ea8adde4c67de0e6283d91d719b6c23bb1b44f9e30d0f72cb73b48b6e",
+      "beleg_id": "f6a13ec47a837ae2c3507ff0446fafe61a19b8cc830756726897d02abe2f167a",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro/polar-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=115&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D1_TB",
-      "zeitpunkt": "2026-11-04T07:12:47Z"
+      "zeitpunkt": "2026-11-05T07:39:38Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3982,9 +4015,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "552abd8d4a72cfa9c6b16813adb52cefd38ca58d2ebb1c261dfa15e02a52f588",
+      "beleg_id": "9b2adc23df894c3da3e59def29a321380a386c510ab3b76a841d5d6dcd6535fc",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro/polar-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=72&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
-      "zeitpunkt": "2026-11-04T07:12:48Z"
+      "zeitpunkt": "2026-11-05T07:39:39Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4023,9 +4056,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "ea5a2fcc05756f8d63a9be0211ef772598da5bd9b688edaca82e0a18faec573d",
+      "beleg_id": "6513c153998affaaf725cf977155940231f636822b1ee39d60f020133497242c",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro/polar-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=144.1&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
-      "zeitpunkt": "2026-11-04T07:12:49Z"
+      "zeitpunkt": "2026-11-05T07:39:40Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4064,9 +4097,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "e499ea233e4a3be91c86389a0e0230e8f00985c44b6d348107372c516299b1de",
+      "beleg_id": "758cbc2182ec69f294ba934b75c740f20fd7e12e01fb05d863d9f0f37015af4b",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro/polar-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=144.1&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D2_TB",
-      "zeitpunkt": "2026-11-04T07:12:52Z"
+      "zeitpunkt": "2026-11-05T07:39:42Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4105,9 +4138,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "74ae0eec90ff44930b19f7fe7c15048e1fda7849dd6a75df360aaa2a13ba45c2",
+      "beleg_id": "c45f989cc61f995aba5a53689bb00b6c8a4b0289cee03c3c7cbc5411cc05caad",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro/polar-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=101.2&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D2_TB",
-      "zeitpunkt": "2026-11-04T07:12:53Z"
+      "zeitpunkt": "2026-11-05T07:39:43Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4146,9 +4179,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "db97309cb1b826445cef4e0fe2899c739239046132b1b109587b0aed1894f81b",
+      "beleg_id": "4a4ec52ae3ace62d5db2ca401f0477e31c2fbfa050d3d8469184aa3b446781a4",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro/polar-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=202.5&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D2_TB",
-      "zeitpunkt": "2026-11-04T07:12:54Z"
+      "zeitpunkt": "2026-11-05T07:39:44Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4181,16 +4214,17 @@
    ],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 94,
-    "beendet": 92,
+    "anfragen": 87,
+    "beendet": 85,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "onebot-webfrontend.oneai.yo-digital.com": 1
+     "onebot-webfrontend.oneai.yo-digital.com": 1,
+     "www.telekom.de": 1
     },
-    "ohne_antwort_ms": 0,
-    "sekunden": 134.7,
-    "takte_ms": 1900,
+    "ohne_antwort_ms": 50,
+    "sekunden": 134.2,
+    "takte_ms": 1450,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -4205,7 +4239,7 @@
     "knoepfe_gefunden": 72,
     "knoepfe_gesucht": 72
    },
-   "verworfen": 37
+   "verworfen": 36
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-17-5g/black-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
@@ -4223,9 +4257,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "ae5ea16439c38ce0fe4223e9ae78e71e1b2642d0c7b4eb49c9ed3c724ec29610",
+      "beleg_id": "cf58b72adace8f904579a9090f44ed29086ff9d221d0532f4557110ff665c97a",
       "seite": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-17-5g/black-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=8.2&instalmentId=36",
-      "zeitpunkt": "2026-11-04T07:16:12Z"
+      "zeitpunkt": "2026-11-05T07:43:01Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4264,9 +4298,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "49dd427aa807bc89221926fa4130b7a9d23390f1fd1b79166f7fbc348f511512",
+      "beleg_id": "1d17f0b05e3a604575b6a208e2d967ceb96d23b9597db313a0d31fdd17484a2a",
       "seite": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-17-5g/black-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=12.4&instalmentId=24",
-      "zeitpunkt": "2026-11-04T07:16:13Z"
+      "zeitpunkt": "2026-11-05T07:43:02Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4305,9 +4339,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "3b2720e9ee78302973690c28f0cdccc24d043a6dd6a9244988fecca083e4ccac",
+      "beleg_id": "58704243566000c549d6f14e89b279e428f910601174eaa278c58cf69be6d706",
       "seite": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-17-5g/black-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=24.8&instalmentId=12",
-      "zeitpunkt": "2026-11-04T07:16:14Z"
+      "zeitpunkt": "2026-11-05T07:43:03Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4341,15 +4375,15 @@
    "ladung": {
     "abstand_s": 10.0,
     "anfragen": 85,
-    "beendet": 83,
+    "beendet": 82,
     "dokument": "complete",
     "geladen": true,
     "offen": {
      "onebot-webfrontend.oneai.yo-digital.com": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 134.4,
-    "takte_ms": 1800,
+    "sekunden": 133.6,
+    "takte_ms": 1400,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -4382,9 +4416,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "27567462224d7d87c3c7e1bb866667b48e48aee937855b5981a84ab369e44479",
+      "beleg_id": "64e28861e17a97de68fb99235ef25a06dcde3cd88e8436f1756899de6bbde71a",
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26plus/white-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=30.5&instalmentId=36",
-      "zeitpunkt": "2026-11-04T07:19:33Z"
+      "zeitpunkt": "2026-11-05T07:46:21Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4423,9 +4457,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "ff83dad6d3ee2dd433a1bcbe769d977e2e3c056e58ba2f0f148b1795bd74cf63",
+      "beleg_id": "a22ad14190e45875d16d0e163b06cacbf7bab4f1c6ae6ff17b3b6495ebd6b43d",
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26plus/white-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=45.8&instalmentId=24",
-      "zeitpunkt": "2026-11-04T07:19:34Z"
+      "zeitpunkt": "2026-11-05T07:46:22Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4464,9 +4498,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "406f6b91e190abbe41b84ef71ef4d001eaa3c1c1d7732a0044bae44deae6fb44",
+      "beleg_id": "a83a145472a7b294c31e4a6825b4b215bd08fc23e0a6e197c33c84a6f0f7081c",
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26plus/white-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=91.6&instalmentId=12",
-      "zeitpunkt": "2026-11-04T07:19:35Z"
+      "zeitpunkt": "2026-11-05T07:46:23Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4505,9 +4539,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "7d760692df27eb22ca76f1faf33cb093f4840fa499d913bffd3e103e561374c3",
+      "beleg_id": "81b2df33255cac1bc2be1fb420bd47a4960d6204da60c6d614d2a19cb1d5cbb9",
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26plus/white-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=91.6&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D512_GB",
-      "zeitpunkt": "2026-11-04T07:19:37Z"
+      "zeitpunkt": "2026-11-05T07:46:26Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4546,9 +4580,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "9ebe001d720661e768ef7bed71d46c86d37025b13dc63630adb1c075533899be",
+      "beleg_id": "ea85403412a2d7b78468a110b240f6078ee73c6ea5cf82c35a9a889cdb186509",
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26plus/white-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=49.1&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-04T07:19:38Z"
+      "zeitpunkt": "2026-11-05T07:46:27Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4587,9 +4621,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "b854379190eef91b15b50677379312d818435519961c992e13f18983bd3544d2",
+      "beleg_id": "18b2da5919a78f6be9b5ccdda5f9f49b93f1efc6470aeec782fcc0cb2047488e",
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26plus/white-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=98.3&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-04T07:19:40Z"
+      "zeitpunkt": "2026-11-05T07:46:28Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4627,13 +4661,11 @@
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "binkiesproductionweu.servicebus.windows.net": 1,
-     "onebot-webfrontend.oneai.yo-digital.com": 1,
-     "www.telekom.de": 1
+     "onebot-webfrontend.oneai.yo-digital.com": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 134.4,
-    "takte_ms": 1600,
+    "sekunden": 134.0,
+    "takte_ms": 1400,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -4648,7 +4680,7 @@
     "knoepfe_gefunden": 36,
     "knoepfe_gesucht": 36
    },
-   "verworfen": 23
+   "verworfen": 24
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17/lavendel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
@@ -4666,9 +4698,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "d0133734a6fc9a3a12901111673ea836bbabb3c93735be83cfee06fdd6537978",
+      "beleg_id": "58746b5eb7ec68aaab39c615682877dc0df95b5b2e3a56874d874adcd4318610",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17/lavendel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=23.8&instalmentId=36",
-      "zeitpunkt": "2026-11-04T07:22:59Z"
+      "zeitpunkt": "2026-11-05T07:49:46Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4707,9 +4739,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "090747c9d1e0918f3d95818ed29aee46e1adc8d24feced4a82a2f5f491ad901d",
+      "beleg_id": "f0c906d0813f11fbcdcfe264740cd1194816ae824b7d3f63c04bd146ad75e9e8",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17/lavendel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=35.7&instalmentId=24",
-      "zeitpunkt": "2026-11-04T07:23:01Z"
+      "zeitpunkt": "2026-11-05T07:49:47Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4748,9 +4780,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "909050a79983caabd768f38d43780e8eba56129e35c4ed78a05e26dce76b8ed3",
+      "beleg_id": "7599e9994184276bf4967f6cdcaac315dd75334f60fdd694f83f19ec79615f51",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17/lavendel-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=71.5&instalmentId=12",
-      "zeitpunkt": "2026-11-04T07:23:02Z"
+      "zeitpunkt": "2026-11-05T07:49:49Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4789,9 +4821,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "e7a221160fb9c08021019703c7412152ca46bd51553d988fb60fb244e3f3dec8",
+      "beleg_id": "7a1ddde9a9938382324ca3f0b255dddbc66bc2af5efefa65d15aa35d07e0a4c1",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17/lavendel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=71.5&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D512_GB",
-      "zeitpunkt": "2026-11-04T07:23:05Z"
+      "zeitpunkt": "2026-11-05T07:49:52Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4830,9 +4862,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "1572f6b40b2db1c0026827f7cd5ccca2d8295c38a46fa3841d135c2809dd9824",
+      "beleg_id": "125ef1a3ddfb9701b16d7aacca1cb9d89717e13c7c9059868deeae95e3163216",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17/lavendel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=42&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-04T07:23:06Z"
+      "zeitpunkt": "2026-11-05T07:49:53Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4871,9 +4903,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "9ffd1376b6cb45b4e81637e8225d2d7a5d2e8f89a539aad2f0cd15ac5014ef6a",
+      "beleg_id": "a0836f28b4e977b3c0c489488d58ae88b197efc711a3dedbd472b79aba45fe90",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17/lavendel-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=84.1&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-04T07:23:07Z"
+      "zeitpunkt": "2026-11-05T07:49:54Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4906,16 +4938,17 @@
    ],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 143,
+    "anfragen": 142,
     "beendet": 141,
     "dokument": "complete",
     "geladen": true,
     "offen": {
+     "binkiesproductionweu.servicebus.windows.net": 1,
      "onebot-webfrontend.oneai.yo-digital.com": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 135.5,
-    "takte_ms": 1750,
+    "sekunden": 134.6,
+    "takte_ms": 1400,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -4948,9 +4981,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "dc2391bf837186c24d160a09a38dd037d511f8651c15cacde22ea23ca638b255",
+      "beleg_id": "be6c2312a678ae64b856ccdd80d58df57b595b2aa743bf634d6125ed8f5ca92f",
       "seite": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-17-pro-max-5g/black-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=9.1&instalmentId=36",
-      "zeitpunkt": "2026-11-04T07:26:26Z"
+      "zeitpunkt": "2026-11-05T07:53:12Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4989,9 +5022,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "32d3d39f19c7b265c00e743cdb8c24c81e3639bc96a08f8c04ba9f881fb3b56e",
+      "beleg_id": "c929e9fab83165a29cbe7104299d5067cabd0802886a05f458f9aa77b56c3be0",
       "seite": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-17-pro-max-5g/black-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=13.6&instalmentId=24",
-      "zeitpunkt": "2026-11-04T07:26:27Z"
+      "zeitpunkt": "2026-11-05T07:53:13Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5030,9 +5063,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "30047d0d63d9650df1ba3a671d2179629cf1a0d98883206a20008e9aeaaff42f",
+      "beleg_id": "94d7608dac4c8fac2f2cbcba560aa7e25c9596b386565257f50dfc8d3a0aff20",
       "seite": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-17-pro-max-5g/black-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=27.3&instalmentId=12",
-      "zeitpunkt": "2026-11-04T07:26:28Z"
+      "zeitpunkt": "2026-11-05T07:53:14Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5065,16 +5098,16 @@
    ],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 85,
-    "beendet": 83,
+    "anfragen": 84,
+    "beendet": 82,
     "dokument": "complete",
     "geladen": true,
     "offen": {
      "onebot-webfrontend.oneai.yo-digital.com": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 134.3,
-    "takte_ms": 1700,
+    "sekunden": 133.5,
+    "takte_ms": 1350,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -5107,9 +5140,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "ff5c526086be0ee63889a7a8595f4a7bcf118450875e96f1879e7dce467fc6b5",
+      "beleg_id": "2ebf165befb6e4c045a0ed157d1043bfc92aaaa4723caf3a0c6f27c65d0d504b",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=32.5&instalmentId=36",
-      "zeitpunkt": "2026-11-04T07:29:48Z"
+      "zeitpunkt": "2026-11-05T07:56:32Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5148,9 +5181,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "445982bea881a822aa3c3cd65733e282f59e4c23d84ea5dc91d995f8d47419cb",
+      "beleg_id": "6015aee9f411f8d101600ed5f78816f26b2eca9229e87567eb12c63da67a3387",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=48.7&instalmentId=24",
-      "zeitpunkt": "2026-11-04T07:29:49Z"
+      "zeitpunkt": "2026-11-05T07:56:32Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5189,9 +5222,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "dca82e7c131a4742f36049c6106e32272db6cfce98907b47066ceea257c3119a",
+      "beleg_id": "ea6976acf089c509fb8a34a1f9a484637ba35ec10f4cccd10cfc3cdba9382169",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=97.5&instalmentId=12",
-      "zeitpunkt": "2026-11-04T07:29:50Z"
+      "zeitpunkt": "2026-11-05T07:56:34Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5230,9 +5263,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "5989ba784bbdefe5c5d8eec8e2713c3277873e2a5246914d6323c5c64ba1efae",
+      "beleg_id": "065d470717f291fda5fec0a01662bdbb65be18bd57b593e5c7ca4553bd150031",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=97.5&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D512_GB",
-      "zeitpunkt": "2026-11-04T07:29:53Z"
+      "zeitpunkt": "2026-11-05T07:56:36Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5271,9 +5304,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "8a91bc692e67380dab905d70ddd4ec3b71617e4c26b045a11cbf9a3fb6a29692",
+      "beleg_id": "0c8abb372e1dd8398b0fe682b1be9faf7e3c9af0e3c85d00eac1640568d37ddc",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=55.4&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-04T07:29:54Z"
+      "zeitpunkt": "2026-11-05T07:56:37Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5312,9 +5345,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "e37411d14893c7ff8d0290160f0721a43eb4e7febf6937498513d0cef67b7b68",
+      "beleg_id": "0ab997fb601daf6b9d815f0de39db549ab9102380d3183477aa5c99ef96989c3",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=110.8&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-04T07:29:55Z"
+      "zeitpunkt": "2026-11-05T07:56:38Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5353,9 +5386,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "d3be168471358a9110ac8b380fce473ec0bd27e7bedc12a7c1fa642d9784878a",
+      "beleg_id": "78295a7c1d38f8e65ca86696346c3ba5c9daa64fe72602a42b62bde27cce8d10",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=110.8&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D1_TB",
-      "zeitpunkt": "2026-11-04T07:29:58Z"
+      "zeitpunkt": "2026-11-05T07:56:41Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5394,9 +5427,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "8d393612a439d7d76322c71efce9d1b7170e0aa9723acba3cf32ad36f2e94032",
+      "beleg_id": "e454e41516c613faa6c8777fbc0a5f7f0c0bbf4f545fcb84a001fff6a064b011",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=70&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
-      "zeitpunkt": "2026-11-04T07:29:59Z"
+      "zeitpunkt": "2026-11-05T07:56:42Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5435,9 +5468,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "92c4fdbfd66078e8ba2b1316d386c05f6cc935e9a38453e0331856a4837f7cd0",
+      "beleg_id": "cd895abd43075c63ce1d92b973be7fca3bafe2bb59bb406076725ef32438ae66",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=140&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
-      "zeitpunkt": "2026-11-04T07:30:00Z"
+      "zeitpunkt": "2026-11-05T07:56:43Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5476,9 +5509,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "564d7eaca806327072931e40371e96646388f2c852304884dfd95a033a32a6ca",
+      "beleg_id": "3909d002139277d8f1a33952f0a10afd3a79f20ecaad8f497af0d7bc3dc38801",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=140&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D2_TB",
-      "zeitpunkt": "2026-11-04T07:30:03Z"
+      "zeitpunkt": "2026-11-05T07:56:45Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5517,9 +5550,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "f7b52e8874fb844b723550022b6e56255041ddd707c7c93e6b4b5b824b3e1ae8",
+      "beleg_id": "cd12f51ab132e4e7a8d02f9c7a6fc90df529c7dcdceaa06fa231399b81f47f83",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=99.1&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D2_TB",
-      "zeitpunkt": "2026-11-04T07:30:04Z"
+      "zeitpunkt": "2026-11-05T07:56:46Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5558,9 +5591,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "6610096cd4420ea8f4b19ebe573c3a97a1b5f922b29e41ef3267d241d84ecbbe",
+      "beleg_id": "b26be40a4a921038ffac48823bf3149838de6059839978f130cd4bc96d7990db",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=198.3&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D2_TB",
-      "zeitpunkt": "2026-11-04T07:30:05Z"
+      "zeitpunkt": "2026-11-05T07:56:47Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5593,17 +5626,16 @@
    ],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 88,
-    "beendet": 85,
+    "anfragen": 94,
+    "beendet": 92,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "onebot-webfrontend.oneai.yo-digital.com": 1,
-     "www.telekom.de": 1
+     "onebot-webfrontend.oneai.yo-digital.com": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 134.8,
-    "takte_ms": 1500,
+    "sekunden": 134.0,
+    "takte_ms": 1350,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -5636,9 +5668,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "b9f0fb35d530c086ec0ce49500b3eb977ff9420ba0834a87ae979c2a1ed0de0c",
+      "beleg_id": "805a5f746dd1f93df8ecff3b47daf7000b5bac68e465c0d678e1fa545e219a40",
       "seite": "https://www.telekom.de/shop/geraet/motorola/motorola-edge-70-fusion/pantone-silhouette-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=7.4&instalmentId=24",
-      "zeitpunkt": "2026-11-04T07:33:24Z"
+      "zeitpunkt": "2026-11-05T08:00:05Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5677,9 +5709,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "5045d6499a9cc9f9221084071c69094689d4c822b23eda90d7bef45eb9eaca1a",
+      "beleg_id": "f7e75e6fcf451f201697d39404b358787fc367e2406e68dd8c9df3a4ec407e32",
       "seite": "https://www.telekom.de/shop/geraet/motorola/motorola-edge-70-fusion/pantone-silhouette-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=14.8&instalmentId=12",
-      "zeitpunkt": "2026-11-04T07:33:25Z"
+      "zeitpunkt": "2026-11-05T08:00:06Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5718,9 +5750,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "bfa4bfdd298ef4ee8ef17bf78fae8f702b6ef72da494a2572b3ee4d030f31c50",
+      "beleg_id": "b783eb21a9525c3a3488d6d8d917b8eaf305e618f1b754cde8a198bc52854299",
       "seite": "https://www.telekom.de/shop/geraet/motorola/motorola-edge-70-fusion/pantone-silhouette-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=29.6&instalmentId=6",
-      "zeitpunkt": "2026-11-04T07:33:26Z"
+      "zeitpunkt": "2026-11-05T08:00:07Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5753,18 +5785,17 @@
    ],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 87,
-    "beendet": 85,
+    "anfragen": 155,
+    "beendet": 138,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "binkiesproductionweu.servicebus.windows.net": 1,
-     "onebot-webfrontend.oneai.yo-digital.com": 1,
-     "www.telekom.de": 1
+     "engage-content2.binkies3d.com": 15,
+     "onebot-webfrontend.oneai.yo-digital.com": 1
     },
     "ohne_antwort_ms": 0,
     "sekunden": 134.1,
-    "takte_ms": 1600,
+    "takte_ms": 1350,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -5779,7 +5810,7 @@
     "knoepfe_gefunden": 18,
     "knoepfe_gesucht": 18
    },
-   "verworfen": 15
+   "verworfen": 16
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-17/black-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
@@ -5820,18 +5851,18 @@
    ],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 86,
-    "beendet": 82,
+    "anfragen": 88,
+    "beendet": 86,
     "dokument": "complete",
     "geladen": true,
     "offen": {
      "pix.telekom.de": 2,
-     "www.telekom.de": 3,
+     "www.telekom.de": 1,
      "www2.telekom.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 153.9,
-    "takte_ms": 1500,
+    "sekunden": 153.6,
+    "takte_ms": 1700,
     "wartet_auf": "load"
    },
    "speicher_gb": 512,
@@ -5864,9 +5895,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "773b603c433ea3007ee1bf747d73d8dd701d9ea7bf3b905be0d474efc8ce5a9e",
+      "beleg_id": "0fba4de04bca062291b6a543c23922f6a415b349c03804736858a3fb5d01a596",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro/polar-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=28&instalmentId=36",
-      "zeitpunkt": "2026-11-04T07:40:38Z"
+      "zeitpunkt": "2026-11-05T08:07:21Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5905,9 +5936,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "b602a119d5f14054adfca654430976be9de3b10c5ccd81ce75bfd8a2b6663102",
+      "beleg_id": "9a93ced3211414ab3b0e4631c9287d9a11e84e2e63c45dc275d354b5cc6734e3",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro/polar-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=42&instalmentId=24",
-      "zeitpunkt": "2026-11-04T07:40:39Z"
+      "zeitpunkt": "2026-11-05T08:07:22Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5946,9 +5977,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "5582868c6c86bb0023e5d151ac5016e14738b56cc2ae828a94dc2a90f2359a19",
+      "beleg_id": "87318ce5733f3962ddbd0f6399b4ee31c9c1c11d494f3553f02402f5bf9fd3c2",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro/polar-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=84&instalmentId=12",
-      "zeitpunkt": "2026-11-04T07:40:40Z"
+      "zeitpunkt": "2026-11-05T08:07:23Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5987,9 +6018,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "6f588a49bd7feb49f70a4cf12ec7ed6874f61cde360c6a748f865058ec98438e",
+      "beleg_id": "de58f31270e44ce9d260118bcf01bfd9244e4f1517724695a70b1a03daec9973",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro/polar-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=84&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D512_GB",
-      "zeitpunkt": "2026-11-04T07:40:42Z"
+      "zeitpunkt": "2026-11-05T08:07:26Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6028,9 +6059,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "6e88fdbb4eda300ae5e83770d8e8c34fa16be4e64df9af249b5a5c5f725c8b70",
+      "beleg_id": "ad3a8d1b84a93561ec186d23b03752772cee87f136ec60de128d7be8958d1088",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro/polar-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=48&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-04T07:40:43Z"
+      "zeitpunkt": "2026-11-05T08:07:27Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6069,9 +6100,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "e21cf82d5b1487cd3e7f0ffa5ec886db6a6b331276cddfac7bd08eb8e0ef1c77",
+      "beleg_id": "e030d127b49c3dedbf7847afa172e67507c4cb96ff8bcab3cfd28461c5364e9b",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro/polar-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=96.5&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-04T07:40:44Z"
+      "zeitpunkt": "2026-11-05T08:07:28Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6110,9 +6141,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "9a39c4691e2e18154db87d0156c3f84e3ccd52de343eb3f37980739928ab47b8",
+      "beleg_id": "a214117373e8f80b8b19ec0da1eda91a11aacbb35e9d74e91d82d24d5b688ac6",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro/polar-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=96.5&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D1_TB",
-      "zeitpunkt": "2026-11-04T07:40:47Z"
+      "zeitpunkt": "2026-11-05T08:07:30Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6151,9 +6182,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "535a501a2637987a72fac4244b66aedac93431fa573696d13f6729a462f28d41",
+      "beleg_id": "761fe1e05f975cb4e31a49260235a4672be6117e9284fbd9fc68206aeabc022b",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro/polar-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=62.5&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
-      "zeitpunkt": "2026-11-04T07:40:48Z"
+      "zeitpunkt": "2026-11-05T08:07:31Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6192,9 +6223,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "203edeaff904bc826d5cc317ad697698d14605aa0b26768892955e8b55959b49",
+      "beleg_id": "3c2f022bc15db20eaa2ff0808ac34c23f3ab20e0ca39e53a650f1ded53cde172",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro/polar-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=125.5&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
-      "zeitpunkt": "2026-11-04T07:40:49Z"
+      "zeitpunkt": "2026-11-05T08:07:32Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6233,9 +6264,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "4c8a6af6764b791367fc30aaa458b651eadd80d33f03d31f9482a7c4c4409c9c",
+      "beleg_id": "dfa65a434c0cae3b05f66ee7bb2daccd8d23abcd78feae2f6f937655be3f8a56",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro/polar-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=125.5&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D2_TB",
-      "zeitpunkt": "2026-11-04T07:40:52Z"
+      "zeitpunkt": "2026-11-05T08:07:35Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6274,9 +6305,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "2e45c9c43e4c8dfbb130085686664344911aacff94b1d33afc096f8b79b6ab2f",
+      "beleg_id": "922477872d245925072fb17d7702a536eda3dc90064ab792d2025ec77be993dd",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro/polar-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=87.5&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D2_TB",
-      "zeitpunkt": "2026-11-04T07:40:53Z"
+      "zeitpunkt": "2026-11-05T08:07:36Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6315,9 +6346,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "f7fef15d26a56f046a77c380ccf42033a4c9842b9b55be3ac557db15117f98fb",
+      "beleg_id": "a6654b7bda4e3cc255e2c74b1bd1b5157bfa94b3c9a29648ba83f3ee31130d08",
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro/polar-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=175.5&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D2_TB",
-      "zeitpunkt": "2026-11-04T07:40:54Z"
+      "zeitpunkt": "2026-11-05T08:07:37Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6350,16 +6381,18 @@
    ],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 93,
-    "beendet": 91,
+    "anfragen": 99,
+    "beendet": 96,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "onebot-webfrontend.oneai.yo-digital.com": 1
+     "binkiesproductionweu.servicebus.windows.net": 1,
+     "onebot-webfrontend.oneai.yo-digital.com": 1,
+     "www.telekom.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 134.8,
-    "takte_ms": 1650,
+    "sekunden": 138.9,
+    "takte_ms": 5800,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -6392,9 +6425,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "46a0e5c03ff2a2a9e6e982e88e47ed01786183c0bf653e26cfea4b79ad16de04",
+      "beleg_id": "5261495e30ac5266ea675a841a80b38b1c4d4a6b04ebacf7c5cd58a424ccac80",
       "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-11-pro-xl/obsidian-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=23.3&instalmentId=36",
-      "zeitpunkt": "2026-11-04T07:44:13Z"
+      "zeitpunkt": "2026-11-05T08:10:55Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6433,9 +6466,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "140fe2567691beb65b4b115fcb8678f2334f9bc14dec00d2ac41e0e0b879b554",
+      "beleg_id": "d8355b2b52c3cff5fe865dcd39a933f1c2b3cc85a6314436db07a208d01eb38e",
       "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-11-pro-xl/obsidian-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=35&instalmentId=24",
-      "zeitpunkt": "2026-11-04T07:44:15Z"
+      "zeitpunkt": "2026-11-05T08:10:56Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6474,9 +6507,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "8ebd57e9ebb900df1b06c6e0a0c1f7933e34850cc8ac2591435b0ea5bb5bc5b5",
+      "beleg_id": "b6f95283ac08b6d97dbc684786afbaf545a696338cc7159cc508b101f8b00f86",
       "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-11-pro-xl/obsidian-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=70&instalmentId=12",
-      "zeitpunkt": "2026-11-04T07:44:16Z"
+      "zeitpunkt": "2026-11-05T08:10:57Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6515,9 +6548,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "b3128d9494ea58fdf2c14317b4eda15310b30d611898ef183a09b66a5df2adc0",
+      "beleg_id": "d89d5a31c05d419812fc7c7d9d3980acca7cd518fd57ce10a7ee783bdbe26835",
       "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-11-pro-xl/obsidian-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=70&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D512_GB",
-      "zeitpunkt": "2026-11-04T07:44:18Z"
+      "zeitpunkt": "2026-11-05T08:11:00Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6556,9 +6589,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "160573f7a9f9ab4222cce3a3332cccd938da0f5331ad64b559c6d7da71ea4b7e",
+      "beleg_id": "96539143323f17a811c4cf82fc86ed2d05f300edee9031b3c66904546ba9f4a0",
       "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-11-pro-xl/obsidian-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=40.4&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-04T07:44:19Z"
+      "zeitpunkt": "2026-11-05T08:11:01Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6597,9 +6630,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "68e71c1961674f750b823fe5c32439ddf73859ae68b5c99979cb30b1ef0a128e",
+      "beleg_id": "f3948831cead44a718a09d768a3ec6f03e695443fab2598a30435b1601fd1033",
       "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-11-pro-xl/obsidian-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=80.8&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-04T07:44:20Z"
+      "zeitpunkt": "2026-11-05T08:11:02Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6632,16 +6665,17 @@
    ],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 93,
-    "beendet": 92,
+    "anfragen": 150,
+    "beendet": 140,
     "dokument": "complete",
     "geladen": true,
     "offen": {
+     "engage-content2.binkies3d.com": 8,
      "onebot-webfrontend.oneai.yo-digital.com": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 134.5,
-    "takte_ms": 1750,
+    "sekunden": 134.0,
+    "takte_ms": 1350,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -6656,7 +6690,7 @@
     "knoepfe_gefunden": 36,
     "knoepfe_gesucht": 36
    },
-   "verworfen": 23
+   "verworfen": 24
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/fairphone/fairphone-gen-6plus/forest-gruen-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
@@ -6674,9 +6708,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "f396b1af3e4f78f9bdaf5d739727d30502c1cc21da294ccc9a481f65171d7c0f",
+      "beleg_id": "23d65dcaff8561e671a37f9e2c654892b369a58523ef5b444237188ebb8cfea4",
       "seite": "https://www.telekom.de/shop/geraet/fairphone/fairphone-gen-6plus/forest-gruen-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=9.6&instalmentId=36",
-      "zeitpunkt": "2026-11-04T07:47:41Z"
+      "zeitpunkt": "2026-11-05T08:14:20Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6715,9 +6749,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "725f3fd1ed96e68138b0f7d05c481d5aee0ce765122c89767cc06c6ec5dbc89e",
+      "beleg_id": "2a8f097cb696bbdfdedf9fbe77d9e5b68ba417c3db7e69166f4f10db0dec6152",
       "seite": "https://www.telekom.de/shop/geraet/fairphone/fairphone-gen-6plus/forest-gruen-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=14.5&instalmentId=24",
-      "zeitpunkt": "2026-11-04T07:47:42Z"
+      "zeitpunkt": "2026-11-05T08:14:20Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6756,9 +6790,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "48f555824aef849f3ded332e221bc9bd05bdd17dcd7e38bc420da0116a00b48d",
+      "beleg_id": "4e49369b546cc0e5ff15c28999000d3ed93b9a7a37db39a3d557b9d25aa5f756",
       "seite": "https://www.telekom.de/shop/geraet/fairphone/fairphone-gen-6plus/forest-gruen-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=29&instalmentId=12",
-      "zeitpunkt": "2026-11-04T07:47:43Z"
+      "zeitpunkt": "2026-11-05T08:14:22Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -6792,7 +6826,7 @@
    "ladung": {
     "abstand_s": 10.0,
     "anfragen": 93,
-    "beendet": 90,
+    "beendet": 91,
     "dokument": "complete",
     "geladen": true,
     "offen": {
@@ -6800,8 +6834,8 @@
      "www.telekom.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 135.3,
-    "takte_ms": 1500,
+    "sekunden": 133.7,
+    "takte_ms": 1450,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -6829,5 +6863,5 @@
  ],
  "uebersichten": [],
  "vertragsform": "tarif_plus_ratenkauf",
- "zeitbudget_sekunden": 10260
+ "zeitbudget_sekunden": 10263
 }
