@@ -120,7 +120,7 @@ anbieter:
 
   - name: MediaMarkt
     typ: handel
-    erfassung: aus
+    erfassung: barpreis
     gruppe: Ceconomy
     rang: 2
     methode: mediamarkt_angebote
