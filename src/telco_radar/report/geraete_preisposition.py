@@ -32,6 +32,7 @@ from html import escape
 from ..geraete_model import serie_aus_modell
 from . import geraete_rechenweg, geraete_zeitreihe_geometrie
 from .anbieter_farben import legendenname, slug_fuer, stil_fuer
+from .geraete_laufzeit import regel_satz
 from .geraete_preisposition_preise import (
     BAND,
     FEHLT_TEXT,
@@ -363,6 +364,7 @@ def aufbereiten(geraete: dict) -> dict:
         "legende": _legende(anbieter, ohne),
         "achse": ach,
         "achsentitel": titel,
+        "regel": regel_satz(k for _, karten in rohe for k in karten.values()),
     }
     daten["svg_breit"] = _svg(daten, False)
     schmal = {

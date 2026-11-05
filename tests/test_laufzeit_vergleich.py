@@ -3,7 +3,7 @@ Ratenlaufzeit.
 
 Ein Bestand für das iPhone 17 Pro 256 GB im Band XS mit allen drei
 Ansichten (12, 24 und 36 Raten): Vodafone und congstar je 12/24/36, o2 nur 24,
-Telekom nur 36, 1&1 ein Vertrag „24 + 12“ über 36 Monate. Die Erwartungen stehen als
+Telekom nur 36, 1&1 ein Vertrag über 36 Monate. Die Erwartungen stehen als
 Rechnung aus den Rohwerten im Test, nicht aus dem Produktcode:
 
   12 Raten (H 24): congstar 1 + 24 × 15 + 12 × 70 = 1.201,00
@@ -11,14 +11,15 @@ Rechnung aus den Rohwerten im Test, nicht aus dem Produktcode:
   24 Raten (H 24): congstar 1 + 24 × 15 + 24 × 38,25 = 1.279,00
                    o2       1 + 24 × 25 + 24 × 40 = 1.561,00
                    Vodafone 1 + 24 × 29,95 + 24 × 45 = 1.799,80
+                   1&1      24 × 42,99 + 340 Ablöse + 39,90 = 1.411,66
   36 Raten (H 36): congstar 1 + 24 × 15 + 36 × 26 = 1.297,00
                    Telekom  1 + 24 × 20 + 36 × 31 = 1.597,00
                    Vodafone 1 + 24 × 29,95 + 36 × 31 = 1.835,80
 
-Der Tarif zählt nur seine 24 Monate, ab Monat 25 nur die Rate. 1&1 (Tarif und
-Gerät in einem Betrag über 36 Monate) ist keine 24-Monats-Finanzierung und
-trägt in keiner Ansicht eine Zahl, sondern die Lücke „Nur als 24 + 12 erfasst“
-(Preisprüfung 02.11.2026).
+Der Tarif zählt nur seine 24 Monate, ab Monat 25 nur die Rate; 1&1 (Tarif und
+Gerät in einem Betrag über 36 Monate, „24 + 12“) wird nur über 24 Monate
+verglichen: 24 Beträge plus Einmalzahlung, in der 24er-Ansicht (Antonio,
+10.10.2026; nach der Lücke vom 02.11.2026 wieder gerechnet, 05.11.2026).
 
 Vor Teil B stellte die 12er-Karte von congstar den Sieger der 24-Monats-Tafel,
 Δ rechnete gegen die günstigste Vodafone-Karte über alle Laufzeiten, und 1&1
@@ -38,7 +39,6 @@ import yaml
 from bestand_pfad import lese_wurzel
 from tarifleiter_testbestand import mit_leiter
 
-from telco_radar import tco_kosten
 from telco_radar.geraete_config import lade_katalog, lade_quellen
 from telco_radar.report import (
     geraete_export,
@@ -75,7 +75,7 @@ GETRENNT = (
 
 SOLL = {
     12: {"congstar": 1201.0, "Vodafone": 1679.8},
-    24: {"congstar": 1279.0, "o2": 1561.0, "Vodafone": 1799.8},
+    24: {"congstar": 1279.0, "o2": 1561.0, "Vodafone": 1799.8, "1&1": 1411.66},
     36: {"congstar": 1297.0, "Telekom": 1597.0, "Vodafone": 1835.8},
 }
 
@@ -363,18 +363,18 @@ def test_ein_36_raten_buendel_steht_nicht_in_der_24er_ansicht(g):
     assert _rund(1597.0) in sechsunddreissig["svg_breit"]
 
 
-def test_1und1_24_plus_12_traegt_keine_zahl_und_kein_delta():
+def test_1und1_wird_ueber_24_monate_gegen_vodafone_24_verglichen():
     """?laufzeit=36: Telekom trägt Δ gegen die Vodafone-Karte mit 36 Raten im selben
-    Band (1.597,00 − 1.835,80 = −238,80). 1&1 „24 + 12“ ist keine
-    24-Monats-Finanzierung: keine Gesamtkosten, kein Δ, die Lücke ist benannt."""
+    Band (1.597,00 − 1.835,80 = −238,80). 1&1 wird nur über 24 Monate verglichen:
+    Δ gegen Vodafone mit 24 Raten (1.411,66 − 1.799,80 = −388,14)."""
     k = _karte_aus(bestand(), "Telekom", 36)
     assert k["delta"] is not None, k["delta_zustand"]
     assert k["delta"]["betrag"] == round(1597.0 - 1835.8, 2)
     assert k["delta_zustand"] is None
     eins = _karte_aus(bestand(), "1&1", 24)
-    assert eins["gesamt"] is None
-    assert eins["delta"] is None
-    assert any("24 + 12" in x for x in eins["luecken"]), eins["luecken"]
+    assert eins["delta_zustand"] is None, eins["delta_zustand"]
+    assert eins["delta"]["betrag"] == round(1411.66 - 1799.8, 2)
+    assert eins["leitzahl_monate"] == 24
     cs12 = _karte_aus(bestand(), "congstar", 12)
     assert cs12["delta"]["betrag"] == round(1201.0 - 1679.8, 2)
 
@@ -442,21 +442,21 @@ def test_antwortsatz_und_grafikachse_nennen_die_laufzeit(g, laufzeit):
 def test_telekom_ist_in_der_24er_ansicht_nicht_erfasst(g):
     """Telekom führt nur 36 Raten: in der 24er-Ansicht steht sie benannt als
     „nicht erfasst“ - nicht als „andere Laufzeit“ und nicht stumm. 1&1 steht
-    unter 24 und 36 mit seinem Grund, nie mit einer Zahl."""
+    unter 24 mit Zahl und unter 36 mit seinem Grund."""
 
     def zustand(laufzeit: int) -> dict:
         return {f["anbieter"]: f["kurz"] for f in _paar(g, laufzeit)["fehlen"]}
 
     vier = zustand(24)
     assert vier["Telekom"].startswith("Mit 24 Raten nicht erfasst"), vier
-    assert vier["1&1"] == "Nur als 24 + 12 erfasst", vier
+    assert "1&1" not in vier, vier
     assert not any("andere Laufzeit" in k for k in vier.values()), vier
     zwoelf = zustand(12)
     assert zwoelf["o2"] == "Mit 12 Raten nicht im Angebot", zwoelf
     assert zwoelf["Telekom"].startswith("Mit 12 Raten nicht erfasst"), zwoelf
     sechsunddreissig = zustand(36)
     assert "Telekom" not in sechsunddreissig, sechsunddreissig
-    assert sechsunddreissig["1&1"] == "Nur als 24 + 12 erfasst"
+    assert sechsunddreissig["1&1"] == "Nur über 24 Monate verglichen"
 
 
 def test_spanne_je_laufzeit(g):
@@ -475,7 +475,6 @@ def test_die_grafik_traegt_je_ansicht_nur_ihre_linien(g):
     for laufzeit, soll in SOLL.items():
         paar = _paar(g, laufzeit)
         assert sorted(paar["anbieter"]) == sorted(soll), (laufzeit, paar["anbieter"])
-        assert "1&1" not in paar["anbieter"], (laufzeit, paar["anbieter"])
         for betrag in soll.values():
             assert _rund(betrag) in paar["svg_breit"], (laufzeit, betrag)
 
@@ -513,7 +512,7 @@ def test_der_wettbewerbsradar_vergleicht_je_laufzeit(g):
     assert telekom["vf_gesamt"] == 1835.8
     assert telekom["prozent"] == round((1597.0 - 1835.8) / 1835.8 * 100, 1)
     assert ("1&1", 36) not in paare
-    assert ("1&1", 24) not in paare
+    assert paare[("1&1", 24)]["vf_gesamt"] == 1799.8
     assert paares_vf(paare, 24) == {1799.8}
     assert paares_vf(paare, 12) == {1679.8}
 
@@ -582,25 +581,28 @@ def test_ohne_24er_nennt_der_katalog_die_raten_des_gezeigten_buendels(tmp_path):
     ) == ("o2", 75.0, 12)
 
 
-def test_der_radar_nennt_fuer_1und1_die_luecke_des_exports_statt_kein_buendel(g):
-    """1&1 führt nur „24 + 12“ (36 Monate): die Radarzeile nennt dieselbe
-    benannte Lücke wie die Lücken-Spalte des Bündel-Exports
-    (`tco_kosten.POSTEN_NUR_24_PLUS_12`), nicht „kein Bündel erhoben“ - ein
-    Bündel ist ja erhoben, nur ohne 24-Monats-Preis."""
+def test_der_radar_vergleicht_1und1_24_plus_12_mit_der_gerechneten_zahl(g):
+    """1&1 führt nur „24 + 12“ (36 Monate): Radarzeile und Bündel-Export tragen
+    dieselbe gerechnete 24-Monats-Zahl (24 × 42,99 + 340 Ablöse + 39,90 =
+    1.411,66, Preisprüfung 05.11.2026), ohne Lücke."""
     gruppen = geraete_radar.netzbetreiber_gruppen(
         g["tco"]["modelle"], g["tco"]["band_je_tarif"]
     )
     gruppe = next(x for x in gruppen if x["id"] == MODELL)
     eins = [z for z in gruppe["zeilen"] if z["anbieter"] == "1&1"]
-    assert [z["grund"] for z in eins] == [tco_kosten.POSTEN_NUR_24_PLUS_12]
-    assert eins[0]["grund"].startswith("24-Monats-Preis (nur als 24 + 12")
+    assert [z["laufzeit"] for z in eins] == [24]
+    assert eins[0]["status"] == geraete_radar.STATUS_VERGLEICHBAR
+    assert eins[0]["vf_gesamt"] == SOLL[24]["Vodafone"]
     text, _n = geraete_export.tco_csv(g["tco"]["export"])
-    luecken = {
-        z["Lücke"]
+    zeilen = [
+        z
         for z in csv.DictReader(io.StringIO(text.lstrip("﻿")), delimiter=";")
         if z.get("Anbieter") == "1&1"
-    }
-    assert any(tco_kosten.POSTEN_NUR_24_PLUS_12 in x for x in luecken), luecken
+    ]
+    assert [geraete_export.leitzahl_aus_zeile(z) for z in zeilen] == [
+        f"{SOLL[24]['1&1']:.2f}".replace(".", ",")
+    ]
+    assert not any(z["Lücke"] for z in zeilen), zeilen
 
 
 def test_gegenprobe_ein_anbieter_ohne_24_plus_12_behaelt_seinen_grund(g):

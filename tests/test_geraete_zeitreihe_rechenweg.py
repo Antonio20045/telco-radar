@@ -34,7 +34,6 @@ from test_geraete_zeitreihe_ansicht import HEUTE, _baue
 from telco_radar.report import geraete_rechenweg as rechenweg
 from telco_radar.report import geraete_zeitreihe as zr
 from telco_radar.report.html import render_site
-from telco_radar.tco_kosten import POSTEN_NUR_24_PLUS_12
 from telco_radar.tco_model import kosten_ueber
 
 WURZEL = pathlib.Path(__file__).resolve().parents[1]
@@ -130,15 +129,28 @@ def test_die_rate_zaehlt_alle_laufzeitmonate():
     assert rate["klammer"] == ""
 
 
-def test_die_zusammenform_24_plus_12_hat_keinen_rechenweg():
+def test_die_zusammenform_hat_einen_buendelposten_und_erfindet_keine_teile():
     """1&1 nennt EINEN Monatsbetrag für Tarif und Gerät - ihn in zwei
-    Hälften zu zerlegen wäre unsere Rechnung (§ 13.2). Preisprüfung
-    02.11.2026: 24 Beträge plus Ablöse sind keine 24-Monats-Finanzierung
-    (die Entscheidung vom 10.10.2026 ist überholt); die „24 + 12"-Zeile hat
-    deshalb keine Summe und keinen Rechenweg, nur die benannte Lücke."""
-    m = _messung(EINS_EINS_MESSUNG, anbieter="1&1", tarif="1&1 All-Net-Flat S")
-    assert zr._rechung(m) is None
-    assert zr._rechung_html("1&1", m) == ""
+    Hälften zu zerlegen wäre unsere Rechnung (§ 13.2). Der Posten heißt
+    Bündelpreis; Tarif und Geräterate erscheinen NICHT. Antonio 10.10.2026:
+    1&1 zählt 24 Beträge (24 × 49,99 = 1.199,76), die Zuzahlung ist die
+    Ablöse nach Monat 24."""
+    r = zr._rechung(
+        _messung(EINS_EINS_MESSUNG, anbieter="1&1", tarif="1&1 All-Net-Flat S")
+    )
+    assert round(sum(p["betrag"] for p in r["posten"]), 2) == 1659.66
+    assert r["gesamt"] == 1659.66
+    labels = [p["label"] for p in r["posten"]]
+    assert labels == [
+        "Anschlusspreis",
+        "Bündelpreis (Tarif und Gerät zusammen)",
+        "Ablöse nach Monat 24",
+    ]
+    buendel = r["posten"][1]
+    assert buendel["anzahl"] == 24 and buendel["einzeln"] == 49.99
+    assert buendel["betrag"] == round(24 * 49.99, 2)
+    assert r["posten"][2]["betrag"] == 420.0
+    assert buendel["klammer"] == ""
 
 
 def test_kein_anschlusspreis_ist_eine_luecke_und_null_null_ein_betrag():
@@ -191,10 +203,12 @@ def test_die_zusammenform_behaelt_ihre_kurve_und_nennt_ihren_zeitraum():
     """
     m = _messung(EINS_EINS_MESSUNG, anbieter="1&1", tarif="1&1 All-Net-Flat S")
     messungen = {("m", "b"): {"1&1": {"2026-09-12": m}}}
-    assert zr._messwert(m) == (None, None)
-    assert zr._serien_aus(messungen) == {("m", "b"): {"1&1": []}}
+    assert zr._messwert(m) == (1659.66, 24)
+    assert zr._serien_aus(messungen) == {("m", "b"): {"1&1": [("2026-09-12", 1659.66)]}}
+    assert zr._zeitraeume_aus(messungen) == {("m", "b"): {"1&1": [24]}}
     kennzahl = kosten_ueber(zr._buendel_aus_messung(m))
-    assert kennzahl.gesamt is None and kennzahl.luecken == [POSTEN_NUR_24_PLUS_12]
+    assert (kennzahl.gesamt, kennzahl.monate) == (1659.66, 24)
+    assert kennzahl.gesamt == round(420.0 + 39.90 + 24 * 49.99, 2)
 
 
 def test_die_aufgeteilte_form_nennt_ihre_24_monate_genauso():
@@ -377,7 +391,12 @@ def test_die_rechnung_kennt_keine_restschuld_alle_raten_liegen_im_zeitraum():
     assert "noch zu zahlen" not in html and "Restschuld" not in html
     assert "36 × 19,00 €" in html and "Kosten über 36 Monate" in html
     eins = _messung(EINS_EINS_MESSUNG, anbieter="1&1", tarif="1&1 All-Net-Flat S")
-    assert zr._rechung(eins) is None
+    r11 = zr._rechung(eins)
+    assert "offen" not in r11 and r11["monate"] == 24
+    html11 = zr._rechung_html("1&1", eins)
+    assert "noch zu zahlen" not in html11
+    assert "24 × 49,99 € <span class='gr-zr-pg'>= 1.199,76 €" in html11
+    assert "Ablöse nach Monat 24" in html11 and "Kosten über 24 Monate" in html11
 
 
 def test_der_rechnungskopf_traegt_den_farbpunkt_des_anbieters():
@@ -386,11 +405,9 @@ def test_der_rechnungskopf_traegt_den_farbpunkt_des_anbieters():
     html = zr._rechung_html("o2", _messung(O2_MESSUNG), O2_TARIFE)
     assert "<i class='gr-zr-rpunkt' style='background:#0019a5'" in html
     html11 = zr._rechung_html(
-        "1&1",
-        _messung(EINS_EINS_MESSUNG, anbieter="1&1", tarif="1&1 All-Net-Flat S"),
-        O2_TARIFE,
+        "1&1", _messung(EINS_EINS_MESSUNG, anbieter="1&1", tarif="1&1 All-Net-Flat S")
     )
-    assert html11 == ""
+    assert "background:#2f7fd1" in html11
 
 
 def test_der_klammer_text_und_das_label_erfuellen_die_12_px_regel(
@@ -527,7 +544,7 @@ def test_der_leerzustands_text_steht_woertlich_in_der_buendel_vorlage(tmp_path):
         assert text.startswith(kompakt), text
 
 
-def test_die_24_plus_12_zeile_bekommt_kein_template():
+def test_zwei_preisformen_am_selben_tag_bleiben_zwei_templates():
     messungen = {
         "o2": {"2026-09-12": _messung(O2_MESSUNG)},
         "1&1": {
@@ -541,7 +558,7 @@ def test_die_24_plus_12_zeile_bekommt_kein_template():
     paare = {
         (t["data-anb"], t["data-m"]) for t in suppe.select("template[data-anb][data-m]")
     }
-    assert paare == {("o2", "2026-09-12")}
+    assert paare == {("o2", "2026-09-12"), ("1&1", "2026-09-12")}
 
 
 def _serien():

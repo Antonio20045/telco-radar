@@ -40,7 +40,7 @@ from typing import Optional
 
 from . import geraete_tco_grafik
 from .anbieter_farben import farbe_fuer
-from .geraete_laufzeit import LAUFZEIT_STANDARD, ansicht, fehlt_satz, nur_24, zeitraum
+from .geraete_laufzeit import LAUFZEIT_STANDARD, ansicht, fehlt_satz, zeitraum
 from .geraete_tco_karten import ANBIETER_REIHENFOLGE, HAENDLER_OHNE_BUENDEL
 
 log = logging.getLogger(__name__)
@@ -253,16 +253,16 @@ def _reihe(anbieter: str, karte: dict) -> dict:
 def _grund(anbieter: str, modell: dict, in_laufzeit: set, laufzeit: int) -> str:
     """Warum dieser Anbieter in diesem Band keine Linie traegt.
 
-    Drei Faelle: UEBERHAUPT kein Buendel (Formulierung aus BRIEF_GRAPH1), keins
-    mit der gewaehlten Ratenlaufzeit („nicht erfasst“, Datenkonzept 5.4; ein
-    „24 + 12“-Angebot zaehlt als erfasst) oder keins in DIESEM Band.
+    Drei Faelle: der Anbieter liefert fuer dieses Geraet UEBERHAUPT kein
+    Buendel (die Formulierung, die BRIEF_GRAPH1 fuer Telekom woertlich
+    vorgibt), keins mit der gewaehlten Ratenlaufzeit („nicht erfasst“,
+    Datenkonzept 5.4), oder keins in DIESEM Band (ein anderes Datenvolumen).
     """
-    karten = modell.get("karten") or []
-    if nur_24(karten, anbieter) or anbieter in anbieter_mit_irgendeinem_buendel(modell):
-        if anbieter in in_laufzeit:
-            return f"{anbieter} führt für dieses Gerät kein Bündel in diesem Band."
-        return fehlt_satz(anbieter, karten, laufzeit)
-    return f"Bündel seitens {anbieter} noch nicht erhoben."
+    if anbieter not in anbieter_mit_irgendeinem_buendel(modell):
+        return f"Bündel seitens {anbieter} noch nicht erhoben."
+    if anbieter not in in_laufzeit:
+        return fehlt_satz(anbieter, modell.get("karten") or [], laufzeit)
+    return f"{anbieter} führt für dieses Gerät kein Bündel in diesem Band."
 
 
 def alle_karten_je_band(

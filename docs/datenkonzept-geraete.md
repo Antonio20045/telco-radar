@@ -111,6 +111,8 @@ Warum der Tarif in der 36er-Ansicht nur 24 Monate zählt (Antonio, 10.10.2026): 
 
 1&1 nennt nur einen Monatsbetrag für Tarif und Gerät; nach 24 Monaten kann man kündigen und das Gerät gegen eine Ablöse behalten („24+12“). Also wird 1&1 nur über 24 Monate verglichen (Antonio, 10.10.2026): 24 × Bündelbetrag + Ablöse + Anschluss in der 24er-Ansicht (`tco_kosten.zeitraum`, `geraete_laufzeit.ansicht`). Die gemessene Zuzahlung eines solchen Vertrags ist die Ablöse, keine Anzahlung; fehlt sie, ist die Zahl die Lücke „Einmalzahlung bei Kündigung“. Die 36er-Ansicht nennt „1&1 wird nur über 24 Monate verglichen“.
 
+Preisprüfung 05.11.2026 (iPhone 18 Pro, 1&1-Laufzeitmodell): Die Kachel „24 + 12 Monate“ (52,99 € im Tarif S) bindet 24 Monate; danach tauscht man das Gerät oder kündigt und behält es gegen eine Einmalzahlung (460 €), nach 36 Monaten ohne Einmalzahlung und Rückgabe. Es sind weder Rabattmonate noch 12 weitere Geräteraten. Die Kachel „24 Monate“ (72,99 €) gibt es wirklich, ist aber nur im Tarif S erhoben und ohne gemessene Einmalzahlung; für den mittleren Tarif M gibt es sie nicht. Regel (Antonio, 05.11.2026: vergleichbar machen, nicht weglassen): Kosten über 24 Monate = Anschluss + 24 × Betrag + Einmalzahlung, also was man am Ende von Monat 24 gezahlt hat, wenn man kündigt und das Gerät behält. Das entspricht den offenen Raten der anderen Anbieter, die ebenfalls nach Monat 24 geschuldet sind. Gegenprobe im Tarif S an 67 Geräten: 24 × Preis der 24-Monats-Kachel liegt im Median 4 € über dieser Rechnung (−64 bis +72 €). Die Seite sagt es unter der Preispositionierung in einem Satz (`geraete_laufzeit.REGEL_24_PLUS_12`), die Zahl ist gerechnet, kein von 1&1 genannter 24-Monats-Preis.
+
 Zweitzahl ist Ø/Monat = Kosten ÷ H, immer mit „über H Monate“ beschriftet. Laufzeitübergreifend gibt es keinen Sieger.
 
 **Entscheidung 1** (bis 10.10.2026: 36 Tarifmonate) ist durch Antonios Regel oben ersetzt.
@@ -305,7 +307,7 @@ Insgesamt 17 bis 23 Sitzungen. Nach Schritt 3 vergleicht die Seite nur noch glei
 
 - Wie die Bestellstrecken von Vodafone, 1&1 und Telekom die Optionen technisch umschalten (je Anbieter beim Bau der Klick-Karte ermitteln).
 - Ob jede Bestellstrecke den Tarifpreis ab Monat 25 nennt.
-- Höhe der 1&1-Einmalzahlung bei Kündigung nach 24 Monaten für Smartphones.
+- Einmalzahlung bei Kündigung nach 24 Monaten: je Gerät aus der Bestellstrecke gemessen (iPhone 18 Pro 460 €, Preisprüfung 05.11.2026); für Geräte ohne Messung bleibt die Zahl eine Lücke.
 - Ob der Telekom-Aufpreis „mit Smartphone“ nach 24 Monaten endet; Ratenlaufzeiten bei freenet und otelo.
 - Feldumfang der Schnittstellen von TARIFFUXX und communicationAds.
 - Ob § 66 TKG getrennte 36-Monats-Ratenkäufe erfasst.

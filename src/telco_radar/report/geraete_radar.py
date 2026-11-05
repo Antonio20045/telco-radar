@@ -70,7 +70,7 @@ from typing import Optional
 from ..tco_model import zeitraum_vergleichbar
 from . import geraete_notbremse as notbremse
 from . import geraete_tco_band, geraete_tco_karten
-from .geraete_laufzeit import LAUFZEIT_STANDARD, LAUFZEITEN, ansicht, nur_24_karte
+from .geraete_laufzeit import LAUFZEIT_STANDARD, LAUFZEITEN, ansicht
 
 NETZ_WETTBEWERBER = tuple(
     a for a in geraete_tco_karten.ANBIETER_REIHENFOLGE if a != "Vodafone"
@@ -466,7 +466,7 @@ def netzbetreiber_gruppen(
             if paare := _paar_zeilen(a, alle_je, band_rang):
                 zeilen += paare
                 continue
-            karte = nur_24_karte(karten, a, uebrig, ungefiltert, erfasst)
+            karte = uebrig.get(a) or ungefiltert.get(a) or erfasst.get(a)
             zeilen.append(_zeile_fuer_anbieter(a, karte, basis, band_je_tarif))
         zeilen.sort(
             key=lambda z: z["prozent"] if z["prozent"] is not None else float("inf")

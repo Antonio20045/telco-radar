@@ -160,9 +160,8 @@ def test_die_leitzahl_zeitraum_spalte_ist_die_von_tco_24(tco_csv):
     24-Monats-Leitzahl - "Laufzeit Monate" und "Leitzahl-Zeitraum Monate"
     sind dort verschiedene Zahlen, und genau das ist der Punkt: die eine
     ist die RATENlaufzeit, die andere der Zeitraum der Summe daneben).
-    Ein Bündelmonatspreis über 36 Monate (1&1 „24+12“) trägt keine
-    Leitzahl: „24 + 12“ ist keine 24-Monats-Finanzierung (Preisprüfung
-    02.11.2026).
+    Ein Bündelmonatspreis über 36 Monate (1&1 „24+12“) zählt nur 24
+    Monate plus Ablöse (Antonio, 10.10.2026).
 
     Seit Datenkonzept Geräte Schritt 2 ist der Zeitraum der aufgeteilten Form
     H = größerer Wert aus Ratenlaufzeit und Tarifbindung: 12 und 24 Raten
@@ -176,16 +175,18 @@ def test_die_leitzahl_zeitraum_spalte_ist_die_von_tco_24(tco_csv):
     buendel = [z for z in zeilen if z[0] == "Bündel" and _o4_leitzahl(z, idx)]
     assert buendel, "keine belastbare Bündel-Zeile im Export"
 
-    mit_buendelpreis = [
-        z for z in zeilen if z[0] == "Bündel" and z[idx["Bündel/Monat EUR"]]
-    ]
+    mit_buendelpreis = [z for z in buendel if z[idx["Bündel/Monat EUR"]]]
     assert mit_buendelpreis, (
         "kein Bündelmonatspreis im Bestand - die Gegenprobe greift nicht"
     )
     for z in mit_buendelpreis:
-        assert z[idx["Laufzeit Monate"]] == "36", z
-        assert not _o4_leitzahl(z, idx), z
-        assert "24 + 12" in z[idx["Lücke"]], z
+        soll = min(int(z[idx["Laufzeit Monate"]]), TCO_HORIZONT)
+        assert z[idx["Leitzahl-Zeitraum Monate"]] == str(soll), z
+    assert any(
+        z[idx["Laufzeit Monate"]] == "36"
+        and z[idx["Leitzahl-Zeitraum Monate"]] == str(TCO_HORIZONT)
+        for z in mit_buendelpreis
+    ), "kein Bündelmonatspreis über 36 Monate, der nur 24 Monate zählt"
 
     def _veraltet(z):
         """Ohne Betrag, auch ohne Bündelpreis: sagt nichts über die Preisform."""
@@ -573,23 +574,27 @@ def test_preisart_der_netzzeile_nennt_nur_einen_belegten_zeitraum():
     )
 
 
-def test_keine_1und1_netzzeile_traegt_einen_preis_aus_24_plus_12(radar_csv):
-    """1&1 „24 + 12“ ist keine 24-Monats-Finanzierung (Preisprüfung 02.11.2026):
-    keine Netzzeile von 1&1 trägt einen Wettbewerber-Preis, und keine ist
-    „vergleichbar“. Die Gegenprobe: die Zeilen der anderen Anbieter tragen
-    ihren Preis weiter."""
+def test_keine_1und1_netzzeile_behauptet_36_monate(radar_csv):
+    """1&1 wird nur über 24 Monate verglichen (Antonio, 10.10.2026): seine
+    Leitzahl zählt 24 Bündelbeträge plus Ablöse. Keine Netzzeile von 1&1
+    darf noch „Kosten über 36 Monate“ nennen; die vergleichbaren tragen
+    „Kosten über 24 Monate“ - die Gegenprobe zu P0-B-h4, als 1&1 nie
+    vergleichbar war."""
     kopf, zeilen = radar_csv
     idx = {name: i for i, name in enumerate(kopf)}
-    netz = [z for z in zeilen if z[idx["Art"]] == "Netzbetreiber"]
-    andere = [
+    eins = [
         z
-        for z in netz
-        if z[idx["Anbieter"]] != "1&1" and z[idx["Wettbewerber-Preis EUR"]]
+        for z in zeilen
+        if z[idx["Art"]] == "Netzbetreiber"
+        and z[idx["Anbieter"]] == "1&1"
+        and z[idx["Wettbewerber-Preis EUR"]]
     ]
-    assert andere, "kein Preis eines anderen Anbieters - die Gegenprobe greift nicht"
-    eins = [z for z in netz if z[idx["Anbieter"]] == "1&1"]
-    assert not [z for z in eins if z[idx["Wettbewerber-Preis EUR"]]], eins[:2]
-    assert not [z for z in eins if z[idx["Status"]] == "vergleichbar"], eins[:2]
+    assert eins, "keine 1&1-Netzzeile mit Preis im Bestand"
+    falsch = [z for z in eins if z[idx["Preisart"]] == "Kosten über 36 Monate"]
+    assert not falsch, falsch
+    vergleichbar = [z for z in eins if z[idx["Status"]] == "vergleichbar"]
+    for z in vergleichbar:
+        assert z[idx["Preisart"]].startswith("Kosten über 24 Monate"), z
 
 
 def test_radar_export_enthaelt_auch_die_alarmtabelle(radar_csv, geraete):
