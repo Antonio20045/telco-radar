@@ -96,9 +96,10 @@ def hole_volltext(item, http_cfg: dict, artikelabruf: bool = True) -> VolltextEr
 
     Ruft die ARTIKELSEITE ab - den Weg also, den sonst kein Collector geht.
     Er laeuft ueber dasselbe `collect/http.py` wie alles andere und damit
-    durch dieselbe Host-Drosselung, denselben User-Agent-Rueckfall und
-    dieselben Fristen. Ein zweiter HTTP-Weg daneben waere eine zweite
-    Hoeflichkeitsregel, die niemand pflegt.
+    durch dieselbe Host-Drosselung, dieselbe Regel bei Schutzantworten (eine
+    Anfrage, keine andere Kennung, kein Umgehen) und dieselben Fristen. Ein
+    zweiter HTTP-Weg daneben waere eine zweite Hoeflichkeitsregel, die
+    niemand pflegt.
     """
     teaser = (item.summary or "").strip()
 
