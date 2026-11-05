@@ -24,7 +24,9 @@ from collections.abc import Iterable
 
 from ..analyze.geraete_pruefstatus import (
     FELD_PRUEFUNG,
+    HERLEITUNG_EINMALZAHLUNG,
     HERLEITUNG_PREISLISTE,
+    HERLEITUNG_WIDERSPRUCH,
     QUARANTAENE,
     REGELN,
     UNBEKANNT,
@@ -50,6 +52,14 @@ HERLEITUNG_SATZ = {
     "tarifaufschlag_aus_tarifraster": (
         "{anbieter} nennt den Monatspreis für diesen Tarif nicht beim Gerät – "
         "berechnet aus dem Grundangebot plus Tarifaufschlag der Preisliste."
+    ),
+    HERLEITUNG_WIDERSPRUCH: (
+        "{anbieter}: Klick und Produktseite nennen verschiedene Werte – die "
+        "Einmalzahlung fehlt, die Zelle wird nicht gerechnet."
+    ),
+    HERLEITUNG_EINMALZAHLUNG: (
+        "{anbieter}-Wert widersprüchlich, neu messen – die Einmalzahlung weicht "
+        "vom Wert der anderen Tarife desselben Geräts ab."
     ),
     "schlusszahlung_aus_grundtarif": (
         "{anbieter} nennt die Schlusszahlung nur beim Grundtarif – von dort übernommen."

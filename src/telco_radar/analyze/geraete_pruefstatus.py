@@ -184,6 +184,13 @@ def abgelaufene_aktionen(aktionen: Iterable[Aktion], heute: str) -> list[Aktion]
 HERLEITUNG_PREISLISTE = frozenset(
     {"tarifaufschlag_aus_tarifraster", "schlusszahlung_aus_grundtarif"}
 )
+HERLEITUNG_WIDERSPRUCH = "klick_widerspricht_adapter"
+"""Marke einer 24+12-Zelle, deren Klick- und Adapterlesung verschiedene Werte nennen
+(``klick_zusammenfuehrung``): ohne Einmalzahlung, nie eine Schätzung als Preis."""
+HERLEITUNG_EINMALZAHLUNG = "einmalzahlung_weicht_vom_geraet_ab"
+"""Marke eines 1&1-Bündels, dessen Einmalzahlung nach Monat 24 vom Wert abweicht, der
+bei den anderen Tarifen desselben Geräts gilt (``geraete_widerspruch``): ohne
+Einmalzahlung, benannte Lücke statt Zahl."""
 
 
 def ist_schaetzung(herleitung: str) -> bool:

@@ -249,11 +249,14 @@ def _einsundeins_alt() -> dict:
     return {**roh, "anbieter": "1&1", "zustand": "neu", "sku_id": farbe}
 
 
-def _einsundeins(einmalzahlung: float | None) -> dict:
+def _einsundeins(
+    einmalzahlung: float | None, buendelbetrag: float | None = None
+) -> dict:
     lesung = einsundeins_lesung()
-    lesung = replace(
-        lesung, buendel=replace(lesung.buendel, einmalzahlung=einmalzahlung)
-    )
+    neu = {"einmalzahlung": einmalzahlung}
+    if buendelbetrag is not None:
+        neu["buendelbetrag"] = buendelbetrag
+    lesung = replace(lesung, buendel=replace(lesung.buendel, **neu))
     kombination = erfasst(lesung, "256", "tariff-anf-s-mvl", 36)
     seite = (EINSUNDEINS_SEITE, lauf(EINSUNDEINS_SEITE, [kombination]))
     return ergebnisdatei("1&1", "1und1", [seite], HEUTE, vertragsform="ein_vertrag")
@@ -542,3 +545,68 @@ def test_klickordner_nur_aus_gesetzter_umgebung():
     assert klickordner({}) is None
     assert klickordner({UMGEBUNG: ""}) is None
     assert klickordner({UMGEBUNG: "klick"}) == Path("klick")
+
+
+def test_widersprechende_24_plus_12_zelle_wird_zur_luecke_nicht_zum_preis(
+    katalog, bestand
+):
+    """Befund M1 vom 05.11.2026 (Galaxy S26, Tarif S): der Klick las 32,99 € und
+    220 €, die Produktseite im selben Lauf 37,99 € und 280 €. Vorher gewann der Klick
+    und blieb als Preis (1.051,66 €) im Bestand. Jetzt zählt keiner der beiden Preise:
+    der Adaptersatz überschreibt den Eintrag ohne Einmalzahlung, die Zelle ist eine
+    benannte Lücke."""
+    from telco_radar.tco_model import kosten_ueber
+
+    alt = {**_einsundeins_alt(), "buendel_monatlich": 37.99, "geraet_zuzahlung": 280.0}
+
+    zug = fuehre_zusammen(
+        [alt], [_einsundeins(220.0, 32.99)], katalog, HEUTE, _geraet(katalog)
+    )
+
+    (satz,) = zug.rohsaetze
+    assert satz.get("quelle_art") != "klick"
+    assert satz["geraet_zuzahlung"] is None
+    assert satz["herleitung"] == "klick_widerspricht_adapter"
+    assert zug.bilanz["widerspruch_24_plus_12"] == 1
+    (b,) = aus_rohsaetzen(zug.rohsaetze, bestand, HEUTE).buendel
+    k = kosten_ueber(b)
+    assert k.gesamt is None and k.luecken, "benannte Lücke statt 1.051,66 €"
+    assert b.geraet_zuzahlung is None
+
+
+def test_stimmen_klick_und_adapter_ueberein_zaehlt_der_klick_wie_bisher(
+    katalog, bestand
+):
+    """Gegenprobe zum Widerspruch: gleiche Werte, kein Widerspruch, der Klick-Satz
+    ersetzt den Adaptersatz mit Preis 44,99 € und 360 €."""
+    alt = _einsundeins_alt()
+
+    zug = fuehre_zusammen(
+        [alt], [_einsundeins(360.0)], katalog, HEUTE, _geraet(katalog)
+    )
+
+    (satz,) = zug.rohsaetze
+    assert satz["quelle_art"] == "klick"
+    assert satz.get("herleitung") != "klick_widerspricht_adapter"
+    assert (satz["buendel_monatlich"], satz["geraet_zuzahlung"]) == (44.99, 360.0)
+    assert zug.bilanz["widerspruch_24_plus_12"] == 0
+
+
+def test_widersprechende_zelle_behaelt_keinen_vorrang_des_alten_klick_eintrags(
+    katalog, bestand
+):
+    """Der Bestand trägt noch die Klick-Messung von heute früh (32,99 €/220 €): der
+    Adaptersatz mit der Widerspruchsmarke darf sie überschreiben, ein gewöhnlicher
+    Adaptersatz bliebe hinter ihr zurück."""
+    from telco_radar.analyze import klick_zusammenfuehrung as zusammenfuehrung
+
+    alt = {**_einsundeins_alt(), "buendel_monatlich": 37.99, "geraet_zuzahlung": 280.0}
+    zug = fuehre_zusammen(
+        [alt], [_einsundeins(220.0, 32.99)], katalog, HEUTE, _geraet(katalog)
+    )
+    (marke,) = aus_rohsaetzen(zug.rohsaetze, bestand, HEUTE).buendel
+    (gewoehnlich,) = aus_rohsaetzen([alt], bestand, HEUTE).buendel
+    eintrag = {"quelle_art": "klick", "abgerufen_am": HEUTE}
+
+    assert zusammenfuehrung._vorrang(marke, eintrag, HEUTE) is False
+    assert zusammenfuehrung._vorrang(gewoehnlich, eintrag, HEUTE) is True

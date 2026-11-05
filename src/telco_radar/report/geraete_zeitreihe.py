@@ -74,6 +74,7 @@ from .geraete_rechenweg import _rechenwege_html as _rechenwege_html
 from .geraete_rechenweg import _rechung as _rechung
 from .geraete_rechenweg import _rechung_html as _rechung_html
 from .geraete_rechenweg import _wert_aus_messung as _wert_aus_messung
+from .geraete_zeitreihe_auswahl import einsortieren
 from .geraete_zeitreihe_geometrie import (
     LUECKE_TAGE_SCHWELLE as LUECKE_TAGE_SCHWELLE,
 )
@@ -293,6 +294,7 @@ def _messungen(
     if not tco_historie.vorhanden(historie):
         return {}
     ohne_id = ohne_stand = ueber_basis = ohne_wert = 0
+    kandidaten: list[dict] = []
     fremder_zeitraum = fremde_laufzeit = 0
     for zeile in tco_historie.zeilen(historie):
         if not zeile.strip():
@@ -335,26 +337,23 @@ def _messungen(
         h = zeitraum(laufzeit)
         if not zeitraum_vergleichbar(monate, h):
             fremder_zeitraum += 1
-        slot = messungen.setdefault((modell, band, laufzeit), {}).setdefault(
-            b.get("anbieter") or "?", {}
-        )
-        alt = slot.get(datum)
-        felder = notbremse.felder_aus_satz(b, heute)
-        if alt is None or notbremse.zaehlt(felder) != notbremse.zaehlt(alt):
-            besser = alt is None or notbremse.zaehlt(felder)
-        elif zeitraum_vergleichbar(monate, alt["monate"]):
-            besser = wert < alt["wert"]
-        else:
-            besser = zeitraum_vergleichbar(monate, h)
-        if besser:
-            slot[datum] = {
-                "satz": satz,
-                "stand": b,
-                "wert": wert,
-                "monate": monate,
-                "laufzeit": laufzeit,
-                **felder,
+        kandidaten.append(
+            {
+                "schluessel": (modell, band, laufzeit),
+                "anbieter": b.get("anbieter") or "?",
+                "datum": datum,
+                "h": h,
+                "mess": {
+                    "satz": satz,
+                    "stand": b,
+                    "wert": wert,
+                    "monate": monate,
+                    "laufzeit": laufzeit,
+                    **notbremse.felder_aus_satz(b, heute),
+                },
             }
+        )
+    einsortieren(kandidaten, messungen, tarife)
     if (
         ohne_id
         or ohne_stand

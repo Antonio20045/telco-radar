@@ -260,3 +260,50 @@ def test_der_tooltip_nennt_den_betrag_mit_cent_die_beschriftung_ganze_euro():
     assert "2.087,75 €" in tips["o2"] and "1.890,66 €" in tips["1&1"]
     zahlen = [t.get_text() for t in svg.select(".gr-pp-summe")]
     assert "1.867 €" in zahlen and all("," not in z for z in zahlen)
+
+
+def _eins_und_eins(gesamt: float | None = 1891.66, **mehr) -> dict:
+    """1&1 „24 + 12“: ein Betrag, 36 Monate, die Zahl ist über 24 Monate gerechnet."""
+    return _karte(
+        "1&1",
+        gesamt,
+        buendel_monatlich=57.99,
+        raten_laufzeit=36,
+        leitzahl_monate=M24,
+        **mehr,
+    )
+
+
+def test_1und1_24_plus_12_ist_ein_punkt_und_die_seite_sagt_in_einem_satz_wie():
+    """Antonio 05.11.2026: vergleichbar machen statt weglassen. 39,90 +
+    24 × 57,99 + 460 Einmalzahlung = 1.891,66 € steht als Punkt im Bild; der
+    Satz zur Regel steht darunter, weil dort ein gerechneter Punkt liegt."""
+    from telco_radar.report.geraete_laufzeit import REGEL_24_PLUS_12
+
+    assert round(39.90 + 24 * 57.99 + 460, 2) == 1891.66
+    karten = [*(k for k in KARTEN if k["anbieter"] != "1&1"), _eins_und_eins()]
+    daten = pp.aufbereiten(_geraete(karten))
+    assert _punkte(daten)["1&1"] == 1891.66
+    assert daten["regel"] == REGEL_24_PLUS_12
+    html = _vorlage(pp.ergaenze(_geraete(karten)))
+    text = BeautifulSoup(html, "html.parser").select_one(".gr-pp-regel").get_text()
+    assert text == REGEL_24_PLUS_12
+    assert "24 Monatsbeträge" in text and "gerechnet" in text
+    assert (
+        "Angebote mit Zubehör-Aufpreis (z. B. Buds beim S26) werden ohne Zubehör "
+        "gerechnet." in text
+    )
+    assert "gratis" not in text.lower()
+
+
+def test_ohne_gerechneten_punkt_steht_kein_regelsatz_auf_der_seite():
+    """Gegenprobe: ohne 1&1-Punkt (Lücke, nicht 0) oder mit regulärer
+    24-Raten-Karte bleibt der Satz weg."""
+    assert pp.aufbereiten(_geraete(KARTEN))["regel"] == ""
+    ohne_preis = [*(k for k in KARTEN if k["anbieter"] != "1&1"), _eins_und_eins(None)]
+    daten = pp.aufbereiten(_geraete(ohne_preis))
+    assert "1&1" not in _punkte(daten) and daten["regel"] == ""
+    html = _vorlage(pp.ergaenze(_geraete(KARTEN)))
+    seite = BeautifulSoup(html, "html.parser")
+    assert seite.select_one(".gr-pp-regel") is None
+    assert "Zubehör-Aufpreis" not in seite.get_text()
