@@ -1,5 +1,5 @@
 {
-  "zweck": "Messrunde 31.08.2026: rohe, unveraenderte HTTP-Antworten als Beleg je Anbieter. Dateien ueber 250 kB liegen gzip-komprimiert (byteidentisch, nur verpackt) - sha256_roh gilt fuer den ENTPACKTEN Inhalt. ERGAENZT AM 04.09.2026 um Telekom (Kategorieseite) und 1&1 (Kategorie- und Produktseite): dieselbe Regel, aber mit dem ehrlichen Absender TelcoRadar/1.0 abgerufen und nicht mit einer Browser-Kennung. ERGAENZT AM 05.09.2026 um Saturn (zwei Markenseiten, /de/brand/apple/iphone/...): ld+json-ItemList UND window.__PRELOADED_STATE__ (Apollo-Cache) derselben Antwort, ehrlicher Absender TelcoRadar/1.0. ERGAENZT AM 18.09.2026 (P5/E3) um die Titel-Zeilen von data/state/geraete_unbekannt.jsonl (Stand 17.09., Bot-Commit 1dd48d4): kein HTTP-Abruf, sondern ein Auszug aus dem Lauf-State - alle 145 art=titel-Zeilen unveraendert; Basis der Tarif-Rauschen-Regel und ihrer Tests.",
+  "zweck": "Messrunde 31.08.2026: rohe, unveraenderte HTTP-Antworten als Beleg je Anbieter. Dateien ueber 250 kB liegen gzip-komprimiert (byteidentisch, nur verpackt) - sha256_roh gilt fuer den ENTPACKTEN Inhalt. ERGAENZT AM 04.09.2026 um Telekom (Kategorieseite) und 1&1 (Kategorie- und Produktseite): dieselbe Regel, aber mit dem ehrlichen Absender TelcoRadar/1.0 abgerufen und nicht mit einer Browser-Kennung. ERGAENZT AM 05.09.2026 um Saturn (zwei Markenseiten, /de/brand/apple/iphone/...): ld+json-ItemList UND window.__PRELOADED_STATE__ (Apollo-Cache) derselben Antwort, ehrlicher Absender TelcoRadar/1.0. ERGAENZT AM 18.09.2026 (P5/E3) um die Titel-Zeilen von data/state/geraete_unbekannt.jsonl (Stand 17.09., Bot-Commit 1dd48d4): kein HTTP-Abruf, sondern ein Auszug aus dem Lauf-State - alle 145 art=titel-Zeilen unveraendert; Basis der Tarif-Rauschen-Regel und ihrer Tests. ERGAENZT AM 05.11.2026 um MediaMarkt (eine Produktseite, /de/product/_samsung-galaxy-a57-...-3039261.html, Samsung Galaxy A57): derselbe Ceconomy-Lesekern wie Saturn (ld+json UND window.__PRELOADED_STATE__), Cache-Praefix 'Media' statt 'Saturn', ehrlicher Absender TelcoRadar/1.0, Abruf aus arbeit/haendler-weg-0411/mm_product_samsung_a57.body.html (04.11.2026, Recherche haendler-weg-0411.md). Ebenfalls am 05.11.2026 ergaenzt: die MediaMarkt-Kampagnenseite /de/campaign/angebote-smartphones (mediamarkt_angebote_smartphones.html.gz, Abruf 04.11.2026) als der produktiv konfigurierte, direkte Einstieg - ebenfalls aus arbeit/haendler-weg-0411/mm_campaign.body.html.",
   "eintraege": [
     {
       "datei": "1und1_produkt_iphone17.html.gz",
@@ -865,6 +865,42 @@
       "gzip": true,
       "bytes_abgelegt": 1937,
       "hinweis": "Koerper unveraendert wie im Mitschnitt. Fuenf Tarife Mobil XS bis XL (virtualItemId 267 bis 271); Beleg fuer die Klick-Karte Vodafone auf der Tarifauswahl (Schnitt 8b Teil 2b) und das Summen-Echo."
+    },
+    {
+      "datei": "mediamarkt_produkt_samsung_a57.html.gz",
+      "url": "https://www.mediamarkt.de/de/product/_samsung-galaxy-a57-256-gb-awesome-gray-dual-sim-3039261.html",
+      "abgerufen_am": "2026-11-04",
+      "http_status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "bytes_roh": 1364466,
+      "sha256_roh": "309df9108b01b4cdcf25fe82ccd75ad08321815db066e21509779e053c086861",
+      "gzip": true,
+      "absender": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)",
+      "bytes_abgelegt": 205393
+    },
+    {
+      "datei": "mediamarkt_angebote_smartphones.html.gz",
+      "url": "https://www.mediamarkt.de/de/campaign/angebote-smartphones",
+      "abgerufen_am": "2026-11-04",
+      "http_status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "bytes_roh": 780040,
+      "sha256_roh": "2cd7e062b324fb00bcc2bf1fdbc704d7ff1c6a7c57f7a1a5490d74cf7ea7c318",
+      "gzip": true,
+      "absender": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)",
+      "bytes_abgelegt": 122118
+    },
+    {
+      "datei": "mediamarkt_robots.txt",
+      "url": "https://www.mediamarkt.de/robots.txt",
+      "abgerufen_am": "2026-11-04",
+      "http_status": 200,
+      "content_type": "text/plain",
+      "bytes_roh": 4268,
+      "sha256_roh": "eb7a09cee609eb09031dcfbf6d2d6c2594ca165e5b6bd3899ad79324ccfd2749",
+      "gzip": false,
+      "absender": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)",
+      "bytes_abgelegt": 4268
     }
   ]
 }

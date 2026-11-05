@@ -110,21 +110,36 @@ anbieter:
     typ: handel
     gruppe: Ceconomy
     rang: 2
-    methode: json_endpunkt
-    aktiv: false
-    grund: >-
-      Produktdetailseiten antworten mit HTTP 403 und einer Cloudflare-Captcha-
-      Wand - auf Chrome-, Edge- und den ehrlichen ClaudeBot-Absender gleich,
-      obwohl robots.txt ClaudeBot ausdrücklich erlaubt. Lesbar ist nur die
-      Kampagnenseite /de/campaign/angebote-smartphones; ihre 26 Gerätepreise
-      stehen in window.__PRELOADED_STATE__, das kein gültiges JSON am Stück
-      ist und einen eigenen Adapter braucht.
+    methode: mediamarkt_angebote
+    aktiv: true
     basis_url: https://www.mediamarkt.de
+    # Zehn Sekunden wie bei Saturn (derselbe Cloudflare-Host der Ceconomy-
+    # Plattform), obwohl robots.txt fuer "*" keinen Crawl-delay nennt
+    # (gelesen 04.11.2026, arbeit/haendler-weg-0411.md Abschnitt 1).
+    rate_limit_sekunden: 10
+    user_agent: "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    hinweis: >-
+      ANGEBUNDEN SEIT 05.11.2026 (Brief brief-mediamarkt-0511.md), nach der
+      Recherche vom 04.11.2026 (arbeit/haendler-weg-0411.md) - der alte
+      Befund ("HTTP 403 und Cloudflare-Captcha auf Produktdetailseiten")
+      traf an diesem Tag fuer KEINE der gemessenen Seiten zu (Start-,
+      Kampagnen- und Produktseite alle HTTP 200 ohne Challenge). Gelesen
+      wird direkt die Kampagnenseite /de/campaign/angebote-smartphones -
+      dieselbe Ceconomy-Plattform wie Saturn, derselbe Apollo-Cache, nur mit
+      dem Tenant-Praefix "Media" statt "Saturn" (siehe
+      collect/geraete/ceconomy.py). Nur
+      isProductOfTypeMarketplace == false zaehlt - auf der Produktseite
+      eines einzelnen Geraets (zur Gegenprobe gemessen, nicht konfiguriert)
+      waren 5 von 21 Preisfeldern Fremdanbieter-Angebote mit bis zu 445 EUR
+      fuer ein Geraet, das MediaMarkt selbst fuer 389,99 EUR fuehrt.
+      GRENZE: Die Kampagnenseite ist eine rotierende Angebotsauswahl (12
+      Preisfelder am Messtag, drei davon Smartphones: Galaxy A57, Galaxy
+      A37, Pixel 10 Pro) - keine vollstaendige Katalogabdeckung, dieselbe
+      Art Luecke wie bei Saturns duennen Markenseiten.
     einstiege:
       - url: https://www.mediamarkt.de/de/campaign/angebote-smartphones
         label: Angebote Smartphones
         kind: static
-        pfadmuster: /de/product/
 
   - name: Saturn
     typ: handel
