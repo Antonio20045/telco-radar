@@ -181,6 +181,8 @@
       class="gr-bnd-fehlt">{{ l }}</span>{% endfor %}{% endif %}</span>{% endif %}
     {% if k.herleitung_satz %}<span class="gr-bnd-herleitung">{{
       k.herleitung_satz }}</span>{% endif %}
+    {% for h in k.versand_hinweise %}<span class="gr-bnd-herleitung gr-bnd-versand-luecke">{{
+      h }} – mit 0 € gerechnet</span>{% endfor %}
     <span class="gr-bnd-chev" aria-hidden="true"></span>
   </summary>
   {# P4-Fix (Sicht-Pruefung 18.09., Kriterium 13 / FM 4): der Aufklapp-

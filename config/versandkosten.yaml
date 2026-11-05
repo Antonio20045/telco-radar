@@ -1,0 +1,50 @@
+# =============================================================================
+# VERSANDKOSTEN - der Pflichtversand je Anbieter
+# =============================================================================
+# Ein Betrag je Anbieter, einmalig, in der Kernzahl "Kosten ueber H Monate"
+# (src/telco_radar/versandkosten.py; im Code kein Sonderfall je Anbieter).
+#
+#   betrag      Euro brutto, wie die Kostenuebersicht vor der Kasse ihn nennt.
+#               0 heisst: in der Kostenuebersicht kein Versandposten (siehe
+#               hinweis je Anbieter: ausdruecklich kostenlos oder keine Zeile).
+#               null heisst: nicht belegt - dann
+#               zaehlt der Versand 0 EUR und die Seite nennt die Luecke
+#               ("Versand bei X nicht belegt"). Nie raten.
+#   quelle      die Seite am Original, auf der gemessen wurde
+#   datum       Tag der Messung
+#   screenshot  Beleg, ausserhalb des Repos (Bereich telcoradar/abnahme)
+#
+# Gemessen mit Playwright (normales Chromium, Standard-User-Agent, ohne Stealth,
+# robots.txt beachtet, kein Konto, nichts bestellt) bis zur Kostenuebersicht vor
+# der Kasse. Jede Aenderung eines Betrags braucht eine neue Messung mit Datum.
+anbieter:
+  Vodafone:
+    betrag: 9.98
+    quelle: "https://www.vodafone.de/privat/handys/iphone-17-pro.html (Kostenuebersicht, Standard-Versand, Mobil M, iPhone 17 Pro)"
+    datum: "2026-11-05"
+    screenshot: "telcoradar/abnahme/versand-0511/vodafone.png"
+    hinweis: "Zeile Versand getrennt von Einmal 1,00 EUR; Anschlusspreis 0 EUR"
+  Telekom:
+    betrag: 0.0
+    quelle: "https://www.telekom.de/shop/geraet/apple/apple-iphone-17/ (Preisuebersicht, MagentaMobil M, iPhone 17)"
+    datum: "2026-11-05"
+    screenshot: "telcoradar/abnahme/versand-0511/telekom.png"
+    hinweis: "Kostenlose Lieferung, keine Versandzeile; Bereitstellung 39,95 EUR ist der Anschlusspreis"
+  o2:
+    betrag: 6.99
+    quelle: "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus (Warenkorb-Kostenuebersicht, O2 Mobile M Plus, iPhone 17 Pro)"
+    datum: "2026-11-05"
+    screenshot: "telcoradar/abnahme/versand-0511/o2.png"
+    hinweis: "Versandkosten stehen in einmalig gesamt neben Anzahlung und Anschluss"
+  congstar:
+    betrag: 4.99
+    quelle: "https://www.congstar.de/geraete/apple/apple-iphone-17/?planId=540&paymentVariantBenefits=FWTI&deviceVariantId=304317&installmentPlanId=510 (Summe einmalig zzgl. Versandkosten, iPhone 17)"
+    datum: "2026-11-05"
+    screenshot: "telcoradar/abnahme/versand-0511/congstar.png"
+    hinweis: "Summe einmalig 16,00 EUR zzgl. 4,99 EUR Versandkosten"
+  "1&1":
+    betrag: 0.0
+    quelle: "https://mobile.1und1.de/flow2/mobile/ssc-private/kosten (Warenkorb, All-Net-Flat M, iPhone 17 Pro)"
+    datum: "2026-11-05"
+    screenshot: "telcoradar/abnahme/versand-0511/1und1.png"
+    hinweis: "Warenkorb 05.11.2026: keine Versandzeile, keine Aussage 'versandkostenfrei'. Block 'Zubehoer, Bereitstellung & Versand': SIM inklusive, Bereitstellungspreis 39,90 EUR; einmalige Kosten gesamt 39,90 EUR = Bereitstellung, kein Versand. Lieferbedingungen per robots.txt gesperrt, nicht abgerufen; Mindestwerte oder Ausnahmen ungeprueft"

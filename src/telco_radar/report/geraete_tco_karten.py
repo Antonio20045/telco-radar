@@ -513,7 +513,7 @@ def buendel_aus_listungen(listungen: list) -> list[Buendel]:
 def _bestandteile_mit_kategorie(posten_je_name: dict) -> list:
     """Die Posten von `kosten_ueber` mit Kostenart - Formatierung, keine Rechnung."""
     posten = []
-    einmalig = (POSTEN_ZUZAHLUNG, POSTEN_ANSCHLUSS, _kosten.POSTEN_EINMALZAHLUNG)
+    einmalig = (POSTEN_ZUZAHLUNG, POSTEN_ANSCHLUSS, *_kosten.EINMALPOSTEN)
     for name, betrag in posten_je_name.items():
         if name in einmalig:
             kat = "einmalig"

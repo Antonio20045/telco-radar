@@ -1386,9 +1386,9 @@ def test_pf_beide_ratenlaufzeiten_eines_congstar_abrufs_werden_zwei_zeilen(
     Zeitraum H (24 Raten: 24 Monate, 36 Raten: 36 Monate). Das Tarifblatt
     nennt 24,00 EUR ohne Phasentabelle, also nur fuer die 24 Monate Bindung;
     gezaehlt wird der Tarif ohnehin nur 24 Monate (Antonio, 10.10.2026): beide
-    Zeilen tragen 1.879,00 EUR (97 + 24 x 24 + 24 x 50,25 und 97 + 24 x 24 +
-    36 x 33,50), unterscheidbar an Rate und Ratenzahl. Eine Restschuld gibt es nicht
-    mehr: alle
+    Zeilen tragen 1.883,99 EUR (97 + 24 x 24 + 24 x 50,25 und 97 + 24 x 24 +
+    36 x 33,50, je + 4,99 Versand), unterscheidbar an Rate und Ratenzahl. Eine
+    Restschuld gibt es nicht mehr: alle
     Raten liegen im Zeitraum. Geprueft werden Zahl, Rate, Ratenzahl und
     Zeitraum je Zeile, damit der Test nicht auf zwei identischen Zeilen
     gruen wird.
@@ -1495,7 +1495,7 @@ def test_pf_beide_ratenlaufzeiten_eines_congstar_abrufs_werden_zwei_zeilen(
         soll = pf_leitzahl_cent(
             {**satz, "id": f"congstar/{laufzeit}m", "tarif_id": _PF_CS_BLATT}, blaetter
         )
-        assert soll == 187900, (
+        assert soll == 188399, (
             f"{laufzeit} Raten: eigene Rechnung {soll} - der Tarif zaehlt nur "
             "die 24 Monate Bindung"
         )
@@ -1510,10 +1510,11 @@ def test_pf_beide_ratenlaufzeiten_eines_congstar_abrufs_werden_zwei_zeilen(
             f"die {laufzeit}-Monats-Zeile nennt ihre Rate nicht: {zeile['bau']}"
         )
     assert (je_laufzeit[24]["gesamt_cent"], je_laufzeit[36]["gesamt_cent"]) == (
-        187900,
-        187900,
+        188399,
+        188399,
     ), (
-        "beide Zeilen tragen 1.879,00 EUR, die 36er ohne Tarif ab Monat 25: "
+        "beide Zeilen tragen 1.883,99 EUR (mit 4,99 EUR Versand), "
+        "die 36er ohne Tarif ab Monat 25: "
         f"{je_laufzeit[24]['gesamt_cent']} gegen "
         f"{je_laufzeit[36]['gesamt_cent']}"
     )
