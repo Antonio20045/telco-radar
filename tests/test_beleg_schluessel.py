@@ -8,6 +8,8 @@ from __future__ import annotations
 from telco_radar.analyze.beleg_schluessel import (
     GRUND_OHNE_BELEG,
     GRUND_OHNE_GERAET,
+    Messung,
+    ist_besser,
     ordne_zu,
     vorher_je_konfiguration,
 )
@@ -137,3 +139,31 @@ def test_satz_ohne_beleg_oder_geraet_wird_gezaehlt_nicht_verschluckt():
     zuordnung = ordne_zu([ohne_beleg, ohne_geraet], [], geraet)
     assert zuordnung.messungen == []
     assert zuordnung.uebersprungen == {GRUND_OHNE_BELEG: 1, GRUND_OHNE_GERAET: 1}
+
+
+def messung(beleg_id: str, gesamt: float | None) -> Messung:
+    return Messung("iphone-17", 256, "Telekom", beleg_id, gesamt, None)
+
+
+def test_ist_besser_bei_gleichem_preis_entscheidet_die_kleinere_beleg_id():
+    """Über Jobs hinweg: gleicher Preis, egal in welcher Reihenfolge verglichen wird."""
+    a, b = messung("b1", 1300.0), messung("b2", 1300.0)
+    assert ist_besser(a, b)
+    assert not ist_besser(b, a)
+
+
+def test_ist_besser_gleiche_messung_ersetzt_sich_nicht():
+    a = messung("b1", 1300.0)
+    assert not ist_besser(a, messung("b1", 1300.0))
+
+
+def test_ist_besser_zahl_schlaegt_none_in_beide_richtungen():
+    zahl, luecke = messung("b9", 5000.0), messung("b1", None)
+    assert ist_besser(zahl, luecke)
+    assert not ist_besser(luecke, zahl)
+
+
+def test_ist_besser_zwei_luecken_entscheidet_die_kleinere_beleg_id():
+    a, b = messung("b1", None), messung("b2", None)
+    assert ist_besser(a, b)
+    assert not ist_besser(b, a)

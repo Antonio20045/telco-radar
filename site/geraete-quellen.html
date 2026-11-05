@@ -95,7 +95,7 @@
     <span class="rubrik-zahl">22</span></h2>
   <div class="t-bilanz-reihe">
     <div class="t-kennzahl"><b>6</b><span>liefern Geräte</span></div>
-    <div class="t-kennzahl"><b>33</b><span>abgefragte Einstiegsseiten</span></div>
+    <div class="t-kennzahl"><b>44</b><span>abgefragte Einstiegsseiten</span></div>
     <div class="t-kennzahl"><b>2</b><span>ohne Hardware-Vermarktung</span></div>
   </div>
 
@@ -168,12 +168,12 @@
     <span class="gr-hersteller">Ceconomy</span>
   </td>
   <td>handel</td>
-  <td><code>json_endpunkt</code></td>
+  <td><code>mediamarkt_angebote</code></td>
   <td>
     
     
-    <span class="sdot quarantaene"></span>
-    nicht angebunden
+    <span class="sdot empty"></span>
+    angebunden, ohne Fund
     
   </td>
   <td class="num">0</td>
@@ -183,9 +183,9 @@
     
     
     
-    Produktdetailseiten antworten mit HTTP 403 und einer Cloudflare-Captcha- Wand - auf Chrome-, Edge- und den ehrlichen ClaudeBot-Absender gleich, obwohl robots.txt ClaudeBot ausdrücklich erlaubt. Lesbar ist nur die Kampagnenseite /de/campaign/angebote-smartphones; ihre 26 Gerätepreise stehen in window.__PRELOADED_STATE__, das kein gültiges JSON am Stück ist und einen eigenen Adapter braucht.
+    ANGEBUNDEN SEIT 05.11.2026 (Brief brief-mediamarkt-0511.md), nach der Recherche vom 04.11.2026 (arbeit/haendler-weg-0411.md) - der alte Befund (&#34;HTTP 403 und Cloudflare-Captcha auf Produktdetailseiten&#34;) traf an diesem Tag fuer KEINE der gemessenen Seiten zu (Start-, Kampagnen- und Produktseite alle HTTP 200 ohne Challenge). Gelesen wird direkt die Kampagnenseite /de/campaign/angebote-smartphones - dieselbe Ceconomy-Plattform wie Saturn, derselbe Apollo-Cache, nur mit dem Tenant-Praefix &#34;Media&#34; statt &#34;Saturn&#34; (siehe collect/geraete/ceconomy.py). Nur isProductOfTypeMarketplace == false zaehlt - auf der Produktseite eines einzelnen Geraets (zur Gegenprobe gemessen, nicht konfiguriert) waren 5 von 21 Preisfeldern Fremdanbieter-Angebote mit bis zu 445 EUR fuer ein Geraet, das MediaMarkt selbst fuer 389,99 EUR fuehrt. GRENZE: Die Kampagnenseite ist eine rotierende Angebotsauswahl (12 Preisfelder am Messtag, drei davon Smartphones: Galaxy A57, Galaxy A37, Pixel 10 Pro) - keine vollstaendige Katalogabdeckung, dieselbe Art Luecke wie bei Saturns duennen Markenseiten.
     
-    <span class="gr-einstiege"><a href="https://www.mediamarkt.de/de/campaign/angebote-smartphones" rel="noopener">Angebote Smartphones</a></span>
+    <span class="gr-einstiege"><a href="https://www.mediamarkt.de/de/campaign/angebote-smartphones" rel="noopener">Angebote Smartphones</a> · <a href="https://www.mediamarkt.de/de/search.html?query=iPhone%2018%20Pro" rel="noopener">Suche iPhone 18 Pro</a> · <a href="https://www.mediamarkt.de/de/search.html?query=iPhone%2017" rel="noopener">Suche iPhone 17</a> · <a href="https://www.mediamarkt.de/de/search.html?query=iPhone%20Air" rel="noopener">Suche iPhone Air</a> · <a href="https://www.mediamarkt.de/de/search.html?query=iPhone%2017e" rel="noopener">Suche iPhone 17e</a> · <a href="https://www.mediamarkt.de/de/search.html?query=Galaxy%20S26" rel="noopener">Suche Galaxy S26</a> · <a href="https://www.mediamarkt.de/de/search.html?query=Galaxy%20S26%20Ultra" rel="noopener">Suche Galaxy S26 Ultra</a> · <a href="https://www.mediamarkt.de/de/search.html?query=Galaxy%20Z%20Fold8" rel="noopener">Suche Galaxy Z Fold8</a> · <a href="https://www.mediamarkt.de/de/search.html?query=Galaxy%20Z%20Flip8" rel="noopener">Suche Galaxy Z Flip8</a> · <a href="https://www.mediamarkt.de/de/search.html?query=Pixel%2011" rel="noopener">Suche Pixel 11</a> · <a href="https://www.mediamarkt.de/de/search.html?query=Pixel%2010a" rel="noopener">Suche Pixel 10a</a></span>
     
   </td>
 </tr>
@@ -762,6 +762,11 @@
       <span>Ein fehlender Punkt heißt: dieser Anbieter hatte an dem Tag
       kein Bündel in diesem Band – Linien verbinden nur echte
       Messungen.</span></li>
+    <li class="list-row"><span class="list-row-date">Ratenlaufzeit</span>
+      <span>Vergleichsbasis sind 24 Monate Ratenzahlung: o2 wird je Laufzeit
+      einzeln gelesen (bei 24 Raten nennt o2 Anzahlung und Monatsrate neu),
+      Zeilen mit 36 Raten stehen nur unter „36 Monate“, nie in der
+      24er-Ansicht.</span></li>
     <li class="list-row"><span class="list-row-date">Tarifleiter</span>
       <span>Die Bänder sind die Vodafone-Tarife „mit Smartphone“ (XS bis
       XL), in jedem Lauf aus dem Tarifbestand gelesen. Ein Wettbewerber-Tarif

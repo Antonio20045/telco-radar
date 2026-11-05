@@ -32,12 +32,14 @@ from __future__ import annotations
 import json
 import subprocess
 import time
+from collections import Counter
 from collections.abc import Callable, Mapping, Sequence
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
 from typing import Protocol
 
+from .beleg_bilanz import Bilanz
 from .beleg_regeln import (
     MAX_ANHAENGE_JE_RELEASE,
     REPO,
@@ -217,29 +219,6 @@ class Bild:
     gross: bool
 
 
-@dataclass
-class Bilanz:
-    """Zähler und Fehler eines Laufs."""
-
-    hochgeladen: int = 0
-    gross: int = 0
-    ausgelassen: int = 0
-    fehlgeschlagen: int = 0
-    fehler: list[str] = field(default_factory=list)
-    releases_geloescht: list[str] = field(default_factory=list)
-    assets_geloescht: int = 0
-
-    def zeilen(self) -> list[str]:
-        """Protokollzeilen."""
-        return [
-            f"Belege: {self.hochgeladen} Bilder in Tages-Releases, {self.gross} in "
-            f"Monats-Releases (große Änderungen), {self.ausgelassen} ausgelassen "
-            f"(Zeit), {self.fehlgeschlagen} fehlgeschlagen, {len(self.fehler)} Fehler",
-            f"Belege: {len(self.releases_geloescht)} Releases und "
-            f"{self.assets_geloescht} Dateien gelöscht",
-        ]
-
-
 def _freier_tag(
     belegt: dict[str, int], bauen: Callable[[date, int], str], tag: date
 ) -> str:
@@ -356,6 +335,9 @@ def veroeffentliche(
     belegt = {tag: len(dateien) for tag, dateien in vorhanden.items()}
     je_tag: dict[str, list[Bild]] = {}
     einmalig = {b.datei.name: b for b in sorted(bilder, key=lambda b: b.datei.name)}
+    bilanz.doppelt = sorted(
+        n for n, z in Counter(b.datei.name for b in bilder).items() if z > 1
+    )
     for bild in einmalig.values():
         ziele = [_freier_tag(belegt, tages_tag, heute)]
         if bild.gross:

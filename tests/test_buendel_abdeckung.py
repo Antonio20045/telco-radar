@@ -6,6 +6,8 @@ der ältere Wächter vergleicht nur mit dem Vortag. Diese Tests halten fest,
 dass die neue Prüfung gegen die Pflichtliste misst.
 """
 
+import json
+from datetime import date
 from pathlib import Path
 
 import pytest
@@ -278,3 +280,128 @@ def test_luecke_gilt_weder_fuer_andere_anbieter_noch_fuer_andere_modelle():
     rot = pruefe({"updated": TAG, "buendel": buendel}, [], congstar)
     assert [b.art for b in rot.befunde] == ["modell_fehlt"]
     assert rot.befunde[0].text.endswith("apple-iphone-17-pro-max")
+
+
+def _luecken_yaml(tmp_path, geprueft="2026-03-01", bis="2026-03-15", mit_bis=True):
+    zeilen = [
+        "pflicht_anbieter: [A]",
+        "pflicht_modelle: [apple-iphone-18-pro]",
+        "belegte_luecken:",
+        "  - anbieter: A",
+        "    modelle: [apple-iphone-18-pro]",
+        "    grund: Anbieter führt das Gerät nicht mehr",
+        f'    geprueft: "{geprueft}"',
+    ]
+    if mit_bis:
+        zeilen.append(f'    bis: "{bis}"')
+    pfad = tmp_path / "a.yaml"
+    pfad.write_text("\n".join(zeilen) + "\n", encoding="utf-8")
+    return pfad
+
+
+def test_ausnahme_darf_hoechstens_14_tage_gelten(tmp_path):
+    pflicht = lade_pflicht(_luecken_yaml(tmp_path, bis="2026-03-15"))
+    assert pflicht["bis"][("A", "apple-iphone-18-pro")].isoformat() == "2026-03-15"
+    for bis in ("2026-03-16", "2026-02-28"):
+        with pytest.raises(ValueError, match="bis"):
+            lade_pflicht(_luecken_yaml(tmp_path, bis=bis))
+
+
+def test_ausnahme_ohne_ablaufdatum_oder_pruefdatum_wird_nicht_geladen(tmp_path):
+    with pytest.raises(ValueError, match="'bis'"):
+        lade_pflicht(_luecken_yaml(tmp_path, mit_bis=False))
+    with pytest.raises(ValueError, match="'geprueft'"):
+        lade_pflicht(_luecken_yaml(tmp_path, geprueft="gestern"))
+
+
+def test_echte_ausnahmen_laufen_hoechstens_14_tage():
+    pflicht = lade_pflicht(ECHTE_CONFIG)
+    assert pflicht["bis"].keys() == pflicht["luecken"].keys()
+
+
+def _mit_luecke(bis="2026-03-15"):
+    return _pflicht(
+        anbieter=("A",),
+        luecken={("A", "apple-iphone-18-pro"): "Anbieter führt das Gerät nicht mehr"},
+    ) | {"bis": {("A", "apple-iphone-18-pro"): date.fromisoformat(bis)}}
+
+
+def _tag_mit_buendel(messtag, modell):
+    return {
+        "updated": messtag,
+        "buendel": [_buendel("A", f"{modell}-256gb-x", tag=messtag)],
+    }
+
+
+def test_ausnahme_gilt_bis_zum_ablaufdatum_einschliesslich():
+    tco = _tag_mit_buendel("2026-03-15", "samsung-galaxy-s26")
+    ergebnis = pruefe(tco, [], _mit_luecke("2026-03-15"))
+    assert not ergebnis.rot
+
+
+def test_abgelaufene_ausnahme_macht_den_lauf_rot_auch_ohne_datum_von_heute():
+    tco = _tag_mit_buendel("2026-03-16", "samsung-galaxy-s26")
+    ergebnis = pruefe(tco, [], _mit_luecke("2026-03-15"))
+    assert [(b.art, b.anbieter) for b in ergebnis.befunde] == [
+        ("luecke_abgelaufen", "A")
+    ]
+    assert "2026-03-15" in ergebnis.befunde[0].text
+    assert "apple-iphone-18-pro" in ergebnis.befunde[0].text
+
+
+def test_ueberholte_ausnahme_warnt_laut_ohne_rot_zu_werden():
+    """Bündel für das Gerät mit belegter Lücke ist wieder da: Eintrag streichen."""
+    tco = _tag_mit_buendel("2026-03-10", "apple-iphone-18-pro")
+    pflicht = _mit_luecke()
+    ergebnis = pruefe(tco, [], pflicht)
+    assert not ergebnis.rot
+    assert [(w.art, w.anbieter) for w in ergebnis.warnungen] == [
+        ("luecke_ueberholt", "A")
+    ]
+    assert "streichen" in ergebnis.warnungen[0].text
+    assert "## Warnungen" in als_markdown(ergebnis, pflicht)
+
+
+def test_gueltige_ausnahme_ohne_buendel_warnt_nicht():
+    tco = _tag_mit_buendel("2026-03-10", "samsung-galaxy-s26")
+    ergebnis = pruefe(tco, [], _mit_luecke())
+    assert ergebnis.warnungen == []
+    assert "## Warnungen" not in als_markdown(ergebnis, _mit_luecke())
+
+
+def test_ueberholte_ausnahme_fuer_ganzen_anbieter_warnt():
+    pflicht = _pflicht(anbieter=("A",), luecken={("A", "*"): "nicht erreichbar"})
+    pflicht["bis"] = {("A", "*"): date(2026, 3, 15)}
+    tco = _tag_mit_buendel("2026-03-10", "samsung-galaxy-s26")
+    ergebnis = pruefe(tco, [], pflicht)
+    assert [w.art for w in ergebnis.warnungen] == ["luecke_ueberholt"]
+
+
+def test_waechterskript_meldet_ueberholte_ausnahme_als_warning(tmp_path, capsys):
+    from scripts import geraete_abdeckungswaechter as skript
+
+    (tmp_path / "config").mkdir()
+    (tmp_path / "config" / "geraete_abdeckung.yaml").write_text(
+        _luecken_yaml(tmp_path).read_text(encoding="utf-8"), encoding="utf-8"
+    )
+    zustand = tmp_path / "data" / "state"
+    zustand.mkdir(parents=True)
+    tco = _tag_mit_buendel("2026-03-10", "apple-iphone-18-pro")
+    (zustand / "geraete_tco.json").write_text(json.dumps(tco), encoding="utf-8")
+    code = skript.main(["--root", str(tmp_path)])
+    ausgabe = capsys.readouterr().out
+    assert code == 0
+    assert "::warning::A: Ausnahme apple-iphone-18-pro ist überholt" in ausgabe
+    assert "::error::" not in ausgabe
+
+
+def test_kommt_das_iphone_17_pro_bei_congstar_zurueck_warnt_die_echte_config():
+    pflicht = lade_pflicht(ECHTE_CONFIG)
+    nur_congstar = {**pflicht, "anbieter": ["congstar"]}
+    buendel = _buendel_aller_pflichtmodelle("congstar", pflicht)
+    ergebnis = pruefe({"updated": TAG, "buendel": buendel}, [], nur_congstar)
+    assert ergebnis.befunde == []
+    assert [(w.anbieter, w.art) for w in ergebnis.warnungen] == [
+        ("congstar", "luecke_ueberholt")
+    ]
+    assert "apple-iphone-17-pro" in ergebnis.warnungen[0].text

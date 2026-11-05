@@ -1404,6 +1404,7 @@ def leer(fehler: str = "") -> dict:
         "verlauf": geraete_verlauf.leer(),
         "tco": geraete_tco_view.leer(),
         "zeitreihe": geraete_zeitreihe.leer(),
+        "hersteller": {"fehler": "", "leer": True},
         "ausfaelle": [],
         "katalog_modelle": [],
         "katalog_ab_preis": None,
@@ -1657,7 +1658,6 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
 
     laeden_mit_daten = _laeden(bestand)
     hersteller_mit_daten = _hersteller(bestand)
-
     tco_heute = _spaeterer_tag(heute, tco_db.updated) if heute else ""
     bestand_heute = _spaeterer_tag(heute, db.updated) if heute else ""
 
