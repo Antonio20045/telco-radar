@@ -18,6 +18,7 @@ from __future__ import annotations
 import csv
 import io
 
+import pytest
 from bestand_pfad import lese_wurzel
 
 from telco_radar.analyze.tco_buendel import aus_rohsaetzen
@@ -135,6 +136,30 @@ def test_ein_vertrag_ueber_36_monate_rechnet_24_betraege_und_die_abloese():
     )
     k = _karte(b)
     assert k["gesamt"] == round(360.0 + 39.9 + 24 * 44.99, 2) == 1479.66
+    assert k["leitzahl_monate"] == 24
+
+
+@pytest.mark.parametrize(
+    ("tarif", "monatlich", "gesamt"),
+    [("All-Net-Flat S", 44.99, 1479.66), ("All-Net-Flat M", 49.99, 1599.66)],
+)
+def test_iphone_17_pro_256_gb_je_tarifband_ueber_24_monate(tarif, monatlich, gesamt):
+    """Nachbesserung 05.11.2026: 39,90 + 24 × Bündelbetrag + 360 € Ablöse. Tarif M
+    bleibt bei 1.599,66 €, Tarif S bei 1.479,66 €; die Schere zwischen beiden sind
+    genau 24 × 5 €."""
+    b = Buendel(
+        sku_id="apple-iphone-17-pro-256gb-silber",
+        anbieter="1&1",
+        tarif_name=tarif,
+        buendel_monatlich=monatlich,
+        geraet_zuzahlung=360.0,
+        laufzeit_monate=36,
+        anschlusspreis=39.9,
+        zustand="neu",
+        abgerufen_am=HEUTE,
+    )
+    k = _karte(b)
+    assert k["gesamt"] == gesamt == round(39.9 + 24 * monatlich + 360.0, 2)
     assert k["leitzahl_monate"] == 24
 
 

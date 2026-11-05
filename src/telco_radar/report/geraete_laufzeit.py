@@ -58,7 +58,8 @@ def rang_der_monatsangabe(laufzeit: int | None) -> tuple:
 REGEL_24_PLUS_12 = (
     "1&1 bietet das Gerät nur als „24 + 12“ an: hier zählen 24 Monatsbeträge, "
     "die Einmalzahlung, mit der man nach 24 Monaten kündigt und das Gerät behält, "
-    "und der Anschlusspreis – gerechnet, kein von 1&1 genannter 24-Monats-Preis."
+    "und der Anschlusspreis – gerechnet, kein von 1&1 genannter 24-Monats-Preis. "
+    "Gratis-Beigaben wie Kopfhörer (z. B. Buds beim S26) sind nicht eingerechnet."
 )
 
 

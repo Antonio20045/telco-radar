@@ -127,10 +127,11 @@ def kosten_ueber(buendel: Buendel, monate: int | None = None) -> Kosten:
 
     Getrennte Preisform: der Tarif in jedem Monat 1 bis T, alle N Raten (auch die
     nach Monat H), Anzahlung und Anschluss; endet H vor der Tarifbindung, fehlen die
-    geschuldeten Tarifmonate danach. Ein Vertrag (`buendel_monatlich`) trägt
-    H × Bündelbetrag nur für H = N: davor fehlt die Einmalzahlung bei Kündigung,
-    danach der Preis. Ein `monate`, das keine ganze Zahl über null ist, ist ein
-    Aufruffehler (ValueError).
+    geschuldeten Tarifmonate danach. Ein Vertrag (`buendel_monatlich`, 1&1 „24+12“)
+    trägt H × Bündelbetrag: bei H < N (Ratenlaufzeit, hier 36) mit der Einmalzahlung
+    als Ablöse (das Gerät bleibt), bei H = N mit der Zuzahlung, bei H > N fehlt der
+    Preis nach Vertragsende. Ein fehlender Posten (auch die Einmalzahlung) ist eine
+    benannte Lücke, nie ein Preis. Ein `monate` unter eins ist ein Aufruffehler.
 
     Abweichung von `tco_24`: Nennen die Preisphasen einen Monat bis 24 nicht, ist er
     hier eine Lücke; `tco_24` schreibt über `phasensumme` den letzten Preis fort. Im
