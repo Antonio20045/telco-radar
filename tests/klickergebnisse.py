@@ -46,7 +46,7 @@ O2_SEITE = Seitenziel(
     "apple-iphone-17-pro",
     256,
     "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details"
-    "?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36"
+    "?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=24"
     "&vertragsart=ratenzahlung&tarif=o2-mobile-unlimited-m-plus",
     None,
     "iPhone 17 Pro",
