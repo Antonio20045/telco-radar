@@ -116,6 +116,12 @@ def _besser(neu: tuple, alt: tuple) -> bool:
     return (neu[0], neu[1]) < (alt[0], alt[1])
 
 
+def ist_besser(neu: Messung, alt: Messung) -> bool:
+    """Ist ``neu`` die bessere Messung für dasselbe Bild als ``alt`` (niedrigere
+    Gesamtkosten, ``None`` verliert, bei Gleichstand die kleinere ``beleg_id``)?"""
+    return _besser((neu.gesamt_24, neu.beleg_id), (alt.gesamt_24, alt.beleg_id))
+
+
 def ordne_zu(
     rohsaetze: Iterable[dict[str, Any]],
     bestand: Iterable[dict[str, Any]],

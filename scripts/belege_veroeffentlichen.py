@@ -31,7 +31,7 @@ import time
 from datetime import UTC, date, datetime
 from pathlib import Path
 
-from telco_radar.analyze.beleg_schluessel import ordne_zu
+from telco_radar.analyze.beleg_schluessel import Messung, ist_besser, ordne_zu
 from telco_radar.beleg_ablage import (
     ZEIT_JE_AUFRUF_S,
     Bild,
@@ -83,9 +83,14 @@ def sammle_bilder(
     katalog,
     heute: date,
 ) -> tuple[list[Bild], list[str]]:
-    """Bilder zu den gewählten Preisen mit endgültigem Namen in ``ziel`` (und Log)."""
+    """Bilder zu den gewählten Preisen mit endgültigem Namen in ``ziel`` (und Log).
+
+    Ein Anbieter läuft in mehreren Matrix-Jobs (telekom, telekom-2 …), die dasselbe
+    Gerät messen: derselbe Dateiname kommt mehrfach vor. Je Name zählt der niedrigste
+    Preis über alle Ergebnisse, sonst scheitert ``gh --clobber`` (HTTP 404).
+    """
     dateien = {p.name: p for p in sorted(quelle.rglob("*.webp"))}
-    bilder: list[Bild] = []
+    gewaehlt: dict[str, tuple[Messung, Path]] = {}
     zeilen: list[str] = []
     for daten in ergebnisse:
         rohsaetze = ausbeute(daten, katalog).rohsaetze
@@ -108,17 +113,23 @@ def sammle_bilder(
                 unbrauchbar += 1
                 zeilen.append(f"{daten.get('anbieter')}: kein Dateiname: {fehler}")
                 continue
-            datei = ziel / name
-            shutil.copyfile(roh, datei)
-            bilder.append(
-                Bild(datei, ist_grosse_aenderung(messung.vorher_24, messung.gesamt_24))
-            )
+            alt = gewaehlt.get(name)
+            if alt is None or ist_besser(messung, alt[0]):
+                gewaehlt[name] = (messung, roh)
         zeilen.append(
             f"{daten.get('anbieter')}: {len(zuordnung.messungen)} Preise, "
             f"{ohne_datei} ohne Bild, {unbrauchbar} ohne Dateiname, "
             f"{zuordnung.mehrdeutig} weitere Tarife, "
             f"{sum(zuordnung.uebersprungen.values())} übersprungen"
         )
+    bilder: list[Bild] = []
+    for name, (messung, roh) in sorted(gewaehlt.items()):
+        datei = ziel / name
+        shutil.copyfile(roh, datei)
+        bilder.append(
+            Bild(datei, ist_grosse_aenderung(messung.vorher_24, messung.gesamt_24))
+        )
+    zeilen.append(f"{len(bilder)} Bilder nach Zusammenführen der Ergebnisse")
     return bilder, zeilen
 
 

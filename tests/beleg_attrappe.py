@@ -40,8 +40,14 @@ class AttrappeReleases:
         self.stand.setdefault(tag, [])
 
     def hochladen(self, tag: str, dateien: Sequence[Path]) -> None:
+        """Wie GitHub: paralleles ``--clobber`` desselben Namens gibt HTTP 404."""
         self._pruefe("hochladen", tag)
         namen = [d.name for d in dateien]
+        if len(set(namen)) != len(namen):
+            raise GhFehler(
+                f"gh release upload: Exit 1: HTTP 404: Not Found "
+                f"(https://uploads.github.com/repos/x/y/releases/1/assets?name={namen[0]})"
+            )
         self.hochgeladen.append((tag, namen))
         liste = self.stand.setdefault(tag, [])
         liste.extend(n for n in namen if n not in liste)
