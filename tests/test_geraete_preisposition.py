@@ -290,9 +290,10 @@ def test_1und1_24_plus_12_ist_ein_punkt_und_die_seite_sagt_in_einem_satz_wie():
     assert text == REGEL_24_PLUS_12
     assert "24 Monatsbeträge" in text and "gerechnet" in text
     assert (
-        "Gratis-Beigaben wie Kopfhörer (z. B. Buds beim S26) sind nicht "
-        "eingerechnet." in text
+        "Angebote mit Zubehör-Aufpreis (z. B. Buds beim S26) werden ohne Zubehör "
+        "gerechnet." in text
     )
+    assert "gratis" not in text.lower()
 
 
 def test_ohne_gerechneten_punkt_steht_kein_regelsatz_auf_der_seite():
@@ -305,4 +306,4 @@ def test_ohne_gerechneten_punkt_steht_kein_regelsatz_auf_der_seite():
     html = _vorlage(pp.ergaenze(_geraete(KARTEN)))
     seite = BeautifulSoup(html, "html.parser")
     assert seite.select_one(".gr-pp-regel") is None
-    assert "Gratis-Beigaben" not in seite.get_text()
+    assert "Zubehör-Aufpreis" not in seite.get_text()
