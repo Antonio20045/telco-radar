@@ -37,6 +37,7 @@ def naht(monkeypatch, pausen):
         monkeypatch.setattr(http, "TRANSPORT", httpx.MockTransport(antworte))
         monkeypatch.setattr(http, "_BACKOFF_WAITS", (0.0, 0.0))
         monkeypatch.setattr(http.time, "sleep", pausen.append)
+        monkeypatch.setattr(http, "_gate", http.HostGate(max_parallel=1_000_000))
         return gesehen
 
     return setze
