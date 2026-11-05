@@ -5,7 +5,9 @@
 # (src/telco_radar/versandkosten.py; im Code kein Sonderfall je Anbieter).
 #
 #   betrag      Euro brutto, wie die Kostenuebersicht vor der Kasse ihn nennt.
-#               0 heisst: gemessen kostenlos. null heisst: nicht belegt - dann
+#               0 heisst: in der Kostenuebersicht kein Versandposten (siehe
+#               hinweis je Anbieter: ausdruecklich kostenlos oder keine Zeile).
+#               null heisst: nicht belegt - dann
 #               zaehlt der Versand 0 EUR und die Seite nennt die Luecke
 #               ("Versand bei X nicht belegt"). Nie raten.
 #   quelle      die Seite am Original, auf der gemessen wurde
@@ -45,4 +47,4 @@ anbieter:
     quelle: "https://mobile.1und1.de/flow2/mobile/ssc-private/kosten (Warenkorb, All-Net-Flat M, iPhone 17 Pro)"
     datum: "2026-11-05"
     screenshot: "telcoradar/abnahme/versand-0511/1und1.png"
-    hinweis: "Block 'Zubehoer, Bereitstellung & Versand': SIM inklusive, Bereitstellungspreis 39,90 EUR, einmalige Kosten gesamt 39,90 EUR, keine Versandzeile"
+    hinweis: "Warenkorb 05.11.2026: keine Versandzeile, keine Aussage 'versandkostenfrei'. Block 'Zubehoer, Bereitstellung & Versand': SIM inklusive, Bereitstellungspreis 39,90 EUR; einmalige Kosten gesamt 39,90 EUR = Bereitstellung, kein Versand. Lieferbedingungen per robots.txt gesperrt, nicht abgerufen; Mindestwerte oder Ausnahmen ungeprueft"
