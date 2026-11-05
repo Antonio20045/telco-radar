@@ -116,8 +116,10 @@ def test_klick_saetze_ohne_alten_leser_werden_buendel(bestand, saetze):
     assert bilanz.ohne_tarif == 0
     tarif = {(b.anbieter, b.tarif_name): b.tarif_id for b in bilanz.buendel}
     assert tarif == {
-        ("o2", "O2 Mobile L Plus mit 150 GB+"): "o2:o2-mobile-l",
-        ("o2", "O2 Mobile Unlimited M Plus mit 100 MBit/s"): "o2:o2-mobile-unlimited-m",
+        ("o2", "O2 Mobile L Plus mit 150 GB+"): "o2:o2-mobile-l-plus",
+        ("o2", "O2 Mobile Unlimited M Plus mit 100 MBit/s"): (
+            "o2:o2-mobile-unlimited-m-plus"
+        ),
         ("o2", "O2 Mobile on Demand M mit 50 GB+"): "o2:o2-mobile-on-demand-m",
         ("o2", "O2 Mobile Unlimited L mit 300 MBit/s"): "o2:o2-mobile-unlimited-l",
         ("congstar", "Allnet Flat XS"): "congstar:allnet-flat-xs-mit-gb",

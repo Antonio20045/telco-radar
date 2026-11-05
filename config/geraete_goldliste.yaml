@@ -25,7 +25,8 @@
 #   1&1       nur 36 Raten; zählend nur 1&1 All-Net-Flat S, Rest Schätzung
 #   Telekom   nur 36 Raten, Stand 15.09. und 09.09.; nur 9 Geräte, deshalb
 #             das iPhone 17 Pro zweimal (Band XS und XL)
-#   o2        zählend nur die Bänder M, L und XL; XS nur als Schätzung
+#   o2        zählend nur die Bänder M, L und XL; XS nur als Schätzung; Band M
+#             mit „O2 Mobile on Demand M“ (ohne Plus, ohne Zweitprodukt, 24 Raten)
 #   congstar  kein Band S; die Beispielseite ist veraltet (Stand 28.09.,
 #             Aktion bis 29.09.)
 # =============================================================================
@@ -52,16 +53,16 @@ anbieter:
       farbe: titan-natur
       tarif_name: "O2 Mobile L mit 150 GB+ (24 Mon.)"
       laufzeit_monate: 24
-    - device_id: google-pixel-10a  # Band M
+    - device_id: google-pixel-10a  # Band M, o2 Mobile M ohne Zweitprodukt
       speicher_gb: 128
       farbe: schwarz
-      tarif_name: "O2 Mobile on Demand M Plus mit 50 GB+ (24 Mon.)"
+      tarif_name: "O2 Mobile on Demand M mit 50 GB+ (24 Mon.)"
       laufzeit_monate: 24
-    - device_id: fairphone-6  # Band M
+    - device_id: fairphone-6  # Band M, o2 Mobile M ohne Zweitprodukt
       speicher_gb: 256
       farbe: schwarz
-      tarif_name: "O2 Mobile on Demand M Plus mit 50 GB+ (24 Mon.)"
-      laufzeit_monate: 36
+      tarif_name: "O2 Mobile on Demand M mit 50 GB+ (24 Mon.)"
+      laufzeit_monate: 24
     - device_id: samsung-galaxy-a27  # Band M
       speicher_gb: 128
       farbe: schwarz

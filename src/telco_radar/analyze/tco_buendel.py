@@ -229,11 +229,6 @@ def aus_rohsaetzen(rohsaetze, bestand: Tarifbestand, heute: str) -> Buendelbilan
     return bilanz
 
 
-PLUS_SLUG = "-plus"
-"""Endung des o2-Slugs der Fassung "Plus" eines Tarifs (nur mit Geraet, Rabatt im
-Buendel): `o2-mobile-unlimited-l-plus` zum Grundtarif `o2-mobile-unlimited-l`."""
-
-
 def ohne_tarifblatt(bestand: Tarifbestand, anbieter: str, slug: str) -> Bezug | None:
     """Ein Buendeltarif ohne Tarifblatt im Bestand - unter dem Slug des Anbieters.
 
@@ -243,15 +238,14 @@ def ohne_tarifblatt(bestand: Tarifbestand, anbieter: str, slug: str) -> Bezug | 
     den Tarif ohne "Plus" geraten. Die Tarif-ID ist `tarif_id(anbieter, slug)`.
 
     Nur, wenn der Bestand o2s Kacheln gelesen hat und den Slug weder als Tarif-ID
-    noch als Kachel-Link kennt; "nicht gelesen" ist nicht "nur mit Geraet". Ein
-    Plus-Slug zusaetzlich nur, wenn die Kachel seines Grundtarifs gelesen ist und
-    einen anderen Slug verlinkt. Fehlt sie (Tarifsammler Mi/Fr, Geraetelauf
-    taeglich), bleibt der Satz ohne Tarif, statt spaeter die ID zu wechseln
-    (`o2:...-m-plus` zu `o2:...-m`, `ueber_slug`). Ohne `-plus` ist es dieselbe ID,
-    die `loese` spaeter findet, wenn das Blatt unter dem Slug steht; verlinkt erst
-    eine spaetere Kachel den Slug unter anderem Namen, wechselt sie. Nur fuer den
-    Anbieter, dessen Slug als Tarif-ID belegt ist (`SLUG_ALS_ID_ANBIETER`);
-    Vodafones Slug ist ein Angebots-Hash, der zwischen Tagen wechselt.
+    noch als Kachel-Link kennt; "nicht gelesen" ist nicht "nur mit Geraet". Die
+    ID eines Plus-Slugs ist dieselbe, ob seine Grundtarif-Kachel gelesen ist oder
+    nicht (`Tarifbestand.ueber_slug`, `o2:...-m-plus`): sie wechselt nie. Ohne
+    `-plus` ist es dieselbe ID, die `loese` spaeter findet, wenn das Blatt unter
+    dem Slug steht; verlinkt erst eine spaetere Kachel den Slug unter anderem
+    Namen, wechselt sie. Nur fuer den Anbieter, dessen Slug als Tarif-ID belegt
+    ist (`SLUG_ALS_ID_ANBIETER`); Vodafones Slug ist ein Angebots-Hash, der
+    zwischen Tagen wechselt.
     """
     gesucht = (slug or "").strip().lower()
     if anbieter != SLUG_ALS_ID_ANBIETER or not gesucht:
@@ -262,10 +256,6 @@ def ohne_tarifblatt(bestand: Tarifbestand, anbieter: str, slug: str) -> Bezug | 
         return None
     if bestand.kacheln_zum_slug(anbieter, gesucht):
         return None
-    if gesucht.endswith(PLUS_SLUG):
-        basis = tarif_id(anbieter, gesucht.removesuffix(PLUS_SLUG))
-        if not (bestand.je_id_aktuell.get(basis) or {}).get("buendel_slug"):
-            return None
     return Bezug(
         tarif_id=tid,
         tarif_name="",

@@ -17,7 +17,7 @@ from bestand_pfad import ZUSTAND
 from telco_radar.analyze.tarif_referenzen import aus_bestand
 from telco_radar.collect.tarif_crawler import tarif_id
 from telco_radar.tarif_bezug import Bezug, Tarifbestand
-from telco_radar.tarif_model import HOCH, MITTEL, ist_zurueckgezogen
+from telco_radar.tarif_model import HOCH, MITTEL, NUR_MIT_GERAET, ist_zurueckgezogen
 from telco_radar.tco_model import SimOnlyReferenz
 
 _WURZEL = Path(__file__).parent.parent
@@ -581,10 +581,39 @@ def test_der_slug_loest_auf_wo_der_name_es_nicht_kann():
     assert bestand.ueber_namen("o2", katalogname) is None
     bezug = bestand.loese("o2", katalogname, slug="o2-mobile-on-demand-m-plus")
     assert bezug is not None
-    assert bezug.tarif_id == "o2:o2-mobile-on-demand-m"
-    assert bezug.guete == HOCH and bezug.belastbar
+    assert bezug.tarif_id == "o2:o2-mobile-on-demand-m-plus"
+    assert bezug.tarif_id != "o2:o2-mobile-on-demand-m"
+    assert bezug.guete == NUR_MIT_GERAET and not bezug.belastbar
     assert "Handy" not in bezug.grund
     assert "o2-mobile-on-demand-m-plus" in bezug.grund
+
+
+def test_m_und_m_plus_ueberschreiben_sich_nie():
+    """Gegenprobe zur eigenen ID: der Tarif M ohne Plus findet weiter die Kachel."""
+    bestand = Tarifbestand([_satz("o2", "O2 Mobile on Demand M", 19.99, **_O2_KACHEL)])
+    plus = bestand.loese(
+        "o2",
+        "O2 Mobile on Demand M Plus mit 50 GB+ (24 Mon.)",
+        slug="o2-mobile-on-demand-m-plus",
+    )
+    ohne = bestand.loese(
+        "o2",
+        "O2 Mobile on Demand M mit 50 GB+ (24 Mon.)",
+        slug="o2-mobile-on-demand-m",
+    )
+    assert ohne.tarif_id == "o2:o2-mobile-on-demand-m" and ohne.guete == HOCH
+    assert plus.tarif_id == "o2:o2-mobile-on-demand-m-plus"
+    assert plus.tarif_id != ohne.tarif_id
+
+
+def test_die_plus_fassung_gilt_nur_bei_o2():
+    """Kein anbieterfremder Sonderweg: ein anderer Anbieter behaelt die Kachel-ID."""
+    bestand = Tarifbestand(
+        [_satz("congstar", "Allnet Flat M", 20.0, buendel_slug="allnet-flat-m-plus")]
+    )
+    bezug = bestand.loese("congstar", "x", slug="allnet-flat-m-plus")
+    assert bezug.tarif_id == "congstar:allnet-flat-m"
+    assert bezug.guete == HOCH
 
 
 def test_der_name_gewinnt_ueber_den_slug():
@@ -643,8 +672,8 @@ def test_der_slug_kommt_vor_dem_betrag():
     bezug = bestand.loese(
         "o2", "Gibtsnicht", betrag=14.99, slug="o2-mobile-on-demand-m-plus"
     )
-    assert bezug.tarif_id == "o2:o2-mobile-on-demand-m"
-    assert bezug.guete == HOCH
+    assert bezug.tarif_id == "o2:o2-mobile-on-demand-m-plus"
+    assert bezug.guete == NUR_MIT_GERAET
 
 
 def test_ein_buendel_haengt_am_geraeteblatt_des_tarifs(echt):

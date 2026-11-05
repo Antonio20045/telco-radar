@@ -68,6 +68,21 @@ def test_unbegrenzt_bleibt_ohne_band_solange_vodafone_xl_begrenzt_ist(tarife):
     assert index.get("o2:o2-mobile-l") == "l"
 
 
+def test_plus_fassung_steht_im_band_ihres_grundtarifs(tarife):
+    """o2 M Plus (`o2:o2-mobile-on-demand-m-plus`) hat kein Tarifblatt, aber ein
+    Band: das seines Grundtarifs. Gegenprobe: ohne Grundtarif kein Plus-Band, und
+    ein eigener Eintrag wird nicht ueberschrieben."""
+    leiter = band.tarifleiter(tarife)
+    index = band.tarif_baender(tarife, leiter)
+    grund = index["o2:o2-mobile-on-demand-m"]
+    assert grund == "m"
+    assert index.get("o2:o2-mobile-on-demand-m-plus") == grund
+    ohne = {t: s for t, s in tarife.items() if t != "o2:o2-mobile-on-demand-m"}
+    assert "o2:o2-mobile-on-demand-m-plus" not in band.tarif_baender(ohne, leiter)
+    eigen = {**tarife, "o2:o2-mobile-on-demand-m-plus": {**tarife["o2:o2-mobile-l"]}}
+    assert band.tarif_baender(eigen, leiter)["o2:o2-mobile-on-demand-m-plus"] == "l"
+
+
 @pytest.fixture(scope="module")
 def bestand():
     tco = json.loads((ZUSTAND / "geraete_tco.json").read_text(encoding="utf-8"))
