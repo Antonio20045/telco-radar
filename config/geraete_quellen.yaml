@@ -120,24 +120,78 @@ anbieter:
 
   - name: MediaMarkt
     typ: handel
-    erfassung: aus
+    erfassung: barpreis
     gruppe: Ceconomy
     rang: 2
-    methode: json_endpunkt
-    aktiv: false
-    grund: >-
-      Produktdetailseiten antworten mit HTTP 403 und einer Cloudflare-Captcha-
-      Wand - auf Chrome-, Edge- und den ehrlichen ClaudeBot-Absender gleich,
-      obwohl robots.txt ClaudeBot ausdrücklich erlaubt. Lesbar ist nur die
-      Kampagnenseite /de/campaign/angebote-smartphones; ihre 26 Gerätepreise
-      stehen in window.__PRELOADED_STATE__, das kein gültiges JSON am Stück
-      ist und einen eigenen Adapter braucht.
+    methode: mediamarkt_angebote
+    aktiv: true
     basis_url: https://www.mediamarkt.de
+    # Zehn Sekunden wie bei Saturn (derselbe Cloudflare-Host der Ceconomy-
+    # Plattform), obwohl robots.txt fuer "*" keinen Crawl-delay nennt
+    # (gelesen 04.11.2026, arbeit/haendler-weg-0411.md Abschnitt 1).
+    rate_limit_sekunden: 10
+    user_agent: "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    hinweis: >-
+      ANGEBUNDEN SEIT 05.11.2026 (Brief brief-mediamarkt-0511.md), nach der
+      Recherche vom 04.11.2026 (arbeit/haendler-weg-0411.md) - der alte
+      Befund ("HTTP 403 und Cloudflare-Captcha auf Produktdetailseiten")
+      traf an diesem Tag fuer KEINE der gemessenen Seiten zu (Start-,
+      Kampagnen- und Produktseite alle HTTP 200 ohne Challenge). Gelesen
+      wird direkt die Kampagnenseite /de/campaign/angebote-smartphones -
+      dieselbe Ceconomy-Plattform wie Saturn, derselbe Apollo-Cache, nur mit
+      dem Tenant-Praefix "Media" statt "Saturn" (siehe
+      collect/geraete/ceconomy.py). Nur
+      isProductOfTypeMarketplace == false zaehlt - auf der Produktseite
+      eines einzelnen Geraets (zur Gegenprobe gemessen, nicht konfiguriert)
+      waren 5 von 21 Preisfeldern Fremdanbieter-Angebote mit bis zu 445 EUR
+      fuer ein Geraet, das MediaMarkt selbst fuer 389,99 EUR fuehrt.
+      GRENZE: Die Kampagnenseite ist eine rotierende Angebotsauswahl (12
+      Preisfelder am Messtag, drei davon Smartphones: Galaxy A57, Galaxy
+      A37, Pixel 10 Pro) - keine vollstaendige Katalogabdeckung, dieselbe
+      Art Luecke wie bei Saturns duennen Markenseiten.
     einstiege:
       - url: https://www.mediamarkt.de/de/campaign/angebote-smartphones
         label: Angebote Smartphones
         kind: static
-        pfadmuster: /de/product/
+      # Suchseiten der Top-/Pflichtmodelle (config/geraete_abdeckung.yaml),
+      # 05.11.2026: /de/search.html ist fuer "*" nicht gesperrt (geprueft
+      # gegen tests/fixtures/geraete/mediamarkt_robots.txt, Test
+      # test_konfigurierter_einstieg_ist_nach_robots_erlaubt), traegt
+      # dieselbe Apollo-Struktur wie die Kampagnenseite und liefert nur die
+      # erste Ergebnisseite (hoechstens 12 Preisfelder). Je Adresse ein
+      # echter Probeabruf mit HTTP 200 (arbeit/mediamarkt-0511/probe2.md).
+      # Nicht abgedeckt: iPhone 17 Pro Max in 256/512 GB (die Suche liefert
+      # nur die 2-TB-Fassung), Pixel 11 Pro Fold; Marktplatz bleibt verworfen.
+      - url: https://www.mediamarkt.de/de/search.html?query=iPhone%2018%20Pro
+        label: Suche iPhone 18 Pro
+        kind: static
+      - url: https://www.mediamarkt.de/de/search.html?query=iPhone%2017
+        label: Suche iPhone 17
+        kind: static
+      - url: https://www.mediamarkt.de/de/search.html?query=iPhone%20Air
+        label: Suche iPhone Air
+        kind: static
+      - url: https://www.mediamarkt.de/de/search.html?query=iPhone%2017e
+        label: Suche iPhone 17e
+        kind: static
+      - url: https://www.mediamarkt.de/de/search.html?query=Galaxy%20S26
+        label: Suche Galaxy S26
+        kind: static
+      - url: https://www.mediamarkt.de/de/search.html?query=Galaxy%20S26%20Ultra
+        label: Suche Galaxy S26 Ultra
+        kind: static
+      - url: https://www.mediamarkt.de/de/search.html?query=Galaxy%20Z%20Fold8
+        label: Suche Galaxy Z Fold8
+        kind: static
+      - url: https://www.mediamarkt.de/de/search.html?query=Galaxy%20Z%20Flip8
+        label: Suche Galaxy Z Flip8
+        kind: static
+      - url: https://www.mediamarkt.de/de/search.html?query=Pixel%2011
+        label: Suche Pixel 11
+        kind: static
+      - url: https://www.mediamarkt.de/de/search.html?query=Pixel%2010a
+        label: Suche Pixel 10a
+        kind: static
 
   - name: Saturn
     typ: handel

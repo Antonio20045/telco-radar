@@ -24,6 +24,7 @@ METHODEN_HEUTE = (
     "coolblue_produkt",
     "einsundeins_buendel",
     "ldjson",
+    "mediamarkt_angebote",
     "o2_katalog",
     "saturn_brand",
     "shopify",

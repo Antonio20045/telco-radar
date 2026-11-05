@@ -54,11 +54,18 @@ from bs4 import BeautifulSoup
 from ...geraete_model import Katalog, lies_listung
 from . import autoerkennung, register
 from .basis import (
+    _MINDESTANTEIL_GELESENER_PRODUKTSEITEN as _MINDESTANTEIL_GELESENER_PRODUKTSEITEN,
+)
+from .basis import (
     ADAPTER,
     Adapter,
     GeraeteAbrufFehler,
+    abruf_argumente,
+    abruf_zusaetze,
     registriere,
+    schutz_abbruch,
 )
+from .basis import _einstieg_gelesen as _einstieg_gelesen
 from .basis import umgesetzte_methoden as umgesetzte_methoden
 from .robots import RobotsWaechter
 from .strukturdaten import ist_lockpreis, produkte_aus_html
@@ -103,22 +110,6 @@ class Anbieterbilanz:
 
 
 _TOTE_STATUS = (404, 410)
-
-_MINDESTANTEIL_GELESENER_PRODUKTSEITEN = 0.75
-
-
-def _einstieg_gelesen(versucht: int, tot: int) -> bool:
-    """Reicht das Gelesene dieser Einstiegsseite fuer "gelesen"?
-
-    `versucht` sind die Produktadressen, an denen dieser Lauf wirklich war,
-    `tot` die davon, die der Anbieter selbst als nicht mehr vorhanden
-    beantwortet hat. Eine Einstiegsseite ganz ohne Produktadressen ist
-    gelesen - es gab nichts nachzuladen; das ist "gelesen, nichts
-    gefunden" und damit eine Aussage, kein Ausfall.
-    """
-    if versucht <= 0:
-        return True
-    return (versucht - tot) >= _MINDESTANTEIL_GELESENER_PRODUKTSEITEN * versucht
 
 
 def ernte_links(
@@ -465,8 +456,9 @@ def sammle_anbieter(
     kopfzeilen = dict(getattr(anbieter, "kopfzeilen", None) or {})
     user_agent = (getattr(anbieter, "user_agent", "") or "").strip() or None
 
-    if user_agent:
-        waechter = RobotsWaechter(hole=lambda url: hole(url, user_agent=user_agent))
+    zusatz = abruf_zusaetze(adapter, user_agent)
+    if zusatz:
+        waechter = RobotsWaechter(hole=lambda url: hole(url, **zusatz))
 
     leitadresse = anbieter.basis_url or anbieter.einstiege[0].url
 
@@ -490,11 +482,7 @@ def sammle_anbieter(
                 bilanz.ausserhalb_besuchszeit = True
             raise
         bilanz.besucht.append(url)
-        kwargs = {}
-        if kopfzeilen:
-            kwargs["kopfzeilen"] = kopfzeilen
-        if user_agent:
-            kwargs["user_agent"] = user_agent
+        kwargs = abruf_argumente(zusatz, kopfzeilen, schleuse, bilanz)
         status, text = hole(url, **kwargs) if kwargs else hole(url)
         if not (200 <= int(status) < 300):
             raise GeraeteAbrufFehler(f"HTTP {status}", status=int(status))
@@ -509,6 +497,8 @@ def sammle_anbieter(
             inhalt = _hole(einstieg.url)
         except GeraeteAbrufFehler as exc:
             gruende.append(f"{einstieg.url}: {exc}")
+            if schutz_abbruch(adapter, exc, gruende):
+                break
             continue
         except Exception as exc:  # noqa: BLE001
             gruende.append(f"{einstieg.url}: {type(exc).__name__}: {str(exc)[:120]}")
@@ -557,6 +547,8 @@ def sammle_anbieter(
                 roh = direkt.lies(inhalt, einstieg.url)
             except GeraeteAbrufFehler as exc:
                 gruende.append(f"{einstieg.url}: {exc}")
+                if schutz_abbruch(adapter, exc, gruende, unlesbar=True):
+                    break
                 continue
             _uebernimm(
                 roh, anbieter, einstieg, einstieg.url, katalog, farben, heute, bilanz
