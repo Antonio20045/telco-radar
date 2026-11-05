@@ -9,7 +9,7 @@ deshalb gegen eine feste Pflichtliste (`config/geraete_abdeckung.yaml`),
 nicht gegen den Vortag, und sie misst die Bündel, aus denen die Leitzahl
 „Kosten über 24 Monate“ entsteht.
 
-Vier Befundarten, jede für sich rot:
+Fünf Befundarten, jede für sich rot:
 
 * ``anbieter_leer``     ein Pflichtanbieter hat am Messtag kein Bündel
 * ``modell_fehlt``      ein Pflichtmodell fehlt bei einem Pflichtanbieter,
@@ -20,9 +20,15 @@ Vier Befundarten, jede für sich rot:
                         `PREISSPRUNG_ANTEIL` gegenüber dem vorigen Messtag; über
                         einen Bruch der Rechenweise (`rechenweise`) wird nicht
                         verglichen
+* ``luecke_abgelaufen`` eine belegte Lücke ist über ihr Ablaufdatum ``bis``
+                        hinaus (Messtag > ``bis``): neu prüfen oder streichen
 
 Eine belegte Lücke (Anbieter führt das Gerät nicht, Anbieter nicht
 erreichbar) ist kein Befund, sie steht aber mit ihrem Grund in der Matrix.
+Jede trägt ``geprueft`` und ``bis``, höchstens ``LUECKE_MAX_TAGE`` Tage nach
+``geprueft``: eine Ausnahme verjährt, sie wird nicht vergessen. Ist ein Bündel
+für eine belegte Lücke wieder da, ist die Ausnahme überholt: das ist kein
+Befund, aber eine laute Warnung (``Abdeckung.warnungen``).
 """
 
 from __future__ import annotations
@@ -31,6 +37,7 @@ import json
 import re
 from collections import defaultdict
 from dataclasses import dataclass, field
+from datetime import date, timedelta
 from pathlib import Path
 
 import yaml
@@ -42,6 +49,7 @@ KOMBI_VERLUST_ANTEIL = 0.10
 KOMBI_VERLUST_MINDEST = 5
 PREISSPRUNG_ANTEIL = 0.25
 BEISPIELE = 8
+LUECKE_MAX_TAGE = 14
 
 _SKU_MUSTER = re.compile(r"^(?P<modell>.+?)-(?P<speicher>\d+gb|ohne-speicher)-")
 
@@ -61,6 +69,7 @@ class Abdeckung:
     anbieter_zahl: dict = field(default_factory=dict)
     luecken: dict = field(default_factory=dict)
     befunde: list = field(default_factory=list)
+    warnungen: list = field(default_factory=list)
 
     @property
     def rot(self) -> bool:
@@ -76,21 +85,64 @@ def modell_und_speicher(sku_id: str) -> tuple[str | None, str | None]:
     return treffer.group("modell"), treffer.group("speicher")
 
 
+def _datum(eintrag: dict, feld: str) -> date:
+    try:
+        return date.fromisoformat(str(eintrag.get(feld)))
+    except ValueError:
+        raise ValueError(f"belegte Lücke ohne Datum '{feld}': {eintrag}") from None
+
+
 def lade_pflicht(pfad: Path) -> dict:
+    """Pflichtliste; ``luecken``: (Anbieter, Modell) -> Grund, ``bis``: -> Datum."""
     daten = yaml.safe_load(pfad.read_text(encoding="utf-8")) or {}
-    luecken = {}
+    luecken, bis = {}, {}
     for eintrag in daten.get("belegte_luecken") or []:
         grund = str(eintrag.get("grund") or "").strip()
         if not grund:
             raise ValueError(f"belegte Lücke ohne Grund: {eintrag}")
-        modelle = eintrag.get("modelle") or ["*"]
-        for modell in modelle:
+        geprueft, ende = _datum(eintrag, "geprueft"), _datum(eintrag, "bis")
+        if not geprueft <= ende <= geprueft + timedelta(days=LUECKE_MAX_TAGE):
+            raise ValueError(
+                f"belegte Lücke: 'bis' muss höchstens {LUECKE_MAX_TAGE} Tage nach "
+                f"'geprueft' liegen: {eintrag}"
+            )
+        for modell in eintrag.get("modelle") or ["*"]:
             luecken[(eintrag["anbieter"], modell)] = grund
+            bis[(eintrag["anbieter"], modell)] = ende
     return {
         "anbieter": list(daten.get("pflicht_anbieter") or []),
         "modelle": list(daten.get("pflicht_modelle") or []),
         "luecken": luecken,
+        "bis": bis,
     }
+
+
+def _pruefe_luecken(ergebnis: Abdeckung, pflicht: dict) -> None:
+    """Abgelaufene Ausnahmen sind Befunde, überholte (Bündel wieder da) Warnungen."""
+    for (anbieter, modell), ende in sorted(pflicht.get("bis", {}).items()):
+        if ergebnis.messtag and ergebnis.messtag > ende.isoformat():
+            text = (
+                f"{anbieter}: belegte Lücke {modell} ist seit {ende.isoformat()} "
+                "abgelaufen: an der Anbieterseite neu prüfen, dann mit neuem "
+                f"'geprueft' und 'bis' (höchstens {LUECKE_MAX_TAGE} Tage) verlängern "
+                "oder streichen"
+            )
+            ergebnis.befunde.append(Befund("luecke_abgelaufen", anbieter, text))
+        da = (
+            ergebnis.anbieter_zahl.get(anbieter)
+            if modell == "*"
+            else (modell, anbieter) in ergebnis.matrix
+        )
+        if da:
+            ergebnis.warnungen.append(
+                Befund(
+                    "luecke_ueberholt",
+                    anbieter,
+                    f"{anbieter}: Ausnahme {modell} ist überholt, am Messtag gibt "
+                    "es wieder Bündel: Eintrag in config/geraete_abdeckung.yaml "
+                    "(belegte_luecken) streichen",
+                )
+            )
 
 
 def _anbieter_aus_id(buendel_id: str, namen: dict) -> str | None:
@@ -160,6 +212,7 @@ def pruefe(tco: dict, historie: list[dict], pflicht: dict) -> Abdeckung:
                 )
             )
 
+    _pruefe_luecken(ergebnis, pflicht)
     _vergleiche_vortag(ergebnis, historie, pflicht["anbieter"], messtag)
     return ergebnis
 
@@ -272,4 +325,7 @@ def als_markdown(ergebnis: Abdeckung, pflicht: dict) -> str:
     if ergebnis.befunde:
         zeilen += ["", "## Befunde", ""]
         zeilen += [f"- {b.text}" for b in ergebnis.befunde]
+    if ergebnis.warnungen:
+        zeilen += ["", "## Warnungen", ""]
+        zeilen += [f"- {w.text}" for w in ergebnis.warnungen]
     return "\n".join(zeilen) + "\n"

@@ -39,7 +39,10 @@ pflicht_modelle:
   - google-pixel-10a
 
 # anbieter + modelle (fehlt `modelle`, gilt der Grund für den ganzen
-# Anbieter) + grund + geprueft (Datum der Messung).
+# Anbieter) + grund + geprueft (Datum der Prüfung am Original) + bis (Ablauf,
+# höchstens 14 Tage nach `geprueft`). Nach `bis` ist die Ausnahme ein Befund
+# (rot), bis sie neu geprüft und verlängert oder gestrichen ist. Kommt ein
+# Bündel zurück, warnt der Wächter: Eintrag streichen.
 belegte_luecken:
   # congstar führt das iPhone 17 Pro seit dem 03.11.2026 nicht mehr: die Seite
   # /geraete/apple/apple-iphone-17-pro/ antwortet 307 auf die Apple-Übersicht
@@ -53,3 +56,4 @@ belegte_luecken:
       - apple-iphone-17-pro
     grund: Anbieter führt das Gerät nicht mehr (Seite leitet auf die Übersicht um, nicht in der Sitemap)
     geprueft: "2026-11-05"
+    bis: "2026-11-19"
