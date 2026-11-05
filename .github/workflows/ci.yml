@@ -19,7 +19,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3, 4, 5, 6, 7, 8]
+        shard: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -41,12 +41,12 @@ jobs:
       # headless gegen 127.0.0.1 und braucht weder Netz noch Systempakete.
       - name: Install Chromium for the browser tests
         run: playwright install chromium
-      - name: Run tests (Teil ${{ matrix.shard }}/8)
+      - name: Run tests (Teil ${{ matrix.shard }}/12)
         env:
           PYTHONPATH: src
         run: |
           set +e
-          pytest -q -n auto -rs --splits 8 --group ${{ matrix.shard }} \
+          pytest -q -n auto -rs --splits 12 --group ${{ matrix.shard }} \
             --splitting-algorithm least_duration --durations-path .test_durations \
             --store-durations --clean-durations \
             | tee pytest-ausgabe.txt
