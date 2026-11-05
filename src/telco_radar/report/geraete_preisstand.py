@@ -50,6 +50,7 @@ _PREISFELDER_LISTE = (
     "zerlegung",
     "rechnung",
     "rechnung_luecken",
+    "versand_hinweise",
     "luecken",
     "aktionen",
 )
