@@ -1,6 +1,86 @@
 {
- "stand": "2026-11-04",
+ "stand": "2026-11-05",
  "videos": [
+  {
+   "id": "rXFV1ivDe6c",
+   "titel": "Are Vector Databases Still Needed? RAG, AI Agents & Search",
+   "kanal": "IBM Technology",
+   "datum": "2026-11-05",
+   "dauer_sekunden": 601,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "rXFV1ivDe6c.jpg"
+  },
+  {
+   "id": "pXRZyOxbDL4",
+   "titel": "How Mozilla strengthens Firefox security with GPT-6 Cyber",
+   "kanal": "OpenAI",
+   "datum": "2026-11-05",
+   "dauer_sekunden": 54,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "pXRZyOxbDL4.jpg"
+  },
+  {
+   "id": "hniPlxcQ7X4",
+   "titel": "What will people REALLY use these for?",
+   "kanal": "Matt Wolfe",
+   "datum": "2026-11-05",
+   "dauer_sekunden": 79,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "hniPlxcQ7X4.jpg"
+  },
+  {
+   "id": "dOTPE-v7NiA",
+   "titel": "MiniMax M3.1 Flash kostet fast nichts. Taugt es was?",
+   "kanal": "The Morpheus Tutorials",
+   "datum": "2026-11-05",
+   "dauer_sekunden": 3308,
+   "stufe": "Fortgeschritten",
+   "sprache": "de",
+   "bild": "dOTPE-v7NiA.jpg"
+  },
+  {
+   "id": "bJldMYfRvMQ",
+   "titel": "Introducing ChatGPT Images 2.6",
+   "kanal": "OpenAI",
+   "datum": "2026-11-05",
+   "dauer_sekunden": 35,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "bJldMYfRvMQ.jpg"
+  },
+  {
+   "id": "YajzUoRKSNQ",
+   "titel": "Astronaut: DAS kommt bis 2030! Weltraumstädte, Roboter, Mond-Hotels, Dyson-Sphären & Aliens",
+   "kanal": "Everlast AI",
+   "datum": "2026-11-05",
+   "dauer_sekunden": 4341,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "YajzUoRKSNQ.jpg"
+  },
+  {
+   "id": "Xo7wNFDOSsc",
+   "titel": "Lokale KI statt Cloud-Abo | c't 4004 #46",
+   "kanal": "c't 3003",
+   "datum": "2026-11-05",
+   "dauer_sekunden": 4900,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "Xo7wNFDOSsc.jpg"
+  },
+  {
+   "id": "TeIHEGkxlKI",
+   "titel": "Behind the Scenes: Building the Copilot Course #excel #copilot",
+   "kanal": "Leila Gharani",
+   "datum": "2026-11-05",
+   "dauer_sekunden": 95,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "TeIHEGkxlKI.jpg"
+  },
   {
    "id": "k8PKrLNqiRk",
    "titel": "Keno sucht Natto-Fans",
@@ -70,6 +150,26 @@
    "stufe": "Einstieg",
    "sprache": "de",
    "bild": "VSP5ofNCoHg.jpg"
+  },
+  {
+   "id": "9ZxCOHkfn_8",
+   "titel": "GPT-Image-2.6: Faster image generation with Flare and Sunburst",
+   "kanal": "OpenAI",
+   "datum": "2026-11-04",
+   "dauer_sekunden": 88,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "9ZxCOHkfn_8.jpg"
+  },
+  {
+   "id": "6IttBmI4P9M",
+   "titel": "Messi asks ChatGPT to reimagine his room",
+   "kanal": "OpenAI",
+   "datum": "2026-11-04",
+   "dauer_sekunden": 18,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "6IttBmI4P9M.jpg"
   },
   {
    "id": "44GBqQGc-v0",
@@ -200,193 +300,93 @@
    "stufe": "Einstieg",
    "sprache": "en",
    "bild": "2h16j4K_NbA.jpg"
-  },
-  {
-   "id": "lZes3U_WIug",
-   "titel": "Generate Worlds in Real-Time (Free & Open Source)",
-   "kanal": "Matt Wolfe",
-   "datum": "2026-11-02",
-   "dauer_sekunden": 76,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "lZes3U_WIug.jpg"
-  },
-  {
-   "id": "jL53DwYaK3c",
-   "titel": "KI-Update kompakt: Linux-Lücke, Audio Intelligence, KI-Operation, KI-Satellit",
-   "kanal": "KI Update (heise)",
-   "datum": "2026-11-02",
-   "dauer_sekunden": 828,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "jL53DwYaK3c.jpg"
-  },
-  {
-   "id": "j068jHeqABk",
-   "titel": "Adobe Photoshop, Premiere und After Effects für lau",
-   "kanal": "c't 3003",
-   "datum": "2026-11-02",
-   "dauer_sekunden": 56,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "j068jHeqABk.jpg"
-  },
-  {
-   "id": "h5SNFLIZl_U",
-   "titel": "Would you be excited to see this at Disneyland?",
-   "kanal": "Matt Wolfe",
-   "datum": "2026-11-02",
-   "dauer_sekunden": 74,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "h5SNFLIZl_U.jpg"
-  },
-  {
-   "id": "EvOYYbW2RZQ",
-   "titel": "KI-Update kompakt: Linux-Lücke, Audio Intelligence, KI-Operation, KI-Satellit",
-   "kanal": "KI Update (heise)",
-   "datum": "2026-11-02",
-   "dauer_sekunden": 861,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "EvOYYbW2RZQ.jpg"
-  },
-  {
-   "id": "EkdIZXDnRK8",
-   "titel": "Context-Aware Coding: Give AI Agents the Right Context",
-   "kanal": "IBM Technology",
-   "datum": "2026-11-02",
-   "dauer_sekunden": 394,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "EkdIZXDnRK8.jpg"
-  },
-  {
-   "id": "DSlDIC58fF0",
-   "titel": "Wie gut ist TTS heute?",
-   "kanal": "The Morpheus Tutorials",
-   "datum": "2026-11-02",
-   "dauer_sekunden": 6396,
-   "stufe": "Fortgeschritten",
-   "sprache": "de",
-   "bild": "DSlDIC58fF0.jpg"
-  },
-  {
-   "id": "DLXIMYfzM9g",
-   "titel": "KI-Abos: Erst dran gewöhnen, dann teuer bezahlen?",
-   "kanal": "c't 3003",
-   "datum": "2026-11-02",
-   "dauer_sekunden": 36,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "DLXIMYfzM9g.jpg"
-  },
-  {
-   "id": "Amm9ySSET4c",
-   "titel": "Coinbase on OpenAI Private Intelligence",
-   "kanal": "OpenAI",
-   "datum": "2026-11-02",
-   "dauer_sekunden": 65,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "Amm9ySSET4c.jpg"
-  },
-  {
-   "id": "9tOu4r-FiQI",
-   "titel": "This DeepSeek v4.1 is powerful and uncensored, let's run it",
-   "kanal": "David Ondrej",
-   "datum": "2026-11-02",
-   "dauer_sekunden": 2144,
-   "stufe": "Fortgeschritten",
-   "sprache": "en",
-   "bild": "9tOu4r-FiQI.jpg"
   }
  ],
  "kanaele": {
   "c't 3003": {
    "error": null,
-   "versucht": "2026-11-04",
-   "abgerufen": "2026-11-04"
+   "versucht": "2026-11-05",
+   "abgerufen": "2026-11-05"
   },
   "KI Update (heise)": {
    "error": null,
-   "versucht": "2026-11-04",
-   "abgerufen": "2026-11-04"
+   "versucht": "2026-11-05",
+   "abgerufen": "2026-11-05"
   },
   "Everlast AI": {
    "error": null,
-   "versucht": "2026-11-04",
-   "abgerufen": "2026-11-04"
+   "versucht": "2026-11-05",
+   "abgerufen": "2026-11-05"
   },
   "The Morpheus Tutorials": {
    "error": null,
-   "versucht": "2026-11-04",
-   "abgerufen": "2026-11-04"
+   "versucht": "2026-11-05",
+   "abgerufen": "2026-11-05"
   },
   "Kevin Stratvert": {
    "error": null,
-   "versucht": "2026-11-04",
-   "abgerufen": "2026-11-04"
+   "versucht": "2026-11-05",
+   "abgerufen": "2026-11-05"
   },
   "Microsoft Mechanics": {
    "error": null,
-   "versucht": "2026-11-04",
-   "abgerufen": "2026-11-04"
+   "versucht": "2026-11-05",
+   "abgerufen": "2026-11-05"
   },
   "Leila Gharani": {
    "error": null,
-   "versucht": "2026-11-04",
-   "abgerufen": "2026-11-04"
+   "versucht": "2026-11-05",
+   "abgerufen": "2026-11-05"
   },
   "Jeff Su": {
    "error": null,
-   "versucht": "2026-11-04",
-   "abgerufen": "2026-11-04"
+   "versucht": "2026-11-05",
+   "abgerufen": "2026-11-05"
   },
   "Matt Wolfe": {
    "error": null,
-   "versucht": "2026-11-04",
-   "abgerufen": "2026-11-04"
+   "versucht": "2026-11-05",
+   "abgerufen": "2026-11-05"
   },
   "IBM Technology": {
    "error": null,
-   "versucht": "2026-11-04",
-   "abgerufen": "2026-11-04"
+   "versucht": "2026-11-05",
+   "abgerufen": "2026-11-05"
   },
   "OpenAI": {
    "error": null,
-   "versucht": "2026-11-04",
-   "abgerufen": "2026-11-04"
+   "versucht": "2026-11-05",
+   "abgerufen": "2026-11-05"
   },
   "Anthropic": {
    "error": null,
-   "versucht": "2026-11-04",
-   "abgerufen": "2026-11-04"
+   "versucht": "2026-11-05",
+   "abgerufen": "2026-11-05"
   },
   "Google DeepMind": {
    "error": null,
-   "versucht": "2026-11-04",
-   "abgerufen": "2026-11-04"
+   "versucht": "2026-11-05",
+   "abgerufen": "2026-11-05"
   },
   "AI Explained": {
    "error": null,
-   "versucht": "2026-11-04",
-   "abgerufen": "2026-11-04"
+   "versucht": "2026-11-05",
+   "abgerufen": "2026-11-05"
   },
   "Two Minute Papers": {
    "error": null,
-   "versucht": "2026-11-04",
-   "abgerufen": "2026-11-04"
+   "versucht": "2026-11-05",
+   "abgerufen": "2026-11-05"
   },
   "3Blue1Brown": {
    "error": null,
-   "versucht": "2026-11-04",
-   "abgerufen": "2026-11-04"
+   "versucht": "2026-11-05",
+   "abgerufen": "2026-11-05"
   },
   "David Ondrej": {
    "error": null,
-   "versucht": "2026-11-04",
-   "abgerufen": "2026-11-04"
+   "versucht": "2026-11-05",
+   "abgerufen": "2026-11-05"
   }
  },
  "error": null
