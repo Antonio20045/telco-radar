@@ -9,9 +9,9 @@
       {% for g in gr.geraete %}
       <li><span class="gr-pf-geraet">{{ g.name }}</span>
         {% if mit_beleg %}
-        <span class="gr-pf-beleg"><a href="{{ g.beleg.url }}" rel="noopener">Beleg</a>{% if g.beleg.original %} · <a href="{{ g.beleg.original }}" rel="noopener">Originalseite</a>{% endif %}<br>geprüft {{ g.beleg.geprueft }}, gültig bis {{ g.beleg.bis }}</span>
+        <span class="gr-pf-beleg"><a href="{{ g.beleg.url }}" rel="noopener">Beleg</a>{% if g.beleg.original %} · <a href="{{ g.beleg.original }}" rel="noopener">Originalseite</a>{% endif %}<br>{{ g.beleg.grund }}<br>geprüft {{ g.beleg.geprueft }}, gültig bis {{ g.beleg.bis }}</span>
         {% else %}
-        <span class="gr-pf-beleg">bei {{ g.fehlt }} nicht gemessen ({{ g.grund }})</span>
+        <span class="gr-pf-beleg">{{ g.satz }}</span>
         {% endif %}
       </li>
       {% endfor %}
@@ -30,6 +30,7 @@
   {% else %}
   <p class="gr-pf-regel">{{ pf.regel }}</p>
   {% if pf.hinweis %}<p class="gr-pf-regel gr-pf-hinweis">{{ pf.hinweis }}</p>{% endif %}
+  {% if pf.fehlende %}<p class="gr-pf-regel gr-pf-fehlende">{{ pf.fehlende }}</p>{% endif %}
   <div class="gr-zr-zeitwahl gr-pf-wahl" id="pf-wahl" role="group" aria-label="Wettbewerber" hidden>
     {% for p in pf.paare %}
     <button type="button" data-pf="{{ p.name }}" aria-pressed="{{ 'true' if p.name == pf.standard else 'false' }}">{{ p.legende }}</button>
@@ -38,6 +39,7 @@
   {% for p in pf.paare %}
   <div class="gr-pf-paar gr-anb--{{ p.slug }}" data-pf="{{ p.name }}" data-nur-w="{{ p.n_w }}" data-nur-v="{{ p.n_v }}" data-offen="{{ p.n_offen }}">
     <h3 class="gr-pf-kopf">{{ p.kopf }}</h3>
+    <p class="gr-pf-kontext">{{ p.kontext }}</p>
     <div class="gr-pf-listen">
       <div class="gr-pf-liste gr-pf-liste--w">
         <h4>Hat {{ p.legende }}, Vodafone nicht</h4>
@@ -48,7 +50,7 @@
         {% if p.nur_v %}{{ gruppen(p.nur_v, true) }}{% else %}<p class="gr-pf-leer">Keine belegte Lücke.</p>{% endif %}
       </div>
     </div>
-    <details class="gr-pf-offen">
+    <details class="gr-pf-offen"{% if p.offen_zeigen %} open{% endif %}>
       <summary>Nicht gemessen (Messlücke, zählt nicht): {{ p.n_offen }}</summary>
       {% if p.offen %}{{ gruppen(p.offen, false) }}{% else %}<p class="gr-pf-leer">Keine.</p>{% endif %}
     </details>

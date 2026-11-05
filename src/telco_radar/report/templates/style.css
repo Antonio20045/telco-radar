@@ -6433,7 +6433,8 @@ a.ki-k1-pille:hover{border-color:var(--ink)}
 .gr-pf-wahl[hidden]{display:none}
 .gr-pf-paar{margin:0 0 28px}
 .gr-pf-paar[hidden]{display:none}
-.gr-pf-kopf{margin:0 0 12px;font:600 20px/1.3 var(--sans);letter-spacing:-.01em;color:var(--ink)}
+.gr-pf-kontext{max-width:var(--wrap-text);margin:0 0 14px;font:600 15px/1.45 var(--sans);color:var(--ink-2)}
+.gr-pf-kopf{margin:0 0 4px;font:600 20px/1.3 var(--sans);letter-spacing:-.01em;color:var(--ink)}
 .gr-pf-listen{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 28px}
 .gr-pf-liste{min-width:0;border-top:3px solid var(--anb,var(--anb-ersatz));padding-top:8px}
 .gr-pf-liste--v{border-top-color:var(--red)}

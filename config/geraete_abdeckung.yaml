@@ -47,19 +47,22 @@ pflicht_modelle:
 # (rot), bis sie neu geprüft und verlängert oder gestrichen ist. Kommt ein
 # Bündel zurück, warnt der Wächter: Eintrag streichen.
 belegte_luecken:
-  # congstar führt das iPhone 17 Pro seit dem 03.11.2026 nicht mehr: die Seite
-  # /geraete/apple/apple-iphone-17-pro/ antwortet 307 auf die Apple-Übersicht
-  # (?redirectFrom=device-details), die Übersicht und sitemap/devices.xml führen
-  # nur 17, 17 Pro Max, 17e, 18 Pro, 18 Pro Max, Air und 16. Belege (Screenshots,
-  # Linkliste, Sitemap) vom 05.11.2026: Bereiche/vodafone/telcoradar/abnahme/
-  # congstar-17pro-0511/. Der Tageslauf liest die Seite weiter und meldet sie als
-  # „Gerät nicht mehr angeboten“; kommt sie zurück, entsteht wieder ein Bündel.
+  # congstar: iPhone 17 Pro ist nicht in der Geräteliste. Belegt (05.11.2026,
+  # docs/belege/congstar-17pro-0511/): Apple-Übersicht (3, Screenshot, 4, Linkliste)
+  # und sitemap/devices.xml (5) führen nur 17, 17 Pro Max, 17e, 18 Pro, 18 Pro Max,
+  # Air und 16, kein 17 Pro. Die Einzelseite leitet per 307 auf die Übersicht um
+  # (Screenshot 1 zeigt dort „Gerät derzeit nicht verfügbar“): das allein wäre nur
+  # „nicht lieferbar“ und kein Beleg; maßgeblich ist die fehlende Geräteliste. Die
+  # Portfolio-Ansicht zählt einen Beleg nur, wenn `grund` eine Sortiments-Aussage
+  # trägt („nicht im Sortiment“, „Seite entfernt“, „nicht in der Geräteliste“).
+  # Der Tageslauf liest die Seite weiter und meldet sie als „Gerät nicht mehr
+  # angeboten“; kommt sie zurück, entsteht wieder ein Bündel.
   - anbieter: congstar
     modelle:
       - apple-iphone-17-pro
-    grund: Anbieter führt das Gerät nicht mehr (Seite leitet auf die Übersicht um, nicht in der Sitemap)
+    grund: Gerät ist nicht in der Geräteliste (Apple-Übersicht) und nicht in der Sitemap; die Seite leitet auf die Übersicht um
     art: nicht_im_portfolio
-    beleg: https://github.com/Antonio20045/telco-radar/blob/main/docs/belege/congstar-17pro-0511/1-iphone-17-pro-seite-leitet-um.png
+    beleg: https://github.com/Antonio20045/telco-radar/blob/main/docs/belege/congstar-17pro-0511/3-apple-uebersicht-ganz.png
     original: https://www.congstar.de/geraete/apple/apple-iphone-17-pro/
     geprueft: "2026-11-05"
     bis: "2026-11-19"
