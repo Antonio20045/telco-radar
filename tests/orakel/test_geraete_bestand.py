@@ -173,9 +173,8 @@ def _gw_leitzahl(buendel: dict, blaetter: dict) -> tuple:
     Kosten über H Monate = Anzahlung + Anschlusspreis + alle N Geräteraten +
     Tarif in jedem Monat 1 bis T, T der kleinere Wert aus H und der Bindung (ohne
     Bindung 24; Antonio, 10.10.2026: ab Monat 25 nur die Rate); ein
-    zusammengelegter Bündelbetrag (1&1) trägt H × Betrag und gilt nur für H = N;
-    ein Vertrag über mehr als 24 Monate (24 + 12) hat keine Zahl (Preisprüfung
-    02.11.2026).
+    zusammengelegter Bündelbetrag (1&1) trägt H × Betrag und gilt nur für H = N
+    oder H = 24 < N; dann ist die Zuzahlung die Ablöse nach Monat 24.
     Fehlt ein Posten, gibt es keine Zahl."""
     monate = gw_zeitraum(buendel, blaetter)
     if monate is None:
@@ -184,7 +183,7 @@ def _gw_leitzahl(buendel: dict, blaetter: dict) -> tuple:
     if buendel.get("buendel_monatlich") is not None:
         teile = [
             gw_cent(buendel["buendel_monatlich"]) * monate
-            if monate == laufzeit
+            if monate <= laufzeit
             else None
         ]
     else:
@@ -1716,21 +1715,6 @@ def test_pf_leitzahl_von_zehn_buendeln_gegen_die_historie(gw_seite):
             f"Die Seite fuehrt kein neu-Buendel {anbieter}/{tarif} zu "
             f"{modell} - Lookup ins Leere, der Test prueft sonst nichts"
         )
-        if anbieter == "1&1":
-            satz = _pf_letzte_messung(
-                historie,
-                modell,
-                slug[anbieter],
-                re.sub(r"[^a-z0-9]+", "-", tarif.lower()).strip("-"),
-                36,
-            )
-            assert pf_leitzahl_cent(satz, blaetter) is None
-            assert all(z["gesamt_cent"] is None for z in kandidaten), (
-                f"{modell} / 1&1: 24 + 12 ist kein 24-Monats-Preis, die Seite "
-                "zeigt eine Zahl"
-            )
-            geprueft.append((modell, anbieter, tarif))
-            continue
         mit_zahl = 0
         for laufzeit in sorted({z["laufzeit_raten"] for z in kandidaten}):
             assert laufzeit is not None, f"{modell}/{anbieter}: Zeile ohne Ratenzahl"
@@ -2118,7 +2102,9 @@ def test_pr_fuenf_leitzahlen_gegen_die_historie_nachgerechnet(gw_seite):
         12 Raten: 0,99 + 24 x 31,95 + 12 x 120,00 + 0,00    = 2.207,79 EUR
         24 Raten: 0,99 + 24 x 31,95 + 24 x 60,00 + 0,00     = 2.207,79 EUR
         36 Raten: 0,99 + 24 x 31,95 + 36 x 40,00 + 0,00     = 2.207,79 EUR
-      1&1 / iPhone 18 Pro 256 / All-Net-Flat S: 24 + 12, keine Zahl (02.11.2026)
+      1&1 / iPhone 18 Pro 256 / All-Net-Flat S, Buendelbetrag
+        36 Monate, gerechnet 24 (Antonio 10.10.2026: nur über 24 Monate):
+                   420,00 Ablöse + 24 x 49,99 + 39,90       = 1.659,66 EUR
       congstar / Galaxy S26 Ultra 256 / Allnet Flat S
         24 Raten: 119,00 + 24 x 20,00 + 24 x 43,50 + 15,00  = 1.658,00 EUR
         36 Raten: 119,00 + 24 x 20,00 + 36 x 29,00 + 15,00  = 1.658,00 EUR
@@ -2135,6 +2121,7 @@ def test_pr_fuenf_leitzahlen_gegen_die_historie_nachgerechnet(gw_seite):
         ("apple-iphone-18-pro-256", "vodafone", "mobil-xs", 12, 220779),
         ("apple-iphone-18-pro-256", "vodafone", "mobil-xs", 24, 220779),
         ("apple-iphone-18-pro-256", "vodafone", "mobil-xs", 36, 220779),
+        ("apple-iphone-18-pro-256", "1-1", "1-1-all-net-flat-s", 36, 165966),
         ("samsung-galaxy-s26-ultra-256", "congstar", "allnet-flat-s", 24, 165800),
         ("samsung-galaxy-s26-ultra-256", "congstar", "allnet-flat-s", 36, 165800),
     )
@@ -2174,27 +2161,11 @@ def test_pr_fuenf_leitzahlen_gegen_die_historie_nachgerechnet(gw_seite):
             )
             if not gezeigt or ist != soll:
                 fehler.append((modell, slug, laufzeit, gezeigt, soll))
-    assert geprueft >= 9 and luecken == 0, (
+    assert geprueft >= 10 and luecken == 0, (
         f"nur {geprueft} Zahlen und {luecken} Luecken geprueft - der Lookup greift "
         "ins Leere"
     )
     assert not fehler, f"Seite gegen eigene Rechnung: {fehler}"
-    satz = _pf_letzte_messung(
-        historie, "apple-iphone-18-pro-256", "1-1", "1-1-all-net-flat-s", 36
-    )
-    assert pf_leitzahl_cent(satz, blaetter) is None
-    einsundeins = [
-        z
-        for z in zeilen
-        if _pr_anbieter_slug(z["anbieter"]) == "1-1"
-        and _pr_tarifteil(z["tarif"]) == "1-1-all-net-flat-s"
-        and z["attribute"].get("zustand") == "neu"
-        and z["modell"] == "apple-iphone-18-pro-256"
-    ]
-    assert einsundeins, "keine 1&1-Zeile zu apple-iphone-18-pro-256"
-    assert not any(z["attribute"].get("gesamt") for z in einsundeins), (
-        "1&1 24 + 12 ist kein 24-Monats-Preis, die Seite zeigt eine Zahl"
-    )
 
 
 def _pr_ratenzahl(zeile: dict) -> int | None:
