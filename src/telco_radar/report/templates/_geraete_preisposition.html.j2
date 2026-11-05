@@ -17,6 +17,7 @@
     {% endfor %}
   </ul>
   <p class="gr-pp-einheit">{{ pp.achsentitel }}</p>
+  {% if pp.regel %}<p class="gr-pp-regel">{{ pp.regel }}</p>{% endif %}
   <div class="gr-pp-bild gr-pp-breit">{{ pp.svg_breit | safe }}</div>
   <div class="gr-pp-bild gr-pp-schmal">{{ pp.svg_schmal | safe }}</div>
   {% endif %}
