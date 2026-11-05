@@ -47,3 +47,9 @@
 - Die IP-Bremse des Dienstes ist nach jedem Spin-down leer; die 24-Stunden-Sperre je Adresse prüft `doi.yml` im Store. Die Bestätigungsseite antwortet sofort, `doi.yml` ist wiederholbar.
 - Brevo: Tageslimit 300 (Wächter bei 280), 30 Mails je Minute; 429 und 5xx werden wiederholt, übrige 4xx nicht. Soft Bounces schalten nach fünf in Folge ab, Hard Bounce und Beschwerde sofort; der Bounce-Abgleich merkt sich den letzten Zeitpunkt.
 - Der Versand schreibt und pusht den Plan vor der ersten Mail (Wiederanlauf nach Runner-Absturz) und gibt in Actions `::add-mask::` aus.
+
+## CI: Tests nur auf GitHub
+
+- Tests laufen ausschließlich in `.github/workflows/ci.yml` (acht parallele Teile mit pytest-split, je `-n auto`, Sammel-Job `test`). Der Pre-Push-Hook des Macs führt keinen pytest aus (`STUFEN_PUSH` in `scripts/pruefleiter.py`: Wächter, Lint, Typen, Schichten).
+- Jeder Teil legt seine gemessenen Zeiten als Artefakt `durations-teil-N` ab. Zum Auffrischen von `.test_durations`: `gh run download <Lauf-ID>`, die acht JSON-Dateien zusammenführen (je Test der neue Wert), committen. Sind die Teile um mehr als etwa 20 % ungleich lang, ist es Zeit dafür.
+- Branch-Schutz: persönliche Repos können GitHub Actions nicht von einem Ruleset ausnehmen; PR-Pflicht oder Pflicht-Check würden die Bot-Pushes (radar, publish-site, geraete, klick, golden, newsletter_stats) auf main brechen. Deshalb nur Löschschutz und Force-Push-Verbot (Ruleset 26457549); der PR-Weg gilt per CLAUDE.md, Auto-Merge ist an.
