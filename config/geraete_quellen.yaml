@@ -49,6 +49,17 @@
 #                 `json_endpunkt` und meinen fünf verschiedene Nutzlasten.
 #                 KEIN ABRUF: `kein_hardware` (gemessen: verkauft keine
 #                 Geräte), `deaktiviert`.
+#   erfassung     Pflicht. WEGEVERZEICHNIS: über welchen Weg dieser Anbieter heute
+#                 erfasst wird (Umbauplan "Eine Methode für alle Anbieter",
+#                 Schritt 1). Beschreibt nur, steuert nichts.
+#                   adapter        anbietereigener Adapter liefert Bündel (Tarif+Gerät)
+#                   klick          nur die Klick-Karte (config/klick_tageslauf.yaml)
+#                   adapter+klick  beide Wege nebeneinander
+#                   barpreis       Adapter liest nur den Geräte-Barpreis, kein Tarif
+#                   aus            wird nicht erfasst (aktiv false oder ohne Adapter)
+#                 tests/test_wegeverzeichnis.py prüft das Feld gegen die
+#                 Adapter-Registry und die Klick-Tagesdatei; wer einen Weg
+#                 hinzufügt oder abschaltet, pflegt es hier mit.
 #   aktiv         false = wird nicht abgefragt. Dann ist `grund` PFLICHT; er
 #                 steht wörtlich auf /geraete-quellen.html. Kein Anbieter
 #                 verschwindet stillschweigend.
@@ -91,6 +102,7 @@ anbieter:
 
   - name: Amazon
     typ: handel
+    erfassung: aus
     gruppe: Amazon
     rang: 1
     methode: deaktiviert
@@ -108,6 +120,7 @@ anbieter:
 
   - name: MediaMarkt
     typ: handel
+    erfassung: aus
     gruppe: Ceconomy
     rang: 2
     methode: json_endpunkt
@@ -128,6 +141,7 @@ anbieter:
 
   - name: Saturn
     typ: handel
+    erfassung: barpreis
     gruppe: Ceconomy
     rang: 2
     methode: saturn_brand
@@ -254,6 +268,7 @@ anbieter:
 
   - name: Coolblue
     typ: handel
+    erfassung: aus
     gruppe: Coolblue
     rang: 3
     methode: coolblue_produkt
@@ -287,6 +302,7 @@ anbieter:
 
   - name: expert
     typ: handel
+    erfassung: aus
     gruppe: expert
     rang: 3
     methode: json_endpunkt
@@ -318,6 +334,7 @@ anbieter:
 
   - name: Medimax
     typ: handel
+    erfassung: barpreis
     gruppe: ElectronicPartner
     rang: 3
     methode: ldjson
@@ -345,6 +362,7 @@ anbieter:
 
   - name: ElectronicPartner
     typ: handel
+    erfassung: barpreis
     gruppe: ElectronicPartner
     rang: 3
     methode: ldjson
@@ -373,6 +391,7 @@ anbieter:
 
   - name: Euronics
     typ: handel
+    erfassung: aus
     gruppe: Euronics
     rang: 3
     methode: deaktiviert
@@ -387,6 +406,7 @@ anbieter:
 
   - name: mobilcom-debitel
     typ: handel
+    erfassung: barpreis
     gruppe: freenet
     # Derselbe LADEN, nicht nur derselbe Konzern: mobilcom-debitel.de leitet
     # vollstaendig auf freenet.de. Die Positionskarte fuehrt ihn deshalb
@@ -439,6 +459,7 @@ anbieter:
 
   - name: Telekom
     typ: netzbetreiber
+    erfassung: adapter+klick
     gruppe: Deutsche Telekom
     rang: 1
     methode: telekom_kategorie
@@ -544,6 +565,7 @@ anbieter:
 
   - name: Vodafone
     typ: netzbetreiber
+    erfassung: adapter+klick
     gruppe: Vodafone
     rang: 2
     eigen: true
@@ -585,6 +607,7 @@ anbieter:
 
   - name: o2
     typ: netzbetreiber
+    erfassung: adapter+klick
     gruppe: Telefónica Deutschland
     rang: 3
     methode: o2_katalog
@@ -670,6 +693,7 @@ anbieter:
 
   - name: 1&1
     typ: netzbetreiber
+    erfassung: adapter+klick
     gruppe: United Internet
     rang: 4
     methode: einsundeins_buendel
@@ -813,6 +837,7 @@ anbieter:
   # ---------------------------------------------------------- im Telekom-Netz
   - name: congstar
     typ: discount
+    erfassung: adapter+klick
     netz: Telekom
     gruppe: Deutsche Telekom
     rang: 10
@@ -909,6 +934,7 @@ anbieter:
 
   - name: fraenk
     typ: discount
+    erfassung: aus
     netz: Telekom
     gruppe: Deutsche Telekom
     rang: 11
@@ -921,6 +947,7 @@ anbieter:
 
   - name: klarmobil
     typ: discount
+    erfassung: aus
     netz: Telekom
     gruppe: freenet
     rang: 12
@@ -948,6 +975,7 @@ anbieter:
 
   - name: Edeka smart
     typ: discount
+    erfassung: aus
     netz: Telekom
     gruppe: EDEKA
     rang: 13
@@ -967,6 +995,7 @@ anbieter:
 
   - name: Norma Connect
     typ: discount
+    erfassung: aus
     netz: Telekom
     gruppe: NORMA
     rang: 14
@@ -987,6 +1016,7 @@ anbieter:
   # --------------------------------------------------------- im Vodafone-Netz
   - name: otelo
     typ: discount
+    erfassung: aus
     netz: Vodafone
     gruppe: Vodafone
     rang: 20
@@ -1022,6 +1052,7 @@ anbieter:
 
   - name: SIMon mobile
     typ: discount
+    erfassung: aus
     netz: Vodafone
     gruppe: Vodafone
     rang: 21
@@ -1034,6 +1065,7 @@ anbieter:
   # --------------------------------------------------------------- im o2-Netz
   - name: Blau
     typ: discount
+    erfassung: aus
     netz: o2
     gruppe: Telefónica Deutschland
     rang: 30
@@ -1051,6 +1083,7 @@ anbieter:
 
   - name: smartmobil
     typ: discount
+    erfassung: aus
     netz: o2
     gruppe: United Internet
     rang: 31
@@ -1069,6 +1102,7 @@ anbieter:
 
   - name: WinSIM
     typ: discount
+    erfassung: aus
     netz: o2
     gruppe: United Internet
     rang: 32
@@ -1087,6 +1121,7 @@ anbieter:
 
   - name: ALDI TALK
     typ: discount
+    erfassung: barpreis
     netz: o2
     gruppe: MEDION / Telefónica
     rang: 33

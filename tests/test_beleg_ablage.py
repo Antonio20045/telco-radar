@@ -49,6 +49,34 @@ def test_grosse_aenderung_geht_zusaetzlich_ins_monatsrelease(tmp_path):
     assert (bilanz.hochgeladen, bilanz.gross) == (2, 1)
 
 
+def test_derselbe_dateiname_geht_nie_zweimal_in_ein_paket(tmp_path):
+    """Regression 04./05.11.2026: mehrere Telekom-Jobs liefern dasselbe Bild; zweimal
+    derselbe Name im Paket scheiterte bei GitHub mit HTTP 404 (``--clobber``)."""
+    erstes, zweites = tmp_path / "a", tmp_path / "b"
+    erstes.mkdir()
+    zweites.mkdir()
+    bilder = [bild(erstes, "g", "telekom"), bild(zweites, "g", "telekom")]
+    bilder.append(bild(tmp_path, "h", "telekom", gross=True))
+    gh = AttrappeReleases()
+    bilanz = veroeffentliche(bilder, HEUTE, gh)
+    assert bilanz.fehler == [] and bilanz.fehlgeschlagen == 0
+    assert gh.hochgeladen[0][1] == [
+        "g__telekom__2026-11-10.webp",
+        "h__telekom__2026-11-10.webp",
+    ]
+    assert (bilanz.hochgeladen, bilanz.gross) == (2, 1)
+
+
+def test_attrappe_scheitert_wie_github_bei_doppeltem_namen(tmp_path):
+    """Gegenprobe: ohne die Zusammenführung wäre der Test oben rot."""
+    erstes, zweites = tmp_path / "a", tmp_path / "b"
+    erstes.mkdir()
+    zweites.mkdir()
+    doppelt = [bild(erstes, "g", "o2").datei, bild(zweites, "g", "o2").datei]
+    with pytest.raises(GhFehler, match="HTTP 404"):
+        AttrappeReleases().hochladen("belege-2026-11-10", doppelt)
+
+
 def test_vorhandenes_release_wird_nicht_neu_angelegt(tmp_path):
     gh = AttrappeReleases({"belege-2026-11-10": ["x__y__2026-11-10.webp"]})
     veroeffentliche([bild(tmp_path, "g", "o2")], HEUTE, gh)

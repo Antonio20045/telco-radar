@@ -1,5 +1,4 @@
-"""Belegbilder in GitHub-Releases legen und Abgelaufenes löschen (``gh``, Regeln in
-``beleg_regeln``).
+"""Belegbilder in GitHub-Releases legen, Abgelaufenes löschen (``gh``, beleg_regeln).
 
 Quelle der Wahrheit für die Seite sind allein die Anhänge der Releases. Es gibt keinen
 Index im Repo: wer ein Bild ins richtige Release lädt, hat es veröffentlicht, wer eines
@@ -9,8 +8,8 @@ die Seite braucht.
 ``veroeffentliche`` (Klick-Job): Jedes Bild geht ins Tages-Release; eine große Änderung
 geht zusätzlich ins Monats-Release (``beleg_regeln.gross_tag``). Fehlende Releases
 entstehen als Pre-Release ohne „latest“. Dateien gehen in Paketen hoch (``PAKET``), mit
-``--clobber``, damit ein zweiter Lauf am selben Tag nicht scheitert. Ein gescheitertes
-Paket steht in der Bilanz, die übrigen laufen weiter (CLAUDE.md Clean Code 5).
+``--clobber`` (zweiter Lauf am selben Tag); kein Name doppelt (HTTP 404). Ein
+gescheitertes Paket steht in der Bilanz, die übrigen laufen weiter (Clean Code 5).
 
 ``raeume_auf`` (Geräte-Job): Tages-Releases nach ``AUFBEWAHRUNG_TAGE``, Monats-Releases
 nach ``AUFBEWAHRUNG_GROSS_TAGE`` löschen; in jüngeren Monats-Releases einzelne Bilder,
@@ -20,7 +19,7 @@ Ein Paket kann halb ankommen (``gh`` lädt die Dateien parallel und bricht beim 
 Fehler ab) und frisch angelegte Releases antworten kurz mit 404. Darum liest
 ``veroeffentliche`` nach einem Fehler die Anhänge, zählt, was angekommen ist, und lädt
 bei vorübergehenden Fehlern (404, „already exists“, 429, 5xx) nur den Rest mit Pause
-erneut (``VERSUCHE``). Was am Ende fehlt, steht als ``fehlgeschlagen`` mit Fehlerzeile;
+erneut (``VERSUCHE``). Was fehlt, steht als ``fehlgeschlagen`` mit Fehlerzeile;
 ``ausgelassen`` heißt nur: Zeit abgelaufen.
 
 ``frist_ende`` ist die monotone Zeit, bis zu der ein neues Paket beginnen darf
@@ -356,7 +355,8 @@ def veroeffentliche(
         return bilanz
     belegt = {tag: len(dateien) for tag, dateien in vorhanden.items()}
     je_tag: dict[str, list[Bild]] = {}
-    for bild in sorted(bilder, key=lambda b: b.datei.name):
+    einmalig = {b.datei.name: b for b in sorted(bilder, key=lambda b: b.datei.name)}
+    for bild in einmalig.values():
         ziele = [_freier_tag(belegt, tages_tag, heute)]
         if bild.gross:
             ziele.append(_freier_tag(belegt, gross_tag, heute))

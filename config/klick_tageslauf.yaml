@@ -45,9 +45,9 @@
 # MagentaMobil-Tarife, M zuerst (Pitch 4, Schnitt 3). 1&1: Tarifdetail-Seiten mit
 # dem Anschlusspreis je Tarif, eigene Lesart (`klickuebersicht.LESARTEN`).
 #
-# Vodafone: die Produktseite wählt den Tarif nicht (Karte: tarif fest
-# „unbekannt“); erfasste Werte bleiben darum ohne Bündel und zählen als Lücke
-# `tarif_unbekannt`, bis die Karte die Tarifauswahl liest.
+# Vodafone: die Produktseite wählt den Tarif nicht; die Karte klickt „Zur
+# Tarifauswahl“ und dort jeden Tarif (`weiter.klicken: tarif`, seit 242d23c3).
+# Lücke `tarif_unbekannt` bleibt nur, wenn die Tarifauswahl keinen Tarif liefert.
 
 anbieter:
   - schluessel: o2
