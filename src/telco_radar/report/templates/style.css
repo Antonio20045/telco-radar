@@ -6347,7 +6347,7 @@ a.ki-k1-pille:hover{border-color:var(--ink)}
 .gr-pp{margin:0 0 clamp(36px,6vh,64px)}
 .gr-pp-legende{list-style:none;margin:14px 0 10px;padding:0;display:flex;flex-wrap:wrap;gap:6px 20px;font:500 14px var(--sans);color:var(--ink-2)}
 .gr-pp-legende li{display:inline-flex;align-items:center;gap:7px}
-.gr-pp-legende svg{width:14px;height:14px;fill:var(--anb-marker,var(--anb-ersatz));stroke:var(--anb-marker-rand,none)}
+.gr-pp-legende svg{width:14px;height:14px;fill:var(--anb,var(--anb-ersatz));stroke:var(--anb-marker-rand,none)}
 .gr-pp-ohne{color:var(--ink-4)}
 .gr-pp-ohne svg{opacity:.35}
 .gr-pp-ohne small{font-size:13px;font-weight:400}
@@ -6362,7 +6362,7 @@ a.ki-k1-pille:hover{border-color:var(--ink)}
 .gr-pp-name{font-size:15px;font-weight:600;fill:var(--ink)}
 .gr-pp-gb{font-size:12px;font-weight:400;fill:var(--ink-3)}
 .gr-pp-spanne{stroke:var(--ink-4);stroke-width:1.5;stroke-linecap:round}
-.gr-pp-punkt{fill:var(--anb-marker,var(--anb-ersatz));stroke:var(--anb-marker-rand,none);stroke-width:1.5}
+.gr-pp-punkt{fill:var(--anb,var(--anb-ersatz));stroke:var(--anb-marker-rand,none);stroke-width:1.5}
 .gr-pp-link{cursor:pointer}
 .gr-pp-treffer{fill:transparent;stroke:none}
 .gr-pp-link:hover .gr-pp-punkt,.gr-pp-link:focus-visible .gr-pp-punkt{stroke:var(--ink);stroke-width:2.5}
@@ -6387,7 +6387,7 @@ a.ki-k1-pille:hover{border-color:var(--ink)}
 .gr-hm-tafel{display:grid;grid-template-columns:150px repeat(var(--hm-n,4),minmax(0,1fr));column-gap:22px;margin-top:6px}
 .gr-hm-achse{display:grid;grid-column:1/-1;grid-template-columns:subgrid;align-items:end;padding:0 0 10px;border-bottom:1px solid var(--rule-ink)}
 .gr-hm-kopf{display:flex;align-items:center;gap:8px;font:600 14px var(--sans);color:var(--ink)}
-.gr-hm-punkt{display:inline-block;flex:none;width:11px;height:11px;border-radius:50%;background:var(--anb-marker,var(--anb-ersatz));box-shadow:0 0 0 1.5px var(--anb-marker-rand,transparent)}
+.gr-hm-punkt{display:inline-block;flex:none;width:11px;height:11px;border-radius:50%;background:var(--anb,var(--anb-ersatz));box-shadow:0 0 0 1.5px var(--anb-marker-rand,transparent)}
 .gr-hm-richtung{grid-column:2/-1;display:flex;justify-content:space-between;padding:6px 0 0;font:400 12px var(--sans);color:var(--ink-3)}
 .gr-hm-zeile{display:grid;grid-column:1/-1;grid-template-columns:subgrid;align-items:center;padding:16px 0;border-bottom:1px solid var(--rule)}
 .gr-hm-zeile--alle{border-bottom:0;border-top:1px solid var(--rule-ink);margin-top:-1px}
@@ -6398,7 +6398,7 @@ a.ki-k1-pille:hover{border-color:var(--ink)}
 .gr-hm-zahl{font:600 30px/1 var(--sans);letter-spacing:-.03em;font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--ink)}
 .gr-hm-spur{position:relative;display:block;height:10px;border-radius:5px;background:var(--paper-3)}
 .gr-hm-spur::after{content:"";position:absolute;left:50%;top:-3px;bottom:-3px;width:2px;margin-left:-1px;background:var(--red)}
-.gr-hm-balken{position:absolute;top:0;bottom:0;border-radius:5px;background:var(--anb-marker,var(--anb-ersatz));box-shadow:inset 0 0 0 1.5px var(--anb-marker-rand,transparent)}
+.gr-hm-balken{position:absolute;top:0;bottom:0;border-radius:5px;background:var(--anb,var(--anb-ersatz));box-shadow:inset 0 0 0 1.5px var(--anb-marker-rand,transparent)}
 .gr-hm-balken[hidden]{display:none}
 .gr-hm-n{font:400 13px var(--sans);color:var(--ink-3);white-space:nowrap}
 .gr-hm-leer .gr-hm-zahl{font:500 15px/30px var(--sans);letter-spacing:0;color:var(--ink-3)}
@@ -6424,3 +6424,33 @@ a.ki-k1-pille:hover{border-color:var(--ink)}
 
 /* Handy: auf dem schmalen Verlauf tragen nur die Endpunkte eine Marke. */
 .gr-zr--schmal .gr-zr-punkt:not(.gr-zr-ende):not(.gr-zr-aktiv){opacity:0}
+
+/* Portfolio gegen Vodafone (Ziel 3): zwei Listen je Wettbewerber nach Hersteller,
+   darunter die Messlücken abgesetzt. Ohne JavaScript stehen alle Paare da. */
+.gr-pf{margin:0 0 clamp(28px,5vh,48px)}
+.gr-pf-regel{max-width:var(--wrap-text);margin:0 0 12px;font:400 14px/1.5 var(--sans);color:var(--ink-3)}
+.gr-pf-hinweis{color:var(--ink-2);font-weight:600}
+.gr-pf-wahl[hidden]{display:none}
+.gr-pf-paar{margin:0 0 28px}
+.gr-pf-paar[hidden]{display:none}
+.gr-pf-kontext{max-width:var(--wrap-text);margin:0 0 14px;font:600 15px/1.45 var(--sans);color:var(--ink-2)}
+.gr-pf-kopf{margin:0 0 4px;font:600 20px/1.3 var(--sans);letter-spacing:-.01em;color:var(--ink)}
+.gr-pf-listen{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 28px}
+.gr-pf-liste{min-width:0;border-top:3px solid var(--anb,var(--anb-ersatz));padding-top:8px}
+.gr-pf-liste--v{border-top-color:var(--red)}
+.gr-pf-liste h4{margin:0 0 8px;font:600 15px/1.3 var(--sans);color:var(--ink)}
+.gr-pf-gruppe{margin:0 0 12px}
+.gr-pf-gruppe h5{margin:0 0 4px;font:600 12px var(--sans);letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3)}
+.gr-pf-gruppe ul{margin:0;padding:0;list-style:none}
+.gr-pf-gruppe li{padding:6px 0;border-bottom:1px solid var(--rule);overflow-wrap:anywhere}
+.gr-pf-geraet{display:block;font:600 16px/1.3 var(--sans);color:var(--ink)}
+.gr-pf-beleg{display:block;font:400 13px/1.4 var(--sans);color:var(--ink-3)}
+.gr-pf-beleg a{color:var(--ink-2);text-decoration:underline}
+.gr-pf-leer{margin:0;font:400 14px var(--sans);color:var(--ink-3)}
+.gr-pf-offen{margin:20px 0 0;padding:10px 14px;border:1px dashed var(--rule-ink);border-radius:var(--radius-klein);background:var(--paper-2)}
+.gr-pf-offen summary{cursor:pointer;font:600 14px/1.4 var(--sans);color:var(--ink-2)}
+.gr-pf-offen[open] summary{margin-bottom:10px}
+@media (max-width:720px){
+  .gr-pf-listen{grid-template-columns:minmax(0,1fr)}
+  .gr-pf-kopf{font-size:17px}
+}

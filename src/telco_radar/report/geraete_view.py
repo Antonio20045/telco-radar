@@ -51,7 +51,7 @@ from ..geraete_model import (
 from . import (
     geraete_alarme,
     geraete_bereinigung,
-    geraete_hersteller,
+    geraete_portfolio,
     geraete_pruefung,
     geraete_tco_karten,
     geraete_tco_view,
@@ -1692,7 +1692,7 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         )
         zeitreihe = geraete_zeitreihe.leer()
         ausfaelle.append(Ausfall.aus_ausnahme(ZEITREIHE_TEIL, exc))
-    hm = geraete_hersteller.ansicht(state_dir, tco, katalog, tarifbestand, tco_heute)
+    hm = geraete_portfolio.hersteller(state_dir, tco, katalog, tarifbestand, tco_heute)
     zr_erlaubt = {
         k: b
         for k, b in ((zeitreihe.get("daten") or {}).get("erlaubt") or {}).items()

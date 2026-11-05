@@ -5515,3 +5515,22 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
     if (f) f.addEventListener('change', function () { if (modus === 'eigen') waehle(modus); });
   });
 })();
+
+/* PORTFOLIO GEGEN VODAFONE (Ziel 3). Der Server schreibt alle Paare ins
+   Dokument; hier zeigt der Umschalter nur das gewählte (Standard: data-standard). */
+(function () {
+  var sec = document.getElementById('portfolio');
+  var wahl = document.getElementById('pf-wahl');
+  if (!sec || !wahl) return;
+  var tasten = [].slice.call(wahl.querySelectorAll('button[data-pf]'));
+  var paare = [].slice.call(sec.querySelectorAll('.gr-pf-paar'));
+  function zeige(name) {
+    paare.forEach(function (p) { p.hidden = p.getAttribute('data-pf') !== name; });
+    tasten.forEach(function (k) { k.setAttribute('aria-pressed', String(k.getAttribute('data-pf') === name)); });
+  }
+  tasten.forEach(function (k) {
+    k.addEventListener('click', function () { zeige(k.getAttribute('data-pf')); });
+  });
+  wahl.hidden = false;
+  zeige(sec.getAttribute('data-standard') || tasten[0].getAttribute('data-pf'));
+})();

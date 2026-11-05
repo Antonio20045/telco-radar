@@ -230,12 +230,16 @@ def _buendel_aller_pflichtmodelle(anbieter, pflicht, ohne=()):
 
 
 def test_echte_config_fuehrt_congstar_iphone_17_pro_als_belegte_luecke():
-    """05.11.2026: congstar leitet die 17-Pro-Seite auf die Übersicht um und führt
-    das Gerät nicht mehr. Die Lücke steht mit Grund in der echten Config, und nur
+    """05.11.2026: congstar leitet die 17-Pro-Seite auf die Übersicht um, das
+    Gerät fehlt in der Geräteliste (kein „nicht mehr“: seit wann ist nicht belegt).
+    Die Lücke steht mit Grund in der echten Config, und nur
     diese eine: kein ganzer Anbieter, kein anderes Modell."""
     pflicht = lade_pflicht(ECHTE_CONFIG)
     assert "apple-iphone-17-pro" in pflicht["modelle"]
-    assert "nicht mehr" in pflicht["luecken"][("congstar", "apple-iphone-17-pro")]
+    assert (
+        "nicht in der Geräteliste"
+        in pflicht["luecken"][("congstar", "apple-iphone-17-pro")]
+    )
     assert [k for k in pflicht["luecken"] if k[0] == "congstar"] == [
         ("congstar", "apple-iphone-17-pro")
     ]

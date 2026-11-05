@@ -50,6 +50,7 @@ KOMBI_VERLUST_MINDEST = 5
 PREISSPRUNG_ANTEIL = 0.25
 BEISPIELE = 8
 LUECKE_MAX_TAGE = 14
+ART_PORTFOLIO = "nicht_im_portfolio"
 
 _SKU_MUSTER = re.compile(r"^(?P<modell>.+?)-(?P<speicher>\d+gb|ohne-speicher)-")
 
@@ -93,9 +94,13 @@ def _datum(eintrag: dict, feld: str) -> date:
 
 
 def lade_pflicht(pfad: Path) -> dict:
-    """Pflichtliste; ``luecken``: (Anbieter, Modell) -> Grund, ``bis``: -> Datum."""
+    """Pflichtliste; ``luecken``: (Anbieter, Modell) -> Grund, ``bis``: -> Datum.
+
+    ``belege``: (Anbieter, Modell) -> Eintrag, nur für Ausnahmen mit
+    ``art: nicht_im_portfolio`` (Anbieter führt das Gerät nachweislich nicht) und
+    einem ``beleg``-Link; nur sie darf die Portfolio-Ansicht als Lücke zeigen."""
     daten = yaml.safe_load(pfad.read_text(encoding="utf-8")) or {}
-    luecken, bis = {}, {}
+    luecken, bis, belege = {}, {}, {}
     for eintrag in daten.get("belegte_luecken") or []:
         grund = str(eintrag.get("grund") or "").strip()
         if not grund:
@@ -106,14 +111,28 @@ def lade_pflicht(pfad: Path) -> dict:
                 f"belegte Lücke: 'bis' muss höchstens {LUECKE_MAX_TAGE} Tage nach "
                 f"'geprueft' liegen: {eintrag}"
             )
+        art = str(eintrag.get("art") or "")
+        if art and art != ART_PORTFOLIO:
+            raise ValueError(f"belegte Lücke mit unbekannter 'art': {eintrag}")
+        if art and not str(eintrag.get("beleg") or "").strip():
+            raise ValueError(f"Lücke '{art}' ohne 'beleg' (Link): {eintrag}")
         for modell in eintrag.get("modelle") or ["*"]:
             luecken[(eintrag["anbieter"], modell)] = grund
             bis[(eintrag["anbieter"], modell)] = ende
+            if art:
+                belege[(eintrag["anbieter"], modell)] = {
+                    "grund": grund,
+                    "geprueft": geprueft,
+                    "bis": ende,
+                    "beleg": str(eintrag["beleg"]).strip(),
+                    "original": str(eintrag.get("original") or "").strip(),
+                }
     return {
         "anbieter": list(daten.get("pflicht_anbieter") or []),
         "modelle": list(daten.get("pflicht_modelle") or []),
         "luecken": luecken,
         "bis": bis,
+        "belege": belege,
     }
 
 

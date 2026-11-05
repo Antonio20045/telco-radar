@@ -272,7 +272,12 @@ def test_die_erste_buendelzeile_ist_ohne_scroll_erreichbar(fixture_name, request
         " return e ? e.offsetHeight + parseFloat("
         "getComputedStyle(e).marginBottom) : 0 }"
     )
-    grenze = 2 * s.viewport_size["height"] + preisbild + herstellerbild
+    portfolio = s.evaluate(
+        "() => { const e = document.querySelector('#portfolio');"
+        " return e ? e.offsetHeight + parseFloat("
+        "getComputedStyle(e).marginBottom) : 0 }"
+    )
+    grenze = 2 * s.viewport_size["height"] + preisbild + herstellerbild + portfolio
     assert s.evaluate("() => !document.querySelector('#tafel-tco .gr-bnd')"), (
         "Bündelzeilen stehen noch auf der Seite"
     )
