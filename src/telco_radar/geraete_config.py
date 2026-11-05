@@ -20,6 +20,7 @@ from urllib.parse import urljoin
 
 import yaml
 
+from .geraete_felder import ERFASSUNG_UNBEKANNT, als_zahl, lese_erfassung
 from .geraete_model import Geraet, Katalog, normalisiere
 
 log = logging.getLogger(__name__)
@@ -81,6 +82,7 @@ class Anbieter:
     sammelrang: Optional[int] = None
     methode: str = "ldjson"
     aktiv: bool = True
+    erfassung: str = ERFASSUNG_UNBEKANNT
     grund: str = ""
     eigen: bool = False
     shop: str = ""
@@ -295,25 +297,6 @@ def _parse_einstiege(raw_liste, basis_url: str, anbieter: str = "") -> list:
     return out
 
 
-def _als_zahl(wert, standard: float, anbieter: str, feld: str) -> float:
-    """Eine unlesbare Zahl kippt nicht den Loader, sondern faellt auf den
-    Standard und meldet sich. Und `0` bleibt `0`: mit `or` waere die
-    ausdrueckliche Null still zum Standardwert geworden."""
-    if wert is None or str(wert).strip() == "":
-        return standard
-    try:
-        return float(str(wert).replace(",", "."))
-    except (TypeError, ValueError):
-        log.warning(
-            "geraete_quellen: %s hat %s=%r - kein Zahlenwert, es gilt %s",
-            anbieter,
-            feld,
-            wert,
-            standard,
-        )
-        return standard
-
-
 def lade_quellen(root: Path) -> QuellenConfig:
     """config/geraete_quellen.yaml -> QuellenConfig.
 
@@ -374,6 +357,7 @@ def lade_quellen(root: Path) -> QuellenConfig:
                 ),
                 methode=methode,
                 aktiv=aktiv,
+                erfassung=lese_erfassung(a),
                 grund=grund,
                 eigen=bool(a.get("eigen", False)),
                 shop=str(a.get("shop") or "").strip() or name,
@@ -382,7 +366,7 @@ def lade_quellen(root: Path) -> QuellenConfig:
                 max_produkte=int(a["max_produkte"])
                 if str(a.get("max_produkte", "")).strip().isdigit()
                 else _MAX_PRODUKTE_STANDARD,
-                rate_limit_sekunden=_als_zahl(
+                rate_limit_sekunden=als_zahl(
                     a.get("rate_limit_sekunden"),
                     _RATE_LIMIT_STANDARD,
                     name,
