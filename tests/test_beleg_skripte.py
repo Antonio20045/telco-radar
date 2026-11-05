@@ -19,6 +19,7 @@ import pytest
 from beleg_attrappe import AttrappeReleases
 
 from telco_radar.beleg_ablage import ZEIT_JE_AUFRUF_S
+from telco_radar.beleg_bilanz import Bilanz
 from telco_radar.beleg_manifest import MANIFEST_DATEI, lies, lies_manifest
 from telco_radar.beleg_regeln import dateiname
 from telco_radar.klick_vertrag import FORMAT
@@ -264,6 +265,53 @@ def test_mehrere_jobs_desselben_anbieters_ergeben_ein_bild_mit_dem_niedrigsten_p
     assert hochgeladen == [b"RIFFyyyyWEBP"]
 
 
+def _zweiter_job(aufbau, roh: dict, inhalt: bytes) -> None:
+    zweiter = aufbau.quelle / "telekom-2"
+    zweiter.mkdir()
+    (zweiter / "ergebnis.json").write_text(
+        json.dumps({"format": FORMAT, "anbieter": "Telekom", "roh": [roh]}),
+        encoding="utf-8",
+    )
+    (zweiter / f"{roh['beleg_id']}.webp").write_bytes(inhalt)
+
+
+def _hochgeladene_inhalte(aufbau, wurzel: Path) -> list[bytes]:
+    inhalte: list[bytes] = []
+
+    class Mitschnitt(AttrappeReleases):
+        def hochladen(self, tag, dateien):
+            inhalte.extend(d.read_bytes() for d in dateien)
+            super().hochladen(tag, dateien)
+
+    assert veroeffentliche(aufbau, wurzel, Mitschnitt()) == 0
+    return inhalte
+
+
+@pytest.mark.parametrize("erst,zweit", [("a1", "b2"), ("b2", "a1")])
+def test_gleicher_preis_ueber_jobs_nimmt_die_kleinere_beleg_id_in_jeder_reihenfolge(
+    aufbau, erst, zweit
+):
+    wurzel = aufbau.lege([], [satz(30.0, erst)])
+    (aufbau.quelle / "telekom" / f"{erst}.webp").write_bytes(f"RIFF{erst}".encode())
+    _zweiter_job(aufbau, satz(30.0, zweit), f"RIFF{zweit}".encode())
+    assert _hochgeladene_inhalte(aufbau, wurzel) == [b"RIFFa1"]
+
+
+@pytest.mark.parametrize("job_ohne_preis", ["telekom", "telekom-2"])
+def test_zahl_schlaegt_luecke_ueber_jobs_in_jeder_reihenfolge(aufbau, job_ohne_preis):
+    """Ein Satz ohne Tarifpreis (Gesamtkosten ``None``) verliert gegen jede Zahl,
+    auch gegen eine teure, egal ob sein Job zuerst oder zuletzt kommt."""
+    ohne = {**satz(30.0, "a1"), "tarif_monatlich": None}
+    mit = satz(90.0, "b2")
+    erster, zweiter = (ohne, mit) if job_ohne_preis == "telekom" else (mit, ohne)
+    wurzel = aufbau.lege([], [erster])
+    (aufbau.quelle / "telekom" / f"{erster['beleg_id']}.webp").write_bytes(
+        f"RIFF{erster['beleg_id']}".encode()
+    )
+    _zweiter_job(aufbau, zweiter, f"RIFF{zweiter['beleg_id']}".encode())
+    assert _hochgeladene_inhalte(aufbau, wurzel) == [b"RIFFb2"]
+
+
 def test_fehlt_das_bild_wird_nichts_vorgetaeuscht(aufbau):
     wurzel = aufbau.lege([], [satz(30.0, "b1")])
     (aufbau.quelle / "telekom" / "b1.webp").unlink()
@@ -378,7 +426,7 @@ def test_veroeffentlichen_rechnet_die_wirksame_frist_ab_jobstart(aufbau, monkeyp
 
     def merke(bilder, heute, gh, frist_ende=None, **_):
         gesehen.append(frist_ende)
-        return SimpleNamespace(zeilen=lambda: [], fehler=[], ausgelassen=0)
+        return Bilanz()
 
     monkeypatch.setattr(modul, "veroeffentliche", merke)
     monkeypatch.setattr(
@@ -402,7 +450,7 @@ def test_jobstart_in_der_zukunft_verlaengert_die_frist_nicht(aufbau, monkeypatch
 
     def merke(bilder, heute, gh, frist_ende=None, **_):
         gesehen.append(frist_ende)
-        return SimpleNamespace(zeilen=lambda: [], fehler=[], ausgelassen=0)
+        return Bilanz()
 
     monkeypatch.setattr(modul, "veroeffentliche", merke)
     monkeypatch.setattr(

@@ -20,6 +20,7 @@ from telco_radar.beleg_ablage import (
     raeume_auf,
     veroeffentliche,
 )
+from telco_radar.beleg_bilanz import Bilanz
 from telco_radar.beleg_regeln import dateiname
 
 HEUTE = date(2026, 11, 10)
@@ -65,6 +66,34 @@ def test_derselbe_dateiname_geht_nie_zweimal_in_ein_paket(tmp_path):
         "h__telekom__2026-11-10.webp",
     ]
     assert (bilanz.hochgeladen, bilanz.gross) == (2, 1)
+
+
+def test_doppelte_namen_stehen_in_einer_protokollzeile(tmp_path):
+    ordner = []
+    for name in ("a", "b", "c"):
+        (tmp_path / name).mkdir()
+        ordner.append(tmp_path / name)
+    bilder = [bild(o, g, "telekom") for o in ordner for g in ("g1", "g2")]
+    bilanz = veroeffentliche(bilder, HEUTE, AttrappeReleases())
+    assert bilanz.doppelt == [
+        "g1__telekom__2026-11-10.webp",
+        "g2__telekom__2026-11-10.webp",
+    ]
+    zeilen = bilanz.hinweise()
+    assert len(zeilen) == 1
+    assert "2 Dateinamen mehrfach" in zeilen[0]
+    assert "g1__telekom__2026-11-10.webp" in zeilen[0]
+
+
+def test_ohne_doppelte_namen_keine_hinweiszeile(tmp_path):
+    bilanz = veroeffentliche([bild(tmp_path, "g", "o2")], HEUTE, AttrappeReleases())
+    assert bilanz.doppelt == [] and bilanz.hinweise() == []
+
+
+def test_hinweiszeile_kuerzt_lange_listen():
+    bilanz = Bilanz(doppelt=[f"g{i}.webp" for i in range(8)])
+    (zeile,) = bilanz.hinweise()
+    assert "8 Dateinamen mehrfach" in zeile and zeile.endswith("und 3 weitere")
 
 
 def test_attrappe_scheitert_wie_github_bei_doppeltem_namen(tmp_path):

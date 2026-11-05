@@ -5,7 +5,8 @@
 
 Schreibt die Matrix als Markdown (nach --bericht, sonst auf stdout, und in
 GitHub Actions zusätzlich in die Job-Zusammenfassung) und endet mit
-Rückgabecode 1, sobald es einen Befund gibt. Rechnet nichts selbst, das
+Rückgabecode 1, sobald es einen Befund gibt. Eine überholte Ausnahme (Bündel
+wieder da) ist kein Befund, kommt aber als ``::warning::``. Rechnet nichts selbst, das
 macht `analyze/buendel_abdeckung.py`.
 """
 
@@ -47,6 +48,8 @@ def main(argv=None) -> int:
     if zusammenfassung:
         with open(zusammenfassung, "a", encoding="utf-8") as f:
             f.write(text)
+    for warnung in ergebnis.warnungen:
+        print(f"::warning::{warnung.text}")
     for befund in ergebnis.befunde:
         print(f"::error::{befund.text}")
     return EXIT_ROT if ergebnis.rot else EXIT_GRUEN

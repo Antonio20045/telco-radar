@@ -168,7 +168,7 @@ def main(argumente: list[str] | None = None, gh: Releases | None = None) -> int:
         for zeile in [*zeilen, *(f"unlesbar: {z}" for z in unlesbar)]:
             print(f"Belege {zeile}")
         bilanz = veroeffentliche(bilder, heute, gh or Gh(), frist_ende=ende)
-    for zeile in bilanz.zeilen()[:1]:
+    for zeile in bilanz.zeilen()[:1] + bilanz.hinweise():
         print(zeile)
     for zeile in bilanz.fehler:
         print(f"Belege: {zeile}", file=sys.stderr)
