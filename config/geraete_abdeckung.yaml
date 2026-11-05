@@ -40,7 +40,10 @@ pflicht_modelle:
 
 # anbieter + modelle (fehlt `modelle`, gilt der Grund für den ganzen
 # Anbieter) + grund + geprueft (Datum der Prüfung am Original) + bis (Ablauf,
-# höchstens 14 Tage nach `geprueft`). Nach `bis` ist die Ausnahme ein Befund
+# höchstens 14 Tage nach `geprueft`). Optional `art: nicht_im_portfolio` plus
+# `beleg` (Link auf den Screenshot) und `original` (Seite des Anbieters): nur
+# so eine Ausnahme zeigt die Portfolio-Ansicht der Geräteseite als Lücke, jede
+# andere ist dort eine Messlücke. Nach `bis` ist die Ausnahme ein Befund
 # (rot), bis sie neu geprüft und verlängert oder gestrichen ist. Kommt ein
 # Bündel zurück, warnt der Wächter: Eintrag streichen.
 belegte_luecken:
@@ -55,5 +58,8 @@ belegte_luecken:
     modelle:
       - apple-iphone-17-pro
     grund: Anbieter führt das Gerät nicht mehr (Seite leitet auf die Übersicht um, nicht in der Sitemap)
+    art: nicht_im_portfolio
+    beleg: https://github.com/Antonio20045/telco-radar/blob/main/docs/belege/congstar-17pro-0511/1-iphone-17-pro-seite-leitet-um.png
+    original: https://www.congstar.de/geraete/apple/apple-iphone-17-pro/
     geprueft: "2026-11-05"
     bis: "2026-11-19"

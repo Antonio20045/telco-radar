@@ -1,0 +1,58 @@
+{# Portfolio gegen Vodafone (Ziel 3): Daten und Texte liefert geraete_portfolio.py.
+   Ohne JavaScript stehen alle Paare untereinander; app.js zeigt nur das gewählte. #}
+{% set pf = geraete.hersteller.portfolio if geraete.hersteller else none %}
+{% macro gruppen(liste, mit_beleg) %}
+  {% for gr in liste %}
+  <div class="gr-pf-gruppe">
+    <h5>{{ gr.hersteller }}</h5>
+    <ul>
+      {% for g in gr.geraete %}
+      <li><span class="gr-pf-geraet">{{ g.name }}</span>
+        {% if mit_beleg %}
+        <span class="gr-pf-beleg"><a href="{{ g.beleg.url }}" rel="noopener">Beleg</a>{% if g.beleg.original %} · <a href="{{ g.beleg.original }}" rel="noopener">Originalseite</a>{% endif %}<br>geprüft {{ g.beleg.geprueft }}, gültig bis {{ g.beleg.bis }}</span>
+        {% else %}
+        <span class="gr-pf-beleg">bei {{ g.fehlt }} nicht gemessen ({{ g.grund }})</span>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endfor %}
+{% endmacro %}
+<section class="gr-pf gx-art gx-art--tarif" id="portfolio" aria-labelledby="pf-titel"{% if pf and pf.standard %} data-standard="{{ pf.standard }}"{% endif %}>
+  <div class="gx-kopf"><h2 id="pf-titel">Portfolio gegen Vodafone</h2></div>
+  {% if not pf %}
+  <p class="gx-leer">Portfolio-Vergleich nicht berechnet.</p>
+  {% elif pf.fehler %}
+  <p class="gx-leer">Portfolio-Vergleich nicht verfügbar: {{ pf.fehler }}</p>
+  {% elif pf.leer %}
+  <p class="gx-leer">Kein Wettbewerber mit frischem Preis bei den aktuellen Modellen.</p>
+  {% else %}
+  <p class="gr-pf-regel">{{ pf.regel }}</p>
+  {% if pf.hinweis %}<p class="gr-pf-regel gr-pf-hinweis">{{ pf.hinweis }}</p>{% endif %}
+  <div class="gr-zr-zeitwahl gr-pf-wahl" id="pf-wahl" role="group" aria-label="Wettbewerber" hidden>
+    {% for p in pf.paare %}
+    <button type="button" data-pf="{{ p.name }}" aria-pressed="{{ 'true' if p.name == pf.standard else 'false' }}">{{ p.legende }}</button>
+    {% endfor %}
+  </div>
+  {% for p in pf.paare %}
+  <div class="gr-pf-paar gr-anb--{{ p.slug }}" data-pf="{{ p.name }}" data-nur-w="{{ p.n_w }}" data-nur-v="{{ p.n_v }}" data-offen="{{ p.n_offen }}">
+    <h3 class="gr-pf-kopf">{{ p.kopf }}</h3>
+    <div class="gr-pf-listen">
+      <div class="gr-pf-liste gr-pf-liste--w">
+        <h4>Hat {{ p.legende }}, Vodafone nicht</h4>
+        {% if p.nur_w %}{{ gruppen(p.nur_w, true) }}{% else %}<p class="gr-pf-leer">Keine belegte Lücke.</p>{% endif %}
+      </div>
+      <div class="gr-pf-liste gr-pf-liste--v">
+        <h4>Hat Vodafone, {{ p.legende }} nicht</h4>
+        {% if p.nur_v %}{{ gruppen(p.nur_v, true) }}{% else %}<p class="gr-pf-leer">Keine belegte Lücke.</p>{% endif %}
+      </div>
+    </div>
+    <details class="gr-pf-offen">
+      <summary>Nicht gemessen (Messlücke, zählt nicht): {{ p.n_offen }}</summary>
+      {% if p.offen %}{{ gruppen(p.offen, false) }}{% else %}<p class="gr-pf-leer">Keine.</p>{% endif %}
+    </details>
+  </div>
+  {% endfor %}
+  {% endif %}
+</section>
