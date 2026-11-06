@@ -53,7 +53,7 @@
    "|5gb",
    "|5€"
   ],
-  "stand": "2026-11-05"
+  "stand": "2026-11-06"
  },
  "https://www.o2online.de/mobilfunk/prepaid/": {
   "werte": [
@@ -82,7 +82,7 @@
    "|80gb",
    "|999gb"
   ],
-  "stand": "2026-11-05"
+  "stand": "2026-11-06"
  },
  "https://www.blau.de/tarife/": {
   "werte": [
@@ -115,7 +115,7 @@
    "|80gb",
    "|9.99€"
   ],
-  "stand": "2026-11-05"
+  "stand": "2026-11-06"
  },
  "https://www.1und1.de/handytarife": {
   "werte": [
@@ -146,7 +146,7 @@
    "|50gb",
    "|9.99€"
   ],
-  "stand": "2026-11-05"
+  "stand": "2026-11-06"
  },
  "https://www.winsim.de/5g-tarife": {
   "werte": [
@@ -176,7 +176,7 @@
    "|8.99€",
    "|9.99€"
   ],
-  "stand": "2026-11-05"
+  "stand": "2026-11-06"
  },
  "https://www.premiumsim.de/": {
   "werte": [
@@ -203,13 +203,13 @@
    "|9.99€",
    "|96€"
   ],
-  "stand": "2026-11-05"
+  "stand": "2026-11-06"
  },
  "https://www.mobilcom-debitel.de/handytarife/": {
   "werte": [
-   "allnet flat|10gb",
+   "allnet flat|15gb",
    "allnet flat|25gb",
-   "allnet flat|40gb",
+   "allnet flat|50gb",
    "beträgt die laufzeit bis|24monate",
    "dir tarife mit mindestens|40gb",
    "durchschnittsnutzer|50gb",
@@ -224,19 +224,18 @@
    "nutzung erfordert nur bis|2gb",
    "vielnutzer|50gb",
    "wenignutzer|15gb",
-   "|14.99€",
+   "|19.99€",
    "|24monate",
    "|25%",
    "|29.99€",
    "|39.99€",
    "|42%",
-   "|46%",
    "|47%",
    "|50%",
    "|59.99€",
    "|99€"
   ],
-  "stand": "2026-11-02"
+  "stand": "2026-11-06"
  },
  "https://www.klarmobil.de/handytarife": {
   "werte": [
@@ -257,7 +256,7 @@
    "|55%",
    "|99€"
   ],
-  "stand": "2026-11-02"
+  "stand": "2026-11-06"
  },
  "https://www.pennymobil.de/tarife": {
   "werte": [
@@ -282,7 +281,7 @@
    "|899€",
    "|9999€"
   ],
-  "stand": "2026-11-05"
+  "stand": "2026-11-06"
  },
  "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html": {
   "werte": [
@@ -464,7 +463,7 @@
    "|9.98€",
    "|999.99€"
   ],
-  "stand": "2026-11-05"
+  "stand": "2026-11-06"
  },
  "https://www.otelo.de/allnet-flat": {
   "werte": [
@@ -483,6 +482,6 @@
    "|30€",
    "|5€"
   ],
-  "stand": "2026-11-05"
+  "stand": "2026-11-06"
  }
 }

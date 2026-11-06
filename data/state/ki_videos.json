@@ -1,6 +1,56 @@
 {
- "stand": "2026-11-05",
+ "stand": "2026-11-06",
  "videos": [
+  {
+   "id": "x_5JijpzprU",
+   "titel": "AI fixes AI in MIT study, Mistral's open model & Google Genie 4",
+   "kanal": "IBM Technology",
+   "datum": "2026-11-06",
+   "dauer_sekunden": 2155,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "x_5JijpzprU.jpg"
+  },
+  {
+   "id": "tm98JJCkAdk",
+   "titel": "KI-Update Deep-Dive: Wie Mistral mit ML4 im KI-Rennen aufholen will",
+   "kanal": "KI Update (heise)",
+   "datum": "2026-11-06",
+   "dauer_sekunden": 2717,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "tm98JJCkAdk.jpg"
+  },
+  {
+   "id": "ivug4z8DCCg",
+   "titel": "KI-Update Deep-Dive: Wie Mistral mit ML4 im KI-Rennen aufholen will - KI-Update – ein heise-Podcast",
+   "kanal": "KI Update (heise)",
+   "datum": "2026-11-06",
+   "dauer_sekunden": 2677,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "ivug4z8DCCg.jpg"
+  },
+  {
+   "id": "a__Rva9Wqek",
+   "titel": "Lokale KI: Das ist der aktuelle Stand",
+   "kanal": "c't 3003",
+   "datum": "2026-11-06",
+   "dauer_sekunden": 1371,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "a__Rva9Wqek.jpg"
+  },
+  {
+   "id": "XgC1QTs6A2U",
+   "titel": "The Future of AI Is Absolutely Incredible (Spencer Huang)",
+   "kanal": "Two Minute Papers",
+   "datum": "2026-11-06",
+   "dauer_sekunden": 2779,
+   "stufe": "Fortgeschritten",
+   "sprache": "en",
+   "bild": "XgC1QTs6A2U.jpg"
+  },
   {
    "id": "rXFV1ivDe6c",
    "titel": "Are Vector Databases Still Needed? RAG, AI Agents & Search",
@@ -42,6 +92,16 @@
    "bild": "dOTPE-v7NiA.jpg"
   },
   {
+   "id": "btMoPRHz8eM",
+   "titel": "How to Use Ollama (Free Local AI)",
+   "kanal": "Kevin Stratvert",
+   "datum": "2026-11-05",
+   "dauer_sekunden": 400,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "btMoPRHz8eM.jpg"
+  },
+  {
    "id": "bJldMYfRvMQ",
    "titel": "Introducing ChatGPT Images 2.6",
    "kanal": "OpenAI",
@@ -53,7 +113,7 @@
   },
   {
    "id": "YajzUoRKSNQ",
-   "titel": "Astronaut: DAS kommt bis 2030! Weltraumstädte, Roboter, Mond-Hotels, Dyson-Sphären & Aliens",
+   "titel": "Astronaut: Was bis 2030 kommt, wird keiner glauben! Roboter, Mond-Hotels, Dyson-Sphären & Aliens",
    "kanal": "Everlast AI",
    "datum": "2026-11-05",
    "dauer_sekunden": 4341,
@@ -103,7 +163,7 @@
   },
   {
    "id": "ep4psgAFOqc",
-   "titel": "How I Get Claude To Edit My Videos (No Code Needed)",
+   "titel": "How I Get Claude To Edit My Videos (Step-By-Step)",
    "kanal": "Matt Wolfe",
    "datum": "2026-11-04",
    "dauer_sekunden": 1965,
@@ -240,153 +300,93 @@
    "stufe": "Einstieg",
    "sprache": "en",
    "bild": "PRAY_SewRxI.jpg"
-  },
-  {
-   "id": "NCxD-qsQcN0",
-   "titel": "TamaGPT",
-   "kanal": "OpenAI",
-   "datum": "2026-11-03",
-   "dauer_sekunden": 82,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "NCxD-qsQcN0.jpg"
-  },
-  {
-   "id": "JR7xBi2kJjY",
-   "titel": "Glean on privacy and OpenAI Private Intelligence",
-   "kanal": "OpenAI",
-   "datum": "2026-11-03",
-   "dauer_sekunden": 28,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "JR7xBi2kJjY.jpg"
-  },
-  {
-   "id": "I_192sI3UPM",
-   "titel": "vidIQ Tutorial for Beginners (Step-by-Step)",
-   "kanal": "Kevin Stratvert",
-   "datum": "2026-11-03",
-   "dauer_sekunden": 805,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "I_192sI3UPM.jpg"
-  },
-  {
-   "id": "6Q0X-yk52w0",
-   "titel": "Es beginnt: KI hat jetzt eine eigene Sprache, die kein Mensch versteht",
-   "kanal": "Everlast AI",
-   "datum": "2026-11-03",
-   "dauer_sekunden": 1018,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "6Q0X-yk52w0.jpg"
-  },
-  {
-   "id": "63pcV4z0DwI",
-   "titel": "ChatGPT Voice is now in Finances",
-   "kanal": "OpenAI",
-   "datum": "2026-11-03",
-   "dauer_sekunden": 52,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "63pcV4z0DwI.jpg"
-  },
-  {
-   "id": "2h16j4K_NbA",
-   "titel": "Glean on privacy and OpenAI Private Intelligence",
-   "kanal": "OpenAI",
-   "datum": "2026-11-03",
-   "dauer_sekunden": 57,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "2h16j4K_NbA.jpg"
   }
  ],
  "kanaele": {
   "c't 3003": {
    "error": null,
-   "versucht": "2026-11-05",
-   "abgerufen": "2026-11-05"
+   "versucht": "2026-11-06",
+   "abgerufen": "2026-11-06"
   },
   "KI Update (heise)": {
    "error": null,
-   "versucht": "2026-11-05",
-   "abgerufen": "2026-11-05"
+   "versucht": "2026-11-06",
+   "abgerufen": "2026-11-06"
   },
   "Everlast AI": {
    "error": null,
-   "versucht": "2026-11-05",
-   "abgerufen": "2026-11-05"
+   "versucht": "2026-11-06",
+   "abgerufen": "2026-11-06"
   },
   "The Morpheus Tutorials": {
    "error": null,
-   "versucht": "2026-11-05",
-   "abgerufen": "2026-11-05"
+   "versucht": "2026-11-06",
+   "abgerufen": "2026-11-06"
   },
   "Kevin Stratvert": {
    "error": null,
-   "versucht": "2026-11-05",
-   "abgerufen": "2026-11-05"
+   "versucht": "2026-11-06",
+   "abgerufen": "2026-11-06"
   },
   "Microsoft Mechanics": {
    "error": null,
-   "versucht": "2026-11-05",
-   "abgerufen": "2026-11-05"
+   "versucht": "2026-11-06",
+   "abgerufen": "2026-11-06"
   },
   "Leila Gharani": {
    "error": null,
-   "versucht": "2026-11-05",
-   "abgerufen": "2026-11-05"
+   "versucht": "2026-11-06",
+   "abgerufen": "2026-11-06"
   },
   "Jeff Su": {
    "error": null,
-   "versucht": "2026-11-05",
-   "abgerufen": "2026-11-05"
+   "versucht": "2026-11-06",
+   "abgerufen": "2026-11-06"
   },
   "Matt Wolfe": {
    "error": null,
-   "versucht": "2026-11-05",
-   "abgerufen": "2026-11-05"
+   "versucht": "2026-11-06",
+   "abgerufen": "2026-11-06"
   },
   "IBM Technology": {
    "error": null,
-   "versucht": "2026-11-05",
-   "abgerufen": "2026-11-05"
+   "versucht": "2026-11-06",
+   "abgerufen": "2026-11-06"
   },
   "OpenAI": {
    "error": null,
-   "versucht": "2026-11-05",
-   "abgerufen": "2026-11-05"
+   "versucht": "2026-11-06",
+   "abgerufen": "2026-11-06"
   },
   "Anthropic": {
    "error": null,
-   "versucht": "2026-11-05",
-   "abgerufen": "2026-11-05"
+   "versucht": "2026-11-06",
+   "abgerufen": "2026-11-06"
   },
   "Google DeepMind": {
    "error": null,
-   "versucht": "2026-11-05",
-   "abgerufen": "2026-11-05"
+   "versucht": "2026-11-06",
+   "abgerufen": "2026-11-06"
   },
   "AI Explained": {
    "error": null,
-   "versucht": "2026-11-05",
-   "abgerufen": "2026-11-05"
+   "versucht": "2026-11-06",
+   "abgerufen": "2026-11-06"
   },
   "Two Minute Papers": {
    "error": null,
-   "versucht": "2026-11-05",
-   "abgerufen": "2026-11-05"
+   "versucht": "2026-11-06",
+   "abgerufen": "2026-11-06"
   },
   "3Blue1Brown": {
    "error": null,
-   "versucht": "2026-11-05",
-   "abgerufen": "2026-11-05"
+   "versucht": "2026-11-06",
+   "abgerufen": "2026-11-06"
   },
   "David Ondrej": {
    "error": null,
-   "versucht": "2026-11-05",
-   "abgerufen": "2026-11-05"
+   "versucht": "2026-11-06",
+   "abgerufen": "2026-11-06"
   }
  },
  "error": null

@@ -1,0 +1,128 @@
+
+<!DOCTYPE html>
+<html lang="de" class="ohne-js">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wie Open-Source-Tools von NVIDIA Forschern beim Aufbau von 6G-Netzwerken der nächsten Generation helfen · Übersetzung · Vodafone Product and Services Insights</title>
+  <meta name="robots" content="noindex">
+  
+  <link rel="preload" href="../static/schrift/instrument-sans.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="../seiten.css">
+  <link rel="icon" href="../favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" href="../logo.png">
+</head>
+
+<body class="uc-markt seite-seite">
+  <a class="sprungmarke" href="#inhalt">Zum Inhalt</a>
+  
+  <header class="topbar kopf" id="kopf">
+    <div class="topbar-inner kopf-inner">
+      <a class="brand" href="../index.html" aria-label="Vodafone Product and Services Insights">
+        <span class="brand-logo-wrap"><img class="brand-logo" src="../logo.png" alt="" width="15" height="15"></span>
+        <span class="brand-name">Vodafone <span class="brand-zusatz">Product and Services</span> <em>Insights</em></span>
+      </a>
+      <nav class="subbar subnav navi" aria-label="Marktrecherche">
+        <a href="../index.html" >Diese Woche</a>
+        <a href="../meldungen.html" >Meldungen</a>
+        <a href="../wettbewerb.html" >Wettbewerb</a>
+        
+        
+        <a href="../geraete.html" >Geräte</a>
+        
+        <a href="../promo/index.html" >Promo</a>
+        <a href="../ki.html" >KI</a>
+      </nav>
+      <div class="topbar-right kopf-rechts">
+        
+        
+        <form class="gsearch" id="gsearch" role="search" action="../suche.html" autocomplete="off">
+          <svg class="gsearch-lupe" viewBox="0 0 20 20" width="15" height="15" fill="none" aria-hidden="true">
+            <circle cx="9" cy="9" r="6.2" stroke="currentColor" stroke-width="1.7"/>
+            <line x1="13.6" y1="13.6" x2="18" y2="18" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+          </svg>
+          <input type="search" id="gsearch-input" name="q" class="gsearch-input" autocomplete="off"
+                 placeholder="Suchen"
+                 aria-label="Marktrecherche durchsuchen">
+          <kbd class="gsearch-taste" aria-hidden="true">⌘K</kbd>
+          <button type="submit" class="gsearch-btn" aria-label="Suchen"><span aria-hidden="true">→</span></button>
+        </form>
+        
+        
+        
+        <a class="kopf-newsletter" href="../newsletter.html">Newsletter</a>
+        
+      </div>
+    </div>
+  </header>
+  <main id="inhalt">
+    
+    <div class="wrap">
+      
+      
+<article class="ueb">
+
+  <p class="ueb-rubrik">Vollständige Übersetzung</p>
+
+  <h1 class="ueb-titel szl">Wie Open-Source-Tools von NVIDIA Forschern beim Aufbau von 6G-Netzwerken der nächsten Generation helfen</h1>
+
+  <p class="ueb-meta">
+    Nvidia Blog · 2026-11-06 ·
+    aus dem Englischen
+  </p>
+
+  
+  <div class="ueb-hinweis">
+    <p><b>Maschinelle Übersetzung.</b> Dieser Text wurde automatisch aus dem
+    Englischen übersetzt und nicht redaktionell geprüft.
+    Verbindlich ist allein das Original.</p>
+    <p class="ueb-original">
+      <a href="https://blogs.nvidia.com/blog/telco-open-source-tools-research-6g-networks/" target="_blank" rel="noopener">Original bei Nvidia Blog lesen</a>
+      
+      <span class="ueb-otitel">How NVIDIA Open Source Tools Are Helping Researchers Build Next-Generation 6G Networks</span>
+      
+    </p>
+  </div>
+
+  <div class="ueb-text">
+    <p>Vor einem Jahr hat NVIDIA seine drahtlose Software Aerial als Open Source zur Verfügung gestellt und sich damit Sionna sowie einer breiteren Palette von Open-Source-Tools zur Beschleunigung der Entwicklung von 6G-Netzwerken der nächsten Generation angeschlossen. Zusammen bieten sie Forschern eine Grundlage, um Ideen zu testen, Ergebnisse zu vergleichen und auf der Arbeit der anderen aufzubauen – sie verknüpfen Simulation und KI-Training mit Experimenten an echten drahtlosen Luftschnittstellensystemen. Heute nutzen Forscher und Entwickler diese Tools, um 6G-fähige Netzwerke zu bauen, die mehr tun als nur Daten zu übertragen: Sie empfangen Signale effektiver, halten Roboter und autonome Systeme in entscheidenden Momenten verbunden und passen sich in Echtzeit an, während sich Geräte durch die Welt bewegen. Im vergangenen Jahr ist die weltweite Akzeptanz von NVIDIA AI Aerial- und NVIDIA Sionna-Software durch Entwickler um das Zehnfache gestiegen, während die Open-Source-5G/6G-Tools von NVIDIA die Marke von 1 Million Downloads überschritten haben. Mehr als 8.000 Forschungs- und akademische Einrichtungen weltweit nutzen diese Plattformen. Die Projekte, die heute entstehen, bieten einen Einblick in das Aussehen zukünftiger Netzwerke. Jedes von ihnen widmet sich einer anderen Herausforderung, zielt aber gemeinsam auf ein umfassenderes Ziel ab: den Aufbau von KI-nativen 6G-Netzwerken, die Milliarden von Menschen, Maschinen und Agenten Konnektivität, Computing und Sensorik über eine konvergente, softwaredefinierte Plattform bereitstellen.</p>
+    <p>Netzwerke, die Robotern helfen, schneller zu reagieren
+Ein Roboter, der ein Objekt aufhebt, muss seine Umgebung verstehen und handeln, bevor sie sich verändert. Wenn die KI, die diese Entscheidung antreibt, auf einem Server in der Nähe oder in der Cloud läuft, wird die drahtlose Verbindung zu einem Teil der Reaktionszeit. Forscher untersuchen einen effizienteren Ansatz namens zielorientierte semantische Kommunikation. Anstatt vollständige Bilder zu senden, übertragen Roboter kompakte Beschreibungen von Objekten, deren Positionen und Beziehungen. Die Übertragung von exakt so vielen Informationen wie nötig versetzt Roboter in die Lage, schneller zu reagieren, insbesondere in dynamischen Umgebungen wie Arbeitsplätzen und Lagern. Am King’s College London schlossen Forscher einen kamerabestückten Roboterarm an einen NVIDIA Jetson AGX Orin an, auf dem NVIDIA Sionna läuft, das sowohl ein softwaredefiniertes 5G-Netzwerk als auch Edge-KI-Verarbeitung unterstützt. Bei Experimenten zum Obstverpacken und Würfelstapeln mit absichtlich herbeigeführten Fehlern verkürzte dieser Ansatz die Abschlusszeit von Roboteraufgaben um bis zu 52,6 % und verbesserte den Aufgabenerfolg im Vergleich zum Senden periodischer Bilder. Neben schnelleren Reaktionen und einem geringeren Verarbeitungs-Overload erwies sich das System auch als widerstandsfähiger – es erkannte herabfallende Objekte, erholte sich von erfolglosen Aktionen und überprüfte in Konfigurationen mit einem digitalen Zwilling geplante Bewegungen vor der Ausführung auf mögliche Kollisionen.</p>
+    <p>Netzwerke, die lernen, Signale besser zu empfangen
+Für einen Feuerwehrmann, der Live-Drohnenaufnahmen empfängt, oder ein Rettungsteam, das nach einer vermissten Person sucht, können zeitnahe Bilder dazu beitragen, dringende Entscheidungen zu leiten. Aber Interferenzen und sich ändernde Funkbedingungen können die Dekodierung drahtloser Signale erschweren, was zu Fehlern und erneuten Übertragungen führt, die Informationen aus dem Einsatzgebiet verzögern. KI-Empfänger begegnen dieser Herausforderung, indem sie lernen, Informationen aus eingehenden Signalen effektiver wiederherzustellen. Ein besserer Empfang könnte den Einsatzkräften helfen, ein klareres, aktuelleres Bild eines Brandherds oder Suchgebiets aufrechtzuerhalten. SoftBank demonstrierte dies durch die Integration eines neuronalen Empfängers in das NVIDIA Aerial CUDA-Accelerated RAN (ACAR) und das Testen mit einem kommerziellen 5G-Smartphone. In kontrollierten Tests mit Interferenzen lieferte der neuronale Empfänger bei allen 15 getesteten Einstellungen einen höheren Uplink-Durchsatz als ein herkömmlicher Empfänger, mit einem maximalen Gewinn von etwa 60 %. Eine weitere Möglichkeit zur Verbesserung des Empfangs besteht darin, Empfängern die Umgebungen beizubringen, in denen sie arbeiten. Unter Verwendung des NVIDIA Aerial Testbeds fanden Forscher der ETH Zürich heraus, dass das Feinabstimmen neuronaler Empfänger mithilfe lokaler Messungen die Blockfehlerraten im Vergleich zu ausgewählten vortrainierten Versionen um mehr als ein Drittel senkte.</p>
+    <p>Netzwerke, die lernen, wann Energie gespart werden muss
+Da 6G mehr Geräte vernetzt und mehr KI-Anwendungen unterstützt, wird das Management des Energiebedarfs immer wichtiger. Beispielsweise benötigt ein Netzwerk möglicherweise ausreichend Kapazität, um ein gut gefülltes Stadion zu versorgen, doch der Bedarf ändert sich, wenn die Menge abzieht. KI kann dabei helfen zu erkennen, wann ungenutzte Kapazitäten heruntergefahren werden können – und wann sie wieder online gehen müssen –, sodass Betreiber den Stromverbrauch senken können, ohne Verbindungen zu unterbrechen. An der University of Leeds entwickelten Forscher ein System, das den Netzwerkbedarf 10 Minuten im Voraus vorhersagt und diese Prognosen nutzt, um Entscheidungen zum Ruhemodus von Basisstationen zu steuern. Vor dem Herunterfahren wird überprüft, ob benachbarte aktive Stationen die betroffenen Geräte weiterhin versorgen können, und es wird auf Änderungen geachtet, die eine Wiederherstellung der Kapazität erfordern. Das Team testete seinen Ansatz mit einer tragbaren, von NVIDIA DGX Spark angetriebenen 5G-„Network-in-a-Box“ zusammen mit einem digitalen Zwilling zur Validierung von Entscheidungen anhand echter Funkausrüstung. Das Ergebnis: Die Forscher verzeichneten eine Reduzierung des RAN-Energieverbrauchs um 45,6 % im Vergleich zu einem Baseline-Betrieb unter voller Leistung, während die Gerätekonnektivität aufrechterhalten wurde.</p>
+    <p>Netzwerke, die schneller getestet werden können – bevor sie gebaut sind
+Bevor ein Netzwerk bereitgestellt wird, müssen Forscher wissen, wie es sich verhält, wenn Hunderte von Geräten um Verbindungen konkurrieren oder Funksignale auf Interferenzen stoßen. Die Simulation dieser Bedingungen hilft Teams dabei, Entwürfe zu bewerten, bevor sie sich auf kostspielige Geräte und Feldversuche festlegen. Realistische Simulationen können jedoch Stunden dauern, was einschränkt, wie viele Ideen Forscher untersuchen können. Das Centre Tecnològic de Telecomunicacions de Catalunya (CTTC) beschleunigt diesen Prozess, indem es GPU-beschleunigte Funkkanalmodelle, die auf ACAR laufen, in den Open-Source-5G-LENA-Netzwerksimulator des CTTC integriert. Diese Modelle berechnen, wie sich Funksignale zwischen Antennen und Geräten ausbreiten – eine Berechnung, die mit wachsenden simulierten Netzwerken immer anspruchsvoller wird. In einer frühen Evaluierung verkürzte der Ansatz die Simulationslaufzeit von etwa drei Stunden auf 10 bis 20 Minuten, abhängig von der Integration, während das erwartete statistische Verhalten und die Netzeristung erhalten blieben. Schnellere Simulationen ermöglichen es Forschern, mehr Entwürfe zu vergleichen, anspruchsvollere Szenarien zu untersuchen und Ideen früher zu verfeinern. Während die Industrie 6G entwickelt, könnte dies den Weg von einer vorgeschlagenen Innovation zu einem gründlich evaluierten Netzwerkdesign verkürzen – und Teams dabei helfen, eine bessere Konnektivität aufzubauen, bevor sie in der realen Welt bereitgestellt wird. Besuchen Sie auf der NVIDIA GTC Washington, D.C. die 6G Developer Sessions, in denen Forscher und Entwickler weitere Innovationen präsentieren, die die Zukunft drahtloser Netzwerke prägen. NVIDIA AI Aerial und NVIDIA Sionna sind auf GitHub verfügbar.</p>
+    
+  </div>
+
+  <p class="ueb-fuss">
+    Übersetzt am 2026-11-06 ·
+    5 Absätze ·
+    Original 6505 Zeichen ·
+    <a href="https://blogs.nvidia.com/blog/telco-open-source-tools-research-6g-networks/" target="_blank" rel="noopener">zum Original</a>
+  </p>
+
+</article>
+
+    </div>
+  </main>
+  <footer class="foot">
+    <div class="foot-inner">
+      <span>Vodafone Product and Services Insights &middot; automatisch erstellt, jede Aussage mit Quelle</span>
+      
+      
+      <span class="foot-recht">
+        <a href="../transparenz.html" >Quellen</a>
+        <a href="../impressum.html">Impressum</a>
+        <a href="../datenschutz.html">Datenschutz</a>
+      </span>
+    </div>
+    <p class="foot-bildnachweis">Bilder: generiert für dieses Portal. Campus-Motiv nach einer Vorlage von
+      <a href="https://commons.wikimedia.org/wiki/File:Vodafone-Campus_D%C3%BCsseldorf.jpg" target="_blank" rel="noopener">Wikimedia Commons</a>.
+      Schrift: Instrument Sans (SIL Open Font License).</p>
+  </footer>
+  <script src="../app.js"></script>
+</body>
+</html>
