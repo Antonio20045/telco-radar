@@ -1,7 +1,7 @@
 {
  "anbieter": "1und1-auto",
- "datum": "2026-11-05",
- "dauer_sekunden": 110.1,
+ "datum": "2026-11-06",
+ "dauer_sekunden": 113.5,
  "format": 1,
  "frischegrenze_tage": 3,
  "grund": null,
@@ -26,9 +26,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "96aec2b6e247451c8c63277a3e1a2998b6ce621f3ff524fdde5c964c9f579d90",
-      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=37824923-fe71-431a-9776-982887d6b4d3",
-      "zeitpunkt": "2026-11-05T06:29:55Z"
+      "beleg_id": "c95c569388622cb4a791b8c33e80a65ef064f839832e15d57b78697d24aeac8d",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=345b2fd1-31f1-4ac2-85a5-3b3d99512b82",
+      "zeitpunkt": "2026-11-06T06:23:39Z"
      },
      "beleg_status": "offen",
      "buendel": {
@@ -39,7 +39,7 @@
       "antwort_betrag": true,
       "antwort_einmalzahlung": true,
       "antwort_laufzeit": 36,
-      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=37824923-fe71-431a-9776-982887d6b4d3",
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=345b2fd1-31f1-4ac2-85a5-3b3d99512b82",
       "fundstellen": [],
       "gleicher_betrag": false,
       "kachel_betrag": true,
@@ -81,9 +81,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "3edbacf974975193294a973232624c4783cfd375c9c36f6cea1a8c86caea07e1",
-      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=37824923-fe71-431a-9776-982887d6b4d3",
-      "zeitpunkt": "2026-11-05T06:29:55Z"
+      "beleg_id": "19ff01b3a1fc52819bf04d2be1964e3dbde55e8cea7e4b1d1d4715cb3eeec8f6",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=345b2fd1-31f1-4ac2-85a5-3b3d99512b82",
+      "zeitpunkt": "2026-11-06T06:23:40Z"
      },
      "beleg_status": "offen",
      "buendel": {
@@ -94,7 +94,7 @@
       "antwort_betrag": true,
       "antwort_einmalzahlung": true,
       "antwort_laufzeit": 36,
-      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=37824923-fe71-431a-9776-982887d6b4d3",
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=345b2fd1-31f1-4ac2-85a5-3b3d99512b82",
       "fundstellen": [
        "window.oResult.data[\"product.tariff.monthlycostsgross.2.cost\"]",
        "window.oResult.data[\"productlist.vendors.multi.tariff.monthlycostsgross.DE.3.cost\"][0]",
@@ -147,9 +147,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "114f650b0bfe5ea5616c299eacfd7e7e75afb3bb18d42e739c47b29cc1c0b5c9",
-      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=2a05cbe2-6b35-414f-a4d9-2bc3242a20c0",
-      "zeitpunkt": "2026-11-05T06:30:16Z"
+      "beleg_id": "fb9d2b31ca39a58b665db3b41f0f4ed428a159046bbfbbbd957ee5721201cafd",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=a685bebb-e696-4cb2-9655-9c6e5446636b",
+      "zeitpunkt": "2026-11-06T06:24:02Z"
      },
      "beleg_status": "offen",
      "buendel": {
@@ -160,7 +160,7 @@
       "antwort_betrag": true,
       "antwort_einmalzahlung": true,
       "antwort_laufzeit": 36,
-      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=2a05cbe2-6b35-414f-a4d9-2bc3242a20c0",
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=a685bebb-e696-4cb2-9655-9c6e5446636b",
       "fundstellen": [],
       "gleicher_betrag": false,
       "kachel_betrag": true,
@@ -202,9 +202,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "adb4f8072e43a24ab4ef61640becc6e73a926710a523603d19a80289139c062d",
-      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=2a05cbe2-6b35-414f-a4d9-2bc3242a20c0",
-      "zeitpunkt": "2026-11-05T06:30:17Z"
+      "beleg_id": "061d70a15105422d76aecc58650d3162e85cac51f4d5ea7824c14bb49641185d",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=a685bebb-e696-4cb2-9655-9c6e5446636b",
+      "zeitpunkt": "2026-11-06T06:24:02Z"
      },
      "beleg_status": "offen",
      "buendel": {
@@ -215,7 +215,7 @@
       "antwort_betrag": true,
       "antwort_einmalzahlung": true,
       "antwort_laufzeit": 36,
-      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=2a05cbe2-6b35-414f-a4d9-2bc3242a20c0",
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=a685bebb-e696-4cb2-9655-9c6e5446636b",
       "fundstellen": [
        "window.iTealiumInterface.history[0].final_dictionary[\"vendors.multi.tealium.inCart.product.tariff.monthlycostsgross.3.cost\"]",
        "window.iTealiumInterface.history[0].final_dictionary[\"vendors.multi.tealium.inCart.product.tariff.monthlycostsgross.2.cost\"]",
@@ -268,9 +268,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "9c440088f6bc63bb8d637f36e6d90daa4659cb02638935c21704d8f99f5c0f72",
-      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=eae4d36a-8bb9-4095-b815-321373d6705e",
-      "zeitpunkt": "2026-11-05T06:30:38Z"
+      "beleg_id": "ce3be33da8cabca7c46432593b93d57293e32cd8932a756bb0ea48c2de8c64be",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=026787b2-4c75-4ac7-a02e-043672ac8146",
+      "zeitpunkt": "2026-11-06T06:24:24Z"
      },
      "beleg_status": "offen",
      "buendel": {
@@ -281,7 +281,7 @@
       "antwort_betrag": true,
       "antwort_einmalzahlung": true,
       "antwort_laufzeit": 36,
-      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=eae4d36a-8bb9-4095-b815-321373d6705e",
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=026787b2-4c75-4ac7-a02e-043672ac8146",
       "fundstellen": [],
       "gleicher_betrag": false,
       "kachel_betrag": true,
@@ -323,9 +323,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "7cd61a0ee901221859806eaf94623dc8adb6d6aeceb7f9eba25d0aa86eb2fc4f",
-      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=eae4d36a-8bb9-4095-b815-321373d6705e",
-      "zeitpunkt": "2026-11-05T06:30:38Z"
+      "beleg_id": "aa2805cc099369538b81aecdc783aab4e3788541dcc18b8aac6da083b6971058",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=026787b2-4c75-4ac7-a02e-043672ac8146",
+      "zeitpunkt": "2026-11-06T06:24:24Z"
      },
      "beleg_status": "offen",
      "buendel": {
@@ -336,7 +336,7 @@
       "antwort_betrag": true,
       "antwort_einmalzahlung": true,
       "antwort_laufzeit": 36,
-      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=eae4d36a-8bb9-4095-b815-321373d6705e",
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=026787b2-4c75-4ac7-a02e-043672ac8146",
       "fundstellen": [
        "window.iTealiumInterface.history[0].final_dictionary[\"vendors.multi.tealium.inCart.product.tariff.monthlycostsgross.3.cost\"]",
        "window.iTealiumInterface.history[0].final_dictionary[\"vendors.multi.tealium.inCart.product.tariff.monthlycostsgross.2.cost\"]",
@@ -389,9 +389,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "7edcd3eb8ba91b7fff938b997ab75be567b5bfa3f3755a37eed087d3da7a1a03",
-      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=822c9516-62e7-4c7c-b3e1-0c8f4b4937a6",
-      "zeitpunkt": "2026-11-05T06:30:59Z"
+      "beleg_id": "78faa34c38a4c9d472befb2ccbf78358422895c76ca1403d8c16711e96b75561",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=6ea61728-1cba-4792-b751-912b27895201",
+      "zeitpunkt": "2026-11-06T06:24:46Z"
      },
      "beleg_status": "offen",
      "buendel": {
@@ -402,7 +402,7 @@
       "antwort_betrag": true,
       "antwort_einmalzahlung": true,
       "antwort_laufzeit": 36,
-      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=822c9516-62e7-4c7c-b3e1-0c8f4b4937a6",
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=6ea61728-1cba-4792-b751-912b27895201",
       "fundstellen": [],
       "gleicher_betrag": false,
       "kachel_betrag": true,
@@ -444,9 +444,9 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "aab210e46170c19755882b8707c38e28cf3144eabb00f818b28a6e6aef13777e",
-      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=822c9516-62e7-4c7c-b3e1-0c8f4b4937a6",
-      "zeitpunkt": "2026-11-05T06:31:00Z"
+      "beleg_id": "8af25ee194eb08f56abe2a830613258426c5e7ad8ad4ccd072d19241fb4a8c43",
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=6ea61728-1cba-4792-b751-912b27895201",
+      "zeitpunkt": "2026-11-06T06:24:46Z"
      },
      "beleg_status": "offen",
      "buendel": {
@@ -457,7 +457,7 @@
       "antwort_betrag": true,
       "antwort_einmalzahlung": true,
       "antwort_laufzeit": 36,
-      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=822c9516-62e7-4c7c-b3e1-0c8f4b4937a6",
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=6ea61728-1cba-4792-b751-912b27895201",
       "fundstellen": [
        "window.iTealiumInterface.history[0].final_dictionary[\"vendors.multi.tealium.inCart.product.tariff.monthlycostsgross.3.cost\"]",
        "window.iTealiumInterface.history[0].final_dictionary[\"vendors.multi.tealium.inCart.product.tariff.monthlycostsgross.2.cost\"]",
@@ -504,16 +504,14 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 28,
-    "beendet": 27,
+    "anfragen": 29,
+    "beendet": 28,
     "dokument": "complete",
     "geladen": true,
-    "offen": {
-     "cdn.appdynamics.com": 1
-    },
+    "offen": {},
     "ohne_antwort_ms": 0,
-    "sekunden": 3.8,
-    "takte_ms": 1500,
+    "sekunden": 6.1,
+    "takte_ms": 1700,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -534,5 +532,5 @@
  "ueberfaellig": [],
  "uebersichten": [],
  "vertragsform": "ein_vertrag",
- "zeitbudget_sekunden": 10268
+ "zeitbudget_sekunden": 10261
 }

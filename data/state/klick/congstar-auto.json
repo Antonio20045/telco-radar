@@ -1,7 +1,7 @@
 {
  "anbieter": "congstar-auto",
- "datum": "2026-11-05",
- "dauer_sekunden": 26.3,
+ "datum": "2026-11-06",
+ "dauer_sekunden": 26.4,
  "format": 1,
  "frischegrenze_tage": 3,
  "grund": "Gerät nicht mehr angeboten, Umleitung auf https://www.congstar.de/geraete/samsung/?redirectFrom=device-details,/geraete/samsung/?redirectFrom=device-details",
@@ -19,14 +19,17 @@
    "kombinationen": [],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 77,
-    "beendet": 70,
+    "anfragen": 87,
+    "beendet": 86,
     "dokument": "complete",
     "geladen": true,
-    "offen": {},
+    "offen": {
+     "images.congstar.de": 2,
+     "www.congstar.de": 1
+    },
     "ohne_antwort_ms": 0,
-    "sekunden": 6.6,
-    "takte_ms": 2500,
+    "sekunden": 7.3,
+    "takte_ms": 2750,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
