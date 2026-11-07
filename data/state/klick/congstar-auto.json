@@ -1,10 +1,10 @@
 {
  "anbieter": "congstar-auto",
- "datum": "2026-11-06",
- "dauer_sekunden": 26.4,
+ "datum": "2026-11-07",
+ "dauer_sekunden": 23.3,
  "format": 1,
  "frischegrenze_tage": 3,
- "grund": "Gerät nicht mehr angeboten, Umleitung auf https://www.congstar.de/geraete/samsung/?redirectFrom=device-details,/geraete/samsung/?redirectFrom=device-details",
+ "grund": "Gerät nicht mehr angeboten, Umleitung auf https://www.congstar.de/geraete/samsung/?redirectFrom=device-details",
  "karte": "congstar.yaml",
  "laufstatus": "nicht_gelesen",
  "lesefrist_tage": 1,
@@ -14,22 +14,21 @@
    "adresse": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s25-fe/",
    "geraet": "samsung-galaxy-s25-fe",
    "gescheitert": 0,
-   "grund": "Gerät nicht mehr angeboten, Umleitung auf https://www.congstar.de/geraete/samsung/?redirectFrom=device-details,/geraete/samsung/?redirectFrom=device-details",
+   "grund": "Gerät nicht mehr angeboten, Umleitung auf https://www.congstar.de/geraete/samsung/?redirectFrom=device-details",
    "http_status": 200,
    "kombinationen": [],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 87,
-    "beendet": 86,
+    "anfragen": 29,
+    "beendet": 26,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "images.congstar.de": 2,
-     "www.congstar.de": 1
+     "www.congstar.de": 3
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 7.3,
-    "takte_ms": 2750,
+    "sekunden": 4.9,
+    "takte_ms": 2500,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -52,5 +51,5 @@
  ],
  "uebersichten": [],
  "vertragsform": "tarif_plus_ratenkauf",
- "zeitbudget_sekunden": 10259
+ "zeitbudget_sekunden": 10267
 }
