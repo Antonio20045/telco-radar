@@ -66,3 +66,25 @@ belegte_luecken:
     original: https://www.congstar.de/geraete/apple/apple-iphone-17-pro/
     geprueft: "2026-11-05"
     bis: "2026-11-19"
+  # congstar: iPhone 17 Pro Max ist nicht mehr in der Geräteliste. Lauf
+  # 42356867331 (07.11.2026, 08:46 UTC) war deshalb rot: "congstar, 1
+  # Pflichtmodell ohne Bündel und ohne belegte Lücke: apple-iphone-17-pro-max".
+  # Belegt (08.11.2026, docs/belege/congstar-17promax-0811/): die Einzelseite
+  # /geraete/apple/apple-iphone-17-pro-max/ leitet per 307 auf die
+  # Apple-Übersicht um (redirectFrom=device-details, Screenshot 1). Die
+  # Übersicht (Screenshot 2, Linkliste 3, 28 Links) führt nur noch 18 Pro,
+  # 18 Pro Max, 17, 17e, 16, Air - kein 17 Pro Max mehr. Die Sitemap
+  # /sitemap/devices.xml (4) bestätigt das. Die Links der Übersicht vom
+  # Vorfall-Beleg (docs/belege/congstar-17pro-0511/4, 05.11.2026) führten das
+  # Gerät noch - zwischen 05.11. und 07.11.2026 aus dem Sortiment genommen.
+  # Der Tageslauf liest die Seite weiter; kommt das Gerät zurück, warnt der
+  # Wächter "überholt".
+  - anbieter: congstar
+    modelle:
+      - apple-iphone-17-pro-max
+    grund: Gerät ist nicht mehr in der Geräteliste (Apple-Übersicht) und nicht in der Sitemap; die Seite leitet auf die Übersicht um
+    art: nicht_im_portfolio
+    beleg: https://github.com/Antonio20045/telco-radar/blob/main/docs/belege/congstar-17promax-0811/2-apple-uebersicht-ganz.png
+    original: https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/
+    geprueft: "2026-11-08"
+    bis: "2026-11-22"
