@@ -1,6 +1,36 @@
 {
- "stand": "2026-11-06",
+ "stand": "2026-11-07",
  "videos": [
+  {
+   "id": "w3z3Fa7ACt8",
+   "titel": "That is Some Crazy Fabric",
+   "kanal": "Matt Wolfe",
+   "datum": "2026-11-07",
+   "dauer_sekunden": 71,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "w3z3Fa7ACt8.jpg"
+  },
+  {
+   "id": "GJ6PMUm5oTA",
+   "titel": "The OpenAI Astra Weight Hack, Explained",
+   "kanal": "Two Minute Papers",
+   "datum": "2026-11-07",
+   "dauer_sekunden": 349,
+   "stufe": "Fortgeschritten",
+   "sprache": "en",
+   "bild": "GJ6PMUm5oTA.jpg"
+  },
+  {
+   "id": "A5SfzBD6M3o",
+   "titel": "Claude Code Just Called My Phone",
+   "kanal": "Matt Wolfe",
+   "datum": "2026-11-07",
+   "dauer_sekunden": 67,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "A5SfzBD6M3o.jpg"
+  },
   {
    "id": "x_5JijpzprU",
    "titel": "AI fixes AI in MIT study, Mistral's open model & Google Genie 4",
@@ -32,6 +62,16 @@
    "bild": "ivug4z8DCCg.jpg"
   },
   {
+   "id": "hJOwOkLHRN0",
+   "titel": "LifeVal: Measuring AI progress on the tasks that matter in everyday life.",
+   "kanal": "OpenAI",
+   "datum": "2026-11-06",
+   "dauer_sekunden": 65,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "hJOwOkLHRN0.jpg"
+  },
+  {
    "id": "a__Rva9Wqek",
    "titel": "Lokale KI: Das ist der aktuelle Stand",
    "kanal": "c't 3003",
@@ -50,6 +90,16 @@
    "stufe": "Fortgeschritten",
    "sprache": "en",
    "bild": "XgC1QTs6A2U.jpg"
+  },
+  {
+   "id": "IrAHINf0M6E",
+   "titel": "AI News: New ChatGPT & Google Models (14 Updates Worth Knowing)",
+   "kanal": "Matt Wolfe",
+   "datum": "2026-11-06",
+   "dauer_sekunden": 1484,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "IrAHINf0M6E.jpg"
   },
   {
    "id": "rXFV1ivDe6c",
@@ -250,143 +300,93 @@
    "stufe": "Einstieg",
    "sprache": "en",
    "bild": "0LDs5rvx1EI.jpg"
-  },
-  {
-   "id": "yC72iQx6rM0",
-   "titel": "Qodo brings company context into Codex code review",
-   "kanal": "OpenAI",
-   "datum": "2026-11-03",
-   "dauer_sekunden": 85,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "yC72iQx6rM0.jpg"
-  },
-  {
-   "id": "wgvEgLJX-e8",
-   "titel": "Codex baut Space Taxi nach – und nimmt eine Abkürzung",
-   "kanal": "c't 3003",
-   "datum": "2026-11-03",
-   "dauer_sekunden": 51,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "wgvEgLJX-e8.jpg"
-  },
-  {
-   "id": "jnP9AgtX0qo",
-   "titel": "Can Your AI Use Sensitive Data Safely? 5 Capabilities You Need",
-   "kanal": "IBM Technology",
-   "datum": "2026-11-03",
-   "dauer_sekunden": 695,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "jnP9AgtX0qo.jpg"
-  },
-  {
-   "id": "hlZ0nJwDGOE",
-   "titel": "The AI bubble is popping",
-   "kanal": "David Ondrej",
-   "datum": "2026-11-03",
-   "dauer_sekunden": 3200,
-   "stufe": "Fortgeschritten",
-   "sprache": "en",
-   "bild": "hlZ0nJwDGOE.jpg"
-  },
-  {
-   "id": "PRAY_SewRxI",
-   "titel": "A real-life speeder bike from Return of the Jedi (Not AI)",
-   "kanal": "Matt Wolfe",
-   "datum": "2026-11-03",
-   "dauer_sekunden": 64,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "PRAY_SewRxI.jpg"
   }
  ],
  "kanaele": {
   "c't 3003": {
    "error": null,
-   "versucht": "2026-11-06",
-   "abgerufen": "2026-11-06"
+   "versucht": "2026-11-07",
+   "abgerufen": "2026-11-07"
   },
   "KI Update (heise)": {
    "error": null,
-   "versucht": "2026-11-06",
-   "abgerufen": "2026-11-06"
+   "versucht": "2026-11-07",
+   "abgerufen": "2026-11-07"
   },
   "Everlast AI": {
    "error": null,
-   "versucht": "2026-11-06",
-   "abgerufen": "2026-11-06"
+   "versucht": "2026-11-07",
+   "abgerufen": "2026-11-07"
   },
   "The Morpheus Tutorials": {
    "error": null,
-   "versucht": "2026-11-06",
-   "abgerufen": "2026-11-06"
+   "versucht": "2026-11-07",
+   "abgerufen": "2026-11-07"
   },
   "Kevin Stratvert": {
    "error": null,
-   "versucht": "2026-11-06",
-   "abgerufen": "2026-11-06"
+   "versucht": "2026-11-07",
+   "abgerufen": "2026-11-07"
   },
   "Microsoft Mechanics": {
    "error": null,
-   "versucht": "2026-11-06",
-   "abgerufen": "2026-11-06"
+   "versucht": "2026-11-07",
+   "abgerufen": "2026-11-07"
   },
   "Leila Gharani": {
    "error": null,
-   "versucht": "2026-11-06",
-   "abgerufen": "2026-11-06"
+   "versucht": "2026-11-07",
+   "abgerufen": "2026-11-07"
   },
   "Jeff Su": {
    "error": null,
-   "versucht": "2026-11-06",
-   "abgerufen": "2026-11-06"
+   "versucht": "2026-11-07",
+   "abgerufen": "2026-11-07"
   },
   "Matt Wolfe": {
    "error": null,
-   "versucht": "2026-11-06",
-   "abgerufen": "2026-11-06"
+   "versucht": "2026-11-07",
+   "abgerufen": "2026-11-07"
   },
   "IBM Technology": {
    "error": null,
-   "versucht": "2026-11-06",
-   "abgerufen": "2026-11-06"
+   "versucht": "2026-11-07",
+   "abgerufen": "2026-11-07"
   },
   "OpenAI": {
    "error": null,
-   "versucht": "2026-11-06",
-   "abgerufen": "2026-11-06"
+   "versucht": "2026-11-07",
+   "abgerufen": "2026-11-07"
   },
   "Anthropic": {
    "error": null,
-   "versucht": "2026-11-06",
-   "abgerufen": "2026-11-06"
+   "versucht": "2026-11-07",
+   "abgerufen": "2026-11-07"
   },
   "Google DeepMind": {
    "error": null,
-   "versucht": "2026-11-06",
-   "abgerufen": "2026-11-06"
+   "versucht": "2026-11-07",
+   "abgerufen": "2026-11-07"
   },
   "AI Explained": {
    "error": null,
-   "versucht": "2026-11-06",
-   "abgerufen": "2026-11-06"
+   "versucht": "2026-11-07",
+   "abgerufen": "2026-11-07"
   },
   "Two Minute Papers": {
    "error": null,
-   "versucht": "2026-11-06",
-   "abgerufen": "2026-11-06"
+   "versucht": "2026-11-07",
+   "abgerufen": "2026-11-07"
   },
   "3Blue1Brown": {
    "error": null,
-   "versucht": "2026-11-06",
-   "abgerufen": "2026-11-06"
+   "versucht": "2026-11-07",
+   "abgerufen": "2026-11-07"
   },
   "David Ondrej": {
    "error": null,
-   "versucht": "2026-11-06",
-   "abgerufen": "2026-11-06"
+   "versucht": "2026-11-07",
+   "abgerufen": "2026-11-07"
   }
  },
  "error": null
