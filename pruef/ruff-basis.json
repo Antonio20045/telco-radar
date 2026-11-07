@@ -253,9 +253,7 @@
   "C901": 1,
   "E501": 1,
   "E741": 3,
-  "SIM102": 2,
-  "UP035": 1,
-  "UP045": 6
+  "SIM102": 2
  },
  "src/telco_radar/collect/geraete/autoerkennung.py": {
   "SIM905": 1,

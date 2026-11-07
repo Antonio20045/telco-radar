@@ -44,9 +44,9 @@ from __future__ import annotations
 import logging
 import re
 import time
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
-from typing import Callable, Optional
 from urllib.parse import urljoin, urlparse
 
 from bs4 import BeautifulSoup
@@ -68,6 +68,7 @@ from .basis import (
 )
 from .basis import _einstieg_gelesen as _einstieg_gelesen
 from .basis import umgesetzte_methoden as umgesetzte_methoden
+from .buendel_prioritaet import nach_prioritaet as _nach_prioritaet
 from .robots import RobotsWaechter
 from .strukturdaten import ist_lockpreis, produkte_aus_html
 
@@ -305,9 +306,7 @@ _FENSTER_PUFFER_SEKUNDEN = 10.0
 _FRIST_GRUND_BUDGET = "Zeitbudget des Geraetezweigs erschoepft"
 
 
-def _fensterfrist(
-    waechter: RobotsWaechter, url: str, jetzt: datetime
-) -> Optional[float]:
+def _fensterfrist(waechter: RobotsWaechter, url: str, jetzt: datetime) -> float | None:
     """Der monotone Zeitpunkt, zu dem das Besuchsfenster dieses Hosts zugeht.
 
     `None` heisst "dieser Host hat kein Fenster" - dann deckelt nichts. Ein
@@ -419,8 +418,8 @@ def sammle_anbieter(
     heute: str,
     waechter: RobotsWaechter,
     jetzt: datetime,
-    frist_bis: Optional[float] = None,
-    uhr: Optional[Callable[[], datetime]] = None,
+    frist_bis: float | None = None,
+    uhr: Callable[[], datetime] | None = None,
 ) -> Anbieterbilanz:
     """Einen Anbieter abarbeiten. Wirft nie - Fehler stehen in der Bilanz.
 
@@ -515,8 +514,8 @@ def sammle_anbieter(
                     adapter.lies_buendel(inhalt, einstieg.url, proben=bilanz.proben)
                     or []
                 )
-                gemappt = _mit_sku(
-                    roh, anbieter, einstieg, katalog, farben, heute, bilanz
+                gemappt = _nach_prioritaet(
+                    _mit_sku(roh, anbieter, einstieg, katalog, farben, heute, bilanz)
                 )
                 if adapter.vertiefe_buendel is not None and gemappt:
                     gemappt = _vertiefe(
@@ -735,7 +734,7 @@ def _vertiefe(
     einstieg,
     gemappt: list,
     hole_text: Callable,
-    frist_bis: Optional[float],
+    frist_bis: float | None,
     katalog: Katalog,
     farben: dict,
     heute: str,
@@ -877,6 +876,7 @@ def _mit_sku(
             {
                 **satz,
                 "sku_id": listung.sku_id,
+                "device_id": listung.device_id,
                 "anbieter": anbieter.name,
                 "zustand": listung.zustand,
                 "quelle_url": listung.quelle_url,
@@ -967,8 +967,8 @@ def sammle(
     hole: Callable,
     heute: str,
     jetzt: datetime,
-    frist_sekunden: Optional[float] = None,
-    uhr: Optional[Callable[[], datetime]] = None,
+    frist_sekunden: float | None = None,
+    uhr: Callable[[], datetime] | None = None,
 ) -> dict:
     """Den ganzen Beobachtungsraum abarbeiten.
 
