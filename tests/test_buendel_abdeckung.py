@@ -232,16 +232,24 @@ def _buendel_aller_pflichtmodelle(anbieter, pflicht, ohne=()):
 def test_echte_config_fuehrt_congstar_iphone_17_pro_als_belegte_luecke():
     """05.11.2026: congstar leitet die 17-Pro-Seite auf die Übersicht um, das
     Gerät fehlt in der Geräteliste (kein „nicht mehr“: seit wann ist nicht belegt).
-    Die Lücke steht mit Grund in der echten Config, und nur
-    diese eine: kein ganzer Anbieter, kein anderes Modell."""
+    08.11.2026: dieselbe Übersicht führt auch das 17 Pro Max nicht mehr (Lauf
+    42356867331, 07.11., war deshalb rot). Beide Lücken stehen mit Grund in
+    der echten Config, und nur diese zwei: kein ganzer Anbieter, kein
+    anderes Modell."""
     pflicht = lade_pflicht(ECHTE_CONFIG)
     assert "apple-iphone-17-pro" in pflicht["modelle"]
+    assert "apple-iphone-17-pro-max" in pflicht["modelle"]
     assert (
         "nicht in der Geräteliste"
         in pflicht["luecken"][("congstar", "apple-iphone-17-pro")]
     )
-    assert [k for k in pflicht["luecken"] if k[0] == "congstar"] == [
-        ("congstar", "apple-iphone-17-pro")
+    assert (
+        "nicht mehr in der Geräteliste"
+        in pflicht["luecken"][("congstar", "apple-iphone-17-pro-max")]
+    )
+    assert sorted(k for k in pflicht["luecken"] if k[0] == "congstar") == [
+        ("congstar", "apple-iphone-17-pro"),
+        ("congstar", "apple-iphone-17-pro-max"),
     ]
 
 
@@ -277,13 +285,16 @@ def test_luecke_gilt_weder_fuer_andere_anbieter_noch_fuer_andere_modelle():
     )
     rot = pruefe({"updated": TAG, "buendel": buendel}, [], telekom)
     assert [b.art for b in rot.befunde] == ["modell_fehlt"]
+    assert ("congstar", "apple-iphone-17e") not in pflicht["luecken"]
     congstar = {**pflicht, "anbieter": ["congstar"]}
     buendel = _buendel_aller_pflichtmodelle(
-        "congstar", pflicht, ohne=("apple-iphone-17-pro", "apple-iphone-17-pro-max")
+        "congstar",
+        pflicht,
+        ohne=("apple-iphone-17-pro", "apple-iphone-17-pro-max", "apple-iphone-17e"),
     )
     rot = pruefe({"updated": TAG, "buendel": buendel}, [], congstar)
     assert [b.art for b in rot.befunde] == ["modell_fehlt"]
-    assert rot.befunde[0].text.endswith("apple-iphone-17-pro-max")
+    assert rot.befunde[0].text.endswith("apple-iphone-17e")
 
 
 def _luecken_yaml(tmp_path, geprueft="2026-03-01", bis="2026-03-15", mit_bis=True):
@@ -400,12 +411,17 @@ def test_waechterskript_meldet_ueberholte_ausnahme_als_warning(tmp_path, capsys)
 
 
 def test_kommt_das_iphone_17_pro_bei_congstar_zurueck_warnt_die_echte_config():
+    """Nur das 17 Pro kommt zurück (Bündel vorhanden), das 17 Pro Max bleibt
+    weg - isoliert die Warnung auf die Lücke, die wirklich überholt ist."""
     pflicht = lade_pflicht(ECHTE_CONFIG)
     nur_congstar = {**pflicht, "anbieter": ["congstar"]}
-    buendel = _buendel_aller_pflichtmodelle("congstar", pflicht)
+    buendel = _buendel_aller_pflichtmodelle(
+        "congstar", pflicht, ohne=("apple-iphone-17-pro-max",)
+    )
     ergebnis = pruefe({"updated": TAG, "buendel": buendel}, [], nur_congstar)
     assert ergebnis.befunde == []
     assert [(w.anbieter, w.art) for w in ergebnis.warnungen] == [
         ("congstar", "luecke_ueberholt")
     ]
     assert "apple-iphone-17-pro" in ergebnis.warnungen[0].text
+    assert "apple-iphone-17-pro-max" not in ergebnis.warnungen[0].text

@@ -600,6 +600,26 @@ anbieter:
       # MF_17502 taucht zwar in Links der Tarifseite auf, trägt aber
       # keine Kachel und keinen Namen — ohne Klarname wäre ein Satz
       # daraus eine Zuzahlung ohne benennbaren Tarif.
+      # BEFUND 08.11.2026 (Paket Telekom/congstar-Topvarianten): productList.data
+      # ist je Tarif ein Bestseller-Karussell mit nur 9-10 Plätzen, nicht der
+      # Katalog — pagination.totalItems nennt 54-57, aber &currentPage=2/3
+      # derselben Adresse liefert dieselben 9-10 Einträge (curl, TelcoRadar/1.0,
+      # HTTP 200). Welche Speicherstufe je Gerät im Karussell steht, wechselt
+      # tagesweise und je Tarif unabhängig — am 07.11. zeigte MagentaMobil L
+      # alle vier iPhone-Duo-Speicherstufen zugleich, am 08.11. nur noch 256 GB,
+      # ebenso bei XS/S/M/XL. Das erklärt die am 08.11. fehlenden Top-Varianten
+      # (u. a. alle iPhone Duo außer 256 GB): keine Alias- oder Parserlücke,
+      # sondern eine Auswahl der Seite selbst — mit dieser Adresse nicht über
+      # Konfiguration zu schließen. Ein echter Ausweg wäre die Produktseite MIT
+      # tariffId (/shop/geraet/<marke>/<slug>/<variante>?tariffId=MF_...): sie
+      # trägt unter productDetailed.productDetailsData.totalPrices einen
+      # ABSOLUTEN Gesamtbetrag für genau diese Variante (gemessen 08.11.2026 an
+      # apple-iphone-duo/nachthimmel-512-gb, MagentaMobil XS: upfrontPrice
+      # 438,95 € + 36 × recurringFee 87,15 €) — widerlegt den alten Befund
+      # "nur deltaPrice" für die Fassung MIT Tarifparameter. Bräuchte eine
+      # zweite Lesart je Variante × Tarif; in diesem Paket nicht gebaut (keine
+      # Zeit für Fixture und Tests), Details in
+      # arbeit/telekom-congstar-vollst-0811.md.
       # ------------------------------------------------------------------
       - url: https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17779
         label: Bündel MagentaMobil XS
