@@ -416,9 +416,11 @@ def test_jede_zeile_traegt_rechenweg_pflichtzeile_und_belege(tmp_path):
         posten = rw.select(".gr-tposten li")
         assert posten, f"{z.get('data-anbieter')}: Rechenweg ohne Posten"
         monate = z.get("data-leitzahl-monate")
-        assert monate and f"Gerechnet über {monate} Monate" in vorlage_text(rw), (
-            f"{z.get('data-anbieter')}: der Zeitraum der Zahl fehlt im Rechenweg"
-        )
+        text = vorlage_text(rw)
+        assert monate and (
+            f"Gerechnet über {monate} Monate" in text
+            or f"Gerechnet über 24 Tarifmonate und {monate} Geräteraten" in text
+        ), f"{z.get('data-anbieter')}: der Zeitraum der Zahl fehlt im Rechenweg"
         assert "noch offen" not in vorlage_text(rw)
         assert rw.select_one("a[href]") is not None, (
             f"{z.get('data-anbieter')}: kein Beleglink im Rechenweg"

@@ -57,6 +57,7 @@ SPALTEN_TCO = [
     "Laufzeit Monate",
     "Anschlusspreis EUR",
     "Leitzahl-Zeitraum Monate",
+    "Tarifmonate in der Summe",
     SPALTE_UEBER_24,
     SPALTE_UEBER_LAUFZEIT,
     "Abgerufen am",
@@ -561,7 +562,7 @@ def test_preisart_der_netzzeile_nennt_nur_einen_belegten_zeitraum():
     assert _preisart_netz({"status": "vergleichbar"}, gruppe) == "Kosten über 24 Monate"
     assert (
         _preisart_netz({"status": "vergleichbar"}, {"vodafone": {"monate": 36}})
-        == "Kosten über 36 Monate"
+        == "Kosten über 24 Tarifmonate und 36 Geräteraten"
     )
     for status in ("nicht_vergleichbar", "band_mismatch", "kein_buendel"):
         assert (

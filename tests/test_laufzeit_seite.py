@@ -39,6 +39,12 @@ from test_laufzeit_vergleich import HEUTE, MODELL, SOLL, ansicht, baue, bestand
 from telco_radar.report.geraete_laufzeit import ALLE_TEXT
 from telco_radar.report.html import render_site
 
+_ZEITRAUM = {
+    12: "24 Monate",
+    24: "24 Monate",
+    36: "24 Tarifmonate und 36 Geräteraten",
+}
+
 
 def _euro(betrag: float) -> str:
     return f"{betrag:,.2f}".replace(",", " ").replace(".", ",").replace(" ", ".")
@@ -221,9 +227,7 @@ def test_der_sieger_jeder_ansicht_hat_ihre_raten(_basis, laufzeit):
     with _oeffne(_basis, f"?laufzeit={laufzeit}") as s:
         antwort = _antwort(s)
         assert f"mit {laufzeit} Raten ist {sieger} am günstigsten" in antwort, antwort
-        assert f"{_euro(soll[sieger])} € Kosten über {max(laufzeit, 24)} Monate" in (
-            antwort
-        )
+        assert f"{_euro(soll[sieger])} € Kosten über {_ZEITRAUM[laufzeit]}" in antwort
     zeilen = _lager_zeilen(basis, str(laufzeit))
     guenstigste = min(zeilen, key=lambda z: float(z["gesamt"]))
     assert guenstigste["anbieter"] == sieger, zeilen
@@ -274,18 +278,20 @@ def test_antwortsatz_und_grafikachse_nennen_die_laufzeit(_basis, laufzeit):
     with _oeffne(_basis) as s:
         if laufzeit != 24:
             _waehle(s, str(laufzeit))
-        h = max(laufzeit, 24)
+        zeitraum = _ZEITRAUM[laufzeit]
+        raten_hinten = "" if laufzeit == 36 else f" · {laufzeit} Raten"
+        raten_mitten = "" if laufzeit == 36 else f" mit {laufzeit} Raten"
         antwort = _antwort(s)
         assert f"mit {laufzeit} Raten" in antwort, antwort
-        assert f"Kosten über {h} Monate" in antwort, antwort
+        assert f"Kosten über {zeitraum}" in antwort, antwort
         kopf = s.eval_on_selector(
             "#gr-zr-gruppe svg.gr-zr--breit", "e => e.getAttribute('aria-label')"
         )
-        assert f"Kosten über {h} Monate · {laufzeit} Raten" in kopf, kopf
+        assert f"Kosten über {zeitraum}{raten_hinten}" in kopf, kopf
         graph = s.eval_on_selector(
             "#gr-zr-gruppe .gr-zr-graph", "e => e.getAttribute('aria-label')"
         )
-        assert f"Kosten über {h} Monate mit {laufzeit} Raten" in graph, graph
+        assert f"Kosten über {zeitraum}{raten_mitten}" in graph, graph
         assert f"laufzeit={laufzeit}" in s.evaluate("location.search")
 
 

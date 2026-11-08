@@ -355,7 +355,7 @@ def test_der_block_zeigt_das_mal_muster_und_die_summe():
     assert "24 × 14,99 €" in html and "= 359,76 €" in html
     assert "36 × 19,00 €" in html and "= 684,00 €" in html
     assert "= <b>1.120,75 €</b>" in html
-    assert "Kosten über 36 Monate" in html
+    assert "Kosten über 24 Tarifmonate und 36 Geräteraten" in html
     assert "TCO-24" not in html
 
 
@@ -390,7 +390,10 @@ def test_36_raten_rechnen_24_tarifmonate_und_sagen_es_im_rechenweg():
     assert "monatlich kündbar" in r["hinweis"]
     html = zr._rechung_html("Telekom", m)
     text = BeautifulSoup(html, "html.parser").get_text(" ")
-    assert "24 × 29,95 €" in html and "Kosten über 36 Monate" in html
+    assert (
+        "24 × 29,95 €" in html
+        and "Kosten über 24 Tarifmonate und 36 Geräteraten" in html
+    )
     assert "Der Tarif zählt nur 24 Monate" in text
     assert "ab Monat 25 zusätzlich den Tarifpreis" in text
 
@@ -416,7 +419,8 @@ def test_der_rechenschaftssatz_der_36er_ansicht_nennt_die_24_tarifmonate():
         zeile, 24
     )
     satz = zr._rechnung_html(zeile, 36)
-    assert "Alles über 36 Monate: Anzahlung, Tarif nur 24 Monate" in satz
+    assert "Alles über 24 Tarifmonate und 36 Geräteraten: Anzahlung, Tarif" in satz
+    assert "Alles über 36 Monate" not in satz
     assert "monatlich kündbar" in satz
 
 
@@ -450,7 +454,10 @@ def test_die_rechnung_kennt_keine_restschuld_alle_raten_liegen_im_zeitraum():
     assert "offen" not in r and r["monate"] == 36
     html = zr._rechung_html("o2", _messung(O2_MESSUNG), O2_TARIFE)
     assert "noch zu zahlen" not in html and "Restschuld" not in html
-    assert "36 × 19,00 €" in html and "Kosten über 36 Monate" in html
+    assert (
+        "36 × 19,00 €" in html
+        and "Kosten über 24 Tarifmonate und 36 Geräteraten" in html
+    )
     eins = _messung(EINS_EINS_MESSUNG, anbieter="1&1", tarif="1&1 All-Net-Flat S")
     r11 = zr._rechung(eins)
     assert "offen" not in r11 and r11["monate"] == 24
@@ -524,7 +531,9 @@ def test_der_klammer_text_und_das_label_erfuellen_die_12_px_regel(
             seite.close()
         klammer, label = gemessen
         assert klammer and klammer["text"] == "24 von 36 Raten", (breite, gemessen)
-        assert label and label["text"] == "Kosten über 36 Monate", (breite, gemessen)
+        assert (
+            label and label["text"] == "Kosten über 24 Tarifmonate und 36 Geräteraten"
+        ), (breite, gemessen)
         for e in gemessen:
             assert e["hoehe"] > 0, (breite, e)
             assert e["px"] >= 12, f"{e['text']!r} bei {breite} px: {e['px']} px"
@@ -688,11 +697,12 @@ def test_zwei_zeitraeume_stehen_an_den_kurven_und_in_der_beschriftung():
         serien, True, {"o2": ("https://b", "2026-09-13")}, {"o2": [24], "1&1": [36]}
     )
     assert (
-        "aria-label='Kosten über 24 und 36 Monate je Messtag und Anbieter: o2, 1&amp;1'"
+        "aria-label='Kosten über 24 Monate bzw. 24 Tarifmonate und 36 Geräteraten "
+        "je Messtag und Anbieter: o2, 1&amp;1'"
     ) in svg, svg[:400]
     suppe = BeautifulSoup(svg, "html.parser")
     etiketten = [t.get_text(strip=True) for t in suppe.select("text.gr-zr-mon")]
-    assert sorted(etiketten) == ["24 Mon.", "36 Mon."], etiketten
+    assert sorted(etiketten) == ["24 Mon.", "36 Raten"], etiketten
     assert len(suppe.select("circle.gr-zr-punkt[data-anb='1&1']")) == 2
 
 

@@ -1086,7 +1086,10 @@ def test_z1_der_alternativ_betrag_nennt_seinen_abweichenden_zeitraum():
     assert alternativen == [{"band": "m", "tco": 2019.54, "monate": 36}]
     luecken = geraete_zeitreihe._luecken([{"anbieter": "Vodafone"}], karten, "xs")
     text = _zeilen_text(fehlzeilen(luecken, {}))
-    assert "1&1: Nur in anderen Bändern: M 2.019,54 € über 36 Monate" in text, text
+    assert (
+        "1&1: Nur in anderen Bändern: M 2.019,54 € "
+        "über 24 Tarifmonate und 36 Geräteraten"
+    ) in text, text
     karten24 = [
         _h3_karte("1&1", 1700.00, 24, band="m"),
         _h3_karte("Vodafone", 1433.80, 24, band="xs"),

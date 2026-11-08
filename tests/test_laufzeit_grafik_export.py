@@ -60,9 +60,12 @@ def test_der_bandgraph_zeigt_je_anbieter_die_karte_seiner_laufzeit(g, laufzeit):
     assert {z["anbieter"]: z["gesamt"] for z in band["balken"]["zeilen"]} == soll
     assert {li["anbieter"] for li in band["grafik"]["linien"]} == set(soll)
     svg = band["grafik"]["svg"]
-    zeitraum, fremd = (36, 24) if laufzeit == 36 else (24, 36)
-    assert f"Kosten über {zeitraum} Monate" in svg
-    assert f"{fremd} Monate" not in svg
+    if laufzeit == 36:
+        assert "Kosten über 24 Tarifmonate und 36 Geräteraten" in svg
+        assert "Kosten über 36 Monate" not in svg
+    else:
+        assert "Kosten über 24 Monate" in svg
+        assert "36 Monate" not in svg and "36 Geräteraten" not in svg
 
 
 def test_die_standardansicht_des_bandgraphen_hat_24_raten(g):

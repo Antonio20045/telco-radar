@@ -72,23 +72,6 @@ def _datum_de(iso: str) -> str:
     return f"{tag.day}. {MONATE_DE[tag.month - 1]} {tag.year}"
 
 
-def _zeitraum_wort(monate: list) -> str:
-    """„24 Monate" / „24 und 36 Monate" - die Beschriftung des Bildes.
-
-    P0-B-z1: der Titel darf keinen Zeitraum behaupten, der nicht fuer
-    ALLE Kurven gilt. Kommen mehrere vor, nennt er sie - in wenigen
-    Worten; die Zuordnung zur einzelnen Kurve steht am Kurvenende
-    (`_mon_kurz`). Leere Liste heisst „kein Zeitraum gelesen" und ergibt
-    KEIN Wort (der Aufrufer laesst die Angabe dann weg).
-    """
-    zahlen = [str(m) for m in monate]
-    if not zahlen:
-        return ""
-    if len(zahlen) == 1:
-        return f"{zahlen[0]} Monate"
-    return f"{', '.join(zahlen[:-1])} und {zahlen[-1]} Monate"
-
-
 def _esc(text: str) -> str:
     return (
         str(text)
@@ -247,6 +230,7 @@ def _rechung(messung: dict, tarife: dict | None = None) -> dict | None:
         "hinweis": tarif_hinweis(kosten.tarifmonate or 0, h),
         "gesamt": kosten.gesamt,
         "monate": h,
+        "tarifmonate": kosten.tarifmonate,
         "datum": satz.get("datum") or "",
         "quelle_url": satz.get("quelle_url") or "",
         "abgerufen_am": satz.get("abgerufen_am") or "",
@@ -329,7 +313,8 @@ def _rechung_html(anbieter: str, messung: dict, tarife: dict | None = None) -> s
     teile.append("</ul>")
     teile.append(
         f"<p class='gr-zr-rsumme'>= <b>{euro(r['gesamt'])}</b> "
-        f"<span class='gr-zr-plabel'>{label_der_leitzahl(r['monate'])}</span></p>"
+        f"<span class='gr-zr-plabel'>"
+        f"{label_der_leitzahl(r['monate'], r.get('tarifmonate'))}</span></p>"
     )
     teile.append(r["hinweis"])
     url = r["quelle_url"]

@@ -519,7 +519,8 @@ def test_wettbewerber_mit_anderer_laufzeit_wird_benannt_statt_still():
         "dieselben Worte wie die Buendelzeile, EINE Definition"
     )
     assert zeile["tco_delta_leer_grund"] == fremd["delta_zustand"]["satz"]
-    assert "36 Monate" in zeile["tco_delta_leer_grund"]
+    assert "36 Geräteraten" in zeile["tco_delta_leer_grund"]
+    assert "36 Monate" not in zeile["tco_delta_leer_grund"]
 
 
 def test_36_monats_summe_steht_nicht_unter_dem_24_monats_kopf():

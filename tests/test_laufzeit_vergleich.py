@@ -431,12 +431,15 @@ def test_gleicher_horizont_prueft_die_ratenlaufzeit(g):
 @pytest.mark.parametrize("laufzeit", [12, 24, 36])
 def test_antwortsatz_und_grafikachse_nennen_die_laufzeit(g, laufzeit):
     paar = _paar(g, laufzeit)
-    h = max(laufzeit, 24)
+    zeitraum = "24 Tarifmonate und 36 Geräteraten" if laufzeit == 36 else "24 Monate"
+    raten = "" if laufzeit == 36 else f" · {laufzeit} Raten"
     antwort = _text(paar["antwort_html"])
     assert f"mit {laufzeit} Raten" in antwort, antwort
-    assert f"Kosten über {h} Monate" in antwort, antwort
-    assert f"Kosten über {h} Monate · {laufzeit} Raten" in paar["svg_breit"]
-    assert f"{laufzeit} Raten" in paar["graph_beschriftung"]
+    assert f"Kosten über {zeitraum}" in antwort, antwort
+    assert f"Kosten über {zeitraum}{raten}" in paar["svg_breit"]
+    assert "Kosten über 36 Monate" not in antwort + paar["svg_breit"]
+    wort = "Geräteraten" if laufzeit == 36 else "Raten"
+    assert f"{laufzeit} {wort}" in paar["graph_beschriftung"]
 
 
 def test_telekom_ist_in_der_24er_ansicht_nicht_erfasst(g):

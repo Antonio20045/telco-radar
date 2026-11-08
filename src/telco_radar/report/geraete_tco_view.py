@@ -200,9 +200,9 @@ def _export_zeilen(
     Aufgelöst wird wie in der Modelltafel (`geraet_je_sku` plus Katalog), die
     Kostenspalte ist `tco_model.kosten_ueber()` wie auf der Karte; Dezimalkomma
     und Semikolon macht `geraete_export.tco_csv`. Eigene Felder: `sku_id` (A4),
-    Zeitraum H (`leitzahl_monate`), `status` (Notbremse), `luecke` (Posten ohne
-    Zahl) und `raten_laufzeit` (Umschalter); nach Ratenlaufzeit gruppiert. Ein
-    veralteter Preis (`geraete_preisstand.buendel_luecke`) trägt keinen Betrag.
+    Zeitraum H (`leitzahl_monate`) mit seinen Tarifmonaten, `status` (Notbremse),
+    `luecke` (Posten ohne Zahl) und `raten_laufzeit` (Umschalter); nach
+    Ratenlaufzeit gruppiert. Ein veralteter Preis trägt keinen Betrag.
 
     Die SIM-only-Zeilen sind DERSELBE Massstab wie auf der Tafel
     (`_referenztabelle`), `ueber_horizont` als ihre TCO-24 (`tco_24` über
@@ -217,7 +217,6 @@ def _export_zeilen(
     geraete_tco_karten.ergaenze_geraete_aus_katalog(geraet_je_sku, buendel, katalog)
     typen = anbieter_typen or {}
     band_von = geraete_tco_band.band_label
-
     zeilen = []
     for b in buendel:
         if not isinstance(b, Buendel):
@@ -245,6 +244,7 @@ def _export_zeilen(
                 "anschlusspreis": None if veraltet else b.anschlusspreis,
                 "tco24": None if veraltet else kosten.gesamt,
                 "leitzahl_monate": kosten.monate,
+                "tarif_monate": kosten.tarifmonate,
                 "abgerufen_am": b.abgerufen_am,
                 "quelle_url": b.quelle_url,
                 "sku_id": b.sku_id or "",

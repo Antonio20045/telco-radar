@@ -19,7 +19,11 @@ import pytest
 
 from telco_radar.analyze.buendel_abdeckung import lade_pflicht
 from telco_radar.report import geraete_preisstand, geraete_sortiment, geraete_tco_view
-from telco_radar.report.geraete_export import SPALTE_UEBER_24, tco_csv
+from telco_radar.report.geraete_export import (
+    SPALTE_UEBER_24,
+    SPALTE_UEBER_LAUFZEIT,
+    tco_csv,
+)
 from telco_radar.tco_model import Buendel
 
 ECHTE_CONFIG = Path(__file__).resolve().parents[1] / "config" / "geraete_abdeckung.yaml"
@@ -108,7 +112,7 @@ def test_beide_varianten_erscheinen_bei_1und1_als_luecke_ohne_preis(
         "Bündel/Monat EUR",
         "Anschlusspreis EUR",
         SPALTE_UEBER_24,
-        "Kosten über die Bündellaufzeit EUR",
+        SPALTE_UEBER_LAUFZEIT,
     ):
         assert zeile[spalte] == ""
 

@@ -23,7 +23,15 @@ import pytest
 
 _GW_HORIZONT = 24
 _GW_SPALTE_24 = "Kosten über 24 Monate EUR"
-_GW_SPALTE_LAUFZEIT = "Kosten über die Bündellaufzeit EUR"
+_GW_SPALTE_LAUFZEIT = "Kosten über Tarifmonate und Geräteraten EUR"
+
+
+def _gw_zeitraum(monate: int) -> str:
+    """Der Zeitraum einer Leitzahl, wie das Etikett ihn nennt (Datenkonzept 5.3):
+    bis 24 Monate „24 Monate“, darüber 24 Tarifmonate und die Geräteraten."""
+    if monate <= _GW_HORIZONT:
+        return f"{monate} Monate"
+    return f"{_GW_HORIZONT} Tarifmonate und {monate} Geräteraten"
 
 
 def _gw_leitzahl_aus_zeile(zeile: dict) -> str:
@@ -762,7 +770,7 @@ def test_leitzahl_des_pflichtfalls_am_bestand(gw_seite):
                 _gw_Dez(attrs["gesamt"]), cent, f"Pflichtfall, {n} Raten, data-gesamt"
             )
             assert _gw_Dez(attrs["schnitt"]) in _gw_o_monat(cent, monate), attrs
-            assert f"Kosten über {monate} Monate" in klar, klar[:200]
+            assert f"Kosten über {_gw_zeitraum(monate)}" in klar, klar[:200]
             euro = f"{cent // 100:,}".replace(",", ".") + f",{cent % 100:02d} €"
             assert euro in klar, f"{n} Raten: {euro} fehlt wörtlich in der Zeile"
     assert luecken == {n for n, c in _GW_PFLICHT_SOLL.items() if c is None}
@@ -831,7 +839,7 @@ def test_monatsschnitt_und_restschuld_des_pflichtfalls_am_bestand(gw_seite):
         assert n in je_laufzeit, f"Rechenweg vom {messtag} nennt {n} Raten"
         zahlweisen.add(n)
         _cent, monate = soll_je[n]
-        assert f"Kosten über {monate} Monate" in roh, (messtag, n)
+        assert f"Kosten über {_gw_zeitraum(monate)}" in roh, (messtag, n)
         assert "noch zu zahlen" not in roh and "Restschuld" not in roh, (
             f"Rechenweg vom {messtag} ({n} Raten) weist eine Restschuld aus, "
             f"obwohl alle Raten in {monate} Monaten liegen"
@@ -2050,7 +2058,9 @@ _PR_LABEL_RE = re.compile(r'gr-bnd-label">([^<]*)<')
 _PR_RWZ_RE = re.compile(r'gr-bnd-rw-z">(.*?)</p>', re.S)
 _PR_NAME_RE = re.compile(r'gr-bnd-name">([^<]*)<')
 _PR_TARIF_RE = re.compile(r'gr-bnd-tarif">(.*?)</span>', re.S)
-_PR_MONATE_RE = re.compile(r"Kosten über (\d+) Monate")
+_PR_MONATE_RE = re.compile(
+    r"Kosten über (?:24 Tarifmonate und )?(\d+) (?:Monate|Geräteraten)"
+)
 _PR_SCHNITT_RE = re.compile(r"Ø ([\d.]+,\d\d) €/Monat")
 _PR_ALARM_RE = re.compile(r'<tr class="gr-a-zeile.*?</tr>', re.S)
 
@@ -2478,7 +2488,9 @@ def _pz_zeilen(html: str) -> list[dict]:
                 "gesamt": feld(r'data-gesamt="([^"]*)"'),
                 "schnitt": feld(r'data-schnitt="([^"]*)"'),
                 "laufzeit_attr": feld(r'data-laufzeit="([^"]*)"'),
-                "etikett": feld(r"Kosten über (\d+) Monate"),
+                "etikett": feld(
+                    r"Kosten über (?:24 Tarifmonate und )?(\d+) (?:Monate|Geräteraten)"
+                ),
             }
         )
     return zeilen
@@ -2799,10 +2811,11 @@ def test_der_name_der_grafik_nennt_die_zeitraeume_die_darin_liegen(gw_seite):
         raten = int(kopf.group(1))
         monate = max(raten, 24)
         genannt = " ".join(name.group(1).split())
-        im_bild = {int(z) for z in re.findall(r">(\d+) Mon\.?<", teil)}
-        if f"Kosten über {monate} Monate mit {raten} Raten" not in genannt or (
-            im_bild - {monate}
-        ):
+        im_bild = {int(z) for z in re.findall(r">(\d+) (?:Mon\.|Raten)<", teil)}
+        soll_name = f"Kosten über {_gw_zeitraum(monate)}" + (
+            "" if raten > _GW_HORIZONT else f" mit {raten} Raten"
+        )
+        if soll_name not in genannt or (im_bild - {monate}):
             falsch.append((raten, genannt, sorted(im_bild)))
         gesehen.add(raten)
     assert {24, 36} <= gesehen, (

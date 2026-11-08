@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import json
 import pathlib
+import re
 
 import pytest
 import yaml
@@ -219,7 +220,7 @@ def _etikett_monate(zeile) -> int | None:
         return None
     text = etikett.get_text(strip=True)
     assert text.startswith("Kosten über "), text
-    return int(text.split()[2])
+    return int(re.findall(r"\d+", text)[-1])
 
 
 def test_die_fixture_mischt_wirklich_zwei_zeitraeume(lager):
@@ -395,7 +396,7 @@ def test_die_sortierung_stellt_zwei_zeitraeume_nicht_in_einen_rang(lager):
     ]
     assert koepfe == ["24", "36"], koepfe
     etikett = gruppen["36"][-1].select_one(".gr-bnd-label").get_text(strip=True)
-    assert etikett == "Kosten über 36 Monate", etikett
+    assert etikett == "Kosten über 24 Tarifmonate und 36 Geräteraten", etikett
 
 
 def test_die_umgekehrte_richtung_dreht_nur_innerhalb_des_zeitraums(lager):

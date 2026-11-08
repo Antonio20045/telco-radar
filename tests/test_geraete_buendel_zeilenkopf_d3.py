@@ -262,7 +262,8 @@ def test_punkt1_zeilen_sind_zugeklappt_unterscheidbar(site):
             .replace(".", ",")
             .replace("#", ".")
         )
-        assert f"{betrag} € Kosten über {n} Monate" in text, (n, text)
+        zeitraum = "24 Tarifmonate und 36 Geräteraten" if n == 36 else "24 Monate"
+        assert f"{betrag} € Kosten über {zeitraum}" in text, (n, text)
 
 
 def _congstar_xs_summarys(html: str) -> list:
@@ -309,8 +310,14 @@ def test_punkt1_ohne_ratenzahl_waeren_die_zeilen_wortgleich(site):
         raten[0].decompose()
         ohne_raten.append(" ".join(summary.get_text(" ").split()))
     assert len(ohne_raten) == 2 and ohne_raten[0] != ohne_raten[1], ohne_raten
-    assert {"Kosten über 24 Monate", "Kosten über 36 Monate"} == {
-        re.search(r"Kosten über \d+ Monate", t).group(0) for t in ohne_raten
+    assert {
+        "Kosten über 24 Monate",
+        "Kosten über 24 Tarifmonate und 36 Geräteraten",
+    } == {
+        re.search(r"Kosten über 24 (?:Tarifmonate und 36 Geräteraten|Monate)", t).group(
+            0
+        )
+        for t in ohne_raten
     }
 
     assert sorted(gesehen) == ["24", "36"], gesehen

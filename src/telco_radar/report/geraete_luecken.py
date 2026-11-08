@@ -34,6 +34,7 @@ from .geraete_luecken_alternativen import (
 )
 from .geraete_rechenweg import ANBIETER_FOLGE, euro
 from .geraete_stufen import KEIN_TARIF_KURZ, KEIN_TARIF_SATZ, stufe_ohne_tarif
+from .geraete_zeitraum_wort import zeitraum_wort
 
 
 def _luecken(
@@ -214,7 +215,7 @@ def _fehlzeile(lu: dict, band_labels: dict, h: int, erfassung: dict) -> dict:
         return _ohne_tarif_zeile(lu, band_labels, h)
     kurz = _KURZ.get(grund, _KURZ["anderes-band"])
     if grund == "anderer-zeitraum" and lu.get("monate") is not None:
-        kurz = f"Nur über {lu['monate']} Monate"
+        kurz = f"Nur über {zeitraum_wort([lu['monate']])}"
     if grund == "zaehlt-nicht" and lu.get("gesperrt"):
         satz = f"{kurz}: {', '.join(lu['gesperrt'])}."
     else:

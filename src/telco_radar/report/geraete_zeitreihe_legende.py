@@ -7,6 +7,7 @@ erscheint als eigener Eintrag „frühere Preise überholt“ statt einer Zahl.
 
 from __future__ import annotations
 
+from ..tco_kosten import ZEITRAUM_OHNE_BINDUNG
 from .geraete_rechenweg import ANBIETER_FOLGE, _esc, _zr_marker_farbe
 
 
@@ -17,7 +18,11 @@ def _euro0(betrag) -> str:
 
 
 def _mon_kurz(monate: list) -> str:
-    """„36 Mon." / „24/36 Mon." - das Etikett AN der Kurve (P0-B-z1).
+    """„24 Mon." / „24 Mon./36 Raten" - das Etikett AN der Kurve (P0-B-z1).
+
+    Mehr als 24 Monate sind Geräteraten, kein Tarifzeitraum: der Tarif zählt
+    höchstens 24 Monate (`tco_kosten.ZEITRAUM_OHNE_BINDUNG`), danach nur die
+    Rate. Darum steht dort „36 Raten“ und nie „36 Mon.“.
 
     Kurz, weil es im Bild neben dem Anbieternamen steht (Antonios Stil:
     wenig Text, keine Erklaerzeile). Die Zahlen sind GELESEN
@@ -27,7 +32,9 @@ def _mon_kurz(monate: list) -> str:
     """
     if not monate:
         return ""
-    return "/".join(str(m) for m in monate) + " Mon."
+    return "/".join(
+        f"{m} Mon." if m <= ZEITRAUM_OHNE_BINDUNG else f"{m} Raten" for m in monate
+    )
 
 
 def ohne_alte(modell: dict, mess: dict, serien: dict) -> dict:

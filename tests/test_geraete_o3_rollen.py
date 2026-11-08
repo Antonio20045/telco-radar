@@ -282,13 +282,15 @@ def test_jede_belastbare_fragment_zeile_traegt_die_pflichtzeile(site):
     )
     belastbar = [z for z in lager.select(".gr-bnd") if z.get("data-gesamt")]
     assert belastbar, "keine belastbare Zeile im Fragment"
-    ohne_pflicht = [
-        z
-        for z in belastbar
-        if f"Gerechnet über {z.get('data-leitzahl-monate')} Monate"
-        not in " ".join("".join(z.find_all(string=True)).split())
-        or z.select_one(".gr-kk-24") is not None
-    ]
+    ohne_pflicht = []
+    for z in belastbar:
+        m = z.get("data-leitzahl-monate")
+        text = " ".join("".join(z.find_all(string=True)).split())
+        if (
+            f"Gerechnet über {m} Monate" not in text
+            and f"Gerechnet über 24 Tarifmonate und {m} Geräteraten" not in text
+        ) or z.select_one(".gr-kk-24") is not None:
+            ohne_pflicht.append(z)
     assert not ohne_pflicht, f"{len(ohne_pflicht)} belastbare Zeilen ohne Zeitraum"
     for z in lager.select(".gr-bnd")[:50]:
         assert z.get("data-anbieter"), "Zeile ohne data-anbieter"
