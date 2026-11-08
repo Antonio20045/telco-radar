@@ -26,7 +26,6 @@ from bs4 import BeautifulSoup
 from telco_radar.config import load_config
 from telco_radar.geraete_config import lade_katalog, lade_quellen
 from telco_radar.report import geraete_view
-from telco_radar.report.geraete_laufzeit import nur_ueber_24
 from telco_radar.report.geraete_preisstand import preis_veraltet
 from telco_radar.report.geraete_tco_grafik import euro
 from telco_radar.report.html import render_site
@@ -277,22 +276,19 @@ def test_o2_zeile_rechnet_wie_die_karte(bestand):
 
 
 def test_zeile_ohne_kernzahl_nennt_was_fehlt(bestand):
-    """Eine Zeile ohne belastbare Zahl trägt keine Summe und benennt den Grund.
-    1&1 „24 + 12“ ist seit der Preisprüfung 02.11.2026 so eine Zeile: kein
-    24-Monats-Preis, keine Rechnung mit Summe, der Grund steht in der Karte."""
+    """Eine Zeile ohne belastbare Zahl zeigt die gemessenen Posten und benennt
+    den fehlenden, ohne Summe."""
     _, karten, soup = bestand
-    offen = [k for k in karten if not k["belastbar"] and k.get("sku_id")]
-    assert offen, "Bestand ohne Zeile mit Lücke – der Test prüft nichts"
-    assert all(k["anbieter"] == "1&1" and nur_ueber_24(k) for k in offen)
-    assert all(k["gesamt"] is None and not k.get("rechnung") for k in offen)
-    assert all("24 + 12" in k["leer_grund"] for k in offen)
-    ohne_summe = [
-        z
-        for z in soup.select("details.gr-bnd > summary")
-        if "keine belastbare Zahl" in _text(z) and "1&1" in _text(z)
+    offen = [
+        k
+        for k in karten
+        if not k["belastbar"] and k.get("sku_id") and k.get("rechnung")
     ]
-    assert 0 < len(ohne_summe) <= len(offen), (len(ohne_summe), len(offen))
-    assert not [r for r in soup.select(".gr-bnd-rechnung") if "=" not in _text(r)]
+    assert offen, "Bestand ohne Zeile mit Lücke – der Test prüft nichts"
+    texte = [_text(r) for r in soup.select(".gr-bnd-rechnung") if "=" not in _text(r)]
+    assert texte and all("nicht genannt" in t for t in texte), texte[:3]
+    assert any("Ablöse nach Monat 24 nicht genannt" in t for t in texte), texte[:3]
+    assert not any("Monat 25–36" in t for t in texte), texte[:3]
 
 
 def test_kein_wort_schaetzung_auf_der_geraeteseite(bestand):

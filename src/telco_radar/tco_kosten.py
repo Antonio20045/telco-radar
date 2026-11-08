@@ -17,11 +17,14 @@ ein Posten oder der Preis eines Monats, ist `Kosten.gesamt` None und die Lücke
 benannt; Boni und Aktionen gehen nie ein, eingerechnete Aktionen stecken schon in der
 gemessenen Rate. Für H = 24 ist es dieselbe Zahl wie `tco_24`.
 
-Ein Vertrag über mehr als 24 Monate (1&1 „24+12“) hat im Standardzeitraum keine
-Zahl, nur die Lücke `POSTEN_NUR_24_PLUS_12`: 24 Beträge plus Ablöse sind keine
-24-Monats-Finanzierung (Preisprüfung 02.11.2026, überholt die Entscheidung vom
-10.10.2026). Ein ausdrücklicher Zeitraum (`kosten_ueber(b, monate)`) rechnet weiter;
-dann ist `geraet_zuzahlung` die Ablöse nach Monat `monate`, keine Anzahlung.
+Ein Vertrag über mehr als 24 Monate (1&1 „24+12“) wird über 24 Monate gerechnet: 24 ×
+Bündelbetrag plus die Einmalzahlung, mit der der Kunde nach Monat 24 kündigt und das
+Gerät behält (Manager, 05.11.2026: vergleichbar machen statt weglassen, nimmt die
+Ausnahme vom 02.11.2026 zurück). `geraet_zuzahlung` ist dann die Ablöse nach Monat 24,
+keine Anzahlung; ohne sie die Lücke `POSTEN_EINMALZAHLUNG`. Weicht die Ablöse zwischen
+Tarifen desselben Geräts ab, ist sie widersprüchlich und wird vorher entfernt
+(`analyze.geraete_widerspruch.mit_einheitlicher_einmalzahlung`) - dieselbe Lücke, nie
+geschätzt. Ein ausdrücklicher Zeitraum (`kosten_ueber(b, monate)`) rechnet ebenso.
 
 `tco_model` reexportiert `Kosten`, `kosten_ueber` und `zeitraum` und lädt dieses Modul
 dafür beim eigenen Laden. Die Namen aus `tco_model` liest dieses Modul deshalb erst
@@ -44,7 +47,6 @@ ZEITRAUM_OHNE_BINDUNG = 24
 POSTEN_ZEITRAUM = "Zeitraum"
 POSTEN_EINMALZAHLUNG = "Einmalzahlung bei Kündigung"
 EINMALPOSTEN = (POSTEN_VERSAND, POSTEN_EINMALZAHLUNG)
-POSTEN_NUR_24_PLUS_12 = "24-Monats-Preis (nur als 24 + 12 mit 36 Monaten erfasst)"
 SCHRITT_GERAET = "geraet"
 SCHRITT_TARIF = "tarif"
 SCHRITT_VERTRAG = "vertrag"
@@ -153,9 +155,6 @@ def kosten_ueber(buendel: Buendel, monate: int | None = None) -> Kosten:
         monate=h,
         ratenlaufzeit=None if buendel.ohne_geraet else buendel.laufzeit_monate,
     )
-    if monate is None and _mit_abloese(buendel, h):
-        k.luecken.append(POSTEN_NUR_24_PLUS_12)
-        return k
     if h is None:
         k.luecken.append(POSTEN_ZEITRAUM)
         if buendel.buendel_monatlich is not None and buendel.laufzeit_monate is None:

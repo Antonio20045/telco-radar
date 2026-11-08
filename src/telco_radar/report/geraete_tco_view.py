@@ -2,7 +2,7 @@
 
 Gerechnet wird ausschliesslich in `tco_model`. Dieses Modul ruft
 `kosten_ueber()` auf und formt das Ergebnis; es addiert selbst keinen Euro.
-Zwei Rechnungen derselben Zahl sind zwei Zahlen. Widerlegte Bündel: `ohne_widerlegte`.
+Zwei Rechnungen derselben Zahl sind zwei Zahlen. Widerlegte Bündel: `bereinigt`.
 
 Fehlt ein Posten, steht die benannte Luecke statt einer Zahl: "Wenn kein
 Anschlusspreis bekannt ist, heisst das nicht kostenlos"
@@ -16,7 +16,7 @@ from __future__ import annotations
 import logging
 
 from ..analyze.geraete_pruefstatus import listen_aus_satz
-from ..analyze.geraete_widerspruch import ohne_widerlegte
+from ..analyze.geraete_widerspruch import bereinigt
 from ..tarif_model import PREISTYP_LIVE_SHOP
 from ..tco_model import (
     TCO_HORIZONT,
@@ -324,7 +324,7 @@ def aufbereiten(
     `heute` (A3, "YYYY-MM-DD") schaltet die Alterung ein - ohne das
     Datum (Default) altert nichts (`geraete_tco_karten.ist_frisch`).
     """
-    buendel = ohne_widerlegte(_aus_speicher(buendel, Buendel, _BUENDEL_FELDER))
+    buendel = _aus_speicher(buendel, Buendel, _BUENDEL_FELDER)
     referenzen = _aus_speicher(referenzen, SimOnlyReferenz, _REFERENZ_FELDER)
 
     geraet_je_sku: dict[str, tuple] = {}
@@ -334,7 +334,7 @@ def aufbereiten(
                 e["sku_id"], (e.get("device_id") or "", e.get("speicher_gb"))
             )
     geraete_tco_karten.ergaenze_geraete_aus_katalog(geraet_je_sku, buendel, katalog)
-
+    buendel = bereinigt(buendel, geraet_je_sku)
     tarife = tarife or {}
     for b in buendel:
         if isinstance(b, Buendel) and b.tarif_id:
