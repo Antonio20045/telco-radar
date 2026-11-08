@@ -1,12 +1,12 @@
 {
  "anbieter": "congstar-auto",
- "datum": "2026-11-07",
- "dauer_sekunden": 23.3,
+ "datum": "2026-11-08",
+ "dauer_sekunden": 43.2,
  "format": 1,
  "frischegrenze_tage": 3,
- "grund": "Gerät nicht mehr angeboten, Umleitung auf https://www.congstar.de/geraete/samsung/?redirectFrom=device-details",
+ "grund": null,
  "karte": "congstar.yaml",
- "laufstatus": "nicht_gelesen",
+ "laufstatus": "gelesen",
  "lesefrist_tage": 1,
  "name": "congstar",
  "seiten": [
@@ -19,16 +19,16 @@
    "kombinationen": [],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 29,
-    "beendet": 26,
+    "anfragen": 35,
+    "beendet": 33,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "www.congstar.de": 3
+     "cdn.congstar.de": 2
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 4.9,
-    "takte_ms": 2500,
+    "sekunden": 6.3,
+    "takte_ms": 3600,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -44,6 +44,376 @@
     "knoepfe_gesucht": 0
    },
    "verworfen": 2
+  },
+  {
+   "adresse": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/",
+   "geraet": "google-pixel-11-pro-fold",
+   "gescheitert": 0,
+   "grund": null,
+   "http_status": 200,
+   "kombinationen": [
+    {
+     "antwort_url": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=543",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "313d75708c3d05d95524fe70c59e1d264f951a243d6b781126a14a52932c06c9",
+      "seite": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=543",
+      "zeitpunkt": "2026-11-08T05:51:58Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "nachweise": {
+      "ratenplan": "[]"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat XS"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 119.0,
+      "rate": 49.0,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        15.0
+       ]
+      ],
+      "volumen_gb": 15.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=543&installmentPlanId=500",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat XS"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "3b680d7fddaee54d28f035a007cb933a5b734a8206e4a573b11cf1f921410fb3",
+      "seite": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=543&installmentPlanId=500",
+      "zeitpunkt": "2026-11-08T05:51:59Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "nachweise": {
+      "ratenplan": "[]"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat XS"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 119.0,
+      "rate": 73.5,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        15.0
+       ]
+      ],
+      "volumen_gb": 15.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=560&installmentPlanId=501",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "74e32b395ecefd7e8b7e718f7d83eb8160c16d5b323917e11d2c99ecbef45e2e",
+      "seite": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=560&installmentPlanId=501",
+      "zeitpunkt": "2026-11-08T05:52:01Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "nachweise": {
+      "ratenplan": "[]"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat S"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 119.0,
+      "rate": 47.0,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        20.0
+       ]
+      ],
+      "volumen_gb": 50.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=560&installmentPlanId=500",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat S"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "6e70d124d3c9d6761ab1a95df1a3cb3213746992d0e3e277fee3a16c6b0ec77b",
+      "seite": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=560&installmentPlanId=500",
+      "zeitpunkt": "2026-11-08T05:52:02Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "nachweise": {
+      "ratenplan": "[]"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat S"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 119.0,
+      "rate": 70.5,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        20.0
+       ]
+      ],
+      "volumen_gb": 50.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=540&installmentPlanId=501",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat M"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "0e8ff3f9a3efe4f1fb66679b6b6062de2cb3f0d334881dc80f60a4971a6b5c02",
+      "seite": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=540&installmentPlanId=501",
+      "zeitpunkt": "2026-11-08T05:52:03Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "nachweise": {
+      "ratenplan": "[]"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat M"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 119.0,
+      "rate": 44.0,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        25.0
+       ]
+      ],
+      "volumen_gb": 125.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=540&installmentPlanId=500",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat M"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "175af3d1761a8604bbbb1aa185c89974c1b5aee4deb8fa423870fc0690064a32",
+      "seite": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=540&installmentPlanId=500",
+      "zeitpunkt": "2026-11-08T05:52:04Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "nachweise": {
+      "ratenplan": "[]"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat M"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 119.0,
+      "rate": 66.0,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        25.0
+       ]
+      ],
+      "volumen_gb": 125.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=545&installmentPlanId=501",
+     "auswahl": {
+      "laufzeit": "36",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "2126268354a3c2b12bf73e3830aadda3f5a8194d219578fde8992c03a2066db9",
+      "seite": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=545&installmentPlanId=501",
+      "zeitpunkt": "2026-11-08T05:52:06Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "nachweise": {
+      "ratenplan": "[]"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 36,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat L"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 119.0,
+      "rate": 43.0,
+      "ratenzahl": 36,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        30.0
+       ]
+      ],
+      "volumen_gb": 200.0
+     }
+    },
+    {
+     "antwort_url": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=545&installmentPlanId=500",
+     "auswahl": {
+      "laufzeit": "24",
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat L"
+     },
+     "befunde": [],
+     "beleg": {
+      "beleg_id": "9039e68f37ceedaefa57182b990448f1c8592463c5e437c1935efb6ba0867e82",
+      "seite": "https://www.congstar.de/geraete/google/google-pixel-11-pro-fold/?planId=545&installmentPlanId=500",
+      "zeitpunkt": "2026-11-08T05:52:07Z"
+     },
+     "beleg_status": "offen",
+     "buendel": null,
+     "grund": null,
+     "luecken": [],
+     "nachweise": {
+      "ratenplan": "[]"
+     },
+     "status": "erfasst",
+     "variante": {
+      "laufzeit": 24,
+      "speicher": "256 GB",
+      "tarif": "Allnet Flat L"
+     },
+     "werte": {
+      "anschluss": 15.0,
+      "anzahlung": 119.0,
+      "rate": 64.5,
+      "ratenzahl": 24,
+      "tarifbindung": 24,
+      "tarifphasen": [
+       [
+        1,
+        null,
+        30.0
+       ]
+      ],
+      "volumen_gb": 200.0
+     }
+    }
+   ],
+   "ladung": {
+    "abstand_s": 2.0,
+    "anfragen": 62,
+    "beendet": 62,
+    "dokument": "complete",
+    "geladen": true,
+    "offen": {},
+    "ohne_antwort_ms": 0,
+    "sekunden": 4.8,
+    "takte_ms": 3300,
+    "wartet_auf": "load"
+   },
+   "speicher_gb": 256,
+   "sperre": null,
+   "status": "gelesen",
+   "stoerung": null,
+   "struktur": {
+    "anteil_felder": 1.0,
+    "anteil_knoepfe": 1.0,
+    "felder_gefunden": 56,
+    "felder_gesucht": 56,
+    "knoepfe_gefunden": 51,
+    "knoepfe_gesucht": 51
+   },
+   "verworfen": 2
   }
  ],
  "ueberfaellig": [
@@ -51,5 +421,5 @@
  ],
  "uebersichten": [],
  "vertragsform": "tarif_plus_ratenkauf",
- "zeitbudget_sekunden": 10267
+ "zeitbudget_sekunden": 10245
 }
