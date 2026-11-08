@@ -69,7 +69,7 @@
    .html.j2` (alle übrigen Modelle, siehe den Kommentar an `#gr-buendel`).
    E3-Fix (QA 17.09.2026): der G0-Block des Verlaufs-Reiters ist GEFALLEN
    (Doppel-Darstellung zur eigenen Geräteauswahl, §4.6/§4.8). #}
-{% from "_geraete_buendel.html.j2" import belegeintrag, belegpaare, fehlzeile %}
+{% from "_geraete_buendel.html.j2" import belegpaare, fehlzeile %}
 {% from "_geraete_zeitreihe.html.j2" import paarblock %}
 {# E3 Schritt 2: die Radar-Tafel - `with context`, weil das Makro den
    `prefix` der Seite für den Tarifübersichts-Link braucht. P4/2a dazu:
@@ -319,10 +319,6 @@
   <section class="gr-buendel" id="gr-buendel" aria-label="Fehlende Anbieter">
     <div id="gr-bnd-gruppe">{% if m and m.fehlzeilen %}<div class="gr-anb-fehlliste">{% for f in m.fehlzeilen
       %}{{ fehlzeile(f) }}{% endfor %}</div>{% endif %}{% if m %}{{ belegpaare(m) }}{% endif %}</div>
-  {# Ziel 1d: Paare zählen, keine Preise - `geraete_belege.quote` (Python). #}
-  {% if belegquote is defined %}{% set bq = belegquote(geraete.tco.modelle) %}{% if bq.satz %}
-  <p class="gr-belegquote" id="gr-belegquote">{{ bq.satz }}</p>
-  {% endif %}{% endif %}
   {# Ziel 1b: warum ein Anbieter nicht jede Tarifstufe füllt (`geraete_stufen`). #}
   <p class="gr-belegquote" id="gr-tarifstufen-regel">{{
   geraete.tco.tarifstufen_regel }}</p>
@@ -857,7 +853,6 @@
             class="gr-a-quelle" href="{{ m.buendel_beleg.quelle_url }}" rel="noopener"
             title="Bündel beim Anbieter öffnen">Beleg<span class="gr-a-pfeil"
             aria-hidden="true">↗</span></a>{% endif %}{% if m.buendel_tarif %} · {{ m.buendel_tarif }}{% endif %}</span>
-          {{ belegeintrag(m.schluessel, m.buendel_anbieter) }}
           {%- else %}<span class="gr-a-klein">kein Preis gemessen</span>
           {%- endif %}</td>
         {# Haendler: die ZAHL fuehrt (sortierbar nach Anzahl), die Namen
@@ -899,7 +894,6 @@
           {% if m.tco_band_label %}<span class="gr-a-klein gr-k-tarif">Tarif {{ m.tco_band_label }}</span>{% endif %}
           {% if m.tco_beleg and m.tco_beleg.abgerufen_am %} <span
             class="gr-a-klein gr-a-datum">{{ m.tco_beleg.abgerufen_am | date_de }}</span>{% endif %}
-          {{ belegeintrag(m.schluessel, m.tco_anbieter) }}
           {%- else %}<span class="gr-a-klein">{{ m.tco_leer }}</span>{%- endif %}</td>
         <td class="num gr-sp--tco" data-k="{{ spalten.monat }}">{% if m.tco_monat is not none %}{{
           m.tco_monat | euro }}{% else %}–{% endif %}</td>
