@@ -31,9 +31,12 @@ from telco_radar.collect.geraete.klickbeleg import baue_beleg
 from telco_radar.collect.geraete.klickbildfolge import (
     HOECHSTE_BREITE,
     HOECHSTE_HOEHE,
+    PREIS,
     SCHRITTE,
+    TEXT_OHNE_BETRAG,
     Folgebild,
     lies_folge,
+    schritttext,
     umfang,
 )
 from telco_radar.collect.geraete.klickcrawler import klicke_durch
@@ -48,8 +51,14 @@ from telco_radar.collect.geraete.klicklauf import (
     Klicklauf,
     Kombiergebnis,
 )
+from telco_radar.collect.geraete.klicktext import (
+    Buendelwerte,
+    Preiswerte,
+    betraege_im_text,
+)
 from telco_radar.collect.geraete.klicktor import Hostschleuse
 from telco_radar.collect.geraete.robots import RobotsWaechter
+from telco_radar.tarif_model import Preisphase
 
 FIXTURES = Path(__file__).parent / "fixtures" / "klickcrawler"
 PRODUKTPFAD = "/handy/beispielhandy-x"
@@ -308,3 +317,87 @@ def test_aufbewahrung_loescht_die_bilder_der_folge_mit_ihrem_beleg():
     namen = {d.rsplit("/", 1)[1] for d in entscheidung.dateien}
     assert {b.datei for b in fertig.beleg.bildfolge} <= namen
     assert len(namen) == 5
+
+
+TELEKOM_BILD = (
+    "EINMALIGE\nZAHLUNG\n138,95 €\ninkl. Bereitstellung\n39,95 €\n"
+    "GESAMTPREIS\nMONATLICH\n76,85 €\nMonatlich\nPreisübersicht anzeigen"
+)
+GERAET_BILD = "Anzahlung 99,00 €\nMonatsrate 26,90 € x 36\nTarif 49,95 €"
+BUENDEL_BILD = "Einmalig 49,00 €\nMonatlich 44,99 €"
+GERAET = Preiswerte(
+    anzahlung=99.0,
+    rate=26.9,
+    ratenzahl=36,
+    anschluss=39.95,
+    tarifphasen=(Preisphase(1, None, 49.95),),
+)
+VARIANTE = Variante("256 GB", "M", 36)
+PREISBILD_FAELLE = {
+    "summe": (GERAET, None, TELEKOM_BILD),
+    "geraet": (GERAET, None, GERAET_BILD),
+    "buendel": (Preiswerte(), Buendelwerte(44.99, 49.0), BUENDEL_BILD),
+    "nur_monat": (GERAET, None, "Gesamtpreis monatlich 76,85 €"),
+    "ohne_betrag": (GERAET, None, "Preis wird berechnet"),
+    "ohne_text": (GERAET, None, None),
+}
+
+
+def _preistext(werte, buendel, bildtext):
+    return schritttext(PREIS, VARIANTE, None, werte, buendel, bildtext)
+
+
+def test_preistext_nennt_die_summe_die_das_bild_zeigt_nicht_die_geraetewerte():
+    text = _preistext(GERAET, None, TELEKOM_BILD)
+
+    assert text == (
+        "Im Bild: einmalig 138,95 € · monatlich 76,85 € (Gerät und Tarif zusammen)"
+    )
+    assert "26,90" not in text
+    assert "99,00" not in text
+
+
+def test_preistext_nennt_geraetewerte_wenn_das_bild_sie_zeigt():
+    text = _preistext(GERAET, None, GERAET_BILD)
+
+    assert text == "Im Bild: Zuzahlung 99,00 € · Monatsrate 26,90 € × 36"
+
+
+def test_preistext_haengt_die_ratenzahl_nur_an_die_gezeigte_monatsrate():
+    text = _preistext(GERAET, None, "Anzahlung 99,00 €\n36 Raten")
+
+    assert text == "Im Bild: Zuzahlung 99,00 €"
+
+
+def test_preistext_nennt_buendelwerte_als_summe():
+    text = _preistext(Preiswerte(), Buendelwerte(44.99, 49.0), BUENDEL_BILD)
+
+    assert text == (
+        "Im Bild: einmalig 49,00 € · monatlich 44,99 € (Gerät und Tarif zusammen)"
+    )
+
+
+def test_preistext_ohne_sichere_betraege_nennt_keine_zahl():
+    for bildtext in (None, "", "Preis wird berechnet"):
+        assert _preistext(GERAET, None, bildtext) == TEXT_OHNE_BETRAG
+    assert not betraege_im_text(TEXT_OHNE_BETRAG)
+
+
+@pytest.mark.parametrize("fall", PREISBILD_FAELLE)
+def test_jeder_betrag_im_preistext_steht_im_bild(fall):
+    werte, buendel, bildtext = PREISBILD_FAELLE[fall]
+
+    text = _preistext(werte, buendel, bildtext)
+
+    assert betraege_im_text(text) <= betraege_im_text(bildtext or "")
+    assert text.startswith("Im Bild: ") or text == TEXT_OHNE_BETRAG
+
+
+def test_preistext_der_position_stimmt_mit_dem_text_des_bildes(chromium):
+    lauf, _, _ = _laufe(chromium, karte=_karte(), hoechste=1)
+    ergebnis = lauf.ergebnisse[0]
+    preis = {b.schritt: b.text for b in ergebnis.beleg.beleg.bildfolge}["preis"]
+
+    assert preis.startswith("Im Bild: ")
+    assert betraege_im_text(preis)
+    assert betraege_im_text(preis) <= betraege_im_text(ergebnis.text)

@@ -31,8 +31,6 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from playwright.sync_api import Error as PlaywrightFehler
-
 from .klickbeleg import Belegquelle, baue_beleg
 from .klickbildleser import Bildleser
 from .klickecho import (
@@ -73,10 +71,9 @@ from .klicklauf import (
 from .klickoptionen import Option, angebotene_werte, lies_optionen
 from .klickquellen import Quellenleser, Quellenlesung
 from .klicktext import Preiswerte
-from .klicktor import kurz
 
 if TYPE_CHECKING:
-    from playwright.sync_api import Locator, Page
+    from playwright.sync_api import Page
 
     from .klickantwort import Antwortlesung
     from .klickwache import Wache
@@ -381,12 +378,6 @@ class Leser(Bildleser):
     def _gewaehlt(self, dimension: str) -> str | None:
         gewaehlt = [o.wert for o in self.optionen(dimension) if o.gewaehlt]
         return gewaehlt[0] if len(gewaehlt) == 1 else None
-
-    def _screenshot(self, bereich: Locator) -> tuple[bytes | None, tuple[Befund, ...]]:
-        try:
-            return bereich.screenshot(type="png", timeout=self.frist_ms), ()
-        except PlaywrightFehler as fehler:
-            return None, (Befund("screenshot", f"Screenshot fehlt: {kurz(fehler)}"),)
 
 
 def _pfad(pfad: str | Wertpfad) -> str:

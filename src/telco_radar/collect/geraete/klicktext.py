@@ -109,6 +109,12 @@ def nennt_betrag(text: str) -> bool:
     return _BETRAG_RE.search(zahlen_ohne_leerraum(text)) is not None
 
 
+def betraege_im_text(text: str) -> frozenset[int]:
+    """Alle Beträge mit €, EUR oder Euro im ``text``, in Cent."""
+    funde = (zahl(t[1]) for t in _BETRAG_RE.finditer(zahlen_ohne_leerraum(text)))
+    return frozenset(round(b * 100) for b in funde if b is not None)
+
+
 def lies_zusammenfassung(text: str) -> Preiswerte:
     """Liest die Werte aus dem sichtbaren Text der Preiszusammenfassung."""
     text = zahlen_ohne_leerraum(text)

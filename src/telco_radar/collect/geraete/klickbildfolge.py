@@ -22,6 +22,7 @@ Ausschnitt höchstens ``HOECHSTE_BREITE`` × ``HOECHSTE_HOEHE`` Pixel, Datei hö
 
 from __future__ import annotations
 
+import re
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
@@ -32,7 +33,7 @@ from .klickecho import Variante
 from .klickkarte import DIMENSIONEN, Klickkarte
 from .klickkartenteile import BILDFOLGE_SCHRITTE
 from .klickoptionen import lies_optionen
-from .klicktext import Buendelwerte, Preiswerte
+from .klicktext import Buendelwerte, Preiswerte, betraege_im_text
 from .klicktor import kurz
 
 if TYPE_CHECKING:
@@ -54,6 +55,7 @@ GRUND_NICHT_AUFGENOMMEN = "nicht aufgenommen"
 GRUND_OHNE_KNOPF = "Dimension ohne Knopf und ohne Selektor in der Karte"
 GRUND_KACHEL = "Option ist eine Kachel ohne Markierung"
 GRUND_UNSICHTBAR = "Optionen nicht sichtbar"
+TEXT_OHNE_BETRAG = "Preisbereich der Anbieterseite nach der Wahl"
 
 
 @dataclass(frozen=True)
@@ -170,6 +172,7 @@ def schritttext(
     modell: str | None = None,
     werte: Preiswerte | None = None,
     buendel: Buendelwerte | None = None,
+    bildtext: str | None = None,
 ) -> str:
     """Was der Schritt zeigt, als Satz für die Seite; aus der Variante, nie geraten."""
     if schritt == GERAET_SPEICHER:
@@ -179,11 +182,70 @@ def schritttext(
         return f"Tarif gewählt: {variante.tarif}"
     if schritt == LAUFZEIT:
         return f"Laufzeit und Raten gewählt: {variante.laufzeit} Monate"
-    werte = werte or Preiswerte()
+    return preistext(werte or Preiswerte(), buendel, bildtext)
+
+
+def preistext(
+    werte: Preiswerte, buendel: Buendelwerte | None, bildtext: str | None
+) -> str:
+    """Die Beträge, die im Bild des Preisbereichs stehen, mit ihrer Bedeutung.
+
+    Gelesen sind Zuzahlung und Monatsrate des Geräts, bei Bündeln Einmalzahlung und
+    Monatsbetrag. Zeigt die Seite stattdessen die Summe aus Gerät und Tarif (Zuzahlung
+    plus Anschluss, Rate plus erster Tarifpreis), nennt der Text sie. Ein Betrag steht
+    nur im Text, wenn ``bildtext`` (der sichtbare Text des Bildes) ihn enthält; ist
+    keiner sicher, nennt der Text keine Zahl.
+    """
+    gezeigt = betraege_im_text(bildtext or "")
+    zusammen = _gezeigt(
+        gezeigt,
+        ("einmalig", _einmalig(werte, buendel)),
+        ("monatlich", _monatlich(werte, buendel)),
+    )
+    geraet = _gezeigt(
+        gezeigt,
+        ("Zuzahlung", werte.anzahlung),
+        ("Monatsrate", werte.rate),
+    )
+    if geraet and geraet[-1].startswith("Monatsrate") and werte.ratenzahl is not None:
+        raten = rf"(?:[x×]\s*{werte.ratenzahl}\b|\b{werte.ratenzahl}\s*Raten\b)"
+        if re.search(raten, bildtext or ""):
+            geraet[-1] += f" × {werte.ratenzahl}"
+    teile = []
+    if zusammen:
+        teile.append(" · ".join(zusammen) + " (Gerät und Tarif zusammen)")
+    teile.extend(geraet)
+    if not teile:
+        return TEXT_OHNE_BETRAG
+    return "Im Bild: " + " · ".join(teile)
+
+
+def _gezeigt(gezeigt: frozenset[int], *posten: tuple[str, float | None]) -> list[str]:
+    """``Name Betrag`` je Posten, dessen Betrag im Bild steht."""
+    return [
+        f"{name} {euro(betrag)}"
+        for name, betrag in posten
+        if betrag is not None and round(betrag * 100) in gezeigt
+    ]
+
+
+def _plus(*summanden: float | None) -> float | None:
+    """Die Summe; ``None``, sobald ein Summand nicht gelesen ist."""
+    if any(s is None for s in summanden):
+        return None
+    return sum(s for s in summanden if s is not None)
+
+
+def _einmalig(werte: Preiswerte, buendel: Buendelwerte | None) -> float | None:
+    """Einmalbetrag von Gerät und Tarif: Bündelwert, sonst Zuzahlung plus Anschluss."""
+    if buendel is not None and buendel.einmalzahlung is not None:
+        return buendel.einmalzahlung
+    return _plus(werte.anzahlung, werte.anschluss)
+
+
+def _monatlich(werte: Preiswerte, buendel: Buendelwerte | None) -> float | None:
+    """Monatsbetrag von Gerät und Tarif: Bündelwert, sonst Rate plus Tarifpreis."""
     if buendel is not None and buendel.buendelbetrag is not None:
-        return (
-            f"Einmalzahlung {euro(buendel.einmalzahlung)} · "
-            f"Monatsbetrag {euro(buendel.buendelbetrag)}"
-        )
-    raten = "" if werte.ratenzahl is None else f" × {werte.ratenzahl}"
-    return f"Zuzahlung {euro(werte.anzahlung)} · Monatsrate {euro(werte.rate)}{raten}"
+        return buendel.buendelbetrag
+    erste = [p.betrag for p in werte.tarifphasen or () if p.von_monat == 1]
+    return _plus(werte.rate, erste[0] if erste else None)

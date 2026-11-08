@@ -163,6 +163,7 @@ class Belegquelle:
     folge: Mapping[str, Folgebild] = field(default_factory=dict)
     folge_fehlt: Mapping[str, str] = field(default_factory=dict)
     modell: str | None = None
+    bildtext: str | None = None
 
 
 def baue_beleg(
@@ -238,7 +239,9 @@ def bildfolge(
         schritte.append(Bildschritt(name, schritt, text, sha256(daten), len(daten)))
         dateien[name] = daten
     daten, typ = preisbild
-    text = schritttext(PREIS, quelle.variante, None, quelle.werte, quelle.buendel)
+    text = schritttext(
+        PREIS, quelle.variante, None, quelle.werte, quelle.buendel, quelle.bildtext
+    )
     name = f"{kennung}.{ENDUNG[typ]}"
     schritte.append(Bildschritt(name, PREIS, text, sha256(daten), len(daten)))
     ordnung = {s: n for n, s in enumerate(SCHRITTE)}
