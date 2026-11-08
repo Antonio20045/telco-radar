@@ -6367,6 +6367,7 @@ a.ki-k1-pille:hover{border-color:var(--ink)}
 .gr-pp-ohne small{font-size:13px;font-weight:400}
 .gr-pp-ohne small::before{content:" · "}
 .gr-pp-einheit{margin:6px 0 10px;font:400 13px var(--sans);color:var(--ink-3)}
+.gr-pp-regel{margin:0 0 10px;font:400 13px var(--sans);color:var(--ink-3)}
 .gr-pp-bild{width:100%}
 .gr-pp-schmal{display:none}
 .gr-pp-svg{display:block;width:100%;height:auto;overflow:visible;font-family:var(--sans)}
