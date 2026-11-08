@@ -20,6 +20,19 @@
 # - Zubuchoptionen Onlineschutz und Connect-Option (B2 El. 42–55, B1 El. 38–41): nie geklickt.
 anbieter: o2
 
+# Schritt 4a „Eine Methode“: was bisher im Python je Anbieter stand (klickratenplan,
+# klick_tarifslug). Ohne diese Felder gibt es keine Ratenphase und keinen Slug.
+ratenplan:
+  # Ratenzahl im Tarifcode der Antwortadresse („…-hwv-36m-05-00“) zusammen mit dem Satz
+  # des Ratenplan-Hinweises (antwort.pfade.ratenplan) bindet den Tarifpreis an die Raten.
+  art: tarifcode
+  teil: tariff
+  muster: '-hwv-(\d+)m-'
+tarifslug:
+  # Der Tarifname ohne Leistungszusatz ist der Angebots-Slug, den die Seite selbst bestellt.
+  art: name
+  beleglink: konfiguration
+
 knoepfe:
   speicher:
     # Ursache-Probe 04.11.2026 (arbeit/o2-klick-0411/ursache.md): alle Radios tragen

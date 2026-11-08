@@ -17,6 +17,17 @@
 #   Zahlweisen ohne Rückgabe (subtype UNSPECIFIED).
 anbieter: congstar
 
+# Schritt 4a „Eine Methode“: was bisher im Python je Anbieter stand (klickratenplan,
+# klick_tarifslug). Ohne diese Felder gibt es keine Ratenphase und keinen Slug.
+ratenplan:
+  # prices.recurring.discounts (antwort.pfade.ratenplan) leer: keine Rabattphase.
+  art: ohne_rabattphase
+  nachweis: '[]'
+tarifslug:
+  # planId der Seitenadresse ist die Nummer des Pflichtblatts.
+  art: seitenparameter
+  parameter: planId
+
 knoepfe:
   speicher:
     # button role=radio, aria-label „512 GB“ (B1 El. 73; B2 El. 75/76). Ein Klick ändert nur die

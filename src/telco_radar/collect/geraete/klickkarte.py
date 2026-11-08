@@ -138,6 +138,21 @@ Stufe 4 von Format 2 (1&1, Erkundung 07.10.2026, Commit c8ce1f77, Seiten 3 und 4
   wie auf einer Startseite) und liest nach jedem Klick Quellen und Zusammenfassung neu
   (``klickfolgeklick``). Genau eins von ``kacheln`` und ``klicken``.
 
+Stufe 5 von Format 2 (Schritt 4a „Eine Methode“, o2 und congstar): anbieterbezogene
+Regeln der Auswertung stehen in der Karte, nicht im Python (``klickregeln``). Fehlt das
+Feld, gibt es keine Phase und keinen Slug (benannte Lücke), nie eine geratene Zahl.
+
+- ``ratenplan: {art, …}``: wie der Tarifpreis an die Ratenlaufzeit gebunden wird
+  (``klickratenplan``). ``art: tarifcode`` (o2) mit ``teil`` der Konfiguration in der
+  Antwortadresse und ``muster`` (erste Gruppe: die Ratenzahl); ``art:
+  ohne_rabattphase`` (congstar) mit ``nachweis``: dem Wortlaut des Nachweises
+  ``ratenplan``, der keine Rabattphase bedeutet.
+- ``tarifslug: {art, parameter, beleglink}``: woher der Tarif-Slug des Klick-Satzes
+  kommt (``analyze.klick_tarifslug``). ``art: name`` (o2): der Tarifname ohne
+  Leistungszusatz; ``art: seitenparameter`` (congstar) mit ``parameter``: die Zahl in
+  diesem Parameter der Seitenadresse. ``beleglink: konfiguration`` (o2): der Beleglink
+  trägt Tarif und Ratenzahl der Zeile.
+
 Selektoren der Klickziele sind Playwright-Selektoren (``:text-matches`` und
 ``:has-text`` gehen); ``passt``, ``bis`` und ``wert_in`` sind reines CSS.
 """
@@ -149,6 +164,7 @@ from pathlib import Path
 import yaml
 
 from .klickkartenleser import Kartenleser
+from .klickkartenteile import Ratenplanregel, Tarifslugregel
 from .klickkartentypen import (
     BUENDELFELDER,
     DIMENSIONEN,
@@ -213,7 +229,9 @@ __all__ = [
     "Klickkarte",
     "Knopf",
     "Phasenpfad",
+    "Ratenplanregel",
     "Seitenwert",
+    "Tarifslugregel",
     "Textlesung",
     "Textmuster",
     "Vorbereitung",
@@ -233,6 +251,8 @@ KOPFFELDER = (
     "seite",
     "vertragsform",
     "weiter",
+    "ratenplan",
+    "tarifslug",
 )
 
 
@@ -286,4 +306,6 @@ def klickkarte_aus_daten(roh: object, quelle: str) -> Klickkarte:
         seite=seite,
         vertragsform=vertragsform,
         weiter=leser.weiter(roh_weiter, knoepfe, textlesung),
+        ratenplan=leser.ratenplan(daten.get("ratenplan")),
+        tarifslug=leser.tarifslug(daten.get("tarifslug")),
     )
