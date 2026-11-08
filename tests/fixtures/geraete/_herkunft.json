@@ -901,6 +901,58 @@
       "gzip": false,
       "absender": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)",
       "bytes_abgelegt": 4268
+    },
+    {
+      "datei": "telekom_produktseite_duo_512gb_xs_20261108.html.gz",
+      "url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-512-gb?tariffId=MF_17779",
+      "abgerufen_am": "2026-11-08",
+      "http_status": 200,
+      "content_type": "text/html; charset=UTF-8",
+      "bytes_roh": 2343144,
+      "sha256_roh": "75965e4ed682a59deeab60fa61ecca9df8505dd77150aa4be2ef37aedfd1b9c3",
+      "gzip": true,
+      "absender": "TelcoRadar/1.0",
+      "bytes_abgelegt": 512763,
+      "hinweis": "B-TELEKOM-PRODUKTSEITE: Apple iPhone Duo 512 GB Nachthimmel, MagentaMobil XS (tariffId=MF_17779). productDetailed.productDetailsData.totalPrices und installmentConfiguratorItems tragen alle Ratenplaene inkl. 24 Monate; productDetailsData.tariff die typisierten Tarifpreise."
+    },
+    {
+      "datei": "telekom_produktseite_duo_1tb_xs_20261108.html.gz",
+      "url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-1-tb?tariffId=MF_17779",
+      "abgerufen_am": "2026-11-08",
+      "http_status": 200,
+      "content_type": "text/html; charset=UTF-8",
+      "bytes_roh": 2343257,
+      "sha256_roh": "9b8dadf5522b8e617a2a367fd00c0463adebad41115f4606c13211be5b6d477f",
+      "gzip": true,
+      "absender": "TelcoRadar/1.0",
+      "bytes_abgelegt": 512732,
+      "hinweis": "B-TELEKOM-PRODUKTSEITE: Apple iPhone Duo 1 TB Nachthimmel, MagentaMobil XS. Variantenslug am 08.11.2026 real abgerufen (HTTP 200, productId identisch mit der 512-GB-Seite, totalPrices gefuellt) - nicht geraten."
+    },
+    {
+      "datei": "telekom_produktseite_duo_512gb_s_20261108.html.gz",
+      "url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-512-gb?tariffId=MF_17785",
+      "abgerufen_am": "2026-11-08",
+      "http_status": 200,
+      "content_type": "text/html; charset=UTF-8",
+      "bytes_roh": 2344247,
+      "sha256_roh": "9c57c7dd9c8ad5431d9664bfdb4c6c4f4ad830086ca51226f7f447623d95c515",
+      "gzip": true,
+      "absender": "TelcoRadar/1.0",
+      "bytes_abgelegt": 512903,
+      "hinweis": "B-TELEKOM-PRODUKTSEITE: dieselbe Variante wie oben, MagentaMobil S (tariffId=MF_17785) - Beleg, dass installmentConfiguratorItems tarifunabhaengig ist, waehrend productDetailsData.tariff je Tarif eigene Preise traegt."
+    },
+    {
+      "datei": "telekom_produktseite_duo_1tb_s_20261108.html.gz",
+      "url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-duo/nachthimmel-1-tb?tariffId=MF_17785",
+      "abgerufen_am": "2026-11-08",
+      "http_status": 200,
+      "content_type": "text/html; charset=UTF-8",
+      "bytes_roh": 2344374,
+      "sha256_roh": "3cc9fb016acbd53bba15e7f1d6f1cb4d2e6feaf21acce392c29069062665836d",
+      "gzip": true,
+      "absender": "TelcoRadar/1.0",
+      "bytes_abgelegt": 512846,
+      "hinweis": "B-TELEKOM-PRODUKTSEITE: Apple iPhone Duo 1 TB Nachthimmel, MagentaMobil S."
     }
   ]
 }

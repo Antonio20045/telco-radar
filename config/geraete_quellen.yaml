@@ -636,6 +636,25 @@ anbieter:
       - url: https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17803
         label: Bündel MagentaMobil XL
         kind: buendel
+    # B-TELEKOM-PRODUKTSEITE (08.11.2026, arbeit/telekom-produktseite-0811.md):
+    # Zusatz-Lesepfad über `telekom_zusatz.vertiefe_buendel` - je Tarif-Einstieg
+    # oben wird NUR abgerufen, was im Bestseller-Karussell dieses Tarifs fehlt
+    # (gemessen: Apple iPhone Duo 512 GB/1 TB/2 TB, am 08.11.2026 12 fehlende
+    # Zellen bei MagentaMobil XS/S/M/XL - MagentaMobil L zeigte an diesem Tag
+    # schon alle vier Speicherstufen und bleibt deshalb ohne Zusatzabruf). Jede
+    # Adresse ist real geprüft (HTTP 200, productId identisch mit der 512-GB-
+    # Seite, totalPrices gefüllt) - nicht geraten.
+    zusatz_varianten:
+      - marke: apple
+        produkt_slug: apple-iphone-duo
+        produkt_name: Apple iPhone Duo
+        varianten:
+          - variante_slug: nachthimmel-512-gb
+            speicher_gb: 512
+          - variante_slug: nachthimmel-1-tb
+            speicher_gb: 1024
+          - variante_slug: nachthimmel-2-tb
+            speicher_gb: 2048
 
   - name: Vodafone
     typ: netzbetreiber
