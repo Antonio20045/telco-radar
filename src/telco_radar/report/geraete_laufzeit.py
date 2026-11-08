@@ -64,6 +64,34 @@ REGEL_24_PLUS_12 = (
 )
 
 
+def ist_24_plus_12(buendel_monatlich: float | None, raten_laufzeit: int | None) -> bool:
+    """Die EINE Regel „Vertrag über mehr als 24 Monate, gerechnet bis zur Ablöse“.
+
+    Ein Betrag für Tarif und Gerät zusammen, belegt für mehr als 24 Monate: die Summe
+    trägt 24 Beträge und die Einmalzahlung bei Kündigung, keine Geräteraten
+    (`tco_kosten._mit_abloese`). Jeder Leser fragt hier, nie am Anbieternamen.
+    """
+    return buendel_monatlich is not None and (raten_laufzeit or 0) > TCO_HORIZONT
+
+
+def raten_text(karte: dict) -> str | None:
+    """Das Ratenwort neben dem Tarif: nennt nur, was die Summe der Zeile trägt.
+
+    „36 Raten“ steht nur, wo 36 Geräteraten in der Summe stecken. Ein 24+12-Vertrag
+    (`ist_24_plus_12`) heißt „24 Monate + Ablöse“, denn seine 36 sind die Laufzeit des
+    Vertrags, keine Raten. Dieselbe Angabe liest die Zeile und die Beschriftung des
+    Zeilenbilds; sie wird an der Karte gebildet, bevor `preis_anzeige` den Preis leert
+    (`setze_ansicht`).
+    """
+    laufzeit = karte.get("raten_laufzeit")
+    buendel = karte.get("buendel_monatlich")
+    if not laufzeit:
+        return None
+    if ist_24_plus_12(buendel, laufzeit):
+        return f"{TCO_HORIZONT} Monate + Ablöse"
+    return f"{laufzeit} {'Raten' if buendel is None else 'Monatsraten'}"
+
+
 def nur_ueber_24(karte: dict) -> bool:
     """Ein Betrag für Tarif und Gerät (1&1) über mehr als 24 Monate.
 
@@ -72,10 +100,7 @@ def nur_ueber_24(karte: dict) -> bool:
     Also steht 1&1 in der 24er-Ansicht mit 24 Bündelbeträgen plus Ablöse
     (`tco_kosten.zeitraum`), ausgewiesen als gerechnet (`REGEL_24_PLUS_12`).
     """
-    return (
-        karte.get("buendel_monatlich") is not None
-        and (karte.get("raten_laufzeit") or 0) > TCO_HORIZONT
-    )
+    return ist_24_plus_12(karte.get("buendel_monatlich"), karte.get("raten_laufzeit"))
 
 
 def regel_satz(karten) -> str:
@@ -112,7 +137,8 @@ def ansicht(karte: dict) -> int | None:
 
 
 def setze_ansicht(karten: list) -> None:
-    """Unter welcher Wahl des Umschalters jede Zeile steht (`laufzeit_sichtbar`).
+    """Unter welcher Wahl des Umschalters jede Zeile steht (`laufzeit_sichtbar`),
+    dazu ihr Ratenwort (`raten_text`, `raten_24_plus_12`).
 
     Genau unter ihrer eigenen Ansicht: eine Zeile mit 36 Raten steht nie unter
     „24 Monate“, auch nicht als nächstgelegene (Regel 5). Eine Zeile ohne
@@ -121,6 +147,8 @@ def setze_ansicht(karten: list) -> None:
     for k in karten:
         laufzeit = ansicht(k)
         k["laufzeit_sichtbar"] = ALLE if laufzeit is None else str(laufzeit)
+        k["raten_text"] = raten_text(k)
+        k["raten_24_plus_12"] = nur_ueber_24(k)
 
 
 def export_je_laufzeit(export: dict) -> dict:

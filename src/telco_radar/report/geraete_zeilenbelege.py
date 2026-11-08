@@ -186,7 +186,7 @@ def ergaenze_paare(
                 {
                     "geraet": karte.get("geraet"),
                     "tarif": karte.get("tarif"),
-                    "raten_laufzeit": karte.get("raten_laufzeit"),
+                    "raten_text": karte.get("raten_text"),
                     "label": karte.get("label"),
                     "gesamt": karte.get("gesamt"),
                     "kombi": kombi(karte),
