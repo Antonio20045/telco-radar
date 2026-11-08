@@ -35,6 +35,7 @@ pflicht_modelle:
   - apple-iphone-17-pro
   - apple-iphone-17-pro-max
   - apple-iphone-17e
+  - apple-iphone-duo
   - apple-iphone-air
   - samsung-galaxy-s26
   - samsung-galaxy-s26-plus
@@ -182,5 +183,20 @@ belegte_luecken:
     art: nicht_im_portfolio
     beleg: https://github.com/Antonio20045/telco-radar/blob/main/docs/belege/o2-speicher-0811/7-pixel11proxl-512gb-nicht-waehlbar.png
     original: https://www.o2online.de/e-shop/google/google-pixel-11-pro-xl-details?tarif=o2-mobile-m&ratenzahlung=24&zielgruppe=privatkunden
+    geprueft: "2026-11-08"
+    bis: "2026-11-22"
+  # congstar: Apple iPhone Duo ist nicht in der Geräteliste. Belegt (08.11.2026,
+  # docs/belege/congstar-duo-0811/): die Einzelseite /geraete/apple/apple-iphone-duo/
+  # antwortet HTTP 200, trägt aber <title>Error 404</title> (Soft-404, curl,
+  # TelcoRadar/1.0). Maßgeblich ist die Geräteliste: die Apple-Übersicht (1,
+  # Screenshot) nennt kein „Duo“, die Sitemap sitemap/devices.xml (2) führt nur
+  # 14/15-refurbished, 16, 17, 17e, 18 Pro, 18 Pro Max, Air - kein Duo.
+  - anbieter: congstar
+    modelle:
+      - apple-iphone-duo
+    grund: Gerät ist nicht in der Geräteliste (Apple-Übersicht) und nicht in der Sitemap; die Einzelseite antwortet HTTP 200 mit Error-404-Inhalt (Soft-404)
+    art: nicht_im_portfolio
+    beleg: https://github.com/Antonio20045/telco-radar/blob/main/docs/belege/congstar-duo-0811/1-apple-uebersicht-ohne-duo.png
+    original: https://www.congstar.de/geraete/apple/apple-iphone-duo/
     geprueft: "2026-11-08"
     bis: "2026-11-22"

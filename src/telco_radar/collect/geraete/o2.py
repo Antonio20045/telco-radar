@@ -619,7 +619,7 @@ def _folgeseiten(hole, weiter, z: dict, seite: dict, art: str) -> list:
 
 
 def vertiefe_buendel(
-    hole, rohsaetze: list, weiter=None, zaehler: Optional[dict] = None
+    hole, rohsaetze: list, weiter=None, zaehler: Optional[dict] = None, zusatz=None
 ) -> list[dict]:
     """Je Katalogbuendel alle Speicher x Laufzeiten x Tarife als Rohsaetze.
 
