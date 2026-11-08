@@ -273,17 +273,19 @@ def test_zwei_farben_derselben_laufzeit_bleiben_eine_zeile():
     assert len(cs) == 1, "zwei Farben sind EIN Angebot"
 
 
-def test_ein_buendelmonatspreis_ueber_36_monate_traegt_keine_24_monats_zahl():
-    """Preisprüfung 02.11.2026: „24 + 12“ von 1&1 ist keine 24-Monats-
-    Finanzierung. Statt 24 × 42,99 + 340,00 Ablöse + 39,90 = 1.411,66 EUR steht
-    die benannte Lücke, kein Preis und kein Δ."""
+def test_ein_buendelmonatspreis_ueber_36_monate_zaehlt_24_monate_und_abloese():
+    """Manager, 05.11.2026: 1&1 wird nur über 24 Monate verglichen. 24 × 42,99 +
+    340,00 Ablöse + 39,90 = 1.411,66 EUR „Kosten über 24 Monate“, nicht mehr
+    340,00 + 36 × 42,99 + 39,90 = 1.927,54 EUR über 36 Monate."""
     modell = _modell([_einsundeins(), _vodafone()])
     eins = next(k for k in modell["karten"] if k["anbieter"] == "1&1")
-    assert not eins["belastbar"] and eins["gesamt"] is None
-    assert any("24 + 12" in x for x in eins["luecken"]), eins["luecken"]
+    assert eins["belastbar"] and eins["gesamt"] == 1411.66
+    assert eins["leitzahl_monate"] == 24
+    assert eins["label"] == "Kosten über 24 Monate"
     text = vorlage_text(zeile_html(eins))
-    assert "1.411,66" not in text and "1.927,54" not in text, text
-    assert "„24 + 12“" in text, text
+    assert "1.411,66 € Kosten über 24 Monate" in text, text
+    assert "24 Monate + Ablöse" in text, text
+    assert "Kosten über 36 Monate" not in text, text
 
     vf = next(
         k for k in modell["karten"] if k["anbieter"] == "Vodafone" and k["sku_id"]
@@ -292,14 +294,18 @@ def test_ein_buendelmonatspreis_ueber_36_monate_traegt_keine_24_monats_zahl():
     assert vf["label"] == "Kosten über 24 Monate"
 
 
-def test_1und1_steht_nur_in_der_24er_ansicht_und_ohne_delta():
-    """1&1 bleibt eine Zeile der 24er-Ansicht, trägt aber weder Zahl noch Δ
-    (Preisprüfung 02.11.2026); nie „andere Laufzeit“."""
+def test_1und1_steht_nicht_mehr_ueber_zwei_zeitraeume():
+    """Befund 3b galt, solange 1&1 über 36 Monate rechnete: gegen die
+    24-Monats-Referenz stand kein Vorzeichen. Seit 1&1 nur über 24 Monate
+    verglichen wird (Manager, 05.11.2026), ist seine Zahl in der 24er-Ansicht;
+    ohne Tarifband trägt es den Grund „Vodafone nicht erfasst“, nie „andere
+    Laufzeit“."""
     modell = _modell([_einsundeins(), _vodafone()])
     eins = next(k for k in modell["karten"] if k["anbieter"] == "1&1")
-    assert eins["delta"] is None and eins["delta_zustand"] is None
+    assert eins["delta"] is None
+    assert eins["delta_zustand"]["kurz"] == "Vodafone nicht erfasst"
     zelle = zeile_html(eins).select_one(".gr-bnd-delta")
-    assert zelle is None or "andere Laufzeit" not in zelle.get_text(strip=True)
+    assert zelle.get_text(strip=True) == "Vodafone nicht erfasst"
     assert zeile_html(eins).select_one(".gr-bnd")["data-lz"] == "24"
 
 

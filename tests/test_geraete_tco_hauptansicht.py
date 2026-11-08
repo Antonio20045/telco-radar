@@ -427,7 +427,7 @@ def test_der_geraetepreis_fuehrt_wo_er_ausgewiesen_ist(bestand):
     assert vodafone["geraetepreis"] < vodafone["gesamt"]
 
     einsundeins = [k for k in modell["karten"] if k["anbieter"] == "1&1"][0]
-    assert not einsundeins["belastbar"], "24 + 12 ist keine 24-Monats-Zahl"
+    assert einsundeins["belastbar"]
     assert einsundeins["geraetepreis"] is None, (
         "1&1 nennt nur einen Buendelpreis - eine Aufteilung waere erfunden"
     )
@@ -457,9 +457,11 @@ def test_eins_und_eins_wird_nicht_in_tarif_und_geraet_zerlegt(bestand):
     ]
     assert karte["buendel_monatlich"] == 44.99
     assert karte["monatlich"] is None and karte["rate"] is None
-    assert karte["gesamt"] is None and karte["bestandteile"] == [], (
-        "24 + 12: weder Summe noch Teile (Preisprüfung 02.11.2026)"
-    )
+    assert [p["kategorie"] for p in karte["bestandteile"]] == [
+        "buendel",
+        "einmalig",
+        "einmalig",
+    ]
 
 
 def test_die_vodafone_referenz_ist_als_gerechnet_gekennzeichnet():
