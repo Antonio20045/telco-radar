@@ -51,6 +51,8 @@ from ..geraete_model import (
 from . import (
     geraete_alarme,
     geraete_bereinigung,
+    geraete_katalog_neu,
+    geraete_luecken_beleg,
     geraete_portfolio,
     geraete_pruefung,
     geraete_tco_karten,
@@ -62,7 +64,7 @@ from . import (
 from . import geraete_delta_wort, geraete_notbremse as notbremse, geraete_sortiment
 
 from .geraete_laufzeit import LAUFZEIT_STANDARD, ansicht, rang_der_monatsangabe
-from .geraete_tco_band import _MONATE, band_label
+from .geraete_tco_band import band_label
 from .geraete_tco_grafik import euro
 from ..analyze import geraete_lifecycle, klick_erfassung as erfassung
 from ..analyze.tco_store import TcoDB
@@ -187,19 +189,6 @@ def pruefe_zahlen(text: str, erlaubt: set) -> bool:
     pruefen laesst, erscheint nicht.
     """
     return zahlen_im_text(text).issubset({round(float(z), 2) for z in erlaubt})
-
-
-def _neu_seit(iso: str) -> str:
-    """„17. September" - Tag und Monat fuer den Neu-Hinweis am Zeitreihen-
-    Suchfeld (R3 der P5-Live-Pruefung). MonatNamen aus derselben Tabelle,
-    die die Katalog-Zeile formatiert (`geraete_tco_band._MONATE` - eine
-    zweite Kopie der zwolf Namen wuerde driften); ein unlesbares Datum
-    steht roh im Satz statt geraten zu werden."""
-    try:
-        jahr, monat, tag = (int(x) for x in iso.split("-"))
-        return f"{tag}. {_MONATE[monat - 1]}"
-    except (AttributeError, ValueError, IndexError):
-        return iso or ""
 
 
 def _im_fenster(datum: str, heute: str, tage: int = FENSTER_TAGE) -> bool:
@@ -1667,6 +1656,7 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
     alarme = geraete_alarme.zeilen(
         vergleich["ohne_vertrag"], pruefung.get("auffaellig")
     )
+    belegte_luecken = geraete_sortiment.belege_aus(state_dir)
     tco = geraete_tco_view.aufbereiten(
         (sichtbar := geraete_sortiment.lies(tco_db.buendel(), state_dir, tco_heute)),
         tco_db.referenzen(),
@@ -1681,6 +1671,9 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
     )
     for modell in tco["modelle"]:
         modell["erfassung"] = erfassung.fuer_modell(tco_db.erfassung, modell)
+        modell["belegte_luecken"] = geraete_luecken_beleg.fuer_modell(
+            belegte_luecken, modell, tco_heute
+        )
     ausfaelle: list[Ausfall] = []
     try:
         zeitreihe = geraete_zeitreihe.aufbereiten(
@@ -1708,23 +1701,7 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         heute=bestand_heute,
     )
     katalog_ab_preis = katalog_leitzahl(katalog_modelle)
-    katalog_neu = []
-    for m in katalog_modelle:
-        if not m.get("hat_buendel") or m.get("zr"):
-            continue
-        belege = sorted(
-            b.get("abgerufen_am")
-            for b in (m.get("ab_beleg"), m.get("buendel_beleg"))
-            if b and b.get("abgerufen_am")
-        )
-        katalog_neu.append(
-            {
-                "id": m["schluessel"],
-                "titel": m["titel"],
-                "datum": _neu_seit(belege[0]) if belege else "",
-                "iso": belege[0] if belege else "",
-            }
-        )
+    katalog_neu = geraete_katalog_neu.liste(katalog_modelle)
     if isinstance((zeitreihe or {}).get("daten"), dict):
         zeitreihe["daten"]["katalog_neu"] = katalog_neu
     return {
