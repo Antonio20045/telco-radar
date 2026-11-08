@@ -216,3 +216,19 @@ def test_gerenderte_zeile_nennt_den_unbelegten_versand(tmp_path, monkeypatch):
     seite = lager(tmp_path / "belegt")
     assert not seite.select(".gr-bnd-versand-luecke")
     assert "nicht belegt – mit 0 €" not in vorlage_text(seite)
+
+
+def test_versand_vodafone_netz_ist_benannte_luecke_nicht_null():
+    """Kein Beleg fuer das Vodafone-Netz (Fixtures/Screenshots nur o2 und
+    Telekom): kein Eintrag, also "nicht belegt" statt 0 EUR."""
+    angabe = versandkosten.versand_fuer("Saturn/MediaMarkt · Vodafone-Netz")
+    assert angabe.betrag is None
+    assert (
+        versandkosten.hinweis_unbelegt("Saturn/MediaMarkt · Vodafone-Netz")
+        == "Versand bei Saturn/MediaMarkt · Vodafone-Netz nicht belegt"
+    )
+    assert versandkosten.versand_fuer("Saturn/MediaMarkt · o2-Netz").betrag == 5.95
+    assert versandkosten.versand_fuer("Saturn/MediaMarkt · Telekom-Netz").betrag == 5.95
+    k = kosten_ueber(_buendel("Saturn/MediaMarkt · Vodafone-Netz"))
+    assert POSTEN_VERSAND not in k.posten
+    assert k.hinweise == ["Versand bei Saturn/MediaMarkt · Vodafone-Netz nicht belegt"]

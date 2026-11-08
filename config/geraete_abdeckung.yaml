@@ -17,6 +17,20 @@ pflicht_anbieter:
   - 1&1
   - congstar
 
+# Pflichtanbieter, die erst gelten, wenn ihre Quelle in
+# `config/geraete_quellen.yaml` `aktiv: true` trägt (Schlüssel = Name der Quelle,
+# Werte = Anbieterzeilen der Bündel). Solange die Quelle `aktiv: false` ist,
+# misst der Wächter sie nicht; mit dem Aktivschalten gelten sie wie jeder
+# Pflichtanbieter (Modelle unten, belegte Lücken mit Grund). Saturn/MediaMarkt
+# mit Tarif (Tarifwelt): je Netz eine Zeile. Vorab zu beachten (Probelauf
+# 08.11.2026): einzelne Netze führen manche Pflichtmodelle nicht - das braucht
+# beim Aktivschalten belegte Lücken je Netz und Modell, nicht eine Lockerung.
+pflicht_anbieter_wenn_aktiv:
+  "MediaMarkt/Saturn Tarifwelt":
+    - "Saturn/MediaMarkt · Telekom-Netz"
+    - "Saturn/MediaMarkt · Vodafone-Netz"
+    - "Saturn/MediaMarkt · o2-Netz"
+
 # Anbieter, deren Pflichtmodelle zusätzlich je SPEICHERSTUFE geprüft werden:
 # führt ein anderer Pflichtanbieter am Messtag eine Stufe, die dieser
 # Anbieter nicht führt, und steht dafür unten keine belegte Lücke, ist das

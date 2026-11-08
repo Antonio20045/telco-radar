@@ -112,11 +112,15 @@ MODELL_SLUGS: dict[str, tuple[str, str, str, str]] = {
 
 @dataclass
 class Lauf:
-    """Ergebnis eines Modells: Buendel und benannte Luecken (Variante -> Grund)."""
+    """Ergebnis eines Modells: Buendel, benannte Luecken (Variante -> Grund) und
+    `tarife` (tarif_id "mediamarkt_tarifwelt:<id>" -> Anbieterzeile, Name,
+    Datenvolumen, Grundgebuehr) fuer die Band-Zuordnung im Bericht
+    (`tarifwelt_bestand`)."""
 
     buendel: list[Buendel] = field(default_factory=list)
     luecken: list[tuple[str, str]] = field(default_factory=list)
     abrufe: int = 0
+    tarife: dict[str, dict] = field(default_factory=dict)
 
 
 def _json(text: str):
@@ -262,6 +266,12 @@ def lies_modell(
             if gefunden is None:
                 continue
             satz, tarif = gefunden
+            lauf.tarife[f"mediamarkt_tarifwelt:{satz['tarif_id']}"] = {
+                "anbieter": tarifwelt.anbieter_zeile(satz["netz"]) or "",
+                "name": satz["tarif_name"] or satz["tarif_id"],
+                "datenvolumen_gb": tarif["datenvolumen_gb"],
+                "grundgebuehr": satz["grundgebuehr"],
+            }
             lauf.buendel.append(
                 Buendel(
                     sku_id=sku_id(geraet, speicher, None),

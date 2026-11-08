@@ -549,3 +549,23 @@ def test_ungeprueter_anbieter_bleibt_ohne_beleg_gruen():
     pflicht = _pflicht(speicher_pflicht_anbieter=())
     ergebnis = pruefe(tco, [], pflicht)
     assert ergebnis.befunde == []
+
+
+def test_pflicht_wenn_aktiv_gilt_erst_mit_aktiv_der_quelle(tmp_path):
+    """Vorbereitete Verdrahtung: die Tarifwelt-Zeilen sind Pflicht, sobald die
+    Quelle `aktiv: true` trägt, vorher nicht (Gegenprobe)."""
+    (tmp_path / "geraete_abdeckung.yaml").write_text(
+        "pflicht_anbieter: [Telekom]\npflicht_modelle: []\n"
+        "pflicht_anbieter_wenn_aktiv:\n  Quelle X:\n    - 'Zeile A'\n    - 'Zeile B'\n"
+    )
+    quellen = tmp_path / "geraete_quellen.yaml"
+    quellen.write_text("anbieter:\n  - name: Quelle X\n    aktiv: false\n")
+    assert lade_pflicht(tmp_path / "geraete_abdeckung.yaml")["anbieter"] == ["Telekom"]
+    quellen.write_text("anbieter:\n  - name: Quelle X\n    aktiv: true\n")
+    assert lade_pflicht(tmp_path / "geraete_abdeckung.yaml")["anbieter"] == [
+        "Telekom",
+        "Zeile A",
+        "Zeile B",
+    ]
+    quellen.unlink()
+    assert lade_pflicht(tmp_path / "geraete_abdeckung.yaml")["anbieter"] == ["Telekom"]

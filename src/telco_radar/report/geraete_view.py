@@ -69,6 +69,7 @@ from ..analyze.tco_store import TcoDB
 from ..analyze.klick_lesestand import mit_klick
 from ..tco_model import TCO_HORIZONT, zeitraum_vergleichbar
 from ..tarif_bezug import Tarifbestand
+from ..tarifwelt_bestand import mit_tarifwelt
 from .ausfall import Ausfall
 from ..analyze.geraete_store import (
     GELESEN,
@@ -1545,16 +1546,15 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
     historie = Preishistorie(state_dir / "geraete_preise.jsonl")
     tco_db = TcoDB(state_dir / "geraete_tco.json")
     tarifbestand = Tarifbestand.aus_datei(state_dir / "tarife.jsonl")
+    tarife_je_id = mit_tarifwelt(tarifbestand.je_id_aktuell, state_dir)
     alle = db.eintraege()
     sichtbar = [e for e in alle if e.get("status") in _SICHTBAR]
-
     pruefung, bestand, belastbar = bestand_und_belastbar(sichtbar, katalog)
 
     konfig = getattr(quellen, "anbieter", [])
     laden = {a.name: (a.shop or a.name) for a in konfig}
     anzeige = {a.name: (a.anzeige or a.name) for a in konfig}
     anzeige.update({(a.shop or a.name): (a.anzeige or a.name) for a in konfig})
-
     punkte_ohne_vertrag = []
     for e in belastbar:
         preis = e.get("preis_ohne_vertrag")
@@ -1673,7 +1673,7 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         belastbar,
         katalog,
         lesbar=tco_db.lesbar,
-        tarife=tarifbestand.je_id_aktuell,
+        tarife=tarife_je_id,
         anbieter_typen={a.name: a.typ for a in quellen.anbieter},
         tco_historie=tco_db.historie_lage(),
         heute=tco_heute,
@@ -1684,7 +1684,7 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
     ausfaelle: list[Ausfall] = []
     try:
         zeitreihe = geraete_zeitreihe.aufbereiten(
-            state_dir, tco, tarife=tarifbestand.je_id_aktuell, heute=tco_heute
+            state_dir, tco, tarife=tarife_je_id, heute=tco_heute
         )
     except Exception as exc:  # noqa: BLE001
         log.error(
