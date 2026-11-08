@@ -2611,6 +2611,7 @@ b,strong{font-weight:700}
 .gr-beleg-paare li{display:flex;flex-wrap:wrap;gap:2px 8px;align-items:baseline;
   margin:2px 0}
 .gr-beleg-anbieter{font-weight:600;color:var(--ink-2)}
+.gr-beleg-fehlt{color:var(--ink-3)}
 .gr-belege--paar{margin:0;flex:1 1 0;min-width:min(100%,16em)}
 .gr-belege--paar>summary{text-decoration:underline;text-underline-offset:2px}
 .gr-belege--paar img{display:block;width:640px;max-width:100%;height:auto;

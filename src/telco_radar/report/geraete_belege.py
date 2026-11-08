@@ -21,7 +21,9 @@ lichtet je Paar nur eine Konfiguration ab (``scripts/belege_veroeffentlichen.py`
 Dateiname trägt keinen Tarif. Welche Zeile das Bild zeigt, ist maschinell nicht
 feststellbar. Die Seite verlinkt es deshalb einmal je Paar (``paarbelege``) als
 „Screenshot der Angebotsseite vom <Datum> (zeigt nicht jeden Tarif)“ und setzt nichts
-an eine Preiszeile. ``quote`` zählt Paare, keine Preise (Clean Code 1: dieselbe
+an eine Preiszeile. Ein Paar mit belastbarem Preis, aber ohne Bild, steht mit dem
+Vermerk „kein Screenshot vorhanden“ daneben, damit „kein Preis“ und „kein Bild“
+unterscheidbar bleiben. ``quote`` zählt Paare, keine Preise (Clean Code 1: dieselbe
 Funktion für Link und Satz).
 """
 

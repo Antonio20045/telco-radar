@@ -76,14 +76,24 @@ def test_sichtbare_links_je_anbieter_mit_bild_auf_der_echten_seite(seite):
         bild = p.select_one("img")
         assert f"/belege-{HEUTE}/{MODELL}__" in bild["data-src"]
     namen = [b.get_text(strip=True) for b in seite.select(".gr-beleg-anbieter")]
-    assert sorted(namen) == sorted(MIT_BILD)
+    assert sorted(namen) == sorted(MIT_BILD + OHNE_BILD)
 
 
-def test_paar_ohne_bild_bekommt_keinen_link_und_keinen_vermerk(seite):
-    """Lieber ein Beleg weniger als ein falscher: nichts für congstar und Vodafone."""
-    zone = seite.select_one("#gr-bnd-gruppe").get_text(" ", strip=True)
+def test_paar_ohne_bild_bekommt_sichtbaren_vermerk_ohne_link(seite):
+    """Auflage 1: "kein Preis" und "kein Bild" sind unterscheidbar, nichts erfunden."""
+    zeilen = seite.select("#gr-bnd-gruppe .gr-beleg-paare li")
+    je_anbieter = {
+        z.select_one(".gr-beleg-anbieter").get_text(strip=True): z for z in zeilen
+    }
+    assert sorted(je_anbieter) == sorted(MIT_BILD + OHNE_BILD)
     for anbieter in OHNE_BILD:
-        assert f"{anbieter} Screenshot" not in zone
+        z = je_anbieter[anbieter]
+        assert z.select_one(".gr-beleg-fehlt").get_text(strip=True) == (
+            "kein Screenshot vorhanden"
+        )
+        assert z.select("details, img, a") == []
+    for anbieter in MIT_BILD:
+        assert je_anbieter[anbieter].select(".gr-beleg-fehlt") == []
     assert "ohne Beleg" not in seite.get_text(" ", strip=True)
 
 
@@ -208,6 +218,11 @@ def test_im_browser_sichtbar_und_oeffnet_das_bild(site, chromium):
                 for i in range(zeilen.count()):
                     assert zeilen.nth(i).is_visible(), breite
                 assert s.locator(".gr-bnd-lager .gr-beleg-paare:visible").count() == 0
+                fehlt = s.locator("#gr-bnd-gruppe .gr-beleg-fehlt")
+                assert fehlt.count() == len(OHNE_BILD), breite
+                for i in range(fehlt.count()):
+                    assert fehlt.nth(i).is_visible(), breite
+                    assert fehlt.nth(i).inner_text() == "kein Screenshot vorhanden"
                 assert s.locator("#gr-belegquote").is_visible()
                 zeilen.first.click()
                 bild = s.locator("#gr-bnd-gruppe .gr-beleg-paare details[open] img")

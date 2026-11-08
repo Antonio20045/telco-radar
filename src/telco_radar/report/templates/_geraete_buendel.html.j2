@@ -32,18 +32,19 @@
 
 {# Beleg je PAAR (Modell, Anbieter), Ziel 1d: das Bild zeigt eine Konfiguration des
    Paares, nicht jeden Tarif - maschinell ist nicht feststellbar, welche. Darum
-   steht der Hinweis EINMAL je Anbieter UNTER den Fehl-Anbietern (sichtbar,
+   steht der Hinweis EINMAL je Anbieter mit belastbarem Preis (ohne Bild: "kein Screenshot vorhanden", damit "kein Preis" von "kein Bild" unterscheidbar bleibt) UNTER den Fehl-Anbietern (sichtbar,
    `app.js` übernimmt `.gr-beleg-paare` mit der Fehlliste) und an KEINER
    Preiszeile. Das Bild öffnet in der Seite (kein Download: GitHub liefert das
    Asset als Datei); `app.js` lädt es erst beim Aufklappen (`data-src`).
    `paarbelege` rechnet in Python (`report/geraete_belege.py`). #}
-{% macro belegpaare(m) %}{% if paarbelege is defined %}{% set mit = paarbelege(m) | selectattr('beleg') | list %}{% if mit %}
-<ul class="gr-beleg-paare">{% for p in mit %}
-  <li><b class="gr-beleg-anbieter">{{ p.anbieter }}</b>
+{% macro belegpaare(m) %}{% if paarbelege is defined %}{% set paare = paarbelege(m) %}{% if paare %}
+<ul class="gr-beleg-paare">{% for p in paare %}
+  <li><b class="gr-beleg-anbieter">{{ p.anbieter }}</b>{% if p.beleg %}
     <details class="gr-belege gr-belege--paar">
       <summary>Screenshot der Angebotsseite vom {{ p.beleg.datum | date_de }} (zeigt nicht jeden Tarif)</summary>
       <img data-src="{{ p.beleg.url }}" alt="Screenshot der Angebotsseite {{ p.anbieter }} vom {{ p.beleg.datum | date_de }}" width="640" height="400">
-    </details></li>{% endfor %}
+    </details>{% else %}
+    <span class="gr-beleg-fehlt">kein Screenshot vorhanden</span>{% endif %}</li>{% endfor %}
 </ul>{% endif %}{% endif %}{% endmacro %}
 
 {% macro buendelzeile(k) %}
