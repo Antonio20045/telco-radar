@@ -40,6 +40,7 @@ METHODEN = (
     "saturn_brand",
     "mediamarkt_angebote",
     "coolblue_produkt",
+    "mediamarkt_tarifwelt",
     "kein_hardware",
     "deaktiviert",
 )

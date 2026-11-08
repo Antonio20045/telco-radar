@@ -320,6 +320,43 @@ anbieter:
         label: iPhone 18 Pro
         kind: static
 
+  - name: MediaMarkt/Saturn Tarifwelt
+    typ: handel
+    erfassung: aus
+    gruppe: Ceconomy
+    rang: 2
+    methode: mediamarkt_tarifwelt
+    aktiv: false
+    # Auftrag brief-tarifwelt-0811.md, Recherche 08.11.2026 (Commit
+    # afb32aa3), Adapter-Paket 08.11.2026. Vier echte Einzelabrufe als
+    # Fixture gesichert (tests/fixtures/geraete/tarifwelt_mm_*.json,
+    # Herkunft dort in _herkunft.json): tarife.mediamarkt.de laedt seine
+    # Tarifliste aus der oeffentlichen, nicht authentifizierten
+    # Schnittstelle tarife-api2.mediamarkt.de/v1/productdetail/<id>/tariff
+    # (kein robots.txt, ehrliche Kennung TelcoRadar/1.0). Der Parser
+    # (collect/geraete/tarifwelt.py, getestet gegen die vier Fixtures in
+    # tests/test_geraete_adapter_tarifwelt.py) liest Netz
+    # (simCards[].carrier.name: "o2" | "freenet - Telekom" |
+    # "freenet - Vodafone"), Datenvolumen (dataVolume) und Monatspreis
+    # (monthlyPrice) direkt aus derselben JSON-Antwort - ein Browserlesen
+    # des sichtbaren Preises (wie im Auftrag zunaechst angenommen) ist
+    # NICHT noetig.
+    grund: >-
+      Noch nicht aktiv: (1) die Zuordnung Katalog-Modell ->
+      `offerGroupId`/`hwi` ist ungeloest - die vier Fixtures tragen die
+      IDs von Hand aus der Recherche, keine Ernte-Schleife ueber die
+      Kampagnenseite findet sie bisher selbst; (2) ein Tarifwelt-Satz
+      traegt `netz` JE ZEILE (dieselbe Seite fuehrt o2, freenet-Telekom
+      und freenet-Vodafone gleichzeitig) - das bestehende Buendelschema
+      kennt `netz` nur als Anbieter-Eigenschaft, nicht je Satz; das muss
+      vor `aktiv: true` sauber in geraete_tco.json eingehaengt werden.
+      Lieber inaktiv und korrekt als aktiv und falsch.
+    hinweis: >-
+      Saturn/MediaMarkt verkaufen Geraet + Fremdtarif (o2, freenet im
+      Telekom- und im Vodafone-Netz) ueber dieselbe Ceconomy-Plattform -
+      der Parser ist fertig und getestet, die Ernte- und Einhaenge-Arbeit
+      folgt in einem weiteren Paket.
+
   - name: Coolblue
     typ: handel
     erfassung: aus
