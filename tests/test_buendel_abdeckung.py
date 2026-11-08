@@ -36,11 +36,19 @@ def _buendel(anbieter, sku, tarif="T S", laufzeit=24, tag=TAG):
     }
 
 
-def _pflicht(anbieter=("A", "B"), modelle=("apple-iphone-18-pro",), luecken=None):
+def _pflicht(
+    anbieter=("A", "B"),
+    modelle=("apple-iphone-18-pro",),
+    luecken=None,
+    speicher_pflicht_anbieter=None,
+):
     return {
         "anbieter": list(anbieter),
         "modelle": list(modelle),
         "luecken": dict(luecken or {}),
+        "speicher_pflicht_anbieter": list(
+            anbieter if speicher_pflicht_anbieter is None else speicher_pflicht_anbieter
+        ),
     }
 
 
@@ -425,3 +433,109 @@ def test_kommt_das_iphone_17_pro_bei_congstar_zurueck_warnt_die_echte_config():
     ]
     assert "apple-iphone-17-pro" in ergebnis.warnungen[0].text
     assert "apple-iphone-17-pro-max" not in ergebnis.warnungen[0].text
+
+
+def _tco_zwei_speicherstufen(gross_bei="A"):
+    """A und B führen `apple-iphone-18-pro`; nur `gross_bei` auch 512gb."""
+    klein = "A" if gross_bei == "B" else "B"
+    return {
+        "updated": TAG,
+        "buendel": [
+            _buendel(gross_bei, "apple-iphone-18-pro-256gb-polar"),
+            _buendel(gross_bei, "apple-iphone-18-pro-512gb-polar"),
+            _buendel(klein, "apple-iphone-18-pro-256gb-polar"),
+        ],
+    }
+
+
+def test_speicherstufe_die_nur_ein_anderer_pflichtanbieter_fuehrt_ist_rot():
+    tco = _tco_zwei_speicherstufen(gross_bei="A")
+    ergebnis = pruefe(tco, [], _pflicht())
+    assert [(b.art, b.anbieter) for b in ergebnis.befunde] == [("speicher_fehlt", "B")]
+    assert "512gb" in ergebnis.befunde[0].text
+    assert "apple-iphone-18-pro" in ergebnis.befunde[0].text
+
+
+def test_belegte_speicherluecke_macht_den_lauf_gruen():
+    tco = _tco_zwei_speicherstufen(gross_bei="A")
+    pflicht = _pflicht(
+        luecken={("B", "apple-iphone-18-pro", "512gb"): "B verkauft 512gb nicht"}
+    )
+    ergebnis = pruefe(tco, [], pflicht)
+    assert ergebnis.befunde == []
+
+
+def test_speicherluecke_belegt_nur_die_genannte_stufe_nicht_die_ganze_variante():
+    """Eine Lücke für 512gb entschuldigt nicht auch noch eine fehlende 1024gb-Stufe."""
+    tco = {
+        "updated": TAG,
+        "buendel": [
+            _buendel("A", "apple-iphone-18-pro-256gb-polar"),
+            _buendel("A", "apple-iphone-18-pro-512gb-polar"),
+            _buendel("A", "apple-iphone-18-pro-1024gb-polar"),
+            _buendel("B", "apple-iphone-18-pro-256gb-polar"),
+        ],
+    }
+    pflicht = _pflicht(
+        luecken={("B", "apple-iphone-18-pro", "512gb"): "B verkauft 512gb nicht"}
+    )
+    ergebnis = pruefe(tco, [], pflicht)
+    assert [(b.art, b.anbieter) for b in ergebnis.befunde] == [("speicher_fehlt", "B")]
+    assert "1024gb" in ergebnis.befunde[0].text
+    assert "512gb" not in ergebnis.befunde[0].text
+
+
+def test_eine_fehlende_stufe_bei_nur_einem_anbieter_ist_gruen():
+    """Keine Vergleichsbasis: nur A führt das Modell überhaupt."""
+    tco = {
+        "updated": TAG,
+        "buendel": [
+            _buendel("A", "apple-iphone-18-pro-256gb-polar"),
+            _buendel("A", "apple-iphone-18-pro-512gb-polar"),
+        ],
+    }
+    ergebnis = pruefe(tco, [], _pflicht(anbieter=("A",)))
+    assert ergebnis.befunde == []
+
+
+def _speicherluecke_yaml(tmp_path, mit_modelle=True):
+    zeilen = [
+        "pflicht_anbieter: [A, B]",
+        "pflicht_modelle: [apple-iphone-18-pro]",
+        "belegte_luecken:",
+        "  - anbieter: B",
+    ]
+    if mit_modelle:
+        zeilen.append("    modelle: [apple-iphone-18-pro]")
+    zeilen += [
+        "    speicher: [512gb]",
+        "    grund: B verkauft 512gb nachweislich nicht",
+        '    geprueft: "2026-03-01"',
+        '    bis: "2026-03-15"',
+    ]
+    pfad = tmp_path / "a.yaml"
+    pfad.write_text("\n".join(zeilen) + "\n", encoding="utf-8")
+    return pfad
+
+
+def test_lade_pflicht_liest_speicherstufe_als_eigenen_schluessel(tmp_path):
+    pflicht = lade_pflicht(_speicherluecke_yaml(tmp_path))
+    assert pflicht["luecken"][("B", "apple-iphone-18-pro", "512gb")] == (
+        "B verkauft 512gb nachweislich nicht"
+    )
+    assert ("B", "apple-iphone-18-pro") not in pflicht["luecken"]
+
+
+def test_speicherfeld_ohne_modelle_wird_abgelehnt(tmp_path):
+    with pytest.raises(ValueError, match="speicher.*ohne.*modelle"):
+        lade_pflicht(_speicherluecke_yaml(tmp_path, mit_modelle=False))
+
+
+def test_ungeprueter_anbieter_bleibt_ohne_beleg_gruen():
+    """Nur wer in 'speicher_pflicht_anbieter' steht, wird auf Speicherstufen
+    gemessen - ein Anbieter, den niemand am Original geprüft hat, wird nicht
+    mit einer erfundenen Portfolio-Aussage rot."""
+    tco = _tco_zwei_speicherstufen(gross_bei="A")
+    pflicht = _pflicht(speicher_pflicht_anbieter=())
+    ergebnis = pruefe(tco, [], pflicht)
+    assert ergebnis.befunde == []

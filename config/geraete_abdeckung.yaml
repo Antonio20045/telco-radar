@@ -17,6 +17,15 @@ pflicht_anbieter:
   - 1&1
   - congstar
 
+# Anbieter, deren Pflichtmodelle zusätzlich je SPEICHERSTUFE geprüft werden:
+# führt ein anderer Pflichtanbieter am Messtag eine Stufe, die dieser
+# Anbieter nicht führt, und steht dafür unten keine belegte Lücke, ist das
+# ein Befund `speicher_fehlt`. Rollout je Anbieter, erst nach einer echten
+# Prüfung an seiner Seite - sonst stünde hier eine erfundene Portfolio-
+# Aussage. o2 seit 08.11.2026 (Auftrag „o2-Lücken Band S“, Belege unten).
+speicher_pflicht_anbieter:
+  - o2
+
 # Modell-IDs wie in der SKU (`geraete_model.device_id`): die aktuellen
 # Topmodelle je Hersteller, die jeder Netzbetreiber üblicherweise führt.
 pflicht_modelle:
@@ -86,5 +95,92 @@ belegte_luecken:
     art: nicht_im_portfolio
     beleg: https://github.com/Antonio20045/telco-radar/blob/main/docs/belege/congstar-17promax-0811/2-apple-uebersicht-ganz.png
     original: https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/
+    geprueft: "2026-11-08"
+    bis: "2026-11-22"
+  # o2: sieben Pflichtmodelle ohne die größte(n) Speicherstufe(n), die ein
+  # anderer Pflichtanbieter führt (Auftrag „o2-Lücken Band S“, 08.11.2026).
+  # Belegt mit echtem Browser (Playwright, Standard-UA, kein Warenkorb): der
+  # Speicher-Wähler der jeweiligen Produktseite (`tef-choice-group
+  # "Speicher:"`) zeigt nur die tatsächlich verkauften Stufen, unabhängig
+  # vom gewählten Tarif - siehe arbeit/o2-original-0811.md (Methodik-Hinweis)
+  # und arbeit/o2-luecken-band-s-0811.md. Jede Zeile einzeln, weil jedes
+  # Modell einen eigenen Beleg trägt.
+  - anbieter: o2
+    modelle:
+      - apple-iphone-17
+    speicher:
+      - 512gb
+    grund: Speicherstufe bei o2 nicht im Angebot (geprüft 08.11.2026) - der Speicher-Wähler der Produktseite zeigt nur 256 GB
+    art: nicht_im_portfolio
+    beleg: https://github.com/Antonio20045/telco-radar/blob/main/docs/belege/o2-speicher-0811/1-iphone17-512gb-nicht-waehlbar.png
+    original: https://www.o2online.de/e-shop/apple/apple-iphone-17-details?tarif=o2-mobile-m&ratenzahlung=24&zielgruppe=privatkunden
+    geprueft: "2026-11-08"
+    bis: "2026-11-22"
+  - anbieter: o2
+    modelle:
+      - apple-iphone-17-pro
+    speicher:
+      - 512gb
+    grund: Speicherstufe bei o2 nicht im Angebot (geprüft 08.11.2026) - der Speicher-Wähler der Produktseite zeigt nur 256 GB
+    art: nicht_im_portfolio
+    beleg: https://github.com/Antonio20045/telco-radar/blob/main/docs/belege/o2-speicher-0811/2-iphone17pro-512gb-nicht-waehlbar.png
+    original: https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-details?tarif=o2-mobile-m&ratenzahlung=24&zielgruppe=privatkunden
+    geprueft: "2026-11-08"
+    bis: "2026-11-22"
+  - anbieter: o2
+    modelle:
+      - apple-iphone-17-pro-max
+    speicher:
+      - 1024gb
+      - 2048gb
+    grund: Speicherstufe bei o2 nicht im Angebot (geprüft 08.11.2026) - der Speicher-Wähler der Produktseite zeigt nur 256 GB und 512 GB
+    art: nicht_im_portfolio
+    beleg: https://github.com/Antonio20045/telco-radar/blob/main/docs/belege/o2-speicher-0811/3-iphone17promax-1024-2048gb-nicht-waehlbar.png
+    original: https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-max-details?tarif=o2-mobile-m&ratenzahlung=24&zielgruppe=privatkunden
+    geprueft: "2026-11-08"
+    bis: "2026-11-22"
+  - anbieter: o2
+    modelle:
+      - apple-iphone-air
+    speicher:
+      - 512gb
+      - 1024gb
+    grund: Speicherstufe bei o2 nicht im Angebot (geprüft 08.11.2026) - der Speicher-Wähler der Produktseite zeigt nur 256 GB
+    art: nicht_im_portfolio
+    beleg: https://github.com/Antonio20045/telco-radar/blob/main/docs/belege/o2-speicher-0811/4-iphoneair-512-1024gb-nicht-waehlbar.png
+    original: https://www.o2online.de/e-shop/apple/apple-iphone-air-details?tarif=o2-mobile-m&ratenzahlung=24&zielgruppe=privatkunden
+    geprueft: "2026-11-08"
+    bis: "2026-11-22"
+  - anbieter: o2
+    modelle:
+      - samsung-galaxy-s26-ultra
+    speicher:
+      - 1024gb
+    grund: Speicherstufe bei o2 nicht im Angebot (geprüft 08.11.2026) - der Speicher-Wähler der Produktseite zeigt nur 256 GB und 512 GB
+    art: nicht_im_portfolio
+    beleg: https://github.com/Antonio20045/telco-radar/blob/main/docs/belege/o2-speicher-0811/5-galaxys26ultra-1024gb-nicht-waehlbar.png
+    original: https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ultra-details?tarif=o2-mobile-m&ratenzahlung=24&zielgruppe=privatkunden
+    geprueft: "2026-11-08"
+    bis: "2026-11-22"
+  - anbieter: o2
+    modelle:
+      - google-pixel-11
+    speicher:
+      - 512gb
+    grund: Speicherstufe bei o2 nicht im Angebot (geprüft 08.11.2026) - der Speicher-Wähler der Produktseite zeigt nur 256 GB
+    art: nicht_im_portfolio
+    beleg: https://github.com/Antonio20045/telco-radar/blob/main/docs/belege/o2-speicher-0811/6-pixel11-512gb-nicht-waehlbar.png
+    original: https://www.o2online.de/e-shop/google/google-pixel-11-details?tarif=o2-mobile-m&ratenzahlung=24&zielgruppe=privatkunden
+    geprueft: "2026-11-08"
+    bis: "2026-11-22"
+  - anbieter: o2
+    modelle:
+      - google-pixel-11-pro-xl
+    speicher:
+      - 512gb
+    grund: Speicherstufe bei o2 nicht im Angebot (geprüft 08.11.2026) - der Speicher-Wähler der Produktseite zeigt nur 256 GB
+    art: nicht_im_portfolio
+    beleg: https://github.com/Antonio20045/telco-radar/blob/main/docs/belege/o2-speicher-0811/7-pixel11proxl-512gb-nicht-waehlbar.png
+    original: https://www.o2online.de/e-shop/google/google-pixel-11-pro-xl-details?tarif=o2-mobile-m&ratenzahlung=24&zielgruppe=privatkunden
     geprueft: "2026-11-08"
     bis: "2026-11-22"
