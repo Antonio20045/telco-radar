@@ -24,6 +24,7 @@ from collections.abc import Iterable
 
 from ..analyze.geraete_pruefstatus import (
     FELD_PRUEFUNG,
+    HERLEITUNG_EINMALZAHLUNG,
     HERLEITUNG_PREISLISTE,
     QUARANTAENE,
     REGELN,
@@ -53,6 +54,10 @@ HERLEITUNG_SATZ = {
     ),
     "schlusszahlung_aus_grundtarif": (
         "{anbieter} nennt die Schlusszahlung nur beim Grundtarif – von dort übernommen."
+    ),
+    HERLEITUNG_EINMALZAHLUNG: (
+        "{anbieter}-Wert widersprüchlich, neu messen – die Einmalzahlung weicht "
+        "vom Wert der anderen Tarife desselben Geräts ab."
     ),
 }
 HERLEITUNG_SATZ_SONST = (
