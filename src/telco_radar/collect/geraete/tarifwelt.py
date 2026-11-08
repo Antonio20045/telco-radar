@@ -32,6 +32,8 @@ from __future__ import annotations
 import json
 import logging
 
+from ...band_regel import abstand_schluessel
+
 log = logging.getLogger(__name__)
 
 
@@ -113,19 +115,17 @@ def ohne_doppelkarte(saetze: list[dict]) -> list[dict]:
 def waehle_je_band(saetze: list[dict], leiter_gb) -> dict[str, dict]:
     """Je Sprosse der uebergebenen Baender-Leiter (Folge von `(key, gb)`)
     den Tarif mit dem naechstgelegenen Datenvolumen - dieselbe Regel wie
-    `report.geraete_tco_band.band_von_gb` (naechstgelegenes Volumen, bei
-    Gleichstand das groessere), hier ohne Importabhaengigkeit zur
-    Berichtsschicht nachgebaut (`.importlinter`: Sammeln zitiert nie
-    Berichten). Bei mehreren gleich nahen Tarifen entscheidet der
-    niedrigere Monatspreis."""
+    `report.geraete_tco_band.band_von_gb` (`band_regel.abstand_schluessel`,
+    EIN gemeinsamer Baustein, ohne dass Sammeln die Berichtsschicht
+    importiert, `.importlinter`). Bei mehreren gleich nahen Tarifen
+    entscheidet der niedrigere Monatspreis."""
     brauchbar = [s for s in saetze if s.get("datenvolumen_gb") is not None]
     out: dict[str, dict] = {}
     for key, gb in leiter_gb:
         kandidaten = sorted(
             brauchbar,
             key=lambda s: (
-                abs(s["datenvolumen_gb"] - gb),
-                -s["datenvolumen_gb"],
+                *abstand_schluessel(s["datenvolumen_gb"], gb),
                 s["grundgebuehr"]
                 if s.get("grundgebuehr") is not None
                 else float("inf"),
