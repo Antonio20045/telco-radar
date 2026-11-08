@@ -239,7 +239,9 @@ def test_panel_von_eins_und_eins_traegt_nie_36_monate(gerendert):
         if anbieter in etiketten and etikett is not None:
             etiketten[anbieter].add(etikett.get_text(strip=True))
     assert "Kosten über 36 Monate" not in etiketten["1&1"], etiketten["1&1"]
-    assert "Kosten über 36 Monate" in etiketten["o2"], "Gegenprobe: o2 mit 36 Raten"
+    assert "Kosten über 24 Tarifmonate und 36 Geräteraten" in etiketten["o2"], (
+        "Gegenprobe: o2 mit 36 Raten"
+    )
 
 
 def test_panel_von_o2_bleibt_bei_24_monaten(gerendert):
@@ -250,7 +252,10 @@ def test_panel_von_o2_bleibt_bei_24_monaten(gerendert):
         for anbieter, inhalt in _panels(fragment)
         if anbieter == "o2" and (etikett := inhalt.select_one(".gr-zr-plabel"))
     }
-    assert etiketten == {"Kosten über 24 Monate", "Kosten über 36 Monate"}, etiketten
+    assert etiketten == {
+        "Kosten über 24 Monate",
+        "Kosten über 24 Tarifmonate und 36 Geräteraten",
+    }, etiketten
 
 
 def test_monatsnamen_sind_deutsch_auch_unter_englischem_locale(gerendert):

@@ -1228,7 +1228,8 @@ def test_h3_kein_vorzeichen_gegen_eine_basis_mit_anderem_zeitraum():
     assert zeile["status"] == wr.STATUS_NICHT_VERGLEICHBAR
     assert zeile["gesamt"] == 1835.54 and zeile["vf_gesamt"] == 1847.80
     assert zeile["quelle_url"] and zeile["abgerufen_am"]
-    assert "36 Monate" in zeile["grund"] and "24 Monate" in zeile["grund"]
+    assert "36 Monate" not in zeile["grund"], "36 Monate Tarif gibt es nicht"
+    assert "36 Geräteraten" in zeile["grund"] and "24 Monate" in zeile["grund"]
     gleich = wr._zeile_fuer_anbieter(
         "1&1", _h3_karte("1&1", 1835.54, 24), _h3_basis(1847.80, 24), {"o2:k": "xs"}
     )
@@ -1248,7 +1249,8 @@ def test_h3_kein_vorzeichen_zwischen_zwei_karten_mit_anderem_zeitraum():
     zeile = wr._paar_zeile("1&1", "xs", wb, vf)
     assert zeile["prozent"] is None
     assert zeile["status"] == wr.STATUS_NICHT_VERGLEICHBAR
-    assert "36 Monate" in zeile["grund"] and "24 Monate" in zeile["grund"]
+    assert "36 Monate" not in zeile["grund"], "36 Monate Tarif gibt es nicht"
+    assert "36 Geräteraten" in zeile["grund"] and "24 Monate" in zeile["grund"]
     gleich = wr._paar_zeile("1&1", "xs", _h3_karte("1&1", 1299.54, 24), vf)
     assert gleich["status"] == wr.STATUS_VERGLEICHBAR
     assert gleich["prozent"] == -9.4
@@ -1280,7 +1282,7 @@ def test_h3_ein_fremder_zeitraum_faellt_aus_der_rangfolge():
     assert zeile["prozent"] is None and zeile["prozent_text"] == ""
     assert zeile["euro"] is None, "auch kein Euro-Abstand ueber zwei Zeitraeume"
     assert zeile["luecke"] == "nicht vergleichbar"
-    assert "36 Monate" in zeile["gruppe_zeilen"][0]["grund"]
+    assert "36 Geräteraten" in zeile["gruppe_zeilen"][0]["grund"]
 
 
 def test_h3_am_echten_bestand_traegt_keine_prozentzahl_zwei_zeitraeume(echt):

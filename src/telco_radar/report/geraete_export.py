@@ -73,6 +73,7 @@ from .geraete_bereinigung import zustand_der_zeile
 from .geraete_laufzeit import export_je_laufzeit
 from .geraete_radar import STATUS_VERGLEICHBAR
 from .geraete_tco_band import band_label
+from .geraete_zeitraum_wort import zeitraum_text
 
 KODIERUNG = "utf-8-sig"
 TRENNER = ";"
@@ -110,20 +111,18 @@ SPALTEN_HISTORIE = [
 ]
 
 SPALTE_UEBER_24 = "Kosten über 24 Monate EUR"
-SPALTE_UEBER_LAUFZEIT = "Kosten über die Bündellaufzeit EUR"
+SPALTE_UEBER_LAUFZEIT = "Kosten über Tarifmonate und Geräteraten EUR"
+SPALTE_TARIFMONATE = "Tarifmonate in der Summe"
 
 
 def leitzahl_aus_zeile(zeile):
     """Die Leitzahl einer TCO-Exportzeile, egal unter welchem Kopf sie steht.
 
-    DER EINE Leseweg fuer beide Spalten. Wer nur `SPALTE_UEBER_24` liest,
-    bekommt fuer die 74 Buendel mit kombiniertem Monatsbetrag (1&1) eine
-    leere Zelle und haelt sie fuer eine fehlende Messung - sie steht aber
-    unter `SPALTE_UEBER_LAUFZEIT`, weil ihr Zeitraum nicht 24 Monate ist.
-
-    `zeile` ist ein dict aus `csv.DictReader`. Rueckgabe ist die
-    Zeichenkette, wie sie in der Datei steht (deutsches Dezimalkomma), oder
-    "" wenn die Zeile keine Leitzahl traegt - dann ist sie wirklich leer.
+    DER EINE Leseweg fuer beide Spalten. Wer nur `SPALTE_UEBER_24` liest, sieht
+    fuer jedes Buendel mit 36 Geraeteraten eine leere Zelle und haelt sie fuer
+    eine fehlende Messung - sie steht unter `SPALTE_UEBER_LAUFZEIT`.
+    `zeile` ist ein dict aus `csv.DictReader`; Rueckgabe ist die Zeichenkette
+    der Datei (Dezimalkomma) oder "" - dann traegt die Zeile keine Leitzahl.
     """
     return zeile.get(SPALTE_UEBER_24) or zeile.get(SPALTE_UEBER_LAUFZEIT) or ""
 
@@ -131,15 +130,11 @@ def leitzahl_aus_zeile(zeile):
 def _leitzahl_spalten(tco24, leitzahl_monate):
     """Die Leitzahl in die Spalte, deren Kopf fuer sie WAHR ist.
 
-    Zwei Koepfe, ein Wert: eine Zahl steht unter "Kosten über 24 Monate
-    EUR", wenn ihr Zeitraum 24 Monate ist, und sonst unter "Kosten über
-    die Buendellaufzeit EUR". Keine Zeile verliert ihren Wert, und kein
-    Kopf traegt eine Zahl, die er falsch beschreibt.
-
-    Der Zeitraum wird hier nicht bestimmt, sondern gelesen
-    (`Tco.leitzahl_monate`, P0-B-h1) - es gibt genau eine Stelle, die ihn
-    festlegt. Fehlt er, ist er eine Luecke und keine 24: dann steht die
-    Zahl in der Laufzeitspalte, weil die 24 nicht belegt ist.
+    Zwei Koepfe, ein Wert: Zeitraum 24 Monate steht unter "Kosten über 24 Monate
+    EUR", jeder andere unter "Kosten über Tarifmonate und Geräteraten EUR" (die
+    Tarifmonate nennt `SPALTE_TARIFMONATE`). Der Zeitraum wird gelesen
+    (`Tco.leitzahl_monate`, P0-B-h1), nicht bestimmt; fehlt er, ist er eine
+    Luecke und keine 24.
     """
     wert = _zahl(tco24)
     if not wert:
@@ -165,6 +160,7 @@ SPALTEN_TCO = [
     "Laufzeit Monate",
     "Anschlusspreis EUR",
     "Leitzahl-Zeitraum Monate",
+    SPALTE_TARIFMONATE,
     SPALTE_UEBER_24,
     SPALTE_UEBER_LAUFZEIT,
     "Abgerufen am",
@@ -312,6 +308,7 @@ def tco_csv(zeilen: dict) -> tuple[str, int]:
                 z.get("laufzeit", "") or "",
                 _zahl(z.get("anschlusspreis")),
                 lz_monate or "",
+                z.get("tarif_monate") or "",
                 ueber_24,
                 ueber_laufzeit,
                 z.get("abgerufen_am", ""),
@@ -340,6 +337,7 @@ def tco_csv(zeilen: dict) -> tuple[str, int]:
                 "",
                 "",
                 _zahl(z.get("anschlusspreis")),
+                lz_monate or "",
                 lz_monate or "",
                 ueber_24,
                 ueber_laufzeit,
@@ -408,7 +406,8 @@ def _preisart_netz(z: dict, gruppe: dict) -> str:
     wurde wie `gruppe["vodafone"]` (Clean Code 3: kein geratener Zeitraum).
     """
     if z.get("status") == STATUS_VERGLEICHBAR and z.get("laufzeit") and z.get("monate"):
-        return f"Kosten über {z['monate']} Monate · {z['laufzeit']} Raten"
+        raten = f" · {z['laufzeit']} Raten" if z["monate"] <= TCO_HORIZONT else ""
+        return f"Kosten über {zeitraum_text(z['monate'])}{raten}"
     vf = gruppe.get("vodafone") or {}
     monate = vf.get("monate")
     if (
@@ -416,7 +415,7 @@ def _preisart_netz(z: dict, gruppe: dict) -> str:
         and monate
         and z.get("vf_gesamt") == vf.get("gesamt")
     ):
-        return f"Kosten über {monate} Monate"
+        return f"Kosten über {zeitraum_text(monate)}"
     return "Kosten über die Bündellaufzeit"
 
 

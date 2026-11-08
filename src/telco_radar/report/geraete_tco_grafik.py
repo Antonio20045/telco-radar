@@ -38,6 +38,7 @@ from typing import Optional
 from xml.sax.saxutils import escape
 
 from ..tco_model import zeitraum_vergleichbar
+from .geraete_zeitraum_wort import zeitraum_text
 
 BREITE = 1180
 LINKS = 300
@@ -117,21 +118,20 @@ def _gruppen(karten: list) -> list:
     gruppen = []
     for monate in sorted(nach_zeitraum):
         zeilen = sorted(nach_zeitraum[monate], key=lambda k: k["gesamt"])
-        gruppen.append({"monate": monate, "karten": zeilen})
+        tarif = [k["tarif_monate"] for k in zeilen if k.get("tarif_monate")]
+        gruppen.append(
+            {"monate": monate, "tarif": min(tarif, default=None), "karten": zeilen}
+        )
     return gruppen
 
 
 def _monate_wort(gruppen: list) -> str:
-    """ "24" oder "24 und 36" - die Zeitraeume, die die Balken TRAGEN.
+    """ "24 Monate" oder "24 Monate bzw. 24 Tarifmonate und 36 Geräteraten".
 
-    Fuer die Ueberschrift der Grafik (P0-B-h3). Sie kommt aus den
-    Gruppen und nennt damit genau die Zeitraeume, die gezeichnet werden -
-    eine feste 24 ueber einem 36-Monats-Balken war Befund 2.
+    Die Zeitraeume, die die Balken TRAGEN (P0-B-h3, Befund 2), aus den Gruppen;
+    ueber 24 Monate trennt `zeitraum_text` Tarifmonate und Geräteraten.
     """
-    monate = [g["monate"] for g in gruppen]
-    if len(monate) == 1:
-        return str(monate[0])
-    return " und ".join([", ".join(str(m) for m in monate[:-1]), str(monate[-1])])
+    return " bzw. ".join(zeitraum_text(g["monate"], g["tarif"]) for g in gruppen)
 
 
 def _skala(betrag: float, hoechst: float) -> float:
@@ -170,7 +170,7 @@ def balken(modell: dict) -> str:
     hoehe = int(hoehe)
 
     name = modell.get("name") or ""
-    titel = f"Kosten über {_monate_wort(gruppen)} Monate für {_t(name)} je Anbieter"
+    titel = f"Kosten über {_monate_wort(gruppen)} für {_t(name)} je Anbieter"
     teile = [
         f'<svg class="gr-g1" viewBox="0 0 {BREITE} {hoehe}" '
         f'width="100%" height="{hoehe}" role="img" '
@@ -183,7 +183,7 @@ def balken(modell: dict) -> str:
         laufzeit = gruppe["monate"]
         teile.append(
             f'<text class="gr-g1-gruppe" x="0" y="{y + 20:.0f}">'
-            f"gerechnet über {laufzeit} Monate</text>"
+            f"gerechnet über {zeitraum_text(laufzeit, gruppe['tarif'])}</text>"
         )
         oben = y + GRUPPE_KOPF - 6
         unten = oben + len(gruppe["karten"]) * (BALKEN_HOEHE + BALKEN_ABSTAND)

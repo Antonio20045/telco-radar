@@ -60,9 +60,12 @@ def test_der_bandgraph_zeigt_je_anbieter_die_karte_seiner_laufzeit(g, laufzeit):
     assert {z["anbieter"]: z["gesamt"] for z in band["balken"]["zeilen"]} == soll
     assert {li["anbieter"] for li in band["grafik"]["linien"]} == set(soll)
     svg = band["grafik"]["svg"]
-    zeitraum, fremd = (36, 24) if laufzeit == 36 else (24, 36)
-    assert f"Kosten über {zeitraum} Monate" in svg
-    assert f"{fremd} Monate" not in svg
+    if laufzeit == 36:
+        assert "Kosten über 24 Tarifmonate und 36 Geräteraten" in svg
+        assert "Kosten über 36 Monate" not in svg
+    else:
+        assert "Kosten über 24 Monate" in svg
+        assert "36 Monate" not in svg and "36 Geräteraten" not in svg
 
 
 def test_die_standardansicht_des_bandgraphen_hat_24_raten(g):
@@ -167,15 +170,18 @@ def _tafel(*zeilen: str):
 
 
 def test_kriterium_11_verlangt_den_zeitraum_an_der_grossen_zahl():
-    """Datenkonzept 5.3: „über H Monate“ an der Zahl, H wie die Zeile ihn
-    trägt. Gegenproben: ohne Etikett und mit falschem H wird das Kriterium rot;
+    """Datenkonzept 5.3: der Zeitraum steht an der Zahl, H wie die Zeile ihn
+    trägt, bei 36 Raten als „24 Tarifmonate und 36 Geräteraten“. Gegenproben:
+    ohne Etikett, mit falschem H und mit „36 Monate“ wird das Kriterium rot;
     eine Zeile ohne Zahl braucht kein Etikett."""
-    gut = _zeile("Kosten über 36 Monate")
+    gut = _zeile("Kosten über 24 Tarifmonate und 36 Geräteraten")
     assert portal.zeitraum_maengel(_tafel(gut)) == []
     assert portal.zeitraum_maengel(_tafel(gut, _zeile(None, gesamt=""))) == []
     assert portal.zeitraum_maengel(_tafel(gut, _zeile(None))) == [
         "1 Bündelzeilen ohne 'über H Monate'"
     ]
-    assert portal.zeitraum_maengel(_tafel(_zeile("Kosten über 24 Monate"))) == [
-        "1 Bündelzeilen ohne 'über H Monate'"
-    ]
+    for falsch in ("Kosten über 24 Monate", "Kosten über 36 Monate"):
+        assert portal.zeitraum_maengel(_tafel(_zeile(falsch))) == [
+            "1 Bündelzeilen ohne 'über H Monate'"
+        ]
+    assert portal.zeitraum_maengel(_tafel(_zeile("Kosten über 24 Monate", "24"))) == []

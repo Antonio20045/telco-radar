@@ -515,7 +515,7 @@
  },
  "src/telco_radar/report/geraete_radar.py": {
   "D103": 1,
-  "UP045": 4
+  "UP045": 3
  },
  "src/telco_radar/report/geraete_tco_band.py": {
   "E501": 1,
@@ -531,7 +531,7 @@
  "src/telco_radar/report/geraete_tco_karten.py": {
   "C901": 1,
   "E741": 2,
-  "UP045": 25
+  "UP045": 24
  },
  "src/telco_radar/report/geraete_vergleich.py": {
   "UP045": 6

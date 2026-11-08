@@ -37,13 +37,12 @@ Dazu das Kriterium des Geraeteradars (10.08.2026):
      keine Reste der geloeschten Preisgrafik, jede Alarmzeile mit Quelllink,
      Abrufdatum und Aufklapper, und die vier Kacheln zaehlen dasselbe wie der
      Satz darunter. Sind noch keine Alarmzeilen erfasst, gilt das Kriterium
-     als uebersprungen - die Seite steht dann unter ihrer
-     Veroeffentlichungsschwelle.
+     als uebersprungen (die Seite steht unter ihrer Veroeffentlichungsschwelle).
      Seit E3 Schritt 3 (17.09.2026) steht die Alarmtabelle im Radar-Reiter
      von geraete.html (bis dahin eigene Seite wettbewerbsradar.html, heute
      eine Weiterleitung) - Kriterium 11 liest sie von der EINEN Seite, und
      11b misst deren ALLE Tafeln einschliesslich der Radar-Tafel. Jede Buendelzeile
-     mit Zahl nennt „über H Monate“ (5.3); die Verbote der seit 30.08.2026
+     mit Zahl nennt ihren Zeitraum (5.3); die Verbote der seit 30.08.2026
      geloeschten Positionskarte misst `tests/test_geraete_reiter_browser.py`.
 
 Dazu das Kriterium der Umbenennung (11.08.2026):
@@ -123,12 +122,13 @@ class Bilanz:
 
 
 def zeitraum_maengel(tafel) -> list[str]:
-    """11: jede Buendelzeile mit Zahl nennt „über H Monate“ (H: data-leitzahl)."""
-    stumm = sum(
-        f"über {z.get('data-leitzahl-monate')} Monate"
-        not in " ".join(e.get_text(" ") for e in z.select(".gr-bnd-tco .gr-bnd-label"))
-        for z in tafel.select(".gr-bnd[data-gesamt]:not([data-gesamt=''])")
-    )
+    """11: jede Buendelzeile mit Zahl nennt ihren Zeitraum (24 Tarifmonate, H Raten)."""
+    stumm = 0
+    for z in tafel.select(".gr-bnd[data-gesamt]:not([data-gesamt=''])"):
+        h = int(z.get("data-leitzahl-monate") or 0)
+        wort = f"{h} Monate" if h <= 24 else f"24 Tarifmonate und {h} Geräteraten"
+        text = " ".join(e.get_text(" ") for e in z.select(".gr-bnd-tco .gr-bnd-label"))
+        stumm += f"über {wort}" not in text
     return [f"{stumm} Bündelzeilen ohne 'über H Monate'"] if stumm else []
 
 

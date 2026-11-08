@@ -393,7 +393,7 @@ def test_die_rechenprobe_steht_auf_der_karte(bestand):
     assert vier["gesamt"] == round(7.0 + 24 * 54.5 + 24 * 19.99, 2) == 1794.76
     assert vier["schnitt_monat"] == 74.78
     assert (sechs["zuzahlung"], sechs["rate"], sechs["monatlich"]) == (1.0, 36.5, 19.99)
-    assert sechs["label"] == "Kosten über 36 Monate"
+    assert sechs["label"] == "Kosten über 24 Tarifmonate und 36 Geräteraten"
     assert sechs["gesamt"] == round(1.0 + 36 * 36.5 + 24 * 19.99, 2) == 1794.76
     assert sechs["belastbar"]
     assert "Tarifgrundpreis Monat 25–36" not in sechs["luecken"]
@@ -657,7 +657,7 @@ def test_jede_belastbare_karte_traegt_das_label_der_leitzahl(bestand):
             assert monate is not None, (
                 f"{modell['id']}/{karte['anbieter']}: belastbar ohne Zeitraum"
             )
-            assert karte["label"] == f"Kosten über {monate} Monate", (
+            assert karte["label"] == f"Kosten über {_zeitraum_soll(karte)}", (
                 f"{modell['id']}/{karte['anbieter']}: {karte['label']!r}"
             )
             soll = 36 if karte["raten_laufzeit"] == 36 else 24
@@ -779,8 +779,13 @@ def test_g1_trennt_die_laufzeiten_mit_eigener_nulllinie():
     }
     svg = grafik.balken(modell)
     assert svg.count("gr-g1-null") == 2, "je Laufzeitgruppe eine Nulllinie"
-    assert "gerechnet über 24 Monate" in svg and "gerechnet über 36 Monate" in svg
-    assert 'aria-label="Kosten über 24 und 36 Monate für Testgerät je Anbieter"' in svg
+    assert "gerechnet über 24 Monate" in svg
+    assert "gerechnet über 24 Tarifmonate und 36 Geräteraten" in svg
+    assert "36 Monate" not in svg
+    assert (
+        'aria-label="Kosten über 24 Monate bzw. 24 Tarifmonate und 36 Geräteraten '
+        'für Testgerät je Anbieter"'
+    ) in svg
 
 
 def test_g1_gruppiert_am_zeitraum_der_leitzahl_nicht_an_der_tariflaufzeit(bestand):
@@ -818,6 +823,19 @@ def test_g1_gruppiert_am_zeitraum_der_leitzahl_nicht_an_der_tariflaufzeit(bestan
     )
 
 
+def _zeitraum_wort(monate, tarifmonate):
+    """Der Zeitraum einer Zahl in Worten, wie die Seite ihn nennen muss: bis zum
+    Ende des Tarifs „24 Monate“, darüber Tarifmonate und Geräteraten getrennt."""
+    tarif = 24 if tarifmonate is None else tarifmonate
+    if monate <= tarif:
+        return f"{monate} Monate"
+    return f"{tarif} Tarifmonate und {monate} Geräteraten"
+
+
+def _zeitraum_soll(karte):
+    return _zeitraum_wort(karte["leitzahl_monate"], karte["tarif_monate"])
+
+
 def test_g1_nennt_in_ueberschrift_und_gruppenkopf_den_echten_zeitraum(bestand):
     """Jeder Zeitraum, der in einem Balken steckt, steht auch im Text -
     Ueberschrift (aria-label/<title>) und Gruppenkopf. Eine Grafik, deren
@@ -839,14 +857,22 @@ def test_g1_nennt_in_ueberschrift_und_gruppenkopf_den_echten_zeitraum(bestand):
         )
         geprueft += 1
         label = re.search(r'aria-label="([^"]+)"', svg).group(1)
+        woerter = []
         for m in monate:
-            assert f"gerechnet über {m} Monate" in svg, (
+            tarife = [
+                k["tarif_monate"]
+                for k in modell["karten"]
+                if k["belastbar"] and k["leitzahl_monate"] == m and k["tarif_monate"]
+            ]
+            wort = _zeitraum_wort(m, min(tarife, default=None))
+            woerter.append(wort)
+            assert f"gerechnet über {wort}" in svg, (
                 f"{modell['id']}: Gruppenkopf fuer {m} Monate fehlt"
             )
             assert str(m) in label, f"{modell['id']}: {label!r} ohne {m}"
-        wort = " und ".join(str(m) for m in monate)
         assert label == (
-            f"Kosten über {wort} Monate für {modell.get('name') or ''} je Anbieter"
+            f"Kosten über {' bzw. '.join(woerter)} für {modell.get('name') or ''}"
+            " je Anbieter"
         ), label
     assert geprueft, "kein Modell mit G1-Grafik - der Test prueft nichts"
 
@@ -1070,7 +1096,10 @@ def test_ein_buendel_ohne_listung_steht_unter_seinem_katalognamen():
     assert modell["titel"] == "Apple iPhone 16 Pro Max 256 GB"
     assert modell["hersteller"] == "Apple"
     o2 = [k for k in modell["karten"] if k["anbieter"] == "o2"][0]
-    assert o2["belastbar"] and o2["label"] == "Kosten über 36 Monate"
+    assert (
+        o2["belastbar"]
+        and o2["label"] == "Kosten über 24 Tarifmonate und 36 Geräteraten"
+    )
     assert o2["zustand"] == "unbekannt", "keine Listung belegt keinen Zustand"
 
 
@@ -1155,7 +1184,7 @@ def test_die_referenz_des_iphone_17_ist_die_aktuelle_messung(bestand):
             == 1847.8
         )
         if k["raten_laufzeit"] == 36:
-            assert k["label"] == "Kosten über 36 Monate"
+            assert k["label"] == "Kosten über 24 Tarifmonate und 36 Geräteraten"
         assert k["abgerufen_am"] == ref["tarif_abgerufen_am"]
     assert all(
         k.get("abgerufen_am") != "2026-09-06"

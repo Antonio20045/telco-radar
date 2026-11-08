@@ -421,7 +421,7 @@
        (`leitzahl_monate`, Datenkonzept 5.3): 24 bei 12 und 24 Raten, 36 bei
        36 Raten, die eigene Laufzeit bei einem zusammengelegten
        Buendelmonatspreis. #}
-    <p class="gr-basis--duenn">Gerechnet über {{ k.leitzahl_monate }} Monate{% if
+    <p class="gr-basis--duenn">Gerechnet über {{ k.zeitraum }}{% if
       k.tarif_bindung and k.raten_laufzeit and k.tarif_bindung !=
       k.raten_laufzeit %} – der Tarif bindet {{ k.tarif_bindung }} Monate, die
       {{ raten_wort }} laufen {{ k.raten_laufzeit }}{% endif %}. Enthalten sind

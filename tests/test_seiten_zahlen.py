@@ -1527,7 +1527,9 @@ def test_pf_beide_ratenlaufzeiten_eines_congstar_abrufs_werden_zwei_zeilen(
             "die 36-Raten-Zeile braucht den Tarif ab Monat 25 nicht"
         )
     assert "Kosten über 24 Monate" in fragment, "die 24er nennt ihren Zeitraum nicht"
-    assert "Kosten über 36 Monate" in fragment, "die 36er nennt ihren Zeitraum nicht"
+    assert "Kosten über 24 Tarifmonate und 36 Geräteraten" in fragment, (
+        "die 36er nennt ihren Zeitraum nicht"
+    )
 
 
 def test_pf_ohne_tarifleiter_nennt_die_seite_den_grund(tmp_path, bestand):

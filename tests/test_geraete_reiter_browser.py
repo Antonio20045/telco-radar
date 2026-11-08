@@ -2991,7 +2991,11 @@ def test_die_buendelzeile_oeffnet_ohne_netzwerk(_seite):
         text = " ".join(vorlage[0].get_text(" ", strip=True).split())
         assert len(text) > 60, f"der Rechenweg ist leer: {text!r}"
         if z.get("data-gesamt"):
-            assert f"Gerechnet über {z['data-leitzahl-monate']} Monate" in text, text
+            m = z["data-leitzahl-monate"]
+            assert (
+                f"Gerechnet über {m} Monate" in text
+                or f"Gerechnet über 24 Tarifmonate und {m} Geräteraten" in text
+            ), text
         nachladend = vorlage[0].select("[src], [srcset], [data-src]")
         assert nachladend == [], nachladend
 

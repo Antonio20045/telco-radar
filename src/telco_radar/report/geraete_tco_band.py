@@ -43,6 +43,7 @@ from . import geraete_tco_grafik
 from .anbieter_farben import farbe_fuer
 from .geraete_laufzeit import LAUFZEIT_STANDARD, ansicht, fehlt_satz, zeitraum
 from .geraete_tco_karten import ANBIETER_REIHENFOLGE, HAENDLER_OHNE_BUENDEL
+from .geraete_zeitraum_wort import zeitraum_text
 
 log = logging.getLogger(__name__)
 
@@ -558,11 +559,10 @@ def baender_fuer_modell(
     """Je Modell die Baender, fuer die es ECHTE Buendel der Ratenlaufzeit
     `laufzeit` gibt (§7/Aufgabe 1; Datenkonzept 5.4: eine Linie je Anbieter in
     der gewaehlten Laufzeit, Achse H) - kein leeres Band wird angeboten.
-    Je Eintrag: key, label, bereich (die Stufe der `leiter`); laufzeit;
-    grafik (`geraete_tco_grafik.zeitreihe`, beschriftet „Kosten über H
-    Monate“); fehlend ([{"anbieter","grund"}] je erwartetem Anbieter ohne
-    Linie, Aufgabe 4); werte (je Anbieter MIT Linie die exakte Zahl als
-    sichtbarer Text, UX-5; `gb` braucht `gb_je_tarif`, sonst ""); balken.
+    Je Eintrag: key, label, bereich (die Stufe der `leiter`); laufzeit; grafik
+    (`geraete_tco_grafik.zeitreihe`, „Kosten über H“); fehlend ([{"anbieter",
+    "grund"}] je Anbieter ohne Linie, Aufgabe 4); werte (je Anbieter MIT Linie
+    die exakte Zahl als Text, UX-5; `gb` braucht `gb_je_tarif`, sonst ""); balken.
     """
     gb_je_tarif = gb_je_tarif or {}
     je_band = karten_je_band(modell, band_je_tarif, laufzeit)
@@ -598,7 +598,7 @@ def baender_fuer_modell(
                 "laufzeit": laufzeit,
                 "grafik": geraete_tco_grafik.zeitreihe(
                     reihen,
-                    messgroesse=f"Kosten über {zeitraum(laufzeit)} Monate",
+                    messgroesse=f"Kosten über {zeitraum_text(zeitraum(laufzeit))}",
                     klasse="gr-tcoband",
                 ),
                 "fehlend": fehlend,

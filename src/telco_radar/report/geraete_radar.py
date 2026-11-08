@@ -71,6 +71,7 @@ from ..tco_model import zeitraum_vergleichbar
 from . import geraete_notbremse as notbremse
 from . import geraete_tco_band, geraete_tco_karten
 from .geraete_laufzeit import LAUFZEIT_STANDARD, LAUFZEITEN, ansicht
+from .geraete_zeitraum_wort import grund_anderer_zeitraum, zeitraum_der_karte
 
 NETZ_WETTBEWERBER = tuple(
     a for a in geraete_tco_karten.ANBIETER_REIHENFOLGE if a != "Vodafone"
@@ -84,30 +85,6 @@ STATUS_VERGLEICHBAR = "vergleichbar"
 STATUS_BAND_MISMATCH = "band_mismatch"
 STATUS_KEIN_BUENDEL = "kein_buendel"
 STATUS_NICHT_VERGLEICHBAR = "nicht_vergleichbar"
-
-
-def _grund_anderer_zeitraum(
-    anbieter: str, karte: dict, vf_monate: Optional[int], raten: tuple
-) -> str:
-    """Der Satz, der eine Zahl mit fremdem Zeitraum benennt (P0-B-h3).
-
-    Er nennt BEIDE Zeitraeume - "nicht vergleichbar" allein liest sich
-    wie ein Mangel des Angebots, und der Strich der Prozentspalte hiesse
-    "kein Angebot" (A2). Dieselbe Aussage wie an der Buendelzeile
-    (`geraete_tco_karten.delta_zustand`), nur an dieser Tabelle in einem
-    Satz statt in zwei Feldern. Ein unbekannter Zeitraum wird benannt,
-    nicht als 24 geraten (Clean Code 3/4); `raten` nennt beide Ratenlaufzeiten.
-    """
-    monate = karte.get("leitzahl_monate")
-    dieses, gegen = (
-        (f"{r} Raten über " if r is not None else "")
-        + (f"{m} Monate" if m is not None else "eine nicht gemessene Laufzeit")
-        for r, m in zip(raten, (monate, vf_monate), strict=True)
-    )
-    return (
-        f"Die Zahl von {anbieter} trägt {dieses}, die Vodafone-Zahl "
-        f"{gegen} – über zwei Laufzeiten gibt es keinen Abstand."
-    )
 
 
 SICHTBAR_MAX = 15
@@ -148,6 +125,7 @@ def _vodafone_basis(modell: dict, band_je_tarif: dict) -> Optional[dict]:
     return {
         "gesamt": ref["gesamt"],
         "monate": ref.get("monate"),
+        "tarif_monate": ref.get("tarif_monate"),
         "tarif": ref.get("tarif", ""),
         "naeherung": not bool(ref.get("aus_buendel")),
         "ansicht": ref.get("ansicht"),
@@ -261,11 +239,12 @@ def _zeile_fuer_anbieter(
             "tarif": karte.get("tarif", ""),
             "band": band,
             "band_label": _band_label(band),
-            "grund": _grund_anderer_zeitraum(
+            "grund": grund_anderer_zeitraum(
                 anbieter,
                 karte,
                 basis.get("monate"),
                 (ansicht(karte), basis.get("ansicht")),
+                basis.get("tarif_monate"),
             ),
             **_beleg(karte.get("quelle_url", ""), karte.get("abgerufen_am", "")),
         }
@@ -320,8 +299,12 @@ def _paar_zeile(anbieter: str, band: str, wb_karte: dict, vf_karte: dict) -> dic
             "tarif": wb_karte.get("tarif", ""),
             "band": band,
             "band_label": _band_label(band),
-            "grund": _grund_anderer_zeitraum(
-                anbieter, wb_karte, vf_karte.get("leitzahl_monate"), raten
+            "grund": grund_anderer_zeitraum(
+                anbieter,
+                wb_karte,
+                vf_karte.get("leitzahl_monate"),
+                raten,
+                vf_karte.get("tarif_monate"),
             ),
             **_beleg(wb_karte.get("quelle_url", ""), wb_karte.get("abgerufen_am", "")),
         }
@@ -336,6 +319,8 @@ def _paar_zeile(anbieter: str, band: str, wb_karte: dict, vf_karte: dict) -> dic
         "vf_gesamt": vf_karte["gesamt"],
         "laufzeit": raten[0],
         "monate": vf_karte.get("leitzahl_monate"),
+        "zeitraum": zeitraum_der_karte(vf_karte),
+        "zeitraum_lang": zeitraum_der_karte(vf_karte, kurz=False),
         "tarif": wb_karte.get("tarif", ""),
         "band": band,
         "band_label": _band_label(band),
@@ -590,6 +575,8 @@ def modellliste(gruppen: list[dict]) -> dict:
                 "gesamt": (paar or {}).get("gesamt"),
                 "vf_gesamt": (paar or {}).get("vf_gesamt"),
                 "monate": (paar or {}).get("monate"),
+                "zeitraum": (paar or {}).get("zeitraum", ""),
+                "zeitraum_lang": (paar or {}).get("zeitraum_lang", ""),
                 "quelle_url": (paar or {}).get("quelle_url", ""),
                 "abgerufen_am": (paar or {}).get("abgerufen_am", ""),
                 "luecke": luecke,

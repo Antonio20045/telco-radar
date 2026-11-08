@@ -410,7 +410,7 @@
   <div class="gr-leit gr-leit--radar"><b class="gr-leit-zahl">{{
     spitze.euro_text }} €</b><span class="gr-leit-label">{{ spitze.anbieter }} {{
     spitze.richtung }} Vodafone: {{ spitze.titel }} mit Tarif, Kosten
-    über {{ spitze.monate }} Monate</span></div>
+    über {{ spitze.zeitraum_lang or 'eine nicht gemessene Laufzeit' }}</span></div>
   {% endif %}
   {# E3-Fix (QA 17.09.2026, B2) / P4-Fix (Sicht-Pruefung 18.09.): Der Kopf
      behauptete die vorzeichenbehaftete Leitzahl für ALLE drei Sektionen -

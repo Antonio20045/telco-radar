@@ -531,7 +531,10 @@ def test_die_finanzierungssumme_heisst_so_und_nicht_geraetepreis(fragment):
     assert "nicht erhoben" in rw, (
         "der Rechenweg nennt die Lücke beim Gerätepreis ohne Vertrag nicht"
     )
-    assert "Kosten über 36 Monate" in summary and "1.477,00" in summary
+    assert (
+        "Kosten über 24 Tarifmonate und 36 Geräteraten" in summary
+        and "1.477,00" in summary
+    )
     assert "1.765,00" not in summary, "36 Tarifmonate gezählt"
 
 

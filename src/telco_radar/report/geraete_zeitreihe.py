@@ -64,7 +64,6 @@ from .geraete_rechenweg import (
     _datum_de,
     _datum_kurz,
     _esc,
-    _zeitraum_wort,
 )
 from .geraete_rechenweg import _buendel_aus_messung as _buendel_aus_messung
 from .geraete_rechenweg import _messwert as _messwert
@@ -72,6 +71,7 @@ from .geraete_rechenweg import _rechenwege_html as _rechenwege_html
 from .geraete_rechenweg import _rechung as _rechung
 from .geraete_rechenweg import _rechung_html as _rechung_html
 from .geraete_rechenweg import _wert_aus_messung as _wert_aus_messung
+from .geraete_zeitraum_wort import raten_zusatz, zeitraum_wort
 from .geraete_zeitreihe_geometrie import (
     LUECKE_TAGE_SCHWELLE as LUECKE_TAGE_SCHWELLE,
 )
@@ -499,10 +499,9 @@ def _svg(
         return oben + (1 - (wert - y0) / (y1 - y0)) * ph
 
     teile: list[str] = []
-    wort = _zeitraum_wort(alle_monate)
+    wort = zeitraum_wort(alle_monate)
     kopf = f"Kosten über {wort}" if wort else "Kosten"
-    if laufzeit is not None:
-        kopf += f" · {laufzeit} Raten"
+    kopf += raten_zusatz(alle_monate, laufzeit, " · ")
     teile.append(
         f"<svg class='gr-zr gr-zr--{'breit' if breit else 'schmal'}' "
         f"viewBox='0 0 {w} {h}' role='img' aria-label='{_esc(kopf)} "
@@ -867,8 +866,8 @@ def _paar(
         "leitzahl_html": _leitzahl_html(zeilen),
         "rechnung_html": _rechnung_html(zeilen, h),
         "legende_html": _legende_html(serien, zeitraeume, ueberholt),
-        "graph_beschriftung": f"Kosten über {h} Monate mit {laufzeit} Raten "
-        f"je Messtag und Anbieter",
+        "graph_beschriftung": f"Kosten über {zeitraum_wort([h])}"
+        f"{raten_zusatz([h], laufzeit, ' mit ')} je Messtag und Anbieter",
         "svg_breit": _svg(
             standard_serien, True, beleg_je, zeitraeume, laufzeit=laufzeit
         ),

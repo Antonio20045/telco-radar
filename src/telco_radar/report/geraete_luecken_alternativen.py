@@ -6,8 +6,8 @@ from __future__ import annotations
 from ..tco_model import TCO_HORIZONT, zeitraum_vergleichbar
 from . import geraete_notbremse as notbremse
 from .geraete_laufzeit import ansicht
-from .geraete_rechenweg import _zeitraum_wort
 from .geraete_tco_band import band_label
+from .geraete_zeitraum_wort import zeitraum_wort
 
 
 def _alternativen(
@@ -92,7 +92,7 @@ def _alt_zeitraum(monate, h: int = TCO_HORIZONT) -> str:
         return ""
     if monate is None:
         return " über eine nicht gemessene Laufzeit"
-    return f" über {_zeitraum_wort([monate])}"
+    return f" über {zeitraum_wort([monate])}"
 
 
 def _stufe(band_labels: dict, band: str) -> str:

@@ -1032,8 +1032,8 @@ def test_ueber_zwei_zeitraeume_steht_kein_betrag_sondern_der_zustand():
     assert zustand["kurz"] == "andere Laufzeit"
     assert zustand["satz"] == (
         "Kein Abstand zur Vodafone-Referenz: diese "
-        "Zahl trägt 24 Monate, die Referenz 36 "
-        "Monate."
+        "Zahl trägt 24 Monate, die Referenz 24 Tarifmonate "
+        "und 36 Geräteraten."
     )
 
     d24 = karten._delta(karte, modell["referenz"])

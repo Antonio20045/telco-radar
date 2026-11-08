@@ -111,7 +111,7 @@ Warum der Tarif in der 36er-Ansicht nur 24 Monate zählt (Antonio, 10.10.2026): 
 
 1&1 nennt nur einen Monatsbetrag für Tarif und Gerät; nach 24 Monaten kann man kündigen und das Gerät gegen eine Ablöse behalten („24+12“). Also wird 1&1 nur über 24 Monate verglichen (Antonio, 10.10.2026): 24 × Bündelbetrag + Ablöse + Anschluss in der 24er-Ansicht (`tco_kosten.zeitraum`, `geraete_laufzeit.ansicht`). Die gemessene Zuzahlung eines solchen Vertrags ist die Ablöse, keine Anzahlung; fehlt sie, ist die Zahl die Lücke „Einmalzahlung bei Kündigung“. Die 36er-Ansicht nennt „1&1 wird nur über 24 Monate verglichen“.
 
-Zweitzahl ist Ø/Monat = Kosten ÷ H, immer mit „über H Monate“ beschriftet. Laufzeitübergreifend gibt es keinen Sieger.
+Zweitzahl ist Ø/Monat = Kosten ÷ H. Das Etikett nennt den Zeitraum so (`geraete_zeitraum_wort.zeitraum_text`, die einzige Quelle für Seite und Export): „Kosten über 24 Monate“, bei 36 Raten „Kosten über 24 Tarifmonate und 36 Geräteraten“, nie „36 Monate“ über einem Tarif, der nur 24 zählt. Im Export trägt `geraete-tco*.csv` die Spalte „Tarifmonate in der Summe“; die Summe steht unter „Kosten über 24 Monate EUR“ oder unter „Kosten über Tarifmonate und Geräteraten EUR“ (H > 24). Laufzeitübergreifend gibt es keinen Sieger.
 
 **Entscheidung 1** (bis 10.10.2026: 36 Tarifmonate) ist durch Antonios Regel oben ersetzt.
 
@@ -120,7 +120,7 @@ Zweitzahl ist Ø/Monat = Kosten ÷ H, immer mit „über H Monate“ beschriftet
 - Umschalter „12 | 24 | 36 Monate“ neben dem Band, Standard 24, im Link als `?laufzeit=24`. Gebaut nach dem Muster des Bandes: beim Laden lesen und gegen `erlaubt` prüfen (`app.js:1117-1133`), per `replaceState` zurückschreiben (`app.js:1750-1784`), vorgerendert je `modell::band::laufzeit` im Fragment `data/geraete-zeitreihe.html`.
 - Der Umschalter steuert alles: Zeilen, Sieger, Antwortsatz, Δ, Spanne, Kacheln, Grafik, Rechenweg und Export. „alle“ zeigt die Zeilen nach Laufzeit gruppiert, ohne Sieger und ohne Δ.
 - Δ zu Vodafone nur gegen die Vodafone-Karte mit gleichem Band und gleicher Laufzeit.
-- Je Zeile steht „36 Raten · Tarif 24 Monate“; die große Zahl heißt „über 36 Monate“.
+- Je Zeile steht „36 Raten · Tarif 24 Monate“; die große Zahl heißt „über 24 Tarifmonate und 36 Geräteraten“.
 - Ein Anbieter ohne Bündel in dieser Laufzeit erscheint benannt: „bietet 12 Monate nicht an“ nur, wenn der Crawler die Option auf der Seite nicht gefunden hat; sonst „nicht erfasst“.
 - Grafik: eine Linie je Anbieter in der gewählten Laufzeit, Achse H.
 

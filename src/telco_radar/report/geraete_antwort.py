@@ -13,6 +13,7 @@ from . import geraete_notbremse as notbremse
 from .geraete_laufzeit import NICHT_ERFASST, ansicht, zeitraum
 from .geraete_rechenweg import EIGEN, _datum_de, _esc, euro
 from .geraete_tco_karten import kurz_datum
+from .geraete_zeitraum_wort import zeitraum_wort
 
 
 def _kurz_name(modell: dict) -> str:
@@ -77,7 +78,7 @@ def _ohne_zeilen(
         beste_fremd = fremd[0]
         monate = beste_fremd.get("leitzahl_monate")
         zeit = (
-            f"{monate} Monate"
+            zeitraum_wort([monate])
             if monate is not None
             else "eine nicht gemessene Laufzeit"
         )
@@ -85,7 +86,8 @@ def _ohne_zeilen(
             f"{beginn} führt nur {_esc(beste_fremd['anbieter'])} – und nur über "
             f"{zeit}: <b class='gr-zr-zahl'>{euro(beste_fremd['gesamt'])}</b> "
             f"({_esc(beste_fremd.get('tarif') or '')}{_gb_teil(beste_fremd)}). "
-            f"Über zwei Laufzeiten gibt es keinen Vergleich mit {h} Monaten."
+            "Über zwei Laufzeiten gibt es keinen Vergleich "
+            f"(Ansicht: {zeitraum_wort([h])})."
         )
     if gesperrt:
         wer = _esc(", ".join(notbremse.namen(gesperrt)))
@@ -142,7 +144,7 @@ def _antwort_html(
     beste = zeilen[0]
     kern = (
         f"<b class='gr-zr-zahl'>{euro(beste['gesamt'])}</b> Kosten über "
-        f"{h} Monate, Ø <b class='gr-zr-zahl'>{_schnitt(beste)}</b> "
+        f"{zeitraum_wort([h])}, Ø <b class='gr-zr-zahl'>{_schnitt(beste)}</b> "
         f"({_esc(beste.get('tarif') or '')}{_gb_teil(beste)})"
     )
     if len(zeilen) == 1 and beste["anbieter"] == EIGEN:
@@ -257,13 +259,9 @@ def _rechnung_html(zeilen: list, h: int = TCO_HORIZONT) -> str:
     )
     datum = beste.get("abgerufen_am") or ""
     datum_teil = f", abgerufen am {_datum_de(datum)}" if datum else ""
-    tarif = (
-        "Tarif"
-        if h <= TCO_HORIZONT
-        else f"Tarif nur {TCO_HORIZONT} Monate (danach monatlich kündbar)"
-    )
+    tarif = "Tarif" if h <= TCO_HORIZONT else "Tarif (danach monatlich kündbar)"
     return (
-        f"Alles über {h} Monate: Anzahlung, {tarif}, alle Geräteraten und "
+        f"Alles über {zeitraum_wort([h])}: Anzahlung, {tarif}, alle Geräteraten und "
         f"Anschlusspreis, ohne Boni. Beleg des günstigsten Angebots: "
         f"{link}{datum_teil}."
     )

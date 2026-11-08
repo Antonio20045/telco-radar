@@ -98,7 +98,7 @@ def test_36_raten_rechnen_24_tarifmonate():
     k = _karte(b)
     assert k["gesamt"] == 1459.0 == kosten_ueber(b).gesamt
     assert k["leitzahl_monate"] == 36
-    assert k["label"] == "Kosten über 36 Monate"
+    assert k["label"] == "Kosten über 24 Tarifmonate und 36 Geräteraten"
     assert k["schnitt_monat"] == round(1459.0 / 36, 2)
     assert k["belastbar"]
     assert round(sum(s["betrag"] for s in k["zerlegung"]), 2) == k["gesamt"]
@@ -109,7 +109,7 @@ def test_ohne_preis_ab_monat_25_traegt_die_36er_karte_ihre_zahl():
     k = _karte(_getrennt(36, 30.5, phasen=False))
     assert k["gesamt"] == 1459.0
     assert k["belastbar"]
-    assert k["label"] == "Kosten über 36 Monate"
+    assert k["label"] == "Kosten über 24 Tarifmonate und 36 Geräteraten"
     assert f"{POSTEN_TARIF} Monat 25–36" not in k["luecken"]
 
 

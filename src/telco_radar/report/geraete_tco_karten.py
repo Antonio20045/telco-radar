@@ -77,6 +77,7 @@ from ..tco_model import (
 from . import anbieter_farben, geraete_preisstand, geraete_rechnung, geraete_vergleich
 from . import geraete_notbremse as notbremse
 from .geraete_tco_grafik import anbieter_slug
+from .geraete_zeitraum_wort import zeitraum_text
 
 LAUFZEIT = TCO_HORIZONT
 AB_MONAT = TCO_HORIZONT + 1
@@ -593,18 +594,15 @@ def zerlegung_balken(
     return segmente
 
 
-def label_der_leitzahl(monate: Optional[int]) -> str:
-    """ "Kosten über 36 Monate" - das Etikett NENNT den Zeitraum der Zahl.
+def label_der_leitzahl(monate: int | None, tarifmonate: int | None = None) -> str:
+    """ "Kosten über 24 Tarifmonate und 36 Geräteraten" - das Etikett der Leitzahl.
 
-    Ein Etikett, das 24 sagt, wo die Zahl 36 Monate traegt, ist keine
-    Formulierungsfrage: es macht aus einer richtigen Summe eine falsche
-    Aussage. Der Zeitraum kommt aus `Tco.leitzahl_monate` - dieselbe
-    Zahl, die den Ø/Monat teilt und ueber den Δ-Vergleich entscheidet
-    (Clean Code 7).
+    Zeitraum aus `Tco.leitzahl_monate` (Clean Code 7), Tarifmonate aus
+    `Kosten.tarifmonate`; den Text baut `geraete_zeitraum_wort.zeitraum_text`.
     """
     if monate is None:
         return LABEL_OHNE_LAUFZEIT
-    return f"Kosten über {monate} Monate"
+    return f"Kosten über {zeitraum_text(monate, tarifmonate)}"
 
 
 AKTION_NAME = {
@@ -717,9 +715,10 @@ def _karte(
         "tarif_id_guete": b.tarif_id_guete,
         "geraetepreis": geraetepreis,
         "geraetepreis_art": geraetepreis_art,
-        "label": label_der_leitzahl(monate),
+        "label": label_der_leitzahl(monate, kosten.tarifmonate),
         "laufzeit": monate,
         "leitzahl_monate": monate,
+        "zeitraum": zeitraum_text(monate, kosten.tarifmonate),
         "tarif_monate": kosten.tarifmonate,
         "tarif_bindung": b.tarif_bindung_monate,
         "raten_laufzeit": geraete_laufzeit.raten_laufzeit(b),
@@ -1062,7 +1061,8 @@ def _referenzkarte(ref: dict, heute: str = "") -> dict:
             "leer_grund": "",
             "tarif": ref["tarif"],
             "tarif_id": ref.get("tarif_id", ""),
-            "label": label_der_leitzahl(ref["tarif_monate"]),
+            "label": label_der_leitzahl(ref["tarif_monate"], ref["tarif_monate"]),
+            "zeitraum": zeitraum_text(ref["tarif_monate"], ref["tarif_monate"]),
             "tarif_monate": ref["tarif_monate"],
             "laufzeit": ref["tarif_monate"],
             "leitzahl_monate": ref["tarif_monate"],
@@ -1178,10 +1178,9 @@ def delta_zustand(karte: dict, referenz: Optional[dict]) -> Optional[dict]:
     if gleicher_horizont(karte, referenz):
         return None
     monate = karte.get("leitzahl_monate")
-    dieses = (
-        f"{monate} Monate" if monate is not None else "eine nicht gemessene Laufzeit"
-    )
-    satz = f"diese Zahl trägt {dieses}, die Referenz {referenz['monate']} Monate"
+    dieses = zeitraum_text(monate, karte.get("tarif_monate"))
+    gegen = zeitraum_text(referenz["monate"], referenz.get("tarif_monate"))
+    satz = f"diese Zahl trägt {dieses}, die Referenz {gegen}"
     if zeitraum_vergleichbar(monate, referenz.get("monate")):
         satz = (
             f"diese Zeile hat {karte.get('raten_laufzeit')} Raten, die "
