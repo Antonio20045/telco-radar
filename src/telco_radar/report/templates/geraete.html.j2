@@ -967,7 +967,7 @@
               else ('nicht lieferbar' if z.verfuegbarkeit == 'nicht_lieferbar'
                     else ('vorbestellbar' if z.verfuegbarkeit == 'vorbestellbar'
                           else z.verfuegbarkeit)) }}</span>{% endif %}</td>
-            <td><span class="gr-a-klein gr-a-datum">{{ z.abgerufen_am | date_de }}</span>{% set sv = stand_vom(z.abgerufen_am, geraete.abgerufen_bis) %}{% if sv %} <span class="gr-kk-marke gr-kk-marke--alt">{{ sv }}</span>{% endif %}</td>
+            <td><span class="gr-a-klein gr-a-datum">{{ z.abgerufen_am | date_de }}</span>{% set sv = stand_vom(z.abgerufen_am, geraete.einzel_stichtag) %}{% if sv %} <span class="gr-kk-marke gr-kk-marke--alt">{{ sv }}</span>{% endif %}</td>
           </tr>
           {% endfor %}
           </tbody>

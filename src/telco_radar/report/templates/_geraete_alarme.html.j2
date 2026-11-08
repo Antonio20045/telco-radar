@@ -63,7 +63,7 @@
     {# KEINE VERFUEGBARKEITSSPALTE (30.08.2026): sie sagte an der echten
        Ausgabe in 12 von 13 Zeilen "unbekannt". Geloescht ist sie nicht -
        der Geraetekatalog der Geraeteseite traegt sie weiter. #}
-    <td><span class="gr-a-klein gr-a-datum">{{ z.bester.abgerufen_am | date_de }}</span>{% set sv = stand_vom(z.bester.abgerufen_am, geraete.abgerufen_bis) %}{% if sv %} <span class="gr-kk-marke gr-kk-marke--alt">{{ sv }}</span>{% endif %}</td>
+    <td><span class="gr-a-klein gr-a-datum">{{ z.bester.abgerufen_am | date_de }}</span>{% set sv = stand_vom(z.bester.abgerufen_am, geraete.einzel_stichtag) %}{% if sv %} <span class="gr-kk-marke gr-kk-marke--alt">{{ sv }}</span>{% endif %}</td>
   </tr>
   <tr class="gr-a-auf{% if rest %} gr-a-rest{% endif %}" id="auf-{{ nr }}"><td colspan="7">
     <ul class="gr-a-liste">
@@ -74,7 +74,7 @@
           }}</span>{% endif %}</span>
         <span>{{ a.zustand }}</span>
         {% if a.farbe %}<span>{{ a.farbe }}</span>{% endif %}
-        <span>{{ a.abgerufen_am | date_de }}{% set sv = stand_vom(a.abgerufen_am, geraete.abgerufen_bis) %}{% if sv %} <span class="gr-kk-marke gr-kk-marke--alt">{{ sv }}</span>{% endif %}</span>
+        <span>{{ a.abgerufen_am | date_de }}{% set sv = stand_vom(a.abgerufen_am, geraete.einzel_stichtag) %}{% if sv %} <span class="gr-kk-marke gr-kk-marke--alt">{{ sv }}</span>{% endif %}</span>
         {% if a.url %}<a href="{{ a.url }}" rel="noopener">Quelle</a>{% endif %}
       </li>
       {% endfor %}

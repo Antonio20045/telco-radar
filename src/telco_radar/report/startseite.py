@@ -15,7 +15,6 @@ import re
 from datetime import date, timedelta
 
 from .bilder import MIND_BREITE_GROSS
-from .geraete_messdatum import je_anbieter as messdatum_je_anbieter
 from .geraete_messdatum import stand_vom
 from .geraete_preisstand import anzeige as preis_anzeige
 
@@ -344,5 +343,4 @@ VORLAGEN_HELFER = {
     "MIND_BREITE_GROSS": MIND_BREITE_GROSS,
     "preis_anzeige": preis_anzeige,
     "stand_vom": stand_vom,
-    "messdatum_je_anbieter": messdatum_je_anbieter,
 }

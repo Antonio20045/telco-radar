@@ -11,24 +11,18 @@ wurde zuletzt am 07.11. gemessen (Schutzseite am Morgen des 08.11.).
 
 from __future__ import annotations
 
-from pathlib import Path
+import json
+import shutil
 
-from bestand_pfad import lese_wurzel
+import test_geraete_buendel_kopf_zeitraum as basis
 from bs4 import BeautifulSoup
-from jinja2 import Environment, FileSystemLoader
 
-from telco_radar.geraete_config import lade_katalog
-from telco_radar.report import geraete_messdatum, geraete_tco_view, startseite
-from telco_radar.tco_model import Buendel
+from telco_radar.geraete_config import lade_katalog, lade_quellen
+from telco_radar.report import geraete_messdatum, geraete_view
+from telco_radar.report.html import render_site
 
 HEUTE = "2026-11-08"
-_VORLAGEN = Path(geraete_messdatum.__file__).parent / "templates"
-
-
-def _env():
-    env = Environment(loader=FileSystemLoader(_VORLAGEN), autoescape=True)
-    env.globals.update(startseite.VORLAGEN_HELFER)
-    return env
+BERICHT = "2026-11-07"
 
 
 def _b(anbieter, tag):
@@ -79,47 +73,133 @@ def test_stand_vom_an_der_zeile():
     assert geraete_messdatum.stand_vom("2026-11-08", "2026-11-08") == ""
     assert geraete_messdatum.stand_vom("", "2026-11-08") == "Messdatum unbekannt"
     assert geraete_messdatum.stand_vom(None, "2026-11-08") == "Messdatum unbekannt"
-    assert geraete_messdatum.stand_vom("2026-11-07", "") == ""
 
 
-def test_die_seite_rendert_die_zeile_aus_den_gerechneten_buendeln():
-    katalog = lade_katalog(lese_wurzel())
-    sku = "apple-iphone-17-pro-256gb-schwarz"
-
-    def bnd(anbieter, tag):
-        return Buendel(
-            sku_id=sku,
-            anbieter=anbieter,
-            tarif_name=f"{anbieter} L",
-            buendel_monatlich=40.0,
-            laufzeit_monate=24,
-            quelle_url="https://example.invalid/x",
-            abgerufen_am=tag,
-        )
-
-    tco = geraete_tco_view.aufbereiten(
-        [bnd("Vodafone", "2026-11-08"), bnd("Telekom", "2026-11-07")],
-        [],
-        [],
-        katalog,
-        heute=HEUTE,
+def test_stand_vom_faengt_zukunft_und_unlesbares_fail_closed():
+    """Zukunft gegen den Vergleichstag, unlesbar, kein Vergleichstag: nie geraten."""
+    assert (
+        geraete_messdatum.stand_vom("2026-12-31", "2026-11-08") == "Messdatum unbekannt"
     )
-    html = (
-        _env()
-        .get_template("_geraete_messdatum.html.j2")
-        .render(geraete={"tco": tco, "stand": HEUTE})
+    assert (
+        geraete_messdatum.stand_vom("kein-datum", "2026-11-08") == "Messdatum unbekannt"
     )
-    suppe = BeautifulSoup(html, "html.parser")
-    je = {
+    assert geraete_messdatum.stand_vom("2026-11-07", "") == "Messdatum unbekannt"
+
+
+def test_juengster_tag_laesst_unlesbares_und_zukunft_nicht_gewinnen():
+    """String-Sort stellt „kein-datum“ und „2026-12-31“ nach oben; sie zählen nicht."""
+    daten = ["2026-11-07", "kein-datum", "2026-12-31", "", None, "2026-11-08"]
+    assert geraete_messdatum.juengster_tag(daten, HEUTE) == "2026-11-08"
+    assert geraete_messdatum.juengster_tag(["kein-datum", ""], HEUTE) == ""
+
+
+def test_anteil_je_anbieter_n_von_m():
+    z = _zeilen(
+        [_b("o2", "2026-11-08")] * 2
+        + [_b("o2", "2026-11-07"), _b("o2", ""), _b("Vodafone", "2026-11-08")]
+    )
+    assert z["o2"]["anteil"] == "2 von 4 Preisen von diesem Tag"
+    assert z["Vodafone"]["anteil"] == "1 von 1 Preisen von diesem Tag"
+    assert z["Telekom"]["anteil"] == ""
+    viele = _zeilen([_b("o2", "2026-11-08")] * 1200)
+    assert viele["o2"]["anteil"] == "1.200 von 1.200 Preisen von diesem Tag"
+
+
+def _baue_wie_live(tmp_path, einzel=None):
+    """Der echte Pfad, wie am 08.11.2026: der jüngste Tagesbericht ist vom 07.11., die
+    Bündeldatei trägt `updated` 08.11.; Vodafone, o2 und congstar sind am 08.11.
+    gemessen, Telekom nur am 07.11. Gerendert wird aus dem Bestand auf der Platte -
+    kein `heute`, kein `geraete`-Dict von Hand."""
+    site = basis._baue(tmp_path)
+    wurzel = site.parent
+    state = wurzel / "data" / "state"
+    datei = state / "geraete_tco.json"
+    tco = json.loads(datei.read_text(encoding="utf-8"))
+    tco["updated"] = HEUTE
+    for b in tco["buendel"]:
+        b["abgerufen_am"] = "2026-11-07" if b["anbieter"] == "Telekom" else HEUTE
+    datei.write_text(json.dumps(tco), encoding="utf-8")
+    dbdatei = state / "geraete_db.json"
+    db = json.loads(dbdatei.read_text(encoding="utf-8"))
+    db["updated"] = HEUTE
+    for listung, tag in zip(db["listungen"], einzel or (), strict=False):
+        listung["abgerufen_am"] = tag
+    dbdatei.write_text(json.dumps(db), encoding="utf-8")
+    berichte = wurzel / "data" / "reports"
+    for alt in berichte.iterdir():
+        alt.unlink()
+    (berichte / f"{BERICHT}.json").write_text(
+        json.dumps(
+            {
+                "date": BERICHT,
+                "language": "de",
+                "briefing_md": "## Auf einen Blick\n\n- x\n",
+                "stats": {},
+                "regions": [],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (berichte / f"{BERICHT}.md").write_text("# Bericht\n", encoding="utf-8")
+    shutil.rmtree(site)
+    render_site(site, berichte)
+    return site
+
+
+def _liste(site):
+    suppe = BeautifulSoup(
+        (site / "geraete.html").read_text(encoding="utf-8"), "html.parser"
+    )
+    return suppe, {
         li["data-anbieter"]: li.get_text(" ", strip=True)
         for li in suppe.select("#messdatum li")
     }
-    assert je["Telekom"] == "Telekom: zuletzt gemessen am 07.11.2026 Stand vom 07.11."
-    assert je["Vodafone"] == "Vodafone: zuletzt gemessen am 08.11.2026"
-    assert je["o2"] == "o2: Messdatum unbekannt"
-    leer = (
-        _env()
-        .get_template("_geraete_messdatum.html.j2")
-        .render(geraete={"tco": geraete_tco_view.leer(), "stand": HEUTE})
+
+
+def test_die_seite_nennt_aus_dem_bestand_vodafone_0811_und_telekom_0711(tmp_path):
+    """Ohne die Korrektur rot: die Zukunftssperre nahm `geraete.stand` (07.11., Datum
+    des jüngsten Tagesberichts) und verwarf alle Messungen vom 08.11.; Vodafone stand
+    dann als „Messdatum unbekannt“, die Telekom-Lücke blieb unsichtbar."""
+    site = _baue_wie_live(tmp_path)
+    _, je = _liste(site)
+    assert je["Vodafone"].startswith("Vodafone: zuletzt gemessen am 08.11.2026"), je
+    assert je["o2"].startswith("o2: zuletzt gemessen am 08.11.2026"), je
+    assert je["congstar"].startswith("congstar: zuletzt gemessen am 08.11.2026"), je
+    assert je["Telekom"].startswith("Telekom: zuletzt gemessen am 07.11.2026"), je
+    assert je["Telekom"].endswith("Stand vom 07.11."), je
+    assert "Stand vom" not in je["Vodafone"] + je["o2"] + je["congstar"]
+    assert "1 von 1 Preisen von diesem Tag" in je["Telekom"]
+    assert je["1&1"] == "1&1: Messdatum unbekannt"
+
+
+def test_das_view_feld_traegt_den_messstichtag_nicht_das_berichtsdatum(tmp_path):
+    site = _baue_wie_live(tmp_path)
+    wurzel = site.parent
+    geraete = geraete_view.aufbereiten(
+        wurzel / "data" / "state",
+        lade_quellen(wurzel),
+        lade_katalog(wurzel),
+        heute=BERICHT,
     )
-    assert leer.count("Messdatum unbekannt") == 5
+    assert geraete["messdatum"]["juengster"] == HEUTE
+    assert geraete["stand"] == BERICHT
+
+
+def test_einzelgeraet_zelle_faengt_zukunft_und_unlesbares_ab(tmp_path):
+    site = _baue_wie_live(tmp_path, einzel=["2026-11-08", "kein-datum"])
+    suppe, _ = _liste(site)
+    zellen = [
+        td.get_text(" ", strip=True) for td in suppe.select("td:has(.gr-a-datum)")
+    ]
+    assert zellen, "keine Einzelgerät-Zelle gefunden - der Test prüft nichts"
+    assert any(z.endswith("Messdatum unbekannt") for z in zellen), zellen
+    assert any(z == "8. November 2026" for z in zellen), zellen
+    suppe2, _ = _liste(
+        _baue_wie_live(tmp_path / "zwei", einzel=["2026-11-08", "2026-11-08"])
+    )
+    zellen2 = [
+        td.get_text(" ", strip=True) for td in suppe2.select("td:has(.gr-a-datum)")
+    ]
+    assert not any("Messdatum unbekannt" in z or "Stand vom" in z for z in zellen2), (
+        zellen2
+    )
