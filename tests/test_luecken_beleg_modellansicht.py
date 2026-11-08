@@ -3,7 +3,8 @@
 Live-Abnahme 08.11.2026 (Punkte 3 und 4): o2 Air 512 GB und congstar iPhone 17 Pro
 Max zeigten „Noch nicht erfasst“ bzw. veraltete Preise, obwohl die Lücke belegt war.
 Regel für alle Anbieter: ein Preis, der nicht jünger ist als die Prüfung der Lücke,
-ist veraltet und wird zur Lücke; ein jüngerer widerspricht ihr und bleibt stehen.
+ist veraltet und wird zur Lücke (ein Mechanismus: `geraete_sortiment.markiere_mit`);
+ein jüngerer widerspricht ihr, bleibt stehen und wird gemeldet.
 """
 
 from __future__ import annotations
@@ -17,7 +18,9 @@ from telco_radar.report.geraete_luecken import (
     fehlen_im_paar,
     ohne_tafelzeile,
 )
-from telco_radar.report.geraete_luecken_beleg import fuer_modell, ohne_widerlegte
+from telco_radar.report.geraete_luecken_beleg import fuer_modell
+from telco_radar.report.geraete_sortiment import VERMERK, markiere_mit
+from telco_radar.report.geraete_zeitreihe_legende import legende_html, ueberholt_html
 
 CONFIG = Path(__file__).resolve().parents[1] / "config" / "geraete_abdeckung.yaml"
 HEUTE = "2026-11-09"
@@ -100,19 +103,31 @@ def test_eine_aufarbeitung_ersetzt_die_luecke_nicht():
     assert ohne_tafelzeile(fehlt, neu) == []
 
 
-def test_preis_vor_der_pruefung_ist_veraltet_und_faellt_weg():
-    """Pro Max 512 GB: Abruf 06.11., Lücke geprüft 08.11. - derselbe Tag zählt
-    ebenso als veraltet (die Uhrzeit ist unbekannt, fail-closed)."""
+def _veraltet(saetze: list, belege: dict, heute: str = HEUTE) -> list[bool]:
+    return [s.get("pruefung") == VERMERK for s in markiere_mit(saetze, belege, heute)]
+
+
+def test_preis_vor_der_pruefung_ist_veraltet(caplog):
+    """Pro Max 512 GB: Abruf 06.11., Lücke geprüft 08.11. Unlesbar ist fail-closed."""
     alt = _buendel(PRO_MAX_512, "2026-11-06")
-    gleich = _buendel(PRO_MAX_512, "2026-11-08")
     unlesbar = _buendel(PRO_MAX_512, "")
-    assert ohne_widerlegte([alt, gleich, unlesbar], _belege(), HEUTE) == []
+    with caplog.at_level(logging.WARNING):
+        assert _veraltet([alt, unlesbar], _belege()) == [True, True]
+    assert caplog.text == ""
+
+
+def test_gleichstand_ist_veraltet_und_warnt(caplog):
+    """Abruf == Prüfdatum: Uhrzeit unbekannt, also veraltet - aber nicht still."""
+    gleich = _buendel(PRO_MAX_512, "2026-11-08")
+    with caplog.at_level(logging.WARNING):
+        assert _veraltet([gleich], _belege()) == [True]
+    assert "Belegte Lücke überholt einen Preis vom Prüftag: congstar" in caplog.text
 
 
 def test_preis_nach_der_pruefung_bleibt_und_die_luecke_wird_gemeldet(caplog):
     neu = _buendel(PRO_MAX_512, "2026-11-09")
     with caplog.at_level(logging.WARNING):
-        assert ohne_widerlegte([neu], _belege(), HEUTE) == [neu]
+        assert markiere_mit([neu], _belege(), HEUTE) == [neu]
     assert "Belegte Lücke widerlegt: congstar" in caplog.text
 
 
@@ -121,19 +136,52 @@ def test_dieselbe_regel_gilt_fuer_jeden_anbieter_und_jede_stufe():
     o2_256 = _buendel("apple-iphone-air-256gb-weiss", "2026-11-07", "o2")
     telekom = _buendel(PRO_MAX_512, "2026-11-06", "Telekom")
     aufgearbeitet = _buendel(PRO_MAX_512, "2026-11-06", zustand="refurbished")
-    rest = ohne_widerlegte([o2_512, o2_256, telekom, aufgearbeitet], _belege(), HEUTE)
-    assert rest == [o2_256, telekom, aufgearbeitet]
+    saetze = [o2_512, o2_256, telekom, aufgearbeitet]
+    assert _veraltet(saetze, _belege()) == [True, False, False, False]
 
 
 def test_ohne_gueltigen_beleg_bleibt_jeder_preis():
     alt = _buendel(PRO_MAX_512, "2026-11-06")
-    assert ohne_widerlegte([alt], _belege(), "2026-11-23") == [alt]
-    assert ohne_widerlegte([alt], {}, HEUTE) == [alt]
+    assert _veraltet([alt], _belege(), "2026-11-23") == [False]
+    assert _veraltet([alt], {}) == [False]
 
 
 def test_ein_stand_vor_der_pruefung_kennt_die_luecke_nicht():
     alt = _buendel(PRO_MAX_512, "2026-10-03")
-    assert ohne_widerlegte([alt], _belege(), "2026-10-03") == [alt]
+    assert _veraltet([alt], _belege(), "2026-10-03") == [False]
     modell = _modell("apple-iphone-duo", 256, [])
     assert fuer_modell(_belege(), modell, "2026-10-03") == {}
     assert "congstar" in fuer_modell(_belege(), modell, "2026-11-08")
+
+
+def test_legende_nennt_den_von_der_luecke_ueberholten_preis_ohne_zahl():
+    """Zeitreihe: der überholte congstar-Preis (06.11.) zählt nicht mehr, die Reihe
+    fehlt - die Legende sagt warum, statt „zuletzt 2.001 €“ oder Schweigen."""
+    modell = {
+        "belegte_luecken": {"congstar": {"kurz": "Nicht im Sortiment (geprüft 08.11.)"}}
+    }
+    mess = {"congstar": {"2026-11-06": {"wert": None}}}
+    html = ueberholt_html(modell, mess, serien={})
+    assert "Nicht im Sortiment (geprüft 08.11.)" in html
+    assert "frühere Preise überholt" in html and "zuletzt" not in html
+    assert ueberholt_html(modell, {}, serien={}) == ""
+    assert (
+        ueberholt_html(modell, mess, serien={"congstar": [("2026-11-09", 1.0)]}) == ""
+    )
+    legende = legende_html({}, None, html)
+    assert legende.startswith("<div class='gr-zr-legende'>") and "congstar" in legende
+
+
+def test_ein_ueberholter_preis_ersetzt_die_fehlzeile_nicht():
+    """Pro Max 512 bei congstar: das Bündel vom 06.11. ist überholt
+    (`nicht_im_sortiment`) - die Fehlzeile mit Grund und Prüfdatum bleibt."""
+    fehlt = [{"anbieter": "congstar", "band": "m", "laufzeit": "24", "grund": "belegt"}]
+    ueberholt = [
+        {
+            "anbieter": "congstar",
+            "band": "m",
+            "zustand": "neu",
+            "nicht_im_sortiment": True,
+        }
+    ]
+    assert ohne_tafelzeile(fehlt, ueberholt) == fehlt

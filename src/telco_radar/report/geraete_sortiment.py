@@ -164,15 +164,22 @@ def markiere_mit(saetze: list[dict], belege: dict, heute: str) -> list[dict]:
             continue
         modell, speicher = buendel_abdeckung.modell_und_speicher(s.get("sku_id") or "")
         geprueft = beleg["geprueft"]
+        art: str | None
         if _nach_pruefung(s.get("abgerufen_am"), geprueft):
             art = WIDERLEGT
             aus.append(s)
         else:
-            art = GLEICHSTAND if str(s.get("abgerufen_am")) == geprueft.isoformat() else None
+            art = (
+                GLEICHSTAND
+                if str(s.get("abgerufen_am")) == geprueft.isoformat()
+                else None
+            )
             aus.append({**s, "pruefung": VERMERK})
         if art:
             warnungen[(art, s.get("anbieter"), modell, speicher)] = geprueft
-    for (art, anbieter, modell, speicher), geprueft in sorted(warnungen.items(), key=str):
+    for (art, anbieter, modell, speicher), geprueft in sorted(
+        warnungen.items(), key=str
+    ):
         log.warning(art, anbieter, modell, speicher, datum_de(geprueft.isoformat()))
     return aus
 

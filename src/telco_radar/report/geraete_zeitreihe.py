@@ -65,7 +65,6 @@ from .geraete_rechenweg import (
     _datum_kurz,
     _esc,
     _zeitraum_wort,
-    _zr_marker_farbe,
 )
 from .geraete_rechenweg import _buendel_aus_messung as _buendel_aus_messung
 from .geraete_rechenweg import _messwert as _messwert
@@ -84,6 +83,10 @@ from .geraete_zeitreihe_geometrie import (
     _y_schritt,
     form_pfad,
 )
+from .geraete_zeitreihe_legende import _euro0 as _euro0
+from .geraete_zeitreihe_legende import _mon_kurz as _mon_kurz
+from .geraete_zeitreihe_legende import legende_html as _legende_html
+from .geraete_zeitreihe_legende import ueberholt_html
 
 log = logging.getLogger(__name__)
 
@@ -106,30 +109,10 @@ ENDLABEL_RAND = 6
 AUTO_SICHTBAR_AB_MESTAGEN = 2
 
 
-def _euro0(betrag) -> str:
-    if betrag is None:
-        return ""
-    return f"{betrag:,.0f}".replace(",", ".") + " €"
-
-
 def _tag_monat(iso: str) -> str:
     """„12.9." - das X-Achsen-Format des Prototyps (echtes deutsches)."""
     y, m, d = iso.split("-")
     return f"{int(d)}.{int(m)}."
-
-
-def _mon_kurz(monate: list) -> str:
-    """„36 Mon." / „24/36 Mon." - das Etikett AN der Kurve (P0-B-z1).
-
-    Kurz, weil es im Bild neben dem Anbieternamen steht (Antonios Stil:
-    wenig Text, keine Erklaerzeile). Die Zahlen sind GELESEN
-    (`_zeitraeume_aus` -> `Tco.leitzahl_monate`), nicht gerechnet; ohne
-    lesbaren Zeitraum steht hier nichts - eine Annahme waere schlimmer
-    als die Luecke (Clean Code 4).
-    """
-    if not monate:
-        return ""
-    return "/".join(str(m) for m in monate) + " Mon."
 
 
 def band_zeilen(modell: dict, laufzeit: int = LAUFZEIT_STANDARD) -> dict:
@@ -702,50 +685,6 @@ def _svg(
     return "".join(teile)
 
 
-def _legende_html(anbieter_serien: dict, zeitraeume: dict | None = None) -> str:
-    """EINE Zeile ueber dem Graphen: Name mit Farb-Punkt, Vodafone rot und
-    benannt. Der „anfangs"-Wert (erster Messbetrag, F9) steht im eigenen Span, der
-    auf dem breiten Bild ausgeblendet ist - dort traegt ihn das kleine
-    Erst-Label im SVG, und eine Zahl steht je Ort genau EINMAL.
-
-    P0-B-z1: kommen im Bild mehrere Zeitraeume vor, traegt jeder Eintrag
-    seinen - „ab 2.019,54 € · zuletzt 2.019,54 €" ohne Zeitraum liest
-    sich sonst als 24-Monats-Betrag. Gelesen wird derselbe Wert wie am
-    Kurvenende (`_zeitraeume_aus`), nicht nachgerechnet."""
-    zeitraeume = zeitraeume or {}
-    vorhanden = sorted(
-        {
-            m
-            for a, ms in zeitraeume.items()
-            if anbieter_serien.get(a)
-            for m in (ms or [])
-        }
-    )
-    eintraege = []
-    for anbieter in ANBIETER_FOLGE:
-        serie = anbieter_serien.get(anbieter)
-        if not serie:
-            continue
-        zusatz = (
-            f" <span class='gr-zr-leg-wert'>anfangs {_euro0(serie[0][1])}"
-            f" · zuletzt {_euro0(serie[-1][1])}</span>"
-        )
-        mon_text = (
-            _mon_kurz(zeitraeume.get(anbieter) or []) if len(vorhanden) > 1 else ""
-        )
-        if mon_text:
-            zusatz += (
-                f" <span class='gr-zr-leg-ab gr-zr-leg-mon'>· {_esc(mon_text)}</span>"
-            )
-        eintraege.append(
-            f"<span><i style='background:{_zr_marker_farbe(anbieter)}'></i>"
-            f"{_esc(anbieter)}{zusatz}</span>"
-        )
-    if not eintraege:
-        return ""
-    return "<div class='gr-zr-legende'>" + "".join(eintraege) + "</div>"
-
-
 _REIHE = tuple(sorted(LAUFZEITEN, key=lambda lz: lz != LAUFZEIT_STANDARD))
 """Die Laufzeiten in der Reihenfolge der Paare: die Standardansicht zuerst."""
 
@@ -827,7 +766,9 @@ def fenster_serien(serien: dict, fenster: str, heute: str = "") -> dict:
     return ergebnis
 
 
-def _fenster_html(serien: dict, beleg_je: dict, zeitraeume: dict, laufzeit: int) -> str:
+def _fenster_html(
+    serien: dict, beleg_je: dict, zeitraeume: dict, laufzeit: int, ueberholt: str = ""
+) -> str:
     """Fertige Grafik, die app.js unveraendert einhaengt."""
     if not _messtage(serien):
         return (
@@ -835,7 +776,7 @@ def _fenster_html(serien: dict, beleg_je: dict, zeitraeume: dict, laufzeit: int)
         )
     breit = _svg(serien, True, beleg_je, zeitraeume, laufzeit=laufzeit)
     schmal = _svg(serien, False, beleg_je, zeitraeume, laufzeit=laufzeit)
-    legende = _legende_html(serien, zeitraeume)
+    legende = _legende_html(serien, zeitraeume, ueberholt)
     return (
         legende
         + '<div class="gr-zr-bild" id="gr-zr-bild" '
@@ -879,6 +820,7 @@ def _paar(
             "und wächst mit jedem Messtag. Der Stand heute steht in den Bündel-"
             "Zeilen darunter."
         )
+    ueberholt = ueberholt_html(modell, mess, serien)
     standard_serien = fenster_serien(serien, ZEITFENSTER_STANDARD, heute)
     weitere: list[dict] = []
     schon: dict[tuple, str] = {}
@@ -896,7 +838,9 @@ def _paar(
                 {
                     "key": fenster,
                     "alias": "",
-                    "html": _fenster_html(ausschnitt, beleg_je, zeitraeume, laufzeit),
+                    "html": _fenster_html(
+                        ausschnitt, beleg_je, zeitraeume, laufzeit, ueberholt
+                    ),
                 }
             )
     return {
@@ -906,7 +850,9 @@ def _paar(
         "fenster_html": (
             f"<p class='gr-zr-keine'>{_esc(leer)}</p>"
             if not serien and leer
-            else _fenster_html(standard_serien, beleg_je, zeitraeume, laufzeit)
+            else _fenster_html(
+                standard_serien, beleg_je, zeitraeume, laufzeit, ueberholt
+            )
         ),
         "fenster_weitere": weitere,
         "antwort_html": _antwort_html(
@@ -922,7 +868,7 @@ def _paar(
         ),
         "leitzahl_html": _leitzahl_html(zeilen),
         "rechnung_html": _rechnung_html(zeilen, h),
-        "legende_html": _legende_html(serien, zeitraeume),
+        "legende_html": _legende_html(serien, zeitraeume, ueberholt),
         "graph_beschriftung": f"Kosten über {h} Monate mit {laufzeit} Raten "
         f"je Messtag und Anbieter",
         "svg_breit": _svg(
