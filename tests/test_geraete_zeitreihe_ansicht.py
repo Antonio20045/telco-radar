@@ -502,8 +502,14 @@ def test_ein_lueckensatz_mit_alternativbaendern_statt_zeilen(ansicht):
     luecke = _zeilen_text(paar["fehlen"])
     assert luecke
     assert "Telekom" in luecke and luecke.count("Telekom") == 1
-    assert "o2: Nur in anderen Bändern: XS 913,00 €" in luecke
-    assert "1&1: Nur in anderen Bändern: XS 841,00 €" in luecke
+    assert (
+        "o2: Hat in dieser Tarifstufe keinen Tarif · in anderen Stufen: XS 913,00 €"
+        in luecke
+    )
+    assert (
+        "1&1: Hat in dieser Tarifstufe keinen Tarif · in anderen Stufen: XS 841,00 €"
+        in luecke
+    )
     assert "Vodafone: Nur in anderen Bändern: XS 1.105,00 €" in luecke
 
 
