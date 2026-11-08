@@ -34,7 +34,7 @@
   <li class="gr-beleg-kopf">Screenshots zur gewählten Kombination aus Gerät, Tarifband, Laufzeit und Anbieter</li>{% for p in paare %}
   <li class="gr-beleg-paar" data-anbieter="{{ p.anbieter }}" data-kombis="{{ p.kombis }}"><b class="gr-beleg-anbieter">{{ p.anbieter }}</b>{% for z in p.zeilenbilder %}
     <div class="gr-beleg-zeile" data-kombi="{{ z.kombi }}"><details class="gr-belege gr-belege--zeile{% if z.bildfolge %} gr-belege--folge{% endif %}">
-      <summary>{% if z.bildfolge %}Screenshot-Folge ({{ z.bildfolge | length }} Bilder){% else %}Screenshot{% endif %} zu dieser Preiszeile vom {{ z.datum | date_de }}, Zuordnung über die Messung: {{ z.geraet }} · {{ z.tarif }}{% if z.raten_laufzeit %} · {{ z.raten_laufzeit }} Raten{% endif %} · {{ z.label }} {{ z.gesamt | euro }}</summary>{% if z.bildfolge %}
+      <summary>{% if z.bildfolge %}Screenshot-Folge ({{ z.bildfolge | length }} Bilder){% else %}Screenshot{% endif %} zu dieser Preiszeile vom {{ z.datum | date_de }}, Zuordnung über die Messung: {{ z.geraet }} · {{ z.tarif }}{% if z.raten_text %} · {{ z.raten_text }}{% endif %} · {{ z.label }} {{ z.gesamt | euro }}</summary>{% if z.bildfolge %}
       <ol class="gr-bildfolge">{% for f in z.bildfolge %}
         <li><span class="gr-bildfolge-schritt">Schritt {{ loop.index }} von {{ loop.length }}{% if f.name %}: {{ f.name }}{% endif %}</span>{% if f.text %}<span class="gr-bildfolge-text">{{ f.text }}</span>{% endif %}
           <img data-src="{{ f.url }}" alt="Screenshot {{ p.anbieter }}, {{ z.tarif }}, Schritt {{ loop.index }} von {{ loop.length }}{% if f.name %}: {{ f.name }}{% endif %}, vom {{ z.datum | date_de }}" width="640" height="400"></li>{% endfor %}
@@ -50,12 +50,10 @@
    Quarantäne („Preis in Prüfung“) werden zur benannten Lücke
    (`geraete_preisstand.anzeige`): keine Zahl, keine Rechnung, `data-gesamt` leer. #}
 {% set k = preis_anzeige(k) %}
-{# D3: das Ratenwort der kompakten Laufzeit-Angabe (siehe .gr-bnd-tarif
-   unten) - "Monatsraten" bei einem zusammengelegten Bündelmonatspreis
-   (1&1), sonst "Raten". Dieselbe Unterscheidung wie `raten_wort` im
-   Rechenweg weiter unten (eigener Name, eigener Block-Scope - Jinja
-   wuerde sonst zwei `set` desselben Namens ineinander schachteln). #}
-{% set kurzraten = 'Monatsraten' if k.buendel_monatlich is not none else 'Raten' %}
+{# Das Ratenwort der kompakten Laufzeit-Angabe (.gr-bnd-tarif unten) kommt aus
+   `k.raten_text` (`geraete_laufzeit.raten_text`): dieselbe Angabe wie die
+   Beschriftung des Zeilenbilds, am Bündel gebildet und darum auch an einer
+   Zeile ohne Preis wahr. #}
 <details class="gr-bnd{% if not k.belastbar %} gr-bnd--leer{% endif %}{% if k.sku_id and k.frisch is defined and not k.frisch %} gr-bnd--alt{% endif %}"
          data-anbieter="{{ k.anbieter }}"
          {% if k.band %}data-band="{{ k.band }}"{% endif %}
@@ -122,10 +120,8 @@
        Raten und den Tarif ueber H Monate. #}
     <span class="gr-bnd-tarif">{{ k.tarif }}{% if k.band_gb_text %} ·
       {{ k.band_gb_text }}{% endif %}{% if k.raten_laufzeit %} · <span
-      class="gr-bnd-raten">{% if k.buendel_monatlich is not none and k.laufzeit
-      and k.raten_laufzeit and k.laufzeit < k.raten_laufzeit %}{{ k.laufzeit }} Monate + Ablöse{% else
-      %}{{ k.raten_laufzeit }} {{ kurzraten }}{% if k.tarif_bindung %} · Tarif {{
-      k.tarif_bindung }} Monate{% endif %}{% endif %}</span>{% endif %}</span>
+      class="gr-bnd-raten">{{ k.raten_text }}{% if k.tarif_bindung
+      and not k.raten_24_plus_12 %} · Tarif {{ k.tarif_bindung }} Monate{% endif %}</span>{% endif %}</span>
     {# DIE TCO TRAEGT IHRE LAUFZEIT IM ETIKETT (A5.1) - eine unbeschriftete
        Gesamtsumme ist ueber zwei Bindungsdauern nicht lesbar. #}
     {# P3-E3: der UEBERHANG - die groesste nicht eingerechnete Aktion
