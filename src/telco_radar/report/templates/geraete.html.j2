@@ -69,7 +69,7 @@
    .html.j2` (alle übrigen Modelle, siehe den Kommentar an `#gr-buendel`).
    E3-Fix (QA 17.09.2026): der G0-Block des Verlaufs-Reiters ist GEFALLEN
    (Doppel-Darstellung zur eigenen Geräteauswahl, §4.6/§4.8). #}
-{% from "_geraete_buendel.html.j2" import belegeintrag, fehlzeile %}
+{% from "_geraete_buendel.html.j2" import belegeintrag, belegpaare, fehlzeile %}
 {% from "_geraete_zeitreihe.html.j2" import paarblock %}
 {# E3 Schritt 2: die Radar-Tafel - `with context`, weil das Makro den
    `prefix` der Seite für den Tarifübersichts-Link braucht. P4/2a dazu:
@@ -318,12 +318,12 @@
          kette, kein zweiter Satzbaumeister im Browser). #}
   <section class="gr-buendel" id="gr-buendel" aria-label="Fehlende Anbieter">
     <div id="gr-bnd-gruppe">{% if m and m.fehlzeilen %}<div class="gr-anb-fehlliste">{% for f in m.fehlzeilen
-      %}{{ fehlzeile(f) }}{% endfor %}</div>{% endif %}</div>
-  </section>
-  {# Ziel 1d: die Belegquote als EIN Satz, gerechnet in `geraete_belege.quote`. #}
+      %}{{ fehlzeile(f) }}{% endfor %}</div>{% endif %}{% if m %}{{ belegpaare(m) }}{% endif %}</div>
+  {# Ziel 1d: Paare zählen, keine Preise - `geraete_belege.quote` (Python). #}
   {% if belegquote is defined %}{% set bq = belegquote(geraete.tco.modelle) %}{% if bq.satz %}
-  <p class="gr-basis--duenn gr-belegquote" id="gr-belegquote">{{ bq.satz }}</p>
+  <p class="gr-belegquote" id="gr-belegquote">{{ bq.satz }}</p>
   {% endif %}{% endif %}
+  </section>
 
   {# EIN BUENDEL OHNE GERAETEZUORDNUNG STEHT HIER BEIM NAMEN (F-R2-3) -
      seit P4/D4 HINTER der Bündel-Sektion: vor der Wahl-Leiste war er der

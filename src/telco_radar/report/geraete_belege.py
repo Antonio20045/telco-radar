@@ -16,12 +16,13 @@ letzten ``ANZEIGE_GROSS_ANZAHL`` älteren großen Änderungen; die 90 Tage Aufbe
 sind keine Anzeige. Hat das Manifest einen Störungsvermerk (Geräte-Lauf konnte es nicht
 erneuern), nennt die Seite ihn als Ausfall „Belegbilder“.
 
-Je Preiszeile (Modell × Anbieter × Tarif, ``zeilenbeleg``) gilt dasselbe Bild: das
-jüngste Bild des Paares (Modell, Anbieter). Der Messweg lichtet je Paar nur die
-günstigste Konfiguration ab (``scripts/belege_veroeffentlichen.py``); das Bild
-trägt keinen Tarif im Namen. Die Zeile sagt das (``HINWEIS_PAAR``), statt ein Bild
-als Beleg genau ihres Tarifs auszugeben. Eine Zeile ohne Bild nennt den Grund
-(``GRUND_*``); ``quote`` zählt dieselben Zeilen mit derselben Funktion (Clean Code 1).
+Das Bild gehört zum Paar (Modell, Anbieter), nicht zu einer Preiszeile: der Messlauf
+lichtet je Paar nur eine Konfiguration ab (``scripts/belege_veroeffentlichen.py``), der
+Dateiname trägt keinen Tarif. Welche Zeile das Bild zeigt, ist maschinell nicht
+feststellbar. Die Seite verlinkt es deshalb einmal je Paar (``paarbelege``) als
+„Screenshot der Angebotsseite vom <Datum> (zeigt nicht jeden Tarif)“ und setzt nichts
+an eine Preiszeile. ``quote`` zählt Paare, keine Preise (Clean Code 1: dieselbe
+Funktion für Link und Satz).
 """
 
 from __future__ import annotations
@@ -34,7 +35,6 @@ from typing import Any
 from ..beleg_manifest import MANIFEST_NAME, Beleg, BelegManifestFehler, lies_manifest
 from ..beleg_regeln import (
     ANZEIGE_GROSS_ANZAHL,
-    ANZEIGE_TAGE,
     anbieter_schluessel,
     ist_anzeige_neu,
 )
@@ -42,23 +42,6 @@ from .ausfall import Ausfall
 from .geraete_preisstand import anzeige as preis_anzeige
 
 TEIL = "Belegbilder"
-HINWEIS_PAAR = (
-    "Der Messlauf lichtet je Gerät und Anbieter die günstigste Konfiguration ab; "
-    "bei einem anderen Tarif kann das Bild einen anderen Tarif zeigen."
-)
-GRUND_KLICK = (
-    "Ohne Beleg: der Preis wurde im Klick-Lauf gelesen, aber zu diesem Gerät und "
-    "Anbieter liegt kein Screenshot der letzten {tage} Tage vor (Bild nicht "
-    "aufgenommen, nicht hochgeladen oder abgelaufen)."
-)
-GRUND_LISTE = (
-    "Ohne Beleg: der Preis stammt aus der Anbieterliste oder einer Schnittstelle, "
-    "nicht aus dem Klick-Lauf; nur dort entsteht ein Screenshot."
-)
-GRUND_MANIFEST = (
-    "Ohne Beleg: die Liste der Belegbilder konnte nicht gelesen werden "
-    "(siehe Ausfall „Belegbilder“)."
-)
 
 
 def _heute(text: str) -> date | None:
@@ -97,54 +80,49 @@ def sortiert_je_preis(
     return je_preis
 
 
-def zeilenbeleg_fuer(
-    belege_fuer: Callable[[str, str], list[dict]], manifest_ok: bool = True
-) -> Callable[[str, dict], dict]:
-    """Baut ``zeilenbeleg(modell_id, karte)``: Bild oder Grund einer Preiszeile.
+def paarbelege(
+    belege_fuer: Callable[[str, str], list[dict]], modell: dict
+) -> list[dict]:
+    """Die Paare (Modell, Anbieter) mit Bild, in der Reihenfolge der Preiszeilen.
 
-    Ergebnis: ``beleg`` (jüngstes Bild des Paares oder ``None``), ``grund`` (Satz, wenn
-    kein Bild), ``hinweis`` (``HINWEIS_PAAR``, wenn ein Bild da ist).
+    Ein Paar zählt, wenn das Modell dort mindestens eine belastbare Preiszeile zeigt
+    (``preis_anzeige``: ein veralteter Preis ist eine Lücke). Ergebnis je Paar:
+    ``anbieter`` (Name der ersten Zeile), ``beleg`` (jüngstes Bild oder ``None``).
+    Die 24- und 36-Raten-Zeilen desselben Tarifs fallen im selben Paar zusammen.
     """
-
-    def zeilenbeleg(modell_id: str, karte: dict) -> dict:
-        bilder = belege_fuer(modell_id, karte.get("anbieter") or "")
-        if bilder:
-            return {"beleg": bilder[0], "grund": "", "hinweis": HINWEIS_PAAR}
-        if not manifest_ok:
-            grund = GRUND_MANIFEST
-        elif karte.get("vom_crawler"):
-            grund = GRUND_KLICK.format(tage=ANZEIGE_TAGE)
-        else:
-            grund = GRUND_LISTE
-        return {"beleg": None, "grund": grund, "hinweis": ""}
-
-    return zeilenbeleg
+    gesehen: dict[str, dict] = {}
+    for karte in [*modell.get("zeilen_band", []), *modell.get("zeilen_ohne_band", [])]:
+        if not preis_anzeige(karte).get("belastbar"):
+            continue
+        name = karte.get("anbieter") or ""
+        schluessel = anbieter_schluessel(name)
+        if schluessel in gesehen:
+            continue
+        bilder = belege_fuer(modell.get("id", ""), name)
+        gesehen[schluessel] = {"anbieter": name, "beleg": bilder[0] if bilder else None}
+    return list(gesehen.values())
 
 
-def quote(zeilenbeleg: Callable[[str, dict], dict], modelle: list[dict]) -> dict:
-    """Wie viele der angezeigten Preiszeilen ein Bild tragen.
+def quote(
+    paare_fuer: Callable[[dict], list[dict]],
+    modelle: list[dict],
+    manifest_ok: bool = True,
+) -> dict:
+    """Für wie viele Gerät-Anbieter-Paare ein Screenshot der Angebotsseite vorliegt.
 
-    Gezählt wird, was die Vorlage als Preis zeigt: Zeilen von ``zeilen_band`` und
-    ``zeilen_ohne_band`` jedes Modells, deren Karte nach ``preis_anzeige`` belastbar
-    ist (ein veralteter Preis ist eine Lücke, kein Preis). ``satz`` ist der fertige
-    Text der Seite; ohne Preiszeile bleibt er leer.
+    Gezählt werden die Paare, die ``paarbelege`` je Modell nennt. ``satz`` ist der
+    fertige Text der Seite; ohne Paar oder bei unlesbarer Belegliste (der Ausfall
+    „Belegbilder“ nennt das) bleibt er leer, statt „0 von N“ zu behaupten.
     """
     mit = gesamt = 0
     for modell in modelle:
-        for karte in [
-            *modell.get("zeilen_band", []),
-            *modell.get("zeilen_ohne_band", []),
-        ]:
-            if not preis_anzeige(karte).get("belastbar"):
-                continue
+        for paar in paare_fuer(modell):
             gesamt += 1
-            if zeilenbeleg(modell["id"], karte)["beleg"]:
-                mit += 1
+            mit += 1 if paar["beleg"] else 0
     satz = (
-        f"{mit} von {gesamt} Preisen mit Screenshot vom Original "
-        "(je Gerät und Anbieter die günstigste Konfiguration; "
-        "jede Zeile ohne Bild nennt den Grund)."
-        if gesamt
+        f"Für {mit} von {gesamt} Gerät-Anbieter-Paaren liegt ein Screenshot "
+        "der Angebotsseite vor."
+        if gesamt and manifest_ok
         else ""
     )
     return {"mit": mit, "gesamt": gesamt, "satz": satz}
@@ -175,7 +153,12 @@ def installiere(env: Any, state_dir: Path, berichte: list[dict]) -> list[Ausfall
     env.globals["belege_fuer"] = lambda geraet_id, anbieter: je_preis.get(
         (geraet_id, anbieter_schluessel(anbieter or "")), []
     )
-    zeilenbeleg = zeilenbeleg_fuer(env.globals["belege_fuer"], manifest_ok)
-    env.globals["zeilenbeleg"] = zeilenbeleg
-    env.globals["belegquote"] = lambda modelle: quote(zeilenbeleg, modelle or [])
+
+    def paare_fuer(modell: dict) -> list[dict]:
+        return paarbelege(env.globals["belege_fuer"], modell)
+
+    env.globals["paarbelege"] = paare_fuer
+    env.globals["belegquote"] = lambda modelle: quote(
+        paare_fuer, modelle or [], manifest_ok
+    )
     return ausfaelle
