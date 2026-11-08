@@ -467,11 +467,14 @@
    Preis, mit seinem Zustand (`geraete_luecken.tafelzeilen`). `data-fehlt-lz`
    statt `data-lz`: app.js zeigt die Zeile nur unter genau ihrer Ansicht, auch
    unter „alle“. Eigene Liste hinter den Bündelzeilen: die Sortierung ordnet
-   nur Bündel. Der ganze Grund steht im `title`. #}
+   nur Bündel. Der ganze Grund steht im `title`; bei einer belegten Lücke
+   steht er zusätzlich sichtbar (`detail`), denn auf dem Telefon gibt es kein
+   Tooltip. #}
 {% macro fehlzeile(f) %}<p class="gr-anb-fehlt" data-anbieter="{{ f.anbieter }}"
   data-band="{{ f.band }}" data-fehlt-lz="{{ f.laufzeit }}" style="--anb:{{
   f.anb_farbe }}" title="{{ f.satz }}"><span class="gr-bnd-name">{{ f.anbieter
-  }}</span><span class="gr-anb-fehlt-zustand">{{ f.kurz }}</span></p>{% endmacro %}
+  }}</span><span class="gr-anb-fehlt-zustand">{{ f.kurz }}</span>{% if f.detail
+  %}<span class="gr-anb-fehlt-detail">{{ f.detail }}</span>{% endif %}</p>{% endmacro %}
 
 {% macro buendelgruppe(m, ids=false) %}
       {# A3: „alles alt“ steht als EIN Satz über den Zeilen des Modells

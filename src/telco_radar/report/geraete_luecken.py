@@ -26,63 +26,9 @@ from .geraete_laufzeit import (
     ansicht,
     nur_ueber_24,
 )
+from .geraete_luecken_alternativen import _alternativen as _alternativen
 from .geraete_rechenweg import ANBIETER_FOLGE, _zeitraum_wort, euro
 from .geraete_tco_band import band_label
-
-
-def _alternativen(
-    karten: list, band: str, anbieter: str, laufzeit: int | None = None
-) -> list[dict]:
-    """Die besten Bänder EINES Anbieters, der im gewählten Band fehlt.
-
-    §4.5: „fehlende Anbieter MIT NAMEN und Alternativ-Bändern samt Betrag
-    in Klammern" - der Leser sieht nicht nur DASS einer fehlt, sondern wo
-    er steht. Nur ECHTE Karten (Bündel mit SKU oder die Näherung) sagen
-    etwas darüber, wo ein Anbieter steht; die Leerkarte der Festanbieter
-    ist kein Angebot. Und seit A3 nur FRISCHE: ein altes Angebot ist keine
-    Alternative von heute (`geraete_tco_karten.ist_frisch`, Clean Code 7 -
-    dieselbe Definition wie Zeilen und Kacheln). Und nur Karten, die
-    zaehlen: eine Schätzung ist auch als Alternative kein Preis.
-
-    P0-B-z1: jede Alternative traegt ihren ZEITRAUM mit
-    (`leitzahl_monate`, gelesen). Ohne ihn stand im Luecken-Satz ein
-    36-Monats-Betrag als „mittel 2.019,54 €" mitten unter
-    24-Monats-Zahlen. Und die Wahl der guenstigsten je Band vergleicht
-    nur INNERHALB eines Zeitraums: der Zeitraum des Horizonts zuerst,
-    sonst der kuerzeste gemessene - ein Minimum ueber zwei Laufzeiten
-    waere dieselbe Rangfolge, die das Tor verbietet. Seit Datenkonzept
-    Geräte Schritt 2 nennt eine Ansicht nur Alternativen IHRER Ratenlaufzeit.
-    """
-    beste: dict[str, dict] = {}
-    for karte in karten:
-        if karte.get("anbieter") != anbieter:
-            continue
-        if laufzeit is not None and ansicht(karte) != laufzeit:
-            continue
-        if not karte.get("frisch", True) or not notbremse.zaehlt(karte):
-            continue
-        if not (karte.get("sku_id") or karte.get("naeherung")):
-            continue
-        b = karte.get("band")
-        if (
-            b is None
-            or not karte.get("vergleichbar")
-            or karte.get("gesamt") is None
-            or b == band
-        ):
-            continue
-        monate = karte.get("leitzahl_monate")
-        rang = (
-            0 if zeitraum_vergleichbar(monate, TCO_HORIZONT) else 1,
-            monate if monate is not None else 10**6,
-            karte["gesamt"],
-        )
-        if b not in beste or rang < beste[b]["rang"]:
-            beste[b] = {"rang": rang, "tco": karte["gesamt"], "monate": monate}
-    return [
-        {"band": b, "tco": v["tco"], "monate": v["monate"]}
-        for b, v in sorted(beste.items())
-    ]
 
 
 def _luecken(
@@ -308,13 +254,23 @@ def fehlzeilen(
     band_labels: dict,
     h: int = TCO_HORIZONT,
     erfassung: dict | None = None,
+    belegt: dict | None = None,
 ) -> list[dict]:
     """Je fehlendem Anbieter eines Blocks seine Zeile, in `ANBIETER_FOLGE`.
 
     Antonio 10.10.2026: „dass die trotzdem in der Liste stehen, aber steht nicht
     vorhanden bei Telekom“. Jeder große Anbieter steht in der Bündelliste, auch
-    ohne Preis; der Grund ist derselbe wie im früheren Lückensatz."""
-    return [_fehlzeile(lu, band_labels, h, erfassung or {}) for lu in luecken]
+    ohne Preis; der Grund ist derselbe wie im früheren Lückensatz. Eine belegte
+    Lücke aus der Config (`geraete_luecken_beleg.fuer_modell`) nennt ihren Grund
+    samt Prüfdatum und geht jedem Erfassungsgrund vor."""
+    belegt = belegt or {}
+    return [
+        _zeile(lu, belegt[lu["anbieter"]]["kurz"], belegt[lu["anbieter"]]["satz"])
+        | {"grund": "belegt", "detail": belegt[lu["anbieter"]].get("detail", "")}
+        if lu["anbieter"] in belegt
+        else _fehlzeile(lu, band_labels, h, erfassung or {})
+        for lu in luecken
+    ]
 
 
 def tafelzeilen(paare: list) -> dict[str, list[dict]]:
@@ -359,7 +315,10 @@ def ohne_tafelzeile(fehlen: list[dict], zeilen: list[dict]) -> list[dict]:
     """Die Zeilen fehlender Anbieter ohne die, deren Anbieter in derselben Ansicht
     schon eine Bündelzeile hat (alt, ohne belastbare Zahl, nicht im Vergleich):
     die steht selbst da und nennt ihren Zustand. Sichtbar ist eine Bündelzeile
-    nach derselben Regel wie in app.js (`stelleZeilen`)."""
+    nach derselben Regel wie in app.js (`stelleZeilen`). Eine belegte Lücke
+    („nicht im Sortiment“) betrifft das Neugerät, eine Aufarbeitung ersetzt sie
+    nicht, und ein von der Lücke überholter Preis (`nicht_im_sortiment`, nur noch
+    „veraltet 17“ ohne Grund und Prüfdatum) auch nicht."""
 
     def sichtbar(z: dict, band: str, lz: str) -> bool:
         return z.get("band") in (None, band) and (
@@ -370,7 +329,15 @@ def ohne_tafelzeile(fehlen: list[dict], zeilen: list[dict]) -> list[dict]:
         f
         for f in fehlen
         if not any(
-            z.get("anbieter") == f["anbieter"] and sichtbar(z, f["band"], f["laufzeit"])
+            z.get("anbieter") == f["anbieter"]
+            and sichtbar(z, f["band"], f["laufzeit"])
+            and (
+                f.get("grund") != "belegt"
+                or (
+                    z.get("zustand") in (None, "", "neu")
+                    and not z.get("nicht_im_sortiment")
+                )
+            )
             for z in zeilen
         )
     ]
@@ -388,7 +355,13 @@ def fehlen_im_paar(
         gesperrt=satz.get("gesperrt"),
         laufzeit=laufzeit,
     )
-    return fehlzeilen(luecken, band_labels, h, modell.get("erfassung"))
+    return fehlzeilen(
+        luecken,
+        band_labels,
+        h,
+        modell.get("erfassung"),
+        modell.get("belegte_luecken"),
+    )
 
 
 def haenge_an(modelle: list, paare: list) -> None:
