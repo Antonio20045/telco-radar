@@ -64,6 +64,14 @@ def pflichtmodelle_je_anbieter(
         return {}
     vorbereitet = daten.get("pflicht_anbieter_wenn_aktiv") or {}
     alle = set(daten.get("pflicht_modelle") or [])
+    doppelt = {z for zeilen in vorbereitet.values() for z in zeilen or []} & set(
+        daten.get("pflicht_anbieter") or []
+    )
+    if doppelt:
+        raise ValueError(
+            "Zeilen in pflicht_anbieter UND pflicht_anbieter_wenn_aktiv: "
+            f"{sorted(doppelt)}"
+        )
     for quelle, modelle in je_quelle.items():
         if quelle not in vorbereitet:
             raise ValueError(

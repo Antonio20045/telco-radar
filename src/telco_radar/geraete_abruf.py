@@ -75,18 +75,24 @@ def hole_fabrik(http_cfg: dict) -> Callable:
 def hole_fuer_anbieter(hole: Callable, anbieter, uhr: Callable) -> Callable:
     """`hole` MIT robots.txt, Crawl-delay und Besuchsfenster (`Abrufschleuse`),
     mit der Kennung des Anbieters, wenn er eine eigene hat - fuer jeden Abruf
-    nach der Sammelphase (Nachsammeln, Tarifwelt)."""
-    from .collect.geraete import hole_mit_robots
+    nach der Sammelphase (Nachsammeln, Tarifwelt). Einmal-Abrufe
+    (`einmalig=True`) bekommen `vor_weiterleitung`: auch jeder Sprung einer
+    Weiterleitung geht vor dem Folgen durch dieselbe Schleuse."""
+    from .collect.geraete import Abrufschleuse
     from .collect.geraete.robots import RobotsWaechter
 
     ua = (getattr(anbieter, "user_agent", "") or "").strip()
-
-    def eigenes(url, *args, **kwargs):
-        return hole(url, *args, **({"user_agent": ua} if ua else {}), **kwargs)
-
-    return hole_mit_robots(
-        eigenes,
-        RobotsWaechter(hole=lambda url: hole(url, user_agent=ua) if ua else hole(url)),
-        getattr(anbieter, "rate_limit_sekunden", 0.0) or 0.0,
+    kennung = {"user_agent": ua} if ua else {}
+    schleuse = Abrufschleuse(
+        RobotsWaechter(hole=lambda url: hole(url, **kennung)),
         uhr,
+        getattr(anbieter, "rate_limit_sekunden", 0.0) or 0.0,
     )
+
+    def gebremst(url: str, *args, **kwargs):
+        schleuse.passiere(url)
+        if kwargs.get("einmalig"):
+            kwargs.setdefault("vor_weiterleitung", schleuse.passiere)
+        return hole(url, *args, **{**kennung, **kwargs})
+
+    return gebremst

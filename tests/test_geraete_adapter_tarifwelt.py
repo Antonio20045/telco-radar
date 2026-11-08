@@ -128,7 +128,7 @@ def test_lies_produktdetail_centgenau_iphone17_telekom_magenta_m():
     assert satz["laufzeit_monate"] == 24
     assert satz["doppelkarte"] is False
     tco = tco_24(_buendel_aus(satz))
-    assert tco.gesamt == 1348.78
+    assert tco.gesamt == 1354.73
 
 
 def test_lies_produktdetail_centgenau_galaxys26_standard():
@@ -138,7 +138,7 @@ def test_lies_produktdetail_centgenau_galaxys26_standard():
     assert satz["anschlusspreis"] == 39.99
     assert satz["grundgebuehr"] == 29.99
     tco = tco_24(_buendel_aus(satz))
-    assert tco.gesamt == 788.75
+    assert tco.gesamt == 794.70
 
 
 def test_lies_produktdetail_o2_doppelkarte_zuzahlung_centgenau():
@@ -420,15 +420,15 @@ def test_lauf_zwei_geraete_zwei_tarife_centgenau_gegen_die_fixtures():
         ("apple-iphone-17", "Saturn/MediaMarkt · Telekom-Netz"): (
             419.99,
             29.99,
-            1179.74,
+            1185.69,
         ),
-        ("apple-iphone-17", "Saturn/MediaMarkt · o2-Netz"): (369.99, 29.99, 1129.74),
+        ("apple-iphone-17", "Saturn/MediaMarkt · o2-Netz"): (369.99, 29.99, 1135.69),
         ("samsung-galaxy-s26", "Saturn/MediaMarkt · Telekom-Netz"): (
             159.99,
             29.99,
-            919.74,
+            925.69,
         ),
-        ("samsung-galaxy-s26", "Saturn/MediaMarkt · o2-Netz"): (379.99, 19.99, 899.74),
+        ("samsung-galaxy-s26", "Saturn/MediaMarkt · o2-Netz"): (379.99, 19.99, 905.69),
     }
     gefunden = {}
     for modell in ("apple-iphone-17", "samsung-galaxy-s26"):

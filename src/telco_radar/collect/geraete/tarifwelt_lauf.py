@@ -15,6 +15,10 @@ centgenau. Der Leser macht deshalb genau diese eine Anfrage je Variante ueber
 den vorhandenen Abrufweg `hole(..., einmalig=True)`: ein Versuch, kein
 Backoff, keine Weiterleitung ohne Wache, ehrliche Kennung, nie ein Wechsel.
 
+Weiterleitung: jeder Sprung geht vor dem Folgen durch dieselbe
+`Abrufschleuse` (robots.txt, Besuchsfenster); `hole_fuer_anbieter` gibt den
+Einmal-Abrufen dafuer `vor_weiterleitung` mit.
+
 HARTER ABBRUCH: eine Schutzantwort (HTTP 403/406/429 oder eine vom Abrufweg
 erkannte Challenge) beendet den GANZEN Lauf mit `GeraeteAbrufFehler` - kein
 Wiederholen, kein weiterer Abruf. Alles andere (404, kein JSON, ein anderer
@@ -42,6 +46,7 @@ import time
 from collections.abc import Callable
 from dataclasses import dataclass, field
 
+from ... import versandkosten
 from ...geraete_model import device_id, sku_id
 from ...tco_model import Buendel
 from . import tarifwelt
@@ -55,6 +60,7 @@ KENNUNG = "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
 PAUSE_SEKUNDEN = 2.0
 LAUFZEIT_MONATE = 24
 MAX_KANDIDATEN = 3
+MONAT_TOLERANZ = 0.01
 KATALOG_SPEICHER = {1000: 1024, 2000: 2048}
 
 MODELL_SLUGS: dict[str, tuple[str, str, str, str]] = {
@@ -349,6 +355,8 @@ def _pruefe(satz: dict | None, gewollt: dict, speicher: int) -> tuple[str | None
         return "Antwort traegt einen anderen Tarif", True
     if f"{speicher} GB" not in (satz.get("geraet_label") or ""):
         return f"Tarif nicht fuer {speicher} GB waehlbar (anderer Speicher)", True
+    if satz.get("geraeteposten") != 1:
+        return f"{satz.get('geraeteposten')} Geraeteposten statt 1", False
     if satz["laufzeit_monate"] != LAUFZEIT_MONATE:
         return f"Laufzeit {satz['laufzeit_monate']} statt {LAUFZEIT_MONATE}", False
     if satz["doppelkarte"]:
@@ -356,4 +364,31 @@ def _pruefe(satz: dict | None, gewollt: dict, speicher: int) -> tuple[str | None
     for feld in ("grundgebuehr", "geraet_zuzahlung", "anschlusspreis"):
         if satz[feld] is None:
             return f"{feld} fehlt", False
+    return _pruefe_kosten(satz)
+
+
+def _pruefe_kosten(satz: dict) -> tuple[str | None, bool]:
+    """Die Antwort muss zu sich selbst und zur Config passen: Monatspreis gleich
+    der Summe der monatlichen Posten (hoechstens `MONAT_TOLERANZ` Abweichung),
+    Versandposten gleich dem Betrag in `config/versandkosten.yaml` (Abweichung:
+    Luecke und Warnung, Config bleibt unveraendert - sie aendert nur eine
+    neue Messung)."""
+    summe = satz.get("monat_posten")
+    if summe is None:
+        return "monatliche Kostenposten fehlen", False
+    if round(abs(summe - satz["grundgebuehr"]), 2) > MONAT_TOLERANZ:
+        return (
+            f"Monatspreis {satz['grundgebuehr']} weicht von der Summe der "
+            f"Monatsposten {summe} ab",
+            False,
+        )
+    zeile = tarifwelt.anbieter_zeile(satz.get("netz")) or ""
+    erwartet = versandkosten.versand_fuer(zeile).betrag
+    if erwartet is not None and satz.get("versand") != erwartet:
+        grund = (
+            f"Versand {satz.get('versand')} weicht von versandkosten.yaml "
+            f"({erwartet}) ab"
+        )
+        log.warning("Tarifwelt: %s: %s - Luecke, neu messen", zeile, grund)
+        return grund, False
     return None, False

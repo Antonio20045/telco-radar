@@ -112,6 +112,16 @@ _POSTEN_ANSCHLUSS = "Anschlusspreis Tarif"
 _POSTEN_VERSAND = "Versandkosten"
 
 
+def _summe_monat(daten: dict) -> float | None:
+    """Summe der monatlichen Kostenposten; `None`, wenn keine lesbar sind."""
+    posten = ((daten.get("costs") or {}).get("monthlyCosts") or {}).get("items") or []
+    betraege = [p.get("amount") for p in posten if isinstance(p, dict)]
+    zahlen = [b for b in betraege if isinstance(b, (int, float))]
+    if not zahlen or len(zahlen) != len(betraege):
+        return None
+    return round(sum(zahlen), 2)
+
+
 def lies_produktdetail(text: str, url: str = "") -> dict | None:
     """Die SKU-genaue Antwort `/v1/productdetail/<id>?tfi=<tarif_id>` (EIN
     vorgewaehlter Tarif) in einen Buendel-Satz - anders als `lies_tarifliste`
@@ -119,7 +129,9 @@ def lies_produktdetail(text: str, url: str = "") -> dict | None:
     `costs.oneTimeCosts.items` traegt immer drei Posten (Geraet, Anschluss,
     Versand); welcher der Geraeteposten ist, steht nicht am Namen (der
     Hardware-Name ist kuerzer als das Item-Label mit Farbe/Speicher), also
-    ist er der EINZIGE Posten ohne einen der beiden festen Namen."""
+    ist er der Posten ohne einen der beiden festen Namen. Gibt es mehr als
+    einen (`geraeteposten`), nimmt der Leser keinen davon: `_pruefe` macht
+    daraus eine Luecke."""
     try:
         daten = json.loads(text or "")
     except (json.JSONDecodeError, ValueError):
@@ -137,15 +149,12 @@ def lies_produktdetail(text: str, url: str = "") -> dict | None:
         or []
         if isinstance(p, dict)
     }
-    geraet_posten = next(
-        (
-            (label, betrag)
-            for label, betrag in posten.items()
-            if label not in (_POSTEN_ANSCHLUSS, _POSTEN_VERSAND)
-        ),
-        (None, None),
-    )
-    geraet_label, geraet_zuzahlung = geraet_posten
+    geraeteposten = [
+        (label, betrag)
+        for label, betrag in posten.items()
+        if label not in (_POSTEN_ANSCHLUSS, _POSTEN_VERSAND)
+    ]
+    geraet_label, geraet_zuzahlung = geraeteposten[0] if geraeteposten else (None, None)
     return {
         "tarif_id": tarif_id,
         "tarif_name": str(tariff.get("name") or tariff.get("nameSlug") or "").strip()
@@ -156,6 +165,9 @@ def lies_produktdetail(text: str, url: str = "") -> dict | None:
         "laufzeit_monate": tariff.get("contractTerm"),
         "geraet_zuzahlung": geraet_zuzahlung,
         "geraet_label": geraet_label,
+        "geraeteposten": len(geraeteposten),
+        "versand": posten.get(_POSTEN_VERSAND),
+        "monat_posten": _summe_monat(daten),
         "anschlusspreis": posten.get(_POSTEN_ANSCHLUSS),
         "doppelkarte": tariff.get("doubleCardAddendum") is not None,
         "quelle": "mediamarkt_tarifwelt",
