@@ -6,9 +6,9 @@ Die eine Frage, an der diese Tafel gebaut ist
      ueber 24 Monate gesamt?"
 
 Alles auf dieser Tafel beantwortet sie oder sagt, warum es sie nicht
-beantworten kann. Der Barpreis ist dabei ein BAUSTEIN und keine
-konkurrierende Hauptspalte (A4): er steht in der Aufschluesselung und in
-der Effektivpreiszeile, nicht als zweite Leitzahl daneben.
+beantworten kann. Der Barpreis ist dabei ein BAUSTEIN und keine konkurrierende
+Hauptspalte (A4): er steht in der Aufschluesselung und in der Effektivpreiszeile,
+nicht als zweite Leitzahl daneben.
 
 Vier Anbieter, immer vier Zeilen
 --------------------------------
@@ -36,10 +36,9 @@ True`, ein eigenes Etikett und niemals die Beschriftung eines Angebots.
 
 Was hier NICHT passiert
 -----------------------
-Kein Barpreis wird aus einer Rate geschaetzt, kein Bundle-Monatspreis in
-Tarif und Geraet zerlegt (§ 13.2: 1&1 nennt EINEN Betrag, seine Aufteilung
-waere unsere Erfindung), und keine Zahl wird ueber Laufzeiten hinweg
-verglichen ausser `Ø/Monat` (A5.3).
+Kein Barpreis wird aus einer Rate geschaetzt, kein Bundle-Monatspreis in Tarif und
+Geraet zerlegt (§ 13.2: 1&1 nennt EINEN Betrag, nicht Tarif plus Rate), und keine Zahl
+wird ueber Laufzeiten hinweg verglichen ausser `Ø/Monat` (A5.3).
 """
 
 from __future__ import annotations
@@ -51,6 +50,7 @@ from datetime import date as _datum
 from typing import Optional
 
 from .. import tco_kosten as _kosten
+from ..analyze.geraete_pruefstatus import HERLEITUNG_EINMALZAHLUNG
 from ..geraete_model import VERGLEICHBARE_ZUSTAENDE, ZUSTAENDE, normalisiere
 from ..tarif_model import QUELLE_KLICK, Preisphase, vor_dem_blatt
 from ..tco_kosten import POSTEN_ZEITRAUM, belegte_phasen, tarifpreis_im_monat
@@ -696,8 +696,11 @@ def _karte(
     luecken = list(kosten.luecken)
     if not b.rabatte and not aktionen:
         luecken.append(POSTEN_RABATTE)
+    leer_grund = "" if belastbar else _grund(kosten)
+    if not belastbar and b.herleitung.strip() == HERLEITUNG_EINMALZAHLUNG:
+        leer_grund = notbremse.herleitung_satz(b.anbieter, b.herleitung)
     return {
-        "leer_grund": "" if belastbar else _grund(kosten),
+        "leer_grund": leer_grund,
         "sku_id": b.sku_id,
         "modell_id": modell_schluessel(device_id, speicher),
         "zustand": zustand,
@@ -760,7 +763,6 @@ _GRUND_JE_LUECKE = {
         "Die Ratenlaufzeit dieses Bündels ist nicht erhoben – "
         "ohne die Zahl der Monate ergibt der Monatsbetrag keine Gesamtsumme."
     ),
-    _kosten.POSTEN_NUR_24_PLUS_12: "Nur als „24 + 12“ erfasst, kein 24-Monats-Preis.",
 }
 
 
@@ -770,8 +772,6 @@ def _grund(kosten) -> str:
         return _GRUND_JE_LUECKE[POSTEN_TARIF]
     if POSTEN_LAUFZEIT in kosten.luecken or POSTEN_ZEITRAUM in kosten.luecken:
         return _GRUND_JE_LUECKE[POSTEN_LAUFZEIT]
-    if _kosten.POSTEN_NUR_24_PLUS_12 in kosten.luecken:
-        return _GRUND_JE_LUECKE[_kosten.POSTEN_NUR_24_PLUS_12]
     if not kosten.posten:
         return (
             "Zu diesem Bündel ist kein einziger Posten erhoben – es "

@@ -13,7 +13,6 @@ eigenen Band der Maßstab, und nur, wo Vodafone kein Bündel hat (`modelle()`).
 
 from __future__ import annotations
 
-from ..tco_kosten import POSTEN_NUR_24_PLUS_12
 from ..tco_model import TCO_HORIZONT
 from . import geraete_notbremse as notbremse
 from . import geraete_tco_karten as karten_modul
@@ -56,13 +55,22 @@ def rang_der_monatsangabe(laufzeit: int | None) -> tuple:
     return (laufzeit != LAUFZEIT_STANDARD, laufzeit is None, laufzeit or 0)
 
 
+REGEL_24_PLUS_12 = (
+    "1&1 bietet das Gerät nur als „24 + 12“ an: hier zählen 24 Monatsbeträge, "
+    "die Einmalzahlung, mit der man nach 24 Monaten kündigt und das Gerät behält, "
+    "und der Anschlusspreis – gerechnet, kein von 1&1 genannter 24-Monats-Preis. "
+    "Angebote mit Zubehör-Aufpreis (z. B. Buds beim S26) werden ohne Zubehör "
+    "gerechnet."
+)
+
+
 def nur_ueber_24(karte: dict) -> bool:
     """Ein Betrag für Tarif und Gerät (1&1) über mehr als 24 Monate.
 
-    Das Modell „24 + 12“ ist keine 24-Monats-Finanzierung. Die Karte trägt in
-    der 24er-Ansicht keine Zahl, nur die benannte Lücke (`tco_kosten`,
-    `POSTEN_NUR_24_PLUS_12`); sie steht dort als Zeile ohne Preis und fließt in
-    keinen Vergleich.
+    Manager, 05.11.2026: alle Preise vergleichbar, nicht weglassen. 1&1 bindet
+    24 Monate; wer danach kündigt, zahlt die Einmalzahlung und behält das Gerät.
+    Also steht 1&1 in der 24er-Ansicht mit 24 Bündelbeträgen plus Ablöse
+    (`tco_kosten.zeitraum`), ausgewiesen als gerechnet (`REGEL_24_PLUS_12`).
     """
     return (
         karte.get("buendel_monatlich") is not None
@@ -70,27 +78,20 @@ def nur_ueber_24(karte: dict) -> bool:
     )
 
 
-def nur_24(karten: list, anbieter: str) -> bool:
-    """Führt der Anbieter unter diesen Karten ein „24 + 12“-Angebot?"""
-    return any(k["anbieter"] == anbieter and nur_ueber_24(k) for k in karten)
-
-
-def nur_24_karte(karten: list, anbieter: str, *quellen: dict) -> dict | None:
-    """Die Karte des Anbieters im Radar; führt er nur „24 + 12“, trägt sie die
-    benannte Lücke des Exports (`tco_kosten.POSTEN_NUR_24_PLUS_12`) als Grund.
-
-    `quellen` sind die Kartenlisten (je Anbieter) in der Reihenfolge, in der die
-    erste mit einem Treffer gilt."""
-    karte = next((q[anbieter] for q in quellen if q.get(anbieter)), None)
-    if nur_24(karten, anbieter):
-        return {**(karte or {}), "leer_grund": POSTEN_NUR_24_PLUS_12}
-    return karte
+def regel_satz(karten) -> str:
+    """Der Satz zur Regel, wenn unter den Karten eine gerechnete 24+12-Zahl ist."""
+    return REGEL_24_PLUS_12 if any(nur_ueber_24(k) for k in karten) else ""
 
 
 def fehlt_satz(anbieter: str, karten: list, laufzeit: int) -> str:
     """Warum ein Anbieter mit Bündeln in dieser Laufzeit keine Zeile trägt."""
-    if laufzeit >= LAUFZEIT_STANDARD and nur_24(karten, anbieter):
-        return f"{anbieter} ist nur als 24 + 12 (36 Monate) erfasst."
+    if any(
+        k["anbieter"] == anbieter
+        and nur_ueber_24(k)
+        and k.get("raten_laufzeit") == laufzeit
+        for k in karten
+    ):
+        return f"{anbieter} wird nur über 24 Monate verglichen."
     return f"{anbieter} ist mit {laufzeit} Raten {NICHT_ERFASST}."
 
 

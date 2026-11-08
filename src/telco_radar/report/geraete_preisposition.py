@@ -30,7 +30,7 @@ import math
 from html import escape
 
 from ..geraete_model import serie_aus_modell
-from . import geraete_rechenweg, geraete_zeitreihe_geometrie
+from . import geraete_laufzeit, geraete_rechenweg, geraete_zeitreihe_geometrie
 from .anbieter_farben import legendenname, slug_fuer, stil_fuer
 from .geraete_preisposition_preise import (
     BAND,
@@ -329,6 +329,7 @@ def aufbereiten(geraete: dict) -> dict:
             "legende": [],
             "achse": None,
             "achsentitel": titel,
+            "regel": "",
         }
     fremde = sorted({a for _, karten in rohe for a in karten} - set(ANBIETER_FOLGE))
     anbieter = [*ANBIETER_FOLGE, *fremde]
@@ -363,6 +364,7 @@ def aufbereiten(geraete: dict) -> dict:
         "legende": _legende(anbieter, ohne),
         "achse": ach,
         "achsentitel": titel,
+        "regel": geraete_laufzeit.regel_satz(k for _, c in rohe for k in c.values()),
     }
     daten["svg_breit"] = _svg(daten, False)
     schmal = {
