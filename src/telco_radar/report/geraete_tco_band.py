@@ -35,9 +35,9 @@ import logging
 import math
 import re
 from dataclasses import dataclass
-from typing import Optional, cast
+from typing import Optional
 
-from ..band_regel import abstand_schluessel
+from ..band_regel import stufe_fuer
 from ..tarif_plus import mit_plus
 from . import geraete_tco_grafik
 from .anbieter_farben import farbe_fuer
@@ -147,18 +147,7 @@ def band_von_gb(gb, leiter: tuple[Stufe, ...]) -> Optional[str]:
     unbegrenzt erhoben ist; ist sie es, faellt unbegrenzt genau dorthin.
     Der Abstand folgt `band_regel.abstand_schluessel` (Gleichstand: groesser).
     """
-    zahl = _zahl(gb)
-    if zahl is None:
-        return None
-    if math.isinf(zahl):
-        for stufe in leiter:
-            if stufe.gb is not None and math.isinf(stufe.gb):
-                return stufe.key
-        return None
-    endlich = [s for s in leiter if s.gb is not None and not math.isinf(s.gb)]
-    if not endlich:
-        return None
-    return min(endlich, key=lambda s: abstand_schluessel(cast(float, s.gb), zahl)).key
+    return stufe_fuer(_zahl(gb), tuple((s.key, s.gb) for s in leiter))
 
 
 def _eigene_stufe(satz: dict, leiter: tuple[Stufe, ...]) -> Optional[str]:

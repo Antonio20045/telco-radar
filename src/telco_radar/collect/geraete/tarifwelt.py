@@ -32,7 +32,7 @@ from __future__ import annotations
 import json
 import logging
 
-from ...band_regel import abstand_schluessel
+from ...band_regel import abstand_schluessel, stufe_fuer
 
 log = logging.getLogger(__name__)
 
@@ -71,6 +71,8 @@ def _gb(eintrag: dict) -> float | None:
         zahl = float(wert)
     except (TypeError, ValueError):
         return None
+    if zahl == 0:
+        return float("inf")
     return zahl if zahl > 0 else None
 
 
@@ -106,31 +108,117 @@ def lies_tarifliste(text: str, url: str = "") -> list[dict]:
     return out
 
 
+_POSTEN_ANSCHLUSS = "Anschlusspreis Tarif"
+_POSTEN_VERSAND = "Versandkosten"
+
+
+def lies_produktdetail(text: str, url: str = "") -> dict | None:
+    """Die SKU-genaue Antwort `/v1/productdetail/<id>?tfi=<tarif_id>` (EIN
+    vorgewaehlter Tarif) in einen Buendel-Satz - anders als `lies_tarifliste`
+    mit der exakten Geraetezuzahlung dieses Tarifs statt eines "ab"-Werts.
+    `costs.oneTimeCosts.items` traegt immer drei Posten (Geraet, Anschluss,
+    Versand); welcher der Geraeteposten ist, steht nicht am Namen (der
+    Hardware-Name ist kuerzer als das Item-Label mit Farbe/Speicher), also
+    ist er der EINZIGE Posten ohne einen der beiden festen Namen."""
+    try:
+        daten = json.loads(text or "")
+    except (json.JSONDecodeError, ValueError):
+        log.warning("Tarifwelt: Produktdetail nicht lesbar (kein JSON)")
+        return None
+    if not isinstance(daten, dict):
+        return None
+    tariff = daten.get("tariff") or {}
+    tarif_id = str(tariff.get("_id") or "").strip()
+    if not tarif_id:
+        return None
+    posten = {
+        str(p.get("label") or "").strip(): p.get("amount")
+        for p in ((daten.get("costs") or {}).get("oneTimeCosts") or {}).get("items")
+        or []
+        if isinstance(p, dict)
+    }
+    geraet_posten = next(
+        (
+            (label, betrag)
+            for label, betrag in posten.items()
+            if label not in (_POSTEN_ANSCHLUSS, _POSTEN_VERSAND)
+        ),
+        (None, None),
+    )
+    geraet_label, geraet_zuzahlung = geraet_posten
+    return {
+        "tarif_id": tarif_id,
+        "tarif_name": str(tariff.get("name") or tariff.get("nameSlug") or "").strip()
+        or None,
+        "netz": str(tariff.get("carrierName") or "").strip() or None,
+        "datenvolumen_gb": _gb(tariff),
+        "grundgebuehr": tariff.get("monthlyPrice"),
+        "laufzeit_monate": tariff.get("contractTerm"),
+        "geraet_zuzahlung": geraet_zuzahlung,
+        "geraet_label": geraet_label,
+        "anschlusspreis": posten.get(_POSTEN_ANSCHLUSS),
+        "doppelkarte": tariff.get("doubleCardAddendum") is not None,
+        "quelle": "mediamarkt_tarifwelt",
+        "url": url,
+    }
+
+
+_NETZ_LABEL = {
+    "o2": "o2-Netz",
+    "freenet - Telekom": "Telekom-Netz",
+    "freenet - Vodafone": "Vodafone-Netz",
+}
+
+
+def anbieter_zeile(netz: str | None) -> str | None:
+    """Die Anbieterzeile "Saturn/MediaMarkt · <Netz>-Netz" (Auftrag
+    brief-tarifwelt-0811.md) - ein unbekanntes Netz bleibt eine benannte
+    Luecke statt eine geratene Zeile."""
+    label = _NETZ_LABEL.get((netz or "").strip())
+    return f"Saturn/MediaMarkt · {label}" if label else None
+
+
 def ohne_doppelkarte(saetze: list[dict]) -> list[dict]:
     """Nur Tarife mit einer eigenstaendigen SIM - ein Doppelkarten-Paket
     (zwei Tarife zu einem Preis) ist kein Vergleichswert je Geraet."""
     return [s for s in saetze if not s.get("doppelkarte")]
 
 
-def waehle_je_band(saetze: list[dict], leiter_gb) -> dict[str, dict]:
-    """Je Sprosse der uebergebenen Baender-Leiter (Folge von `(key, gb)`)
-    den Tarif mit dem naechstgelegenen Datenvolumen - dieselbe Regel wie
-    `report.geraete_tco_band.band_von_gb` (`band_regel.abstand_schluessel`,
-    EIN gemeinsamer Baustein, ohne dass Sammeln die Berichtsschicht
-    importiert, `.importlinter`). Bei mehreren gleich nahen Tarifen
-    entscheidet der niedrigere Monatspreis."""
-    brauchbar = [s for s in saetze if s.get("datenvolumen_gb") is not None]
-    out: dict[str, dict] = {}
-    for key, gb in leiter_gb:
-        kandidaten = sorted(
-            brauchbar,
-            key=lambda s: (
-                *abstand_schluessel(s["datenvolumen_gb"], gb),
-                s["grundgebuehr"]
-                if s.get("grundgebuehr") is not None
-                else float("inf"),
-            ),
-        )
-        if kandidaten:
-            out[key] = kandidaten[0]
+def rangliste_je_band(saetze: list[dict], leiter_gb) -> dict[str, list[dict]]:
+    """Je Sprosse der uebergebenen Baender-Leiter (Folge von `(key, gb)`) die
+    Tarife in Reihenfolge der Eignung - der erste ist DER Tarif des Bandes.
+    Zuerst bekommt jeder Tarif sein Band nach DERSELBEN Regel wie im
+    Bericht (`band_regel.stufe_fuer`, der Baustein hinter
+    `report.geraete_tco_band.band_von_gb`; Sammeln importiert die
+    Berichtsschicht nicht, `.importlinter`): naechstes Volumen, Gleichstand
+    das groessere, unbegrenzt nur in ein unbegrenztes Band. Ein Tarif ohne
+    Band faellt weg. Je Band gewinnt das Volumen mit dem kleinsten Abstand
+    zum Bandwert (Gleichstand: das groessere), danach der niedrigere
+    Monatspreis. So steht kein Tarif in einem Band, in das der Bericht ihn
+    gar nicht legen wuerde. Die Folgeplaetze brauchen nur Geraete, fuer die
+    der erste Tarif nicht waehlbar ist (die Schnittstelle fuehrt Tarife auf,
+    die fuer ein Geraet eine leere Antwort geben)."""
+    leiter = tuple(leiter_gb)
+    gb_je_band = dict(leiter)
+    je_band: dict[str, list[dict]] = {}
+    for satz in saetze:
+        band = stufe_fuer(satz.get("datenvolumen_gb"), leiter)
+        if band is not None:
+            je_band.setdefault(band, []).append(satz)
+    out: dict[str, list[dict]] = {}
+    for key, kandidaten in je_band.items():
+        ziel = gb_je_band[key]
+
+        def rang(s: dict, ziel=ziel) -> tuple:
+            gb = s["datenvolumen_gb"]
+            abstand = 0.0 if gb == ziel else abstand_schluessel(gb, ziel)[0]
+            preis = s.get("grundgebuehr")
+            return (abstand, -gb, float("inf") if preis is None else preis)
+
+        out[key] = sorted(kandidaten, key=rang)
     return out
+
+
+def waehle_je_band(saetze: list[dict], leiter_gb) -> dict[str, dict]:
+    """Je Band genau EIN Tarif: der erste der `rangliste_je_band`."""
+    return {k: v[0] for k, v in rangliste_je_band(saetze, leiter_gb).items()}
