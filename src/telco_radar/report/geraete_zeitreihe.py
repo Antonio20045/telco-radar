@@ -9,10 +9,9 @@ finde ich gut." Der Prototyp (Commit 2f40457) ist hier Production geworden.
 Drei Regeln tragen dieses Modul:
 
 1. **JEDE ZAHL ENTSTEHT HIER, KEINE IM CLIENT.** Der Browser setzt fertige
-   Knoten ein (Antwort-Satz, Messtag-Zeile, beide SVG-Varianten,
-   Lückensatz); er rechnet, formatiert und baut keine Zeichenketten. Die
-   Vorlage und `app.js` sind Montage, kein Renderer - dieselbe Regel wie
-   `luecke_text` in `geraete_tco_band`.
+   Knoten ein (Antwort-Satz, Messtag-Zeile, beide SVG-Varianten, Lückensatz); er
+   rechnet, formatiert und baut keine Zeichenketten. Vorlage und `app.js` sind
+   Montage, kein Renderer - dieselbe Regel wie `luecke_text` in `geraete_tco_band`.
 2. **Nichts wird interpoliert.** Ein Anbieter ohne Messung an einem Tag
    hat keinen Punkt an diesem Tag; unter zwei Punkten gibt es keinen
    Linienzug. Die Lücke IST die Aussage des Graphen.
@@ -29,10 +28,9 @@ Die Zuordnung der Historie ist die des Sammel-Skripts des Prototyps
 Je (Modell, Band, Anbieter, Tag) zählt das GÜNSTIGSTE Bündel: Farben sind
 Preisdimensionen.
 
-ZWEI SVG-Varianten je Paar (breit/schmal) statt clientseitigem Neu-Rendern
-bei Resize: der Prototyp rechnete die Geometrie im Browser neu - hier
-stehen beide fertigen Bilder im Dokument, und ein CSS-Mediaquery zeigt
-genau eines. `display:none` nimmt das andere aus dem Accessibility-Baum.
+ZWEI SVG-Varianten je Paar (breit/schmal) statt clientseitigem Neu-Rendern bei
+Resize: beide fertigen Bilder stehen im Dokument, ein CSS-Mediaquery zeigt genau
+eines (`display:none` nimmt das andere aus dem Accessibility-Baum).
 """
 
 from __future__ import annotations
@@ -48,6 +46,7 @@ from ..analyze.tco_store import basis_aus_satz, id_aus_satz
 from ..tco_model import zeitraum_vergleichbar
 from . import geraete_bewegung
 from . import geraete_notbremse as notbremse
+from . import geraete_zeitreihe_auswahl as zeitreihe_auswahl
 from .anbieter_farben import STRICHMUSTER, stil_fuer
 from .geraete_antwort import _antwort_html as _antwort_html
 from .geraete_antwort import _leitzahl_html as _leitzahl_html
@@ -380,6 +379,7 @@ def _messungen(
             fremde_laufzeit,
             stand_ohne_id,
         )
+    zeitreihe_auswahl.ohne_widersprochenen_juengsten(messungen, buendel, sku_modell)
     return messungen
 
 
