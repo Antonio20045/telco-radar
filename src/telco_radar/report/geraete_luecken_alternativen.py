@@ -6,6 +6,8 @@ from __future__ import annotations
 from ..tco_model import TCO_HORIZONT, zeitraum_vergleichbar
 from . import geraete_notbremse as notbremse
 from .geraete_laufzeit import ansicht
+from .geraete_rechenweg import _zeitraum_wort
+from .geraete_tco_band import band_label
 
 
 def _alternativen(
@@ -61,3 +63,38 @@ def _alternativen(
         {"band": b, "tco": v["tco"], "monate": v["monate"]}
         for b, v in sorted(beste.items())
     ]
+
+
+def _andere_laufzeiten(alle: list, band: str, laufzeit: int | None) -> list:
+    """Die Ratenlaufzeiten, mit denen der Anbieter erfasst ist: im Band die
+    gemessenen Raten (Telekom A17 L nur mit 6), sonst die Ansichten."""
+    im_band = {
+        k["raten_laufzeit"]
+        for k in alle
+        if k.get("band") == band
+        and k.get("raten_laufzeit")
+        and ansicht(k) not in (None, laufzeit)
+    }
+    if im_band:
+        return sorted(im_band)
+    return sorted({a for k in alle if (a := ansicht(k)) is not None} - {laufzeit})
+
+
+def _alt_zeitraum(monate, h: int = TCO_HORIZONT) -> str:
+    """ " über 36 Monate" - der Zeitraum eines Alternativ-Betrags, oder "".
+
+    Nur bei ABWEICHUNG vom Horizont: eine 24 hinter jeder Zahl in einem
+    Satz, der ohnehin von 24 Monaten spricht, waere dieselbe Angabe
+    zweimal am selben Ort. Ein unlesbarer Zeitraum wird BENANNT, nie als
+    Horizont angenommen (Clean Code 4).
+    """
+    if zeitraum_vergleichbar(monate, h):
+        return ""
+    if monate is None:
+        return " über eine nicht gemessene Laufzeit"
+    return f" über {_zeitraum_wort([monate])}"
+
+
+def _stufe(band_labels: dict, band: str) -> str:
+    """Der Name der Stufe ("XS") aus dem Katalog, sonst aus dem Schluessel."""
+    return (band_labels.get(band) or {}).get("label") or band_label(band)

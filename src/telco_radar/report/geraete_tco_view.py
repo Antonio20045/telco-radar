@@ -30,10 +30,13 @@ from . import (
     geraete_laufzeit,
     geraete_notbremse,
     geraete_preisstand,
+    geraete_stufen,
     geraete_tco_band,
     geraete_tco_grafik,
     geraete_tco_karten,
 )
+from .geraete_zuordnung_satz import ANBIETER_UNBEKANNT as ANBIETER_UNBEKANNT
+from .geraete_zuordnung_satz import ohne_zuordnung_satz
 
 log = logging.getLogger(__name__)
 
@@ -269,34 +272,6 @@ def _export_zeilen(
     return {"buendel": zeilen, "sim_only": sim}
 
 
-ANBIETER_UNBEKANNT = "ein unbekannter Anbieter"
-
-
-def ohne_zuordnung_satz(offen: list, anbieter_anzeige: dict | None = None) -> str:
-    """Der Satz zu Buendeln, die auf keinem Geraet stehen - oder `""`.
-
-    Er nennt je Anbieter den Anzeigenamen und die Zahl der Buendel; der
-    Schluessel aus der Quellenkonfiguration erscheint nie auf der Seite.
-    Ein leerer Anbietername heisst `ANBIETER_UNBEKANNT`, nicht "?"
-    (Clean Code 4). Reihenfolge: viele zuerst, dann nach Name.
-    """
-    anzeige = anbieter_anzeige or {}
-    je_name: dict[str, int] = {}
-    for o in offen:
-        schluessel = o.get("anbieter") or ""
-        name = anzeige.get(schluessel) or schluessel or ANBIETER_UNBEKANNT
-        je_name[name] = je_name.get(name, 0) + 1
-    if not je_name:
-        return ""
-    teile = [
-        f"{zahl} Bündel von {name}"
-        for name, zahl in sorted(je_name.items(), key=lambda t: (-t[1], t[0]))
-    ]
-    return (
-        "Nicht auf der Tafel, weil kein Gerät zuzuordnen ist: " + ", ".join(teile) + "."
-    )
-
-
 def aufbereiten(
     buendel: list,
     referenzen: list,
@@ -400,6 +375,7 @@ def aufbereiten(
         modell["baender"] = je_laufzeit[geraete_laufzeit.LAUFZEIT_STANDARD]
         leer = geraete_tco_band.band_leer_text(leiter)
         modell["band_leer"] = None if any(je_laufzeit.values()) else leer
+    geraete_stufen.haenge_an(modelle["modelle"], tarife, band_je_tarif)
 
     graph_daten = {
         "stand": max(
@@ -458,6 +434,7 @@ def aufbereiten(
         "ohne_zuordnung_satz": ohne_zuordnung_satz(
             modelle["ohne_zuordnung"], anbieter_anzeige
         ),
+        "tarifstufen_regel": geraete_stufen.TARIFSTUFEN_REGEL,
         "baender_katalog": geraete_tco_band.baender_katalog(leiter),
         "band_je_tarif": band_je_tarif,
         "export": _export_zeilen(
@@ -478,6 +455,7 @@ def leer() -> dict:
         "modell_vorgabe": "",
         "ohne_zuordnung": [],
         "ohne_zuordnung_satz": "",
+        "tarifstufen_regel": geraete_stufen.TARIFSTUFEN_REGEL,
         "graph_daten": None,
         "baender_katalog": [],
         "band_je_tarif": {},

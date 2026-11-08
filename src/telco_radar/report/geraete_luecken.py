@@ -15,7 +15,7 @@ from ..analyze.klick_erfassung import (
     SATZ_SPEICHER,
     SATZ_SPEICHER_ANGEBOT,
 )
-from ..tco_model import TCO_HORIZONT, zeitraum_vergleichbar
+from ..tco_model import TCO_HORIZONT
 from . import geraete_notbremse as notbremse
 from .anbieter_farben import farbe_fuer
 from .geraete_laufzeit import (
@@ -26,9 +26,14 @@ from .geraete_laufzeit import (
     ansicht,
     nur_ueber_24,
 )
-from .geraete_luecken_alternativen import _alternativen as _alternativen
-from .geraete_rechenweg import ANBIETER_FOLGE, _zeitraum_wort, euro
-from .geraete_tco_band import band_label
+from .geraete_luecken_alternativen import (
+    _alt_zeitraum,
+    _alternativen,
+    _andere_laufzeiten,
+    _stufe,
+)
+from .geraete_rechenweg import ANBIETER_FOLGE, euro
+from .geraete_stufen import KEIN_TARIF_KURZ, KEIN_TARIF_SATZ, stufe_ohne_tarif
 
 
 def _luecken(
@@ -38,6 +43,7 @@ def _luecken(
     fremd: list | None = None,
     gesperrt: list | None = None,
     laufzeit: int | None = None,
+    stufen: dict | None = None,
 ) -> list[dict]:
     """Je erwartetem Anbieter ohne Zeile: der Grund, in EINEM Satz zusammen.
 
@@ -75,6 +81,9 @@ def _luecken(
     stehen, wenn der Sammler die fehlende Option auf der Seite gesehen hätte.
     Ebenso, wenn das Band selbst nur mit anderen Raten erfasst ist: „Nur in
     anderen Bändern“ wäre dann falsch.
+
+    `stufen` (`geraete_stufen.tarife_je_stufe`) trägt je Anbieter die Zahl seiner
+    gemessenen Tarife je Tarifstufe; `stufe_ohne_tarif` ist wahr nur bei null.
     """
     gesehen = {z["anbieter"] for z in zeilen}
     luecken = []
@@ -124,44 +133,10 @@ def _luecken(
                 "gesperrt": namen,
                 "laufzeit": laufzeit,
                 "andere_laufzeiten": _andere_laufzeiten(alle, band, laufzeit),
+                "stufe_ohne_tarif": stufe_ohne_tarif(stufen, anbieter, band),
             }
         )
     return luecken
-
-
-def _andere_laufzeiten(alle: list, band: str, laufzeit: int | None) -> list:
-    """Die Ratenlaufzeiten, mit denen der Anbieter erfasst ist: im Band die
-    gemessenen Raten (Telekom A17 L nur mit 6), sonst die Ansichten."""
-    im_band = {
-        k["raten_laufzeit"]
-        for k in alle
-        if k.get("band") == band
-        and k.get("raten_laufzeit")
-        and ansicht(k) not in (None, laufzeit)
-    }
-    if im_band:
-        return sorted(im_band)
-    return sorted({a for k in alle if (a := ansicht(k)) is not None} - {laufzeit})
-
-
-def _alt_zeitraum(monate, h: int = TCO_HORIZONT) -> str:
-    """ " über 36 Monate" - der Zeitraum eines Alternativ-Betrags, oder "".
-
-    Nur bei ABWEICHUNG vom Horizont: eine 24 hinter jeder Zahl in einem
-    Satz, der ohnehin von 24 Monaten spricht, waere dieselbe Angabe
-    zweimal am selben Ort. Ein unlesbarer Zeitraum wird BENANNT, nie als
-    Horizont angenommen (Clean Code 4).
-    """
-    if zeitraum_vergleichbar(monate, h):
-        return ""
-    if monate is None:
-        return " über eine nicht gemessene Laufzeit"
-    return f" über {_zeitraum_wort([monate])}"
-
-
-def _stufe(band_labels: dict, band: str) -> str:
-    """Der Name der Stufe ("XS") aus dem Katalog, sonst aus dem Schluessel."""
-    return (band_labels.get(band) or {}).get("label") or band_label(band)
 
 
 NICHT_IM_ANGEBOT = "Bietet das Gerät nicht an"
@@ -195,33 +170,48 @@ _KURZ = {
 }
 
 
+def _kein_buendel_zeile(lu: dict, band_labels: dict, h: int, erfassung: dict) -> dict:
+    """Der Anbieter hat zu diesem Gerät gar kein Bündel: Beleg der Klick-Erfassung,
+    sonst - hat er in der Stufe keinen Tarif - dieser Befund, sonst „Noch nicht
+    erfasst“."""
+    satz = erfassung.get(lu["anbieter"])
+    if satz and _NICHT_IM_ANGEBOT_MUSTER.fullmatch(satz):
+        return _zeile(lu, NICHT_IM_ANGEBOT, satz)
+    if satz and (treffer := _SPEICHER_ANGEBOT_MUSTER.fullmatch(satz)):
+        return _zeile(lu, f"Nur mit {treffer['speicher']} im Angebot", satz)
+    if satz and (treffer := _SPEICHER_MUSTER.fullmatch(satz)):
+        return _zeile(lu, f"Nur mit {treffer['speicher']} gelesen", satz)
+    if lu.get("stufe_ohne_tarif"):
+        return _ohne_tarif_zeile(lu, band_labels, h)
+    satz = satz or KEIN_ANGEBOT_GELESEN.format(anbieter=lu["anbieter"])
+    return _zeile(lu, NOCH_NICHT_ERFASST, satz)
+
+
 def _fehlzeile(lu: dict, band_labels: dict, h: int, erfassung: dict) -> dict:
     """Die Zeile EINES fehlenden Anbieters: kurzer Zustand und ganzer Satz.
 
     „Bietet das Gerät nicht an“ nur mit dem Beleg der Klick-Erfassung (Übersicht
     ganz gelesen, `klick_erfassung.SATZ_NICHT_IM_ANGEBOT`); ohne Bündel und ohne
-    diesen Beleg heißt der Anbieter „Noch nicht erfasst“ (Clean Code 6)."""
+    diesen Beleg heißt der Anbieter „Noch nicht erfasst“ (Clean Code 6) - außer er
+    hat in der Tarifstufe keinen gemessenen Tarif (`geraete_stufen`, fail-closed)."""
     anbieter, grund = lu["anbieter"], lu["grund"]
+    ohne_tarif = bool(lu.get("stufe_ohne_tarif"))
     if grund == "gar-kein-buendel":
-        satz = erfassung.get(anbieter)
-        if satz and _NICHT_IM_ANGEBOT_MUSTER.fullmatch(satz):
-            return _zeile(lu, NICHT_IM_ANGEBOT, satz)
-        if satz and (treffer := _SPEICHER_ANGEBOT_MUSTER.fullmatch(satz)):
-            return _zeile(lu, f"Nur mit {treffer['speicher']} im Angebot", satz)
-        if satz and (treffer := _SPEICHER_MUSTER.fullmatch(satz)):
-            return _zeile(lu, f"Nur mit {treffer['speicher']} gelesen", satz)
-        satz = satz or KEIN_ANGEBOT_GELESEN.format(anbieter=anbieter)
-        return _zeile(lu, NOCH_NICHT_ERFASST, satz)
+        return _kein_buendel_zeile(lu, band_labels, h, erfassung)
     if grund == "nicht-erfasst":
         angebot = RATEN_IM_ANGEBOT.get(anbieter)
         if angebot is not None and lu.get("laufzeit") not in angebot:
             kurz = f"Mit {lu.get('laufzeit')} Raten nicht im Angebot"
             return _zeile(lu, kurz, kurz + ".")
+        if ohne_tarif:
+            return _ohne_tarif_zeile(lu, band_labels, h)
         kurz = f"Mit {lu.get('laufzeit')} Raten {NICHT_ERFASST}"
         if lu.get("andere_laufzeiten"):
             raten = " und ".join(str(a) for a in lu["andere_laufzeiten"])
             kurz += f" ({raten} Raten erfasst)"
         return _zeile(lu, kurz, kurz + ".")
+    if ohne_tarif and grund in ("anderes-band", "nur-24"):
+        return _ohne_tarif_zeile(lu, band_labels, h)
     kurz = _KURZ.get(grund, _KURZ["anderes-band"])
     if grund == "anderer-zeitraum" and lu.get("monate") is not None:
         kurz = f"Nur über {lu['monate']} Monate"
@@ -238,6 +228,23 @@ def _fehlzeile(lu: dict, band_labels: dict, h: int, erfassung: dict) -> dict:
         kurz += f": {alt}"
         satz = f"{kurz}."
     return _zeile(lu, kurz, satz)
+
+
+def _ohne_tarif_zeile(lu: dict, band_labels: dict, h: int) -> dict:
+    """Der Anbieter hat in dieser Tarifstufe keinen Tarif (`geraete_stufen`),
+    anders als „Noch nicht erfasst“ ist das keine Messlücke. Preise desselben
+    Geräts in anderen Stufen bleiben als Hinweis stehen."""
+    kurz = KEIN_TARIF_KURZ
+    satz = KEIN_TARIF_SATZ.format(anbieter=lu["anbieter"])
+    if lu.get("alternativ"):
+        alt = " · ".join(
+            f"{_stufe(band_labels, a['band'])} {euro(a['tco'])}"
+            f"{_alt_zeitraum(a.get('monate'), h)}"
+            for a in lu["alternativ"]
+        )
+        kurz += f" · in anderen Stufen: {alt}"
+        satz += f". In anderen Stufen: {alt}"
+    return _zeile(lu, kurz, satz + ".") | {"grund": "stufe-ohne-tarif"}
 
 
 def _zeile(lu: dict, kurz: str, satz: str) -> dict:
@@ -304,6 +311,12 @@ def tafelzeilen(paare: list) -> dict[str, list[dict]]:
                 "kurz": _KURZ["anderes-band"],
                 "satz": _KURZ["anderes-band"] + ".",
             }
+        elif f["grund"] == "stufe-ohne-tarif":
+            f = {
+                **f,
+                "kurz": KEIN_TARIF_KURZ,
+                "satz": KEIN_TARIF_SATZ.format(anbieter=f["anbieter"]) + ".",
+            }
         zeilen[modell].append({**f, "band": band, "laufzeit": ALLE})
     for liste in zeilen.values():
         for z in liste:
@@ -354,6 +367,7 @@ def fehlen_im_paar(
         fremd=satz.get("fremd") or [],
         gesperrt=satz.get("gesperrt"),
         laufzeit=laufzeit,
+        stufen=modell.get("stufen"),
     )
     return fehlzeilen(
         luecken,

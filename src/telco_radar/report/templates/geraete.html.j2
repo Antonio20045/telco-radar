@@ -323,6 +323,9 @@
   {% if belegquote is defined %}{% set bq = belegquote(geraete.tco.modelle) %}{% if bq.satz %}
   <p class="gr-belegquote" id="gr-belegquote">{{ bq.satz }}</p>
   {% endif %}{% endif %}
+  {# Ziel 1b: warum ein Anbieter nicht jede Tarifstufe füllt (`geraete_stufen`). #}
+  <p class="gr-belegquote" id="gr-tarifstufen-regel">{{
+  geraete.tco.tarifstufen_regel }}</p>
   </section>
 
   {# EIN BUENDEL OHNE GERAETEZUORDNUNG STEHT HIER BEIM NAMEN (F-R2-3) -
