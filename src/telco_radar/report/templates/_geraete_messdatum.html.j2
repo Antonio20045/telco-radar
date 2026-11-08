@@ -1,0 +1,12 @@
+{# Letztes Messdatum je Anbieter (Brief messdatum-0811). Text und Regel liefert
+   geraete_messdatum.py; hier steht nur die Hülle. Ein Anbieter, der nicht vom
+   jüngsten Messtag stammt, trägt „Stand vom TT.MM.“; ohne lesbares Datum steht
+   „Messdatum unbekannt“, nie das heutige. #}
+{% set md = messdatum_je_anbieter(geraete.tco.export.buendel, geraete.stand) %}
+{% if md and md.zeilen %}
+<ul class="gr-md" id="messdatum" aria-label="Letztes Messdatum je Anbieter">
+  {% for z in md.zeilen %}
+  <li class="gr-md-z{{ ' gr-md-z--alt' if z.alt }}" data-anbieter="{{ z.name }}" data-datum="{{ z.datum }}">{{ z.satz }}{% if z.stand %} <span class="gr-kk-marke gr-kk-marke--alt">{{ z.stand }}</span>{% endif %}</li>
+  {% endfor %}
+</ul>
+{% endif %}
