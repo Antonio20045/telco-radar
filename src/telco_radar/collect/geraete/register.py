@@ -14,6 +14,7 @@ from . import (
     mediamarkt,
     o2,
     saturn,
+    tarifwelt,
     telekom,
     telekom_zusatz,
     vodafone,
@@ -88,4 +89,8 @@ def registriere_anbieter_adapter() -> None:
             direkt=True,
             bricht_bei_schutzantwort_ab=True,
         ),
+    )
+    registriere(
+        "mediamarkt_tarifwelt",
+        Adapter(name="mediamarkt_tarifwelt", lies=tarifwelt.lies),
     )

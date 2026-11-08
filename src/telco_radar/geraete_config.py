@@ -40,11 +40,14 @@ METHODEN = (
     "saturn_brand",
     "mediamarkt_angebote",
     "coolblue_produkt",
+    "mediamarkt_tarifwelt",
     "kein_hardware",
     "deaktiviert",
 )
 
 _NICHT_CRAWLBAR = ("deaktiviert", "kein_hardware")
+
+_EIGENER_LAUF = ("mediamarkt_tarifwelt",)
 
 ANBIETER_TYPEN = ("handel", "netzbetreiber", "discount")
 
@@ -340,7 +343,12 @@ def lade_quellen(root: Path) -> QuellenConfig:
         name = str(a["name"]).strip()
         alle = _parse_einstiege(a.get("einstiege"), basis_url, name)
         einstiege = [e for e in alle if e.kind != "klick"]
-        if aktiv and methode not in _NICHT_CRAWLBAR and not einstiege:
+        if (
+            aktiv
+            and methode not in _NICHT_CRAWLBAR
+            and methode not in _EIGENER_LAUF
+            and not einstiege
+        ):
             grund = grund or (
                 "keine Einstiegsseite konfiguriert - der Anbieter wird nicht abgefragt"
             )

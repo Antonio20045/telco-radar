@@ -48,3 +48,21 @@ anbieter:
     datum: "2026-11-05"
     screenshot: "telcoradar/abnahme/versand-0511/1und1.png"
     hinweis: "Warenkorb 05.11.2026: keine Versandzeile, keine Aussage 'versandkostenfrei'. Block 'Zubehoer, Bereitstellung & Versand': SIM inklusive, Bereitstellungspreis 39,90 EUR; einmalige Kosten gesamt 39,90 EUR = Bereitstellung, kein Versand. Lieferbedingungen per robots.txt gesperrt, nicht abgerufen; Mindestwerte oder Ausnahmen ungeprueft"
+  "Saturn/MediaMarkt · o2-Netz":
+    betrag: 5.95
+    quelle: "https://tarife-api2.mediamarkt.de/v1/productdetail/iphone-17?... (costs.oneTimeCosts.items 'Versandkosten', iPhone 17, o2-Doppelkarte-Tarif)"
+    datum: "2026-11-08"
+    screenshot: "telcoradar/abnahme/tarifwelt-0811/01_iphone17_o2_standard.png"
+    hinweis: "Fixtures tests/fixtures/geraete/tarifwelt_mm_productdetail_iphone17_o2doppelkarte_20261108.json"
+  "Saturn/MediaMarkt · Telekom-Netz":
+    betrag: 5.95
+    quelle: "https://tarife-api2.mediamarkt.de/v1/productdetail/iphone-17?... (costs.oneTimeCosts.items 'Versandkosten', iPhone 17, Telekom Magenta Mobil M)"
+    datum: "2026-11-08"
+    screenshot: "telcoradar/abnahme/tarifwelt-0811/02_iphone17_telekom_magenta_m.png"
+    hinweis: "Fixtures tests/fixtures/geraete/tarifwelt_mm_productdetail_iphone17_telekom_magenta_m_20261108.json und _galaxys26_standard_20261108.json (beide 5,95 EUR)"
+  "Saturn/MediaMarkt · Vodafone-Netz":
+    betrag: 5.95
+    quelle: "https://tarife.mediamarkt.de/smartphones/apple/iphone-17?storage=256&tfi=6a86e66a7f5200fe031c3ea7 (Preisuebersicht 'Versandkosten', iPhone 17, freenet - Vodafone Mobil M; gleiche Zahl in costs.oneTimeCosts.items der Schnittstelle)"
+    datum: "2026-11-08"
+    screenshot: "telcoradar/abnahme/tarifwelt-0811/04_iphone17_vodafone_mobil_m_preisuebersicht.png"
+    hinweis: "Preisuebersicht auf der Produktseite (Schaltflaeche 'Preisuebersicht anzeigen'), nichts im Warenkorb, nichts bestellt; Fixture tests/fixtures/geraete/tarifwelt_mm_productdetail_iphone17_vodafone_mobil_m_20261108.json"

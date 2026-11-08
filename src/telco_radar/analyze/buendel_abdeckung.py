@@ -1,21 +1,20 @@
 """Abdeckung der Bündel: welcher Anbieter liefert welches Gerät in welchem
 Tarif, und was ist seit dem letzten Messtag weggefallen oder gesprungen.
 
-Der ältere Wächter (`GeraeteDB.ausfall_alarme`) prüft Listungen und schlägt
-nur an, wenn ein Anbieter GESTERN noch lieferte. Die Telekom lieferte seit
-dem 15.09.2026 kein Bündel mehr, und kein Lauf wurde rot: wer schon
-ausgefallen ist, fällt diesem Vergleich nie wieder auf. Diese Prüfung misst
-deshalb gegen eine feste Pflichtliste (`config/geraete_abdeckung.yaml`),
-nicht gegen den Vortag, und sie misst die Bündel, aus denen die Leitzahl
-„Kosten über 24 Monate“ entsteht.
+Der ältere Wächter (`GeraeteDB.ausfall_alarme`) schlägt nur an, wenn ein
+Anbieter GESTERN noch lieferte. Die Telekom lieferte seit dem 15.09.2026
+kein Bündel mehr, und kein Lauf wurde rot: wer schon ausgefallen ist, fällt
+diesem Vergleich nie wieder auf. Diese Prüfung misst deshalb gegen eine feste
+Pflichtliste (`config/geraete_abdeckung.yaml`), nicht gegen den Vortag, und
+sie misst die Bündel, aus denen die Leitzahl „Kosten über 24 Monate“ entsteht.
 
 Sechs Befundarten, jede für sich rot:
 
 * ``anbieter_leer``     ein Pflichtanbieter hat am Messtag kein Bündel
 * ``modell_fehlt``      ein Pflichtmodell fehlt bei einem Pflichtanbieter,
                         ohne dass eine belegte Lücke in der Config steht
-* ``speicher_fehlt``    eine Speicherstufe, die ein anderer Pflichtanbieter
-                        führt, fehlt unbelegt bei einem geprüften Anbieter
+* ``speicher_fehlt``    eine Speicherstufe, die ein Netzbetreiber (nie eine
+                        Händlerzeile) führt, fehlt unbelegt bei einem geprüften
 * ``kombis_weg``        gegenüber dem vorigen Messtag fehlen mehr als
                         `KOMBI_VERLUST_ANTEIL` der Kombinationen
 * ``preissprung``       die Leitzahl einer Kombination springt um mehr als
@@ -44,6 +43,7 @@ from pathlib import Path
 
 import yaml
 
+from .. import abdeckung_pflicht as pflichten
 from .. import rechenweise, tco_historie
 from ..geraete_model import normalisiere
 
@@ -139,8 +139,10 @@ def lade_pflicht(pfad: Path) -> dict:
                         "original": str(eintrag.get("original") or "").strip(),
                     }
     return {
-        "anbieter": list(daten.get("pflicht_anbieter") or []),
+        "anbieter": pflichten.pflichtanbieter(daten, pfad),
         "modelle": list(daten.get("pflicht_modelle") or []),
+        "stufen_quellen": list(daten.get("pflicht_anbieter") or []),
+        "modelle_je_anbieter": pflichten.pflichtmodelle_je_anbieter(daten, pfad),
         "speicher_pflicht_anbieter": list(daten.get("speicher_pflicht_anbieter") or []),
         "luecken": luecken,
         "bis": bis,
@@ -190,13 +192,13 @@ def _anbieter_aus_id(buendel_id: str, namen: dict) -> str | None:
 
 
 def _pruefe_speicherstufen(ergebnis: Abdeckung, pflicht: dict, belegt_speicher) -> None:
-    """Speicherstufe unbelegt fehlend, die ein anderer Pflichtanbieter führt:
-    Befund ``speicher_fehlt`` - nur für Anbieter aus
-    ``speicher_pflicht_anbieter`` (Rollout je Anbieter, sonst eine erfundene
-    Portfolio-Aussage für einen ungeprüften)."""
+    """Speicherstufe unbelegt fehlend, die ein Netzbetreiber führt (nie eine
+    Händlerzeile, ``stufen_quellen``): Befund ``speicher_fehlt``, nur für Anbieter
+    aus ``speicher_pflicht_anbieter`` (Rollout, sonst eine erfundene Aussage)."""
     geprueft = set(pflicht.get("speicher_pflicht_anbieter") or [])
     for modell in pflicht["modelle"]:
-        da = [a for a in pflicht["anbieter"] if (modell, a) in ergebnis.matrix]
+        quellen = pflicht.get("stufen_quellen", pflicht["anbieter"])
+        da = [a for a in quellen if (modell, a) in ergebnis.matrix]
         alle_stufen: set = set()
         for a in da:
             alle_stufen |= ergebnis.matrix[(modell, a)]["speicher"]
@@ -265,7 +267,7 @@ def pruefe(tco: dict, historie: list[dict], pflicht: dict) -> Abdeckung:
             continue
         fehlend = [
             m
-            for m in pflicht["modelle"]
+            for m in pflichten.modelle_fuer(pflicht, anbieter)
             if (m, anbieter) not in ergebnis.matrix and not belegt(anbieter, m)
         ]
         if fehlend:

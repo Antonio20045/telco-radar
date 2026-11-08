@@ -1,5 +1,5 @@
 {
-  "zweck": "Messrunde 31.08.2026: rohe, unveraenderte HTTP-Antworten als Beleg je Anbieter. Dateien ueber 250 kB liegen gzip-komprimiert (byteidentisch, nur verpackt) - sha256_roh gilt fuer den ENTPACKTEN Inhalt. ERGAENZT AM 04.09.2026 um Telekom (Kategorieseite) und 1&1 (Kategorie- und Produktseite): dieselbe Regel, aber mit dem ehrlichen Absender TelcoRadar/1.0 abgerufen und nicht mit einer Browser-Kennung. ERGAENZT AM 05.09.2026 um Saturn (zwei Markenseiten, /de/brand/apple/iphone/...): ld+json-ItemList UND window.__PRELOADED_STATE__ (Apollo-Cache) derselben Antwort, ehrlicher Absender TelcoRadar/1.0. ERGAENZT AM 18.09.2026 (P5/E3) um die Titel-Zeilen von data/state/geraete_unbekannt.jsonl (Stand 17.09., Bot-Commit 1dd48d4): kein HTTP-Abruf, sondern ein Auszug aus dem Lauf-State - alle 145 art=titel-Zeilen unveraendert; Basis der Tarif-Rauschen-Regel und ihrer Tests. ERGAENZT AM 05.11.2026 um MediaMarkt (eine Produktseite, /de/product/_samsung-galaxy-a57-...-3039261.html, Samsung Galaxy A57): derselbe Ceconomy-Lesekern wie Saturn (ld+json UND window.__PRELOADED_STATE__), Cache-Praefix 'Media' statt 'Saturn', ehrlicher Absender TelcoRadar/1.0, Abruf aus arbeit/haendler-weg-0411/mm_product_samsung_a57.body.html (04.11.2026, Recherche haendler-weg-0411.md). Ebenfalls am 05.11.2026 ergaenzt: die MediaMarkt-Kampagnenseite /de/campaign/angebote-smartphones (mediamarkt_angebote_smartphones.html.gz, Abruf 04.11.2026) als der produktiv konfigurierte, direkte Einstieg - ebenfalls aus arbeit/haendler-weg-0411/mm_campaign.body.html.",
+  "zweck": "Messrunde 31.08.2026: rohe, unveraenderte HTTP-Antworten als Beleg je Anbieter. Dateien ueber 250 kB liegen gzip-komprimiert (byteidentisch, nur verpackt) - sha256_roh gilt fuer den ENTPACKTEN Inhalt. ERGAENZT AM 04.09.2026 um Telekom (Kategorieseite) und 1&1 (Kategorie- und Produktseite): dieselbe Regel, aber mit dem ehrlichen Absender TelcoRadar/1.0 abgerufen und nicht mit einer Browser-Kennung. ERGAENZT AM 05.09.2026 um Saturn (zwei Markenseiten, /de/brand/apple/iphone/...): ld+json-ItemList UND window.__PRELOADED_STATE__ (Apollo-Cache) derselben Antwort, ehrlicher Absender TelcoRadar/1.0. ERGAENZT AM 18.09.2026 (P5/E3) um die Titel-Zeilen von data/state/geraete_unbekannt.jsonl (Stand 17.09., Bot-Commit 1dd48d4): kein HTTP-Abruf, sondern ein Auszug aus dem Lauf-State - alle 145 art=titel-Zeilen unveraendert; Basis der Tarif-Rauschen-Regel und ihrer Tests. ERGAENZT AM 05.11.2026 um MediaMarkt (eine Produktseite, /de/product/_samsung-galaxy-a57-...-3039261.html, Samsung Galaxy A57): derselbe Ceconomy-Lesekern wie Saturn (ld+json UND window.__PRELOADED_STATE__), Cache-Praefix 'Media' statt 'Saturn', ehrlicher Absender TelcoRadar/1.0, Abruf aus arbeit/haendler-weg-0411/mm_product_samsung_a57.body.html (04.11.2026, Recherche haendler-weg-0411.md). Ebenfalls am 05.11.2026 ergaenzt: die MediaMarkt-Kampagnenseite /de/campaign/angebote-smartphones (mediamarkt_angebote_smartphones.html.gz, Abruf 04.11.2026) als der produktiv konfigurierte, direkte Einstieg - ebenfalls aus arbeit/haendler-weg-0411/mm_campaign.body.html. ERGAENZT AM 08.11.2026 (Recherche Tarifwelt, Brief brief-tarifwelt-0811.md): vier Belege der gemeinsamen MediaMarktSaturn-Tarifwelt tarife.mediamarkt.de, gelesen ueber ihre oeffentliche, nicht authentifizierte JSON-Schnittstelle tarife-api2.mediamarkt.de (keine robots.txt dort), ehrlicher Absender TelcoRadar/1.0, einzelne Playwright-Seitenaufrufe, nie /pks oder /checkout. Zwei Geraete-x-Tarif-Kombinationen (iPhone 17 x o2-Doppelkarte, iPhone 17 x freenet-Telekom Magenta Mobil M, dazu Samsung Galaxy S26 als zweites Geraet) plus die vollstaendige Tarifliste des iPhone 17 (25 Tarife mit Netz und Datenvolumen-Band). Noch ohne Adapter; Bericht arbeit/tarifwelt-0811.md.",
   "eintraege": [
     {
       "datei": "1und1_produkt_iphone17.html.gz",
@@ -953,6 +953,106 @@
       "absender": "TelcoRadar/1.0",
       "bytes_abgelegt": 512846,
       "hinweis": "B-TELEKOM-PRODUKTSEITE: Apple iPhone Duo 1 TB Nachthimmel, MagentaMobil S."
+    },
+    {
+      "datei": "tarifwelt_mm_productdetail_iphone17_o2doppelkarte_20261108.json",
+      "url": "https://tarife-api2.mediamarkt.de/v1/productdetail/iphone-17",
+      "abgerufen_am": "2026-11-08",
+      "http_status": 200,
+      "content_type": "application/json",
+      "absender": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)",
+      "bytes_abgelegt": 28730,
+      "sha256_roh": "9650da3d1fda7f87470f43ffd3560a977610b9bcd1e4671de8bf8cf41aef1e44"
+    },
+    {
+      "datei": "tarifwelt_mm_productdetail_iphone17_telekom_magenta_m_20261108.json",
+      "url": "https://tarife-api2.mediamarkt.de/v1/productdetail/iphone-17?ogi=68c2d649b31debf7ff0c86c4&ofi=6ada20a5903654b324c7ead4&tfi=680b5e98b1556e63a970b092&hwi=68c2cc264a986e88ff5cfb12_HW110228-1",
+      "abgerufen_am": "2026-11-08",
+      "http_status": 200,
+      "content_type": "application/json",
+      "absender": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)",
+      "bytes_abgelegt": 27601,
+      "sha256_roh": "1aee357aa4eb8051c4e69a78b296d13102d77d8db5f96443fd5853a74975c562"
+    },
+    {
+      "datei": "tarifwelt_mm_productdetail_galaxys26_standard_20261108.json",
+      "url": "https://tarife-api2.mediamarkt.de/v1/productdetail/galaxy-s26",
+      "abgerufen_am": "2026-11-08",
+      "http_status": 200,
+      "content_type": "application/json",
+      "absender": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)",
+      "bytes_abgelegt": 25034,
+      "sha256_roh": "b76348406ff023a361b016bf6e971fbc235ba3e29e14beaf25e83a25c6e8c366"
+    },
+    {
+      "datei": "tarifwelt_mm_tarifliste_iphone17_20261108.json",
+      "url": "https://tarife-api2.mediamarkt.de/v1/productdetail/68c2d649b31debf7ff0c86c4/tariff?hwi=68c2cc264a986e88ff5cfb12_HW110228-1",
+      "abgerufen_am": "2026-11-08",
+      "http_status": 200,
+      "content_type": "application/json",
+      "absender": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)",
+      "bytes_abgelegt": 238334,
+      "sha256_roh": "74d7c00722a6ff9bf41de29600f7ebbf872e7f4d15ead59a04100d928152668a"
+    },
+    {
+      "datei": "tarifwelt_mm_detail_iphone17_256_telekom_allnet50_20261108.json",
+      "url": "https://tarife-api2.mediamarkt.de/v1/productdetail/iphone-17?storage=256&tfi=6a3e48fce8ef8ed1c9722b21",
+      "abgerufen_am": "2026-11-08",
+      "http_status": 200,
+      "content_type": "application/json",
+      "absender": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)",
+      "bytes_abgelegt": 26227,
+      "sha256_roh": "309a08fd31fb7c21f1c3775f42b05f1ee8f8b1c78f7e7657d013bd6cec89168e"
+    },
+    {
+      "datei": "tarifwelt_mm_detail_iphone17_256_o2_unlimited_m_20261108.json",
+      "url": "https://tarife-api2.mediamarkt.de/v1/productdetail/iphone-17?storage=256&tfi=6a1e946e959a3938fb86c58d",
+      "abgerufen_am": "2026-11-08",
+      "http_status": 200,
+      "content_type": "application/json",
+      "absender": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)",
+      "bytes_abgelegt": 22294,
+      "sha256_roh": "95309fdee20089f3b690424337bf00046e5de08095062570dd72cc67bc164bcd"
+    },
+    {
+      "datei": "tarifwelt_mm_detail_galaxys26_256_telekom_allnet50_20261108.json",
+      "url": "https://tarife-api2.mediamarkt.de/v1/productdetail/galaxy-s26?storage=256&tfi=6a3e48fce8ef8ed1c9722b21",
+      "abgerufen_am": "2026-11-08",
+      "http_status": 200,
+      "content_type": "application/json",
+      "absender": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)",
+      "bytes_abgelegt": 24849,
+      "sha256_roh": "82c556c8ab92b32fe27c0b9d8698f67d42024ac7e30a41f38879ba4260d504fb"
+    },
+    {
+      "datei": "tarifwelt_mm_detail_galaxys26_256_o2_mobile_m_promo_20261108.json",
+      "url": "https://tarife-api2.mediamarkt.de/v1/productdetail/galaxy-s26?storage=256&tfi=694953fa6ea7f51cc6762f38",
+      "abgerufen_am": "2026-11-08",
+      "http_status": 200,
+      "content_type": "application/json",
+      "absender": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)",
+      "bytes_abgelegt": 21665,
+      "sha256_roh": "b045ec0d792515775254254413b3b1eca59ca42ea18107f745fc7a4cec7bf5c9"
+    },
+    {
+      "datei": "tarifwelt_mm_tarifliste_galaxys26_20261108.json",
+      "url": "https://tarife-api2.mediamarkt.de/v1/productdetail/66868692b87d976eef0a0b7b/tariff?hwi=699432f4fe928c18b04eaf38_HW110719-1",
+      "abgerufen_am": "2026-11-08",
+      "http_status": 200,
+      "content_type": "application/json",
+      "absender": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)",
+      "bytes_abgelegt": 299690,
+      "sha256_roh": "98e8db992f3cb2b81ebbce5a75424293dc1efa902dc90e89ca14032c9640e3cf"
+    },
+    {
+      "datei": "tarifwelt_mm_productdetail_iphone17_vodafone_mobil_m_20261108.json",
+      "url": "https://tarife-api2.mediamarkt.de/v1/productdetail/iphone-17?storage=256&tfi=6a86e66a7f5200fe031c3ea7",
+      "abgerufen_am": "2026-11-08",
+      "http_status": 200,
+      "content_type": "application/json",
+      "absender": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)",
+      "bytes_abgelegt": 26156,
+      "sha256_roh": "05b8d3453559a5161395593131f6eee4c7340daeffe3f7250a5ae81a2d50eac3"
     }
   ]
 }

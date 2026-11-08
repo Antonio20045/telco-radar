@@ -34,7 +34,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Optional
 
-from .geraete_abruf import hole_fabrik as _hole_fabrik
+from .geraete_abruf import hole_fabrik as _hole_fabrik, hole_fuer_anbieter
 from .geraete_alarm import baue_alarm_mail as baue_alarm_mail
 from .geraete_alarm import melde_ausfall
 from .geraete_alarm import sende_alarm_mail as sende_alarm_mail
@@ -51,14 +51,13 @@ from .analyze.tarif_referenzen import aus_bestand
 from .analyze.geraete_pruefstelle import Seite, vermerke as pruefe_buendel
 from .analyze.tco_store import TcoDB
 from .tarif_bezug import Tarifbestand
-from .collect.geraete import ADAPTER, hole_mit_robots, laufuhr, sammle
-from .collect.geraete.robots import RobotsWaechter
+from .collect.geraete import ADAPTER, laufuhr, sammle
 from .collect.geraete import autoerkennung
 from .collect.geraete.congstar import ergaenze_pib_slug
 from .collect.tarif_einsundeins_simonly import ANBIETER as SIMONLY_ANBIETER
 from .collect.tarif_einsundeins_simonly import sammle as sammle_simonly
 
-from . import geraete_fragment
+from . import geraete_fragment, geraete_tarifwelt
 from .report.geraete_tco_karten import geraet_aus_sku, ist_frisch
 from .geraete_config import lade_farben, lade_katalog, lade_quellen
 
@@ -243,27 +242,7 @@ def nachsammle_buendel(
         adapter = ADAPTER.get(anbieter.methode) if anbieter else None
         if adapter is None:
             continue
-        user_agent = (getattr(anbieter, "user_agent", "") or "").strip()
-        waechter = RobotsWaechter(
-            hole=(lambda url, ua=user_agent: hole(url, user_agent=ua))
-            if user_agent
-            else hole
-        )
-        hole_anbieter = (
-            (
-                lambda url, *args, ua=user_agent, **kwargs: hole(
-                    url, *args, user_agent=ua, **kwargs
-                )
-            )
-            if user_agent
-            else hole
-        )
-        gebremst = hole_mit_robots(
-            hole_anbieter,
-            waechter,
-            getattr(anbieter, "rate_limit_sekunden", 0.0) or 0.0,
-            uhr,
-        )
+        gebremst = hole_fuer_anbieter(hole, anbieter, uhr)
         for haken, meldung in (
             (
                 adapter.loese_tarifnamen,
@@ -414,7 +393,7 @@ def run_geraete_stage(
     tarife = 0
     neue_buendel = 0
     buendelbilanz = None
-    klickbilanz = None
+    klickbilanz, tarifwelt = None, {"status": "aus"}
     geschrieben = False
     try:
         bestand = Tarifbestand.aus_datei(zustand / "tarife.jsonl")
@@ -476,6 +455,9 @@ def run_geraete_stage(
                 if buendelbilanz.buendel:
                     neue_buendel, _ = tco.upsert_buendel(buendelbilanz.buendel, heute)
             klickbilanz, tco.erfassung = klickzug.bilanz, klickzug.erfassung
+            tarifwelt = geraete_tarifwelt.stufe(
+                quellen, bestand, hole, uhr, heute, zustand, tco
+            )
             seite = Seite(ist_frisch, geraet_aus_sku, katalog)
             pruefe_buendel(tco, db, bestand, heute, seite, abgesichert)
             tco.save(heute)
@@ -552,6 +534,7 @@ def run_geraete_stage(
         "buendel_neu": neue_buendel,
         "buendel_ohne_tarif": buendelbilanz.ohne_tarif if buendelbilanz else 0,
         "klick": klickbilanz,
+        "tarifwelt": tarifwelt,
         "kollisionen": len(kollisionen),
         "auto_neu": auto_neu,
         "auto_eintraege": len(auto_eintraege),

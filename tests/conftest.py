@@ -304,6 +304,8 @@ _MIT_ECHTEM_VERSAND = (
     "/golden/",
     "test_versandkosten",
     "test_seiten_zahlen",
+    "test_geraete_adapter_tarifwelt",
+    "test_geraete_tarifwelt_",
 )
 
 

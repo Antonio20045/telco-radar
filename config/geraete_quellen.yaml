@@ -320,6 +320,43 @@ anbieter:
         label: iPhone 18 Pro
         kind: static
 
+  - name: MediaMarkt/Saturn Tarifwelt
+    typ: handel
+    erfassung: aus
+    gruppe: Ceconomy
+    rang: 2
+    methode: mediamarkt_tarifwelt
+    aktiv: true
+    # Auftrag brief-tarifwelt-0811.md, Recherche 08.11.2026 (Commit
+    # afb32aa3), Adapter-Paket 08.11.2026. Vier echte Einzelabrufe als
+    # Fixture gesichert (tests/fixtures/geraete/tarifwelt_mm_*.json,
+    # Herkunft dort in _herkunft.json): tarife.mediamarkt.de laedt seine
+    # Tarifliste aus der oeffentlichen, nicht authentifizierten
+    # Schnittstelle tarife-api2.mediamarkt.de/v1/productdetail/<id>/tariff
+    # (kein robots.txt, ehrliche Kennung TelcoRadar/1.0). Der Parser
+    # (collect/geraete/tarifwelt.py, getestet gegen die vier Fixtures in
+    # tests/test_geraete_adapter_tarifwelt.py) liest Netz
+    # (simCards[].carrier.name: "o2" | "freenet - Telekom" |
+    # "freenet - Vodafone"), Datenvolumen (dataVolume) und Monatspreis
+    # (monthlyPrice) direkt aus derselben JSON-Antwort - ein Browserlesen
+    # des sichtbaren Preises (wie im Auftrag zunaechst angenommen) ist
+    # NICHT noetig.
+    grund: >-
+      Eigener Lauf ueber die Tarifwelt-Schnittstelle, kein Einstieg im
+      Sammellauf (Bilanz `tarifwelt`); heute kein Buendel geliefert.
+    hinweis: >-
+      Saturn/MediaMarkt verkaufen Geraet + Fremdtarif (o2, freenet im
+      Telekom- und im Vodafone-Netz) ueber dieselbe Ceconomy-Plattform.
+      Gelesen wird die Schnittstelle der Tarifwelt (tarife-api2.mediamarkt.de,
+      kein robots.txt; tarife.mediamarkt.de sperrt nur /pks und /checkout)
+      mit ehrlicher Kennung, ein Versuch je Variante, harter Abbruch bei
+      Schutzantwort, Pause 2 s. Je Netz und Band genau ein Tarif nach der
+      Band-Regel der Netzbetreiber (band_regel.stufe_fuer); Doppelkarten,
+      Aktions- und Young-Tarife zaehlen nicht. Aktiv seit 08.11.2026: die drei
+      Netzzeilen sind Pflichtanbieter (config/geraete_abdeckung.yaml), der
+      Versand ist je Netz belegt (config/versandkosten.yaml, 5,95 EUR), zwei
+      Netz-Modell-Paare ohne Tarif stehen dort als belegte Luecke.
+
   - name: Coolblue
     typ: handel
     erfassung: aus
