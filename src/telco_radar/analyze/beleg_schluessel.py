@@ -26,9 +26,8 @@ from dataclasses import dataclass
 from typing import Any
 
 from ..collect.geraete.klickrohsatz import QUELLE
-from ..tco_kosten import kosten_ueber
-from ..tco_model import TCO_HORIZONT
-from .geraete_pruefstatus import GUELTIG, VERALTET, buendel_aus_satz
+from .beleg_position import gesamt_kosten
+from .geraete_pruefstatus import GUELTIG, VERALTET
 from .klick_zusammenfuehrung import Schluessel, klickschluessel
 
 GeraetAusSku = Callable[[str], tuple[str, int | None]]
@@ -68,10 +67,6 @@ def _niedriger(a: float | None, b: float | None) -> float | None:
     return min(a, b)
 
 
-def _gesamt(satz: dict[str, Any]) -> float | None:
-    return kosten_ueber(buendel_aus_satz(satz), TCO_HORIZONT).gesamt
-
-
 def vorher_je_konfiguration(
     bestand: Iterable[dict[str, Any]], geraet: GeraetAusSku
 ) -> dict[Schluessel, float | None]:
@@ -92,7 +87,7 @@ def vorher_je_konfiguration(
         if not device_id:
             continue
         try:
-            gesamt = _gesamt(satz)
+            gesamt = gesamt_kosten(satz)
         except (TypeError, ValueError, KeyError):
             continue
         schluessel = klickschluessel(
@@ -145,7 +140,7 @@ def ordne_zu(
             melde(GRUND_OHNE_GERAET)
             continue
         try:
-            gesamt = _gesamt(satz)
+            gesamt = gesamt_kosten(satz)
         except (TypeError, ValueError, KeyError):
             melde(GRUND_BUENDEL)
             continue

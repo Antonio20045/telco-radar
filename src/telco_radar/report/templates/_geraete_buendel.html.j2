@@ -44,7 +44,14 @@
       <summary>Screenshot der Angebotsseite vom {{ p.beleg.datum | date_de }} (zeigt nicht jeden Tarif)</summary>
       <img data-src="{{ p.beleg.url }}" alt="Screenshot der Angebotsseite {{ p.anbieter }} vom {{ p.beleg.datum | date_de }}" width="640" height="400">
     </details>{% else %}
-    <span class="gr-beleg-fehlt">kein Screenshot vorhanden</span>{% endif %}</li>{% endfor %}
+    <span class="gr-beleg-fehlt">kein Screenshot vorhanden</span>{% endif %}{% if p.zeilen_gesamt is defined %}
+    <span class="gr-beleg-zeilen">{{ p.zeilen_mit }} von {{ p.zeilen_gesamt }} Preiszeilen mit eigenem Screenshot{% if p.zeilen_grund %} ({{ p.zeilen_grund }}){% endif %}</span>{% if p.zeilenbilder %}
+    <ul class="gr-beleg-zeilenliste">{% for z in p.zeilenbilder %}
+      <li><details class="gr-belege gr-belege--zeile">
+        <summary>Screenshot zu dieser Preiszeile vom {{ z.datum | date_de }}, Zuordnung über die Messung: {{ z.geraet }} · {{ z.tarif }}{% if z.raten_laufzeit %} · {{ z.raten_laufzeit }} Raten{% endif %} · {{ z.label }} {{ z.gesamt | euro }}</summary>
+        <img data-src="{{ z.url }}" alt="Screenshot {{ p.anbieter }}, {{ z.tarif }}, vom {{ z.datum | date_de }}" width="640" height="400">
+      </details></li>{% endfor %}
+    </ul>{% endif %}{% endif %}</li>{% endfor %}
 </ul>{% endif %}{% endif %}{% endmacro %}
 
 {% macro buendelzeile(k) %}

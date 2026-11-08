@@ -5,10 +5,9 @@ Die eine Frage, an der diese Tafel gebaut ist
     "iPhone 17 Pro mit Tarif X bei Anbieter Y - was zahlt der Kunde
      ueber 24 Monate gesamt?"
 
-Alles auf dieser Tafel beantwortet sie oder sagt, warum es sie nicht
-beantworten kann. Der Barpreis ist dabei ein BAUSTEIN und keine konkurrierende
-Hauptspalte (A4): er steht in der Aufschluesselung und in der Effektivpreiszeile,
-nicht als zweite Leitzahl daneben.
+Die Tafel beantwortet sie oder sagt, warum nicht. Der Barpreis ist dabei ein
+BAUSTEIN und keine konkurrierende Hauptspalte (A4): er steht in der
+Aufschluesselung und in der Effektivpreiszeile, nicht als zweite Leitzahl daneben.
 
 Vier Anbieter, immer vier Zeilen
 --------------------------------
@@ -747,6 +746,7 @@ def _karte(
         "quelle_url": b.quelle_url,
         "abgerufen_am": b.abgerufen_am,
         "vom_crawler": b.quelle_art == QUELLE_KLICK,
+        "beleg_id": b.beleg_id,
         "tarif_quelle_url": (tarif or {}).get("dokument_url", ""),
         "naeherung": False,
         **notbremse.felder(b, heute),
