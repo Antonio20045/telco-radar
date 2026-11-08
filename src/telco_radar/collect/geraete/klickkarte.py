@@ -153,6 +153,12 @@ Feld, gibt es keine Phase und keinen Slug (benannte Lücke), nie eine geratene Z
   diesem Parameter der Seitenadresse. ``beleglink: konfiguration`` (o2): der Beleglink
   trägt Tarif und Ratenzahl der Zeile.
 
+Bildfolge (Auftrag 08.11.2026, ``klickbildfolge``): Der Beleg zeigt den Klickweg in vier
+Bildern. Den Ausschnitt eines Schritts liefern die Knöpfe der Dimension; nur eine
+Dimension ohne Knopf (fest, Adresse) braucht ``bildfolge: {geraet_speicher: <Selektor>,
+tarif: <Selektor>, laufzeit: <Selektor>}`` (jeder Schlüssel wahlweise), sonst fehlt der
+Schritt mit Grund.
+
 Selektoren der Klickziele sind Playwright-Selektoren (``:text-matches`` und
 ``:has-text`` gehen); ``passt``, ``bis`` und ``wert_in`` sind reines CSS.
 """
@@ -253,6 +259,7 @@ KOPFFELDER = (
     "weiter",
     "ratenplan",
     "tarifslug",
+    "bildfolge",
 )
 
 
@@ -308,4 +315,5 @@ def klickkarte_aus_daten(roh: object, quelle: str) -> Klickkarte:
         weiter=leser.weiter(roh_weiter, knoepfe, textlesung),
         ratenplan=leser.ratenplan(daten.get("ratenplan")),
         tarifslug=leser.tarifslug(daten.get("tarifslug")),
+        bildfolge=leser.bildfolge(daten.get("bildfolge")),
     )

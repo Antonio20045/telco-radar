@@ -31,9 +31,8 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from playwright.sync_api import Error as PlaywrightFehler
-
 from .klickbeleg import Belegquelle, baue_beleg
+from .klickbildleser import Bildleser
 from .klickecho import (
     KEINE_AUSWAHL,
     Antwortlesung,
@@ -72,11 +71,9 @@ from .klicklauf import (
 from .klickoptionen import Option, angebotene_werte, lies_optionen
 from .klickquellen import Quellenleser, Quellenlesung
 from .klicktext import Preiswerte
-from .klicktextleser import Textleser
-from .klicktor import kurz
 
 if TYPE_CHECKING:
-    from playwright.sync_api import Locator, Page
+    from playwright.sync_api import Page
 
     from .klickantwort import Antwortlesung
     from .klickwache import Wache
@@ -104,7 +101,7 @@ class Vorlesung:
     abweichung: tuple[Befund, ...] | None = None
 
 
-class Leser(Textleser):
+class Leser(Bildleser):
     """Liest Optionen, Quellen, Text und die Kombination auf einer Seite nach Karte."""
 
     def __init__(
@@ -200,6 +197,7 @@ class Leser(Textleser):
         url = None if zweite.kopie is None else zweite.kopie.url
         in_antwort = zweite.lesung.werte if zweite.lesung is not None else None
         self.seite.evaluate(_ZWEI_BILDER_JS)
+        self.nimm_bildfolge(ziel)
         dialog = self.oeffne_dialog(bereich)
         text = self.zusammenfassung(bereich) if dialog is None else ""
         if not text:
@@ -314,6 +312,7 @@ class Leser(Textleser):
             json_pfade=teile.json_pfade,
             fundorte=teile.fundorte,
             buendel=ergebnis.buendel,
+            **self.folgefelder(),
         )
         paket, ohne = baue_beleg(quelle, self.karte, zeitpunkt)
         return mit_beleg(ergebnis, paket, ohne)
@@ -379,12 +378,6 @@ class Leser(Textleser):
     def _gewaehlt(self, dimension: str) -> str | None:
         gewaehlt = [o.wert for o in self.optionen(dimension) if o.gewaehlt]
         return gewaehlt[0] if len(gewaehlt) == 1 else None
-
-    def _screenshot(self, bereich: Locator) -> tuple[bytes | None, tuple[Befund, ...]]:
-        try:
-            return bereich.screenshot(type="png", timeout=self.frist_ms), ()
-        except PlaywrightFehler as fehler:
-            return None, (Befund("screenshot", f"Screenshot fehlt: {kurz(fehler)}"),)
 
 
 def _pfad(pfad: str | Wertpfad) -> str:

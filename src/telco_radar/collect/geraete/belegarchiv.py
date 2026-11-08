@@ -3,10 +3,11 @@
 ``archiviere`` legt je offenem Beleg Screenshot und Mitschnitt in die Ablage
 (``belegablage``), hängt die Zeilen an das Manifest ihres Tages und Anbieters
 (``belegmanifest``) und stempelt jedes berührte Manifest mit einer Stempelzeile über
-alle Zeilen davor (``belegstempel``). Erst wenn beide Dateien liegen und die Zeile im
-Manifest steht, heißt die Kombination im Lauf ``belegt`` und kann gültig sein. Scheitert
-die Ablage, ist das Archiv ``gestoert`` mit Grund; jede Kombination, deren Beleg nicht
-in Ablage und Manifest kam, wird ``fehlt`` mit Grund (``klicklauf.beleg_fehlt``), und
+alle Zeilen davor (``belegstempel``). Dazu kommen die Bilder der Bildfolge
+(``klickbildfolge``). Erst wenn alle Dateien liegen und die Zeile im Manifest steht,
+heißt die Kombination im Lauf ``belegt`` und kann gültig sein. Scheitert die Ablage, ist
+das Archiv ``gestoert`` mit Grund; jede Kombination, deren Beleg nicht in Ablage und
+Manifest kam, wird ``fehlt`` mit Grund (``klicklauf.beleg_fehlt``), und
 der Bericht nennt ihre Varianten. Ein ausgefallener Stempel steht im Manifest und stört
 nichts. Den Hinweis der Ablage („Archiv nicht eingerichtet“) trägt jeder Bericht. Hat
 der Lauf keinen Beleg, heißt das ``ohne_beleg``. ``raeume_auf`` löscht die Dateien, die
@@ -28,6 +29,7 @@ from .belegmanifest import (
     Stempelzeile,
     ablageschluessel,
     belegtag,
+    folgedateien,
     haenge_an,
     manifestpfad,
     stand,
@@ -134,6 +136,7 @@ def _lege(
             for datei, daten in (
                 (beleg.bild, paket.bild),
                 (beleg.mitschnitt, paket.mitschnitt),
+                *((d, paket.folgebilder[d.name]) for d in folgedateien(beleg)),
             ):
                 ablage.lege(ablageschluessel(beleg, datei), daten, datei.typ)
         except ArchivFehler as fehler:
