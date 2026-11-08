@@ -1,7 +1,8 @@
 """Manifest der Belege: eine JSONL-Datei je Tag und Anbieter, mit Prüffunktion.
 
 Datenkonzept Geräteradar, Abschnitt 10. Jede Zeile ist ein JSON-Objekt mit ``art`` und
-``version``: ``beleg`` (Schema ``klickbeleg.Beleg``) oder ``stempel`` (Schema
+``version``: ``beleg`` (Schema ``klickbeleg.Beleg``; ``bildfolge`` und ihre zwei Felder
+dürfen in älteren Zeilen fehlen) oder ``stempel`` (Schema
 ``Stempelzeile``: SHA-256 über alle Bytes davor, ihre Zeilenzahl und die Stempel aus
 ``belegstempel``). Das Manifest liegt unter ``<wurzel>/<anbieter>/<JJJJ-MM-TT>.jsonl``,
 die Dateien eines Belegs in der Ablage unter ``<anbieter>/<JJJJ-MM-TT>/<name>``; der
@@ -30,7 +31,18 @@ from typing import Any
 from ...textwerkzeug import slug
 from .belegablage import ArchivFehler
 from .belegstempel import Stempel
-from .klickbeleg import BELEGFELDER, Beleg, Belegdatei, Fundstelle, beleg_id, sha256
+from .klickbeleg import (
+    BELEGFELDER,
+    PNG,
+    WEBP,
+    Beleg,
+    Belegdatei,
+    Bildschritt,
+    Fundstelle,
+    beleg_id,
+    sha256,
+)
+from .klickbildfolge import GEWAEHLT, SCHRITTE, UNVOLLSTAENDIG, VOLLSTAENDIG
 from .klickhar import HarFehler, har_eintrag, zugangskoepfe
 from .klickkarte import DIMENSIONEN
 
@@ -41,6 +53,12 @@ ENDUNG = ".jsonl"
 ZEITFORMAT = "%Y-%m-%dT%H:%M:%SZ"
 _HEX64 = re.compile(r"[0-9a-f]{64}")
 _DATEINAME = re.compile(r"[0-9a-f]{64}\.(?:webp|png|har)")
+_FOLGEDATEI = re.compile(r"[0-9a-f]{64}_(?:" + "|".join(GEWAEHLT) + r")\.(?:webp|png)")
+_OHNE_FOLGE: dict[str, Any] = {
+    "bildfolge": [],
+    "bildfolge_status": None,
+    "bildfolge_fehlt": [],
+}
 _TEXTFELDER = ("beleg_id", "anbieter", "zeitpunkt", "adresse", "seite", "antwort_url")
 
 
@@ -90,6 +108,18 @@ def belegtag(beleg: Beleg) -> date:
 def ablageschluessel(beleg: Beleg, datei: Belegdatei) -> str:
     """Wo eine Datei des Belegs in der Ablage liegt."""
     return f"{slug(beleg.anbieter)}/{belegtag(beleg).isoformat()}/{datei.name}"
+
+
+def folgedateien(beleg: Beleg) -> tuple[Belegdatei, ...]:
+    """Die Dateien der Bildfolge neben dem Bild des Belegs (ohne den Schritt ``preis``,
+    der ``beleg.bild`` zeigt)."""
+    return tuple(
+        Belegdatei(
+            b.datei, PNG if b.datei.endswith(".png") else WEBP, b.sha256, b.groesse
+        )
+        for b in beleg.bildfolge
+        if b.datei != beleg.bild.name
+    )
 
 
 def haenge_an(pfad: Path, zeilen: Iterable[Beleg | Stempelzeile]) -> None:
@@ -150,7 +180,9 @@ def pruefe_manifest(pfad: Path, lies_datei: Callable[[str], bytes | None]) -> li
 def _pruefe(beleg: Beleg, lies_datei: Callable[[str], bytes | None]) -> list[str]:
     befunde = _fundstellenbefunde(beleg)
     inhalt: dict[str, bytes] = {}
-    for rolle, datei in (("Bild", beleg.bild), ("Mitschnitt", beleg.mitschnitt)):
+    dateien = (("Bild", beleg.bild), ("Mitschnitt", beleg.mitschnitt))
+    folge = tuple((f"Bildfolge {d.name[65:]}", d) for d in folgedateien(beleg))
+    for rolle, datei in (*dateien, *folge):
         try:
             daten = lies_datei(ablageschluessel(beleg, datei))
         except (ValueError, ArchivFehler) as fehler:
@@ -164,9 +196,8 @@ def _pruefe(beleg: Beleg, lies_datei: Callable[[str], bytes | None]) -> list[str
             befunde.append(f"{rolle} {datei.name}: SHA-256 passt nicht zur Datei")
         if len(daten) != datei.groesse:
             befunde.append(f"{rolle} {datei.name}: Größe passt nicht zur Datei")
-    if len(inhalt) == 2 and beleg_id(inhalt["Bild"], inhalt["Mitschnitt"]) != (
-        beleg.beleg_id
-    ):
+    paar = "Bild" in inhalt and "Mitschnitt" in inhalt
+    if paar and beleg_id(inhalt["Bild"], inhalt["Mitschnitt"]) != beleg.beleg_id:
         befunde.append("beleg_id passt nicht zu den Dateien")
     if "Mitschnitt" in inhalt:
         befunde += _mitschnittbefunde(beleg, inhalt["Mitschnitt"])
@@ -230,7 +261,7 @@ def _felder(nummer: int, daten: Mapping, art: Any) -> dict[str, Any]:
 
 
 def _beleg(nummer: int, daten: Mapping) -> Beleg:
-    roh = _felder(nummer, daten, Beleg)
+    roh = _felder(nummer, {**_OHNE_FOLGE, **daten}, Beleg)
     for name in _TEXTFELDER:
         if not isinstance(roh[name], str) or not roh[name].strip():
             raise ManifestFehler(nummer, f"Feld {name} ist leer")
@@ -256,7 +287,44 @@ def _beleg(nummer: int, daten: Mapping) -> Beleg:
     except (TypeError, ValueError) as fehler:
         grund = f"Datei oder Fundstelle unvollständig: {fehler}"
         raise ManifestFehler(nummer, grund) from fehler
+    _bildfolge(nummer, roh)
     return Beleg(**roh)
+
+
+def _bildfolge(nummer: int, roh: dict[str, Any]) -> None:
+    """Prüft und wandelt ``bildfolge`` samt Feldern; wirft ``ManifestFehler``."""
+    try:
+        schritte = tuple(Bildschritt(**b) for b in roh["bildfolge"])
+        fehlt = tuple(str(f) for f in roh["bildfolge_fehlt"])
+    except (TypeError, ValueError) as fehler:
+        raise ManifestFehler(nummer, f"bildfolge unvollständig: {fehler}") from fehler
+    status = roh["bildfolge_status"]
+    if status not in (None, VOLLSTAENDIG, UNVOLLSTAENDIG):
+        raise ManifestFehler(nummer, f"bildfolge_status {status!r} unbekannt")
+    folge = [s.schritt for s in schritte]
+    ordnung = [s for s in SCHRITTE if s in folge]
+    if folge != ordnung or len(set(folge)) != len(folge):
+        raise ManifestFehler(nummer, "bildfolge nicht in der Reihenfolge der Schritte")
+    for b in schritte:
+        preis = b.datei == roh["bild"].name
+        if (b.schritt == SCHRITTE[-1]) != preis:
+            raise ManifestFehler(
+                nummer, "bildfolge: nur der Schritt preis zeigt das Bild"
+            )
+        if preis and (b.sha256, b.groesse) != (roh["bild"].sha256, roh["bild"].groesse):
+            raise ManifestFehler(nummer, "bildfolge: Schritt preis weicht vom Bild ab")
+        if not (preis or _FOLGEDATEI.fullmatch(str(b.datei))):
+            raise ManifestFehler(nummer, f"bildfolge: Dateiname {b.datei!r} ungültig")
+        if not isinstance(b.text, str) or not b.text.strip():
+            raise ManifestFehler(nummer, f"bildfolge: Schritt {b.schritt} ohne Text")
+        if not _HEX64.fullmatch(str(b.sha256)) or not isinstance(b.groesse, int):
+            raise ManifestFehler(nummer, f"bildfolge: {b.datei} ohne Hash oder Größe")
+    vollstaendig = folge == list(SCHRITTE) and not fehlt
+    if status == VOLLSTAENDIG and not vollstaendig:
+        raise ManifestFehler(nummer, "bildfolge vollstaendig, aber nicht alle Schritte")
+    if status == UNVOLLSTAENDIG and vollstaendig:
+        raise ManifestFehler(nummer, "bildfolge unvollstaendig, aber alle Schritte da")
+    roh["bildfolge"], roh["bildfolge_fehlt"] = schritte, fehlt
 
 
 def _datei(roh: Mapping) -> Belegdatei:

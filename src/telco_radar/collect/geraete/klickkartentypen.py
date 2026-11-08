@@ -319,6 +319,7 @@ class Klickkarte:
     weiter: Weiterschritt | None = None
     ratenplan: Ratenplanregel | None = None
     tarifslug: Tarifslugregel | None = None
+    bildfolge: Mapping[str, str] = field(default_factory=dict)
 
     @property
     def ein_vertrag(self) -> bool:

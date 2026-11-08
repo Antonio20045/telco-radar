@@ -12,6 +12,7 @@ from collections.abc import Mapping
 
 from .klickkartenteile import (
     BELEGLINK_KONFIGURATION,
+    BILDFOLGE_SCHRITTE,
     GRUND_ART,
     GRUND_NICHT_ZUR_ART,
     GRUND_WEITER_DIMENSION,
@@ -337,6 +338,13 @@ class Kartenleser:
         return Ratenplanregel(
             art=art, nachweis=self.text(daten, "nachweis", "ratenplan")
         )
+
+    def bildfolge(self, roh: object) -> dict[str, str]:
+        """Selektoren der Bildfolge je Schritt; ohne Feld keine."""
+        if roh is None:
+            return {}
+        daten = self.zuordnung(roh, "bildfolge", BILDFOLGE_SCHRITTE)
+        return {s: self.text(daten, s, "bildfolge") for s in daten}
 
     def tarifslug(self, roh: object) -> Tarifslugregel | None:
         """Die Tarifslug-Regel der Karte oder ``None`` ohne das Feld."""

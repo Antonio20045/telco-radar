@@ -20,6 +20,7 @@ BELEGLINK_KONFIGURATION = "konfiguration"
 GRUND_ART = "unbekannte Art"
 GRUND_NICHT_ZUR_ART = "gehört nicht zu dieser Art"
 GRUND_WEITER_DIMENSION = "weiter braucht genau eins von kacheln und klicken"
+BILDFOLGE_SCHRITTE = ("geraet_speicher", "tarif", "laufzeit")
 
 
 @dataclass(frozen=True)

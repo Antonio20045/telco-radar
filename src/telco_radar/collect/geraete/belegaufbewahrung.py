@@ -1,13 +1,13 @@
 """Aufbewahrung der Belegdateien nach Abschnitt 10, gerechnet über das Manifest.
 
-Das Manifest bleibt dauerhaft. Über Screenshot und Mitschnitt eines Belegs entscheidet
-``aufbewahrung``: der erste Beleg einer Reihe und jeder, dessen Werte sich gegen den
-vorigen derselben Reihe ändern, bleibt dauerhaft; jeder jüngere als ``TAEGLICH_TAGE``
-Tage bleibt (täglich); danach bleibt je Reihe und ISO-Kalenderwoche einer, der früheste
-noch nicht gedeckten Woche (Wochenbeleg); jeder andere wird gelöscht. Eine Reihe ist
-Anbieter, Produktseite und Variante. Werte vergleicht sie ohne Lücken, so ändert der
-Wechsel der Belegversion (``klickbeleg.BELEGFELDER``) nichts. Der Stichtag kommt vom
-Aufrufer, nie von der Uhr.
+Das Manifest bleibt dauerhaft. Über Screenshot, Mitschnitt und Bildfolge eines Belegs
+entscheidet ``aufbewahrung``: der erste Beleg einer Reihe und jeder, dessen Werte sich
+gegen den vorigen derselben Reihe ändern, bleibt dauerhaft; jeder jüngere als
+``TAEGLICH_TAGE`` Tage bleibt (täglich); danach bleibt je Reihe und ISO-Kalenderwoche
+einer, der früheste noch nicht gedeckten Woche (Wochenbeleg); jeder andere wird
+gelöscht. Eine Reihe ist Anbieter, Produktseite und Variante. Werte vergleicht sie ohne
+Lücken, so ändert der Wechsel der Belegversion (``klickbeleg.BELEGFELDER``) nichts. Der
+Stichtag kommt vom Aufrufer, nie von der Uhr.
 Dieses Modul ruft kein Netz.
 """
 
@@ -17,7 +17,7 @@ from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import date
 
-from .belegmanifest import ablageschluessel, belegtag
+from .belegmanifest import ablageschluessel, belegtag, folgedateien
 from .klickbeleg import Beleg
 
 TAEGLICH_TAGE = 90
@@ -58,7 +58,8 @@ def aufbewahrung(belege: Iterable[Beleg], stichtag: date) -> list[Entscheidung]:
             if grund != LOESCHEN:
                 gedeckt.add(woche)
             dateien = tuple(
-                ablageschluessel(beleg, d) for d in (beleg.bild, beleg.mitschnitt)
+                ablageschluessel(beleg, d)
+                for d in (beleg.bild, beleg.mitschnitt, *folgedateien(beleg))
             )
             entschieden[beleg.beleg_id] = Entscheidung(
                 beleg.beleg_id, grund != LOESCHEN, grund, dateien

@@ -13,7 +13,9 @@ eine Fundstelle, gibt es keinen Beleg, sondern einen Grund; ein Wert ohne Beleg 
 nicht gültig (``klicklauf.mit_beleg``). ``Beleg`` ist zugleich das Schema einer
 Manifestzeile (``belegmanifest``); ``BELEGFELDER`` nennt je Version die Felder von
 ``werte``: Version 2 trägt die Bündelwerte (``ein_vertrag``), Version 1 bleibt lesbar.
-Dieses Modul ruft kein Netz.
+Die ``bildfolge`` (``klickbildfolge``) nennt je Schritt des Klickwegs sein Bild; fehlt
+ein Schritt, steht die Folge als ``unvollstaendig`` mit ``bildfolge_fehlt`` da und wird
+nie mit dem Bild einer anderen Position gefüllt. Dieses Modul ruft kein Netz.
 """
 
 from __future__ import annotations
@@ -31,6 +33,16 @@ from PIL import Image, UnidentifiedImageError, features
 from playwright.sync_api import Error as PlaywrightFehler
 
 from ...tarif_model import Preisphase
+from .klickbildfolge import (
+    GEWAEHLT,
+    HOECHSTE_BYTES,
+    PREIS,
+    SCHRITTE,
+    UNVOLLSTAENDIG,
+    VOLLSTAENDIG,
+    Folgebild,
+    schritttext,
+)
 from .klickecho import Variante
 from .klickhar import Antwortkopie, har_aus
 from .klickkarte import BUENDELFELDER, WERTFELDER, Klickkarte, Phasenpfad, Wertpfad
@@ -77,6 +89,20 @@ class Belegdatei:
 
 
 @dataclass(frozen=True)
+class Bildschritt:
+    """Ein Bild der Bildfolge: Datei, Schritt, Text, SHA-256 und Größe der Datei.
+
+    Der Schritt ``preis`` zeigt dieselbe Datei wie ``Beleg.bild``.
+    """
+
+    datei: str
+    schritt: str
+    text: str
+    sha256: str
+    groesse: int
+
+
+@dataclass(frozen=True)
 class Beleg:
     """Eine Manifestzeile: ein Klick mit Zeitpunkt, Adresse, Werten und Dateien.
 
@@ -99,15 +125,22 @@ class Beleg:
     bild: Belegdatei
     mitschnitt: Belegdatei
     version: int = BELEG_VERSION
+    bildfolge: tuple[Bildschritt, ...] = ()
+    bildfolge_status: str | None = None
+    bildfolge_fehlt: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
 class Belegpaket:
-    """Ein Beleg mit den Bytes seiner beiden Dateien, bis die Ablage sie nimmt."""
+    """Ein Beleg mit den Bytes seiner Dateien, bis die Ablage sie nimmt.
+
+    ``folgebilder`` hält die Bytes der Bildfolge unter ihrem Dateinamen, ohne ``preis``.
+    """
 
     beleg: Beleg
     bild: bytes = field(repr=False)
     mitschnitt: bytes = field(repr=False)
+    folgebilder: Mapping[str, bytes] = field(default_factory=dict, repr=False)
 
 
 @dataclass(frozen=True)
@@ -127,6 +160,9 @@ class Belegquelle:
     json_pfade: Mapping[str, str] | None = None
     fundorte: Mapping[str, tuple[str, str]] = field(default_factory=dict)
     buendel: Buendelwerte | None = None
+    folge: Mapping[str, Folgebild] = field(default_factory=dict)
+    folge_fehlt: Mapping[str, str] = field(default_factory=dict)
+    modell: str | None = None
 
 
 def baue_beleg(
@@ -150,6 +186,7 @@ def baue_beleg(
     bild, typ = bild_fuer_beleg(quelle.screenshot_png, webp)
     har = har_aus(quelle.antwort, zeitpunkt)
     kennung = beleg_id(bild, har)
+    bildschritte, folgebilder, fehlt = bildfolge(quelle, kennung, (bild, typ), webp)
     beleg = Beleg(
         beleg_id=kennung,
         anbieter=quelle.anbieter,
@@ -169,8 +206,44 @@ def baue_beleg(
         fundstellen=stellen,
         bild=Belegdatei(f"{kennung}.{ENDUNG[typ]}", typ, sha256(bild), len(bild)),
         mitschnitt=Belegdatei(f"{kennung}.{ENDUNG[HAR]}", HAR, sha256(har), len(har)),
+        bildfolge=bildschritte,
+        bildfolge_status=VOLLSTAENDIG if not fehlt else UNVOLLSTAENDIG,
+        bildfolge_fehlt=fehlt,
     )
-    return Belegpaket(beleg, bild, har), None
+    return Belegpaket(beleg, bild, har, folgebilder), None
+
+
+def bildfolge(
+    quelle: Belegquelle, kennung: str, preisbild: tuple[bytes, str], webp: bool
+) -> tuple[tuple[Bildschritt, ...], dict[str, bytes], tuple[str, ...]]:
+    """Die Bildschritte der Position, die Bytes ihrer Dateien und was fehlt.
+
+    Ein Schritt ohne Bild, mit zu großer Datei oder mit Bild eines anderen Werts fehlt
+    mit Grund; nichts wird aus einer anderen Position übernommen.
+    """
+    schritte: list[Bildschritt] = []
+    dateien: dict[str, bytes] = {}
+    fehlt = []
+    for schritt in GEWAEHLT:
+        aufnahme = quelle.folge.get(schritt)
+        if aufnahme is None:
+            fehlt.append(f"{schritt}: {quelle.folge_fehlt.get(schritt, 'fehlt')}")
+            continue
+        daten, typ = bild_fuer_beleg(aufnahme.png, webp)
+        if len(daten) > HOECHSTE_BYTES:
+            fehlt.append(f"{schritt}: Bild größer als {HOECHSTE_BYTES} Byte")
+            continue
+        name = f"{kennung}_{schritt}.{ENDUNG[typ]}"
+        text = schritttext(schritt, quelle.variante, quelle.modell)
+        schritte.append(Bildschritt(name, schritt, text, sha256(daten), len(daten)))
+        dateien[name] = daten
+    daten, typ = preisbild
+    text = schritttext(PREIS, quelle.variante, None, quelle.werte, quelle.buendel)
+    name = f"{kennung}.{ENDUNG[typ]}"
+    schritte.append(Bildschritt(name, PREIS, text, sha256(daten), len(daten)))
+    ordnung = {s: n for n, s in enumerate(SCHRITTE)}
+    schritte.sort(key=lambda b: ordnung[b.schritt])
+    return tuple(schritte), dateien, tuple(fehlt)
 
 
 def belegstellen(
