@@ -326,6 +326,10 @@
   {# Ziel 1b: warum ein Anbieter nicht jede Tarifstufe füllt (`geraete_stufen`). #}
   <p class="gr-belegquote" id="gr-tarifstufen-regel">{{
   geraete.tco.tarifstufen_regel }}</p>
+  {# Ziel 1d je Preiszeile: `geraete_zeilenbelege.quote` (Python), je Anbieter. #}
+  {% if zeilenquote is defined %}{% set zq = zeilenquote(geraete.tco.modelle) %}{% if zq.satz %}
+  <p class="gr-belegquote" id="gr-zeilenquote">{{ zq.satz }}</p>
+  {% endif %}{% endif %}
   </section>
 
   {# EIN BUENDEL OHNE GERAETEZUORDNUNG STEHT HIER BEIM NAMEN (F-R2-3) -

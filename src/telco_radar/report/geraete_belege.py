@@ -34,16 +34,21 @@ from datetime import date
 from pathlib import Path
 from typing import Any
 
+from ..analyze.beleg_position import lies_buendel
 from ..beleg_manifest import MANIFEST_NAME, Beleg, BelegManifestFehler, lies_manifest
 from ..beleg_regeln import (
     ANZEIGE_GROSS_ANZAHL,
     anbieter_schluessel,
     ist_anzeige_neu,
 )
+from . import geraete_zeilenbelege
 from .ausfall import Ausfall
 from .geraete_preisstand import anzeige as preis_anzeige
 
 TEIL = "Belegbilder"
+TEIL_ZEILEN = "Zeilenbelege"
+BESTAND = "geraete_tco.json"
+ZEILEN_STAND = "_zeilenbelege"
 
 
 def _heute(text: str) -> date | None:
@@ -133,7 +138,10 @@ def quote(
 def installiere(env: Any, state_dir: Path, berichte: list[dict]) -> list[Ausfall]:
     """Macht ``belege_fuer(geraet_id, anbietername)`` für die Vorlagen verfügbar.
 
-    ``berichte``: neuester zuerst; sein ``date`` ist das Berichtsdatum.
+    ``berichte``: neuester zuerst; sein ``date`` ist das Berichtsdatum. Die Bilder je
+    Preiszeile (``zeilenbeleg``, ``zeilenquote``) kommen erst mit ``zeilenbelege``
+    dazu; bis dahin (oder wenn es scheitert) trägt keine Zeile ein Bild und die Quote
+    fehlt.
     """
     heute = berichte[0].get("date", "") if berichte else ""
     ausfaelle: list[Ausfall] = []
@@ -155,12 +163,45 @@ def installiere(env: Any, state_dir: Path, berichte: list[dict]) -> list[Ausfall
     env.globals["belege_fuer"] = lambda geraet_id, anbieter: je_preis.get(
         (geraet_id, anbieter_schluessel(anbieter or "")), []
     )
+    zeilen: dict[str, Any] = {
+        "fuer": lambda karte: None,
+        "ok": False,
+        "je_preis": je_preis,
+        "manifest_ok": manifest_ok,
+    }
+    env.globals[ZEILEN_STAND] = zeilen
+    env.globals["zeilenbeleg"] = lambda karte: zeilen["fuer"](karte)
+    env.globals["zeilenquote"] = lambda modelle: geraete_zeilenbelege.quote(
+        zeilen["fuer"], modelle or [], zeilen["ok"] and zeilen["manifest_ok"]
+    )
 
     def paare_fuer(modell: dict) -> list[dict]:
-        return paarbelege(env.globals["belege_fuer"], modell)
+        paare = paarbelege(env.globals["belege_fuer"], modell)
+        if not zeilen["ok"]:
+            return paare
+        return geraete_zeilenbelege.ergaenze_paare(paare, modell, zeilen["fuer"])
 
     env.globals["paarbelege"] = paare_fuer
     env.globals["belegquote"] = lambda modelle: quote(
         paare_fuer, modelle or [], manifest_ok
     )
     return ausfaelle
+
+
+def zeilenbelege(env: Any, state_dir: Path, katalog: Any) -> list[Ausfall]:
+    """Hängt nach ``installiere`` die Bilder an die Preiszeilen.
+
+    ``katalog`` ist der Geräte-Katalog, mit dem jeder Bestandssatz sein Paar findet.
+    Ist der Bestand unlesbar, bleibt jede Zeile ohne Bild, die Quote fehlt und der
+    Ausfall „Zeilenbelege“ nennt es.
+    """
+    zeilen = env.globals[ZEILEN_STAND]
+    try:
+        index, _gruende = geraete_zeilenbelege.baue_index(
+            lies_buendel(state_dir / BESTAND), zeilen["je_preis"], katalog
+        )
+    except ValueError as fehler:
+        return [Ausfall.aus_ausnahme(TEIL_ZEILEN, fehler)]
+    zeilen["fuer"] = geraete_zeilenbelege.zeilenbeleg_fuer(index)
+    zeilen["ok"] = True
+    return []

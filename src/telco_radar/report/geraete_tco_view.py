@@ -6,9 +6,8 @@ Zwei Rechnungen derselben Zahl sind zwei Zahlen. Widerlegte Bündel: `bereinigt`
 
 Fehlt ein Posten, steht die benannte Luecke statt einer Zahl: "Wenn kein
 Anschlusspreis bekannt ist, heisst das nicht kostenlos"
-(`report/effektivpreis.py`, `tco_model` § 6.4). Die Tarifliste, die
-Bereitschaftstabelle und die Euro-Differenz gegen Vodafone sind seit dem
-02.11.2026 von der Seite genommen und hier nicht mehr gerechnet.
+(`report/effektivpreis.py`, `tco_model` § 6.4). Tarifliste, Bereitschaftstabelle
+und Euro-Differenz gegen Vodafone sind seit 02.11.2026 von der Seite genommen.
 """
 
 from __future__ import annotations
@@ -74,6 +73,7 @@ _BUENDEL_FELDER = (
     "quelle_url",
     "abgerufen_am",
     "quelle_art",
+    "beleg_id",
     "zustand",
     "herleitung",
     "pruefung",

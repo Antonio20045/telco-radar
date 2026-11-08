@@ -15,9 +15,8 @@ import markdown as md
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from bs4 import BeautifulSoup
 
-from . import anbieter_farben as _anbieter_farben
+from . import anbieter_farben as _anbieter_farben, bilder as report_bilder
 from .ausfall import NEWSLETTER_TEIL, Ausfall, ohne_konfiguration
-from . import bilder as report_bilder
 from . import diff_bilder, differenzierung_bericht, geraete_fragmente
 from . import differenzierung_view, geraete_belege, geraete_teurer, wettbewerb_puls
 from . import geraete_tco_grafik as _geraete_tco_grafik
@@ -1209,6 +1208,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
             lade_katalog(_wurzel),
             heute=reports[0].get("date", "") if reports else "",
         )
+        ausfaelle += geraete_belege.zeilenbelege(env, state_dir, lade_katalog(_wurzel))
     except Exception as exc:  # noqa: BLE001
         log.error("Geraetedaten nicht aufbereitbar: %s: %s", type(exc).__name__, exc)
         geraete = geraete_view_mod.leer(f"{type(exc).__name__}: {exc}")

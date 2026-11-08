@@ -44,7 +44,8 @@
       <summary>Screenshot der Angebotsseite vom {{ p.beleg.datum | date_de }} (zeigt nicht jeden Tarif)</summary>
       <img data-src="{{ p.beleg.url }}" alt="Screenshot der Angebotsseite {{ p.anbieter }} vom {{ p.beleg.datum | date_de }}" width="640" height="400">
     </details>{% else %}
-    <span class="gr-beleg-fehlt">kein Screenshot vorhanden</span>{% endif %}</li>{% endfor %}
+    <span class="gr-beleg-fehlt">kein Screenshot vorhanden</span>{% endif %}{% if p.zeilen_gesamt is defined %}
+    <span class="gr-beleg-zeilen">{{ p.zeilen_mit }} von {{ p.zeilen_gesamt }} Preiszeilen mit eigenem Screenshot</span>{% endif %}</li>{% endfor %}
 </ul>{% endif %}{% endif %}{% endmacro %}
 
 {% macro buendelzeile(k) %}
@@ -115,7 +116,9 @@
       if k.alt_marke %} <span class="gr-kk-marke gr-kk-marke--alt">{{
       k.alt_marke }}</span>{% endif %}{%
       if k.naeherung %} <span class="gr-kk-marke">Referenzrechnung</span>{%
-      endif %}</span>
+      endif %}{%
+      if k.belastbar and zeilenbeleg is defined and zeilenbeleg(k) %} <span class="gr-kk-marke gr-kk-marke--zeilenbeleg"
+      title="Screenshot genau zu dieser Zeile: Gerät, Tarif und Laufzeit stimmen">Screenshot</span>{% endif %}</span>
     {# D3, PUNKT 1 (gemessen): zwei Zahlweisen DESSELBEN Tarifs (congstar
        24 UND 36 Raten) trugen zugeklappt woertlich denselben Text. Die
        Ratenlaufzeit gehoert deshalb HIER auf die Zeile, knapp, mit der
@@ -432,6 +435,15 @@
       'abgerufen' }} {{ k.abgerufen_am | date_de }}{% endif
       %}{% if k.tarif_quelle_url %} · <a href="{{ k.tarif_quelle_url }}"
       rel="nofollow noopener" target="_blank">Tarifbeleg</a>{% endif %}</p>{% endif %}
+    {# Beleg je Preiszeile (Ziel 1d): das Bild nur, wenn `zeilenbeleg` (Python,
+       `report/geraete_zeilenbelege.py`) es dieser Zeile eindeutig zuordnet; sonst
+       der Vermerk, nie das Bild einer anderen Zeile. #}
+    {% if zeilenbeleg is defined %}{% set zb = zeilenbeleg(k) %}{% if zb %}
+    <details class="gr-belege gr-belege--zeile">
+      <summary>Screenshot zu dieser Zeile vom {{ zb.datum | date_de }}</summary>
+      <img data-src="{{ zb.url }}" alt="Screenshot {{ k.anbieter }}, {{ k.tarif }}, vom {{ zb.datum | date_de }}" width="640" height="400">
+    </details>{% else %}
+    <p class="gr-basis--duenn gr-beleg-zeilenfehlt">Kein Screenshot zu genau dieser Zeile.</p>{% endif %}{% endif %}
 
   {% else %}
   {# B.2.5: ein Anbieter ohne Zahl steht DA, mit seinem Grund. #}
