@@ -27,6 +27,7 @@ from ..analyze.geraete_pruefstatus import (
     HERLEITUNG_EINMALZAHLUNG,
     HERLEITUNG_PREISLISTE,
     QUARANTAENE,
+    REGEL_SORTIMENT,
     REGELN,
     UNBEKANNT,
     VERALTET,
@@ -76,6 +77,10 @@ DELTA_QUARANTAENE = "Quarantäne"
 SATZ_QUARANTAENE = (
     "Kein Abstand zur Vodafone-Referenz: dieser Preis verletzt eine Prüfregel."
 )
+DELTA_SORTIMENT = "nicht im Sortiment"
+SATZ_SORTIMENT = (
+    "Kein Abstand zur Vodafone-Referenz: der Anbieter führt dieses Gerät nicht mehr."
+)
 DELTA_VERALTET = "veraltet"
 SATZ_VERALTET = "Kein Abstand zur Vodafone-Referenz: dieser Preis ist veraltet."
 DELTA_UNGEPRUEFT = "Prüfung gescheitert"
@@ -83,6 +88,7 @@ SATZ_UNGEPRUEFT = (
     "Kein Abstand zur Vodafone-Referenz: die Prüfung dieses Preises ist gescheitert."
 )
 _PRUEFZUSTAENDE = (
+    ("nicht_im_sortiment", DELTA_SORTIMENT, SATZ_SORTIMENT),
     ("quarantaene", DELTA_QUARANTAENE, SATZ_QUARANTAENE),
     ("veraltet_pruefung", DELTA_VERALTET, SATZ_VERALTET),
     ("pruefung_gescheitert", DELTA_UNGEPRUEFT, SATZ_UNGEPRUEFT),
@@ -147,8 +153,13 @@ def _felder(
         "veraltet_aktion": veraltet,
         "quarantaene": status == QUARANTAENE,
         "veraltet_pruefung": status == VERALTET,
+        "nicht_im_sortiment": status == VERALTET and REGEL_SORTIMENT in vermerk.regeln,
         "pruefung_gescheitert": status == UNBEKANNT,
-        "pruefgruende": [f"Regel {n}: {REGELN.get(n, '?')}" for n in vermerk.regeln],
+        "pruefgruende": [
+            f"Regel {n}: {REGELN.get(n, '?')}"
+            for n in vermerk.regeln
+            if n != REGEL_SORTIMENT
+        ],
     }
     return {
         **flags,

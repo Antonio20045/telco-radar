@@ -84,6 +84,10 @@ REGELN = {
     16: "Frische",
 }
 FOLGE = {n: QUARANTAENE for n in REGELN} | {10: VERALTET, 16: VERALTET}
+REGEL_SORTIMENT = 17
+"""Keine Regel der Prüfstelle, sondern die Marke, die die Seite beim Lesen setzt
+(``report/geraete_sortiment``): der Anbieter führt das Gerät laut belegter Lücke nicht
+mehr. Steht darum nicht in ``REGELN`` (Kennzahlen und Regelzähler bleiben bei 16)."""
 
 PFLICHT_GETRENNT = (
     ("geraet_zuzahlung", "Zuzahlung"),

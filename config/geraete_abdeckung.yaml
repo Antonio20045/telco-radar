@@ -200,3 +200,31 @@ belegte_luecken:
     original: https://www.congstar.de/geraete/apple/apple-iphone-duo/
     geprueft: "2026-11-08"
     bis: "2026-11-22"
+  # 1&1: iPhone 16e und iPhone 15 werden nicht mehr verkauft. Belegt (08.11.2026,
+  # docs/belege/1und1-sortiment-0811/, Playwright, ehrliche Kennung, nichts im
+  # Warenkorb): /iphone-16e leitet auf /iphone-17e um (Screenshot 2; das 17e gibt es
+  # nur ab 256 GB, 128 GB steht dort nicht), /iphone-15 zeigt "Leider ist dieses
+  # Gerät nicht mehr verfügbar" (1); die M-Übersicht (3) führt keines von beiden.
+  # Die Bündelzeilen im Bestand (16e abgerufen 05.11.2026 als "gueltig", 15 am
+  # 08.10.2026) stehen deshalb ohne Preis als Lücke ("nicht im Sortiment", Seite,
+  # Export, Grafik; `report/geraete_sortiment`), nicht als gültiger Preis. Wird
+  # ein Bündel NACH dem Prüfdatum abgerufen, ist das Gerät zurück: die Zeile
+  # zählt wieder, der Wächter warnt "überholt".
+  - anbieter: 1&1
+    modelle:
+      - apple-iphone-16e
+    grund: Gerät ist bei 1&1 nicht im Sortiment; die Seite /iphone-16e leitet auf das iPhone 17e um (erst ab 256 GB)
+    art: nicht_im_portfolio
+    beleg: https://github.com/Antonio20045/telco-radar/blob/main/docs/belege/1und1-sortiment-0811/2-iphone16e-leitet-auf-iphone17e.png
+    original: https://www.1und1.de/iphone-16e
+    geprueft: "2026-11-08"
+    bis: "2026-11-22"
+  - anbieter: 1&1
+    modelle:
+      - apple-iphone-15
+    grund: Gerät ist bei 1&1 nicht im Sortiment; die Seite /iphone-15 meldet "Leider ist dieses Gerät nicht mehr verfügbar"
+    art: nicht_im_portfolio
+    beleg: https://github.com/Antonio20045/telco-radar/blob/main/docs/belege/1und1-sortiment-0811/1-iphone15-nicht-mehr-verfuegbar.png
+    original: https://www.1und1.de/iphone-15
+    geprueft: "2026-11-08"
+    bis: "2026-11-22"
