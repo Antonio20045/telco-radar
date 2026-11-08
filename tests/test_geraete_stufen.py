@@ -55,6 +55,29 @@ def test_tarif_ohne_stufe_zaehlt_fuer_keine_stufe():
     assert geraete_stufen.tarife_je_stufe([], tarife, {}) == {}
 
 
+def test_anbieter_mit_tarif_ohne_stufe_ist_nicht_bestimmbar():
+    """1&1 Unlimited XL hat kein erhobenes Volumen und könnte in jede Stufe fallen:
+    für 1&1 darf in keiner Stufe „keinen Tarif“ stehen, andere Anbieter bleiben."""
+    tarife = {
+        "1u1-m": {"anbieter": "1&1", "art": "mobilfunk"},
+        "1u1-xl": {"anbieter": "1&1", "art": "mobilfunk"},
+        "o2-m": {"anbieter": "o2", "art": "mobilfunk"},
+    }
+    stufen = geraete_stufen.tarife_je_stufe([], tarife, {"1u1-m": "m", "o2-m": "m"})
+    assert stufen == {"o2": {"m": 1}}
+    assert not geraete_stufen.stufe_ohne_tarif(stufen, "1&1", "xl")
+    assert geraete_stufen.stufe_ohne_tarif(stufen, "o2", "xl")
+
+
+def test_festnetztarif_ohne_volumen_macht_den_anbieter_nicht_unbestimmbar():
+    tarife = {
+        "o2-m": {"anbieter": "o2", "art": "mobilfunk"},
+        "o2-home": {"anbieter": "o2", "art": "festnetz"},
+    }
+    stufen = geraete_stufen.tarife_je_stufe([], tarife, {"o2-m": "m"})
+    assert stufen == {"o2": {"m": 1}}
+
+
 @pytest.mark.parametrize(
     ("stufen", "anbieter", "band", "erwartet"),
     [
@@ -124,20 +147,19 @@ def test_alternativen_in_anderen_stufen_bleiben_neben_dem_text_stehen():
         assert KEIN_TARIF in zeile["kurz"]
 
 
-def test_erklaersatz_nennt_datenvolumen_und_den_anbieter_mit_wenigen_tarifen():
+def test_erklaersatz_nennt_datenvolumen_und_leere_stufe_trotz_vieler_tarife():
     satz = geraete_stufen.TARIFSTUFEN_REGEL
     assert "Datenvolumen" in satz
-    assert "drei Tarifen" in satz
-    assert "fünf Stufen" in satz
+    assert "viele Tarife" in satz
+    assert "bleibt sie bei ihm leer" in satz
 
 
-@pytest.fixture(scope="module")
-def site(tmp_path_factory):
+def _baue_site(pfad, unstufig: bool = False):
     """Bestand der Kopf-Zeitraum-Fixture (Vodafone, o2, congstar, Telekom in XS) plus
     ein Vodafone-Bündel in M und ein o2-Tarif in M ohne Bündel. In M gilt dann:
     Telekom und congstar haben keinen Tarif, o2 hat einen (Messlücke), 1&1 ist gar
-    nicht gemessen."""
-    site = kopf_zeitraum._baue(tmp_path_factory.mktemp("stufen"))
+    nicht gemessen. Mit `unstufig` hat congstar zusätzlich einen Tarif ohne Volumen."""
+    site = kopf_zeitraum._baue(pfad)
     wurzel = site.parent
     state = wurzel / "data" / "state"
     tco = json.loads((state / "geraete_tco.json").read_text(encoding="utf-8"))
@@ -156,6 +178,11 @@ def site(tmp_path_factory):
     saetze.append(
         {**o2, "name": "O2 Mobile Mittel", "tarif_id": "o2:m", "datenvolumen_gb": 40}
     )
+    if unstufig:
+        cs = next(z for z in saetze if z["anbieter"] == "congstar")
+        saetze.append(
+            {**cs, "name": "Unlimited", "tarif_id": "cs:unl", "datenvolumen_gb": None}
+        )
     (state / "tarife.jsonl").write_text(
         "\n".join(json.dumps(z) for z in saetze) + "\n", encoding="utf-8"
     )
@@ -163,10 +190,24 @@ def site(tmp_path_factory):
     return site
 
 
-@pytest.fixture(scope="module")
-def seite(site) -> BeautifulSoup:
+def _fragment(site) -> BeautifulSoup:
     fragment = site / "data" / "bnd" / f"{kopf_zeitraum.MODELL}.html"
     return BeautifulSoup(fragment.read_text(encoding="utf-8"), "html.parser")
+
+
+@pytest.fixture(scope="module")
+def site(tmp_path_factory):
+    return _baue_site(tmp_path_factory.mktemp("stufen"))
+
+
+@pytest.fixture(scope="module")
+def seite_unstufig(tmp_path_factory) -> BeautifulSoup:
+    return _fragment(_baue_site(tmp_path_factory.mktemp("unstufig"), True))
+
+
+@pytest.fixture(scope="module")
+def seite(site) -> BeautifulSoup:
+    return _fragment(site)
 
 
 def _zustand(seite: BeautifulSoup, anbieter: str, band: str) -> str:
@@ -185,6 +226,15 @@ def test_seite_ohne_tarif_in_m_heisst_keinen_tarif(seite):
 
 def test_seite_gegenprobe_o2_hat_in_m_einen_tarif_und_bleibt_messluecke(seite):
     assert KEIN_TARIF not in _zustand(seite, "o2", "m")
+
+
+def test_seite_tarif_ohne_stufe_sperrt_den_text_fuer_den_ganzen_anbieter(
+    seite_unstufig,
+):
+    """congstar hat einen Tarif ohne Volumen: in M darf für congstar nicht „keinen
+    Tarif“ stehen, Telekom (ohne solchen Tarif) behält den Text."""
+    assert KEIN_TARIF not in _zustand(seite_unstufig, "congstar", "m")
+    assert KEIN_TARIF in _zustand(seite_unstufig, "Telekom", "m")
 
 
 def test_seite_gegenprobe_nicht_gemessener_anbieter_bleibt_noch_nicht_erfasst(seite):
@@ -207,4 +257,4 @@ def test_seite_traegt_den_erklaersatz_der_regel(site):
     assert absatz is not None
     text = absatz.get_text(" ", strip=True)
     assert "Datenvolumen" in text
-    assert "nicht alle fünf Stufen füllen" in text
+    assert "bleibt sie bei ihm leer" in text
