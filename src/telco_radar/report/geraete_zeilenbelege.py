@@ -23,7 +23,6 @@ from typing import Any
 
 from ..analyze.beleg_position import position_des_bildes
 from ..analyze.geraete_pruefstatus import buendel_aus_satz
-from ..beleg_bildfolge import normalisiere as normalisiere_bildfolge
 from ..beleg_regeln import anbieter_schluessel
 from ..tarif_model import QUELLE_KLICK
 from .geraete_laufzeit import raten_laufzeit
@@ -103,9 +102,7 @@ def baue_index(
         except (TypeError, ValueError, KeyError) as fehler:
             gruende[schluessel] = f"Bildsatz unlesbar: {fehler}"
             continue
-        folge = bild.get("bildfolge") or normalisiere_bildfolge(
-            wahl.satz.get("bildfolge"), bild["url"]
-        )
+        folge = bild.get("bildfolge") or ()
         index[buendel.beleg_id] = Zeilenbeleg(
             geraet_id=schluessel[0],
             anbieter_id=schluessel[1],

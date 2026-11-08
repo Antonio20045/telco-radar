@@ -43,13 +43,13 @@ from .beleg_bilanz import Bilanz
 from .beleg_regeln import (
     MAX_ANHAENGE_JE_RELEASE,
     REPO,
+    datum_der_datei,
     gross_tag,
     ist_abgelaufen,
     ist_beleg_tag,
     ist_gross_tag,
     release_abgelaufen,
     tages_tag,
-    zerlege_dateiname,
 )
 
 PAKET = 40
@@ -367,10 +367,8 @@ def raeume_auf(
             continue
         rest[tag] = []
         for datei in anhaenge[tag]:
-            name = zerlege_dateiname(datei)
-            if name is None or not ist_abgelaufen(
-                name.datum, heute, ist_gross_tag(tag)
-            ):
+            datum = datum_der_datei(datei)
+            if datum is None or not ist_abgelaufen(datum, heute, ist_gross_tag(tag)):
                 rest[tag].append(datei)
                 continue
             try:

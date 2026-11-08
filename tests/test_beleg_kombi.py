@@ -23,7 +23,7 @@ import test_beleg_position as pos
 import test_geraete_buendel_kopf_zeitraum as kopf_zeitraum
 from bs4 import BeautifulSoup
 
-from telco_radar.beleg_bildfolge import SCHRITTE, normalisiere
+from telco_radar.beleg_bildfolge import ADRESSE_ANFANG, SCHRITTE, normalisiere
 from telco_radar.beleg_manifest import (
     MANIFEST_NAME,
     Beleg,
@@ -47,6 +47,11 @@ def _datei(nr: int) -> str:
     return f"{pos.MODELL}__o2__{pos.HEUTE}__schritt{nr}.webp"
 
 
+def _adresse(nr: int) -> str:
+    """Die Adresse eines veröffentlichten Anhangs (nur eine Adresse zählt)."""
+    return f"{ADRESSE_ANFANG}{pos.HEUTE}/{_datei(nr)}"
+
+
 @pytest.fixture(scope="module")
 def site(tmp_path_factory) -> Path:
     """o2 mit zwei Zeilen: 24 Raten (eindeutig günstigster Satz, Bild mit Bildfolge)
@@ -66,7 +71,7 @@ def site(tmp_path_factory) -> Path:
     )
     manifest = baue_manifest({f"belege-{pos.HEUTE}": [pos._bild("o2")]}, pos.TAG)
     manifest["belege"][0]["bildfolge"] = [
-        {"datei": _datei(nr), "schritt": schritt, "text": text}
+        {"datei": _adresse(nr), "schritt": schritt, "text": text}
         for nr, (schritt, text) in enumerate(FOLGE, start=1)
     ]
     schreibe(state / MANIFEST_NAME, manifest)
@@ -112,22 +117,43 @@ def test_ohne_bildfolge_bleibt_es_ein_bild(tmp_path):
 
 
 def test_bildfolge_wird_normalisiert_nie_aufgefuellt():
-    """Ein Eintrag ohne lesbare Datei fällt weg; ein Pfad im Dateinamen auch."""
-    basis = "https://x.invalid/belege-1/a__b__2026-11-08.webp"
+    """Nur die Adresse eines Release-Anhangs zählt: ein Dateiname, ein Pfad, eine fremde
+    Adresse oder ein Eintrag ohne Datei fällt weg (#70 baute Links aus Namen)."""
+    gut = f"{ADRESSE_ANFANG}2026-11-08/a__b__2026-11-08__tarif__0123456789abcdef.webp"
     roh = [
         {"datei": "a.webp", "schritt": "tarif", "text": "t"},
         {"datei": "../b.webp", "schritt": "preis"},
         {"schritt": "preis"},
         "kaputt",
         {"datei": "https://y.invalid/c.webp", "schritt": "neu"},
+        {"datei": f"{ADRESSE_ANFANG}2026-11-08/../x.webp", "schritt": "neu"},
+        {"datei": gut, "schritt": "tarif", "text": "t"},
     ]
-    folge = normalisiere(roh, basis)
-    assert [(f["url"], f["name"]) for f in folge] == [
-        ("https://x.invalid/belege-1/a.webp", SCHRITTE["tarif"]),
-        ("https://y.invalid/c.webp", "neu"),
-    ]
-    assert normalisiere(None, basis) == () and normalisiere("x", basis) == ()
+    folge = normalisiere(roh)
+    assert [(f["url"], f["name"]) for f in folge] == [(gut, SCHRITTE["tarif"])]
+    assert normalisiere(None) == () and normalisiere("x") == ()
+    assert normalisiere([{"datei": "a.webp", "schritt": "tarif"}]) == ()
+    basis = f"{ADRESSE_ANFANG}2026-11-08/a__b__2026-11-08.webp"
     assert Beleg("g", "a", date(2026, 11, 8), False, basis).bildfolge == ()
+
+
+def test_luecke_steht_an_der_stelle_ihres_schritts_mit_grund():
+    """Fehlt ein Schritt, nennt ihn die Folge mit Grund und zählt ihn mit."""
+    adresse = f"{ADRESSE_ANFANG}2026-11-08/"
+    roh = [
+        {
+            "datei": f"{adresse}n__a__2026-11-08__tarif__0123456789abcdef.webp",
+            "schritt": "geraet_speicher",
+        },
+        {"datei": f"{adresse}n__a__2026-11-08.webp", "schritt": "preis"},
+    ]
+    folge = normalisiere(roh, ["tarif: Seite markiert keine Option", "kaputt"])
+    assert [(f["schritt"], bool(f["url"]), f["fehlt"]) for f in folge] == [
+        ("geraet_speicher", True, ""),
+        ("tarif", False, "Seite markiert keine Option"),
+        ("preis", True, ""),
+    ]
+    assert normalisiere([], ["tarif: x"]) == ()
 
 
 def _sichtbar(s, anbieter: str) -> dict:

@@ -8,7 +8,9 @@ reicht das nicht, wird das Bild schmaler (``SCHRITT_BREITE``), nie schmaler als
 ``BREITE_MIN``. Im Artefakt heißt die Datei
 ``<beleg_id>.webp`` (``zwischenname``); ihren endgültigen Namen mit Gerät und Anbieter
 (``beleg_regeln.dateiname``) bekommt sie erst beim Veröffentlichen, wenn der Bestand
-das Gerät kennt.
+das Gerät kennt. Die Folgebilder der Bildfolge (``klickbildfolge``) gehen denselben Weg
+mit denselben Grenzen: ``<beleg_id>_<schritt>.webp`` (``folgename``); den Schritt
+``preis`` zeigt das Einzelbild.
 
 Das ist nicht das beweissichere Belegpaket (``klickbeleg``, verlustfrei samt HAR): es
 ist die Ansicht für Manager, kein Beweis vor Gericht. Kein Netz, kein LLM.
@@ -43,6 +45,11 @@ ORDNER = "belege"
 def zwischenname(beleg_id: str) -> str:
     """Name der Datei im Artefakt des Klick-Jobs."""
     return f"{beleg_id}.webp"
+
+
+def folgename(beleg_id: str, schritt: str) -> str:
+    """Name der Datei eines Folgebilds im Artefakt: ``<beleg_id>_<schritt>.webp``."""
+    return f"{beleg_id}_{schritt}.webp"
 
 
 class BildFehler(ValueError):
@@ -87,6 +94,7 @@ class Schreibbilanz:
     geschrieben: int = 0
     ohne_bild: int = 0
     fehler: int = 0
+    folgebilder: int = 0
 
 
 def speichere_bilder(lauf: Klicklauf, ordner: Path) -> Schreibbilanz:
@@ -106,4 +114,29 @@ def speichere_bilder(lauf: Klicklauf, ordner: Path) -> Schreibbilanz:
         except (BildFehler, OSError, ValueError) as fehler:
             bilanz.fehler += 1
             log.warning("Belegbild nicht geschrieben (%s): %s", lauf.adresse, fehler)
+            continue
+        _speichere_folge(ergebnis.beleg, ordner, bilanz, lauf.adresse)
     return bilanz
+
+
+def _speichere_folge(paket, ordner: Path, bilanz: Schreibbilanz, adresse: str) -> None:
+    """Die Folgebilder eines Belegs neben das Einzelbild; ein Fehler lässt nur diesen
+    Schritt aus (er fehlt dann im Artefakt, die Seite nennt ihn)."""
+    kennung = paket.beleg.beleg_id
+    for schritt in paket.beleg.bildfolge:
+        daten = paket.folgebilder.get(schritt.datei)
+        if daten is None:
+            continue
+        try:
+            (ordner / folgename(kennung, schritt.schritt)).write_bytes(
+                verkleinere(daten)
+            )
+            bilanz.folgebilder += 1
+        except (BildFehler, OSError, ValueError) as fehler:
+            bilanz.fehler += 1
+            log.warning(
+                "Folgebild %s nicht geschrieben (%s): %s",
+                schritt.schritt,
+                adresse,
+                fehler,
+            )

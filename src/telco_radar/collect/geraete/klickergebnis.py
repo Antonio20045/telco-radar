@@ -5,7 +5,9 @@ Datum, Karte, Vertragsform, Laufstatus und Zeitbudget, je Produktseite ihr Klick
 mit HTTP-Status, Art der Sperre (``klicksperre.sperrart``, ``None`` ohne Sperre oder
 nicht besucht) und allen Kombinationen. Screenshots, HAR, Seitentext und Cookies
 stehen nie darin, Adressen nur ohne Geheimnisse (``klickspur.ohne_geheimnisse``); vom
-Beleg bleiben ``beleg_id``, Seitenadresse und Zeitpunkt.
+Beleg bleiben ``beleg_id``, Seitenadresse und Zeitpunkt, dazu die Bildfolge als Schritt
+und Text und ihre fehlenden Schritte mit Grund (``bildfolge_fehlt``); aus ihnen baut
+``beleg_folgen`` die Beschriftung der veröffentlichten Folgebilder.
 
 Der Laufstatus des Anbieters (``laufstatus``) ist ``gestoert``, sobald eine Seite
 gestört endete (Bot-Schutz, Challenge, Kanarienwert, Strukturbruch); eine Seite, die
@@ -106,6 +108,10 @@ def kombination_als_daten(ergebnis: Kombiergebnis) -> dict:
             "beleg_id": beleg.beleg_id,
             "seite": ohne_geheimnisse(beleg.seite),
             "zeitpunkt": beleg.zeitpunkt,
+            "bildfolge": [
+                {"schritt": b.schritt, "text": b.text} for b in beleg.bildfolge
+            ],
+            "bildfolge_fehlt": list(beleg.bildfolge_fehlt),
         },
         "beleg_status": ergebnis.beleg_status,
     }

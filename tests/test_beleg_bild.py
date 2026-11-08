@@ -56,7 +56,9 @@ def test_kein_bild_ist_eine_benannte_ausnahme():
 def ergebnis(beleg_id: str | None, bild: bytes | None, status: str = ERFASST):
     paket = None
     if beleg_id is not None:
-        paket = SimpleNamespace(beleg=SimpleNamespace(beleg_id=beleg_id))
+        paket = SimpleNamespace(
+            beleg=SimpleNamespace(beleg_id=beleg_id, bildfolge=()), folgebilder={}
+        )
     return SimpleNamespace(status=status, beleg=paket, screenshot_png=bild)
 
 

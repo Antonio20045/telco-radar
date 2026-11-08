@@ -14,6 +14,13 @@ Der Dateiname trägt die stabilen Schlüssel:
 nie ein Titeltext. Wer ein Bild von Hand hochlädt, benennt es genauso; die Seite
 liest die Anhänge der Releases (``beleg_manifest``) und kennt keinen zweiten Weg.
 
+Ein Folgebild der Bildfolge (``beleg_bildfolge``) liegt im selben Release wie sein
+Einzelbild und heißt
+``<geraet_id>__<anbieter_id>__<JJJJ-MM-TT>__<schritt>__<kennung>.webp``: ``schritt``
+mit Bindestrich statt Unterstrich (``geraet-speicher``), ``kennung`` die ersten
+``KENNUNG_LAENGE`` Zeichen der ``beleg_id`` der Position. Gleiche Kennung heißt gleiche
+Position; Datum und Aufbewahrung gelten wie beim Einzelbild (``datum_der_datei``).
+
 Große Änderung: die Gesamtkosten über 24 Monate weichen von der letzten Messung
 derselben Konfiguration um mindestens ``GROSS_PROZENT`` Prozent ODER ``GROSS_EURO`` Euro
 ab. Ohne frühere Messung oder bei einer Lücke (``None``) ist die Änderung nie groß: was
@@ -51,6 +58,12 @@ _ID = r"[a-z0-9]+(?:-[a-z0-9]+)*"
 _NAME = re.compile(
     rf"^({_ID}){TRENNER}({_ID}){TRENNER}(\d{{4}}-\d{{2}}-\d{{2}}){ENDUNG}$"
 )
+KENNUNG_LAENGE = 16
+_KENNUNG = rf"[0-9a-f]{{{KENNUNG_LAENGE}}}"
+_FOLGE = re.compile(
+    rf"^({_ID}){TRENNER}({_ID}){TRENNER}(\d{{4}}-\d{{2}}-\d{{2}}){TRENNER}({_ID})"
+    rf"{TRENNER}({_KENNUNG}){ENDUNG}$"
+)
 _TAG = re.compile(r"^belege-(\d{4}-\d{2}-\d{2})(?:-(\d+))?$")
 _TAG_GROSS = re.compile(r"^belege-gross-(\d{4})-(\d{2})(?:-(\d+))?$")
 _ID_PRUEFUNG = re.compile(rf"^{_ID}$")
@@ -68,6 +81,22 @@ class Dateiname:
     def schluessel(self) -> str:
         """Gerät und Anbieter ohne Datum."""
         return f"{self.geraet_id}{TRENNER}{self.anbieter_id}"
+
+
+@dataclass(frozen=True)
+class Folgename:
+    """Der zerlegte Dateiname eines Folgebilds."""
+
+    geraet_id: str
+    anbieter_id: str
+    datum: date
+    schritt: str
+    kennung: str
+
+    @property
+    def paar(self) -> tuple[str, str, str]:
+        """Gerät, Anbieter und Tag: der Schlüssel des Einzelbilds."""
+        return (self.geraet_id, self.anbieter_id, self.datum.isoformat())
 
 
 def anbieter_schluessel(anbieter: str) -> str:
@@ -93,6 +122,50 @@ def dateiname(geraet_id: str, anbieter_id: str, datum: date) -> str:
         if not _ID_PRUEFUNG.match(wert or ""):
             raise ValueError(f"{name} unbrauchbar: {wert!r}")
     return f"{geraet_id}{TRENNER}{anbieter_id}{TRENNER}{datum.isoformat()}{ENDUNG}"
+
+
+def folge_dateiname(
+    geraet_id: str, anbieter_id: str, datum: date, schritt: str, beleg_id: str
+) -> str:
+    """Name des Folgebilds eines Schritts; wirft bei unbrauchbarer ID, Schritt oder
+    ``beleg_id``. ``schritt`` darf Unterstriche tragen (``geraet_speicher``)."""
+    kennung = kennung_von(beleg_id)
+    if not _ID_PRUEFUNG.match(schritt.replace("_", "-")):
+        raise ValueError(f"schritt unbrauchbar: {schritt!r}")
+    einzel = dateiname(geraet_id, anbieter_id, datum).removesuffix(ENDUNG)
+    return f"{einzel}{TRENNER}{schritt.replace('_', '-')}{TRENNER}{kennung}{ENDUNG}"
+
+
+def kennung_von(beleg_id: str) -> str:
+    """Kennung einer Position im Dateinamen; wirft bei einer ``beleg_id`` ohne Hex."""
+    kennung = (beleg_id or "")[:KENNUNG_LAENGE]
+    if not re.fullmatch(_KENNUNG, kennung):
+        raise ValueError(f"beleg_id unbrauchbar: {beleg_id!r}")
+    return kennung
+
+
+def zerlege_folgename(name: str) -> Folgename | None:
+    """Die Teile eines Folgebild-Namens; ``None``, wenn er nicht im Schema liegt."""
+    treffer = _FOLGE.match(name or "")
+    if not treffer:
+        return None
+    try:
+        datum = date.fromisoformat(treffer.group(3))
+    except ValueError:
+        return None
+    schritt = treffer.group(4).replace("-", "_")
+    return Folgename(
+        treffer.group(1), treffer.group(2), datum, schritt, treffer.group(5)
+    )
+
+
+def datum_der_datei(name: str) -> date | None:
+    """Das Datum im Namen eines Einzel- oder Folgebilds; sonst ``None``."""
+    einzel = zerlege_dateiname(name)
+    if einzel is not None:
+        return einzel.datum
+    folge = zerlege_folgename(name)
+    return None if folge is None else folge.datum
 
 
 def zerlege_dateiname(name: str) -> Dateiname | None:
@@ -196,7 +269,7 @@ def ist_sichtbar(tag: str, datei: str, heute: date) -> bool:
     Tages-Release von morgen trägt sein eigenes Datum. Dateien außerhalb des Schemas und
     Releases außerhalb des Schemas sind nie sichtbar und werden nie gelöscht.
     """
-    name = zerlege_dateiname(datei)
-    if name is None or not ist_beleg_tag(tag):
+    datum = datum_der_datei(datei)
+    if datum is None or not ist_beleg_tag(tag):
         return False
-    return not ist_abgelaufen(name.datum, heute, ist_gross_tag(tag))
+    return not ist_abgelaufen(datum, heute, ist_gross_tag(tag))
