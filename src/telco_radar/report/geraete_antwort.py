@@ -257,8 +257,13 @@ def _rechnung_html(zeilen: list, h: int = TCO_HORIZONT) -> str:
     )
     datum = beste.get("abgerufen_am") or ""
     datum_teil = f", abgerufen am {_datum_de(datum)}" if datum else ""
+    tarif = (
+        "Tarif"
+        if h <= TCO_HORIZONT
+        else f"Tarif nur {TCO_HORIZONT} Monate (danach monatlich kündbar)"
+    )
     return (
-        f"Alles über {h} Monate: Anzahlung, Tarif, alle Geräteraten und "
+        f"Alles über {h} Monate: Anzahlung, {tarif}, alle Geräteraten und "
         f"Anschlusspreis, ohne Boni. Beleg des günstigsten Angebots: "
         f"{link}{datum_teil}."
     )

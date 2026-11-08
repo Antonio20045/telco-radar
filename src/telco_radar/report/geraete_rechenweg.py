@@ -1,11 +1,9 @@
 """Rechenweg je Messung der Gerätezeitreihe: Kernzahl und Postenliste aus der Historie.
 
-Aus `geraete_zeitreihe` ausgelagert (Datenkonzept Geräte, Schritt 2): die eine
-Baustelle, an der eine Historien-Zeile zum Bündel wird (`_buendel_aus_messung`),
-ihre Kernzahl über H Monate (`_messwert`, gerechnet nur in `tco_kosten.kosten_ueber`)
-und die gesetzte Postenliste je Messung (`_rechung`, `_rechung_html`,
-`_rechenwege_html`). Dazu die kleinen Schreibweisen, die Zeitreihe und Rechenweg
-teilen (`euro`, `_esc`, Datumsformen, `_zeitraum_wort`).
+Hier wird eine Historien-Zeile zum Bündel (`_buendel_aus_messung`), ihre Kernzahl über
+H Monate (`_messwert`, gerechnet nur in `tco_kosten.kosten_ueber`) und die gesetzte
+Postenliste je Messung (`_rechung`, `_rechung_html`, `_rechenwege_html`); dazu die
+Schreibweisen, die Zeitreihe und Rechenweg teilen (`euro`, `_esc`, Datumsformen).
 """
 
 from __future__ import annotations
@@ -26,6 +24,7 @@ from ..tco_model import (
 )
 from ..versandkosten import POSTEN_VERSAND
 from .anbieter_farben import stil_fuer
+from .geraete_tarif_hinweis import tarif_hinweis
 from .geraete_tco_karten import label_der_leitzahl, tarif_anreichern
 from .verlauf import MONATE_DE
 
@@ -166,8 +165,7 @@ def _messwert(
 
 
 def _wert_aus_messung(messung: dict, tarife: dict | None = None) -> float | None:
-    """Die HEUTIGE Leitzahl einer Messung (A1), nicht das eingefrorene
-    `gesamt` der Historie; `None` heisst nur "nicht vollständig gemessen"."""
+    """Die HEUTIGE Leitzahl einer Messung (A1), nicht das eingefrorene `gesamt`."""
     return _messwert(messung, tarife)[0]
 
 
@@ -246,6 +244,7 @@ def _rechung(messung: dict, tarife: dict | None = None) -> dict | None:
         )
     return {
         "posten": posten,
+        "hinweis": tarif_hinweis(kosten.tarifmonate or 0, h),
         "gesamt": kosten.gesamt,
         "monate": h,
         "datum": satz.get("datum") or "",
@@ -332,6 +331,7 @@ def _rechung_html(anbieter: str, messung: dict, tarife: dict | None = None) -> s
         f"<p class='gr-zr-rsumme'>= <b>{euro(r['gesamt'])}</b> "
         f"<span class='gr-zr-plabel'>{label_der_leitzahl(r['monate'])}</span></p>"
     )
+    teile.append(r["hinweis"])
     url = r["quelle_url"]
     link = (
         f"<a href='{_esc(url)}' target='_blank' rel='noopener'>{a}&nbsp;↗</a>"
