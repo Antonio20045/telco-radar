@@ -19,6 +19,7 @@ from bs4 import BeautifulSoup
 from telco_radar.analyze.buendel_abdeckung import lade_pflicht
 from telco_radar.geraete_model import Geraet, Katalog
 from telco_radar.report import geraete_portfolio as pf
+from telco_radar.report import geraete_sortiment
 
 VORLAGEN = Path(pf.__file__).parent / "templates"
 HEUTE = "2026-11-10"
@@ -493,7 +494,9 @@ def test_nicht_verfuegbar_ist_kein_beleg_fuer_nicht_im_portfolio():
         schlecht = {k: {**v, "grund": grund} for k, v in gut.items()}
         p = _paar(_rechne(modelle, schlecht), "congstar")
         assert p["n_w"] == 0 and p["n_offen"] == 1
-        assert p["offen"][0]["geraete"][0]["grund"] == pf.GRUND_UNZUREICHEND
+        assert (
+            p["offen"][0]["geraete"][0]["grund"] == geraete_sortiment.GRUND_UNZUREICHEND
+        )
     for grund in (
         "nicht im Sortiment",
         "Seite entfernt (404)",

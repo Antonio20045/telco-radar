@@ -59,7 +59,7 @@ from . import (
     geraete_verlauf,
     geraete_zeitreihe,
 )
-from . import geraete_delta_wort, geraete_notbremse as notbremse, klick_ueberholt
+from . import geraete_delta_wort, geraete_notbremse as notbremse, geraete_sortiment
 
 from .geraete_laufzeit import LAUFZEIT_STANDARD, ansicht, rang_der_monatsangabe
 from .geraete_tco_band import _MONATE, band_label
@@ -1668,7 +1668,7 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         vergleich["ohne_vertrag"], pruefung.get("auffaellig")
     )
     tco = geraete_tco_view.aufbereiten(
-        (sichtbar := klick_ueberholt.ohne_ueberholte(tco_db.buendel())),
+        (sichtbar := geraete_sortiment.lies(tco_db.buendel(), state_dir, tco_heute)),
         tco_db.referenzen(),
         belastbar,
         katalog,

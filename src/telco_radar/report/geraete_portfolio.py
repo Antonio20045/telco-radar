@@ -29,8 +29,6 @@ es gibt keinen Abruf. Ein Ausfall steht als `fehler`, nie als leere Liste.
 from __future__ import annotations
 
 import logging
-from datetime import date
-from pathlib import Path
 
 from ..analyze import buendel_abdeckung
 from . import geraete_hersteller
@@ -38,16 +36,13 @@ from .anbieter_farben import legendenname, slug_fuer
 from .geraete_hersteller import HERSTELLER_VORAN, aktuelle_geraete
 from .geraete_hersteller_text import EIGEN
 from .geraete_rechenweg import ANBIETER_FOLGE
+from .geraete_sortiment import GRUND_OHNE, abdeckung_pfad, beleg_fuer
+from .geraete_sortiment import datum_de as _datum
 
 log = logging.getLogger(__name__)
 
 STANDARD = "Telekom"
-ABDECKUNG = ("config", "geraete_abdeckung.yaml")
 PREIS, ALT = "preis", "alt"
-GRUND_OHNE = "ohne Beleg"
-GRUND_ABGELAUFEN = "Beleg abgelaufen"
-GRUND_UNZUREICHEND = "Beleg zeigt kein fehlendes Sortiment"
-BELEG_AUSSAGEN = ("nicht im Sortiment", "Seite entfernt", "nicht in der Geräteliste")
 FEHLT_SATZ = (
     "{wer} führt es (Preis gemessen). Für {fehlt} liegt kein {beleg} vor{grund}."
 )
@@ -56,14 +51,6 @@ REGEL = (
     "befristet); fehlt ein Preis ohne gültigen Beleg, ist das eine Messlücke und "
     "zählt nicht als Portfolio-Lücke."
 )
-
-
-def _datum(text) -> str:
-    try:
-        d = date.fromisoformat(str(text))
-    except ValueError:
-        return str(text)
-    return f"{d.day:02d}.{d.month:02d}.{d.year}"
 
 
 def staende(tco_modelle: list[dict]) -> dict[str, dict[str, str]]:
@@ -90,21 +77,6 @@ def staende(tco_modelle: list[dict]) -> dict[str, dict[str, str]]:
             else:
                 je.setdefault(anbieter, ALT)
     return aus
-
-
-def beleg_fuer(
-    belege: dict, anbieter: str, device_id: str, heute: str
-) -> tuple[dict | None, str]:
-    """(gültiger Beleg, Grund). Ohne gültigen Beleg ist der Grund `GRUND_OHNE` oder
-    `GRUND_ABGELAUFEN`; ohne bekannten Stichtag gilt kein Beleg als gültig."""
-    b = belege.get((anbieter, device_id)) or belege.get((anbieter, "*"))
-    if not b:
-        return None, GRUND_OHNE
-    if not any(a.lower() in str(b.get("grund", "")).lower() for a in BELEG_AUSSAGEN):
-        return None, GRUND_UNZUREICHEND
-    if not heute or heute > b["bis"].isoformat():
-        return None, f"{GRUND_ABGELAUFEN} (bis {_datum(b['bis'].isoformat())})"
-    return b, ""
 
 
 def _beleg_text(b: dict) -> dict:
@@ -258,11 +230,6 @@ def berechne(tco_modelle: list[dict], katalog, belege: dict, heute: str) -> dict
         "geraete": len(geraete),
         "belege": len(belege),
     }
-
-
-def abdeckung_pfad(state_dir) -> Path:
-    """`config/geraete_abdeckung.yaml` neben `data/state` (Aufbau des Repos)."""
-    return Path(state_dir).parents[1].joinpath(*ABDECKUNG)
 
 
 def ansicht(state_dir, tco: dict, katalog, heute: str) -> dict:

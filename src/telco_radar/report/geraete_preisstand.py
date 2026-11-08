@@ -56,6 +56,10 @@ _PREISFELDER_LISTE = (
 )
 KURZ_VERALTET = "Preis veraltet"
 SATZ_VERALTET_OHNE_DATUM = "Preis veraltet – nicht mehr bestätigt."
+KURZ_SORTIMENT = "nicht im Sortiment"
+SATZ_SORTIMENT = (
+    "Gerät bei {anbieter} nicht mehr im Sortiment – belegte Lücke, kein Preis."
+)
 KURZ_PRUEFUNG = "Preis in Prüfung"
 SATZ_PRUEFUNG = "Preis in Prüfung."
 KURZ_BEDINGT = DELTA_BEDINGT
@@ -72,6 +76,13 @@ def veraltet(frisch: bool | None, veraltet_pruefung: bool) -> bool:
 def preis_veraltet(karte: dict) -> bool:
     """Ist der Preis der Karte nicht mehr bestätigt? (``veraltet`` an ihren Feldern.)"""
     return veraltet(karte.get("frisch"), karte.get("veraltet_pruefung", False))
+
+
+def nicht_im_sortiment(karte: dict) -> bool:
+    """Führt der Anbieter das Gerät laut belegter Lücke nicht mehr? (Notbremse, Marke
+    aus ``geraete_sortiment``.) Geht jedem anderen Grund vor: ein Gerät, das es nicht
+    gibt, hat keinen „veralteten“ Preis, sondern keinen."""
+    return bool(karte.get("nicht_im_sortiment"))
 
 
 def in_pruefung(karte: dict) -> bool:
@@ -106,6 +117,8 @@ def buendel_luecke(b, heute: str) -> str:
 
     frisch = ist_frisch(b.abgerufen_am, heute)
     flags = geraete_notbremse.felder(b, heute)
+    if nicht_im_sortiment(flags):
+        return SATZ_SORTIMENT.format(anbieter=b.anbieter)
     if flags["bedingter_tarif"]:
         return SATZ_BEDINGT
     if veraltet(frisch, flags["veraltet_pruefung"]):
@@ -124,7 +137,10 @@ def anzeige(karte: dict) -> dict:
     """
     if not karte.get("sku_id"):
         return karte
-    if ist_bedingt(karte):
+    if nicht_im_sortiment(karte):
+        kurz_ = KURZ_SORTIMENT
+        satz = SATZ_SORTIMENT.format(anbieter=karte.get("anbieter") or "dem Anbieter")
+    elif ist_bedingt(karte):
         kurz_, satz = KURZ_BEDINGT, SATZ_BEDINGT
     elif preis_veraltet(karte):
         kurz_, satz = (

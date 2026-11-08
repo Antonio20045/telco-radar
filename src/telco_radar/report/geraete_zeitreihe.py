@@ -44,7 +44,7 @@ from pathlib import Path
 from .. import rechenweise, tco_historie
 from ..analyze.tco_store import basis_aus_satz, id_aus_satz
 from ..tco_model import zeitraum_vergleichbar
-from . import geraete_bewegung
+from . import geraete_bewegung, geraete_sortiment
 from . import geraete_notbremse as notbremse
 from . import geraete_zeitreihe_auswahl as zeitreihe_auswahl
 from .anbieter_farben import STRICHMUSTER, stil_fuer
@@ -275,15 +275,15 @@ def _messungen(
     if tco_datei.exists():
         try:
             roh = json.loads(tco_datei.read_text(encoding="utf-8"))
-            for b in roh.get("buendel") or []:
-                bid = buendel_schluessel(b)
+            for rb in geraete_sortiment.markiere(roh.get("buendel"), state_dir, heute):
+                bid = buendel_schluessel(rb)
                 if bid is None:
                     stand_ohne_id += 1
                     continue
-                buendel[bid] = b
-                basis = basis_aus_satz(b)
+                buendel[bid] = rb
+                basis = basis_aus_satz(rb)
                 if basis:
-                    buendel_basis.setdefault(basis, b)
+                    buendel_basis.setdefault(basis, rb)
         except (json.JSONDecodeError, OSError) as exc:
             log.warning("geraete_tco.json unlesbar fuer die Zeitreihe: %s", exc)
 
