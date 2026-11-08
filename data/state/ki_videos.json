@@ -1,6 +1,26 @@
 {
- "stand": "2026-11-07",
+ "stand": "2026-11-08",
  "videos": [
+  {
+   "id": "v0q266zAQ9M",
+   "titel": "Es ist passiert: Die KI-Blase platzt in Amerika! DAS musst du jetzt wissen | KI-NEWS",
+   "kanal": "Everlast AI",
+   "datum": "2026-11-08",
+   "dauer_sekunden": 1618,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "v0q266zAQ9M.jpg"
+  },
+  {
+   "id": "H_GJapsoLyU",
+   "titel": "Why AI Models Run Faster on Some Chips: The KV Cache Effect",
+   "kanal": "IBM Technology",
+   "datum": "2026-11-08",
+   "dauer_sekunden": 601,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "H_GJapsoLyU.jpg"
+  },
   {
    "id": "w3z3Fa7ACt8",
    "titel": "That is Some Crazy Fabric",
@@ -12,8 +32,28 @@
    "bild": "w3z3Fa7ACt8.jpg"
   },
   {
+   "id": "us6SRuWuqWc",
+   "titel": "The Ultimate Linux Tutorial for AI Agents (watch before 2027)",
+   "kanal": "David Ondrej",
+   "datum": "2026-11-07",
+   "dauer_sekunden": 1528,
+   "stufe": "Fortgeschritten",
+   "sprache": "en",
+   "bild": "us6SRuWuqWc.jpg"
+  },
+  {
+   "id": "Vpl7e3yZtnk",
+   "titel": "Das hat mich einen ganzen Tag gekostet...",
+   "kanal": "The Morpheus Tutorials",
+   "datum": "2026-11-07",
+   "dauer_sekunden": 723,
+   "stufe": "Fortgeschritten",
+   "sprache": "de",
+   "bild": "Vpl7e3yZtnk.jpg"
+  },
+  {
    "id": "GJ6PMUm5oTA",
-   "titel": "The OpenAI Astra Weight Hack, Explained",
+   "titel": "OpenAI's Astra Just Opened The Black Box Of AI",
    "kanal": "Two Minute Papers",
    "datum": "2026-11-07",
    "dauer_sekunden": 349,
@@ -173,7 +213,7 @@
   },
   {
    "id": "Xo7wNFDOSsc",
-   "titel": "Lokale KI statt Cloud-Abo | c't 4004 #46",
+   "titel": "Wirklich keinem bringt die Google KI-Suche etwas | c't 4004 #46",
    "kanal": "c't 3003",
    "datum": "2026-11-05",
    "dauer_sekunden": 4900,
@@ -260,133 +300,93 @@
    "stufe": "Einstieg",
    "sprache": "de",
    "bild": "VSP5ofNCoHg.jpg"
-  },
-  {
-   "id": "9ZxCOHkfn_8",
-   "titel": "GPT-Image-2.6: Faster image generation with Flare and Sunburst",
-   "kanal": "OpenAI",
-   "datum": "2026-11-04",
-   "dauer_sekunden": 88,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "9ZxCOHkfn_8.jpg"
-  },
-  {
-   "id": "6IttBmI4P9M",
-   "titel": "Messi asks ChatGPT to reimagine his room",
-   "kanal": "OpenAI",
-   "datum": "2026-11-04",
-   "dauer_sekunden": 18,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "6IttBmI4P9M.jpg"
-  },
-  {
-   "id": "44GBqQGc-v0",
-   "titel": "How Figma Is Building Self-Serve Analytics with OpenAI",
-   "kanal": "OpenAI",
-   "datum": "2026-11-04",
-   "dauer_sekunden": 66,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "44GBqQGc-v0.jpg"
-  },
-  {
-   "id": "0LDs5rvx1EI",
-   "titel": "How Figma Is Building Self-Serve Analytics with OpenAI",
-   "kanal": "OpenAI",
-   "datum": "2026-11-04",
-   "dauer_sekunden": 42,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "0LDs5rvx1EI.jpg"
   }
  ],
  "kanaele": {
   "c't 3003": {
    "error": null,
-   "versucht": "2026-11-07",
-   "abgerufen": "2026-11-07"
+   "versucht": "2026-11-08",
+   "abgerufen": "2026-11-08"
   },
   "KI Update (heise)": {
    "error": null,
-   "versucht": "2026-11-07",
-   "abgerufen": "2026-11-07"
+   "versucht": "2026-11-08",
+   "abgerufen": "2026-11-08"
   },
   "Everlast AI": {
    "error": null,
-   "versucht": "2026-11-07",
-   "abgerufen": "2026-11-07"
+   "versucht": "2026-11-08",
+   "abgerufen": "2026-11-08"
   },
   "The Morpheus Tutorials": {
    "error": null,
-   "versucht": "2026-11-07",
-   "abgerufen": "2026-11-07"
+   "versucht": "2026-11-08",
+   "abgerufen": "2026-11-08"
   },
   "Kevin Stratvert": {
    "error": null,
-   "versucht": "2026-11-07",
-   "abgerufen": "2026-11-07"
+   "versucht": "2026-11-08",
+   "abgerufen": "2026-11-08"
   },
   "Microsoft Mechanics": {
    "error": null,
-   "versucht": "2026-11-07",
-   "abgerufen": "2026-11-07"
+   "versucht": "2026-11-08",
+   "abgerufen": "2026-11-08"
   },
   "Leila Gharani": {
    "error": null,
-   "versucht": "2026-11-07",
-   "abgerufen": "2026-11-07"
+   "versucht": "2026-11-08",
+   "abgerufen": "2026-11-08"
   },
   "Jeff Su": {
    "error": null,
-   "versucht": "2026-11-07",
-   "abgerufen": "2026-11-07"
+   "versucht": "2026-11-08",
+   "abgerufen": "2026-11-08"
   },
   "Matt Wolfe": {
    "error": null,
-   "versucht": "2026-11-07",
-   "abgerufen": "2026-11-07"
+   "versucht": "2026-11-08",
+   "abgerufen": "2026-11-08"
   },
   "IBM Technology": {
    "error": null,
-   "versucht": "2026-11-07",
-   "abgerufen": "2026-11-07"
+   "versucht": "2026-11-08",
+   "abgerufen": "2026-11-08"
   },
   "OpenAI": {
    "error": null,
-   "versucht": "2026-11-07",
-   "abgerufen": "2026-11-07"
+   "versucht": "2026-11-08",
+   "abgerufen": "2026-11-08"
   },
   "Anthropic": {
    "error": null,
-   "versucht": "2026-11-07",
-   "abgerufen": "2026-11-07"
+   "versucht": "2026-11-08",
+   "abgerufen": "2026-11-08"
   },
   "Google DeepMind": {
    "error": null,
-   "versucht": "2026-11-07",
-   "abgerufen": "2026-11-07"
+   "versucht": "2026-11-08",
+   "abgerufen": "2026-11-08"
   },
   "AI Explained": {
    "error": null,
-   "versucht": "2026-11-07",
-   "abgerufen": "2026-11-07"
+   "versucht": "2026-11-08",
+   "abgerufen": "2026-11-08"
   },
   "Two Minute Papers": {
    "error": null,
-   "versucht": "2026-11-07",
-   "abgerufen": "2026-11-07"
+   "versucht": "2026-11-08",
+   "abgerufen": "2026-11-08"
   },
   "3Blue1Brown": {
    "error": null,
-   "versucht": "2026-11-07",
-   "abgerufen": "2026-11-07"
+   "versucht": "2026-11-08",
+   "abgerufen": "2026-11-08"
   },
   "David Ondrej": {
    "error": null,
-   "versucht": "2026-11-07",
-   "abgerufen": "2026-11-07"
+   "versucht": "2026-11-08",
+   "abgerufen": "2026-11-08"
   }
  },
  "error": null

@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-07",
+ "updated": "2026-11-08",
  "topics": [
   {
    "slug": "apples-iphone-event-am-9-september",
@@ -922,8 +922,8 @@
    ],
    "first_seen": "2026-11-04",
    "last_active": "2026-11-04",
-   "runs_ohne_zuwachs": 3,
-   "status": "aktiv",
+   "runs_ohne_zuwachs": 4,
+   "status": "beendet",
    "items": [
     {
      "url": "https://telesintese.com.br/anatel-aprova-roaming-obrigatorio-em-rodovias-e-pequenas-localidades/",
@@ -1023,7 +1023,8 @@
      "image_w": 800,
      "image_h": 495
     }
-   ]
+   ],
+   "ended": "2026-11-08"
   }
  ]
 }
