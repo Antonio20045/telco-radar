@@ -45,6 +45,7 @@ from pathlib import Path
 import yaml
 
 from .. import rechenweise, tco_historie
+from ..abdeckung_pflicht import pflichtanbieter
 from ..geraete_model import normalisiere
 
 KOMBI_VERLUST_ANTEIL = 0.10
@@ -139,7 +140,7 @@ def lade_pflicht(pfad: Path) -> dict:
                         "original": str(eintrag.get("original") or "").strip(),
                     }
     return {
-        "anbieter": list(daten.get("pflicht_anbieter") or []),
+        "anbieter": pflichtanbieter(daten, pfad),
         "modelle": list(daten.get("pflicht_modelle") or []),
         "speicher_pflicht_anbieter": list(daten.get("speicher_pflicht_anbieter") or []),
         "luecken": luecken,

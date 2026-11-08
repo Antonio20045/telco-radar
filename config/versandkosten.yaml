@@ -53,10 +53,20 @@ anbieter:
     quelle: "https://tarife-api2.mediamarkt.de/v1/productdetail/iphone-17?... (costs.oneTimeCosts.items 'Versandkosten', iPhone 17, o2-Doppelkarte-Tarif)"
     datum: "2026-11-08"
     screenshot: "telcoradar/abnahme/tarifwelt-0811/01_iphone17_o2_standard.png"
-    hinweis: "Fixtures tests/fixtures/geraete/tarifwelt_mm_productdetail_iphone17_o2doppelkarte_20261108.json; Vodafone-Netz noch nicht gemessen, bleibt ohne Eintrag (benannte Luecke)"
+    hinweis: "Fixtures tests/fixtures/geraete/tarifwelt_mm_productdetail_iphone17_o2doppelkarte_20261108.json"
   "Saturn/MediaMarkt · Telekom-Netz":
     betrag: 5.95
     quelle: "https://tarife-api2.mediamarkt.de/v1/productdetail/iphone-17?... (costs.oneTimeCosts.items 'Versandkosten', iPhone 17, Telekom Magenta Mobil M)"
     datum: "2026-11-08"
     screenshot: "telcoradar/abnahme/tarifwelt-0811/02_iphone17_telekom_magenta_m.png"
     hinweis: "Fixtures tests/fixtures/geraete/tarifwelt_mm_productdetail_iphone17_telekom_magenta_m_20261108.json und _galaxys26_standard_20261108.json (beide 5,95 EUR)"
+  # "Saturn/MediaMarkt · Vodafone-Netz" hat ABSICHTLICH keinen Eintrag (Stand
+  # 08.11.2026 06:30): Fixtures und Screenshots belegen den Versand nur fuer das
+  # o2- und das Telekom-Netz (je 5,95 EUR, `deliveryPrice` der Schnittstelle).
+  # Dass es im Vodafone-Netz derselbe Betrag ist, ist wahrscheinlich, aber nicht
+  # gemessen - also zaehlt der Versand dort nicht mit, und die Zeile traegt
+  # "Versand bei Saturn/MediaMarkt · Vodafone-Netz nicht belegt" (kein 0-Euro-Wert).
+  # Eintragen erst mit einer Messung: ein Tarif im Vodafone-Netz bis zur
+  # Kostenuebersicht (costs.oneTimeCosts, 'Versandkosten') mit Screenshot unter
+  # abnahme/tarifwelt-0811/ und Datum. Test: test_versandkosten.py
+  # (test_versand_vodafone_netz_ist_benannte_luecke_nicht_null).

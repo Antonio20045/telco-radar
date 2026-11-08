@@ -197,7 +197,7 @@ def test_versandkosten_centgenau_gegen_die_fixtures():
         versandkosten._TABELLE = vorher
 
 
-_LEITER = (
+LEITER = (
     ("xs", 15.0),
     ("s", 30.0),
     ("m", 60.0),
@@ -220,10 +220,10 @@ def test_band_regel_ist_dieselbe_wie_im_bericht():
 
     leiter = tuple(
         band.Stufe(key=k, label=k, gb=g, tarif_id=k, name=k, grundgebuehr=1.0)
-        for k, g in _LEITER
+        for k, g in LEITER
     )
     for gb in (5, 15, 22.5, 45, 50, 90, 100, 160, 200, float("inf"), None):
-        assert band.band_von_gb(gb, leiter) == stufe_fuer(gb, _LEITER), gb
+        assert band.band_von_gb(gb, leiter) == stufe_fuer(gb, LEITER), gb
 
 
 def test_genau_ein_tarif_je_netz_und_band_ohne_doppelkarte_aktion_young():
@@ -248,7 +248,7 @@ def test_genau_ein_tarif_je_netz_und_band_ohne_doppelkarte_aktion_young():
             "doppelkarte": False,
         },
     ]
-    gewaehlt = tarifwelt_lauf.waehle_tarife(liste + zusatz, _LEITER)
+    gewaehlt = tarifwelt_lauf.waehle_tarife(liste + zusatz, LEITER)
     assert len(gewaehlt) == len(set(gewaehlt))
     ids = {s["tarif_id"] for s in gewaehlt.values()}
     assert "aktion" not in ids and "young" not in ids
@@ -279,7 +279,7 @@ def test_ein_band_ohne_passenden_tarif_bleibt_leer_statt_geraten():
             "doppelkarte": False,
         }
     ]
-    gewaehlt = tarifwelt_lauf.waehle_tarife(nur_unbegrenzt, _LEITER[:4])
+    gewaehlt = tarifwelt_lauf.waehle_tarife(nur_unbegrenzt, LEITER[:4])
     assert gewaehlt == {}
 
 
@@ -306,7 +306,7 @@ def test_schutzantwort_bricht_den_ganzen_lauf_ab_ohne_wiederholung():
 
     with pytest.raises(GeraeteAbrufFehler) as fehler:
         tarifwelt_lauf.lies_modell(
-            "apple-iphone-17", _LEITER, hole, "2026-11-08", warte=lambda s: None
+            "apple-iphone-17", LEITER, hole, "2026-11-08", warte=lambda s: None
         )
     assert fehler.value.schutz is True
     assert len(aufrufe) == 1
@@ -328,7 +328,7 @@ def test_challenge_mit_schutzmerkmal_bricht_ebenfalls_ab():
 
     with pytest.raises(GeraeteAbrufFehler) as fehler:
         tarifwelt_lauf.lies_modell(
-            "apple-iphone-17", _LEITER, hole, "2026-11-08", warte=lambda s: None
+            "apple-iphone-17", LEITER, hole, "2026-11-08", warte=lambda s: None
         )
     assert fehler.value.schutz is True
     assert len(zaehler) == 1
@@ -348,7 +348,7 @@ def test_404_auf_einer_variante_ist_nur_diese_luecke():
         return _Antwort(200, uebersicht)
 
     lauf = tarifwelt_lauf.lies_modell(
-        "apple-iphone-17", _LEITER, hole, "2026-11-08", warte=lambda s: None
+        "apple-iphone-17", LEITER, hole, "2026-11-08", warte=lambda s: None
     )
     assert lauf.buendel == []
     assert lauf.luecken and all("HTTP 404" in grund for _, grund in lauf.luecken)
@@ -363,7 +363,7 @@ _F = "tarifwelt_mm_"
 _SCHALE = json.dumps({"offerId": "", "tariff": {"_id": ""}, "hardware": None})
 
 
-def _fixture_hole():
+def fixture_hole():
     """Antwortet wie die Schnittstelle, aus den gespeicherten Abrufen vom
     08.11.2026: Uebersicht, Tarifliste, zwei Tarife je Geraet. Jeder andere
     Tarif bekommt die leere Huelle, die die Schnittstelle fuer ein Geraet
@@ -414,7 +414,7 @@ def _fixture_hole():
 def test_lauf_zwei_geraete_zwei_tarife_centgenau_gegen_die_fixtures():
     from telco_radar.collect.geraete import tarifwelt_lauf
 
-    hole, aufrufe = _fixture_hole()
+    hole, aufrufe = fixture_hole()
     erwartet = {
         ("apple-iphone-17", "Saturn/MediaMarkt · Telekom-Netz"): (
             419.99,
@@ -432,7 +432,7 @@ def test_lauf_zwei_geraete_zwei_tarife_centgenau_gegen_die_fixtures():
     gefunden = {}
     for modell in ("apple-iphone-17", "samsung-galaxy-s26"):
         lauf = tarifwelt_lauf.lies_modell(
-            modell, _LEITER, hole, "2026-11-08", warte=lambda s: None
+            modell, LEITER, hole, "2026-11-08", warte=lambda s: None
         )
         for b in lauf.buendel:
             assert b.laufzeit_monate == 24
@@ -451,9 +451,9 @@ def test_lauf_zwei_geraete_zwei_tarife_centgenau_gegen_die_fixtures():
 def test_lauf_nicht_waehlbarer_erstplatz_faellt_auf_den_naechsten_zurueck():
     from telco_radar.collect.geraete import tarifwelt_lauf
 
-    hole, aufrufe = _fixture_hole()
+    hole, aufrufe = fixture_hole()
     lauf = tarifwelt_lauf.lies_modell(
-        "samsung-galaxy-s26", _LEITER, hole, "2026-11-08", warte=lambda s: None
+        "samsung-galaxy-s26", LEITER, hole, "2026-11-08", warte=lambda s: None
     )
     tarife = {(b.anbieter, b.tarif_name) for b in lauf.buendel}
     assert ("Saturn/MediaMarkt · o2-Netz", "Mobile M Promo") in tarife
