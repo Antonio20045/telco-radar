@@ -18,7 +18,7 @@ from telco_radar.report import geraete_stufen
 from telco_radar.report.geraete_luecken import fehlen_im_paar
 from telco_radar.report.html import render_site
 
-KEIN_TARIF = "keinen Tarif"
+KEIN_TARIF = "Kein Tarif in dieser Datenstufe"
 _SATZ = {"zeilen": [], "fremd": [], "gesperrt": []}
 
 
@@ -99,7 +99,7 @@ def test_null_tarife_in_der_stufe_tragen_den_eigenen_text():
     stufen = {"o2": {"m": 1, "xl": 1}}
     zeile = _fehlen(_modell(karten, stufen), "s")["o2"]
     assert KEIN_TARIF in zeile["kurz"]
-    assert "o2 hat in dieser Tarifstufe keinen Tarif" in zeile["satz"]
+    assert "o2 hat in dieser Datenstufe keinen Tarif" in zeile["satz"]
 
 
 def test_gegenprobe_mit_tarif_in_der_stufe_bleibt_es_eine_messluecke():
@@ -150,7 +150,8 @@ def test_alternativen_in_anderen_stufen_bleiben_neben_dem_text_stehen():
 def test_erklaersatz_nennt_datenvolumen_und_leere_stufe_trotz_vieler_tarife():
     satz = geraete_stufen.TARIFSTUFEN_REGEL
     assert "Datenvolumen" in satz
-    assert "viele Tarife" in satz
+    assert "in GB" in satz
+    assert "nicht nach dem Namen" in satz
     assert "bleibt sie bei ihm leer" in satz
 
 
@@ -257,4 +258,4 @@ def test_seite_traegt_den_erklaersatz_der_regel(site):
     assert absatz is not None
     text = absatz.get_text(" ", strip=True)
     assert "Datenvolumen" in text
-    assert "bleibt sie bei ihm leer" in text
+    assert "nicht nach dem Namen" in text

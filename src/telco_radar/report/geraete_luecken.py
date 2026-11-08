@@ -232,7 +232,7 @@ def _fehlzeile(lu: dict, band_labels: dict, h: int, erfassung: dict) -> dict:
 
 
 def _ohne_tarif_zeile(lu: dict, band_labels: dict, h: int) -> dict:
-    """Der Anbieter hat in dieser Tarifstufe keinen Tarif (`geraete_stufen`),
+    """Der Anbieter hat in dieser Datenstufe keinen Tarif (`geraete_stufen`),
     anders als „Noch nicht erfasst“ ist das keine Messlücke. Preise desselben
     Geräts in anderen Stufen bleiben als Hinweis stehen."""
     kurz = KEIN_TARIF_KURZ
@@ -243,8 +243,8 @@ def _ohne_tarif_zeile(lu: dict, band_labels: dict, h: int) -> dict:
             f"{_alt_zeitraum(a.get('monate'), h)}"
             for a in lu["alternativ"]
         )
-        kurz += f" · in anderen Stufen: {alt}"
-        satz += f". In anderen Stufen: {alt}"
+        kurz += f" · in anderen Datenstufen: {alt}"
+        satz += f". In anderen Datenstufen: {alt}"
     return _zeile(lu, kurz, satz + ".") | {"grund": "stufe-ohne-tarif"}
 
 

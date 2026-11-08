@@ -20,13 +20,14 @@ für einen Anbieter ohne einen einzigen Tarif in irgendeiner Stufe.
 from __future__ import annotations
 
 TARIFSTUFEN_REGEL = (
-    "Die Tarifstufen XS bis XL teilen alle Tarife nach ihrem Datenvolumen ein, "
-    "Maßstab sind die Vodafone-Stufen. Fällt kein Tarif eines Anbieters in eine "
-    "Stufe, bleibt sie bei ihm leer, auch wenn er viele Tarife hat."
+    "Die Stufen XS bis XL richten sich nach dem Datenvolumen in GB (Maßstab sind "
+    "die Vodafone-Stufen), nicht nach dem Namen, den ein Anbieter seinem Tarif "
+    "gibt: ein Tarif namens „S“ kann deshalb in M stehen. Fällt kein Tarif eines "
+    "Anbieters in eine Stufe, bleibt sie bei ihm leer."
 )
 FESTNETZ = "festnetz"
-KEIN_TARIF_KURZ = "Hat in dieser Tarifstufe keinen Tarif"
-KEIN_TARIF_SATZ = "{anbieter} hat in dieser Tarifstufe keinen Tarif"
+KEIN_TARIF_KURZ = "Kein Tarif in dieser Datenstufe"
+KEIN_TARIF_SATZ = "{anbieter} hat in dieser Datenstufe keinen Tarif"
 
 
 def tarife_je_stufe(
