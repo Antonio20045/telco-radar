@@ -95,6 +95,7 @@ class Anbieter:
     user_agent: str = ""
     einstiege: list = field(default_factory=list)
     klick_einstiege: list = field(default_factory=list)
+    zusatz_varianten: list = field(default_factory=list)
 
     @property
     def schluessel(self) -> str:
@@ -379,6 +380,9 @@ def lade_quellen(root: Path) -> QuellenConfig:
                 user_agent=str(a.get("user_agent") or "").strip(),
                 einstiege=einstiege,
                 klick_einstiege=[e for e in alle if e.kind == "klick"],
+                zusatz_varianten=[
+                    v for v in (a.get("zusatz_varianten") or []) if isinstance(v, dict)
+                ],
             )
         )
     return QuellenConfig(anbieter=out)

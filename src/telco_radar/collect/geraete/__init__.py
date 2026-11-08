@@ -744,16 +744,16 @@ def _vertiefe(
 
     Wirft nie: was die Vertiefung nicht schafft, fehlt als Zusatz, die
     Katalogsaetze bleiben. Ein Abbruch an der Frist steht in
-    `bilanz.gedeckelt` und im Protokoll - er ist eine benannte Luecke, kein
-    stiller Rest.
+    `bilanz.gedeckelt` und im Protokoll - eine benannte Luecke, kein stiller Rest.
     """
     zaehler: dict = {}
 
     def weiter() -> bool:
         return frist_bis is None or time.monotonic() <= frist_bis
 
+    zv = anbieter.zusatz_varianten
     try:
-        tief = adapter.vertiefe_buendel(hole_text, gemappt, weiter, zaehler) or []
+        tief = adapter.vertiefe_buendel(hole_text, gemappt, weiter, zaehler, zv) or []
     except Exception as exc:  # noqa: BLE001
         log.warning(
             "%s: Buendel-Vertiefung gescheitert (%s: %s)",

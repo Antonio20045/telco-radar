@@ -233,9 +233,10 @@ def test_echte_config_fuehrt_congstar_iphone_17_pro_als_belegte_luecke():
     """05.11.2026: congstar leitet die 17-Pro-Seite auf die Übersicht um, das
     Gerät fehlt in der Geräteliste (kein „nicht mehr“: seit wann ist nicht belegt).
     08.11.2026: dieselbe Übersicht führt auch das 17 Pro Max nicht mehr (Lauf
-    42356867331, 07.11., war deshalb rot). Beide Lücken stehen mit Grund in
-    der echten Config, und nur diese zwei: kein ganzer Anbieter, kein
-    anderes Modell."""
+    42356867331, 07.11., war deshalb rot) und Apple iPhone Duo kam dazu
+    (Soft-404, ebenfalls nicht in der Geräteliste). Alle drei Lücken stehen
+    mit Grund in der echten Config, und nur diese drei: kein ganzer
+    Anbieter, kein anderes Modell."""
     pflicht = lade_pflicht(ECHTE_CONFIG)
     assert "apple-iphone-17-pro" in pflicht["modelle"]
     assert "apple-iphone-17-pro-max" in pflicht["modelle"]
@@ -247,9 +248,14 @@ def test_echte_config_fuehrt_congstar_iphone_17_pro_als_belegte_luecke():
         "nicht mehr in der Geräteliste"
         in pflicht["luecken"][("congstar", "apple-iphone-17-pro-max")]
     )
+    assert (
+        "nicht in der Geräteliste"
+        in pflicht["luecken"][("congstar", "apple-iphone-duo")]
+    )
     assert sorted(k for k in pflicht["luecken"] if k[0] == "congstar") == [
         ("congstar", "apple-iphone-17-pro"),
         ("congstar", "apple-iphone-17-pro-max"),
+        ("congstar", "apple-iphone-duo"),
     ]
 
 
@@ -411,8 +417,8 @@ def test_waechterskript_meldet_ueberholte_ausnahme_als_warning(tmp_path, capsys)
 
 
 def test_kommt_das_iphone_17_pro_bei_congstar_zurueck_warnt_die_echte_config():
-    """Nur das 17 Pro kommt zurück (Bündel vorhanden), das 17 Pro Max bleibt
-    weg - isoliert die Warnung auf die Lücke, die wirklich überholt ist."""
+    """17 Pro und Duo kommen zurück (Bündel vorhanden), das 17 Pro Max bleibt
+    weg - isoliert die Warnungen auf die Lücken, die wirklich überholt sind."""
     pflicht = lade_pflicht(ECHTE_CONFIG)
     nur_congstar = {**pflicht, "anbieter": ["congstar"]}
     buendel = _buendel_aller_pflichtmodelle(
@@ -421,7 +427,11 @@ def test_kommt_das_iphone_17_pro_bei_congstar_zurueck_warnt_die_echte_config():
     ergebnis = pruefe({"updated": TAG, "buendel": buendel}, [], nur_congstar)
     assert ergebnis.befunde == []
     assert [(w.anbieter, w.art) for w in ergebnis.warnungen] == [
-        ("congstar", "luecke_ueberholt")
+        ("congstar", "luecke_ueberholt"),
+        ("congstar", "luecke_ueberholt"),
     ]
-    assert "apple-iphone-17-pro" in ergebnis.warnungen[0].text
-    assert "apple-iphone-17-pro-max" not in ergebnis.warnungen[0].text
+    texte = {w.text for w in ergebnis.warnungen}
+    assert any(
+        "apple-iphone-17-pro" in t and "apple-iphone-17-pro-max" not in t for t in texte
+    )
+    assert any("apple-iphone-duo" in t for t in texte)
