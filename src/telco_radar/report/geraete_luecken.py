@@ -317,7 +317,8 @@ def ohne_tafelzeile(fehlen: list[dict], zeilen: list[dict]) -> list[dict]:
     die steht selbst da und nennt ihren Zustand. Sichtbar ist eine Bündelzeile
     nach derselben Regel wie in app.js (`stelleZeilen`). Eine belegte Lücke
     („nicht im Sortiment“) betrifft das Neugerät, eine Aufarbeitung ersetzt sie
-    nicht."""
+    nicht, und ein von der Lücke überholter Preis (`nicht_im_sortiment`, nur noch
+    „veraltet 17“ ohne Grund und Prüfdatum) auch nicht."""
 
     def sichtbar(z: dict, band: str, lz: str) -> bool:
         return z.get("band") in (None, band) and (
@@ -330,7 +331,13 @@ def ohne_tafelzeile(fehlen: list[dict], zeilen: list[dict]) -> list[dict]:
         if not any(
             z.get("anbieter") == f["anbieter"]
             and sichtbar(z, f["band"], f["laufzeit"])
-            and (f.get("grund") != "belegt" or z.get("zustand") in (None, "", "neu"))
+            and (
+                f.get("grund") != "belegt"
+                or (
+                    z.get("zustand") in (None, "", "neu")
+                    and not z.get("nicht_im_sortiment")
+                )
+            )
             for z in zeilen
         )
     ]
