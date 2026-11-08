@@ -266,7 +266,7 @@ def fehlzeilen(
     belegt = belegt or {}
     return [
         _zeile(lu, belegt[lu["anbieter"]]["kurz"], belegt[lu["anbieter"]]["satz"])
-        | {"grund": "belegt"}
+        | {"grund": "belegt", "detail": belegt[lu["anbieter"]].get("detail", "")}
         if lu["anbieter"] in belegt
         else _fehlzeile(lu, band_labels, h, erfassung or {})
         for lu in luecken

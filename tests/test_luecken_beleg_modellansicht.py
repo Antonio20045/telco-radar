@@ -20,7 +20,11 @@ from telco_radar.report.geraete_luecken import (
 )
 from telco_radar.report.geraete_luecken_beleg import fuer_modell
 from telco_radar.report.geraete_sortiment import VERMERK, markiere_mit
-from telco_radar.report.geraete_zeitreihe_legende import legende_html, ueberholt_html
+from telco_radar.report.geraete_zeitreihe_legende import (
+    legende_html,
+    ohne_alte,
+    ueberholt_html,
+)
 
 CONFIG = Path(__file__).resolve().parents[1] / "config" / "geraete_abdeckung.yaml"
 HEUTE = "2026-11-09"
@@ -55,6 +59,18 @@ def test_o2_speicherluecke_nennt_grund_und_pruefdatum():
     assert "Speicherstufe bei o2 nicht im Sortiment" in zeilen["o2"]["satz"]
     assert "Geprüft 08.11.2026, gültig bis 22.11.2026" in zeilen["o2"]["satz"]
     assert zeilen["Telekom"]["kurz"] == NOCH_NICHT_ERFASST
+
+
+def test_der_grund_steht_als_sichtbarer_kurztext_in_der_zeile():
+    """Auf dem Telefon gibt es kein Tooltip: `detail` ist der Grund als Text, bei
+    o2 ohne die Wiederholung „nicht im Sortiment (geprüft …)“."""
+    o2 = _fehlzeilen(_modell("apple-iphone-air", 512, []), _belege())["o2"]
+    assert o2["detail"] == "der Speicher-Wähler der Produktseite zeigt nur 256 GB"
+    cs = _fehlzeilen(_modell("apple-iphone-17-pro-max", 512, []), _belege())
+    assert cs["congstar"]["detail"].startswith(
+        "Gerät ist nicht mehr in der Geräteliste"
+    )
+    assert "Geprüft" not in cs["congstar"]["detail"]
 
 
 def test_gegenprobe_die_gefuehrte_stufe_ist_keine_luecke():
@@ -185,3 +201,13 @@ def test_ein_ueberholter_preis_ersetzt_die_fehlzeile_nicht():
         }
     ]
     assert ohne_tafelzeile(fehlt, ueberholt) == fehlt
+
+
+def test_rechenweg_vorlagen_ueberholter_anbieter_fallen_weg():
+    """Ohne Reihe sind die verdeckten Vorlagen nicht erreichbar, trügen aber die
+    alte Zahl im HTML; wer eine Reihe hat oder keine Lücke, behält sie."""
+    modell = {"belegte_luecken": {"congstar": {"kurz": "x"}}}
+    mess = {"congstar": {"2026-11-06": {}}, "o2": {"2026-11-06": {}}}
+    assert list(ohne_alte(modell, mess, serien={})) == ["o2"]
+    assert list(ohne_alte(modell, mess, serien={"congstar": [1]})) == ["congstar", "o2"]
+    assert list(ohne_alte({}, mess, serien={})) == ["congstar", "o2"]
