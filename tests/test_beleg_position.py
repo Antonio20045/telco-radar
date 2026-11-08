@@ -258,3 +258,11 @@ def test_beleg_mit_abweichendem_geraet_oder_tarif_wird_abgelehnt(abweichung):
     fuer = zeilen.zeilenbeleg_fuer({ID_O2: _beleg()})
     assert fuer(_karte(**abweichung)) is None
     assert fuer(_karte()) is not None
+
+
+def test_bestand_ohne_datei_hat_keine_saetze_ein_kaputter_ist_ein_fehler(tmp_path):
+    datei = tmp_path / "geraete_tco.json"
+    assert schluessel.lies_buendel(datei) == []
+    datei.write_text("{kaputt", encoding="utf-8")
+    with pytest.raises(ValueError, match="geraete_tco.json"):
+        schluessel.lies_buendel(datei)

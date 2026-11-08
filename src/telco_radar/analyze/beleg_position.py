@@ -77,8 +77,10 @@ def position_des_bildes(saetze: Iterable[dict[str, Any]], bildtag: str) -> Bildp
 
 
 def lies_buendel(datei: Path) -> list[dict[str, Any]]:
-    """Die Bündelsätze aus ``geraete_tco.json``; ``ValueError``, wenn unlesbar."""
+    """Die Bündelsätze aus ``geraete_tco.json``; ohne Datei keine, kaputt: Fehler."""
     try:
         return json.loads(datei.read_text(encoding="utf-8"))["buendel"]
+    except FileNotFoundError:
+        return []
     except (OSError, ValueError, KeyError, TypeError) as fehler:
         raise ValueError(f"{datei.name}: {fehler}") from fehler
