@@ -359,6 +359,67 @@ def test_der_block_zeigt_das_mal_muster_und_die_summe():
     assert "TCO-24" not in html
 
 
+TELEKOM_DUO_XS = dict(
+    O2_MESSUNG,
+    id="buendel--telekom--apple-iphone-duo-256gb--magentamobil-xs",
+    datum="2026-11-07",
+    tarif_id=None,
+    tarif_monatlich=29.95,
+    geraet_zuzahlung=399.0,
+    geraet_monatsrate=51.10,
+    laufzeit_monate=36,
+    anschlusspreis=39.95,
+)
+"""Telekom iPhone Duo 256 GB, Band XS, 36 Raten (Live-Abnahme 08.11.2026, Punkt 2)."""
+
+
+def test_36_raten_rechnen_24_tarifmonate_und_sagen_es_im_rechenweg():
+    """Live-Befund 08.11.2026: „Tarif 24 × 29,95 € = 718,80 €“ unter „Kosten über
+    36 Monate“ las sich wie ein Rechenfehler. Die Rechnung ist die dokumentierte
+    (Datenkonzept Geräte 5.3, Antonio 10.10.2026): 399,00 + 39,95 + 24 × 29,95 +
+    36 × 51,10 = 2.997,35 €. Falsch war die Beschriftung: der Rechenweg muss sagen,
+    dass Monat 25 bis 36 nur die Rate zählt und der Tarif danach kündbar ist."""
+    m = _messung(TELEKOM_DUO_XS, anbieter="Telekom", tarif="MagentaMobil XS")
+    r = zr._rechung(m)
+    assert r["gesamt"] == 2997.35 and r["monate"] == 36
+    assert round(399.0 + 39.95 + 24 * 29.95 + 36 * 51.10, 2) == 2997.35
+    tarif = next(p for p in r["posten"] if p["label"] == "Tarif")
+    assert (tarif["anzahl"], tarif["betrag"]) == (24, 718.8)
+    assert "Der Tarif zählt nur 24 Monate" in r["hinweis"]
+    assert "Monat 25 bis 36 zählt nur die Geräterate" in r["hinweis"]
+    assert "monatlich kündbar" in r["hinweis"]
+    html = zr._rechung_html("Telekom", m)
+    text = BeautifulSoup(html, "html.parser").get_text(" ")
+    assert "24 × 29,95 €" in html and "Kosten über 36 Monate" in html
+    assert "Der Tarif zählt nur 24 Monate" in text
+    assert "ab Monat 25 zusätzlich den Tarifpreis" in text
+
+
+def test_ohne_laengere_raten_als_tarif_steht_kein_hinweis():
+    """Gegenprobe: bei 24 Raten (Leitzahl „Kosten über 24 Monate“, unverändert
+    892,75 €) und beim 1&1-Vertrag gibt es nichts zu erklären; der Hinweis
+    erscheint nur dort, wo die Raten den Tarif überdauern."""
+    kurz = _messung(dict(O2_MESSUNG, laufzeit_monate=24))
+    r = zr._rechung(kurz, O2_TARIFE)
+    assert r["gesamt"] == 892.75 and r["hinweis"] == ""
+    assert "gr-zr-roffen" not in zr._rechung_html("o2", kurz, O2_TARIFE)
+    eins = _messung(EINS_EINS_MESSUNG, anbieter="1&1", tarif="1&1 All-Net-Flat S")
+    assert zr._rechung(eins)["hinweis"] == ""
+    assert "gr-zr-roffen" in zr._rechung_html("o2", _messung(O2_MESSUNG), O2_TARIFE)
+
+
+def test_der_rechenschaftssatz_der_36er_ansicht_nennt_die_24_tarifmonate():
+    """Die „So gerechnet“-Zeile der 36er-Ansicht sagte „Alles über 36 Monate:
+    Anzahlung, Tarif, …“; die 24er-Ansicht bleibt wortgleich."""
+    zeile = [{"anbieter": "Telekom", "quelle_url": "", "abgerufen_am": ""}]
+    assert "Alles über 24 Monate: Anzahlung, Tarif, alle" in zr._rechnung_html(
+        zeile, 24
+    )
+    satz = zr._rechnung_html(zeile, 36)
+    assert "Alles über 36 Monate: Anzahlung, Tarif nur 24 Monate" in satz
+    assert "monatlich kündbar" in satz
+
+
 def test_jeder_posten_traegt_seinen_anteil_als_balken():
     """Sicht-A2: „nicht nur Zeilen" - je Posten ein Balken in der Breite
     seines Anteils an der Summe. Die Breite ist eine fertige Prozent-
