@@ -3921,6 +3921,8 @@ td .gr-sprung,td .gr-ksprung{display:inline-block;margin-top:3px}
 .gr-zr-legende span{display:inline-flex;align-items:center;gap:6px;
   white-space:nowrap}
 .gr-zr-legende i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.gr-zr-legende .gr-zr-leg-ueberholt{white-space:normal;max-width:100%;
+  min-width:0;line-height:1.3}
 .gr-zr-leg-ab{color:var(--ink-4);font-weight:600}
 .gr-zr-bild{margin:2px 0 4px}
 /* SPEZIFITAET: die Umschalt-Regeln muessen DIESELBE Spezifitaet tragen wie
@@ -5798,6 +5800,9 @@ html:not([data-art="geraet"]) .gx-held .gx-art--tarif,html[data-art="geraet"] .g
 #gr-bnd-gruppe .gr-anb-fehlt .gr-bnd-name{display:inline-flex;align-items:center;gap:7px;font-weight:500;color:var(--ink-2)}
 #gr-bnd-gruppe .gr-anb-fehlt .gr-bnd-name::before{content:"";width:9px;height:9px;border-radius:50%;border:2px solid var(--anb);background:transparent}
 #gr-bnd-gruppe .gr-anb-fehlt-zustand{font:inherit;color:var(--ink-4)}
+#gr-bnd-gruppe .gr-anb-fehlt{flex-wrap:wrap;max-width:100%}
+.gr-anb-fehlt-detail{flex:0 0 100%;grid-column:1/-1;min-width:0;font-family:var(--sans);
+  font-size:12px;line-height:1.35;color:var(--ink-3);overflow-wrap:anywhere}
 .gx-alle{margin:clamp(56px,10vh,110px) 0 0}
 .gx-alle .gr-kansicht,.gx-alle .gr-leit--katalog{display:none}
 .gx-alle .rubrik{font:400 clamp(18px,1.5vw,21px)/1.15 var(--zeitung);letter-spacing:-.01em;text-transform:none;border-bottom:1px solid var(--rule);padding-bottom:14px}
