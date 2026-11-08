@@ -39,6 +39,7 @@ SOLL = {
     "1&1": 0.0,
     "Saturn/MediaMarkt · o2-Netz": 5.95,
     "Saturn/MediaMarkt · Telekom-Netz": 5.95,
+    "Saturn/MediaMarkt · Vodafone-Netz": 5.95,
 }
 
 
@@ -218,17 +219,28 @@ def test_gerenderte_zeile_nennt_den_unbelegten_versand(tmp_path, monkeypatch):
     assert "nicht belegt – mit 0 €" not in vorlage_text(seite)
 
 
-def test_versand_vodafone_netz_ist_benannte_luecke_nicht_null():
-    """Kein Beleg fuer das Vodafone-Netz (Fixtures/Screenshots nur o2 und
-    Telekom): kein Eintrag, also "nicht belegt" statt 0 EUR."""
-    angabe = versandkosten.versand_fuer("Saturn/MediaMarkt · Vodafone-Netz")
-    assert angabe.betrag is None
-    assert (
-        versandkosten.hinweis_unbelegt("Saturn/MediaMarkt · Vodafone-Netz")
-        == "Versand bei Saturn/MediaMarkt · Vodafone-Netz nicht belegt"
+def test_versand_vodafone_netz_ist_belegt_gegen_die_fixture():
+    """Vodafone-Netz am 08.11.2026 an der Preisuebersicht gemessen (Screenshot 04,
+    Fixture): derselbe Betrag wie die Schnittstelle nennt, kein Sonderfall im Code."""
+    import json
+    from pathlib import Path
+
+    fixture = json.loads(
+        (
+            Path(__file__).parent
+            / "fixtures/geraete"
+            / "tarifwelt_mm_productdetail_iphone17_vodafone_mobil_m_20261108.json"
+        ).read_text("utf-8")
     )
-    assert versandkosten.versand_fuer("Saturn/MediaMarkt · o2-Netz").betrag == 5.95
-    assert versandkosten.versand_fuer("Saturn/MediaMarkt · Telekom-Netz").betrag == 5.95
+    posten = {
+        p["label"]: p["amount"] for p in fixture["costs"]["oneTimeCosts"]["items"]
+    }
+    assert posten["Versandkosten"] == 5.95
+    angabe = versandkosten.versand_fuer("Saturn/MediaMarkt · Vodafone-Netz")
+    assert angabe.betrag == posten["Versandkosten"]
     k = kosten_ueber(_buendel("Saturn/MediaMarkt · Vodafone-Netz"))
-    assert POSTEN_VERSAND not in k.posten
-    assert k.hinweise == ["Versand bei Saturn/MediaMarkt · Vodafone-Netz nicht belegt"]
+    assert k.posten[POSTEN_VERSAND] == 5.95
+    assert k.hinweise == []
+    assert (
+        versandkosten.versand_fuer("Saturn/MediaMarkt · Fantasie-Netz").betrag is None
+    )

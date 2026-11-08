@@ -178,7 +178,8 @@ def test_anbieter_zeile_unbekanntes_netz_ist_luecke():
 def test_versandkosten_centgenau_gegen_die_fixtures():
     """Der Versand (5,95 EUR) steht zentral in versandkosten.yaml (Clean Code
     1), nicht in diesem Parser - hier die Gegenprobe gegen dieselben zwei
-    Netze, die die Fixtures oben belegen."""
+    Netze, die die Fixtures oben belegen, plus das Vodafone-Netz (Messung
+    08.11.2026 an der Preisuebersicht)."""
     from telco_radar import versandkosten
 
     vorher = versandkosten._TABELLE
@@ -191,7 +192,7 @@ def test_versandkosten_centgenau_gegen_die_fixtures():
         )
         assert (
             versandkosten.versand_fuer("Saturn/MediaMarkt · Vodafone-Netz").betrag
-            is None
+            == 5.95
         )
     finally:
         versandkosten._TABELLE = vorher

@@ -19,17 +19,46 @@ pflicht_anbieter:
 
 # Pflichtanbieter, die erst gelten, wenn ihre Quelle in
 # `config/geraete_quellen.yaml` `aktiv: true` trägt (Schlüssel = Name der Quelle,
-# Werte = Anbieterzeilen der Bündel). Solange die Quelle `aktiv: false` ist,
-# misst der Wächter sie nicht; mit dem Aktivschalten gelten sie wie jeder
-# Pflichtanbieter (Modelle unten, belegte Lücken mit Grund). Saturn/MediaMarkt
-# mit Tarif (Tarifwelt): je Netz eine Zeile. Vorab zu beachten (Probelauf
-# 08.11.2026): einzelne Netze führen manche Pflichtmodelle nicht - das braucht
-# beim Aktivschalten belegte Lücken je Netz und Modell, nicht eine Lockerung.
+# Werte = Anbieterzeilen der Bündel). Ist die Quelle `aktiv: false`, misst der
+# Wächter sie nicht; sonst gelten sie wie jeder Pflichtanbieter (Modelle unten,
+# belegte Lücken mit Grund). Saturn/MediaMarkt mit Tarif (Tarifwelt), aktiv seit
+# 08.11.2026: je Netz eine Zeile. Probelauf 08.11.2026: 214 von 450 Netz-Band-
+# Zellen gefüllt; für den Wächter zählt nur, ob ein Netz ein Pflichtmodell
+# überhaupt führt (zwei Paare, belegte Lücken unten). Band-Lücken sind kein
+# Wächter-Thema (Seite: "Noch nicht erfasst").
 pflicht_anbieter_wenn_aktiv:
   "MediaMarkt/Saturn Tarifwelt":
     - "Saturn/MediaMarkt · Telekom-Netz"
     - "Saturn/MediaMarkt · Vodafone-Netz"
     - "Saturn/MediaMarkt · o2-Netz"
+
+# Welche Pflichtmodelle der Wächter für die Zeilen einer vorbereiteten Quelle
+# prüft: genau die, die ihr Leser erfasst (`MODELL_SLUGS` in
+# `collect/geraete/tarifwelt_lauf.py`; Test: Gleichheit beider Listen). Gilt nur
+# für die Zeilen oben, nie für `pflicht_anbieter` - die Netzbetreiber werden
+# immer gegen alle `pflicht_modelle` geprüft. Führt ein Netz ein Modell bei
+# Saturn/MediaMarkt nicht, steht das unten als belegte Lücke (Screenshot am
+# Original, höchstens 14 Tage), nicht hier.
+pflicht_modelle_wenn_aktiv:
+  "MediaMarkt/Saturn Tarifwelt":
+    - apple-iphone-18-pro
+    - apple-iphone-18-pro-max
+    - apple-iphone-17
+    - apple-iphone-17-pro
+    - apple-iphone-17-pro-max
+    - apple-iphone-17e
+    - apple-iphone-duo
+    - apple-iphone-air
+    - samsung-galaxy-s26
+    - samsung-galaxy-s26-plus
+    - samsung-galaxy-s26-ultra
+    - samsung-galaxy-z-fold8
+    - samsung-galaxy-z-flip8
+    - samsung-galaxy-a57
+    - google-pixel-11
+    - google-pixel-11-pro
+    - google-pixel-11-pro-xl
+    - google-pixel-10a
 
 # Anbieter, deren Pflichtmodelle zusätzlich je SPEICHERSTUFE geprüft werden:
 # führt ein anderer Pflichtanbieter am Messtag eine Stufe, die dieser
@@ -240,5 +269,32 @@ belegte_luecken:
     art: nicht_im_portfolio
     beleg: https://github.com/Antonio20045/telco-radar/blob/main/docs/belege/1und1-sortiment-0811/1-iphone15-nicht-mehr-verfuegbar.png
     original: https://www.1und1.de/iphone-15
+    geprueft: "2026-11-08"
+    bis: "2026-11-22"
+  # Saturn/MediaMarkt (Tarifwelt): zwei Pflichtmodelle haben bei einem Netz gar
+  # keinen Tarif. Belegt (08.11.2026, docs/belege/tarifwelt-0811/, Playwright,
+  # ehrliche Kennung, robots.txt beachtet, nichts im Warenkorb): der Dialog
+  # "Tarif ändern" der Produktseite zählt je Netzbetreiber die Tarife des
+  # Geräts. iPhone Duo: Telekom 00 (nur o2 und Vodafone, je ein Tarif). Galaxy
+  # Z Fold8: Telefónica/o2 00 (nur Telekom 02 und Vodafone 01). Der Tageslauf
+  # liest weiter; kommt ein Tarif zurück, warnt der Wächter "überholt". Alle
+  # übrigen leeren Zellen (Band nicht angeboten, Messlücke) sind kein Wächter-
+  # Thema und bleiben "Noch nicht erfasst" (arbeit/tarifwelt-0811.md).
+  - anbieter: "Saturn/MediaMarkt · Telekom-Netz"
+    modelle:
+      - apple-iphone-duo
+    grund: iPhone Duo ist bei Saturn/MediaMarkt mit Telekom-Tarif nicht im Sortiment; der Tarif-Dialog der Produktseite zeigt Telekom 00
+    art: nicht_im_portfolio
+    beleg: https://github.com/Antonio20045/telco-radar/blob/main/docs/belege/tarifwelt-0811/1-iphone-duo-ohne-telekom.png
+    original: https://tarife.mediamarkt.de/smartphones/apple/iphone-duo
+    geprueft: "2026-11-08"
+    bis: "2026-11-22"
+  - anbieter: "Saturn/MediaMarkt · o2-Netz"
+    modelle:
+      - samsung-galaxy-z-fold8
+    grund: Galaxy Z Fold8 ist bei Saturn/MediaMarkt mit o2-Tarif nicht im Sortiment; der Tarif-Dialog der Produktseite zeigt Telefónica 00
+    art: nicht_im_portfolio
+    beleg: https://github.com/Antonio20045/telco-radar/blob/main/docs/belege/tarifwelt-0811/2-galaxy-z-fold8-ohne-o2.png
+    original: https://tarife.mediamarkt.de/smartphones/samsung/galaxy-z-fold-8
     geprueft: "2026-11-08"
     bis: "2026-11-22"

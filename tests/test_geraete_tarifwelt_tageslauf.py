@@ -148,13 +148,13 @@ def test_buendel_der_tarifwelt_stehen_im_band_der_karten():
             )
 
 
-def test_stufe_ist_aus_solange_die_quelle_inaktiv_ist():
+def test_stufe_ist_aus_solange_die_quelle_inaktiv_ist_die_echte_config_ist_aktiv():
     hole, aufrufe = fixture_hole()
     quellen = _Quellen([_Quelle("mediamarkt_tarifwelt", aktiv=False)])
     e = geraete_tarifwelt.lauf(quellen, _vodafone_tarife(), hole, "2026-11-08")
     assert (e.status, e.buendel, aufrufe) == ("aus", [], [])
     echt = lade_quellen(WURZEL)
-    assert not geraete_tarifwelt.quelle_aktiv(echt), "Draft: Config bleibt aktiv: false"
+    assert geraete_tarifwelt.quelle_aktiv(echt)
     assert any(a.methode == "mediamarkt_tarifwelt" for a in echt.anbieter)
 
 

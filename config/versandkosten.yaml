@@ -60,13 +60,9 @@ anbieter:
     datum: "2026-11-08"
     screenshot: "telcoradar/abnahme/tarifwelt-0811/02_iphone17_telekom_magenta_m.png"
     hinweis: "Fixtures tests/fixtures/geraete/tarifwelt_mm_productdetail_iphone17_telekom_magenta_m_20261108.json und _galaxys26_standard_20261108.json (beide 5,95 EUR)"
-  # "Saturn/MediaMarkt · Vodafone-Netz" hat ABSICHTLICH keinen Eintrag (Stand
-  # 08.11.2026 06:30): Fixtures und Screenshots belegen den Versand nur fuer das
-  # o2- und das Telekom-Netz (je 5,95 EUR, `deliveryPrice` der Schnittstelle).
-  # Dass es im Vodafone-Netz derselbe Betrag ist, ist wahrscheinlich, aber nicht
-  # gemessen - also zaehlt der Versand dort nicht mit, und die Zeile traegt
-  # "Versand bei Saturn/MediaMarkt · Vodafone-Netz nicht belegt" (kein 0-Euro-Wert).
-  # Eintragen erst mit einer Messung: ein Tarif im Vodafone-Netz bis zur
-  # Kostenuebersicht (costs.oneTimeCosts, 'Versandkosten') mit Screenshot unter
-  # abnahme/tarifwelt-0811/ und Datum. Test: test_versandkosten.py
-  # (test_versand_vodafone_netz_ist_benannte_luecke_nicht_null).
+  "Saturn/MediaMarkt · Vodafone-Netz":
+    betrag: 5.95
+    quelle: "https://tarife.mediamarkt.de/smartphones/apple/iphone-17?storage=256&tfi=6a86e66a7f5200fe031c3ea7 (Preisuebersicht 'Versandkosten', iPhone 17, freenet - Vodafone Mobil M; gleiche Zahl in costs.oneTimeCosts.items der Schnittstelle)"
+    datum: "2026-11-08"
+    screenshot: "telcoradar/abnahme/tarifwelt-0811/04_iphone17_vodafone_mobil_m_preisuebersicht.png"
+    hinweis: "Preisuebersicht auf der Produktseite (Schaltflaeche 'Preisuebersicht anzeigen'), nichts im Warenkorb, nichts bestellt; Fixture tests/fixtures/geraete/tarifwelt_mm_productdetail_iphone17_vodafone_mobil_m_20261108.json"

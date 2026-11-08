@@ -1043,6 +1043,16 @@
       "absender": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)",
       "bytes_abgelegt": 299690,
       "sha256_roh": "98e8db992f3cb2b81ebbce5a75424293dc1efa902dc90e89ca14032c9640e3cf"
+    },
+    {
+      "datei": "tarifwelt_mm_productdetail_iphone17_vodafone_mobil_m_20261108.json",
+      "url": "https://tarife-api2.mediamarkt.de/v1/productdetail/iphone-17?storage=256&tfi=6a86e66a7f5200fe031c3ea7",
+      "abgerufen_am": "2026-11-08",
+      "http_status": 200,
+      "content_type": "application/json",
+      "absender": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)",
+      "bytes_abgelegt": 26156,
+      "sha256_roh": "05b8d3453559a5161395593131f6eee4c7340daeffe3f7250a5ae81a2d50eac3"
     }
   ]
 }

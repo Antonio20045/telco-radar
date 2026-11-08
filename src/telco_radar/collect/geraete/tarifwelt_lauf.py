@@ -29,6 +29,9 @@ Nie `/pks`, nie `/checkout`, keine Konten, kein Warenkorb.
 Basisseite in https://tarife.mediamarkt.de/sitemap.xml zu (Stand 08.11.2026);
 Seiten mit "-aktion" oder "-online-bonus" sind Aktionen und stehen nie darin.
 Tarifwahl: unbegrenzt (`dataVolume: 0`) ist `inf`, wie im Tarifbestand.
+Speicher: die Tarifwelt nennt 1 TB "1000 GB" (`KATALOG_SPEICHER`), der Katalog
+und die Speicherprüfung des Wächters 1024; in der SKU steht die Katalogstufe,
+in den Abrufen der Wert der Schnittstelle.
 """
 
 from __future__ import annotations
@@ -52,6 +55,7 @@ KENNUNG = "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
 PAUSE_SEKUNDEN = 2.0
 LAUFZEIT_MONATE = 24
 MAX_KANDIDATEN = 3
+KATALOG_SPEICHER = {1000: 1024, 2000: 2048}
 
 MODELL_SLUGS: dict[str, tuple[str, str, str, str]] = {
     "apple-iphone-18-pro": ("Apple", "iPhone 18 Pro", "apple", "iphone-18-pro"),
@@ -274,7 +278,9 @@ def lies_modell(
             }
             lauf.buendel.append(
                 Buendel(
-                    sku_id=sku_id(geraet, speicher, None),
+                    sku_id=sku_id(
+                        geraet, KATALOG_SPEICHER.get(speicher, speicher), None
+                    ),
                     anbieter=tarifwelt.anbieter_zeile(satz["netz"]) or "",
                     tarif_name=satz["tarif_name"] or satz["tarif_id"],
                     tarif_id=f"mediamarkt_tarifwelt:{satz['tarif_id']}",
