@@ -342,18 +342,16 @@ anbieter:
     # des sichtbaren Preises (wie im Auftrag zunaechst angenommen) ist
     # NICHT noetig.
     grund: >-
-      Noch nicht aktiv, Stand 08.11.2026: Leser und Auswahl sind gebaut und
-      gegen echte Fixtures getestet (collect/geraete/tarifwelt_lauf.py,
-      lokaler Probelauf nur dieses Adapters, arbeit/tarifwelt-0811.md
-      "Lauf 08.11. frueh"). Es fehlt die Einhaengung in den Tageslauf:
-      (1) die Tarife dieser Quelle (tarif_id "mediamarkt_tarifwelt:<id>")
-      stehen nicht im Tarifbestand data/state/tarife.jsonl, ohne den der
-      Bericht keinem Satz ein Tarifband zuordnet; (2) das Netz gilt JE ZEILE
-      (Anbieterzeile "Saturn/MediaMarkt · <Netz>-Netz"), das Buendelschema
-      kennt `netz` nur je Anbieter; (3) `lies` liefert bewusst keine
-      Geraeteliste, ein Einstieg fuer den Sammler existiert nicht. Aktiv
-      erst, wenn das im Tageslauf getestet ist - lieber inaktiv und
-      korrekt als aktiv und falsch.
+      Noch nicht aktiv (Draft-PR #50), Stand 08.11.2026: Leser, Auswahl und
+      Einhaengung sind gebaut und gegen echte Fixtures getestet
+      (collect/geraete/tarifwelt_lauf.py; Tageslauf: geraete_tarifwelt.stufe;
+      Band im Bericht ueber data/state/tarifwelt_tarife.json). Aktivschalten
+      ist nur dieser Wert (`aktiv: true`); dann gelten auch die drei
+      Netzzeilen als Pflichtanbieter (config/geraete_abdeckung.yaml,
+      `pflicht_anbieter_wenn_aktiv`). Offen davor: Versand im Vodafone-Netz
+      ist nicht gemessen (config/versandkosten.yaml, benannte Luecke), und
+      der Waechter braucht belegte Luecken fuer Pflichtmodelle, die ein Netz
+      nicht fuehrt (Probelauf 08.11.: 214 von 450 Zellen gefuellt).
     hinweis: >-
       Saturn/MediaMarkt verkaufen Geraet + Fremdtarif (o2, freenet im
       Telekom- und im Vodafone-Netz) ueber dieselbe Ceconomy-Plattform.
