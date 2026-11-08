@@ -11,8 +11,11 @@ Feste Daten, nie das heutige Datum (CLAUDE.md Regel 7).
 
 from __future__ import annotations
 
+import functools
+import http.server
 import json
 import shutil
+import threading
 from datetime import date
 from pathlib import Path
 from types import SimpleNamespace
@@ -58,12 +61,27 @@ def _folgebild(nr: int) -> Folgebild:
     return Folgebild("x", belegbau.png((nr * 50, 30, 30)))
 
 
+class Mitschnitt(AttrappeReleases):
+    """Die Attrappe, die zusätzlich die hochgeladenen Bytes je Dateiname behält."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.inhalte: dict[str, bytes] = {}
+
+    def hochladen(self, tag, dateien):
+        self.inhalte.update({d.name: d.read_bytes() for d in dateien})
+        super().hochladen(tag, dateien)
+
+
 @pytest.fixture(scope="module")
 def weg(tmp_path_factory):
+    return baue_weg(tmp_path_factory.mktemp("bildfolge_weg"))
+
+
+def baue_weg(ordner: Path) -> SimpleNamespace:
     """Der ganze Weg einmal: Erfassung, Artefakt, Trockenlauf der Veröffentlichung,
-    Manifest, Seite. Das Klick-Ergebnis der Fixture hat nicht alle Felder einer ganzen
-    Seite; es wird nach dem Manifest entfernt, damit es den Gerätelauf nicht stört."""
-    ordner = tmp_path_factory.mktemp("bildfolge_weg")
+    Manifest. Das Klick-Ergebnis der Fixture hat nicht alle Felder einer ganzen Seite;
+    es wird nach dem Manifest entfernt, damit es den Gerätelauf nicht stört."""
     folge = {"geraet_speicher": _folgebild(1), "laufzeit": _folgebild(3)}
     fertig, grund = baue_beleg(
         belegbau.quelle(
@@ -109,7 +127,7 @@ def weg(tmp_path_factory):
         "ausbeute",
         lambda daten, katalog: SimpleNamespace(rohsaetze=daten["roh"]),
     )
-    gh = AttrappeReleases()
+    gh = Mitschnitt()
     try:
         code = modul.main(
             ["--root", str(wurzel_pub), "--quelle", str(artefakt.parent)]
@@ -142,9 +160,11 @@ def weg(tmp_path_factory):
     )
 
 
-def _seite(wurzel: Path, site: Path, manifest: dict, beleg_id: str) -> BeautifulSoup:
-    """Baut ``geraete.html`` mit diesem Manifest; o2 hat die Position des Belegs."""
-    state = wurzel / "data" / "state"
+def baue_seite(ordner: Path, manifest: dict, beleg_id: str) -> Path:
+    """Baut die Seite frisch in ``ordner`` mit diesem Manifest; o2 hat die Position
+    des Belegs. Gibt den Seitenordner zurück."""
+    site = kopf._baue(ordner)
+    state = site.parent / "data" / "state"
     bestand = json.loads((state / "geraete_tco.json").read_text(encoding="utf-8"))
     vodafone = [b for b in bestand["buendel"] if b["anbieter"] == "Vodafone"]
     o2 = pos._satz("o2", "O2 Mobile Klein", "o2:klein", 24, 18.0, beleg_id)
@@ -153,7 +173,12 @@ def _seite(wurzel: Path, site: Path, manifest: dict, beleg_id: str) -> Beautiful
         encoding="utf-8",
     )
     (state / MANIFEST_NAME).write_text(json.dumps(manifest), encoding="utf-8")
-    render_site(site, wurzel / "data" / "reports")
+    render_site(site, site.parent / "data" / "reports")
+    return site
+
+
+def _seite(ordner: Path, manifest: dict, beleg_id: str) -> BeautifulSoup:
+    site = baue_seite(ordner, manifest, beleg_id)
     return BeautifulSoup(
         (site / "geraete.html").read_text(encoding="utf-8"), "html.parser"
     )
@@ -167,8 +192,15 @@ def _zeile(seite: BeautifulSoup):
 
 
 @pytest.fixture(scope="module")
-def seite(weg) -> BeautifulSoup:
-    return _seite(weg.wurzel, weg.site, weg.manifest, weg.beleg_id)
+def seitenordner(weg, tmp_path_factory) -> Path:
+    return baue_seite(tmp_path_factory.mktemp("seite"), weg.manifest, weg.beleg_id)
+
+
+@pytest.fixture(scope="module")
+def seite(seitenordner) -> BeautifulSoup:
+    return BeautifulSoup(
+        (seitenordner / "geraete.html").read_text(encoding="utf-8"), "html.parser"
+    )
 
 
 def test_folgebilder_gehen_mit_dem_einzelbild_in_dasselbe_release(weg):
@@ -225,7 +257,9 @@ def test_seite_zeigt_drei_bilder_in_reihenfolge_und_den_fehlenden_schritt(weg, s
     assert len(zeile.select("img")) == 3
 
 
-def test_nicht_veroeffentlichte_datei_ergibt_kein_bild_sondern_den_vermerk(weg):
+def test_nicht_veroeffentlichte_datei_ergibt_kein_bild_sondern_den_vermerk(
+    weg, tmp_path
+):
     """Die Klick-Ergebnisse kennen den Schritt, der Release nicht: kein Link."""
     stand = {t: list(d) for t, d in weg.gh.stand.items()}
     laufzeit = folge_dateiname(pos.MODELL, "o2", TAG, "laufzeit", weg.beleg_id)
@@ -237,14 +271,16 @@ def test_nicht_veroeffentlichte_datei_ergibt_kein_bild_sondern_den_vermerk(weg):
         f"tarif: {GRUND}",
         "laufzeit: Bild nicht veröffentlicht",
     ]
-    seite = _seite(weg.wurzel, weg.site, manifest, weg.beleg_id)
+    seite = _seite(tmp_path, manifest, weg.beleg_id)
     zeile = _zeile(seite)
     assert len(zeile.select("img")) == 2
     assert not any(laufzeit in (i.get("data-src") or "") for i in zeile.select("img"))
     assert "Kein Bild: Bild nicht veröffentlicht" in zeile.get_text(" ", strip=True)
 
 
-def test_alter_eintrag_mit_dateinamen_statt_adressen_zeigt_nur_das_einzelbild(weg):
+def test_alter_eintrag_mit_dateinamen_statt_adressen_zeigt_nur_das_einzelbild(
+    weg, tmp_path
+):
     """Der Fehler von #70: ``<beleg_id>_<schritt>.webp`` neben dem Einzelbild gab
     Links auf Anhänge, die es nie gab. Ein Name ohne Adresse fällt weg."""
     manifest = json.loads(json.dumps(weg.manifest))
@@ -253,7 +289,7 @@ def test_alter_eintrag_mit_dateinamen_statt_adressen_zeigt_nur_das_einzelbild(we
         for s in ("geraet_speicher", "tarif", "laufzeit")
     ]
     manifest["belege"][0]["bildfolge_fehlt"] = []
-    seite = _seite(weg.wurzel, weg.site, manifest, weg.beleg_id)
+    seite = _seite(tmp_path, manifest, weg.beleg_id)
     zeile = _zeile(seite)
     assert not zeile.select(".gr-bildfolge")
     assert [i["data-src"] for i in zeile.select("img")] == [
@@ -345,3 +381,52 @@ def test_artefakt_traegt_nur_geschriebene_folgebilder(weg):
         ]
     )
     assert shutil.disk_usage(weg.ordner).free > 0
+
+
+@pytest.mark.browser
+def test_folge_im_browser_ohne_querscrollen_mit_den_veroeffentlichten_bildern(
+    weg, seitenordner, chromium
+):
+    """Im echten Chromium bei 1440 und 390 px: aufklappen, drei Bilder laden (die
+    Adressen liefert die Fixture mit den hochgeladenen Bytes), der Lückenvermerk
+    steht da, die Seite scrollt nicht quer."""
+    handler = functools.partial(
+        http.server.SimpleHTTPRequestHandler, directory=str(seitenordner)
+    )
+    httpd = http.server.ThreadingHTTPServer(("127.0.0.1", 0), handler)
+    threading.Thread(target=httpd.serve_forever, daemon=True).start()
+
+    def liefere(route):
+        name = route.request.url.rsplit("/", 1)[1]
+        route.fulfill(body=weg.gh.inhalte[name], content_type="image/webp")
+
+    try:
+        for breite in (1440, 390):
+            ctx = chromium.new_context(viewport={"width": breite, "height": 900})
+            try:
+                ctx.route("https://github.com/**", liefere)
+                s = ctx.new_page()
+                meldungen: list[str] = []
+                s.on("console", lambda m, k=meldungen: k.append(m.text))
+                s.on("pageerror", lambda e, k=meldungen: k.append(str(e)))
+                port = httpd.server_address[1]
+                s.goto(f"http://127.0.0.1:{port}/geraete.html")
+                s.click("#gr-zr-laufzeiten button[data-lz='24']")
+                s.locator("#gr-bnd-gruppe .gr-beleg-zeile summary").first.click()
+                s.wait_for_function(
+                    "[...document.querySelectorAll('.gr-bildfolge img')]"
+                    ".every(i => i.hasAttribute('src'))"
+                )
+                geladen = s.evaluate(
+                    "[...document.querySelectorAll('.gr-bildfolge img')]"
+                    ".filter(i => i.complete && i.naturalWidth > 0).length"
+                )
+                assert geladen == 3, breite
+                luecke = s.locator(".gr-bildfolge-luecke .gr-bildfolge-text")
+                assert luecke.inner_text() == f"Kein Bild: {GRUND}"
+                assert s.evaluate("document.documentElement.scrollWidth") <= breite
+                assert meldungen == [], breite
+            finally:
+                ctx.close()
+    finally:
+        httpd.shutdown()
