@@ -2694,11 +2694,12 @@ var TelcoFrage = (function () {
     var fertig = function (knotenB, fehler) {
       gruppeLeeren(gruppe);
       /* Die Bündelliste ist weg (Antonio, 10.10.2026): vom Lager kommt nur
-         die Zeile der fehlenden Anbieter auf die Seite. */
+         die Zeile der fehlenden Anbieter und die Screenshot-Zeilen je Anbieter
+         (Ziel 1d) auf die Seite. */
       if (knotenB) {
         var klon = document.importNode(knotenB, true);
         Array.prototype.forEach.call(
-          klon.querySelectorAll('.gr-anb-fehlliste'),
+          klon.querySelectorAll('.gr-anb-fehlliste, .gr-beleg-paare'),
           function (f) { gruppe.appendChild(f); });
       } else if (fehler) {
         leerSatz(gruppe, 'Fehlende Anbieter nicht geladen.');
