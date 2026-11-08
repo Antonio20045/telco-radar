@@ -16,42 +16,33 @@
    (`gr-kk-marke--alt`, Text aus `alt_marke` - die Zahl steht in Python,
    nie in der Vorlage, Clean Code 8). `frisch` fehlt keiner Karte, die
    `modelle()` baut; `is defined` haelt den Rueckfall auf frisch. #}
-{# „Belege“: die Screenshots der Anbieterseite zu DIESEM Preis (Manifest
-   `belege_manifest.json`, `report/geraete_belege.py`). Schluessel ist
-   (Modell, Anbieter) der Preiszeile. Ohne Bild: nichts. Die Bilder laedt
-   app.js erst beim Aufklappen (`data-src`). #}
-{% macro belegeintrag(modell_id, anbieter) %}{% if belege_fuer is defined %}{% set bel = belege_fuer(modell_id, anbieter) %}{% if bel %}
-    <details class="gr-belege">
-      <summary>Belege ({{ bel | length }})</summary>
-      <ul class="gr-belege-liste">{% for b in bel %}
-        <li><a href="{{ b.url }}" rel="nofollow noopener" target="_blank"><img
-          data-src="{{ b.url }}" alt="Screenshot {{ anbieter }} vom {{ b.datum | date_de }}"
-          width="320" height="200"></a><span class="gr-belege-tag">{{ b.datum | date_de }}{% if b.gross %} · große Änderung{% endif %}</span></li>{% endfor %}
-      </ul>
-    </details>{% endif %}{% endif %}{% endmacro %}
-
-{# Beleg je PAAR (Modell, Anbieter), Ziel 1d: das Bild zeigt eine Konfiguration des
-   Paares, nicht jeden Tarif - maschinell ist nicht feststellbar, welche. Darum
-   steht der Hinweis EINMAL je Anbieter mit belastbarem Preis (ohne Bild: "kein Screenshot vorhanden", damit "kein Preis" von "kein Bild" unterscheidbar bleibt) UNTER den Fehl-Anbietern (sichtbar,
-   `app.js` übernimmt `.gr-beleg-paare` mit der Fehlliste) und an KEINER
-   Preiszeile. Das Bild öffnet in der Seite (kein Download: GitHub liefert das
-   Asset als Datei); `app.js` lädt es erst beim Aufklappen (`data-src`).
-   `paarbelege` rechnet in Python (`report/geraete_belege.py`). #}
-{% macro belegpaare(m) %}{% if paarbelege is defined %}{% set paare = paarbelege(m) %}{% if paare %}
-<ul class="gr-beleg-paare">{% for p in paare %}
-  <li><b class="gr-beleg-anbieter">{{ p.anbieter }}</b>{% if p.beleg %}
-    <details class="gr-belege gr-belege--paar">
-      <summary>Screenshot der Angebotsseite vom {{ p.beleg.datum | date_de }} (zeigt nicht jeden Tarif)</summary>
-      <img data-src="{{ p.beleg.url }}" alt="Screenshot der Angebotsseite {{ p.anbieter }} vom {{ p.beleg.datum | date_de }}" width="640" height="400">
-    </details>{% else %}
-    <span class="gr-beleg-fehlt">kein Screenshot vorhanden</span>{% endif %}{% if p.zeilen_gesamt is defined %}
-    <span class="gr-beleg-zeilen">{{ p.zeilen_mit }} von {{ p.zeilen_gesamt }} Preiszeilen mit eigenem Screenshot{% if p.zeilen_grund %} ({{ p.zeilen_grund }}){% endif %}</span>{% if p.zeilenbilder %}
-    <ul class="gr-beleg-zeilenliste">{% for z in p.zeilenbilder %}
-      <li><details class="gr-belege gr-belege--zeile">
-        <summary>Screenshot zu dieser Preiszeile vom {{ z.datum | date_de }}, Zuordnung über die Messung: {{ z.geraet }} · {{ z.tarif }}{% if z.raten_laufzeit %} · {{ z.raten_laufzeit }} Raten{% endif %} · {{ z.label }} {{ z.gesamt | euro }}</summary>
-        <img data-src="{{ z.url }}" alt="Screenshot {{ p.anbieter }}, {{ z.tarif }}, vom {{ z.datum | date_de }}" width="640" height="400">
-      </details></li>{% endfor %}
-    </ul>{% endif %}{% endif %}</li>{% endfor %}
+{# Belege (Screenshots) folgen der gewaehlten Kombination Geraet x Speicher x
+   Tarifband x Laufzeit x Anbieter (Antonio, 08.11.2026). Je Anbieter stehen nur
+   Bilder, deren Preiszeile Band und Laufzeit der Wahl traegt
+   (`data-kombi`, wie `data-band`/`data-lz` der Zeilen; `app.js` blendet in
+   `stelleZeilen`). Ohne Bild fuer genau diese Kombination sagt die Zeile es
+   ("Fuer diese Kombination liegt noch kein Screenshot vor"); das Seitenbild des
+   Paares (Modell, Anbieter) zeigt EINE unbekannte Konfiguration und steht nirgends
+   mehr als Ersatz. Hat ein Beleg eine Bildfolge (`z.bildfolge`), stehen alle Bilder
+   in Reihenfolge mit Schrittbeschriftung. `data-kombis` nennt alle Kombinationen
+   des Anbieters (Band:Laufzeit); ohne seine Zeile in der Wahl tritt der Anbieter
+   zurueck (die Fehlliste nennt ihn). Die Bilder laedt `app.js` erst beim
+   Aufklappen (`data-src`). Die Zuordnung rechnet Python
+   (`report/geraete_zeilenbelege.py`). #}
+{% macro belegpaare(m) %}{% if paarbelege is defined %}{% set paare = paarbelege(m) %}{% if paare and paare[0].zeilen_gesamt is defined %}
+<ul class="gr-beleg-paare" aria-label="Screenshots zur gewählten Kombination">
+  <li class="gr-beleg-kopf">Screenshots zur gewählten Kombination aus Gerät, Tarifband, Laufzeit und Anbieter</li>{% for p in paare %}
+  <li class="gr-beleg-paar" data-anbieter="{{ p.anbieter }}" data-kombis="{{ p.kombis }}"><b class="gr-beleg-anbieter">{{ p.anbieter }}</b>{% for z in p.zeilenbilder %}
+    <div class="gr-beleg-zeile" data-kombi="{{ z.kombi }}"><details class="gr-belege gr-belege--zeile{% if z.bildfolge %} gr-belege--folge{% endif %}">
+      <summary>{% if z.bildfolge %}Screenshot-Folge ({{ z.bildfolge | length }} Bilder){% else %}Screenshot{% endif %} zu dieser Preiszeile vom {{ z.datum | date_de }}, Zuordnung über die Messung: {{ z.geraet }} · {{ z.tarif }}{% if z.raten_laufzeit %} · {{ z.raten_laufzeit }} Raten{% endif %} · {{ z.label }} {{ z.gesamt | euro }}</summary>{% if z.bildfolge %}
+      <ol class="gr-bildfolge">{% for f in z.bildfolge %}
+        <li><span class="gr-bildfolge-schritt">Schritt {{ loop.index }} von {{ loop.length }}{% if f.name %}: {{ f.name }}{% endif %}</span>{% if f.text %}<span class="gr-bildfolge-text">{{ f.text }}</span>{% endif %}
+          <img data-src="{{ f.url }}" alt="Screenshot {{ p.anbieter }}, {{ z.tarif }}, Schritt {{ loop.index }} von {{ loop.length }}{% if f.name %}: {{ f.name }}{% endif %}, vom {{ z.datum | date_de }}" width="640" height="400"></li>{% endfor %}
+      </ol>{% else %}
+      <img data-src="{{ z.url }}" alt="Screenshot {{ p.anbieter }}, {{ z.tarif }}, vom {{ z.datum | date_de }}" width="640" height="400">{% endif %}
+    </details></div>{% endfor %}
+    <span class="gr-beleg-keins" role="status"{% if p.zeilenbilder %} hidden{% endif %}>Für diese Kombination liegt noch kein Screenshot vor.{% if p.zeilen_grund %} ({{ p.zeilen_grund }}){% endif %}</span>
+  </li>{% endfor %}
 </ul>{% endif %}{% endif %}{% endmacro %}
 
 {% macro buendelzeile(k) %}

@@ -1,8 +1,9 @@
 """Belege neben dem Preis: die Vorlage liest nur das Manifest, ohne Netz.
 
-Feste Daten, nie das heutige Datum (CLAUDE.md Regel 7). Gerendert wird mit der Umgebung
-von `render_site` das echte Makro `belegeintrag`, angebunden über
-`geraete_belege.installiere`.
+Feste Daten, nie das heutige Datum (CLAUDE.md Regel 7). Geprüft wird, was
+`geraete_belege.installiere` je (Gerät, Anbieter) aus dem Manifest bereitstellt
+(`belege_fuer`); die Seite zeigt ein Bild nur noch an der Preiszeile, die es bestätigt
+(`tests/test_beleg_kombi.py`, `tests/test_beleg_position.py`).
 """
 
 from __future__ import annotations
@@ -10,7 +11,6 @@ from __future__ import annotations
 from datetime import date
 from pathlib import Path
 
-from bs4 import BeautifulSoup
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from telco_radar.beleg_manifest import (
@@ -55,10 +55,9 @@ def umgebung() -> Environment:
     return env
 
 
-def zeige(env: Environment, zeile=ZEILE) -> BeautifulSoup:
-    quelle = '{% from "_geraete_buendel.html.j2" import belegeintrag %}'
-    vorlage = env.from_string(quelle + "{{ belegeintrag(g, a) }}")
-    return BeautifulSoup(vorlage.render(g=zeile[0], a=zeile[1]), "html.parser")
+def zeige(env: Environment, zeile=ZEILE) -> list[dict]:
+    """Die Bilder von `installiere` für (Gerät, Anbieter), neueste zuerst."""
+    return env.globals["belege_fuer"](zeile[0], zeile[1])
 
 
 def manifest(tmp_path: Path, anhaenge: dict[str, list[str]]) -> Path:
@@ -75,12 +74,10 @@ def test_beleg_erscheint_mit_zahl_datum_und_adresse(tmp_path):
     ordner = manifest(tmp_path, {"belege-2026-11-10": [name]})
     env = umgebung()
     assert geraete_belege.installiere(env, ordner, BERICHTE) == []
-    seite = zeige(env)
-    assert seite.select_one("summary").get_text(strip=True) == "Belege (1)"
-    bild = seite.select_one("details.gr-belege img")
-    assert bild["data-src"].endswith(f"/belege-2026-11-10/{name}")
-    assert bild.get("src") is None
-    assert "10. November 2026" in seite.select_one(".gr-belege-tag").get_text()
+    bilder = zeige(env)
+    assert len(bilder) == 1
+    assert bilder[0]["url"].endswith(f"/belege-2026-11-10/{name}")
+    assert bilder[0]["datum"] == "2026-11-10" and bilder[0]["gross"] is False
 
 
 def test_mehrere_tage_neueste_zuerst_und_grosse_aenderung_benannt(tmp_path):
@@ -96,17 +93,17 @@ def test_mehrere_tage_neueste_zuerst_und_grosse_aenderung_benannt(tmp_path):
     )
     env = umgebung()
     geraete_belege.installiere(env, ordner, BERICHTE)
-    seite = zeige(env)
-    assert seite.select_one("summary").get_text(strip=True) == "Belege (2)"
-    tage = [t.get_text() for t in seite.select(".gr-belege-tag")]
-    assert tage[0].startswith("10. November 2026") and "große Änderung" not in tage[0]
-    assert tage[1].startswith("5. November 2026") and "große Änderung" in tage[1]
+    bilder = zeige(env)
+    assert [(b["datum"], b["gross"]) for b in bilder] == [
+        ("2026-11-10", False),
+        ("2026-11-05", True),
+    ]
 
 
 def test_ohne_beleg_erscheint_nichts(tmp_path):
     env = umgebung()
     geraete_belege.installiere(env, tmp_path, BERICHTE)
-    assert zeige(env).select_one("details") is None
+    assert zeige(env) == []
 
 
 def test_anderes_geraet_oder_anbieter_zeigt_nichts(tmp_path):
@@ -116,8 +113,8 @@ def test_anderes_geraet_oder_anbieter_zeigt_nichts(tmp_path):
     )
     env = umgebung()
     geraete_belege.installiere(env, ordner, BERICHTE)
-    assert zeige(env).select_one("details") is None
-    assert zeige(env, ("iphone-17-256", "o2")).select_one("details") is not None
+    assert zeige(env) == []
+    assert zeige(env, ("iphone-17-256", "o2")) != []
 
 
 def test_bericht_von_morgen_blendet_abgelaufenes_aus(tmp_path):
@@ -126,7 +123,7 @@ def test_bericht_von_morgen_blendet_abgelaufenes_aus(tmp_path):
     for tag, erwartet in (("2026-11-10", True), ("2026-11-11", False)):
         env = umgebung()
         geraete_belege.installiere(env, ordner, [{"date": tag}])
-        assert (zeige(env).select_one("details") is not None) is erwartet
+        assert bool(zeige(env)) is erwartet
 
 
 def test_kaputtes_manifest_ist_ein_benannter_ausfall(tmp_path):
@@ -135,11 +132,11 @@ def test_kaputtes_manifest_ist_ein_benannter_ausfall(tmp_path):
     ausfaelle = geraete_belege.installiere(env, tmp_path, BERICHTE)
     assert [a.teil for a in ausfaelle] == [geraete_belege.TEIL]
     assert "BelegManifestFehler" in ausfaelle[0].grund
-    assert zeige(env).select_one("details") is None
+    assert zeige(env) == []
 
 
 def test_vorlage_ohne_anbindung_bricht_nicht():
-    assert zeige(umgebung()).select_one("details") is None
+    assert "belege_fuer" not in umgebung().globals
 
 
 def test_anbietername_mit_sonderzeichen_trifft_den_dateinamen(tmp_path):
@@ -147,7 +144,7 @@ def test_anbietername_mit_sonderzeichen_trifft_den_dateinamen(tmp_path):
     ordner = manifest(tmp_path, {"belege-2026-11-10": [name]})
     env = umgebung()
     geraete_belege.installiere(env, ordner, BERICHTE)
-    assert zeige(env, ("iphone-17-256", "1&1")).select_one("details") is not None
+    assert zeige(env, ("iphone-17-256", "1&1")) != []
 
 
 def test_anzeige_sieben_tage_und_hoechstens_drei_aeltere_grosse(tmp_path):
@@ -164,15 +161,8 @@ def test_anzeige_sieben_tage_und_hoechstens_drei_aeltere_grosse(tmp_path):
     )
     env = umgebung()
     geraete_belege.installiere(env, ordner, BERICHTE)
-    seite = zeige(env)
-    gezeigt = [t.get_text()[:16].strip() for t in seite.select(".gr-belege-tag")]
-    assert gezeigt == [
-        "5. November 2026",
-        "22. Oktober 2026",
-        "15. Oktober 2026",
-        "8. Oktober 2026",
-    ]
-    assert seite.select_one("summary").get_text(strip=True) == "Belege (4)"
+    gezeigt = [b["datum"] for b in zeige(env)]
+    assert gezeigt == ["2026-11-05", "2026-10-22", "2026-10-15", "2026-10-08"]
 
 
 def test_anzeige_grenzen_sind_benannte_konstanten():
@@ -202,4 +192,4 @@ def test_stoerungsvermerk_im_manifest_wird_ein_benannter_ausfall(tmp_path):
     ausfaelle = geraete_belege.installiere(env, ordner, BERICHTE)
     assert [a.teil for a in ausfaelle] == [geraete_belege.TEIL]
     assert "Exit 124" in ausfaelle[0].grund
-    assert zeige(env).select_one("details") is not None
+    assert zeige(env) != []

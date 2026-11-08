@@ -18,13 +18,12 @@ erneuern), nennt die Seite ihn als Ausfall „Belegbilder“.
 
 Das Bild gehört zum Paar (Modell, Anbieter), nicht zu einer Preiszeile: der Messlauf
 lichtet je Paar nur eine Konfiguration ab (``scripts/belege_veroeffentlichen.py``), der
-Dateiname trägt keinen Tarif. Welche Zeile das Bild zeigt, ist maschinell nicht
-feststellbar. Die Seite verlinkt es deshalb einmal je Paar (``paarbelege``) als
-„Screenshot der Angebotsseite vom <Datum> (zeigt nicht jeden Tarif)“ und setzt nichts
-an eine Preiszeile. Ein Paar mit belastbarem Preis, aber ohne Bild, steht mit dem
-Vermerk „kein Screenshot vorhanden“ daneben, damit „kein Preis“ und „kein Bild“
-unterscheidbar bleiben. ``quote`` zählt Paare, keine Preise (Clean Code 1: dieselbe
-Funktion für Link und Satz).
+Dateiname trägt keinen Tarif. Die Seite zeigt es darum nie als Beleg eines Tarifs
+(Antonio, 08.11.2026: der Beleg folgt der gewählten Kombination, ein fremdes Bild nie).
+Es steht nur an der Preiszeile, deren Gerät, Tarif und Laufzeit der Bildsatz bestätigt
+(``geraete_zeilenbelege``); ``paarbelege`` liefert die Anbieter in Reihenfolge der
+Preiszeilen, ``ergaenze_paare`` hängt ihnen diese Bilder und ihre Kombinationen an.
+Ein Beleg kann eine Bildfolge sein (``beleg_bildfolge``).
 """
 
 from __future__ import annotations
@@ -81,9 +80,14 @@ def sortiert_je_preis(
                 ):
                     continue
                 aeltere_grosse[schluessel] = aeltere_grosse.get(schluessel, 0) + 1
-        je_preis.setdefault(schluessel, []).append(
-            {"datum": beleg.datum.isoformat(), "gross": beleg.gross, "url": beleg.url}
-        )
+        eintrag: dict = {
+            "datum": beleg.datum.isoformat(),
+            "gross": beleg.gross,
+            "url": beleg.url,
+        }
+        if beleg.bildfolge:
+            eintrag["bildfolge"] = list(beleg.bildfolge)
+        je_preis.setdefault(schluessel, []).append(eintrag)
     return je_preis
 
 
@@ -108,31 +112,6 @@ def paarbelege(
         bilder = belege_fuer(modell.get("id", ""), name)
         gesehen[schluessel] = {"anbieter": name, "beleg": bilder[0] if bilder else None}
     return list(gesehen.values())
-
-
-def quote(
-    paare_fuer: Callable[[dict], list[dict]],
-    modelle: list[dict],
-    manifest_ok: bool = True,
-) -> dict:
-    """Für wie viele Gerät-Anbieter-Paare ein Screenshot der Angebotsseite vorliegt.
-
-    Gezählt werden die Paare, die ``paarbelege`` je Modell nennt. ``satz`` ist der
-    fertige Text der Seite; ohne Paar oder bei unlesbarer Belegliste (der Ausfall
-    „Belegbilder“ nennt das) bleibt er leer, statt „0 von N“ zu behaupten.
-    """
-    mit = gesamt = 0
-    for modell in modelle:
-        for paar in paare_fuer(modell):
-            gesamt += 1
-            mit += 1 if paar["beleg"] else 0
-    satz = (
-        f"Für {mit} von {gesamt} Gerät-Anbieter-Paaren liegt ein Screenshot "
-        "der Angebotsseite vor."
-        if gesamt and manifest_ok
-        else ""
-    )
-    return {"mit": mit, "gesamt": gesamt, "satz": satz}
 
 
 def installiere(env: Any, state_dir: Path, berichte: list[dict]) -> list[Ausfall]:
@@ -184,9 +163,6 @@ def installiere(env: Any, state_dir: Path, berichte: list[dict]) -> list[Ausfall
         )
 
     env.globals["paarbelege"] = paare_fuer
-    env.globals["belegquote"] = lambda modelle: quote(
-        paare_fuer, modelle or [], manifest_ok
-    )
     return ausfaelle
 
 

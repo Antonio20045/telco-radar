@@ -23,6 +23,7 @@ from typing import Any
 
 from ..analyze.beleg_position import position_des_bildes
 from ..analyze.geraete_pruefstatus import buendel_aus_satz
+from ..beleg_bildfolge import normalisiere as normalisiere_bildfolge
 from ..beleg_regeln import anbieter_schluessel
 from ..tarif_model import QUELLE_KLICK
 from .geraete_laufzeit import raten_laufzeit
@@ -46,6 +47,7 @@ class Zeilenbeleg:
     datum: str
     gross: bool
     url: str
+    bildfolge: tuple[dict[str, str], ...] = ()
 
 
 def passt(beleg: Zeilenbeleg, karte: dict) -> bool:
@@ -101,6 +103,9 @@ def baue_index(
         except (TypeError, ValueError, KeyError) as fehler:
             gruende[schluessel] = f"Bildsatz unlesbar: {fehler}"
             continue
+        folge = bild.get("bildfolge") or normalisiere_bildfolge(
+            wahl.satz.get("bildfolge"), bild["url"]
+        )
         index[buendel.beleg_id] = Zeilenbeleg(
             geraet_id=schluessel[0],
             anbieter_id=schluessel[1],
@@ -112,18 +117,28 @@ def baue_index(
             datum=bild["datum"],
             gross=bool(bild["gross"]),
             url=bild["url"],
+            bildfolge=tuple(folge),
         )
     return index, gruende
 
 
 def zeilenbeleg_fuer(index: dict[str, Zeilenbeleg]) -> ZeilenbelegFuer:
-    """``karte -> {datum, gross, url}`` oder ``None``: das Bild nur bei ``passt``."""
+    """``karte -> {datum, gross, url, bildfolge}`` oder ``None``: nur bei ``passt``.
+
+    ``bildfolge`` ist leer (ein Bild: ``url``) oder die Schritte des Klickwegs in
+    Reihenfolge (``beleg_bildfolge``).
+    """
 
     def finde(karte: dict) -> dict | None:
         beleg = index.get(str(karte.get("beleg_id") or ""))
         if beleg is None or not passt(beleg, karte):
             return None
-        return {"datum": beleg.datum, "gross": beleg.gross, "url": beleg.url}
+        return {
+            "datum": beleg.datum,
+            "gross": beleg.gross,
+            "url": beleg.url,
+            "bildfolge": list(beleg.bildfolge),
+        }
 
     return finde
 
@@ -132,6 +147,15 @@ def _zeilen(modell: dict) -> list[dict]:
     """Die belastbaren Preiszeilen eines Modells (``preis_anzeige``)."""
     karten = [*modell.get("zeilen_band", []), *modell.get("zeilen_ohne_band", [])]
     return [k for k in karten if preis_anzeige(k).get("belastbar")]
+
+
+def kombi(karte: dict) -> str:
+    """``Band:Laufzeit-Ansicht`` einer Preiszeile, wie die Seite sie blendet.
+
+    Dieselben Felder wie ``data-band`` und ``data-lz`` der Bündelzeile; leer heißt
+    „unter jeder Wahl sichtbar“ (``app.js`` ``stelleZeilen``).
+    """
+    return f"{karte.get('band') or ''}:{karte.get('laufzeit_sichtbar') or ''}"
 
 
 def ergaenze_paare(
@@ -143,14 +167,19 @@ def ergaenze_paare(
     """Jedes Paar nennt seine Preiszeilen mit eigenem Bild (Gerät, Tarif, Raten, Preis).
 
     ``zeilen_mit`` und ``zeilen_gesamt`` zählen die belastbaren Zeilen des Paares,
-    ``zeilenbilder`` sind die belegten; ohne eine belegte Zeile nennt ``zeilen_grund``
-    (wenn bekannt), warum das Bild des Paares keiner Zeile zugeordnet wird.
+    ``zeilenbilder`` sind die belegten (je mit ``kombi``), ``kombis`` nennt alle
+    Kombinationen (Band:Laufzeit) des Paares, damit die Seite bei der Wahl einer
+    Kombination ohne Bild den Vermerk zeigt statt eines anderen Bildes; ohne eine
+    belegte Zeile nennt ``zeilen_grund`` (wenn bekannt), warum das Bild des Paares
+    keiner Zeile zugeordnet wird.
     """
     gesamt: dict[str, int] = defaultdict(int)
+    kombis: dict[str, set[str]] = defaultdict(set)
     bilder: dict[str, list[dict]] = defaultdict(list)
     for karte in _zeilen(modell):
         schluessel = anbieter_schluessel(karte.get("anbieter") or "")
         gesamt[schluessel] += 1
+        kombis[schluessel].add(kombi(karte))
         beleg = fuer(karte)
         if beleg:
             bilder[schluessel].append(
@@ -160,6 +189,7 @@ def ergaenze_paare(
                     "raten_laufzeit": karte.get("raten_laufzeit"),
                     "label": karte.get("label"),
                     "gesamt": karte.get("gesamt"),
+                    "kombi": kombi(karte),
                     **beleg,
                 }
             )
@@ -173,6 +203,7 @@ def ergaenze_paare(
                 "zeilen_mit": len(bilder[schluessel]),
                 "zeilen_gesamt": gesamt[schluessel],
                 "zeilenbilder": bilder[schluessel],
+                "kombis": " ".join(sorted(kombis[schluessel])),
                 "zeilen_grund": "" if bilder[schluessel] else grund,
             }
         )

@@ -4,7 +4,8 @@ Release-Anhängen.
 ``baue_manifest`` macht aus der Liste der Release-Anhänge (``beleg_ablage.Gh.anhaenge``)
 ``data/state/belege_manifest.json``. ``render_site`` liest nur diese Datei, ohne Netz
 und ohne LLM. Der Dateiname trägt Gerät, Anbieter und Tag (``beleg_regeln.dateiname``);
-der Downloadlink ergibt sich aus Release-Tag und Dateiname.
+der Downloadlink ergibt sich aus Release-Tag und Dateiname. Ein Eintrag kann eine
+``bildfolge`` tragen (``beleg_bildfolge``); die Seite zeigt sie statt des Einzelbilds.
 
 Ein Bild kann in beiden Releases liegen (Tag und Monat, große Änderung). Die Seite zeigt
 es einmal, mit Kennzeichen ``gross``; liegt es nur im Monats-Release, ist es ebenfalls
@@ -27,6 +28,7 @@ from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
 
+from .beleg_bildfolge import normalisiere as normalisiere_bildfolge
 from .beleg_regeln import (
     REPO,
     ist_abgelaufen,
@@ -62,6 +64,7 @@ class Beleg:
     datum: date
     gross: bool
     url: str
+    bildfolge: tuple[dict[str, str], ...] = ()
 
     def sichtbar(self, heute: date) -> bool:
         """Dieselbe Regel wie beim Löschen (``beleg_regeln.ist_abgelaufen``)."""
@@ -153,6 +156,7 @@ def lies_manifest(pfad: Path) -> Manifest:
                 date.fromisoformat(b["datum"]),
                 bool(b["gross"]),
                 str(b["url"]),
+                normalisiere_bildfolge(b.get("bildfolge"), str(b["url"])),
             )
             for b in daten["belege"]
         ]

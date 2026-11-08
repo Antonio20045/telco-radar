@@ -2857,6 +2857,39 @@ var TelcoFrage = (function () {
       });
   }
 
+  /* Belege folgen der gewaehlten Kombination (Antonio, 08.11.2026): je Anbieter
+     nur die Bilder, deren Preiszeile Band UND Laufzeit der Wahl traegt - dieselbe
+     Regel wie bei den Zeilen oben (leer = unter jeder Wahl). Kein Bild fuer genau
+     diese Kombination: der Vermerk, nie das Bild einer anderen. Hat der Anbieter
+     in der Wahl gar keine Zeile, tritt er zurueck (die Fehlliste nennt ihn). */
+  function belegPasst(kombi, band, lz) {
+    var t = kombi.split(':');
+    var bandOk = !band || !t[0] || t[0] === band;
+    var lzOk = lz === 'alle' || !t[1] || t[1] === lz;
+    return bandOk && lzOk;
+  }
+
+  function stelleBelege(band, lz) {
+    Array.prototype.forEach.call(
+      document.querySelectorAll('#gr-bnd-gruppe .gr-beleg-paar'),
+      function (li) {
+        var kombis = (li.getAttribute('data-kombis') || '').split(' ')
+          .filter(Boolean);
+        var hat = kombis.some(function (k) { return belegPasst(k, band, lz); });
+        var sichtbar = 0;
+        Array.prototype.forEach.call(
+          li.querySelectorAll('.gr-beleg-zeile'), function (z) {
+            var passt = belegPasst(z.getAttribute('data-kombi') || ':',
+                                   band, lz);
+            z.hidden = !passt;
+            if (passt) sichtbar += 1;
+          });
+        li.hidden = !hat;
+        var keins = li.querySelector('.gr-beleg-keins');
+        if (keins) keins.hidden = sichtbar > 0;
+      });
+  }
+
   function stelleZeilen(band) {
     var lz = zustand.laufzeit;
     var alle = lz === 'alle';
@@ -2874,6 +2907,7 @@ var TelcoFrage = (function () {
       }
       z.hidden = bandAus || lzAus;
     });
+    stelleBelege(band, lz);
     Array.prototype.forEach.call(
       document.querySelectorAll('#gr-bnd-gruppe .gr-bndliste'),
       function (liste) {

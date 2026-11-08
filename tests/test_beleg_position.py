@@ -119,7 +119,7 @@ def _paare(seite: BeautifulSoup) -> dict[str, object]:
     """Die Paar-Einträge im sichtbaren Teil der Seite, je Anbieter."""
     return {
         li.select_one(".gr-beleg-anbieter").get_text(strip=True): li
-        for li in seite.select("#gr-bnd-gruppe > .gr-beleg-paare > li")
+        for li in seite.select("#gr-bnd-gruppe > .gr-beleg-paare > li.gr-beleg-paar")
     }
 
 
@@ -135,9 +135,7 @@ def test_die_eindeutige_zeile_steht_im_paar_eintrag_mit_ihrem_bild(lager, seite)
     mit Tarif, Raten und Preis, das Bild gehört genau zu ihr."""
     n_o2 = _anzahl(lager)["o2"]
     assert n_o2, "Gegenprobe: die Fixture hat o2-Zeilen"
-    zeilen = _paare(seite)["o2"].select(
-        "ul.gr-beleg-zeilenliste details.gr-belege--zeile"
-    )
+    zeilen = _paare(seite)["o2"].select(".gr-beleg-zeile details.gr-belege--zeile")
     assert len(zeilen) == n_o2
     for z in zeilen:
         assert (
@@ -165,10 +163,10 @@ def test_unklare_zuordnung_zeigt_kein_zeilenbild_sondern_den_grund(lager, seite)
     for anbieter, grund in gruende.items():
         assert n[anbieter], f"Gegenprobe: Zeilen für {anbieter}"
         li = paare[anbieter]
-        assert li.select("details.gr-belege--zeile, ul.gr-beleg-zeilenliste") == []
-        text = li.select_one(".gr-beleg-zeilen").get_text(strip=True)
+        assert li.select("details, img, .gr-beleg-zeile") == []
+        text = li.select_one(".gr-beleg-keins").get_text(strip=True)
         assert text == (
-            f"0 von {n[anbieter]} Preiszeilen mit eigenem Screenshot ({grund})"
+            f"Für diese Kombination liegt noch kein Screenshot vor. ({grund})"
         )
 
 
@@ -191,10 +189,9 @@ def test_quote_nennt_je_anbieter_zeilen_nicht_paare(lager, seite):
 
 def test_paar_nennt_seine_zeilen_mit_bild(lager, seite):
     n_o2 = _anzahl(lager)["o2"]
-    paare = _paare(seite)
-    assert paare["o2"].select_one(".gr-beleg-zeilen").get_text(strip=True) == (
-        f"{n_o2} von {n_o2} Preiszeilen mit eigenem Screenshot"
-    )
+    o2 = _paare(seite)["o2"]
+    assert len(o2.select(".gr-beleg-zeile")) == n_o2
+    assert o2.select_one(".gr-beleg-keins").has_attr("hidden")
 
 
 def test_fragment_traegt_keine_zeilenbilder_an_der_buendelliste(lager):
@@ -204,7 +201,7 @@ def test_fragment_traegt_keine_zeilenbilder_an_der_buendelliste(lager):
     )
 
 
-ZEILE = "#gr-bnd-gruppe .gr-beleg-zeilenliste details.gr-belege--zeile"
+ZEILE = "#gr-bnd-gruppe .gr-beleg-zeile:not([hidden]) details.gr-belege--zeile"
 OFFEN = "#gr-bnd-gruppe .gr-belege--zeile[open] img"
 PNG = bytes.fromhex(
     "89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c489"
