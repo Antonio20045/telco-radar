@@ -47,7 +47,12 @@ PREIS, ALT = "preis", "alt"
 GRUND_OHNE = "ohne Beleg"
 GRUND_ABGELAUFEN = "Beleg abgelaufen"
 GRUND_UNZUREICHEND = "Beleg zeigt kein fehlendes Sortiment"
-BELEG_AUSSAGEN = ("nicht im Sortiment", "Seite entfernt", "nicht in der Geräteliste")
+BELEG_AUSSAGEN = (
+    "nicht im Sortiment",
+    "Seite entfernt",
+    "nicht in der Geräteliste",
+    "nicht mehr in der Geräteliste",
+)
 FEHLT_SATZ = (
     "{wer} führt es (Preis gemessen). Für {fehlt} liegt kein {beleg} vor{grund}."
 )
@@ -93,11 +98,21 @@ def staende(tco_modelle: list[dict]) -> dict[str, dict[str, str]]:
 
 
 def beleg_fuer(
-    belege: dict, anbieter: str, device_id: str, heute: str
+    belege: dict,
+    anbieter: str,
+    device_id: str,
+    heute: str,
+    speicher: str | None = None,
 ) -> tuple[dict | None, str]:
     """(gültiger Beleg, Grund). Ohne gültigen Beleg ist der Grund `GRUND_OHNE` oder
-    `GRUND_ABGELAUFEN`; ohne bekannten Stichtag gilt kein Beleg als gültig."""
-    b = belege.get((anbieter, device_id)) or belege.get((anbieter, "*"))
+    `GRUND_ABGELAUFEN`; ohne bekannten Stichtag gilt kein Beleg als gültig.
+    Mit `speicher` ("512gb") geht eine Lücke genau dieser Stufe vor; ohne ihn
+    zählt nie eine Stufenlücke, denn ein fehlender Speicher ist kein fehlendes Gerät."""
+    b = (
+        (belege.get((anbieter, device_id, speicher)) if speicher else None)
+        or belege.get((anbieter, device_id))
+        or belege.get((anbieter, "*"))
+    )
     if not b:
         return None, GRUND_OHNE
     if not any(a.lower() in str(b.get("grund", "")).lower() for a in BELEG_AUSSAGEN):
@@ -263,6 +278,16 @@ def berechne(tco_modelle: list[dict], katalog, belege: dict, heute: str) -> dict
 def abdeckung_pfad(state_dir) -> Path:
     """`config/geraete_abdeckung.yaml` neben `data/state` (Aufbau des Repos)."""
     return Path(state_dir).parents[1].joinpath(*ABDECKUNG)
+
+
+def lade_belege(state_dir) -> dict:
+    """Die Belege der Config (`lade_pflicht()["belege"]`); nicht lesbar heißt
+    keine Lücke belegt - die sichere Richtung - und steht im Log."""
+    try:
+        return buendel_abdeckung.lade_pflicht(abdeckung_pfad(state_dir))["belege"]
+    except (OSError, ValueError, KeyError, AttributeError):
+        log.exception("Belegliste nicht lesbar")
+        return {}
 
 
 def ansicht(state_dir, tco: dict, katalog, heute: str) -> dict:
