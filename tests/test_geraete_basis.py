@@ -25,6 +25,7 @@ METHODEN_HEUTE = (
     "einsundeins_buendel",
     "ldjson",
     "mediamarkt_angebote",
+    "mediamarkt_tarifwelt",
     "o2_katalog",
     "saturn_brand",
     "shopify",
