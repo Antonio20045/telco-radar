@@ -10,6 +10,19 @@ from __future__ import annotations
 import re
 from collections.abc import Mapping
 
+from .klickkartenteile import (
+    BELEGLINK_KONFIGURATION,
+    GRUND_ART,
+    GRUND_NICHT_ZUR_ART,
+    GRUND_WEITER_DIMENSION,
+    RATENPLAN_ARTEN,
+    RATENPLAN_OHNE_RABATTPHASE,
+    RATENPLAN_TARIFCODE,
+    TARIFSLUG_ARTEN,
+    TARIFSLUG_SEITENPARAMETER,
+    Ratenplanregel,
+    Tarifslugregel,
+)
 from .klickkartentypen import (
     ADRESSATTRIBUT,
     DIMENSIONEN,
@@ -33,7 +46,6 @@ from .klickkartentypen import (
     GRUND_PLATZHALTER,
     GRUND_UNBEKANNT,
     GRUND_WEITER_ADRESSEN,
-    GRUND_WEITER_DIMENSION,
     GRUND_WEITER_KLICK,
     PLATZHALTER_MODELL,
     Adressen,
@@ -64,6 +76,12 @@ VORBEREITUNGSTEILE = ("klick", "bis", "pruefe", "darf_fehlen")
 LESUNGSTEILE = ("selektor", "oeffnen", "schliessen", "ohne", "muster")
 KANARIENTEILE = ("selektor", "enthaelt", "attribut", "ausgelistet_url")
 AUSGELISTETTEILE = ("host", "pfad")
+RATENPLANTEILE = ("art", "teil", "muster", "nachweis")
+RATENPLAN_TEILE_JE_ART = {
+    RATENPLAN_TARIFCODE: ("teil", "muster"),
+    RATENPLAN_OHNE_RABATTPHASE: ("nachweis",),
+}
+TARIFSLUGTEILE = ("art", "parameter", "beleglink")
 KACHELN = "kacheln"
 KLICKEN = "klicken"
 WEITERTEILE = ("selektor", "text", KACHELN, KLICKEN)
@@ -302,6 +320,50 @@ class Kartenleser:
             attribut=self.wahlweise_text(daten, "attribut", feld),
             ausgelistet_url=self.ausgelistet_url(daten.get("ausgelistet_url")),
         )
+
+    def ratenplan(self, roh: object) -> Ratenplanregel | None:
+        """Die Ratenplan-Regel der Karte oder ``None`` ohne das Feld."""
+        if roh is None:
+            return None
+        daten = self.zuordnung(roh, "ratenplan", RATENPLANTEILE)
+        art = self._art(daten, "ratenplan", RATENPLAN_ARTEN)
+        self._nur_teile(daten, "ratenplan", RATENPLAN_TEILE_JE_ART[art])
+        if art == RATENPLAN_TARIFCODE:
+            return Ratenplanregel(
+                art=art,
+                teil=self.text(daten, "teil", "ratenplan"),
+                muster=self.muster(daten, "muster", "ratenplan"),
+            )
+        return Ratenplanregel(
+            art=art, nachweis=self.text(daten, "nachweis", "ratenplan")
+        )
+
+    def tarifslug(self, roh: object) -> Tarifslugregel | None:
+        """Die Tarifslug-Regel der Karte oder ``None`` ohne das Feld."""
+        if roh is None:
+            return None
+        daten = self.zuordnung(roh, "tarifslug", TARIFSLUGTEILE)
+        art = self._art(daten, "tarifslug", TARIFSLUG_ARTEN)
+        parameter = None
+        if art == TARIFSLUG_SEITENPARAMETER:
+            parameter = self.text(daten, "parameter", "tarifslug")
+        elif "parameter" in daten:
+            raise self.fehler("tarifslug.parameter", GRUND_NICHT_ZUR_ART)
+        beleglink = self.wahlweise_text(daten, "beleglink", "tarifslug")
+        if beleglink not in (None, BELEGLINK_KONFIGURATION):
+            raise self.fehler("tarifslug.beleglink", GRUND_ART)
+        return Tarifslugregel(art=art, parameter=parameter, beleglink=beleglink)
+
+    def _art(self, daten: Mapping, feld: str, arten: tuple[str, ...]) -> str:
+        art = self.text(daten, "art", feld)
+        if art not in arten:
+            raise self.fehler(stelle(feld, "art"), f"{GRUND_ART} {art}")
+        return art
+
+    def _nur_teile(self, daten: Mapping, feld: str, erlaubt: tuple[str, ...]) -> None:
+        for schluessel in daten:
+            if schluessel != "art" and schluessel not in erlaubt:
+                raise self.fehler(stelle(feld, str(schluessel)), GRUND_NICHT_ZUR_ART)
 
     def ausgelistet_url(self, roh: object) -> AusgelistetUrl | None:
         """Host und Pfadmuster der Übersicht für ausgelistete Geräte, sonst ``None``."""

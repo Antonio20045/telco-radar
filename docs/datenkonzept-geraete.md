@@ -218,6 +218,17 @@ Eine Maschine für alle Anbieter. Je Anbieter gibt es nur eine **Klick-Karte** (
 | congstar | Aktionsende; 256 GB; 24 und 36; Flex getrennt |
 | freenet | Geräteanteil im Grundpreis als `ein_vertrag`; robots-Sperren beachten |
 
+**Auswertungsregeln in der Karte (Schritt 4a „Eine Methode“, o2 und congstar):** Was bisher im Python je Anbieter stand, steht als Kopffeld in der Karte; der Code verzweigt nach der `art`, nie nach dem Anbieternamen. Fehlt ein Feld, gibt es keine geratene Zahl, sondern eine benannte Lücke.
+
+- `ratenplan.art`: `tarifcode` (o2) bindet den Tarifpreis an die Raten, wenn der Hinweis-Satz im Nachweis `ratenplan` steht und der `teil` der Antwortadresse mit `muster` dieselbe Ratenzahl nennt; `ohne_rabattphase` (congstar) tut es, wenn der Nachweis genau `nachweis` (die leere Rabattliste `[]`) ist.
+- `ratenplan.teil`, `ratenplan.muster`: bei `tarifcode` der Teil der o2-Konfigurations-ID und der reguläre Ausdruck, dessen erste Gruppe die Ratenzahl ist.
+- `ratenplan.nachweis`: bei `ohne_rabattphase` der Wortlaut, der „keine Rabattphase“ belegt.
+- `tarifslug.art`: `name` (o2) macht aus dem Tarifnamen ohne Leistungszusatz den Slug; `seitenparameter` (congstar) nimmt die Zahl aus einem Parameter der Seitenadresse.
+- `tarifslug.parameter`: bei `seitenparameter` der Name des Parameters (congstar `planId`).
+- `tarifslug.beleglink`: `konfiguration` (o2) setzt im Beleglink Tarif und Ratenzahl der Zeile statt der Startkonfiguration der Seite.
+
+Liest eine Karte den Nachweis `ratenplan` (`antwort.pfade.ratenplan`), hat aber kein Feld `ratenplan`, entsteht kein Rohsatz, sondern die Lücke `ratenplan_regel_fehlt`; ohne `tarifslug` fällt der Satz als Tarif ohne Auflösung aus dem Bündelbau. Nennen zwei Karten desselben Anbieters verschiedene Regeln (o2 hat zwei), gilt keine.
+
 ## 9. Prüfregeln vor jeder Veröffentlichung
 
 Ergebnis je Datensatz: gültig, Quarantäne oder veraltet.

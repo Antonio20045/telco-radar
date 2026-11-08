@@ -80,7 +80,7 @@ from .klicklauf import (
 )
 from .klickpfad import ohne_markup
 from .klickraster import ART_RASTER, raster_roh
-from .klickratenplan import ratenplan_phasen
+from .klickratenplan import RatenplanRegelFehlt, buendelphasen
 
 log = logging.getLogger(__name__)
 
@@ -96,6 +96,7 @@ LUECKE_SPEICHER = "speicher_unbekannt"
 LUECKE_GERAET = "geraet_unbekannt"
 LUECKE_OHNE_PREIS = "ohne_preis"
 LUECKE_ZUBEHOER = "buendel_mit_zubehoer"
+LUECKE_RATENPLAN_REGEL = "ratenplan_regel_fehlt"
 LUECKEN_JE_STATUS = {
     BEFUND: BEFUND,
     NICHT_ERFASST: NICHT_ERFASST,
@@ -343,7 +344,10 @@ def rohsatz(
         "abgerufen_am": daten.get("datum"),
         **_preise(werte, kombination.get("buendel"), daten.get("vertragsform")),
     }
-    satz["tarif_phasen"] = _phasen(werte, satz, kombination)
+    try:
+        satz["tarif_phasen"] = buendelphasen(werte, satz, kombination)
+    except RatenplanRegelFehlt:
+        return LUECKE_RATENPLAN_REGEL
     if all(satz.get(f) is None for f in PREISFELDER):
         return LUECKE_OHNE_PREIS
     return satz
@@ -375,24 +379,6 @@ def _ab_monat_eins(phasen: object) -> float | None:
         if von == 1:
             return betrag
     return None
-
-
-def _phasen(werte: dict, satz: dict, kombination: dict) -> list[dict]:
-    """Bündelphasen wie gelesen, eine offene bleibt offen; ein einzelner offener Preis
-    ab Monat 1 ist keine, außer mit Ratenplan-Beleg (``klickratenplan``)."""
-    roh = werte.get("tarifphasen")
-    if satz.get("buendel_monatlich") is not None or not isinstance(roh, list):
-        return []
-    if len(roh) == 1 and roh[0][1] is None:
-        if roh[0][0] != 1:
-            return []
-        laufzeit, betrag = satz["laufzeit_monate"], roh[0][2]
-        return ratenplan_phasen(satz["anbieter"], kombination, laufzeit, betrag)
-    beleg = f"Klick-Beleg {satz['beleg_id'] or satz['quelle_url']}"
-    return [
-        {"von_monat": von, "bis_monat": bis, "betrag": betrag, "beleg": beleg}
-        for von, bis, betrag in roh
-    ]
 
 
 def _quelle(kombination: dict, seite: dict) -> str:
