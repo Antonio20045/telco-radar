@@ -59,6 +59,21 @@ def test_drei_echte_tarifsaetze_treffen_ihre_stufe(tarife):
     assert [(t, index.get(t)) for t, _ in faelle] == faelle
 
 
+def test_o2_mobile_s_faellt_nach_der_band_regel_in_xs_nicht_in_s(tarife):
+    """Auftrag „o2-Lücken Band S“ (08.11.2026): im Export trägt o2 nie eine
+    Zeile mit Band „S“. Ursache ist keine Erfassungslücke, sondern die
+    Band-Regel selbst (`band_von_gb`, nächstgelegenes Vodafone-Volumen):
+    o2 Mobile S hat 15 GB, exakt das Volumen der Vodafone-Stufe XS (15 GB),
+    nicht der Stufe S (30 GB) - der Name „S“ sagt nichts über das Band, nur
+    das Datenvolumen zählt. Das Bündel gibt es (`O2 Mobile S mit 15 GB+` in
+    `data/state/geraete_tco.json`), es landet nur unter einem anderen Band."""
+    leiter = band.tarifleiter(tarife)
+    assert [s.key for s in leiter if s.gb in (15.0, 30.0)] == ["xs", "s"]
+    index = band.tarif_baender(tarife, leiter)
+    assert index["o2:o2-mobile-s"] == "xs"
+    assert index["o2:o2-mobile-s"] != "s"
+
+
 def test_unbegrenzt_bleibt_ohne_band_solange_vodafone_xl_begrenzt_ist(tarife):
     """Gegenprobe zu XL: Ohne unbegrenzte Vodafone-Stufe hat ein unbegrenzter
     Tarif keine Stufe, statt in die groesste endliche zu rutschen."""

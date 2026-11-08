@@ -9,11 +9,13 @@ deshalb gegen eine feste Pflichtliste (`config/geraete_abdeckung.yaml`),
 nicht gegen den Vortag, und sie misst die Bündel, aus denen die Leitzahl
 „Kosten über 24 Monate“ entsteht.
 
-Fünf Befundarten, jede für sich rot:
+Sechs Befundarten, jede für sich rot:
 
 * ``anbieter_leer``     ein Pflichtanbieter hat am Messtag kein Bündel
 * ``modell_fehlt``      ein Pflichtmodell fehlt bei einem Pflichtanbieter,
                         ohne dass eine belegte Lücke in der Config steht
+* ``speicher_fehlt``    eine Speicherstufe, die ein anderer Pflichtanbieter
+                        führt, fehlt unbelegt bei einem geprüften Anbieter
 * ``kombis_weg``        gegenüber dem vorigen Messtag fehlen mehr als
                         `KOMBI_VERLUST_ANTEIL` der Kombinationen
 * ``preissprung``       die Leitzahl einer Kombination springt um mehr als
@@ -94,11 +96,14 @@ def _datum(eintrag: dict, feld: str) -> date:
 
 
 def lade_pflicht(pfad: Path) -> dict:
-    """Pflichtliste; ``luecken``: (Anbieter, Modell) -> Grund, ``bis``: -> Datum.
+    """Pflichtliste; ``luecken``: (Anbieter, Modell[, Speicher]) -> Grund,
+    ``bis``: -> Datum. Optionales Feld ``speicher`` (Liste, Format wie
+    `modell_und_speicher`, z. B. ``256gb``) engt eine Ausnahme auf diese
+    Speicherstufe(n) ein statt auf das ganze Modell.
 
-    ``belege``: (Anbieter, Modell) -> Eintrag, nur für Ausnahmen mit
-    ``art: nicht_im_portfolio`` (Anbieter führt das Gerät nachweislich nicht) und
-    einem ``beleg``-Link; nur sie darf die Portfolio-Ansicht als Lücke zeigen."""
+    ``belege``: wie ``luecken`` geschlüsselt, nur für Ausnahmen mit
+    ``art: nicht_im_portfolio`` und ``beleg``-Link; nur sie zeigt die
+    Portfolio-Ansicht als Lücke."""
     daten = yaml.safe_load(pfad.read_text(encoding="utf-8")) or {}
     luecken, bis, belege = {}, {}, {}
     for eintrag in daten.get("belegte_luecken") or []:
@@ -116,20 +121,27 @@ def lade_pflicht(pfad: Path) -> dict:
             raise ValueError(f"belegte Lücke mit unbekannter 'art': {eintrag}")
         if art and not str(eintrag.get("beleg") or "").strip():
             raise ValueError(f"Lücke '{art}' ohne 'beleg' (Link): {eintrag}")
+        stufen = list(eintrag.get("speicher") or [])
+        if stufen and eintrag.get("modelle") in (None, [], ["*"]):
+            raise ValueError(f"belegte Lücke mit 'speicher' ohne 'modelle': {eintrag}")
         for modell in eintrag.get("modelle") or ["*"]:
-            luecken[(eintrag["anbieter"], modell)] = grund
-            bis[(eintrag["anbieter"], modell)] = ende
-            if art:
-                belege[(eintrag["anbieter"], modell)] = {
-                    "grund": grund,
-                    "geprueft": geprueft,
-                    "bis": ende,
-                    "beleg": str(eintrag["beleg"]).strip(),
-                    "original": str(eintrag.get("original") or "").strip(),
-                }
+            schluessel: list[tuple] = [(eintrag["anbieter"], modell, s) for s in stufen]
+            schluessel = schluessel or [(eintrag["anbieter"], modell)]
+            for k in schluessel:
+                luecken[k] = grund
+                bis[k] = ende
+                if art:
+                    belege[k] = {
+                        "grund": grund,
+                        "geprueft": geprueft,
+                        "bis": ende,
+                        "beleg": str(eintrag["beleg"]).strip(),
+                        "original": str(eintrag.get("original") or "").strip(),
+                    }
     return {
         "anbieter": list(daten.get("pflicht_anbieter") or []),
         "modelle": list(daten.get("pflicht_modelle") or []),
+        "speicher_pflicht_anbieter": list(daten.get("speicher_pflicht_anbieter") or []),
         "luecken": luecken,
         "bis": bis,
         "belege": belege,
@@ -138,28 +150,36 @@ def lade_pflicht(pfad: Path) -> dict:
 
 def _pruefe_luecken(ergebnis: Abdeckung, pflicht: dict) -> None:
     """Abgelaufene Ausnahmen sind Befunde, überholte (Bündel wieder da) Warnungen."""
-    for (anbieter, modell), ende in sorted(pflicht.get("bis", {}).items()):
+    for schluessel, ende in sorted(pflicht.get("bis", {}).items(), key=str):
+        anbieter = schluessel[0]
+        bezeichnung = " ".join(str(t) for t in schluessel[1:])
         if ergebnis.messtag and ergebnis.messtag > ende.isoformat():
             text = (
-                f"{anbieter}: belegte Lücke {modell} ist seit {ende.isoformat()} "
+                f"{anbieter}: belegte Lücke {bezeichnung} ist seit {ende.isoformat()} "
                 "abgelaufen: an der Anbieterseite neu prüfen, dann mit neuem "
                 f"'geprueft' und 'bis' (höchstens {LUECKE_MAX_TAGE} Tage) verlängern "
                 "oder streichen"
             )
             ergebnis.befunde.append(Befund("luecke_abgelaufen", anbieter, text))
-        da = (
-            ergebnis.anbieter_zahl.get(anbieter)
-            if modell == "*"
-            else (modell, anbieter) in ergebnis.matrix
-        )
+        if len(schluessel) == 3:
+            _, modell, speicher = schluessel
+            zelle = ergebnis.matrix.get((modell, anbieter))
+            da = bool(zelle and speicher in zelle["speicher"])
+        else:
+            modell = schluessel[1]
+            da = (
+                bool(ergebnis.anbieter_zahl.get(anbieter))
+                if modell == "*"
+                else (modell, anbieter) in ergebnis.matrix
+            )
         if da:
             ergebnis.warnungen.append(
                 Befund(
                     "luecke_ueberholt",
                     anbieter,
-                    f"{anbieter}: Ausnahme {modell} ist überholt, am Messtag gibt "
-                    "es wieder Bündel: Eintrag in config/geraete_abdeckung.yaml "
-                    "(belegte_luecken) streichen",
+                    f"{anbieter}: Ausnahme {bezeichnung} ist überholt, am Messtag "
+                    "gibt es wieder Bündel: Eintrag in "
+                    "config/geraete_abdeckung.yaml (belegte_luecken) streichen",
                 )
             )
 
@@ -167,6 +187,33 @@ def _pruefe_luecken(ergebnis: Abdeckung, pflicht: dict) -> None:
 def _anbieter_aus_id(buendel_id: str, namen: dict) -> str | None:
     teile = (buendel_id or "").split("--")
     return namen.get(teile[1]) if len(teile) > 1 else None
+
+
+def _pruefe_speicherstufen(ergebnis: Abdeckung, pflicht: dict, belegt_speicher) -> None:
+    """Speicherstufe unbelegt fehlend, die ein anderer Pflichtanbieter führt:
+    Befund ``speicher_fehlt`` - nur für Anbieter aus
+    ``speicher_pflicht_anbieter`` (Rollout je Anbieter, sonst eine erfundene
+    Portfolio-Aussage für einen ungeprüften)."""
+    geprueft = set(pflicht.get("speicher_pflicht_anbieter") or [])
+    for modell in pflicht["modelle"]:
+        da = [a for a in pflicht["anbieter"] if (modell, a) in ergebnis.matrix]
+        alle_stufen: set = set()
+        for a in da:
+            alle_stufen |= ergebnis.matrix[(modell, a)]["speicher"]
+        for a in set(da) & geprueft:
+            eigene = ergebnis.matrix[(modell, a)]["speicher"]
+            fehlend = sorted(
+                s for s in alle_stufen - eigene if not belegt_speicher(a, modell, s)
+            )
+            if fehlend:
+                ergebnis.befunde.append(
+                    Befund(
+                        "speicher_fehlt",
+                        a,
+                        f"{a}: {modell} ohne Speicherstufe(n) {', '.join(fehlend)}, "
+                        "von einem anderen Pflichtanbieter geführt, ohne Beleg",
+                    )
+                )
 
 
 def pruefe(tco: dict, historie: list[dict], pflicht: dict) -> Abdeckung:
@@ -195,10 +242,10 @@ def pruefe(tco: dict, historie: list[dict], pflicht: dict) -> Abdeckung:
         )
 
     def belegt(anbieter: str, modell: str) -> bool:
-        return (anbieter, modell) in ergebnis.luecken or (
-            anbieter,
-            "*",
-        ) in ergebnis.luecken
+        return any(k in ergebnis.luecken for k in ((anbieter, modell), (anbieter, "*")))
+
+    def belegt_speicher(anbieter: str, modell: str, s: str) -> bool:
+        return belegt(anbieter, modell) or (anbieter, modell, s) in ergebnis.luecken
 
     for anbieter in pflicht["anbieter"]:
         if ergebnis.anbieter_zahl.get(anbieter):
@@ -231,6 +278,7 @@ def pruefe(tco: dict, historie: list[dict], pflicht: dict) -> Abdeckung:
                 )
             )
 
+    _pruefe_speicherstufen(ergebnis, pflicht, belegt_speicher)
     _pruefe_luecken(ergebnis, pflicht)
     _vergleiche_vortag(ergebnis, historie, pflicht["anbieter"], messtag)
     return ergebnis
