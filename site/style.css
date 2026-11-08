@@ -2604,26 +2604,28 @@ b,strong{font-weight:700}
 .gr-belege-liste img{display:block;width:320px;max-width:100%;height:auto;
   min-height:60px;background:var(--rule);border:1px solid var(--rule)}
 .gr-belege-tag{color:var(--ink-4);font-size:11px}
-/* Beleg je Paar (Ziel 1d): eine leise Zeile je Anbieter, das Bild öffnet in der
-   Seite. Die Quote ist ein neutraler Satz, keine Warnung. */
+/* Beleg je gewaehlter Kombination (Ziel 1d, 08.11.2026): eine leise Zeile je
+   Anbieter, das Bild oeffnet in der Seite; app.js blendet nach Band und Laufzeit.
+   Ohne Bild steht der Vermerk (kein fremdes Bild). */
 .gr-beleg-paare{list-style:none;margin:10px 0 0;padding:0;font-family:var(--sans);
   font-size:13px;color:var(--ink-3)}
-.gr-beleg-paare li{display:flex;flex-wrap:wrap;gap:2px 8px;align-items:baseline;
+.gr-beleg-kopf{margin:0 0 4px;color:var(--ink-3)}
+.gr-beleg-paar{display:flex;flex-wrap:wrap;gap:2px 8px;align-items:baseline;
   margin:2px 0}
+.gr-beleg-paar[hidden],.gr-beleg-zeile[hidden],.gr-beleg-keins[hidden]{display:none}
 .gr-beleg-anbieter{font-weight:600;color:var(--ink-2)}
-.gr-beleg-fehlt{color:var(--ink-3)}
-.gr-belege--paar{margin:0;flex:1 1 0;min-width:min(100%,16em)}
-.gr-belege--paar>summary{text-decoration:underline;text-underline-offset:2px}
-.gr-belege--paar img{display:block;width:640px;max-width:100%;height:auto;
-  min-height:60px;margin:8px 0;background:var(--rule);border:1px solid var(--rule)}
-.gr-beleg-zeilen{color:var(--ink-3)}
-.gr-beleg-zeilenliste{flex:1 0 100%;list-style:none;margin:2px 0 0;padding:0 0 0 12px;
-  border-left:2px solid var(--rule)}
-.gr-beleg-zeilenliste li{display:block;margin:4px 0}
+.gr-beleg-zeile{flex:1 1 0;min-width:min(100%,16em)}
+.gr-beleg-keins{color:var(--ink-3)}
+.gr-belege--zeile{margin:0}
 .gr-belege--zeile>summary{text-decoration:underline;text-underline-offset:2px;
   overflow-wrap:anywhere}
 .gr-belege--zeile img{display:block;width:640px;max-width:100%;height:auto;
   min-height:60px;margin:8px 0;background:var(--rule);border:1px solid var(--rule)}
+.gr-bildfolge{list-style:none;margin:6px 0 0;padding:0 0 0 12px;
+  border-left:2px solid var(--rule)}
+.gr-bildfolge li{display:block;margin:6px 0}
+.gr-bildfolge-schritt{display:block;font-weight:600;color:var(--ink-2)}
+.gr-bildfolge-text{display:block;color:var(--ink-3)}
 .gr-belegquote{margin:8px 0 0;font-family:var(--sans);font-size:12px;
   color:var(--ink-3)}
 
