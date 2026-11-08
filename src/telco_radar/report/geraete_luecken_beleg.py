@@ -23,6 +23,14 @@ KURZ = "Nicht im Sortiment (geprüft {geprueft})"
 SATZ = "{grund}. Geprüft {geprueft}, gültig bis {bis}."
 
 
+def _detail(grund) -> str:
+    """Der Grund als sichtbarer Kurztext: steht vor einem „ - “ nur die
+    Wiederholung von „nicht im Sortiment (geprüft …)“, zählt der Teil danach;
+    sonst der ganze Grund."""
+    text = str(grund).strip().rstrip(". ")
+    return text.split(" - ", 1)[1] if " - " in text else text
+
+
 def _tag(wert) -> str:
     return f"{wert.day:02d}.{wert.month:02d}."
 
@@ -51,6 +59,7 @@ def fuer_modell(belege: dict, modell: dict, heute: str) -> dict[str, dict]:
         if beleg:
             aus[anbieter] = {
                 "kurz": KURZ.format(geprueft=_tag(beleg["geprueft"])),
+                "detail": _detail(beleg["grund"]),
                 "satz": SATZ.format(
                     grund=str(beleg["grund"]).rstrip(". "),
                     geprueft=_voll(beleg["geprueft"]),

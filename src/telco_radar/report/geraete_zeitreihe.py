@@ -83,10 +83,8 @@ from .geraete_zeitreihe_geometrie import (
     _y_schritt,
     form_pfad,
 )
-from .geraete_zeitreihe_legende import _euro0 as _euro0
-from .geraete_zeitreihe_legende import _mon_kurz as _mon_kurz
+from .geraete_zeitreihe_legende import _euro0, _mon_kurz, ohne_alte, ueberholt_html
 from .geraete_zeitreihe_legende import legende_html as _legende_html
-from .geraete_zeitreihe_legende import ueberholt_html
 
 log = logging.getLogger(__name__)
 
@@ -877,7 +875,9 @@ def _paar(
         "svg_schmal": _svg(
             standard_serien, False, beleg_je, zeitraeume, laufzeit=laufzeit
         ),
-        "rechenweg_html": _rechenwege_html(mess, zeilen, tarife),
+        "rechenweg_html": _rechenwege_html(
+            ohne_alte(modell, mess, serien), zeilen, tarife
+        ),
         "fehlen": fehlen_im_paar(modell, satz, band, laufzeit, band_katalog, h),
         "leer_text": leer,
         "anbieter": [a for a in ANBIETER_FOLGE if serien.get(a)],

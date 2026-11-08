@@ -30,6 +30,14 @@ def _mon_kurz(monate: list) -> str:
     return "/".join(str(m) for m in monate) + " Mon."
 
 
+def ohne_alte(modell: dict, mess: dict, serien: dict) -> dict:
+    """Die Messungen ohne die Anbieter, die eine belegte Lücke überholt hat und die
+    keine Reihe mehr haben: ihre Rechenweg-Vorlagen (`<template data-m=…>`) wären
+    nicht erreichbar, trügen aber die alte Zahl im HTML."""
+    luecken = modell.get("belegte_luecken") or {}
+    return {a: m for a, m in mess.items() if serien.get(a) or a not in luecken}
+
+
 def ueberholt_html(modell: dict, mess: dict, serien: dict) -> str:
     """Legendeneintrag je Anbieter, dessen Preise eine belegte Lücke überholt hat
     (`geraete_sortiment`, Vermerk `veraltet 17`): gemessen wurde, die Reihe fehlt
