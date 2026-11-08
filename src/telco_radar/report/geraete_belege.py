@@ -139,9 +139,9 @@ def installiere(env: Any, state_dir: Path, berichte: list[dict]) -> list[Ausfall
     """Macht ``belege_fuer(geraet_id, anbietername)`` für die Vorlagen verfügbar.
 
     ``berichte``: neuester zuerst; sein ``date`` ist das Berichtsdatum. Die Bilder je
-    Preiszeile (``zeilenbeleg``, ``zeilenquote``) kommen erst mit ``zeilenbelege``
-    dazu; bis dahin (oder wenn es scheitert) trägt keine Zeile ein Bild und die Quote
-    fehlt.
+    Preiszeile (``zeilenquote``, Zeilen im Paar-Eintrag) kommen erst mit
+    ``zeilenbelege`` dazu; bis dahin (oder wenn es scheitert) trägt keine Zeile ein
+    Bild und die Quote fehlt.
     """
     heute = berichte[0].get("date", "") if berichte else ""
     ausfaelle: list[Ausfall] = []
@@ -166,11 +166,11 @@ def installiere(env: Any, state_dir: Path, berichte: list[dict]) -> list[Ausfall
     zeilen: dict[str, Any] = {
         "fuer": lambda karte: None,
         "ok": False,
+        "gruende": {},
         "je_preis": je_preis,
         "manifest_ok": manifest_ok,
     }
     env.globals[ZEILEN_STAND] = zeilen
-    env.globals["zeilenbeleg"] = lambda karte: zeilen["fuer"](karte)
     env.globals["zeilenquote"] = lambda modelle: geraete_zeilenbelege.quote(
         zeilen["fuer"], modelle or [], zeilen["ok"] and zeilen["manifest_ok"]
     )
@@ -179,7 +179,9 @@ def installiere(env: Any, state_dir: Path, berichte: list[dict]) -> list[Ausfall
         paare = paarbelege(env.globals["belege_fuer"], modell)
         if not zeilen["ok"]:
             return paare
-        return geraete_zeilenbelege.ergaenze_paare(paare, modell, zeilen["fuer"])
+        return geraete_zeilenbelege.ergaenze_paare(
+            paare, modell, zeilen["fuer"], zeilen["gruende"]
+        )
 
     env.globals["paarbelege"] = paare_fuer
     env.globals["belegquote"] = lambda modelle: quote(
@@ -197,11 +199,12 @@ def zeilenbelege(env: Any, state_dir: Path, katalog: Any) -> list[Ausfall]:
     """
     zeilen = env.globals[ZEILEN_STAND]
     try:
-        index, _gruende = geraete_zeilenbelege.baue_index(
+        index, gruende = geraete_zeilenbelege.baue_index(
             lies_buendel(state_dir / BESTAND), zeilen["je_preis"], katalog
         )
     except ValueError as fehler:
         return [Ausfall.aus_ausnahme(TEIL_ZEILEN, fehler)]
     zeilen["fuer"] = geraete_zeilenbelege.zeilenbeleg_fuer(index)
+    zeilen["gruende"] = gruende
     zeilen["ok"] = True
     return []

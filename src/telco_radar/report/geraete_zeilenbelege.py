@@ -135,23 +135,48 @@ def _zeilen(modell: dict) -> list[dict]:
 
 
 def ergaenze_paare(
-    paare: list[dict], modell: dict, fuer: ZeilenbelegFuer
+    paare: list[dict],
+    modell: dict,
+    fuer: ZeilenbelegFuer,
+    gruende: dict[tuple[str, str], str] | None = None,
 ) -> list[dict]:
-    """Jedes Paar nennt, wie viele seiner Preiszeilen ein eigenes Bild haben."""
+    """Jedes Paar nennt seine Preiszeilen mit eigenem Bild (Gerät, Tarif, Raten, Preis).
+
+    ``zeilen_mit`` und ``zeilen_gesamt`` zählen die belastbaren Zeilen des Paares,
+    ``zeilenbilder`` sind die belegten; ohne eine belegte Zeile nennt ``zeilen_grund``
+    (wenn bekannt), warum das Bild des Paares keiner Zeile zugeordnet wird.
+    """
     gesamt: dict[str, int] = defaultdict(int)
-    mit: dict[str, int] = defaultdict(int)
+    bilder: dict[str, list[dict]] = defaultdict(list)
     for karte in _zeilen(modell):
         schluessel = anbieter_schluessel(karte.get("anbieter") or "")
         gesamt[schluessel] += 1
-        mit[schluessel] += 1 if fuer(karte) else 0
-    return [
-        {
-            **paar,
-            "zeilen_mit": mit[anbieter_schluessel(paar["anbieter"])],
-            "zeilen_gesamt": gesamt[anbieter_schluessel(paar["anbieter"])],
-        }
-        for paar in paare
-    ]
+        beleg = fuer(karte)
+        if beleg:
+            bilder[schluessel].append(
+                {
+                    "geraet": karte.get("geraet"),
+                    "tarif": karte.get("tarif"),
+                    "raten_laufzeit": karte.get("raten_laufzeit"),
+                    "label": karte.get("label"),
+                    "gesamt": karte.get("gesamt"),
+                    **beleg,
+                }
+            )
+    ergebnis = []
+    for paar in paare:
+        schluessel = anbieter_schluessel(paar["anbieter"])
+        grund = (gruende or {}).get((modell.get("id", ""), schluessel), "")
+        ergebnis.append(
+            {
+                **paar,
+                "zeilen_mit": len(bilder[schluessel]),
+                "zeilen_gesamt": gesamt[schluessel],
+                "zeilenbilder": bilder[schluessel],
+                "zeilen_grund": "" if bilder[schluessel] else grund,
+            }
+        )
+    return ergebnis
 
 
 def _zahl(n: int) -> str:
@@ -182,7 +207,8 @@ def quote(fuer: ZeilenbelegFuer, modelle: list[dict], bestand_ok: bool = True) -
             f"{e['anbieter']} {_zahl(e['mit'])} von {_zahl(e['gesamt'])}" for e in liste
         )
         satz = (
-            f"Screenshot genau zur Preiszeile (Gerät, Tarif und Laufzeit stimmen): "
-            f"{teile}; zusammen {_zahl(mit)} von {_zahl(gesamt)}."
+            "Preiszeilen mit eigenem Screenshot, Zuordnung über die Messung "
+            f"(aus dem Bild allein nicht ablesbar): {teile}; "
+            f"zusammen {_zahl(mit)} von {_zahl(gesamt)}."
         )
     return {"mit": mit, "gesamt": gesamt, "je_anbieter": liste, "satz": satz}

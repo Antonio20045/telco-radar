@@ -8,7 +8,10 @@ mit Bild. Feste Daten, nie das heutige Datum (CLAUDE.md Regel 7). Die Seite wird
 
 from __future__ import annotations
 
+import functools
+import http.server
 import json
+import threading
 from datetime import date, timedelta
 from pathlib import Path
 
@@ -112,64 +115,145 @@ def _text(element) -> str:
     return "".join(element.find_all(string=True)).strip()
 
 
-def _zeilen(*dom: BeautifulSoup) -> dict[str, list]:
-    je_anbieter: dict[str, list] = {}
-    for teil in dom:
-        for z in teil.select(".gr-bnd"):
-            je_anbieter.setdefault(z["data-anbieter"], []).append(z)
+def _paare(seite: BeautifulSoup) -> dict[str, object]:
+    """Die Paar-Einträge im sichtbaren Teil der Seite, je Anbieter."""
+    return {
+        li.select_one(".gr-beleg-anbieter").get_text(strip=True): li
+        for li in seite.select("#gr-bnd-gruppe > .gr-beleg-paare > li")
+    }
+
+
+def _anzahl(lager: BeautifulSoup) -> dict[str, int]:
+    je_anbieter: dict[str, int] = {}
+    for z in lager.select(".gr-bnd"):
+        je_anbieter[z["data-anbieter"]] = je_anbieter.get(z["data-anbieter"], 0) + 1
     return je_anbieter
 
 
-def test_die_eindeutige_zeile_traegt_ihr_bild(lager, seite):
-    """Positiv: o2 hat einen Satz, das Bild gehört genau zu dieser Zeile."""
-    je_anbieter = _zeilen(lager, seite)
-    assert je_anbieter["o2"], "Gegenprobe: die Fixture hat o2-Zeilen"
-    for z in je_anbieter["o2"]:
-        bild = z.select_one("details.gr-belege--zeile img[data-src]")
-        assert bild is not None, z
-        assert f"/belege-{HEUTE}/{_bild('o2')}" in bild["data-src"]
-        assert z.select_one(".gr-kk-marke--zeilenbeleg") is not None
-        assert VERMERK not in _text(z)
+def test_die_eindeutige_zeile_steht_im_paar_eintrag_mit_ihrem_bild(lager, seite):
+    """Positiv: o2 hat einen Satz; jede o2-Zeile steht im sichtbaren Paar-Eintrag
+    mit Tarif, Raten und Preis, das Bild gehört genau zu ihr."""
+    n_o2 = _anzahl(lager)["o2"]
+    assert n_o2, "Gegenprobe: die Fixture hat o2-Zeilen"
+    zeilen = _paare(seite)["o2"].select(
+        "ul.gr-beleg-zeilenliste details.gr-belege--zeile"
+    )
+    assert len(zeilen) == n_o2
+    for z in zeilen:
+        assert (
+            f"/belege-{HEUTE}/{_bild('o2')}"
+            in z.select_one("img[data-src]")["data-src"]
+        )
+        titel = _text(z.summary)
+        assert "O2 Mobile Klein" in titel
+        assert "24 Raten" in titel
+        assert "Zuordnung über die Messung" in titel
+        assert "€" in titel
 
 
-def test_unklare_zuordnung_zeigt_keinen_link_sondern_den_vermerk(lager, seite):
+def test_unklare_zuordnung_zeigt_kein_zeilenbild_sondern_den_grund(lager, seite):
     """Fail-closed: gleich teure Sätze (Telekom), neuerer Abruf als das Bild (congstar)
     und fehlende Klick-Messung (Vodafone) ergeben nie ein Bild an einer Zeile, obwohl
-    die Paare ein Seiten-Bild haben."""
-    je_anbieter = _zeilen(lager, seite)
-    for anbieter in ("Telekom", "congstar", "Vodafone"):
-        assert je_anbieter[anbieter], f"Gegenprobe: Zeilen für {anbieter}"
-        for z in je_anbieter[anbieter]:
-            assert z.select("details.gr-belege--zeile, img, a[href*='releases']") == []
-            assert z.select(".gr-kk-marke--zeilenbeleg") == []
-            assert _text(z.select_one(".gr-beleg-zeilenfehlt")) == VERMERK
+    die Paare ein Seiten-Bild haben; der Paar-Eintrag nennt die Zahl und den Grund."""
+    paare = _paare(seite)
+    n = _anzahl(lager)
+    gruende = {
+        "Telekom": schluessel.GRUND_GLEICHSTAND,
+        "congstar": schluessel.GRUND_BESTAND_NEUER,
+        "Vodafone": schluessel.GRUND_KEIN_KLICKSATZ,
+    }
+    for anbieter, grund in gruende.items():
+        assert n[anbieter], f"Gegenprobe: Zeilen für {anbieter}"
+        li = paare[anbieter]
+        assert li.select("details.gr-belege--zeile, ul.gr-beleg-zeilenliste") == []
+        text = li.select_one(".gr-beleg-zeilen").get_text(strip=True)
+        assert text == (
+            f"0 von {n[anbieter]} Preiszeilen mit eigenem Screenshot ({grund})"
+        )
 
 
 def test_quote_nennt_je_anbieter_zeilen_nicht_paare(lager, seite):
-    """Die Seite zählt Zeilen je Anbieter, ehrlich auch bei 0."""
-    je_anbieter = _zeilen(lager)
-    n = {a: len(z) for a, z in je_anbieter.items()}
+    """Die Seite zählt Zeilen je Anbieter, ehrlich auch bei 0, und sagt, dass die
+    Zuordnung über die Messung läuft und das Bild nur die Preisfelder zeigt."""
+    n = _anzahl(lager)
     satz = seite.select_one("#gr-zeilenquote").get_text(strip=True)
     erwartet = (
-        "Screenshot genau zur Preiszeile (Gerät, Tarif und Laufzeit stimmen): "
+        "Preiszeilen mit eigenem Screenshot, Zuordnung über die Messung "
+        "(aus dem Bild allein nicht ablesbar): "
         f"congstar 0 von {n['congstar']} · o2 {n['o2']} von {n['o2']} · "
         f"Telekom 0 von {n['Telekom']} · Vodafone 0 von {n['Vodafone']}; "
         f"zusammen {n['o2']} von {sum(n.values())}."
     )
     assert satz == erwartet
     assert "Paaren" not in satz
+    assert "Tarif und Laufzeit stimmen" not in satz
 
 
 def test_paar_nennt_seine_zeilen_mit_bild(lager, seite):
-    je_anbieter = {
-        li.select_one(".gr-beleg-anbieter").get_text(strip=True): li
-        for li in seite.select("#gr-bnd-gruppe .gr-beleg-paare li")
-    }
-    n_o2 = len(_zeilen(lager)["o2"])
-    assert je_anbieter["o2"].select_one(".gr-beleg-zeilen").get_text(strip=True) == (
+    n_o2 = _anzahl(lager)["o2"]
+    paare = _paare(seite)
+    assert paare["o2"].select_one(".gr-beleg-zeilen").get_text(strip=True) == (
         f"{n_o2} von {n_o2} Preiszeilen mit eigenem Screenshot"
     )
-    assert "0 von" in je_anbieter["Telekom"].select_one(".gr-beleg-zeilen").text
+
+
+def test_fragment_traegt_keine_zeilenbilder_an_der_buendelliste(lager):
+    """Die Bündelliste ist von der Seite genommen: dort steht kein Zeilenbild."""
+    assert (
+        lager.select(".gr-bnd details.gr-belege, .gr-bnd .gr-beleg-zeilenfehlt") == []
+    )
+
+
+ZEILE = "#gr-bnd-gruppe .gr-beleg-zeilenliste details.gr-belege--zeile"
+OFFEN = "#gr-bnd-gruppe .gr-belege--zeile[open] img"
+PNG = bytes.fromhex(
+    "89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c489"
+    "0000000d49444154789c6360f8cfc0f01f0005000201a5f645400000000049454e44ae426082"
+)
+
+
+def _pruefe_breite(chromium, adresse: str, breite: int) -> list[str]:
+    """Öffnet die Seite in dieser Breite, klappt ein Zeilenbild auf, gibt die
+    Konsolenmeldungen zurück."""
+    meldungen: list[str] = []
+    ctx = chromium.new_context(viewport={"width": breite, "height": 900})
+    try:
+        ctx.route(
+            "https://github.com/**",
+            lambda r: r.fulfill(body=PNG, content_type="image/png"),
+        )
+        s = ctx.new_page()
+        s.on("console", lambda m: meldungen.append(m.text))
+        s.on("pageerror", lambda e: meldungen.append(str(e)))
+        s.goto(adresse, wait_until="domcontentloaded")
+        zeile = s.locator(f"{ZEILE} > summary").first
+        assert zeile.is_visible(), breite
+        assert "Zuordnung über die Messung" in zeile.inner_text()
+        zeile.click()
+        s.wait_for_function(f"document.querySelector('{OFFEN}').hasAttribute('src')")
+        assert s.locator(OFFEN).is_visible(), breite
+        s.wait_for_function(f"document.querySelector('{OFFEN}').complete")
+        assert s.evaluate("document.documentElement.scrollWidth") <= breite
+    finally:
+        ctx.close()
+    return meldungen
+
+
+@pytest.mark.browser
+def test_zeilenbild_im_echten_seitenfluss_sichtbar_und_aufklappbar(site, chromium):
+    """Playwright auf der gebauten Seite (1440 und 390 px): der Zeilenbild-Aufklapper
+    ist sichtbar, öffnet das Bild, kein Querscrollen, Konsole leer."""
+    handler = functools.partial(
+        http.server.SimpleHTTPRequestHandler, directory=str(site)
+    )
+    httpd = http.server.ThreadingHTTPServer(("127.0.0.1", 0), handler)
+    threading.Thread(target=httpd.serve_forever, daemon=True).start()
+    try:
+        adresse = f"http://127.0.0.1:{httpd.server_address[1]}/geraete.html"
+        for breite in (1440, 390):
+            assert _pruefe_breite(chromium, adresse, breite) == [], breite
+    finally:
+        httpd.shutdown()
 
 
 def _roh(beleg_id, rate, tag=HEUTE, **extra):
