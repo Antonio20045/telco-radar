@@ -99,6 +99,7 @@ from .tarif_model import (
     vertrag_basis,
 )
 from .tarif_phasensumme import phasensumme as phasensumme
+from .tarifname import pruefe_tarifname
 from .tco_kosten import Kosten as Kosten
 from .tco_kosten import kosten_ueber as kosten_ueber
 from .tco_kosten import zeitraum as zeitraum
@@ -526,8 +527,7 @@ class Buendel:
     def __post_init__(self):
         if not (self.anbieter or "").strip():
             raise ValueError("ein Buendel ohne Anbieter ist keins")
-        if not (self.tarif_name or "").strip():
-            raise ValueError("ein Buendel ohne Tarif ist keins")
+        pruefe_tarifname(self.tarif_name, "ein Buendel ohne Tarif ist keins")
         self.anbieter = self.anbieter.strip()
         self.tarif_name = self.tarif_name.strip()
         self.sku_id = (self.sku_id or "").strip()
@@ -655,8 +655,7 @@ class SimOnlyReferenz:
     def __post_init__(self):
         if not (self.anbieter or "").strip():
             raise ValueError("eine SIM-only-Referenz ohne Anbieter ist keine")
-        if not (self.tarif_name or "").strip():
-            raise ValueError("eine SIM-only-Referenz ohne Tarif ist keine")
+        pruefe_tarifname(self.tarif_name, "eine SIM-only-Referenz ohne Tarif ist keine")
         self.anbieter = self.anbieter.strip()
         self.tarif_name = self.tarif_name.strip()
         for feld in ("tarif_sim_only_monatlich", "anschlusspreis"):
