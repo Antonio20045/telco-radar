@@ -342,20 +342,27 @@ anbieter:
     # des sichtbaren Preises (wie im Auftrag zunaechst angenommen) ist
     # NICHT noetig.
     grund: >-
-      Noch nicht aktiv: (1) die Zuordnung Katalog-Modell ->
-      `offerGroupId`/`hwi` ist ungeloest - die vier Fixtures tragen die
-      IDs von Hand aus der Recherche, keine Ernte-Schleife ueber die
-      Kampagnenseite findet sie bisher selbst; (2) ein Tarifwelt-Satz
-      traegt `netz` JE ZEILE (dieselbe Seite fuehrt o2, freenet-Telekom
-      und freenet-Vodafone gleichzeitig) - das bestehende Buendelschema
-      kennt `netz` nur als Anbieter-Eigenschaft, nicht je Satz; das muss
-      vor `aktiv: true` sauber in geraete_tco.json eingehaengt werden.
-      Lieber inaktiv und korrekt als aktiv und falsch.
+      Noch nicht aktiv, Stand 08.11.2026: Leser und Auswahl sind gebaut und
+      gegen echte Fixtures getestet (collect/geraete/tarifwelt_lauf.py,
+      lokaler Probelauf nur dieses Adapters, arbeit/tarifwelt-0811.md
+      "Lauf 08.11. frueh"). Es fehlt die Einhaengung in den Tageslauf:
+      (1) die Tarife dieser Quelle (tarif_id "mediamarkt_tarifwelt:<id>")
+      stehen nicht im Tarifbestand data/state/tarife.jsonl, ohne den der
+      Bericht keinem Satz ein Tarifband zuordnet; (2) das Netz gilt JE ZEILE
+      (Anbieterzeile "Saturn/MediaMarkt · <Netz>-Netz"), das Buendelschema
+      kennt `netz` nur je Anbieter; (3) `lies` liefert bewusst keine
+      Geraeteliste, ein Einstieg fuer den Sammler existiert nicht. Aktiv
+      erst, wenn das im Tageslauf getestet ist - lieber inaktiv und
+      korrekt als aktiv und falsch.
     hinweis: >-
       Saturn/MediaMarkt verkaufen Geraet + Fremdtarif (o2, freenet im
-      Telekom- und im Vodafone-Netz) ueber dieselbe Ceconomy-Plattform -
-      der Parser ist fertig und getestet, die Ernte- und Einhaenge-Arbeit
-      folgt in einem weiteren Paket.
+      Telekom- und im Vodafone-Netz) ueber dieselbe Ceconomy-Plattform.
+      Gelesen wird die Schnittstelle der Tarifwelt (tarife-api2.mediamarkt.de,
+      kein robots.txt; tarife.mediamarkt.de sperrt nur /pks und /checkout)
+      mit ehrlicher Kennung, ein Versuch je Variante, harter Abbruch bei
+      Schutzantwort, Pause 2 s. Je Netz und Band genau ein Tarif nach der
+      Band-Regel der Netzbetreiber (band_regel.stufe_fuer); Doppelkarten,
+      Aktions- und Young-Tarife zaehlen nicht.
 
   - name: Coolblue
     typ: handel

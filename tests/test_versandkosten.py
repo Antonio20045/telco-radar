@@ -7,8 +7,9 @@ Beträge stehen mit URL und Abrufdatum in `config/versandkosten.yaml`. Dieses Mo
 rechnet mit den echten Beträgen (`conftest._versand_nur_wo_er_gemeint_ist`).
 
 `SOLL` sind die am 05.11.2026 an den Kostenübersichten der Anbieter gemessenen Beträge
-(Belege: Bereich telcoradar/abnahme/versand-0511), bewusst noch einmal hier: weicht die
-Datei ab, schlägt der Test aus.
+(Belege: Bereich telcoradar/abnahme/versand-0511; die zwei Saturn/MediaMarkt-Zeilen
+am 08.11.2026 an der Tarifwelt, Belege abnahme/tarifwelt-0811), bewusst noch einmal
+hier: weicht die Datei ab, schlägt der Test aus.
 """
 
 from __future__ import annotations
@@ -36,6 +37,8 @@ SOLL = {
     "o2": 6.99,
     "congstar": 4.99,
     "1&1": 0.0,
+    "Saturn/MediaMarkt · o2-Netz": 5.95,
+    "Saturn/MediaMarkt · Telekom-Netz": 5.95,
 }
 
 
