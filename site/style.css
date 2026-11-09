@@ -6449,6 +6449,11 @@ a.ki-k1-pille:hover{border-color:var(--ink)}
 .gr-hm-leer .gr-hm-spur{opacity:.45}
 .gr-hm-duenn .gr-hm-zahl,.gr-hm-duenn .gr-hm-spur{opacity:.55}
 .gr-hm-ohne{margin:12px 0 0;font:500 13px var(--sans);color:var(--ink-3)}
+.gr-md{display:flex;flex-wrap:wrap;gap:4px 18px;list-style:none;margin:0 0 14px;padding:0;
+  font:500 13px/1.5 var(--sans);color:var(--ink-2)}
+.gr-md-z{min-width:0;overflow-wrap:anywhere}
+.gr-md-z--alt{color:var(--ink-3)}
+.gr-md-anteil{color:var(--ink-3)}
 .gr-hm-erklaerung{max-width:var(--wrap-text);margin:12px 0 0;font:400 14px/1.5 var(--sans);color:var(--ink-3)}
 .gr-hm-erklaerung p{margin:0 0 8px}
 @media (max-width:720px){
