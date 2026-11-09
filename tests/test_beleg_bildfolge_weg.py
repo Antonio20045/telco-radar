@@ -28,6 +28,13 @@ from beleg_attrappe import AttrappeReleases
 from bs4 import BeautifulSoup
 from test_beleg_skripte import lade_skript, satz
 
+from telco_radar.beleg_ablage import Bild, GhFehler, veroeffentliche
+from telco_radar.beleg_bildfolge import (
+    ADRESSE_ANFANG,
+    fremd_zur_kennung,
+    kennung_der_adresse,
+    normalisiere,
+)
 from telco_radar.beleg_folgen import lies_folgen
 from telco_radar.beleg_manifest import MANIFEST_DATEI, MANIFEST_NAME, baue_manifest
 from telco_radar.beleg_regeln import (
@@ -204,17 +211,18 @@ def seite(seitenordner) -> BeautifulSoup:
 
 
 def test_folgebilder_gehen_mit_dem_einzelbild_in_dasselbe_release(weg):
-    einzel = dateiname(pos.MODELL, "o2", TAG)
     erwartet = {
-        einzel,
+        folge_dateiname(pos.MODELL, "o2", TAG, "preis", weg.beleg_id),
         folge_dateiname(pos.MODELL, "o2", TAG, "geraet_speicher", weg.beleg_id),
         folge_dateiname(pos.MODELL, "o2", TAG, "laufzeit", weg.beleg_id),
     }
     assert [tag for tag, _ in weg.gh.hochgeladen] == [TAGES_RELEASE]
     assert set(weg.gh.stand[TAGES_RELEASE]) == erwartet
-    assert all(zerlege_folgename(n) or zerlege_dateiname(n) for n in erwartet), (
-        "jeder Name liegt im Schema"
+    assert all(zerlege_folgename(n) for n in erwartet), "jeder Name liegt im Schema"
+    assert {zerlege_folgename(n).kennung for n in erwartet} == {weg.beleg_id[:16]}, (
+        "auch das Einzelbild (preis) trägt die Kennung: eine Position, eine Kennung"
     )
+    assert dateiname(pos.MODELL, "o2", TAG) not in weg.gh.stand[TAGES_RELEASE]
 
 
 def test_manifest_nennt_die_folge_mit_gueltigen_adressen_und_dem_fehlenden_schritt(weg):
@@ -298,30 +306,178 @@ def test_alter_eintrag_mit_dateinamen_statt_adressen_zeigt_nur_das_einzelbild(
 
 
 def test_ohne_folgebilder_im_release_bleibt_es_ein_einzelbild(weg):
-    stand = {t: [n for n in d if zerlege_dateiname(n)] for t, d in weg.gh.stand.items()}
+    stand = {
+        t: [n for n in d if zerlege_folgename(n).schritt == "preis"]
+        for t, d in weg.gh.stand.items()
+    }
     (eintrag,) = baue_manifest(stand, TAG, lies_folgen([weg.klick]))["belege"]
     assert "bildfolge" not in eintrag
-
-
-def test_zwei_positionen_am_selben_tag_ergeben_keine_folge(weg):
-    """Folgebilder zweier Positionen: nicht beweisbar, welche zum Einzelbild gehören."""
-    stand = {t: list(d) for t, d in weg.gh.stand.items()}
-    stand[TAGES_RELEASE].append(
-        folge_dateiname(pos.MODELL, "o2", TAG, "tarif", "f" * 64)
+    assert eintrag["url"].endswith(
+        folge_dateiname(pos.MODELL, "o2", TAG, "preis", weg.beleg_id)
     )
+
+
+def test_zwei_positionen_mit_einzelbild_am_selben_tag_ergeben_keine_folge(weg):
+    """Zwei Einzelbilder (zwei Kennungen) desselben Paares: nicht beweisbar, welches
+    gilt. Kein Einzelbild, keine Folge, gezählt."""
+    stand = {t: list(d) for t, d in weg.gh.stand.items()}
+    stand[TAGES_RELEASE] += [
+        folge_dateiname(pos.MODELL, "o2", TAG, "preis", "f" * 64),
+        folge_dateiname(pos.MODELL, "o2", TAG, "tarif", "f" * 64),
+    ]
     manifest = baue_manifest(stand, TAG, lies_folgen([weg.klick]))
-    (eintrag,) = manifest["belege"]
-    assert "bildfolge" not in eintrag and manifest["folge_verworfen"] == 1
+    assert manifest["belege"] == [] and manifest["folge_verworfen"] == 1
 
 
-def test_veraltetes_folgebild_wird_beim_naechsten_lauf_geloescht(weg):
+def test_folgebilder_ohne_ihr_einzelbild_zaehlen_nicht(weg):
+    """Die Folge einer Kennung ohne Einzelbild (nicht angekommen) ist keine: das
+    Einzelbild der anderen Position zeigt nur seine eigenen Schritte."""
+    stand = {t: list(d) for t, d in weg.gh.stand.items()}
+    fremd = folge_dateiname(pos.MODELL, "o2", TAG, "tarif", "f" * 64)
+    stand[TAGES_RELEASE].append(fremd)
+    (eintrag,) = baue_manifest(stand, TAG, lies_folgen([weg.klick]))["belege"]
+    assert fremd not in json.dumps(eintrag)
+    assert {kennung_der_adresse(b["datei"]) for b in eintrag["bildfolge"]} == {
+        weg.beleg_id[:16]
+    }
+
+
+def test_s1_folge_entsteht_nur_aus_bildern_derselben_kennung():
+    """Zeitfenster eines zweiten Laufs: das neue Einzelbild (K2) liegt, die Schritte
+    der früheren Position (K1) stehen noch. Keine Mischfolge aus K2 und K1."""
+    k1, k2 = "1" * 64, "2" * 64
+    stand = {
+        TAGES_RELEASE: [
+            folge_dateiname(pos.MODELL, "o2", TAG, "preis", k2),
+            folge_dateiname(pos.MODELL, "o2", TAG, "tarif", k1),
+            folge_dateiname(pos.MODELL, "o2", TAG, "laufzeit", k1),
+        ]
+    }
+    (eintrag,) = baue_manifest(stand, TAG, {})["belege"]
+    assert "bildfolge" not in eintrag
+    assert kennung_der_adresse(eintrag["url"]) == k2[:16]
+
+
+def test_s1_einzelbild_ohne_kennung_bleibt_einzelbild_und_bildet_keine_folge(weg):
+    """Bestand von vor der Einführung: nichts geht verloren, nichts zugeschlagen."""
+    alt = dateiname(pos.MODELL, "o2", TAG)
+    stand = {
+        TAGES_RELEASE: [
+            alt,
+            folge_dateiname(pos.MODELL, "o2", TAG, "tarif", weg.beleg_id),
+        ]
+    }
+    (eintrag,) = baue_manifest(stand, TAG, lies_folgen([weg.klick]))["belege"]
+    assert eintrag["url"].endswith(f"/{alt}") and "bildfolge" not in eintrag
+
+
+def test_s1_das_einzelbild_wird_mit_der_kennung_der_position_benannt():
     modul = lade_skript("belege_veroeffentlichen")
-    alt = folge_dateiname(pos.MODELL, "o2", TAG, "tarif", "f" * 64)
-    gh = AttrappeReleases({TAGES_RELEASE: [alt]})
-    neu = Path(dateiname(pos.MODELL, "o2", TAG))
-    bilder = [SimpleNamespace(datei=neu, gross=False)]
+    plain = dateiname(pos.MODELL, "o2", TAG)
+    zeilen: list[str] = []
+    gut = modul.einzelbild_name(SimpleNamespace(beleg_id="ab" * 32), plain, zeilen)
+    assert gut == folge_dateiname(pos.MODELL, "o2", TAG, "preis", "ab" * 32)
+    assert zerlege_folgename(gut).kennung == "ab" * 8 and zeilen == []
+    kaputt = modul.einzelbild_name(SimpleNamespace(beleg_id="kein-hex"), plain, zeilen)
+    assert kaputt == plain and "ohne Kennung" in zeilen[0]
+
+
+def test_veraltetes_bild_wird_geloescht_wenn_das_neue_einzelbild_angekommen_ist():
+    modul = lade_skript("belege_veroeffentlichen")
+    k1, k2 = "1" * 64, "2" * 64
+    alt = [folge_dateiname(pos.MODELL, "o2", TAG, s, k1) for s in ("preis", "tarif")]
+    neu = folge_dateiname(pos.MODELL, "o2", TAG, "preis", k2)
+    gh = AttrappeReleases({TAGES_RELEASE: [*alt, neu]})
+    bilder = [SimpleNamespace(datei=Path(neu), gross=False)]
     assert modul.raeume_veraltete_folgen(bilder, gh) == []
-    assert gh.assets_geloescht == [(TAGES_RELEASE, alt)]
+    assert sorted(gh.assets_geloescht) == sorted((TAGES_RELEASE, d) for d in alt)
+    assert gh.stand[TAGES_RELEASE] == [neu]
+
+
+class EinzelbildNichtAngekommen(AttrappeReleases):
+    """Teilausfall: Schritte kommen an, das Einzelbild (preis) wird abgelehnt."""
+
+    def hochladen(self, tag, dateien):
+        namen = [d.name for d in dateien]
+        liste = self.stand.setdefault(tag, [])
+        liste.extend(
+            n
+            for n in namen
+            if zerlege_folgename(n).schritt != "preis" and n not in liste
+        )
+        if any(zerlege_folgename(n).schritt == "preis" for n in namen):
+            raise GhFehler("gh release upload: Exit 1: Einzelbild abgelehnt")
+
+
+def test_m1_nichts_wird_geloescht_solange_das_neue_einzelbild_fehlt():
+    """Zweiter Lauf am selben Tag (Position K2), das Einzelbild kommt nicht an, seine
+    Schritte schon. Die vollständige frühere Position K1 bleibt stehen (sonst wäre das
+    Einzelbild von K1 weg oder die Folge aus K1 und K2 gemischt)."""
+    modul = lade_skript("belege_veroeffentlichen")
+    k1, k2 = "1" * 64, "2" * 64
+    liegt_k1 = [
+        folge_dateiname(pos.MODELL, "o2", TAG, s, k1)
+        for s in ("preis", "geraet_speicher", "tarif", "laufzeit")
+    ]
+    gh = EinzelbildNichtAngekommen({TAGES_RELEASE: list(liegt_k1)})
+    bilder = [
+        Bild(Path(folge_dateiname(pos.MODELL, "o2", TAG, s, k2)), False)
+        for s in ("preis", "tarif", "laufzeit")
+    ]
+    bilanz = veroeffentliche(bilder, TAG, gh)
+    assert bilanz.fehler, "der Ausfall steht in der Bilanz"
+    assert modul.raeume_veraltete_folgen(bilder, gh) == []
+    assert gh.assets_geloescht == []
+    assert set(liegt_k1) <= set(gh.stand[TAGES_RELEASE])
+    (eintrag,) = baue_manifest(gh.stand, TAG, {})["belege"]
+    kennungen = {kennung_der_adresse(b["datei"]) for b in eintrag["bildfolge"]}
+    assert kennungen == {k1[:16]}, "die Folge besteht nur aus Bildern von K1"
+    assert kennung_der_adresse(eintrag["url"]) == k1[:16]
+
+
+def test_s2_die_seite_zeigt_kein_bild_einer_anderen_messung(weg, tmp_path):
+    """Folge der Kennung K, die Zeile gehört zu einer anderen ``beleg_id``: kein Bild,
+    ein Vermerk statt des fremden Bilds (kein Bild unter der falschen Zeile)."""
+    fremd_id = "9" * 64
+    assert fremd_id[:16] != weg.beleg_id[:16]
+    seite = _seite(tmp_path, weg.manifest, fremd_id)
+    paar = next(
+        li for li in seite.select(".gr-beleg-paar") if li["data-anbieter"] == "o2"
+    )
+    assert paar.select("img") == [] and paar.select(".gr-bildfolge") == []
+    keins = paar.select_one(".gr-beleg-keins")
+    assert "hidden" not in keins.attrs
+    assert "gehört zu einer anderen Messung" in keins.get_text(" ", strip=True)
+    assert weg.beleg_id[:16] in keins.get_text()
+
+
+def _adr(name: str) -> str:
+    return f"{ADRESSE_ANFANG}{TAG}/{name}"
+
+
+def test_s2_ein_fremder_schritt_verwirft_die_ganze_folge():
+    eigene = "ab" * 8
+    folge = [
+        {"url": _adr(folge_dateiname(pos.MODELL, "o2", TAG, s, k)), "schritt": s}
+        for s, k in (("tarif", eigene), ("preis", eigene), ("laufzeit", "cd" * 8))
+    ]
+    einzel = folge[1]["url"]
+    assert "laufzeit" in fremd_zur_kennung(einzel, folge, eigene)
+    assert fremd_zur_kennung(einzel, folge[:2], eigene) == ""
+    assert "gehört zur Messung" in fremd_zur_kennung(einzel, folge[:2], "cd" * 8)
+    alt = _adr(dateiname(pos.MODELL, "o2", TAG))
+    assert fremd_zur_kennung(alt, [], eigene) == "", "altes Einzelbild: nicht beweisbar"
+    ohne_namen = [{"url": _adr("x__y__2026-11-08.webp"), "schritt": "tarif"}]
+    assert fremd_zur_kennung(alt, ohne_namen, eigene)
+
+
+def test_s2_mischfolge_aus_zwei_kennungen_liest_die_seite_nicht(weg):
+    manifest = json.loads(json.dumps(weg.manifest))
+    b = manifest["belege"][0]
+    b["bildfolge"][0]["datei"] = _adr(
+        folge_dateiname(pos.MODELL, "o2", TAG, "geraet_speicher", "7" * 64)
+    )
+    assert normalisiere(b["bildfolge"], b["bildfolge_fehlt"]) == ()
 
 
 def test_aufbewahrung_loescht_das_folgebild_mit_dem_einzelbild():

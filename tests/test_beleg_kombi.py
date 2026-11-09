@@ -31,6 +31,7 @@ from telco_radar.beleg_manifest import (
     lies,
     schreibe,
 )
+from telco_radar.beleg_regeln import folge_dateiname
 from telco_radar.report.html import render_site
 
 ID_O2_36 = "e" * 64
@@ -43,13 +44,14 @@ FOLGE = [
 PNG = pos.PNG
 
 
-def _datei(nr: int) -> str:
-    return f"{pos.MODELL}__o2__{pos.HEUTE}__schritt{nr}.webp"
+def _datei(schritt: str) -> str:
+    """Der Name eines Bilds der Position ``pos.ID_O2`` (Schritt mit Kennung)."""
+    return folge_dateiname(pos.MODELL, "o2", pos.TAG, schritt, pos.ID_O2)
 
 
-def _adresse(nr: int) -> str:
+def _adresse(schritt: str) -> str:
     """Die Adresse eines veröffentlichten Anhangs (nur eine Adresse zählt)."""
-    return f"{ADRESSE_ANFANG}{pos.HEUTE}/{_datei(nr)}"
+    return f"{ADRESSE_ANFANG}{pos.HEUTE}/{_datei(schritt)}"
 
 
 @pytest.fixture(scope="module")
@@ -71,8 +73,8 @@ def site(tmp_path_factory) -> Path:
     )
     manifest = baue_manifest({f"belege-{pos.HEUTE}": [pos._bild("o2")]}, pos.TAG)
     manifest["belege"][0]["bildfolge"] = [
-        {"datei": _adresse(nr), "schritt": schritt, "text": text}
-        for nr, (schritt, text) in enumerate(FOLGE, start=1)
+        {"datei": _adresse(schritt), "schritt": schritt, "text": text}
+        for schritt, text in FOLGE
     ]
     schreibe(state / MANIFEST_NAME, manifest)
     render_site(site, wurzel / "data" / "reports")
@@ -104,7 +106,7 @@ def test_bildfolge_mit_drei_eintraegen_steht_in_reihenfolge(seite):
             f"Schritt {nr} von {len(FOLGE)}: {SCHRITTE[schritt]}"
         )
         assert li.select_one(".gr-bildfolge-text").get_text(strip=True) == text
-        assert li.select_one("img")["data-src"].endswith(f"/{_datei(nr)}")
+        assert li.select_one("img")["data-src"].endswith(f"/{_datei(schritt)}")
     assert "Screenshot-Folge (3 Bilder)" in zeile.summary.get_text(" ", strip=True)
 
 

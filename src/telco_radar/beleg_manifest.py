@@ -6,6 +6,10 @@ Release-Anhängen.
 und ohne LLM. Der Dateiname trägt Gerät, Anbieter und Tag (``beleg_regeln.dateiname``);
 der Downloadlink ergibt sich aus Release-Tag und Dateiname. Ein Eintrag kann eine
 ``bildfolge`` tragen (``beleg_bildfolge``); die Seite zeigt sie statt des Einzelbilds.
+Das Einzelbild einer Messung heißt ``…__preis__<kennung>.webp`` und trägt wie jeder
+Schritt der Folge die Kennung der Position (``beleg_regeln.folge_dateiname``): eine
+Folge besteht nur aus Bildern derselben Kennung. Ein altes Einzelbild ohne Kennung
+bleibt ein Einzelbild ohne Folge.
 
 Ein Bild kann in beiden Releases liegen (Tag und Monat, große Änderung). Die Seite zeigt
 es einmal, mit Kennzeichen ``gross``; liegt es nur im Monats-Release, ist es ebenfalls
@@ -84,18 +88,18 @@ HINWEIS_UNVEROEFFENTLICHT = "Bild nicht veröffentlicht"
 
 
 def _folge(
-    url: str, schritte: Mapping[str, str], info: Folgeninfo | None
+    schritte: Mapping[str, str], info: Folgeninfo | None
 ) -> tuple[list[dict[str, str]], list[str]]:
     """Bildfolge und Lücken einer Position in der Reihenfolge ``SCHRITTE``.
 
-    ``schritte`` sind die veröffentlichten Folgebilder (Schritt -> Adresse); der Schritt
-    ``preis`` ist das Einzelbild unter ``url``."""
+    ``schritte`` sind die veröffentlichten Bilder der Position (Schritt -> Adresse),
+    der Schritt ``preis`` ist ihr Einzelbild."""
     texte = info.texte if info else {}
     gruende = info.fehlt if info else {}
     folge: list[dict[str, str]] = []
     fehlt: list[str] = []
     for schritt in SCHRITTE:
-        adresse = url if schritt == PREIS else schritte.get(schritt)
+        adresse = schritte.get(schritt)
         if adresse is None:
             fehlt.append(
                 f"{schritt}: {gruende.get(schritt, HINWEIS_UNVEROEFFENTLICHT)}"
@@ -113,30 +117,41 @@ def _merke_folge(
     tag: str,
     datei: str,
 ) -> None:
-    """Hält die Adresse eines Folgebilds fest; liegt es auch im Monats-Release (große
-    Änderung), gilt dieses, wie beim Einzelbild."""
+    """Hält die Adresse eines Bilds der Position fest; liegt es auch im Monats-Release
+    (große Änderung), gilt dieses, wie beim alten Einzelbild."""
     stellen = folgebilder.setdefault(folge.paar, {}).setdefault(folge.kennung, {})
     if folge.schritt not in stellen or ist_gross_tag(tag):
         stellen[folge.schritt] = bild_url(tag, datei)
 
 
-def _haenge_folgen_an(
+def _setze_positionen(
     gefunden: dict[tuple[str, str, str], dict],
     folgebilder: dict[tuple[str, str, str], dict[str, dict[str, str]]],
     folgen: Mapping[str, Folgeninfo],
 ) -> int:
-    """Setzt die Bildfolge an jedes Einzelbild mit Folgebildern; gibt die Zahl der
-    Einzelbilder zurück, deren Folge verworfen wurde (mehrere Positionen)."""
+    """Setzt Einzelbild und Bildfolge aus den Bildern mit Kennung ein.
+
+    Das Einzelbild einer Position heißt ``…__preis__<kennung>`` und trägt wie jeder
+    Schritt die Kennung: eine Folge entsteht nur aus Bildern derselben Kennung, nie aus
+    einem Einzelbild und Schritten, die nur zufällig am selben Tag liegen. Ein altes
+    Einzelbild ohne Kennung bleibt ein Einzelbild. Folgebilder einer Kennung ohne ihr
+    Einzelbild (nicht angekommen) zählen nicht. Zeigen zwei Kennungen mit Einzelbild auf
+    dasselbe Paar, ist nicht beweisbar, welche gilt: keines davon, der Fall wird gezählt
+    (``folge_verworfen``). Gibt die Zahl dieser Paare zurück."""
     verworfen = 0
-    for schluessel, rest in gefunden.items():
-        vorhanden = folgebilder.get(schluessel, {})
-        if len(vorhanden) > 1:
+    for schluessel, positionen in folgebilder.items():
+        mit_einzelbild = {k: s for k, s in positionen.items() if PREIS in s}
+        if len(mit_einzelbild) > 1:
             verworfen += 1
-        elif vorhanden:
-            ((kennung, schritte),) = vorhanden.items()
-            rest["bildfolge"], rest["bildfolge_fehlt"] = _folge(
-                rest["url"], schritte, folgen.get(kennung)
-            )
+        elif mit_einzelbild:
+            ((kennung, schritte),) = mit_einzelbild.items()
+            url = schritte[PREIS]
+            eintrag: dict = {"url": url, "gross": ist_gross_tag(url.rsplit("/", 2)[-2])}
+            if len(schritte) > 1:
+                eintrag["bildfolge"], eintrag["bildfolge_fehlt"] = _folge(
+                    schritte, folgen.get(kennung)
+                )
+            gefunden[schluessel] = eintrag
     return verworfen
 
 
@@ -170,7 +185,7 @@ def baue_manifest(
             if eintrag is None or ist_gross_tag(tag):
                 eintrag = {"url": bild_url(tag, datei)}
             gefunden[schluessel] = {**eintrag, "gross": gross}
-    verworfen = _haenge_folgen_an(gefunden, folgebilder, folgen or {})
+    verworfen = _setze_positionen(gefunden, folgebilder, folgen or {})
     belege = [
         {"geraet_id": g, "anbieter_id": a, "datum": d, **rest}
         for (g, a, d), rest in gefunden.items()
