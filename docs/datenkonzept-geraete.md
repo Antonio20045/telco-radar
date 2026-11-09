@@ -249,7 +249,7 @@ Ergebnis je Datensatz: gültig, Quarantäne oder veraltet.
 14. Pflichtfelder vollständig (Zuzahlung, Rate, Ratenlaufzeit, Tarif, Tarifbindung, Anschluss).
 15. Vergleiche nur bei gleicher Ratenlaufzeit und gleichem Zeitraum H.
 16. Bündel älter als drei Tage nicht im Vergleich (gibt es schon).
-17. Ausnahme aus Daten, nicht aus Code je Anbieter: Ein Tarif auf `config/tarif_preis_widerspruch.yaml` („Preis am Original widersprüchlich“, mit Beleg) bleibt ohne Stufe, bis der Eintrag gelöscht wird; derzeit o2 Mobile Unlimited M.
+17. Ausnahme aus Daten, nicht aus Code je Anbieter: Ein Tarif auf `config/tarif_preis_widerspruch.yaml` („Preis am Original widersprüchlich“, mit Beleg) bleibt ohne Stufe, bis der Eintrag gelöscht wird; Stand 09.11. ist die Liste leer.
 
 Umsetzung mit pydantic und pandera in pytest. Kennzahlen je Anbieter und Lauf auf der Quellen-Seite: Abdeckung (je Laufzeit), Frische, Quarantänequote, Konfliktquote, Belegquote.
 

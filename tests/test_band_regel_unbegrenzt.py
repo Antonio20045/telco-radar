@@ -9,21 +9,13 @@ Ausnahmeliste.
 from __future__ import annotations
 
 import pytest
-from bestand_pfad import ZUSTAND
 
 from telco_radar import band_regel
 from telco_radar.collect.geraete import tarifwelt
 from telco_radar.report import geraete_tco_band as band
 from telco_radar.report.geraete_stufen import TARIFSTUFEN_REGEL
-from telco_radar.tarif_bezug import Tarifbestand
 
 INF = float("inf")
-O2_M = "o2:o2-mobile-unlimited-m"
-
-
-@pytest.fixture(scope="module")
-def tarife():
-    return Tarifbestand.aus_datei(ZUSTAND / "tarife.jsonl").je_id
 
 
 def _leiter(xl_gb):
@@ -65,35 +57,55 @@ def test_erklaersatz_nennt_die_regel_in_einem_satz():
     )
 
 
-def test_o2_unlimited_m_bleibt_ohne_stufe_die_uebrigen_unbegrenzten_in_xl(tarife):
-    index = band.tarif_baender(tarife, band.tarifleiter(tarife))
-    assert tarife[O2_M]["datenvolumen_gb"] == INF
-    assert O2_M not in index
-    assert O2_M + "-plus" not in index
-    assert index["o2:o2-mobile-unlimited-l"] == "xl"
-    assert index["o2:o2-mobile-unlimited-s-special"] == "xl"
-    assert index["vodafone:vodafone-mobil-xl"] == "xl"
+def _bestand() -> dict:
+    """Vodafone-Leiter und zwei unbegrenzte Tarife - von Hand, ohne echte Daten."""
+
+    def satz(anbieter, name, gb, grund, tid):
+        return {
+            "anbieter": anbieter,
+            "name": name,
+            "datenvolumen_gb": gb,
+            "grundgebuehr": grund,
+            "tarif_id": tid,
+        }
+
+    saetze = [
+        satz("Vodafone", "Vodafone Mobil XS mit Smartphone", 15.0, 29.95, "v:xs"),
+        satz("Vodafone", "Vodafone Mobil L mit Smartphone", 120.0, 59.95, "v:l"),
+        satz("Vodafone", "Vodafone Mobil XL mit Smartphone", INF, 79.95, "v:xl"),
+        satz("Test", "Unlimited A", INF, 29.99, "t:a"),
+        satz("Test", "Unlimited B", INF, 39.99, "t:b"),
+    ]
+    return {s["tarif_id"]: s for s in saetze}
 
 
-def test_gegenprobe_ohne_listeneintrag_steht_o2_unlimited_m_in_xl(tarife, monkeypatch):
+def test_tarif_auf_der_liste_bleibt_ohne_stufe_die_uebrigen_in_xl(monkeypatch):
+    monkeypatch.setattr(band_regel, "preis_widerspruch", lambda: {"t:a": {}})
+    bestand = _bestand() | {"t:a-plus": dict(_bestand()["t:a"], tarif_id="t:a-plus")}
+    index = band.tarif_baender(bestand, band.tarifleiter(bestand))
+    assert "t:a" not in index
+    assert "t:a-plus" not in index
+    assert index["t:b"] == "xl"
+    assert index["v:xl"] == "xl"
+
+
+def test_gegenprobe_leere_liste_alle_unbegrenzten_in_xl(monkeypatch):
     monkeypatch.setattr(band_regel, "preis_widerspruch", lambda: {})
-    index = band.tarif_baender(tarife, band.tarifleiter(tarife))
-    assert index[O2_M] == "xl"
-    assert index[O2_M + "-plus"] == "xl"
+    bestand = _bestand() | {"t:a-plus": dict(_bestand()["t:a"], tarif_id="t:a-plus")}
+    index = band.tarif_baender(bestand, band.tarifleiter(bestand))
+    assert index["t:a"] == index["t:a-plus"] == index["t:b"] == "xl"
 
 
-def test_die_liste_nennt_name_grund_und_beleg():
+def test_die_echte_liste_laedt_und_jeder_eintrag_hat_name_grund_beleg():
     liste = band_regel.preis_widerspruch()
-    assert set(liste) == {O2_M}
-    eintrag = liste[O2_M]
-    assert (
-        eintrag["name"] and "34,99" in eintrag["grund"] and "24,99" in eintrag["grund"]
-    )
-    assert "unlimited-0811.md" in eintrag["beleg"]
-    bestand = {O2_M + "#live_shop": {}, O2_M + "-plus": {}, "o2:o2-mobile-l": {}}
-    assert set(band_regel.ohne_preis_widerspruch(bestand)) == {"o2:o2-mobile-l"}
-    flex = {"o2:o2-mobile-unlimited-m-flex": {}}
-    assert band_regel.ohne_preis_widerspruch(flex) == flex
+    assert isinstance(liste, dict)
+    assert all(e["name"] and e["grund"] and e["beleg"] for e in liste.values())
+
+
+def test_ausnahme_trifft_plus_und_variante_aber_nicht_den_flex_tarif(monkeypatch):
+    monkeypatch.setattr(band_regel, "preis_widerspruch", lambda: {"t:a": {}})
+    bestand = {"t:a#live_shop": {}, "t:a-plus": {}, "t:b": {}, "t:a-flex": {}}
+    assert set(band_regel.ohne_preis_widerspruch(bestand)) == {"t:b", "t:a-flex"}
 
 
 def test_kaputte_oder_fehlende_liste_ist_ein_fehler_kein_leerer_bestand(tmp_path):
