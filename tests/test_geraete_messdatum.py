@@ -98,11 +98,17 @@ def test_anteil_je_anbieter_n_von_m():
         [_b("o2", "2026-11-08")] * 2
         + [_b("o2", "2026-11-07"), _b("o2", ""), _b("Vodafone", "2026-11-08")]
     )
-    assert z["o2"]["anteil"] == "2 von 4 Preisen von diesem Tag"
-    assert z["Vodafone"]["anteil"] == "1 von 1 Preisen von diesem Tag"
+    assert z["o2"]["anteil"] == "2 von 4 Preisen von diesem Tag (ohne überholte Bündel)"
+    assert (
+        z["Vodafone"]["anteil"]
+        == "1 von 1 Preisen von diesem Tag (ohne überholte Bündel)"
+    )
     assert z["Telekom"]["anteil"] == ""
     viele = _zeilen([_b("o2", "2026-11-08")] * 1200)
-    assert viele["o2"]["anteil"] == "1.200 von 1.200 Preisen von diesem Tag"
+    assert (
+        viele["o2"]["anteil"]
+        == "1.200 von 1.200 Preisen von diesem Tag (ohne überholte Bündel)"
+    )
 
 
 def _baue_wie_live(tmp_path, einzel=None):
@@ -168,7 +174,7 @@ def test_die_seite_nennt_aus_dem_bestand_vodafone_0811_und_telekom_0711(tmp_path
     assert je["Telekom"].startswith("Telekom: zuletzt gemessen am 07.11.2026"), je
     assert je["Telekom"].endswith("Stand vom 07.11."), je
     assert "Stand vom" not in je["Vodafone"] + je["o2"] + je["congstar"]
-    assert "1 von 1 Preisen von diesem Tag" in je["Telekom"]
+    assert "1 von 1 Preisen von diesem Tag (ohne überholte Bündel)" in je["Telekom"]
     assert je["1&1"] == "1&1: Messdatum unbekannt"
 
 
