@@ -61,6 +61,17 @@ knoepfe:
     muster: '^(\d+)\s*mtl\.'
     gewaehlt: {attribut: data-selected, wert: "true"}
 
+bildfolge:
+  # Bilder des Belegs (klickbildfolge). Gerät: die Überschrift h1 („Apple iPhone 18 Pro“,
+  # 120 px über den Speicherknöpfen) zusammen mit den Speicherknöpfen (gewählt: blau
+  # gefüllt), damit das Bild Gerät und Speicher nennt. Tarif und Laufzeit: die ganzen
+  # Kacheln (data-testid plan-/payment-selection-radio-group-item-<id>, 99 bzw. 205 px
+  # hoch) statt der 25 px hohen Labels der Knöpfe, die Preiszeilen schnitten; gewählt:
+  # blau gefüllt, ausgefüllter Radio. Die Produktbilder lädt der Crawler nicht (Platzhalter).
+  geraet_speicher: 'h1, [data-testid="memory-size"]'
+  tarif: '[data-testid^="plan-selection-radio-group-item"]'
+  laufzeit: '[data-testid^="payment-selection-radio-group-item"]'
+
 vorbereitung:
   # Rückgabedeal ab Werk an (B1 El. 90, B2 El. 93: aria-checked="true", Zahlweisen 510/511 mit
   # 37. Schlussrate). Ohne Schalter (Galaxy S25, Redmi Note 17 Pro) ist nichts zu tun: geprüft

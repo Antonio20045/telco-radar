@@ -17,6 +17,7 @@ import re
 from collections.abc import Mapping
 from typing import TYPE_CHECKING
 
+from .klickkartenteile import BILDFOLGE_SCHRITTE
 from .klickkartentypen import (
     BUENDELFELDER,
     DIMENSIONEN,
@@ -172,6 +173,26 @@ def texte(
     ort = f"{feld}.{schluessel}"
     liste = leser.liste(wert, ort)
     return tuple(leser.text({str(n): e}, str(n), ort) for n, e in enumerate(liste))
+
+
+def lies_bildfolge(
+    leser: Kartenleser, roh: object
+) -> tuple[dict[str, str], dict[str, str]]:
+    """``bildfolge``: Selektor je Schritt und, als ``{ohne: <Grund>}``, die Schritte,
+    die die Karte bewusst ohne Bild lässt (Grund für den Beleg); ohne Feld keine."""
+    if roh is None:
+        return {}, {}
+    daten = leser.zuordnung(roh, "bildfolge", BILDFOLGE_SCHRITTE)
+    selektoren, ohne = {}, {}
+    for schritt, wert in daten.items():
+        ort = f"bildfolge.{schritt}"
+        if isinstance(wert, Mapping):
+            ohne[schritt] = leser.text(
+                leser.zuordnung(wert, ort, ("ohne",)), "ohne", ort
+            )
+        else:
+            selektoren[schritt] = leser.text(daten, schritt, "bildfolge")
+    return selektoren, ohne
 
 
 def _quelle(

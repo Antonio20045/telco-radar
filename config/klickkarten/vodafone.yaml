@@ -57,6 +57,17 @@ weiter:
   text: Zur Tarifauswahl
   klicken: tarif
 
+bildfolge:
+  # Keine Bilder für Gerät, Tarif und Laufzeit (Probe 09.11.2026, iPhone 18 Pro, 60
+  # Kombinationen): Der Crawler liest erst auf der Tarifauswahl, dort fehlen die
+  # Knöpfe der Produktseite (Seite markiert nichts statt 256 GB bzw. 36). Die
+  # Tarifkacheln nennen nur das Datenvolumen („35 GB“), der Wert der Karte ist die
+  # virtualItemId („268“); ein Text „Tarif gewählt: 268“ stünde neben einem Bild ohne
+  # Tarifnamen. Der Preisbereich bleibt das Bild des Belegs.
+  geraet_speicher: {ohne: "Gerät und Speicher stehen nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"}
+  tarif: {ohne: "Tarifauswahl nennt nur das Datenvolumen, keinen Tarifnamen"}
+  laufzeit: {ohne: "Die Ratenwahl steht nur auf der Produktseite, das Bild entsteht erst auf der Tarifauswahl"}
+
 seite:
   # Echo „Seite zeigt“: das Label mit dem gewählten Input.
   speicher:

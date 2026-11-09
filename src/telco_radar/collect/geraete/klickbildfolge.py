@@ -22,6 +22,7 @@ Ausschnitt höchstens ``HOECHSTE_BREITE`` × ``HOECHSTE_HOEHE`` Pixel, Datei hö
 
 from __future__ import annotations
 
+import contextlib
 import re
 from collections.abc import Mapping
 from dataclasses import dataclass, field
@@ -37,7 +38,7 @@ from .klicktext import Buendelwerte, Preiswerte, betraege_im_text
 from .klicktor import kurz
 
 if TYPE_CHECKING:
-    from playwright.sync_api import FloatRect, Page
+    from playwright.sync_api import FloatRect, Locator, Page
 
 GERAET_SPEICHER, TARIF, LAUFZEIT = BILDFOLGE_SCHRITTE
 PREIS = "preis"
@@ -48,8 +49,10 @@ VOLLSTAENDIG = "vollstaendig"
 UNVOLLSTAENDIG = "unvollstaendig"
 HOECHSTE_OPTIONEN = 12
 HOECHSTE_BREITE = 1280
-HOECHSTE_HOEHE = 360
+HOECHSTE_HOEHE = 760
 RAND = 10
+OBEN_FREI = 120
+BILDER_WARTEN_MS = 2000
 HOECHSTE_BYTES = 150_000
 GRUND_NICHT_AUFGENOMMEN = "nicht aufgenommen"
 GRUND_OHNE_KNOPF = "Dimension ohne Knopf und ohne Selektor in der Karte"
@@ -82,7 +85,9 @@ def lies_folge(
     for dimension, schritt in SCHRITT_JE_DIMENSION.items():
         knopf = karte.knoepfe[dimension]
         selektor = karte.bildfolge.get(schritt, knopf.selektor)
-        if selektor is None:
+        if schritt in karte.bildfolge_ohne:
+            luecken[schritt] = karte.bildfolge_ohne[schritt]
+        elif selektor is None:
             luecken[schritt] = GRUND_OHNE_KNOPF
         elif dimension == karte.kacheldimension:
             luecken[schritt] = GRUND_KACHEL
@@ -118,24 +123,82 @@ def _gewaehlt_gegen(
 def schnappe(
     seite: Page, selektor: str, schritt: str, frist_ms: int
 ) -> Folgebild | str:
-    """Der Ausschnitt um alle Treffer von ``selektor``; sonst der Grund als Text."""
+    """Der Ausschnitt um alle Treffer von ``selektor``; sonst der Grund als Text.
+
+    Liegen die Treffer weiter auseinander als das Fenster hoch ist (Gerätename oben,
+    Speicherknöpfe weiter unten), rollt die Seite den Ausschnitt ins Fenster, unter
+    eine feste Kopfleiste; Bilder, die noch laden, werden kurz abgewartet.
+    """
     try:
         treffer = seite.locator(selektor)
-        boxen = []
-        for stelle in range(min(treffer.count(), HOECHSTE_OPTIONEN)):
-            if stelle == 0:
-                treffer.nth(0).scroll_into_view_if_needed(timeout=frist_ms)
-            box = treffer.nth(stelle).bounding_box(timeout=frist_ms)
-            if box is not None and box["width"] > 0 and box["height"] > 0:
-                boxen.append(box)
+        anzahl = min(treffer.count(), HOECHSTE_OPTIONEN)
         fenster = seite.viewport_size
+        sichtbar = _boxen(treffer, anzahl, frist_ms)
+        if sichtbar:
+            treffer.nth(sichtbar[0][0]).scroll_into_view_if_needed(timeout=frist_ms)
+            sichtbar = _boxen(treffer, anzahl, frist_ms)
+        boxen = [box for _, box in sichtbar]
         rahmen = umfang(boxen, fenster["width"], fenster["height"]) if fenster else None
+        if fenster and boxen and _schiebe(seite, boxen, fenster["height"]):
+            boxen = [box for _, box in _boxen(treffer, anzahl, frist_ms)]
+            rahmen = umfang(boxen, fenster["width"], fenster["height"])
         if rahmen is None:
             return GRUND_UNSICHTBAR
+        _warte_auf_bilder(seite, rahmen)
         png = seite.screenshot(type="png", clip=rahmen, timeout=frist_ms)
     except PlaywrightFehler as fehler:
         return f"Ausschnitt fehlt: {kurz(fehler)}"
     return Folgebild(schritt, png)
+
+
+def _boxen(treffer: Locator, anzahl: int, frist_ms: int) -> list[tuple[int, FloatRect]]:
+    """Stelle und Box der sichtbaren unter den ersten ``anzahl`` Treffern; ein
+    verborgener Treffer (Größe 0) zählt nicht und wird nie angescrollt."""
+    boxen = []
+    for stelle in range(anzahl):
+        box = treffer.nth(stelle).bounding_box(timeout=frist_ms)
+        if box is not None and box["width"] > 0 and box["height"] > 0:
+            boxen.append((stelle, box))
+    return boxen
+
+
+def _schiebe(seite: Page, boxen: list[FloatRect], hoehe: int) -> bool:
+    """Rollt die Seite, bis der Umfang der ``boxen`` unter einer festen Kopfleiste und
+    über dem Fensterrand liegt (``OBEN_FREI``, ``RAND``); ist er höher als der Platz,
+    beginnt er unter der Kopfleiste. ``True``, wenn gerollt wurde."""
+    oben = min(b["y"] for b in boxen)
+    unten = max(b["y"] + b["height"] for b in boxen)
+    if unten - oben > hoehe - OBEN_FREI - RAND or oben < OBEN_FREI:
+        schub = oben - OBEN_FREI
+    elif unten + RAND > hoehe:
+        schub = unten + RAND - hoehe
+    else:
+        return False
+    if abs(schub) < 1:
+        return False
+    seite.evaluate("schub => window.scrollBy(0, schub)", schub)
+    return True
+
+
+_BILDER_LADEN = """async ([rahmen, frist]) => {
+  const im_rahmen = (b) => b.width > 0
+    && b.right > rahmen.x && b.left < rahmen.x + rahmen.width
+    && b.bottom > rahmen.y && b.top < rahmen.y + rahmen.height;
+  const offen = [...document.images].filter(
+    (i) => !i.complete && im_rahmen(i.getBoundingClientRect()));
+  const fertig = offen.map((i) => new Promise((ok) => {
+    i.addEventListener("load", ok, {once: true});
+    i.addEventListener("error", ok, {once: true});
+  }));
+  await Promise.race([Promise.all(fertig), new Promise((ok) => setTimeout(ok, frist))]);
+}"""
+
+
+def _warte_auf_bilder(seite: Page, rahmen: FloatRect) -> None:
+    """Wartet höchstens ``BILDER_WARTEN_MS`` auf Bilder im Ausschnitt, die noch laden
+    (träge Bilder), damit kein Platzhalter im Beleg steht; ein Fehler ändert nichts."""
+    with contextlib.suppress(PlaywrightFehler):
+        seite.evaluate(_BILDER_LADEN, [rahmen, BILDER_WARTEN_MS])
 
 
 def umfang(boxen: list[FloatRect], breite: int, hoehe: int) -> FloatRect | None:

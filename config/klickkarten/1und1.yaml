@@ -81,6 +81,17 @@ vorbereitung:
   # (ohne sie trug B4 Gruppe 3 „… Samsung Galaxy S26 und Samsung Galaxy Buds 4“).
   - {klick: 'label.toggle-label:has(#no-incentive)', pruefe: "#no-incentive", bis: ":checked"}
 
+bildfolge:
+  # Keine Bilder für Gerät, Tarif und Laufzeit (Probe 09.11.2026, iPhone 18 Pro, 8
+  # Kombinationen): Der Crawler liest auf der Folgeseite des Bestellwegs, dort fehlt der
+  # Speicherknopf (Seite markiert nichts statt 256). Tarif ist fest (tariff-anf-s-mvl, ein
+  # Rohwert statt Name); die Laufzeit-Kacheln tragen keine Markierung, die Wahl ist ihr
+  # „Weiter“. Das Bild des Belegs ist die Kachel selbst („24 Monate 72,99 €/Mon. Inkl.
+  # 1&1 All-Net-Flat S, iPhone 18 Pro“).
+  geraet_speicher: {ohne: "Der Speicher steht nur auf der Produktseite, das Bild entsteht erst auf der Folgeseite des Bestellwegs"}
+  tarif: {ohne: "Tarif ist fest und nicht auf der Seite gewählt, nur im Kacheltext genannt"}
+  laufzeit: {ohne: "Laufzeit-Kacheln tragen keine Markierung der Wahl"}
+
 seite:
   # Auf der Produktseite vor dem Weiter gelesen. Der erste Tarifdetail-Link (B1
   # Element 40 sichtbar, 41 die Kopie der Klebeleiste); updateTariffDetailsLink()

@@ -55,6 +55,14 @@ knoepfe:
     muster: '^(\d+)\s*Monate'
     gewaehlt: {passt: 'tef-choice-panel:has(input[name="payment-plans"]:checked) > label'}
 
+bildfolge:
+  # Wie o2.yaml (Probe 09.11.2026): Gerätename mit Speicherkacheln, die ganzen Kacheln von
+  # Tarif und Laufzeit. Die Tarifgruppe zeigt den Tarif der Adresse als gewählte Kachel,
+  # darum gilt auch hier die ganze Gruppe.
+  geraet_speicher: 'h1 > span, tef-choice-item:has(input[name="storage"])'
+  tarif: 'tef-choice-panel:has(input[name="pdp-tariff-plans-desktop"])'
+  laufzeit: 'tef-choice-panel:has(input[name="payment-plans"])'
+
 zusammenfassung:
   # Kein table mehr (Ursache-Probe 04.11.2026, arbeit/o2-klick-0411/ursache.md): das
   # Preiswidget ist <tef-mini-basket> mit <ul class="list--reset"><li class="row">

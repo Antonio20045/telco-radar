@@ -157,7 +157,9 @@ Bildfolge (Auftrag 08.11.2026, ``klickbildfolge``): Der Beleg zeigt den Klickweg
 Bildern. Den Ausschnitt eines Schritts liefern die Knöpfe der Dimension; nur eine
 Dimension ohne Knopf (fest, Adresse) braucht ``bildfolge: {geraet_speicher: <Selektor>,
 tarif: <Selektor>, laufzeit: <Selektor>}`` (jeder Schlüssel wahlweise), sonst fehlt der
-Schritt mit Grund.
+Schritt mit Grund. Ein Schritt, dessen Bild die Seite nicht hergibt (Gerät und Laufzeit
+stehen auf einer früheren Seite des Bestellwegs), heißt ``{ohne: <Grund>}``: der Beleg
+nennt den Grund als Lücke, es entsteht kein Bild.
 
 Selektoren der Klickziele sind Playwright-Selektoren (``:text-matches`` und
 ``:has-text`` gehen); ``passt``, ``bis`` und ``wert_in`` sind reines CSS.
@@ -290,6 +292,7 @@ def klickkarte_aus_daten(roh: object, quelle: str) -> Klickkarte:
         raise leser.fehler("vertragsform", f"{GRUND_VERTRAGSFORM} {vertragsform}")
     ein_vertrag = vertragsform == EIN_VERTRAG
     seite = lies_seite(leser, daten.get("seite"))
+    bildfolge, bildfolge_ohne = leser.bildfolge(daten.get("bildfolge"))
     quellen = lies_quellen(leser, daten.get("antwort"), seite)
     summe = SUMMENFELD in textlesung.muster and any(
         SUMMENFELD in q.pfade for q in quellen
@@ -315,5 +318,6 @@ def klickkarte_aus_daten(roh: object, quelle: str) -> Klickkarte:
         weiter=leser.weiter(roh_weiter, knoepfe, textlesung),
         ratenplan=leser.ratenplan(daten.get("ratenplan")),
         tarifslug=leser.tarifslug(daten.get("tarifslug")),
-        bildfolge=leser.bildfolge(daten.get("bildfolge")),
+        bildfolge=bildfolge,
+        bildfolge_ohne=bildfolge_ohne,
     )

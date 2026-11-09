@@ -12,7 +12,6 @@ from collections.abc import Mapping
 
 from .klickkartenteile import (
     BELEGLINK_KONFIGURATION,
-    BILDFOLGE_SCHRITTE,
     GRUND_ART,
     GRUND_NICHT_ZUR_ART,
     GRUND_WEITER_DIMENSION,
@@ -59,7 +58,7 @@ from .klickkartentypen import (
     Vorbereitung,
     Weiterschritt,
 )
-from .klickquellenleser import lies_textmuster, texte
+from .klickquellenleser import lies_bildfolge, lies_textmuster, texte
 
 KNOPFTEILE = (
     "selektor",
@@ -339,12 +338,9 @@ class Kartenleser:
             art=art, nachweis=self.text(daten, "nachweis", "ratenplan")
         )
 
-    def bildfolge(self, roh: object) -> dict[str, str]:
-        """Selektoren der Bildfolge je Schritt; ohne Feld keine."""
-        if roh is None:
-            return {}
-        daten = self.zuordnung(roh, "bildfolge", BILDFOLGE_SCHRITTE)
-        return {s: self.text(daten, s, "bildfolge") for s in daten}
+    def bildfolge(self, roh: object) -> tuple[dict[str, str], dict[str, str]]:
+        """Selektoren je Schritt der Bildfolge und die Gründe der Schritte ohne Bild."""
+        return lies_bildfolge(self, roh)
 
     def tarifslug(self, roh: object) -> Tarifslugregel | None:
         """Die Tarifslug-Regel der Karte oder ``None`` ohne das Feld."""
