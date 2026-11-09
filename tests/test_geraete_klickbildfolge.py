@@ -33,7 +33,6 @@ from telco_radar.collect.geraete.klickbildfolge import (
     HOECHSTE_HOEHE,
     PREIS,
     SCHRITTE,
-    TEXT_OHNE_BETRAG,
     Folgebild,
     lies_folge,
     schritttext,
@@ -51,6 +50,7 @@ from telco_radar.collect.geraete.klicklauf import (
     Klicklauf,
     Kombiergebnis,
 )
+from telco_radar.collect.geraete.klickpreistext import TEXT_OHNE_BETRAG
 from telco_radar.collect.geraete.klicktext import (
     Buendelwerte,
     Preiswerte,

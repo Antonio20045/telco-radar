@@ -46,6 +46,7 @@ GRUND_YAML = "kein lesbares YAML"
 GRUND_OHNE_VARIANTE = "Antwort nennt keine Variante (variante oder parameter)"
 GRUND_ATTRIBUT_OHNE_SELEKTOR = "attribut nur mit selektor"
 GRUND_ENTWEDER = "entweder attribut mit wert oder passt"
+GRUND_EINZIGE = "einzige ist nur als true und ohne weitere Angabe erlaubt"
 GRUND_ADRESSEN_UND_KNOPF = "adressen schließt alle anderen Teile des Knopfs aus"
 GRUND_EINE_ADRESSDIMENSION = "adressen nur bei einer Dimension"
 ADRESSATTRIBUT = "href"
@@ -89,13 +90,15 @@ class KlickkartenFehler(ValueError):
 class Auswahlmarke:
     """Woran die Seite die gewählte Option zeigt.
 
-    Entweder ``attribut`` gleich ``wert`` am Klickziel oder ``passt``: ein CSS-Selektor,
-    auf den das Klickziel passt, wenn es gewählt ist (``Element.matches``).
+    Entweder ``attribut`` gleich ``wert`` am Klickziel, ``passt``: ein CSS-Selektor,
+    auf den das Klickziel passt, wenn es gewählt ist (``Element.matches``), oder
+    ``einzige``: die Seite zeigt nur diese eine Option, sie trägt keine Markierung.
     """
 
     attribut: str | None = None
     wert: str | None = None
     passt: str | None = None
+    einzige: bool = False
 
 
 @dataclass(frozen=True)
@@ -321,6 +324,7 @@ class Klickkarte:
     tarifslug: Tarifslugregel | None = None
     bildfolge: Mapping[str, str] = field(default_factory=dict)
     bildfolge_ohne: Mapping[str, str] = field(default_factory=dict)
+    bildfolge_zeigt: frozenset[str] = frozenset()
 
     @property
     def ein_vertrag(self) -> bool:

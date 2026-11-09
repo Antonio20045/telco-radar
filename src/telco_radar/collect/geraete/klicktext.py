@@ -64,6 +64,8 @@ _UNBEGRENZT = re.compile(
 """„unbegrenzt“ als Volumen; „Unlimited on demand“ ist bei 1&1 ein Produktname mit
 festem Grundvolumen (S 10, M 50, L 150 GB laut 1&1, tarife.jsonl), kein Volumen."""
 _GEGENWERT = re.compile(r"\b(?:statt|sonst)\b", re.I)
+_EINMALIG_GESAMT = re.compile(r"\beinmalig\w*\s+gesamt\w*\s*:?\s*" + _BETRAG, re.I)
+_VERSAND = re.compile(r"\bVersand\w*\s*:?\s*" + _BETRAG, re.I)
 _LEERRAUM_IN_ZAHL = re.compile(r"(?<=\d)\s+,\s*(?=\d{1,2}(?!\d))")
 
 
@@ -113,6 +115,21 @@ def betraege_im_text(text: str) -> frozenset[int]:
     """Alle Beträge mit €, EUR oder Euro im ``text``, in Cent."""
     funde = (zahl(t[1]) for t in _BETRAG_RE.finditer(zahlen_ohne_leerraum(text)))
     return frozenset(round(b * 100) for b in funde if b is not None)
+
+
+def einmalig_gesamt_im_text(text: str) -> float | None:
+    """Der Betrag hinter „einmalig gesamt“ im ``text``, sonst ``None``."""
+    return _betrag_nach(_EINMALIG_GESAMT, text)
+
+
+def versand_im_text(text: str) -> float | None:
+    """Der Betrag hinter „Versand…“ im ``text``, sonst ``None``."""
+    return _betrag_nach(_VERSAND, text)
+
+
+def _betrag_nach(muster: re.Pattern[str], text: str) -> float | None:
+    treffer = muster.search(zahlen_ohne_leerraum(text))
+    return None if treffer is None else zahl(treffer[1])
 
 
 def lies_zusammenfassung(text: str) -> Preiswerte:

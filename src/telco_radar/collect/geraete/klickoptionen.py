@@ -11,8 +11,8 @@ benannte Lücke mit. Gesperrt ist ein Knopf mit ``disabled``, ``aria-disabled`` 
 passend auf ``andere_farbe`` der Karte; dann gibt es die Option nur in einer anderen,
 nicht geklickten Farbe (``klicklauf.sperre``: ``nicht_erfasst``). Die Marke ist die der
 Dimension, sonst die der Karte: Attribut gleich Wert oder ein CSS-Selektor, auf den das
-Klickziel passt. Eine feste Dimension hat genau eine gewählte Option ohne Knopf. Dieses
-Modul ruft kein Netz.
+Klickziel passt, bei ``einzige`` die einzige Option der Seite. Eine feste Dimension hat
+genau eine gewählte Option ohne Knopf. Dieses Modul ruft kein Netz.
 """
 
 from __future__ import annotations
@@ -28,12 +28,13 @@ if TYPE_CHECKING:
     from playwright.sync_api import Page
 
 Auswahl = tuple[str | None, ...]
-_OPTIONEN_JS = """(knoepfe, art) => knoepfe.map((k) => {
+_OPTIONEN_JS = """(knoepfe, art) => knoepfe.map((k, _, alle) => {
   const traeger = art.wertIn ? k.querySelector(art.wertIn) : k;
   const wert = traeger === null ? null
     : (art.wert ? traeger.getAttribute(art.wert) : traeger.innerText);
-  const an = art.passt ? k.matches(art.passt)
+  const markiert = art.passt ? k.matches(art.passt)
     : art.marke !== null && k.getAttribute(art.marke) === art.markenwert;
+  const an = art.einzige ? alle.length === 1 : markiert;
   const farbe = art.andereFarbe !== null && k.matches(art.andereFarbe);
   const aus = k.disabled === true || k.getAttribute("aria-disabled") === "true";
   return [wert, aus || farbe, an, farbe];
@@ -65,6 +66,7 @@ def lies_optionen(seite: Page, karte: Klickkarte, dimension: str) -> list[Option
         "wert": knopf.wert_attribut,
         "wertIn": knopf.wert_in,
         "passt": None if marke is None else marke.passt,
+        "einzige": marke is not None and marke.einzige,
         "marke": None if marke is None else marke.attribut,
         "markenwert": None if marke is None else marke.wert,
         "andereFarbe": knopf.andere_farbe,

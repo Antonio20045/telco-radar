@@ -14,6 +14,11 @@ Dimension keinen Knopf (fest, Adresse), gilt der Selektor aus ``Klickkarte.bildf
 Das Bild des vierten Schritts ist der Screenshot des Preisbereichs, den der Beleg
 ohnehin trägt.
 
+Ein Bild gilt nur, wenn die gewählte Kachel vollständig im Ausschnitt liegt (nicht
+abgeschnitten, nicht verborgen); sonst fehlt der Schritt mit diesem Grund. Eine Karte
+kann dazu ``zeigt_wert`` setzen (``Klickkarte.bildfolge_zeigt``, Seite ohne Markierung):
+dann gilt das Bild nur, wenn der Text der Treffer den gemessenen Wert nennt.
+
 Fail-closed: Ein Schritt ohne Bild bleibt in ``fehlt`` mit Grund, die Folge heißt dann
 ``unvollstaendig``; nichts wird mit dem Bild einer anderen Position gefüllt. Grenzen:
 Ausschnitt höchstens ``HOECHSTE_BREITE`` × ``HOECHSTE_HOEHE`` Pixel, Datei höchstens
@@ -34,7 +39,8 @@ from .klickecho import Variante
 from .klickkarte import DIMENSIONEN, Klickkarte
 from .klickkartenteile import BILDFOLGE_SCHRITTE
 from .klickoptionen import lies_optionen
-from .klicktext import Buendelwerte, Preiswerte, betraege_im_text
+from .klickpreistext import preistext
+from .klicktext import Buendelwerte, Preiswerte
 from .klicktor import kurz
 
 if TYPE_CHECKING:
@@ -58,7 +64,10 @@ GRUND_NICHT_AUFGENOMMEN = "nicht aufgenommen"
 GRUND_OHNE_KNOPF = "Dimension ohne Knopf und ohne Selektor in der Karte"
 GRUND_KACHEL = "Option ist eine Kachel ohne Markierung"
 GRUND_UNSICHTBAR = "Optionen nicht sichtbar"
-TEXT_OHNE_BETRAG = "Preisbereich der Anbieterseite nach der Wahl"
+GRUND_GEWAEHLT_FEHLT = "gewählte Kachel nicht sichtbar"
+GRUND_GEWAEHLT_ABGESCHNITTEN = "gewählte Kachel nicht vollständig im Ausschnitt"
+GRUND_WERT_UNBEKANNT = "gemessener Wert unbekannt, Bild kann ihn nicht zeigen"
+TOLERANZ = 1.0
 
 
 @dataclass(frozen=True)
@@ -92,10 +101,14 @@ def lies_folge(
         elif dimension == karte.kacheldimension:
             luecken[schritt] = GRUND_KACHEL
         else:
-            grund = _gewaehlt_gegen(
-                seite, karte, dimension, ziel[dimension], knopf.fest
+            soll = ziel[dimension]
+            grund, gewaehlt = _gewaehlt_gegen(seite, karte, dimension, soll, knopf.fest)
+            wert = soll if schritt in karte.bildfolge_zeigt else None
+            if grund is None and schritt in karte.bildfolge_zeigt and soll is None:
+                grund = GRUND_WERT_UNBEKANNT
+            ergebnis = grund or schnappe(
+                seite, selektor, schritt, frist_ms, gewaehlt, wert
             )
-            ergebnis = grund or schnappe(seite, selektor, schritt, frist_ms)
             if isinstance(ergebnis, str):
                 luecken[schritt] = ergebnis
             else:
@@ -105,25 +118,37 @@ def lies_folge(
 
 def _gewaehlt_gegen(
     seite: Page, karte: Klickkarte, dimension: str, soll: str | None, fest: str | None
-) -> str | None:
-    """Der Grund, wenn die Seite nicht genau ``soll`` markiert; ``None`` bei Treffer
-    (eine feste Dimension hat keine Markierung)."""
+) -> tuple[str | None, Locator | None]:
+    """Der Grund, wenn die Seite nicht genau ``soll`` markiert, sonst ``None``, und die
+    markierte Option (eine feste Dimension hat keine Markierung und keine Option)."""
     if fest is not None:
-        return None
+        return None, None
     try:
         optionen = lies_optionen(seite, karte, dimension)
     except PlaywrightFehler as fehler:
-        return f"Markierung nicht lesbar: {kurz(fehler)}"
-    gewaehlt = [o.wert for o in optionen if o.gewaehlt]
-    if gewaehlt == [soll]:
-        return None
-    return f"Seite markiert {gewaehlt or 'nichts'} statt {soll}"
+        return f"Markierung nicht lesbar: {kurz(fehler)}", None
+    stellen = [n for n, o in enumerate(optionen) if o.gewaehlt]
+    gewaehlt = [optionen[n].wert for n in stellen]
+    if gewaehlt != [soll]:
+        return f"Seite markiert {gewaehlt or 'nichts'} statt {soll}", None
+    selektor = karte.knoepfe[dimension].selektor
+    if selektor is None:
+        return None, None
+    return None, seite.locator(selektor).nth(stellen[0])
 
 
 def schnappe(
-    seite: Page, selektor: str, schritt: str, frist_ms: int
+    seite: Page,
+    selektor: str,
+    schritt: str,
+    frist_ms: int,
+    gewaehlt: Locator | None = None,
+    wert: str | None = None,
 ) -> Folgebild | str:
     """Der Ausschnitt um alle Treffer von ``selektor``; sonst der Grund als Text.
+
+    Das Bild entsteht nur, wenn die ``gewaehlt`` markierte Option vollständig im
+    Ausschnitt liegt und, mit ``wert``, der Text der Treffer diesen Wert nennt.
 
     Liegen die Treffer weiter auseinander als das Fenster hoch ist (Gerätename oben,
     Speicherknöpfe weiter unten), rollt die Seite den Ausschnitt ins Fenster, unter
@@ -145,10 +170,48 @@ def schnappe(
         if rahmen is None:
             return GRUND_UNSICHTBAR
         _warte_auf_bilder(seite, rahmen)
+        grund = _drin(gewaehlt, rahmen, frist_ms) or _zeigt(
+            treffer, [n for n, _ in sichtbar], wert, frist_ms
+        )
+        if grund is not None:
+            return grund
         png = seite.screenshot(type="png", clip=rahmen, timeout=frist_ms)
     except PlaywrightFehler as fehler:
         return f"Ausschnitt fehlt: {kurz(fehler)}"
     return Folgebild(schritt, png)
+
+
+def _drin(gewaehlt: Locator | None, rahmen: FloatRect, frist_ms: int) -> str | None:
+    """Der Grund, wenn die gewählte Option nicht ganz im ``rahmen`` liegt, sonst
+    ``None``; ohne markierte Option (feste Dimension) gibt es nichts zu prüfen."""
+    if gewaehlt is None:
+        return None
+    box = gewaehlt.bounding_box(timeout=frist_ms)
+    if box is None or box["width"] <= 0 or box["height"] <= 0:
+        return GRUND_GEWAEHLT_FEHLT
+    drin = (
+        box["x"] >= rahmen["x"] - TOLERANZ
+        and box["y"] >= rahmen["y"] - TOLERANZ
+        and box["x"] + box["width"] <= rahmen["x"] + rahmen["width"] + TOLERANZ
+        and box["y"] + box["height"] <= rahmen["y"] + rahmen["height"] + TOLERANZ
+    )
+    return None if drin else GRUND_GEWAEHLT_ABGESCHNITTEN
+
+
+def _zeigt(
+    treffer: Locator, stellen: list[int], wert: str | None, frist_ms: int
+) -> str | None:
+    """Der Grund, wenn der Text der sichtbaren Treffer ``wert`` nicht als ganzes Wort
+    nennt (Groß- und Kleinschreibung gleich), sonst ``None``; ohne ``wert`` keine
+    Prüfung."""
+    if wert is None:
+        return None
+    text = " ".join(
+        " ".join(treffer.nth(n).inner_text(timeout=frist_ms).split()) for n in stellen
+    )
+    if re.search(rf"(?<!\w){re.escape(wert)}(?!\w)", text, re.I):
+        return None
+    return f"Bild nennt {wert} nicht"
 
 
 def _boxen(treffer: Locator, anzahl: int, frist_ms: int) -> list[tuple[int, FloatRect]]:
@@ -220,15 +283,6 @@ def umfang(boxen: list[FloatRect], breite: int, hoehe: int) -> FloatRect | None:
     }
 
 
-def euro(betrag: float | None) -> str:
-    """Ein Betrag deutsch mit Komma; ``nicht gelesen`` für eine Lücke."""
-    if betrag is None:
-        return "nicht gelesen"
-    ganz, rest = f"{betrag:.2f}".split(".")
-    gruppen = f"{int(ganz):,}".replace(",", ".")
-    return f"{gruppen},{rest} €"
-
-
 def schritttext(
     schritt: str,
     variante: Variante,
@@ -246,69 +300,3 @@ def schritttext(
     if schritt == LAUFZEIT:
         return f"Laufzeit und Raten gewählt: {variante.laufzeit} Monate"
     return preistext(werte or Preiswerte(), buendel, bildtext)
-
-
-def preistext(
-    werte: Preiswerte, buendel: Buendelwerte | None, bildtext: str | None
-) -> str:
-    """Die Beträge, die im Bild des Preisbereichs stehen, mit ihrer Bedeutung.
-
-    Gelesen sind Zuzahlung und Monatsrate des Geräts, bei Bündeln Einmalzahlung und
-    Monatsbetrag. Zeigt die Seite stattdessen die Summe aus Gerät und Tarif (Zuzahlung
-    plus Anschluss, Rate plus erster Tarifpreis), nennt der Text sie. Ein Betrag steht
-    nur im Text, wenn ``bildtext`` (der sichtbare Text des Bildes) ihn enthält; ist
-    keiner sicher, nennt der Text keine Zahl.
-    """
-    gezeigt = betraege_im_text(bildtext or "")
-    zusammen = _gezeigt(
-        gezeigt,
-        ("einmalig", _einmalig(werte, buendel)),
-        ("monatlich", _monatlich(werte, buendel)),
-    )
-    geraet = _gezeigt(
-        gezeigt,
-        ("Zuzahlung", werte.anzahlung),
-        ("Monatsrate", werte.rate),
-    )
-    if geraet and geraet[-1].startswith("Monatsrate") and werte.ratenzahl is not None:
-        raten = rf"(?:[x×]\s*{werte.ratenzahl}\b|\b{werte.ratenzahl}\s*Raten\b)"
-        if re.search(raten, bildtext or ""):
-            geraet[-1] += f" × {werte.ratenzahl}"
-    teile = []
-    if zusammen:
-        teile.append(" · ".join(zusammen) + " (Gerät und Tarif zusammen)")
-    teile.extend(geraet)
-    if not teile:
-        return TEXT_OHNE_BETRAG
-    return "Im Bild: " + " · ".join(teile)
-
-
-def _gezeigt(gezeigt: frozenset[int], *posten: tuple[str, float | None]) -> list[str]:
-    """``Name Betrag`` je Posten, dessen Betrag im Bild steht."""
-    return [
-        f"{name} {euro(betrag)}"
-        for name, betrag in posten
-        if betrag is not None and round(betrag * 100) in gezeigt
-    ]
-
-
-def _plus(*summanden: float | None) -> float | None:
-    """Die Summe; ``None``, sobald ein Summand nicht gelesen ist."""
-    if any(s is None for s in summanden):
-        return None
-    return sum(s for s in summanden if s is not None)
-
-
-def _einmalig(werte: Preiswerte, buendel: Buendelwerte | None) -> float | None:
-    """Einmalbetrag von Gerät und Tarif: Bündelwert, sonst Zuzahlung plus Anschluss."""
-    if buendel is not None and buendel.einmalzahlung is not None:
-        return buendel.einmalzahlung
-    return _plus(werte.anzahlung, werte.anschluss)
-
-
-def _monatlich(werte: Preiswerte, buendel: Buendelwerte | None) -> float | None:
-    """Monatsbetrag von Gerät und Tarif: Bündelwert, sonst Rate plus Tarifpreis."""
-    if buendel is not None and buendel.buendelbetrag is not None:
-        return buendel.buendelbetrag
-    erste = [p.betrag for p in werte.tarifphasen or () if p.von_monat == 1]
-    return _plus(werte.rate, erste[0] if erste else None)

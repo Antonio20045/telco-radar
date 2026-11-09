@@ -292,7 +292,7 @@ def klickkarte_aus_daten(roh: object, quelle: str) -> Klickkarte:
         raise leser.fehler("vertragsform", f"{GRUND_VERTRAGSFORM} {vertragsform}")
     ein_vertrag = vertragsform == EIN_VERTRAG
     seite = lies_seite(leser, daten.get("seite"))
-    bildfolge, bildfolge_ohne = leser.bildfolge(daten.get("bildfolge"))
+    bildfolge, bildfolge_ohne, bildfolge_zeigt = leser.bildfolge(daten.get("bildfolge"))
     quellen = lies_quellen(leser, daten.get("antwort"), seite)
     summe = SUMMENFELD in textlesung.muster and any(
         SUMMENFELD in q.pfade for q in quellen
@@ -320,4 +320,5 @@ def klickkarte_aus_daten(roh: object, quelle: str) -> Klickkarte:
         tarifslug=leser.tarifslug(daten.get("tarifslug")),
         bildfolge=bildfolge,
         bildfolge_ohne=bildfolge_ohne,
+        bildfolge_zeigt=bildfolge_zeigt,
     )

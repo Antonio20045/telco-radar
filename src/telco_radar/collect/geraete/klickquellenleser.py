@@ -177,22 +177,28 @@ def texte(
 
 def lies_bildfolge(
     leser: Kartenleser, roh: object
-) -> tuple[dict[str, str], dict[str, str]]:
-    """``bildfolge``: Selektor je Schritt und, als ``{ohne: <Grund>}``, die Schritte,
-    die die Karte bewusst ohne Bild lässt (Grund für den Beleg); ohne Feld keine."""
+) -> tuple[dict[str, str], dict[str, str], frozenset[str]]:
+    """``bildfolge``: Selektor je Schritt, als ``{ohne: <Grund>}`` die Schritte, die die
+    Karte bewusst ohne Bild lässt, und als ``{selektor, zeigt_wert: true}`` die
+    Schritte, deren Bild den gemessenen Wert nennen muss; ohne Feld keine."""
     if roh is None:
-        return {}, {}
+        return {}, {}, frozenset()
     daten = leser.zuordnung(roh, "bildfolge", BILDFOLGE_SCHRITTE)
-    selektoren, ohne = {}, {}
+    selektoren, ohne, zeigt = {}, {}, set()
     for schritt, wert in daten.items():
         ort = f"bildfolge.{schritt}"
-        if isinstance(wert, Mapping):
+        if not isinstance(wert, Mapping):
+            selektoren[schritt] = leser.text(daten, schritt, "bildfolge")
+        elif "ohne" in wert:
             ohne[schritt] = leser.text(
                 leser.zuordnung(wert, ort, ("ohne",)), "ohne", ort
             )
         else:
-            selektoren[schritt] = leser.text(daten, schritt, "bildfolge")
-    return selektoren, ohne
+            teile = leser.zuordnung(wert, ort, ("selektor", "zeigt_wert"))
+            selektoren[schritt] = leser.text(teile, "selektor", ort)
+            if leser.schalter(teile, "zeigt_wert", ort):
+                zeigt.add(schritt)
+    return selektoren, ohne, frozenset(zeigt)
 
 
 def _quelle(
