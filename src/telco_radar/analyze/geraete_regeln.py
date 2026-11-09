@@ -356,10 +356,9 @@ _JE_BUENDEL = (
 
 
 def _speicherstufen(lesbar: list[tuple[str, Buendel]], k: Kontext) -> dict[str, Befund]:
-    """Regel 5 über den Bestand: beim selben Anbieter, Tarif, Laufzeit, Gerät und
-    Zustand kostet mehr Speicher nie weniger. Beide Bündel eines verletzten Paars sind
-    Quarantäne. Ein unbekannter Zustand fällt aus dem Vergleich (CLAUDE.md, Clean
-    Code 4): ein generalüberholtes Gerät darf weniger kosten als ein neues."""
+    """Regel 5 über den Bestand: gleicher Anbieter, Tarif, Laufzeit, Gerät und Zustand,
+    mehr Speicher kostet nie weniger; beide Bündel eines Paars sind Quarantäne. Ohne
+    Vergleich: unbekannter Zustand (Clean Code 4) und veralteter Preis (Regel 16)."""
     befunde: dict[str, Befund] = {}
     stufen: dict[tuple, dict[int, list[tuple[str, float]]]] = {}
     for bid, b in lesbar:
@@ -370,6 +369,8 @@ def _speicherstufen(lesbar: list[tuple[str, Buendel]], k: Kontext) -> dict[str, 
             continue
         if b.zustand in ZUSTAND_UNBEKANNT:
             befunde[bid] = _nicht(5, "Zustand des Geräts unbekannt")
+            continue
+        if k.frisch is not None and not k.frisch(b.abgerufen_am, k.heute):
             continue
         tarif = b.tarif_id or normalisiere(b.tarif_name)
         reihe = (normalisiere(b.anbieter), tarif, b.laufzeit_monate, geraet, b.zustand)

@@ -237,6 +237,28 @@ def test_speicher_monotonie_setzt_beide_buendel_in_quarantaene():
         assert _gruende(felder[bid]) == {5: satz}, felder[bid]
 
 
+def test_alter_preis_der_groesseren_stufe_widerlegt_keinen_frischen():
+    """Galaxy S26 o2 (09.11.2026): 256 GB frisch (7 € + 24 x 50 €) stand wegen
+    512 GB aus der Zeit vor dem Frischefenster (1 € + 24 x 48 €) in Quarantäne.
+    Ein veralteter Preis (Regel 16) ist kein Vergleichspartner; die Zeile bleibt
+    veraltet, bekommt aber keinen Befund 5, und die frische bleibt gültig."""
+    klein = _satz(128)
+    gross = _satz(256, geraet_monatsrate=25.0, abgerufen_am="2026-09-01")
+    felder = _pruefe(klein, gross)
+    assert felder[klein["id"]]["status"] == GUELTIG, felder[klein["id"]]
+    assert not _erwaehnt(felder[klein["id"]], 5)
+    assert not _erwaehnt(felder[gross["id"]], 5)
+    assert felder[gross["id"]]["status"] == VERALTET
+    assert 16 in _gruende(felder[gross["id"]])
+
+
+def test_gegenprobe_zwei_frische_stufen_bleiben_verglichen():
+    klein = _satz(128)
+    gross = _satz(256, geraet_monatsrate=25.0)
+    felder = _pruefe(klein, gross)
+    assert all(f["status"] == QUARANTAENE for f in felder.values()), felder
+
+
 @pytest.mark.parametrize(
     "gross",
     [

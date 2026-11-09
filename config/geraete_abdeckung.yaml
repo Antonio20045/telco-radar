@@ -165,12 +165,12 @@ belegte_luecken:
       - apple-iphone-17-pro
     speicher:
       - 512gb
-    grund: Speicherstufe bei o2 nicht im Sortiment (geprüft 08.11.2026) - der Speicher-Wähler der Produktseite zeigt nur 256 GB
+    grund: Speicherstufe bei o2 nicht im Sortiment (geprüft 09.11.2026) - der Speicher-Wähler der Produktseite zeigt nur 256 GB; URLs mit 512gb und 1tb ergeben 404
     art: nicht_im_portfolio
-    beleg: https://github.com/Antonio20045/telco-radar/blob/main/docs/belege/o2-speicher-0811/2-iphone17pro-512gb-nicht-waehlbar.png
+    beleg: https://github.com/Antonio20045/telco-radar/blob/main/docs/belege/o2-speicher-0911/4-iphone17pro-512gb-nicht-waehlbar.png
     original: https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-details?tarif=o2-mobile-m&ratenzahlung=24&zielgruppe=privatkunden
-    geprueft: "2026-11-08"
-    bis: "2026-11-22"
+    geprueft: "2026-11-09"
+    bis: "2026-11-23"
   - anbieter: o2
     modelle:
       - apple-iphone-17-pro-max
@@ -228,6 +228,33 @@ belegte_luecken:
     original: https://www.o2online.de/e-shop/google/google-pixel-11-pro-xl-details?tarif=o2-mobile-m&ratenzahlung=24&zielgruppe=privatkunden
     geprueft: "2026-11-08"
     bis: "2026-11-22"
+  # o2: zwei weitere Speicherstufen ohne Angebot (Auftrag „o2-Rest“, 09.11.2026).
+  # Belegt mit echtem Browser (Playwright, Standard-UA, robots.txt beachtet, kein
+  # Warenkorb), Seitentexte in arbeit/original-duo-o2-0911.md. Die Export-Zeilen
+  # (A37 256 GB abgerufen 14.10., Redmi Note 15 256 GB 30.09.) sind Altbestand. Das
+  # iPhone 17 Pro 512 GB (oben) ist mit dem Beleg vom 09.11.2026 erneuert.
+  - anbieter: o2
+    modelle:
+      - samsung-galaxy-a37
+    speicher:
+      - 256gb
+    grund: Speicherstufe bei o2 nicht im Sortiment (geprüft 09.11.2026) - der Speicher-Wähler der Produktseite hat genau eine Option, 128 GB; die URL mit 256gb ergibt 404
+    art: nicht_im_portfolio
+    beleg: https://github.com/Antonio20045/telco-radar/blob/main/docs/belege/o2-speicher-0911/1-galaxya37-256gb-nicht-waehlbar.png
+    original: https://www.o2online.de/e-shop/samsung/samsung-galaxy-a37-128gb-awesome-charcoal-details?tarif=o2-mobile-on-demand-m&ratenzahlung=24&zielgruppe=privatkunden
+    geprueft: "2026-11-09"
+    bis: "2026-11-23"
+  - anbieter: o2
+    modelle:
+      - xiaomi-redmi-note-15
+    speicher:
+      - 256gb
+    grund: Gerät bei o2 nicht im Sortiment (geprüft 09.11.2026) - die Xiaomi-Liste führt nur das Redmi Note 15 Pro 5G, die frühere Seite ergibt 404
+    art: nicht_im_portfolio
+    beleg: https://github.com/Antonio20045/telco-radar/blob/main/docs/belege/o2-speicher-0911/2-redmi-note15-seite-404.png
+    original: https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-15-256gb-schwarz-5g-details
+    geprueft: "2026-11-09"
+    bis: "2026-11-23"
   # congstar: Apple iPhone Duo ist nicht in der Geräteliste. Belegt (08.11.2026,
   # docs/belege/congstar-duo-0811/): die Einzelseite /geraete/apple/apple-iphone-duo/
   # antwortet HTTP 200, trägt aber <title>Error 404</title> (Soft-404, curl,
