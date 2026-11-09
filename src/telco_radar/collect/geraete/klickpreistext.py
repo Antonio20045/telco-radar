@@ -38,14 +38,18 @@ def preistext(
     Monatsbetrag. Zeigt die Seite stattdessen die Summe aus Gerät und Tarif (Zuzahlung
     plus Anschluss, Rate plus erster Tarifpreis), nennt der Text sie. Ein Betrag steht
     nur im Text, wenn ``bildtext`` (der sichtbare Text des Bildes) ihn enthält; ist
-    keiner sicher, nennt der Text keine Zahl.
+    keiner sicher, nennt der Text keine Zahl. Eine selbst gerechnete Einmalsumme
+    (Zuzahlung plus Anschluss) nennt der Text nicht, wenn das Bild eine größere Summe
+    zeigt, die der Code nicht am Etikett „einmalig gesamt“ erkennt (siehe
+    ``_einmalig_sicher``).
     """
     text = bildtext or ""
     gezeigt = betraege_im_text(text)
+    einmalig = _einmalig(werte, buendel)
+    if not _einmalig_sicher(werte, buendel, text, gezeigt):
+        einmalig = None
     zusammen = _gezeigt(
-        gezeigt,
-        ("einmalig", _einmalig(werte, buendel)),
-        ("monatlich", _monatlich(werte, buendel)),
+        gezeigt, ("einmalig", einmalig), ("monatlich", _monatlich(werte, buendel))
     )
     geraet = _gezeigt(
         gezeigt,
@@ -90,6 +94,35 @@ def _einmalig_gesamt(
             text += f" inkl. {euro(versand)} Versand"
     geraet = _gezeigt(gezeigt, ("davon Gerät", werte.anzahlung))
     return "; ".join([text, *geraet])
+
+
+def _einmalig_sicher(
+    werte: Preiswerte,
+    buendel: Buendelwerte | None,
+    bildtext: str,
+    gezeigt: frozenset[int],
+) -> bool:
+    """Falsch, wenn die selbst gerechnete Einmalsumme (Zuzahlung plus Anschluss) die
+    Zahl sein könnte, die das Bild gar nicht hervorhebt: Es nennt einen Betrag, der
+    genau diese Summe plus einen weiteren genannten Betrag ist (Versand, Gebühr), und
+    der Code erkennt ihn nicht am Etikett „einmalig gesamt“. Das Etikett ist nicht die
+    einzige Stütze: Heißt es im Bild anders („Summe“), erkennt das die Summenprobe
+    trotzdem, und der Text nennt lieber keinen Einmalbetrag als einen unpassenden.
+    Ein gelesener Bündelwert oder ein erkanntes Etikett gilt immer. Bei einer Basis von
+    0 wäre jeder Betrag „Summe plus Rest“; dann zählt nur ein genannter Versand."""
+    if buendel is not None and buendel.einmalzahlung is not None:
+        return True
+    if einmalig_gesamt_im_text(bildtext) is not None:
+        return True
+    basis = _cent(_plus(werte.anzahlung, werte.anschluss))
+    if basis is None:
+        return True
+    if basis == 0:
+        versand = versand_im_text(bildtext)
+        return versand is None or versand <= 0
+    return not any(
+        rest > 0 and basis + rest in gezeigt for rest in gezeigt if rest != basis
+    )
 
 
 def _cent(betrag: float | None) -> int | None:

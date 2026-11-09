@@ -1,5 +1,5 @@
 {
-  "zweck": "BEISPIEL, kein echter Anbieter: eine von Hand geschriebene Produktseite mit Knöpfen für Speicher, Tarif und Ratenlaufzeit, die ihre Preisantwort per JavaScript lädt, die Preisantworten dazu und die passende Klick-Karte. Sie prüfen das Gerüst des Klick-Crawlers ohne Netz (tests/test_geraete_klickcrawler.py). Bewusst eingebaut: 36 Monate sind zu Tarif S deaktiviert (nicht angeboten), 256 GB mit Tarif M und 36 Monaten zeigt einen Online-Rabatt, den die Antwort nicht nennt (Befund), und die Seite lädt bei jedem Preis einen per robots.txt gesperrten Zähler unter /privat/json/. beispiel_kacheln.html: Kachelgruppen mit einer gewählten Kachel in verschiedenen Lagen (im Ausschnitt, über der Höhengrenze, hinter der Optionsgrenze, verborgen, einzige Kachel mit Namen), für tests/test_geraete_klickbildfolge_wahl.py.",
+  "zweck": "BEISPIEL, kein echter Anbieter: eine von Hand geschriebene Produktseite mit Knöpfen für Speicher, Tarif und Ratenlaufzeit, die ihre Preisantwort per JavaScript lädt, die Preisantworten dazu und die passende Klick-Karte. Sie prüfen das Gerüst des Klick-Crawlers ohne Netz (tests/test_geraete_klickcrawler.py). Bewusst eingebaut: 36 Monate sind zu Tarif S deaktiviert (nicht angeboten), 256 GB mit Tarif M und 36 Monaten zeigt einen Online-Rabatt, den die Antwort nicht nennt (Befund), und die Seite lädt bei jedem Preis einen per robots.txt gesperrten Zähler unter /privat/json/. beispiel_kacheln.html: Kachelgruppen mit einer gewählten Kachel in verschiedenen Lagen (im Ausschnitt, über der Höhengrenze, hinter der Optionsgrenze, verborgen, einzige Kachel mit Namen, in einem Behälter mit overflow hidden, scroll, auto, clip, visible und fixiert), für tests/test_geraete_klickbildfolge_wahl.py.",
   "eintraege": [
     {
       "datei": "beispiel_karte.yaml",
@@ -26,8 +26,8 @@
       "datei": "beispiel_kacheln.html",
       "quelle": "BEISPIEL, von Hand geschrieben, kein Abruf: Kachelgruppen für die Bildfolge (Nachbesserung PR 78)",
       "abgerufen_am": null,
-      "bytes_roh": 3385,
-      "sha256_roh": "a6a8d671916aea00d36267fa352149bdb86cc782ce569a9185b00fd7e58a73a6"
+      "bytes_roh": 5206,
+      "sha256_roh": "17393f039ff9e7d6678ab6753cdc05034c6cc97ebd3265f0d123d1f149d05875"
     },
     {
       "datei": "telekom_produktseite_ausschnitt.html",

@@ -233,7 +233,9 @@ def test_a5_schaetzung_in_der_tafel_wird_neben_der_legende_erklaert():
     mess = {"o2": {"2026-11-05": {"zaehlt": True}}}
     serien = {"o2": [("2026-11-05", 1374.0)]}
     html = geraete_zeitreihe_legende.schaetzung_html(satz, mess, serien)
-    assert "nicht zählen" in html and "letzte zählende Messung (1.374 €)" in html
+    assert (
+        "ohne zählenden Preis" in html and "letzte zählende Messung (1.374 €)" in html
+    )
     unzaehlend = {"o2": {"2026-11-05": {"zaehlt": False}}}
     assert geraete_zeitreihe_legende.schaetzung_html(satz, unzaehlend, serien) == ""
     mit_zeile = {**satz, "zeilen": [{"anbieter": "o2"}]}

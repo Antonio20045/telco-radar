@@ -66,8 +66,8 @@ def schaetzung_html(satz: dict | None, mess: dict, serien: dict) -> str:
     für die Kombination (Gerät × Speicher × Band × Laufzeit) aber nur zählende Zeilen
     als Preis. Drei Fälle, immer mit den Wörtern der Tafel (`geraete_preisstand`):
 
-    - keine Zeile und keine Karte des Anbieters: „Die Tafel führt hier keinen Preis“
-      (sein Bündel steht in anderen Bändern oder wird nicht mehr gelesen);
+    - keine Zeile und keine Karte des Anbieters: „Die Tafel führt in diesem Band
+      keinen Preis“ (sein Bündel steht in anderen Bändern oder wird nicht mehr gelesen);
     - keine zählende Zeile, aber Karten: sie werden benannt (nicht direkt genannt,
       Preis veraltet, nur mit Zweitprodukt);
     - eine zählende Zeile, daneben ein billigerer Preis, der nicht zählt: der Leser
@@ -94,9 +94,10 @@ def schaetzung_html(satz: dict | None, mess: dict, serien: dict) -> str:
         if zeile is None:
             worte = _worte(eigene)
             nennt = (
-                f"Die Tafel nennt hier nur Preise, die nicht zählen ({worte})"
+                f"Die Tafel nennt in diesem Band nur Zeilen ohne zählenden Preis "
+                f"({worte})"
                 if worte
-                else "Die Tafel führt hier keinen Preis"
+                else "Die Tafel führt in diesem Band keinen Preis"
             )
             saetze.append(
                 _satz(

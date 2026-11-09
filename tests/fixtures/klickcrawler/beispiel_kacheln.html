@@ -12,6 +12,14 @@ body { margin: 0; font: 16px sans-serif; }
 #hoch .kachel { height: 100px; }
 #viele .kachel { height: 40px; }
 .weg { display: none; }
+.rahmen { width: 400px; height: 60px; border: 0; padding: 0; margin: 0 0 24px 0; position: relative; }
+.rahmen.verborgen { overflow: hidden; }
+.rahmen.scroll { overflow-y: scroll; }
+.rahmen.auto { overflow: auto; }
+.rahmen.klammer { overflow: clip; }
+.rahmen.sichtbar { overflow: visible; }
+.rahmen .kachel { height: 60px; }
+.rahmen .frei { position: fixed; top: 10px; left: 10px; width: 100px; height: 20px; background: #fff; }
 </style>
 </head>
 <body>
@@ -62,6 +70,34 @@ in verschiedenen Lagen, für die Prüfung der Bildfolge (tests/test_geraete_klic
 </div>
 <div class="gruppe" id="einzig-s">
   <div class="kachel"><span class="name" data-name="MagentaMobil M">MagentaMobil S</span> 39,95 €</div>
+</div>
+<div class="rahmen verborgen" id="rahmen-verborgen">
+  <div class="kachel" data-wert="A" aria-pressed="false">Tarif A</div>
+  <div class="kachel" data-wert="B" aria-pressed="true">Tarif B</div>
+</div>
+<div class="rahmen scroll" id="rahmen-scroll">
+  <div class="kachel" data-wert="A" aria-pressed="false">Tarif A</div>
+  <div class="kachel" data-wert="B" aria-pressed="true">Tarif B</div>
+</div>
+<div class="rahmen auto" id="rahmen-auto">
+  <div class="kachel" data-wert="A" aria-pressed="false">Tarif A</div>
+  <div class="kachel" data-wert="B" aria-pressed="true">Tarif B</div>
+</div>
+<div class="rahmen klammer" id="rahmen-klammer">
+  <div class="kachel" data-wert="A" aria-pressed="false">Tarif A</div>
+  <div class="kachel" data-wert="B" aria-pressed="true">Tarif B</div>
+</div>
+<div class="rahmen sichtbar" id="rahmen-sichtbar">
+  <div class="kachel" data-wert="A" aria-pressed="false">Tarif A</div>
+  <div class="kachel" data-wert="B" aria-pressed="true">Tarif B</div>
+</div>
+<div class="rahmen verborgen" id="rahmen-gewaehlt-oben">
+  <div class="kachel" data-wert="A" aria-pressed="true">Tarif A</div>
+  <div class="kachel" data-wert="B" aria-pressed="false">Tarif B</div>
+</div>
+<div class="rahmen verborgen" id="rahmen-fixiert">
+  <div class="kachel" data-wert="A" aria-pressed="false">Tarif A</div>
+  <div class="kachel frei" data-wert="B" aria-pressed="true">Tarif B</div>
 </div>
 </body>
 </html>
