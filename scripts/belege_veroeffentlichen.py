@@ -18,11 +18,12 @@ ohne Kennung (``beleg_regeln.dateiname``): ein Einzelbild ohne Folge.
 (``<beleg_id>_<schritt>.webp`` im Artefakt, ``belegbild.folgename``) gehen denselben
 Weg, in dieselben Releases und mit denselben Grenzen hoch, mit derselben Kennung im
 Namen: Einzelbild und Schritte einer Position bilden eine Folge, nie die einer
-anderen. Gehört ein früheres Bild des Paares zu einer anderen Position, wird es
-gelöscht, aber erst, wenn das neue Einzelbild nachweislich im Release liegt
-(``veraltete_folgen``). Es gibt keine Indexdatei und keinen Commit: die Seite liest die
-Anhänge der Releases (``scripts/belege_manifest.py``). Das Token liegt nur in
-``GH_TOKEN``.
+anderen. Dieser Job löscht nichts: Bilder einer früheren Position desselben Paares und
+Tages bleiben liegen, bis der Gerätelauf das Manifest auf die neuen Bilder gestellt hat
+und sie danach löscht (``beleg_veraltet``, ``scripts/belege_manifest.py``); das
+eingecheckte Manifest zeigt so nie auf gelöschte Dateien. Es gibt keine Indexdatei und
+keinen Commit: die Seite liest die Anhänge der Releases
+(``scripts/belege_manifest.py``). Das Token liegt nur in ``GH_TOKEN``.
 
 Exit-Code 0: alles getan oder nichts zu tun (auch ohne Artefakt); 1: ein Teil ist
 gescheitert; 2: Eingabe oder Konfiguration falsch.
@@ -44,7 +45,6 @@ from telco_radar.beleg_ablage import (
     ZEIT_JE_AUFRUF_S,
     Bild,
     Gh,
-    GhFehler,
     Releases,
     veroeffentliche,
 )
@@ -55,7 +55,6 @@ from telco_radar.beleg_regeln import (
     folge_dateiname,
     ist_grosse_aenderung,
     zerlege_dateiname,
-    zerlege_folgename,
 )
 from telco_radar.collect.geraete.belegbild import folgename, zwischenname
 from telco_radar.collect.geraete.klickbildfolge import GEWAEHLT
@@ -212,57 +211,6 @@ def sammle_folge(
     return folge
 
 
-def veraltete_folgen(
-    bilder: list[Bild], anhaenge: dict[str, list[str]]
-) -> list[tuple[str, str]]:
-    """(Release, Datei) der Bilder, die nicht zur heute veröffentlichten Position ihres
-    Paares gehören.
-
-    ``anhaenge`` ist der Stand NACH dem Hochladen. Das Einzelbild
-    (``…__preis__<kennung>``) eines Paares und Tages trägt die Kennung seiner Position;
-    Bilder einer früheren Position (andere Kennung, gleiches Paar und Tag) gehören dann
-    zu einem anderen Bild.
-    Sie werden nur gelöscht, wenn das neue Einzelbild nachweislich im Release liegt
-    (nicht, weil es hochgeladen werden SOLLTE): kam es nicht an, bleibt die frühere,
-    vollständige Position stehen und zeigt keine Mischfolge."""
-    vorhanden = {datei for dateien in anhaenge.values() for datei in dateien}
-    kennungen: dict[tuple[str, str, str], str] = {}
-    for bild in bilder:
-        einzel = zerlege_folgename(bild.datei.name)
-        if (
-            einzel is not None
-            and einzel.schritt == PREIS
-            and bild.datei.name in vorhanden
-        ):
-            kennungen[einzel.paar] = einzel.kennung
-    veraltet = []
-    for tag, dateien in sorted(anhaenge.items()):
-        for datei in dateien:
-            folge = zerlege_folgename(datei)
-            if (
-                folge
-                and folge.paar in kennungen
-                and folge.kennung != kennungen[folge.paar]
-            ):
-                veraltet.append((tag, datei))
-    return veraltet
-
-
-def raeume_veraltete_folgen(bilder: list[Bild], gh: Releases) -> list[str]:
-    """Löscht ``veraltete_folgen``; die Fehlerzeilen für die Bilanz."""
-    try:
-        veraltet = veraltete_folgen(bilder, gh.anhaenge())
-    except GhFehler as fehler:
-        return [f"Folgebilder nicht geprüft: {fehler}"]
-    fehler_zeilen = []
-    for tag, datei in veraltet:
-        try:
-            gh.asset_loeschen(tag, datei)
-        except GhFehler as fehler:
-            fehler_zeilen.append(f"{tag}/{datei} nicht gelöscht: {fehler}")
-    return fehler_zeilen
-
-
 def main(argumente: list[str] | None = None, gh: Releases | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--root", default=".", type=Path)
@@ -299,8 +247,6 @@ def main(argumente: list[str] | None = None, gh: Releases | None = None) -> int:
             print(f"Belege {zeile}")
         releases = gh or Gh()
         bilanz = veroeffentliche(bilder, heute, releases, frist_ende=ende)
-        if bilder:
-            bilanz.fehler += raeume_veraltete_folgen(bilder, releases)
     for zeile in bilanz.zeilen()[:1] + bilanz.hinweise():
         print(zeile)
     for zeile in bilanz.fehler:

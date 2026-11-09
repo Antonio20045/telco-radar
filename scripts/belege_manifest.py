@@ -11,9 +11,13 @@ einzige Quelle der Wahrheit (``beleg_ablage``). Das Skript löscht, was nach
 ``beleg_regeln`` abgelaufen ist (Tages-Releases nach 7 Tagen, große Änderungen nach 90),
 und schreibt aus dem Rest ``data/state/belege_manifest.json`` (``beleg_manifest``). Von
 Hand hochgeladene Bilder mit richtigem Namen stehen nach dem nächsten Lauf auf der
-Seite. ``--nur-lesen`` löscht nichts. ``--melde-ausfall GRUND`` rührt kein GitHub an
-und vermerkt nur im bestehenden Manifest, dass es nicht erneuert wurde (Handarbeit
-und Notweg); die Seite nennt den Grund als Ausfall.
+Seite. Hat ein zweiter Klick-Lauf am selben Tag eine andere Position gewählt, gilt die
+mit dem jüngeren Einzelbild (``beleg_veraltet``): das Manifest zeigt auf deren Bilder,
+erst danach werden die früheren gelöscht. Ist die Reihenfolge nicht zu klären, bleibt
+alles liegen und das Manifest lässt das Paar aus. ``--nur-lesen`` löscht nichts.
+``--melde-ausfall GRUND`` rührt kein GitHub an und vermerkt nur im bestehenden
+Manifest, dass es nicht erneuert wurde (Handarbeit und Notweg); die Seite nennt den
+Grund als Ausfall.
 
 Frist und Exit-Code: Der Schritt in ``geraete.yml`` hat 5 min und darf den Commit
 des Messtags nie sperren, und die Workflow-Datei bleibt, wie sie ist. Deshalb hält
@@ -53,6 +57,12 @@ from telco_radar.beleg_manifest import (
     baue_manifest,
     markiere_ausfall,
     schreibe,
+)
+from telco_radar.beleg_veraltet import (
+    Veraltet,
+    finde_veraltete,
+    ohne_stellen,
+    streitpaare,
 )
 from telco_radar.klick_vertrag import ORDNER as KLICK_ORDNER
 from telco_radar.klick_vertrag import lies_ergebnisse
@@ -103,9 +113,28 @@ def wachhund(sekunden: float) -> Iterator[None]:
         signal.signal(signal.SIGALRM, alt)
 
 
+def entscheide_veraltete(anhaenge: dict[str, list[str]], gh: Releases) -> Veraltet:
+    """Welche Bilder früherer Positionen desselben Paares und Tages gelten nicht mehr
+    (``beleg_veraltet``)? Die Uploadzeiten liest ``gh`` nur, wenn es einen Streit gibt;
+    scheitert das, bleiben alle Paare unentschieden (``GhFehler`` wird hier gefangen:
+    nichts gelöscht, das Manifest verwirft das Paar, der Fehler steht in der Bilanz)."""
+    paare = streitpaare(anhaenge)
+    if not paare:
+        return Veraltet()
+    try:
+        return finde_veraltete(anhaenge, gh.hochgeladen_am())
+    except GhFehler as fehler:
+        print(f"Belege: Uploadzeiten nicht lesbar: {fehler}", file=sys.stderr)
+        return Veraltet(offen=sorted("/".join(p) for p in paare))
+
+
 def erneuere(root: Path, heute: date, nur_lesen: bool, gh: Releases) -> str | None:
     """Liest, räumt auf, schreibt das Manifest; gibt den Ausfallgrund zurück oder
-    ``None``."""
+    ``None``.
+
+    Frühere Positionen eines Paares und Tages (zweiter Klick-Lauf) fallen zuerst aus
+    dem Manifest und werden erst danach gelöscht: die Datei zeigt auf die neuen Bilder,
+    bevor die alten verschwinden."""
     try:
         anhaenge = gh.anhaenge()
     except GhFehler as fehler:
@@ -113,14 +142,25 @@ def erneuere(root: Path, heute: date, nur_lesen: bool, gh: Releases) -> str | No
     bilanz = Bilanz()
     if not nur_lesen:
         bilanz, anhaenge = raeume_auf(anhaenge, heute, gh)
+    veraltet = entscheide_veraltete(anhaenge, gh)
     ergebnisse, unlesbar = lies_ergebnisse(root / KLICK_ORDNER)
     for zeile in unlesbar:
         print(
             f"Belege: Klick-Ergebnis für die Beschriftung unlesbar: {zeile}",
             file=sys.stderr,
         )
-    manifest = baue_manifest(anhaenge, heute, lies_folgen(ergebnisse))
+    manifest = baue_manifest(
+        ohne_stellen(anhaenge, veraltet.loeschen), heute, lies_folgen(ergebnisse)
+    )
     schreibe(root / MANIFEST_DATEI, manifest)
+    geloescht = 0
+    if not nur_lesen:
+        for tag, datei in veraltet.loeschen:
+            try:
+                gh.asset_loeschen(tag, datei)
+                geloescht += 1
+            except GhFehler as fehler:
+                bilanz.fehler.append(f"{tag}/{datei} nicht gelöscht: {fehler}")
     gross = sum(1 for b in manifest["belege"] if b["gross"])
     print(
         f"Belege: {len(manifest['belege'])} Bilder im Manifest, davon {gross} große "
@@ -128,8 +168,12 @@ def erneuere(root: Path, heute: date, nur_lesen: bool, gh: Releases) -> str | No
         f"Bildfolge, {manifest.get('folge_verworfen', 0)} Folgen verworfen, "
         f"{manifest['fremd']} fremde Dateien; "
         f"{len(bilanz.releases_geloescht)} "
-        f"Releases und {bilanz.assets_geloescht} Dateien gelöscht"
+        f"Releases und {bilanz.assets_geloescht} Dateien gelöscht, "
+        f"{geloescht} Dateien früherer Positionen ersetzt, "
+        f"{len(veraltet.offen)} Paare unentschieden"
     )
+    for paar in veraltet.offen:
+        print(f"Belege: zwei Positionen, keine Reihenfolge: {paar}", file=sys.stderr)
     for zeile in bilanz.fehler:
         print(f"Belege: {zeile}", file=sys.stderr)
     if bilanz.fehler:

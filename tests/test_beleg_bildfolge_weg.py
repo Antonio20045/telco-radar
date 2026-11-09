@@ -14,6 +14,7 @@ from __future__ import annotations
 import functools
 import http.server
 import json
+import os
 import shutil
 import threading
 from datetime import date
@@ -28,7 +29,6 @@ from beleg_attrappe import AttrappeReleases
 from bs4 import BeautifulSoup
 from test_beleg_skripte import lade_skript, satz
 
-from telco_radar.beleg_ablage import Bild, GhFehler, veroeffentliche
 from telco_radar.beleg_bildfolge import (
     ADRESSE_ANFANG,
     fremd_zur_kennung,
@@ -382,59 +382,6 @@ def test_s1_das_einzelbild_wird_mit_der_kennung_der_position_benannt():
     assert kaputt == plain and "ohne Kennung" in zeilen[0]
 
 
-def test_veraltetes_bild_wird_geloescht_wenn_das_neue_einzelbild_angekommen_ist():
-    modul = lade_skript("belege_veroeffentlichen")
-    k1, k2 = "1" * 64, "2" * 64
-    alt = [folge_dateiname(pos.MODELL, "o2", TAG, s, k1) for s in ("preis", "tarif")]
-    neu = folge_dateiname(pos.MODELL, "o2", TAG, "preis", k2)
-    gh = AttrappeReleases({TAGES_RELEASE: [*alt, neu]})
-    bilder = [SimpleNamespace(datei=Path(neu), gross=False)]
-    assert modul.raeume_veraltete_folgen(bilder, gh) == []
-    assert sorted(gh.assets_geloescht) == sorted((TAGES_RELEASE, d) for d in alt)
-    assert gh.stand[TAGES_RELEASE] == [neu]
-
-
-class EinzelbildNichtAngekommen(AttrappeReleases):
-    """Teilausfall: Schritte kommen an, das Einzelbild (preis) wird abgelehnt."""
-
-    def hochladen(self, tag, dateien):
-        namen = [d.name for d in dateien]
-        liste = self.stand.setdefault(tag, [])
-        liste.extend(
-            n
-            for n in namen
-            if zerlege_folgename(n).schritt != "preis" and n not in liste
-        )
-        if any(zerlege_folgename(n).schritt == "preis" for n in namen):
-            raise GhFehler("gh release upload: Exit 1: Einzelbild abgelehnt")
-
-
-def test_m1_nichts_wird_geloescht_solange_das_neue_einzelbild_fehlt():
-    """Zweiter Lauf am selben Tag (Position K2), das Einzelbild kommt nicht an, seine
-    Schritte schon. Die vollständige frühere Position K1 bleibt stehen (sonst wäre das
-    Einzelbild von K1 weg oder die Folge aus K1 und K2 gemischt)."""
-    modul = lade_skript("belege_veroeffentlichen")
-    k1, k2 = "1" * 64, "2" * 64
-    liegt_k1 = [
-        folge_dateiname(pos.MODELL, "o2", TAG, s, k1)
-        for s in ("preis", "geraet_speicher", "tarif", "laufzeit")
-    ]
-    gh = EinzelbildNichtAngekommen({TAGES_RELEASE: list(liegt_k1)})
-    bilder = [
-        Bild(Path(folge_dateiname(pos.MODELL, "o2", TAG, s, k2)), False)
-        for s in ("preis", "tarif", "laufzeit")
-    ]
-    bilanz = veroeffentliche(bilder, TAG, gh)
-    assert bilanz.fehler, "der Ausfall steht in der Bilanz"
-    assert modul.raeume_veraltete_folgen(bilder, gh) == []
-    assert gh.assets_geloescht == []
-    assert set(liegt_k1) <= set(gh.stand[TAGES_RELEASE])
-    (eintrag,) = baue_manifest(gh.stand, TAG, {})["belege"]
-    kennungen = {kennung_der_adresse(b["datei"]) for b in eintrag["bildfolge"]}
-    assert kennungen == {k1[:16]}, "die Folge besteht nur aus Bildern von K1"
-    assert kennung_der_adresse(eintrag["url"]) == k1[:16]
-
-
 def test_s2_die_seite_zeigt_kein_bild_einer_anderen_messung(weg, tmp_path):
     """Folge der Kennung K, die Zeile gehört zu einer anderen ``beleg_id``: kein Bild,
     ein Vermerk statt des fremden Bilds (kein Bild unter der falschen Zeile)."""
@@ -447,8 +394,10 @@ def test_s2_die_seite_zeigt_kein_bild_einer_anderen_messung(weg, tmp_path):
     assert paar.select("img") == [] and paar.select(".gr-bildfolge") == []
     keins = paar.select_one(".gr-beleg-keins")
     assert "hidden" not in keins.attrs
-    assert "gehört zu einer anderen Messung" in keins.get_text(" ", strip=True)
-    assert weg.beleg_id[:16] in keins.get_text()
+    text = keins.get_text(" ", strip=True)
+    assert "gehört zu einer anderen Messung" in text
+    assert weg.beleg_id[:16] not in text and fremd_id[:16] not in text, text
+    assert "Messung " + fremd_id[:4] not in text
 
 
 def _adr(name: str) -> str:
@@ -586,3 +535,132 @@ def test_folge_im_browser_ohne_querscrollen_mit_den_veroeffentlichten_bildern(
                 ctx.close()
     finally:
         httpd.shutdown()
+
+
+VERMERK = "Bild nicht mehr verfügbar"
+
+
+def _zustand(s) -> dict:
+    return s.evaluate(
+        """() => {
+          const z = document.querySelector(
+            '#gr-bnd-gruppe .gr-beleg-zeile:not([hidden])');
+          const bilder = [...z.querySelectorAll('img')];
+          return {
+            summary: z.querySelector('summary').textContent,
+            kaputt: bilder.filter(i => !(i.complete && i.naturalWidth > 0)).length,
+            bilder: bilder.length,
+            schritte: [...z.querySelectorAll('.gr-bildfolge > li')].map(li => ({
+              kopf: li.querySelector('.gr-bildfolge-schritt').textContent,
+              vermerk: (li.querySelector('.gr-bild-fehlt') || {}).textContent || null,
+              bild: !!li.querySelector('img'),
+            })),
+            direkt: [...z.querySelectorAll('details > .gr-bild-fehlt')]
+              .map(v => v.textContent),
+            quer: document.documentElement.scrollWidth,
+          };
+        }"""
+    )
+
+
+def _pruefe_ladefehler(
+    weg, ordner, chromium, manifest, tot, erwartet, breiten, label="schritt"
+):
+    """Öffnet die Zeile im Chromium; Adressen, deren Dateiname ``tot`` enthält, geben
+    404 (gelöschte Release-Datei), alle anderen die hochgeladenen Bytes."""
+    site = baue_seite(ordner, manifest, weg.beleg_id)
+    handler = functools.partial(
+        http.server.SimpleHTTPRequestHandler, directory=str(site)
+    )
+    httpd = http.server.ThreadingHTTPServer(("127.0.0.1", 0), handler)
+    threading.Thread(target=httpd.serve_forever, daemon=True).start()
+
+    def liefere(route):
+        name = route.request.url.rsplit("/", 1)[1]
+        if any(t in name for t in tot):
+            route.fulfill(status=404, body="Not Found", content_type="text/plain")
+        else:
+            route.fulfill(body=weg.gh.inhalte[name], content_type="image/webp")
+
+    ergebnis = {}
+    try:
+        for breite in breiten:
+            ctx = chromium.new_context(viewport={"width": breite, "height": 900})
+            try:
+                ctx.route("https://github.com/**", liefere)
+                s = ctx.new_page()
+                s.goto(f"http://127.0.0.1:{httpd.server_address[1]}/geraete.html")
+                s.click("#gr-zr-laufzeiten button[data-lz='24']")
+                s.locator("#gr-bnd-gruppe .gr-beleg-zeile summary").first.click()
+                s.wait_for_function(
+                    "[...document.querySelectorAll('.gr-beleg-zeile img')]"
+                    ".every(i => i.complete)"
+                )
+                s.wait_for_timeout(300)
+                zustand = _zustand(s)
+                assert zustand["quer"] <= breite, (breite, zustand)
+                assert zustand["kaputt"] == 0, (breite, "kaputtes Bild", zustand)
+                erwartet(zustand, breite)
+                ergebnis[breite] = zustand
+                ablage = os.environ.get("BELEG_ABNAHME_ORDNER")
+                if ablage:
+                    s.locator(".gr-beleg-paar[data-anbieter='o2']").screenshot(
+                        path=f"{ablage}/{label}-{breite}.png"
+                    )
+            finally:
+                ctx.close()
+    finally:
+        httpd.shutdown()
+    return ergebnis
+
+
+@pytest.mark.browser
+def test_ein_geloeschtes_folgebild_wird_zum_vermerk_an_derselben_stelle(
+    weg, tmp_path, chromium
+):
+    """Befund N1: die Datei eines Schritts ist weg (404). Statt des kaputten Bilds
+    steht an derselben Stelle der Vermerk, der Zähler nennt die Bilder, die da sind."""
+
+    def erwartet(z, breite):
+        assert z["summary"].count("2 von 4 Schritten mit Bild") == 1, z["summary"]
+        assert z["bilder"] == 2
+        verteilt = [(x["kopf"].split(": ")[0], x["vermerk"]) for x in z["schritte"]]
+        assert ("Schritt 3 von 4", VERMERK) in verteilt, verteilt
+        assert sum(1 for x in z["schritte"] if x["vermerk"] == VERMERK) == 1
+        ort = [x["vermerk"] for x in z["schritte"]].index(VERMERK)
+        assert z["schritte"][ort]["bild"] is False
+        assert z["schritte"][ort]["kopf"].startswith("Schritt")
+
+    _pruefe_ladefehler(
+        weg, tmp_path, chromium, weg.manifest, ["laufzeit"], erwartet, (1440, 390)
+    )
+
+
+@pytest.mark.browser
+def test_fehlen_alle_bilder_der_folge_sagt_der_zaehler_null_von_n(
+    weg, tmp_path, chromium
+):
+    def erwartet(z, breite):
+        assert "0 von 4 Schritten mit Bild" in z["summary"], z["summary"]
+        assert z["bilder"] == 0
+        assert [x["vermerk"] for x in z["schritte"]].count(VERMERK) == 3
+
+    _pruefe_ladefehler(
+        weg, tmp_path, chromium, weg.manifest, ["__"], erwartet, (390,), "alle"
+    )
+
+
+@pytest.mark.browser
+def test_ein_geloeschtes_einzelbild_wird_zum_vermerk(weg, tmp_path, chromium):
+    manifest = json.loads(json.dumps(weg.manifest))
+    for eintrag in manifest["belege"]:
+        eintrag.pop("bildfolge", None)
+        eintrag.pop("bildfolge_fehlt", None)
+
+    def erwartet(z, breite):
+        assert z["bilder"] == 0 and z["direkt"] == [VERMERK], z
+        assert "Screenshot zu dieser Preiszeile" in z["summary"]
+
+    _pruefe_ladefehler(
+        weg, tmp_path, chromium, manifest, ["__"], erwartet, (1440, 390), "einzel"
+    )

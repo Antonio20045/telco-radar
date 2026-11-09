@@ -29,14 +29,15 @@
    "Schritt i von N" umfasst Bilder und Luecken. `data-kombis` nennt alle Kombinationen
    des Anbieters (Band:Laufzeit); ohne seine Zeile in der Wahl tritt der Anbieter
    zurueck (die Fehlliste nennt ihn). Die Bilder laedt `app.js` erst beim
-   Aufklappen (`data-src`). Die Zuordnung rechnet Python
+   Aufklappen (`data-src`); laedt ein Bild nicht (Datei geloescht), steht an seiner
+   Stelle "Bild nicht mehr verfuegbar" und `.gr-folge-zahl` zaehlt neu. Die Zuordnung rechnet Python
    (`report/geraete_zeilenbelege.py`). #}
 {% macro belegpaare(m) %}{% if paarbelege is defined %}{% set paare = paarbelege(m) %}{% if paare and paare[0].zeilen_gesamt is defined %}
 <ul class="gr-beleg-paare" aria-label="Screenshots zur gewählten Kombination">
   <li class="gr-beleg-kopf">Screenshots zur gewählten Kombination aus Gerät, Tarifband, Laufzeit und Anbieter</li>{% for p in paare %}
   <li class="gr-beleg-paar" data-anbieter="{{ p.anbieter }}" data-kombis="{{ p.kombis }}"><b class="gr-beleg-anbieter">{{ p.anbieter }}</b>{% for z in p.zeilenbilder %}
     <div class="gr-beleg-zeile" data-kombi="{{ z.kombi }}"><details class="gr-belege gr-belege--zeile{% if z.bildfolge %} gr-belege--folge{% endif %}">
-      <summary>{% if z.bildfolge %}{% set bilder = z.bildfolge | selectattr('url') | list | length %}Screenshot-Folge ({% if bilder == z.bildfolge | length %}{{ bilder }} Bilder{% else %}{{ bilder }} von {{ z.bildfolge | length }} Schritten mit Bild{% endif %}){% else %}Screenshot{% endif %} zu dieser Preiszeile vom {{ z.datum | date_de }}, Zuordnung über die Messung: {{ z.geraet }} · {{ z.tarif }}{% if z.raten_text %} · {{ z.raten_text }}{% endif %} · {{ z.label }} {{ z.gesamt | euro }}</summary>{% if z.bildfolge %}
+      <summary>{% if z.bildfolge %}{% set bilder = z.bildfolge | selectattr('url') | list | length %}Screenshot-Folge (<span class="gr-folge-zahl">{% if bilder == z.bildfolge | length %}{{ bilder }} Bilder{% else %}{{ bilder }} von {{ z.bildfolge | length }} Schritten mit Bild{% endif %}</span>){% else %}Screenshot{% endif %} zu dieser Preiszeile vom {{ z.datum | date_de }}, Zuordnung über die Messung: {{ z.geraet }} · {{ z.tarif }}{% if z.raten_text %} · {{ z.raten_text }}{% endif %} · {{ z.label }} {{ z.gesamt | euro }}</summary>{% if z.bildfolge %}
       <ol class="gr-bildfolge">{% for f in z.bildfolge %}
         {% if not f.url %}<li class="gr-bildfolge-luecke"><span class="gr-bildfolge-schritt">Schritt {{ loop.index }} von {{ loop.length }}{% if f.name %}: {{ f.name }}{% endif %}</span><span class="gr-bildfolge-text">Kein Bild: {{ f.fehlt }}</span></li>{% else %}<li><span class="gr-bildfolge-schritt">Schritt {{ loop.index }} von {{ loop.length }}{% if f.name %}: {{ f.name }}{% endif %}</span>{% if f.text %}<span class="gr-bildfolge-text">{{ f.text }}</span>{% endif %}
           <img data-src="{{ f.url }}" alt="Screenshot {{ p.anbieter }}, {{ z.tarif }}, Schritt {{ loop.index }} von {{ loop.length }}{% if f.name %}: {{ f.name }}{% endif %}, vom {{ z.datum | date_de }}" width="640" height="400"></li>{% endif %}{% endfor %}

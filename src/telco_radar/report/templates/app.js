@@ -3147,6 +3147,31 @@ var TelcoFrage = (function () {
     });
   }, true);
 
+  /* Ein Beleg-Bild, das nicht laedt (Release-Datei geloescht, Netz weg), wird zum
+     Vermerk an derselben Stelle statt zum kaputten Bild. Der Zaehler der Folge
+     ("n von N Schritten mit Bild") zaehlt die Bilder, die wirklich da sind. error
+     bubbelt nicht - deshalb Capture, wie beim toggle. */
+  document.addEventListener('error', function (ev) {
+    var bild = ev.target;
+    if (!bild || bild.tagName !== 'IMG') return;
+    var d = bild.closest ? bild.closest('details.gr-belege') : null;
+    if (!d) return;
+    var vermerk = document.createElement('span');
+    vermerk.className = 'gr-bildfolge-text gr-bild-fehlt';
+    vermerk.setAttribute('role', 'status');
+    vermerk.textContent = 'Bild nicht mehr verfügbar';
+    var schritt = bild.closest('li');
+    if (schritt) schritt.classList.add('gr-bildfolge-luecke');
+    bild.parentNode.replaceChild(vermerk, bild);
+    var zahl = d.querySelector('.gr-folge-zahl');
+    if (zahl) {
+      var alle = d.querySelectorAll('.gr-bildfolge > li').length;
+      var mit = d.querySelectorAll('.gr-bildfolge > li img').length;
+      zahl.textContent = mit === alle ? mit + ' Bilder'
+        : mit + ' von ' + alle + ' Schritten mit Bild';
+    }
+  }, true);
+
   /* Die Live-Vorschau: ab 2 Zeichen, hoechstens 8 Treffer, Praefix-Treffer
      auf Titel-Woertern - die Reihenfolge kommt fertig aus Python. */
   function trefferListe(eingabe) {
