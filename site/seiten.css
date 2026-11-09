@@ -2473,7 +2473,10 @@ body:not(.mit-buehne) main{padding-top:112px}
 @keyframes szene-marke{from{opacity:0}to{opacity:1}}
 
 /* Lesetext im Bericht */
-.prose,.szene-text{font-size:18px;line-height:1.68}
+/* overflow-wrap: eine Adresse im Fließtext (falsch geschlossener Quellenlink des
+   Redaktions-Agents) hat keine Umbruchstelle und schob index.html bei 390 px 25 px
+   über den Rand (Prüfung PR 68, 09.11.2026) */
+.prose,.szene-text{font-size:18px;line-height:1.68;overflow-wrap:anywhere}
 .szene-text.prose{max-width:none}
 .szene-text > *{max-width:var(--wrap-text)}
 .prose p{margin:0 0 1.15em}
