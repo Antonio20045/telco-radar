@@ -64,7 +64,8 @@ from . import (
 from . import geraete_delta_wort, geraete_messdatum, geraete_sortiment
 from . import geraete_notbremse as notbremse
 
-from .geraete_laufzeit import LAUFZEIT_STANDARD, ansicht, rang_der_monatsangabe
+from .geraete_katalog_buendel import buendel_je_anbieter_modell
+from .geraete_laufzeit import LAUFZEIT_STANDARD, ansicht
 from .geraete_tco_band import band_label
 from .geraete_tco_grafik import euro
 from ..analyze import geraete_lifecycle, klick_erfassung as erfassung
@@ -653,73 +654,6 @@ TCO_DELTA_GRUND_UNBESTIMMT = (
 )
 
 
-def _buendel_je_anbieter_modell(
-    buendel: list, eintraege: list, katalog, heute: str = ""
-) -> tuple[dict, dict]:
-    """Zwei Lesarten derselben Bündel-Aufloesung.
-
-    1. `(Anbieter, modell_schluessel) -> das guenstigste zählende Bündel mit
-       Monatspreis` (`geraete_notbremse`) - "nur im Bündel, ab X EUR/Monat"
-       braucht einen Beleg aus `geraete_tco.json`, NICHT das
-       `preis_mit_vertrag_ab` der Listung (Belegzwang).
-    2. `modell_schluessel -> {device_id, speicher}` für JEDES Bündel, dessen
-       SKU auf ein Geraet aufloest, auch ohne Monatspreis (P5-Auftrag 1:
-       schon EIN Bündel ohne Listung stellt die Katalog-Zeile).
-
-    Die Bündel-SKU loest wie in `geraete_tco_karten.modelle()` auf (erst die
-    Listung derselben SKU, dann `geraet_aus_sku`) - eine eigene Aufloesung wuesste
-    bald etwas anderes als die TCO-Tafel. Der Monatsbetrag ist die Angabe des
-    ANBIETERS: `buendel_monatlich` (1&1, § 13.2), sonst Tarif- plus Geraeterate.
-    Verglichen wird nur in einer Ratenlaufzeit, 24 Raten zuerst
-    (`rang_der_monatsangabe`); die Angabe nennt ihre `laufzeit`.
-    """
-    modell_je_sku: dict[str, str] = {}
-    geraet_je_sku: dict[str, tuple] = {}
-    for e in eintraege:
-        sku = e.get("sku_id") or ""
-        if sku:
-            modell_je_sku[sku] = geraete_tco_karten.modell_schluessel(
-                e.get("device_id"), e.get("speicher_gb")
-            )
-            geraet_je_sku[sku] = (e.get("device_id") or "", e.get("speicher_gb"))
-    beste: dict = {}
-    geraet_je_mid: dict[str, dict] = {}
-    for b in buendel or []:
-        sku = b.get("sku_id") or ""
-        mid = modell_je_sku.get(sku)
-        if mid:
-            geraet = geraet_je_sku.get(sku, ("", None))
-        else:
-            geraet = geraete_tco_karten.geraet_aus_sku(sku, katalog)
-            if not geraet[0]:
-                continue
-            mid = geraete_tco_karten.modell_schluessel(*geraet)
-        geraet_je_mid.setdefault(mid, {"device_id": geraet[0], "speicher": geraet[1]})
-        if not notbremse.felder_aus_satz(b, heute)["zaehlt"]:
-            continue
-        monat = b.get("buendel_monatlich")
-        if monat is None:
-            tarif, rate = b.get("tarif_monatlich"), b.get("geraet_monatsrate")
-            if tarif is None or rate is None:
-                continue
-            monat = round(float(tarif) + float(rate), 2)
-        monat, laufzeit = float(monat), b.get("laufzeit_monate")
-        rang = (rang_der_monatsangabe(laufzeit), monat)
-        schluessel = (geraete_tco_karten.normalisiere(b.get("anbieter", "")), mid)
-        bisher = beste.get(schluessel)
-        if bisher is None or rang < bisher["rang"]:
-            beste[schluessel] = {
-                "monat": monat,
-                "laufzeit": laufzeit,
-                "rang": rang,
-                "anbieter": b.get("anbieter", ""),
-                "tarif": (b.get("tarif_name") or "").strip(),
-                "quelle_url": b.get("quelle_url", ""),
-                "abgerufen_am": b.get("abgerufen_am", ""),
-            }
-    return beste, geraet_je_mid
-
-
 def _buendel_aus_listungen(eintraege: list) -> list[dict]:
     """Buendel-Saetze im Store-Format, gelesen aus den LISTUNGEN.
 
@@ -733,7 +667,7 @@ def _buendel_aus_listungen(eintraege: list) -> list[dict]:
     Beleg - genau die Felder, die der Store auch haette.
 
     Die Saetze sehen aus wie Store-Saetze, damit
-    `_buendel_je_anbieter_modell` sie nicht unterscheiden muss. Gelesen
+    `buendel_je_anbieter_modell` sie nicht unterscheiden muss. Gelesen
     wird nur, was der Anbieter selbst nennt - nichts gerechnet, keine
     Aufteilung erfunden.
     """
@@ -1002,7 +936,7 @@ def katalog_modellzeilen(
     `geraete_zeitreihe.AUTO_SICHTBAR_AB_MESTAGEN`).
     """
     belege = geraete_tco_karten.barpreise(eintraege)
-    buendel_je, buendel_geraete = _buendel_je_anbieter_modell(
+    buendel_je, buendel_geraete = buendel_je_anbieter_modell(
         buendel, eintraege, katalog, heute
     )
     tco_je_id = {m.get("id"): m for m in (tco_modelle or [])}
@@ -1149,6 +1083,7 @@ def katalog_modellzeilen(
                 "nur_buendel": buendel_angabe is not None,
                 "buendel_monat": buendel_angabe["monat"] if buendel_angabe else None,
                 "buendel_raten": buendel_angabe["laufzeit"] if buendel_angabe else None,
+                "buendel_raten_zusatz": (buendel_angabe or {}).get("raten_zusatz", ""),
                 "buendel_anbieter": (
                     buendel_angabe["anbieter"] if buendel_angabe else None
                 ),

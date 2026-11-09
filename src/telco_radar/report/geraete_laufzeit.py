@@ -92,6 +92,19 @@ def raten_text(karte: dict) -> str | None:
     return f"{laufzeit} {'Raten' if buendel is None else 'Monatsraten'}"
 
 
+def monatsangabe_zusatz(laufzeit: int | None, buendel_monatlich: float | None) -> str:
+    """Der Zusatz hinter „ab X €/Monat“ im Katalog: dieselbe Regel wie `raten_text`.
+
+    Ein 24+12-Vertrag (`ist_24_plus_12`) heißt „· 24 Monate + Ablöse“, nie „mit 36
+    Raten“ (Live-Abnahme 09.11.2026, A6); sonst „mit N Raten“. Ohne Laufzeit nichts.
+    """
+    if not laufzeit:
+        return ""
+    if ist_24_plus_12(buendel_monatlich, laufzeit):
+        return f" · {TCO_HORIZONT} Monate + Ablöse"
+    return f" mit {laufzeit} Raten"
+
+
 def nur_ueber_24(karte: dict) -> bool:
     """Ein Betrag für Tarif und Gerät (1&1) über mehr als 24 Monate.
 

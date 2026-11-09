@@ -47,6 +47,7 @@ from ..tco_model import zeitraum_vergleichbar
 from . import geraete_bewegung, geraete_sortiment
 from . import geraete_notbremse as notbremse
 from . import geraete_zeitreihe_auswahl as zeitreihe_auswahl
+from . import geraete_zeitreihe_uebertrag as uebertrag
 from .anbieter_farben import STRICHMUSTER, stil_fuer
 from .geraete_antwort import _antwort_html as _antwort_html
 from .geraete_antwort import _leitzahl_html as _leitzahl_html
@@ -269,6 +270,7 @@ def _messungen(
             log.warning("geraete_tco.json unlesbar fuer die Zeitreihe: %s", exc)
 
     messungen: dict[tuple, dict] = {}
+    letzte_je_buendel: dict[tuple, dict[str, tuple[str, dict]]] = {}
     historie = state_dir / "geraete_tco_historie.jsonl"
     if not tco_historie.vorhanden(historie):
         return {}
@@ -315,26 +317,23 @@ def _messungen(
         h = zeitraum(laufzeit)
         if not zeitraum_vergleichbar(monate, h):
             fremder_zeitraum += 1
+        anbieter = b.get("anbieter") or "?"
         slot = messungen.setdefault((modell, band, laufzeit), {}).setdefault(
-            b.get("anbieter") or "?", {}
+            anbieter, {}
         )
-        alt = slot.get(datum)
-        felder = notbremse.felder_aus_satz(b, heute)
-        if alt is None or notbremse.zaehlt(felder) != notbremse.zaehlt(alt):
-            besser = alt is None or notbremse.zaehlt(felder)
-        elif zeitraum_vergleichbar(monate, alt["monate"]):
-            besser = wert < alt["wert"]
-        else:
-            besser = zeitraum_vergleichbar(monate, h)
-        if besser:
-            slot[datum] = {
-                "satz": satz,
-                "stand": b,
-                "wert": wert,
-                "monate": monate,
-                "laufzeit": laufzeit,
-                **felder,
-            }
+        messung = {
+            "satz": satz,
+            "stand": b,
+            "wert": wert,
+            "monate": monate,
+            "laufzeit": laufzeit,
+            **notbremse.felder_aus_satz(b, heute),
+        }
+        if uebertrag.besser(messung, slot.get(datum), h):
+            slot[datum] = messung
+        uebertrag.merke(
+            letzte_je_buendel, (modell, band, laufzeit, anbieter), hid, datum, messung
+        )
     if (
         ohne_id
         or ohne_stand
@@ -360,6 +359,7 @@ def _messungen(
             fremde_laufzeit,
             stand_ohne_id,
         )
+    uebertrag.gilt_weiter(messungen, letzte_je_buendel, heute)
     zeitreihe_auswahl.ohne_widersprochenen_juengsten(messungen, buendel, sku_modell)
     return messungen
 

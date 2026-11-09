@@ -4,7 +4,9 @@ Das Bild trägt Gerät, Anbieter und Tag, keinen Tarif. Das Veröffentlichen leg
 das Bild des Klick-Rohsatzes mit den niedrigsten Gesamtkosten ab
 (``beleg_schluessel.ist_besser``); dieselbe Wahl über die Sätze des Bestands nennt die
 Position, wenn sie sich daraus beweisen lässt. Reines Modul ohne Netz und ohne
-Collect-Importe, damit die Seite es nutzen darf (Schicht ``report``).
+Collect-Importe, damit die Seite es nutzen darf (Schicht ``report``). Die Gründe stehen
+nur dort, wo die Liste kein Zeilenbild zeigt: sie sagen, warum keine Zeile eines hat,
+nie, was ein Bild zeigt.
 """
 
 from __future__ import annotations
@@ -28,8 +30,8 @@ def gesamt_kosten(satz: dict[str, Any]) -> float | None:
 GRUND_KEIN_KLICKSATZ = "keine Klick-Messung dieses Paares im Bestand"
 GRUND_BESTAND_NEUER = "Bestand neuer als das Bild: der Bildsatz kann ersetzt sein"
 GRUND_KEIN_SATZ_VOM_TAG = "kein Satz vom Tag des Bildes"
-GRUND_KEINE_KOSTEN = "die günstigste Position hat keine Gesamtkosten"
-GRUND_GLEICHSTAND = "gleich teure Positionen: das Bild zeigt eine davon"
+GRUND_KEINE_KOSTEN = "am Tag des Bildes hat die günstigste Position keine Gesamtkosten"
+GRUND_GLEICHSTAND = "gleich teure Positionen: das Bild lässt sich keiner zuordnen"
 
 
 @dataclass(frozen=True)
