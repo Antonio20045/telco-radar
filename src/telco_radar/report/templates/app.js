@@ -2688,7 +2688,7 @@ var TelcoFrage = (function () {
     gruppe.appendChild(p);
   }
 
-  function setzeBuendel(mid, bandKey) {
+  function setzeBuendel(mid) {
     var gruppe = element('gr-bnd-gruppe');
     if (!gruppe) return;
     var fertig = function (knotenB, fehler) {
@@ -2704,8 +2704,11 @@ var TelcoFrage = (function () {
       } else if (fehler) {
         leerSatz(gruppe, 'Fehlende Anbieter nicht geladen.');
       }
-      setzeBndTitel(mid, bandKey);
-      stelleZeilen(bandKey);
+      /* Live-Abnahme 09.11.2026 (Nachbesserung): die Wahl von JETZT, nicht die
+         des Geraeteklicks. Wechselt Stufe (oder Laufzeit) waehrend das Fragment
+         laedt, gehoerte das eingesetzte Band sonst der alten Wahl. */
+      setzeBndTitel(mid, zustand.band);
+      stelleZeilen(zustand.band);
       wendeSortierungAn();
     };
     /* Live-Abnahme 09.11.2026 (L1): nie ein fremdes Bild zu einem Preis, auch
@@ -3053,7 +3056,7 @@ var TelcoFrage = (function () {
     stelleZeilen(zustand.band);
     if (zustand.modell !== zuletztModell) {
       zuletztModell = zustand.modell;
-      setzeBuendel(zustand.modell, zustand.band);
+      setzeBuendel(zustand.modell);
     }
     schreibeLink();
   }
