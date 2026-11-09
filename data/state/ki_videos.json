@@ -1,6 +1,86 @@
 {
- "stand": "2026-11-08",
+ "stand": "2026-11-09",
  "videos": [
+  {
+   "id": "frXyEsq-qao",
+   "titel": "You’ve Tried ChatGPT. But Have You Tried Grok?",
+   "kanal": "Kevin Stratvert",
+   "datum": "2026-11-09",
+   "dauer_sekunden": 45,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "frXyEsq-qao.jpg"
+  },
+  {
+   "id": "eqyIoewhFzQ",
+   "titel": "KI-Update kompakt: Rechenzentren, Propaganda, Siri AI, Minecraft",
+   "kanal": "KI Update (heise)",
+   "datum": "2026-11-09",
+   "dauer_sekunden": 1143,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "eqyIoewhFzQ.jpg"
+  },
+  {
+   "id": "RcvjZlq12kU",
+   "titel": "Unser gesamtes Firmenwissen! (Stand 2026)",
+   "kanal": "Everlast AI",
+   "datum": "2026-11-09",
+   "dauer_sekunden": 42,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "RcvjZlq12kU.jpg"
+  },
+  {
+   "id": "GpZ5T51jE4U",
+   "titel": "Spec-Driven Development vs. Waterfall: What's Different for AI Coding?",
+   "kanal": "IBM Technology",
+   "datum": "2026-11-09",
+   "dauer_sekunden": 458,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "GpZ5T51jE4U.jpg"
+  },
+  {
+   "id": "F6QzzhQ8F5M",
+   "titel": "Wie viele Issues kriege ich für $2700 gefixt?",
+   "kanal": "The Morpheus Tutorials",
+   "datum": "2026-11-09",
+   "dauer_sekunden": 1320,
+   "stufe": "Fortgeschritten",
+   "sprache": "de",
+   "bild": "F6QzzhQ8F5M.jpg"
+  },
+  {
+   "id": "5x8eHMBj0Rk",
+   "titel": "KI-Update kompakt: Rechenzentren, Propaganda, Siri AI, Minecraft - KI-Update – ein heise-Podcast",
+   "kanal": "KI Update (heise)",
+   "datum": "2026-11-09",
+   "dauer_sekunden": 1075,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "5x8eHMBj0Rk.jpg"
+  },
+  {
+   "id": "4vCbQMUVV-I",
+   "titel": "New Microsoft Copilot Harness | More power, token efficiency & control for agents in Foundry",
+   "kanal": "Microsoft Mechanics",
+   "datum": "2026-11-09",
+   "dauer_sekunden": 879,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "4vCbQMUVV-I.jpg"
+  },
+  {
+   "id": "45-qbcAeUbM",
+   "titel": "More skills = worse agents (do this instead)",
+   "kanal": "David Ondrej",
+   "datum": "2026-11-09",
+   "dauer_sekunden": 2545,
+   "stufe": "Fortgeschritten",
+   "sprache": "en",
+   "bild": "45-qbcAeUbM.jpg"
+  },
   {
    "id": "v0q266zAQ9M",
    "titel": "Es ist passiert: Die KI-Blase platzt in Amerika! DAS musst du jetzt wissen | KI-NEWS",
@@ -10,6 +90,16 @@
    "stufe": "Einstieg",
    "sprache": "de",
    "bild": "v0q266zAQ9M.jpg"
+  },
+  {
+   "id": "jKjir4-HmQI",
+   "titel": "This controls games characters AND robots",
+   "kanal": "Matt Wolfe",
+   "datum": "2026-11-08",
+   "dauer_sekunden": 74,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "jKjir4-HmQI.jpg"
   },
   {
    "id": "H_GJapsoLyU",
@@ -210,183 +300,93 @@
    "stufe": "Einstieg",
    "sprache": "de",
    "bild": "YajzUoRKSNQ.jpg"
-  },
-  {
-   "id": "Xo7wNFDOSsc",
-   "titel": "Wirklich keinem bringt die Google KI-Suche etwas | c't 4004 #46",
-   "kanal": "c't 3003",
-   "datum": "2026-11-05",
-   "dauer_sekunden": 4900,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "Xo7wNFDOSsc.jpg"
-  },
-  {
-   "id": "TeIHEGkxlKI",
-   "titel": "Behind the Scenes: Building the Copilot Course #excel #copilot",
-   "kanal": "Leila Gharani",
-   "datum": "2026-11-05",
-   "dauer_sekunden": 95,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "TeIHEGkxlKI.jpg"
-  },
-  {
-   "id": "k8PKrLNqiRk",
-   "titel": "Keno sucht Natto-Fans",
-   "kanal": "c't 3003",
-   "datum": "2026-11-04",
-   "dauer_sekunden": 46,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "k8PKrLNqiRk.jpg"
-  },
-  {
-   "id": "jVxX-cNJeP4",
-   "titel": "Diese drei CLIs schlagen Claude Code!",
-   "kanal": "The Morpheus Tutorials",
-   "datum": "2026-11-04",
-   "dauer_sekunden": 3683,
-   "stufe": "Fortgeschritten",
-   "sprache": "de",
-   "bild": "jVxX-cNJeP4.jpg"
-  },
-  {
-   "id": "ep4psgAFOqc",
-   "titel": "How I Get Claude To Edit My Videos (Step-By-Step)",
-   "kanal": "Matt Wolfe",
-   "datum": "2026-11-04",
-   "dauer_sekunden": 1965,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "ep4psgAFOqc.jpg"
-  },
-  {
-   "id": "cTuNmSJQWuI",
-   "titel": "KI-Update kompakt: Nein zu Rechenzentren, Anthropic warnt, Google-Zwang, KI-Mythen",
-   "kanal": "KI Update (heise)",
-   "datum": "2026-11-04",
-   "dauer_sekunden": 1154,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "cTuNmSJQWuI.jpg"
-  },
-  {
-   "id": "c5n94VqXZAw",
-   "titel": "Did the Knicks’ phishing test go too far? Plus, hackers pose as IT in Teams",
-   "kanal": "IBM Technology",
-   "datum": "2026-11-04",
-   "dauer_sekunden": 1822,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "c5n94VqXZAw.jpg"
-  },
-  {
-   "id": "ZfXt-4P2UjM",
-   "titel": "KI-Update kompakt: Nein zu Rechenzentren, Anthropic warnt, Google-Zwang, KI-Mythen",
-   "kanal": "KI Update (heise)",
-   "datum": "2026-11-04",
-   "dauer_sekunden": 1194,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "ZfXt-4P2UjM.jpg"
-  },
-  {
-   "id": "VSP5ofNCoHg",
-   "titel": "KI ersetzt Jobs? Cool – bis es der eigene ist",
-   "kanal": "c't 3003",
-   "datum": "2026-11-04",
-   "dauer_sekunden": 57,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "VSP5ofNCoHg.jpg"
   }
  ],
  "kanaele": {
   "c't 3003": {
    "error": null,
-   "versucht": "2026-11-08",
-   "abgerufen": "2026-11-08"
+   "versucht": "2026-11-09",
+   "abgerufen": "2026-11-09"
   },
   "KI Update (heise)": {
    "error": null,
-   "versucht": "2026-11-08",
-   "abgerufen": "2026-11-08"
+   "versucht": "2026-11-09",
+   "abgerufen": "2026-11-09"
   },
   "Everlast AI": {
    "error": null,
-   "versucht": "2026-11-08",
-   "abgerufen": "2026-11-08"
+   "versucht": "2026-11-09",
+   "abgerufen": "2026-11-09"
   },
   "The Morpheus Tutorials": {
    "error": null,
-   "versucht": "2026-11-08",
-   "abgerufen": "2026-11-08"
+   "versucht": "2026-11-09",
+   "abgerufen": "2026-11-09"
   },
   "Kevin Stratvert": {
    "error": null,
-   "versucht": "2026-11-08",
-   "abgerufen": "2026-11-08"
+   "versucht": "2026-11-09",
+   "abgerufen": "2026-11-09"
   },
   "Microsoft Mechanics": {
    "error": null,
-   "versucht": "2026-11-08",
-   "abgerufen": "2026-11-08"
+   "versucht": "2026-11-09",
+   "abgerufen": "2026-11-09"
   },
   "Leila Gharani": {
    "error": null,
-   "versucht": "2026-11-08",
-   "abgerufen": "2026-11-08"
+   "versucht": "2026-11-09",
+   "abgerufen": "2026-11-09"
   },
   "Jeff Su": {
    "error": null,
-   "versucht": "2026-11-08",
-   "abgerufen": "2026-11-08"
+   "versucht": "2026-11-09",
+   "abgerufen": "2026-11-09"
   },
   "Matt Wolfe": {
    "error": null,
-   "versucht": "2026-11-08",
-   "abgerufen": "2026-11-08"
+   "versucht": "2026-11-09",
+   "abgerufen": "2026-11-09"
   },
   "IBM Technology": {
    "error": null,
-   "versucht": "2026-11-08",
-   "abgerufen": "2026-11-08"
+   "versucht": "2026-11-09",
+   "abgerufen": "2026-11-09"
   },
   "OpenAI": {
    "error": null,
-   "versucht": "2026-11-08",
-   "abgerufen": "2026-11-08"
+   "versucht": "2026-11-09",
+   "abgerufen": "2026-11-09"
   },
   "Anthropic": {
    "error": null,
-   "versucht": "2026-11-08",
-   "abgerufen": "2026-11-08"
+   "versucht": "2026-11-09",
+   "abgerufen": "2026-11-09"
   },
   "Google DeepMind": {
    "error": null,
-   "versucht": "2026-11-08",
-   "abgerufen": "2026-11-08"
+   "versucht": "2026-11-09",
+   "abgerufen": "2026-11-09"
   },
   "AI Explained": {
    "error": null,
-   "versucht": "2026-11-08",
-   "abgerufen": "2026-11-08"
+   "versucht": "2026-11-09",
+   "abgerufen": "2026-11-09"
   },
   "Two Minute Papers": {
    "error": null,
-   "versucht": "2026-11-08",
-   "abgerufen": "2026-11-08"
+   "versucht": "2026-11-09",
+   "abgerufen": "2026-11-09"
   },
   "3Blue1Brown": {
    "error": null,
-   "versucht": "2026-11-08",
-   "abgerufen": "2026-11-08"
+   "versucht": "2026-11-09",
+   "abgerufen": "2026-11-09"
   },
   "David Ondrej": {
    "error": null,
-   "versucht": "2026-11-08",
-   "abgerufen": "2026-11-08"
+   "versucht": "2026-11-09",
+   "abgerufen": "2026-11-09"
   }
  },
  "error": null
