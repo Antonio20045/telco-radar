@@ -10,6 +10,7 @@ schrieb „mit 36 Raten bei 1&1“. Gegenprobe: echte Raten (o2 24) behalten ihr
 from __future__ import annotations
 
 import functools
+import html
 import http.server
 import json
 import re
@@ -31,6 +32,7 @@ from telco_radar.geraete_config import lade_katalog, lade_quellen
 from telco_radar.report import (
     geraete_view,
     geraete_zeitreihe,
+    geraete_zeitreihe_legende,
     geraete_zeitreihe_uebertrag,
 )
 from telco_radar.report.html import render_site
@@ -116,9 +118,10 @@ def test_a5_legende_nennt_den_wert_der_zeile(zustand):
     assert not abw, f"{len(abw)} von {verglichen}: {abw[:3]}"
 
 
-def _mess(wert, datum, zaehlt=True, monate=24):
+def _mess(wert, datum, tarif_id, zaehlt=True, monate=24):
     return {
         "satz": {"datum": datum},
+        "stand": {"tarif_id": tarif_id, "sku_id": "s"},
         "wert": wert,
         "monate": monate,
         "laufzeit": 24,
@@ -129,7 +132,8 @@ def _mess(wert, datum, zaehlt=True, monate=24):
 def _linie(heute="2026-11-08"):
     """1&1 im Band XS, 24 Raten: das günstige Bündel wurde gestern, ein teureres heute
     gelesen - der Fall S26 Ultra 256 (1.591,66 € gegen 1.711,66 €)."""
-    guenstig, teuer = _mess(1591.66, "2026-11-07"), _mess(1711.66, "2026-11-08")
+    guenstig = _mess(1591.66, "2026-11-07", "t-alt")
+    teuer = _mess(1711.66, "2026-11-08", "t-neu")
     messungen = {
         ("m", "xs", 24): {
             "1&1": {"2026-11-07": guenstig, "2026-11-08": teuer},
@@ -144,9 +148,19 @@ def _linie(heute="2026-11-08"):
     return messungen, letzte, heute
 
 
+GEFUEHRT = {
+    ("m", "xs", 24, "1&1", "t-alt", "s"),
+    ("m", "xs", 24, "1&1", "t-neu", "s"),
+}
+
+
+def _uebertrage(messungen, letzte, heute, gefuehrt=GEFUEHRT):
+    geraete_zeitreihe_uebertrag.gilt_weiter(messungen, letzte, heute, gefuehrt)
+
+
 def test_a5_juengster_tag_traegt_das_guenstigste_frische_buendel():
     messungen, letzte, heute = _linie()
-    geraete_zeitreihe_uebertrag.gilt_weiter(messungen, letzte, heute)
+    _uebertrage(messungen, letzte, heute)
     slot = messungen[("m", "xs", 24)]["1&1"]
     assert slot["2026-11-08"]["wert"] == 1591.66, slot
     assert slot["2026-11-08"]["satz"]["datum"] == "2026-11-07"
@@ -155,19 +169,71 @@ def test_a5_juengster_tag_traegt_das_guenstigste_frische_buendel():
 
 def test_a5_gegenprobe_zu_altes_oder_nicht_zaehlendes_buendel_zieht_nicht():
     messungen, letzte, heute = _linie("2026-11-11")
-    geraete_zeitreihe_uebertrag.gilt_weiter(messungen, letzte, heute)
+    _uebertrage(messungen, letzte, heute)
     assert messungen[("m", "xs", 24)]["1&1"]["2026-11-08"]["wert"] == 1711.66
     messungen, letzte, heute = _linie()
     letzte[("m", "xs", 24, "1&1")]["alt"][1]["zaehlt"] = False
-    geraete_zeitreihe_uebertrag.gilt_weiter(messungen, letzte, heute)
+    _uebertrage(messungen, letzte, heute)
     assert messungen[("m", "xs", 24)]["1&1"]["2026-11-08"]["wert"] == 1711.66
 
 
 def test_a5_ein_teureres_altes_buendel_verdraengt_das_heutige_nicht():
     messungen, letzte, heute = _linie()
     letzte[("m", "xs", 24, "1&1")]["alt"][1]["wert"] = 1800.0
-    geraete_zeitreihe_uebertrag.gilt_weiter(messungen, letzte, heute)
+    _uebertrage(messungen, letzte, heute)
     assert messungen[("m", "xs", 24)]["1&1"]["2026-11-08"]["wert"] == 1711.66
+
+
+def test_a5_ein_buendel_ausserhalb_der_tafel_wird_nicht_uebertragen():
+    """iPhone 14 128, o2, M: die Tafel führt „On Demand M Plus“, gelesen wurde aber
+    „On Demand M“. Die Linie läuft dann nicht weiter."""
+    messungen, letzte, heute = _linie()
+    _uebertrage(messungen, letzte, heute, {("m", "xs", 24, "1&1", "t-neu", "s")})
+    assert messungen[("m", "xs", 24)]["1&1"]["2026-11-08"]["wert"] == 1711.66
+
+
+def test_a5_der_tooltip_nennt_den_lesetag_des_uebertragenen_punkts():
+    messungen, letzte, heute = _linie()
+    _uebertrage(messungen, letzte, heute)
+    punkt = messungen[("m", "xs", 24)]["1&1"]["2026-11-08"]
+    tag = geraete_zeitreihe_uebertrag.messtag("2026-11-08", punkt)
+    assert tag == "2026-11-08" and tag.gelesen == "2026-11-07"
+    text = geraete_zeitreihe_uebertrag.gelesen_text(tag, lambda t: t[-2:])
+    assert text == " · gelesen am 07"
+    gelesen = geraete_zeitreihe_uebertrag.messtag("2026-11-07", punkt)
+    assert geraete_zeitreihe_uebertrag.gelesen_text(gelesen, str) == ""
+
+
+def test_a5_kein_uebertragener_punkt_ohne_zeile_in_der_tafel(zustand):
+    wurzel = lese_wurzel()
+    g = geraete_view.aufbereiten(
+        zustand, lade_quellen(wurzel), lade_katalog(wurzel), heute=HEUTE_BESTAND
+    )
+    modelle = {m["id"]: m for m in g["tco"]["modelle"]}
+    uebertragen = 0
+    for p in g["zeitreihe"]["paare"]:
+        zeilen = geraete_zeitreihe.band_zeilen(modelle[p["modell"]], p["laufzeit"])
+        hat = {z["anbieter"] for z in zeilen.get(p["band"], {}).get("zeilen", [])}
+        for roh in re.findall(r"<title>([^<]*?) · [^<]*gelesen am", p["svg_breit"]):
+            anbieter = html.unescape(roh)
+            uebertragen += 1
+            assert anbieter in hat, (p["modell"], p["band"], p["laufzeit"], anbieter)
+    assert uebertragen >= 0
+
+
+def test_a5_schaetzung_in_der_tafel_wird_neben_der_legende_erklaert():
+    satz = {
+        "zeilen": [],
+        "gesperrt": [{"anbieter": "o2", "gesamt": 1333.75}],
+    }
+    mess = {"o2": {"2026-11-05": {"zaehlt": True}}}
+    serien = {"o2": [("2026-11-05", 1374.0)]}
+    html = geraete_zeitreihe_legende.schaetzung_html(satz, mess, serien)
+    assert "nicht zählen" in html and "letzte zählende Messung (1.374 €)" in html
+    unzaehlend = {"o2": {"2026-11-05": {"zaehlt": False}}}
+    assert geraete_zeitreihe_legende.schaetzung_html(satz, unzaehlend, serien) == ""
+    mit_zeile = {**satz, "zeilen": [{"anbieter": "o2"}]}
+    assert geraete_zeitreihe_legende.schaetzung_html(mit_zeile, mess, serien) == ""
 
 
 GRUENDE = [

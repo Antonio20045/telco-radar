@@ -359,7 +359,7 @@ def _messungen(
             fremde_laufzeit,
             stand_ohne_id,
         )
-    uebertrag.gilt_weiter(messungen, letzte_je_buendel, heute)
+    uebertrag.gilt_weiter(messungen, letzte_je_buendel, heute, uebertrag.gefuehrt(tco))
     zeitreihe_auswahl.ohne_widersprochenen_juengsten(messungen, buendel, sku_modell)
     return messungen
 
@@ -383,7 +383,7 @@ def _serien_aus(messungen: dict, tarife: dict | None = None) -> dict:
                 if wert is None:
                     wert = _wert_aus_messung(m, tarife)
                 if wert is not None:
-                    reihe.append((d, wert))
+                    reihe.append((uebertrag.messtag(d, m), wert))
             punkte[an] = sorted(reihe)
         fertig[schluessel] = punkte
     return fertig
@@ -599,9 +599,9 @@ def _svg(
             teile.append(
                 f"<circle class='gr-zr-hit' cx='{x:.1f}' "
                 f"cy='{y:.1f}' r='{TREFFERFLAECHE_RADIUS}' fill='transparent'"
-                f"{daten}><title>{_esc(a)} · {_tag_monat(d)} · "
-                f"{_euro0(wert)}{einmal}</title>"
-                f"</circle>"
+                f"{daten}><title>{_esc(a)} · {_tag_monat(d)}"
+                f"{uebertrag.gelesen_text(d, _tag_monat)} · "
+                f"{_euro0(wert)}{einmal}</title></circle>"
             )
 
     abstand = 15 if not breit else 13
@@ -817,7 +817,7 @@ def _paar(
             "und wächst mit jedem Messtag. Der Stand heute steht in den Bündel-"
             "Zeilen darunter."
         )
-    ueberholt = ueberholt_html(modell, mess, serien)
+    ueberholt = ueberholt_html(modell, mess, serien, satz)
     standard_serien = fenster_serien(serien, ZEITFENSTER_STANDARD, heute)
     weitere: list[dict] = []
     schon: dict[tuple, str] = {}

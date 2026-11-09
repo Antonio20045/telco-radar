@@ -8,6 +8,7 @@ erscheint als eigener Eintrag „frühere Preise überholt“ statt einer Zahl.
 from __future__ import annotations
 
 from ..tco_kosten import ZEITRAUM_OHNE_BINDUNG
+from . import geraete_notbremse as notbremse
 from .geraete_rechenweg import ANBIETER_FOLGE, _esc, _zr_marker_farbe
 
 
@@ -45,7 +46,33 @@ def ohne_alte(modell: dict, mess: dict, serien: dict) -> dict:
     return {a: m for a, m in mess.items() if serien.get(a) or a not in luecken}
 
 
-def ueberholt_html(modell: dict, mess: dict, serien: dict) -> str:
+def schaetzung_html(satz: dict | None, mess: dict, serien: dict) -> str:
+    """Satz für jeden Anbieter ohne Zeile in der Tafel, dessen Tafelpreise alle nicht
+    zählen (Schätzung, nur mit Zweitprodukt), während die Legende die letzte zählende
+    Messung nennt: ohne ihn stünden zwei Aussagen ohne Erklärung nebeneinander."""
+    satz = satz or {}
+    mit_zeile = {z["anbieter"] for z in satz.get("zeilen") or []}
+    gesperrt = {k["anbieter"] for k in satz.get("gesperrt") or []}
+    saetze = []
+    for anbieter in ANBIETER_FOLGE:
+        serie, tage = serien.get(anbieter), mess.get(anbieter)
+        if not serie or not tage or anbieter in mit_zeile or anbieter not in gesperrt:
+            continue
+        if not notbremse.zaehlt(tage.get(serie[-1][0]) or {}):
+            continue
+        saetze.append(
+            f"<span class='gr-zr-leg-ueberholt'><i style='background:"
+            f"{_zr_marker_farbe(anbieter)}'></i>{_esc(anbieter)} · Die Tafel nennt "
+            f"hier nur Preise, die nicht zählen (Schätzung oder nur mit Zweitprodukt); "
+            f"die Legende zeigt die letzte zählende Messung "
+            f"({_euro0(serie[-1][1])}).</span>"
+        )
+    return "".join(saetze)
+
+
+def ueberholt_html(
+    modell: dict, mess: dict, serien: dict, satz: dict | None = None
+) -> str:
     """Legendeneintrag je Anbieter, dessen Preise eine belegte Lücke überholt hat
     (`geraete_sortiment`, Vermerk `veraltet 17`): gemessen wurde, die Reihe fehlt
     aber, weil der Preis nicht mehr zählt. Ohne den Eintrag fehlte der Anbieter
@@ -57,7 +84,7 @@ def ueberholt_html(modell: dict, mess: dict, serien: dict) -> str:
         f", frühere Preise überholt und nicht gezeigt</span>"
         for a in ANBIETER_FOLGE
         if a in luecken and mess.get(a) and not serien.get(a)
-    )
+    ) + schaetzung_html(satz, mess, serien)
 
 
 def legende_html(
