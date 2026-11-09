@@ -1,0 +1,12 @@
+# Tarife ohne Tarifstufe, weil ihr Preis am Original widersprüchlich ist.
+# Gelesen von `band_regel.preis_widerspruch()` (gilt für Sammeln und Bericht).
+# Ein Eintrag macht den Tarif und seine Plus-Fassung stufenlos ("Ohne Tarifband");
+# Preise und Zeilen bleiben, nur die Stufe fehlt. Entfernen: Eintrag löschen,
+# sobald der Preis am Original geklärt ist. Pflichtfelder je Eintrag:
+# tarif_id, name, grund, beleg (Pfad der Beleg-Datei).
+#
+# Stand 09.11.2026: leer. o2 Mobile Unlimited M (Tarifseite 29,99 EUR, Geräteweg
+# 24,99 EUR, Kleingedrucktes 34,99 EUR) bleibt in XL: der Geräteweg belegt
+# 24,99 EUR über 24 Monate, der Rechtstext gilt wohl nach Monat 24 und ist
+# vermutlich veraltet (Entscheidung 09.11. 06:05).
+tarife: []

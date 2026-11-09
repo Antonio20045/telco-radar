@@ -20,8 +20,20 @@ from decimal import Decimal as _gw_Dez
 from pathlib import Path
 
 import pytest
+import yaml as _gw_yaml
 
 _GW_HORIZONT = 24
+_GW_OHNE_STUFE = {
+    str(e["tarif_id"])
+    for e in _gw_yaml.safe_load(
+        (
+            Path(__file__).resolve().parents[2]
+            / "config"
+            / "tarif_preis_widerspruch.yaml"
+        ).read_text(encoding="utf-8")
+    )["tarife"]
+}
+"""Tarife mit "Preis am Original widersprüchlich": ohne Stufe, samt Plus-Fassung."""
 _GW_SPALTE_24 = "Kosten über 24 Monate EUR"
 _GW_SPALTE_LAUFZEIT = "Kosten über Tarifmonate und Geräteraten EUR"
 
@@ -289,6 +301,9 @@ def _gw_band_satz(satz: dict | None, leiter: list) -> str | None:
     """Die Stufe eines Tarifsatzes nach den Regeln im Kopf - oder None."""
     if not satz:
         return None
+    stamm = (satz.get("tarif_id") or "").split("#")[0].removesuffix("-plus")
+    if stamm in _GW_OHNE_STUFE:
+        return None
     if (satz.get("anbieter") or "").strip().lower() == "vodafone":
         m = _GW_VF_STUFE.match((satz.get("name") or "").strip())
         if m and m.group(1).lower() in {k for k, _gb in leiter}:
@@ -297,7 +312,7 @@ def _gw_band_satz(satz: dict | None, leiter: list) -> str | None:
     if gb is None:
         return None
     if _gw_math.isinf(gb):
-        return next((k for k, v in leiter if v is not None and _gw_math.isinf(v)), None)
+        return "xl" if any(k == "xl" for k, _v in leiter) else None
     beste = None
     for key, v in leiter:
         if v is None or _gw_math.isinf(v):

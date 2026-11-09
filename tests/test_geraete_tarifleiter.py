@@ -117,13 +117,15 @@ def test_fehlendes_volumen_hat_keine_stufe():
     assert band.band_von_gb("kaputt", leiter) is None
 
 
-def test_unbegrenzt_nur_bei_einer_unbegrenzten_vodafone_stufe():
-    """Heute traegt Vodafone XL kein erhobenes Volumen - ein unbegrenzter
-    Wettbewerber wird dann nicht geraten, sondern bleibt ohne Stufe. Ist XL
-    als unbegrenzt erhoben, faellt er genau dorthin."""
-    assert band.band_von_gb(INF, band.tarifleiter(_bestand())) is None
+def test_unbegrenzt_steht_in_xl_auch_wenn_vodafone_xl_kein_volumen_traegt():
+    """Eine Regel (`band_regel`): unbegrenzt gehoert in die oberste Stufe XL,
+    gleich was die Vodafone-Stufe selbst als Volumen traegt. Ein endliches
+    Volumen rutscht nie dorthin."""
+    leiter_offen = band.tarifleiter(_bestand())
     leiter_inf = band.tarifleiter(_bestand(xl_gb=INF))
+    assert band.band_von_gb(INF, leiter_offen) == "xl"
     assert band.band_von_gb(INF, leiter_inf) == "xl"
+    assert band.band_von_gb(10_000, leiter_offen) == "l"
     assert band.band_von_gb(10_000, leiter_inf) == "l"
 
 
@@ -142,7 +144,7 @@ def test_tarif_baender_ordnet_wettbewerber_nach_volumen():
     assert index["congstar:m"] == "l"
     assert index["11:s"] == "xs"
     assert index["o2:m45"] == "m"
-    assert "telekom:xl" not in index
+    assert index["telekom:xl"] == "xl"
     assert "o2:um" not in index
 
 
