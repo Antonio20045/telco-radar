@@ -37,7 +37,7 @@ from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
-from typing import Protocol
+from typing import Any, Protocol
 
 from .beleg_bilanz import Bilanz
 from .beleg_regeln import (
@@ -75,6 +75,10 @@ class Releases(Protocol):
 
     def anhaenge(self) -> dict[str, list[str]]:
         """Release-Tag -> Dateinamen."""
+        ...
+
+    def hochgeladen_am(self) -> dict[str, dict[str, str]]:
+        """Release-Tag -> Dateiname -> Uploadzeit (ISO 8601)."""
         ...
 
     def release_anlegen(self, tag: str, titel: str) -> None:
@@ -145,32 +149,46 @@ class Gh:
             )
         return fertig.stdout or ""
 
-    def anhaenge(self) -> dict[str, list[str]]:
-        """Alle Releases im Schema mit ihren Anhängen; wirft ``GhFehler`` bei
-        Lesefehlern.
+    def _releases(self, feld: str, jq: str) -> dict[str, Any]:
+        """Je Belege-Release das ``feld``, das ``jq`` aus dem Release bildet.
 
         Eine Zeile JSON je Release (``--paginate`` mit ``--jq``), damit seitenweises
-        Lesen kein Listenende zerreißt.
-        """
-        ausgabe = self._gh(
-            "api",
-            "--paginate",
-            f"repos/{self._repo}/releases?per_page=100",
-            "--jq",
-            ".[] | {tag: .tag_name, dateien: [.assets[].name]}",
-        )
-        ergebnis: dict[str, list[str]] = {}
+        Lesen kein Listenende zerreißt; ``GhFehler`` bei Lese- und Formatfehlern."""
+        argv = ["api", "--paginate", f"repos/{self._repo}/releases?per_page=100"]
+        ausgabe = self._gh(*argv, "--jq", f".[] | {{tag: .tag_name, {feld}: {jq}}}")
+        ergebnis: dict[str, Any] = {}
         for zeile in ausgabe.splitlines():
             if not zeile.strip():
                 continue
             try:
                 eintrag = json.loads(zeile)
-                tag, dateien = str(eintrag["tag"]), list(eintrag["dateien"])
+                tag, wert = str(eintrag["tag"]), eintrag[feld]
             except (ValueError, KeyError, TypeError) as fehler:
                 raise GhFehler(f"gh api: Antwort unlesbar: {fehler}") from fehler
             if ist_beleg_tag(tag):
-                ergebnis[tag] = sorted(str(d) for d in dateien)
+                ergebnis[tag] = wert
         return ergebnis
+
+    def anhaenge(self) -> dict[str, list[str]]:
+        """Alle Releases im Schema mit ihren Anhängen; wirft ``GhFehler`` bei
+        Lesefehlern."""
+        roh = self._releases("dateien", "[.assets[].name]")
+        try:
+            return {
+                tag: sorted(str(d) for d in dateien) for tag, dateien in roh.items()
+            }
+        except TypeError as fehler:
+            raise GhFehler(f"gh api: Antwort unlesbar: {fehler}") from fehler
+
+    def hochgeladen_am(self) -> dict[str, dict[str, str]]:
+        """Uploadzeit jedes Anhangs der Belege-Releases (für ``beleg_veraltet``);
+        wirft ``GhFehler`` bei Lesefehlern."""
+        jq = "([.assets[] | {key: .name, value: .created_at}] | from_entries)"
+        roh = self._releases("zeiten", jq)
+        try:
+            return {t: {str(k): str(v) for k, v in z.items()} for t, z in roh.items()}
+        except (AttributeError, TypeError) as fehler:
+            raise GhFehler(f"gh api: Antwort unlesbar: {fehler}") from fehler
 
     def release_anlegen(self, tag: str, titel: str) -> None:
         """Legt ein Pre-Release ohne „latest“ an."""

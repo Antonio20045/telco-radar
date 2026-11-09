@@ -255,6 +255,27 @@ def test_gh_liest_nur_belege_releases_aus_jsonzeilen():
     }
 
 
+def test_gh_liest_die_uploadzeit_jedes_anhangs():
+    zeilen = "\n".join(
+        [
+            '{"tag":"belege-2026-11-10","zeiten":{"a.webp":"2026-11-10T02:33:00Z"}}',
+            '{"tag":"v1.0","zeiten":{"programm.zip":"2026-01-01T00:00:00Z"}}',
+            '{"tag":"belege-gross-2026-11","zeiten":{}}',
+        ]
+    )
+    lauf = Lauf(zeilen)
+    assert Gh(runner=lauf).hochgeladen_am() == {
+        "belege-2026-11-10": {"a.webp": "2026-11-10T02:33:00Z"},
+        "belege-gross-2026-11": {},
+    }
+    assert "created_at" in lauf.aufrufe[0][-1]
+
+
+def test_gh_unlesbare_uploadzeiten_sind_kein_leeres_ergebnis():
+    with pytest.raises(GhFehler):
+        Gh(runner=Lauf("kein json")).hochgeladen_am()
+
+
 def test_gh_fehler_wird_zur_benannten_ausnahme_ohne_token():
     gh = Gh(runner=Lauf(code=1, stderr="x\nHTTP 403: Resource not accessible"))
     with pytest.raises(GhFehler) as fehler:

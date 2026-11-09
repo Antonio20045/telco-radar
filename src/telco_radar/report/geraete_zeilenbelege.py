@@ -18,6 +18,7 @@ je Anbieter, nie Paare.
 
 from __future__ import annotations
 
+import logging
 from collections import defaultdict
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass
@@ -31,6 +32,13 @@ from ..tarif_model import QUELLE_KLICK
 from .geraete_laufzeit import raten_laufzeit
 from .geraete_preisstand import anzeige as preis_anzeige
 from .geraete_tco_karten import geraet_aus_sku, modell_schluessel
+
+log = logging.getLogger(__name__)
+
+GRUND_FREMD = "Bild gehört zu einer anderen Messung"
+GRUND_UNLESBAR = "Bildsatz unlesbar"
+"""Der Vermerk auf der Seite nennt keine Kennungen und keine Fehlertexte: die stehen im
+Log (``log.warning``), die Leser brauchen den Grund, nicht den Schlüssel."""
 
 ZeilenbelegFuer = Callable[[dict], "dict | None"]
 
@@ -103,12 +111,14 @@ def baue_index(
         try:
             buendel = buendel_aus_satz(wahl.satz)
         except (TypeError, ValueError, KeyError) as fehler:
-            gruende[schluessel] = f"Bildsatz unlesbar: {fehler}"
+            log.warning("Zeilenbeleg %s: Bildsatz unlesbar: %s", schluessel, fehler)
+            gruende[schluessel] = GRUND_UNLESBAR
             continue
         folge = bild.get("bildfolge") or ()
         fremd = fremd_zur_kennung(bild["url"], folge, buendel.beleg_id[:KENNUNG_LAENGE])
         if fremd:
-            gruende[schluessel] = f"Bild gehört zu einer anderen Messung: {fremd}"
+            log.warning("Zeilenbeleg %s: %s: %s", schluessel, GRUND_FREMD, fremd)
+            gruende[schluessel] = GRUND_FREMD
             continue
         index[buendel.beleg_id] = Zeilenbeleg(
             geraet_id=schluessel[0],

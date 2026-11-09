@@ -18,12 +18,30 @@ class AttrappeReleases:
         scheitern_bei: tuple[str, ...] = (),
     ) -> None:
         self.stand = {tag: list(d) for tag, d in (anhaenge or {}).items()}
+        self.zaehler = 0
+        self.zeiten: dict[tuple[str, str], str] = {}
+        for tag, dateien in self.stand.items():
+            for datei in dateien:
+                self._stempel(tag, datei)
         self.lesefehler = lesefehler
         self.scheitern_bei = scheitern_bei
         self.angelegt: list[str] = []
         self.hochgeladen: list[tuple[str, list[str]]] = []
         self.releases_geloescht: list[str] = []
         self.assets_geloescht: list[tuple[str, str]] = []
+
+    def _stempel(self, tag: str, datei: str) -> None:
+        """Uploadzeit: eine aufsteigende Zahl als Text, später ist größer."""
+        self.zaehler += 1
+        self.zeiten[(tag, datei)] = f"2026-11-09T{self.zaehler:08d}Z"
+
+    def hochgeladen_am(self) -> dict[str, dict[str, str]]:
+        if self.lesefehler or "zeiten" in self.scheitern_bei:
+            raise GhFehler("gh api: Exit 1: kein Zugriff")
+        return {
+            tag: {d: self.zeiten[(tag, d)] for d in dateien if (tag, d) in self.zeiten}
+            for tag, dateien in self.stand.items()
+        }
 
     def _pruefe(self, aufruf: str, tag: str) -> None:
         if aufruf in self.scheitern_bei or tag in self.scheitern_bei:
@@ -50,7 +68,10 @@ class AttrappeReleases:
             )
         self.hochgeladen.append((tag, namen))
         liste = self.stand.setdefault(tag, [])
-        liste.extend(n for n in namen if n not in liste)
+        for name in namen:
+            if name not in liste:
+                liste.append(name)
+                self._stempel(tag, name)
 
     def release_loeschen(self, tag: str) -> None:
         self._pruefe("loeschen", tag)

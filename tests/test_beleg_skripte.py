@@ -460,3 +460,17 @@ def test_jobstart_in_der_zukunft_verlaengert_die_frist_nicht(aufbau, monkeypatch
     argv += ["--job-frist-sekunden", "2100", "--job-start", "10100"]
     assert modul.main(argv, gh=AttrappeReleases()) == 0
     assert gesehen == [50.0 + modul.JOB_FRIST_S]
+
+
+def test_klick_job_loescht_keine_bilder_einer_frueheren_position(aufbau):
+    """Zweiter Klick-Lauf am selben Tag mit neuer Position (Befund N1): der Job lädt das
+    neue Einzelbild hoch und lässt die früheren Bilder liegen. Gelöscht wird erst im
+    Gerätelauf, nachdem das Manifest auf die neuen zeigt (``test_beleg_veraltet``)."""
+    alt = "apple-iphone-17-256__telekom__2026-11-10__{}__" + "1" * 16 + ".webp"
+    liegt = [alt.format(s) for s in ("preis", "tarif")]
+    gh = AttrappeReleases({"belege-2026-11-10": list(liegt)})
+    wurzel = aufbau.lege([], [satz(29.0, "2" * 64)])
+    assert veroeffentliche(aufbau, wurzel, gh) == 0
+    neu = "apple-iphone-17-256__telekom__2026-11-10__preis__" + "2" * 16 + ".webp"
+    assert gh.assets_geloescht == []
+    assert sorted(gh.stand["belege-2026-11-10"]) == sorted([*liegt, neu])

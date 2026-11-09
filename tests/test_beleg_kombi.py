@@ -107,7 +107,7 @@ def test_bildfolge_mit_drei_eintraegen_steht_in_reihenfolge(seite):
         )
         assert li.select_one(".gr-bildfolge-text").get_text(strip=True) == text
         assert li.select_one("img")["data-src"].endswith(f"/{_datei(schritt)}")
-    assert "Screenshot-Folge (3 Bilder)" in zeile.summary.get_text(" ", strip=True)
+    assert "Screenshot-Folge (3 Bilder)" in " ".join(zeile.summary.get_text().split())
 
 
 def test_ohne_bildfolge_bleibt_es_ein_bild(tmp_path):
