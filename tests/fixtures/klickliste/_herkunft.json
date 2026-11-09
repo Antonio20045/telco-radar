@@ -1,0 +1,12 @@
+{
+ "zweck": "Echter Auszug aus data/state/geraete_tco.json (Telekom, iPhone Duo, 36 Monate) fuer tests/test_klickliste_auto_tarif.py",
+ "eintraege": [
+  {
+   "datei": "telekom_duo_bestand_0911.json",
+   "quelle": "data/state/geraete_tco.json @ origin/main 8cdd36df (Stand 2026-11-09, Felder anbieter, sku_id, tarif_name, pruefung, quelle_url der acht Duo-Buendel mit 36 Monaten)",
+   "commit": "8cdd36df",
+   "filter": "nur Telekom, sku_id beginnt mit apple-iphone-duo, laufzeit_monate 36, fuenf Felder",
+   "sha256_roh": "7fed08bd8805092def061ee7be495499f45b675c1f5d81d1a10ca67eff062d8d"
+  }
+ ]
+}
