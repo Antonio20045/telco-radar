@@ -1,7 +1,7 @@
 {
  "anbieter": "telekom-9",
- "datum": "2026-11-08",
- "dauer_sekunden": 6298.2,
+ "datum": "2026-11-09",
+ "dauer_sekunden": 6412.9,
  "format": 1,
  "frischegrenze_tage": 3,
  "grund": null,
@@ -26,9 +26,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "ad189c7748a4ca6375fbe71ba317f5d018dc1df295b10cd9f5440bab0db5e34a",
+      "beleg_id": "aa6e34a3b7d08c184ae48a816e88e6324a244ad96e0ed246d72a0364e7c702cf",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 18 Pro Max · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil M"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 36 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 338,95 € · monatlich 82,45 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=32.5&instalmentId=36",
-      "zeitpunkt": "2026-11-08T05:53:55Z"
+      "zeitpunkt": "2026-11-09T06:18:51Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -67,9 +86,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "0c1575d171686f3c7f58118f3e9450e8b0c17f110ea76a678e077e9b9007e31b",
+      "beleg_id": "4e72e4ad8781375ab9754600b4a69c9f53d3b540b222dc9e56c7c2061fa063a2",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 18 Pro Max · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil M"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 24 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 338,95 € · monatlich 98,65 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=48.7&instalmentId=24",
-      "zeitpunkt": "2026-11-08T05:53:56Z"
+      "zeitpunkt": "2026-11-09T06:18:53Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -108,9 +146,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "e82962406bdfc8c18c88b7e5d4e5f61d2eb8927dd46df4d365e240b197c38bd9",
+      "beleg_id": "c470ba0603c1916429095fcdee401d0beb50ce08e44d30b4bd3e9b203839dde9",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 18 Pro Max · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil M"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 12 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 338,95 € · monatlich 147,45 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=97.5&instalmentId=12",
-      "zeitpunkt": "2026-11-08T05:53:57Z"
+      "zeitpunkt": "2026-11-09T06:18:55Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -149,9 +206,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "88c0036c40d68a8c062128ab8b12dae902dd2ca812c73d61a793e86438dbdddb",
+      "beleg_id": "4c05b934de8f5c40fff721d33dbcb62208602d684a345a4be8fe973839114367",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 18 Pro Max · 512 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil M"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 36 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 338,95 € · monatlich 89,65 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-512-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=97.5&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D512_GB",
-      "zeitpunkt": "2026-11-08T05:54:00Z"
+      "zeitpunkt": "2026-11-09T06:18:58Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -190,9 +266,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "39f29be324e6c43bd2be13f9d90877adc50b5143c27c74e4e7d11055f99737e1",
+      "beleg_id": "8f03499594f9b1f3f06ab48af4c76bf09fc2328ef724e2adf4ba11806d3db2e3",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 18 Pro Max · 512 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil M"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 24 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 338,95 € · monatlich 109,45 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-512-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=59.5&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-08T05:54:01Z"
+      "zeitpunkt": "2026-11-09T06:19:00Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -231,9 +326,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "934e93dd52b31d5d1daa170d581eda00ceb12b49eb3bc3a178197534434341ff",
+      "beleg_id": "7d42a68ef54be03058eedaf740a7b0aa68350033ab7534ba2e041014598ab921",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 18 Pro Max · 512 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil M"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 12 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 338,95 € · monatlich 169,05 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-512-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=119.1&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-08T05:54:02Z"
+      "zeitpunkt": "2026-11-09T06:19:01Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -272,9 +386,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "cf0b728fcbdd3c92525147bfe2ac81f7408a10b27b22d6f7d3c4ac99509985ed",
+      "beleg_id": "0c49589e8ec9603f688bb96e31abfefca5e7206d09c219ea60062fd6cba86b64",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 18 Pro Max · 1 TB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil M"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 36 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 438,95 € · monatlich 99,35 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-1-tb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=119.1&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D1_TB",
-      "zeitpunkt": "2026-11-08T05:54:04Z"
+      "zeitpunkt": "2026-11-09T06:19:05Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -313,9 +446,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "b9cb557f3144427c930e66caaf8e4d801513a1453804be87cce2537c1ea1a6f7",
+      "beleg_id": "73186cf1e627c3033930f057954c96864bed992e6e433ae87779f72594cf3287",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 18 Pro Max · 1 TB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil M"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 24 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 438,95 € · monatlich 124,05 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-1-tb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=74.1&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
-      "zeitpunkt": "2026-11-08T05:54:05Z"
+      "zeitpunkt": "2026-11-09T06:19:06Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -354,9 +506,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "8d136dbb1a0e5676a9edb59a33cfb8876b952f21bc0aaab279fafc795a684ee0",
+      "beleg_id": "8ef3c7c0f4d5f38e275e885316a925537dbb70059e73134a848aefe88b5de521",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 18 Pro Max · 1 TB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil M"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 12 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 438,95 € · monatlich 198,25 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-1-tb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=148.3&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
-      "zeitpunkt": "2026-11-08T05:54:07Z"
+      "zeitpunkt": "2026-11-09T06:19:08Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -395,9 +566,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "e033e5f4b47d96d21e783902f468e5a6df3b57a0b818a55bb3662324c491bae7",
+      "beleg_id": "4ae0c317a83b1abae01e8c687b9fdaebee62316e67b3815b4b46a631ed82b676",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 18 Pro Max · 2 TB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil M"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 36 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 438,95 € · monatlich 118,75 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-2-tb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=148.3&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D2_TB",
-      "zeitpunkt": "2026-11-08T05:54:10Z"
+      "zeitpunkt": "2026-11-09T06:19:11Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -436,9 +626,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "1618b19c3cdcf5c73a4e59d42cb3135353d5fee807e7b26305425fc8ed6af7d3",
+      "beleg_id": "45a22adb9f95545a19695c572db5356621ab790046537c1b21965967baf80406",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 18 Pro Max · 2 TB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil M"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 24 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 438,95 € · monatlich 153,25 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-2-tb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=103.3&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D2_TB",
-      "zeitpunkt": "2026-11-08T05:54:11Z"
+      "zeitpunkt": "2026-11-09T06:19:13Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -477,9 +686,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "d0789722de6492e193ce5cc7318950b17d28b982b1be63c1a8002846f1ffb942",
+      "beleg_id": "4e6b970acc443b1c552fb46abbcf5d337c134960b24e4a2e1609f0b62ac74aaf",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 18 Pro Max · 2 TB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil M"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 12 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 438,95 € · monatlich 256,55 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-2-tb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false&tariffCategoryId=smartphone-tarife&installmentValue=206.6&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D2_TB",
-      "zeitpunkt": "2026-11-08T05:54:12Z"
+      "zeitpunkt": "2026-11-09T06:19:15Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -513,17 +741,17 @@
    "ladung": {
     "abstand_s": 10.0,
     "anfragen": 104,
-    "beendet": 102,
+    "beendet": 99,
     "dokument": "complete",
     "geladen": true,
     "offen": {
+     "binkiesproductionweu.servicebus.windows.net": 1,
      "onebot-webfrontend.oneai.yo-digital.com": 1,
-     "render.binkies3d.com": 5,
      "www.telekom.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 138.3,
-    "takte_ms": 900,
+    "sekunden": 138.5,
+    "takte_ms": 950,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -538,7 +766,7 @@
     "knoepfe_gefunden": 72,
     "knoepfe_gesucht": 72
    },
-   "verworfen": 64
+   "verworfen": 67
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/google/google-pixel-10-pro-fold/moonstone-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false",
@@ -549,18 +777,18 @@
    "kombinationen": [],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 102,
+    "anfragen": 104,
     "beendet": 101,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "pix.telekom.de": 2,
      "tags-eu.tiqcdn.com": 1,
+     "www.telekom.de": 1,
      "www2.telekom.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 153.0,
-    "takte_ms": 1600,
+    "sekunden": 153.2,
+    "takte_ms": 1300,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -575,7 +803,7 @@
     "knoepfe_gefunden": 0,
     "knoepfe_gesucht": 0
    },
-   "verworfen": 9
+   "verworfen": 27
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s25-ultra/titanium-black-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
@@ -586,18 +814,18 @@
    "kombinationen": [],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 94,
-    "beendet": 91,
+    "anfragen": 103,
+    "beendet": 100,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "pix.telekom.de": 2,
-     "www.telekom.de": 2,
+     "tags-eu.tiqcdn.com": 1,
+     "www.telekom.de": 1,
      "www2.telekom.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 155.0,
-    "takte_ms": 2600,
+    "sekunden": 154.4,
+    "takte_ms": 2750,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -612,7 +840,7 @@
     "knoepfe_gefunden": 0,
     "knoepfe_gesucht": 0
    },
-   "verworfen": 10
+   "verworfen": 28
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/motorola/motorola-edge-60-neo/pantone-grisaille-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
@@ -623,18 +851,18 @@
    "kombinationen": [],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 93,
-    "beendet": 90,
+    "anfragen": 101,
+    "beendet": 96,
     "dokument": "complete",
     "geladen": true,
     "offen": {
      "tags-eu.tiqcdn.com": 1,
-     "www.telekom.de": 2,
+     "www.telekom.de": 3,
      "www2.telekom.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 163.5,
-    "takte_ms": 1450,
+    "sekunden": 153.3,
+    "takte_ms": 1650,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -649,7 +877,7 @@
     "knoepfe_gefunden": 0,
     "knoepfe_gesucht": 0
    },
-   "verworfen": 9
+   "verworfen": 30
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/motorola/motorola-edge-60-neo/pantone-grisaille-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
@@ -661,17 +889,17 @@
    "ladung": {
     "abstand_s": 10.0,
     "anfragen": 93,
-    "beendet": 91,
+    "beendet": 87,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "tags-eu.tiqcdn.com": 1,
-     "www.telekom.de": 1,
+     "pix.telekom.de": 2,
+     "www.telekom.de": 4,
      "www2.telekom.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 152.9,
-    "takte_ms": 1500,
+    "sekunden": 152.4,
+    "takte_ms": 1000,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -686,7 +914,7 @@
     "knoepfe_gefunden": 0,
     "knoepfe_gesucht": 0
    },
-   "verworfen": 9
+   "verworfen": 29
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-15t/black-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
@@ -697,18 +925,18 @@
    "kombinationen": [],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 88,
-    "beendet": 83,
+    "anfragen": 105,
+    "beendet": 102,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "pix.telekom.de": 2,
-     "www.telekom.de": 4,
+     "tags-eu.tiqcdn.com": 1,
+     "www.telekom.de": 1,
      "www2.telekom.de": 1
     },
-    "ohne_antwort_ms": 50,
-    "sekunden": 152.6,
-    "takte_ms": 1200,
+    "ohne_antwort_ms": 0,
+    "sekunden": 153.3,
+    "takte_ms": 1700,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -723,7 +951,7 @@
     "knoepfe_gefunden": 0,
     "knoepfe_gesucht": 0
    },
-   "verworfen": 9
+   "verworfen": 30
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/motorola/motorola-edge-60-neo/pantone-grisaille-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
@@ -734,8 +962,8 @@
    "kombinationen": [],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 85,
-    "beendet": 80,
+    "anfragen": 94,
+    "beendet": 87,
     "dokument": "complete",
     "geladen": true,
     "offen": {
@@ -744,7 +972,7 @@
      "www2.telekom.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 152.1,
+    "sekunden": 152.5,
     "takte_ms": 1050,
     "wartet_auf": "load"
    },
@@ -760,7 +988,7 @@
     "knoepfe_gefunden": 0,
     "knoepfe_gesucht": 0
    },
-   "verworfen": 9
+   "verworfen": 30
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/motorola/motorola-moto-g77/pantone-black-olive-256-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false",
@@ -771,8 +999,8 @@
    "kombinationen": [],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 94,
-    "beendet": 92,
+    "anfragen": 102,
+    "beendet": 99,
     "dokument": "complete",
     "geladen": true,
     "offen": {
@@ -781,8 +1009,8 @@
      "www2.telekom.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 163.4,
-    "takte_ms": 1600,
+    "sekunden": 153.3,
+    "takte_ms": 1650,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -797,7 +1025,7 @@
     "knoepfe_gefunden": 0,
     "knoepfe_gesucht": 0
    },
-   "verworfen": 9
+   "verworfen": 30
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/motorola/motorola-moto-g77/pantone-black-olive-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
@@ -808,18 +1036,18 @@
    "kombinationen": [],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 84,
-    "beendet": 78,
+    "anfragen": 101,
+    "beendet": 99,
     "dokument": "complete",
     "geladen": true,
     "offen": {
+     "pix.telekom.de": 2,
      "tags-eu.tiqcdn.com": 1,
-     "www.telekom.de": 5,
      "www2.telekom.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 152.1,
-    "takte_ms": 1050,
+    "sekunden": 153.6,
+    "takte_ms": 1950,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -834,7 +1062,7 @@
     "knoepfe_gefunden": 0,
     "knoepfe_gesucht": 0
    },
-   "verworfen": 9
+   "verworfen": 29
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/google/google-pixel-10-pro/obsidian-128-gb?tariffId=MF_17791&categoryId=smartphones&forwardTradeInApplied=false",
@@ -845,18 +1073,18 @@
    "kombinationen": [],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 102,
-    "beendet": 100,
+    "anfragen": 112,
+    "beendet": 110,
     "dokument": "complete",
     "geladen": true,
     "offen": {
+     "bf72977jfz.bf.dynatrace.com": 1,
      "tags-eu.tiqcdn.com": 1,
-     "www.telekom.de": 1,
      "www2.telekom.de": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 153.9,
-    "takte_ms": 2000,
+    "sekunden": 153.2,
+    "takte_ms": 1750,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -871,7 +1099,7 @@
     "knoepfe_gefunden": 0,
     "knoepfe_gesucht": 0
    },
-   "verworfen": 9
+   "verworfen": 28
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-xcover7-enterprise-edition/black-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
@@ -889,9 +1117,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "0a3ecd03821cddbf25d87ddde4a08e9c16f4eb78595d7470c6264237966b97cc",
+      "beleg_id": "f1b05415e9e5c8e24b0a66a6409fb9dd668991ca138afa6c192941298269991b",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Samsung Galaxy XCover7 Enterprise Edition · 128 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil M"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 36 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 40,95 € · monatlich 55,95 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-xcover7-enterprise-edition/black-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=6&instalmentId=36",
-      "zeitpunkt": "2026-11-08T06:33:09Z"
+      "zeitpunkt": "2026-11-09T06:57:54Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -930,9 +1177,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "ecf8a503bc3923e6ccf22f0383cbf65c4b83d3b496843517af5a38ec597c5ccb",
+      "beleg_id": "50ee90b33817ac330c830d58e57a32e54f172b6133a08eab4e762a8da3d10213",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Samsung Galaxy XCover7 Enterprise Edition · 128 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil M"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 24 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 40,95 € · monatlich 58,95 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-xcover7-enterprise-edition/black-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=9&instalmentId=24",
-      "zeitpunkt": "2026-11-08T06:33:26Z"
+      "zeitpunkt": "2026-11-09T06:58:12Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -971,9 +1237,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a978baf924ed981bd4e0b580d45445fd75dc07eca2bbb631eb14f5a2d63b4718",
+      "beleg_id": "5134410ea95cf0da6034f8bd5649ee0f9dafaf70b49c787e7b586fbe87d34ffd",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Samsung Galaxy XCover7 Enterprise Edition · 128 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil M"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 12 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 40,95 € · monatlich 68,05 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-xcover7-enterprise-edition/black-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=18.1&instalmentId=12",
-      "zeitpunkt": "2026-11-08T06:33:43Z"
+      "zeitpunkt": "2026-11-09T06:58:30Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1006,16 +1291,18 @@
    ],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 89,
-    "beendet": 87,
+    "anfragen": 164,
+    "beendet": 142,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "onebot-webfrontend.oneai.yo-digital.com": 1
+     "bf72977jfz.bf.dynatrace.com": 2,
+     "engage-content2.binkies3d.com": 17,
+     "www.telekom.de": 2
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 134.0,
-    "takte_ms": 1550,
+    "sekunden": 134.1,
+    "takte_ms": 1150,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -1030,7 +1317,7 @@
     "knoepfe_gefunden": 18,
     "knoepfe_gesucht": 18
    },
-   "verworfen": 15
+   "verworfen": 63
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/fairphone/fairphone-gen-6plus/forest-gruen-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
@@ -1048,9 +1335,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "f3a2ea6e5f7e8370a61edb32d456a56c8d87a22f7dd03af098da32ddb0c6c43a",
+      "beleg_id": "a75a3c88549341d954e767f5c576119d70c5cf603f8e8c1ab0e3a29d7e9ce602",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Fairphone (Gen. 6+) · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil M"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 36 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 40,95 € · monatlich 65,15 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/fairphone/fairphone-gen-6plus/forest-gruen-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=15.2&instalmentId=36",
-      "zeitpunkt": "2026-11-08T06:37:00Z"
+      "zeitpunkt": "2026-11-09T07:01:50Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1089,9 +1395,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "7b215766b087dd4ce8a16e919a8e353627593b0efe2e739874736af922ecfae9",
+      "beleg_id": "d62aa9330d208251abf5910e2f3900de5e34fc0ff6aa940e5a4aabf3fa77d65b",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Fairphone (Gen. 6+) · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil M"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 24 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 40,95 € · monatlich 72,75 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/fairphone/fairphone-gen-6plus/forest-gruen-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=22.8&instalmentId=24",
-      "zeitpunkt": "2026-11-08T06:37:01Z"
+      "zeitpunkt": "2026-11-09T07:01:53Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1130,9 +1455,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "89a49eb0f5658579612fcf867fa7c9a237532a50007aaa87b9816853b613f93a",
+      "beleg_id": "fb6394c5c28cf6ab8494fa0b513ee89320e48d2270d178c515c542c07ea55826",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Fairphone (Gen. 6+) · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil M"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 12 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 40,95 € · monatlich 95,55 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/fairphone/fairphone-gen-6plus/forest-gruen-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17791&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=45.6&instalmentId=12",
-      "zeitpunkt": "2026-11-08T06:37:02Z"
+      "zeitpunkt": "2026-11-09T07:01:55Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1165,17 +1509,18 @@
    ],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 93,
-    "beendet": 92,
+    "anfragen": 154,
+    "beendet": 145,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "binkiesproductionweu.servicebus.windows.net": 1,
+     "bf72977jfz.bf.dynatrace.com": 1,
+     "engage-content2.binkies3d.com": 8,
      "onebot-webfrontend.oneai.yo-digital.com": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 133.6,
-    "takte_ms": 1400,
+    "sekunden": 134.7,
+    "takte_ms": 1300,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -1190,7 +1535,7 @@
     "knoepfe_gefunden": 18,
     "knoepfe_gesucht": 18
    },
-   "verworfen": 16
+   "verworfen": 41
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-15/blau-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
@@ -1208,9 +1553,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "daa30696b9b69f92a92fa6a48e8dc8bf5b5d0e1760bf63070ace1eaf5d4bbc43",
+      "beleg_id": "62e1fb7bcddafdbcdaead698f2a2de57d8a6f1302a4e513615f8ae23a699dc78",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 15 · 128 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil XS"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 36 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 40,95 € · monatlich 48,75 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-15/blau-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=18.8&instalmentId=36",
-      "zeitpunkt": "2026-11-08T06:40:53Z"
+      "zeitpunkt": "2026-11-09T07:05:48Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1249,9 +1613,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "ad218654095a36e97de4858bfa293de11777a2b6bfe638a4ec021226ee270a32",
+      "beleg_id": "c768caebab86b91b09b36aceb168b4f32c400c206219c0bb76459baf8d40271c",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 15 · 128 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil XS"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 24 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 40,95 € · monatlich 58,15 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-15/blau-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=28.2&instalmentId=24",
-      "zeitpunkt": "2026-11-08T06:41:10Z"
+      "zeitpunkt": "2026-11-09T07:06:06Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1290,9 +1673,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "3953b2d0dbc7eedf73b09ea2900546728d97dd98359e541daa5e013d237e7fc4",
+      "beleg_id": "ce3af02ddb67dabbafb9361213e97975a6aefb2e19759a73197204e872f15ec7",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 15 · 128 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil XS"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 12 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 40,95 € · monatlich 86,45 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-15/blau-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=56.5&instalmentId=12",
-      "zeitpunkt": "2026-11-08T06:41:28Z"
+      "zeitpunkt": "2026-11-09T07:06:25Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1412,16 +1814,17 @@
    ],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 193,
-    "beendet": 192,
+    "anfragen": 201,
+    "beendet": 198,
     "dokument": "complete",
     "geladen": true,
     "offen": {
+     "bf72977jfz.bf.dynatrace.com": 2,
      "onebot-webfrontend.oneai.yo-digital.com": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 134.4,
-    "takte_ms": 1250,
+    "sekunden": 134.9,
+    "takte_ms": 1400,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -1436,7 +1839,7 @@
     "knoepfe_gefunden": 21,
     "knoepfe_gesucht": 21
    },
-   "verworfen": 16
+   "verworfen": 69
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-17t-pro/black-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
@@ -1454,9 +1857,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "102a2b26b9fc7b9a45f9d1e8dfcf85244a0ee59810dd1eb76121ff8f664127cd",
+      "beleg_id": "71846ec63b287ffcafd29acede48c020d057ed2fb82414b85bdc85bae9a1408a",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Xiaomi 17T Pro · 512 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil XS"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 36 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 40,95 € · monatlich 50,65 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-17t-pro/black-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=20.7&instalmentId=36",
-      "zeitpunkt": "2026-11-08T06:44:48Z"
+      "zeitpunkt": "2026-11-09T07:09:47Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1495,9 +1917,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "46e620a88ee5fca5b5073d25100bf4be4d61e649447e38448564c4b7faf64455",
+      "beleg_id": "99bac4ba337c52991978d26b2589816de472581561ffb1e7bc9e7635c701a330",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Xiaomi 17T Pro · 512 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil XS"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 24 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 40,95 € · monatlich 61,05 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-17t-pro/black-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=31.1&instalmentId=24",
-      "zeitpunkt": "2026-11-08T06:44:49Z"
+      "zeitpunkt": "2026-11-09T07:09:50Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1536,9 +1977,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "91aa7241de19bb31e6ee5c7de6f631c06e7ea202c5bc784a10b006a40a4e94ee",
+      "beleg_id": "9e9775999c7258978a112676b705232f76dcee63d887ae04f39546b60eedb792",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Xiaomi 17T Pro · 512 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil XS"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 12 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 40,95 € · monatlich 92,25 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-17t-pro/black-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=62.3&instalmentId=12",
-      "zeitpunkt": "2026-11-08T06:44:50Z"
+      "zeitpunkt": "2026-11-09T07:09:52Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1571,18 +2031,17 @@
    ],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 147,
-    "beendet": 134,
+    "anfragen": 102,
+    "beendet": 99,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "engage-content2.binkies3d.com": 13,
-     "onebot-webfrontend.oneai.yo-digital.com": 1,
-     "www.telekom.de": 1
+     "bf72977jfz.bf.dynatrace.com": 1,
+     "onebot-webfrontend.oneai.yo-digital.com": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 134.3,
-    "takte_ms": 1300,
+    "sekunden": 133.7,
+    "takte_ms": 1400,
     "wartet_auf": "load"
    },
    "speicher_gb": 512,
@@ -1597,7 +2056,7 @@
     "knoepfe_gefunden": 18,
     "knoepfe_gesucht": 18
    },
-   "verworfen": 16
+   "verworfen": 38
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-z-fold7/silver-shadow-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
@@ -1615,9 +2074,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "2f8cafb5802e75c5e16e518cc165b2e7d128f9b242db7cad74f77953be83eafc",
+      "beleg_id": "dcf949de0ed84e467710a7cbf29a4595f6d2ef5c4f836604356a96b98e80e442",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Galaxy Z Fold7 · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil XS"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 36 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 338,95 € · monatlich 74,35 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-z-fold7/silver-shadow-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=44.4&instalmentId=36",
-      "zeitpunkt": "2026-11-08T06:48:08Z"
+      "zeitpunkt": "2026-11-09T07:13:09Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1656,9 +2134,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "87189ee9c803bbd7e16747df47a95fb6d6792839a0e1f17330fb7a091a93b2eb",
+      "beleg_id": "e25546169c8f76d254457c33c7004f7f9f4c86e0b29a92efbbbcdb4476d4d44b",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Galaxy Z Fold7 · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil XS"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 24 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 338,95 € · monatlich 96,55 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-z-fold7/silver-shadow-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=66.6&instalmentId=24",
-      "zeitpunkt": "2026-11-08T06:48:08Z"
+      "zeitpunkt": "2026-11-09T07:13:11Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1697,9 +2194,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "8da6e75ba13641cdda61eda8c02bb2684743f079dc7ff16e9303503c2a561c3b",
+      "beleg_id": "c6f850945c1fd8e0a95c35177543fa21d5d2ea1f2bbe09393bc11fdc2cdfc9bf",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Galaxy Z Fold7 · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil XS"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 12 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 338,95 € · monatlich 163,25 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-z-fold7/silver-shadow-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=133.3&instalmentId=12",
-      "zeitpunkt": "2026-11-08T06:48:10Z"
+      "zeitpunkt": "2026-11-09T07:13:13Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1732,17 +2248,17 @@
    ],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 98,
-    "beendet": 97,
+    "anfragen": 110,
+    "beendet": 106,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "binkiesproductionweu.servicebus.windows.net": 1,
-     "onebot-webfrontend.oneai.yo-digital.com": 1
+     "onebot-webfrontend.oneai.yo-digital.com": 1,
+     "www.telekom.de": 1
     },
-    "ohne_antwort_ms": 0,
-    "sekunden": 133.7,
-    "takte_ms": 1400,
+    "ohne_antwort_ms": 50,
+    "sekunden": 133.5,
+    "takte_ms": 1250,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -1757,7 +2273,7 @@
     "knoepfe_gefunden": 18,
     "knoepfe_gesucht": 18
    },
-   "verworfen": 16
+   "verworfen": 35
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/nothing/nothing-phone-4a-pro/silber-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
@@ -1775,9 +2291,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "80f7c0ca8f4ab3b9f35044ef35a8a19eff4465b121d85e1649ee4dd98f792a76",
+      "beleg_id": "9fc04cb5604a4253e35c946a41f652785dd53844d6fe7aa7749da7873a1fa4cc",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Nothing Phone (4a) Pro · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil XS"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 36 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 40,95 € · monatlich 45,65 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/nothing/nothing-phone-4a-pro/silber-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=15.7&instalmentId=36",
-      "zeitpunkt": "2026-11-08T06:51:27Z"
+      "zeitpunkt": "2026-11-09T07:16:33Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1816,9 +2351,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "9f05634f9a678da895434eec5a8ce0349af961b16d872ac2694234ca27cf2ea8",
+      "beleg_id": "a2ad56657bb581a9729908c7e8ac622313d91953d15b941795a8ffe9c73de3af",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Nothing Phone (4a) Pro · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil XS"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 24 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 40,95 € · monatlich 53,55 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/nothing/nothing-phone-4a-pro/silber-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=23.6&instalmentId=24",
-      "zeitpunkt": "2026-11-08T06:51:28Z"
+      "zeitpunkt": "2026-11-09T07:16:36Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1857,9 +2411,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "6f5f7b18e6de0be9f06850a5fd1db9cf203da26d529c92854877a88bac442080",
+      "beleg_id": "db59877b1a64b6d4e2ba1566e9795120f51094cdb72dd00b06cb102048807e57",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Nothing Phone (4a) Pro · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil XS"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 12 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 40,95 € · monatlich 77,25 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/nothing/nothing-phone-4a-pro/silber-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17779&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=47.3&instalmentId=12",
-      "zeitpunkt": "2026-11-08T06:51:29Z"
+      "zeitpunkt": "2026-11-09T07:16:38Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1892,15 +2465,16 @@
    ],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 94,
-    "beendet": 92,
+    "anfragen": 101,
+    "beendet": 98,
     "dokument": "complete",
     "geladen": true,
     "offen": {
+     "bf72977jfz.bf.dynatrace.com": 1,
      "onebot-webfrontend.oneai.yo-digital.com": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 133.9,
+    "sekunden": 134.3,
     "takte_ms": 1400,
     "wartet_auf": "load"
    },
@@ -1916,7 +2490,7 @@
     "knoepfe_gefunden": 18,
     "knoepfe_gesucht": 18
    },
-   "verworfen": 16
+   "verworfen": 37
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26-ultra/sky-blue-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
@@ -1934,9 +2508,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "ef586a5f530de7738aa1a9d67167080c84f1ecf3f252f934c109e8f0fa132044",
+      "beleg_id": "b9fd1807e1f2b9fdc197f21a75c39800939c675cbbf870c1733e68322544b45b",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Galaxy S26 Ultra · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil S"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 36 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 238,95 € · monatlich 74,65 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26-ultra/sky-blue-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=34.7&instalmentId=36",
-      "zeitpunkt": "2026-11-08T06:54:47Z"
+      "zeitpunkt": "2026-11-09T07:19:58Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1975,9 +2568,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "98525737ba5bc30d523ac1a577d78bec30a84addc0217bd3e86a7eaecc1c158a",
+      "beleg_id": "ed6e573db9450040e7eb8a035a0220cdb9615f97e3d98b88db706156e966acfb",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Galaxy S26 Ultra · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil S"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 24 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 238,95 € · monatlich 91,95 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26-ultra/sky-blue-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=52&instalmentId=24",
-      "zeitpunkt": "2026-11-08T06:54:48Z"
+      "zeitpunkt": "2026-11-09T07:20:00Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2016,9 +2628,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "13de8fd4520ead7a9150d35a11f4e5713ae5681e085e004b40f835fd8ae6d89a",
+      "beleg_id": "7373a7f03dcacc688b19278657653f0cb3e58ef812e846e975eaddf09865ef78",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Galaxy S26 Ultra · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil S"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 12 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 238,95 € · monatlich 144,05 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26-ultra/sky-blue-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=104.1&instalmentId=12",
-      "zeitpunkt": "2026-11-08T06:54:49Z"
+      "zeitpunkt": "2026-11-09T07:20:02Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2057,9 +2688,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "8f9afcedc5738e7c844e6a3e3dcc35250cd60141cdf0adc1d6d6b0274ddf6bca",
+      "beleg_id": "91accec19b60646a13669af0145c1e455cd3fec2b98296b643647e24358a69d4",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Galaxy S26 Ultra · 512 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil S"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 36 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 338,95 € · monatlich 77,15 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26-ultra/sky-blue-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=104.1&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D512_GB",
-      "zeitpunkt": "2026-11-08T06:54:52Z"
+      "zeitpunkt": "2026-11-09T07:20:05Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2098,9 +2748,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "1bf04faceb14830d60a51513786a940e2cea121ddf908bfed8a75c60fa9733ce",
+      "beleg_id": "c5c7da7a79ac87cdebd52d18e1012e0fda51872487879f53ab1a607ae8c630a7",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Galaxy S26 Ultra · 512 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil S"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 24 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 338,95 € · monatlich 95,75 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26-ultra/sky-blue-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=55.8&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-08T06:54:53Z"
+      "zeitpunkt": "2026-11-09T07:20:07Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2139,9 +2808,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a248bd1fed483469423b752aee77df22a257a39f9722411fd57c4e89b16d72be",
+      "beleg_id": "1f34cf693ca5967c110b3107c1cd010ef4833b985762f1bcac9ec2aae4a14a94",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Galaxy S26 Ultra · 512 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil S"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 12 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 338,95 € · monatlich 151,55 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26-ultra/sky-blue-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=111.6&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-08T06:54:54Z"
+      "zeitpunkt": "2026-11-09T07:20:09Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2180,9 +2868,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "836ab65d5da7c50cf714fdd96c7d60a3c93f77d2d6b5bd2f80828a69a8352491",
+      "beleg_id": "95f9e22e5b672c1c7111de1d7601e657e40284eb28b0df2625b420290bb386d5",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Galaxy S26 Ultra · 1 TB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil S"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 36 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 438,95 € · monatlich 84,35 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26-ultra/sky-blue-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=111.6&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D1_TB",
-      "zeitpunkt": "2026-11-08T06:54:56Z"
+      "zeitpunkt": "2026-11-09T07:20:12Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2221,9 +2928,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "377114220ebad254ecc43391571fbd89f8a1d7a9679e54bed056fbedb7131013",
+      "beleg_id": "53e245f0943314d0a0a85a7f8e1d4a7cae4fbb14f69686198bc935702b821533",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Galaxy S26 Ultra · 1 TB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil S"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 24 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 438,95 € · monatlich 106,55 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26-ultra/sky-blue-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=66.6&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
-      "zeitpunkt": "2026-11-08T06:54:57Z"
+      "zeitpunkt": "2026-11-09T07:20:15Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2262,9 +2988,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "2da2e8e4be9dbb2f3ca1b03c23d0b524566d21faea558004c8c85149b2c0130f",
+      "beleg_id": "bc0fa022b47f5f749679bca53ef4dd05b9694ce7309c79d218852c52fa991f1e",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Galaxy S26 Ultra · 1 TB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil S"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 12 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 438,95 € · monatlich 173,25 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-s26-ultra/sky-blue-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=133.3&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
-      "zeitpunkt": "2026-11-08T06:54:58Z"
+      "zeitpunkt": "2026-11-09T07:20:18Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2297,17 +3042,18 @@
    ],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 90,
-    "beendet": 88,
+    "anfragen": 99,
+    "beendet": 95,
     "dokument": "complete",
     "geladen": true,
     "offen": {
+     "bf72977jfz.bf.dynatrace.com": 1,
      "onebot-webfrontend.oneai.yo-digital.com": 1,
-     "www.telekom.de": 1
+     "www.telekom.de": 2
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 134.1,
-    "takte_ms": 1350,
+    "sekunden": 134.5,
+    "takte_ms": 1650,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -2322,7 +3068,7 @@
     "knoepfe_gefunden": 54,
     "knoepfe_gesucht": 54
    },
-   "verworfen": 31
+   "verworfen": 80
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-a37-5g/awesome-lavender-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
@@ -2340,9 +3086,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "77f48a4763f12715a7eea8eaa11ee719e7b761c5bb6966cb6a77978bd387c17c",
+      "beleg_id": "93401517575b078e8788733a156eafd4cf6e076ef7f13d0d7ed46a5cab065b65",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Galaxy A37 · 128 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil S"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 36 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 40,95 € · monatlich 51,55 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-a37-5g/awesome-lavender-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=11.6&instalmentId=36",
-      "zeitpunkt": "2026-11-08T06:58:15Z"
+      "zeitpunkt": "2026-11-09T07:23:38Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2381,9 +3146,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "755eeb6dda058d6417f9f535a24490cbd34b98dbe0b8f82e41545eca69506d37",
+      "beleg_id": "3cd19f2257d829ba9ef889f964cc4a7642528dbaa281982e9c79c3852f430fa6",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Galaxy A37 · 128 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil S"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 24 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 40,95 € · monatlich 57,35 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-a37-5g/awesome-lavender-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=17.4&instalmentId=24",
-      "zeitpunkt": "2026-11-08T06:58:16Z"
+      "zeitpunkt": "2026-11-09T07:23:40Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2422,9 +3206,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "829c7ed19ccc8ff34bf03fa2504796673673e573e79d08a816cc9f6dfe9fe523",
+      "beleg_id": "85f63362145cf6d06041e5aa6babaa7b1f11bc02ec631469af29b3b2b2a35e0c",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Galaxy A37 · 128 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil S"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 12 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 40,95 € · monatlich 74,75 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-a37-5g/awesome-lavender-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=34.8&instalmentId=12",
-      "zeitpunkt": "2026-11-08T06:58:17Z"
+      "zeitpunkt": "2026-11-09T07:23:42Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2463,9 +3266,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "5db79a50b1978d892775f027ee593f50e17b817749d5d5f88e52b9cecb804f73",
+      "beleg_id": "d854f710e57fb2c1298289e96753ba61e06e950ca34e127440bca8aa3ebce8ba",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Galaxy A37 · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil S"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 36 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 40,95 € · monatlich 52,65 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-a37-5g/awesome-lavender-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=34.8&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D256_GB",
-      "zeitpunkt": "2026-11-08T06:58:20Z"
+      "zeitpunkt": "2026-11-09T07:23:45Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2504,9 +3326,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "756b37d5e2b73cbd5633e37772602c2a4ff285091489152ae6eacee73dbddc97",
+      "beleg_id": "e9a596698cbee382e85aba58b03b17e260e021be121dfd9b46dfcc4887888eb5",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Galaxy A37 · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil S"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 24 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 40,95 € · monatlich 58,95 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-a37-5g/awesome-lavender-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=19&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D256_GB",
-      "zeitpunkt": "2026-11-08T06:58:21Z"
+      "zeitpunkt": "2026-11-09T07:23:48Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2545,9 +3386,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "ca7c2a211b296e5d65d127d1ad629e82bde8cfdd1683344fcdcc0d4d233533ee",
+      "beleg_id": "27c75d3be6448ed6d0fefdf01bbb6be100cd7d7c72f6ef2f97956e163772a87d",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Galaxy A37 · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil S"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 12 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 40,95 € · monatlich 78,05 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-a37-5g/awesome-lavender-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=38.1&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D256_GB",
-      "zeitpunkt": "2026-11-08T06:58:22Z"
+      "zeitpunkt": "2026-11-09T07:23:50Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2580,17 +3440,18 @@
    ],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 94,
-    "beendet": 92,
+    "anfragen": 103,
+    "beendet": 100,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "onebot-webfrontend.oneai.yo-digital.com": 1,
-     "www.telekom.de": 1
+     "bf72977jfz.bf.dynatrace.com": 2,
+     "binkiesproductionweu.servicebus.windows.net": 1,
+     "onebot-webfrontend.oneai.yo-digital.com": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 133.6,
-    "takte_ms": 1300,
+    "sekunden": 134.3,
+    "takte_ms": 1550,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -2605,7 +3466,7 @@
     "knoepfe_gefunden": 36,
     "knoepfe_gesucht": 36
    },
-   "verworfen": 24
+   "verworfen": 61
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/google/google-pixel-11/frost-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
@@ -2623,9 +3484,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "db40aed88c71884b75cea093e17f5d457521cf5a168d93bcd3ca60cf9859b9b7",
+      "beleg_id": "797ae64d8f43a6b63d4b87eecee908bdc336f4301371d23f397ff157b534b222",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Pixel 11 · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil S"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 36 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 40,95 € · monatlich 64,25 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-11/frost-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=24.3&instalmentId=36",
-      "zeitpunkt": "2026-11-08T07:01:39Z"
+      "zeitpunkt": "2026-11-09T07:27:10Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2664,9 +3544,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "54cc5f27aa0d7a5de445aed1c2699da3a157ac3ecdae9d8b3d01cbaafca92363",
+      "beleg_id": "00a145123718a9aaa769efeac0b37b934c89ca0c438d430e4e75816666b8b3c6",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Pixel 11 · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil S"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 24 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 40,95 € · monatlich 76,45 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-11/frost-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=36.5&instalmentId=24",
-      "zeitpunkt": "2026-11-08T07:01:40Z"
+      "zeitpunkt": "2026-11-09T07:27:13Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2705,9 +3604,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "12564a7e0dc8a4f08d2a75dab77d451f0faed4d3da12a9b3bebb4fffbbb9bb33",
+      "beleg_id": "b31dd949f29f8d3f265520041e112f1ac679d140698f427bd0efc5afe1bb9fde",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Pixel 11 · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil S"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 12 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 40,95 € · monatlich 113,05 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-11/frost-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=73.1&instalmentId=12",
-      "zeitpunkt": "2026-11-08T07:01:42Z"
+      "zeitpunkt": "2026-11-09T07:27:15Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2827,17 +3745,17 @@
    ],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 98,
-    "beendet": 95,
+    "anfragen": 103,
+    "beendet": 101,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "onebot-webfrontend.oneai.yo-digital.com": 1,
-     "www.telekom.de": 1
+     "bf72977jfz.bf.dynatrace.com": 1,
+     "onebot-webfrontend.oneai.yo-digital.com": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 133.7,
-    "takte_ms": 1200,
+    "sekunden": 134.8,
+    "takte_ms": 1600,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -2852,7 +3770,7 @@
     "knoepfe_gefunden": 21,
     "knoepfe_gesucht": 21
    },
-   "verworfen": 14
+   "verworfen": 41
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
@@ -2870,9 +3788,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "8e35a7ef5c32cf17346ad8f040757307e22ca2a332ee95ac37d6989a8c5acee3",
+      "beleg_id": "971fb07a729e4a897fc9f338d71fafbabf11bfcca164d03579cd0ee2a630e895",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 18 Pro Max · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil S"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 36 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 338,95 € · monatlich 75,15 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=35.2&instalmentId=36",
-      "zeitpunkt": "2026-11-08T07:05:01Z"
+      "zeitpunkt": "2026-11-09T07:30:37Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2911,9 +3848,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "caed3b683cd04c946b2b31b31d1267f6990b207d92c304961b04748b7a52de5f",
+      "beleg_id": "81b3dc96e4f654469034d448fb3d13082339d41665ccaa17314db6c408125a8c",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 18 Pro Max · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil S"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 24 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 338,95 € · monatlich 92,85 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=52.9&instalmentId=24",
-      "zeitpunkt": "2026-11-08T07:05:02Z"
+      "zeitpunkt": "2026-11-09T07:30:39Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2952,9 +3908,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "bf049458a137182575e17f1183bdac5b7c0298a75fd5cd0814a4ca4d7d3a4769",
+      "beleg_id": "b5b04349bb6894f4f7fa4676f0f935c446b61a44a8b6f9c3886da9f511a25cbe",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 18 Pro Max · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil S"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 12 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 338,95 € · monatlich 145,75 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=105.8&instalmentId=12",
-      "zeitpunkt": "2026-11-08T07:05:03Z"
+      "zeitpunkt": "2026-11-09T07:30:42Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2993,9 +3968,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "12049e9c85d0430cf869e3d2859a1760c7fb31e402b036b5d5cf002976d777ad",
+      "beleg_id": "603289a1916d0f8ded17de13959d07762752f02522a46b39ef3b3916031364cd",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 18 Pro Max · 512 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil S"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 36 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 338,95 € · monatlich 82,45 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=105.8&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D512_GB",
-      "zeitpunkt": "2026-11-08T07:05:05Z"
+      "zeitpunkt": "2026-11-09T07:30:45Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3034,9 +4028,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "8f62de6b4e3bd2287626a2c4dd0e4322e786fbd6c280b94239853681cab35a91",
+      "beleg_id": "9e391639cdde53a33c03741e28d6d066bd0a3a55958438d109e4ff2bc90e59e1",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 18 Pro Max · 512 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil S"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 24 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 338,95 € · monatlich 103,65 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=63.7&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-08T07:05:06Z"
+      "zeitpunkt": "2026-11-09T07:30:47Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3075,9 +4088,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "d83fa914d4f9c4bc9b5011f063e2d8d79af1b8cda5af49252cb1c86b541b1671",
+      "beleg_id": "6e337bf7bf3cbc8d3ea4a6ac5a07f4f73daff12470bc4bdae88131045e0238c9",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 18 Pro Max · 512 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil S"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 12 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 338,95 € · monatlich 167,45 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=127.5&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-08T07:05:07Z"
+      "zeitpunkt": "2026-11-09T07:30:49Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3116,9 +4148,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "ea2beac995ef11aa97284111f5cba536227f458f2a94b87fb289e9b74d8c4f66",
+      "beleg_id": "8370987f08fbb93d116020e0d8272fe029d497bf9a8d4dcafbc7c44e0a5807f8",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 18 Pro Max · 1 TB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil S"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 36 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 438,95 € · monatlich 92,15 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=127.5&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D1_TB",
-      "zeitpunkt": "2026-11-08T07:05:10Z"
+      "zeitpunkt": "2026-11-09T07:30:52Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3157,9 +4208,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "8226264f2c2183bf74e7b9e26a1490395396eb9afb0852e5bf216cd464cb84d2",
+      "beleg_id": "339d89bfb9a113ca92147309843cdbf3e47df716d18ae37a8bf09c7b42fb9676",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 18 Pro Max · 1 TB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil S"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 24 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 438,95 € · monatlich 118,25 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=78.3&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
-      "zeitpunkt": "2026-11-08T07:05:11Z"
+      "zeitpunkt": "2026-11-09T07:30:55Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3198,9 +4268,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "15b1fb20a6f3f69eca2d02807d9b81b6d8672bc6e198229b999f1d2e7f4b43bf",
+      "beleg_id": "e0d954f0c3b7b4f6ed8adf3f61be91451ad0f20b25908495c20bcd66e1cefa2f",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 18 Pro Max · 1 TB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil S"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 12 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 438,95 € · monatlich 196,55 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=156.6&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
-      "zeitpunkt": "2026-11-08T07:05:12Z"
+      "zeitpunkt": "2026-11-09T07:30:57Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3239,9 +4328,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "acae8436c329519008a61a8a85f8838a292a9e42027ea7ec8469ae6dbfcf882a",
+      "beleg_id": "8451f0f20542e5f7612d7dca222cdfd3887d8acc51f308f29b49e2826962d949",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 18 Pro Max · 2 TB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil S"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 36 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 438,95 € · monatlich 111,55 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=156.6&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D2_TB",
-      "zeitpunkt": "2026-11-08T07:05:14Z"
+      "zeitpunkt": "2026-11-09T07:31:00Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3280,9 +4388,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "d5ee9c7c63b4c5f81aaba03a45c65abc61bd187544f4b48022887d8bb6cf0ba3",
+      "beleg_id": "8311bd1a2df33e882a48e3516557e35b674064b1ba3e893519112e59bc60f99c",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 18 Pro Max · 2 TB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil S"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 24 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 438,95 € · monatlich 147,45 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=107.5&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D2_TB",
-      "zeitpunkt": "2026-11-08T07:05:15Z"
+      "zeitpunkt": "2026-11-09T07:31:03Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3321,9 +4448,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "c2d240eb196234d2180c599e738b7fa7ce5f3ef737d23f0adbbdb215ded39fd5",
+      "beleg_id": "fb82820ab78e8ea5c0fd561d20dec9ea5f4f2f7a1f10e3cbdf9387d319d91aa8",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 18 Pro Max · 2 TB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil S"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 12 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 438,95 € · monatlich 254,95 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro-max/burgunder-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=215&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D2_TB",
-      "zeitpunkt": "2026-11-08T07:05:16Z"
+      "zeitpunkt": "2026-11-09T07:31:05Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3356,16 +4502,17 @@
    ],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 93,
-    "beendet": 91,
+    "anfragen": 100,
+    "beendet": 98,
     "dokument": "complete",
     "geladen": true,
     "offen": {
+     "bf72977jfz.bf.dynatrace.com": 1,
      "onebot-webfrontend.oneai.yo-digital.com": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 134.0,
-    "takte_ms": 1400,
+    "sekunden": 134.1,
+    "takte_ms": 1450,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -3380,7 +4527,7 @@
     "knoepfe_gefunden": 72,
     "knoepfe_gesucht": 72
    },
-   "verworfen": 37
+   "verworfen": 94
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-17-pro-5g/black-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
@@ -3398,9 +4545,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "f9dbd01746ed9a77c6809b013fa9c467809014f9f6e3d30d824bda9e6aaf0c46",
+      "beleg_id": "5ff3150dcb0054706e139a4ed374a0cffa00b4531c0c27b52bb1a20f84c15e41",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Redmi Note 17 Pro · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil S"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 36 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 40,95 € · monatlich 50,95 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-17-pro-5g/black-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=11&instalmentId=36",
-      "zeitpunkt": "2026-11-08T07:08:33Z"
+      "zeitpunkt": "2026-11-09T07:34:25Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3439,9 +4605,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "e33766cdbc97d21182d1afff4f95ed54d9b9ae096a0c9e6523ee52e7f421fe26",
+      "beleg_id": "5fafb3859293227b0427c1ccdf0a44118c14b53ddc7d4a3f670cf690e9f81a08",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Redmi Note 17 Pro · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil S"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 24 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 40,95 € · monatlich 56,45 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-17-pro-5g/black-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=16.5&instalmentId=24",
-      "zeitpunkt": "2026-11-08T07:08:34Z"
+      "zeitpunkt": "2026-11-09T07:34:27Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3480,9 +4665,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "8cbf94bd1597a71c46db31cc9bfcfe2d4f03905bbf18e9b52bb033b0bcc1293b",
+      "beleg_id": "a3bf9d0acb12fbf859ee1647d28f3cc52b87aa246de7dac3de7d42d4df4b4ed0",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Redmi Note 17 Pro · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil S"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 12 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 40,95 € · monatlich 73,05 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/xiaomi/xiaomi-redmi-note-17-pro-5g/black-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17785&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=33.1&instalmentId=12",
-      "zeitpunkt": "2026-11-08T07:08:35Z"
+      "zeitpunkt": "2026-11-09T07:34:30Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3515,16 +4719,17 @@
    ],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 85,
-    "beendet": 83,
+    "anfragen": 94,
+    "beendet": 89,
     "dokument": "complete",
     "geladen": true,
     "offen": {
+     "bf72977jfz.bf.dynatrace.com": 2,
      "onebot-webfrontend.oneai.yo-digital.com": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 133.5,
-    "takte_ms": 1450,
+    "sekunden": 134.6,
+    "takte_ms": 2000,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -3539,7 +4744,7 @@
     "knoepfe_gefunden": 18,
     "knoepfe_gesucht": 18
    },
-   "verworfen": 11
+   "verworfen": 32
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-a27-5g/black-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
@@ -3557,9 +4762,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "d080e1ba2b504450fa5e5469929127bc493412eab8ccc1a3436a21a82ce64186",
+      "beleg_id": "783a4420be3eb4f30c5dddbd0e1a390bb97b7672baa741c76f9732b2d91ab7a3",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Galaxy A27 · 128 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil L"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 24 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 40,95 € · monatlich 66,05 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-a27-5g/black-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=6.1&instalmentId=24",
-      "zeitpunkt": "2026-11-08T07:11:53Z"
+      "zeitpunkt": "2026-11-09T07:37:49Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3598,9 +4822,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "e7113ed216a98f91b6ac72677255f4233fa0b47ee0d55758233ee449be5767ea",
+      "beleg_id": "808d6c18bdd3d99e7a3622508fb7a8b3afcc4adac2802a54e48fbc2f2afa28cb",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Galaxy A27 · 128 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil L"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 12 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 40,95 € · monatlich 72,25 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-a27-5g/black-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=12.3&instalmentId=12",
-      "zeitpunkt": "2026-11-08T07:11:54Z"
+      "zeitpunkt": "2026-11-09T07:37:52Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3639,9 +4882,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "9f637c8e8a7157f94837ce0a6f92c42812ed781814f7fb2d42a7bdd8173447db",
+      "beleg_id": "89a4ec8e58f16d1127d1c0f2a0bb6dc0e558c8a9dcb48043cf87b4134c126a45",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Galaxy A27 · 128 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil L"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 6 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 40,95 € · monatlich 84,55 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/samsung/samsung-galaxy-a27-5g/black-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=24.6&instalmentId=6",
-      "zeitpunkt": "2026-11-08T07:11:55Z"
+      "zeitpunkt": "2026-11-09T07:37:55Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3674,17 +4936,18 @@
    ],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 143,
-    "beendet": 136,
+    "anfragen": 155,
+    "beendet": 147,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "engage-content2.binkies3d.com": 6,
+     "bf72977jfz.bf.dynatrace.com": 1,
+     "engage-content2.binkies3d.com": 7,
      "onebot-webfrontend.oneai.yo-digital.com": 1
     },
-    "ohne_antwort_ms": 50,
-    "sekunden": 134.0,
-    "takte_ms": 1600,
+    "ohne_antwort_ms": 0,
+    "sekunden": 134.7,
+    "takte_ms": 1300,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -3699,7 +4962,7 @@
     "knoepfe_gefunden": 18,
     "knoepfe_gesucht": 18
    },
-   "verworfen": 15
+   "verworfen": 40
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/motorola/motorola-moto-g37/pantone-impenetrable-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
@@ -3717,9 +4980,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "ab954acb7113058b72dfa509e6c2b17fe6f119ecb2b0735c2601f05039a83f1d",
+      "beleg_id": "118c9918b88a5533e036a13f4378becb1130be20f60a45e757fdd15fbc62e3c3",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: motorola moto g37 · 128 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil L"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 12 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 40,95 € · monatlich 67,25 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/motorola/motorola-moto-g37/pantone-impenetrable-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=7.3&instalmentId=12",
-      "zeitpunkt": "2026-11-08T07:15:44Z"
+      "zeitpunkt": "2026-11-09T07:41:43Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3758,9 +5040,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "da0d6246d4b071c2c7722c90c615a708a00a6d63bfb5a54ddf97954c97d6e9c3",
+      "beleg_id": "d21c9401a4792a94f8e7ce01d135aec123d993a7a856efd58f58254800b0333c",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: motorola moto g37 · 128 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil L"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 6 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 40,95 € · monatlich 74,55 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/motorola/motorola-moto-g37/pantone-impenetrable-128-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=14.6&instalmentId=6",
-      "zeitpunkt": "2026-11-08T07:16:01Z"
+      "zeitpunkt": "2026-11-09T07:42:01Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3793,18 +5094,17 @@
    ],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 153,
-    "beendet": 139,
+    "anfragen": 107,
+    "beendet": 104,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "binkiesproductionweu.servicebus.windows.net": 1,
-     "engage-content2.binkies3d.com": 14,
-     "onebot-webfrontend.oneai.yo-digital.com": 1
+     "onebot-webfrontend.oneai.yo-digital.com": 1,
+     "www.telekom.de": 2
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 133.6,
-    "takte_ms": 1300,
+    "sekunden": 133.3,
+    "takte_ms": 1150,
     "wartet_auf": "load"
    },
    "speicher_gb": 128,
@@ -3819,7 +5119,7 @@
     "knoepfe_gefunden": 12,
     "knoepfe_gesucht": 12
    },
-   "verworfen": 14
+   "verworfen": 49
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/google/google-pixel-10-pro-xl/obsidian-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
@@ -3837,9 +5137,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "2d563302e774481b29ef3723f7263a32c29246cf8f062b27d2ba684343ab258a",
+      "beleg_id": "949231d442d21496d218b898c745231203ac7c5ea242accfc7290bf012595ddb",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Pixel 10 Pro XL · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil L"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 36 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 40,95 € · monatlich 84,55 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-10-pro-xl/obsidian-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=24.6&instalmentId=36",
-      "zeitpunkt": "2026-11-08T07:19:18Z"
+      "zeitpunkt": "2026-11-09T07:45:20Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3878,9 +5197,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "5d4acf3685b9c886ae48ddf1ad8fcfd28a12425604bde92c23c92363b475cc50",
+      "beleg_id": "db94b6554d6e995b1d967aba03177bcf575a83551add05dbc907237909c58cbd",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Pixel 10 Pro XL · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil L"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 24 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 40,95 € · monatlich 96,95 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-10-pro-xl/obsidian-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=37&instalmentId=24",
-      "zeitpunkt": "2026-11-08T07:19:19Z"
+      "zeitpunkt": "2026-11-09T07:45:23Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3919,9 +5257,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "17314d9751586242006d7b7b3120ea879947e9b2a348272370b1a8a72c779d55",
+      "beleg_id": "cd8175d905442e7d5f5ad99e7296d6e4861a3cb964f294d77a7c809b036e99d9",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Pixel 10 Pro XL · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil L"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 12 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 40,95 € · monatlich 133,95 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-10-pro-xl/obsidian-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=74&instalmentId=12",
-      "zeitpunkt": "2026-11-08T07:19:20Z"
+      "zeitpunkt": "2026-11-09T07:45:26Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -3954,16 +5311,17 @@
    ],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 94,
-    "beendet": 93,
+    "anfragen": 102,
+    "beendet": 100,
     "dokument": "complete",
     "geladen": true,
     "offen": {
+     "bf72977jfz.bf.dynatrace.com": 1,
      "onebot-webfrontend.oneai.yo-digital.com": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 133.6,
-    "takte_ms": 1400,
+    "sekunden": 134.2,
+    "takte_ms": 1300,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -3978,7 +5336,7 @@
     "knoepfe_gefunden": 18,
     "knoepfe_gesucht": 18
    },
-   "verworfen": 16
+   "verworfen": 38
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro-max/cosmic-orange-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
@@ -3996,9 +5354,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "de2b40090d376a496e7d3198fab6b90c24b8e8d44279392ecc91ef689e12661a",
+      "beleg_id": "28fe62bff03b6a94d1bf57112490dc83ae6e3998fc6ee1e70040088869cec53d",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 17 Pro Max · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil L"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 36 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 138,95 € · monatlich 88,25 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro-max/cosmic-orange-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=28.3&instalmentId=36",
-      "zeitpunkt": "2026-11-08T07:22:39Z"
+      "zeitpunkt": "2026-11-09T07:48:46Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4037,9 +5414,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "12854104748fb618f145191ba28be5f98ece1aa07f24e2b88f376d127fb56593",
+      "beleg_id": "0a3640e5a974a9d997f8c36db50c5f1460a0aea3a2a2a90aaebb3ce8fe69556d",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 17 Pro Max · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil L"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 24 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 138,95 € · monatlich 102,45 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro-max/cosmic-orange-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=42.5&instalmentId=24",
-      "zeitpunkt": "2026-11-08T07:22:40Z"
+      "zeitpunkt": "2026-11-09T07:48:48Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4078,9 +5474,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "7f24834d5329d7e8e812b7bcb34c3c65f1d2ba02d15a7f4dda56c63522a8ecbf",
+      "beleg_id": "296116aecf1cffa8e51e9c251e59df7b87298e4a54ed250ae7c9e459bba5fdbd",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 17 Pro Max · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil L"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 12 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 138,95 € · monatlich 144,95 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro-max/cosmic-orange-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=85&instalmentId=12",
-      "zeitpunkt": "2026-11-08T07:22:41Z"
+      "zeitpunkt": "2026-11-09T07:48:51Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4119,9 +5534,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "b9675157fb229fbe72987241f0ba69e9fc1fd94563639547c62ffdac5eb8218b",
+      "beleg_id": "2f5ad3ab5aa9f746ef753ecf471805c2b362d9701f5c4940c34e43dceb0f9a6e",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 17 Pro Max · 512 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil L"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 36 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 238,95 € · monatlich 92,15 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro-max/cosmic-orange-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=85&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D512_GB",
-      "zeitpunkt": "2026-11-08T07:22:44Z"
+      "zeitpunkt": "2026-11-09T07:48:54Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4160,9 +5594,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "90f7a986eeeb0c686411088bea31ef3f6192332bc60f00dcaef8c29981c270f8",
+      "beleg_id": "e7953c024a2ef291f419062998dba6de79d0b52df92d40344cc687ab1416be19",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 17 Pro Max · 512 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil L"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 24 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 238,95 € · monatlich 108,25 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro-max/cosmic-orange-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=48.3&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-08T07:22:45Z"
+      "zeitpunkt": "2026-11-09T07:48:57Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4201,9 +5654,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a5a071dc68d4449ef14fc7e7def6b16242a622400c2268abc92daa4429248101",
+      "beleg_id": "7e3c4eb06d7898f40eb29ac1bba229a960c64bf24a378f374c31c690765250b6",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 17 Pro Max · 512 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil L"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 12 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 238,95 € · monatlich 156,55 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro-max/cosmic-orange-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=96.6&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-08T07:22:46Z"
+      "zeitpunkt": "2026-11-09T07:48:59Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4242,9 +5714,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "9045e9e4208d1212575a86eef2eb95784bddd83748b4efdc53818b6e14a02ca9",
+      "beleg_id": "906e2387af82842b14287ebac3ab0b1ddc3fa1e793247319edf4e10536a19e47",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 17 Pro Max · 1 TB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil L"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 36 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 338,95 € · monatlich 96,05 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro-max/cosmic-orange-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=96.6&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D1_TB",
-      "zeitpunkt": "2026-11-08T07:22:49Z"
+      "zeitpunkt": "2026-11-09T07:49:03Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4283,9 +5774,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "8e6584a9b50e187d5c38d9b53c8cda60de6f7269597bcc10d347a3323d3dd72d",
+      "beleg_id": "5d980a6fa17fa14941a6c5c62b5c4de82b47ec440a7e63723528524081c95c61",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 17 Pro Max · 1 TB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil L"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 24 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 338,95 € · monatlich 114,05 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro-max/cosmic-orange-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=54.1&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
-      "zeitpunkt": "2026-11-08T07:22:50Z"
+      "zeitpunkt": "2026-11-09T07:49:05Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4324,9 +5834,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "de7e494d5ce515db348a032d9914cc2573d996372cce116e98c955db1ce63243",
+      "beleg_id": "35888d2877f397f76d1749f9570d3d3db4471ab8c24b12766aee661e782bd6a7",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 17 Pro Max · 1 TB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil L"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 12 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 338,95 € · monatlich 168,25 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro-max/cosmic-orange-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=108.3&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
-      "zeitpunkt": "2026-11-08T07:22:51Z"
+      "zeitpunkt": "2026-11-09T07:49:08Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4446,16 +5975,17 @@
    ],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 143,
-    "beendet": 141,
+    "anfragen": 150,
+    "beendet": 147,
     "dokument": "complete",
     "geladen": true,
     "offen": {
+     "bf72977jfz.bf.dynatrace.com": 1,
      "onebot-webfrontend.oneai.yo-digital.com": 1
     },
     "ohne_antwort_ms": 0,
     "sekunden": 134.8,
-    "takte_ms": 1400,
+    "takte_ms": 1350,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -4470,7 +6000,7 @@
     "knoepfe_gefunden": 57,
     "knoepfe_gesucht": 57
    },
-   "verworfen": 30
+   "verworfen": 80
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro/polar-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
@@ -4488,9 +6018,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "80e8228e4a8424ade247a96170d541d5514d44c694e4915bfae163a1ad5bb687",
+      "beleg_id": "5b492407b724ee0abf8bbff6c49449d71c252741afc2389da9fa078ec80b8a92",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 18 Pro · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil L"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 36 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 138,95 € · monatlich 90,45 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro/polar-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=30.5&instalmentId=36",
-      "zeitpunkt": "2026-11-08T07:26:11Z"
+      "zeitpunkt": "2026-11-09T07:52:33Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4529,9 +6078,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "693f5554614cc7227242f369a7c40d6d984274cf937716082e075f9f216ff788",
+      "beleg_id": "e09e4d4303ecf1e95fd4f00ad675f2d7e3e5571b10194b5268f863f03b551d8a",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 18 Pro · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil L"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 24 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 138,95 € · monatlich 105,95 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro/polar-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=46&instalmentId=24",
-      "zeitpunkt": "2026-11-08T07:26:11Z"
+      "zeitpunkt": "2026-11-09T07:52:35Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4570,9 +6138,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "27130ff8ee2e005f4b66b27dd348448f93efca946d48b760d4677ef68ee09885",
+      "beleg_id": "cb22ca1632c6a036bb096005e89431798f3461b1596d2652155322c948cc417c",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 18 Pro · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil L"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 12 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 138,95 € · monatlich 152,45 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro/polar-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=92.5&instalmentId=12",
-      "zeitpunkt": "2026-11-08T07:26:13Z"
+      "zeitpunkt": "2026-11-09T07:52:38Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4611,9 +6198,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "ae7e564cc5df57aa11f3bc02d4a6c69f75f82f01fc1c1363675a811f5061e2bd",
+      "beleg_id": "4efd9e18ed390a38d04c63e3622b4cc736428fc292b2bd6ca0d5788c86674a7c",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 18 Pro · 512 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil L"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 36 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 338,95 € · monatlich 91,95 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro/polar-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=92.5&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D512_GB",
-      "zeitpunkt": "2026-11-08T07:26:15Z"
+      "zeitpunkt": "2026-11-09T07:52:41Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4652,9 +6258,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "d0a1dea2a2cb55ecfe96c17143ec85c6e63b1d3fad07992dbeafe1d4d48d417b",
+      "beleg_id": "fefb40eeff054b92fd7d230bf4be613d5530c9884d57f56d1df3a94f3bd7f76d",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 18 Pro · 512 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil L"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 24 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 338,95 € · monatlich 107,95 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro/polar-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=48&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-08T07:26:16Z"
+      "zeitpunkt": "2026-11-09T07:52:43Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4693,9 +6318,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "6bde3078b6f96d67dd164917d526c52a3d84e978c26f33e9192a513f11db6a9a",
+      "beleg_id": "6d17c3d3db3133f03e4af229be81cde49f3f1595d221823ebce6dcfa23e92dd0",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 18 Pro · 512 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil L"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 12 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 338,95 € · monatlich 156,45 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro/polar-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=96.5&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-08T07:26:17Z"
+      "zeitpunkt": "2026-11-09T07:52:46Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4734,9 +6378,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "b79f609fb16cca4b0adec17f6acb7ce38924ed5dd64388aaddbcfb33048f767c",
+      "beleg_id": "1b199b230f899046a3f6ccadefdffcdee82a663990a6771e41883cf6fa468af9",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 18 Pro · 1 TB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil L"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 36 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 338,95 € · monatlich 104,45 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro/polar-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=96.5&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D1_TB",
-      "zeitpunkt": "2026-11-08T07:26:20Z"
+      "zeitpunkt": "2026-11-09T07:52:49Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4775,9 +6438,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "28cfca0e7d1dc248a844e229295f3871d29f57e0e806e3b5eaef65317f14c69e",
+      "beleg_id": "5ef363b3dfc455f61506d4c37eaa75d3cad6e1f0adcff96158648cf2924cf73a",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 18 Pro · 1 TB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil L"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 24 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 338,95 € · monatlich 126,95 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro/polar-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=67&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
-      "zeitpunkt": "2026-11-08T07:26:21Z"
+      "zeitpunkt": "2026-11-09T07:52:51Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4816,9 +6498,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "7dc708559d411c90f18e450e3b8aff160035dbe2f24024c35c1ec5152604ec37",
+      "beleg_id": "e8e7116981b6204e84e116020454e3dbd135ea35224248788db9f6d5cb7aaf61",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 18 Pro · 1 TB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil L"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 12 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 338,95 € · monatlich 193,95 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro/polar-1-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=134&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D1_TB",
-      "zeitpunkt": "2026-11-08T07:26:22Z"
+      "zeitpunkt": "2026-11-09T07:52:54Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4857,9 +6558,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "6e270b02bcb4d05ade5ab2934ba05c5cac065bf018d89900a2e806f8f33f9ab1",
+      "beleg_id": "f05d55f8b28c39be35e42144fa36d73d0efeb5b0038f24a862254a0383ce875e",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 18 Pro · 2 TB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil L"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 36 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 438,95 € · monatlich 120,95 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro/polar-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=134&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D2_TB",
-      "zeitpunkt": "2026-11-08T07:26:24Z"
+      "zeitpunkt": "2026-11-09T07:52:57Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4898,9 +6618,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "d2589ababd7f94d06689676e9913caabbde7d017286340dbbe81f327730cfbf8",
+      "beleg_id": "743cd94665e974255fad3b854f45fe1e6650b5b2d7cfe1367d0357dfedc1090d",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 18 Pro · 2 TB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil L"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 24 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 438,95 € · monatlich 151,95 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro/polar-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=92&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D2_TB",
-      "zeitpunkt": "2026-11-08T07:26:25Z"
+      "zeitpunkt": "2026-11-09T07:53:00Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4939,9 +6678,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "231802205d1bdd4c1e728e59351c0d6340968f69081c2022fd935e34d540a709",
+      "beleg_id": "01be023cb04983aee2c712ef3d3fab5833d232b72e5a7146b4ede9c32cb1659d",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 18 Pro · 2 TB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil L"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 12 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 438,95 € · monatlich 243,95 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-18-pro/polar-2-tb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17797&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=184&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D2_TB",
-      "zeitpunkt": "2026-11-08T07:26:26Z"
+      "zeitpunkt": "2026-11-09T07:53:02Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -4974,15 +6732,16 @@
    ],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 90,
-    "beendet": 88,
+    "anfragen": 102,
+    "beendet": 99,
     "dokument": "complete",
     "geladen": true,
     "offen": {
+     "bf72977jfz.bf.dynatrace.com": 2,
      "onebot-webfrontend.oneai.yo-digital.com": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 134.2,
+    "sekunden": 136.7,
     "takte_ms": 1450,
     "wartet_auf": "load"
    },
@@ -4998,7 +6757,7 @@
     "knoepfe_gefunden": 72,
     "knoepfe_gesucht": 72
    },
-   "verworfen": 37
+   "verworfen": 97
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17e/weiss-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
@@ -5016,9 +6775,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "1d64c5a4de0800765b0755ffa90cdd53217afd223ac586ae98e9b8f9c14f1592",
+      "beleg_id": "3ab5b8d4f41b329582bfe78034bc7067a0c6ee3a2a28bda7c70df51a4117898c",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 17e · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil XL"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 36 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 40,95 € · monatlich 100,15 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17e/weiss-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=15.2&instalmentId=36",
-      "zeitpunkt": "2026-11-08T07:29:44Z"
+      "zeitpunkt": "2026-11-09T07:56:21Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5057,9 +6835,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "33fe3427d6c02067cd762347d31b051f45f107e31da7af89f2ec2f2f27e7a4d4",
+      "beleg_id": "48051ac51a67f80e1b341f3d419ea65bbf90b4acea64e7a285798563c34faa55",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 17e · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil XL"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 24 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 40,95 € · monatlich 107,75 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17e/weiss-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=22.8&instalmentId=24",
-      "zeitpunkt": "2026-11-08T07:29:44Z"
+      "zeitpunkt": "2026-11-09T07:56:24Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5098,9 +6895,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "486935cd5f7ea65ab515031057679a4b557d0fec03a1838f9b267e129b292954",
+      "beleg_id": "65abefbee0607d03c102f70b99e36d6b1e0dbd39f8554f232cbd9fee95f8f910",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 17e · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil XL"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 12 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 40,95 € · monatlich 130,55 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17e/weiss-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=45.6&instalmentId=12",
-      "zeitpunkt": "2026-11-08T07:29:46Z"
+      "zeitpunkt": "2026-11-09T07:56:27Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5139,9 +6955,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "d342d21dd7edbce2ec5f6bd51a74f999c2b20d915ffbe44af25b3a0c5182dfbc",
+      "beleg_id": "ecd5994f0e59c57663ed45f2e958edda405ea97cfd6adb756380eaf0597bca81",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 17e · 512 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil XL"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 36 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 40,95 € · monatlich 106,75 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17e/weiss-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=45.6&instalmentId=12&changedAttr%255B%255D=changedAttr.storage%253D512_GB",
-      "zeitpunkt": "2026-11-08T07:29:48Z"
+      "zeitpunkt": "2026-11-09T07:56:30Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5180,9 +7015,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "9c552f3987ed7d4e1fd105b022fa949157f4344dd468bc79bb7765b0a5ad291a",
+      "beleg_id": "0955cb3cae0bfeb484438d641d68fab0fa3f97fd21d07c4a28d8ca62624ca1c7",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 17e · 512 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil XL"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 24 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 40,95 € · monatlich 117,75 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17e/weiss-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=32.8&instalmentId=24&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-08T07:29:49Z"
+      "zeitpunkt": "2026-11-09T07:56:32Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5221,9 +7075,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a93ca4737f9eb81db0f2da96134bb243abc1367b25398c190732223463833bd8",
+      "beleg_id": "f9b4b6a35718ef9b81c23f3b3bb8db34df57ada585e4f567eb956a8c2d7be865",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: iPhone 17e · 512 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil XL"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 12 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 40,95 € · monatlich 150,55 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17e/weiss-512-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=65.6&instalmentId=12&changedAttr%5B%5D=changedAttr.storage%3D512_GB",
-      "zeitpunkt": "2026-11-08T07:29:50Z"
+      "zeitpunkt": "2026-11-09T07:56:34Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5256,16 +7129,17 @@
    ],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 94,
-    "beendet": 92,
+    "anfragen": 101,
+    "beendet": 98,
     "dokument": "complete",
     "geladen": true,
     "offen": {
+     "bf72977jfz.bf.dynatrace.com": 1,
      "onebot-webfrontend.oneai.yo-digital.com": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 133.8,
-    "takte_ms": 1500,
+    "sekunden": 134.0,
+    "takte_ms": 1450,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -5280,7 +7154,7 @@
     "knoepfe_gefunden": 36,
     "knoepfe_gesucht": 36
    },
-   "verworfen": 23
+   "verworfen": 55
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/google/google-pixel-11-pro-fold/obsidian-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
@@ -5298,9 +7172,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "e9d6868f42a070767301015c946f5a86a924bac40d6302c3c989a65f731ed309",
+      "beleg_id": "5c80c7dd4686075cf9173ddca4193fa384fc71cb2d0c06c9496661d332fd3950",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Pixel 11 Pro Fold · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil XL"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 36 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 338,95 € · monatlich 118,75 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-11-pro-fold/obsidian-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=33.8&instalmentId=36",
-      "zeitpunkt": "2026-11-08T07:33:07Z"
+      "zeitpunkt": "2026-11-09T07:59:53Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5339,9 +7232,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "e4c9eac6c9ac2ea72681f650090be1c1bac866186446ada3b0b5791c6723a066",
+      "beleg_id": "f618673757011eab8bed9d538d7a99a1e33049482809d3da9d3a1993801faa7e",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Pixel 11 Pro Fold · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil XL"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 24 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 338,95 € · monatlich 135,75 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-11-pro-fold/obsidian-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=50.8&instalmentId=24",
-      "zeitpunkt": "2026-11-08T07:33:08Z"
+      "zeitpunkt": "2026-11-09T07:59:56Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5380,9 +7292,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "37ab313cb4f01e0040bd0cb323edc0749482b1f0c20a38bdccc3b59636a00ca1",
+      "beleg_id": "99fad60e7aea5ab9f219e33930c8ba260c8e9bfa27171d792997802cecd8369d",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: Pixel 11 Pro Fold · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil XL"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 12 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 338,95 € · monatlich 186,55 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/google/google-pixel-11-pro-fold/obsidian-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=101.6&instalmentId=12",
-      "zeitpunkt": "2026-11-08T07:33:09Z"
+      "zeitpunkt": "2026-11-09T07:59:58Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5415,16 +7346,17 @@
    ],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 90,
-    "beendet": 88,
+    "anfragen": 99,
+    "beendet": 96,
     "dokument": "complete",
     "geladen": true,
     "offen": {
+     "bf72977jfz.bf.dynatrace.com": 2,
      "onebot-webfrontend.oneai.yo-digital.com": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 133.7,
-    "takte_ms": 1450,
+    "sekunden": 133.8,
+    "takte_ms": 1400,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -5439,7 +7371,7 @@
     "knoepfe_gefunden": 18,
     "knoepfe_gesucht": 18
    },
-   "verworfen": 15
+   "verworfen": 39
   },
   {
    "adresse": "https://www.telekom.de/shop/geraet/motorola/motorola-edge-70-fusion/pantone-silhouette-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones",
@@ -5457,9 +7389,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "2f04df9adbbd9e5dfb4625c0fcaa9b6e383ac993c6e0e165f6a44db3577ed773",
+      "beleg_id": "67ef7e1da45c8657da5c2f54695deb4fd23fd9e1ecd8559295e701d5a81b898e",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: motorola edge 70 fusion · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil XL"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 12 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 40,95 € · monatlich 91,45 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/motorola/motorola-edge-70-fusion/pantone-silhouette-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=6.5&instalmentId=12",
-      "zeitpunkt": "2026-11-08T07:36:27Z"
+      "zeitpunkt": "2026-11-09T08:03:17Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5498,9 +7449,28 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "1f68061a1e0beb7d39667a639f97cda9bac78c1daf27aa21ffad793417bbe0da",
+      "beleg_id": "744f489882d60ce83e540e6f36287bfc6d92e751dde58f2513b7491d82230915",
+      "bildfolge": [
+       {
+        "schritt": "geraet_speicher",
+        "text": "Gerät und Speicher gewählt: motorola edge 70 fusion · 256 GB"
+       },
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: MagentaMobil XL"
+       },
+       {
+        "schritt": "laufzeit",
+        "text": "Laufzeit und Raten gewählt: 6 Monate"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: einmalig 40,95 € · monatlich 97,95 € (Gerät und Tarif zusammen)"
+       }
+      ],
+      "bildfolge_fehlt": [],
       "seite": "https://www.telekom.de/shop/geraet/motorola/motorola-edge-70-fusion/pantone-silhouette-256-gb?sortBy=popularityIndex&currentPage=3&tariffId=MF_17803&itemPerPage=24&excludedCurrentPage=1&forwardTradeInApplied=false&bp=acquisition&categoryId=smartphones&tariffCategoryId=smartphone-tarife&installmentValue=13&instalmentId=6",
-      "zeitpunkt": "2026-11-08T07:36:28Z"
+      "zeitpunkt": "2026-11-09T08:03:20Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -5533,16 +7503,17 @@
    ],
    "ladung": {
     "abstand_s": 10.0,
-    "anfragen": 88,
-    "beendet": 87,
+    "anfragen": 100,
+    "beendet": 98,
     "dokument": "complete",
     "geladen": true,
     "offen": {
+     "bf72977jfz.bf.dynatrace.com": 2,
      "binkiesproductionweu.servicebus.windows.net": 1,
      "onebot-webfrontend.oneai.yo-digital.com": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 133.9,
+    "sekunden": 133.8,
     "takte_ms": 1350,
     "wartet_auf": "load"
    },
@@ -5558,7 +7529,7 @@
     "knoepfe_gefunden": 12,
     "knoepfe_gesucht": 12
    },
-   "verworfen": 14
+   "verworfen": 32
   }
  ],
  "ueberfaellig": [
@@ -5574,5 +7545,5 @@
  ],
  "uebersichten": [],
  "vertragsform": "tarif_plus_ratenkauf",
- "zeitbudget_sekunden": 10238
+ "zeitbudget_sekunden": 10256
 }

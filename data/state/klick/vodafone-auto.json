@@ -1,7 +1,7 @@
 {
  "anbieter": "vodafone-auto",
- "datum": "2026-11-08",
- "dauer_sekunden": 812.9,
+ "datum": "2026-11-09",
+ "dauer_sekunden": 820.1,
  "format": 1,
  "frischegrenze_tage": 3,
  "grund": null,
@@ -26,9 +26,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "b401a8c7af973849e703e6224ee3be71e1d042770bb3a6f7a3984b8d0a9a3245",
+      "beleg_id": "989f998fe6cd657bd29d68e5ccc26a6af513d1bdd6b474b14a65447205d88914",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 267"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 76,95 € (Gerät und Tarif zusammen) · Zuzahlung 253,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 256 GB",
+       "laufzeit: Seite markiert nichts statt 36"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T05:52:43Z"
+      "zeitpunkt": "2026-11-09T06:02:42Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -74,9 +88,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "381abd4cd61ab4d499350636143c785d35b9905f7b42fa11ef977f91bd34fd6a",
+      "beleg_id": "cd2e88ead2375f5ad13a1c9529af4cf24d298c08e5f815002627dc3ea07ef8f4",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 268"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 86,95 € (Gerät und Tarif zusammen) · Zuzahlung 253,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 256 GB",
+       "laufzeit: Seite markiert nichts statt 36"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T05:52:44Z"
+      "zeitpunkt": "2026-11-09T06:02:43Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -122,9 +150,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "6903bb20d5e96cd74fdcb7c5bcc1e1fbe41e9a4ee79d166b8e86a9f463461e8f",
+      "beleg_id": "d59263478f9b1db31a8afcc93fcc6af03f2539503c1f544eca870da66c30a247",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 269"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 85,85 € (Gerät und Tarif zusammen) · Zuzahlung 253,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 256 GB",
+       "laufzeit: Seite markiert nichts statt 36"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T05:52:45Z"
+      "zeitpunkt": "2026-11-09T06:02:44Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -170,9 +212,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "737bbec785d86bf6f40fc9f1f1f62b121e044c0be90f117ad18027999ae8b8e6",
+      "beleg_id": "ad241bb8828eeb853bd45248d9a8d105d028fdcef39e2fadcf9df2645030aac7",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 270"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 92,35 € (Gerät und Tarif zusammen) · Zuzahlung 253,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 256 GB",
+       "laufzeit: Seite markiert nichts statt 36"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T05:52:46Z"
+      "zeitpunkt": "2026-11-09T06:02:45Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -218,9 +274,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "786fa7ebb9031b15476ec18e451a0c181257bf9a35d163de4beae40660796f8e",
+      "beleg_id": "950dc2e34ad9f7fed6e450960daf0210fe9564ae67c94b45584e019eddeb65a7",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 271"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 104,85 € (Gerät und Tarif zusammen) · Zuzahlung 253,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 256 GB",
+       "laufzeit: Seite markiert nichts statt 36"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T05:52:46Z"
+      "zeitpunkt": "2026-11-09T06:02:46Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -266,9 +336,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "8c556b6695e0e7af324eefeab35ec833cddb3566ec4e2f6fe1d245eea57366d4",
+      "beleg_id": "cf37d4bfbf00466107ef2a709aa5a02103457def35b149415382b94b394eb1e9",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 267"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 104,70 € (Gerät und Tarif zusammen) · Zuzahlung 253,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 256 GB",
+       "laufzeit: Seite markiert nichts statt 24"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T05:53:50Z"
+      "zeitpunkt": "2026-11-09T06:03:52Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -314,9 +398,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "fa82b2ff89fc5c3d3d3ca451c65bcc743f7f092fb937e62544593f2b98902f38",
+      "beleg_id": "f71d0716d61335e58bfef44fc9f1384bc3f81b76018f2da5880db303d5fdaa51",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 268"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 114,70 € (Gerät und Tarif zusammen) · Zuzahlung 253,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 256 GB",
+       "laufzeit: Seite markiert nichts statt 24"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T05:53:51Z"
+      "zeitpunkt": "2026-11-09T06:03:53Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -362,9 +460,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "7bec3339dcc8a5c1fc6a8063034682c96ee72ff40f8f058d26bfa89f6604c5fc",
+      "beleg_id": "99384e3e04eb00460e2712a34263e03060f392edc65a41f571e870adc58d8fef",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 269"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 113,10 € (Gerät und Tarif zusammen) · Zuzahlung 253,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 256 GB",
+       "laufzeit: Seite markiert nichts statt 24"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T05:53:52Z"
+      "zeitpunkt": "2026-11-09T06:03:54Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -410,9 +522,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "93a1e61c2a63e925f5737553ad2f5f36bc1d202213716afc05b7bd569972ef13",
+      "beleg_id": "3f4b7ed527ea83deb2d9c3737e7f2b0858ea27fb0369d97cc768e1f12b91dc3a",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 270"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 119,35 € (Gerät und Tarif zusammen) · Zuzahlung 253,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 256 GB",
+       "laufzeit: Seite markiert nichts statt 24"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T05:53:53Z"
+      "zeitpunkt": "2026-11-09T06:03:55Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -458,9 +584,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "72584874d21534a1d1b91c81ff7e5948594802b8fccfabb750ed9d888298e650",
+      "beleg_id": "792f510471437e9ccbfda382b1e09e98680e19f2faf83571e2740f61aeb2a67d",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 271"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 131,10 € (Gerät und Tarif zusammen) · Zuzahlung 253,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 256 GB",
+       "laufzeit: Seite markiert nichts statt 24"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T05:53:53Z"
+      "zeitpunkt": "2026-11-09T06:03:56Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -506,9 +646,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "c83fcc36b23ebe327ab8ed5e3f68a1d833ad9e401c85b279c986ddc9ad1505d0",
+      "beleg_id": "51d60dbe6ce06561e5257b81ae803100a4ed9c5987eb324d6e74cce6d330294a",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 267"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 187,95 € (Gerät und Tarif zusammen) · Zuzahlung 253,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 256 GB",
+       "laufzeit: Seite markiert nichts statt 12"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T05:55:01Z"
+      "zeitpunkt": "2026-11-09T06:05:01Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -554,9 +708,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "47aec17b466cee7f8706b1fff5c57d4c8de812597771750ae16140a2cdf25814",
+      "beleg_id": "08b0a91e84d4d5afadf9d8c1163c94b996865f19bba86e3093a12d9e312ec9d5",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 268"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 197,95 € (Gerät und Tarif zusammen) · Zuzahlung 253,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 256 GB",
+       "laufzeit: Seite markiert nichts statt 12"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T05:55:02Z"
+      "zeitpunkt": "2026-11-09T06:05:02Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -611,9 +779,23 @@
       }
      ],
      "beleg": {
-      "beleg_id": "605df043b1fe2c1cb94677d366b3985bd00f547bc40c8484bc329881d42b9b8a",
+      "beleg_id": "2852b91dd0e6c60a884abcdfc0c758bd2d1e38d8b9dc5eb89eecdd8830ce8fb0",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 269"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: Zuzahlung 253,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 256 GB",
+       "laufzeit: Seite markiert nichts statt 12"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T05:55:02Z"
+      "zeitpunkt": "2026-11-09T06:05:03Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -659,9 +841,23 @@
       }
      ],
      "beleg": {
-      "beleg_id": "3c14c8e901023e4d08ac470b37883142cd5b7635728e21b6a9c2830ca79e3293",
+      "beleg_id": "db65b77e3e5a81ab0baa5da13006ad97ce5665336172b82d742c99d9ae30189d",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 270"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: Zuzahlung 253,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 256 GB",
+       "laufzeit: Seite markiert nichts statt 12"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T05:55:03Z"
+      "zeitpunkt": "2026-11-09T06:05:04Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -707,9 +903,23 @@
       }
      ],
      "beleg": {
-      "beleg_id": "653753885a2a7f78fa7284fc6318483c97c668c61aa9bd4f1c9026ad9c540b37",
+      "beleg_id": "35b7b0f7e4288818660bd07a3563aa5989e50b4b4f6fc05ca17629731924b082",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 271"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: Zuzahlung 253,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 256 GB",
+       "laufzeit: Seite markiert nichts statt 12"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T05:55:04Z"
+      "zeitpunkt": "2026-11-09T06:05:05Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -746,9 +956,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "ec2976ba4b3466a1b5153e3ae64cfdfe6fdf40dc9e5d9841df53eb000c296ad3",
+      "beleg_id": "973a11e3f01ceecf63a0193f633275a2b1e1bd497fb394597eefafaca391785e",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 267"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 76,95 € (Gerät und Tarif zusammen) · Zuzahlung 505,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 512 GB",
+       "laufzeit: Seite markiert nichts statt 36"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T05:55:57Z"
+      "zeitpunkt": "2026-11-09T06:05:59Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -794,9 +1018,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "0ce876534a038be1307b333669b24c7431a40d975814cd85da76ff8926df4449",
+      "beleg_id": "8c0a425005c9f53efe0fab5923159f5f9340638a8fea2f5d480b1a83eb0794b9",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 268"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 86,95 € (Gerät und Tarif zusammen) · Zuzahlung 505,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 512 GB",
+       "laufzeit: Seite markiert nichts statt 36"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T05:55:57Z"
+      "zeitpunkt": "2026-11-09T06:06:00Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -842,9 +1080,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "dd945aa43bdc810189ee1e2a943bd3bee1450cac6c79ab2536e04b1df892187d",
+      "beleg_id": "0f78694982ac72343074c6854515b5a3c9b8cd18f6ac653dab838c1621389703",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 269"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 85,85 € (Gerät und Tarif zusammen) · Zuzahlung 505,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 512 GB",
+       "laufzeit: Seite markiert nichts statt 36"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T05:55:58Z"
+      "zeitpunkt": "2026-11-09T06:06:01Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -890,9 +1142,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "99e540d7223a153937dbd2408729748fa6fe3568c2b8584dd660587c7409ce1e",
+      "beleg_id": "66f3d7c8091b9aaa2143a41423a92dad85b40764e24c707171e37881dbb3769f",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 270"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 92,35 € (Gerät und Tarif zusammen) · Zuzahlung 505,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 512 GB",
+       "laufzeit: Seite markiert nichts statt 36"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T05:55:59Z"
+      "zeitpunkt": "2026-11-09T06:06:02Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -938,9 +1204,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "764ba39a137d73b340a41a13a8d20bf9c230415953618bbb9fc665e74d73ddc4",
+      "beleg_id": "ae52d13d316b1293a2181f974bf4c5fb6581bcc2109bc89452265e617c04ac77",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 271"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 104,85 € (Gerät und Tarif zusammen) · Zuzahlung 505,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 512 GB",
+       "laufzeit: Seite markiert nichts statt 36"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T05:56:00Z"
+      "zeitpunkt": "2026-11-09T06:06:03Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -986,9 +1266,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "4b955b0c6dd607a264e4c009fd2ff08506f9e6ad929a08e68a0fbbbdab492527",
+      "beleg_id": "e2dd3a087215a69094c565fa48e0f16be3da7c60e3b18f12da4448e9ccd79a1d",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 267"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 104,70 € (Gerät und Tarif zusammen) · Zuzahlung 505,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 512 GB",
+       "laufzeit: Seite markiert nichts statt 24"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T05:57:09Z"
+      "zeitpunkt": "2026-11-09T06:07:09Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1034,9 +1328,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "fd952953152b08c534cf3fa59f3f9bbfd465d1e0ba4abfbce091ce913c76f0e8",
+      "beleg_id": "78287036e155a0a0516e858fed276fad28d1e7c85a7acdb8641c1d8614c4e1e6",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 268"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 114,70 € (Gerät und Tarif zusammen) · Zuzahlung 505,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 512 GB",
+       "laufzeit: Seite markiert nichts statt 24"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T05:57:09Z"
+      "zeitpunkt": "2026-11-09T06:07:10Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1082,9 +1390,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "1c1338556e4494541e0976f95df53ada9c32f9d970791263b087ecc76f538a93",
+      "beleg_id": "0952592eed4ded9fbb2ac8dc4608f3bcba0db6f9c9e62e9400741a2a09bc4872",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 269"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 113,10 € (Gerät und Tarif zusammen) · Zuzahlung 505,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 512 GB",
+       "laufzeit: Seite markiert nichts statt 24"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T05:57:10Z"
+      "zeitpunkt": "2026-11-09T06:07:11Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1130,9 +1452,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "2ebf8a0240efea720dc95437b7d1588c376032cec887bff0e88b3d1f096e5cce",
+      "beleg_id": "af523e7f3a5bf29d61e118d1793a5188bcfc0f3b9ceb6548d71b9c20c2eeada5",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 270"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 119,35 € (Gerät und Tarif zusammen) · Zuzahlung 505,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 512 GB",
+       "laufzeit: Seite markiert nichts statt 24"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T05:57:11Z"
+      "zeitpunkt": "2026-11-09T06:07:12Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1178,9 +1514,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "c7113b82884d73e7d24e3c48c231b09449d837ab3724383eda6b1fe016168fe7",
+      "beleg_id": "839aa75e9f60201834b6bf83759b81d46dbfa48a7e98e7c93d98b15ea8852326",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 271"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 131,10 € (Gerät und Tarif zusammen) · Zuzahlung 505,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 512 GB",
+       "laufzeit: Seite markiert nichts statt 24"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T05:57:12Z"
+      "zeitpunkt": "2026-11-09T06:07:13Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1226,9 +1576,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "c6489829a572026e68a747aa162b3896a3cadc856561e2e4adcc3ac142948f16",
+      "beleg_id": "edeefe21491700f4874b222c7641a9a085932bd75916808c4375b2ee3b2ead06",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 267"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 187,95 € (Gerät und Tarif zusammen) · Zuzahlung 505,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 512 GB",
+       "laufzeit: Seite markiert nichts statt 12"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T05:58:18Z"
+      "zeitpunkt": "2026-11-09T06:08:20Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1274,9 +1638,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "15a140d08fb70c514ac3b8a2a1bebe0ac7e7aab5caa55370b80c68b974c2d4b7",
+      "beleg_id": "df51e838294458b57e7a0ef2692e9303576df26fefc4a6f2de7c7576a546919d",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 268"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 197,95 € (Gerät und Tarif zusammen) · Zuzahlung 505,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 512 GB",
+       "laufzeit: Seite markiert nichts statt 12"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T05:58:19Z"
+      "zeitpunkt": "2026-11-09T06:08:21Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1331,9 +1709,23 @@
       }
      ],
      "beleg": {
-      "beleg_id": "cd9cf8efd27d9c4848bf13638fd7678a16a1aa8c214e6162e13007bc5a4fcceb",
+      "beleg_id": "05acb3da535352de41f8d56f1af9ba94f5f483674f263b3f004b09e4d3250b06",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 269"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: Zuzahlung 505,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 512 GB",
+       "laufzeit: Seite markiert nichts statt 12"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T05:58:20Z"
+      "zeitpunkt": "2026-11-09T06:08:22Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1379,9 +1771,23 @@
       }
      ],
      "beleg": {
-      "beleg_id": "2404c56f3eddd425de023a069e5f86ff5708726666a5dedb26d74b2cdfdf350a",
+      "beleg_id": "7ad25f0c8504dd1b813a830b16a838022e83631c732bae26630db95c36c2aa75",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 270"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: Zuzahlung 505,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 512 GB",
+       "laufzeit: Seite markiert nichts statt 12"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T05:58:20Z"
+      "zeitpunkt": "2026-11-09T06:08:23Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1427,9 +1833,23 @@
       }
      ],
      "beleg": {
-      "beleg_id": "26c549fad5241a39be203778a1cb65482faae02aa894b39e922d8cedf192d90b",
+      "beleg_id": "6bb506b47861a56b4a8f8a33c8322552254652d95c1798c28616601b7297898a",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 271"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: Zuzahlung 505,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 512 GB",
+       "laufzeit: Seite markiert nichts statt 12"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T05:58:21Z"
+      "zeitpunkt": "2026-11-09T06:08:24Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1466,9 +1886,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "83875354a197b220d8b7f8930fdc5b42da41fe9e0127d8b015af04c5e4fc1cfa",
+      "beleg_id": "66812a36a5d755c6fe597a779e1961b33b46916e3133d45e4991c27532000b0b",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 267"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 76,95 € (Gerät und Tarif zusammen) · Zuzahlung 990,99 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 1 TB",
+       "laufzeit: Seite markiert nichts statt 36"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T05:59:15Z"
+      "zeitpunkt": "2026-11-09T06:09:18Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1514,9 +1948,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "63270a74e6729a3238a9bce9f4557109a4168f41ef7cdf1ea285b05a00d592d1",
+      "beleg_id": "b46ae97eb3f97ce9320f818ca8e9a5eac1a70bb5126b2001e6b5893f685f20e1",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 268"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 86,95 € (Gerät und Tarif zusammen) · Zuzahlung 990,99 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 1 TB",
+       "laufzeit: Seite markiert nichts statt 36"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T05:59:16Z"
+      "zeitpunkt": "2026-11-09T06:09:19Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1562,9 +2010,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "42e119d95b1ab775fdd4c3ea35c974f438c0df72a0876c30728d832a2b855b10",
+      "beleg_id": "5e2645ce74c382b1bea5062898d06a4db1fe958d6af10e0343725cb78e3b6f6d",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 269"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 85,85 € (Gerät und Tarif zusammen) · Zuzahlung 990,99 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 1 TB",
+       "laufzeit: Seite markiert nichts statt 36"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T05:59:17Z"
+      "zeitpunkt": "2026-11-09T06:09:20Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1610,9 +2072,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "a22bf049d20bdac60d4de42b7002435225b93c5076f532a84851077119bbf523",
+      "beleg_id": "2ff3583f99d88c56a3ba6c254ffe7f4dec41808afe9041a9108af3b230794e2b",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 270"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 92,35 € (Gerät und Tarif zusammen) · Zuzahlung 990,99 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 1 TB",
+       "laufzeit: Seite markiert nichts statt 36"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T05:59:18Z"
+      "zeitpunkt": "2026-11-09T06:09:21Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1658,9 +2134,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "7553c7963d65844fa0bb0f181c845fa8d772f0811894f85b5965f3b5c0eb4060",
+      "beleg_id": "284dc873ee40d95b8903d38bd8af0565f440d61b04bec11ae59597adb3a1fd2f",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 271"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 104,85 € (Gerät und Tarif zusammen) · Zuzahlung 990,99 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 1 TB",
+       "laufzeit: Seite markiert nichts statt 36"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T05:59:18Z"
+      "zeitpunkt": "2026-11-09T06:09:22Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1706,9 +2196,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "f424f7e79884a6e249dccce08fb28c3b03b01bb4e48c1224e3ffb134afc9bfa6",
+      "beleg_id": "b3c9a80baee5fa78e9ca91c9e3d8e9f454437aef99f1b7c6435992a1bd7c22c9",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 267"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 104,70 € (Gerät und Tarif zusammen) · Zuzahlung 990,99 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 1 TB",
+       "laufzeit: Seite markiert nichts statt 24"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T06:00:25Z"
+      "zeitpunkt": "2026-11-09T06:10:30Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1754,9 +2258,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "c7abd0ed31557b7451a4f62419d503c795cead353df98e71674cc95e127af871",
+      "beleg_id": "933b50c934541dbf724b3d77716fbfabc1f486bcf00b797c2b5817e16f99b1f1",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 268"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 114,70 € (Gerät und Tarif zusammen) · Zuzahlung 990,99 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 1 TB",
+       "laufzeit: Seite markiert nichts statt 24"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T06:00:26Z"
+      "zeitpunkt": "2026-11-09T06:10:31Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1802,9 +2320,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "62669d24234ae6e74a21f5dfba116b790c23646d882b3b8bc46ff44346742e08",
+      "beleg_id": "e34a6d108286fa19cde170521cf12ef4ffe7e6f44030d9c14276b1b124747802",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 269"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 113,10 € (Gerät und Tarif zusammen) · Zuzahlung 990,99 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 1 TB",
+       "laufzeit: Seite markiert nichts statt 24"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T06:00:27Z"
+      "zeitpunkt": "2026-11-09T06:10:32Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1850,9 +2382,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "ebe762cfe0461240525938e47ec2e0dbd8cb5bce21a5195accfdf97931b2eb68",
+      "beleg_id": "fb966e2a96fbb1740d84abf749d50c9770266c4cd31a14beb0d682ac0ae341ef",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 270"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 119,35 € (Gerät und Tarif zusammen) · Zuzahlung 990,99 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 1 TB",
+       "laufzeit: Seite markiert nichts statt 24"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T06:00:28Z"
+      "zeitpunkt": "2026-11-09T06:10:33Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1898,9 +2444,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "e937fd722ca083ef6f532defe920214ef569d3f59889b31303eb4963f14df7b6",
+      "beleg_id": "3840277c8ffa603d89156752d1c7efbed49fcffea55d370cd17cfb9763d168b8",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 271"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 131,10 € (Gerät und Tarif zusammen) · Zuzahlung 990,99 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 1 TB",
+       "laufzeit: Seite markiert nichts statt 24"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T06:00:28Z"
+      "zeitpunkt": "2026-11-09T06:10:34Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1946,9 +2506,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "9efc561aceea474b62e8556c9d6c5c795413a89d63e3afc1c0387897eb035560",
+      "beleg_id": "1a1c3eb4728dcd558caba684e9c75578e19b3731fd9454fa9d00ee178d8443e5",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 267"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 187,95 € (Gerät und Tarif zusammen) · Zuzahlung 990,99 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 1 TB",
+       "laufzeit: Seite markiert nichts statt 12"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T06:01:38Z"
+      "zeitpunkt": "2026-11-09T06:11:40Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -1994,9 +2568,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "78966c7cf01186f004e7c825c1e470956ea699e63fb10154b94d0749bb86f521",
+      "beleg_id": "189d99a5410f35004f39f9497300e907f5b062a30e8f896a59ab92cc402eab26",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 268"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 197,95 € (Gerät und Tarif zusammen) · Zuzahlung 990,99 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 1 TB",
+       "laufzeit: Seite markiert nichts statt 12"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T06:01:38Z"
+      "zeitpunkt": "2026-11-09T06:11:41Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2051,9 +2639,23 @@
       }
      ],
      "beleg": {
-      "beleg_id": "cad13132713e46cc2fc7c120fb123481e126bb3f503f868832a03b3930bb4a68",
+      "beleg_id": "aa75147839e45852bf5914d57e1982193fe99fb69712e147520f07a54a61a63f",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 269"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: Zuzahlung 990,99 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 1 TB",
+       "laufzeit: Seite markiert nichts statt 12"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T06:01:39Z"
+      "zeitpunkt": "2026-11-09T06:11:42Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2099,9 +2701,23 @@
       }
      ],
      "beleg": {
-      "beleg_id": "38e2e8977cd250b8df0d911fc06597633c9a13114026d17ef1871499b7388e17",
+      "beleg_id": "3942423767e3701a3e42a41b3c9e4eb071d69d63999a53ea4439908163afd08d",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 270"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: Zuzahlung 990,99 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 1 TB",
+       "laufzeit: Seite markiert nichts statt 12"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T06:01:40Z"
+      "zeitpunkt": "2026-11-09T06:11:43Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2147,9 +2763,23 @@
       }
      ],
      "beleg": {
-      "beleg_id": "0f4a03a8dd8011be7fbd1fd932eab6b63d476d1c36049fab5abc772eeb5363a7",
+      "beleg_id": "d8cd08d2cc2fe4c0d4b7e053b6224907b19999d704c0522be413a2bf84190192",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 271"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: Zuzahlung 990,99 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 1 TB",
+       "laufzeit: Seite markiert nichts statt 12"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T06:01:41Z"
+      "zeitpunkt": "2026-11-09T06:11:44Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2186,9 +2816,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "ffa1ceb8ed02e02b47047ffcfe1a5ce78a304cd29feb0f5ce2fbf6861cfd3de2",
+      "beleg_id": "bad987e195b04f230773c9d56b2466ad75fdc192ad05e6dac81a5a473233aabf",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 267"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 76,95 € (Gerät und Tarif zusammen) · Zuzahlung 1.729,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 2 TB",
+       "laufzeit: Seite markiert nichts statt 36"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T06:02:35Z"
+      "zeitpunkt": "2026-11-09T06:12:39Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2234,9 +2878,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "ebd3a2ecdd2d4d93818839dc3d244051f91a3e83d49de504053352850f235da7",
+      "beleg_id": "81ae870cb91b89ec13f2d61c7fb2363164c997da94d16d0ddee072f9f9cac4e8",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 268"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 86,95 € (Gerät und Tarif zusammen) · Zuzahlung 1.729,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 2 TB",
+       "laufzeit: Seite markiert nichts statt 36"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T06:02:36Z"
+      "zeitpunkt": "2026-11-09T06:12:40Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2282,9 +2940,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "7fd73f20d8669798c642a128bb0ab7b303142e4e98fa924aee9cf4b4d8390146",
+      "beleg_id": "40ad89632ec7d7e81edf8d7bdd63fa8a290dc0f8cacdff6eca6c5be27816b4d5",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 269"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 85,85 € (Gerät und Tarif zusammen) · Zuzahlung 1.729,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 2 TB",
+       "laufzeit: Seite markiert nichts statt 36"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T06:02:37Z"
+      "zeitpunkt": "2026-11-09T06:12:41Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2330,9 +3002,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "ea7e0f07b70096a055a2fa8ff478c75bbceb180148625602dfb1664e4a89372b",
+      "beleg_id": "218a803b06e8463be766f83e0abf5280053c167ee44bdba8d0a4e274d7b75e3b",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 270"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 92,35 € (Gerät und Tarif zusammen) · Zuzahlung 1.729,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 2 TB",
+       "laufzeit: Seite markiert nichts statt 36"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T06:02:37Z"
+      "zeitpunkt": "2026-11-09T06:12:42Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2378,9 +3064,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "4c8601c8182f9db57f25a4be985e933f1fe47313618b75748e38a5ecb84b8080",
+      "beleg_id": "2d912906f33bc3ed20fb1f4cf4762dea017a5c49a4d05bdf4c71de3aac6080b6",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 271"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 104,85 € (Gerät und Tarif zusammen) · Zuzahlung 1.729,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 2 TB",
+       "laufzeit: Seite markiert nichts statt 36"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T06:02:38Z"
+      "zeitpunkt": "2026-11-09T06:12:43Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2426,9 +3126,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "c5f91579e9cb3cad7472ca15cee73df01d7c8362301890f6a5cf8d02104ed228",
+      "beleg_id": "252608af1d847312d5f1767c230d6bd37b4ba0f662ec5e44f5e32027bb8645b0",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 267"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 104,70 € (Gerät und Tarif zusammen) · Zuzahlung 1.729,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 2 TB",
+       "laufzeit: Seite markiert nichts statt 24"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T06:03:46Z"
+      "zeitpunkt": "2026-11-09T06:13:52Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2474,9 +3188,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "5e5748ca7cc205848a8f8c0e3a10ed51715f94432cd41a083511509beee8dd49",
+      "beleg_id": "a08ae93845149451a23700599eb2c74ce7a5950498a464c82a6830e025fa2ba9",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 268"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 114,70 € (Gerät und Tarif zusammen) · Zuzahlung 1.729,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 2 TB",
+       "laufzeit: Seite markiert nichts statt 24"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T06:03:47Z"
+      "zeitpunkt": "2026-11-09T06:13:53Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2522,9 +3250,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "88c16da5046c1b7df4bcccdd71bc4532f9f09aa3ca3ea8ca09b41decaf1497f4",
+      "beleg_id": "75a72b739836ec373de2cb1eb9a427bd94b4c37dd56e488f7aea599de38448d0",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 269"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 113,10 € (Gerät und Tarif zusammen) · Zuzahlung 1.729,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 2 TB",
+       "laufzeit: Seite markiert nichts statt 24"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T06:03:48Z"
+      "zeitpunkt": "2026-11-09T06:13:54Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2570,9 +3312,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "c41958f4fd38a2ea537aa057af9d415d56e4805430db72ab8d32541afe4edbb4",
+      "beleg_id": "339719229690084131f447429d27037961afd4212177f5e0d808aa23ad6a9080",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 270"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 119,35 € (Gerät und Tarif zusammen) · Zuzahlung 1.729,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 2 TB",
+       "laufzeit: Seite markiert nichts statt 24"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T06:03:49Z"
+      "zeitpunkt": "2026-11-09T06:13:55Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2618,9 +3374,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "3a94497e376cfddf10a46c3e806538bfc5a3a49d34245f1e25c1117be948493b",
+      "beleg_id": "727e52f1a4da3f28b44b0e9b476fb2f4f29c2e7c571411f152004ba450c4d3fa",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 271"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 131,10 € (Gerät und Tarif zusammen) · Zuzahlung 1.729,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 2 TB",
+       "laufzeit: Seite markiert nichts statt 24"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T06:03:49Z"
+      "zeitpunkt": "2026-11-09T06:13:56Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2666,9 +3436,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "3a4b93850ff200de8e6d48dc44527b745ff84f40ea604ca6d676951b4cd54ae3",
+      "beleg_id": "524e556f292a4e6fef394bed9180626edb67716035e093e12241f45e14055466",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 267"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 187,95 € (Gerät und Tarif zusammen) · Zuzahlung 1.729,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 2 TB",
+       "laufzeit: Seite markiert nichts statt 12"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T06:04:56Z"
+      "zeitpunkt": "2026-11-09T06:15:04Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2714,9 +3498,23 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "c6b89ebf873694681e2a1c81033d038e9844be493b4b96f1bfda3a16c5202d81",
+      "beleg_id": "9f2b14dd55ff69349ad81fe801b82b247e09c0c6102f370a7e3f45b5938044a0",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 268"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: monatlich 197,95 € (Gerät und Tarif zusammen) · Zuzahlung 1.729,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 2 TB",
+       "laufzeit: Seite markiert nichts statt 12"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T06:04:56Z"
+      "zeitpunkt": "2026-11-09T06:15:05Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2771,9 +3569,23 @@
       }
      ],
      "beleg": {
-      "beleg_id": "1dff5397f0668c6c68eb9ba51ac45bce86430ed767841adddf9f791615957f16",
+      "beleg_id": "72c064736d211f0d9a1d340ea6d614738af86f78463c60ea54a4aaba28826d90",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 269"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: Zuzahlung 1.729,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 2 TB",
+       "laufzeit: Seite markiert nichts statt 12"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T06:04:57Z"
+      "zeitpunkt": "2026-11-09T06:15:06Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2819,9 +3631,23 @@
       }
      ],
      "beleg": {
-      "beleg_id": "a652994828e451510195042ac51db27243b49bd9502824d6e152d76b41002c79",
+      "beleg_id": "89677ea79b3c3e237a2869e4e984de156771652606530b70e4e34e4bece372d9",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 270"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: Zuzahlung 1.729,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 2 TB",
+       "laufzeit: Seite markiert nichts statt 12"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T06:04:58Z"
+      "zeitpunkt": "2026-11-09T06:15:07Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2867,9 +3693,23 @@
       }
      ],
      "beleg": {
-      "beleg_id": "0b0f1f48096d52cf4b4376008ace0a56a67d8a5e8dbb33a488ac1a5c5cb492f4",
+      "beleg_id": "e16fd902a64ad7afba52cf774a01aeb1d3292185a64616634c9025506f86a54d",
+      "bildfolge": [
+       {
+        "schritt": "tarif",
+        "text": "Tarif gewählt: 271"
+       },
+       {
+        "schritt": "preis",
+        "text": "Im Bild: Zuzahlung 1.729,00 €"
+       }
+      ],
+      "bildfolge_fehlt": [
+       "geraet_speicher: Seite markiert nichts statt 2 TB",
+       "laufzeit: Seite markiert nichts statt 12"
+      ],
       "seite": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
-      "zeitpunkt": "2026-11-08T06:04:59Z"
+      "zeitpunkt": "2026-11-09T06:15:08Z"
      },
      "beleg_status": "offen",
      "buendel": null,
@@ -2900,16 +3740,16 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 161,
-    "beendet": 157,
+    "anfragen": 159,
+    "beendet": 158,
     "dokument": "complete",
     "geladen": true,
     "offen": {
-     "www.vodafone.de": 4
+     "tags.vodafone.de": 1
     },
     "ohne_antwort_ms": 0,
     "sekunden": 16.0,
-    "takte_ms": 12100,
+    "takte_ms": 12300,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -2930,5 +3770,5 @@
  "ueberfaellig": [],
  "uebersichten": [],
  "vertragsform": "tarif_plus_ratenkauf",
- "zeitbudget_sekunden": 10242
+ "zeitbudget_sekunden": 10253
 }
