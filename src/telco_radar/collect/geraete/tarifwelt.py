@@ -203,7 +203,7 @@ def rangliste_je_band(saetze: list[dict], leiter_gb) -> dict[str, list[dict]]:
     Bericht (`band_regel.stufe_fuer`, der Baustein hinter
     `report.geraete_tco_band.band_von_gb`; Sammeln importiert die
     Berichtsschicht nicht, `.importlinter`): naechstes Volumen, Gleichstand
-    das groessere, unbegrenzt nur in ein unbegrenztes Band. Ein Tarif ohne
+    das groessere, unbegrenzt in die oberste Stufe. Ein Tarif ohne
     Band faellt weg. Je Band gewinnt das Volumen mit dem kleinsten Abstand
     zum Bandwert (Gleichstand: das groessere), danach der niedrigere
     Monatspreis. So steht kein Tarif in einem Band, in das der Bericht ihn
@@ -223,7 +223,10 @@ def rangliste_je_band(saetze: list[dict], leiter_gb) -> dict[str, list[dict]]:
 
         def rang(s: dict, ziel=ziel) -> tuple:
             gb = s["datenvolumen_gb"]
-            abstand = 0.0 if gb == ziel else abstand_schluessel(gb, ziel)[0]
+            unbegrenzt = gb == float("inf")
+            abstand = (
+                0.0 if unbegrenzt or gb == ziel else abstand_schluessel(gb, ziel)[0]
+            )
             preis = s.get("grundgebuehr")
             return (abstand, -gb, float("inf") if preis is None else preis)
 

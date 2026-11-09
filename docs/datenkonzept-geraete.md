@@ -236,7 +236,7 @@ Ergebnis je Datensatz: gültig, Quarantäne oder veraltet.
 1. Anzahlung + Rate × Ratenzahl = Gerätesumme auf der Seite.
 2. Gerätesumme zwischen 85 % und 130 % der UVP.
 3. Tarif mit Gerät ≥ SIM-only-Preis desselben Tarifs (trifft heute 846 o2-Bündel).
-4. Volumen passt zu Tarifname und Band; nie in ein Band mit mehr Volumen.
+4. Volumen passt zu Tarifname und Band; nie in ein Band mit mehr Volumen. Ein Tarif, dessen erfasstes Datenvolumen „unbegrenzt“ ist, gehört in die oberste Stufe XL (`band_regel.stufe_fuer`, eine Stelle für Sammeln und Bericht).
 5. Preis steigt mit dem Speicher beim selben Anbieter, Tarif und Laufzeit.
 6. Ratenlaufzeit ist 6, 12, 24 oder 36 und kommt aus dem Echo der Seite.
 7. Tarifbindung vorhanden, sonst Lücke.
@@ -249,6 +249,7 @@ Ergebnis je Datensatz: gültig, Quarantäne oder veraltet.
 14. Pflichtfelder vollständig (Zuzahlung, Rate, Ratenlaufzeit, Tarif, Tarifbindung, Anschluss).
 15. Vergleiche nur bei gleicher Ratenlaufzeit und gleichem Zeitraum H.
 16. Bündel älter als drei Tage nicht im Vergleich (gibt es schon).
+17. Ausnahme aus Daten, nicht aus Code je Anbieter: Ein Tarif auf `config/tarif_preis_widerspruch.yaml` („Preis am Original widersprüchlich“, mit Beleg) bleibt ohne Stufe, bis der Eintrag gelöscht wird; derzeit o2 Mobile Unlimited M.
 
 Umsetzung mit pydantic und pandera in pytest. Kennzahlen je Anbieter und Lauf auf der Quellen-Seite: Abdeckung (je Laufzeit), Frische, Quarantänequote, Konfliktquote, Belegquote.
 

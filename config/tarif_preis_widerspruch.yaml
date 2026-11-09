@@ -1,0 +1,19 @@
+# Tarife ohne Tarifstufe, weil ihr Preis am Original widersprüchlich ist.
+# Gelesen von `band_regel.preis_widerspruch()` (gilt für Sammeln und Bericht).
+# Ein Eintrag macht den Tarif und seine Plus-Fassung stufenlos ("Ohne Tarifband");
+# Preise und Zeilen bleiben, nur die Stufe fehlt. Entfernen: Eintrag löschen,
+# sobald der Preis am Original geklärt ist. Beleg ist Pflicht.
+tarife:
+  - tarif_id: "o2:o2-mobile-unlimited-m"
+    name: "o2 Mobile Unlimited M"
+    seit: "2026-11-09"
+    grund: >-
+      Tarifseite 29,99 EUR, Geräteweg 24,99 EUR (5 EUR Rabatt bei Kauf mit
+      Gerät), Kleingedrucktes am selben Geräteweg nennt 34,99 EUR und
+      "bis zu 125 GB" mit Drosselung und ab Monat 25 39,99 EUR. Welcher Preis
+      gilt und ob der Tarif unbegrenzt ist, ist am Original nicht belegt.
+    beleg: >-
+      telcoradar/arbeit/unlimited-0811.md, Abschnitt "Klärung 09.11.", Punkt 1;
+      Bilder telcoradar/abnahme/unlimited-0911/
+      o2-geraeteseite-monatliche-kosten-kleingedrucktes.png,
+      o2-tarifseite-unlimited-m.png, o2-geraeteseite-18pro-unlimited-m.png

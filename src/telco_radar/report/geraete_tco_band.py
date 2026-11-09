@@ -37,7 +37,7 @@ import re
 from dataclasses import dataclass
 from typing import Optional
 
-from ..band_regel import stufe_fuer
+from ..band_regel import ohne_preis_widerspruch, stufe_fuer
 from ..tarif_plus import mit_plus
 from . import geraete_tco_grafik
 from .anbieter_farben import farbe_fuer
@@ -144,8 +144,7 @@ def band_von_gb(gb, leiter: tuple[Stufe, ...]) -> Optional[str]:
 
     `None` heisst: nicht zuordenbar, und die Karte steht unter "Ohne
     Tarifband" statt in einer erfundenen Stufe. Das gilt fuer ein fehlendes
-    Volumen und fuer "unbegrenzt", solange keine Vodafone-Stufe selbst als
-    unbegrenzt erhoben ist; ist sie es, faellt unbegrenzt genau dorthin.
+    Volumen; "unbegrenzt" faellt in die oberste Stufe XL (`band_regel`).
     Der Abstand folgt `band_regel.abstand_schluessel` (Gleichstand: groesser).
     """
     return stufe_fuer(_zahl(gb), tuple((s.key, s.gb) for s in leiter))
@@ -173,11 +172,12 @@ def tarif_baender(tarife: dict, leiter: Optional[tuple[Stufe, ...]] = None) -> d
     Datenvolumen des Pflichtdokuments statt der aktuellen Lesart) - keine
     zweite Datenquelle, nur eine zweite Lesart derselben Datei. Die Leiter
     kommt aus demselben Bestand, wenn sie fehlt; Plus (`tarif_plus`) erbt das Grundband.
+    Tarife mit "Preis am Original widerspruechlich" bleiben ohne Stufe.
     """
     if leiter is None:
         leiter = tarifleiter(tarife)
     out: dict = {}
-    for tarif_id, tarif in (tarife or {}).items():
+    for tarif_id, tarif in ohne_preis_widerspruch(tarife).items():
         tarif = tarif or {}
         band = _eigene_stufe(tarif, leiter) or band_von_gb(
             tarif.get("datenvolumen_gb"), leiter

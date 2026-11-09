@@ -10,11 +10,12 @@ Gezählt wird aus zwei gemessenen Listen, zusammen und ohne Doppelzählung:
 der Tarifliste (`data/state/tarife.jsonl`, je Tarif das Datenvolumen, die Stufe
 kommt aus `band_je_tarif`) und den Bündeln aller Geräte (`karten`, Feld
 `band`). Beide ordnen dieselbe Regel (`band_regel.stufe_fuer`, nächstes
-Datenvolumen der Vodafone-Tarifleiter) zu. Ein Tarif ohne Stufe (unbegrenzt,
-ohne erhobenes Volumen) steht auf der Seite unter „Ohne Tarifband“; er könnte in
-jede Stufe fallen. Darum gilt der Anbieter dann als nicht bestimmbar und fehlt im
-Bestand: für ihn wird in keiner Stufe „keinen Tarif“ behauptet (fail-closed), ebenso
-für einen Anbieter ohne einen einzigen Tarif in irgendeiner Stufe.
+Datenvolumen der Vodafone-Tarifleiter) zu. Ein Tarif ohne Stufe (ohne erhobenes
+Volumen, oder mit am Original widersprüchlichem Preis) steht auf der Seite unter
+„Ohne Tarifband“; er könnte in jede Stufe fallen. Darum gilt der Anbieter dann
+als nicht bestimmbar und fehlt im Bestand: für ihn wird in keiner Stufe „keinen
+Tarif“ behauptet (fail-closed), ebenso für einen Anbieter ohne einen einzigen
+Tarif in irgendeiner Stufe.
 """
 
 from __future__ import annotations
@@ -22,8 +23,9 @@ from __future__ import annotations
 TARIFSTUFEN_REGEL = (
     "Die Stufen XS bis XL richten sich nach dem Datenvolumen in GB (Maßstab sind "
     "die Vodafone-Stufen), nicht nach dem Namen, den ein Anbieter seinem Tarif "
-    "gibt: ein Tarif namens „S“ kann deshalb in M stehen. Fällt kein Tarif eines "
-    "Anbieters in eine Stufe, bleibt sie bei ihm leer."
+    "gibt: ein Tarif namens „S“ kann deshalb in M stehen. Ein Tarif mit "
+    "unbegrenztem Datenvolumen steht in der obersten Stufe XL. Fällt kein Tarif "
+    "eines Anbieters in eine Stufe, bleibt sie bei ihm leer."
 )
 FESTNETZ = "festnetz"
 KEIN_TARIF_KURZ = "Kein Tarif in dieser Datenstufe"
