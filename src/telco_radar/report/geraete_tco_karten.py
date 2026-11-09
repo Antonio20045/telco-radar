@@ -50,6 +50,7 @@ from typing import Optional
 
 from .. import tco_kosten as _kosten
 from ..analyze.geraete_pruefstatus import HERLEITUNG_EINMALZAHLUNG
+from ..band_regel import band_der_karte
 from ..geraete_model import VERGLEICHBARE_ZUSTAENDE, ZUSTAENDE, normalisiere
 from ..tarif_model import QUELLE_KLICK, Preisphase, vor_dem_blatt
 from ..tco_kosten import POSTEN_ZEITRAUM, belegte_phasen, tarifpreis_im_monat
@@ -78,6 +79,7 @@ from . import anbieter_farben, geraete_preisstand, geraete_rechnung, geraete_ver
 from . import geraete_notbremse as notbremse
 from .geraete_tco_grafik import anbieter_slug
 from .geraete_zeitraum_wort import zeitraum_text
+from .geraete_zerlegung import zerlegung_balken
 
 LAUFZEIT = TCO_HORIZONT
 AB_MONAT = TCO_HORIZONT + 1
@@ -527,73 +529,6 @@ def _bestandteile_mit_kategorie(posten_je_name: dict) -> list:
     return posten
 
 
-_ZERLEGUNG_RATENKATEGORIEN = ("raten", "buendel")
-LABEL_RESTSCHULD = "Restschuld nach Monat 24"
-
-
-def zerlegung_balken(
-    bestandteile: list, restbetrag: Optional[float], gesamt: Optional[float]
-) -> list:
-    """Die Segmente des Zerlegungsbalkens, mit ihrem Breitenanteil `pct`.
-
-    Ohne `gesamt` (die Kennzahl ist nicht belastbar) oder ohne einen
-    einzigen Posten gibt es keinen Balken - eine leere Liste, kein Balken
-    aus Teilbeträgen ohne Summe (Regel 9: eine Lücke bleibt eine Lücke).
-
-    Review-Fix S3 (mitgenommen): ein Segment mit Betrag exakt 0,00 EUR
-    (eine gemessene "keine Zuzahlung"/"kein Anschlusspreis", Clean Code 3
-    - 0 ist hier eine Aussage, kein fehlender Wert) bekommt keinen
-    eigenen Balkenteil. Der Posten steht textlich ohnehin schon im
-    Rechenweg darunter; ein Nullbreiten-Segment wuerde nur durch die
-    optische Mindestbreite (D3-CSS-Block) als Phantomstreifen sichtbar.
-    """
-    if gesamt is None or not bestandteile:
-        return []
-    rest = round(restbetrag, 2) if restbetrag is not None else 0.0
-    segmente = []
-    gesplittet = False
-    for posten in bestandteile:
-        name, betrag = posten["name"], posten["betrag"]
-        kategorie = posten["kategorie"]
-        if rest and not gesplittet and kategorie in _ZERLEGUNG_RATENKATEGORIEN:
-            faellig = round(betrag - rest, 2)
-            if faellig < 0:
-                log.warning(
-                    "zerlegung_balken: restbetrag %.2f EUR groesser als "
-                    "der Posten %r (%.2f EUR) - Balken bleibt "
-                    "ungezeichnet",
-                    rest,
-                    name,
-                    betrag,
-                )
-                return []
-            if faellig:
-                segmente.append(
-                    {
-                        "name": name,
-                        "betrag": faellig,
-                        "kategorie": kategorie,
-                        "offen": False,
-                    }
-                )
-            segmente.append(
-                {
-                    "name": LABEL_RESTSCHULD,
-                    "betrag": rest,
-                    "kategorie": "restschuld",
-                    "offen": True,
-                }
-            )
-            gesplittet = True
-        elif betrag:
-            segmente.append(
-                {"name": name, "betrag": betrag, "kategorie": kategorie, "offen": False}
-            )
-    for seg in segmente:
-        seg["pct"] = round(seg["betrag"] / gesamt * 100, 3) if gesamt else 0.0
-    return segmente
-
-
 def label_der_leitzahl(monate: int | None, tarifmonate: int | None = None) -> str:
     """ "Kosten über 24 Tarifmonate und 36 Geräteraten" - das Etikett der Leitzahl.
 
@@ -712,6 +647,7 @@ def _karte(
         "eigen": _eigen(b.anbieter),
         "tarif": b.tarif_name,
         "tarif_id": b.tarif_id,
+        "buendel_id": b.id,
         "tarif_id_guete": b.tarif_id_guete,
         "geraetepreis": geraetepreis,
         "geraetepreis_art": geraetepreis_art,
@@ -1329,6 +1265,7 @@ def modelle(
     tarife: dict,
     katalog,
     heute: str = "",
+    band_je_tarif: dict | None = None,
 ) -> dict:
     """Alle Modelle mit mindestens einem Buendel, je Modell vier Anbieter.
 
@@ -1351,7 +1288,8 @@ def modelle(
     ohne_zuordnung = ergaenze_geraete_aus_katalog(geraet_je_sku, buendel, katalog)
     from . import geraete_laufzeit, geraete_tco_band
 
-    band_je_tarif = geraete_tco_band.tarif_baender(tarife) if tarife else {}
+    if band_je_tarif is None:
+        band_je_tarif = geraete_tco_band.tarif_baender(tarife) if tarife else {}
     belege = barpreise(listungen)
     zustaende = _zustand_je_listung(listungen)
 
@@ -1422,7 +1360,7 @@ def modelle(
         if not geraete_laufzeit.zaehlende_eigene(karten):
             naeherung = _vodafone_referenz(referenzen, tarife, belege_modell)
         for k in karten:
-            k["band"] = band_je_tarif.get((k.get("tarif_id") or "").strip())
+            k["band"] = band_der_karte(band_je_tarif, k)
         massstab = geraete_laufzeit.setze_deltas(
             karten, naeherung, band_je_tarif, heute
         )

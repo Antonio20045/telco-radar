@@ -1,6 +1,7 @@
 # Tarife ohne Tarifstufe, weil ihr Preis am Original widersprüchlich ist.
-# Gelesen von `band_regel.preis_widerspruch()` (gilt für Sammeln und Bericht).
-# Ein Eintrag macht den Tarif und seine Plus-Fassung stufenlos ("Ohne Tarifband");
+# Gelesen von `band_regel.preis_widerspruch()`; wirkt nur im Bericht
+# (`geraete_tco_band.tarif_baender`). Das Sammeln (Tarifwelt) kennt andere
+# Tarif-IDs und liest die Liste nicht. Ein Eintrag macht den Tarif und seine Plus-Fassung stufenlos ("Ohne Tarifband");
 # Preise und Zeilen bleiben, nur die Stufe fehlt. Entfernen: Eintrag löschen,
 # sobald der Preis am Original geklärt ist. Pflichtfelder je Eintrag:
 # tarif_id, name, grund, beleg (Pfad der Beleg-Datei).

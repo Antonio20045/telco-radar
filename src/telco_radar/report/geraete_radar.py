@@ -206,7 +206,7 @@ def _zeile_fuer_anbieter(
             **_beleg(karte.get("quelle_url", ""), karte.get("abgerufen_am", "")),
         }
 
-    band = band_je_tarif.get(karte.get("tarif_id") or "")
+    band = geraete_tco_band.band_der_karte(band_je_tarif, karte)
     if basis["band"] is None or band is None or band != basis["band"]:
         vf_band = basis["band_label"]
         wb_band = _band_label(band)

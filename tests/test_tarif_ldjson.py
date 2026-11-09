@@ -93,7 +93,7 @@ def test_das_datenvolumen_kommt_aus_der_beschreibung():
     nach_name = {t.name: t.datenvolumen_gb for t, _ in _tarife()}
     assert nach_name["1&1 All-Net-Flat S"] == 10.0
     assert nach_name["1&1 All-Net-Flat L"] == 150.0
-    assert nach_name["1&1 Unlimited XL"] is None
+    assert nach_name["1&1 Unlimited on demand M"] == 50.0
 
 
 def test_keine_laufzeit_wird_abgeleitet():
@@ -197,3 +197,69 @@ def test_derselbe_knoten_zweimal_ist_eine_dublette_und_kein_zweiter_tarif():
 def test_seite_ohne_strukturierte_daten_liefert_nichts():
     assert _tarife("") == []
     assert _tarife("<html><body>Unsere Tarife ab 9,99 &euro;</body></html>") == []
+
+
+INF = float("inf")
+
+
+def _kachel(name="1&1 Unlimited XL", label="Unlimited pro Monat", slug="s-1") -> str:
+    return (
+        f'<div class="content-box" aria-label="{label}">'
+        f'<input class="toggle-label__radio" value="{slug}">'
+        f'<a title="Tarifdetails {name.replace("&", "&amp;")}"></a></div>'
+    )
+
+
+def _volumen(html: str, name="1&1 Unlimited XL"):
+    return {t.name: t for t, _ in _tarife(html)}[name].datenvolumen_gb
+
+
+def _xl_knoten() -> str:
+    return _knoten(
+        name="1&1 Unlimited XL", preis="39.99", beschreibung="1&1 Unlimited XL"
+    )
+
+
+def test_unlimited_xl_ist_unbegrenzt_weil_seine_kachel_es_sagt():
+    """Gegen den Stand davor rot: der Knoten nennt kein Volumen, die Kachel
+    derselben Seite schreibt "Unlimited pro Monat" (echter Abruf 09.11.2026)."""
+    nach_name = {t.name: t for t, _ in _tarife()}
+    xl = nach_name["1&1 Unlimited XL"]
+    assert xl.datenvolumen_gb == INF
+    assert xl.fundstellen["datenvolumen_gb"] == "Unlimited pro Monat"
+    xl.pruefe_belege()
+
+
+def test_unbegrenzt_ohne_kachel_bleibt_ein_fehlendes_volumen():
+    """Gegenprobe: derselbe Knoten ohne Kachel, die es belegt, bleibt `None`;
+    der Name "Unlimited" allein ist kein Beleg."""
+    assert _volumen(_xl_knoten()) is None
+    assert _volumen(_xl_knoten() + _kachel(label="Telefonie pro Monat")) is None
+
+
+def test_die_kachel_wird_dem_tarif_ueber_den_namen_zugeordnet():
+    assert _volumen(_xl_knoten() + _kachel()) == INF
+    assert _volumen(_xl_knoten() + _kachel(name="1&1 Unlimited L")) is None
+
+
+def test_unlimitierte_telefonie_ist_kein_unbegrenztes_volumen():
+    """Die Seite schreibt "Unlimitierte Telefonie & SMS" an jede Kachel."""
+    html = _xl_knoten() + _kachel(label="Unlimitierte Telefonie & SMS")
+    assert _volumen(html) is None
+
+
+def test_die_beschreibung_geht_der_kachel_vor():
+    html = _knoten(beschreibung="1&1 All-Net-Flat S 10 GB") + _kachel(
+        name="1&1 All-Net-Flat S", label="Unlimited pro Monat"
+    )
+    assert _volumen(html, "1&1 All-Net-Flat S") == 10.0
+
+
+def test_zwei_kacheln_die_sich_widersprechen_belegen_nichts():
+    html = _xl_knoten() + _kachel(slug="a") + _kachel(label="50 GB pro Monat", slug="b")
+    assert _volumen(html) is None
+
+
+def test_die_kachel_nennt_auch_ein_endliches_volumen():
+    html = _xl_knoten() + _kachel(label="500 GB pro Monat")
+    assert _volumen(html) == 500.0

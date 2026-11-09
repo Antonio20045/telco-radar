@@ -16,14 +16,13 @@ import logging
 
 from ..analyze.geraete_pruefstatus import listen_aus_satz
 from ..analyze.geraete_widerspruch import bereinigt
-from ..tarif_model import PREISTYP_LIVE_SHOP
+from ..band_regel import band_fuer
 from ..tco_model import (
     TCO_HORIZONT,
     Buendel,
     Rabatt,
     SimOnlyReferenz,
     kosten_ueber,
-    tco_24,
 )
 from . import (
     geraete_laufzeit,
@@ -33,17 +32,15 @@ from . import (
     geraete_tco_band,
     geraete_tco_grafik,
     geraete_tco_karten,
+    geraete_zeilenband,
 )
+from .geraete_tco_referenz import referenztabelle as _referenztabelle
 from .geraete_zuordnung_satz import ANBIETER_UNBEKANNT as ANBIETER_UNBEKANNT
 from .geraete_zuordnung_satz import ohne_zuordnung_satz
 
 log = logging.getLogger(__name__)
 
-EIGEN = "vodafone"
-
-
-def _eigen(anbieter: str) -> bool:
-    return (anbieter or "").strip().lower() == EIGEN
+_KEINE_HISTORIE = {"messtage": 0, "seit": "", "buendel": 0}
 
 
 def _zeilen_rang(karte: dict) -> tuple:
@@ -130,50 +127,6 @@ def _aus_speicher(eintraege: list, typ, felder: tuple) -> list:
     return fertig
 
 
-def _referenztabelle(referenzen: list) -> list[dict]:
-    """Der Massstab, den Phase 6 geliefert hat: was der Tarif ALLEIN kostet.
-
-    Diese Zahl ist der Grund, warum ein effektiver Geraetepreis ueberhaupt
-    rechenbar ist (`tco_model.SimOnlyReferenz`) - und sie steht in keiner
-    Werbung. Meistens kommt sie aus dem Produktinformationsblatt nach § 1
-    TK-TransparenzV, dem einzigen Dokument dieses Marktes, das rechtlich
-    wahrheitsbewehrt ist - seit dem 05.09.2026 kann sie auch aus einer
-    LIVE-Shop-Seite stammen (`Tarif.preistyp == "live_shop"`,
-    `analyze/tarif_referenzen.py`). `quelle_ist_dokument` traegt das an die
-    Vorlage weiter: nur ein Pflichtdokument heisst dort
-    "Produktinformationsblatt", eine Shop-Seite heisst "Shop-Seite" - ein
-    Beleglink, der das falsche Wort traegt, ist selbst eine Falschangabe.
-
-    Sortiert wird der EIGENE Anbieter zuerst, dann nach Anbietername und
-    Betrag - dieselbe Ordnung wie auf jeder anderen Tafel dieser Seite. Es
-    ist ausdruecklich KEINE Rangliste nach Guenstigkeit: ein Tarif mit mehr
-    Datenvolumen kostet zu Recht mehr, und diese Tafel rechnet das nicht
-    heraus.
-    """
-    zeilen = []
-    for r in referenzen:
-        if not isinstance(r, SimOnlyReferenz) or r.tarif_sim_only_monatlich is None:
-            continue
-        kennzahl, allein = tco_24(r.als_buendel()), tco_24(r.als_buendel(False))
-        zeilen.append(
-            {
-                "anbieter": r.anbieter,
-                "eigen": _eigen(r.anbieter),
-                "tarif": r.tarif_name,
-                "tarif_id": r.tarif_id,
-                "monatlich": r.tarif_sim_only_monatlich,
-                "ueber_horizont": (kennzahl.gesamt if kennzahl.belastbar else None),
-                "tarif_ueber_horizont": allein.gesamt if allein.belastbar else None,
-                "leitzahl_monate": kennzahl.leitzahl_monate,
-                "anschlusspreis": r.anschlusspreis,
-                "quelle_url": r.quelle_url,
-                "abgerufen_am": r.abgerufen_am,
-                "quelle_ist_dokument": r.quelle_art != PREISTYP_LIVE_SHOP,
-            }
-        )
-    return sorted(zeilen, key=lambda z: (not z["eigen"], z["anbieter"], z["monatlich"]))
-
-
 HAENDLER_OHNE_BUENDEL = geraete_tco_karten.HAENDLER_OHNE_BUENDEL
 _haendler_ohne_buendel_preise = geraete_tco_karten._haendler_geraetepreise
 
@@ -233,7 +186,7 @@ def _export_zeilen(
                 "anbieter": b.anbieter,
                 "anbieter_typ": typen.get(b.anbieter, ""),
                 "tarif": b.tarif_name,
-                "band": band_von(band_je_tarif.get(b.tarif_id or "")),
+                "band": band_von(band_fuer(band_je_tarif, b.tarif_id or "", b.id)),
                 "zustand": b.zustand or "",
                 "zuzahlung": None if veraltet else b.geraet_zuzahlung,
                 "tarif_monatlich": None if veraltet else b.tarif_monatlich,
@@ -293,7 +246,9 @@ def aufbereiten(
     der TCO-Export braucht die Spalte, und der Store trägt sie nicht.
     `tco_historie` (O4) ist `TcoDB.historie_lage()` - der ehrliche Satz
     über die Bündel-Historie im Verlaufs-Reiter nennt ihr ECHTES
-    Startdatum, nicht das des Entwurfstages.
+    Startdatum, nicht das des Entwurfstages. Dazu `schwankend`
+    (`analyze/geraete_schwankung.lage_mit_schwankung`): die IDs mit springenden
+    Werten; fehlt es, trägt keine Zeile eines unbegrenzten Tarifs ein Band.
     `anbieter_anzeige` ist {Schluessel: Anzeigename} fuer den Satz zu
     Buendeln ohne Geraet (`ohne_zuordnung_satz`).
     `heute` (A3, "YYYY-MM-DD") schaltet die Alterung ein - ohne das
@@ -316,9 +271,12 @@ def aufbereiten(
             geraete_tco_karten.tarif_anreichern(b, tarife.get(b.tarif_id) or {})
 
     massstab = _referenztabelle(referenzen)
-
+    leiter = geraete_tco_band.tarifleiter(tarife)
+    band_je_tarif = geraete_zeilenband.zeilen_baender(
+        tarife, buendel, (tco_historie or {}).get("schwankend"), leiter
+    )
     modelle = geraete_tco_karten.modelle(
-        buendel, eintraege, referenzen, tarife, katalog, heute=heute
+        buendel, eintraege, referenzen, tarife, katalog, heute, band_je_tarif
     )
 
     listungen_je_modell: dict[str, list] = {}
@@ -328,8 +286,6 @@ def aufbereiten(
         )
         listungen_je_modell.setdefault(mid, []).append(e)
 
-    leiter = geraete_tco_band.tarifleiter(tarife)
-    band_je_tarif = geraete_tco_band.tarif_baender(tarife, leiter)
     gb_je_tarif = {
         tid: (satz or {}).get("datenvolumen_gb") for tid, satz in (tarife or {}).items()
     }
@@ -347,7 +303,7 @@ def aufbereiten(
         ]
         for k in modell["karten"]:
             tid = (k.get("tarif_id") or "").strip()
-            k["band"] = band_je_tarif.get(tid)
+            k["band"] = band_fuer(band_je_tarif, tid, k.get("buendel_id", ""))
             k["band_gb_text"] = geraete_tco_band.gb_text(gb_je_tarif.get(tid))
             k["delta_kurz"] = (
                 geraete_tco_band.delta_text(
@@ -440,9 +396,11 @@ def aufbereiten(
         "export": _export_zeilen(
             buendel, massstab, eintraege, katalog, band_je_tarif, anbieter_typen, heute
         ),
-        "historie_lage": tco_historie
-        if tco_historie is not None
-        else {"messtage": 0, "seit": "", "buendel": 0},
+        "historie_lage": {
+            k: v
+            for k, v in (tco_historie or _KEINE_HISTORIE).items()
+            if k != "schwankend"
+        },
     }
 
 
@@ -460,5 +418,5 @@ def leer() -> dict:
         "baender_katalog": [],
         "band_je_tarif": {},
         "export": {"buendel": [], "sim_only": []},
-        "historie_lage": {"messtage": 0, "seit": "", "buendel": 0},
+        "historie_lage": dict(_KEINE_HISTORIE),
     }

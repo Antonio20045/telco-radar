@@ -1,0 +1,26 @@
+{
+  "zweck": "Echte Bestandsdaten vom 09.11.2026 für tests/test_einsundeins_unlimited_rechenart.py: Rechnung, Stufe und Herkunft der Zeilen von 1&1 Unlimited XL gegen den Export (PR #79, Nachbesserung).",
+  "eintraege": [
+    {
+      "datei": "historie.jsonl",
+      "quelle": "Auszug aus data/state/geraete_tco_historie/2026-11-01.jsonl bis 2026-11-09.jsonl (Felder id, datum, buendel_monatlich, tarif_monatlich, geraet_monatsrate, geraet_zuzahlung, laufzeit_monate) für die neun am Gerät gemessenen 1&1-Unlimited-XL-Zeilen und Galaxy S26 Ultra 256; Werte unverändert",
+      "abgerufen_am": "2026-11-09",
+      "bytes_roh": 16435,
+      "sha256_roh": "5c01b889beae8186de21ba7faf0a25438392394af61b7de65fa487eda511eee8"
+    },
+    {
+      "datei": "stand.json",
+      "quelle": "Auszug aus data/state/geraete_tco.json, geraete_db.json (Listungen: sku_id, device_id, anbieter, speicher_gb, zustand, status) und geraete_tco.json sim_only, Stand 09.11.2026, nur Zeilen von 1&1 Unlimited XL mit abgerufen_am 2026-11-09; Felder unverändert",
+      "abgerufen_am": "2026-11-09",
+      "bytes_roh": 38814,
+      "sha256_roh": "6e32556cab067725f0085732b22780613ceb3d2793b51b6547d366808aaeea3d"
+    },
+    {
+      "datei": "tarife.jsonl",
+      "quelle": "Zeilen aus data/state/tarife.jsonl vom 09.11.2026: die fünf Vodafone-Tarife 'mit Smartphone' (Leiter) und 1&1 Unlimited XL mit datenvolumen_gb Infinity, wie der Sammler (collect/tarif_ldjson.py, Kachel 'Unlimited pro Monat') sie schreibt; unverändert",
+      "abgerufen_am": "2026-11-09",
+      "bytes_roh": 12576,
+      "sha256_roh": "cde06a3c085948aaf6d0154f4696ae015ee45445bb00baeb2655f0aaa7449ea4"
+    }
+  ]
+}

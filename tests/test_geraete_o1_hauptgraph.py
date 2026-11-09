@@ -31,6 +31,7 @@ import pathlib
 import pytest
 from bestand_pfad import ZUSTAND, lese_wurzel
 
+from telco_radar.analyze.geraete_schwankung import schwankende_buendel
 from telco_radar.geraete_config import lade_katalog
 from telco_radar.report import geraete_tco_band as bandmod
 from telco_radar.report import geraete_tco_karten as karten
@@ -81,12 +82,12 @@ def bestand():
     )
 
 
-def _baender(modell, tarife, laufzeit=24):
+def _baender(modell, tarife, laufzeit=24, band_je_tarif=None):
     gb = {tid: (satz or {}).get("datenvolumen_gb") for tid, satz in tarife.items()}
     leiter = bandmod.tarifleiter(tarife)
-    return bandmod.baender_fuer_modell(
-        modell, bandmod.tarif_baender(tarife, leiter), gb, leiter, laufzeit
-    )
+    if band_je_tarif is None:
+        band_je_tarif = bandmod.tarif_baender(tarife, leiter)
+    return bandmod.baender_fuer_modell(modell, band_je_tarif, gb, leiter, laufzeit)
 
 
 def _balken(modell, tarife, key="xs"):
@@ -279,12 +280,14 @@ def _aufbereitung():
     tco = json.loads((ZUSTAND / "geraete_tco.json").read_text(encoding="utf-8"))
     db = json.loads((ZUSTAND / "geraete_db.json").read_text(encoding="utf-8"))
     tarife = Tarifbestand.aus_datei(ZUSTAND / "tarife.jsonl").je_id
+    historie = ZUSTAND / "geraete_tco_historie.jsonl"
     return geraete_tco_view.aufbereiten(
         tco["buendel"],
         tco["sim_only"],
         db["listungen"],
         lade_katalog(lese_wurzel()),
         tarife=tarife,
+        tco_historie={"schwankend": sorted(schwankende_buendel(historie) or [])},
     )
 
 
@@ -313,7 +316,7 @@ def test_der_graph_knoten_traegt_dieselben_zahlen_wie_die_balken():
     geprueft = 0
     for modell in daten["modelle"]:
         for laufzeit in (12, 24, 36):
-            for band in _baender(modell, tarife, laufzeit):
+            for band in _baender(modell, tarife, laufzeit, daten["band_je_tarif"]):
                 im_knoten = knoten[modell["id"]]["baender"][laufzeit][band["key"]]
                 assert im_knoten["zeilen"] == band["balken"]["zeilen"]
                 geprueft += 1

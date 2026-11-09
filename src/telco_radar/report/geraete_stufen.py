@@ -20,14 +20,29 @@ Tarif in irgendeiner Stufe.
 
 from __future__ import annotations
 
+from .. import band_regel
+
 TARIFSTUFEN_REGEL = (
     "Die Stufen XS bis XL richten sich nach dem Datenvolumen in GB (Maßstab sind "
     "die Vodafone-Stufen), nicht nach dem Namen, den ein Anbieter seinem Tarif "
     "gibt: ein Tarif namens „S“ kann deshalb in M stehen. Ein Tarif mit "
-    "unbegrenztem Datenvolumen steht in der obersten Stufe XL. Fällt kein Tarif "
+    "unbegrenztem Datenvolumen steht in der obersten Stufe XL, ein Tarif "
+    "ohne erfasstes Datenvolumen bleibt ohne Stufe. Fällt kein Tarif "
     "eines Anbieters in eine Stufe, bleibt sie bei ihm leer."
 )
 FESTNETZ = "festnetz"
+
+
+def widerspruch_stand(liste: dict | None = None) -> str:
+    """Wer derzeit auf der Ausnahmeliste „Preis am Original widersprüchlich“
+    steht: „derzeit kein Tarif“ oder „derzeit: <Namen>“ (Methodik und
+    Tooltip an „Ohne Tarifband“ teilen diesen Text)."""
+    if liste is None:
+        liste = band_regel.preis_widerspruch()
+    namen = [str(e.get("name") or tid) for tid, e in liste.items()]
+    return f"derzeit: {', '.join(namen)}" if namen else "derzeit kein Tarif"
+
+
 KEIN_TARIF_KURZ = "Kein Tarif in dieser Datenstufe"
 KEIN_TARIF_SATZ = "{anbieter} hat in dieser Datenstufe keinen Tarif"
 

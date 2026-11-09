@@ -216,3 +216,31 @@ def test_methodik_sektion_traegt_die_umgezogenen_saetze(tmp_path):
     assert len(eintraege) >= 8, (
         f"nur {len(eintraege)} Methodik-Einträge - fehlt eine umgezogene Regel?"
     )
+
+
+def test_methodik_nennt_bei_leerer_ausnahmeliste_derzeit_kein_tarif(tmp_path):
+    """Gegen den Stand davor rot: die Kategorie „Preis am Original
+    widersprüchlich“ stand ohne Angabe da, ob es sie gibt. Die Liste ist leer."""
+    from telco_radar import band_regel
+
+    assert band_regel.preis_widerspruch() == {}
+    _, quellen = _gebaut(tmp_path)
+    eintrag = next(
+        z for z in quellen.select("li.list-row") if "Ohne Tarifband" in z.get_text()
+    )
+    assert "widersprüchlich ist (derzeit kein Tarif)" in " ".join(
+        eintrag.get_text(" ", strip=True).split()
+    )
+
+
+def test_tooltip_ohne_tarifband_nennt_den_stand_der_ausnahmeliste(tmp_path):
+    _gebaut(tmp_path)
+    kopf = [
+        k
+        for f in (tmp_path / "site-bau" / "site" / "data").rglob("*.html")
+        for k in BeautifulSoup(f.read_text(encoding="utf-8"), "html.parser").select(
+            "h4.gr-ohneband-kopf"
+        )
+    ]
+    assert kopf, "kein Fragment trägt „Ohne Tarifband“ - der Test prüft nichts"
+    assert all("(derzeit kein Tarif)" in k["title"] for k in kopf)

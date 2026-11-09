@@ -43,6 +43,7 @@ from pathlib import Path
 
 from .. import rechenweise, tco_historie
 from ..analyze.tco_store import basis_aus_satz, id_aus_satz
+from ..band_regel import band_fuer
 from ..tco_model import zeitraum_vergleichbar
 from . import geraete_bewegung, geraete_sortiment
 from . import geraete_notbremse as notbremse
@@ -100,11 +101,8 @@ SCHMAL_W, SCHMAL_MIN_H = 358, 380
 KOPF_FREIRAUM_BREIT, KOPF_FREIRAUM_SCHMAL = 18, 10
 MASSSTAB_FREIRAUM_ANTEIL = 0.12
 TREFFERFLAECHE_RADIUS = 12
-
 ACHSENBRUCH_ANTEIL = 0.10
-
 ENDLABEL_RAND = 6
-
 AUTO_SICHTBAR_AB_MESTAGEN = 2
 
 
@@ -298,7 +296,8 @@ def _messungen(
         modell = sku_modell.get(b.get("sku_id"))
         if modell is None:
             continue
-        band = band_je_tarif.get(satz.get("tarif_id") or b.get("tarif_id") or "")
+        tid = satz.get("tarif_id") or b.get("tarif_id")
+        band = band_fuer(band_je_tarif, tid, hid)
         if not band:
             continue
         datum, gesamt = satz.get("datum"), satz.get("gesamt")
