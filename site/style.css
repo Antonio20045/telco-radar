@@ -2626,6 +2626,7 @@ b,strong{font-weight:700}
 .gr-bildfolge li{display:block;margin:6px 0}
 .gr-bildfolge-schritt{display:block;font-weight:600;color:var(--ink-2)}
 .gr-bildfolge-text{display:block;color:var(--ink-3)}
+.gr-bildfolge-luecke .gr-bildfolge-text{font-style:italic}
 .gr-belegquote{margin:8px 0 0;font-family:var(--sans);font-size:12px;
   color:var(--ink-3)}
 
