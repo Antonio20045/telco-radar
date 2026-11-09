@@ -53,7 +53,9 @@ def stufe_fuer(gb: float | None, stufen) -> str | None:
 def preis_widerspruch(pfad: Path | None = None) -> dict[str, dict]:
     """Die Tarife, die vorerst ohne Stufe bleiben, weil ihr Preis am Original
     widerspruechlich ist: `{tarif_id: Eintrag}` aus
-    `config/tarif_preis_widerspruch.yaml` (Name, Grund, Beleg).
+    `config/tarif_preis_widerspruch.yaml` (Name, Grund, Beleg). Die Liste
+    wirkt nur im Bericht (`tarif_baender`); das Sammeln arbeitet mit den
+    IDs der Tarifwelt und liest sie nicht.
 
     Eine fehlende oder kaputte Datei ist ein Fehler, nie eine leere Liste:
     sonst bekaemen die Tarife still wieder eine Stufe (fail-closed)."""

@@ -12,6 +12,7 @@ import pytest
 
 from telco_radar import band_regel
 from telco_radar.collect.geraete import tarifwelt
+from telco_radar.report import geraete_stufen
 from telco_radar.report import geraete_tco_band as band
 from telco_radar.report.geraete_stufen import TARIFSTUFEN_REGEL
 
@@ -121,3 +122,74 @@ def test_kaputte_oder_fehlende_liste_ist_ein_fehler_kein_leerer_bestand(tmp_path
     leer.write_text("", encoding="utf-8")
     with pytest.raises(ValueError):
         band_regel.preis_widerspruch(leer)
+
+
+def _einsundeins_unlimited_xl() -> dict:
+    """Der Tarifsatz so, wie der Sammler ihn aus der echten Seite baut."""
+    import gzip
+    from pathlib import Path
+
+    from telco_radar.collect import tarif_ldjson
+    from telco_radar.collect.tarif_crawler import tarif_id
+
+    pfad = Path(__file__).parent / "fixtures" / "tarife" / "1und1_handytarife.html.gz"
+    with gzip.open(pfad, "rt", encoding="utf-8") as fh:
+        html = fh.read()
+    for tarif, _ in tarif_ldjson.tarife_aus_html(
+        html, anbieter="1&1", seiten_url="u", abgerufen_am="2026-11-09"
+    ):
+        if tarif.name == "1&1 Unlimited XL":
+            return {**tarif.als_dict(), "tarif_id": tarif_id("1&1", tarif.name)}
+    raise AssertionError("1&1 Unlimited XL fehlt in der Seite")
+
+
+def test_einsundeins_unlimited_xl_bekommt_stufe_xl_im_bericht():
+    satz = _einsundeins_unlimited_xl()
+    assert satz["datenvolumen_gb"] == INF
+    bestand = _bestand() | {satz["tarif_id"]: satz}
+    index = band.tarif_baender(bestand, band.tarifleiter(bestand))
+    assert index[satz["tarif_id"]] == "xl"
+
+
+def test_einsundeins_unlimited_xl_bekommt_stufe_xl_im_sammeln():
+    satz = _einsundeins_unlimited_xl()
+    assert set(tarifwelt.rangliste_je_band([satz], _leiter(INF))) == {"xl"}
+
+
+def test_gegenprobe_ohne_erfasstes_volumen_keine_stufe():
+    satz = dict(_einsundeins_unlimited_xl(), datenvolumen_gb=None)
+    bestand = _bestand() | {satz["tarif_id"]: satz}
+    index = band.tarif_baender(bestand, band.tarifleiter(bestand))
+    assert satz["tarif_id"] not in index
+
+
+def test_kopf_der_ausnahmeliste_behauptet_kein_sammeln():
+    """Die Liste kennt `tarif_id` des Tarifbestands; das Sammeln (Tarifwelt)
+    arbeitet mit anderen IDs und liest sie nicht."""
+    kopf = band_regel.PFAD_PREIS_WIDERSPRUCH.read_text(encoding="utf-8")
+    kopf = kopf.split("tarife:")[0]
+    assert "Sammeln und Bericht" not in kopf
+    assert "nur im Bericht" in kopf
+
+
+def test_sammeln_kennt_die_ausnahmeliste_nicht(monkeypatch):
+    def nie():
+        raise AssertionError("das Sammeln liest die Ausnahmeliste nicht")
+
+    monkeypatch.setattr(band_regel, "preis_widerspruch", nie)
+    saetze = [{"tarif_id": "u", "datenvolumen_gb": INF, "grundgebuehr": 40.0}]
+    assert set(tarifwelt.rangliste_je_band(saetze, _leiter(INF))) == {"xl"}
+
+
+def test_widerspruchsstand_nennt_bei_leerer_liste_derzeit_kein_tarif():
+    assert geraete_stufen.widerspruch_stand({}) == "derzeit kein Tarif"
+
+
+def test_widerspruchsstand_nennt_die_gelisteten_tarife():
+    liste = {"t:a": {"name": "Tarif A"}, "t:b": {"name": "Tarif B"}}
+    assert geraete_stufen.widerspruch_stand(liste) == "derzeit: Tarif A, Tarif B"
+
+
+def test_erklaersatz_nennt_tarife_ohne_erfasstes_volumen():
+    assert "ohne erfasstes Datenvolumen bleibt ohne Stufe" in TARIFSTUFEN_REGEL
+    assert "1&1" not in TARIFSTUFEN_REGEL

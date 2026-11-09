@@ -241,8 +241,10 @@ quellen:
     #   1&1 All-Net-Flat L   19,99 EUR  150 GB
     #   1&1 Unlimited on demand S/M/L   19,99 / 19,99 / 24,99 EUR
     #   1&1 Unlimited XL     39,99 EUR  (ohne GB-Angabe in der description)
-    # Uebernommen werden Name, Grundgebuehr und - wenn die `description`
-    # sie nennt - das Datenvolumen. Sonst NICHTS: die Knoten nennen weder
+    # Uebernommen werden Name, Grundgebuehr und das Datenvolumen: aus der
+    # `description`, sonst aus der Kachel derselben Seite (`aria-label`,
+    # "Unlimited pro Monat" beim Unlimited XL, am 09.11.2026 gemessen;
+    # unbegrenzt ist es nur, wenn diese Zeile es sagt). Sonst NICHTS: die Knoten nennen weder
     # Laufzeit noch Preisphase, also traegt der Satz keine. Dass S und M
     # denselben Betrag tragen, steht so in der Quelle und wird nicht
     # geglaettet.

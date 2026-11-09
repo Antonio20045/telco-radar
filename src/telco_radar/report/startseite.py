@@ -17,6 +17,7 @@ from datetime import date, timedelta
 from .bilder import MIND_BREITE_GROSS
 from .geraete_messdatum import stand_vom
 from .geraete_preisstand import anzeige as preis_anzeige
+from .geraete_stufen import widerspruch_stand
 
 ENDET_BALD_TAGE = 7
 ERSATZBILD = "kapitel-global"
@@ -343,4 +344,5 @@ VORLAGEN_HELFER = {
     "MIND_BREITE_GROSS": MIND_BREITE_GROSS,
     "preis_anzeige": preis_anzeige,
     "stand_vom": stand_vom,
+    "widerspruch_stand": widerspruch_stand,
 }

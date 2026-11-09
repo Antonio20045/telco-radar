@@ -39,6 +39,10 @@ WAS HIER NICHT PASSIERT
   Quelle nicht - und dieses Modul sagt es deshalb auch nicht.
 * **Keine Laufzeit wird abgeleitet.** Steht sie nicht im Knoten, bleibt sie
   `None`.
+* **Kein unbegrenztes Volumen aus dem Namen.** "Unlimited XL" nennt in der
+  `description` kein Volumen; unbegrenzt ist es, weil die Kachel derselben
+  Seite "Unlimited pro Monat" schreibt (`kachel_volumen`, Beleg 09.11.2026),
+  nicht weil "Unlimited" im Namen steht ("Unlimited on demand S" hat 10 GB).
 * **Kein `allnet_flat: true` aus dem Namen.** "All-Net-Flat S" ist eine
   Produktbezeichnung, keine Leistungszusage in einem Datenfeld. Aus einem
   Marketingnamen ein Leistungsmerkmal zu lesen waere geraten, und der
@@ -83,6 +87,26 @@ from .tarif_pdf import dokument_hash
 log = logging.getLogger(__name__)
 
 _VOLUMEN_RE = re.compile(r"(\d+(?:[.,]\d+)?)\s*GB\b", re.I)
+_UNBEGRENZT_RE = re.compile(
+    r"(?:Unlimited|Unlimitiert(?:es)?(?:\s+Datenvolumen)?"
+    r"|Unbegrenzt(?:es)?(?:\s+Datenvolumen)?)(?:\s+pro\s+Monat)?\.?",
+    re.I,
+)
+
+
+def volumen_aus_text(text: str) -> float | None:
+    """Das Datenvolumen, das eine Volumenzeile ausdruecklich nennt.
+
+    "10 GB pro Monat" -> 10.0; "Unlimited pro Monat" -> `inf`. Unbegrenzt
+    gilt NUR, wenn die ganze Zeile nichts anderes sagt: "Unlimitierte
+    Telefonie & SMS" nennt kein Datenvolumen. Alles andere ist `None`."""
+    text = " ".join((text or "").split())
+    treffer = _VOLUMEN_RE.search(text)
+    if treffer:
+        return zahl(treffer.group(1))
+    if _UNBEGRENZT_RE.fullmatch(text):
+        return float("inf")
+    return None
 
 
 def _marke(text: str) -> str:
@@ -136,6 +160,27 @@ def ld_json_bloecke(html: str) -> list[dict]:
     return out
 
 
+def kachel_volumen(html: str) -> dict[str, str]:
+    """Die Volumenzeile der Tarifkacheln einer Seite: `{Tarifname: aria-label}`.
+
+    1&1 schreibt in den Knoten bei sechs von sieben Tarifen das Volumen in die
+    `description`, bei "Unlimited XL" nicht; die Kachel derselben Seite
+    traegt es im `aria-label` ("10 GB pro Monat", "Unlimited pro Monat").
+    Die Kacheln stehen mehrfach auf der Seite: nennen zwei desselben Tarifs
+    verschiedene Zeilen, belegt die Seite nichts, der Tarif fehlt hier."""
+    suppe = BeautifulSoup(html or "", "html.parser")
+    zeilen: dict[str, set[str]] = {}
+    for kachel in suppe.select("div.content-box[aria-label]"):
+        titel = kachel.select_one("[title^='Tarifdetails']")
+        if titel is None or kachel.select_one("input.toggle-label__radio") is None:
+            continue
+        name = " ".join(str(titel["title"]).removeprefix("Tarifdetails").split())
+        zeile = " ".join(str(kachel["aria-label"]).split())
+        if name and zeile:
+            zeilen.setdefault(name, set()).add(zeile)
+    return {n: next(iter(z)) for n, z in zeilen.items() if len(z) == 1}
+
+
 def _ausschnitt(knoten: dict, *pfad) -> str:
     """Der Beleg: der Knoten, eingedampft auf den Weg zu EINEM Wert.
 
@@ -153,7 +198,12 @@ def _ausschnitt(knoten: dict, *pfad) -> str:
 
 
 def tarif_aus_knoten(
-    knoten: dict, *, anbieter: str, seiten_url: str, abgerufen_am: str
+    knoten: dict,
+    *,
+    anbieter: str,
+    seiten_url: str,
+    abgerufen_am: str,
+    kacheln: dict[str, str] | None = None,
 ) -> Optional[tuple[Tarif, str]]:
     """Ein Product-Knoten wird ein Tarif - oder nichts.
 
@@ -194,6 +244,14 @@ def tarif_aus_knoten(
         return None
 
     rohtext = json.dumps(knoten, ensure_ascii=False)
+    beschreibung = str(knoten.get("description") or "")
+    kachelzeile = (kacheln or {}).get(name, "")
+    aus_kachel = (
+        _VOLUMEN_RE.search(beschreibung) is None
+        and volumen_aus_text(kachelzeile) is not None
+    )
+    if aus_kachel:
+        rohtext += f" | Kachel: {kachelzeile}"
     tarif = Tarif(
         anbieter=anbieter,
         abgerufen_am=abgerufen_am,
@@ -204,9 +262,10 @@ def tarif_aus_knoten(
     tarif.setze("name", name, _ausschnitt(knoten, "name"), HOCH)
     tarif.setze("grundgebuehr", betrag, _ausschnitt(knoten, "offers", "price"), HOCH)
 
-    beschreibung = str(knoten.get("description") or "")
     treffer = _VOLUMEN_RE.search(beschreibung)
-    if treffer:
+    if aus_kachel:
+        tarif.setze("datenvolumen_gb", volumen_aus_text(kachelzeile), kachelzeile, HOCH)
+    elif treffer:
         tarif.setze(
             "datenvolumen_gb",
             zahl(treffer.group(1)),
@@ -225,6 +284,7 @@ def tarife_aus_html(
     """Alle Tarife, die die Seite in ihren strukturierten Daten nennt."""
     out: list[tuple[Tarif, str]] = []
     gesehen: set[str] = set()
+    kacheln = kachel_volumen(html)
     for block in ld_json_bloecke(html):
         for knoten in _knoten(block):
             ergebnis = tarif_aus_knoten(
@@ -232,6 +292,7 @@ def tarife_aus_html(
                 anbieter=anbieter,
                 seiten_url=seiten_url,
                 abgerufen_am=abgerufen_am,
+                kacheln=kacheln,
             )
             if ergebnis is None:
                 continue
