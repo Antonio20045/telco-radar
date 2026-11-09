@@ -8,12 +8,20 @@ AUFRUF
 
 ``--quelle`` enthält je Anbieter die Ergebnisdatei und die WebP-Bilder (``belegbild``),
 in beliebig tiefen Unterordnern. Je (Gerät, Anbieter) wählt ``beleg_schluessel`` den
-Preis mit den niedrigsten Gesamtkosten; das Bild heißt dann
-``<geraet_id>__<anbieter_id>__<JJJJ-MM-TT>.webp`` (``beleg_regeln.dateiname``, Gerät aus
-dem Katalog, Anbieter als ASCII-Schlüssel). ``beleg_ablage.veroeffentliche`` lädt es ins
-Release ``belege-JJJJ-MM-TT``, eine große Änderung zusätzlich in
-``belege-gross-JJJJ-MM``. Es gibt keine Indexdatei und keinen Commit: die Seite liest
-die Anhänge der Releases (``scripts/belege_manifest.py``). Das Token liegt nur in
+Preis mit den niedrigsten Gesamtkosten; sein Bild heißt
+``<geraet_id>__<anbieter_id>__<JJJJ-MM-TT>__preis__<kennung>.webp``
+(``beleg_regeln.folge_dateiname``; Gerät aus dem Katalog, Anbieter als ASCII-Schlüssel,
+Kennung aus der ``beleg_id``). Nur ohne brauchbare ``beleg_id`` bleibt es beim Namen
+ohne Kennung (``beleg_regeln.dateiname``): ein Einzelbild ohne Folge.
+``beleg_ablage.veroeffentliche`` lädt es ins Release ``belege-JJJJ-MM-TT``, eine große
+Änderung zusätzlich in ``belege-gross-JJJJ-MM``. Die Folgebilder derselben Position
+(``<beleg_id>_<schritt>.webp`` im Artefakt, ``belegbild.folgename``) gehen denselben
+Weg, in dieselben Releases und mit denselben Grenzen hoch, mit derselben Kennung im
+Namen: Einzelbild und Schritte einer Position bilden eine Folge, nie die einer
+anderen. Gehört ein früheres Bild des Paares zu einer anderen Position, wird es
+gelöscht, aber erst, wenn das neue Einzelbild nachweislich im Release liegt
+(``veraltete_folgen``). Es gibt keine Indexdatei und keinen Commit: die Seite liest die
+Anhänge der Releases (``scripts/belege_manifest.py``). Das Token liegt nur in
 ``GH_TOKEN``.
 
 Exit-Code 0: alles getan oder nichts zu tun (auch ohne Artefakt); 1: ein Teil ist
@@ -36,15 +44,21 @@ from telco_radar.beleg_ablage import (
     ZEIT_JE_AUFRUF_S,
     Bild,
     Gh,
+    GhFehler,
     Releases,
     veroeffentliche,
 )
+from telco_radar.beleg_bildfolge import PREIS
 from telco_radar.beleg_regeln import (
     anbieter_schluessel,
     dateiname,
+    folge_dateiname,
     ist_grosse_aenderung,
+    zerlege_dateiname,
+    zerlege_folgename,
 )
-from telco_radar.collect.geraete.belegbild import zwischenname
+from telco_radar.collect.geraete.belegbild import folgename, zwischenname
+from telco_radar.collect.geraete.klickbildfolge import GEWAEHLT
 from telco_radar.collect.geraete.klickrohsatz import ausbeute
 from telco_radar.geraete_config import lade_katalog
 from telco_radar.klick_vertrag import lies_ergebnisse
@@ -123,14 +137,130 @@ def sammle_bilder(
             f"{sum(zuordnung.uebersprungen.values())} übersprungen"
         )
     bilder: list[Bild] = []
+    folgebilder = 0
     for name, (messung, roh) in sorted(gewaehlt.items()):
+        datei = ziel / einzelbild_name(messung, name, zeilen)
+        shutil.copyfile(roh, datei)
+        gross = ist_grosse_aenderung(messung.vorher_24, messung.gesamt_24)
+        bilder.append(Bild(datei, gross))
+        folge = sammle_folge(messung, name, dateien, ziel, gross, zeilen)
+        bilder += folge
+        folgebilder += len(folge)
+    zeilen.append(
+        f"{len(bilder) - folgebilder} Bilder und {folgebilder} Folgebilder nach "
+        "Zusammenführen der Ergebnisse"
+    )
+    return bilder, zeilen
+
+
+def einzelbild_name(messung: Messung, name: str, zeilen: list[str]) -> str:
+    """Der veröffentlichte Name des Einzelbilds: der Preisschritt mit der Kennung der
+    Position (``…__preis__<kennung>.webp``), damit es zu seiner Folge gehört und zu
+    keiner anderen. Ohne brauchbare ``beleg_id`` bleibt es beim Namen ohne Kennung (ein
+    Einzelbild ohne Folge, nichts geht verloren)."""
+    zerlegt = zerlege_dateiname(name)
+    if zerlegt is None:
+        return name
+    try:
+        return folge_dateiname(
+            zerlegt.geraet_id,
+            zerlegt.anbieter_id,
+            zerlegt.datum,
+            PREIS,
+            messung.beleg_id,
+        )
+    except ValueError as fehler:
+        zeilen.append(f"{name}: ohne Kennung veröffentlicht: {fehler}")
+        return name
+
+
+def sammle_folge(
+    messung: Messung,
+    einzelname: str,
+    dateien: dict[str, Path],
+    ziel: Path,
+    gross: bool,
+    zeilen: list[str],
+) -> list[Bild]:
+    """Die Folgebilder der gewählten Position unter ihrem endgültigen Namen.
+
+    Gerät und Anbieter stehen im Namen des Einzelbilds. Ein Schritt ohne Datei im
+    Artefakt fehlt einfach (die Seite nennt ihn); es gibt keinen Ersatz aus einer
+    anderen Position."""
+    zerlegt = zerlege_dateiname(einzelname)
+    folge: list[Bild] = []
+    if zerlegt is None:
+        return folge
+    for schritt in GEWAEHLT:
+        roh = dateien.get(folgename(messung.beleg_id, schritt))
+        if roh is None:
+            continue
+        try:
+            name = folge_dateiname(
+                zerlegt.geraet_id,
+                zerlegt.anbieter_id,
+                zerlegt.datum,
+                schritt,
+                messung.beleg_id,
+            )
+        except ValueError as fehler:
+            zeilen.append(f"{einzelname}: kein Dateiname für {schritt}: {fehler}")
+            continue
         datei = ziel / name
         shutil.copyfile(roh, datei)
-        bilder.append(
-            Bild(datei, ist_grosse_aenderung(messung.vorher_24, messung.gesamt_24))
-        )
-    zeilen.append(f"{len(bilder)} Bilder nach Zusammenführen der Ergebnisse")
-    return bilder, zeilen
+        folge.append(Bild(datei, gross))
+    return folge
+
+
+def veraltete_folgen(
+    bilder: list[Bild], anhaenge: dict[str, list[str]]
+) -> list[tuple[str, str]]:
+    """(Release, Datei) der Bilder, die nicht zur heute veröffentlichten Position ihres
+    Paares gehören.
+
+    ``anhaenge`` ist der Stand NACH dem Hochladen. Das Einzelbild
+    (``…__preis__<kennung>``) eines Paares und Tages trägt die Kennung seiner Position;
+    Bilder einer früheren Position (andere Kennung, gleiches Paar und Tag) gehören dann
+    zu einem anderen Bild.
+    Sie werden nur gelöscht, wenn das neue Einzelbild nachweislich im Release liegt
+    (nicht, weil es hochgeladen werden SOLLTE): kam es nicht an, bleibt die frühere,
+    vollständige Position stehen und zeigt keine Mischfolge."""
+    vorhanden = {datei for dateien in anhaenge.values() for datei in dateien}
+    kennungen: dict[tuple[str, str, str], str] = {}
+    for bild in bilder:
+        einzel = zerlege_folgename(bild.datei.name)
+        if (
+            einzel is not None
+            and einzel.schritt == PREIS
+            and bild.datei.name in vorhanden
+        ):
+            kennungen[einzel.paar] = einzel.kennung
+    veraltet = []
+    for tag, dateien in sorted(anhaenge.items()):
+        for datei in dateien:
+            folge = zerlege_folgename(datei)
+            if (
+                folge
+                and folge.paar in kennungen
+                and folge.kennung != kennungen[folge.paar]
+            ):
+                veraltet.append((tag, datei))
+    return veraltet
+
+
+def raeume_veraltete_folgen(bilder: list[Bild], gh: Releases) -> list[str]:
+    """Löscht ``veraltete_folgen``; die Fehlerzeilen für die Bilanz."""
+    try:
+        veraltet = veraltete_folgen(bilder, gh.anhaenge())
+    except GhFehler as fehler:
+        return [f"Folgebilder nicht geprüft: {fehler}"]
+    fehler_zeilen = []
+    for tag, datei in veraltet:
+        try:
+            gh.asset_loeschen(tag, datei)
+        except GhFehler as fehler:
+            fehler_zeilen.append(f"{tag}/{datei} nicht gelöscht: {fehler}")
+    return fehler_zeilen
 
 
 def main(argumente: list[str] | None = None, gh: Releases | None = None) -> int:
@@ -167,7 +297,10 @@ def main(argumente: list[str] | None = None, gh: Releases | None = None) -> int:
         )
         for zeile in [*zeilen, *(f"unlesbar: {z}" for z in unlesbar)]:
             print(f"Belege {zeile}")
-        bilanz = veroeffentliche(bilder, heute, gh or Gh(), frist_ende=ende)
+        releases = gh or Gh()
+        bilanz = veroeffentliche(bilder, heute, releases, frist_ende=ende)
+        if bilder:
+            bilanz.fehler += raeume_veraltete_folgen(bilder, releases)
     for zeile in bilanz.zeilen()[:1] + bilanz.hinweise():
         print(zeile)
     for zeile in bilanz.fehler:

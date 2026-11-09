@@ -6,11 +6,13 @@ zeigt, folgt aus der Regel des Veröffentlichens (das Bild des Satzes mit den
 niedrigsten Gesamtkosten, ``analyze.beleg_position.position_des_bildes``) und aus
 dem ``beleg_id`` der Klick-Sätze im Bestand ``geraete_tco.json``.
 
-Fail-closed: eine Zeile bekommt ihr Bild nur, wenn die Wahl eindeutig ist und Gerät,
-Anbieter, SKU, Tarif und Ratenlaufzeit der Zeile mit dem Bildsatz übereinstimmen
-(``passt``). Gleich teure Positionen, ein neuerer Abruf im Paar, fehlende Klick-Messung
-(Vodafone, 1&1-Sätze ohne ``beleg_id``) oder fehlende Gesamtkosten ergeben kein Bild,
-nie ein geratenes. Die Quote zählt Zeilen mit belastbarem Preis (``preis_anzeige``),
+Fail-closed: eine Zeile bekommt ihr Bild nur, wenn die Wahl eindeutig ist, Einzelbild
+und Schritte der Folge die Kennung ihrer ``beleg_id`` tragen (``fremd_zur_kennung``; ein
+Bild einer anderen Messung gibt einen Vermerk statt eines Bilds) und Gerät, Anbieter,
+SKU, Tarif und Ratenlaufzeit der Zeile mit dem Bildsatz übereinstimmen (``passt``).
+Gleich teure Positionen, ein neuerer Abruf im Paar, fehlende Klick-Messung (Vodafone,
+1&1-Sätze ohne ``beleg_id``) oder fehlende Gesamtkosten ergeben kein Bild, nie ein
+geratenes. Die Quote zählt Zeilen mit belastbarem Preis (``preis_anzeige``),
 je Anbieter, nie Paare.
 """
 
@@ -23,8 +25,8 @@ from typing import Any
 
 from ..analyze.beleg_position import position_des_bildes
 from ..analyze.geraete_pruefstatus import buendel_aus_satz
-from ..beleg_bildfolge import normalisiere as normalisiere_bildfolge
-from ..beleg_regeln import anbieter_schluessel
+from ..beleg_bildfolge import fremd_zur_kennung
+from ..beleg_regeln import KENNUNG_LAENGE, anbieter_schluessel
 from ..tarif_model import QUELLE_KLICK
 from .geraete_laufzeit import raten_laufzeit
 from .geraete_preisstand import anzeige as preis_anzeige
@@ -103,9 +105,11 @@ def baue_index(
         except (TypeError, ValueError, KeyError) as fehler:
             gruende[schluessel] = f"Bildsatz unlesbar: {fehler}"
             continue
-        folge = bild.get("bildfolge") or normalisiere_bildfolge(
-            wahl.satz.get("bildfolge"), bild["url"]
-        )
+        folge = bild.get("bildfolge") or ()
+        fremd = fremd_zur_kennung(bild["url"], folge, buendel.beleg_id[:KENNUNG_LAENGE])
+        if fremd:
+            gruende[schluessel] = f"Bild gehört zu einer anderen Messung: {fremd}"
+            continue
         index[buendel.beleg_id] = Zeilenbeleg(
             geraet_id=schluessel[0],
             anbieter_id=schluessel[1],

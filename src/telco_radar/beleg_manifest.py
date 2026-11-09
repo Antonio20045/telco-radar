@@ -6,6 +6,10 @@ Release-Anhängen.
 und ohne LLM. Der Dateiname trägt Gerät, Anbieter und Tag (``beleg_regeln.dateiname``);
 der Downloadlink ergibt sich aus Release-Tag und Dateiname. Ein Eintrag kann eine
 ``bildfolge`` tragen (``beleg_bildfolge``); die Seite zeigt sie statt des Einzelbilds.
+Das Einzelbild einer Messung heißt ``…__preis__<kennung>.webp`` und trägt wie jeder
+Schritt der Folge die Kennung der Position (``beleg_regeln.folge_dateiname``): eine
+Folge besteht nur aus Bildern derselben Kennung. Ein altes Einzelbild ohne Kennung
+bleibt ein Einzelbild ohne Folge.
 
 Ein Bild kann in beiden Releases liegen (Tag und Monat, große Änderung). Die Seite zeigt
 es einmal, mit Kennzeichen ``gross``; liegt es nur im Monats-Release, ist es ebenfalls
@@ -28,13 +32,17 @@ from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
 
+from .beleg_bildfolge import PREIS, SCHRITTE
 from .beleg_bildfolge import normalisiere as normalisiere_bildfolge
+from .beleg_folgen import Folgeninfo
 from .beleg_regeln import (
     REPO,
+    Folgename,
     ist_abgelaufen,
     ist_gross_tag,
     ist_sichtbar,
     zerlege_dateiname,
+    zerlege_folgename,
 )
 
 MANIFEST_NAME = "belege_manifest.json"
@@ -76,15 +84,98 @@ def bild_url(tag: str, datei: str) -> str:
     return f"{DOWNLOAD_BASIS}/{tag}/{datei}"
 
 
-def baue_manifest(anhaenge: Mapping[str, Sequence[str]], heute: date) -> dict:
-    """Das Manifest für ``heute``; neueste Bilder zuerst, sonst nach Schlüssel."""
+HINWEIS_UNVEROEFFENTLICHT = "Bild nicht veröffentlicht"
+
+
+def _folge(
+    schritte: Mapping[str, str], info: Folgeninfo | None
+) -> tuple[list[dict[str, str]], list[str]]:
+    """Bildfolge und Lücken einer Position in der Reihenfolge ``SCHRITTE``.
+
+    ``schritte`` sind die veröffentlichten Bilder der Position (Schritt -> Adresse),
+    der Schritt ``preis`` ist ihr Einzelbild."""
+    texte = info.texte if info else {}
+    gruende = info.fehlt if info else {}
+    folge: list[dict[str, str]] = []
+    fehlt: list[str] = []
+    for schritt in SCHRITTE:
+        adresse = schritte.get(schritt)
+        if adresse is None:
+            fehlt.append(
+                f"{schritt}: {gruende.get(schritt, HINWEIS_UNVEROEFFENTLICHT)}"
+            )
+            continue
+        folge.append(
+            {"datei": adresse, "schritt": schritt, "text": texte.get(schritt, "")}
+        )
+    return folge, fehlt
+
+
+def _merke_folge(
+    folgebilder: dict[tuple[str, str, str], dict[str, dict[str, str]]],
+    folge: Folgename,
+    tag: str,
+    datei: str,
+) -> None:
+    """Hält die Adresse eines Bilds der Position fest; liegt es auch im Monats-Release
+    (große Änderung), gilt dieses, wie beim alten Einzelbild."""
+    stellen = folgebilder.setdefault(folge.paar, {}).setdefault(folge.kennung, {})
+    if folge.schritt not in stellen or ist_gross_tag(tag):
+        stellen[folge.schritt] = bild_url(tag, datei)
+
+
+def _setze_positionen(
+    gefunden: dict[tuple[str, str, str], dict],
+    folgebilder: dict[tuple[str, str, str], dict[str, dict[str, str]]],
+    folgen: Mapping[str, Folgeninfo],
+) -> int:
+    """Setzt Einzelbild und Bildfolge aus den Bildern mit Kennung ein.
+
+    Das Einzelbild einer Position heißt ``…__preis__<kennung>`` und trägt wie jeder
+    Schritt die Kennung: eine Folge entsteht nur aus Bildern derselben Kennung, nie aus
+    einem Einzelbild und Schritten, die nur zufällig am selben Tag liegen. Ein altes
+    Einzelbild ohne Kennung bleibt ein Einzelbild. Folgebilder einer Kennung ohne ihr
+    Einzelbild (nicht angekommen) zählen nicht. Zeigen zwei Kennungen mit Einzelbild auf
+    dasselbe Paar, ist nicht beweisbar, welche gilt: keines davon, der Fall wird gezählt
+    (``folge_verworfen``). Gibt die Zahl dieser Paare zurück."""
+    verworfen = 0
+    for schluessel, positionen in folgebilder.items():
+        mit_einzelbild = {k: s for k, s in positionen.items() if PREIS in s}
+        if len(mit_einzelbild) > 1:
+            verworfen += 1
+        elif mit_einzelbild:
+            ((kennung, schritte),) = mit_einzelbild.items()
+            url = schritte[PREIS]
+            eintrag: dict = {"url": url, "gross": ist_gross_tag(url.rsplit("/", 2)[-2])}
+            if len(schritte) > 1:
+                eintrag["bildfolge"], eintrag["bildfolge_fehlt"] = _folge(
+                    schritte, folgen.get(kennung)
+                )
+            gefunden[schluessel] = eintrag
+    return verworfen
+
+
+def baue_manifest(
+    anhaenge: Mapping[str, Sequence[str]],
+    heute: date,
+    folgen: Mapping[str, Folgeninfo] | None = None,
+) -> dict:
+    """Das Manifest für ``heute``; neueste Bilder zuerst, sonst nach Schlüssel.
+
+    ``folgen``: Beschriftung der Folgebilder je Kennung (``beleg_folgen.lies_folgen``);
+    ohne sie tragen die Schritte keinen Text und keinen bekannten Lückengrund."""
     gefunden: dict[tuple[str, str, str], dict] = {}
+    folgebilder: dict[tuple[str, str, str], dict[str, dict[str, str]]] = {}
     fremd = 0
     for tag in sorted(anhaenge):
         for datei in anhaenge[tag]:
             name = zerlege_dateiname(datei)
             if name is None:
-                fremd += 1
+                folge = zerlege_folgename(datei)
+                if folge is None:
+                    fremd += 1
+                elif ist_sichtbar(tag, datei, heute):
+                    _merke_folge(folgebilder, folge, tag, datei)
                 continue
             if not ist_sichtbar(tag, datei, heute):
                 continue
@@ -94,18 +185,22 @@ def baue_manifest(anhaenge: Mapping[str, Sequence[str]], heute: date) -> dict:
             if eintrag is None or ist_gross_tag(tag):
                 eintrag = {"url": bild_url(tag, datei)}
             gefunden[schluessel] = {**eintrag, "gross": gross}
+    verworfen = _setze_positionen(gefunden, folgebilder, folgen or {})
     belege = [
         {"geraet_id": g, "anbieter_id": a, "datum": d, **rest}
         for (g, a, d), rest in gefunden.items()
     ]
     belege.sort(key=lambda b: (b["geraet_id"], b["anbieter_id"]))
     belege.sort(key=lambda b: b["datum"], reverse=True)
-    return {
+    manifest = {
         "format": FORMAT,
         "erstellt": heute.isoformat(),
         "fremd": fremd,
         "belege": belege,
     }
+    if verworfen:
+        manifest["folge_verworfen"] = verworfen
+    return manifest
 
 
 def schreibe(pfad: Path, manifest: dict) -> None:
@@ -156,7 +251,7 @@ def lies_manifest(pfad: Path) -> Manifest:
                 date.fromisoformat(b["datum"]),
                 bool(b["gross"]),
                 str(b["url"]),
-                normalisiere_bildfolge(b.get("bildfolge"), str(b["url"])),
+                normalisiere_bildfolge(b.get("bildfolge"), b.get("bildfolge_fehlt")),
             )
             for b in daten["belege"]
         ]

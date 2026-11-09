@@ -47,12 +47,15 @@ from telco_radar.beleg_ablage import (
     raeume_auf,
     runner_mit_frist,
 )
+from telco_radar.beleg_folgen import lies_folgen
 from telco_radar.beleg_manifest import (
     MANIFEST_DATEI,
     baue_manifest,
     markiere_ausfall,
     schreibe,
 )
+from telco_radar.klick_vertrag import ORDNER as KLICK_ORDNER
+from telco_radar.klick_vertrag import lies_ergebnisse
 
 SCHRITT_FRIST_S = 300
 """``timeout-minutes`` des Schritts „Belege-Manifest“ in ``geraete.yml`` (5 min)."""
@@ -110,12 +113,20 @@ def erneuere(root: Path, heute: date, nur_lesen: bool, gh: Releases) -> str | No
     bilanz = Bilanz()
     if not nur_lesen:
         bilanz, anhaenge = raeume_auf(anhaenge, heute, gh)
-    manifest = baue_manifest(anhaenge, heute)
+    ergebnisse, unlesbar = lies_ergebnisse(root / KLICK_ORDNER)
+    for zeile in unlesbar:
+        print(
+            f"Belege: Klick-Ergebnis für die Beschriftung unlesbar: {zeile}",
+            file=sys.stderr,
+        )
+    manifest = baue_manifest(anhaenge, heute, lies_folgen(ergebnisse))
     schreibe(root / MANIFEST_DATEI, manifest)
     gross = sum(1 for b in manifest["belege"] if b["gross"])
     print(
         f"Belege: {len(manifest['belege'])} Bilder im Manifest, davon {gross} große "
-        f"Änderungen, {manifest['fremd']} fremde Dateien; "
+        f"Änderungen, {sum(1 for b in manifest['belege'] if b.get('bildfolge'))} mit "
+        f"Bildfolge, {manifest.get('folge_verworfen', 0)} Folgen verworfen, "
+        f"{manifest['fremd']} fremde Dateien; "
         f"{len(bilanz.releases_geloescht)} "
         f"Releases und {bilanz.assets_geloescht} Dateien gelöscht"
     )
