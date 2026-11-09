@@ -222,10 +222,14 @@ def test_a5_kein_uebertragener_punkt_ohne_zeile_in_der_tafel(zustand):
 
 
 def test_a5_schaetzung_in_der_tafel_wird_neben_der_legende_erklaert():
-    satz = {
-        "zeilen": [],
-        "gesperrt": [{"anbieter": "o2", "gesamt": 1333.75}],
+    schaetzung = {
+        "anbieter": "o2",
+        "sku_id": "s",
+        "gesamt": 1333.75,
+        "zaehlt": False,
+        "schaetzung": True,
     }
+    satz = {"zeilen": [], "karten": [schaetzung], "gesperrt": [schaetzung]}
     mess = {"o2": {"2026-11-05": {"zaehlt": True}}}
     serien = {"o2": [("2026-11-05", 1374.0)]}
     html = geraete_zeitreihe_legende.schaetzung_html(satz, mess, serien)

@@ -15,7 +15,7 @@ aber nicht von heute, trägt „Preis vom 10.10.2026“; jenseits der Frische gi
 
 from __future__ import annotations
 
-from .geraete_notbremse import DELTA_BEDINGT
+from .geraete_notbremse import DELTA_BEDINGT, zustand
 
 
 def marke(abgerufen_am: str, heute: str, frisch: bool) -> str:
@@ -160,3 +160,21 @@ def anzeige(karte: dict) -> dict:
     kopie["luecke_kurz"] = kurz_
     kopie["leer_grund"] = satz
     return kopie
+
+
+def zeilen_grund(karte: dict) -> str:
+    """Das Wort, mit dem die Tafel eine Zeile nennt, die nicht zählt, sonst ``""``.
+
+    Eine Zeile ohne Zahl nennt ihre Lücke (``anzeige``: „nur mit Zweitprodukt“,
+    „Preis veraltet“ …), eine mit Zahl ihren Notbremse-Zustand („nicht direkt genannt“).
+    Die Legende der Zeitreihe liest dasselbe Wort (Clean Code 1), statt es nachzubauen.
+    """
+    sichtbar = anzeige(karte)
+    if sichtbar is not karte:
+        return sichtbar["luecke_kurz"]
+    return (zustand(karte) or {}).get("kurz", "")
+
+
+def preis_sichtbar(karte: dict) -> bool:
+    """Steht an der Zeile der Karte eine Zahl? (Nach ``anzeige``, wie in der Tafel.)"""
+    return anzeige(karte).get("gesamt") is not None
