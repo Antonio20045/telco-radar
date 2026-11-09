@@ -64,7 +64,7 @@ def test_ohne_karte_im_band_sagt_die_legende_dass_die_tafel_keinen_preis_fuehrt(
     ohne_telekom = _satz(_karte("Vodafone", gesamt=2300.0))
     assert not [k for k in ohne_telekom["karten"] if k["anbieter"] == "Telekom"]
     text = _legende(ohne_telekom, "Telekom", 2407)
-    assert "Telekom · Die Tafel führt hier keinen Preis" in text, text
+    assert "Telekom · Die Tafel führt in diesem Band keinen Preis" in text, text
     assert "letzte zählende Messung (2.407 €)" in text, text
 
 
@@ -74,7 +74,7 @@ def test_karten_ohne_tarifband_sind_keine_karten_des_bandes():
     assert "xl" not in geraete_zeitreihe.band_zeilen(
         {"karten": [_karte(band=None)]}, 24
     )
-    assert "keinen Preis" in _legende(satz, "o2", 1500)
+    assert "in diesem Band keinen Preis" in _legende(satz, "o2", 1500)
 
 
 def test_gegenprobe_mit_zaehlender_zeile_steht_kein_satz():
@@ -87,7 +87,8 @@ def test_preis_veraltet_heisst_in_der_legende_preis_veraltet():
     alt = _karte(frisch=False, zaehlt=False, schaetzung=True, alt_marke="seit 20.10.")
     assert geraete_preisstand.zeilen_grund(alt) == "Preis veraltet"
     text = _legende(_satz(alt), wert=1506)
-    assert "nicht zählen (Preis veraltet)" in text, text
+    assert "nur Zeilen ohne zählenden Preis (Preis veraltet)" in text, text
+    assert "nennt hier nur Preise" not in text, text
     assert "Schätzung" not in text and "Zweitprodukt" not in text, text
 
 

@@ -15,7 +15,8 @@ Das Bild des vierten Schritts ist der Screenshot des Preisbereichs, den der Bele
 ohnehin trägt.
 
 Ein Bild gilt nur, wenn die gewählte Kachel vollständig im Ausschnitt liegt (nicht
-abgeschnitten, nicht verborgen); sonst fehlt der Schritt mit diesem Grund. Eine Karte
+abgeschnitten, auch nicht von einem Vorfahren mit overflow hidden/auto/scroll/clip,
+nicht verborgen); sonst fehlt der Schritt mit diesem Grund. Eine Karte
 kann dazu ``zeigt_wert`` setzen (``Klickkarte.bildfolge_zeigt``, Seite ohne Markierung):
 dann gilt das Bild nur, wenn der Text der Treffer den gemessenen Wert nennt.
 
@@ -68,6 +69,26 @@ GRUND_GEWAEHLT_FEHLT = "gewählte Kachel nicht sichtbar"
 GRUND_GEWAEHLT_ABGESCHNITTEN = "gewählte Kachel nicht vollständig im Ausschnitt"
 GRUND_WERT_UNBEKANNT = "gemessener Wert unbekannt, Bild kann ihn nicht zeigen"
 TOLERANZ = 1.0
+ABGESCHNITTEN_JS = """(el, tol) => {
+  const r = el.getBoundingClientRect();
+  let pos = getComputedStyle(el).position;
+  for (let a = el.parentElement; a; a = a.parentElement) {
+    if (a === document.body || a === document.documentElement) break;
+    if (pos === 'fixed') break;
+    const s = getComputedStyle(a);
+    if (pos === 'absolute' && s.position === 'static') continue;
+    if ([s.overflowX, s.overflowY].some((o) => o !== 'visible')) {
+      const b = a.getBoundingClientRect();
+      const x = b.left + a.clientLeft, y = b.top + a.clientTop;
+      const w = a.clientWidth, h = a.clientHeight;
+      const kappt = (a1, a2, e1, e2) => e1 < a1 - tol || e2 > a2 + tol;
+      if ((s.overflowX !== 'visible' && kappt(x, x + w, r.left, r.right)) ||
+          (s.overflowY !== 'visible' && kappt(y, y + h, r.top, r.bottom))) return true;
+    }
+    if (pos === 'absolute' && s.position !== 'static') pos = s.position;
+  }
+  return false;
+}"""
 
 
 @dataclass(frozen=True)
@@ -182,8 +203,14 @@ def schnappe(
 
 
 def _drin(gewaehlt: Locator | None, rahmen: FloatRect, frist_ms: int) -> str | None:
-    """Der Grund, wenn die gewählte Option nicht ganz im ``rahmen`` liegt, sonst
-    ``None``; ohne markierte Option (feste Dimension) gibt es nichts zu prüfen."""
+    """Der Grund, wenn die gewählte Option nicht ganz im ``rahmen`` liegt oder ein
+    Vorfahre mit overflow hidden/auto/scroll/clip sie abschneidet
+    (``ABGESCHNITTEN_JS``), sonst ``None``; ohne markierte Option (feste Dimension)
+    gibt es nichts zu prüfen.
+
+    ``ABGESCHNITTEN_JS`` beachtet: Eine absolut positionierte Option schneiden nur ihr
+    Bezugsblock und dessen Vorfahren ab, eine fixierte kein Vorfahre; html und body
+    bilden den Ausschnitt selbst und zählen nicht."""
     if gewaehlt is None:
         return None
     box = gewaehlt.bounding_box(timeout=frist_ms)
@@ -195,6 +222,8 @@ def _drin(gewaehlt: Locator | None, rahmen: FloatRect, frist_ms: int) -> str | N
         and box["x"] + box["width"] <= rahmen["x"] + rahmen["width"] + TOLERANZ
         and box["y"] + box["height"] <= rahmen["y"] + rahmen["height"] + TOLERANZ
     )
+    if drin and gewaehlt.evaluate(ABGESCHNITTEN_JS, TOLERANZ, timeout=frist_ms):
+        drin = False
     return None if drin else GRUND_GEWAEHLT_ABGESCHNITTEN
 
 

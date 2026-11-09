@@ -28,7 +28,11 @@ from telco_radar.collect.geraete.klickkarte import (
     klickkarte_aus_daten,
 )
 from telco_radar.collect.geraete.klickpreistext import TEXT_OHNE_BETRAG
-from telco_radar.collect.geraete.klicktext import Preiswerte, betraege_im_text
+from telco_radar.collect.geraete.klicktext import (
+    Buendelwerte,
+    Preiswerte,
+    betraege_im_text,
+)
 from telco_radar.tarif_model import Preisphase
 
 WURZEL = Path(__file__).parent.parent
@@ -85,6 +89,34 @@ def test_gewaehlte_kachel_ausserhalb_des_ausschnitts_gibt_kein_bild(
 
     assert "tarif" not in bilder
     assert luecken["tarif"] == NICHT_DRIN
+
+
+@pytest.mark.parametrize(
+    "gruppe",
+    ["rahmen-verborgen", "rahmen-scroll", "rahmen-auto", "rahmen-klammer"],
+)
+def test_vom_vorfahren_abgeschnittene_kachel_gibt_kein_bild(chromium, gruppe):
+    """Die Box der Kachel ist voll, das Bild zeigte sie aber nur als Streifen."""
+    karte, wert = _gruppe(gruppe, "B")
+
+    bilder, luecken = _lies(chromium, karte, wert)
+
+    assert "tarif" not in bilder
+    assert luecken["tarif"] == NICHT_DRIN
+
+
+@pytest.mark.parametrize(
+    "gruppe",
+    ["rahmen-sichtbar", "rahmen-gewaehlt-oben", "rahmen-fixiert"],
+)
+def test_kachel_im_behaelter_ohne_abschneiden_gibt_das_bild(chromium, gruppe):
+    wert = "A" if gruppe == "rahmen-gewaehlt-oben" else "B"
+    karte, _ = _gruppe(gruppe, wert)
+
+    bilder, luecken = _lies(chromium, karte, wert)
+
+    assert "tarif" in bilder
+    assert "tarif" not in luecken
 
 
 def test_selektor_ohne_die_gewaehlte_kachel_gibt_kein_bild(chromium):
@@ -246,6 +278,55 @@ def test_preistext_nennt_die_gesamtzahl_des_bildes_und_das_geraet_getrennt():
         "monatlich 89,99 € (Gerät und Tarif zusammen) · Monatsrate 65,00 €"
     )
     assert betraege_im_text(text) <= betraege_im_text(O2_BILD)
+
+
+@pytest.mark.parametrize(
+    "etikett", ["Summe:", "Gesamtbetrag einmalig:", "Zu zahlen heute"]
+)
+def test_preistext_nennt_keinen_einmalbetrag_ohne_erkanntes_gesamtetikett(etikett):
+    """Das Bild hebt 13,99 hervor, der Code erkennt nur „einmalig gesamt“: dann kein
+    „einmalig 7,00 €“, das das Bild nicht als Gesamtzahl zeigt."""
+    bild = O2_BILD.replace("einmalig gesamt:", etikett)
+
+    text = _preis(O2, bild)
+
+    assert "einmalig" not in text.replace("einmaliger", "")
+    assert "7,00" in text
+    assert "Zuzahlung 7,00 €" in text
+    assert "13,99" not in text
+    assert "monatlich 89,99 €" in text
+    assert betraege_im_text(text) <= betraege_im_text(bild)
+
+
+def test_preistext_nennt_die_einmalsumme_wenn_das_bild_keine_groessere_summe_zeigt():
+    bild = (
+        "Gerät Anzahlung:\n7,00\xa0€\neinmaliger Anschlusspreis\n0,00\xa0€\n"
+        "monatlich gesamt:\n89,99\xa0€\nGerät monatlich:\n65,00\xa0€"
+    )
+
+    text = _preis(O2, bild)
+
+    assert "einmalig 7,00 € · monatlich 89,99 € (Gerät und Tarif zusammen)" in text
+
+
+def test_preistext_ohne_zuzahlung_und_anschluss_nennt_null_nur_ohne_versand():
+    ohne = Preiswerte(anzahlung=0.0, anschluss=0.0, rate=65.0, ratenzahl=24)
+    bild = "Gerät Anzahlung: 0,00 € Anschluss 0,00 € monatlich gesamt 65,00 €"
+
+    assert "einmalig 0,00 €" in _preis(ohne, bild)
+    assert "einmalig" not in _preis(ohne, bild + " Versandkosten: 6,99 € Summe: 6,99 €")
+
+
+def test_preistext_nennt_den_gelesenen_buendelwert_auch_ohne_etikett():
+    buendel = Buendelwerte(buendelbetrag=95.95, einmalzahlung=238.95)
+    bild = (
+        "Summe: 238,95 € monatlich 95,95 € Zuzahlung 7,00 € Anschluss 0,00 € "
+        "Versand 6,99 €"
+    )
+
+    text = schritttext(PREIS, VARIANTE, None, O2, buendel, bild)
+
+    assert "einmalig 238,95 €" in text
 
 
 def test_preistext_nennt_das_geraet_nicht_als_einmalige_summe():
