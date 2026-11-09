@@ -2708,16 +2708,30 @@ var TelcoFrage = (function () {
       stelleZeilen(bandKey);
       wendeSortierungAn();
     };
+    /* Live-Abnahme 09.11.2026 (L1): nie ein fremdes Bild zu einem Preis, auch
+       nicht kurz. Die Folge zaehlt JEDEN Wechsel, auch den zurueck aufs
+       Startgeraet - sonst ueberschriebe das spaet eintreffende Fragment eines
+       frueher gewaehlten Geraets die Belege des jetzigen. Der alte Beleg
+       (Bild und Text) geht SOFORT, noch vor dem Laden. */
+    var meineFolge = ++wechselFolge;
+    var aktuell = function () {
+      return meineFolge === wechselFolge && zustand.modell === mid;
+    };
     if (mid === vorgabe) {
       fertig(vorgabeGruppe, false);
       return;
     }
-    var meineFolge = ++wechselFolge;
+    gruppeLeeren(gruppe);
+    var laedt = document.createElement('p');
+    laedt.className = 'gr-erklaer gr-beleg-laedt';
+    laedt.setAttribute('role', 'status');
+    laedt.textContent = 'Screenshots werden geladen …';
+    gruppe.appendChild(laedt);
     holeFragment(mid).then(function (lager) {
-      if (meineFolge !== wechselFolge) return;
+      if (!aktuell()) return;
       fertig(lager ? lager[mid] : null, false);
     }, function () {
-      if (meineFolge !== wechselFolge) return;
+      if (!aktuell()) return;
       fertig(null, true);
     });
   }
