@@ -80,6 +80,7 @@ from pathlib import Path
 
 from .. import rechenweise, tco_historie
 from ..tarif_model import schreibe_buendelphasen
+from ..tarifname import ohne_fehlertext
 from ..tco_model import (
     Buendel,
     SimOnlyReferenz,
@@ -129,17 +130,13 @@ def id_aus_satz(satz: dict) -> str | None:
     """Die heutige Buendel-ID eines GESPEICHERTEN Satzes - die Lesemigration.
 
     Nimmt einen Stand-Eintrag aus `geraete_tco.json` ODER eine Zeile aus
-    `geraete_tco_historie.jsonl` - beide tragen `id` und `laufzeit_monate`,
-    und genau diese zwei Felder braucht `tco_model.buendel_id_aktuell`, um
-    eine ID von VOR B1 (vier Segmente, ohne Laufzeit) demselben Buendel
-    zuzuordnen wie die Zeilen von heute.
+    `geraete_tco_historie.jsonl` (beide tragen `id` und `laufzeit_monate`) und
+    ordnet eine ID von VOR B1 (vier Segmente) dem heutigen Buendel zu.
 
-    Die Zuordnung steht HIER und nicht beim Lesen der Datei, weil beide
-    Dateien diesem Modul gehoeren: eine zweite Migration in der Ansicht
-    waere eine zweite Wahrheit ueber denselben Schluessel.
+    Die Zuordnung steht HIER, weil beide Dateien diesem Modul gehoeren: eine
+    zweite Migration in der Ansicht waere eine zweite Wahrheit.
 
-    `None` heisst "nicht zuordenbar" und ist protokolliert - der Aufrufer
-    zaehlt solche Saetze und nennt sie, statt sie still fallen zu lassen.
+    `None` heisst "nicht zuordenbar" und ist protokolliert; der Aufrufer zaehlt es.
     """
     if not isinstance(satz, dict):
         log.warning(
@@ -180,6 +177,8 @@ class TcoDB:
     `historie_path`): eine Zeile je (buendel_id, datum), siehe Modulkopf.
     """
 
+    verworfene_namen: dict[str, int] = {}
+
     def __init__(self, path: Path, historie_path: Path | None = None):
         self.path = Path(path)
         self.historie_path = Path(historie_path or self.path.parent / _HISTORIE_NAME)
@@ -198,6 +197,7 @@ class TcoDB:
             log.warning("geraete_tco.json unlesbar (%s) - starte leer", exc)
             self.lesbar = False
             return
+        self.verworfene_namen = ohne_fehlertext(roh)
         self.updated = roh.get("updated", "")
         pruefung = roh.get("pruefung")
         self.pruefung = pruefung if isinstance(pruefung, dict) else None

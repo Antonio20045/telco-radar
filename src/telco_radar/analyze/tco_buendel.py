@@ -98,6 +98,7 @@ from ..collect.tarif_crawler import tarif_id
 from ..geraete_model import normalisiere
 from ..tarif_bezug import SLUG_ALS_ID_ANBIETER, Bezug, Tarifbestand
 from ..tarif_model import NUR_MIT_GERAET, buendelphasen_aus
+from ..tarifname import tarifname_fehlergrund
 from ..tco_model import Buendel, aktionen_aus
 from .klick_tarifslug import klick_beleglink, klick_slug
 
@@ -126,6 +127,7 @@ class Buendelbilanz:
     ohne_geraet: int = 0
     ohne_tarif: int = 0
     ungueltig: int = 0
+    ungueltig_gruende: dict = field(default_factory=dict)
     zusatzkarte: int = 0
     nur_mit_geraet: int = 0
     offene_tarife: dict = field(default_factory=dict)
@@ -141,10 +143,31 @@ class Buendelbilanz:
 _BEISPIELE = 8
 
 
+def _ohne_fehlername(rohsaetze, bilanz: Buendelbilanz):
+    """Die Rohsaetze ohne die mit Fehlermeldung als Tarifnamen (gezaehlt, mit Grund)."""
+    for satz in rohsaetze:
+        grund = (
+            tarifname_fehlergrund(satz.get("tarif_name"))
+            if isinstance(satz, dict)
+            else None
+        )
+        if grund is None:
+            yield satz
+            continue
+        bilanz.ungueltig += 1
+        _zaehle(bilanz.ungueltig_gruende, f"{satz.get('anbieter')}: Tarifname {grund}")
+        log.info(
+            "Buendel %s/%s verworfen: Tarifname %s",
+            satz.get("anbieter"),
+            satz.get("sku_id"),
+            grund,
+        )
+
+
 def aus_rohsaetzen(rohsaetze, bestand: Tarifbestand, heute: str) -> Buendelbilanz:
     """Rohsaetze in Buendel verwandeln, soweit ihr Tarif aufloest."""
     bilanz = Buendelbilanz()
-    for satz in rohsaetze or []:
+    for satz in _ohne_fehlername(rohsaetze or [], bilanz):
         if not isinstance(satz, dict):
             bilanz.ungueltig += 1
             continue
@@ -204,6 +227,12 @@ def aus_rohsaetzen(rohsaetze, bestand: Tarifbestand, heute: str) -> Buendelbilan
             bilanz.nur_mit_geraet += 1
             _zaehle(bilanz.tarife_nur_mit_geraet, tarif_name)
 
+    if bilanz.ungueltig_gruende:
+        log.warning(
+            "Buendel: %d Saetze mit Fehlertext als Tarifname verworfen: %s",
+            sum(bilanz.ungueltig_gruende.values()),
+            _haeufigste(bilanz.ungueltig_gruende),
+        )
     if bilanz.offene_tarife:
         log.warning(
             "Buendel: %d Saetze ohne aufloesbaren Tarif verworfen - im "
