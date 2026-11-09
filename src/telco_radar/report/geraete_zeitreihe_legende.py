@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from ..tco_kosten import ZEITRAUM_OHNE_BINDUNG
 from . import geraete_notbremse as notbremse
+from . import geraete_preisstand as preisstand
 from .geraete_rechenweg import ANBIETER_FOLGE, _esc, _zr_marker_farbe
 
 
@@ -46,27 +47,81 @@ def ohne_alte(modell: dict, mess: dict, serien: dict) -> dict:
     return {a: m for a, m in mess.items() if serien.get(a) or a not in luecken}
 
 
+def _worte(karten: list) -> str:
+    """Die Wörter der Tafel für Zeilen, die nicht zählen, ohne Wiederholung."""
+    worte = dict.fromkeys(preisstand.zeilen_grund(k) for k in karten)
+    return ", ".join(w for w in worte if w)
+
+
+def _satz(anbieter: str, text: str) -> str:
+    return (
+        f"<span class='gr-zr-leg-ueberholt'><i style='background:"
+        f"{_zr_marker_farbe(anbieter)}'></i>{_esc(anbieter)} · {_esc(text)}</span>"
+    )
+
+
 def schaetzung_html(satz: dict | None, mess: dict, serien: dict) -> str:
-    """Satz für jeden Anbieter ohne Zeile in der Tafel, dessen Tafelpreise alle nicht
-    zählen (Schätzung, nur mit Zweitprodukt), während die Legende die letzte zählende
-    Messung nennt: ohne ihn stünden zwei Aussagen ohne Erklärung nebeneinander."""
+    """Satz unter der Legende für jeden Anbieter, dessen Legendenzahl die Tafel nicht
+    schon trägt. Eine Legendenzahl gilt der letzten zählenden Messung; die Tafel führt
+    für die Kombination (Gerät × Speicher × Band × Laufzeit) aber nur zählende Zeilen
+    als Preis. Drei Fälle, immer mit den Wörtern der Tafel (`geraete_preisstand`):
+
+    - keine Zeile und keine Karte des Anbieters: „Die Tafel führt hier keinen Preis“
+      (sein Bündel steht in anderen Bändern oder wird nicht mehr gelesen);
+    - keine zählende Zeile, aber Karten: sie werden benannt (nicht direkt genannt,
+      Preis veraltet, nur mit Zweitprodukt);
+    - eine zählende Zeile, daneben ein billigerer Preis, der nicht zählt: der Leser
+      sieht sonst in der Tafel eine kleinere Zahl als in der Legende."""
     satz = satz or {}
-    mit_zeile = {z["anbieter"] for z in satz.get("zeilen") or []}
-    gesperrt = {k["anbieter"] for k in satz.get("gesperrt") or []}
+    zeilen = {z["anbieter"]: z for z in satz.get("zeilen") or []}
+    karten = [
+        k
+        for k in satz.get("karten") or []
+        if k.get("sku_id") and (k.get("zustand") or "neu") == "neu"
+    ]
     saetze = []
     for anbieter in ANBIETER_FOLGE:
         serie, tage = serien.get(anbieter), mess.get(anbieter)
-        if not serie or not tage or anbieter in mit_zeile or anbieter not in gesperrt:
+        if not serie or not tage:
             continue
         if not notbremse.zaehlt(tage.get(serie[-1][0]) or {}):
             continue
-        saetze.append(
-            f"<span class='gr-zr-leg-ueberholt'><i style='background:"
-            f"{_zr_marker_farbe(anbieter)}'></i>{_esc(anbieter)} · Die Tafel nennt "
-            f"hier nur Preise, die nicht zählen (Schätzung oder nur mit Zweitprodukt); "
-            f"die Legende zeigt die letzte zählende Messung "
-            f"({_euro0(serie[-1][1])}).</span>"
-        )
+        eigene = [k for k in karten if k["anbieter"] == anbieter]
+        zahl, zeile = _euro0(serie[-1][1]), zeilen.get(anbieter)
+        if zeile is None:
+            worte = _worte(eigene)
+            nennt = (
+                f"Die Tafel nennt hier nur Preise, die nicht zählen ({worte})"
+                if worte
+                else "Die Tafel führt hier keinen Preis"
+            )
+            saetze.append(
+                _satz(
+                    anbieter,
+                    f"{nennt}; die Legende zeigt die letzte zählende Messung ({zahl}).",
+                )
+            )
+            continue
+        billiger = [
+            k
+            for k in eigene
+            if k.get("vergleichbar")
+            and k.get("gesamt") is not None
+            and not notbremse.zaehlt(k)
+            and preisstand.preis_sichtbar(k)
+            and round(k["gesamt"]) < round(zeile["gesamt"])
+        ]
+        if billiger:
+            guenstigste = min(billiger, key=lambda k: k["gesamt"])
+            saetze.append(
+                _satz(
+                    anbieter,
+                    f"Die Tafel nennt hier zusätzlich einen billigeren Preis, "
+                    f"der nicht zählt ({preisstand.zeilen_grund(guenstigste)}: "
+                    f"{_euro0(guenstigste['gesamt'])}); die Legende zeigt die "
+                    f"zählende Zeile ({zahl}).",
+                )
+            )
     return "".join(saetze)
 
 
