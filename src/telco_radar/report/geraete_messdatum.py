@@ -29,7 +29,7 @@ LUECKE = "Messdatum unbekannt"
 SATZ = "{anbieter}: zuletzt gemessen am {datum}"
 SATZ_LUECKE = "{anbieter}: " + LUECKE
 STAND = "Stand vom {kurz}"
-ANTEIL = "{n} von {m} Preisen von diesem Tag"
+ANTEIL = "{n} von {m} Preisen von diesem Tag (ohne überholte Bündel)"
 
 ERWARTET = ("Vodafone", "Telekom", "o2", "1&1", "congstar")
 
