@@ -2869,13 +2869,25 @@ var TelcoFrage = (function () {
     return bandOk && lzOk;
   }
 
+  /* Hat der Anbieter in der Wahl eine Zeile? Bei gewaehltem Band zaehlt nur eine
+     Zeile, die dieses Band NENNT: eine Zeile ohne Tarifband steht zwar unter jeder
+     Wahl, macht aus einem Anbieter ohne Tarif in dieser Stufe aber keinen mit
+     „kein Screenshot“ (Live-Abnahme 08.11.2026, A3; die Tafel sagt dort
+     „Nur in anderen Bändern“). */
+  function belegHatZeile(kombi, band, lz) {
+    var t = kombi.split(':');
+    var bandOk = !band || t[0] === band;
+    var lzOk = lz === 'alle' || !t[1] || t[1] === lz;
+    return bandOk && lzOk;
+  }
+
   function stelleBelege(band, lz) {
     Array.prototype.forEach.call(
       document.querySelectorAll('#gr-bnd-gruppe .gr-beleg-paar'),
       function (li) {
         var kombis = (li.getAttribute('data-kombis') || '').split(' ')
           .filter(Boolean);
-        var hat = kombis.some(function (k) { return belegPasst(k, band, lz); });
+        var hat = kombis.some(function (k) { return belegHatZeile(k, band, lz); });
         var sichtbar = 0;
         Array.prototype.forEach.call(
           li.querySelectorAll('.gr-beleg-zeile'), function (z) {
@@ -2884,7 +2896,7 @@ var TelcoFrage = (function () {
             z.hidden = !passt;
             if (passt) sichtbar += 1;
           });
-        li.hidden = !hat;
+        li.hidden = !hat && sichtbar === 0;
         var keins = li.querySelector('.gr-beleg-keins');
         if (keins) keins.hidden = sichtbar > 0;
       });
