@@ -37,7 +37,7 @@ import re
 from dataclasses import dataclass
 from typing import Optional
 
-from ..band_regel import ohne_preis_widerspruch, stufe_fuer
+from ..band_regel import band_der_karte, ohne_preis_widerspruch, stufe_fuer
 from ..tarif_plus import mit_plus
 from . import geraete_tco_grafik
 from .anbieter_farben import farbe_fuer
@@ -285,7 +285,7 @@ def alle_karten_je_band(
 
     je_band: dict[str, dict[str, list]] = {}
     for k in echte:
-        band = band_je_tarif.get(k.get("tarif_id") or "")
+        band = band_der_karte(band_je_tarif, k)
         if not band:
             continue
         je_band.setdefault(band, {}).setdefault(k["anbieter"], []).append(k)

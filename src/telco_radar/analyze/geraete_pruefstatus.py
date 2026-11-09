@@ -26,7 +26,7 @@ from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass, field, fields, replace
 
 from ..geraete_model import normalisiere
-from ..tarif_model import buendelphasen_aus
+from ..tarif_model import QUELLE_KLICK, buendelphasen_aus
 from ..tco_model import Aktion, Buendel, aktionen_aus, kosten_ueber
 
 GUELTIG = "gueltig"
@@ -185,14 +185,30 @@ def abgelaufene_aktionen(aktionen: Iterable[Aktion], heute: str) -> list[Aktion]
     return [a for a in aktionen if a.eingerechnet and not a.gilt_am(heute)]
 
 
-HERLEITUNG_PREISLISTE = frozenset(
-    {"tarifaufschlag_aus_tarifraster", "schlusszahlung_aus_grundtarif"}
-)
+HERLEITUNG_TARIFRASTER = "tarifaufschlag_aus_tarifraster"
+HERLEITUNG_SCHLUSSZAHLUNG = "schlusszahlung_aus_grundtarif"
+HERLEITUNG_PREISLISTE = frozenset({HERLEITUNG_TARIFRASTER, HERLEITUNG_SCHLUSSZAHLUNG})
 HERLEITUNG_EINMALZAHLUNG = "einmalzahlung_weicht_vom_geraet_ab"
 """Marke eines 1&1-Bündels, dessen Einmalzahlung nach Monat 24 vom Wert abweicht, der
 bei den anderen Tarifen desselben Geräts (gleicher Speicher) gilt
 (``analyze.geraete_widerspruch.mit_einheitlicher_einmalzahlung``): ohne Einmalzahlung,
 benannte Lücke statt Zahl."""
+
+
+def ist_gemessen(herleitung: str, quelle_art: str) -> bool:
+    """Sind Bündelpreis und Ablöse dieser Zeile am Gerät gelesen, nicht aus einer
+    Preisliste abgeleitet?
+
+    Nein beim Tarifaufschlag aus dem Raster (``HERLEITUNG_TARIFRASTER``: Grundangebot
+    plus fester Aufschlag, für dieses Gerät und diesen Tarif nicht gelesen) und bei
+    einer Schlusszahlung-Zeile ohne Klick-Messung. Ja bei einer Zeile ohne
+    ``herleitung`` und bei der Klick-Zeile, die nur die Schlusszahlung vom Grundtarif
+    übernimmt (sie hängt bei 1&1 an der Gerätevariante; der Monatspreis ist die Kachel
+    des Tarifs). Jede andere Herleitung ist Sache von ``ist_schaetzung``."""
+    weg = herleitung.strip()
+    if weg == HERLEITUNG_SCHLUSSZAHLUNG:
+        return quelle_art == QUELLE_KLICK
+    return weg != HERLEITUNG_TARIFRASTER
 
 
 def ist_schaetzung(herleitung: str) -> bool:

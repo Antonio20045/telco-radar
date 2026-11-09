@@ -69,6 +69,7 @@ from .geraete_laufzeit import LAUFZEIT_STANDARD, ansicht
 from .geraete_tco_band import band_label
 from .geraete_tco_grafik import euro
 from ..analyze import geraete_lifecycle, klick_erfassung as erfassung
+from ..analyze.geraete_schwankung import lage_mit_schwankung
 from ..analyze.tco_store import TcoDB
 from ..analyze.klick_lesestand import mit_klick
 from ..tco_model import TCO_HORIZONT, zeitraum_vergleichbar
@@ -92,11 +93,8 @@ FENSTER_TAGE = 14
 ZEITREIHE_TEIL = "Zeitreihe der Geräteseite"
 
 VORLAUF_TAGE = 28
-
 LIFECYCLE_SICHTBAR = 6
-
 NACHFOLGER_SICHTBAR = 0
-
 EIGEN = ("vodafone",)
 
 SCHWELLE_ANBIETER = 3
@@ -1598,7 +1596,7 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         lesbar=tco_db.lesbar,
         tarife=tarife_je_id,
         anbieter_typen={a.name: a.typ for a in quellen.anbieter},
-        tco_historie=tco_db.historie_lage(),
+        tco_historie=lage_mit_schwankung(tco_db),
         heute=tco_heute,
         anbieter_anzeige=anzeige,
     )
