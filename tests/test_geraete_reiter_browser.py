@@ -589,8 +589,9 @@ def test_jeder_reiter_bleibt_unter_drei_bildschirmen(_seite, tid):
     02.11.2026) und gehört zu keinem Reiter; wie das Aufmacherbild zählt sie
     nicht mit. Die Herstellergrafik (`#hersteller`, 05.11.2026) steht als
     erstes Bild davor und zählt aus demselben Grund nicht mit; ebenso der
-    Abschnitt „Portfolio gegen Vodafone“ (`#portfolio`) dahinter. Die Reiter
-    selbst bleiben unter der Grenze."""
+    Abschnitt „Portfolio gegen Vodafone“ (`#portfolio`) dahinter; ebenso die
+    Zeile „letztes Messdatum je Anbieter“ (`#messdatum`, 08.11.2026), die
+    vor den Reitern steht. Die Reiter selbst bleiben unter der Grenze."""
     _frisch(_seite)
     _zeige_tafel(_seite, tid)
     _seite.wait_for_timeout(60)
@@ -601,6 +602,8 @@ def test_jeder_reiter_bleibt_unter_drei_bildschirmen(_seite, tid):
         " - (document.querySelector('#hersteller') || {offsetHeight: 0})"
         ".offsetHeight"
         " - (document.querySelector('#portfolio') || {offsetHeight: 0})"
+        ".offsetHeight"
+        " - (document.querySelector('#messdatum') || {offsetHeight: 0})"
         ".offsetHeight"
     )
     assert hoehe < MAX_HOEHE, f"{tid}: {hoehe} px ohne Aufmacher und Preisbilder"

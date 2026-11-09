@@ -62,7 +62,7 @@
    (`radar()`), zwei Vorlagen. Die Alarmtabelle kommt aus der geteilten
    Teilvorlage `_geraete_alarme.html.j2` ( dieselbe Tabelle wie auf der
    Schwesterseite, kein Drift). #}
-{% from "_geraete_alarme.html.j2" import alarmtafel %}
+{% from "_geraete_alarme.html.j2" import alarmtafel with context %}
 
 {# ==========================================================================
    SEKTION 2: die Modell-Liste. EINE Hauptzeile je Modell (S2: „die ganzen

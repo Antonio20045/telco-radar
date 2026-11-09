@@ -61,7 +61,8 @@ from . import (
     geraete_verlauf,
     geraete_zeitreihe,
 )
-from . import geraete_delta_wort, geraete_notbremse as notbremse, geraete_sortiment
+from . import geraete_delta_wort, geraete_messdatum, geraete_sortiment
+from . import geraete_notbremse as notbremse
 
 from .geraete_laufzeit import LAUFZEIT_STANDARD, ansicht, rang_der_monatsangabe
 from .geraete_tco_band import band_label
@@ -1372,8 +1373,7 @@ def leer(fehler: str = "") -> dict:
     return {
         "hat_daten": False,
         "stand": "",
-        "abgerufen_bis": "",
-        "abgerufen_ab": "",
+        **geraete_messdatum.felder([], {}, "", "", ""),
         "fenster_tage": FENSTER_TAGE,
         "db_lesbar": not fehler,
         "fehler": fehler,
@@ -1627,8 +1627,6 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         ),
     }
 
-    abrufdaten = sorted(e.get("abgerufen_am") for e in bestand if e.get("abgerufen_am"))
-
     def _laeden(menge):
         return {laden.get(e.get("anbieter"), e.get("anbieter")) for e in menge}
 
@@ -1721,8 +1719,7 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         "pruefbefunde": pruefung["befunde"],
         "hat_daten": bool(bestand),
         "stand": heute,
-        "abgerufen_bis": abrufdaten[-1] if abrufdaten else "",
-        "abgerufen_ab": abrufdaten[0] if abrufdaten else "",
+        **geraete_messdatum.felder(bestand, tco, heute, tco_db.updated, bestand_heute),
         "fenster_tage": FENSTER_TAGE,
         "db_lesbar": db.lesbar,
         "bilanz": {
