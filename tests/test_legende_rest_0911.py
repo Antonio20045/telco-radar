@@ -170,3 +170,9 @@ def test_jeder_legendeneintrag_hat_eine_zaehlende_zeile_oder_einen_satz(seite):
                 ohne.append((p["modell"], p["band"], p["laufzeit"], anbieter))
     assert geprueft > 50, geprueft
     assert not ohne, f"{len(ohne)} von {geprueft}: {ohne[:3]}"
+
+
+def test_ohne_tafel_zum_vergleich_steht_kein_satz():
+    mess = {"o2": {"2026-11-07": {"zaehlt": True}}}
+    serien = {"o2": [("2026-11-07", 1285.75)]}
+    assert geraete_zeitreihe_legende.schaetzung_html(None, mess, serien) == ""

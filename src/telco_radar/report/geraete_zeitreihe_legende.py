@@ -71,8 +71,11 @@ def schaetzung_html(satz: dict | None, mess: dict, serien: dict) -> str:
     - keine zählende Zeile, aber Karten: sie werden benannt (nicht direkt genannt,
       Preis veraltet, nur mit Zweitprodukt);
     - eine zählende Zeile, daneben ein billigerer Preis, der nicht zählt: der Leser
-      sieht sonst in der Tafel eine kleinere Zahl als in der Legende."""
-    satz = satz or {}
+      sieht sonst in der Tafel eine kleinere Zahl als in der Legende.
+
+    Ohne `satz` gibt es keine Tafel zum Vergleich und nichts zu erklären."""
+    if satz is None:
+        return ""
     zeilen = {z["anbieter"]: z for z in satz.get("zeilen") or []}
     karten = [
         k
