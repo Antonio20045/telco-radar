@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>BEISPIEL – keine echte Anbieterseite</title>
+<style>
+body { margin: 0; font: 16px sans-serif; }
+.gruppe { width: 400px; margin: 0 0 24px 0; }
+.kachel { box-sizing: border-box; border: 2px solid #999; margin: 0; }
+.kachel[aria-pressed="true"] { border-color: #e60000; }
+#ok .kachel, #verborgen .kachel { height: 60px; }
+#hoch .kachel { height: 100px; }
+#viele .kachel { height: 40px; }
+.weg { display: none; }
+</style>
+</head>
+<body>
+<p>BEISPIEL: von Hand geschrieben, kein Anbieter. Gruppen mit einer gewählten Kachel
+in verschiedenen Lagen, für die Prüfung der Bildfolge (tests/test_geraete_klickbildfolge_wahl.py).</p>
+<div class="gruppe" id="ok">
+  <div class="kachel" data-wert="A" aria-pressed="false">Tarif A</div>
+  <div class="kachel" data-wert="B" aria-pressed="true">Tarif B</div>
+  <div class="kachel" data-wert="C" aria-pressed="false">Tarif C</div>
+</div>
+<div class="gruppe" id="hoch">
+  <div class="kachel" data-wert="1" aria-pressed="false">Tarif 1</div>
+  <div class="kachel" data-wert="2" aria-pressed="false">Tarif 2</div>
+  <div class="kachel" data-wert="3" aria-pressed="false">Tarif 3</div>
+  <div class="kachel" data-wert="4" aria-pressed="false">Tarif 4</div>
+  <div class="kachel" data-wert="5" aria-pressed="false">Tarif 5</div>
+  <div class="kachel" data-wert="6" aria-pressed="false">Tarif 6</div>
+  <div class="kachel" data-wert="7" aria-pressed="false">Tarif 7</div>
+  <div class="kachel" data-wert="8" aria-pressed="false">Tarif 8</div>
+  <div class="kachel" data-wert="9" aria-pressed="true">Tarif 9</div>
+</div>
+<div class="gruppe" id="viele">
+  <div class="kachel" data-wert="1" aria-pressed="false">Tarif 1</div>
+  <div class="kachel" data-wert="2" aria-pressed="false">Tarif 2</div>
+  <div class="kachel" data-wert="3" aria-pressed="false">Tarif 3</div>
+  <div class="kachel" data-wert="4" aria-pressed="false">Tarif 4</div>
+  <div class="kachel" data-wert="5" aria-pressed="false">Tarif 5</div>
+  <div class="kachel" data-wert="6" aria-pressed="false">Tarif 6</div>
+  <div class="kachel" data-wert="7" aria-pressed="false">Tarif 7</div>
+  <div class="kachel" data-wert="8" aria-pressed="false">Tarif 8</div>
+  <div class="kachel" data-wert="9" aria-pressed="false">Tarif 9</div>
+  <div class="kachel" data-wert="10" aria-pressed="false">Tarif 10</div>
+  <div class="kachel" data-wert="11" aria-pressed="false">Tarif 11</div>
+  <div class="kachel" data-wert="12" aria-pressed="false">Tarif 12</div>
+  <div class="kachel" data-wert="13" aria-pressed="true">Tarif 13</div>
+  <div class="kachel" data-wert="14" aria-pressed="false">Tarif 14</div>
+</div>
+<div class="gruppe" id="verborgen">
+  <div class="kachel" data-wert="A" aria-pressed="false">Tarif A</div>
+  <div class="kachel weg" data-wert="B" aria-pressed="true">Tarif B</div>
+  <div class="kachel" data-wert="C" aria-pressed="false">Tarif C</div>
+</div>
+<div class="gruppe" id="einzig-m">
+  <div class="kachel"><span class="name" data-name="MagentaMobil M">MagentaMobil M</span> 49,95 €</div>
+</div>
+<div class="gruppe" id="einzig-max">
+  <div class="kachel"><span class="name" data-name="MagentaMobil M">MagentaMobil Max</span> 79,95 €</div>
+</div>
+<div class="gruppe" id="einzig-s">
+  <div class="kachel"><span class="name" data-name="MagentaMobil M">MagentaMobil S</span> 39,95 €</div>
+</div>
+</body>
+</html>

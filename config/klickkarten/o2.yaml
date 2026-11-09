@@ -51,6 +51,17 @@ knoepfe:
     muster: '^(\d+)\s*Monate'
     gewaehlt: {passt: 'tef-choice-panel:has(input[name="payment-plans"]:checked) > label'}
 
+bildfolge:
+  # Bilder des Belegs (klickbildfolge), Fundstelle: Probe 09.11.2026, iPhone 18 Pro,
+  # Fenster 1280 x 900. Gerät: der Gerätename (h1 > span, 233 px) zusammen mit den
+  # Speicherkacheln (451 px breit, 93 px hoch, gewählt: blauer Rahmen), damit das Bild
+  # Gerät und Speicher nennt. Tarif und Laufzeit: die ganzen Kacheln (tef-choice-panel,
+  # gewählt: blauer Rahmen und gefüllter Radio) statt der Labels, die die Kachel
+  # anschnitten. Die unsichtbare Mobil-Gruppe zählt nicht (Größe 0).
+  geraet_speicher: 'h1 > span, tef-choice-item:has(input[name="storage"])'
+  tarif: 'tef-choice-panel:has(input[name="pdp-tariff-plans-desktop"])'
+  laufzeit: 'tef-choice-panel:has(input[name="payment-plans"])'
+
 zusammenfassung:
   # Kein table mehr (Ursache-Probe 04.11.2026, arbeit/o2-klick-0411/ursache.md): das
   # Preiswidget ist <tef-mini-basket> mit <ul class="list--reset"><li class="row">

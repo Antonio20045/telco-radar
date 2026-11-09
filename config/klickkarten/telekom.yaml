@@ -41,9 +41,11 @@ knoepfe:
   tarif:
     # be 63 (Gruppe 42, #step1): button.accordion-header „MagentaMobil M“, die
     # Kachel des gewählten Tarifs; die Seite zeigt keinen anderen, darum ist die
-    # einzige Kachel gewählt. Echo: tariff.name der Antwort (mi 210).
+    # einzige Kachel gewählt (`einzige`, keine Markierung auf der Seite; das Bild
+    # prüft deshalb den Namen, siehe bildfolge.tarif). Echo: tariff.name der Antwort
+    # (mi 210).
     selektor: "#step1 button.accordion-header"
-    gewaehlt: {passt: "*"}
+    gewaehlt: {einzige: true}
   laufzeit:
     # be 42-44 (Gruppe 31 „Zahlungsoptionen“): aria-label „26,90 € pro Monat
     # für 36 Monate, zuzüglich 99 € Anzahlung“, ebenso 24 und 12 Monate;
@@ -52,6 +54,20 @@ knoepfe:
     wert: aria-label
     muster: 'für (\d+) Monate'
     gewaehlt: {attribut: aria-checked, wert: "true"}
+
+bildfolge:
+  # Bilder des Belegs (klickbildfolge). Gerät: Titel h2.productTitle („Apple iPhone 18
+  # Pro“, 20 px hoch, 570 px über den Speicherknöpfen) zusammen mit den Speicherknöpfen
+  # (gewählt: rosa Rahmen), damit das Bild Gerät und Speicher nennt. Tarif: die ganze
+  # Tarifkachel #step1 („MagentaMobil M“, Monatspreis, Bindung) statt der 36 px hohen
+  # Kopfzeile des Akkordeons, die den Namen halb abschnitt. Die Seite markiert keinen
+  # Tarif, darum gilt das Bild nur, wenn der Text der Kachel den gemessenen Tarifnamen
+  # nennt (zeigt_wert). Laufzeit und Preis: Knöpfe der Karte (gewählt: rosa Rahmen).
+  geraet_speicher: >-
+    h2.productTitle,
+    #dyt_productViewDesktop button.dt_filterChips[role="radio"][aria-label$=" GB"],
+    #dyt_productViewDesktop button.dt_filterChips[role="radio"][aria-label$=" TB"]
+  tarif: {selektor: "#step1", zeigt_wert: true}
 
 vorbereitung:
   # be 40: Rückgabedeal-Schalter, aria-checked="false" (Startadresse

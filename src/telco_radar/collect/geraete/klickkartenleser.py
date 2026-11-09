@@ -12,7 +12,6 @@ from collections.abc import Mapping
 
 from .klickkartenteile import (
     BELEGLINK_KONFIGURATION,
-    BILDFOLGE_SCHRITTE,
     GRUND_ART,
     GRUND_NICHT_ZUR_ART,
     GRUND_WEITER_DIMENSION,
@@ -31,6 +30,7 @@ from .klickkartentypen import (
     GRUND_ADRESSEN_UND_KNOPF,
     GRUND_DIMENSION,
     GRUND_EINE_ADRESSDIMENSION,
+    GRUND_EINZIGE,
     GRUND_ENTWEDER,
     GRUND_FEHLT,
     GRUND_FEST_UND_KNOPF,
@@ -59,7 +59,7 @@ from .klickkartentypen import (
     Vorbereitung,
     Weiterschritt,
 )
-from .klickquellenleser import lies_textmuster, texte
+from .klickquellenleser import lies_bildfolge, lies_textmuster, texte
 
 KNOPFTEILE = (
     "selektor",
@@ -72,7 +72,7 @@ KNOPFTEILE = (
     "andere_farbe",
 )
 ADRESSTEILE = ("selektor", "attribut", "parameter")
-MARKENTEILE = ("attribut", "wert", "passt")
+MARKENTEILE = ("attribut", "wert", "passt", "einzige")
 VORBEREITUNGSTEILE = ("klick", "bis", "pruefe", "darf_fehlen")
 LESUNGSTEILE = ("selektor", "oeffnen", "schliessen", "ohne", "muster")
 KANARIENTEILE = ("selektor", "enthaelt", "attribut", "ausgelistet_url")
@@ -219,6 +219,10 @@ class Kartenleser:
     def marke(self, roh: object, feld: str) -> Auswahlmarke:
         """Attribut mit Wert oder CSS-Selektor ``passt``."""
         daten = self.zuordnung(roh, feld, MARKENTEILE)
+        if daten.get("einzige") is not None:
+            if daten["einzige"] is not True or len(daten) > 1:
+                raise self.fehler(stelle(feld, "einzige"), GRUND_EINZIGE)
+            return Auswahlmarke(einzige=True)
         if daten.get("passt") is None:
             return Auswahlmarke(
                 attribut=self.text(daten, "attribut", feld),
@@ -339,12 +343,12 @@ class Kartenleser:
             art=art, nachweis=self.text(daten, "nachweis", "ratenplan")
         )
 
-    def bildfolge(self, roh: object) -> dict[str, str]:
-        """Selektoren der Bildfolge je Schritt; ohne Feld keine."""
-        if roh is None:
-            return {}
-        daten = self.zuordnung(roh, "bildfolge", BILDFOLGE_SCHRITTE)
-        return {s: self.text(daten, s, "bildfolge") for s in daten}
+    def bildfolge(
+        self, roh: object
+    ) -> tuple[dict[str, str], dict[str, str], frozenset[str]]:
+        """Selektoren je Schritt der Bildfolge, die Gründe der Schritte ohne Bild und
+        die Schritte, deren Bild den gemessenen Wert nennen muss."""
+        return lies_bildfolge(self, roh)
 
     def tarifslug(self, roh: object) -> Tarifslugregel | None:
         """Die Tarifslug-Regel der Karte oder ``None`` ohne das Feld."""

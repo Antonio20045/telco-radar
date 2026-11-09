@@ -33,7 +33,6 @@ from telco_radar.collect.geraete.klickbildfolge import (
     HOECHSTE_HOEHE,
     PREIS,
     SCHRITTE,
-    TEXT_OHNE_BETRAG,
     Folgebild,
     lies_folge,
     schritttext,
@@ -51,6 +50,7 @@ from telco_radar.collect.geraete.klicklauf import (
     Klicklauf,
     Kombiergebnis,
 )
+from telco_radar.collect.geraete.klickpreistext import TEXT_OHNE_BETRAG
 from telco_radar.collect.geraete.klicktext import (
     Buendelwerte,
     Preiswerte,
@@ -192,6 +192,90 @@ def test_falsch_markierte_option_gibt_kein_bild(chromium):
     assert sorted(bilder) == ["laufzeit", "tarif"]
     assert list(luecken) == ["geraet_speicher"]
     assert "Seite markiert ['128'] statt 256" in luecken["geraet_speicher"]
+
+
+def test_schritt_ohne_bild_nennt_den_grund_der_karte_und_wird_nicht_aufgenommen(
+    chromium,
+):
+    grund = "Die Ratenwahl steht nur auf der Produktseite"
+    fertig = _erste_position(chromium, bildfolge={"laufzeit": {"ohne": grund}})
+    beleg = fertig.beleg
+
+    assert beleg.bildfolge_status == "unvollstaendig"
+    assert [b.schritt for b in beleg.bildfolge] == ["geraet_speicher", "tarif", "preis"]
+    assert beleg.bildfolge_fehlt == (f"laufzeit: {grund}",)
+    assert len(fertig.folgebilder) == 2
+
+
+def test_ohne_gilt_auch_wenn_die_seite_die_option_markiert():
+    karte = _karte(bildfolge={"tarif": {"ohne": "Tarifname fehlt"}})
+
+    assert dict(karte.bildfolge_ohne) == {"tarif": "Tarifname fehlt"}
+    assert dict(karte.bildfolge) == {}
+
+
+@pytest.mark.parametrize(
+    "bildfolge",
+    [
+        {"tarif": {"grund": "x"}},
+        {"tarif": {"ohne": ""}},
+        {"tarif": {"ohne": "x", "selektor": "#tarif"}},
+        {"tarif": ["x"]},
+    ],
+)
+def test_karte_lehnt_kaputtes_ohne_ab(bildfolge):
+    with pytest.raises(KlickkartenFehler):
+        _karte(bildfolge=bildfolge)
+
+
+_HOHE_SEITE = """<!doctype html><meta charset="utf-8">
+<body style="margin:0;font:16px sans-serif">
+<div style="height:{oben}px"></div>
+<h1 id="titel" style="margin:0;height:40px;width:300px">Beispielhandy X</h1>
+<div style="height:{luft}px"></div>
+<div id="speicher" style="display:flex;gap:8px;width:300px">
+  <button style="height:60px;border:3px solid #e20074">128 GB</button>
+  <button style="height:60px">256 GB</button>
+</div>
+<div style="height:2000px"></div></body>"""
+
+
+@pytest.mark.parametrize(("oben", "luft"), [(300, 500), (30, 500), (700, 300)])
+def test_ausschnitt_umfasst_titel_und_knoepfe_auch_ueber_den_fensterrand(
+    chromium, oben, luft
+):
+    from telco_radar.collect.geraete.klickbildfolge import schnappe
+
+    seite = chromium.new_page(viewport={"width": 1280, "height": 900})
+    try:
+        seite.set_content(_HOHE_SEITE.format(oben=oben, luft=luft))
+        bild = schnappe(seite, "#titel, #speicher button", "geraet_speicher", 5000)
+    finally:
+        seite.close()
+
+    assert isinstance(bild, Folgebild)
+    breite, hoehe = _bild(bild.png).size
+    erwartet = 40 + luft + 60
+    assert erwartet <= hoehe <= erwartet + 30
+    assert hoehe > 360 and hoehe <= HOECHSTE_HOEHE
+    assert breite >= 300
+
+
+def test_verborgener_erster_treffer_haelt_den_ausschnitt_nicht_auf(chromium):
+    from telco_radar.collect.geraete.klickbildfolge import schnappe
+
+    seite = chromium.new_page(viewport={"width": 1280, "height": 900})
+    try:
+        seite.set_content(
+            '<div class="kachel" style="display:none">versteckt</div>'
+            '<div class="kachel" style="height:80px;width:200px">sichtbar</div>'
+        )
+        bild = schnappe(seite, ".kachel", "tarif", 1000)
+    finally:
+        seite.close()
+
+    assert isinstance(bild, Folgebild)
+    assert _bild(bild.png).size[1] >= 80
 
 
 def test_karte_lehnt_unbekannten_schritt_der_bildfolge_ab():
