@@ -7,26 +7,23 @@ Anbieter fuer ein GERAET verlangt. Ein Buendel ist ein anderer Sachverhalt: es k
 einer Tarifseite, hat einen anderen Lebenszyklus und eine andere Identitaet (SKU x
 Anbieter x Tarif x Ratenlaufzeit statt SKU x Anbieter). Es steht deshalb in
 
-    data/state/geraete_tco.json    Buendel, SIM-only-Referenzen und unter `pruefung`
-                                   die Kennzahlen der Pruefstelle (`TcoDB.pruefung`)
+    data/state/geraete_tco.json    Buendel, SIM-only-Referenzen, `pruefung` (Kennzahlen
+                                   der Pruefstelle) und `haendler_tarife` (Stammdaten
+                                   der Haendlertarife, `tarifwelt_bestand`)
 
-und nicht als weiterer Abschnitt in der Listungsdatei. Der Grund ist nicht
-Ordnungsliebe, sondern Risiko: `geraete_db.json` traegt 391 gewachsene Listungen und
-haengt an `geraete_preise.jsonl`, das die ganze Preishistorie haelt. Eine neue Entitaet,
-die diese Datei umschreibt, kann eine `listung_id` verschieben - und eine verschobene ID
-zerreisst still den Verlauf, dieselbe Fehlerklasse wie ein neu vergebener Farbschluessel
-(`geraete_model.farbe_aus_titel`). Zwei Dateien koennen das strukturell nicht: dieses
-Modul oeffnet die andere gar nicht.
+und nicht als weiterer Abschnitt in der Listungsdatei: `geraete_db.json` traegt 391
+gewachsene Listungen und haengt an `geraete_preise.jsonl`, der ganzen Preishistorie.
+Eine neue Entitaet, die diese Datei umschreibt, kann eine `listung_id` verschieben - und
+eine verschobene ID zerreisst still den Verlauf (wie ein neu vergebener Farbschluessel,
+`geraete_model.farbe_aus_titel`). Zwei Dateien koennen das nicht: dieses Modul oeffnet
+die andere gar nicht.
 
-Die IDs koennen sich ebenfalls nicht ueberschneiden, und zwar an ihrer Form
-(`tco_model.buendel_id`): eine `listung_id` hat zwei Bestandteile, ein Buendel seit B1
-fuenf (die Ratenlaufzeit ist dazugekommen; vorher vier), eine Referenz drei.
-
-Der Altbestand traegt weiterhin die vierteilige ID - beide Dateien dieses Moduls werden
-NICHT umgeschrieben (harte Regeln 2 und 3). Ein Alt-Satz wird beim LESEN dem heutigen
-Buendel zugeordnet (`id_aus_satz` unten, ueber `laufzeit_monate`); die neue Form
-entsteht in der Stand-Datei erst durch das naechste regulaere `save()`, und in der
-Historie ueberhaupt nicht - eine geschriebene Zeile bleibt, wie sie war.
+Die IDs ueberschneiden sich nicht, an ihrer Form (`tco_model.buendel_id`): eine
+`listung_id` hat zwei Bestandteile, ein Buendel seit B1 fuenf (mit Ratenlaufzeit), eine
+Referenz drei. Der Altbestand traegt weiterhin die vierteilige ID - beide Dateien dieses
+Moduls werden NICHT umgeschrieben (harte Regeln 2 und 3). Ein Alt-Satz wird beim LESEN
+dem heutigen Buendel zugeordnet (`id_aus_satz` unten, ueber `laufzeit_monate`); die neue
+Form entsteht erst durch das naechste `save()`, in der Historie nie (Zeilen bleiben).
 
 Die eine Regel, die dieses Modul von `geraete_store` unterscheidet
 ------------------------------------------------------------------
@@ -49,9 +46,8 @@ Keine Loesch- oder Alterungslogik fuer BUENDEL. Die Alterung alter Werte ist sei
 `report/geraete_tco_karten.ist_frisch` (gegen `ALT_AB_TAGEN`) faellt ein Angebot aus
 ab-Preis, Delta und Ranking, die Zeile bleibt ausgegraut mit Abrufdatum stehen. Der
 Store haelt die Messung unveraendert bereit - zurueck in den Vergleich kommt ein
-Angebot allein durch einen neuen Lauf, nie durch Loeschen.
-`mark_stale` bleibt fuer LISTUNGEN reserviert (`geraete_pipeline`): "Nicht gelesen"
-ist nicht "leer" (CLAUDE.md, Fallstricke).
+Angebot allein durch einen neuen Lauf, nie durch Loeschen. `mark_stale` bleibt fuer
+LISTUNGEN reserviert (`geraete_pipeline`).
 
 Die Preishistorie steht hier sehr wohl - seit P2 (11.09.2026)
 -------------------------------------------------------------
@@ -62,13 +58,13 @@ datum) mit den Messfeldern, der gerechneten Leitzahl `gesamt` (eingefroren aus
 nachzubauen), `abgerufen_am` und `rechenweise.FELD` (auch im Stand). Die Schreibregeln:
 
 * gleiches Datum je Buendel -> die Zeile wird ERSETZT. Ein wiederholter Lauf am selben
-  Tag ist dieselbe Messung, kein zweiter Punkt (sonst luege die Reihe ab P5 um die Zahl
-  der Nachtlaeufe, nicht um den Markt).
+  Tag ist dieselbe Messung, kein zweiter Punkt (sonst luege die Reihe um die Zahl der
+  Nachtlaeufe, nicht um den Markt).
 * neues Datum -> neue Zeile dazu; ALTE Tage bleiben unveraendert stehen. Ein Messtag ist
   nicht nachholbar - deshalb wird die Datei beim Zusammenfuehren gelesen und nie blind
   neu geschrieben.
-* Es gibt keine Rueckrechnung aus den frueheren Stand-Commits (Entscheidung 3 im
-  Strategiedokument): die Reihe beginnt ehrlich mit dem ersten Lauf nach der Umstellung.
+* Keine Rueckrechnung aus frueheren Stand-Commits (Entscheidung 3 im Strategiedokument):
+  die Reihe beginnt ehrlich mit dem ersten Lauf nach der Umstellung.
 """
 
 from __future__ import annotations
@@ -78,7 +74,7 @@ import logging
 from dataclasses import asdict
 from pathlib import Path
 
-from .. import rechenweise, tco_historie
+from .. import rechenweise, tarifwelt_bestand, tco_historie
 from ..tarif_model import schreibe_buendelphasen
 from ..tarifname import ohne_fehlertext
 from ..tco_model import (
@@ -171,7 +167,8 @@ class TcoDB:
     """data/state/geraete_tco.json - Buendel und SIM-only-Referenzen.
 
     Format: {"updated", "buendel", "sim_only", "pruefung"}, unter "erfassung" je
-    Anbieter der Grund eines gestoerten Klick-Laufs (`analyze.klick_erfassung`).
+    Anbieter der Grund eines gestoerten Klick-Laufs (`analyze.klick_erfassung`),
+    unter "haendler_tarife" die Tarif-Stammdaten der Haendler.
 
     Daneben fuehrt der Store die Preishistorie `geraete_tco_historie.jsonl` (Attribut
     `historie_path`): eine Zeile je (buendel_id, datum), siehe Modulkopf.
@@ -187,6 +184,7 @@ class TcoDB:
         self.updated = ""
         self.pruefung: dict | None = None
         self.erfassung: dict[str, str] = {}
+        self.haendler_tarife: dict[str, dict] = {}
         self._historie_pendente: dict[tuple[str, str], dict] = {}
         self.lesbar = True
         if not self.path.exists():
@@ -203,6 +201,7 @@ class TcoDB:
         self.pruefung = pruefung if isinstance(pruefung, dict) else None
         erfassung = roh.get("erfassung")
         self.erfassung = erfassung if isinstance(erfassung, dict) else {}
+        self.haendler_tarife = tarifwelt_bestand.lies(roh.get("haendler_tarife"))
         migriert = 0
         for eintrag in map(beleglink_der_zeile, roh.get("buendel") or []):
             if beleg_widerspricht(eintrag):
@@ -468,6 +467,7 @@ class TcoDB:
             "sim_only": self.referenzen(),
             **({"pruefung": self.pruefung} if self.pruefung else {}),
             **({"erfassung": self.erfassung} if self.erfassung else {}),
+            **tarifwelt_bestand.feld(self.haendler_tarife),
         }
         self.path.write_text(
             json.dumps(daten, ensure_ascii=False, indent=1), encoding="utf-8"

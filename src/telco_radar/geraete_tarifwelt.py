@@ -3,9 +3,9 @@
 Der Leser selbst steht in `collect/geraete/tarifwelt_lauf.py`; dieses Modul
 haengt ihn an die Stelle, an der die uebrigen Buendel entstehen
 (`geraete_pipeline.run_geraete_stage`): es liefert fertige `Buendel` plus die
-Stammdaten ihrer Tarife (`tarifwelt_bestand`, Grundlage der Band-Zuordnung im
-Bericht). Aktivschalten ist nur der Wert `aktiv: true` der Quelle in
-`config/geraete_quellen.yaml` (Methode `mediamarkt_tarifwelt`); ist sie
+Stammdaten ihrer Tarife (`TcoDB.haendler_tarife`, `tarifwelt_bestand`; Grundlage
+der Band-Zuordnung im Bericht). Aktivschalten ist nur der Wert `aktiv: true` der
+Quelle in `config/geraete_quellen.yaml` (Methode `mediamarkt_tarifwelt`); ist sie
 inaktiv oder fehlt sie, passiert nichts - kein Abruf, keine Datei.
 
 Wirft nie ausser dem einen Fall, der den Lauf beenden soll: eine Schutzantwort
@@ -32,7 +32,7 @@ from .tco_model import Buendel
 
 log = logging.getLogger(__name__)
 
-METHODE = "mediamarkt_tarifwelt"
+METHODE = tarifwelt_bestand.METHODE
 
 
 @dataclass
@@ -108,7 +108,8 @@ def stufe(
     quellen, bestand, hole: Callable, uhr: Callable, heute: str, zustand, tco
 ) -> dict:
     """Die Stufe im Tageslauf (`geraete_pipeline.run_geraete_stage`): lesen,
-    Buendel in den TCO-Store, Stammdaten der Tarife in `tarifwelt_tarife.json`.
+    Buendel und Stammdaten der Tarife (`TcoDB.haendler_tarife`) in den TCO-Store;
+    `tco.save` sichert beides in `geraete_tco.json`.
     Die Abrufe gehen durch dieselbe `Abrufschleuse` (robots.txt, Besuchsfenster)
     wie die uebrigen Quellen. Wirft nie: ein Fehler kostet nur diese Stufe."""
     if not quelle_aktiv(quellen):
@@ -123,9 +124,7 @@ def stufe(
         )
         if ergebnis.buendel:
             tco.upsert_buendel(ergebnis.buendel, heute)
-            tarifwelt_bestand.schreibe(
-                zustand / tarifwelt_bestand.DATEINAME, ergebnis.tarife, heute
-            )
+            tco.haendler_tarife.update(ergebnis.tarife)
         log.info(
             "Tarifwelt: %s, %d Buendel, %d Luecken, %d Abrufe%s",
             ergebnis.status,

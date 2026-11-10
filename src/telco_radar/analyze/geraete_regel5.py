@@ -64,7 +64,9 @@ def speicherstufen(
         if b.zustand in ZUSTAND_UNBEKANNT:
             befunde[bid] = _nicht("Zustand des Geräts unbekannt")
             continue
-        veraltet = k.frisch is not None and not k.frisch(b.abgerufen_am, k.heute)
+        veraltet = k.frisch is not None and not k.frisch(
+            b.abgerufen_am, k.heute, b.herleitung
+        )
         tarif = b.tarif_id or normalisiere(b.tarif_name)
         reihe = (normalisiere(b.anbieter), tarif, b.laufzeit_monate, geraet, b.zustand)
         stufe = reihen.setdefault(reihe, {}).setdefault(speicher, [])

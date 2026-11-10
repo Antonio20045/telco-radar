@@ -84,7 +84,7 @@ def _kontext(saetze: tuple[dict, ...], **aenderung) -> Kontext:
     }
     werte = {
         "heute": HEUTE,
-        "frisch": lambda abgerufen, heute: abgerufen == heute,
+        "frisch": lambda abgerufen, heute, _herleitung="": abgerufen == heute,
         "geraet_von": _speicher,
         "volumen_im_namen": volumen_aus_zeile,
         "sim_only": sim_only_tabelle([referenz]),

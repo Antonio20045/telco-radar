@@ -74,7 +74,7 @@ from ..analyze.tco_store import TcoDB
 from ..analyze.klick_lesestand import mit_klick
 from ..tco_model import TCO_HORIZONT, zeitraum_vergleichbar
 from ..tarif_bezug import Tarifbestand
-from ..tarifwelt_bestand import mit_tarifwelt
+from ..tarifwelt_bestand import mit_tarifwelt, typen_der_anbieter
 from .ausfall import Ausfall
 from ..analyze.geraete_store import (
     GELESEN,
@@ -1468,7 +1468,7 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
     historie = Preishistorie(state_dir / "geraete_preise.jsonl")
     tco_db = TcoDB(state_dir / "geraete_tco.json")
     tarifbestand = Tarifbestand.aus_datei(state_dir / "tarife.jsonl")
-    tarife_je_id = mit_tarifwelt(tarifbestand.je_id_aktuell, state_dir)
+    tarife_je_id = mit_tarifwelt(tarifbestand.je_id_aktuell, tco_db.haendler_tarife)
     alle = db.eintraege()
     sichtbar = [e for e in alle if e.get("status") in _SICHTBAR]
     pruefung, bestand, belastbar = bestand_und_belastbar(sichtbar, katalog)
@@ -1595,7 +1595,7 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         katalog,
         lesbar=tco_db.lesbar,
         tarife=tarife_je_id,
-        anbieter_typen={a.name: a.typ for a in quellen.anbieter},
+        anbieter_typen=typen_der_anbieter(quellen.anbieter, tco_db.haendler_tarife),
         tco_historie=lage_mit_schwankung(tco_db),
         heute=tco_heute,
         anbieter_anzeige=anzeige,

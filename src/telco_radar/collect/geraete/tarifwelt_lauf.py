@@ -40,7 +40,6 @@ in den Abrufen der Wert der Schnittstelle.
 
 from __future__ import annotations
 
-import json
 import logging
 import time
 from collections.abc import Callable
@@ -51,6 +50,8 @@ from ...geraete_model import device_id, sku_id
 from ...tco_model import Buendel
 from . import tarifwelt
 from .basis import GeraeteAbrufFehler, antwort_text
+from .tarifwelt_merkmale import unvergleichbar_grund, wechselbonus_aktionen
+from .tarifwelt_uebersicht import lies_uebersicht
 
 log = logging.getLogger(__name__)
 
@@ -133,64 +134,6 @@ class Lauf:
     tarife: dict[str, dict] = field(default_factory=dict)
 
 
-def _json(text: str):
-    try:
-        return json.loads(text or "")
-    except (json.JSONDecodeError, ValueError):
-        return None
-
-
-def lies_uebersicht(text: str) -> dict | None:
-    """Je Speicherstufe Gruppen-ID, Angebots-ID und `hwi` aus der Geraeteantwort
-    `productdetail/<slug>`. Jede Speicherstufe hat ihr EIGENES Angebot; die
-    Antwort selbst traegt nur das vorgewaehlte (`hardware.variants`), alle
-    Stufen stehen in `hardware.variantFilter`. Nur eine lieferbare Variante
-    (`available`) zaehlt; eine Stufe ganz ohne sie steht in `nicht_lieferbar`.
-    `None`, wenn nichts lesbar ist."""
-    daten = _json(text)
-    if not isinstance(daten, dict):
-        return None
-    hardware = daten.get("hardware") or {}
-    je_speicher: dict[int, dict] = {}
-    vorgewaehlt = (
-        daten.get("offerGroupId"),
-        daten.get("offerId"),
-        hardware.get("id"),
-    )
-    if all(vorgewaehlt):
-        for v in hardware.get("variants") or []:
-            if (
-                isinstance(v, dict)
-                and isinstance(v.get("storage"), int)
-                and v.get("ebootisId")
-            ):
-                je_speicher.setdefault(
-                    v["storage"],
-                    {
-                        "ogi": vorgewaehlt[0],
-                        "ofi": vorgewaehlt[1],
-                        "hwi": f"{vorgewaehlt[2]}_{v['ebootisId']}",
-                    },
-                )
-    nicht_lieferbar: set[int] = set()
-    for v in hardware.get("variantFilter") or []:
-        if not isinstance(v, dict) or not isinstance(v.get("storage"), int):
-            continue
-        ogi, ofi, hwi = v.get("offerGroupId"), v.get("offerId"), v.get("hwi")
-        if not (ogi and ofi and hwi):
-            continue
-        if v.get("available"):
-            je_speicher.setdefault(v["storage"], {"ogi": ogi, "ofi": ofi, "hwi": hwi})
-        else:
-            nicht_lieferbar.add(v["storage"])
-    if not je_speicher and not nicht_lieferbar:
-        return None
-    return {
-        "je_speicher": dict(sorted(je_speicher.items())),
-        "nicht_lieferbar": sorted(nicht_lieferbar - set(je_speicher)),
-    }
-
-
 def _abruf(hole: Callable, url: str, lauf: Lauf, warte: Callable[[float], None]) -> str:
     """EIN Abruf, ohne Wiederholung. Schutzantwort: Ausnahme mit `schutz`."""
     if lauf.abrufe:
@@ -211,14 +154,14 @@ def _abruf(hole: Callable, url: str, lauf: Lauf, warte: Callable[[float], None])
 
 
 def rangliste_tarife(liste: list[dict], leiter_gb) -> dict[tuple[str, str], list[dict]]:
-    """(Netz, Band) -> Tarife in Reihenfolge der Eignung. Doppelkarten und
-    Aktionen fallen weg (`ohne_doppelkarte`; Aktionstarife tragen `Aktion` im
-    Namen), ebenso altersgebundene Young-Tarife und unbekannte Netze."""
+    """(Netz, Band) -> Tarife in Reihenfolge der Eignung. Unvergleichbare Tarife
+    fallen weg (`tarifwelt_merkmale.unvergleichbar_grund`: Doppelkarte, Aktion,
+    Young, Kids, Senioren, Cashback, Preiswechsel vor Monat 25), ebenso
+    unbekannte Netze."""
     brauchbar = [
         s
-        for s in tarifwelt.ohne_doppelkarte(liste)
-        if "aktion" not in (s.get("tarif_name") or "").lower()
-        and "young" not in (s.get("tarif_name") or "").lower()
+        for s in liste
+        if unvergleichbar_grund(s) is None
         and tarifwelt.anbieter_zeile(s.get("netz")) is not None
     ]
     je_netz: dict[str, list[dict]] = {}
@@ -282,6 +225,9 @@ def lies_modell(
                 "datenvolumen_gb": tarif["datenvolumen_gb"],
                 "grundgebuehr": satz["grundgebuehr"],
             }
+            quelle_url = (
+                f"{SEITE}/{pfad}/{slug}/?speicher={speicher}&tfi={tarif['tarif_id']}"
+            )
             lauf.buendel.append(
                 Buendel(
                     sku_id=sku_id(
@@ -296,13 +242,11 @@ def lies_modell(
                     geraet_monatsrate=0.0,
                     laufzeit_monate=LAUFZEIT_MONATE,
                     anschlusspreis=satz["anschlusspreis"],
-                    quelle_url=(
-                        f"{SEITE}/{pfad}/{slug}/?speicher={speicher}"
-                        f"&tfi={tarif['tarif_id']}"
-                    ),
+                    quelle_url=quelle_url,
                     abgerufen_am=abgerufen_am,
                     herleitung="tarifwelt_productdetail",
                     zustand="neu",
+                    aktionen=wechselbonus_aktionen(satz.get("hinweise"), quelle_url),
                 )
             )
     return lauf
@@ -359,8 +303,8 @@ def _pruefe(satz: dict | None, gewollt: dict, speicher: int) -> tuple[str | None
         return f"{satz.get('geraeteposten')} Geraeteposten statt 1", False
     if satz["laufzeit_monate"] != LAUFZEIT_MONATE:
         return f"Laufzeit {satz['laufzeit_monate']} statt {LAUFZEIT_MONATE}", False
-    if satz["doppelkarte"]:
-        return "Doppelkarte", False
+    if grund := unvergleichbar_grund(satz):
+        return f"nicht vergleichbar: {grund}", False
     for feld in ("grundgebuehr", "geraet_zuzahlung", "anschlusspreis"):
         if satz[feld] is None:
             return f"{feld} fehlt", False

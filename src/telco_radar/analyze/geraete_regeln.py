@@ -339,7 +339,7 @@ def _r15_zeitraum(satz: Mapping, b: Buendel, k: Kontext) -> Befund | None:
 def _r16_frische(satz: Mapping, b: Buendel, k: Kontext) -> Befund | None:
     if k.frisch is None:
         return _nicht(16, "Frischegrenze fehlt")
-    if k.frisch(b.abgerufen_am, k.heute):
+    if k.frisch(b.abgerufen_am, k.heute, b.herleitung):
         return None
     return _verletzt(16, f"abgerufen am {datum(b.abgerufen_am) or 'unbekannt'}")
 

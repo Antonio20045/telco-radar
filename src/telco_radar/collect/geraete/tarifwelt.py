@@ -33,6 +33,7 @@ import json
 import logging
 
 from ...band_regel import abstand_schluessel, stufe_fuer
+from .tarifwelt_merkmale import preiswechsel
 
 log = logging.getLogger(__name__)
 
@@ -101,6 +102,10 @@ def lies_tarifliste(text: str, url: str = "") -> list[dict]:
                 "grundgebuehr": eintrag.get("monthlyPrice"),
                 "einmalpreis_ab": eintrag.get("oneTimePriceFrom"),
                 "doppelkarte": eintrag.get("doubleCardAddendum") is not None,
+                "name": str(eintrag.get("name") or "").strip() or None,
+                "cashback": eintrag.get("cashback"),
+                "seniors": bool(eintrag.get("seniors")),
+                "preiswechsel": preiswechsel(eintrag.get("pricingIntervals")),
                 "quelle": "mediamarkt_tarifwelt",
                 "url": url,
             }
@@ -170,6 +175,10 @@ def lies_produktdetail(text: str, url: str = "") -> dict | None:
         "monat_posten": _summe_monat(daten),
         "anschlusspreis": posten.get(_POSTEN_ANSCHLUSS),
         "doppelkarte": tariff.get("doubleCardAddendum") is not None,
+        "cashback": tariff.get("cashback"),
+        "seniors": bool(tariff.get("seniors")),
+        "preiswechsel": preiswechsel(tariff.get("pricingIntervals")),
+        "hinweise": tariff.get("bullets"),
         "quelle": "mediamarkt_tarifwelt",
         "url": url,
     }

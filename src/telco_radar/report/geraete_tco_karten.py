@@ -49,7 +49,7 @@ from datetime import date as _datum
 from typing import Optional
 
 from .. import tco_kosten as _kosten
-from ..analyze.geraete_pruefstatus import HERLEITUNG_EINMALZAHLUNG
+from ..analyze.geraete_pruefstatus import HERLEITUNG_EINMALZAHLUNG, alt_ab_tagen
 from ..band_regel import band_der_karte
 from ..geraete_model import VERGLEICHBARE_ZUSTAENDE, ZUSTAENDE, normalisiere
 from ..tarif_model import QUELLE_KLICK, Preisphase, vor_dem_blatt
@@ -115,19 +115,18 @@ def alter_in_tagen(abgerufen_am: str, heute: str) -> Optional[int]:
         return None
 
 
-def ist_frisch(abgerufen_am: str, heute: str) -> bool:
+def ist_frisch(abgerufen_am: str, heute: str, herleitung: str = "") -> bool:
     """DIE EINE Definition von „frisch“ (Clean Code 7).
 
     Anzeige (Marke, Ausgrauung), Auswahl (Antwortzeile, Spanne, Bänder,
-    Zeitreihe, Katalog) und Sortierung lesen alle diese Funktion - eine
-    zweite Frische-Liste wäre zwei Listen, die auseinanderlaufen.
-    Ohne `heute` (leerer String) altert nichts: das ist der Modus der
-    Tests ohne Datum und jeder Aufruf, der bewusst nicht altert.
+    Zeitreihe, Katalog) und Sortierung lesen alle diese Funktion. Ohne
+    `heute` altert nichts (Modus der Tests ohne Datum). Ein direkt gelesener
+    Preis (`herleitung`, `alt_ab_tagen`) altert schon nach einem Tag.
     """
     if not heute:
         return True
     alter = alter_in_tagen(abgerufen_am, heute)
-    return alter is not None and alter <= ALT_AB_TAGEN
+    return alter is not None and alter <= alt_ab_tagen(herleitung, ALT_AB_TAGEN)
 
 
 def kurz_datum(iso: str) -> str:
@@ -610,7 +609,7 @@ def _karte(
     `quelle_art` allein `vom_crawler` (Hinweis neben dem Beleg der Zeile)."""
     from . import geraete_laufzeit
 
-    frisch = ist_frisch(b.abgerufen_am, heute)
+    frisch = ist_frisch(b.abgerufen_am, heute, b.herleitung)
     kosten = kosten_ueber(b)
     belastbar = kosten.gesamt is not None
     aktionen, aktion_ueberhang = aktionen_der_karte(b, heute)
