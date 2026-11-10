@@ -12,7 +12,8 @@ Gerätelaufs (``analyze.takt``). Scheitert sie, auch unerwartet, steht in jedem 
 ``unbekannt`` mit dem Fehler, die Kennzahlen nennen ihn, und der Lauf speichert weiter.
 
 Den Vortag (Regel 11) liest ``vortageswerte`` aus der Preishistorie: je Bündel die
-letzte Messung vor seinem Abruf, damit ein Sprung erst nach dem zweiten Abruf zählt.
+letzte Messung vor seinem Abruf, damit ein Sprung erst nach dem zweiten Abruf zählt,
+und ``historie_vor_stand`` dazu die Messungen der sieben Tage davor (Referenz).
 """
 
 from __future__ import annotations
@@ -22,6 +23,7 @@ import logging
 from collections import Counter
 from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass
+from datetime import date
 from pathlib import Path
 
 from .. import tco_historie
@@ -31,6 +33,7 @@ from ..tarif_bezug import Tarifbestand
 from .geraete_pruefkennzahlen import kennzahlen
 from .geraete_pruefstatus import (
     FELD_PRUEFUNG,
+    REFERENZ_TAGE,
     UNBEKANNT,
     VERLETZT,
     Kontext,
@@ -62,9 +65,19 @@ def vortageswerte(historie: Path, stand: Mapping[str, str]) -> dict[str, dict]:
     Eine fehlende Historie heißt: kein Vortag. Unlesbare Zeilen werden gezählt und
     protokolliert, die übrigen gelten.
     """
+    return historie_vor_stand(historie, stand)[0]
+
+
+def historie_vor_stand(
+    historie: Path, stand: Mapping[str, str]
+) -> tuple[dict[str, dict], dict[str, list[dict]]]:
+    """Je Bündel-ID die letzte Historienzeile vor dem Abruf (Regel 11, Vortag) und die
+    Zeilen der ``REFERENZ_TAGE`` Tage davor, aufsteigend (Regel 11, Referenz); ein
+    Durchgang über die Historie."""
     if not tco_historie.vorhanden(historie):
-        return {}
+        return {}, {}
     vortag: dict[str, dict] = {}
+    verlauf: dict[str, list[dict]] = {}
     unlesbar = 0
     for zeile in tco_historie.zeilen(historie):
         if not zeile.strip():
@@ -77,13 +90,26 @@ def vortageswerte(historie: Path, stand: Mapping[str, str]) -> dict[str, dict]:
         bid = id_aus_satz(satz) if isinstance(satz, dict) else None
         tag = str(satz.get("datum") or "") if bid else ""
         grenze = stand.get(bid or "")
-        if not tag or not grenze or tag >= grenze:
+        if not bid or not tag or not grenze or tag >= grenze:
             continue
-        if bid and (bid not in vortag or tag > str(vortag[bid].get("datum"))):
+        if bid not in vortag or tag > str(vortag[bid].get("datum")):
             vortag[bid] = satz
+        if _innerhalb(tag, grenze):
+            verlauf.setdefault(bid, []).append(satz)
+    for zeilen in verlauf.values():
+        zeilen.sort(key=lambda z: str(z.get("datum")))
     if unlesbar:
         log.warning("Prüfstelle: %d Zeilen der Historie unlesbar", unlesbar)
-    return vortag
+    return vortag, verlauf
+
+
+def _innerhalb(tag: str, grenze: str) -> bool:
+    """Liegt ``tag`` höchstens ``REFERENZ_TAGE`` Tage vor ``grenze``?"""
+    try:
+        abstand = date.fromisoformat(grenze[:10]) - date.fromisoformat(tag[:10])
+    except ValueError:
+        return False
+    return abstand.days <= REFERENZ_TAGE
 
 
 def kontext(
@@ -107,6 +133,7 @@ def kontext(
         if satz.get("datenvolumen_gb") is not None
     }
     stand = {str(s.get("id")): str(s.get("abgerufen_am") or "") for s in tco.buendel()}
+    vortag, verlauf = historie_vor_stand(tco.historie_path, stand)
     return Kontext(
         heute=heute,
         frisch=frisch,
@@ -115,7 +142,8 @@ def kontext(
         sim_only=sim_only_tabelle(tco.referenzen()),
         uvp=uvp,
         volumen=volumen,
-        vortag=vortageswerte(tco.historie_path, stand),
+        vortag=vortag,
+        verlauf=verlauf,
     )
 
 

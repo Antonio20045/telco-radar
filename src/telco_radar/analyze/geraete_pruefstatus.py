@@ -47,6 +47,8 @@ FELD_BELEG_VARIANTE = "beleg_variante"
 UVP_UNTEN = 0.85
 UVP_OBEN = 1.30
 AUSREISSER_VORTAG = 0.15
+REFERENZ_TAGE = 7
+"""Regel 11: Fenster der Referenz in Tagen vor dem Abruf (``geraete_regel11``)."""
 ERLAUBTE_RATENLAUFZEITEN = (6, 12, 24, 36)
 RECHEN_TOLERANZ_EUR = 1.00
 CENT = 0.005
@@ -151,8 +153,9 @@ class Kontext:
 
     ``sim_only`` SIM-only-Monatspreise (``geraete_regeln.sim_only_tabelle``), ``uvp``
     SKU → UVP, ``volumen`` ``tarif_id`` → gemessenes Volumen in GB, ``vortag`` Bündel-ID
-    → Messung des letzten Messtags davor. ``frisch``, ``geraet_von`` (SKU → Gerät und
-    Speicher) und ``volumen_im_namen`` kommen aus der Stufe, die sie definiert.
+    → Messung des letzten Messtags davor, ``verlauf`` Bündel-ID → Messungen der
+    ``REFERENZ_TAGE`` Tage davor (aufsteigend). ``frisch``, ``geraet_von`` (SKU → Gerät
+    und Speicher) und ``volumen_im_namen`` kommen aus der Stufe, die sie definiert.
     """
 
     heute: str
@@ -163,6 +166,7 @@ class Kontext:
     uvp: Mapping[str, float] = field(default_factory=dict)
     volumen: Mapping[str, float] = field(default_factory=dict)
     vortag: Mapping[str, dict] = field(default_factory=dict)
+    verlauf: Mapping[str, list[dict]] = field(default_factory=dict)
 
 
 def buendel_aus_satz(satz: Mapping) -> Buendel:

@@ -237,19 +237,37 @@ Ergebnis je Datensatz: gültig, Quarantäne oder veraltet.
 2. Gerätesumme zwischen 85 % und 130 % der UVP.
 3. Tarif mit Gerät ≥ SIM-only-Preis desselben Tarifs (trifft heute 846 o2-Bündel).
 4. Volumen passt zu Tarifname und Band; nie in ein Band mit mehr Volumen. Ein Tarif, dessen erfasstes Datenvolumen „unbegrenzt“ ist, gehört in die oberste Stufe XL (`band_regel.stufe_fuer`, eine Stelle für Sammeln und Bericht).
-5. Preis steigt mit dem Speicher beim selben Anbieter, Tarif, Laufzeit, Gerät und Zustand. Verglichen werden nur frische Bündel (Regel 16): ein veraltetes ist kein Vergleichspartner. Hat ein frisches Bündel einen veralteten Speicher-Nachbarn, bleibt es nur gültig, wenn Regel 11 es ersatzweise prüft (Vorgänger vorhanden, Sprung höchstens 15 %); ohne Vorgänger ist es Quarantäne 5, also fail-closed. Ohne veralteten Nachbarn ändert sich nichts.
+5. Preis steigt mit dem Speicher beim selben Anbieter, Tarif, Laufzeit, Gerät und Zustand. Verglichen werden nur frische Bündel (Regel 16): ein veraltetes ist kein Vergleichspartner. Hat ein frisches Bündel einen veralteten Speicher-Nachbarn, bleibt es nur gültig, wenn Regel 11 es ersatzweise prüft und besteht (Vorgänger vorhanden und höchstens drei Tage alt, Sprung und Referenz in Ordnung); sonst ist es Quarantäne 5, also fail-closed. Ohne veralteten Nachbarn ändert sich nichts.
 6. Ratenlaufzeit ist 6, 12, 24 oder 36 und kommt aus dem Echo der Seite.
 7. Tarifbindung vorhanden, sonst Lücke.
 8. Preisphasen decken alle H Monate ab, sonst Lücke.
 9. Sichtbarer Text und mitgeschnittene Antwort stimmen überein, sonst Befund.
 10. Aktion mit Enddatum vor heute: veraltet. Platzhalter wie 2050 heißen „unbefristet“.
-11. Ausreißer gegen den Vortag (mehr als 15 %) erst nach zweitem Abruf.
+11. Ausreißer gegen den Vortag und gegen die Woche davor erst nach zweitem Abruf, genauer unter „Regel 11 im Einzelnen“ nach dieser Liste.
 12. Gleicher Wert bei allen Bündeln eines Anbieters ist eine Erfassungslücke (CLAUDE.md Regel 11). Das gilt auch für Laufzeiten: fehlt eine Laufzeit bei allen Geräten eines Anbieters, ist das zuerst „nicht erfasst“.
 13. Beleglink enthält dieselbe Variante.
 14. Pflichtfelder vollständig (Zuzahlung, Rate, Ratenlaufzeit, Tarif, Tarifbindung, Anschluss).
 15. Vergleiche nur bei gleicher Ratenlaufzeit und gleichem Zeitraum H.
 16. Bündel älter als drei Tage nicht im Vergleich (gibt es schon); sie sind auch für Regel 5 kein Partner.
 17. Ausnahme aus Daten, nicht aus Code je Anbieter: Ein Tarif auf `config/tarif_preis_widerspruch.yaml` („Preis am Original widersprüchlich“, mit Beleg) bleibt ohne Stufe, bis der Eintrag gelöscht wird; Stand 09.11. ist die Liste leer.
+
+### Regel 11 im Einzelnen (Stand 10.11.2026)
+
+Regel 11 ist der einzige Schutz für ein frisches Bündel, dessen Speicher-Nachbar veraltet ist (Regel 5). Der Prüfer von PR 84 zeigte drei Wege, auf denen ein falsch billiger Gerätepreis durchkam: Gerätepreis -27 % gegen gestern (die Gesamtsumme bewegt sich nur um den Geräteanteil), ein seit Tagen gleich falscher Preis und ein schleichendes Sinken. Darum prüft die Regel (`analyze/geraete_regel11.py`, Schwellen in `geraete_pruefstatus`):
+
+| Prüfung | Grenze | Folge |
+|---|---|---|
+| Alter des Vorgängers (letzte Messung vor dem Abruf) | höchstens 3 Tage, gleich `ALT_AB_TAGEN` der Seite | älter: Regel nicht anwendbar (nicht prüfbar); beim veralteten Nachbarn Quarantäne 5. Ein Gesamtsprung über 15 % gegen den älteren Vorgänger bleibt Quarantäne 11 wie zuvor |
+| Gesamtsumme 24 Monate gegen den Vorgänger | höchstens 15 % (unverändert) | Quarantäne 11 bis zum zweiten Abruf |
+| Gerätepreis (Zuzahlung plus Raten) gegen den Vorgänger | höchstens 10 % | Quarantäne 11 bis zum zweiten Abruf |
+| Gerätepreis gegen den Höchstwert der 7 Tage davor | höchstens 10 % darunter, ab 3 Messungen im Fenster | Quarantäne 11, bis der Preis aus dem Fenster gewachsen ist (höchstens 7 Tage) |
+
+Begründung der Zahlen aus dem Bestand (Historie 26.10. bis 09.11., 84.212 Paare aufeinanderfolgender Messungen desselben Bündels):
+
+- Der Gerätepreis ändert sich von Messung zu Messung bei 0,9 % der Paare, um mehr als 5 % bei 0,56 %, um mehr als 10 % bei 0,22 % (189 Paare), um mehr als 15 % bei 0,12 %. Die Gesamtsumme dämpft: über 15 % nur 41 Paare. Ein Sprung des Gerätepreises über 10 % ist damit selten genug, um ihn als Verdacht zu behandeln, und deckt die Fehler der Größe aus Regel 5 (17 % und 27 %) ab. Bei 5 % träfe es am Spitzentag (04.11.) 3,0 % der frisch gemessenen Zeilen, bei 10 % 1,3 %.
+- Als Referenz dient der Höchstwert, nicht der Median: der Median sinkt mit einem Preis mit und schlägt auch bei Anstiegen an (Simulation 02. bis 09.11.: 522 Treffer in 8 Tagen gegen 218 beim Höchstwert, Spitzentag 2,0 % gegen 1,6 % der Zeilen). Der Höchstwert ist die einfachste Größe, die schleichendes Sinken fängt (4 % je Tag wird am vierten Tag erkannt) und einen seit Tagen gleich falschen Preis, solange der richtige in den 7 Tagen davor liegt. Sieben Tage statt vierzehn, weil ein dauerhaft gesenkter Preis (Aktion) sonst zwei Wochen in Quarantäne bliebe: mit 14 Tagen träfe es am Bestand 09.11. 27 statt 6 Zeilen, die übrigen 21 führen ihren neuen Preis seit 6 bis 10 Tagen stabil (congstar iPhone 17 256 und 512 GB: 907 auf 685 € am 30.10.). Die Referenz sieht nur Rückgänge: ein höherer Preis ist kein Fall für diese Quarantäne.
+- Grenze der Referenz: ein Preis, der länger als 7 Tage gleich falsch ist, bleibt unentdeckt. Das fängt keine Regel aus der Historie; dafür gibt es den Abgleich am Original (CLAUDE.md Regel 11).
+- Wirkung am Bestand 09.11.: 72 von 7.663 bisher gültigen Zeilen (0,94 %) gehen neu in Quarantäne, am Bestand mit Stichtag 10.11. 54 von 7.366 (0,73 %). Keine Zeile wird lockerer; der Richtwert von 2 % ist eingehalten.
 
 Umsetzung mit pydantic und pandera in pytest. Kennzahlen je Anbieter und Lauf auf der Quellen-Seite: Abdeckung (je Laufzeit), Frische, Quarantänequote, Konfliktquote, Belegquote.
 
