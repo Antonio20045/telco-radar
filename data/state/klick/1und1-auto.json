@@ -1,7 +1,7 @@
 {
  "anbieter": "1und1-auto",
- "datum": "2026-11-09",
- "dauer_sekunden": 110.4,
+ "datum": "2026-11-10",
+ "dauer_sekunden": 140.2,
  "format": 1,
  "frischegrenze_tage": 3,
  "grund": null,
@@ -26,7 +26,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "fd26905989c57f187edf414297913c3edb49ca5e6cb009b569d02ead322e101a",
+      "beleg_id": "06fd4629de63b7a2fbf3eb4371f8db80d113377dc4b52188eac4d69925094d1b",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -34,12 +34,12 @@
        }
       ],
       "bildfolge_fehlt": [
-       "geraet_speicher: Seite markiert nichts statt 256",
-       "tarif: Dimension ohne Knopf und ohne Selektor in der Karte",
-       "laufzeit: Option ist eine Kachel ohne Markierung"
+       "geraet_speicher: Der Speicher steht nur auf der Produktseite, das Bild entsteht erst auf der Folgeseite des Bestellwegs",
+       "tarif: Tarif ist fest und nicht auf der Seite gewählt, nur im Kacheltext genannt",
+       "laufzeit: Laufzeit-Kacheln tragen keine Markierung der Wahl"
       ],
-      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=b7e27f6d-b5cf-4171-b506-7bea9d7c00dd",
-      "zeitpunkt": "2026-11-09T06:02:10Z"
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=654f16bb-6c28-454d-a1a8-990887cbbf5f",
+      "zeitpunkt": "2026-11-10T07:05:26Z"
      },
      "beleg_status": "offen",
      "buendel": {
@@ -50,7 +50,7 @@
       "antwort_betrag": true,
       "antwort_einmalzahlung": true,
       "antwort_laufzeit": 36,
-      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=b7e27f6d-b5cf-4171-b506-7bea9d7c00dd",
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=654f16bb-6c28-454d-a1a8-990887cbbf5f",
       "fundstellen": [],
       "gleicher_betrag": false,
       "kachel_betrag": true,
@@ -92,7 +92,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "1c8ff0b81a6c95c6166cc4cc55fc44bb4234037d49faedaee6a8c51a06bf501a",
+      "beleg_id": "920b9b7e5efceacaa1949a380b5250e236c81f751eff641c15da5b4f6e747fe7",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -100,12 +100,12 @@
        }
       ],
       "bildfolge_fehlt": [
-       "geraet_speicher: Seite markiert nichts statt 256",
-       "tarif: Dimension ohne Knopf und ohne Selektor in der Karte",
-       "laufzeit: Option ist eine Kachel ohne Markierung"
+       "geraet_speicher: Der Speicher steht nur auf der Produktseite, das Bild entsteht erst auf der Folgeseite des Bestellwegs",
+       "tarif: Tarif ist fest und nicht auf der Seite gewählt, nur im Kacheltext genannt",
+       "laufzeit: Laufzeit-Kacheln tragen keine Markierung der Wahl"
       ],
-      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=b7e27f6d-b5cf-4171-b506-7bea9d7c00dd",
-      "zeitpunkt": "2026-11-09T06:02:10Z"
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=654f16bb-6c28-454d-a1a8-990887cbbf5f",
+      "zeitpunkt": "2026-11-10T07:05:26Z"
      },
      "beleg_status": "offen",
      "buendel": {
@@ -116,7 +116,7 @@
       "antwort_betrag": true,
       "antwort_einmalzahlung": true,
       "antwort_laufzeit": 36,
-      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=b7e27f6d-b5cf-4171-b506-7bea9d7c00dd",
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=654f16bb-6c28-454d-a1a8-990887cbbf5f",
       "fundstellen": [
        "window.oResult.data[\"product.tariff.monthlycostsgross.2.cost\"]",
        "window.oResult.data[\"productlist.vendors.multi.tariff.monthlycostsgross.DE.3.cost\"][0]",
@@ -169,7 +169,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "d110dbf29690d110cb6fe53a85b0b72d9f54b0920e215ecfaab42018ed4b8f70",
+      "beleg_id": "05ec03c0e5c4dfa9b2da909ac5e49e4e311e8d9a35f064eca0570b1ee44e8bd5",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -177,12 +177,12 @@
        }
       ],
       "bildfolge_fehlt": [
-       "geraet_speicher: Seite markiert nichts statt 512",
-       "tarif: Dimension ohne Knopf und ohne Selektor in der Karte",
-       "laufzeit: Option ist eine Kachel ohne Markierung"
+       "geraet_speicher: Der Speicher steht nur auf der Produktseite, das Bild entsteht erst auf der Folgeseite des Bestellwegs",
+       "tarif: Tarif ist fest und nicht auf der Seite gewählt, nur im Kacheltext genannt",
+       "laufzeit: Laufzeit-Kacheln tragen keine Markierung der Wahl"
       ],
-      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=04096978-a5f3-4e29-9106-7967ab0b209a",
-      "zeitpunkt": "2026-11-09T06:02:32Z"
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=8e0a44bf-8e9c-4b11-aaff-7118a1f80551",
+      "zeitpunkt": "2026-11-10T07:05:57Z"
      },
      "beleg_status": "offen",
      "buendel": {
@@ -193,7 +193,7 @@
       "antwort_betrag": true,
       "antwort_einmalzahlung": true,
       "antwort_laufzeit": 36,
-      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=04096978-a5f3-4e29-9106-7967ab0b209a",
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=8e0a44bf-8e9c-4b11-aaff-7118a1f80551",
       "fundstellen": [],
       "gleicher_betrag": false,
       "kachel_betrag": true,
@@ -235,7 +235,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "058c64f776add8317fddb7ee02413525d68af8775ffabb80c430d0331ceb124e",
+      "beleg_id": "28c59d5a0042aabaa8bba34d8a22c353f2c553e9df99c53b59cf0194df61f8ad",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -243,12 +243,12 @@
        }
       ],
       "bildfolge_fehlt": [
-       "geraet_speicher: Seite markiert nichts statt 512",
-       "tarif: Dimension ohne Knopf und ohne Selektor in der Karte",
-       "laufzeit: Option ist eine Kachel ohne Markierung"
+       "geraet_speicher: Der Speicher steht nur auf der Produktseite, das Bild entsteht erst auf der Folgeseite des Bestellwegs",
+       "tarif: Tarif ist fest und nicht auf der Seite gewählt, nur im Kacheltext genannt",
+       "laufzeit: Laufzeit-Kacheln tragen keine Markierung der Wahl"
       ],
-      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=04096978-a5f3-4e29-9106-7967ab0b209a",
-      "zeitpunkt": "2026-11-09T06:02:32Z"
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=8e0a44bf-8e9c-4b11-aaff-7118a1f80551",
+      "zeitpunkt": "2026-11-10T07:05:58Z"
      },
      "beleg_status": "offen",
      "buendel": {
@@ -259,7 +259,7 @@
       "antwort_betrag": true,
       "antwort_einmalzahlung": true,
       "antwort_laufzeit": 36,
-      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=04096978-a5f3-4e29-9106-7967ab0b209a",
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=8e0a44bf-8e9c-4b11-aaff-7118a1f80551",
       "fundstellen": [
        "window.iTealiumInterface.history[0].final_dictionary[\"vendors.multi.tealium.inCart.product.tariff.monthlycostsgross.3.cost\"]",
        "window.iTealiumInterface.history[0].final_dictionary[\"vendors.multi.tealium.inCart.product.tariff.monthlycostsgross.2.cost\"]",
@@ -312,7 +312,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "fa7dea22e2d08b12e5107d2e00e7fb2caea2cc314c524b207d7133fe39f45994",
+      "beleg_id": "3a30298c980181270c6573adb4d000dd2850ffe55e1b45c36f6c7d93e359fe7f",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -320,12 +320,12 @@
        }
       ],
       "bildfolge_fehlt": [
-       "geraet_speicher: Seite markiert nichts statt 1024",
-       "tarif: Dimension ohne Knopf und ohne Selektor in der Karte",
-       "laufzeit: Option ist eine Kachel ohne Markierung"
+       "geraet_speicher: Der Speicher steht nur auf der Produktseite, das Bild entsteht erst auf der Folgeseite des Bestellwegs",
+       "tarif: Tarif ist fest und nicht auf der Seite gewählt, nur im Kacheltext genannt",
+       "laufzeit: Laufzeit-Kacheln tragen keine Markierung der Wahl"
       ],
-      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=89f494d8-0101-471e-83bc-5dd1baded2be",
-      "zeitpunkt": "2026-11-09T06:02:54Z"
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=c08d506f-3a48-4e83-b9a9-70ca98754f82",
+      "zeitpunkt": "2026-11-10T07:06:23Z"
      },
      "beleg_status": "offen",
      "buendel": {
@@ -336,7 +336,7 @@
       "antwort_betrag": true,
       "antwort_einmalzahlung": true,
       "antwort_laufzeit": 36,
-      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=89f494d8-0101-471e-83bc-5dd1baded2be",
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=c08d506f-3a48-4e83-b9a9-70ca98754f82",
       "fundstellen": [],
       "gleicher_betrag": false,
       "kachel_betrag": true,
@@ -378,7 +378,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "1839c239e3a917c894d32035ffce895610aa0e11158be2dd22c9103d03f9ef61",
+      "beleg_id": "5cffafeed8e36fb8d0108a59f8f7e2dda2fbb0f79789e30d33a2700ca0a041ea",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -386,12 +386,12 @@
        }
       ],
       "bildfolge_fehlt": [
-       "geraet_speicher: Seite markiert nichts statt 1024",
-       "tarif: Dimension ohne Knopf und ohne Selektor in der Karte",
-       "laufzeit: Option ist eine Kachel ohne Markierung"
+       "geraet_speicher: Der Speicher steht nur auf der Produktseite, das Bild entsteht erst auf der Folgeseite des Bestellwegs",
+       "tarif: Tarif ist fest und nicht auf der Seite gewählt, nur im Kacheltext genannt",
+       "laufzeit: Laufzeit-Kacheln tragen keine Markierung der Wahl"
       ],
-      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=89f494d8-0101-471e-83bc-5dd1baded2be",
-      "zeitpunkt": "2026-11-09T06:02:54Z"
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=c08d506f-3a48-4e83-b9a9-70ca98754f82",
+      "zeitpunkt": "2026-11-10T07:06:23Z"
      },
      "beleg_status": "offen",
      "buendel": {
@@ -402,7 +402,7 @@
       "antwort_betrag": true,
       "antwort_einmalzahlung": true,
       "antwort_laufzeit": 36,
-      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=89f494d8-0101-471e-83bc-5dd1baded2be",
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=c08d506f-3a48-4e83-b9a9-70ca98754f82",
       "fundstellen": [
        "window.iTealiumInterface.history[0].final_dictionary[\"vendors.multi.tealium.inCart.product.tariff.monthlycostsgross.3.cost\"]",
        "window.iTealiumInterface.history[0].final_dictionary[\"vendors.multi.tealium.inCart.product.tariff.monthlycostsgross.2.cost\"]",
@@ -455,7 +455,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "f2363bdb7351fbb57eb8d53661b53c4f4f92bca9e9941e36623cd5b7656ef45f",
+      "beleg_id": "8f4a20ec35b3c18755f72f76a5bad454dda9deaa100cb7d1d3d98f0bf1769776",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -463,12 +463,12 @@
        }
       ],
       "bildfolge_fehlt": [
-       "geraet_speicher: Seite markiert nichts statt 2048",
-       "tarif: Dimension ohne Knopf und ohne Selektor in der Karte",
-       "laufzeit: Option ist eine Kachel ohne Markierung"
+       "geraet_speicher: Der Speicher steht nur auf der Produktseite, das Bild entsteht erst auf der Folgeseite des Bestellwegs",
+       "tarif: Tarif ist fest und nicht auf der Seite gewählt, nur im Kacheltext genannt",
+       "laufzeit: Laufzeit-Kacheln tragen keine Markierung der Wahl"
       ],
-      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=562dc4d5-db7a-4847-938b-4e1092ff8ddc",
-      "zeitpunkt": "2026-11-09T06:03:15Z"
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=50af77fd-686d-4c12-a956-e4764410e3af",
+      "zeitpunkt": "2026-11-10T07:06:53Z"
      },
      "beleg_status": "offen",
      "buendel": {
@@ -479,7 +479,7 @@
       "antwort_betrag": true,
       "antwort_einmalzahlung": true,
       "antwort_laufzeit": 36,
-      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=562dc4d5-db7a-4847-938b-4e1092ff8ddc",
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=50af77fd-686d-4c12-a956-e4764410e3af",
       "fundstellen": [],
       "gleicher_betrag": false,
       "kachel_betrag": true,
@@ -521,7 +521,7 @@
      },
      "befunde": [],
      "beleg": {
-      "beleg_id": "847c56bd2e77dbb163c33b250010129e785b673e563c5915be6e959c49b32051",
+      "beleg_id": "caae82117c7ab20acc6cffc8a89aad5a282cf80364a5fe87f1df88dd7c9827b0",
       "bildfolge": [
        {
         "schritt": "preis",
@@ -529,12 +529,12 @@
        }
       ],
       "bildfolge_fehlt": [
-       "geraet_speicher: Seite markiert nichts statt 2048",
-       "tarif: Dimension ohne Knopf und ohne Selektor in der Karte",
-       "laufzeit: Option ist eine Kachel ohne Markierung"
+       "geraet_speicher: Der Speicher steht nur auf der Produktseite, das Bild entsteht erst auf der Folgeseite des Bestellwegs",
+       "tarif: Tarif ist fest und nicht auf der Seite gewählt, nur im Kacheltext genannt",
+       "laufzeit: Laufzeit-Kacheln tragen keine Markierung der Wahl"
       ],
-      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=562dc4d5-db7a-4847-938b-4e1092ff8ddc",
-      "zeitpunkt": "2026-11-09T06:03:15Z"
+      "seite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=50af77fd-686d-4c12-a956-e4764410e3af",
+      "zeitpunkt": "2026-11-10T07:06:53Z"
      },
      "beleg_status": "offen",
      "buendel": {
@@ -545,7 +545,7 @@
       "antwort_betrag": true,
       "antwort_einmalzahlung": true,
       "antwort_laufzeit": 36,
-      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=562dc4d5-db7a-4847-938b-4e1092ff8ddc",
+      "folgeseite": "https://mobile.1und1.de/flow2/mobile/ssc-private/tariffContractDuration?tariffChangeUrl=%2F%2Fmobile.1und1.de%2Fiphone-duo&optionalPrecedingDocuments=%2F%2Fmobile.1und1.de%2Fiphone-duo&addFlowStates=tradeInAvailable%2CbrandApple%2CwatchAvailable%2CaskWatch%2ChwDurationsAvailable&traceId=50af77fd-686d-4c12-a956-e4764410e3af",
       "fundstellen": [
        "window.iTealiumInterface.history[0].final_dictionary[\"vendors.multi.tealium.inCart.product.tariff.monthlycostsgross.3.cost\"]",
        "window.iTealiumInterface.history[0].final_dictionary[\"vendors.multi.tealium.inCart.product.tariff.monthlycostsgross.2.cost\"]",
@@ -592,16 +592,16 @@
    ],
    "ladung": {
     "abstand_s": 2.0,
-    "anfragen": 29,
-    "beendet": 28,
+    "anfragen": 28,
+    "beendet": 27,
     "dokument": "complete",
     "geladen": true,
     "offen": {
      "cdn.appdynamics.com": 1
     },
     "ohne_antwort_ms": 0,
-    "sekunden": 5.8,
-    "takte_ms": 1450,
+    "sekunden": 4.9,
+    "takte_ms": 2450,
     "wartet_auf": "load"
    },
    "speicher_gb": 256,
@@ -616,11 +616,11 @@
     "knoepfe_gefunden": 9,
     "knoepfe_gesucht": 9
    },
-   "verworfen": 24
+   "verworfen": 28
   }
  ],
  "ueberfaellig": [],
  "uebersichten": [],
  "vertragsform": "ein_vertrag",
- "zeitbudget_sekunden": 10256
+ "zeitbudget_sekunden": 10248
 }
