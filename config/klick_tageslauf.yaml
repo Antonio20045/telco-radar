@@ -29,8 +29,14 @@
 # eigene Seite.
 #
 # Neue Modelle: was hier fehlt, leitet `klickliste_auto` aus Katalog (auch den
-# Auto-Einträgen) und Bestand ab: je Anbieter ein Ziel `<Schlüssel>-auto` mit höchstens
-# 8 Seiten (Telefone von Apple, Samsung Galaxy S, Google Pixel). Hier nichts eintragen.
+# Auto-Einträgen) und Bestand ab: je Anbieter ein Ziel `<Schlüssel>-auto` (Telefone von
+# Apple, Samsung Galaxy S, Google Pixel) mit höchstens 8 Plätzen (Gerät × Speicherstufe).
+# Ein Platz ist eine Seite, bei Telekom aber eine je MagentaMobil-Tarif (die Seite zeigt
+# nur den Tarif ihrer Startadresse), also bis zu 5; acht Plätze wären 40 Seiten. Eine
+# Telekom-Seite braucht bis zu 285 s, ein Job rund 10.258 s: das Ziel hat darum höchstens
+# HOECHSTE_SEITEN_JE_ZIEL (30) Seiten, ganze Plätze. Was nicht passt, rotiert: erst die
+# Plätze mit der ältesten Klick-Messung, so liest jeder Platz höchstens alle 2 Tage und
+# bleibt unter FRISCHEGRENZE_TAGE (3). Hier nichts eintragen.
 #
 # Rotation: nie gelesene Seiten zuerst, dann die am längsten nicht gelesenen
 # (data/state/klick/klick_stand.json). Reicht das Zeitbudget nicht für alle Seiten
