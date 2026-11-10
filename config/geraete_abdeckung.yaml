@@ -255,21 +255,22 @@ belegte_luecken:
     original: https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-15-256gb-schwarz-5g-details
     geprueft: "2026-11-09"
     bis: "2026-11-23"
-  # congstar: Apple iPhone Duo ist nicht in der Geräteliste. Belegt (08.11.2026,
-  # docs/belege/congstar-duo-0811/): die Einzelseite /geraete/apple/apple-iphone-duo/
-  # antwortet HTTP 200, trägt aber <title>Error 404</title> (Soft-404, curl,
-  # TelcoRadar/1.0). Maßgeblich ist die Geräteliste: die Apple-Übersicht (1,
-  # Screenshot) nennt kein „Duo“, die Sitemap sitemap/devices.xml (2) führt nur
-  # 14/15-refurbished, 16, 17, 17e, 18 Pro, 18 Pro Max, Air - kein Duo.
+  # congstar: Apple iPhone Duo ist nicht in der Geräteliste. Belegt (10.11.2026,
+  # docs/belege/congstar-duo-1011/, Playwright, ehrliche Kennung, Menü-Links
+  # statt geratener Adresse, nichts im Warenkorb, Seitentexte in
+  # arbeit/original-congstar-duo-1011.md): die Apple-Kategorie „iPhones mit
+  # Vertrag“ (1, ganze Seite, 28 Einträge) nennt kein „Duo“, die Smartphone-
+  # Kategorie (38 Geräte) ebenso nicht. Die frühere Einzelseite (geratene
+  # Adresse, Soft-404) ist kein Beleg mehr.
   - anbieter: congstar
     modelle:
       - apple-iphone-duo
-    grund: Gerät ist nicht in der Geräteliste (Apple-Übersicht) und nicht in der Sitemap; die Einzelseite antwortet HTTP 200 mit Error-404-Inhalt (Soft-404)
+    grund: Gerät ist nicht in der Geräteliste (Kategorie iPhones mit Vertrag, 28 Einträge, kein Duo) und nicht in der Smartphone-Kategorie
     art: nicht_im_portfolio
-    beleg: https://github.com/Antonio20045/telco-radar/blob/main/docs/belege/congstar-duo-0811/1-apple-uebersicht-ohne-duo.png
-    original: https://www.congstar.de/geraete/apple/apple-iphone-duo/
-    geprueft: "2026-11-08"
-    bis: "2026-11-22"
+    beleg: https://github.com/Antonio20045/telco-radar/blob/main/docs/belege/congstar-duo-1011/1-apple-iphones-kategorie-ohne-duo.png
+    original: https://www.congstar.de/geraete/apple/
+    geprueft: "2026-11-10"
+    bis: "2026-11-24"
   # 1&1: iPhone 16e und iPhone 15 werden nicht mehr verkauft. Belegt (08.11.2026,
   # docs/belege/1und1-sortiment-0811/, Playwright, ehrliche Kennung, nichts im
   # Warenkorb): /iphone-16e leitet auf /iphone-17e um (Screenshot 2; das 17e gibt es
