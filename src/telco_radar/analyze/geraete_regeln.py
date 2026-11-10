@@ -2,12 +2,16 @@
 
 ``pruefe_bestand`` gibt jedem Bündelsatz ein ``Pruefergebnis`` (Status und Befunde,
 ``geraete_pruefstatus``). Regel 5 (Preis steigt mit dem Speicher) prüft den ganzen
-Bestand je Anbieter, Tarif, Laufzeit, Gerät und Zustand; Regel 12 (gleicher Wert bei
-allen Bündeln eines Anbieters, auch eine Ratenlaufzeit, die bei allen Geräten fehlt)
-ergibt eine Erfassungslücke je Anbieter (``erfassungsluecken``), keinen Status. Regel
-15 gilt im Vergleich (Sieger, Δ); je Bündel wird nur geprüft, ob der Zeitraum H
-bestimmbar ist. Regel 4 prüft das Volumen im Tarifnamen gegen den Tarifbestand; ob ein
-Tarif in ein Band mit mehr Volumen fällt, entscheidet die Bandzuordnung der Ansicht.
+Bestand je Anbieter, Tarif, Laufzeit, Gerät und Zustand, aber nur zwischen frischen
+Bündeln: ein veraltetes (Regel 16) ist kein Vergleichspartner. Hat ein frisches einen
+veralteten Speicher-Nachbarn, bleibt es nur gültig, wenn Regel 11 es ersatzweise prüft
+(Vorgänger vorhanden, Sprung höchstens 15 %); ohne Vorgänger ist es Quarantäne 5
+(fail-closed). Regel 12 (gleicher Wert bei allen Bündeln eines Anbieters, auch eine
+Ratenlaufzeit, die bei allen Geräten fehlt) ergibt eine Erfassungslücke je Anbieter
+(``erfassungsluecken``), keinen Status. Regel 15 gilt im Vergleich (Sieger, Δ); je
+Bündel wird nur geprüft, ob der Zeitraum H bestimmbar ist. Regel 4 prüft das Volumen
+im Tarifnamen gegen den Tarifbestand; ob ein Tarif in ein Band mit mehr Volumen fällt,
+entscheidet die Bandzuordnung der Ansicht.
 Regel 3 zieht vom SIM-only-Preis den belegten Bündelnachlass des Anbieters ab
 (``BUENDEL_NACHLASS``). Ein Beleg ohne Ratenlaufzeit, Tarif und Speicher ist für Regel
 13 nicht prüfbar.
@@ -57,14 +61,12 @@ from .geraete_pruefstatus import (
     datum,
     eur,
     gb,
-    geraetepreis,
     ist_bedingter_tarif,
     pflichtfelder,
 )
+from .geraete_regel5 import speicherstufen
 
 FELDER_AUS_DEM_TARIFBLATT = ("tarif_bindung_monate", "tarif_phasen")
-ZUSTAND_UNBEKANNT = ("", "unbekannt")
-"""Zustände, die Regel 5 nicht vergleicht (``Buendel.zustand`` ohne Angabe)."""
 AUS_DEM_TARIFBLATT = (
     "die Seite zeigt Tarifbindung und Preisphasen aus dem Tarifblatt; die Ergänzung "
     "steht nur in report/ (geraete_tco_view, geraete_tco_karten.phasen_fuer_buendel)"
@@ -88,7 +90,12 @@ def pruefe_bestand(saetze: Iterable[Mapping], k: Kontext) -> dict[str, Prueferge
         befunde = [x for regel in _JE_BUENDEL if (x := regel(satz, b, k)) is not None]
         ergebnisse[bid] = Pruefergebnis(befunde)
         lesbar.append((bid, b))
-    for bid, befund in _speicherstufen(lesbar, k).items():
+    geprueft = frozenset(
+        bid
+        for bid, e in ergebnisse.items()
+        if not any(x.regel == 11 for x in e.befunde)
+    )
+    for bid, befund in speicherstufen(lesbar, k, geprueft).items():
         ergebnisse[bid].befunde.append(befund)
     return ergebnisse
 
@@ -353,39 +360,6 @@ _JE_BUENDEL = (
     _r15_zeitraum,
     _r16_frische,
 )
-
-
-def _speicherstufen(lesbar: list[tuple[str, Buendel]], k: Kontext) -> dict[str, Befund]:
-    """Regel 5 über den Bestand: gleicher Anbieter, Tarif, Laufzeit, Gerät und Zustand,
-    mehr Speicher kostet nie weniger; beide Bündel eines Paars sind Quarantäne. Ohne
-    Vergleich: unbekannter Zustand (Clean Code 4) und veralteter Preis (Regel 16)."""
-    befunde: dict[str, Befund] = {}
-    stufen: dict[tuple, dict[int, list[tuple[str, float]]]] = {}
-    for bid, b in lesbar:
-        geraet, speicher = k.geraet_von(b.sku_id) if k.geraet_von else ("", None)
-        preis = geraetepreis(b)
-        if not geraet or speicher is None or preis is None:
-            befunde[bid] = _nicht(5, "Gerät, Speicher oder Gerätepreis fehlt")
-            continue
-        if b.zustand in ZUSTAND_UNBEKANNT:
-            befunde[bid] = _nicht(5, "Zustand des Geräts unbekannt")
-            continue
-        if k.frisch is not None and not k.frisch(b.abgerufen_am, k.heute):
-            continue
-        tarif = b.tarif_id or normalisiere(b.tarif_name)
-        reihe = (normalisiere(b.anbieter), tarif, b.laufzeit_monate, geraet, b.zustand)
-        stufen.setdefault(reihe, {}).setdefault(speicher, []).append((bid, preis))
-    for je_speicher in stufen.values():
-        groessen = sorted(je_speicher)
-        for i, klein in enumerate(groessen):
-            for gross in groessen[i + 1 :]:
-                for kid, kp in je_speicher[klein]:
-                    for gid, gp in je_speicher[gross]:
-                        if gp < kp - CENT:
-                            text = f"{gross} GB für {eur(gp)}, {klein} GB für {eur(kp)}"
-                            befunde.setdefault(kid, _verletzt(5, text))
-                            befunde.setdefault(gid, _verletzt(5, text))
-    return befunde
 
 
 def _echo(satz: Mapping) -> Mapping | None:

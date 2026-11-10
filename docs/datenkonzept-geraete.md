@@ -237,7 +237,7 @@ Ergebnis je Datensatz: gültig, Quarantäne oder veraltet.
 2. Gerätesumme zwischen 85 % und 130 % der UVP.
 3. Tarif mit Gerät ≥ SIM-only-Preis desselben Tarifs (trifft heute 846 o2-Bündel).
 4. Volumen passt zu Tarifname und Band; nie in ein Band mit mehr Volumen. Ein Tarif, dessen erfasstes Datenvolumen „unbegrenzt“ ist, gehört in die oberste Stufe XL (`band_regel.stufe_fuer`, eine Stelle für Sammeln und Bericht).
-5. Preis steigt mit dem Speicher beim selben Anbieter, Tarif und Laufzeit.
+5. Preis steigt mit dem Speicher beim selben Anbieter, Tarif, Laufzeit, Gerät und Zustand. Verglichen werden nur frische Bündel (Regel 16): ein veraltetes ist kein Vergleichspartner. Hat ein frisches Bündel einen veralteten Speicher-Nachbarn, bleibt es nur gültig, wenn Regel 11 es ersatzweise prüft (Vorgänger vorhanden, Sprung höchstens 15 %); ohne Vorgänger ist es Quarantäne 5, also fail-closed. Ohne veralteten Nachbarn ändert sich nichts.
 6. Ratenlaufzeit ist 6, 12, 24 oder 36 und kommt aus dem Echo der Seite.
 7. Tarifbindung vorhanden, sonst Lücke.
 8. Preisphasen decken alle H Monate ab, sonst Lücke.
@@ -248,7 +248,7 @@ Ergebnis je Datensatz: gültig, Quarantäne oder veraltet.
 13. Beleglink enthält dieselbe Variante.
 14. Pflichtfelder vollständig (Zuzahlung, Rate, Ratenlaufzeit, Tarif, Tarifbindung, Anschluss).
 15. Vergleiche nur bei gleicher Ratenlaufzeit und gleichem Zeitraum H.
-16. Bündel älter als drei Tage nicht im Vergleich (gibt es schon).
+16. Bündel älter als drei Tage nicht im Vergleich (gibt es schon); sie sind auch für Regel 5 kein Partner.
 17. Ausnahme aus Daten, nicht aus Code je Anbieter: Ein Tarif auf `config/tarif_preis_widerspruch.yaml` („Preis am Original widersprüchlich“, mit Beleg) bleibt ohne Stufe, bis der Eintrag gelöscht wird; Stand 09.11. ist die Liste leer.
 
 Umsetzung mit pydantic und pandera in pytest. Kennzahlen je Anbieter und Lauf auf der Quellen-Seite: Abdeckung (je Laufzeit), Frische, Quarantänequote, Konfliktquote, Belegquote.

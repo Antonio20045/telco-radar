@@ -241,7 +241,9 @@ def test_alter_preis_der_groesseren_stufe_widerlegt_keinen_frischen():
     """Galaxy S26 o2 (09.11.2026): 256 GB frisch (7 € + 24 x 50 €) stand wegen
     512 GB aus der Zeit vor dem Frischefenster (1 € + 24 x 48 €) in Quarantäne.
     Ein veralteter Preis (Regel 16) ist kein Vergleichspartner; die Zeile bleibt
-    veraltet, bekommt aber keinen Befund 5, und die frische bleibt gültig."""
+    veraltet, bekommt aber keinen Befund 5. Die frische bleibt gültig, weil Regel 11
+    sie ersatzweise prüft: der Vorgänger ist da und der Sprung klein (``_kontext``
+    gibt jedem Satz einen Vortag mit denselben Preisen)."""
     klein = _satz(128)
     gross = _satz(256, geraet_monatsrate=25.0, abgerufen_am="2026-09-01")
     felder = _pruefe(klein, gross)
@@ -250,6 +252,58 @@ def test_alter_preis_der_groesseren_stufe_widerlegt_keinen_frischen():
     assert not _erwaehnt(felder[gross["id"]], 5)
     assert felder[gross["id"]]["status"] == VERALTET
     assert 16 in _gruende(felder[gross["id"]])
+
+
+def _veraltet_und_frisch_falsch_billig() -> tuple[dict, dict]:
+    """Der Fall des Prüfers (PR 84, 10.11.): 128 GB 13 Tage alt, 256 GB frisch und
+    falsch billig (Rate 25 € statt 30 €)."""
+    alt = _satz(128, abgerufen_am="2026-09-20")
+    return alt, _satz(256, geraet_monatsrate=25.0)
+
+
+def test_frischer_falsch_billiger_preis_ohne_vorgaenger_bleibt_in_quarantaene():
+    """Ein veralteter Nachbar ist kein Partner; ohne Vorgänger prüft nichts die
+    frische Zeile. Fail-closed: Quarantäne 5, nicht gültig. Vor dieser Regel (und mit
+    der bloßen Frische-Ausnahme) rutschte sie durch."""
+    alt, frisch = _veraltet_und_frisch_falsch_billig()
+    felder = _pruefe(alt, frisch, vortag={})
+    assert felder[frisch["id"]]["status"] == QUARANTAENE, felder[frisch["id"]]
+    assert _gruende(felder[frisch["id"]])[5] == (
+        "128 GB nur veraltet (abgerufen am 20.09.2026), "
+        "kein Vortagsvergleich als Ersatz"
+    )
+    assert felder[alt["id"]]["status"] == VERALTET
+    assert not _erwaehnt(felder[alt["id"]], 5)
+
+
+def test_frischer_preis_mit_vorgaenger_und_vortagssprung_bleibt_in_quarantaene():
+    """Ersatz durch Regel 11 gilt nur, wenn sie besteht: ein Sprung gegen den Vortag
+    (hier 19 %) hält die Zeile in Quarantäne."""
+    alt, frisch = _veraltet_und_frisch_falsch_billig()
+    gestern = {"id": frisch["id"], "datum": VORTAG, "tarif_monatlich": 20.0}
+    felder = _pruefe(alt, frisch, vortag={frisch["id"]: gestern})
+    assert felder[frisch["id"]]["status"] == QUARANTAENE, felder[frisch["id"]]
+    assert 11 in _gruende(felder[frisch["id"]])
+
+
+def test_frischer_stimmiger_preis_mit_vorgaenger_wird_gueltig():
+    """Gegenprobe zu den beiden Fällen davor: dieselbe Lage mit stimmigem Preis und
+    Vorgänger ist gültig (S26 256 o2: frisch gegen einen teureren Preis vom 14.10.)."""
+    alt = _satz(128, geraet_monatsrate=40.0, abgerufen_am="2026-10-14")
+    frisch = _satz(256, geraet_monatsrate=35.0)
+    felder = _pruefe(alt, frisch)
+    assert felder[frisch["id"]]["status"] == GUELTIG, felder[frisch["id"]]
+    assert not _erwaehnt(felder[frisch["id"]], 5)
+
+
+def test_ohne_veralteten_nachbarn_braucht_regel_5_keinen_vorgaenger():
+    """Wo kein Vergleichspartner fehlt, ändert sich nichts: frische Zeilen ohne
+    Vortag bleiben gültig, auch mit passender Speicherstufe daneben."""
+    klein, gross = _satz(128), _satz(256, geraet_monatsrate=35.0)
+    felder = _pruefe(klein, gross, vortag={})
+    assert {f["status"] for f in felder.values()} == {GUELTIG}, felder
+    einzeln = _pruefe(klein, vortag={})
+    assert einzeln[klein["id"]]["status"] == GUELTIG
 
 
 def test_gegenprobe_zwei_frische_stufen_bleiben_verglichen():
