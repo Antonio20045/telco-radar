@@ -1,10 +1,11 @@
 """Beleg je Preisposition (Zeile), Ziel 1d: ein Bild hängt nur an seiner Zeile.
 
-Die Belegbilder im Manifest tragen Gerät, Anbieter und Tag, aber keinen Tarif
-(``beleg_regeln.dateiname``): ein Bild gehört zum Paar. Welche Zeile des Paares es
-zeigt, folgt aus der Regel des Veröffentlichens (das Bild des Satzes mit den
-niedrigsten Gesamtkosten, ``analyze.beleg_position.position_des_bildes``) und aus
-dem ``beleg_id`` der Klick-Sätze im Bestand ``geraete_tco.json``.
+Die Belegbilder im Manifest tragen Gerät, Anbieter und Tag und, seit der Bildfolge,
+die Kennung der Messung (erste Zeichen der ``beleg_id``): sie nennt den Klick-Satz im
+Bestand ``geraete_tco.json`` genau. Nur ein altes Bild ohne Kennung folgt der Regel des
+Veröffentlichens (Satz mit den niedrigsten Gesamtkosten,
+``analyze.beleg_position.position_des_bildes``). Je Paar zählt das neueste Bild, dessen
+Messung im Bestand liegt.
 
 Fail-closed: eine Zeile bekommt ihr Bild nur, wenn die Wahl eindeutig ist, Einzelbild
 und Schritte der Folge die Kennung ihrer ``beleg_id`` tragen (``fremd_zur_kennung``; ein
@@ -24,9 +25,9 @@ from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from typing import Any
 
-from ..analyze.beleg_position import position_des_bildes
+from ..analyze.beleg_position import Bildposition, position_des_bildes
 from ..analyze.geraete_pruefstatus import buendel_aus_satz
-from ..beleg_bildfolge import fremd_zur_kennung
+from ..beleg_bildfolge import fremd_zur_kennung, kennung_der_adresse
 from ..beleg_regeln import KENNUNG_LAENGE, anbieter_schluessel
 from ..tarif_model import QUELLE_KLICK
 from .geraete_laufzeit import raten_laufzeit
@@ -37,6 +38,8 @@ log = logging.getLogger(__name__)
 
 GRUND_FREMD = "Bild gehört zu einer anderen Messung"
 GRUND_UNLESBAR = "Bildsatz unlesbar"
+GRUND_KENNUNG_FEHLT = "die Messung des Bildes liegt nicht mehr im Bestand"
+GRUND_KENNUNG_MEHRFACH = "die Messung des Bildes gehört zu mehreren Positionen"
 """Der Vermerk auf der Seite nennt keine Kennungen und keine Fehlertexte: die stehen im
 Log (``log.warning``), die Leser brauchen den Grund, nicht den Schlüssel."""
 
@@ -76,6 +79,59 @@ def passt(beleg: Zeilenbeleg, karte: dict) -> bool:
     )
 
 
+def _position(saetze: list[dict[str, Any]], bild: dict) -> Bildposition:
+    """Die Position, die ``bild`` zeigt. Trägt sein Name die Kennung der Messung
+    (``beleg_regeln.folge_dateiname``), ist es der eine Bestandssatz des Paares mit
+    dieser ``beleg_id``: die ``beleg_id`` ist der Hash von Screenshot und Mitschnitt,
+    die Kennung ihr Anfang, die Zuordnung also exakt und ohne Schluss über Preise.
+    Fehlt der Satz (ersetzt oder nie in den Bestand gelangt) oder steht die Kennung
+    für mehrere Positionen, gibt es keine Zeile; ein Bild ohne Kennung (alter
+    Bestand) folgt der Regel von ``position_des_bildes``."""
+    kennung = kennung_der_adresse(bild["url"])
+    if kennung is None:
+        return position_des_bildes(saetze, bild["datum"])
+    treffer = [
+        s for s in saetze if str(s.get("beleg_id") or "")[:KENNUNG_LAENGE] == kennung
+    ]
+    if not treffer:
+        return Bildposition(None, GRUND_KENNUNG_FEHLT)
+    if len(treffer) > 1:
+        return Bildposition(None, GRUND_KENNUNG_MEHRFACH)
+    return Bildposition(treffer[0])
+
+
+def _zeilenbeleg(
+    schluessel: tuple[str, str], bild: dict, satz: dict[str, Any]
+) -> tuple[Zeilenbeleg | None, str]:
+    """Das Bild der Position ``satz`` oder der Grund, warum es nicht gilt."""
+    try:
+        buendel = buendel_aus_satz(satz)
+    except (TypeError, ValueError, KeyError) as fehler:
+        log.warning("Zeilenbeleg %s: Bildsatz unlesbar: %s", schluessel, fehler)
+        return None, GRUND_UNLESBAR
+    folge = bild.get("bildfolge") or ()
+    fremd = fremd_zur_kennung(bild["url"], folge, buendel.beleg_id[:KENNUNG_LAENGE])
+    if fremd:
+        log.warning("Zeilenbeleg %s: %s: %s", schluessel, GRUND_FREMD, fremd)
+        return None, GRUND_FREMD
+    return (
+        Zeilenbeleg(
+            geraet_id=schluessel[0],
+            anbieter_id=schluessel[1],
+            sku_id=buendel.sku_id,
+            tarif=buendel.tarif_name,
+            tarif_id=buendel.tarif_id,
+            raten_laufzeit=raten_laufzeit(buendel),
+            beleg_id=buendel.beleg_id,
+            datum=bild["datum"],
+            gross=bool(bild["gross"]),
+            url=bild["url"],
+            bildfolge=tuple(folge),
+        ),
+        "",
+    )
+
+
 def baue_index(
     saetze: Iterable[dict[str, Any]],
     bilder_je_paar: dict[tuple[str, str], list[dict]],
@@ -84,7 +140,10 @@ def baue_index(
     """``beleg_id`` zu ``Zeilenbeleg``; je Paar der Grund, warum keine Zeile belegt ist.
 
     ``bilder_je_paar`` sind die angezeigten Bilder je (Gerät, Anbieter), neueste zuerst
-    (``geraete_belege.sortiert_je_preis``); es zählt das neueste, wie beim Paar-Link.
+    (``geraete_belege.sortiert_je_preis``); es zählt das neueste, das einer Position
+    des Bestands gehört. Liegt die Messung des neuesten noch nicht im Bestand (der
+    Klick-Lauf war später als der Geräte-Lauf), zeigt die Zeile das ältere Bild,
+    das zu ihrer eigenen Messung gehört, nie das neuere.
     """
     gruppen: dict[tuple[str, str], list[dict[str, Any]]] = defaultdict(list)
     for satz in saetze:
@@ -101,38 +160,16 @@ def baue_index(
     index: dict[str, Zeilenbeleg] = {}
     gruende: dict[tuple[str, str], str] = {}
     for schluessel, bilder in bilder_je_paar.items():
-        if not bilder:
-            continue
-        bild = bilder[0]
-        wahl = position_des_bildes(gruppen.get(schluessel, []), bild["datum"])
-        if wahl.satz is None:
-            gruende[schluessel] = wahl.grund
-            continue
-        try:
-            buendel = buendel_aus_satz(wahl.satz)
-        except (TypeError, ValueError, KeyError) as fehler:
-            log.warning("Zeilenbeleg %s: Bildsatz unlesbar: %s", schluessel, fehler)
-            gruende[schluessel] = GRUND_UNLESBAR
-            continue
-        folge = bild.get("bildfolge") or ()
-        fremd = fremd_zur_kennung(bild["url"], folge, buendel.beleg_id[:KENNUNG_LAENGE])
-        if fremd:
-            log.warning("Zeilenbeleg %s: %s: %s", schluessel, GRUND_FREMD, fremd)
-            gruende[schluessel] = GRUND_FREMD
-            continue
-        index[buendel.beleg_id] = Zeilenbeleg(
-            geraet_id=schluessel[0],
-            anbieter_id=schluessel[1],
-            sku_id=buendel.sku_id,
-            tarif=buendel.tarif_name,
-            tarif_id=buendel.tarif_id,
-            raten_laufzeit=raten_laufzeit(buendel),
-            beleg_id=buendel.beleg_id,
-            datum=bild["datum"],
-            gross=bool(bild["gross"]),
-            url=bild["url"],
-            bildfolge=tuple(folge),
-        )
+        for bild in bilder:
+            wahl = _position(gruppen.get(schluessel, []), bild)
+            grund = wahl.grund
+            if wahl.satz is not None:
+                eintrag, grund = _zeilenbeleg(schluessel, bild, wahl.satz)
+                if eintrag is not None:
+                    index[eintrag.beleg_id] = eintrag
+                    gruende.pop(schluessel, None)
+                    break
+            gruende.setdefault(schluessel, grund)
     return index, gruende
 
 
