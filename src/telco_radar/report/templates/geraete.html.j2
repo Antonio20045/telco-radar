@@ -843,7 +843,7 @@
             {{ m.ab_anbieter }}<span class="gr-a-pfeil" aria-hidden="true">↗</span></a>
           {% else %}<span class="gr-a-klein">bei {{ m.ab_anbieter }}</span>{% endif %}
           {% if m.ab_beleg and m.ab_beleg.abgerufen_am %} <span
-            class="gr-a-klein gr-a-datum">{{ m.ab_beleg.abgerufen_am | date_de }}</span>{% endif %}
+            class="gr-a-klein gr-a-datum">{{ m.ab_beleg.abgerufen_am | date_de }}</span>{% if not m.ab_alt %}{% set sv = stand_vom(m.ab_beleg.abgerufen_am, geraete.einzel_stichtag) %}{% if sv %} <span class="gr-kk-marke gr-kk-marke--alt">{{ sv }}</span>{% endif %}{% endif %}{% endif %}
           {% if m.ab_alt %} <span class="gr-spalten-marke gr-spalten-marke--alt">{{
             m.ab_alt_marke }}</span>{% endif %}
           {%- elif m.nur_buendel %}
@@ -894,7 +894,7 @@
           {% else %}<span class="gr-a-klein">bei {{ m.tco_anbieter }}</span>{% endif %}
           {% if m.tco_band_label %}<span class="gr-a-klein gr-k-tarif">Tarif {{ m.tco_band_label }}</span>{% endif %}
           {% if m.tco_beleg and m.tco_beleg.abgerufen_am %} <span
-            class="gr-a-klein gr-a-datum">{{ m.tco_beleg.abgerufen_am | date_de }}</span>{% endif %}
+            class="gr-a-klein gr-a-datum">{{ m.tco_beleg.abgerufen_am | date_de }}</span>{% set sv = stand_vom(m.tco_beleg.abgerufen_am, geraete.messdatum.juengster) %}{% if sv %} <span class="gr-kk-marke gr-kk-marke--alt">{{ sv }}</span>{% endif %}{% endif %}
           {%- else %}<span class="gr-a-klein">{{ m.tco_leer }}</span>{%- endif %}</td>
         <td class="num gr-sp--tco" data-k="{{ spalten.monat }}">{% if m.tco_monat is not none %}{{
           m.tco_monat | euro }}{% else %}–{% endif %}</td>

@@ -2688,7 +2688,7 @@ var TelcoFrage = (function () {
     gruppe.appendChild(p);
   }
 
-  function setzeBuendel(mid, bandKey) {
+  function setzeBuendel(mid) {
     var gruppe = element('gr-bnd-gruppe');
     if (!gruppe) return;
     var fertig = function (knotenB, fehler) {
@@ -2704,20 +2704,37 @@ var TelcoFrage = (function () {
       } else if (fehler) {
         leerSatz(gruppe, 'Fehlende Anbieter nicht geladen.');
       }
-      setzeBndTitel(mid, bandKey);
-      stelleZeilen(bandKey);
+      /* Live-Abnahme 09.11.2026 (Nachbesserung): die Wahl von JETZT, nicht die
+         des Geraeteklicks. Wechselt Stufe (oder Laufzeit) waehrend das Fragment
+         laedt, gehoerte das eingesetzte Band sonst der alten Wahl. */
+      setzeBndTitel(mid, zustand.band);
+      stelleZeilen(zustand.band);
       wendeSortierungAn();
+    };
+    /* Live-Abnahme 09.11.2026 (L1): nie ein fremdes Bild zu einem Preis, auch
+       nicht kurz. Die Folge zaehlt JEDEN Wechsel, auch den zurueck aufs
+       Startgeraet - sonst ueberschriebe das spaet eintreffende Fragment eines
+       frueher gewaehlten Geraets die Belege des jetzigen. Der alte Beleg
+       (Bild und Text) geht SOFORT, noch vor dem Laden. */
+    var meineFolge = ++wechselFolge;
+    var aktuell = function () {
+      return meineFolge === wechselFolge && zustand.modell === mid;
     };
     if (mid === vorgabe) {
       fertig(vorgabeGruppe, false);
       return;
     }
-    var meineFolge = ++wechselFolge;
+    gruppeLeeren(gruppe);
+    var laedt = document.createElement('p');
+    laedt.className = 'gr-erklaer gr-beleg-laedt';
+    laedt.setAttribute('role', 'status');
+    laedt.textContent = 'Screenshots werden geladen …';
+    gruppe.appendChild(laedt);
     holeFragment(mid).then(function (lager) {
-      if (meineFolge !== wechselFolge) return;
+      if (!aktuell()) return;
       fertig(lager ? lager[mid] : null, false);
     }, function () {
-      if (meineFolge !== wechselFolge) return;
+      if (!aktuell()) return;
       fertig(null, true);
     });
   }
@@ -3039,7 +3056,7 @@ var TelcoFrage = (function () {
     stelleZeilen(zustand.band);
     if (zustand.modell !== zuletztModell) {
       zuletztModell = zustand.modell;
-      setzeBuendel(zustand.modell, zustand.band);
+      setzeBuendel(zustand.modell);
     }
     schreibeLink();
   }
