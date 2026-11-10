@@ -156,7 +156,7 @@ class Kontext:
     """
 
     heute: str
-    frisch: Callable[[str, str], bool] | None = None
+    frisch: Callable[[str, str, str], bool] | None = None
     geraet_von: Callable[[str], tuple[str, int | None]] | None = None
     volumen_im_namen: Callable[[str], float | None] | None = None
     sim_only: Mapping[str, float] = field(default_factory=dict)
@@ -194,6 +194,11 @@ der Anbieterschnittstelle selbst (Saturn/MediaMarkt, ``productdetail?tfi=``: Zuz
 Anschluss, Versand und Monatspreis stehen als Posten in derselben Antwort; der Leser
 verwirft sie, wenn Monatsposten oder Versand nicht zur Config passen). Sie zählen wie
 ein gemessenes Bündel ohne ``herleitung``."""
+ALT_AB_TAGEN_DIREKT = 1
+"""So viele Tage darf der Abruf eines direkt gelesenen Preises (``HERLEITUNG_DIREKT``)
+höchstens zurückliegen: die Schnittstelle bepreist täglich neu (ein Gerät kostete
+einen Tag nach dem Abruf 50 € mehr, Prüfer 10.11.2026), und die Regeln 2 und 3 können
+solche Sprünge nicht abfangen. Ältere Zeilen bleiben stehen, zählen aber nicht."""
 HERLEITUNG_EINMALZAHLUNG = "einmalzahlung_weicht_vom_geraet_ab"
 """Marke eines 1&1-Bündels, dessen Einmalzahlung nach Monat 24 vom Wert abweicht, der
 bei den anderen Tarifen desselben Geräts (gleicher Speicher) gilt
@@ -215,6 +220,12 @@ def ist_gemessen(herleitung: str, quelle_art: str) -> bool:
     if weg == HERLEITUNG_SCHLUSSZAHLUNG:
         return quelle_art == QUELLE_KLICK
     return weg != HERLEITUNG_TARIFRASTER
+
+
+def alt_ab_tagen(herleitung: str, standard: int) -> int:
+    """Wie alt ein Abruf höchstens sein darf: ``ALT_AB_TAGEN_DIREKT`` für einen direkt
+    gelesenen Preis, sonst die ``standard``-Grenze der Seite."""
+    return ALT_AB_TAGEN_DIREKT if herleitung.strip() in HERLEITUNG_DIREKT else standard
 
 
 def ist_schaetzung(herleitung: str) -> bool:

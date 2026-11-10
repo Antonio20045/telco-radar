@@ -115,7 +115,7 @@ def buendel_luecke(b, heute: str) -> str:
     from . import geraete_notbremse
     from .geraete_tco_karten import ist_frisch
 
-    frisch = ist_frisch(b.abgerufen_am, heute)
+    frisch = ist_frisch(b.abgerufen_am, heute, b.herleitung)
     flags = geraete_notbremse.felder(b, heute)
     if nicht_im_sortiment(flags):
         return SATZ_SORTIMENT.format(anbieter=b.anbieter)

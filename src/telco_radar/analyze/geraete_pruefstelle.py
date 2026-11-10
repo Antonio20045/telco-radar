@@ -51,7 +51,7 @@ class Seite:
     """Die Definitionen der Geräteseite (``report/geraete_tco_karten``), die die Regeln
     teilen: ``frisch`` (Regel 16) und Gerät mit Speicher je SKU (Regeln 5 und 13)."""
 
-    frisch: Callable[[str, str], bool]
+    frisch: Callable[[str, str, str], bool]
     geraet_aus_sku: Callable[[str, Katalog], tuple[str, int | None]]
     katalog: Katalog
 
@@ -92,7 +92,7 @@ def kontext(
     bestand: Tarifbestand,
     heute: str,
     *,
-    frisch: Callable[[str, str], bool],
+    frisch: Callable[[str, str, str], bool],
     geraet_von: Callable[[str], tuple[str, int | None]],
 ) -> Kontext:
     """Was die Regeln aus Store, Listungen und Tarifbestand brauchen."""

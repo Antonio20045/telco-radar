@@ -22,6 +22,7 @@ import time
 from collections.abc import Callable
 from dataclasses import dataclass, field
 
+from . import tarifwelt_bestand
 from .collect.geraete import tarifwelt_lauf
 from .collect.geraete.basis import GeraeteAbrufFehler
 from .collect.geraete.buendel_prioritaet import pflicht_modelle
@@ -31,7 +32,7 @@ from .tco_model import Buendel
 
 log = logging.getLogger(__name__)
 
-METHODE = "mediamarkt_tarifwelt"
+METHODE = tarifwelt_bestand.METHODE
 
 
 @dataclass

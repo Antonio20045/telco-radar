@@ -18,6 +18,7 @@ Wurzelmodul: importiert keine Schicht, damit Sammeln und Bericht es teilen.
 from __future__ import annotations
 
 PRAEFIX = "mediamarkt_tarifwelt:"
+METHODE = "mediamarkt_tarifwelt"
 
 
 def lies(roh: object) -> dict[str, dict]:
@@ -42,3 +43,17 @@ def mit_tarifwelt(tarife: dict | None, zusatz: dict | None) -> dict:
         if tid.startswith(PRAEFIX) and isinstance(satz, dict)
     }
     return {**plus, **(tarife or {})} if plus else dict(tarife or {})
+
+
+def typen_der_anbieter(anbieter: list, haendler_tarife: dict | None) -> dict[str, str]:
+    """{Anbietername: Typ} aus der Quellenkonfiguration PLUS die Anbieterzeilen der
+    Tarifwelt-Tarife ("Saturn/MediaMarkt · o2-Netz"), die den Typ ihrer Quelle
+    (Methode `METHODE`) tragen. Ohne die Zeilen blieb "Anbietertyp" im Export leer,
+    weil der Name der Quelle nicht der Name der Zeile ist."""
+    typen = {a.name: a.typ for a in anbieter}
+    typ = next((a.typ for a in anbieter if a.methode == METHODE), None)
+    if typ is not None:
+        for satz in (haendler_tarife or {}).values():
+            if satz.get("anbieter"):
+                typen.setdefault(satz["anbieter"], typ)
+    return typen
