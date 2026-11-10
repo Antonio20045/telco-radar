@@ -5809,7 +5809,8 @@ html:not([data-art="geraet"]) .gx-held .gx-art--tarif,html[data-art="geraet"] .g
 .gx-mehr[open] summary{display:none}
 .gx-leer{color:var(--ink-3);font-size:18px;margin:18px 0}
 #gr-buendel{margin:14px 0 0;padding:0;border:0;background:none}
-#gr-bnd-gruppe > :not(.gr-anb-fehlliste):not(.gr-beleg-paare){display:none}
+#gr-bnd-gruppe > :not(.gr-anb-fehlliste):not(.gr-beleg-paare):not(.gr-beleg-laedt){display:none}
+#gr-bnd-gruppe .gr-beleg-laedt{margin:0;font-size:14px;color:var(--ink-3)}
 #gr-bnd-gruppe .gr-anb-fehlliste{display:flex;flex-wrap:wrap;gap:8px 22px;margin:0;padding:0;border:0}
 #gr-bnd-gruppe .gr-anb-fehlt{display:inline-flex;align-items:center;gap:8px;margin:0;padding:0;border:0;background:none;font-size:14px;color:var(--ink-3)}
 #gr-bnd-gruppe .gr-anb-fehlt .gr-bnd-name{display:inline-flex;align-items:center;gap:7px;font-weight:500;color:var(--ink-2)}

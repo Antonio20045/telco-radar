@@ -3742,7 +3742,7 @@ body{font-synthesis-style:none}
   .qf-leiter b{font-size:16px}
   .qf-leiter span{font-size:11px;line-height:1.2}}
 #gr-buendel{margin:14px 0 0;padding:0;border:0;background:none}
-#gr-bnd-gruppe > :not(.gr-anb-fehlliste):not(.gr-beleg-paare){display:none}
+#gr-bnd-gruppe > :not(.gr-anb-fehlliste):not(.gr-beleg-paare):not(.gr-beleg-laedt){display:none}
 
 /* MELDUNGEN: grosses Bild mit dem Zeitungskopf (Antonio, 10.10.2026) */
 .seite-meldungen{--wa-rand:clamp(16px,4vw,64px)}
