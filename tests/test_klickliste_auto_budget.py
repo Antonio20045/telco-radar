@@ -608,6 +608,139 @@ def test_unter_veralteten_buendeln_gewinnt_das_juengste(wurzel):
         assert [s.url for s in seiten] == [jung["quelle_url"]]
 
 
+def _wie_main(bestand: list[dict]) -> list[dict]:
+    """Der Bestand, wie main ihn zuließe: veraltete Bündel mehr als 14 Tage vor dem
+    jüngsten Bündel des Gesamtbestands fehlen. Auf ihm ist der Anker je Anbieter ohne
+    Wirkung (jedes übrige Bündel liegt innerhalb der Frist), ``leite_ab`` liefert also
+    die Plätze von main."""
+    from telco_radar.collect.geraete.klickliste_auto import QUELLE_HOECHSTALTER_TAGE
+
+    stand = max(date.fromisoformat(b["abgerufen_am"]) for b in bestand)
+    grenze = stand - timedelta(days=QUELLE_HOECHSTALTER_TAGE)
+    return [
+        b
+        for b in bestand
+        if not b["pruefung"].startswith("veraltet")
+        or date.fromisoformat(b["abgerufen_am"]) >= grenze
+    ]
+
+
+def _plaetze_und_seiten(seiten) -> tuple[set, set]:
+    plaetze = {(s.anbieter, s.geraet, s.speicher_gb) for s in seiten}
+    seiten_je = {
+        (s.anbieter, s.geraet, _tarif(s.url) if "tariffId" in s.url else s.url)
+        for s in seiten
+    }
+    return plaetze, seiten_je
+
+
+def _szenarien_anker_und_grenze():
+    """Volle Platzgrenze (zehn Geräte, acht Plätze): einzelne, mehrere und fast alle
+    Geräte mit veraltetem Bündel von 12 bis 40 Tagen, der Anbieter liegt 0 bis 6 Tage
+    hinter dem Gesamtbestand (die Szenarien des Prüfers zu PR 88: Telekom S25 Ultra
+    15 Tage veraltet, Telekom einen Tag zurück)."""
+    gruppen = (
+        *((i,) for i in range(len(GERAETE))),
+        (0, 6),
+        (2, 3, 6),
+        (6, 7, 8, 9),
+        tuple(range(1, len(GERAETE))),
+        tuple(range(len(GERAETE))),
+    )
+    for anbieter in ("Telekom", "o2"):
+        for alt in gruppen:
+            for tage in (13, 14, 15, 16, 40):
+                for rueckstand in (0, 1, 3, 6):
+                    yield anbieter, alt, tage, rueckstand
+
+
+def _bestand_anker(anbieter: str, alt: tuple, tage: int, rueckstand: int) -> list[dict]:
+    """Der Anbieter liest bis TAG0 - rückstand, ein zweiter Anbieter (congstar) setzt
+    den Gesamtstand auf TAG0; die Geräte in ``alt`` sind ``tage`` vor TAG0 veraltet."""
+    stand = TAG0 - timedelta(days=rueckstand)
+    tarife = TARIFE if anbieter == "Telekom" else ("",)
+    bestand = []
+    for i, n in enumerate(GERAETE):
+        for tarif in tarife:
+            if i in alt:
+                bestand.append(
+                    _buendel(
+                        n, tarif, TAG0 - timedelta(days=tage), anbieter, "veraltet 16"
+                    )
+                )
+            else:
+                bestand.append(_buendel(n, tarif, stand, anbieter))
+    bestand.append(_buendel(GERAETE[0], "", TAG0, "congstar"))
+    return bestand
+
+
+@pytest.mark.parametrize(
+    "vorhanden", (set(), {("Telekom", GERAETE[1])}), ids=("leer", "hand")
+)
+def test_platzmenge_enthaelt_immer_die_von_main(wurzel, vorhanden):
+    """Prüfung PR 88, M1: Der Anker je Anbieter darf Plätze nur dazugeben, nie ein
+    Gerät verdrängen, das main hält, auch bei voller Platzgrenze und ``vorhanden`` leer
+    (Telekom S25 Ultra 15 Tage veraltet, Telekom einen Tag zurück: iPhone 17 verlor
+    alle fünf Seiten). Verglichen wird mit dem Bestand, den main zuließe."""
+    katalog = lade_katalog(wurzel)
+    verloren, geprueft, mit_gewinn = [], 0, 0
+    for anbieter, alt, tage, rueckstand in _szenarien_anker_und_grenze():
+        bestand = _bestand_anker(anbieter, alt, tage, rueckstand)
+        _bestand(wurzel, bestand)
+        pr = leite_ab(wurzel, katalog, vorhanden)
+        _bestand(wurzel, _wie_main(bestand))
+        main = leite_ab(wurzel, katalog, vorhanden)
+        geprueft += 1
+        mit_gewinn += len(pr) > len(main)
+        fehlt = [
+            (a - b)
+            for a, b in zip(
+                _plaetze_und_seiten(main), _plaetze_und_seiten(pr), strict=True
+            )
+        ]
+        if fehlt[0] or fehlt[1]:
+            verloren.append(((anbieter, alt, tage, rueckstand), fehlt))
+    assert geprueft > 400
+    assert not verloren, f"{len(verloren)} von {geprueft}: {verloren[:3]}"
+    assert mit_gewinn, "der Anker wirkt in keinem Szenario: Szenarien taugen nichts"
+
+
+def test_anker_verdraengt_bei_voller_grenze_kein_frisch_gelesenes_geraet(wurzel):
+    """Prüfung PR 88, M1, einfachster Fall: zehn Telekom-Geräte, das siebte Gerät
+    (S25 Ultra) 15 Tage veraltet, Telekom einen Tag hinter dem Gesamtbestand. Main
+    schließt das Bündel aus und hält acht frische Geräte; der Anker darf es nicht vor
+    das achte Gerät stellen."""
+    bestand = _bestand_anker("Telekom", (6,), 15, 1)
+    _bestand(wurzel, bestand)
+
+    seiten = leite_ab(wurzel, lade_katalog(wurzel), set())
+
+    telekom = [s for s in seiten if s.anbieter == "Telekom"]
+    _bestand(wurzel, _wie_main(bestand))
+    main = leite_ab(wurzel, lade_katalog(wurzel), set())
+    assert GERAETE[6] not in {s.geraet for s in telekom}
+    assert len(telekom) == ALLE_SEITEN
+    assert _plaetze_und_seiten(telekom) == _plaetze_und_seiten(
+        [s for s in main if s.anbieter == "Telekom"]
+    )
+
+
+def test_anker_fuellt_freie_plaetze_mit_dem_veralteten_geraet(wurzel):
+    """Gegenprobe zu M1: Ist die Platzgrenze nicht voll, kommt das nur durch den Anker
+    zugelassene Gerät dazu (S1 bleibt)."""
+    weg = tuple(n + "-" for n in GERAETE[7:])
+    bestand = [
+        b
+        for b in _bestand_anker("Telekom", (6,), 15, 1)
+        if not b["sku_id"].startswith(weg)
+    ]
+    _bestand(wurzel, bestand)
+
+    seiten = leite_ab(wurzel, lade_katalog(wurzel), set())
+
+    assert GERAETE[6] in {s.geraet for s in seiten if s.anbieter == "Telekom"}
+
+
 def test_ausfall_eines_ganzen_anbieters_steht_als_warnung_im_log(wurzel, caplog):
     """Prüfung PR 88, S1: Ohne frisches Bündel eines Anbieters bleibt seine Liste
     (Frist je Anbieter), das Log sagt es aber: Anbieter und letztes Bündel. Gegenprobe:
