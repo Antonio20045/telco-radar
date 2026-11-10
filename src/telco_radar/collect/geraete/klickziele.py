@@ -290,6 +290,23 @@ def _text(daten: dict, feld: str, ort: str) -> str:
     return wert.strip()
 
 
+def karten_mit_farbmarke(root: Path) -> frozenset[str]:
+    """Namen (ohne Endung) der Karten, die an der Speicherwahl „nur in anderer Farbe“
+    markieren (``andere_farbe``). Nur dort heißt ein gesperrter Speicher, dass die
+    Seite ihn in keiner Farbe führt; ohne Marke kann er in einer anderen Farbe da sein
+    (Telekom Pixel 11: 512 GB in Frost gesperrt, in Obsidian bestellbar). Eine
+    unlesbare Karte zählt nicht (fail-closed)."""
+    namen = set()
+    for pfad in (root / KARTEN).glob("*.yaml"):
+        try:
+            roh = yaml.safe_load(pfad.read_text(encoding="utf-8"))
+            if roh["knoepfe"]["speicher"].get("andere_farbe"):
+                namen.add(pfad.stem)
+        except (OSError, yaml.YAMLError, KeyError, TypeError, AttributeError):
+            log.warning("Karte %s: Speicherwahl nicht lesbar", pfad.name)
+    return frozenset(namen)
+
+
 def geplante_anbieter(root: Path) -> list[str] | None:
     """Namen der Anbieter aus ``TAGESDATEI`` mit Karte; ``None``, wenn die Datei fehlt.
 

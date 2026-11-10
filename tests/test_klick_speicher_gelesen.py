@@ -168,7 +168,9 @@ def test_geraeteliste_allein_belegt_kein_angebot():
     assert erfassungsgruende({"dateien": [eintrag]})[schluessel] == gelesen
     gesperrt = {"apple-iphone-17-pro": {"gesperrt": [512, 1024]}}
     mit_beleg = {**eintrag, "speicher_seite": gesperrt}
-    assert erfassungsgruende({"dateien": [mit_beleg]})[schluessel] == angebot
+    assert erfassungsgruende({"dateien": [mit_beleg]})[schluessel] == gelesen
+    eindeutig = {**mit_beleg, "sperre_eindeutig": True}
+    assert erfassungsgruende({"dateien": [eindeutig]})[schluessel] == angebot
 
 
 class _Liste:

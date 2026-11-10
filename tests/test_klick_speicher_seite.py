@@ -29,8 +29,11 @@ def _seite(*kombis: dict) -> dict:
     }
 
 
-def _eintrag(seiten: list[dict]) -> dict:
+def _eintrag(seiten: list[dict], eindeutig: bool = True) -> dict:
+    """``eindeutig``: die Karte des Anbieters erkennt „nur in anderer Farbe“ (sonst
+    ist ein gesperrter Knopf kein Beleg, Stichprobe 10.11.2026)."""
     return {
+        "sperre_eindeutig": eindeutig,
         "anbieter": "Telekom",
         "datum": "2026-10-12",
         "alter_tage": 0,
@@ -54,6 +57,19 @@ def test_gesperrter_speicher_belegt_im_angebot():
     (eintrag,) = je_anbieter_vereint([_eintrag([seite])])
     saetze = speicher_gelesen(eintrag)
     assert saetze["Telekom|apple-iphone-17-pro-max"] == _satz(SATZ_SPEICHER_ANGEBOT)
+
+
+def test_gegenprobe_gesperrter_speicher_ohne_farbmarke_belegt_nichts():
+    """Telekom Pixel 11, 512 GB: gesperrt in Frost, bestellbar in Obsidian. Eine Karte
+    ohne ``andere_farbe`` kann beides nicht unterscheiden."""
+    seite = _seite(
+        _kombi("256 GB", "erfasst"),
+        _kombi("1 TB", "erfasst"),
+        _kombi("2 TB", "nicht_angeboten"),
+    )
+    (eintrag,) = je_anbieter_vereint([_eintrag([seite], eindeutig=False)])
+    saetze = speicher_gelesen(eintrag)
+    assert saetze["Telekom|apple-iphone-17-pro-max"] == _satz(SATZ_SPEICHER)
 
 
 def test_gegenprobe_nicht_erfasster_speicher_bleibt_gelesen():

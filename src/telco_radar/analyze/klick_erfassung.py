@@ -15,12 +15,21 @@ mit dieser Geräte-ID statt eines Anbietergrundes. Ebenso bekommt jedes Gerät, 
 Lauf von heute gelesen hat (``speicher_gelesen``), gestört oder nicht, den Satz „Bei
 Telekom nur mit 256 GB gelesen (10.10.2026)“: ein Modell mit anderem Speicher fehlt
 dort, weil die Übersicht je Gerät einen Speicher zeigt, nicht weil die Seite sperrt.
+
+Diese drei Sätze sind Lückenbelege und gelten nur mit Datum, höchstens
+``BELEG_MAX_TAGE`` alt (``beleg_gilt``), und nur ohne Widerspruch des Radars
+(``Neugeraete``: lieferbares Neugerät derselben Kombination). „Nur mit … im Angebot“
+braucht zusätzlich eine Seite, die eine gesperrte Option von einer Option in anderer
+Farbe unterscheidet (``sperre_eindeutig``): Telekom las das Pixel 11 in Frost, dort ist
+512 GB gesperrt, in Obsidian bestellbar (Stichprobe 10.11.2026). Was daran fehlt, ist
+eine Messlücke („nur … gelesen“, „Noch nicht erfasst“), keine Portfolio-Lücke.
 """
 
 from __future__ import annotations
 
 import re
 from datetime import date
+from typing import NamedTuple
 
 from ..klick_vertrag import (
     CHALLENGE_STATUS,
@@ -41,6 +50,9 @@ SATZ_NICHT_IM_ANGEBOT = (
 SATZ_SPEICHER = "Bei {anbieter} nur mit {speicher} gelesen ({datum})"
 SATZ_SPEICHER_ANGEBOT = "Bei {anbieter} nur mit {speicher} im Angebot ({datum})"
 TRENNER = "|"
+BELEG_MAX_TAGE = FRISCHEGRENZE_TAGE
+"""Höchstalter eines Lückenbelegs in Tagen (ausschließlich): so lange gilt auch die
+Klick-Datei, aus der er stammt; ein älterer Satz stand ohne neue Lesung im Bestand."""
 GESPERRT = "gesperrt"
 OFFEN = "offen"
 """Schlüssel von ``speicher_seite`` (``klick_teillauf``): gesperrt gezeigte Speicher
@@ -119,6 +131,9 @@ def je_anbieter_vereint(dateien: list[dict]) -> list[dict]:
             str(eintrag.get("anbieter")),
             {**eintrag, "speicher_gelesen": {}, "speicher_seite": {}},
         )
+        ziel["sperre_eindeutig"] = bool(
+            ziel.get("sperre_eindeutig") and eintrag.get("sperre_eindeutig")
+        )
         for geraet, speicher in je_geraet.items():
             bisher = ziel["speicher_gelesen"].get(geraet, [])
             ziel["speicher_gelesen"][geraet] = sorted({*bisher, *speicher})
@@ -163,7 +178,12 @@ def speicher_gelesen(eintrag: dict) -> dict[str, str]:
 
 def seite_belegt(eintrag: dict, geraet: str, gelesen: list[int]) -> bool:
     """Die Seiten von heute zeigen mindestens einen Speicher gesperrt und jeden nicht
-    gelesenen entweder gesperrt oder gar nicht (``klick_teillauf.speicher_seite``)."""
+    gelesenen entweder gesperrt oder gar nicht (``klick_teillauf.speicher_seite``).
+    Nur wenn die Karte der Seite „gesperrt“ von „nur in anderer Farbe“ unterscheidet
+    (``sperre_eindeutig``, ``klick_zusammenfuehrung``); sonst gesperrt in der gelesenen
+    Farbe, und die Seite kann den Speicher in einer anderen führen."""
+    if not eintrag.get("sperre_eindeutig"):
+        return False
     arten = (eintrag.get("speicher_seite") or {}).get(geraet) or {}
     offen = set(arten.get(OFFEN) or []) - set(gelesen)
     return bool(arten.get(GESPERRT)) and not offen
@@ -189,6 +209,92 @@ def ohne_karte(
     return {a: satz for a, satz in eigene.items() if a not in mit_karte}
 
 
-def fuer_modell(gruende: dict[str, str], modell: dict) -> dict[str, str]:
-    """``ohne_karte`` für ein Modell der Geräteseite (Karten und Geräte-ID)."""
-    return ohne_karte(gruende, modell.get("karten") or [], modell.get("device_id"))
+class Neugeraete(NamedTuple):
+    """Lieferbare, frische Neugeräte des Radars: (Anbieter, Gerät) und
+    (Anbieter, Gerät, Speicher in GB)."""
+
+    geraet: frozenset[tuple[str, str]] = frozenset()
+    speicher: frozenset[tuple[str, str, int]] = frozenset()
+
+
+KEINE_NEUGERAETE = Neugeraete()
+_LUECKEN_ART = {
+    SATZ_NICHT_IM_ANGEBOT: "geraet",
+    SATZ_SPEICHER_ANGEBOT: "speicher",
+    SATZ_SPEICHER: "speicher",
+}
+_FELD = {
+    "{anbieter}": ".+",
+    "{speicher}": ".+",
+    "{datum}": r"(?P<datum>\d{2}\.\d{2}\.\d{4})",
+}
+
+
+def _muster(vorlage: str) -> re.Pattern[str]:
+    text = re.escape(vorlage)
+    for feld, regel in _FELD.items():
+        text = text.replace(re.escape(feld), regel)
+    return re.compile(text)
+
+
+_LUECKEN_MUSTER = [(_muster(v), art) for v, art in _LUECKEN_ART.items()]
+
+
+def lueckenbeleg(satz: str) -> tuple[str, date | None] | None:
+    """Art (``geraet``: Gerät nicht im Angebot, ``speicher``: Speicher) und Datum eines
+    Satzes, der eine Lücke behauptet; ``None`` für jeden anderen Satz (Störung). Das
+    Datum ist ``None``, wenn es kein Tag ist."""
+    for muster, art in _LUECKEN_MUSTER:
+        if treffer := muster.fullmatch(satz):
+            tag, monat, jahr = (int(t) for t in treffer["datum"].split("."))
+            try:
+                return art, date(jahr, monat, tag)
+            except ValueError:
+                return art, None
+    return None
+
+
+def beleg_gilt(satz: str, heute: str | None) -> bool:
+    """Ein Lückenbeleg gilt mit Datum von heute bis höchstens ``BELEG_MAX_TAGE`` vorher
+    (ausschließlich); ohne Datum, aus der Zukunft oder ohne bekannten Stichtag nicht.
+    ``heute=None``: Aufrufer ohne Uhr, nur Tests. Andere Sätze gelten immer."""
+    beleg = lueckenbeleg(satz)
+    if beleg is None or heute is None:
+        return True
+    try:
+        stichtag = date.fromisoformat(heute)
+    except ValueError:
+        return False
+    return beleg[1] is not None and 0 <= (stichtag - beleg[1]).days < BELEG_MAX_TAGE
+
+
+def widerspricht(
+    satz: str, anbieter: str, geraet: str | None, speicher: int | None, neu: Neugeraete
+) -> bool:
+    """Der Radar führt für dieselbe Kombination selbst ein lieferbares Neugerät: der
+    Lückensatz ist dann kein Beleg (Messlücke). „Nicht im Angebot“ meint das Gerät,
+    jeder Speichersatz den Speicher dieses Modells."""
+    beleg = lueckenbeleg(satz)
+    if beleg is None or geraet is None:
+        return False
+    if beleg[0] == "geraet":
+        return (anbieter, geraet) in neu.geraet
+    return (anbieter, geraet, speicher) in neu.speicher
+
+
+def fuer_modell(
+    gruende: dict[str, str],
+    modell: dict,
+    heute: str | None = None,
+    neu: Neugeraete = KEINE_NEUGERAETE,
+) -> dict[str, str]:
+    """``ohne_karte`` für ein Modell der Geräteseite (Karten und Geräte-ID), ohne
+    Lückenbelege, die nicht mehr gelten (``beleg_gilt``) oder denen der Radar
+    widerspricht (``widerspricht``)."""
+    geraet, speicher = modell.get("device_id"), modell.get("speicher")
+    eigene = ohne_karte(gruende, modell.get("karten") or [], geraet)
+    return {
+        a: satz
+        for a, satz in eigene.items()
+        if beleg_gilt(satz, heute) and not widerspricht(satz, a, geraet, speicher, neu)
+    }

@@ -29,8 +29,16 @@ GRUND = (
 def _baue_site(tmp_path: pathlib.Path) -> pathlib.Path:
     """Das Zeitreihen-Testbestand; o2 iPhone 17 Pro ist am Abrufdatum seines
     Bündels als nicht im Sortiment geprüft (Gleichstand: der Preis ist überholt,
-    die Messtage davor bleiben als Reihe ohne Serie übrig)."""
+    die Messtage davor bleiben als Reihe ohne Serie übrig). Widerspruchsregel vom
+    10.11.2026: ein lieferbares, frisches Neugerät derselben Kombination hebt die
+    Lücke auf, also ist o2 iPhone 17 Pro in der Geräteliste nicht lieferbar."""
     root, _ = bestand._baue(tmp_path)
+    db_pfad = root / "data" / "state" / "geraete_db.json"
+    db = json.loads(db_pfad.read_text(encoding="utf-8"))
+    for e in db["listungen"]:
+        if e["anbieter"] == "o2" and e["device_id"] == "apple-iphone-17-pro":
+            e["verfuegbarkeit"] = "nicht_lieferbar"
+    db_pfad.write_text(json.dumps(db), encoding="utf-8")
     (root / "config" / "geraete_abdeckung.yaml").write_text(
         yaml.safe_dump(
             {
