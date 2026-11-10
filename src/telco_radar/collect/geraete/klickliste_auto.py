@@ -19,6 +19,29 @@ bekommt darum eine Seite je Tarif, den der Bestand für dieses Gerät mit eigene
 führt, jeweils auf der kleinsten Stufe (die Seite liest alle Stufen). Befund 09.11.2026:
 das iPhone Duo stand bei Telekom nur mit der Adresse der ersten Fundstelle (Tarif L) in
 der Liste, 24 Raten gab es für XS, S, M und XL nicht.
+
+Ein Bündel des Bestands bleibt Quelle der Adresse, auch wenn seine Messung veraltet ist
+(``pruefung`` „veraltet …“): seine Preise zählt diese Liste nicht, sie liest nur
+Adresse, Gerät und Stufe. Ein Platz, dessen Seite einmal nicht rechtzeitig gelesen
+wurde (Lauf ausgefallen, Messdaten einen Tag später im Bestand), bliebe sonst für immer
+aus der Liste und käme nie zurück, denn nur eine Lesung erneuert das Bündel (Prüfung
+PR 85, 10.11.2026). Das gilt ``QUELLE_HOECHSTALTER_TAGE`` Tage vor dem jüngsten Bündel
+des Bestands; der Bestand löscht nie ein Bündel (``analyze/tco_store``), und ein Gerät,
+das der Anbieter nicht mehr führt (1&1 iPhone 15, Oktober 2026), bliebe sonst ewig als
+tote Seite in der Rotation. Zwei Wochen ohne Lesung sind ein Störfall, kein Ausfalltag.
+Neuere Bündel gehen vor: eine Adresse aus einem veralteten Bündel gilt nur, wo kein
+frisches denselben Platz nennt.
+
+Zeitbudget (CLAUDE.md Regel 8): Die Liste hat keine eigene Seitengrenze, nur die
+Platzgrenze. Bei Telekom hat ein Platz bis zu fünf Seiten, acht Plätze also bis zu 40;
+mehr als ein Matrix-Job von 10.258 s (``klicktageslauf``) lesen kann. Den Rest trägt die
+Rotation im Tageslauf (``klicktageslauf.reihenfolge``): nie gelesene Seiten zuerst, dann
+die am längsten nicht gelesenen, nach dem Lesestand des Laufs; die Fristschleuse hält
+das Budget ein, was nicht passt, heißt ``nicht_besucht`` und kommt am nächsten Tag
+zuerst dran. Eine Seitengrenze, die nach dem Bündelalter im Bestand rotiert (PR 85,
+Stand 2d15fe31), käme erst einen Tag nach dem Lauf an die Daten und bliebe bei einer
+Seite stecken, die kein Bündel mehr liefert (Gerät nicht mehr angeboten): deren Alter
+wächst, sie stünde jeden Tag vorn und verdrängte die übrigen.
 """
 
 from __future__ import annotations
@@ -26,6 +49,7 @@ from __future__ import annotations
 import json
 import re
 from dataclasses import dataclass
+from datetime import date, timedelta
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 
@@ -40,6 +64,7 @@ FAMILIEN = {
 HOECHSTE_SEITEN_JE_ANBIETER = 8
 TARIF_PARAMETER = {"Telekom": "tariffId"}
 PRUEFUNG_VERALTET = "veraltet"
+QUELLE_HOECHSTALTER_TAGE = 14
 _SPEICHER_SKU = re.compile(r"^(\d+)gb-")
 _SPEICHER_URL = re.compile(r"(?<![a-z0-9])(\d+)[-]?(gb|tb)(?![a-z0-9])")
 _GB_JE_TB = 1024
@@ -146,12 +171,32 @@ def _lies_buendel(pfad: Path) -> list[dict]:
     liste = daten.get("buendel") if isinstance(daten, dict) else None
     if not isinstance(liste, list):
         raise KlicklisteAutoFehler(f"{pfad}: Feld buendel fehlt")
-    return [
-        b
-        for b in liste
-        if isinstance(b, dict)
-        and not str(b.get("pruefung") or "").startswith(PRUEFUNG_VERALTET)
-    ]
+    return _nutzbar([b for b in liste if isinstance(b, dict)])
+
+
+def _nutzbar(buendel: list[dict]) -> list[dict]:
+    """Frische Bündel, dann die veralteten, deren Messung höchstens
+    ``QUELLE_HOECHSTALTER_TAGE`` hinter dem jüngsten Bündel liegt (Reihenfolge sonst
+    wie im Bestand)."""
+    stand = max((d for d in map(_datum, buendel) if d), default=None)
+    grenze = None if stand is None else stand - timedelta(days=QUELLE_HOECHSTALTER_TAGE)
+
+    def veraltet(eintrag: dict) -> bool:
+        return str(eintrag.get("pruefung") or "").startswith(PRUEFUNG_VERALTET)
+
+    def jung_genug(eintrag: dict) -> bool:
+        datum = _datum(eintrag)
+        return grenze is not None and datum is not None and datum >= grenze
+
+    frisch = [b for b in buendel if not veraltet(b)]
+    return frisch + [b for b in buendel if veraltet(b) and jung_genug(b)]
+
+
+def _datum(eintrag: dict) -> date | None:
+    try:
+        return date.fromisoformat(str(eintrag.get("abgerufen_am") or "")[:10])
+    except ValueError:
+        return None
 
 
 def _paar(eintrag: dict, geraete: dict[str, Geraet]) -> tuple[Geraet, int] | None:

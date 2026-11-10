@@ -186,7 +186,9 @@ def test_gegenprobe_kein_iphone_18_ohne_zusatz_aus_dem_nichts(wurzel):
     assert {s.geraet for s in seiten} == {"apple-iphone-duo"}
 
 
-def test_gegenprobe_zubehoer_und_veraltete_buendel_zaehlen_nicht(wurzel):
+def test_gegenprobe_zubehoer_zaehlt_nicht_veraltete_buendel_schon(wurzel):
+    """Zubehör liefert keine Seite. Ein veraltetes Bündel schon: es ist Quelle der
+    Adresse, nur seine Preise zählen nicht (Prüfung PR 85, 10.11.2026)."""
     _bestand(
         wurzel,
         [
@@ -196,12 +198,18 @@ def test_gegenprobe_zubehoer_und_veraltete_buendel_zaehlen_nicht(wurzel):
                 "https://www.vodafone.de/privat/handys/airpods-pro-3.html",
             ),
             _buendel(
-                "Vodafone", "apple-iphone-duo-256gb-x", VF_DUO, pruefung="veraltet 16"
+                "Vodafone",
+                "apple-iphone-duo-256gb-x",
+                VF_DUO,
+                pruefung="veraltet 16",
+                abgerufen_am="2026-11-05",
             ),
         ],
     )
 
-    assert _auto_ziele(wurzel) == {}
+    seiten = _auto_ziele(wurzel)["vodafone-auto"].seiten
+
+    assert [s.geraet for s in seiten] == ["apple-iphone-duo"]
 
 
 def test_hoechstens_so_viele_seiten_je_anbieter(wurzel):
