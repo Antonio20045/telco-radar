@@ -47,6 +47,8 @@ from .analyze.geraete_store import (
     TEILGELESEN,
 )
 from .analyze.klick_angebot import zusammenfuehren
+from .geraete_adressen import adressbilanz as _adressbilanz
+from .analyze.klick_nachholen import Nachholen, nachholen_aus_umgebung
 from .analyze.tarif_referenzen import aus_bestand
 from .analyze.geraete_pruefstelle import Seite, vermerke as pruefe_buendel
 from .analyze.tco_store import TcoDB
@@ -144,27 +146,6 @@ def _abdeckungszustand(bilanz) -> str:
         gelesen = bilanz.gelesene_einstiege or bilanz.listungen or bilanz.buendel
         return TEILGELESEN if gelesen else NICHT_GELESEN
     return GELESEN if bilanz.vollstaendig else LESEFEHLER
-
-
-def _adressbilanz(bilanz) -> tuple:
-    """Die zwei ADRESSZAHLEN eines Laufs - oder zweimal `None`.
-
-    `(produkte_versucht, tote_adressen)`. "Keine Produktadresse versucht"
-    ist KEINE Null: ein uebersprungener Anbieter, ein toter Einstieg und
-    ein Adapter ohne Produktseiten haben nichts gemessen, und eine 0
-    daneben waere die Entwarnung "versucht, keine war tot" - genau die,
-    die `test_ein_lauf_ohne_produktseiten_bucht_keine_null` fuer den
-    Bestand verbietet und die bis zum 22.09.2026 trotzdem im
-    Protokoll-JSON stand (CLAUDE.md Clean Code 3).
-
-    EINE Rechnung fuer beide Kanaele - Bestand und Protokoll -, damit die
-    Seite nicht etwas anderes zaehlt als das Log (Clean Code 7). Aus dem
-    Bestand wird daraus die Reihe, an der `geraete_store.ALARM_EROSION`
-    eine ueber Tage wegbroeselnde Quelle erkennt.
-    """
-    if bilanz.produkte_versucht <= 0:
-        return (None, None)
-    return (bilanz.produkte_versucht, len(bilanz.tote_adressen))
 
 
 def melde_proben(bilanzen: list) -> None:
@@ -280,6 +261,7 @@ def run_geraete_stage(
     hole: Optional[Callable] = None,
     referenz_anbieter: Optional[set] = None,
     klick: Path | None = None,
+    klick_nachholen: Nachholen | None = None,
 ) -> dict:
     """Sammeln, aufnehmen, altern, speichern. Gibt die Bilanz zurueck.
 
@@ -293,7 +275,8 @@ def run_geraete_stage(
     vom 15.09.2026 hat ohne diesen Scope 35 Fremd-Referenzen neu datiert
     und 1&1 abgerufen (Befund Runde 2, outputs/telekom-taeglich-2026-09-15.md).
     `klick` ist der Ordner der Klick-Ergebnisse (`analyze.klick_zusammenfuehrung`),
-    ohne Angabe aus TELCO_KLICK_ERGEBNISSE, sonst `data/state/klick`.
+    ohne Angabe aus TELCO_KLICK_ERGEBNISSE, sonst `data/state/klick`; `klick_nachholen`
+    holt dort vor dem Merge den Stand von origin, wenn er nicht vom Messtag ist.
     """
     beginn = time.monotonic()
     if jetzt is None:
@@ -449,6 +432,7 @@ def run_geraete_stage(
                 katalog,
                 heute,
                 lambda sku: geraet_aus_sku(sku, katalog),
+                klick_nachholen,
             )
             if klickzug.rohsaetze:
                 buendelbilanz = klickzug.buendel(bestand, heute, tco.nach_id)
@@ -643,6 +627,7 @@ def main() -> None:
         None,
         frist_sekunden=args.frist,
         klick=args.klick,
+        klick_nachholen=nachholen_aus_umgebung(root),
     )
 
 
