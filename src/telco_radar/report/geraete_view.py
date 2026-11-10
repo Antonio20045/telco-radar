@@ -52,13 +52,13 @@ from . import (
     geraete_alarme,
     geraete_bereinigung,
     geraete_katalog_neu,
-    geraete_luecken_beleg,
     geraete_portfolio,
     geraete_pruefung,
     geraete_tco_karten,
     geraete_tco_view,
     geraete_vergleich,
     geraete_verlauf,
+    geraete_widerspruch,
     geraete_zeitreihe,
 )
 from . import geraete_delta_wort, geraete_messdatum, geraete_sortiment
@@ -68,7 +68,7 @@ from .geraete_katalog_buendel import buendel_je_anbieter_modell
 from .geraete_laufzeit import LAUFZEIT_STANDARD, ansicht
 from .geraete_tco_band import band_label
 from .geraete_tco_grafik import euro
-from ..analyze import geraete_lifecycle, klick_erfassung as erfassung
+from ..analyze import geraete_lifecycle
 from ..analyze.geraete_schwankung import lage_mit_schwankung
 from ..analyze.tco_store import TcoDB
 from ..analyze.klick_lesestand import mit_klick
@@ -1600,11 +1600,9 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         heute=tco_heute,
         anbieter_anzeige=anzeige,
     )
-    for modell in tco["modelle"]:
-        modell["erfassung"] = erfassung.fuer_modell(tco_db.erfassung, modell)
-        modell["belegte_luecken"] = geraete_luecken_beleg.fuer_modell(
-            belegte_luecken, modell, tco_heute
-        )
+    geraete_widerspruch.setze_luecken(
+        tco["modelle"], tco_db.erfassung, belegte_luecken, alle, tco_heute
+    )
     ausfaelle: list[Ausfall] = []
     try:
         zeitreihe = geraete_zeitreihe.aufbereiten(

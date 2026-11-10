@@ -47,10 +47,11 @@ from pathlib import Path
 from ..collect.geraete.klickergebnis import FRISCHEGRENZE_TAGE, ORDNER, lies_ergebnisse
 from ..collect.geraete.klicklauf import LAUF_GELESEN, LAUF_GESTOERT
 from ..collect.geraete.klickrohsatz import QUELLE, ZUSTAND_NEU, tarifschluessel
-from ..collect.geraete.klickziele import geplante_anbieter
+from ..collect.geraete.klickziele import geplante_anbieter, karten_mit_farbmarke
 from ..geraete_model import Katalog
 from ..tarif_bezug import Tarifbestand
 from ..tco_model import Buendel, laufzeit_in_monaten
+from .klick_bilanzlog import protokolliere
 from .klick_erfassung import Angebot, erfassungsgruende
 from .klick_geraetepreis import gegenprobe_geraet
 from .klick_geschwister import Schluessel, geschwister, mit_namen
@@ -172,8 +173,9 @@ def zusammenfuehren(
         return Zusammenfuehrung(list(adapter))
     ergebnisse, unlesbar = lies_ergebnisse(ordner)
     geplant = geplante_anbieter(root)
+    farbe = karten_mit_farbmarke(root)
     return fuehre_zusammen(
-        adapter, ergebnisse, katalog, heute, geraet, unlesbar, geplant
+        adapter, ergebnisse, katalog, heute, geraet, unlesbar, geplant, farbe
     )
 
 
@@ -185,13 +187,15 @@ def fuehre_zusammen(
     geraet: Geraet,
     unlesbar: Iterable[str] = (),
     geplant: list[str] | None = None,
+    farbmarke: frozenset[str] = frozenset(),
 ) -> Zusammenfuehrung:
-    """Klick-Sätze ersetzen Adaptersätze mit gleichem Schlüssel (siehe Modulkopf)."""
+    """Klick-Sätze ersetzen Adaptersätze mit gleichem Schlüssel (siehe Modulkopf).
+    ``farbmarke``: Karten, die „nur in anderer Farbe“ erkennen (``_datei``)."""
     eintraege: list[dict] = []
     saetze: list[dict] = []
     ohne_tarif: list[dict] = []
     for daten in ergebnisse:
-        eintrag, aus_datei, geraetepreise = _datei(daten, katalog, heute)
+        eintrag, aus_datei, geraetepreise = _datei(daten, katalog, heute, farbmarke)
         eintraege.append(eintrag)
         saetze.extend(aus_datei)
         ohne_tarif.extend(geraetepreise)
@@ -237,7 +241,7 @@ def fuehre_zusammen(
         "gegenprobe": probe.als_daten(),
         "gegenprobe_geraet": gegenprobe_geraet(ohne_tarif, adapter, geraet),
     }
-    _protokolliere(bilanz)
+    protokolliere(bilanz, log)
     bleiben = [satz for stelle, satz in enumerate(adapter) if stelle not in ersetzt]
     return Zusammenfuehrung(bleiben + neu, bilanz)
 
@@ -270,10 +274,11 @@ def alter_tage(datum: object, heute: str) -> int | None:
 
 
 def _datei(
-    daten: dict, katalog: Katalog, heute: str
+    daten: dict, katalog: Katalog, heute: str, farbmarke: frozenset[str] = frozenset()
 ) -> tuple[dict, list[dict], list[dict]]:
     """Kopf einer Ergebnisdatei für die Bilanz und, wenn verwendet, ihre Rohsätze und
-    Gerätepreise ohne Tarif."""
+    Gerätepreise ohne Tarif. ``sperre_eindeutig``: die Karte der Datei unterscheidet
+    einen gesperrten Speicher von einem nur in anderer Farbe vorhandenen."""
     status = daten.get("laufstatus")
     datum = daten.get("datum")
     alter = alter_tage(datum, heute)
@@ -286,6 +291,7 @@ def _datei(
         "ueberfaellig": list(daten.get("ueberfaellig") or []),
         "verwendet": False,
         "warum_nicht": None,
+        "sperre_eindeutig": Path(str(daten.get("karte"))).stem in farbmarke,
     }
     if alter is None:
         eintrag["warum_nicht"] = GRUND_DATUM.format(datum=datum)
@@ -355,45 +361,3 @@ def _zeige(satz: dict) -> str:
         f"{satz.get('anbieter')} {satz.get('tarif_name')}"
         f" {satz.get('laufzeit_monate')} Raten"
     )
-
-
-def _protokolliere(bilanz: dict) -> None:
-    for datei in bilanz["dateien"]:
-        if not datei["verwendet"]:
-            log.warning(
-                "Klick-Ergebnis %s ersetzt nichts: %s",
-                datei["anbieter"],
-                datei["warum_nicht"],
-            )
-        if datei["ueberfaellig"]:
-            log.warning(
-                "Klick-Ergebnis %s: %d Seiten überfällig",
-                datei["anbieter"],
-                len(datei["ueberfaellig"]),
-            )
-    if bilanz["geplant"] is None:
-        log.warning("Klick-Tagesplan fehlt: geplante Anbieter unbekannt")
-    for name in bilanz["fehlt"]:
-        log.warning("Klick-Ergebnis %s fehlt: keine Datei im Ordner", name)
-    for schluessel in bilanz["mehrdeutig"]:
-        log.warning("Klick-Sätze mehrdeutig, keiner verwendet: %s", schluessel)
-    unvollstaendig = bilanz["unvollstaendig"]
-    if unvollstaendig["nicht_ersetzt"]:
-        log.warning(
-            "Klick-Sätze unvollständig, %d Adaptersätze nicht ersetzt: %s",
-            unvollstaendig["nicht_ersetzt"],
-            ", ".join(f"{f} {n}" for f, n in unvollstaendig["felder"].items()),
-        )
-    probe = bilanz["gegenprobe"]
-    log.info(
-        "Klick-Bündel: %d Sätze, %d Adaptersätze ersetzt (%d gleich, %d abweichend,"
-        " %d ohne Vergleich), %d ohne Gegenstück",
-        bilanz["klick_rohsaetze"],
-        bilanz["ersetzt"],
-        probe["gleich"],
-        probe["abweichend"],
-        probe["ohne_vergleich"],
-        bilanz["ohne_gegenstueck"],
-    )
-    for beispiel in probe["beispiele"]:
-        log.warning("Klick-Gegenprobe weicht ab: %s", beispiel)
