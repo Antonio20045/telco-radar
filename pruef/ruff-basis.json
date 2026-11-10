@@ -514,8 +514,7 @@
   "B905": 1
  },
  "src/telco_radar/report/geraete_radar.py": {
-  "D103": 1,
-  "UP045": 3
+  "D103": 1
  },
  "src/telco_radar/report/geraete_tco_band.py": {
   "E501": 1,
@@ -541,7 +540,7 @@
   "I001": 1
  },
  "src/telco_radar/report/geraete_view.py": {
-  "C901": 3,
+  "C901": 2,
   "DTZ007": 1,
   "E501": 1,
   "F401": 2,
