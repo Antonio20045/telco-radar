@@ -23,6 +23,7 @@ from __future__ import annotations
 import json
 import logging
 import shutil
+from collections import Counter
 from datetime import date, timedelta
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
@@ -487,8 +488,8 @@ def test_warnung_nennt_keinen_platz_den_ein_anderes_buendel_haelt(wurzel, caplog
 
 def test_frische_stufe_geht_vor_der_kleineren_veralteten_bei_telekom(wurzel):
     """S4: Telekom hat die 256-GB-Seite (5 Tage alt, „veraltet“) und die 512-GB-Seite
-    frisch im Bestand. Die Stufenwahl nimmt die kleinste Stufe: das war die tote
-    256er-Adresse und verdrängte die frische 512er (main: 512er)."""
+    frisch im Bestand. Die Seite nimmt die frische 512er-Adresse statt der toten
+    256er; der Platz bleibt der von main (256 GB)."""
     n = GERAETE[0]
     alt = _buendel(n, TARIFE[2], TAG0 - timedelta(days=5), pruefung="veraltet 16")
     frisch = _buendel(n, TARIFE[2], TAG0)
@@ -498,13 +499,12 @@ def test_frische_stufe_geht_vor_der_kleineren_veralteten_bei_telekom(wurzel):
 
     seiten = leite_ab(wurzel, lade_katalog(wurzel), set())
 
-    assert [(s.speicher_gb, s.url) for s in seiten] == [(512, frisch["quelle_url"])]
+    assert [(s.speicher_gb, s.url) for s in seiten] == [(256, frisch["quelle_url"])]
 
 
 def test_frische_stufe_geht_vor_der_kleineren_veralteten_bei_gleicher_adresse(wurzel):
     """S4, andere Seite derselben Wahl: Eine Adresse ohne Stufe steht für mehrere
-    Stufen (o2). Die frische 512er gilt vor der veralteten 256er, auch wenn die
-    kleinere Stufe sonst gewinnt."""
+    Stufen (o2). Der Platz ist der von main (256 GB), die Adresse dieselbe."""
     n = GERAETE[0]
     adresse = "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26/?tarif=m"
     alt = _buendel(n, "", TAG0 - timedelta(days=5), "o2", "veraltet 16")
@@ -516,7 +516,117 @@ def test_frische_stufe_geht_vor_der_kleineren_veralteten_bei_gleicher_adresse(wu
 
     seiten = leite_ab(wurzel, lade_katalog(wurzel), set())
 
-    assert [(s.speicher_gb, s.url) for s in seiten] == [(512, adresse)]
+    assert [(s.speicher_gb, s.url) for s in seiten] == [(256, adresse)]
+
+
+def _zwei_stufen(messung: date) -> list[dict]:
+    """Zehn Geräte, fünf Tarife, je Tarif ein 256er- und ein 512er-Bündel mit eigener
+    Adresse (Telekom: die Seite trägt die Stufe in der Adresse)."""
+    bestand = _alle_plaetze(messung)
+    for eintrag in list(bestand):
+        gross = dict(eintrag)
+        gross["sku_id"] = eintrag["sku_id"].replace("256gb", "512gb")
+        gross["quelle_url"] = eintrag["quelle_url"].replace("256", "512")
+        bestand.append(gross)
+    return bestand
+
+
+def _je_geraet(seiten) -> dict[str, int]:
+    return dict(Counter(s.geraet for s in seiten if s.anbieter == "Telekom"))
+
+
+def test_frische_stufe_aendert_die_platzzahl_nicht_ein_tarif(wurzel):
+    """Prüfung PR 88, M1: Das 256er-Bündel des S26 Ultra im Tarif MF_17779 ist fünf
+    Tage alt („veraltet“), alle übrigen sind frisch. Die Seite dieses Tarifs nimmt die
+    frische 512er-Adresse, der Platz bleibt aber derselbe wie auf main (Gerät, kleinste
+    Stufe, auch in der Bezeichnung): acht Plätze, 40 Seiten, kein Gerät verliert seine
+    Seiten (der Stand 59b8485d zählte neun Plätze und warf das iPhone 17 der echten
+    Daten hinaus)."""
+    ultra = GERAETE[2]
+    _bestand(wurzel, _zwei_stufen(TAG0))
+    gesund = leite_ab(wurzel, lade_katalog(wurzel), set())
+    bestand = _zwei_stufen(TAG0)
+    for eintrag in bestand:
+        if (
+            eintrag["sku_id"] == f"{ultra}-256gb-x"
+            and _tarif(eintrag["quelle_url"]) == TARIFE[0]
+        ):
+            eintrag["abgerufen_am"] = (TAG0 - timedelta(days=5)).isoformat()
+            eintrag["pruefung"] = "veraltet 16"
+    _bestand(wurzel, bestand)
+
+    seiten = leite_ab(wurzel, lade_katalog(wurzel), set())
+
+    assert len(_je_geraet(gesund)) == HOECHSTE_SEITEN_JE_ANBIETER
+    assert _je_geraet(seiten) == _je_geraet(gesund)
+    assert len(seiten) == len(gesund) == ALLE_SEITEN
+    seite = next(s for s in seiten if s.geraet == ultra and TARIFE[0] in s.url)
+    assert "512" in seite.url, "S4: die frische Adresse gilt"
+    assert {(s.geraet, s.speicher_gb) for s in seiten} == {
+        (s.geraet, s.speicher_gb) for s in gesund
+    }, "dieselben Plätze (Gerät, Stufe) wie auf main"
+
+
+@pytest.mark.parametrize("anteil", (2, 3), ids=("jedes_zweite", "jedes_dritte"))
+def test_halbe_buendel_mit_verlorenen_messtagen_kosten_keinen_platz(wurzel, anteil):
+    """Prüfung PR 88, M1, zweites Szenario: Bei einem Teil der 256er-Bündel gingen
+    zwei Messtage verloren (Lesung kam nicht im Bestand an, Bündel „veraltet“), die
+    512er sind frisch. Die Plätze sind je Gerät dieselben wie bei lauter frischen
+    Bündeln, nie weniger als auf main."""
+    _bestand(wurzel, _zwei_stufen(TAG0))
+    gesund = leite_ab(wurzel, lade_katalog(wurzel), set())
+    bestand = _zwei_stufen(TAG0)
+    for i, eintrag in enumerate(bestand):
+        if "256gb" in eintrag["sku_id"] and i % anteil == 0:
+            eintrag["abgerufen_am"] = (TAG0 - timedelta(days=5)).isoformat()
+            eintrag["pruefung"] = "veraltet 16"
+    _bestand(wurzel, bestand)
+
+    seiten = leite_ab(wurzel, lade_katalog(wurzel), set())
+
+    assert _je_geraet(seiten) == _je_geraet(gesund)
+    assert len(seiten) == ALLE_SEITEN
+    assert any("512" in s.url for s in seiten), "S4 greift: frische Adressen gelten"
+    assert {(s.geraet, s.speicher_gb) for s in seiten} == {
+        (s.geraet, s.speicher_gb) for s in gesund
+    }
+
+
+def test_unter_veralteten_buendeln_gewinnt_das_juengste(wurzel):
+    """Prüfung PR 88, S2: Zwei veraltete Bündel nennen für denselben Platz
+    verschiedene Adressen (congstar Galaxy S26 256: 06.11. und 23.10.); die Adresse des
+    jüngeren gilt, unabhängig von der Reihenfolge im Bestand."""
+    n = GERAETE[0]
+    alt = _buendel(n, "", TAG0 - timedelta(days=9), "o2", "veraltet 16")
+    alt["quelle_url"] = O2_SEITE.format(n=n).replace("x-details", "alt-details")
+    jung = _buendel(n, "", TAG0 - timedelta(days=4), "o2", "veraltet 16")
+    for reihenfolge in ([alt, jung], [jung, alt]):
+        _bestand(wurzel, reihenfolge)
+
+        seiten = leite_ab(wurzel, lade_katalog(wurzel), set())
+
+        assert [s.url for s in seiten] == [jung["quelle_url"]]
+
+
+def test_ausfall_eines_ganzen_anbieters_steht_als_warnung_im_log(wurzel, caplog):
+    """Prüfung PR 88, S1: Ohne frisches Bündel eines Anbieters bleibt seine Liste
+    (Frist je Anbieter), das Log sagt es aber: Anbieter und letztes Bündel. Gegenprobe:
+    ein Anbieter mit einem frischen Bündel löst nichts aus."""
+    telekom = _alle_plaetze(TAG0 - timedelta(days=20))
+    for eintrag in telekom:
+        eintrag["pruefung"] = "veraltet 16"
+    o2 = [_buendel(n, "", TAG0, "o2") for n in GERAETE[:3]]
+    _bestand(wurzel, [*telekom, *o2])
+
+    with caplog.at_level(logging.WARNING, logger="telco_radar"):
+        seiten = leite_ab(wurzel, lade_katalog(wurzel), set())
+
+    assert len([s for s in seiten if s.anbieter == "Telekom"]) == ALLE_SEITEN
+    warnungen = [r.getMessage() for r in caplog.records if r.levelno >= logging.WARNING]
+    assert len(warnungen) == 1
+    assert "Telekom" in warnungen[0]
+    assert (TAG0 - timedelta(days=20)).isoformat() in warnungen[0]
+    assert "o2" not in warnungen[0]
 
 
 def test_gegenprobe_sehr_altes_buendel_ist_keine_quelle_mehr(wurzel):

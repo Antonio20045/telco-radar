@@ -34,9 +34,14 @@ iPhone 15, Oktober 2026), bliebe sonst ewig als tote Seite in der Rotation. Zwei
 Wochen ohne Lesung sind ein Störfall, kein Ausfalltag; ein Platz, der dabei
 herausfällt, steht als Warnung im Lauf-Log (``log.warning``, wie die Hinweise in
 ``klickziele``).
-Frische Bündel gehen vor: eine Adresse aus einem veralteten Bündel gilt nur, wo kein
-frisches denselben Platz nennt, und die Stufenwahl (``_je_adresse_eine_stufe``,
-``_je_tarif_eine_stufe``) nimmt zuerst die frischen Bündel, dann die kleinste Stufe.
+Frische Bündel gehen vor, ohne die Plätze zu ändern: Die Plätze (Gerät und Stufe, bei
+Telekom je Tarif die kleinste Stufe) wählt allein die Regel von main und zählt die
+Platzgrenze (``_begrenze``); danach ersetzt ``_frischere_adresse`` die Adresse eines
+Platzes durch die eines frischen Bündels derselben Seite (derselbe Tarif, dieselbe
+Adresse), sonst bleibt sie. Wählte die Stufenwahl selbst die frische Stufe, spaltete
+sich ein Gerät in zwei Plätze auf und die Platzgrenze warf ein anderes Gerät samt allen
+Seiten hinaus (Prüfung PR 88, 10.11.2026: iPhone 17 bei Telekom). Unter veralteten
+Bündeln gilt das jüngste (``_nutzbar``).
 
 Zeitbudget (CLAUDE.md Regel 8): Die Liste hat keine eigene Seitengrenze, nur die
 Platzgrenze. Bei Telekom hat ein Platz bis zu fünf Seiten, acht Plätze also bis zu 40;
@@ -109,12 +114,13 @@ def leite_ab(
     """
     buendel, ausgeschieden = _lies_buendel(root / BESTAND)
     geraete = {g.device_id: g for g in katalog.geraete if ist_grosse_marke(g)}
+    _warne_anbieter_ohne_frische(buendel + ausgeschieden)
     kandidaten, frische = _kandidaten(buendel, geraete, vorhanden)
     _warne_ausgeschieden(_kandidaten(ausgeschieden, geraete, vorhanden)[0], kandidaten)
-    gewaehlt = _je_tarif_eine_stufe(
-        _je_adresse_eine_stufe(kandidaten, frische), frische
+    plaetze = _begrenze(
+        _je_tarif_eine_stufe(_je_adresse_eine_stufe(kandidaten)), geraete
     )
-    return _begrenze(gewaehlt, geraete)
+    return [_frischere_adresse(s, kandidaten, frische) for s in plaetze]
 
 
 def _kandidaten(
@@ -171,6 +177,61 @@ def _warne_ausgeschieden(
         )
 
 
+def _warne_anbieter_ohne_frische(buendel: list[dict]) -> None:
+    """Warnung für jeden Anbieter, dessen Bündel alle veraltet sind: Seine Liste bleibt
+    (Frist je Anbieter), aber er wird nicht mehr gelesen."""
+    letzte: dict[str, date | None] = {}
+    frisch: set[str] = set()
+    for eintrag in buendel:
+        name = _anbieter(eintrag)
+        if not name:
+            continue
+        if not _ist_veraltet(eintrag):
+            frisch.add(name)
+        datum = _datum(eintrag)
+        alt = letzte.get(name)
+        if datum is not None and (alt is None or datum > alt):
+            letzte[name] = datum
+        else:
+            letzte.setdefault(name, None)
+    for name in sorted(set(letzte) - frisch):
+        datum = letzte[name]
+        log.warning(
+            "Klickliste auto: %s hat kein frisches Bündel mehr (jüngstes: %s); seine "
+            "Seiten bleiben in der Liste, solange die Bündel nutzbar sind, werden aber "
+            "nicht mehr gemessen (Sperre, Strukturbruch, Anbieter nicht mehr gelesen?)",
+            name,
+            datum.isoformat() if datum else "ohne Datum",
+        )
+
+
+def _frischere_adresse(
+    seite: AutoSeite, kandidaten: dict[_Schluessel, str], frische: set[_Schluessel]
+) -> AutoSeite:
+    """Die Adresse eines Platzes aus einem frischen Bündel derselben Seite (bei Tarif:
+    derselbe Tarif; sonst dieselbe Adresse), darunter die kleinste Stufe. Der Platz
+    bleibt der, den die Platzgrenze gezählt hat, mit seiner Stufe (die Seite liest alle
+    Stufen, ``speicher_gb`` ist nur die Bezeichnung); nur die Adresse ändert sich, und
+    nur, wo ein frisches Bündel die bisherige Wahl verdrängt."""
+    tarif = _tarif_kennung(seite.anbieter, seite.url)
+
+    def gleiche_seite(schluessel: _Schluessel) -> bool:
+        anbieter, gid, _, kennung = schluessel
+        if (anbieter, gid) != (seite.anbieter, seite.geraet):
+            return False
+        return kennung == tarif if tarif else kandidaten[schluessel] == seite.url
+
+    gewaehlt = (seite.anbieter, seite.geraet, seite.speicher_gb, tarif)
+    beste = min(
+        filter(gleiche_seite, kandidaten),
+        key=lambda s: (s not in frische, s[2]),
+        default=gewaehlt,
+    )
+    if beste == gewaehlt or beste not in frische or gewaehlt in frische:
+        return seite
+    return AutoSeite(seite.anbieter, seite.geraet, seite.speicher_gb, kandidaten[beste])
+
+
 def _tarif_kennung(anbieter: str, url: str) -> str:
     """Der Tarif, den die Adresse wählt; leer, wo die Seite den Tarif nicht aus der
     Adresse nimmt (``TARIF_PARAMETER``)."""
@@ -181,14 +242,11 @@ def _tarif_kennung(anbieter: str, url: str) -> str:
     return werte[0].strip() if werte else ""
 
 
-def _je_tarif_eine_stufe(
-    kandidaten: dict[_Schluessel, str], frische: set[_Schluessel]
-) -> dict[_Schluessel, str]:
-    """Wählt die Adresse den Tarif, genügt je (Anbieter, Gerät, Tarif) eine Stufe: die
-    frische, darunter die kleinste (die Seite liest alle Stufen). Ohne Tarifkennung
-    bleibt jede Stufe."""
+def _je_tarif_eine_stufe(kandidaten: dict[_Schluessel, str]) -> dict[_Schluessel, str]:
+    """Wählt die Adresse den Tarif, genügt je (Anbieter, Gerät, Tarif) die kleinste
+    Stufe: die Seite liest alle Stufen. Ohne Tarifkennung bleibt jede Stufe."""
     einzeln: dict[tuple[str, str, str], _Schluessel] = {}
-    for schluessel in sorted(kandidaten, key=lambda s: (s not in frische, s[2])):
+    for schluessel in sorted(kandidaten, key=lambda s: s[2]):
         anbieter, gid, _, tarif = schluessel
         if tarif:
             einzeln.setdefault((anbieter, gid, tarif), schluessel)
@@ -197,13 +255,12 @@ def _je_tarif_eine_stufe(
 
 
 def _je_adresse_eine_stufe(
-    kandidaten: dict[_Schluessel, str], frische: set[_Schluessel]
+    kandidaten: dict[_Schluessel, str],
 ) -> dict[_Schluessel, str]:
     """Steht eine Adresse für mehrere Stufen (Geräteseite ohne Stufe in der Adresse),
-    bleibt die frische, darunter die kleinste: der Crawler klickt alle Varianten einer
-    Seite ohnehin."""
+    bleibt die kleinste: der Crawler klickt alle Varianten einer Seite ohnehin."""
     einzeln: dict[tuple[str, str, str], _Schluessel] = {}
-    for schluessel in sorted(kandidaten, key=lambda s: (s not in frische, s[2])):
+    for schluessel in sorted(kandidaten, key=lambda s: s[2]):
         anbieter, gid, _, _ = schluessel
         einzeln.setdefault((anbieter, gid, kandidaten[schluessel]), schluessel)
     return {s: kandidaten[s] for s in einzeln.values()}
@@ -234,7 +291,8 @@ def _ist_veraltet(eintrag: dict) -> bool:
 def _nutzbar(buendel: list[dict]) -> tuple[list[dict], list[dict]]:
     """Frische Bündel, dann die veralteten, deren Messung höchstens
     ``QUELLE_HOECHSTALTER_TAGE`` hinter dem jüngsten Bündel *desselben Anbieters*
-    liegt (Reihenfolge sonst wie im Bestand); dazu die ausgeschiedenen."""
+    liegt, das jüngste zuerst (die erste Nennung eines Platzes gilt); dazu die
+    ausgeschiedenen."""
     stand: dict[str, date] = {}
     for eintrag in buendel:
         datum = _datum(eintrag)
@@ -253,6 +311,7 @@ def _nutzbar(buendel: list[dict]) -> tuple[list[dict], list[dict]]:
 
     frisch = [b for b in buendel if not _ist_veraltet(b)]
     alt = [b for b in buendel if _ist_veraltet(b)]
+    alt.sort(key=lambda b: _datum(b) or date.min, reverse=True)
     return frisch + [b for b in alt if jung_genug(b)], [
         b for b in alt if not jung_genug(b)
     ]
