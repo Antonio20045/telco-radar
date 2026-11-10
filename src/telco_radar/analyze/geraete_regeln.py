@@ -5,13 +5,13 @@
 Bestand je Anbieter, Tarif, Laufzeit, Gerät und Zustand, aber nur zwischen frischen
 Bündeln: ein veraltetes (Regel 16) ist kein Vergleichspartner. Hat ein frisches einen
 veralteten Speicher-Nachbarn, bleibt es nur gültig, wenn Regel 11 es ersatzweise prüft
-(Vorgänger vorhanden, Sprung höchstens 15 %); ohne Vorgänger ist es Quarantäne 5
-(fail-closed). Regel 12 (gleicher Wert bei allen Bündeln eines Anbieters, auch eine
-Ratenlaufzeit, die bei allen Geräten fehlt) ergibt eine Erfassungslücke je Anbieter
-(``erfassungsluecken``), keinen Status. Regel 15 gilt im Vergleich (Sieger, Δ); je
-Bündel wird nur geprüft, ob der Zeitraum H bestimmbar ist. Regel 4 prüft das Volumen
-im Tarifnamen gegen den Tarifbestand; ob ein Tarif in ein Band mit mehr Volumen fällt,
-entscheidet die Bandzuordnung der Ansicht.
+(Vorgänger vorhanden, nicht älter als drei Tage, Sprung und Referenz bestehen,
+``geraete_regel11``); sonst ist es Quarantäne 5 (fail-closed). Regel 12 (gleicher Wert
+bei allen Bündeln eines Anbieters, auch eine Ratenlaufzeit, die bei allen Geräten
+fehlt) ergibt eine Erfassungslücke je Anbieter (``erfassungsluecken``), keinen Status.
+Regel 15 gilt im Vergleich (Sieger, Δ); je Bündel wird nur geprüft, ob der Zeitraum H
+bestimmbar ist. Regel 4 prüft das Volumen im Tarifnamen gegen den Tarifbestand; ob
+ein Tarif in ein Band mit mehr Volumen fällt, entscheidet die Bandzuordnung der Ansicht.
 Regel 3 zieht vom SIM-only-Preis den belegten Bündelnachlass des Anbieters ab
 (``BUENDEL_NACHLASS``). Ein Beleg ohne Ratenlaufzeit, Tarif und Speicher ist für Regel
 13 nicht prüfbar.
@@ -32,13 +32,11 @@ from __future__ import annotations
 
 from collections.abc import Iterable, Mapping
 
-from .. import rechenweise
 from ..geraete_model import normalisiere
-from ..tarif_model import BUENDELPHASEN, NUR_MIT_GERAET, vertrag_basis
-from ..tco_model import Buendel, sim_only_id, tco_24
+from ..tarif_model import NUR_MIT_GERAET, vertrag_basis
+from ..tco_model import Buendel, sim_only_id
 from ..tco_model import zeitraum as zeitraum_h
 from .geraete_pruefstatus import (
-    AUSREISSER_VORTAG,
     BUENDEL_NACHLASS,
     CENT,
     ERLAUBTE_RATENLAUFZEITEN,
@@ -65,6 +63,7 @@ from .geraete_pruefstatus import (
     pflichtfelder,
 )
 from .geraete_regel5 import speicherstufen
+from .geraete_regel11 import regel_11_vortag
 
 FELDER_AUS_DEM_TARIFBLATT = ("tarif_bindung_monate", "tarif_phasen")
 AUS_DEM_TARIFBLATT = (
@@ -267,30 +266,6 @@ def _r10_aktion(satz: Mapping, b: Buendel, k: Kontext) -> Befund | None:
     return None
 
 
-def _r11_vortag(satz: Mapping, b: Buendel, k: Kontext) -> Befund | None:
-    alt = k.vortag.get(str(satz.get("id") or ""))
-    if alt is None:
-        return _nicht(11, "kein Vortageswert")
-    if not rechenweise.gleich(satz, alt):
-        return _nicht(11, rechenweise.BRUCH)
-    try:
-        vorher = tco_24(buendel_aus_satz({**satz, BUENDELPHASEN: None, **alt}))
-    except (TypeError, ValueError):
-        return _nicht(11, "Vortageswert unlesbar")
-    jetzt = tco_24(b)
-    neu, alt_ = jetzt.gesamt, vorher.gesamt
-    if not (jetzt.belastbar and vorher.belastbar) or neu is None or not alt_:
-        return _nicht(11, "Gesamtpreis heute oder am Vortag unvollständig")
-    sprung = abs(neu - alt_) / alt_
-    if sprung <= AUSREISSER_VORTAG:
-        return None
-    return _verletzt(
-        11,
-        f"{eur(neu)} statt {eur(alt_)} am {datum(str(alt.get('datum') or ''))} "
-        f"({sprung:.0%}), Quarantäne bis zum zweiten Abruf",
-    )
-
-
 def regel_13_beleglink(satz: Mapping, b: Buendel, k: Kontext) -> Befund | None:
     """Regel 13: der Beleglink nennt dieselbe Variante; None heißt bestanden."""
     beleg = satz.get(FELD_BELEG_VARIANTE)
@@ -354,7 +329,7 @@ _JE_BUENDEL = (
     _r8_phasen,
     regel_9_echo,
     _r10_aktion,
-    _r11_vortag,
+    regel_11_vortag,
     regel_13_beleglink,
     _r14_pflicht,
     _r15_zeitraum,
