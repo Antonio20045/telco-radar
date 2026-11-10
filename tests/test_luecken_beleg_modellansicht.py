@@ -27,7 +27,7 @@ from telco_radar.report.geraete_zeitreihe_legende import (
 )
 
 CONFIG = Path(__file__).resolve().parents[1] / "config" / "geraete_abdeckung.yaml"
-HEUTE = "2026-11-09"
+HEUTE = "2026-11-10"
 PRO_MAX_512 = "apple-iphone-17-pro-max-512gb-deep-blue"
 
 
@@ -94,12 +94,12 @@ def test_congstar_pro_max_ist_in_jeder_stufe_nicht_im_sortiment():
 
 def test_congstar_duo_fehlt_nicht_still_in_der_modellansicht():
     zeilen = _fehlzeilen(_modell("apple-iphone-duo", 256, []), _belege())
-    assert zeilen["congstar"]["kurz"] == "Nicht im Sortiment (geprüft 08.11.)"
+    assert zeilen["congstar"]["kurz"] == "Nicht im Sortiment (geprüft 10.11.)"
 
 
 def test_abgelaufener_beleg_ist_wieder_noch_nicht_erfasst():
     modell = _modell("apple-iphone-duo", 256, [])
-    assert fuer_modell(_belege(), modell, "2026-11-23") == {}
+    assert fuer_modell(_belege(), modell, "2026-11-25") == {}
 
 
 def test_ein_neuer_preis_des_anbieters_verdraengt_die_luecke():
@@ -167,7 +167,8 @@ def test_ein_stand_vor_der_pruefung_kennt_die_luecke_nicht():
     assert _veraltet([alt], _belege(), "2026-10-03") == [False]
     modell = _modell("apple-iphone-duo", 256, [])
     assert fuer_modell(_belege(), modell, "2026-10-03") == {}
-    assert "congstar" in fuer_modell(_belege(), modell, "2026-11-08")
+    assert "congstar" not in fuer_modell(_belege(), modell, "2026-11-09")
+    assert "congstar" in fuer_modell(_belege(), modell, "2026-11-10")
 
 
 def test_legende_nennt_den_von_der_luecke_ueberholten_preis_ohne_zahl():
