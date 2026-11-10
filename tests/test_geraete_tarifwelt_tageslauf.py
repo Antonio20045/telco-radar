@@ -15,6 +15,7 @@ from bestand_pfad import lese_wurzel
 from test_geraete_adapter_tarifwelt import LEITER, fixture_hole
 
 from telco_radar import geraete_tarifwelt, tarifwelt_bestand
+from telco_radar.analyze.tco_store import TcoDB
 from telco_radar.collect.geraete import tarifwelt_lauf
 from telco_radar.collect.geraete.basis import GeraeteAbrufFehler
 from telco_radar.geraete_config import lade_katalog, lade_quellen
@@ -80,15 +81,20 @@ def test_tarifwelt_tarife_bekommen_im_bericht_dasselbe_band_wie_ein_netzbetreibe
     tarife = {}
     for teil in _lauf_beide_geraete():
         tarife.update(teil.tarife)
-    pfad = tmp_path / tarifwelt_bestand.DATEINAME
     ohne = bandmod.tarif_baender(vf)
     assert not any(t.startswith("mediamarkt_tarifwelt:") for t in ohne)
 
-    tarifwelt_bestand.schreibe(pfad, tarife, "2026-11-08")
-    gelesen = tarifwelt_bestand.lade(pfad)
+    pfad = tmp_path / "geraete_tco.json"
+    abgelegt = TcoDB(pfad)
+    abgelegt.haendler_tarife.update(tarife)
+    abgelegt.upsert_buendel(
+        [b for teil in _lauf_beide_geraete() for b in teil.buendel], "2026-11-08"
+    )
+    assert abgelegt.save("2026-11-08")
+    gelesen = TcoDB(pfad).haendler_tarife
     assert set(gelesen) == set(tarife)
 
-    gesamt = tarifwelt_bestand.mit_tarifwelt(vf, tmp_path)
+    gesamt = tarifwelt_bestand.mit_tarifwelt(vf, gelesen)
     assert set(vf) <= set(gesamt) and set(tarife) <= set(gesamt)
     baender = bandmod.tarif_baender(gesamt)
     leiter = bandmod.tarifleiter(gesamt)
@@ -101,17 +107,16 @@ def test_tarifwelt_tarife_bekommen_im_bericht_dasselbe_band_wie_ein_netzbetreibe
     assert {t: baender[t] for t in vorher} == vorher
 
 
-def test_bestand_ueberschreibt_keinen_netzbetreiber_tarif(tmp_path):
-    pfad = tmp_path / tarifwelt_bestand.DATEINAME
-    pfad.write_text(
-        '{"tarife": {"vodafone:mobil-m": {"datenvolumen_gb": 1}, '
-        '"mediamarkt_tarifwelt:x": {"datenvolumen_gb": 5}}}'
-    )
+def test_bestand_ueberschreibt_keinen_netzbetreiber_tarif():
+    zusatz = {
+        "vodafone:mobil-m": {"datenvolumen_gb": 1},
+        "mediamarkt_tarifwelt:x": {"datenvolumen_gb": 5},
+    }
     vf = _vodafone_tarife()
-    gesamt = tarifwelt_bestand.mit_tarifwelt(vf, tmp_path)
+    gesamt = tarifwelt_bestand.mit_tarifwelt(vf, zusatz)
     assert gesamt["vodafone:mobil-m"] == vf["vodafone:mobil-m"]
     assert gesamt["mediamarkt_tarifwelt:x"]["datenvolumen_gb"] == 5
-    assert tarifwelt_bestand.lade(tmp_path / "gibt-es-nicht.json") == {}
+    assert tarifwelt_bestand.mit_tarifwelt(vf, None) == vf
 
 
 def test_buendel_der_tarifwelt_stehen_im_band_der_karten():
@@ -218,11 +223,10 @@ def test_waechter_config_nennt_die_drei_netzzeilen_erst_wirksam_bei_aktiv():
 
 
 def test_tageslauf_stufe_schreibt_buendel_und_tarifbestand(tmp_path, monkeypatch):
-    """`geraete_tarifwelt.stufe`: Buendel im TCO-Store UND Stammdaten
-    in `tarifwelt_tarife.json`; inaktiv schreibt nichts."""
+    """`geraete_tarifwelt.stufe`: Buendel UND Stammdaten im TCO-Store,
+    nach `save` und neuem Lesen in `geraete_tco.json`; inaktiv schreibt nichts."""
     from datetime import UTC, datetime
 
-    from telco_radar.analyze.tco_store import TcoDB
     from telco_radar.tarif_bezug import Tarifbestand
 
     monkeypatch.setattr(
@@ -255,7 +259,7 @@ def test_tageslauf_stufe_schreibt_buendel_und_tarifbestand(tmp_path, monkeypatch
         tco,
     )
     assert aus == {"status": "aus"}
-    assert not (tmp_path / tarifwelt_bestand.DATEINAME).exists()
+    assert not tco.haendler_tarife
 
     an = geraete_tarifwelt.stufe(
         _Quellen([_Quelle("mediamarkt_tarifwelt", True)]),
@@ -268,6 +272,8 @@ def test_tageslauf_stufe_schreibt_buendel_und_tarifbestand(tmp_path, monkeypatch
     )
     assert an["status"] == "ok" and an["buendel"] == 4, an
     assert len(tco.buendel()) == 4
+    assert {b["tarif_id"] for b in tco.buendel()} == set(tco.haendler_tarife)
+    assert tco.save("2026-11-08")
     assert {b["tarif_id"] for b in tco.buendel()} == set(
-        tarifwelt_bestand.lade(tmp_path / tarifwelt_bestand.DATEINAME)
+        TcoDB(tmp_path / "geraete_tco.json").haendler_tarife
     )

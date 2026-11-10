@@ -188,6 +188,12 @@ def abgelaufene_aktionen(aktionen: Iterable[Aktion], heute: str) -> list[Aktion]
 HERLEITUNG_TARIFRASTER = "tarifaufschlag_aus_tarifraster"
 HERLEITUNG_SCHLUSSZAHLUNG = "schlusszahlung_aus_grundtarif"
 HERLEITUNG_PREISLISTE = frozenset({HERLEITUNG_TARIFRASTER, HERLEITUNG_SCHLUSSZAHLUNG})
+HERLEITUNG_DIREKT = frozenset({"tarifwelt_productdetail"})
+"""Herkunftsmarken, die keinen Rechenweg nennen: das Bündel ist die SKU-genaue Antwort
+der Anbieterschnittstelle selbst (Saturn/MediaMarkt, ``productdetail?tfi=``: Zuzahlung,
+Anschluss, Versand und Monatspreis stehen als Posten in derselben Antwort; der Leser
+verwirft sie, wenn Monatsposten oder Versand nicht zur Config passen). Sie zählen wie
+ein gemessenes Bündel ohne ``herleitung``."""
 HERLEITUNG_EINMALZAHLUNG = "einmalzahlung_weicht_vom_geraet_ab"
 """Marke eines 1&1-Bündels, dessen Einmalzahlung nach Monat 24 vom Wert abweicht, der
 bei den anderen Tarifen desselben Geräts (gleicher Speicher) gilt
@@ -214,14 +220,15 @@ def ist_gemessen(herleitung: str, quelle_art: str) -> bool:
 def ist_schaetzung(herleitung: str) -> bool:
     """Ist ein Preis mit dieser ``herleitung`` eine Schätzung, die nicht zählt?
 
-    Nicht für Rechenwege, die eine Preisliste exakt nachrechnen
-    (``HERLEITUNG_PREISLISTE``): 1&1 bepreist jede Tarifstufe als Grundangebot plus
-    festen Tarifaufschlag (Gegenprobe in ``einsundeins.ergaenze_tarifstufen``), die
-    Ablöse hängt nur an der Gerätevariante. Die Preisprüfung vom 26.10.2026 fand diese
+    Nicht für eine Herkunftsmarke ohne Rechenweg (``HERLEITUNG_DIREKT``) und nicht für
+    Rechenwege, die eine Preisliste exakt nachrechnen (``HERLEITUNG_PREISLISTE``):
+    1&1 bepreist jede Tarifstufe als Grundangebot plus festen Tarifaufschlag
+    (Gegenprobe in ``einsundeins.ergaenze_tarifstufen``), die Ablöse hängt nur an
+    der Gerätevariante. Die Preisprüfung vom 26.10.2026 fand diese
     Preise beim Anbieter wieder (A17, All-Net-Flat M, 22,99 €).
     """
     weg = herleitung.strip()
-    return bool(weg) and weg not in HERLEITUNG_PREISLISTE
+    return bool(weg) and weg not in HERLEITUNG_PREISLISTE | HERLEITUNG_DIREKT
 
 
 def ist_bedingter_tarif(anbieter: str, tarif_name: str) -> bool:
