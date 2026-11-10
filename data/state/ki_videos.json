@@ -1,6 +1,136 @@
 {
- "stand": "2026-11-09",
+ "stand": "2026-11-10",
  "videos": [
+  {
+   "id": "vug73goPJaM",
+   "titel": "Is Software Over?",
+   "kanal": "Two Minute Papers",
+   "datum": "2026-11-10",
+   "dauer_sekunden": 386,
+   "stufe": "Fortgeschritten",
+   "sprache": "en",
+   "bild": "vug73goPJaM.jpg"
+  },
+  {
+   "id": "vdEGZYIvFiI",
+   "titel": "Greg Brockman on how OpenAI uses frontier models for cyber defense",
+   "kanal": "OpenAI",
+   "datum": "2026-11-10",
+   "dauer_sekunden": 58,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "vdEGZYIvFiI.jpg"
+  },
+  {
+   "id": "sSyzj08Cy2U",
+   "titel": "Greg Brockman on how OpenAI uses frontier models for cyber defense",
+   "kanal": "OpenAI",
+   "datum": "2026-11-10",
+   "dauer_sekunden": 21,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "sSyzj08Cy2U.jpg"
+  },
+  {
+   "id": "ZTxzWJeGFAA",
+   "titel": "How CodeRabbit uses OpenAI to review AI-generated code",
+   "kanal": "OpenAI",
+   "datum": "2026-11-10",
+   "dauer_sekunden": 77,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "ZTxzWJeGFAA.jpg"
+  },
+  {
+   "id": "Z9k5oI3Paoc",
+   "titel": "Introducing Businesses in ChatGPT in beta",
+   "kanal": "OpenAI",
+   "datum": "2026-11-10",
+   "dauer_sekunden": 49,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "Z9k5oI3Paoc.jpg"
+  },
+  {
+   "id": "NkkAwdm2k7s",
+   "titel": "How to Use Claude Code for FREE with Ollama",
+   "kanal": "Kevin Stratvert",
+   "datum": "2026-11-10",
+   "dauer_sekunden": 420,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "NkkAwdm2k7s.jpg"
+  },
+  {
+   "id": "N-Fj9h6Detw",
+   "titel": "3 Excel Dashboards You Won't Believe Are Possible",
+   "kanal": "Leila Gharani",
+   "datum": "2026-11-10",
+   "dauer_sekunden": 731,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "N-Fj9h6Detw.jpg"
+  },
+  {
+   "id": "GcFRheDNh5U",
+   "titel": "This Airtaxi is Ready For Primetime!",
+   "kanal": "Matt Wolfe",
+   "datum": "2026-11-10",
+   "dauer_sekunden": 84,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "GcFRheDNh5U.jpg"
+  },
+  {
+   "id": "FNTz0CdqL6g",
+   "titel": "Kuken Industries searches 70 years of drawings in minutes",
+   "kanal": "OpenAI",
+   "datum": "2026-11-10",
+   "dauer_sekunden": 180,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "FNTz0CdqL6g.jpg"
+  },
+  {
+   "id": "BajLtMHISQU",
+   "titel": "„Verbot für Superintelligenz“ USA stoppen Rechenzentren, Claude RSI, Starfall & Merz' KI-Steuer",
+   "kanal": "Everlast AI",
+   "datum": "2026-11-10",
+   "dauer_sekunden": 7384,
+   "stufe": "Einstieg",
+   "sprache": "de",
+   "bild": "BajLtMHISQU.jpg"
+  },
+  {
+   "id": "9Hwanevuhd8",
+   "titel": "Top 6 AI Productivity Tips for Work!",
+   "kanal": "Jeff Su",
+   "datum": "2026-11-10",
+   "dauer_sekunden": 1090,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "9Hwanevuhd8.jpg"
+  },
+  {
+   "id": "4uvq8Cz3A7Y",
+   "titel": "What Is Model Distillation? How Smaller AI Models Learn",
+   "kanal": "IBM Technology",
+   "datum": "2026-11-10",
+   "dauer_sekunden": 813,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "4uvq8Cz3A7Y.jpg"
+  },
+  {
+   "id": "1vUnEBsooCo",
+   "titel": "Prompt Agent vs. Agent Harness",
+   "kanal": "Microsoft Mechanics",
+   "datum": "2026-11-10",
+   "dauer_sekunden": 44,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "1vUnEBsooCo.jpg"
+  },
   {
    "id": "frXyEsq-qao",
    "titel": "You’ve Tried ChatGPT. But Have You Tried Grok?",
@@ -82,6 +212,16 @@
    "bild": "45-qbcAeUbM.jpg"
   },
   {
+   "id": "2TM8W66NI_8",
+   "titel": "Anthropic's Fable 5.2 is the World’s Best AI Model",
+   "kanal": "Matt Wolfe",
+   "datum": "2026-11-09",
+   "dauer_sekunden": 1247,
+   "stufe": "Einstieg",
+   "sprache": "en",
+   "bild": "2TM8W66NI_8.jpg"
+  },
+  {
    "id": "v0q266zAQ9M",
    "titel": "Es ist passiert: Die KI-Blase platzt in Amerika! DAS musst du jetzt wissen | KI-NEWS",
    "kanal": "Everlast AI",
@@ -160,233 +300,93 @@
    "stufe": "Einstieg",
    "sprache": "en",
    "bild": "A5SfzBD6M3o.jpg"
-  },
-  {
-   "id": "x_5JijpzprU",
-   "titel": "AI fixes AI in MIT study, Mistral's open model & Google Genie 4",
-   "kanal": "IBM Technology",
-   "datum": "2026-11-06",
-   "dauer_sekunden": 2155,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "x_5JijpzprU.jpg"
-  },
-  {
-   "id": "tm98JJCkAdk",
-   "titel": "KI-Update Deep-Dive: Wie Mistral mit ML4 im KI-Rennen aufholen will",
-   "kanal": "KI Update (heise)",
-   "datum": "2026-11-06",
-   "dauer_sekunden": 2717,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "tm98JJCkAdk.jpg"
-  },
-  {
-   "id": "ivug4z8DCCg",
-   "titel": "KI-Update Deep-Dive: Wie Mistral mit ML4 im KI-Rennen aufholen will - KI-Update – ein heise-Podcast",
-   "kanal": "KI Update (heise)",
-   "datum": "2026-11-06",
-   "dauer_sekunden": 2677,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "ivug4z8DCCg.jpg"
-  },
-  {
-   "id": "hJOwOkLHRN0",
-   "titel": "LifeVal: Measuring AI progress on the tasks that matter in everyday life.",
-   "kanal": "OpenAI",
-   "datum": "2026-11-06",
-   "dauer_sekunden": 65,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "hJOwOkLHRN0.jpg"
-  },
-  {
-   "id": "a__Rva9Wqek",
-   "titel": "Lokale KI: Das ist der aktuelle Stand",
-   "kanal": "c't 3003",
-   "datum": "2026-11-06",
-   "dauer_sekunden": 1371,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "a__Rva9Wqek.jpg"
-  },
-  {
-   "id": "XgC1QTs6A2U",
-   "titel": "The Future of AI Is Absolutely Incredible (Spencer Huang)",
-   "kanal": "Two Minute Papers",
-   "datum": "2026-11-06",
-   "dauer_sekunden": 2779,
-   "stufe": "Fortgeschritten",
-   "sprache": "en",
-   "bild": "XgC1QTs6A2U.jpg"
-  },
-  {
-   "id": "IrAHINf0M6E",
-   "titel": "AI News: New ChatGPT & Google Models (14 Updates Worth Knowing)",
-   "kanal": "Matt Wolfe",
-   "datum": "2026-11-06",
-   "dauer_sekunden": 1484,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "IrAHINf0M6E.jpg"
-  },
-  {
-   "id": "rXFV1ivDe6c",
-   "titel": "Are Vector Databases Still Needed? RAG, AI Agents & Search",
-   "kanal": "IBM Technology",
-   "datum": "2026-11-05",
-   "dauer_sekunden": 601,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "rXFV1ivDe6c.jpg"
-  },
-  {
-   "id": "pXRZyOxbDL4",
-   "titel": "How Mozilla strengthens Firefox security with GPT-6 Cyber",
-   "kanal": "OpenAI",
-   "datum": "2026-11-05",
-   "dauer_sekunden": 54,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "pXRZyOxbDL4.jpg"
-  },
-  {
-   "id": "hniPlxcQ7X4",
-   "titel": "What will people REALLY use these for?",
-   "kanal": "Matt Wolfe",
-   "datum": "2026-11-05",
-   "dauer_sekunden": 79,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "hniPlxcQ7X4.jpg"
-  },
-  {
-   "id": "dOTPE-v7NiA",
-   "titel": "MiniMax M3.1 Flash kostet fast nichts. Taugt es was?",
-   "kanal": "The Morpheus Tutorials",
-   "datum": "2026-11-05",
-   "dauer_sekunden": 3308,
-   "stufe": "Fortgeschritten",
-   "sprache": "de",
-   "bild": "dOTPE-v7NiA.jpg"
-  },
-  {
-   "id": "btMoPRHz8eM",
-   "titel": "How to Use Ollama (Free Local AI)",
-   "kanal": "Kevin Stratvert",
-   "datum": "2026-11-05",
-   "dauer_sekunden": 400,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "btMoPRHz8eM.jpg"
-  },
-  {
-   "id": "bJldMYfRvMQ",
-   "titel": "Introducing ChatGPT Images 2.6",
-   "kanal": "OpenAI",
-   "datum": "2026-11-05",
-   "dauer_sekunden": 35,
-   "stufe": "Einstieg",
-   "sprache": "en",
-   "bild": "bJldMYfRvMQ.jpg"
-  },
-  {
-   "id": "YajzUoRKSNQ",
-   "titel": "Astronaut: Was bis 2030 kommt, wird keiner glauben! Roboter, Mond-Hotels, Dyson-Sphären & Aliens",
-   "kanal": "Everlast AI",
-   "datum": "2026-11-05",
-   "dauer_sekunden": 4341,
-   "stufe": "Einstieg",
-   "sprache": "de",
-   "bild": "YajzUoRKSNQ.jpg"
   }
  ],
  "kanaele": {
   "c't 3003": {
    "error": null,
-   "versucht": "2026-11-09",
-   "abgerufen": "2026-11-09"
+   "versucht": "2026-11-10",
+   "abgerufen": "2026-11-10"
   },
   "KI Update (heise)": {
    "error": null,
-   "versucht": "2026-11-09",
-   "abgerufen": "2026-11-09"
+   "versucht": "2026-11-10",
+   "abgerufen": "2026-11-10"
   },
   "Everlast AI": {
    "error": null,
-   "versucht": "2026-11-09",
-   "abgerufen": "2026-11-09"
+   "versucht": "2026-11-10",
+   "abgerufen": "2026-11-10"
   },
   "The Morpheus Tutorials": {
    "error": null,
-   "versucht": "2026-11-09",
-   "abgerufen": "2026-11-09"
+   "versucht": "2026-11-10",
+   "abgerufen": "2026-11-10"
   },
   "Kevin Stratvert": {
    "error": null,
-   "versucht": "2026-11-09",
-   "abgerufen": "2026-11-09"
+   "versucht": "2026-11-10",
+   "abgerufen": "2026-11-10"
   },
   "Microsoft Mechanics": {
    "error": null,
-   "versucht": "2026-11-09",
-   "abgerufen": "2026-11-09"
+   "versucht": "2026-11-10",
+   "abgerufen": "2026-11-10"
   },
   "Leila Gharani": {
    "error": null,
-   "versucht": "2026-11-09",
-   "abgerufen": "2026-11-09"
+   "versucht": "2026-11-10",
+   "abgerufen": "2026-11-10"
   },
   "Jeff Su": {
    "error": null,
-   "versucht": "2026-11-09",
-   "abgerufen": "2026-11-09"
+   "versucht": "2026-11-10",
+   "abgerufen": "2026-11-10"
   },
   "Matt Wolfe": {
    "error": null,
-   "versucht": "2026-11-09",
-   "abgerufen": "2026-11-09"
+   "versucht": "2026-11-10",
+   "abgerufen": "2026-11-10"
   },
   "IBM Technology": {
    "error": null,
-   "versucht": "2026-11-09",
-   "abgerufen": "2026-11-09"
+   "versucht": "2026-11-10",
+   "abgerufen": "2026-11-10"
   },
   "OpenAI": {
    "error": null,
-   "versucht": "2026-11-09",
-   "abgerufen": "2026-11-09"
+   "versucht": "2026-11-10",
+   "abgerufen": "2026-11-10"
   },
   "Anthropic": {
    "error": null,
-   "versucht": "2026-11-09",
-   "abgerufen": "2026-11-09"
+   "versucht": "2026-11-10",
+   "abgerufen": "2026-11-10"
   },
   "Google DeepMind": {
    "error": null,
-   "versucht": "2026-11-09",
-   "abgerufen": "2026-11-09"
+   "versucht": "2026-11-10",
+   "abgerufen": "2026-11-10"
   },
   "AI Explained": {
    "error": null,
-   "versucht": "2026-11-09",
-   "abgerufen": "2026-11-09"
+   "versucht": "2026-11-10",
+   "abgerufen": "2026-11-10"
   },
   "Two Minute Papers": {
    "error": null,
-   "versucht": "2026-11-09",
-   "abgerufen": "2026-11-09"
+   "versucht": "2026-11-10",
+   "abgerufen": "2026-11-10"
   },
   "3Blue1Brown": {
    "error": null,
-   "versucht": "2026-11-09",
-   "abgerufen": "2026-11-09"
+   "versucht": "2026-11-10",
+   "abgerufen": "2026-11-10"
   },
   "David Ondrej": {
    "error": null,
-   "versucht": "2026-11-09",
-   "abgerufen": "2026-11-09"
+   "versucht": "2026-11-10",
+   "abgerufen": "2026-11-10"
   }
  },
  "error": null
