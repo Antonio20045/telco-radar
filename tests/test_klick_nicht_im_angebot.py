@@ -144,6 +144,7 @@ def test_gerenderte_seite_zeigt_den_satz_in_der_telekom_zeile(tmp_path, katalog)
     pfad = tmp_path / "data" / "state" / "geraete_tco.json"
     daten = json.loads(pfad.read_text(encoding="utf-8"))
     daten["erfassung"] = _erfassung(_datei(), katalog)
+    daten["updated"] = TAG
     pfad.write_text(json.dumps(daten, ensure_ascii=False), encoding="utf-8")
     render_site(tmp_path / "site", berichte, load_config(tmp_path))
     seite = (tmp_path / "site" / "geraete.html").read_text(encoding="utf-8")

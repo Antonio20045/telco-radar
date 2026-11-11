@@ -17,6 +17,7 @@ Sortiments-Aussage im Grund, heute <= `bis`). Kein Abruf, nur Config und Bündel
 
 from __future__ import annotations
 
+from ..analyze.klick_erfassung import KEINE_NEUGERAETE, Neugeraete
 from .geraete_sortiment import gueltiger_beleg, stufe
 
 KURZ = "Nicht im Sortiment (geprüft {geprueft})"
@@ -39,10 +40,13 @@ def _voll(wert) -> str:
     return f"{_tag(wert)}{wert.year}"
 
 
-def fuer_modell(belege: dict, modell: dict, heute: str) -> dict[str, dict]:
+def fuer_modell(
+    belege: dict, modell: dict, heute: str, neu: Neugeraete = KEINE_NEUGERAETE
+) -> dict[str, dict]:
     """{Anbieter: Lücke} für ein Modell der Seite: gültig belegt und ohne jeden
     gültigen neuen Preis des Anbieters in diesem Modell (ein von der Lücke überholter
-    Preis, `nicht_im_sortiment`, zählt nicht)."""
+    Preis, `nicht_im_sortiment`, zählt nicht) und ohne lieferbares Neugerät derselben
+    Kombination im Radar (`neu`, Widerspruchsregel: dann Messlücke)."""
     device_id, gb = modell.get("device_id"), stufe(modell.get("speicher"))
     mit_preis = {
         k.get("anbieter")
@@ -54,6 +58,8 @@ def fuer_modell(belege: dict, modell: dict, heute: str) -> dict[str, dict]:
     aus: dict[str, dict] = {}
     for anbieter in {k[0] for k in belege}:
         if anbieter in mit_preis or not device_id:
+            continue
+        if (anbieter, device_id, modell.get("speicher")) in neu.speicher:
             continue
         beleg = gueltiger_beleg(belege, anbieter, device_id, heute, gb)
         if beleg:
