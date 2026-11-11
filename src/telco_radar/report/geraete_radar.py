@@ -922,9 +922,7 @@ def nicht_erhebbar(quellenlage: dict) -> list[dict]:
     config/geraete_quellen.yaml) - keine zweite Einschätzung."""
     out = []
     for z in (quellenlage or {}).get("zeilen", []):
-        if (z.get("typ") or "") != "handel":
-            continue
-        if z.get("zustand") == "liefert":
+        if (z.get("typ") or "") != "handel" or z.get("zustand") == "liefert":
             continue
         out.append(
             {
@@ -964,7 +962,9 @@ def radar(
         tco.get("modelle", []), band_je_tarif, _band_rang(tco.get("baender_katalog"))
     )
     haendler = haendler_zeilen(vergleich_ohne_vertrag)
-    fehlt = nicht_erhebbar(quellenlage)
+    from .geraete_tarifwelt_lage import ohne_lieferndes
+
+    fehlt = ohne_lieferndes(nicht_erhebbar(quellenlage), quellenlage, tco)
     hat_vergleichbare = any(
         z["prozent"] is not None for g in gruppen for z in g["zeilen"]
     )
