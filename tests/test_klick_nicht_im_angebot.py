@@ -25,7 +25,8 @@ from telco_radar.report.html import render_site
 
 TAG = "2026-10-09"
 SATZ = "Bei Telekom nicht im Angebot (Übersicht vom 09.10.2026 ganz gelesen)"
-NUR_256 = "Bei Telekom nur mit 256 GB gelesen (09.10.2026)"
+NUR_256 = "Bei Telekom noch nicht erfasst (gelesen: 256 GB, 09.10.2026)"
+TELEFONE = {"Telekom": frozenset({"telefon"})}
 X = "apple-iphone-17-pro"
 Y = "apple-iphone-17"
 TARIFE = ("MF_17791", "MF_17779", "MF_17785", "MF_17797", "MF_17803")
@@ -85,7 +86,9 @@ def _datei(*, dritte: dict | None = None, extra: list[dict] = ()) -> dict:
 
 
 def _erfassung(datei: dict, katalog) -> dict[str, str]:
-    zug = fuehre_zusammen([], [datei], katalog, TAG, lambda sku: ("", None))
+    zug = fuehre_zusammen(
+        [], [datei], katalog, TAG, lambda sku: ("", None), klassen=TELEFONE
+    )
     return zug.erfassung
 
 
@@ -135,7 +138,9 @@ def test_gegenprobe_anderer_speicher_zaehlt_als_angeboten(katalog):
 
 
 def test_gegenprobe_veraltete_datei_kein_satz(katalog):
-    zug = fuehre_zusammen([], [_datei()], katalog, "2026-10-10", lambda s: ("", None))
+    zug = fuehre_zusammen(
+        [], [_datei()], katalog, "2026-10-10", lambda s: ("", None), klassen=TELEFONE
+    )
     assert fuer_modell(zug.erfassung, {"karten": [], "device_id": X}) == {}
 
 
@@ -144,6 +149,7 @@ def test_gerenderte_seite_zeigt_den_satz_in_der_telekom_zeile(tmp_path, katalog)
     pfad = tmp_path / "data" / "state" / "geraete_tco.json"
     daten = json.loads(pfad.read_text(encoding="utf-8"))
     daten["erfassung"] = _erfassung(_datei(), katalog)
+    daten["updated"] = TAG
     pfad.write_text(json.dumps(daten, ensure_ascii=False), encoding="utf-8")
     render_site(tmp_path / "site", berichte, load_config(tmp_path))
     seite = (tmp_path / "site" / "geraete.html").read_text(encoding="utf-8")

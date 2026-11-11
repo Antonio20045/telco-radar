@@ -1,4 +1,4 @@
-"""„Bei Telekom nur mit 256 GB gelesen“ statt „Seite sperrt automatisches Lesen“.
+"""„Bei Telekom noch nicht erfasst (gelesen: 256 GB, …)“ statt „Seite sperrt …“.
 
 Antonio, 10.10.2026: Beim Google Pixel 10 (128 GB) stand in der Telekom-Zeile „Telekom
 nicht erfasst: Seite sperrt automatisches Lesen (HTTP 202, 10.10.2026)“. Die Telekom-
@@ -36,7 +36,7 @@ GESPERRT = (
     "https://www.telekom.de/resources/ag2/legalnote-replacer/build/p.js)"
 )
 PIXEL = "google-pixel-10"
-SATZ = "Bei Telekom nur mit 256 GB gelesen (10.10.2026)"
+SATZ = "Bei Telekom noch nicht erfasst (gelesen: 256 GB, 10.10.2026)"
 
 
 @pytest.fixture(scope="module")
@@ -144,7 +144,8 @@ def test_geraeteliste_allein_belegt_kein_angebot():
     """Preisprüfung 11.10.2026, Punkt f: o2 führt das iPhone 17 Pro in seiner
     Geräteliste nur mit 256 GB, die Klick-Seite las am 12.10.2026 aber 512 GB. Die
     Liste belegt darum nicht, dass ein nicht gelesener Speicher fehlt: der Satz bleibt
-    „nur mit 256 GB gelesen“. Gegenprobe: eine gesperrt gezeigte Seite belegt es."""
+    „noch nicht erfasst (gelesen: 256 GB)“. Gegenprobe: eine gesperrt gezeigte Seite
+    belegt es."""
     eintrag = {
         "anbieter": "o2",
         "datum": "2026-10-11",
@@ -168,7 +169,9 @@ def test_geraeteliste_allein_belegt_kein_angebot():
     assert erfassungsgruende({"dateien": [eintrag]})[schluessel] == gelesen
     gesperrt = {"apple-iphone-17-pro": {"gesperrt": [512, 1024]}}
     mit_beleg = {**eintrag, "speicher_seite": gesperrt}
-    assert erfassungsgruende({"dateien": [mit_beleg]})[schluessel] == angebot
+    assert erfassungsgruende({"dateien": [mit_beleg]})[schluessel] == gelesen
+    eindeutig = {**mit_beleg, "sperre_eindeutig": True}
+    assert erfassungsgruende({"dateien": [eindeutig]})[schluessel] == angebot
 
 
 class _Liste:

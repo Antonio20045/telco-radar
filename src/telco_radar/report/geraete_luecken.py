@@ -181,7 +181,8 @@ def _kein_buendel_zeile(lu: dict, band_labels: dict, h: int, erfassung: dict) ->
     if satz and (treffer := _SPEICHER_ANGEBOT_MUSTER.fullmatch(satz)):
         return _zeile(lu, f"Nur mit {treffer['speicher']} im Angebot", satz)
     if satz and (treffer := _SPEICHER_MUSTER.fullmatch(satz)):
-        return _zeile(lu, f"Nur mit {treffer['speicher']} gelesen", satz)
+        kurz = f"{NOCH_NICHT_ERFASST} (gelesen: {treffer['speicher']})"
+        return _zeile(lu, kurz, satz)
     if lu.get("stufe_ohne_tarif"):
         return _ohne_tarif_zeile(lu, band_labels, h)
     satz = satz or KEIN_ANGEBOT_GELESEN.format(anbieter=lu["anbieter"])

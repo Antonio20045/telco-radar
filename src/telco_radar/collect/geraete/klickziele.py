@@ -33,6 +33,7 @@ from urllib.parse import urlsplit
 import yaml
 
 from ...geraete_config import lade_katalog, lade_quellen
+from ...geraete_klasse import KLASSEN
 from ...geraete_model import Katalog
 from .klickliste_auto import KlicklisteAutoFehler, leite_ab
 from .robots import host_von
@@ -288,6 +289,47 @@ def _text(daten: dict, feld: str, ort: str) -> str:
     if not isinstance(wert, str) or not wert.strip():
         raise ErkundungszielFehler(f"{ort}: {feld} fehlt oder ist leer")
     return wert.strip()
+
+
+def karten_mit_farbmarke(root: Path) -> frozenset[str]:
+    """Namen (ohne Endung) der Karten, die an der Speicherwahl „nur in anderer Farbe“
+    markieren (``andere_farbe``). Nur dort heißt ein gesperrter Speicher, dass die
+    Seite ihn in keiner Farbe führt; ohne Marke kann er in einer anderen Farbe da sein
+    (Telekom Pixel 11: 512 GB in Frost gesperrt, in Obsidian bestellbar). Eine
+    unlesbare Karte zählt nicht (fail-closed)."""
+    namen = set()
+    for pfad in (root / KARTEN).glob("*.yaml"):
+        try:
+            roh = yaml.safe_load(pfad.read_text(encoding="utf-8"))
+            if roh["knoepfe"]["speicher"].get("andere_farbe"):
+                namen.add(pfad.stem)
+        except (OSError, yaml.YAMLError, KeyError, TypeError, AttributeError):
+            log.warning("Karte %s: Speicherwahl nicht lesbar", pfad.name)
+    return frozenset(namen)
+
+
+def uebersicht_klassen(root: Path) -> dict[str, frozenset[str]]:
+    """Je Anbietername die Geräteklassen (``geraete_klasse.KLASSEN``), die seine
+    Übersichten abdecken (``uebersicht_klassen`` der Einträge in ``TAGESDATEI``, bei
+    mehreren Einträgen des Namens vereint). „Nicht im Angebot“ gilt nur für eine
+    abgedeckte Klasse, sonst ist es eine Messlücke. Fehlt die Angabe, ist die Datei
+    unlesbar oder die Klasse unbekannt, deckt die Übersicht nichts ab (fail-closed)."""
+    try:
+        roh = yaml.safe_load((root / TAGESDATEI).read_text(encoding="utf-8"))
+        eintraege = roh["anbieter"]
+    except (OSError, yaml.YAMLError, KeyError, TypeError):
+        log.warning("%s: Übersichtsklassen nicht lesbar", TAGESDATEI.name)
+        return {}
+    klassen: dict[str, set[str]] = {}
+    for eintrag in eintraege:
+        angabe = (
+            eintrag.get("uebersicht_klassen") if isinstance(eintrag, dict) else None
+        )
+        if isinstance(angabe, list) and eintrag.get("name"):
+            klassen.setdefault(str(eintrag["name"]), set()).update(
+                k for k in angabe if k in KLASSEN
+            )
+    return {name: frozenset(k) for name, k in klassen.items()}
 
 
 def geplante_anbieter(root: Path) -> list[str] | None:

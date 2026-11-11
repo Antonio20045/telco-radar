@@ -65,12 +65,11 @@ Werte zuerst - Begruendung in `outputs/rad1-2026-09-08.md`.
 
 from __future__ import annotations
 
-from typing import Optional
-
 from ..tco_model import zeitraum_vergleichbar
 from . import geraete_notbremse as notbremse
 from . import geraete_tco_band, geraete_tco_karten
 from .geraete_laufzeit import LAUFZEIT_STANDARD, LAUFZEITEN, ansicht
+from .geraete_widerspruch import erneuert_satz
 from .geraete_zeitraum_wort import grund_anderer_zeitraum, zeitraum_der_karte
 
 NETZ_WETTBEWERBER = tuple(
@@ -95,7 +94,7 @@ MODELLISTE_SICHTBAR = 5
 GRAFIK_MAX = 12
 
 
-def _band_label(band: Optional[str]) -> str:
+def _band_label(band: str | None) -> str:
     return geraete_tco_band.band_label(band) or "nicht bestimmbar"
 
 
@@ -111,7 +110,7 @@ def _beleg(quelle_url: str, abgerufen_am: str) -> dict:
     return {"quelle_url": quelle_url or "", "abgerufen_am": abgerufen_am or ""}
 
 
-def _vodafone_basis(modell: dict, band_je_tarif: dict) -> Optional[dict]:
+def _vodafone_basis(modell: dict, band_je_tarif: dict) -> dict | None:
     """Die EINE Vodafone-Referenz dieses Geraets, mit ihrem Tarifband.
 
     `ref["aus_buendel"]` steht nur, wenn `_referenz_aus_buendel` sie gebaut
@@ -148,7 +147,7 @@ def _notbremse_satz(karte: dict | None) -> str:
 
 
 def _zeile_fuer_anbieter(
-    anbieter: str, karte: Optional[dict], basis: dict, band_je_tarif: dict
+    anbieter: str, karte: dict | None, basis: dict, baender: dict, neu: bool = False
 ) -> dict:
     """Eine Zeile des Wettbewerbers gegen die Vodafone-Basis dieses Geraets."""
     grund = "" if karte is None else (karte.get("leer_grund") or "")
@@ -198,15 +197,11 @@ def _zeile_fuer_anbieter(
             "tarif": karte.get("tarif", ""),
             "band": None,
             "band_label": "",
-            "grund": (
-                f"{anbieter} führt für dieses Gerät nur ein "
-                f"{karte.get('zustand_etikett') or 'nicht neues'} "
-                "Gerät – kein Vergleich gegen ein Neugerät."
-            ),
+            "grund": erneuert_satz(anbieter, karte.get("zustand_etikett"), neu),
             **_beleg(karte.get("quelle_url", ""), karte.get("abgerufen_am", "")),
         }
 
-    band = geraete_tco_band.band_der_karte(band_je_tarif, karte)
+    band = geraete_tco_band.band_der_karte(baender, karte)
     if basis["band"] is None or band is None or band != basis["band"]:
         vf_band = basis["band_label"]
         wb_band = _band_label(band)
@@ -263,7 +258,9 @@ def _zeile_fuer_anbieter(
     }
 
 
-def _paar_zeile(anbieter: str, band: str, wb_karte: dict, vf_karte: dict) -> dict:
+def _paar_zeile(
+    anbieter: str, band: str, wb_karte: dict, vf_karte: dict, neu: bool = False
+) -> dict:
     """Vergleichbare Zeile: beide Karten liegen im SELBEN Band, und die
     Abweichung rechnet gegen VODAFONES KARTE IN DIESEM BAND - nicht gegen
     die Referenz des Geraets (Grund im Modulkopf, BASIS JE GERAET).
@@ -279,11 +276,7 @@ def _paar_zeile(anbieter: str, band: str, wb_karte: dict, vf_karte: dict) -> dic
             "tarif": wb_karte.get("tarif", ""),
             "band": band,
             "band_label": _band_label(band),
-            "grund": (
-                f"{anbieter} führt für dieses Gerät nur ein "
-                f"{wb_karte.get('zustand_etikett') or 'nicht neues'} "
-                "Gerät – kein Vergleich gegen ein Neugerät."
-            ),
+            "grund": erneuert_satz(anbieter, wb_karte.get("zustand_etikett"), neu),
             **_beleg(wb_karte.get("quelle_url", ""), wb_karte.get("abgerufen_am", "")),
         }
     raten = (ansicht(wb_karte), ansicht(vf_karte))
@@ -361,7 +354,9 @@ def _vf_zaehlt(je: dict) -> bool:
     return "Vodafone" in je and je["Vodafone"][0].get("vergleichbar", True)
 
 
-def _paar_zeilen(anbieter: str, alle_je: dict, band_rang: dict) -> list[dict]:
+def _paar_zeilen(
+    anbieter: str, alle_je: dict, band_rang: dict, neu: bool = False
+) -> list[dict]:
     """Jede Karte des Wettbewerbers in einem Band, in dem Vodafone eine Karte
     führt: gegen Vodafones Karte derselben Ratenlaufzeit, sonst als benannte
     Zeile gegen die Vodafone-Karte des Bandes (24 Raten zuerst) - verglichen
@@ -380,7 +375,7 @@ def _paar_zeilen(anbieter: str, alle_je: dict, band_rang: dict) -> list[dict]:
     ):
         je = alle_je[lz][b]
         vf = je["Vodafone"][0] if _vf_zaehlt(je) else vf_im_band[b]
-        zeilen += [_paar_zeile(anbieter, b, k, vf) for k in je[anbieter]]
+        zeilen += [_paar_zeile(anbieter, b, k, vf, neu) for k in je[anbieter]]
     return zeilen
 
 
@@ -448,11 +443,14 @@ def netzbetreiber_gruppen(
         for a in ALLE_WETTBEWERBER:
             if a not in NETZ_WETTBEWERBER and a not in hat_karte:
                 continue
-            if paare := _paar_zeilen(a, alle_je, band_rang):
+            neben_neu = a in modell.get("neu_da", [])
+            if paare := _paar_zeilen(a, alle_je, band_rang, neben_neu):
                 zeilen += paare
                 continue
             karte = uebrig.get(a) or ungefiltert.get(a) or erfasst.get(a)
-            zeilen.append(_zeile_fuer_anbieter(a, karte, basis, band_je_tarif))
+            zeilen.append(
+                _zeile_fuer_anbieter(a, karte, basis, band_je_tarif, neben_neu)
+            )
         zeilen.sort(
             key=lambda z: z["prozent"] if z["prozent"] is not None else float("inf")
         )
