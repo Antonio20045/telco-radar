@@ -68,8 +68,9 @@ from __future__ import annotations
 from typing import Optional
 
 from ..tco_model import zeitraum_vergleichbar
+from . import geraete_eigen_pruefung, geraete_tco_band, geraete_tco_karten
 from . import geraete_notbremse as notbremse
-from . import geraete_tco_band, geraete_tco_karten
+from .geraete_eigen_pruefung import KURZ_NICHT_ERHOBEN
 from .geraete_laufzeit import LAUFZEIT_STANDARD, LAUFZEITEN, ansicht
 from .geraete_zeitraum_wort import grund_anderer_zeitraum, zeitraum_der_karte
 
@@ -435,10 +436,7 @@ def netzbetreiber_gruppen(
                     "hersteller": modell["hersteller"],
                     "speicher": modell["speicher"],
                     "vodafone": None,
-                    "vodafone_grund": (
-                        "Keine Vodafone-Kosten für dieses Gerät erhoben – "
-                        "kein Bündel und kein eigener Barpreis."
-                    ),
+                    **geraete_eigen_pruefung.ohne_basis(modell),
                     "zeilen": zeilen,
                     "rang": float("inf"),
                 }
@@ -536,7 +534,7 @@ def modellliste(gruppen: list[dict]) -> dict:
         sprung_band = ""
         if paar is None:
             if g["vodafone"] is None:
-                luecke = "keine Vodafone-Kosten erhoben"
+                luecke = g.get("vodafone_luecke") or KURZ_NICHT_ERHOBEN
             else:
                 luecke = "kein Vergleich"
                 for status in (

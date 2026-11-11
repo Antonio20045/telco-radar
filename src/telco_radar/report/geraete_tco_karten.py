@@ -1356,7 +1356,7 @@ def modelle(
             {k["raten_laufzeit"] for k in karten if k["raten_laufzeit"]}
         )
         naeherung = None
-        if not geraete_laufzeit.zaehlende_eigene(karten):
+        if geraete_laufzeit.naeherung_erlaubt(karten):
             naeherung = _vodafone_referenz(referenzen, tarife, belege_modell)
         for k in karten:
             k["band"] = band_der_karte(band_je_tarif, k)

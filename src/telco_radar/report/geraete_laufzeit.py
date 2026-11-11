@@ -14,6 +14,7 @@ eigenen Band der Maßstab, und nur, wo Vodafone kein Bündel hat (`modelle()`).
 from __future__ import annotations
 
 from ..tco_model import TCO_HORIZONT
+from . import geraete_eigen_pruefung as eigen_pruefung
 from . import geraete_notbremse as notbremse
 from . import geraete_tco_karten as karten_modul
 
@@ -192,6 +193,15 @@ def zaehlende_eigene(karten: list) -> list:
         for k in filter(notbremse.zaehlt, karten)
         if k["eigen"] and k["belastbar"] and k["vergleichbar"] and k["frisch"]
     ]
+
+
+def naeherung_erlaubt(karten: list) -> bool:
+    """Darf die Näherung (Tarif ohne Gerät plus Barpreis) die Vodafone-Zahl stellen?
+
+    Nur, wenn kein eigenes Bündel zählt und die Prüfstelle auch keines zurückhält:
+    ein Preis in Prüfung wird nicht durch eine Rechnung ersetzt
+    (`geraete_eigen_pruefung`)."""
+    return not zaehlende_eigene(karten) and not eigen_pruefung.zurueckgehalten(karten)
 
 
 def referenzen(karten: list) -> dict:
